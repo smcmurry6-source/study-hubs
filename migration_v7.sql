@@ -1,0 +1,5 @@
+-- Not needed -- do not run.
+-- The "class performance" feature this was drafted for ended up reusing
+-- the existing question_stats(hub,qid,attempts,correct) table (already
+-- populated and already readable anonymously via the "Toughest questions"
+-- panel), so no new table or RPC was required after all.

@@ -1,0 +1,62 @@
+/* ============ SHARED STUDY-HUB WIDGET (class stats / popular / online-now /
+   my stats / toughest questions / search / flag / suggest / back-to-index) ============
+   One file, loaded by every hub via <link rel="stylesheet" href="../../widget/v3.css">.
+   Editing this file updates every hub at once — no more copy-pasting into each
+   hub's HTML and re-truncating/re-appending by hand. */
+#shstat-root{position:fixed; right:16px; bottom:16px; z-index:9999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+#shstat-root *{box-sizing:border-box;}
+.shstat-pillrow{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+.shstat-pill{display:flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent;}
+.shstat-pill:hover{border-color:rgba(255,255,255,.32);}
+.shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
+@media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
+@keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+#shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
+#shstat-panel, #shstat-searchpanel{max-height:64vh; overflow-y:auto;}
+#shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{display:block;}
+#shstat-panel h5, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
+#shstat-panel .shstat-sec{margin-bottom:16px;}
+#shstat-panel .shstat-sec:last-child{margin-bottom:0;}
+.shstat-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:12.5px; line-height:1.4;}
+.shstat-row:last-child{border-bottom:none;}
+.shstat-row .shstat-label{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.shstat-row .shstat-val{flex:none; font-variant-numeric:tabular-nums; color:#f2f2f0; font-weight:700;}
+.shstat-row .shstat-val.shstat-bad{color:#f0806b;}
+.shstat-row .shstat-val.shstat-ok{color:#3ecf7e;}
+.shstat-row .shstat-attempts{flex:none; font-size:10.5px; color:#7a7a80; margin-left:6px;}
+.shstat-empty{font-size:12px; color:#a7a7ac; padding:4px 0;}
+.shstat-close{position:absolute; top:10px; right:10px; background:none; border:none; color:#a7a7ac; font-size:16px; line-height:1; cursor:pointer; padding:4px;}
+.shstat-hist{display:flex; align-items:flex-end; gap:2px; height:54px; margin-top:6px;}
+.shstat-hbar{flex:1; background:linear-gradient(180deg, rgba(62,207,126,.85), rgba(62,207,126,.32)); border-radius:2px 2px 0 0; min-height:2px;}
+.shstat-hlabels{display:flex; justify-content:space-between; font-size:9px; color:#7a7a80; margin-top:4px;}
+#shstat-flagpanel textarea, #shstat-suggestpanel textarea{width:100%; min-height:64px; resize:vertical; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:12.5px; padding:8px; margin-top:2px;}
+#shstat-flagpanel button.shstat-send, #shstat-suggestpanel button.shstat-send{margin-top:9px; background:#3ecf7e; color:#0b1a12; border:none; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer;}
+#shstat-flagpanel button.shstat-send:disabled, #shstat-suggestpanel button.shstat-send:disabled{opacity:.5; cursor:default;}
+.shstat-flagmsg{font-size:11.5px; color:#a7a7ac; margin-top:7px; min-height:14px;}
+.shstat-name-row{display:flex; gap:6px; margin-top:10px;}
+.shstat-name-row input{flex:1; min-width:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:11.5px; padding:6px 8px;}
+.shstat-name-row button{background:#3ecf7e; color:#0b1a12; border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer; flex:none;}
+.shstat-name-row button:disabled{opacity:.5; cursor:default;}
+.shstat-namemsg{font-size:10.5px; color:#a7a7ac; margin-top:5px; min-height:13px;}
+.shstat-streaktoast{position:fixed; z-index:10001; left:50%; top:16%; background:rgba(20,20,24,.94); color:#f2f2f0; font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px; box-shadow:0 12px 40px rgba(0,0,0,.4); pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.9); transition:opacity .25s, transform .25s; white-space:nowrap;}
+.shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
+.shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
+
+/* ---------- search panel ---------- */
+#shstat-searchpanel input[type="text"]{width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:13px; padding:8px 10px; margin-bottom:10px;}
+.shstat-search-sec{margin-bottom:14px;}
+.shstat-search-sec:last-child{margin-bottom:0;}
+.shstat-search-lec{font-size:12.5px; color:#f2f2f0; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08);}
+.shstat-search-lec:last-child{border-bottom:none;}
+.shstat-search-q{padding:8px 0; border-bottom:1px solid rgba(255,255,255,.08); cursor:pointer;}
+.shstat-search-q:last-child{border-bottom:none;}
+.shstat-search-q .sq-text{font-size:12.5px; color:#f2f2f0; line-height:1.4;}
+.shstat-search-q .sq-lec{font-size:10px; color:#7a7a80; margin-top:3px;}
+.shstat-search-q .sq-hint{font-size:11.5px; color:#9fe0b8; margin-top:6px; line-height:1.4; display:none;}
+.shstat-search-q.is-open .sq-hint{display:block;}
+
+/* ---------- back-to-index pill ---------- */
+#shhome-pill{position:fixed; left:16px; top:16px; z-index:9999; display:inline-flex; align-items:center; gap:7px; background:rgba(20,20,24,.92); color:#f2f2f0; text-decoration:none; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:8px 14px 8px 12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12.5px; font-weight:600; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28);}
+#shhome-pill:hover{border-color:rgba(255,255,255,.32);}
+#shhome-pill svg{width:13px; height:13px; flex:none;}
+@media (max-width:520px){ #shhome-pill span{display:none;} #shhome-pill{padding:9px;} }

@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "static", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8765"], "port": 8765 },
+    { "name": "costume-gallery", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8766", "--directory", "C:/Users/smcmu/AppData/Local/Temp/claude/C--Users-smcmu-OneDrive-Documents-study-hubs/cfe3daee-1841-491b-b929-2a9af3d4fb3c/scratchpad"], "port": 8766 }
+  ]
+}
