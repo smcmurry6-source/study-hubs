@@ -1,0 +1,263 @@
+<title>Study Hub Index</title>
+<meta name="description" content="Every study hub Sam has built, in one place — Dental Genetics, Hepatobiliary, and Fixed Prosthodontics, with more added each exam.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#1B2432;
+  --ink-2:#4A5468;
+  --ink-3:#7C859A;
+  --paper:#EDEFEC;
+  --paper-2:#E4E7E1;
+  --card:#FFFFFF;
+  --line:#D7DAD3;
+  --line-strong:#C2C7BC;
+
+  --accent:#4B4FA0;
+  --accent-ink:#33356F;
+  --accent-soft:#E6E5F5;
+
+  --hub-genetics:#246B64;
+  --hub-genetics-soft:#DCEAE7;
+  --hub-gi:#A8752A;
+  --hub-gi-soft:#F0E0BE;
+  --hub-pros:#A94E34;
+  --hub-pros-soft:#F3DED4;
+
+  --shadow:0 1px 2px rgba(20,25,15,.05), 0 10px 28px -14px rgba(20,25,15,.22);
+  --shadow-lg:0 6px 16px -6px rgba(20,25,15,.14), 0 24px 48px -18px rgba(20,25,15,.30);
+  --r-m:12px; --r-l:18px; --r-pill:999px;
+
+  --font-display:'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body:'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:'Space Mono', 'SF Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E9ECE6;
+    --ink-2:#B7BFB2;
+    --ink-3:#828C7E;
+    --paper:#171A16;
+    --paper-2:#1E221C;
+    --card:#20241F;
+    --line:#333A2F;
+    --line-strong:#454E3F;
+
+    --accent:#9497D6;
+    --accent-ink:#C9CBEF;
+    --accent-soft:#282A50;
+
+    --hub-genetics:#6FC2B8;
+    --hub-genetics-soft:#16302D;
+    --hub-gi:#D9A94A;
+    --hub-gi-soft:#332813;
+    --hub-pros:#DE8262;
+    --hub-pros-soft:#3B241C;
+
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.5);
+    --shadow-lg:0 6px 16px -6px rgba(0,0,0,.4), 0 24px 48px -18px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E9ECE6; --ink-2:#B7BFB2; --ink-3:#828C7E;
+  --paper:#171A16; --paper-2:#1E221C; --card:#20241F;
+  --line:#333A2F; --line-strong:#454E3F;
+  --accent:#9497D6; --accent-ink:#C9CBEF; --accent-soft:#282A50;
+  --hub-genetics:#6FC2B8; --hub-genetics-soft:#16302D;
+  --hub-gi:#D9A94A; --hub-gi-soft:#332813;
+  --hub-pros:#DE8262; --hub-pros-soft:#3B241C;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.5);
+  --shadow-lg:0 6px 16px -6px rgba(0,0,0,.4), 0 24px 48px -18px rgba(0,0,0,.6);
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; scroll-behavior:auto!important;}
+}
+
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--font-body); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2{font-family:var(--font-display); font-weight:600; margin:0; text-wrap:balance; color:var(--ink);}
+p{margin:0;}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+::selection{background:var(--accent-soft); color:var(--accent-ink);}
+:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:4px;}
+.mono{font-family:var(--font-mono);}
+
+#wrap{max-width:840px; margin:0 auto; padding:0 22px 90px;}
+
+/* ============ HEADER ============ */
+header{padding:56px 0 40px; border-bottom:1px solid var(--line);}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:16px;
+}
+.eyebrow .drawer-icon{
+  width:16px; height:12px; border:1.4px solid var(--ink-3); border-radius:2px; position:relative; flex:none;
+}
+.eyebrow .drawer-icon::after{content:""; position:absolute; left:5px; right:5px; top:3px; height:1.4px; background:var(--ink-3);}
+header h1{font-size:clamp(32px,5vw,44px); letter-spacing:-.01em;}
+header .lede{font-size:16px; color:var(--ink-2); max-width:56ch; margin-top:14px; line-height:1.65;}
+header .lede b{color:var(--ink); font-weight:600;}
+.header-meta{display:flex; gap:20px; flex-wrap:wrap; margin-top:24px; font-family:var(--font-mono); font-size:12.5px; color:var(--ink-3);}
+.header-meta span b{color:var(--ink-2); font-weight:700;}
+
+/* ============ LEDGER ============ */
+.ledger{margin-top:8px;}
+.ledger-row{
+  display:grid; grid-template-columns:78px 1fr auto; gap:22px; align-items:start;
+  padding:30px 0; border-bottom:1px solid var(--line);
+  opacity:0; transform:translateY(6px); animation:rowin .5s cubic-bezier(.2,.7,.3,1) forwards;
+}
+.ledger-row:first-of-type{padding-top:36px;}
+.ledger-row:nth-child(1){animation-delay:.03s;}
+.ledger-row:nth-child(2){animation-delay:.11s;}
+.ledger-row:nth-child(3){animation-delay:.19s;}
+@keyframes rowin{to{opacity:1; transform:none;}}
+@media (max-width:640px){
+  .ledger-row{grid-template-columns:1fr; gap:14px;}
+  .ledger-num{flex-direction:row!important; align-items:center; gap:10px;}
+}
+
+.ledger-num{
+  display:flex; flex-direction:column; gap:10px; align-items:flex-start; padding-top:3px;
+}
+.ledger-num .acc{font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--ink-3); line-height:1;}
+.hub-dot{width:10px; height:10px; border-radius:50%; background:var(--dot); box-shadow:0 0 0 3px color-mix(in srgb, var(--dot) 22%, transparent);}
+
+.ledger-body h2{font-size:24px; margin-bottom:6px;}
+.course-code{
+  display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--dot-ink); background:var(--dot-soft);
+  padding:3px 9px; border-radius:var(--r-pill); margin-bottom:10px;
+}
+.hub-desc{font-size:14.5px; color:var(--ink-2); max-width:56ch; line-height:1.6;}
+.mode-row{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px;}
+.mode-chip{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.03em; color:var(--ink-2);
+  background:var(--paper-2); border:1px solid var(--line-strong); border-radius:6px; padding:4px 8px;
+}
+
+.ledger-action{display:flex; align-items:center; padding-top:4px;}
+.open-btn{
+  display:inline-flex; align-items:center; gap:9px; background:var(--ink); color:var(--paper);
+  border:none; border-radius:var(--r-pill); padding:11px 20px 11px 22px; font-weight:600; font-size:13.5px;
+  text-decoration:none; white-space:nowrap; transition:transform .14s, box-shadow .14s;
+  box-shadow:var(--shadow);
+}
+.open-btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg);}
+.open-btn svg{width:13px; height:13px; flex:none;}
+
+/* ============ FOOTER ============ */
+footer{margin-top:52px; padding-top:26px;}
+.footer-card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-l);
+  padding:22px 24px; display:flex; gap:16px; align-items:flex-start; box-shadow:var(--shadow);
+}
+.footer-card .fc-icon{
+  width:34px; height:34px; border-radius:9px; background:var(--accent-soft); color:var(--accent-ink);
+  display:flex; align-items:center; justify-content:center; flex:none; font-family:var(--font-mono); font-size:13px; font-weight:700;
+}
+.footer-card p{font-size:13.5px; color:var(--ink-2); line-height:1.6;}
+.footer-card b{color:var(--ink); font-weight:600;}
+.footer-fine{margin-top:20px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3); text-align:center;}
+</style>
+
+<div id="wrap">
+  <header>
+    <span class="eyebrow"><span class="drawer-icon"></span>Study hub index &middot; updated as new hubs go live</span>
+    <h1>Every hub, one shelf.</h1>
+    <p class="lede">This is the one link to keep. Each entry below opens straight into that exam's hub — reading, question bank, and study game — and when a hub gets updated, <b>this same link always shows the newest version</b>. No more re-sending files.</p>
+    <div class="header-meta">
+      <span><b id="hubCount">3</b> hubs live</span>
+      <span>D2 &middot; UAB</span>
+    </div>
+  </header>
+
+  <div class="ledger" id="ledger">
+
+    <article class="ledger-row" style="--dot:var(--hub-genetics); --dot-ink:var(--hub-genetics); --dot-soft:var(--hub-genetics-soft);">
+      <div class="ledger-num">
+        <span class="acc">001</span>
+        <span class="hub-dot"></span>
+      </div>
+      <div class="ledger-body">
+        <span class="course-code">D2 &middot; Genetics</span>
+        <h2>Dental Genetics Rounds</h2>
+        <p class="hub-desc">Mendelian &amp; multifactorial inheritance, genetic testing ethics, precision medicine, amelogenesis, dentin genetics, and patterning disorders — eight lectures end to end.</p>
+        <div class="mode-row">
+          <span class="mode-chip">Compendium</span>
+          <span class="mode-chip">Atlas</span>
+          <span class="mode-chip">Grand Rounds (game)</span>
+        </div>
+      </div>
+      <div class="ledger-action">
+        <a class="open-btn" href="https://claude.ai/code/artifact/74453c5e-505d-47cd-9948-e6e96d8b30b4?org=c8729469-8868-4fa2-99db-726fb2e67946" target="_blank" rel="noopener">
+          Open hub
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="ledger-row" style="--dot:var(--hub-gi); --dot-ink:var(--hub-gi); --dot-soft:var(--hub-gi-soft);">
+      <div class="ledger-num">
+        <span class="acc">002</span>
+        <span class="hub-dot"></span>
+      </div>
+      <div class="ledger-body">
+        <span class="course-code">GI &middot; Unit 2</span>
+        <h2>Hepatobiliary Hub</h2>
+        <p class="hub-desc">Compendium and Atlas for the hepatobiliary unit, plus an On Call ward simulation, a timed mock exam, and a Dungeons &amp; Duodenums bonus mode for extra reps.</p>
+        <div class="mode-row">
+          <span class="mode-chip">Compendium</span>
+          <span class="mode-chip">Atlas</span>
+          <span class="mode-chip">On Call (game)</span>
+          <span class="mode-chip">Mock Exam</span>
+        </div>
+      </div>
+      <div class="ledger-action">
+        <a class="open-btn" href="https://claude.ai/code/artifact/6bb931d8-aa19-4b83-bb81-9aa8d43dcc7f?org=c8729469-8868-4fa2-99db-726fb2e67946" target="_blank" rel="noopener">
+          Open hub
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <article class="ledger-row" style="--dot:var(--hub-pros); --dot-ink:var(--hub-pros); --dot-soft:var(--hub-pros-soft);">
+      <div class="ledger-num">
+        <span class="acc">003</span>
+        <span class="hub-dot"></span>
+      </div>
+      <div class="ledger-body">
+        <span class="course-code">PCD D2 &middot; Exam 2</span>
+        <h2>Fixed Prosthodontics Compendium</h2>
+        <p class="hub-desc">Work authorizations, cast alloy crowns, PFM biomaterials, pontic design, digital scanning with TRIOS, casting &amp; investments, and metal-ceramic restorations.</p>
+        <div class="mode-row">
+          <span class="mode-chip">Compendium</span>
+          <span class="mode-chip">After Hours (game)</span>
+        </div>
+      </div>
+      <div class="ledger-action">
+        <a class="open-btn" href="https://claude.ai/code/artifact/c8874938-e2ec-4e82-af1f-e84a06396dcb?org=c8729469-8868-4fa2-99db-726fb2e67946" target="_blank" rel="noopener">
+          Open hub
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+        </a>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    <div class="footer-card">
+      <span class="fc-icon">+</span>
+      <p><b>New hub, same link.</b> As each hub goes up for a new exam, it gets added here — bookmark this page instead of the individual hub links, and you'll always find the current set.</p>
+    </div>
+    <p class="footer-fine">Built &amp; maintained by Sam &middot; D2 &middot; UAB</p>
+  </footer>
+</div>
