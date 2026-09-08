@@ -83,9 +83,20 @@
 /* ============ BASE ============ */
 *,*::before,*::after{box-sizing:border-box;}
 body{
-  margin:0; background:var(--paper); color:var(--ink);
+  margin:0; color:var(--ink);
   font-family:var(--font-body); font-size:16px; line-height:1.55;
   -webkit-font-smoothing:antialiased;
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(560px circle at 6% -8%, color-mix(in srgb, var(--hub-genetics) 16%, transparent), transparent 62%),
+    radial-gradient(620px circle at 100% 6%, color-mix(in srgb, var(--hub-gi) 15%, transparent), transparent 60%),
+    radial-gradient(560px circle at -4% 58%, color-mix(in srgb, var(--hub-perio) 12%, transparent), transparent 58%),
+    radial-gradient(680px circle at 104% 78%, color-mix(in srgb, var(--hub-pros) 14%, transparent), transparent 60%),
+    radial-gradient(520px circle at 50% 130%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 58%),
+    radial-gradient(circle, color-mix(in srgb, var(--ink) 6%, transparent) 1px, transparent 1.4px);
+  background-repeat:no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  background-size:auto, auto, auto, auto, auto, 26px 26px;
+  background-attachment:fixed, fixed, fixed, fixed, fixed, fixed;
 }
 h1,h2{font-family:var(--font-display); font-weight:600; margin:0; text-wrap:balance; color:var(--ink);}
 p{margin:0;}
@@ -153,53 +164,54 @@ header .lede b{color:var(--ink); font-weight:600;}
 .class-head-text h2{font-size:19.5px; margin-bottom:2px;}
 .class-sub{font-family:var(--font-mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3);}
 
-.hub-list{margin-top:2px;}
-
-/* ============ LEDGER ROWS ============ */
-.ledger-row{
-  display:grid; grid-template-columns:60px 1fr auto; gap:22px; align-items:start;
-  padding:24px 0; border-bottom:1px solid var(--line);
-  opacity:0; transform:translateY(6px); animation:rowin .5s cubic-bezier(.2,.7,.3,1) forwards;
+/* ============ HUB CARDS (grid) ============ */
+.hub-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:14px;
+  margin-top:4px; padding-bottom:10px;
 }
 @keyframes rowin{to{opacity:1; transform:none;}}
-@media (max-width:640px){
-  .ledger-row{grid-template-columns:1fr; gap:14px;}
-  .ledger-num{flex-direction:row!important; align-items:center; gap:10px;}
-  .class-head{padding-left:0;}
-}
 
-.ledger-num{
-  display:flex; flex-direction:column; gap:10px; align-items:flex-start; padding-top:3px;
+.hub-card{
+  display:flex; flex-direction:column; gap:9px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-l);
+  padding:18px 18px 16px; box-shadow:var(--shadow);
+  opacity:0; transform:translateY(8px); animation:rowin .5s cubic-bezier(.2,.7,.3,1) forwards;
+  transition:transform .16s, box-shadow .16s, border-color .16s;
 }
-.ledger-num .acc{font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--ink-3); line-height:1;}
-.hub-dot{width:10px; height:10px; border-radius:50%; background:var(--dot); box-shadow:0 0 0 3px color-mix(in srgb, var(--dot) 22%, transparent);}
+.hub-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:var(--line-strong);}
 
-.ledger-body h2{font-size:22px; margin-bottom:6px;}
+.hub-card-top{display:flex; align-items:center; gap:9px;}
+.hub-card-top .acc{font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--ink-3); line-height:1;}
+.hub-dot{width:9px; height:9px; border-radius:50%; background:var(--dot); box-shadow:0 0 0 3px color-mix(in srgb, var(--dot) 22%, transparent); flex:none;}
+
+.hub-card h3{font-family:var(--font-display); font-weight:600; font-size:18px; line-height:1.25; margin:0; color:var(--ink);}
 .course-code{
-  display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px;
+  display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10.5px;
   letter-spacing:.06em; text-transform:uppercase; color:var(--dot-ink); background:var(--dot-soft);
-  padding:3px 9px; border-radius:var(--r-pill); margin-bottom:10px;
+  padding:3px 9px; border-radius:var(--r-pill); width:fit-content;
 }
-.hub-desc{font-size:14.5px; color:var(--ink-2); max-width:56ch; line-height:1.6;}
-.mode-row{display:flex; gap:7px; flex-wrap:wrap; margin-top:14px;}
+.hub-desc{
+  font-size:13px; color:var(--ink-2); line-height:1.55;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.mode-row{display:flex; gap:6px; flex-wrap:wrap;}
 .mode-chip{
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.03em; color:var(--ink-2);
-  background:var(--paper-2); border:1px solid var(--line-strong); border-radius:6px; padding:4px 8px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.02em; color:var(--ink-2);
+  background:var(--paper-2); border:1px solid var(--line-strong); border-radius:6px; padding:3px 7px;
 }
-.hub-meta-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;}
-.updated-pill{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3);}
-.updated-pill svg{width:11px; height:11px; flex:none; opacity:.85;}
+.hub-meta-row{display:flex; gap:10px; flex-wrap:wrap;}
+.updated-pill{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:10px; color:var(--ink-3);}
+.updated-pill svg{width:10px; height:10px; flex:none; opacity:.85;}
 
-.ledger-action{display:flex; align-items:center; padding-top:4px;}
 .open-btn{
-  display:inline-flex; align-items:center; gap:9px; background:var(--ink); color:var(--paper);
-  border:none; border-radius:var(--r-pill); padding:11px 20px 11px 22px; font-weight:600; font-size:13.5px;
+  display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:var(--paper);
+  border:none; border-radius:var(--r-pill); padding:9px 16px 9px 17px; font-weight:600; font-size:12.5px;
   text-decoration:none; white-space:nowrap; transition:transform .14s, box-shadow .14s;
-  box-shadow:var(--shadow); position:relative;
+  box-shadow:var(--shadow); position:relative; margin-top:auto; align-self:flex-start;
 }
 .open-btn:hover{transform:translateY(-1px); box-shadow:var(--shadow-lg);}
 .open-btn:active{transform:translateY(0) scale(.97);}
-.open-btn svg{width:13px; height:13px; flex:none;}
+.open-btn svg{width:12px; height:12px; flex:none;}
 
 /* ============ EASTER EGG TOASTS + BURST ============ */
 .egg-toast{
@@ -280,31 +292,27 @@ footer{margin-top:52px; padding-top:26px;}
           <span class="class-sub">1 exam hub</span>
         </div>
       </div>
-      <div class="hub-list">
-        <article class="ledger-row" style="animation-delay:.06s;">
-          <div class="ledger-num">
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.06s;">
+          <div class="hub-card-top">
             <span class="acc">001</span>
             <span class="hub-dot"></span>
           </div>
-          <div class="ledger-body">
-            <span class="course-code">Genetics &middot; Full unit</span>
-            <h2>Dental Genetics Rounds</h2>
-            <p class="hub-desc">Mendelian &amp; multifactorial inheritance, genetic testing ethics, precision medicine, amelogenesis, dentin genetics, and patterning disorders — eight lectures end to end.</p>
-            <div class="mode-row">
-              <span class="mode-chip">Compendium</span>
-              <span class="mode-chip">Atlas</span>
-              <span class="mode-chip">Grand Rounds (game)</span>
-            </div>
-            <div class="hub-meta-row">
-              <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
-            </div>
+          <span class="course-code">Genetics &middot; Full unit</span>
+          <h3>Dental Genetics Rounds</h3>
+          <p class="hub-desc">Mendelian &amp; multifactorial inheritance, genetic testing ethics, precision medicine, amelogenesis, dentin genetics, and patterning disorders — eight lectures end to end.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">Atlas</span>
+            <span class="mode-chip">Grand Rounds (game)</span>
           </div>
-          <div class="ledger-action">
-            <a class="open-btn" href="hubs/genetics/" target="_blank" rel="noopener" data-emoji="&#129516;">
-              Open hub
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-            </a>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
+          <a class="open-btn" href="hubs/genetics/" target="_blank" rel="noopener" data-emoji="&#129516;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
         </article>
       </div>
     </div>
@@ -320,59 +328,51 @@ footer{margin-top:52px; padding-top:26px;}
           <span class="class-sub">2 exam hubs</span>
         </div>
       </div>
-      <div class="hub-list">
-        <article class="ledger-row" style="animation-delay:.14s;">
-          <div class="ledger-num">
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.14s;">
+          <div class="hub-card-top">
             <span class="acc">002</span>
             <span class="hub-dot"></span>
           </div>
-          <div class="ledger-body">
-            <span class="course-code">GI &amp; MSK &middot; Exam 1</span>
-            <h2>GI Compendium</h2>
-            <p class="hub-desc">GI tract intro, foregut/midgut/hindgut anatomy, the abdominal wall, oral &amp; salivary histology, esophagus &amp; stomach histology, GI hormones, and secretion &amp; motility — nine lectures, plus a hormone reference and cram sheet.</p>
-            <div class="mode-row">
-              <span class="mode-chip">Lectures</span>
-              <span class="mode-chip">Hormones ref</span>
-              <span class="mode-chip">Cram sheet</span>
-              <span class="mode-chip">Exam hints</span>
-            </div>
-            <div class="hub-meta-row">
-              <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
-            </div>
+          <span class="course-code">GI &amp; MSK &middot; Exam 1</span>
+          <h3>GI Compendium</h3>
+          <p class="hub-desc">GI tract intro, foregut/midgut/hindgut anatomy, the abdominal wall, oral &amp; salivary histology, esophagus &amp; stomach histology, GI hormones, and secretion &amp; motility — nine lectures, plus a hormone reference and cram sheet.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Lectures</span>
+            <span class="mode-chip">Hormones ref</span>
+            <span class="mode-chip">Cram sheet</span>
+            <span class="mode-chip">Exam hints</span>
           </div>
-          <div class="ledger-action">
-            <a class="open-btn" href="hubs/gi-exam1/" target="_blank" rel="noopener" data-emoji="&#127760;">
-              Open hub
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-            </a>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
+          <a class="open-btn" href="hubs/gi-exam1/" target="_blank" rel="noopener" data-emoji="&#127760;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
         </article>
 
-        <article class="ledger-row" style="animation-delay:.18s;">
-          <div class="ledger-num">
+        <article class="hub-card" style="animation-delay:.18s;">
+          <div class="hub-card-top">
             <span class="acc">003</span>
             <span class="hub-dot"></span>
           </div>
-          <div class="ledger-body">
-            <span class="course-code">GI &amp; MSK &middot; Exam 2</span>
-            <h2>Hepatobiliary Hub</h2>
-            <p class="hub-desc">Compendium and Atlas for the hepatobiliary unit, plus an On Call ward simulation, a timed mock exam, and a Dungeons &amp; Duodenums bonus mode for extra reps.</p>
-            <div class="mode-row">
-              <span class="mode-chip">Compendium</span>
-              <span class="mode-chip">Atlas</span>
-              <span class="mode-chip">On Call (game)</span>
-              <span class="mode-chip">Mock Exam</span>
-            </div>
-            <div class="hub-meta-row">
-              <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
-            </div>
+          <span class="course-code">GI &amp; MSK &middot; Exam 2</span>
+          <h3>Hepatobiliary Hub</h3>
+          <p class="hub-desc">Compendium and Atlas for the hepatobiliary unit, plus an On Call ward simulation, a timed mock exam, and a Dungeons &amp; Duodenums bonus mode for extra reps.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">Atlas</span>
+            <span class="mode-chip">On Call (game)</span>
+            <span class="mode-chip">Mock Exam</span>
           </div>
-          <div class="ledger-action">
-            <a class="open-btn" href="hubs/hepatobiliary/" target="_blank" rel="noopener" data-emoji="&#129360;">
-              Open hub
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-            </a>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
+          <a class="open-btn" href="hubs/hepatobiliary/" target="_blank" rel="noopener" data-emoji="&#129360;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
         </article>
       </div>
     </div>
@@ -388,30 +388,26 @@ footer{margin-top:52px; padding-top:26px;}
           <span class="class-sub">1 exam hub</span>
         </div>
       </div>
-      <div class="hub-list">
-        <article class="ledger-row" style="animation-delay:.26s;">
-          <div class="ledger-num">
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.26s;">
+          <div class="hub-card-top">
             <span class="acc">004</span>
             <span class="hub-dot"></span>
           </div>
-          <div class="ledger-body">
-            <span class="course-code">Fixed Pros &middot; Exam 2</span>
-            <h2>Fixed Prosthodontics Compendium</h2>
-            <p class="hub-desc">Work authorizations, cast alloy crowns, PFM biomaterials, pontic design, digital scanning with TRIOS, casting &amp; investments, and metal-ceramic restorations.</p>
-            <div class="mode-row">
-              <span class="mode-chip">Compendium</span>
-              <span class="mode-chip">After Hours (game)</span>
-            </div>
-            <div class="hub-meta-row">
-              <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
-            </div>
+          <span class="course-code">Fixed Pros &middot; Exam 2</span>
+          <h3>Fixed Prosthodontics Compendium</h3>
+          <p class="hub-desc">Work authorizations, cast alloy crowns, PFM biomaterials, pontic design, digital scanning with TRIOS, casting &amp; investments, and metal-ceramic restorations.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">After Hours (game)</span>
           </div>
-          <div class="ledger-action">
-            <a class="open-btn" href="hubs/fixed-pros/" target="_blank" rel="noopener" data-emoji="&#128081;">
-              Open hub
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-            </a>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
+          <a class="open-btn" href="hubs/fixed-pros/" target="_blank" rel="noopener" data-emoji="&#128081;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
         </article>
       </div>
     </div>
@@ -427,31 +423,27 @@ footer{margin-top:52px; padding-top:26px;}
           <span class="class-sub">1 exam hub</span>
         </div>
       </div>
-      <div class="hub-list">
-        <article class="ledger-row" style="animation-delay:.34s;">
-          <div class="ledger-num">
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.34s;">
+          <div class="hub-card-top">
             <span class="acc">005</span>
             <span class="hub-dot"></span>
           </div>
-          <div class="ledger-body">
-            <span class="course-code">Periodontology &middot; Full unit</span>
-            <h2>Periodontology D2 Compendium</h2>
-            <p class="hub-desc">Diagnosis &amp; classification, incisions/flaps/sutures, risk assessment, Phase I therapy, resective surgery &amp; furcation management, regeneration, implants in perio patients, host modulation, and periodontal plastic therapy &amp; esthetics.</p>
-            <div class="mode-row">
-              <span class="mode-chip">Compendium</span>
-              <span class="mode-chip">Atlas</span>
-              <span class="mode-chip">Clinic Floor (game)</span>
-            </div>
-            <div class="hub-meta-row">
-              <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
-            </div>
+          <span class="course-code">Periodontology &middot; Full unit</span>
+          <h3>Periodontology D2 Compendium</h3>
+          <p class="hub-desc">Diagnosis &amp; classification, incisions/flaps/sutures, risk assessment, Phase I therapy, resective surgery &amp; furcation management, regeneration, implants in perio patients, host modulation, and periodontal plastic therapy &amp; esthetics.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">Atlas</span>
+            <span class="mode-chip">Clinic Floor (game)</span>
           </div>
-          <div class="ledger-action">
-            <a class="open-btn" href="hubs/perio/" target="_blank" rel="noopener" data-emoji="&#129471;">
-              Open hub
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-            </a>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
+          <a class="open-btn" href="hubs/perio/" target="_blank" rel="noopener" data-emoji="&#129471;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
         </article>
       </div>
     </div>
