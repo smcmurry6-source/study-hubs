@@ -205,10 +205,10 @@ header .lede b{color:var(--ink); font-weight:600;}
 .egg-toast{
   position:fixed; z-index:10000; background:var(--ink); color:var(--paper); font-size:12.5px; font-weight:600;
   padding:8px 14px; border-radius:var(--r-pill); box-shadow:var(--shadow-lg); pointer-events:none;
-  opacity:0; transform:translate(-50%,4px) scale(.96); transition:opacity .22s, transform .22s;
+  opacity:0; transform:translate(-50%,-100%) translateY(6px) scale(.96); transition:opacity .22s, transform .22s;
   max-width:min(82vw,320px); text-align:center; line-height:1.4;
 }
-.egg-toast.is-shown{opacity:1; transform:translate(-50%,-8px) scale(1);}
+.egg-toast.is-shown{opacity:1; transform:translate(-50%,-100%) translateY(-10px) scale(1);}
 .burst-particle{position:fixed; z-index:10000; pointer-events:none; font-size:16px; will-change:transform,opacity;}
 
 /* ============ EMPTY SEMESTER ============ */
