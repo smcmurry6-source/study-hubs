@@ -2734,4 +2734,143 @@ if(document.readyState==='loading'){
 
 
 
+
+<!-- ============ CLASS STATS / POPULAR / ONLINE-NOW (shared widget) ============ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  #shstat-root{position:fixed; right:16px; bottom:16px; z-index:9999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+  #shstat-root *{box-sizing:border-box;}
+  .shstat-pillrow{display:flex; gap:6px;}
+  .shstat-pill{display:flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent;}
+  .shstat-pill:hover{border-color:rgba(255,255,255,.32);}
+  .shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
+  @media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
+  @keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+  #shstat-panel{display:none; width:290px; max-height:60vh; overflow-y:auto; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px);}
+  #shstat-panel.is-open{display:block;}
+  #shstat-panel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
+  #shstat-panel .shstat-sec{margin-bottom:16px;}
+  #shstat-panel .shstat-sec:last-child{margin-bottom:0;}
+  .shstat-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:12.5px; line-height:1.4;}
+  .shstat-row:last-child{border-bottom:none;}
+  .shstat-row .shstat-label{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .shstat-row .shstat-val{flex:none; font-variant-numeric:tabular-nums; color:#f2f2f0; font-weight:700;}
+  .shstat-row .shstat-val.shstat-bad{color:#f0806b;}
+  .shstat-row .shstat-val.shstat-ok{color:#3ecf7e;}
+  .shstat-empty{font-size:12px; color:#a7a7ac; padding:4px 0;}
+  .shstat-close{position:absolute; top:10px; right:10px; background:none; border:none; color:#a7a7ac; font-size:16px; line-height:1; cursor:pointer; padding:4px;}
+</style>
+<script>
+(function(){
+  var HUB = "genetics";
+  var ANSWERED_EVENT = "dgh:answered";
+  var DEFAULT_MODE = "compendium";
+  var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
+  var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
+
+  var supabase = null;
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SB_URL, SB_KEY);
+    }
+  } catch (e) { /* stats layer is best-effort, never block the hub */ }
+  if (!supabase) return;
+
+  /* ---------- online-now presence ---------- */
+  var presenceId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random());
+  var onlineCount = 1;
+  var channel = supabase.channel("presence:" + HUB, { config: { presence: { key: presenceId } } });
+  channel.on("presence", { event: "sync" }, function(){
+    try {
+      var state = channel.presenceState();
+      onlineCount = Object.keys(state).length || 1;
+    } catch (e) { onlineCount = 1; }
+    renderOnline();
+  });
+  channel.subscribe(function(status){
+    if (status === "SUBSCRIBED") {
+      channel.track({ online_at: new Date().toISOString() });
+    }
+  });
+
+  /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
+  function safeRpc(fn, args){
+    try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
+  }
+  document.addEventListener(ANSWERED_EVENT, function(e){
+    var d = (e && e.detail) || {};
+    safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: !!d.correct });
+  });
+  var modeSwitchEl = document.getElementById("modeSwitch");
+  if (modeSwitchEl) {
+    modeSwitchEl.addEventListener("click", function(e){
+      var t = e.target.closest("[data-mode]");
+      if (t && t.dataset && t.dataset.mode) safeRpc("record_mode_open", { p_hub: HUB, p_mode: t.dataset.mode });
+    });
+  }
+  safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
+
+  /* ---------- floating widget ---------- */
+  var root = document.createElement("div");
+  root.id = "shstat-root";
+  root.innerHTML =
+    '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
+    '<div class="shstat-sec"><h5>Toughest questions</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
+    '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
+    '</div>' +
+    '<div class="shstat-pillrow">' +
+    '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-dot"></span><span id="shstat-online-n">1</span> studying now</button>' +
+    '<button class="shstat-pill" id="shstat-stats-pill" type="button">Class stats</button>' +
+    '</div>';
+  document.body.appendChild(root);
+
+  function renderOnline(){
+    var n = document.getElementById("shstat-online-n");
+    if (n) n.textContent = onlineCount;
+  }
+
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+  function loadStats(){
+    var toughEl = document.getElementById("shstat-tough");
+    var modesEl = document.getElementById("shstat-modes");
+    supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).then(function(res){
+      var rows = (res && res.data) || [];
+      rows = rows.filter(function(r){ return r.attempts >= 3; });
+      rows.sort(function(a,b){ return (a.correct/a.attempts) - (b.correct/b.attempts); });
+      rows = rows.slice(0, 6);
+      if (!rows.length) { toughEl.innerHTML = '<div class="shstat-empty">Not enough answers yet — check back once the class has done some questions.</div>'; return; }
+      var bank = (typeof QUESTIONS !== "undefined") ? QUESTIONS : [];
+      var html = rows.map(function(r){
+        var q = bank.find(function(x){ return x.id === r.qid; });
+        var label = q ? (q.q || q.stem || r.qid) : r.qid;
+        if (label.length > 70) label = label.slice(0, 68) + "…";
+        var pct = Math.round((r.correct / r.attempts) * 100);
+        var cls = pct < 50 ? "shstat-bad" : (pct >= 80 ? "shstat-ok" : "");
+        return '<div class="shstat-row"><span class="shstat-label" title="' + esc(label) + '">' + esc(label) + '</span><span class="shstat-val ' + cls + '">' + pct + '%</span></div>';
+      }).join("");
+      toughEl.innerHTML = html;
+    }, function(){ toughEl.innerHTML = '<div class="shstat-empty">Couldn\'t load stats right now.</div>'; });
+
+    supabase.from("mode_stats").select("mode,opens").eq("hub", HUB).then(function(res){
+      var rows = (res && res.data) || [];
+      rows.sort(function(a,b){ return b.opens - a.opens; });
+      if (!rows.length) { modesEl.innerHTML = '<div class="shstat-empty">No data yet.</div>'; return; }
+      modesEl.innerHTML = rows.map(function(r){
+        return '<div class="shstat-row"><span class="shstat-label">' + esc(r.mode) + '</span><span class="shstat-val">' + r.opens + '</span></div>';
+      }).join("");
+    }, function(){ modesEl.innerHTML = '<div class="shstat-empty">Couldn\'t load stats right now.</div>'; });
+  }
+
+  var panel = document.getElementById("shstat-panel");
+  document.getElementById("shstat-stats-pill").addEventListener("click", function(){
+    var open = panel.classList.toggle("is-open");
+    if (open) loadStats();
+  });
+  document.querySelector("#shstat-panel .shstat-close").addEventListener("click", function(){
+    panel.classList.remove("is-open");
+  });
+})();
+</script>
+
 </body></html>
