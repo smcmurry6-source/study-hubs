@@ -167,6 +167,15 @@ footer{margin-top:52px; padding-top:26px;}
 .footer-card p{font-size:13.5px; color:var(--ink-2); line-height:1.6;}
 .footer-card b{color:var(--ink); font-weight:600;}
 .footer-fine{margin-top:20px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3); text-align:center;}
+
+/* ============ CHANGELOG STRIP ============ */
+.changelog-strip{margin-top:28px; padding:16px 18px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); box-shadow:var(--shadow);}
+.cl-label{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px; font-weight:700;}
+.cl-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px;}
+.cl-item{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; font-size:13.5px; color:var(--ink-2); line-height:1.5;}
+.cl-item .cl-date{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); flex:none; white-space:nowrap;}
+.cl-item .cl-hub{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); padding:2px 7px; border-radius:5px; flex:none;}
+.cl-item .cl-msg{color:var(--ink);}
 </style>
 
 <div id="wrap">
@@ -179,6 +188,11 @@ footer{margin-top:52px; padding-top:26px;}
       <span>D2 &middot; UAB</span>
     </div>
   </header>
+
+  <section id="changelog-strip" class="changelog-strip" hidden>
+    <div class="cl-label">What's new</div>
+    <ul id="changelog-list" class="cl-list"></ul>
+  </section>
 
   <div class="ledger" id="ledger">
 
@@ -261,3 +275,38 @@ footer{margin-top:52px; padding-top:26px;}
     <p class="footer-fine">Built &amp; maintained by Sam &middot; D2 &middot; UAB</p>
   </footer>
 </div>
+
+<script>
+(function(){
+  var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
+  var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
+  var strip = document.getElementById("changelog-strip");
+  var list = document.getElementById("changelog-list");
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "Hepatobiliary", "fixed-pros": "Fixed Pros" };
+
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+  function fmtDate(iso){
+    try {
+      var d = new Date(iso);
+      var diffH = (new Date() - d) / 36e5;
+      if (diffH < 20) return "today";
+      if (diffH < 44) return "yesterday";
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch (e) { return ""; }
+  }
+
+  fetch(SB_URL + "/rest/v1/changelog?select=hub,message,created_at&order=created_at.desc&limit=3", {
+    headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
+  })
+  .then(function(r){ return r.ok ? r.json() : []; })
+  .then(function(rows){
+    if (!rows || !rows.length) return; // stays hidden until something's posted
+    list.innerHTML = rows.map(function(r){
+      var badge = r.hub && HUB_LABEL[r.hub] ? '<span class="cl-hub">' + esc(HUB_LABEL[r.hub]) + '</span>' : '';
+      return '<li class="cl-item">' + badge + '<span class="cl-date">' + fmtDate(r.created_at) + '</span><span class="cl-msg">' + esc(r.message) + '</span></li>';
+    }).join("");
+    strip.hidden = false;
+  })
+  .catch(function(){ /* best-effort — never break the page */ });
+})();
+</script>
