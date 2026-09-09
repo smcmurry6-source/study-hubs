@@ -1,7 +1,7 @@
 /* ============ SHARED STUDY-HUB WIDGET (class stats / popular / online-now /
    my stats / toughest questions / search / flag / suggest / back-to-index) ============
    One file, loaded by every hub via <link rel="stylesheet" href="../../widget/v3.css">.
-   Editing this file updates every hub at once — no more copy-pasting into each
+   Editing this file updates every hub at once - no more copy-pasting into each
    hub's HTML and re-truncating/re-appending by hand. */
 :root{--sh-tabbar-h:60px;} /* height of the mobile bottom bar below, published so
   each hub's own mobile CSS can stack its own bottom tab bar directly above it */
@@ -99,6 +99,7 @@
 .sh-tts-btn[data-state="playing"] .sh-tts-label-pause{display:inline;}
 .sh-tts-btn[data-state="paused"] .sh-tts-label-play{display:inline;}
 .sh-tts-btn[data-state="paused"] .sh-tts-label-pause{display:none;}
+.sh-tts-voice-picker{display:inline-block; max-width:150px; margin-left:6px; padding:5px 8px; font-size:11.5px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border:1px solid var(--line,rgba(0,0,0,.14)); border-radius:999px; background:var(--card,#fff); color:inherit; vertical-align:middle;}
 
 .sh-tts-word{cursor:pointer; border-radius:3px; padding:0 1px; margin:0 -1px; transition:background-color .1s;}
 .sh-tts-word:hover{background:rgba(120,120,120,.16);}
@@ -153,4 +154,5 @@
   #shhome-pill span{display:none;}
 
   .sh-tts-btn{padding:9px 15px 9px 12px; font-size:13px;}
+  .sh-tts-voice-picker{display:block; max-width:none; margin:8px 0 0; padding:8px 10px; font-size:13px;}
 }
