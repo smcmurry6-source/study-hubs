@@ -161,8 +161,18 @@ header .lede b{color:var(--ink); font-weight:600;}
 .class-icon.egg-perio.is-active svg{animation:eggpulse .6s ease;}
 @keyframes eggpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.24);}}
 
+.class-head-text{flex:1; min-width:0; cursor:pointer;}
 .class-head-text h2{font-size:19.5px; margin-bottom:2px;}
 .class-sub{font-family:var(--font-mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3);}
+.class-toggle{
+  flex:none; width:32px; height:32px; border-radius:9px; border:1px solid var(--line-strong);
+  background:var(--card); color:var(--ink-3); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:transform .25s cubic-bezier(.3,1,.4,1), background .15s, color .15s;
+}
+.class-toggle:hover{background:var(--paper-2); color:var(--ink);}
+.class-toggle svg{width:14px; height:14px;}
+.class-group.is-collapsed .class-toggle{transform:rotate(-90deg);}
+.class-group.is-collapsed .hub-grid{display:none;}
 
 /* ============ HUB CARDS (grid) ============ */
 .hub-grid{
@@ -276,7 +286,18 @@ footer{margin-top:52px; padding-top:26px;}
 
 /* ============ CHANGELOG STRIP ============ */
 .changelog-strip{margin-top:28px; padding:16px 18px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); box-shadow:var(--shadow);}
-.cl-label{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px; font-weight:700;}
+.cl-label-row{display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;}
+.cl-label{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:700;}
+.changelog-strip:not(.is-collapsed) .cl-label-row{margin-bottom:10px;}
+.cl-toggle{
+  flex:none; width:26px; height:26px; border-radius:8px; border:1px solid var(--line-strong);
+  background:var(--card); color:var(--ink-3); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:transform .25s cubic-bezier(.3,1,.4,1), background .15s, color .15s;
+}
+.cl-toggle:hover{background:var(--paper-2); color:var(--ink);}
+.cl-toggle svg{width:12px; height:12px;}
+.changelog-strip.is-collapsed .cl-toggle{transform:rotate(-90deg);}
+.changelog-strip.is-collapsed .cl-list{display:none;}
 .cl-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px;}
 .cl-item{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; font-size:13.5px; color:var(--ink-2); line-height:1.5;}
 .cl-item .cl-date{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); flex:none; white-space:nowrap;}
@@ -315,7 +336,12 @@ footer{margin-top:52px; padding-top:26px;}
   </section>
 
   <section id="changelog-strip" class="changelog-strip" hidden>
-    <div class="cl-label">What's new</div>
+    <div class="cl-label-row" id="changelogToggle">
+      <span class="cl-label">What's new</span>
+      <button class="cl-toggle" type="button" aria-expanded="true" aria-controls="changelog-list" aria-label="Collapse What's new">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
+    </div>
     <ul id="changelog-list" class="cl-list"></ul>
   </section>
 
@@ -336,6 +362,9 @@ footer{margin-top:52px; padding-top:26px;}
           <h2>Genetics</h2>
           <span class="class-sub">1 exam hub</span>
         </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse Genetics">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
       </div>
       <div class="hub-grid">
         <article class="hub-card" style="animation-delay:.06s;">
@@ -372,6 +401,9 @@ footer{margin-top:52px; padding-top:26px;}
           <h2>GI &amp; Musculoskeletal</h2>
           <span class="class-sub">2 exam hubs</span>
         </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse GI and Musculoskeletal">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
       </div>
       <div class="hub-grid">
         <article class="hub-card" style="animation-delay:.14s;">
@@ -432,6 +464,9 @@ footer{margin-top:52px; padding-top:26px;}
           <h2>PCD Fixed Prosthodontics</h2>
           <span class="class-sub">1 exam hub</span>
         </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse PCD Fixed Prosthodontics">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
       </div>
       <div class="hub-grid">
         <article class="hub-card" style="animation-delay:.26s;">
@@ -467,6 +502,9 @@ footer{margin-top:52px; padding-top:26px;}
           <h2>Periodontology</h2>
           <span class="class-sub">1 exam hub</span>
         </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse Periodontology">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
       </div>
       <div class="hub-grid">
         <article class="hub-card" style="animation-delay:.34s;">
@@ -544,12 +582,14 @@ footer{margin-top:52px; padding-top:26px;}
     } catch (e) { return ""; }
   }
 
-  fetch(SB_URL + "/rest/v1/changelog?select=hub,message,created_at&order=created_at.desc&limit=3", {
+  fetch(SB_URL + "/rest/v1/changelog?select=hub,message,created_at&order=created_at.desc&limit=10", {
     headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
   })
   .then(function(r){ return r.ok ? r.json() : []; })
   .then(function(rows){
     if (!rows || !rows.length) return; // stays hidden until something's posted
+    // newest first: the query already orders by created_at desc, and we render
+    // in that same order without re-sorting, so the freshest entry stays on top.
     list.innerHTML = rows.map(function(r){
       var badge = r.hub && HUB_LABEL[r.hub] ? '<span class="cl-hub">' + esc(HUB_LABEL[r.hub]) + '</span>' : '';
       return '<li class="cl-item">' + badge + '<span class="cl-date">' + fmtDate(r.created_at) + '</span><span class="cl-msg">' + esc(r.message) + '</span></li>';
@@ -557,6 +597,44 @@ footer{margin-top:52px; padding-top:26px;}
     strip.hidden = false;
   })
   .catch(function(){ /* best-effort — never break the page */ });
+
+  /* ---------- changelog collapse (remembered per browser) ---------- */
+  (function(){
+    var toggleRow = document.getElementById("changelogToggle");
+    var toggleBtn = toggleRow ? toggleRow.querySelector(".cl-toggle") : null;
+    if (!toggleRow || !toggleBtn) return;
+    var COLLAPSE_KEY = "sh_changelog_collapsed";
+    function setCollapsed(collapsed){
+      strip.classList.toggle("is-collapsed", collapsed);
+      toggleBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      toggleBtn.setAttribute("aria-label", collapsed ? "Expand What's new" : "Collapse What's new");
+      try { localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0"); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(COLLAPSE_KEY); } catch (e) {}
+    if (saved === "1") setCollapsed(true);
+    toggleRow.addEventListener("click", function(){ setCollapsed(!strip.classList.contains("is-collapsed")); });
+  })();
+
+  /* ---------- class-group collapse (remembered per browser) ---------- */
+  document.querySelectorAll(".class-group").forEach(function(group){
+    var head = group.querySelector(".class-head-text");
+    var btn = group.querySelector(".class-toggle");
+    var eggBtn = group.querySelector(".class-icon[data-egg]");
+    if (!head || !btn) return;
+    var key = "sh_class_collapsed_" + (eggBtn ? eggBtn.getAttribute("data-egg") : group.querySelector("h2").textContent);
+    function setCollapsed(collapsed){
+      group.classList.toggle("is-collapsed", collapsed);
+      btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      try { localStorage.setItem(key, collapsed ? "1" : "0"); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(key); } catch (e) {}
+    if (saved === "1") setCollapsed(true);
+    function toggle(){ setCollapsed(!group.classList.contains("is-collapsed")); }
+    head.addEventListener("click", toggle);
+    btn.addEventListener("click", toggle);
+  });
 
   /* ---------- "Updated ..." pills — instant, no network wait ---------- */
   function relDateOnly(ymd){
