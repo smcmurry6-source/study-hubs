@@ -131,7 +131,7 @@ button{font-family:inherit; cursor:pointer;}
   function render(){
     var rows = allReports.filter(function(r){ return showResolved.checked || !r.resolved; });
     if (!rows.length) {
-      reportList.innerHTML = '<div class="empty">Nothing here' + (showResolved.checked ? '' : ' — everything\\'s resolved, or nobody\\'s sent anything yet') + '.</div>';
+      reportList.innerHTML = '<div class="empty">Nothing here' + (showResolved.checked ? '' : ' — everything&#39;s resolved, or nobody&#39;s sent anything yet') + '.</div>';
     } else {
       reportList.innerHTML = rows.map(function(r){
         return '<div class="report' + (r.resolved ? ' is-resolved' : '') + '" data-kind="' + r.kind + '" data-id="' + r.id + '">' +
