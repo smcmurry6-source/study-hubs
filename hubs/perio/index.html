@@ -450,6 +450,32 @@ footer.hub-footer{
   .card{padding:16px;}
   .qcard-match-cols{gap:10px;}
 }
+
+/* ================= MOBILE (<=760px): compendium sub-nav becomes a fixed
+   bottom tab bar; top mode switch becomes a horizontal scroll strip. ================= */
+@media (max-width:760px){
+  #modeSwitch{
+    display:flex; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    gap:2px; scrollbar-width:none; max-width:100%;
+  }
+  #modeSwitch::-webkit-scrollbar{display:none;}
+  #modeSwitch button{flex:none;}
+
+  #compendium-subnav{
+    position:fixed; left:0; right:0; bottom:var(--sh-tabbar-h,60px); z-index:9998;
+    display:flex; flex-wrap:nowrap; justify-content:stretch; gap:0; margin:0;
+    background:var(--surface); border-top:1px solid var(--line);
+    padding:4px 2px; box-shadow:0 -2px 16px rgba(0,0,0,.08);
+  }
+  #compendium-subnav button{
+    flex:1 1 0; border-radius:9px; padding:7px 2px; font-size:10px; text-align:center;
+    min-height:46px; white-space:normal; line-height:1.15;
+  }
+
+  .mode-panel{padding-bottom:calc(var(--sh-tabbar-h,60px) + 74px + env(safe-area-inset-bottom,0px));}
+
+  .reading-toolbar{align-items:flex-start;}
+}
 </style>
 
 <div id="app">
@@ -1427,6 +1453,7 @@ function gotoLecture(lecId){
 }
 
 function renderLectureNotes(){
+  if (window.shTTS) window.shTTS.stop();
   var html = '<div class="lecture-grid section-block">';
   LECTURES.forEach(function(l){
     var st = STATUS_LABEL[l.status];
@@ -1445,11 +1472,23 @@ function renderLectureNotes(){
     '<div class="reading-toolbar">' +
       '<div><span class="eyebrow">Session '+l.num+' &middot; '+escHtml(l.who)+'</span><h2 style="margin-bottom:2px;">'+escHtml(l.title)+'</h2>' +
       '<span class="tag-chip '+st.cls+'">'+st.text+'</span></div>' +
+      '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">' +
+      '<button type="button" class="sh-tts-btn" id="sh-tts-btn" aria-label="Listen to this lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
       '<div class="qbank-count mono">'+prog.correct+' / '+prog.total+' bank questions correct</div>' +
+      '</div>' +
     '</div>' +
     '<div class="reading-prose">' + (READINGS[l.id] || '<p>Notes coming soon.</p>') + '</div>' +
     '</div>';
   document.getElementById('compendium-content').innerHTML = html;
+  var ttsBtn = document.getElementById('sh-tts-btn');
+  if (ttsBtn) {
+    if (!window.speechSynthesis) { ttsBtn.disabled = true; ttsBtn.title = 'Not supported in this browser'; }
+    ttsBtn.addEventListener('click', function(){
+      if (!window.shTTS) return;
+      var proseEl = document.querySelector('#reading-pane .reading-prose');
+      window.shTTS.speak(proseEl ? proseEl.textContent : '', ttsBtn);
+    });
+  }
 }
 
 function filteredQuestions(){

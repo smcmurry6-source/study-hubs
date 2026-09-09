@@ -35,6 +35,77 @@
     document.body.appendChild(a);
   })();
 
+  /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
+     so it still works even if the stats layer fails to init. Each hub's own
+     render function inserts a .sh-tts-btn and wires it to window.shTTS.speak,
+     looked up lazily at click time so load order never matters. ---------- */
+  window.shTTS = (function(){
+    var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
+    var activeBtn = null;
+    function setState(btn, state){
+      if (!btn) return;
+      btn.setAttribute("data-state", state);
+      btn.setAttribute("aria-label", state === "playing" ? "Pause reading" : (state === "paused" ? "Resume reading" : "Listen to this"));
+    }
+    function stop(){
+      if (synth) { try { synth.cancel(); } catch (e) {} }
+      if (activeBtn) setState(activeBtn, "idle");
+      activeBtn = null;
+    }
+    function speak(text, btn){
+      if (!synth) return;
+      if (activeBtn === btn) {
+        if (synth.speaking && !synth.paused) { synth.pause(); setState(btn, "paused"); return; }
+        if (synth.paused) { synth.resume(); setState(btn, "playing"); return; }
+      }
+      stop();
+      text = String(text == null ? "" : text).replace(/\s+/g, " ").trim();
+      if (!text) return;
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 1; u.pitch = 1;
+      u.onend = function(){ if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; } };
+      u.onerror = u.onend;
+      activeBtn = btn;
+      setState(btn, "playing");
+      synth.speak(u);
+    }
+    return { supported: !!synth, speak: speak, stop: stop };
+  })();
+
+  /* ---------- update-available banner — raw fetch (not the supabase client),
+     so it still works even if createClient/realtime failed above. Every deploy
+     logs a changelog row, so a fresh row appearing after this page loaded IS
+     "an update was pushed" — piggybacks on that instead of a separate version file. ---------- */
+  (function(){
+    var POLL_MS = 4 * 60 * 1000;
+    var baseline = null, toastEl = null;
+    function ensureToast(){
+      if (toastEl) return toastEl;
+      toastEl = document.createElement("div");
+      toastEl.className = "sh-update-toast";
+      toastEl.innerHTML = '<span>This hub has been updated.</span><button type="button" class="sh-update-reload">Reload</button><button type="button" class="sh-update-dismiss" aria-label="Dismiss">&times;</button>';
+      document.body.appendChild(toastEl);
+      toastEl.querySelector(".sh-update-reload").addEventListener("click", function(){ location.reload(); });
+      toastEl.querySelector(".sh-update-dismiss").addEventListener("click", function(){ toastEl.classList.remove("is-shown"); });
+      return toastEl;
+    }
+    function check(){
+      fetch(SB_URL + "/rest/v1/changelog?select=created_at&order=created_at.desc&limit=1", {
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
+      })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        if (!rows || !rows.length) return;
+        var latest = rows[0].created_at;
+        if (baseline === null) { baseline = latest; return; }
+        if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+      })
+      .catch(function(){ /* best-effort — never break the hub */ });
+    }
+    check();
+    setInterval(check, POLL_MS);
+  })();
+
   if (!supabase) return;
 
   /* ---------- anonymous per-device visitor id (shared across all hubs, same origin) ---------- */
@@ -146,6 +217,15 @@
   }
 
   /* ---------- floating widget ---------- */
+  var ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
+  var ICON_STATS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10"/><path d="M12 20V4"/><path d="M18 20v-7"/></svg>';
+  var ICON_BULB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.6c.6.5.9 1.2 1 2h6c.1-.8.4-1.5 1-2A6 6 0 0 0 12 2Z"/></svg>';
+  var ICON_FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></svg>';
+
+  var backdrop = document.createElement("div");
+  backdrop.id = "shstat-backdrop";
+  document.body.appendChild(backdrop);
+
   var root = document.createElement("div");
   root.id = "shstat-root";
   root.innerHTML =
@@ -175,11 +255,11 @@
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
     '</div>' +
     '<div class="shstat-pillrow">' +
-    '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-dot"></span><span id="shstat-online-n">1</span> studying now</button>' +
-    '<button class="shstat-pill" id="shstat-search-pill" type="button">Search</button>' +
-    '<button class="shstat-pill" id="shstat-stats-pill" type="button">Class stats</button>' +
-    '<button class="shstat-pill" id="shstat-suggest-pill" type="button">Suggest something</button>' +
-    '<button class="shstat-pill" id="shstat-flag-pill" type="button">Flag issue</button>' +
+    '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-pill-icon shstat-pill-icon-dot"><span class="shstat-dot"></span></span><span class="shstat-pill-label"><span id="shstat-online-n">1</span> <span class="spl-full">studying now</span><span class="spl-short">live</span></span></button>' +
+    '<button class="shstat-pill" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
+    '<button class="shstat-pill" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
+    '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label"><span class="spl-full">Suggest something</span><span class="spl-short">Suggest</span></span></button>' +
+    '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label"><span class="spl-full">Flag issue</span><span class="spl-short">Flag</span></span></button>' +
     '</div>';
   document.body.appendChild(root);
 
@@ -358,30 +438,45 @@
     if (keep !== suggestPanel) suggestPanel.classList.remove("is-open");
     if (keep !== searchPanel) searchPanel.classList.remove("is-open");
   }
+  function updateSheetState(){
+    var open = panel.classList.contains("is-open") || flagPanel.classList.contains("is-open") ||
+      suggestPanel.classList.contains("is-open") || searchPanel.classList.contains("is-open");
+    document.body.classList.toggle("sh-sheet-open", open);
+  }
+  backdrop.addEventListener("click", function(){
+    closeOtherPanels(null);
+    updateSheetState();
+  });
   document.getElementById("shstat-stats-pill").addEventListener("click", function(){
     closeOtherPanels(panel);
     var open = panel.classList.toggle("is-open");
     if (open) { loadStats(); loadPersonalStats(); loadBusiestTimes(); }
+    updateSheetState();
   });
   document.querySelector("#shstat-panel .shstat-close").addEventListener("click", function(){
     panel.classList.remove("is-open");
+    updateSheetState();
   });
 
   document.getElementById("shstat-search-pill").addEventListener("click", function(){
     closeOtherPanels(searchPanel);
     var open = searchPanel.classList.toggle("is-open");
     if (open && searchInput) searchInput.focus();
+    updateSheetState();
   });
   document.querySelector("#shstat-searchpanel .shstat-close").addEventListener("click", function(){
     searchPanel.classList.remove("is-open");
+    updateSheetState();
   });
 
   document.getElementById("shstat-flag-pill").addEventListener("click", function(){
     closeOtherPanels(flagPanel);
     flagPanel.classList.toggle("is-open");
+    updateSheetState();
   });
   document.querySelector("#shstat-flagpanel .shstat-close").addEventListener("click", function(){
     flagPanel.classList.remove("is-open");
+    updateSheetState();
   });
   document.getElementById("shstat-flag-submit").addEventListener("click", function(){
     var ta = document.getElementById("shstat-flag-text");
@@ -402,9 +497,11 @@
   document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
     closeOtherPanels(suggestPanel);
     suggestPanel.classList.toggle("is-open");
+    updateSheetState();
   });
   document.querySelector("#shstat-suggestpanel .shstat-close").addEventListener("click", function(){
     suggestPanel.classList.remove("is-open");
+    updateSheetState();
   });
   document.getElementById("shstat-suggest-submit").addEventListener("click", function(){
     var ta = document.getElementById("shstat-suggest-text");

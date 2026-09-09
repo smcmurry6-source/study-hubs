@@ -387,6 +387,57 @@ table.data-table tr:nth-child(even) td{background:var(--porcelain-dim);}
 .achv-card span{font-size:11.5px; color:var(--ink-faint);}
 
 footer.hub-footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); font-size:12px; color:var(--ink-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:var(--font-mono);}
+
+/* ================= MOBILE (<=760px): bottom tab bar for compendium sub-nav,
+   horizontal lecture strip instead of a sidebar, scrollable mode switch ================= */
+@media (max-width:760px){
+  #app{padding:0 16px calc(var(--sh-tabbar-h,60px) + 76px + env(safe-area-inset-bottom,0px));}
+  #topbar{margin:0 -16px 20px; padding-left:16px; padding-right:16px; padding-top:12px;}
+  .topbar-row{gap:10px; padding-bottom:10px;}
+  .brand h1{font-size:17px;}
+  .brand-mark{font-size:9.5px; padding:2px 7px;}
+  .hud{gap:10px; font-size:10.5px; flex-wrap:wrap; width:100%;}
+
+  #modeSwitch{
+    display:flex; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    gap:6px; margin:0 -16px; padding:0 16px 12px; scrollbar-width:none;
+  }
+  #modeSwitch::-webkit-scrollbar{display:none;}
+  #modeSwitch button{flex:none; padding:10px 14px; min-height:40px;}
+
+  .compendium-layout{grid-template-columns:1fr; gap:0;}
+
+  .lecture-rail{
+    position:static; flex-direction:row; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    gap:7px; margin:0 0 16px; padding:2px 2px 8px; scrollbar-width:none; top:auto;
+  }
+  .lecture-rail::-webkit-scrollbar{display:none;}
+  .lecture-rail button{
+    flex:none; white-space:nowrap; border-left:none; border:1px solid var(--line);
+    border-radius:999px; padding:9px 14px; background:var(--card);
+  }
+  .lecture-rail button.is-active{border-color:var(--accent); border-width:1.5px;}
+  .lecture-rail .rail-divider{display:none;}
+
+  /* compendium sub-nav (Reading/Bank/Tables/Cram/Hints) becomes a fixed bottom
+     tab bar, stacked directly above the shared widget's own bottom bar via
+     the --sh-tabbar-h custom property it publishes. */
+  .compendium-tabs{
+    position:fixed; left:0; right:0; bottom:var(--sh-tabbar-h,60px); z-index:9998;
+    display:flex; flex-wrap:nowrap; justify-content:stretch; margin:0; gap:0;
+    border-bottom:none; border-top:1px solid var(--line);
+    background:color-mix(in srgb, var(--porcelain) 96%, transparent); backdrop-filter:blur(8px);
+    padding:4px 2px; box-shadow:0 -2px 16px rgba(0,0,0,.08);
+  }
+  .compendium-tabs button{
+    flex:1 1 0; margin:0; padding:7px 2px; font-size:10px; font-weight:700; text-align:center;
+    border-bottom:none; border-radius:9px; min-height:46px; white-space:normal; line-height:1.15;
+    top:0;
+  }
+  .compendium-tabs button.is-active{background:var(--card-sage);}
+
+  .achv-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
 </style>
 
 <div id="app">
@@ -1949,6 +2000,7 @@ function renderCompendiumTabs(){
 }
 
 function renderReadingPanel(){
+  if (window.shTTS) window.shTTS.stop();
   const lec = LECTURE_BY_ID[UI.compLecture];
   const el = document.getElementById('ctab-reading');
   const m = lectureMastery(lec.id);
@@ -1965,6 +2017,12 @@ function renderReadingPanel(){
         <div class="lecture-meta">${escapeHTML(lec.who)} · ${escapeHTML(lec.source)} · ${m.total} questions in bank${m.attempted? ` · ${Math.round(m.pct*100)}% correct so far`:''}</div>
       </div>
     </div>
+    <div class="reading-toolbar-row" style="margin-bottom:14px;">
+      <button type="button" class="sh-tts-btn" id="sh-tts-btn" aria-label="Listen to this lecture">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+        <span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span>
+      </button>
+    </div>
     ${hasLevels ? `
     <div class="atlas-switch reading-level-switch" id="readingLevelSwitch" role="group" aria-label="Reading level">
       <button type="button" data-level="full" class="${level==='full'?'is-active':''}">As Taught</button>
@@ -1978,6 +2036,15 @@ function renderReadingPanel(){
         UI.readingLevel = btn.getAttribute('data-level');
         renderReadingPanel();
       });
+    });
+  }
+  const ttsBtn = document.getElementById('sh-tts-btn');
+  if (ttsBtn) {
+    if (!window.speechSynthesis) { ttsBtn.disabled = true; ttsBtn.title = 'Not supported in this browser'; }
+    ttsBtn.addEventListener('click', function(){
+      if (!window.shTTS) return;
+      const readingEl = document.querySelector('#ctab-reading .reading');
+      window.shTTS.speak(readingEl ? readingEl.textContent : '', ttsBtn);
     });
   }
 }

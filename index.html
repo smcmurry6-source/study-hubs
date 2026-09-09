@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Study Hub Dashboard</title>
 <meta name="description" content="Every study hub Sam has built, organized by class — Genetics, GI &amp; Musculoskeletal, Fixed Prosthodontics, and Periodontology — with Fall 2026 live and Spring 2027 on deck.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -286,9 +287,8 @@ footer{margin-top:52px; padding-top:26px;}
 
 /* ============ CHANGELOG STRIP ============ */
 .changelog-strip{margin-top:28px; padding:16px 18px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); box-shadow:var(--shadow);}
-.cl-label-row{display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;}
+.cl-label-row{display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; margin-bottom:10px;}
 .cl-label{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:700;}
-.changelog-strip:not(.is-collapsed) .cl-label-row{margin-bottom:10px;}
 .cl-toggle{
   flex:none; width:26px; height:26px; border-radius:8px; border:1px solid var(--line-strong);
   background:var(--card); color:var(--ink-3); display:flex; align-items:center; justify-content:center;
@@ -297,12 +297,80 @@ footer{margin-top:52px; padding-top:26px;}
 .cl-toggle:hover{background:var(--paper-2); color:var(--ink);}
 .cl-toggle svg{width:12px; height:12px;}
 .changelog-strip.is-collapsed .cl-toggle{transform:rotate(-90deg);}
-.changelog-strip.is-collapsed .cl-list{display:none;}
+/* collapsed: keep just the most recent entry peeking through, rest hidden until expanded */
+.changelog-strip.is-collapsed .cl-item:not(:first-child){display:none;}
 .cl-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px;}
 .cl-item{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; font-size:13.5px; color:var(--ink-2); line-height:1.5;}
 .cl-item .cl-date{font-family:var(--font-mono); font-size:10.5px; color:var(--ink-3); flex:none; white-space:nowrap;}
 .cl-item .cl-hub{font-family:var(--font-mono); font-size:9.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent-ink); background:var(--accent-soft); padding:2px 7px; border-radius:5px; flex:none;}
 .cl-item .cl-msg{color:var(--ink);}
+
+/* ============ UPDATE-AVAILABLE BANNER ============ */
+.sh-update-toast{
+  position:fixed; top:0; left:0; right:0; z-index:10060;
+  display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
+  padding:12px 16px; background:#18181b; color:#f4f4f3;
+  font-size:13.5px; font-weight:600; text-align:center; font-family:var(--font-sans, inherit);
+  transform:translateY(-120%); transition:transform .35s cubic-bezier(.3,1,.4,1);
+  box-shadow:0 6px 24px rgba(0,0,0,.3);
+}
+.sh-update-toast.is-shown{transform:translateY(0);}
+.sh-update-toast button{border:none; border-radius:999px; cursor:pointer; font-family:inherit; font-weight:700;}
+.sh-update-reload{background:#f4f4f3; color:#18181b; padding:6px 16px; font-size:12.5px;}
+.sh-update-reload:hover{background:#fff;}
+.sh-update-dismiss{background:transparent; color:#c9c9c6; width:24px; height:24px; font-size:18px; line-height:1; padding:0; flex:none;}
+.sh-update-dismiss:hover{color:#fff;}
+@media (max-width:760px){
+  .sh-update-toast{font-size:12.5px; padding:10px 14px; gap:10px;}
+}
+
+/* ============ MOBILE QUICK-JUMP (hidden on desktop) ============ */
+.quickjump{display:none;}
+
+/* ================= MOBILE (<=760px) ================= */
+@media (max-width:760px){
+  html{scroll-behavior:smooth;}
+  #wrap{padding:0 16px 100px;}
+  header{padding:30px 0 18px;}
+  header h1{font-size:clamp(26px,7vw,32px);}
+  header .lede{font-size:14.5px; margin-top:11px;}
+  .header-meta{margin-top:16px; gap:12px 16px; font-size:11.5px;}
+
+  .quickjump{
+    display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    margin:16px -16px 0; padding:6px 16px 12px; position:sticky; top:0; z-index:50;
+    background:var(--paper); scrollbar-width:none;
+  }
+  .quickjump::-webkit-scrollbar{display:none;}
+  .quickjump a{
+    flex:none; font-family:var(--font-mono); font-size:12px; font-weight:700; text-decoration:none;
+    color:var(--ink-2); background:var(--card); border:1px solid var(--line-strong); border-radius:999px;
+    padding:10px 15px; white-space:nowrap; box-shadow:var(--shadow);
+  }
+  .quickjump a:active{background:var(--paper-2);}
+
+  .term-head{margin:30px 0 4px;}
+  .class-group{scroll-margin-top:56px;}
+  .class-head{padding:20px 0 6px; gap:11px;}
+  .class-icon{width:40px; height:40px; border-radius:11px;}
+  .class-icon svg{width:19px; height:19px;}
+  .class-head-text h2{font-size:17px;}
+  .class-toggle{width:44px; height:44px; border-radius:11px;}
+  .class-toggle svg{width:15px; height:15px;}
+
+  .hub-grid{grid-template-columns:1fr; gap:12px;}
+  .hub-card{padding:16px 16px 15px;}
+
+  .pulse-section .term-head{margin-top:2px;}
+  .pulse-grid{grid-template-columns:1fr; gap:12px; margin-top:12px;}
+  .pulse-card{padding:16px;}
+
+  .changelog-strip{padding:14px 15px; margin-top:22px;}
+  .cl-toggle{width:38px; height:38px;}
+  .cl-toggle svg{width:14px; height:14px;}
+
+  footer{padding:36px 0 20px;}
+}
 </style>
 
 <div id="wrap">
@@ -315,6 +383,12 @@ footer{margin-top:52px; padding-top:26px;}
       <span><b id="classCount">4</b> classes</span>
       <span>D2 &middot; UAB</span>
     </div>
+    <nav class="quickjump" aria-label="Jump to class">
+      <a href="#class-genetics">Genetics</a>
+      <a href="#class-gi">GI &amp; MSK</a>
+      <a href="#class-pros">Fixed Pros</a>
+      <a href="#class-perio">Perio</a>
+    </nav>
   </header>
 
   <!-- ============ CLASS PULSE ============ -->
@@ -335,10 +409,10 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
   </section>
 
-  <section id="changelog-strip" class="changelog-strip" hidden>
+  <section id="changelog-strip" class="changelog-strip is-collapsed" hidden>
     <div class="cl-label-row" id="changelogToggle">
       <span class="cl-label">What's new</span>
-      <button class="cl-toggle" type="button" aria-expanded="true" aria-controls="changelog-list" aria-label="Collapse What's new">
+      <button class="cl-toggle" type="button" aria-expanded="false" aria-controls="changelog-list" aria-label="Expand What's new">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
       </button>
     </div>
@@ -353,7 +427,7 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
 
     <!-- Genetics -->
-    <div class="class-group" style="--dot:var(--hub-genetics); --dot-ink:var(--hub-genetics); --dot-soft:var(--hub-genetics-soft);">
+    <div class="class-group" id="class-genetics" style="--dot:var(--hub-genetics); --dot-ink:var(--hub-genetics); --dot-soft:var(--hub-genetics-soft);">
       <div class="class-head" style="animation-delay:.02s;">
         <button class="class-icon egg-genetics" type="button" data-egg="genetics" aria-label="Genetics — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 2c4 3 6 3 10 6-4 3-6 3-10 6"/><path d="M15 2c-4 3-6 3-10 6 4 3 6 3 10 6"/><path d="M6.4 5.1h7.2M5 10h10M6.4 14.9h7.2"/></svg>
@@ -392,7 +466,7 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
 
     <!-- GI & Musculoskeletal -->
-    <div class="class-group" style="--dot:var(--hub-gi); --dot-ink:var(--hub-gi); --dot-soft:var(--hub-gi-soft);">
+    <div class="class-group" id="class-gi" style="--dot:var(--hub-gi); --dot-ink:var(--hub-gi); --dot-soft:var(--hub-gi-soft);">
       <div class="class-head" style="animation-delay:.10s;">
         <button class="class-icon egg-gi" type="button" data-egg="gi" aria-label="GI and Musculoskeletal — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 2.4a5 5 0 0 1 0 10 3.4 3.4 0 0 1 0-6.8 1.9 1.9 0 0 1 0 3.8"/><path d="M10 12.4v2.6a3 3 0 0 0 3 3h2.2"/></svg>
@@ -455,7 +529,7 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
 
     <!-- PCD Fixed Prosthodontics -->
-    <div class="class-group" style="--dot:var(--hub-pros); --dot-ink:var(--hub-pros); --dot-soft:var(--hub-pros-soft);">
+    <div class="class-group" id="class-pros" style="--dot:var(--hub-pros); --dot-ink:var(--hub-pros); --dot-soft:var(--hub-pros-soft);">
       <div class="class-head" style="animation-delay:.22s;">
         <button class="class-icon egg-pros" type="button" data-egg="pros" aria-label="Fixed Prosthodontics — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.2c2 1.9 4 .9 6 .9s4 1 6-.9L14.4 17l-2-5h-4.8l-2 5z"/></svg>
@@ -493,7 +567,7 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
 
     <!-- Periodontology -->
-    <div class="class-group" style="--dot:var(--hub-perio); --dot-ink:var(--hub-perio); --dot-soft:var(--hub-perio-soft);">
+    <div class="class-group" id="class-perio" style="--dot:var(--hub-perio); --dot-ink:var(--hub-perio); --dot-soft:var(--hub-perio-soft);">
       <div class="class-head" style="animation-delay:.30s;">
         <button class="class-icon egg-perio" type="button" data-egg="perio" aria-label="Periodontology — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 4c0-1.2 1-2 2-2 .7 0 1.2.6 1.8.6S11.3 2 12 2c1 0 2 .8 2 2 0 3-1 4-1 7 0 2-1 3-1 3s-.4-2-1-2-1 2-1 2-1-1-1-3c0-3-1-4-1-7z"/><circle cx="15.2" cy="14.8" r="1.9"/></svg>
@@ -612,8 +686,44 @@ footer{margin-top:52px; padding-top:26px;}
     }
     var saved = null;
     try { saved = localStorage.getItem(COLLAPSE_KEY); } catch (e) {}
-    if (saved === "1") setCollapsed(true);
+    /* collapsed by default (a peek of the newest entry still shows); only
+       an explicit "0" — the visitor expanded it themselves before — opens it */
+    setCollapsed(saved !== "0");
     toggleRow.addEventListener("click", function(){ setCollapsed(!strip.classList.contains("is-collapsed")); });
+  })();
+
+  /* ---------- update-available banner: lets anyone with the page already
+     open know a newer version was just published, and offers a reload.
+     Piggybacks on the same changelog table — every deploy logs an entry,
+     so a fresh entry appearing after page-load IS "an update was pushed". ---------- */
+  (function(){
+    var POLL_MS = 4 * 60 * 1000;
+    var baseline = null, toastEl = null;
+    function ensureToast(){
+      if (toastEl) return toastEl;
+      toastEl = document.createElement("div");
+      toastEl.className = "sh-update-toast";
+      toastEl.innerHTML = '<span>This page has been updated.</span><button type="button" class="sh-update-reload">Reload</button><button type="button" class="sh-update-dismiss" aria-label="Dismiss">&times;</button>';
+      document.body.appendChild(toastEl);
+      toastEl.querySelector(".sh-update-reload").addEventListener("click", function(){ location.reload(); });
+      toastEl.querySelector(".sh-update-dismiss").addEventListener("click", function(){ toastEl.classList.remove("is-shown"); });
+      return toastEl;
+    }
+    function check(){
+      fetch(SB_URL + "/rest/v1/changelog?select=created_at&order=created_at.desc&limit=1", {
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
+      })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        if (!rows || !rows.length) return;
+        var latest = rows[0].created_at;
+        if (baseline === null) { baseline = latest; return; }
+        if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+      })
+      .catch(function(){ /* best-effort — never break the page */ });
+    }
+    check();
+    setInterval(check, POLL_MS);
   })();
 
   /* ---------- class-group collapse (remembered per browser) ---------- */

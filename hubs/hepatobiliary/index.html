@@ -785,6 +785,34 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
   .readiness-row{gap:10px 16px;}
   .rr-metric-label{width:auto;}
 }
+
+/* ================= MOBILE (<=760px): mode-switch becomes a fixed bottom tab
+   bar (stacked above the shared widget's own bar); the 10-item compendium
+   tab-row was already a horizontal scroll strip, just resized for touch. ================= */
+@media (max-width:760px){
+  /* backdrop-filter on an ancestor makes it the containing block for any
+     fixed-position descendant (like the bottom tab bar below) — drop it on
+     mobile so .mode-switch positions against the real viewport, not this header. */
+  .chart-rail{padding:9px 12px; gap:8px; backdrop-filter:none; -webkit-backdrop-filter:none;}
+  .brandmark .bm-text{font-size:.9rem;}
+  .coverage-chip{display:none!important;}
+  .rail-btn{width:36px; height:36px;}
+
+  .mode-switch{
+    position:fixed; left:0; right:0; bottom:var(--sh-tabbar-h,60px); z-index:9998;
+    background:var(--surface); border:none; border-top:1px solid var(--border-soft);
+    border-radius:0; padding:4px 2px; gap:0; justify-content:stretch;
+    box-shadow:0 -2px 16px rgba(0,0,0,.08);
+  }
+  .mode-btn{flex:1 1 0; flex-direction:column; gap:2px; padding:7px 2px; border-radius:9px; font-size:.62rem; min-height:48px; justify-content:center;}
+  .mode-btn span{display:block;}
+  .mode-btn svg{width:19px; height:19px;}
+
+  .shell-inner-wide{padding-bottom:calc(var(--sh-tabbar-h,60px) + 74px + env(safe-area-inset-bottom,0px));}
+
+  .tab-row{gap:6px; margin-bottom:22px;}
+  .tab-btn{padding:9px 12px; font-size:.78rem; min-height:38px;}
+}
 </style>
 
 <div id="app">
@@ -2907,6 +2935,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     return (text||"").split(/\n\n+/).map(function(p){ return '<p>'+esc(p)+'</p>'; }).join("");
   }
   function showLectureDetail(lecId){
+    if (window.shTTS) window.shTTS.stop();
     document.querySelectorAll("#lecPillRow .pill-filter").forEach(function(b){ b.classList.toggle("is-active", b.getAttribute("data-lecpill")===lecId); });
     var l = LECTURE_BY_ID[lecId];
     var qs = QUESTIONS_BY_LECTURE[lecId]||[];
@@ -2922,7 +2951,10 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       html += '<div class="card lecture-notes-card">'
         + '<div class="lecture-notes-head">'
         + '<div><h4 style="font-size:.92rem;">Lecture notes</h4><p class="muted-note" style="margin-top:2px;">'+(lvl==="plain"?"Same material, translated to plain English.":"Written at the level this lecture was actually taught.")+'</p></div>'
+        + '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">'
+        + '<button type="button" class="sh-tts-btn" id="sh-tts-btn" aria-label="Listen to this lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>'
         + '<div class="seg-group" id="lecLevelSeg"><button class="seg-btn'+(lvl==="full"?" active":"")+'" data-level="full" type="button">As Taught</button><button class="seg-btn'+(lvl==="plain"?" active":"")+'" data-level="plain" type="button">Plain English</button></div>'
+        + '</div>'
         + '</div>'
         + '<div class="lecture-notes-prose">'+proseHTML(notes[lvl])+'</div>'
         + '</div>';
@@ -2934,6 +2966,15 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       html += '<div class="empty-state">'+icoSvg("book")+"<p>This lecture hasn't been uploaded yet. Once its slides or a recording are added, its questions will appear here automatically.</p></div>";
     }
     byId("lecDetail").innerHTML = html;
+    var ttsBtn = document.getElementById("sh-tts-btn");
+    if (ttsBtn) {
+      if (!window.speechSynthesis) { ttsBtn.disabled = true; ttsBtn.title = "Not supported in this browser"; }
+      ttsBtn.addEventListener("click", function(){
+        if (!window.shTTS) return;
+        var proseEl = document.querySelector(".lecture-notes-prose");
+        window.shTTS.speak(proseEl ? proseEl.textContent : "", ttsBtn);
+      });
+    }
   }
   byId("lecDetail").addEventListener("click", function(e){
     var lvlBtn = e.target.closest("[data-level]");

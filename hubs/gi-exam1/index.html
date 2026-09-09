@@ -324,6 +324,25 @@
     .lecture-rail{position:static; flex-direction:row; overflow-x:auto; padding-bottom:4px;}
   }
 
+  /* ================= MOBILE (<=760px): top tab strip becomes a fixed bottom
+     bar (stacked above the shared widget's own bar). ================= */
+  @media (max-width:760px){
+    header.topbar{backdrop-filter:none; -webkit-backdrop-filter:none;}
+    .topbar-inner{padding:12px 14px 0;}
+    .brand-mark{font-size:1.2rem;}
+    .exam-chip{display:none;}
+
+    nav.tabbar{
+      position:fixed; left:0; right:0; bottom:var(--sh-tabbar-h,60px); z-index:9998;
+      gap:2px; background:var(--surface); border-top:1px solid var(--border);
+      padding:6px 8px; box-shadow:0 -2px 16px rgba(0,0,0,.08); margin:0;
+    }
+    .tab-btn{flex:none; padding:9px 13px; font-size:.8rem; border-bottom:none; border-radius:9px; min-height:40px;}
+    .tab-btn[aria-selected="true"]{background:var(--accent-soft);}
+
+    main.content{padding:0 14px calc(var(--sh-tabbar-h,60px) + 74px + env(safe-area-inset-bottom,0px));}
+  }
+
   /* ---- Quiz ---- */
   .quiz-toolbar{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
@@ -524,9 +543,12 @@
         <p class="lede">Pick a lecture on the left. Flip the switch below to drop the jargon whenever a concept isn't landing — same facts either way.</p>
       </div>
 
-      <div class="level-switch panel-narrow" style="max-width:var(--maxw-wide);">
-        <button data-level="taught" class="is-active">As taught</button>
-        <button data-level="plain">Plain English</button>
+      <div class="panel-narrow" style="max-width:var(--maxw-wide); display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+        <div class="level-switch" style="margin-bottom:0;">
+          <button data-level="taught" class="is-active">As taught</button>
+          <button data-level="plain">Plain English</button>
+        </div>
+        <button type="button" class="sh-tts-btn" id="sh-tts-btn" aria-label="Listen to this lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>
       </div>
 
       <div class="lecture-layout panel-narrow" style="max-width:var(--maxw-wide);">
@@ -2346,14 +2368,24 @@
   }
   document.addEventListener("click", function(e){
     var pill = e.target.closest(".lecture-pill");
-    if(pill){ selectLecture(pill.dataset.lecture); }
+    if(pill){ if (window.shTTS) window.shTTS.stop(); selectLecture(pill.dataset.lecture); }
     var lvl = e.target.closest(".level-switch button");
     if(lvl){
+      if (window.shTTS) window.shTTS.stop();
       var level = lvl.dataset.level;
       document.querySelectorAll(".level-switch button").forEach(function(b){ b.classList.toggle("is-active", b===lvl); });
       document.querySelectorAll(".level-block").forEach(function(b){ b.classList.toggle("is-active", b.dataset.level===level); });
     }
+    var ttsBtn = e.target.closest("#sh-tts-btn");
+    if(ttsBtn && window.shTTS){
+      var activeBlock = document.querySelector(".lecture-panel.is-active .level-block.is-active");
+      window.shTTS.speak(activeBlock ? activeBlock.textContent : "", ttsBtn);
+    }
   });
+  if (!window.speechSynthesis) {
+    var ttsBtnInit = document.getElementById("sh-tts-btn");
+    if (ttsBtnInit) { ttsBtnInit.disabled = true; ttsBtnInit.title = "Not supported in this browser"; }
+  }
 
   // ---------- Quiz accordion + filters ----------
   document.addEventListener("click", function(e){
@@ -2397,8 +2429,13 @@
      the other hubs), so questions are read straight from the rendered
      .q-card markup instead of a JS array. LECTURES is in scope here since
      this runs inside the same IIFE. */
+  function shDecodeEntities(s){
+    var t = document.createElement("textarea");
+    t.innerHTML = String(s == null ? "" : s);
+    return t.value;
+  }
   window.SH_EXPORT = {
-    lectures: LECTURES.map(function(l){ return { id: l.id, title: l.title }; }),
+    lectures: LECTURES.map(function(l){ return { id: l.id, title: shDecodeEntities(l.title) }; }),
     questions: Array.prototype.slice.call(document.querySelectorAll(".q-card")).map(function(card, i){
       var promptEl = card.querySelector(".q-prompt-text");
       var text = "";

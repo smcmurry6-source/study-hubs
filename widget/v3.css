@@ -3,11 +3,17 @@
    One file, loaded by every hub via <link rel="stylesheet" href="../../widget/v3.css">.
    Editing this file updates every hub at once — no more copy-pasting into each
    hub's HTML and re-truncating/re-appending by hand. */
+:root{--sh-tabbar-h:60px;} /* height of the mobile bottom bar below, published so
+  each hub's own mobile CSS can stack its own bottom tab bar directly above it */
 #shstat-root{position:fixed; right:16px; bottom:16px; z-index:9999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
 #shstat-root *{box-sizing:border-box;}
 .shstat-pillrow{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
 .shstat-pill{display:flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent;}
 .shstat-pill:hover{border-color:rgba(255,255,255,.32);}
+.shstat-pill-icon{display:none;}
+.shstat-pill-icon-dot{display:inline-flex; align-items:center;}
+.spl-full{display:inline;}
+.spl-short{display:none;}
 .shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
 @media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
 @keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
@@ -42,6 +48,25 @@
 .shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
 .shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
 
+/* ---------- update-available banner ---------- */
+.sh-update-toast{
+  position:fixed; top:0; left:0; right:0; z-index:10060;
+  display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
+  padding:12px 16px; background:#18181b; color:#f4f4f3;
+  font-size:13.5px; font-weight:600; text-align:center;
+  transform:translateY(-120%); transition:transform .35s cubic-bezier(.3,1,.4,1);
+  box-shadow:0 6px 24px rgba(0,0,0,.3);
+}
+.sh-update-toast.is-shown{transform:translateY(0);}
+.sh-update-toast button{border:none; border-radius:999px; cursor:pointer; font-family:inherit; font-weight:700;}
+.sh-update-reload{background:#f4f4f3; color:#18181b; padding:6px 16px; font-size:12.5px;}
+.sh-update-reload:hover{background:#fff;}
+.sh-update-dismiss{background:transparent; color:#c9c9c6; width:24px; height:24px; font-size:18px; line-height:1; padding:0; flex:none;}
+.sh-update-dismiss:hover{color:#fff;}
+@media (max-width:760px){
+  .sh-update-toast{font-size:12.5px; padding:10px 14px; gap:10px;}
+}
+
 /* ---------- search panel ---------- */
 #shstat-searchpanel input[type="text"]{width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:13px; padding:8px 10px; margin-bottom:10px;}
 .shstat-search-sec{margin-bottom:14px;}
@@ -59,4 +84,67 @@
 #shhome-pill{position:fixed; left:16px; top:16px; z-index:9999; display:inline-flex; align-items:center; gap:7px; background:rgba(20,20,24,.92); color:#f2f2f0; text-decoration:none; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:8px 14px 8px 12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12.5px; font-weight:600; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28);}
 #shhome-pill:hover{border-color:rgba(255,255,255,.32);}
 #shhome-pill svg{width:13px; height:13px; flex:none;}
-@media (max-width:520px){ #shhome-pill span{display:none;} #shhome-pill{padding:9px;} }
+
+/* ---------- text-to-speech button (lecture reading panels) ---------- */
+.sh-tts-btn{display:inline-flex; align-items:center; gap:6px; background:var(--card,#fff); color:inherit; border:1px solid var(--line,rgba(0,0,0,.14)); border-radius:999px; padding:7px 13px 7px 11px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-tap-highlight-color:transparent;}
+.sh-tts-btn svg{width:15px; height:15px; flex:none;}
+.sh-tts-btn[disabled]{opacity:.4; cursor:default;}
+.sh-tts-btn[data-state="playing"]{background:#3ecf7e; color:#0b1a12; border-color:#3ecf7e;}
+.sh-tts-btn[data-state="paused"]{background:#e8c15a; color:#231a04; border-color:#e8c15a;}
+.sh-tts-btn .sh-tts-label-play{display:inline;}
+.sh-tts-btn .sh-tts-label-pause{display:none;}
+.sh-tts-btn[data-state="playing"] .sh-tts-label-play{display:none;}
+.sh-tts-btn[data-state="playing"] .sh-tts-label-pause{display:inline;}
+.sh-tts-btn[data-state="paused"] .sh-tts-label-play{display:inline;}
+.sh-tts-btn[data-state="paused"] .sh-tts-label-pause{display:none;}
+
+/* ================= MOBILE (<=760px): bottom tab bar + full-screen sheets ================= */
+@media (max-width:760px){
+  #shstat-root{left:0; right:0; bottom:0; top:auto; width:100%; align-items:stretch; gap:0;}
+  #shstat-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9997; opacity:0; pointer-events:none; transition:opacity .2s ease;}
+  body.sh-sheet-open #shstat-backdrop{opacity:1; pointer-events:auto;}
+
+  .shstat-pillrow{
+    position:fixed; left:0; right:0; bottom:0; z-index:9999; flex-wrap:nowrap;
+    justify-content:stretch; gap:0; background:rgba(14,14,17,.98);
+    border-top:1px solid rgba(255,255,255,.1);
+    padding:4px 2px calc(4px + env(safe-area-inset-bottom,0px));
+    backdrop-filter:blur(10px); box-shadow:0 -4px 24px rgba(0,0,0,.3);
+  }
+  .shstat-pill{
+    flex:1 1 0; flex-direction:column; gap:3px; border:none; border-radius:10px;
+    background:transparent; box-shadow:none; padding:7px 2px; min-height:52px;
+    justify-content:center; white-space:normal; text-align:center;
+  }
+  .shstat-pill:active{background:rgba(255,255,255,.08);}
+  .shstat-pill-icon{display:flex; align-items:center; justify-content:center; width:21px; height:21px; margin:0 auto; color:#c9c9ce;}
+  .shstat-pill-icon svg{width:100%; height:100%;}
+  .shstat-pill-icon-dot{width:auto; height:auto;}
+  .shstat-pill-label{font-size:9.5px; font-weight:700; line-height:1.15; letter-spacing:.01em;}
+  .spl-full{display:none;}
+  .spl-short{display:inline;}
+
+  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{
+    display:block; position:fixed; left:0; right:0; bottom:0; top:auto; width:100%;
+    max-height:min(78vh,640px); overflow-y:auto; border-radius:18px 18px 0 0; z-index:10000;
+    padding:16px 16px calc(90px + env(safe-area-inset-bottom,0px));
+    transform:translateY(105%); transition:transform .28s cubic-bezier(.2,.8,.3,1);
+    box-shadow:0 -10px 44px rgba(0,0,0,.5); pointer-events:none;
+  }
+  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{
+    transform:translateY(0); pointer-events:auto;
+  }
+  #shstat-panel::before, #shstat-flagpanel::before, #shstat-suggestpanel::before, #shstat-searchpanel::before{
+    content:""; position:absolute; top:8px; left:50%; width:36px; height:4px;
+    margin-left:-18px; border-radius:99px; background:rgba(255,255,255,.22);
+  }
+  #shstat-panel .shstat-close, #shstat-flagpanel .shstat-close, #shstat-suggestpanel .shstat-close, #shstat-searchpanel .shstat-close{
+    top:14px; right:10px; font-size:22px; padding:6px 10px;
+  }
+  #shstat-panel h5:first-of-type, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5{margin-top:8px;}
+
+  #shhome-pill{top:calc(14px + env(safe-area-inset-top,0px)); padding:9px;}
+  #shhome-pill span{display:none;}
+
+  .sh-tts-btn{padding:9px 15px 9px 12px; font-size:13px;}
+}
