@@ -30,6 +30,8 @@
 .shstat-row .shstat-val.shstat-bad{color:#f0806b;}
 .shstat-row .shstat-val.shstat-ok{color:#3ecf7e;}
 .shstat-row .shstat-attempts{flex:none; font-size:10.5px; color:#7a7a80; margin-left:6px;}
+.shstat-label-wrap{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
+.shstat-tough-tag{font-size:10px; color:#9a9aa0; text-transform:uppercase; letter-spacing:.03em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .shstat-empty{font-size:12px; color:#a7a7ac; padding:4px 0;}
 .shstat-close{position:absolute; top:10px; right:10px; background:none; border:none; color:#a7a7ac; font-size:16px; line-height:1; cursor:pointer; padding:4px;}
 .shstat-hist{display:flex; align-items:flex-end; gap:2px; height:54px; margin-top:6px;}

@@ -72,6 +72,21 @@
     return { supported: !!synth, speak: speak, stop: stop };
   })();
 
+  /* ---------- per-question class-wide correctness — raw fetch, exposed the
+     same way as shTTS so a hub's own qcard code can look it up lazily at
+     click time, independent of load order and of the stats layer below. ---------- */
+  window.shQuestionStats = function(qid, cb){
+    fetch(SB_URL + "/rest/v1/question_stats?hub=eq." + encodeURIComponent(HUB) + "&qid=eq." + encodeURIComponent(qid) + "&select=attempts,correct", {
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
+    })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      var row = rows && rows[0];
+      cb(row ? { attempts: row.attempts, correct: row.correct } : null);
+    })
+    .catch(function(){ cb(null); });
+  };
+
   /* ---------- update-available banner — raw fetch (not the supabase client),
      so it still works even if createClient/realtime failed above. Every deploy
      logs a changelog row, so a fresh row appearing after this page loaded IS
@@ -276,16 +291,23 @@
     if (!ex || typeof ex !== "object") return { lectures: [], questions: [] };
     return { lectures: ex.lectures || [], questions: ex.questions || [] };
   }
-  function findQuestionText(qid){
+  function lectureTitle(lecId){
+    if (!lecId) return null;
+    var ls = getExport().lectures;
+    for (var i = 0; i < ls.length; i++) if (ls[i].id === lecId) return ls[i].title;
+    // no SH_EXPORT lecture list published — fall back to humanizing the raw id
+    return String(lecId).replace(/[-_]+/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  }
+  function findQuestionMeta(qid){
     var qs = getExport().questions;
-    for (var i = 0; i < qs.length; i++) if (qs[i].id === qid) return qs[i].text;
+    for (var i = 0; i < qs.length; i++) if (qs[i].id === qid) return { text: qs[i].text, lec: qs[i].lec };
     // fall back to a hub's raw global QUESTIONS array, for any hub that hasn't
     // published SH_EXPORT yet — same lookup the original widget used.
     try {
       var bank = (typeof QUESTIONS !== "undefined") ? QUESTIONS : [];
       var q = bank.filter(function(x){ return x.id === qid; })[0];
-      return q ? (q.q || q.stem || null) : null;
-    } catch (e) { return null; }
+      return q ? { text: (q.q || q.stem || null), lec: q.lec || null } : { text: null, lec: null };
+    } catch (e) { return { text: null, lec: null }; }
   }
 
   function loadStats(){
@@ -298,11 +320,14 @@
       rows = rows.slice(0, 10);
       if (!rows.length) { toughEl.innerHTML = '<div class="shstat-empty">Not enough answers yet — check back once the class has done some questions.</div>'; return; }
       var html = rows.map(function(r){
-        var label = findQuestionText(r.qid) || r.qid;
+        var meta = findQuestionMeta(r.qid);
+        var label = meta.text || r.qid;
         if (label.length > 76) label = label.slice(0, 74) + "…";
+        var lecTitle = lectureTitle(meta.lec);
+        var tag = lecTitle ? '<span class="shstat-tough-tag">' + esc(lecTitle) + '</span>' : '';
         var pct = Math.round((r.correct / r.attempts) * 100);
         var cls = pct < 50 ? "shstat-bad" : (pct >= 80 ? "shstat-ok" : "");
-        return '<div class="shstat-row"><span class="shstat-label" title="' + esc(label) + '">' + esc(label) + '</span><span class="shstat-val ' + cls + '">' + pct + '%<span class="shstat-attempts">(' + r.attempts + ')</span></span></div>';
+        return '<div class="shstat-row shstat-row-tough"><span class="shstat-label-wrap"><span class="shstat-label" title="' + esc(label) + '">' + esc(label) + '</span>' + tag + '</span><span class="shstat-val ' + cls + '">' + pct + '%<span class="shstat-attempts">(' + r.attempts + ')</span></span></div>';
       }).join("");
       toughEl.innerHTML = html;
     }, function(){ toughEl.innerHTML = '<div class="shstat-empty">Couldn&#39;t load stats right now.</div>'; });

@@ -182,6 +182,11 @@ table{border-collapse:collapse; width:100%;}
 .qcard-explain{display:none; font-size:13.5px; color:var(--ink-soft); background:var(--porcelain-dim); border-radius:9px; padding:10px 12px; border-left:3px solid var(--gold);}
 .qcard-explain.is-visible{display:block; animation:fadein .2s ease;}
 .qcard-foot{display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--ink-faint); gap:8px; flex-wrap:wrap;}
+.qcard-classdata-btn{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--ink-soft); background:var(--card-sage); border:none; border-radius:999px; padding:3px 10px; cursor:pointer; transition:background .15s;}
+.qcard-classdata-btn:hover{background:var(--porcelain-dim);}
+.qcard-classdata-result{font-family:var(--font-mono); font-size:11px; color:var(--ink-soft);}
+.qcard-classdata-result.is-bad{color:var(--rose);}
+.qcard-classdata-result.is-ok{color:var(--teal);}
 
 /* Sequence & match question types */
 .seq-list{list-style:none; margin:0; padding:0; display:grid; gap:6px;}
@@ -1440,6 +1445,10 @@ function qCardHTML(q, opts){
       <span><span class="src-chip">${q.src==='practice-test'?'professor quiz/exam bank':'hub-authored'}</span> ${flagNote}</span>
       <span data-role="status"></span>
     </div>
+    <div class="qcard-foot" style="margin-top:2px;">
+      <button type="button" class="qcard-classdata-btn" data-role="classdata">Class data</button>
+      <span class="qcard-classdata-result" data-role="classdata-result"></span>
+    </div>
   </div>`;
 }
 
@@ -1455,6 +1464,34 @@ function wireQuestionContainer(container){
     if(!q) return;
     const statusEl = card.querySelector('[data-role="status"]');
     const explainEl = card.querySelector('[data-role="explain"]');
+
+    // Class-wide correctness data for this question — looked up lazily so
+    // load order never matters (widget/v3.js may finish loading after this).
+    const classDataBtn = evt.target.closest('[data-role="classdata"]');
+    if(classDataBtn && card.contains(classDataBtn)){
+      const resultEl = card.querySelector('[data-role="classdata-result"]');
+      if(!resultEl) return;
+      if(typeof window.shQuestionStats !== 'function'){
+        resultEl.textContent = 'Stats unavailable right now.';
+        resultEl.className = 'qcard-classdata-result';
+        return;
+      }
+      classDataBtn.disabled = true;
+      resultEl.textContent = 'Loading…';
+      resultEl.className = 'qcard-classdata-result';
+      window.shQuestionStats(q.id, function(stats){
+        classDataBtn.disabled = false;
+        if(!stats || stats.attempts < 3){
+          resultEl.textContent = 'Not enough class answers yet.';
+          resultEl.className = 'qcard-classdata-result';
+          return;
+        }
+        const pct = Math.round((stats.correct / stats.attempts) * 100);
+        resultEl.textContent = pct + '% correct class-wide (' + stats.attempts + ' answered)';
+        resultEl.className = 'qcard-classdata-result ' + (pct < 50 ? 'is-bad' : (pct >= 80 ? 'is-ok' : ''));
+      });
+      return;
+    }
 
     // MCQ choice click
     const choiceBtn = evt.target.closest('[data-role="choice"]');
