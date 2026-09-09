@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Reports — Study Hub Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --ink:#1B2432; --ink-2:#4A5468; --ink-3:#7C859A;
+  --paper:#EDEFEC; --paper-2:#E4E7E1; --card:#FFFFFF;
+  --line:#D7DAD3; --line-strong:#C2C7BC;
+  --accent:#4B4FA0; --accent-ink:#33356F; --accent-soft:#E6E5F5;
+  --ok:#246B64; --ok-soft:#DCEAE7;
+  --warn:#A94E34; --warn-soft:#F3DED4;
+  --shadow:0 1px 2px rgba(20,25,15,.05), 0 10px 28px -14px rgba(20,25,15,.22);
+  --r-m:12px; --r-l:18px; --r-pill:999px;
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:'Space Mono', 'SF Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#E9ECE6; --ink-2:#B7BFB2; --ink-3:#828C7E;
+    --paper:#171A16; --paper-2:#1E221C; --card:#20241F;
+    --line:#333A2F; --line-strong:#454E3F;
+    --accent:#9497D6; --accent-ink:#C9CBEF; --accent-soft:#282A50;
+    --ok:#6FC2B8; --ok-soft:#16302D;
+    --warn:#DE8262; --warn-soft:#3B241C;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.5);
+  }
+}
+*,*::before,*::after{box-sizing:border-box;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.5;}
+h1{font-family:var(--font-display); font-weight:600; margin:0 0 6px;}
+button{font-family:inherit; cursor:pointer;}
+#wrap{max-width:720px; margin:0 auto; padding:50px 20px 80px;}
+
+.eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px;}
+
+/* gate */
+#gate{max-width:360px; margin:80px auto; text-align:center;}
+#gate input{
+  width:100%; margin-top:18px; padding:11px 14px; border:1px solid var(--line-strong); border-radius:var(--r-m);
+  background:var(--card); color:var(--ink); font-family:var(--font-mono); font-size:14px; text-align:center;
+}
+#gate button{
+  margin-top:12px; width:100%; padding:11px 14px; border:none; border-radius:var(--r-pill);
+  background:var(--ink); color:var(--paper); font-weight:600; font-size:14px;
+}
+#gateMsg{margin-top:12px; font-size:13px; color:var(--warn); min-height:16px;}
+
+/* toolbar */
+.toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:26px 0 18px;}
+.toolbar label{display:inline-flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2);}
+.stat{font-family:var(--font-mono); font-size:12px; color:var(--ink-3);}
+
+/* report cards */
+.report{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow);
+}
+.report.is-resolved{opacity:.5;}
+.report-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
+.badge{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; padding:3px 8px; border-radius:var(--r-pill); font-weight:700;}
+.badge.flag{color:var(--warn); background:var(--warn-soft);}
+.badge.suggestion{color:var(--accent-ink); background:var(--accent-soft);}
+.badge.hub{color:var(--ink-2); background:var(--paper-2); font-weight:600;}
+.report-date{font-family:var(--font-mono); font-size:11px; color:var(--ink-3); margin-left:auto;}
+.report-note{font-size:14px; color:var(--ink); line-height:1.5; white-space:pre-wrap;}
+.report-actions{margin-top:10px;}
+.resolve-btn{
+  border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2);
+  padding:5px 12px; border-radius:var(--r-pill); font-size:12px; font-weight:600;
+}
+.resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
+.empty{color:var(--ink-3); font-size:14px; padding:30px 0; text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <span class="eyebrow">Study hub review</span>
+  <h1>Enter passphrase</h1>
+  <input type="password" id="gateInput" placeholder="passphrase" autocomplete="off">
+  <button id="gateBtn" type="button">Unlock</button>
+  <div id="gateMsg"></div>
+</div>
+
+<div id="wrap" hidden>
+  <span class="eyebrow">Study hub review</span>
+  <h1>Flags &amp; suggestions</h1>
+  <div class="toolbar">
+    <label><input type="checkbox" id="showResolved"> show resolved too</label>
+    <span class="stat" id="reportStat"></span>
+  </div>
+  <div id="reportList"></div>
+</div>
+
+<script>
+(function(){
+  var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
+  var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
+  var supabase = window.supabase.createClient(SB_URL, SB_KEY);
+  var SESSION_KEY = "sh_admin_secret";
+
+  var gate = document.getElementById("gate");
+  var wrap = document.getElementById("wrap");
+  var gateInput = document.getElementById("gateInput");
+  var gateBtn = document.getElementById("gateBtn");
+  var gateMsg = document.getElementById("gateMsg");
+  var showResolved = document.getElementById("showResolved");
+  var reportList = document.getElementById("reportList");
+  var reportStat = document.getElementById("reportStat");
+
+  var secret = null;
+  var allReports = [];
+
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+  function fmtDate(iso){
+    try {
+      var d = new Date(iso);
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    } catch (e) { return iso; }
+  }
+
+  function render(){
+    var rows = allReports.filter(function(r){ return showResolved.checked || !r.resolved; });
+    if (!rows.length) {
+      reportList.innerHTML = '<div class="empty">Nothing here' + (showResolved.checked ? '' : ' — everything\\'s resolved, or nobody\\'s sent anything yet') + '.</div>';
+    } else {
+      reportList.innerHTML = rows.map(function(r){
+        return '<div class="report' + (r.resolved ? ' is-resolved' : '') + '" data-kind="' + r.kind + '" data-id="' + r.id + '">' +
+          '<div class="report-top">' +
+            '<span class="badge ' + r.kind + '">' + r.kind + '</span>' +
+            (r.hub ? '<span class="badge hub">' + esc(r.hub) + '</span>' : '') +
+            '<span class="report-date">' + fmtDate(r.created_at) + '</span>' +
+          '</div>' +
+          '<div class="report-note">' + esc(r.note) + '</div>' +
+          '<div class="report-actions"><button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved' : 'Mark resolved') + '</button></div>' +
+        '</div>';
+      }).join("");
+    }
+    var open = allReports.filter(function(r){ return !r.resolved; }).length;
+    reportStat.textContent = open + " open · " + allReports.length + " total";
+  }
+
+  function loadReports(){
+    reportList.innerHTML = '<div class="empty">Loading…</div>';
+    supabase.rpc("get_reports", { p_secret: secret }).then(function(res){
+      if (res && res.error) {
+        unlock(false, "Wrong passphrase, or reports aren't set up yet.");
+        return;
+      }
+      allReports = (res && res.data) || [];
+      render();
+    }, function(){
+      reportList.innerHTML = '<div class="empty">Couldn&#39;t load reports right now — try again in a moment.</div>';
+    });
+  }
+
+  function unlock(ok, msg){
+    if (ok) {
+      gate.hidden = true;
+      wrap.hidden = false;
+    } else {
+      gate.hidden = false;
+      wrap.hidden = true;
+      gateMsg.textContent = msg || "";
+      try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+    }
+  }
+
+  function tryUnlock(candidate){
+    secret = candidate;
+    gateBtn.disabled = true;
+    gateMsg.textContent = "Checking…";
+    supabase.rpc("get_reports", { p_secret: secret }).then(function(res){
+      gateBtn.disabled = false;
+      if (res && res.error) {
+        unlock(false, "Wrong passphrase.");
+        return;
+      }
+      try { sessionStorage.setItem(SESSION_KEY, secret); } catch (e) {}
+      allReports = (res && res.data) || [];
+      unlock(true);
+      render();
+    }, function(){
+      gateBtn.disabled = false;
+      unlock(false, "Couldn't reach the server — try again.");
+    });
+  }
+
+  gateBtn.addEventListener("click", function(){
+    var v = (gateInput.value || "").trim();
+    if (!v) { gateMsg.textContent = "Type the passphrase first."; return; }
+    tryUnlock(v);
+  });
+  gateInput.addEventListener("keydown", function(e){
+    if (e.key === "Enter") gateBtn.click();
+  });
+
+  showResolved.addEventListener("change", render);
+
+  reportList.addEventListener("click", function(e){
+    var btn = e.target.closest(".resolve-btn");
+    if (!btn) return;
+    var card = btn.closest(".report");
+    var kind = card.getAttribute("data-kind");
+    var id = Number(card.getAttribute("data-id"));
+    var row = allReports.find(function(r){ return r.kind === kind && r.id === id; });
+    if (!row) return;
+    var next = !row.resolved;
+    btn.disabled = true;
+    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next }).then(function(){
+      row.resolved = next;
+      btn.disabled = false;
+      render();
+    }, function(){
+      btn.disabled = false;
+    });
+  });
+
+  /* auto-unlock if we remember the passphrase from this browser tab session */
+  try {
+    var saved = sessionStorage.getItem(SESSION_KEY);
+    if (saved) tryUnlock(saved);
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

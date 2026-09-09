@@ -246,6 +246,33 @@ footer{margin-top:52px; padding-top:26px;}
 .footer-card p{font-size:13.5px; color:var(--ink-2); line-height:1.6;}
 .footer-card b{color:var(--ink); font-weight:600;}
 .footer-fine{margin-top:20px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3); text-align:center;}
+.footer-fine a{color:inherit; text-decoration:none;}
+.footer-fine a:hover{text-decoration:underline;}
+
+/* ============ CLASS PULSE ============ */
+.pulse-section{margin-top:6px;}
+.pulse-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-top:14px; margin-bottom:8px;}
+.pulse-card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r-l);
+  padding:20px 20px 18px; box-shadow:var(--shadow);
+}
+.pulse-card h3{font-family:var(--font-display); font-weight:600; font-size:16px; margin:0 0 12px;}
+.pulse-live{display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:12px; color:var(--ink-3); white-space:nowrap;}
+.pulse-live .pulse-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.22); flex:none;}
+@media (prefers-reduced-motion: no-preference){ .pulse-live .pulse-dot{animation:pulse-blink 2.2s ease-in-out infinite;} }
+@keyframes pulse-blink{0%,100%{opacity:1;}50%{opacity:.45;}}
+
+.pulse-hist{display:flex; align-items:flex-end; gap:2px; height:70px; margin-top:6px;}
+.pulse-hbar{flex:1; background:linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 35%, transparent)); border-radius:2px 2px 0 0; min-height:2px;}
+.pulse-hlabels{display:flex; justify-content:space-between; font-size:9.5px; font-family:var(--font-mono); color:var(--ink-3); margin-top:6px;}
+
+.pulse-lb{list-style:none; margin:0; padding:0; display:flex; flex-direction:column;}
+.pulse-lb-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px;}
+.pulse-lb-row:last-child{border-bottom:none;}
+.pulse-lb-rank{font-family:var(--font-mono); font-size:12px; color:var(--ink-3); width:16px; flex:none;}
+.pulse-lb-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink);}
+.pulse-lb-streak{font-family:var(--font-mono); font-weight:700; color:var(--accent-ink); flex:none; font-size:12.5px;}
+.pulse-empty{font-size:13px; color:var(--ink-3);}
 
 /* ============ CHANGELOG STRIP ============ */
 .changelog-strip{margin-top:28px; padding:16px 18px; background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); box-shadow:var(--shadow);}
@@ -462,15 +489,34 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
   </section>
 
+  <!-- ============ CLASS PULSE ============ -->
+  <section class="pulse-section">
+    <div class="term-head">
+      <span class="term-label">Class Pulse</span>
+      <span class="pulse-live"><span class="pulse-dot"></span><span id="pulseLiveCount">—</span> studying right now</span>
+    </div>
+    <div class="pulse-grid">
+      <div class="pulse-card">
+        <h3>Busiest times, all hubs combined</h3>
+        <div id="pulseHistWrap"><div class="pulse-empty">Loading…</div></div>
+      </div>
+      <div class="pulse-card">
+        <h3>Study streaks</h3>
+        <div id="pulseLeaderboard"><div class="pulse-empty">Loading…</div></div>
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="footer-card">
       <span class="fc-icon">+</span>
       <p><b>New hub, same link.</b> As each hub goes up for a new exam, it gets added here under its class — bookmark this page instead of the individual hub links, and you'll always find the current set.</p>
     </div>
-    <p class="footer-fine">Built &amp; maintained by Sam &middot; D2 &middot; UAB</p>
+    <p class="footer-fine">Built &amp; maintained by Sam &middot; D2 &middot; UAB &middot; <a href="review/">review</a></p>
   </footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
@@ -478,6 +524,14 @@ footer{margin-top:52px; padding-top:26px;}
   var strip = document.getElementById("changelog-strip");
   var list = document.getElementById("changelog-list");
   var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio" };
+  var ALL_HUBS = ["genetics", "hepatobiliary", "fixed-pros", "gi-exam1", "perio"];
+
+  var supabase = null;
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SB_URL, SB_KEY);
+    }
+  } catch (e) { /* Class Pulse is best-effort, never break the page */ }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
   function fmtDate(iso){
@@ -588,5 +642,66 @@ footer{margin-top:52px; padding-top:26px;}
       }
     });
   });
+
+  /* ---------- Class Pulse: aggregated live count across all hubs ---------- */
+  if (supabase) {
+    var liveCounts = {};
+    var liveEl = document.getElementById("pulseLiveCount");
+    function renderLive(){
+      var total = 0;
+      ALL_HUBS.forEach(function(h){ total += liveCounts[h] || 0; });
+      if (liveEl) liveEl.textContent = total;
+    }
+    var watcherId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random());
+    ALL_HUBS.forEach(function(hub){
+      try {
+        var ch = supabase.channel("presence:" + hub, { config: { presence: { key: "dash-" + watcherId + "-" + hub } } });
+        ch.on("presence", { event: "sync" }, function(){
+          try {
+            var state = ch.presenceState();
+            liveCounts[hub] = Object.keys(state).length || 0;
+          } catch (e) { liveCounts[hub] = 0; }
+          renderLive();
+        });
+        ch.subscribe(); // listen only — never track, so the dashboard itself never counts as "studying"
+      } catch (e) {}
+    });
+
+    /* ---------- Class Pulse: combined busiest-times heatmap ---------- */
+    var pulseHistWrap = document.getElementById("pulseHistWrap");
+    supabase.from("presence_hourly").select("hour_of_day,ping_count").then(function(res){
+      if (!pulseHistWrap) return;
+      var rows = (res && res.data) || [];
+      if (!rows.length) { pulseHistWrap.innerHTML = '<div class="pulse-empty">Not enough activity yet.</div>'; return; }
+      var byHour = {};
+      rows.forEach(function(r){ byHour[r.hour_of_day] = (byHour[r.hour_of_day] || 0) + r.ping_count; });
+      var max = 0;
+      for (var h = 0; h < 24; h++) max = Math.max(max, byHour[h] || 0);
+      var bars = "";
+      for (var h2 = 0; h2 < 24; h2++) {
+        var v = byHour[h2] || 0;
+        var pctH = max ? Math.max(3, Math.round((v / max) * 100)) : 3;
+        var label = (h2 === 0 ? "12a" : h2 < 12 ? h2 + "a" : h2 === 12 ? "12p" : (h2 - 12) + "p");
+        bars += '<div class="pulse-hbar" style="height:' + pctH + '%" title="' + label + ': ' + v + '"></div>';
+      }
+      pulseHistWrap.innerHTML = '<div class="pulse-hist">' + bars + '</div><div class="pulse-hlabels"><span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span></div>';
+    }, function(){ if (pulseHistWrap) pulseHistWrap.innerHTML = '<div class="pulse-empty">Couldn&#39;t load this right now.</div>'; });
+
+    /* ---------- Class Pulse: study-streak leaderboard ---------- */
+    var pulseLbEl = document.getElementById("pulseLeaderboard");
+    supabase.rpc("get_leaderboard", { p_limit: 6 }).then(function(res){
+      if (!pulseLbEl) return;
+      var rows = (res && res.data) || [];
+      if (!rows.length) { pulseLbEl.innerHTML = '<div class="pulse-empty">No active streaks yet — answer a couple days in a row to show up here.</div>'; return; }
+      pulseLbEl.innerHTML = '<ul class="pulse-lb">' + rows.map(function(r, i){
+        return '<li class="pulse-lb-row"><span class="pulse-lb-rank">' + (i + 1) + '</span><span class="pulse-lb-name">' + esc(r.display_name) + '</span><span class="pulse-lb-streak">' + r.streak + (r.streak === 1 ? ' day' : ' days') + '</span></li>';
+      }).join("") + '</ul>';
+    }, function(){ if (pulseLbEl) pulseLbEl.innerHTML = '<div class="pulse-empty">Couldn&#39;t load the leaderboard right now.</div>'; });
+  } else {
+    var pulseHistWrapFallback = document.getElementById("pulseHistWrap");
+    var pulseLbElFallback = document.getElementById("pulseLeaderboard");
+    if (pulseHistWrapFallback) pulseHistWrapFallback.innerHTML = '<div class="pulse-empty">Unavailable right now.</div>';
+    if (pulseLbElFallback) pulseLbElFallback.innerHTML = '<div class="pulse-empty">Unavailable right now.</div>';
+  }
 })();
 </script>

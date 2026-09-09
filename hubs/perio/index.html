@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
 <title>Periodontology D2 Compendium</title>
-<meta name="description" content="Unified study hub for Periodontology D2 — lecture compendium, diagram atlas, and clinic-floor practice game.">
+<meta name="description" content="Unified study hub for Periodontology D2 — lecture compendium, diagram atlas, and an underground Understory practice game.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -467,7 +467,7 @@ footer.hub-footer{
     <nav id="modeSwitch" role="tablist" aria-label="Study mode">
       <button role="tab" data-mode="compendium" aria-selected="true"><span class="mode-icon">&#9776;</span>Compendium</button>
       <button role="tab" data-mode="atlas" aria-selected="false"><span class="mode-icon">&#9737;</span>Atlas</button>
-      <button role="tab" data-mode="game" aria-selected="false"><span class="mode-icon">&#9733;</span>Clinic Floor</button>
+      <button role="tab" data-mode="game" aria-selected="false"><span class="mode-icon">&#9935;</span>Understory</button>
     </nav>
   </header>
 
@@ -493,7 +493,7 @@ footer.hub-footer{
 /* ---------- LECTURES ---------- */
 var LECTURES = [
   { id:'diagnosis-tx-planning', num:1, title:'Overview of Diagnosis, Classification & Treatment Planning', who:'Dr. Abou-Arraj', tag:'teal', source:'Lecture recording + slides (session 1)', status:'taught' },
-  { id:'incisions-flaps-sutures', num:2, title:'Incisions, Flaps & Sutures', who:'Dr. Basma', tag:'rose', source:'Slide deck preloaded — recording not posted yet', status:'preview' },
+  { id:'incisions-flaps-sutures', num:2, title:'Incisions, Flaps & Sutures', who:'Dr. Basma', tag:'rose', source:'Recording + slide deck', status:'taught' },
   { id:'risk-assessment', num:3, title:'Risk Assessment', who:'Dr. Geisinger', tag:'amber', source:'Exam-review guide only — session not yet taught', status:'upcoming' },
   { id:'phase1-therapy', num:4, title:'Phase I Therapy', who:'Dr. Carr', tag:'blue', source:'Exam-review guide only (instrumentation) — session not yet taught', status:'upcoming' },
   { id:'resective-furcation', num:5, title:'Resective Surgery & Furcation Management', who:'Dr. Litz', tag:'violet', source:'Exam-review guide only — session not yet taught', status:'upcoming' },
@@ -534,12 +534,18 @@ var SUTURE_TECHNIQUES = [
 ];
 
 var FLAP_DESIGNS = [
-  { name:'Sulcular flap', note:'Limited access; good for minor augmentation and simple implant placement; hard to advance because of lateral attachment. Adding a lateral extension improves access for moderate augmentation.' },
-  { name:'Pyramidal flap', note:'Named shape-based design incorporating releasing incisions.' },
-  { name:'Trapezoidal flap', note:'Named shape-based design incorporating releasing incisions.' },
+  { name:'Sulcular flap', note:'Intrasulcular incision around the surgical tooth plus one adjacent tooth on each side, no vertical release. Limited access and hard to advance because the tissue stays attached laterally — the first option for minor augmentation or single implant placement. Extending it to include more teeth (still no vertical) buys moderate additional access without dropping a vertical incision.' },
+  { name:'Pyramidal flap', note:'One vertical incision plus an intrasulcular incision across three teeth (e.g. distal of #7, then intrasulcular on 7-8-9) — named for the triangular shape it opens. Used when a periapical lesion or graft site needs more exposure than a sulcular flap gives but doesn\'t justify releasing both sides — a classic choice for implant placement with an onlay graft.' },
+  { name:'Trapezoidal flap', note:'Two vertical incisions, one on each side of the defect, combined with the intrasulcular incision between them. Needed for major augmentation (vertical ridge grafts, large sinus lifts) because two releases let the flap coronally advance with passive, tension-free closure over the graft — a single vertical often can\'t stretch that far without tearing.' },
+  { name:'Envelope (pouch) flap', note:'Buccal-only elevation with no papilla reflection at all — the papillae are left completely intact. Used for soft-tissue augmentation (root coverage) where the graft needs to be tucked under coronally advanced tissue without disturbing the interdental architecture.' },
   { name:'Full-thickness (mucoperiosteal) flap', note:'Periosteum reflected with the flap; exposes bone.' },
   { name:'Split-thickness flap', note:'Periosteum left on the bone; only mucosa/submucosa reflected — used when apical repositioning or periosteal preservation is needed.' },
   { name:'Papilla-sparing flap', note:'Keeps the interdental papilla intact — favored for esthetic and regenerative surgery.' }
+];
+var INCISION_TYPES = [
+  { name:'Intrasulcular incision', note:'Blade inserted in the sulcus around a present tooth, separating the gingival fibers from the tooth — runs around the full circumference: buccal, lingual, and through the papillae. This is the same physical incision as a "crestal" incision; it only gets the intrasulcular name because a tooth is there.' },
+  { name:'Crestal incision', note:'The identical straight incision along the ridge, used instead of "intrasulcular" only because the site is edentulous — there is no sulcus to speak of. Naming is about tooth presence, not technique.' },
+  { name:'Vertical (releasing) incision', note:'Placed vertically at the line angle of a tooth to open a bigger flap than intrasulcular/crestal incisions alone can give — dropped whenever the surgery (soft-tissue, bone, or sinus augmentation) needs more apical exposure than a small flap provides. One vertical makes a pyramidal flap; two make a trapezoidal flap.' }
 ];
 var FLAP_CLASSIFICATION_AXES = [
   'Bone exposure after flap reflection (full-thickness vs. split-thickness)',
@@ -812,6 +818,12 @@ var QUESTIONS = [
 { id:'q2-15', lec:'incisions-flaps-sutures', type:'mcq', stem:"Flap designs are classified along three axes. Which of these is NOT one of them?", choices:['Suture material used to close the flap','Bone exposure after flap reflection','Placement of the flap after surgery relative to the CEJ','Management of the papillae'], answer:0, src:'lecture' },
 { id:'q2-16', lec:'incisions-flaps-sutures', type:'recall', stem:"List the 5 surgical principles for incisions and flap design given in this lecture.", answer:"1) Firm, continuous incision stroke. 2) Incision at a distance from the lesion/bony defect. 3) Vertical incisions at the line angle of the tooth. 4) Periosteum reflected as an integral part of the flap. 5) The flap base as wide as its free edge.", src:'lecture' },
 { id:'q2-17', lec:'incisions-flaps-sutures', type:'mcq', stem:"Why must the base of a flap be at least as wide as its free edge?", choices:["To protect the flap's blood supply", 'To make suturing easier', 'To reduce total incision length', 'To avoid touching the periosteum'], answer:0, src:'lecture' },
+{ id:'q2-18', lec:'incisions-flaps-sutures', type:'mcq', stem:"A surgeon performs the exact same sulcus-following incision around tooth #8, which is present, and along an edentulous ridge where tooth #9 used to be. What are these two incisions called?", choices:['Intrasulcular at #8, crestal at #9 — same technique, named by tooth presence','Crestal at #8, intrasulcular at #9','Both are called vertical incisions','Both are called pouch incisions'], answer:0, ex:"Intrasulcular and crestal are the same physical incision. The name changes based only on whether a tooth is present at that site, not on any difference in technique.", src:'lecture' },
+{ id:'q2-19', lec:'incisions-flaps-sutures', type:'mcq', stem:"Why would a surgeon drop a vertical incision instead of just extending the intrasulcular incision to more teeth?", choices:["To gain more apical exposure without including teeth that don't need to be involved","Because vertical incisions heal faster than intrasulcular ones","Vertical incisions are required by law to be used before any bone graft","To avoid ever having to place a suture"], answer:0, src:'lecture' },
+{ id:'q2-20', lec:'incisions-flaps-sutures', type:'mcq', stem:"A root-coverage case needs a soft-tissue graft placed without disturbing the papillae at all. Which flap design fits?", choices:['Envelope (pouch) flap','Trapezoidal flap','Full-thickness flap exposing bone','Sulcular flap extended to 4 teeth'], answer:0, ex:"The envelope/pouch flap elevates only the buccal tissue and never reflects the papillae — exactly what a root-coverage graft needs.", src:'lecture' },
+{ id:'q2-21', lec:'incisions-flaps-sutures', type:'mcq', stem:"A major vertical ridge-augmentation graft needs the flap to advance coronally with zero tension over the graft. Which flap design is built for that?", choices:['Trapezoidal flap (two vertical incisions)','Sulcular flap (no vertical incisions)','Pyramidal flap (one vertical incision)','Envelope flap (no reflection of the papillae)'], answer:0, ex:"Two releasing incisions, one on each side of the defect, let the flap stretch coronally without tension — a single vertical often can't reach that far without tearing.", src:'lecture' },
+{ id:'q2-22', lec:'incisions-flaps-sutures', type:'mcq', stem:"An implant needs onlay bone grafting around it, and the surgeon wants more access than a sulcular flap gives without opening both sides of the site. What's the fit?", choices:['Pyramidal flap — one vertical plus intrasulcular across three teeth','Trapezoidal flap — two verticals','Sulcular flap only','Envelope flap only'], answer:0, src:'lecture' },
+{ id:'q2-23', lec:'incisions-flaps-sutures', type:'match', stem:"Match each suture material family to an example the lecture named.", pairs:[['Absorbable, natural','Gut / chromic gut'],['Absorbable, synthetic','Vicryl / Monocryl'],['Non-absorbable','Silk / ePTFE / Prolene / nylon']], src:'lecture' },
 
 /* ===== Lecture 3 — Risk Assessment ===== */
 { id:'q3-01', lec:'risk-assessment', type:'mcq', stem:"Which risk-assessment system is applied to individual teeth and can be either diagnostic or therapeutic?", choices:['McGuire & Nunn','Kwok & Caton','Miller & McEntire','None of these'], answer:0, src:'exam-review' },
@@ -924,14 +936,21 @@ READINGS['diagnosis-tx-planning'] = `
 `;
 
 READINGS['incisions-flaps-sutures'] = `
-<p>This session (not yet lectured — the notes below come from Dr. Basma's preloaded slide deck) covers how a periodontal flap is opened, shaped, and closed. Incisions are either vertical or crestal, or the surgeon can avoid a flap altogether with a pouch/tunnel approach. Five principles govern every incision and flap: a firm, continuous stroke; keeping the incision at a distance from the actual lesion or bony defect; placing vertical incisions at the line angle of the tooth; reflecting the periosteum as an integral part of the flap; and keeping the base of the flap at least as wide as its free edge, since a narrow base starves the flap of blood supply.</p>
+<p>Every periodontal surgery sits somewhere on one spectrum: a simple extraction might need no incision and no flap at all; a soft-tissue graft over a recession needs a small flap with limited reflection; a sinus or ridge augmentation needs a large flap opened by multiple incisions. The choice of incision and flap design is genuinely clinician-dependent — Dr. Basma was upfront that two surgeons can disagree on the best approach to the same case — but a small, fixed set of designs covers nearly everything.</p>
+<h5>Naming an incision: it's about the tooth, not the technique</h5>
+<p>The most-missed distinction in this session is that <b>intrasulcular</b> and <b>crestal</b> describe the same physical incision, named differently only by whether a tooth is present. If a tooth is there, the blade is inserted in the sulcus to separate the gingival fibers from the tooth — all the way around, buccal, lingual, and through the papillae — and that's called intrasulcular. If the site is edentulous, there's no sulcus, so the identical straight incision along the crest of the ridge is instead called a crestal incision. More teeth included in the intrasulcular/crestal incision means more flap and better access, but including teeth you don't need to compromises esthetics for no benefit.</p>
+<p>When intrasulcular or crestal alone doesn't give enough exposure — most major augmentations — a <b>vertical (releasing) incision</b> is dropped at the line angle of a tooth to open a bigger flap without having to include more teeth in the horizontal incision. One vertical incision plus intrasulcular across three teeth (say, distal of #7 with intrasulcular on 7-8-9) makes a triangular <b>pyramidal flap</b> — enough exposure for implant placement with an onlay graft. Two verticals, one on each side of the defect, make a <b>trapezoidal flap</b>, needed for major vertical augmentation because two releases let the flap coronally advance with passive, tension-free closure over a graft — something a single vertical often can't stretch to do without tearing.</p>
+<p>There's one more incision family that skips reflection almost entirely: the <b>envelope (pouch) flap</b>. The papillae are never touched — only the buccal tissue is elevated, giving just enough release to coronally advance the flap over a soft-tissue graft (autogenous or allograft) while leaving the interdental architecture completely intact. This is the design of choice for pure root-coverage cases, where disturbing the papilla would work against the esthetic goal.</p>
 <h5>Reading a flap design</h5>
-<p>Flaps are classified along three independent axes: how much bone is exposed on reflection (full-thickness, taking the periosteum with it, versus split-thickness, leaving periosteum on the bone), where the flap is repositioned after surgery (coronal to the CEJ for soft-tissue augmentation, or apical for crown lengthening and osseous surgery), and whether the papilla is preserved intact (papilla-sparing) or not. A sulcular flap gives limited access and is hard to advance because of its lateral attachment — useful for minor augmentation or simple implant placement, and can be extended laterally when more access is needed. Pyramidal and trapezoidal flaps are named for their releasing-incision shape.</p>
+<p>Beyond how it's opened, a flap is classified along three more axes: how much bone is exposed on reflection (full-thickness, taking the periosteum with it, versus split-thickness, leaving periosteum on the bone), where it's repositioned after surgery (coronal to the CEJ for soft-tissue augmentation, or apical for crown lengthening and osseous surgery), and whether the papilla is preserved intact or not. A <b>sulcular flap</b> — intrasulcular incision only, no vertical release — gives the most limited access of the group and is hard to advance because the tissue stays attached laterally; it's the first, smallest option, reached for on minor augmentation or a single implant. Extending it to include one more tooth on each side (still no vertical) buys moderate additional access without escalating to a releasing incision at all.</p>
 <h5>Choosing a suture material</h5>
-<p>Every suture sits on two axes: natural versus synthetic, and monofilament versus braided. Chromic gut is natural, monofilament, and resorbs fastest (7–10 days) but handles very poorly, and is reached for at extraction sites, implants without additional grafting, or to stabilize a collagen membrane. The two synthetic resorbables split by construction: PGA is braided, resorbs slowest of the resorbables (55–70 days), handles beautifully, but irritates tissue — a fit for ridge and sinus augmentation where healing takes a while. PGCL is monofilament, resorbs faster (22–55 days), and is gentler on tissue, making it the choice for soft-tissue grafting and esthetic crown lengthening. Among the non-resorbables, poly-propylene behaves like nylon with no tissue adherence; silk handles beautifully but causes the worst tissue reaction of any material on the list and must be physically removed at 7 days; PTFE is the highest-cost option and is used across nearly every surgery type except pure soft-tissue grafts.</p>
+<p>At the broadest level, sutures split into <b>absorbable</b> (degrade in the body via hydrolysis or enzymatic cleavage — gut, chromic gut, and the synthetic Vicryl/Monocryl family) and <b>non-absorbable</b> (must be physically removed by the clinician, typically 10–14 days out, or left long-term — silk, ePTFE, polypropylene/Prolene, nylon). Plain gut resorbs fastest (7–10 days); chromic gut, treated with chromium salts, lasts a bit longer (10–14 days); synthetic absorbables like Vicryl hold tensile strength for 2–3 weeks and fully resorb over a longer stretch. Absorbables are the natural choice for quick pediatric cases or simple extractions where a suture-removal visit is a burden; non-absorbables like ePTFE are favored over major bone grafts specifically because they resist plaque attraction, hold high tensile strength, and won't break down prematurely on you.</p>
+<p>The course's own material comparison chart sorts six specific materials along the same two axes — natural vs. synthetic, monofilament vs. braided — plus resorption time, strength, tissue reaction, and handling (full chart in Reference Tables). Chromic gut is natural, monofilament, and resorbs fastest (7–10 days) but handles very poorly; it's reached for at extraction sites, implants without additional grafting, or to stabilize a collagen membrane. The two synthetic resorbables split by construction: PGA is braided, resorbs slowest of the resorbables (55–70 days), handles beautifully, but irritates tissue — a fit for ridge and sinus augmentation where healing takes a while. PGCL is monofilament, resorbs faster (22–55 days), and is gentler on tissue, making it the choice for soft-tissue grafting and esthetic crown lengthening. Among the non-resorbables, poly-propylene behaves like nylon with no tissue adherence; silk handles beautifully but causes the worst tissue reaction of any material on the list and must be physically removed at 7 days; PTFE is the highest-cost option and is used across nearly every surgery type except pure soft-tissue grafts.</p>
 <p>Needle geometry matters as much as the thread. A reverse cutting needle keeps its flat side toward the tissue on the upward pass, reducing tear-through compared to a standard cutting needle. Larger curvature (a bigger arc of the circle) takes a deeper bite; a larger needle diameter passes through more tissue but demands more hand rotation. In suture sizing, a larger number means a smaller diameter — and a smaller-diameter thread needs more knots to hold securely.</p>
 <h5>Choosing a technique</h5>
 <p>Single interrupted sutures (with the figure-8 variant) are the general-purpose default, each throw tied independently. Horizontal mattress sutures are essential for larger bone-augmentation procedures and prevent flap-margin inversion, but overtightening constricts blood supply to the incision edge and risks bone necrosis and dehiscence. Vertical mattress sutures maximize tissue approximation and eversion, and are the go-to for approximating papillae in the esthetic zone or closing an oro-antral communication. Continuous and continuous-locking sutures place bites close together for a strong seal, but the entire line can come undone if a single throw fails — a real risk with monofilament or other high-glide materials — and are typically reserved for edentulous long-span areas, alveoloplasties, and apicoectomies. Sling and periosteal-anchorage sutures round out the technique list for repositioning a flap around a single tooth or anchoring it apically or laterally.</p>
+<h5>Five surgical principles</h5>
+<p>Every incision and flap in this course answers to the same five rules: a firm, continuous stroke rather than several tentative passes; keeping the incision at a distance from the actual lesion or bony defect rather than cutting directly over it; placing vertical incisions at the line angle of the tooth; reflecting the periosteum as an integral part of the flap; and keeping the base of the flap at least as wide as its free edge, since a narrow base starves the flap of the only blood supply it has left once it's reflected.</p>
 `;
 
 READINGS['risk-assessment'] = `
@@ -982,7 +1001,9 @@ var EXAM_HINTS = [
   { lec:'diagnosis-tx-planning', type:'emphasize', quote:"It's fair to come back and ask you [about session 1–4 material on the final]. These are things you're going to be doing on your patients day in and day out, here and later.", takeaway:"The comprehensive final can re-test material already covered on the midterm — do not treat midterm topics as \"done\" once the midterm has passed." },
   { lec:'diagnosis-tx-planning', type:'emphasize', quote:"The evidence is overwhelming for the efficacy of periodontal maintenance.", takeaway:"Be ready to cite the Becker et al. tooth-loss-per-year figures (untreated vs. treated-without-maintenance vs. treated-with-maintenance) as the evidence base for this claim." },
   { lec:'diagnosis-tx-planning', type:'deemphasize', quote:"Nothing really in the minutiae of things such as percentages and all that. You may have one or two on those, but that's not really the gist of it.", takeaway:"Exam questions lean case-based and conceptual rather than testing exact epidemiological percentages — know the concepts (e.g., \"42% of US adults have some form of periodontitis\") without over-memorizing statistics." },
-  { lec:'diagnosis-tx-planning', type:'deemphasize', quote:"Third molars aren't always kind of taking an account in the essence of the case because they're not always present for most patients... we typically don't necessarily take them heavily into account.", takeaway:"When staging a case, third-molar findings (like isolated mobility) usually will not drive the overall stage the way the same finding on another tooth would." }
+  { lec:'diagnosis-tx-planning', type:'deemphasize', quote:"Third molars aren't always kind of taking an account in the essence of the case because they're not always present for most patients... we typically don't necessarily take them heavily into account.", takeaway:"When staging a case, third-molar findings (like isolated mobility) usually will not drive the overall stage the way the same finding on another tooth would." },
+  { lec:'incisions-flaps-sutures', type:'deemphasize', quote:"There's a lot of incisions that we have, but I will focus on only two: vertical and crestal incisions... We have different kinds of incisions, but we're not going to go deep into those kind of incisions.", takeaway:"Study intrasulcular/crestal and vertical incisions in depth — other incision families were named only in passing and aren't where this lecture's testing weight sits." },
+  { lec:'incisions-flaps-sutures', type:'emphasize', quote:"This topic is very controversial... it's really a topic that can be based on the clinician preference. Like, if you ask the same question or the same case for two different surgeons, they might have a different opinion on what's the best material of suture material we're going to use, what is the best incision or flap design we're going to be doing in this case.", takeaway:"Expect case-based reasoning rather than a single memorized \"correct\" answer for incision/flap/suture choice — be ready to justify a defensible option, the same case-based exam style as Session 1." }
 ];
 
 /* ---------- ATLAS VIEWS ---------- */
@@ -1058,7 +1079,7 @@ var ACHIEVEMENTS = [
   { id:'fifty-correct', name:'Chart Topper', desc:'Answer 50 questions correctly.', icon:'50', cond:{type:'totalCorrect', value:50} },
   { id:'streak-5', name:'Clean Margins', desc:'String together a 5-answer streak.', icon:'5x', cond:{type:'streak', value:5} },
   { id:'streak-10', name:'No Bleeding on Probing', desc:'String together a 10-answer streak.', icon:'10x', cond:{type:'streak', value:10} },
-  { id:'full-clinic', name:'Full Clinic Day', desc:'Clear every room on the clinic floor.', icon:'9/9', cond:{type:'allCleared'} }
+  { id:'full-dig', name:'Bedrock Reached', desc:'Clear every gallery in the Understory.', icon:'9/9', cond:{type:'allCleared'} }
 ];
 LECTURES.forEach(function(l){
   ACHIEVEMENTS.push({ id:'mastery-'+l.id, name:'Session '+l.num+' Mastered', desc:'Answer every question from "'+l.title+'" correctly.', icon:'S'+l.num, cond:{type:'topicPercent', lec:l.id, value:100} });
@@ -1512,7 +1533,10 @@ function renderReferenceTables(){
   html += refSection('ref-incisions-flaps-sutures-2','rose','Suturing techniques (Session 2)','Incisions, Flaps & Sutures', tableWrap(
     ['Technique','Notes'], SUTURE_TECHNIQUES.map(function(r){ return tr([r.name,r.note]); }).join('')
   ));
-  html += refSection('ref-incisions-flaps-sutures-3','rose','Flap designs (Session 2)','Incisions, Flaps & Sutures',
+  html += refSection('ref-incisions-flaps-sutures-3','rose','Incision types (Session 2)','Incisions, Flaps & Sutures',
+    tableWrap(['Incision','Notes'], INCISION_TYPES.map(function(r){ return tr([r.name,r.note]); }).join('')));
+
+  html += refSection('ref-incisions-flaps-sutures-4','rose','Flap designs (Session 2)','Incisions, Flaps & Sutures',
     '<p style="font-size:.85rem;color:var(--ink-soft);margin-bottom:10px;">Classified along three axes: ' + FLAP_CLASSIFICATION_AXES.join('; ') + '.</p>' +
     tableWrap(['Design','Notes'], FLAP_DESIGNS.map(function(r){ return tr([r.name,r.note]); }).join('')) +
     '<p style="margin-top:10px;"><b>Surgical principles:</b> ' + SURGICAL_PRINCIPLES.join(' &middot; ') + '</p>');
@@ -1565,7 +1589,7 @@ function renderReferenceTables(){
 
 var CRAM_CONTENT = [
   { lec:'diagnosis-tx-planning', points:['CAL = PD + GR (signed) — always confirm attachment AND bone loss before staging off probing depth alone','RT1 no interproximal loss / RT2 buccal>interproximal / RT3 interproximal>buccal','Stage 1–2: CAL ≤4mm, coronal third. Stage 3–4: CAL ≥5mm, middle third+ — separated by tooth loss (≤4 vs ≥5) and complexity, not more CAL','Auto Stage 3/4: vertical loss ≥3mm, Class II–III furcation, periodontitis tooth loss','Default Grade B; ratio >1 → C. Heavy smoking or HbA1c ≥7% force Grade C regardless of ratio','More remaining bony walls = better regeneration prognosis (3-wall best, 1-wall worst)','Phase I always first; caries control is part of Phase I; final crown/RPD waits until perio therapy is done','Maintenance ≠ prophylaxis — treated-without-maintenance patients lose teeth ~2x faster than maintained patients'] },
-  { lec:'incisions-flaps-sutures', points:['Resorbable: chromic gut (fastest, worst handling) < PGCL < PGA (slowest, best handling, worst reaction)','Non-resorbable: poly-propylene (like nylon) / silk (worst reaction, remove @7d) / PTFE (priciest, broadest use)','Horizontal mattress = augmentation workhorse but can strangle blood supply if overtight','Vertical mattress = esthetic-zone papilla approximation, oro-antral closure','Continuous/locking = fast seal, whole-line failure risk — long edentulous spans','Flap base must be ≥ as wide as its free edge, to protect blood supply','Vertical incisions always at the line angle, never mid-facial'] },
+  { lec:'incisions-flaps-sutures', points:['Intrasulcular = crestal — same incision, named by whether a tooth is present or the site is edentulous','Sulcular flap (no vertical) → Pyramidal (1 vertical) → Trapezoidal (2 verticals) as access needs escalate','Envelope/pouch flap = buccal only, papillae never touched — the root-coverage design','Resorbable: chromic gut (fastest, worst handling) < PGCL < PGA (slowest, best handling, worst reaction)','Non-resorbable: poly-propylene (like nylon) / silk (worst reaction, remove @7d) / PTFE (priciest, broadest use)','Horizontal mattress = augmentation workhorse but can strangle blood supply if overtight','Vertical mattress = esthetic-zone papilla approximation, oro-antral closure','Continuous/locking = fast seal, whole-line failure risk — long edentulous spans','Flap base must be ≥ as wide as its free edge, to protect blood supply','Vertical incisions always at the line angle, never mid-facial'] },
   { lec:'risk-assessment', points:['McGuire & Nunn: per tooth, diagnostic OR therapeutic','Kwok & Caton: whole dentition, therapeutic only, predicts stability','Miller & McEntire: molars only, therapeutic only, predicts retention'] },
   { lec:'phase1-therapy', points:['Gracey curettes are area-specific (3/4 anterior, 11/12 mesial+molar B/L, 13/14 distal, 15/16 alt-mesial)','Columbia 13/14 is the universal subgingival curette','Nabers = furcation; ODU 11/12 = root-surface roughness; sickle/S204SD9 = supragingival only'] },
   { lec:'resective-furcation', points:['Maxillary molar furcation entrances: mesial 3mm, buccal 3.5mm (narrowest), distal 5mm from CEJ','Mandibular: lingual entrance wider AND deeper than buccal','Class I → SRP + plasty. Class II → +tunnel/resection/GTR (mandibular). Class III → tunnel/resection/extraction','Reverse (negative) bone architecture = interdental bone apical to facial/lingual margins = resective target'] },
@@ -1857,33 +1881,37 @@ function wireAtlasPanel(panel){
 }
 
 /* ====================================================================
-   GAME MODE — The Clinic Floor
+   GAME MODE — The Understory
+   An excavated root-and-cave system beneath the surface. Each gallery's
+   walls are cut to match the bone-defect wall-counts taught in that
+   gallery's sessions (see gallerySVG below) — the setting's shape is
+   drawn from the subject's own vocabulary, not just its colors.
    ==================================================================== */
-var CLINIC_WINGS = [
-  { id:'wing-foundations', name:'Foundations Wing', tag:'teal', room:'Exam Room',
-    desc:'Diagnosis, surgical basics, risk, and Phase I — the first four sessions.',
+var GALLERIES = [
+  { id:'gallery-taproot', name:'Taproot Gallery', tag:'teal', room:'Root Chamber',
+    desc:'Diagnosis, surgical basics, risk, and Phase I — the first four sessions, the root system everything else grows from.',
     wards:['diagnosis-tx-planning','incisions-flaps-sutures','risk-assessment','phase1-therapy'] },
-  { id:'wing-surgical', name:'Surgical & Regenerative Wing', tag:'rose', room:'Surgical Suite',
-    desc:'Resective correction and regenerative grafting.',
+  { id:'gallery-crater', name:'Crater Hollow', tag:'rose', room:'Defect Chamber',
+    desc:'Resective correction and regenerative grafting — carving out and rebuilding bony defects.',
     wards:['resective-furcation','periodontal-regeneration'] },
-  { id:'wing-reconstructive', name:'Reconstructive & Pharmacy Wing', tag:'amber', room:'Pharmacy & Lab',
-    desc:'Implants, pharmacotherapy, and periodontal plastic surgery.',
+  { id:'gallery-vein', name:'Vein Works', tag:'amber', room:'Vein Chamber',
+    desc:'Implants, pharmacotherapy, and periodontal plastic surgery — metal, chemistry, and polish.',
     wards:['implants-perio','antibiotics-host-mod','perio-plastic-esthetics'] }
 ];
-var CLINIC_WING_BY_ID = {}; CLINIC_WINGS.forEach(function(w){ CLINIC_WING_BY_ID[w.id]=w; });
+var GALLERY_BY_ID = {}; GALLERIES.forEach(function(w){ GALLERY_BY_ID[w.id]=w; });
 var CHECKPOINTS = [
-  { id:'checkpoint-midterm', name:'Midterm Review', wards:['diagnosis-tx-planning','incisions-flaps-sutures','risk-assessment','phase1-therapy'], count:12 },
-  { id:'checkpoint-final', name:'Comprehensive Final', wards:LECTURES.map(function(l){return l.id;}), count:20 }
+  { id:'checkpoint-midterm', name:'The Fault Line', wards:['diagnosis-tx-planning','incisions-flaps-sutures','risk-assessment','phase1-therapy'], count:12 },
+  { id:'checkpoint-final', name:'The Bedrock', wards:LECTURES.map(function(l){return l.id;}), count:20 }
 ];
 var CHECKPOINT_BY_ID = {}; CHECKPOINTS.forEach(function(c){ CHECKPOINT_BY_ID[c.id]=c; });
 
-function wingOf(lecId){
-  return CLINIC_WINGS.find(function(w){ return w.wards.indexOf(lecId) > -1; });
+function galleryOf(lecId){
+  return GALLERIES.find(function(w){ return w.wards.indexOf(lecId) > -1; });
 }
-function wingProgress(wing){
+function galleryProgress(gallery){
   var correct = 0, total = 0;
-  wing.wards.forEach(function(lecId){ var p = lectureProgress(lecId); correct += p.correct; total += p.total; });
-  return { correct:correct, total:total, cleared: wing.wards.every(isLectureCleared) };
+  gallery.wards.forEach(function(lecId){ var p = lectureProgress(lecId); correct += p.correct; total += p.total; });
+  return { correct:correct, total:total, cleared: gallery.wards.every(isLectureCleared) };
 }
 function checkpointCleared(cp){ return cp.wards.every(isLectureCleared); }
 function checkpointProgress(cp){
@@ -1895,196 +1923,246 @@ function checkpointProgress(cp){
 /* ---------- Cutscenes — small recurring cast drawn from the Session-1 case files ---------- */
 var CUTSCENES = {
   'diagnosis-tx-planning': { beats:[
-    { kind:'narrator', text:'Chart review, first patient of the day.' },
-    { kind:'doc', text:'CHART — Case A, 30F, systemically healthy. FMX pending review.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Probing depth alone will not tell you the diagnosis. What else do you need?' },
+    { kind:'narrator', text:'Root Chamber, first specimen log of the day.' },
+    { kind:'doc', text:'FIELD LOG — Case A, 30F, systemically healthy. FMX pending review.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Probing depth alone will not tell you the diagnosis. What else do you need?' },
     { kind:'dialogue', speaker:'You', text:'Attachment loss and bone loss, both — otherwise it could just be gingivitis.' },
     { kind:'doc', text:'#30 mesial: 7mm PD, bone loss into the middle third. Bone-loss/age ratio > 1.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'So — stage and grade?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'So — stage and grade?' },
     { kind:'dialogue', speaker:'You', text:'Localized Stage 3, Grade C.' },
-    { kind:'narrator', text:'Correct. Chart signed. Next patient waiting in the surgical suite.' }
+    { kind:'narrator', text:'Correct. Log signed. Next specimen waiting deeper in the Root Chamber.' }
   ]},
   'incisions-flaps-sutures': { beats:[
-    { kind:'narrator', text:'Surgical suite, between cases.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Case B is on the schedule for a resective revision. Braided or monofilament for the closure?' },
+    { kind:'narrator', text:'Root Chamber, between digs.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Case B is on the schedule for a resective revision. Braided or monofilament for the closure?' },
     { kind:'dialogue', speaker:'You', text:'Depends what is driving the choice — monofilament glides but can slip undone if a throw fails; braided handles well but drags more bacteria and reacts worse.' },
-    { kind:'doc', text:'SUPPLY CART — PGCL spool, PTFE spool, silk spool (flagged: remove @ 7 days).' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'And the flap base?' },
+    { kind:'doc', text:'TOOL CACHE — PGCL spool, PTFE spool, silk spool (flagged: remove @ 7 days).' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'And the flap base?' },
     { kind:'dialogue', speaker:'You', text:'At least as wide as the free edge — it is the only blood supply the flap has left once it is reflected.' },
-    { kind:'narrator', text:'Tray is ready. Scrub in.' }
+    { kind:'narrator', text:'Kit\'s ready. Back to the trench.' }
   ]},
   'risk-assessment': { beats:[
-    { kind:'narrator', text:'Consult room — treatment-planning huddle.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Case C has several teeth in question. Which system tells you how likely a single one is to survive?' },
+    { kind:'narrator', text:'Root Chamber — survey huddle before the next cut.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Case C has several teeth in question. Which system tells you how likely a single one is to survive?' },
     { kind:'dialogue', speaker:'You', text:'McGuire and Nunn — that one is scored per tooth.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'And her odds of reaching stability across the whole mouth?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'And her odds of reaching stability across the whole mouth?' },
     { kind:'dialogue', speaker:'You', text:'Kwok and Caton — whole dentition, therapeutic only.' },
-    { kind:'narrator', text:'Filed. On to the molars specifically, next.' }
+    { kind:'narrator', text:'Logged. On to the molars specifically, next.' }
   ]},
   'phase1-therapy': { beats:[
-    { kind:'narrator', text:'Hygiene bay — instrument tray laid out for Case D.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Furcation check on the lower molars first — which probe?' },
+    { kind:'narrator', text:'Root Chamber — tool roll laid out for Case D.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Furcation check on the lower molars first — which probe?' },
     { kind:'dialogue', speaker:'You', text:'Nabers.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Then the mesial of the posterior teeth, subgingival.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Then the mesial of the posterior teeth, subgingival.' },
     { kind:'dialogue', speaker:'You', text:'Gracey 11/12 — or 15/16 if it is tight.' },
-    { kind:'doc', text:'INSTRUMENT LOG — Columbia 13/14 used universally on the distal sextant.' },
-    { kind:'narrator', text:'Tray restocked. Case D is up next door.' }
+    { kind:'doc', text:'TOOL LOG — Columbia 13/14 used universally on the distal sextant.' },
+    { kind:'narrator', text:'Kit restocked. Case D is up next, deeper in the gallery.' }
   ]},
   'resective-furcation': { beats:[
-    { kind:'narrator', text:'Second surgical bay — flap already reflected.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'The probe sinks past 3mm horizontally at the buccal furcation. Class?' },
+    { kind:'narrator', text:'Crater Hollow — the wall\'s already opened up.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'The probe sinks past 3mm horizontally at the buccal furcation. Class?' },
     { kind:'dialogue', speaker:'You', text:'Class II.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'On a mandibular molar, at that class — options?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'On a mandibular molar, at that class — options?' },
     { kind:'dialogue', speaker:'You', text:'Furcation plasty, tunnel prep, root resection, extraction — or GTR, since it is mandibular.' },
-    { kind:'doc', text:'OP NOTE — reverse architecture noted distal, flagged for resective recontouring.' },
-    { kind:'narrator', text:'Plan confirmed. Closing up.' }
+    { kind:'doc', text:'DIG NOTE — reverse architecture noted distal, flagged for resective recontouring.' },
+    { kind:'narrator', text:'Plan confirmed. Closing up the hollow.' }
   ]},
   'periodontal-regeneration': { beats:[
-    { kind:'narrator', text:'Same bay, different tray — grafting instruments today.' },
-    { kind:'doc', text:'CHART — Case E, 47F, HbA1c 6.1%. #2 defect: 3-wall, >3mm deep, <25° angle.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Good candidate. What goes in first?' },
+    { kind:'narrator', text:'Same hollow, different tools — grafting kit today.' },
+    { kind:'doc', text:'FIELD LOG — Case E, 47F, HbA1c 6.1%. #2 defect: 3-wall, >3mm deep, <25° angle.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Good candidate. What goes in first?' },
     { kind:'dialogue', speaker:'You', text:'EMD, or a graft alongside it — outcomes track close to GTR either way.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'And to keep the space from collapsing?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'And to keep the space from collapsing?' },
     { kind:'dialogue', speaker:'You', text:'A β-TCP scaffold — osteoconductive, and it stabilizes the clot.' },
     { kind:'narrator', text:'Grafted and closed. The five-year films will tell the story.' }
   ]},
   'implants-perio': { beats:[
-    { kind:'narrator', text:'Implant consult — Case B is asking about replacing a hopeless molar.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'He is still smoking a pack a day. What do you tell him?' },
+    { kind:'narrator', text:'Vein Works — Case B wants a hopeless molar replaced with something sturdier.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'He is still smoking a pack a day. What do you tell him?' },
     { kind:'dialogue', speaker:'You', text:'Nicotine impairs revascularization in soft and hard tissue and raises his failure risk directly — and A.a. and P. gingivalis get harder to clear.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'And if he also carries a positive IL-1 genotype?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'And if he also carries a positive IL-1 genotype?' },
     { kind:'dialogue', speaker:'You', text:'Synergistic, not additive — the highest peri-implantitis risk on the list.' },
-    { kind:'doc', text:'CONSULT NOTE — cessation counseling documented before consent.' },
-    { kind:'narrator', text:'Referral logged. Next chart.' }
+    { kind:'doc', text:'VEIN LOG — cessation counseling documented before consent.' },
+    { kind:'narrator', text:'Logged. Next specimen.' }
   ]},
   'antibiotics-host-mod': { beats:[
-    { kind:'narrator', text:'Pharmacy corner — a prescription pad and a lot of interactions to check.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Case C needs coverage for a necrotizing presentation you are worried about. First choice?' },
+    { kind:'narrator', text:'Vein Works apothecary niche — a prescription pad and a lot of interactions to check.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Case C needs coverage for a necrotizing presentation you are worried about. First choice?' },
     { kind:'dialogue', speaker:'You', text:'Metronidazole — anaerobes only, often paired with amoxicillin.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'She is also on warfarin for another condition — any concern?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'She is also on warfarin for another condition — any concern?' },
     { kind:'dialogue', speaker:'You', text:'Metronidazole increases the anticoagulant effect — worth a call to her physician.' },
-    { kind:'doc', text:'RX NOTE — avoid the tetracycline class entirely given her other prescriptions and age.' },
-    { kind:'narrator', text:'Prescription confirmed. Chart closed.' }
+    { kind:'doc', text:'APOTHECARY NOTE — avoid the tetracycline class entirely given her other prescriptions and age.' },
+    { kind:'narrator', text:'Prescription confirmed. Niche closed up.' }
   ]},
   'perio-plastic-esthetics': { beats:[
-    { kind:'narrator', text:'Final chart of the day — Case D, back for the root-coverage discussion.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'RT2 on the lower incisors. What can you promise her?' },
+    { kind:'narrator', text:'Final specimen of the day, deep in the Vein Works — Case D, back for the root-coverage discussion.' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'RT2 on the lower incisors. What can you promise her?' },
     { kind:'dialogue', speaker:'You', text:'Partial coverage — the interproximal loss caps how much we can bring back.' },
-    { kind:'dialogue', speaker:'Dr. A (attending)', text:'Autograft or allograft?' },
+    { kind:'dialogue', speaker:'Dr. A (dig lead)', text:'Autograft or allograft?' },
     { kind:'dialogue', speaker:'You', text:'A connective tissue graft off the palate for the best odds, or an ADM allograft if she would rather skip a second surgical site.' },
     { kind:'doc', text:'TX PLAN — non-surgical therapy first, root coverage procedure to follow crown revision.' },
-    { kind:'narrator', text:'Plan signed. Clinic is done for the day.' }
+    { kind:'narrator', text:'Plan signed. The dig is done for the day.' }
   ]}
 };
 
-var GAME_VIEW = { mode:'scene', wingId:null, lecId:null, checkpointId:null };
+var GAME_VIEW = { mode:'scene', galleryId:null, lecId:null, checkpointId:null };
 var GAME_ENCOUNTER_POOL = {}; // lecId or checkpointId -> array of question objects for this render pass
 
 function renderGame(){
-  if(GAME_VIEW.mode === 'wing') return renderWingDrilldown();
+  if(GAME_VIEW.mode === 'gallery') return renderGalleryDrilldown();
   if(GAME_VIEW.mode === 'encounter') return renderEncounter();
-  renderClinicScene();
+  renderUnderstoryScene();
 }
 
-function clinicFloorSVG(){
+function caveMouthPoints(x1, y1, x2, y2){
+  // an irregular cave-mouth silhouette in place of a sharp rectangle — deterministic, no external randomness
+  var w = x2-x1;
+  var j = Math.min(14, w*0.035);
+  var pts = [
+    [x1+j, y1], [x1+w*0.42, y1-j*0.5], [x2-j*1.3, y1+j*0.4], [x2, y1+j*1.7],
+    [x2-j*0.4, y2-j*1.3], [x2-w*0.36, y2+j*0.35], [x1+j*1.3, y2-j*0.25], [x1, y2-j*1.9]
+  ];
+  return pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ');
+}
+
+function understorySVG(){
   var W = 1400, H = 480;
   var svg = '';
-  // back wall
+  // rock-face back wall
   svg += '<rect x="0" y="60" width="'+W+'" height="300" fill="var(--surface-2)"></rect>';
-  // floor tiles (loop)
-  svg += '<rect x="0" y="360" width="'+W+'" height="120" fill="var(--surface)"></rect>';
-  for(var x=0; x<W; x+=56){
-    svg += '<line x1="'+x+'" y1="360" x2="'+x+'" y2="480" stroke="var(--line)"></line>';
+  // scattered rock texture (deterministic pseudo-random flecks)
+  for(var i=0; i<70; i++){
+    var fx = (i*61) % W;
+    var fy = 70 + ((i*97) % 260);
+    var fr = 1 + (i % 3);
+    svg += '<circle cx="'+fx+'" cy="'+fy+'" r="'+fr+'" fill="var(--line)"></circle>';
   }
+  // floor: mine-cart rails + ties, in place of tile
+  svg += '<rect x="0" y="360" width="'+W+'" height="120" fill="var(--surface)"></rect>';
   svg += '<line x1="0" y1="360" x2="'+W+'" y2="360" stroke="var(--line-strong)" stroke-width="2"></line>';
+  for(var x=10; x<W; x+=34){
+    svg += '<line x1="'+x+'" y1="400" x2="'+(x+16)+'" y2="400" stroke="var(--line)" stroke-width="4"></line>';
+  }
+  svg += '<line x1="0" y1="392" x2="'+W+'" y2="392" stroke="var(--ink-soft)" stroke-width="2.5"></line>';
+  svg += '<line x1="0" y1="410" x2="'+W+'" y2="410" stroke="var(--ink-soft)" stroke-width="2.5"></line>';
 
-  // reception decoration
-  svg += '<text x="35" y="100" font-size="13" fill="var(--ink-soft)" font-family="var(--font-mono)">ENTRANCE</text>';
-  svg += '<rect x="20" y="150" width="45" height="70" rx="4" fill="var(--surface)" stroke="var(--line-strong)"></rect>';
-  svg += '<circle cx="58" cy="185" r="2.5" fill="var(--ink-soft)"></circle>';
+  // stalactites in the gaps between chambers only — kept clear of every hotspot x-range
+  [30, 440, 580, 920, 1260, 1392].forEach(function(sx, i){
+    var sh = 26 + (i%3)*10;
+    svg += '<path d="M'+(sx-9)+',60 L'+sx+','+(60+sh)+' L'+(sx+9)+',60 Z" fill="var(--surface-2)" stroke="var(--line-strong)"></path>';
+  });
 
-  // ---- Wing A: Exam Room (teal) x 80-420 ----
-  svg += wingBaySVG(80, 420, 'var(--tag-teal-soft)', 'var(--tag-teal)', 'Foundations Wing', examRoomInterior());
-  // Midterm checkpoint door 460-560
-  svg += checkpointDoorSVG(460, 560, 'Midterm Review');
-  // ---- Wing B: Surgical Suite (rose) x 620-900 ----
-  svg += wingBaySVG(620, 900, 'var(--tag-rose-soft)', 'var(--tag-rose)', 'Surgical & Regen. Wing', surgicalRoomInterior());
-  // ---- Wing C: Pharmacy & Lab (amber) x 960-1240 ----
-  svg += wingBaySVG(960, 1240, 'var(--tag-amber-soft)', 'var(--tag-amber)', 'Reconstructive & Pharmacy Wing', pharmacyRoomInterior());
-  // Final checkpoint door 1280-1380
-  svg += checkpointDoorSVG(1280, 1380, 'Comprehensive Final');
+  // surface shaft — the entrance down into the Understory
+  svg += '<text x="8" y="46" font-size="12" fill="var(--ink-soft)" font-family="var(--font-mono)" letter-spacing="1">SURFACE</text>';
+  svg += '<line x1="18" y1="58" x2="18" y2="378" stroke="var(--ink-soft)" stroke-width="4"></line>';
+  svg += '<line x1="66" y1="58" x2="66" y2="378" stroke="var(--ink-soft)" stroke-width="4"></line>';
+  svg += '<line x1="18" y1="58" x2="66" y2="58" stroke="var(--ink-soft)" stroke-width="5"></line>';
+  svg += '<line x1="30" y1="70" x2="30" y2="378" stroke="var(--ink-soft)" stroke-width="2"></line>';
+  svg += '<line x1="54" y1="70" x2="54" y2="378" stroke="var(--ink-soft)" stroke-width="2"></line>';
+  for(var ry=90; ry<370; ry+=42){
+    svg += '<line x1="24" y1="'+ry+'" x2="60" y2="'+ry+'" stroke="var(--ink-soft)" stroke-width="2.5"></line>';
+  }
+
+  // ---- Gallery 1: Taproot Gallery (teal) x 80-420 ----
+  svg += gallerySVG(80, 420, 'var(--tag-teal-soft)', 'var(--tag-teal)', 'Taproot Gallery', rootChamberInterior());
+  // Fault Line checkpoint 460-560
+  svg += checkpointDoorSVG(460, 560, 'The Fault Line', 'fault');
+  // ---- Gallery 2: Crater Hollow (rose) x 620-900 ----
+  svg += gallerySVG(620, 900, 'var(--tag-rose-soft)', 'var(--tag-rose)', 'Crater Hollow', defectChamberInterior());
+  // ---- Gallery 3: Vein Works (amber) x 960-1240 ----
+  svg += gallerySVG(960, 1240, 'var(--tag-amber-soft)', 'var(--tag-amber)', 'Vein Works', veinChamberInterior());
+  // Bedrock checkpoint 1280-1380
+  svg += checkpointDoorSVG(1280, 1380, 'The Bedrock', 'bedrock');
 
   return { w:W, h:H, svg:svg };
 }
-function wingBaySVG(x1, x2, fillSoft, fillStrong, label, interiorSvg){
+function gallerySVG(x1, x2, fillSoft, fillStrong, label, interiorSvg){
   var w = x2 - x1;
   var s = '<g>';
-  s += '<rect x="'+x1+'" y="90" width="'+w+'" height="270" fill="'+fillSoft+'" stroke="'+fillStrong+'" stroke-width="2"></rect>';
+  s += '<polygon points="'+caveMouthPoints(x1,90,x2,360)+'" fill="'+fillSoft+'" stroke="'+fillStrong+'" stroke-width="2"></polygon>';
   s += '<text x="'+(x1+w/2)+'" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="'+fillStrong+'" font-family="var(--font-body)">'+escHtml(label)+'</text>';
   s += '<g transform="translate('+x1+',120)">' + interiorSvg + '</g>';
   s += '</g>';
   return s;
 }
-function checkpointDoorSVG(x1, x2, label){
+function checkpointDoorSVG(x1, x2, label, kind){
   var w = x2 - x1, cx = x1 + w/2;
   var s = '<g>';
-  s += '<rect x="'+x1+'" y="140" width="'+w+'" height="220" fill="var(--surface)" stroke="var(--alert)" stroke-width="2.5"></rect>';
-  s += '<circle cx="'+(x2-14)+'" cy="250" r="4" fill="var(--alert)"></circle>';
+  if(kind === 'bedrock'){
+    // a solid, layered slab — deeper and heavier than a fault crack
+    s += '<rect x="'+x1+'" y="120" width="'+w+'" height="240" fill="var(--surface-2)" stroke="var(--alert)" stroke-width="3"></rect>';
+    for(var sy=142; sy<352; sy+=24){
+      s += '<line x1="'+(x1+6)+'" y1="'+sy+'" x2="'+(x2-6)+'" y2="'+sy+'" stroke="var(--alert-soft)" stroke-width="2"></line>';
+    }
+    s += '<circle cx="'+cx+'" cy="250" r="14" fill="var(--alert-soft)" stroke="var(--alert)" stroke-width="2"></circle>';
+  } else {
+    // a jagged, glowing crack splitting the rock face
+    s += '<rect x="'+x1+'" y="140" width="'+w+'" height="220" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2"></rect>';
+    var mx = cx;
+    var d = 'M'+(mx-10)+',140 L'+(mx+6)+',180 L'+(mx-8)+',220 L'+(mx+10)+',260 L'+(mx-6)+',300 L'+(mx+4)+',360';
+    s += '<path d="'+d+'" fill="none" stroke="var(--alert)" stroke-width="4" stroke-linejoin="round"></path>';
+    s += '<line x1="'+(mx-8)+'" y1="200" x2="'+(mx-30)+'" y2="190" stroke="var(--alert-soft)" stroke-width="2"></line>';
+    s += '<line x1="'+(mx+9)+'" y1="270" x2="'+(mx+32)+'" y2="262" stroke="var(--alert-soft)" stroke-width="2"></line>';
+  }
   s += '<text x="'+cx+'" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="var(--alert-ink)" font-family="var(--font-body)">'+escHtml(label)+'</text>';
-  s += '<line x1="'+x1+'" y1="140" x2="'+x1+'" y2="360" stroke="var(--alert)" stroke-width="2"></line>';
   s += '</g>';
   return s;
 }
-function examRoomInterior(){
-  // reclined dental chair + wall x-ray viewer, teal-toned
-  return '' +
-    '<ellipse cx="70" cy="150" rx="26" ry="14" fill="var(--surface)" stroke="var(--ink-soft)"></ellipse>' +
-    '<rect x="44" y="150" width="90" height="34" rx="10" fill="var(--surface)" stroke="var(--ink-soft)"></rect>' +
-    '<rect x="120" y="150" width="34" height="70" rx="8" fill="var(--surface)" stroke="var(--ink-soft)"></rect>' +
-    '<line x1="90" y1="100" x2="90" y2="60" stroke="var(--ink-soft)" stroke-width="4"></line>' +
-    '<circle cx="90" cy="55" r="16" fill="var(--flag-soft)" stroke="var(--flag)" stroke-width="2"></circle>' +
-    '<rect x="220" y="20" width="70" height="90" rx="4" fill="var(--surface)" stroke="var(--ink-soft)"></rect>' +
-    '<line x1="234" y1="35" x2="234" y2="95" stroke="var(--line-strong)"></line>' +
-    '<line x1="255" y1="35" x2="255" y2="95" stroke="var(--line-strong)"></line>' +
-    '<line x1="276" y1="35" x2="276" y2="95" stroke="var(--line-strong)"></line>';
+function rootChamberInterior(){
+  // hanging root tendrils + a probe sunk into a measured root cross-section + a lantern, teal-toned
+  var roots = '';
+  var rootX = [20, 70, 130, 190, 250, 300];
+  rootX.forEach(function(x, i){
+    var sway = (i%2===0) ? 14 : -10;
+    var len = 50 + (i%3)*18;
+    roots += '<path d="M'+x+',0 Q'+(x+sway)+','+(len*0.5)+' '+(x+sway*0.4)+','+len+'" stroke="var(--ink-soft)" stroke-width="'+(2.6-i*0.15).toFixed(2)+'" fill="none" stroke-linecap="round"></path>';
+  });
+  return '' + roots +
+    '<ellipse cx="150" cy="190" rx="60" ry="16" fill="var(--surface-2)" stroke="var(--ink-soft)"></ellipse>' +
+    '<path d="M150,190 L150,110 Q158,90 150,72" stroke="var(--ink-soft)" stroke-width="6" fill="none" stroke-linecap="round"></path>' +
+    '<line x1="132" y1="100" x2="168" y2="100" stroke="var(--line-strong)" stroke-width="2"></line>' +
+    '<line x1="132" y1="130" x2="168" y2="130" stroke="var(--line-strong)" stroke-width="2"></line>' +
+    '<line x1="132" y1="160" x2="168" y2="160" stroke="var(--line-strong)" stroke-width="2"></line>' +
+    '<line x1="250" y1="150" x2="250" y2="120" stroke="var(--ink-soft)" stroke-width="2.5"></line>' +
+    '<path d="M234,150 L266,150 L260,185 L240,185 Z" fill="var(--surface)" stroke="var(--ink-soft)" stroke-width="1.5"></path>' +
+    '<circle cx="250" cy="167" r="12" fill="var(--flag-soft)" stroke="var(--flag)" stroke-width="1.5"></circle>';
 }
-function surgicalRoomInterior(){
-  // overhead surgical light + instrument tray, rose-toned
-  var bulbs = '';
-  for(var a=0;a<360;a+=45){
-    var rad = a*Math.PI/180;
-    bulbs += '<circle cx="'+(90+22*Math.cos(rad)).toFixed(1)+'" cy="'+(40+22*Math.sin(rad)).toFixed(1)+'" r="4" fill="var(--surface)" stroke="var(--ink-soft)"></circle>';
+function defectChamberInterior(){
+  // a partially-walled crater with graft granules piled in — echoes the 2-wall "crater" defect from lecture, rose-toned
+  var granules = '';
+  for(var i=0;i<14;i++){
+    var gx = 90 + ((i*13) % 70) - 20;
+    var gy = 175 + ((i*7) % 18);
+    granules += '<circle cx="'+gx+'" cy="'+gy+'" r="'+(2+(i%3))+'" fill="var(--tag-rose)" opacity="0.55"></circle>';
   }
   return '' +
-    '<line x1="90" y1="10" x2="90" y2="40" stroke="var(--ink-soft)" stroke-width="4"></line>' +
-    '<circle cx="90" cy="40" r="10" fill="var(--flag-soft)" stroke="var(--flag)" stroke-width="2"></circle>' +
-    bulbs +
-    '<rect x="30" y="120" width="150" height="18" rx="3" fill="var(--surface)" stroke="var(--ink-soft)"></rect>' +
-    '<rect x="30" y="138" width="6" height="60" fill="var(--ink-soft)"></rect>' +
-    '<rect x="174" y="138" width="6" height="60" fill="var(--ink-soft)"></rect>' +
-    (function(){ var t=''; for(var i=0;i<5;i++){ t+='<rect x="'+(42+i*26)+'" y="106" width="18" height="10" rx="2" fill="var(--surface)" stroke="var(--ink-soft)"></rect>'; } return t; })() +
-    '<rect x="230" y="150" width="60" height="10" rx="2" fill="var(--rose,var(--alert-soft))" stroke="var(--alert)"></rect>';
+    '<path d="M40,80 L40,190 Q120,215 200,190 L200,80" fill="var(--surface-2)" stroke="var(--ink-soft)" stroke-width="2"></path>' +
+    '<line x1="40" y1="80" x2="40" y2="190" stroke="var(--tag-rose)" stroke-width="4"></line>' +
+    '<line x1="200" y1="80" x2="200" y2="190" stroke="var(--tag-rose)" stroke-width="4"></line>' +
+    '<path d="M40,190 Q120,215 200,190" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="4,4"></path>' +
+    granules +
+    '<line x1="235" y1="50" x2="252" y2="175" stroke="var(--ink-soft)" stroke-width="4" stroke-linecap="round"></line>' +
+    '<path d="M220,42 Q237,32 257,44" stroke="var(--ink-soft)" stroke-width="4" fill="none" stroke-linecap="round"></path>';
 }
-function pharmacyRoomInterior(){
-  // shelving of labeled bottles + mortar/pestle, amber-toned
-  var bottles = '';
-  for(var row=0; row<2; row++){
-    for(var col=0; col<6; col++){
-      bottles += '<rect x="'+(20+col*24)+'" y="'+(30+row*36)+'" width="16" height="26" rx="2" fill="var(--surface)" stroke="var(--ink-soft)"></rect>';
-      bottles += '<rect x="'+(23+col*24)+'" y="'+(34+row*36)+'" width="10" height="6" fill="var(--flag-soft)"></rect>';
-    }
+function veinChamberInterior(){
+  // a glittering ore vein, apothecary niches, and a faceted gem, amber-toned
+  var niches = '';
+  for(var i=0;i<4;i++){
+    niches += '<rect x="'+(20+i*30)+'" y="150" width="22" height="30" rx="2" fill="var(--surface-2)" stroke="var(--ink-soft)"></rect>';
+    niches += '<rect x="'+(24+i*30)+'" y="155" width="14" height="8" fill="var(--flag-soft)"></rect>';
   }
   return '' +
-    '<line x1="10" y1="20" x2="180" y2="20" stroke="var(--ink-soft)" stroke-width="2"></line>' +
-    '<line x1="10" y1="66" x2="180" y2="66" stroke="var(--ink-soft)" stroke-width="2"></line>' +
-    bottles +
-    '<ellipse cx="230" cy="150" rx="20" ry="10" fill="var(--surface)" stroke="var(--ink-soft)"></ellipse>' +
-    '<line x1="230" y1="140" x2="248" y2="118" stroke="var(--ink-soft)" stroke-width="4" stroke-linecap="round"></line>';
+    '<path d="M150,15 L175,55 L160,90 L195,130 L180,170" stroke="var(--tag-amber)" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.85"></path>' +
+    '<path d="M150,15 L175,55 L160,90 L195,130 L180,170" stroke="var(--surface)" stroke-width="2" fill="none" stroke-dasharray="1,7" stroke-linecap="round"></path>' +
+    niches +
+    '<path d="M230,140 L250,152 L244,178 L216,178 L210,152 Z" fill="var(--surface)" stroke="var(--tag-amber)" stroke-width="2"></path>' +
+    '<line x1="230" y1="140" x2="230" y2="178" stroke="var(--tag-amber)" stroke-width="1.2"></line>' +
+    '<line x1="210" y1="152" x2="250" y2="152" stroke="var(--tag-amber)" stroke-width="1.2"></line>';
 }
 
-function renderClinicScene(){
+function renderUnderstoryScene(){
   var panel = document.getElementById('panel-game');
-  var scene = clinicFloorSVG();
+  var scene = understorySVG();
   var html = '<div class="game-hud section-block">' +
     '<div class="hud-tile"><b>'+STATE.totalCorrect+'</b> / '+QUESTIONS.length+' correct across the course</div>' +
     '<div class="hud-tile"><b>'+STATE.bestStreak+'</b> best streak</div>' +
@@ -2093,14 +2171,14 @@ function renderClinicScene(){
   html += '<div class="game-scene-wrap"><div class="game-scene-inner" style="min-width:'+scene.w+'px;">';
   html += '<svg viewBox="0 0 '+scene.w+' '+scene.h+'" style="width:100%;display:block;" class="atlas-svg">' + scene.svg + '</svg>';
 
-  CLINIC_WINGS.forEach(function(w){
-    var prog = wingProgress(w);
+  GALLERIES.forEach(function(w){
+    var prog = galleryProgress(w);
     var leftPct, x1, x2;
-    if(w.id==='wing-foundations'){ x1=80; x2=420; }
-    else if(w.id==='wing-surgical'){ x1=620; x2=900; }
+    if(w.id==='gallery-taproot'){ x1=80; x2=420; }
+    else if(w.id==='gallery-crater'){ x1=620; x2=900; }
     else { x1=960; x2=1240; }
     leftPct = ((x1+x2)/2 / scene.w * 100).toFixed(2);
-    html += '<button type="button" class="game-hotspot" style="left:'+leftPct+'%;top:'+(360/scene.h*100).toFixed(2)+'%;" data-open-wing="'+w.id+'" data-cleared="'+prog.cleared+'">' +
+    html += '<button type="button" class="game-hotspot" style="left:'+leftPct+'%;top:'+(360/scene.h*100).toFixed(2)+'%;" data-open-gallery="'+w.id+'" data-cleared="'+prog.cleared+'">' +
       '<span class="gh-label">'+escHtml(w.room)+'</span>' +
       '<span class="gh-progress mono">'+prog.correct+'/'+prog.total+'</span>' +
       '</button>';
@@ -2117,15 +2195,15 @@ function renderClinicScene(){
   });
 
   html += '</div></div>';
-  html += '<p style="color:var(--ink-soft);font-size:.82rem;margin-top:12px;">Every room is open from the start — work them in any order. The two review doors mix questions from the sessions they cover.</p>';
+  html += '<p style="color:var(--ink-soft);font-size:.82rem;margin-top:12px;">Every gallery is open from the start — work them in any order. The Fault Line and the Bedrock mix questions from the sessions they cover.</p>';
   panel.innerHTML = html;
   wireGamePanel(panel);
 }
 
-function renderWingDrilldown(){
+function renderGalleryDrilldown(){
   var panel = document.getElementById('panel-game');
-  var w = CLINIC_WING_BY_ID[GAME_VIEW.wingId];
-  var html = '<div class="atlas-back"><button type="button" data-game-back="scene">&larr; Clinic floor</button></div>';
+  var w = GALLERY_BY_ID[GAME_VIEW.galleryId];
+  var html = '<div class="atlas-back"><button type="button" data-game-back="scene">&larr; Understory</button></div>';
   html += '<div class="card section-block"><span class="eyebrow"><span class="tag-chip tag-'+w.tag+'"><span class="tag-dot"></span>'+escHtml(w.room)+'</span></span><h2>'+escHtml(w.name)+'</h2><p style="color:var(--ink-soft);">'+escHtml(w.desc)+'</p></div>';
   html += '<div class="lecture-grid">';
   w.wards.forEach(function(lecId){
@@ -2163,13 +2241,13 @@ function renderEncounter(){
   var html = '';
   if(isCheckpoint){
     var cp = CHECKPOINT_BY_ID[GAME_VIEW.checkpointId];
-    html += '<div class="atlas-back"><button type="button" data-game-back="scene">&larr; Clinic floor</button></div>';
-    html += '<div class="card section-block"><span class="eyebrow">Review door</span><h2>'+escHtml(cp.name)+'</h2>' +
-      '<p style="color:var(--ink-soft);">A fresh, shuffled draw of '+GAME_ENCOUNTER_POOL.list.length+' questions from '+(cp.wards.length)+' session'+(cp.wards.length===1?'':'s')+'. Reopen the door any time for a new draw.</p></div>';
+    html += '<div class="atlas-back"><button type="button" data-game-back="scene">&larr; Understory</button></div>';
+    html += '<div class="card section-block"><span class="eyebrow">Checkpoint</span><h2>'+escHtml(cp.name)+'</h2>' +
+      '<p style="color:var(--ink-soft);">A fresh, shuffled draw of '+GAME_ENCOUNTER_POOL.list.length+' questions from '+(cp.wards.length)+' session'+(cp.wards.length===1?'':'s')+'. Come back any time for a new draw.</p></div>';
   } else {
     var l = LECTURE_BY_ID[GAME_VIEW.lecId];
-    var w = wingOf(l.id);
-    html += '<div class="atlas-back"><button type="button" data-game-back="wing" data-wing-id="'+w.id+'">&larr; '+escHtml(w.room)+'</button></div>';
+    var w = galleryOf(l.id);
+    html += '<div class="atlas-back"><button type="button" data-game-back="gallery" data-gallery-id="'+w.id+'">&larr; '+escHtml(w.room)+'</button></div>';
     var prog = lectureProgress(l.id);
     html += '<div class="card section-block"><span class="eyebrow"><span class="tag-chip tag-'+l.tag+'"><span class="tag-dot"></span>Session '+l.num+'</span></span><h2>'+escHtml(l.title)+'</h2>' +
       '<div class="encounter-progress mono">'+prog.correct+' / '+prog.total+' correct</div></div>';
@@ -2230,19 +2308,19 @@ function wireGamePanel(panel){
   if(panel.__wired) return;
   panel.__wired = true;
   panel.addEventListener('click', function(e){
-    var wingBtn = e.target.closest('[data-open-wing]');
-    if(wingBtn){ GAME_VIEW = { mode:'wing', wingId:wingBtn.getAttribute('data-open-wing'), lecId:null, checkpointId:null }; renderGame(); return; }
+    var galleryBtn = e.target.closest('[data-open-gallery]');
+    if(galleryBtn){ GAME_VIEW = { mode:'gallery', galleryId:galleryBtn.getAttribute('data-open-gallery'), lecId:null, checkpointId:null }; renderGame(); return; }
     var cpBtn = e.target.closest('[data-open-checkpoint]');
-    if(cpBtn){ GAME_VIEW = { mode:'encounter', wingId:null, lecId:null, checkpointId:cpBtn.getAttribute('data-open-checkpoint') }; renderGame(); return; }
+    if(cpBtn){ GAME_VIEW = { mode:'encounter', galleryId:null, lecId:null, checkpointId:cpBtn.getAttribute('data-open-checkpoint') }; renderGame(); return; }
     var encBtn = e.target.closest('[data-open-encounter]');
-    if(encBtn){ GAME_VIEW = { mode:'encounter', wingId:null, lecId:encBtn.getAttribute('data-open-encounter'), checkpointId:null }; renderGame(); return; }
+    if(encBtn){ GAME_VIEW = { mode:'encounter', galleryId:null, lecId:encBtn.getAttribute('data-open-encounter'), checkpointId:null }; renderGame(); return; }
     var replayBtn = e.target.closest('[data-replay-cutscene]');
     if(replayBtn){ playCutscene(replayBtn.getAttribute('data-replay-cutscene')); return; }
     var backBtn = e.target.closest('[data-game-back]');
     if(backBtn){
       var target = backBtn.getAttribute('data-game-back');
-      if(target === 'scene'){ GAME_VIEW = { mode:'scene', wingId:null, lecId:null, checkpointId:null }; }
-      else if(target === 'wing'){ GAME_VIEW = { mode:'wing', wingId:backBtn.getAttribute('data-wing-id'), lecId:null, checkpointId:null }; }
+      if(target === 'scene'){ GAME_VIEW = { mode:'scene', galleryId:null, lecId:null, checkpointId:null }; }
+      else if(target === 'gallery'){ GAME_VIEW = { mode:'gallery', galleryId:backBtn.getAttribute('data-gallery-id'), lecId:null, checkpointId:null }; }
       renderGame();
       return;
     }
@@ -2282,8 +2360,7 @@ if(document.readyState === 'loading'){
   boot();
 }
 </script>
-
-<!-- ============ CLASS STATS / POPULAR / ONLINE-NOW / MY STATS / FLAG (shared widget) ============ -->
+<!-- ============ CLASS STATS / POPULAR / ONLINE-NOW / MY STATS / FLAG / SUGGEST (shared widget) ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   #shstat-root{position:fixed; right:16px; bottom:16px; z-index:9999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
@@ -2294,10 +2371,10 @@ if(document.readyState === 'loading'){
   .shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
   @media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
   @keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
-  #shstat-panel, #shstat-flagpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
+  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
   #shstat-panel{max-height:64vh; overflow-y:auto;}
-  #shstat-panel.is-open, #shstat-flagpanel.is-open{display:block;}
-  #shstat-panel h5, #shstat-flagpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
+  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open{display:block;}
+  #shstat-panel h5, #shstat-flagpanel h5, #shstat-suggestpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
   #shstat-panel .shstat-sec{margin-bottom:16px;}
   #shstat-panel .shstat-sec:last-child{margin-bottom:0;}
   .shstat-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:12.5px; line-height:1.4;}
@@ -2311,10 +2388,18 @@ if(document.readyState === 'loading'){
   .shstat-hist{display:flex; align-items:flex-end; gap:2px; height:54px; margin-top:6px;}
   .shstat-hbar{flex:1; background:linear-gradient(180deg, rgba(62,207,126,.85), rgba(62,207,126,.32)); border-radius:2px 2px 0 0; min-height:2px;}
   .shstat-hlabels{display:flex; justify-content:space-between; font-size:9px; color:#7a7a80; margin-top:4px;}
-  #shstat-flagpanel textarea{width:100%; min-height:64px; resize:vertical; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:12.5px; padding:8px; margin-top:2px;}
-  #shstat-flagpanel button.shstat-send{margin-top:9px; background:#3ecf7e; color:#0b1a12; border:none; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer;}
-  #shstat-flagpanel button.shstat-send:disabled{opacity:.5; cursor:default;}
+  #shstat-flagpanel textarea, #shstat-suggestpanel textarea{width:100%; min-height:64px; resize:vertical; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:12.5px; padding:8px; margin-top:2px;}
+  #shstat-flagpanel button.shstat-send, #shstat-suggestpanel button.shstat-send{margin-top:9px; background:#3ecf7e; color:#0b1a12; border:none; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer;}
+  #shstat-flagpanel button.shstat-send:disabled, #shstat-suggestpanel button.shstat-send:disabled{opacity:.5; cursor:default;}
   .shstat-flagmsg{font-size:11.5px; color:#a7a7ac; margin-top:7px; min-height:14px;}
+  .shstat-name-row{display:flex; gap:6px; margin-top:10px;}
+  .shstat-name-row input{flex:1; min-width:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:11.5px; padding:6px 8px;}
+  .shstat-name-row button{background:#3ecf7e; color:#0b1a12; border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer; flex:none;}
+  .shstat-name-row button:disabled{opacity:.5; cursor:default;}
+  .shstat-namemsg{font-size:10.5px; color:#a7a7ac; margin-top:5px; min-height:13px;}
+  .shstat-streaktoast{position:fixed; z-index:10001; left:50%; top:16%; background:rgba(20,20,24,.94); color:#f2f2f0; font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px; box-shadow:0 12px 40px rgba(0,0,0,.4); pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.9); transition:opacity .25s, transform .25s; white-space:nowrap;}
+  .shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
+  .shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
 </style>
 <script>
 (function(){
@@ -2368,10 +2453,21 @@ if(document.readyState === 'loading'){
   function safeRpc(fn, args){
     try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
   }
+  var sessionCorrectStreak = 0;
   document.addEventListener(ANSWERED_EVENT, function(e){
     var d = (e && e.detail) || {};
-    safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: !!d.correct });
-    safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: !!d.correct });
+    var isCorrect = !!d.correct;
+    safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    if (isCorrect) {
+      sessionCorrectStreak++;
+      if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
+        fireConfetti();
+        showStreakToast(sessionCorrectStreak + " in a row! 🔥");
+      }
+    } else {
+      sessionCorrectStreak = 0;
+    }
   });
   var modeSwitchEl = document.getElementById("modeSwitch");
   var modeAttr = "mode";
@@ -2387,10 +2483,58 @@ if(document.readyState === 'loading'){
   }
   safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
 
+  /* ---------- confetti + streak toast ---------- */
+  function showStreakToast(text){
+    var t = document.createElement("div");
+    t.className = "shstat-streaktoast";
+    t.textContent = text;
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add("is-shown"); });
+    setTimeout(function(){
+      t.classList.remove("is-shown");
+      setTimeout(function(){ t.remove(); }, 300);
+    }, 1600);
+  }
+  function fireConfetti(){
+    var colors = ["#3ecf7e", "#f0806b", "#e8c15a", "#8fb4e8", "#c58fe8"];
+    for (var i = 0; i < 26; i++){
+      (function(i){
+        var p = document.createElement("span");
+        p.className = "shstat-confetti";
+        var size = 6 + Math.random() * 5;
+        p.style.width = size + "px";
+        p.style.height = (size * 0.4) + "px";
+        p.style.background = colors[i % colors.length];
+        p.style.borderRadius = "1px";
+        p.style.left = (Math.random() * window.innerWidth) + "px";
+        p.style.top = "-16px";
+        document.body.appendChild(p);
+        var dx = (Math.random() - 0.5) * 160;
+        var dy = window.innerHeight * (0.55 + Math.random() * 0.5);
+        var rot = 180 + Math.random() * 540;
+        if (p.animate){
+          var anim = p.animate([
+            { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+            { transform: "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)", opacity: 0 }
+          ], { duration: 1400 + Math.random() * 700, easing: "cubic-bezier(.15,.6,.4,1)" });
+          anim.onfinish = function(){ p.remove(); };
+        } else {
+          setTimeout(function(){ p.remove(); }, 2000);
+        }
+      })(i);
+    }
+  }
+
   /* ---------- floating widget ---------- */
   var root = document.createElement("div");
   root.id = "shstat-root";
   root.innerHTML =
+    '<div id="shstat-suggestpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
+    '<h5>Suggest something</h5>' +
+    '<textarea id="shstat-suggest-text" maxlength="500" placeholder="e.g. add a flashcard mode, more questions on lecture 3..."></textarea>' +
+    '<div><button class="shstat-send" id="shstat-suggest-submit" type="button">Send</button></div>' +
+    '<div class="shstat-flagmsg" id="shstat-suggest-msg"></div>' +
+    '</div>' +
     '<div id="shstat-flagpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Report a typo or issue</h5>' +
     '<textarea id="shstat-flag-text" maxlength="500" placeholder="e.g. Q14 answer key looks off, typo in Lecture 3..."></textarea>' +
@@ -2398,7 +2542,9 @@ if(document.readyState === 'loading'){
     '<div class="shstat-flagmsg" id="shstat-flag-msg"></div>' +
     '</div>' +
     '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
-    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div></div>' +
+    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div>' +
+    '<div class="shstat-name-row"><input type="text" id="shstat-name-input" maxlength="24" placeholder="Leaderboard name (optional)"><button id="shstat-name-save" type="button">Save</button></div>' +
+    '<div class="shstat-namemsg" id="shstat-name-msg"></div></div>' +
     '<div class="shstat-sec"><h5>Toughest questions</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
@@ -2406,6 +2552,7 @@ if(document.readyState === 'loading'){
     '<div class="shstat-pillrow">' +
     '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-dot"></span><span id="shstat-online-n">1</span> studying now</button>' +
     '<button class="shstat-pill" id="shstat-stats-pill" type="button">Class stats</button>' +
+    '<button class="shstat-pill" id="shstat-suggest-pill" type="button">Suggest something</button>' +
     '<button class="shstat-pill" id="shstat-flag-pill" type="button">Flag issue</button>' +
     '</div>';
   document.body.appendChild(root);
@@ -2495,10 +2642,40 @@ if(document.readyState === 'loading'){
     }, function(){ wrap.innerHTML = '<div class="shstat-empty">Couldn&#39;t load this right now.</div>'; });
   }
 
+  /* ---------- leaderboard display name (opt-in) ---------- */
+  try {
+    var savedName = localStorage.getItem("sh_display_name");
+    var nameInputEl = document.getElementById("shstat-name-input");
+    if (savedName && nameInputEl) nameInputEl.value = savedName;
+  } catch (e) {}
+  var nameSaveBtn = document.getElementById("shstat-name-save");
+  if (nameSaveBtn) {
+    nameSaveBtn.addEventListener("click", function(){
+      var nameInput = document.getElementById("shstat-name-input");
+      var nameMsg = document.getElementById("shstat-name-msg");
+      var name = (nameInput.value || "").trim();
+      if (!name) { nameMsg.textContent = "Type a name first."; return; }
+      nameSaveBtn.disabled = true;
+      nameMsg.textContent = "Saving…";
+      safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+      try { localStorage.setItem("sh_display_name", name); } catch (e) {}
+      setTimeout(function(){
+        nameSaveBtn.disabled = false;
+        nameMsg.textContent = "Saved — you'll show up on the leaderboard as \"" + name + "\".";
+      }, 400);
+    });
+  }
+
   var panel = document.getElementById("shstat-panel");
+  var flagPanel = document.getElementById("shstat-flagpanel");
+  var suggestPanel = document.getElementById("shstat-suggestpanel");
+  function closeOtherPanels(keep){
+    if (keep !== panel) panel.classList.remove("is-open");
+    if (keep !== flagPanel) flagPanel.classList.remove("is-open");
+    if (keep !== suggestPanel) suggestPanel.classList.remove("is-open");
+  }
   document.getElementById("shstat-stats-pill").addEventListener("click", function(){
-    var flagPanelEl = document.getElementById("shstat-flagpanel");
-    if (flagPanelEl) flagPanelEl.classList.remove("is-open");
+    closeOtherPanels(panel);
     var open = panel.classList.toggle("is-open");
     if (open) { loadStats(); loadPersonalStats(); loadBusiestTimes(); }
   });
@@ -2506,9 +2683,8 @@ if(document.readyState === 'loading'){
     panel.classList.remove("is-open");
   });
 
-  var flagPanel = document.getElementById("shstat-flagpanel");
   document.getElementById("shstat-flag-pill").addEventListener("click", function(){
-    panel.classList.remove("is-open");
+    closeOtherPanels(flagPanel);
     flagPanel.classList.toggle("is-open");
   });
   document.querySelector("#shstat-flagpanel .shstat-close").addEventListener("click", function(){
@@ -2523,6 +2699,29 @@ if(document.readyState === 'loading'){
     btn.disabled = true;
     msg.textContent = "Sending…";
     supabase.from("question_flags").insert({ hub: HUB, note: text }).then(function(res){
+      btn.disabled = false;
+      if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
+      ta.value = "";
+      msg.textContent = "Thanks — sent!";
+    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
+  });
+
+  document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
+    closeOtherPanels(suggestPanel);
+    suggestPanel.classList.toggle("is-open");
+  });
+  document.querySelector("#shstat-suggestpanel .shstat-close").addEventListener("click", function(){
+    suggestPanel.classList.remove("is-open");
+  });
+  document.getElementById("shstat-suggest-submit").addEventListener("click", function(){
+    var ta = document.getElementById("shstat-suggest-text");
+    var msg = document.getElementById("shstat-suggest-msg");
+    var btn = document.getElementById("shstat-suggest-submit");
+    var text = (ta.value || "").trim();
+    if (!text) { msg.textContent = "Type something first."; return; }
+    btn.disabled = true;
+    msg.textContent = "Sending…";
+    supabase.from("hub_suggestions").insert({ hub: HUB, note: text }).then(function(res){
       btn.disabled = false;
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";

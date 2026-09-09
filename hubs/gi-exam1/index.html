@@ -2394,8 +2394,7 @@
 
 })();
 </script>
-
-<!-- ============ CLASS STATS / POPULAR / ONLINE-NOW / MY STATS / FLAG (shared widget) ============ -->
+<!-- ============ CLASS STATS / POPULAR / ONLINE-NOW / MY STATS / FLAG / SUGGEST (shared widget) ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   #shstat-root{position:fixed; right:16px; bottom:16px; z-index:9999; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
@@ -2406,10 +2405,10 @@
   .shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
   @media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
   @keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
-  #shstat-panel, #shstat-flagpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
+  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
   #shstat-panel{max-height:64vh; overflow-y:auto;}
-  #shstat-panel.is-open, #shstat-flagpanel.is-open{display:block;}
-  #shstat-panel h5, #shstat-flagpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
+  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open{display:block;}
+  #shstat-panel h5, #shstat-flagpanel h5, #shstat-suggestpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
   #shstat-panel .shstat-sec{margin-bottom:16px;}
   #shstat-panel .shstat-sec:last-child{margin-bottom:0;}
   .shstat-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:12.5px; line-height:1.4;}
@@ -2423,10 +2422,18 @@
   .shstat-hist{display:flex; align-items:flex-end; gap:2px; height:54px; margin-top:6px;}
   .shstat-hbar{flex:1; background:linear-gradient(180deg, rgba(62,207,126,.85), rgba(62,207,126,.32)); border-radius:2px 2px 0 0; min-height:2px;}
   .shstat-hlabels{display:flex; justify-content:space-between; font-size:9px; color:#7a7a80; margin-top:4px;}
-  #shstat-flagpanel textarea{width:100%; min-height:64px; resize:vertical; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:12.5px; padding:8px; margin-top:2px;}
-  #shstat-flagpanel button.shstat-send{margin-top:9px; background:#3ecf7e; color:#0b1a12; border:none; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer;}
-  #shstat-flagpanel button.shstat-send:disabled{opacity:.5; cursor:default;}
+  #shstat-flagpanel textarea, #shstat-suggestpanel textarea{width:100%; min-height:64px; resize:vertical; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:12.5px; padding:8px; margin-top:2px;}
+  #shstat-flagpanel button.shstat-send, #shstat-suggestpanel button.shstat-send{margin-top:9px; background:#3ecf7e; color:#0b1a12; border:none; border-radius:999px; padding:7px 15px; font-size:12px; font-weight:700; cursor:pointer;}
+  #shstat-flagpanel button.shstat-send:disabled, #shstat-suggestpanel button.shstat-send:disabled{opacity:.5; cursor:default;}
   .shstat-flagmsg{font-size:11.5px; color:#a7a7ac; margin-top:7px; min-height:14px;}
+  .shstat-name-row{display:flex; gap:6px; margin-top:10px;}
+  .shstat-name-row input{flex:1; min-width:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:8px; color:#f2f2f0; font:inherit; font-size:11.5px; padding:6px 8px;}
+  .shstat-name-row button{background:#3ecf7e; color:#0b1a12; border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer; flex:none;}
+  .shstat-name-row button:disabled{opacity:.5; cursor:default;}
+  .shstat-namemsg{font-size:10.5px; color:#a7a7ac; margin-top:5px; min-height:13px;}
+  .shstat-streaktoast{position:fixed; z-index:10001; left:50%; top:16%; background:rgba(20,20,24,.94); color:#f2f2f0; font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px; box-shadow:0 12px 40px rgba(0,0,0,.4); pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.9); transition:opacity .25s, transform .25s; white-space:nowrap;}
+  .shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
+  .shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
 </style>
 <script>
 (function(){
@@ -2480,10 +2487,21 @@
   function safeRpc(fn, args){
     try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
   }
+  var sessionCorrectStreak = 0;
   document.addEventListener(ANSWERED_EVENT, function(e){
     var d = (e && e.detail) || {};
-    safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: !!d.correct });
-    safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: !!d.correct });
+    var isCorrect = !!d.correct;
+    safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    if (isCorrect) {
+      sessionCorrectStreak++;
+      if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
+        fireConfetti();
+        showStreakToast(sessionCorrectStreak + " in a row! 🔥");
+      }
+    } else {
+      sessionCorrectStreak = 0;
+    }
   });
   var modeSwitchEl = document.getElementById("modeSwitch");
   var modeAttr = "mode";
@@ -2499,10 +2517,58 @@
   }
   safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
 
+  /* ---------- confetti + streak toast ---------- */
+  function showStreakToast(text){
+    var t = document.createElement("div");
+    t.className = "shstat-streaktoast";
+    t.textContent = text;
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add("is-shown"); });
+    setTimeout(function(){
+      t.classList.remove("is-shown");
+      setTimeout(function(){ t.remove(); }, 300);
+    }, 1600);
+  }
+  function fireConfetti(){
+    var colors = ["#3ecf7e", "#f0806b", "#e8c15a", "#8fb4e8", "#c58fe8"];
+    for (var i = 0; i < 26; i++){
+      (function(i){
+        var p = document.createElement("span");
+        p.className = "shstat-confetti";
+        var size = 6 + Math.random() * 5;
+        p.style.width = size + "px";
+        p.style.height = (size * 0.4) + "px";
+        p.style.background = colors[i % colors.length];
+        p.style.borderRadius = "1px";
+        p.style.left = (Math.random() * window.innerWidth) + "px";
+        p.style.top = "-16px";
+        document.body.appendChild(p);
+        var dx = (Math.random() - 0.5) * 160;
+        var dy = window.innerHeight * (0.55 + Math.random() * 0.5);
+        var rot = 180 + Math.random() * 540;
+        if (p.animate){
+          var anim = p.animate([
+            { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+            { transform: "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)", opacity: 0 }
+          ], { duration: 1400 + Math.random() * 700, easing: "cubic-bezier(.15,.6,.4,1)" });
+          anim.onfinish = function(){ p.remove(); };
+        } else {
+          setTimeout(function(){ p.remove(); }, 2000);
+        }
+      })(i);
+    }
+  }
+
   /* ---------- floating widget ---------- */
   var root = document.createElement("div");
   root.id = "shstat-root";
   root.innerHTML =
+    '<div id="shstat-suggestpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
+    '<h5>Suggest something</h5>' +
+    '<textarea id="shstat-suggest-text" maxlength="500" placeholder="e.g. add a flashcard mode, more questions on lecture 3..."></textarea>' +
+    '<div><button class="shstat-send" id="shstat-suggest-submit" type="button">Send</button></div>' +
+    '<div class="shstat-flagmsg" id="shstat-suggest-msg"></div>' +
+    '</div>' +
     '<div id="shstat-flagpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Report a typo or issue</h5>' +
     '<textarea id="shstat-flag-text" maxlength="500" placeholder="e.g. Q14 answer key looks off, typo in Lecture 3..."></textarea>' +
@@ -2510,7 +2576,9 @@
     '<div class="shstat-flagmsg" id="shstat-flag-msg"></div>' +
     '</div>' +
     '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
-    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div></div>' +
+    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div>' +
+    '<div class="shstat-name-row"><input type="text" id="shstat-name-input" maxlength="24" placeholder="Leaderboard name (optional)"><button id="shstat-name-save" type="button">Save</button></div>' +
+    '<div class="shstat-namemsg" id="shstat-name-msg"></div></div>' +
     '<div class="shstat-sec"><h5>Toughest questions</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
@@ -2518,6 +2586,7 @@
     '<div class="shstat-pillrow">' +
     '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-dot"></span><span id="shstat-online-n">1</span> studying now</button>' +
     '<button class="shstat-pill" id="shstat-stats-pill" type="button">Class stats</button>' +
+    '<button class="shstat-pill" id="shstat-suggest-pill" type="button">Suggest something</button>' +
     '<button class="shstat-pill" id="shstat-flag-pill" type="button">Flag issue</button>' +
     '</div>';
   document.body.appendChild(root);
@@ -2607,10 +2676,40 @@
     }, function(){ wrap.innerHTML = '<div class="shstat-empty">Couldn&#39;t load this right now.</div>'; });
   }
 
+  /* ---------- leaderboard display name (opt-in) ---------- */
+  try {
+    var savedName = localStorage.getItem("sh_display_name");
+    var nameInputEl = document.getElementById("shstat-name-input");
+    if (savedName && nameInputEl) nameInputEl.value = savedName;
+  } catch (e) {}
+  var nameSaveBtn = document.getElementById("shstat-name-save");
+  if (nameSaveBtn) {
+    nameSaveBtn.addEventListener("click", function(){
+      var nameInput = document.getElementById("shstat-name-input");
+      var nameMsg = document.getElementById("shstat-name-msg");
+      var name = (nameInput.value || "").trim();
+      if (!name) { nameMsg.textContent = "Type a name first."; return; }
+      nameSaveBtn.disabled = true;
+      nameMsg.textContent = "Saving…";
+      safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+      try { localStorage.setItem("sh_display_name", name); } catch (e) {}
+      setTimeout(function(){
+        nameSaveBtn.disabled = false;
+        nameMsg.textContent = "Saved — you'll show up on the leaderboard as \"" + name + "\".";
+      }, 400);
+    });
+  }
+
   var panel = document.getElementById("shstat-panel");
+  var flagPanel = document.getElementById("shstat-flagpanel");
+  var suggestPanel = document.getElementById("shstat-suggestpanel");
+  function closeOtherPanels(keep){
+    if (keep !== panel) panel.classList.remove("is-open");
+    if (keep !== flagPanel) flagPanel.classList.remove("is-open");
+    if (keep !== suggestPanel) suggestPanel.classList.remove("is-open");
+  }
   document.getElementById("shstat-stats-pill").addEventListener("click", function(){
-    var flagPanelEl = document.getElementById("shstat-flagpanel");
-    if (flagPanelEl) flagPanelEl.classList.remove("is-open");
+    closeOtherPanels(panel);
     var open = panel.classList.toggle("is-open");
     if (open) { loadStats(); loadPersonalStats(); loadBusiestTimes(); }
   });
@@ -2618,9 +2717,8 @@
     panel.classList.remove("is-open");
   });
 
-  var flagPanel = document.getElementById("shstat-flagpanel");
   document.getElementById("shstat-flag-pill").addEventListener("click", function(){
-    panel.classList.remove("is-open");
+    closeOtherPanels(flagPanel);
     flagPanel.classList.toggle("is-open");
   });
   document.querySelector("#shstat-flagpanel .shstat-close").addEventListener("click", function(){
@@ -2635,6 +2733,29 @@
     btn.disabled = true;
     msg.textContent = "Sending…";
     supabase.from("question_flags").insert({ hub: HUB, note: text }).then(function(res){
+      btn.disabled = false;
+      if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
+      ta.value = "";
+      msg.textContent = "Thanks — sent!";
+    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
+  });
+
+  document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
+    closeOtherPanels(suggestPanel);
+    suggestPanel.classList.toggle("is-open");
+  });
+  document.querySelector("#shstat-suggestpanel .shstat-close").addEventListener("click", function(){
+    suggestPanel.classList.remove("is-open");
+  });
+  document.getElementById("shstat-suggest-submit").addEventListener("click", function(){
+    var ta = document.getElementById("shstat-suggest-text");
+    var msg = document.getElementById("shstat-suggest-msg");
+    var btn = document.getElementById("shstat-suggest-submit");
+    var text = (ta.value || "").trim();
+    if (!text) { msg.textContent = "Type something first."; return; }
+    btn.disabled = true;
+    msg.textContent = "Sending…";
+    supabase.from("hub_suggestions").insert({ hub: HUB, note: text }).then(function(res){
       btn.disabled = false;
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
