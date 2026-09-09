@@ -314,6 +314,10 @@ table.ref-table tbody tr:hover{background:var(--paper-2);}
 .q-choice.is-correct{border-color:var(--good); background:var(--good-soft); color:var(--good);}
 .q-choice.is-wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--bad);}
 .q-explain{margin:0 18px 18px; padding:12px 14px; background:var(--paper-2); border-radius:var(--r-s); font-size:.86rem; color:var(--ink-2); display:flex; gap:9px;}
+.q-classdata-row{margin:0 18px 14px;}
+.q-classdata-result{font-family:var(--font-mono); font-size:.75rem; color:var(--ink-2);}
+.q-classdata-result.is-bad{color:var(--bad);}
+.q-classdata-result.is-ok{color:var(--good);}
 .q-recall-box{padding:0 18px 18px; display:flex; flex-direction:column; gap:12px;}
 .q-recall-answer{background:var(--paper-2); border-radius:var(--r-s); padding:12px 14px; font-size:.92rem;}
 .q-recall-answer b{color:var(--gold-ink,var(--gold));}
@@ -2707,7 +2711,8 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
         + '<div class="match-col">'+rights.map(function(i){ return '<button class="match-chip" data-match-right="'+i+'" type="button">'+esc(q.pairs[i][1])+'</button>'; }).join("")+'</div>'
         + '</div><div class="q-action-row"><button class="btn btn-accent btn-sm" data-match-check type="button">Check matches</button><button class="btn btn-ghost btn-sm" data-match-reset type="button">Reset</button></div>';
     }
-    return '<div class="q-card" data-qcard="'+q.id+'">'+head+body+'</div>';
+    var classData = '<div class="q-classdata-row"><span class="q-classdata-result" data-role="classdata-result">Loading class data…</span></div>';
+    return '<div class="q-card" data-qcard="'+q.id+'" data-qid="'+q.id+'">'+head+body+classData+'</div>';
   }
 
   function refreshFlagButtons(qid){
@@ -2972,7 +2977,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       ttsBtn.addEventListener("click", function(){
         if (!window.shTTS) return;
         var proseEl = document.querySelector(".lecture-notes-prose");
-        window.shTTS.speak(proseEl ? proseEl.textContent : "", ttsBtn);
+        if (proseEl) window.shTTS.speak(proseEl, ttsBtn);
       });
     }
   }
@@ -4158,6 +4163,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       + '<div class="case-progress-row"><div class="case-progress-track"><div class="case-progress-fill" style="width:'+(gameCaseIndex/total*100)+'%;"></div></div><span class="mono muted-note">'+(gameCaseIndex+1)+' / '+total+'</span></div>'
       + '<div id="caseStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
       + '<div class="q-action-row" id="caseNextRow" style="padding:14px 0 0;"></div>';
+    if (window.shFillClassData) window.shFillClassData(byId("gameWardActive"));
   }
   function showNextCaseButton(){
     var isLast = gameCaseIndex >= gameCaseQueue.length-1;
@@ -4207,6 +4213,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     byId("gameWardActive").innerHTML = '<div class="boss-banner"><span class="bb-icon">'+(STATE.settings.nightShift?"🌙":"🩺")+'</span><div><h4>Attending Check-In — '+esc(l.title)+'</h4><p>Question '+(gameBossIndex+1)+' of '+gameBossQueue.length+'</p><div class="boss-pip-row" id="bossPipRow"></div></div></div>'
       + '<div id="caseStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
       + '<div class="q-action-row" id="bossNextRow" style="padding:14px 0 0;"></div>';
+    if (window.shFillClassData) window.shFillClassData(byId("gameWardActive"));
     renderBossPips();
   }
   document.addEventListener("hbh:answered", function(e){
@@ -4876,6 +4883,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       content.innerHTML = '<div class="boss-banner"><span class="bb-icon">⚔️</span><div><h4>Trial — '+esc(l.title)+'</h4><p>Question '+(ctx.index+1)+' of '+ctx.queue.length+'</p><div class="boss-pip-row" id="dndTrialPipRow"></div></div></div>'
         + '<div id="dndTrialStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
         + '<div class="q-action-row" id="dndTrialNextRow" style="padding:14px 0 0;"></div>';
+      if (window.shFillClassData) window.shFillClassData(content);
       renderDndTrialPips();
     }
     document.addEventListener("hbh:answered", function(e){

@@ -100,6 +100,10 @@
 .sh-tts-btn[data-state="paused"] .sh-tts-label-play{display:inline;}
 .sh-tts-btn[data-state="paused"] .sh-tts-label-pause{display:none;}
 
+.sh-tts-word{cursor:pointer; border-radius:3px; padding:0 1px; margin:0 -1px; transition:background-color .1s;}
+.sh-tts-word:hover{background:rgba(120,120,120,.16);}
+.sh-tts-word.sh-tts-active{background:#f5cf5a; color:#1a1608; box-shadow:0 0 0 1px rgba(0,0,0,.06);}
+
 /* ================= MOBILE (<=760px): bottom tab bar + full-screen sheets ================= */
 @media (max-width:760px){
   #shstat-root{left:0; right:0; bottom:0; top:auto; width:100%; align-items:stretch; gap:0;}

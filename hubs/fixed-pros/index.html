@@ -1574,7 +1574,7 @@ function renderCompRead(){
     if (!ttsBtn || !window.shTTS) return;
     const section = ttsBtn.closest('.lecture-section');
     const visible = section && section.querySelector('.lecture-notes-full:not([hidden]), .lecture-notes-plain:not([hidden])');
-    window.shTTS.speak(visible ? visible.textContent : '', ttsBtn);
+    if (visible) window.shTTS.speak(visible, ttsBtn);
   });
   if (!window.speechSynthesis) {
     el.querySelectorAll('.sh-tts-btn').forEach(b=>{ b.disabled = true; b.title = 'Not supported in this browser'; });

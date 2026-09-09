@@ -308,6 +308,10 @@ table.chart-table tbody tr:hover{background:var(--surface-2);}
   font-size:.85rem;color:var(--ink-soft);display:none;
 }
 .qcard-explain.shown{display:block;}
+.qcard-classdata-row{margin-top:8px;}
+.qcard-classdata-result{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-soft);}
+.qcard-classdata-result.is-bad{color:var(--alert-ink);}
+.qcard-classdata-result.is-ok{color:var(--teal-ink);}
 .qcard-reveal-btn,.qcard-grade-btns{margin-top:10px;}
 .qcard-reveal-btn button,.qcard-grade-btns button{
   appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
@@ -1242,6 +1246,7 @@ function qCardHTML(q){
   return '<div class="qcard" data-qid="'+q.id+'" data-qtype="'+q.type+'">' +
     '<div class="qcard-head"><div class="qcard-stem">'+escHtml(q.stem)+'</div></div>' +
     qMeta(q) + body +
+    '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div>' +
     '</div>';
 }
 
@@ -1486,7 +1491,7 @@ function renderLectureNotes(){
     ttsBtn.addEventListener('click', function(){
       if (!window.shTTS) return;
       var proseEl = document.querySelector('#reading-pane .reading-prose');
-      window.shTTS.speak(proseEl ? proseEl.textContent : '', ttsBtn);
+      if (proseEl) window.shTTS.speak(proseEl, ttsBtn);
     });
   }
 }
@@ -1520,6 +1525,7 @@ function renderQuestionBank(){
   html += '</div>';
   document.getElementById('compendium-content').innerHTML = html;
   wireQuestionContainer(document.getElementById('qbankList'));
+  if (window.shFillClassData) window.shFillClassData(document.getElementById('qbankList'));
   document.getElementById('qbankSearch').addEventListener('input', function(e){ QBANK_FILTER.search = e.target.value; renderQuestionBankListOnly(); });
   document.getElementById('qbankLecFilter').addEventListener('change', function(e){ QBANK_FILTER.lec = e.target.value; renderQuestionBankListOnly(); });
   document.getElementById('qbankTypeFilter').addEventListener('change', function(e){ QBANK_FILTER.type = e.target.value; renderQuestionBankListOnly(); });
@@ -1529,7 +1535,10 @@ function renderQuestionBankListOnly(){
   var countEl = document.querySelector('#compendium-content .qbank-count');
   if(countEl) countEl.textContent = qs.length + ' question' + (qs.length===1?'':'s');
   var list = document.getElementById('qbankList');
-  if(list){ list.innerHTML = qs.map(qCardHTML).join(''); }
+  if(list){
+    list.innerHTML = qs.map(qCardHTML).join('');
+    if (window.shFillClassData) window.shFillClassData(list);
+  }
 }
 
 function tableWrap(headers, rows){
@@ -2295,6 +2304,7 @@ function renderEncounter(){
   panel.innerHTML = html;
   wireGamePanel(panel);
   wireQuestionContainer(document.getElementById('encounterList'));
+  if (window.shFillClassData) window.shFillClassData(document.getElementById('encounterList'));
 }
 
 /* ---------- Cutscene overlay ---------- */

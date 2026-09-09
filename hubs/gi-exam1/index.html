@@ -2379,7 +2379,7 @@
     var ttsBtn = e.target.closest("#sh-tts-btn");
     if(ttsBtn && window.shTTS){
       var activeBlock = document.querySelector(".lecture-panel.is-active .level-block.is-active");
-      window.shTTS.speak(activeBlock ? activeBlock.textContent : "", ttsBtn);
+      if (activeBlock) window.shTTS.speak(activeBlock, ttsBtn);
     }
   });
   if (!window.speechSynthesis) {

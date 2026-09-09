@@ -38,53 +38,190 @@
   /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
      so it still works even if the stats layer fails to init. Each hub's own
      render function inserts a .sh-tts-btn and wires it to window.shTTS.speak,
-     looked up lazily at click time so load order never matters. ---------- */
+     looked up lazily at click time so load order never matters.
+
+     speak(container, btn) takes the actual reading-panel DOM element (not
+     plain text): it wraps each word in a <span class="sh-tts-word">, drives
+     the utterance off that same word list so it can highlight the word
+     being spoken (via the utterance's boundary events) and — since the Web
+     Speech API can't seek within an utterance — lets a click on any word
+     cancel and re-speak from that word onward, which is what gives the
+     "click a word to resume from there" behavior.
+
+     Voice choice: the browser's own default voice (often a dated local
+     "SAPI" voice on Windows) is what sounded robotic. There's no good way to
+     add a real neural TTS API here without a server to hold its key — any
+     key embedded in a public static site is a key anyone can lift and abuse.
+     Instead this picks the best already-installed voice at no extra cost:
+     Chrome/Edge ship free cloud-backed "Natural"/"Online" voices alongside
+     the classic ones, just never selected by default. ---------- */
   window.shTTS = (function(){
     var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
-    var activeBtn = null;
+    var activeBtn = null, activeWords = null, wordCursor = -1;
+    var bestVoice = null;
+
+    function scoreVoice(v){
+      var n = v.name || "";
+      var s = 0;
+      if (/natural|online/i.test(n)) s += 100;
+      if (/neural|enhanced|premium/i.test(n)) s += 80;
+      if (/google/i.test(n)) s += 40;
+      if (/^en-US/i.test(v.lang)) s += 20; else if (/^en/i.test(v.lang)) s += 10;
+      if (v.localService === false) s += 5;
+      return s;
+    }
+    function pickBestVoice(){
+      if (!synth) return null;
+      var voices = synth.getVoices() || [];
+      if (!voices.length) return null;
+      return voices.slice().sort(function(a, b){ return scoreVoice(b) - scoreVoice(a); })[0] || null;
+    }
+    if (synth) {
+      bestVoice = pickBestVoice();
+      synth.onvoiceschanged = function(){ bestVoice = pickBestVoice(); };
+    }
+
     function setState(btn, state){
       if (!btn) return;
       btn.setAttribute("data-state", state);
       btn.setAttribute("aria-label", state === "playing" ? "Pause reading" : (state === "paused" ? "Resume reading" : "Listen to this"));
     }
+    function clearHighlight(){
+      if (activeWords) activeWords.forEach(function(w){ w.el.classList.remove("sh-tts-active"); });
+    }
     function stop(){
       if (synth) { try { synth.cancel(); } catch (e) {} }
       if (activeBtn) setState(activeBtn, "idle");
-      activeBtn = null;
+      clearHighlight();
+      activeBtn = null; activeWords = null; wordCursor = -1;
     }
-    function speak(text, btn){
+
+    // Wrap each word of a container's text in its own span so it can be
+    // highlighted and clicked. Re-entrant: if the container's content was
+    // already wrapped (and hasn't been re-rendered since), reuses those
+    // spans rather than nesting new ones inside them.
+    function wrapWords(container){
+      var existing = container.querySelectorAll(".sh-tts-word");
+      if (existing.length) {
+        return Array.prototype.map.call(existing, function(el){ return { el: el, text: el.textContent }; });
+      }
+      var words = [];
+      function walk(node){
+        if (node.nodeType === 3) {
+          var parts = node.nodeValue.split(/(\s+)/);
+          if (parts.length <= 1) return;
+          var frag = document.createDocumentFragment();
+          parts.forEach(function(part){
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+            var span = document.createElement("span");
+            span.className = "sh-tts-word";
+            span.textContent = part;
+            frag.appendChild(span);
+            words.push({ el: span, text: part });
+          });
+          node.parentNode.replaceChild(frag, node);
+        } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE)$/i.test(node.tagName)) {
+          Array.prototype.slice.call(node.childNodes).forEach(walk);
+        }
+      }
+      Array.prototype.slice.call(container.childNodes).forEach(walk);
+      return words;
+    }
+
+    function speakFrom(words, startIdx, btn){
       if (!synth) return;
-      if (activeBtn === btn) {
+      var text = words.slice(startIdx).map(function(w){ return w.text; }).join(" ").replace(/\s+/g, " ").trim();
+      if (!text) return;
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 1; u.pitch = 1;
+      if (bestVoice) u.voice = bestVoice;
+      wordCursor = startIdx - 1;
+      u.onboundary = function(ev){
+        if (ev.name && ev.name !== "word") return;
+        wordCursor++;
+        clearHighlight();
+        var w = words[wordCursor];
+        if (w) w.el.classList.add("sh-tts-active");
+      };
+      u.onend = function(){ if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; clearHighlight(); } };
+      u.onerror = u.onend;
+      activeBtn = btn;
+      activeWords = words;
+      setState(btn, "playing");
+      synth.speak(u);
+    }
+
+    function speak(container, btn){
+      if (!synth || !container) return;
+      if (activeBtn === btn && activeWords) {
         if (synth.speaking && !synth.paused) { synth.pause(); setState(btn, "paused"); return; }
         if (synth.paused) { synth.resume(); setState(btn, "playing"); return; }
       }
       stop();
-      text = String(text == null ? "" : text).replace(/\s+/g, " ").trim();
-      if (!text) return;
-      var u = new SpeechSynthesisUtterance(text);
-      u.rate = 1; u.pitch = 1;
-      u.onend = function(){ if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; } };
-      u.onerror = u.onend;
-      activeBtn = btn;
-      setState(btn, "playing");
-      synth.speak(u);
+      var words = wrapWords(container);
+      if (!words.length) return;
+      words.forEach(function(w, i){
+        if (w.el.__shTTSWired) return;
+        w.el.__shTTSWired = true;
+        w.el.addEventListener("click", function(){
+          if (synth) { try { synth.cancel(); } catch (e) {} }
+          speakFrom(words, i, btn);
+        });
+      });
+      speakFrom(words, 0, btn);
     }
+
     return { supported: !!synth, speak: speak, stop: stop };
   })();
 
-  /* ---------- per-question class-wide correctness — raw fetch, exposed the
-     same way as shTTS so a hub's own qcard code can look it up lazily at
-     click time, independent of load order and of the stats layer below. ---------- */
-  window.shQuestionStats = function(qid, cb){
-    fetch(SB_URL + "/rest/v1/question_stats?hub=eq." + encodeURIComponent(HUB) + "&qid=eq." + encodeURIComponent(qid) + "&select=attempts,correct", {
+  /* ---------- per-question class-wide correctness — one fetch for the whole
+     hub, cached, instead of one request per question. Exposed the same way
+     as shTTS so a hub's own qcard code can use it independent of load order
+     and of the stats layer below. shQuestionStats(qid, cb) resolves from the
+     cache (fetching it once, lazily, on first call); shFillClassData(container)
+     auto-populates every [data-role="classdata-result"] under a container —
+     no click needed. ---------- */
+  var questionStatsCache = null; // null = not fetched yet; {} (or filled) once loaded
+  var questionStatsPromise = null;
+  function loadQuestionStats(){
+    if (questionStatsCache) return Promise.resolve(questionStatsCache);
+    if (questionStatsPromise) return questionStatsPromise;
+    questionStatsPromise = fetch(SB_URL + "/rest/v1/question_stats?hub=eq." + encodeURIComponent(HUB) + "&select=qid,attempts,correct", {
       headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
     })
     .then(function(r){ return r.ok ? r.json() : []; })
     .then(function(rows){
-      var row = rows && rows[0];
-      cb(row ? { attempts: row.attempts, correct: row.correct } : null);
+      var map = {};
+      (rows || []).forEach(function(r){ map[r.qid] = { attempts: r.attempts, correct: r.correct }; });
+      questionStatsCache = map;
+      return map;
     })
-    .catch(function(){ cb(null); });
+    .catch(function(){ questionStatsCache = {}; return questionStatsCache; });
+    return questionStatsPromise;
+  }
+  window.shQuestionStats = function(qid, cb){
+    loadQuestionStats().then(function(map){ cb(map[qid] || null); });
+  };
+  window.shFillClassData = function(container){
+    if (!container) return;
+    var els = container.querySelectorAll('[data-role="classdata-result"]');
+    if (!els.length) return;
+    loadQuestionStats().then(function(map){
+      els.forEach(function(el){
+        var card = el.closest('[data-qid]');
+        var qid = card && card.getAttribute('data-qid');
+        var stats = qid ? map[qid] : null;
+        if (!stats || stats.attempts < 3) {
+          el.textContent = 'Not enough class answers yet.';
+          el.className = 'qcard-classdata-result';
+          return;
+        }
+        var pct = Math.round((stats.correct / stats.attempts) * 100);
+        el.textContent = pct + '% correct class-wide (' + stats.attempts + ' answered)';
+        el.className = 'qcard-classdata-result ' + (pct < 50 ? 'is-bad' : (pct >= 80 ? 'is-ok' : ''));
+      });
+    });
   };
 
   /* ---------- update-available banner — raw fetch (not the supabase client),
