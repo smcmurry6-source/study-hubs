@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Dental Genetics Rounds</title>
 <style>
 /* ============ FONTS ============ */
@@ -207,19 +207,19 @@ table{border-collapse:collapse; width:100%;}
 /* ============ COMPENDIUM ============ */
 .compendium-layout{display:grid; grid-template-columns:220px 1fr; gap:26px; align-items:start;}
 @media (max-width:820px){.compendium-layout{grid-template-columns:1fr;}}
-.lecture-rail{position:sticky; top:120px; display:flex; flex-direction:column; gap:4px;}
+.lecture-rail{position:sticky; top:120px; display:flex; flex-direction:column; gap:4px; min-width:0;}
 .lecture-rail button{
   text-align:left; background:transparent; border:none; border-radius:9px; padding:9px 12px;
   font-size:13.5px; color:var(--ink-soft); display:flex; align-items:center; gap:9px;
-  border-left:3px solid transparent;
+  border-left:3px solid transparent; min-width:0;
 }
 .lecture-rail button .num{font-family:var(--font-mono); font-size:11px; color:var(--ink-faint);}
 .lecture-rail button:hover{background:var(--card-sage);}
 .lecture-rail button.is-active{background:var(--card); border-left-color:var(--accent); box-shadow:var(--shadow); color:var(--ink); font-weight:600;}
 .lecture-rail .rail-divider{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-faint); margin:14px 0 2px 12px;}
 
-.compendium-tabs{display:flex; gap:6px; margin-bottom:18px; border-bottom:1px solid var(--line); padding-bottom:0;}
-.compendium-tabs button{background:none; border:none; padding:9px 4px; margin-right:18px; font-size:14px; font-weight:600; color:var(--ink-faint); border-bottom:2px solid transparent; position:relative; top:1px;}
+.compendium-tabs{display:flex; flex-wrap:wrap; gap:6px 0; margin-bottom:18px; border-bottom:1px solid var(--line); padding-bottom:0;}
+.compendium-tabs button{background:none; border:none; padding:9px 4px; margin-right:18px; font-size:14px; font-weight:600; color:var(--ink-faint); border-bottom:2px solid transparent; position:relative; top:1px; white-space:nowrap;}
 .compendium-tabs button.is-active{color:var(--ink); border-bottom-color:var(--teal);}
 
 .lecture-header{display:flex; gap:14px; align-items:flex-start; margin-bottom:6px;}
@@ -257,6 +257,24 @@ table.data-table tr:nth-child(even) td{background:var(--porcelain-dim);}
 .cram-card h4{font-size:14px; margin-bottom:8px;}
 .cram-card ul{margin:0; padding-left:16px; font-size:12.8px; color:var(--ink-soft);}
 .cram-card li{margin-bottom:4px;}
+
+/* ============ EXAM HINTS ============ */
+.hints-title{font-size:19px; margin-bottom:4px; font-family:var(--font-body); font-weight:700;}
+.hints-intro{font-size:13.5px; color:var(--ink-soft); max-width:62ch; margin-bottom:22px;}
+.hints-group{margin-bottom:34px;}
+.hints-group:last-child{margin-bottom:6px;}
+.hints-group-head{font-size:15.5px; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.06em; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:14px;}
+.hints-logistics{background:var(--gold-soft); border-left:3px solid var(--gold); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13.5px; color:var(--ink);}
+.hints-logistics b{font-family:var(--font-mono); text-transform:uppercase; font-size:11px; letter-spacing:.08em; display:block; margin-bottom:3px; color:var(--gold);}
+.hints-list{display:flex; flex-direction:column; gap:14px;}
+.hint-card{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:var(--radius-sm); padding:16px 18px;}
+.hint-quote{font-style:italic; font-size:14.5px; color:var(--ink); margin-bottom:10px; line-height:1.5;}
+.hint-lecs{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}
+.hint-lec-chip{display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; padding:4px 10px 4px 8px; border-radius:999px; background:var(--porcelain-dim); color:var(--ink-soft); border:1px solid var(--line);}
+.hint-lec-chip:hover{border-color:var(--accent); color:var(--ink);}
+.hint-lec-chip .dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+.hint-answer{font-size:13.8px; color:var(--ink-soft); line-height:1.65;}
+.hint-answer b{color:var(--ink);}
 
 /* ============ ATLAS ============ */
 .atlas-switch{display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;}
@@ -403,12 +421,14 @@ footer.hub-footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--
             <button data-ctab="bank" aria-selected="false">Question Bank</button>
             <button data-ctab="tables" aria-selected="false">Reference Tables</button>
             <button data-ctab="cram" aria-selected="false">Cram Sheet</button>
+            <button data-ctab="hints" aria-selected="false">Exam Hints</button>
           </div>
           <div id="ctabPanels">
             <div id="ctab-reading" class="ctab-panel"></div>
             <div id="ctab-bank" class="ctab-panel" hidden></div>
             <div id="ctab-tables" class="ctab-panel" hidden></div>
             <div id="ctab-cram" class="ctab-panel" hidden></div>
+            <div id="ctab-hints" class="ctab-panel" hidden></div>
           </div>
         </div>
       </div>
@@ -1833,6 +1853,56 @@ const CRAM = {
 };
 
 /* =========================================================================
+   DATA LAYER — EXAM HINTS
+   Sourced verbatim from the professors' own exam-guidance messages
+   (project docs "Exam information from Dr. Amm" / "...Dr. Lamani").
+   Each item's `prompt` is the professor's own words (or a lightly-trimmed
+   clause of them); `answer` is real synthesized material from the actual
+   lecture content, not a restatement of the hint.
+   ========================================================================= */
+const EXAM_HINTS = [
+  {
+    professor: 'Dr. Hope Amm',
+    logistics: "For the first part of the exam, there will be three definitions that come from the written assignment and a pedigree to answer questions about.",
+    items: [
+      { lecs:['primer'],
+        prompt:"For lecture 1, I recommend focusing on inheritance patterns.",
+        answer:"Know the three pedigree questions cold: do unaffected parents have affected offspring (recessive if yes); are both sexes affected equally (autosomal if yes); do affected males have affected sons (Y-linked if yes, otherwise X-linked). From there, know the four inheritance-pattern signatures by name: <b>autosomal dominant</b> (vertical transmission, 50% risk per pregnancy, no carriers, male-to-male transmission possible), <b>autosomal recessive</b> (horizontal transmission clustered in one generation, 25% risk from two carrier parents, consanguinity is a clue), <b>X-linked recessive</b> (males hemizygous and more often/severely affected, no male-to-male transmission, an affected father's daughters are all carriers and his sons are all unaffected), and <b>X-linked dominant</b> (an affected father passes it to all his daughters, none of his sons). Also be ready to apply Mendel's three postulates (diploid gene pairs, dominant/recessive, random segregation) to a monohybrid (3:1) or dihybrid (9:3:3:1) cross, and to read pedigree symbols (filled = affected, double line = consanguineous parents, proband = first affected person identified)."},
+      { lecs:['ethics'],
+        prompt:"For lecture 2, know about the informed consent process and the GINA.",
+        answer:"Informed consent must happen <b>before</b> testing — not after, and not just before disclosing results. Patients need to be told upfront what decisions they may face and that testing can reveal more than what was asked for (incidental findings, unrelated pathogenic mutations, false paternity, variants of unknown significance that may later be reclassified). For <b>GINA</b> (Genetic Information Nondiscrimination Act, 2008): it bars health insurers from using genetic information to set eligibility/premiums or requiring genetic testing, and bars employers from using it in hiring/firing/assignment decisions — but its gaps make good exam material too. GINA does NOT cover supplemental insurance (life, long-term care, disability, mortgage), does not protect someone already symptomatic, and does not apply to businesses under 15 employees, the military, VA care, federal employees, or Indian Health Service. Since 2013, HIPAA's Privacy Rule has also treated genetic information as Protected Health Information (PHI)."},
+      { lecs:['multifactorial'],
+        prompt:"For lecture 3 (multifactorial inheritance), know the definitions and the genes associated with each condition and how it relates to function.",
+        answer:"Definitions to have cold: <b>oligogenic</b> (more than one gene shapes the phenotype), <b>multifactorial</b> (genetic AND environmental factors both shape it), <b>epistasis</b> (one gene's expression depends on a different, modifier locus — vs. dominance, an interaction between alleles at the SAME locus), and <b>penetrance</b> (the proportion of mutation carriers who show any symptoms at all — rare Mendelian disease pairs a rare allele with high penetrance; common multifactorial disease pairs common alleles with low penetrance). Then gene-to-function for each named condition: caries protection links to <span class=\"gene-word\">DSPP</span> (dentin), <span class=\"gene-word\">KLK4</span> (enamel-maturation protease), and <span class=\"gene-word\">AQP5</span> (aquaporin — saliva production) from a 575-child Iowa fluoride study; periodontitis links to immune/inflammatory genes like interleukin-1, with aggressive periodontitis showing a 16× higher prevalence in African-American populations and 60–70% of patients carrying a documented neutrophil defect; orofacial clefting links to <span class=\"gene-word\">MSX1</span>, <span class=\"gene-word\">FGFR1</span>, <span class=\"gene-word\">FGF8</span> (~70% non-syndromic, with smoking and pre-existing diabetes as environmental risk factors); oral cancer progression tracks P16 inactivation → TP53 mutation → cyclin D/EGFR amplification (tobacco causes ~85% of head & neck cancers)."},
+      { lecs:['precision'],
+        prompt:"For lecture 4 (precision medicine), understand benefits and negatives of precision medicine, understand patient stratification, know the genes associated with each condition, and understand warfarin and codeine metabolism and associated enzymes.",
+        answer:"<b>Benefits:</b> better first-try matching of patients to drugs, fewer trial-and-error adverse reactions, lower overall clinical-trial costs. <b>Negatives:</b> real cost/access barriers, ethical and data-privacy concerns, and the need for clinician education. <b>Patient stratification</b> is identifying a group of patients who share a biological characteristic (mutation, protein, bacterial strain) via molecular/biochemical/imaging testing, to select the management most likely to help that subgroup — Herceptin is the worked example: only HER2 IHC 2+/3+ patients (~25–30% of breast cancer) qualify, and testing everyone unstratified would have kept response rates below the approval bar. For <b>warfarin</b>: inactivated by <span class=\"gene-word\">CYP2C9</span>, works by inhibiting <span class=\"gene-word\">VKORC1</span> (blocking vitamin K production); decreased CYP2C9 activity means slower metabolism, more active drug in circulation, and higher bleeding risk — so those patients need a LOWER maintenance dose. For <b>codeine</b>: a prodrug, inert until <span class=\"gene-word\">CYP2D6</span> converts it to morphine — poor metabolizers (~10%) get little analgesia, while ultra-rapid metabolizers risk dangerous morphine excess (including in breast milk). Also know the other named dental pharmacogenes: CYP2C9 (NSAIDs), CYP3A4 (clarithromycin, erythromycin, benzodiazepines, lidocaine), CYP2E1 (acetaminophen, general anesthetics)."},
+      { lecs:['amelogenesis'],
+        prompt:"For lecture 5 (amelogenesis), know when and how enamel is formed and the associated enamel matrix proteins and enzymes.",
+        answer:"<b>When:</b> enamel and dentin begin forming together at the late bell stage, at the crest of the inner enamel epithelium (the future cusp tip), via appositional growth — dentin grows inward and enamel grows outward simultaneously from the DEJ. <b>How:</b> ameloblasts pass through three stages — pre-secretory (form/elongate/polarize, no protein yet), secretory (Tomes' processes secrete matrix proteins; the first enamel at the DEJ is aprismatic before organizing into rods), and maturation (two proteases clear degraded protein as mineral hardens). Matrix proteins, in the order they matter: <span class=\"gene-word\">amelogenin</span> (major matrix protein, self-assembles into ~100-monomer nanospheres that template crystal growth, encoded on X/Y), <span class=\"gene-word\">enamelin</span> (largest enamel protein, chromosome 4), <span class=\"gene-word\">ameloblastin</span> (~5–10% of total enamel protein, cleaved by MMP-20). Enzymes, strictly in order: <span class=\"gene-word\">MMP-20</span> acts first (cleaves amelogenin, activates pro-KLK4), then <span class=\"gene-word\">KLK4</span> acts second (clears remaining fragments during maturation) — MMP-20 must always act before KLK4 since it's what switches KLK4 on."},
+    ]
+  },
+  {
+    professor: 'Dr. Ejvis Lamani',
+    logistics: "\"I tried to make my lectures as concise as I could.\" — treat every distinguishing detail named in his slides as fair game, not padding.",
+    items: [
+      { lecs:['enamel','dentin','patterning'],
+        prompt:"Make sure you understand specific features/characteristics of the different types of AI, DGI, DD, and the tooth patterning disorders.",
+        answer:"<b>AI (enamel):</b> hypoplastic = thin but hard/mature enamel (matrix-synthesis defect); hypomaturation = normal thickness but soft and discolored, classically 'snow-capped' (processing defect); hypocalcified = normal thickness but chips/abrades easily, opaque and rough (mineralization defect). <b>DGI/DD (dentin):</b> DGI gives steel-gray/opalescent crowns with pulp obliteration — DGI-I comes WITH osteogenesis imperfecta (blue sclera, fractures, double-jointedness); DGI-II from a nonsense mutation shows yellow/brown teeth with fully obliterated pulp chambers, while a frameshift mutation instead gives amber teeth with a thistle-shaped pulp chamber; DGI-III ('the Brandywine isolate') has variable severity. DD-I ('rootless teeth') looks normal above the gumline but has short/conical/absent roots with near-total pulp obliteration; DD-II shows DGI-II-like primary teeth but NORMAL-shaped permanent teeth with a thistle-tube pulp and pulp stones. <b>Patterning:</b> hypodontia is &lt;6 missing teeth (excluding 3rd molars); oligodontia is ≥6 missing (usually Mendelian); anodontia is all teeth missing. Each syndrome has a signature combination: ectodermal dysplasia needs ≥2 affected ectodermal structures (hair/teeth/nails/sweat glands); EEC syndrome pairs ectrodactyly + ectodermal dysplasia + cleft lip/palate; Rieger syndrome pairs severe oligodontia with midfacial hypoplasia; Cleidocranial Dysplasia pairs absent/hypoplastic clavicles, cranial dysmorphology, and supernumerary teeth."},
+      { lecs:['enamel','dentin','patterning'],
+        prompt:"You will need to know the genes and mode of inheritance.",
+        answer:"<b>AI:</b> <span class=\"gene-word\">AMELX</span> (X-linked), <span class=\"gene-word\">ENAM</span> (AD/AR), <span class=\"gene-word\">AMBN</span> (AR) → hypoplastic; <span class=\"gene-word\">MMP20</span>, <span class=\"gene-word\">KLK4</span>, <span class=\"gene-word\">WDR72</span> (all AR) → hypomaturation; <span class=\"gene-word\">FAM83H</span> (AD, the single most common non-syndromic AI gene at ~46%), <span class=\"gene-word\">C4orf26</span> (AR), <span class=\"gene-word\">SLC24A4</span> (AR) → hypocalcified; <span class=\"gene-word\">DLX3</span> (AD, complete penetrance) → AIHHT/TDO; <span class=\"gene-word\">CNNM4</span> (AR) → Jalili syndrome; <span class=\"gene-word\">FAM20A</span> (AR) → AIGFS/enamel-renal syndrome. <b>Dentin:</b> <span class=\"gene-word\">COL1A1/COL1A2</span> (AD) → DGI-I; <span class=\"gene-word\">DSPP</span> (AD, all three mutation types — nonsense, frameshift, missense) → DGI-II, DGI-III, and DD-II as an allelic series; <span class=\"gene-word\">NFIC</span> → DD-I, most often AD but a likely AR pedigree has also been documented (with NFIC itself testing negative in that AR family, so a second gene is suspected). <b>Patterning:</b> <span class=\"gene-word\">MSX1</span> (AD, premolar pattern), <span class=\"gene-word\">PAX9</span> (AD, molar + lower-incisor pattern), <span class=\"gene-word\">AXIN2</span> (AD, no consistent pattern) → tooth agenesis; <span class=\"gene-word\">EDA</span> (X-linked recessive, most common HED cause), <span class=\"gene-word\">EDAR</span> (AD or AR), <span class=\"gene-word\">EDARADD</span> (AR) → Hypohidrotic Ectodermal Dysplasia; <span class=\"gene-word\">p63</span> (AD) → EEC syndrome; <span class=\"gene-word\">PITX2</span> (AD) → Rieger syndrome; <span class=\"gene-word\">Runx2</span> (AD) → Cleidocranial Dysplasia."},
+      { lecs:['enamel','dentin','patterning'],
+        prompt:"Know differential diagnosis.",
+        answer:"<b>AI:</b> rule out environmental enamel hypoplasia first (birth trauma, infection, malnutrition, endocrine dysfunction, medications). The #1 mimic is dental fluorosis (mottled enamel with a chronological distribution tied to fluoride exposure); tetracycline staining is another (doesn't respond to bleaching, since the stain is built into the enamel during formation). Four questions separate true AI from a look-alike: family history, uniformity across all teeth, chronological distribution, relevant medical history. <b>Dentin:</b> the biggest differential inside this lecture is DD-I vs. everything else — every other dentin disorder here traces to DSPP, but DD-I is the NFIC-linked outlier (short/conical/absent roots with near-total pulp obliteration is the tell). Within DGI-II, nonsense vs. frameshift DSPP mutations are told apart by pulp-chamber shape (fully obliterated vs. thistle-shaped) and crown color (yellow/brown vs. amber). DGI-I is distinguished from DGI-II/III by the presence of systemic osteogenesis imperfecta findings. <b>Patterning:</b> distinguish Mendelian tooth agenesis (MSX1/PAX9/AXIN2, clear inheritance pattern) from complex/polygenic tooth agenesis (the ~20% of the population missing a 3rd molar, no single-gene pattern). Among the syndromes, the number/combination of affected ectodermal structures and the presence of limb, facial-midline, or skeletal (clavicle/cranial-suture) findings are what separate ectodermal dysplasia, EEC, Rieger, and Cleidocranial Dysplasia from one another."},
+      { lecs:['enamel','dentin','patterning'],
+        prompt:"Make sure you understand the steps on treatment of these patients.",
+        answer:"<b>AI:</b> start conservative — oral hygiene, dietary advice, desensitization — then bleaching/microabrasion, then (as needed) crown-lengthening surgery, composite resin, porcelain veneers, metal onlays, crowns, implants, and removable dentures only as a last resort; a multidisciplinary team follows the patient through growth. <b>Dentin (DGI/DD):</b> preventive care first (exams, hygiene, fluoride, desensitizers) for both. DGI ranges from routine restorative techniques in mild/moderate cases to full-coverage restoration of both dentitions (sometimes with overdentures) in severe cases — bleaching rarely normalizes the color, so veneers/implants are common; endodontically, pulpal obliteration means apical surgery may be needed and instrumenting obliterated canals risks lateral perforation. DD-I usually needs prosthetic replacement (dentures/overdentures/implants) given compromised roots, while DD-II's normal-shaped, normal-rooted teeth can often be restored conventionally with successful endodontics. <b>Patterning:</b> mild hypodontia can be managed with adhesive bridges/composite build-ups plus orthodontic space closure; severe cases need a combined orthodontic-restorative-surgical approach, sometimes ending in implants or orthognathic surgery. Cleidocranial Dysplasia management has specifically shifted over time — from historically extracting everything and going straight to dentures, toward a combined orthodontic-surgical approach that preserves more of the patient's own teeth. The throughline across all three lectures: early accurate diagnosis plus a multidisciplinary team, treating as conservatively as possible."},
+    ]
+  },
+];
+
+/* =========================================================================
    UI STATE (transient — not persisted, unlike STATE)
    ========================================================================= */
 const UI = {
@@ -1857,7 +1927,7 @@ function renderLectureRail(){
     const m = lectureMastery(l.id);
     return `<button type="button" data-lec="${l.id}" class="${UI.compLecture===l.id?'is-active':''}" style="--accent:var(--tag-${l.tag})">
       <span class="num mono">${String(l.num).padStart(2,'0')}</span>
-      <span style="flex:1">${escapeHTML(l.title)}</span>
+      <span style="flex:1; min-width:0;">${escapeHTML(l.title)}</span>
       ${m.attempted? `<span class="mono" style="font-size:10.5px;color:var(--ink-faint)">${m.attempted}/${m.total}</span>`:''}
     </button>`;
   }).join('');
@@ -1873,7 +1943,7 @@ function renderCompendiumTabs(){
     btn.classList.toggle('is-active', active);
     btn.setAttribute('aria-selected', active?'true':'false');
   });
-  ['reading','bank','tables','cram'].forEach(t=>{
+  ['reading','bank','tables','cram','hints'].forEach(t=>{
     document.getElementById('ctab-'+t).hidden = (t!==UI.compTab);
   });
 }
@@ -1968,6 +2038,39 @@ function renderCramPanel(){
       </div>`).join('')}</div>`;
 }
 
+function renderHintsPanel(){
+  const el = document.getElementById('ctab-hints');
+  el.innerHTML = `
+    <span class="section-eyebrow">Straight from your professors</span>
+    <h3 class="hints-title">Exam Hints</h3>
+    <p class="hints-intro">Dr. Amm and Dr. Lamani each sent exam guidance directly. Every hint below is their own wording, paired with the real material it points to — not a guess at what they meant.</p>
+    ${EXAM_HINTS.map((group,gi)=>`
+      <div class="hints-group">
+        <h4 class="hints-group-head">${escapeHTML(group.professor)}</h4>
+        ${group.logistics? `<div class="hints-logistics"><b>${gi===0?'Exam logistics':'In their own words'}</b>${escapeHTML(group.logistics)}</div>` : ''}
+        <div class="hints-list">
+          ${group.items.map((item,ii)=>`
+            <div class="hint-card" style="--accent:var(--tag-${LECTURE_BY_ID[item.lecs[0]].tag})">
+              <div class="hint-quote">&ldquo;${escapeHTML(item.prompt)}&rdquo;</div>
+              <div class="hint-lecs">${item.lecs.map(lid=>{
+                const l = LECTURE_BY_ID[lid];
+                return `<button type="button" class="hint-lec-chip" data-jump-lec="${lid}" style="--accent:var(--tag-${l.tag})"><span class="dot" style="background:var(--tag-${l.tag})"></span>${escapeHTML(l.title)}</button>`;
+              }).join('')}</div>
+              <div class="hint-answer">${item.answer}</div>
+            </div>`).join('')}
+        </div>
+      </div>`).join('')}
+  `;
+  el.querySelectorAll('[data-jump-lec]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      UI.compLecture = btn.getAttribute('data-jump-lec');
+      UI.compTab = 'reading';
+      renderCompendium();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+}
+
 function renderCompendium(){
   renderLectureRail();
   renderCompendiumTabs();
@@ -1975,6 +2078,7 @@ function renderCompendium(){
   renderBankPanel();
   renderTablesPanel();
   renderCramPanel();
+  renderHintsPanel();
 }
 
 /* =========================================================================
@@ -2729,6 +2833,7 @@ if(document.readyState==='loading'){
   boot();
 }
 </script>
+
 <!-- ============ CLASS STATS / POPULAR / ONLINE-NOW / MY STATS / FLAG / SUGGEST (shared widget) ============ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>

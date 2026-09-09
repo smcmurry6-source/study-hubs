@@ -250,7 +250,7 @@ footer{margin-top:52px; padding-top:26px;}
 .footer-fine a:hover{text-decoration:underline;}
 
 /* ============ CLASS PULSE ============ */
-.pulse-section{margin-top:6px;}
+.pulse-section{margin-top:34px;}
 .pulse-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin-top:14px; margin-bottom:8px;}
 .pulse-card{
   background:var(--card); border:1px solid var(--line); border-radius:var(--r-l);
@@ -295,6 +295,24 @@ footer{margin-top:52px; padding-top:26px;}
       <span>D2 &middot; UAB</span>
     </div>
   </header>
+
+  <!-- ============ CLASS PULSE ============ -->
+  <section class="pulse-section">
+    <div class="term-head">
+      <span class="term-label">Class Pulse</span>
+      <span class="pulse-live"><span class="pulse-dot"></span><span id="pulseLiveCount">—</span> studying right now</span>
+    </div>
+    <div class="pulse-grid">
+      <div class="pulse-card">
+        <h3>Busiest times, all hubs combined</h3>
+        <div id="pulseHistWrap"><div class="pulse-empty">Loading…</div></div>
+      </div>
+      <div class="pulse-card">
+        <h3>Study streaks</h3>
+        <div id="pulseLeaderboard"><div class="pulse-empty">Loading…</div></div>
+      </div>
+    </div>
+  </section>
 
   <section id="changelog-strip" class="changelog-strip" hidden>
     <div class="cl-label">What's new</div>
@@ -486,24 +504,6 @@ footer{margin-top:52px; padding-top:26px;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="M12 14c-4 0-6-2.5-6-6.5C8.5 8 12 8.5 12 14z"/><path d="M12 14c4 0 6-2.5 6-6.5C15.5 8 12 8.5 12 14z"/><path d="M6 21h12"/></svg>
       <p>Nothing here yet — this shelf fills up once spring classes start.</p>
       <span class="empty-sub">Check back in January</span>
-    </div>
-  </section>
-
-  <!-- ============ CLASS PULSE ============ -->
-  <section class="pulse-section">
-    <div class="term-head">
-      <span class="term-label">Class Pulse</span>
-      <span class="pulse-live"><span class="pulse-dot"></span><span id="pulseLiveCount">—</span> studying right now</span>
-    </div>
-    <div class="pulse-grid">
-      <div class="pulse-card">
-        <h3>Busiest times, all hubs combined</h3>
-        <div id="pulseHistWrap"><div class="pulse-empty">Loading…</div></div>
-      </div>
-      <div class="pulse-card">
-        <h3>Study streaks</h3>
-        <div id="pulseLeaderboard"><div class="pulse-empty">Loading…</div></div>
-      </div>
     </div>
   </section>
 
