@@ -2,7 +2,7 @@
    One file, loaded by every hub via:
      <script src="../../widget/v3.js" data-hub="..." data-answered-event="..." data-default-mode="..."></script>
    Editing this file updates every hub at once. Previously this whole thing was
-   copy-pasted into each hub's HTML and re-spliced by hand on every change -
+   copy-pasted into each hub's HTML and re-spliced by hand on every change —
    that's what externalizing it here fixes.
 
    Each hub optionally publishes window.SH_EXPORT = { lectures:[{id,title}],
@@ -35,7 +35,7 @@
     document.body.appendChild(a);
   })();
 
-  /* ---------- text-to-speech (lecture reading panels) - independent of Supabase,
+  /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
      so it still works even if the stats layer fails to init. Each hub's own
      render function inserts a .sh-tts-btn and wires it to window.shTTS.speak,
      looked up lazily at click time so load order never matters.
@@ -43,14 +43,14 @@
      speak(container, btn) takes the actual reading-panel DOM element (not
      plain text): it wraps each word in a <span class="sh-tts-word">, drives
      the utterance off that same word list so it can highlight the word
-     being spoken (via the utterance's boundary events) and - since the Web
-     Speech API can't seek within an utterance - lets a click on any word
+     being spoken (via the utterance's boundary events) and — since the Web
+     Speech API can't seek within an utterance — lets a click on any word
      cancel and re-speak from that word onward, which is what gives the
      "click a word to resume from there" behavior.
 
      Voice choice: the browser's own default voice (often a dated local
      "SAPI" voice on Windows) is what sounded robotic. There's no good way to
-     add a real neural TTS API here without a server to hold its key - any
+     add a real neural TTS API here without a server to hold its key — any
      key embedded in a public static site is a key anyone can lift and abuse.
      Instead this picks the best already-installed voice at no extra cost:
      Chrome/Edge ship free cloud-backed "Natural"/"Online" voices alongside
@@ -58,6 +58,7 @@
   window.shTTS = (function(){
     var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
     var activeBtn = null, activeWords = null, wordCursor = -1;
+    var activeAudioEl = null;
     var bestVoice = null;
     var VOICE_PREF_KEY = "sh_tts_voice_name";
     var pickers = [];
@@ -121,6 +122,12 @@
     }
     function ensureVoicePicker(btn){
       if (!btn || btn.__shVoicePicker || !synth) return;
+      // Buttons backed by a pre-generated audio file don't use the browser's
+      // voice list at all, so the picker would be confusing there (changing
+      // it wouldn't do anything). It's skipped for those — unless the audio
+      // file fails to load, at which point the error handler below clears
+      // this flag and falls back to the normal synth path, picker included.
+      if (btn.getAttribute && btn.getAttribute("data-sh-tts-audio") === "1") return;
       btn.__shVoicePicker = true;
       var select = document.createElement("select");
       select.className = "sh-tts-voice-picker";
@@ -177,6 +184,10 @@
       if (activeWords) activeWords.forEach(function(w){ w.el.classList.remove("sh-tts-active"); });
     }
     function stop(){
+      if (activeAudioEl) {
+        try { activeAudioEl.pause(); } catch (e) {}
+        activeAudioEl = null;
+      }
       if (synth) { try { synth.cancel(); } catch (e) {} }
       if (activeBtn) setState(activeBtn, "idle");
       clearHighlight();
@@ -256,13 +267,9 @@
       synth.speak(u);
     }
 
-    function speak(container, btn){
+    function speakWithSynth(container, btn){
       if (!synth || !container) return;
       ensureVoicePicker(btn);
-      if (activeBtn === btn && activeWords) {
-        if (synth.speaking && !synth.paused) { synth.pause(); setState(btn, "paused"); return; }
-        if (synth.paused) { synth.resume(); setState(btn, "playing"); return; }
-      }
       stop();
       var words = wrapWords(container);
       if (!words.length) return;
@@ -277,15 +284,69 @@
       speakFrom(words, 0, btn);
     }
 
+    // Pre-generated-audio path (Kokoro-narrated mp3s for hubs that have
+    // them). No per-word highlighting here — there's no boundary-event
+    // equivalent for a static audio file — just play/pause/resume of the
+    // file, using the same button + state machine as the synth path. If the
+    // file 404s or otherwise fails to play, this drops back to the browser
+    // voice (speakWithSynth) so Listen never just goes silent.
+    function playAudioFile(container, btn, audioUrl){
+      var audio = new Audio(audioUrl);
+      audio.preload = "auto";
+      audio.addEventListener("ended", function(){
+        if (activeAudioEl === audio) activeAudioEl = null;
+        if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; }
+      });
+      audio.addEventListener("error", function(){
+        if (activeAudioEl === audio) activeAudioEl = null;
+        if (activeBtn === btn) activeBtn = null;
+        if (btn) btn.removeAttribute("data-sh-tts-audio");
+        speakWithSynth(container, btn);
+      });
+      activeBtn = btn;
+      activeAudioEl = audio;
+      setState(btn, "playing");
+      var p = audio.play();
+      if (p && p.catch) {
+        p.catch(function(){
+          if (activeAudioEl === audio) activeAudioEl = null;
+          if (btn) btn.removeAttribute("data-sh-tts-audio");
+          speakWithSynth(container, btn);
+        });
+      }
+    }
+
+    // Public entry point. audioUrl is optional — pass it when a hub has a
+    // pre-generated narration file for the content currently shown in
+    // container; omit it (or pass a falsy value) to use the browser's own
+    // voice, unchanged from before.
+    function speak(container, btn, audioUrl){
+      if (!container) return;
+      if (activeBtn === btn) {
+        if (activeAudioEl) {
+          if (activeAudioEl.paused) { activeAudioEl.play(); setState(btn, "playing"); }
+          else { activeAudioEl.pause(); setState(btn, "paused"); }
+          return;
+        }
+        if (synth && activeWords) {
+          if (synth.speaking && !synth.paused) { synth.pause(); setState(btn, "paused"); return; }
+          if (synth.paused) { synth.resume(); setState(btn, "playing"); return; }
+        }
+      }
+      stop();
+      if (audioUrl) { playAudioFile(container, btn, audioUrl); return; }
+      speakWithSynth(container, btn);
+    }
+
     return { supported: !!synth, speak: speak, stop: stop };
   })();
 
-  /* ---------- per-question class-wide correctness - one fetch for the whole
+  /* ---------- per-question class-wide correctness — one fetch for the whole
      hub, cached, instead of one request per question. Exposed the same way
      as shTTS so a hub's own qcard code can use it independent of load order
      and of the stats layer below. shQuestionStats(qid, cb) resolves from the
      cache (fetching it once, lazily, on first call); shFillClassData(container)
-     auto-populates every [data-role="classdata-result"] under a container -
+     auto-populates every [data-role="classdata-result"] under a container —
      no click needed. ---------- */
   var questionStatsCache = null; // null = not fetched yet; {} (or filled) once loaded
   var questionStatsPromise = null;
@@ -329,10 +390,10 @@
     });
   };
 
-  /* ---------- update-available banner - raw fetch (not the supabase client),
+  /* ---------- update-available banner — raw fetch (not the supabase client),
      so it still works even if createClient/realtime failed above. Every deploy
      logs a changelog row, so a fresh row appearing after this page loaded IS
-     "an update was pushed" - piggybacks on that instead of a separate version file. ---------- */
+     "an update was pushed" — piggybacks on that instead of a separate version file. ---------- */
   (function(){
     var POLL_MS = 4 * 60 * 1000;
     var baseline = null, toastEl = null;
@@ -357,7 +418,7 @@
         if (baseline === null) { baseline = latest; return; }
         if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
       })
-      .catch(function(){ /* best-effort - never break the hub */ });
+      .catch(function(){ /* best-effort — never break the hub */ });
     }
     check();
     setInterval(check, POLL_MS);
@@ -411,7 +472,7 @@
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
         fireConfetti();
-        showStreakToast(sessionCorrectStreak + " in a row! ??");
+        showStreakToast(sessionCorrectStreak + " in a row! 🔥");
       }
     } else {
       sessionCorrectStreak = 0;
@@ -488,7 +549,7 @@
   root.innerHTML =
     '<div id="shstat-searchpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Search this hub</h5>' +
-    '<input type="text" id="shstat-search-input" placeholder="Search lectures &amp; questions.">' +
+    '<input type="text" id="shstat-search-input" placeholder="Search lectures &amp; questions…">' +
     '<div id="shstat-search-results"><div class="shstat-empty">Type to search.</div></div>' +
     '</div>' +
     '<div id="shstat-suggestpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
@@ -504,12 +565,12 @@
     '<div class="shstat-flagmsg" id="shstat-flag-msg"></div>' +
     '</div>' +
     '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
-    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading.</div></div>' +
+    '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div>' +
     '<div class="shstat-name-row"><input type="text" id="shstat-name-input" maxlength="24" placeholder="Leaderboard name (optional)"><button id="shstat-name-save" type="button">Save</button></div>' +
     '<div class="shstat-namemsg" id="shstat-name-msg"></div></div>' +
-    '<div class="shstat-sec"><h5>Toughest questions (class-wide)</h5><div id="shstat-tough"><div class="shstat-empty">Loading.</div></div></div>' +
-    '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading.</div></div></div>' +
-    '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading.</div></div></div>' +
+    '<div class="shstat-sec"><h5>Toughest questions (class-wide)</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
+    '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
+    '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
     '</div>' +
     '<div class="shstat-pillrow">' +
     '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-pill-icon shstat-pill-icon-dot"><span class="shstat-dot"></span></span><span class="shstat-pill-label"><span id="shstat-online-n">1</span> <span class="spl-full">studying now</span><span class="spl-short">live</span></span></button>' +
@@ -537,14 +598,14 @@
     if (!lecId) return null;
     var ls = getExport().lectures;
     for (var i = 0; i < ls.length; i++) if (ls[i].id === lecId) return ls[i].title;
-    // no SH_EXPORT lecture list published - fall back to humanizing the raw id
+    // no SH_EXPORT lecture list published — fall back to humanizing the raw id
     return String(lecId).replace(/[-_]+/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); });
   }
   function findQuestionMeta(qid){
     var qs = getExport().questions;
     for (var i = 0; i < qs.length; i++) if (qs[i].id === qid) return { text: qs[i].text, lec: qs[i].lec };
     // fall back to a hub's raw global QUESTIONS array, for any hub that hasn't
-    // published SH_EXPORT yet - same lookup the original widget used.
+    // published SH_EXPORT yet — same lookup the original widget used.
     try {
       var bank = (typeof QUESTIONS !== "undefined") ? QUESTIONS : [];
       var q = bank.filter(function(x){ return x.id === qid; })[0];
@@ -560,11 +621,11 @@
       rows = rows.filter(function(r){ return r.attempts >= 3; });
       rows.sort(function(a,b){ return (a.correct/a.attempts) - (b.correct/b.attempts); });
       rows = rows.slice(0, 10);
-      if (!rows.length) { toughEl.innerHTML = '<div class="shstat-empty">Not enough answers yet - check back once the class has done some questions.</div>'; return; }
+      if (!rows.length) { toughEl.innerHTML = '<div class="shstat-empty">Not enough answers yet — check back once the class has done some questions.</div>'; return; }
       var html = rows.map(function(r){
         var meta = findQuestionMeta(r.qid);
         var label = meta.text || r.qid;
-        if (label.length > 76) label = label.slice(0, 74) + ".";
+        if (label.length > 76) label = label.slice(0, 74) + "…";
         var lecTitle = lectureTitle(meta.lec);
         var tag = lecTitle ? '<span class="shstat-tough-tag">' + esc(lecTitle) + '</span>' : '';
         var pct = Math.round((r.correct / r.attempts) * 100);
@@ -631,7 +692,7 @@
     }, function(){ wrap.innerHTML = '<div class="shstat-empty">Couldn&#39;t load this right now.</div>'; });
   }
 
-  /* ---------- search (fully client-side, over window.SH_EXPORT - no network) ---------- */
+  /* ---------- search (fully client-side, over window.SH_EXPORT — no network) ---------- */
   var searchInput = document.getElementById("shstat-search-input");
   var searchResults = document.getElementById("shstat-search-results");
   function runSearch(query){
@@ -659,7 +720,7 @@
         var lecTitle = "";
         for (var i = 0; i < data.lectures.length; i++) if (data.lectures[i].id === q.lec) { lecTitle = data.lectures[i].title; break; }
         return '<div class="shstat-search-q" data-qid="' + esc(q.id) + '"><div class="sq-text">' + esc(q.text) + '</div>'
-          + (lecTitle ? '<div class="sq-lec">' + esc(lecTitle) + ' - tap to reveal</div>' : '<div class="sq-lec">Tap to reveal</div>')
+          + (lecTitle ? '<div class="sq-lec">' + esc(lecTitle) + ' — tap to reveal</div>' : '<div class="sq-lec">Tap to reveal</div>')
           + (q.hint ? '<div class="sq-hint">' + esc(q.hint) + '</div>' : '') + '</div>';
       }).join("") + '</div>';
     }
@@ -685,12 +746,12 @@
       var name = (nameInput.value || "").trim();
       if (!name) { nameMsg.textContent = "Type a name first."; return; }
       nameSaveBtn.disabled = true;
-      nameMsg.textContent = "Saving.";
+      nameMsg.textContent = "Saving…";
       safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
       try { localStorage.setItem("sh_display_name", name); } catch (e) {}
       setTimeout(function(){
         nameSaveBtn.disabled = false;
-        nameMsg.textContent = "Saved - you'll show up on the leaderboard as \"" + name + "\".";
+        nameMsg.textContent = "Saved — you'll show up on the leaderboard as \"" + name + "\".";
       }, 400);
     });
   }
@@ -752,13 +813,13 @@
     var text = (ta.value || "").trim();
     if (!text) { msg.textContent = "Type something first."; return; }
     btn.disabled = true;
-    msg.textContent = "Sending.";
+    msg.textContent = "Sending…";
     supabase.from("question_flags").insert({ hub: HUB, note: text }).then(function(res){
       btn.disabled = false;
-      if (res && res.error) { msg.textContent = "Couldn't send - try again later."; return; }
+      if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
-      msg.textContent = "Thanks - sent!";
-    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send - try again later."; });
+      msg.textContent = "Thanks — sent!";
+    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
 
   document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
@@ -777,12 +838,12 @@
     var text = (ta.value || "").trim();
     if (!text) { msg.textContent = "Type something first."; return; }
     btn.disabled = true;
-    msg.textContent = "Sending.";
+    msg.textContent = "Sending…";
     supabase.from("hub_suggestions").insert({ hub: HUB, note: text }).then(function(res){
       btn.disabled = false;
-      if (res && res.error) { msg.textContent = "Couldn't send - try again later."; return; }
+      if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
-      msg.textContent = "Thanks - sent!";
-    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send - try again later."; });
+      msg.textContent = "Thanks — sent!";
+    }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
 })();

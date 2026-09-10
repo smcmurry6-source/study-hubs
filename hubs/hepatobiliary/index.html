@@ -2957,7 +2957,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
         + '<div class="lecture-notes-head">'
         + '<div><h4 style="font-size:.92rem;">Lecture notes</h4><p class="muted-note" style="margin-top:2px;">'+(lvl==="plain"?"Same material, translated to plain English.":"Written at the level this lecture was actually taught.")+'</p></div>'
         + '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">'
-        + '<button type="button" class="sh-tts-btn" id="sh-tts-btn" aria-label="Listen to this lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>'
+        + '<button type="button" class="sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to this lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>'
         + '<div class="seg-group" id="lecLevelSeg"><button class="seg-btn'+(lvl==="full"?" active":"")+'" data-level="full" type="button">As Taught</button><button class="seg-btn'+(lvl==="plain"?" active":"")+'" data-level="plain" type="button">Plain English</button></div>'
         + '</div>'
         + '</div>'
@@ -2973,11 +2973,11 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     byId("lecDetail").innerHTML = html;
     var ttsBtn = document.getElementById("sh-tts-btn");
     if (ttsBtn) {
-      if (!window.speechSynthesis) { ttsBtn.disabled = true; ttsBtn.title = "Not supported in this browser"; }
+      if (!window.speechSynthesis && typeof Audio === "undefined") { ttsBtn.disabled = true; ttsBtn.title = "Not supported in this browser"; }
       ttsBtn.addEventListener("click", function(){
         if (!window.shTTS) return;
         var proseEl = document.querySelector(".lecture-notes-prose");
-        if (proseEl) window.shTTS.speak(proseEl, ttsBtn);
+        if (proseEl && notes) window.shTTS.speak(proseEl, ttsBtn, "audio/" + lecId + "-" + lvl + ".mp3");
       });
     }
   }
