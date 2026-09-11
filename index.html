@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <title>Study Hub Dashboard</title>
-<meta name="description" content="Every study hub Sam has built, organized by class - Genetics, GI &amp; Musculoskeletal, Fixed Prosthodontics, and Periodontology - with Fall 2026 live and Spring 2027 on deck.">
+<meta name="description" content="Every study hub Sam has built, organized by class — Genetics, GI &amp; Musculoskeletal, Fixed Prosthodontics, and Periodontology — with Fall 2026 live and Spring 2027 on deck.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -134,6 +134,13 @@ header .lede b{color:var(--ink); font-weight:600;}
 .semester:first-of-type .term-head{margin-top:30px;}
 .term-label{font-family:var(--font-display); font-size:23px; font-weight:600; color:var(--ink);}
 .term-stat{font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); white-space:nowrap;}
+.archive-toggle{
+  display:flex; align-items:center; gap:8px; background:none; border:none; padding:0;
+  font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); white-space:nowrap;
+}
+.archive-toggle:hover{color:var(--ink-2);}
+.archive-toggle svg{width:13px; height:13px; transition:transform .15s ease;}
+.archive-toggle[aria-expanded="true"] svg{transform:rotate(180deg);}
 
 /* ============ CLASS GROUPS ============ */
 .class-group{margin-bottom:0;}
@@ -380,17 +387,17 @@ footer{margin-top:52px; padding-top:26px;}
   <header>
     <span class="eyebrow"><span class="drawer-icon"></span>Study hub dashboard &middot; updated as new hubs go live</span>
     <h1>Every hub, one shelf.</h1>
-    <p class="lede">This is the one link to keep. Hubs are grouped by class below - open the exam you need, and when a hub gets updated, <b>this same link always shows the newest version</b>. No more re-sending files. Tap a class icon if you're curious what happens.</p>
+    <p class="lede">This is the one link to keep. Hubs are grouped by class below — open the exam you need, and when a hub gets updated, <b>this same link always shows the newest version</b>. No more re-sending files. Tap a class icon if you're curious what happens.</p>
     <div class="header-meta">
-      <span><b id="hubCount">5</b> hubs live</span>
-      <span><b id="classCount">4</b> classes</span>
+      <span><b id="hubCount">3</b> hubs live</span>
+      <span><b id="classCount">2</b> classes</span>
+      <span><a href="#class-archived" style="color:inherit;">2 archived</a></span>
       <span>D2 &middot; UAB</span>
     </div>
     <nav class="quickjump" aria-label="Jump to class">
-      <a href="#class-genetics">Genetics</a>
       <a href="#class-gi">GI &amp; MSK</a>
-      <a href="#class-pros">Fixed Pros</a>
       <a href="#class-perio">Perio</a>
+      <a href="#class-archived">Archived</a>
     </nav>
   </header>
 
@@ -398,16 +405,16 @@ footer{margin-top:52px; padding-top:26px;}
   <section class="pulse-section">
     <div class="term-head">
       <span class="term-label">Class Pulse</span>
-      <span class="pulse-live"><span class="pulse-dot"></span><span id="pulseLiveCount">-</span> studying right now</span>
+      <span class="pulse-live"><span class="pulse-dot"></span><span id="pulseLiveCount">—</span> studying right now</span>
     </div>
     <div class="pulse-grid">
       <div class="pulse-card">
         <h3>Busiest times, all hubs combined</h3>
-        <div id="pulseHistWrap"><div class="pulse-empty">Loading.</div></div>
+        <div id="pulseHistWrap"><div class="pulse-empty">Loading…</div></div>
       </div>
       <div class="pulse-card">
         <h3>Study streaks</h3>
-        <div id="pulseLeaderboard"><div class="pulse-empty">Loading.</div></div>
+        <div id="pulseLeaderboard"><div class="pulse-empty">Loading…</div></div>
       </div>
     </div>
   </section>
@@ -426,52 +433,13 @@ footer{margin-top:52px; padding-top:26px;}
   <section class="semester" data-term="fall2026">
     <div class="term-head">
       <span class="term-label">Fall 2026 &#127811;</span>
-      <span class="term-stat">5 hubs &middot; 4 classes</span>
-    </div>
-
-    <!-- Genetics -->
-    <div class="class-group" id="class-genetics" style="--dot:var(--hub-genetics); --dot-ink:var(--hub-genetics); --dot-soft:var(--hub-genetics-soft);">
-      <div class="class-head" style="animation-delay:.02s;">
-        <button class="class-icon egg-genetics" type="button" data-egg="genetics" aria-label="Genetics - tap for a surprise">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 2c4 3 6 3 10 6-4 3-6 3-10 6"/><path d="M15 2c-4 3-6 3-10 6 4 3 6 3 10 6"/><path d="M6.4 5.1h7.2M5 10h10M6.4 14.9h7.2"/></svg>
-        </button>
-        <div class="class-head-text">
-          <h2>Genetics</h2>
-          <span class="class-sub">1 exam hub</span>
-        </div>
-        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse Genetics">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
-        </button>
-      </div>
-      <div class="hub-grid">
-        <article class="hub-card" style="animation-delay:.06s;">
-          <div class="hub-card-top">
-            <span class="acc">001</span>
-            <span class="hub-dot"></span>
-          </div>
-          <span class="course-code">Genetics &middot; Full unit</span>
-          <h3>Dental Genetics Rounds</h3>
-          <p class="hub-desc">Mendelian &amp; multifactorial inheritance, genetic testing ethics, precision medicine, amelogenesis, dentin genetics, and patterning disorders - eight lectures end to end.</p>
-          <div class="mode-row">
-            <span class="mode-chip">Compendium</span>
-            <span class="mode-chip">Atlas</span>
-            <span class="mode-chip">Grand Rounds (game)</span>
-          </div>
-          <div class="hub-meta-row">
-            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated.</span></span>
-          </div>
-          <a class="open-btn" href="hubs/genetics/" target="_blank" rel="noopener" data-emoji="&#129516;">
-            Open hub
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-          </a>
-        </article>
-      </div>
+      <span class="term-stat">3 hubs &middot; 2 classes</span>
     </div>
 
     <!-- GI & Musculoskeletal -->
     <div class="class-group" id="class-gi" style="--dot:var(--hub-gi); --dot-ink:var(--hub-gi); --dot-soft:var(--hub-gi-soft);">
       <div class="class-head" style="animation-delay:.10s;">
-        <button class="class-icon egg-gi" type="button" data-egg="gi" aria-label="GI and Musculoskeletal - tap for a surprise">
+        <button class="class-icon egg-gi" type="button" data-egg="gi" aria-label="GI and Musculoskeletal — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 2.4a5 5 0 0 1 0 10 3.4 3.4 0 0 1 0-6.8 1.9 1.9 0 0 1 0 3.8"/><path d="M10 12.4v2.6a3 3 0 0 0 3 3h2.2"/></svg>
         </button>
         <div class="class-head-text">
@@ -490,7 +458,7 @@ footer{margin-top:52px; padding-top:26px;}
           </div>
           <span class="course-code">GI &amp; MSK &middot; Exam 1</span>
           <h3>GI Compendium</h3>
-          <p class="hub-desc">GI tract intro, foregut/midgut/hindgut anatomy, the abdominal wall, oral &amp; salivary histology, esophagus &amp; stomach histology, GI hormones, and secretion &amp; motility - nine lectures, plus a hormone reference and cram sheet.</p>
+          <p class="hub-desc">GI tract intro, foregut/midgut/hindgut anatomy, the abdominal wall, oral &amp; salivary histology, esophagus &amp; stomach histology, GI hormones, and secretion &amp; motility — nine lectures, plus a hormone reference and cram sheet.</p>
           <div class="mode-row">
             <span class="mode-chip">Lectures</span>
             <span class="mode-chip">Hormones ref</span>
@@ -498,7 +466,7 @@ footer{margin-top:52px; padding-top:26px;}
             <span class="mode-chip">Exam hints</span>
           </div>
           <div class="hub-meta-row">
-            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated.</span></span>
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
           <a class="open-btn" href="hubs/gi-exam1/" target="_blank" rel="noopener" data-emoji="&#127760;">
             Open hub
@@ -521,47 +489,9 @@ footer{margin-top:52px; padding-top:26px;}
             <span class="mode-chip">Mock Exam</span>
           </div>
           <div class="hub-meta-row">
-            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated.</span></span>
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
           <a class="open-btn" href="hubs/hepatobiliary/" target="_blank" rel="noopener" data-emoji="&#129360;">
-            Open hub
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
-          </a>
-        </article>
-      </div>
-    </div>
-
-    <!-- PCD Fixed Prosthodontics -->
-    <div class="class-group" id="class-pros" style="--dot:var(--hub-pros); --dot-ink:var(--hub-pros); --dot-soft:var(--hub-pros-soft);">
-      <div class="class-head" style="animation-delay:.22s;">
-        <button class="class-icon egg-pros" type="button" data-egg="pros" aria-label="Fixed Prosthodontics - tap for a surprise">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.2c2 1.9 4 .9 6 .9s4 1 6-.9L14.4 17l-2-5h-4.8l-2 5z"/></svg>
-        </button>
-        <div class="class-head-text">
-          <h2>PCD Fixed Prosthodontics</h2>
-          <span class="class-sub">1 exam hub</span>
-        </div>
-        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse PCD Fixed Prosthodontics">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
-        </button>
-      </div>
-      <div class="hub-grid">
-        <article class="hub-card" style="animation-delay:.26s;">
-          <div class="hub-card-top">
-            <span class="acc">004</span>
-            <span class="hub-dot"></span>
-          </div>
-          <span class="course-code">Fixed Pros &middot; Exam 2</span>
-          <h3>Fixed Prosthodontics Compendium</h3>
-          <p class="hub-desc">Work authorizations, cast alloy crowns, PFM biomaterials, pontic design, digital scanning with TRIOS, casting &amp; investments, and metal-ceramic restorations.</p>
-          <div class="mode-row">
-            <span class="mode-chip">Compendium</span>
-            <span class="mode-chip">After Hours (game)</span>
-          </div>
-          <div class="hub-meta-row">
-            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated.</span></span>
-          </div>
-          <a class="open-btn" href="hubs/fixed-pros/" target="_blank" rel="noopener" data-emoji="&#128081;">
             Open hub
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
           </a>
@@ -572,7 +502,7 @@ footer{margin-top:52px; padding-top:26px;}
     <!-- Periodontology -->
     <div class="class-group" id="class-perio" style="--dot:var(--hub-perio); --dot-ink:var(--hub-perio); --dot-soft:var(--hub-perio-soft);">
       <div class="class-head" style="animation-delay:.30s;">
-        <button class="class-icon egg-perio" type="button" data-egg="perio" aria-label="Periodontology - tap for a surprise">
+        <button class="class-icon egg-perio" type="button" data-egg="perio" aria-label="Periodontology — tap for a surprise">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 4c0-1.2 1-2 2-2 .7 0 1.2.6 1.8.6S11.3 2 12 2c1 0 2 .8 2 2 0 3-1 4-1 7 0 2-1 3-1 3s-.4-2-1-2-1 2-1 2-1-1-1-3c0-3-1-4-1-7z"/><circle cx="15.2" cy="14.8" r="1.9"/></svg>
         </button>
         <div class="class-head-text">
@@ -598,7 +528,7 @@ footer{margin-top:52px; padding-top:26px;}
             <span class="mode-chip">Clinic Floor (game)</span>
           </div>
           <div class="hub-meta-row">
-            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated.</span></span>
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
           </div>
           <a class="open-btn" href="hubs/perio/" target="_blank" rel="noopener" data-emoji="&#129471;">
             Open hub
@@ -617,15 +547,107 @@ footer{margin-top:52px; padding-top:26px;}
     </div>
     <div class="empty-term">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="M12 14c-4 0-6-2.5-6-6.5C8.5 8 12 8.5 12 14z"/><path d="M12 14c4 0 6-2.5 6-6.5C15.5 8 12 8.5 12 14z"/><path d="M6 21h12"/></svg>
-      <p>Nothing here yet - this shelf fills up once spring classes start.</p>
+      <p>Nothing here yet — this shelf fills up once spring classes start.</p>
       <span class="empty-sub">Check back in January</span>
+    </div>
+  </section>
+
+  <!-- ============ ARCHIVED ============ -->
+  <section class="semester" data-term="archived" id="class-archived">
+    <div class="term-head">
+      <span class="term-label">Archived</span>
+      <button type="button" class="archive-toggle" id="archiveToggle" aria-expanded="false" aria-controls="archivedBody">
+        <span>2 hubs &middot; exam already taken</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
+    </div>
+    <p class="lede" style="font-size:14px; margin:2px 0 18px;">Kept here for reference — nothing lost, just out of the way once the exam's behind you.</p>
+    <div id="archivedBody" hidden>
+
+    <!-- Genetics -->
+    <div class="class-group" id="class-genetics" style="--dot:var(--hub-genetics); --dot-ink:var(--hub-genetics); --dot-soft:var(--hub-genetics-soft);">
+      <div class="class-head" style="animation-delay:.02s;">
+        <button class="class-icon egg-genetics" type="button" data-egg="genetics" aria-label="Genetics — tap for a surprise">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 2c4 3 6 3 10 6-4 3-6 3-10 6"/><path d="M15 2c-4 3-6 3-10 6 4 3 6 3 10 6"/><path d="M6.4 5.1h7.2M5 10h10M6.4 14.9h7.2"/></svg>
+        </button>
+        <div class="class-head-text">
+          <h2>Genetics</h2>
+          <span class="class-sub">1 exam hub &middot; archived</span>
+        </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse Genetics">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+      </div>
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.06s;">
+          <div class="hub-card-top">
+            <span class="acc">001</span>
+            <span class="hub-dot"></span>
+          </div>
+          <span class="course-code">Genetics &middot; Full unit</span>
+          <h3>Dental Genetics Rounds</h3>
+          <p class="hub-desc">Mendelian &amp; multifactorial inheritance, genetic testing ethics, precision medicine, amelogenesis, dentin genetics, and patterning disorders — eight lectures end to end.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">Atlas</span>
+            <span class="mode-chip">Grand Rounds (game)</span>
+          </div>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
+          </div>
+          <a class="open-btn" href="hubs/genetics/" target="_blank" rel="noopener" data-emoji="&#129516;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
+        </article>
+      </div>
+    </div>
+
+    <!-- PCD Fixed Prosthodontics -->
+    <div class="class-group" id="class-pros" style="--dot:var(--hub-pros); --dot-ink:var(--hub-pros); --dot-soft:var(--hub-pros-soft);">
+      <div class="class-head" style="animation-delay:.10s;">
+        <button class="class-icon egg-pros" type="button" data-egg="pros" aria-label="Fixed Prosthodontics — tap for a surprise">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.2c2 1.9 4 .9 6 .9s4 1 6-.9L14.4 17l-2-5h-4.8l-2 5z"/></svg>
+        </button>
+        <div class="class-head-text">
+          <h2>PCD Fixed Prosthodontics</h2>
+          <span class="class-sub">1 exam hub &middot; archived</span>
+        </div>
+        <button class="class-toggle" type="button" aria-expanded="true" aria-label="Collapse PCD Fixed Prosthodontics">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+        </button>
+      </div>
+      <div class="hub-grid">
+        <article class="hub-card" style="animation-delay:.14s;">
+          <div class="hub-card-top">
+            <span class="acc">004</span>
+            <span class="hub-dot"></span>
+          </div>
+          <span class="course-code">Fixed Pros &middot; Exam 2</span>
+          <h3>Fixed Prosthodontics Compendium</h3>
+          <p class="hub-desc">Work authorizations, cast alloy crowns, PFM biomaterials, pontic design, digital scanning with TRIOS, casting &amp; investments, and metal-ceramic restorations.</p>
+          <div class="mode-row">
+            <span class="mode-chip">Compendium</span>
+            <span class="mode-chip">After Hours (game)</span>
+          </div>
+          <div class="hub-meta-row">
+            <span class="updated-pill" data-updated="2026-09-08"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.4"/></svg><span class="upd-text">Updated…</span></span>
+          </div>
+          <a class="open-btn" href="hubs/fixed-pros/" target="_blank" rel="noopener" data-emoji="&#128081;">
+            Open hub
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h7v7"/><path d="M13 3 3 13"/></svg>
+          </a>
+        </article>
+      </div>
+    </div>
+
     </div>
   </section>
 
   <footer>
     <div class="footer-card">
       <span class="fc-icon">+</span>
-      <p><b>New hub, same link.</b> As each hub goes up for a new exam, it gets added here under its class - bookmark this page instead of the individual hub links, and you'll always find the current set.</p>
+      <p><b>New hub, same link.</b> As each hub goes up for a new exam, it gets added here under its class — bookmark this page instead of the individual hub links, and you'll always find the current set.</p>
     </div>
     <p class="footer-fine">Built &amp; maintained by Sam &middot; D2 &middot; UAB &middot; <a href="review/">review</a></p>
   </footer>
@@ -680,7 +702,7 @@ footer{margin-top:52px; padding-top:26px;}
     }).join("");
     strip.hidden = false;
   })
-  .catch(function(){ /* best-effort - never break the page */ });
+  .catch(function(){ /* best-effort — never break the page */ });
 
   /* ---------- changelog collapse (remembered per browser) ---------- */
   (function(){
@@ -697,14 +719,14 @@ footer{margin-top:52px; padding-top:26px;}
     var saved = null;
     try { saved = localStorage.getItem(COLLAPSE_KEY); } catch (e) {}
     /* collapsed by default (a peek of the newest entry still shows); only
-       an explicit "0" - the visitor expanded it themselves before - opens it */
+       an explicit "0" — the visitor expanded it themselves before — opens it */
     setCollapsed(saved !== "0");
     toggleRow.addEventListener("click", function(){ setCollapsed(!strip.classList.contains("is-collapsed")); });
   })();
 
   /* ---------- update-available banner: lets anyone with the page already
      open know a newer version was just published, and offers a reload.
-     Piggybacks on the same changelog table - every deploy logs an entry,
+     Piggybacks on the same changelog table — every deploy logs an entry,
      so a fresh entry appearing after page-load IS "an update was pushed". ---------- */
   (function(){
     var POLL_MS = 4 * 60 * 1000;
@@ -730,10 +752,28 @@ footer{margin-top:52px; padding-top:26px;}
         if (baseline === null) { baseline = latest; return; }
         if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
       })
-      .catch(function(){ /* best-effort - never break the page */ });
+      .catch(function(){ /* best-effort — never break the page */ });
     }
     check();
     setInterval(check, POLL_MS);
+  })();
+
+  /* ---------- archived section (remembered per browser) ---------- */
+  (function(){
+    var toggle = document.getElementById("archiveToggle");
+    var body = document.getElementById("archivedBody");
+    if (!toggle || !body) return;
+    var key = "sh_archived_expanded";
+    function setExpanded(expanded){
+      body.hidden = !expanded;
+      toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+      try { localStorage.setItem(key, expanded ? "1" : "0"); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(key); } catch (e) {}
+    if (saved === "1") setExpanded(true);
+    if (location.hash === "#class-archived") setExpanded(true);
+    toggle.addEventListener("click", function(){ setExpanded(body.hidden); });
   })();
 
   /* ---------- class-group collapse (remembered per browser) ---------- */
@@ -756,7 +796,7 @@ footer{margin-top:52px; padding-top:26px;}
     btn.addEventListener("click", toggle);
   });
 
-  /* ---------- "Updated ..." pills - instant, no network wait ---------- */
+  /* ---------- "Updated ..." pills — instant, no network wait ---------- */
   function relDateOnly(ymd){
     try {
       var parts = ymd.split("-").map(Number);
@@ -776,10 +816,10 @@ footer{margin-top:52px; padding-top:26px;}
 
   /* ---------- easter eggs on class icons ---------- */
   var EGG_COPY = {
-    genetics: "?? Trait expressed - heterozygous for finals stress.",
-    gi: "?? Peristalsis activated. Moving right along.",
-    pros: "?? Crown seated - margins closed, occlusion checked.",
-    perio: "?? Probing depths: 1-2-3, no bleeding on probing."
+    genetics: "🧬 Trait expressed — heterozygous for finals stress.",
+    gi: "🌀 Peristalsis activated. Moving right along.",
+    pros: "👑 Crown seated — margins closed, occlusion checked.",
+    perio: "🦷 Probing depths: 1-2-3, no bleeding on probing."
   };
   var eggTimers = {};
   function showEggToast(btn, text){
@@ -805,7 +845,7 @@ footer{margin-top:52px; padding-top:26px;}
       btn.classList.add("is-active");
       clearTimeout(eggTimers[key]);
       eggTimers[key] = setTimeout(function(){ btn.classList.remove("is-active"); }, 900);
-      showEggToast(btn, EGG_COPY[key] || "?");
+      showEggToast(btn, EGG_COPY[key] || "✨");
     });
   });
 
@@ -861,7 +901,7 @@ footer{margin-top:52px; padding-top:26px;}
           } catch (e) { liveCounts[hub] = 0; }
           renderLive();
         });
-        ch.subscribe(); // listen only - never track, so the dashboard itself never counts as "studying"
+        ch.subscribe(); // listen only — never track, so the dashboard itself never counts as "studying"
       } catch (e) {}
     });
 
@@ -890,7 +930,7 @@ footer{margin-top:52px; padding-top:26px;}
     supabase.rpc("get_leaderboard", { p_limit: 6 }).then(function(res){
       if (!pulseLbEl) return;
       var rows = (res && res.data) || [];
-      if (!rows.length) { pulseLbEl.innerHTML = '<div class="pulse-empty">No active streaks yet - answer a couple days in a row to show up here.</div>'; return; }
+      if (!rows.length) { pulseLbEl.innerHTML = '<div class="pulse-empty">No active streaks yet — answer a couple days in a row to show up here.</div>'; return; }
       pulseLbEl.innerHTML = '<ul class="pulse-lb">' + rows.map(function(r, i){
         return '<li class="pulse-lb-row"><span class="pulse-lb-rank">' + (i + 1) + '</span><span class="pulse-lb-name">' + esc(r.display_name) + '</span><span class="pulse-lb-streak">' + r.streak + (r.streak === 1 ? ' day' : ' days') + '</span></li>';
       }).join("") + '</ul>';

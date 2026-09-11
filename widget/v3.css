@@ -1,7 +1,7 @@
 /* ============ SHARED STUDY-HUB WIDGET (class stats / popular / online-now /
    my stats / toughest questions / search / flag / suggest / back-to-index) ============
    One file, loaded by every hub via <link rel="stylesheet" href="../../widget/v3.css">.
-   Editing this file updates every hub at once - no more copy-pasting into each
+   Editing this file updates every hub at once — no more copy-pasting into each
    hub's HTML and re-truncating/re-appending by hand. */
 :root{--sh-tabbar-h:60px;} /* height of the mobile bottom bar below, published so
   each hub's own mobile CSS can stack its own bottom tab bar directly above it */
@@ -17,10 +17,10 @@
 .shstat-dot{width:7px; height:7px; border-radius:50%; background:#3ecf7e; box-shadow:0 0 0 3px rgba(62,207,126,.25); flex:none;}
 @media (prefers-reduced-motion: no-preference){ .shstat-dot{animation:shstat-pulse 2.2s ease-in-out infinite;} }
 @keyframes shstat-pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
-#shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
-#shstat-panel, #shstat-searchpanel{max-height:64vh; overflow-y:auto;}
-#shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{display:block;}
-#shstat-panel h5, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
+#shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel, #shstat-settingspanel{display:none; width:290px; background:rgba(20,20,24,.97); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:14px 14px 16px; box-shadow:0 12px 40px rgba(0,0,0,.4); backdrop-filter:blur(8px); position:relative;}
+#shstat-panel, #shstat-searchpanel, #shstat-settingspanel{max-height:64vh; overflow-y:auto;}
+#shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open, #shstat-settingspanel.is-open{display:block;}
+#shstat-panel h5, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5, #shstat-settingspanel h5{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#a7a7ac; margin:0 0 8px; font-weight:700;}
 #shstat-panel .shstat-sec{margin-bottom:16px;}
 #shstat-panel .shstat-sec:last-child{margin-bottom:0;}
 .shstat-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); font-size:12.5px; line-height:1.4;}
@@ -49,6 +49,21 @@
 .shstat-streaktoast{position:fixed; z-index:10001; left:50%; top:16%; background:rgba(20,20,24,.94); color:#f2f2f0; font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px; box-shadow:0 12px 40px rgba(0,0,0,.4); pointer-events:none; opacity:0; transform:translate(-50%,-50%) scale(.9); transition:opacity .25s, transform .25s; white-space:nowrap;}
 .shstat-streaktoast.is-shown{opacity:1; transform:translate(-50%,-50%) scale(1);}
 .shstat-confetti{position:fixed; z-index:10000; top:0; pointer-events:none; will-change:transform,opacity;}
+
+/* ---------- settings panel ---------- */
+.shset-row{margin-bottom:16px;}
+.shset-row:last-child{margin-bottom:0;}
+.shset-row > label{display:block; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:#a7a7ac; font-weight:700; margin-bottom:8px;}
+.shset-seg{display:flex; gap:6px; flex-wrap:wrap;}
+.shset-seg button{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#f2f2f0; border-radius:999px; padding:6px 12px; font-size:11.5px; font-weight:600; cursor:pointer; font-family:inherit; -webkit-tap-highlight-color:transparent;}
+.shset-seg button.is-active{background:#3ecf7e; color:#0b1a12; border-color:#3ecf7e;}
+#shset-volume{width:100%; margin-top:10px; accent-color:#3ecf7e;}
+.shset-hint{font-size:10.5px; color:#7a7a80; margin-top:8px; line-height:1.4;}
+
+/* ---------- persistent screen-name badge ---------- */
+#shname-badge{position:fixed; left:16px; top:60px; z-index:9999; display:inline-flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent;}
+#shname-badge:hover{border-color:rgba(255,255,255,.32);}
+#shname-badge[hidden]{display:none;}
 
 /* ---------- update-available banner ---------- */
 .sh-update-toast{
@@ -131,27 +146,28 @@
   .spl-full{display:none;}
   .spl-short{display:inline;}
 
-  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel{
+  #shstat-panel, #shstat-flagpanel, #shstat-suggestpanel, #shstat-searchpanel, #shstat-settingspanel{
     display:block; position:fixed; left:0; right:0; bottom:0; top:auto; width:100%;
     max-height:min(78vh,640px); overflow-y:auto; border-radius:18px 18px 0 0; z-index:10000;
     padding:16px 16px calc(90px + env(safe-area-inset-bottom,0px));
     transform:translateY(105%); transition:transform .28s cubic-bezier(.2,.8,.3,1);
     box-shadow:0 -10px 44px rgba(0,0,0,.5); pointer-events:none;
   }
-  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open{
+  #shstat-panel.is-open, #shstat-flagpanel.is-open, #shstat-suggestpanel.is-open, #shstat-searchpanel.is-open, #shstat-settingspanel.is-open{
     transform:translateY(0); pointer-events:auto;
   }
-  #shstat-panel::before, #shstat-flagpanel::before, #shstat-suggestpanel::before, #shstat-searchpanel::before{
+  #shstat-panel::before, #shstat-flagpanel::before, #shstat-suggestpanel::before, #shstat-searchpanel::before, #shstat-settingspanel::before{
     content:""; position:absolute; top:8px; left:50%; width:36px; height:4px;
     margin-left:-18px; border-radius:99px; background:rgba(255,255,255,.22);
   }
-  #shstat-panel .shstat-close, #shstat-flagpanel .shstat-close, #shstat-suggestpanel .shstat-close, #shstat-searchpanel .shstat-close{
+  #shstat-panel .shstat-close, #shstat-flagpanel .shstat-close, #shstat-suggestpanel .shstat-close, #shstat-searchpanel .shstat-close, #shstat-settingspanel .shstat-close{
     top:14px; right:10px; font-size:22px; padding:6px 10px;
   }
-  #shstat-panel h5:first-of-type, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5{margin-top:8px;}
+  #shstat-panel h5:first-of-type, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5, #shstat-settingspanel h5:first-of-type{margin-top:8px;}
 
   #shhome-pill{top:calc(14px + env(safe-area-inset-top,0px)); padding:9px;}
   #shhome-pill span{display:none;}
+  #shname-badge{top:calc(54px + env(safe-area-inset-top,0px)); padding:6px 11px; font-size:11px;}
 
   .sh-tts-btn{padding:9px 15px 9px 12px; font-size:13px;}
   .sh-tts-voice-picker{display:block; max-width:none; margin:8px 0 0; padding:8px 10px; font-size:13px;}

@@ -341,6 +341,135 @@
     return { supported: !!synth, speak: speak, stop: stop };
   })();
 
+  /* ---------- universal settings: font, text size, screen name — applied
+     immediately (independent of Supabase) so a returning visitor's choices
+     take effect on load, not just after opening the Settings panel. Each hub
+     already exposes --font-body/--font-display/--font-mono as root CSS custom
+     properties (the shared design-token pattern), so remapping --font-body
+     here reaches every hub without touching their own stylesheets. ---------- */
+  var SH_FONT_KEY = "sh_pref_font";
+  var SH_SIZE_KEY = "sh_pref_size";
+  var SH_MUSIC_KEY = "sh_pref_music";
+  var SH_VOLUME_KEY = "sh_pref_volume";
+  var SH_NAME_KEY = "sh_display_name";
+  var SH_VISITS_KEY = "sh_visit_count";
+  var FONT_STACKS = {
+    serif: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
+    sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+  };
+  var SIZE_ZOOM = { small: 0.9, "default": 1, large: 1.15, xlarge: 1.3 };
+
+  function prefGet(key, fallback){
+    try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function prefSet(key, val){ try { localStorage.setItem(key, val); } catch (e) {} }
+
+  function applyFontPref(){
+    var stack = FONT_STACKS[prefGet(SH_FONT_KEY, "default")];
+    if (stack) document.documentElement.style.setProperty("--font-body", stack);
+    else document.documentElement.style.removeProperty("--font-body");
+  }
+  function applySizePref(){
+    var z = SIZE_ZOOM[prefGet(SH_SIZE_KEY, "default")] || 1;
+    document.documentElement.style.zoom = z;
+  }
+  applyFontPref();
+  applySizePref();
+
+  function currentName(){
+    try { return (localStorage.getItem(SH_NAME_KEY) || "").trim(); } catch (e) { return ""; }
+  }
+  window.shName = currentName;
+  window.shGreet = function(text){
+    var n = currentName();
+    return n ? (text + ", " + n) : text;
+  };
+
+  var nameBadge = document.createElement("button");
+  nameBadge.id = "shname-badge";
+  nameBadge.type = "button";
+  nameBadge.hidden = true;
+  document.body.appendChild(nameBadge);
+  function renderNameBadge(){
+    var n = currentName();
+    if (n) { nameBadge.textContent = "Hi, " + n; nameBadge.hidden = false; }
+    else { nameBadge.hidden = true; }
+  }
+  renderNameBadge();
+  nameBadge.addEventListener("click", function(){ if (window.shOpenSettings) window.shOpenSettings(); });
+
+  // Welcome-back toast for a returning, named visitor — once per page load,
+  // a beat after load so it doesn't collide with anything else appearing.
+  (function(){
+    var visits = (parseInt(prefGet(SH_VISITS_KEY, "0"), 10) || 0) + 1;
+    prefSet(SH_VISITS_KEY, String(visits));
+    var n = currentName();
+    if (visits > 1 && n) {
+      setTimeout(function(){ showStreakToast("Welcome back, " + n + " 👋"); }, 900);
+    }
+  })();
+
+  /* ---------- background music (procedural — no external audio files, so
+     there's nothing to host or license. Web Audio only starts from a real
+     user gesture per browser autoplay rules, so this only ever plays when
+     triggered from a click — see the Settings panel wiring below. ---------- */
+  var shMusic = (function(){
+    var ctx = null, master = null, nodes = [];
+    function ensureCtx(){
+      if (ctx) return ctx;
+      try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      master = ctx.createGain();
+      master.gain.value = (parseInt(prefGet(SH_VOLUME_KEY, "35"), 10) / 100) * 0.35;
+      master.connect(ctx.destination);
+      return ctx;
+    }
+    function stopAll(){
+      nodes.forEach(function(n){ try { n.stop && n.stop(); } catch (e) {} try { n.disconnect(); } catch (e) {} });
+      nodes = [];
+    }
+    function playPad(){
+      var c = ensureCtx(); if (!c) return;
+      stopAll();
+      [110, 165, 220].forEach(function(f, i){
+        var osc = c.createOscillator();
+        osc.type = "sine"; osc.frequency.value = f;
+        var lfo = c.createOscillator();
+        lfo.type = "sine"; lfo.frequency.value = 0.05 + i * 0.02;
+        var lfoGain = c.createGain(); lfoGain.gain.value = 3;
+        lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+        var g = c.createGain(); g.gain.value = 0.5 / 3;
+        osc.connect(g); g.connect(master);
+        osc.start(); lfo.start();
+        nodes.push(osc, lfo);
+      });
+    }
+    function playRain(){
+      var c = ensureCtx(); if (!c) return;
+      stopAll();
+      var bufferSize = 2 * c.sampleRate;
+      var buffer = c.createBuffer(1, bufferSize, c.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+      var noise = c.createBufferSource();
+      noise.buffer = buffer; noise.loop = true;
+      var filter = c.createBiquadFilter();
+      filter.type = "bandpass"; filter.frequency.value = 1200; filter.Q.value = 0.6;
+      var g = c.createGain(); g.gain.value = 0.6;
+      noise.connect(filter); filter.connect(g); g.connect(master);
+      noise.start();
+      nodes.push(noise);
+    }
+    function setTrack(track){
+      if (track === "off") { stopAll(); return; }
+      if (!ensureCtx()) return;
+      if (ctx.state === "suspended") { ctx.resume().catch(function(){}); }
+      if (track === "pad") playPad();
+      else if (track === "rain") playRain();
+    }
+    function setVolume(v){ if (master) master.gain.value = v * 0.35; }
+    return { setTrack: setTrack, setVolume: setVolume };
+  })();
+
   /* ---------- per-question class-wide correctness — one fetch for the whole
      hub, cached, instead of one request per question. Exposed the same way
      as shTTS so a hub's own qcard code can use it independent of load order
@@ -472,7 +601,7 @@
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
         fireConfetti();
-        showStreakToast(sessionCorrectStreak + " in a row! 🔥");
+        showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "! 🔥");
       }
     } else {
       sessionCorrectStreak = 0;
@@ -539,6 +668,7 @@
   var ICON_STATS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10"/><path d="M12 20V4"/><path d="M18 20v-7"/></svg>';
   var ICON_BULB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.6c.6.5.9 1.2 1 2h6c.1-.8.4-1.5 1-2A6 6 0 0 0 12 2Z"/></svg>';
   var ICON_FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></svg>';
+  var ICON_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 
   var backdrop = document.createElement("div");
   backdrop.id = "shstat-backdrop";
@@ -572,12 +702,41 @@
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
     '</div>' +
+    '<div id="shstat-settingspanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
+    '<h5>Settings</h5>' +
+    '<div class="shset-row"><label>Screen name</label>' +
+    '<div class="shstat-name-row"><input type="text" id="shset-name-input" maxlength="24" placeholder="What should we call you?"><button id="shset-name-save" type="button">Save</button></div>' +
+    '<div class="shstat-namemsg" id="shset-name-msg"></div></div>' +
+    '<div class="shset-row"><label>Reading font</label>' +
+    '<div class="shset-seg" data-pref="font">' +
+    '<button type="button" data-val="default">Default</button>' +
+    '<button type="button" data-val="serif">Serif</button>' +
+    '<button type="button" data-val="sans">Sans</button>' +
+    '</div></div>' +
+    '<div class="shset-row"><label>Text size</label>' +
+    '<div class="shset-seg" data-pref="size">' +
+    '<button type="button" data-val="small">Small</button>' +
+    '<button type="button" data-val="default">Default</button>' +
+    '<button type="button" data-val="large">Large</button>' +
+    '<button type="button" data-val="xlarge">X-Large</button>' +
+    '</div></div>' +
+    '<div class="shset-row"><label>Background music</label>' +
+    '<div class="shset-seg" data-pref="music">' +
+    '<button type="button" data-val="off">Off</button>' +
+    '<button type="button" data-val="pad">Ambient</button>' +
+    '<button type="button" data-val="rain">Soft rain</button>' +
+    '</div>' +
+    '<input type="range" id="shset-volume" min="0" max="100">' +
+    '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
+    '</div>' +
+    '</div>' +
     '<div class="shstat-pillrow">' +
     '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-pill-icon shstat-pill-icon-dot"><span class="shstat-dot"></span></span><span class="shstat-pill-label"><span id="shstat-online-n">1</span> <span class="spl-full">studying now</span><span class="spl-short">live</span></span></button>' +
     '<button class="shstat-pill" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
     '<button class="shstat-pill" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
     '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label"><span class="spl-full">Suggest something</span><span class="spl-short">Suggest</span></span></button>' +
     '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label"><span class="spl-full">Flag issue</span><span class="spl-short">Flag</span></span></button>' +
+    '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label"><span class="spl-full">Settings</span><span class="spl-short">Settings</span></span></button>' +
     '</div>';
   document.body.appendChild(root);
 
@@ -749,6 +908,9 @@
       nameMsg.textContent = "Saving…";
       safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
       try { localStorage.setItem("sh_display_name", name); } catch (e) {}
+      renderNameBadge();
+      var settingsInput = document.getElementById("shset-name-input");
+      if (settingsInput) settingsInput.value = name;
       setTimeout(function(){
         nameSaveBtn.disabled = false;
         nameMsg.textContent = "Saved — you'll show up on the leaderboard as \"" + name + "\".";
@@ -760,15 +922,18 @@
   var flagPanel = document.getElementById("shstat-flagpanel");
   var suggestPanel = document.getElementById("shstat-suggestpanel");
   var searchPanel = document.getElementById("shstat-searchpanel");
+  var settingsPanel = document.getElementById("shstat-settingspanel");
   function closeOtherPanels(keep){
     if (keep !== panel) panel.classList.remove("is-open");
     if (keep !== flagPanel) flagPanel.classList.remove("is-open");
     if (keep !== suggestPanel) suggestPanel.classList.remove("is-open");
     if (keep !== searchPanel) searchPanel.classList.remove("is-open");
+    if (keep !== settingsPanel) settingsPanel.classList.remove("is-open");
   }
   function updateSheetState(){
     var open = panel.classList.contains("is-open") || flagPanel.classList.contains("is-open") ||
-      suggestPanel.classList.contains("is-open") || searchPanel.classList.contains("is-open");
+      suggestPanel.classList.contains("is-open") || searchPanel.classList.contains("is-open") ||
+      settingsPanel.classList.contains("is-open");
     document.body.classList.toggle("sh-sheet-open", open);
   }
   backdrop.addEventListener("click", function(){
@@ -846,4 +1011,82 @@
       msg.textContent = "Thanks — sent!";
     }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
+
+  /* ---------- settings panel ---------- */
+  function syncSettingsSegUI(){
+    document.querySelectorAll(".shset-seg").forEach(function(seg){
+      var pref = seg.getAttribute("data-pref");
+      var key = pref === "font" ? SH_FONT_KEY : pref === "size" ? SH_SIZE_KEY : SH_MUSIC_KEY;
+      var cur = prefGet(key, pref === "music" ? "off" : "default");
+      seg.querySelectorAll("button").forEach(function(b){
+        b.classList.toggle("is-active", b.getAttribute("data-val") === cur);
+      });
+    });
+    var volEl = document.getElementById("shset-volume");
+    if (volEl) volEl.value = prefGet(SH_VOLUME_KEY, "35");
+  }
+  function syncSettingsUI(){
+    var nInput = document.getElementById("shset-name-input");
+    if (nInput) nInput.value = currentName();
+    syncSettingsSegUI();
+  }
+  window.shOpenSettings = function(){
+    closeOtherPanels(settingsPanel);
+    settingsPanel.classList.add("is-open");
+    updateSheetState();
+    syncSettingsUI();
+    var savedTrack = prefGet(SH_MUSIC_KEY, "off");
+    if (savedTrack !== "off") shMusic.setTrack(savedTrack); // resume within this click's user-gesture window
+  };
+  document.getElementById("shstat-settings-pill").addEventListener("click", function(){
+    if (settingsPanel.classList.contains("is-open")) {
+      settingsPanel.classList.remove("is-open");
+      updateSheetState();
+    } else {
+      window.shOpenSettings();
+    }
+  });
+  document.querySelector("#shstat-settingspanel .shstat-close").addEventListener("click", function(){
+    settingsPanel.classList.remove("is-open");
+    updateSheetState();
+  });
+  document.querySelectorAll(".shset-seg").forEach(function(seg){
+    seg.addEventListener("click", function(e){
+      var btn = e.target.closest("button[data-val]");
+      if (!btn) return;
+      var pref = seg.getAttribute("data-pref");
+      var val = btn.getAttribute("data-val");
+      if (pref === "font") { prefSet(SH_FONT_KEY, val); applyFontPref(); }
+      else if (pref === "size") { prefSet(SH_SIZE_KEY, val); applySizePref(); }
+      else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
+      syncSettingsSegUI();
+    });
+  });
+  var settingsVolumeEl = document.getElementById("shset-volume");
+  if (settingsVolumeEl) {
+    settingsVolumeEl.addEventListener("input", function(){
+      prefSet(SH_VOLUME_KEY, settingsVolumeEl.value);
+      shMusic.setVolume(parseInt(settingsVolumeEl.value, 10) / 100);
+    });
+  }
+  var setNameSaveBtn = document.getElementById("shset-name-save");
+  if (setNameSaveBtn) {
+    setNameSaveBtn.addEventListener("click", function(){
+      var nameInput = document.getElementById("shset-name-input");
+      var nameMsg = document.getElementById("shset-name-msg");
+      var name = (nameInput.value || "").trim();
+      if (!name) { nameMsg.textContent = "Type a name first."; return; }
+      setNameSaveBtn.disabled = true;
+      nameMsg.textContent = "Saving…";
+      safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+      prefSet(SH_NAME_KEY, name);
+      renderNameBadge();
+      var otherInput = document.getElementById("shstat-name-input");
+      if (otherInput) otherInput.value = name;
+      setTimeout(function(){
+        setNameSaveBtn.disabled = false;
+        nameMsg.textContent = "Saved — hi, " + name + "!";
+      }, 400);
+    });
+  }
 })();
