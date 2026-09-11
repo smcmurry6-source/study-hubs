@@ -302,7 +302,12 @@ table.chart-table tbody tr:hover{background:var(--surface-2);}
 .qcard-choice:hover{border-color:var(--line-strong);}
 .qcard-choice[data-state="correct"]{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-ink);}
 .qcard-choice[data-state="incorrect"]{background:var(--alert-soft);border-color:var(--alert);color:var(--alert-ink);}
+.qcard-choice[data-selected="true"]{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink);}
 .qcard-choice[disabled]{cursor:default;}
+.exam-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.exam-progress,.exam-timer{font-family:var(--font-mono);font-size:.85rem;color:var(--ink-soft);}
+.spot-bar{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;margin:8px 0;}
+.spot-bar-fill{height:100%;border-radius:5px;}
 .qcard-explain{
   margin-top:10px;padding:10px 12px;border-radius:var(--radius-s);background:var(--surface-2);
   font-size:.85rem;color:var(--ink-soft);display:none;
@@ -1677,10 +1682,204 @@ function renderExamHints(){
   document.getElementById('compendium-content').innerHTML = html;
 }
 
+/* ====================================================================
+   MOCK EXAM — timed, blind multiple-choice set pulled from every session.
+   No feedback until submit; missed questions feed Weak Spots + STATE.
+   ==================================================================== */
+var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, elapsedTimer:null };
+
+function examPoolSizeOptions(){
+  var maxMcq = QUESTIONS.filter(function(q){ return q.type==='mcq'; }).length;
+  var opts = [10,20,40].filter(function(n){ return n < maxMcq; });
+  if(maxMcq > 0) opts.push(maxMcq);
+  return opts;
+}
+function formatElapsed(ms){
+  var s = Math.floor(ms/1000);
+  var m = Math.floor(s/60); s = s%60;
+  return m + ':' + String(s).padStart(2,'0');
+}
+function startMockExam(size){
+  var pool = shuffled(QUESTIONS.filter(function(q){ return q.type==='mcq'; }));
+  EXAM_STATE = { phase:'active', pool:pool.slice(0, Math.min(size, pool.length)), answers:{}, startedAt:Date.now(), finishedElapsed:0, elapsedTimer:null };
+  renderCompendiumContent();
+}
+function submitMockExam(){
+  EXAM_STATE.finishedElapsed = Date.now() - EXAM_STATE.startedAt;
+  if(EXAM_STATE.elapsedTimer){ clearInterval(EXAM_STATE.elapsedTimer); EXAM_STATE.elapsedTimer = null; }
+  EXAM_STATE.pool.forEach(function(q){
+    recordAnswer(q.id, q.lec, EXAM_STATE.answers[q.id] === q.answer);
+  });
+  EXAM_STATE.phase = 'results';
+  renderCompendiumContent();
+}
+function examCardHTML(q, num){
+  var picked = EXAM_STATE.answers[q.id];
+  var order = shuffled(q.choices.map(function(c, i){ return i; }));
+  var body = '<div class="qcard-choices" data-qtype="examchoice" data-qid="'+q.id+'">';
+  order.forEach(function(origIdx){
+    body += '<button type="button" class="qcard-choice" data-exam-choice="'+origIdx+'" data-qid="'+q.id+'"'+(picked===origIdx?' data-selected="true"':'')+'>'+escHtml(q.choices[origIdx])+'</button>';
+  });
+  body += '</div>';
+  return '<div class="qcard" data-qid="'+q.id+'">' +
+    '<div class="qcard-head"><div class="qcard-stem">'+num+'. '+escHtml(q.stem)+'</div></div>' +
+    qMeta(q) + body + '</div>';
+}
+function renderMockExamSetup(){
+  var opts = examPoolSizeOptions();
+  var html = '<div class="card section-block">' +
+    '<span class="eyebrow">Mock Exam</span><h2>Simulate exam conditions</h2>' +
+    '<p>Pulls a shuffled, multiple-choice-only set from every session. No hints, no explanations, no class data until you submit — missed questions land straight in Weak Spots afterward.</p>';
+  if(!opts.length){
+    html += '<p style="color:var(--ink-soft);">Not enough multiple-choice questions in this hub yet to build a mock exam.</p></div>';
+  } else {
+    html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">' +
+      opts.map(function(n){ return '<button type="button" class="btn" data-exam-action="start" data-size="'+n+'">'+n+' questions</button>'; }).join('') +
+      '</div></div>';
+  }
+  document.getElementById('compendium-content').innerHTML = html;
+}
+function renderMockExamActive(){
+  var answeredCount = Object.keys(EXAM_STATE.answers).length;
+  var html = '<div class="card section-block"><div class="exam-toolbar">' +
+    '<span class="exam-progress">'+answeredCount+' / '+EXAM_STATE.pool.length+' answered</span>' +
+    '<span class="exam-timer" id="examTimer">0:00</span>' +
+    '<button type="button" class="btn" data-exam-action="submit">Submit exam</button>' +
+    '</div><p style="color:var(--ink-soft);font-size:.85rem;margin:10px 0 0;">Unanswered questions count as incorrect at submit.</p></div>';
+  html += '<div id="examList">' + EXAM_STATE.pool.map(function(q,i){ return examCardHTML(q, i+1); }).join('') + '</div>';
+  document.getElementById('compendium-content').innerHTML = html;
+  if(EXAM_STATE.elapsedTimer) clearInterval(EXAM_STATE.elapsedTimer);
+  EXAM_STATE.elapsedTimer = setInterval(function(){
+    var el = document.getElementById('examTimer');
+    if(!el){ clearInterval(EXAM_STATE.elapsedTimer); EXAM_STATE.elapsedTimer = null; return; }
+    el.textContent = formatElapsed(Date.now() - EXAM_STATE.startedAt);
+  }, 1000);
+}
+function renderMockExamResults(){
+  var total = EXAM_STATE.pool.length, correctCount = 0, missed = [];
+  EXAM_STATE.pool.forEach(function(q){
+    if(EXAM_STATE.answers[q.id] === q.answer) correctCount++; else missed.push(q);
+  });
+  var pct = total ? Math.round(100*correctCount/total) : 0;
+  var html = '<div class="card section-block">' +
+    '<span class="eyebrow">Mock Exam &middot; Results</span><h2>'+correctCount+' / '+total+' correct ('+pct+'%)</h2>' +
+    '<p style="color:var(--ink-soft);">Time: '+formatElapsed(EXAM_STATE.finishedElapsed)+'</p>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">' +
+    '<button type="button" class="btn" data-exam-action="retake">Take another mock exam</button>' +
+    (missed.length ? '<button type="button" class="btn ghost" data-exam-action="goto-weak">Drill missed questions in Weak Spots</button>' : '') +
+    '</div></div>';
+  if(missed.length){
+    html += '<div class="card section-block"><h3>Missed questions ('+missed.length+')</h3><div id="examMissedList">' + missed.map(qCardHTML).join('') + '</div></div>';
+  } else {
+    html += '<div class="card section-block"><p>Clean sweep — nothing missed.</p></div>';
+  }
+  document.getElementById('compendium-content').innerHTML = html;
+  if(missed.length){
+    wireQuestionContainer(document.getElementById('examMissedList'));
+    if (window.shFillClassData) window.shFillClassData(document.getElementById('examMissedList'));
+  }
+}
+function renderMockExam(){
+  if (window.shTTS) window.shTTS.stop();
+  if(EXAM_STATE.phase === 'setup') renderMockExamSetup();
+  else if(EXAM_STATE.phase === 'active') renderMockExamActive();
+  else renderMockExamResults();
+}
+
+/* ====================================================================
+   WEAK SPOTS — ranks sessions by accuracy among attempted questions,
+   and queues up everything not yet answered correctly for a focused drill.
+   ==================================================================== */
+var WEAK_DRILL_LEC = null; // null = list view, 'all', or a lecture id
+
+function weakSpotStats(){
+  return LECTURES.map(function(l){
+    var qs = QUESTIONS_BY_LECTURE[l.id] || [];
+    var attempted = 0, mastered = 0;
+    qs.forEach(function(q){
+      var a = STATE.answered[q.id];
+      if(a && a.seen){ attempted++; if(a.correct) mastered++; }
+    });
+    return { lec:l, total:qs.length, attempted:attempted, mastered:mastered,
+      pct: attempted ? Math.round(100*mastered/attempted) : null, remaining: qs.length - mastered };
+  });
+}
+function weakDrillQueue(scope){
+  var lecIds = scope === 'all' ? LECTURES.map(function(l){ return l.id; }) : [scope];
+  var qs = [];
+  lecIds.forEach(function(lecId){
+    (QUESTIONS_BY_LECTURE[lecId]||[]).forEach(function(q){
+      var a = STATE.answered[q.id];
+      if(!a || !a.correct) qs.push(q);
+    });
+  });
+  return shuffled(qs);
+}
+function weakLectureCardHTML(s){
+  return '<div class="section-block" style="border-top:3px solid var(--tag-'+s.lec.tag+');padding-top:12px;">' +
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">' +
+    '<h4 style="margin:0;">S'+s.lec.num+' &middot; '+escHtml(s.lec.title)+'</h4>' +
+    '<span class="mono" style="color:var(--ink-soft);font-size:.85rem;">'+s.pct+'% of '+s.attempted+' attempted</span></div>' +
+    '<div class="spot-bar"><div class="spot-bar-fill" style="width:'+s.pct+'%;background:var(--tag-'+s.lec.tag+')"></div></div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">' +
+    '<span style="color:var(--ink-soft);font-size:.85rem;">'+s.remaining+' of '+s.total+' not yet mastered</span>' +
+    '<button type="button" class="btn ghost" data-weak-action="drill-lec" data-lec="'+s.lec.id+'">Drill this session &rarr;</button></div></div>';
+}
+function renderWeakSpotsList(){
+  var stats = weakSpotStats();
+  var started = stats.filter(function(s){ return s.attempted > 0; });
+  var notStarted = stats.filter(function(s){ return s.attempted === 0; });
+  started.sort(function(a,b){ return a.pct - b.pct || b.remaining - a.remaining; });
+  var weak = started.filter(function(s){ return s.remaining > 0; });
+  var html = '<div class="card section-block"><span class="eyebrow">Weak Spots</span><h2>Where to focus next</h2>' +
+    '<p>Ranked by accuracy among questions you’ve tried. “Not yet mastered” means never answered correctly — attempted or not.</p>';
+  if(weak.length){
+    html += '<div style="margin-top:14px;"><button type="button" class="btn" data-weak-action="drill-all">Drill everything not yet mastered (' +
+      weak.reduce(function(sum,s){ return sum+s.remaining; },0) + ' questions)</button></div>';
+  }
+  html += '</div>';
+  if(!started.length){
+    html += '<div class="card section-block"><p style="color:var(--ink-soft);">Answer a few questions anywhere in the hub — Question Bank, Lecture Notes recall cards, Mock Exam — and your weak spots will show up here.</p></div>';
+  } else if(!weak.length){
+    html += '<div class="card section-block"><p>Everything you’ve attempted is fully mastered. Try the Mock Exam, or dig into sessions you haven’t started yet.</p></div>';
+  } else {
+    html += '<div class="card section-block"><h3>Needs work</h3>' + weak.map(weakLectureCardHTML).join('') + '</div>';
+  }
+  if(notStarted.length){
+    html += '<div class="card section-block"><h3>Not started yet</h3><div class="lecture-grid">';
+    notStarted.forEach(function(s){
+      html += '<button type="button" class="lecture-card" style="--lec-color:var(--tag-'+s.lec.tag+')" data-goto-lecture="'+s.lec.id+'">' +
+        '<span class="lec-num mono">Session '+s.lec.num+'</span><h4>'+escHtml(s.lec.title)+'</h4>' +
+        '<span class="lec-who">'+s.total+' question'+(s.total===1?'':'s')+'</span></button>';
+    });
+    html += '</div></div>';
+  }
+  document.getElementById('compendium-content').innerHTML = html;
+}
+function renderWeakDrill(){
+  var qs = weakDrillQueue(WEAK_DRILL_LEC);
+  var label = WEAK_DRILL_LEC === 'all' ? 'Everything not yet mastered' : ('Session drill · ' + escHtml(LECTURE_BY_ID[WEAK_DRILL_LEC].title));
+  var html = '<div class="card section-block"><button type="button" class="btn ghost" data-weak-action="back" style="margin-bottom:10px;">&larr; Back to Weak Spots</button>' +
+    '<h2 style="margin-top:0;">'+label+'</h2>' +
+    '<p style="color:var(--ink-soft);">'+qs.length+' question'+(qs.length===1?'':'s')+' left to master'+(qs.length?'':' — you cleared this set!')+'</p></div>';
+  if(qs.length) html += '<div id="weakDrillList">' + qs.map(qCardHTML).join('') + '</div>';
+  document.getElementById('compendium-content').innerHTML = html;
+  if(qs.length){
+    wireQuestionContainer(document.getElementById('weakDrillList'));
+    if (window.shFillClassData) window.shFillClassData(document.getElementById('weakDrillList'));
+  }
+}
+function renderWeakSpots(){
+  if (window.shTTS) window.shTTS.stop();
+  if(WEAK_DRILL_LEC) renderWeakDrill(); else renderWeakSpotsList();
+}
+
 var COMPENDIUM_VIEWS = [
   { id:'course-info', label:'Course Info', fn:renderCourseInfo },
   { id:'lecture-notes', label:'Lecture Notes', fn:renderLectureNotes },
   { id:'question-bank', label:'Question Bank', fn:renderQuestionBank },
+  { id:'mock-exam', label:'Mock Exam', fn:renderMockExam },
+  { id:'weak-spots', label:'Weak Spots', fn:renderWeakSpots },
   { id:'reference-tables', label:'Reference Tables', fn:renderReferenceTables },
   { id:'cram-sheet', label:'Cram Sheet', fn:renderCramSheet },
   { id:'exam-hints', label:'Exam Hints', fn:renderExamHints }
@@ -1707,6 +1906,34 @@ function renderCompendium(){
       if(navBtn){ COMPENDIUM_VIEW = navBtn.getAttribute('data-view'); renderCompendiumSubnav(); renderCompendiumContent(); return; }
       var lecBtn = e.target.closest('[data-goto-lecture]');
       if(lecBtn){ gotoLecture(lecBtn.getAttribute('data-goto-lecture')); return; }
+      var examChoiceBtn = e.target.closest('[data-exam-choice]');
+      if(examChoiceBtn){
+        var eqid = examChoiceBtn.getAttribute('data-qid');
+        EXAM_STATE.answers[eqid] = parseInt(examChoiceBtn.getAttribute('data-exam-choice'),10);
+        examChoiceBtn.closest('.qcard-choices').querySelectorAll('.qcard-choice').forEach(function(b){ b.removeAttribute('data-selected'); });
+        examChoiceBtn.setAttribute('data-selected','true');
+        var progEl = document.querySelector('.exam-progress');
+        if(progEl) progEl.textContent = Object.keys(EXAM_STATE.answers).length + ' / ' + EXAM_STATE.pool.length + ' answered';
+        return;
+      }
+      var examBtn = e.target.closest('[data-exam-action]');
+      if(examBtn){
+        var eaction = examBtn.getAttribute('data-exam-action');
+        if(eaction === 'start') startMockExam(parseInt(examBtn.getAttribute('data-size'),10));
+        else if(eaction === 'submit') submitMockExam();
+        else if(eaction === 'retake'){ EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, elapsedTimer:null }; renderCompendiumContent(); }
+        else if(eaction === 'goto-weak'){ COMPENDIUM_VIEW = 'weak-spots'; WEAK_DRILL_LEC = null; renderCompendiumSubnav(); renderCompendiumContent(); }
+        return;
+      }
+      var weakBtn = e.target.closest('[data-weak-action]');
+      if(weakBtn){
+        var waction = weakBtn.getAttribute('data-weak-action');
+        if(waction === 'drill-all') WEAK_DRILL_LEC = 'all';
+        else if(waction === 'drill-lec') WEAK_DRILL_LEC = weakBtn.getAttribute('data-lec');
+        else if(waction === 'back') WEAK_DRILL_LEC = null;
+        renderCompendiumContent();
+        return;
+      }
     });
   }
 }
