@@ -35,6 +35,45 @@
     document.body.appendChild(a);
   })();
 
+  /* ---------- reserve top clearance so the fixed "All hubs" pill / name badge
+     never sits on top of each hub's own sticky header/title. Every hub uses
+     exactly one <header> element for its top bar (position:sticky;top:0), so
+     that's the one hub-agnostic anchor point we push down + re-pin, rather
+     than hand-tuning per-hub CSS. Re-measured on resize (mobile breakpoint
+     changes pill size) and whenever the name badge's visibility changes. ---------- */
+  function reserveTopClearance(){
+    try{
+      var bottom = 0;
+      ["shhome-pill","shname-badge"].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el && !el.hidden){
+          var r = el.getBoundingClientRect();
+          if(r.bottom > bottom) bottom = r.bottom;
+        }
+      });
+      if(bottom <= 0) return;
+      var clearance = Math.ceil(bottom + 10);
+      var styleEl = document.getElementById("sh-top-clearance-style");
+      if(!styleEl){
+        styleEl = document.createElement("style");
+        styleEl.id = "sh-top-clearance-style";
+        document.head.appendChild(styleEl);
+      }
+      var header = document.querySelector("header");
+      var headerRule = "";
+      if(header && getComputedStyle(header).position === "sticky"){
+        headerRule = "header{top:" + clearance + "px !important;}";
+      }
+      styleEl.textContent = "body{padding-top:" + clearance + "px;}" + headerRule;
+    }catch(e){ /* purely cosmetic, never block the hub */ }
+  }
+  window.shReserveTopClearance = reserveTopClearance;
+  reserveTopClearance();
+  window.addEventListener("resize", (function(){
+    var t = null;
+    return function(){ clearTimeout(t); t = setTimeout(reserveTopClearance, 150); };
+  })());
+
   /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
      so it still works even if the stats layer fails to init. Each hub's own
      render function inserts a .sh-tts-btn and wires it to window.shTTS.speak,
@@ -394,6 +433,7 @@
     var n = currentName();
     if (n) { nameBadge.textContent = "Hi, " + n; nameBadge.hidden = false; }
     else { nameBadge.hidden = true; }
+    if (window.shReserveTopClearance) window.shReserveTopClearance();
   }
   renderNameBadge();
   nameBadge.addEventListener("click", function(){ if (window.shOpenSettings) window.shOpenSettings(); });
@@ -459,12 +499,82 @@
       noise.start();
       nodes.push(noise);
     }
+    function playWaves(){
+      var c = ensureCtx(); if (!c) return;
+      stopAll();
+      var bufferSize = 2 * c.sampleRate;
+      var buffer = c.createBuffer(1, bufferSize, c.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.6;
+      var noise = c.createBufferSource();
+      noise.buffer = buffer; noise.loop = true;
+      var filter = c.createBiquadFilter();
+      filter.type = "lowpass"; filter.frequency.value = 500; filter.Q.value = 0.7;
+      var lfo = c.createOscillator();
+      lfo.type = "sine"; lfo.frequency.value = 0.09; // slow swell, ~11s per wave
+      var lfoGain = c.createGain(); lfoGain.gain.value = 350;
+      lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+      var g = c.createGain(); g.gain.value = 0.55;
+      noise.connect(filter); filter.connect(g); g.connect(master);
+      noise.start(); lfo.start();
+      nodes.push(noise, lfo);
+    }
+    function playLofi(){
+      var c = ensureCtx(); if (!c) return;
+      stopAll();
+      var chords = [
+        [220.00, 261.63, 329.63],
+        [196.00, 246.94, 293.66],
+        [174.61, 220.00, 261.63],
+        [196.00, 246.94, 311.13]
+      ];
+      var chordLen = 3.4;
+      var chordGain = c.createGain(); chordGain.gain.value = 0.22; chordGain.connect(master);
+      var step = 0;
+      function scheduleChord(){
+        var freqs = chords[step % chords.length];
+        var startAt = c.currentTime + 0.05;
+        freqs.forEach(function(f){
+          var osc = c.createOscillator();
+          osc.type = "triangle"; osc.frequency.value = f;
+          var env = c.createGain(); env.gain.value = 0;
+          osc.connect(env); env.connect(chordGain);
+          env.gain.setValueAtTime(0, startAt);
+          env.gain.linearRampToValueAtTime(1, startAt + 0.8);
+          env.gain.linearRampToValueAtTime(0, startAt + chordLen);
+          osc.start(startAt); osc.stop(startAt + chordLen + 0.1);
+          nodes.push(osc);
+        });
+        step++;
+      }
+      scheduleChord();
+      var timer = setInterval(scheduleChord, chordLen * 1000);
+      nodes.push({ stop: function(){ clearInterval(timer); }, disconnect: function(){} });
+    }
+    function playFocus(){
+      var c = ensureCtx(); if (!c) return;
+      stopAll();
+      if (!c.createStereoPanner) { playPad(); return; } // graceful fallback if unsupported
+      var left = c.createOscillator(); left.type = "sine"; left.frequency.value = 190;
+      var right = c.createOscillator(); right.type = "sine"; right.frequency.value = 200; // ~10Hz beat
+      var panL = c.createStereoPanner(); panL.pan.value = -1;
+      var panR = c.createStereoPanner(); panR.pan.value = 1;
+      var g = c.createGain(); g.gain.value = 0.18;
+      left.connect(panL); panL.connect(g);
+      right.connect(panR); panR.connect(g);
+      g.connect(master);
+      left.start(); right.start();
+      nodes.push(left, right);
+    }
     function setTrack(track){
       if (track === "off") { stopAll(); return; }
       if (!ensureCtx()) return;
       if (ctx.state === "suspended") { ctx.resume().catch(function(){}); }
       if (track === "pad") playPad();
       else if (track === "rain") playRain();
+      else if (track === "waves") playWaves();
+      else if (track === "lofi") playLofi();
+      else if (track === "focus") playFocus();
     }
     function setVolume(v){ if (master) master.gain.value = v * 0.35; }
     return { setTrack: setTrack, setVolume: setVolume };
@@ -725,6 +835,9 @@
     '<button type="button" data-val="off">Off</button>' +
     '<button type="button" data-val="pad">Ambient</button>' +
     '<button type="button" data-val="rain">Soft rain</button>' +
+    '<button type="button" data-val="waves">Ocean waves</button>' +
+    '<button type="button" data-val="lofi">Lo-fi keys</button>' +
+    '<button type="button" data-val="focus">Focus tone</button>' +
     '</div>' +
     '<input type="range" id="shset-volume" min="0" max="100">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +

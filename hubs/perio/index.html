@@ -308,6 +308,19 @@ table.chart-table tbody tr:hover{background:var(--surface-2);}
 .exam-progress,.exam-timer{font-family:var(--font-mono);font-size:.85rem;color:var(--ink-soft);}
 .spot-bar{height:8px;border-radius:5px;background:var(--surface-2);overflow:hidden;margin:8px 0;}
 .spot-bar-fill{height:100%;border-radius:5px;}
+.cloze-toggle-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.cloze-blank{
+  display:inline-block;min-width:54px;padding:3px 10px;border-radius:6px;
+  background:repeating-linear-gradient(135deg,var(--ink-soft) 0,var(--ink-soft) 4px,var(--surface-2) 4px,var(--surface-2) 8px);
+  border:1px solid var(--line-strong);color:transparent;cursor:pointer;font:inherit;opacity:.85;
+}
+.cloze-blank:hover{opacity:1;}
+.cloze-blank-line{
+  display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;
+  background:var(--surface-2);border:1px dashed var(--line-strong);color:var(--ink-soft);
+  font:inherit;font-size:inherit;cursor:pointer;
+}
+.cloze-blank-line:hover{background:var(--surface);border-color:var(--teal);}
 .qcard-explain{
   margin-top:10px;padding:10px 12px;border-radius:var(--radius-s);background:var(--surface-2);
   font-size:.85rem;color:var(--ink-soft);display:none;
@@ -1561,7 +1574,7 @@ function refSection(id, tag, title, sourceLabel, innerHtml){
     '<h3>'+escHtml(title)+'</h3>' + innerHtml + '</div>';
 }
 
-function renderReferenceTables(){
+function referenceTablesHTML(){
   var html = '';
 
   html += refSection('ref-diagnosis-tx-planning-1','teal','Staging (Session 1)','Diagnosis & Tx Planning', tableWrap(
@@ -1637,7 +1650,36 @@ function renderReferenceTables(){
     tableWrap(['Parameter','Norm'], ESTHETIC_NORMS.map(function(r){ return tr([r.param,r.note]); }).join('')) +
     tableWrap(['Esthetic problem','Treatment'], ESTHETIC_TX.map(function(r){ return tr([r.problem,r.tx]); }).join('')));
 
-  document.getElementById('compendium-content').innerHTML = html;
+  return html;
+}
+var CLOZE_MODE = false;
+function clozeToggleHTML(){
+  return '<div class="cloze-toggle-row"><button type="button" class="btn ghost" data-cloze-action="toggle-mode">' +
+    (CLOZE_MODE ? 'Show everything' : 'Hide key facts (click to reveal)') + '</button></div>';
+}
+function applyClozeToTables(rootEl){
+  var idx = 0;
+  rootEl.querySelectorAll('table.chart-table tbody tr').forEach(function(row){
+    var tds = row.querySelectorAll('td');
+    tds.forEach(function(td, i){
+      if(i === 0) return; // keep the term/name column visible for scannability
+      var original = td.innerHTML;
+      if(!original || !original.replace(/&mdash;|-/g,'').trim()) return; // nothing worth blanking
+      idx++;
+      td.innerHTML = '<button type="button" class="cloze-blank" data-cloze-action="reveal-cell" data-cloze-content="'+encodeURIComponent(original)+'">&#9632;&#9632;&#9632;&#9632;</button>';
+    });
+  });
+  return idx;
+}
+function renderReferenceTables(){
+  var html = referenceTablesHTML();
+  if(CLOZE_MODE){
+    var scratch = document.createElement('div');
+    scratch.innerHTML = html;
+    applyClozeToTables(scratch);
+    html = scratch.innerHTML;
+  }
+  document.getElementById('compendium-content').innerHTML = clozeToggleHTML() + html;
 }
 
 var CRAM_CONTENT = [
@@ -1652,11 +1694,16 @@ var CRAM_CONTENT = [
   { lec:'perio-plastic-esthetics', points:['Recession most common on buccal maxillary molars & mandibular incisors','CTG = no epithelium, covered by flap. FGG = epithelium+CT, left exposed. ADM = most common allograft','Type 1A → gingivectomy. Type 2A → APF. Both "B" subcategories → APF + osseous surgery','Tooth width ratio ≈ 1.6 : 1 : 0.6 (central : lateral : half-canine)'] }
 ];
 function renderCramSheet(){
-  var html = '<div class="cram-grid section-block">';
+  var html = clozeToggleHTML() + '<div class="cram-grid section-block">';
   CRAM_CONTENT.forEach(function(c){
     var l = LECTURE_BY_ID[c.lec];
     html += '<div class="cram-card" style="border-top:3px solid var(--tag-'+l.tag+')"><h5>S'+l.num+' &middot; '+escHtml(l.title)+'</h5><ul>' +
-      c.points.map(function(p){ return '<li>'+escHtml(p)+'</li>'; }).join('') + '</ul></div>';
+      c.points.map(function(p){
+        if(CLOZE_MODE){
+          return '<li><button type="button" class="cloze-blank-line" data-cloze-action="reveal-cell" data-cloze-content="'+encodeURIComponent(escHtml(p))+'">Click to reveal</button></li>';
+        }
+        return '<li>'+escHtml(p)+'</li>';
+      }).join('') + '</ul></div>';
   });
   html += '</div>';
   document.getElementById('compendium-content').innerHTML = html;
@@ -1874,12 +1921,151 @@ function renderWeakSpots(){
   if(WEAK_DRILL_LEC) renderWeakDrill(); else renderWeakSpotsList();
 }
 
+/* ====================================================================
+   ACTIVE RECALL MODE — hide-and-reveal flashcards built from the
+   cram sheet, exam hints, and reference tables (self-graded, no
+   effect on Weak Spots/mastery — this is supplementary review, not
+   part of the gradable question bank)
+   ==================================================================== */
+var RECALL_DECK = null;
+var RECALL_ORDER = [];
+var RECALL_FILTER = { source:'all', lec:'all' };
+var RECALL_TALLY = { good:0, bad:0 };
+var REF_SECTION_LEC = {
+  'Diagnosis & Tx Planning':'diagnosis-tx-planning',
+  'Incisions, Flaps & Sutures':'incisions-flaps-sutures',
+  'Risk Assessment':'risk-assessment',
+  'Phase I Therapy':'phase1-therapy',
+  'Resective Surgery & Furcation':'resective-furcation',
+  'Periodontal Regeneration':'periodontal-regeneration',
+  'Implants':'implants-perio',
+  'Antibiotics & Host Modulation':'antibiotics-host-mod',
+  'Perio Plastic Therapy':'perio-plastic-esthetics'
+};
+
+function buildRecallDeck(){
+  if(RECALL_DECK) return RECALL_DECK;
+  var deck = [];
+
+  CRAM_CONTENT.forEach(function(c){
+    var lec = LECTURE_BY_ID[c.lec];
+    if(!lec) return;
+    deck.push({
+      id:'cram-'+c.lec, source:'cram', sourceLabel:'Cram Sheet', lec:c.lec, tag:lec.tag,
+      prompt:'Recall everything on the cram sheet for <b>'+escHtml(lec.title)+'</b> (Session '+lec.num+').',
+      answer:'<ul style="margin:0;padding-left:1.2em;">'+c.points.map(function(p){ return '<li>'+escHtml(p)+'</li>'; }).join('')+'</ul>'
+    });
+  });
+
+  EXAM_HINTS.forEach(function(h,hi){
+    var lec = LECTURE_BY_ID[h.lec];
+    if(!lec) return;
+    deck.push({
+      id:'hint-'+hi, source:'hints', sourceLabel:'Exam Hints', lec:h.lec, tag:lec.tag,
+      prompt:'&ldquo;'+escHtml(h.quote)+'&rdquo;',
+      answer:escHtml(h.takeaway)
+    });
+  });
+
+  var scratch = document.createElement('div');
+  scratch.innerHTML = referenceTablesHTML();
+  var sections = scratch.querySelectorAll('.card.section-block');
+  Array.prototype.forEach.call(sections, function(section, si){
+    var tagChip = section.querySelector('.tag-chip');
+    var sourceLabel = tagChip ? tagChip.textContent.trim() : 'Reference';
+    var lecId = REF_SECTION_LEC[sourceLabel] || null;
+    var lecObj = lecId ? LECTURE_BY_ID[lecId] : null;
+    var tagCls = lecObj ? lecObj.tag : 'slate';
+    var tables = section.querySelectorAll('table.chart-table');
+    Array.prototype.forEach.call(tables, function(table, ti){
+      var headers = Array.prototype.map.call(table.querySelectorAll('thead th'), function(th){ return th.textContent; });
+      var rows = table.querySelectorAll('tbody tr');
+      Array.prototype.forEach.call(rows, function(row, ri){
+        var cells = Array.prototype.map.call(row.querySelectorAll('td'), function(td){ return td.innerHTML; });
+        if(cells.length < 2) return;
+        var rest = cells.slice(1);
+        var answerHtml = rest.map(function(val, i){
+          var label = headers[i+1] || '';
+          return (label ? '<b>'+escHtml(label)+':</b> ' : '') + val;
+        }).join('<br>');
+        deck.push({
+          id:'ref-'+si+'-'+ti+'-'+ri, source:'reference', sourceLabel:sourceLabel, lec:lecId, tag:tagCls,
+          prompt: cells[0],
+          answer: answerHtml || '&mdash;'
+        });
+      });
+    });
+  });
+
+  RECALL_DECK = deck;
+  RECALL_ORDER = shuffled(deck.map(function(c){ return c.id; }));
+  return deck;
+}
+function filteredRecallDeck(){
+  var deck = buildRecallDeck();
+  var byId = {};
+  deck.forEach(function(c){ byId[c.id] = c; });
+  return RECALL_ORDER.filter(function(id){ return byId.hasOwnProperty(id); }).map(function(id){ return byId[id]; }).filter(function(c){
+    if(RECALL_FILTER.source !== 'all' && c.source !== RECALL_FILTER.source) return false;
+    if(RECALL_FILTER.lec !== 'all' && c.lec !== RECALL_FILTER.lec) return false;
+    return true;
+  });
+}
+function recallTallyText(cards){
+  return cards.length+' card'+(cards.length===1?'':'s')+' &middot; Knew it: '+RECALL_TALLY.good+' &middot; Missed: '+RECALL_TALLY.bad;
+}
+function recallCardHTML(c){
+  return '<div class="qcard" data-rid="'+c.id+'">' +
+    '<div class="qcard-head"><div class="qcard-stem">'+c.prompt+'</div></div>' +
+    '<span class="qcard-meta"><span class="tag-chip tag-'+c.tag+'"><span class="tag-dot"></span>'+escHtml(c.sourceLabel)+'</span></span>' +
+    '<div class="qcard-reveal-btn" data-role="reveal-wrap">' +
+    '<button type="button" class="btn" data-recall-action="reveal" data-rid="'+c.id+'">Show answer</button>' +
+    '</div>' +
+    '<div class="qcard-explain" data-role="explain" id="explain-'+c.id+'">'+c.answer+'</div>' +
+    '<div class="qcard-grade-btns" data-role="grade-wrap" style="display:none">' +
+    '<button type="button" class="good" data-recall-action="grade" data-grade="good" data-rid="'+c.id+'">I knew it</button>' +
+    '<button type="button" class="bad" data-recall-action="grade" data-grade="bad" data-rid="'+c.id+'">I missed it</button>' +
+    '</div></div>';
+}
+function renderActiveRecall(){
+  if (window.shTTS) window.shTTS.stop();
+  buildRecallDeck();
+  var cards = filteredRecallDeck();
+  var html = '<div class="card section-block">';
+  html += '<div class="qbank-toolbar">' +
+    '<select id="recallSourceFilter">' +
+      [['all','All sources'],['cram','Cram Sheet'],['hints','Exam Hints'],['reference','Reference Tables']].map(function(o){
+        return '<option value="'+o[0]+'"'+(RECALL_FILTER.source===o[0]?' selected':'')+'>'+o[1]+'</option>';
+      }).join('') +
+    '</select>' +
+    '<select id="recallLecFilter"><option value="all">All sessions</option>' +
+      LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(RECALL_FILTER.lec===l.id?' selected':'')+'>Session '+l.num+' &middot; '+escHtml(l.title)+'</option>'; }).join('') +
+    '</select>' +
+    '<button type="button" class="btn ghost" data-recall-action="shuffle">Shuffle</button>' +
+    '</div>';
+  html += '<div class="qbank-count mono" id="recallTally" style="margin-bottom:10px;">'+recallTallyText(cards)+'</div>';
+  html += '<div id="recallList">' + cards.map(recallCardHTML).join('') + '</div>';
+  if(!cards.length) html += '<p style="color:var(--ink-soft);">No cards match those filters.</p>';
+  html += '</div>';
+  document.getElementById('compendium-content').innerHTML = html;
+  document.getElementById('recallSourceFilter').addEventListener('change', function(e){ RECALL_FILTER.source = e.target.value; renderActiveRecallListOnly(); });
+  document.getElementById('recallLecFilter').addEventListener('change', function(e){ RECALL_FILTER.lec = e.target.value; renderActiveRecallListOnly(); });
+}
+function renderActiveRecallListOnly(){
+  var cards = filteredRecallDeck();
+  var tallyEl = document.getElementById('recallTally');
+  if(tallyEl) tallyEl.innerHTML = recallTallyText(cards);
+  var list = document.getElementById('recallList');
+  if(list) list.innerHTML = cards.map(recallCardHTML).join('');
+}
+
 var COMPENDIUM_VIEWS = [
   { id:'course-info', label:'Course Info', fn:renderCourseInfo },
   { id:'lecture-notes', label:'Lecture Notes', fn:renderLectureNotes },
   { id:'question-bank', label:'Question Bank', fn:renderQuestionBank },
   { id:'mock-exam', label:'Mock Exam', fn:renderMockExam },
   { id:'weak-spots', label:'Weak Spots', fn:renderWeakSpots },
+  { id:'active-recall', label:'Active Recall', fn:renderActiveRecall },
   { id:'reference-tables', label:'Reference Tables', fn:renderReferenceTables },
   { id:'cram-sheet', label:'Cram Sheet', fn:renderCramSheet },
   { id:'exam-hints', label:'Exam Hints', fn:renderExamHints }
@@ -1932,6 +2118,43 @@ function renderCompendium(){
         else if(waction === 'drill-lec') WEAK_DRILL_LEC = weakBtn.getAttribute('data-lec');
         else if(waction === 'back') WEAK_DRILL_LEC = null;
         renderCompendiumContent();
+        return;
+      }
+      var recallBtn = e.target.closest('[data-recall-action]');
+      if(recallBtn){
+        var raction = recallBtn.getAttribute('data-recall-action');
+        if(raction === 'shuffle'){
+          RECALL_ORDER = shuffled(RECALL_ORDER);
+          renderActiveRecallListOnly();
+          return;
+        }
+        var rid = recallBtn.getAttribute('data-rid');
+        var rcard = recallBtn.closest('.qcard');
+        if(raction === 'reveal'){
+          var explainEl = document.getElementById('explain-'+rid);
+          if(explainEl) explainEl.classList.add('shown');
+          rcard.querySelector('[data-role="reveal-wrap"]').style.display = 'none';
+          rcard.querySelector('[data-role="grade-wrap"]').style.display = 'block';
+        } else if(raction === 'grade'){
+          var rgrade = recallBtn.getAttribute('data-grade');
+          rcard.querySelectorAll('[data-recall-action="grade"]').forEach(function(b){ b.disabled = true; });
+          RECALL_TALLY[rgrade === 'good' ? 'good' : 'bad']++;
+          var tallyEl = document.getElementById('recallTally');
+          if(tallyEl) tallyEl.innerHTML = recallTallyText(filteredRecallDeck());
+        }
+        return;
+      }
+      var clozeBtn = e.target.closest('[data-cloze-action]');
+      if(clozeBtn){
+        var caction = clozeBtn.getAttribute('data-cloze-action');
+        if(caction === 'toggle-mode'){
+          CLOZE_MODE = !CLOZE_MODE;
+          renderCompendiumContent();
+        } else if(caction === 'reveal-cell'){
+          var clozeContent = decodeURIComponent(clozeBtn.getAttribute('data-cloze-content'));
+          var clozeParent = clozeBtn.parentElement;
+          if(clozeParent) clozeParent.innerHTML = clozeContent;
+        }
         return;
       }
     });
