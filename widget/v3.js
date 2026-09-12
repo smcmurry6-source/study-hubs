@@ -701,6 +701,39 @@
   function safeRpc(fn, args){
     try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
   }
+
+  /* ---------- visit/section time tracking (best-effort analytics for the
+     admin review page only — never affects the hub itself). One ping right
+     away, then every PING_INTERVAL_MS while the tab is actually visible
+     (paused when backgrounded, so an idle tab doesn't inflate the numbers).
+     "section" reads the universal #modeSwitch [data-mode] convention every
+     hub already uses, so this needs zero per-hub changes to work. ---------- */
+  var VISIT_ID = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("visit-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+  var PING_INTERVAL_MS = 25000;
+  function currentSection(){
+    try {
+      var active = document.querySelector('#modeSwitch [aria-selected="true"]');
+      return (active && active.getAttribute("data-mode")) || "";
+    } catch (e) { return ""; }
+  }
+  function pingActivity(){
+    safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: currentSection() });
+  }
+  var activityTimer = null;
+  function startActivityPing(){
+    if (activityTimer) return;
+    pingActivity();
+    activityTimer = setInterval(pingActivity, PING_INTERVAL_MS);
+  }
+  function stopActivityPing(){
+    if (activityTimer) { clearInterval(activityTimer); activityTimer = null; }
+  }
+  if (document.visibilityState !== "hidden") startActivityPing();
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "hidden") stopActivityPing();
+    else startActivityPing();
+  });
+
   var sessionCorrectStreak = 0;
   document.addEventListener(ANSWERED_EVENT, function(e){
     var d = (e && e.detail) || {};

@@ -322,6 +322,8 @@ table.ref-table tbody tr:hover{background:var(--paper-2);}
 .q-recall-answer{background:var(--paper-2); border-radius:var(--r-s); padding:12px 14px; font-size:.92rem;}
 .q-recall-answer b{color:var(--gold-ink,var(--gold));}
 .q-selfgrade{display:flex; gap:8px;}
+.btn.is-correct{background:var(--good-soft); color:var(--good); border-color:var(--good);}
+.btn.is-wrong{background:var(--bad-soft); color:var(--bad); border-color:var(--bad);}
 .q-seq-list, .q-match-cols{padding:0 18px 18px;}
 .q-seq-list{display:flex; flex-direction:column; gap:8px;}
 .seq-step{
@@ -870,6 +872,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
           <button class="tab-btn" data-ctab="reference" type="button" role="tab" aria-selected="false">Reference</button>
           <button class="tab-btn" data-ctab="quiz" type="button" role="tab" aria-selected="false">Quiz Bank</button>
           <button class="tab-btn" data-ctab="cram" type="button" role="tab" aria-selected="false">Cram Sheet</button>
+          <button class="tab-btn" data-ctab="recall" type="button" role="tab" aria-selected="false">Active Recall</button>
           <button class="tab-btn" data-ctab="signal" type="button" role="tab" aria-selected="false">Exam Signal</button>
           <button class="tab-btn" data-ctab="hints" type="button" role="tab" aria-selected="false">Exam Hints</button>
           <button class="tab-btn" data-ctab="mockexam" type="button" role="tab" aria-selected="false">Mock Exam</button>
@@ -942,6 +945,17 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
           <div id="cramMatchGrids"></div>
           <h3 style="font-size:1rem; margin:28px 0 12px;">Commonly confused pairs</h3>
           <div class="def-grid" id="cramConfusedGrid"></div>
+        </div>
+
+        <div class="tab-panel" data-ctabpanel="recall" hidden>
+          <p class="lede" style="margin-top:0;">Hide-and-reveal flashcards pulled from the Exam Hints, Cram Sheet, and Reference tabs — self-graded here, and kept separate from the gradable Quiz Bank.</p>
+          <div class="stat-row" id="recallStats" style="margin-bottom:18px;"></div>
+          <div class="pill-filter-row" id="arcSourceFilter"></div>
+          <div class="pill-filter-row" id="arcLecFilter"></div>
+          <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
+            <button class="btn btn-ghost btn-sm" id="arcShuffleBtn" type="button">Shuffle</button>
+          </div>
+          <div id="recallList"></div>
         </div>
 
         <div class="tab-panel" data-ctabpanel="signal" hidden>
@@ -1805,6 +1819,20 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       stim:"Glucose and fat in the small intestine lumen.",
       action:"An incretin — potentiates glucose-stimulated insulin release from pancreatic beta cells.",
       clinical:"Named for an early-observed gastric-acid-inhibiting effect at high, non-physiologic doses, but its main physiologic role is as an incretin alongside GLP-1."}
+  ];
+
+  // Commonly-confused-pairs contrast list — shared by the Cram Sheet
+  // (renderCram) and the Active Recall deck (buildRecallDeck) so the
+  // pairs only need to be authored once.
+  const CONFUSED_PAIRS = [
+    {a:"Cholelithiasis", b:"Cholecystitis", d:"Cholelithiasis is just having gallstones. Cholecystitis is the gallbladder inflammation that follows when one obstructs the cystic duct."},
+    {a:"Secretin", b:"CCK", d:"Secretin answers acid — it drives pancreatic/biliary HCO3-. CCK answers fat and protein — it drives enzyme secretion and gallbladder contraction."},
+    {a:"Hepatic lobule", b:"Hepatic acinus", d:"Same tissue, two organizing schemes: the lobule is defined by anatomy (a hexagon around the central vein); the acinus by blood flow (zone 1→3, portal triad to central vein)."},
+    {a:"Direct bilirubin", b:"Indirect bilirubin", d:"Direct (conjugated) is water-soluble, made by the liver, and shows up in urine when elevated. Indirect (unconjugated) hasn't been processed by the liver yet and isn't water-soluble."},
+    {a:"Crohn's disease", b:"Ulcerative colitis", d:"Crohn's: transmural, skip lesions, granulomas, anywhere mouth-to-anus, fistulizes. UC: mucosal/submucosal only, continuous, colon/rectum only, rarely fistulizes."},
+    {a:"Villi", b:"Plicae circulares", d:"Villi are microscopic mucosal projections. Plicae circulares are permanent macroscopic folds of mucosa and submucosa — visible to the naked eye, unlike villi."},
+    {a:"M cells", b:"Paneth cells", d:"M cells sample and hand off luminal antigens to Peyer's-patch immune cells. Paneth cells, at the crypt base, secrete antimicrobial peptides directly."},
+    {a:"Pre-hepatic jaundice", b:"Post-hepatic jaundice", d:"Pre-hepatic: too much bilirubin made (hemolysis) before the liver even gets it. Post-hepatic: bilirubin is made and conjugated fine, but can't get out (obstruction)."}
   ];
 
   const ATLAS_VIEWS = [
@@ -2763,6 +2791,32 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       return;
     }
 
+    var arcReveal = t.closest("[data-arc-reveal]");
+    if(arcReveal){
+      var arcBox = arcReveal.closest(".q-recall-box");
+      var arcC = RECALL_DECK_BY_ID[arcBox.getAttribute("data-arcid")];
+      arcBox.innerHTML = '<div class="q-recall-answer">'+arcC.answer+'</div>'
+        + '<div class="q-selfgrade"><button class="btn btn-accent btn-sm" data-arc-grade="good" type="button">I knew it</button><button class="btn btn-ghost btn-sm" data-arc-grade="missed" type="button">I missed it</button></div>';
+      return;
+    }
+    var arcGrade = t.closest("[data-arc-grade]");
+    if(arcGrade){
+      var agBox = arcGrade.closest(".q-recall-box");
+      if(agBox.dataset.graded) return;
+      agBox.dataset.graded = "1";
+      var arcResult = arcGrade.getAttribute("data-arc-grade");
+      agBox.querySelectorAll("[data-arc-grade]").forEach(function(b){ b.disabled = true; });
+      arcGrade.classList.add(arcResult==="good"? "is-correct":"is-wrong");
+      RECALL_TALLY[arcResult]++;
+      var recallStatsEl = byId("recallStats");
+      if(recallStatsEl) recallStatsEl.innerHTML = [
+        {n:filteredRecallDeck().length, l:"Cards in view"},
+        {n:RECALL_TALLY.good, l:"Knew it"},
+        {n:RECALL_TALLY.missed, l:"Missed"}
+      ].map(function(s){ return '<div class="stat-tile"><div class="stat-num tnum">'+s.n+'</div><div class="stat-label">'+s.l+'</div></div>'; }).join("");
+      return;
+    }
+
     var seqStep = t.closest("[data-seq-step]");
     if(seqStep && !seqStep.disabled){
       var seqWrap = seqStep.closest(".q-seq-list");
@@ -3088,17 +3142,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
         + '</div>';
     }).join("");
 
-    var confused = [
-      {a:"Cholelithiasis", b:"Cholecystitis", d:"Cholelithiasis is just having gallstones. Cholecystitis is the gallbladder inflammation that follows when one obstructs the cystic duct."},
-      {a:"Secretin", b:"CCK", d:"Secretin answers acid — it drives pancreatic/biliary HCO3-. CCK answers fat and protein — it drives enzyme secretion and gallbladder contraction."},
-      {a:"Hepatic lobule", b:"Hepatic acinus", d:"Same tissue, two organizing schemes: the lobule is defined by anatomy (a hexagon around the central vein); the acinus by blood flow (zone 1→3, portal triad to central vein)."},
-      {a:"Direct bilirubin", b:"Indirect bilirubin", d:"Direct (conjugated) is water-soluble, made by the liver, and shows up in urine when elevated. Indirect (unconjugated) hasn't been processed by the liver yet and isn't water-soluble."},
-      {a:"Crohn's disease", b:"Ulcerative colitis", d:"Crohn's: transmural, skip lesions, granulomas, anywhere mouth-to-anus, fistulizes. UC: mucosal/submucosal only, continuous, colon/rectum only, rarely fistulizes."},
-      {a:"Villi", b:"Plicae circulares", d:"Villi are microscopic mucosal projections. Plicae circulares are permanent macroscopic folds of mucosa and submucosa — visible to the naked eye, unlike villi."},
-      {a:"M cells", b:"Paneth cells", d:"M cells sample and hand off luminal antigens to Peyer's-patch immune cells. Paneth cells, at the crypt base, secrete antimicrobial peptides directly."},
-      {a:"Pre-hepatic jaundice", b:"Post-hepatic jaundice", d:"Pre-hepatic: too much bilirubin made (hemolysis) before the liver even gets it. Post-hepatic: bilirubin is made and conjugated fine, but can't get out (obstruction)."}
-    ];
-    byId("cramConfusedGrid").innerHTML = confused.map(function(c){
+    byId("cramConfusedGrid").innerHTML = CONFUSED_PAIRS.map(function(c){
       return '<div class="def-card"><div class="dc-term">'+esc(c.a)+' <span style="color:var(--ink-3); font-weight:400;">vs.</span> '+esc(c.b)+'</div><div class="dc-def">'+esc(c.d)+'</div></div>';
     }).join("");
   }
@@ -3179,6 +3223,178 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
         + '</div>';
     }).join("");
   }
+
+  /* ============================================================
+     ACTIVE RECALL — hide-and-reveal flashcards built from data that
+     already lives elsewhere in this file: Exam Hints, the Cram
+     Sheet's confused-pairs/suffix/match tables, and the Drug &
+     Hormone reference. Self-graded only — unlike qCardHTML's own
+     "recall" question type, grading here never calls recordAnswer
+     or touches STATE, since this is supplementary review, not part
+     of the gradable question bank. The deck itself is built once
+     and cached in RECALL_DECK; only its display order (RECALL_ORDER)
+     changes, on Shuffle.
+     ============================================================ */
+  var RECALL_DECK = null;
+  var RECALL_DECK_BY_ID = {};
+  var RECALL_ORDER = [];
+  var RECALL_TALLY = { good:0, missed:0 };
+  var arcSourceFilter = "all", arcLecFilter = "all";
+  var ARC_SOURCES = [
+    {key:"hints", label:"Exam Hints"},
+    {key:"confused", label:"Confused Pairs"},
+    {key:"cram", label:"Cram Sheet"},
+    {key:"drugs", label:"Drug Reference"},
+    {key:"hormones", label:"Hormone Reference"}
+  ];
+
+  function arcInfoBlockHTML(rows){
+    return '<div style="display:flex; flex-direction:column; gap:7px; font-size:.9rem; color:var(--ink-2); line-height:1.55;">'
+      + rows.map(function(r){ return '<p><b style="color:var(--ink);">'+esc(r[0])+'</b> — '+esc(r[1])+'</p>'; }).join("")
+      + '</div>';
+  }
+
+  function buildRecallDeck(){
+    if(RECALL_DECK) return RECALL_DECK;
+    var deck = [];
+
+    EXAM_HINTS.forEach(function(h, i){
+      var lec = LECTURE_BY_ID[h.lec];
+      if(!lec) return;
+      var isUp = h.kind==="emphasize";
+      deck.push({
+        id:"arc-hint-"+i, sourceKey:"hints", sourceLabel:"Exam Hints", lec:h.lec,
+        chips:[
+          {tag:lec.tag, label:"Lecture "+lec.num+" · "+lec.title},
+          {tag:isUp?"good":"pending", label:isUp?"High-yield":"Lower priority"}
+        ],
+        prompt:'<span style="font-style:italic;">“'+esc(h.quote)+'”</span>',
+        answer:esc(h.note)
+      });
+    });
+
+    CONFUSED_PAIRS.forEach(function(c, i){
+      deck.push({
+        id:"arc-confused-"+i, sourceKey:"confused", sourceLabel:"Confused Pairs", lec:null,
+        chips:[{tag:"slate", label:"Confused Pair"}],
+        prompt:esc(c.a)+' <span style="color:var(--ink-3); font-weight:400;">vs.</span> '+esc(c.b),
+        answer:esc(c.d)
+      });
+    });
+
+    var suffixQ = QUESTIONS_BY_ID["mt01"];
+    if(suffixQ){
+      var suffixLec = LECTURE_BY_ID[suffixQ.lec];
+      suffixQ.pairs.forEach(function(p, i){
+        deck.push({
+          id:"arc-suffix-"+i, sourceKey:"cram", sourceLabel:"Cram Sheet", lec:suffixQ.lec,
+          chips: suffixLec ? [{tag:suffixLec.tag, label:"Lecture "+suffixLec.num+" · "+suffixLec.title}] : [],
+          prompt:'<div class="muted-note" style="margin-bottom:6px;">Suffix → drug class</div><span class="mono">'+esc(p[0])+'</span>',
+          answer:esc(p[1])
+        });
+      });
+    }
+    ["mt02","mt03","mt04","mt05"].forEach(function(mid){
+      var mq = QUESTIONS_BY_ID[mid];
+      if(!mq) return;
+      var mLec = LECTURE_BY_ID[mq.lec];
+      mq.pairs.forEach(function(p, i){
+        deck.push({
+          id:"arc-"+mid+"-"+i, sourceKey:"cram", sourceLabel:"Cram Sheet", lec:mq.lec,
+          chips: mLec ? [{tag:mLec.tag, label:"Lecture "+mLec.num+" · "+mLec.title}] : [],
+          prompt:'<div class="muted-note" style="margin-bottom:6px;">'+esc(mq.q)+'</div>'+esc(p[0]),
+          answer:esc(p[1])
+        });
+      });
+    });
+
+    DRUGS.forEach(function(d){
+      deck.push({
+        id:"arc-drug-"+d.id, sourceKey:"drugs", sourceLabel:"Drug Reference", lec:null,
+        chips:[{tag:d.tag, label:d.cat}],
+        prompt:esc(d.name)+(d.suffix? ' <span class="mono" style="font-size:.75rem; color:var(--ink-3); font-weight:400;">'+esc(d.suffix)+'</span>':''),
+        answer:arcInfoBlockHTML([["MOA",d.moa],["Use",d.use],["Adverse",d.ae]])
+      });
+    });
+
+    HORMONES.forEach(function(h){
+      deck.push({
+        id:"arc-hormone-"+h.id, sourceKey:"hormones", sourceLabel:"Hormone Reference", lec:null,
+        chips:[{tag:h.tag, label:h.cell+" · "+h.site}],
+        prompt:esc(h.name),
+        answer:arcInfoBlockHTML([["Stimulus",h.stim],["Action",h.action],["Clinical",h.clinical]])
+      });
+    });
+
+    deck.forEach(function(c){ RECALL_DECK_BY_ID[c.id] = c; });
+    RECALL_DECK = deck;
+    RECALL_ORDER = shuffle(deck.map(function(c){ return c.id; }));
+    return deck;
+  }
+
+  function filteredRecallDeck(){
+    buildRecallDeck();
+    return RECALL_ORDER.map(function(id){ return RECALL_DECK_BY_ID[id]; }).filter(function(c){
+      if(arcSourceFilter!=="all" && c.sourceKey!==arcSourceFilter) return false;
+      if(arcLecFilter!=="all" && c.lec!==arcLecFilter) return false;
+      return true;
+    });
+  }
+
+  function arcCardHTML(c){
+    var chips = c.chips.map(function(ch){ return '<span class="chip" data-tag="'+ch.tag+'">'+esc(ch.label)+'</span>'; }).join("");
+    return '<div class="q-card" data-arcard="'+c.id+'">'
+      + '<div class="q-card-top"><div class="q-card-meta">'+chips+'</div></div>'
+      + '<div class="q-card-q">'+c.prompt+'</div>'
+      + '<div class="q-recall-box" data-arcid="'+c.id+'">'
+      + '<button class="btn btn-ghost btn-sm" data-arc-reveal type="button" style="align-self:flex-start;">Show answer</button>'
+      + '</div></div>';
+  }
+
+  function renderActiveRecallList(){
+    var cards = filteredRecallDeck();
+    byId("recallStats").innerHTML = [
+      {n:cards.length, l:"Cards in view"},
+      {n:RECALL_TALLY.good, l:"Knew it"},
+      {n:RECALL_TALLY.missed, l:"Missed"}
+    ].map(function(s){ return '<div class="stat-tile"><div class="stat-num tnum">'+s.n+'</div><div class="stat-label">'+s.l+'</div></div>'; }).join("");
+    byId("recallList").innerHTML = cards.length? cards.map(arcCardHTML).join("") : '<div class="empty-state">'+icoSvg("book")+"<p>No cards match these filters.</p></div>";
+  }
+
+  function renderActiveRecall(){
+    var deck = buildRecallDeck();
+    var srcCounts = {};
+    deck.forEach(function(c){ srcCounts[c.sourceKey] = (srcCounts[c.sourceKey]||0)+1; });
+    byId("arcSourceFilter").innerHTML = '<button class="pill-filter'+(arcSourceFilter==="all"?" is-active":"")+'" data-arcsrc="all" type="button">All sources <span class="pf-count">'+deck.length+'</span></button>'
+      + ARC_SOURCES.map(function(s){
+          return '<button class="pill-filter'+(arcSourceFilter===s.key?" is-active":"")+'" data-arcsrc="'+s.key+'" type="button">'+s.label+' <span class="pf-count">'+(srcCounts[s.key]||0)+'</span></button>';
+        }).join("");
+
+    var lecCounts = {};
+    deck.forEach(function(c){ if(c.lec) lecCounts[c.lec]=(lecCounts[c.lec]||0)+1; });
+    byId("arcLecFilter").innerHTML = '<button class="pill-filter'+(arcLecFilter==="all"?" is-active":"")+'" data-arclec="all" type="button">All lectures <span class="pf-count">'+deck.length+'</span></button>'
+      + LECTURES_SORTED.filter(function(l){ return lecCounts[l.id]; }).map(function(l){
+          return '<button class="pill-filter'+(arcLecFilter===l.id?" is-active":"")+'" data-arclec="'+l.id+'" type="button">'+esc(l.num)+' · '+esc(l.title)+' <span class="pf-count">'+lecCounts[l.id]+'</span></button>';
+        }).join("");
+
+    renderActiveRecallList();
+  }
+  byId("arcSourceFilter").addEventListener("click", function(e){
+    var b = e.target.closest("[data-arcsrc]"); if(!b) return;
+    arcSourceFilter = b.getAttribute("data-arcsrc");
+    byId("arcSourceFilter").querySelectorAll(".pill-filter").forEach(function(x){ x.classList.toggle("is-active", x===b); });
+    renderActiveRecallList();
+  });
+  byId("arcLecFilter").addEventListener("click", function(e){
+    var b = e.target.closest("[data-arclec]"); if(!b) return;
+    arcLecFilter = b.getAttribute("data-arclec");
+    byId("arcLecFilter").querySelectorAll(".pill-filter").forEach(function(x){ x.classList.toggle("is-active", x===b); });
+    renderActiveRecallList();
+  });
+  byId("arcShuffleBtn").addEventListener("click", function(){
+    RECALL_ORDER = shuffle(RECALL_ORDER);
+    renderActiveRecallList();
+  });
 
 
   // ============================================================
@@ -3454,7 +3670,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     }
   });
 
-  renderHome(); renderLectures(); renderReference(); renderQuizFilters(); renderQuizList(); renderCram(); renderSignal(); renderExamHints(); // ============================================================
+  renderHome(); renderLectures(); renderReference(); renderQuizFilters(); renderQuizList(); renderCram(); renderSignal(); renderExamHints(); renderActiveRecall(); // ============================================================
   // READINESS DASHBOARD — a rollup of existing STATE.wardStats (already
   // maintained by recordAnswer for every mode) into one readiness view.
   // No new tracking: reads the same numbers Follow-ups/Chief Rounds/On

@@ -79,6 +79,22 @@ button{font-family:inherit; cursor:pointer;}
 }
 .resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
 .empty{color:var(--ink-3); font-size:14px; padding:30px 0; text-align:center;}
+
+/* analytics */
+.analytics{margin-top:44px; padding-top:30px; border-top:1px solid var(--line);}
+.analytics h2{font-family:var(--font-display); font-weight:600; font-size:19px; margin:0 0 4px;}
+.analytics .lede{font-size:13px; color:var(--ink-3); margin:0 0 20px;}
+.stat-tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:24px;}
+.stat-tile{background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:14px 16px; box-shadow:var(--shadow);}
+.stat-tile .num{font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--ink);}
+.stat-tile .label{font-size:12px; color:var(--ink-3); margin-top:2px;}
+.bar-list{display:flex; flex-direction:column; gap:8px; margin-bottom:26px;}
+.bar-row{display:flex; align-items:center; gap:10px; font-size:13px;}
+.bar-row .bar-label{width:150px; flex:none; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.bar-row .bar-track{flex:1; height:8px; border-radius:5px; background:var(--paper-2); overflow:hidden;}
+.bar-row .bar-fill{height:100%; background:var(--accent); border-radius:5px;}
+.bar-row .bar-val{width:70px; flex:none; text-align:right; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3);}
+.analytics-empty{color:var(--ink-3); font-size:13px;}
 </style>
 </head>
 <body>
@@ -99,6 +115,13 @@ button{font-family:inherit; cursor:pointer;}
     <span class="stat" id="reportStat"></span>
   </div>
   <div id="reportList"></div>
+
+  <div class="analytics">
+    <span class="eyebrow">Last 30 days</span>
+    <h2>Visitor analytics</h2>
+    <p class="lede">Approximate — built from a heartbeat ping roughly every 25s while a tab is open and visible, not exact instrumentation.</p>
+    <div id="analyticsBody"><div class="analytics-empty">Loading…</div></div>
+  </div>
 </div>
 
 <script>
@@ -163,6 +186,52 @@ button{font-family:inherit; cursor:pointer;}
     });
   }
 
+  var analyticsBody = document.getElementById("analyticsBody");
+  function barList(rows, labelKey, valueKey, unit){
+    if (!rows || !rows.length) return '<div class="analytics-empty">No activity logged yet.</div>';
+    var max = Math.max.apply(null, rows.map(function(r){ return r[valueKey] || 0; })) || 1;
+    return '<div class="bar-list">' + rows.map(function(r){
+      var v = r[valueKey] || 0;
+      var pct = Math.max(2, Math.round((v / max) * 100));
+      return '<div class="bar-row">' +
+        '<span class="bar-label">' + esc(r[labelKey]) + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
+        '<span class="bar-val">' + v + unit + '</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  function loadAnalytics(){
+    analyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
+    Promise.all([
+      supabase.rpc("get_visitor_summary", { p_secret: secret, p_days: 30 }),
+      supabase.rpc("get_visitor_by_hub", { p_secret: secret, p_days: 30 }),
+      supabase.rpc("get_visitor_by_section", { p_secret: secret, p_days: 30 })
+    ]).then(function(results){
+      var summaryRes = results[0], hubRes = results[1], sectionRes = results[2];
+      if ((summaryRes && summaryRes.error) || (hubRes && hubRes.error) || (sectionRes && sectionRes.error)) {
+        analyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v6.sql in the Supabase SQL editor.</div>';
+        return;
+      }
+      var summary = (summaryRes && summaryRes.data && summaryRes.data[0]) || { unique_visitors: 0, total_visits: 0, avg_visit_minutes: 0 };
+      var byHub = (hubRes && hubRes.data) || [];
+      var bySection = (sectionRes && sectionRes.data) || [];
+      var hubLabels = byHub.map(function(r){ return { label: r.hub, total_minutes: r.total_minutes }; });
+      var sectionLabels = bySection.map(function(r){ return { label: r.hub + ' · ' + r.section, total_minutes: r.total_minutes }; });
+      analyticsBody.innerHTML =
+        '<div class="stat-tiles">' +
+          '<div class="stat-tile"><div class="num">' + (summary.unique_visitors || 0) + '</div><div class="label">Unique visitors</div></div>' +
+          '<div class="stat-tile"><div class="num">' + (summary.total_visits || 0) + '</div><div class="label">Total visits</div></div>' +
+          '<div class="stat-tile"><div class="num">' + (summary.avg_visit_minutes || 0) + '</div><div class="label">Avg. minutes / visit</div></div>' +
+        '</div>' +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Time by hub</h3>' +
+        barList(hubLabels, 'label', 'total_minutes', ' min') +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Time by section</h3>' +
+        barList(sectionLabels, 'label', 'total_minutes', ' min');
+    }, function(){
+      analyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load analytics right now — try again in a moment.</div>';
+    });
+  }
+
   function unlock(ok, msg){
     if (ok) {
       gate.hidden = true;
@@ -189,6 +258,7 @@ button{font-family:inherit; cursor:pointer;}
       allReports = (res && res.data) || [];
       unlock(true);
       render();
+      loadAnalytics();
     }, function(){
       gateBtn.disabled = false;
       unlock(false, "Couldn't reach the server — try again.");

@@ -159,6 +159,7 @@ table{border-collapse:collapse; width:100%;}
 .btn:hover{transform:translateY(-1px); box-shadow:var(--shadow);}
 .btn.btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--line);}
 .btn.btn-teal{background:var(--teal); color:#fff;}
+.btn.btn-rose{background:var(--rose); color:#fff;}
 .btn:disabled{opacity:.4; cursor:not-allowed; transform:none;}
 
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);}
@@ -270,6 +271,9 @@ table.data-table tr:nth-child(even) td{background:var(--porcelain-dim);}
 .hints-logistics{background:var(--gold-soft); border-left:3px solid var(--gold); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13.5px; color:var(--ink);}
 .hints-logistics b{font-family:var(--font-mono); text-transform:uppercase; font-size:11px; letter-spacing:.08em; display:block; margin-bottom:3px; color:var(--gold);}
 .hints-list{display:flex; flex-direction:column; gap:14px;}
+
+/* Active Recall flashcards (reuses .qcard/.qcard-explain from the shared question renderer) */
+.recall-grade-btns{display:flex; gap:10px;}
 .hint-card{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:var(--radius-sm); padding:16px 18px;}
 .hint-quote{font-style:italic; font-size:14.5px; color:var(--ink); margin-bottom:10px; line-height:1.5;}
 .hint-lecs{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}
@@ -476,6 +480,7 @@ footer.hub-footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--
             <button data-ctab="tables" aria-selected="false">Reference Tables</button>
             <button data-ctab="cram" aria-selected="false">Cram Sheet</button>
             <button data-ctab="hints" aria-selected="false">Exam Hints</button>
+            <button data-ctab="recall" aria-selected="false">Active Recall</button>
           </div>
           <div id="ctabPanels">
             <div id="ctab-reading" class="ctab-panel"></div>
@@ -483,6 +488,7 @@ footer.hub-footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--
             <div id="ctab-tables" class="ctab-panel" hidden></div>
             <div id="ctab-cram" class="ctab-panel" hidden></div>
             <div id="ctab-hints" class="ctab-panel" hidden></div>
+            <div id="ctab-recall" class="ctab-panel" hidden></div>
           </div>
         </div>
       </div>
@@ -2000,7 +2006,7 @@ function renderCompendiumTabs(){
     btn.classList.toggle('is-active', active);
     btn.setAttribute('aria-selected', active?'true':'false');
   });
-  ['reading','bank','tables','cram','hints'].forEach(t=>{
+  ['reading','bank','tables','cram','hints','recall'].forEach(t=>{
     document.getElementById('ctab-'+t).hidden = (t!==UI.compTab);
   });
 }
@@ -2145,6 +2151,150 @@ function renderHintsPanel(){
   });
 }
 
+/* =========================================================================
+   ACTIVE RECALL — hide-and-reveal flashcards built from the Reference
+   Tables, Cram Sheet, and Exam Hints data already in this file. Self-graded
+   only: grading here just increments a running tally, it never calls
+   recordAnswer() or touches STATE — this is supplementary review, not part
+   of the gradable question bank.
+   ========================================================================= */
+let RECALL_DECK = null;
+let RECALL_ORDER = [];
+const RECALL_FILTER = { source:'all', lec:'all' };
+const RECALL_TALLY = { good:0, bad:0 };
+const RECALL_SOURCES = [
+  { id:'all', title:'All sources' },
+  { id:'genes', title:'Gene Reference' },
+  { id:'pharm', title:'Pharmacogenomics' },
+  { id:'cram', title:'Cram Sheet' },
+  { id:'hints', title:'Exam Hints' },
+];
+
+function buildRecallDeck(){
+  if(RECALL_DECK) return RECALL_DECK;
+  const deck = [];
+
+  GENE_TABLE.forEach((g,i)=>{
+    deck.push({
+      id:'gene-'+i, source:'genes', sourceLabel:'Gene Reference', lec:null, tag:null,
+      prompt:`<span class="mono" style="font-weight:600">${escapeHTML(g.gene)}</span>`,
+      answer:`<b>${escapeHTML(g.disorder)}</b> &middot; ${escapeHTML(g.inherit)} &middot; ${escapeHTML(g.tissue)}${g.note?`<br>${escapeHTML(g.note)}`:''}`
+    });
+  });
+
+  PHARMACOGENE_TABLE.forEach((g,i)=>{
+    deck.push({
+      id:'pharm-'+i, source:'pharm', sourceLabel:'Pharmacogenomics', lec:null, tag:null,
+      prompt:`<span class="mono" style="font-weight:600">${escapeHTML(g.gene)}</span>`,
+      answer:`<b>${escapeHTML(g.drug)}</b><br>${escapeHTML(g.effect)}`
+    });
+  });
+
+  LECTURES.forEach(l=>{
+    const points = CRAM[l.id];
+    if(!points) return;
+    deck.push({
+      id:'cram-'+l.id, source:'cram', sourceLabel:'Cram Sheet', lec:l.id, tag:l.tag,
+      prompt:`Recall everything on the cram sheet for <b>${escapeHTML(l.title)}</b> (Lecture ${l.num}).`,
+      answer:`<ul style="margin:0; padding-left:1.2em;">${points.map(p=>`<li>${escapeHTML(p)}</li>`).join('')}</ul>`
+    });
+  });
+
+  EXAM_HINTS.forEach((group,gi)=>{
+    group.items.forEach((item,ii)=>{
+      const lec = LECTURE_BY_ID[item.lecs[0]];
+      deck.push({
+        id:'hint-'+gi+'-'+ii, source:'hints', sourceLabel:'Exam Hints', lec:item.lecs[0], tag:lec?lec.tag:null,
+        prompt:`&ldquo;${escapeHTML(item.prompt)}&rdquo;`,
+        answer:item.answer // already HTML in the source data — do not re-escape
+      });
+    });
+  });
+
+  RECALL_DECK = deck;
+  RECALL_ORDER = shuffle(deck.map(c=>c.id));
+  return deck;
+}
+
+function filteredRecallDeck(){
+  const deck = buildRecallDeck();
+  const byId = {};
+  deck.forEach(c=>{ byId[c.id] = c; });
+  return RECALL_ORDER.filter(id=>byId.hasOwnProperty(id)).map(id=>byId[id]).filter(c=>{
+    if(RECALL_FILTER.source!=='all' && c.source!==RECALL_FILTER.source) return false;
+    if(RECALL_FILTER.lec!=='all' && c.lec!==RECALL_FILTER.lec) return false;
+    return true;
+  });
+}
+
+function recallTallyText(cards){
+  return `${cards.length} card${cards.length===1?'':'s'} &middot; Knew it: ${RECALL_TALLY.good} &middot; Missed: ${RECALL_TALLY.bad}`;
+}
+
+function recallCardHTML(c){
+  const accentVar = c.tag ? `var(--tag-${c.tag})` : 'var(--gold)';
+  return `<div class="qcard" data-rid="${c.id}" style="--accent:${accentVar}">
+    <div class="qcard-head">
+      <div class="qcard-stem">${c.prompt}</div>
+      <span class="tag-chip"><span class="swatch" style="background:${accentVar}"></span>${escapeHTML(c.sourceLabel)}</span>
+    </div>
+    <div data-role="reveal-wrap">
+      <button type="button" class="btn btn-ghost" data-recall-action="reveal">Show answer</button>
+    </div>
+    <div class="qcard-explain" data-role="recall-answer">${c.answer}</div>
+    <div class="recall-grade-btns" data-role="grade-wrap" hidden>
+      <button type="button" class="btn btn-teal" data-recall-action="grade" data-grade="good">I knew it</button>
+      <button type="button" class="btn btn-rose" data-recall-action="grade" data-grade="bad">I missed it</button>
+    </div>
+  </div>`;
+}
+
+function renderActiveRecallPanel(){
+  const el = document.getElementById('ctab-recall');
+  const cards = filteredRecallDeck();
+  const lecChips = [{id:'all', title:'All lectures'}].concat(LECTURES.map(l=>({id:l.id, title:l.title.split(':')[0]})));
+  el.innerHTML = `
+    <span class="section-eyebrow">Self-graded review</span>
+    <h3 style="font-size:19px; margin-bottom:2px; font-family:var(--font-body); font-weight:700;">Active Recall</h3>
+    <p class="hints-intro">Hide-and-reveal flashcards built from the reference tables, cram sheet, and exam hints. Grading yourself here is just for you — it doesn't touch your Question Bank progress.</p>
+    <div class="bank-controls" id="recallSourceChips">
+      ${RECALL_SOURCES.map(s=>`<button type="button" class="filter-chip ${RECALL_FILTER.source===s.id?'is-active':''}" data-source="${s.id}">${escapeHTML(s.title)}</button>`).join('')}
+    </div>
+    <div class="bank-controls" id="recallLecChips">
+      ${lecChips.map(c=>`<button type="button" class="filter-chip ${RECALL_FILTER.lec===c.id?'is-active':''}" data-lec="${c.id}">${escapeHTML(c.title)}</button>`).join('')}
+      <button type="button" class="btn btn-ghost" data-recall-action="shuffle" style="margin-left:auto;">Shuffle</button>
+    </div>
+    <div class="bank-meta-row" id="recallTally">${recallTallyText(cards)}</div>
+    <div class="bank-grid" id="recallList">${cards.map(recallCardHTML).join('') || '<p style="color:var(--ink-faint)">No cards match those filters.</p>'}</div>
+  `;
+  el.querySelectorAll('#recallSourceChips [data-source]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ RECALL_FILTER.source = btn.getAttribute('data-source'); renderActiveRecallPanel(); });
+  });
+  el.querySelectorAll('#recallLecChips [data-lec]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ RECALL_FILTER.lec = btn.getAttribute('data-lec'); renderActiveRecallPanel(); });
+  });
+  const shuffleBtn = el.querySelector('[data-recall-action="shuffle"]');
+  if(shuffleBtn) shuffleBtn.addEventListener('click', ()=>{ RECALL_ORDER = shuffle(RECALL_ORDER); renderActiveRecallPanel(); });
+  el.querySelectorAll('[data-recall-action="reveal"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const card = btn.closest('.qcard');
+      card.querySelector('[data-role="recall-answer"]').classList.add('is-visible');
+      card.querySelector('[data-role="reveal-wrap"]').hidden = true;
+      card.querySelector('[data-role="grade-wrap"]').hidden = false;
+    });
+  });
+  el.querySelectorAll('[data-recall-action="grade"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const card = btn.closest('.qcard');
+      const grade = btn.getAttribute('data-grade');
+      RECALL_TALLY[grade==='good' ? 'good' : 'bad']++;
+      card.querySelectorAll('[data-recall-action="grade"]').forEach(b=>{ b.disabled = true; });
+      const tallyEl = document.getElementById('recallTally');
+      if(tallyEl) tallyEl.innerHTML = recallTallyText(filteredRecallDeck());
+    });
+  });
+}
+
 function renderCompendium(){
   renderLectureRail();
   renderCompendiumTabs();
@@ -2153,6 +2303,7 @@ function renderCompendium(){
   renderTablesPanel();
   renderCramPanel();
   renderHintsPanel();
+  renderActiveRecallPanel();
 }
 
 /* =========================================================================
