@@ -40,7 +40,15 @@
      exactly one <header> element for its top bar (position:sticky;top:0), so
      that's the one hub-agnostic anchor point we push down + re-pin, rather
      than hand-tuning per-hub CSS. Re-measured on resize (mobile breakpoint
-     changes pill size) and whenever the name badge's visibility changes. ---------- */
+     changes pill size) and whenever the name badge's visibility changes.
+
+     Pushing the header's sticky offset down opens up a plain top:0..clearance
+     band that the header's own box no longer covers. Once the header is
+     actually stuck (scrolled), whatever page content is passing underneath
+     keeps painting through that band behind the fixed pill/badge — a solid
+     backdrop the same color as the page fixes it, so it reads as one
+     continuous bar instead of scrolled content bleeding through above the
+     header. ---------- */
   function reserveTopClearance(){
     try{
       var bottom = 0;
@@ -65,6 +73,16 @@
         headerRule = "header{top:" + clearance + "px !important;}";
       }
       styleEl.textContent = "body{padding-top:" + clearance + "px;}" + headerRule;
+
+      var backdrop = document.getElementById("sh-top-backdrop");
+      if(!backdrop){
+        backdrop = document.createElement("div");
+        backdrop.id = "sh-top-backdrop";
+        document.body.appendChild(backdrop);
+      }
+      var pageBg = getComputedStyle(document.body).backgroundColor;
+      backdrop.style.cssText = "position:fixed;top:0;left:0;right:0;height:" + clearance +
+        "px;background:" + pageBg + ";z-index:9998;pointer-events:none;";
     }catch(e){ /* purely cosmetic, never block the hub */ }
   }
   window.shReserveTopClearance = reserveTopClearance;
@@ -73,6 +91,15 @@
     var t = null;
     return function(){ clearTimeout(t); t = setTimeout(reserveTopClearance, 150); };
   })());
+  /* a light/dark ("nightshift") toggle flips a class on <body> in every hub;
+     re-measure so the backdrop color picks up the new background instead of
+     staying stuck on whatever theme was active on page load. */
+  try{
+    new MutationObserver((function(){
+      var t = null;
+      return function(){ clearTimeout(t); t = setTimeout(reserveTopClearance, 50); };
+    })()).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  }catch(e){}
 
   /* ---------- text-to-speech (lecture reading panels) — independent of Supabase,
      so it still works even if the stats layer fails to init. Each hub's own
