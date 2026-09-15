@@ -61,7 +61,7 @@
 .shset-hint{font-size:10.5px; color:#7a7a80; margin-top:8px; line-height:1.4;}
 
 /* ---------- persistent screen-name badge ---------- */
-#shname-badge{position:fixed; left:16px; top:60px; z-index:9999; display:inline-flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent;}
+#shname-badge{display:inline-flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #shname-badge:hover{border-color:rgba(255,255,255,.32);}
 #shname-badge[hidden]{display:none;}
 
@@ -97,8 +97,12 @@
 .shstat-search-q .sq-hint{font-size:11.5px; color:#9fe0b8; margin-top:6px; line-height:1.4; display:none;}
 .shstat-search-q.is-open .sq-hint{display:block;}
 
-/* ---------- back-to-index pill ---------- */
-#shhome-pill{position:fixed; left:16px; top:16px; z-index:9999; display:inline-flex; align-items:center; gap:7px; background:rgba(20,20,24,.92); color:#f2f2f0; text-decoration:none; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:8px 14px 8px 12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12.5px; font-weight:600; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28);}
+/* ---------- shared fixed top-left row: back-to-index pill + name badge
+   side by side (was two independently-positioned elements stacked on top
+   of each other -- that reserved ~2 rows of permanent top clearance on
+   every hub; one row is enough). ---------- */
+#sh-topbar{position:fixed; left:16px; top:16px; z-index:9999; display:flex; align-items:center; gap:8px; flex-wrap:wrap; max-width:calc(100vw - 32px);}
+#shhome-pill{display:inline-flex; align-items:center; gap:7px; background:rgba(20,20,24,.92); color:#f2f2f0; text-decoration:none; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:8px 14px 8px 12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12.5px; font-weight:600; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28);}
 #shhome-pill:hover{border-color:rgba(255,255,255,.32);}
 #shhome-pill svg{width:13px; height:13px; flex:none;}
 
@@ -165,9 +169,10 @@
   }
   #shstat-panel h5:first-of-type, #shstat-flagpanel h5, #shstat-suggestpanel h5, #shstat-searchpanel h5, #shstat-settingspanel h5:first-of-type{margin-top:8px;}
 
-  #shhome-pill{top:calc(14px + env(safe-area-inset-top,0px)); padding:9px;}
+  #sh-topbar{top:calc(14px + env(safe-area-inset-top,0px)); left:14px;}
+  #shhome-pill{padding:9px;}
   #shhome-pill span{display:none;}
-  #shname-badge{top:calc(54px + env(safe-area-inset-top,0px)); padding:6px 11px; font-size:11px;}
+  #shname-badge{padding:6px 11px; font-size:11px; max-width:130px;}
 
   .sh-tts-btn{padding:9px 15px 9px 12px; font-size:13px;}
   .sh-tts-voice-picker{display:block; max-width:none; margin:8px 0 0; padding:8px 10px; font-size:13px;}

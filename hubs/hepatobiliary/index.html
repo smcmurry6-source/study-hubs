@@ -2770,8 +2770,15 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       + '<button class="flag-btn'+(flagged?' is-flagged':'')+'" data-flag-toggle="'+q.id+'" type="button" title="Toggle Follow-up" aria-label="Toggle follow-up flag">'+ICO_FLAG+'</button></div>';
     var body = "";
     if(q.type==="mcq"){
+      /* Randomize display order every render (data-mcq-pick keeps the
+         ORIGINAL choice index -- everything below already keys off that,
+         not display position). Across this hub's whole bank the correct
+         choice is "B" about 60% of the time and is the single longest
+         option in a further majority of cases -- both patterns are
+         answerable without knowing the material, which this closes. */
+      var mcqOrder = shuffle(q.ch.map(function(c,i){ return i; }));
       body = '<div class="q-card-q">'+esc(q.q)+'</div><div class="q-choices" data-qid="'+q.id+'">'
-        + q.ch.map(function(c,i){ return '<button class="q-choice" data-mcq-pick="'+i+'" type="button"><span class="qc-letter">'+String.fromCharCode(65+i)+'</span><span>'+esc(c)+'</span></button>'; }).join("")
+        + mcqOrder.map(function(origIdx,pos){ return '<button class="q-choice" data-mcq-pick="'+origIdx+'" type="button"><span class="qc-letter">'+String.fromCharCode(65+pos)+'</span><span>'+esc(q.ch[origIdx])+'</span></button>'; }).join("")
         + '</div>';
     } else if(q.type==="recall"){
       body = '<div class="q-card-q">'+esc(q.q)+'</div><div class="q-recall-box" data-qid="'+q.id+'">'
@@ -2810,10 +2817,11 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       mcqWrap.dataset.answered = "1";
       var mq = QUESTIONS_BY_ID[mcqWrap.getAttribute("data-qid")];
       var picked = parseInt(mcq.getAttribute("data-mcq-pick"),10);
-      mcqWrap.querySelectorAll(".q-choice").forEach(function(btn,i){
+      mcqWrap.querySelectorAll(".q-choice").forEach(function(btn){
         btn.disabled = true;
-        if(i===mq.a) btn.classList.add("is-correct");
-        else if(i===picked) btn.classList.add("is-wrong");
+        var bi = parseInt(btn.getAttribute("data-mcq-pick"),10);
+        if(bi===mq.a) btn.classList.add("is-correct");
+        else if(bi===picked) btn.classList.add("is-wrong");
       });
       if(mq.ex) mcqWrap.insertAdjacentHTML("afterend", '<div class="q-explain">'+esc(mq.ex)+'</div>');
       recordAnswer(mq.id, mq.lec, picked===mq.a);
@@ -3459,11 +3467,26 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
   var mockExamDurationChoice = 60;
   var mockReviewFilter = "missed";
 
+  /* Shallow-copies q with its choices in a random order and .a remapped to
+     match -- everything in the mock-exam flow (render, submit, review) reads
+     q.ch/q.a straight off the queue entry, so shuffling once here at
+     queue-build time is enough for the whole attempt to be consistent
+     (same order while navigating back and forth, same order in the review
+     screen after submit) without touching any of that code. Doesn't mutate
+     the shared QUESTIONS/QUESTIONS_BY_ID objects. */
+  function shuffleChoices(q){
+    if(q.type!=="mcq" || !Array.isArray(q.ch)) return q;
+    var order = shuffle(q.ch.map(function(c,i){ return i; }));
+    var copy = Object.assign({}, q);
+    copy.ch = order.map(function(i){ return q.ch[i]; });
+    copy.a = order.indexOf(q.a);
+    return copy;
+  }
   function buildMockExamQueue(){
     var pool = QUESTIONS.filter(function(q){ return q.type==="mcq"; });
     var picked = shuffle(pool).slice(0, EXAM_CURRENT_Q);
     var cumulative = shuffle(EXAM1_REVIEW_POOL.slice()).slice(0, EXAM_CUMULATIVE_Q);
-    return shuffle(picked.concat(cumulative));
+    return shuffle(picked.concat(cumulative)).map(shuffleChoices);
   }
 
   function fmtClock(sec){
@@ -4418,7 +4441,6 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       + '<div class="case-progress-row"><div class="case-progress-track"><div class="case-progress-fill" style="width:'+(gameCaseIndex/total*100)+'%;"></div></div><span class="mono muted-note">'+(gameCaseIndex+1)+' / '+total+'</span></div>'
       + '<div id="caseStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
       + '<div class="q-action-row" id="caseNextRow" style="padding:14px 0 0;"></div>';
-    if (window.shFillClassData) window.shFillClassData(byId("gameWardActive"));
   }
   function showNextCaseButton(){
     var isLast = gameCaseIndex >= gameCaseQueue.length-1;
@@ -4468,7 +4490,6 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     byId("gameWardActive").innerHTML = '<div class="boss-banner"><span class="bb-icon">'+(STATE.settings.nightShift?"🌙":"🩺")+'</span><div><h4>Attending Check-In — '+esc(l.title)+'</h4><p>Question '+(gameBossIndex+1)+' of '+gameBossQueue.length+'</p><div class="boss-pip-row" id="bossPipRow"></div></div></div>'
       + '<div id="caseStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
       + '<div class="q-action-row" id="bossNextRow" style="padding:14px 0 0;"></div>';
-    if (window.shFillClassData) window.shFillClassData(byId("gameWardActive"));
     renderBossPips();
   }
   document.addEventListener("hbh:answered", function(e){
@@ -5138,7 +5159,6 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       content.innerHTML = '<div class="boss-banner"><span class="bb-icon">⚔️</span><div><h4>Trial — '+esc(l.title)+'</h4><p>Question '+(ctx.index+1)+' of '+ctx.queue.length+'</p><div class="boss-pip-row" id="dndTrialPipRow"></div></div></div>'
         + '<div id="dndTrialStage" class="case-stage-enter">'+qCardHTML(q)+'</div>'
         + '<div class="q-action-row" id="dndTrialNextRow" style="padding:14px 0 0;"></div>';
-      if (window.shFillClassData) window.shFillClassData(content);
       renderDndTrialPips();
     }
     document.addEventListener("hbh:answered", function(e){
@@ -5258,4 +5278,5 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
 <link rel="stylesheet" href="../../widget/v3.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../widget/v3.js" data-hub="hepatobiliary" data-answered-event="hbh:answered" data-default-mode="compendium"></script>
+<script>if (window.shWireClassStats) window.shWireClassStats(".q-card[data-qid]");</script>
 </body></html>

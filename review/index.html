@@ -122,6 +122,13 @@ button{font-family:inherit; cursor:pointer;}
     <p class="lede">Approximate — built from a heartbeat ping roughly every 25s while a tab is open and visible, not exact instrumentation.</p>
     <div id="analyticsBody"><div class="analytics-empty">Loading…</div></div>
   </div>
+
+  <div class="analytics">
+    <span class="eyebrow">All time · every hub</span>
+    <h2>Question performance</h2>
+    <p class="lede">From the same answer data each hub's own "Toughest questions" panel reads — questions with fewer than 3 recorded answers are left out so a single fluke doesn't rank.</p>
+    <div id="questionAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
+  </div>
 </div>
 
 <script>
@@ -232,6 +239,59 @@ button{font-family:inherit; cursor:pointer;}
     });
   }
 
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio" };
+  function hubLabel(h){ return HUB_LABEL[h] || h || "(unknown)"; }
+
+  var questionAnalyticsBody = document.getElementById("questionAnalyticsBody");
+  function loadQuestionAnalytics(){
+    if (!questionAnalyticsBody) return;
+    questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
+    Promise.all([
+      supabase.from("question_stats").select("hub,qid,attempts,correct"),
+      supabase.from("mode_stats").select("hub,mode,opens")
+    ]).then(function(results){
+      var qRes = results[0], mRes = results[1];
+      if ((qRes && qRes.error) || (mRes && mRes.error)) {
+        questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet, or these tables aren&#39;t readable from here.</div>';
+        return;
+      }
+      var qRows = (qRes && qRes.data) || [];
+      var mRows = (mRes && mRes.data) || [];
+
+      var totalAttempts = 0, totalCorrect = 0, questionsWithData = 0;
+      qRows.forEach(function(r){
+        totalAttempts += r.attempts || 0;
+        totalCorrect += r.correct || 0;
+        if ((r.attempts || 0) >= 3) questionsWithData++;
+      });
+      var overallPct = totalAttempts ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+
+      var tough = qRows.filter(function(r){ return (r.attempts || 0) >= 3; });
+      tough.sort(function(a, b){ return (a.correct / a.attempts) - (b.correct / b.attempts); });
+      tough = tough.slice(0, 15).map(function(r){
+        return { label: hubLabel(r.hub) + ' · ' + r.qid, val: Math.round((r.correct / r.attempts) * 100) };
+      });
+
+      var modes = mRows.slice().sort(function(a, b){ return (b.opens || 0) - (a.opens || 0); });
+      modes = modes.slice(0, 15).map(function(r){
+        return { label: hubLabel(r.hub) + ' · ' + r.mode, val: r.opens };
+      });
+
+      questionAnalyticsBody.innerHTML =
+        '<div class="stat-tiles">' +
+          '<div class="stat-tile"><div class="num">' + totalAttempts + '</div><div class="label">Answers logged</div></div>' +
+          '<div class="stat-tile"><div class="num">' + overallPct + '%</div><div class="label">Overall accuracy</div></div>' +
+          '<div class="stat-tile"><div class="num">' + questionsWithData + '</div><div class="label">Questions w/ 3+ answers</div></div>' +
+        '</div>' +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Toughest questions (lowest % correct, 3+ answers)</h3>' +
+        barList(tough, 'label', 'val', '%') +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Most-opened sections</h3>' +
+        barList(modes, 'label', 'val', ' opens');
+    }, function(){
+      questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
+    });
+  }
+
   function unlock(ok, msg){
     if (ok) {
       gate.hidden = true;
@@ -259,6 +319,7 @@ button{font-family:inherit; cursor:pointer;}
       unlock(true);
       render();
       loadAnalytics();
+      loadQuestionAnalytics();
     }, function(){
       gateBtn.disabled = false;
       unlock(false, "Couldn't reach the server — try again.");

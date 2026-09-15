@@ -1080,7 +1080,15 @@ function defaultState(){
     theme:null,           // 'light' | 'dark' | null (system)
     lastActiveDate:null,
     activeDates:{},        // 'YYYY-MM-DD' -> true, for streak-day pill
-    game:{ cutscenesSeen:{} }
+    game:{ cutscenesSeen:{} },
+    // Separate from `answered` on purpose: only answers given while actually
+    // playing the Understory (encounterList) land here, so gallery/checkpoint
+    // clearing reflects real in-game play instead of being pre-cleared by
+    // quiz-bank/weak-drill/exam answers to the same questions. Personal
+    // stats, achievements, and the Compendium progress bars intentionally
+    // keep reading the shared `answered` bucket -- this only affects what
+    // counts as "cleared" inside the game itself.
+    gameAnswered:{}        // qid -> {correct:bool, seen:int}
   };
 }
 function loadState(){
@@ -1148,6 +1156,23 @@ function allLecturesCleared(){
   return LECTURES.every(function(l){ return isLectureCleared(l.id); });
 }
 
+/* Game-scoped mirrors of the two functions above, reading STATE.gameAnswered
+   instead of STATE.answered -- used only by the Understory's own gallery/
+   checkpoint "cleared" logic below, so playing the game is what clears the
+   game, not answering the same questions in the quiz bank/weak drill/exam
+   review. Compendium progress bars and achievements intentionally keep using
+   the shared lectureProgress/isLectureCleared above. */
+function lectureProgressInGame(lecId){
+  var qs = QUESTIONS_BY_LECTURE[lecId] || [];
+  var correct = 0;
+  qs.forEach(function(q){ var a = STATE.gameAnswered[q.id]; if(a && a.correct) correct++; });
+  return { correct:correct, total:qs.length, pct: qs.length ? Math.round(100*correct/qs.length) : 0 };
+}
+function isLectureClearedInGame(lecId){
+  var p = lectureProgressInGame(lecId);
+  return p.total > 0 && p.correct === p.total;
+}
+
 function checkAchievements(){
   var newly = [];
   ACHIEVEMENTS.forEach(function(a){
@@ -1184,6 +1209,17 @@ function recordAnswer(qid, lecId, correct){
   checkAchievements();
   renderHeaderMeta();
   document.dispatchEvent(new CustomEvent('perio:answered', { detail:{ qid:qid, lec:lecId, correct:correct } }));
+}
+/* Only called for answers given inside the game itself (see
+   wireQuestionContainer's isGame flag) -- keeps gallery/checkpoint
+   "cleared" state isolated from quiz-bank/weak-drill/exam answers to the
+   same questions. */
+function recordGameAnswer(qid, correct){
+  var prev = STATE.gameAnswered[qid] || {correct:false, seen:0};
+  prev.seen += 1;
+  if(correct) prev.correct = true;
+  STATE.gameAnswered[qid] = prev;
+  saveState();
 }
 
 /* ---------- TOASTS ---------- */
@@ -1228,8 +1264,15 @@ function qCardHTML(q){
   var body = '';
   if(q.type === 'mcq'){
     body += '<div class="qcard-choices" data-qtype="mcq">';
-    q.choices.forEach(function(c, idx){
-      body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+idx+'">'+escHtml(c)+'</button>';
+    /* Render choices in a randomized order every time (data-idx stays the
+       ORIGINAL choice index, which is all the click handler and recordAnswer
+       below ever compare against -- so nothing downstream needs to change).
+       Without this, every single MCQ in this hub's bank has its correct
+       choice authored first in the array, i.e. the answer is always "A"
+       verbatim -- trivially gameable without knowing any of the material. */
+    var mcqOrder = shuffled(q.choices.map(function(c, i){ return i; }));
+    mcqOrder.forEach(function(origIdx){
+      body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+origIdx+'">'+escHtml(q.choices[origIdx])+'</button>';
     });
     body += '</div>';
     body += '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'">'+(q.ex? escHtml(q.ex):'')+'</div>';
@@ -1273,10 +1316,12 @@ function markExplain(qid, show){
   if(el && show) el.classList.add('shown');
 }
 
-/* One delegated listener, attached per container that renders qCardHTML output. */
-function wireQuestionContainer(container){
+/* One delegated listener, attached per container that renders qCardHTML output.
+   isGame=true only for the game's own encounter container -- see recordGameAnswer. */
+function wireQuestionContainer(container, isGame){
   if(!container || container.__wired) return;
   container.__wired = true;
+  container.__isGame = !!isGame;
   container.addEventListener('click', function(e){
     var mcqBtn = e.target.closest('.qcard-choices[data-qtype="mcq"] .qcard-choice');
     if(mcqBtn){
@@ -1295,6 +1340,7 @@ function wireQuestionContainer(container){
       });
       markExplain(qid, true);
       recordAnswer(qid, q.lec, correct);
+      if(container.__isGame) recordGameAnswer(qid, correct);
       return;
     }
     var seqBtn = e.target.closest('.qcard-seq-steps[data-qtype="sequence"] .qcard-choice');
@@ -1319,6 +1365,7 @@ function wireQuestionContainer(container){
         });
         markExplain(sqid, true);
         recordAnswer(sqid, sq.lec, seqCorrect);
+        if(container.__isGame) recordGameAnswer(sqid, seqCorrect);
       }
       return;
     }
@@ -1355,6 +1402,7 @@ function wireQuestionContainer(container){
         if(doneCount === totalPairs){
           markExplain(mqid, true);
           recordAnswer(mqid, mq.lec, true);
+          if(container.__isGame) recordGameAnswer(mqid, true);
         }
       } else {
         otherEl.setAttribute('data-state','incorrect');
@@ -1382,7 +1430,9 @@ function wireQuestionContainer(container){
       } else if(action === 'grade'){
         var grade = actionBtn.getAttribute('data-grade');
         card.querySelectorAll('[data-action="grade"]').forEach(function(b){ b.disabled = true; });
-        recordAnswer(aqid, aq.lec, grade === 'good');
+        var gradeCorrect = grade === 'good';
+        recordAnswer(aqid, aq.lec, gradeCorrect);
+        if(container.__isGame) recordGameAnswer(aqid, gradeCorrect);
       }
       return;
     }
@@ -1543,7 +1593,6 @@ function renderQuestionBank(){
   html += '</div>';
   document.getElementById('compendium-content').innerHTML = html;
   wireQuestionContainer(document.getElementById('qbankList'));
-  if (window.shFillClassData) window.shFillClassData(document.getElementById('qbankList'));
   document.getElementById('qbankSearch').addEventListener('input', function(e){ QBANK_FILTER.search = e.target.value; renderQuestionBankListOnly(); });
   document.getElementById('qbankLecFilter').addEventListener('change', function(e){ QBANK_FILTER.lec = e.target.value; renderQuestionBankListOnly(); });
   document.getElementById('qbankTypeFilter').addEventListener('change', function(e){ QBANK_FILTER.type = e.target.value; renderQuestionBankListOnly(); });
@@ -1555,7 +1604,6 @@ function renderQuestionBankListOnly(){
   var list = document.getElementById('qbankList');
   if(list){
     list.innerHTML = qs.map(qCardHTML).join('');
-    if (window.shFillClassData) window.shFillClassData(list);
   }
 }
 
@@ -1823,7 +1871,6 @@ function renderMockExamResults(){
   document.getElementById('compendium-content').innerHTML = html;
   if(missed.length){
     wireQuestionContainer(document.getElementById('examMissedList'));
-    if (window.shFillClassData) window.shFillClassData(document.getElementById('examMissedList'));
   }
 }
 function renderMockExam(){
@@ -1913,7 +1960,6 @@ function renderWeakDrill(){
   document.getElementById('compendium-content').innerHTML = html;
   if(qs.length){
     wireQuestionContainer(document.getElementById('weakDrillList'));
-    if (window.shFillClassData) window.shFillClassData(document.getElementById('weakDrillList'));
   }
 }
 function renderWeakSpots(){
@@ -1957,15 +2003,10 @@ function buildRecallDeck(){
     });
   });
 
-  EXAM_HINTS.forEach(function(h,hi){
-    var lec = LECTURE_BY_ID[h.lec];
-    if(!lec) return;
-    deck.push({
-      id:'hint-'+hi, source:'hints', sourceLabel:'Exam Hints', lec:h.lec, tag:lec.tag,
-      prompt:'&ldquo;'+escHtml(h.quote)+'&rdquo;',
-      answer:escHtml(h.takeaway)
-    });
-  });
+  // Exam Hints are intentionally NOT included here — they're direct quotes
+  // pulled from the lecture recording, and a raw quote makes a weak recall
+  // prompt (there's no clear question to answer from it). They still live
+  // in their own Exam Hints tab; this only affects the Active Recall deck.
 
   var scratch = document.createElement('div');
   scratch.innerHTML = referenceTablesHTML();
@@ -2034,7 +2075,7 @@ function renderActiveRecall(){
   var html = '<div class="card section-block">';
   html += '<div class="qbank-toolbar">' +
     '<select id="recallSourceFilter">' +
-      [['all','All sources'],['cram','Cram Sheet'],['hints','Exam Hints'],['reference','Reference Tables']].map(function(o){
+      [['all','All sources'],['cram','Cram Sheet'],['reference','Reference Tables']].map(function(o){
         return '<option value="'+o[0]+'"'+(RECALL_FILTER.source===o[0]?' selected':'')+'>'+o[1]+'</option>';
       }).join('') +
     '</select>' +
@@ -2408,14 +2449,14 @@ function galleryOf(lecId){
 }
 function galleryProgress(gallery){
   var correct = 0, total = 0;
-  gallery.wards.forEach(function(lecId){ var p = lectureProgress(lecId); correct += p.correct; total += p.total; });
-  return { correct:correct, total:total, cleared: gallery.wards.every(isLectureCleared) };
+  gallery.wards.forEach(function(lecId){ var p = lectureProgressInGame(lecId); correct += p.correct; total += p.total; });
+  return { correct:correct, total:total, cleared: gallery.wards.every(isLectureClearedInGame) };
 }
-function checkpointCleared(cp){ return cp.wards.every(isLectureCleared); }
+function checkpointCleared(cp){ return cp.wards.every(isLectureClearedInGame); }
 function checkpointProgress(cp){
   var correct = 0, total = 0;
-  cp.wards.forEach(function(lecId){ var p = lectureProgress(lecId); correct += p.correct; total += p.total; });
-  return { correct:correct, total:total, cleared: cp.wards.every(isLectureCleared) };
+  cp.wards.forEach(function(lecId){ var p = lectureProgressInGame(lecId); correct += p.correct; total += p.total; });
+  return { correct:correct, total:total, cleared: cp.wards.every(isLectureClearedInGame) };
 }
 
 /* ---------- Cutscenes — small recurring cast drawn from the Session-1 case files ---------- */
@@ -2706,8 +2747,8 @@ function renderGalleryDrilldown(){
   html += '<div class="lecture-grid">';
   w.wards.forEach(function(lecId){
     var l = LECTURE_BY_ID[lecId];
-    var prog = lectureProgress(lecId);
-    var cleared = isLectureCleared(lecId);
+    var prog = lectureProgressInGame(lecId);
+    var cleared = isLectureClearedInGame(lecId);
     html += '<button type="button" class="lecture-card" style="--lec-color:var(--tag-'+l.tag+')" data-open-encounter="'+l.id+'">' +
       '<span class="lec-num mono">Session '+l.num+'</span><h4>'+escHtml(l.title)+'</h4>' +
       '<span class="lec-who">'+escHtml(l.who)+'</span>' +
@@ -2746,15 +2787,14 @@ function renderEncounter(){
     var l = LECTURE_BY_ID[GAME_VIEW.lecId];
     var w = galleryOf(l.id);
     html += '<div class="atlas-back"><button type="button" data-game-back="gallery" data-gallery-id="'+w.id+'">&larr; '+escHtml(w.room)+'</button></div>';
-    var prog = lectureProgress(l.id);
+    var prog = lectureProgressInGame(l.id);
     html += '<div class="card section-block"><span class="eyebrow"><span class="tag-chip tag-'+l.tag+'"><span class="tag-dot"></span>Session '+l.num+'</span></span><h2>'+escHtml(l.title)+'</h2>' +
       '<div class="encounter-progress mono">'+prog.correct+' / '+prog.total+' correct</div></div>';
   }
   html += '<div id="encounterList">' + GAME_ENCOUNTER_POOL.list.map(qCardHTML).join('') + '</div>';
   panel.innerHTML = html;
   wireGamePanel(panel);
-  wireQuestionContainer(document.getElementById('encounterList'));
-  if (window.shFillClassData) window.shFillClassData(document.getElementById('encounterList'));
+  wireQuestionContainer(document.getElementById('encounterList'), true);
 }
 
 /* ---------- Cutscene overlay ---------- */
@@ -2796,7 +2836,7 @@ function renderCutsceneOverlay(){
 document.addEventListener('perio:answered', function(e){
   var lecId = e.detail.lec;
   if(!lecId || !CUTSCENES[lecId]) return;
-  if(isLectureCleared(lecId) && !STATE.game.cutscenesSeen[lecId]){
+  if(isLectureClearedInGame(lecId) && !STATE.game.cutscenesSeen[lecId]){
     STATE.game.cutscenesSeen[lecId] = true;
     saveState();
     setTimeout(function(){ playCutscene(lecId); }, 300);
@@ -2875,4 +2915,5 @@ window.SH_EXPORT = {
 <link rel="stylesheet" href="../../widget/v3.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="compendium"></script>
+<script>if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");</script>
 </body></html>

@@ -26,13 +26,19 @@
     }
   } catch (e) { /* stats layer is best-effort, never block the hub */ }
 
-  /* ---------- back-to-index pill (was static markup per hub; now built here) ---------- */
+  /* ---------- back-to-index pill (was static markup per hub; now built here) ----------
+     Lives inside a shared #sh-topbar flex row (not its own fixed element) so the
+     name badge below can sit beside it instead of stacking underneath it --
+     one compact row instead of two stacked ones. ---------- */
+  var topbar = document.createElement("div");
+  topbar.id = "sh-topbar";
+  document.body.appendChild(topbar);
   (function(){
     var a = document.createElement("a");
     a.id = "shhome-pill";
     a.href = "../../index.html";
     a.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>All hubs</span>';
-    document.body.appendChild(a);
+    topbar.appendChild(a);
   })();
 
   /* ---------- reserve top clearance so the fixed "All hubs" pill / name badge
@@ -51,14 +57,9 @@
      header. ---------- */
   function reserveTopClearance(){
     try{
-      var bottom = 0;
-      ["shhome-pill","shname-badge"].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el && !el.hidden){
-          var r = el.getBoundingClientRect();
-          if(r.bottom > bottom) bottom = r.bottom;
-        }
-      });
+      var bar = document.getElementById("sh-topbar");
+      if(!bar) return;
+      var bottom = bar.getBoundingClientRect().bottom;
       if(bottom <= 0) return;
       var clearance = Math.ceil(bottom + 10);
       var styleEl = document.getElementById("sh-top-clearance-style");
@@ -423,7 +424,7 @@
     serif: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
     sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
   };
-  var SIZE_ZOOM = { small: 0.9, "default": 1, large: 1.15, xlarge: 1.3 };
+  var SIZE_ZOOM = { small: 0.9, "default": 1, large: 1.15, xlarge: 1.3, xxlarge: 1.45 };
 
   function prefGet(key, fallback){
     try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
@@ -451,11 +452,89 @@
     return n ? (text + ", " + n) : text;
   };
 
+  /* ---------- class performance stats (aggregate, anonymous, batched) ----------
+     A hub's "X% of the class got this right" placeholder (every hub that
+     has one just says "Loading class data..." forever and nothing ever
+     fills it in -- there was no code anywhere that fetched it). Two-part
+     API so each hub keeps its own card markup/classnames:
+
+     - window.shGetClassStats(qids, cb) -- low-level: cb receives a
+       {qid: {total, correct}} map. Calls made within a short window all
+       get coalesced into one get_question_class_stats RPC instead of one
+       round trip per question.
+     - window.shWireClassStats(cardSelector) -- high-level: pass the CSS
+       selector for a hub's own question-card wrapper (must carry
+       data-qid) and this finds every [data-role="classdata-result"]
+       inside matching cards -- present ones now, future ones via a
+       MutationObserver so it keeps working as more cards render (quiz
+       bank, search results, wherever) -- and fills each in. ---------- */
+  var classStatsPending = [];
+  var classStatsCallbacks = [];
+  var classStatsTimer = null;
+  function flushClassStats(){
+    var qids = classStatsPending, cbs = classStatsCallbacks;
+    classStatsPending = []; classStatsCallbacks = [];
+    var unique = qids.filter(function(v, i, a){ return a.indexOf(v) === i; });
+    if (!supabase || !unique.length) { cbs.forEach(function(cb){ cb({}); }); return; }
+    /* question_stats(hub,qid,attempts,correct) already exists and is already
+       read anonymously elsewhere (the "Toughest questions" panel above) --
+       reuse it rather than adding a new table/RPC for the same data. */
+    supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).in("qid", unique).then(function(res){
+      var byQid = {};
+      ((res && res.data) || []).forEach(function(r){ byQid[r.qid] = { total: r.attempts, correct: r.correct }; });
+      cbs.forEach(function(cb){ cb(byQid); });
+    }, function(){ cbs.forEach(function(cb){ cb({}); }); });
+  }
+  window.shGetClassStats = function(qids, cb){
+    if (!qids || !qids.length || typeof cb !== "function") return;
+    classStatsPending = classStatsPending.concat(qids);
+    classStatsCallbacks.push(cb);
+    clearTimeout(classStatsTimer);
+    classStatsTimer = setTimeout(flushClassStats, 150);
+  };
+  window.shWireClassStats = function(cardSelector){
+    // Dedup key is the *element*, not the qid: the same question re-appears
+    // in fresh card instances all the time (switching a filter, revisiting a
+    // tab, the same question turning up again in the game) since most views
+    // replace a container's innerHTML wholesale rather than reusing nodes.
+    // Keying "seen" on qid alone marked the question done forever after its
+    // very first render anywhere on the page, so every later re-render of
+    // that same question got silently skipped and sat stuck on
+    // "Loading class data..." -- which is exactly what was reported.
+    function handleCard(card){
+      var qid = card.getAttribute("data-qid");
+      var el = card.querySelector('[data-role="classdata-result"]');
+      if (!qid || !el || el.__shClassDataWired) return;
+      el.__shClassDataWired = true;
+      window.shGetClassStats([qid], function(byQid){
+        var r = byQid[qid];
+        if (!r || !r.total) { el.textContent = "Not enough class data yet"; return; }
+        var pct = Math.round((r.correct / r.total) * 100);
+        el.textContent = pct + "% of the class got this right (n=" + r.total + ")";
+        el.classList.remove("is-ok", "is-bad");
+        if (pct >= 70) el.classList.add("is-ok");
+        else if (pct < 50) el.classList.add("is-bad");
+      });
+    }
+    try {
+      document.querySelectorAll(cardSelector).forEach(handleCard);
+      new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          (m.addedNodes || []).forEach(function(node){
+            if (node.nodeType !== 1) return;
+            if (node.matches && node.matches(cardSelector)) handleCard(node);
+            if (node.querySelectorAll) node.querySelectorAll(cardSelector).forEach(handleCard);
+          });
+        });
+      }).observe(document.body, { childList: true, subtree: true });
+    } catch (e) { /* cosmetic-only feature, never block the hub */ }
+  };
+
   var nameBadge = document.createElement("button");
   nameBadge.id = "shname-badge";
   nameBadge.type = "button";
   nameBadge.hidden = true;
-  document.body.appendChild(nameBadge);
+  (document.getElementById("sh-topbar") || document.body).appendChild(nameBadge);
   function renderNameBadge(){
     var n = currentName();
     if (n) { nameBadge.textContent = "Hi, " + n; nameBadge.hidden = false; }
@@ -481,180 +560,54 @@
      user gesture per browser autoplay rules, so this only ever plays when
      triggered from a click — see the Settings panel wiring below. ---------- */
   var shMusic = (function(){
-    var ctx = null, master = null, nodes = [];
-    function ensureCtx(){
-      if (ctx) return ctx;
-      try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
-      master = ctx.createGain();
-      master.gain.value = (parseInt(prefGet(SH_VOLUME_KEY, "35"), 10) / 100) * 0.35;
-      master.connect(ctx.destination);
-      return ctx;
+    // Real recorded tracks (widget/audio/*.mp3) played through <audio> elements,
+    // replacing the earlier oscillator-synthesized options. AUDIO_BASE is derived
+    // from this script's own resolved URL (not the hub page's URL) so it works
+    // the same from every hub regardless of folder depth.
+    var AUDIO_BASE = (function(){
+      try { return new URL("audio/", thisScript.src).href; } catch (e) { return "audio/"; }
+    })();
+    var TRACKS = {
+      rain: "rain.mp3",
+      waves: "waves.mp3",
+      cafe: "cafe.mp3",
+      lofi: "lofi.mp3",
+      piano: "piano.mp3"
+    };
+    var els = {}; // one <audio> element per track, created lazily and reused
+    var current = null;
+    var volume = (parseInt(prefGet(SH_VOLUME_KEY, "35"), 10) / 100) * 0.85;
+    function elFor(track){
+      if (els[track]) return els[track];
+      var a = new Audio(AUDIO_BASE + TRACKS[track]);
+      a.loop = true;
+      a.preload = "none";
+      a.volume = volume;
+      els[track] = a;
+      return a;
     }
     function stopAll(){
-      nodes.forEach(function(n){ try { n.stop && n.stop(); } catch (e) {} try { n.disconnect(); } catch (e) {} });
-      nodes = [];
-    }
-    function playPad(){
-      var c = ensureCtx(); if (!c) return;
-      stopAll();
-      [110, 165, 220].forEach(function(f, i){
-        var osc = c.createOscillator();
-        osc.type = "sine"; osc.frequency.value = f;
-        var lfo = c.createOscillator();
-        lfo.type = "sine"; lfo.frequency.value = 0.05 + i * 0.02;
-        var lfoGain = c.createGain(); lfoGain.gain.value = 3;
-        lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-        var g = c.createGain(); g.gain.value = 0.5 / 3;
-        osc.connect(g); g.connect(master);
-        osc.start(); lfo.start();
-        nodes.push(osc, lfo);
+      Object.keys(els).forEach(function(t){
+        try { els[t].pause(); els[t].currentTime = 0; } catch (e) {}
       });
-    }
-    function playRain(){
-      var c = ensureCtx(); if (!c) return;
-      stopAll();
-      var bufferSize = 2 * c.sampleRate;
-      var buffer = c.createBuffer(1, bufferSize, c.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
-      var noise = c.createBufferSource();
-      noise.buffer = buffer; noise.loop = true;
-      var filter = c.createBiquadFilter();
-      filter.type = "bandpass"; filter.frequency.value = 1200; filter.Q.value = 0.6;
-      var g = c.createGain(); g.gain.value = 0.6;
-      noise.connect(filter); filter.connect(g); g.connect(master);
-      noise.start();
-      nodes.push(noise);
-    }
-    function playWaves(){
-      var c = ensureCtx(); if (!c) return;
-      stopAll();
-      var bufferSize = 2 * c.sampleRate;
-      var buffer = c.createBuffer(1, bufferSize, c.sampleRate);
-      var data = buffer.getChannelData(0);
-      for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.6;
-      var noise = c.createBufferSource();
-      noise.buffer = buffer; noise.loop = true;
-      var filter = c.createBiquadFilter();
-      filter.type = "lowpass"; filter.frequency.value = 500; filter.Q.value = 0.7;
-      var lfo = c.createOscillator();
-      lfo.type = "sine"; lfo.frequency.value = 0.09; // slow swell, ~11s per wave
-      var lfoGain = c.createGain(); lfoGain.gain.value = 350;
-      lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
-      var g = c.createGain(); g.gain.value = 0.55;
-      noise.connect(filter); filter.connect(g); g.connect(master);
-      noise.start(); lfo.start();
-      nodes.push(noise, lfo);
-    }
-    function playLofi(){
-      var c = ensureCtx(); if (!c) return;
-      stopAll();
-      var chords = [
-        [220.00, 261.63, 329.63],
-        [196.00, 246.94, 293.66],
-        [174.61, 220.00, 261.63],
-        [196.00, 246.94, 311.13]
-      ];
-      var chordLen = 3.4;
-      var chordGain = c.createGain(); chordGain.gain.value = 0.22; chordGain.connect(master);
-      var step = 0;
-      function scheduleChord(){
-        var freqs = chords[step % chords.length];
-        var startAt = c.currentTime + 0.05;
-        freqs.forEach(function(f){
-          var osc = c.createOscillator();
-          osc.type = "triangle"; osc.frequency.value = f;
-          var env = c.createGain(); env.gain.value = 0;
-          osc.connect(env); env.connect(chordGain);
-          env.gain.setValueAtTime(0, startAt);
-          env.gain.linearRampToValueAtTime(1, startAt + 0.8);
-          env.gain.linearRampToValueAtTime(0, startAt + chordLen);
-          osc.start(startAt); osc.stop(startAt + chordLen + 0.1);
-          nodes.push(osc);
-        });
-        step++;
-      }
-      scheduleChord();
-      var timer = setInterval(scheduleChord, chordLen * 1000);
-      nodes.push({ stop: function(){ clearInterval(timer); }, disconnect: function(){} });
-    }
-    function playFocus(){
-      var c = ensureCtx(); if (!c) return;
-      stopAll();
-      if (!c.createStereoPanner) { playPad(); return; } // graceful fallback if unsupported
-      var left = c.createOscillator(); left.type = "sine"; left.frequency.value = 190;
-      var right = c.createOscillator(); right.type = "sine"; right.frequency.value = 200; // ~10Hz beat
-      var panL = c.createStereoPanner(); panL.pan.value = -1;
-      var panR = c.createStereoPanner(); panR.pan.value = 1;
-      var g = c.createGain(); g.gain.value = 0.18;
-      left.connect(panL); panL.connect(g);
-      right.connect(panR); panR.connect(g);
-      g.connect(master);
-      left.start(); right.start();
-      nodes.push(left, right);
+      current = null;
     }
     function setTrack(track){
-      if (track === "off") { stopAll(); return; }
-      if (!ensureCtx()) return;
-      if (ctx.state === "suspended") { ctx.resume().catch(function(){}); }
-      if (track === "pad") playPad();
-      else if (track === "rain") playRain();
-      else if (track === "waves") playWaves();
-      else if (track === "lofi") playLofi();
-      else if (track === "focus") playFocus();
+      if (track === "off" || !TRACKS[track]) { stopAll(); return; }
+      if (current === track && !els[track].paused) return;
+      stopAll();
+      var a = elFor(track);
+      try { a.currentTime = 0; } catch (e) {}
+      var p = a.play();
+      if (p && p.catch) p.catch(function(){}); // autoplay-policy rejection is fine -- setTrack always runs inside a user gesture here, so the next click retries cleanly
+      current = track;
     }
-    function setVolume(v){ if (master) master.gain.value = v * 0.35; }
+    function setVolume(v){
+      volume = v * 0.85;
+      Object.keys(els).forEach(function(t){ els[t].volume = volume; });
+    }
     return { setTrack: setTrack, setVolume: setVolume };
   })();
-
-  /* ---------- per-question class-wide correctness — one fetch for the whole
-     hub, cached, instead of one request per question. Exposed the same way
-     as shTTS so a hub's own qcard code can use it independent of load order
-     and of the stats layer below. shQuestionStats(qid, cb) resolves from the
-     cache (fetching it once, lazily, on first call); shFillClassData(container)
-     auto-populates every [data-role="classdata-result"] under a container —
-     no click needed. ---------- */
-  var questionStatsCache = null; // null = not fetched yet; {} (or filled) once loaded
-  var questionStatsPromise = null;
-  function loadQuestionStats(){
-    if (questionStatsCache) return Promise.resolve(questionStatsCache);
-    if (questionStatsPromise) return questionStatsPromise;
-    questionStatsPromise = fetch(SB_URL + "/rest/v1/question_stats?hub=eq." + encodeURIComponent(HUB) + "&select=qid,attempts,correct", {
-      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
-    })
-    .then(function(r){ return r.ok ? r.json() : []; })
-    .then(function(rows){
-      var map = {};
-      (rows || []).forEach(function(r){ map[r.qid] = { attempts: r.attempts, correct: r.correct }; });
-      questionStatsCache = map;
-      return map;
-    })
-    .catch(function(){ questionStatsCache = {}; return questionStatsCache; });
-    return questionStatsPromise;
-  }
-  window.shQuestionStats = function(qid, cb){
-    loadQuestionStats().then(function(map){ cb(map[qid] || null); });
-  };
-  window.shFillClassData = function(container){
-    if (!container) return;
-    var els = container.querySelectorAll('[data-role="classdata-result"]');
-    if (!els.length) return;
-    loadQuestionStats().then(function(map){
-      els.forEach(function(el){
-        var card = el.closest('[data-qid]');
-        var qid = card && card.getAttribute('data-qid');
-        var stats = qid ? map[qid] : null;
-        if (!stats || stats.attempts < 3) {
-          el.textContent = 'Not enough class answers yet.';
-          el.className = 'qcard-classdata-result';
-          return;
-        }
-        var pct = Math.round((stats.correct / stats.attempts) * 100);
-        el.textContent = pct + '% correct class-wide (' + stats.attempts + ' answered)';
-        el.className = 'qcard-classdata-result ' + (pct < 50 ? 'is-bad' : (pct >= 80 ? 'is-ok' : ''));
-      });
-    });
-  };
 
   /* ---------- update-available banner — raw fetch (not the supabase client),
      so it still works even if createClient/realtime failed above. Every deploy
@@ -737,10 +690,22 @@
      hub already uses, so this needs zero per-hub changes to work. ---------- */
   var VISIT_ID = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("visit-" + Date.now() + "-" + Math.random().toString(16).slice(2));
   var PING_INTERVAL_MS = 25000;
+  /* every hub's top-level nav uses one of two conventions: #modeSwitch
+     with data-mode (most hubs), or a plain nav.tabbar/.tabbar with data-tab
+     (gi-exam1). Detect once and share it with the mode-open click tracker
+     below so section-tracking and mode-open-tracking can never disagree
+     about which element/attribute is the source of truth. */
+  var modeSwitchEl = document.getElementById("modeSwitch");
+  var modeAttr = "mode";
+  if (!modeSwitchEl) {
+    var tabbarEl = document.querySelector("nav.tabbar, .tabbar");
+    if (tabbarEl) { modeSwitchEl = tabbarEl; modeAttr = "tab"; }
+  }
   function currentSection(){
     try {
-      var active = document.querySelector('#modeSwitch [aria-selected="true"]');
-      return (active && active.getAttribute("data-mode")) || "";
+      if (!modeSwitchEl) return "";
+      var active = modeSwitchEl.querySelector('[aria-selected="true"]');
+      return (active && active.getAttribute("data-" + modeAttr)) || "";
     } catch (e) { return ""; }
   }
   function pingActivity(){
@@ -777,12 +742,6 @@
       sessionCorrectStreak = 0;
     }
   });
-  var modeSwitchEl = document.getElementById("modeSwitch");
-  var modeAttr = "mode";
-  if (!modeSwitchEl) {
-    var tabbarEl = document.querySelector("nav.tabbar, .tabbar");
-    if (tabbarEl) { modeSwitchEl = tabbarEl; modeAttr = "tab"; }
-  }
   if (modeSwitchEl) {
     modeSwitchEl.addEventListener("click", function(e){
       var t = e.target.closest("[data-" + modeAttr + "]");
@@ -889,15 +848,16 @@
     '<button type="button" data-val="default">Default</button>' +
     '<button type="button" data-val="large">Large</button>' +
     '<button type="button" data-val="xlarge">X-Large</button>' +
+    '<button type="button" data-val="xxlarge">XX-Large</button>' +
     '</div></div>' +
     '<div class="shset-row"><label>Background music</label>' +
     '<div class="shset-seg" data-pref="music">' +
     '<button type="button" data-val="off">Off</button>' +
-    '<button type="button" data-val="pad">Ambient</button>' +
     '<button type="button" data-val="rain">Soft rain</button>' +
     '<button type="button" data-val="waves">Ocean waves</button>' +
+    '<button type="button" data-val="cafe">Coffee shop</button>' +
     '<button type="button" data-val="lofi">Lo-fi keys</button>' +
-    '<button type="button" data-val="focus">Focus tone</button>' +
+    '<button type="button" data-val="piano">Piano</button>' +
     '</div>' +
     '<input type="range" id="shset-volume" min="0" max="100">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
