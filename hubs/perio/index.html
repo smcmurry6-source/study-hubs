@@ -156,6 +156,21 @@ button{font-family:inherit;}
   font-family:var(--font-mono);background:var(--teal-soft);color:var(--teal-ink);
   border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;
 }
+/* Back-to-index icon button, sitting in the header ribbon itself (see
+   sh-ribbon-back in widget/v3.js) instead of a separate fixed bar above it. */
+.hub-back-btn{
+  appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);
+  width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+  flex:none;align-self:center;text-decoration:none;transition:border-color .15s,color .15s;
+}
+.hub-back-btn:hover{color:var(--ink);border-color:var(--line-strong);}
+.hub-back-btn svg{width:16px;height:16px;}
+/* Name badge, same ribbon -- hidden until a display name is set in Settings. */
+.hub-name-pill{
+  appearance:none;cursor:pointer;font-family:var(--font-body);background:var(--surface-2);color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;
+}
+.hub-name-pill:hover{color:var(--ink);border-color:var(--line-strong);}
 
 /* Chart-tab style mode switcher */
 #modeSwitch{
@@ -504,10 +519,12 @@ footer.hub-footer{
   <header class="hub-header">
     <div class="hub-header-top">
       <div class="hub-title">
+        <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
         <h1>Periodontology D2 Compendium</h1>
         <span class="hub-subtitle">Course #2145 &middot; Fall</span>
       </div>
       <div class="hub-meta">
+        <button id="sh-ribbon-name" class="hub-name-pill" type="button" hidden></button>
         <span class="streak-pill" id="streakPill">0 day streak</span>
         <span id="progressSummary" class="mono"></span>
       </div>

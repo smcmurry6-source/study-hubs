@@ -26,20 +26,32 @@
     }
   } catch (e) { /* stats layer is best-effort, never block the hub */ }
 
-  /* ---------- back-to-index pill (was static markup per hub; now built here) ----------
-     Lives inside a shared #sh-topbar flex row (not its own fixed element) so the
-     name badge below can sit beside it instead of stacking underneath it --
-     one compact row instead of two stacked ones. ---------- */
-  var topbar = document.createElement("div");
-  topbar.id = "sh-topbar";
-  document.body.appendChild(topbar);
-  (function(){
-    var a = document.createElement("a");
-    a.id = "shhome-pill";
-    a.href = "../../index.html";
-    a.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>All hubs</span>';
-    topbar.appendChild(a);
-  })();
+  /* ---------- back-to-index button ----------
+     Prefers a slot each hub's own sticky header/ribbon markup provides
+     (#sh-ribbon-back) so the button sits inline with content that's already
+     there, instead of a second fixed bar stacked above it -- that separate
+     bar pushed every hub's own header down by its own height just to show
+     one link. Falls back to the old fixed #sh-topbar bar (plus the
+     reserveTopClearance dance below) for any hub that hasn't added the slot
+     yet, so nothing breaks if one is ever added without it. ---------- */
+  var BACK_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg>';
+  var ribbonBack = document.getElementById("sh-ribbon-back");
+  var usingRibbon = !!ribbonBack;
+  if (usingRibbon) {
+    ribbonBack.innerHTML = BACK_ICON;
+    if (!ribbonBack.getAttribute("href")) ribbonBack.setAttribute("href", "../../index.html");
+  } else {
+    var topbar = document.createElement("div");
+    topbar.id = "sh-topbar";
+    document.body.appendChild(topbar);
+    (function(){
+      var a = document.createElement("a");
+      a.id = "shhome-pill";
+      a.href = "../../index.html";
+      a.innerHTML = BACK_ICON + '<span>All hubs</span>';
+      topbar.appendChild(a);
+    })();
+  }
 
   /* ---------- reserve top clearance so the fixed "All hubs" pill / name badge
      never sits on top of each hub's own sticky header/title. Every hub uses
@@ -56,6 +68,7 @@
      continuous bar instead of scrolled content bleeding through above the
      header. ---------- */
   function reserveTopClearance(){
+    if (usingRibbon) return; // back button + name badge live in the hub's own ribbon -- nothing fixed to reserve space for
     try{
       var bar = document.getElementById("sh-topbar");
       if(!bar) return;
@@ -530,11 +543,14 @@
     } catch (e) { /* cosmetic-only feature, never block the hub */ }
   };
 
-  var nameBadge = document.createElement("button");
-  nameBadge.id = "shname-badge";
-  nameBadge.type = "button";
-  nameBadge.hidden = true;
-  (document.getElementById("sh-topbar") || document.body).appendChild(nameBadge);
+  var nameBadge = document.getElementById("sh-ribbon-name");
+  if (!nameBadge) {
+    nameBadge = document.createElement("button");
+    nameBadge.id = "shname-badge";
+    nameBadge.type = "button";
+    nameBadge.hidden = true;
+    (document.getElementById("sh-topbar") || document.body).appendChild(nameBadge);
+  }
   function renderNameBadge(){
     var n = currentName();
     if (n) { nameBadge.textContent = "Hi, " + n; nameBadge.hidden = false; }

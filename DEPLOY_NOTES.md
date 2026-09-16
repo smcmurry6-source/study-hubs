@@ -58,6 +58,17 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-16** — Hub index: integrated the universal back button into each
+  live hub's own sticky ribbon instead of a separate fixed bar above it
+  (perio, hepatobiliary); removed a redundant duplicate background-music
+  system inside Hepatobiliary's own Lounge panel; converted all 60
+  originally free-recall questions in the archived GI Exam 1 question bank
+  (question-banks/gi1-question-bank.json) to multiple-choice with curated
+  distractors, so all 89 GI1 questions are now MCQ, and expanded
+  Hepatobiliary Mock Exam's embedded EXAM1_REVIEW_POOL from a 27-question
+  curated subset to the full 89.
+
+
 - **2026-09-15** — Hepatobiliary: GI Pharmacology + Clinical Applications for
   Dentistry lecture transcripts mined into Lecture Notes/Exam Hints/Questions
   (now 10/10 lectures, 363 questions), reconciled via 3-way merge with a

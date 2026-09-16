@@ -376,362 +376,677 @@
   {
     "id": "gi1-q24",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Involuntary response for the elimination of feces (two words)?",
-    "answer": "Defecation reflex. Rectal stretch triggers parasympathetic signaling that relaxes the internal anal sphincter and contracts the rectum; only the external sphincter stays under voluntary control.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Defecation reflex",
+      "Gastrocolic reflex",
+      "Enterogastric reflex",
+      "Gastroileal reflex"
+    ],
+    "ex": "Rectal stretch triggers parasympathetic signaling that relaxes the internal anal sphincter and contracts the rectum; only the external sphincter stays under voluntary control."
   },
   {
     "id": "gi1-q25",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Folds of the mucosa of the small intestine?",
-    "answer": "Villi. Finger-like mucosal projections covered in enterocytes and goblet cells, further amplified by the microvilli brush border on each cell.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Plicae circulares",
+      "Villi",
+      "Rugae",
+      "Taeniae coli"
+    ],
+    "ex": "Finger-like mucosal projections covered in enterocytes and goblet cells, further amplified by the microvilli brush border on each cell."
   },
   {
     "id": "gi1-q26",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Stage of digestion in which there is relaxation of the ileocecal valve?",
-    "answer": "Colonic phase. Triggered by the gastroileal reflex, letting chyme move from the ileum into the cecum.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Gastric phase",
+      "Cephalic phase",
+      "Colonic phase",
+      "Intestinal phase"
+    ],
+    "ex": "Triggered by the gastroileal reflex, letting chyme move from the ileum into the cecum."
   },
   {
     "id": "gi1-q27",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI endocrine hormone released in response to decreased caloric intake?",
-    "answer": "Ghrelin. Made mainly by the gastric fundus; rises with fasting to drive appetite and also promotes growth hormone release.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Leptin",
+      "Motilin",
+      "GLP-1",
+      "Ghrelin"
+    ],
+    "ex": "Made mainly by the gastric fundus; rises with fasting to drive appetite and also promotes growth hormone release."
   },
   {
     "id": "gi1-q28",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI paracrine that inhibits gastric secretion and gastrin release?",
-    "answer": "Somatostatin. Released by D cells once luminal pH drops below 3, shutting off both acid and gastrin as the main \"off switch.\"",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Somatostatin",
+      "Secretin",
+      "GIP",
+      "VIP"
+    ],
+    "ex": "Released by D cells once luminal pH drops below 3, shutting off both acid and gastrin as the main \"off switch.\""
   },
   {
     "id": "gi1-q29",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Fold of the peritoneum that connects the liver to the anterior abdominal wall and diaphragm?",
-    "answer": "Falciform ligament. Also carries the ligamentum teres (the obliterated fetal umbilical vein) and marks the liver's right/left lobe division anteriorly.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Hepatoduodenal ligament",
+      "Falciform ligament",
+      "Gastrosplenic ligament",
+      "Coronary ligament"
+    ],
+    "ex": "Also carries the ligamentum teres (the obliterated fetal umbilical vein) and marks the liver's right/left lobe division anteriorly."
   },
   {
     "id": "gi1-q30",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Enzyme in saliva that inhibits growth of bacteria in the oral cavity?",
-    "answer": "Lysozyme. Breaks down peptidoglycan in bacterial cell walls, especially in Gram-positive organisms.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Amylase",
+      "Mucin",
+      "Lysozyme",
+      "Lactoferrin"
+    ],
+    "ex": "Breaks down peptidoglycan in bacterial cell walls, especially in Gram-positive organisms."
   },
   {
     "id": "gi1-q31",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Incretin hormone released by the L cells of the duodenum and jejunum (abbreviation)?",
-    "answer": "GLP-1. Boosts insulin, slows gastric emptying, and suppresses appetite — the target of drugs like semaglutide.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "GIP",
+      "CCK",
+      "Secretin",
+      "GLP-1"
+    ],
+    "ex": "Boosts insulin, slows gastric emptying, and suppresses appetite — the target of drugs like semaglutide."
   },
   {
     "id": "gi1-q32",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Formed by the contraction of the taeniae coli?",
-    "answer": "Haustra. Sacculations that reform in fixed positions as the three longitudinal muscle bands shorten the colon.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Haustra",
+      "Plicae circulares",
+      "Rugae",
+      "Villi"
+    ],
+    "ex": "Sacculations that reform in fixed positions as the three longitudinal muscle bands shorten the colon."
   },
   {
     "id": "gi1-q33",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Mucoprotein essential for vitamin B12 absorption?",
-    "answer": "Intrinsic factor. Made by parietal cells; the IF–B12 complex is absorbed by receptor-mediated endocytosis in the terminal ileum.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Mucin",
+      "Intrinsic factor",
+      "Pepsinogen",
+      "Transferrin"
+    ],
+    "ex": "Made by parietal cells; the IF–B12 complex is absorbed by receptor-mediated endocytosis in the terminal ileum."
   },
   {
     "id": "gi1-q34",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Prevents backup of stomach contents?",
-    "answer": "Lower esophageal sphincter. Stays contracted at rest; its failure — excess transient relaxations — is the mechanism behind GERD.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Upper esophageal sphincter",
+      "Pyloric sphincter",
+      "Lower esophageal sphincter",
+      "Sphincter of Oddi"
+    ],
+    "ex": "Stays contracted at rest; its failure — excess transient relaxations — is the mechanism behind GERD."
   },
   {
     "id": "gi1-q35",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI paracrine released by ECL cells?",
-    "answer": "Histamine. Acts locally on nearby parietal cells via the H2 receptor to potentiate acid secretion.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Somatostatin",
+      "Serotonin",
+      "Gastrin",
+      "Histamine"
+    ],
+    "ex": "Acts locally on nearby parietal cells via the H2 receptor to potentiate acid secretion."
   },
   {
     "id": "gi1-q36",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI endocrine hormone released by the I cells of the small intestine?",
-    "answer": "CCK. Triggers gallbladder contraction, pancreatic enzyme release, and slows gastric emptying.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "CCK",
+      "Secretin",
+      "GIP",
+      "Motilin"
+    ],
+    "ex": "Triggers gallbladder contraction, pancreatic enzyme release, and slows gastric emptying."
   },
   {
     "id": "gi1-q37",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Type of papillae expressed in the tongue that functions in rasping?",
-    "answer": "Filiform. The most numerous lingual papillae; purely mechanical, no taste buds.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Fungiform papillae",
+      "Filiform",
+      "Circumvallate papillae",
+      "Foliate papillae"
+    ],
+    "ex": "The most numerous lingual papillae; purely mechanical, no taste buds."
   },
   {
     "id": "gi1-q38",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Region of small intestine containing Peyer's patches?",
-    "answer": "Ileum. Lymphoid nodules providing immune surveillance right before the ileocecal valve.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Jejunum",
+      "Duodenum",
+      "Ileum",
+      "Cecum"
+    ],
+    "ex": "Lymphoid nodules providing immune surveillance right before the ileocecal valve."
   },
   {
     "id": "gi1-q39",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Second anatomical region of the small intestine?",
-    "answer": "Jejunum. Sits between the duodenum and ileum; the primary site of nutrient absorption.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Duodenum",
+      "Ileum",
+      "Cecum",
+      "Jejunum"
+    ],
+    "ex": "Sits between the duodenum and ileum; the primary site of nutrient absorption."
   },
   {
     "id": "gi1-q40",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI neurocrine that stimulates gastrin release?",
-    "answer": "GRP (gastrin-releasing peptide). Released from vagal nerve endings onto G cells.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "GRP (gastrin-releasing peptide)",
+      "VIP",
+      "Substance P",
+      "Nitric oxide"
+    ],
+    "ex": "Released from vagal nerve endings onto G cells."
   },
   {
     "id": "gi1-q41",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Activates the cleavage of pepsinogen into pepsin?",
-    "answer": "HCl. Acid triggers the first cleavage; pepsin then autocatalyzes activation of more of itself.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Pepsin",
+      "HCl",
+      "Gastrin",
+      "Intrinsic factor"
+    ],
+    "ex": "Acid triggers the first cleavage; pepsin then autocatalyzes activation of more of itself."
   },
   {
     "id": "gi1-q42",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Region of small intestine distinguished by the presence of Brunner's glands?",
-    "answer": "Duodenum. These submucosal glands secrete alkaline mucus to neutralize the acid load arriving from the stomach.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Jejunum",
+      "Ileum",
+      "Duodenum",
+      "Stomach"
+    ],
+    "ex": "These submucosal glands secrete alkaline mucus to neutralize the acid load arriving from the stomach."
   },
   {
     "id": "gi1-q43",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Gastric cell type responsible for acid secretion?",
-    "answer": "Parietal cells. Also the source of intrinsic factor.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Chief cells",
+      "G cells",
+      "Mucous neck cells",
+      "Parietal cells"
+    ],
+    "ex": "Also the source of intrinsic factor."
   },
   {
     "id": "gi1-q44",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Branch of the abdominal aorta that supplies the foregut?",
-    "answer": "Celiac trunk. The single unpaired branch covering the abdominal esophagus through the proximal duodenum, plus liver, spleen, and pancreas.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Celiac trunk",
+      "Superior mesenteric artery",
+      "Inferior mesenteric artery",
+      "Renal artery"
+    ],
+    "ex": "The single unpaired branch covering the abdominal esophagus through the proximal duodenum, plus liver, spleen, and pancreas."
   },
   {
     "id": "gi1-q45",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Layer of the intestinal wall that contains Meissner's plexus?",
-    "answer": "Submucosa. Regulates secretion and local blood flow.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Mucosa",
+      "Submucosa",
+      "Muscularis externa",
+      "Serosa"
+    ],
+    "ex": "Regulates secretion and local blood flow."
   },
   {
     "id": "gi1-q46",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Waves of intestinal contraction during the fasting state (abbreviation)?",
-    "answer": "MMC (migrating myoelectric complex). Driven by motilin; sweeps residual food and bacteria toward the colon roughly every 90 minutes.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Peristalsis",
+      "Segmentation",
+      "MMC (migrating myoelectric complex)",
+      "Mass movement"
+    ],
+    "ex": "Driven by motilin; sweeps residual food and bacteria toward the colon roughly every 90 minutes."
   },
   {
     "id": "gi1-q47",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Nerve that innervates the diaphragm?",
-    "answer": "Phrenic nerve. Arises from C3–C5 — \"C3, 4, 5 keep the diaphragm alive.\"",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Vagus nerve",
+      "Intercostal nerves",
+      "Greater splanchnic nerve",
+      "Phrenic nerve"
+    ],
+    "ex": "Arises from C3–C5 — \"C3, 4, 5 keep the diaphragm alive.\""
   },
   {
     "id": "gi1-q48",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Serous membrane that lines the abdominal and pelvic cavities?",
-    "answer": "Peritoneum.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Peritoneum",
+      "Pleura",
+      "Pericardium",
+      "Mesentery"
+    ],
+    "ex": "A serous membrane with parietal and visceral layers; in the abdomen the parietal layer lines the cavity wall and the visceral layer covers the organs themselves."
   },
   {
     "id": "gi1-q49",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Forms the roots of a tooth and the interior of the crown?",
-    "answer": "Dentin. Sits beneath enamel and cementum, making up the bulk of the tooth.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Enamel",
+      "Dentin",
+      "Cementum",
+      "Pulp"
+    ],
+    "ex": "Sits beneath enamel and cementum, making up the bulk of the tooth."
   },
   {
     "id": "gi1-q50",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Prevents the backup of fecal material into the ileum (two words)?",
-    "answer": "Ileocecal valve.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Pyloric sphincter",
+      "Sphincter of Oddi",
+      "Ileocecal valve",
+      "Anal sphincter"
+    ],
+    "ex": "Sits at the ileum-cecum junction; relaxes during the colonic phase via the gastroileal reflex, letting chyme move forward while normally blocking reflux."
   },
   {
     "id": "gi1-q51",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Anastomoses that form between the caval and portal veins draining the anterior abdominal wall?",
-    "answer": "Caput medusae. Distended periumbilical veins — a sign of portal hypertension.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Esophageal varices",
+      "Hemorrhoids",
+      "Splenomegaly",
+      "Caput medusae"
+    ],
+    "ex": "Distended periumbilical veins — a sign of portal hypertension."
   },
   {
     "id": "gi1-q52",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Sheet of peritoneum that hangs down from the greater curvature of the stomach?",
-    "answer": "Greater omentum.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Greater omentum",
+      "Lesser omentum",
+      "Mesentery proper",
+      "Falciform ligament"
+    ],
+    "ex": "A fatty peritoneal apron draped from the greater curvature over the transverse colon and small intestine — often nicknamed the abdomen's \"policeman\" for walling off local infection."
   },
   {
     "id": "gi1-q53",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Opening that allows communication between the greater and lesser peritoneal sacs?",
-    "answer": "Epiploic foramen (foramen of Winslow). Sits posterior to the hepatoduodenal ligament.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Esophageal hiatus",
+      "Epiploic foramen (foramen of Winslow)",
+      "Inguinal canal",
+      "Umbilical ring"
+    ],
+    "ex": "Sits posterior to the hepatoduodenal ligament."
   },
   {
     "id": "gi1-q54",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Landmark used to locate the base of the appendix clinically?",
-    "answer": "McBurney's point. Two-thirds of the way from the umbilicus to the right anterior superior iliac spine.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Murphy's point",
+      "Costovertebral angle",
+      "McBurney's point",
+      "Linea semilunaris"
+    ],
+    "ex": "Two-thirds of the way from the umbilicus to the right anterior superior iliac spine."
   },
   {
     "id": "gi1-q55",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Layer of the intestinal tract that contains Auerbach's plexus?",
-    "answer": "Muscularis externa. Coordinates motility, sandwiched between the circular and longitudinal muscle layers.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "Submucosa",
+      "Mucosa",
+      "Serosa",
+      "Muscularis externa"
+    ],
+    "ex": "Coordinates motility, sandwiched between the circular and longitudinal muscle layers."
   },
   {
     "id": "gi1-q56",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Salivary gland found beneath the floor of the mouth?",
-    "answer": "Sublingual gland. Smallest of the three major salivary glands, mostly mucous secretion.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Sublingual gland",
+      "Submandibular gland",
+      "Parotid gland",
+      "Minor salivary glands"
+    ],
+    "ex": "Smallest of the three major salivary glands, mostly mucous secretion."
   },
   {
     "id": "gi1-q57",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Secreted by gastric chief cells?",
-    "answer": "Pepsinogen. The inactive precursor to pepsin.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Gastrin",
+      "Pepsinogen",
+      "Intrinsic factor",
+      "Mucus"
+    ],
+    "ex": "The inactive precursor to pepsin."
   },
   {
     "id": "gi1-q58",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Anterior region of the stomach responsible for the secretion of mucus and bicarbonate?",
-    "answer": "Study guide answer: fundus. Worth a flag — the histology lecture instead describes the cardia as the narrow, dedicated mucus/bicarbonate-secreting zone right at the esophagogastric junction, while it describes the fundus and body as parietal- and chief-cell-rich (acid- and enzyme-producing) territory. Know both terms and how each source frames it; if this one shows up, lean on whichever your professor emphasized in lecture.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Cardia",
+      "Antrum",
+      "Fundus",
+      "Body"
+    ],
+    "ex": "The study guide keys this to the fundus, but the histology lecture instead assigns mucus/bicarbonate secretion to the cardia — the narrow zone right at the esophagogastric junction — while describing the fundus and body as parietal- and chief-cell-rich (acid- and enzyme-producing) territory. Know both framings; if this appears on your exam, go with whichever your professor emphasized in lecture."
   },
   {
     "id": "gi1-q59",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI endocrine hormone released by K cells in response to glucose, amino acids, and fatty acids (abbreviation)?",
-    "answer": "GIP.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "GLP-1",
+      "CCK",
+      "Secretin",
+      "GIP"
+    ],
+    "ex": "K cells in the duodenum and proximal jejunum release GIP in response to glucose, amino acids, and fatty acids — one of the two classic incretins alongside GLP-1."
   },
   {
     "id": "gi1-q60",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Folds of the mucosa when the stomach is empty?",
-    "answer": "Rugae. Flatten out as the stomach fills and stretches.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Rugae",
+      "Villi",
+      "Plicae circulares",
+      "Haustra"
+    ],
+    "ex": "Flatten out as the stomach fills and stretches."
   },
   {
     "id": "gi1-q61",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Invagination of a proximal segment of intestine into the lumen of an adjoining distal segment?",
-    "answer": "Intussusception. Risks cutting off blood supply and causing necrosis.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Volvulus",
+      "Intussusception",
+      "Diverticulitis",
+      "Hernia"
+    ],
+    "ex": "Risks cutting off blood supply and causing necrosis."
   },
   {
     "id": "gi1-q62",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI endocrine secreted by the S cells of the duodenum?",
-    "answer": "Secretin. Triggered by duodenal acid; stimulates pancreatic and biliary bicarbonate.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "CCK",
+      "GIP",
+      "Secretin",
+      "Gastrin"
+    ],
+    "ex": "Triggered by duodenal acid; stimulates pancreatic and biliary bicarbonate."
   },
   {
     "id": "gi1-q63",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "GI neurocrine that binds to NK1 receptors?",
-    "answer": "Substance P. An excitatory (e-NANC) neurocrine that contracts smooth muscle.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "VIP",
+      "GRP",
+      "Nitric oxide",
+      "Substance P"
+    ],
+    "ex": "An excitatory (e-NANC) neurocrine that contracts smooth muscle."
   },
   {
     "id": "gi1-q64",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Stage of digestion in which the sphincter of Oddi relaxes?",
-    "answer": "Intestinal phase. Lets bile and pancreatic enzymes flow into the duodenum.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Intestinal phase",
+      "Cephalic phase",
+      "Gastric phase",
+      "Colonic phase"
+    ],
+    "ex": "Lets bile and pancreatic enzymes flow into the duodenum."
   },
   {
     "id": "gi1-q65",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Gland that produces approximately 60% of saliva?",
-    "answer": "Submandibular gland. A mixed serous/mucous gland.",
-    "src": "recall"
+    "answer": 1,
+    "src": "recall",
+    "choices": [
+      "Parotid gland",
+      "Submandibular gland",
+      "Sublingual gland",
+      "Minor salivary glands"
+    ],
+    "ex": "A mixed serous/mucous gland."
   },
   {
     "id": "gi1-q66",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Space between the parietal and visceral layers of the peritoneum?",
-    "answer": "Peritoneal cavity.",
-    "src": "recall"
+    "answer": 2,
+    "src": "recall",
+    "choices": [
+      "Retroperitoneal space",
+      "Pleural cavity",
+      "Peritoneal cavity",
+      "Mesentery"
+    ],
+    "ex": "The potential space between the parietal and visceral peritoneal layers; normally contains only a thin film of serous fluid for lubrication."
   },
   {
     "id": "gi1-q67",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Abdominal wall muscle that originates at the lower costal cartilages, thoracolumbar fascia, and iliac crest?",
-    "answer": "Transversus abdominis. The innermost of the three flank muscles, fibers running horizontally.",
-    "src": "recall"
+    "answer": 3,
+    "src": "recall",
+    "choices": [
+      "External oblique",
+      "Internal oblique",
+      "Rectus abdominis",
+      "Transversus abdominis"
+    ],
+    "ex": "The innermost of the three flank muscles, fibers running horizontally."
   },
   {
     "id": "gi1-q68",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Largest of the salivary glands?",
-    "answer": "Parotid gland. Purely serous and enzyme-rich — the major source of salivary amylase.",
-    "src": "recall"
+    "answer": 0,
+    "src": "recall",
+    "choices": [
+      "Parotid gland",
+      "Submandibular gland",
+      "Sublingual gland",
+      "Minor salivary glands"
+    ],
+    "ex": "Purely serous and enzyme-rich — the major source of salivary amylase."
   },
   {
     "id": "gi1-q69",
@@ -752,42 +1067,77 @@
   {
     "id": "gi1-q70",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "CCK inhibits:",
-    "answer": "Gastric emptying. Alongside stimulating gallbladder contraction, pancreatic enzyme release, and sphincter of Oddi relaxation, CCK's other major job is slowing the stomach down so fat has time to digest.",
-    "src": "vignette"
+    "answer": 1,
+    "src": "vignette",
+    "choices": [
+      "Gallbladder contraction",
+      "Gastric emptying",
+      "Pancreatic enzyme release",
+      "Gastric acid secretion"
+    ],
+    "ex": "Alongside stimulating gallbladder contraction, pancreatic enzyme release, and sphincter of Oddi relaxation, CCK's other major job is slowing the stomach down so fat has time to digest."
   },
   {
     "id": "gi1-q71",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Which substance, released from neurons in the GI tract, produces smooth muscle relaxation?",
-    "answer": "VIP. Mediates lower esophageal sphincter relaxation as a food bolus approaches, working together with nitric oxide.",
-    "src": "vignette"
+    "answer": 2,
+    "src": "vignette",
+    "choices": [
+      "Substance P",
+      "GRP",
+      "VIP",
+      "Acetylcholine"
+    ],
+    "ex": "Mediates lower esophageal sphincter relaxation as a food bolus approaches, working together with nitric oxide."
   },
   {
     "id": "gi1-q72",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "A 23-year-old develops severe periumbilical pain that later localizes to the right lower quadrant; she's diagnosed with appendicitis. Which nerve carried the initial, poorly-localized periumbilical pain?",
-    "answer": "Lesser splanchnic nerves. The appendix's visceral afferents run back to the T10 spinal level via these nerves — the same level that supplies umbilical skin sensation, which is why the early pain is felt around the belly button rather than in the right lower quadrant.",
-    "src": "vignette"
+    "answer": 3,
+    "src": "vignette",
+    "choices": [
+      "Greater splanchnic nerves",
+      "Pudendal nerve",
+      "Vagus nerve",
+      "Lesser splanchnic nerves"
+    ],
+    "ex": "The appendix's visceral afferents run back to the T10 spinal level via these nerves — the same level that supplies umbilical skin sensation, which is why the early pain is felt around the belly button rather than in the right lower quadrant."
   },
   {
     "id": "gi1-q73",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Secretion of which substance is inhibited by low pH?",
-    "answer": "Gastrin. Acid negatively feeds back on the G cell — partly through somatostatin — so as gastric pH drops, gastrin secretion falls off.",
-    "src": "vignette"
+    "answer": 0,
+    "src": "vignette",
+    "choices": [
+      "Gastrin",
+      "Secretin",
+      "Somatostatin",
+      "Cholecystokinin (CCK)"
+    ],
+    "ex": "Acid negatively feeds back on the G cell — partly through somatostatin — so as gastric pH drops, gastrin secretion falls off."
   },
   {
     "id": "gi1-q74",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Which substance inhibits gastric emptying?",
-    "answer": "CCK. The only GI hormone that inhibits gastric emptying under normal physiological conditions.",
-    "src": "vignette"
+    "answer": 1,
+    "src": "vignette",
+    "choices": [
+      "Secretin",
+      "CCK",
+      "Gastrin",
+      "Motilin"
+    ],
+    "ex": "The only GI hormone that inhibits gastric emptying under normal physiological conditions."
   },
   {
     "id": "gi1-q75",
@@ -808,10 +1158,17 @@
   {
     "id": "gi1-q76",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Rank the jejunum, ileum, and colon by how much water each absorbs (with feces as the final output) — greatest to smallest.",
-    "answer": "Jejunum > ileum > colon > feces. The proximal small intestine does the heavy lifting on fluid reabsorption, with each downstream segment handling progressively less — only about 100–200 mL leaves as fecal water out of the 8–9 L that enters the gut daily.",
-    "src": "vignette"
+    "answer": 2,
+    "src": "vignette",
+    "choices": [
+      "Ileum > jejunum > colon > feces",
+      "Colon > jejunum > ileum > feces",
+      "Jejunum > ileum > colon > feces",
+      "Jejunum > colon > ileum > feces"
+    ],
+    "ex": "The proximal small intestine does the heavy lifting on fluid reabsorption, with each downstream segment handling progressively less — only about 100–200 mL leaves as fecal water out of the 8–9 L that enters the gut daily."
   },
   {
     "id": "gi1-q77",
@@ -832,26 +1189,47 @@
   {
     "id": "gi1-q78",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Site of secretion of gastrin?",
-    "answer": "Gastric antrum. Specifically the antral G cells — don't confuse this with the fundus, which secretes HCl and intrinsic factor rather than gastrin.",
-    "src": "vignette"
+    "answer": 3,
+    "src": "vignette",
+    "choices": [
+      "Gastric fundus",
+      "Gastric body",
+      "Duodenum",
+      "Gastric antrum"
+    ],
+    "ex": "Specifically the antral G cells — don't confuse this with the fundus, which secretes HCl and intrinsic factor rather than gastrin."
   },
   {
     "id": "gi1-q79",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "A 10-year-old eats a cheeseburger, fries, and a shake. Presence of fat, carbohydrate, or protein in the duodenum stimulates release of which single hormone — the only one triggered by all three?",
-    "answer": "GIP. The only GI hormone triggered by all three macronutrient classes — CCK responds to fat and protein but not carbohydrate, and gastrin responds to protein in the stomach specifically, not the duodenum. Worth flagging: the study guide's own answer key spells this \"GLIP,\" which isn't a real GI hormone abbreviation — almost certainly a typo for GIP (glucose-dependent insulinotropic peptide), which is exactly the glucose-/amino-acid-/fatty-acid-responsive hormone the explanation describes. Written here as GIP.",
-    "src": "vignette"
+    "answer": 0,
+    "src": "vignette",
+    "choices": [
+      "GIP",
+      "CCK",
+      "Secretin",
+      "Gastrin"
+    ],
+    "ex": "The only GI hormone triggered by all three macronutrient classes — CCK responds to fat and protein but not carbohydrate, and gastrin responds to protein in the stomach specifically, not the duodenum. Worth flagging: the study guide's own answer key spells this \"GLIP,\" which isn't a real GI hormone abbreviation — almost certainly a typo for GIP (glucose-dependent insulinotropic peptide), which is exactly the glucose-/amino-acid-/fatty-acid-responsive hormone the explanation describes. Written here as GIP."
   },
   {
     "id": "gi1-q80",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Which hormone, released by fat and protein in the small intestine, has a major effect of decreasing gastric emptying?",
-    "answer": "CCK. The one GI hormone with a true physiological brake on gastric emptying — part of why a fat-and-protein breakfast \"sticks with you\" longer than a carb-heavy one.",
-    "src": "vignette"
+    "answer": 1,
+    "src": "vignette",
+    "choices": [
+      "Secretin",
+      "CCK",
+      "GIP",
+      "Gastrin"
+    ],
+    "ex": "The one GI hormone with a true physiological brake on gastric emptying — part of why a fat-and-protein breakfast \"sticks with you\" longer than a carb-heavy one."
   },
   {
     "id": "gi1-q81",
@@ -872,18 +1250,32 @@
   {
     "id": "gi1-q82",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "A 19-year-old is fed intravenously for several weeks after an accident and develops GI mucosal atrophy. A reduced blood level of which hormone explains this?",
-    "answer": "Gastrin. Gastrin has a major trophic (growth-promoting) role for the GI mucosa; without enteral feeding to trigger its release, the mucosa atrophies.",
-    "src": "vignette"
+    "answer": 2,
+    "src": "vignette",
+    "choices": [
+      "Cholecystokinin (CCK)",
+      "Secretin",
+      "Gastrin",
+      "Epidermal growth factor (EGF)"
+    ],
+    "ex": "Gastrin has a major trophic (growth-promoting) role for the GI mucosa; without enteral feeding to trigger its release, the mucosa atrophies."
   },
   {
     "id": "gi1-q83",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Which stimulus–mediator pairing normally inhibits gastrin release?",
-    "answer": "Acid, acting through somatostatin. Luminal acid directly stimulates somatostatin release from D cells, and somatostatin then shuts down both the parietal cell directly and G-cell gastrin release indirectly — the core negative-feedback loop that keeps gastric pH from spiraling.",
-    "src": "vignette"
+    "answer": 3,
+    "src": "vignette",
+    "choices": [
+      "Distension, acting through stretch receptors",
+      "Protein, acting through gastrin-releasing peptide",
+      "Fat, acting through CCK",
+      "Acid, acting through somatostatin"
+    ],
+    "ex": "Luminal acid directly stimulates somatostatin release from D cells, and somatostatin then shuts down both the parietal cell directly and G-cell gastrin release indirectly — the core negative-feedback loop that keeps gastric pH from spiraling."
   },
   {
     "id": "gi1-q84",
@@ -903,33 +1295,61 @@
   {
     "id": "gi1-q85",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "MMCs normally occur about every 90 minutes between meals. An absence of MMCs causes an increase in which of the following?",
-    "answer": "Intestinal bacteria. MMCs sweep residual food and bacteria out of the upper GI tract; without them, bacteria that would normally be cleared can overgrow, as in small intestinal bacterial overgrowth.",
-    "src": "vignette"
+    "answer": 0,
+    "src": "vignette",
+    "choices": [
+      "Intestinal bacteria",
+      "Gastric acid secretion",
+      "Bile flow",
+      "Pancreatic enzyme output"
+    ],
+    "ex": "MMCs sweep residual food and bacteria out of the upper GI tract; without them, bacteria that would normally be cleared can overgrow, as in small intestinal bacterial overgrowth."
   },
   {
     "id": "gi1-q86",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Mass movements — often triggered by gastric or duodenal distension — commonly lead to which of the following?",
-    "answer": "Bowel movements. Mass movements force feces into the rectum, stretching its wall and triggering the defecation reflex.",
-    "src": "vignette"
+    "answer": 1,
+    "src": "vignette",
+    "choices": [
+      "Vomiting",
+      "Bowel movements",
+      "Belching",
+      "Gastric acid secretion"
+    ],
+    "ex": "Mass movements force feces into the rectum, stretching its wall and triggering the defecation reflex."
   },
   {
     "id": "gi1-q87",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "Gastric acid is secreted after a meal. Which factors act directly on the parietal cell to stimulate acid secretion?",
-    "answer": "Gastrin, acetylcholine, and histamine. All three converge directly on the parietal cell (via CCK-B, muscarinic, and H2 receptors respectively). Somatostatin, by contrast, directly inhibits it — and ACh also stimulates gastrin release from G cells as an additional, indirect effect.",
-    "src": "vignette"
+    "answer": 2,
+    "src": "vignette",
+    "choices": [
+      "Secretin, CCK, and somatostatin",
+      "Gastrin, secretin, and VIP",
+      "Gastrin, acetylcholine, and histamine",
+      "Acetylcholine, somatostatin, and motilin"
+    ],
+    "ex": "All three converge directly on the parietal cell (via CCK-B, muscarinic, and H2 receptors respectively). Somatostatin, by contrast, directly inhibits it — and ACh also stimulates gastrin release from G cells as an additional, indirect effect."
   },
   {
     "id": "gi1-q88",
     "lec": "gi1",
-    "type": "recall",
+    "type": "mcq",
     "stem": "A healthy 21-year-old eats a big meal, then rides a bus with no bathroom for 3 hours. About 20 minutes after eating she feels a strong urge to defecate but holds it. What mechanisms occurred?",
-    "answer": "The defecation reflex still fired — feces reaching the rectum stretched its wall, triggering involuntary internal anal sphincter relaxation and rectal contraction — but she voluntarily kept the external anal sphincter contracted to override the urge until it was convenient.",
-    "src": "vignette"
+    "answer": 3,
+    "src": "vignette",
+    "choices": [
+      "The defecation reflex was suppressed entirely, so neither sphincter ever received a signal to relax.",
+      "Both the internal and external anal sphincters relaxed involuntarily, and she had no voluntary control over the urge.",
+      "The gastrocolic reflex was blocked, preventing the rectum from ever stretching enough to trigger a reflex.",
+      "The defecation reflex still fired — feces reaching the rectum stretched its wall, triggering involuntary internal anal sphincter relaxation and rectal contraction — but she voluntarily kept the external anal sphincter contracted to override the urge until it was convenient"
+    ],
+    "ex": "The urge came from a real defecation reflex — rectal stretch triggers involuntary internal anal sphincter relaxation no matter what — but voluntary control lives entirely in the external anal sphincter, which she kept contracted to override the reflex until a bathroom was available."
   }
 ]
