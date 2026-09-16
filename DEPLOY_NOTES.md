@@ -70,7 +70,15 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
   fixed a spacing bug in the renderer itself: `layout()` was assigning
   leaf rows a fixed height while `nodeBoxHTML()` sized each box to its
   actual wrapped-line count, so any 2-3-line label produced a box taller
-  than its row and visually spilled into the node below it.
+  than its row and visually spilled into the node below it. **Follow-up
+  fix, same day:** the first deploy of this feature shipped
+  `widget/v3.js` and both hub HTML files but forgot `widget/v3.css` —
+  the mind maps went live as unstyled black SVG silhouettes (no fill/
+  stroke/font rules) until a second deploy an hour later added the
+  missing CSS file. Lesson: when a change touches both `widget/v3.js`
+  and `widget/v3.css`, double-check FILES in `deploy_rollout.py`
+  includes both before running it — it's easy to edit both files and
+  only remember to list one.
 
 - **2026-09-16** — Hub index: integrated the universal back button into each
   live hub's own sticky ribbon instead of a separate fixed bar above it
