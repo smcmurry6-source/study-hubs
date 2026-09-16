@@ -58,6 +58,31 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-16** — Perio: Session 3 (Risk Assessment, Dr. Geisinger) ingested
+  from its lecture recording transcript + slide deck — flipped from
+  exam-review-guide-only to fully lectured (new reading, 2 reference tables,
+  17 new lecture-sourced questions, rewritten cram-sheet entry and mind map).
+  Session 2 (Incisions/Flaps/Sutures) enriched with a supplementary in-class
+  Q&A transcript (sub-marginal incisions, flap-thickness-by-procedure,
+  palatal graft harvesting) — 9 new questions, 1 new incision type, 1 new
+  reference table, 3 new exam hints. Question bank grew from 124 to 150.
+  Regenerated Kokoro narration (`audio/risk-assessment-full.mp3`,
+  `audio/incisions-flaps-sutures-full.mp3`) to match, per the
+  text-and-audio-must-not-drift rule above. Also fixed two pre-existing bugs
+  surfaced by testing against the larger bank (neither introduced by this
+  content work — both date from the earlier Game-mode/gameplay-progress-split
+  change, and both are general fixes in the shared `qCardHTML`/
+  `wireQuestionContainer` pattern, not perio-specific): `recordGameAnswer`
+  never dispatched the event the cutscene-trigger listener watches for, so
+  clearing a lecture by actually playing through Understory never played its
+  reward cutscene; and `SEQ_STATE`/`MATCH_STATE` (sequence/match
+  click-tracking) were keyed globally by question id instead of per-render,
+  so a sequence or match question could only ever be completed once per page
+  load, in whichever mode/view reached it first — re-encountering the same
+  question in a second context (Question Bank, then a Game encounter)
+  silently could never be completed there. Worth checking other hubs that
+  share this rendering pattern for the same two issues.
+
 - **2026-09-16** — Added data-driven lecture mind maps: a new shared
   `window.shMindMap.render()` renderer in `widget/v3.js` (generic
   hierarchical tree layout, inline SVG, horizontally scrollable) plus a
