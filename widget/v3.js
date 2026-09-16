@@ -1179,6 +1179,111 @@
     if (nInput) nInput.value = currentName();
     syncSettingsSegUI();
   }
+  /* ====================================================================
+     MIND MAP -- a generic, data-driven hierarchical diagram renderer
+     shared by every hub. A hub supplies a plain tree of
+     {label, children:[...]} nodes (any depth) plus an optional accent
+     color expression (e.g. "var(--gold)"), and this lays it out
+     left-to-right and draws it as one inline SVG -- no per-lecture
+     hand-built markup, no hardcoded positions. Root at the left, leaves
+     at the right, each node's vertical slot sized by how many leaves
+     its subtree has so siblings never overlap.
+     ==================================================================== */
+  window.shMindMap = {
+    render: function(container, tree, opts){
+      if (!container || !tree || !tree.label) return;
+      opts = opts || {};
+      var COL_W = opts.colWidth || 210;
+      var ROW_GAP = opts.rowGap || 14;
+      var PAD_X = 16, PAD_Y = 14;
+      var CHARS_PER_LINE = 20, MAX_LINES = 3, LINE_H = 14;
+
+      function wrapLabel(text){
+        var words = String(text).split(/\s+/);
+        var lines = [], cur = "";
+        words.forEach(function(w){
+          var next = cur ? cur + " " + w : w;
+          if (next.length > CHARS_PER_LINE && cur) { lines.push(cur); cur = w; }
+          else cur = next;
+        });
+        if (cur) lines.push(cur);
+        if (lines.length > MAX_LINES) {
+          lines = lines.slice(0, MAX_LINES);
+          lines[MAX_LINES - 1] = lines[MAX_LINES - 1].replace(/\s*\S*$/, "") + "…";
+        }
+        return lines;
+      }
+      // Shared by layout() (vertical spacing) and nodeBoxHTML (actual rect height) so a
+      // wrapped 3-line label always gets a tall enough row slot -- previously layout() used
+      // a fixed row height while nodeBoxHTML sized the box to line count, so any label
+      // wrapping to 2-3 lines produced a box taller than its row and it visually spilled
+      // into the next node down.
+      function boxHeightFor(lines){ return Math.max(30, lines.length * LINE_H + 14); }
+
+      var rowCursor = 0;
+      var maxDepth = 0;
+      var nodeList = [];
+      function layout(node, depth, parentXRight){
+        maxDepth = Math.max(maxDepth, depth);
+        node.__lines = wrapLabel(node.label);
+        node.__depth = depth;
+        node.__x = depth * COL_W + PAD_X;
+        var kids = node.children || [];
+        if (!kids.length) {
+          var boxH = boxHeightFor(node.__lines);
+          node.__y = rowCursor + boxH / 2 + PAD_Y;
+          rowCursor += boxH + ROW_GAP;
+        } else {
+          kids.forEach(function(c){ layout(c, depth + 1); });
+          node.__y = (kids[0].__y + kids[kids.length - 1].__y) / 2;
+        }
+        nodeList.push(node);
+      }
+      layout(tree, 0);
+
+      var width = (maxDepth + 1) * COL_W + PAD_X * 2 + 140;
+      var height = Math.max(rowCursor - ROW_GAP, 30) + PAD_Y * 2;
+
+      function nodeBoxHTML(node){
+        var lineCount = node.__lines.length;
+        var boxH = boxHeightFor(node.__lines);
+        var boxW = Math.min(COL_W - 26, 20 + Math.max.apply(null, node.__lines.map(function(l){ return l.length; })) * 6.4);
+        boxW = Math.max(boxW, 64);
+        var cls = "sh-mmap-node" + (node.__depth === 0 ? " sh-mmap-node-root" : (node.children && node.children.length ? " sh-mmap-node-branch" : " sh-mmap-node-leaf"));
+        var x = node.__x, y = node.__y;
+        var rectY = y - boxH / 2;
+        var textY = y - ((lineCount - 1) * LINE_H) / 2 + 4;
+        var tspans = node.__lines.map(function(line, i){
+          return '<tspan x="' + (x + boxW / 2) + '" y="' + (textY + i * LINE_H) + '">' + escMM(line) + '</tspan>';
+        }).join("");
+        node.__boxW = boxW; node.__boxH = boxH;
+        return '<rect class="' + cls + '" x="' + x + '" y="' + rectY + '" width="' + boxW + '" height="' + boxH + '" rx="' + (node.__depth === 0 ? 12 : 9) + '"></rect>' +
+          '<text class="sh-mmap-label" text-anchor="middle">' + tspans + '</text>';
+      }
+      function escMM(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+      // nodeBoxHTML (below) sets __boxW/__boxH on every node as it runs, so
+      // links are collected AFTER that pass, once every box's real width is known.
+      var nodesSVG = nodeList.map(nodeBoxHTML).join("");
+      var linksSVG = "";
+      (function collectLinks(node){
+        (node.children || []).forEach(function(c){
+          var x1 = node.__x + node.__boxW, y1 = node.__y;
+          var x2 = c.__x, y2 = c.__y;
+          var midX = (x1 + x2) / 2;
+          linksSVG += '<path class="sh-mmap-link" d="M' + x1 + ',' + y1 + ' C' + midX + ',' + y1 + ' ' + midX + ',' + y2 + ' ' + x2 + ',' + y2 + '"></path>';
+          collectLinks(c);
+        });
+      })(tree);
+
+      var accent = opts.accent || "var(--ink)";
+      container.innerHTML = '<div class="sh-mmap-scroll">' +
+        '<svg class="sh-mmap-svg" viewBox="0 0 ' + width + ' ' + height + '" style="min-width:' + Math.max(width, 480) + 'px; --mmap-accent:' + accent + ';">' +
+        linksSVG + nodesSVG +
+        '</svg></div>';
+    }
+  };
+
   window.shOpenSettings = function(){
     closeOtherPanels(settingsPanel);
     settingsPanel.classList.add("is-open");

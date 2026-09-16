@@ -1535,6 +1535,776 @@ function renderCourseInfo(){
   document.getElementById('compendium-content').innerHTML = html;
 }
 
+var MINDMAPS = {
+  "diagnosis-tx-planning": {
+    "label": "Diagnosis & Treatment Planning",
+    "children": [
+      {
+        "label": "Measuring attachment loss",
+        "children": [
+          {
+            "label": "PD: margin to pocket base"
+          },
+          {
+            "label": "GR: CEJ to margin (neg. if CEJ subgingival)"
+          },
+          {
+            "label": "CAL = PD + GR, the number that stages disease"
+          },
+          {
+            "label": "Deep pocket + no recession = less CAL but harder to clean"
+          }
+        ]
+      },
+      {
+        "label": "Radiographs",
+        "children": [
+          {
+            "label": "Vertical bitewings preferred over horizontal"
+          },
+          {
+            "label": "Horizontal BW can miss bone loss on one arch"
+          },
+          {
+            "label": "Panoramic: useful overview, not diagnostic alone"
+          }
+        ]
+      },
+      {
+        "label": "Health, gingivitis, or periodontitis",
+        "children": [
+          {
+            "label": "Health: PD ≤3mm, no bleeding, no CAL/bone loss"
+          },
+          {
+            "label": "Gingivitis: PD 4-5mm + BOP, NO attachment/bone loss"
+          },
+          {
+            "label": "10% BOP threshold across mouth before calling it"
+          },
+          {
+            "label": "Periodontitis: CAL + bone loss, often ≥6mm, irreversible"
+          }
+        ]
+      },
+      {
+        "label": "Intact vs. reduced periodontium",
+        "children": [
+          {
+            "label": "Intact: can be healthy or gingivitis"
+          },
+          {
+            "label": "Reduced (prior perio, recession, CL): can be healthy too"
+          },
+          {
+            "label": "Stable-on-maintenance = healthy on reduced periodontium"
+          }
+        ]
+      },
+      {
+        "label": "Recession types (RT1-3)",
+        "children": [
+          {
+            "label": "RT1: no interproximal loss, full coverage predicted"
+          },
+          {
+            "label": "RT2: some interproximal loss, partial coverage"
+          },
+          {
+            "label": "RT3: interproximal loss > buccal, coverage not attempted"
+          }
+        ]
+      },
+      {
+        "label": "Staging",
+        "children": [
+          {
+            "label": "Interdental CAL is gold standard (bone loss 2nd)"
+          },
+          {
+            "label": "Stage 3 vs 4: split by tooth loss count, not CAL"
+          },
+          {
+            "label": "Auto Stage 3/4: vertical loss ≥3mm, Class II-III furcation, tooth loss"
+          },
+          {
+            "label": "Deep pockets alone never prove periodontitis"
+          }
+        ]
+      },
+      {
+        "label": "Grading",
+        "children": [
+          {
+            "label": "Default Grade B unless evidence says otherwise"
+          },
+          {
+            "label": "% bone loss / age: <0.25=A, 0.25-1.0=B, >1.0=C"
+          },
+          {
+            "label": "Heavy smoking or HbA1c ≥7% force Grade C"
+          },
+          {
+            "label": "One stage + one grade per patient (worst site rules)"
+          }
+        ]
+      },
+      {
+        "label": "Bone defect walls & treatment sequence",
+        "children": [
+          {
+            "label": "3-wall defect: best prognosis for regeneration"
+          },
+          {
+            "label": "Crater: buccal+lingual only, proximal bone gone"
+          },
+          {
+            "label": "Phase I always first: OHI, SRP, caries control"
+          },
+          {
+            "label": "Re-eval visit decides need for Phase II surgery"
+          },
+          {
+            "label": "No maintenance = ~2x tooth loss rate vs. maintained"
+          }
+        ]
+      }
+    ]
+  },
+  "incisions-flaps-sutures": {
+    "label": "Incisions, Flaps & Sutures",
+    "children": [
+      {
+        "label": "Naming incisions",
+        "children": [
+          {
+            "label": "Intrasulcular = crestal: same incision, tooth present or not"
+          },
+          {
+            "label": "More teeth included = more flap, less esthetics"
+          },
+          {
+            "label": "Vertical (releasing) incision at line angle for more access"
+          },
+          {
+            "label": "1 vertical + 3 teeth = pyramidal flap"
+          },
+          {
+            "label": "2 verticals = trapezoidal flap for major augmentation"
+          }
+        ]
+      },
+      {
+        "label": "Envelope (pouch) flap",
+        "children": [
+          {
+            "label": "Papillae never touched, buccal-only elevation"
+          },
+          {
+            "label": "Coronally advances flap over soft-tissue graft"
+          },
+          {
+            "label": "First choice for pure root-coverage cases"
+          }
+        ]
+      },
+      {
+        "label": "Flap classification axes",
+        "children": [
+          {
+            "label": "Full-thickness (w/ periosteum) vs. split-thickness"
+          },
+          {
+            "label": "Repositioned coronal (soft-tissue) vs. apical (osseous)"
+          },
+          {
+            "label": "Papilla-sparing or not"
+          },
+          {
+            "label": "Sulcular flap: no vertical, limited/hard-to-advance"
+          }
+        ]
+      },
+      {
+        "label": "Choosing suture material",
+        "children": [
+          {
+            "label": "Absorbable (gut, chromic gut, Vicryl) vs. non-absorbable"
+          },
+          {
+            "label": "Chromic gut: fastest resorb (7-10d), handles poorly"
+          },
+          {
+            "label": "PGA: braided, slow resorb (55-70d), irritates tissue"
+          },
+          {
+            "label": "PGCL: monofilament, faster (22-55d), gentle - soft tissue"
+          },
+          {
+            "label": "Silk: great handling, worst reaction, remove at 7d"
+          },
+          {
+            "label": "PTFE: high cost, used almost everywhere except soft graft"
+          }
+        ]
+      },
+      {
+        "label": "Needle geometry",
+        "children": [
+          {
+            "label": "Reverse cutting: flat side toward tissue, less tear-through"
+          },
+          {
+            "label": "Bigger curvature = deeper bite"
+          },
+          {
+            "label": "Larger suture number = smaller diameter, more knots needed"
+          }
+        ]
+      },
+      {
+        "label": "Suturing techniques",
+        "children": [
+          {
+            "label": "Single interrupted: general-purpose default"
+          },
+          {
+            "label": "Horizontal mattress: bone augmentation, watch necrosis risk"
+          },
+          {
+            "label": "Vertical mattress: papilla approximation, esthetic zone"
+          },
+          {
+            "label": "Continuous/locking: fast but one failure undoes the line"
+          }
+        ]
+      },
+      {
+        "label": "Five surgical principles",
+        "children": [
+          {
+            "label": "Firm continuous stroke, not tentative passes"
+          },
+          {
+            "label": "Keep incision away from the actual defect"
+          },
+          {
+            "label": "Verticals at the line angle of the tooth"
+          },
+          {
+            "label": "Reflect periosteum as part of the flap"
+          },
+          {
+            "label": "Flap base ≥ free edge width (blood supply)"
+          }
+        ]
+      }
+    ]
+  },
+  "risk-assessment": {
+    "label": "Risk Assessment",
+    "children": [
+      {
+        "label": "McGuire & Nunn",
+        "children": [
+          {
+            "label": "Scored per tooth"
+          },
+          {
+            "label": "Diagnostic (pre-tx) OR therapeutic (post-tx)"
+          },
+          {
+            "label": "Asks: how keepable is this tooth?"
+          }
+        ]
+      },
+      {
+        "label": "Kwok & Caton",
+        "children": [
+          {
+            "label": "Scored for whole dentition"
+          },
+          {
+            "label": "Therapeutic only"
+          },
+          {
+            "label": "Asks: will the patient reach stability overall?"
+          }
+        ]
+      },
+      {
+        "label": "Miller & McEntire",
+        "children": [
+          {
+            "label": "Molars only"
+          },
+          {
+            "label": "Therapeutic only"
+          },
+          {
+            "label": "Asks: how likely is this molar to be retained?"
+          }
+        ]
+      },
+      {
+        "label": "High-yield distinction",
+        "children": [
+          {
+            "label": "Scope: tooth vs. dentition vs. molars-only"
+          },
+          {
+            "label": "Diagnostic-capable vs. therapeutic-only is testable"
+          }
+        ]
+      }
+    ]
+  },
+  "phase1-therapy": {
+    "label": "Phase I Therapy: Instrumentation",
+    "children": [
+      {
+        "label": "Diagnostic tools",
+        "children": [
+          {
+            "label": "Periodontal probe: PD at 6 sites/tooth"
+          },
+          {
+            "label": "ODU 11/12 explorer: feels for root roughness"
+          },
+          {
+            "label": "Nabers probe: furcation exams only"
+          }
+        ]
+      },
+      {
+        "label": "Supragingival scalers",
+        "children": [
+          {
+            "label": "Sickle scaler: anteriors + molar buccal/lingual"
+          },
+          {
+            "label": "S204SD9: posterior interproximal surfaces"
+          }
+        ]
+      },
+      {
+        "label": "Subgingival curettes",
+        "children": [
+          {
+            "label": "Gracey 3/4: all surfaces of anteriors (area-specific)"
+          },
+          {
+            "label": "Gracey 11/12: mesial posterior + molar buccal/lingual"
+          },
+          {
+            "label": "Gracey 15/16: alternate mesial instrument"
+          },
+          {
+            "label": "Gracey 13/14: distal surfaces of posteriors"
+          },
+          {
+            "label": "Columbia 13/14: universal, any surface"
+          }
+        ]
+      }
+    ]
+  },
+  "resective-furcation": {
+    "label": "Resective Surgery & Furcation",
+    "children": [
+      {
+        "label": "Maxillary molar furcation",
+        "children": [
+          {
+            "label": "Mesial entrance: 3mm from CEJ"
+          },
+          {
+            "label": "Buccal entrance: 3.5mm, narrowest of the three"
+          },
+          {
+            "label": "Distal entrance: 5mm, farthest out"
+          },
+          {
+            "label": "1st molar root trunk shorter → furcation reached sooner"
+          }
+        ]
+      },
+      {
+        "label": "Mandibular molar furcation",
+        "children": [
+          {
+            "label": "Buccal: ~3mm from CEJ, narrow (<0.75mm)"
+          },
+          {
+            "label": "Lingual: >4mm apical, wider (>0.75mm)"
+          },
+          {
+            "label": "Mesial root: hourglass cross-section (wide B-L)"
+          },
+          {
+            "label": "Distal root concavities also possible"
+          }
+        ]
+      },
+      {
+        "label": "Maxillary premolars",
+        "children": [
+          {
+            "label": "Bifurcated ~40% of the time"
+          },
+          {
+            "label": "Shallow 0.5mm buccal-root concavity"
+          },
+          {
+            "label": "Entrance ~8mm from CEJ, ~0.7mm wide"
+          }
+        ]
+      },
+      {
+        "label": "Treatment by furcation class",
+        "children": [
+          {
+            "label": "Class I: SRP + furcation plasty"
+          },
+          {
+            "label": "Class II: tunnel prep, root resection, extraction, or GTR (mandibular)"
+          },
+          {
+            "label": "Class III: tunnel prep, root resection, or extraction"
+          }
+        ]
+      },
+      {
+        "label": "Bone architecture",
+        "children": [
+          {
+            "label": "Positive: interdental bone coronal (normal)"
+          },
+          {
+            "label": "Flat"
+          },
+          {
+            "label": "Reverse/negative: bone apical → osseous crater"
+          },
+          {
+            "label": "Resective surgery corrects reverse architecture"
+          }
+        ]
+      }
+    ]
+  },
+  "periodontal-regeneration": {
+    "label": "Periodontal Regeneration",
+    "children": [
+      {
+        "label": "Favorable defect window",
+        "children": [
+          {
+            "label": "Intrabony, depth >3mm, angle <25° to root"
+          },
+          {
+            "label": "Ideally 3 bony walls remaining"
+          },
+          {
+            "label": "1-wall defect or thin scalloped biotype: less predictable"
+          }
+        ]
+      },
+      {
+        "label": "Enamel matrix derivative (EMD)",
+        "children": [
+          {
+            "label": "Amelogenin extract (enamel/attachment formation proteins)"
+          },
+          {
+            "label": "Similar outcomes to GTR, alone or with graft"
+          }
+        ]
+      },
+      {
+        "label": "rhPDGF-BB",
+        "children": [
+          {
+            "label": "Recombinant growth factor"
+          },
+          {
+            "label": "Chemotactic + mitogenic for bone/PDL cells"
+          },
+          {
+            "label": "Angiogenic: drives revascularization"
+          }
+        ]
+      },
+      {
+        "label": "β-TCP scaffold",
+        "children": [
+          {
+            "label": "Osteoconductive matrix"
+          },
+          {
+            "label": "Prevents soft-tissue collapse into defect"
+          },
+          {
+            "label": "Stabilizes clot while bone fills in"
+          }
+        ]
+      }
+    ]
+  },
+  "implants-perio": {
+    "label": "Implants in Perio Patients",
+    "children": [
+      {
+        "label": "Implant success criteria",
+        "children": [
+          {
+            "label": "Immobile, no radiolucency, no pain/infection/paresthesia"
+          },
+          {
+            "label": "<0.2mm vertical bone loss per year after 1st year"
+          }
+        ]
+      },
+      {
+        "label": "Smoking",
+        "children": [
+          {
+            "label": "Microbiologic: harder to eradicate Aa, Pg, Bf"
+          },
+          {
+            "label": "Immunologic: ↓neutrophil function, ↓T/B cells, ↑IL-6/TNF-α"
+          },
+          {
+            "label": "Physiologic: nicotine impairs revascularization"
+          }
+        ]
+      },
+      {
+        "label": "Diabetes",
+        "children": [
+          {
+            "label": "No added risk with optimal glycemic control"
+          },
+          {
+            "label": "Contraindicated when control is poor"
+          }
+        ]
+      },
+      {
+        "label": "Genetics",
+        "children": [
+          {
+            "label": "IL-1 polymorphism: hyper-responsive inflammation"
+          },
+          {
+            "label": "IL-1(+) + smoking: synergistic, not just additive, risk"
+          }
+        ]
+      }
+    ]
+  },
+  "antibiotics-host-mod": {
+    "label": "Antibiotics & Host Modulation",
+    "children": [
+      {
+        "label": "Core principle",
+        "children": [
+          {
+            "label": "Always adjunctive — never stand-alone treatment"
+          }
+        ]
+      },
+      {
+        "label": "Beta-lactams",
+        "children": [
+          {
+            "label": "Amoxicillin/Augmentin: bactericidal, gram +/-"
+          },
+          {
+            "label": "Cephalosporins: similar coverage"
+          }
+        ]
+      },
+      {
+        "label": "Clindamycin",
+        "children": [
+          {
+            "label": "Binds 50S ribosomal subunit"
+          },
+          {
+            "label": "Risk: pseudomembranous colitis"
+          }
+        ]
+      },
+      {
+        "label": "Tetracycline",
+        "children": [
+          {
+            "label": "Bacteriostatic, binds 30S subunit"
+          },
+          {
+            "label": "Indicated when A. actinomycetemcomitans present"
+          },
+          {
+            "label": "Blocked by dairy/antacids; stains developing teeth"
+          }
+        ]
+      },
+      {
+        "label": "Macrolides",
+        "children": [
+          {
+            "label": "Erythromycin, azithromycin, clarithromycin: bind 50S"
+          },
+          {
+            "label": "Azithromycin: away from food"
+          },
+          {
+            "label": "Clarithromycin: avoid in pregnancy"
+          }
+        ]
+      },
+      {
+        "label": "Metronidazole",
+        "children": [
+          {
+            "label": "Bactericidal, obligate anaerobes/spirochetes only"
+          },
+          {
+            "label": "The ANUG drug, often paired with amoxicillin"
+          }
+        ]
+      },
+      {
+        "label": "Ciprofloxacin",
+        "children": [
+          {
+            "label": "Inhibits bacterial DNA gyrase"
+          },
+          {
+            "label": "Better absorbed with food (opposite of azithromycin)"
+          },
+          {
+            "label": "Phototoxicity risk"
+          }
+        ]
+      },
+      {
+        "label": "Local drug delivery",
+        "children": [
+          {
+            "label": "PerioChip: chlorhexidine in gelatin matrix"
+          },
+          {
+            "label": "Atridox: doxycycline; no brush/floss/eat x7 days"
+          },
+          {
+            "label": "Arestin: minocycline; no brush x12h, floss x10 days"
+          }
+        ]
+      },
+      {
+        "label": "Host modulation",
+        "children": [
+          {
+            "label": "NSAIDs: block PGE2 bone resorption, need daily dosing"
+          },
+          {
+            "label": "Bisphosphonates: inhibit resorption, osteonecrosis risk"
+          },
+          {
+            "label": "Periostat: sub-antimicrobial dose, inhibits collagenase"
+          }
+        ]
+      }
+    ]
+  },
+  "perio-plastic-esthetics": {
+    "label": "Periodontal Plastic & Esthetics",
+    "children": [
+      {
+        "label": "Recession & RT grading",
+        "children": [
+          {
+            "label": "Most common: buccal of max. molars, mand. incisors"
+          },
+          {
+            "label": "Increases with age"
+          },
+          {
+            "label": "RT1/RT2/RT3 decides if coverage is worth attempting"
+          }
+        ]
+      },
+      {
+        "label": "Soft-tissue grafting",
+        "children": [
+          {
+            "label": "CTG: connective tissue only, covered by flap"
+          },
+          {
+            "label": "FGG: epithelium + CT, left exposed"
+          },
+          {
+            "label": "Allograft (acellular dermal matrix): spares 2nd site"
+          },
+          {
+            "label": "Deep palatal vault = most harvest room"
+          }
+        ]
+      },
+      {
+        "label": "Gingival excess & treatment",
+        "children": [
+          {
+            "label": "Pseudopocket: hygiene + scaling"
+          },
+          {
+            "label": "Drug-induced: gingivectomy + hygiene + med discussion"
+          },
+          {
+            "label": "Excess display: gingivectomy or apically positioned flap"
+          }
+        ]
+      },
+      {
+        "label": "Altered passive eruption",
+        "children": [
+          {
+            "label": "Type 1 (wide, MGJ apical) vs. Type 2 (normal, MGJ at CEJ)"
+          },
+          {
+            "label": "Subcat A (crest >1mm away) vs. B (crest close)"
+          },
+          {
+            "label": "1A: gingivectomy alone; 2A: apically positioned flap alone"
+          },
+          {
+            "label": "Both B: need flap + osseous surgery (bone is limiting)"
+          }
+        ]
+      },
+      {
+        "label": "Esthetic proportions",
+        "children": [
+          {
+            "label": "Increased lower-face third → vertical maxillary excess"
+          },
+          {
+            "label": "Upper lip at rest: ~20-22mm (F), ~22-24mm (M)"
+          },
+          {
+            "label": "Lateral incisor margin ~1mm coronal to central/canine line"
+          },
+          {
+            "label": "Width ratio: central 1.6 : lateral 1 : canine 0.6"
+          }
+        ]
+      }
+    ]
+  }
+};
+
 function gotoLecture(lecId){
   COMPENDIUM_VIEW = 'lecture-notes';
   COMPENDIUM_SELECTED_LEC = lecId;
@@ -1569,7 +2339,39 @@ function renderLectureNotes(){
     '</div>' +
     '<div class="reading-prose">' + (READINGS[l.id] || '<p>Notes coming soon.</p>') + '</div>' +
     '</div>';
+
+  var mmap = (typeof MINDMAPS !== 'undefined') ? MINDMAPS[l.id] : null;
+  if(mmap){
+    html += '<div class="card" id="sh-mmap-card">' +
+      '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">' +
+      '<div><h4 style="font-size:.92rem;">Mind map</h4><p class="muted-note" style="margin-top:2px;">See how this session\'s ideas connect at a glance.</p></div>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="sh-mmap-toggle" data-mmap-open="0">Show mind map</button>' +
+      '</div>' +
+      '<div id="sh-mmap-container" style="display:none; margin-top:14px;"></div>' +
+      '</div>';
+  }
+
   document.getElementById('compendium-content').innerHTML = html;
+  var mmapBtn = document.getElementById('sh-mmap-toggle');
+  if(mmapBtn){
+    mmapBtn.addEventListener('click', function(){
+      var cont = document.getElementById('sh-mmap-container');
+      var isOpen = mmapBtn.getAttribute('data-mmap-open')==='1';
+      if(isOpen){
+        cont.style.display = 'none';
+        mmapBtn.setAttribute('data-mmap-open','0');
+        mmapBtn.textContent = 'Show mind map';
+      } else {
+        if(!cont.dataset.rendered && window.shMindMap){
+          window.shMindMap.render(cont, mmap, {accent: 'var(--tag-'+l.tag+')'});
+          cont.dataset.rendered = '1';
+        }
+        cont.style.display = 'block';
+        mmapBtn.setAttribute('data-mmap-open','1');
+        mmapBtn.textContent = 'Hide mind map';
+      }
+    });
+  }
   var ttsBtn = document.getElementById('sh-tts-btn');
   if (ttsBtn) {
     if (!window.speechSynthesis && typeof Audio === 'undefined') { ttsBtn.disabled = true; ttsBtn.title = 'Not supported in this browser'; }

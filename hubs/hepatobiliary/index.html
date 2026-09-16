@@ -3134,6 +3134,897 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
   function proseHTML(text){
     return (text||"").split(/\n\n+/).map(function(p){ return '<p>'+esc(p)+'</p>'; }).join("");
   }
+  // Data-driven mind maps for the Lecture Notes tab -- one tree per
+  // lecture id, {label, children:[...]}. Rendered on demand by the
+  // shared window.shMindMap.render() in widget/v3.js; nothing here is
+  // hand-built markup, just data.
+  var MINDMAPS = {
+  "panc-bili": {
+    "label": "Pancreatic & Biliary Secretion",
+    "children": [
+      {
+        "label": "Acinar cells",
+        "children": [
+          {
+            "label": "Zymogens: trypsinogen, chymotrypsinogen, proelastase"
+          },
+          {
+            "label": "Already active: amylase, lipase, RNase, DNase"
+          },
+          {
+            "label": "Driven by ACh (vagal) + CCK"
+          }
+        ]
+      },
+      {
+        "label": "Duct cells",
+        "children": [
+          {
+            "label": "80-90% of fluid volume, mostly water + HCO3-"
+          },
+          {
+            "label": "Cl-/HCO3- swap inversely with flow rate"
+          },
+          {
+            "label": "Neutralizes ~60% of duodenal acid"
+          }
+        ]
+      },
+      {
+        "label": "3-phase regulation",
+        "children": [
+          {
+            "label": "Cephalic: vagal, only ~10%"
+          },
+          {
+            "label": "Gastric: distension, vagovagal reflex"
+          },
+          {
+            "label": "Intestinal (dominant): secretin + CCK + ACh"
+          }
+        ]
+      },
+      {
+        "label": "Bile formation & recycling",
+        "children": [
+          {
+            "label": "Primary bile acids from cholesterol"
+          },
+          {
+            "label": "Enterohepatic circulation: ~90% reclaimed at ileum"
+          },
+          {
+            "label": "Gallbladder concentrates bile between meals"
+          },
+          {
+            "label": "CCK: gallbladder contracts, Oddi relaxes"
+          }
+        ]
+      },
+      {
+        "label": "Bilirubin & jaundice",
+        "children": [
+          {
+            "label": "Conjugated in liver → urobilinogen in gut"
+          },
+          {
+            "label": "Prehepatic: hemolysis"
+          },
+          {
+            "label": "Intrahepatic: uptake/conjugation failure"
+          },
+          {
+            "label": "Posthepatic: obstruction"
+          }
+        ]
+      }
+    ]
+  },
+  "dig-absorb": {
+    "label": "Digestion & Absorption",
+    "children": [
+      {
+        "label": "Carbohydrates",
+        "children": [
+          {
+            "label": "Luminal amylase, then brush-border finish"
+          },
+          {
+            "label": "SGLT1: glucose + galactose, Na+-coupled"
+          },
+          {
+            "label": "Fructose: passive facilitated transport"
+          }
+        ]
+      },
+      {
+        "label": "Protein",
+        "children": [
+          {
+            "label": "Pepsin → pancreatic zymogens (inactive)"
+          },
+          {
+            "label": "Enterokinase triggers trypsin cascade"
+          },
+          {
+            "label": "Free AAs: Na+-dependent transport"
+          },
+          {
+            "label": "Di/tripeptides: PepT1, H+-coupled"
+          }
+        ]
+      },
+      {
+        "label": "Fat",
+        "children": [
+          {
+            "label": "Emulsify (mouth/stomach) → micelles"
+          },
+          {
+            "label": "Colipase anchors lipase past bile salts"
+          },
+          {
+            "label": "Short/medium-chain FA → portal vein directly"
+          },
+          {
+            "label": "Long-chain FA → chylomicrons → lymphatics"
+          }
+        ]
+      },
+      {
+        "label": "Worked example",
+        "children": [
+          {
+            "label": "Big Mac: ~25g protein, 28g fat, 47g carb"
+          }
+        ]
+      }
+    ]
+  },
+  "liver-gb-histo": {
+    "label": "Liver & Gallbladder Histology",
+    "children": [
+      {
+        "label": "Liver gross anatomy",
+        "children": [
+          {
+            "label": "~3 lb, Glisson's capsule"
+          },
+          {
+            "label": "Falciform ligament → coronary ligaments"
+          },
+          {
+            "label": "Portal vein + hepatic artery → sinusoids → central vein"
+          }
+        ]
+      },
+      {
+        "label": "Hepatic lobule",
+        "children": [
+          {
+            "label": "Hexagon: central vein + 6 portal triads"
+          },
+          {
+            "label": "Zone 1 (periportal, best O2)"
+          },
+          {
+            "label": "Zone 3 (pericentral, worst O2, first to suffer)"
+          },
+          {
+            "label": "Portal lobule = bile-flow view"
+          }
+        ]
+      },
+      {
+        "label": "Three separate channels",
+        "children": [
+          {
+            "label": "Blood: sinusoids → central vein"
+          },
+          {
+            "label": "Bile: canaliculi → canals of Hering → duct"
+          },
+          {
+            "label": "Lymph: Space of Disse → portal lymphatics"
+          }
+        ]
+      },
+      {
+        "label": "Resident cells",
+        "children": [
+          {
+            "label": "Kupffer cells: phagocytose debris/RBCs"
+          },
+          {
+            "label": "Stellate (Ito) cells: store vit A, drive fibrosis"
+          }
+        ]
+      },
+      {
+        "label": "Gallbladder",
+        "children": [
+          {
+            "label": "Concentrates bile; simple columnar + microvilli"
+          },
+          {
+            "label": "CCK + vagal input trigger release"
+          }
+        ]
+      },
+      {
+        "label": "Pancreas histology",
+        "children": [
+          {
+            "label": "Acinar (zymogens) + islets (endocrine)"
+          },
+          {
+            "label": "Centroacinar cells unique to pancreas"
+          }
+        ]
+      }
+    ]
+  },
+  "intestine-histo": {
+    "label": "Intestinal Histology",
+    "children": [
+      {
+        "label": "Small intestine regions",
+        "children": [
+          {
+            "label": "Duodenum (~25cm) → jejunum (~2.5m) → ileum (~3.5m)"
+          },
+          {
+            "label": "Amplification: plicae > villi > microvilli (~600x)"
+          }
+        ]
+      },
+      {
+        "label": "Crypt & villus cells",
+        "children": [
+          {
+            "label": "Enterocytes: brush border, chylomicrons"
+          },
+          {
+            "label": "Goblet cells: mucus, increase toward ileum"
+          },
+          {
+            "label": "Paneth cells: lysozyme, defensins"
+          },
+          {
+            "label": "Enteroendocrine: gastrin, CCK, motilin, VIP, GIP, secretin"
+          }
+        ]
+      },
+      {
+        "label": "Regional markers",
+        "children": [
+          {
+            "label": "Duodenum: Brunner's glands"
+          },
+          {
+            "label": "Ileum: Peyer's patches + M cells"
+          },
+          {
+            "label": "Jejunum: neither"
+          }
+        ]
+      },
+      {
+        "label": "Large intestine",
+        "children": [
+          {
+            "label": "Teniae coli contraction → haustra"
+          },
+          {
+            "label": "No villi or plicae; goblet density rises distally"
+          },
+          {
+            "label": "Appendix: lymphoid nodules + Paneth cells"
+          }
+        ]
+      },
+      {
+        "label": "Rectum & anal canal",
+        "children": [
+          {
+            "label": "Colorectal → transitional → squamous zones"
+          },
+          {
+            "label": "Internal sphincter: smooth, involuntary"
+          },
+          {
+            "label": "External sphincter: skeletal, voluntary"
+          }
+        ]
+      }
+    ]
+  },
+  "liver-physio": {
+    "label": "Liver Physiology",
+    "children": [
+      {
+        "label": "Zonation",
+        "children": [
+          {
+            "label": "Zone 1: gluconeogenesis, plasma proteins"
+          },
+          {
+            "label": "Zone 3: detox, glycolysis, most vulnerable"
+          }
+        ]
+      },
+      {
+        "label": "Plasma proteins (Zone 1)",
+        "children": [
+          {
+            "label": "Albumin, lipoproteins, transferrin"
+          },
+          {
+            "label": "Clotting factors -- but not factor VIII"
+          }
+        ]
+      },
+      {
+        "label": "Glucose handling",
+        "children": [
+          {
+            "label": "Insulin → glycogen storage"
+          },
+          {
+            "label": "Glucagon → glycogenolysis + gluconeogenesis"
+          },
+          {
+            "label": "G6Pase: liver-only, releases free glucose"
+          }
+        ]
+      },
+      {
+        "label": "Ammonia / urea",
+        "children": [
+          {
+            "label": "Zone 1: CPS → urea (high-capacity, low-affinity)"
+          },
+          {
+            "label": "Zone 3: glutamine synthase backup"
+          },
+          {
+            "label": "Lactulose traps NH3 as NH4+ in colon"
+          }
+        ]
+      },
+      {
+        "label": "Drug metabolism",
+        "children": [
+          {
+            "label": "Phase I: CYP450, mostly Zone 3"
+          },
+          {
+            "label": "Phase II: conjugation (glucuronide, etc)"
+          },
+          {
+            "label": "First-pass effect"
+          }
+        ]
+      },
+      {
+        "label": "Acetaminophen toxicity",
+        "children": [
+          {
+            "label": "95% safe conjugation, 5% → NAPQI"
+          },
+          {
+            "label": "Overdose depletes glutathione → Zone 3 necrosis"
+          },
+          {
+            "label": "N-acetylcysteine: replenishes glutathione"
+          }
+        ]
+      },
+      {
+        "label": "Storage & protection",
+        "children": [
+          {
+            "label": "Vitamin A (~10mo), D (~3-4mo), B12 (1-5yr)"
+          },
+          {
+            "label": "Kupffer cells clear portal bacteria"
+          },
+          {
+            "label": "Chronic injury → stellate cells → fibrosis"
+          }
+        ]
+      },
+      {
+        "label": "Lipoprotein cascade",
+        "children": [
+          {
+            "label": "Chylomicrons → LPL strips FA → remnants"
+          },
+          {
+            "label": "Liver repackages: VLDL → IDL → LDL"
+          },
+          {
+            "label": "HDL: reverse transport via SR-B1"
+          }
+        ]
+      }
+    ]
+  },
+  "fluid-lytes": {
+    "label": "Fluid & Electrolyte Transport",
+    "children": [
+      {
+        "label": "Fluid balance",
+        "children": [
+          {
+            "label": "~9L presented daily, ~99% reabsorbed"
+          },
+          {
+            "label": "Villus = absorption; crypt = secretion"
+          }
+        ]
+      },
+      {
+        "label": "Junctions",
+        "children": [
+          {
+            "label": "Tight junctions set epithelial 'leakiness'"
+          },
+          {
+            "label": "Gallbladder leaky; colon tighter than small bowel"
+          }
+        ]
+      },
+      {
+        "label": "Absorption mechanisms",
+        "children": [
+          {
+            "label": "SGLT1 (apical) + GLUT2 (basolateral)"
+          },
+          {
+            "label": "NHE3 + Cl-/HCO3- exchanger"
+          },
+          {
+            "label": "ENaC: colon only"
+          }
+        ]
+      },
+      {
+        "label": "Secretion (crypt cells)",
+        "children": [
+          {
+            "label": "NKCC1 loads Cl- in basolaterally"
+          },
+          {
+            "label": "CFTR releases Cl- apically"
+          },
+          {
+            "label": "CFTR = the cystic fibrosis defect"
+          }
+        ]
+      },
+      {
+        "label": "Vomiting",
+        "children": [
+          {
+            "label": "3 centers: CTZ, NTS, vomiting center"
+          },
+          {
+            "label": "Sequence: salivate → reverse peristalsis → expel"
+          },
+          {
+            "label": "Causes metabolic alkalosis + hypokalemia"
+          }
+        ]
+      },
+      {
+        "label": "Diarrhea mechanisms",
+        "children": [
+          {
+            "label": "Osmotic: lactose intolerance, celiac, rotavirus"
+          },
+          {
+            "label": "Motility-driven: bacterial overgrowth"
+          },
+          {
+            "label": "Secretory: cholera toxin → cAMP → CFTR"
+          },
+          {
+            "label": "Inflammatory: Crohn's, UC"
+          },
+          {
+            "label": "Causes metabolic acidosis + hypokalemia"
+          }
+        ]
+      }
+    ]
+  },
+  "liver-path": {
+    "label": "Liver & Biliary Pathology",
+    "children": [
+      {
+        "label": "Anatomy & labs",
+        "children": [
+          {
+            "label": "1400-1600g; 35% artery / 65% portal supply"
+          },
+          {
+            "label": "Function: albumin, PT, ammonia"
+          },
+          {
+            "label": "Integrity: AST, ALT, LDH"
+          },
+          {
+            "label": "Excretory: ALP, bilirubin"
+          }
+        ]
+      },
+      {
+        "label": "Patterns of injury",
+        "children": [
+          {
+            "label": "Degeneration, inflammation, necrosis, fibrosis"
+          },
+          {
+            "label": "Necrosis hits Zone 3 first"
+          },
+          {
+            "label": "Cirrhosis: bridging fibrosis + nodules"
+          }
+        ]
+      },
+      {
+        "label": "Failure & portal HTN",
+        "children": [
+          {
+            "label": "Needs 80-90% function loss"
+          },
+          {
+            "label": "Jaundice, encephalopathy, coagulopathy"
+          },
+          {
+            "label": "Portal HTN: varices, ascites, splenomegaly"
+          }
+        ]
+      },
+      {
+        "label": "Viral hepatitis",
+        "children": [
+          {
+            "label": "Hep A: fecal-oral, no chronic state"
+          },
+          {
+            "label": "Hep B: 4-10% chronic; dental relevance"
+          },
+          {
+            "label": "Hep C: 85% chronic, most transplants"
+          },
+          {
+            "label": "Hep D needs HBsAg; Hep E risky in pregnancy"
+          }
+        ]
+      },
+      {
+        "label": "Toxic & metabolic disease",
+        "children": [
+          {
+            "label": "Alcoholic: steatosis → steatohepatitis → cirrhosis"
+          },
+          {
+            "label": "Autoimmune hepatitis: women, anti-LKM/ANA/ASMA"
+          },
+          {
+            "label": "Acetaminophen: 46% of acute liver failure"
+          },
+          {
+            "label": "Hemochromatosis (iron), Wilson (copper)"
+          }
+        ]
+      },
+      {
+        "label": "Tumors & biliary disease",
+        "children": [
+          {
+            "label": "Metastases most common tumor overall"
+          },
+          {
+            "label": "HCC most common primary malignancy"
+          },
+          {
+            "label": "Cholelithiasis → cholecystitis"
+          }
+        ]
+      },
+      {
+        "label": "Dental relevance",
+        "children": [
+          {
+            "label": "Hep C survives 5 days on surfaces"
+          },
+          {
+            "label": "Check PT/INR + platelets before bleeding procedures"
+          },
+          {
+            "label": "Reduce doses the liver metabolizes"
+          }
+        ]
+      }
+    ]
+  },
+  "gi-path": {
+    "label": "GI Pathology",
+    "children": [
+      {
+        "label": "Esophagus",
+        "children": [
+          {
+            "label": "Reflux vs eosinophilic esophagitis"
+          },
+          {
+            "label": "Barrett esophagus: needs dysplasia call"
+          },
+          {
+            "label": "Varices; SCC declining, adenoCA rising"
+          }
+        ]
+      },
+      {
+        "label": "Stomach: gastritis",
+        "children": [
+          {
+            "label": "Oxyntic (fundus/body) vs mucous (cardia/antrum)"
+          },
+          {
+            "label": "H. pylori, reactive, iron pill, autoimmune"
+          },
+          {
+            "label": "H. pylori urease → ammonia, a 'double hit'"
+          }
+        ]
+      },
+      {
+        "label": "Gastric tumors",
+        "children": [
+          {
+            "label": "GIST: interstitial cells of Cajal, KIT mutation"
+          },
+          {
+            "label": "Polyps: fundic gland, hyperplastic, adenomatous"
+          },
+          {
+            "label": "Adenocarcinoma + MALT lymphoma"
+          }
+        ]
+      },
+      {
+        "label": "Small bowel / appendix",
+        "children": [
+          {
+            "label": "Celiac disease: villous flattening spectrum"
+          },
+          {
+            "label": "Appendicitis: obstruction → distention → invasion"
+          }
+        ]
+      },
+      {
+        "label": "Colon: mechanical",
+        "children": [
+          {
+            "label": "Ischemic colitis: watershed zones"
+          },
+          {
+            "label": "Herniation, adhesions, volvulus, intussusception"
+          },
+          {
+            "label": "Diverticular disease vs diverticulitis"
+          }
+        ]
+      },
+      {
+        "label": "Colon: inflammatory",
+        "children": [
+          {
+            "label": "Pseudomembranous colitis (C. diff)"
+          },
+          {
+            "label": "Crohn's: transmural, skip lesions"
+          },
+          {
+            "label": "UC: continuous, mucosal only"
+          }
+        ]
+      },
+      {
+        "label": "Colorectal cancer",
+        "children": [
+          {
+            "label": "Adenoma-carcinoma sequence"
+          },
+          {
+            "label": "Left-sided obstructs early; right-sided bleeds occultly"
+          },
+          {
+            "label": "FAP (APC gene) vs HNPCC/Lynch"
+          }
+        ]
+      }
+    ]
+  },
+  "gi-pharm": {
+    "label": "GI Pharmacology",
+    "children": [
+      {
+        "label": "Acid secretion & NSAIDs",
+        "children": [
+          {
+            "label": "ACh, histamine, gastrin drive acid"
+          },
+          {
+            "label": "Prostaglandins protect; NSAIDs remove that"
+          },
+          {
+            "label": "GERD ties to dental erosion + bruxism"
+          }
+        ]
+      },
+      {
+        "label": "Acid suppression",
+        "children": [
+          {
+            "label": "PPIs: irreversible, 3-4 days to max effect"
+          },
+          {
+            "label": "H2 blockers: faster, tolerance develops"
+          },
+          {
+            "label": "H. pylori: triple/quadruple therapy"
+          }
+        ]
+      },
+      {
+        "label": "Antacids",
+        "children": [
+          {
+            "label": "NaHCO3, CaCO3, Mg(OH)2 + Al(OH)3"
+          },
+          {
+            "label": "Space 4h before / 2h after other drugs"
+          }
+        ]
+      },
+      {
+        "label": "Antidiarrheals",
+        "children": [
+          {
+            "label": "Loperamide: peripheral, no addiction risk"
+          },
+          {
+            "label": "Bismuth subsalicylate: multi-mechanism"
+          }
+        ]
+      },
+      {
+        "label": "Antiemetics",
+        "children": [
+          {
+            "label": "Scopolamine: vestibular/muscarinic"
+          },
+          {
+            "label": "D2 antagonists: extrapyramidal symptom risk"
+          },
+          {
+            "label": "5HT3 'setrons': first-line chemo/postop"
+          }
+        ]
+      },
+      {
+        "label": "IBD drugs",
+        "children": [
+          {
+            "label": "Sulfasalazine → 5-ASA for UC"
+          },
+          {
+            "label": "Glucocorticoids: induce, don't maintain"
+          },
+          {
+            "label": "Azathioprine, methotrexate for Crohn's"
+          },
+          {
+            "label": "Anti-TNF biologics; vedolizumab (gut-selective)"
+          }
+        ]
+      }
+    ]
+  },
+  "dental": {
+    "label": "Clinical Applications for Dentistry",
+    "children": [
+      {
+        "label": "Bone & TMJ",
+        "children": [
+          {
+            "label": "Osteoblasts vs osteoclasts; PTH/vit D/calcitonin"
+          },
+          {
+            "label": "Lateral pterygoid uniquely opens the jaw"
+          },
+          {
+            "label": "MRONJ risk: bisphosphonates/denosumab"
+          }
+        ]
+      },
+      {
+        "label": "GI-dental connections",
+        "children": [
+          {
+            "label": "GERD: erosion, sensitivity"
+          },
+          {
+            "label": "PUD: H. pylori / NSAIDs"
+          },
+          {
+            "label": "IBD: UC aphthous vs Crohn's cobblestone/granulomas"
+          }
+        ]
+      },
+      {
+        "label": "Liver & bleeding risk",
+        "children": [
+          {
+            "label": "Coagulopathy + altered drug metabolism"
+          },
+          {
+            "label": "Check INR before invasive tx (>3.5 defer)"
+          }
+        ]
+      },
+      {
+        "label": "Nutritional deficiencies",
+        "children": [
+          {
+            "label": "Iron: atrophic glossitis, angular cheilitis"
+          },
+          {
+            "label": "B12: burning tongue"
+          },
+          {
+            "label": "Vitamin C: gingival bleeding (scurvy)"
+          },
+          {
+            "label": "Celiac: enamel hypoplasia"
+          }
+        ]
+      },
+      {
+        "label": "Saliva",
+        "children": [
+          {
+            "label": "Amylase, buffering, antimicrobial"
+          },
+          {
+            "label": "Denture retention needs a saliva seal"
+          }
+        ]
+      },
+      {
+        "label": "Medication management",
+        "children": [
+          {
+            "label": "Long-term steroids: stress dose before procedures"
+          },
+          {
+            "label": "Immunosuppressants: infection risk"
+          },
+          {
+            "label": "Anticoagulants: watch INR thresholds"
+          }
+        ]
+      }
+    ]
+  }
+};
+
   function showLectureDetail(lecId){
     if (window.shTTS) window.shTTS.stop();
     document.querySelectorAll("#lecPillRow .pill-filter").forEach(function(b){ b.classList.toggle("is-active", b.getAttribute("data-lecpill")===lecId); });
@@ -3159,6 +4050,16 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
         + '<div class="lecture-notes-prose">'+proseHTML(notes[lvl])+'</div>'
         + '</div>';
     }
+    var mmap = (typeof MINDMAPS !== "undefined") ? MINDMAPS[lecId] : null;
+    if(mmap){
+      html += '<div class="card">'
+        + '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">'
+        + '<div><h4 style="font-size:.92rem;">Mind map</h4><p class="muted-note" style="margin-top:2px;">See how this lecture\'s ideas connect at a glance.</p></div>'
+        + '<button type="button" class="btn btn-ghost btn-sm" id="sh-mmap-toggle" data-mmap-open="0">Show mind map</button>'
+        + '</div>'
+        + '<div id="sh-mmap-container" style="display:none; margin-top:14px;"></div>'
+        + '</div>';
+    }
     if(l.status==="loaded"){
       html += '<h4 style="font-size:.92rem; margin-bottom:10px;">Questions from this lecture ('+qs.length+')</h4>';
       html += qs.map(qCardHTML).join("");
@@ -3166,6 +4067,26 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       html += '<div class="empty-state">'+icoSvg("book")+"<p>This lecture hasn't been uploaded yet. Once its slides or a recording are added, its questions will appear here automatically.</p></div>";
     }
     byId("lecDetail").innerHTML = html;
+    var mmapBtn = document.getElementById("sh-mmap-toggle");
+    if(mmapBtn){
+      mmapBtn.addEventListener("click", function(){
+        var cont = document.getElementById("sh-mmap-container");
+        var isOpen = mmapBtn.getAttribute("data-mmap-open")==="1";
+        if(isOpen){
+          cont.style.display = "none";
+          mmapBtn.setAttribute("data-mmap-open","0");
+          mmapBtn.textContent = "Show mind map";
+        } else {
+          if(!cont.dataset.rendered && window.shMindMap){
+            window.shMindMap.render(cont, mmap, {accent: "var(--"+l.tag+")"});
+            cont.dataset.rendered = "1";
+          }
+          cont.style.display = "block";
+          mmapBtn.setAttribute("data-mmap-open","1");
+          mmapBtn.textContent = "Hide mind map";
+        }
+      });
+    }
     var ttsBtn = document.getElementById("sh-tts-btn");
     if (ttsBtn) {
       if (!window.speechSynthesis && typeof Audio === "undefined") { ttsBtn.disabled = true; ttsBtn.title = "Not supported in this browser"; }

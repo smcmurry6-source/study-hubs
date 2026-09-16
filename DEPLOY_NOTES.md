@@ -58,6 +58,20 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-16** — Added data-driven lecture mind maps: a new shared
+  `window.shMindMap.render()` renderer in `widget/v3.js` (generic
+  hierarchical tree layout, inline SVG, horizontally scrollable) plus a
+  `MINDMAPS` data object per hub (10 hepatobiliary lectures, 9 perio
+  sessions, content grounded in each hub's own lecture notes/reading
+  text). A "Show mind map" toggle now appears under the lecture-notes
+  reading pane in both hubs, following the same shared-renderer/
+  hub-local-data pattern as `shGetClassStats`/`qCardHTML` — a future hub
+  only needs its own `MINDMAPS` object, not new rendering code. Also
+  fixed a spacing bug in the renderer itself: `layout()` was assigning
+  leaf rows a fixed height while `nodeBoxHTML()` sized each box to its
+  actual wrapped-line count, so any 2-3-line label produced a box taller
+  than its row and visually spilled into the node below it.
+
 - **2026-09-16** — Hub index: integrated the universal back button into each
   live hub's own sticky ribbon instead of a separate fixed bar above it
   (perio, hepatobiliary); removed a redundant duplicate background-music
