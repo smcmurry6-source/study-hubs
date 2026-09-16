@@ -54,7 +54,7 @@ if not TOKEN:
 # Edit every field below for what THIS deploy actually changes, then run.
 
 FILES = [
-    # text files, relative to repo root, forward slashes
+    "deploy_rollout.py",
 ]
 
 BINARY_FILES = [
