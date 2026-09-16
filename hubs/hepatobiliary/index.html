@@ -1370,7 +1370,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     {id:"sl07",lec:"dig-absorb",type:"mcq",src:"exam2-pollev",q:"Which condition fits bulky, greasy stools and gluten sensitivity?",ch:["Crohn's disease","Celiac disease","Zollinger-Ellison syndrome","Lactase deficiency"],a:1,ex:"Celiac disease damages small-intestinal villi via an autoimmune reaction to gluten, causing fat malabsorption (steatorrhea) alongside the gluten trigger. 81% of the class got this right."},
     {id:"sl08",lec:"gi-pharm",type:"mcq",src:"exam2-pollev",q:"Which bacterium is most associated with chronic gastritis?",ch:["Clostridium difficile","Helicobacter pylori","Escherichia coli","Campylobacter jejuni"],a:1,ex:"H. pylori colonizes the gastric mucosa and drives chronic gastritis, peptic ulcer disease, and gastric cancer risk. 93% of the class got this right."},
     {id:"sl09",lec:"intestine-histo",type:"mcq",src:"exam2-pollev",q:"Which intestinal cell type delivers luminal antigens to immune cells in Peyer's patches?",ch:["Paneth cells","Goblet cells","M cells","Enteroendocrine cells"],a:2,ex:"M (microfold) cells overlie Peyer's patches, endocytose luminal antigens, and hand them to lymphocytes waiting just beneath. 59% of the class got this right."},
-    {id:"sl10",lec:"dig-absorb",type:"mcq",src:"exam2-pollev",q:"Amiloride would impair intestinal absorption of:",ch:["Glucose","Di- and tripeptides","Fructose","Long-chain fatty acids"],a:1,ex:"PepT1-mediated di/tripeptide uptake depends on an inward H+ gradient maintained by Na+/H+ exchange; amiloride blocks that exchanger and collapses the gradient PepT1 needs. Only 29% of the class got this right — it bridges Fluid/Electrolyte Transport and Digestion & Absorption, easy to miss if you studied those lectures in isolation."},
+    {id:"sl10",lec:"dig-absorb",type:"mcq",src:"exam2-pollev",notTested:true,q:"Amiloride would impair intestinal absorption of:",ch:["Glucose","Di- and tripeptides","Fructose","Long-chain fatty acids"],a:1,ex:"PepT1-mediated di/tripeptide uptake depends on an inward H+ gradient maintained by Na+/H+ exchange; amiloride blocks that exchanger and collapses the gradient PepT1 needs — only 29% of the class got this right when it came up in the review session. Dr. Herr has since confirmed this specific question will NOT be on the actual exam, since this content wasn't covered for this class; kept here for reference only, and excluded from Mock Exam."},
     {id:"sl11",lec:"dig-absorb",type:"mcq",src:"exam2-pollev",q:"Fat enters enterocytes primarily as:",ch:["Triglycerides","Free fatty acids and monoglycerides","Chylomicrons","Cholesterol esters"],a:1,ex:"Lipase/colipase break triglycerides down to free fatty acids and monoglycerides, which diffuse into the enterocyte — triglycerides are only re-synthesized after absorption. 49% of the class got this right."},
     {id:"sl12",lec:"panc-bili",type:"mcq",src:"exam2-pollev",q:"Gallbladder hypomotility leading to gallstones may result from:",ch:["Secretin receptor knockout","CCK-A receptor knockout","Somatostatin excess","Vagal hyperactivity"],a:1,ex:"CCK acting on CCK-A receptors is the main driver of gallbladder contraction after a fatty meal; losing that receptor leaves bile stagnant and prone to stone formation. 50% of the class got this right."},
     {id:"sl13",lec:"panc-bili",type:"mcq",src:"exam2-pollev",q:"Which hormone combination most strongly stimulates pancreatic secretion?",ch:["Gastrin + Secretin + CCK","Somatostatin + Secretin","Gastrin alone","VIP + Motilin"],a:0,ex:"Secretin, CCK, and ACh act synergistically — together they produce far more secretion than any single signal alone, conserving hormone. 44% of the class got this right."},
@@ -2382,6 +2382,15 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     {id:"gi1-q88",type:"mcq",src:"exam1-vignette",q:"A healthy 21-year-old eats a big meal, then rides a bus with no bathroom for 3 hours. About 20 minutes after eating she feels a strong urge to defecate but holds it. What mechanisms occurred?",ch:["The defecation reflex was suppressed entirely, so neither sphincter ever received a signal to relax.","Both the internal and external anal sphincters relaxed involuntarily, and she had no voluntary control over the urge.","The gastrocolic reflex was blocked, preventing the rectum from ever stretching enough to trigger a reflex.","The defecation reflex still fired — feces reaching the rectum stretched its wall, triggering involuntary internal anal sphincter relaxation and rectal contraction — but she voluntarily kept the external anal sphincter contracted to override the urge until it was convenient"],a:3,ex:"The urge came from a real defecation reflex — rectal stretch triggers involuntary internal anal sphincter relaxation no matter what — but voluntary control lives entirely in the external anal sphincter, which she kept contracted to override the reflex until a bathroom was available."},
   ];
 
+  // Which EXAM1_REVIEW_POOL questions cover the salivary-gland lecture --
+  // identified by content match since the upstream pool has no per-lecture
+  // tagging (every entry's original `lec` was just "gi1"; see
+  // question-banks/gi1-question-bank.json). Added 2026-09-16 after the
+  // professor said the real exam's Exam-1-cumulative section focuses on
+  // salivary content specifically -- buildMockExamQueue() below draws the
+  // cumulative slice from this subset first so mock practice matches.
+  var EXAM1_SALIVARY_IDS = ["gi1-q5","gi1-q22","gi1-q30","gi1-q56","gi1-q65","gi1-q68"];
+
   function flagQuestion(qid){
     if(!STATE.flagged[qid]){ STATE.flagged[qid]=true; var n=Object.keys(STATE.flagged).length; if(n>STATE.maxFlagged) STATE.maxFlagged=n; }
   }
@@ -2849,7 +2858,9 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     var flagged = !!STATE.flagged[q.id];
     var head = '<div class="q-card-top"><div class="q-card-meta">'
       + '<span class="chip" data-tag="'+(lec?lec.tag:"pending")+'">'+esc(lec?lec.title:q.lec)+'</span>'
-      + '<span class="chip" data-tag="pending">'+esc(SRC_LABEL[q.src]||q.src)+'</span></div>'
+      + '<span class="chip" data-tag="pending">'+esc(SRC_LABEL[q.src]||q.src)+'</span>'
+      + (q.notTested ? '<span class="chip" data-tag="bad" title="Confirmed by the professor: not covered this semester, will not be on the exam.">Not on the exam</span>' : '')
+      + '</div>'
       + '<button class="flag-btn'+(flagged?' is-flagged':'')+'" data-flag-toggle="'+q.id+'" type="button" title="Toggle Follow-up" aria-label="Toggle follow-up flag">'+ICO_FLAG+'</button></div>';
     var body = "";
     if(q.type==="mcq"){
@@ -4487,9 +4498,18 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     return copy;
   }
   function buildMockExamQueue(){
-    var pool = QUESTIONS.filter(function(q){ return q.type==="mcq"; });
+    var pool = QUESTIONS.filter(function(q){ return q.type==="mcq" && !q.notTested; });
     var picked = shuffle(pool).slice(0, EXAM_CURRENT_Q);
-    var cumulative = shuffle(EXAM1_REVIEW_POOL.slice()).slice(0, EXAM_CUMULATIVE_Q);
+    // Draw the Exam-1 cumulative slice from the salivary-gland subset first
+    // (see EXAM1_SALIVARY_IDS above) -- only fills from the rest of
+    // EXAM1_REVIEW_POOL if that subset ever has fewer than EXAM_CUMULATIVE_Q
+    // questions in it.
+    var salivaryPool = EXAM1_REVIEW_POOL.filter(function(q){ return EXAM1_SALIVARY_IDS.indexOf(q.id) !== -1; });
+    var restPool = EXAM1_REVIEW_POOL.filter(function(q){ return EXAM1_SALIVARY_IDS.indexOf(q.id) === -1; });
+    var cumulative = shuffle(salivaryPool.slice()).slice(0, EXAM_CUMULATIVE_Q);
+    if(cumulative.length < EXAM_CUMULATIVE_Q){
+      cumulative = cumulative.concat(shuffle(restPool.slice()).slice(0, EXAM_CUMULATIVE_Q - cumulative.length));
+    }
     return shuffle(picked.concat(cumulative)).map(shuffleChoices);
   }
 
@@ -4523,7 +4543,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     var host = byId("mockExamRoot");
     host.innerHTML = '<div class="mock-setup-card">'
       + '<h3 style="margin-top:0;">Generate a Mock Exam</h3>'
-      + '<p class="muted-note">'+EXAM_TOTAL_Q+' questions, randomly drawn fresh each time you generate one — '+EXAM_CURRENT_Q+' from this material (a flat random draw across all lectures, not weighted) plus '+EXAM_CUMULATIVE_Q+' cumulative questions from Exam 1. Nothing is revealed as correct or wrong until you submit, the same way the real exam works.</p>'
+      + '<p class="muted-note">'+EXAM_TOTAL_Q+' questions, randomly drawn fresh each time you generate one — '+EXAM_CURRENT_Q+' from this material (a flat random draw across all lectures, not weighted) plus '+EXAM_CUMULATIVE_Q+' cumulative questions from Exam 1, drawn from the salivary gland lecture specifically — that\'s where your professor said the real exam\'s cumulative section focuses. Nothing is revealed as correct or wrong until you submit, the same way the real exam works.</p>'
       + '<div class="mock-duration-row"><span class="mock-duration-label">Time limit</span><div class="seg-group" id="mockDurationSeg">'
       + [45,60,75,90].map(function(m){ return '<button class="seg-btn'+(m===mockExamDurationChoice?" active":"")+'" data-mockdur="'+m+'" type="button">'+m+' min</button>'; }).join("")
       + '<button class="seg-btn'+(mockExamDurationChoice===0?" active":"")+'" data-mockdur="0" type="button">Untimed</button>'

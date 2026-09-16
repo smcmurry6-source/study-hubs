@@ -80,6 +80,7 @@
   {
     "id": "gi1-q5",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Which component of saliva primarily functions to lubricate food and protect the oral mucosa?",
     "choices": [
@@ -345,6 +346,7 @@
   {
     "id": "gi1-q22",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Saliva is important for swallowing because it:",
     "choices": [
@@ -466,6 +468,7 @@
   {
     "id": "gi1-q30",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Enzyme in saliva that inhibits growth of bacteria in the oral cavity?",
     "answer": 2,
@@ -856,6 +859,7 @@
   {
     "id": "gi1-q56",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Salivary gland found beneath the floor of the mouth?",
     "answer": 0,
@@ -991,6 +995,7 @@
   {
     "id": "gi1-q65",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Gland that produces approximately 60% of saliva?",
     "answer": 1,
@@ -1036,6 +1041,7 @@
   {
     "id": "gi1-q68",
     "lec": "gi1",
+    "topic": "salivary",
     "type": "mcq",
     "stem": "Largest of the salivary glands?",
     "answer": 0,
