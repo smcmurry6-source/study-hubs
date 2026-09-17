@@ -433,6 +433,14 @@
   var SH_VOLUME_KEY = "sh_pref_volume";
   var SH_NAME_KEY = "sh_display_name";
   var SH_VISITS_KEY = "sh_visit_count";
+  var SH_NUKE_PREF_KEY = "sh_pref_nuke_alerts";
+  var NUKE_STREAK_THRESHOLD = 50;
+  var NUKE_IMG_BASE = (function(){
+    try { return new URL("img/", thisScript.src).href; } catch (e) { return "img/"; }
+  })();
+  var NUKE_VID_BASE = (function(){
+    try { return new URL("vid/", thisScript.src).href; } catch (e) { return "vid/"; }
+  })();
   var FONT_STACKS = {
     serif: "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
     sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
@@ -625,6 +633,35 @@
     return { setTrack: setTrack, setVolume: setVolume };
   })();
 
+  /* ---------- tactical-nuke sound effects (widget/sfx/*.mp3) — same
+     script-relative-URL pattern as the background-music tracks above, so it
+     works from every hub regardless of folder depth. One-shot clips, not
+     loops: each play() call rewinds and re-triggers so a rapid re-arm still
+     sounds right. ---------- */
+  var shNukeSfx = (function(){
+    var SFX_BASE = (function(){
+      try { return new URL("sfx/", thisScript.src).href; } catch (e) { return "sfx/"; }
+    })();
+    var FILES = { unlock: "nuke-unlock.mp3", launch: "nuke-launch.mp3", blast: "nuke-blast.mp3" };
+    var els = {};
+    function elFor(name){
+      if (els[name]) return els[name];
+      var a = new Audio(SFX_BASE + FILES[name]);
+      a.preload = "auto";
+      els[name] = a;
+      return a;
+    }
+    function play(name){
+      try {
+        var a = elFor(name);
+        a.currentTime = 0;
+        var p = a.play();
+        if (p && p.catch) p.catch(function(){}); // autoplay-policy rejection is fine -- every call site is inside a user gesture (or the ANSWERED_EVENT dispatch that follows one)
+      } catch (e) {}
+    }
+    return { play: play };
+  })();
+
   /* ---------- update-available banner — raw fetch (not the supabase client),
      so it still works even if createClient/realtime failed above. Every deploy
      logs a changelog row, so a fresh row appearing after this page loaded IS
@@ -686,6 +723,11 @@
     } catch (e) { onlineCount = 1; }
     renderOnline();
   });
+  channel.on("broadcast", { event: "nuke" }, function(msg){
+    if (prefGet(SH_NUKE_PREF_KEY, "on") !== "on") return;
+    var payload = (msg && msg.payload) || {};
+    playNukeSequence(payload.name || "Someone");
+  });
   channel.subscribe(function(status){
     if (status === "SUBSCRIBED") {
       channel.track({ online_at: new Date().toISOString() });
@@ -743,6 +785,7 @@
   });
 
   var sessionCorrectStreak = 0;
+  var nukeReady = false;
   document.addEventListener(ANSWERED_EVENT, function(e){
     var d = (e && e.detail) || {};
     var isCorrect = !!d.correct;
@@ -753,6 +796,11 @@
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
         fireConfetti();
         showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "! 🔥");
+      }
+      if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady) {
+        nukeReady = true;
+        showNukeBadge();
+        showStreakToast(shGreet("Tactical nuke ready") + " ☢️");
       }
     } else {
       sessionCorrectStreak = 0;
@@ -806,6 +854,204 @@
         }
       })(i);
     }
+  }
+
+  /* ---------- tactical nuke: earned after NUKE_STREAK_THRESHOLD correct
+     answers in a row (session-only streak, resets on reload). Broadcasts
+     over the same per-hub presence channel everyone already joins, so the
+     countdown/blast plays live for everyone currently on THIS hub -- no new
+     Supabase table, nothing persisted or logged. ---------- */
+  var nukeBadgeEl = null;
+  var nukeArmed = false;
+  var nukeArmedTimer = null;
+
+  function showNukeBadge(){
+    if (nukeBadgeEl) return;
+    shNukeSfx.play("unlock");
+    nukeBadgeEl = document.createElement("button");
+    nukeBadgeEl.type = "button";
+    nukeBadgeEl.id = "sh-nuke-badge";
+    nukeBadgeEl.innerHTML = '<span class="sh-nuke-icon sh-nuke-icon-md" aria-hidden="true"></span><span class="sh-nuke-badge-label">Tactical Nuke Ready</span>';
+    nukeBadgeEl.setAttribute("aria-label", "Tactical nuke ready -- tap to call it in");
+    document.body.appendChild(nukeBadgeEl);
+    requestAnimationFrame(function(){ if (nukeBadgeEl) nukeBadgeEl.classList.add("is-shown"); });
+    nukeBadgeEl.addEventListener("click", handleNukeBadgeClick);
+  }
+  function hideNukeBadge(){
+    if (!nukeBadgeEl) return;
+    var el = nukeBadgeEl;
+    nukeBadgeEl = null;
+    nukeArmed = false;
+    clearTimeout(nukeArmedTimer);
+    el.classList.remove("is-shown");
+    setTimeout(function(){ el.remove(); }, 300);
+  }
+  function handleNukeBadgeClick(){
+    if (!nukeBadgeEl) return;
+    if (!nukeArmed) {
+      nukeArmed = true;
+      nukeBadgeEl.classList.add("is-armed");
+      nukeBadgeEl.querySelector(".sh-nuke-badge-label").textContent = "Confirm strike?";
+      clearTimeout(nukeArmedTimer);
+      nukeArmedTimer = setTimeout(function(){
+        if (!nukeBadgeEl) return;
+        nukeArmed = false;
+        nukeBadgeEl.classList.remove("is-armed");
+        nukeBadgeEl.querySelector(".sh-nuke-badge-label").textContent = "Tactical Nuke Ready";
+      }, 4000);
+      return;
+    }
+    clearTimeout(nukeArmedTimer);
+    launchNuke();
+  }
+  function launchNuke(){
+    var name = currentName() || "Someone";
+    hideNukeBadge();
+    sessionCorrectStreak = 0;
+    nukeReady = false;
+    shNukeSfx.play("launch");
+    safeRpc("record_nuke_launch", { p_hub: HUB, p_visitor: VISITOR_ID, p_name: name });
+    try { channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {}
+    playNukeSequence(name);
+  }
+  function playNukeSequence(name){
+    var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    // Non-reduced-motion's countdown is paced to match the real length of the
+    // countdown-fx video below (baked-in 10.0 -> 0.0 digits, ending in its own
+    // flash around the 13s mark) so our timer and its on-screen numbers reach
+    // zero together without needing to distort its playback rate.
+    var startAt = reduceMotion ? 3 : 13;
+    document.body.classList.add("sh-nuke-active");
+    var overlay = document.createElement("div");
+    overlay.className = "sh-nuke-overlay";
+    overlay.innerHTML =
+      '<div class="sh-nuke-banner"><span class="sh-nuke-icon sh-nuke-icon-sm" aria-hidden="true"></span><span>' + esc(name) + ' has called in a tactical strike</span></div>' +
+      '<div class="sh-nuke-stage">' +
+        '<img class="sh-nuke-photo sh-nuke-photo-cloud" src="' + NUKE_IMG_BASE + 'nuke-cloud.webp" alt="" aria-hidden="true">' +
+        '<video class="sh-nuke-photo sh-nuke-video" muted playsinline preload="auto" aria-hidden="true"><source src="' + NUKE_VID_BASE + 'nuke-blast-cloud.webm" type="video/webm"><source src="' + NUKE_VID_BASE + 'nuke-blast-cloud.mp4" type="video/mp4"></video>' +
+        (reduceMotion ?
+          '<div class="sh-nuke-countdown"><span class="sh-nuke-icon sh-nuke-icon-lg" aria-hidden="true"></span><span class="sh-nuke-count">' + startAt.toFixed(2) + '</span></div>' :
+          '<div class="sh-nuke-countdown sh-nuke-countdown-fx">' +
+            '<canvas class="sh-nuke-countdown-canvas" aria-hidden="true"></canvas>' +
+            '<video class="sh-nuke-countdown-video" muted playsinline preload="auto"><source src="' + NUKE_VID_BASE + 'nuke-countdown-fx.webm" type="video/webm"><source src="' + NUKE_VID_BASE + 'nuke-countdown-fx.mp4" type="video/mp4"></video>' +
+          '</div>') +
+      '</div>' +
+      '<div class="sh-nuke-flash" aria-hidden="true"></div>' +
+      '<div class="sh-nuke-aftermath">Direct hit. Back to studying.</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function(){ overlay.classList.add("is-shown"); });
+
+    var countEl = overlay.querySelector(".sh-nuke-count");
+    var photoCloud = overlay.querySelector(".sh-nuke-photo-cloud");
+    var blastVideo = overlay.querySelector(".sh-nuke-video");
+    var flashEl = overlay.querySelector(".sh-nuke-flash");
+    var cdCanvas = overlay.querySelector(".sh-nuke-countdown-canvas");
+    var cdVideo = overlay.querySelector(".sh-nuke-countdown-video");
+    var countdownStart = null;
+    var blastFired = false;
+
+    if (!reduceMotion && cdVideo) {
+      runNukeCountdownKeyCanvas(cdCanvas, cdVideo);
+      var cdPlay = cdVideo.play();
+      if (cdPlay && cdPlay.catch) cdPlay.catch(function(){});
+    }
+
+    function countdownFrame(ts){
+      if (!overlay.isConnected) return;
+      if (countdownStart === null) countdownStart = ts;
+      var remaining = Math.max(0, startAt - (ts - countdownStart) / 1000);
+      if (countEl) countEl.textContent = remaining.toFixed(2);
+      if (remaining > 0) {
+        requestAnimationFrame(countdownFrame);
+      } else if (!blastFired) {
+        blastFired = true;
+        triggerBlast();
+      }
+    }
+    requestAnimationFrame(countdownFrame);
+
+    function triggerBlast(){
+      overlay.classList.add("is-blast");
+      shNukeSfx.play("blast");
+      if (cdVideo) { try { cdVideo.pause(); } catch (e) {} }
+      if (reduceMotion) {
+        photoCloud.classList.add("is-shown");
+      } else {
+        overlay.classList.add("is-shaking");
+        // Whole screen snaps to solid white the instant the countdown hits zero,
+        // then fades away ~150ms later to reveal the real explosion video, which
+        // is already rolling (from t=0) behind the white the whole time.
+        flashEl.classList.add("is-flash");
+        blastVideo.currentTime = 0;
+        var playPromise = blastVideo.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(function(){
+            // Autoplay blocked for some reason -- fall back to the static cloud still.
+            photoCloud.classList.add("is-shown");
+          });
+        }
+        setTimeout(function(){
+          flashEl.classList.add("is-fading");
+          blastVideo.classList.add("is-shown");
+        }, 150);
+      }
+      var holdMs = reduceMotion ? 900 : 7800;
+      setTimeout(function(){
+        overlay.classList.add("is-fading");
+        setTimeout(function(){
+          if (overlay.parentNode) overlay.remove();
+          document.body.classList.remove("sh-nuke-active");
+        }, 1000);
+      }, holdMs);
+    }
+  }
+
+  /* ---------- countdown-fx chroma key: the countdown video (a real, spinning,
+     glowing radiation-icon countdown graphic Sam supplied, green-screened,
+     ending in its own flash around the 13s mark) is drawn to a small canvas
+     frame-by-frame, with the green screen keyed out to transparent live in
+     JS (getImageData/putImageData) so it composites over the page like any
+     other UI chrome rather than needing alpha-channel video support, which
+     isn't reliable across real browsers. Runs only outside reduced motion;
+     the reduced-motion path never touches this and shows plain text instead. ---------- */
+  function runNukeCountdownKeyCanvas(canvas, video){
+    if (!canvas || !video) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cssSize = 200;
+    canvas.width = cssSize * dpr;
+    canvas.height = cssSize * dpr;
+    var ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+    // Tight crop around the icon+number in the 640x360 source, established by
+    // sampling the non-green bounding box across several frames.
+    var SRC_X = 176, SRC_Y = 47, SRC_W = 280, SRC_H = 280;
+    var KEY_R = 0, KEY_G = 215, KEY_B = 0, TOL = 70, SOFT = 50;
+
+    function tick(){
+      if (!canvas.isConnected) return;
+      if (video.paused || video.ended || video.readyState < 2) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      try {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, SRC_X, SRC_Y, SRC_W, SRC_H, 0, 0, canvas.width, canvas.height);
+        var frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var d = frame.data;
+        for (var i = 0; i < d.length; i += 4) {
+          var r = d[i], g = d[i + 1], b = d[i + 2];
+          var dr = r - KEY_R, dg = g - KEY_G, db = b - KEY_B;
+          var dist = Math.sqrt(dr * dr + dg * dg + db * db);
+          var alpha = Math.max(0, Math.min(1, (dist - TOL) / SOFT));
+          var excessG = Math.max(0, g - Math.max(r, b));
+          d[i + 1] = g - excessG * 0.6;
+          d[i + 3] = Math.round(alpha * 255);
+        }
+        ctx.putImageData(frame, 0, 0);
+      } catch (e) {}
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 
   /* ---------- floating widget ---------- */
@@ -877,6 +1123,13 @@
     '</div>' +
     '<input type="range" id="shset-volume" min="0" max="100">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
+    '</div>' +
+    '<div class="shset-row"><label>Tactical nuke alerts</label>' +
+    '<div class="shset-seg" data-pref="nuke">' +
+    '<button type="button" data-val="on">On</button>' +
+    '<button type="button" data-val="off">Off</button>' +
+    '</div>' +
+    '<div class="shset-hint">Get ' + NUKE_STREAK_THRESHOLD + ' questions right in a row to unlock a tactical nuke you can call in. Turn this off to skip seeing other people\'s strikes (yours will still work).</div>' +
     '</div>' +
     '</div>' +
     '<div class="shstat-pillrow">' +
@@ -1162,11 +1415,18 @@
   });
 
   /* ---------- settings panel ---------- */
+  var SEG_PREF_MAP = {
+    font: { key: SH_FONT_KEY, def: "default" },
+    size: { key: SH_SIZE_KEY, def: "default" },
+    music: { key: SH_MUSIC_KEY, def: "off" },
+    nuke: { key: SH_NUKE_PREF_KEY, def: "on" }
+  };
   function syncSettingsSegUI(){
     document.querySelectorAll(".shset-seg").forEach(function(seg){
       var pref = seg.getAttribute("data-pref");
-      var key = pref === "font" ? SH_FONT_KEY : pref === "size" ? SH_SIZE_KEY : SH_MUSIC_KEY;
-      var cur = prefGet(key, pref === "music" ? "off" : "default");
+      var map = SEG_PREF_MAP[pref];
+      if (!map) return;
+      var cur = prefGet(map.key, map.def);
       seg.querySelectorAll("button").forEach(function(b){
         b.classList.toggle("is-active", b.getAttribute("data-val") === cur);
       });
@@ -1313,6 +1573,7 @@
       if (pref === "font") { prefSet(SH_FONT_KEY, val); applyFontPref(); }
       else if (pref === "size") { prefSet(SH_SIZE_KEY, val); applySizePref(); }
       else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
+      else if (pref === "nuke") { prefSet(SH_NUKE_PREF_KEY, val); }
       syncSettingsSegUI();
     });
   });

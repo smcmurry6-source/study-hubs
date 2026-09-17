@@ -60,6 +60,139 @@
 #shset-volume{width:100%; margin-top:10px; accent-color:#3ecf7e;}
 .shset-hint{font-size:10.5px; color:#7a7a80; margin-top:8px; line-height:1.4;}
 
+/* ---------- tactical nuke ---------- */
+.sh-nuke-icon{position:relative; display:inline-block; border-radius:50%; background:#1f1204; box-shadow:0 0 0 2px rgba(0,0,0,.35);}
+.sh-nuke-icon::before{content:""; position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(#2a1706 0deg 60deg, transparent 60deg 120deg, #2a1706 120deg 180deg, transparent 180deg 240deg, #2a1706 240deg 300deg, transparent 300deg 360deg),
+    radial-gradient(circle, #f5cf5a 0 22%, #e8b93f 22% 62%, #1f1204 62% 66%, transparent 66%);
+}
+.sh-nuke-icon::after{content:""; position:absolute; left:50%; top:50%; width:26%; height:26%; margin:-13% 0 0 -13%; border-radius:50%; background:#1f1204; box-shadow:0 0 0 2px #f5cf5a inset;}
+.sh-nuke-icon-sm{width:16px; height:16px;}
+.sh-nuke-icon-md{width:20px; height:20px;}
+.sh-nuke-icon-lg{width:56px; height:56px;}
+@media (prefers-reduced-motion: no-preference){
+  .sh-nuke-icon{animation:sh-nuke-icon-spin 4s linear infinite;}
+  #sh-nuke-badge.is-armed .sh-nuke-icon{animation:sh-nuke-icon-spin 1.6s linear infinite, sh-nuke-icon-pulse 1.1s ease-in-out infinite;}
+  .sh-nuke-countdown .sh-nuke-icon{animation:sh-nuke-icon-spin 1s linear infinite, sh-nuke-icon-pulse 1.1s ease-in-out infinite;}
+}
+
+#sh-nuke-badge{
+  position:fixed; right:16px; top:50%; z-index:9998;
+  display:flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg, rgba(40,24,4,.95), rgba(20,12,2,.95));
+  color:#ffe9a8; border:1px solid rgba(245,207,90,.55); border-radius:999px;
+  padding:9px 16px 9px 10px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:12.5px; font-weight:700; letter-spacing:.01em; cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.4), 0 0 0 1px rgba(245,207,90,.15);
+  transform:translateY(-50%) translateX(140%); transition:transform .35s cubic-bezier(.2,.8,.3,1);
+  -webkit-tap-highlight-color:transparent;
+}
+#sh-nuke-badge.is-shown{transform:translateY(-50%) translateX(0);}
+#sh-nuke-badge.is-armed{background:linear-gradient(135deg, rgba(90,20,8,.97), rgba(50,8,4,.97)); border-color:#f0806b; color:#ffd8cc;}
+@media (prefers-reduced-motion: no-preference){
+  #sh-nuke-badge{animation:sh-nuke-badge-pulse 2.4s ease-in-out infinite;}
+}
+
+.sh-nuke-overlay{
+  position:fixed; inset:0; z-index:999999; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:rgba(4,2,0,0); pointer-events:none;
+  opacity:0; transition:opacity .4s ease, background .4s ease;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; text-align:center;
+}
+.sh-nuke-overlay.is-shown{opacity:1; background:rgba(4,2,0,.86);}
+.sh-nuke-overlay.is-fading{opacity:0;}
+body.sh-nuke-active{overflow:hidden;}
+
+.sh-nuke-banner{
+  position:absolute; top:0; left:0; right:0; display:flex; align-items:center; justify-content:center; gap:9px;
+  padding:16px 16px; background:rgba(0,0,0,.4); color:#ffe9a8; font-size:14px; font-weight:700;
+  transform:translateY(-120%); transition:transform .5s cubic-bezier(.2,.8,.3,1) .1s;
+}
+.sh-nuke-overlay.is-shown .sh-nuke-banner{transform:translateY(0);}
+
+.sh-nuke-stage{position:relative; width:min(94vw,760px); height:min(72vh,560px); display:flex; align-items:center; justify-content:center;}
+
+/* full-screen white flash at the instant the countdown hits zero, fading away
+   shortly after to reveal the real explosion video already playing beneath it. */
+.sh-nuke-flash{position:absolute; inset:0; z-index:10; background:#fff; opacity:0; pointer-events:none;}
+.sh-nuke-flash.is-flash{opacity:1;}
+.sh-nuke-flash.is-fading{opacity:0; transition:opacity .7s ease;}
+
+/* nuke-cloud.webp (AI-generated still, true-black background) and the real explosion
+   video (nuke-blast-cloud.mp4, a cropped clip shot on near-black), both composited
+   with mix-blend-mode:screen so their dark backgrounds vanish against the overlay's
+   own dark backdrop and only the bright fire/cloud pixels show through. */
+.sh-nuke-photo{
+  position:absolute; inset:8% 2% 0; z-index:0; width:96%; height:92%;
+  object-fit:contain; object-position:center bottom;
+  mix-blend-mode:screen; opacity:0; pointer-events:none;
+  transition:opacity 1s ease;
+}
+.sh-nuke-photo.is-shown{opacity:1;}
+/* the source clip's background is a near-black (not pure #000) ambient glow --
+   a radial mask fades the video's own edges to fully transparent well before they'd
+   otherwise show as a faint tinted box, leaving only the fireball/cloud itself visible. */
+.sh-nuke-video{
+  -webkit-mask-image:radial-gradient(ellipse 45% 38% at 50% 62%, #fff 45%, transparent 100%);
+  mask-image:radial-gradient(ellipse 45% 38% at 50% 62%, #fff 45%, transparent 100%);
+}
+
+.sh-nuke-countdown{position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:14px; opacity:1; transition:opacity .3s ease, transform .3s ease;}
+.sh-nuke-overlay.is-blast .sh-nuke-countdown{opacity:0; transform:scale(1.3);}
+.sh-nuke-count{font-size:60px; font-weight:800; min-width:2.5ch; color:#ffe9a8; font-variant-numeric:tabular-nums; text-shadow:0 0 30px rgba(245,207,90,.5);}
+
+/* countdown-fx: a real green-screened countdown video (its own spinning glowing
+   radiation icon + baked-in decimal digits, keyed live to transparent on a small
+   canvas by runNukeCountdownKeyCanvas in v3.js) standing in for the plain CSS icon
+   + text-node countdown used elsewhere. The source <video> itself is never shown --
+   only the keyed canvas is visible. */
+.sh-nuke-countdown-fx{gap:0;}
+.sh-nuke-countdown-canvas{width:200px; height:200px; filter:drop-shadow(0 0 24px rgba(245,207,90,.35));}
+.sh-nuke-countdown-video{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;}
+
+.sh-nuke-aftermath{
+  position:absolute; z-index:2; bottom:4%; left:0; right:0; color:#ffe9a8; font-size:14px; font-weight:600; opacity:0;
+  text-shadow:0 1px 6px rgba(0,0,0,.6);
+}
+.sh-nuke-overlay.is-blast .sh-nuke-aftermath{animation:sh-nuke-aftermath-in .6s ease .95s forwards;}
+
+.sh-nuke-overlay.is-shaking{animation:sh-nuke-shake .5s cubic-bezier(.36,.07,.19,.97) both;}
+
+@keyframes sh-nuke-icon-pulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.35);}}
+@keyframes sh-nuke-icon-spin{to{transform:rotate(360deg);}}
+@keyframes sh-nuke-badge-pulse{0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.4), 0 0 0 1px rgba(245,207,90,.15);}50%{box-shadow:0 4px 26px rgba(245,207,90,.35), 0 0 0 5px rgba(245,207,90,.12);}}
+@keyframes sh-nuke-aftermath-in{0%{opacity:0; transform:translateY(8px);}100%{opacity:1; transform:translateY(0);}}
+@keyframes sh-nuke-shake{
+  10%,90%{transform:translate3d(-2px,0,0);} 20%,80%{transform:translate3d(4px,0,0);}
+  30%,50%,70%{transform:translate3d(-9px,0,0);} 40%,60%{transform:translate3d(9px,0,0);}
+}
+
+@media (prefers-reduced-motion: reduce){
+  #sh-nuke-badge{animation:none; transition:opacity .2s ease; transform:none;}
+  #sh-nuke-badge:not(.is-shown){opacity:0; pointer-events:none;}
+  #sh-nuke-badge.is-shown{opacity:1;}
+  .sh-nuke-icon, #sh-nuke-badge.is-armed .sh-nuke-icon, .sh-nuke-countdown .sh-nuke-icon{animation:none;}
+  .sh-nuke-overlay, .sh-nuke-banner, .sh-nuke-countdown, .sh-nuke-aftermath{
+    transition-duration:.001ms !important; animation-duration:.001ms !important;
+  }
+  .sh-nuke-overlay.is-shown .sh-nuke-banner{transform:translateY(0);}
+  .sh-nuke-overlay.is-shaking{animation:none;}
+  .sh-nuke-overlay.is-blast .sh-nuke-aftermath{opacity:1; transform:none;}
+}
+
+@media (max-width:760px){
+  #sh-nuke-badge{
+    top:auto; bottom:calc(76px + env(safe-area-inset-bottom,0px)); right:10px;
+    transform:translateX(140%); padding:8px 13px 8px 9px; font-size:11.5px;
+  }
+  #sh-nuke-badge.is-shown{transform:translateX(0);}
+  .sh-nuke-count{font-size:42px;}
+  .sh-nuke-banner{font-size:12.5px; padding:12px 12px;}
+  .sh-nuke-icon-lg{width:44px; height:44px;}
+  .sh-nuke-countdown-canvas{width:140px; height:140px;}
+}
+
 /* ---------- persistent screen-name badge ---------- */
 #shname-badge{display:inline-flex; align-items:center; gap:6px; background:rgba(20,20,24,.92); color:#f2f2f0; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:12px; font-weight:600; cursor:pointer; backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.28); -webkit-tap-highlight-color:transparent; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #shname-badge:hover{border-color:rgba(255,255,255,.32);}
