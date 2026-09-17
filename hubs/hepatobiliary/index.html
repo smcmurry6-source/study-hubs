@@ -974,10 +974,13 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
           <div id="examCountdownCard"></div>
           <div class="callout" style="margin-bottom:22px;">
             <h4>What "Exam Signal" means here</h4>
-            <p>No lecture recording or objectives sheet exists yet for this exam, so this tab doesn't guess at a tiered "confirmed / likely / skip" the way a hindsight guide could. Instead it shows exactly how the real Exam 2 practice packet — the Quizzes, Crossword, and live PollEverywhere review — was distributed across lectures. That's a real signal about what got emphasized in practice material, just an honestly-labeled one. It upgrades automatically once a recording or objectives sheet is added.</p>
+            <p>The exam's own per-lecture question breakdown is available (below) — exactly how many of the 55 real questions come from each lecture, including the 5 cumulative Exam-1 questions. Mock Exam draws to match it. Further down, for comparison, is how the practice packet itself — the Quizzes, Crossword, and live PollEverywhere review — was distributed across lectures: a useful secondary signal for prioritizing which practice material to review, but no longer a stand-in for the real breakdown now that it's available.</p>
           </div>
-          <h3 style="font-size:1rem; margin-bottom:6px;">Practice-packet emphasis by lecture</h3>
-          <p class="muted-note" style="margin-bottom:14px;">Bar length shows source mix within each lecture; the number is its total question count.</p>
+          <h3 style="font-size:1rem; margin-bottom:6px;">Real exam question breakdown by lecture</h3>
+          <p class="muted-note" style="margin-bottom:14px;">Bar length is proportional to how many of the real exam's 55 questions come from that lecture — the biggest lever for where to spend review time.</p>
+          <div style="display:flex; flex-direction:column; gap:10px;" id="examBreakdownBars"></div>
+          <h3 style="font-size:1rem; margin:30px 0 14px;">Practice-packet emphasis by lecture (for comparison)</h3>
+          <p class="muted-note" style="margin-bottom:14px;">Bar length shows source mix within each lecture; the number is its total question count in this hub's bank — not the real exam's own count (see above).</p>
           <div id="signalLegend" style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:16px;"></div>
           <div style="display:flex; flex-direction:column; gap:10px;" id="signalBars"></div>
           <h3 style="font-size:1rem; margin:30px 0 14px;">Source mix, whole bank</h3>
@@ -1144,6 +1147,27 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
   // material) — used by the Exam Signal countdown and to size Mock Exam.
   var EXAM_DATE = new Date(2026, 8, 18, 9, 0, 0); // Sept 18, 2026, month is 0-indexed
   var EXAM_TOTAL_Q = 55, EXAM_CURRENT_Q = 50, EXAM_CUMULATIVE_Q = 5;
+  // The real exam's own per-lecture question breakdown -- from the course's
+  // "Question breakdown" project doc (added 2026-09-11, wired in 2026-09-17).
+  // Keys are this hub's lecture ids; values are exactly how many of the real
+  // exam's questions come from that lecture. Sums to EXAM_CURRENT_Q (50) --
+  // the other 5 of the real exam's 55 are the Exam-1 cumulative questions,
+  // tracked separately via EXAM_CUMULATIVE_Q/EXAM1_REVIEW_POOL. Used by
+  // buildMockExamQueue() to weight the current-material draw to match, and by
+  // renderExamBreakdown() to show it on the Exam Signal tab. If the professor
+  // ever revises the breakdown, update these numbers directly.
+  var EXAM_QUESTION_BREAKDOWN = {
+    "intestine-histo": 3,  // Lecture 10
+    "liver-gb-histo": 3,   // Lecture 11
+    "panc-bili": 9,        // Lecture 12
+    "dig-absorb": 6,       // Lecture 13
+    "fluid-lytes": 4,      // Lecture 14
+    "liver-physio": 4,     // Lecture 15
+    "liver-path": 5,       // Lecture 16
+    "gi-path": 7,          // Lecture 17
+    "gi-pharm": 6,         // Lecture 18
+    "dental": 3            // Dentistry application
+  };
 
   // Dual-level lecture reference prose - "full" (as taught) and "plain" (plain-English)
   // translation of the same material, same paragraph order. Rendered by showLectureDetail()
@@ -4239,6 +4263,18 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
       + '</div>';
   }
 
+  function renderExamBreakdown(){
+    var host = byId("examBreakdownBars");
+    if(!host) return;
+    var maxN = Math.max(EXAM_CUMULATIVE_Q, Math.max.apply(null, Object.keys(EXAM_QUESTION_BREAKDOWN).map(function(k){ return EXAM_QUESTION_BREAKDOWN[k]; })));
+    var rows = LECTURES_SORTED.filter(function(l){ return EXAM_QUESTION_BREAKDOWN.hasOwnProperty(l.id); }).map(function(l){
+      var n = EXAM_QUESTION_BREAKDOWN[l.id];
+      return '<div class="src-bar-row"><span class="sb-label">'+esc(l.num)+' · '+esc(l.title)+'</span><span class="src-bar-track"><span class="src-bar-seg" style="width:'+(n/maxN*100)+'%; background:var(--'+l.tag+');"></span></span><span class="sb-count tnum">'+n+'</span></div>';
+    });
+    rows.push('<div class="src-bar-row"><span class="sb-label">Exam 1 · Cumulative review</span><span class="src-bar-track"><span class="src-bar-seg" style="width:'+(EXAM_CUMULATIVE_Q/maxN*100)+'%; background:var(--slate);"></span></span><span class="sb-count tnum">'+EXAM_CUMULATIVE_Q+'</span></div>');
+    host.innerHTML = rows.join("");
+  }
+
   function renderSignal(){
     var srcColor = {"exam2-quiz":"gold","exam2-crossword":"verdigris","exam2-pollev":"slate","hub":"oxblood"};
     byId("signalLegend").innerHTML = Object.keys(SRC_LABEL).map(function(s){
@@ -4498,8 +4534,25 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     return copy;
   }
   function buildMockExamQueue(){
-    var pool = QUESTIONS.filter(function(q){ return q.type==="mcq" && !q.notTested; });
-    var picked = shuffle(pool).slice(0, EXAM_CURRENT_Q);
+    // Current-material draw is weighted to match EXAM_QUESTION_BREAKDOWN's real
+    // per-lecture counts exactly, lecture by lecture (replacing the flat random
+    // draw across the whole bank used through 2026-09-16). Falls back to filling
+    // from whatever current-material MCQ pool is left over if a lecture's own
+    // available pool is ever smaller than its assigned count -- not expected to
+    // trigger under the current bank, where every lecture's pool comfortably
+    // exceeds its breakdown count.
+    var picked = [];
+    var usedIds = {};
+    Object.keys(EXAM_QUESTION_BREAKDOWN).forEach(function(lecId){
+      var lecPool = (QUESTIONS_BY_LECTURE[lecId]||[]).filter(function(q){ return q.type==="mcq" && !q.notTested; });
+      var take = shuffle(lecPool.slice()).slice(0, EXAM_QUESTION_BREAKDOWN[lecId]);
+      take.forEach(function(q){ usedIds[q.id]=true; });
+      picked = picked.concat(take);
+    });
+    if(picked.length < EXAM_CURRENT_Q){
+      var rest = QUESTIONS.filter(function(q){ return q.type==="mcq" && !q.notTested && !usedIds[q.id]; });
+      picked = picked.concat(shuffle(rest).slice(0, EXAM_CURRENT_Q - picked.length));
+    }
     // Draw the Exam-1 cumulative slice from the salivary-gland subset first
     // (see EXAM1_SALIVARY_IDS above) -- only fills from the rest of
     // EXAM1_REVIEW_POOL if that subset ever has fewer than EXAM_CUMULATIVE_Q
@@ -4543,7 +4596,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     var host = byId("mockExamRoot");
     host.innerHTML = '<div class="mock-setup-card">'
       + '<h3 style="margin-top:0;">Generate a Mock Exam</h3>'
-      + '<p class="muted-note">'+EXAM_TOTAL_Q+' questions, randomly drawn fresh each time you generate one — '+EXAM_CURRENT_Q+' from this material (a flat random draw across all lectures, not weighted) plus '+EXAM_CUMULATIVE_Q+' cumulative questions from Exam 1, drawn from the salivary gland lecture specifically — that\'s where your professor said the real exam\'s cumulative section focuses. Nothing is revealed as correct or wrong until you submit, the same way the real exam works.</p>'
+      + '<p class="muted-note">'+EXAM_TOTAL_Q+' questions, freshly sampled each time you generate one — '+EXAM_CURRENT_Q+' from this material, drawn lecture-by-lecture to match the real exam\'s own question breakdown (so the mix mirrors exam day, not just this hub\'s overall bank — see Exam Signal for the breakdown itself) — plus '+EXAM_CUMULATIVE_Q+' cumulative questions from Exam 1, drawn from the salivary gland lecture specifically — that\'s where your professor said the real exam\'s cumulative section focuses. Nothing is revealed as correct or wrong until you submit, the same way the real exam works.</p>'
       + '<div class="mock-duration-row"><span class="mock-duration-label">Time limit</span><div class="seg-group" id="mockDurationSeg">'
       + [45,60,75,90].map(function(m){ return '<button class="seg-btn'+(m===mockExamDurationChoice?" active":"")+'" data-mockdur="'+m+'" type="button">'+m+' min</button>'; }).join("")
       + '<button class="seg-btn'+(mockExamDurationChoice===0?" active":"")+'" data-mockdur="0" type="button">Untimed</button>'
@@ -4756,7 +4809,7 @@ body.is-nightshift .clinic-scene, body.is-nightshift .ward-scene{filter:brightne
     }
   });
 
-  renderHome(); renderLectures(); renderReference(); renderQuizFilters(); renderQuizList(); renderCram(); renderSignal(); renderExamHints(); renderActiveRecall(); // ============================================================
+  renderHome(); renderLectures(); renderReference(); renderQuizFilters(); renderQuizList(); renderCram(); renderSignal(); renderExamBreakdown(); renderExamHints(); renderActiveRecall(); // ============================================================
   // READINESS DASHBOARD — a rollup of existing STATE.wardStats (already
   // maintained by recordAnswer for every mode) into one readiness view.
   // No new tracking: reads the same numbers Follow-ups/Chief Rounds/On
