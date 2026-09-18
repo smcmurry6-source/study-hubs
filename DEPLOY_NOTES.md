@@ -58,6 +58,16 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-18** — Tactical nuke: raised the streak requirement from 50 to
+  100 correct answers in a row, per request. Also replaced the generic
+  "Someone has called in a tactical strike" banner with the visitor's
+  actual resolved name — the same deterministic name (e.g. "Gleaming
+  Molar") the leaderboard and nuke/streak analytics already fall back to
+  when a visitor hasn't set a custom display name, instead of a generic
+  placeholder word. Added `get_display_name(p_visitor)` (`migration_v9.sql`,
+  public, no secret) so the client can resolve it once on load; degrades
+  gracefully back to "Someone" if the RPC isn't reachable.
+
 - **2026-09-18** — Wired up analytics that had been silently no-op-ing:
   `widget/v3.js` was already calling `record_nuke_launch` on every tactical-
   nuke strike (since the feature shipped 2026-09-17), but the backing

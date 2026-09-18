@@ -434,7 +434,7 @@
   var SH_NAME_KEY = "sh_display_name";
   var SH_VISITS_KEY = "sh_visit_count";
   var SH_NUKE_PREF_KEY = "sh_pref_nuke_alerts";
-  var NUKE_STREAK_THRESHOLD = 50;
+  var NUKE_STREAK_THRESHOLD = 100;
   var NUKE_IMG_BASE = (function(){
     try { return new URL("img/", thisScript.src).href; } catch (e) { return "img/"; }
   })();
@@ -712,6 +712,20 @@
   }
   var VISITOR_ID = getVisitorId();
 
+  /* ---------- resolved display name: the same deterministic dentistry-
+     themed name (e.g. "Gleaming Molar") the leaderboard/nuke-analytics/
+     correct-streak stats already fall back to when a visitor never opted
+     into a custom name -- fetched once so the nuke banner can use it
+     instead of the generic word "Someone". Always resolves well before
+     NUKE_STREAK_THRESHOLD correct answers could realistically happen. ---------- */
+  var resolvedAnonName = "";
+  try {
+    supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
+      if (res && !res.error && res.data) resolvedAnonName = res.data;
+    }, function(){});
+  } catch (e) {}
+  function displayName(){ return currentName() || resolvedAnonName || "Someone"; }
+
   /* ---------- online-now presence ---------- */
   var presenceId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random());
   var onlineCount = 1;
@@ -910,7 +924,7 @@
     launchNuke();
   }
   function launchNuke(){
-    var name = currentName() || "Someone";
+    var name = displayName();
     hideNukeBadge();
     sessionCorrectStreak = 0;
     nukeReady = false;
