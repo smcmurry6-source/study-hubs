@@ -791,6 +791,7 @@
     var isCorrect = !!d.correct;
     safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
     if (isCorrect) {
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
@@ -857,10 +858,14 @@
   }
 
   /* ---------- tactical nuke: earned after NUKE_STREAK_THRESHOLD correct
-     answers in a row (session-only streak, resets on reload). Broadcasts
-     over the same per-hub presence channel everyone already joins, so the
-     countdown/blast plays live for everyone currently on THIS hub -- no new
-     Supabase table, nothing persisted or logged. ---------- */
+     answers in a row (session-only streak, resets on reload -- separate
+     from the persisted correct_streaks table above, which tracks a
+     longer-running per-visitor streak for the dashboard and never gates
+     this badge). Broadcasts over the same per-hub presence channel
+     everyone already joins, so the countdown/blast plays live for
+     everyone currently on THIS hub. Each launch is also logged (see
+     record_nuke_launch below) for the admin review page's nuke-analytics
+     section -- fire-and-forget via safeRpc, never blocks the effect. ---------- */
   var nukeBadgeEl = null;
   var nukeArmed = false;
   var nukeArmedTimer = null;

@@ -129,6 +129,20 @@ button{font-family:inherit; cursor:pointer;}
     <p class="lede">From the same answer data each hub's own "Toughest questions" panel reads — questions with fewer than 3 recorded answers are left out so a single fluke doesn't rank.</p>
     <div id="questionAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
   </div>
+
+  <div class="analytics">
+    <span class="eyebrow">All time</span>
+    <h2>Correct-answer streaks</h2>
+    <p class="lede">Longest run of correct answers in a row — the one still standing right now, and the best any visitor has ever reached.</p>
+    <div id="streakAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
+  </div>
+
+  <div class="analytics">
+    <span class="eyebrow">Last 30 days</span>
+    <h2>Tactical nuke</h2>
+    <p class="lede">Fires when someone calls in a strike after a hot streak — visible to everyone on that hub when it goes off.</p>
+    <div id="nukeAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
+  </div>
 </div>
 
 <script>
@@ -292,6 +306,72 @@ button{font-family:inherit; cursor:pointer;}
     });
   }
 
+  var streakAnalyticsBody = document.getElementById("streakAnalyticsBody");
+  function loadStreakAnalytics(){
+    if (!streakAnalyticsBody) return;
+    streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
+    supabase.rpc("get_correct_streak_stats").then(function(res){
+      if (res && res.error) {
+        streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v8.sql in the Supabase SQL editor.</div>';
+        return;
+      }
+      var rows = (res && res.data) || [];
+      var active = rows.find(function(r){ return r.kind === "active"; });
+      var record = rows.find(function(r){ return r.kind === "record"; });
+      if (!active && !record) {
+        streakAnalyticsBody.innerHTML = '<div class="analytics-empty">No streaks yet.</div>';
+        return;
+      }
+      streakAnalyticsBody.innerHTML =
+        '<div class="stat-tiles">' +
+          '<div class="stat-tile"><div class="num">' + (active ? active.streak : 0) + '</div><div class="label">Longest active' + (active ? ' · ' + esc(active.display_name) : '') + '</div></div>' +
+          '<div class="stat-tile"><div class="num">' + (record ? record.streak : 0) + '</div><div class="label">All-time record' + (record ? ' · ' + esc(record.display_name) : '') + '</div></div>' +
+        '</div>';
+    }, function(){
+      streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
+    });
+  }
+
+  var nukeAnalyticsBody = document.getElementById("nukeAnalyticsBody");
+  function loadNukeAnalytics(){
+    if (!nukeAnalyticsBody) return;
+    nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
+    Promise.all([
+      supabase.rpc("get_nuke_summary", { p_secret: secret, p_days: 30 }),
+      supabase.rpc("get_nuke_by_hub", { p_secret: secret, p_days: 30 }),
+      supabase.rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 })
+    ]).then(function(results){
+      var summaryRes = results[0], hubRes = results[1], recentRes = results[2];
+      if ((summaryRes && summaryRes.error) || (hubRes && hubRes.error) || (recentRes && recentRes.error)) {
+        nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v8.sql in the Supabase SQL editor.</div>';
+        return;
+      }
+      var summary = (summaryRes && summaryRes.data && summaryRes.data[0]) || { total_launches: 0, unique_launchers: 0 };
+      var byHub = (hubRes && hubRes.data) || [];
+      var recent = (recentRes && recentRes.data) || [];
+      var hubRows = byHub.map(function(r){ return { label: hubLabel(r.hub), val: r.launches }; });
+      var recentHTML = recent.length
+        ? '<div class="bar-list">' + recent.map(function(r){
+            return '<div class="bar-row">' +
+              '<span class="bar-label" style="width:auto; flex:1;">' + esc(r.display_name) + ' · ' + esc(hubLabel(r.hub)) + '</span>' +
+              '<span class="bar-val" style="width:auto;">' + fmtDate(r.launched_at) + '</span>' +
+            '</div>';
+          }).join('') + '</div>'
+        : '<div class="analytics-empty">No launches yet.</div>';
+      nukeAnalyticsBody.innerHTML =
+        '<div class="stat-tiles">' +
+          '<div class="stat-tile"><div class="num">' + (summary.total_launches || 0) + '</div><div class="label">Launches</div></div>' +
+          '<div class="stat-tile"><div class="num">' + (summary.unique_launchers || 0) + '</div><div class="label">Unique launchers</div></div>' +
+        '</div>' +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Launches by hub</h3>' +
+        barList(hubRows, 'label', 'val', '') +
+        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Most recent</h3>' +
+        recentHTML;
+    }, function(){
+      nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
+    });
+  }
+
   function unlock(ok, msg){
     if (ok) {
       gate.hidden = true;
@@ -320,6 +400,8 @@ button{font-family:inherit; cursor:pointer;}
       render();
       loadAnalytics();
       loadQuestionAnalytics();
+      loadStreakAnalytics();
+      loadNukeAnalytics();
     }, function(){
       gateBtn.disabled = false;
       unlock(false, "Couldn't reach the server — try again.");

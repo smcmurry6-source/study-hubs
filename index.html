@@ -406,6 +406,10 @@ footer{margin-top:52px; padding-top:26px;}
         <h3>Study streaks</h3>
         <div id="pulseLeaderboard"><div class="pulse-empty">Loading…</div></div>
       </div>
+      <div class="pulse-card">
+        <h3>Correct-answer streaks</h3>
+        <div id="pulseCorrectStreaks"><div class="pulse-empty">Loading…</div></div>
+      </div>
     </div>
   </section>
 
@@ -844,11 +848,29 @@ footer{margin-top:52px; padding-top:26px;}
         return '<li class="pulse-lb-row"><span class="pulse-lb-rank">' + (i + 1) + '</span><span class="pulse-lb-name">' + esc(r.display_name) + '</span><span class="pulse-lb-streak">' + r.streak + (r.streak === 1 ? ' day' : ' days') + '</span></li>';
       }).join("") + '</ul>';
     }, function(){ if (pulseLbEl) pulseLbEl.innerHTML = '<div class="pulse-empty">Couldn&#39;t load the leaderboard right now.</div>'; });
+
+    /* ---------- Class Pulse: correct-answer streaks -- the longest run
+       still standing right now, and the best any visitor has ever
+       reached (separate from the day-based Study streaks above). ---------- */
+    var pulseCorrectEl = document.getElementById("pulseCorrectStreaks");
+    supabase.rpc("get_correct_streak_stats").then(function(res){
+      if (!pulseCorrectEl) return;
+      var rows = (res && res.data) || [];
+      var active = rows.find(function(r){ return r.kind === "active"; });
+      var record = rows.find(function(r){ return r.kind === "record"; });
+      if (!active && !record) { pulseCorrectEl.innerHTML = '<div class="pulse-empty">No streaks yet — get a few questions right in a row to show up here.</div>'; return; }
+      var items = "";
+      if (active) items += '<li class="pulse-lb-row"><span class="pulse-lb-name">Longest active &middot; ' + esc(active.display_name) + '</span><span class="pulse-lb-streak">' + active.streak + '</span></li>';
+      if (record) items += '<li class="pulse-lb-row"><span class="pulse-lb-name">All-time record &middot; ' + esc(record.display_name) + '</span><span class="pulse-lb-streak">' + record.streak + '</span></li>';
+      pulseCorrectEl.innerHTML = '<ul class="pulse-lb">' + items + '</ul>';
+    }, function(){ if (pulseCorrectEl) pulseCorrectEl.innerHTML = '<div class="pulse-empty">Couldn&#39;t load this right now.</div>'; });
   } else {
     var pulseHistWrapFallback = document.getElementById("pulseHistWrap");
     var pulseLbElFallback = document.getElementById("pulseLeaderboard");
+    var pulseCorrectElFallback = document.getElementById("pulseCorrectStreaks");
     if (pulseHistWrapFallback) pulseHistWrapFallback.innerHTML = '<div class="pulse-empty">Unavailable right now.</div>';
     if (pulseLbElFallback) pulseLbElFallback.innerHTML = '<div class="pulse-empty">Unavailable right now.</div>';
+    if (pulseCorrectElFallback) pulseCorrectElFallback.innerHTML = '<div class="pulse-empty">Unavailable right now.</div>';
   }
 })();
 </script>
