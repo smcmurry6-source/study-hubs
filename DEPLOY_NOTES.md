@@ -58,23 +58,22 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-09-17** — Added a rare tactical-nuke streak-reward easter egg, shared
-  across all hubs via `widget/v3.js` + `widget/v3.css` (no per-hub HTML changes):
-  a badge appears after a hot answer streak, arming it plays a countdown (a real
-  green-screened countdown clip, chroma-keyed live on canvas), and at zero the
-  screen flashes white and fades into a real mushroom-cloud explosion video
-  (Pixabay stock footage, CSS-masked to remove its background wash). New unlock/
-  launch/blast SFX generated with ElevenLabs. New binary assets: `widget/sfx/
-  nuke-{unlock,launch,blast}.mp3`, `widget/vid/nuke-{blast-cloud,countdown-fx}.
-  {mp4,webm}`, `widget/img/nuke-cloud.webp`. Built and demoed to Sam first per
-  standing policy; deployed only after explicit approval. Note for anyone
-  deploying new mp4/webp binaries through the device bridge: Sam's machine (or
-  something in its sync/security pipeline) silently embeds a C2PA content-
-  provenance box into `.mp4`/`.webp` files the moment they land in the OneDrive-
-  synced folder (confirmed via byte-for-byte diff — `.webm`/`.mp3`/text files are
-  unaffected). It doesn't break playback, but always re-verify checksums/decode
-  after a commit-to-device step for those two formats before creating the git
-  blob from them, rather than assuming the on-disk bytes are what you wrote.
+- **2026-09-18** — Wired up analytics that had been silently no-op-ing:
+  `widget/v3.js` was already calling `record_nuke_launch` on every tactical-
+  nuke strike (since the feature shipped 2026-09-17), but the backing
+  Supabase table/function never existed, so every call failed silently and
+  the review page showed nothing. `migration_v8.sql` adds `nuke_launches` +
+  `record_nuke_launch`/`get_nuke_summary`/`get_nuke_by_hub`/`get_nuke_recent`,
+  and a new "Tactical nuke" section on the review page (launches, unique
+  launchers, by hub, recent activity). Also added persisted correct-answer
+  streak tracking (`correct_streaks` table + `record_correct_streak`, called
+  from the same answered-question handler as `record_answer` — separate from
+  the in-page-only counter that gates the nuke badge, which still resets on
+  reload by design) and `get_correct_streak_stats()` (public, no secret,
+  same pattern as `get_leaderboard`) showing the longest streak currently
+  still standing and the all-time record. Shown in two places per request:
+  a "Correct-answer streaks" section on the review page, and a matching
+  card on the public dashboard (`index.html`) next to Study Streaks.
 
 - **2026-09-16** — Perio: Session 3 (Risk Assessment, Dr. Geisinger) ingested
   from its lecture recording transcript + slide deck — flipped from
