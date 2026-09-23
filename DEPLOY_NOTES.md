@@ -58,6 +58,19 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-23** — New hub: `hubs/msk-exam3/` ("Musculoskeletal Exam 3 Hub", widget
+  `data-hub="msk-exam3"`, event `msk3:answered`, localStorage `msk3-state-v1`),
+  built from the GI 3 Claude Project (L19-L27; L26 drugs and L27 tumors are
+  slides-only until their recordings are uploaded). Modes: Compendium, Review
+  (grouped reference: drugs, hormones, cells, matrix, genes, diseases, tumors,
+  processes, superlatives; with a recall/blur toggle), and an Arcade that
+  REPLACES the illustrated-scene game pattern at Sam's request: three
+  cool-math-games-style mini games (Sort Storm, Osteo Snake, Stack Attack).
+  Osteo Snake answers go through the normal answered event, so they count in
+  class stats. Hub source is built from split files (css/js) in that Project's
+  session; the deployed `index.html` is the single-file build. Added the hub to
+  the dashboard GI group, `HUB_LABEL`/`ALL_HUBS`, and `review/` `HUB_LABEL`.
+
 - **2026-09-18** — Tactical nuke: raised the streak requirement from 50 to
   100 correct answers in a row, per request. Also replaced the generic
   "Someone has called in a tactical strike" banner with the visitor's
