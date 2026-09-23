@@ -773,30 +773,130 @@
     var tabbarEl = document.querySelector("nav.tabbar, .tabbar");
     if (tabbarEl) { modeSwitchEl = tabbarEl; modeAttr = "tab"; }
   }
+  /* Section = "<mode>/<sub-view>", e.g. "compendium/quiz" or
+     "compendium/notes". Mode is the active #modeSwitch button, matched by
+     aria-selected="true" OR an is-active/active class (hepatobiliary only
+     ever set the class, so every minute there used to log as
+     "(unspecified)"). Sub-view is the first *visible* active tab outside
+     the mode switch that carries one of the hub nav attributes below
+     (perio data-view, msk data-sub/data-group, hepatobiliary-style
+     data-ctab/data-gtab/data-dtab). A hub can override all of this by
+     defining window.SH_SECTION = function(){ return "mode/sub"; }. */
+  var SUB_ATTRS = ["view", "sub", "ctab", "gtab", "dtab", "tab", "group", "section", "pane", "panel"];
+  var SUB_SELECTOR = SUB_ATTRS.map(function(a){ return "[data-" + a + "]"; }).join(",");
+  function isActiveEl(el){
+    if (!el) return false;
+    if (el.getAttribute("aria-selected") === "true") return true;
+    var c = el.classList;
+    return !!(c && (c.contains("is-active") || c.contains("active")));
+  }
+  function isVisible(el){
+    return !!(el && (el.offsetWidth || el.offsetHeight || el.getClientRects().length));
+  }
+  function subAttrValue(el){
+    for (var i = 0; i < SUB_ATTRS.length; i++) {
+      var v = el.getAttribute("data-" + SUB_ATTRS[i]);
+      if (v) return v;
+    }
+    return "";
+  }
+  function currentMode(){
+    if (!modeSwitchEl) return "";
+    var btns = modeSwitchEl.querySelectorAll("[data-" + modeAttr + "]");
+    for (var i = 0; i < btns.length; i++) {
+      if (isActiveEl(btns[i])) return btns[i].getAttribute("data-" + modeAttr) || "";
+    }
+    return "";
+  }
+  function currentSubView(){
+    var els = document.querySelectorAll(SUB_SELECTOR);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (modeSwitchEl && modeSwitchEl.contains(el)) continue;
+      if (!isActiveEl(el) || !isVisible(el)) continue;
+      var v = subAttrValue(el);
+      if (v) return v;
+    }
+    return "";
+  }
   function currentSection(){
     try {
-      if (!modeSwitchEl) return "";
-      var active = modeSwitchEl.querySelector('[aria-selected="true"]');
-      return (active && active.getAttribute("data-" + modeAttr)) || "";
+      if (typeof window.SH_SECTION === "function") {
+        var custom = window.SH_SECTION();
+        if (custom) return String(custom).slice(0, 80);
+      }
+      var mode = currentMode();
+      var sub = currentSubView();
+      if (!mode) return sub;
+      return sub && sub !== mode ? (mode + "/" + sub).slice(0, 80) : mode;
     } catch (e) { return ""; }
   }
-  function pingActivity(){
-    safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: currentSection() });
+  window.shCurrentSection = currentSection;
+
+  /* Each activity ping is worth PING_INTERVAL_MS of study time, so instead
+     of sampling "whatever section happens to be open at the 25s mark" (which
+     credited a whole 25s to the wrong section whenever someone switched
+     between pings), time is accumulated per section every second and a ping
+     is sent for a section only once it has actually banked a full 25s. The
+     first ping still goes out on load (so a short visit is still counted as
+     a visit) and is pre-credited against the starting section. Paused while
+     the tab is hidden; on hide, a section holding at least half a ping's
+     worth is rounded up so short stints aren't systematically dropped. */
+  var TICK_MS = 1000;
+  var sectionBank = {};
+  var tickTimer = null;
+  var lastTick = 0;
+  function pingActivity(section){
+    safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: section });
   }
-  var activityTimer = null;
+  function tick(){
+    var now = Date.now();
+    var dt = Math.min(now - lastTick, 5 * TICK_MS); /* cap so a frozen/sleeping tab can't dump minutes into one section */
+    lastTick = now;
+    var sec = currentSection();
+    sectionBank[sec] = (sectionBank[sec] || 0) + dt;
+    if (sectionBank[sec] >= PING_INTERVAL_MS) {
+      sectionBank[sec] -= PING_INTERVAL_MS;
+      pingActivity(sec);
+    }
+  }
+  function flushBank(){
+    Object.keys(sectionBank).forEach(function(sec){
+      if (sectionBank[sec] >= PING_INTERVAL_MS / 2) pingActivity(sec);
+      sectionBank[sec] = 0;
+    });
+  }
+  var firstPingSent = false;
   function startActivityPing(){
-    if (activityTimer) return;
-    pingActivity();
-    activityTimer = setInterval(pingActivity, PING_INTERVAL_MS);
+    if (tickTimer) return;
+    if (!firstPingSent) {
+      firstPingSent = true;
+      var startSec = currentSection();
+      pingActivity(startSec);
+      sectionBank[startSec] = -PING_INTERVAL_MS;
+    }
+    lastTick = Date.now();
+    tickTimer = setInterval(tick, TICK_MS);
   }
   function stopActivityPing(){
-    if (activityTimer) { clearInterval(activityTimer); activityTimer = null; }
+    if (!tickTimer) return;
+    clearInterval(tickTimer); tickTimer = null;
+    tick();
+    flushBank();
   }
-  if (document.visibilityState !== "hidden") startActivityPing();
+  /* start a moment after load so the hub's own scripts have rendered their
+     initial tabs -- otherwise the first (pre-credited) ping is labelled with
+     the bare mode ("compendium") and the real sub-view double-counts. */
+  var trackingArmed = false;
+  setTimeout(function(){
+    trackingArmed = true;
+    if (document.visibilityState !== "hidden") startActivityPing();
+  }, 1500);
   document.addEventListener("visibilitychange", function(){
     if (document.visibilityState === "hidden") stopActivityPing();
-    else startActivityPing();
+    else if (trackingArmed) startActivityPing();
   });
+  window.addEventListener("pagehide", stopActivityPing);
 
   var sessionCorrectStreak = 0;
   var nukeReady = false;

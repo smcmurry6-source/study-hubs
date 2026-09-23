@@ -58,6 +58,30 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-23** — Archived GI Exam 2 (`hubs/hepatobiliary/`, incl. its
+  narration audio) off the live site after the exam, same pattern as GI
+  Exam 1: the full 404-question bank + lecture list was saved first to
+  `question-banks/gi2-question-bank.json` (hub's own field names; see
+  `question-banks/README.md`, regenerate with `extract_gi2.js`). Dashboard
+  card removed; `hepatobiliary` stays in `HUB_LABEL` so old changelog/stats
+  rows still label correctly. **Widget time tracking is now per section:**
+  `record_activity_ping`'s `p_section` is `"<mode>/<sub-view>"` (e.g.
+  `compendium/bank`, `review/drugs`, `compendium/exam-hints`) instead of
+  only the top-level mode. Mode detection accepts `aria-selected="true"` OR
+  an `is-active`/`active` class (hepatobiliary only set the class, so all of
+  its ~12k minutes had logged as `(unspecified)`); sub-view = first visible
+  active element outside `#modeSwitch` carrying `data-view|sub|ctab|gtab|
+  dtab|tab|group|section|pane|panel`. A hub can override with
+  `window.SH_SECTION = () => "mode/sub"`. Time is banked per section each
+  second and a ping only fires once a section has earned a full 25s, so
+  switching mid-interval no longer credits the wrong section. No schema
+  change. `review/` rebuilt as a tabbed admin (Overview / Time by section /
+  Questions / Engagement / Inbox) with a 7/30/90-day range, an "include
+  archived hubs" toggle (archived list is `ARCHIVED` in `review/index.html`
+  — add a hub there when you archive it), and "active time per visit"
+  (total ping minutes ÷ visits) replacing the old span-based average, which
+  counted hours of backgrounded tabs.
+
 - **2026-09-23** — New hub: `hubs/msk-exam3/` ("Musculoskeletal Exam 3 Hub", widget
   `data-hub="msk-exam3"`, event `msk3:answered`, localStorage `msk3-state-v1`),
   built from the GI 3 Claude Project (L19-L27; L26 drugs and L27 tumors are

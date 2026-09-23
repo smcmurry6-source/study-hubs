@@ -4,145 +4,182 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Reports — Study Hub Review</title>
+<title>Hub Admin — Study Hub Review</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --ink:#1B2432; --ink-2:#4A5468; --ink-3:#7C859A;
-  --paper:#EDEFEC; --paper-2:#E4E7E1; --card:#FFFFFF;
-  --line:#D7DAD3; --line-strong:#C2C7BC;
+  --ink:#1B2432; --ink-2:#4A5468; --ink-3:#6E778C;
+  --paper:#EEF0ED; --paper-2:#E3E6E0; --card:#FFFFFF;
+  --line:#DADDD6; --line-strong:#C2C7BC;
   --accent:#4B4FA0; --accent-ink:#33356F; --accent-soft:#E6E5F5;
+  --bar:#6A6FC4; --bar-track:#ECEDF4;
   --ok:#246B64; --ok-soft:#DCEAE7;
-  --warn:#A94E34; --warn-soft:#F3DED4;
-  --shadow:0 1px 2px rgba(20,25,15,.05), 0 10px 28px -14px rgba(20,25,15,.22);
-  --r-m:12px; --r-l:18px; --r-pill:999px;
+  --warn:#A94E34; --warn-soft:#F6E1D7;
+  --shadow:0 1px 2px rgba(20,25,15,.05), 0 8px 24px -16px rgba(20,25,15,.25);
+  --r-s:8px; --r-m:12px; --r-l:16px; --r-pill:999px;
   --font-display:'Fraunces', Georgia, serif;
   --font-body:'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono:'Space Mono', 'SF Mono', Consolas, monospace;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --ink:#E9ECE6; --ink-2:#B7BFB2; --ink-3:#828C7E;
-    --paper:#171A16; --paper-2:#1E221C; --card:#20241F;
-    --line:#333A2F; --line-strong:#454E3F;
-    --accent:#9497D6; --accent-ink:#C9CBEF; --accent-soft:#282A50;
+    --ink:#E9ECE6; --ink-2:#BCC3B7; --ink-3:#8E9889;
+    --paper:#161915; --paper-2:#1F231D; --card:#21251F;
+    --line:#333A2F; --line-strong:#48513F;
+    --accent:#9EA1E0; --accent-ink:#D0D2F3; --accent-soft:#2A2C52;
+    --bar:#8E92DA; --bar-track:#2C3129;
     --ok:#6FC2B8; --ok-soft:#16302D;
-    --warn:#DE8262; --warn-soft:#3B241C;
-    --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 28px -14px rgba(0,0,0,.5);
+    --warn:#E48C6C; --warn-soft:#3D251C;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -16px rgba(0,0,0,.6);
   }
 }
 *,*::before,*::after{box-sizing:border-box;}
-body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.5;}
-h1{font-family:var(--font-display); font-weight:600; margin:0 0 6px;}
-button{font-family:inherit; cursor:pointer;}
-#wrap{max-width:720px; margin:0 auto; padding:50px 20px 80px;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;}
+button{font-family:inherit; cursor:pointer; color:inherit;}
+.num, td.n, .n{font-variant-numeric:tabular-nums;}
+[hidden]{display:none !important;}
 
-.eyebrow{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px;}
+/* ---------- gate ---------- */
+#gate{max-width:340px; margin:14vh auto 0; padding:0 16px; text-align:center;}
+#gate h1{font-family:var(--font-display); font-weight:600; font-size:26px; margin:6px 0 0;}
+.kicker{font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);}
+#gate input{width:100%; margin-top:20px; padding:12px 14px; border:1px solid var(--line-strong); border-radius:var(--r-m); background:var(--card); color:var(--ink); font-size:15px; text-align:center;}
+#gate button{margin-top:10px; width:100%; padding:12px 14px; border:none; border-radius:var(--r-pill); background:var(--ink); color:var(--paper); font-weight:600; font-size:15px;}
+#gateMsg{margin-top:12px; font-size:13px; color:var(--warn); min-height:18px;}
 
-/* gate */
-#gate{max-width:360px; margin:80px auto; text-align:center;}
-#gate input{
-  width:100%; margin-top:18px; padding:11px 14px; border:1px solid var(--line-strong); border-radius:var(--r-m);
-  background:var(--card); color:var(--ink); font-family:var(--font-mono); font-size:14px; text-align:center;
-}
-#gate button{
-  margin-top:12px; width:100%; padding:11px 14px; border:none; border-radius:var(--r-pill);
-  background:var(--ink); color:var(--paper); font-weight:600; font-size:14px;
-}
-#gateMsg{margin-top:12px; font-size:13px; color:var(--warn); min-height:16px;}
+/* ---------- shell ---------- */
+.topbar{position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.topbar-inner{max-width:1080px; margin:0 auto; padding:14px 16px 0;}
+.title-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.title-row h1{font-family:var(--font-display); font-weight:600; font-size:22px; margin:0; letter-spacing:-.01em;}
+.controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.seg{display:inline-flex; background:var(--paper-2); border:1px solid var(--line); border-radius:var(--r-pill); padding:3px;}
+.seg button{border:none; background:none; padding:5px 12px; border-radius:var(--r-pill); font-size:13px; font-weight:600; color:var(--ink-2);}
+.seg button[aria-pressed="true"]{background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.switch{display:inline-flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-2); cursor:pointer; user-select:none;}
+.switch input{accent-color:var(--accent); width:16px; height:16px;}
+.icon-btn{border:1px solid var(--line); background:var(--card); border-radius:var(--r-pill); padding:5px 12px; font-size:13px; font-weight:600; color:var(--ink-2);}
+.tabs{display:flex; gap:4px; margin-top:12px; overflow-x:auto; scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tabs button{border:none; background:none; padding:9px 12px 11px; font-size:14px; font-weight:600; color:var(--ink-3); border-bottom:2px solid transparent; white-space:nowrap;}
+.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent);}
+.tabs .count{display:inline-block; min-width:18px; margin-left:6px; padding:0 6px; border-radius:var(--r-pill); background:var(--warn-soft); color:var(--warn); font-size:11.5px; line-height:18px; text-align:center;}
+.tabs .count.zero{background:var(--paper-2); color:var(--ink-3);}
 
-/* toolbar */
-.toolbar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:26px 0 18px;}
-.toolbar label{display:inline-flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2);}
-.stat{font-family:var(--font-mono); font-size:12px; color:var(--ink-3);}
+main{max-width:1080px; margin:0 auto; padding:22px 16px 80px;}
+.panel{display:flex; flex-direction:column; gap:18px;}
 
-/* report cards */
-.report{
-  background:var(--card); border:1px solid var(--line); border-radius:var(--r-m);
-  padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow);
-}
-.report.is-resolved{opacity:.5;}
-.report-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
-.badge{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; padding:3px 8px; border-radius:var(--r-pill); font-weight:700;}
-.badge.flag{color:var(--warn); background:var(--warn-soft);}
-.badge.suggestion{color:var(--accent-ink); background:var(--accent-soft);}
-.badge.hub{color:var(--ink-2); background:var(--paper-2); font-weight:600;}
-.report-date{font-family:var(--font-mono); font-size:11px; color:var(--ink-3); margin-left:auto;}
-.report-note{font-size:14px; color:var(--ink); line-height:1.5; white-space:pre-wrap;}
-.report-actions{margin-top:10px;}
-.resolve-btn{
-  border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2);
-  padding:5px 12px; border-radius:var(--r-pill); font-size:12px; font-weight:600;
-}
+/* ---------- cards ---------- */
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--r-l); box-shadow:var(--shadow); padding:18px 20px; min-width:0;}
+.card-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+.card h2{font-size:16px; font-weight:700; margin:0;}
+.card .sub{font-size:13px; color:var(--ink-3); margin:2px 0 0;}
+.card-head .aside{font-size:12.5px; color:var(--ink-3);}
+.grid-2{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:18px;}
+@media (max-width:760px){ .grid-2{grid-template-columns:1fr;} .card{padding:16px;} }
+
+/* ---------- KPI tiles ---------- */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit, minmax(132px,1fr)); gap:12px;}
+@media (max-width:560px){ .kpis{grid-template-columns:repeat(2, minmax(0,1fr));} .kpi .value{font-size:24px;} }
+.kpi{background:var(--card); border:1px solid var(--line); border-radius:var(--r-l); padding:14px 16px; box-shadow:var(--shadow);}
+.kpi .label{font-size:12.5px; font-weight:600; color:var(--ink-2);}
+.kpi .value{font-size:28px; font-weight:700; line-height:1.15; margin-top:4px; letter-spacing:-.01em;}
+.kpi .value small{font-size:14px; font-weight:600; color:var(--ink-3); margin-left:3px;}
+.kpi .hint{font-size:12px; color:var(--ink-3); margin-top:3px;}
+.kpi.alert .value{color:var(--warn);}
+
+/* ---------- data tables with inline bars ---------- */
+.tbl-wrap{overflow-x:auto; margin:0 -4px;}
+table.data{width:100%; border-collapse:collapse; font-size:14px;}
+table.data th{font-size:12px; font-weight:600; color:var(--ink-3); text-align:left; padding:0 8px 8px; border-bottom:1px solid var(--line); white-space:nowrap;}
+table.data td{padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:middle;}
+table.data tr:last-child td{border-bottom:none;}
+table.data th.n, table.data td.n{text-align:right; white-space:nowrap;}
+table.data td.lbl{font-weight:600;}
+table.data td.lbl .muted{font-weight:400;}
+table.data td.barcell{width:34%; min-width:110px;}
+table.data tr.group td{padding-top:14px; font-size:14px; font-weight:700; color:var(--ink);}
+table.data tr.group td .tag{display:block; font-size:12px; font-weight:500; color:var(--ink-3); margin-top:1px;}
+.card-head .aside a{color:var(--accent); font-weight:600; text-decoration:none;}
+.card-head .aside a:hover{text-decoration:underline;}
+@media (max-width:560px){ table.data.wide td.barcell, table.data.wide th.barcell{display:none;} }
+table.data tr.child td.lbl{padding-left:22px; font-weight:500; color:var(--ink-2);}
+table.data tr:hover td{background:color-mix(in srgb, var(--accent-soft) 45%, transparent);}
+table.data tr.group:hover td{background:none;}
+.muted{color:var(--ink-3);}
+.bar{position:relative; height:10px; border-radius:4px; background:var(--bar-track);}
+.bar > span{position:absolute; left:0; top:0; bottom:0; border-radius:4px; background:var(--bar); min-width:3px;}
+.bar.low > span{background:var(--warn);}
+.pill{display:inline-block; font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:var(--r-pill); background:var(--paper-2); color:var(--ink-2); white-space:nowrap;}
+.pill.arch{background:transparent; border:1px solid var(--line-strong); color:var(--ink-3);}
+.pill.flag{background:var(--warn-soft); color:var(--warn);}
+.pill.suggestion{background:var(--accent-soft); color:var(--accent-ink);}
+
+.chips{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;}
+.chips button{border:1px solid var(--line); background:var(--card); border-radius:var(--r-pill); padding:4px 11px; font-size:13px; font-weight:600; color:var(--ink-2);}
+.chips button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper);}
+
+.note{font-size:12.5px; color:var(--ink-3); margin:12px 0 0;}
+.empty{color:var(--ink-3); font-size:14px; padding:18px 0; text-align:center;}
+.err{color:var(--warn); font-size:14px; padding:12px 0;}
+
+/* ---------- inbox ---------- */
+.report{border:1px solid var(--line); border-radius:var(--r-m); padding:12px 14px; display:flex; gap:14px; align-items:flex-start;}
+.report + .report{margin-top:10px;}
+.report.is-resolved{opacity:.55;}
+.report-main{flex:1; min-width:0;}
+.report-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:6px;}
+.report-date{font-size:12.5px; color:var(--ink-3);}
+.report-note{font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
+.resolve-btn{flex:none; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2); padding:5px 12px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600;}
 .resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
-.empty{color:var(--ink-3); font-size:14px; padding:30px 0; text-align:center;}
-
-/* analytics */
-.analytics{margin-top:44px; padding-top:30px; border-top:1px solid var(--line);}
-.analytics h2{font-family:var(--font-display); font-weight:600; font-size:19px; margin:0 0 4px;}
-.analytics .lede{font-size:13px; color:var(--ink-3); margin:0 0 20px;}
-.stat-tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:24px;}
-.stat-tile{background:var(--card); border:1px solid var(--line); border-radius:var(--r-m); padding:14px 16px; box-shadow:var(--shadow);}
-.stat-tile .num{font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--ink);}
-.stat-tile .label{font-size:12px; color:var(--ink-3); margin-top:2px;}
-.bar-list{display:flex; flex-direction:column; gap:8px; margin-bottom:26px;}
-.bar-row{display:flex; align-items:center; gap:10px; font-size:13px;}
-.bar-row .bar-label{width:150px; flex:none; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-.bar-row .bar-track{flex:1; height:8px; border-radius:5px; background:var(--paper-2); overflow:hidden;}
-.bar-row .bar-fill{height:100%; background:var(--accent); border-radius:5px;}
-.bar-row .bar-val{width:70px; flex:none; text-align:right; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3);}
-.analytics-empty{color:var(--ink-3); font-size:13px;}
+@media (max-width:560px){ .report{flex-direction:column; gap:10px;} }
 </style>
 </head>
 <body>
 
 <div id="gate">
-  <span class="eyebrow">Study hub review</span>
+  <span class="kicker">Study hub admin</span>
   <h1>Enter passphrase</h1>
   <input type="password" id="gateInput" placeholder="passphrase" autocomplete="off">
   <button id="gateBtn" type="button">Unlock</button>
   <div id="gateMsg"></div>
 </div>
 
-<div id="wrap" hidden>
-  <span class="eyebrow">Study hub review</span>
-  <h1>Flags &amp; suggestions</h1>
-  <div class="toolbar">
-    <label><input type="checkbox" id="showResolved"> show resolved too</label>
-    <span class="stat" id="reportStat"></span>
-  </div>
-  <div id="reportList"></div>
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="title-row">
+        <h1>Hub admin</h1>
+        <div class="controls">
+          <div class="seg" id="rangeSeg" role="group" aria-label="Time range">
+            <button type="button" data-days="7" aria-pressed="false">7 days</button>
+            <button type="button" data-days="30" aria-pressed="true">30 days</button>
+            <button type="button" data-days="90" aria-pressed="false">90 days</button>
+          </div>
+          <label class="switch"><input type="checkbox" id="showArchived"> Include archived hubs</label>
+          <button class="icon-btn" id="refreshBtn" type="button">Refresh</button>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+        <button role="tab" data-tab="time" aria-selected="false">Time by section</button>
+        <button role="tab" data-tab="questions" aria-selected="false">Questions</button>
+        <button role="tab" data-tab="engagement" aria-selected="false">Engagement</button>
+        <button role="tab" data-tab="inbox" aria-selected="false">Inbox<span class="count zero" id="inboxCount">0</span></button>
+      </nav>
+    </div>
+  </header>
 
-  <div class="analytics">
-    <span class="eyebrow">Last 30 days</span>
-    <h2>Visitor analytics</h2>
-    <p class="lede">Approximate — built from a heartbeat ping roughly every 25s while a tab is open and visible, not exact instrumentation.</p>
-    <div id="analyticsBody"><div class="analytics-empty">Loading…</div></div>
-  </div>
-
-  <div class="analytics">
-    <span class="eyebrow">All time · every hub</span>
-    <h2>Question performance</h2>
-    <p class="lede">From the same answer data each hub's own "Toughest questions" panel reads — questions with fewer than 3 recorded answers are left out so a single fluke doesn't rank.</p>
-    <div id="questionAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
-  </div>
-
-  <div class="analytics">
-    <span class="eyebrow">All time</span>
-    <h2>Correct-answer streaks</h2>
-    <p class="lede">Longest run of correct answers in a row — the one still standing right now, and the best any visitor has ever reached.</p>
-    <div id="streakAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
-  </div>
-
-  <div class="analytics">
-    <span class="eyebrow">Last 30 days</span>
-    <h2>Tactical nuke</h2>
-    <p class="lede">Fires when someone calls in a strike after a hot streak — visible to everyone on that hub when it goes off.</p>
-    <div id="nukeAnalyticsBody"><div class="analytics-empty">Loading…</div></div>
-  </div>
+  <main>
+    <section class="panel" data-panel="overview"></section>
+    <section class="panel" data-panel="time" hidden></section>
+    <section class="panel" data-panel="questions" hidden></section>
+    <section class="panel" data-panel="engagement" hidden></section>
+    <section class="panel" data-panel="inbox" hidden></section>
+  </main>
 </div>
 
 <script>
@@ -151,298 +188,422 @@ button{font-family:inherit; cursor:pointer;}
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
   var supabase = window.supabase.createClient(SB_URL, SB_KEY);
   var SESSION_KEY = "sh_admin_secret";
+  var PREF_KEY = "sh_admin_prefs";
 
-  var gate = document.getElementById("gate");
-  var wrap = document.getElementById("wrap");
-  var gateInput = document.getElementById("gateInput");
-  var gateBtn = document.getElementById("gateBtn");
-  var gateMsg = document.getElementById("gateMsg");
-  var showResolved = document.getElementById("showResolved");
-  var reportList = document.getElementById("reportList");
-  var reportStat = document.getElementById("reportStat");
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3" };
+  /* hubs that are no longer on the live site -- hidden unless "Include archived hubs" is on */
+  var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
+
+  /* friendly names for the mode/sub-view ids the widget records */
+  var SECTION_LABEL = {
+    compendium: "Compendium", atlas: "Atlas", game: "Game", quest: "Dungeons & Duodenums", review: "Review", arcade: "Arcade",
+    notes: "Lecture Notes", bank: "Question Bank", hints: "Exam Hints", cram: "Cram Sheet", recall: "Active Recall",
+    quiz: "Quiz", mock: "Mock Exam", mockexam: "Mock Exam", drugdrill: "Drug Drill", lectures: "Lectures", signal: "Exam Signal",
+    reference: "Reference", dashboard: "My Dashboard", home: "Home", directory: "Directory", rounds: "Rounds",
+    lounge: "Lounge", followups: "Follow-ups", "course-info": "Course Info", "lecture-notes": "Lecture Notes",
+    "exam-hints": "Exam Hints", "question-bank": "Question Bank", "cram-sheet": "Cram Sheet", "active-recall": "Active Recall"
+  };
 
   var secret = null;
-  var allReports = [];
+  var state = { days: 30, archived: false, tab: "overview", qHub: "all" };
+  var data = {};
+  try {
+    var saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    if (saved.days) state.days = saved.days;
+    if (typeof saved.archived === "boolean") state.archived = saved.archived;
+    if (saved.tab) state.tab = saved.tab;
+  } catch (e) {}
+  function savePrefs(){ try { localStorage.setItem(PREF_KEY, JSON.stringify({ days: state.days, archived: state.archived, tab: state.tab })); } catch (e) {} }
 
-  function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+  /* ---------- helpers ---------- */
+  function $(s, r){ return (r || document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function hubLabel(h){ return HUB_LABEL[h] || h || "(unknown hub)"; }
+  function isArchived(h){ return !!ARCHIVED[h]; }
+  function keepHub(h){ return state.archived || !isArchived(h); }
+  function hubCell(h){ return esc(hubLabel(h)) + (isArchived(h) ? ' <span class="pill arch">archived</span>' : ''); }
+  function prettyPart(id){
+    if (!id) return "";
+    if (SECTION_LABEL[id]) return SECTION_LABEL[id];
+    return id.replace(/[-_]+/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  }
+  function fmtNum(n){ return (Math.round(n || 0)).toLocaleString(); }
+  function fmtMin(m){
+    m = Number(m) || 0;
+    if (m < 1) return "<1 min";
+    if (m < 60) return Math.round(m) + " min";
+    var h = m / 60;
+    return (h < 10 ? h.toFixed(1) : Math.round(h).toLocaleString()) + " hr";
+  }
   function fmtDate(iso){
     try {
       var d = new Date(iso);
-      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + ", " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
     } catch (e) { return iso; }
   }
-
-  function render(){
-    var rows = allReports.filter(function(r){ return showResolved.checked || !r.resolved; });
-    if (!rows.length) {
-      reportList.innerHTML = '<div class="empty">Nothing here' + (showResolved.checked ? '' : ' — everything&#39;s resolved, or nobody&#39;s sent anything yet') + '.</div>';
-    } else {
-      reportList.innerHTML = rows.map(function(r){
-        return '<div class="report' + (r.resolved ? ' is-resolved' : '') + '" data-kind="' + r.kind + '" data-id="' + r.id + '">' +
-          '<div class="report-top">' +
-            '<span class="badge ' + r.kind + '">' + r.kind + '</span>' +
-            (r.hub ? '<span class="badge hub">' + esc(r.hub) + '</span>' : '') +
-            '<span class="report-date">' + fmtDate(r.created_at) + '</span>' +
-          '</div>' +
-          '<div class="report-note">' + esc(r.note) + '</div>' +
-          '<div class="report-actions"><button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved' : 'Mark resolved') + '</button></div>' +
-        '</div>';
-      }).join("");
-    }
-    var open = allReports.filter(function(r){ return !r.resolved; }).length;
-    reportStat.textContent = open + " open · " + allReports.length + " total";
+  function bar(v, max, low, title){
+    var pct = max > 0 ? Math.max(1.5, (v / max) * 100) : 0;
+    return '<div class="bar' + (low ? ' low' : '') + '" title="' + esc(title || "") + '"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
   }
+  function card(title, sub, body, aside){
+    return '<div class="card"><div class="card-head"><div><h2>' + title + '</h2>' + (sub ? '<p class="sub">' + sub + '</p>' : '') + '</div>' + (aside ? '<span class="aside">' + aside + '</span>' : '') + '</div>' + body + '</div>';
+  }
+  function kpi(label, value, hint, alert){
+    return '<div class="kpi' + (alert ? ' alert' : '') + '"><div class="label">' + label + '</div><div class="value n">' + value + '</div>' + (hint ? '<div class="hint">' + hint + '</div>' : '') + '</div>';
+  }
+  function rangeText(){ return "last " + state.days + " days"; }
 
-  function loadReports(){
-    reportList.innerHTML = '<div class="empty">Loading…</div>';
-    supabase.rpc("get_reports", { p_secret: secret }).then(function(res){
-      if (res && res.error) {
-        unlock(false, "Wrong passphrase, or reports aren't set up yet.");
-        return;
-      }
-      allReports = (res && res.data) || [];
-      render();
-    }, function(){
-      reportList.innerHTML = '<div class="empty">Couldn&#39;t load reports right now — try again in a moment.</div>';
+  /* ---------- data loading ---------- */
+  function rpc(fn, args){
+    return supabase.rpc(fn, args).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
+  }
+  function table(name, cols){
+    return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
+  }
+  function loadAll(){
+    $$(".panel").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
+    var d = state.days;
+    return Promise.all([
+      rpc("get_visitor_summary", { p_secret: secret, p_days: d }),
+      rpc("get_visitor_by_hub", { p_secret: secret, p_days: d }),
+      rpc("get_visitor_by_section", { p_secret: secret, p_days: d }),
+      table("question_stats", "hub,qid,attempts,correct"),
+      table("mode_stats", "hub,mode,opens"),
+      rpc("get_correct_streak_stats", {}),
+      rpc("get_nuke_summary", { p_secret: secret, p_days: d }),
+      rpc("get_nuke_by_hub", { p_secret: secret, p_days: d }),
+      rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 }),
+      rpc("get_reports", { p_secret: secret })
+    ]).then(function(r){
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9] };
+      renderAll();
     });
   }
 
-  var analyticsBody = document.getElementById("analyticsBody");
-  function barList(rows, labelKey, valueKey, unit){
-    if (!rows || !rows.length) return '<div class="analytics-empty">No activity logged yet.</div>';
-    var max = Math.max.apply(null, rows.map(function(r){ return r[valueKey] || 0; })) || 1;
-    return '<div class="bar-list">' + rows.map(function(r){
-      var v = r[valueKey] || 0;
-      var pct = Math.max(2, Math.round((v / max) * 100));
-      return '<div class="bar-row">' +
-        '<span class="bar-label">' + esc(r[labelKey]) + '</span>' +
-        '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
-        '<span class="bar-val">' + v + unit + '</span>' +
+  /* ---------- derived numbers ---------- */
+  function hubRows(){
+    return (data.byHub.data || []).filter(function(r){ return keepHub(r.hub); })
+      .map(function(r){ return { hub: r.hub, visitors: Number(r.unique_visitors) || 0, minutes: Number(r.total_minutes) || 0 }; })
+      .sort(function(a, b){ return b.minutes - a.minutes; });
+  }
+  function allHubMinutes(){
+    return (data.byHub.data || []).reduce(function(s, r){ return s + (Number(r.total_minutes) || 0); }, 0);
+  }
+  /* sections grouped per hub -> per mode -> sub-views */
+  function sectionTree(){
+    var hubs = {};
+    (data.bySection.data || []).forEach(function(r){
+      if (!keepHub(r.hub)) return;
+      var sec = r.section || "(unspecified)";
+      var mins = Number(r.total_minutes) || 0;
+      var h = hubs[r.hub] || (hubs[r.hub] = { hub: r.hub, minutes: 0, modes: {} });
+      h.minutes += mins;
+      var parts = sec === "(unspecified)" ? ["(unspecified)"] : sec.split("/");
+      var mode = parts[0], sub = parts.slice(1).join("/");
+      var m = h.modes[mode] || (h.modes[mode] = { mode: mode, minutes: 0, subs: {} });
+      m.minutes += mins;
+      var key = sub || "";
+      m.subs[key] = (m.subs[key] || 0) + mins;
+    });
+    return Object.keys(hubs).map(function(k){ return hubs[k]; }).sort(function(a, b){ return b.minutes - a.minutes; });
+  }
+  function questionRows(){
+    return (data.qstats.data || []).filter(function(r){ return keepHub(r.hub); });
+  }
+  function openReports(){ return (data.reports.data || []).filter(function(r){ return !r.resolved; }); }
+
+  /* ---------- panels ---------- */
+  function renderOverview(){
+    var el = $('[data-panel="overview"]');
+    var s = (data.summary.data && data.summary.data[0]) || {};
+    var visits = Number(s.total_visits) || 0;
+    var totalMin = allHubMinutes();
+    var activePerVisit = visits ? totalMin / visits : 0;
+    var q = questionRows();
+    var att = 0, cor = 0;
+    q.forEach(function(r){ att += r.attempts || 0; cor += r.correct || 0; });
+    var acc = att ? Math.round(cor / att * 100) : 0;
+    var open = openReports().length;
+
+    var tiles = '<div class="kpis">' +
+      kpi("Unique visitors", fmtNum(s.unique_visitors), rangeText() + ", all hubs") +
+      kpi("Visits", fmtNum(visits), rangeText()) +
+      kpi("Active time / visit", Math.round(activePerVisit) + "<small>min</small>", "time with the hub tab in view") +
+      kpi("Total study time", fmtMin(totalMin), rangeText() + ", all hubs") +
+      kpi("Answers logged", fmtNum(att), "all time" + (state.archived ? "" : ", live hubs")) +
+      kpi("Class accuracy", acc + "<small>%</small>", "all time" + (state.archived ? "" : ", live hubs")) +
+      kpi("Open reports", open, open ? "flags & suggestions to review" : "inbox is clear", open > 0) +
+    '</div>';
+
+    var hubs = hubRows();
+    var maxH = hubs.reduce(function(m, r){ return Math.max(m, r.minutes); }, 0);
+    var hubBody = hubs.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Time</th><th></th></tr></thead><tbody>' +
+      hubs.map(function(r){ return '<tr><td class="lbl">' + hubCell(r.hub) + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="barcell">' + bar(r.minutes, maxH, false, fmtMin(r.minutes)) + '</td></tr>'; }).join("") +
+      '</tbody></table></div>' : '<div class="empty">No activity in this range.</div>';
+
+    var flat = [];
+    sectionTree().forEach(function(h){
+      Object.keys(h.modes).forEach(function(mk){
+        var m = h.modes[mk];
+        Object.keys(m.subs).forEach(function(sk){ flat.push({ hub: h.hub, mode: mk, sub: sk, minutes: m.subs[sk] }); });
+      });
+    });
+    flat.sort(function(a, b){ return b.minutes - a.minutes; });
+    flat = flat.slice(0, 8);
+    var maxS = flat.length ? flat[0].minutes : 0;
+    var secBody = flat.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Section</th><th class="n">Time</th><th></th></tr></thead><tbody>' +
+      flat.map(function(r){
+        return '<tr><td class="lbl">' + esc(sectionName(r.mode, r.sub)) + ' <span class="muted">· ' + esc(hubLabel(r.hub)) + '</span></td><td class="n">' + fmtMin(r.minutes) + '</td><td class="barcell">' + bar(r.minutes, maxS, false, fmtMin(r.minutes)) + '</td></tr>';
+      }).join("") + '</tbody></table></div>' : '<div class="empty">No activity in this range.</div>';
+
+    var tough = toughest("all").slice(0, 5);
+    var toughBody = tough.length ? toughTable(tough) : '<div class="empty">Not enough answers yet.</div>';
+
+    el.innerHTML = tiles +
+      '<div class="grid-2">' +
+        card("Where time goes", rangeText(), hubBody) +
+        card("Busiest sections", "top 8, " + rangeText(), secBody, '<a href="#" data-goto="time">All sections →</a>') +
+      '</div>' +
+      card("Hardest questions right now", "lowest % correct, 3+ answers", toughBody, '<a href="#" data-goto="questions">All questions →</a>');
+  }
+
+  function sectionName(mode, sub){
+    if (mode === "(unspecified)") return "Unknown section";
+    return prettyPart(mode) + (sub ? " › " + prettyPart(sub) : "");
+  }
+
+  function renderTime(){
+    var el = $('[data-panel="time"]');
+    if (data.bySection.error || data.byHub.error) { el.innerHTML = card("Time by section", "", '<div class="err">Couldn’t load time data.</div>'); return; }
+    var hubs = hubRows();
+    var maxH = hubs.reduce(function(m, r){ return Math.max(m, r.minutes); }, 0);
+    var hubTbl = hubs.length ? '<div class="tbl-wrap"><table class="data wide"><thead><tr><th>Hub</th><th class="n">Visitors</th><th class="n">Total time</th><th class="n">Per visitor</th><th></th></tr></thead><tbody>' +
+      hubs.map(function(r){
+        return '<tr><td class="lbl">' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.visitors) + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtMin(r.visitors ? r.minutes / r.visitors : 0) + '</td><td class="barcell">' + bar(r.minutes, maxH, false, fmtMin(r.minutes)) + '</td></tr>';
+      }).join("") + '</tbody></table></div>' : '<div class="empty">No activity in this range.</div>';
+
+    var out = card("Time by hub", rangeText(), hubTbl);
+
+    sectionTree().forEach(function(h){
+      var modes = Object.keys(h.modes).map(function(k){ return h.modes[k]; }).sort(function(a, b){ return b.minutes - a.minutes; });
+      var rows = "";
+      modes.forEach(function(m){
+        var subs = Object.keys(m.subs).map(function(k){ return { sub: k, minutes: m.subs[k] }; }).sort(function(a, b){ return b.minutes - a.minutes; });
+        var onlyUntracked = subs.length === 1 && subs[0].sub === "";
+        var tag = m.mode === "(unspecified)" ? "mode not detected by older tracking" : (onlyUntracked ? "all views · logged before per-view tracking" : "");
+        rows += '<tr class="group"><td>' + esc(sectionName(m.mode, "")) + (tag ? '<span class="tag">' + tag + '</span>' : '') + '</td><td class="n">' + fmtMin(m.minutes) + '</td><td class="n">' + pctOf(m.minutes, h.minutes) + '</td><td class="barcell">' + (tag ? bar(m.minutes, h.minutes, false, pctOf(m.minutes, h.minutes) + " of " + hubLabel(h.hub)) : '') + '</td></tr>';
+        if (tag) return;
+        subs.forEach(function(s){
+          var name = s.sub ? prettyPart(s.sub) : "Main view / before per-view tracking";
+          rows += '<tr class="child"><td class="lbl">' + esc(name) + '</td><td class="n">' + fmtMin(s.minutes) + '</td><td class="n">' + pctOf(s.minutes, h.minutes) + '</td><td class="barcell">' + bar(s.minutes, h.minutes, false, pctOf(s.minutes, h.minutes) + " of " + hubLabel(h.hub)) + '</td></tr>';
+        });
+      });
+      var body = '<div class="tbl-wrap"><table class="data"><thead><tr><th>Section</th><th class="n">Time</th><th class="n">Share</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      out += card(hubCell(h.hub), fmtMin(h.minutes) + " total · " + rangeText(), body);
+    });
+
+    out += '<p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the exact section on screen (e.g. Compendium › Question Bank). Per-view detail starts 2026-09-23 — older time only knows the top-level mode, and shows as “before per-view tracking.”</p>';
+    el.innerHTML = out;
+  }
+  function pctOf(v, total){ return total ? Math.round(v / total * 100) + "%" : "—"; }
+
+  function toughest(hub){
+    return questionRows().filter(function(r){ return (r.attempts || 0) >= 3 && (hub === "all" || r.hub === hub); })
+      .map(function(r){ return { hub: r.hub, qid: r.qid, attempts: r.attempts, pct: Math.round(r.correct / r.attempts * 100) }; })
+      .sort(function(a, b){ return a.pct - b.pct || b.attempts - a.attempts; });
+  }
+  function toughTable(rows){
+    return '<div class="tbl-wrap"><table class="data wide"><thead><tr><th>Question</th><th>Hub</th><th class="n">Answers</th><th class="n">Correct</th><th></th></tr></thead><tbody>' +
+      rows.map(function(r){
+        return '<tr><td class="lbl">' + esc(r.qid) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
+      }).join("") + '</tbody></table></div>';
+  }
+  function renderQuestions(){
+    var el = $('[data-panel="questions"]');
+    if (data.qstats.error) { el.innerHTML = card("Questions", "", '<div class="err">Couldn’t load question data.</div>'); return; }
+    var rows = questionRows();
+    var byHub = {};
+    rows.forEach(function(r){
+      var h = byHub[r.hub] || (byHub[r.hub] = { hub: r.hub, att: 0, cor: 0, qs: 0, rated: 0 });
+      h.att += r.attempts || 0; h.cor += r.correct || 0; h.qs++; if ((r.attempts || 0) >= 3) h.rated++;
+    });
+    var hubs = Object.keys(byHub).map(function(k){ return byHub[k]; }).sort(function(a, b){ return b.att - a.att; });
+    var sumTbl = hubs.length ? '<div class="tbl-wrap"><table class="data wide"><thead><tr><th>Hub</th><th class="n">Questions</th><th class="n">Answers</th><th class="n">Accuracy</th><th></th></tr></thead><tbody>' +
+      hubs.map(function(h){
+        var p = h.att ? Math.round(h.cor / h.att * 100) : 0;
+        return '<tr><td class="lbl">' + hubCell(h.hub) + '</td><td class="n">' + fmtNum(h.qs) + '</td><td class="n">' + fmtNum(h.att) + '</td><td class="n">' + p + '%</td><td class="barcell">' + bar(p, 100, p < 50, p + "% correct") + '</td></tr>';
+      }).join("") + '</tbody></table></div>' : '<div class="empty">No answers yet.</div>';
+
+    if (state.qHub !== "all" && !byHub[state.qHub]) state.qHub = "all";
+    var chips = '<div class="chips" id="qChips"><button type="button" data-qhub="all" aria-pressed="' + (state.qHub === "all") + '">All hubs</button>' +
+      hubs.map(function(h){ return '<button type="button" data-qhub="' + esc(h.hub) + '" aria-pressed="' + (state.qHub === h.hub) + '">' + esc(hubLabel(h.hub)) + '</button>'; }).join("") + '</div>';
+    var tough = toughest(state.qHub).slice(0, 25);
+    var toughBody = chips + (tough.length ? toughTable(tough) : '<div class="empty">No questions with 3+ answers here yet.</div>');
+
+    el.innerHTML = card("Accuracy by hub", "all time", sumTbl) +
+      card("Toughest questions", "lowest % correct, 25 max · questions with fewer than 3 answers are left out so one fluke doesn’t rank", toughBody) +
+      '<p class="note">Red bars are under 50% correct. Question IDs match each hub’s own question bank.</p>';
+  }
+
+  function renderEngagement(){
+    var el = $('[data-panel="engagement"]');
+    var out = "";
+    /* streaks */
+    var sRows = data.streaks.data || [];
+    var active = sRows.find(function(r){ return r.kind === "active"; });
+    var record = sRows.find(function(r){ return r.kind === "record"; });
+    var ns = (data.nukeSum.data && data.nukeSum.data[0]) || {};
+    out += '<div class="kpis">' +
+      kpi("Longest active streak", active ? active.streak : 0, active ? esc(active.display_name) : "no one on a streak") +
+      kpi("All-time streak record", record ? record.streak : 0, record ? esc(record.display_name) : "—") +
+      kpi("Tactical nukes", fmtNum(ns.total_launches), rangeText()) +
+      kpi("Unique launchers", fmtNum(ns.unique_launchers), rangeText()) +
+    '</div>';
+
+    /* mode opens grouped by hub */
+    if (data.modes.error) out += card("Most-opened modes", "", '<div class="err">Couldn’t load mode data.</div>');
+    else {
+      var byHub = {};
+      (data.modes.data || []).forEach(function(r){
+        if (!r.hub || !keepHub(r.hub)) return;
+        (byHub[r.hub] = byHub[r.hub] || []).push(r);
+      });
+      var hubs = Object.keys(byHub).sort(function(a, b){ return sumOpens(byHub[b]) - sumOpens(byHub[a]); });
+      var rows = "";
+      hubs.forEach(function(h){
+        var list = byHub[h].sort(function(a, b){ return (b.opens || 0) - (a.opens || 0); });
+        var max = list[0] ? list[0].opens : 0;
+        rows += '<tr class="group"><td colspan="2">' + esc(hubLabel(h)) + (isArchived(h) ? ' · archived' : '') + '</td><td class="n">' + fmtNum(sumOpens(list)) + '</td></tr>';
+        list.forEach(function(r){
+          rows += '<tr class="child"><td class="lbl">' + esc(prettyPart(r.mode)) + '</td><td class="barcell">' + bar(r.opens, max, false, r.opens + " opens") + '</td><td class="n">' + fmtNum(r.opens) + '</td></tr>';
+        });
+      });
+      out += card("Most-opened modes", "all time · how often each top-level mode was clicked open",
+        rows ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Mode</th><th></th><th class="n">Opens</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : '<div class="empty">No data yet.</div>');
+    }
+
+    /* nukes */
+    var nh = (data.nukeHub.data || []).filter(function(r){ return keepHub(r.hub); });
+    var nr = data.nukeRecent.data || [];
+    var nukeBody = (nh.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Launches</th></tr></thead><tbody>' +
+        nh.map(function(r){ return '<tr><td class="lbl">' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.launches) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches in this range.</div>');
+    var recentBody = nr.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Who</th><th>Hub</th><th class="n">When</th></tr></thead><tbody>' +
+        nr.map(function(r){ return '<tr><td class="lbl">' + esc(r.display_name) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtDate(r.launched_at) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches yet.</div>';
+    out += '<div class="grid-2">' + card("Nukes by hub", rangeText(), nukeBody) + card("Recent nukes", "last 10", recentBody) + '</div>';
+    el.innerHTML = out;
+  }
+  function sumOpens(list){ return list.reduce(function(s, r){ return s + (r.opens || 0); }, 0); }
+
+  var showResolvedReports = false;
+  function renderInbox(){
+    var el = $('[data-panel="inbox"]');
+    if (data.reports.error) { el.innerHTML = card("Inbox", "", '<div class="err">Couldn’t load reports.</div>'); return; }
+    var all = data.reports.data || [];
+    var rows = all.filter(function(r){ return showResolvedReports || !r.resolved; });
+    var list = rows.length ? rows.map(function(r){
+      return '<div class="report' + (r.resolved ? ' is-resolved' : '') + '" data-kind="' + esc(r.kind) + '" data-id="' + esc(r.id) + '">' +
+        '<div class="report-main"><div class="report-top"><span class="pill ' + esc(r.kind) + '">' + (r.kind === "flag" ? "Flag" : "Suggestion") + '</span>' +
+        (r.hub ? '<span class="pill">' + esc(hubLabel(r.hub)) + '</span>' : '') +
+        '<span class="report-date">' + fmtDate(r.created_at) + '</span></div>' +
+        '<div class="report-note">' + esc(r.note) + '</div></div>' +
+        '<button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved' : 'Mark resolved') + '</button>' +
       '</div>';
-    }).join('') + '</div>';
+    }).join("") : '<div class="empty">' + (showResolvedReports ? 'Nothing here yet.' : 'All clear — nothing open.') + '</div>';
+    var open = all.filter(function(r){ return !r.resolved; }).length;
+    el.innerHTML = card("Flags & suggestions", open + " open · " + all.length + " total", list,
+      '<label class="switch"><input type="checkbox" id="showResolved"' + (showResolvedReports ? ' checked' : '') + '> Show resolved</label>');
   }
-  function loadAnalytics(){
-    analyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
-    Promise.all([
-      supabase.rpc("get_visitor_summary", { p_secret: secret, p_days: 30 }),
-      supabase.rpc("get_visitor_by_hub", { p_secret: secret, p_days: 30 }),
-      supabase.rpc("get_visitor_by_section", { p_secret: secret, p_days: 30 })
-    ]).then(function(results){
-      var summaryRes = results[0], hubRes = results[1], sectionRes = results[2];
-      if ((summaryRes && summaryRes.error) || (hubRes && hubRes.error) || (sectionRes && sectionRes.error)) {
-        analyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v6.sql in the Supabase SQL editor.</div>';
-        return;
-      }
-      var summary = (summaryRes && summaryRes.data && summaryRes.data[0]) || { unique_visitors: 0, total_visits: 0, avg_visit_minutes: 0 };
-      var byHub = (hubRes && hubRes.data) || [];
-      var bySection = (sectionRes && sectionRes.data) || [];
-      var hubLabels = byHub.map(function(r){ return { label: r.hub, total_minutes: r.total_minutes }; });
-      var sectionLabels = bySection.map(function(r){ return { label: r.hub + ' · ' + r.section, total_minutes: r.total_minutes }; });
-      analyticsBody.innerHTML =
-        '<div class="stat-tiles">' +
-          '<div class="stat-tile"><div class="num">' + (summary.unique_visitors || 0) + '</div><div class="label">Unique visitors</div></div>' +
-          '<div class="stat-tile"><div class="num">' + (summary.total_visits || 0) + '</div><div class="label">Total visits</div></div>' +
-          '<div class="stat-tile"><div class="num">' + (summary.avg_visit_minutes || 0) + '</div><div class="label">Avg. minutes / visit</div></div>' +
-        '</div>' +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Time by hub</h3>' +
-        barList(hubLabels, 'label', 'total_minutes', ' min') +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Time by section</h3>' +
-        barList(sectionLabels, 'label', 'total_minutes', ' min');
-    }, function(){
-      analyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load analytics right now — try again in a moment.</div>';
-    });
+  function updateInboxCount(){
+    var n = data.reports && !data.reports.error ? openReports().length : 0;
+    var c = $("#inboxCount");
+    c.textContent = n;
+    c.classList.toggle("zero", n === 0);
   }
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3" };
-  function hubLabel(h){ return HUB_LABEL[h] || h || "(unknown)"; }
-
-  var questionAnalyticsBody = document.getElementById("questionAnalyticsBody");
-  function loadQuestionAnalytics(){
-    if (!questionAnalyticsBody) return;
-    questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
-    Promise.all([
-      supabase.from("question_stats").select("hub,qid,attempts,correct"),
-      supabase.from("mode_stats").select("hub,mode,opens")
-    ]).then(function(results){
-      var qRes = results[0], mRes = results[1];
-      if ((qRes && qRes.error) || (mRes && mRes.error)) {
-        questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet, or these tables aren&#39;t readable from here.</div>';
-        return;
-      }
-      var qRows = (qRes && qRes.data) || [];
-      var mRows = (mRes && mRes.data) || [];
-
-      var totalAttempts = 0, totalCorrect = 0, questionsWithData = 0;
-      qRows.forEach(function(r){
-        totalAttempts += r.attempts || 0;
-        totalCorrect += r.correct || 0;
-        if ((r.attempts || 0) >= 3) questionsWithData++;
-      });
-      var overallPct = totalAttempts ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-
-      var tough = qRows.filter(function(r){ return (r.attempts || 0) >= 3; });
-      tough.sort(function(a, b){ return (a.correct / a.attempts) - (b.correct / b.attempts); });
-      tough = tough.slice(0, 15).map(function(r){
-        return { label: hubLabel(r.hub) + ' · ' + r.qid, val: Math.round((r.correct / r.attempts) * 100) };
-      });
-
-      var modes = mRows.slice().sort(function(a, b){ return (b.opens || 0) - (a.opens || 0); });
-      modes = modes.slice(0, 15).map(function(r){
-        return { label: hubLabel(r.hub) + ' · ' + r.mode, val: r.opens };
-      });
-
-      questionAnalyticsBody.innerHTML =
-        '<div class="stat-tiles">' +
-          '<div class="stat-tile"><div class="num">' + totalAttempts + '</div><div class="label">Answers logged</div></div>' +
-          '<div class="stat-tile"><div class="num">' + overallPct + '%</div><div class="label">Overall accuracy</div></div>' +
-          '<div class="stat-tile"><div class="num">' + questionsWithData + '</div><div class="label">Questions w/ 3+ answers</div></div>' +
-        '</div>' +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Toughest questions (lowest % correct, 3+ answers)</h3>' +
-        barList(tough, 'label', 'val', '%') +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Most-opened sections</h3>' +
-        barList(modes, 'label', 'val', ' opens');
-    }, function(){
-      questionAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
-    });
+  function renderAll(){
+    renderOverview(); renderTime(); renderQuestions(); renderEngagement(); renderInbox(); updateInboxCount();
   }
 
-  var streakAnalyticsBody = document.getElementById("streakAnalyticsBody");
-  function loadStreakAnalytics(){
-    if (!streakAnalyticsBody) return;
-    streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
-    supabase.rpc("get_correct_streak_stats").then(function(res){
-      if (res && res.error) {
-        streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v8.sql in the Supabase SQL editor.</div>';
-        return;
-      }
-      var rows = (res && res.data) || [];
-      var active = rows.find(function(r){ return r.kind === "active"; });
-      var record = rows.find(function(r){ return r.kind === "record"; });
-      if (!active && !record) {
-        streakAnalyticsBody.innerHTML = '<div class="analytics-empty">No streaks yet.</div>';
-        return;
-      }
-      streakAnalyticsBody.innerHTML =
-        '<div class="stat-tiles">' +
-          '<div class="stat-tile"><div class="num">' + (active ? active.streak : 0) + '</div><div class="label">Longest active' + (active ? ' · ' + esc(active.display_name) : '') + '</div></div>' +
-          '<div class="stat-tile"><div class="num">' + (record ? record.streak : 0) + '</div><div class="label">All-time record' + (record ? ' · ' + esc(record.display_name) : '') + '</div></div>' +
-        '</div>';
-    }, function(){
-      streakAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
-    });
+  /* ---------- tabs & controls ---------- */
+  function showTab(t){
+    state.tab = t; savePrefs();
+    $$(".tabs [role=tab]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.tab === t)); });
+    $$(".panel").forEach(function(p){ p.hidden = p.dataset.panel !== t; });
+    window.scrollTo(0, 0);
+  }
+  $(".tabs").addEventListener("click", function(e){
+    var b = e.target.closest("[data-tab]"); if (b) showTab(b.dataset.tab);
+  });
+  document.addEventListener("click", function(e){
+    var g = e.target.closest("[data-goto]");
+    if (g) { e.preventDefault(); showTab(g.dataset.goto); }
+    var c = e.target.closest("[data-qhub]");
+    if (c) { state.qHub = c.dataset.qhub; renderQuestions(); }
+  });
+  $("#rangeSeg").addEventListener("click", function(e){
+    var b = e.target.closest("[data-days]"); if (!b) return;
+    state.days = Number(b.dataset.days); savePrefs(); syncControls(); loadAll();
+  });
+  $("#showArchived").addEventListener("change", function(e){
+    state.archived = e.target.checked; savePrefs(); renderAll();
+  });
+  $("#refreshBtn").addEventListener("click", function(){ loadAll(); });
+  function syncControls(){
+    $$("#rangeSeg [data-days]").forEach(function(b){ b.setAttribute("aria-pressed", String(Number(b.dataset.days) === state.days)); });
+    $("#showArchived").checked = state.archived;
   }
 
-  var nukeAnalyticsBody = document.getElementById("nukeAnalyticsBody");
-  function loadNukeAnalytics(){
-    if (!nukeAnalyticsBody) return;
-    nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Loading…</div>';
-    Promise.all([
-      supabase.rpc("get_nuke_summary", { p_secret: secret, p_days: 30 }),
-      supabase.rpc("get_nuke_by_hub", { p_secret: secret, p_days: 30 }),
-      supabase.rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 })
-    ]).then(function(results){
-      var summaryRes = results[0], hubRes = results[1], recentRes = results[2];
-      if ((summaryRes && summaryRes.error) || (hubRes && hubRes.error) || (recentRes && recentRes.error)) {
-        nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Not set up yet — run migration_v8.sql in the Supabase SQL editor.</div>';
-        return;
-      }
-      var summary = (summaryRes && summaryRes.data && summaryRes.data[0]) || { total_launches: 0, unique_launchers: 0 };
-      var byHub = (hubRes && hubRes.data) || [];
-      var recent = (recentRes && recentRes.data) || [];
-      var hubRows = byHub.map(function(r){ return { label: hubLabel(r.hub), val: r.launches }; });
-      var recentHTML = recent.length
-        ? '<div class="bar-list">' + recent.map(function(r){
-            return '<div class="bar-row">' +
-              '<span class="bar-label" style="width:auto; flex:1;">' + esc(r.display_name) + ' · ' + esc(hubLabel(r.hub)) + '</span>' +
-              '<span class="bar-val" style="width:auto;">' + fmtDate(r.launched_at) + '</span>' +
-            '</div>';
-          }).join('') + '</div>'
-        : '<div class="analytics-empty">No launches yet.</div>';
-      nukeAnalyticsBody.innerHTML =
-        '<div class="stat-tiles">' +
-          '<div class="stat-tile"><div class="num">' + (summary.total_launches || 0) + '</div><div class="label">Launches</div></div>' +
-          '<div class="stat-tile"><div class="num">' + (summary.unique_launchers || 0) + '</div><div class="label">Unique launchers</div></div>' +
-        '</div>' +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Launches by hub</h3>' +
-        barList(hubRows, 'label', 'val', '') +
-        '<h3 style="font-size:14px; margin:0 0 10px; color:var(--ink-2);">Most recent</h3>' +
-        recentHTML;
-    }, function(){
-      nukeAnalyticsBody.innerHTML = '<div class="analytics-empty">Couldn&#39;t load this right now — try again in a moment.</div>';
-    });
-  }
+  /* inbox interactions */
+  $('[data-panel="inbox"]').addEventListener("change", function(e){
+    if (e.target.id === "showResolved") { showResolvedReports = e.target.checked; renderInbox(); }
+  });
+  $('[data-panel="inbox"]').addEventListener("click", function(e){
+    var btn = e.target.closest(".resolve-btn"); if (!btn) return;
+    var cardEl = btn.closest(".report");
+    var kind = cardEl.getAttribute("data-kind");
+    var id = Number(cardEl.getAttribute("data-id"));
+    var row = (data.reports.data || []).find(function(r){ return r.kind === kind && r.id === id; });
+    if (!row) return;
+    var next = !row.resolved;
+    btn.disabled = true;
+    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next }).then(function(res){
+      if (!(res && res.error)) row.resolved = next;
+      renderInbox(); updateInboxCount(); renderOverview();
+    }, function(){ btn.disabled = false; });
+  });
 
+  /* ---------- gate ---------- */
+  var gate = $("#gate"), app = $("#app"), gateInput = $("#gateInput"), gateBtn = $("#gateBtn"), gateMsg = $("#gateMsg");
   function unlock(ok, msg){
-    if (ok) {
-      gate.hidden = true;
-      wrap.hidden = false;
-    } else {
-      gate.hidden = false;
-      wrap.hidden = true;
-      gateMsg.textContent = msg || "";
-      try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
-    }
+    gate.hidden = ok; app.hidden = !ok;
+    if (!ok) { gateMsg.textContent = msg || ""; try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {} }
   }
-
   function tryUnlock(candidate){
     secret = candidate;
     gateBtn.disabled = true;
     gateMsg.textContent = "Checking…";
     supabase.rpc("get_reports", { p_secret: secret }).then(function(res){
       gateBtn.disabled = false;
-      if (res && res.error) {
-        unlock(false, "Wrong passphrase.");
-        return;
-      }
+      if (res && res.error) { unlock(false, "Wrong passphrase."); return; }
       try { sessionStorage.setItem(SESSION_KEY, secret); } catch (e) {}
-      allReports = (res && res.data) || [];
+      gateMsg.textContent = "";
       unlock(true);
-      render();
-      loadAnalytics();
-      loadQuestionAnalytics();
-      loadStreakAnalytics();
-      loadNukeAnalytics();
+      syncControls();
+      showTab(state.tab);
+      loadAll();
     }, function(){
       gateBtn.disabled = false;
       unlock(false, "Couldn't reach the server — try again.");
     });
   }
-
   gateBtn.addEventListener("click", function(){
     var v = (gateInput.value || "").trim();
     if (!v) { gateMsg.textContent = "Type the passphrase first."; return; }
     tryUnlock(v);
   });
-  gateInput.addEventListener("keydown", function(e){
-    if (e.key === "Enter") gateBtn.click();
-  });
-
-  showResolved.addEventListener("change", render);
-
-  reportList.addEventListener("click", function(e){
-    var btn = e.target.closest(".resolve-btn");
-    if (!btn) return;
-    var card = btn.closest(".report");
-    var kind = card.getAttribute("data-kind");
-    var id = Number(card.getAttribute("data-id"));
-    var row = allReports.find(function(r){ return r.kind === kind && r.id === id; });
-    if (!row) return;
-    var next = !row.resolved;
-    btn.disabled = true;
-    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next }).then(function(){
-      row.resolved = next;
-      btn.disabled = false;
-      render();
-    }, function(){
-      btn.disabled = false;
-    });
-  });
-
-  /* auto-unlock if we remember the passphrase from this browser tab session */
-  try {
-    var saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) tryUnlock(saved);
-  } catch (e) {}
+  gateInput.addEventListener("keydown", function(e){ if (e.key === "Enter") gateBtn.click(); });
+  try { var s = sessionStorage.getItem(SESSION_KEY); if (s) tryUnlock(s); } catch (e) {}
 })();
 </script>
 </body>
