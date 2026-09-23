@@ -487,6 +487,52 @@ main{padding-top:16px}
 .gm-hud .hrt{border:0;padding:0;background:none;border-radius:0}
 .gm-hud b[data-hud="lives"]{display:inline-flex;align-items:center}
 
+/* ---------- Clast Blaster ---------- */
+.cb-canvas{cursor:crosshair}
+.ar-wrap.fs-on .cb-canvas{max-width:min(100%, calc((100vh - 330px) * 1.636))}
+
+/* ---------- Bone Search ---------- */
+.bs-stage{min-height:470px;display:flex;flex-direction:column}
+.bs-body{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:18px;padding:14px;align-items:start}
+.bs-grid{display:grid;grid-template-columns:repeat(12,34px);gap:3px;justify-content:center}
+.bs-cell{width:34px;height:34px;border-radius:7px;border:0;background:var(--ar-panel-2);color:var(--ar-ink);font-family:var(--font-mono);font-weight:700;font-size:.95rem;cursor:pointer;padding:0}
+.bs-cell:hover{background:#3b3270}
+.bs-cell.sel{background:var(--ar-yellow);color:#120f24}
+.bs-cell.found{background:color-mix(in srgb, var(--ar-cyan) 55%, var(--ar-panel-2));color:#120f24}
+.bs-clues{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:c}
+.bs-clues li{background:var(--ar-panel-2);border:2px solid var(--ar-line);border-radius:10px;padding:8px 10px;font-size:.86rem;display:flex;flex-direction:column;gap:4px}
+.bs-clues li.found{border-color:var(--ar-cyan)}
+.bs-clue{color:var(--ar-ink)}
+.bs-ans{font-family:var(--font-mono);font-size:.76rem;color:var(--ar-dim)}
+.bs-clues li.found .bs-ans{color:var(--ar-cyan)}
+.bs-clues .lec-chip{align-self:flex-start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-wrap.fs-on .bs-grid{grid-template-columns:repeat(12,clamp(34px, 5vh, 52px))}
+.ar-wrap.fs-on .bs-cell{width:clamp(34px, 5vh, 52px);height:clamp(34px, 5vh, 52px);font-size:1.1rem}
+
+/* ---------- Whack-a-Clast ---------- */
+.wa-stage{min-height:470px;display:flex;flex-direction:column;padding:14px;gap:14px}
+.wa-target{background:var(--ar-orange);color:#120f24;border-radius:12px;padding:10px 14px;font-family:var(--font-arcade);font-size:.68rem;line-height:1.6;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wa-target b{font-size:.8rem}
+.wa-target span{font-family:var(--font-body);font-size:.8rem;margin-left:auto;opacity:.75}
+.wa-grid{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.wa-hole{position:relative;min-height:110px;border:0;border-radius:14px;background:radial-gradient(ellipse 40% 20% at 50% 86%, #120f24 0 98%, transparent 100%), #f1e7d0;cursor:pointer;overflow:hidden;padding:0;touch-action:manipulation}
+.wa-hole kbd{position:absolute;top:6px;left:8px;font-family:var(--font-mono);font-size:.62rem;color:#8b7d5e}
+.wa-mole{position:absolute;left:50%;bottom:-100%;transform:translateX(-50%);width:82%;min-height:70%;border-radius:40px 40px 12px 12px;background:var(--ar-violet);display:flex;align-items:center;justify-content:center;padding:8px;transition:bottom .12s ease-out;box-shadow:inset 0 -8px 0 rgba(0,0,0,.18)}
+.wa-mole::before,.wa-mole::after{content:"";position:absolute;top:10px;width:7px;height:7px;border-radius:50%;background:rgba(18,15,36,.45)}
+.wa-mole::before{left:32%}.wa-mole::after{right:32%}
+.wa-mole span{font-weight:800;font-size:.82rem;color:#120f24;text-align:center;line-height:1.2;margin-top:10px}
+.wa-hole.up .wa-mole{bottom:8%}
+.wa-hole.hit{background:radial-gradient(ellipse 40% 20% at 50% 86%, #120f24 0 98%, transparent 100%), color-mix(in srgb, var(--ar-green) 55%, #f1e7d0)}
+.wa-hole.miss{background:radial-gradient(ellipse 40% 20% at 50% 86%, #120f24 0 98%, transparent 100%), color-mix(in srgb, var(--ar-pink) 55%, #f1e7d0)}
+.ar-wrap.fs-on .wa-hole{min-height:calc((100vh - 330px) / 3)}
+@media (max-width:760px){
+  .bs-body{grid-template-columns:minmax(0,1fr)}
+  .bs-grid{grid-template-columns:repeat(12,minmax(0,1fr));width:100%}
+  .bs-cell{width:auto;height:auto;aspect-ratio:1;font-size:.72rem}
+  .wa-hole{min-height:90px}
+  .wa-mole span{font-size:.7rem}
+}
+
 </style>
 </head>
 <body>
@@ -1973,7 +2019,7 @@ var STATE_KEY = 'msk3-state-v1';
 function defaultState(){
   return { v:1, seen:{}, streak:0, bestStreak:0, totalCorrect:0, totalAnswered:0, lecStats:{}, days:[], ach:{},
     ui:{ mode:'compendium', sub:'notes', lec:'nutrition', group:'drugs', recall:false, qlec:'all', qsrc:'all', qstatus:'all' },
-    arcade:{ best:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0 }, plays:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0 }, muted:false, sortSet:'mix', snakeLec:'all', stackSet:'mix', matchSet:'mix', hangLec:'all' } };
+    arcade:{ best:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0, blaster:0, search:0, whack:0 }, plays:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0, blaster:0, search:0, whack:0 }, muted:false, sortSet:'mix', snakeLec:'all', stackSet:'mix', matchSet:'mix', hangLec:'all', blastLec:'all', searchLec:'all', whackSet:'mix' } };
 }
 function loadState(){
   var base = defaultState();
@@ -2403,7 +2449,10 @@ var ARCADE = (function(){
     { id:'stack', name:'STACK ATTACK', color:'var(--ar-cyan)',   desc:'Steps of a process ride the conveyor. Grab them in order to build the tower: growth plate zones, remodeling, fracture repair, osteoclast resorption.', thumb:thumbStack },
     { id:'match', name:'MARROW MATCH', color:'var(--ar-violet)', desc:'Memory flip. Find each term and its partner: gene and disease, antibody and target, drug and side effect. Clear boards to buy more time.', thumb:thumbMatch },
     { id:'hangman', name:'BONE TO PICK', color:'var(--ar-orange)', desc:'Hangman with a skeleton. Spell the answer to a clue one letter at a time before all six bones fall off. Answers count toward class stats.', thumb:thumbHang },
-    { id:'fact', name:'FACT OR FRACTURE', color:'var(--ar-pink)', desc:'60-second rush. Is the detail on the card true, or swapped in from a look-alike? Streaks multiply your score.', thumb:thumbFact }
+    { id:'fact', name:'FACT OR FRACTURE', color:'var(--ar-pink)', desc:'60-second rush. Is the detail on the card true, or swapped in from a look-alike? Streaks multiply your score.', thumb:thumbFact },
+    { id:'blaster', name:'CLAST BLASTER', color:'var(--ar-green)', desc:'Shooter. Osteoclasts carrying answers drift toward the bone; blast the one with the right answer before it lands. Answers count toward class stats.', thumb:thumbBlaster },
+    { id:'search', name:'BONE SEARCH', color:'var(--ar-cyan)', desc:'Word search. Six answers hide in a letter grid; read each clue and find its answer across, down or diagonal.', thumb:thumbSearch },
+    { id:'whack', name:'WHACK-A-CLAST', color:'var(--ar-orange)', desc:'Whack-a-mole. The banner names a category (say, every hypercalcemia sign); whack only the osteoclasts that belong to it.', thumb:thumbWhack }
   ];
 
   /* ---------- sound ---------- */
@@ -2507,6 +2556,23 @@ var ARCADE = (function(){
       '<rect x="60" y="118" width="92" height="34" rx="9" fill="#7ee36b"/><text x="106" y="140" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#120f24">FACT</text><rect x="168" y="118" width="92" height="34" rx="9" fill="#ff5c8a"/><text x="214" y="140" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#120f24">FRACTURE</text></svg>';
   }
 
+  function thumbBlaster(){
+    var cl = [['A',70,50,'#ffd23f'],['B',145,80,'#ff5c8a'],['C',215,40,'#3fe0d0'],['D',285,70,'#a98bff']].map(function(c){ return '<ellipse cx="'+c[1]+'" cy="'+c[2]+'" rx="26" ry="18" fill="'+c[3]+'"/><circle cx="'+(c[1]-9)+'" cy="'+(c[2]-4)+'" r="3" fill="#120f24" fill-opacity=".35"/><circle cx="'+(c[1]+9)+'" cy="'+(c[2]-3)+'" r="3" fill="#120f24" fill-opacity=".35"/><text x="'+c[1]+'" y="'+(c[2]+5)+'" text-anchor="middle" font-family="monospace" font-size="13" font-weight="700" fill="#120f24">'+c[0]+'</text>'; }).join('');
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+cl+'<rect x="213" y="92" width="4" height="30" fill="#7ee36b"/><path d="M215 118l22 30h-44z" fill="#7ee36b"/><rect y="150" width="320" height="20" fill="#f1e7d0"/></svg>';
+  }
+  function thumbSearch(){
+    var L = 'OSTEOCYTEPQRAKNMGOUTZLBPAGETXFH', h = '';
+    for(var y=0;y<4;y++) for(var x=0;x<9;x++){ var ch = L[(y*9+x) % L.length]; var hi = (y===0 && x<9) || (x===2 && y>0 && y<4 && false); h += '<text x="'+(52+x*27)+'" y="'+(40+y*26)+'" text-anchor="middle" font-family="monospace" font-size="15" font-weight="700" fill="'+(hi?'#120f24':'#a79fcf')+'">'+ch+'</text>'; }
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/><rect x="36" y="22" width="248" height="26" rx="13" fill="#3fe0d0"/>'+h+'<rect x="36" y="128" width="248" height="28" rx="8" fill="none" stroke="#3b3270" stroke-width="2"/><text x="160" y="147" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#f4f1ff">Cells that maintain matrix and do not divide</text></svg>';
+  }
+  function thumbWhack(){
+    var h = '';
+    for(var i=0;i<6;i++){ var x = 60 + (i%3)*100, y = 60 + Math.floor(i/3)*62, up = i===1||i===5;
+      h += '<ellipse cx="'+x+'" cy="'+(y+18)+'" rx="34" ry="10" fill="#120f24"/>';
+      if(up) h += '<ellipse cx="'+x+'" cy="'+(y+2)+'" rx="26" ry="20" fill="'+(i===1?'#ff9b3f':'#a98bff')+'"/><circle cx="'+(x-8)+'" cy="'+(y-2)+'" r="3" fill="#120f24"/><circle cx="'+(x+8)+'" cy="'+(y-2)+'" r="3" fill="#120f24"/>'; }
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/><rect x="40" y="10" width="240" height="24" rx="12" fill="#ff9b3f"/><text x="160" y="27" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700" fill="#120f24">WHACK: HYPERCALCEMIA</text>'+h+'<path d="M200 44l30-20 8 12-30 20z" fill="#f4f1ff"/><rect x="226" y="10" width="10" height="34" rx="3" transform="rotate(55 231 27)" fill="#d9c9a6"/></svg>';
+  }
+
   /* ---------- fullscreen ---------- */
   function fsSupported(){ return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen); }
   function toggleFullscreen(root){
@@ -2530,13 +2596,13 @@ var ARCADE = (function(){
     stopAll();
     panel = document.getElementById('panel-arcade');
     var a = STATE.arcade;
-    var h = '<div class="ar-wrap"><div class="ar-hero"><h2 class="ar-logo">BONE ZONE ARCADE<small>SIX QUICK GAMES · SAME EXAM 3 MATERIAL</small></h2>' +
+    var h = '<div class="ar-wrap"><div class="ar-hero"><h2 class="ar-logo">BONE ZONE ARCADE<small>NINE QUICK GAMES · SAME EXAM 3 MATERIAL</small></h2>' +
       '<div class="ar-stats"><span class="ar-stat">PLAYS<b>'+GAMES.reduce(function(n,g){ return n + (a.plays[g.id]||0); }, 0)+'</b></span><span class="ar-stat">STREAK<b>'+STATE.streak+'</b></span><button type="button" class="ar-mute" id="arMute" aria-label="Toggle sound">'+(a.muted?icon('soundOff'):icon('soundOn'))+'</button></div></div>' +
       '<div class="ar-grid">' + GAMES.map(function(g){
         return '<button type="button" class="ar-tile" style="--c:'+g.color+'" data-game="'+g.id+'"><span class="ar-thumb">'+g.thumb()+'</span><span class="ar-tile-body"><h3>'+g.name+'</h3><p>'+g.desc+'</p><span class="ar-tile-foot"><span class="ar-best">BEST '+String(a.best[g.id]||0).padStart(5,'0')+'</span><span class="ar-play">PLAY '+icon('play')+'</span></span></span></button>';
       }).join('') + '</div>' +
       '<div class="ar-boards" id="arBoards"><h3 class="ar-sub">'+icon('medal')+'CLASS LEADERBOARDS</h3><div class="ar-board-grid">' + GAMES.map(function(g){ return '<div class="ar-board" style="--c:'+g.color+'" data-board="'+g.id+'"><h4>'+g.name+'</h4><div class="lb-body"><div class="lb-empty">Loading…</div></div></div>'; }).join('') + '</div></div>' +
-      '<div class="ar-how"><b>How these help:</b> Sort Storm and Fact or Fracture drill the look-alike splits the exam loves; Osteo Snake and Bone to Pick run the real question bank (those answers count toward class-wide stats); Stack Attack drills every ordered process; Marrow Match drills the one-to-one pairs (gene to disease, antibody to target). Every game ends with what you missed and the right answer, and posts your score to the class leaderboard. Use FULL SCREEN inside any game for a bigger board.</div></div>';
+      '<div class="ar-how"><b>How these help:</b> Sort Storm and Fact or Fracture drill the look-alike splits the exam loves; Osteo Snake and Bone to Pick run the real question bank (those answers count toward class-wide stats); Clast Blaster runs the question bank too; Stack Attack drills every ordered process; Marrow Match and Bone Search drill the one-to-one pairs and key terms; Whack-a-Clast drills the category splits at speed. Every game ends with what you missed and the right answer, and posts your score to the class leaderboard. Use FULL SCREEN inside any game for a bigger board.</div></div>';
     panel.innerHTML = h;
     panel.querySelectorAll('[data-game]').forEach(function(b){ b.addEventListener('click', function(){ startGame(b.getAttribute('data-game')); }); });
     renderBoards();
@@ -2546,7 +2612,7 @@ var ARCADE = (function(){
   function startGame(id){
     stopAll();
     panel = document.getElementById('panel-arcade');
-    active = id === 'sort' ? SortStorm() : id === 'snake' ? Snake() : id === 'stack' ? StackAttack() : id === 'match' ? MarrowMatch() : id === 'hangman' ? BoneToPick() : FactOrFracture();
+    active = id === 'sort' ? SortStorm() : id === 'snake' ? Snake() : id === 'stack' ? StackAttack() : id === 'match' ? MarrowMatch() : id === 'hangman' ? BoneToPick() : id === 'fact' ? FactOrFracture() : id === 'blaster' ? ClastBlaster() : id === 'search' ? BoneSearch() : WhackAClast();
     active.mount(panel);
   }
   function shell(g, selectHTML, stageHTML, keysHTML){
@@ -3202,6 +3268,327 @@ var ARCADE = (function(){
         document.addEventListener('keydown', onKey);
       },
       stop: function(){ if(st) st.running = false; cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); }
+    };
+  }
+
+  /* =================================================================== CLAST BLASTER (shooter on real MCQs) */
+  function ClastBlaster(){
+    var g = GAMES[6], root, canvas, ctx, legend, promptEl, raf = null, last = 0, st = null;
+    var W = 720, H = 440, LANES = 4, COLORS = ['#ffd23f','#ff5c8a','#3fe0d0','#a98bff'], LETTERS = ['A','B','C','D'];
+    function pool(){
+      var lec = STATE.arcade.blastLec;
+      return QUESTIONS.filter(function(q){ return q.type === 'mcq' && q.choices.length >= 4 && (lec === 'all' || q.lec === lec) && q.stem.length <= 230 && q.choices.every(function(c){ return c.length <= 64; }); });
+    }
+    function laneX(i){ return (i + 0.5) * W / LANES; }
+    function nextQ(){
+      if(!st.deck.length) st.deck = shuffled(pool());
+      var q = st.deck.shift(); st.q = q; st.answered = false;
+      var opts = shuffled([{ text:q.choices[0], right:true }].concat(shuffled(q.choices.slice(1)).slice(0,3).map(function(t){ return { text:t, right:false }; })));
+      st.enemies = opts.map(function(o, i){ return { lane:i, y:-30 - Math.random()*70, text:o.text, right:o.right, i:i, alive:true, wob:Math.random()*6 }; });
+      promptEl.innerHTML = lecChip(q.lec) + '<span>' + escHtml(q.stem) + '</span>';
+      legend.innerHTML = st.enemies.map(function(en){ return '<div class="sn-opt" data-opt="'+en.i+'"><i style="background:'+COLORS[en.i]+'">'+LETTERS[en.i]+'</i><span>'+escHtml(en.text)+'</span></div>'; }).join('');
+      st.pause = 0.6;
+    }
+    function fire(){
+      if(!st || !st.running || st.cool > 0) return;
+      st.bolts.push({ x: st.shipX, y: H - 50 }); st.cool = 0.28; beep(880, .04, 'square', .04);
+    }
+    function resolve(en, how){
+      if(st.answered) return;
+      st.answered = true;
+      var right = st.enemies.filter(function(e){ return e.right; })[0];
+      if(how === 'hit' && en.right){
+        recordAnswer(st.q.id, st.q.lec, true, 'blaster');
+        st.combo++; st.correct++; var pts = 100 + st.combo * 20 + Math.max(0, Math.round((H - en.y) / 4)); st.score += pts; sGood();
+        st.booms.push({ x:laneX(en.lane), y:en.y, t:0, c:'#7ee36b' });
+        st.speed = Math.min(78, 26 + st.correct * 2.5);
+        hud(root, { score: st.score, level: 1 + Math.floor(st.correct / 5) });
+      } else {
+        recordAnswer(st.q.id, st.q.lec, false, 'blaster');
+        st.combo = 0; st.lives--; sBad();
+        if(en) st.booms.push({ x:laneX(en.lane), y:en.y, t:0, c:'#ff5c8a' });
+        st.missed.push({ q: st.q.stem, a: st.q.choices[0] });
+        hud(root, { lives: hearts(st.lives) });
+      }
+      legend.querySelectorAll('.sn-opt').forEach(function(o){ var i = +o.getAttribute('data-opt'); if(i === right.i) o.classList.add('is-right'); else if(en && i === en.i && !en.right) o.classList.add('is-wrong'); });
+      st.enemies.forEach(function(e){ e.alive = false; });
+      setTimeout(function(){ if(!st || !st.running) return; if(st.lives <= 0) return over(); nextQ(); }, how === 'hit' && en.right ? 550 : 1500);
+    }
+    function loop(t){
+      if(!st || !st.running) return;
+      var dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+      if(st.paused){ draw(); raf = requestAnimationFrame(loop); return; }
+      if(st.keys.left) st.shipX -= 420 * dt; if(st.keys.right) st.shipX += 420 * dt;
+      if(st.targetX !== null){ var d = st.targetX - st.shipX; st.shipX += Math.max(-520*dt, Math.min(520*dt, d)); if(Math.abs(d) < 4){ st.shipX = st.targetX; st.targetX = null; if(st.fireOnArrive){ st.fireOnArrive = false; fire(); } } }
+      st.shipX = Math.max(30, Math.min(W - 30, st.shipX));
+      st.cool -= dt; if(st.pause > 0) st.pause -= dt;
+      st.bolts.forEach(function(b){ b.y -= 620 * dt; });
+      st.bolts = st.bolts.filter(function(b){ return b.y > -20; });
+      if(st.pause <= 0) st.enemies.forEach(function(en){
+        if(!en.alive) return;
+        en.y += st.speed * dt; en.wob += dt * 3;
+        st.bolts.forEach(function(b){ if(en.alive && Math.abs(b.x - laneX(en.lane)) < 36 && Math.abs(b.y - en.y) < 30){ b.y = -99; en.alive = false; resolve(en, 'hit'); } });
+        if(en.alive && en.y > H - 70 && en.right){ en.alive = false; resolve(null, 'escaped'); }
+        if(en.alive && en.y > H - 70){ en.alive = false; }
+      });
+      st.booms.forEach(function(b){ b.t += dt; }); st.booms = st.booms.filter(function(b){ return b.t < .5; });
+      draw();
+      raf = requestAnimationFrame(loop);
+    }
+    function clast(x, y, color, letter, wob){
+      /* a multinucleated osteoclast: lumpy body + several nuclei + ruffled underside */
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for(var a = 0; a <= Math.PI*2 + .01; a += Math.PI/8){ var r = 26 + Math.sin(a*3 + wob) * 3; var px = x + Math.cos(a) * r * 1.2, py = y + Math.sin(a) * r * .8; if(a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); }
+      ctx.fill();
+      ctx.fillStyle = 'rgba(18,15,36,.35)';
+      [[-12,-6],[0,-9],[12,-5],[-6,5],[7,6]].forEach(function(n){ ctx.beginPath(); ctx.arc(x+n[0], y+n[1], 3.2, 0, Math.PI*2); ctx.fill(); });
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+      for(var i=-24;i<=24;i+=6){ ctx.moveTo(x+i, y+18); ctx.lineTo(x+i+3, y+25); }
+      ctx.stroke();
+      ctx.fillStyle = '#120f24'; ctx.font = 'bold 15px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(letter, x, y + 1);
+    }
+    function draw(){
+      ctx.fillStyle = '#1d1838'; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+      for(var i=1;i<LANES;i++){ ctx.beginPath(); ctx.moveTo(i*W/LANES, 0); ctx.lineTo(i*W/LANES, H-60); ctx.stroke(); }
+      /* bone floor with trabecular holes */
+      ctx.fillStyle = '#f1e7d0'; ctx.fillRect(0, H - 40, W, 40);
+      ctx.fillStyle = '#d9c9a6'; for(var k=0;k<24;k++){ ctx.beginPath(); ctx.ellipse(15 + k*30, H - 20 + (k%2?6:-6), 8, 5, 0, 0, Math.PI*2); ctx.fill(); }
+      if(!st) return;
+      st.enemies.forEach(function(en){ if(en.alive) clast(laneX(en.lane), en.y, COLORS[en.i], LETTERS[en.i], en.wob); });
+      st.bolts.forEach(function(b){ ctx.fillStyle = '#7ee36b'; ctx.fillRect(b.x - 2, b.y - 12, 4, 14); });
+      st.booms.forEach(function(b){ ctx.strokeStyle = b.c; ctx.lineWidth = 3; ctx.globalAlpha = 1 - b.t * 2; ctx.beginPath(); ctx.arc(b.x, b.y, 10 + b.t * 80, 0, Math.PI*2); ctx.stroke(); ctx.globalAlpha = 1; });
+      /* ship: an osteoblast turret */
+      var sx = st.shipX, sy = H - 52;
+      ctx.fillStyle = '#7ee36b'; ctx.beginPath(); ctx.moveTo(sx, sy - 18); ctx.lineTo(sx + 22, sy + 10); ctx.lineTo(sx - 22, sy + 10); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#120f24'; ctx.beginPath(); ctx.arc(sx, sy + 2, 4, 0, Math.PI*2); ctx.fill();
+      if(st.paused){ ctx.fillStyle = 'rgba(18,15,36,.6)'; ctx.fillRect(0, H/2 - 30, W, 60); ctx.fillStyle = '#ffd23f'; ctx.font = 'bold 26px monospace'; ctx.textAlign = 'center'; ctx.fillText('PAUSED', W/2, H/2); }
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      if(!pool().length){ toast('No questions for that lecture yet'); return; }
+      st = { running:true, score:0, lives:3, combo:0, correct:0, speed:26, deck:shuffled(pool()), missed:[], enemies:[], bolts:[], booms:[], shipX:W/2, targetX:null, keys:{}, cool:0, pause:0, paused:false };
+      hud(root, { score:0, lives:hearts(3), level:1 });
+      nextQ(); last = 0; raf = requestAnimationFrame(loop);
+    }
+    function over(){
+      st.running = false; cancelAnimationFrame(raf);
+      var best = finish(g, st.score);
+      root.querySelector('.gm-stage').insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){
+      if(!st || !st.running){ if((e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } return; }
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); st.keys.left = true; }
+      else if(e.key === 'ArrowRight'){ e.preventDefault(); st.keys.right = true; }
+      else if(e.key === ' ' || e.key === 'ArrowUp'){ e.preventDefault(); fire(); }
+      else if(e.key === 'p' || e.key === 'P'){ st.paused = !st.paused; }
+      else { var L = 'abcd'.indexOf((e.key||'').toLowerCase()); if(L !== -1){ e.preventDefault(); var en = st.enemies.filter(function(x){ return x.i === L; })[0]; if(en){ st.targetX = laneX(en.lane); st.fireOnArrive = true; } } }
+    }
+    function onKeyUp(e){ if(!st) return; if(e.key === 'ArrowLeft') st.keys.left = false; if(e.key === 'ArrowRight') st.keys.right = false; }
+    return {
+      mount: function(p){
+        var opts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.arcade.blastLec===l.id?' selected':'')+'>L'+l.num+' '+escHtml(l.title)+'</option>'; }).join('');
+        p.innerHTML = shell(g, '<label for="cbLec">Questions from:</label><select id="cbLec">'+opts+'</select>',
+          '<div class="sn-prompt" id="cbPrompt">Blast the osteoclast carrying the right answer.</div>' +
+          '<div class="gm-stage sn-board"><canvas class="sn-canvas cb-canvas" id="cbCanvas" width="'+W+'" height="'+H+'"></canvas>' +
+            overlayHTML(g, 'CLAST BLASTER', 'Four osteoclasts drift down toward the bone, each carrying an answer (A-D, listed under the board). Blast the right one before it reaches the bone. Hitting a wrong one, or letting the right one land, costs a life. Tap a lane on mobile to move there and fire.', 'START') + '</div>' +
+          '<div class="sn-legend" id="cbLegend"></div>',
+          '<kbd>←</kbd><kbd>→</kbd> move · <kbd>Space</kbd> fire · or press <kbd>A</kbd>–<kbd>D</kbd> to auto-aim · <kbd>P</kbd> pause');
+        root = p.querySelector('.gm'); canvas = p.querySelector('#cbCanvas'); ctx = canvas.getContext('2d'); legend = p.querySelector('#cbLegend'); promptEl = p.querySelector('#cbPrompt');
+        bindCommon(root); draw();
+        root.querySelector('.gm-stage').addEventListener('click', function(e){ if(e.target.closest('[data-start]')) start(); });
+        canvas.addEventListener('pointerdown', function(e){
+          if(!st || !st.running) return;
+          var r = canvas.getBoundingClientRect(); var x = (e.clientX - r.left) / r.width * W;
+          var lane = Math.max(0, Math.min(LANES - 1, Math.floor(x / (W / LANES))));
+          st.targetX = laneX(lane); st.fireOnArrive = true;
+        });
+        p.querySelector('#cbLec').addEventListener('change', function(e){ STATE.arcade.blastLec = e.target.value; saveState(); if(st && st.running) st.deck = shuffled(pool()); });
+        document.addEventListener('keydown', onKey); document.addEventListener('keyup', onKeyUp);
+      },
+      stop: function(){ if(st) st.running = false; cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp); }
+    };
+  }
+
+  /* =================================================================== BONE SEARCH (word search on crossword answers) */
+  function searchPool(lec){
+    return QUESTIONS.filter(function(q){
+      if(q.type !== 'mcq') return false;
+      if(lec !== 'all' && q.lec !== lec) return false;
+      var a = q.choices[0]; if(!/^[A-Za-z ]+$/.test(a)) return false;
+      var w = a.replace(/ /g,''); return w.length >= 4 && w.length <= 11 && q.stem.length <= 150;
+    });
+  }
+  function BoneSearch(){
+    var g = GAMES[7], root, stage, timer = null, st = null, N = 12;
+    var DIRS = [[1,0],[0,1],[1,1],[1,-1]];
+    function build(){
+      var pool = shuffled(searchPool(STATE.arcade.searchLec)), words = [], grid = [];
+      for(var y=0;y<N;y++){ grid.push([]); for(var x=0;x<N;x++) grid[y].push(''); }
+      for(var i=0; i<pool.length && words.length < 6; i++){
+        var q = pool[i], w = q.choices[0].replace(/ /g,'').toUpperCase();
+        if(words.some(function(o){ return o.word === w; })) continue;
+        var placed = false;
+        for(var tries=0; tries<120 && !placed; tries++){
+          var d = DIRS[Math.floor(Math.random()*DIRS.length)], sx = Math.floor(Math.random()*N), sy = Math.floor(Math.random()*N);
+          var ex = sx + d[0]*(w.length-1), ey = sy + d[1]*(w.length-1);
+          if(ex < 0 || ex >= N || ey < 0 || ey >= N) continue;
+          var ok = true;
+          for(var k=0;k<w.length;k++){ var c = grid[sy+d[1]*k][sx+d[0]*k]; if(c && c !== w[k]){ ok = false; break; } }
+          if(!ok) continue;
+          for(k=0;k<w.length;k++) grid[sy+d[1]*k][sx+d[0]*k] = w[k];
+          words.push({ word:w, q:q, sx:sx, sy:sy, d:d, found:false }); placed = true;
+        }
+      }
+      var AL = 'ABCDEFGHIJKLMNOPRSTUEAIO';
+      for(y=0;y<N;y++) for(x=0;x<N;x++) if(!grid[y][x]) grid[y][x] = AL[Math.floor(Math.random()*AL.length)];
+      st.grid = grid; st.words = words; st.sel = null;
+      render();
+    }
+    function render(){
+      var gh = '';
+      for(var y=0;y<N;y++) for(var x=0;x<N;x++) gh += '<button type="button" class="bs-cell" data-x="'+x+'" data-y="'+y+'">'+st.grid[y][x]+'</button>';
+      root.querySelector('#bsGrid').innerHTML = gh;
+      root.querySelector('#bsClues').innerHTML = st.words.map(function(w, i){ return '<li data-w="'+i+'" class="'+(w.found?'found':'')+'">'+lecChip(w.q.lec)+'<span class="bs-clue">'+escHtml(w.q.stem)+'</span><b class="bs-ans">'+(w.found ? escHtml(w.q.choices[0]) : w.word.length + ' letters')+'</b></li>'; }).join('');
+      st.words.forEach(function(w){ if(w.found) mark(w); });
+    }
+    function cell(x, y){ return root.querySelector('.bs-cell[data-x="'+x+'"][data-y="'+y+'"]'); }
+    function mark(w){ for(var k=0;k<w.word.length;k++){ var c = cell(w.sx + w.d[0]*k, w.sy + w.d[1]*k); if(c) c.classList.add('found'); } }
+    function pick(x, y){
+      if(!st || !st.running) return;
+      if(!st.sel){ st.sel = { x:x, y:y }; cell(x, y).classList.add('sel'); return; }
+      var a = st.sel; st.sel = null;
+      root.querySelectorAll('.bs-cell.sel').forEach(function(c){ c.classList.remove('sel'); });
+      var dx = x - a.x, dy = y - a.y, len = Math.max(Math.abs(dx), Math.abs(dy)) + 1;
+      if(!(dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy))) { sBad(); return; }
+      var ux = Math.sign(dx), uy = Math.sign(dy), s = '';
+      for(var k=0;k<len;k++) s += st.grid[a.y + uy*k][a.x + ux*k];
+      var rev = s.split('').reverse().join('');
+      var w = st.words.filter(function(o){ return !o.found && (o.word === s || o.word === rev); })[0];
+      if(w){
+        w.found = true; w.sx = a.x; w.sy = a.y; w.d = [ux, uy]; if(w.word === rev){ w.sx = x; w.sy = y; w.d = [-ux, -uy]; }
+        st.combo++; var pts = 80 + w.word.length * 15 + st.combo * 10; st.score += pts; sGood();
+        hud(root, { score: st.score });
+        render();
+        if(st.words.every(function(o){ return o.found; })){ st.round++; st.time = Math.min(st.limit, st.time + 45); hud(root, { level: st.round + 1 }); toast('Board cleared!'); setTimeout(function(){ if(st && st.running) build(); }, 700); }
+      } else { st.combo = 0; sBad(); }
+    }
+    function tick(){
+      if(!st || !st.running) return;
+      st.time -= 0.25;
+      root.querySelector('#bsTime i').style.transform = 'scaleX(' + Math.max(0, st.time / st.limit) + ')';
+      if(st.time <= 0) return over();
+      timer = setTimeout(tick, 250);
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      if(searchPool(STATE.arcade.searchLec).length < 3){ toast('Not enough short answers for that lecture; try All lectures'); return; }
+      st = { running:true, score:0, round:0, combo:0, limit:150, time:150, missed:[] };
+      hud(root, { score:0, lives:'—', level:1 });
+      build(); tick();
+    }
+    function over(){
+      st.running = false; clearTimeout(timer);
+      st.words.forEach(function(w){ if(!w.found) st.missed.push({ q: w.q.stem, a: w.q.choices[0] }); });
+      var best = finish(g, st.score);
+      stage.insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){ if((!st || !st.running) && (e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } }
+    return {
+      mount: function(p){
+        var opts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.arcade.searchLec===l.id?' selected':'')+'>L'+l.num+' '+escHtml(l.title)+'</option>'; }).join('');
+        p.innerHTML = shell(g, '<label for="bsLec">Words from:</label><select id="bsLec">'+opts+'</select>',
+          '<div class="gm-stage bs-stage"><div class="mm-head"><h3>Find the answer to every clue</h3><div class="sa-timer" id="bsTime"><i></i></div></div><div class="bs-body"><div class="bs-grid" id="bsGrid"></div><ol class="bs-clues" id="bsClues"></ol></div>' +
+            overlayHTML(g, 'BONE SEARCH', 'Six answers are hidden in the letter grid: across, down or diagonal, forward or backward. Read a clue, find its answer, then tap the first and last letter. Clear the board to add time.', 'START') + '</div>',
+          'Tap the first letter, then the last letter of a word');
+        root = p.querySelector('.gm'); stage = p.querySelector('.bs-stage');
+        bindCommon(root);
+        stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) return start(); var c = e.target.closest('.bs-cell'); if(c) pick(+c.getAttribute('data-x'), +c.getAttribute('data-y')); });
+        p.querySelector('#bsLec').addEventListener('change', function(e){ STATE.arcade.searchLec = e.target.value; saveState(); });
+        document.addEventListener('keydown', onKey);
+      },
+      stop: function(){ if(st) st.running = false; clearTimeout(timer); document.removeEventListener('keydown', onKey); }
+    };
+  }
+
+  /* =================================================================== WHACK-A-CLAST (whack-a-mole on sort sets) */
+  function WhackAClast(){
+    var g = GAMES[8], root, stage, timer = null, st = null, KEYS = ['1','2','3','4','5','6','7','8','9'];
+    function newTarget(){
+      var c = STATE.arcade.whackSet;
+      var set = SORT_SETS.filter(function(x){ return x.id === c; })[0] || SORT_SETS[Math.floor(Math.random()*SORT_SETS.length)];
+      st.set = set; st.bin = Math.floor(Math.random()*set.bins.length); st.popsLeft = 10;
+      root.querySelector('#waTarget').innerHTML = 'WHACK ONLY: <b>' + escHtml(set.bins[st.bin]) + '</b><span>' + escHtml(set.title) + '</span>';
+    }
+    function pop(){
+      if(!st || !st.running) return;
+      if(st.popsLeft <= 0) newTarget();
+      var free = []; for(var i=0;i<9;i++) if(!st.holes[i]) free.push(i);
+      if(free.length){
+        var h = free[Math.floor(Math.random()*free.length)];
+        var targets = st.set.items.filter(function(it){ return it[1] === st.bin; }), others = st.set.items.filter(function(it){ return it[1] !== st.bin; });
+        var item = (Math.random() < 0.55 ? targets : others); item = item[Math.floor(Math.random()*item.length)];
+        var life = Math.max(1.1, 2.2 - st.level * 0.12);
+        st.holes[h] = { text:item[0], ib:item[1], good:item[1] === st.bin, until: Date.now() + life*1000, set:st.set, bin:st.bin };
+        st.popsLeft--;
+        var el = root.querySelector('.wa-hole[data-h="'+h+'"]');
+        el.querySelector('.wa-mole span').textContent = item[0]; el.classList.remove('hit','miss'); el.classList.add('up');
+      }
+      timer = setTimeout(pop, Math.max(420, 900 - st.level * 55));
+    }
+    function sweep(){
+      if(!st || !st.running) return;
+      var now = Date.now();
+      st.holes.forEach(function(m, i){
+        if(m && now > m.until){ st.holes[i] = null; root.querySelector('.wa-hole[data-h="'+i+'"]').classList.remove('up'); if(m.good){ st.combo = 0; st.escaped++; } }
+      });
+      st.sweep = setTimeout(sweep, 100);
+    }
+    function whack(i){
+      if(!st || !st.running) return;
+      var m = st.holes[i], el = root.querySelector('.wa-hole[data-h="'+i+'"]');
+      if(!m) return;
+      st.holes[i] = null; el.classList.remove('up');
+      if(m.good){ st.combo++; st.hits++; var pts = 40 + st.combo * 10; st.score += pts; sGood(); el.classList.add('hit'); if(st.hits % 8 === 0){ st.level++; hud(root, { level: st.level }); } }
+      else { st.combo = 0; st.lives--; sBad(); el.classList.add('miss'); st.missed.push({ q: m.text + ' (' + m.set.title.replace('?','') + ')', a: m.set.bins[m.ib] }); hud(root, { lives: hearts(st.lives) }); if(st.lives <= 0) return over(); }
+      hud(root, { score: st.score });
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      st = { running:true, score:0, lives:3, level:1, combo:0, hits:0, escaped:0, holes:[null,null,null,null,null,null,null,null,null], missed:[] };
+      root.querySelectorAll('.wa-hole').forEach(function(h){ h.classList.remove('up','hit','miss'); });
+      hud(root, { score:0, lives:hearts(3), level:1 });
+      newTarget(); pop(); sweep();
+    }
+    function over(){
+      st.running = false; clearTimeout(timer); clearTimeout(st.sweep);
+      var best = finish(g, st.score);
+      stage.insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){
+      if(!st || !st.running){ if((e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } return; }
+      var k = KEYS.indexOf(e.key); if(k !== -1){ e.preventDefault(); whack(k); }
+    }
+    return {
+      mount: function(p){
+        var opts = '<option value="mix">Shuffle all topics</option>' + SORT_SETS.map(function(s){ return '<option value="'+s.id+'"'+(STATE.arcade.whackSet===s.id?' selected':'')+'>'+escHtml(s.title)+'</option>'; }).join('');
+        var holes = ''; for(var i=0;i<9;i++) holes += '<button type="button" class="wa-hole" data-h="'+i+'"><kbd>'+KEYS[i]+'</kbd><span class="wa-mole"><span></span></span><span class="wa-pit"></span></button>';
+        p.innerHTML = shell(g, '<label for="waSet">Topic:</label><select id="waSet">'+opts+'</select>',
+          '<div class="gm-stage wa-stage"><div class="wa-target" id="waTarget">Ready?</div><div class="wa-grid">'+holes+'</div>' +
+            overlayHTML(g, 'WHACK-A-CLAST', 'Osteoclasts pop out of the bone carrying a term. The banner tells you which kind to whack (for example, every hypocalcemia sign). Whack the right ones fast; whacking a wrong one costs a life. The target changes every 10 pops.', 'START') + '</div>',
+          'Tap a mole, or press <kbd>1</kbd>–<kbd>9</kbd> (top-left to bottom-right)');
+        root = p.querySelector('.gm'); stage = p.querySelector('.wa-stage');
+        bindCommon(root);
+        stage.addEventListener('pointerdown', function(e){ if(e.target.closest('[data-start]')) return; var h = e.target.closest('.wa-hole'); if(h) whack(+h.getAttribute('data-h')); });
+        stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) start(); });
+        p.querySelector('#waSet').addEventListener('change', function(e){ STATE.arcade.whackSet = e.target.value; saveState(); });
+        document.addEventListener('keydown', onKey);
+      },
+      stop: function(){ if(st){ st.running = false; clearTimeout(st.sweep); } clearTimeout(timer); document.removeEventListener('keydown', onKey); }
     };
   }
 

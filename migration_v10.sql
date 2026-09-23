@@ -1,6 +1,6 @@
 -- ============================================================
 -- migration_v10.sql — class-wide arcade leaderboards (first used by
--- hubs/msk-exam3 "Bone Zone Arcade": games sort / snake / stack / match / hangman / fact).
+-- hubs/msk-exam3 "Bone Zone Arcade": games sort / snake / stack / match / hangman / fact / blaster / search / whack).
 --
 -- arcade_scores: one row per finished game. Reads return each
 -- visitor's BEST score per (hub, game), ranked, using the same
@@ -35,7 +35,7 @@ set search_path = public
 as $$
 begin
   if p_visitor is null or length(trim(p_visitor)) = 0 then return; end if;
-  if p_game not in ('sort', 'snake', 'stack', 'match', 'hangman', 'fact') then return; end if;
+  if p_game not in ('sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack') then return; end if;
   if p_score is null or p_score < 1 or p_score > 200000 then return; end if;
   if exists (
     select 1 from arcade_scores
