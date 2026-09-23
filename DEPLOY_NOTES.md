@@ -58,6 +58,15 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-23 (later)** — msk-exam3: 40-question Mock Exam; emoji replaced by a
+  hub-local inline-SVG icon set (`ICON_PATHS`/`icon()`); compact one-row
+  ribbon; Arcade grew to six games (added Marrow Match, Bone to Pick, Fact or
+  Fracture) with a fullscreen toggle and an easier Snake. **Class-wide arcade
+  leaderboards** via `migration_v10.sql` (`arcade_scores` table,
+  `submit_arcade_score`, `get_arcade_leaderboard`): run it once in the Supabase
+  SQL editor. Until then the hub shows "leaderboard warming up" and keeps
+  working. Other hubs can reuse the same two RPCs with their own `p_hub`.
+
 - **2026-09-23** — Archived GI Exam 2 (`hubs/hepatobiliary/`, incl. its
   narration audio) off the live site after the exam, same pattern as GI
   Exam 1: the full 404-question bank + lecture list was saved first to

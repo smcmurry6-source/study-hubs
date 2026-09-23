@@ -98,7 +98,7 @@ main{padding-top:20px}
 
 /* ---------- lecture notes ---------- */
 .notes-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px}
-.lec-nav{display:flex;flex-direction:column;gap:6px;min-width:0;position:sticky;top:130px;align-self:start}
+.lec-nav{display:flex;flex-direction:column;gap:6px;min-width:0;position:sticky;top:66px;align-self:start}
 .lec-nav button{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 10px;cursor:pointer;min-width:0}
 .lec-nav button.is-active{border-color:var(--ink);box-shadow:var(--shadow)}
 .lec-num{font-family:var(--font-mono);font-size:.75rem;font-weight:700;padding:2px 6px;border-radius:6px;color:#fff;flex:none;margin-top:2px}
@@ -224,7 +224,7 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 /* ===================================================================
    ARCADE (fixed dark world)
    =================================================================== */
-#panel-arcade{background:var(--ar-bg);color:var(--ar-ink);margin:-20px -20px 0;padding:24px 20px 40px;min-height:70vh;border-radius:0 0 18px 18px;position:relative;overflow:hidden}
+#panel-arcade{background:var(--ar-bg);color:var(--ar-ink);margin:-16px -20px 0;padding:24px 20px 40px;min-height:70vh;border-radius:0 0 18px 18px;position:relative;overflow:hidden}
 #panel-arcade::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);background-size:22px 22px;pointer-events:none}
 .ar-wrap{position:relative;max-width:1060px;margin:0 auto}
 .ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -332,7 +332,7 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 @media (max-width: 520px){
   #app{padding:0 16px 50px}
   .hub-header{margin:0 -16px;padding:10px 16px 0}
-  #panel-arcade{margin:-20px -16px 0;padding:18px 12px 30px}
+  #panel-arcade{margin:-16px -16px 0;padding:18px 12px 30px}
   .hub-title h1{font-size:1.2rem}
   .hub-subtitle{display:none}
   #streakPill,#progressSummary{display:none}
@@ -346,6 +346,147 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
   .cram-grid{grid-template-columns:minmax(0,1fr)}
 }
 
+/* ---------- custom icon set ---------- */
+.ic{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
+.theme-btn{display:inline-flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+.theme-btn .ic{width:15px;height:15px}
+.group-chip .ic{width:17px;height:17px;color:var(--accent)}
+.group-chip.is-active .ic{color:var(--bg)}
+.group-head h2{display:flex;align-items:center;gap:10px}
+.group-head h2 .ic{width:26px;height:26px;color:var(--accent);padding:4px;border-radius:8px;background:var(--accent-soft);box-sizing:content-box}
+.rv-tip{display:inline-flex;gap:6px;align-items:center}
+.toast{display:flex;gap:8px;align-items:center}
+.ar-mute{display:inline-flex;align-items:center}
+.ar-mute .ic{width:18px;height:18px}
+.ar-play{display:inline-flex;align-items:center;gap:6px}
+.ar-play .ic,.gm-back .ic{width:11px;height:11px}
+.gm-back{display:inline-flex;align-items:center;gap:6px}
+.gm-overlay p .ic{color:var(--ar-yellow)}
+.sn-pad button{display:inline-flex;align-items:center;justify-content:center}
+.sn-pad .ic{width:20px;height:20px}
+.hrt{display:inline-flex;margin-right:3px;color:var(--ar-pink)}
+.hrt .px-heart{width:14px;height:12px;vertical-align:-1px}
+.hrt.lost{color:var(--ar-line)}
+
+/* ---------- compact single-row ribbon ---------- */
+.hub-header{padding:6px 20px}
+.hub-header-top{flex-wrap:nowrap;gap:14px}
+.hub-title{align-items:center;gap:8px;flex:none}
+.hub-title h1{font-size:1.12rem;white-space:nowrap}
+.hub-back-btn{width:30px;height:30px}
+#modeSwitch{margin:0;gap:2px;background:var(--surface-2);border-radius:999px;padding:3px;flex:0 1 auto;min-width:0}
+#modeSwitch button{padding:5px 12px;border:0;border-radius:999px;font-size:.86rem;gap:6px}
+#modeSwitch button[aria-selected="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12);color:var(--ink)}
+#modeSwitch button[data-mode="arcade"][aria-selected="true"]{color:var(--ar-pink)}
+#modeSwitch .mode-icon{display:inline-flex}
+#modeSwitch .mode-icon .ic{width:16px;height:16px}
+.hub-meta{margin-left:auto;flex-wrap:nowrap;gap:6px}
+.pill{padding:3px 9px;font-size:.76rem}
+.theme-btn{width:28px;height:26px}
+main{padding-top:16px}
+@media (max-width: 760px){
+  .hub-title h1{font-size:1rem}
+  #progressSummary{display:none}
+  #modeSwitch button{padding:5px 9px}
+}
+@media (max-width: 560px){
+  .hub-header{padding:6px 12px}
+  .hub-header-top{gap:8px}
+  .mode-label{display:none}
+  #modeSwitch button{padding:6px 11px}
+  .pill.countdown{font-size:.7rem;padding:3px 7px}
+  .hub-back-btn{width:28px;height:28px}
+}
+@media (max-width: 380px){ .hub-title h1{display:none} }
+
+/* ---------- arcade leaderboards ---------- */
+.ar-boards{margin-top:26px}
+.ar-sub{font-family:var(--font-arcade);font-size:.72rem;color:var(--ar-yellow);display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.ar-sub .ic{width:18px;height:18px}
+.ar-board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.ar-board{background:var(--ar-panel);border:3px solid var(--ar-line);border-top-color:var(--c);border-radius:14px;padding:12px 14px}
+.ar-board h4{margin:0 0 8px;font-family:var(--font-arcade);font-size:.62rem;color:var(--c)}
+.lb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-family:var(--font-mono);font-size:.8rem}
+.lb-list li{display:flex;gap:10px;align-items:center;padding:4px 8px;border-radius:7px;background:rgba(255,255,255,.03)}
+.lb-list li.me{background:color-mix(in srgb, var(--ar-yellow) 18%, transparent);color:var(--ar-yellow)}
+.lb-list li.lb-gap{background:none;justify-content:center;color:var(--ar-dim);padding:0}
+.lb-rk{width:22px;color:var(--ar-dim);text-align:right;flex:none}
+.lb-list li:nth-child(1) .lb-rk{color:var(--ar-yellow)} .lb-list li:nth-child(2) .lb-rk{color:#d8d4f0} .lb-list li:nth-child(3) .lb-rk{color:var(--ar-orange)}
+.lb-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ar-ink)}
+.lb-list li.me .lb-nm{color:var(--ar-yellow)}
+.lb-sc{color:var(--ar-yellow);flex:none}
+.lb-empty{color:var(--ar-dim);font-size:.82rem;padding:6px 2px}
+.gm-lb{width:100%;max-width:420px;background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:12px;padding:10px 12px;text-align:left}
+.gm-lb h4{margin:0 0 6px;font-family:var(--font-arcade);font-size:.58rem;color:var(--ar-yellow)}
+
+/* ---------- fullscreen arcade ---------- */
+.gm-fs{margin-left:auto;order:3}
+.gm-bar .gm-title{margin-right:0}
+.gm-bar .gm-hud{order:4}
+.ar-wrap:fullscreen,.ar-wrap:-webkit-full-screen{background:var(--ar-bg);padding:18px 24px;max-width:none;overflow:auto;color:var(--ar-ink)}
+.ar-wrap.is-fs{position:fixed;inset:0;z-index:200;background:var(--ar-bg);padding:18px 24px;max-width:none;overflow:auto}
+.ar-wrap.fs-on .gm{max-width:1400px;margin:0 auto}
+.ar-wrap.fs-on .ss-stage{height:calc(100vh - 190px)}
+.ar-wrap.fs-on .sa-stage{height:calc(100vh - 190px)}
+.ar-wrap.fs-on .sn-canvas{max-width:min(100%, calc((100vh - 330px) * 1.5))}
+.ar-wrap.fs-on .mm-stage,.ar-wrap.fs-on .hm-stage,.ar-wrap.fs-on .ff-stage{min-height:calc(100vh - 190px)}
+.ar-wrap.fs-on .gm-keys{display:none}
+
+/* ---------- Marrow Match ---------- */
+.mm-stage{min-height:470px;display:flex;flex-direction:column}
+.mm-head{padding:12px 16px;border-bottom:2px solid var(--ar-line)}
+.mm-head h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;gap:10px}
+.mm-grid{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px;align-content:center}
+.mm-card{position:relative;min-height:96px;border-radius:12px;border:3px solid var(--ar-line);background:var(--ar-panel-2);color:var(--ar-dim);cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:.86rem;line-height:1.25;transition:transform .15s,background .15s}
+.mm-card .mm-face{display:none;color:#120f24}
+.mm-card .mm-back .ic{width:30px;height:30px}
+.mm-card.up{background:#f4f1ff;border-color:var(--ar-violet);transform:scale(1.03)}
+.mm-card.side-1.up{border-color:var(--ar-cyan)}
+.mm-card.up .mm-face{display:block}.mm-card.up .mm-back{display:none}
+.mm-card.done{background:color-mix(in srgb, var(--ar-green) 30%, #f4f1ff);border-color:var(--ar-green);cursor:default}
+
+/* ---------- Bone to Pick ---------- */
+.hm-stage{min-height:470px;display:flex;flex-direction:column;gap:12px;padding:14px}
+.hm-clue{border-width:2px}
+.hm-mid{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;flex:1}
+.hm-bone{width:130px;color:var(--ar-ink)}
+.hm-bone svg{width:100%;height:auto}
+.hm-bone g{transition:opacity .25s} .hm-bone g.off{opacity:.12;color:var(--ar-pink)}
+.hm-word{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:560px}
+.hm-word b{width:30px;height:40px;border-bottom:4px solid var(--ar-orange);display:flex;align-items:flex-end;justify-content:center;font-family:var(--font-arcade);font-size:.95rem;color:var(--ar-ink);padding-bottom:4px}
+.hm-word b.ok{color:var(--ar-green)} .hm-word b.bad{color:var(--ar-pink)}
+.hm-word .sp{width:14px}
+.hm-left{text-align:center;color:var(--ar-dim);font-size:.82rem;margin-top:10px;font-family:var(--font-mono)}
+.hm-keys{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:5px}
+.hm-key{background:var(--ar-panel-2);border:2px solid var(--ar-line);border-radius:7px;color:var(--ar-ink);font-family:var(--font-mono);font-weight:700;padding:8px 0;cursor:pointer}
+.hm-key.hit{background:color-mix(in srgb, var(--ar-green) 35%, var(--ar-panel));border-color:var(--ar-green)}
+.hm-key.miss{opacity:.35}
+
+/* ---------- Fact or Fracture ---------- */
+.ff-stage{min-height:470px;display:flex;flex-direction:column}
+.ff-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:18px}
+.ff-card{background:#f4f1ff;color:#120f24;border-radius:16px;padding:20px 24px;width:min(560px,100%);text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;box-shadow:0 8px 0 #3b3270;transition:transform .15s,background .15s}
+.ff-card.ok{background:color-mix(in srgb, var(--ar-green) 45%, #f4f1ff);transform:scale(1.03)}
+.ff-card.bad{background:color-mix(in srgb, var(--ar-pink) 45%, #f4f1ff);animation:shake .3s}
+.ff-name{font-weight:800;font-size:1.25rem}
+.ff-label{font-family:var(--font-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:#5f5890}
+.ff-val{font-weight:700;font-size:1.05rem;line-height:1.35}
+.ff-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px}
+.ff-btn{border:0;border-radius:12px;padding:14px;font-family:var(--font-arcade);font-size:.7rem;color:#120f24;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.ff-btn .ic{width:18px;height:18px}
+.ff-btn kbd{font-family:var(--font-mono);font-size:.62rem;background:rgba(18,15,36,.15);border-radius:4px;padding:1px 5px}
+.ff-btn.t{background:var(--ar-green);box-shadow:0 5px 0 #4a9e3c} .ff-btn.f{background:var(--ar-pink);box-shadow:0 5px 0 #a8284f}
+.gm-select-note{font-size:.82rem;color:var(--ar-dim)}
+@media (max-width:560px){
+  .mm-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hm-keys{grid-template-columns:repeat(9,minmax(0,1fr))}
+  .hm-word b{width:22px;height:32px;font-size:.75rem}
+  .gm-fs{order:2;margin-left:0}
+}
+
+.gm-hud .hrt{border:0;padding:0;background:none;border-radius:0}
+.gm-hud b[data-hud="lives"]{display:inline-flex;align-items:center}
+
 </style>
 </head>
 <body>
@@ -354,22 +495,21 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1>Musculoskeletal Exam 3 Hub</h1>
-        <span class="hub-subtitle">Lectures 19–27 &middot; 40 Qs, new material only</span>
+        <h1 title="Lectures 19-27 · 40 questions, new material only">MSK Exam 3</h1>
       </div>
+      <nav id="modeSwitch" role="tablist" aria-label="Study mode">
+        <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
+        <button role="tab" type="button" data-mode="review" aria-selected="false"><span class="mode-icon" data-ic="review"></span><span class="mode-label">Review</span></button>
+        <button role="tab" type="button" data-mode="arcade" aria-selected="false"><span class="mode-icon" data-ic="arcade"></span><span class="mode-label">Arcade</span></button>
+      </nav>
       <div class="hub-meta">
         <button id="sh-ribbon-name" class="hub-name-pill" type="button" hidden></button>
         <span class="pill countdown" id="countdownPill"></span>
-        <span class="pill" id="streakPill">0 day streak</span>
         <span class="pill mono" id="progressSummary"></span>
-        <button type="button" class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Theme: system / light / dark">◐</button>
+        <span class="pill" id="streakPill" hidden>0 day streak</span>
+        <button type="button" class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Theme: system / light / dark"></button>
       </div>
     </div>
-    <nav id="modeSwitch" role="tablist" aria-label="Study mode">
-      <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon">📖</span>Compendium</button>
-      <button role="tab" type="button" data-mode="review" aria-selected="false"><span class="mode-icon">🗂️</span>Review</button>
-      <button role="tab" type="button" data-mode="arcade" aria-selected="false"><span class="mode-icon">🕹️</span>Arcade</button>
-    </nav>
   </header>
 
   <main>
@@ -386,6 +526,59 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 <script>
 'use strict';
 (function(){
+/* ---------- ICONS: hand-drawn inline SVG set for this hub (no emoji) ----------
+   24x24 grid, 1.8 stroke, currentColor, so every icon follows the theme/tag color. */
+var ICON_PATHS = {
+  book:     '<path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z"/><path d="M11 19c0 .8.9 1 1 1s1-.2 1-1"/><path d="M6.5 8h2M15.5 8h2M6.5 11h2M15.5 11h2"/>',
+  review:   '<rect x="3.5" y="6" width="13" height="14" rx="2"/><path d="M7.5 6V4.5c0-.6.4-1 1-1h11c.6 0 1 .4 1 1V16c0 .6-.4 1-1 1h-3"/><path d="M6.5 10.5h7M6.5 13.5h7M6.5 16.5h4"/>',
+  arcade:   '<rect x="3" y="11" width="18" height="9" rx="3"/><path d="M12 11V7"/><circle cx="12" cy="5.5" r="2.2"/><path d="M7 15.5h3M8.5 14v3"/><circle cx="15.5" cy="15" r=".9" fill="currentColor"/><circle cx="17.5" cy="16.8" r=".9" fill="currentColor"/>',
+  capsule:  '<rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.9 9.1l4.2 5.8"/><path d="M6.8 11.6l1.4-1.2"/>',
+  hormone:  '<path d="M12 3.5l4.3 2.5v5L12 13.5 7.7 11V6z"/><path d="M12 13.5v3"/><circle cx="12" cy="18.5" r="2"/><path d="M16.3 6l2.7-1.5M7.7 6L5 4.5"/>',
+  cell:     '<path d="M12 3.5c4.6 0 8.5 3.4 8.5 8.2 0 4.6-3.7 8.8-8.6 8.8S3.5 16.7 3.5 12C3.5 7.1 7.4 3.5 12 3.5z"/><circle cx="12.5" cy="11.5" r="3"/><circle cx="12.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="7.2" cy="15.6" r=".8" fill="currentColor"/><circle cx="16.8" cy="16.2" r=".8" fill="currentColor"/>',
+  helix:    '<path d="M7 3c0 4 10 5 10 9s-10 5-10 9"/><path d="M17 3c0 4-10 5-10 9s10 5 10 9"/><path d="M9 5.5h6M8.5 18.5h7M9.5 9.5h5M9.5 14.5h5"/>',
+  gene:     '<path d="M6 3v18M18 3v18"/><path d="M6 6h12M6 10h12M6 14h12M6 18h12"/><circle cx="12" cy="10" r="1.4" fill="currentColor"/>',
+  leaf:     '<path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15z"/><path d="M5 19l8-8"/><path d="M9.5 14.5h3.5M12 12V9"/>',
+  joint:    '<path d="M4.5 4.5c1.2-1.2 3-.4 3 1.2 1.6 0 2.4 1.8 1.2 3L7 10.4l4 4"/><path d="M19.5 19.5c-1.2 1.2-3 .4-3-1.2-1.6 0-2.4-1.8-1.2-3l1.7-1.7-4-4"/><path d="M11 14.4l-.8 2.1 2.1-.8M13 9.6l.8-2.1-2.1.8"/>',
+  shield:   '<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/>',
+  xray:     '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 7.5c-.9-.9-.2-2.3 1-2.1.3-1 1.9-1 2.2 0M15 16.5c.9.9.2 2.3-1 2.1-.3 1-1.9 1-2.2 0"/><path d="M10.6 7.2l2.8 9.6"/><path d="M11.4 12.4l1.6-.9-.4 1.6"/>',
+  mass:     '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5c2.4 0 4.5 1.9 4.5 4.3 0 2.6-2.1 4.7-4.6 4.7S7.5 14.4 7.5 12c0-2.6 2-4.5 4.5-4.5z"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
+  cycle:    '<path d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3"/><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3"/><path d="M17.3 3.8v3h-3M6.7 20.2v-3h3"/>',
+  medal:    '<path d="M8 3h8l-2.2 6.5h-3.6z"/><circle cx="12" cy="15" r="5"/><path d="M12 12.4l.8 1.7 1.9.2-1.4 1.3.4 1.9-1.7-1-1.7 1 .4-1.9-1.4-1.3 1.9-.2z"/>',
+  bone:     '<path d="M7.6 5.2a2.3 2.3 0 1 0-3.2 3.2 2.3 2.3 0 1 0 3.2 3.2l6.8-6.8M16.4 18.8a2.3 2.3 0 1 0 3.2-3.2 2.3 2.3 0 1 0-3.2-3.2l-6.8 6.8"/><path d="M8.2 11.6l4.2 4.2"/>',
+  dumbbell: '<path d="M3.5 9.5v5M6.5 7v10M17.5 7v10M20.5 9.5v5M6.5 12h11"/>',
+  target:   '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
+  chain:    '<rect x="2.8" y="8.8" width="10" height="6.4" rx="3.2"/><rect x="11.2" y="8.8" width="10" height="6.4" rx="3.2"/>',
+  ribbon:   '<path d="M12 3.5c2.3 0 3.5 1.8 3.5 3.6 0 2.4-2.2 5.1-3.5 6.9-1.3-1.8-3.5-4.5-3.5-6.9 0-1.8 1.2-3.6 3.5-3.6z"/><path d="M10.2 11.8L6.5 20.5l2.3-.9 1.3 2M13.8 11.8l3.7 8.7-2.3-.9-1.3 2"/>',
+  bulb:     '<path d="M9 17.5h6M10 20.5h4"/><path d="M12 3.5a5.5 5.5 0 0 0-3.2 10c.7.5 1.2 1.3 1.2 2.2v1.8h4v-1.8c0-.9.5-1.7 1.2-2.2A5.5 5.5 0 0 0 12 3.5z"/>',
+  soundOn:  '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+  soundOff: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5"/>',
+  sun:      '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  moon:     '<path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7z"/>',
+  auto:     '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>',
+  play:     '<path d="M8 5.5v13l10-6.5z" fill="currentColor"/>',
+  back:     '<path d="M15 5.5l-7 6.5 7 6.5" />',
+  up:       '<path d="M12 6l7 10H5z" fill="currentColor"/>',
+  down:     '<path d="M12 18l7-10H5z" fill="currentColor"/>',
+  left:     '<path d="M6 12l10-7v14z" fill="currentColor"/>',
+  right:    '<path d="M18 12L8 5v14z" fill="currentColor"/>',
+  check:    '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  crack:    '<path d="M4 7.5c1.1-1.1 2.8-.4 2.8 1.2 1.5 0 2.3 1.7 1.2 2.8l1.6 1.6 1.8-2.4 2 2.5 1.6-1.6c-1.1-1.1-.4-2.8 1.2-2.8 0-1.5 1.7-2.3 2.8-1.2"/><path d="M4 16.5c1.1 1.1 2.8.4 2.8-1.2M20 16.5c-1.1 1.1-2.8.4-2.8-1.2"/>',
+  expand:   '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  shrink:   '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
+  cards:    '<rect x="3.5" y="5" width="8" height="12" rx="1.5"/><rect x="12.5" y="7" width="8" height="12" rx="1.5"/>',
+  star:     '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor"/>'
+};
+function icon(name, cls){
+  var p = ICON_PATHS[name]; if(!p) return '';
+  return '<svg class="ic'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';
+}
+/* Pixel heart for the arcade HUD (drawn on a 7x6 grid). */
+function pixelHeart(){
+  var rows = ['0110110','1111111','1111111','0111110','0011100','0001000'], r = '';
+  rows.forEach(function(row, y){ for(var x=0;x<7;x++) if(row[x]==='1') r += '<rect x="'+x+'" y="'+y+'" width="1" height="1"/>'; });
+  return '<svg class="ic px-heart" viewBox="0 0 7 6" aria-hidden="true" fill="currentColor" shape-rendering="crispEdges">'+r+'</svg>';
+}
+
 /* ---------- LECTURES ---------- */
 var EXAM_DATE = '2026-10-02';
 var LECTURES = [
@@ -1099,7 +1292,7 @@ function C(name, sub, lec, facts, tip){ return { name:name, sub:sub||'', lec:lec
 
 var REVIEW = [
 /* =================================================================== DRUGS */
-{ id:'drugs', title:'Drugs', icon:'💊', blurb:'Every drug named in the unit, sorted by what it is for. The osteoporosis/mineral drugs (L26) are the big block; the rest are disease treatments named in other lectures.',
+{ id:'drugs', title:'Drugs', icon:'capsule', blurb:'Every drug named in the unit, sorted by what it is for. The osteoporosis/mineral drugs (L26) are the big block; the rest are disease treatments named in other lectures.',
   sections:[
   { title:'Bone-mineral & osteoporosis drugs (L26)', type:'cards', items:[
     C('Calcium carbonate','Oral Ca supplement','drugs',[['Key fact','Most widely used; NEEDS gastric acid for absorption'],['Interactions','Lowers absorption of tetracyclines (doxycycline), quinolones (levofloxacin), levothyroxine, bisphosphonates: separate doses']]),
@@ -1175,7 +1368,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== HORMONES */
-{ id:'hormones', title:'Hormones & signals', icon:'🧪', blurb:'Systemic hormones first, then the local cytokines and ligands that run bone and cartilage. Rule from Dr. Javed: every mineral hormone pushes osteoblasts and osteoclasts in OPPOSITE directions.',
+{ id:'hormones', title:'Hormones & signals', icon:'hormone', blurb:'Systemic hormones first, then the local cytokines and ligands that run bone and cartilage. Rule from Dr. Javed: every mineral hormone pushes osteoblasts and osteoclasts in OPPOSITE directions.',
   sections:[
   { title:'Systemic hormones', type:'cards', items:[
     C('PTH (parathyroid hormone)','Released when serum Ca is LOW','bonedev',[['Bone','INDIRECT: tells osteoblasts to make RANKL, so more osteoclasts, so Ca and P released (osteoclasts have no PTH receptor)'],['Kidney','More Ca reabsorption, more phosphate wasting; activates 1-alpha hydroxylase (25-OH D to 1,25(OH)2D)'],['GI','Via active vitamin D: more Ca and P absorption'],['Chronic vs intermittent','Chronic = resorption and higher serum Ca; intermittent = anabolic (teriparatide)'],['Osteoclasts','Promotes their survival (with IL-1)']],'3 axes: bone, kidney, GI'),
@@ -1220,7 +1413,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== CELLS */
-{ id:'cells', title:'Cell types', icon:'🔬', blurb:'Who builds, who maintains, who destroys, and the other cells the diseases hinge on.',
+{ id:'cells', title:'Cell types', icon:'cell', blurb:'Who builds, who maintains, who destroys, and the other cells the diseases hinge on.',
   sections:[
   { title:'Cartilage cells', type:'cards', items:[
     C('Chondrogenic (perichondrial) cells','Inner layer of the perichondrium','cartilage',[['Role','Precursors; become chondroblasts (appositional growth, repair)'],['Absent in','Articular cartilage: no repair']]),
@@ -1256,7 +1449,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== MATRIX */
-{ id:'matrix', title:'Matrix molecules', icon:'🧬', blurb:'Collagens, proteoglycans, noncollagenous proteins, mineral, and how cartilage and bone matrix compare.',
+{ id:'matrix', title:'Matrix molecules', icon:'helix', blurb:'Collagens, proteoglycans, noncollagenous proteins, mineral, and how cartilage and bone matrix compare.',
   sections:[
   { title:'Collagens', type:'table', head:['Type','Where','Key facts'], rows:[
     ['I','BONE (~90% of organic matrix), dentin, skin, tendon; fibrocartilage (from fibroblasts)','Heterotrimer: 2 alpha-1 + 1 alpha-2 (COL1A1/COL1A2). Defect = osteogenesis imperfecta'],
@@ -1306,7 +1499,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== GENES */
-{ id:'genes', title:'Genes & mutations', icon:'🧷', blurb:'One gene, one disease: the associations the exam can hand you in a single line.',
+{ id:'genes', title:'Genes & mutations', icon:'gene', blurb:'One gene, one disease: the associations the exam can hand you in a single line.',
   sections:[
   { title:'Gene → disease', type:'table', head:['Gene','Disease / role','Key point','Lecture'], rows:[
     ['FGFR3 (Gly380Arg)','Achondroplasia / hypochondroplasia','Gain of function, constitutively active; AD; 90% de novo, paternal allele','hereditary'],
@@ -1341,7 +1534,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== NUTRITION */
-{ id:'nutrition-dx', title:'Nutritional diseases', icon:'🥕', blurb:'Dr. Dutt: "The most important thing you need to remember is the vitamin, mineral, or protein, what it does, and if it is deficient, then what happens."',
+{ id:'nutrition-dx', title:'Nutritional diseases', icon:'leaf', blurb:'Dr. Dutt: "The most important thing you need to remember is the vitamin, mineral, or protein, what it does, and if it is deficient, then what happens."',
   sections:[
   { title:'Protein-energy malnutrition', type:'table', head:['','Marasmus','Kwashiorkor'], rows:[
     ['Cause','Severe global calorie reduction','Protein lack out of proportion to calories (carb-only diet, nephrosis, burns)'],
@@ -1389,7 +1582,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== JOINTS */
-{ id:'joint-dx', title:'Joint diseases', icon:'🦴', blurb:'Dr. Herr: 4 questions on Exam 3. "If you can distinguish RA and OA, and know a little about gout, you should be good to go."',
+{ id:'joint-dx', title:'Joint diseases', icon:'joint', blurb:'Dr. Herr: 4 questions on Exam 3. "If you can distinguish RA and OA, and know a little about gout, you should be good to go."',
   sections:[
   { title:'OA vs RA (the key comparison)', type:'table', head:['','Osteoarthritis','Rheumatoid arthritis'], rows:[
     ['Nature','Degenerative, mechanical, polygenic','Systemic AUTOIMMUNE (CD4+ T cells; HLA-DRB1/DR4)'],
@@ -1415,7 +1608,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== AUTOIMMUNE */
-{ id:'auto-dx', title:'Autoimmune diseases', icon:'🛡️', blurb:'Loss of self-tolerance, then organ-specific vs systemic disease. Know each disease\'s target and antibody.',
+{ id:'auto-dx', title:'Autoimmune diseases', icon:'shield', blurb:'Loss of self-tolerance, then organ-specific vs systemic disease. Know each disease\'s target and antibody.',
   sections:[
   { title:'Self-tolerance', type:'table', head:['Mechanism','How it works'], rows:[
     ['CENTRAL: negative selection','Self-reactive T cells deleted (apoptosis) in thymus, B cells in marrow; AIRE drives self-antigen expression; some become Tregs'],
@@ -1454,7 +1647,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== BONE DISORDERS */
-{ id:'bone-dx', title:'Bone disorders & repair', icon:'🩻', blurb:'Hereditary/congenital, acquired, calcium disorders and fracture repair.',
+{ id:'bone-dx', title:'Bone disorders & repair', icon:'xray', blurb:'Hereditary/congenital, acquired, calcium disorders and fracture repair.',
   sections:[
   { title:'Hereditary & congenital', type:'cards', items:[
     C('Dysostoses','Localized mesenchymal migration/condensation problem','hereditary',[['Types','Aplasia (absent bone), supernumerary bones/digits, syndactyly (fused digits), hypoplasia (mandible, maxilla)'],['Genes','Homeobox transcription factors'],['With','Cleft lip, optic coloboma, hernias, renal hypoplasia'],['Craniofacial','1st/2nd pharyngeal arches: maxillary, malar, mandibular hypoplasia, cleft palate, ear defects']]),
@@ -1491,7 +1684,7 @@ var REVIEW = [
 ]},
 
 /* =================================================================== TUMORS */
-{ id:'tumor-dx', title:'Tumors', icon:'🎯', blurb:'Most bone tumors are metastatic (BLT with Kosher Pickle). Primary: <1% of neoplasms, ~40% malignant, ~80% around the knee.',
+{ id:'tumor-dx', title:'Tumors', icon:'mass', blurb:'Most bone tumors are metastatic (BLT with Kosher Pickle). Primary: <1% of neoplasms, ~40% malignant, ~80% around the knee.',
   sections:[
   { title:'Benign bone tumors', type:'table', head:['Tumor','Description','Location','Who','Extra'], rows:[
     ['Osteochondroma (30%)','Cartilage-capped subperiosteal bony projection on a stalk','Lower femur / upper tibia (growth plate)','Males < 25 (3:1)','Solitary or multiple (hereditary exostosis, AD); stops at growth-plate closure; <1% chondrosarcoma'],
@@ -1519,12 +1712,12 @@ var REVIEW = [
 ]},
 
 /* =================================================================== PROCESSES */
-{ id:'processes', title:'Processes & sequences', icon:'🔁', blurb:'Every ordered process in the unit. These also power Stack Attack in the Arcade.',
+{ id:'processes', title:'Processes & sequences', icon:'cycle', blurb:'Every ordered process in the unit. These also power Stack Attack in the Arcade.',
   sections:[ { title:'', type:'flows' } ]
 },
 
 /* =================================================================== MOST COMMON + MNEMONICS */
-{ id:'superlatives', title:'"Most common" & mnemonics', icon:'🏆', blurb:'The one-liners exams love.',
+{ id:'superlatives', title:'"Most common" & mnemonics', icon:'medal', blurb:'The one-liners exams love.',
   sections:[
   { title:'Most common…', type:'table', head:['Most common…','Answer'], rows:[
     ['Joint disease','Osteoarthritis'],['Inflammatory arthropathy','Gout'],['Chronic rheumatic disease / arthritis of children','Juvenile idiopathic arthritis'],['First site of gout','1st MTP (big toe)'],
@@ -1773,14 +1966,14 @@ function shuffled(arr){ var a = arr.slice(); for(var i=a.length-1;i>0;i--){ var 
 function tagOf(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? l.tag : 'blue'; }
 function lecChip(lecId){ var l = LECTURE_BY_ID[lecId]; if(!l) return ''; return '<span class="lec-chip tag-'+l.tag+'">L'+l.num+' · '+escHtml(l.title.split(':')[0].split(',')[0])+'</span>'; }
 function todayStr(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function toast(msg){ var host = document.getElementById('toastHost'); if(!host) return; var t = document.createElement('div'); t.className='toast'; t.textContent = msg; host.appendChild(t); setTimeout(function(){ t.remove(); }, 2600); }
+function toast(msg, ic){ var host = document.getElementById('toastHost'); if(!host) return; var t = document.createElement('div'); t.className='toast'; t.innerHTML = (ic ? icon(ic) : '') + '<span>' + escHtml(msg) + '</span>'; host.appendChild(t); setTimeout(function(){ t.remove(); }, 2600); }
 
 /* ---------- STATE ---------- */
 var STATE_KEY = 'msk3-state-v1';
 function defaultState(){
   return { v:1, seen:{}, streak:0, bestStreak:0, totalCorrect:0, totalAnswered:0, lecStats:{}, days:[], ach:{},
     ui:{ mode:'compendium', sub:'notes', lec:'nutrition', group:'drugs', recall:false, qlec:'all', qsrc:'all', qstatus:'all' },
-    arcade:{ best:{ sort:0, snake:0, stack:0 }, plays:{ sort:0, snake:0, stack:0 }, muted:false, sortSet:'mix', snakeLec:'all', stackSet:'mix' } };
+    arcade:{ best:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0 }, plays:{ sort:0, snake:0, stack:0, match:0, hangman:0, fact:0 }, muted:false, sortSet:'mix', snakeLec:'all', stackSet:'mix', matchSet:'mix', hangLec:'all' } };
 }
 function loadState(){
   var base = defaultState();
@@ -1805,13 +1998,13 @@ function saveState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(STATE)
 
 /* ---------- achievements ---------- */
 var ACHIEVEMENTS = [
-  { id:'first', name:'First Rep', icon:'🦴', desc:'Answer your first question', cond:{ type:'totalCorrect', n:1 } },
-  { id:'fifty', name:'Half a Hundred', icon:'💪', desc:'50 correct answers', cond:{ type:'totalCorrect', n:50 } },
-  { id:'streak10', name:'Osteon Ring', icon:'🎯', desc:'10 correct in a row', cond:{ type:'streak', n:10 } },
-  { id:'streak25', name:'Bony Ankylosis', icon:'🔗', desc:'25 correct in a row', cond:{ type:'streak', n:25 } },
-  { id:'drugs', name:'Pharm Tech', icon:'💊', desc:'80% on L26 drugs (10+ answered)', cond:{ type:'lecPct', lec:'drugs', pct:80, min:10 } },
-  { id:'tumors', name:'Tumor Board', icon:'🎗️', desc:'80% on L27 tumors (10+ answered)', cond:{ type:'lecPct', lec:'tumors', pct:80, min:10 } },
-  { id:'all', name:'Full Skeleton', icon:'🏅', desc:'Answer every question in the bank at least once', cond:{ type:'allSeen' } }
+  { id:'first', name:'First Rep', icon:'bone', desc:'Answer your first question', cond:{ type:'totalCorrect', n:1 } },
+  { id:'fifty', name:'Half a Hundred', icon:'dumbbell', desc:'50 correct answers', cond:{ type:'totalCorrect', n:50 } },
+  { id:'streak10', name:'Osteon Ring', icon:'target', desc:'10 correct in a row', cond:{ type:'streak', n:10 } },
+  { id:'streak25', name:'Bony Ankylosis', icon:'chain', desc:'25 correct in a row', cond:{ type:'streak', n:25 } },
+  { id:'drugs', name:'Pharm Tech', icon:'capsule', desc:'80% on L26 drugs (10+ answered)', cond:{ type:'lecPct', lec:'drugs', pct:80, min:10 } },
+  { id:'tumors', name:'Tumor Board', icon:'ribbon', desc:'80% on L27 tumors (10+ answered)', cond:{ type:'lecPct', lec:'tumors', pct:80, min:10 } },
+  { id:'all', name:'Full Skeleton', icon:'medal', desc:'Answer every question in the bank at least once', cond:{ type:'allSeen' } }
 ];
 function checkAchievements(){
   ACHIEVEMENTS.forEach(function(a){
@@ -1821,7 +2014,7 @@ function checkAchievements(){
     else if(c.type === 'streak') ok = STATE.streak >= c.n;
     else if(c.type === 'lecPct'){ var st = STATE.lecStats[c.lec]; ok = !!(st && st.a >= c.min && (st.c / st.a) * 100 >= c.pct); }
     else if(c.type === 'allSeen') ok = QUESTIONS.every(function(q){ return STATE.seen[q.id]; });
-    if(ok){ STATE.ach[a.id] = todayStr(); toast(a.icon + ' Achievement: ' + a.name); }
+    if(ok){ STATE.ach[a.id] = todayStr(); toast('Achievement: ' + a.name, a.icon); }
   });
 }
 
@@ -1848,13 +2041,13 @@ function dayStreak(){
 }
 function renderHeaderStats(){
   var seenCount = QUESTIONS.filter(function(q){ return STATE.seen[q.id]; }).length;
-  var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + ' / ' + QUESTIONS.length + ' seen';
+  var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + '/' + QUESTIONS.length;
   var sp = document.getElementById('streakPill'); if(sp){ var n = dayStreak(); sp.textContent = n + ' day streak'; }
   var cd = document.getElementById('countdownPill');
   if(cd){
     var ex = new Date(EXAM_DATE + 'T08:00:00'); var now = new Date();
     var days = Math.ceil((ex - now) / 864e5);
-    cd.textContent = days > 1 ? ('Exam in ' + days + ' days · Oct 2') : days === 1 ? 'Exam tomorrow' : days === 0 ? 'Exam day!' : 'Exam done';
+    cd.textContent = days > 1 ? (days + ' days to exam') : days === 1 ? 'Exam tomorrow' : days === 0 ? 'Exam day!' : 'Exam done';
   }
 }
 
@@ -2069,7 +2262,7 @@ function hl(text, term){
 function cardHTML(c, term){
   return '<div class="rv-card tag-'+tagOf(c.lec)+'"><h4>'+hl(c.name, term)+'</h4>'+(c.sub?'<div class="sub">'+hl(c.sub, term)+'</div>':'')+
     '<dl>'+c.facts.map(function(f){ return '<dt>'+escHtml(f[0])+'</dt><dd>'+hl(f[1], term)+'</dd>'; }).join('')+'</dl>'+
-    (c.tip?'<div class="rv-tip">💡 '+escHtml(c.tip)+'</div>':'')+
+    (c.tip?'<div class="rv-tip">'+icon('bulb')+escHtml(c.tip)+'</div>':'')+
     '<div>'+lecChip(c.lec)+'</div></div>';
 }
 function tableHTML(sec, rows, term){
@@ -2111,17 +2304,17 @@ function renderReview(){
   var g = REVIEW.filter(function(x){ return x.id === STATE.ui.group; })[0] || REVIEW[0];
   p.innerHTML = '<div class="review-top"><input id="rvSearch" type="search" placeholder="Search every table and card (e.g. RANKL, cataracts, HLA-B27)…" value="'+escHtml(reviewSearch)+'">' +
     '<button type="button" class="toggle'+(STATE.ui.recall?' on':'')+'" id="rvRecall" aria-pressed="'+(STATE.ui.recall?'true':'false')+'"><span class="sw"></span>Recall mode: hide answers</button></div>' +
-    '<nav class="group-nav" aria-label="Review groups">' + REVIEW.map(function(x){ return '<button type="button" class="group-chip'+(x.id===g.id && !reviewSearch?' is-active':'')+'" data-group="'+x.id+'"><span>'+x.icon+'</span>'+escHtml(x.title)+'<span class="n">'+groupCount(x)+'</span></button>'; }).join('') + '</nav>' +
+    '<nav class="group-nav" aria-label="Review groups">' + REVIEW.map(function(x){ return '<button type="button" class="group-chip'+(x.id===g.id && !reviewSearch?' is-active':'')+'" data-group="'+x.id+'">'+icon(x.icon)+escHtml(x.title)+'<span class="n">'+groupCount(x)+'</span></button>'; }).join('') + '</nav>' +
     '<div id="rvBody" class="'+(STATE.ui.recall?'recall':'')+'"></div>';
   var rb = document.getElementById('rvBody');
   function draw(){
     var term = reviewSearch.trim();
     if(term){
       var html = '';
-      REVIEW.forEach(function(x){ var s = x.sections.map(function(sec){ return sectionHTML(sec, term); }).join(''); if(s) html += '<div class="group-head"><h2>'+x.icon+' '+escHtml(x.title)+'</h2></div>' + s; });
+      REVIEW.forEach(function(x){ var s = x.sections.map(function(sec){ return sectionHTML(sec, term); }).join(''); if(s) html += '<div class="group-head"><h2>'+icon(x.icon)+escHtml(x.title)+'</h2></div>' + s; });
       rb.innerHTML = html || '<div class="rv-empty">Nothing matches “'+escHtml(term)+'”.</div>';
     } else {
-      rb.innerHTML = '<div class="group-head"><h2>'+g.icon+' '+escHtml(g.title)+'</h2><p>'+escHtml(g.blurb)+'</p></div>' + g.sections.map(function(sec){ return sectionHTML(sec, ''); }).join('');
+      rb.innerHTML = '<div class="group-head"><h2>'+icon(g.icon)+escHtml(g.title)+'</h2><p>'+escHtml(g.blurb)+'</p></div>' + g.sections.map(function(sec){ return sectionHTML(sec, ''); }).join('');
     }
   }
   draw();
@@ -2206,8 +2399,11 @@ var ARCADE = (function(){
   var panel, active = null;
   var GAMES = [
     { id:'sort',  name:'SORT STORM',   color:'var(--ar-yellow)', desc:'Cards rain down. Fling each one into the right bin before it hits the floor: anabolic vs antiresorptive, OA vs RA, benign vs malignant, and more.', thumb:thumbSort },
-    { id:'snake', name:'OSTEO SNAKE',  color:'var(--ar-green)',  desc:'Classic snake with a twist: read the clue, then eat the lettered dot with the right answer. Wrong bites and walls cost lives. Answers count toward class stats.', thumb:thumbSnake },
-    { id:'stack', name:'STACK ATTACK', color:'var(--ar-cyan)',   desc:'Steps of a process ride the conveyor. Grab them in order to build the tower: growth plate zones, remodeling, fracture repair, osteoclast resorption.', thumb:thumbStack }
+    { id:'snake', name:'OSTEO SNAKE',  color:'var(--ar-green)',  desc:'Relaxed snake with a twist: read the clue, then eat the lettered dot with the right answer. It moves slowly, wraps around the edges, and gives you five lives. Answers count toward class stats.', thumb:thumbSnake },
+    { id:'stack', name:'STACK ATTACK', color:'var(--ar-cyan)',   desc:'Steps of a process ride the conveyor. Grab them in order to build the tower: growth plate zones, remodeling, fracture repair, osteoclast resorption.', thumb:thumbStack },
+    { id:'match', name:'MARROW MATCH', color:'var(--ar-violet)', desc:'Memory flip. Find each term and its partner: gene and disease, antibody and target, drug and side effect. Clear boards to buy more time.', thumb:thumbMatch },
+    { id:'hangman', name:'BONE TO PICK', color:'var(--ar-orange)', desc:'Hangman with a skeleton. Spell the answer to a clue one letter at a time before all six bones fall off. Answers count toward class stats.', thumb:thumbHang },
+    { id:'fact', name:'FACT OR FRACTURE', color:'var(--ar-pink)', desc:'60-second rush. Is the detail on the card true, or swapped in from a look-alike? Streaks multiply your score.', thumb:thumbFact }
   ];
 
   /* ---------- sound ---------- */
@@ -2225,6 +2421,46 @@ var ARCADE = (function(){
   function sGood(){ beep(660, .08); setTimeout(function(){ beep(990, .1); }, 70); }
   function sBad(){ beep(160, .25, 'sawtooth', .07); }
   function sOver(){ beep(330,.15); setTimeout(function(){ beep(247,.15); },150); setTimeout(function(){ beep(165,.35,'triangle'); },300); }
+
+  /* ---------- class-wide leaderboards (Supabase: submit_arcade_score / get_arcade_leaderboard, migration_v10) ---------- */
+  var HUB_ID = 'msk-exam3', sb = null;
+  function client(){
+    if(sb) return sb;
+    try{ if(window.supabase && window.supabase.createClient) sb = window.supabase.createClient('https://thytmzsgymydbzcqdnix.supabase.co', 'sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS'); }catch(e){}
+    return sb;
+  }
+  function visitorId(){
+    try{
+      var v = localStorage.getItem('sh_visitor_id');
+      if(!v){ v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-' + Date.now() + '-' + Math.random().toString(16).slice(2)); localStorage.setItem('sh_visitor_id', v); }
+      return v;
+    }catch(e){ return null; }
+  }
+  function fetchBoard(game, limit){
+    var c = client();
+    if(!c) return Promise.resolve(null);
+    return c.rpc('get_arcade_leaderboard', { p_hub:HUB_ID, p_game:game, p_visitor:visitorId(), p_limit:limit||10 }).then(function(r){ return (r && !r.error) ? (r.data || []) : null; }, function(){ return null; });
+  }
+  function submitScore(game, score){
+    var c = client(), v = visitorId();
+    if(!c || !v || score < 1) return Promise.resolve();
+    return c.rpc('submit_arcade_score', { p_visitor:v, p_hub:HUB_ID, p_game:game, p_score:score }).then(function(){}, function(){});
+  }
+  function boardRows(rows, limit){
+    if(rows === null) return '<div class="lb-empty">Class leaderboard is warming up. Your scores will post here soon.</div>';
+    if(!rows.length) return '<div class="lb-empty">No scores yet. Be the first on the board.</div>';
+    var top = rows.filter(function(r){ return r.rnk <= limit; });
+    var me = rows.filter(function(r){ return r.is_me && r.rnk > limit; })[0];
+    function row(r){ return '<li class="'+(r.is_me?'me':'')+'"><span class="lb-rk">'+r.rnk+'</span><span class="lb-nm">'+escHtml(r.display_name || 'Classmate')+(r.is_me?' (you)':'')+'</span><span class="lb-sc">'+String(r.best).padStart(5,'0')+'</span></li>'; }
+    return '<ol class="lb-list">' + top.map(row).join('') + (me ? '<li class="lb-gap">…</li>' + row(me) : '') + '</ol>';
+  }
+  function renderBoards(){
+    var host = document.getElementById('arBoards'); if(!host) return;
+    GAMES.forEach(function(g){
+      var el = host.querySelector('[data-board="'+g.id+'"] .lb-body');
+      fetchBoard(g.id, 10).then(function(rows){ if(el && document.body.contains(el)) el.innerHTML = boardRows(rows, 10); });
+    });
+  }
 
   /* ---------- thumbnails (inline SVG, decorative) ---------- */
   function thumbSort(){
@@ -2253,41 +2489,80 @@ var ARCADE = (function(){
       '<path d="M170 128 L170 104" stroke="#f4f1ff" stroke-width="2" stroke-dasharray="4 4"/></svg>';
   }
 
+  function thumbMatch(){
+    var cols = ['#a98bff','#3fe0d0','#ffd23f','#ff5c8a'], h = '';
+    for(var i=0;i<8;i++){ var x = 34 + (i%4)*66, y = 22 + Math.floor(i/4)*70, up = i===1||i===6;
+      h += '<rect x="'+x+'" y="'+y+'" width="54" height="58" rx="8" fill="'+(up?'#f4f1ff':'#3b3270')+'" stroke="'+(up?cols[i%4]:'#4d4390')+'" stroke-width="3"/>';
+      if(up) h += '<text x="'+(x+27)+'" y="'+(y+34)+'" text-anchor="middle" font-family="monospace" font-size="10" font-weight="700" fill="#120f24">'+(i===1?'RUNX2':'CCD')+'</text>';
+      else h += '<path d="M'+(x+18)+' '+(y+22)+'l18 14" stroke="#a79fcf" stroke-width="4" stroke-linecap="round"/><circle cx="'+(x+16)+'" cy="'+(y+20)+'" r="4" fill="#a79fcf"/><circle cx="'+(x+38)+'" cy="'+(y+38)+'" r="4" fill="#a79fcf"/>'; }
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+h+'</svg>';
+  }
+  function thumbHang(){
+    var letters = 'OSTEO_ _'.split(''), t = '';
+    ['O','S','T','E','','',''].forEach(function(L, i){ t += '<rect x="'+(150+i*22)+'" y="112" width="16" height="3" fill="#ff9b3f"/>' + (L ? '<text x="'+(158+i*22)+'" y="106" text-anchor="middle" font-family="monospace" font-size="16" font-weight="700" fill="#f4f1ff">'+L+'</text>' : ''); });
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/><g fill="none" stroke="#f4f1ff" stroke-width="4" stroke-linecap="round"><path d="M30 150h80M50 150V20h45v14"/><circle cx="95" cy="46" r="11"/><path d="M95 58v34M95 66l-14 16M95 66l14 16" /></g><g stroke="#ff5c8a" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 5"><path d="M95 92l-10 22M95 92l10 22"/></g>'+t+'</svg>';
+  }
+  function thumbFact(){
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/><rect x="70" y="18" width="180" height="84" rx="12" fill="#f4f1ff"/><text x="160" y="46" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="800" fill="#120f24">Denosumab</text><text x="160" y="66" text-anchor="middle" font-family="monospace" font-size="10" fill="#5f5890">AEs</text><text x="160" y="86" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#120f24">Cataracts</text>' +
+      '<rect x="60" y="118" width="92" height="34" rx="9" fill="#7ee36b"/><text x="106" y="140" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#120f24">FACT</text><rect x="168" y="118" width="92" height="34" rx="9" fill="#ff5c8a"/><text x="214" y="140" text-anchor="middle" font-family="monospace" font-size="12" font-weight="700" fill="#120f24">FRACTURE</text></svg>';
+  }
+
+  /* ---------- fullscreen ---------- */
+  function fsSupported(){ return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen); }
+  function toggleFullscreen(root){
+    var wrap = root.closest('.ar-wrap');
+    var isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    if(isFs){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    if(fsSupported()){ (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap); }
+    else { wrap.classList.toggle('is-fs'); syncFsButton(root); }
+  }
+  function syncFsButton(root){
+    var b = root && root.querySelector('[data-fs]'); if(!b) return;
+    var on = !!(document.fullscreenElement || document.webkitFullscreenElement) || root.closest('.ar-wrap').classList.contains('is-fs');
+    b.innerHTML = icon(on ? 'shrink' : 'expand') + (on ? 'EXIT' : 'FULL SCREEN');
+    root.closest('.ar-wrap').classList.toggle('fs-on', on);
+  }
+  document.addEventListener('fullscreenchange', function(){ var r = document.querySelector('#panel-arcade .gm'); if(r) syncFsButton(r); });
+  document.addEventListener('webkitfullscreenchange', function(){ var r = document.querySelector('#panel-arcade .gm'); if(r) syncFsButton(r); });
+
   /* ---------- lobby ---------- */
   function renderLobby(){
     stopAll();
     panel = document.getElementById('panel-arcade');
     var a = STATE.arcade;
-    var h = '<div class="ar-wrap"><div class="ar-hero"><h2 class="ar-logo">BONE ZONE ARCADE<small>THREE QUICK GAMES · SAME EXAM 3 MATERIAL</small></h2>' +
-      '<div class="ar-stats"><span class="ar-stat">PLAYS<b>'+(a.plays.sort+a.plays.snake+a.plays.stack)+'</b></span><span class="ar-stat">STREAK<b>'+STATE.streak+'</b></span><button type="button" class="ar-mute" id="arMute" aria-label="Toggle sound">'+(a.muted?'🔇':'🔊')+'</button></div></div>' +
+    var h = '<div class="ar-wrap"><div class="ar-hero"><h2 class="ar-logo">BONE ZONE ARCADE<small>SIX QUICK GAMES · SAME EXAM 3 MATERIAL</small></h2>' +
+      '<div class="ar-stats"><span class="ar-stat">PLAYS<b>'+GAMES.reduce(function(n,g){ return n + (a.plays[g.id]||0); }, 0)+'</b></span><span class="ar-stat">STREAK<b>'+STATE.streak+'</b></span><button type="button" class="ar-mute" id="arMute" aria-label="Toggle sound">'+(a.muted?icon('soundOff'):icon('soundOn'))+'</button></div></div>' +
       '<div class="ar-grid">' + GAMES.map(function(g){
-        return '<button type="button" class="ar-tile" style="--c:'+g.color+'" data-game="'+g.id+'"><span class="ar-thumb">'+g.thumb()+'</span><span class="ar-tile-body"><h3>'+g.name+'</h3><p>'+g.desc+'</p><span class="ar-tile-foot"><span class="ar-best">BEST '+String(a.best[g.id]||0).padStart(5,'0')+'</span><span class="ar-play">PLAY ▶</span></span></span></button>';
+        return '<button type="button" class="ar-tile" style="--c:'+g.color+'" data-game="'+g.id+'"><span class="ar-thumb">'+g.thumb()+'</span><span class="ar-tile-body"><h3>'+g.name+'</h3><p>'+g.desc+'</p><span class="ar-tile-foot"><span class="ar-best">BEST '+String(a.best[g.id]||0).padStart(5,'0')+'</span><span class="ar-play">PLAY '+icon('play')+'</span></span></span></button>';
       }).join('') + '</div>' +
-      '<div class="ar-how"><b>How these help:</b> Sort Storm drills the category splits the exam loves; Osteo Snake runs the real question bank (every answer is saved and counts toward class-wide stats); Stack Attack drills every ordered process. Each game ends with a list of what you missed, with the right answer.</div></div>';
+      '<div class="ar-boards" id="arBoards"><h3 class="ar-sub">'+icon('medal')+'CLASS LEADERBOARDS</h3><div class="ar-board-grid">' + GAMES.map(function(g){ return '<div class="ar-board" style="--c:'+g.color+'" data-board="'+g.id+'"><h4>'+g.name+'</h4><div class="lb-body"><div class="lb-empty">Loading…</div></div></div>'; }).join('') + '</div></div>' +
+      '<div class="ar-how"><b>How these help:</b> Sort Storm and Fact or Fracture drill the look-alike splits the exam loves; Osteo Snake and Bone to Pick run the real question bank (those answers count toward class-wide stats); Stack Attack drills every ordered process; Marrow Match drills the one-to-one pairs (gene to disease, antibody to target). Every game ends with what you missed and the right answer, and posts your score to the class leaderboard. Use FULL SCREEN inside any game for a bigger board.</div></div>';
     panel.innerHTML = h;
     panel.querySelectorAll('[data-game]').forEach(function(b){ b.addEventListener('click', function(){ startGame(b.getAttribute('data-game')); }); });
+    renderBoards();
     document.getElementById('arMute').addEventListener('click', function(){ STATE.arcade.muted = !STATE.arcade.muted; saveState(); renderLobby(); });
   }
   function stopAll(){ if(active && active.stop) active.stop(); active = null; }
   function startGame(id){
     stopAll();
     panel = document.getElementById('panel-arcade');
-    active = id === 'sort' ? SortStorm() : id === 'snake' ? Snake() : StackAttack();
+    active = id === 'sort' ? SortStorm() : id === 'snake' ? Snake() : id === 'stack' ? StackAttack() : id === 'match' ? MarrowMatch() : id === 'hangman' ? BoneToPick() : FactOrFracture();
     active.mount(panel);
   }
   function shell(g, selectHTML, stageHTML, keysHTML){
-    return '<div class="ar-wrap"><div class="gm" style="--c:'+g.color+'"><div class="gm-bar"><button type="button" class="gm-back" data-back>◀ ARCADE</button><span class="gm-title">'+g.name+'</span>' +
-      '<div class="gm-hud"><span>SCORE <b data-hud="score">0</b></span><span>LIVES <b data-hud="lives">♥♥♥</b></span><span>LVL <b data-hud="level">1</b></span><span>BEST <b data-hud="best">'+(STATE.arcade.best[g.id]||0)+'</b></span></div></div>' +
+    return '<div class="ar-wrap"><div class="gm" style="--c:'+g.color+'"><div class="gm-bar"><button type="button" class="gm-back" data-back>'+icon('back')+'ARCADE</button><span class="gm-title">'+g.name+'</span><button type="button" class="gm-back gm-fs" data-fs>'+icon('expand')+'FULL SCREEN</button>' +
+      '<div class="gm-hud"><span>SCORE <b data-hud="score">0</b></span><span>LIVES <b data-hud="lives"></b></span><span>LVL <b data-hud="level">1</b></span><span>BEST <b data-hud="best">'+(STATE.arcade.best[g.id]||0)+'</b></span></div></div>' +
       '<div class="gm-select">'+selectHTML+'</div>' + stageHTML + '<div class="gm-keys">'+keysHTML+'</div></div></div>';
   }
-  function hud(root, o){ Object.keys(o).forEach(function(k){ var el = root.querySelector('[data-hud="'+k+'"]'); if(el) el.textContent = o[k]; }); }
-  function hearts(n){ return n > 0 ? '♥♥♥♥♥'.slice(0, n) : '–'; }
+  function hud(root, o){ Object.keys(o).forEach(function(k){ var el = root.querySelector('[data-hud="'+k+'"]'); if(el){ if(k === 'lives') el.innerHTML = o[k]; else el.textContent = o[k]; } }); }
+  function hearts(n, max){ max = max || (n > 3 ? 5 : 3); var h=''; for(var i=0;i<max;i++) h += '<span class="hrt'+(i<n?'':' lost')+'">'+pixelHeart()+'</span>'; return h; }
   function overlayHTML(g, title, text, btnLabel){
     return '<div class="gm-overlay" data-overlay><h2>'+title+'</h2><p>'+text+'</p><button type="button" class="gm-btn" data-start>'+btnLabel+'</button></div>';
   }
   function gameOverHTML(g, score, isBest, missed){
     var list = missed.length ? '<div class="gm-missed"><h4>REVIEW WHAT YOU MISSED</h4><ul>'+missed.slice(-12).map(function(m){ return '<li>'+escHtml(m.q)+' → <span>'+escHtml(m.a)+'</span></li>'; }).join('')+'</ul></div>' : '<p>Flawless run. Nothing missed.</p>';
-    return '<div class="gm-overlay" data-overlay><h2>GAME OVER</h2><div class="gm-big">'+String(score).padStart(5,'0')+'</div><p>'+(isBest?'★ NEW HIGH SCORE ★':'Best: '+STATE.arcade.best[g.id])+'</p>'+list+
+    return '<div class="gm-overlay" data-overlay><h2>GAME OVER</h2><div class="gm-big">'+String(score).padStart(5,'0')+'</div><p>'+(isBest?icon('star')+' NEW HIGH SCORE '+icon('star'):'Best: '+STATE.arcade.best[g.id])+'</p>'+list+
+      '<div class="gm-lb" data-lb><h4>CLASS TOP 5</h4><div class="lb-body"><div class="lb-empty">Posting your score…</div></div></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button type="button" class="gm-btn" data-start>PLAY AGAIN</button><button type="button" class="gm-btn alt" data-back>ARCADE</button></div></div>';
   }
   function finish(g, score){
@@ -2295,10 +2570,16 @@ var ARCADE = (function(){
     var isBest = score > (STATE.arcade.best[g.id]||0);
     if(isBest) STATE.arcade.best[g.id] = score;
     saveState(); sOver();
+    submitScore(g.id, score).then(function(){ return fetchBoard(g.id, 5); }).then(function(rows){
+      var el = document.querySelector('.gm-overlay [data-lb] .lb-body'); if(el) el.innerHTML = boardRows(rows, 5);
+    });
     return isBest;
   }
   function bindCommon(root){
-    root.addEventListener('click', function(e){ if(e.target.closest('[data-back]')){ renderLobby(); } });
+    root.addEventListener('click', function(e){
+      if(e.target.closest('[data-fs]')){ toggleFullscreen(root); return; }
+      if(e.target.closest('[data-back]')){ var w = root.closest('.ar-wrap'); if(document.fullscreenElement || document.webkitFullscreenElement){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); } if(w) w.classList.remove('is-fs'); renderLobby(); }
+    });
   }
 
   /* =================================================================== SORT STORM */
@@ -2391,7 +2672,7 @@ var ARCADE = (function(){
         var opts = '<option value="mix"'+(STATE.arcade.sortSet==='mix'?' selected':'')+'>Shuffle all sorts</option>' + SORT_SETS.map(function(s){ return '<option value="'+s.id+'"'+(STATE.arcade.sortSet===s.id?' selected':'')+'>'+escHtml(s.title)+'</option>'; }).join('');
         p.innerHTML = shell(g, '<label for="ssSet">Sort:</label><select id="ssSet">'+opts+'</select>',
           '<div class="gm-stage ss-stage"><div class="ss-banner"></div><div class="ss-card" id="ssCard"></div><div class="ss-danger"></div><div class="ss-bins"><button type="button" class="ss-bin" style="--bc:var(--ar-yellow)" data-bin="0"><span></span><kbd>← / A</kbd></button><button type="button" class="ss-bin" style="--bc:var(--ar-pink)" data-bin="1"><span></span><kbd>→ / D</kbd></button></div>' +
-            overlayHTML(g, 'SORT STORM', 'Each card belongs in one of two bins. Press ← or → (or tap a bin) before it crosses the dashed line. Hold ↓ to drop faster for bonus points. Streaks of 4 multiply your score.', 'START ▶') + '</div>',
+            overlayHTML(g, 'SORT STORM', 'Each card belongs in one of two bins. Press ← or → (or tap a bin) before it crosses the dashed line. Hold ↓ to drop faster for bonus points. Streaks of 4 multiply your score.', 'START') + '</div>',
           '<kbd>←</kbd> <kbd>→</kbd> sort · <kbd>↓</kbd> fast drop · tap a bin on mobile');
         root = p.querySelector('.gm'); stage = p.querySelector('.ss-stage'); cardEl = p.querySelector('#ssCard'); bins = [].slice.call(p.querySelectorAll('.ss-bin'));
         var preview = SORT_SETS.filter(function(s){ return s.id === STATE.arcade.sortSet; })[0] || SORT_SETS[0];
@@ -2409,7 +2690,7 @@ var ARCADE = (function(){
   /* =================================================================== OSTEO SNAKE */
   function Snake(){
     var g = GAMES[1], root, canvas, ctx, legend, promptEl, timer = null;
-    var COLS = 22, ROWS = 14, CELL = 28;
+    var COLS = 18, ROWS = 12, CELL = 32;
     var FOOD_COLORS = ['#ffd23f','#ff5c8a','#3fe0d0','#a98bff'], LETTERS = ['A','B','C','D'];
     var st = null;
     function pool(){
@@ -2453,10 +2734,10 @@ var ARCADE = (function(){
       if(lastDir.x === dx && lastDir.y === dy) return;
       if(st.queue.length < 3) st.queue.push({x:dx,y:dy});
     }
-    function speed(){ return Math.max(78, 165 - st.correct * 5); }
+    function speed(){ return Math.max(150, 260 - st.correct * 4); }
     function schedule(){ clearTimeout(timer); timer = setTimeout(tick, speed()); }
     function loseLife(msg){
-      st.lives--; sBad(); hud(root, { lives: hearts(st.lives) });
+      st.lives--; sBad(); hud(root, { lives: hearts(st.lives, 5) });
       if(st.lives <= 0){ draw(); return over(); }
       st.pausedUntil = Date.now() + 900; st.flash = msg;
     }
@@ -2465,15 +2746,15 @@ var ARCADE = (function(){
       if(st.paused || Date.now() < st.pausedUntil){ draw(); return schedule(); }
       st.flash = null;
       if(st.queue.length) st.dir = st.queue.shift();
-      var h = st.snake[0], nx = h.x + st.dir.x, ny = h.y + st.dir.y;
-      if(nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS || st.snake.some(function(s, i){ return i < st.snake.length - 1 && s.x === nx && s.y === ny; })){
+      var h = st.snake[0], nx = (h.x + st.dir.x + COLS) % COLS, ny = (h.y + st.dir.y + ROWS) % ROWS;
+      if(st.snake.some(function(s, i){ return i < st.snake.length - 1 && s.x === nx && s.y === ny; })){
         loseLife('BONK!'); if(!st.running) return; resetSnake(); draw(); return schedule();
       }
       st.snake.unshift({ x:nx, y:ny });
       var food = st.foods.filter(function(f){ return f.x === nx && f.y === ny; })[0];
       if(food){
         var optEl = legend.querySelector('[data-opt="'+food.i+'"]');
-        if(!st.answered){ st.answered = true; recordAnswer(st.q.id, st.q.lec, food.right, 'snake'); }
+          if(!st.answered){ st.answered = true; recordAnswer(st.q.id, st.q.lec, food.right, 'snake'); }
         if(food.right){
           st.correct++; st.grow += 2; var pts = 100 + st.snake.length * 5; st.score += pts; sGood();
           if(optEl) optEl.classList.add('is-right');
@@ -2486,7 +2767,6 @@ var ARCADE = (function(){
           var rightF = st.foods.filter(function(f){ return f.right; })[0];
           var rEl = rightF && legend.querySelector('[data-opt="'+rightF.i+'"]'); if(rEl) rEl.classList.add('is-right');
           st.missed.push({ q: st.q.stem, a: st.q.choices[0] });
-          if(st.snake.length > 4){ st.snake.pop(); }
           loseLife('WRONG!');
           if(!st.running) return;
           st.pausedUntil = Date.now() + 1500;
@@ -2530,9 +2810,9 @@ var ARCADE = (function(){
     function start(){
       var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
       if(!pool().length){ toast('No snake-sized questions for that lecture yet'); return; }
-      st = { running:true, score:0, lives:3, level:1, correct:0, deck:shuffled(pool()), missed:[], foods:[], pausedUntil:0, paused:false };
+      st = { running:true, score:0, lives:5, level:1, correct:0, deck:shuffled(pool()), missed:[], foods:[], pausedUntil:Date.now() + 1200, paused:false };
       resetSnake(); nextQuestion();
-      hud(root, { score:0, lives:hearts(3), level:1 });
+      hud(root, { score:0, lives:hearts(5), level:1 });
       draw(); schedule();
     }
     function over(){
@@ -2556,9 +2836,9 @@ var ARCADE = (function(){
         p.innerHTML = shell(g, '<label for="snLec">Questions from:</label><select id="snLec">'+opts+'</select>',
           '<div class="sn-prompt" id="snPrompt">Press START, then steer with the arrow keys.</div>' +
           '<div class="gm-stage sn-board"><canvas class="sn-canvas" id="snCanvas" width="'+(COLS*CELL)+'" height="'+(ROWS*CELL)+'"></canvas>' +
-            overlayHTML(g, 'OSTEO SNAKE', 'Read the clue above the board. Four lettered dots match the four answers listed below it. Eat the right one to grow and score; a wrong bite or a wall costs a life. Space pauses.', 'START ▶') + '</div>' +
+            overlayHTML(g, 'OSTEO SNAKE', 'Read the clue above the board. Four lettered dots match the four answers listed below it. Eat the right one to grow and score. The snake moves slowly and wraps around the edges, so only a wrong bite or running into yourself costs one of your five lives. Space pauses.', 'START') + '</div>' +
           '<div class="sn-legend" id="snLegend"></div>' +
-          '<div class="sn-pad"><button type="button" class="up" data-dir="0,-1" aria-label="Up">▲</button><button type="button" class="left" data-dir="-1,0" aria-label="Left">◀</button><button type="button" class="down" data-dir="0,1" aria-label="Down">▼</button><button type="button" class="right" data-dir="1,0" aria-label="Right">▶</button></div>',
+          '<div class="sn-pad"><button type="button" class="up" data-dir="0,-1" aria-label="Up">'+icon('up')+'</button><button type="button" class="left" data-dir="-1,0" aria-label="Left">'+icon('left')+'</button><button type="button" class="down" data-dir="0,1" aria-label="Down">'+icon('down')+'</button><button type="button" class="right" data-dir="1,0" aria-label="Right">'+icon('right')+'</button></div>',
           '<kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> or WASD steer · <kbd>Space</kbd> pause · swipe on mobile');
         root = p.querySelector('.gm'); canvas = p.querySelector('#snCanvas'); ctx = canvas.getContext('2d'); legend = p.querySelector('#snLegend'); promptEl = p.querySelector('#snPrompt');
         bindCommon(root); draw();
@@ -2673,7 +2953,7 @@ var ARCADE = (function(){
         var opts = '<option value="mix"'+(STATE.arcade.stackSet==='mix'?' selected':'')+'>Shuffle all processes</option>' + SEQUENCES.map(function(s){ return '<option value="'+s.id+'"'+(STATE.arcade.stackSet===s.id?' selected':'')+'>'+escHtml(s.title)+'</option>'; }).join('');
         p.innerHTML = shell(g, '<label for="saSet">Process:</label><select id="saSet">'+opts+'</select>',
           '<div class="gm-stage sa-stage"><div class="sa-head"><div style="flex:1;min-width:0"><h3 id="saTitle">Ready?</h3><div class="sa-timer"><i></i></div></div><span class="sa-next" id="saNext"></span></div><div class="sa-tower" id="saTower"></div><div class="sa-belt" id="saBelt"></div>' +
-            overlayHTML(g, 'STACK ATTACK', 'Steps of a process ride the conveyor in scrambled order. Grab them first-to-last (tap, or press the number on the block) to build the tower before the timer runs out. Wrong grabs cost a life.', 'START ▶') + '</div>',
+            overlayHTML(g, 'STACK ATTACK', 'Steps of a process ride the conveyor in scrambled order. Grab them first-to-last (tap, or press the number on the block) to build the tower before the timer runs out. Wrong grabs cost a life.', 'START') + '</div>',
           'Tap a block or press its <kbd>1</kbd>–<kbd>9</kbd> key');
         root = p.querySelector('.gm'); stage = p.querySelector('.sa-stage'); belt = p.querySelector('#saBelt'); tower = p.querySelector('#saTower');
         bindCommon(root);
@@ -2688,16 +2968,254 @@ var ARCADE = (function(){
     };
   }
 
+  /* =================================================================== MARROW MATCH (memory pairs) */
+  function pairSets(){
+    var sets = [];
+    REVIEW.forEach(function(g){ g.sections.forEach(function(sec){
+      if(sec.type !== 'table' || sec.head.length < 2) return;
+      var rows = sec.rows.filter(function(r){ return r[0] && r[1] && String(r[0]).length <= 46 && String(r[1]).length <= 60 && r[1] !== '-' && r[1] !== ''; });
+      if(rows.length >= 6) sets.push({ id: g.id + ':' + sec.title, title: sec.title, lec: null, pairs: rows.map(function(r){ return [String(r[0]), String(r[1])]; }) });
+    }); });
+    QUESTIONS.filter(function(q){ return q.type === 'match'; }).forEach(function(q){ sets.push({ id:q.id, title:q.stem.replace(/^Match /,'').replace(/\.$/,''), lec:q.lec, pairs:q.pairs }); });
+    return sets;
+  }
+  function MarrowMatch(){
+    var g = GAMES[3], root, stage, timer = null, st = null, SETS = pairSets();
+    function pickSet(){ var c = STATE.arcade.matchSet; var s = SETS.filter(function(x){ return x.id === c; })[0]; return s || SETS[Math.floor(Math.random()*SETS.length)]; }
+    function deal(){
+      var set = pickSet(); st.set = set;
+      var n = Math.min(6, set.pairs.length);
+      var chosen = shuffled(set.pairs).slice(0, n);
+      st.cards = shuffled(chosen.reduce(function(a, p, i){ a.push({ pair:i, side:0, text:p[0] }); a.push({ pair:i, side:1, text:p[1] }); return a; }, []));
+      st.open = []; st.found = 0; st.need = n; st.lock = false;
+      root.querySelector('#mmTitle').textContent = set.title;
+      var grid = root.querySelector('#mmGrid');
+      grid.innerHTML = st.cards.map(function(c, i){ return '<button type="button" class="mm-card side-'+c.side+'" data-i="'+i+'"><span class="mm-back">'+icon('bone')+'</span><span class="mm-face">'+escHtml(c.text)+'</span></button>'; }).join('');
+    }
+    function flip(i){
+      if(!st || !st.running || st.lock) return;
+      var c = st.cards[i], el = root.querySelector('.mm-card[data-i="'+i+'"]');
+      if(!c || c.done || st.open.indexOf(i) !== -1) return;
+      el.classList.add('up'); st.open.push(i); beep(520, .05);
+      if(st.open.length < 2) return;
+      var a = st.cards[st.open[0]], b = st.cards[st.open[1]];
+      var ea = root.querySelector('.mm-card[data-i="'+st.open[0]+'"]'), eb = el;
+      if(a.pair === b.pair && a.side !== b.side){
+        a.done = b.done = true; ea.classList.add('done'); eb.classList.add('done'); st.open = [];
+        st.combo++; st.found++; st.score += 100 + st.combo * 25 + Math.max(0, Math.round(st.time)); sGood();
+        hud(root, { score: st.score });
+        if(st.found >= st.need){ st.round++; st.time = Math.min(st.limit, st.time + 20); hud(root, { level: st.round + 1 }); st.lock = true; toast('Board cleared: ' + st.set.title); setTimeout(function(){ if(st && st.running){ deal(); } }, 700); }
+      } else {
+        st.combo = 0; st.lock = true; sBad();
+        st.missed.push({ q: a.text, a: st.set.pairs.filter(function(p){ return p[0] === a.text || p[1] === a.text; }).map(function(p){ return p[0] === a.text ? p[1] : p[0]; })[0] || '' });
+        setTimeout(function(){ ea.classList.remove('up'); eb.classList.remove('up'); st.open = []; st.lock = false; }, 800);
+      }
+    }
+    function tick(){
+      if(!st || !st.running) return;
+      st.time -= 0.25;
+      root.querySelector('#mmTime i').style.transform = 'scaleX(' + Math.max(0, st.time / st.limit) + ')';
+      if(st.time <= 0) return over();
+      timer = setTimeout(tick, 250);
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      st = { running:true, score:0, round:0, combo:0, limit:90, time:90, missed:[] };
+      hud(root, { score:0, lives:'—', level:1 });
+      deal(); tick();
+    }
+    function over(){
+      st.running = false; clearTimeout(timer);
+      var best = finish(g, st.score);
+      stage.insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){ if((!st || !st.running) && (e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } }
+    return {
+      mount: function(p){
+        var opts = '<option value="mix">Shuffle all topics</option>' + SETS.map(function(s){ return '<option value="'+escHtml(s.id)+'"'+(STATE.arcade.matchSet===s.id?' selected':'')+'>'+escHtml(s.title)+'</option>'; }).join('');
+        p.innerHTML = shell(g, '<label for="mmSet">Topic:</label><select id="mmSet">'+opts+'</select>',
+          '<div class="gm-stage mm-stage"><div class="mm-head"><h3 id="mmTitle">Ready?</h3><div class="sa-timer" id="mmTime"><i></i></div></div><div class="mm-grid" id="mmGrid"></div>' +
+            overlayHTML(g, 'MARROW MATCH', 'Flip two cards at a time to find each term and its partner (drug and mechanism, gene and disease, antibody and target). Clear boards to add time. Fast matches and combos score more.', 'START') + '</div>',
+          'Click or tap cards to flip them');
+        root = p.querySelector('.gm'); stage = p.querySelector('.mm-stage');
+        bindCommon(root);
+        stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) return start(); var c = e.target.closest('.mm-card'); if(c) flip(+c.getAttribute('data-i')); });
+        p.querySelector('#mmSet').addEventListener('change', function(e){ STATE.arcade.matchSet = e.target.value; saveState(); });
+        document.addEventListener('keydown', onKey);
+      },
+      stop: function(){ if(st) st.running = false; clearTimeout(timer); document.removeEventListener('keydown', onKey); }
+    };
+  }
+
+  /* =================================================================== BONE TO PICK (hangman) */
+  function hangmanPool(lec){
+    return QUESTIONS.filter(function(q){
+      if(q.type !== 'mcq') return false;
+      if(lec !== 'all' && q.lec !== lec) return false;
+      var a = q.choices[0];
+      return /^[A-Za-z][A-Za-z '\-]{2,24}$/.test(a) && a.split(' ').length <= 3 && q.stem.length <= 200;
+    });
+  }
+  function BoneToPick(){
+    var g = GAMES[4], root, stage, st = null, MAXMISS = 6;
+    function nextWord(){
+      if(!st.deck.length) st.deck = shuffled(hangmanPool(STATE.arcade.hangLec));
+      st.q = st.deck.shift(); st.word = st.q.choices[0].toUpperCase(); st.guessed = {}; st.miss = 0; st.done = false;
+      draw();
+    }
+    function masked(){ return st.word.split('').map(function(ch){ return /[A-Z]/.test(ch) ? (st.guessed[ch] ? ch : '_') : ch; }); }
+    function draw(){
+      root.querySelector('#hmClue').innerHTML = lecChip(st.q.lec) + '<span>' + escHtml(st.q.stem) + '</span>';
+      root.querySelector('#hmWord').innerHTML = masked().map(function(c){ return c === ' ' ? '<i class="sp"></i>' : '<b>'+escHtml(c === '_' ? '' : c)+'</b>'; }).join('');
+      root.querySelector('#hmKeys').innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function(L){ var used = st.guessed[L]; var cls = used ? (st.word.indexOf(L) !== -1 ? 'hit' : 'miss') : ''; return '<button type="button" class="hm-key '+cls+'" data-l="'+L+'"'+(used?' disabled':'')+'>'+L+'</button>'; }).join('');
+      root.querySelector('#hmBone').innerHTML = boneSVG(st.miss);
+      root.querySelector('#hmLeft').textContent = (MAXMISS - st.miss) + ' misses left';
+    }
+    function boneSVG(m){
+      /* a skeleton that loses pieces with each miss: skull, spine, 2 arms, 2 legs */
+      var parts = [
+        '<circle cx="60" cy="22" r="13"/><circle cx="55" cy="20" r="2.5" fill="currentColor"/><circle cx="65" cy="20" r="2.5" fill="currentColor"/>',
+        '<path d="M60 36v40"/><path d="M50 46h20M52 54h16M54 62h12"/>',
+        '<path d="M60 44L40 64"/>', '<path d="M60 44L80 64"/>',
+        '<path d="M60 76L46 104"/>', '<path d="M60 76L74 104"/>'
+      ];
+      return '<svg viewBox="0 0 120 112" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">' + parts.map(function(p, i){ return '<g class="'+(i < MAXMISS - m ? 'on' : 'off')+'">'+p+'</g>'; }).join('') + '</svg>';
+    }
+    function guess(L){
+      if(!st || !st.running || st.done || st.guessed[L]) return;
+      st.guessed[L] = true;
+      if(st.word.indexOf(L) !== -1){ beep(700, .05); if(masked().indexOf('_') === -1) return solved(true); }
+      else { st.miss++; sBad(); if(st.miss >= MAXMISS) return solved(false); }
+      draw();
+    }
+    function solved(ok){
+      st.done = true; draw();
+      root.querySelector('#hmWord').innerHTML = st.word.split('').map(function(c){ return c === ' ' ? '<i class="sp"></i>' : '<b class="'+(ok?'ok':'bad')+'">'+escHtml(c)+'</b>'; }).join('');
+      recordAnswer(st.q.id, st.q.lec, ok, 'hangman');
+      if(ok){ var pts = 100 + (MAXMISS - st.miss) * 40; st.score += pts; st.solved++; sGood(); hud(root, { score: st.score, level: 1 + Math.floor(st.solved / 3) }); }
+      else { st.lives--; st.missed.push({ q: st.q.stem, a: st.q.choices[0] }); hud(root, { lives: hearts(st.lives) }); }
+      setTimeout(function(){ if(!st || !st.running) return; if(st.lives <= 0) return over(); nextWord(); }, ok ? 900 : 1600);
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      if(!hangmanPool(STATE.arcade.hangLec).length){ toast('No short answers for that lecture yet'); return; }
+      st = { running:true, score:0, lives:3, solved:0, deck:[], missed:[] };
+      hud(root, { score:0, lives:hearts(3), level:1 });
+      nextWord();
+    }
+    function over(){
+      st.running = false;
+      var best = finish(g, st.score);
+      stage.insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){
+      if(!st || !st.running){ if((e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } return; }
+      var k = (e.key || '').toUpperCase();
+      if(/^[A-Z]$/.test(k) && !e.ctrlKey && !e.metaKey){ e.preventDefault(); guess(k); }
+    }
+    return {
+      mount: function(p){
+        var opts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.arcade.hangLec===l.id?' selected':'')+'>L'+l.num+' '+escHtml(l.title)+'</option>'; }).join('');
+        p.innerHTML = shell(g, '<label for="hmLec">Words from:</label><select id="hmLec">'+opts+'</select>',
+          '<div class="gm-stage hm-stage"><div class="sn-prompt hm-clue" id="hmClue">Guess the term from the clue.</div><div class="hm-mid"><div class="hm-bone" id="hmBone"></div><div><div class="hm-word" id="hmWord"></div><div class="hm-left" id="hmLeft"></div></div></div><div class="hm-keys" id="hmKeys"></div>' +
+            overlayHTML(g, 'BONE TO PICK', 'Read the clue and spell the answer one letter at a time. Each wrong letter knocks a bone off the skeleton; lose all six and the word costs a life. Answers count toward class stats.', 'START') + '</div>',
+          'Type letters on your keyboard or tap them');
+        root = p.querySelector('.gm'); stage = p.querySelector('.hm-stage');
+        bindCommon(root);
+        stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) return start(); var k = e.target.closest('.hm-key'); if(k) guess(k.getAttribute('data-l')); });
+        p.querySelector('#hmLec').addEventListener('change', function(e){ STATE.arcade.hangLec = e.target.value; saveState(); if(st && st.running) st.deck = []; });
+        document.addEventListener('keydown', onKey);
+      },
+      stop: function(){ if(st) st.running = false; document.removeEventListener('keydown', onKey); }
+    };
+  }
+
+  /* =================================================================== FACT OR FRACTURE (true/false rush) */
+  function factPool(){
+    var out = [];
+    REVIEW.forEach(function(g){ g.sections.forEach(function(sec){
+      if(sec.type !== 'cards') return;
+      sec.items.forEach(function(c){ c.facts.forEach(function(f){
+        if(f[1].length > 110) return;
+        var others = sec.items.filter(function(o){ return o !== c && o.facts.some(function(of){ return of[0] === f[0] && of[1] !== f[1] && of[1].length <= 110; }); });
+        out.push({ name:c.name, label:f[0], value:f[1], lec:c.lec, others: others.map(function(o){ return o.facts.filter(function(of){ return of[0] === f[0]; })[0][1]; }) });
+      }); });
+    }); });
+    return out.filter(function(x){ return x.name.length <= 60; });
+  }
+  function FactOrFracture(){
+    var g = GAMES[5], root, stage, raf = null, last = 0, st = null, POOL = factPool();
+    function next(){
+      var f = POOL[Math.floor(Math.random()*POOL.length)];
+      var truth = !f.others.length || Math.random() < 0.5;
+      var shown = truth ? f.value : f.others[Math.floor(Math.random()*f.others.length)];
+      st.cur = { f:f, truth:truth, shown:shown };
+      var card = root.querySelector('#ffCard');
+      card.className = 'ff-card';
+      card.innerHTML = '<div class="ff-name">'+escHtml(f.name)+'</div><div class="ff-label">'+escHtml(f.label)+'</div><div class="ff-val">'+escHtml(shown)+'</div><div>'+lecChip(f.lec)+'</div>';
+    }
+    function answer(saysTrue){
+      if(!st || !st.running || !st.cur || st.wait) return;
+      var ok = saysTrue === st.cur.truth, card = root.querySelector('#ffCard');
+      if(ok){ st.combo++; var pts = 50 * (1 + Math.floor(st.combo / 5)); st.score += pts; st.time = Math.min(st.limit, st.time + 1.2); sGood(); card.classList.add('ok'); }
+      else { st.combo = 0; st.time -= 4; sBad(); card.classList.add('bad'); st.missed.push({ q: st.cur.f.name + ' · ' + st.cur.f.label + ': "' + st.cur.shown + '" is ' + (st.cur.truth ? 'TRUE' : 'FALSE'), a: st.cur.f.value }); }
+      hud(root, { score: st.score, level: 1 + Math.floor(st.combo / 5) });
+      st.wait = true; setTimeout(function(){ if(st && st.running){ st.wait = false; next(); } }, ok ? 260 : 900);
+    }
+    function loop(t){
+      if(!st || !st.running) return;
+      var dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+      st.time -= dt;
+      root.querySelector('#ffTime i').style.transform = 'scaleX(' + Math.max(0, st.time / st.limit) + ')';
+      root.querySelector('#ffSecs').textContent = Math.max(0, Math.ceil(st.time)) + 's';
+      if(st.time <= 0) return over();
+      raf = requestAnimationFrame(loop);
+    }
+    function start(){
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      st = { running:true, score:0, combo:0, limit:60, time:60, missed:[] };
+      hud(root, { score:0, lives:'—', level:1 });
+      next(); last = 0; raf = requestAnimationFrame(loop);
+    }
+    function over(){
+      st.running = false; cancelAnimationFrame(raf);
+      var best = finish(g, st.score);
+      stage.insertAdjacentHTML('beforeend', gameOverHTML(g, st.score, best, st.missed));
+      hud(root, { best: STATE.arcade.best[g.id] });
+    }
+    function onKey(e){
+      if(!st || !st.running){ if((e.key === 'Enter' || e.key === ' ') && root.querySelector('[data-start]')){ e.preventDefault(); start(); } return; }
+      if(e.key === 'ArrowLeft' || e.key === 't' || e.key === 'T'){ e.preventDefault(); answer(true); }
+      else if(e.key === 'ArrowRight' || e.key === 'f' || e.key === 'F'){ e.preventDefault(); answer(false); }
+    }
+    return {
+      mount: function(p){
+        p.innerHTML = shell(g, '<span class="gm-select-note">Facts come from every card in the Review tab</span>',
+          '<div class="gm-stage ff-stage"><div class="mm-head"><h3>60-second rush <span class="sa-next" id="ffSecs">60s</span></h3><div class="sa-timer" id="ffTime"><i></i></div></div><div class="ff-wrap"><div class="ff-card" id="ffCard"></div></div><div class="ff-btns"><button type="button" class="ff-btn t" data-tf="1">'+icon('check')+'FACT<kbd>T / ←</kbd></button><button type="button" class="ff-btn f" data-tf="0">'+icon('crack')+'FRACTURE<kbd>F / →</kbd></button></div>' +
+            overlayHTML(g, 'FACT OR FRACTURE', 'Each card pairs a drug, disease, cell or hormone with a detail. Is it a FACT, or has the detail been swapped from a look-alike (a FRACTURE)? Right answers add time; wrong ones cost 4 seconds.', 'START') + '</div>',
+          '<kbd>T</kbd> or <kbd>←</kbd> fact · <kbd>F</kbd> or <kbd>→</kbd> fracture');
+        root = p.querySelector('.gm'); stage = p.querySelector('.ff-stage');
+        bindCommon(root);
+        stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) return start(); var b = e.target.closest('[data-tf]'); if(b) answer(b.getAttribute('data-tf') === '1'); });
+        document.addEventListener('keydown', onKey);
+      },
+      stop: function(){ if(st) st.running = false; cancelAnimationFrame(raf); document.removeEventListener('keydown', onKey); }
+    };
+  }
+
   return { renderLobby:renderLobby, stopAll:stopAll, startGame:startGame };
 })();
 
 /* ---------- theme toggle ---------- */
 function applyTheme(t){
   if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
-  var b = document.getElementById('themeBtn'); if(b) b.textContent = t === 'dark' ? '☾' : t === 'light' ? '☀' : '◐';
+  var b = document.getElementById('themeBtn'); if(b) b.innerHTML = icon(t === 'dark' ? 'moon' : t === 'light' ? 'sun' : 'auto');
 }
 function boot(){
   var saved = null; try{ saved = localStorage.getItem('msk3-theme'); }catch(e){}
+  document.querySelectorAll('[data-ic]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-ic')); });
   applyTheme(saved);
   document.getElementById('themeBtn').addEventListener('click', function(){
     var cur = document.documentElement.getAttribute('data-theme');
