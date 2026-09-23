@@ -355,7 +355,7 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
         <h1>Musculoskeletal Exam 3 Hub</h1>
-        <span class="hub-subtitle">GI &amp; Musculoskeletal &middot; Lectures 19–27</span>
+        <span class="hub-subtitle">Lectures 19–27 &middot; 40 Qs, new material only</span>
       </div>
       <div class="hub-meta">
         <button id="sh-ribbon-name" class="hub-name-pill" type="button" hidden></button>
@@ -536,7 +536,6 @@ cw('cw-intramem','bonedev','Bone formation by direct replacement of mesenchyme',
 cw('cw-ms','autoimmune','Autoimmune demyelinating disorder','Multiple sclerosis',['Myasthenia gravis','Wernicke-Korsakoff','Guillain-Barre'],'Neurologic deficits separated in time, partial recovery; white-matter lesions; F>M.');
 cw('cw-osteophyte','joints','Bony outgrowth at a joint affected by osteoarthritis','Osteophyte',['Tophus','Pannus','Callus'],'Heberden nodes = DIP; Bouchard nodes = PIP.');
 cw('cw-ewing','tumors','Undifferentiated "small blue cell" neoplasm of the long bones, pelvis, scapula and ribs','Ewing sarcoma',['Osteosarcoma','Chondrosarcoma','Giant cell tumor'],'EWS-FLI1 fusion; children and young adults; lytic tumor from the medullary cavity.');
-cw('cw-lamellar','bone','Bodies containing glycosphingolipids, phospholipids and ceramides that are produced by keratinocytes','Lamellar bodies',['Howship lacunae','Haversian canals','Isogenous groups'],'Class crossword item. This is skin biology and is not covered in any Exam 3 deck; kept because it is in the class bank.');
 cw('cw-rhabdo','tumors','Most common soft tissue sarcoma of childhood and adolescence','Rhabdomyosarcoma',['Liposarcoma','Leiomyosarcoma','Ewing sarcoma'],'Alveolar and embryonal subtypes; head/neck, sinuses, GU tract; alveolar = FOXO1 fused to PAX3 or PAX7.');
 cw('cw-jia','joints','Most common arthritis in children','Juvenile idiopathic arthritis',['Rheumatoid arthritis','Reactive arthritis','Gout'],'Onset before 16; oligoarthritis, large joints, RF usually absent, ANA often positive; chronic uveitis in 20-30%.');
 cw('cw-oa','joints','Most common joint disease','Osteoarthritis',['Rheumatoid arthritis','Gout','Ankylosing spondylitis'],'Degeneration of articular cartilage; gout is the most common INFLAMMATORY arthropathy.');
@@ -1889,7 +1888,7 @@ function qCardHTML(q, opts){
   }
   var seen = STATE.seen[q.id];
   var status = seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
-  return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'">' +
+  return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+
@@ -1958,7 +1957,7 @@ function setMode(mode){
 /* ===================================================================
    COMPENDIUM
    =================================================================== */
-var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['hints','Exam Hints'], ['cram','Cram Sheet'] ];
+var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (40)'] ];
 var BANK_PAGE = 30, bankShown = BANK_PAGE;
 
 function renderCompendium(){
@@ -1971,6 +1970,7 @@ function renderCompendium(){
   if(sub === 'notes') renderNotes(body);
   else if(sub === 'bank') renderBank(body);
   else if(sub === 'hints') renderHints(body);
+  else if(sub === 'mock') renderMock(body);
   else renderCram(body);
 }
 
@@ -2133,6 +2133,70 @@ function renderReview(){
     var el = e.target.closest('dd, td, .flow li .st span'); if(el) el.classList.toggle('shown');
   });
 }
+
+/* ===================================================================
+   MOCK EXAM: 40 MCQs, new material only, weighted like the real exam
+   (Dr. Herr said L20 contributes 4 questions; the rest split ~evenly)
+   =================================================================== */
+var MOCK_BLUEPRINT = { nutrition:5, joints:4, cartilage:4, bone:4, bonedev:5, autoimmune:5, hereditary:5, drugs:4, tumors:4 };
+function buildMock(){
+  var ids = [];
+  Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
+    var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq'; });
+    var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
+    var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
+    fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
+  });
+  STATE.mock = { ids: shuffled(ids), t0: Date.now(), res: {} };
+  saveState();
+}
+var mockTimer = null;
+function renderMock(body){
+  clearInterval(mockTimer);
+  var m = STATE.mock;
+  var total = Object.keys(MOCK_BLUEPRINT).reduce(function(n,k){ return n + MOCK_BLUEPRINT[k]; }, 0);
+  if(!m || !m.ids || !m.ids.length){
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the same length as Exam 3, drawn only from the new Exam 3 lectures (L19–L27). Weighting follows the real exam: 4 from Joint Diseases (Dr. Herr said four) and 4–5 from each other lecture. Questions you haven\'t seen or missed last time are picked first.</p><p>A clock runs so you can pace yourself (about a minute per question). Your score and a per-lecture breakdown appear when you finish, and every answer counts toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
+    return;
+  }
+  var answered = Object.keys(m.res).length, correct = Object.keys(m.res).filter(function(k){ return m.res[k]; }).length;
+  var done = answered >= m.ids.length;
+  var h = '<div class="qfilters" style="padding:4px 0"><span class="pill" id="mockClock">0:00</span><span class="pill">'+answered+' / '+m.ids.length+' answered</span>'+(done?'<span class="pill countdown">Score '+correct+' / '+m.ids.length+' · '+Math.round(correct/m.ids.length*100)+'%</span>':'')+'<button type="button" class="btn" id="mockNew">New mock</button></div>';
+  if(done){
+    h += '<div class="rv-table-wrap" style="margin-bottom:24px"><table class="rv-table"><thead><tr><th>Lecture</th><th>Correct</th><th>Score</th></tr></thead><tbody>' +
+      Object.keys(MOCK_BLUEPRINT).map(function(lec){
+        var qs = m.ids.filter(function(id){ return QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].lec === lec; });
+        var c = qs.filter(function(id){ return m.res[id]; }).length;
+        return '<tr><td>'+lecChip(lec)+'</td><td>'+c+' / '+qs.length+'</td><td>'+(qs.length?Math.round(c/qs.length*100):0)+'%</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  h += '<div class="qlist" id="mockList">' + m.ids.map(function(id, i){
+    var q = QUESTIONS_BY_ID[id]; if(!q) return '';
+    return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' + qCardHTML(q, { ctx:'mock' }) + '</div>';
+  }).join('') + '</div>';
+  body.innerHTML = h;
+  var list = document.getElementById('mockList'); wireQuestionContainer(list);
+  /* restore answered cards so a reload doesn't wipe progress */
+  m.ids.forEach(function(id){
+    if(!(id in m.res)) return;
+    var card = list.querySelector('.qcard[data-qid="'+id+'"]'); if(!card) return;
+    card.classList.add('is-answered');
+    card.querySelectorAll('.qcard-choice').forEach(function(b){ b.disabled = true; if(b.getAttribute('data-answer') === '1') b.classList.add('is-correct'); });
+    var v = card.querySelector('.qcard-verdict'); if(v){ v.textContent = m.res[id] ? 'Correct.' : 'Missed.'; v.className = 'qcard-verdict ' + (m.res[id] ? 'ok' : 'bad'); }
+  });
+  document.getElementById('mockNew').onclick = function(){ STATE.mock = null; saveState(); renderMock(body); };
+  var clock = document.getElementById('mockClock');
+  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var s = Math.floor((end - m.t0)/1000); clock.textContent = '⏱ ' + Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+  tick(); if(!done) mockTimer = setInterval(tick, 1000);
+}
+document.addEventListener('msk3:answered', function(e){
+  var d = e.detail; if(d.ctx !== 'mock' || !STATE.mock) return;
+  if(STATE.mock.ids.indexOf(d.qid) === -1 || (d.qid in STATE.mock.res)) return;
+  STATE.mock.res[d.qid] = d.correct;
+  if(Object.keys(STATE.mock.res).length >= STATE.mock.ids.length){ STATE.mock.tEnd = Date.now(); saveState(); var b = document.getElementById('compBody'); if(b && STATE.ui.sub === 'mock') setTimeout(function(){ renderMock(b); window.scrollTo(0,0); }, 400); }
+  else { saveState(); var pills = document.querySelectorAll('#compBody .qfilters .pill'); if(pills[1]) pills[1].textContent = Object.keys(STATE.mock.res).length + ' / ' + STATE.mock.ids.length + ' answered'; }
+});
 
 /* ===================================================================
    ARCADE — three quick-play mini games built on the shared data
