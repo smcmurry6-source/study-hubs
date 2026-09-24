@@ -418,8 +418,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         <div id="pulseCorrect"><p class="muted">Loading…</p></div>
       </div>
       <div class="panel p-arcade">
-        <h3>Bone Zone Arcade high scores</h3>
-        <p class="panel-sub">From the Musculoskeletal Exam 3 hub</p>
+        <h3 id="arcadeTitle">Arcade high scores</h3>
+        <p class="panel-sub" id="arcadeSub">From the hub arcades</p>
+        <div class="game-tabs" id="arcadeHubs" aria-label="Arcade" style="margin-bottom:6px"></div>
         <div class="game-tabs" role="tablist" id="gameTabs" aria-label="Arcade game"></div>
         <div id="arcadeBoard"><p class="muted">Loading…</p></div>
       </div>
@@ -474,16 +475,21 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
       modes:["Compendium","Review tables","Mock exam","Arcade"], stateKey:"msk3-state-v1" },
     { id:"perio", cls:"perio", title:"Periodontology D2 Compendium", code:"Periodontology · Full unit",
-      examDate:null, examName:"Periodontology", updated:"2026-09-08", emoji:"🦷",
-      desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment, Phase I therapy, resective surgery and furcations, regeneration, implants in perio patients, host modulation, and plastic surgery and esthetics.",
-      modes:["Compendium","Atlas","Clinic Floor game","Listen"], stateKey:"perio-d2-compendium-state-v1" }
+      examDate:null, examName:"Periodontology", updated:"2026-09-24", emoji:"🦷",
+      desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam, a diagram atlas and the Pocket Arcade.",
+      modes:["Compendium","Plain-English notes","Review tables","Atlas","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
   var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3" };
   var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "fixed-pros":"pros", perio:"perio" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
-  var ARCADE = [
-    ["sort","Sort Storm"],["snake","Osteo Snake"],["stack","Stack Attack"],["match","Marrow Match"],["hangman","Bone to Pick"],
-    ["fact","Fact or Fracture"],["blaster","Clast Blaster"],["search","Bone Search"],["whack","Whack-a-Clast"]
+  /* Arcade high-score panel: one entry per hub arcade (p_hub for get_arcade_leaderboard). */
+  var ARCADES = [
+    { hub:"msk-exam3", title:"Bone Zone Arcade", from:"Musculoskeletal Exam 3 hub", games:[
+      ["sort","Sort Storm"],["snake","Osteo Snake"],["stack","Stack Attack"],["match","Marrow Match"],["hangman","Bone to Pick"],
+      ["fact","Fact or Fracture"],["blaster","Clast Blaster"],["search","Bone Search"],["whack","Whack-a-Clast"] ] },
+    { hub:"perio", title:"Pocket Arcade", from:"Periodontology D2 hub", money:["smile"], games:[
+      ["flappy","Flappy Flap"],["crusher","Calculus Crusher"],["probe","Pocket Probe"],["quadrants","Quadrants"],["perdle","Perdle"],
+      ["planer","Root Planer"],["smile","Million-Dollar Smile"],["sweeper","Probe Sweeper"],["cross","Cross-Section"] ] }
   ];
 
   /* ====================================================================
@@ -819,28 +825,45 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       $("pulseCorrect").innerHTML = '<div class="stat-pair">' + stat(act, "Longest run still going") + stat(rec, "All-time record") + '</div>';
     }, function(){ unavailable("pulseCorrect"); });
 
-    /* arcade high scores */
+    /* arcade high scores (one tab row per hub arcade; see ARCADES) */
     (function(){
-      var tabs = $("gameTabs"), key = "sh_dash_arcade_game", sel = ls(key) || "sort";
-      if (!ARCADE.some(function(g){ return g[0] === sel; })) sel = "sort";
-      tabs.innerHTML = ARCADE.map(function(g){ return '<button type="button" role="tab" data-game="' + g[0] + '" aria-selected="' + (g[0] === sel) + '">' + esc(g[1]) + '</button>'; }).join("");
+      var hubsEl = $("arcadeHubs"), tabs = $("gameTabs"), hk = "sh_dash_arcade_hub", key = "sh_dash_arcade_game";
+      var hubSel = ls(hk) || ARCADES[0].hub;
+      if (!ARCADES.some(function(a){ return a.hub === hubSel; })) hubSel = ARCADES[0].hub;
+      function arc(){ return ARCADES.filter(function(a){ return a.hub === hubSel; })[0]; }
+      function drawHubs(){
+        hubsEl.innerHTML = ARCADES.map(function(a){ return '<button type="button" data-arc="' + a.hub + '" aria-pressed="' + (a.hub === hubSel) + '" aria-selected="' + (a.hub === hubSel) + '">' + esc(a.title) + '</button>'; }).join("");
+        $("arcadeTitle").textContent = arc().title + " high scores";
+        $("arcadeSub").textContent = "From the " + arc().from;
+      }
+      function drawTabs(){
+        var a = arc(), sel = ls(key + ":" + a.hub) || a.games[0][0];
+        if (!a.games.some(function(g){ return g[0] === sel; })) sel = a.games[0][0];
+        tabs.innerHTML = a.games.map(function(g){ return '<button type="button" role="tab" data-game="' + g[0] + '" aria-selected="' + (g[0] === sel) + '">' + esc(g[1]) + '</button>'; }).join("");
+        load(sel);
+      }
       function load(game){
-        var name = ARCADE.filter(function(g){ return g[0] === game; })[0][1];
+        var a = arc(), name = a.games.filter(function(g){ return g[0] === game; })[0][1], money = (a.money || []).indexOf(game) > -1;
         $("arcadeBoard").innerHTML = '<p class="muted">Loading…</p>';
-        sb.rpc("get_arcade_leaderboard", { p_hub:"msk-exam3", p_game:game, p_visitor:VISITOR || null, p_limit:5 }).then(function(res){
+        sb.rpc("get_arcade_leaderboard", { p_hub:a.hub, p_game:game, p_visitor:VISITOR || null, p_limit:5 }).then(function(res){
+          if (arc().hub !== a.hub) return;
           var rows = (res && res.data) || [];
           if (!rows.length){ $("arcadeBoard").innerHTML = '<p class="muted">No ' + esc(name) + ' scores yet. Finish a game in the hub\'s Arcade to claim first place.</p>'; return; }
           $("arcadeBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
-            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
+            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
           }).join("") + '</ol>';
         }, function(){ unavailable("arcadeBoard"); });
       }
+      hubsEl.addEventListener("click", function(e){
+        var b = e.target.closest("[data-arc]"); if (!b) return;
+        hubSel = b.getAttribute("data-arc"); lsSet(hk, hubSel); drawHubs(); drawTabs();
+      });
       tabs.addEventListener("click", function(e){
         var b = e.target.closest("[data-game]"); if (!b) return;
         tabs.querySelectorAll("[data-game]").forEach(function(x){ x.setAttribute("aria-selected", x === b ? "true" : "false"); });
-        lsSet(key, b.getAttribute("data-game")); load(b.getAttribute("data-game"));
+        lsSet(key + ":" + hubSel, b.getAttribute("data-game")); load(b.getAttribute("data-game"));
       });
-      load(sel);
+      drawHubs(); drawTabs();
     })();
   }
 

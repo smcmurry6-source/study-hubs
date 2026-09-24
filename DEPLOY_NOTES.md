@@ -58,6 +58,24 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-24 (perio revamp + Pocket Arcade)** — `hubs/perio/index.html` rebuilt (Perio Project) to
+  match the revamped site: compact one-row ribbon (back, title, icon mode pills, countdown, progress,
+  theme toggle), inline-SVG icon set (no emoji), Instrument Serif/Sans + IBM Plex Mono. Modes are now
+  **Compendium · Review · Atlas · Arcade**; the Understory game + cutscenes were retired at Sam's
+  request (replaced by the Arcade). Reference tables moved to a Review mode (data-driven `REF_SECTIONS`,
+  search + hide-answers). New content: Session 4 (Phase I, Dr. Kaur slide deck, status `preview`) and
+  the Session 3 in-class case review; bank 150 → 216. **Pocket Arcade**: nine new games (flappy,
+  crusher, probe, quadrants, perdle, planer, smile, sweeper, cross) posting to `arcade_scores` with
+  `p_hub='perio'`; `migration_v11.sql` (whitelists those ids) **was applied 2026-09-24 via the
+  connector**. Bank-based games call `recordAnswer`, so they fire `perio:answered`. The state key and
+  `answered/totalSeen/activeDates` shape are unchanged (dashboard `readProgress` still works); new
+  `STATE.ui`/`STATE.arcade` sub-objects. The hub is now built from split sources in the Perio Project
+  session; the deployed `index.html` is the single-file build. Lecture Notes now have an **As taught / Plain English** toggle (`READINGS_PLAIN`, `STATE.ui.level`); each level has
+  its own narration file, `audio/<id>-full.mp3` and `audio/<id>-plain.mp3` (all 9 plain files new; full regenerated for
+  `phase1-therapy` and `risk-assessment`) — **edit either level's text and you must regenerate that file**. The Listen
+  button is re-skinned with hub tokens in `hubs/perio` (the widget's `var(--card,#fff)` fallback made it white-on-white
+  in dark mode; any hub without a `--card` token has the same issue). Dashboard: perio `HUBS` entry updated, and the arcade
+  high-score panel is now data-driven by an `ARCADES` array (Bone Zone + Pocket Arcade, hub switcher).
 - **2026-09-24** — msk-exam3: Listen button on Lecture Notes (shared `window.shTTS`, same
   markup as perio) plus Kokoro narration `hubs/msk-exam3/audio/<lec>-full.mp3` for all 9
   lectures (af_heart). **msk-exam3 now has pre-generated audio: any READINGS text edit must
