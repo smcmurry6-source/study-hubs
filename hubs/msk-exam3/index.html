@@ -533,6 +533,10 @@ main{padding-top:16px}
   .wa-mole span{font-size:.7rem}
 }
 
+/* ---------- Listen (shared widget TTS) ---------- */
+.reading .meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.reading .meta-row .meta{margin:0}
+
 </style>
 </head>
 <body>
@@ -2222,6 +2226,7 @@ function wireQuestionContainer(container){
 
 /* ---------- mode switching ---------- */
 function setMode(mode){
+  if(window.shTTS) window.shTTS.stop();
   STATE.ui.mode = mode; saveState();
   document.querySelectorAll('#modeSwitch [data-mode]').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-mode') === mode ? 'true' : 'false'); });
   document.querySelectorAll('[data-mode-panel]').forEach(function(p){ p.hidden = p.getAttribute('data-mode-panel') !== mode; });
@@ -2239,6 +2244,7 @@ var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['hints','E
 var BANK_PAGE = 30, bankShown = BANK_PAGE;
 
 function renderCompendium(){
+  if(window.shTTS) window.shTTS.stop();
   var p = document.getElementById('panel-compendium');
   var sub = STATE.ui.sub;
   var h = '<div class="subtabs">' + SUBTABS.map(function(t){ return '<button type="button" class="subtab'+(t[0]===sub?' is-active':'')+'" data-sub="'+t[0]+'">'+t[1]+'</button>'; }).join('') + '</div><div id="compBody"></div>';
@@ -2253,6 +2259,7 @@ function renderCompendium(){
 }
 
 function renderNotes(body){
+  if(window.shTTS) window.shTTS.stop();
   var lec = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   var nav = '<nav class="lec-nav" aria-label="Lectures">' + LECTURES.map(function(l){
     var st = STATE.lecStats[l.id]; var pct = st && st.a >= 5 ? st.c+'/'+st.a : '';
@@ -2261,12 +2268,22 @@ function renderNotes(body){
   var nq = (QUESTIONS_BY_LECTURE[lec.id]||[]).length;
   var art = '<article class="reading tag-'+lec.tag+'" id="lec-'+lec.id+'">' +
     '<h2>L'+lec.num+' · '+escHtml(lec.title)+'<span class="status-badge '+lec.status+'">'+(lec.status==='taught'?'Recording + slides':'Slides only')+'</span></h2>' +
-    '<div class="meta">'+escHtml(lec.who)+' · '+escHtml(lec.source)+' · '+nq+' questions</div>' +
-    (READINGS[lec.id] || '<p>Notes coming soon.</p>') +
+    '<div class="meta-row"><div class="meta">'+escHtml(lec.who)+' · '+escHtml(lec.source)+' · '+nq+' questions</div>' +
+      (READINGS[lec.id] ? '<button type="button" class="sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : '') + '</div>' +
+    '<div class="reading-prose">' + (READINGS[lec.id] || '<p>Notes coming soon.</p>') + '</div>' +
     '<div class="reading-actions"><button type="button" class="btn primary" data-go="bank">Practice L'+lec.num+' questions</button><button type="button" class="btn" data-go="cram">Cram bullets</button><button type="button" class="btn" data-go="review">Open Review tables</button></div>' +
   '</article>';
   body.innerHTML = '<div class="notes-layout">'+nav+art+'</div>';
   body.querySelectorAll('[data-lec]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.lec = b.getAttribute('data-lec'); saveState(); renderNotes(body); }); });
+  var ttsBtn = body.querySelector('#sh-tts-btn');
+  if(ttsBtn){
+    if(!window.speechSynthesis && typeof Audio === 'undefined'){ ttsBtn.disabled = true; ttsBtn.title = 'Not supported in this browser'; }
+    ttsBtn.addEventListener('click', function(){
+      if(!window.shTTS) return;
+      var prose = body.querySelector('.reading-prose');
+      if(prose) window.shTTS.speak(prose, ttsBtn, 'audio/' + lec.id + '-full.mp3');
+    });
+  }
   body.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click', function(){
     var g = b.getAttribute('data-go');
     if(g === 'bank'){ STATE.ui.qlec = lec.id; STATE.ui.sub = 'bank'; bankShown = BANK_PAGE; saveState(); renderCompendium(); }
