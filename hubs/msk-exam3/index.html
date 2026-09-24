@@ -536,6 +536,10 @@ main{padding-top:16px}
 /* ---------- Listen (shared widget TTS) ---------- */
 .reading .meta-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
 .reading .meta-row .meta{margin:0}
+/* the shared widget styles the Listen button with --card, which this hub doesn't define; map it to this hub's tokens so it follows light/dark */
+.sh-tts-btn:not([data-state="playing"]):not([data-state="paused"]){background:var(--surface);color:var(--ink);border-color:var(--line-strong)}
+.sh-tts-btn:not([data-state="playing"]):not([data-state="paused"]):hover{background:var(--surface-2)}
+.sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px solid var(--line-strong)}
 
 </style>
 </head>
