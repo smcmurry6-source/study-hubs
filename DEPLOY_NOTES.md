@@ -58,6 +58,19 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-23 (dashboard revamp)** — `index.html` rebuilt (hub index Project). Hub cards
+  are now rendered from a `HUBS` array (+ `CLASSES`, `TERMS`) near the top of the script:
+  **to add or archive a hub on the dashboard, edit that array, not markup.** Each entry's
+  `examDate` drives the hero countdown and card "Exam in N days"; `stateKey` is the hub's own
+  localStorage key, read-only, used to show personal progress (supports the msk-style
+  `seen/totalAnswered/days` and perio-style `answered/totalSeen/activeDates` shapes; if a
+  hub changes its state shape or key, update `readProgress()`). New: next-exam hero, personal
+  14-day activity strip (`get_personal_stats` across live hubs), greeting via
+  `sh_display_name`/`get_display_name`, light/dark/system toggle (`sh_dash_theme`), arcade
+  high-score panel (`get_arcade_leaderboard`, hub `msk-exam3`), changelog as a timeline.
+  Hub links now open in the same tab (hubs have their own back button). Fonts: Instrument
+  Sans/Serif. Kept: presence count, busiest hours, streak boards, update-available prompt,
+  changelog-driven "Updated" labels, class easter eggs, collapse state keys.
 - **2026-09-23 (latest)** — msk-exam3: arcade grows to nine games (Clast Blaster shooter,
   Bone Search word search, Whack-a-Clast). `migration_v10.sql` updated in place to accept the
   new game ids (`blaster`, `search`, `whack`). **migration_v10 was applied to Supabase on
