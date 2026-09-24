@@ -62,6 +62,9 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
   markup as perio) plus Kokoro narration `hubs/msk-exam3/audio/<lec>-full.mp3` for all 9
   lectures (af_heart). **msk-exam3 now has pre-generated audio: any READINGS text edit must
   regenerate that lecture's mp3** (text-and-audio-must-not-drift rule).
+- **2026-09-24 (later)** — msk-exam3: As Taught / Plain English toggle on Lecture Notes
+  (`READINGS_PLAIN`, `STATE.ui.level`), each level with its own narration
+  (`audio/<lec>-full.mp3`, `audio/<lec>-plain.mp3`). Edits to either text need that level's mp3 remade.
 - **2026-09-23 (dashboard revamp)** — `index.html` rebuilt (hub index Project). Hub cards
   are now rendered from a `HUBS` array (+ `CLASSES`, `TERMS`) near the top of the script:
   **to add or archive a hub on the dashboard, edit that array, not markup.** Each entry's
