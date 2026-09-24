@@ -60,8 +60,8 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 - **2026-09-23 (latest)** — msk-exam3: arcade grows to nine games (Clast Blaster shooter,
   Bone Search word search, Whack-a-Clast). `migration_v10.sql` updated in place to accept the
-  new game ids (`blaster`, `search`, `whack`); it has still not been run, so running it once
-  covers all nine games.
+  new game ids (`blaster`, `search`, `whack`). **migration_v10 was applied to Supabase on
+  2026-09-23 via the Supabase connector**; arcade leaderboards are live for all nine games.
 - **2026-09-23 (later)** — msk-exam3: 40-question Mock Exam; emoji replaced by a
   hub-local inline-SVG icon set (`ICON_PATHS`/`icon()`); compact one-row
   ribbon; Arcade grew to six games (added Marrow Match, Bone to Pick, Fact or
