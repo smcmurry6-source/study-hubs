@@ -2216,7 +2216,7 @@ function renderCompendium(){
 function renderNotes(body){
   var lec = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   var nav = '<nav class="lec-nav" aria-label="Lectures">' + LECTURES.map(function(l){
-    var st = STATE.lecStats[l.id]; var pct = st && st.a ? Math.round(st.c/st.a*100)+'%' : '';
+    var st = STATE.lecStats[l.id]; var pct = st && st.a >= 5 ? st.c+'/'+st.a : '';
     return '<button type="button" class="tag-'+l.tag+(l.id===lec.id?' is-active':'')+'" data-lec="'+l.id+'"><span class="lec-num">L'+l.num+'</span><span><span class="t">'+escHtml(l.title)+'</span><br><span class="w">'+escHtml(l.who)+(pct?' · '+pct+' correct':'')+'</span></span></button>';
   }).join('') + '</nav>';
   var nq = (QUESTIONS_BY_LECTURE[lec.id]||[]).length;
