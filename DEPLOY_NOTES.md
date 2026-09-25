@@ -34,7 +34,7 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -63,6 +63,25 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (audit batch 2 + easter eggs, Claude Code)** — Widget: new launcher/menu (desktop) and a 3-item bottom
+  bar with a "More" sheet (phones), redrawn icons, **full-content search** over each hub's `SH_EXPORT.sections` (notes
+  paragraphs, review rows, hints, cram lines) that jumps to the spot via the hub's `window.SH_GOTO(go)`; a **Report**
+  button on every question (`window.shOpenFlag(qid)`); `record_choice` stores which option was picked
+  (`question_choices`, migration_v12, applied) and `review/` shows question text + the most-picked wrong answer (it
+  reads each hub's `SH_EXPORT` through a hidden `?sh_export=1` iframe). Listen player: seek, ±15 s, speed, resume,
+  lock-screen controls. Spaced review (`sh_srs_<hub>`, `window.shSrsDue()`) feeds a "due today" drill in both hubs'
+  Weak Spots tab (new in MSK). Dashboard "Add exams to my calendar" (.ics). PWA: `manifest.webmanifest`, `sw.js`
+  (network-first; bump `VERSION` when you change what it precaches), icons/OG images in `assets/`. 136 explanations
+  added and distractors rebalanced in both banks. CI: `.github/workflows/check.yml`. `supabase/schema.sql` is a full
+  schema snapshot (admin secret as a `<ADMIN_SECRET>` placeholder) — refresh it with every migration.
+  **Easter eggs** live in `widget/eggs.js` (loaded by v3.js, which hands it `window.shEggHooks`): Golden Probe (one
+  taught question per hub per Central-time day; `claim_golden_probe`/`get_golden_today`, shown on the dashboard),
+  Tooth Fairy (`record_fairy`/`get_fairy_board`, board in the Stats panel) — both in `migration_v13.sql`, **applied
+  2026-09-25 via the connector**; Plaque Boss (5+ online, shared HP over the `presence:<hub>` channel's `egg`
+  broadcast), exam luck wall (evening before / morning of each date in `SH_EXPORT.exams`), professor quotes (tap a
+  name 5x; `SH_EXPORT.lectures[].who` + `SH_EXPORT.hints`), Night Owl, Through the Root Canal, Konami 8-bit mode,
+  "floss". Off via Settings → Surprises (`sh_pref_eggs`) and never during a mock exam (section matching `mock`). A new
+  hub gets them for free if its `SH_EXPORT` carries `who`/`status` on lectures, `hints` and `exams`.
 - **2026-09-25 (exam-week fixes, Claude Code)** — Dashboard `HUBS` entries now take `exams:[{name,label,date,code}]`
   (several per hub; perio has midterm + final) instead of `examDate`/`examName`; the hero lists every exam in the next
   14 days and has a real "no exams" state. Perio accuracy on the dashboard uses each question's latest try (perio's

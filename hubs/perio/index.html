@@ -5543,13 +5543,15 @@ window.SH_GOTO = function(g){
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
-  lectures: LECTURES.map(function(l){ return { id:l.id, title:'S'+l.num+' ' + l.title }; }),
+  lectures: LECTURES.map(function(l){ return { id:l.id, title:'S'+l.num+' ' + l.title, who:l.who, status:l.status }; }),
   questions: QUESTIONS.map(function(q){
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.type === 'match' ? q.pairs.map(function(p){ return p.join(': '); }).join('; ') : (q.answer || '');
     if(q.ex) hint = hint ? hint + ' — ' + q.ex : q.ex;
     return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
   }),
-  sections: shSearchSections()
+  sections: shSearchSections(),
+  hints: EXAM_HINTS.map(function(x){ return { lec:x.lec, quote:x.quote }; }),
+  exams: [ { label:'Midterm', date:MIDTERM_DATE }, { label:'Final', date:FINAL_DATE } ]
 };
 
 })();

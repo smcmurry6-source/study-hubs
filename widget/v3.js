@@ -854,6 +854,9 @@
     } catch (e) { onlineCount = 1; }
     renderOnline();
   });
+  channel.on("broadcast", { event: "egg" }, function(msg){
+    document.dispatchEvent(new CustomEvent("sh:egg", { detail: (msg && msg.payload) || {} }));
+  });
   channel.on("broadcast", { event: "nuke" }, function(msg){
     if (prefGet(SH_NUKE_PREF_KEY, "on") !== "on") return;
     var payload = (msg && msg.payload) || {};
@@ -1374,6 +1377,13 @@
     '<input type="range" id="shset-volume" min="0" max="100" aria-label="Music volume">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
     '</div>' +
+    '<div class="shset-row"><label>Surprises</label>' +
+    '<div class="shset-seg" data-pref="eggs">' +
+    '<button type="button" data-val="on">On</button>' +
+    '<button type="button" data-val="off">Off</button>' +
+    '</div>' +
+    '<div class="shset-hint">Little hidden extras around the hubs, including a few you share live with classmates. They never appear during a mock exam.</div>' +
+    '</div>' +
     '<div class="shset-row"><label>Tactical nuke alerts</label>' +
     '<div class="shset-seg" data-pref="nuke">' +
     '<button type="button" data-val="on">On</button>' +
@@ -1736,7 +1746,8 @@
     font: { key: SH_FONT_KEY, def: "default" },
     size: { key: SH_SIZE_KEY, def: "default" },
     music: { key: SH_MUSIC_KEY, def: "off" },
-    nuke: { key: SH_NUKE_PREF_KEY, def: "on" }
+    nuke: { key: SH_NUKE_PREF_KEY, def: "on" },
+    eggs: { key: "sh_pref_eggs", def: "on" }
   };
   function syncSettingsSegUI(){
     document.querySelectorAll(".shset-seg").forEach(function(seg){
@@ -1891,6 +1902,7 @@
       else if (pref === "size") { prefSet(SH_SIZE_KEY, val); applySizePref(); }
       else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
       else if (pref === "nuke") { prefSet(SH_NUKE_PREF_KEY, val); }
+      else if (pref === "eggs") { prefSet("sh_pref_eggs", val); }
       syncSettingsSegUI();
     });
   });
@@ -1920,5 +1932,18 @@
         nameMsg.textContent = "Saved — hi, " + name + "!";
       }, 400);
     });
+  }
+  /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
+  window.shEggHooks = {
+    hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase,
+    send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
+    name: displayName, section: currentSection, online: function(){ return onlineCount; },
+    toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,
+    statsPanel: function(){ return document.getElementById("shstat-panel"); }
+  };
+  if (!EXPORT_ONLY) {
+    var eggScript = document.createElement("script");
+    eggScript.src = new URL("eggs.js", thisScript.src).href; eggScript.async = true;
+    document.head.appendChild(eggScript);
   }
 })();
