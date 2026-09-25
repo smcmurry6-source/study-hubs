@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../widget/vendor/supabase-2.117.2.js"></script>
 <style>
 :root{
   --ink:#1B2432; --ink-2:#4A5468; --ink-3:#6E778C;
@@ -139,6 +139,9 @@ table.data tr.group:hover td{background:none;}
 .resolve-btn{flex:none; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2); padding:5px 12px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600;}
 .resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
 @media (max-width:560px){ .report{flex-direction:column; gap:10px;} }
+.qtext{font-weight:500;white-space:normal;margin-top:3px;max-width:62ch;line-height:1.4}
+.qkey{font-size:12.5px;color:var(--good,#1F8A5B);margin-top:3px;white-space:normal}
+.qwrong{font-size:12.5px;color:var(--bad,#B3261E);margin-top:2px;white-space:normal}
 </style>
 </head>
 <body>
@@ -277,9 +280,10 @@ table.data tr.group:hover td{background:none;}
       rpc("get_nuke_summary", { p_secret: secret, p_days: d }),
       rpc("get_nuke_by_hub", { p_secret: secret, p_days: d }),
       rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 }),
-      rpc("get_reports", { p_secret: secret })
+      rpc("get_reports", { p_secret: secret }),
+      table("question_choices", "hub,qid,choice,picks")
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10] };
       renderAll();
     });
   }
@@ -416,10 +420,43 @@ table.data tr.group:hover td{background:none;}
       .map(function(r){ return { hub: r.hub, qid: r.qid, attempts: r.attempts, pct: Math.round(r.correct / r.attempts * 100) }; })
       .sort(function(a, b){ return a.pct - b.pct || b.attempts - a.attempts; });
   }
+  /* question text comes from each live hub's own SH_EXPORT, read from a hidden same-site
+     frame (?sh_export=1 keeps that copy from logging any activity) */
+  var QTEXT = {}, qtextLoaded = {};
+  function loadQuestionText(hub){
+    if (qtextLoaded[hub] || isArchived(hub)) return;
+    qtextLoaded[hub] = true;
+    var f = document.createElement("iframe");
+    f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
+    f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
+    f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
+    f.onload = function(){
+      try {
+        var ex = f.contentWindow.SH_EXPORT;
+        (ex && ex.questions || []).forEach(function(q){ QTEXT[hub + "|" + q.id] = q; });
+      } catch (e) {}
+      f.remove();
+      renderAll();
+    };
+    document.body.appendChild(f);
+  }
+  function topWrong(hub, qid){
+    var q = QTEXT[hub + "|" + qid]; if (!q || !q.choices || q.answer == null) return null;
+    var best = null;
+    (data.choices && data.choices.data || []).forEach(function(c){
+      if (c.hub === hub && c.qid === qid && c.choice !== q.answer && (!best || c.picks > best.picks)) best = c;
+    });
+    return best && q.choices[best.choice] ? { text: q.choices[best.choice], picks: best.picks } : null;
+  }
   function toughTable(rows){
+    rows.forEach(function(r){ loadQuestionText(r.hub); });
     return '<div class="tbl-wrap"><table class="data wide"><thead><tr><th>Question</th><th>Hub</th><th class="n">Answers</th><th class="n">Correct</th><th></th></tr></thead><tbody>' +
       rows.map(function(r){
-        return '<tr><td class="lbl">' + esc(r.qid) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
+        var q = QTEXT[r.hub + "|" + r.qid], w = topWrong(r.hub, r.qid);
+        var cell = '<span class="mono">' + esc(r.qid) + '</span>' + (q ? '<div class="qtext">' + esc(q.text) + '</div>' +
+          (q.choices && q.answer != null ? '<div class="qkey">Key: ' + esc(q.choices[q.answer]) + '</div>' : '') +
+          (w ? '<div class="qwrong">Most picked wrong: ' + esc(w.text) + ' (' + w.picks + ')</div>' : '') : '');
+        return '<tr><td class="lbl">' + cell + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
       }).join("") + '</tbody></table></div>';
   }
   function renderQuestions(){

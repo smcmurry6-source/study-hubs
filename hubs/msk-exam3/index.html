@@ -2261,7 +2261,7 @@ function checkAchievements(){
 }
 
 /* ---------- the one answer choke point ---------- */
-function recordAnswer(qid, lecId, correct, ctx){
+function recordAnswer(qid, lecId, correct, ctx, choice){
   var s = STATE.seen[qid] || { n:0, c:0, last:null };
   s.n++; if(correct) s.c++; s.last = !!correct; STATE.seen[qid] = s;
   STATE.totalAnswered++;
@@ -2271,7 +2271,7 @@ function recordAnswer(qid, lecId, correct, ctx){
   checkAchievements();
   saveState();
   renderHeaderStats();
-  document.dispatchEvent(new CustomEvent('msk3:answered', { detail:{ qid:qid, lec:lecId, correct:!!correct, ctx:ctx||'bank' } }));
+  document.dispatchEvent(new CustomEvent('msk3:answered', { detail:{ qid:qid, lec:lecId, correct:!!correct, ctx:ctx||'bank', choice:(typeof choice === 'number' ? choice : null) } }));
 }
 
 /* ---------- header ---------- */
@@ -2336,7 +2336,8 @@ function finishCard(card, correct){
   card.classList.add('is-answered');
   var v = card.querySelector('.qcard-verdict'); if(v){ v.textContent = correct ? 'Correct.' : 'Not quite.'; v.className = 'qcard-verdict ' + (correct ? 'ok' : 'bad'); }
   var q = QUESTIONS_BY_ID[card.getAttribute('data-qid')];
-  if(q) recordAnswer(q.id, q.lec, correct, card.getAttribute('data-ctx') || 'bank');
+  var pk = card.getAttribute('data-pick');
+  if(q) recordAnswer(q.id, q.lec, correct, card.getAttribute('data-ctx') || 'bank', pk === null ? null : +pk);
 }
 function wireQuestionContainer(container){
   if(container.__wired) return; container.__wired = true;
@@ -2350,6 +2351,7 @@ function wireQuestionContainer(container){
       var ok = btn.getAttribute('data-answer') === '1';
       card.querySelectorAll('.qcard-choice').forEach(function(b){ b.disabled = true; if(b.getAttribute('data-answer') === '1') b.classList.add('is-correct'); });
       if(!ok) btn.classList.add('is-wrong');
+      card.setAttribute('data-pick', btn.getAttribute('data-idx'));
       finishCard(card, ok);
     } else if(act === 'seq'){
       var st = SEQ_STATE[rid]; if(!st) return;
@@ -2678,7 +2680,7 @@ function renderMock(body){
         var q = QUESTIONS_BY_ID[id]; if(!q) return;
         var ok = (id in m.picks) && m.picks[id] === q.answer;
         m.res[id] = ok;
-        if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock');
+        if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock', m.picks[id]);
       });
       saveState(); renderMock(body); window.scrollTo(0,0);
     };
@@ -3891,7 +3893,7 @@ window.SH_EXPORT = {
   questions: QUESTIONS.map(function(q){
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.pairs.map(function(p){ return p.join(': '); }).join('; ');
     if(q.ex) hint += ' — ' + q.ex;
-    return { id:q.id, lec:q.lec, text:q.stem, hint:hint };
+    return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
   })
 };
 

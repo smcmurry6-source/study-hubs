@@ -3114,7 +3114,7 @@ function checkAchievements(){
 }
 
 /* ---------- THE one answer choke point (every mode and every arcade game that uses the bank) ---------- */
-function recordAnswer(qid, lecId, correct){
+function recordAnswer(qid, lecId, correct, choice){
   touchActiveDay();
   var prev = STATE.answered[qid] || {correct:false, seen:0, lastCorrect:null};
   prev.seen += 1; prev.lastCorrect = correct;
@@ -3126,7 +3126,7 @@ function recordAnswer(qid, lecId, correct){
   saveState();
   checkAchievements();
   renderHeaderMeta();
-  document.dispatchEvent(new CustomEvent('perio:answered', { detail:{ qid:qid, lec:lecId, correct:correct } }));
+  document.dispatchEvent(new CustomEvent('perio:answered', { detail:{ qid:qid, lec:lecId, correct:correct, choice:(typeof choice === 'number' ? choice : null) } }));
 }
 
 /* ---------- utils ---------- */
@@ -3211,7 +3211,7 @@ function wireQuestionContainer(container){
         var bi = parseInt(b.getAttribute('data-idx'),10);
         if(bi === q.answer) b.setAttribute('data-state','correct'); else if(b === mcqBtn) b.setAttribute('data-state','incorrect');
       });
-      markExplain(q.id); recordAnswer(q.id, q.lec, correct);
+      markExplain(q.id); recordAnswer(q.id, q.lec, correct, idx);
       return;
     }
     var seqBtn = e.target.closest('.qcard-seq-steps[data-qtype="sequence"] .qcard-choice');
@@ -3590,7 +3590,7 @@ function startMockExam(size){
 function submitMockExam(){
   EXAM_STATE.finishedElapsed = Date.now() - EXAM_STATE.startedAt;
   if(EXAM_STATE.timer){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; }
-  EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, EXAM_STATE.answers[q.id] === q.answer); });
+  EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, EXAM_STATE.answers[q.id] === q.answer, EXAM_STATE.answers[q.id]); });
   EXAM_STATE.phase = 'results'; renderCompendiumContent();
 }
 function examCardHTML(q, n){
@@ -5503,7 +5503,7 @@ window.SH_EXPORT = {
   questions: QUESTIONS.map(function(q){
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.type === 'match' ? q.pairs.map(function(p){ return p.join(': '); }).join('; ') : (q.answer || '');
     if(q.ex) hint = hint ? hint + ' — ' + q.ex : q.ex;
-    return { id:q.id, lec:q.lec, text:q.stem, hint:hint };
+    return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
   })
 };
 

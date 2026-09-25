@@ -20,8 +20,11 @@
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
 
   var supabase = null;
+  /* ?sh_export=1: the admin page loads a hub in a hidden frame only to read SH_EXPORT.
+     No presence, pings or answers from that copy. */
+  var EXPORT_ONLY = /[?&]sh_export=1\b/.test(location.search);
   try {
-    if (window.supabase && window.supabase.createClient) {
+    if (!EXPORT_ONLY && window.supabase && window.supabase.createClient) {
       supabase = window.supabase.createClient(SB_URL, SB_KEY);
     }
   } catch (e) { /* stats layer is best-effort, never block the hub */ }
@@ -911,6 +914,9 @@
     var d = (e && e.detail) || {};
     var isCorrect = !!d.correct;
     safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
+    /* which option was picked (its authored index, 0 = the key), for the admin page's
+       "most popular wrong answer"; hubs send it for bank and mock-exam MCQs */
+    if (typeof d.choice === "number") safeRpc("record_choice", { p_hub: HUB, p_qid: String(d.qid || ""), p_choice: d.choice });
     safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
     if (isCorrect) {
