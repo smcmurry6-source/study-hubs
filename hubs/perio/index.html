@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Bungee&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../widget/v3.css">
 <style>
 /* ===================================================================
    PERIODONTOLOGY D2 — tokens
@@ -17,7 +18,7 @@
 :root{
   color-scheme: light;
   --bg:#F6F1EE; --surface:#FFFCFA; --surface-2:#F1E9E5; --surface-3:#E8DDD8;
-  --ink:#241A1F; --ink-soft:#5E4F56; --ink-faint:#8B7B82; --line:#E4D7D2; --line-strong:#CFBDB7;
+  --ink:#241A1F; --ink-soft:#5E4F56; --ink-faint:#6F6068; --line:#E4D7D2; --line-strong:#CFBDB7;
   --accent:#A23F5E; --accent-ink:#86304C; --accent-soft:#F6E2E8;
   --probe:#2F5D7C; --probe-soft:#DDE8F1;
   --good:#2A7858; --good-soft:#DCEFE5; --bad:#B0393A; --bad-soft:#F7DEDC; --caution:#98640F; --caution-soft:#F6E8CB;
@@ -698,6 +699,25 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
 .rp-canvas-wrap::before{content:"";position:absolute;left:14%;right:14%;top:0;bottom:54px;background:linear-gradient(90deg,#16304b,#20405f 50%,#16304b);border-radius:0 0 46% 46%/0 0 10% 10%;opacity:.8}
 .rp-canvas-wrap::after{content:"ROOT SURFACE";position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;color:#3d6284}
 
+
+/* ---------- tabs: phones get a full-width labeled mode row; laptops wrap the compendium sub-tabs
+   instead of hiding the last ones past the edge behind an invisible scrollbar ---------- */
+@media (min-width: 761px){
+  .subtabs{flex-wrap:wrap;overflow-x:visible}
+}
+@media (max-width: 760px){
+  .subtabs{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent);padding-right:28px}
+}
+@media (max-width: 560px){
+  .hub-header-top{flex-wrap:wrap;row-gap:6px}
+  .hub-title{flex:1 1 auto}
+  #modeSwitch{order:3;flex:1 0 100%;overflow:visible}
+  #modeSwitch button{flex:1 1 0;min-width:0;justify-content:center;gap:4px;padding:6px 4px;font-size:.8rem}
+  #modeSwitch .mode-label, #modeSwitch button[aria-selected="true"] .mode-label{display:inline}
+}
+@media (max-width: 380px){
+  #modeSwitch .mode-icon{display:none}
+}
 </style>
 </head>
 <body>
@@ -3126,6 +3146,8 @@ function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
   return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.mid===false?'<span class="chip src nomid" title="Dr. Kaur: instruments, ultrasonics and polishing are not on the midterm">Not on midterm</span>':'')+'</div>';
 }
+/* class-wide % sits inside the explanation, so it only appears once the student has answered */
+var CLASS_ROW = '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div>';
 function qCardHTML(q){
   var lec = LECTURE_BY_ID[q.lec], body = '';
   if(q.type === 'mcq'){
@@ -3135,10 +3157,10 @@ function qCardHTML(q){
     shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+i+'">'+escHtml(q.choices[i])+'</button>';
     });
-    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'">'+(q.ex?escHtml(q.ex):'')+'</div>';
+    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
   } else if(q.type === 'recall'){
     body += '<div class="qcard-reveal-btn" data-role="reveal-wrap"><button type="button" class="btn sm" data-action="reveal" data-qid="'+q.id+'">'+icon('eye')+'Show answer</button></div>' +
-      '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'">'+escHtml(q.answer)+(q.ex?('<br><br>'+escHtml(q.ex)):'')+'</div>' +
+      '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+escHtml(q.answer)+(q.ex?('<br><br>'+escHtml(q.ex)):'')+'</div>'+CLASS_ROW+'</div>' +
       '<div class="qcard-grade-btns" data-role="grade-wrap" style="display:none">' +
       '<button type="button" class="good" data-action="grade" data-grade="good" data-qid="'+q.id+'">I had it right</button>' +
       '<button type="button" class="bad" data-action="grade" data-grade="bad" data-qid="'+q.id+'">I missed it</button></div>';
@@ -3149,19 +3171,18 @@ function qCardHTML(q){
     shuffled(q.steps.map(function(s,i){ return i; })).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-step-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.steps[i])+'</button>';
     });
-    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'">'+(q.ex?escHtml(q.ex):'')+'</div>';
+    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
   } else if(q.type === 'match'){
     delete MATCH_STATE[q.id];
     body += '<div class="qcard-match-cols" data-qtype="match" data-qid="'+q.id+'"><div class="qcard-match-col" data-side="left">';
     shuffled(q.pairs.map(function(p,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-match-item" data-side="left" data-pair-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.pairs[i][0])+'</button>'; });
     body += '</div><div class="qcard-match-col" data-side="right">';
     shuffled(q.pairs.map(function(p,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-match-item" data-side="right" data-pair-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.pairs[i][1])+'</button>'; });
-    body += '</div></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'">'+(q.ex?escHtml(q.ex):'')+'</div>';
+    body += '</div></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
   }
   var hint = q.type === 'sequence' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap the steps in order.</div>' : q.type === 'match' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap a left item, then its partner.</div>' : '';
   return '<div class="qcard tag-'+lec.tag+'" data-qid="'+q.id+'" data-qtype="'+q.type+'">' + qMeta(q) +
-    '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body +
-    '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>';
+    '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body + '</div>';
 }
 function markExplain(qid){ var el = document.getElementById('explain-'+qid); if(el && el.textContent.trim()) el.classList.add('shown'); }
 
@@ -3200,7 +3221,8 @@ function wireQuestionContainer(container){
           b.setAttribute('data-state', picks.indexOf(bi) === bi ? 'correct' : 'incorrect');
         });
         var ex = document.getElementById('explain-'+sq.id);
-        if(ex && !ok){ ex.innerHTML = '<b>Correct order:</b> ' + sq.steps.map(escHtml).join(' → ') + (sq.ex ? '<br><br>' + escHtml(sq.ex) : ''); }
+        var exb = ex && ex.querySelector('.qx-body');
+        if(exb && !ok){ exb.innerHTML = '<b>Correct order:</b> ' + sq.steps.map(escHtml).join(' → ') + (sq.ex ? '<br><br>' + escHtml(sq.ex) : ''); }
         markExplain(sq.id); recordAnswer(sq.id, sq.lec, ok);
       }
       return;
@@ -3522,9 +3544,9 @@ function filteredQuestions(){
 function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
-    '<select id="qbLec"><option value="all">All sessions</option><option value="midterm"'+sel('midterm',QBANK_FILTER.lec)+'>Midterm scope (S1-4, per Dr. Kaur)</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
-    '<select id="qbType">' + [['all','All types'],['mcq','Multiple choice'],['recall','Recall'],['sequence','Sequence'],['match','Matching']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
-    '<select id="qbStatus">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option><option value="midterm"'+sel('midterm',QBANK_FILTER.lec)+'>Midterm scope (S1-4, per Dr. Kaur)</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
+    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['recall','Recall'],['sequence','Sequence'],['match','Matching']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
     '<div class="qcount" id="qbCount" style="margin-bottom:12px"></div><div class="qlist" id="qbankList"></div>';
   content().innerHTML = h;
@@ -4224,6 +4246,7 @@ var ARCADE = (function(){
   var sb = null;
   function client(){
     if(sb) return sb;
+    if(window.shSupabase) return (sb = window.shSupabase); /* the shared widget's client */
     try{ if(window.supabase && window.supabase.createClient) sb = window.supabase.createClient('https://thytmzsgymydbzcqdnix.supabase.co', 'sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS'); }catch(e){}
     return sb;
   }
@@ -5442,15 +5465,19 @@ window.SH_SECTION = function(){
   if(m === 'compendium') return 'compendium/' + COMPENDIUM_VIEW;
   if(m === 'arcade') return 'arcade/' + (ARCADE.current() || 'lobby');
   if(m === 'atlas') return 'atlas/' + (ATLAS_VIEW_ID || 'index');
+  if(m === 'review') return 'review/' + (REVIEW.lec || 'all');
   return m;
 };
 function boot(){
   document.querySelectorAll('[data-ic]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-ic')); });
-  applyTheme(STATE.theme);
+  /* sh_theme is the site-wide choice shared with the dashboard; STATE.theme is this hub's old copy */
+  var t0 = null; try{ t0 = localStorage.getItem('sh_theme'); }catch(e){}
+  if(t0 === null) t0 = STATE.theme;
+  applyTheme(t0 === 'light' || t0 === 'dark' ? t0 : null);
   document.getElementById('themeBtn').addEventListener('click', function(){
     var cur = document.documentElement.getAttribute('data-theme');
     var next = !cur ? 'light' : cur === 'light' ? 'dark' : null;
-    STATE.theme = next; saveState(); applyTheme(next);
+    STATE.theme = next; saveState(); try{ localStorage.setItem('sh_theme', next || ''); }catch(e){} applyTheme(next);
   });
   document.getElementById('modeSwitch').addEventListener('click', function(e){ var b = e.target.closest('[data-mode]'); if(b) setMode(b.getAttribute('data-mode')); });
   renderHeaderMeta();
@@ -5458,7 +5485,8 @@ function boot(){
   if(location.hash){ var h = location.hash.slice(1); if(MODE_RENDERERS[h]) m = h; }
   setMode(m || 'compendium');
 }
-if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+/* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
+boot();
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
@@ -5472,9 +5500,8 @@ window.SH_EXPORT = {
 
 })();
 </script>
-<link rel="stylesheet" href="../../widget/v3.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="compendium"></script>
-<script>if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");</script>
+<script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
+<script defer src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="compendium"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]"); });</script>
 </body>
 </html>

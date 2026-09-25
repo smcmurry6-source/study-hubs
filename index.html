@@ -10,7 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script>
 /* set theme before paint so there is no flash */
-(function(){ try{ var t = localStorage.getItem("sh_dash_theme"); if(t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); }catch(e){} })();
+/* sh_theme is shared by the dashboard and every hub; sh_dash_theme is the old dashboard-only key */
+(function(){ try{ var t = localStorage.getItem("sh_theme"); if(t === null) t = localStorage.getItem("sh_dash_theme"); if(t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); }catch(e){} })();
 </script>
 <style>
 /* ================= TOKENS =================
@@ -25,7 +26,7 @@
   --tray:#DDE3E7;
   --ink:#15202A;
   --ink-2:#4A5864;
-  --ink-3:#7A8894;
+  --ink-3:#5F6D78;
   --line:#D3DADF;
   --line-2:#BCC6CD;
   --on-ink:#F4F7F8;
@@ -47,7 +48,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0D1317; --surface:#151D23; --surface-2:#1A242B; --tray:#111920;
-    --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#72818C;
+    --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#8795A1;
     --line:#24313A; --line-2:#33424C; --on-ink:#0D1317;
     --focus:#7BA7F0; --good:#4CC38A; --live:#3DDC8A;
     --c-gi:#DDAE52;      --c-gi-soft:#2F2614;
@@ -60,7 +61,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#0D1317; --surface:#151D23; --surface-2:#1A242B; --tray:#111920;
-  --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#72818C;
+  --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#8795A1;
   --line:#24313A; --line-2:#33424C; --on-ink:#0D1317;
   --focus:#7BA7F0; --good:#4CC38A; --live:#3DDC8A;
   --c-gi:#DDAE52;      --c-gi-soft:#2F2614;
@@ -154,6 +155,13 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .btn-quiet{background:transparent; color:var(--ink-2); border-color:var(--line-2); padding:11px 16px; font-size:14px;}
 .btn-quiet:hover{color:var(--ink); background:var(--surface-2);}
 .hero-note{font-size:13.5px; color:var(--ink-3);}
+.hero-also{list-style:none; margin:24px 0 0; padding:16px 0 0; border-top:1px dashed var(--line-2); display:flex; flex-direction:column; gap:10px;}
+.hero-also li{display:flex; align-items:center; gap:10px;}
+.hero-also li::before{content:""; width:5px; height:18px; border-radius:3px; background:var(--ring); flex:none;}
+.hero-also a{display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px; text-decoration:none;}
+.hero-also a:hover .also-name{text-decoration:underline; text-underline-offset:3px;}
+.also-name{font-weight:600; font-size:15.5px;}
+.also-when{font-size:14px; color:var(--ink-2);}
 
 .hero-side{
   background:var(--surface-2); border-left:1px solid var(--line); padding:30px 30px 28px;
@@ -290,7 +298,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .stat .who{font-size:13.5px; color:var(--ink); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .game-tabs{display:flex; gap:6px; overflow-x:auto; margin:14px -4px 0; padding:2px 4px 6px; scrollbar-width:thin;}
 .game-tabs button{flex:none; font-size:13px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink-2); white-space:nowrap;}
-.game-tabs button[aria-selected="true"]{background:var(--ink); color:var(--on-ink); border-color:var(--ink);}
+.game-tabs button[aria-selected="true"], .game-tabs button[aria-pressed="true"]{background:var(--ink); color:var(--on-ink); border-color:var(--ink);}
 .muted{font-size:14px; color:var(--ink-3); margin-top:14px;}
 
 /* ================= WHAT'S NEW ================= */
@@ -319,7 +327,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   max-width:min(82vw,320px); text-align:center;
 }
 .egg-toast.is-shown{opacity:1; transform:translate(-50%,-100%) translateY(-10px);}
-.burst-particle{position:fixed; z-index:10000; pointer-events:none; font-size:16px;}
+.burst-particle{position:fixed; z-index:10000; pointer-events:none; width:5px; height:15px; border-radius:3px;}
 .sh-update-toast{
   position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); z-index:10060;
   transform:translate(-50%, 160%); transition:transform .35s cubic-bezier(.3,1,.4,1);
@@ -443,7 +451,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   </footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="widget/vendor/supabase-2.117.2.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -453,7 +461,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   /* ====================================================================
      DATA — add a hub by adding one entry to HUBS (and its class to
      CLASSES if new). Everything on the page renders from these.
-     examDate: 'YYYY-MM-DD' drives the countdown; null = no date.
+     exams: [{ name, label, date:'YYYY-MM-DD', code }] drives the countdowns;
+     a hub can have several (e.g. midterm + final). [] = no dates yet.
      stateKey: the hub's own localStorage key, read (never written) to
      show a visitor's personal progress on the card.
      ==================================================================== */
@@ -471,11 +480,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   };
   var HUBS = [
     { id:"msk-exam3", cls:"gi", title:"Musculoskeletal Exam 3 Hub", code:"GI & MSK · Exam 3",
-      examDate:"2026-10-02", examName:"Musculoskeletal Exam 3", updated:"2026-09-23", emoji:"🦴",
+      exams:[ { name:"Musculoskeletal Exam 3", label:"Exam", date:"2026-10-02" } ], updated:"2026-09-23",
       desc:"Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
       modes:["Compendium","Review tables","Mock exam","Arcade"], stateKey:"msk3-state-v1" },
     { id:"perio", cls:"perio", title:"Periodontology D2 Compendium", code:"Periodontology · Full unit",
-      examDate:"2026-10-01", examName:"Periodontology midterm (S1-4)", updated:"2026-09-25", emoji:"🦷",
+      exams:[ { name:"Periodontology midterm (S1-4)", label:"Midterm", date:"2026-10-01", code:"Periodontology · Midterm" },
+              { name:"Periodontology final", label:"Final", date:"2026-11-19", code:"Periodontology · Final" } ], updated:"2026-09-25",
       desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam, a diagram atlas and the Pocket Arcade.",
       modes:["Compendium","Plain-English notes","Review tables","Atlas","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
@@ -528,7 +538,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      ==================================================================== */
   (function(){
     var btn = $("themeBtn"), order = ["auto","light","dark"];
-    function current(){ var t = ls("sh_dash_theme"); return (t === "light" || t === "dark") ? t : "auto"; }
+    function current(){ var t = ls("sh_theme"); if (t === null) t = ls("sh_dash_theme"); return (t === "light" || t === "dark") ? t : "auto"; }
     function apply(t){
       if (t === "auto") document.documentElement.removeAttribute("data-theme");
       else document.documentElement.setAttribute("data-theme", t);
@@ -539,7 +549,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     apply(current());
     btn.addEventListener("click", function(){
       var next = order[(order.indexOf(current()) + 1) % order.length];
-      lsSet("sh_dash_theme", next === "auto" ? "" : next); apply(next);
+      lsSet("sh_theme", next === "auto" ? "" : next); apply(next);
     });
   })();
 
@@ -551,16 +561,24 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   function readProgress(hub){
     var raw = ls(hub.stateKey); if (!raw) return null;
     try{
-      var s = JSON.parse(raw), seen = 0, answered = 0, correct = 0, days = [];
-      if (s.seen && typeof s.seen === "object"){            /* msk-style */
-        seen = Object.keys(s.seen).length; answered = +s.totalAnswered || 0; correct = +s.totalCorrect || 0;
+      var s = JSON.parse(raw), seen = 0, answered = 0, pct = 0, label = "", days = [];
+      if (s.seen && typeof s.seen === "object"){            /* msk-style: per-answer totals */
+        seen = Object.keys(s.seen).length; answered = +s.totalAnswered || 0;
+        pct = answered ? Math.round((+s.totalCorrect || 0) / answered * 100) : 0;
+        label = "correct across " + answered + (answered === 1 ? " answer" : " answers");
         days = Array.isArray(s.days) ? s.days : [];
       } else if (s.answered && typeof s.answered === "object"){ /* perio-style */
-        seen = Object.keys(s.answered).length; answered = +s.totalSeen || 0; correct = +s.totalCorrect || 0;
+        /* perio's totalCorrect counts questions ever answered right (once each), so it can't be
+           divided by totalSeen. Use each tried question's latest attempt instead. */
+        var ids = Object.keys(s.answered), right = 0;
+        ids.forEach(function(k){ if (s.answered[k] && s.answered[k].lastCorrect) right++; });
+        seen = ids.length; answered = +s.totalSeen || 0;
+        pct = seen ? Math.round(right / seen * 100) : 0;
+        label = "right on your latest try";
         days = s.activeDates ? Object.keys(s.activeDates) : [];
       }
       if (!answered && !seen) return null;
-      return { seen:seen, answered:answered, correct:correct, pct: answered ? Math.round(correct / answered * 100) : 0, days:days, best:+s.bestStreak || 0 };
+      return { seen:seen, answered:answered, pct:pct, pctLabel:label, days:days, best:+s.bestStreak || 0 };
     }catch(e){ return null; }
   }
   var LAST = (function(){ try{ return JSON.parse(ls("sh_dash_last") || "null"); }catch(e){ return null; } })();
@@ -568,39 +586,56 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   /* ====================================================================
      HERO — the next exam with a date, else the hub you last opened
      ==================================================================== */
-  function pickHeroHub(){
-    var upcoming = HUBS.filter(function(h){ return h.examDate && daysUntil(h.examDate) >= 0; })
-                       .sort(function(a,b){ return a.examDate < b.examDate ? -1 : 1; });
-    if (upcoming.length) return upcoming[0];
-    if (LAST) { var l = HUBS.filter(function(h){ return h.id === LAST.id; })[0]; if (l) return l; }
-    return HUBS[0];
+  function nextExam(hub){
+    return (hub.exams || []).filter(function(e){ return daysUntil(e.date) >= 0; })
+      .sort(function(a,b){ return a.date < b.date ? -1 : 1; })[0] || null;
   }
+  function upcomingExams(){
+    var list = [];
+    HUBS.forEach(function(h){ (h.exams || []).forEach(function(e){ var d = daysUntil(e.date); if (d >= 0) list.push({ hub:h, exam:e, d:d }); }); });
+    return list.sort(function(a,b){ return a.d - b.d; });
+  }
+  function daysText(d){ return d === 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days"; }
   function renderHero(){
-    var hub = pickHeroHub(), cls = CLASSES[hub.cls];
-    $("hero").setAttribute("style", ringVars(cls.ring));
-    var countHTML, sub;
-    if (hub.examDate && daysUntil(hub.examDate) >= 0){
-      var d = daysUntil(hub.examDate);
-      countHTML = d === 0 ? "Today" : d + "<small>" + (d === 1 ? "day to go" : "days to go") + "</small>";
-      sub = longDate(hub.examDate);
-    } else {
-      countHTML = "Keep going";
-      sub = LAST && LAST.id === hub.id ? "You last opened this " + relDay(new Date(LAST.t)) : "No exam date set yet";
+    var up = upcomingExams(), first = up[0] || null, hub, cls;
+    if (first) hub = first.hub;
+    else {
+      hub = (LAST && HUBS.filter(function(h){ return h.id === LAST.id; })[0]) || HUBS[0];
     }
-    var lastNote = (LAST && LAST.id === hub.id && hub.examDate) ? '<span class="hero-note">You last opened it ' + esc(relDay(new Date(LAST.t))) + '</span>' : "";
-    $("heroMain").innerHTML =
-      '<div class="hero-kicker"><span class="code">' + esc(hub.code) + '</span><span>' + (hub.examDate ? "Next exam" : "Pick up where you left off") + '</span></div>' +
-      '<div class="hero-count">' + countHTML + '</div>' +
-      '<div class="hero-title">' + esc(hub.examDate ? "until " + hub.examName : hub.title) + '</div>' +
-      '<div class="hero-date">' + esc(sub) + '</div>' +
-      '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '" data-emoji="' + hub.emoji + '">' +
-      (readProgress(hub) ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' + lastNote + '</div>';
+    cls = CLASSES[hub.cls];
+    $("hero").setAttribute("style", ringVars(cls.ring));
+    var opened = LAST && LAST.id === hub.id ? relDay(new Date(LAST.t)) : null;
+    var p = readProgress(hub), html;
+    if (first){
+      var d = first.d;
+      /* everything else on the calendar in the next two weeks, so back-to-back exams both show */
+      var also = up.slice(1).filter(function(x){ return x.d <= 14; });
+      html =
+        '<div class="hero-kicker"><span class="code">' + esc(first.exam.code || hub.code) + '</span><span>Next exam</span></div>' +
+        '<div class="hero-count">' + (d === 0 ? "Today" : d + "<small>" + (d === 1 ? "day to go" : "days to go") + "</small>") + '</div>' +
+        '<div class="hero-title">' + esc((d === 0 ? "" : "until ") + first.exam.name) + '</div>' +
+        '<div class="hero-date">' + esc(longDate(first.exam.date)) + '</div>' +
+        '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
+        (p ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' +
+        (opened ? '<span class="hero-note">You last opened it ' + esc(opened) + '</span>' : '') + '</div>' +
+        (also.length ? '<ul class="hero-also">' + also.map(function(x){
+          return '<li style="' + ringVars(CLASSES[x.hub.cls].ring) + '"><a href="hubs/' + x.hub.id + '/" data-hub="' + x.hub.id + '"><span class="also-name">' + esc(x.exam.name) + '</span><span class="also-when">' + esc(parseYmd(x.exam.date).toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })) + ' · ' + esc(daysText(x.d)) + '</span></a></li>';
+        }).join("") + '</ul>' : '');
+    } else {
+      html =
+        '<div class="hero-kicker"><span class="code">' + esc(hub.code) + '</span><span>Pick up where you left off</span></div>' +
+        '<div class="hero-count">Keep going</div>' +
+        '<div class="hero-title">' + esc(hub.title) + '</div>' +
+        '<div class="hero-date">' + esc(opened ? "You last opened this " + opened : "No exams scheduled right now") + '</div>' +
+        '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
+        (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a></div>';
+    }
+    $("heroMain").innerHTML = html;
 
-    var p = readProgress(hub);
     $("heroProgLabel").textContent = "Your progress in " + (HUB_LABEL[hub.id] || "this hub");
     $("heroProg").innerHTML = p
-      ? '<div class="prog-top"><div class="prog-big">' + p.seen + '<small>questions tried</small></div></div>' +
-        '<div class="prog-sub"><b>' + p.pct + '%</b> correct across ' + p.answered + ' answers' + (p.best ? ', best run ' + p.best + ' in a row' : '') + '</div>' +
+      ? '<div class="prog-top"><div class="prog-big">' + p.seen + '<small>' + (p.seen === 1 ? "question" : "questions") + ' tried</small></div></div>' +
+        '<div class="prog-sub"><b>' + p.pct + '%</b> ' + p.pctLabel + (p.best ? ', best run ' + p.best + ' in a row' : '') + '</div>' +
         '<div class="meter" aria-hidden="true"><i data-w="' + p.pct + '"></i></div>'
       : '<div class="prog-sub" style="margin-top:0">You haven\'t answered anything in this hub on this device yet. Your progress will show up here once you do.</div>';
   }
@@ -633,11 +668,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      HUB CARDS
      ==================================================================== */
   function hubCardHTML(hub){
-    var cls = CLASSES[hub.cls], p = readProgress(hub), due = "";
-    if (hub.examDate){
-      var d = daysUntil(hub.examDate);
-      due = d < 0 ? '<span class="due">Exam finished</span>'
-          : '<span class="due' + (d <= 10 ? ' soon' : '') + '">' + ICON.cal + (d === 0 ? "Exam today" : d === 1 ? "Exam tomorrow" : "Exam in " + d + " days") + '</span>';
+    var cls = CLASSES[hub.cls], p = readProgress(hub), due = "", nx = nextExam(hub);
+    if (nx){
+      var d = daysUntil(nx.date), lbl = nx.label || "Exam";
+      due = '<span class="due' + (d <= 10 ? ' soon' : '') + '">' + ICON.cal + lbl + ' ' + (d === 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days") + '</span>';
+    } else if ((hub.exams || []).length){
+      due = '<span class="due">Exams finished</span>';
     }
     return '<article class="hub-card" style="' + ringVars(cls.ring) + '">' +
       '<div class="hub-top"><span class="chip">' + esc(hub.code) + '</span>' + due + '</div>' +
@@ -645,10 +681,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<p class="hub-desc clamp">' + esc(hub.desc) + '</p>' +
       '<button class="more" type="button" data-more>Read more</button>' +
       '<div class="modes">' + hub.modes.map(function(m){ return '<span>' + esc(m) + '</span>'; }).join("") + '</div>' +
-      (p ? '<div class="mine">You\'ve tried <b>' + p.seen + '</b> questions, <b>' + p.pct + '%</b> correct<div class="meter" aria-hidden="true"><i data-w="' + p.pct + '"></i></div></div>'
+      (p ? '<div class="mine">You\'ve tried <b>' + p.seen + '</b> ' + (p.seen === 1 ? "question" : "questions") + ', <b>' + p.pct + '%</b> ' + esc(p.pctLabel) + '<div class="meter" aria-hidden="true"><i data-w="' + p.pct + '"></i></div></div>'
          : '<div class="mine">Not started on this device yet.</div>') +
       '<div class="hub-foot"><span class="updated" data-updated="' + hub.updated + '" data-hub="' + hub.id + '">Updated ' + esc(relDay(parseYmd(hub.updated))) + '</span>' +
-      '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '" data-emoji="' + hub.emoji + '">Open' + ICON.arrow + '</a></div>' +
+      '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">Open' + ICON.arrow + '</a></div>' +
     '</article>';
   }
   function renderHubs(){
@@ -708,10 +744,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   document.addEventListener("click", function(e){
     var a = e.target.closest("a[data-hub]"); if (!a) return;
     lsSet("sh_dash_last", JSON.stringify({ id:a.getAttribute("data-hub"), t:Date.now() }));
-    var emoji = a.getAttribute("data-emoji"); if (!emoji || !a.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!a.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    /* a small send-off of ring bands in the hub's own class color */
+    var ring = getComputedStyle(a).getPropertyValue("--ring").trim() || "currentColor";
     var r = a.getBoundingClientRect();
-    for (var i = 0; i < 6; i++){
-      var p = document.createElement("span"); p.className = "burst-particle"; p.textContent = emoji; document.body.appendChild(p);
+    for (var i = 0; i < 7; i++){
+      var p = document.createElement("span"); p.className = "burst-particle"; p.style.background = ring; document.body.appendChild(p);
       p.style.left = (r.left + r.width * (.15 + Math.random() * .7)) + "px"; p.style.top = (r.top + r.height / 2) + "px";
       var dx = (Math.random() - .5) * 80, dy = -(40 + Math.random() * 50), rot = (Math.random() - .5) * 200;
       p.animate([{ transform:"translate(-50%,-50%) scale(.6)", opacity:1 },
@@ -750,14 +788,17 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   /* ====================================================================
      SUPABASE — everything below is best-effort; the page works without it
      ==================================================================== */
-  var sb = null;
-  try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
   function rest(path){
     return fetch(SB_URL + "/rest/v1/" + path, { headers:{ apikey:SB_KEY, Authorization:"Bearer " + SB_KEY } })
       .then(function(r){ return r.ok ? r.json() : null; });
   }
   function unavailable(id, msg){ var el = $(id); if (el) el.innerHTML = '<p class="muted">' + (msg || "Couldn't reach the class data just now. Reload to try again.") + '</p>'; }
 
+  /* supabase-js is a deferred, self-hosted script (widget/vendor/), so it runs after this
+     one: the page renders first and the class data fills in once the library is ready. */
+  function startClassData(){
+  var sb = null;
+  try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
   if (!sb){
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard"].forEach(function(id){ unavailable(id); });
   } else {
@@ -777,12 +818,13 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
     /* live count across every hub (listen only, never counted ourselves) */
     var live = {}, watcher = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random());
-    ALL_HUBS.forEach(function(hub){
+    HUBS.forEach(function(h){
+      var hub = h.id;
       try{
         var ch = sb.channel("presence:" + hub, { config:{ presence:{ key:"dash-" + watcher + "-" + hub } } });
         ch.on("presence", { event:"sync" }, function(){
           try{ live[hub] = Object.keys(ch.presenceState()).length || 0; }catch(e){ live[hub] = 0; }
-          var t = 0; ALL_HUBS.forEach(function(h){ t += live[h] || 0; }); $("liveCount").textContent = t;
+          var t = 0; Object.keys(live).forEach(function(k){ t += live[k] || 0; }); $("liveCount").textContent = t;
         });
         ch.subscribe();
       }catch(e){}
@@ -832,7 +874,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (!ARCADES.some(function(a){ return a.hub === hubSel; })) hubSel = ARCADES[0].hub;
       function arc(){ return ARCADES.filter(function(a){ return a.hub === hubSel; })[0]; }
       function drawHubs(){
-        hubsEl.innerHTML = ARCADES.map(function(a){ return '<button type="button" data-arc="' + a.hub + '" aria-pressed="' + (a.hub === hubSel) + '" aria-selected="' + (a.hub === hubSel) + '">' + esc(a.title) + '</button>'; }).join("");
+        hubsEl.innerHTML = ARCADES.map(function(a){ return '<button type="button" data-arc="' + a.hub + '" aria-pressed="' + (a.hub === hubSel) + '">' + esc(a.title) + '</button>'; }).join("");
         $("arcadeTitle").textContent = arc().title + " high scores";
         $("arcadeSub").textContent = "From the " + arc().from;
       }
@@ -866,6 +908,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       drawHubs(); drawTabs();
     })();
   }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startClassData); else startClassData();
 
   /* ---------- What's new + "updated" labels, from the changelog every deploy logs to ---------- */
   rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
