@@ -34,7 +34,7 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js` and `widget/ranks.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -63,6 +63,51 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (handpiece ranks, trophies, link devices, Claude Code)** — `widget/ranks.js` (loaded by v3.js and the
+  dashboard) draws seven tiers of handpiece medallions in inline SVG (Antique, Stone, Bronze, Silver, Gold, Diamond,
+  Dark Matter; textures are SVG filters, the glint/sparkles animate only at large sizes) and mounts the rank card,
+  per-hub mastery bar (Bronze 50 / Silver 75 / Gold 90 / Crown 100% of the bank right on the latest try), a 14-trophy
+  case (6 secret ones read "???" until earned), unlockable accent colours in Settings (`sh_pref_accent`; injects
+  `--accent/--accent-ink/--accent-soft` for light + dark) and **Link my devices** into the hub widget. XP is computed
+  on the server from `personal_answers` (`sh_visitor_xp`, private): 10 first-time right, 2 repeat right, 1 miss, 600/day
+  cap on answer XP, +20 per study day; tiers at 150/600/1500/3000/6000/12000 (`sh_tier`). Public RPCs:
+  `get_rank_profile`, `get_rank_board`, `get_hub_mastery`, `record_achievement` (whitelisted kinds: boss, owl,
+  rootcanal, mock90, mastery-*), `create_link_code`/`redeem_link_code` (6-char, 10 min, 10 tries/hour; redeeming moves
+  the device's rows onto the code maker's id, `visitor_links` records it). `get_leaderboard`,
+  `get_correct_streak_stats` and `get_arcade_leaderboard` gained a `tier` column (dropped + recreated). Hubs fire
+  `sh:mock-done {correct,total}` when a mock is submitted. Dashboard: "Handpiece ranks" panel (top 10 + ladder) and tier
+  icons on every board. `migration_v15.sql` **applied 2026-09-25 via the connector**. First dashboard survey
+  ("Help shape the hubs") published live the same day.
+- **2026-09-25 (Atlas retired; clicks + surveys, Claude Code)** — **Perio Atlas mode removed** at Sam's request (the
+  diagrams were inaccurate; it had ~2 minutes of use from 5 people in two weeks). Removed from `hubs/perio/index.html`
+  (tab, panel, `ATLAS_VIEWS`, `ATLAS_RENDERERS`, CSS) and the dashboard card. **Perio Project: drop Atlas from the split
+  sources too, or the next single-file build brings it back.** Click analytics: `widget/clicks.js` (loaded by v3.js and
+  the dashboard) batches clicks as `{section, target, count}` into `record_clicks` → `ui_clicks`/`ui_click_reach`;
+  targets are named from `id`, the first `data-*` attribute (question-level ones skipped, numbers collapsed) or the
+  label, and answer choices are grouped by class. Dashboard survey card: `get_active_survey`/`submit_survey`, one survey
+  live at a time, shown once per visitor (answer or "No thanks" both count, plus `sh_survey_done_<id>` locally).
+  Admin page gained **Clicks** and **Surveys** tabs (results, on/off, publish form). `migration_v14.sql` **applied
+  2026-09-25 via the connector**; its admin functions call `sh_admin_ok()`, which copies the secret check from
+  `get_nuke_summary` at migration time, so no secret is in the repo.
+- **2026-09-25 (audit batch 2 + easter eggs, Claude Code)** — Widget: new launcher/menu (desktop) and a 3-item bottom
+  bar with a "More" sheet (phones), redrawn icons, **full-content search** over each hub's `SH_EXPORT.sections` (notes
+  paragraphs, review rows, hints, cram lines) that jumps to the spot via the hub's `window.SH_GOTO(go)`; a **Report**
+  button on every question (`window.shOpenFlag(qid)`); `record_choice` stores which option was picked
+  (`question_choices`, migration_v12, applied) and `review/` shows question text + the most-picked wrong answer (it
+  reads each hub's `SH_EXPORT` through a hidden `?sh_export=1` iframe). Listen player: seek, ±15 s, speed, resume,
+  lock-screen controls. Spaced review (`sh_srs_<hub>`, `window.shSrsDue()`) feeds a "due today" drill in both hubs'
+  Weak Spots tab (new in MSK). Dashboard "Add exams to my calendar" (.ics). PWA: `manifest.webmanifest`, `sw.js`
+  (network-first; bump `VERSION` when you change what it precaches), icons/OG images in `assets/`. 136 explanations
+  added and distractors rebalanced in both banks. CI: `.github/workflows/check.yml`. `supabase/schema.sql` is a full
+  schema snapshot (admin secret as a `<ADMIN_SECRET>` placeholder) — refresh it with every migration.
+  **Easter eggs** live in `widget/eggs.js` (loaded by v3.js, which hands it `window.shEggHooks`): Golden Probe (one
+  taught question per hub per Central-time day; `claim_golden_probe`/`get_golden_today`, shown on the dashboard),
+  Tooth Fairy (`record_fairy`/`get_fairy_board`, board in the Stats panel) — both in `migration_v13.sql`, **applied
+  2026-09-25 via the connector**; Plaque Boss (5+ online, shared HP over the `presence:<hub>` channel's `egg`
+  broadcast), exam luck wall (evening before / morning of each date in `SH_EXPORT.exams`), professor quotes (tap a
+  name 5x; `SH_EXPORT.lectures[].who` + `SH_EXPORT.hints`), Night Owl, Through the Root Canal, Konami 8-bit mode (phones: swipe ↑↑↓↓←→←→ then tap twice),
+  "floss". Off via Settings → Surprises (`sh_pref_eggs`) and never during a mock exam (section matching `mock`). A new
+  hub gets them for free if its `SH_EXPORT` carries `who`/`status` on lectures, `hints` and `exams`.
 - **2026-09-25 (exam-week fixes, Claude Code)** — Dashboard `HUBS` entries now take `exams:[{name,label,date,code}]`
   (several per hub; perio has midterm + final) instead of `examDate`/`examName`; the hero lists every exam in the next
   14 days and has a real "no exams" state. Perio accuracy on the dashboard uses each question's latest try (perio's

@@ -3,12 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#15202A">
 <meta name="robots" content="noindex,nofollow">
 <title>Hub Admin — Study Hub Review</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../widget/vendor/supabase-2.117.2.js"></script>
 <style>
 :root{
   --ink:#1B2432; --ink-2:#4A5468; --ink-3:#6E778C;
@@ -121,6 +124,13 @@ table.data tr.group:hover td{background:none;}
 .chips button{border:1px solid var(--line); background:var(--card); border-radius:var(--r-pill); padding:4px 11px; font-size:13px; font-weight:600; color:var(--ink-2);}
 .chips button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper);}
 
+.sv-form{display:grid; gap:10px;}
+.sv-form input, .sv-form select, .sv-form textarea{font:inherit; font-size:14px; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);}
+.sv-form .sv-q{display:grid; grid-template-columns:1fr 140px; gap:8px; padding:10px; border:1px dashed var(--line); border-radius:10px;}
+.sv-form .sv-q input.sv-opts{grid-column:1 / -1;}
+.sv-form .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.sv-ans{display:flex; justify-content:space-between; gap:10px; padding:4px 0; border-bottom:1px dashed var(--line); font-size:14px;}
+.sv-text{font-size:14px; padding:6px 0; border-bottom:1px dashed var(--line);}
 .note{font-size:12.5px; color:var(--ink-3); margin:12px 0 0;}
 .empty{color:var(--ink-3); font-size:14px; padding:18px 0; text-align:center;}
 .err{color:var(--warn); font-size:14px; padding:12px 0;}
@@ -136,6 +146,9 @@ table.data tr.group:hover td{background:none;}
 .resolve-btn{flex:none; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2); padding:5px 12px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600;}
 .resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
 @media (max-width:560px){ .report{flex-direction:column; gap:10px;} }
+.qtext{font-weight:500;white-space:normal;margin-top:3px;max-width:62ch;line-height:1.4}
+.qkey{font-size:12.5px;color:var(--good,#1F8A5B);margin-top:3px;white-space:normal}
+.qwrong{font-size:12.5px;color:var(--bad,#B3261E);margin-top:2px;white-space:normal}
 </style>
 </head>
 <body>
@@ -167,7 +180,9 @@ table.data tr.group:hover td{background:none;}
         <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
         <button role="tab" data-tab="time" aria-selected="false">Time by section</button>
         <button role="tab" data-tab="questions" aria-selected="false">Questions</button>
+        <button role="tab" data-tab="clicks" aria-selected="false">Clicks</button>
         <button role="tab" data-tab="engagement" aria-selected="false">Engagement</button>
+        <button role="tab" data-tab="surveys" aria-selected="false">Surveys</button>
         <button role="tab" data-tab="inbox" aria-selected="false">Inbox<span class="count zero" id="inboxCount">0</span></button>
       </nav>
     </div>
@@ -177,7 +192,9 @@ table.data tr.group:hover td{background:none;}
     <section class="panel" data-panel="overview"></section>
     <section class="panel" data-panel="time" hidden></section>
     <section class="panel" data-panel="questions" hidden></section>
+    <section class="panel" data-panel="clicks" hidden></section>
     <section class="panel" data-panel="engagement" hidden></section>
+    <section class="panel" data-panel="surveys" hidden></section>
     <section class="panel" data-panel="inbox" hidden></section>
   </main>
 </div>
@@ -190,7 +207,7 @@ table.data tr.group:hover td{background:none;}
   var SESSION_KEY = "sh_admin_secret";
   var PREF_KEY = "sh_admin_prefs";
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3" };
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", dashboard: "Dashboard" };
   /* hubs that are no longer on the live site -- hidden unless "Include archived hubs" is on */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
 
@@ -274,9 +291,12 @@ table.data tr.group:hover td{background:none;}
       rpc("get_nuke_summary", { p_secret: secret, p_days: d }),
       rpc("get_nuke_by_hub", { p_secret: secret, p_days: d }),
       rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 }),
-      rpc("get_reports", { p_secret: secret })
+      rpc("get_reports", { p_secret: secret }),
+      table("question_choices", "hub,qid,choice,picks"),
+      rpc("get_click_summary", { p_secret: secret, p_days: d }),
+      rpc("get_survey_results", { p_secret: secret })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12] };
       renderAll();
     });
   }
@@ -406,6 +426,111 @@ table.data tr.group:hover td{background:none;}
     out += '<p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the exact section on screen (e.g. Compendium › Question Bank). Per-view detail starts 2026-09-23 — older time only knows the top-level mode, and shows as “before per-view tracking.”</p>';
     el.innerHTML = out;
   }
+  /* ---------- clicks: what people actually press, per hub ---------- */
+  function clickName(t){
+    var w = /^widget:/.test(t), x = t.replace(/^widget:/, "");
+    var m = x.match(/^([a-z-]+)=(.*)$/);
+    if (m) x = prettyPart(m[1].replace(/-/g, " ")) + ": " + m[2];
+    else if (/^#/.test(x)) x = x.slice(1).replace(/[-_]/g, " ");
+    else if (/^\./.test(x)) x = x.slice(1).replace(/[-_]/g, " ") + " (any)";
+    return (w ? "Tools menu › " : "") + x;
+  }
+  function renderClicks(){
+    var el = $('[data-panel="clicks"]');
+    if (!data.clicks || data.clicks.error) { el.innerHTML = card("Clicks", "", '<div class="err">Couldn’t load click data (migration_v14).</div>'); return; }
+    var byHub = {};
+    (data.clicks.data || []).forEach(function(r){
+      if (!keepHub(r.hub) && r.hub !== "dashboard") return;
+      var h = byHub[r.hub] || (byHub[r.hub] = { hub: r.hub, total: 0, targets: {} });
+      var c = Number(r.clicks) || 0; h.total += c;
+      var t = h.targets[r.target] || (h.targets[r.target] = { target: r.target, clicks: 0, people: Number(r.people) || 0, sections: {} });
+      t.clicks += c; t.sections[r.section || ""] = (t.sections[r.section || ""] || 0) + c;
+    });
+    var hubs = Object.keys(byHub).map(function(k){ return byHub[k]; }).sort(function(a, b){ return b.total - a.total; });
+    if (!hubs.length) { el.innerHTML = card("Clicks", rangeText(), '<div class="empty">No clicks recorded yet. Tracking started 2026-09-25.</div>'); return; }
+    var out = "";
+    hubs.forEach(function(h){
+      var ts = Object.keys(h.targets).map(function(k){ return h.targets[k]; }).sort(function(a, b){ return b.clicks - a.clicks; });
+      var max = ts.length ? ts[0].clicks : 0;
+      var rows = ts.slice(0, 40).map(function(t){
+        var where = Object.keys(t.sections).sort(function(a, b){ return t.sections[b] - t.sections[a]; }).slice(0, 2).map(function(sx){ return sx ? sx.split("/").map(prettyPart).join(" › ") : "—"; }).join(", ");
+        return '<tr><td class="lbl">' + esc(clickName(t.target)) + '<span class="tag">' + esc(where) + '</span></td><td class="n">' + fmtNum(t.clicks) + '</td><td class="n">' + fmtNum(t.people) + '</td><td class="barcell">' + bar(t.clicks, max, false, fmtNum(t.clicks) + " clicks") + '</td></tr>';
+      }).join("");
+      out += card(hubCell(h.hub), fmtNum(h.total) + " clicks · " + rangeText() + (ts.length > 40 ? " · top 40 of " + ts.length : ""),
+        '<div class="tbl-wrap"><table class="data"><thead><tr><th>Button / tab</th><th class="n">Clicks</th><th class="n">People</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>');
+    });
+    out += '<p class="note">Counted per button, tab or link (answer choices are grouped, never logged one by one). “People” is distinct devices. Pair this with Time by section: something with lots of time but few clicks is being read; something nobody opens is a candidate to cut.</p>';
+    el.innerHTML = out;
+  }
+
+  /* ---------- surveys: results, on/off, and a form to publish one ---------- */
+  function renderSurveys(){
+    var el = $('[data-panel="surveys"]');
+    var list = (data.surveys && data.surveys.data) || [];
+    var out = "";
+    if (data.surveys && data.surveys.error) out += card("Surveys", "", '<div class="err">Couldn’t load surveys (migration_v14).</div>');
+    list.forEach(function(sv){
+      var qs = sv.questions || [], ans = sv.answers || [], body = "";
+      qs.forEach(function(q, qi){
+        var id = String(q.id || ("q" + (qi + 1)));
+        body += '<h4 style="margin:14px 0 6px">' + esc(q.prompt || id) + '</h4>';
+        var vals = ans.map(function(a){ return a && a[id]; }).filter(function(v){ return v != null && v !== ""; });
+        if (q.kind === "text") {
+          body += vals.length ? vals.slice(0, 60).map(function(v){ return '<div class="sv-text">' + esc(v) + '</div>'; }).join("") : '<div class="empty">No written answers yet.</div>';
+        } else {
+          var counts = {};
+          vals.forEach(function(v){ (Array.isArray(v) ? v : [v]).forEach(function(x){ counts[x] = (counts[x] || 0) + 1; }); });
+          var keys = q.kind === "scale" ? ["1", "2", "3", "4", "5"] : (q.options || []).map(String);
+          Object.keys(counts).forEach(function(k){ if (keys.indexOf(String(k)) < 0) keys.push(String(k)); });
+          var max = Math.max.apply(null, keys.map(function(k){ return counts[k] || 0; }).concat([0]));
+          body += keys.map(function(k){ return '<div class="sv-ans"><span>' + esc(k) + '</span><span style="flex:1;max-width:50%">' + bar(counts[k] || 0, max, false, (counts[k] || 0) + " votes") + '</span><b>' + (counts[k] || 0) + '</b></div>'; }).join("");
+          if (q.kind === "scale" && vals.length) body += '<p class="note">Average ' + (vals.reduce(function(s, v){ return s + Number(v); }, 0) / vals.length).toFixed(1) + ' / 5</p>';
+        }
+      });
+      var toggle = '<button class="icon-btn" type="button" data-sv-toggle="' + sv.survey_id + '" data-on="' + (sv.active ? "1" : "0") + '">' + (sv.active ? "Turn off" : "Turn on") + '</button>';
+      out += card(esc(sv.title) + (sv.active ? ' <span class="pill">live on the dashboard</span>' : ''),
+        fmtNum(sv.responses) + " answered · " + fmtNum(sv.skipped) + " said no thanks · created " + new Date(sv.created_at).toLocaleDateString(), body, toggle);
+    });
+    var qRow = function(n){ return '<div class="sv-q"><input class="sv-prompt" placeholder="Question ' + n + (n > 1 ? ' (optional)' : '') + '"><select class="sv-kind"><option value="choice">Pick one</option><option value="multi">Pick any</option><option value="scale">1–5 scale</option><option value="text">Written answer</option></select><input class="sv-opts" placeholder="Options, comma-separated (for pick one / pick any)"></div>'; };
+    out += card("New survey", "Shows once to each person on the dashboard, bottom corner; answering or “No thanks” both hide it for good. Only one survey is live at a time.",
+      '<form class="sv-form" id="svForm"><input id="svTitle" placeholder="Title, e.g. “Help shape the hubs”" required maxlength="80">' + qRow(1) + qRow(2) + qRow(3) +
+      '<div class="row"><label class="switch"><input type="checkbox" id="svLive" checked> Go live now</label><button class="icon-btn" type="submit">Publish survey</button><span id="svMsg" class="note" style="margin:0"></span></div></form>');
+    if (!list.length) out = card("Surveys", "", '<div class="empty">No surveys yet. Publish one below, or ask a Claude session to write one.</div>') + out;
+    el.innerHTML = out;
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-sv-toggle]"); if (!b) return;
+    b.disabled = true;
+    supabase.rpc("admin_set_survey_active", { p_secret: secret, p_survey: Number(b.dataset.svToggle), p_active: b.dataset.on !== "1" })
+      .then(function(){ return rpc("get_survey_results", { p_secret: secret }); })
+      .then(function(r){ data.surveys = r; renderSurveys(); });
+  });
+  document.addEventListener("submit", function(e){
+    if (e.target.id !== "svForm") return;
+    e.preventDefault();
+    var f = e.target, msg = $("#svMsg"), qs = [];
+    f.querySelectorAll(".sv-q").forEach(function(row, i){
+      var prompt = row.querySelector(".sv-prompt").value.trim(); if (!prompt) return;
+      var kind = row.querySelector(".sv-kind").value;
+      var q = { id: "q" + (i + 1), kind: kind, prompt: prompt };
+      if (kind === "choice" || kind === "multi") {
+        q.options = row.querySelector(".sv-opts").value.split(",").map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 8);
+        if (q.options.length < 2) { msg.textContent = "Question " + (i + 1) + " needs at least two options."; qs = null; return; }
+      }
+      if (qs) qs.push(q);
+    });
+    if (!qs) return;
+    if (!qs.length) { msg.textContent = "Add at least one question."; return; }
+    var title = $("#svTitle").value.trim();
+    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) + "-" + Date.now().toString(36);
+    msg.textContent = "Publishing…";
+    supabase.rpc("admin_upsert_survey", { p_secret: secret, p_slug: slug, p_title: title, p_questions: qs, p_active: $("#svLive").checked })
+      .then(function(r){
+        if (r && r.error) { msg.textContent = "Couldn’t publish: " + r.error.message; return; }
+        return rpc("get_survey_results", { p_secret: secret }).then(function(res){ data.surveys = res; renderSurveys(); });
+      });
+  });
+
   function pctOf(v, total){ return total ? Math.round(v / total * 100) + "%" : "—"; }
 
   function toughest(hub){
@@ -413,10 +538,43 @@ table.data tr.group:hover td{background:none;}
       .map(function(r){ return { hub: r.hub, qid: r.qid, attempts: r.attempts, pct: Math.round(r.correct / r.attempts * 100) }; })
       .sort(function(a, b){ return a.pct - b.pct || b.attempts - a.attempts; });
   }
+  /* question text comes from each live hub's own SH_EXPORT, read from a hidden same-site
+     frame (?sh_export=1 keeps that copy from logging any activity) */
+  var QTEXT = {}, qtextLoaded = {};
+  function loadQuestionText(hub){
+    if (qtextLoaded[hub] || isArchived(hub)) return;
+    qtextLoaded[hub] = true;
+    var f = document.createElement("iframe");
+    f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
+    f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
+    f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
+    f.onload = function(){
+      try {
+        var ex = f.contentWindow.SH_EXPORT;
+        (ex && ex.questions || []).forEach(function(q){ QTEXT[hub + "|" + q.id] = q; });
+      } catch (e) {}
+      f.remove();
+      renderAll();
+    };
+    document.body.appendChild(f);
+  }
+  function topWrong(hub, qid){
+    var q = QTEXT[hub + "|" + qid]; if (!q || !q.choices || q.answer == null) return null;
+    var best = null;
+    (data.choices && data.choices.data || []).forEach(function(c){
+      if (c.hub === hub && c.qid === qid && c.choice !== q.answer && (!best || c.picks > best.picks)) best = c;
+    });
+    return best && q.choices[best.choice] ? { text: q.choices[best.choice], picks: best.picks } : null;
+  }
   function toughTable(rows){
+    rows.forEach(function(r){ loadQuestionText(r.hub); });
     return '<div class="tbl-wrap"><table class="data wide"><thead><tr><th>Question</th><th>Hub</th><th class="n">Answers</th><th class="n">Correct</th><th></th></tr></thead><tbody>' +
       rows.map(function(r){
-        return '<tr><td class="lbl">' + esc(r.qid) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
+        var q = QTEXT[r.hub + "|" + r.qid], w = topWrong(r.hub, r.qid);
+        var cell = '<span class="mono">' + esc(r.qid) + '</span>' + (q ? '<div class="qtext">' + esc(q.text) + '</div>' +
+          (q.choices && q.answer != null ? '<div class="qkey">Key: ' + esc(q.choices[q.answer]) + '</div>' : '') +
+          (w ? '<div class="qwrong">Most picked wrong: ' + esc(w.text) + ' (' + w.picks + ')</div>' : '') : '');
+        return '<tr><td class="lbl">' + cell + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
       }).join("") + '</tbody></table></div>';
   }
   function renderQuestions(){
@@ -522,7 +680,7 @@ table.data tr.group:hover td{background:none;}
   }
 
   function renderAll(){
-    renderOverview(); renderTime(); renderQuestions(); renderEngagement(); renderInbox(); updateInboxCount();
+    renderOverview(); renderTime(); renderQuestions(); renderClicks(); renderEngagement(); renderSurveys(); renderInbox(); updateInboxCount();
   }
 
   /* ---------- tabs & controls ---------- */

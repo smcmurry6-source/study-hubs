@@ -1,0 +1,16 @@
+{
+  "name": "Study Hubs · D2 UAB",
+  "short_name": "Study Hubs",
+  "description": "Every study hub for the UAB D2 class: exam countdowns, notes with narration, question banks and the arcades.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E9EDF0",
+  "theme_color": "#15202A",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

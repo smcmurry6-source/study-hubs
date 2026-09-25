@@ -16,7 +16,7 @@ does it differently.
   arrays near the top of the script; add or archive a hub there, not in markup.
 - `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` — shared cross-hub layer (search, class stats,
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, and `widget/ranks.js`, handpiece ranks) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. `question-banks/` — archived hubs' banks.
@@ -43,7 +43,15 @@ don't take one side wholesale; the other side is usually another session's work.
 
 ## Verify before pushing
 
-- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js`.
+GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/syntax.js`
+(every inline script parses, no conflict markers) and `node tools/ci/smoke.js` (headless click-through
+of the dashboard and every hub on desktop and phone, plus a question-bank lint: duplicate ids, answer
+ranges, missing explanations, missing narration files, and the correct answer being the longest choice
+in more than 40% of MCQs). Run both locally before pushing; the smoke test needs Playwright
+(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
+data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
+
+- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/ranks.js`.
 - Question / lecture counts match what you expect; no duplicate ids.
 - Grep that the feature you added (and anything from a merged-in branch) is present.
 - Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —
@@ -78,6 +86,16 @@ samples, sr = k.create(text, voice="af_heart", speed=1.0, lang="en-us")
 Encode to mp3 (ffmpeg or lameenc). ~20–30 chars/sec on one CPU — for many
 lectures, shard the job and skip files that already exist. Keep the job in the
 foreground/polled; an idle cloud VM is reclaimed and background work is lost.
+
+## Usage data and surveys
+
+To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
+`activity_pings` (time per `<mode>/<sub-view>`, 25 s per ping), `ui_clicks` + `ui_click_reach` (clicks per
+button/tab and distinct people, per day), `question_stats` / `question_choices` (accuracy, popular wrong answers),
+`mode_stats`. The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
+Surveys: one live at a time on the dashboard, shown once per visitor. Publish from `review/` → Surveys, or
+`admin_upsert_survey(p_secret, p_slug, p_title, p_questions, p_active)` with 1-3 questions
+(`kind`: choice | multi | scale | text). Results: `get_survey_results(p_secret)`. Ask Sam before a survey goes live.
 
 ## Secrets
 
