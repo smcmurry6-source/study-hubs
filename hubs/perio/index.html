@@ -312,6 +312,32 @@ main{padding-top:20px}
 .hint .take{font-size:.9rem;color:var(--ink-soft);margin:0}
 .kind{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-right:6px}
 .kind.emphasize{background:var(--good-soft);color:var(--good)} .kind.deemphasize{background:var(--caution-soft);color:var(--caution)} .kind.slide{background:var(--probe-soft);color:var(--probe)}
+.pbox{border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);padding:10px 14px;margin:0 0 12px}
+.pbox-head{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.pbox-head svg{width:14px;height:14px}
+.pbox dl{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:4px 14px;margin:0;font-size:.9rem}
+.pbox dt{font-weight:700;color:var(--ink-soft)}
+.pbox dd{margin:0;color:var(--ink)}
+@media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
+.qcard-choice.multi{padding-left:38px;position:relative}
+.qcard-choice.multi::before{content:"";position:absolute;left:12px;top:50%;width:15px;height:15px;margin-top:-8px;border:1.5px solid var(--line-strong);border-radius:4px;background:var(--surface)}
+.qcard-choice.multi[data-selected="true"]::before,.qcard-choice.multi[data-picked="true"]::before{background:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--surface)}
+.qcard-choice[data-state="missed"]{border-style:dashed;border-color:var(--good)}
+.multi-score{font-family:var(--font-mono);font-size:.8rem;font-weight:700;color:var(--ink-soft)}
+.exam-match{display:flex;flex-direction:column;gap:8px}
+.exam-match-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center;font-size:.92rem}
+.exam-match-row select{width:100%;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;font-size:.88rem}
+@media (max-width:560px){.exam-match-row{grid-template-columns:1fr}}
+.exam-kinds{display:grid;gap:10px;margin-top:14px}
+.exam-kind{appearance:none;text-align:left;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;gap:4px;font:inherit}
+.exam-kind b{font-size:1.02rem}
+.exam-kind span{font-size:.86rem;color:var(--ink-soft)}
+.exam-kind:hover{border-color:var(--ink)}
+.midterm-card{border-top:4px solid var(--accent)}
+.midterm-card .mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.midterm-card .mt-when{font-family:var(--font-display);font-size:1.7rem;line-height:1.1}
+.midterm-card h4{margin:10px 0 6px;font-size:.92rem}
+@media (max-width:760px){.midterm-card .mt-grid{grid-template-columns:1fr}}
 .chip.src.nomid{background:var(--caution-soft);color:var(--caution)}
 .cram-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
 .cram-card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--t);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
@@ -1260,6 +1286,38 @@ var QUESTIONS = [
 { id:'q4-L41', lec:'phase1-therapy', type:'recall', stem:"Explain the two ways probing depth decreases after SRP.", answer:"At the gingival margin, inflammation and edema resolve, the tissue loses volume, and this is recorded as increased recession. At the base of the pocket, the junctional epithelium (7-10 days) and connective tissue (4-6 weeks) reattach to the freshly cleaned root.", src:'lecture' },
 { id:'q4-L42', lec:'phase1-therapy', type:'mcq', stem:"Why does 'failure of therapy' after good SRP happen more often in smokers and uncontrolled diabetics?", choices:["The host response shapes healing as well as disease, so outcomes are poorer short- and long-term", "They form calculus faster, so deposits return before the tissues have a chance to heal", "Ultrasonic tips don't work well on their roots, so much less calculus is removed during scaling and root planing", "Their pockets are always shallower, so there is less probing-depth reduction left to gain"], answer:0, ex:"Phase II (surgery to eliminate pockets) may follow.", src:'lecture' },
 
+/* ===== Exam-format practice (added 2026-09-26 from Dr. Abou-Arraj's midterm email):
+   Patient Box cases (pbox), multiple-answer items (type:'multi', partial credit). Built only from facts in these notes. ===== */
+{ id:'q1-P01', lec:'diagnosis-tx-planning', type:'mcq', pbox:[['Patient','45-year-old female'],['Medical history','Non-contributory; no diabetes'],['Social history','Never smoker'],['Periodontal findings','Worst interdental CAL 4 mm (#19 mesial and #30 mesial); PD ≤5 mm; BOP 22%; no mobility; no furcation involvement'],['Radiographs','Horizontal bone loss at #19 and #30, 25% of root length, coronal third'],['Missing teeth','None']], stem:"What is the periodontal diagnosis?", choices:['Localized Stage 2 Grade B periodontitis','Localized Stage 2 Grade A periodontitis','Localized Stage 3 Grade B periodontitis','Generalized gingivitis'], answer:0, ex:"CAL 3-4 mm with bone loss in the coronal third is Stage 2. Grade: 25% ÷ 45 ≈ 0.56, which falls between 0.25 and 1.0, so Grade B. Only two sites are involved, so localized.", src:'lecture' },
+{ id:'q1-P02', lec:'diagnosis-tx-planning', type:'mcq', pbox:[['Patient','38-year-old male'],['Medical history','Healthy'],['Social history','Smokes 15 cigarettes a day'],['Periodontal findings','Worst interdental CAL 3 mm; PD 4-5 mm at several molar sites; BOP 18%'],['Radiographs','Horizontal bone loss 20% of root length, coronal third'],['Missing teeth','None']], stem:"Which stage and grade fit this patient?", choices:['Stage 2 Grade C','Stage 2 Grade B','Stage 1 Grade C','Stage 3 Grade C'], answer:0, ex:"CAL 3 mm with coronal-third bone loss is Stage 2. The ratio (20 ÷ 38 ≈ 0.53) alone would be Grade B, but more than 10 cigarettes a day pushes the grade to C.", src:'lecture' },
+{ id:'q1-P03', lec:'diagnosis-tx-planning', type:'mcq', pbox:[['Patient','52-year-old female'],['Medical history','Type 2 diabetes, HbA1c 6.1%'],['Social history','Non-smoker'],['Periodontal findings','Worst interdental CAL 4 mm; PD up to 5 mm; Class II furcation involvement on #30 buccal'],['Radiographs','Horizontal bone loss 30% of root length'],['Missing teeth','#1, #16 (third molars, not periodontal)']], stem:"What stage and grade should be assigned?", choices:['Stage 3 Grade B','Stage 2 Grade B','Stage 3 Grade C','Stage 4 Grade B'], answer:0, ex:"The CAL alone says Stage 2, but a Class II furcation is an automatic Stage 3/4 trigger. With no periodontal tooth loss and no need for complex rehabilitation it's Stage 3, not 4. Grade: 30 ÷ 52 ≈ 0.58 is B, and an HbA1c under 7% doesn't push it to C.", src:'lecture' },
+{ id:'q1-P04', lec:'diagnosis-tx-planning', type:'mcq', pbox:[['Patient','24-year-old female'],['Medical history','Healthy'],['Chief complaint','"My gums bleed when I brush"'],['Periodontal findings','Generalized PD 4-5 mm; BOP 35%; gingival margins edematous and coronal to the CEJ; no CAL loss'],['Radiographs','Bone crest 1-2 mm below the CEJ throughout; no bone loss']], stem:"What is the diagnosis?", choices:['Generalized gingivitis on an intact periodontium','Generalized Stage 1 periodontitis','Localized Stage 2 periodontitis','Clinical health on a reduced periodontium'], answer:0, ex:"4s and 5s with bleeding but no attachment or bone loss are pseudopockets. Dr. Abou-Arraj warned against staging from probing depth alone: 'You may over-diagnose a case that does not even have periodontitis.'", src:'lecture' },
+{ id:'q1-P05', lec:'diagnosis-tx-planning', type:'multi', pbox:[['Patient','61-year-old male'],['Medical history','Hypertension, controlled'],['Social history','Former smoker, quit 10 years ago'],['Periodontal findings','PD 5 mm on #14 mesial; BOP 40%; Class II furcation on #30; 4 mm vertical (angular) defect on #19 mesial'],['Missing teeth','#3, extracted 2 years ago because of periodontitis']], stem:"Which findings would, on their own, place this case in Stage 3 or 4? Select all that apply.", choices:['The 4 mm vertical defect on #19','The Class II furcation on #30','#3 lost to periodontitis','The 5 mm pocket on #14','BOP of 40%','His former smoking history'], correct:[0,1,2], ex:"The three automatic triggers: vertical bone loss ≥3 mm, Class II or III furcation, and tooth loss due to periodontitis. Probing depth and bleeding don't stage a case, and a former smoker gets no grade modifier.", src:'lecture' },
+{ id:'q2-P01', lec:'incisions-flaps-sutures', type:'multi', pbox:[['Patient','60-year-old female'],['Planned surgery','Vertical ridge augmentation (large bone graft) at the #29-30 site before implants'],['Tissue','Thick keratinized tissue; the graft will need passive, tension-free closure']], stem:"Which choices fit this surgery? Select all that apply.", choices:['A full-thickness (mucoperiosteal) flap','A trapezoidal flap with two vertical releasing incisions','Vertical incisions placed at the line angles','Horizontal mattress sutures for the layered closure','A split-thickness flap','A vertical incision through the middle of the papilla','Chromic gut sutures for the graft closure'], correct:[0,1,2,3], ex:"Bone augmentation needs a full-thickness flap to expose bone, and major augmentation needs two releases (trapezoidal) for passive coronal advancement. Verticals go at the line angle, never mid-papilla (black triangle). Horizontal mattress is the layered-closure suture for augmentation. Chromic gut is weak and resorbs in 7-10 days.", src:'lecture' },
+{ id:'q3-P01', lec:'risk-assessment', type:'mcq', pbox:[['Patient','57-year-old male'],['History','Generalized Stage 3 Grade C periodontitis, treated with SRP and osseous surgery last year'],['Social history','Still smokes 1 pack a day'],['Today','Stable; residual 4 mm pockets; BOP 12%']], stem:"What maintenance interval fits this patient?", choices:['Every 3 months','Every 6 months','Every 12 months','No maintenance is needed once pockets are ≤4 mm'], answer:0, ex:"Once periodontitis, always higher risk, and he's a current heavy smoker. Pathogens repopulate in about 9-11 weeks, which is why high-risk patients are seen about every 3 months.", src:'lecture' },
+{ id:'q3-P02', lec:'risk-assessment', type:'mcq', pbox:[['Patient','13-year-old'],['Medical history','Healthy'],['Findings','Little plaque or inflammation; 8-11 mm pockets on #14 and the first molars']], stem:"Which diagnosis fits the case Dr. Geisinger reviewed in class?", choices:['Localized Stage 3 Grade C periodontitis, molar-incisor pattern','Generalized Stage 2 Grade B periodontitis','Localized gingivitis','Stage 4 Grade A periodontitis'], answer:0, ex:"Deep pockets and bone loss this young give a bone-loss/age ratio well over 1.0 (Grade C). The plan was regeneration, closer lifelong maintenance and counseling against nicotine.", src:'lecture' },
+{ id:'q4-P01', lec:'phase1-therapy', type:'mcq', pbox:[['Patient','58-year-old male'],['Medical history','Hypertension'],['Medications','Amlodipine 10 mg daily'],['Clinical','Bulbous gingival enlargement, mostly interdental, worse on the buccal/labial'],['#8 mesial','PD 5 mm; gingival margin sits 3 mm coronal to the CEJ']], stem:"What is the clinical attachment level at #8 mesial?", choices:['2 mm','5 mm','8 mm','0 mm'], answer:0, ex:"Recession is −3 mm, so CAL = 5 + (−3) = 2 mm. Leaving recession blank (or 0) in Salud would record CAL 5 and over-diagnose disease.", src:'lecture' },
+{ id:'q4-P02', lec:'phase1-therapy', type:'mcq', pbox:[['Patient','47-year-old male'],['Dental history','No dental visit in 12 years'],['Clinical','Heavy generalized calculus covering the gingival margins and parts of the occlusal surfaces; the margin can\'t be seen or explored'],['Insurance','Private dental insurance']], stem:"What is the appropriate first appointment?", choices:['Full-mouth debridement, then a comprehensive periodontal evaluation in about 2 weeks','Full-mouth debridement and SRP of all four quadrants the same day','A prophylaxis with polishing','Periodontal charting from the calculus surface, then SRP'], answer:0, ex:"Debridement is only for when you can't see or explore the margin, it's never combined with SRP, and insurance won't pay for it plus an exam the same day. (At school, first charting is free, so faculty may let you chart the same visit.)", src:'lecture' },
+{ id:'q4-P03', lec:'phase1-therapy', type:'mcq', pbox:[['Patient','26-year-old female'],['Dental history','Second premolars extracted for orthodontics as a teen; never diagnosed with periodontitis'],['Clinical','Generalized red, swollen gingiva; BOP 60%; lingual bridge of calculus'],['Radiographs','Mild bone-level loss next to the premolar extraction sites and molar tipping; no other bone loss']], stem:"Which procedure fits this patient?", choices:['Scaling in the presence of generalized moderate or severe gingival inflammation (D4346)','Four-quadrant SRP for periodontitis','Periodontal maintenance','Full-mouth debridement'], answer:0, ex:"Gingival inflammation on a reduced periodontium in a non-periodontitis patient. It sits between a prophy and SRP, is done with perio faculty, and gets a Phase I evaluation.", src:'lecture' },
+{ id:'q4-P04', lec:'phase1-therapy', type:'mcq', pbox:[['Patient','50-year-old female'],['History','SRP of all quadrants 5 weeks ago for Stage 3 Grade B periodontitis'],['Today (Phase I evaluation)','Most sites improved; #3 and #14 still bleed and probe 6 mm; the probe catches residual calculus on both roots']], stem:"What is the best next step?", choices:['Remove the residual calculus and re-evaluate in 2 weeks','Refer for osseous surgery today','Repeat full-mouth SRP','Wait 3 more months for additional pocket reduction'], answer:0, ex:"Residual deposits explain the persistent disease, so remove them and re-evaluate in two weeks. Waiting past 4-6 weeks adds no pocket reduction, and more SRP where the roots are already clean won't help (improve oral hygiene instead).", src:'lecture' },
+{ id:'q4-P05', lec:'phase1-therapy', type:'multi', pbox:[['Patient','44-year-old male'],['Social history','Smokes 20 cigarettes a day'],['Medical history','Uncontrolled type 2 diabetes'],['Clinical','Tissue looks pale and fibrotic, with less redness than expected for 6-7 mm pockets']], stem:"Which statements about this patient are consistent with the Session 4 lecture? Select all that apply.", choices:['Nicotine\'s vasoconstriction can mask inflammation, giving a paler, cyanotic look','His outcome after even excellent SRP may be poorer short- and long-term','Uncontrolled diabetes tends to exaggerate the inflammatory picture','His pale tissue means BOP can be skipped','SRP will reverse his bone loss if he quits smoking'], correct:[0,1,2], ex:"Smoking masks, diabetes exaggerates. The host response shapes healing, so 'failure of therapy' is more likely. BOP is always recorded, and non-surgical therapy never reverses bone loss.", src:'lecture' },
+{ id:'q1-M01', lec:'diagnosis-tx-planning', type:'multi', stem:"Which modifiers can move a periodontitis case to Grade C regardless of the bone-loss/age ratio? Select all that apply.", choices:['Smoking more than 10 cigarettes a day','HbA1c of 7% or higher','Being a non-smoker','Well-controlled diabetes (HbA1c 6%)','Age over 65'], correct:[0,1], ex:"Modifiers only push the grade up. Not smoking or not having diabetes never earns a downgrade.", src:'lecture' },
+{ id:'q1-M02', lec:'diagnosis-tx-planning', type:'multi', stem:"Which are true of plaque-induced gingivitis? Select all that apply.", choices:['Probing depths can reach 4-5 mm','There is bleeding on probing','There is no attachment loss or bone loss','It is reversible with plaque control','Bone loss is limited to the coronal third'], correct:[0,1,2,3], ex:"Any bone loss from periodontitis makes it periodontitis. The course uses a 10% full-mouth BOP threshold before calling a case gingivitis.", src:'lecture' },
+{ id:'q1-M03', lec:'diagnosis-tx-planning', type:'multi', stem:"Which belong in Phase I (non-surgical) therapy? Select all that apply.", choices:['Oral hygiene instruction','Scaling and root planing','Smoking-cessation counseling','Caries control','Replacing plaque-retentive restorative margins','Osseous (resective) surgery','Delivering the final crowns'], correct:[0,1,2,3,4], ex:"'Never forget this: caries control is part of Phase I.' Final crowns wait until periodontal therapy is complete, and surgery is Phase II.", src:'lecture' },
+{ id:'q1-M04', lec:'diagnosis-tx-planning', type:'multi', stem:"Which recession types predict at least partial root coverage? Select all that apply.", choices:['RT1','RT2','RT3'], correct:[0,1], ex:"RT1 (no interproximal loss) predicts full coverage and RT2 (buccal recession exceeds interproximal loss) partial. RT3 isn't attempted.", src:'lecture' },
+{ id:'q2-M01', lec:'incisions-flaps-sutures', type:'multi', stem:"Which suture materials are resorbable? Select all that apply.", choices:['Chromic gut','Poly-glycolic acid (PGA)','Poly-glycolide (PGCL)','Silk','PTFE','Polypropylene'], correct:[0,1,2], ex:"Chromic gut (7-10 days), PGA (55-70 days) and PGCL (22-55 days) resorb. Silk, PTFE and polypropylene have to be removed.", src:'lecture' },
+{ id:'q2-M02', lec:'incisions-flaps-sutures', type:'multi', stem:"Which follow the surgical principles taught for incisions and flaps? Select all that apply.", choices:['Make the incision with a firm, continuous stroke','Place vertical incisions at the line angle','Keep the incision away from the bony defect','Make the flap base at least as wide as its free edge','Place the vertical incision in the middle of the papilla','Place the incision directly over the defect'], correct:[0,1,2,3], ex:"A mid-papilla vertical risks recession and a black triangle, and a narrow base starves the flap.", src:'lecture' },
+{ id:'q2-M03', lec:'incisions-flaps-sutures', type:'multi', stem:"Which procedures call for a full-thickness flap? Select all that apply.", choices:['Implant placement','Bone, ridge or sinus augmentation','Crown lengthening / osseous surgery','Soft-tissue grafting'], correct:[0,1,2], ex:"Soft-tissue grafting uses a split-thickness flap so the periosteum stays behind as a vascular bed for the graft.", src:'lecture' },
+{ id:'q3-M01', lec:'risk-assessment', type:'multi', stem:"Which inputs does the UniFe risk tool score? Select all that apply.", choices:['Smoking (cigarettes a day)','Diabetic status (HbA1c)','Number of pockets ≥5 mm','BOP percentage','Bone-loss/age ratio','Plaque index','Number of furcations'], correct:[0,1,2,3,4], ex:"Each of the five is scored 0-4 and summed into a five-tier risk score.", src:'lecture' },
+{ id:'q3-M02', lec:'risk-assessment', type:'multi', stem:"Which statements describe the Kwok & Caton prognosis system? Select all that apply.", choices:['It asks whether periodontal stability can be achieved','It is therapeutic only','Questionable sits in the middle of its scale','It works well for medically complex patients','It applies only to molars','It is scored numerically from smoking and A1c'], correct:[0,1,2,3], ex:"Molars-only and numeric scoring describe Miller & McEntire.", src:'lecture' },
+{ id:'q3-M03', lec:'risk-assessment', type:'multi', stem:"Which are the P's of P4 medicine? Select all that apply.", choices:['Personalized','Preventive','Predictive','Participatory','Palliative','Prescriptive'], correct:[0,1,2,3], ex:"Personalized, preventive, predictive and participatory (some add a fifth P). It's set against one-size-fits-all Hippocratic medicine.", src:'lecture' },
+{ id:'q4-M01', lec:'phase1-therapy', type:'multi', stem:"Which make it harder to feel the CEJ when measuring negative recession? Select all that apply.", choices:['Heavy gingival inflammation','Drug-induced gingival overgrowth','Altered passive eruption','Calculus or restorative margins','True (positive) recession','Healthy tissue with a visible CEJ'], correct:[0,1,2,3], ex:"Inflammation and overgrowth are pathologic, altered passive eruption is physiologic, and calculus or margins can feel like a CEJ.", src:'lecture' },
+{ id:'q4-M02', lec:'phase1-therapy', type:'multi', stem:"Which are goals of scaling and root planing? Select all that apply.", choices:['Reduce inflammation','Shift the flora from gram-negative toward gram-positive','Arrest disease progression','Reverse bone and attachment loss','Eliminate the pocket (the main rationale)'], correct:[0,1,2], ex:"SRP doesn't reverse the damage, and pocket elimination isn't the rationale, though PD does drop.", src:'lecture' },
+{ id:'q4-M03', lec:'phase1-therapy', type:'multi', stem:"Which contribute to probing-depth reduction after SRP? Select all that apply.", choices:['More recession as edema resolves','Junctional epithelium reattaching','Connective tissue reattaching','New bone filling the defect','Extrusion of the tooth'], correct:[0,1,2], ex:"At the margin, resolving edema shows up as more recession. At the base, JE (7-10 days) and connective tissue (4-6 weeks) reattach to the clean root. SRP doesn't regrow bone.", src:'lecture' },
+{ id:'q4-M04', lec:'phase1-therapy', type:'multi', stem:"Which statements about full-mouth debridement are correct? Select all that apply.", choices:['It is not a therapeutic procedure','It is indicated only when you can\'t see or explore the gingival margin','There is only a full-mouth code','It should never be combined with SRP','It can be billed per quadrant','Insurance pays for it and a periodontal exam at the same visit'], correct:[0,1,2,3], ex:"There is no quadrant or half-mouth code, and insurance won't pay for debridement plus an exam the same day, so the exam is usually about 2 weeks later.", src:'lecture' },
+{ id:'q4-M05', lec:'phase1-therapy', type:'multi', stem:"Which are limitations of scaling and root planing discussed in class? Select all that apply.", choices:['It is a blinded, tactile procedure','Motile bacteria invade the pocket lining','Overhanging or subgingival restorative margins','Root grooves, concavities and furcations','Over-removing cementum causes hypersensitivity','It can\'t be done with local anesthesia'], correct:[0,1,2,3,4], ex:"Also on the list: pocket depth and access, patient compliance with hygiene, and operator skill.", src:'lecture' },
+{ id:'q4-M06', lec:'phase1-therapy', type:'multi', stem:"Which can a radiograph tell you before you probe? Select all that apply.", choices:['Whether bone loss is localized or generalized','Horizontal vs. vertical bone loss','Root proximity and fused roots','Calculus','A periapical lesion','Bleeding on probing'], correct:[0,1,2,3,4], ex:"BOP is a clinical finding. Dr. Kaur's tip: keep the x-rays open during SRP, not the chart.", src:'lecture' },
+
 /* ===== Lecture 5 — Resective Surgery & Furcation Management ===== */
 { id:'q5-01', lec:'resective-furcation', type:'mcq', stem:"On maxillary molars, which furcation entrance is the narrowest?", choices:['Buccal','Mesial','Distal','They are all equal'], answer:0, ex:"On maxillary molars the buccal furcation entrance (about 3.5 mm from the CEJ) is the narrowest of the three.", src:'exam-review' },
 { id:'q5-02', lec:'resective-furcation', type:'mcq', stem:"On maxillary molars, how far from the CEJ is the distal furcation entrance?", choices:['5 mm','3 mm','3.5 mm','8 mm'], answer:0, ex:"Maxillary molar furcation entrances sit at about 3 mm (mesial), 3.5 mm (buccal) and 5 mm (distal) from the CEJ. The distal one is the most apical.", src:'exam-review' },
@@ -1664,6 +1722,7 @@ EXAM_HINTS.push(
   { lec:'phase1-therapy', type:'emphasize', src:'slide', quote:"Don't Forget!!! 1. Modified Pen Grasp Technique 2. Finger Rest", takeaway:"The one slide in the deck set in all-caps emphasis. Know the four finger rests (conventional, cross-arch, opposite-arch, finger-on-finger). From the slide deck. In class she deferred grasp and finger rests to the PCD sessions, so expect them there and on the practical." }
 );
 EXAM_HINTS.push(
+  { lec:'diagnosis-tx-planning', type:'emphasize', src:'email', quote:"Number of questions: around 40. Type of questions: A few Patient Box (case-based) scenarios with majority multiple choice questions, a few multiple answers (with partial credit) and matching questions. No essays.", takeaway:"Dr. Abou-Arraj's midterm email (Oct 1, 10:00 am, sessions 1-4). Practice the format: the Mock Exam's midterm-format option mixes Patient Box cases, multiple-answer items with partial credit, matching and MCQs. On multiple-answer items, pick only what you're sure of, since wrong picks can cost credit." },
   { lec:'phase1-therapy', type:'deemphasize', src:'email', quote:"For the midterm exam, you will not be tested on instruments/ultrasonics/polishing. For exam preparation, focus on the discussion and slides up to failure of therapy in the given pdf.", takeaway:"From Dr. Kaur's email the day after class. Everything in the deck after failure of therapy (instruments, ultrasonics, technique, polishing) is off the midterm. Those questions are tagged 'Not on midterm' and left out of the midterm mock exam. The email says nothing about the final, so don't drop them for good." },
   { lec:'phase1-therapy', type:'emphasize', quote:"How many times you have seen this before? Has anybody been counting? That's going to be on the quiz.", takeaway:"Said of the host-bacteria pathogenesis diagram (health → gingivitis → periodontitis). Know it cold: plaque bacteria initiate, the host response drives progression, and SRP targets the bacteria." },
   { lec:'phase1-therapy', type:'emphasize', quote:"Bacteria is only responsible for 25% of the damage that happens in periodontitis. 75% of the damage that happens in periodontitis is because of those inflammatory markers and cells of bone destruction, osteoclasts, that are released by the host.", takeaway:"The 25/75 split. Bacteria bring endotoxin (LPS), not osteoclasts. Removing them calms the host, and host modulation (Dr. Litz) calms it directly." },
@@ -3135,6 +3194,14 @@ function qCardHTML(q){
       body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+i+'">'+escHtml(q.choices[i])+'</button>';
     });
     body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
+  } else if(q.type === 'multi'){
+    delete MULTI_STATE[q.id];
+    body += '<div class="qcard-choices" data-qtype="multi" data-qid="'+q.id+'">';
+    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){
+      body += '<button type="button" class="qcard-choice multi" data-qid="'+q.id+'" data-multi-idx="'+i+'" aria-pressed="false">'+escHtml(q.choices[i])+'</button>';
+    });
+    body += '</div><div class="qcard-reveal-btn" data-role="check-wrap"><button type="button" class="btn sm" data-action="multi-check" data-qid="'+q.id+'">Check answer</button></div>' +
+      '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
   } else if(q.type === 'recall'){
     body += '<div class="qcard-reveal-btn" data-role="reveal-wrap"><button type="button" class="btn sm" data-action="reveal" data-qid="'+q.id+'">'+icon('eye')+'Show answer</button></div>' +
       '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+escHtml(q.answer)+(q.ex?('<br><br>'+escHtml(q.ex)):'')+'</div>'+CLASS_ROW+'</div>' +
@@ -3157,9 +3224,22 @@ function qCardHTML(q){
     shuffled(q.pairs.map(function(p,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-match-item" data-side="right" data-pair-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.pairs[i][1])+'</button>'; });
     body += '</div></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
   }
-  var hint = q.type === 'sequence' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap the steps in order.</div>' : q.type === 'match' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap a left item, then its partner.</div>' : '';
+  var hint = q.type === 'sequence' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap the steps in order.</div>' : q.type === 'match' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap a left item, then its partner.</div>' : q.type === 'multi' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Select every correct answer, then check. Partial credit.</div>' : '';
   return '<div class="qcard tag-'+lec.tag+'" data-qid="'+q.id+'" data-qtype="'+q.type+'">' + qMeta(q) +
-    '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body + '</div>';
+    pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body + '</div>';
+}
+/* Patient Box: the case-based format named in the midterm email */
+function pboxHTML(q){
+  if(!q.pbox) return '';
+  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
+}
+/* Multiple-answer partial credit (Canvas-style): each correct pick earns 1/n, each wrong pick costs 1/n, floor 0.
+   The course's exact partial-credit rule isn't published; this is the common convention. */
+var MULTI_STATE = {};
+function multiScore(q, picks){
+  picks = picks || [];
+  var hit = picks.filter(function(i){ return q.correct.indexOf(i) > -1; }).length, wrong = picks.length - hit;
+  return Math.max(0, (hit - wrong) / q.correct.length);
 }
 function markExplain(qid){ var el = document.getElementById('explain-'+qid); if(el && el.textContent.trim()) el.classList.add('shown'); }
 
@@ -3180,6 +3260,16 @@ function wireQuestionContainer(container){
         if(bi === q.answer) b.setAttribute('data-state','correct'); else if(b === mcqBtn) b.setAttribute('data-state','incorrect');
       });
       markExplain(q.id); recordAnswer(q.id, q.lec, correct, idx);
+      return;
+    }
+    var mBtn = e.target.closest('.qcard-choices[data-qtype="multi"] .qcard-choice');
+    if(mBtn){
+      if(mBtn.closest('.qcard-choices').getAttribute('data-answered') === 'true') return;
+      var mqid = mBtn.getAttribute('data-qid'), mi = parseInt(mBtn.getAttribute('data-multi-idx'),10);
+      var mp = MULTI_STATE[mqid] = MULTI_STATE[mqid] || [];
+      var at = mp.indexOf(mi);
+      if(at > -1){ mp.splice(at,1); mBtn.removeAttribute('data-selected'); mBtn.setAttribute('aria-pressed','false'); }
+      else { mp.push(mi); mBtn.setAttribute('data-selected','true'); mBtn.setAttribute('aria-pressed','true'); }
       return;
     }
     var seqBtn = e.target.closest('.qcard-seq-steps[data-qtype="sequence"] .qcard-choice');
@@ -3230,6 +3320,21 @@ function wireQuestionContainer(container){
     if(actionBtn){
       var aq = QUESTIONS_BY_ID[actionBtn.getAttribute('data-qid')], card = actionBtn.closest('.qcard');
       if(!aq) return;
+      if(actionBtn.getAttribute('data-action') === 'multi-check'){
+        var picks = MULTI_STATE[aq.id] || [];
+        if(!picks.length){ actionBtn.textContent = 'Pick at least one'; return; }
+        var wrapM = card.querySelector('.qcard-choices[data-qtype="multi"]'); wrapM.setAttribute('data-answered','true');
+        var sc = multiScore(aq, picks);
+        wrapM.querySelectorAll('.qcard-choice').forEach(function(b){
+          b.disabled = true; var bi = parseInt(b.getAttribute('data-multi-idx'),10), isC = aq.correct.indexOf(bi) > -1, was = picks.indexOf(bi) > -1;
+          b.removeAttribute('data-selected'); if(was) b.setAttribute('data-picked','true');
+          if(isC) b.setAttribute('data-state', was ? 'correct' : 'missed'); else if(was) b.setAttribute('data-state','incorrect');
+        });
+        card.querySelector('[data-role="check-wrap"]').innerHTML = '<span class="multi-score">Partial credit: '+Math.round(sc*100)+'%</span>';
+        var exM = document.getElementById('explain-'+aq.id); if(exM){ exM.classList.add('shown'); var xb = exM.querySelector('.qx-body') || exM; if(!aq.ex) xb.innerHTML = '<b>Correct:</b> ' + aq.correct.map(function(i){ return escHtml(aq.choices[i]); }).join('; '); }
+        recordAnswer(aq.id, aq.lec, sc === 1);
+        return;
+      }
       if(actionBtn.getAttribute('data-action') === 'reveal'){
         document.getElementById('explain-'+aq.id).classList.add('shown');
         card.querySelector('[data-role="reveal-wrap"]').style.display = 'none';
@@ -3249,7 +3354,7 @@ function renderHeaderMeta(){
   var cd = document.getElementById('countdownPill');
   if(cd){
     var mid = daysUntil(MIDTERM_DATE), fin = daysUntil(FINAL_DATE), txt, title;
-    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1 · sessions 1-4'; }
+    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-4 · ~40 questions'; }
     else if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · all 9 sessions'; }
     else { txt = 'Course complete'; title = ''; }
     cd.innerHTML = icon('cal') + txt; cd.title = title;
@@ -3380,9 +3485,18 @@ function shortTitle(l){
 var COURSE_GRADING = [
   { component:'Weekly recording quizzes', weight:'10%', note:'5 short questions at the start of each in-person session (sessions 2-9), on that session\'s pre-recorded lecture. Described as straightforward, not designed to trip you up.' },
   { component:'PCD sessions (formative)', weight:'20%', note:'Participation and demonstrated ability across 4 hands-on instrumentation sessions with Dr. Carr and Dr. Bowie.' },
-  { component:'Midterm exam', weight:'Remainder', note:'Sessions 1-4 only. Follows the Phase I session.' },
+  { component:'Midterm exam', weight:'Remainder', note:'Thu Oct 1, 10:00 am. Sessions 1-4 (Sept 3 - Sept 24), about 40 questions.' },
   { component:'Comprehensive final exam', weight:'Remainder', note:'November 19. All 9 sessions; earlier material stays fair game even though the midterm already tested it.' }
 ];
+/* From Dr. Abou-Arraj's midterm email (2026-09-26) */
+var MIDTERM_INFO = {
+  when:'Thursday, Oct 1 · 10:00 am', where:'Rooms 220 and 222 (room assignment comes next week)',
+  covers:'Sessions 1-4 (Sept 3 - Sept 24)', count:'About 40 questions',
+  format:['Mostly multiple choice','A few Patient Box (case-based) scenarios','A few multiple-answer questions, with partial credit','Matching questions','No essays'],
+  checklist:['Laptop fully charged, with Lockdown Browser and Respondus Monitor ready','Sign the sign-in sheet','Leave an empty chair between every two students','Can\'t log in? Go to the HIBS office on the 6th floor','Scratch paper is in the room; hand it to Ms. Patrice Headington (proctor) before you leave','Dr. Abou-Arraj will be covering clinic, not in the room'],
+  grades:'Grades won\'t post right away: he reviews how each question performed first (may drop a question or give everyone credit).',
+  scope:'Dr. Kaur (Session 4): no instruments, ultrasonics or polishing. Focus on the discussion and slides up to failure of therapy.'
+};
 var PCD_COMPETENCIES = ['Periodontal charting / probing', 'Identifying and selecting instruments', 'Scaling and root planing'];
 
 var CRAM_CONTENT = [
@@ -3431,17 +3545,25 @@ function renderCourseInfo(){
     '<div class="hh-actions"><button type="button" class="btn primary" data-goto-lecture="'+cont.id+'">'+icon('notes')+'Continue: S'+cont.num+' '+escHtml(shortTitle(cont))+'</button>' +
     '<button type="button" class="btn" data-set-view="mock-exam">'+icon('timer')+'Mock exam</button><button type="button" class="btn" data-goto-mode="arcade">'+icon('arcade')+'Pocket Arcade</button></div></div>' +
     '<div class="hh-side"><div class="hh-exams">' +
-      '<div class="hh-stat"><div class="k">Midterm · Oct 1 · S1-4</div><div class="v">'+(mid !== null && mid >= 0 ? mid+'<small>days</small>' : mid !== null ? 'Done' : 'After S4')+'</div></div>' +
+      '<div class="hh-stat"><div class="k">Midterm · Oct 1, 10 am</div><div class="v">'+(mid !== null && mid >= 0 ? mid+'<small>days</small>' : mid !== null ? 'Done' : 'After S4')+'</div></div>' +
       '<div class="hh-stat"><div class="k">Final · Nov 19</div><div class="v">'+(fin >= 0 ? fin+'<small>days</small>' : 'Done')+'</div></div></div>' +
       '<div class="hh-stat"><div class="k">Your progress</div><div class="v">'+mastered+'<small>of '+total+' questions correct</small></div><div class="bar" style="margin-top:8px"><i style="width:'+(total?Math.round(100*mastered/total):0)+'%"></i></div></div>' +
       '<div class="hh-stat"><div class="k">Lectured so far</div><div class="v">'+taught+'<small>of '+LECTURES.length+' sessions · '+currentStreakDays()+'-day streak</small></div></div>' +
     '</div></div>';
+  if(mid !== null && mid >= 0){
+    var M = MIDTERM_INFO;
+    h += '<div class="card section-block midterm-card"><div class="eyebrow">'+icon('flag')+'Midterm day</div>' +
+      '<div class="mt-grid"><div><div class="mt-when">'+escHtml(M.when)+'</div><p class="muted" style="margin:4px 0 12px">'+escHtml(M.where)+' · '+escHtml(M.covers)+' · '+escHtml(M.count)+'</p>' +
+      '<h4>Question types</h4>'+ulOf(M.format)+'<p class="note">'+escHtml(M.scope)+'</p>' +
+      '<button type="button" class="btn primary" data-set-view="mock-exam">'+icon('timer')+'Take a midterm-format mock</button></div>' +
+      '<div><h4>Before you walk in</h4>'+ulOf(M.checklist)+'<p class="note">'+escHtml(M.grades)+'</p></div></div></div>';
+  }
   h += '<div class="home-grid"><div class="card"><div class="eyebrow">'+icon('cal')+'Course map</div><div class="course-map">';
   LECTURES.forEach(function(l){
     var p = lectureProgress(l.id);
     h += '<button type="button" class="cm-row tag-'+l.tag+'" data-goto-lecture="'+l.id+'"><span class="cm-dot">'+l.num+'</span><span><span class="cm-title">'+escHtml(l.title)+'</span><span class="cm-sub">'+escHtml(l.who)+' '+statusHTML(l)+'</span></span>' +
       '<span class="cm-prog">'+p.correct+'/'+p.total+'<span class="bar"><i style="width:'+p.pct+'%"></i></span></span></button>';
-    if(l.num === MIDTERM_AFTER) h += '<div class="cm-milestone">'+icon('flag')+'Midterm · Thu Oct 1 · sessions 1-'+MIDTERM_AFTER+'</div>';
+    if(l.num === MIDTERM_AFTER) h += '<div class="cm-milestone">'+icon('flag')+'Midterm · Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-'+MIDTERM_AFTER+'</div>';
   });
   h += '<div class="cm-milestone">'+icon('trophy')+'Comprehensive final · Nov 19 · all 9 sessions</div></div></div>';
   h += '<div><div class="card section-block"><div class="eyebrow">How the grade breaks down</div>' +
@@ -3506,13 +3628,14 @@ function filteredQuestions(){
   return QUESTIONS.filter(function(q){
     if(QBANK_FILTER.lec === 'midterm'){ if(q.mid === false || !(LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)) return false; }
     else if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
-    if(QBANK_FILTER.type !== 'all' && q.type !== QBANK_FILTER.type) return false;
+    if(QBANK_FILTER.type === 'pbox'){ if(!q.pbox) return false; }
+    else if(QBANK_FILTER.type !== 'all' && q.type !== QBANK_FILTER.type) return false;
     var a = STATE.answered[q.id];
     if(QBANK_FILTER.status === 'new' && a) return false;
     if(QBANK_FILTER.status === 'missed' && !(a && !a.correct)) return false;
     if(QBANK_FILTER.status === 'mastered' && !(a && a.correct)) return false;
     if(s){
-      var hay = (q.stem + ' ' + (q.choices||[]).join(' ') + ' ' + (q.answer && typeof q.answer === 'string' ? q.answer : '')).toLowerCase();
+      var hay = (q.stem + ' ' + (q.pbox ? q.pbox.map(function(r){ return r.join(' '); }).join(' ') : '') + ' ' + (q.choices||[]).join(' ') + ' ' + (q.answer && typeof q.answer === 'string' ? q.answer : '')).toLowerCase();
       if(hay.indexOf(s) === -1) return false;
     }
     return true;
@@ -3522,7 +3645,7 @@ function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
     '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option><option value="midterm"'+sel('midterm',QBANK_FILTER.lec)+'>Midterm scope (S1-4, per Dr. Kaur)</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
-    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['recall','Recall'],['sequence','Sequence'],['match','Matching']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
     '<div class="qcount" id="qbCount" style="margin-bottom:12px"></div><div class="qlist" id="qbankList"></div>';
@@ -3542,33 +3665,80 @@ function renderQuestionBankListOnly(){
 }
 
 /* ---------- Mock exam ---------- */
-var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, timer:null, scope:'midterm' };
-function examPool(scope){
-  var lecs = scope === 'midterm' ? LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }) : LECTURES;
-  var ids = lecs.map(function(l){ return l.id; });
-  return QUESTIONS.filter(function(q){ return q.type === 'mcq' && ids.indexOf(q.lec) > -1 && !(scope === 'midterm' && q.mid === false); });
+/* Two kinds: the exam-format mock (mirrors Dr. Abou-Arraj's midterm email: ~40 questions, a few Patient Box cases,
+   a few multiple-answer items with partial credit, matching, the rest multiple choice) and an MCQ-only sprint. */
+var EXAM_FORMAT = { total:40, pbox:5, multi:5, match:3 };
+var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, timer:null, scope:'midterm', kind:'format' };
+function scopeLecIds(scope){ return (scope === 'midterm' ? LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }) : LECTURES).map(function(l){ return l.id; }); }
+function inScope(q, scope){ return scopeLecIds(scope).indexOf(q.lec) > -1 && !(scope === 'midterm' && q.mid === false); }
+function examPool(scope){ return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && inScope(q, scope); }); }
+function roundRobin(qs, n){
+  var by = {}; shuffled(qs).forEach(function(q){ (by[q.lec] = by[q.lec] || []).push(q); });
+  var keys = shuffled(Object.keys(by)), out = [];
+  while(out.length < n && keys.some(function(k){ return by[k].length; })) keys.forEach(function(k){ if(out.length < n && by[k].length) out.push(by[k].shift()); });
+  return out;
+}
+function formatPool(scope){
+  var all = QUESTIONS.filter(function(q){ return inScope(q, scope); });
+  var pb = roundRobin(all.filter(function(q){ return q.pbox; }), EXAM_FORMAT.pbox);
+  var mu = roundRobin(all.filter(function(q){ return q.type === 'multi' && !q.pbox; }), EXAM_FORMAT.multi);
+  var ma = roundRobin(all.filter(function(q){ return q.type === 'match'; }), EXAM_FORMAT.match);
+  var mc = roundRobin(examPool(scope), EXAM_FORMAT.total - pb.length - mu.length - ma.length);
+  return shuffled(pb.concat(mu, ma, mc));
 }
 function formatElapsed(ms){ var s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
-function startMockExam(size){
-  var pool = shuffled(examPool(EXAM_STATE.scope));
+function startMockExam(size, kind){
+  var pool = kind === 'format' ? formatPool(EXAM_STATE.scope) : shuffled(examPool(EXAM_STATE.scope)).slice(0, size);
   if(EXAM_STATE.timer) clearInterval(EXAM_STATE.timer);
-  EXAM_STATE = { phase:'active', pool:pool.slice(0, Math.min(size, pool.length)), answers:{}, startedAt:Date.now(), finishedElapsed:0, timer:null, scope:EXAM_STATE.scope };
-  renderCompendiumContent();
+  EXAM_STATE = { phase:'active', pool:pool, answers:{}, startedAt:Date.now(), finishedElapsed:0, timer:null, scope:EXAM_STATE.scope, kind:kind };
+  renderCompendiumContent(); window.scrollTo({top:0});
 }
+function examAnswered(q){
+  var a = EXAM_STATE.answers[q.id];
+  if(a == null) return false;
+  if(q.type === 'multi') return a.length > 0;
+  if(q.type === 'match') return Object.keys(a).length > 0;
+  return true;
+}
+function examPoints(q){
+  var a = EXAM_STATE.answers[q.id];
+  if(a == null) return 0;
+  if(q.type === 'multi') return multiScore(q, a);
+  if(q.type === 'match'){ var n = 0; q.pairs.forEach(function(p,i){ if(a[i] === i) n++; }); return n / q.pairs.length; }
+  return a === q.answer ? 1 : 0;
+}
+function answeredCount(){ return EXAM_STATE.pool.filter(examAnswered).length; }
+function updateExamProg(){ var pe = document.getElementById('examProg'); if(pe) pe.textContent = answeredCount() + ' / ' + EXAM_STATE.pool.length + ' answered'; }
 function submitMockExam(){
   EXAM_STATE.finishedElapsed = Date.now() - EXAM_STATE.startedAt;
   if(EXAM_STATE.timer){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; }
-  EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, EXAM_STATE.answers[q.id] === q.answer, EXAM_STATE.answers[q.id]); });
+  EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, examPoints(q) === 1, q.type === 'mcq' ? EXAM_STATE.answers[q.id] : undefined); });
   /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) */
-  var nRight = EXAM_STATE.pool.filter(function(q){ return EXAM_STATE.answers[q.id] === q.answer; }).length;
+  var nRight = EXAM_STATE.pool.filter(function(q){ return examPoints(q) === 1; }).length;
   document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:EXAM_STATE.pool.length } }));
-  EXAM_STATE.phase = 'results'; renderCompendiumContent();
+  EXAM_STATE.phase = 'results'; renderCompendiumContent(); window.scrollTo({top:0});
 }
+var EXAM_KIND_LABEL = { mcq:'Multiple choice', multi:'Multiple answer', match:'Matching' };
 function examCardHTML(q, n){
-  var picked = EXAM_STATE.answers[q.id], l = LECTURE_BY_ID[q.lec];
-  var body = '<div class="qcard-choices" data-qtype="examchoice">';
-  shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-choice" data-exam-choice="'+i+'" data-qid="'+q.id+'"'+(picked===i?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
-  return '<div class="qcard tag-'+l.tag+'"><div class="qcard-top"><span class="chip src">Q'+n+'</span>'+sessChip(l)+'</div><p class="qcard-stem">'+escHtml(q.stem)+'</p>'+body+'</div></div>';
+  var a = EXAM_STATE.answers[q.id], l = LECTURE_BY_ID[q.lec], body = '', note = '';
+  if(q.type === 'multi'){
+    note = '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Select all that apply. Partial credit.</div>';
+    body = '<div class="qcard-choices" data-qtype="examchoice">';
+    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){ var on = a && a.indexOf(i) > -1; body += '<button type="button" class="qcard-choice multi" data-exam-multi="'+i+'" data-qid="'+q.id+'" aria-pressed="'+!!on+'"'+(on?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
+    body += '</div>';
+  } else if(q.type === 'match'){
+    note = '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Match each item. Each pair is scored separately.</div>';
+    var rights = shuffled(q.pairs.map(function(p,i){ return i; }));
+    body = '<div class="exam-match">' + shuffled(q.pairs.map(function(p,i){ return i; })).map(function(i){
+      return '<label class="exam-match-row"><span>'+escHtml(q.pairs[i][0])+'</span><select data-exam-match="'+i+'" data-qid="'+q.id+'"><option value="">Choose…</option>' +
+        rights.map(function(r){ return '<option value="'+r+'"'+(a && a[i] === r ? ' selected' : '')+'>'+escHtml(q.pairs[r][1])+'</option>'; }).join('') + '</select></label>';
+    }).join('') + '</div>';
+  } else {
+    body = '<div class="qcard-choices" data-qtype="examchoice">';
+    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-choice" data-exam-choice="'+i+'" data-qid="'+q.id+'"'+(a===i?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
+    body += '</div>';
+  }
+  return '<div class="qcard tag-'+l.tag+'"><div class="qcard-top"><span class="chip src">Q'+n+'</span>'+sessChip(l)+(q.pbox?'<span class="chip src">Patient box</span>':'')+(q.type!=='mcq'?'<span class="chip src">'+EXAM_KIND_LABEL[q.type]+'</span>':'')+'</div>'+pboxHTML(q)+'<p class="qcard-stem">'+escHtml(q.stem)+'</p>'+note+body+'</div>';
 }
 function renderMockExam(){
   if(window.shTTS) window.shTTS.stop();
@@ -3576,24 +3746,39 @@ function renderMockExam(){
   if(EXAM_STATE.phase === 'setup'){
     var mid = examPool('midterm').length, all = examPool('final').length, n = EXAM_STATE.scope === 'midterm' ? mid : all;
     var sizes = [10,20,40].filter(function(s){ return s < n; }).concat([n]);
-    c.innerHTML = '<div class="card section-block"><div class="eyebrow">'+icon('timer')+'Mock exam</div><h2>Simulate exam conditions</h2><p class="muted" style="max-width:62ch">A shuffled, multiple-choice-only set with a running clock. No feedback until you submit; anything you miss lands in Weak Spots.</p>' +
-      '<div class="seg" role="group" aria-label="Exam scope"><button type="button" data-exam-scope="midterm" aria-pressed="'+(EXAM_STATE.scope==='midterm')+'">Midterm · S1-4 <span class="mono">'+mid+'</span></button><button type="button" data-exam-scope="final" aria-pressed="'+(EXAM_STATE.scope==='final')+'">Final · all 9 <span class="mono">'+all+'</span></button></div>' +
+    var isMid = EXAM_STATE.scope === 'midterm';
+    c.innerHTML = '<div class="card section-block"><div class="eyebrow">'+icon('timer')+'Mock exam</div><h2>Simulate exam conditions</h2><p class="muted" style="max-width:64ch">A running clock and no feedback until you submit. Anything you don\'t get full credit on lands in Weak Spots.</p>' +
+      '<div class="seg" role="group" aria-label="Exam scope"><button type="button" data-exam-scope="midterm" aria-pressed="'+isMid+'">Midterm · S1-4</button><button type="button" data-exam-scope="final" aria-pressed="'+!isMid+'">Final · all 9</button></div>' +
+      '<div class="exam-kinds"><button type="button" class="exam-kind primary" data-exam-action="start-format"><b>'+(isMid?'Midterm format':'Exam format')+' · '+EXAM_FORMAT.total+' questions</b><span>'+EXAM_FORMAT.pbox+' Patient Box cases, '+EXAM_FORMAT.multi+' multiple-answer (partial credit), '+EXAM_FORMAT.match+' matching, the rest multiple choice'+(isMid?'. Built to match Dr. Abou-Arraj\'s email; leaves out what Dr. Kaur said isn\'t on the midterm.':'.')+'</span></button></div>' +
+      '<h3 style="margin:18px 0 8px;font-size:1rem">Or a multiple-choice sprint <span class="mono faint" style="font-size:.8rem">'+n+' in the pool</span></h3>' +
       '<div class="size-picks">' + sizes.map(function(s){ return '<button type="button" class="size-pick" data-exam-action="start" data-size="'+s+'"><b>'+s+'</b><span>'+(s===n?'every question':'questions')+'</span></button>'; }).join('') + '</div></div>';
     c.querySelectorAll('[data-exam-scope]').forEach(function(b){ b.addEventListener('click', function(){ EXAM_STATE.scope = b.getAttribute('data-exam-scope'); renderMockExam(); }); });
     return;
   }
   if(EXAM_STATE.phase === 'active'){
-    c.innerHTML = '<div class="card section-block exam-bar"><div class="exam-toolbar"><span class="exam-progress" id="examProg">'+Object.keys(EXAM_STATE.answers).length+' / '+EXAM_STATE.pool.length+' answered</span><span class="exam-timer" id="examTimer">0:00</span><button type="button" class="btn primary" data-exam-action="submit">Submit exam</button></div></div>' +
+    c.innerHTML = '<div class="card section-block exam-bar"><div class="exam-toolbar"><span class="exam-progress" id="examProg">'+answeredCount()+' / '+EXAM_STATE.pool.length+' answered</span><span class="exam-timer" id="examTimer">0:00</span><button type="button" class="btn primary" data-exam-action="submit">Submit exam</button></div></div>' +
       '<div class="qlist" id="examList">' + EXAM_STATE.pool.map(function(q,i){ return examCardHTML(q, i+1); }).join('') + '</div>';
+    document.getElementById('examList').addEventListener('change', function(e){
+      var s = e.target.closest('[data-exam-match]'); if(!s) return;
+      var qid = s.getAttribute('data-qid'), li = parseInt(s.getAttribute('data-exam-match'),10), m = EXAM_STATE.answers[qid] = EXAM_STATE.answers[qid] || {};
+      if(s.value === '') delete m[li]; else m[li] = parseInt(s.value,10);
+      updateExamProg();
+    });
     if(EXAM_STATE.timer) clearInterval(EXAM_STATE.timer);
     EXAM_STATE.timer = setInterval(function(){ var el = document.getElementById('examTimer'); if(!el){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; return; } el.textContent = formatElapsed(Date.now() - EXAM_STATE.startedAt); }, 1000);
     return;
   }
-  var total = EXAM_STATE.pool.length, right = 0, missed = [], byLec = {};
-  EXAM_STATE.pool.forEach(function(q){ var ok = EXAM_STATE.answers[q.id] === q.answer; if(ok) right++; else missed.push(q); var b = byLec[q.lec] = byLec[q.lec] || {r:0,t:0}; b.t++; if(ok) b.r++; });
-  var pct = total ? Math.round(100*right/total) : 0;
-  var h = '<div class="card section-block"><div class="eyebrow">Mock exam · results</div><div class="score-hero"><b>'+pct+'%</b><span class="muted">'+right+' of '+total+' correct · '+formatElapsed(EXAM_STATE.finishedElapsed)+'</span></div>' +
-    '<div style="margin:14px 0 4px">' + LECTURES.filter(function(l){ return byLec[l.id]; }).map(function(l){ var b = byLec[l.id]; return '<div class="weak-row tag-'+l.tag+'" style="padding:8px 0"><span>'+sessChip(l)+' '+escHtml(shortTitle(l))+'</span><span class="mono">'+b.r+'/'+b.t+'</span><div class="bar"><i style="width:'+Math.round(100*b.r/b.t)+'%"></i></div></div>'; }).join('') + '</div>' +
+  var total = EXAM_STATE.pool.length, pts = 0, missed = [], byLec = {}, byKind = {};
+  EXAM_STATE.pool.forEach(function(q){
+    var p = examPoints(q); pts += p; if(p < 1) missed.push(q);
+    var b = byLec[q.lec] = byLec[q.lec] || {r:0,t:0}; b.t++; b.r += p;
+    var kk = q.pbox ? 'Patient box' : EXAM_KIND_LABEL[q.type]; var k2 = byKind[kk] = byKind[kk] || {r:0,t:0}; k2.t++; k2.r += p;
+  });
+  var fmt = function(x){ return Math.round(x*10)/10; };
+  var pct = total ? Math.round(100*pts/total) : 0;
+  var h = '<div class="card section-block"><div class="eyebrow">Mock exam · results</div><div class="score-hero"><b>'+pct+'%</b><span class="muted">'+fmt(pts)+' of '+total+' points · '+formatElapsed(EXAM_STATE.finishedElapsed)+'</span></div>' +
+    '<div style="margin:14px 0 4px">' + LECTURES.filter(function(l){ return byLec[l.id]; }).map(function(l){ var b = byLec[l.id]; return '<div class="weak-row tag-'+l.tag+'" style="padding:8px 0"><span>'+sessChip(l)+' '+escHtml(shortTitle(l))+'</span><span class="mono">'+fmt(b.r)+'/'+b.t+'</span><div class="bar"><i style="width:'+Math.round(100*b.r/b.t)+'%"></i></div></div>'; }).join('') + '</div>' +
+    (EXAM_STATE.kind === 'format' ? '<p class="mono faint" style="font-size:.8rem;margin:10px 0 0">' + Object.keys(byKind).map(function(k){ return k + ' ' + fmt(byKind[k].r) + '/' + byKind[k].t; }).join(' · ') + '</p>' : '') +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" class="btn primary" data-exam-action="retake">'+icon('shuffle')+'New mock exam</button>' + (missed.length ? '<button type="button" class="btn" data-set-view="weak-spots">'+icon('target')+'Drill in Weak Spots</button>' : '') + '</div></div>';
   h += missed.length ? '<h3>Review what you missed ('+missed.length+')</h3><div class="qlist" id="examMissedList">' + missed.map(qCardHTML).join('') + '</div>' : '<div class="card"><p style="margin:0">Clean sweep: nothing missed.</p></div>';
   c.innerHTML = h;
@@ -3748,14 +3933,23 @@ function renderCompendium(){
         EXAM_STATE.answers[ec.getAttribute('data-qid')] = parseInt(ec.getAttribute('data-exam-choice'),10);
         ec.closest('.qcard-choices').querySelectorAll('.qcard-choice').forEach(function(b){ b.removeAttribute('data-selected'); });
         ec.setAttribute('data-selected','true');
-        var pe = document.getElementById('examProg'); if(pe) pe.textContent = Object.keys(EXAM_STATE.answers).length + ' / ' + EXAM_STATE.pool.length + ' answered';
+        updateExamProg();
+        return;
+      }
+      var em = e.target.closest('[data-exam-multi]');
+      if(em){
+        var eq = em.getAttribute('data-qid'), ei = parseInt(em.getAttribute('data-exam-multi'),10), arr = EXAM_STATE.answers[eq] = EXAM_STATE.answers[eq] || [];
+        var pos = arr.indexOf(ei);
+        if(pos > -1){ arr.splice(pos,1); em.removeAttribute('data-selected'); em.setAttribute('aria-pressed','false'); } else { arr.push(ei); em.setAttribute('data-selected','true'); em.setAttribute('aria-pressed','true'); }
+        updateExamProg();
         return;
       }
       var ea = e.target.closest('[data-exam-action]');
       if(ea){
         var a = ea.getAttribute('data-exam-action');
-        if(a === 'start') startMockExam(parseInt(ea.getAttribute('data-size'),10));
-        else if(a === 'submit'){ var left = EXAM_STATE.pool.length - Object.keys(EXAM_STATE.answers).length; if(left > 0 && ea.getAttribute('data-confirm') !== '1'){ ea.setAttribute('data-confirm','1'); ea.textContent = left + ' unanswered: submit anyway?'; return; } submitMockExam(); }
+        if(a === 'start') startMockExam(parseInt(ea.getAttribute('data-size'),10), 'mcq');
+        else if(a === 'start-format') startMockExam(EXAM_FORMAT.total, 'format');
+        else if(a === 'submit'){ var left = EXAM_STATE.pool.length - answeredCount(); if(left > 0 && ea.getAttribute('data-confirm') !== '1'){ ea.setAttribute('data-confirm','1'); ea.textContent = left + ' unanswered: submit anyway?'; return; } submitMockExam(); }
         else if(a === 'retake'){ EXAM_STATE.phase = 'setup'; renderCompendiumContent(); }
         return;
       }
@@ -3956,7 +4150,7 @@ var ARCADE = (function(){
     if(scope === 'all') return LECTURES.map(function(l){ return l.id; });
     return [scope];
   }
-  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && ids.indexOf(q.lec) > -1; }); }
+  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && ids.indexOf(q.lec) > -1; }); }
   function termPool(scope, filter){ var ids = scopeLecs(scope); return PERIO_TERMS.filter(function(t){ return ids.indexOf(t.lec) > -1 && (!filter || filter(t)); }); }
   function scopeSelectHTML(kind, min){
     min = min || 6;
@@ -5262,9 +5456,9 @@ window.SH_GOTO = function(g){
 window.SH_EXPORT = {
   lectures: LECTURES.map(function(l){ return { id:l.id, title:'S'+l.num+' ' + l.title, who:l.who, status:l.status }; }),
   questions: QUESTIONS.map(function(q){
-    var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.type === 'match' ? q.pairs.map(function(p){ return p.join(': '); }).join('; ') : (q.answer || '');
+    var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'multi' ? q.correct.map(function(i){ return q.choices[i]; }).join('; ') : q.type === 'sequence' ? q.steps.join(' → ') : q.type === 'match' ? q.pairs.map(function(p){ return p.join(': '); }).join('; ') : (q.answer || '');
     if(q.ex) hint = hint ? hint + ' — ' + q.ex : q.ex;
-    return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
+    return { id:q.id, lec:q.lec, text:(q.pbox ? q.pbox.map(function(r){ return r.join(': '); }).join('. ') + '. ' : '') + q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
   }),
   sections: shSearchSections(),
   hints: EXAM_HINTS.map(function(x){ return { lec:x.lec, quote:x.quote }; }),

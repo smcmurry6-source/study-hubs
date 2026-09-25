@@ -63,6 +63,17 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-26 (perio: midterm format, Perio Project/Cowork)** — From Dr. Abou-Arraj's midterm email (Oct 1,
+  10:00 am, rooms 220/222, ~40 questions: mostly MCQ, a few Patient Box cases, a few multiple-answer with
+  partial credit, matching, no essays). `hubs/perio` gains a `pbox` question field (case table rendered
+  above the stem) and a `multi` type (`correct:[...]`, Canvas-style partial credit: +1/n per right pick,
+  −1/n per wrong pick, floor 0). 29 new items (13 Patient Box, 19 multiple-answer, some overlap). Mock Exam
+  gets a 40-question exam-format option (5 Patient Box, 5 multi, 3 matching, rest MCQ, spread across
+  sessions); matching is scored per pair; `sh:mock-done` counts full-credit items. Course Home has a
+  "Midterm day" card. Arcade bank games skip `pbox` items. Three-way merged onto the 28 commits since
+  6f97c09 (explanations, Report button, CLASS_ROW, choice tracking); CI smoke + lint pass locally.
+  No reading text changed, so no narration was regenerated.
+
 - **2026-09-25 (rank order + phone panel, Claude Code)** — Stone is now the first rank (0 XP) and Antique the second
   (300 XP): only the order of the first two `TIERS` entries in `widget/ranks.js` changed; server tier numbers are the same.
   Dashboard ranks panel fits phones (grid columns `minmax(0,1fr)`).
