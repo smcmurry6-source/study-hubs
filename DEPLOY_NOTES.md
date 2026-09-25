@@ -63,6 +63,11 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (nuke countdown key fix, Claude Code, #5)** — `runNukeCountdownKeyCanvas` in `widget/v3.js` now keys each
+  frame against its own background (sampled at the crop's four corners; falls back to the fixed green if they disagree)
+  instead of one fixed green. The countdown clip whites out on its own from ~12.25 s, so the fixed key left a pale green
+  square around the icon until the 13 s blast; now the icon swells into a soft white disc as the clip whitens. Timing
+  and `nuke-countdown.mp3` unchanged (its build-up peaks ~12-12.5 s, which is why the blast stays at 13 s).
 - **2026-09-26 (perio: midterm format, Perio Project/Cowork)** — From Dr. Abou-Arraj's midterm email (Oct 1,
   10:00 am, rooms 220/222, ~40 questions: mostly MCQ, a few Patient Box cases, a few multiple-answer with
   partial credit, matching, no essays). `hubs/perio` gains a `pbox` question field (case table rendered
