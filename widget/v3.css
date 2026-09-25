@@ -451,6 +451,13 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-rank-art{display:block; overflow:visible;}
 .sh-rank-mini{display:inline-flex; width:20px; height:20px; flex:0 0 auto; vertical-align:-5px; margin-right:6px;}
 .sh-rank-mini svg{width:100%; height:100%;}
+.sh-rank-mini{position:relative;}
+.sh-rank-mini:has(.sh-rank-lv){margin-right:11px;}
+.sh-rank-lv{position:absolute; right:-5px; bottom:-3px; min-width:11px; height:11px; padding:0 2.5px; border-radius:4px; display:flex; align-items:center; justify-content:center;
+  font:700 8px/1 Georgia, 'Times New Roman', serif; letter-spacing:.02em; color:#fff; background:#2A2622; box-shadow:0 0 0 1.2px var(--sh-lv-ring, #C69A4A);}
+.sh-lv-antique{--sh-lv-ring:#C69A4A;} .sh-lv-stone{--sh-lv-ring:#BDB6AB;} .sh-lv-bronze{--sh-lv-ring:#E09A5E;} .sh-lv-silver{--sh-lv-ring:#E4E9EE;}
+.sh-lv-gold{--sh-lv-ring:#F6CD55;} .sh-lv-diamond{--sh-lv-ring:#9EE6FF;} .sh-lv-dark{--sh-lv-ring:#B57BFF;}
+.sh-has-rank[data-rank-lv]::after{content:attr(data-rank-lv); margin-left:6px; padding:1px 5px; border-radius:5px; font:700 10px/1.4 Georgia, serif; background:rgba(0,0,0,.08); color:inherit;}
 .sh-has-rank::before{content:""; display:inline-block; width:17px; height:17px; margin-right:6px; vertical-align:-3.5px; background:var(--sh-rank-img) center/contain no-repeat;}
 
 .sh-rank-sec{font-family:var(--shw-font); color:var(--shw-ink);}

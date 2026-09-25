@@ -255,19 +255,21 @@
       // light on the ring
       disc += '<path d="M18 40 A52 52 0 0 1 56 8" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none" stroke-linecap="round"/>';
     }
-    if (rich && opt.level) {
-      var lv = Math.max(1, Math.min(3, opt.level)), pip = "";
-      for (var k = 0; k < lv; k++) {
-        var ang = (90 + (k - (lv - 1) / 2) * 13) * Math.PI / 180, cx = 64 + 56.5 * Math.cos(ang), cy = 64 + 56.5 * Math.sin(ang);
-        pip += '<circle cx="' + cx.toFixed(2) + '" cy="' + cy.toFixed(2) + '" r="3.4" fill="' + D[3] + '" stroke="rgba(0,0,0,.55)" stroke-width="1"/>' +
-          '<circle cx="' + (cx - .9).toFixed(2) + '" cy="' + (cy - .9).toFixed(2) + '" r="1.1" fill="#fff" opacity=".85"/>';
+    /* level numeral: an engraved plaque on the rim (large), or a corner tag (small icons) */
+    var over2 = '';
+    if (opt.level) {
+      var num = ROMAN[Math.max(1, Math.min(3, opt.level)) - 1];
+      if (rich) {
+        var pw = 14 + num.length * 8;
+        disc += '<g transform="translate(64 113)"><rect x="' + (-pw / 2) + '" y="-11" width="' + pw + '" height="22" rx="6" fill="url(#' + p + 'ring)" stroke="rgba(0,0,0,.55)" stroke-width="1.2"/>' +
+          '<rect x="' + (-pw / 2 + 2) + '" y="-9" width="' + (pw - 4) + '" height="18" rx="4.5" fill="' + D[2] + '" opacity=".88"/>' +
+          '<text x="0" y="5.2" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" letter-spacing="1" fill="' + D[3] + '" stroke="rgba(0,0,0,.35)" stroke-width=".4">' + num + '</text></g>';
       }
-      disc += pip;
     }
     var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')">' + shadow + under + body + over + '</g></g>';
     defs += '<clipPath id="' + p + 'dclip2"><circle cx="64" cy="64" r="' + (rich ? 60 : 58) + '"/></clipPath>';
     return '<svg class="sh-rank-art sh-rank-' + t + '" width="' + px + '" height="' + px + '" viewBox="0 0 128 128" role="img" aria-label="' +
-      TIERS[tier].name + ' handpiece"><defs>' + defs + '</defs>' + disc + g + '</svg>';
+      TIERS[tier].name + ' handpiece' + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
   }
 
   /* medallion interior: centre, mid, edge, spotlight colour */
@@ -385,6 +387,7 @@
       ["sh-ribbon-name", "shname-badge"].forEach(function(id){
         var el = document.getElementById(id); if (!el) return;
         el.classList.add("sh-has-rank"); el.style.setProperty("--sh-rank-img", uri); el.setAttribute("data-rank", TIERS[t].name);
+        if (profile && profile.level) el.setAttribute("data-rank-lv", ROMAN[profile.level - 1]);
       });
     }
 
@@ -539,9 +542,11 @@
   window.shRanks = {
     TIERS: TIERS, TROPHIES: TROPHIES, MASTERY: MASTERY,
     art: art,
-    mini: function(tier){
-      tier = Math.max(0, Math.min(6, tier | 0));
-      return miniCache[tier] || (miniCache[tier] = '<span class="sh-rank-mini" title="' + TIERS[tier].name + ' handpiece">' + art(tier, 20) + '</span>');
+    mini: function(tier, level){
+      tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
+      var k = tier + ":" + level;
+      return miniCache[k] || (miniCache[k] = '<span class="sh-rank-mini" title="' + rankName(tier, level) + '">' + art(tier, 20) +
+        (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
     mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri, rankName: rankName,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
