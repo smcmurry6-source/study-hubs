@@ -12,7 +12,7 @@ does it differently.
 
 ## Repo map
 
-- `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES` / `TERMS`
+- `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`
   arrays near the top of the script; add or archive a hub there, not in markup.
 - `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).

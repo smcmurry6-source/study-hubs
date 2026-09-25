@@ -73,6 +73,8 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
   which the arcades reuse. Light/dark is one shared key, `sh_theme` (old per-page keys still read). Phones: mode tabs
   get their own labeled row in both hubs; MSK lecture chips wrap. Perio's class % now sits inside the explanation
   (hidden until answered). MSK mock exam is exam-style (pick all, submit, review; `STATE.mock.picks/order/submitted`).
+  The dashboard no longer groups hubs by term (`TERMS` and each class's `term` field are gone); every class with a
+  live hub shows in one grid, since old exams get archived.
 - **2026-09-25** — Added `CLAUDE.md` (imports this file) so Claude Code sessions
   start with the repo rules; Claude Code deploys go through branches + PRs.
   Kokoro model re-hosted as release `kokoro-model-v1.0`. No site changes.
