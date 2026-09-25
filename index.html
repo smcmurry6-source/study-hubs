@@ -275,6 +275,28 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .pulse-grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px;}
 .panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px 22px; box-shadow:var(--shadow); min-width:0;}
 .panel h3{font-size:16px; letter-spacing:-.005em;}
+/* survey card: one short survey at a time, bottom corner, never blocks the page */
+.survey{position:fixed; z-index:50; right:16px; bottom:16px; width:min(380px, calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto;
+  background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow-lift); padding:18px 18px 16px;
+  opacity:0; transform:translateY(16px); transition:opacity .3s, transform .3s cubic-bezier(.2,.8,.3,1);}
+.survey.is-shown{opacity:1; transform:none;}
+.survey-eyebrow{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);}
+.survey h3{font-family:var(--serif); font-weight:400; font-size:24px; line-height:1.15; margin:4px 32px 10px 0;}
+.survey-x{position:absolute; top:10px; right:10px; width:32px; height:32px; border:0; border-radius:50%; background:transparent; color:var(--ink-3); font-size:22px; cursor:pointer;}
+.survey-x:hover{background:var(--surface-2); color:var(--ink);}
+.survey-q{margin:12px 0 0;}
+.survey-q p{margin:0 0 8px; font-size:14.5px; font-weight:600;}
+.survey-opts{display:flex; flex-wrap:wrap; gap:6px;}
+.survey-opt{font:inherit; font-size:13.5px; padding:7px 12px; border-radius:99px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink); cursor:pointer;}
+.survey-opt[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--on-ink);}
+.survey-scale .survey-opt{min-width:40px; text-align:center;}
+.survey-scale-ends{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin-top:4px;}
+.survey textarea{width:100%; min-height:64px; font:inherit; font-size:14px; padding:8px 10px; border-radius:10px; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); resize:vertical;}
+.survey-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;}
+.survey-foot .btn{padding:9px 16px; font-size:14px;}
+.survey-skip{font:inherit; font-size:13.5px; border:0; background:none; color:var(--ink-3); cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
+.survey-thanks{font-size:15px; margin:6px 0 2px;}
+@media (max-width:600px){ .survey{right:8px; left:8px; bottom:8px; width:auto;} }
 .golden-line{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:-6px 0 16px; padding:10px 14px; border-radius:12px; border:1px solid color-mix(in srgb, #C9971C 45%, var(--line)); background:color-mix(in srgb, #C9971C 8%, var(--surface)); font-size:14px; color:var(--ink-2);}
 .golden-line svg{flex:0 0 auto; width:18px; height:18px; color:#C9971C;}
 .golden-line b{color:var(--ink);}
@@ -462,6 +484,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 </div>
 
 <script src="widget/vendor/supabase-2.117.2.js" defer></script>
+<script src="widget/clicks.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -492,8 +515,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"perio", cls:"perio", title:"Periodontology D2 Compendium", code:"Periodontology · Full unit",
       exams:[ { name:"Periodontology midterm (S1-4)", label:"Midterm", date:"2026-10-01", code:"Periodontology · Midterm" },
               { name:"Periodontology final", label:"Final", date:"2026-11-19", code:"Periodontology · Final" } ], updated:"2026-09-25",
-      desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam, a diagram atlas and the Pocket Arcade.",
-      modes:["Compendium","Plain-English notes","Review tables","Atlas","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
+      desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
+      modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
   var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3" };
   var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "fixed-pros":"pros", perio:"perio" };
@@ -820,6 +843,75 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
   /* supabase-js is a deferred, self-hosted script (widget/vendor/), so it runs after this
      one: the page renders first and the class data fills in once the library is ready. */
+  function surveyVisitor(){
+    if (VISITOR) return VISITOR;
+    try{
+      VISITOR = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("v-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+      localStorage.setItem("sh_visitor_id", VISITOR);
+    }catch(e){}
+    return VISITOR;
+  }
+  function startSurvey(sb){
+    var me = surveyVisitor();
+    if (!me) return;
+    sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){
+      var sv = res && res.data && res.data[0];
+      if (!sv || ls("sh_survey_done_" + sv.id)) return;
+      var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 3) : [];
+      if (!qs.length) return;
+      var answers = {};
+      var box = document.createElement("section");
+      box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Quick survey");
+      var h = '<button type="button" class="survey-x" aria-label="No thanks">×</button><div class="survey-eyebrow">Quick survey · ' +
+        (qs.length === 1 ? "1 question" : qs.length + " questions") + '</div><h3>' + esc(sv.title) + '</h3>';
+      qs.forEach(function(q, qi){
+        var id = String(q.id || ("q" + (qi + 1)));
+        h += '<div class="survey-q" data-sq="' + esc(id) + '" data-kind="' + esc(q.kind || "choice") + '"><p>' + esc(q.prompt || "") + '</p>';
+        if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt || "Your answer") + '"></textarea>';
+        else if (q.kind === "scale") {
+          h += '<div class="survey-opts survey-scale">';
+          for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + n + '">' + n + '</button>';
+          h += '</div><div class="survey-scale-ends"><span>' + esc((q.ends && q.ends[0]) || "Not at all") + '</span><span>' + esc((q.ends && q.ends[1]) || "Very") + '</span></div>';
+        } else {
+          h += '<div class="survey-opts">' + (q.options || []).map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+        }
+        h += '</div>';
+      });
+      h += '<div class="survey-foot"><button type="button" class="survey-skip">No thanks</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+      box.innerHTML = h;
+      document.body.appendChild(box);
+      requestAnimationFrame(function(){ box.classList.add("is-shown"); });
+      var send = box.querySelector(".survey-send");
+      function refresh(){
+        box.querySelectorAll("textarea").forEach(function(t){ var id = t.closest(".survey-q").getAttribute("data-sq"); var v = t.value.trim(); if (v) answers[id] = v.slice(0, 600); else delete answers[id]; });
+        send.disabled = !Object.keys(answers).length;
+      }
+      function done(payload, thanks){
+        try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
+        sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){}, function(){});
+        if (!thanks){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); return; }
+        box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
+        setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+      }
+      box.addEventListener("input", refresh);
+      box.addEventListener("click", function(e){
+        var opt = e.target.closest(".survey-opt");
+        if (opt){
+          var q = opt.closest(".survey-q"), id = q.getAttribute("data-sq"), multi = q.getAttribute("data-kind") === "multi";
+          var on = opt.getAttribute("aria-pressed") !== "true";
+          if (!multi) q.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+          opt.setAttribute("aria-pressed", String(on));
+          var picked = Array.prototype.map.call(q.querySelectorAll('.survey-opt[aria-pressed="true"]'), function(b){ return b.getAttribute("data-sv"); });
+          if (!picked.length) delete answers[id];
+          else answers[id] = multi ? picked : (q.getAttribute("data-kind") === "scale" ? +picked[0] : picked[0]);
+          refresh(); return;
+        }
+        if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
+        else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
+      });
+    }, function(){});
+  }
+
   function startClassData(){
   var sb = null;
   try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
@@ -854,6 +946,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       }catch(e){}
     });
     setTimeout(function(){ if ($("liveCount").textContent === "–") $("liveCount").textContent = "0"; }, 6000);
+
+    /* what gets clicked (widget/clicks.js), so we know what to improve or retire */
+    if (window.shClicks) window.shClicks.start({ sb:sb, hub:"dashboard", visitor:surveyVisitor(), section:function(){ return "dashboard"; } });
+
+    /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
+    setTimeout(function(){ startSurvey(sb); }, 4000);
 
     /* Golden Probe (an easter egg in the hubs): who found today's, per hub */
     sb.rpc("get_golden_today").then(function(res){

@@ -1946,4 +1946,11 @@
     eggScript.src = new URL("eggs.js", thisScript.src).href; eggScript.async = true;
     document.head.appendChild(eggScript);
   }
+  /* click analytics (widget/clicks.js): what people use, for improving each hub */
+  if (!EXPORT_ONLY && supabase) {
+    var clickScript = document.createElement("script");
+    clickScript.src = new URL("clicks.js", thisScript.src).href; clickScript.async = true;
+    clickScript.onload = function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); };
+    document.head.appendChild(clickScript);
+  }
 })();
