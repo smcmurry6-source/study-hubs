@@ -301,6 +301,19 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .golden-line svg{flex:0 0 auto; width:18px; height:18px; color:#C9971C;}
 .golden-line b{color:var(--ink);}
 .panel .panel-sub{font-size:13px; color:var(--ink-3); margin-top:2px;}
+.p-ranks{grid-column:1 / -1;}
+.ranks-wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:22px; align-items:start;}
+.ladder{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:14px;}
+.ladder .rung{display:flex; flex-direction:column; align-items:center; text-align:center; gap:4px; padding:10px 4px 8px; border-radius:14px; border:1px solid transparent; font-size:12.5px; color:var(--ink-3);}
+.ladder .rung svg{width:100%; max-width:84px; height:auto; filter:drop-shadow(0 5px 10px rgba(0,0,0,.25));}
+.ladder .rung b{color:var(--ink); font-size:13.5px;}
+.ladder .rung.me{border-color:var(--line-2); background:var(--surface-2);}
+.ladder .rung.me .you{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink);}
+.sh-rank-mini{display:inline-flex; width:20px; height:20px; flex:none; vertical-align:-5px; margin-right:6px;}
+.sh-rank-mini svg{width:100%; height:100%;}
+.board .nm .sh-rank-mini{margin-right:8px;}
+.board .xp{font-variant-numeric:tabular-nums;}
+.stat .who .sh-rank-mini{width:18px; height:18px; margin-right:5px;}
 .p-hours{grid-column:span 7;}
 .p-streaks{grid-column:span 5;}
 .p-correct{grid-column:span 5;}
@@ -376,6 +389,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   .hero{grid-template-columns:1fr;}
   .hero-side{border-left:0; border-top:1px solid var(--line);}
   .p-hours,.p-streaks,.p-correct,.p-arcade{grid-column:1 / -1;}
+  .ranks-wrap{grid-template-columns:1fr;}
+  .ladder{grid-template-columns:repeat(4, 1fr);}
 }
 @media (max-width:560px){
   #wrap{padding:0 16px 64px;}
@@ -442,6 +457,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     </div>
     <p class="golden-line" id="goldenLine" hidden></p>
     <div class="pulse-grid">
+      <div class="panel p-ranks">
+        <h3>Handpiece ranks</h3>
+        <p class="panel-sub">XP from every hub: 10 for a new question right, 2 for a repeat, 1 for trying, 20 per day studied</p>
+        <div class="ranks-wrap"><div id="rankBoard"><p class="muted">Loading…</p></div><div class="ladder" id="rankLadder"></div></div>
+      </div>
       <div class="panel p-hours">
         <h3>When people study</h3>
         <p class="panel-sub">All hubs combined, by hour of day</p>
@@ -485,6 +505,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
 <script src="widget/vendor/supabase-2.117.2.js" defer></script>
 <script src="widget/clicks.js" defer></script>
+<script src="widget/ranks.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -912,11 +933,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){});
   }
 
+  function rankMini(t){ return window.shRanks && t != null ? window.shRanks.mini(t) : ""; }
   function startClassData(){
   var sb = null;
   try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
   if (!sb){
-    ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard"].forEach(function(id){ unavailable(id); });
+    ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
     if (!localName && VISITOR){
       sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data) greet(r.data); });
@@ -984,12 +1006,27 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         '<p class="hist-note">Busiest around <b>' + hourLabel(peak) + '</b>. Right now (green) is running at ' + nowShare + '% of the peak.</p>';
     }, function(){ unavailable("pulseHist"); });
 
+    /* handpiece ranks: the top ten by XP, plus you */
+    sb.rpc("get_rank_board", { p_visitor:VISITOR || null, p_limit:10 }).then(function(res){
+      var rows = (res && res.data) || [], R = window.shRanks;
+      if (!rows.length || !R){ unavailable("rankBoard", "No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
+      $("rankBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
+        return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + (r.is_me ? " (you)" : "") +
+          '</span><span class="val xp">' + Number(r.xp).toLocaleString() + '<small>XP</small></span></li>';
+      }).join("") + '</ol>';
+      var me = rows.filter(function(r){ return r.is_me; })[0];
+      $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
+        return '<div class="rung' + (me && me.tier === i ? ' me' : '') + '">' + R.art(i, 84, { animate: me && me.tier === i }) + '<b>' + t.name + '</b><span>' +
+          (i ? Number(t.at).toLocaleString() + " XP" : "Start") + '</span>' + (me && me.tier === i ? '<span class="you">You</span>' : '') + '</div>';
+      }).join("");
+    }, function(){ unavailable("rankBoard"); });
+
     /* day streaks */
     sb.rpc("get_leaderboard", { p_limit:6 }).then(function(res){
       var rows = (res && res.data) || [];
       if (!rows.length){ unavailable("pulseLeaderboard", "No streaks yet. Answer questions two days in a row to start one."); return; }
       $("pulseLeaderboard").innerHTML = '<ol class="board">' + rows.map(function(r, i){
-        return '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + esc(r.display_name) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
+        return '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
       }).join("") + '</ol>';
     }, function(){ unavailable("pulseLeaderboard"); });
 
@@ -998,7 +1035,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var rows = (res && res.data) || [];
       var act = rows.filter(function(r){ return r.kind === "active"; })[0], rec = rows.filter(function(r){ return r.kind === "record"; })[0];
       if (!act && !rec){ unavailable("pulseCorrect", "No runs yet. Get a few right in a row to set the first record."); return; }
-      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="who">' + esc(r.display_name) + '</div></div>' : ""; }
+      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="who">' + rankMini(r.tier) + esc(r.display_name) + '</div></div>' : ""; }
       $("pulseCorrect").innerHTML = '<div class="stat-pair">' + stat(act, "Longest run still going") + stat(rec, "All-time record") + '</div>';
     }, function(){ unavailable("pulseCorrect"); });
 
@@ -1027,7 +1064,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           var rows = (res && res.data) || [];
           if (!rows.length){ $("arcadeBoard").innerHTML = '<p class="muted">No ' + esc(name) + ' scores yet. Finish a game in the hub\'s Arcade to claim first place.</p>'; return; }
           $("arcadeBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
-            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
+            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
           }).join("") + '</ol>';
         }, function(){ unavailable("arcadeBoard"); });
       }

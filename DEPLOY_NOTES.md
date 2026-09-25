@@ -34,7 +34,7 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js` and `widget/clicks.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js` and `widget/ranks.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -63,6 +63,21 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (handpiece ranks, trophies, link devices, Claude Code)** — `widget/ranks.js` (loaded by v3.js and the
+  dashboard) draws seven tiers of handpiece medallions in inline SVG (Antique, Stone, Bronze, Silver, Gold, Diamond,
+  Dark Matter; textures are SVG filters, the glint/sparkles animate only at large sizes) and mounts the rank card,
+  per-hub mastery bar (Bronze 50 / Silver 75 / Gold 90 / Crown 100% of the bank right on the latest try), a 14-trophy
+  case (6 secret ones read "???" until earned), unlockable accent colours in Settings (`sh_pref_accent`; injects
+  `--accent/--accent-ink/--accent-soft` for light + dark) and **Link my devices** into the hub widget. XP is computed
+  on the server from `personal_answers` (`sh_visitor_xp`, private): 10 first-time right, 2 repeat right, 1 miss, 600/day
+  cap on answer XP, +20 per study day; tiers at 150/600/1500/3000/6000/12000 (`sh_tier`). Public RPCs:
+  `get_rank_profile`, `get_rank_board`, `get_hub_mastery`, `record_achievement` (whitelisted kinds: boss, owl,
+  rootcanal, mock90, mastery-*), `create_link_code`/`redeem_link_code` (6-char, 10 min, 10 tries/hour; redeeming moves
+  the device's rows onto the code maker's id, `visitor_links` records it). `get_leaderboard`,
+  `get_correct_streak_stats` and `get_arcade_leaderboard` gained a `tier` column (dropped + recreated). Hubs fire
+  `sh:mock-done {correct,total}` when a mock is submitted. Dashboard: "Handpiece ranks" panel (top 10 + ladder) and tier
+  icons on every board. `migration_v15.sql` **applied 2026-09-25 via the connector**. First dashboard survey
+  ("Help shape the hubs") published live the same day.
 - **2026-09-25 (Atlas retired; clicks + surveys, Claude Code)** — **Perio Atlas mode removed** at Sam's request (the
   diagrams were inaccurate; it had ~2 minutes of use from 5 people in two weeks). Removed from `hubs/perio/index.html`
   (tab, panel, `ATLAS_VIEWS`, `ATLAS_RENDERERS`, CSS) and the dashboard card. **Perio Project: drop Atlas from the split

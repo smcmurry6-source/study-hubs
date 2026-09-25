@@ -2769,6 +2769,9 @@ function renderMock(body){
         m.res[id] = ok;
         if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock', m.picks[id]);
       });
+      /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) */
+      var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
+      document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:m.ids.length } }));
       saveState(); renderMock(body); window.scrollTo(0,0);
     };
   } else {

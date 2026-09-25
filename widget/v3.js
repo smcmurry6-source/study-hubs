@@ -1946,6 +1946,13 @@
     eggScript.src = new URL("eggs.js", thisScript.src).href; eggScript.async = true;
     document.head.appendChild(eggScript);
   }
+  /* handpiece ranks, trophies, accent unlocks, link my devices (widget/ranks.js) */
+  if (!EXPORT_ONLY) {
+    var rankScript = document.createElement("script");
+    rankScript.src = new URL("ranks.js", thisScript.src).href; rankScript.async = true;
+    rankScript.onload = function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); };
+    document.head.appendChild(rankScript);
+  }
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
   if (!EXPORT_ONLY && supabase) {
     var clickScript = document.createElement("script");

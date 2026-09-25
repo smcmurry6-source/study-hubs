@@ -16,7 +16,7 @@ does it differently.
   arrays near the top of the script; add or archive a hub there, not in markup.
 - `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, and `widget/clicks.js`, click analytics) — shared cross-hub layer (search, class stats,
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, and `widget/ranks.js`, handpiece ranks) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. `question-banks/` — archived hubs' banks.
@@ -51,7 +51,7 @@ in more than 40% of MCQs). Run both locally before pushing; the smoke test needs
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
 
-- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js`.
+- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/ranks.js`.
 - Question / lecture counts match what you expect; no duplicate ids.
 - Grep that the feature you added (and anything from a merged-in branch) is present.
 - Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —

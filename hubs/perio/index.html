@@ -3559,6 +3559,9 @@ function submitMockExam(){
   EXAM_STATE.finishedElapsed = Date.now() - EXAM_STATE.startedAt;
   if(EXAM_STATE.timer){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; }
   EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, EXAM_STATE.answers[q.id] === q.answer, EXAM_STATE.answers[q.id]); });
+  /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) */
+  var nRight = EXAM_STATE.pool.filter(function(q){ return EXAM_STATE.answers[q.id] === q.answer; }).length;
+  document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:EXAM_STATE.pool.length } }));
   EXAM_STATE.phase = 'results'; renderCompendiumContent();
 }
 function examCardHTML(q, n){

@@ -158,6 +158,7 @@
     if (boss.hp === 0) {
       var me = H.name();
       H.send({ t: "boss-down", id: boss.id, by: me });
+      rpc("record_achievement", { p_visitor: VISITOR, p_kind: "boss", p_hub: HUB });
       defeatBoss(me);
     } else if (Date.now() - lastHitSend > 600) {
       lastHitSend = Date.now();
@@ -253,6 +254,7 @@
       if (rightAfter === 10) {
         wrongRun = 0; rightAfter = 0;
         H.confetti();
+        rpc("record_achievement", { p_visitor: VISITOR, p_kind: "rootcanal", p_hub: HUB });
         toast(row(IC.root, "Through the Root Canal", "Ten misses, then ten straight right. That's the whole procedure."), 6000, "is-gold");
       }
     } else wrongRun = 0;
@@ -262,6 +264,7 @@
       var night = new Date().toDateString();
       if (ls("sh_egg_owl") !== night) {
         ls("sh_egg_owl", night);
+        rpc("record_achievement", { p_visitor: VISITOR, p_kind: "owl", p_hub: HUB });
         toast(row(IC.owl, "Night Owl", "Studying at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + ". Respect. Now go to sleep."), 6000);
       }
     }

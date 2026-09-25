@@ -5,7 +5,7 @@
    --font-body ...), so the widget looks like part of whichever hub it is on, in light and dark.
    Fallbacks keep it readable on a page without those tokens. */
 :root{--sh-tabbar-h:60px;} /* height of the phone bottom bar, published so a hub's own mobile CSS can stack above it */
-#shstat-root, #shstat-backdrop, .shstat-streaktoast, .sh-egg, .sh-egg-board, .sh-update-toast, #sh-topbar, #shname-badge{
+#shstat-root, #shstat-backdrop, .shstat-streaktoast, .sh-egg, .sh-egg-board, .sh-rank-sec, .sh-accent-row, .sh-update-toast, #sh-topbar, #shname-badge{
   --shw-bg: var(--surface, #fff);
   --shw-bg2: var(--surface-2, #f2f3f4);
   --shw-ink: var(--ink, #15202A);
@@ -446,3 +446,93 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
   .sh-egg-boss{bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
   .sh-egg-luck.is-shown ~ .sh-egg-boss, .sh-egg-boss:has(~ .sh-egg-luck.is-shown){bottom:calc(var(--sh-tabbar-h) + 86px + env(safe-area-inset-bottom,0px));}
 }
+
+/* ================= handpiece ranks (widget/ranks.js) ================= */
+.sh-rank-art{display:block; overflow:visible;}
+.sh-rank-mini{display:inline-flex; width:20px; height:20px; flex:0 0 auto; vertical-align:-5px; margin-right:6px;}
+.sh-rank-mini svg{width:100%; height:100%;}
+.sh-has-rank::before{content:""; display:inline-block; width:17px; height:17px; margin-right:6px; vertical-align:-3.5px; background:var(--sh-rank-img) center/contain no-repeat;}
+
+.sh-rank-sec{font-family:var(--shw-font); color:var(--shw-ink);}
+.sh-rank-card{display:flex; align-items:center; gap:14px; padding:12px 14px 12px 10px; border-radius:18px; border:1px solid var(--shw-line);
+  background:radial-gradient(120% 140% at 0% 0%, var(--sh-tier-glow, rgba(0,0,0,.04)) 0%, transparent 60%), var(--shw-bg2);}
+.sh-tier-antique{--sh-tier-glow:rgba(176,122,60,.22);} .sh-tier-stone{--sh-tier-glow:rgba(140,134,124,.25);}
+.sh-tier-bronze{--sh-tier-glow:rgba(224,140,80,.28);} .sh-tier-silver{--sh-tier-glow:rgba(170,186,204,.35);}
+.sh-tier-gold{--sh-tier-glow:rgba(240,196,70,.32);} .sh-tier-diamond{--sh-tier-glow:rgba(110,200,245,.35);}
+.sh-tier-dark{--sh-tier-glow:rgba(140,80,255,.35);}
+.sh-rank-art-wrap{flex:0 0 auto; width:108px; height:108px; filter:drop-shadow(0 6px 14px rgba(0,0,0,.28));}
+.sh-rank-info{flex:1 1 auto; min-width:0;}
+.sh-rank-eyebrow{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--shw-ink3);}
+.sh-rank-name{font-family:var(--font-display, Georgia, serif); font-size:26px; line-height:1.1; margin:2px 0 4px;}
+.sh-tier-gold .sh-rank-name, .sh-tier-silver .sh-rank-name, .sh-tier-bronze .sh-rank-name, .sh-tier-diamond .sh-rank-name, .sh-tier-dark .sh-rank-name{
+  background:linear-gradient(100deg, var(--sh-n1) 0%, var(--sh-n2) 45%, var(--sh-n1) 55%, var(--sh-n3) 100%); background-size:220% 100%;
+  -webkit-background-clip:text; background-clip:text; color:transparent; animation:sh-name-sheen 5s linear infinite;}
+.sh-tier-bronze{--sh-n1:#8A4A1E; --sh-n2:#F2B27A; --sh-n3:#A8612C;}
+.sh-tier-silver{--sh-n1:#56616D; --sh-n2:#E9EEF3; --sh-n3:#7D8894;}
+.sh-tier-gold{--sh-n1:#9A6D05; --sh-n2:#FFE9A0; --sh-n3:#C4920F;}
+.sh-tier-diamond{--sh-n1:#1E86BE; --sh-n2:#D8F6FF; --sh-n3:#5AB6E6;}
+.sh-tier-dark{--sh-n1:#5B25D6; --sh-n2:#FF7AE0; --sh-n3:#44C8FF;}
+@keyframes sh-name-sheen{to{background-position:-220% 0;}}
+.sh-rank-xp{font-size:13.5px; color:var(--shw-ink2);}
+.sh-rank-xp b{color:var(--shw-ink); font-variant-numeric:tabular-nums;}
+.sh-rank-bar{height:7px; border-radius:99px; background:var(--shw-line); margin:8px 0 5px; overflow:hidden;}
+.sh-rank-bar i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg, var(--sh-n1, var(--shw-accent)), var(--sh-n2, var(--shw-accent)));}
+.sh-tier-antique .sh-rank-bar i{background:linear-gradient(90deg, #7A4A22, #D39A55);} .sh-tier-stone .sh-rank-bar i{background:linear-gradient(90deg, #6F6A63, #BDB6AB);}
+.sh-rank-next{font-size:12px; color:var(--shw-ink3);}
+
+.sh-mastery{margin:14px 2px 0;}
+.sh-mastery-top{display:flex; justify-content:space-between; font-size:13px; color:var(--shw-ink2);}
+.sh-mastery-top b{color:var(--shw-ink);}
+.sh-mastery-bar{position:relative; height:8px; border-radius:99px; background:var(--shw-line); margin:7px 0 6px;}
+.sh-mastery-bar i{display:block; height:100%; border-radius:99px; background:var(--shw-accent);}
+.sh-mastery-tick{position:absolute; top:-3px; width:3px; height:14px; margin-left:-1.5px; border-radius:2px; background:var(--shw-line2);}
+.sh-mastery-tick.is-hit{background:var(--shw-ink);}
+.sh-mastery-note{font-size:12px; color:var(--shw-ink3); line-height:1.4;}
+
+.sh-trophies-h{display:flex; justify-content:space-between; margin:16px 2px 8px; font-size:13px; font-weight:700; color:var(--shw-ink2); text-transform:uppercase; letter-spacing:.05em;}
+.sh-trophies-h b{color:var(--shw-ink);}
+.sh-trophies{display:grid; grid-template-columns:repeat(auto-fill, minmax(76px, 1fr)); gap:8px;}
+.sh-trophy{display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; padding:8px 4px; border-radius:12px; font-size:11.5px; line-height:1.2; color:var(--shw-ink3);}
+.sh-trophy-medal{position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%;
+  background:var(--shw-bg2); border:1.5px dashed var(--shw-line2); color:var(--shw-ink3);}
+.sh-trophy-medal svg{width:20px; height:20px;}
+.sh-trophy.is-earned{color:var(--shw-ink);}
+.sh-trophy.is-earned .sh-trophy-medal{border:0; color:#5A3A05; overflow:hidden;
+  background:radial-gradient(circle at 32% 28%, #FFF6CF 0 12%, #F6CD55 34%, #C9960F 70%, #7A5406 100%);
+  box-shadow:inset 0 0 0 2px rgba(255,236,170,.55), inset 0 -3px 6px rgba(90,58,5,.45), 0 3px 8px -2px rgba(120,80,5,.55);}
+.sh-trophy.is-earned .sh-trophy-medal::after{content:""; position:absolute; inset:-40%; background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.75) 50%, transparent 60%);
+  transform:translateX(-80%); animation:sh-medal-glint 4.5s ease-in-out infinite;}
+@keyframes sh-medal-glint{0%,60%{transform:translateX(-80%);} 80%,100%{transform:translateX(80%);}}
+.sh-rank-how{margin:14px 2px 0; font-size:12.5px; color:var(--shw-ink2);}
+.sh-rank-how summary{cursor:pointer; font-weight:600; color:var(--shw-ink);}
+.sh-rank-how p{margin:6px 0 0; line-height:1.5;}
+
+.sh-link{margin-top:14px;}
+.sh-link-toggle, .sh-link-make, .sh-link-go{font:inherit; font-size:13px; font-weight:600; padding:7px 14px; border-radius:99px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink); cursor:pointer;}
+.sh-link-body{margin-top:10px; padding:12px; border-radius:12px; background:var(--shw-bg2); font-size:13px; color:var(--shw-ink2);}
+.sh-link-body p{margin:0 0 10px; line-height:1.45;}
+.sh-link-step{margin-top:10px;} .sh-link-step b{display:block; margin-bottom:6px; color:var(--shw-ink);}
+.sh-link-code{margin-top:8px;} .sh-link-code small{display:block; margin-top:4px;}
+.sh-link-big{font-family:var(--shw-mono); font-size:28px; font-weight:700; letter-spacing:.12em; color:var(--shw-ink);}
+.sh-link-enter{display:flex; gap:8px;}
+.sh-link-enter input{flex:1; min-width:0; font-family:var(--shw-mono); font-size:18px; letter-spacing:.14em; text-transform:uppercase; padding:6px 10px; border-radius:10px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink);}
+.sh-link-msg{margin-top:6px; min-height:1.2em;}
+
+.sh-accent-swatches{display:flex; flex-wrap:wrap; gap:6px;}
+.sh-accent-swatches button{display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:12.5px; font-weight:600; padding:6px 11px 6px 7px; border-radius:99px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink); cursor:pointer;}
+.sh-accent-swatches button[aria-pressed="true"]{border-color:var(--shw-ink); box-shadow:inset 0 0 0 1px var(--shw-ink);}
+.sh-accent-swatches button:disabled{opacity:.5; cursor:not-allowed;}
+.sh-acc-dot{width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);}
+.sh-acc-default{background:conic-gradient(#a83a2c 0 50%, #A23F5E 0);}
+.sh-acc-lock{width:12px; height:12px;}
+
+.sh-rankup{position:fixed; inset:0; z-index:10004; display:flex; align-items:center; justify-content:center; background:rgba(8,6,14,.55); opacity:0; transition:opacity .3s; padding:16px;}
+.sh-rankup.is-shown{opacity:1;}
+.sh-rankup-card{text-align:center; width:min(340px, 100%); padding:26px 22px 22px; border-radius:24px; background:var(--shw-bg); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow);
+  transform:scale(.9); transition:transform .45s cubic-bezier(.2,1.4,.4,1);}
+.sh-rankup.is-shown .sh-rankup-card{transform:none;}
+.sh-rankup-card .sh-rank-art{margin:0 auto 8px; filter:drop-shadow(0 10px 22px rgba(0,0,0,.35));}
+.sh-rankup-card .sh-rank-name{font-size:30px;}
+.sh-rankup-card p{margin:8px 0 16px; font-size:14px; color:var(--shw-ink2);}
+.sh-rankup-card button{font:inherit; font-weight:700; padding:9px 26px; border-radius:99px; border:0; background:var(--shw-ink); color:var(--shw-bg); cursor:pointer;}
+@media (prefers-reduced-motion: reduce){ .sh-rank-name, .sh-trophy-medal::after{animation:none !important;} }

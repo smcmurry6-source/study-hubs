@@ -10,6 +10,6 @@ for (const p of pages) {
   [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach((m, i) => { const f = path.join(tmp, p.replace(/\W+/g, '_') + i + '.js'); fs.writeFileSync(f, m[1]); check(f, `${p} inline script #${i + 1}`); });
   html.split('\n').forEach((line, n) => { if (/^(<<<<<<<|=======$|>>>>>>>)/.test(line)) { failed = true; console.error(`✗ ${p}:${n + 1} merge-conflict marker`); } });
 }
-for (const w of ['widget/v3.js', 'widget/eggs.js', 'widget/clicks.js']) check(path.join(root, w), w);
+for (const w of ['widget/v3.js', 'widget/eggs.js', 'widget/clicks.js', 'widget/ranks.js']) check(path.join(root, w), w);
 console.log(failed ? 'Syntax check failed' : `✓ ${pages.length} pages and the widget scripts parse`);
 process.exit(failed ? 1 : 0);
