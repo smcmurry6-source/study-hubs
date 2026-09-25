@@ -305,12 +305,15 @@
     { k: "run-100",      n: "Tactical",             d: "100 right answers in a row",           ic: "M12 3v6M12 15v6M3 12h6M15 12h6M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 1 0-6 0" },
     { k: "mock90",       n: "Mock Ace",             d: "90%+ on a mock exam of 20+ questions", ic: "M12 4a8 8 0 1 0 0 16 8 8 0 1 0 0-16zM12 8v4l3 2" },
     { k: "arcade-25",    n: "Arcade Regular",       d: "Play 25 arcade games",                 ic: "M6 9h12a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3zM8 11v4M6 13h4M15 12h.01M17 14h.01" },
-    { k: "golden",       n: "Golden Probe",         d: "Find the day's golden question first", ic: "M3 21l9-9M12 12l3-3c1-1 1-3 3-4l2-1", secret: true },
-    { k: "fairy",        n: "Tooth Fairy",          d: "Catch the Tooth Fairy",                ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5z", secret: true },
-    { k: "fairy-5",      n: "Fairy Collector",      d: "Catch the Tooth Fairy 5 times",        ic: "M12 3l2 4 4 .6-3 3 .8 4.4L12 13l-3.8 2 .8-4.4-3-3 4-.6z", secret: true },
-    { k: "boss",         n: "Final Blow",           d: "Land the last hit on a Plaque Boss",   ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true },
-    { k: "owl",          n: "Night Owl",            d: "Answer a question between 2 and 4 am", ic: "M5 4l3 3h8l3-3v9a7 7 0 0 1-14 0zM9.5 11a1.5 1.5 0 1 0 .01 0M14.5 11a1.5 1.5 0 1 0 .01 0", secret: true },
-    { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true }
+    { k: "golden",       n: "Golden Probe",         d: "Find the day's golden question first", ic: "M3 21l9-9M12 12l3-3c1-1 1-3 3-4l2-1", secret: true, clue: "One question in every hub turns gold each day. Be the first to get it right." },
+    { k: "fairy",        n: "Tooth Fairy",          d: "Catch the Tooth Fairy",                ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5z", secret: true, clue: "Keep answering questions. Something small with wings is out there." },
+    { k: "fairy-5",      n: "Fairy Collector",      d: "Catch the Tooth Fairy 5 times",        ic: "M12 3l2 4 4 .6-3 3 .8 4.4L12 13l-3.8 2 .8-4.4-3-3 4-.6z", secret: true, clue: "She comes back. Be quick, five times over." },
+    { k: "boss",         n: "Final Blow",           d: "Land the last hit on a Plaque Boss",   ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." },
+    { k: "owl",          n: "Night Owl",            d: "Answer a question between 2 and 4 am", ic: "M5 4l3 3h8l3-3v9a7 7 0 0 1-14 0zM9.5 11a1.5 1.5 0 1 0 .01 0M14.5 11a1.5 1.5 0 1 0 .01 0", secret: true, clue: "Study while the rest of the class is asleep." },
+    { k: "konami",       n: "Cheat Code",           d: "Enter the Konami code",                ic: "M12 4v16M12 4l-5 5M12 4l5 5", secret: true, clue: "Old-school gamers know it: ↑ ↑ ↓ ↓ ← → ← → B A. On a phone, swipe it and tap twice." },
+    { k: "floss",        n: "Floss Boss",           d: "Type the magic word",                  ic: "M4 18c4-10 12-10 16 0M8 8l-2-4M16 8l2-4", secret: true, clue: "Type the one thing your hygienist always asks whether you have been doing." },
+    { k: "prof",         n: "Office Hours",         d: "Get a professor to quote themselves",  ic: "M4 5h16v11H9l-5 4zM8 10h8", secret: true, clue: "Professors repeat themselves. Tap one's name, a few times, quickly." },
+    { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." }
   ];
   var MASTERY = [
     { k: "mastery-bronze", n: "Bronze", pct: .5 }, { k: "mastery-silver", n: "Silver", pct: .75 },
@@ -394,10 +397,10 @@
     }
     function trophyHTML(tr, earned){
       var hidden = tr.secret && !earned;
-      return '<div class="sh-trophy' + (earned ? " is-earned" : "") + '" title="' + esc(hidden ? "A secret: keep exploring" : tr.d) + '">' +
+      return '<button type="button" class="sh-trophy' + (earned ? " is-earned" : "") + '" data-trophy="' + tr.k + '" title="' + esc(hidden ? "Secret: tap for a clue" : tr.d) + '">' +
         '<span class="sh-trophy-medal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
         (hidden ? '<path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"/>' : '<path d="' + tr.ic + '"/>') + '</svg></span>' +
-        '<span class="sh-trophy-name">' + esc(hidden ? "???" : tr.n) + '</span></div>';
+        '<span class="sh-trophy-name">' + esc(hidden ? "???" : tr.n) + '</span></button>';
     }
     function render(){
       if (!profile) return;
@@ -421,6 +424,7 @@
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
+        '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
         '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
         TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + ' XP.</p></details>' +
         '<div class="sh-link"><button type="button" class="sh-link-toggle" aria-expanded="false">Link my devices</button><div class="sh-link-body" hidden></div></div>';
@@ -441,6 +445,21 @@
       requestAnimationFrame(function(){ d.classList.add("is-shown"); });
       setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 4200);
     }
+    /* a clue for one secret you haven't found yet, different on each open */
+    function psst(earned){
+      var left = TROPHIES.filter(function(x){ return x.secret && !earned[x.k]; });
+      if (!left.length) return "You've found every secret. Tap a trophy to see what it's for.";
+      var x = left[Math.floor(Math.random() * left.length)];
+      return '<b>Psst.</b> ' + esc(x.clue) + ' <span class="sh-trophy-hint">Tap any trophy for more.</span>';
+    }
+    sec.addEventListener("click", function(e){
+      var b = e.target.closest("[data-trophy]"); if (!b || !profile) return;
+      var tr = TROPHIES.filter(function(x){ return x.k === b.getAttribute("data-trophy"); })[0]; if (!tr) return;
+      var got = (profile.badges || []).some(function(k){ return k.split(":")[0] === tr.k; });
+      sec.querySelectorAll("[data-trophy]").forEach(function(x){ x.classList.toggle("is-sel", x === b); });
+      sec.querySelector(".sh-trophy-detail").innerHTML = got ? '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '. Earned.'
+        : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.';
+    });
     function celebrate(t){
       if (H.prefGet("sh_pref_eggs", "on") === "off") return;
       var d = document.createElement("div");

@@ -423,7 +423,7 @@ table.data tr.group:hover td{background:none;}
       out += card(hubCell(h.hub), fmtMin(h.minutes) + " total · " + rangeText(), body);
     });
 
-    out += '<p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the exact section on screen (e.g. Compendium › Question Bank). Per-view detail starts 2026-09-23 — older time only knows the top-level mode, and shows as “before per-view tracking.”</p>';
+    out += '<p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the exact section on screen (e.g. Compendium › Question Bank). Since 2026-09-25, time stops counting after 15 minutes with no taps, clicks, keys or scrolling (unless a lecture is playing in Listen), so tabs left open no longer inflate it. Per-view detail starts 2026-09-23 — older time only knows the top-level mode, and shows as “before per-view tracking.”</p>';
     el.innerHTML = out;
   }
   /* ---------- clicks: what people actually press, per hub ---------- */

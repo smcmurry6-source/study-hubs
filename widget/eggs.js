@@ -294,6 +294,7 @@
     if (!pool.length) return;
     var q = pool[Math.floor(Math.random() * pool.length)].quote.replace(/\s+/g, " ").trim();
     if (q.length > 240) q = q.slice(0, 240).replace(/\s+\S*$/, "") + "…";
+    rpc("record_achievement", { p_visitor: VISITOR, p_kind: "prof", p_hub: HUB });
     toast('<span class="sh-egg-ic">' + IC.quote + '</span><span><span class="sh-egg-quote">' + esc(q) + '</span><small>— ' + esc(who) + '</small></span>', 9000, "is-quote");
   }, true);
 
@@ -340,6 +341,7 @@
       document.head.appendChild(l);
     }
     document.documentElement.classList.toggle("sh-8bit", sh8bit);
+    if (sh8bit) rpc("record_achievement", { p_visitor: VISITOR, p_kind: "konami", p_hub: HUB });
     toast(row(IC.tooth, sh8bit ? "8-bit mode" : "Back to 2026", sh8bit ? "Correct answers go blip. Do the code again to leave." : ""), 3200);
     if (sh8bit) blip(true);
   }
@@ -364,6 +366,7 @@
       '<g class="egg-fl-body"><path fill="var(--egg-fairy-fill,#fff)" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="M26 12c-7 0-11 5-11 12 0 8 4 12 5 19 1 8 3 17 7 17s5-8 6-13c.5-3 1.5-4 7-4s6.5 1 7 4c1 5 2 13 6 13s6-9 7-17c1-7 5-11 5-19 0-7-4-12-11-12-5 0-8 2-14 2s-9-2-14-2z"/>' +
       '<circle cx="32" cy="30" r="2.6" fill="currentColor"/><circle cx="48" cy="30" r="2.6" fill="currentColor"/><path d="M33 38c4 4 10 4 14 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></g></svg>';
     document.body.appendChild(d);
+    rpc("record_achievement", { p_visitor: VISITOR, p_kind: "floss", p_hub: HUB });
     setTimeout(function(){ d.remove(); }, 4600);
   }
 
