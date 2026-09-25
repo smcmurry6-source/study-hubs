@@ -1,6 +1,6 @@
 -- ============================================================================
 -- study-hubs Supabase schema snapshot (project thytmzsgymydbzcqdnix)
--- Generated 2026-09-25 from the live database, after migration_v16.
+-- Generated 2026-09-25 from the live database, after migration_v17.
 --
 -- This is the full picture the migration_v*.sql files only partly cover (17 of
 -- the functions below had no source in the repo before this file). If the
@@ -1051,4 +1051,20 @@ language sql stable security definer set search_path = public as $$
   from r left join visitor_names vn on vn.visitor_id = r.visitor_id
   where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor)
   order by r.rnk;
+$$;
+
+-- ============================================================================
+-- more secret trophies (migration_v17; replaces record_achievement)
+-- ============================================================================
+-- konami (Konami code / swipe code), floss (typed "floss"), prof (a professor's quote from tapping their name)
+create or replace function public.record_achievement(p_visitor text, p_kind text, p_hub text default '')
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 then return false; end if;
+  if p_kind not in ('boss', 'owl', 'rootcanal', 'mock90', 'konami', 'floss', 'prof',
+                    'mastery-bronze', 'mastery-silver', 'mastery-gold', 'mastery-crown') then return false; end if;
+  insert into achievements (visitor_id, kind, hub) values (p_visitor, p_kind, left(coalesce(p_hub, ''), 40))
+    on conflict do nothing;
+  return found;
+end;
 $$;

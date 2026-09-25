@@ -1405,7 +1405,7 @@
     '<button type="button" data-val="on">On</button>' +
     '<button type="button" data-val="off">Off</button>' +
     '</div>' +
-    '<div class="shset-hint">Little hidden extras around the hubs, including a few you share live with classmates. They never appear during a mock exam.</div>' +
+    '<div class="shset-hint">Little hidden extras around the hubs, including a few you share live with classmates. Stuck? The trophy case in Stats has clues. They never appear during a mock exam.</div>' +
     '</div>' +
     '<div class="shset-row"><label>Tactical nuke alerts</label>' +
     '<div class="shset-seg" data-pref="nuke">' +
