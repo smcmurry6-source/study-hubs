@@ -301,6 +301,7 @@ main{padding-top:20px}
 .hint .take{font-size:.9rem;color:var(--ink-soft);margin:0}
 .kind{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-right:6px}
 .kind.emphasize{background:var(--good-soft);color:var(--good)} .kind.deemphasize{background:var(--caution-soft);color:var(--caution)} .kind.slide{background:var(--probe-soft);color:var(--probe)}
+.chip.src.nomid{background:var(--caution-soft);color:var(--caution)}
 .cram-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
 .cram-card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--t);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
 .cram-card h3{font-size:1.25rem;display:flex;gap:8px;align-items:center}
@@ -742,7 +743,7 @@ var LECTURES = [
   { id:'diagnosis-tx-planning', num:1, title:'Overview of Diagnosis, Classification & Treatment Planning', who:'Dr. Abou-Arraj', tag:'teal', source:'Lecture recording + slides (session 1)', status:'taught' },
   { id:'incisions-flaps-sutures', num:2, title:'Incisions, Flaps & Sutures', who:'Dr. Basma', tag:'rose', source:'Recording + slide deck', status:'taught' },
   { id:'risk-assessment', num:3, title:'Risk Assessment', who:'Dr. Geisinger', tag:'amber', source:'Lecture recording + slides + in-class case review (session 3)', status:'taught' },
-  { id:'phase1-therapy', num:4, title:'Phase I Therapy & Instrumentation', who:'Dr. Kaur', tag:'blue', source:'Slide deck (Phase I therapy, evaluation & instrumentation, 2026) + exam-review guide', status:'preview' },
+  { id:'phase1-therapy', num:4, title:'Phase I Therapy & Instrumentation', who:'Dr. Kaur', tag:'blue', source:'Class recording + slide deck (Phase I therapy, evaluation & instrumentation, 2026) + exam-review guide', status:'taught' },
   { id:'resective-furcation', num:5, title:'Resective Surgery & Furcation Management', who:'Dr. Litz', tag:'violet', source:'Exam-review guide only — session not yet taught', status:'upcoming' },
   { id:'periodontal-regeneration', num:6, title:'Periodontal Regeneration', who:'Dr. Geurs', tag:'slate', source:'Exam-review guide only — session not yet taught', status:'upcoming' },
   { id:'implants-perio', num:7, title:'Implants for Periodontally Compromised Patients', who:'Dr. Carr', tag:'teal', source:'Exam-review guide only — session not yet taught', status:'upcoming' },
@@ -1153,14 +1154,14 @@ var QUESTIONS = [
 
 /* ===== Lecture 4 — Phase I Therapy (instrumentation) ===== */
 { id:'q4-01', lec:'phase1-therapy', type:'mcq', stem:"Which instrument is used specifically to examine furcations?", choices:['Nabers probe','ODU 11/12 explorer','Gracey 11/12','Columbia 13/14'], answer:0, src:'exam-review' },
-{ id:'q4-02', lec:'phase1-therapy', type:'mcq', stem:"Which instrument evaluates root-surface roughness on all surfaces of all teeth?", choices:['ODU 11/12 explorer','Periodontal probe','Nabers probe','Sickle scaler'], answer:0, src:'exam-review' },
-{ id:'q4-03', lec:'phase1-therapy', type:'mcq', stem:"Which Gracey curette is used subgingivally on the distal surfaces of posterior teeth?", choices:['Gracey 13/14','Gracey 11/12','Gracey 3/4','Gracey 15/16'], answer:0, src:'exam-review' },
-{ id:'q4-04', lec:'phase1-therapy', type:'mcq', stem:"Which Gracey curette covers all surfaces of the anterior teeth, subgingivally?", choices:['Gracey 3/4','Gracey 11/12','Gracey 13/14','Columbia 13/14'], answer:0, src:'exam-review' },
-{ id:'q4-05', lec:'phase1-therapy', type:'mcq', stem:"Which curette is a universal instrument rather than an area-specific one?", choices:['Columbia 13/14','Gracey 11/12','Gracey 15/16','Gracey 3/4'], answer:0, src:'exam-review' },
-{ id:'q4-06', lec:'phase1-therapy', type:'mcq', stem:"Which scaler is used supragingivally, specifically on posterior interproximal surfaces?", choices:['S204SD9','Sickle scaler','Gracey 13/14','Nabers probe'], answer:0, src:'exam-review' },
-{ id:'q4-07', lec:'phase1-therapy', type:'mcq', stem:"The sickle scaler is used supragingivally on which surfaces?", choices:['Anterior teeth and the buccal/lingual of molars','All subgingival surfaces','Only posterior interproximal surfaces','Only furcations'], answer:0, src:'exam-review' },
-{ id:'q4-08', lec:'phase1-therapy', type:'match', stem:"Match each instrument to its area of use.", pairs:[['Gracey 11/12','Mesial of posterior teeth + buccal/lingual of molars'],['Gracey 13/14','Distal of posterior teeth'],['Gracey 3/4','All surfaces of anterior teeth'],['Columbia 13/14','Universal, subgingival']], src:'exam-review' },
-{ id:'q4-09', lec:'phase1-therapy', type:'recall', stem:"What is the key difference between how Gracey curettes and the Columbia curette are used?", answer:"Gracey curettes are area-specific — each one is designed for one particular surface or area — while the Columbia curette is a universal instrument usable subgingivally on any surface.", src:'exam-review' },
+{ id:'q4-02', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which instrument evaluates root-surface roughness on all surfaces of all teeth?", choices:['ODU 11/12 explorer','Periodontal probe','Nabers probe','Sickle scaler'], answer:0, src:'exam-review' },
+{ id:'q4-03', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which Gracey curette is used subgingivally on the distal surfaces of posterior teeth?", choices:['Gracey 13/14','Gracey 11/12','Gracey 3/4','Gracey 15/16'], answer:0, src:'exam-review' },
+{ id:'q4-04', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which Gracey curette covers all surfaces of the anterior teeth, subgingivally?", choices:['Gracey 3/4','Gracey 11/12','Gracey 13/14','Columbia 13/14'], answer:0, src:'exam-review' },
+{ id:'q4-05', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which curette is a universal instrument rather than an area-specific one?", choices:['Columbia 13/14','Gracey 11/12','Gracey 15/16','Gracey 3/4'], answer:0, src:'exam-review' },
+{ id:'q4-06', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which scaler is used supragingivally, specifically on posterior interproximal surfaces?", choices:['S204SD9','Sickle scaler','Gracey 13/14','Nabers probe'], answer:0, src:'exam-review' },
+{ id:'q4-07', lec:'phase1-therapy', mid:false, type:'mcq', stem:"The sickle scaler is used supragingivally on which surfaces?", choices:['Anterior teeth and the buccal/lingual of molars','All subgingival surfaces','Only posterior interproximal surfaces','Only furcations'], answer:0, src:'exam-review' },
+{ id:'q4-08', lec:'phase1-therapy', mid:false, type:'match', stem:"Match each instrument to its area of use.", pairs:[['Gracey 11/12','Mesial of posterior teeth + buccal/lingual of molars'],['Gracey 13/14','Distal of posterior teeth'],['Gracey 3/4','All surfaces of anterior teeth'],['Columbia 13/14','Universal, subgingival']], src:'exam-review' },
+{ id:'q4-09', lec:'phase1-therapy', mid:false, type:'recall', stem:"What is the key difference between how Gracey curettes and the Columbia curette are used?", answer:"Gracey curettes are area-specific — each one is designed for one particular surface or area — while the Columbia curette is a universal instrument usable subgingivally on any surface.", src:'exam-review' },
 
 /* ----- Added from the Session 4 slide deck (Phase I therapy, Phase I evaluation & instrumentation) ----- */
 { id:'q4-10', lec:'phase1-therapy', type:'mcq', stem:"A site probes 2 mm with 5 mm of gingival recession. What is the clinical attachment level?", choices:['7 mm','3 mm','2 mm','5 mm'], answer:0, ex:"CAL = probing depth + recession = 2 + 5 = 7 mm. This slide example is paired with a 7 mm pocket and no recession, which also gives CAL 7 mm: same attachment loss, very different pockets.", src:'slides' },
@@ -1182,30 +1183,74 @@ var QUESTIONS = [
 { id:'q4-26', lec:'phase1-therapy', type:'mcq', stem:"In pockets 5 mm or deeper, about how often is root debridement inadequate?", choices:['About 65% of the time','About 5% of the time','About 25% of the time','Never, if a specialist does it'], answer:0, ex:"Other limits on non-surgical therapy: not 100% effective against A. actinomycetemcomitans, overhanging restorations, furcations, root anatomy, hypersensitivity, operator skill, patient compliance (Greenstein 2000).", src:'slides' },
 { id:'q4-27', lec:'phase1-therapy', type:'mcq', stem:"When is the Phase I re-evaluation done?", choices:['4-6 weeks after therapy','1 week after therapy','6 months after therapy','12 months after therapy'], answer:0, src:'slides' },
 { id:'q4-28', lec:'phase1-therapy', type:'mcq', stem:"After SRP, where does most of the probing-depth reduction come from?", choices:['Resolution of inflammation and edema, with the recession that follows','New bone formation','New connective-tissue attachment to cementum','Tooth extrusion'], answer:0, ex:"The biggest PD changes happen in the first 4 weeks.", src:'slides' },
-{ id:'q4-29', lec:'phase1-therapy', type:'mcq', stem:"After SRP, how long until the dentogingival junction is re-established?", choices:['2-4 weeks','24 hours','9-12 months','6 months'], answer:0, ex:"Gradual repair and maturation can continue for 9-12 months.", src:'slides' },
+{ id:'q4-29', lec:'phase1-therapy', type:'mcq', stem:"After SRP, how long until the dentogingival junction is re-established?", choices:['2-4 weeks','24 hours','9-12 months','6 months'], answer:0, ex:"Gradual repair and maturation can continue for 9-12 months (deck). In class Dr. Kaur split it up: junctional epithelium 7-10 days, connective tissue reattachment 4-6 weeks, collagen maturation 3-6 months.", src:'slides' },
 { id:'q4-30', lec:'phase1-therapy', type:'mcq', stem:"Phase I therapy has failed at re-evaluation. Which of these is NOT one of the recommended next steps?", choices:['Move the patient to routine 6-month prophylaxis','Antibiotics or antimicrobials','Repeat non-surgical therapy','Periodontal surgery (Phase II)'], answer:0, ex:"First assess tissue response, remaining deposits, health history/risk factors, and possibly a plaque culture. Options are antimicrobials, host modulation, repeat non-surgical therapy, re-evaluation, or Phase II surgery.", src:'slides' },
-{ id:'q4-31', lec:'phase1-therapy', type:'mcq', stem:"Which feature belongs to a sickle scaler and not to a curette?", choices:['Pointed tip with a triangular cross-section','Rounded toe','Half-circle cross-section','Safe for deep subgingival use'], answer:0, src:'slides' },
-{ id:'q4-32', lec:'phase1-therapy', type:'mcq', stem:"Which describes a Gracey curette?", choices:['70° blade angle, one cutting edge, rounded back, lower shank parallel to the long axis of the tooth','Two cutting edges, pointed tip','Triangular cross-section, supragingival only','Straight shank, used with a push stroke'], answer:0, src:'slides' },
-{ id:'q4-33', lec:'phase1-therapy', type:'mcq', stem:"How is a Gracey curette inserted and then activated?", choices:['Closed angle to insert into the sulcus or pocket, then a 70-80° working angle against the root','Inserted at 90° and kept there','Inserted open at 80°, then closed to 0° to work','Inserted at 45° with a push stroke'], answer:0, src:'slides' },
-{ id:'q4-34', lec:'phase1-therapy', type:'mcq', stem:"How far below the gingival margin can a sickle scaler remove calculus?", choices:['1-2 mm','5-6 mm','To the base of any pocket','Not at all'], answer:0, ex:"Sickles work mainly supragingivally with a short, powerful pull stroke, using the lower third of the blade. Use on exposed cementum is restricted.", src:'slides' },
-{ id:'q4-35', lec:'phase1-therapy', type:'mcq', stem:"What is the working angle of the H6/7 anterior sickle and the S204SD9 posterior sickle against the tooth?", choices:['About 80°','About 45°','About 110°','0°'], answer:0, ex:"H6/7 has a straight shank for anteriors and the buccal/lingual of molars. S204SD9 has a right-angled shank for posterior interproximals. Both use a pull stroke.", src:'slides' },
-{ id:'q4-36', lec:'phase1-therapy', type:'mcq', stem:"Which Gracey has more bends in its shank than the 11/12 and uses a pull stroke apico-coronally or postero-anteriorly?", choices:['Gracey 13/14','Gracey 3/4','Gracey 15/16','Columbia 13/14'], answer:0, src:'slides' },
-{ id:'q4-37', lec:'phase1-therapy', type:'mcq', stem:"How does a root-planing stroke differ from a scaling stroke?", choices:['Longer, shaving stroke with lighter pressure','Shorter, more powerful stroke','They are identical','It is a push stroke'], answer:0, ex:"Scaling strokes are controlled, short, overlapping and powerful.", src:'slides' },
-{ id:'q4-38', lec:'phase1-therapy', type:'mcq', stem:"What characterizes an exploratory stroke?", choices:['Light force with the instrument adapted, to map pocket depth, topography and calculus','Tight grasp and firm pressure against the tooth','A rubber cup held at 90°','A pull stroke with the sickle toe'], answer:0, src:'slides' },
-{ id:'q4-39', lec:'phase1-therapy', type:'match', stem:"Match each intraoral finger rest to where it sits.", pairs:[['Conventional','Tooth surfaces right next to the working area'],['Cross-arch','The other side of the same arch'],['Opposite-arch','The opposite arch'],['Finger-on-finger','Index finger or thumb of the non-working hand']], src:'slides' },
-{ id:'q4-40', lec:'phase1-therapy', type:'match', stem:"Match each ultrasonic type to how its tip works.", pairs:[['Magnetostrictive','Nickel-iron metal stacks; elliptical/orbital motion, so every tip surface works'],['Piezoelectric','Crystals in the handpiece; linear motion, mainly the lateral surfaces work']], src:'slides' },
-{ id:'q4-41', lec:'phase1-therapy', type:'mcq', stem:"Which areas are most commonly missed during scaling and root planing?", choices:['The CEJ, furcation entrances, line angles, and distal surfaces of posterior teeth','Facial surfaces of anterior teeth','Occlusal surfaces','Palatal surfaces of maxillary incisors only'], answer:0, src:'slides' },
-{ id:'q4-42', lec:'phase1-therapy', type:'mcq', stem:"How are implant probes calibrated?", choices:['In 3-mm sections (3-6-9-12 or 3-6-8-11)','In 1-mm marks to 15 mm','In colored 5-mm bands','They are not; implants are never probed'], answer:0, ex:"Implant instruments in the deck: anterior and posterior sickle scalers and the Columbia 4R/4L curette.", src:'slides' },
-{ id:'q4-43', lec:'phase1-therapy', type:'mcq', stem:"What is a UNC-15?", choices:['A periodontal probe calibrated to 15 mm','A furcation probe','An explorer','An implant probe'], answer:0, src:'slides' },
-{ id:'q4-44', lec:'phase1-therapy', type:'mcq', stem:"How much enamel can 30 seconds of polishing with pumice paste remove?", choices:['Up to 4 µm','Up to 40 µm','Up to 0.4 mm','None'], answer:0, ex:"That outermost layer holds the highest fluoride concentration, which is part of the case against routine polishing.", src:'slides' },
-{ id:'q4-45', lec:'phase1-therapy', type:'mcq', stem:"What can a rubber cup with pumice do to the gingiva in 2 minutes?", choices:['Completely remove the sulcular epithelium','Regenerate attachment','Remove 1 mm of enamel','Permanently seal dentinal tubules'], answer:0, src:'slides' },
-{ id:'q4-46', lec:'phase1-therapy', type:'mcq', stem:"Which polishing technique does the deck recommend?", choices:['Low-abrasion paste, slow-speed handpiece, minimal heat, cup at 90° with intermittent light pressure','Coarse paste at high speed with steady heavy pressure','Pumice for 2 minutes per tooth','Subgingival polishing to the base of the pocket'], answer:0, src:'slides' },
-{ id:'q4-47', lec:'phase1-therapy', type:'mcq', stem:"Which is a valid reason FOR polishing?", choices:['Removing extrinsic stain before sealants or fluoride, and patient satisfaction','Removing subgingival calculus','Reducing probing depth','Removing endotoxin from cementum'], answer:0, src:'slides' },
+{ id:'q4-31', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which feature belongs to a sickle scaler and not to a curette?", choices:['Pointed tip with a triangular cross-section','Rounded toe','Half-circle cross-section','Safe for deep subgingival use'], answer:0, src:'slides' },
+{ id:'q4-32', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which describes a Gracey curette?", choices:['70° blade angle, one cutting edge, rounded back, lower shank parallel to the long axis of the tooth','Two cutting edges, pointed tip','Triangular cross-section, supragingival only','Straight shank, used with a push stroke'], answer:0, src:'slides' },
+{ id:'q4-33', lec:'phase1-therapy', mid:false, type:'mcq', stem:"How is a Gracey curette inserted and then activated?", choices:['Closed angle to insert into the sulcus or pocket, then a 70-80° working angle against the root','Inserted at 90° and kept there','Inserted open at 80°, then closed to 0° to work','Inserted at 45° with a push stroke'], answer:0, src:'slides' },
+{ id:'q4-34', lec:'phase1-therapy', mid:false, type:'mcq', stem:"How far below the gingival margin can a sickle scaler remove calculus?", choices:['1-2 mm','5-6 mm','To the base of any pocket','Not at all'], answer:0, ex:"This is the deck's number. In class Dr. Kaur said about 2-3 mm, adding that sources give 1-3 or 1-2. Sickles work mainly supragingivally with a short, powerful pull stroke, using the lower third of the blade. Use on exposed cementum is restricted.", src:'slides' },
+{ id:'q4-35', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What is the working angle of the H6/7 anterior sickle and the S204SD9 posterior sickle against the tooth?", choices:['About 80°','About 45°','About 110°','0°'], answer:0, ex:"H6/7 has a straight shank for anteriors and the buccal/lingual of molars. S204SD9 has a right-angled shank for posterior interproximals. Both use a pull stroke.", src:'slides' },
+{ id:'q4-36', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which Gracey has more bends in its shank than the 11/12 and uses a pull stroke apico-coronally or postero-anteriorly?", choices:['Gracey 13/14','Gracey 3/4','Gracey 15/16','Columbia 13/14'], answer:0, src:'slides' },
+{ id:'q4-37', lec:'phase1-therapy', mid:false, type:'mcq', stem:"How does a root-planing stroke differ from a scaling stroke?", choices:['Longer, shaving stroke with lighter pressure','Shorter, more powerful stroke','They are identical','It is a push stroke'], answer:0, ex:"Scaling strokes are controlled, short, overlapping and powerful.", src:'slides' },
+{ id:'q4-38', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What characterizes an exploratory stroke?", choices:['Light force with the instrument adapted, to map pocket depth, topography and calculus','Tight grasp and firm pressure against the tooth','A rubber cup held at 90°','A pull stroke with the sickle toe'], answer:0, src:'slides' },
+{ id:'q4-39', lec:'phase1-therapy', mid:false, type:'match', stem:"Match each intraoral finger rest to where it sits.", pairs:[['Conventional','Tooth surfaces right next to the working area'],['Cross-arch','The other side of the same arch'],['Opposite-arch','The opposite arch'],['Finger-on-finger','Index finger or thumb of the non-working hand']], src:'slides' },
+{ id:'q4-40', lec:'phase1-therapy', mid:false, type:'match', stem:"Match each ultrasonic type to how its tip works.", pairs:[['Magnetostrictive','Nickel-iron metal stacks; elliptical/orbital motion, so every tip surface works'],['Piezoelectric','Crystals in the handpiece; linear motion, mainly the lateral surfaces work']], src:'slides' },
+{ id:'q4-41', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which areas are most commonly missed during scaling and root planing?", choices:['The CEJ, furcation entrances, line angles, and distal surfaces of posterior teeth','Facial surfaces of anterior teeth','Occlusal surfaces','Palatal surfaces of maxillary incisors only'], answer:0, src:'slides' },
+{ id:'q4-42', lec:'phase1-therapy', mid:false, type:'mcq', stem:"How are implant probes calibrated?", choices:['In 3-mm sections (3-6-9-12 or 3-6-8-11)','In 1-mm marks to 15 mm','In colored 5-mm bands','They are not; implants are never probed'], answer:0, ex:"Implant instruments in the deck: anterior and posterior sickle scalers and the Columbia 4R/4L curette.", src:'slides' },
+{ id:'q4-43', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What is a UNC-15?", choices:['A periodontal probe calibrated to 15 mm','A furcation probe','An explorer','An implant probe'], answer:0, src:'slides' },
+{ id:'q4-44', lec:'phase1-therapy', mid:false, type:'mcq', stem:"How much enamel can 30 seconds of polishing with pumice paste remove?", choices:['Up to 4 µm','Up to 40 µm','Up to 0.4 mm','None'], answer:0, ex:"That outermost layer holds the highest fluoride concentration, which is part of the case against routine polishing.", src:'slides' },
+{ id:'q4-45', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What can a rubber cup with pumice do to the gingiva in 2 minutes?", choices:['Completely remove the sulcular epithelium','Regenerate attachment','Remove 1 mm of enamel','Permanently seal dentinal tubules'], answer:0, src:'slides' },
+{ id:'q4-46', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which polishing technique does the deck recommend?", choices:['Low-abrasion paste, slow-speed handpiece, minimal heat, cup at 90° with intermittent light pressure','Coarse paste at high speed with steady heavy pressure','Pumice for 2 minutes per tooth','Subgingival polishing to the base of the pocket'], answer:0, src:'slides' },
+{ id:'q4-47', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which is a valid reason FOR polishing?", choices:['Removing extrinsic stain before sealants or fluoride, and patient satisfaction','Removing subgingival calculus','Reducing probing depth','Removing endotoxin from cementum'], answer:0, src:'slides' },
 { id:'q4-48', lec:'phase1-therapy', type:'mcq', stem:"The mucogingival part of the exam records which two things?", choices:['The amount of keratinized gingiva and the location of the mucogingival junction','Probing depth and BOP','Mobility and fremitus','Furcation class and root trunk length'], answer:0, src:'slides' },
 { id:'q4-49', lec:'phase1-therapy', type:'sequence', stem:"Put the steps for disclosing plaque in order.", steps:['Chew the disclosing tablet','Rinse briefly with water','Remove excess solution from the cheeks and tongue','Show the patient with a mirror'], src:'slides' },
 { id:'q4-50', lec:'phase1-therapy', type:'recall', stem:"List the occlusal findings the deck links to periodontal disease.", answer:"Parafunctional habits, tooth mobility, fremitus, tooth migration, open contacts, atypical tooth wear and wear facets, possible TMJ pain, infrabony defects, and a widened PDL space.", src:'slides' },
 { id:'q4-51', lec:'phase1-therapy', type:'mcq', stem:"Which instrument does the deck call the most important one in the periodontal exam?", choices:['The periodontal probe','The ODU 11/12 explorer','The mouth mirror','The Nabers probe'], answer:0, ex:"The probe measures PD and CAL, outlines pocket form, and contributes to plaque, gingival and calculus assessment.", src:'slides' },
-{ id:'q4-52', lec:'phase1-therapy', type:'mcq', stem:"During Phase I, how do you check whether you scaled and root planed well?", choices:['Explore the root surface during the session, then judge tissue response (less erythema, edema and BOP) at re-evaluation','Take a radiograph the same day','Measure new bone at 1 week','Check whether the patient reports sensitivity'], answer:0, ex:"The patient's oral hygiene plays a fundamental role in how the re-evaluation looks.", src:'slides' },
+{ id:'q4-52', lec:'phase1-therapy', mid:false, type:'mcq', stem:"During Phase I, how do you check whether you scaled and root planed well?", choices:['Explore the root surface during the session, then judge tissue response (less erythema, edema and BOP) at re-evaluation','Take a radiograph the same day','Measure new bone at 1 week','Check whether the patient reports sensitivity'], answer:0, ex:"The patient's oral hygiene plays a fundamental role in how the re-evaluation looks.", src:'slides' },
+
+/* Session 4 — from the class recording */
+{ id:'q4-L01', lec:'phase1-therapy', type:'mcq', stem:"Which diagnosis is impossible by definition?", choices:['Periodontitis on an intact periodontium','Gingivitis on a reduced periodontium','Health on a reduced periodontium','Gingivitis on an intact periodontium'], answer:0, ex:"Bone loss is what separates periodontitis from health and gingivitis, so periodontitis always sits on a reduced periodontium. Health and gingivitis can each be on an intact or a reduced periodontium.", src:'lecture' },
+{ id:'q4-L02', lec:'phase1-therapy', type:'mcq', stem:"You run the probe about 1 mm into each sulcus and score 1 where plaque comes out and 0 where it doesn't. What does this record?", choices:['Presence or absence of plaque only','The amount of plaque at each site','Plaque thickness in the gingival third','The probing depth'], answer:0, ex:"Neither this method nor disclosing tablets quantifies plaque. Quantifying (gingival third, half the tooth, whole tooth) at every site would take too much chair time.", src:'lecture' },
+{ id:'q4-L03', lec:'phase1-therapy', type:'mcq', stem:"You finish probing the upper right and move to the upper left. Looking back, a few upper-right sites that didn't bleed at first are now bleeding. How are they scored?", choices:['As bleeding (1)','As not bleeding (0), because bleeding must be immediate','Re-probe them at the next visit','Record them as suppuration'], answer:0, ex:"Delayed bleeding still counts as BOP.", src:'lecture' },
+{ id:'q4-L04', lec:'phase1-therapy', type:'mcq', stem:"A heavy smoker has periodontitis. Compared with a non-smoker, how will the gingiva tend to look?", choices:['Less inflamed, more cyanotic, because nicotine vasoconstriction masks inflammation','More edematous and hemorrhagic','Bulbous interdental overgrowth','Exactly the same'], answer:0, ex:"Smoking masks inflammation. Diabetes does the opposite and exaggerates it.", src:'lecture' },
+{ id:'q4-L05', lec:'phase1-therapy', type:'mcq', stem:"A hypertensive patient has bulbous gingival enlargement, mostly interdental and more on the buccal/labial than the lingual/palatal. Which medication fits?", choices:['Amlodipine','Metformin','Atorvastatin','Lisinopril'], answer:0, ex:"Amlodipine is a calcium channel blocker, a classic cause of drug-induced gingival overgrowth.", src:'lecture' },
+{ id:'q4-L06', lec:'phase1-therapy', type:'mcq', stem:"A site probes 5 mm and the gingival margin sits 3 mm coronal to the CEJ (recession −3 mm). What is the CAL?", choices:['2 mm','5 mm','8 mm','3 mm'], answer:0, ex:"CAL = PD + GR = 5 + (−3) = 2 mm. Skipping the recession would record CAL 5 mm and push the case toward Stage 3 or 4.", src:'lecture' },
+{ id:'q4-L07', lec:'phase1-therapy', type:'mcq', stem:"In periodontal health on an intact periodontium, how do probing depth and CAL compare?", choices:['They are not equal, because the gingival margin sits coronal to the CEJ','They are always equal','CAL is always larger than PD','CAL can\'t be measured in health'], answer:0, ex:"The margin hides the CEJ, so recession is negative and PD ≠ CAL.", src:'lecture' },
+{ id:'q4-L08', lec:'phase1-therapy', type:'mcq', stem:"In Salud, what happens if you leave the recession field blank at a site with negative recession?", choices:['Salud sets CAL equal to PD, over-diagnosing disease','Salud estimates the recession from the radiograph','Salud flags the site and won\'t save','CAL is recorded as zero'], answer:0, ex:"Typing 0 without checking has the same effect. Enter the signed value (+ or −) and Salud calculates CAL correctly.", src:'lecture' },
+{ id:'q4-L09', lec:'phase1-therapy', type:'mcq', stem:"How do you measure negative recession when you can't see the CEJ?", choices:['Probe to the pocket base, withdraw slowly until you feel the CEJ, and read how much probe is still under the margin','Estimate it from the radiograph','Use the Nabers probe horizontally','Record it as zero'], answer:0, ex:"That reading is the negative GR, which you subtract from PD to get CAL.", src:'lecture' },
+{ id:'q4-L10', lec:'phase1-therapy', type:'mcq', stem:"Which of these makes it harder to feel the CEJ for a negative recession reading, but is physiologic rather than pathologic?", choices:['Altered passive eruption','Drug-induced gingival overgrowth','Gingival inflammation','Subgingival calculus'], answer:0, ex:"Inflammation and overgrowth are pathologic. Calculus and restorative margins can also feel like a CEJ.", src:'lecture' },
+{ id:'q4-L11', lec:'phase1-therapy', type:'mcq', stem:"What is passive eruption?", choices:['Apical migration of the gingiva (with its connective tissue and junctional epithelium) to settle at the CEJ','The tooth moving occlusally to meet the opposing arch','Extrusion of a tooth that has lost its antagonist','Recession caused by toothbrush trauma'], answer:0, ex:"Active eruption is the tooth moving toward occlusion. In altered passive eruption the tissue never migrates apically, so the margin stays well coronal to the CEJ.", src:'lecture' },
+{ id:'q4-L12', lec:'phase1-therapy', type:'mcq', stem:"What is the only indication for full-mouth debridement?", choices:['Calculus so heavy you can\'t see or explore the gingival margin, so no numbers can be captured','Treating moderate periodontitis in one visit','Preparing a maintenance patient for polishing','Any patient with subgingival calculus'], answer:0, ex:"Debridement is not therapeutic and should never be combined with scaling and root planing.", src:'lecture' },
+{ id:'q4-L13', lec:'phase1-therapy', type:'mcq', stem:"Which statement about the debridement code is correct?", choices:['Only a full-mouth code exists','There are separate quadrant codes','Half-mouth debridement can be billed with SRP','It is billed together with the periodontal exam'], answer:0, ex:"Insurance won't pay for debridement and a periodontal exam at the same visit; the patient returns in about two weeks. At school the first perio charting is free, so the two can be combined if the tissue allows and faculty agree.", src:'lecture' },
+{ id:'q4-L14', lec:'phase1-therapy', type:'match', stem:"Match each Glickman furcation class to its description.", pairs:[['Class I','Incipient: the probe just feels a catch'],['Class II','Cul-de-sac: bone remains on the other side'],['Class III','Through-and-through'],['Class IV','Through-and-through and clinically visible (soft tissue lost)']], src:'lecture' },
+{ id:'q4-L15', lec:'phase1-therapy', type:'mcq', stem:"Which furcation class is most amenable to regeneration?", choices:['Class II','Class I','Class III','Class IV'], answer:0, ex:"It has depth and containability, because a bony wall remains on the other side. Class I usually needs no treatment; Class III has no containability.", src:'lecture' },
+{ id:'q4-L16', lec:'phase1-therapy', type:'mcq', stem:"Why must a Class IV furcation be watched closely at every maintenance visit?", choices:['Exposed root surfaces risk root caries, and caries in the furcation makes the tooth hopeless','It always converts back to Class II','It is the most amenable to regeneration','It can\'t be cleaned with any aid'], answer:0, ex:"Patients can clean it with interdental aids or a water flosser, but sensitivity and root caries are the risks.", src:'lecture' },
+{ id:'q4-L17', lec:'phase1-therapy', type:'mcq', stem:"The Nabers probe has alternating light and dark bands. Which classification do we use for furcations here?", choices:['Glickman (qualitative), not millimeter readings','Millimeter depth from the Nabers markings','Miller','Hamp, by horizontal millimeters only'], answer:0, ex:"The bands are 3 mm apart, but Class I means a catch, not '3 mm or less'.", src:'lecture' },
+{ id:'q4-L18', lec:'phase1-therapy', type:'mcq', stem:"How is the rolling technique used in the mucogingival exam?", choices:['Roll the mucosa coronally until it stops at the mucogingival junction to find the width of keratinized tissue','Roll the probe around the tooth to find furcations','Roll a cotton tip to disclose plaque','Roll the tooth between two instruments to test mobility'], answer:0, ex:"Keratinized tissue width matters around implants as well as teeth.", src:'lecture' },
+{ id:'q4-L19', lec:'phase1-therapy', type:'mcq', stem:"What is fremitus?", choices:['Mobility in function, palpated with a finger on the root while the patient occludes','Static mobility tested with two instruments','Radiographic widening of the PDL','A tooth that is depressible in its socket'], answer:0, ex:"It can be vertical and/or horizontal and is palpated, not seen, unless extreme. A depressible tooth is ready for extraction.", src:'lecture' },
+{ id:'q4-L20', lec:'phase1-therapy', type:'mcq', stem:"Maxillary premolars are fremitus-positive in a patient missing posterior teeth. What is the most likely reason?", choices:['Lack of posterior support, so the premolars are doing the work of molars','Drug-induced overgrowth','Altered passive eruption','Root caries'], answer:0, ex:"Occlusal trauma on a reduced periodontium can also come from parafunction or overjet/overbite.", src:'lecture' },
+{ id:'q4-L21', lec:'phase1-therapy', type:'mcq', stem:"Where do you record occlusal findings such as wear patterns, erosion and parafunction?", choices:['In the notes section, since the perio chart has no field for them','In the mobility row','In the furcation column','They aren\'t recorded in the perio exam'], answer:0, ex:"Treating a 5 mm pocket won't resolve grade 2 mobility unless the underlying occlusal problem is addressed.", src:'lecture' },
+{ id:'q4-L22', lec:'phase1-therapy', type:'mcq', stem:"Before starting SRP, what does Dr. Kaur recommend having open in front of you?", choices:['The radiographs, rather than the probing chart','The probing chart, to target the deepest pockets','The medical history only','Nothing; work from feel alone'], answer:0, ex:"The instrument will find the pocket and its base is your limit. The x-rays tell you where the calculus, PA lesions and root anatomy are.", src:'lecture' },
+{ id:'q4-L23', lec:'phase1-therapy', type:'mcq', stem:"Roughly what share of periodontal destruction is caused by the host response rather than the bacteria?", choices:['About 75%','About 25%','About 50%','Nearly 100%'], answer:0, ex:"Bacteria (bringing endotoxin/LPS) account for about 25%. The host's inflammatory mediators and osteoclasts account for about 75%, yet SRP targets the bacteria, which calms the host response.", src:'lecture' },
+{ id:'q4-L24', lec:'phase1-therapy', type:'mcq', stem:"In the pathogenesis model taught in class, what initiates periodontitis and what drives its progression?", choices:['Plaque bacteria initiate it; the host immune response drives progression','The host initiates it; bacteria drive progression','Calculus initiates it; smoking drives progression','Genetics initiates it; plaque drives progression'], answer:0, ex:"Flagged in class: 'That's going to be on the quiz.'", src:'lecture' },
+{ id:'q4-L25', lec:'phase1-therapy', type:'mcq', stem:"Which is NOT a goal of scaling and root planing?", choices:['Reversing bone and attachment loss','Reducing inflammation','Shifting the flora from gram-negative toward gram-positive','Arresting disease progression'], answer:0, ex:"Non-surgical therapy can't reverse the damage. Pocket elimination isn't the rationale either, though PD does drop.", src:'lecture' },
+{ id:'q4-L26', lec:'phase1-therapy', type:'mcq', stem:"After SRP, inflammation resolves and the gingiva loses volume. How is that recorded clinically?", choices:['As increased gingival recession','As decreased recession','As new bone','As deeper probing'], answer:0, ex:"The other half of the PD reduction is reattachment of junctional epithelium and connective tissue at the base of the pocket.", src:'lecture' },
+{ id:'q4-L27', lec:'phase1-therapy', type:'match', stem:"Match each healing event after SRP to its approximate timing (as taught in class).", pairs:[['Junctional epithelium reattaches','7-10 days'],['Connective tissue reattaches','4-6 weeks'],['Collagen fibers mature and orient','3-6 months'],['Phase I re-evaluation','4-6 weeks']], src:'lecture' },
+{ id:'q4-L28', lec:'phase1-therapy', type:'mcq', stem:"Why not wait 3 months to re-evaluate after SRP?", choices:['The maximum PD reduction is seen by 4-6 weeks; waiting longer gives no additional reduction','Collagen can\'t mature before 3 months','Insurance requires 4-6 weeks','Calculus reforms after 6 weeks'], answer:0, src:'lecture' },
+{ id:'q4-L29', lec:'phase1-therapy', type:'mcq', stem:"Is scaling a supragingival or a subgingival procedure?", choices:['Both','Supragingival only','Subgingival only','Neither; it is only for prostheses'], answer:0, ex:"Root planing stays subgingival on root surfaces only. Clinically the two are done together.", src:'lecture' },
+{ id:'q4-L30', lec:'phase1-therapy', type:'mcq', stem:"A patient who has never had periodontitis has 1-2 mm of subgingival calculus in normal sulci. What is the appropriate procedure?", choices:['Prophylaxis','Periodontal maintenance','Scaling and root planing','Full-mouth debridement'], answer:0, ex:"Subgingival calculus doesn't make it periodontitis, and prophylaxis is preventive. Maintenance is supportive therapy only for patients already treated for periodontitis.", src:'lecture' },
+{ id:'q4-L31', lec:'phase1-therapy', type:'mcq', stem:"A treated periodontitis patient has mostly 1-3 mm pockets, a few non-bleeding 4s and one 5 mm site, good hygiene and no radiographic progression. What now?", choices:['Continue periodontal maintenance; localized SRP on non-responding sites is allowed under maintenance','Restart full-mouth SRP','Switch to prophylaxis','Refer for surgery immediately'], answer:0, src:'lecture' },
+{ id:'q4-L32', lec:'phase1-therapy', type:'mcq', stem:"A young patient, never diagnosed with periodontitis, had premolars extracted for orthodontics (so some bone loss and tipping) and now has generalized inflammation from heavy plaque and calculus. What is the diagnosis?", choices:['Generalized gingival inflammation on a reduced periodontium in a non-periodontitis patient','Stage 2 periodontitis','Gingival health on an intact periodontium','Necrotizing periodontitis'], answer:0, ex:"Treated with scaling in the presence of gingival inflammation (D4346), done with perio faculty, followed by a Phase I evaluation.", src:'lecture' },
+{ id:'q4-L33', lec:'phase1-therapy', type:'mcq', stem:"At the Phase I evaluation, inflammation and pockets persist, but you removed all deposits at SRP. What will help most?", choices:['Improving the patient\'s oral hygiene','Repeating full-mouth SRP','Adding a second round of irrigation','Immediate extraction'], answer:0, ex:"If residual calculus is the cause, remove it and re-evaluate in two weeks. Otherwise more SRP sessions won't do anything.", src:'lecture' },
+{ id:'q4-L34', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What can the clinic's piezoelectric ultrasonic NOT accomplish?", choices:['Root planing (a smooth root surface)','Subgingival deposit removal','Gross calculus removal','Pocket lavage'], answer:0, src:'lecture' },
+{ id:'q4-L35', lec:'phase1-therapy', mid:false, type:'sequence', stem:"Put Dr. Kaur's instrumentation sequence in order.", steps:['Ultrasonic to remove gross deposits','Hand instruments','Ultrasonic again to flush the pocket (lavage)'], src:'lecture' },
+{ id:'q4-L36', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Why is a curette safer subgingivally than a scaler?", choices:['A Gracey curette cuts on one side only, so the side facing the soft tissue is protected','Curettes are shorter','Curettes have a pointed tip','Curettes are used with a push stroke'], answer:0, ex:"Scalers have blades on both sides and use short, powerful strokes; curettes use longer, slightly lighter strokes.", src:'lecture' },
+{ id:'q4-L37', lec:'phase1-therapy', mid:false, type:'mcq', stem:"On your kit, what does an instrument marked 'SC' indicate, as opposed to 'SG'?", choices:['The single universal curette, with a blade on both sides','A Gracey curette','A sickle scaler','A calibrated probe'], answer:0, ex:"SG marks the site-specific Gracey curettes, which make up almost all the curettes on the kit.", src:'lecture' },
+{ id:'q4-L38', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What is the periodontal explorer in the exam kit used for?", choices:['Checking for smooth root surfaces (any catch or roughness) after therapy','Detecting occlusal caries','Measuring probing depth','Classifying furcations'], answer:0, src:'lecture' },
+{ id:'q4-L39', lec:'phase1-therapy', type:'mcq', stem:"When probing the mesiobuccal of a posterior tooth, where do you take the reading?", choices:['Past the line angle, under the contact area','At the mesiobuccal line angle','At the mid-buccal','Through the contact with firm pressure'], answer:0, ex:"Interproximal probing is not line-angle probing. Go under the contact point (anteriors) or contact area (posteriors).", src:'lecture' },
+{ id:'q4-L40', lec:'phase1-therapy', type:'recall', stem:"List the limitations of scaling and root planing discussed in class.", answer:"Pocket depth and access; SRP is a blinded, tactile procedure; motile bacteria invading the pocket lining (SRP only treats the pocket); restorative margins (overhanging, subgingival, open, rough); furcations; developmental grooves, fissures and concavities; over-removal of cementum causing hypersensitivity; patient compliance with oral hygiene; operator skill.", src:'lecture' },
+{ id:'q4-L41', lec:'phase1-therapy', type:'recall', stem:"Explain the two ways probing depth decreases after SRP.", answer:"At the gingival margin, inflammation and edema resolve, the tissue loses volume, and this is recorded as increased recession. At the base of the pocket, the junctional epithelium (7-10 days) and connective tissue (4-6 weeks) reattach to the freshly cleaned root.", src:'lecture' },
+{ id:'q4-L42', lec:'phase1-therapy', type:'mcq', stem:"Why does 'failure of therapy' after good SRP happen more often in smokers and uncontrolled diabetics?", choices:['The host response shapes healing as well as disease, so outcomes are poorer short- and long-term','They form calculus faster','Ultrasonics don\'t work on them','Their pockets are always shallower'], answer:0, ex:"Phase II (surgery to eliminate pockets) may follow.", src:'lecture' },
 
 /* ===== Lecture 5 — Resective Surgery & Furcation Management ===== */
 { id:'q5-01', lec:'resective-furcation', type:'mcq', stem:"On maxillary molars, which furcation entrance is the narrowest?", choices:['Buccal','Mesial','Distal','They are all equal'], answer:0, src:'exam-review' },
@@ -1363,31 +1408,72 @@ READINGS['risk-assessment'] = `
 `;
 
 READINGS['phase1-therapy'] = `
-<p>Phase I is the non-surgical stage every periodontal patient starts with, whatever the stage. This deck covers the whole arc: the exam that comes before treatment, what Phase I therapy is and why it works, the evidence on how to deliver it, how to judge it at re-evaluation, and the instruments and technique used. The slides were posted ahead of the session, so these notes come from the deck plus the class exam-review guide. The in-class emphasis will be added once the session is lectured.</p>
-<h5>The exam comes first</h5>
-<p>A complete periodontal exam covers oral hygiene (plaque index), gingival health, probing, attachment level, furcations, the mucogingival complex, mobility, occlusion, and radiographs. Plaque is shown to the patient with a probe or explorer, or with a disclosing tablet: chew it, rinse briefly, clear excess solution off the cheeks and tongue, then show the patient in a mirror and record the plaque index. Gingival health is read from <b>color</b> (erythema), <b>texture</b> (edema), <b>bleeding on probing</b>, and a gingival index.</p>
-<p>Probing records <b>six sites per tooth</b> (DB, B, MB, DL, L, ML), taking the deepest reading on each. Three numbers come out of it. <b>Probing depth</b> runs from the gingival margin to the base of the pocket. <b>Recession</b> runs from the CEJ to the gingival margin. <b>Clinical attachment level</b> runs from the CEJ to the base of the pocket, so CAL = PD + recession. The deck's paired examples make the point: a 7 mm pocket with no recession and a 2 mm pocket with 5 mm of recession both have a CAL of 7 mm. The attachment loss is the same, but the patient faces very different cleaning problems.</p>
-<p>The probe is the most important instrument in the exam. Use light pressure, feel for the elastic stop, and keep the probe parallel to the long axis of the tooth. Interproximally, tilt it slightly toward the area apical to the contact point. The usual errors are too little angulation or too much. Furcations are examined with the curved <b>Nabers probe</b> alongside radiographs. The mucogingival exam records how much keratinized gingiva there is and where the mucogingival junction sits. Recession and gingival overgrowth are noted here as well.</p>
-<p>Mobility is checked with <b>two rigid instruments</b>, one on each side of the tooth, and graded on the <b>Miller scale</b>: 0 is normal, 1 is slightly more than normal (&lt;1 mm), 2 is moderately more (&gt;1 mm but &lt;2 mm), and 3 is severe faciolingual and/or mesiodistal mobility combined with vertical displacement. Occlusion enters through parafunctional habits, mobility, fremitus, migration, open contacts, atypical wear and wear facets, possible TMJ pain, infrabony defects and a widened PDL space. Radiographs assess the mineralized tissues: horizontal vs. vertical (angular) bone loss, furcation invasion, periapical pathology, caries and other pathology.</p>
-<h5>What Phase I therapy is for</h5>
-<p>The goals are to restore gingival health, arrest disease progression, reduce inflammation, and shift the flora from mainly gram-negative toward more gram-positive species. A periodontal pocket is a space the patient cannot clean, filled with more virulent gram-negative flora and facing the host immune response. Phase I changes that local environment by removing the plaque, calculus and bacterial endotoxin that sustain the inflammation.</p>
-<p>The vocabulary matters because it maps onto codes. <b>Scaling</b> removes plaque, calculus and stain from supra- and subgingival surfaces. <b>Root planing</b> is the definitive step: removing cementum or surface dentin that is rough, calculus-impregnated, or contaminated with toxins or microorganisms. A <b>prophylaxis</b> is preventive scaling and polishing for patients without periodontal disease. <b>Periodontal maintenance</b> is for patients already treated for gingivitis or periodontitis and can include root planing where needed. <b>Scaling in the presence of gingival inflammation (D4346)</b> fits generalized moderate-to-severe gingival inflammation with suprabony pockets and moderate-to-severe BOP but <i>no periodontitis</i>, and it is not reported with a prophy, SRP or debridement. <b>Full-mouth debridement (D4355)</b> is gross removal of plaque and calculus so a proper evaluation and diagnosis can be done at a later visit. The deck's worked case, a non-periodontitis patient with a reduced periodontium and inflamed tissue, was diagnosed as <b>gingivitis on a reduced periodontium</b> and treated with D4346.</p>
+<p>Phase I is the non-surgical stage every periodontal patient starts with, whatever the stage. These notes combine the 2026 slide deck with the recorded class session. Dr. Kaur framed D2 as a step past D1: less about fundamentals, more about therapy, when it succeeds and fails, and what options exist, all to get you ready for clinic next year. She spent the session on the exam and the reasoning behind therapy, and deliberately left instrument detail for the upcoming PCD sessions.</p>
+<div class="pearl"><b>Midterm scope (Dr. Kaur's email after class):</b> you will not be tested on instruments, ultrasonics or polishing. Focus on the class discussion and the slides up to <b>failure of therapy</b>. In these notes, that means everything down to the section on Phase I evaluation and failure. The sections after it are marked.</div>
+<div class="pearl"><b>Flagged in class:</b> the host-bacteria pathogenesis diagram (health → gingivitis → periodontitis) was introduced with "how many times you have seen this before, has anybody been counting? That's going to be on the quiz." Know who initiates the disease, who drives it, and what SRP actually targets.</div>
+<h5>Start from the diagnosis</h5>
+<p>Every patient in the chair lands in one of three broad categories: <b>health</b>, <b>gingivitis</b> or <b>periodontitis</b>. Health and gingivitis can each sit on an <b>intact</b> or a <b>reduced periodontium</b>. Periodontitis cannot sit on an intact periodontium, because underlying bone loss is what separates it from the other two. You can't tell the three apart just by looking, whether from a photo or the patient's mouth. Tissue appearance is only one piece. An accurate diagnosis needs the full charting (probing depth, recession, attachment loss, furcations, mobility, tissue health) combined with the radiographs.</p>
+<h5>The exam: plaque and gingival health</h5>
+<p>A complete periodontal exam covers oral hygiene (plaque index), gingival health, probing, attachment level, furcations, the mucogingival complex, mobility, occlusion and radiographs. It always starts with oral hygiene, because plaque is the primary etiologic factor. There are two ways to capture plaque. You can run the probe about <b>1 mm</b> into the sulcus or pocket (not the same as measuring probing depth) and score each site <b>1</b> if you pick up plaque and <b>0</b> if you don't. Or the patient chews a <b>disclosing tablet</b> (lavender or pink, in the clinic inventory), rinses briefly, and you clear excess solution off the cheeks and tongue, show them in a mirror and record the index. Both methods record only <b>presence or absence</b>, not quantity. Quantifying plaque (gingival third, half the tooth, the whole tooth) at every site would take far more chair time.</p>
+<p>Gingival health is read from <b>color</b> (erythema), <b>texture</b> (edema), <b>bleeding on probing</b> and a gingival index. BOP is captured while you probe: a site that bleeds scores <b>1</b>, one that doesn't scores <b>0</b>. <b>Delayed bleeding counts.</b> When you've moved on to the next quadrant or the next two teeth, look back. Sites that have started bleeding since are still scored 1.</p>
+<p>Not every periodontitis case looks the same, because risk factors change the clinical picture. <b>Smoking masks inflammation</b>: nicotine's vasoconstriction tends to leave the tissue looking <b>cyanotic</b> rather than edematous and hemorrhagic. <b>Diabetes exaggerates it.</b> <b>Drug-induced gingival overgrowth</b> is a sign that something in the medical or social history is adding to the picture. The class example was a hypertensive patient on <b>amlodipine</b>, a calcium channel blocker, with bulbous enlargement mostly in the interdental tissue, and more on the buccal/labial than the lingual/palatal. The four patients shown (all from the student clinic) all had periodontitis. One was stage 1, one stage 2, and one had stage 2 with uncontrolled diabetes plus a calcium channel blocker, yet each looked different.</p>
+<h5>Probing, recession and CAL</h5>
+<p>Probing records <b>six sites per tooth</b> (DB, B, MB, DL, L, ML), taking the deepest reading on each. <b>Probing depth</b> runs from the gingival margin to the base of the pocket. <b>Recession</b> runs from the CEJ to the gingival margin. <b>Clinical attachment level</b> runs from the CEJ to the base of the pocket, so <b>CAL = PD + GR</b>. The deck's paired examples: a 7 mm pocket with no recession and a 2 mm pocket with 5 mm of recession both have a CAL of 7 mm.</p>
+<p>The lecture's main point about these numbers: <b>in health, probing depth is not equal to clinical attachment level.</b> In intact tissue the gingival margin sits slightly <b>coronal to the CEJ</b> and hides it. Recession is <b>positive</b> when there is true recession (you can see the CEJ) and <b>negative</b> when the margin is coronal to the CEJ: −1, −2, −3, or −3 to −4 or more with drug-induced overgrowth. Add it with its sign. PD 5 mm with GR −3 mm gives <b>CAL 2 mm</b>. Skip the recession and that same site reads CAL 5 mm, which would push you toward <b>Stage 3 or 4</b> even though the radiographs may show only about 20% bone loss. Probing depth, CAL and the radiographs have to tell the same story.</p>
+<p>The same trap is built into <b>Salud</b>. Leave recession blank, or type 0 without checking whether it is really positive or negative, and Salud sets CAL equal to PD. A blank <b>over-diagnoses</b> disease, and a reflexive zero gives an inaccurate diagnosis too. Only when you enter the signed value does Salud calculate CAL correctly.</p>
+<p>To measure negative recession, you have to <b>feel</b> the CEJ, because you can't see it. Walk the probe to the base of the pocket, then slowly draw it out until you feel the rough CEJ. The millimeters still under the margin at that point are the negative GR, which you subtract from PD. It's harder with heavy <b>inflammation</b> or <b>gingival overgrowth</b> (both pathologic), with <b>altered passive eruption</b> (physiologic), and with <b>calculus or restorative margins</b> that can feel like a CEJ. Some background on eruption: as a tooth comes in, <b>active eruption</b> moves the tooth toward occlusion, while <b>passive eruption</b> is the gingiva, with its connective tissue and junctional epithelium, migrating apically to settle at the CEJ. In altered passive eruption the tissue never makes that move, so the margin ends up well coronal to the CEJ. Expect a learning curve here.</p>
+<p>The probe is the most important instrument in the exam. Use light pressure, feel for the elastic stop, and keep it parallel to the long axis. <b>Interproximal probing is not line-angle probing.</b> Stopping at the line angle is wrong. Carry the probe past the line angle and under the contact point (anteriors) or contact area (posteriors), tilted slightly toward the area apical to the contact. The usual errors are too little angulation or too much.</p>
+<h5>When you can't probe yet: debridement</h5>
+<p><b>Debridement is not a therapeutic procedure.</b> You never do it to treat disease, and it should <b>never be combined with scaling and root planing</b>. Its only indication is that calculus hides the gingival margin so completely that you can't see or explore it, and so can't capture any numbers. There is only a <b>full-mouth</b> debridement code. No half-mouth, lower-anterior or maxillary-posterior version exists. The code is intended for generalized calculus heavy enough to cover even chewing surfaces, and you will seldom see that. Insurance won't pay for debridement and a periodontal exam at the same visit, on the reasoning that if you couldn't probe before, the tissue won't be ready right after. So in practice the patient comes back in about <b>two weeks</b> for full charting.</p>
+<p>At school it's more flexible. First-time perio charting is <b>free</b>, so after debriding a localized bridge of calculus you can go straight on to full-mouth charting in the same visit if the tissue holds up. Check with your faculty, who may prefer to let it settle for two weeks. Combining the two saves the patient a visit. In private practice you can choose not to bill the debridement at all, though a fully booked hygiene schedule is often a reason to stagger the appointments anyway.</p>
+<h5>Furcations: Glickman, not millimeters</h5>
+<p>Furcations are examined with the <b>Nabers probe</b>. It is curved, with alternating light and dark bands 3 mm apart, and it is read alongside radiographs. Even though it has markings, the language used here is the <b>Glickman classification</b>, not a millimeter scale. Class I is not "3 mm or less."</p>
+<ul>
+<li><b>Class I, incipient.</b> The probe just feels a catch. Usually needs no treatment, and it is easy to maintain as long as attachment loss and probing depth don't increase.</li>
+<li><b>Class II, cul-de-sac.</b> A definite furcation invasion, but a bony wall remains on the other side (probe from buccal and the palatal or lingual crest is still there). It has depth and containability, so it is the class <b>most amenable to regeneration</b>.</li>
+<li><b>Class III, through-and-through.</b> The hardest to treat. With no containability left, it has lost its regenerative potential.</li>
+<li><b>Class IV.</b> A class III that has also lost the soft tissue over it, naturally through recession or surgically, so the through-and-through furcation is visible. The patient can clean it with interdental aids or a water flosser, but the exposed root trunk risks sensitivity and <b>root caries</b>. Caries in a furcation makes the tooth hopeless, so keep these teeth under close watch at every maintenance visit.</li>
+</ul>
+<p>Dr. Kaur's cases: an upper molar (#3) with distopalatal and straight buccal involvement was the only distal abutment of a bridge, so rather than extract it, the class III was converted to class IV (furcation cleaned, margin moved apically for access). That patient is still doing well. Another patient with the same treatment developed a large carious lesion under the furcation roof.</p>
+<h5>Mucogingival exam, mobility and occlusion</h5>
+<p>The mucogingival exam asks how much keratinized tissue the patient has. Measure its width directly, or use the <b>rolling technique</b>: roll the mucosa coronally until you reach the mucogingival junction, beyond which it won't roll. This matters around <b>implants</b> as well as teeth. Recession and overgrowth are noted here too.</p>
+<p>Mobility is checked with <b>two rigid (blunt) instruments</b>, one on each side of the tooth, and graded on the <b>Miller scale</b>: 0 is normal, 1 is slightly more than normal (&lt;1 mm), 2 is moderately more (&gt;1 mm but &lt;2 mm), and 3 is severe faciolingual and/or mesiodistal mobility combined with vertical displacement. A tooth that is <b>depressible</b> in its socket is ready for extraction. That's <b>static</b> mobility. <b>Fremitus</b> is mobility in <b>function</b>. You rest a finger on the root while the patient brings the teeth together and feel for vibration. It can have a vertical and/or horizontal component, and it is <b>palpated, not seen</b>, unless it is extreme. Positive fremitus means you need to find out why the tooth carries that load. In the class example, lack of posterior support meant the <b>premolars were doing the work of molars</b>.</p>
+<p>The perio chart has no place for occlusal findings, so record them in the <b>notes section</b>: wear patterns, erosion, vertical defects and whether they tie to an occlusal problem, and parafunctional habits. That matters because mobility isn't always from periodontitis alone. It can be <b>occlusal trauma on a reduced periodontium</b>, from lack of posterior support, parafunction, or overjet and overbite. Treating a 5 mm pocket won't resolve grade 2 mobility unless the occlusion is addressed. The deck's list of occlusal signs: parafunctional habits, mobility, fremitus, migration, open contacts, atypical wear and wear facets, possible TMJ pain, infrabony defects and a widened PDL space.</p>
+<h5>Radiographs, before you touch the patient</h5>
+<p>Before any clinical data, a radiograph can show you whether there is <b>bone loss</b>, where it is (<b>localized or generalized</b>) and its pattern (<b>horizontal, vertical</b>, or both). It also shows <b>tipped teeth</b>, <b>fused roots</b>, <b>root proximity</b> (important for surgical and non-surgical therapy), <b>calculus</b>, <b>sinus proximity</b>, and a <b>periapical lesion</b> (#7 in the class film). Seeing calculus on a radiograph should make you "a little bit of both" sad and excited. Sad the patient got there, excited because you now know the cause and it is something you can remove. Once calculus has formed the patient can't remove it, so your role matters even more.</p>
+<p>Her practical tip: when you sit down for SRP (or even a prophy), don't open the chart to hunt for deep pockets. The instrument will find the pocket, and its base is your limit. Open the <b>x-rays</b> instead (screenshot them, since Salud times out). Then roughness on #14-15 matches calculus you've already seen, and exudate or a sinus tract on #7 matches the PA lesion. Always look at the x-rays before you start capturing numbers.</p>
+<h5>Why Phase I works: bacteria start it, the host drives it</h5>
+<p>Plaque bacteria <b>initiate</b> the disease. The <b>host immune response</b> drives its <b>progression</b>. In health the host is responsive and the bacterial load isn't virulent enough, so inflammation is fought off acutely before disease surfaces. In gingivitis the bacterial composition shifts and the attack gets more aggressive. The host still wins, but it takes longer: T cells and B cells are recruited alongside PMNs, and you see inflammation for days to weeks. Not every patient moves from reversible to irreversible inflammation. Those who do have a host that has become <b>hyper-responsive</b>, whether to the same bacteria or a heavier attack, releasing pro-inflammatory cytokines. Environmental, genetic, behavioral and epigenetic factors add risk. The picture of periodontitis is attachment loss, bone loss, loss of PDL, cementum and alveolar bone.</p>
+<p>SRP targets the <b>bacteria</b>, yet bacteria cause only about <b>25%</b> of the damage. About <b>75%</b> comes from the host's inflammatory mediators and bone-destroying cells (<b>osteoclasts</b>). Bacteria bring <b>endotoxin (lipopolysaccharide)</b>, not osteoclasts. Removing the bacteria calms the host response. When even good home care plus the best SRP or surgery leaves residual disease, you can also calm the host directly. That is <b>host modulation</b>, or "periodontal medicine," covered later by Dr. Litz. Bacteria cover calculus and live inside its tubules. Calculus and plaque also act as <b>irritants</b> the host reacts to, supra- or subgingivally.</p>
+<p>The goals of removing them: <b>reduce inflammation</b>, shift the pocket flora from <b>gram-negative toward gram-positive</b> (healthy mouths still have bacteria, just different ones), and <b>arrest progression</b>. SRP does <b>not reverse the damage</b>. Lost bone and attachment stay lost, which is why periodontitis is called irreversible. And <b>pocket elimination is not the rationale</b> for SRP, even though pockets do shrink. A pocket is a space the patient can't clean, filled with more virulent gram-negative flora and facing the host response. Phase I changes that local environment.</p>
+<h5>How pockets shrink, and why re-evaluate at 4-6 weeks</h5>
+<p>Two changes reduce probing depth. At the <b>gingival margin</b>: inflammation means increased volume (cells and fluid, inside and outside cells). As it resolves the tissue shrinks, which you record clinically as <b>increased recession</b>. At the <b>base of the pocket</b>: disease had broken both the junctional epithelium (which is why the probe sank deeper) and the connective tissue fibers. After SRP both <b>reattach</b> to the clean root. The measurement is two-dimensional, but the disease is three-dimensional.</p>
+<p>The healing clock: <b>junctional epithelium 7-10 days</b>, <b>connective tissue reattachment 4-6 weeks</b>, and collagen fiber <b>maturation and orientation 3-6 months</b>. That is why the patient returns at <b>4-6 weeks</b>. You see the maximum result by then, and research shows waiting longer gives no additional pocket reduction. The deck puts it slightly differently: the biggest PD changes happen in the first 4 weeks, the dentogingival junction is re-established at <b>2-4 weeks</b>, and repair and maturation can continue for <b>9-12 months</b>. Know both sets of numbers. The deck's "6 mm might become 5 or 4.5" figures are there for a sense of scale. She said you are <b>not expected to memorize</b> them.</p>
+<h5>The vocabulary (and the codes)</h5>
+<p><b>Scaling</b> removes soft and hard deposits from tooth and root surfaces and from any fixed or removable prosthesis, <b>both supra- and subgingivally</b>. If asked whether scaling is supra- or sub-G, the answer is both. <b>Root planing</b> stays <b>subgingival</b> and works only on root surfaces, removing cementum or surface dentin that is rough, calculus-impregnated or contaminated, to leave a smooth root with no ridges, roughness or catch. Clinically the two are done together.</p>
+<p><b>Prophylaxis</b> is <i>preventive</i>, not therapeutic. It is for a patient who has <b>never had periodontitis</b> (gingival health or gingivitis). Subgingival calculus doesn't make it periodontitis: normal sulci have depth, and calculus 1-2 mm down is subgingival and gets removed as part of the prophy. <b>Periodontal maintenance</b> is <i>supportive</i> therapy for a patient <b>already treated for periodontitis</b>, to keep the disease from recurring, with oral hygiene evaluated every visit. The terms are not interchangeable. A maintenance patient with mostly 1-3 mm pockets, some residual 4s and an isolated 5 is fine to stay on maintenance when hygiene is good, those sites don't bleed, the tissue looks healthy and the radiographs show no progression. <b>Localized SRP on residual pockets</b> that didn't respond is defined as part of maintenance.</p>
+<p><b>Scaling in the presence of gingival inflammation (D4346)</b> sits between a prophy and SRP. It is for a patient <b>never diagnosed with periodontitis</b> who has no bone loss but heavy, generalized inflammation from local factors (plaque and calculus), so a simple prophy undersells the work. At school it's done the perio way, with perio faculty or a resident, and gets a <b>Phase I evaluation</b>. The class case was a young patient (20s to early 30s) with a lingual bridge of calculus. What looked like bone loss around the premolars and mesial of the molars came from second premolars extracted for orthodontics and the tipping that followed, not from periodontitis. Diagnosis: <b>generalized gingival inflammation on a reduced periodontium in a non-periodontitis patient</b> (the deck calls it gingivitis on a reduced periodontium), treated with D4346. That case had debridement, charting and therapy in the same visit. <b>Full-mouth debridement (D4355)</b> is gross removal so a proper evaluation can be done at a later visit.</p>
 <h5>What the evidence says about delivery</h5>
-<p>There is no considerable advantage to spreading instrumentation over <b>multiple sessions</b>: calculus left behind after several visits stays for the same reasons it stays after one (Anderson et al. 1996). <b>Manual and mechanically driven</b> (ultrasonic) instrumentation show no statistical difference in probing-depth reduction or attachment gain, and adding subgingival irrigation with chlorhexidine, saline or peroxide adds nothing. Non-surgical therapy has real limits. Root debridement is inadequate about <b>65% of the time in pockets ≥5 mm</b>. It does not reliably suppress <i>A. actinomycetemcomitans</i>. Overhanging or over-contoured restorations, furcations and root anatomy block access. Removing cementum to chase endotoxin can cause hypersensitivity. And results depend on operator skill and on patient compliance with hygiene and maintenance (Greenstein 2000).</p>
-<h5>Phase I evaluation (re-evaluation)</h5>
-<p>Re-evaluate at <b>4-6 weeks</b>: plaque scores, signs of inflammation, BOP, PD, recession, CAL, mobility, furcation and suppuration. The largest probing-depth changes come in the first 4 weeks, and most of the reduction is from inflammation and edema resolving, with the recession that follows, not from new attachment. The dentogingival junction is re-established at <b>2-4 weeks</b>, and repair and maturation can continue for <b>9-12 months</b>. This is the visit where the decision about surgery is made.</p>
-<p>If Phase I has failed, look for the reason: how the tissue responded, what deposits remain, the health history and risk factors, and possibly a plaque culture. Then choose among antibiotics or antimicrobials, host-modulation strategies, repeating non-surgical therapy, another Phase I re-evaluation, or periodontal surgery (Phase II).</p>
-<h5>The instruments</h5>
-<p>Periodontal hand instruments fall into mirrors, explorers, probes, scaling and root-planing instruments, and polishing instruments. Each has a handle, a shank and a working end. The <b>mirror</b> gives indirect vision, illumination and retraction. The <b>ODU 11/12 explorer</b> is used on every surface of every tooth to feel root roughness. Its shank resembles the Gracey 11/12, and it is inserted with the terminal shank parallel to the tooth down to the slight resistance of the epithelial attachment, using up-and-down and side-to-side strokes with the side of the tip. The <b>UNC-15</b> probe is 15 mm long. The exam kit is probe, explorer, Nabers probe, mirror and cotton pliers.</p>
-<p><b>Scalers vs. curettes.</b> A sickle scaler has a pointed tip, a triangular cross-section and two cutting edges, and works supragingivally (reaching only 1-2 mm below the margin). Use on exposed cementum is restricted. It is used with a short, powerful <b>pull</b> stroke under the ledge of calculus, using the lower third of the blade. The <b>H6/7</b> anterior sickle has a straight shank for anterior teeth and the buccal/lingual of molars. The <b>S204SD9</b> posterior sickle has a right-angled shank for posterior interproximals. Both work at about 80° to the root. A curette has a rounded tip and a half-circle cross-section and works supra- and subgingivally. A universal curette (<b>Columbia 13/14</b>) has two cutting edges. An area-specific <b>Gracey</b> has one.</p>
+<p>There is no considerable advantage to spreading instrumentation over <b>multiple sessions</b>: calculus left behind after several visits stays for the same reasons it stays after one (Anderson et al. 1996). <b>Manual and mechanically driven</b> (ultrasonic) instrumentation show no statistical difference in probing-depth reduction or attachment gain, and adding subgingival irrigation with chlorhexidine, saline or peroxide adds nothing. Root debridement is inadequate about <b>65% of the time in pockets ≥5 mm</b> (Greenstein 2000).</p>
+<p>The limitations, as she taught them: deeper pockets are harder to reach, though a 5 mm pocket doesn't mean calculus is left every time. <b>SRP is a blinded procedure</b>: tactile sensation and proprioception are your guide in the pocket. <b>Motile bacteria</b> invade the pocket lining, while SRP only targets the pocket itself (and it doesn't reliably suppress <i>A. actinomycetemcomitans</i>). <b>Restorations</b> with overhanging, subgingival, open or rough margins both collect plaque and resist cleaning. <b>Furcations</b> and <b>developmental grooves, fissures and concavities</b> block access. Chasing a smooth root can remove too much <b>cementum</b>, causing <b>hypersensitivity</b>. And results depend on the patient's <b>compliance</b> with hygiene and on <b>operator skill</b>, which has a learning curve.</p>
+<h5>Phase I evaluation, and when it "fails"</h5>
+<p>Re-evaluate at <b>4-6 weeks</b>: plaque scores, signs of inflammation, BOP, PD, recession, CAL, mobility, furcation and suppuration. This is the visit where the decision about surgery is made. If there's still inflammation and the numbers haven't improved, check whether <b>residual calculus</b> is the reason. You'll often feel it with the probe while recharting. If it is, remove it (not charged) and do another Phase I evaluation in <b>two weeks</b>. If you already removed all the deposits the first time, <b>more rounds of SRP won't do anything</b>. What works is <b>improving the patient's oral hygiene</b>.</p>
+<p>"Failure of therapy" is a harsh term, because so much is outside your control. The host response matters to healing as well as to disease. A <b>smoker</b> or a patient with <b>uncontrolled diabetes</b> may not get the same short- or long-term result from your best SRP. The deck's approach to a failed Phase I: assess the tissue response, remaining deposits, health history and risk factors, possibly a plaque culture. Then choose among antibiotics or antimicrobials, host modulation, repeating non-surgical therapy, another re-evaluation, or <b>Phase II</b>, which is <b>surgical therapy to eliminate pockets</b>.</p>
+<h5>The instruments (not on the midterm)</h5>
+<p>Per Dr. Kaur's email, instruments, ultrasonics and polishing are off the midterm, and in the deck they come after failure of therapy. The email only covers the midterm, so this material can still come back on the comprehensive final and in the PCD instrument competency.</p>
+<p>She deliberately kept instruments light this session. They get dissected in the upcoming <b>PCD</b> sessions, and you don't need the numbers yet, though you will later. For now, three sets live on your daily kits. The <b>exam kit</b> holds the mirror, the periodontal probe, the Nabers probe for furcations, and a <b>periodontal explorer</b>. That explorer is not the caries explorer. You use it after therapy to check for smooth roots or any catch or roughness. Then come <b>scalers</b> and <b>curettes</b>. Every instrument has a handle, a shank and a blade (the shank connects the two).</p>
+<p><b>Scalers</b> are mainly supragingival. They reach only a short way subgingivally (the deck says 1-2 mm; in class she said about 2-3, noting sources give 1-3 or 1-2). Working strokes are <b>short, powerful and fast</b>. <b>Curettes</b> travel deep into the pocket with <b>longer, slightly lighter</b> strokes that take more time, though tenacious calculus can still need real pressure. The key difference is the blade. A scaler has cutting edges on <b>both sides</b>. A Gracey curette cuts on <b>one side</b> only, so subgingivally the side facing the soft tissue is protected. Nearly every curette on the kit is a <b>Gracey</b>, marked <b>SG</b>, site-specific with one cutting edge. The single <b>SC</b> instrument is the one <b>universal curette</b>, which, like a scaler, has a blade on both sides.</p>
+<p>The clinic has <b>piezoelectric</b> ultrasonic handpieces and tips alongside hand instruments. They can be used subgingivally, but they <b>cannot root plane</b>, so they won't leave a smooth root. Use them in combination: <b>ultrasonic</b> to remove gross deposits, then <b>hand instruments</b>, then the <b>ultrasonic again</b> so the irrigation's lavage flushes the pocket.</p>
+<p>From the deck, for later: periodontal hand instruments are mirrors, explorers, probes, scaling and root-planing instruments, and polishing instruments. The <b>mirror</b> gives indirect vision, illumination and retraction. The <b>ODU 11/12 explorer</b> is used on every surface of every tooth to feel root roughness. Its shank resembles the Gracey 11/12, and it is inserted with the terminal shank parallel to the tooth down to the slight resistance of the epithelial attachment, using up-and-down and side-to-side strokes with the side of the tip. The <b>UNC-15</b> probe is 15 mm long. The exam kit is probe, explorer, Nabers probe, mirror and cotton pliers.</p>
+<p><b>Sickle scalers</b> have a pointed tip, a triangular cross-section and two cutting edges. Use on exposed cementum is restricted. They work with a short, powerful <b>pull</b> stroke under the ledge of calculus, using the lower third of the blade. The <b>H6/7</b> anterior sickle has a straight shank for anterior teeth and the buccal/lingual of molars. The <b>S204SD9</b> posterior sickle has a right-angled shank for posterior interproximals. Both work at about 80° to the root. A curette has a rounded tip and a half-circle cross-section and works supra- and subgingivally. A universal curette (<b>Columbia 13/14</b>) has two cutting edges. An area-specific <b>Gracey</b> has one.</p>
 <p><b>Gracey curettes</b> have a 70° blade angle, a single cutting edge on the lower side of the blade, a rounded back that protects the tissue, and a lower shank that should sit parallel to the long axis of the tooth. Each is inserted at a closed angle, then opened to a <b>70-80° working angle</b> against the root. The <b>3/4</b> (or 1/2, 7/8) covers all surfaces of anterior teeth (the demo slide adds premolars) and deep subgingival calculus. The <b>11/12</b> covers mesial surfaces of posterior teeth plus the buccal/lingual of molars. The <b>15/16</b> is an alternative mesial-posterior instrument. The <b>13/14</b> covers distal surfaces of posterior teeth: its shank has more bends than the 11/12, and it is pulled apico-coronally or postero-anteriorly.</p>
 <p><b>Ultrasonics</b> come in two types. A <b>magnetostrictive</b> unit sends electrical energy to nickel-iron metal stacks in the insert, which change shape and vibrate in an elliptical-to-orbital pattern at roughly 18,000-42,000 cycles per second, so every surface of the tip can debride. A <b>piezoelectric</b> unit uses crystals in the handpiece, and the tip moves linearly, so mainly its lateral surfaces work. For <b>implants</b>, probes are marked in 3-mm sections (3-6-9-12 or 3-6-8-11), and the listed instruments are anterior and posterior sickles plus the Columbia 4R/4L.</p>
-<h5>Technique</h5>
+<h5>Technique (not on the midterm)</h5>
 <div class="pearl"><b>Don't forget (the deck's own emphasis):</b> modified pen grasp and a finger rest.</div>
 <p>There are four intraoral finger rests: <b>conventional</b> (tooth surfaces right next to the working area), <b>cross-arch</b> (the other side of the same arch), <b>opposite-arch</b> (the opposite arch), and <b>finger-on-finger</b> (the index finger or thumb of the non-working hand). Adaptation depends on the tissue (fibrotic vs. hemorrhagic), the severity of disease (how retractable the tissue is, the interproximal embrasure), and how tenacious the calculus is.</p>
 <p>An <b>exploratory stroke</b> uses light force with the instrument adapted, to map the depth and topography of the pocket and find calculus. A <b>working stroke</b> uses a tight grasp with pressure through the working end: <b>scaling</b> strokes are short, overlapping, powerful and controlled, and <b>root-planing</b> strokes are longer and shaving, with lighter pressure. You check your work during the session by exploring the root surface, and at Phase I evaluation by the tissue response: less erythema, edema and BOP. The patient's own hygiene weighs heavily on that result. The areas most often missed are the <b>CEJ, furcation entrances, line angles</b> and hard-to-reach areas, especially <b>distal surfaces of posterior teeth</b>.</p>
-<h5>To polish or not to polish</h5>
-<p>For polishing: it removes extrinsic stain that brushing and scaling leave, prepares teeth for sealants, fluoride gels and varnishes, and patients like it. Against: 30 seconds with pumice can remove up to <b>4 µm of enamel</b>, and the outermost layer holds the most fluoride. A coarse abrasive can leave a rougher surface than it started with. Steady pressure from a fast rubber cup can cause pain and possible pulpal damage. A rubber cup with pumice for 2 minutes can strip the sulcular epithelium entirely, and pumice can be pushed subgingivally. If you polish, use a low-abrasion paste on a slow-speed handpiece with minimal heat, the cup at 90° to the tooth, and intermittent light pressure.</p>
+<h5>To polish or not to polish (not on the midterm)</h5>
+<p>For polishing: it removes extrinsic stain that brushing and scaling leave, prepares teeth for sealants, fluoride gels and varnishes, and patients like it. Against: 30 seconds with pumice can remove up to <b>4 µm of enamel</b>, and the outermost layer holds the most fluoride. A coarse abrasive can leave a rougher surface than it started with. Steady pressure from a fast rubber cup can cause pain and possible pulpal damage. A rubber cup with pumice for 2 minutes can strip the sulcular epithelium entirely, and pumice can be pushed subgingivally. If you polish, use a low-abrasion paste on a slow-speed handpiece with minimal heat, the cup at 90° to the tooth, and intermittent light pressure. (Polishing came from the deck. It wasn't covered in the recorded session.)</p>
 `;
 
 READINGS['resective-furcation'] = `
@@ -1433,6 +1519,44 @@ var EXAM_HINTS = [
   { lec:'incisions-flaps-sutures', type:'emphasize', quote:"What was question number one in your quiz? Where do you place your vertical incision? ...At the line [angle]... Why I cannot place it in the middle? ...It would lead to recession... If I place it in the middle of the papilla, what's going to happen? I might kill the papilla and you end up with a black triangle.", takeaway:"Confirmed as a literal quiz question: vertical incisions go at the line angle, never through the papilla — placing one mid-papilla risks a black triangle, placing one off the line angle risks recession." },
   { lec:'incisions-flaps-sutures', type:'emphasize', quote:"When we say trapezoidal flap that was another question exam or quiz... most of the time when you are doing your vertical incisions... the base always has to be wider than the upper part... so that the flap can survive.", takeaway:"Confirmed as a literal quiz question: a flap's base must be wider than its coronal edge, or the flap starves the tissue it's still attached to of blood supply." }
 ];
+
+/* ---------- SESSION 4 — reference data from the class recording ---------- */
+var GLICKMAN_FURCATION = [
+  { cls:'I', name:'Incipient', finding:'The Nabers probe just feels a catch', mgmt:'Usually no treatment; easy to maintain if CAL and PD stay stable' },
+  { cls:'II', name:'Cul-de-sac', finding:'Definite invasion, but a bony wall remains on the other side', mgmt:'Most amenable to regeneration (depth + containability)' },
+  { cls:'III', name:'Through-and-through', finding:'Probe passes between the roots', mgmt:'Hardest to treat; no containability, so no regenerative potential' },
+  { cls:'IV', name:'Through-and-through, visible', finding:'Class III with soft tissue lost (recession, or made surgically)', mgmt:'Patient cleans with interdental aids or a water flosser; watch closely for root caries (a carious furcation means hopeless)' }
+];
+var CAL_CASES = [
+  { pd:'5 mm', gr:'−3 mm (margin coronal to CEJ)', cal:'2 mm', lesson:'Add recession with its sign' },
+  { pd:'5 mm', gr:'Left blank or entered as 0', cal:'5 mm (Salud sets CAL = PD)', lesson:'Over-diagnoses: reads as Stage 3/4 when x-rays may show ~20% bone loss' },
+  { pd:'7 mm', gr:'0', cal:'7 mm', lesson:'Deck example: deep pocket, no recession' },
+  { pd:'2 mm', gr:'+5 mm', cal:'7 mm', lesson:'Deck example: same attachment loss, very different pocket' }
+];
+var CEJ_CHALLENGES = ['Heavy inflammation (pathologic)','Gingival overgrowth, e.g. drug-induced (pathologic)','Altered passive eruption (physiologic: the gingiva never migrated apically to the CEJ)','Calculus or restorative margins that feel like a CEJ'];
+var TISSUE_MODIFIERS = [
+  { factor:'Smoking', effect:'Masks inflammation', look:'Cyanotic rather than edematous and hemorrhagic (nicotine vasoconstriction)' },
+  { factor:'Diabetes', effect:'Exaggerates inflammation', look:'More inflamed than the local factors alone would explain' },
+  { factor:'Calcium channel blocker (e.g. amlodipine)', effect:'Drug-induced gingival overgrowth', look:'Bulbous, mostly interdental; buccal/labial more than lingual/palatal' }
+];
+var CARE_TYPES = [
+  { name:'Prophylaxis', who:'Never had periodontitis (gingival health or gingivitis)', what:'Preventive, not therapeutic. Includes removing shallow subgingival calculus.' },
+  { name:'Scaling in the presence of gingival inflammation (D4346)', who:'Never diagnosed with periodontitis, no bone loss from periodontitis, but heavy generalized inflammation from local factors', what:'Between a prophy and SRP; done with perio faculty, followed by a Phase I evaluation' },
+  { name:'Scaling and root planing', who:'Periodontitis', what:'Therapeutic: scaling supra- and subgingivally, root planing subgingivally on roots only, done together' },
+  { name:'Periodontal maintenance', who:'Already treated for periodontitis', what:'Supportive therapy to prevent recurrence; OHI evaluated each visit; localized SRP on non-responding residual pockets is allowed' },
+  { name:'Full-mouth debridement (D4355)', who:'Calculus hides the gingival margin so nothing can be charted', what:'Not therapeutic; never combined with SRP; full-mouth code only; exam usually ~2 weeks later (combinable at school, where first charting is free)' }
+];
+var HEALING_TIMELINE = [
+  { event:'Junctional epithelium reattaches', when:'7-10 days', src:'Class' },
+  { event:'Dentogingival junction re-established', when:'2-4 weeks', src:'Deck' },
+  { event:'Connective tissue reattaches', when:'4-6 weeks', src:'Class' },
+  { event:'Phase I re-evaluation (maximum PD reduction; waiting longer adds none)', when:'4-6 weeks', src:'Class + deck' },
+  { event:'Residual calculus found at re-eval: remove, then re-evaluate', when:'2 weeks later', src:'Class' },
+  { event:'Collagen fibers mature and orient', when:'3-6 months', src:'Class' },
+  { event:'Gradual repair and maturation', when:'Up to 9-12 months', src:'Deck' }
+];
+var RADIOGRAPH_READS = ['Bone loss vs. none','Localized vs. generalized','Horizontal vs. vertical (or both)','Tipped teeth','Fused roots','Root proximity','Calculus (the cause, and removable)','Sinus proximity','Periapical lesions'];
+var SRP_LIMITS = ['Pocket depth and access','A blinded, tactile procedure','Motile bacteria invading the pocket lining','Restorative margins: overhanging, subgingival, open, rough','Furcations','Developmental grooves, fissures, concavities','Over-removing cementum → hypersensitivity','Patient compliance with hygiene','Operator skill (a learning curve)'];
 
 /* ---------- SESSION 4 (Phase I therapy) — reference data from the 2026 slide deck ---------- */
 var PERIO_EXAM_COMPONENTS = ['Oral hygiene (plaque index)','Gingival health (color/erythema, texture/edema, bleeding on probing, gingival index)','Periodontal probing (6 sites per tooth)','Attachment level','Furcation analysis (Nabers probe)','Mucogingival exam (keratinized gingiva, MGJ location)','Mobility','Occlusal analysis','Radiographic exam'];
@@ -1529,8 +1653,29 @@ EXAM_HINTS.push(
   { lec:'risk-assessment', type:'emphasize', quote:"The mistake everybody makes is they want to flip-flop poor and questionable, right? Because it feels like poor is worse.", takeaway:"In McGuire & Nunn, questionable comes after poor. A questionable tooth either gets worse (hopeless) or improves (poor)." },
   { lec:'risk-assessment', type:'emphasize', quote:"Instead of memorizing the order, which we will then lay down on our pillow the night after the midterm and it will all flow out of our ear... let's think about what those two systems are based on.", takeaway:"McGuire & Nunn is about tooth retention (diagnostic or therapeutic). Kwok & Caton is about periodontal stability (therapeutic only), which is why questionable sits in its middle." },
   { lec:'risk-assessment', type:'emphasize', quote:"Which of these can be used as a diagnostic prognostication system? Everybody in here should have the answer to that, right?", takeaway:"Only McGuire & Nunn works as a diagnostic prognosis. Any of the three can be used therapeutically." },
-  { lec:'phase1-therapy', type:'emphasize', src:'slide', quote:"Don't Forget!!! 1. Modified Pen Grasp Technique 2. Finger Rest", takeaway:"The one slide in the deck set in all-caps emphasis. Know the four finger rests (conventional, cross-arch, opposite-arch, finger-on-finger). From the slide deck, not a recording, since the session hasn't been lectured yet." }
+  { lec:'phase1-therapy', type:'emphasize', src:'slide', quote:"Don't Forget!!! 1. Modified Pen Grasp Technique 2. Finger Rest", takeaway:"The one slide in the deck set in all-caps emphasis. Know the four finger rests (conventional, cross-arch, opposite-arch, finger-on-finger). From the slide deck. In class she deferred grasp and finger rests to the PCD sessions, so expect them there and on the practical." }
 );
+EXAM_HINTS.push(
+  { lec:'phase1-therapy', type:'deemphasize', src:'email', quote:"For the midterm exam, you will not be tested on instruments/ultrasonics/polishing. For exam preparation, focus on the discussion and slides up to failure of therapy in the given pdf.", takeaway:"From Dr. Kaur's email the day after class. Everything in the deck after failure of therapy (instruments, ultrasonics, technique, polishing) is off the midterm. Those questions are tagged 'Not on midterm' and left out of the midterm mock exam. The email says nothing about the final, so don't drop them for good." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"How many times you have seen this before? Has anybody been counting? That's going to be on the quiz.", takeaway:"Said of the host-bacteria pathogenesis diagram (health → gingivitis → periodontitis). Know it cold: plaque bacteria initiate, the host response drives progression, and SRP targets the bacteria." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Bacteria is only responsible for 25% of the damage that happens in periodontitis. 75% of the damage that happens in periodontitis is because of those inflammatory markers and cells of bone destruction, osteoclasts, that are released by the host.", takeaway:"The 25/75 split. Bacteria bring endotoxin (LPS), not osteoclasts. Removing them calms the host, and host modulation (Dr. Litz) calms it directly." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"In health, pocket depth is not equal to clinical attachment level.", takeaway:"The margin sits coronal to the CEJ, so recession is negative. CAL = PD + GR with its sign: PD 5, GR −3 → CAL 2." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Not putting anything for gingival recession will make you over-diagnose disease. Just putting zeros without calculating if there is a positive or negative gingival recession will also give you inaccurate diagnosis.", takeaway:"In Salud a blank or a reflexive 0 sets CAL = PD. Skipped negative recession turns a CAL-2 site into CAL 5 and a false Stage 3/4." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Debridement is not a therapeutic procedure... debridement should never be combined with scaling and root planing.", takeaway:"The only indication is calculus hiding the gingival margin so no numbers can be captured. Full-mouth code only; insurance won't pay for it plus an exam the same day (return in about 2 weeks)." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Class 2 furcation is the one which is most amenable for regeneration... Class three is through and through. It's the most difficult one to treat.", takeaway:"Glickman, not millimeters: I catch, II cul-de-sac (containable), III through-and-through, IV visible. Root caries in a Class IV furcation means a hopeless tooth." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Fremitus is palpated, not seen.", takeaway:"Fremitus is mobility in function, felt with a finger on the root; it can be vertical and/or horizontal. Static mobility uses two blunt instruments, and a depressible tooth is ready for extraction." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"We cannot assume by treating a 5 millimeter pocket on that site, we are going to resolve grade 2 mobility on that tooth, unless we address the underlying occlusal deformity.", takeaway:"Occlusal trauma on a reduced periodontium (lack of posterior support, parafunction, overjet/overbite). Record occlusal findings in the notes section, since the chart has no field for them." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Sometimes the immediate response is to get rid of the pocket. That is not the rationale for doing scaling and root planing.", takeaway:"The goals are less inflammation, a gram-negative → gram-positive shift and arrested progression. SRP does not reverse bone or attachment loss, even though PD drops." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Research has shown if we wait longer, we are not going to get any additional reduction in that pocket.", takeaway:"Why re-evaluation is at 4-6 weeks: JE reattaches in 7-10 days, connective tissue in 4-6 weeks (collagen matures over 3-6 months)." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"If you have taken care of all the calculus and bacteria at the time of scaling and root planing, multiple sessions of scaling and root planing is not going to do anything. But what is going to work here is improvement in patient's oral hygiene.", takeaway:"At re-eval, residual calculus → remove it and re-evaluate in 2 weeks. Otherwise the fix is home care, not more SRP." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"If someone asks you, is scaling only for supra-G or sub-G? It's for both.", takeaway:"Scaling is supra- and subgingival. Root planing is subgingival, on root surfaces only. Clinically they're done together." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Sometimes we end up using these terms interchangeably, they are completely different.", takeaway:"Prophylaxis is preventive, for patients who never had periodontitis. Maintenance is supportive therapy after treated periodontitis, and localized SRP on residual pockets falls under it. D4346 sits between prophy and SRP." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"The only thing the ultrasonic instruments cannot accomplish is root planing.", takeaway:"Piezoelectric units work subgingivally too. Her sequence: ultrasonic for gross deposits → hand instruments → ultrasonic again for lavage." },
+  { lec:'phase1-therapy', type:'emphasize', quote:"Always have a look at x-rays even before you start capturing your numbers.", takeaway:"Radiographs show bone loss (localized/generalized, horizontal/vertical), tipping, fused roots, root proximity, calculus, the sinus and PA lesions. Keep them open during SRP rather than the chart." },
+  { lec:'phase1-therapy', type:'deemphasize', quote:"You are not expected to memorize the numbers. This is just to give you an idea if you have a 6 millimeter pocket how much change you can expect.", takeaway:"The deck's expected-reduction figures (a 6 mm pocket becoming 5 or 4.5) are for scale only. Know why pockets shrink, not the table." },
+  { lec:'phase1-therapy', type:'deemphasize', quote:"We are not going to go in detail about the instruments in this session... You don't have to remember the numbers for now, but later you will have to.", takeaway:"Instrument numbers and anatomy get dissected in the upcoming PCD sessions (and the must-pass instrument competency). For now: scaler vs. curette, SG = Gracey, SC = the one universal curette." }
+);
+
 
 /* ---------- ATLAS VIEWS ---------- */
 var ATLAS_VIEWS = [
@@ -1540,7 +1685,7 @@ var ATLAS_VIEWS = [
   { id:'furcation-map', title:'Furcation Anatomy', lec:'resective-furcation', blurb:'Entrance distances and widths on maxillary and mandibular molars.' },
   { id:'flap-thickness', title:'Full- vs. Split-Thickness Flap', lec:'incisions-flaps-sutures', blurb:'What stays on the bone, and what lifts with the flap.' },
   { id:'suture-techniques', title:'Suture Technique Cross-Sections', lec:'incisions-flaps-sutures', blurb:'How interrupted, mattress, and continuous throws sit in tissue.' },
-  { id:'curette-map', title:'Which Instrument Where', lec:'phase1-therapy', blurb:'Gracey, sickle, Columbia and Nabers mapped onto one quadrant.' }
+  { id:'curette-map', title:'Which Instrument Where', lec:'phase1-therapy', blurb:'Gracey, sickle, Columbia and Nabers mapped onto one quadrant. Not on the midterm (Dr. Kaur), still fair for the final and PCD.' }
 ];
 
 
@@ -1639,31 +1784,72 @@ READINGS_PLAIN['risk-assessment'] = `
 `;
 
 READINGS_PLAIN['phase1-therapy'] = `
-<p>Phase I is the non-surgical first step every gum patient gets, whatever their stage. This slide deck covers the whole path: the exam before treatment, what Phase I is and why it works, what the research says about how to do it, how to check the results, and the instruments and hand skills involved. The slides were posted before the lecture, so these notes come from the deck plus the class review guide; what the instructor stresses in class will be added after the session.</p>
-<h5>The exam comes first</h5>
-<p>A full gum exam checks: home hygiene (plaque score), gum health, pocket depths, attachment, furcations, the gum-to-cheek-lining border, loose teeth, the bite, and X-rays. To show a patient their plaque, use a probe or explorer, or a disclosing tablet: chew it, rinse briefly, wipe the extra dye off the cheeks and tongue, then show them in a mirror and record the plaque score. Gum health is judged by <b>color</b> (redness), <b>texture</b> (swelling), <b>bleeding when probed</b>, and a gingival index.</p>
-<p>Probing records <b>six spots per tooth</b> (DB, B, MB, DL, L, ML), taking the deepest reading at each. Three numbers come out of it. <b>Probing depth</b>: gum edge to the bottom of the pocket. <b>Recession</b>: CEJ (enamel-root line) to the gum edge. <b>Clinical attachment level</b>: CEJ to the bottom of the pocket, so CAL = probing depth + recession. The deck's pair of examples: a 7 mm pocket with no recession and a 2 mm pocket with 5 mm of recession both have 7 mm of attachment loss. Same damage, very different cleaning problem for the patient.</p>
-<p>The probe is the most important exam tool. Press lightly, feel for the springy stop at the bottom, and keep it parallel to the tooth. Between teeth, tilt it slightly toward the area just under the contact point. The usual mistakes are tilting too little or too much. Furcations (where roots split) are checked with the curved <b>Nabers probe</b>, alongside X-rays. The gum border check records how much firm (keratinized) gum there is and where it meets the loose cheek lining (the mucogingival junction). Recession and gum overgrowth are noted here too.</p>
-<p>Looseness is checked with <b>two rigid instrument handles</b>, one on each side of the tooth, and graded on the <b>Miller scale</b>: 0 is normal; 1 is a little more than normal (under 1 mm); 2 is moderately more (between 1 and 2 mm); 3 is severe side-to-side movement plus the tooth can be pushed down into its socket. The bite matters too: grinding or clenching habits, loose teeth, fremitus (a buzz you feel when the teeth tap together), drifting teeth, open contacts, unusual wear and wear facets, possible jaw-joint pain, vertical bone defects, and a widened ligament space on X-ray. X-rays check the hard tissue: flat vs. vertical bone loss, bone loss between roots, infection at the root tip, cavities and other problems.</p>
-<h5>What Phase I therapy is for</h5>
-<p>The goals: get the gums healthy again, stop the disease getting worse, calm the inflammation, and shift the bacteria from mostly gram-negative (the more harmful kind) toward more gram-positive. A gum pocket is a space the patient can't clean, full of more aggressive bacteria and fighting the body's immune response. Phase I changes that environment by removing the plaque, tartar (calculus) and bacterial toxins that keep the inflammation going.</p>
-<p>The words matter because they match billing codes. <b>Scaling</b> removes plaque, tartar and stain above and below the gum. <b>Root planing</b> goes further: it smooths away root surface (cementum or dentin) that is rough, packed with tartar, or soaked with toxins or bacteria. A <b>prophylaxis</b> ("prophy") is a preventive cleaning and polish for people without gum disease. <b>Periodontal maintenance</b> is the ongoing cleaning for people already treated for gingivitis or periodontitis, including root planing where needed. <b>Scaling in the presence of gingival inflammation (D4346)</b> is for widespread moderate-to-severe gum inflammation with pockets from swelling and lots of bleeding, but <i>no periodontitis</i>; it isn't billed together with a prophy, deep cleaning or debridement. <b>Full-mouth debridement (D4355)</b> is a rough first clean-out of plaque and tartar so you can do a proper exam and diagnosis at the next visit. The deck's case, a patient with reduced support but no periodontitis and inflamed gums, was diagnosed as <b>gingivitis on a reduced periodontium</b> and treated with D4346.</p>
-<h5>What the evidence says about delivery</h5>
-<p>Splitting the deep cleaning into <b>several visits</b> doesn't really help: tartar left behind after several visits stays for the same reasons it stays after one (Anderson 1996). <b>Hand instruments and ultrasonic (powered) scalers</b> work about the same for shrinking pockets and regaining attachment, and adding under-the-gum rinsing with chlorhexidine, saline or peroxide adds nothing. Non-surgical care has limits. In pockets 5 mm or deeper, the root isn't fully cleaned about <b>65% of the time</b>. It doesn't reliably wipe out <i>A. actinomycetemcomitans</i>. Overhanging fillings, furcations and root shape get in the way. Removing root surface to chase toxins can make teeth sensitive. And results depend on the clinician's skill and the patient keeping up (Greenstein 2000).</p>
-<h5>Phase I evaluation (re-evaluation)</h5>
-<p>Check back at <b>4-6 weeks</b>: plaque scores, signs of inflammation, bleeding, pocket depths, recession, attachment, looseness, furcations and pus. Pockets shrink most in the first 4 weeks, and most of that shrinkage is swelling going down (with some recession), not new attachment. The seal between gum and tooth re-forms in <b>2-4 weeks</b>, and healing and firming up can continue for <b>9-12 months</b>. This visit is where the decision about surgery is made.</p>
-<p>If Phase I didn't work, find out why: how the gums responded, what tartar is left, health history and risk factors, and maybe a plaque culture. Then choose: antibiotics or antimicrobials, host-modulation drugs, repeat the deep cleaning, re-evaluate again, or move to surgery (Phase II).</p>
-<h5>The instruments</h5>
-<p>Gum hand instruments are mirrors, explorers, probes, scaling and root-planing tools, and polishing tools. Each has a handle, a shank (the neck), and a working end. The <b>mirror</b> lets you see indirectly, bounces light in, and holds the cheek or tongue back. The <b>ODU 11/12 explorer</b> is run over every surface of every tooth to feel for rough root; its neck is shaped like the Gracey 11/12. Slide it in with the lower neck parallel to the tooth until you feel the slight resistance of the gum attachment, then stroke up-and-down and side-to-side with the side of the tip. The <b>UNC-15</b> probe is 15 mm long. The exam kit is probe, explorer, Nabers probe, mirror and cotton pliers.</p>
-<p><b>Scalers vs. curettes.</b> A <b>sickle scaler</b> has a pointed tip, a triangle-shaped cross-section and two cutting edges. It works above the gum, reaching only 1-2 mm below it, and shouldn't be used much on exposed root. Hook it under the ledge of tartar and <b>pull</b> with short, strong strokes using the lower third of the blade. The <b>H6/7</b> (straight neck) is for front teeth and the cheek/tongue sides of molars. The <b>S204SD9</b> (neck bent at a right angle) is for the spaces between back teeth. Both are held at about 80° to the root. A <b>curette</b> has a rounded tip and a half-moon cross-section and works above and below the gum. A universal curette (<b>Columbia 13/14</b>) has two cutting edges; an area-specific <b>Gracey</b> has one.</p>
-<p><b>Gracey curettes</b> have a 70° blade angle, one cutting edge (the lower one), and a rounded back so they don't cut the gum. The lower neck should sit parallel to the tooth. Slide it in nearly flat (closed), then open it to <b>70-80°</b> against the root to work. Which one goes where: <b>3/4</b> (or 1/2, 7/8) for all surfaces of front teeth (the demo slide adds premolars) and deep tartar; <b>11/12</b> for the mesial (front-facing) surfaces of back teeth plus the cheek/tongue sides of molars; <b>15/16</b> as another mesial tool for back teeth; <b>13/14</b> for the distal (back-facing) surfaces of back teeth. The 13/14 has more bends in its neck than the 11/12 and is pulled from root toward crown or from back toward front.</p>
+<p>Phase I is the non-surgical first step every gum patient gets, whatever their stage. These notes combine the 2026 slide deck with the recorded class. Dr. Kaur explained that D2 goes a step past D1. Instead of basics, it covers treatment: when it works, when it doesn't, and what the options are, so you're ready for clinic next year. She spent class on the exam and the reasons behind treatment, and saved the instrument details for the upcoming PCD (hands-on) sessions.</p>
+<div class="pearl"><b>What's on the midterm (Dr. Kaur's email after class):</b> instruments, ultrasonic scalers and polishing won't be tested. Study the class discussion and the slides up to <b>failure of therapy</b>. In these notes, that's everything down to the section on the re-evaluation and when treatment "fails." The sections after it are marked.</div>
+<div class="pearl"><b>Flagged in class:</b> about the diagram showing how bacteria and the body's immune response move a patient from health to gingivitis to periodontitis, she said "has anybody been counting? That's going to be on the quiz." Know what starts the disease, what makes it worse, and which one a deep cleaning actually treats.</div>
+<h5>Start from the diagnosis</h5>
+<p>Every patient fits one of three big groups: <b>healthy gums</b>, <b>gingivitis</b> (gum inflammation only) or <b>periodontitis</b> (gum disease that has destroyed bone). Healthy gums and gingivitis can each happen on a full-height set of supporting tissues (<b>intact periodontium</b>) or on one that has already lost some height (<b>reduced periodontium</b>). Periodontitis can't happen on an intact periodontium, because bone loss is what makes it periodontitis. You can't tell the three apart just by looking at a photo or into the mouth. You need the full gum chart (pocket depths, recession, attachment loss, furcations, loose teeth, how the gums look) plus the X-rays.</p>
+<h5>The exam: plaque and gum health</h5>
+<p>A full gum exam checks home hygiene (plaque score), gum health, pocket depths, attachment, furcations, the gum-to-cheek-lining border, loose teeth, the bite, and X-rays. It always starts with plaque, because plaque is the main cause of gum disease. There are two ways to record it. You can slide the probe about <b>1 mm</b> into the gum crevice (this isn't measuring the pocket) and score each spot <b>1</b> if plaque comes out on the probe and <b>0</b> if not. Or the patient chews a <b>disclosing tablet</b> (lavender or pink in the clinic), rinses briefly, and you wipe the extra dye off the cheeks and tongue, show them in a mirror and record the score. Both methods only record whether plaque <b>is there or not</b>, not how much. Measuring amount (near the gum only, half the tooth, the whole tooth) at every spot would take far too long.</p>
+<p>Gum health is judged by <b>color</b> (redness), <b>texture</b> (swelling), <b>bleeding when probed</b> (BOP) and a gingival index. Bleeding is recorded while you probe: <b>1</b> if the spot bleeds, <b>0</b> if not. <b>Late bleeding counts.</b> After you've moved on a couple of teeth or to the next quarter of the mouth, look back. Any earlier spot that has started bleeding still gets a 1.</p>
+<p>Not every periodontitis patient looks the same, because other factors change how the gums appear. <b>Smoking hides inflammation</b>: nicotine squeezes blood vessels, so the gums often look bluish-gray instead of puffy and bleeding. <b>Diabetes makes inflammation look worse.</b> <b>Gum overgrowth caused by a medication</b> tells you something in the medical history is adding to the picture. The class example was a patient with high blood pressure taking <b>amlodipine</b> (a calcium channel blocker). The gums were bulging, mostly between the teeth, and more on the cheek/lip side than the tongue/palate side. The four patients shown, all from the student clinic, all had periodontitis. Their gums looked quite different, including one with uncontrolled diabetes who was also on a calcium channel blocker.</p>
+<h5>Probing, recession and CAL</h5>
+<p>Probing records <b>six spots per tooth</b> (DB, B, MB, DL, L, ML), taking the deepest reading at each. <b>Probing depth</b> runs from the gum edge to the bottom of the pocket. <b>Recession</b> runs from the CEJ (the line where enamel meets root) to the gum edge. <b>Clinical attachment level</b> runs from the CEJ to the bottom of the pocket, so <b>CAL = probing depth + recession</b>. The deck's pair: a 7 mm pocket with no recession and a 2 mm pocket with 5 mm of recession both have a CAL of 7 mm.</p>
+<p>Her big point: <b>in healthy gums, pocket depth is not the same as attachment level.</b> Healthy gum sits a little <b>above the CEJ</b> and covers it. Recession is <b>positive</b> when the gum has pulled back and you can see the CEJ. It's <b>negative</b> when the gum edge sits above the CEJ: −1, −2, −3, or even more with medication-caused overgrowth. Add it with its sign. A 5 mm pocket with −3 mm recession is a <b>CAL of 2 mm</b>. Skip the recession and the same spot reads 5 mm, which would point to <b>Stage 3 or 4</b> disease even if the X-rays show only about 20% bone loss. Pocket depths, attachment levels and X-rays should all tell the same story.</p>
+<p>The same mistake happens in <b>Salud</b>, the charting software. If you leave recession blank, or type 0 without checking whether it's really positive or negative, Salud makes CAL equal to pocket depth. A blank <b>over-diagnoses</b> disease, and an automatic zero is inaccurate too. Enter the real number with its sign and Salud does the math correctly.</p>
+<p>To measure negative recession you have to <b>feel</b> the CEJ, since you can't see it. Slide the probe to the bottom of the pocket, then slowly pull it out until you feel the rough CEJ. The millimeters still under the gum at that point are the negative recession, which you subtract from the pocket depth. It's harder with lots of <b>inflammation</b> or <b>overgrowth</b> (both caused by disease), with <b>altered passive eruption</b> (a normal variation), and with <b>tartar or filling edges</b> that can feel like a CEJ. On eruption: as a tooth comes in, <b>active eruption</b> is the tooth moving up to meet the opposite tooth, and <b>passive eruption</b> is the gum moving down to settle at the CEJ. In altered passive eruption the gum never moves down, so its edge stays well above the CEJ. Getting good at this takes practice.</p>
+<p>The probe is the most important exam tool. Press lightly, feel for the springy stop, and keep it parallel to the tooth. <b>Between teeth, don't stop at the corner of the tooth</b> (the line angle). Go past it and under the contact point (front teeth) or contact area (back teeth), tilting slightly toward the spot just below the contact.</p>
+<h5>When you can't probe yet: debridement</h5>
+<p><b>Debridement isn't a treatment.</b> You never do it to treat disease, and it should <b>never be combined with scaling and root planing</b> (deep cleaning). The only reason to do it is tartar so heavy that you can't see or feel the gum edge, so you can't take any measurements. There's only a <b>full-mouth</b> debridement code, no half-mouth or single-area version. It's meant for tartar so widespread it covers even the chewing surfaces, which is rare. Insurance won't pay for debridement and a gum exam at the same visit: if you couldn't measure before, the gums won't be ready right after. So in private practice the patient usually comes back in about <b>two weeks</b> for the full chart.</p>
+<p>School is more flexible. The first gum charting is <b>free</b>, so after clearing a patch of heavy tartar you can do the full chart at the same visit if the gums look okay. Check with your faculty, who may want to let the gums settle for two weeks. Combining saves the patient a trip. In private practice you can also choose not to charge for a small debridement, though a packed hygiene schedule is often a reason to split visits anyway.</p>
+<h5>Furcations: named classes, not millimeters</h5>
+<p>A <b>furcation</b> is where a tooth's roots split. It's checked with the <b>Nabers probe</b>, which is curved with light and dark bands every 3 mm, alongside X-rays. Even so, the grading used here is the <b>Glickman classification</b>, which is based on what you feel, not a millimeter count. Class I does not mean "3 mm or less."</p>
+<ul>
+<li><b>Class I, just starting.</b> The probe barely catches. Usually no treatment. Easy to keep stable as long as the attachment and pocket don't get worse.</li>
+<li><b>Class II, a dead end.</b> The probe goes clearly into the furcation, but bone still stands on the far side (probe from the cheek side and the palate/tongue-side bone is still there). Because it's a contained pocket with depth, it's the class <b>best suited to regrowing bone</b> (regeneration).</li>
+<li><b>Class III, all the way through.</b> The hardest to treat. Nothing contains it, so it can't regrow.</li>
+<li><b>Class IV.</b> A Class III where the gum has also pulled back (naturally or by surgery), so you can see through it. The patient can clean it with little brushes or a water flosser, but the exposed roots risk sensitivity and <b>root cavities</b>. A cavity in a furcation makes the tooth hopeless (it will need to come out), so watch these teeth closely at every maintenance visit.</li>
+</ul>
+<p>Her cases: an upper molar (#3) with furcation involvement was the only back support for a bridge. Instead of pulling it, they turned the Class III into a Class IV (cleaned it and moved the gum down so the patient could reach it). That patient is still doing well. Another patient given the same treatment got a large cavity under the roof of the furcation.</p>
+<h5>Gum border, loose teeth and the bite</h5>
+<p>The gum border check asks how much firm (keratinized) gum the patient has. Measure its width directly, or use the <b>rolling technique</b>: roll the loose cheek lining up toward the teeth until it stops at the mucogingival junction (where firm gum begins). This matters around <b>implants</b> as well as teeth.</p>
+<p>Looseness is checked with <b>two rigid, blunt instrument handles</b>, one on each side of the tooth, and graded on the <b>Miller scale</b>: 0 is normal, 1 is a little more than normal (under 1 mm), 2 is moderately more (between 1 and 2 mm), and 3 is severe side-to-side movement plus the tooth can be pushed down into its socket. A tooth that <b>pushes down into its socket</b> is ready to come out. That's looseness at rest. <b>Fremitus</b> is looseness while the teeth work. Put a finger on the root while the patient taps their teeth together and feel for vibration. It can go up-and-down and/or side-to-side, and you usually <b>feel it rather than see it</b>. If you feel fremitus, find out why that tooth is taking so much force. In the class example, missing back teeth meant the <b>premolars were doing the molars' job</b>.</p>
+<p>The gum chart has no box for bite findings, so put them in the <b>notes section</b>: wear patterns, acid erosion, vertical bone defects and whether they link to a bite problem, and grinding or clenching. This matters because a loose tooth isn't always just gum disease. It can be <b>too much biting force on a tooth that has already lost support</b>, from missing back teeth, grinding, or overjet and overbite. Treating a 5 mm pocket won't fix grade 2 looseness unless the bite is fixed too. The deck's list of bite warning signs: grinding or clenching habits, loose teeth, fremitus, drifting teeth, open contacts, unusual wear and wear facets, possible jaw-joint pain, vertical bone defects and a widened ligament space on X-ray.</p>
+<h5>X-rays, before you touch the patient</h5>
+<p>Before you take any measurements, X-rays show whether there's <b>bone loss</b>, whether it's in a few spots or <b>all over</b>, and its pattern (<b>flat, vertical</b>, or both). They also show <b>tipped teeth</b>, <b>fused roots</b>, <b>roots too close together</b> (important for surgery and deep cleaning), <b>tartar</b>, <b>how close the sinus is</b>, and an <b>infection at a root tip</b> (#7 in the class X-ray). Seeing tartar on an X-ray should make you "a little bit of both" sad and excited. Sad the patient got to that point, excited because now you know the cause and it's something you can remove. Once tartar has formed the patient can't brush it off, so your job matters even more.</p>
+<p>Her tip: when you start a deep cleaning (or even a regular cleaning), don't open the chart to hunt for deep pockets. Your instrument will find the pocket, and the bottom of the pocket is where you stop. Open the <b>X-rays</b> instead (take screenshots, since Salud logs you out). Then roughness on #14-15 matches tartar you already saw, and pus or a draining spot on #7 matches the root-tip infection. Look at the X-rays before you start measuring.</p>
+<h5>Why Phase I works: bacteria start it, the body drives it</h5>
+<p>Plaque bacteria <b>start</b> the disease. The body's <b>immune response</b> is what makes it <b>get worse</b>. In health the immune system handles the bacteria quickly and the bacteria aren't very harmful, so disease never shows. In gingivitis the bacteria change and the attack gets stronger. The body still wins, but it takes longer: more immune cells (T cells and B cells) join the first responders (neutrophils), and you see inflammation for days to a couple of weeks. Not everyone moves from reversible inflammation to permanent damage. Those who do have an immune system that <b>overreacts</b> and releases inflammatory signals (cytokines). Environment, genes, habits and gene-switching (epigenetic) factors add to the risk. The result is lost attachment, lost bone, and damage to the ligament, root surface and bone around the tooth.</p>
+<p>Deep cleaning targets the <b>bacteria</b>, yet bacteria cause only about <b>25%</b> of the damage. About <b>75%</b> comes from the body's own inflammatory signals and bone-dissolving cells (<b>osteoclasts</b>). Bacteria bring toxins (<b>endotoxin</b>, also called lipopolysaccharide), not osteoclasts. Removing the bacteria calms the body's response. Some patients still have disease after good home care and the best cleaning or surgery. For them, drugs can calm the body's response directly. That's <b>host modulation</b>, or "periodontal medicine," which Dr. Litz covers later. Bacteria coat tartar and live inside its tiny channels, and tartar and plaque also act as <b>irritants</b> the body reacts to.</p>
+<p>The goals of removing them: <b>less inflammation</b>, a shift in the pocket bacteria from the harmful <b>gram-negative</b> kind toward <b>gram-positive</b> (healthy mouths still have bacteria, just friendlier ones), and <b>stopping the disease from getting worse</b>. Deep cleaning <b>doesn't undo the damage</b>. Lost bone and attachment stay lost, which is why periodontitis is called irreversible. And <b>getting rid of pockets is not the reason</b> for deep cleaning, even though pockets do shrink. A pocket is a space the patient can't clean, full of more harmful bacteria. Phase I changes that environment.</p>
+<h5>How pockets shrink, and why you check at 4-6 weeks</h5>
+<p>Two things make a pocket shallower. At the <b>top</b>: inflamed gum is swollen with extra cells and fluid. As it calms down the gum shrinks, which you measure as <b>more recession</b>. At the <b>bottom</b>: disease had broken both the thin seal of gum cells against the tooth (the junctional epithelium, which is why the probe sank deeper) and the fibers holding the gum to the root. After cleaning, both <b>reattach</b> to the clean root. You measure in two dimensions, but the disease is three-dimensional.</p>
+<p>The healing timeline: the <b>gum seal (junctional epithelium) takes 7-10 days</b>, the <b>fiber reattachment takes 4-6 weeks</b>, and the fibers <b>mature and line up over 3-6 months</b>. That's why the patient comes back at <b>4-6 weeks</b>. You see the full result by then, and research shows waiting longer doesn't shrink the pocket any further. The deck says it a bit differently: pockets shrink most in the first 4 weeks, the seal between gum and tooth re-forms in <b>2-4 weeks</b>, and healing can keep going for <b>9-12 months</b>. Know both. The deck's "a 6 mm pocket might become 5 or 4.5" numbers are just for a sense of scale. She said you <b>don't need to memorize</b> them.</p>
+<h5>The words (and the billing codes)</h5>
+<p><b>Scaling</b> removes soft and hard buildup from teeth, roots and any bridges or dentures, <b>both above and below the gum</b>. If you're asked whether scaling is above or below the gum, the answer is both. <b>Root planing</b> stays <b>below the gum</b> and only works on roots. It smooths away rough, tartar-packed or contaminated root surface until there are no ridges, rough spots or catches. In practice you do both together.</p>
+<p>A <b>prophylaxis</b> ("prophy") is a <i>preventive</i> cleaning, not a treatment, for someone who has <b>never had periodontitis</b> (healthy gums or gingivitis). Tartar a little below the gum doesn't mean periodontitis: everyone has a shallow crevice, and tartar 1-2 mm down is removed as part of the prophy. <b>Periodontal maintenance</b> is <i>ongoing support</i> for someone <b>already treated for periodontitis</b>, to keep the disease from coming back, with their home care checked every visit. The two terms don't mean the same thing. A maintenance patient with mostly 1-3 mm pockets, a few leftover 4s and one 5 can stay on maintenance if their hygiene is good, those spots don't bleed, the gums look healthy and the X-rays show no new bone loss. <b>Deep cleaning just the few leftover deep pockets</b> is officially part of maintenance.</p>
+<p><b>Scaling in the presence of gingival inflammation (D4346)</b> sits between a prophy and a deep cleaning. It's for someone <b>never diagnosed with periodontitis</b>, with no bone loss, but with heavy, widespread gum inflammation caused by plaque and tartar, so a simple prophy doesn't cover the work. At school it's done with perio faculty or a resident and gets a <b>Phase I re-evaluation</b>. The class case was a young patient (20s to early 30s) with a bridge of tartar on the tongue side of the teeth. What looked like bone loss around the premolars and front of the molars came from premolars pulled for braces and the tipping that followed, not from periodontitis. Diagnosis: <b>widespread gum inflammation on a reduced periodontium in a patient without periodontitis</b> (the deck calls it gingivitis on a reduced periodontium), treated with D4346. That patient had debridement, charting and treatment all in one visit. <b>Full-mouth debridement (D4355)</b> is a rough clean-out so the proper exam can happen at a later visit.</p>
+<h5>What the evidence says about how to do it</h5>
+<p>Splitting the deep cleaning into <b>several visits</b> doesn't really help: tartar left behind after several visits stays for the same reasons it stays after one (Anderson 1996). <b>Hand instruments and ultrasonic (powered) scalers</b> work about the same for shrinking pockets and regaining attachment, and adding under-the-gum rinsing with chlorhexidine, saline or peroxide adds nothing. In pockets 5 mm or deeper, the root isn't fully cleaned about <b>65% of the time</b> (Greenstein 2000).</p>
+<p>What makes it hard, as she taught it: deeper pockets are harder to reach, though a 5 mm pocket doesn't mean tartar gets left every time. <b>Deep cleaning is done blind</b>: you work by feel. Some bacteria <b>swim into the gum lining</b>, while cleaning only reaches the pocket (and it doesn't reliably wipe out <i>A. actinomycetemcomitans</i>). <b>Fillings and crowns</b> with overhanging, below-the-gum, open or rough edges collect plaque and are hard to clean around. <b>Furcations</b> and the natural <b>grooves and dips</b> in roots block access. Trying hard for a smooth root can take off too much root surface (<b>cementum</b>) and make teeth <b>sensitive</b>. And results depend on the patient's <b>home care</b> and the clinician's <b>skill</b>, which improves with practice.</p>
+<h5>The re-evaluation, and when it "fails"</h5>
+<p>Check back at <b>4-6 weeks</b>: plaque scores, signs of inflammation, bleeding, pocket depths, recession, attachment, looseness, furcations and pus. This is where the decision about surgery is made. If there's still inflammation and the numbers haven't improved, check whether <b>leftover tartar</b> is the reason. You'll often feel it with the probe while re-measuring. If so, remove it (no charge) and re-check in <b>two weeks</b>. If you already got all the tartar the first time, <b>more rounds of deep cleaning won't help</b>. What helps is <b>better home care</b>.</p>
+<p>"Failure of therapy" is a harsh phrase, because so much is out of your control. The body's response affects healing as well as disease. A <b>smoker</b> or someone with <b>uncontrolled diabetes</b> may not get the same short- or long-term result from your best cleaning. The deck's approach when Phase I doesn't work: look at how the gums responded, what tartar is left, the health history and risk factors, and maybe a plaque culture. Then choose antibiotics or antimicrobials, host-modulation drugs, a repeat cleaning, another re-evaluation, or <b>Phase II</b>, which is <b>surgery to get rid of pockets</b>.</p>
+<h5>The instruments (not on the midterm)</h5>
+<p>Dr. Kaur's email says instruments, ultrasonic scalers and polishing won't be on the midterm. In the slides they come after failure of therapy. The email is only about the midterm, so this can still show up on the final and in the hands-on instrument check.</p>
+<p>She kept instruments light on purpose. They get covered in detail in the upcoming <b>PCD</b> sessions, and you don't need the numbers yet, though you will later. For now, your daily kit has three groups. The <b>exam tools</b> are the mirror, the gum probe, the Nabers probe for furcations, and a <b>gum explorer</b>. This isn't the cavity explorer. You use it after cleaning to check that roots feel smooth with no catches. Then come <b>scalers</b> and <b>curettes</b>. Every instrument has a handle, a shank (the neck) and a blade.</p>
+<p><b>Scalers</b> are mostly for above the gum. They reach only a little way under it (the deck says 1-2 mm; in class she said about 2-3, noting sources vary). Their strokes are <b>short, strong and fast</b>. <b>Curettes</b> go deep into the pocket with <b>longer, slightly lighter</b> strokes that take more time, though stubborn tartar can still need real pressure. The key difference is the blade. A scaler cuts on <b>both sides</b>. A Gracey curette cuts on <b>one side</b> only, so below the gum the side facing the gum can't cut it. Almost every curette in your kit is a <b>Gracey</b>, marked <b>SG</b>, each shaped for one area and cutting on one side. The one <b>SC</b> instrument is the <b>universal curette</b>, which, like a scaler, cuts on both sides.</p>
+<p>The clinic has <b>piezoelectric</b> ultrasonic (vibrating) scalers along with hand instruments. They work below the gum too, but they <b>can't root plane</b>, so they won't leave the root smooth. Use them together: <b>ultrasonic</b> to knock off the heavy tartar, then <b>hand instruments</b>, then the <b>ultrasonic again</b> so its water spray flushes out the pocket.</p>
+<p>From the deck, for later: gum hand instruments are mirrors, explorers, probes, scaling and root-planing tools, and polishing tools. The <b>mirror</b> lets you see indirectly, bounces light in, and holds the cheek or tongue back. The <b>ODU 11/12 explorer</b> is run over every surface of every tooth to feel for rough root. Its neck is shaped like the Gracey 11/12. Slide it in with the lower neck parallel to the tooth until you feel the slight resistance of the gum attachment, then stroke up-and-down and side-to-side with the side of the tip. The <b>UNC-15</b> probe is 15 mm long. The exam kit is probe, explorer, Nabers probe, mirror and cotton pliers.</p>
+<p>A <b>sickle scaler</b> has a pointed tip, a triangle-shaped cross-section and two cutting edges, and shouldn't be used much on exposed root. Hook it under the ledge of tartar and <b>pull</b> with short, strong strokes using the lower third of the blade. The <b>H6/7</b> (straight neck) is for front teeth and the cheek/tongue sides of molars. The <b>S204SD9</b> (neck bent at a right angle) is for the spaces between back teeth. Both are held at about 80° to the root. A <b>curette</b> has a rounded tip and a half-moon cross-section and works above and below the gum. A universal curette (<b>Columbia 13/14</b>) has two cutting edges. An area-specific <b>Gracey</b> has one.</p>
+<p><b>Gracey curettes</b> have a 70° blade angle, one cutting edge (the lower one), and a rounded back so they don't cut the gum. The lower neck should sit parallel to the tooth. Slide it in nearly flat (closed), then open it to <b>70-80°</b> against the root to work. Which one goes where: <b>3/4</b> (or 1/2, 7/8) for all surfaces of front teeth (the demo slide adds premolars) and deep tartar. <b>11/12</b> for the mesial (front-facing) surfaces of back teeth plus the cheek/tongue sides of molars. <b>15/16</b> as another mesial tool for back teeth. <b>13/14</b> for the distal (back-facing) surfaces of back teeth. The 13/14 has more bends in its neck than the 11/12 and is pulled from root toward crown or from back toward front.</p>
 <p><b>Ultrasonic scalers</b> come in two types. <b>Magnetostrictive</b>: electricity makes the nickel-iron metal stack in the insert change shape and vibrate in an oval-to-circular pattern, about 18,000-42,000 times a second, so every side of the tip can clean. <b>Piezoelectric</b>: electricity vibrates crystals in the handpiece, the tip moves back and forth in a line, and mainly its sides do the work. For <b>implants</b>, probes are marked in 3 mm bands (3-6-9-12 or 3-6-8-11), and the listed tools are front and back sickle scalers plus the Columbia 4R/4L.</p>
-<h5>Technique</h5>
+<h5>Technique (not on the midterm)</h5>
 <div class="pearl"><b>Don't forget (the deck's own emphasis):</b> modified pen grasp and a finger rest.</div>
 <p>A finger rest (fulcrum) steadies your hand. There are four: <b>conventional</b> (on the teeth right next to where you're working), <b>cross-arch</b> (on the other side of the same jaw), <b>opposite-arch</b> (on the other jaw), and <b>finger-on-finger</b> (on the index finger or thumb of your other hand). How you fit the instrument to the tooth depends on the gum (tough and fibrous vs. puffy and bleeding), how bad the disease is (how easily the gum moves aside, the space between teeth), and how stuck-on the tartar is.</p>
-<p>An <b>exploratory stroke</b> is light, with the tool fitted to the tooth, to map the pocket and find tartar. A <b>working stroke</b> uses a firm grip with pressure through the tip: <b>scaling</b> strokes are short, overlapping, strong and controlled; <b>root-planing</b> strokes are longer and lighter, like shaving. You check your work during the visit by feeling the root with an explorer, and at re-evaluation by how the gums respond: less redness, swelling and bleeding. The patient's home care weighs heavily on that result. The spots most often missed are the <b>CEJ, furcation entrances, line angles</b> (corners of the teeth), and hard-to-reach areas, especially the <b>back surfaces of back teeth</b>.</p>
-<h5>To polish or not to polish</h5>
-<p>For polishing: it removes stain that brushing and scaling leave behind, preps teeth for sealants, fluoride gels and varnishes, and patients like it. Against: 30 seconds with pumice can take off up to <b>4 µm of enamel</b>, and that outer layer has the most fluoride. A coarse paste can leave the surface rougher than before. Steady pressure from a fast-spinning rubber cup can hurt and may heat the nerve. A rubber cup with pumice for 2 minutes can strip the thin lining inside the gum pocket completely, and pumice can get pushed under the gum. If you polish, use a low-abrasion paste on a slow handpiece with little heat, hold the cup at 90° to the tooth, and press lightly on and off.</p>
+<p>An <b>exploratory stroke</b> is light, with the tool fitted to the tooth, to map the pocket and find tartar. A <b>working stroke</b> uses a firm grip with pressure through the tip. <b>Scaling</b> strokes are short, overlapping, strong and controlled. <b>Root-planing</b> strokes are longer and lighter, like shaving. You check your work during the visit by feeling the root with an explorer, and at re-evaluation by how the gums respond: less redness, swelling and bleeding. The patient's home care weighs heavily on that result. The spots most often missed are the <b>CEJ, furcation entrances, line angles</b> (corners of the teeth), and hard-to-reach areas, especially the <b>back surfaces of back teeth</b>.</p>
+<h5>To polish or not to polish (not on the midterm)</h5>
+<p>For polishing: it removes stain that brushing and scaling leave behind, preps teeth for sealants, fluoride gels and varnishes, and patients like it. Against: 30 seconds with pumice can take off up to <b>4 µm of enamel</b>, and that outer layer has the most fluoride. A coarse paste can leave the surface rougher than before. Steady pressure from a fast-spinning rubber cup can hurt and may heat the nerve. A rubber cup with pumice for 2 minutes can strip the thin lining inside the gum pocket completely, and pumice can get pushed under the gum. If you polish, use a low-abrasion paste on a slow handpiece with little heat, hold the cup at 90° to the tooth, and press lightly on and off. (Polishing comes from the deck. It wasn't covered in the recorded class.)</p>
 `;
 
 READINGS_PLAIN['resective-furcation'] = `
@@ -2089,61 +2275,228 @@ var MINDMAPS = {
   "label": "Phase I Therapy & Instrumentation",
   "children": [
    {
-    "label": "The exam first",
+    "label": "Diagnosis first",
     "children": [
      {
-      "label": "6 sites/tooth, deepest reading each"
+      "label": "Health / gingivitis / periodontitis"
      },
      {
-      "label": "PD: margin to pocket base; GR: CEJ to margin"
+      "label": "Intact vs. reduced periodontium"
      },
      {
-      "label": "CAL = PD + GR (PD7/GR0 = PD2/GR5 = CAL 7)"
+      "label": "Perio never on intact"
      },
      {
-      "label": "Miller mobility 0-3 (3 = vertical displacement)"
-     },
-     {
-      "label": "Nabers probe + radiographs for furcations"
+      "label": "Chart + x-rays, not looks"
      }
     ]
    },
    {
-    "label": "Why Phase I",
+    "label": "Plaque & tissue",
     "children": [
      {
-      "label": "Restore gingival health, arrest progression"
+      "label": "Plaque 1/0: probe 1 mm or disclosing tab"
      },
      {
-      "label": "Gram-negative to gram-positive shift"
+      "label": "BOP 1/0, delayed bleeding counts"
      },
      {
-      "label": "Remove plaque, calculus, endotoxin"
+      "label": "Smoking masks (cyanotic)"
+     },
+     {
+      "label": "Diabetes exaggerates"
+     },
+     {
+      "label": "Amlodipine → bulbous overgrowth"
      }
     ]
    },
    {
-    "label": "Codes & definitions",
+    "label": "PD, GR, CAL",
     "children": [
      {
-      "label": "Root planing removes rough/contaminated cementum"
+      "label": "In health PD ≠ CAL"
      },
      {
-      "label": "D4346: inflamed gingiva, no periodontitis"
+      "label": "CAL = PD + GR (with sign)"
      },
      {
-      "label": "D4355: debride now, diagnose next visit"
+      "label": "PD 5, GR −3 → CAL 2"
      },
      {
-      "label": "Maintenance is not a prophy"
+      "label": "Blank/0 in Salud → over-diagnosis"
+     },
+     {
+      "label": "Feel CEJ: withdraw the probe"
+     },
+     {
+      "label": "Under the contact, not the line angle"
      }
     ]
    },
    {
-    "label": "Evidence",
+    "label": "Debridement",
     "children": [
      {
-      "label": "1 vs multiple sessions: no real difference"
+      "label": "Not therapeutic"
+     },
+     {
+      "label": "Never with SRP"
+     },
+     {
+      "label": "Only when margin is hidden"
+     },
+     {
+      "label": "Full-mouth code only"
+     },
+     {
+      "label": "Exam ~2 wk later (school can combine)"
+     }
+    ]
+   },
+   {
+    "label": "Furcations (Glickman)",
+    "children": [
+     {
+      "label": "I catch: no tx"
+     },
+     {
+      "label": "II cul-de-sac: regenerate"
+     },
+     {
+      "label": "III through-and-through: hardest"
+     },
+     {
+      "label": "IV visible: root caries → hopeless"
+     },
+     {
+      "label": "Nabers probe, 3 mm bands"
+     }
+    ]
+   },
+   {
+    "label": "Mobility & occlusion",
+    "children": [
+     {
+      "label": "Two blunt instruments"
+     },
+     {
+      "label": "Depressible = extract"
+     },
+     {
+      "label": "Fremitus: palpated in function"
+     },
+     {
+      "label": "Premolars doing molar work"
+     },
+     {
+      "label": "Occlusal notes section"
+     },
+     {
+      "label": "Pocket tx won't fix occlusal mobility"
+     }
+    ]
+   },
+   {
+    "label": "Radiographs",
+    "children": [
+     {
+      "label": "Bone loss pattern"
+     },
+     {
+      "label": "Tipping, fused roots, proximity"
+     },
+     {
+      "label": "Calculus: sad + excited"
+     },
+     {
+      "label": "Sinus, PA lesion"
+     },
+     {
+      "label": "Open x-rays, not the chart"
+     }
+    ]
+   },
+   {
+    "label": "Why SRP works",
+    "children": [
+     {
+      "label": "Bacteria initiate, host progresses"
+     },
+     {
+      "label": "25% bacteria / 75% host"
+     },
+     {
+      "label": "Remove LPS → calm host"
+     },
+     {
+      "label": "Host modulation (Dr. Litz)"
+     },
+     {
+      "label": "Gram− → gram+"
+     },
+     {
+      "label": "Doesn't reverse damage"
+     },
+     {
+      "label": "Pocket elimination isn't the goal"
+     }
+    ]
+   },
+   {
+    "label": "Healing & re-eval",
+    "children": [
+     {
+      "label": "More recession + reattachment"
+     },
+     {
+      "label": "JE 7-10 d · CT 4-6 wk"
+     },
+     {
+      "label": "Collagen 3-6 mo"
+     },
+     {
+      "label": "Re-eval 4-6 wk (no gain waiting)"
+     },
+     {
+      "label": "Residual calculus → redo, 2 wk"
+     },
+     {
+      "label": "Else fix OH, not more SRP"
+     },
+     {
+      "label": "Smokers/diabetics: poorer outcomes"
+     },
+     {
+      "label": "Phase II = surgery"
+     }
+    ]
+   },
+   {
+    "label": "Codes",
+    "children": [
+     {
+      "label": "Scaling supra + sub"
+     },
+     {
+      "label": "Root planing sub, roots only"
+     },
+     {
+      "label": "Prophy: never had perio"
+     },
+     {
+      "label": "Maintenance: treated perio"
+     },
+     {
+      "label": "D4346: inflamed, no perio"
+     }
+    ]
+   },
+   {
+    "label": "Evidence (deck)",
+    "children": [
+     {
+      "label": "1 vs multiple sessions: no difference"
      },
      {
       "label": "Hand vs ultrasonic: no difference"
@@ -2152,78 +2505,36 @@ var MINDMAPS = {
       "label": "Irrigation adds nothing"
      },
      {
-      "label": "PD ≥5 mm: debridement inadequate ~65%"
+      "label": "PD ≥5 mm: inadequate ~65%"
      }
     ]
    },
    {
-    "label": "Re-evaluation",
+    "label": "Instruments (not on midterm)",
     "children": [
      {
-      "label": "4-6 weeks"
+      "label": "Exam kit: mirror, probe, perio explorer, Nabers"
      },
      {
-      "label": "PD drop mostly from resolved edema (+ recession)"
+      "label": "Scaler: 2 edges, short powerful"
      },
      {
-      "label": "DGJ back at 2-4 wk; matures 9-12 mo"
+      "label": "Curette: longer, lighter"
      },
      {
-      "label": "Failure: antimicrobials, host mod, redo, or surgery"
-     }
-    ]
-   },
-   {
-    "label": "Instruments",
-    "children": [
-     {
-      "label": "Sickle: pointed, triangular, supra (1-2 mm sub), ~80°"
+      "label": "SG = Gracey (1 edge)"
      },
      {
-      "label": "H6/7 anteriors; S204SD9 posterior interproximal"
+      "label": "SC = universal curette"
      },
      {
-      "label": "Gracey: 70° blade, 1 edge, lower shank parallel"
+      "label": "Piezo can't root plane"
      },
      {
-      "label": "3/4 ant · 11/12 & 15/16 mesial · 13/14 distal"
+      "label": "Ultrasonic → hand → lavage"
      },
      {
-      "label": "Columbia 13/14 universal; 4R/4L for implants"
-     }
-    ]
-   },
-   {
-    "label": "Technique",
-    "children": [
-     {
-      "label": "Modified pen grasp + finger rest"
-     },
-     {
-      "label": "Rests: conventional, cross-arch, opposite-arch, finger-on-finger"
-     },
-     {
-      "label": "Scaling: short powerful strokes; planing: long, light"
-     },
-     {
-      "label": "Most missed: CEJ, furcations, line angles, distals"
-     }
-    ]
-   },
-   {
-    "label": "Ultrasonics & polishing",
-    "children": [
-     {
-      "label": "Magnetostrictive: orbital, all surfaces"
-     },
-     {
-      "label": "Piezo: linear, lateral surfaces"
-     },
-     {
-      "label": "Pumice 30 s = up to 4 µm enamel"
-     },
-     {
-      "label": "Low-abrasion paste, slow speed, 90°, light"
+      "label": "Details in PCD"
      }
     ]
    }
@@ -2687,7 +2998,7 @@ var LEC_ICON = { 'diagnosis-tx-planning':'probe', 'incisions-flaps-sutures':'sut
   'resective-furcation':'scalpel', 'periodontal-regeneration':'layers', 'implants-perio':'implant', 'antibiotics-host-mod':'pill', 'perio-plastic-esthetics':'graft' };
 
 /* ---------- exam calendar (fill MIDTERM_DATE in once it is announced: 'YYYY-MM-DD') ---------- */
-var MIDTERM_DATE = null;
+var MIDTERM_DATE = '2026-10-01';
 var FINAL_DATE = '2026-11-19';
 
 /* ====================================================================
@@ -2813,7 +3124,7 @@ function statusHTML(l){ var s = STATUS_LABEL[l.status]; return '<span class="sta
 var SEQ_STATE = {}, MATCH_STATE = {};
 function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
-  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span></div>';
+  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.mid===false?'<span class="chip src nomid" title="Dr. Kaur: instruments, ultrasonics and polishing are not on the midterm">Not on midterm</span>':'')+'</div>';
 }
 function qCardHTML(q){
   var lec = LECTURE_BY_ID[q.lec], body = '';
@@ -2939,8 +3250,8 @@ function renderHeaderMeta(){
   var cd = document.getElementById('countdownPill');
   if(cd){
     var mid = daysUntil(MIDTERM_DATE), fin = daysUntil(FINAL_DATE), txt, title;
-    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm covers sessions 1-4'; }
-    else if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · midterm (sessions 1-4) follows Session 4'; }
+    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1 · sessions 1-4'; }
+    else if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · all 9 sessions'; }
     else { txt = 'Course complete'; title = ''; }
     cd.innerHTML = icon('cal') + txt; cd.title = title;
   }
@@ -2976,16 +3287,22 @@ var REF_SECTIONS = [
   { id:'risk-tools', lec:'risk-assessment', title:'Whole-patient risk tools', body:function(){ return tableWrap(['Tool','Inputs','Output'], rowsOf(RISK_MEASUREMENT_TOOLS,['name','inputs','output'])); } },
   { id:'risk-protocol', lec:'risk-assessment', title:'Risk-stratified maintenance protocol', body:function(){ return tableWrap(['Risk tier','Exams','Preventive care','Other'], rowsOf(RISK_STRATIFIED_PROTOCOL,['risk','exam','preventive','notes'])); } },
   { id:'p1-measures', lec:'phase1-therapy', title:'Periodontal measurements', body:function(){ return tableWrap(['Measure','Measured from','Note'], rowsOf(PERIO_MEASURES,['m','from','note'])) + '<p class="note"><b>A complete exam covers:</b> ' + PERIO_EXAM_COMPONENTS.map(escHtml).join('; ') + '.</p>'; } },
+  { id:'p1-cal-cases', lec:'phase1-therapy', title:'Recession, CAL and the Salud trap', body:function(){ return tableWrap(['PD','Recession entered','CAL','Lesson'], rowsOf(CAL_CASES,['pd','gr','cal','lesson'])) + '<p class="note"><b>In health PD ≠ CAL.</b> To measure negative recession, probe to the base, withdraw until you feel the CEJ, read what is still under the margin. Harder with: ' + CEJ_CHALLENGES.map(escHtml).join('; ') + '.</p>'; } },
+  { id:'p1-tissue', lec:'phase1-therapy', title:'What changes how periodontitis looks', body:function(){ return tableWrap(['Factor','Effect','What you see'], rowsOf(TISSUE_MODIFIERS,['factor','effect','look'])) + '<p class="note"><b>Plaque and BOP are scored 1/0</b> (presence only, not quantity). Delayed bleeding still scores 1.</p>'; } },
+  { id:'p1-glickman', lec:'phase1-therapy', title:'Glickman furcation classes', body:function(){ return tableWrap(['Class','Name','Finding','Management'], rowsOf(GLICKMAN_FURCATION,['cls','name','finding','mgmt'])) + '<p class="note"><b>Nabers probe:</b> curved, alternating light and dark 3 mm bands, but the class is qualitative (Class I is a catch, not "3 mm or less").</p>'; } },
   { id:'p1-mobility', lec:'phase1-therapy', title:'Miller mobility scale', body:function(){ return tableWrap(['Class','Definition'], rowsOf(MILLER_MOBILITY,['cls','def'])) + '<p class="note"><b>Test with two rigid instruments.</b> Occlusal signs to note: ' + OCCLUSAL_SIGNS.map(escHtml).join(', ') + '.</p>'; } },
   { id:'p1-procedures', lec:'phase1-therapy', title:'Phase I procedures and codes', body:function(){ return tableWrap(['Procedure','Definition'], rowsOf(PHASE1_PROCEDURES,['name','def'])); } },
+  { id:'p1-care-types', lec:'phase1-therapy', title:'Prophy, D4346, SRP, maintenance, debridement', body:function(){ return tableWrap(['Procedure','For whom','Key point'], rowsOf(CARE_TYPES,['name','who','what'])); } },
+  { id:'p1-healing', lec:'phase1-therapy', title:'Healing timeline after SRP', body:function(){ return tableWrap(['Event','When','Source'], rowsOf(HEALING_TIMELINE,['event','when','src'])) + '<p class="note"><b>Why PD drops:</b> resolving edema shows up as more recession at the margin, plus JE and connective tissue reattach at the base. SRP targets bacteria (~25% of the damage); the host causes ~75%.</p>'; } },
+  { id:'p1-xray-limits', lec:'phase1-therapy', title:'Radiograph reads and SRP limitations', body:function(){ return '<h5>What the x-ray tells you before you probe</h5>' + ulOf(RADIOGRAPH_READS) + '<h5>Limitations of SRP (as taught)</h5>' + ulOf(SRP_LIMITS); } },
   { id:'p1-evidence', lec:'phase1-therapy', title:'What the evidence says', body:function(){ return tableWrap(['Question','Finding'], rowsOf(PHASE1_EVIDENCE,['topic','finding'])); } },
   { id:'p1-reeval', lec:'phase1-therapy', title:'Phase I evaluation (re-evaluation)', body:function(){ return tableWrap(['Item','Detail'], rowsOf(PHASE1_REEVAL,['item','detail'])); } },
-  { id:'p1-instruments', lec:'phase1-therapy', title:'Instrument guide (slide deck)', body:function(){ return tableWrap(['Instrument','Kit','Where','How'], rowsOf(PHASE1_INSTRUMENTS,['name','kit','where','how'])); } },
-  { id:'p1-instruments-guide', lec:'phase1-therapy', title:'Instrument list (exam-review guide)', body:function(){ return tableWrap(['Instrument','Field','Use'], rowsOf(INSTRUMENTS,['name','field','use'])); } },
-  { id:'p1-scaler-curette', lec:'phase1-therapy', title:'Scaler vs. curette', body:function(){ return tableWrap(['Feature','Sickle scaler','Curette'], rowsOf(SCALER_VS_CURETTE,['f','scaler','curette'])) + '<p class="note"><b>Gracey curettes:</b> ' + GRACEY_FEATURES.map(escHtml).join('; ') + '. Insert at a closed angle, work at 70-80°.</p>'; } },
-  { id:'p1-technique', lec:'phase1-therapy', title:'Finger rests and strokes', body:function(){ return tableWrap(['Finger rest','Where it sits'], rowsOf(FINGER_RESTS,['rest','where'])) + tableWrap(['Stroke','Detail'], rowsOf(STROKES,['stroke','detail'])) + '<p class="note"><b>Adaptation depends on:</b> ' + ADAPTATION_FACTORS.map(escHtml).join('; ') + '. <b>Most-missed areas:</b> ' + MISSED_AREAS.map(escHtml).join('; ') + '.</p>'; } },
-  { id:'p1-ultrasonics', lec:'phase1-therapy', title:'Ultrasonic scalers', body:function(){ return tableWrap(['Type','Mechanism','Tip motion','Working surfaces'], rowsOf(ULTRASONICS,['type','mech','motion','surfaces'])); } },
-  { id:'p1-polish', lec:'phase1-therapy', title:'To polish or not to polish', body:function(){ return '<h5>For</h5>' + ulOf(POLISH_PROS) + '<h5>Against</h5>' + ulOf(POLISH_CONS) + '<p class="note"><b>Technique:</b> ' + escHtml(POLISH_TECHNIQUE) + '</p>'; } },
+  { id:'p1-instruments', lec:'phase1-therapy', title:'Instrument guide (slide deck) · not on midterm', body:function(){ return tableWrap(['Instrument','Kit','Where','How'], rowsOf(PHASE1_INSTRUMENTS,['name','kit','where','how'])); } },
+  { id:'p1-instruments-guide', lec:'phase1-therapy', title:'Instrument list (exam-review guide) · not on midterm', body:function(){ return tableWrap(['Instrument','Field','Use'], rowsOf(INSTRUMENTS,['name','field','use'])); } },
+  { id:'p1-scaler-curette', lec:'phase1-therapy', title:'Scaler vs. curette · not on midterm', body:function(){ return tableWrap(['Feature','Sickle scaler','Curette'], rowsOf(SCALER_VS_CURETTE,['f','scaler','curette'])) + '<p class="note"><b>Gracey curettes:</b> ' + GRACEY_FEATURES.map(escHtml).join('; ') + '. Insert at a closed angle, work at 70-80°.</p>'; } },
+  { id:'p1-technique', lec:'phase1-therapy', title:'Finger rests and strokes · not on midterm', body:function(){ return tableWrap(['Finger rest','Where it sits'], rowsOf(FINGER_RESTS,['rest','where'])) + tableWrap(['Stroke','Detail'], rowsOf(STROKES,['stroke','detail'])) + '<p class="note"><b>Adaptation depends on:</b> ' + ADAPTATION_FACTORS.map(escHtml).join('; ') + '. <b>Most-missed areas:</b> ' + MISSED_AREAS.map(escHtml).join('; ') + '.</p>'; } },
+  { id:'p1-ultrasonics', lec:'phase1-therapy', title:'Ultrasonic scalers · not on midterm', body:function(){ return tableWrap(['Type','Mechanism','Tip motion','Working surfaces'], rowsOf(ULTRASONICS,['type','mech','motion','surfaces'])); } },
+  { id:'p1-polish', lec:'phase1-therapy', title:'To polish or not to polish · not on midterm', body:function(){ return '<h5>For</h5>' + ulOf(POLISH_PROS) + '<h5>Against</h5>' + ulOf(POLISH_CONS) + '<p class="note"><b>Technique:</b> ' + escHtml(POLISH_TECHNIQUE) + '</p>'; } },
   { id:'furcation-anatomy', lec:'resective-furcation', title:'Furcation anatomy', body:function(){ return FURCATION_ANATOMY.map(function(s){ return '<h5>'+escHtml(s.site)+'</h5>' + ulOf(s.points); }).join(''); } },
   { id:'furcation-tx', lec:'resective-furcation', title:'Furcation treatment by class and bone architecture', body:function(){ return tableWrap(['Class','Treatment options'], rowsOf(FURCATION_TX,['cls','tx'])) + tableWrap(['Architecture','Pattern'], rowsOf(BONE_ARCHITECTURE,['type','note'])); } },
   { id:'regen', lec:'periodontal-regeneration', title:'Regeneration: candidacy and modifiers', body:function(){ return ulOf(REGEN_CANDIDACY) + tableWrap(['Modifier','What it does'], rowsOf(REGEN_MODIFIERS,['name','note'])); } },
@@ -3073,7 +3390,7 @@ var CRAM_CONTENT = [
   { lec:'diagnosis-tx-planning', points:['CAL = PD + GR (signed). Confirm attachment AND bone loss before staging off probing depth alone','RT1 no interproximal loss / RT2 buccal > interproximal / RT3 interproximal > buccal','Stage 1-2: CAL ≤4 mm, coronal third. Stage 3-4: CAL ≥5 mm, middle third or beyond, separated by tooth loss (≤4 vs ≥5) and complexity, not by more CAL','Auto Stage 3/4: vertical loss ≥3 mm, Class II-III furcation, tooth loss to periodontitis','Default Grade B; ratio >1 → C. Heavy smoking or HbA1c ≥7% force Grade C regardless of ratio','More remaining bony walls = better regeneration prognosis (3-wall best, 1-wall worst)','Phase I always first; caries control is part of Phase I; the final crown or RPD waits until perio therapy is done','Maintenance is not a prophylaxis: treated-but-unmaintained patients lose teeth ~2x faster'] },
   { lec:'incisions-flaps-sutures', points:['Intrasulcular = crestal: same incision, named by whether a tooth is present','Sulcular flap (no vertical) → pyramidal (1 vertical) → trapezoidal (2 verticals) as access needs grow','Envelope/pouch flap = buccal only, papillae untouched: the root-coverage design','Sub-marginal incision = excisional, below the free margin, for pocket elimination; creates recession on purpose','Full thickness whenever bone is the goal (implant, augmentation, crown lengthening); split thickness only for soft-tissue grafts','Resorbable: chromic gut (fastest, worst handling) < PGCL < PGA (slowest, best handling, worst reaction)','Non-resorbable: polypropylene (like nylon) / silk (worst reaction, remove at 7 d) / PTFE (priciest, broadest use)','Monofilament beats braided (braided wicks bacteria); wipe braided sutures with CHX before removal','Palatal CTG harvest: molar area (more lamina propria, less fat that would shrink)','Horizontal mattress = augmentation workhorse, but strangles blood supply if overtightened','Vertical mattress = esthetic-zone papillae, oro-antral closure','Continuous/locking = fast seal, whole-line failure risk; long edentulous spans','Flap base at least as wide as its free edge','Vertical incisions at the line angle, never mid-papilla or mid-facial (both confirmed quiz questions)'] },
   { lec:'risk-assessment', points:['McGuire & Nunn sorts by maintainability: Good → Fair → Poor → Questionable → Hopeless (don\'t swap poor and questionable)','M&N is ~80% right overall, ~50% once good teeth are excluded; teeth usually outlast the prediction','Only M&N can be diagnostic (no-treatment outcome); all three systems can be therapeutic','Kwok & Caton: can stability be achieved with treatment? Questionable sits in the middle; best for medically complex patients','Miller & McEntire: molars only, quantitative, therapeutic; smokers ~296% more likely to lose molars','Regenerating a stage-defining vertical defect or furcation is the only way back from Stage 3','~70% of molar-incisor-pattern teens have a neutrophil chemotactic deficiency; ~70% who generalize use nicotine','~10% resistant · 10-15% at risk for severe disease · 20-25% don\'t respond to standard therapy','P4/P5 medicine = Personalized, Preventive, Predictive, Participatory (+ Periodontal)','72% of periodontitis patients first present just wanting a cleaning; the D1110 share rises with age','PISA: healthy ≈34 mm² vs. mild-moderate periodontitis ≈2,309 mm²','Low risk: exam 6-12 mo, biofilm removal 6 mo. Moderate: screening 6 mo, debridement 4-6 mo. High: screening 3 mo, debridement 2-4 mo','Recolonization takes 9-11 weeks → 3-month recall; ortho patients 4-6 weeks','#1 reason patients decline treatment is lack of trust, not cost'] },
-  { lec:'phase1-therapy', points:['CAL = PD + recession (PD 7/GR 0 and PD 2/GR 5 are both CAL 7)','6 sites per tooth; interproximally, tilt toward the area apical to the contact','Miller mobility (two rigid instruments): 1 <1 mm, 2 1-2 mm, 3 with vertical displacement','D4346 = inflamed gingiva, no periodontitis; D4355 = debride now, diagnose at a later visit','One vs. multiple sessions and hand vs. ultrasonic: no difference; irrigation adds nothing','PD ≥5 mm → debridement inadequate ~65% of the time','Re-eval at 4-6 wk; DGJ back at 2-4 wk; maturation 9-12 mo; PD drop is mostly resolved edema','Sickle: pointed, triangular, supragingival (1-2 mm sub), ~80°. H6/7 anteriors, S204SD9 posterior interproximal','Gracey: 70° blade, one lower cutting edge, lower shank parallel to the long axis; insert closed, work at 70-80°','Gracey 3/4 anterior · 11/12 and 15/16 mesial posterior · 13/14 distal posterior; Columbia 13/14 universal','Nabers = furcations; ODU 11/12 = root roughness; UNC-15 probe; implant probe in 3-mm bands; Columbia 4R/4L for implants','Magnetostrictive = orbital, all tip surfaces; piezo = linear, lateral surfaces','Finger rests: conventional, cross-arch, opposite-arch, finger-on-finger','Most missed: CEJ, furcation entrances, line angles, posterior distals','Polishing: 30 s of pumice ≈ 4 µm of enamel; low-abrasion paste, slow speed, 90°, light and intermittent'] },
+  { lec:'phase1-therapy', points:['Flagged "on the quiz": plaque bacteria initiate, the host drives progression; bacteria ~25% of damage, host ~75% (cytokines, osteoclasts); bacteria bring LPS','Three diagnoses: health / gingivitis / periodontitis. Periodontitis can never be on an intact periodontium','Plaque (probe 1 mm in, or disclosing tab) and BOP are scored 1/0, presence only. Delayed bleeding = 1','Smoking masks inflammation (cyanotic); diabetes exaggerates it; amlodipine → bulbous interdental overgrowth','In health PD ≠ CAL. CAL = PD + GR with sign: PD 5, GR −3 → CAL 2. Blank or 0 in Salud → CAL = PD → over-diagnosis','Negative GR: probe to base, withdraw until you feel the CEJ. Harder with inflammation, overgrowth, altered passive eruption, calculus/margins','Interproximal probing goes under the contact, not at the line angle. 6 sites per tooth','Debridement: not therapeutic, never with SRP, only when you can\'t see the margin, full-mouth code only, exam ~2 wk later (combinable at school)','Glickman: I catch (no tx) · II cul-de-sac (best for regeneration) · III through-and-through (hardest) · IV visible (root caries → hopeless)','Rolling technique finds the MGJ / keratinized width (teeth and implants)','Mobility: two blunt instruments; depressible = extract. Fremitus = mobility in function, palpated not seen','Occlusal findings go in the notes section. Pocket tx won\'t fix grade 2 mobility without fixing the occlusion','Look at x-rays before SRP, not the chart: bone loss pattern, tipping, fused roots, root proximity, calculus, sinus, PA lesion','SRP goals: less inflammation, gram− → gram+, arrest progression. Does not reverse damage; pocket elimination is not the rationale','PD drops from more recession (edema resolves) + reattachment: JE 7-10 d, CT 4-6 wk, collagen 3-6 mo. Re-eval 4-6 wk (deck: DGJ 2-4 wk, maturation 9-12 mo)','Scaling = supra + sub; root planing = sub, roots only; done together','Prophy = never had periodontitis; maintenance = treated periodontitis (localized SRP allowed); D4346 = between them, no periodontitis','Re-eval: residual calculus → remove, re-eval in 2 wk; otherwise more SRP won\'t help, better OH will','(Not on midterm) Piezo can go sub-G but can\'t root plane: ultrasonic → hand → ultrasonic lavage','(Not on midterm) Scalers: 2 cutting edges, short powerful strokes, sub-G only ~1-3 mm. Curettes: longer lighter strokes; Gracey (SG) 1 edge; the one SC = universal','One vs. multiple sessions and hand vs. ultrasonic: no difference; irrigation adds nothing; PD ≥5 mm → inadequate ~65%','(Not on midterm) Gracey 3/4 anterior · 11/12 and 15/16 mesial posterior · 13/14 distal posterior; Gracey 70° blade, work at 70-80°','(Not on midterm) Polishing (deck): 30 s pumice ≈ 4 µm enamel; low-abrasion, slow, 90°, light and intermittent'] },
   { lec:'resective-furcation', points:['Maxillary molar furcation entrances: mesial 3 mm, buccal 3.5 mm (narrowest), distal 5 mm from the CEJ','Mandibular: the lingual entrance is wider AND more apical than the buccal','Class I → SRP + furcation plasty. Class II → add tunnel/resection/GTR (mandibular). Class III → tunnel/resection/extraction','Reverse (negative) architecture = interdental bone apical to the facial/lingual margins = resective target'] },
   { lec:'periodontal-regeneration', points:['Best candidate: >3 mm deep, <25° angle, 3-wall defect','Risk factors: 1-wall defect, thin scalloped biotype','EMD = amelogenins, outcomes ~ GTR. rhPDGF-BB = chemotactic/mitogenic/angiogenic. β-TCP = osteoconductive scaffold'] },
   { lec:'implants-perio', points:['Success: immobile, no radiolucency, no pain or paresthesia, <0.2 mm bone loss per year after year 1','Smoking hits microbiology (A.a., P.g., B.f. harder to eradicate), immunology, and physiology (impaired revascularization)','Diabetes: fine if controlled; contraindicated if poorly controlled','IL-1 genotype + smoking = synergistic peri-implantitis risk'] },
@@ -3115,7 +3432,7 @@ function renderCourseInfo(){
     '<div class="hh-actions"><button type="button" class="btn primary" data-goto-lecture="'+cont.id+'">'+icon('notes')+'Continue: S'+cont.num+' '+escHtml(shortTitle(cont))+'</button>' +
     '<button type="button" class="btn" data-set-view="mock-exam">'+icon('timer')+'Mock exam</button><button type="button" class="btn" data-goto-mode="arcade">'+icon('arcade')+'Pocket Arcade</button></div></div>' +
     '<div class="hh-side"><div class="hh-exams">' +
-      '<div class="hh-stat"><div class="k">Midterm · S1-4</div><div class="v">'+(mid !== null && mid >= 0 ? mid+'<small>days</small>' : mid !== null ? 'Done' : 'After S4')+'</div></div>' +
+      '<div class="hh-stat"><div class="k">Midterm · Oct 1 · S1-4</div><div class="v">'+(mid !== null && mid >= 0 ? mid+'<small>days</small>' : mid !== null ? 'Done' : 'After S4')+'</div></div>' +
       '<div class="hh-stat"><div class="k">Final · Nov 19</div><div class="v">'+(fin >= 0 ? fin+'<small>days</small>' : 'Done')+'</div></div></div>' +
       '<div class="hh-stat"><div class="k">Your progress</div><div class="v">'+mastered+'<small>of '+total+' questions correct</small></div><div class="bar" style="margin-top:8px"><i style="width:'+(total?Math.round(100*mastered/total):0)+'%"></i></div></div>' +
       '<div class="hh-stat"><div class="k">Lectured so far</div><div class="v">'+taught+'<small>of '+LECTURES.length+' sessions · '+currentStreakDays()+'-day streak</small></div></div>' +
@@ -3125,7 +3442,7 @@ function renderCourseInfo(){
     var p = lectureProgress(l.id);
     h += '<button type="button" class="cm-row tag-'+l.tag+'" data-goto-lecture="'+l.id+'"><span class="cm-dot">'+l.num+'</span><span><span class="cm-title">'+escHtml(l.title)+'</span><span class="cm-sub">'+escHtml(l.who)+' '+statusHTML(l)+'</span></span>' +
       '<span class="cm-prog">'+p.correct+'/'+p.total+'<span class="bar"><i style="width:'+p.pct+'%"></i></span></span></button>';
-    if(l.num === MIDTERM_AFTER) h += '<div class="cm-milestone">'+icon('flag')+'Midterm: sessions 1-'+MIDTERM_AFTER+(MIDTERM_DATE ? ' · ' + MIDTERM_DATE : '')+'</div>';
+    if(l.num === MIDTERM_AFTER) h += '<div class="cm-milestone">'+icon('flag')+'Midterm · Thu Oct 1 · sessions 1-'+MIDTERM_AFTER+'</div>';
   });
   h += '<div class="cm-milestone">'+icon('trophy')+'Comprehensive final · Nov 19 · all 9 sessions</div></div></div>';
   h += '<div><div class="card section-block"><div class="eyebrow">How the grade breaks down</div>' +
@@ -3188,7 +3505,8 @@ function renderLectureNotes(){
 function filteredQuestions(){
   var s = QBANK_FILTER.search.trim().toLowerCase();
   return QUESTIONS.filter(function(q){
-    if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
+    if(QBANK_FILTER.lec === 'midterm'){ if(q.mid === false || !(LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)) return false; }
+    else if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
     if(QBANK_FILTER.type !== 'all' && q.type !== QBANK_FILTER.type) return false;
     var a = STATE.answered[q.id];
     if(QBANK_FILTER.status === 'new' && a) return false;
@@ -3204,7 +3522,7 @@ function filteredQuestions(){
 function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
-    '<select id="qbLec"><option value="all">All sessions</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
+    '<select id="qbLec"><option value="all">All sessions</option><option value="midterm"'+sel('midterm',QBANK_FILTER.lec)+'>Midterm scope (S1-4, per Dr. Kaur)</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
     '<select id="qbType">' + [['all','All types'],['mcq','Multiple choice'],['recall','Recall'],['sequence','Sequence'],['match','Matching']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<select id="qbStatus">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
@@ -3229,7 +3547,7 @@ var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedE
 function examPool(scope){
   var lecs = scope === 'midterm' ? LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }) : LECTURES;
   var ids = lecs.map(function(l){ return l.id; });
-  return QUESTIONS.filter(function(q){ return q.type === 'mcq' && ids.indexOf(q.lec) > -1; });
+  return QUESTIONS.filter(function(q){ return q.type === 'mcq' && ids.indexOf(q.lec) > -1 && !(scope === 'midterm' && q.mid === false); });
 }
 function formatElapsed(ms){ var s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
 function startMockExam(size){
@@ -3392,7 +3710,7 @@ function renderExamHints(){
   LECTURES.forEach(function(l){
     var hs = byLec[l.id]; if(!hs) return;
     h += '<div class="hint-group"><div class="hint-group-head">'+sessChip(l)+'<h3>'+escHtml(l.title)+'</h3><button type="button" class="btn sm ghost" data-goto-lecture="'+l.id+'">Open notes'+icon('arrowR')+'</button></div>' +
-      hs.map(function(x){ return '<div class="hint tag-'+l.tag+'"><blockquote>&ldquo;'+escHtml(x.quote)+'&rdquo;</blockquote><p class="take"><span class="kind '+x.type+'">'+(x.type==='emphasize'?'Testable':'Lower priority')+'</span>'+(x.src==='slide'?'<span class="kind slide">Slide</span>':'')+escHtml(x.takeaway)+'</p></div>'; }).join('') + '</div>';
+      hs.map(function(x){ return '<div class="hint tag-'+l.tag+'"><blockquote>&ldquo;'+escHtml(x.quote)+'&rdquo;</blockquote><p class="take"><span class="kind '+x.type+'">'+(x.type==='emphasize'?'Testable':'Lower priority')+'</span>'+(x.src==='slide'?'<span class="kind slide">Slide</span>':x.src==='email'?'<span class="kind slide">Instructor email</span>':'')+escHtml(x.takeaway)+'</p></div>'; }).join('') + '</div>';
   });
   content().innerHTML = h;
 }
@@ -3762,6 +4080,14 @@ var PERIO_TERMS = [
   { w:'PIEZO', c:'Ultrasonic type with linear tip motion (short name)', lec:'phase1-therapy' },
   { w:'PUMICE', c:'30 seconds of it can remove 4 µm of enamel', lec:'phase1-therapy' },
   { w:'DEBRIDEMENT', c:'D4355: full-mouth ___', lec:'phase1-therapy' },
+  { w:'GLICKMAN', c:'Furcation classification used here: catch, cul-de-sac, through-and-through, visible', lec:'phase1-therapy' },
+  { w:'AMLODIPINE', c:'Calcium channel blocker behind bulbous interdental overgrowth', lec:'phase1-therapy' },
+  { w:'CYANOTIC', c:'How a smoker\'s gingiva often looks: inflammation masked', lec:'phase1-therapy' },
+  { w:'OSTEOCLAST', c:'Bone-destroying cell released by the host, not brought by bacteria', lec:'phase1-therapy' },
+  { w:'ENDOTOXIN', c:'What bacteria do bring: lipopolysaccharide', lec:'phase1-therapy' },
+  { w:'LAVAGE', c:'Why you finish with the ultrasonic: flush the pocket', lec:'phase1-therapy' },
+  { w:'ROLLING', c:'___ technique: find the MGJ and keratinized width', lec:'phase1-therapy' },
+  { w:'PROPHYLAXIS', c:'Preventive; for patients who never had periodontitis', lec:'phase1-therapy' },
   { w:'CURETTE', c:'Rounded toe, half-circle cross-section', lec:'phase1-therapy' },
   { w:'MIRROR', c:'Indirect vision, illumination and retraction', lec:'phase1-therapy' },
   { w:'DISCLOSING', c:'Tablet that stains plaque for the patient to see', lec:'phase1-therapy' },
@@ -3802,6 +4128,9 @@ var QUAD_GROUPS = [
   { name:'Most-missed SRP areas', lec:'phase1-therapy', items:['CEJ','Furcation entrance','Line angle','Posterior distal'] },
   { name:'Occlusal trauma signs', lec:'phase1-therapy', items:['Fremitus','Wear facets','Widened PDL','Tooth migration'] },
   { name:'Re-evaluation measures', lec:'phase1-therapy', items:['BOP','Probing depth','Suppuration','Plaque score'] },
+  { name:'Glickman furcation classes', lec:'phase1-therapy', items:['Incipient catch','Cul-de-sac','Through-and-through','Visible through-and-through'] },
+  { name:'Hide the CEJ from your probe', lec:'phase1-therapy', items:['Inflammation','Drug-induced overgrowth','Altered passive eruption','Restorative margin'] },
+  { name:'SRP limitations', lec:'phase1-therapy', items:['Blinded procedure','Motile bacteria','Root concavities','Operator skill'] },
   { name:'McGuire & Nunn categories', lec:'risk-assessment', items:['Good','Fair','Poor','Hopeless'] },
   { name:'P4 medicine', lec:'risk-assessment', items:['Personalized','Preventive','Predictive','Participatory'] },
   { name:'Risk-scoring tools', lec:'risk-assessment', items:['UniFe','PRA','PreViser','Overjet'] },

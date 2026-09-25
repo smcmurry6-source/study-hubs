@@ -58,6 +58,19 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (perio: midterm date + Session 4 lectured)** — Midterm set to **Thu Oct 1** (sessions 1-4):
+  `MIDTERM_DATE = '2026-10-01'` in the perio hub (ribbon countdown, course home, course map) and
+  `examDate:"2026-10-01"` on the dashboard's perio HUBS entry (it now leads the next-exam hero, a day
+  before MSK Exam 3). Session 4 (Phase I) flipped from `preview` to `taught` from the class recording:
+  both reading levels rewritten, 42 lecture questions (`q4-L01`-`q4-L42`), 17 verbatim exam hints, 6
+  new review tables (Glickman furcations, CAL/Salud trap, tissue modifiers, prophy vs D4346 vs SRP vs
+  maintenance vs debridement, healing timeline, radiograph reads + SRP limits), new cram sheet and mind
+  map, 8 arcade terms and 3 Quadrants groups. Both `phase1-therapy` narration files regenerated.
+  Midterm scope from Dr. Kaur's email (no instruments/ultrasonics/polishing; slides up to failure of
+  therapy): 31 S4 questions carry `mid:false` (a "Not on midterm" chip; excluded from the midterm mock
+  exam and from the new "Midterm scope" question-bank filter), and the matching notes sections, review
+  tables, cram lines, mind-map branch and Atlas diagram are labeled.
+
 - **2026-09-24 (perio revamp + Pocket Arcade)** — `hubs/perio/index.html` rebuilt (Perio Project) to
   match the revamped site: compact one-row ribbon (back, title, icon mode pills, countdown, progress,
   theme toggle), inline-SVG icon set (no emoji), Instrument Serif/Sans + IBM Plex Mono. Modes are now
