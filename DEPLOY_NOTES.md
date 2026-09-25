@@ -54,10 +54,18 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
   `main`, served at `smcmurry6-source.github.io/study-hubs/`. Deploy via the
   GitHub Git Data API (blob → tree → commit → ref update); a GitHub PAT is
   needed for this and should only ever be used transiently (env var for one
-  script run), never written into a committed file.
+  script run), never written into a committed file. **Claude Code sessions
+  (cloud or local) don't use the API path or a PAT:** they push a branch and
+  open a PR, and merging the PR is the deploy — see `CLAUDE.md`.
+- **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
+  (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
+  only download release files from repos attached to the session.
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25** — Added `CLAUDE.md` (imports this file) so Claude Code sessions
+  start with the repo rules; Claude Code deploys go through branches + PRs.
+  Kokoro model re-hosted as release `kokoro-model-v1.0`. No site changes.
 - **2026-09-25 (perio: midterm date + Session 4 lectured)** — Midterm set to **Thu Oct 1** (sessions 1-4):
   `MIDTERM_DATE = '2026-10-01'` in the perio hub (ribbon countdown, course home, course map) and
   `examDate:"2026-10-01"` on the dashboard's perio HUBS entry (it now leads the next-exam hero, a day
