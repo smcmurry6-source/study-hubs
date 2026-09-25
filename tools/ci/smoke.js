@@ -54,7 +54,7 @@ function lint(hub, A){
   await new Promise(r => server.listening ? r() : server.on('listening', r));
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   for (const vp of [{ width: 1366, height: 860 }, { width: 390, height: 844, isMobile: true }]) {
-    const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.isMobile, hasTouch: !!vp.isMobile });
+    const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.isMobile, hasTouch: !!vp.isMobile, serviceWorkers: 'block' }); /* sw.js would bypass the lint hook */
     await stub(context);
     const label = vp.isMobile ? 'phone' : 'desktop';
     // dashboard
