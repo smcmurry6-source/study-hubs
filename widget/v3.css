@@ -354,3 +354,12 @@ body.sh-nuke-active{overflow:hidden;}
   #shhome-pill span{display:none;}
   #shname-badge{padding:6px 11px; font-size:11.5px; max-width:130px;}
 }
+
+/* ---------- Listen player strip (pre-generated narration) ---------- */
+.sh-tts-player{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 14px; padding:8px 10px; border:1px solid var(--line, rgba(0,0,0,.12)); border-radius:12px; background:var(--surface-2, #f3f3f3); font-family:var(--font-body, sans-serif); color:var(--ink, #222);}
+.sh-tts-player[hidden]{display:none;}
+.sh-tts-seek{flex:1 1 160px; min-width:120px; accent-color:var(--accent, #2F6FD6);}
+.sh-tts-skip{appearance:none; border:1px solid var(--line-strong, rgba(0,0,0,.2)); background:var(--surface, #fff); color:inherit; border-radius:8px; padding:4px 8px; font:600 12px/1 var(--font-mono, monospace); cursor:pointer;}
+.sh-tts-skip:hover{border-color:var(--ink, #222);}
+.sh-tts-time{font:500 12px/1 var(--font-mono, monospace); color:var(--ink-soft, #555); font-variant-numeric:tabular-nums; min-width:9.5ch; text-align:right;}
+.sh-tts-rate{border:1px solid var(--line-strong, rgba(0,0,0,.2)); background:var(--surface, #fff); color:inherit; border-radius:8px; padding:3px 6px; font:600 12px/1.2 var(--font-body, sans-serif);}

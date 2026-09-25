@@ -375,19 +375,80 @@
     // file, using the same button + state machine as the synth path. If the
     // file 404s or otherwise fails to play, this drops back to the browser
     // voice (speakWithSynth) so Listen never just goes silent.
+    /* Player strip for pre-generated narration: seek bar, 15 s back / forward, speed, and the
+       position remembered per file (localStorage) so a long lecture resumes where you stopped.
+       Lock-screen / headphone controls come from the Media Session API where supported. */
+    var RATE_KEY = "sh_tts_rate", POS_PREFIX = "sh_tts_pos:";
+    function fmtTime(sec){ sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+    function savedPos(url){ try { return parseFloat(localStorage.getItem(POS_PREFIX + url)) || 0; } catch (e) { return 0; } }
+    function savePos(url, t){ try { if (t > 0) localStorage.setItem(POS_PREFIX + url, String(Math.floor(t))); else localStorage.removeItem(POS_PREFIX + url); } catch (e) {} }
+    function ensurePlayer(btn){
+      if (btn.__shPlayer && btn.__shPlayer.isConnected) return btn.__shPlayer;
+      var el = document.createElement("div");
+      el.className = "sh-tts-player";
+      el.innerHTML =
+        '<button type="button" class="sh-tts-skip" data-skip="-15" aria-label="Back 15 seconds">−15</button>' +
+        '<input type="range" class="sh-tts-seek" min="0" max="1000" value="0" step="1" aria-label="Position in the narration">' +
+        '<button type="button" class="sh-tts-skip" data-skip="15" aria-label="Forward 15 seconds">+15</button>' +
+        '<span class="sh-tts-time">0:00</span>' +
+        '<select class="sh-tts-rate" aria-label="Playback speed"><option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select>';
+      var row = btn.parentNode;
+      (row && row.parentNode ? row.parentNode : btn.parentNode).insertBefore(el, row && row.nextSibling);
+      btn.__shPlayer = el;
+      return el;
+    }
     function playAudioFile(container, btn, audioUrl){
       var audio = new Audio(audioUrl);
       audio.preload = "auto";
+      var rate = parseFloat(prefGetSafe(RATE_KEY)) || 1;
+      audio.playbackRate = rate; audio.defaultPlaybackRate = rate;
+      var player = ensurePlayer(btn), seek = player.querySelector(".sh-tts-seek"), time = player.querySelector(".sh-tts-time"), rateSel = player.querySelector(".sh-tts-rate");
+      rateSel.value = String(rate);
+      player.hidden = false;
+      var dragging = false, lastSave = 0;
+      function paint(){
+        if (!audio.duration || !isFinite(audio.duration)) return;
+        if (!dragging) seek.value = String(Math.round(audio.currentTime / audio.duration * 1000));
+        time.textContent = fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration);
+      }
+      audio.addEventListener("loadedmetadata", function(){
+        var at = savedPos(audioUrl);
+        if (at > 5 && at < audio.duration - 10) { try { audio.currentTime = at; } catch (e) {} }
+        paint();
+      });
+      audio.addEventListener("timeupdate", function(){
+        paint();
+        var now = Date.now(); if (now - lastSave > 4000) { lastSave = now; savePos(audioUrl, audio.currentTime); }
+      });
+      audio.addEventListener("pause", function(){ savePos(audioUrl, audio.currentTime); if (activeAudioEl === audio && activeBtn === btn) setState(btn, "paused"); });
+      audio.addEventListener("play", function(){ if (activeAudioEl === audio && activeBtn === btn) setState(btn, "playing"); });
+      seek.oninput = function(){ dragging = true; if (audio.duration) time.textContent = fmtTime(seek.value / 1000 * audio.duration) + " / " + fmtTime(audio.duration); };
+      seek.onchange = function(){ dragging = false; if (audio.duration) { audio.currentTime = seek.value / 1000 * audio.duration; savePos(audioUrl, audio.currentTime); } };
+      player.querySelectorAll("[data-skip]").forEach(function(b){ b.onclick = function(){ if (audio.duration) audio.currentTime = Math.min(audio.duration - 1, Math.max(0, audio.currentTime + (+b.getAttribute("data-skip")))); paint(); }; });
+      rateSel.onchange = function(){ var r = parseFloat(rateSel.value) || 1; audio.playbackRate = r; try { localStorage.setItem(RATE_KEY, String(r)); } catch (e) {} };
       audio.addEventListener("ended", function(){
+        savePos(audioUrl, 0);
         if (activeAudioEl === audio) activeAudioEl = null;
         if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; }
       });
       audio.addEventListener("error", function(){
         if (activeAudioEl === audio) activeAudioEl = null;
         if (activeBtn === btn) activeBtn = null;
+        player.hidden = true;
         if (btn) btn.removeAttribute("data-sh-tts-audio");
         speakWithSynth(container, btn);
       });
+      if ("mediaSession" in navigator) {
+        try {
+          var head = btn.closest("article, section");
+          var h = head && head.querySelector("h2, h1");
+          navigator.mediaSession.metadata = new MediaMetadata({ title: h ? h.textContent.trim().slice(0, 90) : document.title, artist: "Study Hubs", album: document.title });
+          navigator.mediaSession.setActionHandler("play", function(){ audio.play(); });
+          navigator.mediaSession.setActionHandler("pause", function(){ audio.pause(); });
+          navigator.mediaSession.setActionHandler("seekbackward", function(){ audio.currentTime = Math.max(0, audio.currentTime - 15); });
+          navigator.mediaSession.setActionHandler("seekforward", function(){ audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15); });
+        } catch (e) {}
+      }
       activeBtn = btn;
       activeAudioEl = audio;
       setState(btn, "playing");
@@ -395,11 +456,13 @@
       if (p && p.catch) {
         p.catch(function(){
           if (activeAudioEl === audio) activeAudioEl = null;
+          player.hidden = true;
           if (btn) btn.removeAttribute("data-sh-tts-audio");
           speakWithSynth(container, btn);
         });
       }
     }
+    function prefGetSafe(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
 
     // Public entry point. audioUrl is optional — pass it when a hub has a
     // pre-generated narration file for the content currently shown in
