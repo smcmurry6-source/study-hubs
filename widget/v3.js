@@ -28,6 +28,10 @@
       supabase = window.supabase.createClient(SB_URL, SB_KEY);
     }
   } catch (e) { /* stats layer is best-effort, never block the hub */ }
+  /* offline copy of the hubs (sw.js at the site root, next to the widget folder); best-effort */
+  if (!EXPORT_ONLY && "serviceWorker" in navigator && window.isSecureContext) {
+    try { navigator.serviceWorker.register(new URL("../sw.js", thisScript.src).href, { scope: new URL("../", thisScript.src).href }); } catch (e) {}
+  }
   /* shared with the hubs' own arcades so a page never builds a second client */
   window.shSupabase = supabase;
 
@@ -535,6 +539,25 @@
   function currentName(){
     try { return (localStorage.getItem(SH_NAME_KEY) || "").trim(); } catch (e) { return ""; }
   }
+  /* ---------- spaced review ("Due today"): a missed question comes back tomorrow; a correct
+     one comes back after 1, 3, 7, 14, then 30 days. Stored per hub on this device. ---------- */
+  var SRS_KEY = "sh_srs_" + HUB, SRS_STEPS = [1, 3, 7, 14, 30];
+  function srsDay(offset){ var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + (offset || 0)); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function srsLoad(){ try { return JSON.parse(localStorage.getItem(SRS_KEY) || "{}") || {}; } catch (e) { return {}; } }
+  function srsRecord(qid, correct){
+    if (!qid) return;
+    var all = srsLoad(), r = all[qid] || { b: 0 };
+    if (correct) { r.b = Math.min(r.b + 1, SRS_STEPS.length); r.due = srsDay(SRS_STEPS[r.b - 1]); }
+    else { r.b = 0; r.due = srsDay(1); }
+    all[qid] = r;
+    try { localStorage.setItem(SRS_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  /* question ids due today or earlier, most-overdue first */
+  window.shSrsDue = function(){
+    var all = srsLoad(), today = srsDay(0);
+    return Object.keys(all).filter(function(k){ return all[k].due && all[k].due <= today; })
+      .sort(function(a, b){ return all[a].due < all[b].due ? -1 : all[a].due > all[b].due ? 1 : all[a].b - all[b].b; });
+  };
   window.shName = currentName;
   /* scroll something into view and pulse it, used when search jumps to a result */
   window.shFlash = function(el){
@@ -999,6 +1022,7 @@
   document.addEventListener(ANSWERED_EVENT, function(e){
     var d = (e && e.detail) || {};
     var isCorrect = !!d.correct;
+    srsRecord(String(d.qid || ""), isCorrect);
     safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     /* which option was picked (its authored index, 0 = the key), for the admin page's
        "most popular wrong answer"; hubs send it for bank and mock-exam MCQs */

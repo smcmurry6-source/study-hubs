@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="../../assets/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
 <meta name="theme-color" content="#15202A">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Musculoskeletal Exam 3 Hub">
@@ -2453,6 +2454,14 @@ function mindMapFor(lec){
    =================================================================== */
 var WEAK_DRILL = null;
 function renderWeak(body){
+  if(WEAK_DRILL === 'due'){
+    var due = (window.shSrsDue ? window.shSrsDue() : []).map(function(id){ return QUESTIONS_BY_ID[id]; }).filter(Boolean).slice(0, 30);
+    body.innerHTML = '<div class="qfilters" style="padding:4px 0"><button type="button" class="btn" id="weakBack">'+icon('back')+'Weak spots</button><span class="pill">Due today · '+due.length+'</span></div>' +
+      (due.length ? '<div class="qlist" id="weakList">' + due.map(function(q){ return qCardHTML(q, { ctx:'due' }); }).join('') + '</div>' : '<div class="rv-empty">Nothing is due. Questions come back here a day after you miss them, and at growing gaps once you get them right.</div>');
+    var dl = document.getElementById('weakList'); if(dl) wireQuestionContainer(dl);
+    document.getElementById('weakBack').onclick = function(){ WEAK_DRILL = null; renderWeak(body); window.scrollTo(0,0); };
+    return;
+  }
   if(WEAK_DRILL){
     var lecs = WEAK_DRILL === 'all' ? LECTURES.map(function(l){ return l.id; }) : [WEAK_DRILL];
     var missed = [], fresh = [];
@@ -2479,7 +2488,8 @@ function renderWeak(body){
       (r.pct !== null ? '<span class="weak-meter"><i style="width:'+r.pct+'%"></i></span>' : '') + '</div><button type="button" class="btn'+(r.missed ? ' primary' : '')+'" data-drill="'+r.l.id+'">Drill</button></div>';
   }
   body.innerHTML = '<div class="reading" style="max-width:860px"><h2>Weak spots</h2><p>Lectures ranked by your accuracy on this device (3+ answers needed). Drill a lecture to get the questions you missed last time, then the ones you haven\'t tried.</p>' +
-    (totalMissed ? '<div class="reading-actions" style="margin:6px 0 14px"><button type="button" class="btn primary" data-drill="all">Drill everything I missed ('+totalMissed+')</button></div>' : '') +
+    (function(){ var nd = window.shSrsDue ? window.shSrsDue().filter(function(id){ return QUESTIONS_BY_ID[id]; }).length : 0;
+      return (nd || totalMissed) ? '<div class="reading-actions" style="margin:6px 0 14px">' + (nd ? '<button type="button" class="btn primary" data-drill="due">Due today ('+nd+')</button>' : '') + (totalMissed ? '<button type="button" class="btn'+(nd ? '' : ' primary')+'" data-drill="all">Drill everything I missed ('+totalMissed+')</button>' : '') + '</div>' : ''; })() +
     (started.length ? '<div class="weak-list">' + started.map(row).join('') + '</div>' : '<p class="rv-empty">Answer a few questions in the bank or mock exam and your weak spots show up here.</p>') +
     (notYet.length ? '<h3 style="margin-top:22px">Not started yet</h3><div class="weak-list">' + notYet.map(row).join('') + '</div>' : '') + '</div>';
   body.querySelectorAll('[data-drill]').forEach(function(b){ b.onclick = function(){ WEAK_DRILL = b.getAttribute('data-drill'); renderWeak(body); window.scrollTo(0,0); }; });

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="../../assets/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="manifest" href="../../manifest.webmanifest">
 <meta name="theme-color" content="#15202A">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Periodontology D2 Compendium">
@@ -3641,6 +3642,13 @@ function weakSpotStats(){
 function renderWeakSpots(){
   if(window.shTTS) window.shTTS.stop();
   var c = content();
+  if(WEAK_DRILL_LEC === 'due'){
+    var dq = (window.shSrsDue ? window.shSrsDue() : []).map(function(id){ return QUESTIONS_BY_ID[id]; }).filter(Boolean).slice(0, 30);
+    c.innerHTML = '<div class="card section-block"><button type="button" class="btn sm ghost" data-weak-action="back">'+icon('arrowL')+'Weak Spots</button><h2 style="margin-top:10px">Due today</h2><p class="muted" style="margin:0;max-width:64ch">'+(dq.length ? dq.length + ' question' + (dq.length === 1 ? '' : 's') + ' to review. A miss brings a question back tomorrow; each right answer pushes it further out (1, 3, 7, 14, then 30 days).' : 'Nothing is due. Questions come back here a day after you miss them, and at growing gaps once you get them right.')+'</p></div>' +
+      (dq.length ? '<div class="qlist" id="weakDrillList">' + dq.map(qCardHTML).join('') + '</div>' : '');
+    if(dq.length) wireQuestionContainer(document.getElementById('weakDrillList'));
+    return;
+  }
   if(WEAK_DRILL_LEC){
     var lecIds = WEAK_DRILL_LEC === 'all' ? LECTURES.map(function(l){ return l.id; }) : [WEAK_DRILL_LEC];
     var qs = [];
@@ -3656,6 +3664,7 @@ function renderWeakSpots(){
   started.sort(function(a,b){ return a.pct - b.pct || b.remaining - a.remaining; });
   var weak = started.filter(function(s){ return s.remaining > 0; });
   var h = '<div class="card section-block"><div class="eyebrow">'+icon('target')+'Weak spots</div><h2>Where to focus next</h2><p class="muted" style="max-width:64ch">Sessions ranked by your accuracy on the questions you\'ve tried. "Not yet mastered" means never answered correctly, tried or not.</p>' +
+    (function(){ var nd = window.shSrsDue ? window.shSrsDue().filter(function(id){ return QUESTIONS_BY_ID[id]; }).length : 0; return nd ? '<button type="button" class="btn primary" data-weak-action="drill-due" style="margin-right:8px">'+icon('bolt')+'Due today ('+nd+')</button>' : ''; })() +
     (weak.length ? '<button type="button" class="btn primary" data-weak-action="drill-all">'+icon('bolt')+'Drill everything not yet mastered ('+weak.reduce(function(n,s){ return n + s.remaining; },0)+')</button>' : '') + '</div>';
   if(!started.length) h += '<div class="card section-block"><p class="muted" style="margin:0">Answer a few questions anywhere in the hub (Question Bank, Mock Exam, the bank-based arcade games) and your weak spots will show up here.</p></div>';
   else if(weak.length) h += '<div class="card section-block">' + weak.map(function(s){ return '<div class="weak-row tag-'+s.lec.tag+'"><h4>'+sessChip(s.lec)+escHtml(s.lec.title)+'</h4><span class="mono muted">'+s.pct+'% of '+s.attempted+' tried</span><div class="bar"><i style="width:'+s.pct+'%"></i></div><span class="faint" style="font-size:.84rem">'+s.remaining+' of '+s.total+' not yet mastered</span><button type="button" class="btn sm" data-weak-action="drill-lec" data-lec="'+s.lec.id+'">Drill '+icon('arrowR')+'</button></div>'; }).join('') + '</div>';
@@ -3781,7 +3790,7 @@ function renderCompendium(){
         return;
       }
       var wa = e.target.closest('[data-weak-action]');
-      if(wa){ var w = wa.getAttribute('data-weak-action'); WEAK_DRILL_LEC = w === 'drill-all' ? 'all' : w === 'drill-lec' ? wa.getAttribute('data-lec') : null; renderCompendiumContent(); window.scrollTo({top:0}); return; }
+      if(wa){ var w = wa.getAttribute('data-weak-action'); WEAK_DRILL_LEC = w === 'drill-due' ? 'due' : w === 'drill-all' ? 'all' : w === 'drill-lec' ? wa.getAttribute('data-lec') : null; renderCompendiumContent(); window.scrollTo({top:0}); return; }
       var ra = e.target.closest('[data-recall-action]');
       if(ra){
         var act = ra.getAttribute('data-recall-action');

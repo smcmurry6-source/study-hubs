@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#15202A">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Study Hubs · D2 UAB">
@@ -596,6 +597,25 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     HUBS.forEach(function(h){ (h.exams || []).forEach(function(e){ var d = daysUntil(e.date); if (d >= 0) list.push({ hub:h, exam:e, d:d }); }); });
     return list.sort(function(a,b){ return a.d - b.d; });
   }
+  /* every upcoming exam as an .ics file (all-day events, reminder the morning before) */
+  function downloadIcs(){
+    var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+    function d8(s){ return s.replace(/-/g, ""); }
+    function next(s){ var d = parseYmd(s); d.setDate(d.getDate() + 1); return ymd(d).replace(/-/g, ""); }
+    function txt(t){ return String(t).replace(/[\\,;]/g, function(c){ return "\\" + c; }); }
+    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Study Hubs D2 UAB//EN", "CALSCALE:GREGORIAN", "X-WR-CALNAME:D2 exams"];
+    upcomingExams().forEach(function(x){
+      var url = location.href.replace(/[#?].*$/, "").replace(/index\.html$/, "") + "hubs/" + x.hub.id + "/";
+      lines.push("BEGIN:VEVENT", "UID:" + x.hub.id + "-" + d8(x.exam.date) + "@study-hubs", "DTSTAMP:" + stamp,
+        "DTSTART;VALUE=DATE:" + d8(x.exam.date), "DTEND;VALUE=DATE:" + next(x.exam.date),
+        "SUMMARY:" + txt(x.exam.name), "DESCRIPTION:" + txt("Study hub: " + url), "URL:" + url,
+        "BEGIN:VALARM", "TRIGGER:-PT15H", "ACTION:DISPLAY", "DESCRIPTION:" + txt(x.exam.name + " tomorrow"), "END:VALARM", "END:VEVENT");
+    });
+    lines.push("END:VCALENDAR");
+    var blob = new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "d2-exams.ics";
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
   function daysText(d){ return d === 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days"; }
   function renderHero(){
     var up = upcomingExams(), first = up[0] || null, hub, cls;
@@ -618,6 +638,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         '<div class="hero-date">' + esc(longDate(first.exam.date)) + '</div>' +
         '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
         (p ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' +
+        '<button type="button" class="btn btn-quiet" id="icsBtn">' + ICON.cal + 'Add exams to my calendar</button>' +
         (opened ? '<span class="hero-note">You last opened it ' + esc(opened) + '</span>' : '') + '</div>' +
         (also.length ? '<ul class="hero-also">' + also.map(function(x){
           return '<li style="' + ringVars(CLASSES[x.hub.cls].ring) + '"><a href="hubs/' + x.hub.id + '/" data-hub="' + x.hub.id + '"><span class="also-name">' + esc(x.exam.name) + '</span><span class="also-when">' + esc(parseYmd(x.exam.date).toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })) + ' · ' + esc(daysText(x.d)) + '</span></a></li>';
@@ -632,6 +653,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a></div>';
     }
     $("heroMain").innerHTML = html;
+    var ib = $("icsBtn"); if (ib) ib.addEventListener("click", downloadIcs);
 
     $("heroProgLabel").textContent = "Your progress in " + (HUB_LABEL[hub.id] || "this hub");
     $("heroProg").innerHTML = p
@@ -965,6 +987,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }
     check(); setInterval(check, 4 * 60 * 1000);
   })();
+
+  /* offline copy of the dashboard and hubs (sw.js); best-effort */
+  if ("serviceWorker" in navigator && window.isSecureContext) { try { navigator.serviceWorker.register("sw.js"); } catch (e) {} }
 
   /* refresh countdowns if the tab stays open past midnight */
   var dayKey = ymd(new Date());
