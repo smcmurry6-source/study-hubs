@@ -10,8 +10,8 @@
   if (window.shRanks) return;
 
   var TIERS = [
-    { key: "antique", name: "Antique",     at: 0,     accent: "#8A5A32" },
-    { key: "stone",   name: "Stone",       at: 300,   accent: "#6F6A63" },
+    { key: "stone",   name: "Stone",       at: 0,     accent: "#6F6A63" },
+    { key: "antique", name: "Antique",     at: 300,   accent: "#8A5A32" },
     { key: "bronze",  name: "Bronze",      at: 1500,  accent: "#B0672B" },
     { key: "silver",  name: "Silver",      at: 5000,  accent: "#7D8792" },
     { key: "gold",    name: "Gold",        at: 12000, accent: "#B8860B" },
