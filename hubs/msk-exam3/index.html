@@ -3,8 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="../../assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#15202A">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Musculoskeletal Exam 3 Hub">
+<meta property="og:description" content="Notes with narration, a question bank, an exam-style mock, grouped review tables and the Bone Zone Arcade.">
+<meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/msk-exam3/">
+<meta property="og:image" content="https://smcmurry6-source.github.io/study-hubs/assets/og-msk-exam3.png">
+<meta name="twitter:card" content="summary_large_image">
 <title>Musculoskeletal Exam 3 Hub</title>
-<meta name="description" content="GI & Musculoskeletal Exam 3 study hub: lecture notes, question bank, grouped review of drugs, hormones, cells and diseases, and three arcade mini games.">
+<meta name="description" content="GI & Musculoskeletal Exam 3 study hub: lecture notes, question bank, grouped review of drugs, hormones, cells and diseases, an exam-style mock, and nine arcade mini games.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -2269,13 +2278,15 @@ function recordAnswer(qid, lecId, correct, ctx){
 function dayStreak(){
   var set = {}; STATE.days.forEach(function(d){ set[d] = 1; });
   var n = 0, d = new Date();
+  var k0 = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(!set[k0]) d.setDate(d.getDate()-1); /* not studied yet today: the streak is still alive from yesterday */
   for(;;){ var k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); if(set[k]){ n++; d.setDate(d.getDate()-1); } else break; }
   return n;
 }
 function renderHeaderStats(){
   var seenCount = QUESTIONS.filter(function(q){ return STATE.seen[q.id]; }).length;
   var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + '/' + QUESTIONS.length;
-  var sp = document.getElementById('streakPill'); if(sp){ var n = dayStreak(); sp.textContent = n + ' day streak'; }
+  var sp = document.getElementById('streakPill'); if(sp){ var n = dayStreak(); sp.textContent = n + ' day streak'; sp.hidden = n < 2; }
   var cd = document.getElementById('countdownPill');
   if(cd){
     var ex = new Date(EXAM_DATE + 'T08:00:00'); var now = new Date();
@@ -2853,7 +2864,9 @@ var ARCADE = (function(){
     document.getElementById('arMute').addEventListener('click', function(){ STATE.arcade.muted = !STATE.arcade.muted; saveState(); renderLobby(); });
   }
   function stopAll(){ if(active && active.stop) active.stop(); active = null; }
+  var activeId = null;
   function startGame(id){
+    activeId = id;
     stopAll();
     panel = document.getElementById('panel-arcade');
     active = id === 'sort' ? SortStorm() : id === 'snake' ? Snake() : id === 'stack' ? StackAttack() : id === 'match' ? MarrowMatch() : id === 'hangman' ? BoneToPick() : id === 'fact' ? FactOrFracture() : id === 'blaster' ? ClastBlaster() : id === 'search' ? BoneSearch() : WhackAClast();
@@ -3836,7 +3849,7 @@ var ARCADE = (function(){
     };
   }
 
-  return { renderLobby:renderLobby, stopAll:stopAll, startGame:startGame };
+  return { renderLobby:renderLobby, stopAll:stopAll, startGame:startGame, current:function(){ return active ? activeId : null; } };
 })();
 
 /* ---------- theme toggle ---------- */
@@ -3861,6 +3874,14 @@ function boot(){
   var m = STATE.ui.mode; if(['compendium','review','arcade'].indexOf(m) === -1) m = 'compendium';
   setMode(m);
 }
+/* Section label for the shared widget's per-section time tracking (adds the arcade game). */
+window.SH_SECTION = function(){
+  var m = STATE.ui.mode;
+  if(m === 'compendium') return 'compendium/' + STATE.ui.sub;
+  if(m === 'review') return 'review/' + STATE.ui.group;
+  if(m === 'arcade') return 'arcade/' + (ARCADE.current() || 'lobby');
+  return m;
+};
 /* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
 boot();
 
