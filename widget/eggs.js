@@ -8,7 +8,8 @@
    - Luck wall: the evening before and the morning of an exam, send classmates luck
    - Professor soundboard: tap a professor's name 5 times for one of their exam-hint quotes
    - Night Owl (answering 2-4 am), Through the Root Canal (10 wrong, then 10 right)
-   - Konami code → 8-bit mode; type "floss" for a dancing tooth */
+   - Konami code → 8-bit mode (keyboard, or on a phone: swipe up up down down left right left right, tap tap);
+     type "floss" for a dancing tooth */
 (function(){
   "use strict";
   var H = window.shEggHooks;
@@ -305,6 +306,28 @@
     if (keys.join(" ") === KONAMI) { keys = []; toggle8bit(); }
     else if (keys.slice(-5).join("") === "floss") { keys = []; if (!inMock()) floss(); }
   });
+  /* phones: the same code as swipes (up up down down left right left right) then two taps;
+     each gesture must follow the last within 1.5 s, so ordinary scrolling never completes it */
+  var swipes = [], touch0 = null, lastGesture = 0, SWIPE_CODE = "U U D D L R L R T T";
+  document.addEventListener("touchstart", function(e){
+    if (e.touches.length !== 1) { touch0 = null; return; }
+    touch0 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  document.addEventListener("touchend", function(e){
+    if (!touch0 || !on()) return;
+    var t = e.changedTouches[0], dx = t.clientX - touch0.x, dy = t.clientY - touch0.y, g;
+    touch0 = null;
+    if (Math.abs(dx) < 12 && Math.abs(dy) < 12) g = "T";
+    else if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) g = dx < 0 ? "L" : "R";
+    else if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx) * 1.5) g = dy < 0 ? "U" : "D";
+    else return;
+    var now = Date.now();
+    if (now - lastGesture > 1500) swipes = [];
+    lastGesture = now;
+    swipes.push(g);
+    if (swipes.length > 10) swipes.shift();
+    if (swipes.join(" ") === SWIPE_CODE) { swipes = []; toggle8bit(); }
+  }, { passive: true });
   function toggle8bit(){
     sh8bit = !sh8bit;
     if (sh8bit && !document.getElementById("sh-egg-8bit-font")) {
@@ -314,7 +337,7 @@
       document.head.appendChild(l);
     }
     document.documentElement.classList.toggle("sh-8bit", sh8bit);
-    toast(row(IC.tooth, sh8bit ? "8-bit mode" : "Back to 2026", sh8bit ? "Correct answers go blip. Enter the code again to leave." : ""), 3200);
+    toast(row(IC.tooth, sh8bit ? "8-bit mode" : "Back to 2026", sh8bit ? "Correct answers go blip. Do the code again to leave." : ""), 3200);
     if (sh8bit) blip(true);
   }
   function blip(up){
