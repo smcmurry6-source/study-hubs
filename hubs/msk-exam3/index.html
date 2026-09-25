@@ -569,6 +569,16 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
   #modeSwitch button{flex:1 1 0;justify-content:center;padding:7px 4px 9px;font-size:.84rem;gap:5px}
   #modeSwitch .mode-label{display:inline}
 }
+
+/* ---------- weak spots + mind map ---------- */
+.mmap-block{margin:18px 0 4px}
+#sh-mmap-container{margin-top:12px}
+.weak-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.weak-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--t, var(--line));border-radius:12px;background:var(--surface)}
+.weak-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.weak-main span{font-size:.85rem;color:var(--ink-soft)}
+.weak-meter{display:block;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:4px}
+.weak-meter i{display:block;height:100%;background:var(--t, var(--accent));border-radius:99px}
 </style>
 </head>
 <body>
@@ -2397,7 +2407,7 @@ function setMode(mode){
 /* ===================================================================
    COMPENDIUM
    =================================================================== */
-var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (40)'] ];
+var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (40)'] ];
 var BANK_PAGE = 30, bankShown = BANK_PAGE;
 
 function renderCompendium(){
@@ -2412,7 +2422,67 @@ function renderCompendium(){
   else if(sub === 'bank') renderBank(body);
   else if(sub === 'hints') renderHints(body);
   else if(sub === 'mock') renderMock(body);
+  else if(sub === 'weak') renderWeak(body);
   else renderCram(body);
+}
+
+/* ===================================================================
+   MIND MAPS: built from each lecture's own notes (section headings as
+   branches, the bolded key terms under each as leaves), drawn by the
+   shared window.shMindMap renderer
+   =================================================================== */
+function mindMapFor(lec){
+  var d = document.createElement('div'); d.innerHTML = READINGS[lec.id] || '';
+  var branches = [], cur = { label:null, children:[] }, seen = {}; /* the intro paragraph before the first heading is left out */
+  Array.prototype.forEach.call(d.children, function(el){
+    if(/^H[34]$/.test(el.tagName)){ if(cur.label && cur.children.length) branches.push(cur); cur = { label:el.textContent.trim(), children:[] }; return; }
+    if(!cur.label) return;
+    Array.prototype.forEach.call(el.querySelectorAll('b, strong'), function(x){
+      var t = x.textContent.trim(), k = t.toLowerCase();
+      if(t.length < 2 || t.length > 38 || seen[k] || cur.children.length >= 6) return;
+      seen[k] = 1; cur.children.push({ label:t });
+    });
+  });
+  if(cur.label && cur.children.length) branches.push(cur);
+  return { label:'L' + lec.num + ' ' + lec.title, children:branches };
+}
+
+/* ===================================================================
+   WEAK SPOTS: lectures ranked by your accuracy, then a drill of the
+   questions you missed last time (and any you haven't tried)
+   =================================================================== */
+var WEAK_DRILL = null;
+function renderWeak(body){
+  if(WEAK_DRILL){
+    var lecs = WEAK_DRILL === 'all' ? LECTURES.map(function(l){ return l.id; }) : [WEAK_DRILL];
+    var missed = [], fresh = [];
+    lecs.forEach(function(id){ (QUESTIONS_BY_LECTURE[id] || []).forEach(function(q){ var s = STATE.seen[q.id]; if(s && s.last === false) missed.push(q); else if(!s && WEAK_DRILL !== 'all') fresh.push(q); }); });
+    var list = shuffled(missed).concat(shuffled(fresh)).slice(0, 20);
+    var l = LECTURE_BY_ID[WEAK_DRILL];
+    body.innerHTML = '<div class="qfilters" style="padding:4px 0"><button type="button" class="btn" id="weakBack">'+icon('back')+'All lectures</button><span class="pill">'+(l ? 'L'+l.num+' '+escHtml(l.title) : 'Everything you missed')+'</span><span class="pill">'+missed.length+' missed last time'+(fresh.length ? ' · '+fresh.length+' not tried' : '')+'</span></div>' +
+      (list.length ? '<div class="qlist" id="weakList">' + list.map(function(q){ return qCardHTML(q, { ctx:'weak' }); }).join('') + '</div>' : '<div class="rv-empty">Nothing to drill here: no misses and nothing untried. Nice.</div>');
+    var wl = document.getElementById('weakList'); if(wl) wireQuestionContainer(wl);
+    document.getElementById('weakBack').onclick = function(){ WEAK_DRILL = null; renderWeak(body); window.scrollTo(0,0); };
+    return;
+  }
+  var rows = LECTURES.map(function(l){
+    var qs = QUESTIONS_BY_LECTURE[l.id] || [], tried = 0, missed = 0;
+    qs.forEach(function(q){ var s = STATE.seen[q.id]; if(s){ tried++; if(s.last === false) missed++; } });
+    var st = STATE.lecStats[l.id] || { a:0, c:0 };
+    return { l:l, total:qs.length, tried:tried, missed:missed, a:st.a, pct: st.a ? Math.round(st.c / st.a * 100) : null };
+  });
+  var started = rows.filter(function(r){ return r.a >= 3; }).sort(function(a, b){ return a.pct - b.pct; });
+  var notYet = rows.filter(function(r){ return r.a < 3; });
+  var totalMissed = rows.reduce(function(n, r){ return n + r.missed; }, 0);
+  function row(r){
+    return '<div class="weak-row tag-'+r.l.tag+'"><span class="lec-num">L'+r.l.num+'</span><div class="weak-main"><b>'+escHtml(r.l.title)+'</b><span>'+(r.pct === null ? r.tried+' of '+r.total+' tried' : r.pct+'% correct · '+r.tried+' of '+r.total+' tried'+(r.missed ? ' · '+r.missed+' missed last time' : ''))+'</span>' +
+      (r.pct !== null ? '<span class="weak-meter"><i style="width:'+r.pct+'%"></i></span>' : '') + '</div><button type="button" class="btn'+(r.missed ? ' primary' : '')+'" data-drill="'+r.l.id+'">Drill</button></div>';
+  }
+  body.innerHTML = '<div class="reading" style="max-width:860px"><h2>Weak spots</h2><p>Lectures ranked by your accuracy on this device (3+ answers needed). Drill a lecture to get the questions you missed last time, then the ones you haven\'t tried.</p>' +
+    (totalMissed ? '<div class="reading-actions" style="margin:6px 0 14px"><button type="button" class="btn primary" data-drill="all">Drill everything I missed ('+totalMissed+')</button></div>' : '') +
+    (started.length ? '<div class="weak-list">' + started.map(row).join('') + '</div>' : '<p class="rv-empty">Answer a few questions in the bank or mock exam and your weak spots show up here.</p>') +
+    (notYet.length ? '<h3 style="margin-top:22px">Not started yet</h3><div class="weak-list">' + notYet.map(row).join('') + '</div>' : '') + '</div>';
+  body.querySelectorAll('[data-drill]').forEach(function(b){ b.onclick = function(){ WEAK_DRILL = b.getAttribute('data-drill'); renderWeak(body); window.scrollTo(0,0); }; });
 }
 
 function renderNotes(body){
@@ -2432,11 +2502,18 @@ function renderNotes(body){
       (READINGS[lec.id] ? '<button type="button" class="sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : '') + '</div>' +
     (hasPlain ? '<div class="level-switch" role="group" aria-label="Reading level"><button type="button" data-level="full" class="'+(level==='full'?'is-active':'')+'" aria-pressed="'+(level==='full')+'">As Taught</button><button type="button" data-level="plain" class="'+(level==='plain'?'is-active':'')+'" aria-pressed="'+(level==='plain')+'">Plain English</button></div>' : '') +
     '<div class="reading-prose">' + (text || '<p>Notes coming soon.</p>') + '</div>' +
+    '<div class="mmap-block"><button type="button" class="btn" id="sh-mmap-toggle" aria-expanded="false">Show mind map</button><div id="sh-mmap-container" hidden></div></div>' +
     '<div class="reading-actions"><button type="button" class="btn primary" data-go="bank">Practice L'+lec.num+' questions</button><button type="button" class="btn" data-go="cram">Cram bullets</button><button type="button" class="btn" data-go="review">Open Review tables</button></div>' +
   '</article>';
   body.innerHTML = '<div class="notes-layout">'+nav+art+'</div>';
   body.querySelectorAll('[data-lec]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.lec = b.getAttribute('data-lec'); saveState(); renderNotes(body); }); });
   body.querySelectorAll('.level-switch [data-level]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.level = b.getAttribute('data-level'); saveState(); renderNotes(body); }); });
+  var mmBtn = body.querySelector('#sh-mmap-toggle');
+  if(mmBtn) mmBtn.addEventListener('click', function(){
+    var c = body.querySelector('#sh-mmap-container'), open = mmBtn.getAttribute('aria-expanded') === 'true';
+    if(!open && !c.dataset.rendered && window.shMindMap){ window.shMindMap.render(c, mindMapFor(lec), { accent:'var(--tag-'+lec.tag+')' }); c.dataset.rendered = '1'; }
+    c.hidden = open; mmBtn.setAttribute('aria-expanded', String(!open)); mmBtn.textContent = open ? 'Show mind map' : 'Hide mind map';
+  });
   var ttsBtn = body.querySelector('#sh-tts-btn');
   if(ttsBtn){
     if(!window.speechSynthesis && typeof Audio === 'undefined'){ ttsBtn.disabled = true; ttsBtn.title = 'Not supported in this browser'; }
