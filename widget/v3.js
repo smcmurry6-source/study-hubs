@@ -473,6 +473,14 @@
     try { return (localStorage.getItem(SH_NAME_KEY) || "").trim(); } catch (e) { return ""; }
   }
   window.shName = currentName;
+  /* scroll something into view and pulse it, used when search jumps to a result */
+  window.shFlash = function(el){
+    if (!el) return;
+    var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    try { el.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }); } catch (e) { el.scrollIntoView(); }
+    el.classList.remove("sh-search-flash"); void el.offsetWidth; el.classList.add("sh-search-flash");
+    setTimeout(function(){ el.classList.remove("sh-search-flash"); }, 1900);
+  };
   window.shGreet = function(text){
     var n = currentName();
     return n ? (text + ", " + n) : text;
@@ -518,6 +526,20 @@
     clearTimeout(classStatsTimer);
     classStatsTimer = setTimeout(flushClassStats, 150);
   };
+  /* a small Report button on every question card; it opens the flag panel already
+     tagged with that question's id, so reports arrive with context */
+  var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
+  var pendingFlagQid = null;
+  function addFlagButton(card){
+    if (card.__shFlagBtn) return; card.__shFlagBtn = true;
+    var qid = card.getAttribute("data-qid"); if (!qid) return;
+    var top = card.querySelector(".qcard-top") || card;
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
+    b.setAttribute("aria-label", "Report a problem with this question");
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid); });
+    top.appendChild(b);
+  }
   window.shWireClassStats = function(cardSelector){
     // Dedup key is the *element*, not the qid: the same question re-appears
     // in fresh card instances all the time (switching a filter, revisiting a
@@ -528,6 +550,7 @@
     // that same question got silently skipped and sat stuck on
     // "Loading class data..." -- which is exactly what was reported.
     function handleCard(card){
+      addFlagButton(card);
       var qid = card.getAttribute("data-qid");
       var el = card.querySelector('[data-role="classdata-result"]');
       if (!qid || !el || el.__shClassDataWired) return;
@@ -580,7 +603,7 @@
     prefSet(SH_VISITS_KEY, String(visits));
     var n = currentName();
     if (visits > 1 && n) {
-      setTimeout(function(){ showStreakToast("Welcome back, " + n + " 👋"); }, 900);
+      setTimeout(function(){ showStreakToast("Welcome back, " + n); }, 900);
     }
   })();
 
@@ -923,12 +946,12 @@
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
         fireConfetti();
-        showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "! 🔥");
+        showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "!", ICON_FLAME);
       }
       if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady) {
         nukeReady = true;
         showNukeBadge();
-        showStreakToast(shGreet("Tactical nuke ready") + " ☢️");
+        showStreakToast(shGreet("Tactical nuke ready"), '<span class="sh-nuke-icon sh-nuke-icon-sm"></span>');
       }
     } else {
       sessionCorrectStreak = 0;
@@ -943,10 +966,11 @@
   safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
 
   /* ---------- confetti + streak toast ---------- */
-  function showStreakToast(text){
+  function showStreakToast(text, iconHTML){
     var t = document.createElement("div");
     t.className = "shstat-streaktoast";
     t.textContent = text;
+    if (iconHTML) t.insertAdjacentHTML("afterbegin", '<span class="shstat-toast-ic">' + iconHTML + '</span>');
     document.body.appendChild(t);
     requestAnimationFrame(function(){ t.classList.add("is-shown"); });
     setTimeout(function(){
@@ -1187,11 +1211,17 @@
   }
 
   /* ---------- floating widget ---------- */
-  var ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
-  var ICON_STATS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V10"/><path d="M12 20V4"/><path d="M18 20v-7"/></svg>';
-  var ICON_BULB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.6c.6.5.9 1.2 1 2h6c.1-.8.4-1.5 1-2A6 6 0 0 0 12 2Z"/></svg>';
-  var ICON_FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></svg>';
-  var ICON_GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  /* drawn to match the hubs' own icon sets: 24px grid, 1.8 stroke, round caps */
+  function shIcon(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
+  var ICON_SEARCH = shIcon('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>');
+  var ICON_STATS = shIcon('<rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="5" width="4" height="15" rx="1.2"/><rect x="16" y="9" width="4" height="11" rx="1.2"/>');
+  var ICON_BULB = shIcon('<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4 3.5V15h0a2 2 0 0 1-2-2z"/><path d="M12 7.5v5M9.5 10h5"/>');
+  var ICON_FLAG = shIcon('<path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/>');
+  var ICON_GEAR = shIcon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
+  var ICON_MORE = shIcon('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>');
+  /* the site's mark: the four class ring bands, as on the dashboard wordmark */
+  var ICON_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="3" height="14" rx="1.5" fill="#C28A2E"/><rect x="8.6" y="5" width="3" height="14" rx="1.5" fill="#C85A7C"/><rect x="13.2" y="5" width="3" height="14" rx="1.5" fill="#2E8A80"/><rect x="17.8" y="5" width="3" height="14" rx="1.5" fill="#C06544"/></svg>';
+  var ICON_FLAME = shIcon('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
   var backdrop = document.createElement("div");
   backdrop.id = "shstat-backdrop";
@@ -1202,8 +1232,8 @@
   root.innerHTML =
     '<div id="shstat-searchpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Search this hub</h5>' +
-    '<input type="text" id="shstat-search-input" placeholder="Search lectures &amp; questions…">' +
-    '<div id="shstat-search-results"><div class="shstat-empty">Type to search.</div></div>' +
+    '<input type="text" id="shstat-search-input" placeholder="Search notes, tables, hints, questions…">' +
+    '<div id="shstat-search-results"><div class="shstat-empty">Search the notes, review tables, exam hints, cram sheet and questions.</div></div>' +
     '</div>' +
     '<div id="shstat-suggestpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Suggest something</h5>' +
@@ -1213,6 +1243,7 @@
     '</div>' +
     '<div id="shstat-flagpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Report a typo or issue</h5>' +
+    '<div class="shstat-flagctx" id="shstat-flag-ctx"></div>' +
     '<textarea id="shstat-flag-text" maxlength="500" placeholder="e.g. Q14 answer key looks off, typo in Lecture 3..."></textarea>' +
     '<div><button class="shstat-send" id="shstat-flag-submit" type="button">Send</button></div>' +
     '<div class="shstat-flagmsg" id="shstat-flag-msg"></div>' +
@@ -1264,19 +1295,27 @@
     '<div class="shset-hint">Get ' + NUKE_STREAK_THRESHOLD + ' questions right in a row to unlock a tactical nuke you can call in. Turn this off to skip seeing other people\'s strikes (yours will still work).</div>' +
     '</div>' +
     '</div>' +
-    '<div class="shstat-pillrow">' +
-    '<button class="shstat-pill" id="shstat-online-pill" type="button"><span class="shstat-pill-icon shstat-pill-icon-dot"><span class="shstat-dot"></span></span><span class="shstat-pill-label"><span id="shstat-online-n">1</span> <span class="spl-full">studying now</span><span class="spl-short">live</span></span></button>' +
-    '<button class="shstat-pill" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
-    '<button class="shstat-pill" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
-    '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label"><span class="spl-full">Suggest something</span><span class="spl-short">Suggest</span></span></button>' +
-    '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label"><span class="spl-full">Flag issue</span><span class="spl-short">Flag</span></span></button>' +
-    '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label"><span class="spl-full">Settings</span><span class="spl-short">Settings</span></span></button>' +
-    '</div>';
+    /* Desktop: one launcher button that opens this menu. Phones: the menu is a three-item
+       bottom bar (Search, Stats, More) and More opens the rest as a small sheet. */
+    '<div class="shstat-pillrow" id="shstat-menu">' +
+      '<button class="shstat-pill shm-primary" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
+      '<button class="shstat-pill shm-primary" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
+      '<button class="shstat-pill shm-more" id="shstat-more-pill" type="button" aria-expanded="false"><span class="shstat-pill-icon">' + ICON_MORE + '</span><span class="shstat-pill-label">More</span></button>' +
+      '<div class="shm-group">' +
+        '<div class="shm-live" id="shstat-online-pill"><span class="shstat-dot"></span><span><b id="shstat-online-n">1</b> studying now</span></div>' +
+        '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label">Settings</span></button>' +
+        '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label">Suggest something</span></button>' +
+        '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label">Report an issue</span></button>' +
+      '</div>' +
+    '</div>' +
+    '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools: search, class stats, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span></button>';
   document.body.appendChild(root);
 
   function renderOnline(){
     var n = document.getElementById("shstat-online-n");
     if (n) n.textContent = onlineCount;
+    var n2 = document.getElementById("shstat-launch-n");
+    if (n2) n2.textContent = onlineCount;
   }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
@@ -1284,8 +1323,8 @@
   /* ---------- SH_EXPORT: each hub's own {lectures, questions} data, if published ---------- */
   function getExport(){
     var ex = window.SH_EXPORT;
-    if (!ex || typeof ex !== "object") return { lectures: [], questions: [] };
-    return { lectures: ex.lectures || [], questions: ex.questions || [] };
+    if (!ex || typeof ex !== "object") return { lectures: [], questions: [], sections: [] };
+    return { lectures: ex.lectures || [], questions: ex.questions || [], sections: ex.sections || [] };
   }
   function lectureTitle(lecId){
     if (!lecId) return null;
@@ -1391,41 +1430,61 @@
   /* ---------- search (fully client-side, over window.SH_EXPORT — no network) ---------- */
   var searchInput = document.getElementById("shstat-search-input");
   var searchResults = document.getElementById("shstat-search-results");
+  /* Searches everything a hub publishes in SH_EXPORT: note paragraphs, review rows, exam hints,
+     cram lines (SH_EXPORT.sections) and questions. Every word typed must appear. A result
+     jumps to its place in the hub through window.SH_GOTO. */
+  var SEARCH_GROUPS = ["Notes", "Review", "Exam hints", "Cram sheet", "Questions"];
+  var searchHits = [];
+  function reEsc(w){ return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function snippet(text, terms){
+    var t = String(text || ""), low = t.toLowerCase(), at = -1;
+    terms.forEach(function(w){ var k = low.indexOf(w); if (k !== -1 && (at === -1 || k < at)) at = k; });
+    var start = Math.max(0, at - 60), out = t.slice(start, start + 170);
+    out = (start > 0 ? "…" : "") + out + (start + 170 < t.length ? "…" : "");
+    var html = esc(out);
+    terms.forEach(function(w){ if (w.length > 1) html = html.replace(new RegExp("(" + reEsc(esc(w)) + ")", "ig"), "<mark>$1</mark>"); });
+    return html;
+  }
   function runSearch(query){
-    query = (query || "").trim().toLowerCase();
-    if (!query) { searchResults.innerHTML = '<div class="shstat-empty">Type to search.</div>'; return; }
+    var raw = (query || "").trim();
+    if (!raw) { searchResults.innerHTML = '<div class="shstat-empty">Search the notes, review tables, exam hints, cram sheet and questions.</div>'; return; }
     var data = getExport();
-    if (!data.lectures.length && !data.questions.length) {
+    if (!data.lectures.length && !data.questions.length && !data.sections.length) {
       searchResults.innerHTML = '<div class="shstat-empty">Search isn&#39;t available for this hub yet.</div>';
       return;
     }
-    var lecMatches = data.lectures.filter(function(l){ return (l.title || "").toLowerCase().indexOf(query) !== -1; }).slice(0, 8);
-    var qMatches = data.questions.filter(function(q){ return (q.text || "").toLowerCase().indexOf(query) !== -1; }).slice(0, 12);
-    if (!lecMatches.length && !qMatches.length) {
-      searchResults.innerHTML = '<div class="shstat-empty">No matches for &#8220;' + esc(query) + '&#8221;.</div>';
-      return;
-    }
-    var html = "";
-    if (lecMatches.length) {
-      html += '<div class="shstat-search-sec"><h5>Lectures</h5>' + lecMatches.map(function(l){
-        return '<div class="shstat-search-lec">' + esc(l.title) + '</div>';
-      }).join("") + '</div>';
-    }
-    if (qMatches.length) {
-      html += '<div class="shstat-search-sec"><h5>Questions</h5>' + qMatches.map(function(q){
-        var lecTitle = "";
-        for (var i = 0; i < data.lectures.length; i++) if (data.lectures[i].id === q.lec) { lecTitle = data.lectures[i].title; break; }
-        return '<div class="shstat-search-q" data-qid="' + esc(q.id) + '"><div class="sq-text">' + esc(q.text) + '</div>'
-          + (lecTitle ? '<div class="sq-lec">' + esc(lecTitle) + ' — tap to reveal</div>' : '<div class="sq-lec">Tap to reveal</div>')
-          + (q.hint ? '<div class="sq-hint">' + esc(q.hint) + '</div>' : '') + '</div>';
-      }).join("") + '</div>';
-    }
-    searchResults.innerHTML = html;
+    var terms = raw.toLowerCase().split(/\s+/).filter(Boolean);
+    function hit(t){ t = String(t || "").toLowerCase(); return terms.every(function(w){ return t.indexOf(w) !== -1; }); }
+    var byKind = {};
+    data.sections.forEach(function(e){ if (hit((e.title || "") + " " + e.text)) (byKind[e.kind] = byKind[e.kind] || []).push(e); });
+    data.questions.forEach(function(q){
+      if (!hit(q.text + " " + (q.hint || ""))) return;
+      (byKind.Questions = byKind.Questions || []).push({ kind: "Questions", where: lectureTitle(q.lec) || "", text: q.text, title: "", q: q, go: { v: "bank", q: raw } });
+    });
+    searchHits = []; var html = "", total = 0;
+    SEARCH_GROUPS.forEach(function(kind){
+      var list = byKind[kind]; if (!list || !list.length) return;
+      total += list.length;
+      var cap = kind === "Questions" ? 10 : 8;
+      html += '<div class="shstat-search-sec"><h5>' + esc(kind) + ' · ' + list.length + '</h5>' + list.slice(0, cap).map(function(e){
+        var i = searchHits.push(e) - 1;
+        return '<button type="button" class="shstat-search-hit" data-hit="' + i + '">' +
+          (e.title ? '<span class="sh-hit-title">' + snippet(e.title, terms) + '</span>' : '') +
+          '<span class="sh-hit-snip">' + snippet(e.text, terms) + '</span>' +
+          (e.where ? '<span class="sh-hit-where">' + esc(e.where) + '</span>' : '') + '</button>';
+      }).join("") + (list.length > cap ? '<div class="shstat-empty">' + (list.length - cap) + ' more. Add a word to narrow it down.</div>' : '') + '</div>';
+    });
+    searchResults.innerHTML = total ? html : '<div class="shstat-empty">No matches for &#8220;' + esc(raw) + '&#8221;.</div>';
   }
-  if (searchInput) searchInput.addEventListener("input", function(){ runSearch(searchInput.value); });
+  var searchTimer = null;
+  if (searchInput) searchInput.addEventListener("input", function(){ clearTimeout(searchTimer); searchTimer = setTimeout(function(){ runSearch(searchInput.value); }, 110); });
   searchResults.addEventListener("click", function(e){
-    var row = e.target.closest(".shstat-search-q");
-    if (row) row.classList.toggle("is-open");
+    var b = e.target.closest("[data-hit]"); if (!b) return;
+    var h = searchHits[+b.getAttribute("data-hit")]; if (!h) return;
+    if (typeof window.SH_GOTO === "function") {
+      searchPanel.classList.remove("is-open"); updateSheetState();
+      try { window.SH_GOTO(h.go); } catch (err) {}
+    }
   });
 
   /* ---------- leaderboard display name (opt-in) ---------- */
@@ -1473,7 +1532,19 @@
       settingsPanel.classList.contains("is-open");
     document.body.classList.toggle("sh-sheet-open", open);
   }
+  /* launcher (desktop) and More (phones) */
+  var launchBtn = document.getElementById("shstat-launch"), moreBtn = document.getElementById("shstat-more-pill");
+  function setMenu(open){ root.classList.toggle("is-menu-open", open); launchBtn.setAttribute("aria-expanded", String(open)); if (!open) setMore(false); }
+  function setMore(open){ root.classList.toggle("is-more-open", open); document.body.classList.toggle("sh-more-open", open); moreBtn.setAttribute("aria-expanded", String(open)); }
+  launchBtn.addEventListener("click", function(){ var open = !root.classList.contains("is-menu-open"); if (open) { closeOtherPanels(null); updateSheetState(); } setMenu(open); });
+  moreBtn.addEventListener("click", function(){ setMore(!root.classList.contains("is-more-open")); });
+  /* picking a tool closes the menu; its panel opens in its place */
+  root.querySelectorAll("#shstat-menu .shstat-pill:not(.shm-more)").forEach(function(b){ b.addEventListener("click", function(){ setMenu(false); }); });
+  document.addEventListener("click", function(e){ if (!root.contains(e.target)) setMenu(false); });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") { setMenu(false); closeOtherPanels(null); updateSheetState(); } });
+
   backdrop.addEventListener("click", function(){
+    setMenu(false);
     closeOtherPanels(null);
     updateSheetState();
   });
@@ -1499,7 +1570,24 @@
     updateSheetState();
   });
 
+  function setFlagContext(qid){
+    pendingFlagQid = qid || null;
+    var ctx = document.getElementById("shstat-flag-ctx");
+    if (!ctx) return;
+    if (!qid) { ctx.textContent = ""; return; }
+    var meta = findQuestionMeta(qid), t = meta.text || "";
+    ctx.textContent = "About question " + qid + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
+  }
+  window.shOpenFlag = function(qid){
+    closeOtherPanels(flagPanel);
+    setFlagContext(qid);
+    document.getElementById("shstat-flag-msg").textContent = "";
+    flagPanel.classList.add("is-open");
+    updateSheetState();
+    var ta = document.getElementById("shstat-flag-text"); if (ta) ta.focus();
+  };
   document.getElementById("shstat-flag-pill").addEventListener("click", function(){
+    setFlagContext(null);
     closeOtherPanels(flagPanel);
     flagPanel.classList.toggle("is-open");
     updateSheetState();
@@ -1517,7 +1605,12 @@
     if (!supabase) { msg.textContent = "Couldn't send — try again later."; return; }
     btn.disabled = true;
     msg.textContent = "Sending…";
-    supabase.from("question_flags").insert({ hub: HUB, note: text }).then(function(res){
+    /* where the student was, so the report can be found: [question id] and the current section */
+    var where = [];
+    if (pendingFlagQid) where.push("question " + pendingFlagQid);
+    var sec = currentSection(); if (sec) where.push(sec);
+    var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);
+    supabase.from("question_flags").insert({ hub: HUB, note: note }).then(function(res){
       btn.disabled = false;
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";

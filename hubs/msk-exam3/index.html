@@ -3887,6 +3887,42 @@ window.SH_SECTION = function(){
 /* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
 boot();
 
+/* ---------- full-content search for the shared widget: every note paragraph, review row,
+   exam hint and cram line, each with a place to jump to (window.SH_GOTO) ---------- */
+function shSearchSections(){
+  var out = [];
+  function frag(html){ var d = document.createElement('div'); d.innerHTML = html || ''; return d; }
+  function clean(t){ return String(t || '').replace(/\s+/g, ' ').trim(); }
+  LECTURES.forEach(function(l){
+    var where = 'L' + l.num + ' ' + l.title;
+    Array.prototype.forEach.call(frag(READINGS[l.id]).querySelectorAll('p, li, h3, h4'), function(el, k){
+      var t = clean(el.textContent); if(t.length > 2) out.push({ kind:'Notes', where:where, text:t, lec:l.id, go:{ v:'notes', lec:l.id, k:k } });
+    });
+    (CRAM[l.id] || []).forEach(function(b){ out.push({ kind:'Cram sheet', where:where, text:b, lec:l.id, go:{ v:'cram', lec:l.id } }); });
+  });
+  HINTS.forEach(function(x){ var l = LECTURE_BY_ID[x.lec]; out.push({ kind:'Exam hints', where:l ? 'L'+l.num+' '+l.title : '', text:clean(x.quote + ' ' + x.take), lec:x.lec, go:{ v:'hints', lec:x.lec } }); });
+  REVIEW.forEach(function(g){
+    g.sections.forEach(function(sec){
+      if(sec.type === 'cards') sec.items.forEach(function(c){ out.push({ kind:'Review', where:g.title, title:c.name, text:clean(c.name + ' ' + c.sub + ' ' + c.facts.map(function(f){ return f[0] + ': ' + f[1]; }).join('; ') + ' ' + c.tip), go:{ v:'review', q:c.name } }); });
+      else if(sec.type === 'table') sec.rows.forEach(function(r){ out.push({ kind:'Review', where:g.title + (sec.title ? ' · ' + sec.title : ''), title:r[0], text:clean(r.join(' · ')), go:{ v:'review', q:r[0] } }); });
+      else if(sec.type === 'list') sec.items.forEach(function(it){ out.push({ kind:'Review', where:g.title, text:clean(it), go:{ v:'review', q:clean(it).split(' ').slice(0, 4).join(' ') } }); });
+    });
+  });
+  SEQUENCES.forEach(function(sq){ out.push({ kind:'Review', where:'Processes', title:sq.title, text:clean(sq.title + ': ' + sq.steps.join(' → ')), go:{ v:'review', q:sq.title } }); });
+  return out;
+}
+function shFlashIn(sel){ setTimeout(function(){ var el = typeof sel === 'string' ? document.querySelector(sel) : sel(); if(el && window.shFlash) window.shFlash(el); }, 60); }
+window.SH_GOTO = function(g){
+  if(!g) return;
+  if(g.v === 'notes'){ STATE.ui.lec = g.lec; STATE.ui.sub = 'notes'; STATE.ui.level = 'full'; saveState(); setMode('compendium');
+    shFlashIn(function(){ var p = document.querySelector('#compBody .reading-prose'); return p && p.querySelectorAll('p, li, h3, h4')[g.k]; }); }
+  else if(g.v === 'cram'){ STATE.ui.sub = 'cram'; saveState(); setMode('compendium'); shFlashIn('#cram-' + g.lec); }
+  else if(g.v === 'hints'){ STATE.ui.sub = 'hints'; saveState(); setMode('compendium');
+    shFlashIn(function(){ var a = document.querySelector('#compBody .hint-group [data-lec="' + g.lec + '"]'); return a && a.closest('.hint-group'); }); }
+  else if(g.v === 'review'){ reviewSearch = g.q || ''; setMode('review'); }
+  else if(g.v === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'all'; bankSearch = g.q || ''; bankShown = BANK_PAGE; saveState(); setMode('compendium'); }
+};
+
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
   lectures: LECTURES.map(function(l){ return { id:l.id, title:'L'+l.num+' ' + l.title }; }),
@@ -3894,7 +3930,8 @@ window.SH_EXPORT = {
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.pairs.map(function(p){ return p.join(': '); }).join('; ');
     if(q.ex) hint += ' — ' + q.ex;
     return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
-  })
+  }),
+  sections: shSearchSections()
 };
 
 })();

@@ -5497,6 +5497,41 @@ function boot(){
 /* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
 boot();
 
+/* ---------- full-content search for the shared widget: every note paragraph, review-table row,
+   exam hint and cram line, each with a place to jump to (window.SH_GOTO) ---------- */
+function shSearchSections(){
+  var out = [];
+  function frag(html){ var d = document.createElement('div'); d.innerHTML = html || ''; return d; }
+  function clean(t){ return String(t || '').replace(/\s+/g, ' ').trim(); }
+  LECTURES.forEach(function(l){
+    var where = 'S' + l.num + ' ' + l.title;
+    Array.prototype.forEach.call(frag(READINGS[l.id]).querySelectorAll('p, li, h3, h4'), function(el, k){
+      var t = clean(el.textContent); if(t.length > 2) out.push({ kind:'Notes', where:where, text:t, lec:l.id, go:{ v:'notes', lec:l.id, k:k } });
+    });
+  });
+  CRAM_CONTENT.forEach(function(c){ var l = LECTURE_BY_ID[c.lec]; c.points.forEach(function(p){ out.push({ kind:'Cram sheet', where:'S' + l.num + ' ' + l.title, text:p, lec:c.lec, go:{ v:'cram', lec:c.lec } }); }); });
+  EXAM_HINTS.forEach(function(x){ var l = LECTURE_BY_ID[x.lec]; out.push({ kind:'Exam hints', where:'S' + l.num + ' ' + l.title, text:clean(x.quote + ' ' + (x.takeaway || '')), lec:x.lec, go:{ v:'hints', lec:x.lec } }); });
+  REF_SECTIONS.forEach(function(sec){
+    var d; try{ d = frag(sec.body()); }catch(e){ return; }
+    var rows = d.querySelectorAll('tbody tr');
+    if(rows.length) Array.prototype.forEach.call(rows, function(tr){ var first = clean(tr.cells[0] && tr.cells[0].textContent); out.push({ kind:'Review', where:sec.title, title:first, text:clean(Array.prototype.map.call(tr.cells, function(td){ return td.textContent; }).join(' · ')), go:{ v:'review', q:first, id:sec.id } }); });
+    Array.prototype.forEach.call(d.querySelectorAll('li, p'), function(el){ var t = clean(el.textContent); if(t.length > 2) out.push({ kind:'Review', where:sec.title, text:t, go:{ v:'review', q:sec.title, id:sec.id } }); });
+  });
+  return out;
+}
+function shFlashIn(sel){ setTimeout(function(){ var el = typeof sel === 'string' ? document.querySelector(sel) : sel(); if(el && window.shFlash) window.shFlash(el); }, 80); }
+window.SH_GOTO = function(g){
+  if(!g) return;
+  if(g.v === 'notes'){ STATE.ui.level = 'full'; saveState(); setMode('compendium'); gotoLecture(g.lec);
+    shFlashIn(function(){ var p = document.querySelector('#compendium-content .reading-prose'); return p && p.querySelectorAll('p, li, h3, h4')[g.k]; }); }
+  else if(g.v === 'cram'){ setMode('compendium'); setView('cram-sheet');
+    shFlashIn(function(){ var cards = document.querySelectorAll('#compendium-content .cram-card'); return cards[CRAM_CONTENT.map(function(c){ return c.lec; }).indexOf(g.lec)] || null; }); }
+  else if(g.v === 'hints'){ setMode('compendium'); setView('exam-hints');
+    shFlashIn(function(){ var b = document.querySelector('#compendium-content .hint-group [data-goto-lecture="' + g.lec + '"]'); return b && b.closest('.hint-group'); }); }
+  else if(g.v === 'review'){ REVIEW.lec = 'all'; REVIEW.q = ''; setMode('review'); if(g.id) shFlashIn('#ref-' + g.id); }
+  else if(g.v === 'bank'){ QBANK_FILTER = { search:g.q || '', lec:'all', type:'all', status:'all' }; setMode('compendium'); setView('question-bank'); }
+};
+
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
   lectures: LECTURES.map(function(l){ return { id:l.id, title:'S'+l.num+' ' + l.title }; }),
@@ -5504,7 +5539,8 @@ window.SH_EXPORT = {
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'sequence' ? q.steps.join(' → ') : q.type === 'match' ? q.pairs.map(function(p){ return p.join(': '); }).join('; ') : (q.answer || '');
     if(q.ex) hint = hint ? hint + ' — ' + q.ex : q.ex;
     return { id:q.id, lec:q.lec, text:q.stem, hint:hint, choices:q.choices || null, answer:(q.type === 'mcq' ? q.answer : null) };
-  })
+  }),
+  sections: shSearchSections()
 };
 
 })();
