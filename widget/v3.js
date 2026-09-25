@@ -490,7 +490,9 @@
       speakWithSynth(container, btn);
     }
 
-    return { supported: !!synth, speak: speak, stop: stop };
+    /* true while a lecture is being read aloud (pre-recorded narration or the browser voice) */
+    function listening(){ return !!(activeAudioEl && !activeAudioEl.paused && !activeAudioEl.ended) || !!(synth && synth.speaking && !synth.paused); }
+    return { supported: !!synth, speak: speak, stop: stop, listening: listening };
   })();
 
   /* ---------- universal settings: font, text size, screen name — applied
@@ -968,6 +970,19 @@
      the tab is hidden; on hide, a section holding at least half a ping's
      worth is rounded up so short stints aren't systematically dropped. */
   var TICK_MS = 1000;
+  /* Idle rule: after 15 minutes with no input (tap, click, key, scroll) time stops counting until
+     the next input, unless a lecture is playing in Listen. A visible tab left open on a desk
+     used to count as study time for as long as it sat there. */
+  var IDLE_MS = 15 * 60 * 1000;
+  var lastInput = Date.now();
+  ["pointerdown", "keydown", "wheel", "touchstart", "scroll", "mousemove"].forEach(function(ev){
+    window.addEventListener(ev, function(){ lastInput = Date.now(); }, { passive: true, capture: true });
+  });
+  function isIdle(now){
+    if (now - lastInput < IDLE_MS) return false;
+    try { if (window.shTTS && window.shTTS.listening && window.shTTS.listening()) { lastInput = now; return false; } } catch (e) {}
+    return true;
+  }
   var sectionBank = {};
   var tickTimer = null;
   var lastTick = 0;
@@ -978,6 +993,7 @@
     var now = Date.now();
     var dt = Math.min(now - lastTick, 5 * TICK_MS); /* cap so a frozen/sleeping tab can't dump minutes into one section */
     lastTick = now;
+    if (isIdle(now)) return;
     var sec = currentSection();
     sectionBank[sec] = (sectionBank[sec] || 0) + dt;
     if (sectionBank[sec] >= PING_INTERVAL_MS) {
