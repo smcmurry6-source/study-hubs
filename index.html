@@ -313,6 +313,13 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .ladder .rung.me .you{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink);}
 .sh-rank-mini{display:inline-flex; width:20px; height:20px; flex:none; vertical-align:-5px; margin-right:6px;}
 .sh-rank-mini svg{width:100%; height:100%;}
+.sh-rank-mini{position:relative;}
+.sh-rank-mini:has(.sh-rank-lv){margin-right:11px;}
+.sh-rank-lv{position:absolute; right:-5px; bottom:-3px; min-width:11px; height:11px; padding:0 2.5px; border-radius:4px; display:flex; align-items:center; justify-content:center;
+  font:700 8px/1 Georgia, 'Times New Roman', serif; letter-spacing:.02em; color:#fff; background:#2A2622; box-shadow:0 0 0 1.2px var(--sh-lv-ring, #C69A4A);}
+.sh-lv-antique{--sh-lv-ring:#C69A4A;} .sh-lv-stone{--sh-lv-ring:#BDB6AB;} .sh-lv-bronze{--sh-lv-ring:#E09A5E;} .sh-lv-silver{--sh-lv-ring:#E4E9EE;}
+.sh-lv-gold{--sh-lv-ring:#F6CD55;} .sh-lv-diamond{--sh-lv-ring:#9EE6FF;} .sh-lv-dark{--sh-lv-ring:#B57BFF;}
+
 .board .nm .sh-rank-mini{margin-right:8px;}
 .board .xp{font-variant-numeric:tabular-nums;}
 .board .lvl{flex:none; font-size:12.5px; color:var(--ink-3); margin-right:4px;}
@@ -937,7 +944,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){});
   }
 
-  function rankMini(t){ return window.shRanks && t != null ? window.shRanks.mini(t) : ""; }
+  function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
   function startClassData(){
   var sb = null;
   try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
@@ -1016,7 +1023,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (!rows.length || !R){ unavailable("rankBoard", "No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
       $("rankBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
         var lv = r.level || R.levelFor(r.xp);
-        return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + (r.is_me ? " (you)" : "") +
+        return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + (r.is_me ? " (you)" : "") +
           '</span><span class="lvl">' + esc(R.rankName(r.tier, lv)) + '</span><span class="val xp">' + Number(r.xp).toLocaleString() + '<small>XP</small></span></li>';
       }).join("") + '</ol>';
       var me = rows.filter(function(r){ return r.is_me; })[0];
@@ -1031,7 +1038,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var rows = (res && res.data) || [];
       if (!rows.length){ unavailable("pulseLeaderboard", "No streaks yet. Answer questions two days in a row to start one."); return; }
       $("pulseLeaderboard").innerHTML = '<ol class="board">' + rows.map(function(r, i){
-        return '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
+        return '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
       }).join("") + '</ol>';
     }, function(){ unavailable("pulseLeaderboard"); });
 
@@ -1040,7 +1047,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var rows = (res && res.data) || [];
       var act = rows.filter(function(r){ return r.kind === "active"; })[0], rec = rows.filter(function(r){ return r.kind === "record"; })[0];
       if (!act && !rec){ unavailable("pulseCorrect", "No runs yet. Get a few right in a row to set the first record."); return; }
-      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="who">' + rankMini(r.tier) + esc(r.display_name) + '</div></div>' : ""; }
+      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="who">' + rankMini(r.tier, r.level) + esc(r.display_name) + '</div></div>' : ""; }
       $("pulseCorrect").innerHTML = '<div class="stat-pair">' + stat(act, "Longest run still going") + stat(rec, "All-time record") + '</div>';
     }, function(){ unavailable("pulseCorrect"); });
 
@@ -1069,7 +1076,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           var rows = (res && res.data) || [];
           if (!rows.length){ $("arcadeBoard").innerHTML = '<p class="muted">No ' + esc(name) + ' scores yet. Finish a game in the hub\'s Arcade to claim first place.</p>'; return; }
           $("arcadeBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
-            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier) + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
+            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
           }).join("") + '</ol>';
         }, function(){ unavailable("arcadeBoard"); });
       }
