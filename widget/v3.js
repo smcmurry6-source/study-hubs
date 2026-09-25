@@ -756,7 +756,9 @@
     var SFX_BASE = (function(){
       try { return new URL("sfx/", thisScript.src).href; } catch (e) { return "sfx/"; }
     })();
-    var FILES = { unlock: "nuke-unlock.mp3", launch: "nuke-launch.mp3", blast: "nuke-blast.mp3" };
+    /* nuke-countdown.mp3 is the countdown video's own soundtrack, pulled out as a file: the video
+       has to stay muted to autoplay (and its .webm, which Chrome prefers, has no audio at all) */
+    var FILES = { unlock: "nuke-unlock.mp3", launch: "nuke-launch.mp3", blast: "nuke-blast.mp3", countdown: "nuke-countdown.mp3" };
     var els = {};
     function elFor(name){
       if (els[name]) return els[name];
@@ -765,15 +767,16 @@
       els[name] = a;
       return a;
     }
-    function play(name){
+    function stop(name){ try { if (els[name]) els[name].pause(); } catch (e) {} }
+    function play(name, from){
       try {
         var a = elFor(name);
-        a.currentTime = 0;
+        a.currentTime = from || 0;
         var p = a.play();
         if (p && p.catch) p.catch(function(){}); // autoplay-policy rejection is fine -- every call site is inside a user gesture (or the ANSWERED_EVENT dispatch that follows one)
       } catch (e) {}
     }
-    return { play: play };
+    return { play: play, stop: stop, preload: function(name){ try { elFor(name).load(); } catch (e) {} } };
   })();
 
   /* ---------- update-available banner — raw fetch (not the supabase client),
@@ -1114,6 +1117,7 @@
   function showNukeBadge(){
     if (nukeBadgeEl) return;
     shNukeSfx.play("unlock");
+    shNukeSfx.preload("countdown");
     nukeBadgeEl = document.createElement("button");
     nukeBadgeEl.type = "button";
     nukeBadgeEl.id = "sh-nuke-badge";
@@ -1196,6 +1200,8 @@
     var countdownStart = null;
     var blastFired = false;
 
+    /* countdown audio: the full 13 s track, or its last 3 s for the short reduced-motion version */
+    shNukeSfx.play("countdown", reduceMotion ? 10 : 0);
     if (!reduceMotion && cdVideo) {
       runNukeCountdownKeyCanvas(cdCanvas, cdVideo);
       var cdPlay = cdVideo.play();
@@ -1218,6 +1224,7 @@
 
     function triggerBlast(){
       overlay.classList.add("is-blast");
+      shNukeSfx.stop("countdown");
       shNukeSfx.play("blast");
       if (cdVideo) { try { cdVideo.pause(); } catch (e) {} }
       if (reduceMotion) {

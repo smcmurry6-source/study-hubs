@@ -11,13 +11,16 @@
 
   var TIERS = [
     { key: "antique", name: "Antique",     at: 0,     accent: "#8A5A32" },
-    { key: "stone",   name: "Stone",       at: 150,   accent: "#6F6A63" },
-    { key: "bronze",  name: "Bronze",      at: 600,   accent: "#B0672B" },
-    { key: "silver",  name: "Silver",      at: 1500,  accent: "#7D8792" },
-    { key: "gold",    name: "Gold",        at: 3000,  accent: "#B8860B" },
-    { key: "diamond", name: "Diamond",     at: 6000,  accent: "#2F9FD6" },
-    { key: "dark",    name: "Dark Matter", at: 12000, accent: "#7A3CFF" }
+    { key: "stone",   name: "Stone",       at: 300,   accent: "#6F6A63" },
+    { key: "bronze",  name: "Bronze",      at: 1500,  accent: "#B0672B" },
+    { key: "silver",  name: "Silver",      at: 5000,  accent: "#7D8792" },
+    { key: "gold",    name: "Gold",        at: 12000, accent: "#B8860B" },
+    { key: "diamond", name: "Diamond",     at: 25000, accent: "#2F9FD6" },
+    { key: "dark",    name: "Dark Matter", at: 50000, accent: "#7A3CFF" }
   ];
+  /* each tier has three levels (I, II, III); the server computes them too (sh_step, migration_v16) */
+  var ROMAN = ["I", "II", "III"];
+  function rankName(t, level){ return TIERS[t].name + (level ? " " + ROMAN[Math.max(1, Math.min(3, level)) - 1] : ""); }
 
   var uid = 0;
 
@@ -252,6 +255,15 @@
       // light on the ring
       disc += '<path d="M18 40 A52 52 0 0 1 56 8" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none" stroke-linecap="round"/>';
     }
+    if (rich && opt.level) {
+      var lv = Math.max(1, Math.min(3, opt.level)), pip = "";
+      for (var k = 0; k < lv; k++) {
+        var ang = (90 + (k - (lv - 1) / 2) * 13) * Math.PI / 180, cx = 64 + 56.5 * Math.cos(ang), cy = 64 + 56.5 * Math.sin(ang);
+        pip += '<circle cx="' + cx.toFixed(2) + '" cy="' + cy.toFixed(2) + '" r="3.4" fill="' + D[3] + '" stroke="rgba(0,0,0,.55)" stroke-width="1"/>' +
+          '<circle cx="' + (cx - .9).toFixed(2) + '" cy="' + (cy - .9).toFixed(2) + '" r="1.1" fill="#fff" opacity=".85"/>';
+      }
+      disc += pip;
+    }
     var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')">' + shadow + under + body + over + '</g></g>';
     defs += '<clipPath id="' + p + 'dclip2"><circle cx="64" cy="64" r="' + (rich ? 60 : 58) + '"/></clipPath>';
     return '<svg class="sh-rank-art sh-rank-' + t + '" width="' + px + '" height="' + px + '" viewBox="0 0 128 128" role="img" aria-label="' +
@@ -389,16 +401,17 @@
     }
     function render(){
       if (!profile) return;
-      var t = profile.tier || 0, xp = profile.xp || 0, next = profile.next_at, at = profile.tier_at || 0;
+      var t = profile.tier || 0, xp = profile.xp || 0, next = profile.next_at, at = profile.step_at != null ? profile.step_at : (profile.tier_at || 0);
+      var lvl = profile.level || 1, step = profile.step != null ? profile.step : t * 3;
       var pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
       var m = masteryFor(), badges = profile.badges || [];
       var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
-        '<div class="sh-rank-art-wrap">' + art(t, 108, { animate: true }) + '</div>' +
+        '<div class="sh-rank-art-wrap">' + art(t, 108, { animate: true, level: lvl }) + '</div>' +
         '<div class="sh-rank-info"><div class="sh-rank-eyebrow">Your handpiece</div>' +
-        '<div class="sh-rank-name">' + TIERS[t].name + '</div>' +
+        '<div class="sh-rank-name">' + rankName(t, lvl) + '</div>' +
         '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
         '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + TIERS[t + 1].name : 'The highest rank there is.') + '</div></div></div>';
+        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div></div></div>';
       if (m.bank) {
         h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
           '<div class="sh-mastery-bar"><i style="width:' + (m.pct * 100).toFixed(1) + '%"></i>' +
@@ -408,8 +421,8 @@
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
-        '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Ranks: ' +
-        TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + '.</p></details>' +
+        '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
+        TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + ' XP.</p></details>' +
         '<div class="sh-link"><button type="button" class="sh-link-toggle" aria-expanded="false">Link my devices</button><div class="sh-link-body" hidden></div></div>';
       sec.innerHTML = h;
       // hub mastery tiers become trophies on the server once reached
@@ -419,12 +432,21 @@
       }
     }
 
+    function levelToast(t, lvl){
+      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      var d = document.createElement("div");
+      d.className = "sh-egg sh-egg-toast is-gold"; d.setAttribute("role", "status");
+      d.innerHTML = '<span class="sh-egg-ic" style="width:44px;height:44px">' + art(t, 44, { level: lvl }) + '</span><span><b>' + rankName(t, lvl) + '</b><small>Level up. Keep going.</small></span>';
+      document.body.appendChild(d);
+      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
+      setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 4200);
+    }
     function celebrate(t){
       if (H.prefGet("sh_pref_eggs", "on") === "off") return;
       var d = document.createElement("div");
       d.className = "sh-egg sh-rankup"; d.setAttribute("role", "status");
       d.innerHTML = '<div class="sh-rankup-card sh-tier-' + TIERS[t].key + '">' + art(t, 150, { animate: true }) + '<div class="sh-rank-eyebrow">New rank</div><div class="sh-rank-name">' +
-        TIERS[t].name + ' handpiece</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent colour in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
+        TIERS[t].name + ' I</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent colour in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
       document.body.appendChild(d);
       requestAnimationFrame(function(){ d.classList.add("is-shown"); });
       H.confetti(); setTimeout(H.confetti, 400);
@@ -438,9 +460,10 @@
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         profile = r[0]; mastery = r[1] || [];
-        var prev = ls("sh_rank_tier");
-        ls("sh_rank_tier", String(profile.tier || 0));
+        var prev = ls("sh_rank_tier"), prevStep = ls("sh_rank_step"), stepNow = profile.step != null ? profile.step : (profile.tier || 0) * 3;
+        ls("sh_rank_tier", String(profile.tier || 0)); ls("sh_rank_step", String(stepNow));
         if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
+        else if (prevStep !== null && stepNow > +prevStep) levelToast(profile.tier || 0, profile.level || 1);
         badgeIcon(profile.tier || 0); render(); drawAccents();
       });
     }
@@ -501,8 +524,9 @@
       tier = Math.max(0, Math.min(6, tier | 0));
       return miniCache[tier] || (miniCache[tier] = '<span class="sh-rank-mini" title="' + TIERS[tier].name + ' handpiece">' + art(tier, 20) + '</span>');
     },
-    mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri,
+    mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri, rankName: rankName,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
+    levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade
   };
 })();
