@@ -25,6 +25,8 @@
       supabase = window.supabase.createClient(SB_URL, SB_KEY);
     }
   } catch (e) { /* stats layer is best-effort, never block the hub */ }
+  /* shared with the hubs' own arcades so a page never builds a second client */
+  window.shSupabase = supabase;
 
   /* ---------- back-to-index button ----------
      Prefers a slot each hub's own sticky header/ribbon markup provides
@@ -696,7 +698,9 @@
     setInterval(check, POLL_MS);
   })();
 
-  if (!supabase) return;
+  /* No early return here when supabase-js is missing (CDN blocked, offline): search, settings,
+     mind maps and the panels below are local and must keep working. Every network call
+     below checks `supabase` itself. */
 
   /* ---------- anonymous per-device visitor id (shared across all hubs, same origin) ---------- */
   function getVisitorId(){
@@ -719,7 +723,7 @@
      instead of the generic word "Someone". Always resolves well before
      NUKE_STREAK_THRESHOLD correct answers could realistically happen. ---------- */
   var resolvedAnonName = "";
-  try {
+  if (supabase) try {
     supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
       if (res && !res.error && res.data) resolvedAnonName = res.data;
     }, function(){});
@@ -729,7 +733,8 @@
   /* ---------- online-now presence ---------- */
   var presenceId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random());
   var onlineCount = 1;
-  var channel = supabase.channel("presence:" + HUB, { config: { presence: { key: presenceId } } });
+  var channel = supabase ? supabase.channel("presence:" + HUB, { config: { presence: { key: presenceId } } }) : null;
+  if (channel) {
   channel.on("presence", { event: "sync" }, function(){
     try {
       var state = channel.presenceState();
@@ -748,9 +753,11 @@
       safeRpc("record_presence_ping", { p_hub: HUB });
     }
   });
+  }
 
   /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
   function safeRpc(fn, args){
+    if (!supabase) return;
     try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
   }
 
@@ -1030,7 +1037,7 @@
     nukeReady = false;
     shNukeSfx.play("launch");
     safeRpc("record_nuke_launch", { p_hub: HUB, p_visitor: VISITOR_ID, p_name: name });
-    try { channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {}
+    try { if (channel) channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {}
     playNukeSequence(name);
   }
   function playNukeSequence(name){
@@ -1240,7 +1247,7 @@
     '<button type="button" data-val="lofi">Lo-fi keys</button>' +
     '<button type="button" data-val="piano">Piano</button>' +
     '</div>' +
-    '<input type="range" id="shset-volume" min="0" max="100">' +
+    '<input type="range" id="shset-volume" min="0" max="100" aria-label="Music volume">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
     '</div>' +
     '<div class="shset-row"><label>Tactical nuke alerts</label>' +
@@ -1266,7 +1273,7 @@
     if (n) n.textContent = onlineCount;
   }
 
-  function esc(s){ return String(s == null ? "" : s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 
   /* ---------- SH_EXPORT: each hub's own {lectures, questions} data, if published ---------- */
   function getExport(){
@@ -1296,6 +1303,7 @@
   function loadStats(){
     var toughEl = document.getElementById("shstat-tough");
     var modesEl = document.getElementById("shstat-modes");
+    if (!supabase) { toughEl.innerHTML = modesEl.innerHTML = '<div class="shstat-empty">Class data isn&#39;t reachable right now.</div>'; return; }
     supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).then(function(res){
       var rows = (res && res.data) || [];
       rows = rows.filter(function(r){ return r.attempts >= 3; });
@@ -1328,6 +1336,7 @@
   function loadPersonalStats(){
     var el = document.getElementById("shstat-mine");
     if (!el) return;
+    if (!supabase) { el.innerHTML = '<div class="shstat-empty">Your stats aren&#39;t reachable right now.</div>'; return; }
     supabase.rpc("get_personal_stats", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
       var rows = (res && res.data) || [];
       if (!rows.length) { el.innerHTML = '<div class="shstat-empty">Answer a few questions and your stats show up here.</div>'; return; }
@@ -1354,6 +1363,7 @@
   function loadBusiestTimes(){
     var wrap = document.getElementById("shstat-hist-wrap");
     if (!wrap) return;
+    if (!supabase) { wrap.innerHTML = '<div class="shstat-empty">Not reachable right now.</div>'; return; }
     supabase.from("presence_hourly").select("hour_of_day,ping_count").eq("hub", HUB).then(function(res){
       var rows = (res && res.data) || [];
       if (!rows.length) { wrap.innerHTML = '<div class="shstat-empty">Not enough activity yet.</div>'; return; }
@@ -1498,6 +1508,7 @@
     var btn = document.getElementById("shstat-flag-submit");
     var text = (ta.value || "").trim();
     if (!text) { msg.textContent = "Type something first."; return; }
+    if (!supabase) { msg.textContent = "Couldn't send — try again later."; return; }
     btn.disabled = true;
     msg.textContent = "Sending…";
     supabase.from("question_flags").insert({ hub: HUB, note: text }).then(function(res){
@@ -1523,6 +1534,7 @@
     var btn = document.getElementById("shstat-suggest-submit");
     var text = (ta.value || "").trim();
     if (!text) { msg.textContent = "Type something first."; return; }
+    if (!supabase) { msg.textContent = "Couldn't send — try again later."; return; }
     btn.disabled = true;
     msg.textContent = "Sending…";
     supabase.from("hub_suggestions").insert({ hub: HUB, note: text }).then(function(res){

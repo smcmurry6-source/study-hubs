@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../widget/v3.css">
 <style>
 /* ===================================================================
    MSK EXAM 3 HUB — tokens
@@ -16,7 +17,7 @@
 :root{
   color-scheme: light;
   --bg:#f4efe5; --surface:#fffdf8; --surface-2:#efe7d7; --surface-3:#e6dcc8;
-  --ink:#221c16; --ink-soft:#5f5548; --ink-faint:#8b8173; --line:#dccfb9; --line-strong:#c7b79c;
+  --ink:#221c16; --ink-soft:#5f5548; --ink-faint:#6E6558; --line:#dccfb9; --line-strong:#c7b79c;
   --accent:#a83a2c; --accent-ink:#8f2e22; --accent-soft:#f3dcd4;
   --good:#2f7a4f; --good-soft:#dcefe2; --bad:#b33a2c; --bad-soft:#f7ded8; --caution:#9a6412; --caution-soft:#f6e8c9;
   --tag-amber:#b0741a; --tag-sage:#57834f; --tag-blue:#3c6c9c; --tag-teal:#23807b; --tag-violet:#6f52a3; --tag-red:#b13a2e; --tag-green:#4d7a22; --tag-rose:#bb4369;
@@ -35,7 +36,7 @@
   :root:not([data-theme="light"]){
     color-scheme: dark;
     --bg:#15120e; --surface:#1f1a15; --surface-2:#29231c; --surface-3:#342c23;
-    --ink:#f0e9dd; --ink-soft:#bcb09f; --ink-faint:#8d8273; --line:#3a3128; --line-strong:#4e4336;
+    --ink:#f0e9dd; --ink-soft:#bcb09f; --ink-faint:#8d8273;--lec-num-ink:#17130c; --line:#3a3128; --line-strong:#4e4336;
     --accent:#e27a63; --accent-ink:#f09a86; --accent-soft:#40231d;
     --good:#6fc28d; --good-soft:#1d3527; --bad:#ef8a78; --bad-soft:#40211c; --caution:#e2b056; --caution-soft:#3a2d15;
     --tag-amber:#e0a64a; --tag-sage:#93bf89; --tag-blue:#7fa9d8; --tag-teal:#5cc2bb; --tag-violet:#ad95e0; --tag-red:#ec7f70; --tag-green:#9bc567; --tag-rose:#ec86a6;
@@ -46,7 +47,7 @@
 :root[data-theme="dark"]{
   color-scheme: dark;
   --bg:#15120e; --surface:#1f1a15; --surface-2:#29231c; --surface-3:#342c23;
-  --ink:#f0e9dd; --ink-soft:#bcb09f; --ink-faint:#8d8273; --line:#3a3128; --line-strong:#4e4336;
+  --ink:#f0e9dd; --ink-soft:#bcb09f; --ink-faint:#8d8273;--lec-num-ink:#17130c; --line:#3a3128; --line-strong:#4e4336;
   --accent:#e27a63; --accent-ink:#f09a86; --accent-soft:#40231d;
   --good:#6fc28d; --good-soft:#1d3527; --bad:#ef8a78; --bad-soft:#40211c; --caution:#e2b056; --caution-soft:#3a2d15;
   --tag-amber:#e0a64a; --tag-sage:#93bf89; --tag-blue:#7fa9d8; --tag-teal:#5cc2bb; --tag-violet:#ad95e0; --tag-red:#ec7f70; --tag-green:#9bc567; --tag-rose:#ec86a6;
@@ -101,7 +102,7 @@ main{padding-top:20px}
 .lec-nav{display:flex;flex-direction:column;gap:6px;min-width:0;position:sticky;top:66px;align-self:start}
 .lec-nav button{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 10px;cursor:pointer;min-width:0}
 .lec-nav button.is-active{border-color:var(--ink);box-shadow:var(--shadow)}
-.lec-num{font-family:var(--font-mono);font-size:.75rem;font-weight:700;padding:2px 6px;border-radius:6px;color:#fff;flex:none;margin-top:2px}
+.lec-num{font-family:var(--font-mono);font-size:.75rem;font-weight:700;padding:2px 6px;border-radius:6px;color:var(--lec-num-ink,#fff);flex:none;margin-top:2px}
 .lec-nav .t{font-size:.86rem;font-weight:600;line-height:1.3}
 .lec-nav .w{font-size:.74rem;color:var(--ink-faint)}
 .reading{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow);min-width:0}
@@ -547,6 +548,18 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .level-switch button:hover{color:var(--ink)}
 .level-switch button.is-active{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 
+
+/* ---------- phone header: mode tabs get their own labeled row so none are hidden past the edge ---------- */
+.lec-chip{white-space:normal;max-width:100%;min-width:0}
+.qcard-top{flex-wrap:wrap}
+.flow h4 .lec-chip{flex:0 1 auto}
+@media (max-width: 560px){
+  .hub-header-top{flex-wrap:wrap;row-gap:4px}
+  .hub-title{flex:1 1 auto}
+  #modeSwitch{order:3;flex:1 0 100%;margin-top:2px;overflow:visible}
+  #modeSwitch button{flex:1 1 0;justify-content:center;padding:7px 4px 9px;font-size:.84rem;gap:5px}
+  #modeSwitch .mode-label{display:inline}
+}
 </style>
 </head>
 <body>
@@ -626,7 +639,8 @@ var ICON_PATHS = {
   expand:   '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   shrink:   '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
   cards:    '<rect x="3.5" y="5" width="8" height="12" rx="1.5"/><rect x="12.5" y="7" width="8" height="12" rx="1.5"/>',
-  star:     '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor"/>'
+  star:     '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
 };
 function icon(name, cls){
   var p = ICON_PATHS[name]; if(!p) return '';
@@ -934,7 +948,7 @@ mcq('h-jt-jia','joints','hub','Compared with adult RA, juvenile idiopathic arthr
   'Chronic uveitis (20-30%) is the main complication. Dr. Herr: you do not need the seven categories.');
 match('h-jt-match','joints','hub','Match the joint disease to its buzzword.',
   [['Rheumatoid arthritis','Pannus'],['Osteoarthritis','Eburnation'],['Gout','Negatively birefringent needles'],['Ankylosing spondylitis','Bamboo spine'],['Reactive arthritis','Can\'t see, pee, climb a tree']],
-  '');
+  "Pannus is RA's inflamed synovium eroding cartilage. Eburnation is OA's polished bone after the cartilage is gone. Gout crystals are negatively birefringent needles. Ankylosing spondylitis fuses the spine into a bamboo spine. Reactive arthritis is the conjunctivitis, urethritis and arthritis triad.");
 seq('h-jt-ra-seq','joints','hub','Order the progression of a rheumatoid joint.',
   ['CD4+ T cells react with an arthritogenic antigen','Synovial hyperplasia with chronic synovitis','Pannus creeps over and erodes cartilage','Osteoclast activation and subchondral erosion','Fibrous ankylosis (pannus bridges bones)','Bony ankylosis (the bridge ossifies)'],
   'Ankylosis = abnormal stiffening or fusion of a joint.');
@@ -1122,7 +1136,7 @@ mcq('h-ai-mimicry','autoimmune','hub','A microbe expresses an antigen with amino
   'Infections may also upregulate co-stimulators on APCs or release self-antigens by tissue injury.');
 mcq('h-ai-epitope','autoimmune','hub','Why do autoimmune diseases tend to progress?',
   ['Epitope spreading: damage exposes new self-epitopes that activate new lymphocyte clones','Tregs multiply','Antibodies wane','Anergy spreads'],
-  '');
+  "Tissue damage exposes self-antigens the immune system hadn't seen, which recruits new autoreactive clones, so the response keeps broadening. Tregs and anergy hold autoimmunity back rather than drive it.");
 mcq('h-ai-hypo','autoimmune','hub','A patient has weight gain, cold intolerance, lethargy, coarse facial features, an enlarged tongue and puffy hands. Labs?',
   ['Low T3/T4, high TSH','High T3/T4, low TSH','High T3/T4, high TSH','Normal T4, low TSH'],
   'Myxedema/hypothyroidism. Hashimoto is the most common cause in the US.');
@@ -1170,7 +1184,7 @@ mcq('h-ai-classify','autoimmune','hub','Which is a SYSTEMIC (not organ-specific)
   'Systemic: SLE, Sjogren, RA, systemic sclerosis.');
 match('h-ai-match','autoimmune','hub','Match each disease to its target.',
   [['Graves','TSH receptor (stimulated)'],['Myasthenia gravis','ACh receptor'],['Goodpasture','Type IV collagen'],['Type 1 diabetes','Pancreatic beta cells'],['Sjogren','Lacrimal and salivary glands']],
-  '');
+  "Graves antibodies stimulate the TSH receptor. Myasthenia gravis antibodies block ACh receptors. Goodpasture targets type IV collagen in glomerular and alveolar basement membranes. Type 1 diabetes destroys beta cells, and Sjögren's attacks the lacrimal and salivary glands.");
 
 /* ===== Hub-authored: Hereditary / acquired ===== */
 mcq('h-he-dys-vs','hereditary','hub','Dysostoses differ from dysplasias because dysostoses are:',
@@ -1226,7 +1240,7 @@ mcq('h-he-pseudo','hereditary','hub','A malformed callus undergoes cystic degene
   'A false joint. Delayed/nonunion comes from inadequate immobilization.');
 seq('h-he-fx-seq','hereditary','hub','Order the stages of fracture repair.',
   ['Hematoma fills the gap (fibrin mesh)','Cytokines drive angiogenesis and activate osteoblasts/osteoclasts','Procallus (end of week 1)','Bony callus: woven bone + fibrocartilage (week 2-3)','Mineralization bridges the ends','Remodeling along stress lines'],
-  '');
+  "The hematoma comes first, then cytokines drive new vessels and recruit bone cells. A soft procallus forms by the end of week 1 and a bony callus by weeks 2–3, mineralization bridges the ends, and remodeling along stress lines finishes the job.");
 
 /* ===== Hub-authored: Drugs ===== */
 mcq('h-dr-carbonate','drugs','hub','Which oral calcium supplement needs gastric acid for absorption?',
@@ -1258,7 +1272,7 @@ mcq('h-dr-romo-box','drugs','hub','Romosozumab carries a boxed warning for:',
   'It is both anabolic (anti-sclerostin, so Wnt/beta-catenin runs and osteoblasts build) and antiresorptive. AEs: hypocalcemia, hypersensitivity, low-risk atypical femur fracture and ONJ.');
 mcq('h-dr-romo-mech','drugs','hub','Romosozumab increases bone formation by:',
   ['Blocking sclerostin, releasing the Wnt/beta-catenin pathway','Binding RANKL','Inhibiting FPP synthase','Mimicking intermittent PTH'],
-  '');
+  "Osteocytes release sclerostin, which brakes Wnt signaling. Romosozumab removes that brake so osteoblasts build bone. Anti-RANKL is denosumab, FPP synthase is the bisphosphonate target, and intermittent PTH is teriparatide.");
 mcq('h-dr-deno-mech','drugs','hub','Denosumab (Prolia) is a monoclonal antibody that:',
   ['Binds RANKL so it cannot activate RANK on preosteoclasts','Blocks sclerostin','Inhibits FPP synthase','Mimics OPG receptor on osteoblasts'],
   'Mnemonic from the deck: "the NOSE detects rank ligand" (deNOSumab). Uses: high-risk osteoporosis, bone mets, hypercalcemia of malignancy, anti-estrogen/anti-androgen therapy.');
@@ -1291,7 +1305,7 @@ mcq('h-dr-hypercal-tx','drugs','hub','First-line management of hypercalcemia beg
   'Then bisphosphonates/denosumab and glucocorticoids.');
 match('h-dr-match','drugs','hub','Match each drug to its mechanism.',
   [['Alendronate','Inhibits FPP synthase (mevalonate)'],['Denosumab','Anti-RANKL antibody'],['Teriparatide','Intermittent PTH 1-34'],['Romosozumab','Anti-sclerostin antibody'],['Calcitriol','Active 1,25(OH)2 vitamin D']],
-  '');
+  "Alendronate (a bisphosphonate) inhibits FPP synthase in osteoclasts. Denosumab blocks RANKL. Teriparatide is intermittent PTH 1-34 and anabolic. Romosozumab blocks sclerostin. Calcitriol is the active hormone form of vitamin D.");
 
 /* ===== Hub-authored: Tumors ===== */
 mcq('h-tu-mets','tumors','hub','Most tumors found in bone are metastatic. Which primary sites are classic ("BLT with Kosher Pickle")?',
@@ -1326,7 +1340,7 @@ mcq('h-tu-ewing-trans','tumors','hub','Ewing sarcoma is driven by which molecula
   'Small round blue cells with scant cytoplasm, pseudorosettes; diaphysis of long bones and pelvis; ~50% durable remission with chemo + surgery/radiation.');
 mcq('h-tu-mdm2','tumors','hub','Amplification of a 12q region containing MDM2 (a p53 inhibitor) is seen in:',
   ['Well-differentiated liposarcoma','Rhabdomyosarcoma','Leiomyosarcoma','Lipoma'],
-  '');
+  "Well-differentiated liposarcoma carries a 12q13–15 amplification including MDM2 (which switches off p53) and CDK4. That finding separates it from a benign lipoma.");
 mcq('h-tu-rhabdomyoma','tumors','hub','Rhabdomyoma is a benign cardiac tumor seen in patients with:',
   ['Tuberous sclerosis','Neurofibromatosis','Li-Fraumeni','Down syndrome'],
   'Most common cardiac tumor of infants and children; often regresses in the first few years.');
@@ -2577,23 +2591,36 @@ function buildMock(){
     var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
     fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
   });
-  STATE.mock = { ids: shuffled(ids), t0: Date.now(), res: {} };
+  var order = {}; ids.forEach(function(id){ order[id] = shuffled(QUESTIONS_BY_ID[id].choices.map(function(c,k){ return k; })); });
+  STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
   saveState();
 }
 var mockTimer = null;
+/* Exam-style: pick an answer for every question (no feedback), then Submit to score it and
+   review each card. Picks are saved in STATE.mock so a reload keeps your place. */
+function mockTotal(){ return Object.keys(MOCK_BLUEPRINT).reduce(function(n,k){ return n + MOCK_BLUEPRINT[k]; }, 0); }
 function renderMock(body){
   clearInterval(mockTimer);
   var m = STATE.mock;
-  var total = Object.keys(MOCK_BLUEPRINT).reduce(function(n,k){ return n + MOCK_BLUEPRINT[k]; }, 0);
+  if(m && !m.picks){ /* a mock started before exam mode: keep it only if it was already finished */
+    if(m.ids && Object.keys(m.res||{}).length >= m.ids.length){ m.picks = {}; m.submitted = true; }
+    else { STATE.mock = m = null; }
+    saveState();
+  }
+  var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the same length as Exam 3, drawn only from the new Exam 3 lectures (L19–L27). Weighting follows the real exam: 4 from Joint Diseases (Dr. Herr said four) and 4–5 from each other lecture. Questions you haven\'t seen or missed last time are picked first.</p><p>A clock runs so you can pace yourself (about a minute per question). Your score and a per-lecture breakdown appear when you finish, and every answer counts toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the same length as Exam 3, drawn only from the new Exam 3 lectures (L19–L27). Weighting follows the real exam: 4 from Joint Diseases (Dr. Herr said four) and 4–5 from each other lecture. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
-  var answered = Object.keys(m.res).length, correct = Object.keys(m.res).filter(function(k){ return m.res[k]; }).length;
-  var done = answered >= m.ids.length;
-  var h = '<div class="qfilters" style="padding:4px 0"><span class="pill" id="mockClock">0:00</span><span class="pill">'+answered+' / '+m.ids.length+' answered</span>'+(done?'<span class="pill countdown">Score '+correct+' / '+m.ids.length+' · '+Math.round(correct/m.ids.length*100)+'%</span>':'')+'<button type="button" class="btn" id="mockNew">New mock</button></div>';
-  if(done){
+  var picked = Object.keys(m.picks).length;
+  var correct = m.submitted ? m.ids.filter(function(id){ return m.res[id]; }).length : 0;
+  var h = '<div class="qfilters" style="padding:4px 0"><span class="pill" id="mockClock">'+icon('clock')+'0:00</span>' +
+    (m.submitted ? '<span class="pill countdown">Score '+correct+' / '+m.ids.length+' · '+Math.round(correct/m.ids.length*100)+'%</span>' +
+                   '<button type="button" class="btn" id="mockMissed" aria-pressed="'+(!!m.onlyMissed)+'">'+(m.onlyMissed?'Show all questions':'Show only missed')+'</button>'
+                 : '<span class="pill" id="mockProg">'+picked+' / '+m.ids.length+' answered</span><button type="button" class="btn primary" id="mockSubmit">Submit exam</button>') +
+    '<button type="button" class="btn" id="mockNew">New mock</button></div>';
+  if(m.submitted){
     h += '<div class="rv-table-wrap" style="margin-bottom:24px"><table class="rv-table"><thead><tr><th>Lecture</th><th>Correct</th><th>Score</th></tr></thead><tbody>' +
       Object.keys(MOCK_BLUEPRINT).map(function(lec){
         var qs = m.ids.filter(function(id){ return QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].lec === lec; });
@@ -2603,30 +2630,55 @@ function renderMock(body){
   }
   h += '<div class="qlist" id="mockList">' + m.ids.map(function(id, i){
     var q = QUESTIONS_BY_ID[id]; if(!q) return '';
-    return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' + qCardHTML(q, { ctx:'mock' }) + '</div>';
+    if(m.submitted && m.onlyMissed && m.res[id]) return '';
+    var pick = (id in m.picks) ? m.picks[id] : null;
+    var order = (m.order && m.order[id]) || q.choices.map(function(c,k){ return k; });
+    var choices = order.map(function(k){
+      var cls = 'qcard-choice';
+      if(m.submitted){ if(k === q.answer) cls += ' is-correct'; else if(k === pick) cls += ' is-wrong'; }
+      else if(k === pick) cls += ' is-picked';
+      return '<button type="button" class="'+cls+'" data-mock-pick="'+k+'" data-qid="'+id+'"'+(m.submitted?' disabled':'')+' aria-pressed="'+(k === pick)+'">'+escHtml(q.choices[k])+'</button>';
+    }).join('');
+    var verdict = !m.submitted ? '' : pick === null ? '<span class="qcard-verdict bad">Not answered.</span>' : m.res[id] ? '<span class="qcard-verdict ok">Correct.</span>' : '<span class="qcard-verdict bad">Missed.</span>';
+    return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' +
+      '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
+      '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
+      '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
+      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+
+        '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
+      '</div></div>';
   }).join('') + '</div>';
   body.innerHTML = h;
-  var list = document.getElementById('mockList'); wireQuestionContainer(list);
-  /* restore answered cards so a reload doesn't wipe progress */
-  m.ids.forEach(function(id){
-    if(!(id in m.res)) return;
-    var card = list.querySelector('.qcard[data-qid="'+id+'"]'); if(!card) return;
-    card.classList.add('is-answered');
-    card.querySelectorAll('.qcard-choice').forEach(function(b){ b.disabled = true; if(b.getAttribute('data-answer') === '1') b.classList.add('is-correct'); });
-    var v = card.querySelector('.qcard-verdict'); if(v){ v.textContent = m.res[id] ? 'Correct.' : 'Missed.'; v.className = 'qcard-verdict ' + (m.res[id] ? 'ok' : 'bad'); }
-  });
+  var list = document.getElementById('mockList');
+  if(!m.submitted){
+    list.addEventListener('click', function(e){
+      var b = e.target.closest('[data-mock-pick]'); if(!b) return;
+      var id = b.getAttribute('data-qid');
+      m.picks[id] = +b.getAttribute('data-mock-pick'); saveState();
+      b.parentNode.querySelectorAll('[data-mock-pick]').forEach(function(x){ x.classList.toggle('is-picked', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+      var pr = document.getElementById('mockProg'); if(pr) pr.textContent = Object.keys(m.picks).length + ' / ' + m.ids.length + ' answered';
+      var sb = document.getElementById('mockSubmit'); if(sb && sb.getAttribute('data-confirm')){ sb.removeAttribute('data-confirm'); sb.textContent = 'Submit exam'; }
+    });
+    document.getElementById('mockSubmit').onclick = function(){
+      var left = m.ids.length - Object.keys(m.picks).length;
+      if(left > 0 && !this.getAttribute('data-confirm')){ this.setAttribute('data-confirm','1'); this.textContent = left + ' unanswered: submit anyway?'; return; }
+      m.submitted = true; m.tEnd = Date.now(); m.res = {};
+      m.ids.forEach(function(id){
+        var q = QUESTIONS_BY_ID[id]; if(!q) return;
+        var ok = (id in m.picks) && m.picks[id] === q.answer;
+        m.res[id] = ok;
+        if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock');
+      });
+      saveState(); renderMock(body); window.scrollTo(0,0);
+    };
+  } else {
+    document.getElementById('mockMissed').onclick = function(){ m.onlyMissed = !m.onlyMissed; saveState(); renderMock(body); };
+  }
   document.getElementById('mockNew').onclick = function(){ STATE.mock = null; saveState(); renderMock(body); };
   var clock = document.getElementById('mockClock');
-  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var s = Math.floor((end - m.t0)/1000); clock.textContent = '⏱ ' + Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
-  tick(); if(!done) mockTimer = setInterval(tick, 1000);
+  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'); }
+  tick(); if(!m.submitted) mockTimer = setInterval(tick, 1000);
 }
-document.addEventListener('msk3:answered', function(e){
-  var d = e.detail; if(d.ctx !== 'mock' || !STATE.mock) return;
-  if(STATE.mock.ids.indexOf(d.qid) === -1 || (d.qid in STATE.mock.res)) return;
-  STATE.mock.res[d.qid] = d.correct;
-  if(Object.keys(STATE.mock.res).length >= STATE.mock.ids.length){ STATE.mock.tEnd = Date.now(); saveState(); var b = document.getElementById('compBody'); if(b && STATE.ui.sub === 'mock') setTimeout(function(){ renderMock(b); window.scrollTo(0,0); }, 400); }
-  else { saveState(); var pills = document.querySelectorAll('#compBody .qfilters .pill'); if(pills[1]) pills[1].textContent = Object.keys(STATE.mock.res).length + ' / ' + STATE.mock.ids.length + ' answered'; }
-});
 
 /* ===================================================================
    ARCADE — three quick-play mini games built on the shared data
@@ -2666,6 +2718,7 @@ var ARCADE = (function(){
   var HUB_ID = 'msk-exam3', sb = null;
   function client(){
     if(sb) return sb;
+    if(window.shSupabase) return (sb = window.shSupabase); /* the shared widget's client */
     try{ if(window.supabase && window.supabase.createClient) sb = window.supabase.createClient('https://thytmzsgymydbzcqdnix.supabase.co', 'sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS'); }catch(e){}
     return sb;
   }
@@ -3792,13 +3845,15 @@ function applyTheme(t){
   var b = document.getElementById('themeBtn'); if(b) b.innerHTML = icon(t === 'dark' ? 'moon' : t === 'light' ? 'sun' : 'auto');
 }
 function boot(){
-  var saved = null; try{ saved = localStorage.getItem('msk3-theme'); }catch(e){}
+  /* sh_theme is the site-wide choice shared with the dashboard; msk3-theme is this hub's old key */
+  var saved = null; try{ saved = localStorage.getItem('sh_theme'); if(saved === null) saved = localStorage.getItem('msk3-theme'); }catch(e){}
+  if(saved !== 'light' && saved !== 'dark') saved = null;
   document.querySelectorAll('[data-ic]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-ic')); });
   applyTheme(saved);
   document.getElementById('themeBtn').addEventListener('click', function(){
     var cur = document.documentElement.getAttribute('data-theme');
     var next = !cur ? 'light' : cur === 'light' ? 'dark' : null;
-    try{ if(next) localStorage.setItem('msk3-theme', next); else localStorage.removeItem('msk3-theme'); }catch(e){}
+    try{ localStorage.setItem('sh_theme', next || ''); localStorage.removeItem('msk3-theme'); }catch(e){}
     applyTheme(next);
   });
   document.querySelectorAll('#modeSwitch [data-mode]').forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
@@ -3806,7 +3861,8 @@ function boot(){
   var m = STATE.ui.mode; if(['compendium','review','arcade'].indexOf(m) === -1) m = 'compendium';
   setMode(m);
 }
-if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+/* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
+boot();
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
@@ -3820,9 +3876,8 @@ window.SH_EXPORT = {
 
 })();
 </script>
-<link rel="stylesheet" href="../../widget/v3.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../../widget/v3.js" data-hub="msk-exam3" data-answered-event="msk3:answered" data-default-mode="compendium"></script>
-<script>if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");</script>
+<script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
+<script defer src="../../widget/v3.js" data-hub="msk-exam3" data-answered-event="msk3:answered" data-default-mode="compendium"></script>
+<script>document.addEventListener("DOMContentLoaded", function(){ if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]"); });</script>
 </body>
 </html>

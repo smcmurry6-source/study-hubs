@@ -63,6 +63,18 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-25 (exam-week fixes, Claude Code)** — Dashboard `HUBS` entries now take `exams:[{name,label,date,code}]`
+  (several per hub; perio has midterm + final) instead of `examDate`/`examName`; the hero lists every exam in the next
+  14 days and has a real "no exams" state. Perio accuracy on the dashboard uses each question's latest try (perio's
+  `totalCorrect` counts unique questions). supabase-js is **self-hosted and pinned** at
+  `widget/vendor/supabase-2.117.2.js`, loaded with `defer` everywhere (no jsdelivr dependency); hubs call `boot()`
+  directly instead of waiting for DOMContentLoaded, and the class-stats wiring runs on DOMContentLoaded. The widget no
+  longer returns early without Supabase (search, settings, mind maps keep working) and exposes `window.shSupabase`,
+  which the arcades reuse. Light/dark is one shared key, `sh_theme` (old per-page keys still read). Phones: mode tabs
+  get their own labeled row in both hubs; MSK lecture chips wrap. Perio's class % now sits inside the explanation
+  (hidden until answered). MSK mock exam is exam-style (pick all, submit, review; `STATE.mock.picks/order/submitted`).
+  The dashboard no longer groups hubs by term (`TERMS` and each class's `term` field are gone); every class with a
+  live hub shows in one grid, since old exams get archived.
 - **2026-09-25** — Added `CLAUDE.md` (imports this file) so Claude Code sessions
   start with the repo rules; Claude Code deploys go through branches + PRs.
   Kokoro model re-hosted as release `kokoro-model-v1.0`. No site changes.
