@@ -1295,6 +1295,21 @@
     // sampling the non-green bounding box across several frames.
     var SRC_X = 176, SRC_Y = 47, SRC_W = 280, SRC_H = 280;
     var KEY_R = 0, KEY_G = 215, KEY_B = 0, TOL = 70, SOFT = 50;
+    // From ~12.25 s the clip whites out on its own, lightening the green toward white,
+    // so a fixed key colour stopped matching and the lit-up screen showed as a pale
+    // square around the icon until the blast at 13 s. Each frame is keyed against its
+    // own background instead (sampled at the four corners), and as it whitens the icon
+    // swells into this soft white disc, handing off to the full-screen flash.
+    var cw = canvas.width, ch = canvas.height;
+    var corners = [(3 * cw + 3) * 4, (3 * cw + cw - 4) * 4, ((ch - 4) * cw + 3) * 4, ((ch - 4) * cw + cw - 4) * 4];
+    var disc = new Float32Array(cw * ch);
+    for (var py = 0; py < ch; py++) {
+      for (var px = 0; px < cw; px++) {
+        var rr = Math.sqrt(Math.pow(px - cw / 2 + 0.5, 2) + Math.pow(py - ch / 2 + 0.5, 2)) / cw;
+        var t = Math.max(0, Math.min(1, (rr - 0.36) / 0.14));
+        disc[py * cw + px] = 1 - t * t * (3 - 2 * t);
+      }
+    }
 
     function tick(){
       if (!canvas.isConnected) return;
@@ -1307,13 +1322,28 @@
         ctx.drawImage(video, SRC_X, SRC_Y, SRC_W, SRC_H, 0, 0, canvas.width, canvas.height);
         var frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
         var d = frame.data;
+        var kr = KEY_R, kg = KEY_G, kb = KEY_B, sr = 0, sg = 0, sb = 0;
+        for (var c = 0; c < 4; c++) {
+          var ci = corners[c];
+          sr += d[ci]; sg += d[ci + 1]; sb += d[ci + 2];
+        }
+        // corners agree = plain background; otherwise keep the default key
+        var spread = 0;
+        for (var c2 = 0; c2 < 4; c2++) {
+          var cj = corners[c2];
+          spread = Math.max(spread, Math.abs(d[cj] - sr / 4), Math.abs(d[cj + 1] - sg / 4), Math.abs(d[cj + 2] - sb / 4));
+        }
+        if (spread < 20) { kr = sr / 4; kg = sg / 4; kb = sb / 4; }
+        var wash = Math.min(kr, kb) / 255; // 0 on the green screen, 1 once the clip is white
+        var despill = 0.6 + 0.4 * wash;
         for (var i = 0; i < d.length; i += 4) {
           var r = d[i], g = d[i + 1], b = d[i + 2];
-          var dr = r - KEY_R, dg = g - KEY_G, db = b - KEY_B;
+          var dr = r - kr, dg = g - kg, db = b - kb;
           var dist = Math.sqrt(dr * dr + dg * dg + db * db);
           var alpha = Math.max(0, Math.min(1, (dist - TOL) / SOFT));
+          if (wash > 0.01) alpha = Math.max(alpha, wash * disc[i >> 2]);
           var excessG = Math.max(0, g - Math.max(r, b));
-          d[i + 1] = g - excessG * 0.6;
+          d[i + 1] = g - excessG * despill;
           d[i + 3] = Math.round(alpha * 255);
         }
         ctx.putImageData(frame, 0, 0);
