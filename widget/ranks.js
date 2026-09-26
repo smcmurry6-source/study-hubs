@@ -490,7 +490,7 @@
         ls("sh_rank_tier", String(profile.tier || 0)); ls("sh_rank_step", String(stepNow));
         if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
         else if (prevStep !== null && stepNow > +prevStep) levelToast(profile.tier || 0, profile.level || 1);
-        badgeIcon(profile.tier || 0); render(); drawAccents();
+        badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
       });
     }
     load();
@@ -552,7 +552,7 @@
       return miniCache[k] || (miniCache[k] = '<span class="sh-rank-mini" title="' + rankName(tier, level) + '">' + art(tier, 20) +
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
-    mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri, rankName: rankName,
+    mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade

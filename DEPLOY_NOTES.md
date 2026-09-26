@@ -63,6 +63,18 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-26 (hub recap, dashboard rank + settings, Claude Code)** — **Recap tab** on `review/`: pick a hub (live or
+  archived) and it draws a 1080x1640 shareable image (`review/recap.js`, canvas; Download PNG, or Share on phones) with
+  hours studied, classmates, answers, class accuracy, hours per day up to the exam, the day before the exam, peak hour,
+  people studying after midnight, regulars (3+ days), the hardest multiple-choice question with its answer, and a hall of
+  fame (most answers, longest correct streak). Data from `get_hub_recap(p_secret, p_hub, p_exam)` (`migration_v20.sql`,
+  admin-gated via `sh_admin_ok`, applied via the connector). Pings before 2026-09-25 count only the first 3 h of each
+  visit (no idle rule back then). Question text: `ARCHIVE_BANK` → `question-banks/*.json` for archived hubs, `SH_EXPORT`
+  for live ones. **Dashboard**: a "your rank" card under the greeting (handpiece, XP, animated bar to the next level,
+  `get_rank_profile`); a Settings sheet (gear in the top bar) that edits the same localStorage keys as the hub widget's
+  Settings (theme, font, size, accent, music, surprises, nuke alerts; font/size also apply on the dashboard). "Add exams
+  to my calendar" removed (everyone has them already). `widget/ranks.js` exposes `ACCENTS` and re-applies the chosen
+  accent once the rank loads.
 - **2026-09-26 (easier name change, Claude Code)** — The hub top-bar name badge now always shows (your custom name, or
   the random class name like "Gleaming Molar") with a pencil; tapping it opens a small editor (`window.shEditName()` in
   `widget/v3.js`) that explains where the name shows, saves on Enter, and offers "Go back to a random name"
