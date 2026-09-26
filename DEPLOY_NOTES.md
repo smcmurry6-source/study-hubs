@@ -63,6 +63,12 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-26 (easier name change, Claude Code)** — The hub top-bar name badge now always shows (your custom name, or
+  the random class name like "Gleaming Molar") with a pencil; tapping it opens a small editor (`window.shEditName()` in
+  `widget/v3.js`) that explains where the name shows, saves on Enter, and offers "Go back to a random name"
+  (`clear_display_name`, `migration_v19.sql`, applied via the connector). The rank card in Stats has a "Shown as NAME ·
+  change" link and the dashboard greeting a "Pick your name / Change name" button. One save path (`saveName`/`resetName`)
+  keeps the Settings and Stats name boxes in sync and fires `sh:name`. Before this only 1 of 77 visitors had set a name.
 - **2026-09-26 (home-screen icon, Claude Code)** — App icons are now the Gold handpiece medallion (rendered from
   `widget/ranks.js`) on a solid dark ground: `assets/apple-touch-icon.png` (180), `icon-192/512.png`, `icon-maskable-512.png`
   (extra safe-zone margin), `favicon-32/64.png`. All opaque; the old ones had transparent corners, and iPhones were

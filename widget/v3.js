@@ -667,6 +667,9 @@
     } catch (e) { /* cosmetic-only feature, never block the hub */ }
   };
 
+  /* ---------- your name: always shown in the top bar (custom, or the random class name such as
+     "Gleaming Molar"), with a pencil. Tapping it opens a small editor right there; the Settings and
+     Stats name boxes use the same save/reset code. ---------- */
   var nameBadge = document.getElementById("sh-ribbon-name");
   if (!nameBadge) {
     nameBadge = document.createElement("button");
@@ -675,14 +678,83 @@
     nameBadge.hidden = true;
     (document.getElementById("sh-topbar") || document.body).appendChild(nameBadge);
   }
+  nameBadge.classList.add("sh-name-edit");
+  var PENCIL_SVG = '<svg class="sh-name-pencil" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
   function renderNameBadge(){
-    var n = currentName();
-    if (n) { nameBadge.textContent = "Hi, " + n; nameBadge.hidden = false; }
-    else { nameBadge.hidden = true; }
+    var n = currentName() || resolvedAnonName;
+    if (n) {
+      nameBadge.innerHTML = '<span class="sh-name-text">' + esc(n) + '</span>' + PENCIL_SVG;
+      nameBadge.title = "Change the name classmates see on the leaderboards";
+      nameBadge.setAttribute("aria-label", "Your name: " + n + ". Change it");
+      nameBadge.hidden = false;
+    } else { nameBadge.hidden = true; }
     if (window.shReserveTopClearance) window.shReserveTopClearance();
   }
+  function syncNameInputs(){
+    var n = currentName();
+    ["shset-name-input", "shstat-name-input"].forEach(function(id){
+      var el = document.getElementById(id); if (!el) return;
+      el.value = n;
+      if (resolvedAnonName) el.placeholder = "Right now you're " + resolvedAnonName;
+    });
+  }
+  function saveName(name){
+    name = String(name || "").trim().slice(0, 24);
+    if (!name) return false;
+    safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+    prefSet(SH_NAME_KEY, name);
+    renderNameBadge(); syncNameInputs();
+    try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: name } })); } catch (e) {}
+    return true;
+  }
+  function resetName(){
+    try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {}
+    if (supabase) try {
+      supabase.rpc("clear_display_name", { p_visitor: VISITOR_ID }).then(function(res){
+        if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); }
+      }, function(){});
+    } catch (e) {}
+    renderNameBadge(); syncNameInputs();
+    try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: "" } })); } catch (e) {}
+  }
+  var nameDlg = null;
+  function closeNameEditor(){ if (nameDlg) { nameDlg.remove(); nameDlg = null; } }
+  function openNameEditor(){
+    closeNameEditor();
+    var custom = currentName();
+    nameDlg = document.createElement("div");
+    nameDlg.className = "sh-name-dlg";
+    nameDlg.innerHTML = '<div class="sh-name-card" role="dialog" aria-modal="true" aria-labelledby="sh-name-h">' +
+      '<button class="sh-name-x" type="button" aria-label="Close">&times;</button>' +
+      '<h4 id="sh-name-h">Your name</h4>' +
+      '<p>This is how classmates see you on the leaderboards, streak boards and ranks, in every hub.' +
+      (custom ? '' : (resolvedAnonName ? ' Right now you have a random one: <b>' + esc(resolvedAnonName) + '</b>.' : '')) + '</p>' +
+      '<form class="sh-name-form"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" placeholder="Pick a name" value="' + esc(custom) + '">' +
+      '<button type="submit">Save</button></form>' +
+      '<div class="sh-name-msg" aria-live="polite"></div>' +
+      (custom ? '<button class="sh-name-reset" type="button">Go back to a random name</button>' : '<div class="sh-name-hint">Up to 24 characters. You can change it any time.</div>') +
+      '</div>';
+    document.body.appendChild(nameDlg);
+    var input = nameDlg.querySelector("input"), msg = nameDlg.querySelector(".sh-name-msg");
+    setTimeout(function(){ try { input.focus(); input.select(); } catch (e) {} }, 30);
+    nameDlg.addEventListener("click", function(e){
+      if (e.target === nameDlg || e.target.closest(".sh-name-x")) { closeNameEditor(); return; }
+      if (e.target.closest(".sh-name-reset")) { resetName(); closeNameEditor(); }
+    });
+    nameDlg.addEventListener("keydown", function(e){ if (e.key === "Escape") closeNameEditor(); });
+    nameDlg.querySelector("form").addEventListener("submit", function(e){
+      e.preventDefault();
+      var v = input.value.trim();
+      if (!v) { msg.textContent = "Type a name first."; input.focus(); return; }
+      saveName(v);
+      msg.textContent = "Saved. Hi, " + v + "!";
+      setTimeout(closeNameEditor, 700);
+    });
+  }
+  window.shEditName = openNameEditor;
+  window.shNameNow = function(){ return currentName() || resolvedAnonName || ""; };
   renderNameBadge();
-  nameBadge.addEventListener("click", function(){ if (window.shOpenSettings) window.shOpenSettings(); });
+  nameBadge.addEventListener("click", openNameEditor);
 
   // Welcome-back toast for a returning, named visitor — once per page load,
   // a beat after load so it doesn't collide with anything else appearing.
@@ -842,7 +914,7 @@
   var resolvedAnonName = "";
   if (supabase) try {
     supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
-      if (res && !res.error && res.data) resolvedAnonName = res.data;
+      if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
     }, function(){});
   } catch (e) {}
   function displayName(){ return currentName() || resolvedAnonName || "Someone"; }
@@ -1637,30 +1709,16 @@
     }
   });
 
-  /* ---------- leaderboard display name (opt-in) ---------- */
-  try {
-    var savedName = localStorage.getItem("sh_display_name");
-    var nameInputEl = document.getElementById("shstat-name-input");
-    if (savedName && nameInputEl) nameInputEl.value = savedName;
-  } catch (e) {}
+  /* ---------- leaderboard display name (the Stats panel box) ---------- */
+  syncNameInputs();
   var nameSaveBtn = document.getElementById("shstat-name-save");
   if (nameSaveBtn) {
     nameSaveBtn.addEventListener("click", function(){
       var nameInput = document.getElementById("shstat-name-input");
       var nameMsg = document.getElementById("shstat-name-msg");
       var name = (nameInput.value || "").trim();
-      if (!name) { nameMsg.textContent = "Type a name first."; return; }
-      nameSaveBtn.disabled = true;
-      nameMsg.textContent = "Saving…";
-      safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
-      try { localStorage.setItem("sh_display_name", name); } catch (e) {}
-      renderNameBadge();
-      var settingsInput = document.getElementById("shset-name-input");
-      if (settingsInput) settingsInput.value = name;
-      setTimeout(function(){
-        nameSaveBtn.disabled = false;
-        nameMsg.textContent = "Saved — you'll show up on the leaderboard as \"" + name + "\".";
-      }, 400);
+      if (!saveName(name)) { nameMsg.textContent = "Type a name first."; return; }
+      nameMsg.textContent = "Saved. You'll show up on the leaderboard as \"" + name + "\".";
     });
   }
 
@@ -1816,8 +1874,7 @@
     if (volEl) volEl.value = prefGet(SH_VOLUME_KEY, "35");
   }
   function syncSettingsUI(){
-    var nInput = document.getElementById("shset-name-input");
-    if (nInput) nInput.value = currentName();
+    syncNameInputs();
     syncSettingsSegUI();
   }
   /* ====================================================================
@@ -1972,18 +2029,8 @@
       var nameInput = document.getElementById("shset-name-input");
       var nameMsg = document.getElementById("shset-name-msg");
       var name = (nameInput.value || "").trim();
-      if (!name) { nameMsg.textContent = "Type a name first."; return; }
-      setNameSaveBtn.disabled = true;
-      nameMsg.textContent = "Saving…";
-      safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
-      prefSet(SH_NAME_KEY, name);
-      renderNameBadge();
-      var otherInput = document.getElementById("shstat-name-input");
-      if (otherInput) otherInput.value = name;
-      setTimeout(function(){
-        setNameSaveBtn.disabled = false;
-        nameMsg.textContent = "Saved — hi, " + name + "!";
-      }, 400);
+      if (!saveName(name)) { nameMsg.textContent = "Type a name first."; return; }
+      nameMsg.textContent = "Saved. Hi, " + name + "!";
     });
   }
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
