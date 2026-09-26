@@ -5,7 +5,7 @@
    --font-body ...), so the widget looks like part of whichever hub it is on, in light and dark.
    Fallbacks keep it readable on a page without those tokens. */
 :root{--sh-tabbar-h:60px;} /* height of the phone bottom bar, published so a hub's own mobile CSS can stack above it */
-#shstat-root, #shstat-backdrop, .shstat-streaktoast, .sh-egg, .sh-egg-board, .sh-rank-sec, .sh-accent-row, .sh-update-toast, #sh-topbar, #shname-badge{
+#shstat-root, #shstat-backdrop, .shstat-streaktoast, .sh-egg, .sh-egg-board, .sh-rank-sec, .sh-accent-row, .sh-update-toast, #sh-topbar, #shname-badge, .sh-name-dlg{
   --shw-bg: var(--surface, #fff);
   --shw-bg2: var(--surface-2, #f2f3f4);
   --shw-ink: var(--ink, #15202A);
@@ -549,3 +549,30 @@ button.sh-trophy:hover, button.sh-trophy.is-sel{border-color:var(--shw-line); ba
 .sh-trophy-detail{margin:10px 2px 0; min-height:2.6em; font-size:13px; line-height:1.45; color:var(--shw-ink2);}
 .sh-trophy-detail b{color:var(--shw-ink);}
 .sh-trophy-hint{color:var(--shw-ink3);}
+
+/* ---------- your name: top-bar badge with a pencil + the small editor it opens ---------- */
+.sh-name-edit{display:inline-flex !important; align-items:center; gap:0; min-width:0; max-width:240px;}
+.sh-name-edit[hidden]{display:none !important;}
+.sh-name-edit .sh-name-text{order:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.sh-name-edit.sh-has-rank::after{order:1; flex:none;}
+.sh-name-edit.sh-has-rank::before{flex:none;}
+.sh-name-pencil{order:2; flex:none; width:13px; height:13px; margin-left:6px; opacity:.6;}
+.sh-name-edit:hover .sh-name-pencil{opacity:1;}
+@media (max-width:640px){ .sh-name-edit{max-width:min(196px, 50vw);} }
+/* the badge is the part of a hub's top-bar row that gives way on a narrow phone */
+#sh-ribbon-name.sh-name-edit{flex:0 1 auto;}
+*:has(> #sh-ribbon-name){min-width:0; max-width:100%;}
+.sh-name-dlg{position:fixed; inset:0; z-index:10050; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,8,6,.45); font-family:var(--shw-font);}
+.sh-name-card{position:relative; width:100%; max-width:360px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:16px; box-shadow:var(--shw-shadow); padding:20px 20px 16px;}
+.sh-name-card h4{margin:0 0 6px; font-size:17px;}
+.sh-name-card p{margin:0 0 12px; font-size:13.5px; line-height:1.45; color:var(--shw-ink2);}
+.sh-name-card p b{color:var(--shw-ink);}
+.sh-name-x{position:absolute; top:8px; right:10px; background:none; border:none; font-size:22px; line-height:1; color:var(--shw-ink3); cursor:pointer; padding:4px;}
+.sh-name-form{display:flex; gap:8px;}
+.sh-name-form input{flex:1; min-width:0; background:var(--shw-bg2); border:1px solid var(--shw-line2); border-radius:10px; color:var(--shw-ink); font:inherit; font-size:16px; padding:9px 11px;}
+.sh-name-form input:focus{outline:2px solid var(--shw-accent); outline-offset:1px;}
+.sh-name-form button{flex:none; background:var(--shw-ink); color:var(--shw-bg); border:none; border-radius:10px; padding:0 16px; font:inherit; font-size:14px; font-weight:700; cursor:pointer;}
+.sh-name-msg{min-height:16px; margin-top:6px; font-size:12.5px; color:var(--shw-ink2);}
+.sh-name-hint{font-size:12px; color:var(--shw-ink3);}
+.sh-name-reset{background:none; border:none; padding:0; font:inherit; font-size:12.5px; color:var(--shw-ink2); text-decoration:underline; cursor:pointer;}
+.sh-rank-rename{margin-top:6px; background:none; border:none; padding:0; font:inherit; font-size:12.5px; font-weight:600; color:var(--shw-accent); cursor:pointer;}

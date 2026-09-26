@@ -417,7 +417,9 @@
         '<div class="sh-rank-name">' + rankName(t, lvl) + '</div>' +
         '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
         '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div></div></div>';
+        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div>' +
+        (window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
+        '</div></div>';
       if (m.bank) {
         h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
           '<div class="sh-mastery-bar"><i style="width:' + (m.pct * 100).toFixed(1) + '%"></i>' +
@@ -455,6 +457,8 @@
       var x = left[Math.floor(Math.random() * left.length)];
       return '<b>Psst.</b> ' + esc(x.clue) + ' <span class="sh-trophy-hint">Tap any trophy for more.</span>';
     }
+    sec.addEventListener("click", function(e){ if (e.target.closest(".sh-rank-rename") && window.shEditName) window.shEditName(); });
+    document.addEventListener("sh:name", function(){ render(); });
     sec.addEventListener("click", function(e){
       var b = e.target.closest("[data-trophy]"); if (!b || !profile) return;
       var tr = TROPHIES.filter(function(x){ return x.k === b.getAttribute("data-trophy"); })[0]; if (!tr) return;

@@ -134,6 +134,21 @@ button{font:inherit; color:inherit; cursor:pointer;}
 /* ================= HERO ================= */
 .greeting{font-size:17px; color:var(--ink-2); margin:44px 0 14px;}
 .greeting b{color:var(--ink); font-weight:600;}
+.greet-edit{font:inherit; font-size:13.5px; font-weight:600; margin-left:8px; padding:3px 10px 3px 8px; border-radius:99px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2); cursor:pointer; vertical-align:2px; display:inline-flex; align-items:center; gap:5px;}
+.greet-edit:hover{color:var(--ink); border-color:var(--ink-3);}
+.greet-edit svg{width:13px; height:13px;}
+.name-dlg{position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,14,18,.45);}
+.name-card{position:relative; width:100%; max-width:380px; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow-lift); padding:22px 20px 16px;}
+.name-card h3{font-family:var(--serif); font-weight:400; font-size:24px; margin:0 32px 6px 0;}
+.name-card p{margin:0 0 12px; font-size:14px; line-height:1.45; color:var(--ink-2);}
+.name-card p b{color:var(--ink);}
+.name-form{display:flex; gap:8px;}
+.name-form input{flex:1; min-width:0; font:inherit; font-size:16px; padding:9px 11px; border-radius:10px; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink);}
+.name-form input:focus{outline:2px solid var(--focus); outline-offset:1px;}
+.name-form button{flex:none; font:inherit; font-size:14px; font-weight:700; padding:0 16px; border:0; border-radius:10px; background:var(--ink); color:var(--on-ink); cursor:pointer;}
+.name-msg{min-height:16px; margin-top:6px; font-size:13px; color:var(--ink-2);}
+.name-reset{font:inherit; font-size:13px; padding:0; border:0; background:none; color:var(--ink-2); text-decoration:underline; cursor:pointer;}
+.name-hint{font-size:12.5px; color:var(--ink-3);}
 .hero{
   position:relative; overflow:hidden; border-radius:22px; background:var(--surface);
   border:1px solid var(--line); box-shadow:var(--shadow);
@@ -863,13 +878,57 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      generated name (same one the leaderboards use)
      ==================================================================== */
   var VISITOR = ls("sh_visitor_id");
-  function greet(name){
+  var PENCIL = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+  var localName = (ls("sh_display_name") || "").trim(), randomName = "", nameSb = null;
+  function greet(){
     var h = new Date().getHours();
     var part = h < 5 ? "Up late" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
-    $("greeting").innerHTML = esc(part) + (name ? ", <b>" + esc(name) + "</b>." : ".");
+    var name = localName || randomName;
+    $("greeting").innerHTML = esc(part) + (name ? ", <b>" + esc(name) + "</b>." : ".") +
+      ' <button type="button" class="greet-edit" id="greetEdit" title="Change the name classmates see on the leaderboards">' + PENCIL +
+      (localName ? "Change name" : "Pick your name") + '</button>';
   }
-  var localName = (ls("sh_display_name") || "").trim();
-  greet(localName);
+  greet();
+  $("greeting").addEventListener("click", function(e){ if (e.target.closest("#greetEdit")) openNameEditor(); });
+  function openNameEditor(){
+    if (!VISITOR){
+      VISITOR = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("v-" + Date.now() + "-" + Math.random().toString(16).slice(2));
+      lsSet("sh_visitor_id", VISITOR);
+    }
+    var d = document.createElement("div");
+    d.className = "name-dlg";
+    d.innerHTML = '<div class="name-card" role="dialog" aria-modal="true" aria-labelledby="nameH">' +
+      '<button class="survey-x" type="button" aria-label="Close">&times;</button>' +
+      '<h3 id="nameH">Your name</h3>' +
+      '<p>This is how classmates see you on the leaderboards, streak boards and ranks, in every hub.' +
+      (!localName && randomName ? ' Right now you have a random one: <b>' + esc(randomName) + '</b>.' : '') + '</p>' +
+      '<form class="name-form"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" placeholder="Pick a name" value="' + esc(localName) + '"><button type="submit">Save</button></form>' +
+      '<div class="name-msg" aria-live="polite"></div>' +
+      (localName ? '<button class="name-reset" type="button">Go back to a random name</button>' : '<div class="name-hint">Up to 24 characters. You can change it any time.</div>') +
+      '</div>';
+    document.body.appendChild(d);
+    var input = d.querySelector("input"), msg = d.querySelector(".name-msg");
+    function close(){ d.remove(); }
+    setTimeout(function(){ try{ input.focus(); input.select(); }catch(e){} }, 30);
+    d.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
+    d.addEventListener("click", function(e){
+      if (e.target === d || e.target.closest(".survey-x")) { close(); return; }
+      if (e.target.closest(".name-reset")){
+        localName = ""; try{ localStorage.removeItem("sh_display_name"); }catch(err){}
+        if (nameSb) nameSb.rpc("clear_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } }, function(){});
+        greet(); close();
+      }
+    });
+    d.querySelector("form").addEventListener("submit", function(e){
+      e.preventDefault();
+      var v = input.value.trim().slice(0, 24);
+      if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
+      if (nameSb) nameSb.rpc("set_display_name", { p_visitor:VISITOR, p_name:v }).then(function(){}, function(){});
+      localName = v; lsSet("sh_display_name", v); greet();
+      msg.textContent = "Saved. Hi, " + v + "!";
+      setTimeout(close, 700);
+    });
+  }
 
   /* ====================================================================
      SUPABASE — everything below is best-effort; the page works without it
@@ -958,8 +1017,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   if (!sb){
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
+    nameSb = sb;
     if (!localName && VISITOR){
-      sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data) greet(r.data); });
+      sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } });
     }
 
     /* your two weeks, from the server, across every live hub */

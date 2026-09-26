@@ -1,6 +1,6 @@
 -- ============================================================================
 -- study-hubs Supabase schema snapshot (project thytmzsgymydbzcqdnix)
--- Generated 2026-09-25 from the live database, after migration_v18.
+-- Generated 2026-09-25 from the live database, after migration_v19.
 --
 -- This is the full picture the migration_v*.sql files only partly cover (17 of
 -- the functions below had no source in the repo before this file). If the
@@ -1141,5 +1141,15 @@ begin
   left join sh_visitor_xp(r.visitor_id) x on true
   where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor)
   order by r.rnk, r.best desc;
+end;
+$$;
+
+-- a visitor can drop their custom name and go back to the generated one (migration_v19)
+create or replace function public.clear_display_name(p_visitor text)
+returns text language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(trim(p_visitor)) = 0 then return null; end if;
+  delete from visitor_names where visitor_id = p_visitor;
+  return anon_name(p_visitor);
 end;
 $$;
