@@ -23,7 +23,9 @@ does it differently.
   whenever a hub is archived, and add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`).
   `question-banks/` — archived hubs' banks.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
-  New migrations are run once, by hand, in the Supabase SQL editor.
+  New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
+  Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
+  refresh `supabase/schema.sql` either way.
 - `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code
   session doesn't need them: use git.
 
