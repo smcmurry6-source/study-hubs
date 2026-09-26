@@ -19,7 +19,9 @@ does it differently.
 - `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, and `widget/ranks.js`, handpiece ranks) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
-- `review/` — admin analytics page. `question-banks/` — archived hubs' banks.
+- `review/` — admin analytics page (its **Recap** tab makes the shareable end-of-hub image; offer Sam one
+  whenever a hub is archived, and add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`).
+  `question-banks/` — archived hubs' banks.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor.
 - `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code

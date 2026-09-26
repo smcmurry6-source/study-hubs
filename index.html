@@ -131,6 +131,36 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .icon-btn:hover{color:var(--ink); border-color:var(--line-2);}
 .icon-btn svg{width:18px; height:18px;}
 
+/* ================= YOUR RANK (level-up bar) ================= */
+.me-rank{display:flex; align-items:center; gap:16px; margin:0 0 18px; padding:14px 18px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow);}
+.me-rank-art{flex:none; width:64px; height:64px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.22));}
+.me-rank-art svg{width:100%; height:100%;}
+.me-rank-body{flex:1; min-width:0;}
+.me-rank-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.me-rank-name{font-family:var(--serif); font-size:24px; line-height:1.1;}
+.me-rank-xp{font-size:13.5px; color:var(--ink-2); font-variant-numeric:tabular-nums;}
+.me-rank-xp b{color:var(--ink);}
+.me-rank-bar{position:relative; height:10px; margin:9px 0 6px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden;}
+.me-rank-bar i{position:absolute; inset:0 auto 0 0; border-radius:99px; background:linear-gradient(90deg, var(--me-c1, #B08A3C), var(--me-c2, #E3C06A)); transition:width .8s cubic-bezier(.2,.8,.2,1);}
+.me-rank-next{font-size:13px; color:var(--ink-3);}
+.me-rank-next b{color:var(--ink-2); font-weight:600;}
+@media (max-width:600px){ .me-rank{gap:12px; padding:12px 14px;} .me-rank-art{width:52px; height:52px;} .me-rank-name{font-size:20px;} }
+
+/* ================= SETTINGS SHEET ================= */
+.set-card{max-width:440px; max-height:calc(100vh - 32px); overflow:auto;}
+.set-row{padding:12px 0; border-top:1px solid var(--line);}
+.set-row:first-of-type{border-top:0;}
+.set-row > label, .set-lab{display:block; font-size:13px; font-weight:700; color:var(--ink-2); margin-bottom:7px;}
+.set-seg{display:flex; flex-wrap:wrap; gap:6px;}
+.set-seg button{font:inherit; font-size:13.5px; padding:6px 12px; border-radius:99px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink); cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+.set-seg button.is-on{background:var(--ink); color:var(--on-ink); border-color:var(--ink);}
+.set-seg button:disabled{opacity:.45; cursor:default;}
+.set-seg .dot{width:12px; height:12px; border-radius:50%; flex:none; border:1px solid rgba(0,0,0,.15);}
+.set-hint{font-size:12.5px; color:var(--ink-3); margin:7px 0 0; line-height:1.4;}
+.set-name{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.set-name b{font-size:15px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.set-row input[type=range]{width:100%; margin-top:10px; accent-color:var(--ink);}
+
 /* ================= HERO ================= */
 .greeting{font-size:17px; color:var(--ink-2); margin:44px 0 14px;}
 .greeting b{color:var(--ink); font-weight:600;}
@@ -452,10 +482,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   <div class="topbar">
     <div class="wordmark"><span class="rings" aria-hidden="true"><i style="background:var(--c-gi)"></i><i style="background:var(--c-perio)"></i><i style="background:var(--c-genetics)"></i><i style="background:var(--c-pros)"></i></span>Study Hubs</div>
     <span class="live-pill" title="People with a hub open right now"><span class="live-dot"></span><span><b id="liveCount">–</b> <span class="lp-long">studying </span>now</span></span>
+    <button class="icon-btn" id="setBtn" type="button" aria-label="Settings" title="Settings"></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme"></button>
   </div>
 
   <p class="greeting" id="greeting">Welcome back.</p>
+  <section class="me-rank" id="meRank" aria-label="Your handpiece rank" hidden></section>
 
   <!-- ============ HERO: next exam + your progress ============ -->
   <section class="hero" id="hero" aria-label="Next exam">
@@ -613,13 +645,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     chev:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>',
     sun:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.6"/><path d="M10 1.8v2M10 16.2v2M1.8 10h2M16.2 10h2M4.2 4.2l1.4 1.4M14.4 14.4l1.4 1.4M4.2 15.8l1.4-1.4M14.4 5.6l1.4-1.4"/></svg>',
     moon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M16.5 12.4A7 7 0 0 1 7.6 3.5a7 7 0 1 0 8.9 8.9z"/></svg>',
+    gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     auto:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor" stroke="none"/></svg>'
   };
 
   /* ====================================================================
      THEME — system / light / dark, remembered on this device
      ==================================================================== */
-  (function(){
+  var theme = (function(){
     var btn = $("themeBtn"), order = ["auto","light","dark"];
     function current(){ var t = ls("sh_theme"); if (t === null) t = ls("sh_dash_theme"); return (t === "light" || t === "dark") ? t : "auto"; }
     function apply(t){
@@ -630,11 +663,78 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       btn.setAttribute("aria-label", label + ". Click to change."); btn.title = label;
     }
     apply(current());
-    btn.addEventListener("click", function(){
-      var next = order[(order.indexOf(current()) + 1) % order.length];
-      lsSet("sh_theme", next === "auto" ? "" : next); apply(next);
-    });
+    function set(t){ lsSet("sh_theme", t === "auto" ? "" : t); apply(t); }
+    btn.addEventListener("click", function(){ set(order[(order.indexOf(current()) + 1) % order.length]); });
+    return { current: current, set: set };
   })();
+
+  /* ====================================================================
+     SETTINGS — the same preferences the hubs' Settings panel keeps (same
+     localStorage keys), so a change here shows up in every hub
+     ==================================================================== */
+  var FONT_STACKS = { serif:"Georgia, 'Iowan Old Style', 'Times New Roman', serif", sans:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" };
+  var SIZE_ZOOM = { small:0.9, "default":1, large:1.15, xlarge:1.3, xxlarge:1.45 };
+  function applyReadingPrefs(){
+    var st = FONT_STACKS[ls("sh_pref_font")];
+    if (st) document.documentElement.style.setProperty("--sans", st); else document.documentElement.style.removeProperty("--sans");
+    document.documentElement.style.zoom = SIZE_ZOOM[ls("sh_pref_size") || "default"] || 1;
+  }
+  applyReadingPrefs();
+  var myTier = null;
+  var SETTINGS = [
+    { key:"theme", label:"Theme", opts:[["auto","Match device"],["light","Light"],["dark","Dark"]] },
+    { key:"sh_pref_font", label:"Reading font", def:"default", opts:[["default","Default"],["serif","Serif"],["sans","Sans"]] },
+    { key:"sh_pref_size", label:"Text size", def:"default", opts:[["small","Small"],["default","Default"],["large","Large"],["xlarge","X-Large"],["xxlarge","XX-Large"]] },
+    { key:"sh_pref_accent", label:"Accent colour", def:"default", accent:true, hint:"Unlocked by your handpiece rank. Changes the highlight colour in every hub." },
+    { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." },
+    { key:"sh_pref_eggs", label:"Surprises", def:"on", opts:[["on","On"],["off","Off"]], hint:"Little hidden extras around the hubs. Stuck? The trophy case in each hub's Stats has clues." },
+    { key:"sh_pref_nuke_alerts", label:"Tactical nuke alerts", def:"on", opts:[["on","On"],["off","Off"]], hint:"Turn off to skip seeing other people's strikes (yours still work)." }
+  ];
+  function settingValue(x){ return x.key === "theme" ? theme.current() : (ls(x.key) || x.def); }
+  function openSettings(){
+    var d = document.createElement("div");
+    d.className = "name-dlg";
+    function rowHTML(x){
+      var cur = settingValue(x), opts = x.opts;
+      if (x.accent){
+        var A = (window.shRanks && window.shRanks.ACCENTS) || {}, T = (window.shRanks && window.shRanks.TIERS) || [];
+        var have = myTier != null ? myTier : +(ls("sh_rank_tier") || 0);
+        opts = [["default","Hub default"]].concat(Object.keys(A).map(function(k){ return [k, (T[A[k].tier] || {}).name || k, A[k]]; }));
+        return '<div class="set-row"><span class="set-lab">' + x.label + '</span><div class="set-seg" data-set="' + x.key + '">' + opts.map(function(o){
+          var locked = o[2] && have < o[2].tier;
+          return '<button type="button" data-val="' + o[0] + '"' + (cur === o[0] ? ' class="is-on"' : '') + (locked ? ' disabled title="Reach ' + esc(o[1]) + ' to unlock"' : '') + '>' +
+            (o[2] ? '<span class="dot" style="background:' + o[2].L[0] + '"></span>' : '') + esc(o[1]) + (locked ? ' 🔒' : '') + '</button>';
+        }).join("") + '</div><p class="set-hint">' + x.hint + '</p></div>';
+      }
+      return '<div class="set-row"><span class="set-lab">' + x.label + '</span><div class="set-seg" data-set="' + x.key + '">' + opts.map(function(o){
+        return '<button type="button" data-val="' + o[0] + '"' + (cur === o[0] ? ' class="is-on"' : '') + '>' + esc(o[1]) + '</button>';
+      }).join("") + '</div>' + (x.key === "sh_pref_music" ? '<input type="range" min="0" max="100" data-vol aria-label="Music volume" value="' + esc(ls("sh_pref_volume") || "35") + '">' : '') +
+        (x.hint ? '<p class="set-hint">' + x.hint + '</p>' : '') + '</div>';
+    }
+    d.innerHTML = '<div class="name-card set-card" role="dialog" aria-modal="true" aria-labelledby="setH">' +
+      '<button class="survey-x" type="button" aria-label="Close">&times;</button>' +
+      '<h3 id="setH">Settings</h3><p>Saved on this device and used in every hub.</p>' +
+      '<div class="set-row"><span class="set-lab">Your name</span><div class="set-name"><b>' + esc(localName || randomName || "Not set") + '</b><button type="button" class="greet-edit" data-rename>' + PENCIL + (localName ? "Change" : "Pick a name") + '</button></div></div>' +
+      SETTINGS.map(rowHTML).join("") + '</div>';
+    document.body.appendChild(d);
+    var closeBtn = d.querySelector(".survey-x"); setTimeout(function(){ try{ closeBtn.focus(); }catch(e){} }, 30);
+    function close(){ d.remove(); try{ $("setBtn").focus(); }catch(e){} }
+    d.addEventListener("keydown", function(e){ if (e.key === "Escape") close(); });
+    d.addEventListener("input", function(e){ if (e.target.hasAttribute("data-vol")) lsSet("sh_pref_volume", e.target.value); });
+    d.addEventListener("click", function(e){
+      if (e.target === d || e.target.closest(".survey-x")) { close(); return; }
+      if (e.target.closest("[data-rename]")) { close(); openNameEditor(); return; }
+      var b = e.target.closest("[data-set] button"); if (!b || b.disabled) return;
+      var key = b.parentNode.getAttribute("data-set"), val = b.getAttribute("data-val");
+      if (key === "theme") theme.set(val);
+      else if (key === "sh_pref_accent") { if (val === "default") { try{ localStorage.removeItem(key); }catch(err){} } else lsSet(key, val); }
+      else lsSet(key, val);
+      if (key === "sh_pref_font" || key === "sh_pref_size") applyReadingPrefs();
+      b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
+    });
+  }
+  $("setBtn").innerHTML = ICON.gear;
+  $("setBtn").addEventListener("click", openSettings);
 
   /* ====================================================================
      PERSONAL PROGRESS — read straight from each hub's own saved state
@@ -678,25 +778,6 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     HUBS.forEach(function(h){ (h.exams || []).forEach(function(e){ var d = daysUntil(e.date); if (d >= 0) list.push({ hub:h, exam:e, d:d }); }); });
     return list.sort(function(a,b){ return a.d - b.d; });
   }
-  /* every upcoming exam as an .ics file (all-day events, reminder the morning before) */
-  function downloadIcs(){
-    var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
-    function d8(s){ return s.replace(/-/g, ""); }
-    function next(s){ var d = parseYmd(s); d.setDate(d.getDate() + 1); return ymd(d).replace(/-/g, ""); }
-    function txt(t){ return String(t).replace(/[\\,;]/g, function(c){ return "\\" + c; }); }
-    var lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Study Hubs D2 UAB//EN", "CALSCALE:GREGORIAN", "X-WR-CALNAME:D2 exams"];
-    upcomingExams().forEach(function(x){
-      var url = location.href.replace(/[#?].*$/, "").replace(/index\.html$/, "") + "hubs/" + x.hub.id + "/";
-      lines.push("BEGIN:VEVENT", "UID:" + x.hub.id + "-" + d8(x.exam.date) + "@study-hubs", "DTSTAMP:" + stamp,
-        "DTSTART;VALUE=DATE:" + d8(x.exam.date), "DTEND;VALUE=DATE:" + next(x.exam.date),
-        "SUMMARY:" + txt(x.exam.name), "DESCRIPTION:" + txt("Study hub: " + url), "URL:" + url,
-        "BEGIN:VALARM", "TRIGGER:-PT15H", "ACTION:DISPLAY", "DESCRIPTION:" + txt(x.exam.name + " tomorrow"), "END:VALARM", "END:VEVENT");
-    });
-    lines.push("END:VCALENDAR");
-    var blob = new Blob([lines.join("\r\n") + "\r\n"], { type: "text/calendar" });
-    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "d2-exams.ics";
-    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-  }
   function daysText(d){ return d === 0 ? "today" : d === 1 ? "tomorrow" : "in " + d + " days"; }
   function renderHero(){
     var up = upcomingExams(), first = up[0] || null, hub, cls;
@@ -719,7 +800,6 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         '<div class="hero-date">' + esc(longDate(first.exam.date)) + '</div>' +
         '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
         (p ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' +
-        '<button type="button" class="btn btn-quiet" id="icsBtn">' + ICON.cal + 'Add exams to my calendar</button>' +
         (opened ? '<span class="hero-note">You last opened it ' + esc(opened) + '</span>' : '') + '</div>' +
         (also.length ? '<ul class="hero-also">' + also.map(function(x){
           return '<li style="' + ringVars(CLASSES[x.hub.cls].ring) + '"><a href="hubs/' + x.hub.id + '/" data-hub="' + x.hub.id + '"><span class="also-name">' + esc(x.exam.name) + '</span><span class="also-when">' + esc(parseYmd(x.exam.date).toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })) + ' · ' + esc(daysText(x.d)) + '</span></a></li>';
@@ -734,7 +814,6 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a></div>';
     }
     $("heroMain").innerHTML = html;
-    var ib = $("icsBtn"); if (ib) ib.addEventListener("click", downloadIcs);
 
     $("heroProgLabel").textContent = "Your progress in " + (HUB_LABEL[hub.id] || "this hub");
     $("heroProg").innerHTML = p
@@ -1010,6 +1089,29 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){});
   }
 
+  /* your handpiece + a progress bar to the next level (XP comes from every hub, computed on the server) */
+  function renderMyRank(p){
+    var R = window.shRanks, el = $("meRank"); if (!R || !el) return;
+    p = p || { xp:0, tier:0, level:1, step:0, step_at:0, next_at:100 };
+    var t = p.tier || 0, lv = p.level || 1, step = p.step != null ? p.step : t * 3, xp = p.xp || 0;
+    var at = p.step_at != null ? p.step_at : 0, next = p.next_at, pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
+    var nextName = next ? R.rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : "";
+    var c = R.TIERS[t].accent;
+    el.style.setProperty("--me-c1", R.shade ? R.shade(c, -0.1) : c); el.style.setProperty("--me-c2", R.shade ? R.shade(c, 0.35) : c);
+    el.innerHTML = '<div class="me-rank-art">' + R.art(t, 64, { level: lv }) + '</div>' +
+      '<div class="me-rank-body"><div class="me-rank-top"><span class="me-rank-name">' + esc(R.rankName(t, lv)) + '</span>' +
+      '<span class="me-rank-xp"><b>' + Number(xp).toLocaleString() + '</b> XP' + (p.position ? ' · #' + p.position + ' of ' + p.of : '') + '</span></div>' +
+      '<div class="me-rank-bar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
+      '<div class="me-rank-next">' + (!xp ? 'Answer a question in any hub to start earning XP.' : next ? '<b>' + Number(next - xp).toLocaleString() + ' XP</b> to ' + esc(nextName) : 'The highest rank there is.') + '</div></div>';
+    el.hidden = false;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = el.querySelector(".me-rank-bar i"); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
+  }
+  function loadMyRank(sb){
+    if (!VISITOR){ renderMyRank(null); return; }
+    sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){
+      if (r && r.data){ myTier = r.data.tier || 0; renderMyRank(r.data); }
+    }, function(){});
+  }
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
   function startClassData(){
   var sb = null;
@@ -1018,6 +1120,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
     nameSb = sb;
+    loadMyRank(sb);
     if (!localName && VISITOR){
       sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } });
     }

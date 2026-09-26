@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="../widget/vendor/supabase-2.117.2.js"></script>
+<script src="recap.js"></script>
 <style>
 :root{
   --ink:#1B2432; --ink-2:#4A5468; --ink-3:#6E778C;
@@ -129,6 +130,18 @@ table.data tr.group:hover td{background:none;}
 .chips button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper);}
 
 .sv-form{display:grid; gap:10px;}
+.rc-wrap{display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr); gap:20px; align-items:start;}
+@media (max-width:760px){ .rc-wrap{grid-template-columns:1fr;} }
+.rc-form{display:grid; gap:12px;}
+.rc-form label{display:grid; gap:4px; font-size:13px; font-weight:600; color:var(--ink-2);}
+.rc-form label.rc-check{display:flex; align-items:center; gap:8px;}
+.rc-form input[type=text], .rc-form input[type=date], .rc-form select{font:inherit; font-size:14px; font-weight:400; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);}
+.rc-btns{display:flex; gap:8px; flex-wrap:wrap;}
+.rc-btns button{border:1px solid var(--line-strong); background:var(--card); border-radius:var(--r-pill); padding:8px 16px; font-size:14px; font-weight:600;}
+.rc-btns button.primary{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.rc-btns button:disabled{opacity:.5; cursor:default;}
+.rc-note{font-size:12.5px; color:var(--ink-3); line-height:1.45; margin:0;}
+.rc-preview canvas{display:block; width:100%; max-width:540px; height:auto; border-radius:12px; box-shadow:var(--shadow);}
 .sv-form input, .sv-form select, .sv-form textarea{font:inherit; font-size:14px; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);}
 .sv-form .sv-q{display:grid; grid-template-columns:1fr 140px; gap:8px; padding:10px; border:1px dashed var(--line); border-radius:10px;}
 .sv-form .sv-q input.sv-opts{grid-column:1 / -1;}
@@ -187,6 +200,7 @@ table.data tr.group:hover td{background:none;}
         <button role="tab" data-tab="clicks" aria-selected="false">Clicks</button>
         <button role="tab" data-tab="engagement" aria-selected="false">Engagement</button>
         <button role="tab" data-tab="surveys" aria-selected="false">Surveys</button>
+        <button role="tab" data-tab="recap" aria-selected="false">Recap</button>
         <button role="tab" data-tab="inbox" aria-selected="false">Inbox<span class="count zero" id="inboxCount">0</span></button>
       </nav>
     </div>
@@ -200,6 +214,7 @@ table.data tr.group:hover td{background:none;}
     <section class="panel" data-panel="engagement" hidden></section>
     <section class="panel" data-panel="surveys" hidden></section>
     <section class="panel" data-panel="inbox" hidden></section>
+    <section class="panel" data-panel="recap" hidden></section>
   </main>
 </div>
 
@@ -283,7 +298,7 @@ table.data tr.group:hover td{background:none;}
     return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
   }
   function loadAll(){
-    $$(".panel").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
+    $$(".panel:not([data-panel=recap])").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
     var d = state.days;
     return Promise.all([
       rpc("get_visitor_summary", { p_secret: secret, p_days: d }),
@@ -683,8 +698,90 @@ table.data tr.group:hover td{background:none;}
     c.classList.toggle("zero", n === 0);
   }
 
+  /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
+  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
+  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
+  /* archived hubs' questions live in question-banks/; live hubs publish theirs as SH_EXPORT */
+  var ARCHIVE_BANK = { hepatobiliary: "gi2-question-bank.json", "gi-exam1": "gi1-question-bank.json" };
+  var recapBanks = {};
+  function recapQuestions(hub){
+    if (recapBanks[hub]) return recapBanks[hub];
+    function norm(q){
+      var choices = q.ch || q.choices, ai = q.a != null ? q.a : q.answer;
+      return { id: q.id, type: q.type || (choices ? "mcq" : ""), text: q.q || q.stem || q.text || "",
+        choices: choices, answer: choices && typeof ai === "number" ? choices[ai] : (q.ans || ""), answerIndex: typeof ai === "number" ? ai : null };
+    }
+    recapBanks[hub] = ARCHIVE_BANK[hub]
+      ? fetch("../question-banks/" + ARCHIVE_BANK[hub]).then(function(r){ return r.json(); }).then(function(b){ return (b.questions || []).map(norm); }, function(){ return []; })
+      : new Promise(function(resolve){
+          var f = document.createElement("iframe");
+          f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
+          f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px"; f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
+          var done = function(list){ f.remove(); resolve(list); };
+          f.onload = function(){ try { done(((f.contentWindow.SH_EXPORT || {}).questions || []).map(norm)); } catch (e) { done([]); } };
+          setTimeout(function(){ if (f.isConnected) done([]); }, 15000);
+          document.body.appendChild(f);
+        });
+    return recapBanks[hub];
+  }
+  var recapCanvas = null;
+  function renderRecapPanel(){
+    var el = $('[data-panel="recap"]'); if (el.dataset.ready) return; el.dataset.ready = "1";
+    var hubs = Object.keys(HUB_TITLE);
+    el.innerHTML = card("Hub recap", "A shareable image of how the class used a hub: time, questions, the busiest day, the toughest question. Make one when a hub is archived.",
+      '<div class="rc-wrap"><form class="rc-form" id="rcForm">' +
+      '<label>Hub<select id="rcHub">' + hubs.map(function(h){ return '<option value="' + h + '"' + (h === "hepatobiliary" ? " selected" : "") + '>' + esc(hubLabel(h)) + (isArchived(h) ? " (archived)" : "") + '</option>'; }).join("") + '</select></label>' +
+      '<label>Title on the image<input type="text" id="rcTitle" maxlength="40"></label>' +
+      '<label>Exam date <input type="date" id="rcExam"></label>' +
+      '<p class="rc-note">Leave the date empty to use the last day with real study time. The chart ends on this day and "the day before the exam" uses it.</p>' +
+      '<label class="rc-check"><input type="checkbox" id="rcNames" checked> Show names in the hall of fame</label>' +
+      '<div class="rc-btns"><button type="submit" class="primary">Make recap</button><button type="button" id="rcDownload" disabled>Download PNG</button><button type="button" id="rcShare" hidden disabled>Share</button></div>' +
+      '<p class="rc-note" id="rcMsg">Names are the leaderboard names (custom or the random class name). Time before Sep 25 counts at most 3 hours per sitting, since the idle rule didn\'t exist yet.</p>' +
+      '</form><div class="rc-preview" id="rcPreview"><div class="empty">Pick a hub and press Make recap.</div></div></div>');
+    var hubSel = $("#rcHub"), title = $("#rcTitle");
+    function syncTitle(){ title.value = HUB_TITLE[hubSel.value] || hubLabel(hubSel.value); }
+    syncTitle(); hubSel.addEventListener("change", syncTitle);
+    if (navigator.canShare) $("#rcShare").hidden = false;
+    $("#rcForm").addEventListener("submit", function(e){ e.preventDefault(); makeRecap(); });
+    $("#rcDownload").addEventListener("click", function(){
+      if (!recapCanvas) return;
+      var a = document.createElement("a"); a.download = recapFileName(); a.href = recapCanvas.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove();
+    });
+    $("#rcShare").addEventListener("click", function(){
+      if (!recapCanvas) return;
+      recapCanvas.toBlob(function(b){
+        var file = new File([b], recapFileName(), { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: $("#rcTitle").value + " recap" }).catch(function(){});
+      }, "image/png");
+    });
+  }
+  function recapFileName(){ return ($("#rcTitle").value || "hub").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png"; }
+  function makeRecap(){
+    var hub = $("#rcHub").value, msg = $("#rcMsg"), prev = $("#rcPreview"), btn = $("#rcForm button[type=submit]");
+    btn.disabled = true; prev.innerHTML = '<div class="empty">Crunching the numbers…</div>';
+    var args = { p_secret: secret, p_hub: hub }; if ($("#rcExam").value) args.p_exam = $("#rcExam").value;
+    var fonts = document.fonts ? Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })).catch(function(){}) : Promise.resolve();
+    Promise.all([supabase.rpc("get_hub_recap", args), recapQuestions(hub), fonts]).then(function(res){
+      btn.disabled = false;
+      var r = res[0], bank = res[1] || [];
+      if (!r || r.error || !r.data) { prev.innerHTML = '<div class="empty">Couldn\'t load the recap' + (r && r.error ? ": " + esc(r.error.message) : "") + '.</div>'; return; }
+      var R = r.data, byId = {}; bank.forEach(function(q){ byId[q.id] = q; });
+      if (!$("#rcExam").value && R.exam_day) $("#rcExam").value = String(R.exam_day).slice(0, 10);
+      /* the toughest question to feature: the hardest multiple-choice one we have text for, else the hardest overall */
+      var tough = R.toughest || [], pick = tough.filter(function(t){ var q = byId[t.qid]; return q && q.text && q.type === "mcq" && q.answer; })[0] || tough[0];
+      if (pick) R.toughest = [pick].concat(tough.filter(function(t){ return t !== pick; }));
+      var q = pick && byId[pick.qid], question = q && q.text ? { text: q.text, answer: q.answer } : null;
+      recapCanvas = document.createElement("canvas");
+      window.shRecap.draw(recapCanvas, R, { title: $("#rcTitle").value, color: HUB_COLOR[hub], names: $("#rcNames").checked, question: question,
+        footnote: String(R.first_day) < "2026-09-25" ? "Time before Sep 25 counts at most 3 hours per sitting, so tabs left open don't inflate it." : "" });
+      recapCanvas.setAttribute("role", "img"); recapCanvas.setAttribute("aria-label", "Recap image for " + $("#rcTitle").value);
+      prev.innerHTML = ""; prev.appendChild(recapCanvas);
+      $("#rcDownload").disabled = false; $("#rcShare").disabled = false;
+    }, function(){ btn.disabled = false; prev.innerHTML = '<div class="empty">Couldn\'t reach the server. Try again.</div>'; });
+  }
+
   function renderAll(){
-    renderOverview(); renderTime(); renderQuestions(); renderClicks(); renderEngagement(); renderSurveys(); renderInbox(); updateInboxCount();
+    renderOverview(); renderTime(); renderQuestions(); renderClicks(); renderEngagement(); renderSurveys(); renderInbox(); updateInboxCount(); renderRecapPanel();
   }
 
   /* ---------- tabs & controls ---------- */
