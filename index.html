@@ -255,6 +255,44 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .section-head h2{font-family:var(--serif); font-weight:400; font-size:36px; letter-spacing:-.01em; line-height:1.1;}
 .section-head .aside{font-size:14px; color:var(--ink-3);}
 
+/* ================= HUB RECAPS (slideshow of archived hubs) ================= */
+.rcs{display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:32px; align-items:start;}
+.rcs-stage{position:relative; width:100%; height:0; border-radius:18px; overflow:hidden; background:#12161C; box-shadow:var(--shadow-lift); outline:none; touch-action:pan-y;
+  transition:height .6s cubic-bezier(.22,.8,.2,1);}
+.rcs-stage:focus-visible{box-shadow:0 0 0 3px var(--focus), var(--shadow-lift);}
+.rcs-slide{-webkit-user-drag:none; user-select:none; -webkit-user-select:none; position:absolute; inset:0 0 auto 0; width:100%; height:auto; display:block; opacity:0; transform:translateX(9%) scale(.96); pointer-events:none;
+  transition:transform .75s cubic-bezier(.22,.8,.2,1), opacity .55s ease; will-change:transform, opacity;}
+.rcs-slide.is-before{transform:translateX(-9%) scale(.96);}
+.rcs-slide.is-active{opacity:1; transform:none; pointer-events:auto;}
+.rcs-kicker{font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);}
+.rcs-title{font-family:var(--serif); font-weight:400; font-size:40px; line-height:1.05; margin:6px 0 8px;}
+.rcs-sub{font-size:15px; color:var(--ink-2); line-height:1.5; margin:0 0 18px; max-width:44ch;}
+.rcs-sub b{color:var(--ink); font-weight:600;}
+.rcs-ctrl{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.rcs-ctrl .icon-btn{width:42px; height:42px; border-radius:50%;}
+.rcs-ctrl .icon-btn svg{width:18px; height:18px;}
+.rcs-ctrl .btn{padding:10px 16px; font-size:14px;}
+.rcs-list{list-style:none; margin:22px 0 0; padding:0; display:grid; gap:6px;}
+.rcs-list button{width:100%; display:flex; align-items:center; gap:12px; text-align:left; font:inherit; font-size:14.5px; color:var(--ink-2); background:transparent; border:1px solid transparent; border-radius:12px; padding:9px 12px; cursor:pointer; position:relative; overflow:hidden;}
+.rcs-list button:hover{background:var(--surface-2);}
+.rcs-list button[aria-current="true"]{background:var(--surface); border-color:var(--line); color:var(--ink); box-shadow:var(--shadow);}
+.rcs-list .dot{width:10px; height:10px; border-radius:50%; flex:none;}
+.rcs-list .when{margin-left:auto; font-size:13px; color:var(--ink-3);}
+.rcs-list .bar{position:absolute; left:0; bottom:0; height:2px; width:0; background:var(--ink-3); opacity:.55;}
+.rcs-list button[aria-current="true"] .bar{animation:rcsTimer var(--rcs-ms, 8000ms) linear forwards;}
+.rcs.is-paused .rcs-list .bar{animation-play-state:paused;}
+@keyframes rcsTimer{from{width:0}to{width:100%}}
+@media (prefers-reduced-motion: reduce){
+  .rcs-slide{transform:none !important; transition:opacity .25s linear;}
+  .rcs-stage{transition:none;}
+  .rcs-list button[aria-current="true"] .bar{animation:none;}
+}
+@media (max-width:760px){
+  .rcs{grid-template-columns:1fr; gap:18px;}
+  .rcs-stage{max-width:440px; margin:0 auto;}
+  .rcs-title{font-size:32px;}
+}
+
 /* ================= CLASSES / HUB CARDS ================= */
 .class-group{padding-top:4px;}
 .class-head{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
@@ -512,6 +550,28 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     </div>
     <div id="terms"></div>
     <noscript><p><a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
+  </section>
+
+  <!-- ============ HUB RECAPS: archived hubs, as a slideshow ============ -->
+  <section class="section" id="recaps" aria-labelledby="recapsHead" hidden>
+    <div class="section-head">
+      <h2 id="recapsHead">Hub recaps</h2>
+      <span class="aside">How the class used each hub, after the exam</span>
+    </div>
+    <div class="rcs" id="rcs">
+      <div class="rcs-stage" id="rcsStage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Hub recaps. Use the arrow keys to switch."></div>
+      <div class="rcs-side">
+        <div class="rcs-kicker" id="rcsCount"></div>
+        <h3 class="rcs-title" id="rcsTitle"></h3>
+        <p class="rcs-sub" id="rcsSub" aria-live="polite"></p>
+        <div class="rcs-ctrl">
+          <button class="icon-btn" id="rcsPrev" type="button" aria-label="Previous recap"></button>
+          <button class="icon-btn" id="rcsNext" type="button" aria-label="Next recap"></button>
+          <a class="btn btn-quiet" id="rcsSave" download>Save image</a>
+        </div>
+        <ul class="rcs-list" id="rcsList"></ul>
+      </div>
+    </div>
   </section>
 
   <!-- ============ CLASS ACTIVITY ============ -->
@@ -1089,6 +1149,109 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){});
   }
 
+  /* ====================================================================
+     HUB RECAPS — archived hubs' recap images (published from the admin
+     page), drawn with widget/recap.js and played as a slideshow
+     ==================================================================== */
+  function loadScriptOnce(src){
+    return new Promise(function(resolve, reject){
+      if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+      var s = document.createElement("script"); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+    });
+  }
+  function loadRecaps(sb){
+    sb.rpc("get_published_recaps").then(function(res){
+      var rows = (res && res.data) || [];
+      if (!rows.length) return;
+      if (!document.getElementById("recapFonts")) {
+        var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet";
+        l.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@500;600;700&display=swap";
+        document.head.appendChild(l);
+      }
+      var fonts = function(){ return document.fonts ? Promise.race([
+        Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })),
+        new Promise(function(r){ setTimeout(r, 2500); })]).catch(function(){}) : Promise.resolve(); };
+      loadScriptOnce("widget/recap.js").then(fonts).then(function(){ startRecapShow(rows); }, function(){});
+    }, function(){});
+  }
+  function startRecapShow(rows){
+    var R = window.shRecap; if (!R) return;
+    var stage = $("rcsStage"), list = $("rcsList"), wrap = $("rcs"), ms = 8000, cur = -1, paused = 0, hidden = false;
+    var reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var slides = rows.map(function(row, i){
+      var c = document.createElement("canvas");
+      R.draw(c, row.data, { title: row.title, color: row.color, names: row.names, question: row.question, footnote: row.footnote });
+      var img = new Image(), d = row.data || {};
+      img.className = "rcs-slide"; img.decoding = "async"; img.draggable = false;
+      img.alt = row.title + " recap: " + Math.round((d.minutes || 0) / 60).toLocaleString() + " hours studied by " + (d.people || 0) + " classmates, " +
+        Number(d.answers || 0).toLocaleString() + " questions answered, " + (d.answers ? Math.round(d.correct / d.answers * 100) : 0) + "% correct.";
+      img.src = c.toDataURL("image/png");
+      img.dataset.ratio = c.height / c.width;
+      img.setAttribute("aria-hidden", "true");
+      stage.appendChild(img);
+      return { row: row, img: img };
+    });
+    $("rcsPrev").innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg>';
+    $("rcsNext").innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5L10.5 8 6 12.5"/></svg>';
+    list.innerHTML = slides.map(function(s, i){
+      var d = s.row.data || {};
+      return '<li><button type="button" data-rc="' + i + '"><span class="dot" style="background:' + esc(s.row.color || "#999") + '"></span>' + esc(s.row.title) +
+        '<span class="when">' + (d.exam_day ? esc(parseYmd(String(d.exam_day).slice(0, 10)).toLocaleDateString(undefined, { month:"short", day:"numeric" })) : "") + '</span><span class="bar"></span></button></li>';
+    }).join("");
+    wrap.style.setProperty("--rcs-ms", ms + "ms");
+    var single = slides.length < 2;
+    $("rcsPrev").hidden = $("rcsNext").hidden = single; list.hidden = single;
+    function fit(){ var s = slides[cur]; if (s) stage.style.height = Math.round(stage.clientWidth * +s.img.dataset.ratio) + "px"; }
+    function go(i, dir){
+      i = (i + slides.length) % slides.length; if (i === cur) return;
+      var prev = slides[cur], next = slides[i];
+      if (dir === undefined) dir = i > cur ? 1 : -1;
+      /* park the incoming slide on the side it enters from, then let both transition */
+      next.img.classList.remove("is-before", "is-active");
+      if (dir < 0) next.img.classList.add("is-before");
+      void next.img.offsetWidth;
+      if (prev) { prev.img.classList.remove("is-active"); prev.img.classList.toggle("is-before", dir > 0); prev.img.setAttribute("aria-hidden", "true"); }
+      next.img.classList.remove("is-before"); next.img.classList.add("is-active"); next.img.removeAttribute("aria-hidden");
+      cur = i; fit();
+      var d = next.row.data || {}, acc = d.answers ? Math.round(d.correct / d.answers * 100) : 0;
+      $("rcsCount").textContent = single ? "Archived hub" : "Recap " + (i + 1) + " of " + slides.length;
+      $("rcsTitle").textContent = next.row.title;
+      $("rcsSub").innerHTML = '<b>' + Math.round((d.minutes || 0) / 60).toLocaleString() + ' hours</b> studied by <b>' + (d.people || 0) + ' classmates</b>, ' +
+        '<b>' + Number(d.answers || 0).toLocaleString() + '</b> questions answered at <b>' + acc + '%</b>.' +
+        (d.exam_day ? ' Exam ' + esc(parseYmd(String(d.exam_day).slice(0, 10)).toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric" })) + '.' : '');
+      var save = $("rcsSave"); save.href = next.img.src; save.setAttribute("download", next.row.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png");
+      list.querySelectorAll("[data-rc]").forEach(function(b){
+        var on = +b.getAttribute("data-rc") === i; b.setAttribute("aria-current", on ? "true" : "false");
+        var bar = b.querySelector(".bar"); bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = "";
+      });
+      if (reduced && !single) restartTimer();
+    }
+    /* autoplay: the active list item's bar animates for 8 s; when it finishes, advance. Hover, focus or a hidden tab pause it. */
+    var rmTimer = null;
+    function restartTimer(){ clearTimeout(rmTimer); if (!paused && !hidden) rmTimer = setTimeout(function(){ go(cur + 1, 1); }, ms); }
+    list.addEventListener("animationend", function(e){ if (e.animationName === "rcsTimer" && !reduced) go(cur + 1, 1); });
+    function setPaused(){ wrap.classList.toggle("is-paused", paused > 0 || hidden); if (reduced) { if (paused || hidden) clearTimeout(rmTimer); else restartTimer(); } }
+    wrap.addEventListener("mouseenter", function(){ paused++; setPaused(); });
+    wrap.addEventListener("mouseleave", function(){ paused = Math.max(0, paused - 1); setPaused(); });
+    wrap.addEventListener("focusin", function(){ paused++; setPaused(); });
+    wrap.addEventListener("focusout", function(){ paused = Math.max(0, paused - 1); setPaused(); });
+    document.addEventListener("visibilitychange", function(){ hidden = document.hidden; setPaused(); });
+    $("rcsPrev").addEventListener("click", function(){ go(cur - 1, -1); });
+    $("rcsNext").addEventListener("click", function(){ go(cur + 1, 1); });
+    list.addEventListener("click", function(e){ var b = e.target.closest("[data-rc]"); if (b) go(+b.getAttribute("data-rc")); });
+    stage.addEventListener("keydown", function(e){
+      if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1, 1); } else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1, -1); }
+    });
+    /* swipe on phones */
+    var sx = null;
+    stage.addEventListener("pointerdown", function(e){ sx = e.clientX; });
+    stage.addEventListener("pointerup", function(e){ if (sx === null || single) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
+    window.addEventListener("resize", fit);
+    $("recaps").hidden = false;
+    go(0, 1);
+    if (single) wrap.classList.add("is-paused");
+  }
+
   /* your handpiece + a progress bar to the next level (XP comes from every hub, computed on the server) */
   function renderMyRank(p){
     var R = window.shRanks, el = $("meRank"); if (!R || !el) return;
@@ -1121,6 +1284,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   } else {
     nameSb = sb;
     loadMyRank(sb);
+    loadRecaps(sb);
     if (!localName && VISITOR){
       sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } });
     }
