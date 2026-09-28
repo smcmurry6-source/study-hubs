@@ -193,5 +193,17 @@
     var h = hex.replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&");
     var n = parseInt(h, 16); return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")";
   }
-  window.shRecap = { draw: draw, W: W, H: H };
+  /* what the dashboard keeps of a recap: only the fields draw() reads, and no names when they're turned off */
+  function snapshot(R, names){
+    var pick = function(o, keys){ var x = {}; keys.forEach(function(k){ if (o && o[k] !== undefined) x[k] = o[k]; }); return x; };
+    var S = pick(R, ["hub", "first_day", "last_day", "exam_day", "minutes", "people", "answers", "correct", "by_day", "by_hour",
+      "after_midnight", "night_before", "night_before_people", "regulars"]);
+    S.toughest = (R.toughest || []).slice(0, 1);
+    S.top_answers = (R.top_answers || []).slice(0, 1).map(function(t){ return pick(t, names ? ["name", "answers"] : ["answers"]); });
+    S.best_run = R.best_run ? pick(R.best_run, names ? ["name", "len"] : ["len"]) : null;
+    S.awards = {};
+    Object.keys(R.awards || {}).forEach(function(k){ var a = R.awards[k]; if (a) S.awards[k] = pick(a, (names ? ["name"] : []).concat(["minutes", "correct", "total"])); });
+    return S;
+  }
+  window.shRecap = { draw: draw, snapshot: snapshot, W: W, H: H };
 })();

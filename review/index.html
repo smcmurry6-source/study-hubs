@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="../widget/vendor/supabase-2.117.2.js"></script>
-<script src="recap.js"></script>
+<script src="../widget/recap.js"></script>
 <style>
 :root{
   --ink:#1B2432; --ink-2:#4A5468; --ink-3:#6E778C;
@@ -140,6 +140,7 @@ table.data tr.group:hover td{background:none;}
 .rc-btns button{border:1px solid var(--line-strong); background:var(--card); border-radius:var(--r-pill); padding:8px 16px; font-size:14px; font-weight:600;}
 .rc-btns button.primary{background:var(--ink); color:var(--paper); border-color:var(--ink);}
 .rc-btns button:disabled{opacity:.5; cursor:default;}
+.rc-pub{display:grid; gap:8px; padding-top:12px; border-top:1px solid var(--line);}
 .rc-note{font-size:12.5px; color:var(--ink-3); line-height:1.45; margin:0;}
 .rc-preview canvas{display:block; width:100%; max-width:540px; height:auto; border-radius:12px; box-shadow:var(--shadow);}
 .sv-form input, .sv-form select, .sv-form textarea{font:inherit; font-size:14px; padding:7px 10px; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink);}
@@ -724,7 +725,18 @@ table.data tr.group:hover td{background:none;}
         });
     return recapBanks[hub];
   }
-  var recapCanvas = null;
+  var recapCanvas = null, recapBuilt = null, published = {};
+  function loadPublished(){
+    return supabase.rpc("get_published_recaps").then(function(r){ published = {}; ((r && r.data) || []).forEach(function(x){ published[x.hub] = x; }); syncPublishUI(); }, function(){});
+  }
+  function syncPublishUI(){
+    var hub = $("#rcHub") && $("#rcHub").value, p = published[hub], msg = $("#rcPubMsg"); if (!msg) return;
+    $("#rcUnpublish").hidden = !p;
+    $("#rcPublish").textContent = p ? "Update on dashboard" : "Publish to dashboard";
+    $("#rcPublish").disabled = !(recapBuilt && recapBuilt.hub === hub);
+    msg.textContent = p ? "On the dashboard since " + fmtDate(p.published_at) + (p.names ? "" : " (names hidden)") + ". Publishing again replaces it with what's in the preview."
+      : "Published recaps play as a slideshow on the dashboard. Publish once a hub is archived: the numbers are saved as they are when you publish (publish again to refresh them).";
+  }
   function renderRecapPanel(){
     var el = $('[data-panel="recap"]'); if (el.dataset.ready) return; el.dataset.ready = "1";
     var hubs = Object.keys(HUB_TITLE);
@@ -736,11 +748,27 @@ table.data tr.group:hover td{background:none;}
       '<p class="rc-note">Leave the date empty to use the last day with real study time. The chart ends on this day and "the day before the exam" uses it.</p>' +
       '<label class="rc-check"><input type="checkbox" id="rcNames" checked> Show names on the awards</label>' +
       '<div class="rc-btns"><button type="submit" class="primary">Make recap</button><button type="button" id="rcDownload" disabled>Download PNG</button><button type="button" id="rcShare" hidden disabled>Share</button></div>' +
+      '<div class="rc-pub"><div class="rc-btns"><button type="button" id="rcPublish" disabled>Publish to dashboard</button><button type="button" id="rcUnpublish" hidden>Remove from dashboard</button></div>' +
+      '<p class="rc-note" id="rcPubMsg">Published recaps play as a slideshow on the dashboard. Publish once a hub is archived: the numbers are saved as they are when you publish (publish again to refresh them).</p></div>' +
       '<p class="rc-note" id="rcMsg">Awards: most questions answered, longest correct streak, most time in the lecture notes, most time in the arcade and the best mock score (mocks of 20+ questions, saved from Sep 28 on). An award only shows when there is data for it. Names are the leaderboard names (custom or the random class name). Time before Sep 25 counts at most 3 hours per sitting, since the idle rule didn\'t exist yet.</p>' +
       '</form><div class="rc-preview" id="rcPreview"><div class="empty">Pick a hub and press Make recap.</div></div></div>');
     var hubSel = $("#rcHub"), title = $("#rcTitle");
     function syncTitle(){ title.value = HUB_TITLE[hubSel.value] || hubLabel(hubSel.value); }
-    syncTitle(); hubSel.addEventListener("change", syncTitle);
+    syncTitle(); hubSel.addEventListener("change", function(){ syncTitle(); syncPublishUI(); });
+    loadPublished();
+    $("#rcPublish").addEventListener("click", function(){
+      if (!recapBuilt) return;
+      var b = recapBuilt, btn = $("#rcPublish"); btn.disabled = true; $("#rcPubMsg").textContent = "Publishing…";
+      supabase.rpc("admin_publish_recap", { p_secret: secret, p_hub: b.hub, p_title: b.title, p_color: b.color, p_data: window.shRecap.snapshot(b.R, b.names),
+        p_question: b.question, p_names: b.names, p_footnote: b.footnote }).then(function(r){
+        if (r && r.error) { $("#rcPubMsg").textContent = "Couldn't publish: " + r.error.message; btn.disabled = false; return; }
+        loadPublished();
+      }, function(){ $("#rcPubMsg").textContent = "Couldn't reach the server. Try again."; btn.disabled = false; });
+    });
+    $("#rcUnpublish").addEventListener("click", function(){
+      var hub = $("#rcHub").value; if (!confirm("Take the " + ($("#rcTitle").value || hub) + " recap off the dashboard?")) return;
+      supabase.rpc("admin_unpublish_recap", { p_secret: secret, p_hub: hub }).then(function(){ loadPublished(); }, function(){});
+    });
     if (navigator.canShare) $("#rcShare").hidden = false;
     $("#rcForm").addEventListener("submit", function(e){ e.preventDefault(); makeRecap(); });
     $("#rcDownload").addEventListener("click", function(){
@@ -772,11 +800,12 @@ table.data tr.group:hover td{background:none;}
       if (pick) R.toughest = [pick].concat(tough.filter(function(t){ return t !== pick; }));
       var q = pick && byId[pick.qid], question = q && q.text ? { text: q.text, answer: q.answer } : null;
       recapCanvas = document.createElement("canvas");
-      window.shRecap.draw(recapCanvas, R, { title: $("#rcTitle").value, color: HUB_COLOR[hub], names: $("#rcNames").checked, question: question,
-        footnote: String(R.first_day) < "2026-09-25" ? "Time before Sep 25 counts at most 3 hours per sitting, so tabs left open don't inflate it." : "" });
+      var footnote = String(R.first_day) < "2026-09-25" ? "Time before Sep 25 counts at most 3 hours per sitting, so tabs left open don't inflate it." : "";
+      recapBuilt = { hub: hub, R: R, title: $("#rcTitle").value, color: HUB_COLOR[hub], names: $("#rcNames").checked, question: question, footnote: footnote };
+      window.shRecap.draw(recapCanvas, R, { title: recapBuilt.title, color: recapBuilt.color, names: recapBuilt.names, question: question, footnote: footnote });
       recapCanvas.setAttribute("role", "img"); recapCanvas.setAttribute("aria-label", "Recap image for " + $("#rcTitle").value);
       prev.innerHTML = ""; prev.appendChild(recapCanvas);
-      $("#rcDownload").disabled = false; $("#rcShare").disabled = false;
+      $("#rcDownload").disabled = false; $("#rcShare").disabled = false; syncPublishUI();
     }, function(){ btn.disabled = false; prev.innerHTML = '<div class="empty">Couldn\'t reach the server. Try again.</div>'; });
   }
 
