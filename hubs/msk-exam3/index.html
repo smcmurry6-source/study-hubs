@@ -664,7 +664,8 @@ var ICON_PATHS = {
   shrink:   '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
   cards:    '<rect x="3.5" y="5" width="8" height="12" rx="1.5"/><rect x="12.5" y="7" width="8" height="12" rx="1.5"/>',
   star:     '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="currentColor"/>',
-  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  bolt:     '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>'
 };
 function icon(name, cls){
   var p = ICON_PATHS[name]; if(!p) return '';
@@ -2458,14 +2459,6 @@ function mindMapFor(lec){
    =================================================================== */
 var WEAK_DRILL = null;
 function renderWeak(body){
-  if(WEAK_DRILL === 'due'){
-    var due = (window.shSrsDue ? window.shSrsDue() : []).map(function(id){ return QUESTIONS_BY_ID[id]; }).filter(Boolean).slice(0, 30);
-    body.innerHTML = '<div class="qfilters" style="padding:4px 0"><button type="button" class="btn" id="weakBack">'+icon('back')+'Weak spots</button><span class="pill">Due today · '+due.length+'</span></div>' +
-      (due.length ? '<div class="qlist" id="weakList">' + due.map(function(q){ return qCardHTML(q, { ctx:'due' }); }).join('') + '</div>' : '<div class="rv-empty">Nothing is due. Questions come back here a day after you miss them, and at growing gaps once you get them right.</div>');
-    var dl = document.getElementById('weakList'); if(dl) wireQuestionContainer(dl);
-    document.getElementById('weakBack').onclick = function(){ WEAK_DRILL = null; renderWeak(body); window.scrollTo(0,0); };
-    return;
-  }
   if(WEAK_DRILL){
     var lecs = WEAK_DRILL === 'all' ? LECTURES.map(function(l){ return l.id; }) : [WEAK_DRILL];
     var missed = [], fresh = [];
@@ -2492,8 +2485,7 @@ function renderWeak(body){
       (r.pct !== null ? '<span class="weak-meter"><i style="width:'+r.pct+'%"></i></span>' : '') + '</div><button type="button" class="btn'+(r.missed ? ' primary' : '')+'" data-drill="'+r.l.id+'">Drill</button></div>';
   }
   body.innerHTML = '<div class="reading" style="max-width:860px"><h2>Weak spots</h2><p>Lectures ranked by your accuracy on this device (3+ answers needed). Drill a lecture to get the questions you missed last time, then the ones you haven\'t tried.</p>' +
-    (function(){ var nd = window.shSrsDue ? window.shSrsDue().filter(function(id){ return QUESTIONS_BY_ID[id]; }).length : 0;
-      return (nd || totalMissed) ? '<div class="reading-actions" style="margin:6px 0 14px">' + (nd ? '<button type="button" class="btn primary" data-drill="due">Due today ('+nd+')</button>' : '') + (totalMissed ? '<button type="button" class="btn'+(nd ? '' : ' primary')+'" data-drill="all">Drill everything I missed ('+totalMissed+')</button>' : '') + '</div>' : ''; })() +
+    '<div class="reading-actions" style="margin:6px 0 14px"><button type="button" class="btn primary" data-sh-drill="weak">'+icon('bolt')+'Daily drill</button>' + (totalMissed ? '<button type="button" class="btn" data-drill="all">Drill everything I missed ('+totalMissed+')</button>' : '') + '</div>' +
     (started.length ? '<div class="weak-list">' + started.map(row).join('') + '</div>' : '<p class="rv-empty">Answer a few questions in the bank or mock exam and your weak spots show up here.</p>') +
     (notYet.length ? '<h3 style="margin-top:22px">Not started yet</h3><div class="weak-list">' + notYet.map(row).join('') + '</div>' : '') + '</div>';
   body.querySelectorAll('[data-drill]').forEach(function(b){ b.onclick = function(){ WEAK_DRILL = b.getAttribute('data-drill'); renderWeak(body); window.scrollTo(0,0); }; });
@@ -4015,6 +4007,16 @@ window.SH_GOTO = function(g){
     shFlashIn(function(){ var a = document.querySelector('#compBody .hint-group [data-lec="' + g.lec + '"]'); return a && a.closest('.hint-group'); }); }
   else if(g.v === 'review'){ reviewSearch = g.q || ''; setMode('review'); }
   else if(g.v === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'all'; bankSearch = g.q || ''; bankShown = BANK_PAGE; saveState(); setMode('compendium'); }
+};
+
+/* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
+   draw each card, so answers go through recordAnswer like anywhere else. */
+var DRILL_HY = { quiz:'on the class quiz', 'lecture-quiz':'a self-check slide in the lecture', slido:'asked in class on Slido' };
+window.SH_DRILL = {
+  pool: function(){
+    return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
+  },
+  render: function(el, qid){ var q = QUESTIONS_BY_ID[qid]; if(!q) return false; el.innerHTML = qCardHTML(q, { ctx:'drill' }); wireQuestionContainer(el); return true; }
 };
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
