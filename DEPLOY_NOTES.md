@@ -63,6 +63,13 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-28 (recap awards + saved mock scores, Claude Code)** — The Recap image gains an **Awards** panel: Question
+  machine (most answers), Unbreakable (longest correct streak), Bookworm (most time in lecture notes: sections ending in
+  `notes`/`lecture-notes`), Arcade champion (most time in `arcade/*`) and Mock exam ace (best score on a 20+ question mock,
+  up to the exam day). Each only shows when the data exists; the image height grows with the number of awards
+  (~1,970 px with all five). New `mock_scores` table + public `record_mock_score` (validated, one per person per hub per
+  minute), called from `widget/ranks.js` on `sh:mock-done`, so mock scores are saved from 2026-09-28 on (none before).
+  `migration_v21.sql` (applied via the connector) also replaces `get_hub_recap` to return `awards` and `mocks_taken`.
 - **2026-09-26 (hub recap, dashboard rank + settings, Claude Code)** — **Recap tab** on `review/`: pick a hub (live or
   archived) and it draws a 1080x1640 shareable image (`review/recap.js`, canvas; Download PNG, or Share on phones) with
   hours studied, classmates, answers, class accuracy, hours per day up to the exam, the day before the exam, peak hour,
