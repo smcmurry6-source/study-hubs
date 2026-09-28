@@ -1,7 +1,7 @@
 /* ============ DAILY DRILL (loaded by widget/v3.js) ============
    A short set of questions each day, per hub, so what you've studied doesn't fade:
      1. questions due for spaced review (sh_srs_<hub>, kept by v3.js: a miss comes back the next
-        day, a right answer after 1, 3, 7, 14, then 30 days), up to 6 of the 10;
+        day, a right answer after 1, 2, 4, then 7 days, never after the day before the exam), up to 6 of the 10;
      2. questions you missed before spaced review existed (your latest try on this device was wrong),
         up to 8 of the 10 together with (1);
      3. high-yield questions from lectures you've already studied: the ones the class gets wrong
@@ -168,7 +168,7 @@
       '<h2 id="shd-title">Today\'s drill</h2>' +
       '<p class="shd-lead">' + items.length + (items.length === 1 ? ' question' : ' questions') + ', about ' + Math.max(2, Math.round(items.length * .6)) + ' minutes' + (sc ? ' · ' + esc(sc) : '') + '</p>' +
       '<ul class="shd-mix">' + rows + '</ul>' +
-      '<p class="shd-how">Miss one and it comes back tomorrow. Get it right and it comes back after longer and longer gaps (1, 3, 7, 14, then 30 days), so what you studied stays fresh. A new set is picked every day.</p>' +
+      '<p class="shd-how">Miss one and it comes back tomorrow. Get it right and it comes back after 1, 2, 4, then 7 days, and never later than the day before the exam, so what you studied stays fresh. A new set is picked every day.</p>' +
       '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="start">Start</button></div>' +
       streakLine(false);
   }
@@ -220,7 +220,7 @@
       '<h2 id="shd-title">' + (extra ? 'Extra set done' : 'Drill done for today') + '</h2>' +
       '<p class="shd-lead">' + (right + wrong ? right + ' of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
       '<p class="shd-how">' + (wrong ? (wrong === 1 ? 'The one you missed comes back tomorrow. ' : 'The ' + wrong + ' you missed come back tomorrow. ') : '') +
-        (right ? 'The ones you got right come back in a few days, a little later each time.' : '') + '</p>' +
+        (right ? 'The ones you got right come back in a day or two, a little later each time, and before the exam.' : '') + '</p>' +
       streakLine(true) +
       '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="more">' + SIZE + ' more</button>' +
       '<button type="button" class="shd-btn" data-shd="close">Close</button></div>' +

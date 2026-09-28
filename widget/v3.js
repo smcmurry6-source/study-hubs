@@ -541,19 +541,50 @@
   function currentName(){
     try { return (localStorage.getItem(SH_NAME_KEY) || "").trim(); } catch (e) { return ""; }
   }
-  /* ---------- spaced review (feeds the Daily Drill, widget/drill.js): a missed question comes back
-     tomorrow; a correct one comes back after 1, 3, 7, 14, then 30 days. Stored per hub on this device. ---------- */
-  var SRS_KEY = "sh_srs_" + HUB, SRS_STEPS = [1, 3, 7, 14, 30];
+  /* ---------- spaced review (feeds the Daily Drill, widget/drill.js). Hubs are live for about a week
+     before their exam, so the gaps are short: a missed question comes back tomorrow; a right one after
+     1, 2, 4, then 7 days, and never later than the day before the hub's next exam (SH_EXPORT.exams).
+     Only the first right answer of the day moves a question along, so answering it twice in one sitting
+     doesn't push it out. Stored per hub on this device: { qid: { b: right answers in a row, due, t: last day } } ---------- */
+  var SRS_KEY = "sh_srs_" + HUB, SRS_STEPS = [1, 2, 4, 7];
   function srsDay(offset){ var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + (offset || 0)); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
   function srsLoad(){ try { return JSON.parse(localStorage.getItem(SRS_KEY) || "{}") || {}; } catch (e) { return {}; } }
+  /* the day before the next exam still ahead (from tomorrow on), or "" */
+  function srsExamEve(){
+    var ex = (window.SH_EXPORT && window.SH_EXPORT.exams) || [], tomorrow = srsDay(1), eve = "";
+    ex.forEach(function(x){
+      var p = String((x && x.date) || "").split("-").map(Number); if (p.length !== 3 || !p[0]) return;
+      var d = new Date(p[0], p[1] - 1, p[2] - 1), e = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+      if (e >= tomorrow && (!eve || e < eve)) eve = e;
+    });
+    return eve;
+  }
+  function srsDue(b){ var due = srsDay(b ? SRS_STEPS[b - 1] : 1), eve = srsExamEve(); return eve && due > eve ? eve : due; }
   function srsRecord(qid, correct){
     if (!qid) return;
-    var all = srsLoad(), r = all[qid] || { b: 0 };
-    if (correct) { r.b = Math.min(r.b + 1, SRS_STEPS.length); r.due = srsDay(SRS_STEPS[r.b - 1]); }
-    else { r.b = 0; r.due = srsDay(1); }
+    var all = srsLoad(), r = all[qid] || { b: 0 }, today = srsDay(0);
+    if (correct) {
+      if (r.t === today && r.b) return;
+      r.b = Math.min(r.b + 1, SRS_STEPS.length);
+    } else r.b = 0;
+    r.due = srsDue(r.b); r.t = today;
     all[qid] = r;
     try { localStorage.setItem(SRS_KEY, JSON.stringify(all)); } catch (e) {}
   }
+  /* once per hub: pull in reviews scheduled under the old 1/3/7/14/30-day gaps */
+  (function(){
+    try {
+      if (localStorage.getItem(SRS_KEY + "_v") === "2") return;
+      var all = srsLoad();
+      Object.keys(all).forEach(function(k){
+        var r = all[k]; if (!r) return;
+        r.b = Math.min(r.b || 0, SRS_STEPS.length);
+        var max = srsDue(r.b); if (r.due && r.due > max) r.due = max;
+      });
+      localStorage.setItem(SRS_KEY, JSON.stringify(all));
+      localStorage.setItem(SRS_KEY + "_v", "2");
+    } catch (e) {}
+  })();
   /* question ids due today or earlier, most-overdue first */
   window.shSrsDue = function(){
     var all = srsLoad(), today = srsDay(0);
