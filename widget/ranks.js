@@ -501,6 +501,7 @@
     });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
+      if (d.total > 0) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
       if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(load, 800); });
     });
 

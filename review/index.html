@@ -734,9 +734,9 @@ table.data tr.group:hover td{background:none;}
       '<label>Title on the image<input type="text" id="rcTitle" maxlength="40"></label>' +
       '<label>Exam date <input type="date" id="rcExam"></label>' +
       '<p class="rc-note">Leave the date empty to use the last day with real study time. The chart ends on this day and "the day before the exam" uses it.</p>' +
-      '<label class="rc-check"><input type="checkbox" id="rcNames" checked> Show names in the hall of fame</label>' +
+      '<label class="rc-check"><input type="checkbox" id="rcNames" checked> Show names on the awards</label>' +
       '<div class="rc-btns"><button type="submit" class="primary">Make recap</button><button type="button" id="rcDownload" disabled>Download PNG</button><button type="button" id="rcShare" hidden disabled>Share</button></div>' +
-      '<p class="rc-note" id="rcMsg">Names are the leaderboard names (custom or the random class name). Time before Sep 25 counts at most 3 hours per sitting, since the idle rule didn\'t exist yet.</p>' +
+      '<p class="rc-note" id="rcMsg">Awards: most questions answered, longest correct streak, most time in the lecture notes, most time in the arcade and the best mock score (mocks of 20+ questions, saved from Sep 28 on). An award only shows when there is data for it. Names are the leaderboard names (custom or the random class name). Time before Sep 25 counts at most 3 hours per sitting, since the idle rule didn\'t exist yet.</p>' +
       '</form><div class="rc-preview" id="rcPreview"><div class="empty">Pick a hub and press Make recap.</div></div></div>');
     var hubSel = $("#rcHub"), title = $("#rcTitle");
     function syncTitle(){ title.value = HUB_TITLE[hubSel.value] || hubLabel(hubSel.value); }

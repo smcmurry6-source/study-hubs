@@ -1,9 +1,9 @@
-/* Hub recap image: draws a 1080x1640 shareable summary of how the class used a hub onto a canvas.
+/* Hub recap image: draws a 1080-wide (about 1900 tall) shareable summary of how the class used a hub onto a canvas.
    window.shRecap.draw(canvas, recap, opts) -- recap is get_hub_recap's jsonb; opts:
    { title, subtitle, color, names (bool), question: {text, answer, wrong} for the toughest question,
      sectionLabel(id) -> friendly name }. Pure drawing, no network. */
 (function(){
-  var W = 1080, H = 1640, PAD = 72;
+  var W = 1080, H = 1640, PAD = 72, TOP_H = 1236;
   var INK = "#F3F1EC", INK2 = "#B9BDC4", INK3 = "#858B95", BG = "#12161C", PANEL = "#1B2029", LINE = "#2A303B";
   var SERIF = "'Fraunces', Georgia, serif", SANS = "'Work Sans', -apple-system, 'Segoe UI', sans-serif";
 
@@ -53,6 +53,8 @@
   function draw(canvas, R, o){
     o = o || {};
     var accent = o.color || "#DDAE52";
+    var awards = awardList(R), AWARD_ROW = 104, awardsH = awards.length ? 78 + Math.ceil(awards.length / 2) * AWARD_ROW : 0;
+    H = TOP_H + 226 + 20 + (awards.length ? awardsH + 20 : 0) + 76;
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext("2d");
     ctx.textBaseline = "alphabetic";
@@ -135,46 +137,57 @@
     });
     y += Math.ceil(Math.min(4, facts.length) / 2) * (fh + gap) + 4;
 
-    /* bottom row: the toughest question + hall of fame */
-    var bh = H - y - 96, qw = Math.round((W - PAD * 2 - gap) * 0.56), hw = W - PAD * 2 - gap - qw;
-    var tq = (R.toughest || [])[0], q = o.question;
-    panel(ctx, PAD, y, qw, bh);
+    /* the toughest question, full width */
+    var tq = (R.toughest || [])[0], q = o.question, qh = 226, qw = W - PAD * 2;
+    panel(ctx, PAD, y, qw, qh);
     eyebrow(ctx, "The one that got us", PAD + 26, y + 40);
     if (tq) {
       var pct = Math.round(tq.correct / tq.attempts * 100);
       font(ctx, 46, 700); ctx.fillStyle = accent; ctx.fillText(pct + "%", PAD + 26, y + 96);
       var pw = ctx.measureText(pct + "%").width;
       font(ctx, 21, 500); ctx.fillStyle = INK2; ctx.fillText("got it right (" + fmt(tq.correct) + " of " + fmt(tq.attempts) + ")", PAD + 36 + pw, y + 94);
-      var ly = y + 138;
+      var ly = y + 136;
       if (q && q.text) {
         font(ctx, 23, 500); ctx.fillStyle = INK;
-        var room = Math.max(1, Math.floor((bh - 150 - (q.answer ? 64 : 0)) / 31));
-        wrap(ctx, q.text, qw - 52, room).forEach(function(l){ ctx.fillText(l, PAD + 26, ly); ly += 31; });
+        wrap(ctx, q.text, qw - 52, q.answer ? 2 : 3).forEach(function(l){ ctx.fillText(l, PAD + 26, ly); ly += 31; });
         if (q.answer) {
-          ly += 10; font(ctx, 19, 700); ctx.fillStyle = INK3; ctx.fillText("ANSWER", PAD + 26, ly);
-          font(ctx, 22, 600); ctx.fillStyle = INK; ctx.fillText(wrap(ctx, q.answer, qw - 52, 1)[0], PAD + 26, ly + 30);
+          ly += 8; font(ctx, 18, 700); ctx.fillStyle = INK3; ctx.fillText("ANSWER", PAD + 26, ly);
+          var aw = ctx.measureText("ANSWER").width + 14;
+          font(ctx, 22, 600); ctx.fillStyle = INK; ctx.fillText(wrap(ctx, q.answer, qw - 52 - aw, 1)[0], PAD + 26 + aw, ly);
         }
       } else { font(ctx, 22, 500); ctx.fillStyle = INK3; ctx.fillText("Question " + tq.qid, PAD + 26, ly); }
     } else { font(ctx, 22, 500); ctx.fillStyle = INK3; ctx.fillText("Not enough answers yet.", PAD + 26, y + 96); }
+    y += qh + gap;
 
-    var hx = PAD + qw + gap;
-    panel(ctx, hx, y, hw, bh);
-    eyebrow(ctx, "Hall of fame", hx + 26, y + 40);
-    var hy = y + 84, top1 = (R.top_answers || [])[0], run = R.best_run;
-    function fame(label, name, val){
-      font(ctx, 19, 600); ctx.fillStyle = INK3; ctx.fillText(label, hx + 26, hy);
-      if (o.names !== false && name) { fit(ctx, name, hw - 52, 28, 700, SANS, 18); ctx.fillStyle = INK; ctx.fillText(name, hx + 26, hy + 34); hy += 34; }
-      font(ctx, 24, 700); ctx.fillStyle = accent; ctx.fillText(val, hx + 26, hy + 34);
-      hy += 78;
+    /* awards */
+    if (awards.length) {
+      panel(ctx, PAD, y, W - PAD * 2, awardsH);
+      eyebrow(ctx, "Awards", PAD + 26, y + 42);
+      var cw2 = (W - PAD * 2 - 52 - 24) / 2;
+      awards.forEach(function(aw, i){
+        var ax = PAD + 26 + (i % 2) * (cw2 + 24), ay = y + 74 + Math.floor(i / 2) * AWARD_ROW;
+        font(ctx, 17, 700); ctx.fillStyle = accent; ctx.letterSpacing = "1.5px"; ctx.fillText(aw.title.toUpperCase(), ax, ay + 18); ctx.letterSpacing = "0px";
+        var vy = ay + 50;
+        if (o.names !== false && aw.name) { fit(ctx, aw.name, cw2, 27, 700, SANS, 18); ctx.fillStyle = INK; ctx.fillText(aw.name, ax, vy); vy += 30; }
+        font(ctx, 20, 500); ctx.fillStyle = INK2; ctx.fillText(wrap(ctx, aw.value, cw2, 1)[0], ax, vy);
+      });
     }
-    if (top1) fame("Most questions answered", top1.name, fmt(top1.answers) + " answers");
-    if (run && run.len) fame("Longest correct streak", run.name, fmt(run.len) + " right in a row");
-    if (!top1 && !(run && run.len)) { font(ctx, 22, 500); ctx.fillStyle = INK3; ctx.fillText("—", hx + 26, hy); }
 
     /* footer */
     font(ctx, 21, 600); ctx.fillStyle = INK2; ctx.fillText("smcmurry6-source.github.io/study-hubs", PAD, H - 52);
     if (o.footnote) { font(ctx, 17, 500); ctx.fillStyle = INK3; var fl = wrap(ctx, o.footnote, 470, 2); fl.forEach(function(l, i){ ctx.fillText(l, W - PAD - ctx.measureText(l).width, H - 62 + i * 22); }); }
     return canvas;
+  }
+  function duration(min){ min = Math.round(min || 0); return min < 60 ? min + " min" : (min / 60 >= 10 ? fmt(min / 60) : (min / 60).toFixed(1)) + " hours"; }
+  /* whichever awards the data supports, in a fixed order */
+  function awardList(R){
+    var A = R.awards || {}, top1 = (R.top_answers || [])[0], run = R.best_run, out = [];
+    if (top1) out.push({ title: "Question machine", name: top1.name, value: fmt(top1.answers) + " questions answered" });
+    if (run && run.len) out.push({ title: "Unbreakable", name: run.name, value: fmt(run.len) + " right in a row" });
+    if (A.notes && A.notes.minutes >= 5) out.push({ title: "Bookworm", name: A.notes.name, value: duration(A.notes.minutes) + " in the lecture notes" });
+    if (A.arcade && A.arcade.minutes >= 5) out.push({ title: "Arcade champion", name: A.arcade.name, value: duration(A.arcade.minutes) + " in the arcade" });
+    if (A.mock && A.mock.total) out.push({ title: "Mock exam ace", name: A.mock.name, value: Math.round(A.mock.correct / A.mock.total * 100) + "% on the mock (" + A.mock.correct + " of " + A.mock.total + ")" });
+    return out;
   }
   function hexA(hex, a){
     var h = hex.replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&");
