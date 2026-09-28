@@ -63,6 +63,12 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-28 (perio: two student reports fixed, Claude Code, #15)** — Self-graded cards (recall questions via
+  `qCardHTML`, and Active Recall) now keep the tapped grade button highlighted (`data-picked`, `--good-soft`/`--bad-soft`),
+  dim the other and add a "Saved as right / missed" note (`markGraded()`). The grade was always saved, but the buttons
+  looked unchanged, so it read as broken (report #3). `q3-47`'s explanation now states the 10% "resistant" figure and
+  separates it from the slide's 10-15% / 20-25% numbers; unused choice "About 35%" → "About 25%" (report #4). Both reports
+  marked resolved. **Perio Project: carry these into the split sources, or the next single-file build reverts them.**
 - **2026-09-28 (hub recap slideshow, Claude Code)** — Published recaps play on the dashboard in a **Hub recaps** section
   (after Hubs; hidden until one is published): image on the left, title/summary, prev/next, Save image, and a list whose
   active item's bar times the 8 s autoplay (pauses on hover/focus/hidden tab; swipe and arrow keys; slide + fade
