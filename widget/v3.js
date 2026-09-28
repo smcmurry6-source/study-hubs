@@ -541,19 +541,50 @@
   function currentName(){
     try { return (localStorage.getItem(SH_NAME_KEY) || "").trim(); } catch (e) { return ""; }
   }
-  /* ---------- spaced review ("Due today"): a missed question comes back tomorrow; a correct
-     one comes back after 1, 3, 7, 14, then 30 days. Stored per hub on this device. ---------- */
-  var SRS_KEY = "sh_srs_" + HUB, SRS_STEPS = [1, 3, 7, 14, 30];
+  /* ---------- spaced review (feeds the Daily Drill, widget/drill.js). Hubs are live for about a week
+     before their exam, so the gaps are short: a missed question comes back tomorrow; a right one after
+     1, 2, 4, then 7 days, and never later than the day before the hub's next exam (SH_EXPORT.exams).
+     Only the first right answer of the day moves a question along, so answering it twice in one sitting
+     doesn't push it out. Stored per hub on this device: { qid: { b: right answers in a row, due, t: last day } } ---------- */
+  var SRS_KEY = "sh_srs_" + HUB, SRS_STEPS = [1, 2, 4, 7];
   function srsDay(offset){ var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + (offset || 0)); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
   function srsLoad(){ try { return JSON.parse(localStorage.getItem(SRS_KEY) || "{}") || {}; } catch (e) { return {}; } }
+  /* the day before the next exam still ahead (from tomorrow on), or "" */
+  function srsExamEve(){
+    var ex = (window.SH_EXPORT && window.SH_EXPORT.exams) || [], tomorrow = srsDay(1), eve = "";
+    ex.forEach(function(x){
+      var p = String((x && x.date) || "").split("-").map(Number); if (p.length !== 3 || !p[0]) return;
+      var d = new Date(p[0], p[1] - 1, p[2] - 1), e = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+      if (e >= tomorrow && (!eve || e < eve)) eve = e;
+    });
+    return eve;
+  }
+  function srsDue(b){ var due = srsDay(b ? SRS_STEPS[b - 1] : 1), eve = srsExamEve(); return eve && due > eve ? eve : due; }
   function srsRecord(qid, correct){
     if (!qid) return;
-    var all = srsLoad(), r = all[qid] || { b: 0 };
-    if (correct) { r.b = Math.min(r.b + 1, SRS_STEPS.length); r.due = srsDay(SRS_STEPS[r.b - 1]); }
-    else { r.b = 0; r.due = srsDay(1); }
+    var all = srsLoad(), r = all[qid] || { b: 0 }, today = srsDay(0);
+    if (correct) {
+      if (r.t === today && r.b) return;
+      r.b = Math.min(r.b + 1, SRS_STEPS.length);
+    } else r.b = 0;
+    r.due = srsDue(r.b); r.t = today;
     all[qid] = r;
     try { localStorage.setItem(SRS_KEY, JSON.stringify(all)); } catch (e) {}
   }
+  /* once per hub: pull in reviews scheduled under the old 1/3/7/14/30-day gaps */
+  (function(){
+    try {
+      if (localStorage.getItem(SRS_KEY + "_v") === "2") return;
+      var all = srsLoad();
+      Object.keys(all).forEach(function(k){
+        var r = all[k]; if (!r) return;
+        r.b = Math.min(r.b || 0, SRS_STEPS.length);
+        var max = srsDue(r.b); if (r.due && r.due > max) r.due = max;
+      });
+      localStorage.setItem(SRS_KEY, JSON.stringify(all));
+      localStorage.setItem(SRS_KEY + "_v", "2");
+    } catch (e) {}
+  })();
   /* question ids due today or earlier, most-overdue first */
   window.shSrsDue = function(){
     var all = srsLoad(), today = srsDay(0);
@@ -1020,6 +1051,7 @@
   }
   function currentSection(){
     try {
+      if (window.shDrill && window.shDrill.isOpen()) return "drill/daily";
       if (typeof window.SH_SECTION === "function") {
         var custom = window.SH_SECTION();
         if (custom) return String(custom).slice(0, 80);
@@ -1436,6 +1468,7 @@
   var ICON_MORE = shIcon('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>');
   /* the site's mark: the four class ring bands, as on the dashboard wordmark */
   var ICON_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="3" height="14" rx="1.5" fill="#C28A2E"/><rect x="8.6" y="5" width="3" height="14" rx="1.5" fill="#C85A7C"/><rect x="13.2" y="5" width="3" height="14" rx="1.5" fill="#2E8A80"/><rect x="17.8" y="5" width="3" height="14" rx="1.5" fill="#C06544"/></svg>';
+  var ICON_BOLT = shIcon('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>');
   var ICON_FLAME = shIcon('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
   var backdrop = document.createElement("div");
@@ -1521,6 +1554,7 @@
        bottom bar (Search, Stats, More) and More opens the rest as a small sheet. */
     '<div class="shstat-pillrow" id="shstat-menu">' +
       '<button class="shstat-pill shm-primary" id="shstat-search-pill" type="button"><span class="shstat-pill-icon">' + ICON_SEARCH + '</span><span class="shstat-pill-label">Search</span></button>' +
+      '<button class="shstat-pill shm-primary" id="shstat-drill-pill" type="button" data-sh-drill hidden><span class="shstat-pill-icon">' + ICON_BOLT + '</span><span class="shstat-pill-label"><span class="spl-full">Daily drill</span><span class="spl-short">Drill</span></span><span class="shd-badge" hidden></span></button>' +
       '<button class="shstat-pill shm-primary" id="shstat-stats-pill" type="button"><span class="shstat-pill-icon">' + ICON_STATS + '</span><span class="shstat-pill-label"><span class="spl-full">Class stats</span><span class="spl-short">Stats</span></span></button>' +
       '<button class="shstat-pill shm-more" id="shstat-more-pill" type="button" aria-expanded="false"><span class="shstat-pill-icon">' + ICON_MORE + '</span><span class="shstat-pill-label">More</span></button>' +
       '<div class="shm-group">' +
@@ -1530,7 +1564,11 @@
         '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label">Report an issue</span></button>' +
       '</div>' +
     '</div>' +
-    '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools: search, class stats, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span></button>';
+    /* desktop: today's drill sits beside the launcher until it's done (widget/drill.js fills it in) */
+    '<div class="shstat-launchrow">' +
+      '<button class="sh-drill-chip" id="sh-drill-chip" type="button" data-sh-drill hidden>' + ICON_BOLT + '<span>Daily drill</span><span class="shd-chip-sub"></span></button>' +
+      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools: search, daily drill, class stats, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span></button>' +
+    '</div>';
   document.body.appendChild(root);
 
   function renderOnline(){
@@ -1756,6 +1794,8 @@
     closeOtherPanels(null);
     updateSheetState();
   });
+  /* the daily drill opens full screen, so the menu and any panel close first */
+  window.shCloseWidgetPanels = function(){ setMenu(false); closeOtherPanels(null); updateSheetState(); };
   document.getElementById("shstat-stats-pill").addEventListener("click", function(){
     closeOtherPanels(panel);
     var open = panel.classList.toggle("is-open");
@@ -2039,7 +2079,8 @@
     send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
     name: displayName, section: currentSection, online: function(){ return onlineCount; },
     toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,
-    statsPanel: function(){ return document.getElementById("shstat-panel"); }
+    statsPanel: function(){ return document.getElementById("shstat-panel"); },
+    srs: srsLoad, day: srsDay
   };
   if (!EXPORT_ONLY) {
     var eggScript = document.createElement("script");
@@ -2052,6 +2093,13 @@
     rankScript.src = new URL("ranks.js", thisScript.src).href; rankScript.async = true;
     rankScript.onload = function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); };
     document.head.appendChild(rankScript);
+  }
+  /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
+  if (!EXPORT_ONLY) {
+    var drillScript = document.createElement("script");
+    drillScript.src = new URL("drill.js", thisScript.src).href; drillScript.async = true;
+    drillScript.onload = function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); };
+    document.head.appendChild(drillScript);
   }
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
   if (!EXPORT_ONLY && supabase) {
