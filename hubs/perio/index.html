@@ -276,6 +276,11 @@ main{padding-top:20px}
 .qcard-grade-btns button{appearance:none;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:600;font-size:.84rem}
 .qcard-grade-btns button.good{border-color:var(--good);color:var(--good)}
 .qcard-grade-btns button.bad{border-color:var(--bad);color:var(--bad)}
+.qcard-grade-btns button:disabled{cursor:default;opacity:.4}
+.qcard-grade-btns button[data-picked]{opacity:1;box-shadow:inset 0 0 0 1px currentColor}
+.qcard-grade-btns button.good[data-picked]{background:var(--good-soft)}
+.qcard-grade-btns button.bad[data-picked]{background:var(--bad-soft)}
+.qcard-grade-note{align-self:center;display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:var(--ink-faint)}
 .qcard-classdata-row{margin-top:9px}
 .qcard-classdata-result{font-family:var(--font-mono);font-size:.72rem;color:var(--ink-faint)}
 .qcard-classdata-result.is-bad{color:var(--bad)} .qcard-classdata-result.is-ok{color:var(--good)}
@@ -1187,7 +1192,7 @@ var QUESTIONS = [
 { id:'q3-44', lec:'risk-assessment', type:'mcq', stem:"When is the only time a patient can move back down from Stage 3?", choices:["When the stage-defining lesion (a vertical defect or furcation) is successfully regenerated", "When they quit smoking, since smoking status is part of the staging criteria", "After a full year of 3-month maintenance visits with no new attachment loss recorded at any site", "When probing depths fall below 4 mm everywhere after SRP at the re-evaluation"], answer:0, ex:"Stage never goes down just because pockets shrink or habits improve. The only way back down from Stage 3 is to regenerate the lesion that put the patient there: the vertical defect or the furcation.", src:'lecture' },
 { id:'q3-45', lec:'risk-assessment', type:'mcq', stem:"In-class case: 75-year-old former smoker, BOP at ~80% of sites, vertical and horizontal defects. Overall McGuire & Nunn diagnostic prognosis?", choices:['Poor','Good','Hopeless','Fair'], answer:0, ex:"Overall poor, though individual teeth range from good to hopeless. With compliance plus resective/regenerative therapy, the therapeutic prognosis improves to fair.", src:'lecture' },
 { id:'q3-46', lec:'risk-assessment', type:'mcq', stem:"A Grade C patient is newly diagnosed with diabetes (A1c 8.8%). What changes?", choices:["Her grade stays C, but a risk tool like the PRA shows a much larger risk footprint", "Her grade moves up to a new Grade D, which is reserved for poorly controlled diabetic patients", "Her stage drops to 2 because the diabetes, not the periodontitis, now explains the bone loss", "Nothing changes in any assessment, since grade and risk tools ignore systemic conditions entirely"], answer:0, ex:"The point: prognosis and risk tools capture differences that the same stage and grade cannot, which is why prognosis is kept separate from the diagnosis.", src:'lecture' },
-{ id:'q3-47', lec:'risk-assessment', type:'mcq', stem:"Roughly what share of people are resistant to periodontitis regardless of their oral hygiene?", choices:['About 10%','About 50%','About 1%','About 35%'], answer:0, ex:"About 10-15% are at risk for severe destructive disease, and about 20-25% do not respond to standard therapy.", src:'lecture' },
+{ id:'q3-47', lec:'risk-assessment', type:'mcq', stem:"Roughly what share of people are resistant to periodontitis regardless of their oral hygiene?", choices:['About 10%','About 50%','About 1%','About 25%'], answer:0, ex:"About 10% resist periodontitis no matter how good or bad their hygiene is. Don't mix it up with the other two numbers on the same slide, which are different groups: 10-15% are at risk for severe destructive disease, and 20-25% don't respond to standard therapy.", src:'lecture' },
 { id:'q3-48', lec:'risk-assessment', type:'mcq', stem:"What does the Periodontal Risk Assessment (PRA) tool look like?", choices:['A spider-web diagram whose footprint grows with risk','A bar chart of probing depths','A standard periodontal chart','A decision flowchart'], answer:0, ex:"Inputs include BOP sites, sites with PD ≥5 mm, missing teeth, % bone loss, smoking, and systemic factors. Its output: maintain current measures, or see the patient more or less often.", src:'lecture' },
 
 /* ===== Lecture 4 — Phase I Therapy (instrumentation) ===== */
@@ -3246,6 +3251,13 @@ function multiScore(q, picks){
   return Math.max(0, (hit - wrong) / q.correct.length);
 }
 function markExplain(qid){ var el = document.getElementById('explain-'+qid); if(el && el.textContent.trim()) el.classList.add('shown'); }
+/* self-graded cards: lock both buttons but keep the one tapped highlighted, with a note, so the tap visibly counted */
+function markGraded(btn, note){
+  var wrap = btn.closest('[data-role="grade-wrap"]');
+  wrap.querySelectorAll('button').forEach(function(b){ b.disabled = true; });
+  btn.setAttribute('data-picked','true'); btn.setAttribute('aria-pressed','true');
+  wrap.insertAdjacentHTML('beforeend', '<span class="qcard-grade-note" role="status">'+icon('check')+note+'</span>');
+}
 
 function wireQuestionContainer(container){
   if(!container || container.__wired) return;
@@ -3344,8 +3356,9 @@ function wireQuestionContainer(container){
         card.querySelector('[data-role="reveal-wrap"]').style.display = 'none';
         card.querySelector('[data-role="grade-wrap"]').style.display = 'flex';
       } else if(actionBtn.getAttribute('data-action') === 'grade'){
-        card.querySelectorAll('[data-action="grade"]').forEach(function(b){ b.disabled = true; });
-        recordAnswer(aq.id, aq.lec, actionBtn.getAttribute('data-grade') === 'good');
+        var good = actionBtn.getAttribute('data-grade') === 'good';
+        markGraded(actionBtn, good ? 'Saved as right' : 'Saved as missed');
+        recordAnswer(aq.id, aq.lec, good);
       }
     }
   });
@@ -3965,7 +3978,7 @@ function renderCompendium(){
         if(act === 'shuffle'){ RECALL_ORDER = shuffled(RECALL_ORDER); renderActiveRecallList(); return; }
         var card = ra.closest('.qcard');
         if(act === 'reveal'){ card.querySelector('[data-role="explain"]').classList.add('shown'); card.querySelector('[data-role="reveal-wrap"]').style.display = 'none'; card.querySelector('[data-role="grade-wrap"]').style.display = 'flex'; }
-        else if(act === 'grade'){ card.querySelectorAll('[data-recall-action="grade"]').forEach(function(b){ b.disabled = true; }); RECALL_TALLY[ra.getAttribute('data-grade') === 'good' ? 'good' : 'bad']++; document.getElementById('rcTally').textContent = recallTally(filteredRecall().length); }
+        else if(act === 'grade'){ markGraded(ra, 'Added to your tally'); RECALL_TALLY[ra.getAttribute('data-grade') === 'good' ? 'good' : 'bad']++; document.getElementById('rcTally').textContent = recallTally(filteredRecall().length); }
         return;
       }
       var cr = e.target.closest('[data-cram-reveal]'); if(cr){ cr.parentElement.innerHTML = decodeURIComponent(cr.getAttribute('data-cram-reveal')); return; }
