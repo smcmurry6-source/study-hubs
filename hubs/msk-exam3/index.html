@@ -144,6 +144,9 @@ main{padding-top:20px}
 .qfilters select,.qfilters input{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);min-width:0}
 .qfilters input{flex:1 1 200px}
 .qcount{color:var(--ink-faint);font-size:.84rem;margin-bottom:10px}
+.rv-set{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;border:1px solid var(--accent);background:var(--accent-soft,var(--surface-2));border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
+.rv-set b{display:block}
+.rv-set span{color:var(--ink-soft)}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
@@ -695,7 +698,7 @@ var LECTURES = [
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order.
    src: quiz = class quiz (study guide/Anki), lecture-quiz = self-assessment slide in the deck,
-        slido = in-class Slido, crossword = class crossword, hub = hub-authored from slides/transcript. */
+        slido = in-class Slido, review = PollEv exam review (6 verbatim on the exam), crossword = class crossword, hub = hub-authored from slides/transcript. */
 var QUESTIONS = [];
 function mcq(id, lec, src, stem, choices, ex){ QUESTIONS.push({ id:id, lec:lec, type:'mcq', stem:stem, choices:choices, answer:0, ex:ex||'', src:src }); }
 function seq(id, lec, src, stem, steps, ex){ QUESTIONS.push({ id:id, lec:lec, type:'sequence', stem:stem, steps:steps, ex:ex||'', src:src }); }
@@ -809,6 +812,78 @@ mcq('sl-mg','autoimmune','slido','The symptoms of myasthenia gravis can sometime
 mcq('sl-central-tol','autoimmune','slido','The central mechanism of self-tolerance involves:',
   ['Deletion of self-reactive T cell clones in the thymus','Anergy from missing co-stimulation','Suppression by regulatory T cells in the periphery','Antigen sequestration in privileged sites'],
   'Central tolerance = negative selection (apoptosis) of self-reactive T cells in the thymus (AIRE drives self-antigen expression) and B cells in bone marrow. The other options are peripheral mechanisms.');
+
+/* ===== Exam review (PollEv review session, 9/29): six are verbatim on Exam 3, the rest are close.
+   Stems and choices kept as given; only typos fixed. ===== */
+mcq('rv-graves','autoimmune','review','IgG autoantibody to the TSH receptor results in:',
+  ['Graves disease','Hashimoto thyroiditis','Subacute granulomatous (de Quervain) thyroiditis','Toxic multinodular goiter'],
+  'Graves: an IgG that STIMULATES the TSH receptor, so hyperthyroidism, diffuse goiter and ophthalmopathy. Hashimoto antibodies (anti-TPO, anti-thyroglobulin, blocking anti-TSH-R) destroy the gland. De Quervain is a painful post-viral thyroiditis, and toxic multinodular goiter is autonomous nodules, not an autoantibody.');
+mcq('rv-oa-except','joints','review','All of the following occur in osteoarthritis EXCEPT:',
+  ['Fibrous ankylosis (pannus)','Osteophytosis','Heberden’s nodes','Eburnation','Subchondral cysts'],
+  'Pannus (inflamed synovium growing over cartilage) and the fibrous, then bony, ankylosis it leads to are rheumatoid arthritis. OA gives osteophytes (Heberden nodes at the DIP, Bouchard at the PIP), eburnation (polished exposed bone) and subchondral cysts.');
+mcq('rv-mg','autoimmune','review','The symptoms of myasthenia gravis can sometimes be improved or stabilized by treatment with which of the following?',
+  ['Cholinesterase inhibitor','Antibiotics','Corticosteroids','NSAIDs','Anticholinergic drug'],
+  'Anti-ACh-receptor antibodies leave fewer working receptors at the NMJ; a cholinesterase inhibitor (pyridostigmine; edrophonium for the Tensilon test) keeps more ACh in the cleft. Heads up: steroids are also used as immunosuppression in MG, but the answer the review keyed is the cholinesterase inhibitor. An anticholinergic would make weakness worse, and some antibiotics (aminoglycosides) can too.');
+mcq('rv-thiamine','nutrition','review','Which finding is most consistent with thiamine deficiency (Beriberi)?',
+  ['Peripheral neurologic deficits such as foot drop and hyporeflexia','Night blindness','Macrocytic red blood cells with hypersegmented neutrophils','Generalized loss of bone density'],
+  'Dry beriberi is a peripheral polyneuropathy (myelin degeneration) that starts in the legs: foot drop, hyporeflexia, stocking-glove sensory loss. Night blindness is vitamin A; macrocytes with hypersegmented neutrophils are folate/B12.');
+mcq('rv-pairing','nutrition','review','Which nutrient-deficiency pairing is correct?',
+  ['Folate - macrocytic red blood cells with hypersegmented neutrophils','Vitamin A - macrocytic anemia','Thiamine - night blindness','Protein - beriberi'],
+  'The right pairs: folate (or B12) = megaloblastic anemia; vitamin A = night blindness; thiamine = beriberi; protein = kwashiorkor.');
+mcq('rv-kwashiorkor','nutrition','review','The clinical condition known as Kwashiorkor is caused by a deficiency of which of the following?',
+  ['Protein','Thiamine','Niacin','Vitamin C','Folate'],
+  'Kwashiorkor = protein deficiency with calories relatively preserved: edema (low albumin), fatty liver, "flaky paint" skin. Marasmus is overall calorie deficiency. Niacin = pellagra, vitamin C = scurvy.');
+mcq('rv-ra-vs-oa','joints','review','Which pattern is most characteristic of rheumatoid arthritis rather than osteoarthritis?',
+  ['Symmetric inflammatory involvement of small joints','Heberden nodes at the distal interphalangeal joints','Pain that worsens primarily with mechanical use','Eburnation of subchondral bone'],
+  'RA is an autoimmune synovitis: symmetric, small joints of the hands (PIP, MCP), morning stiffness that eases with use. Heberden nodes, pain with use and eburnation are all OA.');
+mcq('rv-osteoblast','bone','review','The primary function of an osteoblast is to:',
+  ['Synthesize and deposit bone matrix','Resorb mineralized tissue','Maintain a ruffled border for bone resorption','Differentiate into a macrophage'],
+  'Osteoblasts secrete osteoid (mostly type I collagen), which then mineralizes. Resorbing bone with a ruffled border is the osteoclast, which comes FROM the monocyte/macrophage line.');
+mcq('rv-osteoid','bone','review','Which of the following best defines osteoid?',
+  ['Newly formed, unmineralized bone matrix','Mature osteoblasts actively engaged in bone synthesis','The structural unit of compact bone','A channel connecting adjacent osteocytes'],
+  'Osteoid is the new organic matrix laid down by osteoblasts before it calcifies. The structural unit of compact bone is the osteon; channels between osteocytes are canaliculi.');
+mcq('rv-osteon','bone','review','Which of the following statements BEST defines the Osteon?',
+  ['Structural unit of compact (cortical) bone','Mature osteoblasts actively engaged in bone synthesis','Newly formed, but yet uncalcified bone'],
+  'Osteon = Haversian system: concentric lamellae around a central (Haversian) canal, the unit of compact bone. Newly formed, uncalcified bone is osteoid.');
+mcq('rv-fibrocart','cartilage','review','Which type of cartilage is found in intervertebral discs and menisci?',
+  ['Fibrocartilage','Hyaline','Elastic','Articular cartilage'],
+  'Fibrocartilage (type I plus type II collagen, no perichondrium) resists compression and tension: intervertebral discs, menisci, pubic symphysis, TMJ disc. Elastic = ear, epiglottis. Articular cartilage is hyaline.');
+mcq('rv-articular','cartilage','review','Which statement best describes articular cartilage?',
+  ['It lacks a perichondrium and has a limited capacity for repair','It is richly vascularized and repairs rapidly after injury','It is surrounded by a prominent perichondrium','It is composed primarily of type I collagen with little water'],
+  'Articular cartilage is hyaline cartilage with no perichondrium and no blood vessels, so it repairs poorly. It is mostly water with type II collagen and proteoglycans.');
+mcq('rv-endochon','bonedev','review','Which type of ossification uses a hyaline cartilage template that is progressively replaced by bone?',
+  ['Endochondral ossification','Intramembranous ossification','Appositional ossification','Interstitial ossification'],
+  'Endochondral ossification builds long bones, ribs and vertebrae on a hyaline cartilage model. Intramembranous ossification turns mesenchyme straight into bone (calvaria, maxilla, mandible). Appositional and interstitial describe how tissue grows, not a type of ossification.');
+mcq('rv-socket','bonedev','review','Following tooth extraction, new bone that fills the socket forms primarily by which type of ossification?',
+  ['Intramembranous','Endochondral','Interstitial','Calcification without bone formation'],
+  'Extraction sockets heal like the jaws develop: mesenchymal cells become osteoblasts directly, with no cartilage template.');
+mcq('rv-central-tol','autoimmune','review','Which mechanism is most important for central self-tolerance of T lymphocytes?',
+  ['Deletion of self reactive T cell clones in the thymus','Anergy of mature T cells in peripheral tissues','Suppression by regulatory T cells in peripheral tissues','Antigen sequestration in immune-privileged sites'],
+  'Central = in the thymus (T cells) or bone marrow (B cells): negative selection deletes self-reactive clones, helped by AIRE. Anergy, Tregs and sequestration are peripheral tolerance.');
+mcq('rv-organ-specific','autoimmune','review','All of the following are classified as an organ specific autoimmune disease EXCEPT:',
+  ['Systemic lupus erythematosus','Goodpasture syndrome','Myasthenia gravis','Multiple sclerosis','Graves disease'],
+  'SLE is the classic systemic autoimmune disease (antinuclear antibodies, many organs). Goodpasture (kidney and lung basement membrane), myasthenia gravis (NMJ), MS (CNS myelin) and Graves (thyroid) each target one organ or tissue.');
+mcq('rv-paget','hereditary','review','Which disorder is characterized by chaotic bone remodeling that can produce a mosaic or jigsaw pattern of lamellar bone?',
+  ['Paget disease of bone','Osteogenesis imperfecta','Osteopetrosis','Achondroplasia'],
+  'Paget disease: osteoclastic, mixed, then burnt-out sclerotic phases leave a mosaic of lamellar bone with jigsaw cement lines. OI is defective type I collagen, osteopetrosis is failed osteoclast resorption, achondroplasia is FGFR3 at the growth plate.');
+mcq('rv-fracture','hereditary','review','What is the earliest major event in normal fracture repair?',
+  ['Hematoma formation at the fracture site','Formation of a mineralized bony callus','Remodeling of woven bone into lamellar bone','Development of a pseudoarthrosis'],
+  'Order: hematoma (fibrin scaffold, inflammatory cells) → soft (procallus) → bony callus of woven bone → remodeling to lamellar bone. Pseudoarthrosis is a complication of a fracture that fails to unite.');
+mcq('rv-alendronate','drugs','review','Which of the following best describes the action of alendronate (Fosamax)?',
+  ['Inhibits osteoclast-mediated bone resorption','Direct inhibition of RANK ligand activity','Increases intestinal absorption of calcium and phosphorus','Directly increases osteoblast activity'],
+  'Bisphosphonates bind hydroxyapatite and are taken up by resorbing osteoclasts, where they block FPP synthase and trigger apoptosis. RANKL inhibition is denosumab, raising gut absorption is vitamin D (calcitriol), and direct anabolic action is teriparatide/abaloparatide.');
+mcq('rv-calcitriol','drugs','review','A patient with severe chronic renal failure requires the active form of vitamin D for supplementation. Which is most appropriate?',
+  ['Calcitriol','Cholecalciferol (Vitamin D3)','Ergocalciferol (Vitamin D2)','Calcifediol'],
+  'The kidney does the final 1-alpha hydroxylation, so renal failure needs the already-active 1,25(OH)2D, calcitriol. Cholecalciferol and ergocalciferol need both liver and kidney steps; calcifediol (25-OH D) still needs the kidney.');
+mcq('rv-ewing','tumors','review','A teenager has a painful enlarging mass in the diaphysis of a long bone. The tumor is composed of primitive round cells without obvious differentiation. Which diagnosis is most likely?',
+  ['Ewing sarcoma','Osteosarcoma','Chondrosarcoma','Osteoid osteoma','Enchondroma'],
+  'Ewing sarcoma: children and teens, diaphysis of long bones (also pelvis), sheets of small round blue cells, EWS-FLI1 t(11;22), onion-skin periosteal reaction. Osteosarcoma is metaphyseal and makes osteoid.');
+mcq('rv-osteochondroma','tumors','review','Which benign bone tumor is cartilage-capped, arises near the growth plate of a tubular long bone, and is attached by a bony stalk?',
+  ['Osteochondroma','Enchondroma','Giant cell tumor','Osteoid osteoma','Juxtacortical chondroma'],
+  'Osteochondroma (exostosis) is the most common benign bone tumor: a cartilage-capped outgrowth on a bony stalk from the metaphysis near the growth plate. Multiple ones = hereditary multiple exostoses (EXT1/EXT2).');
+mcq('rv-enchondroma','tumors','review','Which of the following is a benign tumor of the hyaline cartilage in the medullary cavity, involving the short tubular bones of the hands and feet?',
+  ['Enchondroma','Osteochondroma','Giant cell tumor','Juxtacortical chondroma','Osteoid osteoma'],
+  'Enchondroma: hyaline cartilage inside the medulla, most often the small bones of the hands and feet. Juxtacortical chondroma sits on the bone surface; multiple enchondromas = Ollier disease (Maffucci with hemangiomas).');
 
 /* ===== Crossword (class crossword / Anki) ===== */
 function cw(id, lec, clue, answer, distractors, ex){ mcq(id, lec, 'crossword', clue, [answer].concat(distractors), ex); }
@@ -2233,7 +2308,7 @@ tumors: `
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
-var SRC_LABEL = { 'quiz':'Class quiz', 'lecture-quiz':'Lecture self-check', 'slido':'Slido', 'crossword':'Crossword', 'hub':'Hub-authored' };
+var SRC_LABEL = { 'quiz':'Class quiz', 'lecture-quiz':'Lecture self-check', 'slido':'Slido', 'review':'Exam review (PollEv)', 'crossword':'Crossword', 'hub':'Hub-authored' };
 
 /* ---------- utils ---------- */
 function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -2571,7 +2646,9 @@ function renderBank(body){
   var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>L'+l.num+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var rvN = QUESTIONS.filter(function(q){ return q.src === 'review'; }).length, rvOn = STATE.ui.qsrc === 'review';
+  var rvSet = '<div class="rv-set"><div><b>Exam review set ('+rvN+' questions)</b><span>From the PollEv review. Six of these are word for word on the exam and the rest are very close.</span></div><button type="button" class="btn'+(rvOn?'':' primary')+'" id="fReview">'+(rvOn?'Show all questions':'Practice the review set')+'</button></div>';
+  body.innerHTML = rvSet + '<div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   var order = null;
   function draw(){
@@ -2582,7 +2659,8 @@ function renderBank(body){
     document.getElementById('qMore').hidden = qs.length <= bankShown;
   }
   document.getElementById('fLec').onchange = function(e){ STATE.ui.qlec = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
-  document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
+  document.getElementById('fReview').onclick = function(){ var on = STATE.ui.qsrc !== 'review'; STATE.ui.qsrc = on ? 'review' : 'all'; if(on){ STATE.ui.qlec = 'all'; STATE.ui.qstatus = 'all'; } bankShown = BANK_PAGE; saveState(); renderBank(body); };
   document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
   var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ bankShown = BANK_PAGE; draw(); }, 180); };
   document.getElementById('fShuffle').onclick = function(){ order = shuffled(QUESTIONS.map(function(q){ return q.id; })); draw(); };
@@ -4028,7 +4106,7 @@ window.SH_GOTO = function(g){
 
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
    draw each card, so answers go through recordAnswer like anywhere else. */
-var DRILL_HY = { quiz:'on the class quiz', 'lecture-quiz':'a self-check slide in the lecture', slido:'asked in class on Slido' };
+var DRILL_HY = { quiz:'on the class quiz', 'lecture-quiz':'a self-check slide in the lecture', slido:'asked in class on Slido', review:'from the exam review: six of these are word for word on the exam' };
 window.SH_DRILL = {
   pool: function(){
     return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
