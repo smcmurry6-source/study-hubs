@@ -1871,7 +1871,7 @@
     if (pendingFlagQid) where.push("question " + pendingFlagQid);
     var sec = currentSection(); if (sec) where.push(sec);
     var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);
-    supabase.from("question_flags").insert({ hub: HUB, note: note }).then(function(res){
+    supabase.from("question_flags").insert({ hub: HUB, note: note, visitor_id: VISITOR_ID }).then(function(res){
       btn.disabled = false;
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
@@ -1897,7 +1897,7 @@
     if (!supabase) { msg.textContent = "Couldn't send — try again later."; return; }
     btn.disabled = true;
     msg.textContent = "Sending…";
-    supabase.from("hub_suggestions").insert({ hub: HUB, note: text }).then(function(res){
+    supabase.from("hub_suggestions").insert({ hub: HUB, note: text, visitor_id: VISITOR_ID }).then(function(res){
       btn.disabled = false;
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
@@ -2145,5 +2145,12 @@
     clickScript.src = new URL("clicks.js", thisScript.src).href; clickScript.async = true;
     clickScript.onload = function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); };
     document.head.appendChild(clickScript);
+  }
+  /* replies (widget/replies.js): tells someone once when their report or suggestion has been dealt with, plus notices to everyone */
+  if (!EXPORT_ONLY && supabase) {
+    var replyScript = document.createElement("script");
+    replyScript.src = new URL("replies.js", thisScript.src).href; replyScript.async = true;
+    replyScript.onload = function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB }); };
+    document.head.appendChild(replyScript);
   }
 })();

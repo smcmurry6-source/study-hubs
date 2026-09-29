@@ -161,6 +161,11 @@ table.data tr.group:hover td{background:none;}
 .report-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:6px;}
 .report-date{font-size:12.5px; color:var(--ink-3);}
 .report-note{font-size:14.5px; white-space:pre-wrap; overflow-wrap:anywhere;}
+.report-reply{margin-top:8px; font-size:13.5px; white-space:pre-wrap; overflow-wrap:anywhere; border-left:3px solid var(--ok); padding-left:10px;}
+.report-sent{display:block; margin-top:6px; font-size:12.5px; color:var(--ink-3);}
+.report-replybox{display:block; width:100%; min-height:64px; margin-top:10px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:var(--r-m); background:var(--paper-2); color:inherit; font:inherit; font-size:14px; resize:vertical;}
+.report-opts{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.report-opts .report-sent{margin-top:4px;}
 .resolve-btn{flex:none; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2); padding:5px 12px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600;}
 .resolve-btn.is-done{border-color:var(--ok); color:var(--ok); background:var(--ok-soft);}
 @media (max-width:560px){ .report{flex-direction:column; gap:10px;} }
@@ -723,8 +728,15 @@ table.data tr.group:hover td{background:none;}
         '<div class="report-main"><div class="report-top"><span class="pill ' + esc(r.kind) + '">' + (r.kind === "flag" ? "Flag" : "Suggestion") + '</span>' +
         (r.hub ? '<span class="pill">' + esc(hubLabel(r.hub)) + '</span>' : '') +
         '<span class="report-date">' + fmtDate(r.created_at) + '</span></div>' +
-        '<div class="report-note">' + esc(r.note) + '</div></div>' +
-        '<button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved' : 'Mark resolved') + '</button>' +
+        '<div class="report-note">' + esc(r.note) + '</div>' +
+        (r.resolved
+          ? (r.reply ? '<div class="report-reply"><b>Reply:</b> ' + esc(r.reply) + '</div>' : '') +
+            '<div class="report-sent">' + (r.can_notify ? (r.reply_seen_at ? 'Seen by the sender ' + fmtDate(r.reply_seen_at) : 'Sender will see this next visit') : 'Sent before replies existed: the sender can’t be notified') + '</div>'
+          : '<textarea class="report-replybox" maxlength="1500" placeholder="' + (r.kind === "flag" ? 'What was fixed (shown to the sender)' : 'Reply to the sender (optional)') + '"></textarea>' +
+            '<div class="report-opts"><span class="report-sent">' + (r.can_notify ? 'The sender is notified when you resolve this.' : 'Sent before replies existed: only “tell everyone” reaches anyone.') + '</span>' +
+            '<label class="switch"><input type="checkbox" class="report-all"> Tell everyone</label></div>') +
+        '</div>' +
+        '<button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved · reopen' : 'Resolve & notify') + '</button>' +
       '</div>';
     }).join("") : '<div class="empty">' + (showResolvedReports ? 'Nothing here yet.' : 'All clear — nothing open.') + '</div>';
     var open = all.filter(function(r){ return !r.resolved; }).length;
@@ -893,9 +905,24 @@ table.data tr.group:hover td{background:none;}
     var row = (data.reports.data || []).find(function(r){ return r.kind === kind && r.id === id; });
     if (!row) return;
     var next = !row.resolved;
+    var box = cardEl.querySelector(".report-replybox");
+    var reply = box ? box.value.trim() : "";
+    var toAll = !!(cardEl.querySelector(".report-all") || {}).checked;
+    if (next && toAll && !reply) { alert("Write the reply first: it's what everyone will see."); return; }
     btn.disabled = true;
-    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next }).then(function(res){
-      if (!(res && res.error)) row.resolved = next;
+    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next, p_reply: reply || null }).then(function(res){
+      if (!(res && res.error)) {
+        row.resolved = next;
+        if (next) { if (reply) row.reply = reply; row.resolved_at = new Date().toISOString(); row.reply_seen_at = null; }
+        /* "Tell everyone": the same reply as a notice every visitor sees once (widget/replies.js) */
+        if (next && toAll) {
+          supabase.rpc("admin_post_notice", { p_secret: secret, p_hub: null,
+            p_title: kind === "flag" ? "A question was fixed after a student report" : "A classmate's suggestion was added",
+            p_message: (row.hub ? hubLabel(row.hub) + ": " : "") + reply, p_days: 14 }).then(function(r2){
+            if (r2 && r2.error) alert("Resolved, but the notice to everyone didn't send.");
+          });
+        }
+      }
       renderInbox(); updateInboxCount(); renderOverview();
     }, function(){ btn.disabled = false; });
   });

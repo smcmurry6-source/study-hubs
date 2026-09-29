@@ -34,7 +34,7 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -75,6 +75,16 @@ live hubs. **Before building a new hub** (any session, hub Projects included), i
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-09-29 (replies to reports + notices to everyone, Claude Code, #29)** — Reports and suggestions now store the
+  sender's `visitor_id`, and resolving one can carry a `reply`. `widget/replies.js` (loaded by v3.js and the dashboard)
+  shows it to the sender once on their next visit (`get_my_replies`, `mark_reply_seen`). **Always write the reply when
+  resolving** (for a question report: what was wrong and what changed). Admin Inbox: reply box, "Resolve & notify", and
+  "Tell everyone", which posts a **notice** every visitor sees once (`site_notices`, `get_notices`, `admin_post_notice`;
+  hub null = every page, 14 days; seen per device in `sh_notice_seen`). The student insert policies now refuse a
+  reply/resolved row. Rows from before today have no sender, so only a notice reaches them. `migration_v25.sql` (applied
+  via the connector). First notice: the `cw-osteosarcoma` fix (report #7; its stem now says "Malignant", Osteoma →
+  Ewing sarcoma). `sw.js` → `sh-v7`. **MSK Project: carry the `cw-osteosarcoma` change into the split sources.**
 
 - **2026-09-29 (daily lessons refresh, Claude Code)** — New routine "Daily lessons refresh" (fresh cloud session
   each day) runs `tools/lessons-refresh.md`: queries in `tools/lessons-daily.sql` (every report, suggestion, check-in,
