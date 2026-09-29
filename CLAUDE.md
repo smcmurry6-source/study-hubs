@@ -124,7 +124,7 @@ or SQL through the connector: `update question_flags set resolved = true, resolv
 (`set_report_resolved(p_secret, p_kind, p_id, true, p_reply)` does the same). For a fix the whole class should hear
 about, post a notice everyone sees once (and keeps in their Inbox): Inbox → "Tell everyone" (its own title and message,
 written for the whole class, not the sender), or `insert into site_notices (hub, title, message)`
-(`hub` null = every page; expires after 14 days). Ask Sam before sending one to everyone.
+(`hub` only labels it, e.g. which hub was fixed; it shows everywhere, pops up for 14 days and stays in the Inbox 60). Ask Sam before sending one to everyone.
 
 ## Secrets
 

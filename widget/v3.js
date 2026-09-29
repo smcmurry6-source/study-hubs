@@ -1464,6 +1464,17 @@
   var ICON_STATS = shIcon('<rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="5" width="4" height="15" rx="1.2"/><rect x="16" y="9" width="4" height="11" rx="1.2"/>');
   var ICON_BULB = shIcon('<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4 3.5V15h0a2 2 0 0 1-2-2z"/><path d="M12 7.5v5M9.5 10h5"/>');
   var ICON_INBOX = shIcon('<path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/>');
+  /* the inbox also sits in the hub's top bar, beside your name, so it's one tap away on every page (widget/replies.js opens it) */
+  (function(){
+    if (!nameBadge || !nameBadge.parentNode) return;
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "sh-ribbon-inbox"; btn.setAttribute("data-sh-inbox", "");
+    btn.setAttribute("aria-label", "Inbox"); btn.title = "Inbox";
+    btn.innerHTML = ICON_INBOX + '<span class="sh-inbox-badge sh-inbox-dot" hidden></span>';
+    var theme = document.getElementById("themeBtn");
+    if (theme && theme.parentNode === nameBadge.parentNode) theme.parentNode.insertBefore(btn, theme);
+    else nameBadge.parentNode.insertBefore(btn, nameBadge.nextSibling);
+  })();
   var ICON_FLAG = shIcon('<path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/>');
   var ICON_GEAR = shIcon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
   var ICON_MORE = shIcon('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>');

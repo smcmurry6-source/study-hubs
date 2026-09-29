@@ -687,3 +687,10 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .shstat-launch, .shm-more{position:relative;}
 .sh-inbox-dot{position:absolute; top:4px; right:4px; width:10px; height:10px; border-radius:50%; background:var(--shw-accent); box-shadow:0 0 0 2px var(--shw-bg);}
 .shm-more .sh-inbox-dot{top:6px; right:auto; left:calc(50% + 8px);}
+/* top-bar inbox button (sits beside the name in the hub ribbon, or the fallback top bar) */
+.sh-ribbon-inbox{position:relative; flex:none; appearance:none; display:inline-flex; align-items:center; justify-content:center; width:32px; height:30px; padding:0;
+  border:1px solid var(--line, rgba(0,0,0,.12)); background:var(--surface, #fff); color:var(--ink-soft, var(--ink-2, #4A5864)); border-radius:999px; cursor:pointer;}
+.sh-ribbon-inbox:hover{color:var(--ink, #15202A);}
+.sh-ribbon-inbox svg{width:16px; height:16px;}
+.sh-ribbon-inbox .sh-inbox-dot{top:-2px; right:-2px; background:var(--accent, #2F6FD6); box-shadow:0 0 0 2px var(--surface, #fff);}
+@media (max-width:760px){ .sh-ribbon-inbox{width:28px; height:26px;} .sh-ribbon-inbox svg{width:14px; height:14px;} }
