@@ -314,9 +314,11 @@ table.data tr.group:hover td{background:none;}
       rpc("get_reports", { p_secret: secret }),
       table("question_choices", "hub,qid,choice,picks"),
       rpc("get_click_summary", { p_secret: secret, p_days: d }),
-      rpc("get_survey_results", { p_secret: secret })
+      rpc("get_survey_results", { p_secret: secret }),
+      rpc("get_exam_debriefs", { p_secret: secret }),
+      rpc("get_search_terms", { p_secret: secret, p_days: d })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14] };
       renderAll();
     });
   }
@@ -483,6 +485,43 @@ table.data tr.group:hover td{background:none;}
     el.innerHTML = out;
   }
 
+  /* ---------- exam check-ins + search terms (migration_v23): read when a hub is archived, see LESSONS.md ---------- */
+  function renderDebriefs(){
+    var d = data.debriefs;
+    if (!d || d.error) return card("Exam check-ins", "", '<div class="err">Couldn’t load exam check-ins (migration_v23).</div>');
+    var groups = {};
+    (d.data || []).forEach(function(r){ var k = r.hub + "\u0001" + r.exam; (groups[k] = groups[k] || []).push(r); });
+    var keys = Object.keys(groups).sort().reverse();
+    if (!keys.length) return card("Exam check-ins", "Pop-up on each person's first dashboard visit after an exam, plus a Check in button on the hub's card (live or archived) for 60 days.", '<div class="empty">None yet. The first ones come in the day after the next exam.</div>');
+    return keys.map(function(k){
+      var rows = groups[k], ans = rows.filter(function(r){ return r.answers; }), p = k.split("\u0001");
+      function tally(id){
+        var c = {}; ans.forEach(function(r){ var v = r.answers[id]; if (v != null && v !== "") c[v] = (c[v] || 0) + 1; });
+        return Object.keys(c).sort(function(a, b){ return c[b] - c[a]; }).map(function(v){ return esc(v) + " <b>" + c[v] + "</b>"; }).join(" · ") || "—";
+      }
+      var ready = ans.filter(function(r){ return r.answers.ready; });
+      var avg = ready.length ? (ready.reduce(function(s, r){ return s + Number(r.answers.ready); }, 0) / ready.length).toFixed(1) : "—";
+      var body = '<p><b>Ready (1–5):</b> average ' + avg + ' · ' + tally("ready") + '</p><p><b>How it went:</b> ' + tally("went") + '</p><p><b>Hub vs exam:</b> ' + tally("match") + '</p>';
+      var notes = ans.filter(function(r){ return r.answers.missed; });
+      body += '<h4 style="margin:14px 0 6px">Missed or barely covered</h4>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<div class="empty">No written answers.</div>');
+      var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "—") + '</td><td>' + esc(r.answers.went || "—") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "—" : r.accuracy + "%") + '</td></tr>'; }).join("");
+      body += '<h4 style="margin:14px 0 6px">Each answer next to that person’s use of the hub</h4><div class="tbl-wrap"><table class="data"><thead><tr><th class="n">Ready</th><th>How it went</th><th class="n">Time in hub</th><th class="n">Answers</th><th class="n">Accuracy</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
+      var who = {}; ans.forEach(function(r){ who[r.visitor_id] = 1; });
+      return card("Exam check-in · " + hubCell(p[0]) + " · " + esc(p[1]), fmtNum(ans.length) + " check-ins from " + fmtNum(Object.keys(who).length) + " people (someone can send more than one)", body);
+    }).join("");
+  }
+  function renderSearches(){
+    var d = data.searches;
+    if (!d || d.error) return card("Search terms", "", '<div class="err">Couldn’t load search terms (migration_v23).</div>');
+    var rows = (d.data || []).filter(function(r){ return keepHub(r.hub); });
+    if (!rows.length) return card("Search terms", rangeText(), '<div class="empty">No searches recorded yet. Tracking started 2026-09-29.</div>');
+    var none = rows.filter(function(r){ return !Number(r.hits); }), top = rows.slice(0, 30);
+    function tbl(list){ return '<div class="tbl-wrap"><table class="data"><thead><tr><th>Term</th><th>Hub</th><th class="n">Searches</th><th class="n">Results</th></tr></thead><tbody>' +
+      list.map(function(r){ return '<tr><td class="lbl">' + esc(r.term) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.searches) + '</td><td class="n">' + fmtNum(r.hits) + '</td></tr>'; }).join("") + '</tbody></table></div>'; }
+    return card("Searches with no results", rangeText() + " · content the hub didn’t have", none.length ? tbl(none.slice(0, 40)) : '<div class="empty">Every search found something.</div>') +
+      card("Top searches", rangeText(), tbl(top));
+  }
+
   /* ---------- surveys: results, on/off, and a form to publish one ---------- */
   function renderSurveys(){
     var el = $('[data-panel="surveys"]');
@@ -516,7 +555,7 @@ table.data tr.group:hover td{background:none;}
       '<form class="sv-form" id="svForm"><input id="svTitle" placeholder="Title, e.g. “Help shape the hubs”" required maxlength="80">' + qRow(1) + qRow(2) + qRow(3) +
       '<div class="row"><label class="switch"><input type="checkbox" id="svLive" checked> Go live now</label><button class="icon-btn" type="submit">Publish survey</button><span id="svMsg" class="note" style="margin:0"></span></div></form>');
     if (!list.length) out = card("Surveys", "", '<div class="empty">No surveys yet. Publish one below, or ask a Claude session to write one.</div>') + out;
-    el.innerHTML = out;
+    el.innerHTML = renderDebriefs() + renderSearches() + out;
   }
   document.addEventListener("click", function(e){
     var b = e.target.closest("[data-sv-toggle]"); if (!b) return;
