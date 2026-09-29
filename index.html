@@ -712,14 +712,29 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
       modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
-  /* Archived hubs keep a small card (no Open button) for DEBRIEF_DAYS after their last exam, so people who come
-     back late can still do the exam check-in. Move a hub's entry here from HUBS when it's archived (keep exams and
-     stateKey; the hub's saved progress stays in the browser after its page is gone). */
-  var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in (and an archived hub's card) stays offered */
+  /* Archiving is automatic: a hub in HUBS turns into an archived card (no Open button) at ARCHIVE_HOUR on the day
+     of its last exam, and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
+     Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
+     from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
+     DEBRIEF_DAYS after the exam. Moving an entry here by hand (keep exams and stateKey) works the same way. */
+  var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
+  var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [
     { id:"hepatobiliary", cls:"gi", title:"GI Exam 2 Hub", code:"GI & MSK · Exam 2", stateKey:"hbh-state-v1",
-      exams:[ { name:"GI Exam 2", label:"Exam", date:"2026-09-18" } ] }
+      exams:[ { name:"GI Exam 2", label:"Exam", date:"2026-09-18" } ], hideCardOn:"2026-10-06" }
   ];
+  function examAt(x, hour){ var d = parseYmd(x.date); d.setHours(hour, 0, 0, 0); return d; }
+  function lastExam(hub){ return (hub.exams || []).filter(function(x){ return x.date; }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null; }
+  function archiveAt(hub){ var x = lastExam(hub); return x ? examAt(x, ARCHIVE_HOUR) : null; }
+  function cardGoneAt(hub){
+    if (hub.hideCardOn) return parseYmd(hub.hideCardOn);
+    var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;
+  }
+  HUBS = HUBS.filter(function(h){
+    var a = archiveAt(h);
+    if (a && new Date() >= a){ ARCHIVED_HUBS.push(h); return false; }
+    return true;
+  });
   var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3" };
   var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "fixed-pros":"pros", perio:"perio" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
@@ -933,6 +948,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     else {
       hub = (LAST && HUBS.filter(function(h){ return h.id === LAST.id; })[0]) || HUBS[0];
     }
+    $("hero").style.display = hub ? "" : "none";
+    if (!hub) return;
     cls = CLASSES[hub.cls];
     $("hero").setAttribute("style", ringVars(cls.ring));
     var opened = LAST && LAST.id === hub.id ? relDay(new Date(LAST.t)) : null;
@@ -1020,9 +1037,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">Open' + ICON.arrow + '</a></div>' +
     '</article>';
   }
-  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return pastExams(h).length; }); }
+  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ var g = cardGoneAt(h); return g && new Date() < g; }); }
   function archivedCardHTML(hub){
-    var cls = CLASSES[hub.cls], p = readProgress(hub), last = pastExams(hub)[0];
+    var cls = CLASSES[hub.cls], p = readProgress(hub), last = lastExam(hub);
     return '<article class="hub-card is-archived" style="' + ringVars(cls.ring) + '">' +
       '<div class="hub-top"><span class="chip">' + esc(hub.code) + '</span><span class="due arch-tag">Archived</span></div>' +
       '<h4>' + esc(hub.title) + '</h4>' +
@@ -1210,13 +1227,15 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
   ];
   var debriefSb = null;
-  function pastExams(hub){
-    return (hub.exams || []).filter(function(x){ var d = -daysUntil(x.date); return x.date && d >= 1 && d <= DEBRIEF_DAYS; })
+  /* exams whose check-in is open: from `hour` on exam day until DEBRIEF_DAYS after it, newest first */
+  function pastExams(hub, hour){
+    var now = new Date();
+    return (hub.exams || []).filter(function(x){ return x.date && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS; })
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
   }
   function debriefHub(id){ return HUBS.concat(ARCHIVED_HUBS).filter(function(h){ return h.id === id; })[0]; }
   function checkinButtonsHTML(hub){
-    return pastExams(hub).map(function(x){
+    return pastExams(hub, CHECKIN_HOUR).map(function(x){
       return '<button type="button" class="checkin-btn" data-checkin="' + esc(hub.id) + '" data-exam="' + esc(x.date) + '">' + ICON.chat +
         '<span>Check in on ' + esc(x.name || hub.title) + '</span></button>';
     }).join("");
@@ -1226,7 +1245,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var best = null;
     HUBS.concat(ARCHIVED_HUBS).forEach(function(h){
       if (!readProgress(h)) return;
-      pastExams(h).forEach(function(x){
+      pastExams(h, ARCHIVE_HOUR).forEach(function(x){
         if (ls("sh_debrief_" + h.id + "_" + x.date)) return;
         if (!best || x.date > best.x.date) best = { h:h, x:x };
       });

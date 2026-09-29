@@ -26,9 +26,11 @@ does it differently.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub. **Archiving a hub
   always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
   clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
-  resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. When archiving, **move** the hub's
-  `HUBS` entry into `ARCHIVED_HUBS` in `index.html` (keep `exams` and `stateKey`), so its archived card and exam
-  check-in stay on the dashboard for 60 days after the exam. Read the check-ins as late as you can.
+  resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. The dashboard archives a hub **by itself** at 10 pm on the day of
+  its last exam (`ARCHIVE_HOUR`): its card turns into an archived card with no Open button, which disappears 10 days
+  later (`CARD_DAYS`; `hideCardOn` overrides). "Check in" buttons show from 8 am on exam day; the pop-up only goes out
+  from 10 pm and still reaches first visits up to 60 days after (`DEBRIEF_DAYS`). The hub's page itself stays up until
+  someone removes it, so the retrospective and cleanup are still manual; moving the entry into `ARCHIVED_HUBS` then is optional. Read the check-ins as late as you can.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
   Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
