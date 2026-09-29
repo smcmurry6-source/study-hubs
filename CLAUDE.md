@@ -23,7 +23,10 @@ does it differently.
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, offer Sam
   a recap and ask before publishing it; add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
   `question-banks/` — archived hubs' banks.
-- `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub. **Archiving a hub
+- `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
+  hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. A daily routine
+  ("Daily lessons refresh") runs that whole runbook: refreshes `LESSONS.md` from all data, reports and suggestions
+  (`tools/lessons-daily.sql`) and opens a PR with small data-backed fixes to the live hubs. **Archiving a hub
   always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
   clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
   resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. The dashboard archives a hub **by itself** at 10 pm on the day of
