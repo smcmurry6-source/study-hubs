@@ -2676,9 +2676,9 @@ function renderReview(){
 
 /* ===================================================================
    MOCK EXAM: 40 MCQs, new material only, weighted like the real exam
-   (Dr. Herr said L20 contributes 4 questions; the rest split ~evenly)
+   (the official per-lecture question counts for Exam 3)
    =================================================================== */
-var MOCK_BLUEPRINT = { nutrition:5, joints:4, cartilage:4, bone:4, bonedev:5, autoimmune:5, hereditary:5, drugs:4, tumors:4 };
+var MOCK_BLUEPRINT = { nutrition:4, joints:4, cartilage:6, bone:4, bonedev:4, autoimmune:5, hereditary:4, drugs:5, tumors:4 };
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
@@ -2705,7 +2705,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the same length as Exam 3, drawn only from the new Exam 3 lectures (L19–L27). Weighting follows the real exam: 4 from Joint Diseases (Dr. Herr said four) and 4–5 from each other lecture. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the same length as Exam 3, drawn only from the new Exam 3 lectures (L19–L27). Weighting matches the real exam\'s question count per lecture: 6 from Cartilage (L21), 5 each from Autoimmune Diseases (L24) and Bone Drugs (L26), and 4 from each of the other six lectures. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
