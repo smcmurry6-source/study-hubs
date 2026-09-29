@@ -101,8 +101,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 
 - **Every question type needs obvious right/wrong feedback.** Two of the first four real reports were about this:
   self-graded recall cards looked unchanged after tapping "I got it" (perio, fixed 2026-09-28), and ordering
-  questions didn't say clearly whether the order was right (perio `q4-49`, fixed on branch
-  `claude/epic-cannon-wd29zd`, not merged as of 2026-09-29). Before shipping a new question type, answer one right
+  questions didn't say clearly whether the order was right (perio `q4-49`, fixed 2026-09-29 in #19: finished
+  sequences turn green/red, show where each misplaced step belongs and a verdict line; the "picked" style had been
+  overriding the result colours). Before shipping a new question type, answer one right
   and one wrong on a phone and check the result is unmistakable.
 - **Answer choices must not give the answer away.** Perio `q2-02` labelled the wrong choices "(… monofilament)"
   while the stem asked for the braided suture. An audit then found 24 more giveaways (labels that rule a choice out,
