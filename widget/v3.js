@@ -1735,6 +1735,19 @@
       }).join("") + (list.length > cap ? '<div class="shstat-empty">' + (list.length - cap) + ' more. Add a word to narrow it down.</div>' : '') + '</div>';
     });
     searchResults.innerHTML = total ? html : '<div class="shstat-empty">No matches for &#8220;' + esc(raw) + '&#8221;.</div>';
+    logSearch(raw, total);
+  }
+  /* What people search for, once they stop typing (search_terms, migration_v23): terms with 0 results are
+     content the hub is missing, which is read back when the hub is archived. Each term once per page load. */
+  var searchLogTimer = null, searchLogged = {};
+  function logSearch(raw, total){
+    clearTimeout(searchLogTimer);
+    var term = raw.toLowerCase().replace(/\s+/g, " ").trim();
+    if (term.length < 3 || term.length > 60 || searchLogged[term]) return;
+    searchLogTimer = setTimeout(function(){
+      searchLogged[term] = 1;
+      safeRpc("record_search", { p_hub: HUB, p_term: term, p_hits: total });
+    }, 1500);
   }
   var searchTimer = null;
   if (searchInput) searchInput.addEventListener("input", function(){ clearTimeout(searchTimer); searchTimer = setTimeout(function(){ runSearch(searchInput.value); }, 110); });

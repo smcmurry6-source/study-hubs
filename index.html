@@ -1139,6 +1139,81 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }catch(e){}
     return VISITOR;
   }
+  /* Exam check-in: from the day after an exam in HUBS, for 6 days, anyone with progress in that hub
+     is asked once how it went (exam_debriefs, migration_v23). Read back when the hub is archived, to
+     improve the next one (see LESSONS.md). Answering or "No thanks" both hide it for good. */
+  var DEBRIEF_QS = [
+    { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
+    { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
+    { id:"match", kind:"choice", prompt:"The hub's questions compared with the real exam:", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
+    { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
+  ];
+  function dueDebrief(){
+    var today = dayStart(new Date()), best = null;
+    HUBS.forEach(function(h){
+      if (!readProgress(h)) return;
+      (h.exams || []).forEach(function(x){
+        if (!x.date) return;
+        var days = Math.round((today - dayStart(new Date(x.date + "T12:00:00"))) / 864e5);
+        if (days < 1 || days > 6) return;
+        var key = "sh_debrief_" + h.id + "_" + x.date;
+        if (ls(key)) return;
+        if (!best || x.date > best.x.date) best = { h:h, x:x, key:key };
+      });
+    });
+    return best;
+  }
+  function startDebrief(sb){
+    var due = dueDebrief(), me = surveyVisitor();
+    if (!due || !me) return false;
+    var answers = {}, examId = due.x.date + " " + (due.x.label || "Exam");
+    var box = document.createElement("section");
+    box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
+    var h = '<button type="button" class="survey-x" aria-label="No thanks">×</button><div class="survey-eyebrow">Exam check-in · 1 minute</div>' +
+      '<h3>How did ' + esc(due.x.name || due.h.title) + ' go?</h3>';
+    DEBRIEF_QS.forEach(function(q){
+      h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p>' + esc(q.prompt) + '</p>';
+      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="Topics, question styles, anything"></textarea>';
+      else if (q.kind === "scale") {
+        h += '<div class="survey-opts survey-scale">';
+        for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + n + '">' + n + '</button>';
+        h += '</div><div class="survey-scale-ends"><span>' + esc(q.ends[0]) + '</span><span>' + esc(q.ends[1]) + '</span></div>';
+      } else h += '<div class="survey-opts">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+      h += '</div>';
+    });
+    h += '<div class="survey-foot"><button type="button" class="survey-skip">No thanks</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+    box.innerHTML = h;
+    document.body.appendChild(box);
+    requestAnimationFrame(function(){ box.classList.add("is-shown"); });
+    var send = box.querySelector(".survey-send");
+    function refresh(){
+      var t = box.querySelector("textarea"), v = t ? t.value.trim() : "";
+      if (v) answers.missed = v.slice(0, 600); else delete answers.missed;
+      send.disabled = !Object.keys(answers).length;
+    }
+    function done(payload, thanks){
+      lsSet(due.key, "1");
+      sb.rpc("submit_exam_debrief", { p_hub:due.h.id, p_exam:examId, p_visitor:me, p_answers:payload }).then(function(){}, function(){});
+      if (!thanks){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); return; }
+      box.innerHTML = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> This shapes how the next hub is built.</p>';
+      setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+    }
+    box.addEventListener("input", refresh);
+    box.addEventListener("click", function(e){
+      var opt = e.target.closest(".survey-opt");
+      if (opt){
+        var q = opt.closest(".survey-q"), id = q.getAttribute("data-sq"), on = opt.getAttribute("aria-pressed") !== "true";
+        q.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+        opt.setAttribute("aria-pressed", String(on));
+        if (on) answers[id] = q.getAttribute("data-kind") === "scale" ? +opt.getAttribute("data-sv") : opt.getAttribute("data-sv");
+        else delete answers[id];
+        refresh(); return;
+      }
+      if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
+      else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
+    });
+    return true;
+  }
   function startSurvey(sb){
     var me = surveyVisitor();
     if (!me) return;
@@ -1369,7 +1444,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (window.shClicks) window.shClicks.start({ sb:sb, hub:"dashboard", visitor:surveyVisitor(), section:function(){ return "dashboard"; } });
 
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
-    setTimeout(function(){ startSurvey(sb); }, 4000);
+    /* after an exam, an exam check-in takes the survey's place for that visit */
+    setTimeout(function(){ if (!startDebrief(sb)) startSurvey(sb); }, 4000);
 
     /* Golden Probe (an easter egg in the hubs): who found today's, per hub */
     sb.rpc("get_golden_today").then(function(res){

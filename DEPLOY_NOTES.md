@@ -61,8 +61,24 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.
 
+## Archiving a hub = retrospective (standing rule)
+
+Every time a hub is archived, all the data gathered on it (time by section, clicks, engagement, questions, exam
+check-ins, search terms, reports, surveys) is used to improve the next hubs: run `tools/retro.sql`, then record the
+findings and resulting changes in `LESSONS.md`. **Any session building or restructuring a hub reads `LESSONS.md`
+first** (hub Projects included: it holds what the class actually used and where they struggled).
+
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-29 (retrospectives + new tracking, Claude Code)** — New standing rule: archiving a hub includes a
+  retrospective from all its data; `LESSONS.md` (standing lessons + a GI Exam 2 retro written from its data) and
+  `tools/retro.sql` (the queries). Two new data sources (`migration_v23.sql`, applied via the connector):
+  **exam check-ins** — from the day after each exam in the dashboard's `HUBS` list, for 6 days, people with progress
+  in that hub get a one-time card (how ready they felt, how it went, hub vs exam, what the hub missed; replaces
+  that visit's survey), stored in `exam_debriefs` via `submit_exam_debrief`; keep an archived hub's `HUBS` entry
+  until that window has passed. **Search terms** — the widget's Search sends the term (lowercased, 3-60 chars, 1.5 s
+  after typing stops, once per term per page load) and its result count to `record_search` → `search_terms`.
+  Admin page Surveys tab shows both (`get_exam_debriefs`, `get_search_terms`, admin only).
 - **2026-09-29 (perio: ordering-question feedback + q4-49, Claude Code)** — From student report #6. Finished sequence
   questions never showed right/wrong: `.qcard-seq-steps .qcard-choice[data-picked]` out-ranked the `data-state` colours.
   Now the steps re-sort into the tapped order, turn green/red, wrong ones say "Belongs in step N", and a verdict line

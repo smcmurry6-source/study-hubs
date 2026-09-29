@@ -23,6 +23,11 @@ does it differently.
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, offer Sam
   a recap and ask before publishing it; add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
   `question-banks/` — archived hubs' banks.
+- `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub. **Archiving a hub
+  always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
+  clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
+  resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. Leave the hub's `HUBS` entry on the
+  dashboard until the 6-day exam check-in window after its last exam has passed, or no check-ins get collected.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
   Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
@@ -97,7 +102,8 @@ foreground/polled; an idle cloud VM is reclaimed and background work is lost.
 To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
 `activity_pings` (time per `<mode>/<sub-view>`, 25 s per ping), `ui_clicks` + `ui_click_reach` (clicks per
 button/tab and distinct people, per day), `question_stats` / `question_choices` (accuracy, popular wrong answers),
-`mode_stats`. The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
+`mode_stats`, `exam_debriefs` (post-exam check-ins) and `search_terms` (what people searched for, with result
+counts). The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
 Surveys: one live at a time on the dashboard, shown once per visitor. Publish from `review/` → Surveys, or
 `admin_upsert_survey(p_secret, p_slug, p_title, p_questions, p_active)` with 1-3 questions
 (`kind`: choice | multi | scale | text). Results: `get_survey_results(p_secret)`. Ask Sam before a survey goes live.
