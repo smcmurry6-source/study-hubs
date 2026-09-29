@@ -164,6 +164,9 @@ table.data tr.group:hover td{background:none;}
 .report-reply{margin-top:8px; font-size:13.5px; white-space:pre-wrap; overflow-wrap:anywhere; border-left:3px solid var(--ok); padding-left:10px;}
 .report-sent{display:block; margin-top:6px; font-size:12.5px; color:var(--ink-3);}
 .report-replybox{display:block; width:100%; min-height:64px; margin-top:10px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:var(--r-m); background:var(--paper-2); color:inherit; font:inherit; font-size:14px; resize:vertical;}
+.report-all-title{display:block; width:100%; margin-top:6px; padding:7px 10px; border:1px solid var(--line-strong); border-radius:var(--r-m); background:var(--paper-2); color:inherit; font:inherit; font-size:14px; font-weight:600;}
+.report-everyone .report-replybox, .report-all-msg{display:block; width:100%; min-height:80px; margin-top:6px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:var(--r-m); background:var(--paper-2); color:inherit; font:inherit; font-size:14px; resize:vertical;}
+.report-everyone[hidden]{display:none;}
 .report-opts{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
 .report-opts .report-sent{margin-top:4px;}
 .resolve-btn{flex:none; border:1px solid var(--line-strong); background:var(--paper-2); color:var(--ink-2); padding:5px 12px; border-radius:var(--r-pill); font-size:12.5px; font-weight:600;}
@@ -734,7 +737,11 @@ table.data tr.group:hover td{background:none;}
             '<div class="report-sent">' + (r.can_notify ? (r.reply_seen_at ? 'Seen by the sender ' + fmtDate(r.reply_seen_at) : 'Sender will see this next visit') : 'Sent before replies existed: the sender can’t be notified') + '</div>'
           : '<textarea class="report-replybox" maxlength="1500" placeholder="' + (r.kind === "flag" ? 'What was fixed (shown to the sender)' : 'Reply to the sender (optional)') + '"></textarea>' +
             '<div class="report-opts"><span class="report-sent">' + (r.can_notify ? 'The sender is notified when you resolve this.' : 'Sent before replies existed: only “tell everyone” reaches anyone.') + '</span>' +
-            '<label class="switch"><input type="checkbox" class="report-all"> Tell everyone</label></div>') +
+            '<label class="switch"><input type="checkbox" class="report-all"> Tell everyone</label></div>' +
+            /* what the whole class sees: its own wording, since the reply is written to one person */
+            '<div class="report-everyone" hidden><div class="report-sent">Notice to everyone (shown once on every hub and the dashboard, kept in their Inbox):</div>' +
+            '<input class="report-all-title" maxlength="120" value="' + esc(r.kind === "flag" ? "A question was fixed after a student report" : "A classmate's suggestion was added") + '">' +
+            '<textarea class="report-all-msg" maxlength="1500" placeholder="What everyone should know"></textarea></div>') +
         '</div>' +
         '<button class="resolve-btn' + (r.resolved ? ' is-done' : '') + '" type="button">' + (r.resolved ? '✓ Resolved · reopen' : 'Resolve & notify') + '</button>' +
       '</div>';
@@ -896,6 +903,17 @@ table.data tr.group:hover td{background:none;}
   /* inbox interactions */
   $('[data-panel="inbox"]').addEventListener("change", function(e){
     if (e.target.id === "showResolved") { showResolvedReports = e.target.checked; renderInbox(); }
+    /* "Tell everyone" opens its own box, started from the reply so it can be reworded for the class */
+    if (e.target.classList.contains("report-all")) {
+      var cardEl = e.target.closest(".report"), ev = cardEl.querySelector(".report-everyone");
+      ev.hidden = !e.target.checked;
+      var msg = cardEl.querySelector(".report-all-msg"), reply = cardEl.querySelector(".report-replybox").value.trim();
+      if (e.target.checked && !msg.value.trim() && reply) {
+        var row = (data.reports.data || []).find(function(r){ return r.kind === cardEl.getAttribute("data-kind") && r.id === Number(cardEl.getAttribute("data-id")); });
+        msg.value = (row && row.hub ? hubLabel(row.hub) + ": " : "") + reply;
+      }
+      if (e.target.checked) msg.focus();
+    }
   });
   $('[data-panel="inbox"]').addEventListener("click", function(e){
     var btn = e.target.closest(".resolve-btn"); if (!btn) return;
@@ -908,17 +926,17 @@ table.data tr.group:hover td{background:none;}
     var box = cardEl.querySelector(".report-replybox");
     var reply = box ? box.value.trim() : "";
     var toAll = !!(cardEl.querySelector(".report-all") || {}).checked;
-    if (next && toAll && !reply) { alert("Write the reply first: it's what everyone will see."); return; }
+    var allTitle = toAll ? cardEl.querySelector(".report-all-title").value.trim() : "";
+    var allMsg = toAll ? cardEl.querySelector(".report-all-msg").value.trim() : "";
+    if (next && toAll && (!allTitle || !allMsg)) { alert("Write the notice to everyone first (title and message)."); return; }
     btn.disabled = true;
     supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next, p_reply: reply || null }).then(function(res){
       if (!(res && res.error)) {
         row.resolved = next;
         if (next) { if (reply) row.reply = reply; row.resolved_at = new Date().toISOString(); row.reply_seen_at = null; }
-        /* "Tell everyone": the same reply as a notice every visitor sees once (widget/replies.js) */
+        /* "Tell everyone": a notice every visitor sees once and keeps in their Inbox (widget/replies.js) */
         if (next && toAll) {
-          supabase.rpc("admin_post_notice", { p_secret: secret, p_hub: null,
-            p_title: kind === "flag" ? "A question was fixed after a student report" : "A classmate's suggestion was added",
-            p_message: (row.hub ? hubLabel(row.hub) + ": " : "") + reply, p_days: 14 }).then(function(r2){
+          supabase.rpc("admin_post_notice", { p_secret: secret, p_hub: null, p_title: allTitle, p_message: allMsg, p_days: 14 }).then(function(r2){
             if (r2 && r2.error) alert("Resolved, but the notice to everyone didn't send.");
           });
         }
