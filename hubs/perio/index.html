@@ -267,6 +267,11 @@ main{padding-top:20px}
 .qcard-choice[data-state="incorrect"],.qcard-match-item[data-state="incorrect"]{background:var(--bad-soft);border-color:var(--bad);color:var(--ink)}
 .qcard-choice[data-selected="true"],.qcard-match-item[data-selected="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .qcard-seq-steps .qcard-choice[data-picked="true"]{background:var(--surface-2);border-color:var(--ink)}
+.qcard-seq-steps .qcard-choice[data-state="correct"]{background:var(--good-soft);border-color:var(--good)}
+.qcard-seq-steps .qcard-choice[data-state="incorrect"]{background:var(--bad-soft);border-color:var(--bad)}
+.qcard-seq-fix{display:block;font-size:.78rem;font-weight:600;color:var(--bad);margin-top:2px}
+.qcard-seq-result{margin:8px 0 0;font-size:.88rem;font-weight:600}
+.qcard-seq-result.ok{color:var(--good)}.qcard-seq-result.miss{color:var(--bad)}
 .qcard-choice[disabled]{cursor:default}
 .qcard-match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .qcard-match-col{display:flex;flex-direction:column;gap:7px;min-width:0}
@@ -1246,7 +1251,7 @@ var QUESTIONS = [
 { id:'q4-46', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which polishing technique does the deck recommend?", choices:["Low-abrasion paste, slow-speed handpiece, minimal heat, cup at 90° with intermittent light pressure", "Coarse paste at high speed with steady, heavy pressure so stain comes off in one pass", "Pumice for a full 2 minutes per tooth, with the cup held flat and pressed firmly against the surface", "Subgingival polishing down to the base of the pocket with a pointed rubber cup"], answer:0, ex:"Polish with a low-abrasion paste on a slow-speed handpiece, keep heat down, and hold the cup at 90° with light, intermittent pressure to limit enamel and tissue loss.", src:'slides' },
 { id:'q4-47', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Which is a valid reason FOR polishing?", choices:["Removing extrinsic stain before sealants or fluoride, and patient satisfaction", "Removing subgingival calculus that the curette left behind on the root", "Reducing probing depth by smoothing the soft-tissue side of the pocket wall", "Removing endotoxin that is bound to the cementum of the root surface"], answer:0, ex:"Polishing removes extrinsic stain, preps teeth for sealants or fluoride, and patients like it. It does nothing for subgingival calculus, pocket depth or endotoxin.", src:'slides' },
 { id:'q4-48', lec:'phase1-therapy', type:'mcq', stem:"The mucogingival part of the exam records which two things?", choices:["The amount of keratinized gingiva and the location of the mucogingival junction", "Probing depth and bleeding on probing at each of the six sites around every tooth", "Mobility and fremitus, tested with two instrument handles and a finger on the teeth", "Furcation class and root-trunk length on every multi-rooted tooth in the mouth"], answer:0, ex:"The mucogingival exam records the width of keratinized gingiva and where the mucogingival junction sits.", src:'slides' },
-{ id:'q4-49', lec:'phase1-therapy', type:'sequence', stem:"Put the steps for disclosing plaque in order.", steps:['Chew the disclosing tablet','Rinse briefly with water','Remove excess solution from the cheeks and tongue','Show the patient with a mirror'], ex:"Disclose, rinse lightly so only the plaque stays stained, clear the excess dye from cheeks and tongue, then hand the patient a mirror to show them.", src:'slides' },
+{ id:'q4-49', lec:'phase1-therapy', type:'mcq', stem:"After chewing a disclosing tablet, why does the patient rinse only briefly with water before you show them the result?", choices:['Rinsing longer would stain the enamel and pellicle as well','Rinsing lightly clears loose dye while the plaque stays stained','The tablet needs a few minutes to stain the gingiva as well','A brief rinse keeps the dye from staining existing restorations'], answer:1, ex:"The rinse is only meant to clear loose dye. Plaque holds on to the stain, so after a light rinse (and wiping excess dye off the cheeks and tongue) only the plaque stays colored, and you hand the patient a mirror to show them where it is. Disclosing shows presence of plaque, not how much.", src:'slides' },
 { id:'q4-50', lec:'phase1-therapy', type:'recall', stem:"List the occlusal findings the deck links to periodontal disease.", answer:"Parafunctional habits, tooth mobility, fremitus, tooth migration, open contacts, atypical tooth wear and wear facets, possible TMJ pain, infrabony defects, and a widened PDL space.", src:'slides' },
 { id:'q4-51', lec:'phase1-therapy', type:'mcq', stem:"Which instrument does the deck call the most important one in the periodontal exam?", choices:['The periodontal probe','The ODU 11/12 explorer','The mouth mirror','The Nabers probe'], answer:0, ex:"The probe measures PD and CAL, outlines pocket form, and contributes to plaque, gingival and calculus assessment.", src:'slides' },
 { id:'q4-52', lec:'phase1-therapy', mid:false, type:'mcq', stem:"During Phase I, how do you check whether you scaled and root planed well?", choices:["Explore the root surface during the session, then judge tissue response (less erythema, edema and BOP) at re-evaluation", "Take a radiograph the same day and compare the calculus visible interproximally with the pre-op film to confirm that it is gone", "Measure new bone fill at one week, since good root planing produces radiographic bone gain by then", "Ask whether the patient reports sensitivity afterwards, since smooth, clean roots are always sensitive"], answer:0, ex:"The patient's oral hygiene plays a fundamental role in how the re-evaluation looks.", src:'slides' },
@@ -3301,10 +3306,16 @@ function wireQuestionContainer(container){
       seqBtn.textContent = picks.length + '. ' + sq.steps[oi];
       if(picks.length === sq.steps.length){
         var ok = picks.every(function(v,i){ return v === i; });
-        seqBtn.closest('.qcard-seq-steps').querySelectorAll('.qcard-choice').forEach(function(b){
-          var bi = parseInt(b.getAttribute('data-step-idx'),10);
-          b.setAttribute('data-state', picks.indexOf(bi) === bi ? 'correct' : 'incorrect');
+        /* show the answer in the order it was tapped, each step marked right/wrong with where it belongs, plus a verdict */
+        var seqWrap = seqBtn.closest('.qcard-seq-steps'), nRight = 0;
+        picks.forEach(function(oi2, pos){
+          var b = seqWrap.querySelector('.qcard-choice[data-step-idx="'+oi2+'"]');
+          var right = oi2 === pos; if(right) nRight++;
+          b.setAttribute('data-state', right ? 'correct' : 'incorrect');
+          if(!right) b.insertAdjacentHTML('beforeend', '<span class="qcard-seq-fix">Belongs in step '+(oi2+1)+'</span>');
+          seqWrap.appendChild(b);
         });
+        seqWrap.insertAdjacentHTML('afterend', '<p class="qcard-seq-result '+(ok?'ok':'miss')+'" role="status">'+(ok ? 'Correct: every step is in the right order.' : 'Not quite: '+nRight+' of '+picks.length+' steps in the right spot. The correct order is below.')+'</p>');
         var ex = explainOf(sq.id, seqBtn);
         var exb = ex && ex.querySelector('.qx-body');
         if(exb && !ok){ exb.innerHTML = '<b>Correct order:</b> ' + sq.steps.map(escHtml).join(' → ') + (sq.ex ? '<br><br>' + escHtml(sq.ex) : ''); }
