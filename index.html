@@ -384,7 +384,10 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px 22px; box-shadow:var(--shadow); min-width:0;}
 .panel h3{font-size:16px; letter-spacing:-.005em;}
 /* survey card: one short survey at a time, bottom corner, never blocks the page */
-.survey{position:fixed; z-index:50; right:16px; bottom:16px; width:min(380px, calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto;
+.survey{position:fixed; z-index:50; right:16px; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); width:min(380px, calc(100vw - 32px));
+  /* dvh = the height actually visible on phones (100vh includes the space behind the browser's toolbars) */
+  max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  overflow:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
   background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow-lift); padding:18px 18px 16px;
   opacity:0; transform:translateY(16px); transition:opacity .3s, transform .3s cubic-bezier(.2,.8,.3,1);}
 .survey.is-shown{opacity:1; transform:none;}
@@ -400,11 +403,26 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .survey-scale .survey-opt{min-width:40px; text-align:center;}
 .survey-scale-ends{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin-top:4px;}
 .survey textarea{width:100%; min-height:64px; font:inherit; font-size:14px; padding:8px 10px; border-radius:10px; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); resize:vertical;}
-.survey-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;}
+.survey-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;
+  /* Send and Not now stay in view even when the card has to scroll */
+  position:sticky; bottom:-16px; margin-bottom:-16px; padding:10px 0 16px; background:var(--surface); border-top:1px solid var(--line);}
 .survey-foot .btn{padding:9px 16px; font-size:14px;}
 .survey-skip{font:inherit; font-size:13.5px; border:0; background:none; color:var(--ink-3); cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
 .survey-thanks{font-size:15px; margin:6px 0 2px;}
-@media (max-width:600px){ .survey{right:8px; left:8px; bottom:8px; width:auto;} }
+@media (max-width:600px){
+  .survey{right:8px; left:8px; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); width:auto;
+    max-height:calc(100vh - 16px); max-height:calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));}
+  .survey textarea{font-size:16px;}   /* under 16px, iPhones zoom the page in when the box is tapped */
+}
+@media (max-height:760px){
+  .survey{padding:14px 16px 16px;}
+  .survey h3{font-size:21px; margin-bottom:6px;}
+  .survey-why{font-size:12.5px;}
+  .survey-q{margin-top:9px;}
+  .survey-q p{margin-bottom:6px; font-size:14px;}
+  .survey-opt{padding:6px 11px; font-size:13px;}
+  .survey textarea{min-height:52px;}
+}
 .golden-line{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:-6px 0 16px; padding:10px 14px; border-radius:12px; border:1px solid color-mix(in srgb, #C9971C 45%, var(--line)); background:color-mix(in srgb, #C9971C 8%, var(--surface)); font-size:14px; color:var(--ink-2);}
 .golden-line svg{flex:0 0 auto; width:18px; height:18px; color:#C9971C;}
 .golden-line b{color:var(--ink);}
