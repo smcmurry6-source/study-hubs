@@ -70,6 +70,14 @@ first** (hub Projects included: it holds what the class actually used and where 
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-29 (Anki deck vetting, Claude Code)** — Vetted the class Anki decks (Drive: 7 "MSK & GI Exam 3" decks + last
+  year's Exam 3 practice deck; the D2 Perio Midterm and Practice Questions decks) card by card against each bank and the
+  lecture notes; only real gaps were added, nothing imported wholesale. MSK +5 (`h-jt-oa-case`, `h-nut-vitA-epith`,
+  `h-nut-iron-us`, `h-ai-sjogren-lymph`, `h-dr-teri-limit`), perio +2 (`q1-31` Stage 3 vs 4, `q1-32` grading vs staging).
+  PerioChip corrected from 1.5 mg to **2.5 mg** chlorhexidine (review table, `q8-11`, arcade clue). The D2 Perio Final
+  Exam deck (S5-S9) is on hold until those sessions are taught. No reading text changed, so no narration regenerated.
+  **MSK and Perio Projects: carry these into the split sources, or the next single-file build reverts them.**
+
 - **2026-09-29 (retrospectives + new tracking, Claude Code)** — New standing rule: archiving a hub includes a
   retrospective from all its data; `LESSONS.md` (standing lessons + a GI Exam 2 retro written from its data) and
   `tools/retro.sql` (the queries). Two new data sources (`migration_v23.sql`, applied via the connector):
