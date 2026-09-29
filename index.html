@@ -707,7 +707,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
       modes:["Compendium","Review tables","Mock exam","Arcade"], stateKey:"msk3-state-v1" },
     { id:"perio", cls:"perio", title:"Periodontology D2 Compendium", code:"Periodontology · Full unit",
-      exams:[ { name:"Periodontology midterm (S1-4)", label:"Midterm", date:"2026-10-01", code:"Periodontology · Midterm" },
+      exams:[ { name:"Periodontology midterm (S1-4)", label:"Midterm", date:"2026-10-01", code:"Periodontology · Midterm", promptHour:10 },
               { name:"Periodontology final", label:"Final", date:"2026-11-19", code:"Periodontology · Final" } ], updated:"2026-09-25",
       desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
       modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
@@ -716,7 +716,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      of its last exam, and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
-     DEBRIEF_DAYS after the exam. Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
+     until the final). Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [
@@ -1227,15 +1228,19 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
   ];
   var debriefSb = null;
-  /* exams whose check-in is open: from `hour` on exam day until DEBRIEF_DAYS after it, newest first */
-  function pastExams(hub, hour){
+  /* exams whose check-in is open, newest first: the card button from CHECKIN_HOUR on exam day, the pop-up from the
+     exam's promptHour (default ARCHIVE_HOUR); both until DEBRIEF_DAYS after it */
+  function pastExams(hub, forPopup){
     var now = new Date();
-    return (hub.exams || []).filter(function(x){ return x.date && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS; })
+    return (hub.exams || []).filter(function(x){
+      var hour = forPopup ? (x.promptHour != null ? x.promptHour : ARCHIVE_HOUR) : CHECKIN_HOUR;
+      return x.date && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS;
+    })
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
   }
   function debriefHub(id){ return HUBS.concat(ARCHIVED_HUBS).filter(function(h){ return h.id === id; })[0]; }
   function checkinButtonsHTML(hub){
-    return pastExams(hub, CHECKIN_HOUR).map(function(x){
+    return pastExams(hub, false).map(function(x){
       return '<button type="button" class="checkin-btn" data-checkin="' + esc(hub.id) + '" data-exam="' + esc(x.date) + '">' + ICON.chat +
         '<span>Check in on ' + esc(x.name || hub.title) + '</span></button>';
     }).join("");
@@ -1245,7 +1250,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var best = null;
     HUBS.concat(ARCHIVED_HUBS).forEach(function(h){
       if (!readProgress(h)) return;
-      pastExams(h, ARCHIVE_HOUR).forEach(function(x){
+      pastExams(h, true).forEach(function(x){
         if (ls("sh_debrief_" + h.id + "_" + x.date)) return;
         if (!best || x.date > best.x.date) best = { h:h, x:x };
       });

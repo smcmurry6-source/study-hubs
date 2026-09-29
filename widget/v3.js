@@ -2114,6 +2114,31 @@
     drillScript.onload = function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); };
     document.head.appendChild(drillScript);
   }
+  /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR);
+     a hub page still reachable after that says so once per visit, with a way back to the dashboard. */
+  (function(){
+    if (EXPORT_ONLY) return;
+    var last = null;
+    ((window.SH_EXPORT && window.SH_EXPORT.exams) || []).forEach(function(x){
+      var p = String((x && x.date) || "").split("-").map(Number); if (p.length !== 3 || !p[0]) return;
+      var d = new Date(p[0], p[1] - 1, p[2], 22);
+      if (!last || d > last.at) last = { at: d, x: x };
+    });
+    if (!last || new Date() < last.at) return;
+    try { if (sessionStorage.getItem("sh_archived_seen_" + HUB)) return; sessionStorage.setItem("sh_archived_seen_" + HUB, "1"); } catch (e) {}
+    function show(){
+      var box = document.createElement("div");
+      box.className = "sh-archived"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "This hub is archived");
+      box.innerHTML = '<div class="sh-archived-card"><b>This hub is archived</b>' +
+        '<p>It closed after the ' + esc(last.x.label || "exam") + ' on ' + esc(last.at.toLocaleDateString(undefined, { month: "long", day: "numeric" })) +
+        '. Everything still works if you want to look back, but it is no longer updated. Tell us how the exam went from the dashboard.</p>' +
+        '<div class="sh-archived-foot"><button type="button" class="sh-archived-stay">Keep browsing</button>' +
+        '<a class="sh-archived-go" href="' + new URL("../", thisScript.src).href + '">Go to the dashboard</a></div></div>';
+      box.addEventListener("click", function(e){ if (e.target === box || e.target.closest(".sh-archived-stay")) box.remove(); });
+      document.body.appendChild(box);
+    }
+    if (document.body) show(); else document.addEventListener("DOMContentLoaded", show);
+  })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
   if (!EXPORT_ONLY && supabase) {
     var clickScript = document.createElement("script");
