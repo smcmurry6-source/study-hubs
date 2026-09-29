@@ -68,7 +68,20 @@ check-ins, search terms, reports, surveys) is used to improve the next hubs: run
 findings and resulting changes in `LESSONS.md`. **Any session building or restructuring a hub reads `LESSONS.md`
 first** (hub Projects included: it holds what the class actually used and where they struggled).
 
+It is also refreshed **every day** (not just at archiving) by a Claude Code routine following
+`tools/lessons-refresh.md`: it reads all tracked data, student reports and suggestions since the last run
+(`tools/lessons-daily.sql`), rewrites the "Live signals" section, and opens a PR with small, data-backed fixes to the
+live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
+date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
+
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-09-29 (daily lessons refresh, Claude Code)** — New routine "Daily lessons refresh" (fresh cloud session
+  each day) runs `tools/lessons-refresh.md`: queries in `tools/lessons-daily.sql` (every report, suggestion, check-in,
+  survey answer and zero-result search since the last run, use per hub, hardest/easiest questions, popular wrong
+  answers, mocks, drill), rewrites `LESSONS.md`'s new "Live signals" section and "Last refreshed" date, and opens a
+  draft PR with small data-backed fixes to live hubs (bigger ideas go to Sam in the PR). New hubs: refresh first if
+  the date isn't today. No site change by itself.
 
 - **2026-09-29 (automatic archiving, Claude Code)** — The dashboard (`index.html`) archives a hub by itself at 10 pm on
   the day of its last exam (`ARCHIVE_HOUR`) and removes the archived card 10 days later (`CARD_DAYS`; `hideCardOn`

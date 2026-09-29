@@ -4,6 +4,11 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
+**Last refreshed: 2026-09-25** (never yet; the first run covers everything since click tracking began). A daily
+routine refreshes this file from all tracked data, reports and suggestions (`tools/lessons-refresh.md`) and ships
+small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
+`tools/lessons-refresh.md` first.**
+
 ## When a hub is archived: the retrospective
 
 Do this in the same session that archives the hub (after its bank is saved to `question-banks/`), and tell Sam
@@ -69,6 +74,10 @@ What each signal tells an author, and what to do with it in the next hub (and in
   for look-alikes (e.g. Crohn vs UC), and move exam hints into the relevant paragraph.
 - **What the exam asked that the hub missed** (check-ins): add those topics to that lecture's summary, and note the
   professor's emphasis for the next course they teach.
+
+## Live signals (rewritten by each daily refresh)
+
+Nothing yet: the first daily refresh fills this in (per live hub: what the data says now and what to do about it).
 
 ## Standing lessons (read before building a hub)
 
