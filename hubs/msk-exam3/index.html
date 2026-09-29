@@ -1412,6 +1412,23 @@ mcq('h-tu-os-mets','tumors','hub','An osteosarcoma patient already has lung meta
   ['Under 20%','About 50%','About 75%','Over 90%'],
   'Metastases at diagnosis are a poor prognostic sign: with pulmonary metastases, 5-year survival is under 20%. Treatment is surgery, radiation and extensive chemotherapy.');
 
+/* ===== Gaps found vetting the class Anki decks (9/29) against this bank and the notes ===== */
+mcq('h-jt-oa-case','joints','hub','A 67-year-old has hand and knee pain that is worse at the end of the day. Hard bony swellings sit at the DIP and PIP joints; the MCPs and wrists are spared. X-ray: joint-space narrowing, osteophytes and subchondral cysts. Diagnosis?',
+  ['Osteoarthritis','Rheumatoid arthritis','Psoriatic arthritis','Chronic tophaceous gout'],
+  'Heberden (DIP) and Bouchard (PIP) nodes are osteophytes, and pain that worsens with use, osteophytes and subchondral cysts are OA. RA is a symmetric inflammatory arthritis of the MCPs and PIPs with pannus and spares the DIPs. Dr. Herr: telling OA from RA is most of the exam questions from this lecture.');
+mcq('h-nut-vitA-epith','nutrition','hub','Beyond the eye, vitamin A deficiency causes squamous metaplasia of epithelium. Which consequences follow?',
+  ['More lung infections and renal stones','Cheilosis, glossitis and corneal ulcers','A periorificial rash and poor wound healing','Bleeding gums and subperiosteal hemorrhage'],
+  'Squamous metaplasia of the respiratory epithelium raises pulmonary infections; of the urinary epithelium, renal stones; plugged skin ducts give phrynoderma. The other choices are riboflavin, zinc and vitamin C deficiency.');
+mcq('h-nut-iron-us','nutrition','hub','A 55-year-old man in the US eats a normal diet. He has a hypochromic, microcytic anemia with low ferritin and high TIBC. What should you look for first?',
+  ['Chronic blood loss, such as from the GI tract','Low dietary iron intake','Pernicious anemia','Isoniazid-induced B6 deficiency'],
+  'Low intake is very rarely the sole cause of iron deficiency in the US; think chronic blood loss (e.g., colon cancer), malabsorption, or the extra demand of pregnancy and infancy. Pernicious anemia gives a macrocytic anemia.');
+mcq('h-ai-sjogren-lymph','autoimmune','hub','A patient with long-standing Sjogren syndrome develops a firm, steadily enlarging parotid gland. Which complication is the patient at increased risk for?',
+  ['Non-Hodgkin (B-cell) lymphoma','Oral squamous cell carcinoma','Osteonecrosis of the jaw','Goodpasture syndrome'],
+  'Sjogren syndrome carries an increased risk of non-Hodgkin (marginal zone B-cell) lymphoma. Dr. Ding called Sjogren the autoimmune disease most relevant to your practice: dry mouth, parotid enlargement, lip biopsy, and watch for lymphoma.');
+mcq('h-dr-teri-limit','drugs','hub','Why is teriparatide therapy limited to about 2 years?',
+  ['Osteosarcoma in rat studies and no long-term safety data','Its risk of osteonecrosis of the jaw climbs after 2 years','Neutralizing antibodies make it ineffective by 2 years','Long-term use causes cataracts in about 5% of patients'],
+  'Teriparatide (recombinant PTH 1-34, daily SC) is anabolic. Limit it to 2 years because of the osteosarcoma seen in rats, then follow with an antiresorptive or the bone gained is lost. It is the osteoporosis drug NOT linked to ONJ; cataracts are a denosumab AE.');
+
 /* ---------- REVIEW: grouped reference (drugs, hormones, cells, matrix, genes, diseases, tumors, processes) ----------
    Section types: cards | table | flow | list. Every card/row carries a lecture id for its color tag. */
 function C(name, sub, lec, facts, tip){ return { name:name, sub:sub||'', lec:lec, facts:facts||[], tip:tip||'' }; }
