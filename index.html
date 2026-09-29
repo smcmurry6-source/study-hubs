@@ -678,6 +678,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
 <script src="widget/vendor/supabase-2.117.2.js" defer></script>
 <script src="widget/clicks.js" defer></script>
+<script src="widget/replies.js" defer></script>
 <script src="widget/ranks.js" defer></script>
 <script>
 (function(){
@@ -1560,6 +1561,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
     /* what gets clicked (widget/clicks.js), so we know what to improve or retire */
     if (window.shClicks) window.shClicks.start({ sb:sb, hub:"dashboard", visitor:surveyVisitor(), section:function(){ return "dashboard"; } });
+    /* "your report was addressed" and notices to everyone (widget/replies.js) */
+    if (window.shReplies) window.shReplies.start({ sb:sb, visitor:VISITOR || null, hub:"dashboard" });
 
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
     /* after an exam, an exam check-in takes the survey's place for that visit */
