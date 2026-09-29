@@ -2130,7 +2130,7 @@
       var box = document.createElement("div");
       box.className = "sh-archived"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "This hub is archived");
       box.innerHTML = '<div class="sh-archived-card"><b>This hub is archived</b>' +
-        '<p>It closed after the ' + esc(last.x.label || "exam") + ' on ' + esc(last.at.toLocaleDateString(undefined, { month: "long", day: "numeric" })) +
+        '<p>It closed after ' + esc(/^exam\b/i.test(last.x.label || "") ? last.x.label : "the " + (last.x.label || "exam")) + ' on ' + esc(last.at.toLocaleDateString(undefined, { month: "long", day: "numeric" })) +
         '. Everything still works if you want to look back, but it is no longer updated. Tell us how the exam went from the dashboard.</p>' +
         '<div class="sh-archived-foot"><button type="button" class="sh-archived-stay">Keep browsing</button>' +
         '<a class="sh-archived-go" href="' + new URL("../", thisScript.src).href + '">Go to the dashboard</a></div></div>';
