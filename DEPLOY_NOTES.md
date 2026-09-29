@@ -70,6 +70,13 @@ first** (hub Projects included: it holds what the class actually used and where 
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-29 (MSK exam review set, Claude Code)** — The 23 PollEv exam-review questions (Sam: the professor said six
+  are verbatim on Exam 3 and the rest very similar) added to `hubs/msk-exam3` as `rv-*` with a new source `review`
+  ("Exam review (PollEv)"), stems/choices as given (typos fixed only). Question Bank has an "Exam review set" callout
+  with a one-tap filter; the Daily Drill counts them as high-yield (`DRILL_HY.review`). They overlap older `sl-*` Slido
+  items on purpose (the wording matters). Bank 264 → 287. No reading text changed, so no narration regenerated.
+  **MSK Project: carry these into the split sources, or the next single-file build drops them.**
+
 - **2026-09-29 (Anki deck vetting, Claude Code)** — Vetted the class Anki decks (Drive: 7 "MSK & GI Exam 3" decks + last
   year's Exam 3 practice deck; the D2 Perio Midterm and Practice Questions decks) card by card against each bank and the
   lecture notes; only real gaps were added, nothing imported wholesale. MSK +5 (`h-jt-oa-case`, `h-nut-vitA-epith`,
