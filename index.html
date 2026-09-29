@@ -130,6 +130,10 @@ button{font:inherit; color:inherit; cursor:pointer;}
 }
 .icon-btn:hover{color:var(--ink); border-color:var(--line-2);}
 .icon-btn svg{width:18px; height:18px;}
+#inboxBtn{position:relative;}
+.inbox-badge{position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:var(--focus); color:var(--on-ink,#fff);
+  font:700 11px/18px var(--sans); text-align:center; box-shadow:0 0 0 2px var(--bg);}
+.inbox-badge[hidden]{display:none;}
 
 /* ================= YOUR RANK (level-up bar) ================= */
 .me-rank{display:flex; align-items:center; gap:16px; margin:0 0 18px; padding:14px 18px; background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow);}
@@ -568,6 +572,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   <div class="topbar">
     <div class="wordmark"><span class="rings" aria-hidden="true"><i style="background:var(--c-gi)"></i><i style="background:var(--c-perio)"></i><i style="background:var(--c-genetics)"></i><i style="background:var(--c-pros)"></i></span>Study Hubs</div>
     <span class="live-pill" title="People with a hub open right now"><span class="live-dot"></span><span><b id="liveCount">–</b> <span class="lp-long">studying </span>now</span></span>
+    <button class="icon-btn" id="inboxBtn" type="button" aria-label="Inbox" title="Inbox" data-sh-inbox><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/></svg><span class="inbox-badge sh-inbox-badge" hidden></span></button>
     <button class="icon-btn" id="setBtn" type="button" aria-label="Settings" title="Settings"></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme"></button>
   </div>

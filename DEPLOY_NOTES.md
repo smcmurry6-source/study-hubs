@@ -76,6 +76,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-29 (student inbox, Claude Code)** — Replies to your reports/suggestions (90 days) and notices to everyone
+  (60 days) now stay in an **Inbox**: an item in the hub widget menu (unread count; a dot on the desktop launcher and the
+  phone More tab) and an inbox button in the dashboard top bar (`[data-sh-inbox]` opens it, `.sh-inbox-badge` shows
+  unread). Opening it marks everything read. The one-time pop-up moved from top-center to the **bottom-right** (above
+  the phone bar). `get_my_inbox` (`migration_v26.sql`, applied via the connector). Admin Inbox: "Tell everyone" now has
+  its own title + message box, started from the reply so it can be reworded for the class. `sw.js` → `sh-v8`.
+
 - **2026-09-29 (replies to reports + notices to everyone, Claude Code, #29)** — Reports and suggestions now store the
   sender's `visitor_id`, and resolving one can carry a `reply`. `widget/replies.js` (loaded by v3.js and the dashboard)
   shows it to the sender once on their next visit (`get_my_replies`, `mark_reply_seen`). **Always write the reply when
