@@ -21,7 +21,7 @@
     ".sh-reply *,.sh-inbox *{box-sizing:border-box;}" +
     /* bottom-right, like a notification: above the hub tools button (desktop) or the phone bar */
     ".sh-reply{position:fixed;right:16px;bottom:calc(var(--sh-tabbar-h,0px) + 16px + env(safe-area-inset-bottom,0px));z-index:10001;" +
-    "width:min(400px,calc(100vw - 32px));max-height:min(70vh,calc(100vh - 120px));overflow:auto;box-sizing:border-box;padding:16px 18px 14px;border-radius:16px;" +
+    "width:min(400px,calc(var(--r-vw,100vw) - 32px));max-height:calc(var(--r-vh,100vh) - var(--sh-tabbar-h,0px) - 48px);overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;padding:16px 18px 14px;border-radius:16px;" +
     "background:var(--r-bg);border:1px solid var(--r-line);" +
     "box-shadow:0 2px 6px rgba(20,16,12,.08),0 18px 44px -14px rgba(20,16,12,.4);animation:shReplyIn .28s ease-out;}" +
     "@media (max-width:560px){.sh-reply{right:12px;left:12px;width:auto;}}" +
@@ -35,6 +35,8 @@
     ".sh-reply-you{font-size:13px;color:var(--r-ink2);border-left:3px solid var(--r-line);padding:2px 0 2px 10px;margin:0 0 10px;" +
     "white-space:pre-wrap;overflow-wrap:anywhere;}" +
     ".sh-reply-msg{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;}" +
+    /* in the pop-up only the message scrolls, so the buttons stay on screen at any text size */
+    ".sh-reply > *{flex:none;}.sh-reply > .sh-reply-msg{flex:0 1 auto;min-height:3em;overflow:auto;}" +
     ".sh-reply-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;}" +
     ".sh-reply-count{margin-right:auto;font-size:12.5px;color:var(--r-ink2);}" +
     ".sh-reply-ok{border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;" +
@@ -43,7 +45,7 @@
     ".sh-inbox{position:fixed;inset:0;z-index:10002;display:flex;align-items:center;justify-content:center;padding:16px;" +
     "background:rgba(10,14,18,.45);animation:shInboxFade .2s ease-out;}" +
     "@keyframes shInboxFade{from{opacity:0;}to{opacity:1;}}" +
-    ".sh-inbox-card{position:relative;width:min(520px,100%);max-height:min(640px,calc(100vh - 32px));display:flex;flex-direction:column;" +
+    ".sh-inbox-card{position:relative;width:min(520px,100%);max-height:min(640px,100%);display:flex;flex-direction:column;" +
     "background:var(--r-bg);border:1px solid var(--r-line);border-radius:18px;box-shadow:0 18px 50px -12px rgba(0,0,0,.45);}" +
     ".sh-inbox-head{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--r-line);}" +
     ".sh-inbox-head h2{margin:0;font-size:18px;font-weight:700;font-family:inherit;flex:1;}" +
@@ -58,7 +60,7 @@
     ".sh-inbox-item .sh-reply-msg{margin:0;}" +
     ".sh-inbox-empty{padding:28px 4px;color:var(--r-ink2);text-align:center;}" +
     "@media (max-width:560px){.sh-inbox{align-items:flex-end;padding:0;}" +
-    ".sh-inbox-card{width:100%;max-height:85vh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);}}" +
+    ".sh-inbox-card{width:100%;max-height:88%;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);}}" +
     "@media (prefers-reduced-motion:reduce){.sh-reply,.sh-inbox{animation:none;}}" +
     ".sh-inbox-badge[hidden]{display:none !important;}";
   var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>';
@@ -68,6 +70,15 @@
   function ownWords(note){ return String(note || "").replace(/\s+—\s+(question\s+\S+|[a-z-]+\/[\w-]+)(\s+·\s+\S+)?\s*$/i, "").trim(); }
   function qidOf(note){ var m = /—\s+question\s+(\S+)/.exec(String(note || "")); return m ? m[1] : ""; }
   function fmtDate(t){ try { return new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" }); } catch (e) { return ""; } }
+  /* The text-size setting zooms the whole page (html style.zoom), and 100vh/100vw inside a zoomed page are
+     bigger than the screen, so the pop-up measures the real viewport in zoomed px instead. The inbox needs
+     none of this: it sizes itself inside a fixed inset:0 layer, which always matches the screen. */
+  function fitViewport(el){
+    var z = 1;
+    try { z = parseFloat(getComputedStyle(document.documentElement).zoom) || parseFloat(document.documentElement.style.zoom) || 1; } catch (e) {}
+    el.style.setProperty("--r-vw", (window.innerWidth / z) + "px");
+    el.style.setProperty("--r-vh", (window.innerHeight / z) + "px");
+  }
   function injectCss(){
     if (document.getElementById("sh-reply-css")) return;
     var st = document.createElement("style"); st.id = "sh-reply-css"; st.textContent = CSS; document.head.appendChild(st);
@@ -140,7 +151,10 @@
       var box = document.createElement("div");
       box.className = "sh-reply"; box.setAttribute("role", "dialog"); box.setAttribute("aria-live", "polite");
       document.body.appendChild(box);
-      function close(){ box.remove(); document.removeEventListener("keydown", onKey); }
+      fitViewport(box);
+      function refit(){ fitViewport(box); }
+      window.addEventListener("resize", refit);
+      function close(){ box.remove(); document.removeEventListener("keydown", onKey); window.removeEventListener("resize", refit); }
       function onKey(e){ if (e.key === "Escape") { markSeen(rows[i]); close(); } }
       document.addEventListener("keydown", onKey);
       function render(){

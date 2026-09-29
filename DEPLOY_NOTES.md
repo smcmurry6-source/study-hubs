@@ -79,6 +79,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 - **2026-09-30 (one inbox, Claude Code)** — The Inbox is now the same on every hub and the dashboard: notices are no
   longer filtered by hub (`site_notices.hub` only labels which hub a notice is about), and pop-ups go out on whichever
   page someone opens first. Read state was already shared (server for replies, `sh_notice_seen` for notices).
+  An **Inbox button now sits in each hub's top bar** beside the name (`.sh-ribbon-inbox`, added by `widget/v3.js`
+  before `#themeBtn`), so it's reachable from every page. **Text size fix:** the size setting zooms `<html>`, and
+  `vh`/`vw` inside a zoomed page overshoot the screen, so the inbox now sizes inside its fixed `inset:0` layer and the
+  pop-up measures the real viewport (`fitViewport`); only the pop-up's message scrolls, so its buttons stay visible.
+  `sw.js` → `sh-v9`. **Any new fixed overlay: don't size it with `vh`/`vw`.**
 
 - **2026-09-29 (student inbox, Claude Code)** — Replies to your reports/suggestions (90 days) and notices to everyone
   (60 days) now stay in an **Inbox**: an item in the hub widget menu (unread count; a dot on the desktop launcher and the
