@@ -1,9 +1,9 @@
 /* study-hubs replies + inbox. When a report ("Report an issue" / the Report button on a question) or a suggestion
    someone sent has been dealt with, they're told once in a pop-up, with the reply written when it was resolved (for a
    question report, what was fixed). Notices to everyone (site_notices, posted from the admin Inbox's "Tell everyone")
-   pop up once per device (sh_notice_seen) while they're live; a notice with a hub only shows on that hub and the
-   dashboard. Everything also stays in an Inbox (replies 90 days, notices 60), opened by any [data-sh-inbox] element;
-   .sh-inbox-badge elements show the unread count. Data: get_my_inbox; reading a reply calls mark_reply_seen.
+   pop up once per device (sh_notice_seen) while they're live, on whichever page is opened first. Everything also stays
+   in one Inbox (replies 90 days, notices 60), the same on every hub and the dashboard; a notice's hub only labels it.
+   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox; reading a reply calls mark_reply_seen.
    Used by widget/v3.js (hubs) and the dashboard:
      shReplies.start({ sb: supabaseClient, visitor: "..." or null, hub: "perio" | "dashboard" }) */
 (function(){
@@ -79,7 +79,7 @@
   function start(o){
     if (!o || !o.sb || api.started) return;
     api.started = true;
-    var sb = o.sb, visitor = o.visitor || null, hub = o.hub || "";
+    var sb = o.sb, visitor = o.visitor || null;
     var items = [], loading = null;
 
     function seenNotices(){ try { return JSON.parse(localStorage.getItem(SEEN_KEY) || "[]") || []; } catch (e) { return []; } }
@@ -106,7 +106,7 @@
       if (loading) return loading;
       loading = sb.rpc("get_my_inbox", { p_visitor: visitor }).then(function(res){
         var rows = res && !res.error && Array.isArray(res.data) ? res.data : [];
-        items = rows.filter(function(r){ return r.kind !== "notice" || !r.hub || hub === "dashboard" || r.hub === hub; });
+        items = rows;  /* one inbox: the same list on every hub and the dashboard (a notice's hub is just its label) */
         updateBadges();
         return items;
       }, function(){ return items; });
