@@ -492,7 +492,7 @@ table.data tr.group:hover td{background:none;}
     var groups = {};
     (d.data || []).forEach(function(r){ var k = r.hub + "\u0001" + r.exam; (groups[k] = groups[k] || []).push(r); });
     var keys = Object.keys(groups).sort().reverse();
-    if (!keys.length) return card("Exam check-ins", "Asked on the dashboard for 6 days after each exam, once per person with progress in that hub.", '<div class="empty">None yet. The first ones come in the day after the next exam.</div>');
+    if (!keys.length) return card("Exam check-ins", "Pop-up on each person's first dashboard visit after an exam, plus a Check in button on the hub's card (live or archived) for 60 days.", '<div class="empty">None yet. The first ones come in the day after the next exam.</div>');
     return keys.map(function(k){
       var rows = groups[k], ans = rows.filter(function(r){ return r.answers; }), p = k.split("\u0001");
       function tally(id){
@@ -506,7 +506,8 @@ table.data tr.group:hover td{background:none;}
       body += '<h4 style="margin:14px 0 6px">Missed or barely covered</h4>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<div class="empty">No written answers.</div>');
       var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "—") + '</td><td>' + esc(r.answers.went || "—") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "—" : r.accuracy + "%") + '</td></tr>'; }).join("");
       body += '<h4 style="margin:14px 0 6px">Each answer next to that person’s use of the hub</h4><div class="tbl-wrap"><table class="data"><thead><tr><th class="n">Ready</th><th>How it went</th><th class="n">Time in hub</th><th class="n">Answers</th><th class="n">Accuracy</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
-      return card("Exam check-in · " + hubCell(p[0]) + " · " + esc(p[1]), fmtNum(ans.length) + " answered · " + fmtNum(rows.length - ans.length) + " said no thanks", body);
+      var who = {}; ans.forEach(function(r){ who[r.visitor_id] = 1; });
+      return card("Exam check-in · " + hubCell(p[0]) + " · " + esc(p[1]), fmtNum(ans.length) + " check-ins from " + fmtNum(Object.keys(who).length) + " people (someone can send more than one)", body);
     }).join("");
   }
   function renderSearches(){

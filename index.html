@@ -358,6 +358,14 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .drill-txt b{font-size:14px; font-weight:600; color:var(--ink);}
 .drill-go{margin-left:auto; display:inline-flex; align-items:center; gap:5px; font-size:13.5px; font-weight:600; color:var(--ring-ink); white-space:nowrap;}
 .drill-go svg{width:14px; height:14px;}
+.checkin-btn{font:inherit; display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px 12px; border-radius:12px;
+  border:1px dashed var(--ring); background:transparent; color:var(--ink); font-size:14px; font-weight:600; cursor:pointer; transition:background .15s;}
+.checkin-btn:hover{background:var(--ring-soft);}
+.checkin-btn svg{width:18px; height:18px; flex:none; color:var(--ring-ink);}
+.hub-card.is-archived{background:var(--surface-2); box-shadow:none;}
+.hub-card.is-archived h4{color:var(--ink-2);}
+.arch-tag{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);}
+.survey-why{font-size:13px; line-height:1.45; color:var(--ink-3); margin:-4px 0 4px;}
 .hero-drill svg{color:var(--ring-ink);}
 .hub-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:auto; padding-top:4px;}
 .updated{font-size:12.5px; color:var(--ink-3);}
@@ -675,6 +683,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
       modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
+  /* Archived hubs keep a small card (no Open button) for DEBRIEF_DAYS after their last exam, so people who come
+     back late can still do the exam check-in. Move a hub's entry here from HUBS when it's archived (keep exams and
+     stateKey; the hub's saved progress stays in the browser after its page is gone). */
+  var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in (and an archived hub's card) stays offered */
+  var ARCHIVED_HUBS = [
+    { id:"hepatobiliary", cls:"gi", title:"GI Exam 2 Hub", code:"GI & MSK · Exam 2", stateKey:"hbh-state-v1",
+      exams:[ { name:"GI Exam 2", label:"Exam", date:"2026-09-18" } ] }
+  ];
   var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3" };
   var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "fixed-pros":"pros", perio:"perio" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
@@ -719,7 +735,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     auto:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor" stroke="none"/></svg>',
     bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></svg>',
-    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.2 4.2L19 7"/></svg>'
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.2 4.2L19 7"/></svg>',
+    chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a7.5 7.5 0 0 1-11 6.6L4 20l1.4-4.6A7.5 7.5 0 1 1 20 12z"/><path d="M8.5 11h7M8.5 14h4"/></svg>'
   };
 
   /* ====================================================================
@@ -969,27 +986,40 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       (p ? '<div class="mine">You\'ve tried <b>' + p.seen + '</b> ' + (p.seen === 1 ? "question" : "questions") + ', <b>' + p.pct + '%</b> ' + esc(p.pctLabel) + '<div class="meter" aria-hidden="true"><i data-w="' + p.pct + '"></i></div></div>'
          : '<div class="mine">Not started on this device yet.</div>') +
       drillRowHTML(hub) +
+      checkinButtonsHTML(hub) +
       '<div class="hub-foot"><span class="updated" data-updated="' + hub.updated + '" data-hub="' + hub.id + '">Updated ' + esc(relDay(parseYmd(hub.updated))) + '</span>' +
       '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">Open' + ICON.arrow + '</a></div>' +
     '</article>';
   }
+  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return pastExams(h).length; }); }
+  function archivedCardHTML(hub){
+    var cls = CLASSES[hub.cls], p = readProgress(hub), last = pastExams(hub)[0];
+    return '<article class="hub-card is-archived" style="' + ringVars(cls.ring) + '">' +
+      '<div class="hub-top"><span class="chip">' + esc(hub.code) + '</span><span class="due arch-tag">Archived</span></div>' +
+      '<h4>' + esc(hub.title) + '</h4>' +
+      '<p class="hub-desc">This hub closed after the exam on ' + esc(parseYmd(last.date).toLocaleDateString(undefined, { month:"long", day:"numeric" })) +
+        '. Tell us how the exam went: it shapes the next hubs.</p>' +
+      (p ? '<div class="mine">You tried <b>' + p.seen + '</b> ' + (p.seen === 1 ? "question" : "questions") + ' here.</div>' : '') +
+      checkinButtonsHTML(hub) +
+    '</article>';
+  }
   function renderHubs(){
-    var html = "", liveClasses = {};
+    var html = "", liveClasses = {}, archived = shownArchived();
     /* one grid of every class that has a live hub (old exams get archived, so no term grouping) */
-    var classIds = Object.keys(CLASSES).filter(function(c){ return HUBS.some(function(h){ return h.cls === c; }); });
+    var classIds = Object.keys(CLASSES).filter(function(c){ return HUBS.concat(archived).some(function(h){ return h.cls === c; }); });
     if (!classIds.length){
       html += '<div class="empty-term"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="M12 14c-4 0-6-2.5-6-6.5C8.5 8 12 8.5 12 14z"/><path d="M12 14c4 0 6-2.5 6-6.5C15.5 8 12 8.5 12 14z"/><path d="M6 21h12"/></svg><p>No hubs are live right now. New ones appear here as each exam gets close.<small>Same link, nothing to re-download.</small></p></div>';
     }
     html += '<div class="term-body">';
     classIds.forEach(function(cid){
-      var c = CLASSES[cid], hubs = HUBS.filter(function(h){ return h.cls === cid; });
-      liveClasses[cid] = 1;
+      var c = CLASSES[cid], hubs = HUBS.filter(function(h){ return h.cls === cid; }), old = archived.filter(function(h){ return h.cls === cid; });
+      if (hubs.length) liveClasses[cid] = 1;
       html += '<div class="class-group" id="class-' + cid + '" data-class="' + cid + '" style="' + ringVars(c.ring) + '">' +
         '<div class="class-head">' +
           '<button class="class-icon" type="button" data-egg="' + cid + '" aria-label="' + esc(c.name) + ' (tap for a surprise)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + c.icon + '</svg></button>' +
-          '<button class="class-title" type="button" data-toggle aria-expanded="true"><h3>' + esc(c.name) + '</h3><span>' + hubs.length + (hubs.length === 1 ? " hub" : " hubs") + '</span></button>' +
+          '<button class="class-title" type="button" data-toggle aria-expanded="true"><h3>' + esc(c.name) + '</h3><span>' + hubs.length + (hubs.length === 1 ? " hub" : " hubs") + (old.length ? " · " + old.length + " archived" : "") + '</span></button>' +
           '<button class="class-toggle" type="button" data-toggle aria-expanded="true" aria-label="Show or hide ' + esc(c.name) + '">' + ICON.chev + '</button>' +
-        '</div><div class="hub-grid">' + hubs.map(hubCardHTML).join("") + '</div></div>';
+        '</div><div class="hub-grid">' + hubs.map(hubCardHTML).join("") + old.map(archivedCardHTML).join("") + '</div></div>';
     });
     html += '</div>';
     $("terms").innerHTML = html;
@@ -1005,6 +1035,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     /* read more: only show when the text is actually clipped */
     document.querySelectorAll(".hub-card").forEach(function(card){
       var d = card.querySelector(".hub-desc"), m = card.querySelector("[data-more]");
+      if (!m) return;
       if (d.scrollHeight <= d.clientHeight + 2) { m.remove(); return; }
       m.addEventListener("click", function(){ var open = d.classList.toggle("clamp"); m.textContent = open ? "Read more" : "Show less"; });
     });
@@ -1139,38 +1170,53 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }catch(e){}
     return VISITOR;
   }
-  /* Exam check-in: from the day after an exam in HUBS, for 6 days, anyone with progress in that hub
-     is asked once how it went (exam_debriefs, migration_v23). Read back when the hub is archived, to
-     improve the next one (see LESSONS.md). Answering or "No thanks" both hide it for good. */
+  /* Exam check-in (exam_debriefs, migration_v23/v24). After an exam, anyone with progress in that hub gets the
+     check-in as a pop-up once, on their first visit after it, however late. Every hub card (live or archived) with a
+     finished exam keeps a "Check in" button, so people can send more than one. Answers are read back when the hub
+     is archived, to improve the next ones (see LESSONS.md). */
   var DEBRIEF_QS = [
     { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
     { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
     { id:"match", kind:"choice", prompt:"The hub's questions compared with the real exam:", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
     { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
   ];
-  function dueDebrief(){
-    var today = dayStart(new Date()), best = null;
-    HUBS.forEach(function(h){
+  var debriefSb = null;
+  function pastExams(hub){
+    return (hub.exams || []).filter(function(x){ var d = -daysUntil(x.date); return x.date && d >= 1 && d <= DEBRIEF_DAYS; })
+      .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
+  }
+  function debriefHub(id){ return HUBS.concat(ARCHIVED_HUBS).filter(function(h){ return h.id === id; })[0]; }
+  function checkinButtonsHTML(hub){
+    return pastExams(hub).map(function(x){
+      return '<button type="button" class="checkin-btn" data-checkin="' + esc(hub.id) + '" data-exam="' + esc(x.date) + '">' + ICON.chat +
+        '<span>Check in on ' + esc(x.name || hub.title) + '</span></button>';
+    }).join("");
+  }
+  /* the pop-up: the newest finished exam this device studied for that it hasn't been shown yet */
+  function autoDebrief(){
+    var best = null;
+    HUBS.concat(ARCHIVED_HUBS).forEach(function(h){
       if (!readProgress(h)) return;
-      (h.exams || []).forEach(function(x){
-        if (!x.date) return;
-        var days = Math.round((today - dayStart(new Date(x.date + "T12:00:00"))) / 864e5);
-        if (days < 1 || days > 6) return;
-        var key = "sh_debrief_" + h.id + "_" + x.date;
-        if (ls(key)) return;
-        if (!best || x.date > best.x.date) best = { h:h, x:x, key:key };
+      pastExams(h).forEach(function(x){
+        if (ls("sh_debrief_" + h.id + "_" + x.date)) return;
+        if (!best || x.date > best.x.date) best = { h:h, x:x };
       });
     });
-    return best;
+    if (!best) return false;
+    openDebrief(best.h, best.x);
+    return true;
   }
-  function startDebrief(sb){
-    var due = dueDebrief(), me = surveyVisitor();
-    if (!due || !me) return false;
-    var answers = {}, examId = due.x.date + " " + (due.x.label || "Exam");
+  function openDebrief(hub, x){
+    var me = surveyVisitor();
+    if (!me) return;
+    lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
+    var old = document.querySelector(".survey"); if (old) old.remove();
+    var answers = {}, examId = x.date + " " + (x.label || "Exam");
     var box = document.createElement("section");
     box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
-    var h = '<button type="button" class="survey-x" aria-label="No thanks">×</button><div class="survey-eyebrow">Exam check-in · 1 minute</div>' +
-      '<h3>How did ' + esc(due.x.name || due.h.title) + ' go?</h3>';
+    var h = '<button type="button" class="survey-x" aria-label="Close">×</button><div class="survey-eyebrow">Exam check-in · 1 minute</div>' +
+      '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
+      '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
     DEBRIEF_QS.forEach(function(q){
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p>' + esc(q.prompt) + '</p>';
       if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="Topics, question styles, anything"></textarea>';
@@ -1181,22 +1227,16 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       } else h += '<div class="survey-opts">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
       h += '</div>';
     });
-    h += '<div class="survey-foot"><button type="button" class="survey-skip">No thanks</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+    h += '<div class="survey-foot"><button type="button" class="survey-skip">Not now</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
     box.innerHTML = h;
     document.body.appendChild(box);
     requestAnimationFrame(function(){ box.classList.add("is-shown"); });
     var send = box.querySelector(".survey-send");
+    function close(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
     function refresh(){
       var t = box.querySelector("textarea"), v = t ? t.value.trim() : "";
       if (v) answers.missed = v.slice(0, 600); else delete answers.missed;
       send.disabled = !Object.keys(answers).length;
-    }
-    function done(payload, thanks){
-      lsSet(due.key, "1");
-      sb.rpc("submit_exam_debrief", { p_hub:due.h.id, p_exam:examId, p_visitor:me, p_answers:payload }).then(function(){}, function(){});
-      if (!thanks){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); return; }
-      box.innerHTML = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> This shapes how the next hub is built.</p>';
-      setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
     }
     box.addEventListener("input", refresh);
     box.addEventListener("click", function(e){
@@ -1209,11 +1249,19 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         else delete answers[id];
         refresh(); return;
       }
-      if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
-      else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
+      if (e.target.closest(".survey-x, .survey-skip")) { close(); return; }
+      if (e.target.closest(".survey-send") && !send.disabled){
+        if (debriefSb) debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(){}, function(){});
+        box.innerHTML = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub\'s card.</p>';
+        setTimeout(close, 3200);
+      }
     });
-    return true;
   }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-checkin]"); if (!b) return;
+    var hub = debriefHub(b.getAttribute("data-checkin")), x = hub && (hub.exams || []).filter(function(z){ return z.date === b.getAttribute("data-exam"); })[0];
+    if (hub && x) openDebrief(hub, x);
+  });
   function startSurvey(sb){
     var me = surveyVisitor();
     if (!me) return;
@@ -1445,7 +1493,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
     /* after an exam, an exam check-in takes the survey's place for that visit */
-    setTimeout(function(){ if (!startDebrief(sb)) startSurvey(sb); }, 4000);
+    debriefSb = sb;
+    setTimeout(function(){ if (!autoDebrief()) startSurvey(sb); }, 4000);
 
     /* Golden Probe (an easter egg in the hubs): who found today's, per hub */
     sb.rpc("get_golden_today").then(function(res){
