@@ -366,6 +366,17 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .hub-card.is-archived h4{color:var(--ink-2);}
 .arch-tag{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);}
 .survey-why{font-size:13px; line-height:1.45; color:var(--ink-3); margin:-4px 0 4px;}
+.debrief-steps{display:flex; gap:4px; margin:8px 36px 12px 0;}
+.debrief-steps i{flex:1; height:4px; border-radius:2px; background:var(--line-2); transition:background .25s;}
+.debrief-steps i.on{background:var(--ink);}
+.debrief .survey-q{margin-top:6px;}
+.debrief .debrief-prompt{font-family:var(--serif); font-weight:400; font-size:22px; line-height:1.2; margin:2px 0 14px;}
+.debrief-list{flex-direction:column; align-items:stretch;}
+.debrief-list .survey-opt{text-align:left; border-radius:12px; padding:11px 14px; font-size:14.5px;}
+.debrief .survey-scale{justify-content:space-between;}
+.debrief .survey-scale .survey-opt{flex:1; min-width:0; padding:10px 0;}
+.debrief textarea{min-height:96px;}
+.debrief .survey-foot .btn-quiet{padding:9px 16px; font-size:14px;}
 .hero-drill svg{color:var(--ring-ink);}
 .hub-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:auto; padding-top:4px;}
 .updated{font-size:12.5px; color:var(--ink-3);}
@@ -1195,7 +1206,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   var DEBRIEF_QS = [
     { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
     { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
-    { id:"match", kind:"choice", prompt:"The hub's questions compared with the real exam:", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
+    { id:"match", kind:"choice", prompt:"How did the hub's questions compare with the real exam?", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
     { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
   ];
   var debriefSb = null;
@@ -1224,51 +1235,67 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     openDebrief(best.h, best.x);
     return true;
   }
+  /* One question per step (with a progress bar) so the card stays short on any screen instead of scrolling.
+     Tapping a choice moves on by itself; the text question at the end has Send. Every question is optional. */
   function openDebrief(hub, x){
     var me = surveyVisitor();
     if (!me) return;
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
     var old = document.querySelector(".survey"); if (old) old.remove();
-    var answers = {}, examId = x.date + " " + (x.label || "Exam");
+    var answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = DEBRIEF_QS.length - 1, timer = null;
     var box = document.createElement("section");
-    box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
-    var h = '<button type="button" class="survey-x" aria-label="Close">×</button><div class="survey-eyebrow">Exam check-in · 1 minute</div>' +
-      '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
-      '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
-    DEBRIEF_QS.forEach(function(q){
-      h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p>' + esc(q.prompt) + '</p>';
-      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="Topics, question styles, anything"></textarea>';
+    box.className = "survey debrief"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
+    document.body.appendChild(box);
+    function render(){
+      var q = DEBRIEF_QS[step], v = answers[q.id], h = '<button type="button" class="survey-x" aria-label="Close">×</button>' +
+        '<div class="survey-eyebrow">Exam check-in · ' + (step + 1) + ' of ' + DEBRIEF_QS.length + '</div>' +
+        '<div class="debrief-steps" aria-hidden="true">' + DEBRIEF_QS.map(function(_, i){ return '<i' + (i <= step ? ' class="on"' : '') + '></i>'; }).join("") + '</div>';
+      if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
+        '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
+      h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
+      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="Topics, question styles, anything">' + esc(v || "") + '</textarea>';
       else if (q.kind === "scale") {
         h += '<div class="survey-opts survey-scale">';
-        for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + n + '">' + n + '</button>';
+        for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="' + (v === n) + '" data-sv="' + n + '">' + n + '</button>';
         h += '</div><div class="survey-scale-ends"><span>' + esc(q.ends[0]) + '</span><span>' + esc(q.ends[1]) + '</span></div>';
-      } else h += '<div class="survey-opts">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
-      h += '</div>';
-    });
-    h += '<div class="survey-foot"><button type="button" class="survey-skip">Not now</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
-    box.innerHTML = h;
-    document.body.appendChild(box);
-    requestAnimationFrame(function(){ box.classList.add("is-shown"); });
-    var send = box.querySelector(".survey-send");
-    function close(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
-    function refresh(){
-      var t = box.querySelector("textarea"), v = t ? t.value.trim() : "";
-      if (v) answers.missed = v.slice(0, 600); else delete answers.missed;
-      send.disabled = !Object.keys(answers).length;
+      } else h += '<div class="survey-opts debrief-list">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="' + (v === o) + '" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+      h += '</div><div class="survey-foot"><button type="button" class="survey-skip" data-act="' + (step ? 'back' : 'close') + '">' + (step ? 'Back' : 'Not now') + '</button>';
+      if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
+      else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
+      box.innerHTML = h + '</div>';
+      refresh();
+      var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
     }
+    function refresh(){
+      var t = box.querySelector("textarea"), send = box.querySelector(".survey-send");
+      if (t){ var v = t.value.trim(); if (v) answers.missed = v.slice(0, 600); else delete answers.missed; }
+      if (send) send.disabled = !Object.keys(answers).length;
+    }
+    function go(n){ clearTimeout(timer); step = Math.max(0, Math.min(last, n)); render(); }
+    function close(){ clearTimeout(timer); box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+    render();
+    requestAnimationFrame(function(){ box.classList.add("is-shown"); });
     box.addEventListener("input", refresh);
     box.addEventListener("click", function(e){
       var opt = e.target.closest(".survey-opt");
       if (opt){
-        var q = opt.closest(".survey-q"), id = q.getAttribute("data-sq"), on = opt.getAttribute("aria-pressed") !== "true";
-        q.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+        var q = DEBRIEF_QS[step], on = opt.getAttribute("aria-pressed") !== "true";
+        box.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
         opt.setAttribute("aria-pressed", String(on));
-        if (on) answers[id] = q.getAttribute("data-kind") === "scale" ? +opt.getAttribute("data-sv") : opt.getAttribute("data-sv");
-        else delete answers[id];
-        refresh(); return;
+        if (on) answers[q.id] = q.kind === "scale" ? +opt.getAttribute("data-sv") : opt.getAttribute("data-sv");
+        else delete answers[q.id];
+        clearTimeout(timer);
+        if (on) timer = setTimeout(function(){ go(step + 1); }, 320); else render();
+        return;
       }
-      if (e.target.closest(".survey-x, .survey-skip")) { close(); return; }
-      if (e.target.closest(".survey-send") && !send.disabled){
+      if (e.target.closest(".survey-x")) { close(); return; }
+      var act = e.target.closest("[data-act]"); if (!act) return;
+      var a = act.getAttribute("data-act");
+      if (a === "close") close();
+      else if (a === "back") go(step - 1);
+      else if (a === "next") go(step + 1);
+      else if (a === "send" && !act.disabled){
+        refresh();
         if (debriefSb) debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(){}, function(){});
         box.innerHTML = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub\'s card.</p>';
         setTimeout(close, 3200);
