@@ -76,6 +76,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-30 (second lessons refresh, Claude Code)** — `LESSONS.md` refreshed with all data to date (last refresh's
+  fixes checked: `q2-03` 30% → 61%, `q4-L27` 20% → 44%, perio under-5-minute visits 40% → 17% on midterm eve). New
+  standing lesson: ordering questions over 4-5 steps and select-all questions with many options barely work.
+  Explanations now name the favourite wrong answer on MSK `h-dr-hypoCa` (hyporeflexia), `h-tu-gct-arthritis`
+  (osteochondroma), `h-ai-sle-ab` (anti-Ro/La) and perio `q3-M01` (UniFe inputs). No reading text changed, so no
+  narration regenerated. **Perio and MSK Projects: carry these into the split sources.**
+
 - **2026-09-29 (first lessons refresh, Claude Code)** — `LESSONS.md` refreshed from all data since 09-25 (Live signals
   written; new lessons on duplicate matching answers, explanations that name the favourite wrong answer, exam harder
   than hub + Patient Box questions). Perio: matching questions now grade by answer text in practice and mock
