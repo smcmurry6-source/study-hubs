@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-09-30** (first refresh, covering 2026-09-25 to 2026-09-29). A daily
+**Last refreshed: 2026-09-29** (first refresh, run the evening of 09-29 Central, covering 09-25 on). A daily
 routine refreshes this file from all tracked data, reports and suggestions (`tools/lessons-refresh.md`) and ships
 small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -117,7 +117,7 @@ Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4):
   (4-5 pairs), and check any item under ~15% with 20+ attempts for a grading or wording bug before assuming it is
   just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts). **Never give two left items
   the same right-hand answer** unless grading compares text: perio `q4-L27` had "4-6 weeks" twice, and picking
-  the other copy was marked wrong (20% correct; grading compares text since 2026-09-30).
+  the other copy was marked wrong (20% correct; grading compares text since 2026-09-29).
 - **The last lectures before the exam get the least practice and score lowest.** GI2's GI Pharm and GI Path were
   answered ~17 times per question vs ~30 for the early lectures, at 71-73% vs 81-84%. The Daily Drill and mock
   exams should lean toward late-added lectures; say on Course Home when new questions land.
@@ -151,7 +151,7 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   length and form as the answer, and keep qualifiers in the explanation, not the choices.
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
-  (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-30; write explanations this way
+  (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
   from the start: key fact, then one sentence per tempting distractor.
 - **Explanations must agree with the key and show the number.** Perio `q3-47`'s explanation didn't match its answer
   and mixed up two slide figures. When a question tests a figure, the explanation states it and names which figure

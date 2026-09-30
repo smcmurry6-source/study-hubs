@@ -76,7 +76,7 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-09-30 (first lessons refresh, Claude Code)** — `LESSONS.md` refreshed from all data since 09-25 (Live signals
+- **2026-09-29 (first lessons refresh, Claude Code)** — `LESSONS.md` refreshed from all data since 09-25 (Live signals
   written; new lessons on duplicate matching answers, explanations that name the favourite wrong answer, exam harder
   than hub + Patient Box questions). Perio: matching questions now grade by answer text in practice and mock
   (`q4-L27` listed "4-6 weeks" twice, so the other copy was marked wrong); `q2-03` and `q4-15` explanations cover the
