@@ -406,17 +406,6 @@ body.sh-nuke-active{overflow:hidden;}
 .sh-egg-boss.is-dead{opacity:0; transform:translate(-50%, 0) scale(1.15); transition:opacity .8s, transform .8s;}
 @keyframes sh-egg-shake{0%,100%{transform:none;} 25%{transform:translateX(-4px) rotate(-6deg);} 75%{transform:translateX(4px) rotate(6deg);}}
 
-.sh-egg-luck{position:fixed; z-index:9990; left:16px; bottom:16px; display:flex; align-items:center; gap:10px; max-width:min(380px, calc(100vw - 32px)); padding:10px 8px 10px 12px;
-  border-radius:14px; background:var(--shw-bg); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow); font-size:14px;
-  opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .3s, transform .3s;}
-.sh-egg-luck.is-shown{opacity:1; pointer-events:auto; transform:none;}
-.sh-egg-luck .sh-egg-ic{color:var(--shw-good);}
-.sh-egg-luck-send{flex:0 0 auto; padding:7px 12px; border:0; border-radius:99px; background:var(--shw-good); color:#fff; font:inherit; font-size:13px; font-weight:700; cursor:pointer;}
-.sh-egg-luckfloat{position:fixed; z-index:10002; bottom:90px; display:flex; align-items:center; gap:6px; padding:6px 12px 6px 8px; border-radius:99px;
-  background:var(--shw-bg); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow); font-size:13px; font-weight:700; pointer-events:none; animation:sh-egg-rise 4.2s ease-out forwards;}
-.sh-egg-luckfloat svg{width:18px; height:18px; color:var(--shw-good);}
-@keyframes sh-egg-rise{0%{opacity:0; transform:translateY(20px);} 12%{opacity:1;} 80%{opacity:1;} 100%{opacity:0; transform:translateY(-45vh);}}
-
 .sh-egg-floss{position:fixed; z-index:10002; left:50%; bottom:calc(var(--sh-tabbar-h) + 30px); width:110px; height:124px; margin-left:-55px; pointer-events:none; color:var(--shw-ink);
   animation:sh-egg-pop 4.6s ease forwards;}
 .sh-egg-floss .egg-fl-body{transform-origin:40px 70px; animation:sh-egg-hips .5s ease-in-out infinite alternate;}
@@ -442,14 +431,11 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 
 @media (prefers-reduced-motion: reduce){
   .sh-egg-fairy{animation-duration:12s;}
-  .sh-egg-fairy .egg-wl, .sh-egg-fairy .egg-wr, .sh-egg-floss *, .sh-egg-luckfloat{animation:none !important;}
+  .sh-egg-fairy .egg-wl, .sh-egg-fairy .egg-wr, .sh-egg-floss *{animation:none !important;}
   .sh-egg-floss{animation:none; opacity:1;}
 }
 @media (max-width:760px){
-  .sh-egg-luck{left:10px; right:10px; max-width:none; bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
-  .sh-egg-luckfloat{bottom:calc(var(--sh-tabbar-h) + 90px);}
   .sh-egg-boss{bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
-  .sh-egg-luck.is-shown ~ .sh-egg-boss, .sh-egg-boss:has(~ .sh-egg-luck.is-shown){bottom:calc(var(--sh-tabbar-h) + 86px + env(safe-area-inset-bottom,0px));}
 }
 
 /* ================= handpiece ranks (widget/ranks.js) ================= */
