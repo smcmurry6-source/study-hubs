@@ -5,7 +5,6 @@
    - Golden Probe: one taught question per hub per day is secretly golden; first right answer claims it
    - Tooth Fairy: rare flutter across the screen after an answer; tap to catch (collectors board in Stats)
    - Plaque Boss: with 5+ classmates online, correct answers chip away at a shared boss
-   - Luck wall: the evening before and the morning of an exam, send classmates luck
    - Professor soundboard: tap a professor's name 5 times for one of their exam-hint quotes
    - Night Owl (answering 2-4 am), Through the Root Canal (10 wrong, then 10 right)
    - Konami code → 8-bit mode (keyboard, or on a phone: swipe up up down down left right left right, tap tap);
@@ -40,7 +39,6 @@
     tooth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/></svg>',
     wing: '<svg viewBox="0 0 48 40"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path class="egg-wl" d="M18 16C10 4 1 6 2 14c1 6 9 7 16 4"/><path class="egg-wr" d="M30 16C38 4 47 6 46 14c-1 6-9 7-16 4"/><path fill="var(--egg-fairy-fill,#fff)" d="M17 9c-2 0-3.5 1.5-3.5 3.5 0 2 1 3 1.4 4.8.4 2.2.7 4.7 1.8 4.7s1.3-2.2 1.6-3.6c.1-.7.4-1.1 1.7-1.1s1.6.4 1.7 1.1c.3 1.4.5 3.6 1.6 3.6s1.4-2.5 1.8-4.7c.4-1.8 1.4-2.8 1.4-4.8C30 10.5 28.5 9 26.5 9c-1.5 0-2.2.7-3.6.7S18.5 9 17 9z" transform="translate(2 8)"/></g><g fill="currentColor"><circle cx="8" cy="30" r="1"/><circle cx="41" cy="33" r="1.2"/><circle cx="24" cy="4" r="1"/></g></svg>',
     blob: '<svg viewBox="0 0 40 40"><path fill="currentColor" d="M20 4c6 0 8 4 12 5s5 6 4 10 2 8-2 12-9 2-14 4-9-1-12-5-4-8-3-12 2-9 6-11 5-3 9-3z"/><circle cx="14" cy="17" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="26" cy="17" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="14.6" cy="17.6" r="1.4"/><circle cx="26.6" cy="17.6" r="1.4"/><path d="M13 27c3-2.5 11-2.5 14 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
-    clover: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 11c-1.5-3-5.5-3.5-5.5-.5S10 13 12 11zM12 11c3-1.5 3.5-5.5.5-5.5S10 9 12 11zM12 11c1.5 3 5.5 3.5 5.5.5S14 9 12 11zM12 11c-3 1.5-3.5 5.5-.5 5.5S14 13 12 11z"/><path d="M12 11c0 4 1 7 3 10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>',
     owl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4l3 3h8l3-3v9a7 7 0 0 1-14 0z"/><circle cx="9.5" cy="11" r="2"/><circle cx="14.5" cy="11" r="2"/><path d="M11 14.5l1 1.2 1-1.2"/></svg>',
     quote: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 18v-5c0-4 2-7 6-8l.7 1.6C8.3 7.6 7.5 9.3 7.5 11H10v7zm10 0v-5c0-4 2-7 6-8l.7 1.6c-2.4 1-3.2 2.7-3.2 4.4H20v7z"/></svg>',
     root: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M9.5 8.5l1 8M14.5 8.5l-1 8"/></svg>'
@@ -171,56 +169,6 @@
     drawBoss();
   }, 15000);
 
-  /* ================= Luck wall (evening before + morning of an exam) ================= */
-  function luckExam(){
-    var c = centralParts();
-    var tomorrow = new Date(c.day + "T12:00:00Z"); tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-    var tmr = tomorrow.toISOString().slice(0, 10);
-    var hit = null;
-    (exp().exams || []).forEach(function(x){
-      if (x.date === c.day && c.hour >= 5 && c.hour < 13) hit = { label: x.label, when: "today" };
-      else if (x.date === tmr && c.hour >= 17) hit = { label: x.label, when: "tomorrow" };
-    });
-    return hit;
-  }
-  var luckEl = null, luckGot = 0, lastLuckSend = 0, luckQueue = 0;
-  function showLuckWall(){
-    var ex = luckExam();
-    if (!ex || !ok() || ls("sh_egg_luck_hide") === centralParts().day) { if (luckEl) luckEl.classList.remove("is-shown"); return; }
-    if (!luckEl) {
-      luckEl = document.createElement("div");
-      luckEl.className = "sh-egg sh-egg-luck";
-      document.body.appendChild(luckEl);
-      luckEl.addEventListener("click", function(e){
-        if (e.target.closest(".sh-egg-x")) { ls("sh_egg_luck_hide", centralParts().day); luckEl.classList.remove("is-shown"); return; }
-        if (!e.target.closest(".sh-egg-luck-send")) return;
-        if (Date.now() - lastLuckSend < 20000) { floatLuck("You", true); return; }
-        lastLuckSend = Date.now();
-        H.send({ t: "luck", name: H.name() });
-        floatLuck("You", true);
-      });
-    }
-    luckEl.innerHTML = '<span class="sh-egg-ic">' + IC.clover + '</span><span><b>' + esc(ex.label) + ' ' + ex.when + '</b>' +
-      '<small>' + (luckGot ? luckGot + " good-luck wish" + (luckGot === 1 ? "" : "es") + " from classmates so far" : "Send the class some luck") + '</small></span>' +
-      '<button type="button" class="sh-egg-luck-send">Send luck</button><button type="button" class="sh-egg-x" aria-label="Hide for today">×</button>';
-    requestAnimationFrame(function(){ luckEl.classList.add("is-shown"); });
-  }
-  function floatLuck(name, mine){
-    if (!ok() || luckQueue > 5) return;
-    luckQueue++;
-    setTimeout(function(){
-      luckQueue--;
-      var b = document.createElement("div");
-      b.className = "sh-egg sh-egg-luckfloat";
-      b.style.left = (12 + Math.random() * 70) + "vw";
-      b.innerHTML = IC.clover + '<span>' + (mine ? "Luck sent!" : esc(name) + " sends luck") + '</span>';
-      document.body.appendChild(b);
-      setTimeout(function(){ b.remove(); }, 4200);
-    }, luckQueue * 700);
-  }
-  setTimeout(showLuckWall, 1500);
-  setInterval(showLuckWall, 60000);
-
   /* ================= broadcasts from classmates ================= */
   document.addEventListener("sh:egg", function(e){
     var d = e.detail || {};
@@ -231,10 +179,6 @@
     } else if (d.t === "boss-down" && d.id === bossId()) {
       if (!boss) { ls("sh_egg_boss_down", d.id); return; }
       defeatBoss(String(d.by || "a classmate").slice(0, 40));
-    } else if (d.t === "luck") {
-      luckGot++;
-      floatLuck(String(d.name || "A classmate").slice(0, 40));
-      if (luckEl) showLuckWall();
     } else if (d.t === "golden" && ok()) {
       toast(row(IC.probe, esc(String(d.name || "A classmate").slice(0, 40)) + " just found today's Golden Probe", "One question here is golden each day. Tomorrow it could be you."), 5000, "is-gold");
     }
