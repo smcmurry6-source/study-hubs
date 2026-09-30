@@ -4,9 +4,9 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-09-29** (first refresh, run the evening of 09-29 Central, covering 09-25 on). A daily
-routine refreshes this file from all tracked data, reports and suggestions (`tools/lessons-refresh.md`) and ships
-small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
+**Last refreshed: 2026-09-29** (first refresh, run the evening of 09-29 Central, covering 09-25 on). Sam runs
+the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
+suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
 
 ## When a hub is archived: the retrospective
@@ -75,7 +75,7 @@ What each signal tells an author, and what to do with it in the next hub (and in
 - **What the exam asked that the hub missed** (check-ins): add those topics to that lecture's summary, and note the
   professor's emphasis for the next course they teach.
 
-## Live signals (rewritten by each daily refresh)
+## Live signals (rewritten by each refresh)
 
 Data 2026-09-25 to 09-29 (Central). Live hubs: perio (midterm Oct 1) and MSK Exam 3 (Oct 2).
 

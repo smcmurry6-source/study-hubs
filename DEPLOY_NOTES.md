@@ -68,8 +68,8 @@ check-ins, search terms, reports, surveys) is used to improve the next hubs: run
 findings and resulting changes in `LESSONS.md`. **Any session building or restructuring a hub reads `LESSONS.md`
 first** (hub Projects included: it holds what the class actually used and where they struggled).
 
-It is also refreshed **every day** (not just at archiving) by a Claude Code routine following
-`tools/lessons-refresh.md`: it reads all tracked data, student reports and suggestions since the last run
+It is also refreshed between archivings, by hand when Sam asks a Claude Code session to "run the lessons refresh"
+(`tools/lessons-refresh.md`; no scheduled routine): it reads all tracked data, student reports and suggestions since the last run
 (`tools/lessons-daily.sql`), rewrites the "Live signals" section, and opens a PR with small, data-backed fixes to the
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
