@@ -76,6 +76,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-30 (accent textures fixed + Stone/Antique, Claude Code)** — The metal accents are now **pre-rendered PNGs**
+  (`assets/tex/<key>.png`, made by `tools/make-accent-tex.js` from `shRanks.accentSvg()`; bump `TEX_V` in
+  `widget/ranks.js` when you regenerate): the SVG-filter data URIs didn't show up for students (Safari/phones). Bronze
+  lost its green patina specks; new **Stone** (everyone) and **Antique** accents with quieter grain than the medallions.
+  The texture also covers the ribbon's exam countdown pill, and the **dashboard** now applies the accent to its primary
+  buttons (it never applied it before).
+
 - **2026-09-30 (luck moves to the dashboard + metal accents, Claude Code)** — The hubs' exam "luck wall" pop-up
   (`widget/eggs.js`) is gone (#35: it got in the way of last-minute studying). The dashboard's next-exam card now has a
   **Send luck** row the day before and the morning (before 2 pm) of the exam: one per person per exam, with the class

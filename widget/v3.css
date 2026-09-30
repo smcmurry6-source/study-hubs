@@ -525,9 +525,9 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-acc-lock{width:12px; height:12px;}
 /* an unlocked accent is a metal, not just a colour (widget/ranks.js applyAccent sets data-sh-accent and --sh-tex):
    filled accent things in every hub get the rank's own texture. Text and borders keep the flat --accent. */
-html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .sh-archived-go, .shd-badge:not(.is-done)){
+html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .pill.countdown, .sh-archived-go, .shd-badge:not(.is-done)){
   background-image:var(--sh-tex); background-size:100% 100%; color:var(--sh-tex-ink); text-shadow:var(--sh-tex-shadow); border-color:var(--accent-ink);}
-html[data-sh-accent] :is(.btn.primary, .qs-btn.primary) :is(svg, .ic){filter:drop-shadow(var(--sh-tex-shadow));}
+html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .pill.countdown) :is(svg, .ic){filter:drop-shadow(var(--sh-tex-shadow));}
 html[data-sh-accent] :is(.toggle.on .sw, .toggle input:checked, .qcard-choice.multi[data-selected="true"]::before, .qcard-choice.multi[data-picked="true"]::before,
   .bar i:not([class*="tag-"] i), .weak-meter i:not([class*="tag-"] i), .shd-bar i, .sh-mastery-bar i, .shstat-hbar){
   background-image:var(--sh-tex); background-size:100% 100%;}
