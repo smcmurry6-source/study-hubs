@@ -1,12 +1,13 @@
-# Lessons refresh (daily, and before every new hub)
+# Lessons refresh (on request, and before every new hub)
 
 Keeps `LESSONS.md` current from **all** tracked data, student reports and suggestions, and pushes anything worth it
 out to the live hubs. It runs:
 
-- **Every day** as a Claude Code routine ("Daily lessons refresh", a fresh cloud session each time).
+- **When Sam asks** ("run the lessons refresh") in a Claude Code session with the Supabase connector. There is no
+  scheduled routine (Sam cancelled it 2026-09-29 in favour of running it by hand).
 - **Before building a new hub**: whatever session builds it (Claude Code, Cowork, a hub's Claude Project) runs
   steps 1-3 itself first if `LESSONS.md`'s "Last refreshed" date is not today, so the new hub starts from the latest
-  data. Steps 4-5 can wait for the daily run.
+  data. Steps 4-5 can wait for the next full run.
 
 Archiving a hub still gets the full retrospective in `LESSONS.md` (`tools/retro.sql`); this is the rolling version.
 
@@ -61,5 +62,4 @@ Rules:
 - Title: `Lessons refresh YYYY-MM-DD`. Body, in plain student-facing language: what changed on the live hubs, then
   the `LESSONS.md` highlights, the report verdicts, and "For Sam" (proposals and anything that needs a decision).
 - Add a line to "Recent major changes" in `DEPLOY_NOTES.md` only when live hubs changed.
-- The routine session ends after opening the PR; it doesn't babysit it. If CI fails, the next day's run fixes it
-  first.
+- Watch the PR until CI is green, and merge only when Sam says so.
