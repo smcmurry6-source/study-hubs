@@ -100,7 +100,7 @@
   }
 
   /* ---------- textures (filters) ---------- */
-  function filters(p, t, rich, plain){
+  function filters(p, t, rich){
     if (!rich) return '';
     var light = '<feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="b"/>' +
       '<feSpecularLighting in="b" surfaceScale="3.2" specularConstant="1.05" specularExponent="22" lighting-color="#fff" result="sp">' +
@@ -113,12 +113,8 @@
         '<feColorMatrix in="n" type="matrix" values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.45" result="streak"/>' +
         '<feComposite in="streak" in2="SourceAlpha" operator="in" result="st"/>' +
         '<feBlend in="SourceGraphic" in2="st" mode="overlay" result="brushed"/>' +
-        (t === "bronze" && !plain ? '<feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" seed="9" result="pn"/>' +
-          '<feColorMatrix in="pn" type="matrix" values="0 0 0 0 .3  0 0 0 0 .52  0 0 0 0 .44  0 0 0 24 -16.6" result="pat"/>' +
-          '<feComposite in="pat" in2="SourceAlpha" operator="in" result="pati"/>' +
-          '<feComposite in="pati" in2="brushed" operator="over" result="brushed2"/>' : '') +
         light +
-        '<feComposite in="' + (t === "bronze" && !plain ? "brushed2" : "brushed") + '" in2="spi" operator="arithmetic" k1="0" k2="1" k3="' + (t === "silver" ? ".75" : ".6") + '" k4="0"/>' +
+        '<feComposite in="brushed" in2="spi" operator="arithmetic" k1="0" k2="1" k3="' + (t === "silver" ? ".75" : ".6") + '" k4="0"/>' +
         '</filter>';
     } else if (t === "stone") {
       f = '<filter id="' + p + 'tex" x="-8%" y="-30%" width="116%" height="160%" color-interpolation-filters="sRGB">' +
@@ -374,7 +370,7 @@
         '<feColorMatrix in="grain" type="matrix" values="0 0 0 0 .25  0 0 0 0 .13  0 0 0 0 .04  0 0 0 1.8 -.75" result="gr"/>' +
         '<feBlend in="SourceGraphic" in2="gr" mode="multiply" result="aged"/>' +
         '<feColorMatrix in="aged" type="matrix" values=".92 .1 .02 0 0  .06 .86 .04 0 0  .04 .08 .72 0 0  0 0 0 1 0"/></filter>';
-    } else defs += filters(p, key, true, true);
+    } else defs += filters(p, key, true);
     if (key === "diamond") {
       defs += facets(p);
       top = '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'fac)" opacity=".7"/>' +
