@@ -520,9 +520,17 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-accent-swatches button{display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:12.5px; font-weight:600; padding:6px 11px 6px 7px; border-radius:99px; border:1px solid var(--shw-line2); background:var(--shw-bg); color:var(--shw-ink); cursor:pointer;}
 .sh-accent-swatches button[aria-pressed="true"]{border-color:var(--shw-ink); box-shadow:inset 0 0 0 1px var(--shw-ink);}
 .sh-accent-swatches button:disabled{opacity:.5; cursor:not-allowed;}
-.sh-acc-dot{width:16px; height:16px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);}
+.sh-acc-dot{width:20px; height:20px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.2);}
 .sh-acc-default{background:conic-gradient(#a83a2c 0 50%, #A23F5E 0);}
 .sh-acc-lock{width:12px; height:12px;}
+/* an unlocked accent is a metal, not just a colour (widget/ranks.js applyAccent sets data-sh-accent and --sh-tex):
+   filled accent things in every hub get the rank's own texture. Text and borders keep the flat --accent. */
+html[data-sh-accent] :is(.btn.primary, .qs-btn.primary, .sh-archived-go, .shd-badge:not(.is-done)){
+  background-image:var(--sh-tex); background-size:100% 100%; color:var(--sh-tex-ink); text-shadow:var(--sh-tex-shadow); border-color:var(--accent-ink);}
+html[data-sh-accent] :is(.btn.primary, .qs-btn.primary) :is(svg, .ic){filter:drop-shadow(var(--sh-tex-shadow));}
+html[data-sh-accent] :is(.toggle.on .sw, .toggle input:checked, .qcard-choice.multi[data-selected="true"]::before, .qcard-choice.multi[data-picked="true"]::before,
+  .bar i:not([class*="tag-"] i), .weak-meter i:not([class*="tag-"] i), .shd-bar i, .sh-mastery-bar i, .shstat-hbar){
+  background-image:var(--sh-tex); background-size:100% 100%;}
 
 .sh-rankup{position:fixed; inset:0; z-index:10004; display:flex; align-items:center; justify-content:center; background:rgba(8,6,14,.55); opacity:0; transition:opacity .3s; padding:16px;}
 .sh-rankup.is-shown{opacity:1;}
