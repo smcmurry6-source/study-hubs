@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-09-29** (first refresh, run the evening of 09-29 Central, covering 09-25 on). Sam runs
+**Last refreshed: 2026-09-30** (second refresh, 2 pm Central, all data to date). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -77,32 +77,41 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Data 2026-09-25 to 09-29 (Central). Live hubs: perio (midterm Oct 1) and MSK Exam 3 (Oct 2).
+Refreshed 2026-09-30 at 2 pm Central, using all data to date (numbers "since" = since the 09-29 evening refresh).
+Live hubs: perio (midterm Thu Oct 1, 10 am) and MSK Exam 3 (Fri Oct 2).
 
-**Perio**: 58 people, ~63 h. Time is question bank 1,771 min (30 people) and lecture notes 1,443 min (31); review
-tables ~250 min, mock exam 52 min (12 people), exam hints 46 min, Daily Drill 35 min (4 people), arcade ~75 min. 47
-people landed on Course Home but only ~30 went on to notes or the bank, and 23 of 58 left within 5 minutes: the
-bounce is at the landing page. 5 mocks saved, average 73%.
-- Hardest (15+ tries): `q4-L27` healing-timeline matching 20% (a grading bug, fixed today, see below), `q2-03`
-  poly-propylene 30% (11 of 33 picked silk), `q1-P05` Patient Box multi-answer staging 30%, `q4-15` Miller class 32%
-  (11 of 19 picked Class 1 for a 1-2 mm tooth), `q3-04` McGuire & Nunn 33% (9 of 21 picked Miller & McEntire's
-  "retaining the tooth"), `q2-06` suture construction matching 38%.
-- Do: prognosis systems (McGuire & Nunn vs Miller & McEntire vs Kwok & Caton) and suture material
-  (natural/synthetic × braided/monofilament) are look-alike sets; make sure each has a side-by-side table in the
-  notes, and put them in the midterm-eve review.
+**Did the last refresh's fixes work?** Yes, all of them so far:
+- Explanations that name the favourite wrong answer: perio `q2-03` 30% before, 14 of 23 (61%) since; `sl-calcitriol`
+  (MSK) 20% before, 3 of 6 since. Perio `q4-15` dropped off the hardest list.
+- `q4-L27` matching (grading bug fixed): 20% before, 7 of 16 (44%) since.
+- Perio Course Home quick-start row: on 09-30 only 6 of 36 perio visitors left within 5 minutes (was 23 of 58, 40%), and
+  6 people used "Practice questions" (`practice=midterm`). It's the day before the midterm, so some of that is
+  motivation, not the button; recheck after the exam.
 
-**MSK Exam 3**: 29 people, ~62 h, and they come back: 20 of 29 on 2+ days and only 3 under 5 minutes (exam is
-closer). Lecture notes 1,785 min (28 people), bank 1,262 min (21), Weak Spots 245 min (11); every review table,
-arcade game, cram sheet and exam hints under 80 min each. Mock exam: 3 people, 44 min, **no score ever submitted**.
-Daily Drill: 5 people, 39 min.
-- Hardest: all ordering questions: `h-bd-remodel` 13%, `h-jt-ra-seq` 23%, `h-ca-collagen-seq` 24%, `h-bd-zones`
-  33% (5-6 steps, all-or-nothing). `sl-calcitriol` 20%: 8 of 15 picked cholecalciferol in CKD.
-- Do: on exam eve, point people at the ordering questions through the drill; keep new ordering items to 4-5 steps.
+**Perio** (94 people, ~108 h, 6,851 answers, 81% correct; every question tried at least once). 09-30 so far: 36
+people, 29 h. Question bank 833 min (28 people), lecture notes 438 (23), mock exam 104 (7), Daily Drill 42 (8, the
+most drill use yet). 10 mocks saved since 09-29, averaging 76% then 87%.
+- By session: Risk Assessment is the weakest taught one (77%), then Phase I (80%), Incisions/Flaps/Sutures (81%),
+  Diagnosis (84%). Professor exam-review items score 72% vs 81% for lecture items.
+- By type: multi-answer (select all) 65%, matching 72%, MCQ 82%. The hardest items are select-all with many options:
+  `q3-M01` UniFe inputs 20% (5 right out of 7 options), `q1-P05` Patient Box staging 44%.
+- Still hard: `q3-04` McGuire & Nunn 38% (20 of 45 picked Miller & McEntire; a comparison table already exists in
+  Review), `q4-02` ODU 11/12 explorer 25% (not on the midterm).
+- Reports: #8 and #9 on `q1-02` (CAL with the CEJ 4 mm under the margin), the second from the same visitor saying
+  they misread it. The stem is clear; no change.
 
-**Both / site-wide**: nobody has opened the widget's Search since click tracking started (0 clicks on its pill,
-0 `search_terms` rows), while the launcher got 95 clicks. The widget's Stats pill 37, Daily Drill chip 11,
-Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4): readiness 4, 4, 4, 2; two said
-"Hub was easier" than the exam, two "About right"; one said the hub missed "patient box style questions".
+**MSK Exam 3** (45 people, ~78 h, 5,096 answers, 77% correct). 09-30 so far: 18 people, 7 h, mostly the bank
+(310 min, 10 people) and cram sheet (54 min). The **first MSK mock score came in today** (73% on 40), so the mock does
+work; it's just long.
+- By lecture: Bone Development 67% (its ordering questions drag it down), Drugs 72%, everything else 77-83%. By
+  source: the professor's quiz items 69%, hub-written 74%, the PollEv review set 90%.
+- Ordering questions are the weakest items in either hub: 34% overall, 16-23% for the six-step ones
+  (`h-bd-remodel`, `h-bd-endo-seq`, `h-jt-ra-seq`, `h-ca-collagen-seq`), even with the new "k of n" feedback.
+- Favourite wrong answers, now answered in the explanations: `h-dr-hypoCa` (9 of 13 picked hyporeflexia, a
+  hypercalcemia sign), `h-tu-gct-arthritis` (7 of 12 picked osteochondroma), `h-ai-sle-ab` (6 of 19 picked anti-Ro/La).
+
+**Site-wide**: still no one has used the widget's Search (kept, Sam 09-29). Five GI Exam 2 check-ins now: readiness
+4, 4, 4, 2, 5; three "About right", two "Hub was easier"; one wanted Patient Box questions.
 
 ## Standing lessons (read before building a hub)
 
@@ -115,7 +124,10 @@ Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4):
 - **Matching and sequence questions score ~30 points lower than MCQ** (GI2: 53% vs 84% MCQ, 74% recall) and are
   over-practised because people retry them. Grade them per pair/step (perio does since 2026-09-26), keep them short
   (4-5 pairs), and check any item under ~15% with 20+ attempts for a grading or wording bug before assuming it is
-  just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts). **Never give two left items
+  just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts). **Ordering questions longer than 4-5 steps
+  barely work:** MSK's six-step sequences sat at 16-23% over 17-30 attempts each (09-30) even with per-step feedback,
+  because one misplaced step makes the whole item wrong. **Select-all questions with many options are the same trap**
+  (perio `q3-M01`, 5 of 7 options correct: 20%); keep them to 4-5 options, and name every option in the explanation. **Never give two left items
   the same right-hand answer** unless grading compares text: perio `q4-L27` had "4-6 weeks" twice, and picking
   the other copy was marked wrong (20% correct; grading compares text since 2026-09-29).
 - **The last lectures before the exam get the least practice and score lowest.** GI2's GI Pharm and GI Path were
@@ -130,7 +142,8 @@ Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4):
   61%), and half or more only come on one day. The landing view should get someone to a question or the notes in one tap.
   Perio (2026-09-29): 47 of 58 people saw Course Home, ~30 reached notes or the bank, 23 left within 5 minutes.
   Perio now opens with a one-tap row (Practice questions, Daily drill, Lecture notes); check next refresh whether
-  the under-5-minute share drops and which button gets used (`practice=midterm`, `sh-drill=quick`).
+  the under-5-minute share drops and which button gets used (`practice=midterm`, `sh-drill=quick`). First read
+  (09-30, midterm eve): 6 of 36 under 5 minutes, and "Practice questions" is the button people use.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
@@ -154,7 +167,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
-  from the start: key fact, then one sentence per tempting distractor.
+  from the start: key fact, then one sentence per tempting distractor. It works: `q2-03` went from 30% to 61% right after its
+  explanation named silk (09-30).
 - **Explanations must agree with the key and show the number.** Perio `q3-47`'s explanation didn't match its answer
   and mixed up two slide figures. When a question tests a figure, the explanation states it and names which figure
   it is, and separates it from look-alike numbers.
