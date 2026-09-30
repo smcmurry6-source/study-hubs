@@ -129,6 +129,8 @@ Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4):
 - **Many visitors bounce.** 40-60% of each hub's visitors spend under 5 minutes in it (GI2 40%, MSK 40%, perio
   61%), and half or more only come on one day. The landing view should get someone to a question or the notes in one tap.
   Perio (2026-09-29): 47 of 58 people saw Course Home, ~30 reached notes or the bank, 23 left within 5 minutes.
+  Perio now opens with a one-tap row (Practice questions, Daily drill, Lecture notes); check next refresh whether
+  the under-5-minute share drops and which button gets used (`practice=midterm`, `sh-drill=quick`).
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.

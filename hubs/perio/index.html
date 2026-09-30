@@ -185,6 +185,18 @@ main{padding-top:20px}
 .home-hero h2 i{color:var(--accent)}
 .home-hero .lede{color:var(--ink-soft);max-width:56ch}
 .hh-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+/* one-tap start at the very top of Course Home: 23 of 58 visitors left within 5 minutes of landing here (lessons refresh 2026-09-29) */
+.quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.qs-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;box-shadow:var(--shadow);min-width:0}
+.qs-btn:hover{border-color:var(--accent)}
+.qs-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+[data-theme="dark"] .qs-btn.primary{color:#1E171A}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .qs-btn.primary{color:#1E171A} }
+.qs-btn .qs-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb, currentColor 12%, transparent)}
+.qs-btn b{display:block;font-size:1rem}
+.qs-btn small{display:block;font-size:.8rem;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qs-btn span{min-width:0}
+@media (max-width:720px){.quick-start{grid-template-columns:minmax(0,1fr);gap:8px}.qs-btn{padding:12px 14px}}
 .hh-side{background:var(--surface-2);border-left:1px solid var(--line);padding:24px 26px;display:flex;flex-direction:column;gap:14px;background-image:radial-gradient(color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px);background-size:14px 14px}
 .hh-stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .hh-stat .k{font-size:.72rem;font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
@@ -3573,7 +3585,13 @@ function renderCourseInfo(){
   var mastered = STATE.totalCorrect, total = QUESTIONS.length;
   var taught = LECTURES.filter(function(l){ return l.status === 'taught'; }).length;
   var cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
-  var h = '<div class="home-hero"><div class="hh-main"><div class="eyebrow">Course #2145 · Fall 2026 · 9 sessions</div>' +
+  var preMid = mid !== null && mid >= 0, left = QUESTIONS.filter(function(q){ return !STATE.answered[q.id] && (!preMid || (q.mid !== false && LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)); }).length;
+  var h = '<div class="quick-start" aria-label="Start studying">' +
+    '<button type="button" class="qs-btn primary" data-practice="'+(preMid ? 'midterm' : 'all')+'"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+(preMid ? 'Midterm scope · ' : '')+left+' you haven\'t tried</small></span></button>' +
+    '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>10 questions: misses + high-yield</small></span></button>' +
+    '<button type="button" class="qs-btn" data-goto-lecture="'+cont.id+'"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>S'+cont.num+' '+escHtml(shortTitle(cont))+'</small></span></button>' +
+    '</div>';
+  h += '<div class="home-hero"><div class="hh-main"><div class="eyebrow">Course #2145 · Fall 2026 · 9 sessions</div>' +
     '<h2>Periodontology <i>D2</i></h2><p class="lede">A shorter companion to the D1 course, taught flipped: each session after the first has a recording under an hour, class opens with a 5-question quiz on it, and the live session covers what the recording didn\'t. This hub grows as each session is lectured.</p>' +
     '<div class="hh-actions"><button type="button" class="btn primary" data-goto-lecture="'+cont.id+'">'+icon('notes')+'Continue: S'+cont.num+' '+escHtml(shortTitle(cont))+'</button>' +
     '<button type="button" class="btn" data-sh-drill="home">'+icon('bolt')+'Daily drill</button><button type="button" class="btn" data-set-view="mock-exam">'+icon('timer')+'Mock exam</button><button type="button" class="btn" data-goto-mode="arcade">'+icon('arcade')+'Pocket Arcade</button></div></div>' +
