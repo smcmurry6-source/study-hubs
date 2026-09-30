@@ -185,6 +185,18 @@ main{padding-top:20px}
 .home-hero h2 i{color:var(--accent)}
 .home-hero .lede{color:var(--ink-soft);max-width:56ch}
 .hh-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+/* one-tap start at the very top of Course Home: 23 of 58 visitors left within 5 minutes of landing here (lessons refresh 2026-09-29) */
+.quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.qs-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;box-shadow:var(--shadow);min-width:0}
+.qs-btn:hover{border-color:var(--accent)}
+.qs-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+[data-theme="dark"] .qs-btn.primary{color:#1E171A}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .qs-btn.primary{color:#1E171A} }
+.qs-btn .qs-ic{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb, currentColor 12%, transparent)}
+.qs-btn b{display:block;font-size:1rem}
+.qs-btn small{display:block;font-size:.8rem;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qs-btn span{min-width:0}
+@media (max-width:720px){.quick-start{grid-template-columns:minmax(0,1fr);gap:8px}.qs-btn{padding:12px 14px}}
 .hh-side{background:var(--surface-2);border-left:1px solid var(--line);padding:24px 26px;display:flex;flex-direction:column;gap:14px;background-image:radial-gradient(color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px);background-size:14px 14px}
 .hh-stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .hh-stat .k{font-size:.72rem;font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
@@ -1119,7 +1131,7 @@ var QUESTIONS = [
 /* ===== Lecture 2 — Incisions, Flaps & Sutures ===== */
 { id:'q2-01', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which suture material is natural, monofilament, resorbs fastest (7–10 days), but handles very poorly?", choices:['Chromic gut','Poly-Glycolic Acid (PGA)','Silk','PTFE'], answer:0, ex:"Chromic gut: natural monofilament, 7–10 day resorption, low strength, mild reaction, very bad handling.", src:'lecture' },
 { id:'q2-02', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which suture material is synthetic and braided, resorbs slowest of the resorbable options (55–70 days), and is used for ridge and sinus augmentation?", choices:["Poly-Glycolic Acid (PGA)", "Silk", "Poly-Glycolide (PGCL)", "Chromic gut"], answer:0, ex:"PGA: synthetic braided resorbable, 55–70 days, moderate strength, bad tissue reaction, great handling. Silk is the other braided suture, but it's natural and non-resorbable. PGCL is the other synthetic resorbable, but it's a monofilament and resorbs faster (22–55 days). Chromic gut is natural and monofilament, and resorbs fastest (7–10 days).", src:'lecture' },
-{ id:'q2-03', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which non-resorbable suture is described as having no adherence to tissue, similar to nylon?", choices:['Poly-Propylene','Silk','PTFE','Poly-Glycolide (PGCL)'], answer:0, ex:"Poly-propylene is the non-resorbable monofilament that behaves like nylon: no adherence to tissue. PTFE is the look-alike trap here: it is also a synthetic non-resorbable monofilament, but the lecture tags it as the high-cost option used in every surgery type except pure soft-tissue grafting, not the \"like nylon\" one.", src:'lecture' },
+{ id:'q2-03', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which non-resorbable suture is described as having no adherence to tissue, similar to nylon?", choices:['Poly-Propylene','Silk','PTFE','Poly-Glycolide (PGCL)'], answer:0, ex:"Poly-propylene is the non-resorbable monofilament that behaves like nylon: no adherence to tissue. PTFE is the look-alike trap here: it is also a synthetic non-resorbable monofilament, but the lecture tags it as the high-cost option used in every surgery type except pure soft-tissue grafting, not the \"like nylon\" one. Silk is non-resorbable too, but it is natural and braided, the opposite of a nylon-like monofilament.", src:'lecture' },
 { id:'q2-04', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which material causes the worst tissue reaction of all six sutures taught, despite handling very well?", choices:['Silk','Poly-Glycolide (PGCL)','PTFE','Chromic gut'], answer:0, ex:"Silk: natural braided non-resorbable, high strength, very bad tissue reaction, great handling — and must be removed at 7 days.", src:'lecture' },
 { id:'q2-05', lec:'incisions-flaps-sutures', type:'mcq', stem:"Which non-resorbable suture must be physically removed, and at what interval?", choices:['Silk, at 7 days','PTFE, at 7 days','Poly-Propylene, at 10 days','Silk, at 14 days'], answer:0, ex:"Silk is non-resorbable and is specifically noted as removed at 7 days.", src:'lecture' },
 { id:'q2-06', lec:'incisions-flaps-sutures', type:'match', stem:"Match each suture material to its construction.", pairs:[['Chromic Gut','Natural monofilament'],['Poly-Glycolic Acid','Synthetic braided'],['Silk','Natural braided'],['PTFE','Synthetic monofilament']], ex:"Only silk and PGA are braided; gut and PTFE are monofilament. Origin splits the other way: gut and silk are natural, PGA and PTFE synthetic.", src:'lecture' },
@@ -1219,7 +1231,7 @@ var QUESTIONS = [
 { id:'q4-12', lec:'phase1-therapy', type:'mcq', stem:"Gingival recession is measured from where to where?", choices:['CEJ to the gingival margin','Gingival margin to the base of the pocket','CEJ to the base of the pocket','Alveolar crest to the CEJ'], answer:0, ex:"PD: gingival margin to pocket base. CAL: CEJ to pocket base (PD + recession).", src:'slides' },
 { id:'q4-13', lec:'phase1-therapy', type:'mcq', stem:"How many probing readings are recorded per tooth?", choices:["Six (DB, B, MB, DL, L, ML), recording the deepest reading at each", "Four (M, D, B, L), recording the average of the readings at each of the four surfaces", "Three, all on the buccal side, since lingual sites are recorded only when there is bleeding", "One, the deepest site found anywhere around the tooth, recorded as that tooth's single probing depth"], answer:0, ex:"Six sites are probed per tooth (DB, B, MB, DL, L, ML), and the deepest reading at each is recorded.", src:'slides' },
 { id:'q4-14', lec:'phase1-therapy', type:'mcq', stem:"How should the probe be angled when probing interproximally?", choices:['Slightly tilted toward the area apical to the contact point','Perfectly vertical at the line angle','Horizontally through the contact','Angled away from the contact at 45°'], answer:0, ex:"The common mistakes are too little angulation and too much. Elsewhere: light pressure, elastic feel, probe parallel to the long axis.", src:'slides' },
-{ id:'q4-15', lec:'phase1-therapy', type:'mcq', stem:"A tooth moves more than 1 mm but less than 2 mm, with no vertical displacement. What is its Miller mobility class?", choices:['Class 2','Class 1','Class 3','Class 0'], answer:0, ex:"Miller Class 1 is under 1 mm, Class 2 is more than 1 mm but under 2 mm, and Class 3 adds vertical displacement. This tooth moves 1–2 mm with no vertical movement, so it is Class 2.", src:'slides' },
+{ id:'q4-15', lec:'phase1-therapy', type:'mcq', stem:"A tooth moves more than 1 mm but less than 2 mm, with no vertical displacement. What is its Miller mobility class?", choices:['Class 2','Class 1','Class 3','Class 0'], answer:0, ex:"Miller Class 1 is under 1 mm, Class 2 is more than 1 mm but under 2 mm, and Class 3 adds vertical displacement. This tooth moves 1–2 mm with no vertical movement, so it is Class 2. Don't read the class off the millimetres: just over 1 mm is already Class 2, not Class 1.", src:'slides' },
 { id:'q4-16', lec:'phase1-therapy', type:'mcq', stem:"What defines Miller Class 3 mobility?", choices:["Severe faciolingual and/or mesiodistal movement combined with vertical displacement", "Any horizontal movement under 1 mm, felt between two instrument handles", "Movement only in the mesiodistal direction, with no faciolingual movement at all", "Movement that is visible only on a radiograph, as a widened PDL space with no clinical mobility"], answer:0, ex:"Class 3 is the only Miller class with vertical displacement (the tooth can be depressed in its socket), on top of severe horizontal movement.", src:'slides' },
 { id:'q4-17', lec:'phase1-therapy', type:'mcq', stem:"How is tooth mobility assessed?", choices:['With two rigid instruments, one on each side of the tooth','With a fingertip and the probe tip','With the probe inserted in the sulcus','From a radiograph alone'], answer:0, ex:"Mobility is checked between two rigid instrument handles, one on each side. A fingertip is soft enough to mask the movement.", src:'slides' },
 { id:'q4-18', lec:'phase1-therapy', type:'mcq', stem:"What is full-mouth debridement (D4355) for?", choices:["Gross removal of plaque and calculus so a comprehensive evaluation and diagnosis can be done at a later visit", "Definitive periodontal treatment completed in one visit, replacing scaling and root planing for patients with heavy calculus", "Maintenance for a previously treated periodontitis patient who has missed their recall visits", "Polishing and stain removal after SRP, billed once the root planing visits are complete"], answer:0, ex:"Full-mouth debridement (D4355) is not treatment. It removes enough calculus that the margins can be seen and charted, so the real exam and diagnosis happen at a later visit.", src:'slides' },
@@ -3336,9 +3348,10 @@ function wireQuestionContainer(container){
         st.selected = { side:side, idx:pi, el:matchBtn }; matchBtn.setAttribute('data-selected','true'); return;
       }
       var other = st.selected.el, otherIdx = st.selected.idx; st.selected = null;
-      if(otherIdx === pi){
+      /* compare the answers' text, not their index: two left items can share a right-hand answer (q4-L27's "4-6 weeks") */
+      if(otherIdx === pi || mq.pairs[otherIdx][1] === mq.pairs[pi][1]){
         [other, matchBtn].forEach(function(b){ b.removeAttribute('data-selected'); b.setAttribute('data-state','correct'); b.disabled = true; });
-        st.matched[pi] = true;
+        st.matched[side === 'left' ? pi : otherIdx] = true;
         if(Object.keys(st.matched).length === mq.pairs.length){ markExplain(mq.id, matchBtn); recordAnswer(mq.id, mq.lec, st.misses === 0); }
       } else {
         st.misses++;
@@ -3572,7 +3585,13 @@ function renderCourseInfo(){
   var mastered = STATE.totalCorrect, total = QUESTIONS.length;
   var taught = LECTURES.filter(function(l){ return l.status === 'taught'; }).length;
   var cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
-  var h = '<div class="home-hero"><div class="hh-main"><div class="eyebrow">Course #2145 · Fall 2026 · 9 sessions</div>' +
+  var preMid = mid !== null && mid >= 0, left = QUESTIONS.filter(function(q){ return !STATE.answered[q.id] && (!preMid || (q.mid !== false && LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)); }).length;
+  var h = '<div class="quick-start" aria-label="Start studying">' +
+    '<button type="button" class="qs-btn primary" data-practice="'+(preMid ? 'midterm' : 'all')+'"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+(preMid ? 'Midterm scope · ' : '')+left+' you haven\'t tried</small></span></button>' +
+    '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>10 questions: misses + high-yield</small></span></button>' +
+    '<button type="button" class="qs-btn" data-goto-lecture="'+cont.id+'"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>S'+cont.num+' '+escHtml(shortTitle(cont))+'</small></span></button>' +
+    '</div>';
+  h += '<div class="home-hero"><div class="hh-main"><div class="eyebrow">Course #2145 · Fall 2026 · 9 sessions</div>' +
     '<h2>Periodontology <i>D2</i></h2><p class="lede">A shorter companion to the D1 course, taught flipped: each session after the first has a recording under an hour, class opens with a 5-question quiz on it, and the live session covers what the recording didn\'t. This hub grows as each session is lectured.</p>' +
     '<div class="hh-actions"><button type="button" class="btn primary" data-goto-lecture="'+cont.id+'">'+icon('notes')+'Continue: S'+cont.num+' '+escHtml(shortTitle(cont))+'</button>' +
     '<button type="button" class="btn" data-sh-drill="home">'+icon('bolt')+'Daily drill</button><button type="button" class="btn" data-set-view="mock-exam">'+icon('timer')+'Mock exam</button><button type="button" class="btn" data-goto-mode="arcade">'+icon('arcade')+'Pocket Arcade</button></div></div>' +
@@ -3736,7 +3755,7 @@ function examPoints(q){
   var a = EXAM_STATE.answers[q.id];
   if(a == null) return 0;
   if(q.type === 'multi') return multiScore(q, a);
-  if(q.type === 'match'){ var n = 0; q.pairs.forEach(function(p,i){ if(a[i] === i) n++; }); return n / q.pairs.length; }
+  if(q.type === 'match'){ var n = 0; q.pairs.forEach(function(p,i){ if(a[i] != null && q.pairs[a[i]][1] === p[1]) n++; }); return n / q.pairs.length; } /* by text: two items can share an answer */
   return a === q.answer ? 1 : 0;
 }
 function answeredCount(){ return EXAM_STATE.pool.filter(examAnswered).length; }

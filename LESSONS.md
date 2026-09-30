@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-09-25** (never yet; the first run covers everything since click tracking began). A daily
+**Last refreshed: 2026-09-29** (first refresh, run the evening of 09-29 Central, covering 09-25 on). A daily
 routine refreshes this file from all tracked data, reports and suggestions (`tools/lessons-refresh.md`) and ships
 small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -77,7 +77,32 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each daily refresh)
 
-Nothing yet: the first daily refresh fills this in (per live hub: what the data says now and what to do about it).
+Data 2026-09-25 to 09-29 (Central). Live hubs: perio (midterm Oct 1) and MSK Exam 3 (Oct 2).
+
+**Perio**: 58 people, ~63 h. Time is question bank 1,771 min (30 people) and lecture notes 1,443 min (31); review
+tables ~250 min, mock exam 52 min (12 people), exam hints 46 min, Daily Drill 35 min (4 people), arcade ~75 min. 47
+people landed on Course Home but only ~30 went on to notes or the bank, and 23 of 58 left within 5 minutes: the
+bounce is at the landing page. 5 mocks saved, average 73%.
+- Hardest (15+ tries): `q4-L27` healing-timeline matching 20% (a grading bug, fixed today, see below), `q2-03`
+  poly-propylene 30% (11 of 33 picked silk), `q1-P05` Patient Box multi-answer staging 30%, `q4-15` Miller class 32%
+  (11 of 19 picked Class 1 for a 1-2 mm tooth), `q3-04` McGuire & Nunn 33% (9 of 21 picked Miller & McEntire's
+  "retaining the tooth"), `q2-06` suture construction matching 38%.
+- Do: prognosis systems (McGuire & Nunn vs Miller & McEntire vs Kwok & Caton) and suture material
+  (natural/synthetic × braided/monofilament) are look-alike sets; make sure each has a side-by-side table in the
+  notes, and put them in the midterm-eve review.
+
+**MSK Exam 3**: 29 people, ~62 h, and they come back: 20 of 29 on 2+ days and only 3 under 5 minutes (exam is
+closer). Lecture notes 1,785 min (28 people), bank 1,262 min (21), Weak Spots 245 min (11); every review table,
+arcade game, cram sheet and exam hints under 80 min each. Mock exam: 3 people, 44 min, **no score ever submitted**.
+Daily Drill: 5 people, 39 min.
+- Hardest: all ordering questions: `h-bd-remodel` 13%, `h-jt-ra-seq` 23%, `h-ca-collagen-seq` 24%, `h-bd-zones`
+  33% (5-6 steps, all-or-nothing). `sl-calcitriol` 20%: 8 of 15 picked cholecalciferol in CKD.
+- Do: on exam eve, point people at the ordering questions through the drill; keep new ordering items to 4-5 steps.
+
+**Both / site-wide**: nobody has opened the widget's Search since click tracking started (0 clicks on its pill,
+0 `search_terms` rows), while the launcher got 95 clicks. The widget's Stats pill 37, Daily Drill chip 11,
+Report 5, Suggest 1. All 5 reports so far are resolved. GI Exam 2 check-ins (4): readiness 4, 4, 4, 2; two said
+"Hub was easier" than the exam, two "About right"; one said the hub missed "patient box style questions".
 
 ## Standing lessons (read before building a hub)
 
@@ -90,7 +115,9 @@ Nothing yet: the first daily refresh fills this in (per live hub: what the data 
 - **Matching and sequence questions score ~30 points lower than MCQ** (GI2: 53% vs 84% MCQ, 74% recall) and are
   over-practised because people retry them. Grade them per pair/step (perio does since 2026-09-26), keep them short
   (4-5 pairs), and check any item under ~15% with 20+ attempts for a grading or wording bug before assuming it is
-  just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts).
+  just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts). **Never give two left items
+  the same right-hand answer** unless grading compares text: perio `q4-L27` had "4-6 weeks" twice, and picking
+  the other copy was marked wrong (20% correct; grading compares text since 2026-09-29).
 - **The last lectures before the exam get the least practice and score lowest.** GI2's GI Pharm and GI Path were
   answered ~17 times per question vs ~30 for the early lectures, at 71-73% vs 81-84%. The Daily Drill and mock
   exams should lean toward late-added lectures; say on Course Home when new questions land.
@@ -101,6 +128,12 @@ Nothing yet: the first daily refresh fills this in (per live hub: what the data 
   lecture with paired look-alikes should have a comparison table and a question per distinguishing feature.
 - **Many visitors bounce.** 40-60% of each hub's visitors spend under 5 minutes in it (GI2 40%, MSK 40%, perio
   61%), and half or more only come on one day. The landing view should get someone to a question or the notes in one tap.
+  Perio (2026-09-29): 47 of 58 people saw Course Home, ~30 reached notes or the bank, 23 left within 5 minutes.
+  Perio now opens with a one-tap row (Practice questions, Daily drill, Lecture notes); check next refresh whether
+  the under-5-minute share drops and which button gets used (`practice=midterm`, `sh-drill=quick`).
+- **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
+  easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
+  (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
 
 ## What student reports and surveys have taught (keep adding)
 
@@ -118,6 +151,10 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   while the stem asked for the braided suture. An audit then found 24 more giveaways (labels that rule a choice out,
   stem words echoed only by the answer, throwaway distractors). Write distractors that are the same category,
   length and form as the answer, and keep qualifiers in the explanation, not the choices.
+- **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
+  wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
+  (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
+  from the start: key fact, then one sentence per tempting distractor.
 - **Explanations must agree with the key and show the number.** Perio `q3-47`'s explanation didn't match its answer
   and mixed up two slide figures. When a question tests a figure, the explanation states it and names which figure
   it is, and separates it from look-alike numbers.
