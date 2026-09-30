@@ -76,6 +76,14 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-09-30 (first lessons refresh, Claude Code)** — `LESSONS.md` refreshed from all data since 09-25 (Live signals
+  written; new lessons on duplicate matching answers, explanations that name the favourite wrong answer, exam harder
+  than hub + Patient Box questions). Perio: matching questions now grade by answer text in practice and mock
+  (`q4-L27` listed "4-6 weeks" twice, so the other copy was marked wrong); `q2-03` and `q4-15` explanations cover the
+  most-picked wrong answer. MSK: `sl-calcitriol` explanation covers cholecalciferol; a wrong ordering question now
+  says "Not quite: k of n in the right spot". No reading text changed, so no narration regenerated. **Perio and MSK
+  Projects: carry these into the split sources, or the next single-file build reverts them.**
+
 - **2026-09-30 (one inbox, Claude Code)** — The Inbox is now the same on every hub and the dashboard: notices are no
   longer filtered by hub (`site_notices.hub` only labels which hub a notice is about), and pop-ups go out on whichever
   page someone opens first. Read state was already shared (server for replies, `sh_notice_seen` for notices).

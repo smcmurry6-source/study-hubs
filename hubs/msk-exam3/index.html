@@ -757,7 +757,7 @@ mcq('dq-ckd','drugs','quiz','A 58-year-old man with stage 4 CKD has decreased ni
   'He has hypocalcemia (neuromuscular excitability, paresthesias, cataracts) from CKD. Heads up: the class study guide keys "low 25-hydroxyvitamin D." In CKD it is specifically activation (1-alpha hydroxylation to 1,25(OH)2D) in the kidney that fails, so expect the exam to frame it as a vitamin D problem.');
 mcq('sl-calcitriol','drugs','slido','JS is on epoetin for anemia from severe chronic renal failure. Which is most appropriate for his vitamin D supplementation?',
   ['Calcitriol','Cholecalciferol','Ergocalciferol','Calcium carbonate'],
-  'The final activation step (1-alpha hydroxylase, 25-OH D to 1,25(OH)2D) happens in the kidney. With renal failure, give the already-active form, calcitriol.');
+  'The final activation step (1-alpha hydroxylase, 25-OH D to 1,25(OH)2D) happens in the kidney. With renal failure, give the already-active form, calcitriol. Cholecalciferol (D3) and ergocalciferol (D2) are the inactive forms: they still need that kidney step, so they cannot work here.');
 mcq('sl-alendronate','drugs','slido','Which best describes the action of the bisphosphonate alendronate (Fosamax)?',
   ['Direct inhibition of osteoclast function','Stimulation of osteoblast activity','Blocking RANKL binding to RANK','Neutralizing sclerostin'],
   'Bisphosphonates are pyrophosphate analogs that bind hydroxyapatite, get released during resorption, and are taken up by osteoclasts, where they block function and promote apoptosis.');
@@ -2467,9 +2467,10 @@ function wireQuestionContainer(container){
       btn.disabled = true; btn.classList.add('is-picked');
       btn.insertAdjacentHTML('afterbegin', '<span class="ord">'+st.picks.length+'</span>');
       if(st.picks.length === q.steps.length){
-        var good = st.picks.every(function(v,i){ return v === i; });
+        var good = st.picks.every(function(v,i){ return v === i; }), inPlace = st.picks.filter(function(v,i){ return v === i; }).length;
         card.querySelectorAll('[data-act="seq"]').forEach(function(b){ var i = +b.getAttribute('data-step-idx'); var pos = st.picks.indexOf(i); b.classList.remove('is-picked'); b.classList.add(pos === i ? 'is-correct' : 'is-wrong'); });
         finishCard(card, good);
+        var sv = card.querySelector('.qcard-verdict'); if(sv && !good) sv.textContent = 'Not quite: ' + inPlace + ' of ' + q.steps.length + ' in the right spot.';
       }
     } else if(act === 'match'){
       var ms = MATCH_STATE[rid]; if(!ms || btn.classList.contains('is-matched')) return;
