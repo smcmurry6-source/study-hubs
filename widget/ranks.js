@@ -100,7 +100,7 @@
   }
 
   /* ---------- textures (filters) ---------- */
-  function filters(p, t, rich){
+  function filters(p, t, rich, plain){
     if (!rich) return '';
     var light = '<feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="b"/>' +
       '<feSpecularLighting in="b" surfaceScale="3.2" specularConstant="1.05" specularExponent="22" lighting-color="#fff" result="sp">' +
@@ -113,12 +113,12 @@
         '<feColorMatrix in="n" type="matrix" values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.4 -.45" result="streak"/>' +
         '<feComposite in="streak" in2="SourceAlpha" operator="in" result="st"/>' +
         '<feBlend in="SourceGraphic" in2="st" mode="overlay" result="brushed"/>' +
-        (t === "bronze" ? '<feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" seed="9" result="pn"/>' +
+        (t === "bronze" && !plain ? '<feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" seed="9" result="pn"/>' +
           '<feColorMatrix in="pn" type="matrix" values="0 0 0 0 .3  0 0 0 0 .52  0 0 0 0 .44  0 0 0 24 -16.6" result="pat"/>' +
           '<feComposite in="pat" in2="SourceAlpha" operator="in" result="pati"/>' +
           '<feComposite in="pati" in2="brushed" operator="over" result="brushed2"/>' : '') +
         light +
-        '<feComposite in="' + (t === "bronze" ? "brushed2" : "brushed") + '" in2="spi" operator="arithmetic" k1="0" k2="1" k3="' + (t === "silver" ? ".75" : ".6") + '" k4="0"/>' +
+        '<feComposite in="' + (t === "bronze" && !plain ? "brushed2" : "brushed") + '" in2="spi" operator="arithmetic" k1="0" k2="1" k3="' + (t === "silver" ? ".75" : ".6") + '" k4="0"/>' +
         '</filter>';
     } else if (t === "stone") {
       f = '<filter id="' + p + 'tex" x="-8%" y="-30%" width="116%" height="160%" color-interpolation-filters="sRGB">' +
@@ -324,6 +324,8 @@
 
   /* ---------- unlockable accent colours (cosmetic; each needs that tier or higher) ---------- */
   var ACCENTS = {
+    stone:   { tier: 0, L: ["#6F6A63", "#57524C", "#ECE8E2"], D: ["#B5AEA4", "#D2CCC3", "#2B2926"] },
+    antique: { tier: 1, L: ["#8A5A32", "#6E4524", "#F1E4D6"], D: ["#D39A68", "#E8BD94", "#35251A"] },
     bronze:  { tier: 2, L: ["#A5602A", "#85491B", "#F3E1D0"], D: ["#E09A5E", "#F2BE8F", "#3A2415"] },
     silver:  { tier: 3, L: ["#5F6B78", "#4A5561", "#E3E7EB"], D: ["#B7C1CC", "#D6DDE4", "#262C33"] },
     gold:    { tier: 4, L: ["#A67808", "#7F5B04", "#F6EAC6"], D: ["#E8BE45", "#F5D77E", "#3A2E0E"] },
@@ -334,17 +336,45 @@
   /* the metal itself, for filled things (primary buttons, switches, progress bars): the medallions' own gradient and
      texture filter drawn on a stretchable tile. Ink = text colour on top of it. */
   var TEX_INK = {
+    stone:   ["#1F1C19", "0 1px 0 rgba(255,255,255,.55)"],
+    antique: ["#FFF6E6", "0 1px 1px rgba(30,15,0,.85)"],
     bronze:  ["#FFFFFF", "0 1px 1px rgba(40,15,0,.7)"],
     silver:  ["#1D242B", "0 1px 0 rgba(255,255,255,.7)"],
     gold:    ["#3A2503", "0 1px 0 rgba(255,246,207,.7)"],
     diamond: ["#0B3350", "0 1px 0 rgba(255,255,255,.8)"],
     dark:    ["#FFFFFF", "0 0 6px rgba(167,123,255,.9)"]
   };
-  var texCache = {};
-  function accentTex(key){
+  /* The tiles are pre-rendered to assets/tex/<key>.png by tools/make-accent-tex.js from accentSvg() below: an SVG
+     filter used as a CSS background doesn't render reliably on phones (Safari), and a PNG is cheaper to paint. */
+  var TEX_V = 2;
+  var TEX_BASE = (function(){
+    var src = (document.currentScript && document.currentScript.src) || "";
+    if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : location.href; }
+    try { return new URL("../assets/tex/", src).href; } catch (e) { return "assets/tex/"; }
+  })();
+  function accentTex(key){ return ACCENTS[key] ? TEX_BASE + key + ".png?v=" + TEX_V : ""; }
+  function accentSvg(key){
     if (!ACCENTS[key]) return "";
-    if (texCache[key]) return texCache[key];
-    var p = "tx" + key, W = 240, Hh = 48, defs = cyl(p + "g", METAL[key]) + filters(p, key, true), top = "";
+    var p = "tx" + key, W = 240, Hh = 48, mat = key === "antique" ? METAL.brass : METAL[key];
+    var defs = cyl(p + "g", mat), top = "";
+    if (key === "stone") {
+      // quieter than the medallion's stone: fine grain and soft mottling, no veins, so text stays readable
+      defs += '<filter id="' + p + 'tex" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="3" result="m"/>' +
+        '<feColorMatrix in="m" type="matrix" values="0 0 0 0 .5  0 0 0 0 .48  0 0 0 0 .45  0 0 0 .9 -.2" result="mot"/>' +
+        '<feBlend in="SourceGraphic" in2="mot" mode="soft-light" result="a"/>' +
+        '<feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" seed="7" result="g"/>' +
+        '<feColorMatrix in="g" type="matrix" values="0 0 0 0 .18  0 0 0 0 .17  0 0 0 0 .16  0 0 0 14 -10.2" result="dk"/>' +
+        '<feColorMatrix in="g" type="matrix" values="0 0 0 0 .95  0 0 0 0 .94  0 0 0 0 .9  0 0 0 -14 3.4" result="lt"/>' +
+        '<feMerge><feMergeNode in="a"/><feMergeNode in="dk"/><feMergeNode in="lt"/></feMerge></filter>';
+    } else if (key === "antique") {
+      // aged brass: wood-like grain, no rust blotches
+      defs += '<filter id="' + p + 'tex" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.008 0.35" numOctaves="3" seed="2" result="grain"/>' +
+        '<feColorMatrix in="grain" type="matrix" values="0 0 0 0 .25  0 0 0 0 .13  0 0 0 0 .04  0 0 0 1.8 -.75" result="gr"/>' +
+        '<feBlend in="SourceGraphic" in2="gr" mode="multiply" result="aged"/>' +
+        '<feColorMatrix in="aged" type="matrix" values=".92 .1 .02 0 0  .06 .86 .04 0 0  .04 .08 .72 0 0  0 0 0 1 0"/></filter>';
+    } else defs += filters(p, key, true, true);
     if (key === "diamond") {
       defs += facets(p);
       top = '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'fac)" opacity=".7"/>' +
@@ -356,7 +386,7 @@
     }
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" preserveAspectRatio="none"><defs>' + defs + '</defs>' +
       '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'g)" filter="url(#' + p + 'tex)"/>' + top + '</svg>';
-    return (texCache[key] = "data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, "%27"));
+    return svg;
   }
   function applyAccent(key){
     var el = document.getElementById("sh-rank-accent"), root = document.documentElement;
@@ -582,7 +612,7 @@
       return miniCache[k] || (miniCache[k] = '<span class="sh-rank-mini" title="' + rankName(tier, level) + '">' + art(tier, 20) +
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
-    mount: mount, applyAccent: applyAccent, accentTex: accentTex, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
+    mount: mount, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade

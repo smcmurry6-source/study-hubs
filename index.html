@@ -215,6 +215,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .btn-primary{background:var(--ink); color:var(--on-ink); box-shadow:var(--shadow);}
 .btn-primary:hover{box-shadow:var(--shadow-lift); transform:translateY(-1px);}
 .btn-primary:active{transform:translateY(0) scale(.98);}
+html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-size:100% 100%; color:var(--sh-tex-ink); text-shadow:var(--sh-tex-shadow);}
 .btn-quiet{background:transparent; color:var(--ink-2); border-color:var(--line-2); padding:11px 16px; font-size:14px;}
 .btn-quiet:hover{color:var(--ink); background:var(--surface-2);}
 .hero-note{font-size:13.5px; color:var(--ink-3);}
@@ -833,6 +834,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   }
   applyReadingPrefs();
   var myTier = null;
+  /* the accent a rank unlocked (widget/ranks.js): here it only dresses the primary buttons in that metal */
+  function dashAccent(){ try{ if (window.shRanks) window.shRanks.applyAccent(ls("sh_pref_accent")); }catch(e){} }
+  document.addEventListener("DOMContentLoaded", dashAccent);
   var SETTINGS = [
     { key:"theme", label:"Theme", opts:[["auto","Match device"],["light","Light"],["dark","Dark"]] },
     { key:"sh_pref_font", label:"Reading font", def:"default", opts:[["default","Default"],["serif","Serif"],["sans","Sans"]] },
@@ -879,7 +883,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var b = e.target.closest("[data-set] button"); if (!b || b.disabled) return;
       var key = b.parentNode.getAttribute("data-set"), val = b.getAttribute("data-val");
       if (key === "theme") theme.set(val);
-      else if (key === "sh_pref_accent") { if (val === "default") { try{ localStorage.removeItem(key); }catch(err){} } else lsSet(key, val); }
+      else if (key === "sh_pref_accent") { if (val === "default") { try{ localStorage.removeItem(key); }catch(err){} } else lsSet(key, val); dashAccent(); }
       else lsSet(key, val);
       if (key === "sh_pref_font" || key === "sh_pref_size") applyReadingPrefs();
       b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
@@ -1577,7 +1581,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   function loadMyRank(sb){
     if (!VISITOR){ renderMyRank(null); return; }
     sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){
-      if (r && r.data){ myTier = r.data.tier || 0; renderMyRank(r.data); }
+      if (r && r.data){ myTier = r.data.tier || 0; lsSet("sh_rank_tier", String(myTier)); renderMyRank(r.data); dashAccent(); }
     }, function(){});
   }
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
