@@ -331,12 +331,41 @@
     dark:    { tier: 6, L: ["#6A35E0", "#5426B8", "#E7DDFB"], D: ["#A77BFF", "#C6A8FF", "#251540"] }
   };
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
+  /* the metal itself, for filled things (primary buttons, switches, progress bars): the medallions' own gradient and
+     texture filter drawn on a stretchable tile. Ink = text colour on top of it. */
+  var TEX_INK = {
+    bronze:  ["#FFFFFF", "0 1px 1px rgba(40,15,0,.7)"],
+    silver:  ["#1D242B", "0 1px 0 rgba(255,255,255,.7)"],
+    gold:    ["#3A2503", "0 1px 0 rgba(255,246,207,.7)"],
+    diamond: ["#0B3350", "0 1px 0 rgba(255,255,255,.8)"],
+    dark:    ["#FFFFFF", "0 0 6px rgba(167,123,255,.9)"]
+  };
+  var texCache = {};
+  function accentTex(key){
+    if (!ACCENTS[key]) return "";
+    if (texCache[key]) return texCache[key];
+    var p = "tx" + key, W = 240, Hh = 48, defs = cyl(p + "g", METAL[key]) + filters(p, key, true), top = "";
+    if (key === "diamond") {
+      defs += facets(p);
+      top = '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'fac)" opacity=".7"/>' +
+        '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'rb)" opacity=".22"/>';
+    } else if (key === "dark") {
+      [[18, 10, .9], [52, 34, .6], [83, 14, 1.1], [121, 38, .7], [150, 9, .8], [178, 29, 1], [209, 16, .6], [230, 40, .8], [104, 24, .5]].forEach(function(x){
+        top += '<circle cx="' + x[0] + '" cy="' + x[1] + '" r="' + x[2] + '" fill="#fff" opacity=".85"/>';
+      });
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + Hh + '" width="' + W + '" height="' + Hh + '" preserveAspectRatio="none"><defs>' + defs + '</defs>' +
+      '<rect width="' + W + '" height="' + Hh + '" fill="url(#' + p + 'g)" filter="url(#' + p + 'tex)"/>' + top + '</svg>';
+    return (texCache[key] = "data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, "%27"));
+  }
   function applyAccent(key){
-    var el = document.getElementById("sh-rank-accent");
+    var el = document.getElementById("sh-rank-accent"), root = document.documentElement;
     var a = ACCENTS[key], known = +(ls("sh_rank_tier") || 0);
-    if (!a || known < a.tier) { if (el) el.remove(); return; }
+    if (!a || known < a.tier) { if (el) el.remove(); root.removeAttribute("data-sh-accent"); return; }
     function v(c){ return "--accent:" + c[0] + ";--accent-ink:" + c[1] + ";--accent-soft:" + c[2] + ";"; }
-    var css = 'html:root{' + v(a.L) + '}@media (prefers-color-scheme: dark){html:root:not([data-theme="light"]){' + v(a.D) + '}}html:root[data-theme="dark"]{' + v(a.D) + '}';
+    var tex = "--sh-tex:url('" + accentTex(key) + "');--sh-tex-ink:" + TEX_INK[key][0] + ";--sh-tex-shadow:" + TEX_INK[key][1] + ";";
+    var css = 'html:root{' + v(a.L) + tex + '}@media (prefers-color-scheme: dark){html:root:not([data-theme="light"]){' + v(a.D) + '}}html:root[data-theme="dark"]{' + v(a.D) + '}';
+    root.setAttribute("data-sh-accent", key);
     if (!el) { el = document.createElement("style"); el.id = "sh-rank-accent"; document.head.appendChild(el); }
     el.textContent = css;
   }
@@ -372,8 +401,8 @@
         Object.keys(ACCENTS).map(function(k){
           var a = ACCENTS[k], locked = have < a.tier;
           return '<button type="button" data-acc="' + k + '" aria-pressed="' + (cur === k) + '"' + (locked ? ' disabled title="Unlocks at ' + TIERS[a.tier].name + '"' : '') + '>' +
-            '<span class="sh-acc-dot" style="background:' + a.L[0] + '"></span>' + TIERS[a.tier].name + (locked ? ' <svg class="sh-acc-lock" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '') + '</button>';
-        }).join("") + '</div><div class="shset-hint">Unlocked by your handpiece rank. Changes the highlight colour in every hub.</div>';
+            '<span class="sh-acc-dot" style="background:' + a.L[0] + ' url(\'' + accentTex(k) + '\') center/cover"></span>' + TIERS[a.tier].name + (locked ? ' <svg class="sh-acc-lock" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>' : '') + '</button>';
+        }).join("") + '</div><div class="shset-hint">Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal.</div>';
     }
     accRow.addEventListener("click", function(e){
       var b = e.target.closest("[data-acc]"); if (!b || b.disabled) return;
@@ -553,7 +582,7 @@
       return miniCache[k] || (miniCache[k] = '<span class="sh-rank-mini" title="' + rankName(tier, level) + '">' + art(tier, 20) +
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
-    mount: mount, applyAccent: applyAccent, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
+    mount: mount, applyAccent: applyAccent, accentTex: accentTex, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade
