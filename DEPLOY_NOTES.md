@@ -77,8 +77,10 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-10-01 (suture diagrams, Claude Code)** — Perio Review → Incisions, Flaps & Sutures gains **Suture diagrams**:
-  schematic inline-SVG drawings (`SUTURE_DIAGRAMS`, theme tokens, captioned) of every technique in
-  `SUTURE_TECHNIQUES` plus monofilament vs braided, because 5 of 14 midterm check-ins said the exam showed suture
+  illustrated inline-SVG figures (`SUTURE_DIAGRAMS`, shared gradients in `SUTURE_DEFS`, fixed illustration colours on a
+  light plate, captioned): simple loop and figure-of-eight as interdental cross-sections, sling and criss-cross as
+  occlusal views, mattress sutures as surface + section, continuous/locking on a ridge, periosteal anchorage in
+  section, plus monofilament vs braided, because 5 of 14 midterm check-ins said the exam showed suture
   pictures. Drawn for the hub, not from the slides; Sam reviewed them before merge. **Perio Project: carry these into
   the split sources.**
 

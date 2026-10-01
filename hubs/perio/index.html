@@ -271,8 +271,8 @@ main{padding-top:20px}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
-.sut-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:10px}
-.sut-fig{margin:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sut-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:10px}
+.sut-fig{margin:0;padding:8px 8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .sut-fig svg{display:block;width:100%;height:auto}
 .sut-fig figcaption{font-size:.84rem;margin-top:6px;color:var(--ink-soft);line-height:1.4}
 .sut-fig figcaption b{display:block;color:var(--ink);font-size:.9rem;margin-bottom:2px}
@@ -841,54 +841,138 @@ var SUTURE_TECHNIQUES = [
   { name:'Periosteal Anchorage', note:'Anchors the flap to periosteum for controlled apical or lateral repositioning.' }
 ];
 
-/* Suture diagrams (2026-10-01; 5 of 14 midterm check-ins asked for pictures of sutures). Schematic drawings made for
-   the hub, not taken from the course slides. Top views: flap above, incision across the middle; a solid strand is on
-   the surface, a dashed one runs under the tissue, a filled dot is the knot. Each entry: [svg, caption note]. */
+/* Suture diagrams (2026-10-01; 5 of 14 midterm check-ins asked for pictures of sutures). Schematic illustrations made
+   for the hub, not taken from the course slides. Fixed illustration colours on a light plate, so they read the same in
+   light and dark mode. Each entry: [svg, caption]. SUTURE_DEFS (gradients/patterns) is placed once before them. */
+var SUTURE_DEFS = '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
+  '<linearGradient id="sdGum" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6CAD1"/><stop offset="1" stop-color="#E9A3B1"/></linearGradient>' +
+  '<linearGradient id="sdCut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E58C9C"/><stop offset="1" stop-color="#D16F82"/></linearGradient>' +
+  '<radialGradient id="sdTooth" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#FFFEF9"/><stop offset=".7" stop-color="#F4ECDA"/><stop offset="1" stop-color="#E4D7BC"/></radialGradient>' +
+  '<linearGradient id="sdBone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3E6C9"/><stop offset="1" stop-color="#E2CFA6"/></linearGradient>' +
+  '<pattern id="sdTrab" width="18" height="14" patternUnits="userSpaceOnUse"><path d="M2 3 Q7 1 9 6 Q11 11 16 9 M0 12 Q4 8 7 13 M12 1 Q15 4 18 2" fill="none" stroke="#C9AE7C" stroke-width=".9" opacity=".75"/></pattern>' +
+  '<radialGradient id="sdClot" cx=".45" cy=".4" r=".65"><stop offset="0" stop-color="#B23A48"/><stop offset=".75" stop-color="#7E1F2C"/><stop offset="1" stop-color="#5E1520"/></radialGradient>' +
+  '<linearGradient id="sdTube" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9D4FF"/><stop offset=".35" stop-color="#7D90E0"/><stop offset="1" stop-color="#2B3B8C"/></linearGradient>' +
+  '<linearGradient id="sdPlate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFCF8"/><stop offset="1" stop-color="#FBF3EE"/></linearGradient>' +
+  '<pattern id="sdBraid" width="9" height="18" patternUnits="userSpaceOnUse"><rect width="9" height="18" fill="#2B3B8C"/>' +
+    '<path d="M-1 4 Q4.5 -1 10 4 L10 8 Q4.5 3 -1 8 Z" fill="url(#sdTube)"/><path d="M-1 13 Q4.5 8 10 13 L10 17 Q4.5 12 -1 17 Z" fill="#6F82D6"/></pattern>' +
+  '</defs></svg>';
 var SUTURE_DIAGRAMS = (function(){
-  var T = 'fill="var(--accent-soft)" stroke="var(--line-strong)"';
-  function wrap(inner){ return '<svg viewBox="0 0 240 150" role="img" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>'; }
-  function tissue(){ return '<rect x="8" y="12" width="224" height="126" rx="10" ' + T + '/><line x1="14" y1="75" x2="226" y2="75" stroke="var(--accent-ink)" stroke-width="2"/>' + label(222, 70, 'incision', 'end'); }
-  function top(x1, y1, x2, y2){ return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--probe)" stroke-width="2.6" stroke-linecap="round"/>'; }
-  function under(x1, y1, x2, y2){ return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--probe)" stroke-width="1.6" stroke-dasharray="4 3" opacity=".75"/>'; }
-  function path(d, hidden){ return '<path d="'+d+'" fill="none" stroke="var(--probe)" stroke-linecap="round" ' + (hidden ? 'stroke-width="1.6" stroke-dasharray="4 3" opacity=".75"' : 'stroke-width="2.6"') + '/>'; }
-  function knot(x, y){ return '<circle cx="'+x+'" cy="'+y+'" r="4.2" fill="var(--probe)"/>'; }
-  function hole(x, y){ return '<circle cx="'+x+'" cy="'+y+'" r="2.4" fill="var(--surface)" stroke="var(--probe)" stroke-width="1.3"/>'; }
-  function label(x, y, t, anchor){ return '<text x="'+x+'" y="'+y+'" font-size="11" fill="var(--ink-soft)" text-anchor="'+(anchor||'middle')+'">'+t+'</text>'; }
+  var INK = '#4A3A42', TH = '#25368A';
+  function plate(inner, h){ h = h || 210; return '<svg viewBox="0 0 320 '+h+'" role="img" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="'+h+'" rx="12" fill="url(#sdPlate)"/>' + inner + '</svg>'; }
+  function thread(d){ return '<path d="'+d+'" fill="none" stroke="'+TH+'" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="'+d+'" fill="none" stroke="#9FB2FF" stroke-width="1" stroke-linecap="round" opacity=".7"/>'; }
+  function hidden(d){ return '<path d="'+d+'" fill="none" stroke="'+TH+'" stroke-width="2" stroke-dasharray="5 3.5" stroke-linecap="round" opacity=".6"/>'; }
+  function hole(x, y){ return '<ellipse cx="'+x+'" cy="'+y+'" rx="3" ry="2.3" fill="#8E2B40" opacity=".85"/><ellipse cx="'+(x-.8)+'" cy="'+(y-.7)+'" rx="1" ry=".7" fill="#F7C9D2"/>'; }
+  function knot(x, y, a){ a = a || 0; var r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+    function p(dx, dy){ return (x + dx * c - dy * s).toFixed(1) + ' ' + (y + dx * s + dy * c).toFixed(1); }
+    return '<path d="M'+p(3,1)+' L'+p(13,7)+' M'+p(3,-1)+' L'+p(12,-8)+'" stroke="'+TH+'" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<ellipse cx="'+x+'" cy="'+y+'" rx="5.2" ry="4.2" transform="rotate('+a+' '+x+' '+y+')" fill="'+TH+'"/><path d="M'+p(-3,-1.2)+' Q'+p(0,-3.2)+' '+p(3,-1.2)+'" stroke="#9FB2FF" stroke-width="1" fill="none"/>'; }
+  function label(x, y, t, anchor, size){ return '<text x="'+x+'" y="'+y+'" font-size="'+(size||10.5)+'" font-family="system-ui,sans-serif" fill="'+INK+'" text-anchor="'+(anchor||'middle')+'">'+t+'</text>'; }
+  function tag(x, y, t){ return label(x, y, t, 'middle', 9.5).replace('fill="'+INK+'"', 'fill="#8A7480" font-weight="600" letter-spacing=".08em"'); }
+  function lead(x1, y1, x2, y2){ return '<path d="M'+x1+' '+y1+' L'+x2+' '+y2+'" stroke="#9C8890" stroke-width=".8"/>'; }
+  /* interdental cross-section (buccal left, lingual right) */
+  function interdental(){
+    return '<path d="M58 22 Q58 8 80 8 L150 8 Q160 8 160 22 L160 58 Q120 70 70 60 Q58 56 58 40 Z M262 22 Q262 8 240 8 L170 8 Q160 8 160 22 L160 58 Q200 70 250 60 Q262 56 262 40 Z" fill="url(#sdTooth)" stroke="#D3C3A3" opacity=".75"/>' +
+      '<path d="M118 206 L118 152 Q160 128 202 152 L202 206 Z" fill="url(#sdBone)" stroke="#C3A877"/><path d="M118 206 L118 152 Q160 128 202 152 L202 206 Z" fill="url(#sdTrab)"/>' +
+      '<path d="M82 206 L82 120 C82 98 96 86 112 88 C126 90 132 102 132 118 L132 146 L118 152 L118 206 Z" fill="url(#sdCut)" stroke="#B85A6E"/>' +
+      '<path d="M238 206 L238 120 C238 98 224 86 208 88 C194 90 188 102 188 118 L188 146 L202 152 L202 206 Z" fill="url(#sdCut)" stroke="#B85A6E"/>' +
+      '<path d="M82 206 L82 120 C82 98 96 86 112 88" fill="none" stroke="#F6CAD1" stroke-width="2.4"/><path d="M238 206 L238 120 C238 98 224 86 208 88" fill="none" stroke="#F6CAD1" stroke-width="2.4"/>' +
+      label(160, 186, 'bone', 'middle', 10) + tag(40, 196, 'BUCCAL') + tag(280, 196, 'LINGUAL') +
+      label(40, 178, 'flap', 'middle', 10) + label(280, 178, 'flap', 'middle', 10) + lead(52, 175, 84, 168) + lead(268, 175, 236, 168);
+  }
+  /* occlusal view helpers */
+  function toothO(x, y, w, h){ return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+Math.min(w,h)*.36+'" fill="url(#sdTooth)" stroke="#CDBB98" stroke-width="1.2"/>' +
+      '<path d="M'+(x+w*.22)+' '+(y+h*.5)+' Q'+(x+w*.38)+' '+(y+h*.38)+' '+(x+w*.5)+' '+(y+h*.52)+' Q'+(x+w*.62)+' '+(y+h*.64)+' '+(x+w*.78)+' '+(y+h*.48)+' M'+(x+w*.5)+' '+(y+h*.52)+' L'+(x+w*.5)+' '+(y+h*.3)+' M'+(x+w*.5)+' '+(y+h*.52)+' L'+(x+w*.48)+' '+(y+h*.72)+'" fill="none" stroke="#D6C6A6" stroke-width="1.1" stroke-linecap="round"/>'; }
   var d = {};
-  d['Single Interrupted'] = [wrap(tissue() + [60, 120, 180].map(function(x){ return top(x, 50, x, 100) + hole(x, 100) + knot(x, 46); }).join('')),
-    'Each stitch is tied and cut on its own; the knot sits beside the incision, not on it.'];
-  var cc = [[60, 34], [180, 34], [180, 116], [60, 116]];
-  d['Criss-Cross'] = [wrap('<rect x="8" y="12" width="224" height="126" rx="10" ' + T + '/><ellipse cx="120" cy="75" rx="44" ry="27" fill="var(--surface-3)" stroke="var(--line-strong)"/>' + label(120, 79, 'socket') +
-    under(60, 34, 180, 34) + under(60, 116, 180, 116) + top(60, 34, 180, 116) + top(180, 34, 60, 116) + hole(60, 34) + hole(180, 34) + hole(180, 116) + knot(60, 116) + label(120, 26, 'lingual') + label(120, 132, 'buccal')),
-    'Over an extraction socket: the strand crosses the socket as an X on top and runs under the tissue along each side.'];
-  d['Horizontal Mattress'] = [wrap(tissue() + under(80, 48, 80, 102) + under(160, 48, 160, 102) + top(80, 102, 160, 102) + top(80, 48, 112, 48) + top(128, 48, 160, 48) +
-    hole(80, 102) + hole(160, 102) + hole(80, 48) + hole(160, 48) + knot(120, 48)),
-    'Two bites side by side, joined on the surface parallel to the incision; the knot is on one side. Keeps the flap margin from inverting.'];
-  d['Vertical Mattress'] = [wrap('<rect x="10" y="42" width="104" height="84" rx="6" ' + T + '/><rect x="126" y="42" width="104" height="84" rx="6" ' + T + '/>' + label(120, 140, 'incision') +
-    path('M38 42 C38 116 202 116 202 42') + path('M202 40 L150 40') + path('M150 42 C150 66 90 66 90 42') + path('M90 40 L70 36') + path('M38 40 L58 36') + knot(64, 35) +
-    label(202, 24, 'far') + label(150, 24, 'near') + label(38, 24, 'far') + label(90, 24, 'near')),
-    'Cross-section: a deep far-far bite, then a shallow near-near bite on the same line. Everts and closely approximates the edges (papillae in the esthetic zone).'];
-  var cont = '', lock = '';
-  [50, 90, 130, 170].forEach(function(x, i, a){ cont += under(x, 50, x, 100) + hole(x, 50) + hole(x, 100); if(i < a.length - 1) cont += top(x, 100, x + 40, 50); });
-  d['Continuous'] = [wrap(tissue() + cont + top(26, 50, 50, 50) + knot(26, 50) + top(170, 100, 196, 100) + knot(196, 100)),
-    'One strand with a knot only at each end: diagonal on top, straight across underneath.'];
-  [50, 90, 130, 170].forEach(function(x, i, a){ lock += top(x, 50, x, 100) + hole(x, 50) + '<circle cx="'+x+'" cy="100" r="3.6" fill="var(--surface)" stroke="var(--probe)" stroke-width="1.6"/>'; if(i < a.length - 1) lock += top(x + 4, 100, x + 36, 100); });
-  d['Continuous Locking'] = [wrap(tissue() + lock + top(26, 50, 50, 50) + knot(26, 50) + top(174, 100, 198, 100) + knot(198, 100)),
-    'Each pass loops through the one before, so it locks along one edge. Better seal on long spans, but one failed throw can loosen the whole line.'];
-  d['Sling'] = [wrap('<rect x="8" y="96" width="224" height="42" rx="8" ' + T + '/>' + label(120, 128, 'buccal flap') +
-    '<path d="M66 96 L80 82 L94 96 Z M146 96 L160 82 L174 96 Z" ' + T + '/>' +
-    '<rect x="100" y="40" width="40" height="48" rx="16" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="1.5"/>' + label(120, 68, 'tooth') +
-    path('M80 92 C58 4 182 4 160 92') + path('M160 92 L162 106', true) + path('M162 106 C192 -14 48 -14 78 106') + knot(78, 107) + hole(80, 92) + hole(160, 92) + label(212, 20, 'lingual', 'end')),
-    'Occlusal view: the strand passes through the buccal papillae and wraps around the lingual of one tooth, so the flap is repositioned without engaging the lingual side.'];
-  d['Periosteal Anchorage'] = [wrap('<rect x="8" y="104" width="224" height="36" rx="6" fill="var(--surface-3)" stroke="var(--line-strong)"/>' + label(200, 128, 'bone') +
-    '<line x1="8" y1="101" x2="232" y2="101" stroke="var(--caution)" stroke-width="3"/>' + label(226, 94, 'periosteum', 'end') +
-    '<path d="M8 62 L120 62 Q130 62 130 72 L130 98 L8 98 Z" ' + T + '/>' + label(54, 84, 'flap') +
-    path('M100 60 C100 116 172 116 172 101') + path('M172 101 C172 80 140 66 112 58') + knot(106, 57)),
-    'Cross-section: the bite goes through the flap and into the periosteum beyond it, holding the flap where you placed it (apically or laterally).'];
-  var braid = ''; for(var x = 22; x < 214; x += 9){ braid += '<path d="M'+x+' 109 L'+(x+8)+' 95" stroke="var(--probe)" stroke-width="1.4"/><path d="M'+(x+4)+' 95 L'+(x+12)+' 109" stroke="var(--probe)" stroke-width="1" opacity=".5"/>'; }
-  d['_strands'] = [wrap('<rect x="20" y="36" width="200" height="16" rx="8" fill="var(--probe-soft)" stroke="var(--probe)"/><line x1="28" y1="41" x2="212" y2="41" stroke="var(--surface)" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>' +
-    label(120, 26, 'Monofilament') + '<rect x="20" y="94" width="200" height="16" rx="8" fill="var(--probe-soft)" stroke="var(--probe)"/>' + braid + label(120, 84, 'Braided')),
-    'Monofilament (chromic gut, PGCL, poly-propylene, PTFE) is one smooth strand. Braided (silk, PGA) is woven, and the weave wicks and traps bacteria.'];
+
+  d['Single Interrupted'] = [plate(interdental() +
+      thread('M78 128 L238 124 C256 118 250 68 160 64 C70 68 62 110 78 128') +
+      hole(83, 127) + hole(237, 124) + knot(74, 130, 200) +
+      ''),
+    'Simple loop, in cross-section between two teeth. The needle enters the outer surface of the buccal flap, crosses under the contact, comes out of the lingual flap, and returns over the papillae to be tied on the buccal. The thread makes a loop around both papillae. This is the everyday default: each stitch is tied and cut on its own.'];
+
+  d['Figure-Eight'] = [plate(interdental() +
+      thread('M78 128 L132 124 C156 120 172 78 206 76 C236 74 252 104 238 128 L188 130 C164 132 148 80 114 78 C84 76 66 104 78 128') +
+      hole(83, 127) + hole(237, 128) + knot(74, 130, 200) +
+      ''),
+    'Same cross-section. The needle enters both flaps from their outer surfaces, so the thread crosses between the flaps. Used when the flaps do not meet closely (for example an apically positioned flap or scalloped incisions).'];
+
+  d['Sling'] = [plate(
+      '<path d="M0 12 L320 12 L320 72 Q290 66 262 78 L250 92 Q236 74 214 74 Q206 74 203 84 Q200 74 190 72 Q160 64 130 72 Q120 74 117 84 Q114 74 106 74 Q84 74 70 92 L58 78 Q30 66 0 72 Z" fill="url(#sdGum)" stroke="#D891A1"/>' +
+      '<path d="M0 206 L320 206 L320 140 Q290 146 262 136 L250 124 Q236 140 214 140 Q206 140 203 128 Q200 140 190 142 Q160 150 130 142 Q120 140 117 128 Q114 140 106 140 Q84 140 70 124 L58 136 Q30 146 0 140 Z" fill="url(#sdGum)" stroke="#D891A1"/>' +
+      toothO(20, 72, 96, 66) + toothO(118, 68, 84, 74) + toothO(204, 72, 96, 66) +
+      hidden('M207 130 L207 86') + hidden('M113 86 L113 130') +
+      thread('M207 86 C207 64 200 57 186 57 L134 57 C120 57 113 64 113 86') + thread('M216 158 C212 150 208 140 207 130') + thread('M113 130 C112 142 110 150 108 158') +
+      hidden('M200 130 L200 88') + hidden('M120 88 L120 132') +
+      thread('M200 88 C200 70 195 63 184 63 L136 63 C125 63 120 70 120 88') + thread('M108 158 C114 150 119 142 120 132') + thread('M200 130 C200 142 206 152 214 160') +
+      hole(108, 158) + hole(216, 158) + knot(218, 166, 30) +
+      tag(160, 28, 'LINGUAL (NOT ENGAGED)') + tag(160, 194, 'BUCCAL FLAP') + label(60, 182, 'mesial papilla', 'middle', 9.5) + label(262, 182, 'distal papilla', 'middle', 9.5) + lead(70, 176, 104, 160) + lead(250, 176, 214, 168) + label(160, 108, 'tooth', 'middle', 10)),
+    'Occlusal view of one tooth. The needle enters the buccal papilla on one side, is carried around the lingual of the tooth neck, and comes through the papilla on the other side; it then goes back around the lingual and is tied on the buccal. Only the buccal flap is engaged, so it is repositioned independently.'];
+
+  d['Criss-Cross'] = [plate(
+      '<path d="M0 12 L320 12 L320 74 Q300 70 286 76 L230 76 Q210 64 160 62 Q110 64 90 76 L34 76 Q20 70 0 74 Z" fill="url(#sdGum)" stroke="#D891A1"/>' +
+      '<path d="M0 206 L320 206 L320 138 Q300 142 286 136 L230 136 Q210 150 160 152 Q110 150 90 136 L34 136 Q20 142 0 138 Z" fill="url(#sdGum)" stroke="#D891A1"/>' +
+      toothO(-20, 74, 96, 64) + toothO(244, 74, 96, 64) +
+      '<ellipse cx="160" cy="106" rx="62" ry="40" fill="url(#sdClot)" stroke="#5E1520"/><ellipse cx="146" cy="96" rx="20" ry="9" fill="#D8606F" opacity=".35"/>' +
+      label(160, 140, 'socket', 'middle', 10).replace('fill="'+INK+'"', 'fill="#FBE3E7"') +
+      hidden('M118 166 L202 166') + hidden('M118 46 L202 46') +
+      thread('M202 166 L118 46') + thread('M202 46 L124 160') +
+      hole(118, 166) + hole(202, 166) + hole(118, 46) + hole(202, 46) + knot(118, 166, 210) +
+      tag(160, 26, 'LINGUAL') + tag(160, 196, 'BUCCAL') + label(34, 194, 'mesial', 'middle', 9.5) + label(288, 194, 'distal', 'middle', 9.5)),
+    'Occlusal view of an extraction socket. In at the mesiobuccal, out at the distobuccal; cross over the socket, in at the mesiolingual, out at the distolingual; tie at the mesiobuccal. The X sits on top; the two side passes run under the tissue. It is a crossed horizontal mattress that helps hold the socket margins and any graft.'];
+
+  function surface(y0, h){ return '<rect x="20" y="'+y0+'" width="280" height="'+h+'" rx="10" fill="url(#sdGum)" stroke="#D891A1"/><path d="M28 '+(y0+h/2)+' Q90 '+(y0+h/2-2)+' 160 '+(y0+h/2)+' T292 '+(y0+h/2)+'" stroke="#9C3A52" stroke-width="2" fill="none"/>'; }
+  function section(y0){ return '<path d="M20 '+(y0+14)+' L156 '+(y0+14)+' Q160 '+(y0+10)+' 158 '+(y0+18)+' L158 '+(y0+74)+' L20 '+(y0+74)+' Z" fill="url(#sdCut)" stroke="#B85A6E"/><path d="M300 '+(y0+14)+' L164 '+(y0+14)+' Q160 '+(y0+10)+' 162 '+(y0+18)+' L162 '+(y0+74)+' L300 '+(y0+74)+' Z" fill="url(#sdCut)" stroke="#B85A6E"/>' +
+    '<path d="M20 '+(y0+14)+' L156 '+(y0+14)+' M300 '+(y0+14)+' L164 '+(y0+14)+'" stroke="#F6CAD1" stroke-width="2.4"/>'; }
+
+  d['Horizontal Mattress'] = [plate(tag(20, 18, 'SURFACE').replace('text-anchor="middle"', 'text-anchor="start"') + surface(24, 82) +
+      hidden('M110 44 L110 86') + hidden('M210 44 L210 86') + thread('M110 86 L210 86') + thread('M110 44 L152 44') + thread('M168 44 L210 44') +
+      hole(110, 44) + hole(210, 44) + hole(110, 86) + hole(210, 86) + knot(160, 44, 0) +
+      tag(20, 126, 'SECTION THROUGH ONE BITE').replace('text-anchor="middle"', 'text-anchor="start"') + section(130) +
+      thread('M118 142 C118 196 202 196 202 142') + thread('M202 142 L232 142') + thread('M118 142 L100 138') + knot(98, 138, 190) + label(160, 214, 'passes deep, under the incision', 'middle', 9.5), 222),
+    'Two bites side by side are joined on the surface parallel to the incision, with the knot on one side. It spreads tension, keeps the flap margin from inverting and is essential for larger bone augmentations. Tied too tight, it can choke the blood supply to the incision edge.'];
+
+  d['Vertical Mattress'] = [plate(tag(20, 18, 'SURFACE').replace('text-anchor="middle"', 'text-anchor="start"') + surface(24, 82) +
+      hidden('M155 30 L155 100') + hidden('M165 52 L165 78') + thread('M160 100 L160 78') + thread('M160 30 L160 38') + thread('M160 52 L160 46') +
+      hole(160, 30) + hole(160, 52) + hole(160, 78) + hole(160, 100) + knot(160, 42, 90) +
+      label(196, 32, 'far', 'start', 9.5) + label(196, 55, 'near', 'start', 9.5) + label(196, 81, 'near', 'start', 9.5) + label(196, 103, 'far', 'start', 9.5) +
+      lead(166, 30, 192, 30) + lead(166, 52, 192, 52) + lead(166, 78, 192, 78) + lead(166, 100, 192, 100) +
+      tag(20, 126, 'SECTION').replace('text-anchor="middle"', 'text-anchor="start"') +
+      '<path d="M20 144 L146 144 Q156 142 156 134 L158 136 L158 204 L20 204 Z" fill="url(#sdCut)" stroke="#B85A6E"/><path d="M300 144 L174 144 Q164 142 164 134 L162 136 L162 204 L300 204 Z" fill="url(#sdCut)" stroke="#B85A6E"/>' +
+      '<path d="M20 144 L146 144 Q156 142 156 134 M300 144 L174 144 Q164 142 164 134" stroke="#F6CAD1" stroke-width="2.4" fill="none"/>' +
+      thread('M96 144 C96 214 224 214 224 144') + thread('M224 142 L190 142') + thread('M190 144 C190 168 130 168 130 144') + thread('M130 142 L113 136') + thread('M96 142 L109 136') + knot(111, 135, 90) +
+      label(160, 124, 'edges everted', 'middle', 9.5), 210),
+    'A deep far-far bite, then a shallow near-near bite back on the same line, tied on the side it started. It everts the edges and gives the closest approximation, so it is used for papillae in the esthetic zone and to close oro-antral communications.'];
+
+  function ridge(){ return '<rect x="14" y="30" width="292" height="150" rx="40" fill="url(#sdGum)" stroke="#D891A1"/><path d="M34 105 Q160 101 286 105" stroke="#9C3A52" stroke-width="2" fill="none"/>' + tag(160, 22, 'EDENTULOUS RIDGE, CRESTAL INCISION') + tag(160, 198, 'TOP VIEW'); }
+  var xs = [64, 112, 160, 208, 256], cont = '', lock = '';
+  xs.forEach(function(x, i){ cont += hidden('M'+x+' 82 L'+x+' 128') + (i < xs.length - 1 ? thread('M'+x+' 128 L'+(x + 48)+' 82') : ''); });
+  xs.forEach(function(x){ cont += hole(x, 82) + hole(x, 128); });
+  d['Continuous'] = [plate(ridge() + cont + thread('M42 74 L64 82') + knot(40, 73, 200) + thread('M256 128 L276 136') + knot(279, 138, 20)),
+    'One thread with a knot only at each end. It runs diagonally on the surface and straight across under the tissue. Bites sit close together for a good seal; if one throw fails, the whole line can loosen.'];
+  xs.forEach(function(x, i){ lock += hidden('M'+(x+5)+' 82 L'+(x+5)+' 128') + thread('M'+x+' 82 L'+x+' 132');
+    if(i < xs.length - 1) lock += thread('M'+(x+3)+' 136 Q'+(x+24)+' 142 '+(x+44)+' 136') + '<path d="M'+(x+44)+' 136 Q'+(x+50)+' 130 '+(x+48)+' 124" fill="none" stroke="'+TH+'" stroke-width="3.4" stroke-linecap="round"/>'; });
+  xs.forEach(function(x){ lock += hole(x, 82) + hole(x + 5, 128) + '<circle cx="'+x+'" cy="134" r="4.4" fill="none" stroke="'+TH+'" stroke-width="2.2"/>'; });
+  d['Continuous Locking'] = [plate(ridge() + lock + thread('M42 74 L64 82') + knot(40, 73, 200) + thread('M256 136 L278 144') + knot(281, 146, 20)),
+    'Before each new bite, the needle passes through the loop of the previous stitch, so the line locks along one edge. Used for long edentulous spans, the tuberosity and retromolar areas. It seals well, but one failed throw loosens the line.'];
+
+  d['Periosteal Anchorage'] = [plate(
+      '<rect x="14" y="148" width="292" height="50" rx="6" fill="url(#sdBone)" stroke="#C3A877"/><rect x="14" y="148" width="292" height="50" rx="6" fill="url(#sdTrab)"/>' +
+      '<rect x="14" y="140" width="292" height="8" fill="#C7794E" stroke="#A55E39" stroke-width=".8"/>' +
+      '<path d="M14 104 L216 104 Q234 104 234 122 L234 140 L14 140 Z" fill="url(#sdCut)" stroke="#B85A6E"/><path d="M14 104 L216 104 Q234 104 234 122" fill="none" stroke="#F6CAD1" stroke-width="2.4"/>' +
+      thread('M120 104 L132 144 L176 144 L188 104') + thread('M120 104 L146 98') + thread('M188 104 L162 98') + knot(154, 96, 0) +
+      hole(120, 104) + hole(188, 104) +
+      label(60, 126, 'split-thickness flap', 'middle', 9.5) + label(270, 136, 'periosteum', 'middle', 9.5) + lead(270, 139, 270, 143) + label(64, 180, 'bone', 'middle', 10) +
+      label(154, 166, 'bite through the periosteum', 'middle', 9.5) + lead(154, 158, 154, 147) +
+      tag(40, 30, 'CORONAL').replace('text-anchor="middle"', 'text-anchor="start"') + tag(282, 30, 'APICAL') + '<path d="M70 36 L250 36" stroke="#B9A4AD" stroke-width="1.2" marker-end="none"/><path d="M244 32 L252 36 L244 40" fill="none" stroke="#B9A4AD" stroke-width="1.2"/>' +
+      label(160, 62, 'cross-section of the flap lying on bone', 'middle', 10)),
+    'Cross-section. In a split-thickness flap the periosteum stays on the bone. The needle passes through the flap, takes a bite of periosteum, comes back up through the flap and is tied, so the flap stays where it was placed (apically or laterally).'];
+
+  d['_strands'] = [plate(
+      tag(160, 30, 'MONOFILAMENT') + '<rect x="30" y="42" width="260" height="20" rx="10" fill="url(#sdTube)"/><rect x="40" y="46" width="240" height="3.4" rx="1.7" fill="#fff" opacity=".7"/>' +
+      label(160, 82, 'chromic gut · PGCL · poly-propylene · PTFE', 'middle', 10) +
+      tag(160, 118, 'BRAIDED') + '<rect x="30" y="130" width="260" height="20" rx="10" fill="url(#sdBraid)"/><rect x="30" y="130" width="260" height="20" rx="10" fill="none" stroke="#1E2C70"/>' +
+      label(160, 170, 'silk · PGA', 'middle', 10) + label(160, 188, 'the weave wicks and traps bacteria', 'middle', 9.5)),
+    'Monofilament is one smooth strand: less drag and less bacterial wicking. Braided thread is woven, so it handles beautifully but traps bacteria. That is why silk scores worst for tissue reaction; wipe a braided suture with chlorhexidine gauze before removing it.'];
   return d;
 })();
 
@@ -3557,8 +3641,8 @@ var REF_SECTIONS = [
   { id:'suture-materials', lec:'incisions-flaps-sutures', title:'Suture materials', body:function(){ return tableWrap(['Material','Origin','Construction','Absorption','Strength','Tissue reaction','Handling','Typical use'], rowsOf(SUTURE_MATERIALS,['name','origin','construction','absorption','strength','reaction','handling','use'])); } },
   { id:'suture-techniques', lec:'incisions-flaps-sutures', title:'Suturing techniques', body:function(){ return tableWrap(['Technique','Notes'], rowsOf(SUTURE_TECHNIQUES,['name','note'])); } },
   { id:'suture-diagrams', lec:'incisions-flaps-sutures', title:'Suture diagrams', body:function(){
-    var names = ['Single Interrupted','Criss-Cross','Horizontal Mattress','Vertical Mattress','Continuous','Continuous Locking','Sling','Periosteal Anchorage'];
-    return '<p class="note">Schematic drawings made for the hub, not taken from the course slides. Top views unless marked: flap above, incision across the middle; a solid strand sits on the surface, a dashed one runs under the tissue, a filled dot is the knot.</p><div class="sut-grid">' +
+    var names = ['Single Interrupted','Figure-Eight','Sling','Criss-Cross','Horizontal Mattress','Vertical Mattress','Continuous','Continuous Locking','Periosteal Anchorage'];
+    return '<p class="note">Illustrations made for the hub, not taken from the course slides. Solid thread is on the surface, dashed thread runs under the tissue, and the dark blob is the knot.</p>' + SUTURE_DEFS + '<div class="sut-grid">' +
       names.concat(['_strands']).map(function(n){ var dg = SUTURE_DIAGRAMS[n]; return '<figure class="sut-fig">' + dg[0] + '<figcaption><b>' + escHtml(n === '_strands' ? 'Monofilament vs braided' : n) + '</b><span>' + escHtml(dg[1]) + '</span></figcaption></figure>'; }).join('') + '</div>'; } },
   { id:'incisions', lec:'incisions-flaps-sutures', title:'Incision types', body:function(){ return tableWrap(['Incision','Notes'], rowsOf(INCISION_TYPES,['name','note'])); } },
   { id:'flaps', lec:'incisions-flaps-sutures', title:'Flap designs', body:function(){ return '<p class="note" style="margin:0 0 10px">Flaps are also classified by: ' + FLAP_CLASSIFICATION_AXES.map(escHtml).join('; ') + '.</p>' + tableWrap(['Design','Notes'], rowsOf(FLAP_DESIGNS,['name','note'])) + '<p class="note"><b>Five surgical principles:</b> ' + SURGICAL_PRINCIPLES.map(escHtml).join(' · ') + '</p>'; } },
