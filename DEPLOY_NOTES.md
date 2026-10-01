@@ -81,7 +81,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   refresh's fixes worked, reading every hard question, safe explanation edits, `LESSONS.md`, a draft PR and draft replies
   to reports. Helpers: `tools/dump-banks.js <dir>` (each live hub's QUESTIONS/LECTURES as JSON, the CI lint's hook) and
   `tools/lessons-join.py` (accuracy by lecture/type/source and the hardest items with their favourite wrong answer).
-  No site change.
+  The audit also reads **check-ins against each person's study time**, and when a hub's last exam has passed it writes
+  that hub's full retrospective and **publishes its recap to the dashboard** without asking (Sam, 2026-10-01) via
+  `tools/publish-recap.js <hub> --bank <file> [--dry-run]` (same snapshot as `review/` → Recap; needs `SB_KEY` +
+  `ADMIN_SECRET`; exam date from `index.html`, since `get_hub_recap` can time out without one). **CI lint**: a matching
+  item that repeats an answer now fails (`SAME_ANSWER_OK` lists perio `q4-L27`, which perio grades by text), and 6+
+  step orderings / 7+ option select-alls are listed as a heads-up. No site change.
 
 - **2026-09-30 (bronze without patina, Claude Code)** — The green patina specks are gone from the Bronze handpiece
   medallion too (`filters()` in `widget/ranks.js`); Sam found them ugly. Accent tiles were already clean.

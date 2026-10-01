@@ -12,6 +12,7 @@ out to the live hubs. It runs:
   data. Steps 4-5 can wait for the next full run.
 
 Archiving a hub still gets the full retrospective in `LESSONS.md` (`tools/retro.sql`); this is the rolling version.
+`/lessons-audit` notices a newly archived hub and does its retrospective and dashboard recap in the same run.
 
 ## 1. Pull the data
 
