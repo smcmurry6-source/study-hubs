@@ -271,6 +271,11 @@ main{padding-top:20px}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.sut-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:10px}
+.sut-fig{margin:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sut-fig svg{display:block;width:100%;height:auto}
+.sut-fig figcaption{font-size:.84rem;margin-top:6px;color:var(--ink-soft);line-height:1.4}
+.sut-fig figcaption b{display:block;color:var(--ink);font-size:.9rem;margin-bottom:2px}
 .qcard-stem{font-weight:600;margin:0 0 12px;font-size:1rem;line-height:1.45;white-space:pre-line}
 .qcard-choices,.qcard-seq-steps{display:flex;flex-direction:column;gap:7px}
 .qcard-choice,.qcard-match-item{appearance:none;text-align:left;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px;cursor:pointer;line-height:1.38;font-size:.93rem;width:100%}
@@ -835,6 +840,57 @@ var SUTURE_TECHNIQUES = [
   { name:'Sling', note:'Wraps around a single tooth to reposition the flap/papilla without engaging the opposing side.' },
   { name:'Periosteal Anchorage', note:'Anchors the flap to periosteum for controlled apical or lateral repositioning.' }
 ];
+
+/* Suture diagrams (2026-10-01; 5 of 14 midterm check-ins asked for pictures of sutures). Schematic drawings made for
+   the hub, not taken from the course slides. Top views: flap above, incision across the middle; a solid strand is on
+   the surface, a dashed one runs under the tissue, a filled dot is the knot. Each entry: [svg, caption note]. */
+var SUTURE_DIAGRAMS = (function(){
+  var T = 'fill="var(--accent-soft)" stroke="var(--line-strong)"';
+  function wrap(inner){ return '<svg viewBox="0 0 240 150" role="img" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>'; }
+  function tissue(){ return '<rect x="8" y="12" width="224" height="126" rx="10" ' + T + '/><line x1="14" y1="75" x2="226" y2="75" stroke="var(--accent-ink)" stroke-width="2"/>' + label(222, 70, 'incision', 'end'); }
+  function top(x1, y1, x2, y2){ return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--probe)" stroke-width="2.6" stroke-linecap="round"/>'; }
+  function under(x1, y1, x2, y2){ return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--probe)" stroke-width="1.6" stroke-dasharray="4 3" opacity=".75"/>'; }
+  function path(d, hidden){ return '<path d="'+d+'" fill="none" stroke="var(--probe)" stroke-linecap="round" ' + (hidden ? 'stroke-width="1.6" stroke-dasharray="4 3" opacity=".75"' : 'stroke-width="2.6"') + '/>'; }
+  function knot(x, y){ return '<circle cx="'+x+'" cy="'+y+'" r="4.2" fill="var(--probe)"/>'; }
+  function hole(x, y){ return '<circle cx="'+x+'" cy="'+y+'" r="2.4" fill="var(--surface)" stroke="var(--probe)" stroke-width="1.3"/>'; }
+  function label(x, y, t, anchor){ return '<text x="'+x+'" y="'+y+'" font-size="11" fill="var(--ink-soft)" text-anchor="'+(anchor||'middle')+'">'+t+'</text>'; }
+  var d = {};
+  d['Single Interrupted'] = [wrap(tissue() + [60, 120, 180].map(function(x){ return top(x, 50, x, 100) + hole(x, 100) + knot(x, 46); }).join('')),
+    'Each stitch is tied and cut on its own; the knot sits beside the incision, not on it.'];
+  var cc = [[60, 34], [180, 34], [180, 116], [60, 116]];
+  d['Criss-Cross'] = [wrap('<rect x="8" y="12" width="224" height="126" rx="10" ' + T + '/><ellipse cx="120" cy="75" rx="44" ry="27" fill="var(--surface-3)" stroke="var(--line-strong)"/>' + label(120, 79, 'socket') +
+    under(60, 34, 180, 34) + under(60, 116, 180, 116) + top(60, 34, 180, 116) + top(180, 34, 60, 116) + hole(60, 34) + hole(180, 34) + hole(180, 116) + knot(60, 116) + label(120, 26, 'lingual') + label(120, 132, 'buccal')),
+    'Over an extraction socket: the strand crosses the socket as an X on top and runs under the tissue along each side.'];
+  d['Horizontal Mattress'] = [wrap(tissue() + under(80, 48, 80, 102) + under(160, 48, 160, 102) + top(80, 102, 160, 102) + top(80, 48, 112, 48) + top(128, 48, 160, 48) +
+    hole(80, 102) + hole(160, 102) + hole(80, 48) + hole(160, 48) + knot(120, 48)),
+    'Two bites side by side, joined on the surface parallel to the incision; the knot is on one side. Keeps the flap margin from inverting.'];
+  d['Vertical Mattress'] = [wrap('<rect x="10" y="42" width="104" height="84" rx="6" ' + T + '/><rect x="126" y="42" width="104" height="84" rx="6" ' + T + '/>' + label(120, 140, 'incision') +
+    path('M38 42 C38 116 202 116 202 42') + path('M202 40 L150 40') + path('M150 42 C150 66 90 66 90 42') + path('M90 40 L70 36') + path('M38 40 L58 36') + knot(64, 35) +
+    label(202, 24, 'far') + label(150, 24, 'near') + label(38, 24, 'far') + label(90, 24, 'near')),
+    'Cross-section: a deep far-far bite, then a shallow near-near bite on the same line. Everts and closely approximates the edges (papillae in the esthetic zone).'];
+  var cont = '', lock = '';
+  [50, 90, 130, 170].forEach(function(x, i, a){ cont += under(x, 50, x, 100) + hole(x, 50) + hole(x, 100); if(i < a.length - 1) cont += top(x, 100, x + 40, 50); });
+  d['Continuous'] = [wrap(tissue() + cont + top(26, 50, 50, 50) + knot(26, 50) + top(170, 100, 196, 100) + knot(196, 100)),
+    'One strand with a knot only at each end: diagonal on top, straight across underneath.'];
+  [50, 90, 130, 170].forEach(function(x, i, a){ lock += top(x, 50, x, 100) + hole(x, 50) + '<circle cx="'+x+'" cy="100" r="3.6" fill="var(--surface)" stroke="var(--probe)" stroke-width="1.6"/>'; if(i < a.length - 1) lock += top(x + 4, 100, x + 36, 100); });
+  d['Continuous Locking'] = [wrap(tissue() + lock + top(26, 50, 50, 50) + knot(26, 50) + top(174, 100, 198, 100) + knot(198, 100)),
+    'Each pass loops through the one before, so it locks along one edge. Better seal on long spans, but one failed throw can loosen the whole line.'];
+  d['Sling'] = [wrap('<rect x="8" y="96" width="224" height="42" rx="8" ' + T + '/>' + label(120, 128, 'buccal flap') +
+    '<path d="M66 96 L80 82 L94 96 Z M146 96 L160 82 L174 96 Z" ' + T + '/>' +
+    '<rect x="100" y="40" width="40" height="48" rx="16" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="1.5"/>' + label(120, 68, 'tooth') +
+    path('M80 92 C58 4 182 4 160 92') + path('M160 92 L162 106', true) + path('M162 106 C192 -14 48 -14 78 106') + knot(78, 107) + hole(80, 92) + hole(160, 92) + label(212, 20, 'lingual', 'end')),
+    'Occlusal view: the strand passes through the buccal papillae and wraps around the lingual of one tooth, so the flap is repositioned without engaging the lingual side.'];
+  d['Periosteal Anchorage'] = [wrap('<rect x="8" y="104" width="224" height="36" rx="6" fill="var(--surface-3)" stroke="var(--line-strong)"/>' + label(200, 128, 'bone') +
+    '<line x1="8" y1="101" x2="232" y2="101" stroke="var(--caution)" stroke-width="3"/>' + label(226, 94, 'periosteum', 'end') +
+    '<path d="M8 62 L120 62 Q130 62 130 72 L130 98 L8 98 Z" ' + T + '/>' + label(54, 84, 'flap') +
+    path('M100 60 C100 116 172 116 172 101') + path('M172 101 C172 80 140 66 112 58') + knot(106, 57)),
+    'Cross-section: the bite goes through the flap and into the periosteum beyond it, holding the flap where you placed it (apically or laterally).'];
+  var braid = ''; for(var x = 22; x < 214; x += 9){ braid += '<path d="M'+x+' 109 L'+(x+8)+' 95" stroke="var(--probe)" stroke-width="1.4"/><path d="M'+(x+4)+' 95 L'+(x+12)+' 109" stroke="var(--probe)" stroke-width="1" opacity=".5"/>'; }
+  d['_strands'] = [wrap('<rect x="20" y="36" width="200" height="16" rx="8" fill="var(--probe-soft)" stroke="var(--probe)"/><line x1="28" y1="41" x2="212" y2="41" stroke="var(--surface)" stroke-width="2.5" stroke-linecap="round" opacity=".9"/>' +
+    label(120, 26, 'Monofilament') + '<rect x="20" y="94" width="200" height="16" rx="8" fill="var(--probe-soft)" stroke="var(--probe)"/>' + braid + label(120, 84, 'Braided')),
+    'Monofilament (chromic gut, PGCL, poly-propylene, PTFE) is one smooth strand. Braided (silk, PGA) is woven, and the weave wicks and traps bacteria.'];
+  return d;
+})();
 
 var FLAP_DESIGNS = [
   { name:'Sulcular flap', note:'Intrasulcular incision around the surgical tooth plus one adjacent tooth on each side, no vertical release. Limited access and hard to advance because the tissue stays attached laterally — the first option for minor augmentation or single implant placement. Extending it to include more teeth (still no vertical) buys moderate additional access without dropping a vertical incision.' },
@@ -3500,6 +3556,10 @@ var REF_SECTIONS = [
   { id:'recession-types', lec:'diagnosis-tx-planning', title:'Recession types (RT1-RT3)', body:function(){ return tableWrap(['Type','Definition','Root coverage'], rowsOf(RECESSION_TYPES,['type','def','implication'])); } },
   { id:'suture-materials', lec:'incisions-flaps-sutures', title:'Suture materials', body:function(){ return tableWrap(['Material','Origin','Construction','Absorption','Strength','Tissue reaction','Handling','Typical use'], rowsOf(SUTURE_MATERIALS,['name','origin','construction','absorption','strength','reaction','handling','use'])); } },
   { id:'suture-techniques', lec:'incisions-flaps-sutures', title:'Suturing techniques', body:function(){ return tableWrap(['Technique','Notes'], rowsOf(SUTURE_TECHNIQUES,['name','note'])); } },
+  { id:'suture-diagrams', lec:'incisions-flaps-sutures', title:'Suture diagrams', body:function(){
+    var names = ['Single Interrupted','Criss-Cross','Horizontal Mattress','Vertical Mattress','Continuous','Continuous Locking','Sling','Periosteal Anchorage'];
+    return '<p class="note">Schematic drawings made for the hub, not taken from the course slides. Top views unless marked: flap above, incision across the middle; a solid strand sits on the surface, a dashed one runs under the tissue, a filled dot is the knot.</p><div class="sut-grid">' +
+      names.concat(['_strands']).map(function(n){ var dg = SUTURE_DIAGRAMS[n]; return '<figure class="sut-fig">' + dg[0] + '<figcaption><b>' + escHtml(n === '_strands' ? 'Monofilament vs braided' : n) + '</b><span>' + escHtml(dg[1]) + '</span></figcaption></figure>'; }).join('') + '</div>'; } },
   { id:'incisions', lec:'incisions-flaps-sutures', title:'Incision types', body:function(){ return tableWrap(['Incision','Notes'], rowsOf(INCISION_TYPES,['name','note'])); } },
   { id:'flaps', lec:'incisions-flaps-sutures', title:'Flap designs', body:function(){ return '<p class="note" style="margin:0 0 10px">Flaps are also classified by: ' + FLAP_CLASSIFICATION_AXES.map(escHtml).join('; ') + '.</p>' + tableWrap(['Design','Notes'], rowsOf(FLAP_DESIGNS,['name','note'])) + '<p class="note"><b>Five surgical principles:</b> ' + SURGICAL_PRINCIPLES.map(escHtml).join(' · ') + '</p>'; } },
   { id:'flap-thickness', lec:'incisions-flaps-sutures', title:'Full vs. split thickness, by procedure', body:function(){ return tableWrap(['Procedure','Flap thickness','Why'], rowsOf(FLAP_THICKNESS_BY_GOAL,['procedure','thickness','why'])); } },
