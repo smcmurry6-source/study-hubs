@@ -76,6 +76,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (third lessons refresh, Claude Code)** — Midterm-morning refresh. Perio `q3-P02` (report #10): the Patient
+  Box now lists the radiographs ("Deep, narrow vertical bone defects on those teeth", as the notes describe the case) and
+  the explanation walks stage, extent and grade from the box. Explanations now name the tempting wrong option on perio
+  `q4-L11` (tooth extruding after losing its antagonist), `q1-M02`, `q4-M05`, `q2-P01` (split-thickness) and MSK
+  `h-ai-mikulicz` (sicca), `qz-rickets` (unmineralized osteoid goes up). No reading text changed, so no narration
+  regenerated. `LESSONS.md` refreshed. **Perio and MSK Projects: carry these into the split sources.**
+
 - **2026-10-01 (lessons-audit skill, Claude Code)** — `/lessons-audit` (`.claude/skills/lessons-audit/SKILL.md`) runs the
   lessons refresh on demand in a Claude Code session: all data plus "since last time", a check of whether the last
   refresh's fixes worked, reading every hard question, safe explanation edits, `LESSONS.md`, a draft PR and draft replies
