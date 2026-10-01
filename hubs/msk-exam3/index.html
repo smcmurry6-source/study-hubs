@@ -2985,7 +2985,7 @@ var ARCADE = (function(){
     if(!rows.length) return '<div class="lb-empty">No scores yet. Be the first on the board.</div>';
     var top = rows.filter(function(r){ return r.rnk <= limit; });
     var me = rows.filter(function(r){ return r.is_me && r.rnk > limit; })[0];
-    function row(r){ return '<li class="'+(r.is_me?'me':'')+'"><span class="lb-rk">'+r.rnk+'</span><span class="lb-nm">'+escHtml(r.display_name || 'Classmate')+(r.is_me?' (you)':'')+'</span><span class="lb-sc">'+String(r.best).padStart(5,'0')+'</span></li>'; }
+    function row(r){ return '<li class="'+(r.is_me?'me':'')+'"><span class="lb-rk">'+r.rnk+'</span><span class="lb-nm">'+escHtml(r.display_name || 'Classmate')+(r.is_me?' (you)':'')+(window.shRanks&&window.shRanks.flair?window.shRanks.flair(r.flair):'')+'</span><span class="lb-sc">'+String(r.best).padStart(5,'0')+'</span></li>'; }
     return '<ol class="lb-list">' + top.map(row).join('') + (me ? '<li class="lb-gap">…</li>' + row(me) : '') + '</ol>';
   }
   function renderBoards(){

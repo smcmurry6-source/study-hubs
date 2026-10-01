@@ -142,6 +142,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .me-rank-body{flex:1; min-width:0;}
 .me-rank-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
 .me-rank-name{font-family:var(--serif); font-size:24px; line-height:1.1;}
+.me-rank-flair{font-size:12.5px; color:var(--ink-3); margin-top:6px; display:flex; align-items:center; gap:2px;}
 .me-rank-xp{font-size:13.5px; color:var(--ink-2); font-variant-numeric:tabular-nums;}
 .me-rank-xp b{color:var(--ink);}
 .me-rank-bar{position:relative; height:10px; margin:9px 0 6px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden;}
@@ -168,6 +169,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 /* ================= HERO ================= */
 .greeting{font-size:17px; color:var(--ink-2); margin:44px 0 14px;}
 .greeting b{color:var(--ink); font-weight:600;}
+.greeting.has-pet{margin-top:112px;}   /* room for Timmy Tooth (widget/pet.js) sitting on your name until you meet him */
 .greet-edit{font:inherit; font-size:13.5px; font-weight:600; margin-left:8px; padding:3px 10px 3px 8px; border-radius:99px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2); cursor:pointer; vertical-align:2px; display:inline-flex; align-items:center; gap:5px;}
 .greet-edit:hover{color:var(--ink); border-color:var(--ink-3);}
 .greet-edit svg{width:13px; height:13px;}
@@ -493,6 +495,10 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .board .rk{width:22px; height:22px; border-radius:7px; background:var(--surface-2); border:1px solid var(--line); font-size:12px; font-weight:600; color:var(--ink-2); display:flex; align-items:center; justify-content:center; flex:none;}
 .board li:first-child .rk{background:var(--ink); color:var(--on-ink); border-color:var(--ink);}
 .board .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+/* name + mastery medals: the name gives way (ellipsis) before the medals do */
+.nm.has-flair, .who.has-flair{display:flex; align-items:center; min-width:0;}
+.nm.has-flair > *, .who.has-flair > *{flex:none;}
+.nm.has-flair > .nm-t, .who.has-flair > .nm-t{flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;}
 .board .val{font-weight:600; flex:none;}
 .board .val small{font-weight:400; color:var(--ink-3); margin-left:3px;}
 .board li.me{background:color-mix(in srgb, var(--focus) 8%, transparent); margin:0 -10px; padding-left:10px; padding-right:10px; border-radius:8px;}
@@ -590,6 +596,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
   <p class="greeting" id="greeting">Welcome back.</p>
   <section class="me-rank" id="meRank" aria-label="Your handpiece rank" hidden></section>
+  <section id="petHome" aria-label="Timmy Tooth, your tooth buddy" hidden></section>
 
   <!-- ============ HERO: next exam + your progress ============ -->
   <section class="hero" id="hero" aria-label="Next exam">
@@ -696,6 +703,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 <script src="widget/clicks.js" defer></script>
 <script src="widget/replies.js" defer></script>
 <script src="widget/ranks.js" defer></script>
+<script src="widget/pet.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -844,6 +852,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { key:"sh_pref_accent", label:"Accent colour", def:"default", accent:true, hint:"Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal." },
     { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." },
     { key:"sh_pref_eggs", label:"Surprises", def:"on", opts:[["on","On"],["off","Off"]], hint:"Little hidden extras around the hubs. Stuck? The trophy case in each hub's Stats has clues." },
+    { key:"sh_pref_pet", label:"Timmy Tooth", def:"on", opts:[["on","Everywhere"],["dash","Dashboard only"],["off","Off"]], hint:"Your cartoon tooth buddy. Right answers and study streaks keep him healthy; skipped days give him plaque, cavities and worse." },
     { key:"sh_pref_nuke_alerts", label:"Tactical nuke alerts", def:"on", opts:[["on","On"],["off","Off"]], hint:"Turn off to skip seeing other people's strikes (yours still work)." }
   ];
   function settingValue(x){ return x.key === "theme" ? theme.current() : (ls(x.key) || x.def); }
@@ -886,6 +895,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       else if (key === "sh_pref_accent") { if (val === "default") { try{ localStorage.removeItem(key); }catch(err){} } else lsSet(key, val); dashAccent(); }
       else lsSet(key, val);
       if (key === "sh_pref_font" || key === "sh_pref_size") applyReadingPrefs();
+      if (key === "sh_pref_pet" && window.shPet) window.shPet.refresh();
       b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
     });
   }
@@ -1578,20 +1588,35 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<div class="me-rank-body"><div class="me-rank-top"><span class="me-rank-name">' + esc(R.rankName(t, lv)) + '</span>' +
       '<span class="me-rank-xp"><b>' + Number(xp).toLocaleString() + '</b> XP' + (p.position ? ' · #' + p.position + ' of ' + p.of : '') + '</span></div>' +
       '<div class="me-rank-bar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
-      '<div class="me-rank-next">' + (!xp ? 'Answer a question in any hub to start earning XP.' : next ? '<b>' + Number(next - xp).toLocaleString() + ' XP</b> to ' + esc(nextName) : 'The highest rank there is.') + '</div></div>';
+      '<div class="me-rank-next">' + (!xp ? 'Answer a question in any hub to start earning XP.' : next ? '<b>' + Number(next - xp).toLocaleString() + ' XP</b> to ' + esc(nextName) : 'The highest rank there is.') + '</div>' +
+      (R.flair && R.flairFromBadges(p.badges) ? '<div class="me-rank-flair">Mastery ' + R.flair(R.flairFromBadges(p.badges), { max: 8 }) + '</div>' : '') + '</div>';
     el.hidden = false;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = el.querySelector(".me-rank-bar i"); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
   }
   function loadMyRank(sb){
     if (!VISITOR){ renderMyRank(null); return; }
     sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){
-      if (r && r.data){ myTier = r.data.tier || 0; lsSet("sh_rank_tier", String(myTier)); renderMyRank(r.data); dashAccent(); }
+      if (r && r.data){ myTier = r.data.tier || 0; lsSet("sh_rank_tier", String(myTier)); renderMyRank(r.data); dashAccent();
+        /* rank and mastery decorate Timmy Tooth's house (widget/pet.js) */
+        if (window.shRanks && window.shRanks.flairFromBadges){ try{ localStorage.setItem("sh_rank_flair", window.shRanks.flairFromBadges(r.data.badges)); }catch(e){} }
+        try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){} }
     }, function(){});
   }
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
+  /* a board row's name with its mastery medals (migration_v31 `flair`); the caller adds the "has-flair" class via nmClass */
+  function nameFlair(r, extra){
+    var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair) : "";
+    return f ? '<span class="nm-t">' + esc(r.display_name) + (extra || "") + '</span>' + f : esc(r.display_name) + (extra || "");
+  }
+  function nmClass(r, base){ return base + (r.flair && window.shRanks && window.shRanks.flair ? " has-flair" : ""); }
   function startClassData(){
   var sb = null;
   try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
+  /* the tooth buddy (widget/pet.js) perches on your name in the greeting */
+  if (window.shPet) window.shPet.mount({ where:"dashboard", sb:sb, visitor:VISITOR,
+    name:function(){ return localName || randomName; },
+    perch:function(){ return document.querySelector("#greeting b") || document.getElementById("greeting"); },
+    home:function(){ return document.getElementById("petHome"); } });
   if (!sb){
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
@@ -1675,7 +1700,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (!rows.length || !R){ unavailable("rankBoard", "No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
       $("rankBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
         var lv = r.level || R.levelFor(r.xp);
-        return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + (r.is_me ? " (you)" : "") +
+        return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="' + nmClass(r, "nm") + '">' + rankMini(r.tier, r.level) + nameFlair(r, r.is_me ? " (you)" : "") +
           '</span><span class="lvl">' + esc(R.rankName(r.tier, lv)) + '</span><span class="val xp">' + Number(r.xp).toLocaleString() + '<small>XP</small></span></li>';
       }).join("") + '</ol>';
       var me = rows.filter(function(r){ return r.is_me; })[0];
@@ -1690,7 +1715,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var rows = (res && res.data) || [];
       if (!rows.length){ unavailable("pulseLeaderboard", "No streaks yet. Answer questions two days in a row to start one."); return; }
       $("pulseLeaderboard").innerHTML = '<ol class="board">' + rows.map(function(r, i){
-        return '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
+        return '<li><span class="rk">' + (i + 1) + '</span><span class="' + nmClass(r, "nm") + '">' + rankMini(r.tier, r.level) + nameFlair(r) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
       }).join("") + '</ol>';
     }, function(){ unavailable("pulseLeaderboard"); });
 
@@ -1699,7 +1724,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var rows = (res && res.data) || [];
       var act = rows.filter(function(r){ return r.kind === "active"; })[0], rec = rows.filter(function(r){ return r.kind === "record"; })[0];
       if (!act && !rec){ unavailable("pulseCorrect", "No runs yet. Get a few right in a row to set the first record."); return; }
-      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="who">' + rankMini(r.tier, r.level) + esc(r.display_name) + '</div></div>' : ""; }
+      function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="' + nmClass(r, "who") + '">' + rankMini(r.tier, r.level) + nameFlair(r) + '</div></div>' : ""; }
       $("pulseCorrect").innerHTML = '<div class="stat-pair">' + stat(act, "Longest run still going") + stat(rec, "All-time record") + '</div>';
     }, function(){ unavailable("pulseCorrect"); });
 
@@ -1728,7 +1753,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           var rows = (res && res.data) || [];
           if (!rows.length){ $("arcadeBoard").innerHTML = '<p class="muted">No ' + esc(name) + ' scores yet. Finish a game in the hub\'s Arcade to claim first place.</p>'; return; }
           $("arcadeBoard").innerHTML = '<ol class="board">' + rows.map(function(r){
-            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="nm">' + rankMini(r.tier, r.level) + esc(r.display_name) + (r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
+            return '<li' + (r.is_me ? ' class="me"' : '') + '><span class="rk">' + r.rnk + '</span><span class="' + nmClass(r, "nm") + '">' + rankMini(r.tier, r.level) + nameFlair(r, r.is_me ? " (you)" : "") + '</span><span class="val">' + (money ? "$" : "") + Number(r.best).toLocaleString() + '<small>' + r.plays + (r.plays == 1 ? " play" : " plays") + '</small></span></li>';
           }).join("") + '</ol>';
         }, function(){ unavailable("arcadeBoard"); });
       }
