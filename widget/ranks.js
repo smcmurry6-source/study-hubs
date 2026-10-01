@@ -558,6 +558,8 @@
           'Each one puts a medal next to your name on every leaderboard.</div></div>';
       }
       var myFlair = flairFromBadges(badges.concat(m.lvl >= 0 ? [MASTERY[m.lvl].k + ":" + H.hub] : []));
+      /* Timmy Tooth's house (widget/pet.js) hangs a pennant per mastered hub */
+      if ((ls("sh_rank_flair") || "") !== myFlair) { ls("sh_rank_flair", myFlair || null); try { document.dispatchEvent(new CustomEvent("sh:rank")); } catch (e) {} }
       if (myFlair) h += '<div class="sh-flair-row"><span>Your leaderboard flair</span>' + flair(myFlair, { max: 8, big: true }) + '</div>';
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +

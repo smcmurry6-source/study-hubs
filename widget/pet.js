@@ -254,46 +254,141 @@
     return h + '</g>';
   }
 
-  /* Timmy's house on the dashboard: a little cottage on a hill, with a toothbrush for a signpost. Timmy himself is a
-     separate button placed over the empty spot on the right (.shpet-spot). */
-  function houseSvg(){
-    var p = "shph" + (++uid) + "-";
-    return '<svg class="shpet-housesvg" viewBox="0 0 240 150" aria-hidden="true"><defs>' +
-      '<linearGradient id="' + p + 'sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE5FA"/><stop offset="1" stop-color="#EEF8FD"/></linearGradient>' +
-      '<linearGradient id="' + p + 'gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A7DE93"/><stop offset="1" stop-color="#6CBB68"/></linearGradient>' +
+  /* ================= Timmy's house =================
+     A little cottage on a hill with a toothbrush planted by the door. Timmy himself is a separate button over the
+     empty spot on the right (.shpet-spot). It dresses up two ways:
+       - upgrades you earn: one per handpiece rank (sh_rank_tier), a pennant per hub you've mastered and a crown on the
+         roof for any Crown mastery (sh_rank_flair, "perio:3,msk-exam3:1", written by ranks.js and the dashboard)
+       - holiday decorations, on the same dates as the hubs' holiday themes */
+  var UPGRADES = [
+    { tier: 1, n: "Picket fence", how: "Reach Antique rank" },
+    { tier: 2, n: "Bronze mailbox", how: "Reach Bronze rank" },
+    { tier: 3, n: "Garden lamppost", how: "Reach Silver rank" },
+    { tier: 4, n: "Gold trim and door", how: "Reach Gold rank" },
+    { tier: 5, n: "Diamond windows", how: "Reach Diamond rank" },
+    { tier: 6, n: "A night sky of his own", how: "Reach Dark Matter rank" },
+    { mastery: 1, n: "A pennant for every hub you master", how: "Bronze mastery (50%) in any hub; it turns silver, gold or crowned as you go" },
+    { mastery: 4, n: "A crown on the roof", how: "Crown mastery (100%) in any hub" }
+  ];
+  function houseDeco(){
+    var flair = String(ls("sh_rank_flair") || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
+      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
+    return { tier: Math.max(0, Math.min(6, +(ls("sh_rank_tier") || 0))), flair: flair, holiday: holidayId() };
+  }
+  function houseSvg(deco){
+    deco = deco || houseDeco();
+    var p = "shph" + (++uid) + "-", T = deco.tier, H = deco.holiday, night = T >= 6;
+    var crown = deco.flair.some(function(f){ return f.lvl >= 4; });
+    var gold = T >= 4 ? "#E8BE45" : null;
+    var s = '<svg class="shpet-housesvg" viewBox="0 0 240 150" aria-hidden="true"><defs>' +
+      '<linearGradient id="' + p + 'sky" x1="0" y1="0" x2="0" y2="1">' + (night ? '<stop offset="0" stop-color="#140B33"/><stop offset=".7" stop-color="#3C2A78"/><stop offset="1" stop-color="#6B4FB8"/>'
+        : '<stop offset="0" stop-color="#BFE5FA"/><stop offset="1" stop-color="#EEF8FD"/>') + '</linearGradient>' +
+      '<linearGradient id="' + p + 'gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + (night ? "#5E9E6A" : "#A7DE93") + '"/><stop offset="1" stop-color="' + (night ? "#3D7449" : "#6CBB68") + '"/></linearGradient>' +
       '<linearGradient id="' + p + 'roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7A3BA"/><stop offset="1" stop-color="#E5779A"/></linearGradient>' +
+      '<radialGradient id="' + p + 'glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>' +
       '<clipPath id="' + p + 'c"><rect width="240" height="150" rx="16"/></clipPath></defs>' +
       '<g clip-path="url(#' + p + 'c)">' +
-      '<rect width="240" height="150" fill="url(#' + p + 'sky)"/>' +
-      '<g class="shpet-sun"><circle cx="30" cy="26" r="11" fill="#FFE27A"/><g stroke="#FFD24A" stroke-width="2.4" stroke-linecap="round"><path d="M30 8v-4M30 48v-4M12 26H8M52 26h-4M17 13l-3-3M46 42l-3-3M17 39l-3 3M46 10l-3 3"/></g></g>' +
-      '<g class="shpet-cloud" fill="#fff" opacity=".9"><ellipse cx="188" cy="24" rx="16" ry="7"/><ellipse cx="200" cy="19" rx="10" ry="8"/><ellipse cx="178" cy="21" rx="8" ry="6"/></g>' +
-      '<path d="M0 116 Q60 98 124 110 T240 104 L240 150 L0 150 Z" fill="url(#' + p + 'gr)"/>' +
+      '<rect width="240" height="150" fill="url(#' + p + 'sky)"/>';
+    /* sky */
+    if (night) {
+      var st = ""; [[12, 10], [44, 30], [70, 12], [104, 24], [126, 8], [150, 34], [176, 14], [204, 28], [228, 10], [90, 44], [218, 48]].forEach(function(xy, i){
+        st += '<circle class="shpet-star" cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + (i % 3 ? .9 : 1.4) + '" fill="#fff" style="animation-delay:' + (i * .37).toFixed(2) + 's"/>'; });
+      s += st + '<path d="M38 14 A13 13 0 1 0 50 34 A10 10 0 1 1 38 14 Z" fill="#FFF3C4"/>' +
+        '<path d="M0 46 C50 30 90 52 140 36 S220 30 240 40" stroke="#7FF0D2" stroke-width="7" fill="none" opacity=".18"/>';
+    } else {
+      s += '<g class="shpet-sun"><circle cx="30" cy="26" r="11" fill="#FFE27A"/><g stroke="#FFD24A" stroke-width="2.4" stroke-linecap="round"><path d="M30 8v-4M30 48v-4M12 26H8M52 26h-4M17 13l-3-3M46 42l-3-3M17 39l-3 3M46 10l-3 3"/></g></g>' +
+        '<g class="shpet-cloud" fill="#fff" opacity=".9"><ellipse cx="184" cy="44" rx="16" ry="7"/><ellipse cx="196" cy="39" rx="10" ry="8"/><ellipse cx="174" cy="41" rx="8" ry="6"/></g>';
+    }
+    if (H === "stpatrick") s += '<g fill="none" stroke-width="5" opacity=".75"><path d="M-10 118 A70 70 0 0 1 130 118" stroke="#E5484D"/><path d="M-4 118 A64 64 0 0 1 124 118" stroke="#F59A1E"/><path d="M2 118 A58 58 0 0 1 118 118" stroke="#F5D21E"/><path d="M8 118 A52 52 0 0 1 112 118" stroke="#3ECF7E"/><path d="M14 118 A46 46 0 0 1 106 118" stroke="#3FA7E0"/></g>';
+    if (H === "newyear") s += '<g class="shpet-fw" stroke-width="1.8" stroke-linecap="round"><g stroke="#F6CD55"><path d="M196 30l0-9M196 30l7-5M196 30l8 3M196 30l3 8M196 30l-5 7M196 30l-8 1M196 30l-6-6"/></g><g stroke="#E0457B" transform="translate(-52 6)"><path d="M196 30l0-7M196 30l6-4M196 30l6 3M196 30l2 7M196 30l-4 6M196 30l-7 1M196 30l-5-5"/></g></g>';
+    if (H === "halloween") s += '<g fill="#2B1B3D"><path d="M150 26c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/><path d="M196 54c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/></g>';
+    if (H === "winter") s += '<g fill="#fff" opacity=".9"><circle cx="140" cy="14" r="1.6"/><circle cx="168" cy="26" r="1.3"/><circle cx="214" cy="18" r="1.7"/><circle cx="128" cy="40" r="1.2"/><circle cx="230" cy="44" r="1.4"/><circle cx="100" cy="20" r="1.3"/></g>';
+    /* ground */
+    s += '<path d="M0 116 Q60 98 124 110 T240 104 L240 150 L0 150 Z" fill="url(#' + p + 'gr)"/>' +
       '<path d="M0 132 Q70 122 140 130 T240 126 L240 150 L0 150 Z" fill="#5FAE5C" opacity=".45"/>' +
-      '<path d="M54 121 Q62 132 52 150 L70 150 Q76 132 66 121 Z" fill="#F3E3C4" opacity=".9"/>' +
-      /* chimney + smoke, behind the roof */
-      '<rect x="80" y="36" width="11" height="22" fill="#D96C8C" stroke="' + OUT + '" stroke-width="2.6"/>' +
-      '<g class="shpet-smoke" fill="#fff" opacity=".85"><circle cx="86" cy="28" r="4"/><circle cx="91" cy="20" r="5"/><circle cx="98" cy="11" r="6"/></g>' +
-      /* the house */
-      '<rect x="24" y="64" width="72" height="58" rx="3" fill="#FFF7EC" stroke="' + OUT + '" stroke-width="3"/>' +
+      (H === "winter" ? '<path d="M0 118 Q60 100 124 112 T240 106 L240 114 Q180 116 124 118 T0 126 Z" fill="#fff" opacity=".85"/>' : '') +
+      '<path d="M54 121 Q62 132 52 150 L70 150 Q76 132 66 121 Z" fill="#F3E3C4" opacity=".9"/>';
+    /* Silver: a lamppost on the left */
+    if (T >= 3) s += '<circle cx="12" cy="74" r="12" fill="url(#' + p + 'glow)"/><rect x="10.6" y="78" width="3" height="46" fill="#8E98A3" stroke="' + OUT + '" stroke-width="1.4"/>' +
+      '<path d="M7 70 L18 70 L16 79 L9 79 Z" fill="#FFE9A8" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 70 L12 65 L19 70 Z" fill="#B6BEC7" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/>';
+    /* chimney + smoke, behind the roof */
+    s += '<rect x="80" y="36" width="11" height="22" fill="#D96C8C" stroke="' + OUT + '" stroke-width="2.6"/>' +
+      '<g class="shpet-smoke" fill="#fff" opacity=".85"><circle cx="86" cy="28" r="4"/><circle cx="91" cy="20" r="5"/><circle cx="98" cy="11" r="6"/></g>';
+    /* the house */
+    var winFill = T >= 5 ? "#CFF1FF" : night ? "#FFE08A" : "#FFE9A8";
+    s += '<rect x="24" y="64" width="72" height="58" rx="3" fill="#FFF7EC" stroke="' + OUT + '" stroke-width="3"/>' +
       '<path d="M14 70 L60 30 L106 70 Z" fill="url(#' + p + 'roof)" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
+      (gold ? '<path d="M19.5 67.6 L60 33.4 L100.5 67.6" fill="none" stroke="' + gold + '" stroke-width="2.4" stroke-linejoin="round"/>' : '') +
       '<path d="M24 66 L60 36" stroke="#fff" stroke-width="2.4" opacity=".55" stroke-linecap="round"/>' +
-      '<circle cx="60" cy="55" r="8" fill="#fff" stroke="' + OUT + '" stroke-width="2.2"/>' +
-      '<path d="M56.8 51.4c-1.4 0-2.3 1-2.3 2.5 0 1.6.9 2.4 1.2 3.7.3 1.6.5 3.4 1.3 3.4s1-1.6 1.2-2.6c.1-.5.4-.8 1.8-.8s1.7.3 1.8.8c.2 1 .5 2.6 1.2 2.6s1-1.8 1.3-3.4c.3-1.3 1.2-2.1 1.2-3.7 0-1.5-.9-2.5-2.3-2.5-1.1 0-1.7.6-3.2.6s-2.1-.6-3.2-.6z" fill="#F7F1E4" stroke="' + OUT + '" stroke-width="1"/>' +
-      '<rect x="30" y="78" width="16" height="15" rx="2" fill="#FFE9A8" stroke="' + OUT + '" stroke-width="2.4"/><path d="M38 78v15M30 85.5h16" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<path d="M30 78 q4 6 0 11 M46 78 q-4 6 0 11" fill="#F7A3BA" opacity=".8"/>' +
-      '<rect x="70" y="78" width="16" height="15" rx="2" fill="#FFE9A8" stroke="' + OUT + '" stroke-width="2.4"/><path d="M78 78v15M70 85.5h16" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<path d="M50 122 V102 a10 10 0 0 1 20 0 V122 Z" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.6"/><circle cx="65" cy="112" r="1.6" fill="' + OUT + '"/>' +
-      '<g transform="translate(60 97)"><rect x="-15" y="-11" width="30" height="9" rx="2" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/><text x="0" y="-4.4" text-anchor="middle" font-family="Georgia,serif" font-size="6.4" font-weight="700" fill="' + OUT + '">TIMMY</text></g>' +
-      /* flower boxes and flowers */
-      '<rect x="28" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/><rect x="68" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/>' +
-      '<g><circle cx="33" cy="91" r="2.2" fill="#FF8FB1"/><circle cx="39" cy="90.4" r="2.2" fill="#FFE27A"/><circle cx="44" cy="91" r="2.2" fill="#B08CFF"/><circle cx="73" cy="91" r="2.2" fill="#FFE27A"/><circle cx="79" cy="90.4" r="2.2" fill="#FF8FB1"/><circle cx="84" cy="91" r="2.2" fill="#8FD3F5"/></g>' +
-      /* toothbrush signpost */
-      '<g transform="rotate(-6 116 112)"><rect x="113" y="82" width="6" height="40" rx="3" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.2"/>' +
-      '<rect x="109" y="70" width="14" height="14" rx="3" fill="#fff" stroke="' + OUT + '" stroke-width="2.2"/>' +
-      '<path d="M111 70v-6M114 70v-7M117 70v-7M120 70v-7M122.6 70v-6" stroke="#3ECF7E" stroke-width="2" stroke-linecap="round"/></g>' +
-      '<g fill="#FF8FB1"><circle cx="14" cy="128" r="2.4"/><circle cx="104" cy="132" r="2.4"/><circle cx="226" cy="124" r="2.4"/></g>' +
-      '<g fill="#FFE27A"><circle cx="20" cy="136" r="2"/><circle cx="214" cy="134" r="2"/></g>' +
-      '</g></svg>';
+      (H === "winter" ? '<path d="M14 70 L60 30 L106 70 L101 70 C98 66 95 71 92 66 C89 70 85 64 82 60 L60 40 L38 60 C35 64 31 70 28 66 C25 71 22 66 19 70 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>' : '') +
+      '<circle cx="60" cy="55" r="8" fill="#fff" stroke="' + (gold || OUT) + '" stroke-width="2.2"/>' +
+      '<path d="M56.8 51.4c-1.4 0-2.3 1-2.3 2.5 0 1.6.9 2.4 1.2 3.7.3 1.6.5 3.4 1.3 3.4s1-1.6 1.2-2.6c.1-.5.4-.8 1.8-.8s1.7.3 1.8.8c.2 1 .5 2.6 1.2 2.6s1-1.8 1.3-3.4c.3-1.3 1.2-2.1 1.2-3.7 0-1.5-.9-2.5-2.3-2.5-1.1 0-1.7.6-3.2.6s-2.1-.6-3.2-.6z" fill="#F7F1E4" stroke="' + OUT + '" stroke-width="1"/>';
+    [30, 70].forEach(function(x){
+      s += '<rect x="' + x + '" y="78" width="16" height="15" rx="2" fill="' + winFill + '" stroke="' + OUT + '" stroke-width="2.4"/>';
+      if (T >= 5) s += '<path d="M' + x + ' 78 L' + (x + 16) + ' 93 M' + (x + 16) + ' 78 L' + x + ' 93" stroke="#7FCDEB" stroke-width="1"/><path d="M' + (x + 4) + ' 81 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1z" fill="#fff" class="shpet-twinkle"/>';
+      s += '<path d="M' + (x + 8) + ' 78v15M' + x + ' 85.5h16" stroke="' + OUT + '" stroke-width="1.6"/>';
+      if (H === "valentine") s += '<path d="M' + (x + 8) + ' 90 c-3-2-4.4-4-4.4-5.4 a2.2 2.2 0 0 1 4.4-1 a2.2 2.2 0 0 1 4.4 1 c0 1.4-1.4 3.4-4.4 5.4z" fill="#E0457B"/>';
+    });
+    s += '<path d="M30 78 q4 6 0 11 M46 78 q-4 6 0 11" fill="#F7A3BA" opacity=".8"/>';
+    /* door: gold at Gold rank */
+    s += '<path d="M50 122 V102 a10 10 0 0 1 20 0 V122 Z" fill="' + (gold ? "#F2C94C" : "#8FD3F5") + '" stroke="' + OUT + '" stroke-width="2.6"/>' +
+      (gold ? '<path d="M53.5 120 V103 a6.5 6.5 0 0 1 13 0 V120" fill="none" stroke="#B8860B" stroke-width="1.4"/>' : '') +
+      '<circle cx="65" cy="112" r="1.6" fill="' + (gold ? "#7A5A00" : OUT) + '"/>';
+    if (H === "winter") s += '<circle cx="60" cy="108" r="5.2" fill="none" stroke="#2F8F4E" stroke-width="3"/><path d="M58 112.6 l2 -1.6 2 1.6 -1 3 M60 111 l-1 4" stroke="#D6363C" stroke-width="1.6" fill="none"/>';
+    if (H === "thanksgiving") s += '<g transform="translate(60 108)">' + [0, 60, 120, 180, 240, 300].map(function(a, i){ return '<ellipse cx="0" cy="-4.6" rx="1.8" ry="3" fill="' + ["#C2410C", "#E58E26", "#B45309"][i % 3] + '" transform="rotate(' + a + ')"/>'; }).join("") + '</g>';
+    s += '<g transform="translate(60 97)"><rect x="-15" y="-11" width="30" height="9" rx="2" fill="#fff" stroke="' + (gold || OUT) + '" stroke-width="1.6"/><text x="0" y="-4.4" text-anchor="middle" font-family="Georgia,serif" font-size="6.4" font-weight="700" fill="' + OUT + '">TIMMY</text></g>';
+    /* flower boxes and flowers */
+    s += '<rect x="28" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/><rect x="68" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/>' +
+      '<g><circle cx="33" cy="91" r="2.2" fill="#FF8FB1"/><circle cx="39" cy="90.4" r="2.2" fill="#FFE27A"/><circle cx="44" cy="91" r="2.2" fill="#B08CFF"/><circle cx="73" cy="91" r="2.2" fill="#FFE27A"/><circle cx="79" cy="90.4" r="2.2" fill="#FF8FB1"/><circle cx="84" cy="91" r="2.2" fill="#8FD3F5"/></g>';
+    /* winter: string lights along the eaves */
+    if (H === "winter") { var li = ""; for (var k = 0; k < 9; k++) li += '<circle class="shpet-twinkle" cx="' + (26 + k * 8.5) + '" cy="' + (67 + (k % 2) * 1.6) + '" r="1.7" fill="' + ["#E5484D", "#F5D21E", "#3ECF7E", "#3FA7E0"][k % 4] + '" style="animation-delay:' + (k * .2).toFixed(1) + 's"/>'; s += '<path d="M24 66.4 Q60 71 96 66.4" stroke="#333" stroke-width=".8" fill="none"/>' + li; }
+    /* crown on the roof for any Crown mastery */
+    if (crown) s += '<g transform="translate(60 25)"><path d="M-8 4 L-9 -5 L-4 -1 L0 -8 L4 -1 L9 -5 L8 4 Z" fill="#F2C230" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/><rect x="-8.6" y="3" width="17.2" height="3.4" rx="1" fill="#E8BE45" stroke="' + OUT + '" stroke-width="1.4"/><circle cx="0" cy="-8.4" r="1.4" fill="#E0457B"/></g>';
+    /* Antique: a picket fence (with a gap for the path) */
+    if (T >= 1) {
+      var f = '<g fill="#FFFDF6" stroke="' + OUT + '" stroke-width="1.3" stroke-linejoin="round"><rect x="0" y="117" width="48" height="3" /><rect x="0" y="124" width="48" height="3"/><rect x="74" y="117" width="34" height="3"/><rect x="74" y="124" width="34" height="3"/>';
+      [2, 9, 16, 23, 30, 37, 44, 76, 83, 90, 97, 104].forEach(function(x){ f += '<path d="M' + x + ' 132 V115 L' + (x + 2.2) + ' 112 L' + (x + 4.4) + ' 115 V132 Z"/>'; });
+      s += f + '</g>';
+    }
+    /* holiday props on the ground */
+    if (H === "halloween") s += '<g transform="translate(38 126)"><ellipse cx="0" cy="0" rx="8" ry="6.4" fill="#F59A1E" stroke="' + OUT + '" stroke-width="1.6"/><path d="M-3 -6 Q0 -2 3 -6" stroke="#C2650E" stroke-width="1.2" fill="none"/><path d="M0 -6 L1 -9" stroke="#3B7A2A" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M-4.6 -1.6 L-2.4 -3.4 L-1.4 -1 Z M4.6 -1.6 L2.4 -3.4 L1.4 -1 Z M-4 2 Q0 5 4 2 L2.6 2.8 L1.4 1.8 L0 3 L-1.4 1.8 L-2.6 2.8 Z" fill="#FFE27A"/></g>';
+    if (H === "thanksgiving") s += '<g stroke="' + OUT + '" stroke-width="1.4"><ellipse cx="40" cy="127" rx="7" ry="5.4" fill="#E58E26"/><ellipse cx="80" cy="128" rx="5.6" ry="4.4" fill="#D9A441"/></g><path d="M40 121.6 v-3 M80 123.6 v-2.6" stroke="#5B3A1A" stroke-width="1.6"/>';
+    if (H === "easter") [[22, 136, "#FFB3C7"], [96, 140, "#B5E3FF"], [130, 136, "#FFE58F"], [232, 140, "#C3F0CA"]].forEach(function(e){ s += '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="3.4" ry="4.4" fill="' + e[2] + '" stroke="' + OUT + '" stroke-width="1.2"/><path d="M' + (e[0] - 3.2) + ' ' + e[1] + ' q1.6 -1.4 3.2 0 t3.2 0" stroke="#fff" stroke-width="1" fill="none"/>'; });
+    if (H === "stpatrick") s += '<g transform="translate(14 134)"><path d="M-8 -4 Q-9 6 0 6 Q9 6 8 -4 Z" fill="#2B2B2B" stroke="' + OUT + '" stroke-width="1.4"/><ellipse cx="0" cy="-4" rx="8.4" ry="2.6" fill="#F6CD55" stroke="' + OUT + '" stroke-width="1.2"/><circle cx="-3" cy="-6" r="1.6" fill="#F6CD55"/><circle cx="2" cy="-6.4" r="1.6" fill="#F6CD55"/></g>';
+    if (H === "dentist" || H === "valentine") s += '<g><path d="M124 46 Q122 30 128 22" stroke="#555" stroke-width=".8" fill="none"/>' + (H === "valentine"
+      ? '<path d="M128 22 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z" fill="#E0457B" stroke="' + OUT + '" stroke-width="1.4"/>'
+      : '<ellipse cx="128" cy="15" rx="6.4" ry="7.6" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="1.4"/><path d="M125.6 12c-1 0-1.6.7-1.6 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.6-1.7-.8 0-1.2.4-1.8.4s-1-.4-1.8-.4z" fill="#fff"/>') + '</g>';
+    /* the toothbrush planted by the door: tapered handle with a rubber grip, slim neck, head with bristle tufts
+       sticking out sideways, and a striped swirl of toothpaste on top */
+    s += '<g transform="rotate(-5 115 124)">' +
+      '<path d="M110.6 124 C110.2 108 110.8 94 112.6 82 L113.4 70 L116.6 70 L117.4 82 C119.2 94 119.8 108 119.4 124 Z" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.2" stroke-linejoin="round"/>' +
+      '<path d="M112.2 112 C112 104 112.4 98 113.2 92 L116.8 92 C117.6 98 118 104 117.8 112 Z" fill="#3FA7E0" opacity=".9"/>' +
+      '<path d="M112.6 96h4.8M112.4 101h5.2M112.3 106h5.4" stroke="#fff" stroke-width="1" opacity=".6"/>' +
+      '<path d="M112 70 L112 51 Q112 47.4 115 47.4 Q118 47.4 118 51 L118 70 Z" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="2.2" stroke-linejoin="round"/>' +
+      '<g stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round">' +
+      [50, 54, 58, 62, 66].map(function(y, i){ return '<rect x="118" y="' + y + '" width="9.5" height="3.2" rx="1.4" fill="' + (i % 2 ? "#3ECF7E" : "#fff") + '"/>'; }).join("") + '</g>' +
+      '<path d="M119.5 49.6 C118.8 46.6 121.2 44.4 123.4 45.6 C124.4 43.2 128 43.6 128.2 46.2 C130.2 46.6 130 49.4 128 49.8 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<path d="M120.6 48.4 C122.4 47 124.6 47.6 126.6 46.4 M122.6 49.4 C124.6 48.6 126.4 49 128.4 48.4" stroke="#3FA7E0" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+      '</g>';
+    /* Bronze: a mailbox on the right */
+    if (T >= 2) s += '<rect x="221" y="104" width="3" height="22" fill="#7A5A3A" stroke="' + OUT + '" stroke-width="1.2"/>' +
+      '<path d="M212 104 V96 a8 6 0 0 1 16 0 V104 Z" fill="#B0672B" stroke="' + OUT + '" stroke-width="1.8"/><path d="M215 96 a5 3.6 0 0 1 10 0" stroke="#F2B884" stroke-width="1.2" fill="none"/>' +
+      '<path d="M228 94 V86 L234 88 L228 90" fill="#E5484D" stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round"/>';
+    /* mastery pennants strung across the sky, one per hub, in that hub's medal colour */
+    if (deco.flair.length) {
+      var fl = deco.flair.slice(0, 7), x0 = 134, x1 = 236, step = (x1 - x0) / (fl.length + 1);
+      s += '<path d="M' + x0 + ' 6 Q' + ((x0 + x1) / 2) + ' 22 ' + x1 + ' 6" stroke="#7A6A5A" stroke-width=".9" fill="none"/>';
+      fl.forEach(function(f, i){
+        var x = x0 + step * (i + 1), t = (x - x0) / (x1 - x0), y = 6 + 32 * t * (1 - t);
+        var c = ["", "#C47A3E", "#C9D1D9", "#E8BE45", "#F2C230"][f.lvl];
+        s += '<path d="M' + (x - 4.6).toFixed(1) + ' ' + y.toFixed(1) + ' L' + (x + 4.6).toFixed(1) + ' ' + y.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (y + 10).toFixed(1) + ' Z" fill="' + c + '" stroke="' + OUT + '" stroke-width="1"/>' +
+          (f.lvl >= 4 ? '<path d="M' + (x - 2.4).toFixed(1) + ' ' + (y + 4).toFixed(1) + ' l.6 -2.4 1.2 1.2 .6 -1.8 .6 1.8 1.2 -1.2 .6 2.4 Z" fill="#fff"/>' : '');
+      });
+    }
+    s += '<g fill="#FF8FB1"><circle cx="14" cy="140" r="2.4"/><circle cx="104" cy="140" r="2.4"/><circle cx="232" cy="132" r="2.4"/></g>' +
+      '<g fill="#FFE27A"><circle cx="24" cy="144" r="2"/><circle cx="214" cy="140" r="2"/></g>';
+    return s + '</g></svg>';
   }
 
   /* ================= health ================= */
@@ -511,6 +606,12 @@
       ".shpet-actions{display:flex; gap:8px; flex-wrap:wrap;}",
       ".shpet-smoke circle{animation:shpet-smoke 4s ease-in-out infinite;} .shpet-smoke circle:nth-child(2){animation-delay:.6s;} .shpet-smoke circle:nth-child(3){animation-delay:1.2s;}",
       ".shpet-cloud{animation:shpet-drift 14s ease-in-out infinite alternate;}",
+      ".shpet-star, .shpet-twinkle{animation:shpet-blinkstar 2.6s ease-in-out infinite;} .shpet-fw{animation:shpet-blinkstar 1.8s ease-in-out infinite;}",
+      "@keyframes shpet-blinkstar{0%,100%{opacity:1;} 50%{opacity:.35;}}",
+      ".shpet-upg{list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:6px;}",
+      ".shpet-upg li{font-size:12.5px; line-height:1.35; padding:7px 9px; border-radius:10px; border:1px solid var(--pet-line); color:var(--pet-ink2);}",
+      ".shpet-upg li b{display:block; color:var(--pet-ink); font-size:13px;} .shpet-upg li.is-locked{opacity:.55;} .shpet-upg li.is-on b::after{content:' \\2713'; color:#2E9E5B;}",
+      "@media (max-width:480px){ .shpet-upg{grid-template-columns:1fr;} }",
       "@keyframes shpet-smoke{0%,100%{opacity:.85; transform:translateY(0);} 50%{opacity:.4; transform:translateY(-3px);}}",
       "@keyframes shpet-drift{from{transform:translateX(0);} to{transform:translateX(-26px);}}",
       "@media (max-width:600px){ .shpet-house{grid-template-columns:1fr; gap:12px; padding:10px;} .shpet-housesvg{max-height:190px;} }",
@@ -857,6 +958,7 @@
       '<div class="shpet-hpline"><span>Today: ' + st.today.a + ' answered, ' + st.today.c + ' right</span><span>' + st.streak + '-day streak</span></div>' +
       (cs.length ? '<ul class="shpet-conds">' + cs.map(function(k){ return '<li><i style="background:' + colors[k] + '"></i><span><b>' + CONDITION_INFO[k][0] + '.</b> ' + CONDITION_INFO[k][1] + '</span></li>'; }).join("") + '</ul>'
         : '<ul class="shpet-conds"><li><i style="background:#3ECF7E"></i><span><b>All clear.</b> No plaque, no stains, no cavities. Chef\'s kiss.</span></li></ul>') +
+      (M.where === "dashboard" ? upgradesHTML() : '') +
       '<p style="margin-top:12px">Each right answer heals me a little (up to 30 HP a day), and studying on back-to-back days adds a bonus. Each day you skip, I slip, faster the longer you\'re gone. At 0 HP I can\'t die, but I heal at half speed until I\'m back to 50.</p>' +
       '<div class="shpet-row"><span>Show me <span class="shpet-seg" role="group" aria-label="Where to show your tooth buddy">' +
       '<button type="button" data-p="on" aria-pressed="' + (p === "on") + '">Everywhere</button><button type="button" data-p="dash" aria-pressed="' + (p === "dash") + '">Dashboard only</button></span></span></div>' +
@@ -867,6 +969,19 @@
       if (e.target.closest("[data-off]")) { d.remove(); setPref("off"); return; }
     });
   }
+  /* the house upgrades your rank and hub mastery have unlocked (and the ones still to come) */
+  function upgradesHTML(){
+    var d = houseDeco(), best = 0; d.flair.forEach(function(f){ best = Math.max(best, f.lvl); });
+    return '<h3 style="font-size:19px;margin-top:16px">House upgrades</h3><ul class="shpet-upg">' + UPGRADES.map(function(u){
+      var got = u.tier ? d.tier >= u.tier : best >= u.mastery;
+      return '<li class="' + (got ? "is-on" : "is-locked") + '"><b>' + esc(u.n) + '</b>' + esc(got ? "Unlocked" : u.how) + '</li>';
+    }).join("") + '</ul>';
+  }
+  /* redraw just the house when your rank or mastery changes (ranks.js and the dashboard fire sh:rank) */
+  document.addEventListener("sh:rank", function(){
+    if (!M || !M.el || !M.el.classList.contains("shpet-house")) return;
+    var old = M.el.querySelector(".shpet-housesvg"); if (old) old.outerHTML = houseSvg();
+  });
   function setPref(v){
     ls("sh_pref_pet", v);
     try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: "sh_pref_pet", val: v } })); } catch (e) {}
@@ -883,5 +998,5 @@
   }
   function refresh(){ if (!M) return; hush(); render(); }
 
-  window.shPet = { mount: mount, refresh: refresh, art: art, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { mount: mount, refresh: refresh, art: art, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();

@@ -1596,7 +1596,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   function loadMyRank(sb){
     if (!VISITOR){ renderMyRank(null); return; }
     sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){
-      if (r && r.data){ myTier = r.data.tier || 0; lsSet("sh_rank_tier", String(myTier)); renderMyRank(r.data); dashAccent(); }
+      if (r && r.data){ myTier = r.data.tier || 0; lsSet("sh_rank_tier", String(myTier)); renderMyRank(r.data); dashAccent();
+        /* rank and mastery decorate Timmy Tooth's house (widget/pet.js) */
+        if (window.shRanks && window.shRanks.flairFromBadges){ try{ localStorage.setItem("sh_rank_flair", window.shRanks.flairFromBadges(r.data.badges)); }catch(e){} }
+        try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){} }
     }, function(){});
   }
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
