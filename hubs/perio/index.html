@@ -271,6 +271,9 @@ main{padding-top:20px}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.qcard-figure{max-width:420px;margin:0 0 12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qcard-figure svg{display:block;width:100%;height:auto}
+.qcard-figure .sd-hint{display:none}
 .sut-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:10px}
 .sut-fig{margin:0;padding:8px 8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .sut-fig svg{display:block;width:100%;height:auto}
@@ -867,6 +870,8 @@ var SUTURE_DIAGRAMS = (function(){
     return '<path d="M'+p(3,1)+' L'+p(13,7)+' M'+p(3,-1)+' L'+p(12,-8)+'" stroke="'+TH+'" stroke-width="2.6" stroke-linecap="round"/>' +
       '<ellipse cx="'+x+'" cy="'+y+'" rx="5.2" ry="4.2" transform="rotate('+a+' '+x+' '+y+')" fill="'+TH+'"/><path d="M'+p(-3,-1.2)+' Q'+p(0,-3.2)+' '+p(3,-1.2)+'" stroke="#9FB2FF" stroke-width="1" fill="none"/>'; }
   function label(x, y, t, anchor, size){ return '<text x="'+x+'" y="'+y+'" font-size="'+(size||10.5)+'" font-family="system-ui,sans-serif" fill="'+INK+'" text-anchor="'+(anchor||'middle')+'">'+t+'</text>'; }
+  function hint(x, y, t, anchor, size){ return label(x, y, t, anchor, size).replace('<text ', '<text class="sd-hint" '); }
+  function leadH(x1, y1, x2, y2){ return lead(x1, y1, x2, y2).replace('<path ', '<path class="sd-hint" '); }
   function tag(x, y, t){ return label(x, y, t, 'middle', 9.5).replace('fill="'+INK+'"', 'fill="#8A7480" font-weight="600" letter-spacing=".08em"'); }
   function lead(x1, y1, x2, y2){ return '<path d="M'+x1+' '+y1+' L'+x2+' '+y2+'" stroke="#9C8890" stroke-width=".8"/>'; }
   /* interdental cross-section (buccal left, lingual right) */
@@ -905,7 +910,7 @@ var SUTURE_DIAGRAMS = (function(){
       hidden('M200 130 L200 88') + hidden('M120 88 L120 132') +
       thread('M200 88 C200 70 195 63 184 63 L136 63 C125 63 120 70 120 88') + thread('M108 158 C114 150 119 142 120 132') + thread('M200 130 C200 142 206 152 214 160') +
       hole(108, 158) + hole(216, 158) + knot(218, 166, 30) +
-      tag(160, 28, 'LINGUAL (NOT ENGAGED)') + tag(160, 194, 'BUCCAL FLAP') + label(60, 182, 'mesial papilla', 'middle', 9.5) + label(262, 182, 'distal papilla', 'middle', 9.5) + lead(70, 176, 104, 160) + lead(250, 176, 214, 168) + label(160, 108, 'tooth', 'middle', 10)),
+      tag(160, 28, 'LINGUAL') + hint(160, 42, '(not engaged)', 'middle', 9) + tag(160, 194, 'BUCCAL FLAP') + label(60, 182, 'mesial papilla', 'middle', 9.5) + label(262, 182, 'distal papilla', 'middle', 9.5) + lead(70, 176, 104, 160) + lead(250, 176, 214, 168) + label(160, 108, 'tooth', 'middle', 10)),
     'Occlusal view of one tooth. The needle enters the buccal papilla on one side, is carried around the lingual of the tooth neck, and comes through the papilla on the other side; it then goes back around the lingual and is tied on the buccal. Only the buccal flap is engaged, so it is repositioned independently.'];
 
   d['Criss-Cross'] = [plate(
@@ -928,19 +933,19 @@ var SUTURE_DIAGRAMS = (function(){
       hidden('M110 44 L110 86') + hidden('M210 44 L210 86') + thread('M110 86 L210 86') + thread('M110 44 L152 44') + thread('M168 44 L210 44') +
       hole(110, 44) + hole(210, 44) + hole(110, 86) + hole(210, 86) + knot(160, 44, 0) +
       tag(20, 126, 'SECTION THROUGH ONE BITE').replace('text-anchor="middle"', 'text-anchor="start"') + section(130) +
-      thread('M118 142 C118 196 202 196 202 142') + thread('M202 142 L232 142') + thread('M118 142 L100 138') + knot(98, 138, 190) + label(160, 214, 'passes deep, under the incision', 'middle', 9.5), 222),
+      thread('M118 142 C118 196 202 196 202 142') + thread('M202 142 L232 142') + thread('M118 142 L100 138') + knot(98, 138, 190) + hint(160, 214, 'passes deep, under the incision', 'middle', 9.5), 222),
     'Two bites side by side are joined on the surface parallel to the incision, with the knot on one side. It spreads tension, keeps the flap margin from inverting and is essential for larger bone augmentations. Tied too tight, it can choke the blood supply to the incision edge.'];
 
   d['Vertical Mattress'] = [plate(tag(20, 18, 'SURFACE').replace('text-anchor="middle"', 'text-anchor="start"') + surface(24, 82) +
       hidden('M155 30 L155 100') + hidden('M165 52 L165 78') + thread('M160 100 L160 78') + thread('M160 30 L160 38') + thread('M160 52 L160 46') +
       hole(160, 30) + hole(160, 52) + hole(160, 78) + hole(160, 100) + knot(160, 42, 90) +
-      label(196, 32, 'far', 'start', 9.5) + label(196, 55, 'near', 'start', 9.5) + label(196, 81, 'near', 'start', 9.5) + label(196, 103, 'far', 'start', 9.5) +
-      lead(166, 30, 192, 30) + lead(166, 52, 192, 52) + lead(166, 78, 192, 78) + lead(166, 100, 192, 100) +
+      hint(196, 32, 'far', 'start', 9.5) + hint(196, 55, 'near', 'start', 9.5) + hint(196, 81, 'near', 'start', 9.5) + hint(196, 103, 'far', 'start', 9.5) +
+      leadH(166, 30, 192, 30) + leadH(166, 52, 192, 52) + leadH(166, 78, 192, 78) + leadH(166, 100, 192, 100) +
       tag(20, 126, 'SECTION').replace('text-anchor="middle"', 'text-anchor="start"') +
       '<path d="M20 144 L146 144 Q156 142 156 134 L158 136 L158 204 L20 204 Z" fill="url(#sdCut)" stroke="#B85A6E"/><path d="M300 144 L174 144 Q164 142 164 134 L162 136 L162 204 L300 204 Z" fill="url(#sdCut)" stroke="#B85A6E"/>' +
       '<path d="M20 144 L146 144 Q156 142 156 134 M300 144 L174 144 Q164 142 164 134" stroke="#F6CAD1" stroke-width="2.4" fill="none"/>' +
       thread('M96 144 C96 214 224 214 224 144') + thread('M224 142 L190 142') + thread('M190 144 C190 168 130 168 130 144') + thread('M130 142 L113 136') + thread('M96 142 L109 136') + knot(111, 135, 90) +
-      label(160, 124, 'edges everted', 'middle', 9.5), 210),
+      hint(160, 124, 'edges everted', 'middle', 9.5), 210),
     'A deep far-far bite, then a shallow near-near bite back on the same line, tied on the side it started. It everts the edges and gives the closest approximation, so it is used for papillae in the esthetic zone and to close oro-antral communications.'];
 
   function ridge(){ return '<rect x="14" y="30" width="292" height="150" rx="40" fill="url(#sdGum)" stroke="#D891A1"/><path d="M34 105 Q160 101 286 105" stroke="#9C3A52" stroke-width="2" fill="none"/>' + tag(160, 22, 'EDENTULOUS RIDGE, CRESTAL INCISION') + tag(160, 198, 'TOP VIEW'); }
@@ -962,16 +967,16 @@ var SUTURE_DIAGRAMS = (function(){
       thread('M120 104 L132 144 L176 144 L188 104') + thread('M120 104 L146 98') + thread('M188 104 L162 98') + knot(154, 96, 0) +
       hole(120, 104) + hole(188, 104) +
       label(60, 126, 'split-thickness flap', 'middle', 9.5) + label(270, 136, 'periosteum', 'middle', 9.5) + lead(270, 139, 270, 143) + label(64, 180, 'bone', 'middle', 10) +
-      label(154, 166, 'bite through the periosteum', 'middle', 9.5) + lead(154, 158, 154, 147) +
+      hint(154, 166, 'bite through the periosteum', 'middle', 9.5) + leadH(154, 158, 154, 147) +
       tag(40, 30, 'CORONAL').replace('text-anchor="middle"', 'text-anchor="start"') + tag(282, 30, 'APICAL') + '<path d="M70 36 L250 36" stroke="#B9A4AD" stroke-width="1.2" marker-end="none"/><path d="M244 32 L252 36 L244 40" fill="none" stroke="#B9A4AD" stroke-width="1.2"/>' +
       label(160, 62, 'cross-section of the flap lying on bone', 'middle', 10)),
     'Cross-section. In a split-thickness flap the periosteum stays on the bone. The needle passes through the flap, takes a bite of periosteum, comes back up through the flap and is tied, so the flap stays where it was placed (apically or laterally).'];
 
   d['_strands'] = [plate(
       tag(160, 30, 'MONOFILAMENT') + '<rect x="30" y="42" width="260" height="20" rx="10" fill="url(#sdTube)"/><rect x="40" y="46" width="240" height="3.4" rx="1.7" fill="#fff" opacity=".7"/>' +
-      label(160, 82, 'chromic gut · PGCL · poly-propylene · PTFE', 'middle', 10) +
+      hint(160, 82, 'chromic gut · PGCL · poly-propylene · PTFE', 'middle', 10) +
       tag(160, 118, 'BRAIDED') + '<rect x="30" y="130" width="260" height="20" rx="10" fill="url(#sdBraid)"/><rect x="30" y="130" width="260" height="20" rx="10" fill="none" stroke="#1E2C70"/>' +
-      label(160, 170, 'silk · PGA', 'middle', 10) + label(160, 188, 'the weave wicks and traps bacteria', 'middle', 9.5)),
+      hint(160, 170, 'silk · PGA', 'middle', 10) + hint(160, 188, 'the weave wicks and traps bacteria', 'middle', 9.5)),
     'Monofilament is one smooth strand: less drag and less bacterial wicking. Braided thread is woven, so it handles beautifully but traps bacteria. That is why silk scores worst for tissue reaction; wipe a braided suture with chlorhexidine gauze before removing it.'];
   return d;
 })();
@@ -1601,6 +1606,21 @@ var QUESTIONS = [
 { id:'q1-S07', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Stage 1 complexity is a max PD of 4 mm or less with mostly horizontal bone loss.\n2. Stage 3 complexity adds PD ≥6 mm, vertical bone loss ≥3 mm, a Class II or III furcation and a moderate ridge defect.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true, straight from the 2018 AAP/EFP staging table. Stage 2 is the same as Stage 1 with a max PD of 5 mm.", src:'aap' },
 { id:'q1-S08', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. In a patient with diabetes, an HbA1c below 7% falls in the Grade C row.\n2. Smoking 10 or more cigarettes a day falls in the Grade C row.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: diabetes with HbA1c below 7.0% is the Grade B row; 7.0% or higher is Grade C. Statement 2 is true: fewer than 10 a day is the Grade B row, 10 or more Grade C.", src:'aap' },
 { id:'q1-S09', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Stage 4 requires more interdental CAL than Stage 3.\n2. Heavy biofilm with little destruction fits the Grade C case phenotype.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:1, ex:"Both are false. Stages 3 and 4 share the same CAL (≥5 mm) and bone-loss cutoffs; tooth loss and the complexity list separate them. Heavy biofilm with little destruction is the Grade A phenotype; Grade C is destruction beyond what the biofilm explains.", src:'aap' },
+/* Suture-diagram questions (2026-10-01): the midterm showed suture pictures; q.img draws SUTURE_DIAGRAMS[img] above the stem */
+{ id:'q2-D01', lec:'incisions-flaps-sutures', type:'mcq', img:'Single Interrupted', stem:"Which suturing technique is shown in this cross-section between two teeth?", choices:['Simple loop (interrupted)','Figure-of-eight','Sling','Vertical mattress'], answer:0, ex:"A simple loop: the thread goes in through the outer surface of the buccal flap, out through the lingual flap, and back over both papillae to a knot on the buccal, so it makes one loop with no crossing. In a figure-of-eight the thread would cross between the flaps.", src:'lecture' },
+{ id:'q2-D02', lec:'incisions-flaps-sutures', type:'mcq', img:'Figure-Eight', stem:"Which suturing technique is shown in this cross-section between two teeth?", choices:['Figure-of-eight','Simple loop (interrupted)','Horizontal mattress','Criss-cross'], answer:0, ex:"Figure-of-eight: the needle enters both flaps from their outer surfaces, so the thread crosses between the flaps. A simple loop makes one loop around both papillae without crossing.", src:'lecture' },
+{ id:'q2-D03', lec:'incisions-flaps-sutures', type:'mcq', img:'Figure-Eight', stem:"When is the technique shown preferred over a simple loop?", choices:['When the flaps do not meet closely, as with an apically positioned flap','When maximal eversion of the papillae is needed','When only the buccal flap should be moved','When closing a long edentulous span'], answer:0, ex:"Figure-of-eight leaves thread between the flaps, so it is used when they will not be in close apposition (apically positioned flaps, scalloped incisions). Eversion is the vertical mattress; moving one flap alone is the sling; long spans are continuous sutures.", src:'lecture' },
+{ id:'q2-D04', lec:'incisions-flaps-sutures', type:'mcq', img:'Sling', stem:"Which suturing technique is shown (occlusal view, one tooth)?", choices:['Sling','Continuous locking','Horizontal mattress','Figure-of-eight'], answer:0, ex:"Sling: the thread goes through the buccal papillae on each side and wraps around the lingual of the tooth, so it never passes through the lingual tissue.", src:'lecture' },
+{ id:'q2-D05', lec:'incisions-flaps-sutures', type:'mcq', img:'Sling', stem:"What does the technique shown let you do?", choices:['Reposition the buccal flap without engaging the lingual','Evert the wound edges as much as possible','Hold a graft in an extraction socket','Anchor the flap to the periosteum'], answer:0, ex:"Because the sling wraps around the tooth instead of the lingual flap, one flap (or papilla) is repositioned on its own. Eversion is the vertical mattress, a socket graft is the criss-cross, periosteal anchorage holds a flap to periosteum.", src:'lecture' },
+{ id:'q2-D06', lec:'incisions-flaps-sutures', type:'mcq', img:'Criss-Cross', stem:"Which suturing technique is shown over this extraction socket?", choices:['Criss-cross','Horizontal mattress','Figure-of-eight','Simple continuous'], answer:0, ex:"Criss-cross: in mesiobuccal, out distobuccal, across the socket, in mesiolingual, out distolingual, tied at the start. The X sits on top of the socket and the two side passes run under the tissue; it is a crossed horizontal mattress.", src:'lecture' },
+{ id:'q2-D07', lec:'incisions-flaps-sutures', type:'mcq', img:'Horizontal Mattress', stem:"Which suturing technique is shown?", choices:['Horizontal mattress','Vertical mattress','Simple loop (interrupted)','Continuous locking'], answer:0, ex:"Horizontal mattress: two bites side by side, joined on the surface parallel to the incision, with the knot on one side; in section the thread passes deep under the incision. A vertical mattress puts its two bites on one line across the incision.", src:'lecture' },
+{ id:'q2-D08', lec:'incisions-flaps-sutures', type:'mcq', img:'Horizontal Mattress', stem:"Tying the suture shown too tight risks:", choices:['Bone necrosis and dehiscence','Inversion of the flap margin','The whole line coming undone','Bacteria wicking along the thread'], answer:0, ex:"Overtightening a horizontal mattress constricts the blood supply to the incision edge, risking bone necrosis and dehiscence. Done right, it prevents flap-margin inversion; a whole line coming undone is the continuous suture's risk; wicking is a braided-thread problem.", src:'lecture' },
+{ id:'q2-D09', lec:'incisions-flaps-sutures', type:'mcq', img:'Vertical Mattress', stem:"Which suturing technique is shown?", choices:['Vertical mattress','Horizontal mattress','Figure-of-eight','Periosteal anchorage'], answer:0, ex:"Vertical mattress: a deep far-far bite and a shallow near-near bite on the same line across the incision, tied on the side it started. The two loops evert the edges.", src:'lecture' },
+{ id:'q2-D10', lec:'incisions-flaps-sutures', type:'mcq', img:'Vertical Mattress', stem:"Where is the technique shown especially useful?", choices:['Approximating papillae in the esthetic zone','Long edentulous spans','Stabilizing a collagen membrane over a socket','Repositioning a single buccal papilla'], answer:0, ex:"The vertical mattress gives maximal approximation and eversion, so it is used for papillae in the esthetic zone and to close oro-antral communications. Long spans take continuous sutures; a single papilla can be slung.", src:'lecture' },
+{ id:'q2-D11', lec:'incisions-flaps-sutures', type:'mcq', img:'Continuous', stem:"Which suturing technique is shown along this ridge?", choices:['Simple continuous','Continuous locking','Interrupted','Criss-cross'], answer:0, ex:"Simple continuous: one thread with knots only at the ends, running diagonally on the surface and straight across underneath. A locking suture would loop through each previous stitch along one edge.", src:'lecture' },
+{ id:'q2-D12', lec:'incisions-flaps-sutures', type:'mcq', img:'Continuous Locking', stem:"Which suturing technique is shown along this ridge?", choices:['Continuous locking','Simple continuous','Horizontal mattress','Criss-cross'], answer:0, ex:"Continuous locking: before each new bite, the needle passes through the loop of the previous stitch, so the line locks along one edge (used for long edentulous spans, tuberosity and retromolar areas).", src:'lecture' },
+{ id:'q2-D13', lec:'incisions-flaps-sutures', type:'mcq', img:'Periosteal Anchorage', stem:"Which suturing technique is shown in this cross-section?", choices:['Periosteal anchorage','Vertical mattress','Sling','Simple loop (interrupted)'], answer:0, ex:"Periosteal suture: in a split-thickness flap the periosteum stays on the bone, and the needle takes a bite of it under the flap, holding the flap where it was placed (apically or laterally).", src:'lecture' },
+{ id:'q2-D14', lec:'incisions-flaps-sutures', type:'mcq', img:'_strands', stem:"The lower thread is braided, the upper one monofilament. Which material on the course chart is braided and non-resorbable?", choices:['Silk','PTFE','Poly-propylene','Chromic gut'], answer:0, ex:"Silk is natural, braided and non-resorbable (out at 7 days), with the worst tissue reaction on the chart because the weave traps bacteria. PTFE and poly-propylene are non-resorbable monofilaments; chromic gut is a resorbable monofilament.", src:'lecture' },
 { id:'q1-E01', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following place a case in at least Stage 3, regardless of the CAL numbers, EXCEPT:", choices:['Generalized 6 mm pockets with no bone loss','A vertical bone defect of 3 mm or more','A Class II furcation','A tooth lost to periodontitis'], answer:0, ex:"Deep pockets alone never stage a case: without confirmed attachment and bone loss they could be gingivitis. Vertical bone loss ≥3 mm, Class II-III furcation involvement and any tooth lost to periodontitis each force Stage 3/4 regardless of the CAL math.", src:'lecture' },
 { id:'q1-E02', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following are true of grading EXCEPT:", choices:['Not smoking lowers the grade to A','Grade B is assumed by default','An HbA1c of 7% or higher means Grade C','A bone-loss/age ratio over 1.0 suggests Grade C'], answer:0, ex:"Smoking and HbA1c can only push a grade up; a non-smoker without diabetes does not earn a downgrade. Grade B is the default until evidence shifts it, and a ratio over 1.0 or an HbA1c ≥7% points to Grade C.", src:'lecture' },
 { id:'q2-E01', lec:'incisions-flaps-sutures', type:'mcq', fmt:'except', stem:"All of the following are true of silk sutures EXCEPT:", choices:['They resorb within about 7-10 days','They are braided','They handle very well','They come out at about 7 days'], answer:0, ex:"Silk is non-resorbable, so it has to be removed (at 7 days). The 7-10 day resorption is chromic gut. Silk is natural and braided, handles beautifully, and has the worst tissue reaction on the course chart.", src:'lecture' },
@@ -3421,7 +3441,7 @@ function statusHTML(l){ var s = STATUS_LABEL[l.status]; return '<span class="sta
 var SEQ_STATE = {}, MATCH_STATE = {};
 function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
-  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+'</div>';
+  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.img?'<span class="chip src">Diagram</span>':'')+'</div>';
 }
 /* class-wide % sits inside the explanation, so it only appears once the student has answered */
 var CLASS_ROW = '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div>';
@@ -3467,9 +3487,11 @@ function qCardHTML(q){
   }
   var hint = q.type === 'sequence' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap the steps in order.</div>' : q.type === 'match' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap a left item, then its partner.</div>' : q.type === 'multi' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Select every correct answer, then check. Partial credit.</div>' : '';
   return '<div class="qcard tag-'+lec.tag+'" data-qid="'+q.id+'" data-qtype="'+q.type+'">' + qMeta(q) +
-    pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body + '</div>';
+    pboxHTML(q) + figHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + hint + body + '</div>';
 }
 /* Patient Box: the case-based format named in the midterm email */
+/* suture-diagram questions: q.img names a SUTURE_DIAGRAMS entry; labels that give the answer away (.sd-hint) are hidden */
+function figHTML(q){ return q.img && SUTURE_DIAGRAMS[q.img] ? '<div class="qcard-figure">' + SUTURE_DIAGRAMS[q.img][0] + '</div>' : ''; }
 function pboxHTML(q){
   if(!q.pbox) return '';
   return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
@@ -3642,7 +3664,7 @@ var REF_SECTIONS = [
   { id:'suture-techniques', lec:'incisions-flaps-sutures', title:'Suturing techniques', body:function(){ return tableWrap(['Technique','Notes'], rowsOf(SUTURE_TECHNIQUES,['name','note'])); } },
   { id:'suture-diagrams', lec:'incisions-flaps-sutures', title:'Suture diagrams', body:function(){
     var names = ['Single Interrupted','Figure-Eight','Sling','Criss-Cross','Horizontal Mattress','Vertical Mattress','Continuous','Continuous Locking','Periosteal Anchorage'];
-    return '<p class="note">Illustrations made for the hub, not taken from the course slides. Solid thread is on the surface, dashed thread runs under the tissue, and the dark blob is the knot.</p>' + SUTURE_DEFS + '<div class="sut-grid">' +
+    return '<p class="note">Illustrations made for the hub, not taken from the course slides. Solid thread is on the surface, dashed thread runs under the tissue, and the dark blob is the knot.</p>' + '<div class="sut-grid">' +
       names.concat(['_strands']).map(function(n){ var dg = SUTURE_DIAGRAMS[n]; return '<figure class="sut-fig">' + dg[0] + '<figcaption><b>' + escHtml(n === '_strands' ? 'Monofilament vs braided' : n) + '</b><span>' + escHtml(dg[1]) + '</span></figcaption></figure>'; }).join('') + '</div>'; } },
   { id:'incisions', lec:'incisions-flaps-sutures', title:'Incision types', body:function(){ return tableWrap(['Incision','Notes'], rowsOf(INCISION_TYPES,['name','note'])); } },
   { id:'flaps', lec:'incisions-flaps-sutures', title:'Flap designs', body:function(){ return '<p class="note" style="margin:0 0 10px">Flaps are also classified by: ' + FLAP_CLASSIFICATION_AXES.map(escHtml).join('; ') + '.</p>' + tableWrap(['Design','Notes'], rowsOf(FLAP_DESIGNS,['name','note'])) + '<p class="note"><b>Five surgical principles:</b> ' + SURGICAL_PRINCIPLES.map(escHtml).join(' · ') + '</p>'; } },
@@ -3876,6 +3898,7 @@ function filteredQuestions(){
   return QUESTIONS.filter(function(q){
     if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
     if(QBANK_FILTER.type === 'pbox'){ if(!q.pbox) return false; }
+    else if(QBANK_FILTER.type === 'img'){ if(!q.img) return false; }
     else if(QBANK_FILTER.type === '2stmt' || QBANK_FILTER.type === 'except'){ if(q.fmt !== QBANK_FILTER.type) return false; }
     else if(QBANK_FILTER.type !== 'all' && q.type !== QBANK_FILTER.type) return false;
     var a = STATE.answered[q.id];
@@ -3893,7 +3916,7 @@ function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
     '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
-    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['2stmt','Two-statement'],['except','EXCEPT / NOT'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['img','Suture diagrams'],['2stmt','Two-statement'],['except','EXCEPT / NOT'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
     '<div class="qcount" id="qbCount" style="margin-bottom:12px"></div><div class="qlist" id="qbankList"></div>';
@@ -3997,7 +4020,7 @@ function examCardHTML(q, n){
     choiceOrder(q).forEach(function(i){ body += '<button type="button" class="qcard-choice" data-exam-choice="'+i+'" data-qid="'+q.id+'"'+(a===i?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
     body += '</div>';
   }
-  return '<div class="qcard tag-'+l.tag+'"><div class="qcard-top"><span class="chip src">Q'+n+'</span>'+sessChip(l)+(q.pbox?'<span class="chip src">Patient box</span>':'')+(q.type!=='mcq'?'<span class="chip src">'+EXAM_KIND_LABEL[q.type]+'</span>':'')+'</div>'+pboxHTML(q)+'<p class="qcard-stem">'+escHtml(q.stem)+'</p>'+note+body+'</div>';
+  return '<div class="qcard tag-'+l.tag+'"><div class="qcard-top"><span class="chip src">Q'+n+'</span>'+sessChip(l)+(q.pbox?'<span class="chip src">Patient box</span>':'')+(q.img?'<span class="chip src">Diagram</span>':'')+(q.type!=='mcq'?'<span class="chip src">'+EXAM_KIND_LABEL[q.type]+'</span>':'')+'</div>'+pboxHTML(q)+figHTML(q)+'<p class="qcard-stem">'+escHtml(q.stem)+'</p>'+note+body+'</div>';
 }
 function renderMockExam(){
   if(window.shTTS) window.shTTS.stop();
@@ -4399,7 +4422,7 @@ var ARCADE = (function(){
     if(scope === 'all') return LECTURES.map(function(l){ return l.id; });
     return [scope];
   }
-  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && q.fmt !== '2stmt' && ids.indexOf(q.lec) > -1; }); }
+  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && !q.img && q.fmt !== '2stmt' && ids.indexOf(q.lec) > -1; }); }
   function termPool(scope, filter){ var ids = scopeLecs(scope); return PERIO_TERMS.filter(function(t){ return ids.indexOf(t.lec) > -1 && (!filter || filter(t)); }); }
   function scopeSelectHTML(kind, min){
     min = min || 6;
@@ -5646,6 +5669,7 @@ window.SH_SECTION = function(){
   return m;
 };
 function boot(){
+  if(!document.getElementById('sdGum')) document.body.insertAdjacentHTML('beforeend', SUTURE_DEFS);
   document.querySelectorAll('[data-ic]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-ic')); });
   /* sh_theme is the site-wide choice shared with the dashboard; STATE.theme is this hub's old copy */
   var t0 = null; try{ t0 = localStorage.getItem('sh_theme'); }catch(e){}
