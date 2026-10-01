@@ -3,8 +3,10 @@
 Keeps `LESSONS.md` current from **all** tracked data, student reports and suggestions, and pushes anything worth it
 out to the live hubs. It runs:
 
-- **When Sam asks** ("run the lessons refresh") in a Claude Code session with the Supabase connector. There is no
-  scheduled routine (Sam cancelled it 2026-09-29 in favour of running it by hand).
+- **When Sam asks** ("run the lessons refresh", "lessons audit", or `/lessons-audit`) in a Claude Code session with
+  the Supabase connector. The `lessons-audit` skill (`.claude/skills/lessons-audit/SKILL.md`) is the step-by-step way
+  to run it, with `tools/dump-banks.js` and `tools/lessons-join.py`. There is no scheduled routine (Sam cancelled it
+  2026-09-29 in favour of running it by hand).
 - **Before building a new hub**: whatever session builds it (Claude Code, Cowork, a hub's Claude Project) runs
   steps 1-3 itself first if `LESSONS.md`'s "Last refreshed" date is not today, so the new hub starts from the latest
   data. Steps 4-5 can wait for the next full run.

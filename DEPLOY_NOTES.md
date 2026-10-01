@@ -76,6 +76,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (lessons-audit skill, Claude Code)** — `/lessons-audit` (`.claude/skills/lessons-audit/SKILL.md`) runs the
+  lessons refresh on demand in a Claude Code session: all data plus "since last time", a check of whether the last
+  refresh's fixes worked, reading every hard question, safe explanation edits, `LESSONS.md`, a draft PR and draft replies
+  to reports. Helpers: `tools/dump-banks.js <dir>` (each live hub's QUESTIONS/LECTURES as JSON, the CI lint's hook) and
+  `tools/lessons-join.py` (accuracy by lecture/type/source and the hardest items with their favourite wrong answer).
+  No site change.
+
 - **2026-09-30 (bronze without patina, Claude Code)** — The green patina specks are gone from the Bronze handpiece
   medallion too (`filters()` in `widget/ranks.js`); Sam found them ugly. Accent tiles were already clean.
 
