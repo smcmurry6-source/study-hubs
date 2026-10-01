@@ -50,7 +50,7 @@
       return new Date(y, Math.floor((h + l - 7 * mm + 114) / 31) - 1, ((h + l - 7 * mm + 114) % 31) + 1); }
     var today = new Date(y, m - 1, d).getTime();
     function near(at, b, a){ var t = at.getTime(); return today >= t - b * 864e5 && today <= t + a * 864e5; }
-    if (x >= 1024 && x <= 1031) return "halloween";
+    if (x >= 1001 && x <= 1031) return "halloween";
     if (near(nthThu(y), 6, 1)) return "thanksgiving";
     if (x >= 1210 && x <= 1230) return "winter";
     if (x === 1231 || x <= 102) return "newyear";

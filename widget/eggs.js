@@ -81,7 +81,7 @@
   function around(at, before, after){ return function(d){ var t = d.getTime(), a = at(d.getFullYear()).getTime(); return t >= a - before * 864e5 && t <= a + after * 864e5; }; }
   function md(m1, d1, m2, d2){ return function(d){ var x = (d.getMonth() + 1) * 100 + d.getDate(), a = m1 * 100 + d1, b = m2 * 100 + d2; return a <= b ? x >= a && x <= b : x >= a || x <= b; }; }
   var HOLIDAYS = [
-    { id: "halloween", name: "Halloween", on: md(10, 24, 10, 31), word: "fangs", shape: "bat", boss: "Count Plaqula",
+    { id: "halloween", name: "Halloween", on: md(10, 1, 10, 31), word: "fangs", shape: "bat", boss: "Count Plaqula",
       colors: ["#F59A1E", "#7A3CC2", "#2B1B3D", "#9BE15D", "#F5D21E"], confetti: "candy",
       line: "A bat colony just flew through your notes. Happy Halloween!" },
     { id: "thanksgiving", name: "Thanksgiving", on: around(function(y){ return nthWeekday(y, 10, 4, 4); }, 6, 1), word: "gobble", shape: "leaf", boss: "Pilgrim Plaque",
