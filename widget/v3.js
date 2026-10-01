@@ -559,6 +559,11 @@
     });
     return eve;
   }
+  /* true on the (local) day of any of this hub's exams (SH_EXPORT.exams) */
+  function isExamDay(){
+    var today = srsDay(0);
+    return ((window.SH_EXPORT && window.SH_EXPORT.exams) || []).some(function(x){ return x && x.date === today; });
+  }
   function srsDue(b){ var due = srsDay(b ? SRS_STEPS[b - 1] : 1), eve = srsExamEve(); return eve && due > eve ? eve : due; }
   function srsRecord(qid, correct){
     if (!qid) return;
@@ -967,6 +972,7 @@
   });
   channel.on("broadcast", { event: "nuke" }, function(msg){
     if (prefGet(SH_NUKE_PREF_KEY, "on") !== "on") return;
+    if (isExamDay()) return;
     var payload = (msg && msg.payload) || {};
     playNukeSequence(payload.name || "Someone");
   });
@@ -1283,7 +1289,8 @@
     nukeReady = false;
     shNukeSfx.play("launch");
     safeRpc("record_nuke_launch", { p_hub: HUB, p_visitor: VISITOR_ID, p_name: name });
-    try { if (channel) channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {}
+    // On exam day the strike plays only for the person who launched it, so classmates cramming aren't interrupted.
+    if (!isExamDay()) { try { if (channel) channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {} }
     playNukeSequence(name);
   }
   function playNukeSequence(name){
