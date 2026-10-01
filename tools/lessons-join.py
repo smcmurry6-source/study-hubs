@@ -6,7 +6,7 @@
 <banks-dir> comes from `node tools/dump-banks.js <dir>`. <stats.json> is the saved result of the "stats" query in
 .claude/skills/lessons-audit/SKILL.md: {"q": [{hub, qid, attempts, correct}], "choices": [{hub, qid, choice, picks}]}
 (the raw connector output also works; the JSON is found inside it). Prints accuracy by lecture, type and source, and the
-hardest questions with their most-picked wrong answer. Choice indexes are the bank's own (as stored by record_choice).
+hardest questions with their most-picked wrong answer. Choice indexes are the bank's own (record_choice for MCQs; record_choices, one row per ticked option, for select-alls).
 """
 import json, sys, os
 from collections import defaultdict
@@ -60,4 +60,9 @@ for f in sorted(os.listdir(banks_dir)):
             wrong = sorted(((n, i) for i, n in p.items() if i != q['answer']), reverse=True)
             if wrong:
                 line += f"\n         favourite wrong: {q['choices'][wrong[0][1]][:70]!r} x{wrong[0][0]}  (key: {q['choices'][q['answer']][:50]!r})"
+        elif q['type'] == 'multi' and p:
+            # select-all rows count ticks per option (record_choices, from 2026-10-01)
+            ticks = ', '.join(f"{'+' if i in q['correct'] else '-'}{q['choices'][i][:30]!r} x{n}"
+                              for n, i in sorted(((n, i) for i, n in p.items() if i < len(q['choices'])), reverse=True))
+            line += f"\n         ticks (+ key, - wrong): {ticks}"
         print(line)

@@ -100,8 +100,8 @@ its best day). 26 mocks from 14 people on 09-30, averaging 86%.
   82% lecture. By type: select-all 64%, matching 75%, MCQ 83%.
 - **Select-all and Patient Box items are now the hardest and getting worse under exam-eve traffic**: `q1-P05` (staging
   triggers, 3 of 6 correct) 44% before, 3 of 15 since; `q2-P01` (augmentation flap, 4 of 7) 50% before, 11 of 34
-  since; `q4-M05` 8 of 20 since. Their keys check out against the notes. Which option trips people can't be seen:
-  `question_choices` records only single-answer picks.
+  since; `q4-M05` 8 of 20 since. Their keys check out against the notes. Per-option ticks are recorded from 10-01 on
+  (`record_choices`), and `q3-M01`, `q2-P01`, `q1-M03` were cut to 5 options the same morning.
 - `q4-L11` passive eruption 54% (14 picked "a tooth extruding after losing its antagonist"); `q3-47` resistant share
   46% (13 picked "About 25%", the slide's non-responder figure, which the explanation already separates; 10 of 25
   since). `q3-04` McGuire & Nunn up from 38% to 21 of 33 (64%) since.
@@ -133,7 +133,8 @@ it on the dashboard and 5 in perio since yesterday.
   barely work:** MSK's six-step sequences sat at 16-23% over 17-30 attempts each (09-30) even with per-step feedback,
   because one misplaced step makes the whole item wrong. **Select-all questions with many options are the same trap**
   (perio `q3-M01`, 5 of 7 options correct: 20%); keep them to 4-5 options, and name every option in the explanation. Patient Box select-alls are the worst of all under exam pressure (perio `q1-P05` 3 of 15 right, `q2-P01`
-  11 of 34 on midterm eve), and their per-option picks aren't recorded, so a misconception can't be seen. **Never give two left items
+  11 of 34 on midterm eve), and until 2026-10-01 their per-option picks weren't recorded. From then on `question_choices` has one row per ticked
+  option (`record_choices`), and the three 7-option perio items are down to 5 options, 3 correct: compare after the final. **Never give two left items
   the same right-hand answer** unless grading compares text: perio `q4-L27` had "4-6 weeks" twice, and picking
   the other copy was marked wrong (20% correct; grading compares text since 2026-09-29).
 - **The last lectures before the exam get the least practice and score lowest.** GI2's GI Pharm and GI Path were

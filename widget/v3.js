@@ -1153,6 +1153,8 @@
     /* which option was picked (its authored index, 0 = the key), for the admin page's
        "most popular wrong answer"; hubs send it for bank and mock-exam MCQs */
     if (typeof d.choice === "number") safeRpc("record_choice", { p_hub: HUB, p_qid: String(d.qid || ""), p_choice: d.choice });
+    /* select-all questions: every option ticked (authored indexes), one row per option in question_choices */
+    else if (Array.isArray(d.picks) && d.picks.length) safeRpc("record_choices", { p_hub: HUB, p_qid: String(d.qid || ""), p_choices: d.picks });
     safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
     if (isCorrect) {
