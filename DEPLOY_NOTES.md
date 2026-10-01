@@ -76,6 +76,17 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (select-all picks + shorter select-alls, Claude Code)** — **Select-all questions now record which options
+  were ticked**: perio's `recordAnswer` passes the ticked indexes (practice and mock exam) as `detail.picks`, and
+  `widget/v3.js` sends them in one call to `record_choices` (`migration_v28.sql`, applied via the connector), one
+  `question_choices` row per option. For a multi item a row's `picks` = times that option was ticked (none before
+  today). Perio's `SH_EXPORT` questions carry `correct` for multi items; `review/` shows a select-all's key and its
+  most-ticked wrong option; `tools/lessons-join.py` lists ticks per option (+ key, - wrong). **Any hub with select-alls:
+  pass the ticked array as the 4th argument of its answer call.** The three 7-option select-alls are now 5 options with
+  3 correct (standing lesson): perio `q3-M01` (UniFe), `q2-P01` (augmentation flap), `q1-M03` (Phase I); ids kept, so
+  their `question_stats` mix both versions from today. `sw.js` → `sh-v10`. **Perio Project: carry these into the split
+  sources.**
+
 - **2026-10-01 (third lessons refresh, Claude Code)** — Midterm-morning refresh. Perio `q3-P02` (report #10): the Patient
   Box now lists the radiographs ("Deep, narrow vertical bone defects on those teeth", as the notes describe the case) and
   the explanation walks stage, extent and grade from the box. Explanations now name the tempting wrong option on perio

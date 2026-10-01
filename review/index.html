@@ -626,10 +626,13 @@ table.data tr.group:hover td{background:none;}
     document.body.appendChild(f);
   }
   function topWrong(hub, qid){
-    var q = QTEXT[hub + "|" + qid]; if (!q || !q.choices || q.answer == null) return null;
+    var q = QTEXT[hub + "|" + qid]; if (!q || !q.choices) return null;
+    /* select-all: rows count how often each option was ticked; wrong = an option not in the key */
+    var isKey = Array.isArray(q.correct) ? function(i){ return q.correct.indexOf(i) > -1; } : q.answer != null ? function(i){ return i === q.answer; } : null;
+    if (!isKey) return null;
     var best = null;
     (data.choices && data.choices.data || []).forEach(function(c){
-      if (c.hub === hub && c.qid === qid && c.choice !== q.answer && (!best || c.picks > best.picks)) best = c;
+      if (c.hub === hub && c.qid === qid && !isKey(c.choice) && (!best || c.picks > best.picks)) best = c;
     });
     return best && q.choices[best.choice] ? { text: q.choices[best.choice], picks: best.picks } : null;
   }
@@ -640,7 +643,8 @@ table.data tr.group:hover td{background:none;}
         var q = QTEXT[r.hub + "|" + r.qid], w = topWrong(r.hub, r.qid);
         var cell = '<span class="mono">' + esc(r.qid) + '</span>' + (q ? '<div class="qtext">' + esc(q.text) + '</div>' +
           (q.choices && q.answer != null ? '<div class="qkey">Key: ' + esc(q.choices[q.answer]) + '</div>' : '') +
-          (w ? '<div class="qwrong">Most picked wrong: ' + esc(w.text) + ' (' + w.picks + ')</div>' : '') : '');
+          (q.choices && Array.isArray(q.correct) ? '<div class="qkey">Key: ' + esc(q.correct.map(function(i){ return q.choices[i]; }).join('; ')) + '</div>' : '') +
+          (w ? '<div class="qwrong">' + (Array.isArray(q.correct) ? 'Most ticked wrong option: ' : 'Most picked wrong: ') + esc(w.text) + ' (' + w.picks + ')</div>' : '') : '');
         return '<tr><td class="lbl">' + cell + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.attempts) + '</td><td class="n">' + r.pct + '%</td><td class="barcell">' + bar(r.pct, 100, r.pct < 50, r.pct + "% correct") + '</td></tr>';
       }).join("") + '</tbody></table></div>';
   }

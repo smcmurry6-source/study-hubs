@@ -219,6 +219,20 @@ begin
 end;
 $$;
 
+-- select-all questions: one pick per ticked option (migration_v28)
+create or replace function public.record_choices(p_hub text, p_qid text, p_choices integer[])
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if p_hub is null or p_qid is null or p_choices is null
+     or cardinality(p_choices) = 0 or cardinality(p_choices) > 10 then return; end if;
+  insert into question_choices (hub, qid, choice, picks)
+  select p_hub, p_qid, c, 1 from (select distinct unnest(p_choices) c) x where c between 0 and 9
+  on conflict (hub, qid, choice) do update set picks = question_choices.picks + 1;
+end;
+$$;
+
+grant execute on function public.record_choices(text, text, integer[]) to anon, authenticated;
+
 create or replace function public.record_personal_answer(p_visitor text, p_hub text, p_qid text, p_correct boolean)
 returns void language plpgsql security definer set search_path = public as $$
 begin
