@@ -311,12 +311,87 @@
     { k: "konami",       n: "Cheat Code",           d: "Enter the Konami code",                ic: "M12 4v16M12 4l-5 5M12 4l5 5", secret: true, clue: "Old-school gamers know it: ↑ ↑ ↓ ↓ ← → ← → B A. On a phone, swipe it and tap twice." },
     { k: "floss",        n: "Floss Boss",           d: "Type the magic word",                  ic: "M4 18c4-10 12-10 16 0M8 8l-2-4M16 8l2-4", secret: true, clue: "Type the one thing your hygienist always asks whether you have been doing." },
     { k: "prof",         n: "Office Hours",         d: "Get a professor to quote themselves",  ic: "M4 5h16v11H9l-5 4zM8 10h8", secret: true, clue: "Professors repeat themselves. Tap one's name, a few times, quickly." },
-    { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." }
+    { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." },
+    { k: "mirror",       n: "Indirect Vision",      d: "See the hub the way you see a maxillary molar", ic: "M12 4a5 5 0 1 0 0 10 5 5 0 1 0 0-10zM12 14v7M9 21h6", secret: true, clue: "Your most-used instrument shows everything backwards. Type its name." },
+    { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
+    { k: "flosschain",   n: "Floss Chain",          d: "Floss with two classmates at once",    ic: "M3 14c3-4 6-4 9 0s6 4 9 0M6 9v2M12 7v2M18 9v2", secret: true, clue: "The magic word works better with friends. Three of you, in the same hub, within a minute." },
+    { k: "cavity",       n: "Restorative",          d: "Find the week's hidden cavity",        ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5zM12 9.5h.01", secret: true, clue: "Each week a tiny dark spot hides somewhere in one hub's Lecture Notes. Only five people get to fill it." },
+    { k: "holiday",      n: "Holiday Spirit",       d: "Say the season's magic word",          ic: "M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6", secret: true, clue: "Around a holiday the hubs dress up. Each holiday has its own magic word: type it." },
+    { k: "pet-perfect",  n: "Pearly Whites",        d: "Keep your tooth buddy at full health", ic: "M12 3l1.8 4.2 4.6.4-3.5 3 1 4.4L12 12.8 8.1 15l1-4.4-3.5-3 4.6-.4z", secret: true, clue: "Got a tooth buddy on the dashboard? Get them to 100 HP." },
+    { k: "pet-revive",   n: "Full Recovery",        d: "Nurse your tooth buddy from 0 HP back to 100", ic: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10zM9 11h6M12 8v6", secret: true, clue: "Even a tooth at rock bottom can come back. It takes a real treatment plan." }
   ];
   var MASTERY = [
     { k: "mastery-bronze", n: "Bronze", pct: .5 }, { k: "mastery-silver", n: "Silver", pct: .75 },
     { k: "mastery-gold", n: "Gold", pct: .9 }, { k: "mastery-crown", n: "Crown", pct: 1 }
   ];
+
+  /* ---------- mastery flair: a medal per hub mastered, next to your name on every leaderboard ----------
+     The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31). */
+  var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
+    "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros" };
+  function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
+  var MEDAL = {
+    1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
+    2: ["#3E4650", "#8E98A3", "#E4E9EE", "#FFFFFF"],
+    3: ["#5A3905", "#B58309", "#F6CD55", "#FFF6CF"]
+  };
+  var fuid = 0;
+  function medalSvg(lvl, px){
+    var p = "shfl" + (++fuid) + "-";
+    if (lvl >= 4) {
+      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
+        '<linearGradient id="' + p + 'c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B8"/><stop offset=".45" stop-color="#F2C230"/><stop offset="1" stop-color="#A6740A"/></linearGradient></defs>' +
+        '<path d="M2.6 15.4 L3.4 6.2 L7.4 9.8 L10 3.6 L12.6 9.8 L16.6 6.2 L17.4 15.4 Z" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1" stroke-linejoin="round"/>' +
+        '<rect x="2.6" y="14.2" width="14.8" height="3" rx="1" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1"/>' +
+        '<circle cx="10" cy="3.4" r="1.2" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".7"/><circle cx="3.3" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/><circle cx="16.7" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/>' +
+        '<circle cx="10" cy="15.7" r="1" fill="#E0457B"/><circle cx="6.2" cy="15.7" r=".8" fill="#3FA7E0"/><circle cx="13.8" cy="15.7" r=".8" fill="#3FA7E0"/>' +
+        '<path d="M5 8.6 L6.6 13" stroke="#FFFBE6" stroke-width=".8" stroke-linecap="round" opacity=".8"/></svg>';
+    }
+    var m = MEDAL[lvl] || MEDAL[1];
+    return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
+      '<radialGradient id="' + p + 'm" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="' + m[3] + '"/><stop offset=".45" stop-color="' + m[2] + '"/><stop offset="1" stop-color="' + m[1] + '"/></radialGradient></defs>' +
+      '<path d="M6 12.5 L4.6 19 L7.2 17.6 L8.6 19.6 L9.6 13.4 Z" fill="#C2414B"/><path d="M14 12.5 L15.4 19 L12.8 17.6 L11.4 19.6 L10.4 13.4 Z" fill="#2F5FA8"/>' +
+      '<circle cx="10" cy="8.4" r="7" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width="1"/>' +
+      '<circle cx="10" cy="8.4" r="5.1" fill="none" stroke="' + m[0] + '" stroke-opacity=".45" stroke-width=".7"/>' +
+      '<path d="M7.6 5.6c-.9 0-1.5.7-1.5 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.5-1.7-.8 0-1.2.4-2.4.4s-1.5-.4-2.4-.4z" fill="#fff" fill-opacity=".92" stroke="' + m[0] + '" stroke-width=".55" stroke-linejoin="round"/></svg>';
+  }
+  function parseFlair(s){
+    return String(s || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
+      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
+  }
+  /* the badges list from get_rank_profile ("mastery-gold:perio", ...) -> the same flair string the boards return */
+  function flairFromBadges(badges){
+    var best = {};
+    (badges || []).forEach(function(b){
+      var parts = String(b).split(":"), i = -1;
+      MASTERY.forEach(function(m, j){ if (m.k === parts[0]) i = j; });
+      if (i >= 0 && parts[1]) best[parts[1]] = Math.max(best[parts[1]] || 0, i + 1);
+    });
+    return Object.keys(best).sort(function(a, b){ return best[b] - best[a] || (a < b ? -1 : 1); }).map(function(h){ return h + ":" + best[h]; }).join(",");
+  }
+  function flairCss(){
+    if (document.getElementById("sh-flair-css")) return;
+    var st = document.createElement("style"); st.id = "sh-flair-css";
+    st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-3px;margin:0 3px;white-space:nowrap}' +
+      '.sh-flair-m{display:inline-flex;width:16px;height:16px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
+      '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+      '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.65;margin-left:1px}' +
+      '.sh-flair.is-big{gap:4px}.sh-flair.is-big .sh-flair-m{width:24px;height:24px}' +
+      '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown{animation:none}}';
+    (document.head || document.documentElement).appendChild(st);
+  }
+  /* shRanks.flair(str, { max, big }) -> inline medals; empty string when there's nothing to show */
+  function flair(s, opt){
+    opt = opt || {};
+    var list = parseFlair(s); if (!list.length) return "";
+    flairCss();
+    var max = opt.max || 3, px = opt.big ? 24 : 16;
+    var label = list.map(function(x){ return hubName(x.hub) + ": " + MASTERY[x.lvl - 1].n + " mastery"; }).join(" · ");
+    return '<span class="sh-flair' + (opt.big ? ' is-big' : '') + '" role="img" aria-label="' + label + '" title="' + label + '">' +
+      list.slice(0, max).map(function(x){ return '<span class="sh-flair-m' + (x.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(x.lvl, px) + '</span>'; }).join("") +
+      (list.length > max ? '<span class="sh-flair-more">+' + (list.length - max) + '</span>' : '') + '</span>';
+  }
 
   /* ---------- unlockable accent colours (cosmetic; each needs that tier or higher) ---------- */
   var ACCENTS = {
@@ -479,8 +554,11 @@
         h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
           '<div class="sh-mastery-bar"><i style="width:' + (m.pct * 100).toFixed(1) + '%"></i>' +
           MASTERY.map(function(x, i){ return '<span class="sh-mastery-tick' + (m.lvl >= i ? ' is-hit' : '') + '" style="left:' + (x.pct * 100) + '%" title="' + x.n + ' at ' + Math.round(x.pct * 100) + '%"></span>'; }).join("") +
-          '</div><div class="sh-mastery-note">' + fmt(m.got) + ' of ' + fmt(m.bank) + ' questions right on your latest try. Bronze 50% · Silver 75% · Gold 90% · Crown 100%.</div></div>';
+          '</div><div class="sh-mastery-note">' + fmt(m.got) + ' of ' + fmt(m.bank) + ' questions right on your latest try. Bronze 50% · Silver 75% · Gold 90% · Crown 100%. ' +
+          'Each one puts a medal next to your name on every leaderboard.</div></div>';
       }
+      var myFlair = flairFromBadges(badges.concat(m.lvl >= 0 ? [MASTERY[m.lvl].k + ":" + H.hub] : []));
+      if (myFlair) h += '<div class="sh-flair-row"><span>Your leaderboard flair</span>' + flair(myFlair, { max: 8, big: true }) + '</div>';
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
@@ -489,11 +567,28 @@
         TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + ' XP.</p></details>' +
         '<div class="sh-link"><button type="button" class="sh-link-toggle" aria-expanded="false">Link my devices</button><div class="sh-link-body" hidden></div></div>';
       sec.innerHTML = h;
-      // hub mastery tiers become trophies on the server once reached
+      // hub mastery tiers become trophies on the server once reached; a new one is announced, since it shows to everyone
+      var fresh = -1;
       for (var i = 0; i <= m.lvl; i++) {
         var key = MASTERY[i].k;
-        if (badges.indexOf(key + ":" + H.hub) < 0) rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub });
+        if (badges.indexOf(key + ":" + H.hub) < 0) {
+          fresh = i; badges.push(key + ":" + H.hub);
+          rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub });
+        }
       }
+      if (fresh >= 0) masteryToast(fresh);
+    }
+    function masteryToast(i){
+      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      var d = document.createElement("div");
+      d.className = "sh-egg sh-egg-toast is-gold"; d.setAttribute("role", "status");
+      d.innerHTML = '<span class="sh-egg-ic" style="width:40px;height:40px">' + medalSvg(i + 1, 40) + '</span><span><b>' + MASTERY[i].n + ' mastery in ' + esc(hubName(H.hub)) + '</b>' +
+        '<small>' + (i === 3 ? 'Every question right. The crown now sits next to your name on every leaderboard.' : 'A ' + MASTERY[i].n.toLowerCase() + ' medal now shows next to your name on every leaderboard.') + '</small></span>';
+      document.body.appendChild(d);
+      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
+      H.confetti(); if (i >= 2) setTimeout(H.confetti, 400);
+      d.addEventListener("click", function(){ d.remove(); });
+      setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 6500);
     }
 
     function levelToast(t, lvl){
@@ -546,6 +641,8 @@
         if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
         else if (prevStep !== null && stepNow > +prevStep) levelToast(profile.tier || 0, profile.level || 1);
         badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
+        /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
+        if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
       });
     }
     load();
@@ -608,6 +705,7 @@
       return miniCache[k] || (miniCache[k] = '<span class="sh-rank-mini" title="' + rankName(tier, level) + '">' + art(tier, 20) +
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
+    flair: flair, flairFromBadges: flairFromBadges, medal: medalSvg, hubName: hubName,
     mount: mount, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },

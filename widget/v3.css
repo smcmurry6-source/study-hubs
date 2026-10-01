@@ -422,6 +422,59 @@ body.sh-nuke-active{overflow:hidden;}
 .sh-egg-board li{display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed var(--shw-line); counter-increment:egg;}
 .sh-egg-board li span::before{content:counter(egg) ". "; color:var(--shw-ink3);}
 
+/* "mirror": the hub's page flipped left-to-right, like the maxillary arch in a mouth mirror (eggs.js marks which
+   blocks to flip; the floating widget, toasts and tooth buddy stay put) */
+.sh-mirror-flip{transform:scaleX(-1); animation:sh-mirror-in .5s cubic-bezier(.4,0,.2,1);}
+@keyframes sh-mirror-in{from{transform:scaleX(1);}}
+
+/* holiday magic word: the parade of shapes, and the shape in its toast */
+.sh-egg-parade{position:fixed; z-index:10003; pointer-events:none; filter:drop-shadow(0 0 1.5px rgba(255,255,255,.75)) drop-shadow(0 2px 2px rgba(0,0,0,.18));}
+.sh-egg-hshape{display:block; width:26px; height:26px;}
+.shstat-confetti svg{display:block; width:100%; height:100%;}
+
+/* Floss Chain */
+.sh-egg-chain{position:fixed; z-index:10002; left:0; right:0; bottom:calc(var(--sh-tabbar-h) + 8px); pointer-events:none; text-align:center; color:var(--shw-ink);
+  animation:sh-egg-chain-in .5s cubic-bezier(.2,.8,.3,1);}
+.sh-egg-chain.is-out{opacity:0; transform:translateY(40px); transition:opacity .5s, transform .5s;}
+.sh-egg-chain-h{display:inline-block; padding:8px 16px; border-radius:99px; background:var(--shw-bg); border:1px solid var(--egg-gold); box-shadow:var(--shw-shadow); font-weight:700; font-size:14.5px;}
+.sh-egg-chain svg{display:block; width:100%; height:auto; max-height:190px; margin-top:4px; overflow:visible; --egg-fairy-fill:#FFFDF6;}
+.sh-egg-chain .egg-chain-t{color:#3B2E3A;}
+.sh-egg-chain .egg-chain-t .egg-fl-arms{stroke:var(--shw-ink);}
+.sh-egg-chain .egg-chain-string{fill:none; stroke:var(--egg-floss, #3ecf7e); stroke-width:2.4; stroke-linecap:round; animation:sh-egg-chain-sway .5s ease-in-out infinite alternate;}
+.sh-egg-chain .egg-chain-t{animation:sh-egg-chain-sway .5s ease-in-out infinite alternate;}
+.sh-egg-chain .egg-fl-body{transform-origin:40px 70px; animation:sh-egg-hips .5s ease-in-out infinite alternate;}
+.sh-egg-chain .egg-chain-name{font:700 12px var(--shw-font); fill:var(--shw-ink); paint-order:stroke; stroke:var(--shw-bg); stroke-width:4px;}
+@keyframes sh-egg-chain-sway{from{transform:translateX(-8px);} to{transform:translateX(8px);}}
+@keyframes sh-egg-chain-in{from{opacity:0; transform:translateY(50px);}}
+
+/* Full Arch: a little dental arch at the bottom left (above the tooth buddy when it's there) */
+.sh-egg-arch{position:fixed; z-index:9991; left:16px; bottom:16px; width:150px; padding:8px 10px 6px; border-radius:16px; background:var(--shw-bg); border:1px solid var(--shw-line);
+  box-shadow:var(--shw-shadow); pointer-events:none; opacity:0; transform:translateY(12px) scale(.96); transition:opacity .3s, transform .3s cubic-bezier(.2,.8,.3,1), bottom .3s;}
+html.sh-pet-on .sh-egg-arch{bottom:132px;}
+.sh-egg-arch.is-shown{opacity:1; transform:none;}
+.sh-egg-arch svg{width:100%; height:auto; aspect-ratio:136/44; overflow:visible; color:var(--shw-ink2);}
+.sh-egg-arch .egg-arch-t{fill:color-mix(in srgb, var(--shw-ink) 5%, transparent); stroke:color-mix(in srgb, var(--shw-ink) 32%, transparent); stroke-width:.55; stroke-dasharray:1.2 .9; transition:fill .25s, stroke .25s;}
+.sh-egg-arch .egg-arch-t.is-in{fill:#FFFDF6; stroke:#4A3E48; stroke-dasharray:none; stroke-width:.7;}
+.sh-egg-arch .egg-arch-t.is-pop{animation:sh-egg-erupt .45s cubic-bezier(.3,1.6,.5,1); transform-box:fill-box; transform-origin:center;}
+.sh-egg-arch.is-full{border-color:var(--egg-gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--egg-gold) 25%, transparent), var(--shw-shadow);}
+.sh-egg-arch.is-full .egg-arch-t.is-in{fill:#FFF6D6; stroke:var(--egg-gold);}
+.sh-egg-arch-cap{display:flex; justify-content:space-between; align-items:baseline; margin-top:2px; font-size:12px; color:var(--shw-ink2);}
+.sh-egg-arch-cap b{color:var(--shw-ink); font-size:12.5px;}
+.sh-egg-arch-n{font-variant-numeric:tabular-nums;}
+.sh-egg-arch-fly{position:fixed; z-index:9992; width:14px; height:14px; color:var(--shw-ink); pointer-events:none; animation:sh-egg-knock .85s cubic-bezier(.3,.1,.6,1) forwards;}
+@keyframes sh-egg-erupt{0%{transform:scale(0);} 100%{transform:scale(1);}}
+@keyframes sh-egg-knock{0%{transform:none; opacity:1;} 30%{transform:translate(18px,-26px) rotate(160deg);} 100%{transform:translate(40px,60px) rotate(520deg); opacity:0;}}
+
+/* Cavity Search: a tiny carious lesion tucked between two words of the notes */
+.sh-egg-cavity{display:inline-block; width:9px; height:7px; margin:0 1px 0 3px; padding:0; border:0; vertical-align:middle; cursor:pointer;
+  border-radius:55% 45% 60% 40% / 60% 50% 50% 40%; background:radial-gradient(circle at 45% 40%, #1d120a 0 35%, #4a2b14 60%, #8a5a2b 100%);
+  box-shadow:0 0 0 1.5px rgba(138,90,43,.28); transition:transform .2s, background .4s, box-shadow .4s, opacity .8s;}
+.sh-egg-cavity:hover, .sh-egg-cavity:focus-visible{transform:scale(1.6); outline:none;}
+.sh-egg-cavity.is-filled{background:radial-gradient(circle at 40% 35%, #ffffff 0 25%, #e6edf2 55%, #b9c4cc 100%); box-shadow:0 0 0 1.5px rgba(150,170,185,.6), 0 0 10px 2px rgba(255,255,255,.9);
+  animation:sh-egg-shine .9s ease;}
+.sh-egg-cavity.is-gone{opacity:0;}
+@keyframes sh-egg-shine{0%{transform:scale(2.4);} 60%{transform:scale(1.3);} 100%{transform:scale(1);}}
+
 /* Konami: 8-bit mode */
 html.sh-8bit body, html.sh-8bit body *:not(svg):not(svg *){font-family:'VT323', ui-monospace, monospace !important; border-radius:0 !important; letter-spacing:.02em;}
 html.sh-8bit body{font-size:118%;}
@@ -436,7 +489,15 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 }
 @media (max-width:760px){
   .sh-egg-boss{bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
+  .sh-egg-arch{left:10px; width:124px; bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
+  html.sh-pet-on .sh-egg-arch{bottom:calc(var(--sh-tabbar-h) + 100px + env(safe-area-inset-bottom,0px));}
 }
+@media (prefers-reduced-motion: reduce){
+  .sh-mirror-flip{animation:none;}
+  .sh-egg-chain *, .sh-egg-arch *{animation:none !important;}
+}
+/* mastery flair row in the hub's rank card */
+.sh-flair-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 4px; font-size:13px; color:var(--shw-ink2);}
 
 /* ================= handpiece ranks (widget/ranks.js) ================= */
 .sh-rank-art{display:block; overflow:visible;}

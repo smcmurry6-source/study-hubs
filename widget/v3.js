@@ -524,7 +524,11 @@
   function prefGet(key, fallback){
     try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
   }
-  function prefSet(key, val){ try { localStorage.setItem(key, val); } catch (e) {} }
+  function prefSet(key, val){
+    try { localStorage.setItem(key, val); } catch (e) {}
+    /* eggs.js (holiday theme) and pet.js (tooth buddy on/off) follow settings live */
+    try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: key, val: val } })); } catch (e) {}
+  }
 
   function applyFontPref(){
     var stack = FONT_STACKS[prefGet(SH_FONT_KEY, "default")];
@@ -1200,15 +1204,24 @@
     }, 1600);
   }
   function fireConfetti(){
-    var colors = ["#3ecf7e", "#f0806b", "#e8c15a", "#8fb4e8", "#c58fe8"];
+    /* a holiday (widget/eggs.js) swaps the colours and the paper strips for little shapes (candy corn, leaves, snow...) */
+    var theme = window.shConfettiTheme;
+    var colors = (theme && theme.colors) || ["#3ecf7e", "#f0806b", "#e8c15a", "#8fb4e8", "#c58fe8"];
     for (var i = 0; i < 26; i++){
       (function(i){
         var p = document.createElement("span");
         p.className = "shstat-confetti";
         var size = 6 + Math.random() * 5;
-        p.style.width = size + "px";
-        p.style.height = (size * 0.4) + "px";
-        p.style.background = colors[i % colors.length];
+        if (theme && theme.svg) {
+          size = 13 + Math.random() * 7;
+          p.style.width = size + "px"; p.style.height = size + "px";
+          p.style.color = colors[i % colors.length];
+          p.innerHTML = theme.svg;
+        } else {
+          p.style.width = size + "px";
+          p.style.height = (size * 0.4) + "px";
+          p.style.background = colors[i % colors.length];
+        }
         p.style.borderRadius = "1px";
         p.style.left = (Math.random() * window.innerWidth) + "px";
         p.style.top = "-16px";
@@ -1562,6 +1575,14 @@
     '<button type="button" data-val="off">Off</button>' +
     '</div>' +
     '<div class="shset-hint">Little hidden extras around the hubs, including a few you share live with classmates. Stuck? The trophy case in Stats has clues. They never appear during a mock exam.</div>' +
+    '</div>' +
+    '<div class="shset-row"><label>Timmy Tooth</label>' +
+    '<div class="shset-seg" data-pref="pet">' +
+    '<button type="button" data-val="on">Everywhere</button>' +
+    '<button type="button" data-val="dash">Dashboard only</button>' +
+    '<button type="button" data-val="off">Off</button>' +
+    '</div>' +
+    '<div class="shset-hint">Your cartoon tooth buddy, in the bottom corner. Right answers and study streaks keep him healthy; skipped days give him plaque, cavities and worse. Meet him on the dashboard. He hides during mock exams.</div>' +
     '</div>' +
     '<div class="shset-row"><label>Tactical nuke alerts</label>' +
     '<div class="shset-seg" data-pref="nuke">' +
@@ -1933,7 +1954,8 @@
     size: { key: SH_SIZE_KEY, def: "default" },
     music: { key: SH_MUSIC_KEY, def: "off" },
     nuke: { key: SH_NUKE_PREF_KEY, def: "on" },
-    eggs: { key: "sh_pref_eggs", def: "on" }
+    eggs: { key: "sh_pref_eggs", def: "on" },
+    pet: { key: "sh_pref_pet", def: "on" }
   };
   function syncSettingsSegUI(){
     document.querySelectorAll(".shset-seg").forEach(function(seg){
@@ -2088,6 +2110,7 @@
       else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
       else if (pref === "nuke") { prefSet(SH_NUKE_PREF_KEY, val); }
       else if (pref === "eggs") { prefSet("sh_pref_eggs", val); }
+      else if (pref === "pet") { prefSet("sh_pref_pet", val); }
       syncSettingsSegUI();
     });
   });
@@ -2128,6 +2151,13 @@
     rankScript.src = new URL("ranks.js", thisScript.src).href; rankScript.async = true;
     rankScript.onload = function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); };
     document.head.appendChild(rankScript);
+  }
+  /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard */
+  if (!EXPORT_ONLY) {
+    var petScript = document.createElement("script");
+    petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks }); };
+    document.head.appendChild(petScript);
   }
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {
