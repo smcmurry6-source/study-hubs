@@ -1312,12 +1312,13 @@ begin
       select t::date as d, 25 / 60.0 as m, 0 as a, visitor_id as v from p
       union all select t::date, 0, 1, visitor_id from ans) u group by d),
   exam as (select coalesce(p_exam, (select max(d) from days where minutes >= 30)) as d),
+  -- one pass per table (correlated per-visitor subqueries re-scanned p and ans for every person and hit the API's 3 s timeout)
+  per_ans as (select visitor_id, count(*) as answers, count(*) filter (where correct) as correct from ans group by 1),
+  per_days as (select visitor_id, count(distinct t::date) as days from (select visitor_id, t from p union all select visitor_id, t from ans) z group by 1),
+  -- names only for the 3 shown (anon_name is slow: ~15 ms a person)
   per_person as (
-    select v.visitor_id, coalesce(vn.display_name, anon_name(v.visitor_id)) as name,
-      (select count(*) from ans where ans.visitor_id = v.visitor_id) as answers,
-      (select count(*) filter (where correct) from ans where ans.visitor_id = v.visitor_id) as correct,
-      (select count(distinct t::date) from (select t from p where p.visitor_id = v.visitor_id union all select t from ans where ans.visitor_id = v.visitor_id) z) as days
-    from people v left join visitor_names vn on vn.visitor_id = v.visitor_id
+    select v.visitor_id, coalesce(pa.answers, 0) as answers, coalesce(pa.correct, 0) as correct, coalesce(pd.days, 0) as days
+    from people v left join per_ans pa on pa.visitor_id = v.visitor_id left join per_days pd on pd.visitor_id = v.visitor_id
   ),
   runs as (
     select visitor_id, count(*) as len from (
@@ -1327,7 +1328,7 @@ begin
   ),
   best_run as (
     select r.len, coalesce(vn.display_name, anon_name(r.visitor_id)) as name
-    from runs r left join visitor_names vn on vn.visitor_id = r.visitor_id order by r.len desc limit 1
+    from (select * from runs order by len desc limit 1) r left join visitor_names vn on vn.visitor_id = r.visitor_id
   ),
   secs as (select split_part(coalesce(section, ''), '/', 1) as mode, section, count(*) * 25 / 60.0 as minutes from p group by 1, 2),
   nm as (select visitor_id, display_name from visitor_names),
@@ -1367,7 +1368,9 @@ begin
                        where hub = p_hub and attempts >= greatest(5, (select count(*) from people) / 6) order by pct, attempts desc limit 25) s),
     'choices', (select coalesce(jsonb_agg(jsonb_build_object('qid', qid, 'choice', choice, 'picks', picks)), '[]') from question_choices where hub = p_hub),
     'top_answers', (select coalesce(jsonb_agg(jsonb_build_object('name', name, 'answers', answers, 'correct', correct) order by answers desc), '[]')
-                    from (select * from per_person where answers > 0 order by answers desc limit 3) s),
+                    from (select coalesce(vn.display_name, anon_name(t.visitor_id)) as name, t.answers, t.correct
+                          from (select * from per_person where answers > 0 order by answers desc limit 3) t
+                          left join visitor_names vn on vn.visitor_id = t.visitor_id) s),
     'best_run', (select jsonb_build_object('name', name, 'len', len) from best_run),
     'regulars', (select count(*) from per_person where days >= 3),
     'median_answers', (select coalesce(percentile_cont(0.5) within group (order by answers), 0) from per_person where answers > 0),

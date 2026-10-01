@@ -76,6 +76,20 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (recaps no longer time out + Perio Midterm recap, Claude Code)** — `get_hub_recap` timed out for perio
+  (the API stops anon calls at 3 s): it counted each person's answers and days by re-scanning all pings/answers once per
+  person, and ran the slow `anon_name()` (~15 ms) for all 118 people when the recap names 3. `migration_v30.sql` (applied
+  via the connector) aggregates once and names only the people shown: same output, perio ~1.6 s, MSK 1.1 s. **Perio
+  Midterm** recap published (`tools/publish-recap.js perio --exam 2026-10-01 --title "Perio Midterm"`, names on,
+  featured question limited to midterm scope by passing a bank without `mid:false` items). `hub_recaps` holds one recap
+  per hub, so publishing the perio final's recap will replace this one.
+
+- **2026-10-01 (exam check-ins save on exam day, Claude Code, #46)** — `submit_exam_debrief` refused any exam dated
+  today, but the dashboard opens check-ins on exam day (button from 8 am, perio midterm pop-up from 10 am), so the 2
+  perio midterm check-ins sent that morning were dropped (answers not recoverable; the request logs hold no bodies).
+  `migration_v29.sql` (applied via the connector) accepts exam day, never a future date. The dashboard's check-in
+  pop-up now waits for the save and says "That didn't save" instead of always thanking.
+
 - **2026-10-01 (nuke stays local on exam day, Claude Code)** — On the day of any of a hub's exams
   (`SH_EXPORT.exams`, local date), a tactical nuke plays only for the person who launched it: `launchNuke` in
   `widget/v3.js` skips the `nuke` broadcast and the receiver ignores one too (`isExamDay()`), so stale clients can't
