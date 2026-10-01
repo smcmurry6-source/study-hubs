@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-01** (third refresh, 6 am Central, all data to date). Sam runs
+**Last refreshed: 2026-10-01** (fourth refresh, 4 pm Central, after the perio midterm; all data to date). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -77,46 +77,51 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-01 at 6 am Central (perio midterm 10 am today), using all data to date; "since" = since the
-09-30 refresh's fixes merged (2:32 pm Central 09-30), from `personal_answers`. Live hubs: perio (midterm today,
-final later) and MSK Exam 3 (Fri Oct 2). Midterm eve inflates every "since" number.
+Refreshed 2026-10-01 at 4 pm Central, using all data to date; "since" = since the morning refresh's fixes merged
+(5:50 am Central), from `personal_answers`, so mostly the perio midterm morning (exam 10 am) and the MSK Exam 3 eve.
+Live hubs: perio (midterm done; **comprehensive final Nov 19, all 9 sessions**) and MSK Exam 3 (Fri Oct 2).
 
-**Did the last refresh's fixes work?** The MSK explanation fixes did, on small numbers; perio's select-all items did not:
-- MSK explanations that now name the favourite wrong answer: `h-dr-hypoCa` 31% before (n = 13), 3 of 3 since;
-  `h-tu-gct-arthritis` 33% (n = 12), 4 of 4 since; `h-ai-sle-ab` 42% (n = 19), 3 of 5 since; `sl-calcitriol` (09-29
-  fix) 3 of 3 since.
-- Perio `q3-M01` (UniFe inputs, explanation now names every option): 20% before (n = 25), 9 of 21 (43%) since. Better,
-  still the hardest item: 7 options, 5 correct.
-- Earlier fixes still holding: `q2-03` 25 of 31 (81%) since, `q4-15` 19 of 24 (79%), `q4-L27` matching 17 of 25 (68%).
-- Quick-start row (perio): midterm eve 3 of 57 visitors under 5 minutes (5%), down from 40% on 09-28/29. "Practice
-  questions" was used by 6 people, the drill button in it by 1. The exam-eve rush explains part of it; recheck before
-  the final.
+**Did the morning's fixes work?** Small numbers, one exam morning:
+- Perio `q3-P02` (report #10; case box now lists the radiographs): 13 of 14 since (79% before).
+- 7-option select-alls cut to 5: `q1-M03` 12 of 12 (68% before), `q2-P01` 14 of 21, 67% (42%). **`q3-M01` (UniFe)
+  got worse: 5 of 23, 22% (30%).** Per-option ticks (new today) show why: "Plaque index" ticked 13 times against 15-17
+  for each right input. Its explanation now says why plaque index tempts; a two-statement and an EXCEPT item test it too.
+- `q4-M05` (SRP limitations, 5 of 6 correct): 6 of 19 since (44% before). Ticks: "Motile bacteria invade the pocket
+  lining" 8, every other right option 11-16. Explanation now covers it.
+- No change: `q4-L11` passive eruption 9 of 16 (54% before), `q1-M02` 7 of 12 (55%), `q1-P05` 8 of 17 (38%).
+- MSK: `qz-rickets` 9 of 15 since (50% before), `sl-calcitriol` 5 of 7, `h-dr-hypoCa` 3 of 6, `h-ai-mikulicz` 2 of 2.
 
-**Perio** (108 people, ~175 h, 12,064 answers, 82% correct). **Midterm eve (09-30) alone: 57 people and 91 h, 52% of
-all perio time ever.** Since the last refresh: question bank 1,983 min (44 people), lecture notes 806 (27), mock exam
-372 (16), review tables ~640 (21 on "all"), cram sheet 128 (10), Daily Drill 87 (10; 127 min from 15 people on 09-30,
-its best day). 26 mocks from 14 people on 09-30, averaging 86%.
-- By session: Risk Assessment 80%, Phase I 81%, Incisions/Flaps/Sutures 83%, Diagnosis 86%. Exam-review items 76% vs
-  82% lecture. By type: select-all 64%, matching 75%, MCQ 83%.
-- **Select-all and Patient Box items are now the hardest and getting worse under exam-eve traffic**: `q1-P05` (staging
-  triggers, 3 of 6 correct) 44% before, 3 of 15 since; `q2-P01` (augmentation flap, 4 of 7) 50% before, 11 of 34
-  since; `q4-M05` 8 of 20 since. Their keys check out against the notes. Per-option ticks are recorded from 10-01 on
-  (`record_choices`), and `q3-M01`, `q2-P01`, `q1-M03` were cut to 5 options the same morning.
-- `q4-L11` passive eruption 54% (14 picked "a tooth extruding after losing its antagonist"); `q3-47` resistant share
-  46% (13 picked "About 25%", the slide's non-responder figure, which the explanation already separates; 10 of 25
-  since). `q3-04` McGuire & Nunn up from 38% to 21 of 33 (64%) since.
-- **Report #10** (today, 5:16 am): `q3-P02`'s explanation leaned on bone loss the case box never gave. Fixed in this run.
+**Perio midterm check-ins (n = 14 by 4 pm, all on exam day; later ones go into the next refresh).** Everyone felt
+ready (4 or 5 of 5), yet 6 of 14 said it went worse than expected and 1 better. Hub vs exam: About right 9, Hub was
+easier 3, Exam asked different things 2. **Unlike GI Exam 2, the people who called the hub easier or different were
+not light users:** 168-616 min in the hub (median ~250) vs 70-309 min (median ~130) for "About right". What the exam
+had that the hub didn't:
+- **Pictures of sutures** (5 of 14): identifying suture types/techniques from images, and tissue response by material.
+  The hub has no images (Atlas was retired for inaccurate diagrams), so this is for Sam.
+- **Two-statement questions** (2; "statement 1 true, statement 2 false…") and **"all of the following EXCEPT" / "which is
+  NOT true"** (1, "lots of" them). The bank had none of either. Added in this run: 20 two-statement and 21 EXCEPT/NOT
+  items (bank filter "Two-statement" / "EXCEPT / NOT").
+- **Staging/grading details beyond the class charts** (3): severity vs complexity components, Stage III vs IV. Added
+  the full 2018 AAP/EFP tables as a review table (complexity factors, extent, direct evidence, phenotype, modifier
+  rows) and 12 questions tagged "2018 AAP/EFP tables". The tables say ≥10 cigarettes a day for Grade C; the class said
+  "more than 10", so both are named.
+- More patient-scenario / case questions (2).
 
-**MSK Exam 3** (51 people, ~89 h, 6,087 answers, 78% correct). 09-30: 30 people, 18 h; **11 of 30 left within 5
-minutes** (2-3 of 21-26 on the days before). MSK has no quick-start row; perio's cut the same number to 5%.
-- By lecture: Bone Development 69% (its ordering items), Drugs 74%, the rest 78-82%. By source: professor quiz 70%,
-  hub 75%, PollEv review set 92%. Ordering items 33% overall; five sit at 13-20%.
-- 3 mocks from 2 people (88%). Drill 18-24 min a day from 3-6 people.
-- Favourite wrong answers worth a sentence: `qz-rickets` (11 of 48 picked "unmineralized osteoid", which goes up),
-  `h-ai-mikulicz` (6 of 24 picked sicca). Both explanations fixed in this run.
+**Perio** (117 people, ~215 h, 15,106 answers, 83% correct). 10-01: 59 people, 47 h (morning before the exam and after
+it), 6 under 5 minutes. Since the morning: bank 1,020 min (39 people), notes 417 (24), review tables ~650, mock exam 267
+(16; 15 mocks from 10 people at 91%), cram sheet 168 (20), drill 81 (8). Midterm-only settings are removed (scope
+filters, "Not on midterm" chips, mock-exam scope, the midterm card); S5-S9 still have only exam-review-guide items
+(2-3 tries each, 53-91%), so they need lecture content as each session is taught.
 
-**Site-wide**: nobody has used Search yet (still kept). Six GI Exam 2 check-ins (see the retro). Inbox: 6 people opened
-it on the dashboard and 5 in perio since yesterday.
+**MSK Exam 3** (62 people, ~106 h, 7,561 answers, 78% correct). 10-01 (exam eve): 39 people, 19 h, **13 of 39 left
+within 5 minutes** (11 of 30 on 09-30); still no quick-start row. Bank 640 min (23 people), notes 350 (30), cram 38, drill
+26 (5). Only 3 mocks ever (2 people). By lecture: Bone Development 71% (its 6-step orderings at 13-27%), Drugs 74%,
+the rest 78-83%. By source: professor quiz 71%, hub 75%, PollEv review 92%.
+- Favourite wrong answers fixed today: `h-tu-mdm2` (7 of 14 picked rhabdomyosarcoma), `h-nut-vitA-epith` (zinc's rash),
+  `h-tu-gct-demo` (males under 25 = osteochondroma/osteoid osteoma), `h-tu-match` (explanation was "From the tumor
+  tables"). 15 EXCEPT/NOT items added from the hub's own tables (the professor quizzes use the format).
+
+**Site-wide**: `search_terms` is still empty: nobody has run a widget search. GI Exam 2 check-ins now 7 (see the retro).
 
 ## Standing lessons (read before building a hub)
 
@@ -151,6 +156,13 @@ it on the dashboard and 5 in perio since yesterday.
   Perio now opens with a one-tap row (Practice questions, Daily drill, Lecture notes); check next refresh whether
   the under-5-minute share drops and which button gets used (`practice=midterm`, `sh-drill=quick`). First read
   (09-30, midterm eve): 6 of 36 under 5 minutes, and "Practice questions" is the button people use.
+- **Write questions in the exam's formats, not just its content.** The perio midterm used two-statement items
+  (two numbered statements; choices: both true / both false / 1 true 2 false / 1 false 2 true), "all of the following
+  EXCEPT" and "which is NOT true", and suture pictures; the hub had none of them, and 6 of 14 check-ins said it went
+  worse than expected despite everyone feeling ready (4-5 of 5), heavy users included. Every hub gets a share of
+  two-statement and EXCEPT/NOT items from the start (render two-statement choices in that fixed order:
+  `fmt:'2stmt'` in perio), and asks Sam early whether the professor uses images. When a class table simplifies a
+  published standard (staging/grading), put the full standard beside it and say where they differ.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
@@ -219,7 +231,7 @@ Drill and future banks). Check-ins (n = 6 by 10-01, against each person's own ti
 (598-813 answers) and felt ready (4, 4, 5); the two "Hub was easier" studied 166-176 min (187-260 answers), readiness
 4 and 2, one "worse than expected"; one "Hub was harder" studied 85 min (290 answers), readiness 3, "better than
 expected". Small numbers, but who calls the hub easier isn't who used it most. Missed: "patient box style questions".
-Later check-ins go into the next refresh.
+A seventh (10-01): About right, readiness 3, better than expected. Later check-ins go into the next refresh.
 
 Exam check-ins and search-term tracking were added so the next retro can answer what this
 one couldn't: did the hub match the exam, and what were people looking for that wasn't there.

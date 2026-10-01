@@ -271,7 +271,7 @@ main{padding-top:20px}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
-.qcard-stem{font-weight:600;margin:0 0 12px;font-size:1rem;line-height:1.45}
+.qcard-stem{font-weight:600;margin:0 0 12px;font-size:1rem;line-height:1.45;white-space:pre-line}
 .qcard-choices,.qcard-seq-steps{display:flex;flex-direction:column;gap:7px}
 .qcard-choice,.qcard-match-item{appearance:none;text-align:left;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px;cursor:pointer;line-height:1.38;font-size:.93rem;width:100%}
 .qcard-choice:hover,.qcard-match-item:hover{border-color:var(--ink)}
@@ -359,11 +359,6 @@ main{padding-top:20px}
 .exam-kind b{font-size:1.02rem}
 .exam-kind span{font-size:.86rem;color:var(--ink-soft)}
 .exam-kind:hover{border-color:var(--ink)}
-.midterm-card{border-top:4px solid var(--accent)}
-.midterm-card .mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.midterm-card .mt-when{font-family:var(--font-display);font-size:1.7rem;line-height:1.1}
-.midterm-card h4{margin:10px 0 6px;font-size:.92rem}
-@media (max-width:760px){.midterm-card .mt-grid{grid-template-columns:1fr}}
 .chip.src.nomid{background:var(--caution-soft);color:var(--caution)}
 .cram-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
 .cram-card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--t);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
@@ -892,9 +887,29 @@ var GRADING_TABLE = [
   { grade:'Grade C', meaning:'Rapid progression', ratio:'% bone loss ÷ age > 1.0' }
 ];
 var GRADE_MODIFIERS = [
-  'Heavy smoking (>10 cigarettes/day) pushes the grade up to C, regardless of the bone-loss/age ratio.',
+  'Heavy smoking (10 or more cigarettes/day in the 2018 tables; class said more than 10) pushes the grade up to C, regardless of the bone-loss/age ratio.',
   'HbA1c ≥ 7% (poorly controlled diabetes) pushes the grade up to C, regardless of the bone-loss/age ratio.',
   'Being a non-smoker or non-diabetic never downgrades a patient — modifiers only push the grade up, never down.'
+];
+/* Full 2017 World Workshop / 2018 AAP-EFP tables (Tonetti, Greenwell & Kornman 2018), added 2026-10-01 because the
+   midterm asked staging/grading details the class charts didn't show (check-ins). */
+var AAP_STAGING = [
+  { stage:'Stage 1', severity:'Interdental CAL 1-2 mm; RBL coronal third (<15%); no tooth loss to periodontitis', complexity:'Max PD ≤4 mm; mostly horizontal bone loss' },
+  { stage:'Stage 2', severity:'Interdental CAL 3-4 mm; RBL coronal third (15-33%); no tooth loss to periodontitis', complexity:'Max PD ≤5 mm; mostly horizontal bone loss' },
+  { stage:'Stage 3', severity:'Interdental CAL ≥5 mm; RBL to the middle third of the root or beyond; ≤4 teeth lost to periodontitis', complexity:'Everything in Stage 2, plus: PD ≥6 mm; vertical bone loss ≥3 mm; Class II or III furcation; moderate ridge defect' },
+  { stage:'Stage 4', severity:'Interdental CAL ≥5 mm; RBL to the middle third of the root or beyond; ≥5 teeth lost to periodontitis', complexity:'Everything in Stage 3, plus a need for complex rehabilitation because of: masticatory dysfunction; secondary occlusal trauma (mobility degree ≥2); severe ridge defect; bite collapse, drifting, flaring; fewer than 20 remaining teeth (10 opposing pairs)' }
+];
+var AAP_STAGING_NOTES = [
+  'Extent, written in front of the stage: localized (<30% of teeth), generalized (≥30%), or molar/incisor pattern.',
+  'Severity sets the starting stage; any one complexity factor can shift it up (a Class II furcation in a Stage 2 mouth makes it Stage 3).',
+  'Stage 3 and 4 share the same CAL and bone-loss cutoffs: tooth loss (≤4 vs ≥5) and the Stage 4 complexity list separate them.'
+];
+var AAP_GRADING = [
+  { row:'Direct evidence: CAL or bone loss over 5 years', a:'No loss', b:'<2 mm', c:'≥2 mm' },
+  { row:'Indirect: % bone loss ÷ age (worst tooth)', a:'<0.25', b:'0.25-1.0', c:'>1.0' },
+  { row:'Indirect: case phenotype', a:'Heavy biofilm, low destruction', b:'Destruction in line with biofilm', c:'Destruction exceeds what the biofilm explains; rapid-progression or early-onset patterns (molar/incisor, poor response to standard therapy)' },
+  { row:'Modifier: smoking', a:'Non-smoker', b:'<10 cigarettes/day', c:'≥10 cigarettes/day' },
+  { row:'Modifier: diabetes', a:'No diabetes (normoglycemic)', b:'Diabetes with HbA1c <7.0%', c:'Diabetes with HbA1c ≥7.0%' }
 ];
 var FOUR_STEP_APPROACH = [
   { step:'1. Initial screening', detail:'Review full-mouth radiographs, full-mouth probing depths, and missing teeth to sort the case into mild-to-moderate (Stage 1–2) vs. severe-to-very-severe (Stage 3–4).' },
@@ -1343,14 +1358,14 @@ var QUESTIONS = [
 { id:'q2-M01', lec:'incisions-flaps-sutures', type:'multi', stem:"Which suture materials are resorbable? Select all that apply.", choices:['Chromic gut','Poly-glycolic acid (PGA)','Poly-glycolide (PGCL)','Silk','PTFE','Polypropylene'], correct:[0,1,2], ex:"Chromic gut (7-10 days), PGA (55-70 days) and PGCL (22-55 days) resorb. Silk, PTFE and polypropylene have to be removed.", src:'lecture' },
 { id:'q2-M02', lec:'incisions-flaps-sutures', type:'multi', stem:"Which follow the surgical principles taught for incisions and flaps? Select all that apply.", choices:['Make the incision with a firm, continuous stroke','Place vertical incisions at the line angle','Keep the incision away from the bony defect','Make the flap base at least as wide as its free edge','Place the vertical incision in the middle of the papilla','Place the incision directly over the defect'], correct:[0,1,2,3], ex:"A mid-papilla vertical risks recession and a black triangle, and a narrow base starves the flap.", src:'lecture' },
 { id:'q2-M03', lec:'incisions-flaps-sutures', type:'multi', stem:"Which procedures call for a full-thickness flap? Select all that apply.", choices:['Implant placement','Bone, ridge or sinus augmentation','Crown lengthening / osseous surgery','Soft-tissue grafting'], correct:[0,1,2], ex:"Soft-tissue grafting uses a split-thickness flap so the periosteum stays behind as a vascular bed for the graft.", src:'lecture' },
-{ id:'q3-M01', lec:'risk-assessment', type:'multi', stem:"Which inputs does the UniFe risk tool score? Select all that apply.", choices:['Smoking (cigarettes a day)','Diabetic status (HbA1c)','Bone-loss/age ratio','Plaque index','Number of furcations'], correct:[0,1,2], ex:"UniFe scores five inputs, each 0-4, summed into a five-tier risk score: cigarettes a day, HbA1c, number of pockets ≥5 mm, BOP % and the bone-loss/age ratio. Plaque index and the number of furcations are not UniFe inputs.", src:'lecture' },
+{ id:'q3-M01', lec:'risk-assessment', type:'multi', stem:"Which inputs does the UniFe risk tool score? Select all that apply.", choices:['Smoking (cigarettes a day)','Diabetic status (HbA1c)','Bone-loss/age ratio','Plaque index','Number of furcations'], correct:[0,1,2], ex:"UniFe scores five inputs, each 0-4, summed into a five-tier risk score: cigarettes a day, HbA1c, number of pockets ≥5 mm, BOP % and the bone-loss/age ratio. Plaque index and the number of furcations are not UniFe inputs. Plaque index is the favourite wrong tick: plaque starts the disease, but UniFe scores bleeding (BOP %), not plaque.", src:'lecture' },
 { id:'q3-M02', lec:'risk-assessment', type:'multi', stem:"Which statements describe the Kwok & Caton prognosis system? Select all that apply.", choices:['It asks whether periodontal stability can be achieved','It is therapeutic only','Questionable sits in the middle of its scale','It works well for medically complex patients','It applies only to molars','It is scored numerically from smoking and A1c'], correct:[0,1,2,3], ex:"Molars-only and numeric scoring describe Miller & McEntire.", src:'lecture' },
 { id:'q3-M03', lec:'risk-assessment', type:'multi', stem:"Which are the P's of P4 medicine? Select all that apply.", choices:['Personalized','Preventive','Predictive','Participatory','Palliative','Prescriptive'], correct:[0,1,2,3], ex:"Personalized, preventive, predictive and participatory (some add a fifth P). It's set against one-size-fits-all Hippocratic medicine.", src:'lecture' },
 { id:'q4-M01', lec:'phase1-therapy', type:'multi', stem:"Which make it harder to feel the CEJ when measuring negative recession? Select all that apply.", choices:['Heavy gingival inflammation','Drug-induced gingival overgrowth','Altered passive eruption','Calculus or restorative margins','True (positive) recession','Healthy tissue with a visible CEJ'], correct:[0,1,2,3], ex:"Inflammation and overgrowth are pathologic, altered passive eruption is physiologic, and calculus or margins can feel like a CEJ.", src:'lecture' },
 { id:'q4-M02', lec:'phase1-therapy', type:'multi', stem:"Which are goals of scaling and root planing? Select all that apply.", choices:['Reduce inflammation','Shift the flora from gram-negative toward gram-positive','Arrest disease progression','Reverse bone and attachment loss','Eliminate the pocket (the main rationale)'], correct:[0,1,2], ex:"SRP doesn't reverse the damage, and pocket elimination isn't the rationale, though PD does drop.", src:'lecture' },
 { id:'q4-M03', lec:'phase1-therapy', type:'multi', stem:"Which contribute to probing-depth reduction after SRP? Select all that apply.", choices:['More recession as edema resolves','Junctional epithelium reattaching','Connective tissue reattaching','New bone filling the defect','Extrusion of the tooth'], correct:[0,1,2], ex:"At the margin, resolving edema shows up as more recession. At the base, JE (7-10 days) and connective tissue (4-6 weeks) reattach to the clean root. SRP doesn't regrow bone.", src:'lecture' },
 { id:'q4-M04', lec:'phase1-therapy', type:'multi', stem:"Which statements about full-mouth debridement are correct? Select all that apply.", choices:['It is not a therapeutic procedure','It is indicated only when you can\'t see or explore the gingival margin','There is only a full-mouth code','It should never be combined with SRP','It can be billed per quadrant','Insurance pays for it and a periodontal exam at the same visit'], correct:[0,1,2,3], ex:"There is no quadrant or half-mouth code, and insurance won't pay for debridement plus an exam the same day, so the exam is usually about 2 weeks later.", src:'lecture' },
-{ id:'q4-M05', lec:'phase1-therapy', type:'multi', stem:"Which are limitations of scaling and root planing discussed in class? Select all that apply.", choices:['It is a blinded, tactile procedure','Motile bacteria invade the pocket lining','Overhanging or subgingival restorative margins','Root grooves, concavities and furcations','Over-removing cementum causes hypersensitivity','It can\'t be done with local anesthesia'], correct:[0,1,2,3,4], ex:"All but the last are on the list. Local anesthesia is not a limitation: SRP is routinely done with it. Also on the list: pocket depth and access, patient compliance with hygiene, and operator skill.", src:'lecture' },
+{ id:'q4-M05', lec:'phase1-therapy', type:'multi', stem:"Which are limitations of scaling and root planing discussed in class? Select all that apply.", choices:['It is a blinded, tactile procedure','Motile bacteria invade the pocket lining','Overhanging or subgingival restorative margins','Root grooves, concavities and furcations','Over-removing cementum causes hypersensitivity','It can\'t be done with local anesthesia'], correct:[0,1,2,3,4], ex:"All but the last are on the list. The one most often left unticked is motile bacteria: they invade the soft-tissue pocket lining, and SRP only reaches the root surface in the pocket. Local anesthesia is not a limitation: SRP is routinely done with it. Also on the list: pocket depth and access, patient compliance with hygiene, and operator skill.", src:'lecture' },
 { id:'q4-M06', lec:'phase1-therapy', type:'multi', stem:"Which can a radiograph tell you before you probe? Select all that apply.", choices:['Whether bone loss is localized or generalized','Horizontal vs. vertical bone loss','Root proximity and fused roots','Calculus','A periapical lesion','Bleeding on probing'], correct:[0,1,2,3,4], ex:"BOP is a clinical finding. Dr. Kaur's tip: keep the x-rays open during SRP, not the chart.", src:'lecture' },
 
 /* ===== Lecture 5 — Resective Surgery & Furcation Management ===== */
@@ -1415,7 +1430,56 @@ var QUESTIONS = [
 { id:'q9-09', lec:'perio-plastic-esthetics', type:'mcq', stem:"An increased lower-facial-third proportion on facial exam suggests which condition?", choices:['Vertical maxillary excess','Altered passive eruption','RT3 recession','Necrotizing gingivitis'], answer:0, ex:"An increased lower facial third points to vertical maxillary excess, a skeletal cause of a gummy smile.", src:'exam-review' },
 { id:'q9-10', lec:'perio-plastic-esthetics', type:'mcq', stem:"A hypermobile upper lip that exposes excess gingiva on smiling is best managed with:", choices:['Botox or lip-repositioning surgery','Orthognathic surgery only','Gingivectomy alone','No treatment is available'], answer:0, ex:"A hypermobile lip is a muscle problem, so it is managed by weakening the lip (Botox) or limiting its travel (lip repositioning surgery).", src:'exam-review' },
 { id:'q9-11', lec:'perio-plastic-esthetics', type:'recall', stem:"What is the recommended treatment for a structurally short upper lip at rest?", answer:"The course material notes there is no reliably good treatment option for a short upper lip.", src:'exam-review' },
-{ id:'q9-12', lec:'perio-plastic-esthetics', type:'mcq', stem:"In the tooth-width proportions cited, if the central incisor is 1.6 units wide, roughly how wide is the lateral incisor?", choices:['≈1 unit','≈1.6 units','≈0.6 units','≈2 units'], answer:0, ex:"Using the cited proportions: central ≈1.6 units, lateral ≈1 unit, half the canine ≈0.6 units.", src:'exam-review' }
+{ id:'q9-12', lec:'perio-plastic-esthetics', type:'mcq', stem:"In the tooth-width proportions cited, if the central incisor is 1.6 units wide, roughly how wide is the lateral incisor?", choices:['≈1 unit','≈1.6 units','≈0.6 units','≈2 units'], answer:0, ex:"Using the cited proportions: central ≈1.6 units, lateral ≈1 unit, half the canine ≈0.6 units.", src:'exam-review' },
+/* Exam formats the midterm used that the bank lacked (check-ins, 2026-10-01): two-statement items (fmt '2stmt', choices
+   always in this order, never shuffled) and "all of the following EXCEPT" items (fmt 'except'). */
+{ id:'q1-S01', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Stage 3 and Stage 4 are told apart by how much more clinical attachment loss is present.\n2. A vertical bone defect of 3 mm or more places a case in at least Stage 3.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: Stages 3 and 4 share the same cutoffs (interdental CAL ≥5 mm, bone loss into the middle third or beyond). They are separated by teeth lost to periodontitis (≤4 = Stage 3, ≥5 = Stage 4) and by whether the case needs complex, multidisciplinary rehabilitation. Statement 2 is true: vertical bone loss ≥3 mm, Class II-III furcation involvement and any tooth lost to periodontitis each force a case to Stage 3/4 regardless of the CAL math.", src:'lecture' },
+{ id:'q1-S02', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Smoking more than 10 cigarettes a day moves a case to Grade C even when the bone-loss/age ratio suggests Grade B.\n2. A patient who does not smoke and does not have diabetes is moved down to Grade A for that reason.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true: heavy smoking (10 or more a day in the 2018 tables) and an HbA1c of 7% or higher each push the grade up to C outright. Statement 2 is false: the modifiers only ever push a grade up. Grade B is the default, and nobody earns a downgrade just for not smoking or not having diabetes.", src:'lecture' },
+{ id:'q1-S03', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Staging uses interdental CAL as the gold standard, with radiographic bone loss as the second choice.\n2. The stage is assigned from the single worst site in the mouth.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true. Only one stage and one grade are given per patient: the stage comes from the single worst site, the grade from progression evidence plus the modifiers (smoking, HbA1c).", src:'lecture' },
+{ id:'q1-S04', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. A bone-loss/age ratio between 0.25 and 1.0 suggests Grade C.\n2. Deep probing depths on their own prove periodontitis.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:1, ex:"Both are false. A ratio of 0.25-1.0 suggests Grade B (under 0.25 Grade A, over 1.0 Grade C). And a deep probing depth by itself never proves periodontitis: without confirmed attachment and bone loss, a mouthful of 4s and 5s could just be generalized gingivitis.", src:'lecture' },
+{ id:'q1-S05', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. A 3-wall defect has the best prognosis for regeneration.\n2. A crater is a 1-wall defect.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true: buccal, lingual and the wall against the neighboring tooth remain, with only the involved root bare. Statement 2 is false: a crater is the 2-wall pattern left when bone is gone from both proximal surfaces and only the buccal and lingual walls remain. A 1-wall defect has the worst prognosis.", src:'lecture' },
+{ id:'q2-S01', lec:'incisions-flaps-sutures', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Silk causes the worst tissue reaction of the six materials on the course chart.\n2. A braided suture traps bacteria more than a monofilament does.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true. Silk is natural and braided: it handles beautifully but rates \"very bad\" for tissue reaction and must come out at 7 days. Braided strands wick and trap bacteria, which is the reason for silk's score, so wipe a braided suture with chlorhexidine gauze before removing it.", src:'lecture' },
+{ id:'q2-S02', lec:'incisions-flaps-sutures', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. PGA is a braided synthetic resorbable that lasts longer than PGCL.\n2. PGCL causes more tissue reaction than PGA.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true: PGA resorbs in 55-70 days, PGCL in 22-55. Statement 2 is false, it is the other way round: braided PGA irritates tissue (rated \"bad\") and suits ridge and sinus augmentation, while monofilament PGCL is gentle (\"great\") and is the choice for soft-tissue grafting and esthetic crown lengthening.", src:'lecture' },
+{ id:'q2-S03', lec:'incisions-flaps-sutures', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Chromic gut handles very well.\n2. Chromic gut is a natural, monofilament, resorbable suture.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: the course chart rates chromic gut's handling \"very bad\". Statement 2 is true, and it resorbs fastest of the six. It is used at extraction sites, for implants with no additional grafting and to stabilize a collagen membrane.", src:'lecture' },
+{ id:'q2-S04', lec:'incisions-flaps-sutures', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. PTFE is the usual choice for pure soft-tissue grafts.\n2. Poly-propylene is a braided non-resorbable suture.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:1, ex:"Both are false. PTFE (synthetic, monofilament, non-resorbable, high cost) is used for every surgery type except pure soft-tissue grafting. Poly-propylene is a monofilament that behaves like nylon, with no adherence to tissue; of the six materials, only silk and PGA are braided.", src:'lecture' },
+{ id:'q3-S01', lec:'risk-assessment', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. UniFe scores bleeding on probing (BOP %), not the plaque index.\n2. Each UniFe input is scored 0-4, and the scores are summed into a risk tier.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true. UniFe's five inputs are cigarettes a day, HbA1c, number of pockets ≥5 mm, BOP % and the bone-loss/age ratio, each scored 0-4 and summed into a five-tier risk score from low to high. Plaque index is the classic wrong pick: plaque starts the disease, but UniFe counts bleeding.", src:'lecture' },
+{ id:'q3-S02', lec:'risk-assessment', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. About 10% of people resist periodontitis regardless of their oral hygiene.\n2. About 10-15% of people do not respond to standard therapy.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true. Statement 2 is false: it swaps the slide's two other numbers. 10-15% are at risk for severe destructive disease, and 20-25% do not respond to standard therapy.", src:'lecture' },
+{ id:'q3-S03', lec:'risk-assessment', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. McGuire & Nunn rates how likely the tooth is to be retained.\n2. Kwok & Caton rates the likelihood of achieving periodontal stability.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: McGuire & Nunn asks how easy the tooth will be to maintain. Likelihood of retaining the tooth is Miller & McEntire. Statement 2 is true.", src:'lecture' },
+{ id:'q4-S01', lec:'phase1-therapy', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Pocket elimination is the main rationale for scaling and root planing.\n2. SRP aims to shift the pocket flora from gram-negative toward gram-positive.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: pockets do shrink after SRP, but pocket elimination is not its rationale. Statement 2 is true: the goals are to reduce inflammation, shift the flora from gram-negative toward gram-positive and arrest progression. SRP does not reverse lost bone or attachment.", src:'lecture' },
+{ id:'q4-S02', lec:'phase1-therapy', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. After SRP, the junctional epithelium re-forms within about 7-10 days.\n2. Re-evaluation waits about 6 months, because pocket depths keep dropping until then.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true. Statement 2 is false: connective tissue reattaches by 4-6 weeks, so the patient returns at 4-6 weeks. The maximum result is seen by then, and waiting longer gives no additional pocket reduction (collagen keeps maturing for 3-6 months).", src:'lecture' },
+{ id:'q4-S03', lec:'phase1-therapy', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Scaling is done both supragingivally and subgingivally.\n2. Root planing is done both supragingivally and subgingivally.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true: scaling removes deposits from tooth and root surfaces, supra- and subgingivally. Statement 2 is false: root planing stays subgingival and works only on root surfaces, leaving a smooth root with no catch.", src:'lecture' },
+{ id:'q4-S04', lec:'phase1-therapy', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. SRP is a blinded procedure guided by tactile sensation.\n2. Motile bacteria that invade the pocket lining are a limitation of SRP.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true; both are on the list of SRP limitations as taught. SRP only reaches the root surface in the pocket, not bacteria that have moved into the soft-tissue lining. The rest of the list: restorations with overhanging or subgingival margins, furcations and root concavities, over-removing cementum (hypersensitivity), patient compliance and operator skill.", src:'lecture' },
+{ id:'q1-A01', lec:'diagnosis-tx-planning', type:'mcq', stem:"Which complexity factor belongs to Stage 4 rather than Stage 3?", choices:['Bite collapse, drifting or flaring','A Class II furcation','Vertical bone loss of 3 mm or more','Probing depths of 6 mm or more'], answer:0, ex:"The 2018 AAP/EFP table: Stage 3 complexity is PD ≥6 mm, vertical bone loss ≥3 mm, Class II-III furcation and a moderate ridge defect. Stage 4 adds a need for complex rehabilitation: masticatory dysfunction, secondary occlusal trauma (mobility ≥2), a severe ridge defect, bite collapse/drifting/flaring, or fewer than 20 remaining teeth.", src:'aap' },
+{ id:'q1-A02', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following are Stage 4 complexity factors EXCEPT:", choices:['A Class II or III furcation','Fewer than 20 remaining teeth (10 opposing pairs)','Masticatory dysfunction','Tooth mobility of degree 2 or more'], answer:0, ex:"The 2018 AAP/EFP table: a Class II-III furcation is a Stage 3 complexity factor. Fewer than 20 remaining teeth, masticatory dysfunction and secondary occlusal trauma (mobility ≥2) are Stage 4, along with a severe ridge defect and bite collapse, drifting or flaring.", src:'aap' },
+{ id:'q1-A03', lec:'diagnosis-tx-planning', type:'mcq', stem:"How does a ridge defect count in staging?", choices:['Moderate → Stage 3; severe → Stage 4','Any ridge defect → Stage 4','It sets the grade, not the stage','It only counts toward Stage 2'], answer:0, ex:"The 2018 AAP/EFP table: a moderate ridge defect is on the Stage 3 complexity list and a severe ridge defect on the Stage 4 list. Ridge defects never affect the grade.", src:'aap' },
+{ id:'q1-A04', lec:'diagnosis-tx-planning', type:'mcq', stem:"Which complexity profile fits Stage 2?", choices:['Max PD ≤5 mm, mostly horizontal bone loss','Max PD ≤4 mm, mostly vertical bone loss','Max PD ≥6 mm, mostly horizontal bone loss','Max PD ≤5 mm with a Class II furcation'], answer:0, ex:"The 2018 AAP/EFP table: Stage 1 is max PD ≤4 mm and Stage 2 max PD ≤5 mm, both with mostly horizontal bone loss. A 6 mm pocket, a ≥3 mm vertical defect or a Class II furcation all push the case to Stage 3.", src:'aap' },
+{ id:'q1-A05', lec:'diagnosis-tx-planning', type:'mcq', stem:"When is periodontitis called generalized?", choices:['When 30% or more of teeth are involved','When 50% or more of teeth are involved','When more than one quadrant is involved','When both arches are involved'], answer:0, ex:"The 2018 AAP/EFP table: extent is localized below 30% of teeth and generalized at 30% or more. The third option is a molar/incisor pattern, as in the 13-year-old case.", src:'aap' },
+{ id:'q1-A06', lec:'diagnosis-tx-planning', type:'mcq', stem:"With 5 years of records, how much CAL or bone loss is direct evidence for Grade C?", choices:['2 mm or more','Any loss at all','More than 1 mm','None: only the bone-loss/age ratio sets Grade C'], answer:0, ex:"The 2018 AAP/EFP table: direct evidence is the gold standard when records exist: no loss over 5 years = Grade A, under 2 mm = Grade B, 2 mm or more = Grade C. Without records, use the bone-loss/age ratio and the case phenotype.", src:'aap' },
+{ id:'q1-A07', lec:'diagnosis-tx-planning', type:'mcq', stem:"A patient has little plaque but far more destruction than the biofilm would explain. Which grade does this case phenotype point to?", choices:['Grade C','Grade A','Grade B','Phenotype does not affect the grade'], answer:0, ex:"The 2018 AAP/EFP table: case phenotype is indirect evidence. Heavy biofilm with little destruction is Grade A, destruction in line with the biofilm is Grade B, and destruction that exceeds what the biofilm explains (or a molar/incisor or early-onset pattern) is Grade C.", src:'aap' },
+{ id:'q1-A08', lec:'diagnosis-tx-planning', type:'mcq', stem:"A patient smokes 5 cigarettes a day. Which grade row does smoking fall in?", choices:['Grade B','Grade A','Grade C','None: under 10 a day is ignored'], answer:0, ex:"The 2018 AAP/EFP table: non-smoker = Grade A row, fewer than 10 a day = Grade B, 10 or more = Grade C. Since Grade B is the default, a light smoker is not pushed up; only 10 or more a day moves the case to C.", src:'aap' },
+{ id:'q1-S06', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Fewer than 20 remaining teeth (10 opposing pairs) is a Stage 4 complexity factor.\n2. Bite collapse, drifting and flaring are Stage 3 complexity factors.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:2, ex:"Statement 1 is true. Statement 2 is false: bite collapse, drifting and flaring are on the Stage 4 list (need for complex rehabilitation), with masticatory dysfunction, mobility ≥2 and a severe ridge defect. Stage 3's list is PD ≥6 mm, vertical bone loss ≥3 mm, Class II-III furcation and a moderate ridge defect.", src:'aap' },
+{ id:'q1-S07', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Stage 1 complexity is a max PD of 4 mm or less with mostly horizontal bone loss.\n2. Stage 3 complexity adds PD ≥6 mm, vertical bone loss ≥3 mm, a Class II or III furcation and a moderate ridge defect.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:0, ex:"Both are true, straight from the 2018 AAP/EFP staging table. Stage 2 is the same as Stage 1 with a max PD of 5 mm.", src:'aap' },
+{ id:'q1-S08', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. In a patient with diabetes, an HbA1c below 7% falls in the Grade C row.\n2. Smoking 10 or more cigarettes a day falls in the Grade C row.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:3, ex:"Statement 1 is false: diabetes with HbA1c below 7.0% is the Grade B row; 7.0% or higher is Grade C. Statement 2 is true: fewer than 10 a day is the Grade B row, 10 or more Grade C.", src:'aap' },
+{ id:'q1-S09', lec:'diagnosis-tx-planning', type:'mcq', fmt:'2stmt', stem:"Read the two statements.\n1. Stage 4 requires more interdental CAL than Stage 3.\n2. Heavy biofilm with little destruction fits the Grade C case phenotype.", choices:['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'], answer:1, ex:"Both are false. Stages 3 and 4 share the same CAL (≥5 mm) and bone-loss cutoffs; tooth loss and the complexity list separate them. Heavy biofilm with little destruction is the Grade A phenotype; Grade C is destruction beyond what the biofilm explains.", src:'aap' },
+{ id:'q1-E01', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following place a case in at least Stage 3, regardless of the CAL numbers, EXCEPT:", choices:['Generalized 6 mm pockets with no bone loss','A vertical bone defect of 3 mm or more','A Class II furcation','A tooth lost to periodontitis'], answer:0, ex:"Deep pockets alone never stage a case: without confirmed attachment and bone loss they could be gingivitis. Vertical bone loss ≥3 mm, Class II-III furcation involvement and any tooth lost to periodontitis each force Stage 3/4 regardless of the CAL math.", src:'lecture' },
+{ id:'q1-E02', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following are true of grading EXCEPT:", choices:['Not smoking lowers the grade to A','Grade B is assumed by default','An HbA1c of 7% or higher means Grade C','A bone-loss/age ratio over 1.0 suggests Grade C'], answer:0, ex:"Smoking and HbA1c can only push a grade up; a non-smoker without diabetes does not earn a downgrade. Grade B is the default until evidence shifts it, and a ratio over 1.0 or an HbA1c ≥7% points to Grade C.", src:'lecture' },
+{ id:'q2-E01', lec:'incisions-flaps-sutures', type:'mcq', fmt:'except', stem:"All of the following are true of silk sutures EXCEPT:", choices:['They resorb within about 7-10 days','They are braided','They handle very well','They come out at about 7 days'], answer:0, ex:"Silk is non-resorbable, so it has to be removed (at 7 days). The 7-10 day resorption is chromic gut. Silk is natural and braided, handles beautifully, and has the worst tissue reaction on the course chart.", src:'lecture' },
+{ id:'q3-E01', lec:'risk-assessment', type:'mcq', fmt:'except', stem:"UniFe scores all of the following EXCEPT:", choices:['Plaque index','Bleeding on probing (BOP %)','HbA1c','Number of pockets ≥5 mm'], answer:0, ex:"UniFe's five inputs are cigarettes a day, HbA1c, number of pockets ≥5 mm, BOP % and the bone-loss/age ratio. Plaque index is not one of them: UniFe counts bleeding, not plaque.", src:'lecture' },
+{ id:'q4-E01', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"All of the following are goals of scaling and root planing EXCEPT:", choices:['Eliminating the pocket','Reducing inflammation','Arresting disease progression','Shifting the flora toward gram-positive'], answer:0, ex:"Pockets do shrink after SRP, but pocket elimination is not its rationale. The goals are to reduce inflammation, shift the flora from gram-negative toward gram-positive and arrest progression; lost bone and attachment stay lost.", src:'lecture' },
+{ id:'q4-E02', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"All of the following are limitations of SRP discussed in class EXCEPT:", choices:['Hand instruments reduce pockets less than ultrasonics','Motile bacteria invade the pocket lining','It is a blinded, tactile procedure','Furcations and root concavities block access'], answer:0, ex:"Manual and ultrasonic instrumentation show no statistical difference in probing-depth reduction or attachment gain, so the instrument choice is not a limitation. The other three are on the list as taught, along with restorative margins, over-removing cementum, compliance and operator skill.", src:'lecture' },
+{ id:'q1-E03', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"Which of the following is NOT true of plaque-induced gingivitis?", choices:['It causes some attachment loss','Probing depths can reach 4-5 mm','There is bleeding on probing','It can return fully to health'], answer:0, ex:"Gingivitis stays within the gingiva: no attachment loss and no bone loss, which is why it is fully reversible with plaque control. Swelling can still push probing depths to 4-5 mm, and it bleeds on probing.", src:'lecture' },
+{ id:'q1-E04', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following belong in Phase I therapy EXCEPT:", choices:['A permanent crown on a periodontally involved tooth','Caries control','Oral hygiene instruction','Smoking-cessation counseling'], answer:0, ex:"Any permanent crown or final RPD waits until periodontal therapy is complete; a temporary crown bridges the gap. Caries control is the easy-to-forget Phase I item, done before or alongside SRP.", src:'lecture' },
+{ id:'q1-E05', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"A treated periodontitis patient is stable on maintenance. Which statement is NOT correct?", choices:['They are re-staged at each maintenance visit','They are healthy on a reduced periodontium','They stay on periodontal maintenance, not prophylaxis','Their tissue heals with a long junctional epithelium'], answer:0, ex:"A stable treated patient is diagnosed as healthy on a reduced periodontium, not re-staged, unless disease recurs. They stay on the maintenance code even with 3 mm pockets, because the long junctional epithelium left after treatment breaks down more easily.", src:'lecture' },
+{ id:'q1-E06', lec:'diagnosis-tx-planning', type:'mcq', fmt:'except', stem:"All of the following are true about CAL EXCEPT:", choices:['A 7 mm pocket always means at least 7 mm of CAL','CAL = probing depth + recession','Interdental CAL is the gold standard for staging','CAL is smaller than PD when the CEJ is subgingival'], answer:0, ex:"CAL is measured from the CEJ, so a 7 mm pocket with the CEJ felt 4 mm under the margin is only 3 mm of attachment loss (recession is recorded as negative). With visible recession, CAL comes out larger than PD.", src:'lecture' },
+{ id:'q2-E02', lec:'incisions-flaps-sutures', type:'mcq', fmt:'except', stem:"All of the following are true of the horizontal mattress suture EXCEPT:", choices:['It is the general-purpose default suture','It is essential for larger bone augmentations','It prevents flap-margin inversion','Overtightening it risks dehiscence'], answer:0, ex:"The general-purpose default is the single interrupted suture. The horizontal mattress is for layered closure and bone augmentation, prevents the flap margin from inverting and needs high tensile strength; tied too tight, it starves the incision edge of blood (bone necrosis, dehiscence).", src:'lecture' },
+{ id:'q2-E03', lec:'incisions-flaps-sutures', type:'mcq', fmt:'except', stem:"All of the following sutures are absorbable EXCEPT:", choices:['ePTFE','Chromic gut','Plain gut','PGCL'], answer:0, ex:"ePTFE, silk, poly-propylene and nylon are non-absorbable and must be removed (or left long-term). Gut, chromic gut and the synthetic PGA/PGCL family resorb.", src:'lecture' },
+{ id:'q3-E02', lec:'risk-assessment', type:'mcq', fmt:'except', stem:"All of the following are true about periodontal maintenance EXCEPT:", choices:['Most patients (about 80-90%) comply with it','Treated patients who skip it lose about twice as many teeth','Pathogens start re-establishing 4-8 weeks after treatment','A 3-month recall sits inside that regrowth window'], answer:0, ex:"Compliance with maintenance runs only about 30-40%. Treated-but-not-maintained patients lose teeth about twice as often, and because subgingival pathogens start returning at 4-8 weeks (near pre-treatment levels by 9-11), a 3-month recall falls inside that window.", src:'lecture' },
+{ id:'q3-E03', lec:'risk-assessment', type:'mcq', fmt:'except', stem:"Which of the following is NOT a risk-assessment tool named in the lecture?", choices:['McGuire & Nunn','UniFe','PRA (Lang and Tonetti)','PreViser/PAT'], answer:0, ex:"McGuire & Nunn is a tooth prognosis system (how easy the tooth is to maintain), not a patient risk-scoring tool. UniFe, PRA and PreViser/PAT all combine clinical, radiographic and behavioral inputs into a risk tier.", src:'lecture' },
+{ id:'q3-E04', lec:'risk-assessment', type:'mcq', fmt:'except', stem:"All of the following are true of PISA (periodontal inflamed surface area) EXCEPT:", choices:['Stage 1-2 periodontitis averages about the size of a paper cut','It measures the area of inflamed pocket epithelium','A healthy patient averages about 34 mm²','Stage 1-2 periodontitis averages about 2,309 mm²'], answer:0, ex:"The paper cut is the healthy mouth (about 34 mm²). Even Stage 1-2 periodontitis averages about 2,309 mm², a wound the size of cellulitis with early Ludwig's angina, which is the lecture's argument for periodontitis as a systemic inflammatory burden.", src:'lecture' },
+{ id:'q4-E03', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"All of the following are true of a prophylaxis EXCEPT:", choices:['It is for patients already treated for periodontitis','It is preventive, not therapeutic','It can remove calculus 1-2 mm subgingivally','It is for gingival health or gingivitis'], answer:0, ex:"Prophylaxis is for patients who have never had periodontitis; removing calculus 1-2 mm under the margin is still part of it. A patient already treated for periodontitis gets periodontal maintenance, which is supportive therapy, and the two terms are not interchangeable.", src:'lecture' },
+{ id:'q4-E04', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"Which of the following is NOT true of SRP outcomes, as taught?", choices:['Spreading SRP over several visits removes more calculus','Hand and ultrasonic instruments give similar pocket reduction','Adding chlorhexidine irrigation adds nothing','Debridement is inadequate about 65% of the time in pockets ≥5 mm'], answer:0, ex:"Spreading instrumentation over several sessions has no real advantage: calculus left behind stays for the same reasons (Anderson et al. 1996). Manual and ultrasonic give no statistical difference, irrigation adds nothing, and root debridement is inadequate about 65% of the time in pockets ≥5 mm (Greenstein 2000).", src:'lecture' },
+{ id:'q4-E05', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"All of the following reduce probing depth after SRP EXCEPT:", choices:['Regrowth of the lost bone','Shrinkage of the inflamed gingival margin','Junctional epithelium reattaching to the root','Connective tissue fibers reattaching to the root'], answer:0, ex:"SRP does not reverse lost bone or attachment. Probing depth drops because the swollen margin shrinks (recorded as more recession) and because the junctional epithelium and connective tissue fibers reattach to the clean root at the base of the pocket.", src:'lecture' },
+{ id:'q4-E06', lec:'phase1-therapy', type:'mcq', fmt:'except', stem:"All of the following are true about what causes periodontal destruction EXCEPT:", choices:['Bacteria bring osteoclasts into the tissue','The host response causes about 75% of the damage','Plaque bacteria initiate the disease','Bacteria bring endotoxin (lipopolysaccharide)'], answer:0, ex:"Bacteria bring endotoxin (LPS), not osteoclasts; the osteoclasts are the host's. Bacteria initiate the disease and cause about 25% of the damage, the host's inflammatory mediators and osteoclasts about 75%.", src:'lecture' },
 
 ];
 var QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
@@ -2602,7 +2666,7 @@ var MINDMAPS = {
     ]
    },
    {
-    "label": "Instruments (not on midterm)",
+    "label": "Instruments",
     "children": [
      {
       "label": "Exam kit: mirror, probe, perio explorer, Nabers"
@@ -3197,11 +3261,13 @@ function showToast(html){
   var el = document.createElement('div'); el.className = 'toast'; el.innerHTML = html;
   host.appendChild(el); setTimeout(function(){ el.remove(); }, 3400);
 }
+/* two-statement items keep their choices in the authored order, as on the exam */
+function choiceOrder(q){ var idx = q.choices.map(function(c,i){ return i; }); return q.fmt === '2stmt' ? idx : shuffled(idx); }
 function shuffled(arr){ var a = arr.slice(); for(var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function escHtml(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function sessChip(l){ return '<span class="chip tag-'+l.tag+'">S'+l.num+'</span>'; }
-var SRC_LABEL = { 'lecture':'Lecture', 'slides':'Slide deck', 'exam-review':'Exam-review guide' };
+var SRC_LABEL = { 'lecture':'Lecture', 'slides':'Slide deck', 'exam-review':'Exam-review guide', 'aap':'2018 AAP/EFP tables' };
 var STATUS_LABEL = {
   taught:   { text:'Lectured · full notes', cls:'taught' },
   preview:  { text:'Slides posted · not yet lectured', cls:'preview' },
@@ -3215,7 +3281,7 @@ function statusHTML(l){ var s = STATUS_LABEL[l.status]; return '<span class="sta
 var SEQ_STATE = {}, MATCH_STATE = {};
 function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
-  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.mid===false?'<span class="chip src nomid" title="Dr. Kaur: instruments, ultrasonics and polishing are not on the midterm">Not on midterm</span>':'')+'</div>';
+  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+'</div>';
 }
 /* class-wide % sits inside the explanation, so it only appears once the student has answered */
 var CLASS_ROW = '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div>';
@@ -3225,7 +3291,7 @@ function qCardHTML(q){
     /* Choices render in a fresh random order every time; data-idx keeps the ORIGINAL index,
        which is all the handler compares against (every MCQ is authored with the key first). */
     body += '<div class="qcard-choices" data-qtype="mcq">';
-    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){
+    choiceOrder(q).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+i+'">'+escHtml(q.choices[i])+'</button>';
     });
     body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+CLASS_ROW+'</div>';
@@ -3405,9 +3471,8 @@ function renderHeaderMeta(){
   if(el) el.textContent = STATE.totalCorrect + '/' + QUESTIONS.length;
   var cd = document.getElementById('countdownPill');
   if(cd){
-    var mid = daysUntil(MIDTERM_DATE), fin = daysUntil(FINAL_DATE), txt, title;
-    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-4 · 46 questions, 80 min'; }
-    else if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · all 9 sessions'; }
+    var fin = daysUntil(FINAL_DATE), txt, title;
+    if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · all 9 sessions'; }
     else { txt = 'Course complete'; title = ''; }
     cd.innerHTML = icon('cal') + txt; cd.title = title;
   }
@@ -3429,6 +3494,7 @@ function ulOf(arr){ return '<ul>' + arr.map(function(p){ return '<li>'+escHtml(p
 var REF_SECTIONS = [
   { id:'staging', lec:'diagnosis-tx-planning', title:'Staging', body:function(){ return tableWrap(['Stage','Interdental CAL','Radiographic bone loss','Max probing depth','Tooth loss'], rowsOf(STAGING_TABLE,['stage','cal','rbl','pd','toothLoss'])) + '<p class="note"><b>Automatic Stage 3/4</b>, whatever the CAL: ' + STAGE_AUTOMATIC_TRIGGERS.map(escHtml).join('; ') + '.</p>'; } },
   { id:'grading', lec:'diagnosis-tx-planning', title:'Grading', body:function(){ return tableWrap(['Grade','Meaning','Bone-loss / age ratio'], rowsOf(GRADING_TABLE,['grade','meaning','ratio'])) + '<p class="note">' + GRADE_MODIFIERS.map(escHtml).join('<br>') + '</p>'; } },
+  { id:'aap-full', lec:'diagnosis-tx-planning', title:'Staging and grading: the full 2018 AAP/EFP tables', body:function(){ return tableWrap(['Stage','Severity','Complexity'], rowsOf(AAP_STAGING,['stage','severity','complexity'])) + '<p class="note">' + AAP_STAGING_NOTES.map(escHtml).join('<br>') + '</p>' + tableWrap(['Grading','Grade A (slow)','Grade B (moderate)','Grade C (rapid)'], rowsOf(AAP_GRADING,['row','a','b','c'])) + '<p class="note">From the 2017 World Workshop tables (Tonetti, Greenwell &amp; Kornman 2018), for the details the class charts leave out. Start at Grade B and shift with evidence; the modifiers only push the grade up.</p>'; } },
   { id:'four-step', lec:'diagnosis-tx-planning', title:'The four-step staging workflow', body:function(){ return tableWrap(['Step','What you do'], rowsOf(FOUR_STEP_APPROACH,['step','detail'])); } },
   { id:'defect-walls', lec:'diagnosis-tx-planning', title:'Intrabony defect wall configurations', body:function(){ return tableWrap(['Configuration','What it means'], rowsOf(BONE_DEFECT_WALLS,['walls','note'])); } },
   { id:'recession-types', lec:'diagnosis-tx-planning', title:'Recession types (RT1-RT3)', body:function(){ return tableWrap(['Type','Definition','Root coverage'], rowsOf(RECESSION_TYPES,['type','def','implication'])); } },
@@ -3453,12 +3519,12 @@ var REF_SECTIONS = [
   { id:'p1-xray-limits', lec:'phase1-therapy', title:'Radiograph reads and SRP limitations', body:function(){ return '<h5>What the x-ray tells you before you probe</h5>' + ulOf(RADIOGRAPH_READS) + '<h5>Limitations of SRP (as taught)</h5>' + ulOf(SRP_LIMITS); } },
   { id:'p1-evidence', lec:'phase1-therapy', title:'What the evidence says', body:function(){ return tableWrap(['Question','Finding'], rowsOf(PHASE1_EVIDENCE,['topic','finding'])); } },
   { id:'p1-reeval', lec:'phase1-therapy', title:'Phase I evaluation (re-evaluation)', body:function(){ return tableWrap(['Item','Detail'], rowsOf(PHASE1_REEVAL,['item','detail'])); } },
-  { id:'p1-instruments', lec:'phase1-therapy', title:'Instrument guide (slide deck) · not on midterm', body:function(){ return tableWrap(['Instrument','Kit','Where','How'], rowsOf(PHASE1_INSTRUMENTS,['name','kit','where','how'])); } },
-  { id:'p1-instruments-guide', lec:'phase1-therapy', title:'Instrument list (exam-review guide) · not on midterm', body:function(){ return tableWrap(['Instrument','Field','Use'], rowsOf(INSTRUMENTS,['name','field','use'])); } },
-  { id:'p1-scaler-curette', lec:'phase1-therapy', title:'Scaler vs. curette · not on midterm', body:function(){ return tableWrap(['Feature','Sickle scaler','Curette'], rowsOf(SCALER_VS_CURETTE,['f','scaler','curette'])) + '<p class="note"><b>Gracey curettes:</b> ' + GRACEY_FEATURES.map(escHtml).join('; ') + '. Insert at a closed angle, work at 70-80°.</p>'; } },
-  { id:'p1-technique', lec:'phase1-therapy', title:'Finger rests and strokes · not on midterm', body:function(){ return tableWrap(['Finger rest','Where it sits'], rowsOf(FINGER_RESTS,['rest','where'])) + tableWrap(['Stroke','Detail'], rowsOf(STROKES,['stroke','detail'])) + '<p class="note"><b>Adaptation depends on:</b> ' + ADAPTATION_FACTORS.map(escHtml).join('; ') + '. <b>Most-missed areas:</b> ' + MISSED_AREAS.map(escHtml).join('; ') + '.</p>'; } },
-  { id:'p1-ultrasonics', lec:'phase1-therapy', title:'Ultrasonic scalers · not on midterm', body:function(){ return tableWrap(['Type','Mechanism','Tip motion','Working surfaces'], rowsOf(ULTRASONICS,['type','mech','motion','surfaces'])); } },
-  { id:'p1-polish', lec:'phase1-therapy', title:'To polish or not to polish · not on midterm', body:function(){ return '<h5>For</h5>' + ulOf(POLISH_PROS) + '<h5>Against</h5>' + ulOf(POLISH_CONS) + '<p class="note"><b>Technique:</b> ' + escHtml(POLISH_TECHNIQUE) + '</p>'; } },
+  { id:'p1-instruments', lec:'phase1-therapy', title:'Instrument guide (slide deck)', body:function(){ return tableWrap(['Instrument','Kit','Where','How'], rowsOf(PHASE1_INSTRUMENTS,['name','kit','where','how'])); } },
+  { id:'p1-instruments-guide', lec:'phase1-therapy', title:'Instrument list (exam-review guide)', body:function(){ return tableWrap(['Instrument','Field','Use'], rowsOf(INSTRUMENTS,['name','field','use'])); } },
+  { id:'p1-scaler-curette', lec:'phase1-therapy', title:'Scaler vs. curette', body:function(){ return tableWrap(['Feature','Sickle scaler','Curette'], rowsOf(SCALER_VS_CURETTE,['f','scaler','curette'])) + '<p class="note"><b>Gracey curettes:</b> ' + GRACEY_FEATURES.map(escHtml).join('; ') + '. Insert at a closed angle, work at 70-80°.</p>'; } },
+  { id:'p1-technique', lec:'phase1-therapy', title:'Finger rests and strokes', body:function(){ return tableWrap(['Finger rest','Where it sits'], rowsOf(FINGER_RESTS,['rest','where'])) + tableWrap(['Stroke','Detail'], rowsOf(STROKES,['stroke','detail'])) + '<p class="note"><b>Adaptation depends on:</b> ' + ADAPTATION_FACTORS.map(escHtml).join('; ') + '. <b>Most-missed areas:</b> ' + MISSED_AREAS.map(escHtml).join('; ') + '.</p>'; } },
+  { id:'p1-ultrasonics', lec:'phase1-therapy', title:'Ultrasonic scalers', body:function(){ return tableWrap(['Type','Mechanism','Tip motion','Working surfaces'], rowsOf(ULTRASONICS,['type','mech','motion','surfaces'])); } },
+  { id:'p1-polish', lec:'phase1-therapy', title:'To polish or not to polish', body:function(){ return '<h5>For</h5>' + ulOf(POLISH_PROS) + '<h5>Against</h5>' + ulOf(POLISH_CONS) + '<p class="note"><b>Technique:</b> ' + escHtml(POLISH_TECHNIQUE) + '</p>'; } },
   { id:'furcation-anatomy', lec:'resective-furcation', title:'Furcation anatomy', body:function(){ return FURCATION_ANATOMY.map(function(s){ return '<h5>'+escHtml(s.site)+'</h5>' + ulOf(s.points); }).join(''); } },
   { id:'furcation-tx', lec:'resective-furcation', title:'Furcation treatment by class and bone architecture', body:function(){ return tableWrap(['Class','Treatment options'], rowsOf(FURCATION_TX,['cls','tx'])) + tableWrap(['Architecture','Pattern'], rowsOf(BONE_ARCHITECTURE,['type','note'])); } },
   { id:'regen', lec:'periodontal-regeneration', title:'Regeneration: candidacy and modifiers', body:function(){ return ulOf(REGEN_CANDIDACY) + tableWrap(['Modifier','What it does'], rowsOf(REGEN_MODIFIERS,['name','note'])); } },
@@ -3540,15 +3606,6 @@ var COURSE_GRADING = [
   { component:'Midterm exam', weight:'Remainder', note:'Thu Oct 1, 10:00 am. Sessions 1-4 (Sept 3 - Sept 24), 46 questions in 80 minutes.' },
   { component:'Comprehensive final exam', weight:'Remainder', note:'November 19. All 9 sessions; earlier material stays fair game even though the midterm already tested it.' }
 ];
-/* From Dr. Abou-Arraj's midterm email (2026-09-26) */
-var MIDTERM_INFO = {
-  when:'Thursday, Oct 1 · 10:00 am', where:'Rooms 220 and 222 (room assignment comes next week)',
-  covers:'Sessions 1-4 (Sept 3 - Sept 24)', count:'46 questions in 80 minutes (updated the morning of the exam)',
-  format:['Mostly multiple choice','A few Patient Box (case-based) scenarios','A few multiple-answer questions, with partial credit','One ordering question (pick the right order of categories)','No matching questions (dropped in the exam-day update)','No essays'],
-  checklist:['Laptop fully charged, with Lockdown Browser and Respondus Monitor ready','Sign the sign-in sheet','Leave an empty chair between every two students','Can\'t log in? Go to the HIBS office on the 6th floor','Scratch paper is in the room; hand it to Ms. Patrice Headington (proctor) before you leave','Dr. Abou-Arraj will be covering clinic; Ms. Patrice and Ms. Sarah proctor the rooms'],
-  grades:'Grades won\'t post right away: he reviews how each question performed first (may drop a question or give everyone credit).',
-  scope:'Dr. Kaur (Session 4): no instruments, ultrasonics or polishing. Focus on the discussion and slides up to failure of therapy.'
-};
 var PCD_COMPETENCIES = ['Periodontal charting / probing', 'Identifying and selecting instruments', 'Scaling and root planing'];
 
 var CRAM_CONTENT = [
@@ -3588,13 +3645,13 @@ function gotoLecture(lecId){ COMPENDIUM_SELECTED_LEC = lecId; STATE.ui.lec = lec
 
 /* ---------- Course home ---------- */
 function renderCourseInfo(){
-  var mid = daysUntil(MIDTERM_DATE), fin = daysUntil(FINAL_DATE);
+  var fin = daysUntil(FINAL_DATE);
   var mastered = STATE.totalCorrect, total = QUESTIONS.length;
   var taught = LECTURES.filter(function(l){ return l.status === 'taught'; }).length;
   var cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
-  var preMid = mid !== null && mid >= 0, left = QUESTIONS.filter(function(q){ return !STATE.answered[q.id] && (!preMid || (q.mid !== false && LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)); }).length;
+  var left = QUESTIONS.filter(function(q){ return !STATE.answered[q.id]; }).length;
   var h = '<div class="quick-start" aria-label="Start studying">' +
-    '<button type="button" class="qs-btn primary" data-practice="'+(preMid ? 'midterm' : 'all')+'"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+(preMid ? 'Midterm scope · ' : '')+left+' you haven\'t tried</small></span></button>' +
+    '<button type="button" class="qs-btn primary" data-practice="all"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>10 questions: misses + high-yield</small></span></button>' +
     '<button type="button" class="qs-btn" data-goto-lecture="'+cont.id+'"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>S'+cont.num+' '+escHtml(shortTitle(cont))+'</small></span></button>' +
     '</div>';
@@ -3603,25 +3660,15 @@ function renderCourseInfo(){
     '<div class="hh-actions"><button type="button" class="btn primary" data-goto-lecture="'+cont.id+'">'+icon('notes')+'Continue: S'+cont.num+' '+escHtml(shortTitle(cont))+'</button>' +
     '<button type="button" class="btn" data-sh-drill="home">'+icon('bolt')+'Daily drill</button><button type="button" class="btn" data-set-view="mock-exam">'+icon('timer')+'Mock exam</button><button type="button" class="btn" data-goto-mode="arcade">'+icon('arcade')+'Pocket Arcade</button></div></div>' +
     '<div class="hh-side"><div class="hh-exams">' +
-      '<div class="hh-stat"><div class="k">Midterm · Oct 1, 10 am</div><div class="v">'+(mid !== null && mid >= 0 ? mid+'<small>days</small>' : mid !== null ? 'Done' : 'After S4')+'</div></div>' +
       '<div class="hh-stat"><div class="k">Final · Nov 19</div><div class="v">'+(fin >= 0 ? fin+'<small>days</small>' : 'Done')+'</div></div></div>' +
       '<div class="hh-stat"><div class="k">Your progress</div><div class="v">'+mastered+'<small>of '+total+' questions correct</small></div><div class="bar" style="margin-top:8px"><i style="width:'+(total?Math.round(100*mastered/total):0)+'%"></i></div></div>' +
       '<div class="hh-stat"><div class="k">Lectured so far</div><div class="v">'+taught+'<small>of '+LECTURES.length+' sessions · '+currentStreakDays()+'-day streak</small></div></div>' +
     '</div></div>';
-  if(mid !== null && mid >= 0){
-    var M = MIDTERM_INFO;
-    h += '<div class="card section-block midterm-card"><div class="eyebrow">'+icon('flag')+'Midterm day</div>' +
-      '<div class="mt-grid"><div><div class="mt-when">'+escHtml(M.when)+'</div><p class="muted" style="margin:4px 0 12px">'+escHtml(M.where)+' · '+escHtml(M.covers)+' · '+escHtml(M.count)+'</p>' +
-      '<h4>Question types</h4>'+ulOf(M.format)+'<p class="note">'+escHtml(M.scope)+'</p>' +
-      '<button type="button" class="btn primary" data-set-view="mock-exam">'+icon('timer')+'Take a midterm-format mock</button></div>' +
-      '<div><h4>Before you walk in</h4>'+ulOf(M.checklist)+'<p class="note">'+escHtml(M.grades)+'</p></div></div></div>';
-  }
   h += '<div class="home-grid"><div class="card"><div class="eyebrow">'+icon('cal')+'Course map</div><div class="course-map">';
   LECTURES.forEach(function(l){
     var p = lectureProgress(l.id);
     h += '<button type="button" class="cm-row tag-'+l.tag+'" data-goto-lecture="'+l.id+'"><span class="cm-dot">'+l.num+'</span><span><span class="cm-title">'+escHtml(l.title)+'</span><span class="cm-sub">'+escHtml(l.who)+' '+statusHTML(l)+'</span></span>' +
       '<span class="cm-prog">'+p.correct+'/'+p.total+'<span class="bar"><i style="width:'+p.pct+'%"></i></span></span></button>';
-    if(l.num === MIDTERM_AFTER) h += '<div class="cm-milestone">'+icon('flag')+'Midterm · Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-'+MIDTERM_AFTER+'</div>';
   });
   h += '<div class="cm-milestone">'+icon('trophy')+'Comprehensive final · Nov 19 · all 9 sessions</div></div></div>';
   h += '<div><div class="card section-block"><div class="eyebrow">How the grade breaks down</div>' +
@@ -3640,7 +3687,6 @@ function renderLectureNotes(){
   LECTURES.forEach(function(x){
     var px = lectureProgress(x.id);
     nav += '<button type="button" class="lec-nav-item tag-'+x.tag+'" data-goto-lecture="'+x.id+'" aria-current="'+(x.id===l.id)+'"><span class="snum">S'+x.num+'</span><span style="min-width:0"><span class="t">'+escHtml(x.title)+'</span><span class="w">'+escHtml(x.who)+' · '+px.correct+'/'+px.total+'</span></span></button>';
-    if(x.num === MIDTERM_AFTER) nav += '<div class="lec-nav-sep">Midterm</div>';
   });
   nav += '</nav>';
   var idx = LECTURES.indexOf(l), next = LECTURES[idx+1];
@@ -3684,9 +3730,9 @@ function renderLectureNotes(){
 function filteredQuestions(){
   var s = QBANK_FILTER.search.trim().toLowerCase();
   return QUESTIONS.filter(function(q){
-    if(QBANK_FILTER.lec === 'midterm'){ if(q.mid === false || !(LECTURE_BY_ID[q.lec].num <= MIDTERM_AFTER)) return false; }
-    else if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
+    if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
     if(QBANK_FILTER.type === 'pbox'){ if(!q.pbox) return false; }
+    else if(QBANK_FILTER.type === '2stmt' || QBANK_FILTER.type === 'except'){ if(q.fmt !== QBANK_FILTER.type) return false; }
     else if(QBANK_FILTER.type !== 'all' && q.type !== QBANK_FILTER.type) return false;
     var a = STATE.answered[q.id];
     if(QBANK_FILTER.status === 'new' && a) return false;
@@ -3702,8 +3748,8 @@ function filteredQuestions(){
 function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
-    '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option><option value="midterm"'+sel('midterm',QBANK_FILTER.lec)+'>Midterm scope (S1-4, per Dr. Kaur)</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
-    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
+    '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['2stmt','Two-statement'],['except','EXCEPT / NOT'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
     '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
     '<div class="qcount" id="qbCount" style="margin-bottom:12px"></div><div class="qlist" id="qbankList"></div>';
@@ -3726,7 +3772,7 @@ function renderQuestionBankListOnly(){
 /* Two kinds: the exam-format mock (mirrors Dr. Abou-Arraj's midterm emails: 46 questions in 80 minutes, a few Patient Box cases,
    a few multiple-answer items with partial credit, one ordering question, no matching, the rest multiple choice) and an MCQ-only sprint. */
 var EXAM_FORMAT = { total:46, pbox:5, multi:5, match:0, order:1, minutes:80 };
-var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, timer:null, scope:'midterm', kind:'format' };
+var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, timer:null, scope:'final', kind:'format' };
 function scopeLecIds(scope){ return (scope === 'midterm' ? LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }) : LECTURES).map(function(l){ return l.id; }); }
 function inScope(q, scope){ return scopeLecIds(scope).indexOf(q.lec) > -1 && !(scope === 'midterm' && q.mid === false); }
 function examPool(scope){ return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && inScope(q, scope); }); }
@@ -3793,7 +3839,7 @@ function examCardHTML(q, n){
   if(q.type === 'multi'){
     note = '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Select all that apply. Partial credit.</div>';
     body = '<div class="qcard-choices" data-qtype="examchoice">';
-    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){ var on = a && a.indexOf(i) > -1; body += '<button type="button" class="qcard-choice multi" data-exam-multi="'+i+'" data-qid="'+q.id+'" aria-pressed="'+!!on+'"'+(on?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
+    choiceOrder(q).forEach(function(i){ var on = a && a.indexOf(i) > -1; body += '<button type="button" class="qcard-choice multi" data-exam-multi="'+i+'" data-qid="'+q.id+'" aria-pressed="'+!!on+'"'+(on?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
     body += '</div>';
   } else if(q.type === 'match'){
     note = '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Match each item. Each pair is scored separately.</div>';
@@ -3804,7 +3850,7 @@ function examCardHTML(q, n){
     }).join('') + '</div>';
   } else {
     body = '<div class="qcard-choices" data-qtype="examchoice">';
-    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-choice" data-exam-choice="'+i+'" data-qid="'+q.id+'"'+(a===i?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
+    choiceOrder(q).forEach(function(i){ body += '<button type="button" class="qcard-choice" data-exam-choice="'+i+'" data-qid="'+q.id+'"'+(a===i?' data-selected="true"':'')+'>'+escHtml(q.choices[i])+'</button>'; });
     body += '</div>';
   }
   return '<div class="qcard tag-'+l.tag+'"><div class="qcard-top"><span class="chip src">Q'+n+'</span>'+sessChip(l)+(q.pbox?'<span class="chip src">Patient box</span>':'')+(q.type!=='mcq'?'<span class="chip src">'+EXAM_KIND_LABEL[q.type]+'</span>':'')+'</div>'+pboxHTML(q)+'<p class="qcard-stem">'+escHtml(q.stem)+'</p>'+note+body+'</div>';
@@ -3813,15 +3859,12 @@ function renderMockExam(){
   if(window.shTTS) window.shTTS.stop();
   var c = content();
   if(EXAM_STATE.phase === 'setup'){
-    var mid = examPool('midterm').length, all = examPool('final').length, n = EXAM_STATE.scope === 'midterm' ? mid : all;
+    var n = examPool('final').length;
     var sizes = [10,20,EXAM_FORMAT.total].filter(function(s){ return s < n; }).concat([n]);
-    var isMid = EXAM_STATE.scope === 'midterm';
     c.innerHTML = '<div class="card section-block"><div class="eyebrow">'+icon('timer')+'Mock exam</div><h2>Simulate exam conditions</h2><p class="muted" style="max-width:64ch">A running clock and no feedback until you submit. Anything you don\'t get full credit on lands in Weak Spots.</p>' +
-      '<div class="seg" role="group" aria-label="Exam scope"><button type="button" data-exam-scope="midterm" aria-pressed="'+isMid+'">Midterm · S1-4</button><button type="button" data-exam-scope="final" aria-pressed="'+!isMid+'">Final · all 9</button></div>' +
-      '<div class="exam-kinds"><button type="button" class="exam-kind primary" data-exam-action="start-format"><b>'+(isMid?'Midterm format':'Exam format')+' · '+EXAM_FORMAT.total+' questions</b><span>'+EXAM_FORMAT.minutes+' minutes. '+EXAM_FORMAT.pbox+' Patient Box cases, '+EXAM_FORMAT.multi+' multiple-answer (partial credit), '+EXAM_FORMAT.order+' ordering question, the rest multiple choice'+(isMid?'. Built to match Dr. Abou-Arraj\'s email; leaves out what Dr. Kaur said isn\'t on the midterm.':'.')+'</span></button></div>' +
+      '<div class="exam-kinds"><button type="button" class="exam-kind primary" data-exam-action="start-format"><b>Exam format · '+EXAM_FORMAT.total+' questions</b><span>'+EXAM_FORMAT.minutes+' minutes. '+EXAM_FORMAT.pbox+' Patient Box cases, '+EXAM_FORMAT.multi+' multiple-answer (partial credit), '+EXAM_FORMAT.order+' ordering question, the rest multiple choice. All 9 sessions: the final is cumulative.</span></button></div>' +
       '<h3 style="margin:18px 0 8px;font-size:1rem">Or a multiple-choice sprint <span class="mono faint" style="font-size:.8rem">'+n+' in the pool</span></h3>' +
       '<div class="size-picks">' + sizes.map(function(s){ return '<button type="button" class="size-pick" data-exam-action="start" data-size="'+s+'"><b>'+s+'</b><span>'+(s===n?'every question':'questions')+'</span></button>'; }).join('') + '</div></div>';
-    c.querySelectorAll('[data-exam-scope]').forEach(function(b){ b.addEventListener('click', function(){ EXAM_STATE.scope = b.getAttribute('data-exam-scope'); renderMockExam(); }); });
     return;
   }
   if(EXAM_STATE.phase === 'active'){
@@ -4181,7 +4224,7 @@ var ARCADE = (function(){
   var CATS = [['all','All games'],['action','Action'],['puzzle','Puzzle'],['word','Word'],['quiz','Quiz show']];
   var panel = null, active = null, activeId = null, lobbyCat = 'all', boardGame = null;
   var A = STATE.arcade;
-  if(!A.scope) A.scope = 'midterm';
+  if(!A.scope || A.scope === 'midterm') A.scope = 'all';
 
   /* ---------- sound ---------- */
   var actx = null;
@@ -4212,14 +4255,14 @@ var ARCADE = (function(){
     if(scope === 'all') return LECTURES.map(function(l){ return l.id; });
     return [scope];
   }
-  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && ids.indexOf(q.lec) > -1; }); }
+  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && q.fmt !== '2stmt' && ids.indexOf(q.lec) > -1; }); }
   function termPool(scope, filter){ var ids = scopeLecs(scope); return PERIO_TERMS.filter(function(t){ return ids.indexOf(t.lec) > -1 && (!filter || filter(t)); }); }
   function scopeSelectHTML(kind, min){
     min = min || 6;
     var count = function(s){ return kind === 'bank' ? bankPool(s).length : termPool(s).length; };
-    var opts = [['midterm','Midterm · S1-4'],['all','All 9 sessions']].concat(LECTURES.map(function(l){ return [l.id, 'S'+l.num+' · '+shortTitle(l)]; }))
+    var opts = [['all','All 9 sessions']].concat(LECTURES.map(function(l){ return [l.id, 'S'+l.num+' · '+shortTitle(l)]; }))
       .filter(function(o){ return count(o[0]) >= min; });
-    var cur = opts.some(function(o){ return o[0] === A.scope; }) ? A.scope : 'midterm';
+    var cur = opts.some(function(o){ return o[0] === A.scope; }) ? A.scope : 'all';
     return '<label for="gmScope">Questions from</label><select id="gmScope" data-scope>' + opts.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===cur?' selected':'')+'>'+escHtml(o[1])+' ('+count(o[0])+')</option>'; }).join('') + '</select>';
   }
   function currentScope(root){ var s = root && root.querySelector('[data-scope]'); return s ? s.value : A.scope; }
@@ -4871,8 +4914,7 @@ GAME_IMPL.quadrants = function(g, C){
   var root, stage, S, running = false;
   var BAND = ['#FFD84D','#43E0AC','#5CC8FF','#B69CFF'];
   function groupPool(){
-    var sc = C.currentScope(root), ids = sc === 'all' ? null : LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }).map(function(l){ return l.id; });
-    return QUAD_GROUPS.filter(function(gr){ return !ids || ids.indexOf(gr.lec) > -1; });
+    return QUAD_GROUPS.slice();
   }
   function newBoard(){
     var pool = shuffled(groupPool().filter(function(gr){ return S.used.indexOf(gr.name) === -1; }));
@@ -4923,7 +4965,7 @@ GAME_IMPL.quadrants = function(g, C){
   function end(win){ running = false; C.finish(g, root, S.score, S.missed, win ? { title:'All five boards!', win:true } : null); }
   return {
     mount:function(panel){
-      var sel = '<label for="gmScope">Groups from</label><select id="gmScope" data-scope><option value="midterm"'+(C.A.scope==='all'?'':' selected')+'>Midterm · S1-4</option><option value="all"'+(C.A.scope==='all'?' selected':'')+'>All 9 sessions</option></select>';
+      var sel = '<label for="gmScope">Groups from</label><select id="gmScope" data-scope><option value="all" selected>All 9 sessions</option></select>';
       panel.innerHTML = C.shell(g, { hud:['score','board'], select:sel, stage:'<div class="gm-stage qd-stage" data-stage style="--c:'+g.color+'"><div data-body style="display:flex;flex-direction:column;gap:12px;min-height:380px"></div></div>', keys:'Pick four tiles that share a category, then Submit · four mistakes per game · up to five boards' });
       root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
       stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Sixteen terms, four hidden groups of four: suture families, flap designs, finger rests, prognosis categories, antibiotic classes and more. Watch for red herrings. Four mistakes and the game ends.', 'Start'));
@@ -5515,13 +5557,11 @@ window.SH_GOTO = function(g){
 };
 
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
-   draw each card, so answers go through recordAnswer like anywhere else. Midterm scope until the midterm. */
-function drillScope(){ var d = daysUntil(MIDTERM_DATE); return d !== null && d >= 0 ? 'midterm' : 'all'; }
+   draw each card, so answers go through recordAnswer like anywhere else. All 9 sessions (the final is cumulative). */
 window.SH_DRILL = {
-  scope: function(){ return drillScope() === 'midterm' ? 'Midterm scope: sessions 1-' + MIDTERM_AFTER : ''; },
+  scope: function(){ return ''; },
   pool: function(){
-    var scope = drillScope();
-    return QUESTIONS.filter(function(q){ return inScope(q, scope); }).map(function(q){
+    return QUESTIONS.map(function(q){
       var a = STATE.answered[q.id];
       return { id:q.id, lec:q.lec, last: a ? (typeof a.lastCorrect === 'boolean' ? a.lastCorrect : !!a.correct) : null, hy: q.src === 'exam-review' ? 'on the class exam-review guide' : '' };
     });
