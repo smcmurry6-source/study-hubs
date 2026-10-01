@@ -76,6 +76,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (nuke stays local on exam day, Claude Code)** — On the day of any of a hub's exams
+  (`SH_EXPORT.exams`, local date), a tactical nuke plays only for the person who launched it: `launchNuke` in
+  `widget/v3.js` skips the `nuke` broadcast and the receiver ignores one too (`isExamDay()`), so stale clients can't
+  interrupt classmates either. The launch is still recorded (`record_nuke_launch`). No schema change.
+
 - **2026-10-01 (select-all picks + shorter select-alls, Claude Code)** — **Select-all questions now record which options
   were ticked**: perio's `recordAnswer` passes the ticked indexes (practice and mock exam) as `detail.picks`, and
   `widget/v3.js` sends them in one call to `record_choices` (`migration_v28.sql`, applied via the connector), one
