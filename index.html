@@ -1386,9 +1386,13 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       else if (a === "next") go(step + 1);
       else if (a === "send" && !act.disabled){
         refresh();
-        if (debriefSb) debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(){}, function(){});
-        box.innerHTML = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub\'s card.</p>';
-        setTimeout(close, 3200);
+        var thanks = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub\'s card.</p>';
+        var failed = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>That didn\'t save.</b> Please try again in a minute from the hub\'s card.</p>';
+        act.disabled = true;
+        if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+        debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+          box.innerHTML = (!r.error && r.data === true) ? thanks : failed; setTimeout(close, 3600);
+        }, function(){ box.innerHTML = failed; setTimeout(close, 4000); });
       }
     });
   }
