@@ -20,12 +20,13 @@ does it differently.
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
-  `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, offer Sam
-  a recap and ask before publishing it; add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
+  `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
+  recap (`tools/publish-recap.js`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it); add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
   `question-banks/` — archived hubs' banks.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
   hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
-  runbook by hand whenever Sam asks for a lessons refresh (there is no scheduled routine): it refreshes `LESSONS.md` from all data, reports and suggestions
+  runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in
+  `.claude/skills/lessons-audit/`; there is no scheduled routine): it refreshes `LESSONS.md` from all data, reports and suggestions
   (`tools/lessons-daily.sql`) and opens a PR with small data-backed fixes to the live hubs. **Archiving a hub
   always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
   clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the

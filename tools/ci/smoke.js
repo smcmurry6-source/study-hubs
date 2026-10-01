@@ -25,8 +25,10 @@ async function stub(context){
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
 }
 
+/* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
+const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
 function lint(hub, A){
-  const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id));
+  const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
   Q.forEach(q => {
     if (ids.has(q.id)) problems.push(`${hub}: duplicate question id ${q.id}`); ids.add(q.id);
     if (!lecIds.has(q.lec)) problems.push(`${hub}: ${q.id} points at unknown lecture "${q.lec}"`);
@@ -37,7 +39,17 @@ function lint(hub, A){
       const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${q.id} has duplicate choices`);
     }
     if (q.type !== 'recall' && !String(q.ex || '').trim()) problems.push(`${hub}: ${q.id} has no explanation`);
+    if (q.type === 'match') {
+      /* two items with the same answer: grading by index marks the other copy wrong (perio q4-L27, LESSONS.md) */
+      ['left', 'right'].forEach((side, k) => {
+        const vals = (q.pairs || []).map(p => String(p[k]).trim().toLowerCase());
+        if (new Set(vals).size !== vals.length && !SAME_ANSWER_OK.has(`${hub}:${q.id}`)) problems.push(`${hub}: ${q.id} matching has the same ${side}-hand item twice (give each pair a distinct answer)`);
+      });
+    }
+    if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
+    if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
+  if (longItems.length) notes.push(`${hub}: heads-up, long ordering/select-all items score very low (LESSONS.md): ${longItems.join(', ')}`);
   const mc = Q.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
   const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
   const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
