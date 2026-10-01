@@ -76,6 +76,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-01 (exam check-ins save on exam day, Claude Code, #46)** — `submit_exam_debrief` refused any exam dated
+  today, but the dashboard opens check-ins on exam day (button from 8 am, perio midterm pop-up from 10 am), so the 2
+  perio midterm check-ins sent that morning were dropped (answers not recoverable; the request logs hold no bodies).
+  `migration_v29.sql` (applied via the connector) accepts exam day, never a future date. The dashboard's check-in
+  pop-up now waits for the save and says "That didn't save" instead of always thanking.
+
 - **2026-10-01 (nuke stays local on exam day, Claude Code)** — On the day of any of a hub's exams
   (`SH_EXPORT.exams`, local date), a tactical nuke plays only for the person who launched it: `launchNuke` in
   `widget/v3.js` skips the `nuke` broadcast and the receiver ignores one too (`isExamDay()`), so stale clients can't
