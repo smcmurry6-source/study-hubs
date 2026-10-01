@@ -1306,6 +1306,10 @@ var QUESTIONS = [
 { id:'q4-L33', lec:'phase1-therapy', type:'mcq', stem:"At the Phase I evaluation, inflammation and pockets persist, but you removed all deposits at SRP. What will help most?", choices:['Improving the patient\'s oral hygiene','Repeating full-mouth SRP','Adding a second round of irrigation','Immediate extraction'], answer:0, ex:"If residual calculus is the cause, remove it and re-evaluate in two weeks. Otherwise more SRP sessions won't do anything.", src:'lecture' },
 { id:'q4-L34', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What can the clinic's piezoelectric ultrasonic NOT accomplish?", choices:['Root planing (a smooth root surface)','Subgingival deposit removal','Gross calculus removal','Pocket lavage'], answer:0, ex:"The ultrasonic removes gross and subgingival deposits and flushes the pocket, but it cannot plane the root smooth. That takes hand instruments.", src:'lecture' },
 { id:'q4-L35', lec:'phase1-therapy', mid:false, type:'sequence', stem:"Put Dr. Kaur's instrumentation sequence in order.", steps:['Ultrasonic to remove gross deposits','Hand instruments','Ultrasonic again to flush the pocket (lavage)'], ex:"Dr. Kaur's order: the ultrasonic takes off gross deposits, hand instruments do the definitive work, then the ultrasonic flushes the pocket (lavage) at the end.", src:'lecture' },
+{ id:'q3-O01', lec:'risk-assessment', type:'sequence', stem:"Put the Kwok & Caton prognosis categories in order, best to worst.", steps:['Favorable','Questionable','Unfavorable','Hopeless'], ex:"Kwok & Caton asks whether periodontal stability can be achieved with treatment: likely (favorable), don't know (questionable), unlikely (unfavorable). So questionable sits in the middle here, unlike McGuire & Nunn, where it comes right before hopeless.", src:'lecture' },
+{ id:'q4-O01', lec:'phase1-therapy', type:'sequence', stem:"Put the Glickman furcation classes in order, least to most severe.", steps:['Incipient: the Nabers probe just catches','Cul-de-sac: definite invasion, bony wall remains','Through-and-through: probe passes between the roots','Through-and-through and visible: soft tissue lost too'], ex:"Glickman I to IV. Class II is the most amenable to regeneration; Class III has no containability; Class IV is Class III with the soft tissue gone, so the patient can clean it with interdental aids.", src:'lecture' },
+{ id:'q4-O02', lec:'phase1-therapy', type:'sequence', stem:"Put the Miller mobility classes in order, 0 to 3.", steps:['Normal (physiologic) mobility','Slightly more than normal (under 1 mm)','Moderately more than normal (over 1 mm, under 2 mm)','Severe horizontal mobility with vertical displacement'], ex:"Miller 0 to 3, tested with two rigid instrument handles. Only Class 3 adds vertical (depressible) movement.", src:'lecture' },
+{ id:'q1-O01', lec:'diagnosis-tx-planning', type:'sequence', stem:"Put the grades in order, slowest to fastest (by % bone loss ÷ age at the worst tooth).", steps:['Grade A: under 0.25','Grade B: 0.25 to 1.0','Grade C: over 1.0'], ex:"Start by assuming Grade B and shift only with evidence. Smoking more than 10 cigarettes a day or an A1c of 7% or higher pushes to Grade C.", src:'lecture' },
 { id:'q4-L36', lec:'phase1-therapy', mid:false, type:'mcq', stem:"Why is a curette safer subgingivally than a scaler?", choices:["A Gracey curette cuts on one side only, so the side facing the soft tissue is protected", "Curettes are shorter, so they cannot reach the base of the pocket and damage the attachment", "A curette has a pointed tip, which slips more easily under the tissue without tearing it", "Curettes are used with a push stroke, which moves calculus away from the soft tissue safely"], answer:0, ex:"Scalers have blades on both sides and use short, powerful strokes; curettes use longer, slightly lighter strokes.", src:'lecture' },
 { id:'q4-L37', lec:'phase1-therapy', mid:false, type:'mcq', stem:"On your kit, what does an instrument marked 'SC' indicate, as opposed to 'SG'?", choices:["The single universal curette, with a blade on both sides", "A Gracey curette, area-specific, with a single cutting edge on the lower side of the blade", "A sickle scaler: pointed tip, triangular cross-section, for supragingival use only", "A calibrated probe marked in millimeters, used to chart probing depths around each tooth"], answer:0, ex:"SG marks the site-specific Gracey curettes, which make up almost all the curettes on the kit.", src:'lecture' },
 { id:'q4-L38', lec:'phase1-therapy', mid:false, type:'mcq', stem:"What is the periodontal explorer in the exam kit used for?", choices:["Checking for smooth root surfaces (any catch or roughness) after therapy", "Detecting occlusal caries in pits and fissures before any restorative treatment is planned", "Measuring probing depth when a calibrated probe is not available in the exam kit", "Classifying furcations by how far the tip passes between the roots of a molar"], answer:0, ex:"The explorer is a tactile check after therapy: any catch or roughness on the root means calculus is still there.", src:'lecture' },
@@ -1753,7 +1757,7 @@ EXAM_HINTS.push(
   { lec:'phase1-therapy', type:'emphasize', src:'slide', quote:"Don't Forget!!! 1. Modified Pen Grasp Technique 2. Finger Rest", takeaway:"The one slide in the deck set in all-caps emphasis. Know the four finger rests (conventional, cross-arch, opposite-arch, finger-on-finger). From the slide deck. In class she deferred grasp and finger rests to the PCD sessions, so expect them there and on the practical." }
 );
 EXAM_HINTS.push(
-  { lec:'diagnosis-tx-planning', type:'emphasize', src:'email', quote:"Number of questions: around 40. Type of questions: A few Patient Box (case-based) scenarios with majority multiple choice questions, a few multiple answers (with partial credit) and matching questions. No essays.", takeaway:"Dr. Abou-Arraj's midterm email (Oct 1, 10:00 am, sessions 1-4). Practice the format: the Mock Exam's midterm-format option mixes Patient Box cases, multiple-answer items with partial credit, matching and MCQs. On multiple-answer items, pick only what you're sure of, since wrong picks can cost credit." },
+  { lec:'diagnosis-tx-planning', type:'emphasize', src:'email', quote:"Number of questions: around 40. Type of questions: A few Patient Box (case-based) scenarios with majority multiple choice questions, a few multiple answers (with partial credit) and matching questions. No essays.", takeaway:"Dr. Abou-Arraj's midterm email (Oct 1, 10:00 am, sessions 1-4). Exam-day update: 46 questions in 80 minutes, no matching, and one ordering question (pick the right order of categories). Practice the format: the Mock Exam's midterm-format option mixes Patient Box cases, multiple-answer items with partial credit, one ordering question and MCQs. On multiple-answer items, pick only what you're sure of, since wrong picks can cost credit." },
   { lec:'phase1-therapy', type:'deemphasize', src:'email', quote:"For the midterm exam, you will not be tested on instruments/ultrasonics/polishing. For exam preparation, focus on the discussion and slides up to failure of therapy in the given pdf.", takeaway:"From Dr. Kaur's email the day after class. Everything in the deck after failure of therapy (instruments, ultrasonics, technique, polishing) is off the midterm. Those questions are tagged 'Not on midterm' and left out of the midterm mock exam. The email says nothing about the final, so don't drop them for good." },
   { lec:'phase1-therapy', type:'emphasize', quote:"How many times you have seen this before? Has anybody been counting? That's going to be on the quiz.", takeaway:"Said of the host-bacteria pathogenesis diagram (health → gingivitis → periodontitis). Know it cold: plaque bacteria initiate, the host response drives progression, and SRP targets the bacteria." },
   { lec:'phase1-therapy', type:'emphasize', quote:"Bacteria is only responsible for 25% of the damage that happens in periodontitis. 75% of the damage that happens in periodontitis is because of those inflammatory markers and cells of bone destruction, osteoclasts, that are released by the host.", takeaway:"The 25/75 split. Bacteria bring endotoxin (LPS), not osteoclasts. Removing them calms the host, and host modulation (Dr. Litz) calms it directly." },
@@ -3402,7 +3406,7 @@ function renderHeaderMeta(){
   var cd = document.getElementById('countdownPill');
   if(cd){
     var mid = daysUntil(MIDTERM_DATE), fin = daysUntil(FINAL_DATE), txt, title;
-    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-4 · ~40 questions'; }
+    if(mid !== null && mid >= 0){ txt = mid === 0 ? 'Midterm today' : mid === 1 ? 'Midterm tomorrow' : mid + ' days to midterm'; title = 'Midterm Thu Oct 1, 10:00 am · Rooms 220/222 · sessions 1-4 · 46 questions, 80 min'; }
     else if(fin !== null && fin >= 0){ txt = fin === 0 ? 'Final today' : fin === 1 ? 'Final tomorrow' : fin + ' days to final'; title = 'Comprehensive final, Nov 19 · all 9 sessions'; }
     else { txt = 'Course complete'; title = ''; }
     cd.innerHTML = icon('cal') + txt; cd.title = title;
@@ -3533,15 +3537,15 @@ function shortTitle(l){
 var COURSE_GRADING = [
   { component:'Weekly recording quizzes', weight:'10%', note:'5 short questions at the start of each in-person session (sessions 2-9), on that session\'s pre-recorded lecture. Described as straightforward, not designed to trip you up.' },
   { component:'PCD sessions (formative)', weight:'20%', note:'Participation and demonstrated ability across 4 hands-on instrumentation sessions with Dr. Carr and Dr. Bowie.' },
-  { component:'Midterm exam', weight:'Remainder', note:'Thu Oct 1, 10:00 am. Sessions 1-4 (Sept 3 - Sept 24), about 40 questions.' },
+  { component:'Midterm exam', weight:'Remainder', note:'Thu Oct 1, 10:00 am. Sessions 1-4 (Sept 3 - Sept 24), 46 questions in 80 minutes.' },
   { component:'Comprehensive final exam', weight:'Remainder', note:'November 19. All 9 sessions; earlier material stays fair game even though the midterm already tested it.' }
 ];
 /* From Dr. Abou-Arraj's midterm email (2026-09-26) */
 var MIDTERM_INFO = {
   when:'Thursday, Oct 1 · 10:00 am', where:'Rooms 220 and 222 (room assignment comes next week)',
-  covers:'Sessions 1-4 (Sept 3 - Sept 24)', count:'About 40 questions',
-  format:['Mostly multiple choice','A few Patient Box (case-based) scenarios','A few multiple-answer questions, with partial credit','Matching questions','No essays'],
-  checklist:['Laptop fully charged, with Lockdown Browser and Respondus Monitor ready','Sign the sign-in sheet','Leave an empty chair between every two students','Can\'t log in? Go to the HIBS office on the 6th floor','Scratch paper is in the room; hand it to Ms. Patrice Headington (proctor) before you leave','Dr. Abou-Arraj will be covering clinic, not in the room'],
+  covers:'Sessions 1-4 (Sept 3 - Sept 24)', count:'46 questions in 80 minutes (updated the morning of the exam)',
+  format:['Mostly multiple choice','A few Patient Box (case-based) scenarios','A few multiple-answer questions, with partial credit','One ordering question (pick the right order of categories)','No matching questions (dropped in the exam-day update)','No essays'],
+  checklist:['Laptop fully charged, with Lockdown Browser and Respondus Monitor ready','Sign the sign-in sheet','Leave an empty chair between every two students','Can\'t log in? Go to the HIBS office on the 6th floor','Scratch paper is in the room; hand it to Ms. Patrice Headington (proctor) before you leave','Dr. Abou-Arraj will be covering clinic; Ms. Patrice and Ms. Sarah proctor the rooms'],
   grades:'Grades won\'t post right away: he reviews how each question performed first (may drop a question or give everyone credit).',
   scope:'Dr. Kaur (Session 4): no instruments, ultrasonics or polishing. Focus on the discussion and slides up to failure of therapy.'
 };
@@ -3719,9 +3723,9 @@ function renderQuestionBankListOnly(){
 }
 
 /* ---------- Mock exam ---------- */
-/* Two kinds: the exam-format mock (mirrors Dr. Abou-Arraj's midterm email: ~40 questions, a few Patient Box cases,
-   a few multiple-answer items with partial credit, matching, the rest multiple choice) and an MCQ-only sprint. */
-var EXAM_FORMAT = { total:40, pbox:5, multi:5, match:3 };
+/* Two kinds: the exam-format mock (mirrors Dr. Abou-Arraj's midterm emails: 46 questions in 80 minutes, a few Patient Box cases,
+   a few multiple-answer items with partial credit, one ordering question, no matching, the rest multiple choice) and an MCQ-only sprint. */
+var EXAM_FORMAT = { total:46, pbox:5, multi:5, match:0, order:1, minutes:80 };
 var EXAM_STATE = { phase:'setup', pool:[], answers:{}, startedAt:null, finishedElapsed:0, timer:null, scope:'midterm', kind:'format' };
 function scopeLecIds(scope){ return (scope === 'midterm' ? LECTURES.filter(function(l){ return l.num <= MIDTERM_AFTER; }) : LECTURES).map(function(l){ return l.id; }); }
 function inScope(q, scope){ return scopeLecIds(scope).indexOf(q.lec) > -1 && !(scope === 'midterm' && q.mid === false); }
@@ -3738,8 +3742,18 @@ function formatPool(scope){
   var pb = roundRobin(all.filter(function(q){ return q.pbox && q.type === 'mcq'; }), EXAM_FORMAT.pbox);
   var mu = roundRobin(all.filter(function(q){ return q.type === 'multi' && !q.pbox; }), EXAM_FORMAT.multi);
   var ma = roundRobin(all.filter(function(q){ return q.type === 'match'; }), EXAM_FORMAT.match);
-  var mc = roundRobin(examPool(scope), EXAM_FORMAT.total - pb.length - mu.length - ma.length);
-  return shuffled(pb.concat(mu, ma, mc));
+  var od = roundRobin(all.filter(function(q){ return q.type === 'sequence' && q.steps.length > 2; }), EXAM_FORMAT.order).map(orderingMCQ);
+  var mc = roundRobin(examPool(scope), EXAM_FORMAT.total - pb.length - mu.length - ma.length - od.length);
+  return shuffled(pb.concat(mu, ma, od, mc));
+}
+/* The exam's ordering item is "select the appropriate order of categories": a single-answer pick among orderings,
+   built from a sequence question with near-miss orders (adjacent swaps, reversal) as distractors */
+function orderingMCQ(q){
+  var key = function(a){ return a.join(' → '); }, right = key(q.steps), seen = {}, alts = [];
+  seen[right] = 1;
+  var cands = q.steps.slice(0, -1).map(function(_, i){ var a = q.steps.slice(); a[i] = q.steps[i+1]; a[i+1] = q.steps[i]; return a; }).concat([q.steps.slice().reverse()]);
+  shuffled(cands).forEach(function(a){ var k = key(a); if(!seen[k] && alts.length < 3){ seen[k] = 1; alts.push(k); } });
+  return { id:q.id, lec:q.lec, type:'order', orig:q, stem:q.stem.replace(/^Put /, 'Select the right order: ').replace(/ in order(,|\.)/, '$1'), choices:[right].concat(alts), answer:0 };
 }
 function formatElapsed(ms){ var s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
 function startMockExam(size, kind){
@@ -3773,7 +3787,7 @@ function submitMockExam(){
   document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:EXAM_STATE.pool.length } }));
   EXAM_STATE.phase = 'results'; renderCompendiumContent(); window.scrollTo({top:0});
 }
-var EXAM_KIND_LABEL = { mcq:'Multiple choice', multi:'Multiple answer', match:'Matching' };
+var EXAM_KIND_LABEL = { mcq:'Multiple choice', multi:'Multiple answer', match:'Matching', order:'Ordering' };
 function examCardHTML(q, n){
   var a = EXAM_STATE.answers[q.id], l = LECTURE_BY_ID[q.lec], body = '', note = '';
   if(q.type === 'multi'){
@@ -3804,7 +3818,7 @@ function renderMockExam(){
     var isMid = EXAM_STATE.scope === 'midterm';
     c.innerHTML = '<div class="card section-block"><div class="eyebrow">'+icon('timer')+'Mock exam</div><h2>Simulate exam conditions</h2><p class="muted" style="max-width:64ch">A running clock and no feedback until you submit. Anything you don\'t get full credit on lands in Weak Spots.</p>' +
       '<div class="seg" role="group" aria-label="Exam scope"><button type="button" data-exam-scope="midterm" aria-pressed="'+isMid+'">Midterm · S1-4</button><button type="button" data-exam-scope="final" aria-pressed="'+!isMid+'">Final · all 9</button></div>' +
-      '<div class="exam-kinds"><button type="button" class="exam-kind primary" data-exam-action="start-format"><b>'+(isMid?'Midterm format':'Exam format')+' · '+EXAM_FORMAT.total+' questions</b><span>'+EXAM_FORMAT.pbox+' Patient Box cases, '+EXAM_FORMAT.multi+' multiple-answer (partial credit), '+EXAM_FORMAT.match+' matching, the rest multiple choice'+(isMid?'. Built to match Dr. Abou-Arraj\'s email; leaves out what Dr. Kaur said isn\'t on the midterm.':'.')+'</span></button></div>' +
+      '<div class="exam-kinds"><button type="button" class="exam-kind primary" data-exam-action="start-format"><b>'+(isMid?'Midterm format':'Exam format')+' · '+EXAM_FORMAT.total+' questions</b><span>'+EXAM_FORMAT.minutes+' minutes. '+EXAM_FORMAT.pbox+' Patient Box cases, '+EXAM_FORMAT.multi+' multiple-answer (partial credit), '+EXAM_FORMAT.order+' ordering question, the rest multiple choice'+(isMid?'. Built to match Dr. Abou-Arraj\'s email; leaves out what Dr. Kaur said isn\'t on the midterm.':'.')+'</span></button></div>' +
       '<h3 style="margin:18px 0 8px;font-size:1rem">Or a multiple-choice sprint <span class="mono faint" style="font-size:.8rem">'+n+' in the pool</span></h3>' +
       '<div class="size-picks">' + sizes.map(function(s){ return '<button type="button" class="size-pick" data-exam-action="start" data-size="'+s+'"><b>'+s+'</b><span>'+(s===n?'every question':'questions')+'</span></button>'; }).join('') + '</div></div>';
     c.querySelectorAll('[data-exam-scope]').forEach(function(b){ b.addEventListener('click', function(){ EXAM_STATE.scope = b.getAttribute('data-exam-scope'); renderMockExam(); }); });
@@ -3820,7 +3834,7 @@ function renderMockExam(){
       updateExamProg();
     });
     if(EXAM_STATE.timer) clearInterval(EXAM_STATE.timer);
-    EXAM_STATE.timer = setInterval(function(){ var el = document.getElementById('examTimer'); if(!el){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; return; } el.textContent = formatElapsed(Date.now() - EXAM_STATE.startedAt); }, 1000);
+    EXAM_STATE.timer = setInterval(function(){ var el = document.getElementById('examTimer'); if(!el){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; return; } var ms = Date.now() - EXAM_STATE.startedAt; if(EXAM_STATE.kind === 'format'){ var left = EXAM_FORMAT.minutes*60000 - ms; el.textContent = left > 0 ? formatElapsed(left + 999) + ' left' : 'Time up · +' + formatElapsed(-left); el.style.color = left < 5*60000 ? 'var(--bad)' : ''; } else el.textContent = formatElapsed(ms); }, 1000);
     return;
   }
   var total = EXAM_STATE.pool.length, pts = 0, missed = [], byLec = {}, byKind = {};
@@ -3835,7 +3849,7 @@ function renderMockExam(){
     '<div style="margin:14px 0 4px">' + LECTURES.filter(function(l){ return byLec[l.id]; }).map(function(l){ var b = byLec[l.id]; return '<div class="weak-row tag-'+l.tag+'" style="padding:8px 0"><span>'+sessChip(l)+' '+escHtml(shortTitle(l))+'</span><span class="mono">'+fmt(b.r)+'/'+b.t+'</span><div class="bar"><i style="width:'+Math.round(100*b.r/b.t)+'%"></i></div></div>'; }).join('') + '</div>' +
     (EXAM_STATE.kind === 'format' ? '<p class="mono faint" style="font-size:.8rem;margin:10px 0 0">' + Object.keys(byKind).map(function(k){ return k + ' ' + fmt(byKind[k].r) + '/' + byKind[k].t; }).join(' · ') + '</p>' : '') +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button type="button" class="btn primary" data-exam-action="retake">'+icon('shuffle')+'New mock exam</button>' + (missed.length ? '<button type="button" class="btn" data-set-view="weak-spots">'+icon('target')+'Drill in Weak Spots</button>' : '') + '</div></div>';
-  h += missed.length ? '<h3>Review what you missed ('+missed.length+')</h3><div class="qlist" id="examMissedList">' + missed.map(qCardHTML).join('') + '</div>' : '<div class="card"><p style="margin:0">Clean sweep: nothing missed.</p></div>';
+  h += missed.length ? '<h3>Review what you missed ('+missed.length+')</h3><div class="qlist" id="examMissedList">' + missed.map(function(q){ return qCardHTML(q.orig || q); }).join('') + '</div>' : '<div class="card"><p style="margin:0">Clean sweep: nothing missed.</p></div>';
   c.innerHTML = h;
   if(missed.length) wireQuestionContainer(document.getElementById('examMissedList'));
 }
