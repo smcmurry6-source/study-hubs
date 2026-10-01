@@ -1448,8 +1448,8 @@ begin
   if p_exam is null or p_exam !~ '^\d{4}-\d{2}-\d{2}' or length(p_exam) > 60 then return false; end if;
   if p_visitor is null or length(p_visitor) not between 1 and 80 then return false; end if;
   if p_answers is null or jsonb_typeof(p_answers) <> 'object' or p_answers = '{}'::jsonb or length(p_answers::text) > 3000 then return false; end if;
-  -- only for an exam that has happened, and not forever after
-  if left(p_exam, 10)::date >= (now() at time zone 'America/Chicago')::date
+  -- only for an exam that has happened (exam day counts), and not forever after
+  if left(p_exam, 10)::date > (now() at time zone 'America/Chicago')::date
      or left(p_exam, 10)::date < (now() at time zone 'America/Chicago')::date - 90 then return false; end if;
   if (select count(*) from exam_debriefs where hub = p_hub and exam = p_exam and visitor_id = p_visitor) >= 10 then return false; end if;
   insert into exam_debriefs (hub, exam, visitor_id, answers) values (p_hub, p_exam, p_visitor, p_answers);
