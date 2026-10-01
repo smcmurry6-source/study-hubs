@@ -3814,7 +3814,7 @@ function renderMockExam(){
   var c = content();
   if(EXAM_STATE.phase === 'setup'){
     var mid = examPool('midterm').length, all = examPool('final').length, n = EXAM_STATE.scope === 'midterm' ? mid : all;
-    var sizes = [10,20,40].filter(function(s){ return s < n; }).concat([n]);
+    var sizes = [10,20,EXAM_FORMAT.total].filter(function(s){ return s < n; }).concat([n]);
     var isMid = EXAM_STATE.scope === 'midterm';
     c.innerHTML = '<div class="card section-block"><div class="eyebrow">'+icon('timer')+'Mock exam</div><h2>Simulate exam conditions</h2><p class="muted" style="max-width:64ch">A running clock and no feedback until you submit. Anything you don\'t get full credit on lands in Weak Spots.</p>' +
       '<div class="seg" role="group" aria-label="Exam scope"><button type="button" data-exam-scope="midterm" aria-pressed="'+isMid+'">Midterm · S1-4</button><button type="button" data-exam-scope="final" aria-pressed="'+!isMid+'">Final · all 9</button></div>' +
