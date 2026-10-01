@@ -97,6 +97,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   by what you earn (`UPGRADES`: one item per handpiece tier from `sh_rank_tier`; a pennant per mastered hub and a roof crown
   from `sh_rank_flair`, which ranks.js and the dashboard write and announce with `sh:rank`) and by the holiday calendar.
 
+- **2026-10-01 (MSK `ex-mets` fix, Claude Code, #51)** — Report #11: the bone-metastasis EXCEPT question keyed
+  "Colon", but the notes list colon as a source ("BLT with a Kosher Pickle, plus colon"). The exception is now "Brain"
+  (same position); explanation updated. Earlier `question_choices` rows for it refer to "Colon". Report resolved with a
+  reply. **MSK Project: carry this into the split sources.**
+
 - **2026-10-01 (suture-diagram questions, Claude Code)** — 14 perio picture questions (`q2-D01`-`q2-D14`): a question
   with `img:'<SUTURE_DIAGRAMS key>'` draws that diagram above the stem (`figHTML()`, in the bank card and the mock exam;
   "Diagram" chip; bank type filter "Suture diagrams"; arcade games skip them). Labels that would give the answer away
