@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png?v=2">
+<meta name="theme-color" content="#15202A">
+<title>About the hubs · Study Hubs</title>
+<meta name="description" content="Every Study Hubs feature, easter egg, holiday and trophy, with how to find each one and what it does.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>
+/* same theme key as the dashboard and hubs; spoilers stay hidden unless you ask */
+(function(){ try{ var t = localStorage.getItem("sh_theme"); if(t === null) t = localStorage.getItem("sh_dash_theme"); if(t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  if (localStorage.getItem("sh_about_spoilers") !== "1") document.documentElement.classList.add("hide-spoilers"); }catch(e){ document.documentElement.classList.add("hide-spoilers"); } })();
+</script>
+<style>
+/* the dashboard's tokens (index.html), so this page reads as part of the site */
+:root{
+  --bg:#E9EDF0; --surface:#FFFFFF; --surface-2:#F3F6F7; --ink:#15202A; --ink-2:#4A5864; --ink-3:#5F6D78;
+  --line:#D3DADF; --line-2:#BCC6CD; --focus:#2F6FD6; --good:#1F8A5B; --good-soft:#DDF1E7;
+  --accent:#A23F5E; --accent-soft:#F5E1E7; --gold:#8A6417; --gold-soft:#F3E6CB;
+  --serif:'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans:'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mono:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D1317; --surface:#151D23; --surface-2:#1A242B; --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#8795A1;
+  --line:#24313A; --line-2:#33424C; --focus:#7BA7F0; --good:#4CC38A; --good-soft:#15291F;
+  --accent:#E88EA9; --accent-soft:#351D26; --gold:#DDAE52; --gold-soft:#2F2614; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0D1317; --surface:#151D23; --surface-2:#1A242B; --ink:#E4EAEE; --ink-2:#A7B4BD; --ink-3:#8795A1;
+  --line:#24313A; --line-2:#33424C; --focus:#7BA7F0; --good:#4CC38A; --good-soft:#15291F;
+  --accent:#E88EA9; --accent-soft:#351D26; --gold:#DDAE52; --gold-soft:#2F2614; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font:16px/1.6 var(--sans); margin:0}
+a{color:var(--accent)}
+.wrap{max-width:980px; margin:0 auto; padding-inline:20px; padding-block:28px 90px}
+h1,h2{font-family:var(--serif); font-weight:400; line-height:1.1; text-wrap:balance; margin:0}
+h1{font-size:clamp(40px,7vw,64px)}
+h2{font-size:clamp(30px,4.6vw,40px)}
+h3{font-family:var(--sans); font-weight:700; line-height:1.25; margin:0}
+p{margin:0; max-width:70ch}
+.back{display:inline-block; margin-bottom:18px; font-size:14px; font-weight:600; color:var(--ink-2); text-decoration:none; padding:6px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface)}
+.back:hover{color:var(--ink); border-color:var(--line-2)}
+.lede{font-size:18px; color:var(--ink-2); margin-top:12px}
+.eyebrow{font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+.spoil-toggle{display:inline-flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:16px; padding:8px 14px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-weight:600; cursor:pointer}
+.spoil-toggle input{width:18px; height:18px; accent-color:var(--accent)}
+.spoil-toggle small{font-weight:400; color:var(--ink-3)}
+.hide-spoilers .spoil{display:none !important}
+html:not(.hide-spoilers) .spoil-ph{display:none !important}
+nav.toc{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px}
+nav.toc a{font-size:14px; font-weight:600; color:var(--ink); text-decoration:none; padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:var(--surface)}
+nav.toc a:hover, nav.toc a:focus-visible{border-color:var(--accent); outline:none}
+section{margin-top:56px; display:grid; gap:16px}
+section > header{display:grid; gap:6px}
+.items{display:grid; border:1px solid var(--line); border-radius:16px; background:var(--surface); overflow:hidden}
+.item{display:grid; grid-template-columns:minmax(0,220px) minmax(0,1fr); gap:6px 22px; padding:16px 20px; border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item h3{font-size:16px}
+.item .body{display:grid; gap:6px; min-width:0}
+.how{font-size:14.5px}
+.how::before{content:"How: "; font-weight:700; color:var(--good)}
+.what{font-size:14.5px; color:var(--ink-2)}
+.tag{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:2px 8px; border-radius:99px; vertical-align:middle; margin-left:4px}
+.tag.new{background:var(--accent-soft); color:var(--accent)}
+.tag.live{background:var(--good-soft); color:var(--good)}
+.tag.trophy{background:var(--gold-soft); color:var(--gold)}
+kbd, .word{font-family:var(--mono); font-size:13.5px; background:var(--good-soft); color:var(--ink); padding:1px 7px; border-radius:6px; white-space:nowrap}
+.tablebox{overflow-x:auto; border:1px solid var(--line); border-radius:16px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:720px}
+th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-2); font-weight:700; background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
+.clue{color:var(--ink-2); font-style:italic}
+.note{padding:14px 18px; border-radius:14px; background:var(--gold-soft); color:var(--ink); font-size:14.5px}
+.spoil-ph{color:var(--ink-3)}
+td .spoil-ph{font-style:italic}
+:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+@media (max-width:700px){ .item{grid-template-columns:minmax(0,1fr)} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="../">← Dashboard</a>
+    <div class="eyebrow">About the hubs</div>
+    <h1>Everything in the hubs</h1>
+    <p class="lede">Every feature, every easter egg and every trophy, with how to find it and what it does. <span class="tag new">new</span> means recently added; <span class="tag live">shared</span> means classmates see it live; <span class="tag trophy">trophy</span> means it earns one.</p>
+    <label class="spoil-toggle"><input type="checkbox" id="spoilers"> <span>Show spoilers</span> <small>(how to find every easter egg and secret trophy)</small></label>
+    <nav class="toc" aria-label="Contents">
+      <a href="#dashboard">Dashboard</a><a href="#widget">In every hub</a><a href="#modes">Hub modes</a><a href="#arcade">Arcade games</a>
+      <a href="#progress">Ranks and progress</a><a href="#timmy">Timmy Tooth</a><a href="#eggs">Easter eggs</a><a href="#seasons">Holidays and seasons</a>
+      <a href="#trophies">All 24 trophies</a>
+    </nav>
+  </header>
+
+  <section id="dashboard">
+    <header><div class="eyebrow">Part 1</div><h2>The dashboard</h2><p>The home page at smcmurry6-source.github.io/study-hubs. Bookmark this, not individual hubs.</p></header>
+    <div class="items">
+      <div class="item"><h3>Greeting and name</h3><div class="body"><p class="what">Says good morning/evening with your name. Everyone gets a random class name ("Gleaming Molar") until they pick one; it's what shows on every leaderboard.</p><p class="how">Tap "Pick your name" / "Change name". "Go back to a random name" undoes it.</p></div></div>
+      <div class="item"><h3>Your rank card</h3><div class="body"><p class="what">Your handpiece medallion, rank and level (e.g. Gold II), total XP, your place in the class ("#2 of 106"), a bar to the next level, and a Mastery row with your medals.</p></div></div>
+      <div class="item"><h3>Timmy Tooth's house <span class="tag new">new</span></h3><div class="body"><p class="what">Your tooth buddy's home: his health bar, a status line, and buttons for a joke, a checkup and a secret tip. More in <a href="#timmy">Part 6</a>.</p></div></div>
+      <div class="item"><h3>Next-exam hero</h3><div class="body"><p class="what">A giant countdown ("Today", "3 days") to the next exam, with Start studying and Daily drill buttons, and every other exam in the next 14 days underneath. On the right: your progress in that hub and your last two weeks of study days with your streak and weekly accuracy.</p></div></div>
+      <div class="item"><h3>Send luck <span class="tag live">shared</span></h3><div class="body"><p class="what">The day before an exam and the morning of it (until 2 pm), a row lets you send luck once per exam. It shows how many classmates sent it and the latest names.</p></div></div>
+      <div class="item"><h3>Hub cards</h3><div class="body"><p class="what">One card per live hub, grouped by class: what it covers, its modes, your progress on this device, a Daily drill row, "Updated" labels when the hub changes, and Open. A hub archives itself at 10 pm on its last exam day: its card greys out with no Open button and disappears 10 days later.</p></div></div>
+      <div class="item"><h3>Exam check-ins</h3><div class="body"><p class="what">From 8 am on exam day a "Check in" button appears on the hub card; from 10 pm a pop-up asks once. Short questions: how ready you felt, how it went, how the hub compared to the exam, what it missed. The answers shape the next hubs.</p></div></div>
+      <div class="item"><h3>The class <span class="tag live">shared</span></h3><div class="body"><p class="what">Handpiece ranks (top 10 and the ladder of medallions), study streaks (days in a row), correct-in-a-row (longest live run and the all-time record), when people study (busiest hours) and arcade high scores for both hubs. Mastery medals show next to every name.</p></div></div>
+      <div class="item"><h3>Studying now <span class="tag live">shared</span></h3><div class="body"><p class="what">The green pill in the top bar counts classmates with a hub open right now.</p></div></div>
+      <div class="item"><h3>Hub recaps</h3><div class="body"><p class="what">After an exam, a shareable recap image of that hub (hours studied, accuracy, peak hour, the hardest question, awards) plays in a slideshow. Save image keeps it.</p></div></div>
+      <div class="item"><h3>What's new</h3><div class="body"><p class="what">A timeline of every student-facing change, newest first.</p></div></div>
+      <div class="item"><h3>Inbox</h3><div class="body"><p class="what">Replies to your reports and suggestions (kept 90 days) and notices to the whole class (60 days). The top-bar button shows an unread count; new items pop up once in the bottom right.</p></div></div>
+      <div class="item"><h3>Settings and theme</h3><div class="body"><p class="what">The gear holds the same settings as a hub (below). The half-moon toggles light, dark or system theme.</p></div></div>
+      <div class="item"><h3>Surveys</h3><div class="body"><p class="what">At most one short survey is live at a time and each person sees it once. Answering or "No thanks" both dismiss it.</p></div></div>
+    </div>
+  </section>
+
+  <section id="widget">
+    <header><div class="eyebrow">Part 2</div><h2>In every hub</h2><p>A shared layer that every hub gets. On a computer it's the launcher in the bottom-right corner; on a phone it's the bottom bar (Search, Drill, Stats, More).</p></header>
+    <div class="items">
+      <div class="item"><h3>Search</h3><div class="body"><p class="what">Searches the full text of the hub (notes paragraphs, review rows, exam hints, cram lines and questions) and jumps to the exact spot. Magic words typed here also work (that's how phones do the easter eggs).</p></div></div>
+      <div class="item"><h3>Daily drill</h3><div class="body"><p class="what">Ten questions a day per hub, fixed for the day: spaced-review questions that are due, questions you missed last time, then high-yield ones the class finds hard, at most 3 per lecture. Each card says why it was picked. Finish for a results screen, a "10 more" button and a drill streak.</p><p class="how">The Drill tab (phone), the chip beside the launcher (computer), the drill buttons on the dashboard, or <kbd>…/hubs/&lt;hub&gt;/#drill</kbd>.</p></div></div>
+      <div class="item"><h3>Spaced review</h3><div class="body"><p class="what">Every question you get right comes back after 1, then 2, 4 and 7 days, never later than the day before the exam. Misses come back sooner. It feeds the drill and Weak Spots.</p></div></div>
+      <div class="item"><h3>Class stats</h3><div class="body"><p class="what">Your rank card, your mastery in this hub, your leaderboard flair, the trophy case, today's Golden Probe winner, Tooth Fairy collectors, the week's cavity finders, and Link my devices.</p></div></div>
+      <div class="item"><h3>Class accuracy on every question</h3><div class="body"><p class="what">After you answer, the explanation shows what % of the class got it right. Explanations name the most popular wrong answer when it's a common trap.</p></div></div>
+      <div class="item"><h3>Report an issue</h3><div class="body"><p class="what">A Report button on every question, plus one in the menu. When it's fixed you get a reply in your Inbox saying what changed.</p></div></div>
+      <div class="item"><h3>Suggest something</h3><div class="body"><p class="what">Send an idea for the hubs. Replies come back the same way.</p></div></div>
+      <div class="item"><h3>Listen</h3><div class="body"><p class="what">On Lecture Notes: pre-recorded narration of every lecture, at both reading levels, with seek, ±15 s, speed, resume where you left off, and lock-screen controls.</p></div></div>
+      <div class="item"><h3>As taught / Plain English</h3><div class="body"><p class="what">Lecture Notes come in two reading levels: the professor's wording, or a plain-English rewrite. Each has its own narration.</p></div></div>
+      <div class="item"><h3>Mind maps</h3><div class="body"><p class="what">"Show mind map" under each lecture draws its outline as a branching tree.</p></div></div>
+      <div class="item"><h3>Settings</h3><div class="body"><p class="what"><b>Font</b> (Default, Serif, Sans) · <b>Text size</b> (Small to XX-Large) · <b>Background sound</b> (Soft rain, Ocean waves, Coffee shop, Lo-fi keys, Piano) · <b>Accent</b> (colours and metals you unlock by rank) · <b>Surprises</b> (all easter eggs on/off) · <b>Timmy Tooth</b> (Everywhere / Dashboard only / Off) · <b>Nuke alerts</b> (hide other people's strikes) · your display name.</p></div></div>
+      <div class="item"><h3>Name badge</h3><div class="body"><p class="what">Your name (and rank numeral) sits in each hub's top bar with a pencil to change it.</p></div></div>
+      <div class="item"><h3>Install as an app</h3><div class="body"><p class="what">"Add to Home Screen" gives a Gold-handpiece app icon and opens full screen. Pages load from cache when the connection is bad.</p></div></div>
+    </div>
+  </section>
+
+  <section id="modes">
+    <header><div class="eyebrow">Part 3</div><h2>Hub modes</h2><p>Each hub has three modes in its top bar. Tabs vary slightly by hub; these are Perio's.</p></header>
+    <div class="items">
+      <div class="item"><h3>Compendium</h3><div class="body"><p class="what"><b>Course Home</b> (quick-start row, countdown, progress, course map, grade breakdown) · <b>Lecture Notes</b> (two reading levels, Listen, mind maps) · <b>Question Bank</b> (filter by lecture, type and source; exam-review sets; suture diagrams) · <b>Mock Exam</b> (exam-length, timed, exam format) · <b>Weak Spots</b> (your misses and what's due) · <b>Active Recall</b> (hide-and-reveal flashcards) · <b>Cram Sheet</b> · <b>Exam Hints</b> (the professors' own words).</p></div></div>
+      <div class="item"><h3>Question types</h3><div class="body"><p class="what">Multiple choice, select-all with partial credit, matching, ordering, two-statement, EXCEPT / NOT, Patient Box cases and picture questions, each in the exam's own format.</p></div></div>
+      <div class="item"><h3>Review</h3><div class="body"><p class="what">Every reference table for the course in one place, searchable, with a "hide answers" switch to quiz yourself.</p></div></div>
+      <div class="item"><h3>Arcade</h3><div class="body"><p class="what">Nine games per hub (next part). Games built on the question bank count toward your stats, XP and Timmy's health.</p></div></div>
+    </div>
+  </section>
+
+  <section id="arcade">
+    <header><div class="eyebrow">Part 4</div><h2>Arcade games</h2><p>Every game has a class-wide high-score board.</p></header>
+    <div class="tablebox"><table>
+      <thead><tr><th>Perio: Pocket Arcade</th><th>What it is</th><th>MSK: Bone Zone</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><td><b>Flappy Flap</b></td><td>Flap a tooth through the gap with the right answer</td><td><b>Sort Storm</b></td><td>Fling falling cards into the right bin</td></tr>
+        <tr><td><b>Calculus Crusher</b></td><td>Breakout: hit the brick with the right answer</td><td><b>Osteo Snake</b></td><td>Slow snake: eat the dot with the right answer</td></tr>
+        <tr><td><b>Pocket Probe</b></td><td>Read the chart against the clock: CAL, stage, grade, mobility</td><td><b>Stack Attack</b></td><td>Grab the steps of a process in order</td></tr>
+        <tr><td><b>Quadrants</b></td><td>16 terms, 4 hidden groups of 4</td><td><b>Marrow Match</b></td><td>Memory flip: term and partner</td></tr>
+        <tr><td><b>Perdle</b></td><td>Guess the perio word in six tries</td><td><b>Bone to Pick</b></td><td>Hangman with a skeleton</td></tr>
+        <tr><td><b>Root Planer</b></td><td>Type answers to plane deposits off the root</td><td><b>Fact or Fracture</b></td><td>60-second true-or-swapped rush</td></tr>
+        <tr><td><b>Million-Dollar Smile</b></td><td>Quiz show: 12 rungs, three lifelines</td><td><b>Clast Blaster</b></td><td>Shoot the osteoclast with the right answer</td></tr>
+        <tr><td><b>Probe Sweeper</b></td><td>Minesweeper on gingiva; bleeding sites ask a question</td><td><b>Bone Search</b></td><td>Word search from clues</td></tr>
+        <tr><td><b>Cross-Section</b></td><td>A fresh mini crossword every game</td><td><b>Whack-a-Clast</b></td><td>Whack only the ones that fit the category</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="progress">
+    <header><div class="eyebrow">Part 5</div><h2>Ranks, mastery and recognition</h2></header>
+    <div class="items">
+      <div class="item"><h3>XP</h3><div class="body"><p class="what">10 XP for a question you get right for the first time, 2 for a repeat right answer, 1 for a miss (answer XP caps at 600 a day), plus 20 for every day you study. Counted across every hub.</p></div></div>
+      <div class="item"><h3>Handpiece ranks</h3><div class="body"><p class="what">Seven handpiece medallions: Stone (start), Antique (300 XP), Bronze (1,500), Silver (5,000), Gold (12,000), Diamond (25,000), Dark Matter (50,000). Each has levels I, II and III. A new level gets a toast; a new rank gets a full celebration.</p></div></div>
+      <div class="item"><h3>Accents</h3><div class="body"><p class="what">Each rank unlocks its metal as an accent in Settings, which paints buttons, switches and progress bars in that metal's texture.</p></div></div>
+      <div class="item"><h3>Hub mastery</h3><div class="body"><p class="what">The share of a hub's question bank you got right on your latest try: Bronze 50%, Silver 75%, Gold 90%, Crown 100%.</p></div></div>
+      <div class="item"><h3>Mastery medals <span class="tag new">new</span> <span class="tag live">shared</span></h3><div class="body"><p class="what">Each mastery tier puts a medal (or a crown) next to your name on every leaderboard: rank, streak, correct-in-a-row, both arcades and Tooth Fairy collectors. Up to three show, best first, then "+N". Hover or long-press to see which hubs. A new medal gets its own pop-up.</p></div></div>
+      <div class="item"><h3>Trophy case <span class="tag new">new: percentages</span></h3><div class="body"><p class="what">24 trophies in the Stats panel, 14 of them secret ("???" with a clue until you earn them). Each now shows the share of the class that has it ("61%", "&lt;1%", "nobody yet"); tap one for the exact count. A "Psst" line under the grid gives a random clue for a secret you haven't found. Full list in <a href="#trophies">Part 9</a>.</p></div></div>
+      <div class="item"><h3>Link my devices</h3><div class="body"><p class="what">Make a 6-character code on one device and enter it on another within 10 minutes; both then count as you (XP, streaks, trophies).</p></div></div>
+    </div>
+  </section>
+
+  <section id="timmy">
+    <header><div class="eyebrow">Part 6</div><h2>Timmy Tooth <span class="tag new">new</span></h2><p>An optional cartoon tooth buddy. Settings → Timmy Tooth: Everywhere, Dashboard only, or Off. Nobody else can see him or his health.</p></header>
+    <div class="items">
+      <div class="item"><h3>Meeting him</h3><div class="body"><p class="what">Before you meet him he sits on your name on the dashboard ("Psst. Up here. Tap me!"). Tapping opens a four-step introduction: who he is, how to take care of him, the fine print (he can't die; he can be turned off) and moving in. Finishing or closing it adopts him; "No thanks" turns him off. Adoption follows you to your other devices.</p></div></div>
+      <div class="item"><h3>Where he lives</h3><div class="body"><p class="what">In a house card on the dashboard, and in the bottom-left corner of every hub with a health bar. He hides during mock exams.</p></div></div>
+      <div class="item"><h3>Health</h3><div class="body"><p class="what">0 to 100 HP, worked out from your answers in every hub. Each right answer heals 0.8 HP (up to 30 a day), each day in a row adds a streak bonus (up to 10), and each skipped day costs 8, then 12, 16 and 20 HP the longer you're away. At 0 he can't die, but he heals at half speed until he's back to 50.</p></div></div>
+      <div class="item"><h3>What goes wrong</h3><div class="body"><p class="what">Below 70 HP: plaque. Below 55: brown stains and red, puffy gums (gingivitis). Below 40: a cavity. Below 25: periodontitis (recession, calculus, loose). Below 12: a cracked cusp. At 0: a bandage. Each goes away as he heals, and he thanks you.</p></div></div>
+      <div class="item"><h3>Talking to him</h3><div class="body"><p class="what">Tap him for one of 32 dental jokes; every few taps he gives a status update or a secret tip. Tap 5 times fast and he complains it tickles. "Checkup" opens his chart: health, today's answers, streak, every condition, and his house upgrades.</p></div></div>
+      <div class="item"><h3>Secret tips <span class="tag new">new</span></h3><div class="body"><p class="what">He tells you how to find every easter egg, one at a time.</p><p class="what spoil">In order: the current holiday's word first (type <span class="word">fangs</span> in October), then floss, mirror, Floss Chain, the Konami code, professor quotes, the Golden Probe, the Tooth Fairy, the Plaque Boss, Cavity Search, Full Arch, the root canal, Night Owl, the nuke, his own trophies and the trophy-case clues.</p><p class="how">The "Secret tip" button on his house, every 4th tap, or sometimes as his hello in a hub.</p></div></div>
+      <div class="item"><h3>Reactions</h3><div class="body"><p class="what">He greets you (and mentions it if you skipped yesterday), cheers at 3, 5, 10 and more right in a row, winces at misses and encourages you after a bad run, comments when you switch modes, reacts to every easter egg, naps if you go idle for 3 minutes, and gives pep talks the day before and the day of an exam.</p></div></div>
+      <div class="item"><h3>His house</h3><div class="body"><p class="what">Gets an upgrade at each rank: picket fence (Antique), mailbox (Bronze), lamppost (Silver), gold trim and door (Gold), diamond windows (Diamond), a night sky (Dark Matter). A flagpole in the yard flies a pennant in the medal colour of each hub you master, and any Crown mastery puts a crown on the roof. It also decorates for every holiday and season (Part 8).</p></div></div>
+      <div class="item"><h3>His trophies</h3><div class="body"><p class="what"><b>Pearly Whites</b> for getting him to 100 HP; <b>Full Recovery</b> for bringing him from 0 back to 100.</p></div></div>
+    </div>
+  </section>
+
+  <section id="eggs">
+    <header><div class="eyebrow">Part 7</div><h2>Easter eggs</h2><p>All of them switch off with Settings → Surprises and never appear during a mock exam. Magic words can be typed anywhere on a hub page (not in a text box), or into the hub's Search box on a phone.</p></header>
+    <p class="spoil-ph note">These are the secrets. Want to find them yourself? Timmy's "Secret tip" button and the trophy case clues will nudge you. Otherwise, tick <b>Show spoilers</b> at the top.</p>
+    <div class="items spoil">
+      <div class="item"><h3>floss <span class="tag trophy">Floss Boss</span></h3><div class="body"><p class="how">Type <span class="word">floss</span>.</p><p class="what">A tooth pops up and does the floss dance.</p></div></div>
+      <div class="item"><h3>Floss Chain <span class="tag new">new</span> <span class="tag live">shared</span> <span class="tag trophy">Floss Chain</span></h3><div class="body"><p class="how">Three or more people type <span class="word">floss</span> in the same hub within one minute.</p><p class="what">Everyone in that hub gets a row of dancing teeth with the flossers' names, linked by floss.</p></div></div>
+      <div class="item"><h3>mirror <span class="tag new">new</span> <span class="tag trophy">Indirect Vision</span></h3><div class="body"><p class="how">Type <span class="word">mirror</span>. Type it again to flip back.</p><p class="what">The whole hub flips left to right, the way the maxillary arch looks in a mouth mirror.</p></div></div>
+      <div class="item"><h3>Konami code <span class="tag trophy">Cheat Code</span></h3><div class="body"><p class="how">Keyboard: <kbd>↑ ↑ ↓ ↓ ← → ← → B A</kbd>. Phone: swipe up, up, down, down, left, right, left, right, then tap twice.</p><p class="what">8-bit mode: pixel font, chiptune blips on right answers. Do it again to turn it off.</p></div></div>
+      <div class="item"><h3>Professor soundboard <span class="tag trophy">Office Hours</span></h3><div class="body"><p class="how">Tap a professor's name 5 times quickly.</p><p class="what">One of that professor's own exam-hint quotes pops up with their name.</p></div></div>
+      <div class="item"><h3>Golden Probe <span class="tag live">shared</span> <span class="tag trophy">Golden Probe</span></h3><div class="body"><p class="how">Each day one taught question in each hub is secretly golden. Be the first in the class to get it right.</p><p class="what">Gold confetti, your name on the dashboard and in Stats as today's finder, and a toast for everyone else in the hub.</p></div></div>
+      <div class="item"><h3>Tooth Fairy <span class="tag trophy">Tooth Fairy · Fairy Collector</span></h3><div class="body"><p class="how">Keep answering. Once in a while she flutters across the screen after an answer; tap her before she leaves.</p><p class="what">A catch goes on the Tooth Fairy collectors board. Catch her once for one trophy, five times for another.</p></div></div>
+      <div class="item"><h3>Plaque Boss <span class="tag live">shared</span> <span class="tag trophy">Final Blow</span></h3><div class="body"><p class="how">When 5 or more classmates are in the same hub at once, a Plaque Boss appears. Every right answer from anyone chips its shared health bar.</p><p class="what">The person who lands the last hit gets the trophy. On holidays it wears a costume.</p></div></div>
+      <div class="item"><h3>Cavity Search <span class="tag new">new</span> <span class="tag live">shared</span> <span class="tag trophy">Restorative</span></h3><div class="body"><p class="how">Each week a tiny dark spot hides in one paragraph of each hub's Lecture Notes. Find it and tap it.</p><p class="what">The first five people to tap it fill the cavity and get the trophy; the Stats panel lists who found it. A new one hides every Monday.</p></div></div>
+      <div class="item"><h3>Full Arch <span class="tag new">new</span> <span class="tag trophy">Full Arch</span></h3><div class="body"><p class="how">Just answer questions. A small dental chart pops up in the corner: each right answer grows a tooth, each miss knocks one out.</p><p class="what">Fill all 32 for confetti and the trophy. It happens once per hub; after that the chart is gone for good in that hub.</p></div></div>
+      <div class="item"><h3>Through the Root Canal <span class="tag trophy">Through the Root Canal</span></h3><div class="body"><p class="how">Get 10 wrong in a row, then 10 right in a row.</p><p class="what">A toast, and the trophy.</p></div></div>
+      <div class="item"><h3>Night Owl <span class="tag trophy">Night Owl</span></h3><div class="body"><p class="how">Answer a question between 2 and 4 am.</p><p class="what">An owl toast, the trophy, and a gentle suggestion to sleep.</p></div></div>
+      <div class="item"><h3>Tactical nuke <span class="tag live">shared</span> <span class="tag trophy">Tactical</span></h3><div class="body"><p class="how">Get 100 questions right in a row (in one sitting) to unlock it, then call it in.</p><p class="what">A countdown and a blast that plays for everyone in the hub, with your name. On exam days it plays only for you. Settings → Nuke alerts hides other people's.</p></div></div>
+      <div class="item"><h3>Holiday words <span class="tag new">new</span> <span class="tag trophy">Holiday Spirit</span></h3><div class="body"><p class="how">During a holiday, type its magic word (Part 8). Right now: <span class="word">fangs</span>.</p><p class="what">A parade of the holiday's shape across the screen (bats, leaves, snowflakes…) with confetti.</p></div></div>
+      <div class="item"><h3>Hidden clues</h3><div class="body"><p class="what">The trophy case has a clue for every secret, and Timmy's secret tips spell each one out.</p></div></div>
+    </div>
+  </section>
+
+  <section id="seasons">
+    <header><div class="eyebrow">Part 8</div><h2>Holidays and seasons <span class="tag new">new</span></h2><p>Dates are Central time and switch on by themselves. During a holiday the confetti changes, the Plaque Boss wears a costume, Timmy wears a hat, his house decorates, and the magic word works. Dates shown for this school year.</p></header>
+    <div class="tablebox"><table>
+      <thead><tr><th>When</th><th>Dates</th><th>Word</th><th>Plaque Boss</th><th>Timmy</th><th>House</th></tr></thead>
+      <tbody>
+        <tr><td><b>Fall</b> (season)</td><td class="num">Sep 22 – Nov 30</td><td>—</td><td>—</td><td>—</td><td>A tree turns orange and red and drops leaves</td></tr>
+        <tr><td><b>Halloween</b></td><td class="num">Oct 1 – 31</td><td><span class="word">fangs</span></td><td>Count Plaqula</td><td>Witch hat</td><td>Jack-o'-lantern, bats</td></tr>
+        <tr><td><b>Thanksgiving</b></td><td class="num">Nov 20 – 27</td><td><span class="word">gobble</span></td><td>Pilgrim Plaque</td><td>Pilgrim hat</td><td>Leaf wreath, gourds</td></tr>
+        <tr><td><b>Winter break</b></td><td class="num">Dec 10 – 30</td><td><span class="word">jingle</span></td><td>Plaque Claus</td><td>Santa hat</td><td>Snowy roof and yard, a snowman, string lights, wreath, falling snow</td></tr>
+        <tr><td><b>New Year</b></td><td class="num">Dec 31 – Jan 2</td><td><span class="word">cheers</span></td><td>Party Plaque</td><td>Party hat</td><td>Fireworks</td></tr>
+        <tr><td><b>Valentine's Day</b></td><td class="num">Feb 10 – 14</td><td><span class="word">smile</span></td><td>Plaque-entine</td><td>Heart headband</td><td>Heart balloon, hearts in the windows</td></tr>
+        <tr><td><b>Dentist's Day</b></td><td class="num">Mar 6</td><td><span class="word">dentist</span></td><td>Plaque Boss (very nervous)</td><td>Head mirror</td><td>Tooth balloon</td></tr>
+        <tr><td><b>St. Patrick's</b></td><td class="num">Mar 14 – 17</td><td><span class="word">lucky</span></td><td>Plaquerechaun</td><td>Leprechaun hat</td><td>Rainbow, pot of gold</td></tr>
+        <tr><td><b>Easter</b></td><td class="num">Mar 22 – 29</td><td><span class="word">hop</span></td><td>Plaque Bunny</td><td>Bunny ears</td><td>Eggs on the lawn</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="trophies">
+    <header><div class="eyebrow">Part 9</div><h2>All 24 trophies</h2><p>"Have it" is the share of everyone who has answered at least one question<span id="pctAsOf">, as of Oct 2</span>. It updates live here and in the trophy case.</p></header>
+    <div class="tablebox"><table>
+      <thead><tr><th>Trophy</th><th>How to earn it</th><th>Secret?</th><th>Clue while locked</th><th>Have it</th></tr></thead>
+      <tbody>
+        <tr data-k="answers-100"><td><b>First Hundred</b></td><td>Answer 100 questions</td><td>No</td><td></td><td class="num" data-pct>61%</td></tr>
+        <tr data-k="answers-1000"><td><b>Thousand Club</b></td><td>Answer 1,000 questions</td><td>No</td><td></td><td class="num" data-pct>10%</td></tr>
+        <tr data-k="days-7"><td><b>Full Week</b></td><td>Study 7 days in a row</td><td>No</td><td></td><td class="num" data-pct>3%</td></tr>
+        <tr data-k="days-30"><td><b>Iron Routine</b></td><td>Study 30 days in a row</td><td>No</td><td></td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="run-25"><td><b>Sharp Explorer</b></td><td>25 right answers in a row</td><td>No</td><td></td><td class="num" data-pct>48%</td></tr>
+        <tr data-k="run-100"><td><b>Tactical</b></td><td>100 right answers in a row</td><td>No</td><td></td><td class="num" data-pct>2%</td></tr>
+        <tr data-k="mock90"><td><b>Mock Ace</b></td><td>90%+ on a mock exam of 20+ questions</td><td>No</td><td></td><td class="num" data-pct>17%</td></tr>
+        <tr data-k="arcade-25"><td><b>Arcade Regular</b></td><td>Play 25 arcade games</td><td>No</td><td></td><td class="num" data-pct>&lt;1%</td></tr>
+        <tr data-k="golden"><td><span class="spoil"><b>Golden Probe</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Be first to answer the day's golden question</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">One question in every hub turns gold each day. Be the first to get it right.</td><td class="num" data-pct>9%</td></tr>
+        <tr data-k="fairy"><td><span class="spoil"><b>Tooth Fairy</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Catch the Tooth Fairy</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Keep answering questions. Something small with wings is out there.</td><td class="num" data-pct>10%</td></tr>
+        <tr data-k="fairy-5"><td><span class="spoil"><b>Fairy Collector</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Catch her 5 times</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">She comes back. Be quick, five times over.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="boss"><td><span class="spoil"><b>Final Blow</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Land the last hit on a Plaque Boss</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Wait until five or more classmates are online at once, then answer fast.</td><td class="num" data-pct>40%</td></tr>
+        <tr data-k="owl"><td><span class="spoil"><b>Night Owl</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Answer a question between 2 and 4 am</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Study while the rest of the class is asleep.</td><td class="num" data-pct>&lt;1%</td></tr>
+        <tr data-k="konami"><td><span class="spoil"><b>Cheat Code</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Enter the Konami code</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Old-school gamers know it: ↑ ↑ ↓ ↓ ← → ← → B A. On a phone, swipe it and tap twice.</td><td class="num" data-pct>3%</td></tr>
+        <tr data-k="floss"><td><span class="spoil"><b>Floss Boss</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Type <span class="word">floss</span></span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Type the one thing your hygienist always asks whether you have been doing.</td><td class="num" data-pct>2%</td></tr>
+        <tr data-k="prof"><td><span class="spoil"><b>Office Hours</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">Tap a professor's name 5 times</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Professors repeat themselves. Tap one's name, a few times, quickly.</td><td class="num" data-pct>2%</td></tr>
+        <tr data-k="rootcanal"><td><span class="spoil"><b>Through the Root Canal</b></span><span class="spoil-ph">???</span></td><td><span class="spoil">10 misses, then 10 right in a row</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Go all the way down, then all the way back up. Ten each way.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="mirror"><td><span class="spoil"><b>Indirect Vision</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Type <span class="word">mirror</span></span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Your most-used instrument shows everything backwards. Type its name.</td><td class="num" data-pct>&lt;1%</td></tr>
+        <tr data-k="fullarch"><td><span class="spoil"><b>Full Arch</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Fill all 32 teeth on the Full Arch chart</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Every right answer grows a tooth; every miss knocks one out. Adults have how many?</td><td class="num" data-pct>15%</td></tr>
+        <tr data-k="flosschain"><td><span class="spoil"><b>Floss Chain</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Floss with two classmates in the same hub within a minute</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">The magic word works better with friends. Three of you, in the same hub, within a minute.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="cavity"><td><span class="spoil"><b>Restorative</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Be one of the first 5 to fill the week's hidden cavity</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Each week a tiny dark spot hides somewhere in one hub's Lecture Notes. Only five people get to fill it.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="holiday"><td><span class="spoil"><b>Holiday Spirit</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Type a holiday's magic word during that holiday</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Around a holiday the hubs dress up. Each holiday has its own magic word: type it.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="pet-perfect"><td><span class="spoil"><b>Pearly Whites</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Get Timmy to 100 HP</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Got a tooth buddy on the dashboard? Get them to 100 HP.</td><td class="num" data-pct>nobody yet</td></tr>
+        <tr data-k="pet-revive"><td><span class="spoil"><b>Full Recovery</b> <span class="tag new">new</span></span><span class="spoil-ph">???</span></td><td><span class="spoil">Nurse Timmy from 0 HP back to 100</span><span class="spoil-ph">Secret</span></td><td>Yes</td><td class="clue">Even a tooth at rock bottom can come back. It takes a real treatment plan.</td><td class="num" data-pct>nobody yet</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Mastery tiers (Bronze 50%, Silver 75%, Gold 90%, Crown 100% of a hub's questions right on your latest try) count the same way but show as medals by your name and pennants on Timmy's flagpole rather than in the 24.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var root = document.documentElement, box = document.getElementById("spoilers");
+  box.checked = !root.classList.contains("hide-spoilers");
+  box.addEventListener("change", function(){
+    root.classList.toggle("hide-spoilers", !box.checked);
+    try { localStorage.setItem("sh_about_spoilers", box.checked ? "1" : "0"); } catch (e) {}
+  });
+  /* live trophy unlock rates (get_trophy_stats, migration_v32); the numbers in the page are the fallback */
+  var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co", SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
+  fetch(SB_URL + "/rest/v1/rpc/get_trophy_stats", { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: "{}" })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(rows){
+      if (!rows || !rows.length) return;
+      var by = {}, total = rows[0].total || 0; rows.forEach(function(r){ by[r.kind] = r.n; });
+      if (!total) return;
+      document.querySelectorAll("tr[data-k]").forEach(function(tr){
+        var n = by[tr.getAttribute("data-k")] || 0, p = n / total * 100;
+        var cell = tr.querySelector("[data-pct]");
+        cell.textContent = !n ? "nobody yet" : p < 1 ? "<1%" : Math.round(p) + "%";
+        cell.title = n + " of " + total + " classmates";
+      });
+      var asof = document.getElementById("pctAsOf"); if (asof) asof.textContent = " (" + total + " people right now)";
+    }, function(){});
+})();
+</script>
+</body>
+</html>

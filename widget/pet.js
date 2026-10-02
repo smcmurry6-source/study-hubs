@@ -273,11 +273,18 @@
   function houseDeco(){
     var flair = String(ls("sh_rank_flair") || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
       .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
-    return { tier: Math.max(0, Math.min(6, +(ls("sh_rank_tier") || 0))), flair: flair, holiday: holidayId() };
+    return { tier: Math.max(0, Math.min(6, +(ls("sh_rank_tier") || 0))), flair: flair, holiday: holidayId(), fall: isFall() };
+  }
+  /* fall (Sep 22 - Nov 30, Central time): the tree by Timmy's house turns and drops its leaves */
+  function isFall(){
+    var p = centralDay().split("-"), x = +p[1] * 100 + +p[2];
+    if (ls("sh_egg_holiday_test") === "fall") return true;
+    return x >= 922 && x <= 1130;
   }
   function houseSvg(deco){
     deco = deco || houseDeco();
     var p = "shph" + (++uid) + "-", T = deco.tier, H = deco.holiday, night = T >= 6;
+    var fall = deco.fall != null ? deco.fall : isFall();
     var crown = deco.flair.some(function(f){ return f.lvl >= 4; });
     var gold = T >= 4 ? "#E8BE45" : null;
     var s = '<svg class="shpet-housesvg" viewBox="0 0 240 150" aria-hidden="true"><defs>' +
@@ -297,17 +304,21 @@
         '<path d="M0 46 C50 30 90 52 140 36 S220 30 240 40" stroke="#7FF0D2" stroke-width="7" fill="none" opacity=".18"/>';
     } else {
       s += '<g class="shpet-sun"><circle cx="30" cy="26" r="11" fill="#FFE27A"/><g stroke="#FFD24A" stroke-width="2.4" stroke-linecap="round"><path d="M30 8v-4M30 48v-4M12 26H8M52 26h-4M17 13l-3-3M46 42l-3-3M17 39l-3 3M46 10l-3 3"/></g></g>' +
-        '<g class="shpet-cloud" fill="#fff" opacity=".9"><ellipse cx="184" cy="44" rx="16" ry="7"/><ellipse cx="196" cy="39" rx="10" ry="8"/><ellipse cx="174" cy="41" rx="8" ry="6"/></g>';
+        (fall ? '' : '<g class="shpet-cloud" fill="#fff" opacity=".9"><ellipse cx="184" cy="44" rx="16" ry="7"/><ellipse cx="196" cy="39" rx="10" ry="8"/><ellipse cx="174" cy="41" rx="8" ry="6"/></g>');
     }
     if (H === "stpatrick") s += '<g fill="none" stroke-width="5" opacity=".75"><path d="M-10 118 A70 70 0 0 1 130 118" stroke="#E5484D"/><path d="M-4 118 A64 64 0 0 1 124 118" stroke="#F59A1E"/><path d="M2 118 A58 58 0 0 1 118 118" stroke="#F5D21E"/><path d="M8 118 A52 52 0 0 1 112 118" stroke="#3ECF7E"/><path d="M14 118 A46 46 0 0 1 106 118" stroke="#3FA7E0"/></g>';
     if (H === "newyear") s += '<g class="shpet-fw" stroke-width="1.8" stroke-linecap="round"><g stroke="#F6CD55"><path d="M196 30l0-9M196 30l7-5M196 30l8 3M196 30l3 8M196 30l-5 7M196 30l-8 1M196 30l-6-6"/></g><g stroke="#E0457B" transform="translate(-52 6)"><path d="M196 30l0-7M196 30l6-4M196 30l6 3M196 30l2 7M196 30l-4 6M196 30l-7 1M196 30l-5-5"/></g></g>';
     if (H === "halloween") s += '<g fill="#2B1B3D"><path d="M150 26c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/><path d="M196 54c2-3 4-3 5-1l1-2 1 2c1-2 3-2 5 1-2 0-3 1-3 3-1-1-2-1-3 0-1-1-2-1-3 0 0-2-1-3-3-3z"/></g>';
+    if (H === "winter") s += '<g fill="#fff" opacity=".95">' + [[16,52],[58,8],[112,30],[150,52],[188,8],[200,60],[236,26],[76,46],[24,88],[132,70],[226,74],[160,90]].map(function(c, i){ return '<circle class="shpet-snow" cx="' + c[0] + '" cy="' + c[1] + '" r="' + (i % 3 ? 1.2 : 1.8) + '" style="animation-delay:' + (i * .41).toFixed(2) + 's"/>'; }).join("") + '</g>';
     if (H === "winter") s += '<g fill="#fff" opacity=".9"><circle cx="140" cy="14" r="1.6"/><circle cx="168" cy="26" r="1.3"/><circle cx="214" cy="18" r="1.7"/><circle cx="128" cy="40" r="1.2"/><circle cx="230" cy="44" r="1.4"/><circle cx="100" cy="20" r="1.3"/></g>';
     /* ground */
     s += '<path d="M0 116 Q60 98 124 110 T240 104 L240 150 L0 150 Z" fill="url(#' + p + 'gr)"/>' +
       '<path d="M0 132 Q70 122 140 130 T240 126 L240 150 L0 150 Z" fill="#5FAE5C" opacity=".45"/>' +
-      (H === "winter" ? '<path d="M0 118 Q60 100 124 112 T240 106 L240 114 Q180 116 124 118 T0 126 Z" fill="#fff" opacity=".85"/>' : '') +
-      '<path d="M54 121 Q62 132 52 150 L70 150 Q76 132 66 121 Z" fill="#F3E3C4" opacity=".9"/>';
+      /* winter: the whole yard under snow, with soft blue drifts and a trodden path */
+      (H === "winter" ? '<path d="M0 115 Q60 97 124 109 T240 103 L240 150 L0 150 Z" fill="#F7FBFF"/>' +
+        '<path d="M0 134 Q50 126 96 132 T180 128 T240 132 L240 150 L0 150 Z" fill="#DCEAF6"/>' +
+        '<path d="M150 112 Q172 104 196 110 M10 124 Q30 118 44 122 M176 138 Q196 132 222 137" stroke="#C9DDEE" stroke-width="2" fill="none" stroke-linecap="round"/>' : '') +
+      '<path d="M54 121 Q62 132 52 150 L70 150 Q76 132 66 121 Z" fill="' + (H === "winter" ? "#C9D8E6" : "#F3E3C4") + '" opacity=".9"/>';
     /* Silver: a lamppost on the left */
     if (T >= 3) s += '<circle cx="12" cy="74" r="12" fill="url(#' + p + 'glow)"/><rect x="10.6" y="78" width="3" height="46" fill="#8E98A3" stroke="' + OUT + '" stroke-width="1.4"/>' +
       '<path d="M7 70 L18 70 L16 79 L9 79 Z" fill="#FFE9A8" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 70 L12 65 L19 70 Z" fill="#B6BEC7" stroke="' + OUT + '" stroke-width="1.8" stroke-linejoin="round"/>';
@@ -336,7 +347,10 @@
       '<circle cx="65" cy="112" r="1.6" fill="' + (gold ? "#7A5A00" : OUT) + '"/>';
     if (H === "winter") s += '<circle cx="60" cy="108" r="5.2" fill="none" stroke="#2F8F4E" stroke-width="3"/><path d="M58 112.6 l2 -1.6 2 1.6 -1 3 M60 111 l-1 4" stroke="#D6363C" stroke-width="1.6" fill="none"/>';
     if (H === "thanksgiving") s += '<g transform="translate(60 108)">' + [0, 60, 120, 180, 240, 300].map(function(a, i){ return '<ellipse cx="0" cy="-4.6" rx="1.8" ry="3" fill="' + ["#C2410C", "#E58E26", "#B45309"][i % 3] + '" transform="rotate(' + a + ')"/>'; }).join("") + '</g>';
-    s += '<g transform="translate(60 97)"><rect x="-15" y="-11" width="30" height="9" rx="2" fill="#fff" stroke="' + (gold || OUT) + '" stroke-width="1.6"/><text x="0" y="-4.4" text-anchor="middle" font-family="Georgia,serif" font-size="6.4" font-weight="700" fill="' + OUT + '">TIMMY</text></g>';
+    /* house plaque: on the wall above the door, between the windows */
+    s += '<g transform="translate(60 85.5)"><rect x="-10.5" y="-4.2" width="21" height="8.4" rx="1.6" fill="' + (gold ? "#FFF3C4" : "#FFFDF6") + '" stroke="' + (gold || OUT) + '" stroke-width="1.4"/>' +
+      '<circle cx="-9.3" cy="0" r=".55" fill="' + OUT + '"/><circle cx="9.3" cy="0" r=".55" fill="' + OUT + '"/>' +
+      '<text x="0" y="2" text-anchor="middle" font-family="Georgia,serif" font-size="4.5" font-weight="700" fill="' + OUT + '">TIMMY</text></g>';
     /* flower boxes and flowers */
     s += '<rect x="28" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/><rect x="68" y="93" width="20" height="5" rx="1.5" fill="#B9845A" stroke="' + OUT + '" stroke-width="1.6"/>' +
       '<g><circle cx="33" cy="91" r="2.2" fill="#FF8FB1"/><circle cx="39" cy="90.4" r="2.2" fill="#FFE27A"/><circle cx="44" cy="91" r="2.2" fill="#B08CFF"/><circle cx="73" cy="91" r="2.2" fill="#FFE27A"/><circle cx="79" cy="90.4" r="2.2" fill="#FF8FB1"/><circle cx="84" cy="91" r="2.2" fill="#8FD3F5"/></g>';
@@ -359,6 +373,42 @@
     if (H === "dentist" || H === "valentine") s += '<g><path d="M124 46 Q122 30 128 22" stroke="#555" stroke-width=".8" fill="none"/>' + (H === "valentine"
       ? '<path d="M128 22 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z" fill="#E0457B" stroke="' + OUT + '" stroke-width="1.4"/>'
       : '<ellipse cx="128" cy="15" rx="6.4" ry="7.6" fill="#8FD3F5" stroke="' + OUT + '" stroke-width="1.4"/><path d="M125.6 12c-1 0-1.6.7-1.6 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.6-1.7-.8 0-1.2.4-1.8.4s-1-.4-1.8-.4z" fill="#fff"/>') + '</g>';
+    /* fall: a tree behind Timmy with turning leaves (green going to gold, orange and red), a few falling, a few on the lawn */
+    if (fall) {
+      var LV = ["#E8A33D", "#D9622B", "#C2410C", "#F2C230", "#B5452A", "#9FB54A"];
+      s += '<path d="M168 118 C169 104 168 92 166 80 M168 96 C172 88 176 80 180 74 M167 88 C163 82 159 77 155 72" stroke="#6B4A2B" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+        '<path d="M168 118 C169 104 168 92 166 80" stroke="' + OUT + '" stroke-width="1.2" fill="none" opacity=".35"/>';
+      /* one leafy canopy: the outline is drawn under all the blobs, then the blobs fill it in without their own edges */
+      var CAN = [[166, 52, 20], [148, 62, 14], [186, 62, 15], [156, 42, 12], [178, 40, 13], [168, 68, 13]];
+      CAN.forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (c[2] + 1.3) + '" fill="' + OUT + '"/>'; });
+      s += '<defs><radialGradient id="' + p + 'leaf" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#F2B23A"/><stop offset=".55" stop-color="#E07A2C"/><stop offset="1" stop-color="#B5452A"/></radialGradient></defs>';
+      CAN.forEach(function(c){ s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '" fill="url(#' + p + 'leaf)"/>'; });
+      /* speckles of leaves still turning: gold, red, a last bit of green */
+      [[150, 56, 0], [160, 48, 3], [170, 58, 1], [178, 48, 4], [186, 58, 2], [158, 66, 3], [174, 70, 0], [192, 66, 1], [164, 36, 2], [182, 36, 3], [146, 66, 5], [168, 44, 4]].forEach(function(c){
+        s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="2.6" fill="' + ["#F5D21E", "#C2410C", "#E8A33D", "#9B2D1F", "#F2C230", "#9FB54A"][c[2]] + '" opacity=".85"/>'; });
+      s += '<path d="M152 50 a14 14 0 0 1 14 -12 M176 30 a10 10 0 0 1 9 8" stroke="#fff" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/>';
+      [[154, 50], [172, 34], [182, 54], [160, 66], [174, 62], [146, 60], [190, 64], [164, 44]].forEach(function(c, i){
+        s += '<path d="M' + c[0] + ' ' + c[1] + ' q2.4 -3 4.8 0 q-2.4 3 -4.8 0z" fill="' + LV[(i + 2) % LV.length] + '" stroke="' + OUT + '" stroke-width=".5"/>';
+      });
+      [[140, 86, 0], [196, 92, 1.3], [178, 104, 2.6], [124, 74, 3.6]].forEach(function(c, i){
+        s += '<path class="shpet-leaf" style="animation-delay:' + c[2] + 's" d="M' + c[0] + ' ' + c[1] + ' q2.6 -3.2 5.2 0 q-2.6 3.2 -5.2 0z" fill="' + LV[i % 5] + '" stroke="' + OUT + '" stroke-width=".5"/>';
+      });
+      if (H !== "winter") [[132, 128], [150, 134], [196, 128], [226, 138], [140, 142], [100, 146]].forEach(function(c, i){
+        s += '<path d="M' + c[0] + ' ' + c[1] + ' q2.4 -2.4 4.8 0 q-2.4 2.4 -4.8 0z" fill="' + LV[i % 5] + '" opacity=".9"/>';
+      });
+    }
+    /* winter: a snowman in the front yard, with a scarf, a carrot nose, coal buttons and stick arms */
+    if (H === "winter") s += '<g transform="translate(30 -4)">' +
+      '<path d="M-6 128 L-15 121 M-13.4 122.4 L-15.6 124.6 M6 128 L15 121 M13.4 122.4 L15.6 124.6" stroke="#6B4A2B" stroke-width="1.3" stroke-linecap="round"/>' +
+      '<circle cx="0" cy="140" r="8.4" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
+      '<circle cx="0" cy="128.6" r="6.4" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
+      '<circle cx="0" cy="119" r="5" fill="#fff" stroke="' + OUT + '" stroke-width="1.6"/>' +
+      '<path d="M-4.6 123.2 Q0 125.6 4.6 123.2 L4.6 125.4 Q0 127.6 -4.6 125.4 Z M2.6 125 L4.6 131 L1.2 130.6 Z" fill="#D6363C" stroke="' + OUT + '" stroke-width=".9" stroke-linejoin="round"/>' +
+      '<g fill="' + OUT + '"><circle cx="-1.7" cy="118" r=".75"/><circle cx="1.7" cy="118" r=".75"/><circle cx="0" cy="129.2" r=".8"/><circle cx="0" cy="132.6" r=".8"/><circle cx="0" cy="138.6" r=".9"/></g>' +
+      '<path d="M0 119.6 L5.4 120.6 L0 121.2 Z" fill="#F59A1E" stroke="#C2650E" stroke-width=".5"/>' +
+      '<path d="M-1.8 121.4 Q0 122.4 1.8 121.4" stroke="' + OUT + '" stroke-width=".6" fill="none" stroke-linecap="round"/>' +
+      '<rect x="-5.6" y="113.6" width="11.2" height="1.6" rx=".6" fill="#2B2B2B"/><rect x="-3.6" y="107.6" width="7.2" height="6.4" rx=".8" fill="#2B2B2B"/><rect x="-3.6" y="111.4" width="7.2" height="1.3" fill="#D6363C"/>' +
+      '<ellipse cx="0" cy="148.4" rx="11" ry="1.6" fill="#C9DDEE"/></g>';
     /* the toothbrush planted by the door: tapered handle with a rubber grip, slim neck, head with bristle tufts
        sticking out sideways, and a striped swirl of toothpaste on top */
     s += '<g transform="rotate(-5 115 124)">' +
@@ -375,18 +425,21 @@
     if (T >= 2) s += '<rect x="221" y="104" width="3" height="22" fill="#7A5A3A" stroke="' + OUT + '" stroke-width="1.2"/>' +
       '<path d="M212 104 V96 a8 6 0 0 1 16 0 V104 Z" fill="#B0672B" stroke="' + OUT + '" stroke-width="1.8"/><path d="M215 96 a5 3.6 0 0 1 10 0" stroke="#F2B884" stroke-width="1.2" fill="none"/>' +
       '<path d="M228 94 V86 L234 88 L228 90" fill="#E5484D" stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round"/>';
-    /* mastery pennants strung across the sky, one per hub, in that hub's medal colour */
+    /* mastery pennants: a flagpole in the yard (between Timmy and the mailbox), one pennant per mastered hub in that
+       hub's medal colour, best at the top; a crowned one carries a little crown */
     if (deco.flair.length) {
-      var fl = deco.flair.slice(0, 7), x0 = 134, x1 = 236, step = (x1 - x0) / (fl.length + 1);
-      s += '<path d="M' + x0 + ' 6 Q' + ((x0 + x1) / 2) + ' 22 ' + x1 + ' 6" stroke="#7A6A5A" stroke-width=".9" fill="none"/>';
+      var fl = deco.flair.slice().sort(function(a, b){ return b.lvl - a.lvl; }).slice(0, 4), px = 207;
+      s += '<ellipse cx="' + px + '" cy="125" rx="5" ry="1.6" fill="#000" opacity=".12"/>' +
+        '<rect x="' + (px - 1.1) + '" y="38" width="2.2" height="87" rx="1" fill="#B6BEC7" stroke="' + OUT + '" stroke-width="1"/>' +
+        '<circle cx="' + px + '" cy="36.4" r="2.6" fill="#F2C230" stroke="' + OUT + '" stroke-width="1"/>' +
+        '<path d="M' + (px - 4) + ' 124.6 h8 v-2.6 h-8 Z" fill="#8E98A3" stroke="' + OUT + '" stroke-width="1"/>';
       fl.forEach(function(f, i){
-        var x = x0 + step * (i + 1), t = (x - x0) / (x1 - x0), y = 6 + 32 * t * (1 - t);
-        var c = ["", "#C47A3E", "#C9D1D9", "#E8BE45", "#F2C230"][f.lvl];
-        s += '<path d="M' + (x - 4.6).toFixed(1) + ' ' + y.toFixed(1) + ' L' + (x + 4.6).toFixed(1) + ' ' + y.toFixed(1) + ' L' + x.toFixed(1) + ' ' + (y + 10).toFixed(1) + ' Z" fill="' + c + '" stroke="' + OUT + '" stroke-width="1"/>' +
-          (f.lvl >= 4 ? '<path d="M' + (x - 2.4).toFixed(1) + ' ' + (y + 4).toFixed(1) + ' l.6 -2.4 1.2 1.2 .6 -1.8 .6 1.8 1.2 -1.2 .6 2.4 Z" fill="#fff"/>' : '');
+        var y = 42 + i * 11, c = ["", "#C47A3E", "#C9D1D9", "#E8BE45", "#F2C230"][f.lvl];
+        s += '<path class="shpet-flag" style="animation-delay:' + (i * .3).toFixed(1) + 's" d="M' + (px + 1.1) + ' ' + y + ' L' + (px + 16) + ' ' + (y + 4.2) + ' L' + (px + 1.1) + ' ' + (y + 8.4) + ' Z" fill="' + c + '" stroke="' + OUT + '" stroke-width="1" stroke-linejoin="round"/>' +
+          (f.lvl >= 4 ? '<path d="M' + (px + 3.4) + ' ' + (y + 5.8) + ' l.5 -3 1.3 1.4 .9 -2.2 .9 2.2 1.3 -1.4 .5 3 Z" fill="#fff"/>' : '');
       });
     }
-    s += '<g fill="#FF8FB1"><circle cx="14" cy="140" r="2.4"/><circle cx="104" cy="140" r="2.4"/><circle cx="232" cy="132" r="2.4"/></g>' +
+    if (H !== "winter") s += '<g fill="#FF8FB1"><circle cx="14" cy="140" r="2.4"/><circle cx="104" cy="140" r="2.4"/><circle cx="232" cy="132" r="2.4"/></g>' +
       '<g fill="#FFE27A"><circle cx="24" cy="144" r="2"/><circle cx="214" cy="140" r="2"/></g>';
     return s + '</g></svg>';
   }
@@ -491,6 +544,43 @@
     [/review/, ["Review tables. My favourite kind of furniture."]],
     [/(notes|reading|lecture|compendium)/, ["Reading time. I'll be quiet. Mostly.", "Notes! Tap the Listen button if your eyes are tired."]]
   ];
+  /* ---------- secret tips: Timmy tells you how to find every easter egg (widget/eggs.js) ----------
+     Each tip is [plain text, the bit to bold]. They come in order (sh_pet_tip), so you hear all of them. */
+  var HOLIDAY_WORD = { halloween: "fangs", thanksgiving: "gobble", winter: "jingle", newyear: "cheers", valentine: "smile",
+    dentist: "dentist", stpatrick: "lucky", easter: "hop" };
+  var HOLIDAY_NAME = { halloween: "Halloween", thanksgiving: "Thanksgiving", winter: "winter break", newyear: "New Year's",
+    valentine: "Valentine's", dentist: "National Dentist's Day", stpatrick: "St. Patrick's", easter: "Easter" };
+  var TIPS = [
+    ["Type {floss} anywhere in a hub. On a phone, type it into the Search box.", "floss"],
+    ["Type {mirror} in a hub. Everything flips, like looking through a mouth mirror. Type it again to flip back.", "mirror"],
+    ["Get two friends to type {floss} in the same hub within a minute of you. That makes a Floss Chain.", "floss"],
+    ["Know the Konami code? {↑ ↑ ↓ ↓ ← → ← → B A}. On a phone: swipe up, up, down, down, left, right, left, right, then tap twice.", "↑ ↑ ↓ ↓ ← → ← → B A"],
+    ["Tap a professor's name {5 times} fast and they'll quote one of their exam hints.", "5 times"],
+    ["Every day one question in each hub is secretly {golden}. Be the first to get it right.", "golden"],
+    ["Sometimes a {Tooth Fairy} flutters past after you answer. Tap her before she's gone!", "Tooth Fairy"],
+    ["When {5 or more} people are in the same hub, a Plaque Boss shows up. Every right answer hits it.", "5 or more"],
+    ["Each week a tiny {cavity} hides in one paragraph of each hub's Lecture Notes. The first five people to tap it fill it.", "cavity"],
+    ["Every right answer grows a tooth on the {Full Arch} chart, and every miss knocks one out. Fill all 32.", "Full Arch"],
+    ["Get {10 wrong} in a row, then {10 right} in a row. That's going through the root canal.", "10 wrong|10 right"],
+    ["Answering questions between {2 and 4 am} earns a trophy. Please also sleep.", "2 and 4 am"],
+    ["Get {100 right} in a row and you unlock a tactical nuke you can call in.", "100 right"],
+    ["Get me to {100 HP} for a trophy. If I ever hit 0, nursing me back to 100 earns another one.", "100 HP"],
+    ["Your {trophy case} (Stats in any hub) has a clue for every secret you haven't found.", "trophy case"]
+  ];
+  function tipHTML(t){ return esc(t[0]).replace(/\{([^}]*)\}/g, function(_, x){ return "<b>" + x + "</b>"; }); }
+  function nextTip(){
+    if (ls("sh_pref_eggs") === "off") return "Surprises are off in Settings, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
+    var hol = holidayId(), list = TIPS.slice();
+    if (hol && HOLIDAY_WORD[hol]) list.unshift(["It's " + HOLIDAY_NAME[hol] + "! Type {" + HOLIDAY_WORD[hol] + "} in any hub and see what happens.", HOLIDAY_WORD[hol]]);
+    var i = (+(ls("sh_pet_tip") || 0)) % list.length;
+    ls("sh_pet_tip", String(i + 1));
+    return list[i];
+  }
+  function tellTip(ms){
+    var t = nextTip();
+    if (typeof t === "string") talk(t, "do-wave", 7000);
+    else talk("<small>Psst. Secret tip:</small><br>" + tipHTML(t), "do-look", ms || 10000, true);
+  }
   var EGG_LINES = {
     golden: ["GOLDEN PROBE! I'm so proud I could crack. (I won't.)"],
     fairy: ["You caught the Tooth Fairy! Did she leave a coin?", "She's real! I told you!"],
@@ -587,6 +677,7 @@
       "  font-size:12.5px; line-height:1.35; text-align:left; opacity:0; transform:translateY(6px) scale(.96); transform-origin:0 100%; pointer-events:none; transition:opacity .25s, transform .25s cubic-bezier(.2,.8,.3,1);}",
       ".shpet-say.is-on{opacity:1; transform:none; pointer-events:auto;}",
       ".shpet-say b{font-weight:700;}",
+      ".shpet-say small{font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; opacity:.65;}",
       ".shpet-say .shpet-more{display:inline-block; margin-top:6px; padding:0; border:0; background:none; color:var(--pet-accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}",
       /* where it lives */
       ".shpet-home{position:fixed; z-index:9989; left:14px; bottom:12px; width:64px; transition:opacity .3s, transform .3s;}",
@@ -608,6 +699,9 @@
       ".shpet-cloud{animation:shpet-drift 14s ease-in-out infinite alternate;}",
       ".shpet-star, .shpet-twinkle{animation:shpet-blinkstar 2.6s ease-in-out infinite;} .shpet-fw{animation:shpet-blinkstar 1.8s ease-in-out infinite;}",
       "@keyframes shpet-blinkstar{0%,100%{opacity:1;} 50%{opacity:.35;}}",
+      ".shpet-leaf{transform-box:fill-box; transform-origin:center; animation:shpet-leaf 6s ease-in-out infinite;} @keyframes shpet-leaf{0%{transform:translate(0,-8px) rotate(0); opacity:0;} 15%{opacity:1;} 50%{transform:translate(-6px,8px) rotate(140deg);} 85%{opacity:1;} 100%{transform:translate(4px,26px) rotate(300deg); opacity:0;}}",
+      ".shpet-snow{animation:shpet-snow 5s ease-in-out infinite;} @keyframes shpet-snow{0%{transform:translate(0,-6px); opacity:0;} 20%{opacity:1;} 100%{transform:translate(4px,18px); opacity:0;}}",
+      ".shpet-flag{transform-box:fill-box; transform-origin:0 50%; animation:shpet-flag 2.4s ease-in-out infinite;} @keyframes shpet-flag{0%,100%{transform:scaleX(1) skewY(0);} 50%{transform:scaleX(.9) skewY(4deg);}}",
       ".shpet-upg{list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:6px;}",
       ".shpet-upg li{font-size:12.5px; line-height:1.35; padding:7px 9px; border-radius:10px; border:1px solid var(--pet-line); color:var(--pet-ink2);}",
       ".shpet-upg li b{display:block; color:var(--pet-ink); font-size:13px;} .shpet-upg li.is-locked{opacity:.55;} .shpet-upg li.is-on b::after{content:' \\2713'; color:#2E9E5B;}",
@@ -699,9 +793,9 @@
       a.forEach(function(k){ if (b.indexOf(k) < 0 && CONDITION_INFO[k]) talk("My " + CONDITION_INFO[k][0].toLowerCase() + " is gone! Thank you!", "do-hop"); });
     }
   }
-  function award(kind){
+  function award(kind, hub){
     if (!M.sb || !M.visitor) return;
-    M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: "" }).then(function(){}, function(){});
+    M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: hub || "" }).then(function(){}, function(){});
   }
   function render(){
     var home = M.where === "dashboard" && M.home ? M.home() : null;
@@ -716,7 +810,7 @@
       el.innerHTML = '<div class="shpet-scene">' + houseSvg() + '<div class="shpet-spot"><button type="button" class="shpet-btn"></button><div class="shpet-say" role="status" aria-live="polite"></div></div></div>' +
         '<div class="shpet-info"><div class="shpet-title"><b>' + petName() + '</b><span class="shpet-hpnum"></span></div>' +
         '<span class="shpet-hp" aria-hidden="true"><i></i></span><p class="shpet-status"></p>' +
-        '<div class="shpet-actions"><button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button></div></div>';
+        '<div class="shpet-actions"><button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button><button type="button" class="shpet-ghost" data-tip>Secret tip</button></div></div>';
       if (!el.__shpet) { el.__shpet = true; el.addEventListener("click", homeClick); }
     } else {
       el = document.createElement("div");
@@ -735,6 +829,7 @@
   function homeClick(e){
     if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(pick(JOKES), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
     else if (e.target.closest("[data-check]")) { hush(); checkup(); }
+    else if (e.target.closest("[data-tip]")) tellTip();
   }
   function draw(){
     if (!M || !M.btn) return;
@@ -815,6 +910,7 @@
       if (ex) talk(ex, "do-cheer", 8000);
       else if (h < 5) talk("It's late. Sleep is good for memory AND teeth. A few more, then bed?", "do-wave", 7000);
       else if (st.hp < 40) talk(statusLine(st), "do-flinch", 8000);
+      else if (Math.random() < 0.35) tellTip(9000);
       else talk(pick([part + "! Let's study.", "Ready when you are.", "Let's get some right answers. I could use the HP.", "I'll be down here cheering."]), "do-wave", 5000);
     }
   }
@@ -836,6 +932,7 @@
     if (M.taps >= 5) { M.taps = 0; talk(pick(["Hey! That tickles.", "Okay okay, I'm awake!", "Careful, I'm load-bearing."]), "do-spin"); return; }
     M.jokes = (M.jokes || 0) + 1;
     if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + '<br><button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
+    else if (M.jokes % 4 === 2) tellTip();
     else talk(esc(pick(JOKES)) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), 8500, true);
   }
 
@@ -931,8 +1028,11 @@
       d.querySelector("[data-back]").style.visibility = step ? "visible" : "hidden";
       d.querySelector("[data-next]").textContent = step === STEPS.length - 1 ? "Adopt Timmy" : "Next";
     }
+    var done = false;
     function finish(){
+      if (done) return; done = true;
       ls("sh_pet_born", centralDay());
+      award("pet-adopt", centralDay());
       M.skipHello = true;
       d.remove();
       update(true); render();
@@ -941,8 +1041,11 @@
     d.addEventListener("click", function(e){
       if (e.target.closest("[data-next]")) { if (step === STEPS.length - 1) finish(); else { step++; show(); } }
       else if (e.target.closest("[data-back]")) { if (step) { step--; show(); } }
-      else if (e.target.closest("[data-no]")) { setPref("off"); d.remove(); }
+      else if (e.target.closest("[data-no]")) { done = true; setPref("off"); d.remove(); }
+      /* closing the introduction any other way still adopts him, so he never stays stuck on your name */
+      else if (e.target === d || e.target.closest(".shpet-x")) finish();
     });
+    d.addEventListener("keydown", function(e){ if (e.key === "Escape") finish(); });
     show();
   }
 
@@ -997,6 +1100,16 @@
     setTimeout(function(){ t.remove(); }, 4200);
   }
   function refresh(){ if (!M) return; hush(); render(); }
+  /* adoption follows you to your other devices: ranks.js and the dashboard pass the badges from get_rank_profile,
+     where 'pet-adopt' shows up once you've adopted him anywhere (migration_v32) */
+  function syncBadges(badges){
+    /* the badge is "pet-adopt:<day you adopted him>", so every device counts his health from the same day */
+    var b = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; })[0];
+    var day = b && /^\d{4}-\d{2}-\d{2}$/.test(String(b).split(":")[1] || "") ? String(b).split(":")[1] : null;
+    if (b && !adopted()) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
+    else if (b && day && ls("sh_pet_born") > day) { ls("sh_pet_born", day); if (M) { update(true); draw(); } }
+    else if (!b && adopted() && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
+  }
 
-  window.shPet = { mount: mount, refresh: refresh, art: art, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();

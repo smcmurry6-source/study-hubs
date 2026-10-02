@@ -578,7 +578,9 @@
     for (var k = 1; k <= 32; k++) {
       var upper = k <= 16, i = upper ? k - 1 : 32 - k, t = ARCH_TYPE.charAt(i);
       var x = 2.2 + i * 8.25 + (t === "M" ? 0 : .5);
-      s += '<path class="egg-arch-t" data-k="' + k + '" d="' + ARCH_SHAPE[t] + '" transform="translate(' + x.toFixed(2) + (upper ? ' 2)' : ' 42) scale(1 -1)') + '"/>';
+      /* the position (and the lower arch's flip) lives on a wrapper group: the pop animation's CSS transform on the
+         path itself would otherwise replace it, and fill-box origins would shift the flipped lower teeth */
+      s += '<g transform="translate(' + x.toFixed(2) + (upper ? ' 2)' : ' 42) scale(1 -1)') + '"><path class="egg-arch-t" data-k="' + k + '" d="' + ARCH_SHAPE[t] + '"/></g>';
     }
     return s + '<path d="M2 22 H134" stroke="currentColor" stroke-width=".6" stroke-dasharray="2 2" opacity=".35"/></svg>';
   }

@@ -552,6 +552,8 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-trophies-h b{color:var(--shw-ink);}
 .sh-trophies{display:grid; grid-template-columns:repeat(auto-fill, minmax(76px, 1fr)); gap:8px;}
 .sh-trophy{display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; padding:8px 4px; border-radius:12px; font-size:11.5px; line-height:1.2; color:var(--shw-ink3);}
+.sh-trophy-pct{font-size:10.5px; font-weight:700; color:var(--shw-ink3); font-variant-numeric:tabular-nums; padding:1px 6px; border-radius:99px; background:var(--shw-bg2);}
+.sh-trophy.is-earned .sh-trophy-pct{color:var(--shw-ink2);}
 .sh-trophy-medal{position:relative; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%;
   background:var(--shw-bg2); border:1.5px dashed var(--shw-line2); color:var(--shw-ink3);}
 .sh-trophy-medal svg{width:20px; height:20px;}
