@@ -627,7 +627,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
   </main>
 
   <footer class="hub-footer">
-    Musculoskeletal Exam 3 Hub &middot; built from the Exam 3 lecture slides, recordings, the class study guide, review sheet, quiz, Slido and crossword.
+    Musculoskeletal Exam 3 Hub &middot; built from the Exam 3 lecture slides, recordings, the class study guide, review sheet, lecture self-checks and Slido.
   </footer>
 </div>
 <div id="toastHost"></div>
@@ -705,44 +705,14 @@ var LECTURES = [
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order.
-   src: quiz = class quiz (study guide/Anki), lecture-quiz = self-assessment slide in the deck,
-        slido = in-class Slido, review = PollEv exam review (6 verbatim on the exam), crossword = class crossword, hub = hub-authored from slides/transcript. */
+   src: lecture-quiz = self-assessment slide in the deck, slido = in-class Slido,
+        review = PollEv exam review (6 verbatim on the exam), hub = hub-authored from slides/transcript.
+   Canvas quiz and crossword items are left out on purpose: the syllabus keeps graded quiz content confidential. */
 var QUESTIONS = [];
 function mcq(id, lec, src, stem, choices, ex){ QUESTIONS.push({ id:id, lec:lec, type:'mcq', stem:stem, choices:choices, answer:0, ex:ex||'', src:src }); }
 function seq(id, lec, src, stem, steps, ex){ QUESTIONS.push({ id:id, lec:lec, type:'sequence', stem:stem, steps:steps, ex:ex||'', src:src }); }
 function match(id, lec, src, stem, pairs, ex){ QUESTIONS.push({ id:id, lec:lec, type:'match', stem:stem, pairs:pairs, ex:ex||'', src:src }); }
 
-/* ===== Class quiz (study guide "Quiz" section / Anki deck) ===== */
-mcq('qz-socket','bonedev','quiz','Following extraction, a tooth socket fills with new bone over the next several months. What type of bone formation occurs during this time?',
-  ['Intramembranous','Endochondral','Interstitial cartilage growth','Heterotopic ossification'],
-  'The maxilla and mandible develop by intramembranous ossification, and extraction sites heal the same way: mesenchyme differentiates directly into osteoblasts with no cartilage template.');
-mcq('qz-endogrowth','bonedev','quiz','Endochondral osteogenesis occurs by which type(s) of growth?',
-  ['Both interstitial and appositional','Interstitial only','Appositional only','Direct replacement of mesenchyme only'],
-  'Endochondral bone forms on a cartilage template that grows interstitially (chondrocytes dividing inside the matrix) and appositionally (new matrix added at the surface). Anki key: "All of the above."');
-mcq('qz-il8','bonedev','quiz','All of the following stimulate osteoclastic activity EXCEPT:',
-  ['IL-8','IL-1','TNF-beta','PTH','RANKL'],
-  'IL-8 is a chemoattractant for neutrophils (PMNs) and has no effect on bone metabolism. IL-1, IL-6 and TNF-beta stimulate osteoclast maturation; PTH and RANKL induce osteoclastic activity.');
-mcq('qz-osteopontin','bonedev','quiz','All of the following regulate bone remodeling EXCEPT:',
-  ['Osteopontin','Calcitonin','Osteoprotegerin','PTH','BMP-2'],
-  'Osteopontin is a structural matrix protein made by osteoblasts and odontoblasts (secretion regulated by vitamin D). Calcitonin inhibits osteoclasts, OPG is a decoy that blocks RANKL, PTH stimulates resorption, and BMP-2/7 drive osteoblast differentiation.');
-mcq('qz-woven','bone','quiz','A 69-year-old woman fractures her humerus in a motor vehicle accident. Which type of bone will most likely be seen in a biopsy from the healing area?',
-  ['Woven','Lamellar','Compact','Cancellous','Trabecular'],
-  'When bone forms quickly (healing fracture, metabolic bone disease, tumor) the collagen is randomly oriented: woven bone. Compact, cancellous and trabecular bone are all lamellar.');
-mcq('qz-rickets','nutrition','quiz','A 3-year-old inner-city boy has bowlegs, knock knees, frontal bossing, flaring of the rib cage and pigeon breast deformity. A decrease in which of the following is characteristic of this condition?',
-  ['Calcification of osteoid','Serum alkaline phosphatase','Serum PTH','Thickness of the epiphyseal growth plates','Amount of unmineralized osteoid'],
-  'Rickets: failure of calcitriol action means osteoid fails to calcify, so osteoid accumulates and growth plates thicken: the amount of unmineralized osteoid goes up, not down. Secondary hyperparathyroidism raises PTH, and increased osteoblast activity raises alkaline phosphatase.');
-mcq('qz-gout','joints','quiz','A 50-year-old man has recurrent episodes of excruciating pain, swelling and redness of the right great toe, each following a large meal with heavy alcohol intake. What most likely causes this condition?',
-  ['Urate crystal deposition','Autoimmune synovitis with pannus','Degeneration of articular cartilage','Calcium phosphate crystal deposition','Reactive arthritis after GU infection'],
-  'Gout = deposition of monosodium urate crystals from hyperuricemia; the first MTP joint (big toe) is the classic first site. Primary gout (most common) has no evident cause; secondary gout follows high nucleic-acid turnover (leukemia, myeloma) or reduced excretion.');
-mcq('qz-osteoporosis','hereditary','quiz','An 88-year-old woman with progressive kyphosis and loss of height develops sudden back pain after changing position. X-ray shows generalized osteopenia and a lower thoracic vertebral fracture. Which is an association of her generalized bone disorder?',
-  ['Postmenopausal state and estrogen deficiency','Elevated serum calcium and phosphate','Defective synthesis of type I collagen','Chaotic remodeling with a jigsaw pattern','Unmineralized osteoid from vitamin D deficiency'],
-  'Osteoporosis: reduced bone mass with normal proportions of matrix and mineral; most common in older (postmenopausal) women. Serum calcium and phosphate are typically normal.');
-mcq('qz-ra','joints','quiz','A 40-year-old woman has symmetric stiffness and swelling of the PIP and MCP joints, fatigue and myalgia. Symptoms are worst in the morning and improve with use. Symmetric ulnar deviation is noted. What is the most likely cause?',
-  ['Autoimmune','Mechanical wear and tear','Urate crystal deposition','Prior GU infection','Trauma'],
-  'Rheumatoid arthritis is a chronic autoimmune synovitis of the small joints of the hands (PIP, MCP). Synovial hyperplasia forms pannus over the cartilage; tendon/ligament inflammation causes ulnar deviation.');
-mcq('qz-teriparatide','drugs','quiz','A 59-year-old woman with cystic fibrosis, prior prednisone courses and raloxifene therapy has T-scores of -1.6 to -2.2. Which drug would reduce fracture risk by further stimulating bone FORMATION?',
-  ['Teriparatide','Cholecalciferol','Ergocalciferol','Furosemide','Tamoxifen'],
-  'Teriparatide (recombinant PTH 1-34), given intermittently, is anabolic: it raises osteoblast activity. Cholecalciferol/ergocalciferol are vitamin D3/D2, furosemide increases calcium excretion, and tamoxifen is a SERM less bone-selective than raloxifene. Limit teriparatide to 2 years (osteosarcoma concern).');
 
 /* ===== Drugs lecture self-assessment + study guide ===== */
 mcq('dq-alendronate-upright','drugs','lecture-quiz','A patient on alendronate is told to take it with a full glass of water, stay upright for at least 30 minutes, and not eat for 30 minutes. These instructions mainly decrease the risk of:',
@@ -757,12 +727,6 @@ mcq('dq-mevalonate','drugs','lecture-quiz','A new osteoporosis drug decreases th
 mcq('dq-onj','drugs','lecture-quiz','A 58-year-old man with prostate cancer asks whether the drug he takes to prevent bone loss will raise his risk of osteonecrosis of the jaw before implant surgery. You say his therapy is NOT associated with ONJ. Which drug is he most likely taking?',
   ['Teriparatide','Romosozumab','Denosumab','Alendronate'],
   'Deck answer key: A. Bisphosphonates, denosumab and romosozumab all carry an ONJ risk because they suppress remodeling; teriparatide is anabolic and is not associated with ONJ.');
-mcq('dq-hcm','drugs','quiz','A 62-year-old man with metastatic prostate cancer has fatigue, nausea, confusion and serum calcium 13.2 mg/dL. IV hydration is started. Which drug most appropriately lowers calcium by inhibiting osteoclast-mediated resorption?',
-  ['Zoledronic acid','Teriparatide','Calcitriol','Calcium carbonate','Romosozumab'],
-  'Hypercalcemia of malignancy: IV saline plus loop diuretics, then antiresorptives (IV bisphosphonate such as zoledronic acid, or denosumab), and glucocorticoids.');
-mcq('dq-ckd','drugs','quiz','A 58-year-old man with stage 4 CKD has decreased night vision, muscle pain and twitching, perioral tingling, and cloudy lenses. Which finding is most likely?',
-  ['Low 25-hydroxyvitamin D','High serum calcium','Low serum PTH','Low serum phosphate from renal wasting'],
-  'He has hypocalcemia (neuromuscular excitability, paresthesias, cataracts) from CKD. Heads up: the class study guide keys "low 25-hydroxyvitamin D." In CKD it is specifically activation (1-alpha hydroxylation to 1,25(OH)2D) in the kidney that fails, so expect the exam to frame it as a vitamin D problem.');
 mcq('sl-calcitriol','drugs','slido','JS is on epoetin for anemia from severe chronic renal failure. Which is most appropriate for his vitamin D supplementation?',
   ['Calcitriol','Cholecalciferol','Ergocalciferol','Calcium carbonate'],
   'The final activation step (1-alpha hydroxylase, 25-OH D to 1,25(OH)2D) happens in the kidney. With renal failure, give the already-active form, calcitriol. Cholecalciferol (D3) and ergocalciferol (D2) are the inactive forms: they still need that kidney step, so they cannot work here.');
@@ -893,55 +857,6 @@ mcq('rv-enchondroma','tumors','review','Which of the following is a benign tumor
   ['Enchondroma','Osteochondroma','Giant cell tumor','Juxtacortical chondroma','Osteoid osteoma'],
   'Enchondroma: hyaline cartilage inside the medulla, most often the small bones of the hands and feet. Juxtacortical chondroma sits on the bone surface; multiple enchondromas = Ollier disease (Maffucci with hemangiomas).');
 
-/* ===== Crossword (class crossword / Anki) ===== */
-function cw(id, lec, clue, answer, distractors, ex){ mcq(id, lec, 'crossword', clue, [answer].concat(distractors), ex); }
-cw('cw-liposarcoma','tumors','Malignant neoplasm of adipocytes','Liposarcoma',['Lipoma','Leiomyosarcoma','Rhabdomyosarcoma'],'Liposarcoma: 25% of malignant soft-tissue tumors, deep proximal extremities and retroperitoneum; 12q amplification (MDM2) in well-differentiated tumors.');
-cw('cw-aplasia','hereditary','Congenital absence of individual bones','Aplasia',['Hypoplasia','Syndactyly','Dysplasia'],'A dysostosis (localized problem of mesenchymal migration/condensation).');
-cw('cw-beta','autoimmune','Type 1 diabetes is due to destruction of this cell type','Beta cells',['Alpha cells','Parietal cells','Hurthle cells'],'CD4 and CD8 T cells react against beta-cell antigens in the pancreatic islets.');
-cw('cw-ganglion','joints','Benign pseudocysts adjacent to a joint capsule or tendon sheath','Ganglion cysts',['Tophi','Rheumatoid nodules','Bouchard nodes'],'From cystic/myxoid degeneration of connective tissue; wrist and hand; surgery is the gold standard, observation if asymptomatic.');
-cw('cw-interstitial','cartilage','Growth of cartilage from chondrocytes within the cartilage','Interstitial',['Appositional','Intramembranous','Endochondral'],'Chondrocytes divide in their lacunae and form isogenous groups; appositional growth comes from the perichondrium.');
-cw('cw-bisphos','drugs','Drug family used to prevent osteoporosis that induces apoptosis of osteoclasts','Bisphosphonates',['PTH analogs','RANKL inhibitors','Sclerostin inhibitors'],'Pyrophosphate analogs taken up by osteoclasts during resorption.');
-cw('cw-oi','hereditary','Most common inherited disorder of connective tissue','Osteogenesis imperfecta',['Achondroplasia','Osteopetrosis','Stickler syndrome'],'Defective synthesis of type I collagen.');
-cw('cw-osteoblasts','bone','Bone cells that synthesize and secrete osteoid','Osteoblasts',['Osteocytes','Osteoclasts','Chondroblasts'],'Once differentiated they do not divide. Three fates: apoptosis (most), bone-lining cells, osteocytes.');
-cw('cw-goodpasture','autoimmune','Autoimmune disease with circulating antibodies against type IV collagen','Goodpasture syndrome',['Scleroderma','SLE','Sjogren syndrome'],'Destroys glomerular and alveolar basement membrane: hemoptysis then glomerulonephritis; M>F; death from uremia.');
-cw('cw-osteoclasts','bone','Multinucleate bone cells that remodel bone by resorbing matrix','Osteoclasts',['Osteoblasts','Osteocytes','Chondrocytes'],'Hematopoietic (monocyte/macrophage) origin, 5-50 nuclei, ruffled border, Howship lacunae.');
-cw('cw-type2','cartilage','Most abundant and cartilage-specific collagen','Type II',['Type I','Type IV','Type X'],'Homotrimer of three alpha-1(II) chains with Gly-X-Y repeats.');
-cw('cw-endochondral','bonedev','Bone formation from a cartilage template, as in long bones','Endochondral',['Intramembranous','Appositional','Heterotopic'],'Long bones and ribs.');
-cw('cw-intramem','bonedev','Bone formation by direct replacement of mesenchyme','Intramembranous',['Endochondral','Interstitial','Dysostosis'],'Calvaria, maxilla, mandible.');
-cw('cw-ms','autoimmune','Autoimmune demyelinating disorder','Multiple sclerosis',['Myasthenia gravis','Wernicke-Korsakoff','Guillain-Barre'],'Neurologic deficits separated in time, partial recovery; white-matter lesions; F>M.');
-cw('cw-osteophyte','joints','Bony outgrowth at a joint affected by osteoarthritis','Osteophyte',['Tophus','Pannus','Callus'],'Heberden nodes = DIP; Bouchard nodes = PIP.');
-cw('cw-ewing','tumors','Undifferentiated "small blue cell" neoplasm of the long bones, pelvis, scapula and ribs','Ewing sarcoma',['Osteosarcoma','Chondrosarcoma','Giant cell tumor'],'EWS-FLI1 fusion; children and young adults; lytic tumor from the medullary cavity.');
-cw('cw-rhabdo','tumors','Most common soft tissue sarcoma of childhood and adolescence','Rhabdomyosarcoma',['Liposarcoma','Leiomyosarcoma','Ewing sarcoma'],'Alveolar and embryonal subtypes; head/neck, sinuses, GU tract; alveolar = FOXO1 fused to PAX3 or PAX7.');
-cw('cw-jia','joints','Most common arthritis in children','Juvenile idiopathic arthritis',['Rheumatoid arthritis','Reactive arthritis','Gout'],'Onset before 16; oligoarthritis, large joints, RF usually absent, ANA often positive; chronic uveitis in 20-30%.');
-cw('cw-oa','joints','Most common joint disease','Osteoarthritis',['Rheumatoid arthritis','Gout','Ankylosing spondylitis'],'Degeneration of articular cartilage; gout is the most common INFLAMMATORY arthropathy.');
-cw('cw-storm','autoimmune','Acute exacerbation of hyperthyroidism precipitated by illness, surgery or trauma','Thyroid storm',['Myxedema','Graves ophthalmopathy','Goiter'],'A medical emergency.');
-cw('cw-osteochondroma','tumors','Benign bone tumor: cartilage-capped subperiosteal bony projection from the bone surface','Osteochondroma',['Enchondroma','Osteoid osteoma','Giant cell tumor'],'Most common benign bone tumor (30%); growth plate of long bones; M:F 3:1; <1% become chondrosarcoma.');
-cw('cw-scleroderma','autoimmune','Autoimmune disease with diffuse fibrosis in skin and multiple organs','Scleroderma',['Sjogren syndrome','SLE','Goodpasture syndrome'],'Systemic sclerosis: vascular damage + fibroblast/collagen overproduction; limited (fingers, forearms, face) or diffuse.');
-cw('cw-reactive','joints','Triad of arthritis, nongonococcal urethritis or cervicitis, and conjunctivitis','Reactive arthritis',['Psoriatic arthritis','Enteropathic arthritis','Gout'],'"Can\'t see, can\'t pee, can\'t climb a tree." Follows GU/GI infection by 1-3 weeks.');
-cw('cw-gout','joints','Disease from deposition of urate crystals in and around joints of the extremities','Gout',['Pseudogout','Osteoarthritis','Reactive arthritis'],'Gout = urate buildup.');
-cw('cw-endosteum','bonedev','Region of bone made of marrow stromal cells, resting osteoblasts and cells lining Haversian canals','Endosteum',['Periosteum','Perichondrium','Metaphysis'],'The periosteum covers the outer surface (not articular surfaces or tendon insertions).');
-cw('cw-osteopetrosis','hereditary','Genetic disease of decreased bone resorption leading to bone overgrowth','Osteopetrosis',['Osteogenesis imperfecta','Paget disease','Osteoporosis'],'Deficient osteoclast activity, usually failed acidification of the resorption pit.');
-cw('cw-achondro','hereditary','Most common skeletal dysplasia','Achondroplasia',['Osteogenesis imperfecta','Cleidocranial dysplasia','Kniest dysplasia'],'Gain-of-function FGFR3 mutation (Gly380Arg).');
-cw('cw-col1','hereditary','Defective synthesis of this matrix protein underlies osteogenesis imperfecta','Type I collagen',['Type II collagen','Aggrecan','Osteocalcin'],'Type I collagen makes up ~90% of bone matrix.');
-cw('cw-chondrocytes','cartilage','Chondroblasts surrounded by matrix','Chondrocytes',['Osteocytes','Fibroblasts','Chondroclasts'],'They sit in lacunae and can still divide (interstitial growth).');
-cw('cw-osteosarcoma','tumors','Malignant osteoid- and bone-producing neoplasm, most often in the metaphysis of the distal femur or proximal tibia','Osteosarcoma',['Chondrosarcoma','Osteoid osteoma','Ewing sarcoma'],'Most common primary bone malignancy; metaphysis around the knee; Codman triangle. "Neoplasm" alone covers benign and malignant tumors. Osteoid osteoma also makes osteoid and bone, but it is benign: a nidus under 2 cm in the cortex, with night pain relieved by NSAIDs. Chondrosarcoma makes cartilage, and Ewing sarcoma is small blue cells with no osteoid.');
-cw('cw-obesity','joints','Second most important predisposing factor for primary osteoarthritis','Obesity',['Trauma','HLA-B27','Hyperuricemia'],'Age first, then obesity.');
-cw('cw-dysostosis','hereditary','Developmental anomaly from localized problems in migration/condensation of mesenchyme and its differentiation into cartilage','Dysostosis',['Dysplasia','Aplasia','Osteopetrosis'],'Dysostosis = localized (a bone or group of bones, homeobox genes). Dysplasia = global disorganization of bone/cartilage.');
-cw('cw-hyaline','cartilage','Most common form of cartilage','Hyaline',['Elastic','Fibrocartilage','Articular'],'Clear matrix; fetal skeleton template, trachea, larynx, articular surfaces.');
-cw('cw-articular','cartilage','Cartilage that lacks a perichondrium','Articular',['Elastic','Hyaline of trachea','Epiglottic'],'Nourished by subchondral bone and synovial fluid, so it cannot repair.');
-cw('cw-psoriatic','joints','Arthritis affecting ~5% of patients with a skin disease; small joints of hands and feet','Psoriatic arthritis',['Reactive arthritis','Rheumatoid arthritis','Enteropathic arthritis'],'Slides say 5-30% of patients with psoriasis; less severe than RA.');
-cw('cw-osteocytes','bone','Bone cells that maintain the matrix and do not divide','Osteocytes',['Osteoblasts','Osteoprogenitor cells','Osteoclasts'],'90-95% of bone cells; ~100 dendritic processes; secrete sclerostin and FGF-23.');
-cw('cw-goiter','autoimmune','Diffuse enlargement of the thyroid gland','Goiter',['Myxedema','Thyroid storm','Hurthle change'],'Seen in Graves (diffuse) and Hashimoto (painless, nodular from fibrosis); iodine deficiency also causes goiter.');
-cw('cw-leiomyoma','tumors','Most common neoplasm in women','Leiomyoma',['Lipoma','Enchondroma','Rhabdomyoma'],'Uterine "fibroids" (77%); spindle-cell fascicles crossing at right angles.');
-cw('cw-osteoporosis','hereditary','Reduced bone mass owing to small incremental losses incurred in constant bone turnover','Osteoporosis',['Osteomalacia','Osteopetrosis','Paget disease'],'Normal ratio of matrix to mineral, just less of both.');
-cw('cw-compound','hereditary','Fracture that communicates with the skin','Compound',['Comminuted','Greenstick','Pathologic'],'Comminuted = fragmented; greenstick = partly through; pathologic = weakened by disease.');
-cw('cw-paget','hereditary','Bone disease of disorganized woven and lamellar bone from increased osteoblastic AND osteoclastic activity','Paget disease',['Osteopetrosis','Osteoporosis','Fibrous dysplasia'],'Osteitis deformans: chaotic remodeling, jigsaw/mosaic pattern.');
-cw('cw-lipoma','tumors','Benign tumor of fat','Lipoma',['Liposarcoma','Leiomyoma','Rhabdomyoma'],'Most common soft-tissue tumor of adulthood; soft, mobile, painless; cured by excision.');
-cw('cw-senile','hereditary','Type of osteoporosis in both men and women over age 70','Senile',['Postmenopausal','Secondary','Localized'],'Loses both trabecular and cortical bone; hip, humerus, tibia, pelvis fractures.');
-cw('cw-tsh','autoimmune','In hyperthyroidism, TSH is _____ and free T4 is elevated','Decreased',['Increased','Normal','Undetectable T4'],'Negative feedback: high T4 suppresses TSH. Hypothyroidism is the reverse.');
-cw('cw-osteolytic','hereditary','First stage in the progression of osteitis deformans','Osteolytic',['Mixed osteolytic-osteoblastic','Osteosclerotic','Quiescent'],'Osteolytic (huge osteoclasts) then mixed then quiescent osteosclerotic.');
-cw('cw-syndactyly','hereditary','Fusion of adjacent digits','Syndactyly',['Polydactyly','Aplasia','Brachydactyly'],'Slides: "syndactylism"; crossword: "syndactylysis".');
-cw('cw-mg','autoimmune','Autoimmune disease with antibodies against the ACh receptor','Myasthenia gravis',['Multiple sclerosis','Graves disease','Goodpasture syndrome'],'Weakness starts in extraocular muscles (ptosis, diplopia); death from respiratory compromise.');
 
 /* ===== Hub-authored: Nutrition ===== */
 mcq('h-nut-kwash','nutrition','hub','Which finding best distinguishes kwashiorkor from marasmus?',
@@ -984,7 +899,7 @@ mcq('h-nut-vitC','nutrition','hub','Vitamin C is required for:',
   ['Hydroxylation of proline and lysine in procollagen','Carboxylation of clotting factors','Synthesis of NAD','Rhodopsin synthesis'],
   'Deficiency = scurvy: bleeding gums, subperiosteal hemorrhage, poor wound healing, and in children bone disease.');
 mcq('h-nut-b12store','nutrition','hub','Which water-soluble vitamin is the exception that is stored long-term in the liver?',
-  ['Vitamin B12','Folate','Vitamin C','Thiamine'],
+  ['Vitamin B12','Folate (folic acid)','Vitamin C','Thiamine'],
   'Asked in lecture. Fat-soluble A, D, E, K are stored; among water-soluble vitamins only B12 has large hepatic stores.');
 mcq('h-nut-b12-if','nutrition','hub','Why won\'t oral B12 correct deficiency in pernicious anemia or after gastrectomy?',
   ["No intrinsic factor from parietal cells, so B12 cannot be absorbed in the ileum", "B12 is destroyed by stomach acid before it can reach the small intestine", "The liver cannot store B12 after gastrectomy, so it is lost as fast as it is absorbed", "Folate competes with B12 for absorption in the ileum and blocks its uptake"],
@@ -996,7 +911,7 @@ mcq('h-nut-zinc','nutrition','hub','A periorificial rash (around eyes, nose, mou
   ['Zinc','Copper','Selenium','Iodine'],
   'Acrodermatitis enteropathica. Zinc is a cofactor in vitamin A metabolism, hence night vision.');
 mcq('h-nut-selenium','nutrition','hub','Myopathy and cardiomyopathy are the deficiency findings of:',
-  ['Selenium','Copper','Iodine','Zinc'],
+  ['Selenium','Chromium','Iodine','Zinc'],
   'Copper = muscle weakness, neuro defects, hypopigmentation, abnormal collagen cross-linking. Iodine = goiter/hypothyroidism.');
 mcq('h-nut-bmi','nutrition','hub','Obesity is defined as a BMI of:',
   ['Above 30','Above 25','Above 35','18.5 to 25'],
@@ -1008,7 +923,7 @@ mcq('h-nut-cachexia','nutrition','hub','Roughly what share of cancer deaths is a
   ['30%','5%','50%','75%'],
   '50% of cancer patients develop cachexia (most with GI, pancreatic, lung cancer); 30% of cancer deaths are due to it.');
 mcq('h-nut-milk','nutrition','hub','Milk is fortified in the US with:',
-  ['Vitamin D','Iodine','Iron','Thiamine'],
+  ['Vitamin D','Iodine','Iron','Thiamine (B1)'],
   'Bread: thiamine, niacin, riboflavin, iron. Cereals: iron and B vitamins. Salt: iodine.');
 seq('h-nut-vitA-seq','nutrition','hub','Order the ocular progression of vitamin A deficiency (earliest first).',
   ['Night blindness','Xerophthalmia (dry eyes)','Bitot spots','Keratomalacia (corneal erosion)','Blindness'],
@@ -1163,7 +1078,7 @@ mcq('h-bd-ruffled','bonedev','hub','What distinguishes an ACTIVE osteoclast from
   ['Polarization with a ruffled border','More nuclei','Location on the bone surface','Expression of RANK'],
   'The ruffled border raises the surface area ~100-fold for proton pumps. A sealing zone (actin, integrins, osteopontin) contains the acid.');
 mcq('h-bd-ca2','bonedev','hub','Inside an osteoclast, which enzyme generates the protons it pumps into the resorption lacuna?',
-  ['Carbonic anhydrase II','Cathepsin K','Alkaline phosphatase','FPP synthase'],
+  ['Carbonic anhydrase II','Cathepsin K','Tartrate-resistant acid phosphatase','FPP synthase'],
   'CO2 + H2O makes H+ and HCO3-. H+ goes out via an ATP-dependent pump; HCO3- is swapped for Cl-, which follows into the lacuna (HCl, pH 3-4.5). Cathepsin K and MMPs then digest collagen.');
 mcq('h-bd-opg','bonedev','hub','Osteoprotegerin (OPG) inhibits osteoclastogenesis by:',
   ['Acting as a decoy that binds RANKL so it cannot bind RANK','Blocking the M-CSF receptor','Killing osteoclasts directly','Neutralizing PTH'],
@@ -1441,7 +1356,7 @@ mcq('h-tu-codman','tumors','hub','A Codman triangle (lifted periosteum laying do
   ['Osteosarcoma','Ewing sarcoma','Osteochondroma','Giant cell tumor'],
   '75% under age 20; metaphysis of long bones; lung mets in 20% at diagnosis (poor prognosis).');
 mcq('h-tu-chondrosarc','tumors','hub','The second most common malignant bone tumor, usually after age 50 in the central skeleton, is:',
-  ['Chondrosarcoma','Ewing sarcoma','Osteosarcoma','Liposarcoma'],
+  ['Chondrosarcoma','Ewing sarcoma','Osteosarcoma','Fibrosarcoma of bone'],
   'Men 2x. Low grade: 90% 5-year survival; high-grade/dedifferentiated spreads hematogenously to lungs.');
 mcq('h-tu-ewing-trans','tumors','hub','Ewing sarcoma is driven by which molecular event?',
   ['EWS-FLI1 fusion from translocation','FOXO1-PAX3 fusion','MDM2 amplification on 12q','FGFR3 activation'],
@@ -1469,7 +1384,7 @@ mcq('ex-graves','autoimmune','hub','All of the following fit Graves disease EXCE
   ['Blocking antibodies against the TSH receptor','Low TSH with high free T4','Ophthalmopathy','A diffuse goiter'],
   'Graves IgG STIMULATES the TSH receptor (TSH low, free T4 high, diffuse goiter, bulging eyes). Blocking anti-TSH receptor antibodies are Hashimoto.');
 mcq('ex-antiresorp','drugs','hub','All of the following are antiresorptive EXCEPT:',
-  ['Teriparatide','Denosumab','Alendronate','Raloxifene'],
+  ['Teriparatide','Denosumab','Zoledronic acid','Raloxifene'],
   'Teriparatide is anabolic: intermittent PTH raises osteoblast number and activity. Bisphosphonates, denosumab, estrogen/SERMs and calcitonin are antiresorptive; romosozumab is both.');
 mcq('ex-deno','drugs','hub','All of the following are true of denosumab EXCEPT:',
   ['It inhibits FPP synthase','It is a monoclonal antibody against RANKL','Cataracts are a signature adverse effect','It can cause hypocalcemia'],
@@ -1496,7 +1411,7 @@ mcq('h-tu-mdm2','tumors','hub','Amplification of a 12q region containing MDM2 (a
   ['Well-differentiated liposarcoma','Rhabdomyosarcoma','Leiomyosarcoma','Lipoma'],
   "Well-differentiated liposarcoma carries a 12q13–15 amplification including MDM2 (which switches off p53) and CDK4. That finding separates it from a benign lipoma. Rhabdomyosarcoma, the tempting pick, is the childhood soft tissue sarcoma marked by a FOXO1-PAX3 or PAX7 fusion, not MDM2 amplification.");
 mcq('h-tu-rhabdomyoma','tumors','hub','Rhabdomyoma is a benign cardiac tumor seen in patients with:',
-  ['Tuberous sclerosis','Neurofibromatosis','Li-Fraumeni','Down syndrome'],
+  ['Tuberous sclerosis','Neurofibromatosis type 1','Li-Fraumeni','Down syndrome'],
   'Most common cardiac tumor of infants and children; often regresses in the first few years.');
 mcq('h-tu-alveolar','tumors','hub','Alveolar rhabdomyosarcoma is characterized by fusion of FOXO1 with:',
   ["PAX3 or PAX7", "EWSR1", "MDM2", "FLI1"],
@@ -2374,10 +2289,8 @@ var QUESTION_CUES = {
   "h-bd-zones":"From the epiphysis down: \"Rest, Proliferate, Hypertrophy, Calcify, Ossify\". Cells sleep, multiply, swell, harden, then become bone.",
   "h-ai-sle-ab":"\"SLE loves its DNA and Smith\": anti-dsDNA and anti-Smith. Ro/La is Sjogren; RF and anti-CCP are RA.",
   "h-dr-hypoCa":"Low calcium = twitchy (tingling, spasms, tetany). High calcium = \"stones, bones, groans, moans\" and weak, slow reflexes.",
-  "dq-hcm":"Malignancy hypercalcemia: fluids first, then an IV bisphosphonate (zoledronic acid) to shut down the osteoclasts.",
   "ex-osteosarc":"Osteosarcoma = Metaphysis by the knee; Ewing = diaphysis (Ewing Eats the middle of the shaft).",
   "h-nut-iron-us":"In a US adult on a normal diet, iron-deficiency anemia means bleeding until proven otherwise. Look at the gut first.",
-  "cw-oi":"OI = imperfect type I collagen: the most common inherited connective-tissue disorder.",
   "h-nut-vitA-epith":"Vitamin A keeps epithelium lining-type: without it, airways and urinary tract go squamous, so more lung infections and kidney stones.",
   "h-tu-gct-arthritis":"Giant cell tumor = the \"arthritis\" that isn't: a lytic hole in the epiphysis at the knee in a 20-40-year-old.",
   "h-ai-mikulicz":"Mikulicz = big glands (lacrimal and salivary swollen); Sicca = dry (eyes and mouth).",
@@ -2388,7 +2301,6 @@ var QUESTION_CUES = {
   "h-bo-ontogeny":"Stem cell, progenitor, pre-osteoblast, osteoblast, osteocyte: it ends up buried in its own bone.",
   "h-dr-fx-site":"Postmenopausal hits trabecular bone (spine, wrist); age-related hits everything, and the Hip rises with age.",
   "h-he-paget-tx":"Paget's bone is overactive, so calm the osteoclasts: bisphosphonates first, calcitonin as backup. Never teriparatide.",
-  "qz-rickets":"Rickets = soft bones: osteoid piles up but doesn't calcify. What goes down is the calcification.",
   "h-bd-fgf23":"FGF-23 = \"Phosphate Goes Free\": made by osteocytes, it dumps phosphate in the urine and turns down 1-alpha hydroxylase.",
   "ex-graves":"Graves Gets the TSH receptor Going (stimulates it); Hashimoto Halts it (blocks it).",
   "h-tu-gct-demo":"Giant cell tumor = young-to-middle-aged adults, women 20-40 on the table. Boys under 25 is osteochondroma; boys 10-20 is osteosarcoma.",
@@ -2407,11 +2319,8 @@ var QUESTION_CUES = {
   "h-tu-oring":"O-ring in a finger bone = a ring of calcifying cartilage = Enchondroma (\"EN\" = inside the hand bones).",
   "h-dr-bp-renal":"Bisphosphonates leave by the kidney: below a clearance of about 30-35, don't give them.",
   "h-bo-endocrine":"Osteocalcin talks to the pancreas and testes: beta cells, insulin, male fertility.",
-  "qz-osteopontin":"Osteopontin is a brick, not a boss: a structural matrix protein, not a remodeling regulator.",
-  "cw-rhabdo":"Rhabdomyosarcoma = the kids' soft tissue sarcoma (head and neck, sinuses, GU tract).",
   "h-ai-graves-tx":"Plasma exchange cleans antibodies out of the blood for Goodpasture. Graves gets beta blockers, antithyroid drugs, radioiodine or surgery.",
   "h-jt-hlab27":"B27 = \"PAIR\": Psoriatic, Ankylosing spondylitis, IBD-related, Reactive. All seronegative.",
-  "cw-endosteum":"ENDOsteum = lines the INside of bone (marrow side and Haversian canals); periosteum covers the outside.",
   "h-ca-chondronectin":"Chondro-NECTIN connects: it sticks chondrocytes to their matrix (as fibronectin does for other cells).",
   "ex-deno":"FPP synthase is the bisphosphonate target. Denosumab works one step up the line: it blocks RANKL.",
   "h-ca-aggrecan":"Aggrecan = the bottle brush: a hyaluronan handle, link proteins, and GAG bristles that hold water.",
@@ -2422,7 +2331,6 @@ var QUESTION_CUES = {
   "h-he-pmo":"Menopause = estrogen drops, IL-1 rises, osteoclasts multiply: trabecular bone goes first, so spine and wrist break.",
   "h-he-op-marrow":"Osteopetrosis = \"marble bone\": bone crowds out the marrow, so blood counts fall.",
   "h-bo-cellpct":"Osteocytes are almost everyone (90-95%); blasts ~5%, clasts ~1-2%.",
-  "cw-osteosarcoma":"Osteosarcoma = malignant bone-maker at the knee metaphysis (Codman triangle). Osteoid osteoma is the small, benign one.",
   "ex-antiresorp":"TeriPARAtide builds (anabolic); the rest stop the osteoclasts.",
   "h-bd-pth-kidney":"PTH in the kidney: keep Calcium, dump Phosphate, activate vitamin D (\"PTH = Phosphate Trashing Hormone\").",
   "dq-mevalonate":"Mevalonate/FPP = \"-dronate\": any bisphosphonate (alendronate, risedronate, zoledronate).",
@@ -2437,24 +2345,17 @@ var QUESTION_CUES = {
   "ex-sjogren":"Sjogren's antibodies are Ro/La (SS-A/SS-B); anti-dsDNA belongs to SLE.",
   "h-ai-tensilon":"Tensilon test: a quick anticholinesterase, and a myasthenic patient's strength briefly comes back.",
   "h-nut-selenium":"Selenium protects muscle: no selenium, weak skeletal and heart muscle.",
-  "cw-interstitial":"INterstitial = from INside (chondrocytes dividing in lacunae); appositional = adding to the surface.",
   "h-dr-carbonate":"Carbonate needs acid: take it with food. Citrate goes in with or without acid.",
   "sl-intramem":"Flat bones of the head (calvaria, face, mandible) are intramembranous; long bones and ribs grow on a cartilage model.",
-  "dq-ckd":"CKD + twitching, tingling, cataracts = low calcium from a vitamin D failure. Bad kidneys, bad vitamin D.",
   "h-bd-hox":"HOX = shoulder to hand (proximal-distal). SHH = thumb to pinky. Wnt7a = knuckles to palm.",
   "h-he-pseudo":"A pseudoarthrosis is a false joint: a broken callus that grows a synovial-like lining.",
   "h-bo-sclerostin":"Sclerostin = \"stop building\": osteocytes use it to brake formation; romosozumab removes the brake.",
-  "cw-compound":"Compound = Complicated by an open wound: bone meets skin.",
-  "qz-il8":"IL-8 calls neutrophils (\"IL-8 = clean-up crew\"), not osteoclasts.",
-  "cw-ewing":"Ewing = small blue cells in the shaft (diaphysis) of a child's long bone; EWS-FLI1, t(11;22).",
-  "cw-achondro":"Achondroplasia is the top skeletal dysplasia: one FGFR3 point mutation in about 95% of cases.",
-  "qz-endogrowth":"Endochondral bone needs a cartilage model, and cartilage grows both ways: from inside (interstitial) and at the surface (appositional)."
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_CUES[q.id]) q.cue = QUESTION_CUES[q.id]; });
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
-var SRC_LABEL = { 'quiz':'Class quiz', 'lecture-quiz':'Lecture self-check', 'slido':'Slido', 'review':'Exam review (PollEv)', 'crossword':'Crossword', 'hub':'Hub-authored' };
+var SRC_LABEL = { 'lecture-quiz':'Lecture self-check', 'slido':'Slido', 'review':'Exam review (PollEv)', 'hub':'Hub-authored' };
 
 /* ---------- utils ---------- */
 function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -4008,7 +3909,7 @@ var ARCADE = (function(){
     };
   }
 
-  /* =================================================================== BONE SEARCH (word search on crossword answers) */
+  /* =================================================================== BONE SEARCH (word search on one-word answers) */
   function searchPool(lec){
     return QUESTIONS.filter(function(q){
       if(q.type !== 'mcq') return false;
@@ -4262,7 +4163,7 @@ window.SH_GOTO = function(g){
 
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
    draw each card, so answers go through recordAnswer like anywhere else. */
-var DRILL_HY = { quiz:'on the class quiz', 'lecture-quiz':'a self-check slide in the lecture', slido:'asked in class on Slido', review:'from the exam review: six of these are word for word on the exam' };
+var DRILL_HY = { 'lecture-quiz':'a self-check slide in the lecture', slido:'asked in class on Slido', review:'from the exam review: six of these are word for word on the exam' };
 window.SH_DRILL = {
   pool: function(){
     return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });

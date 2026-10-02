@@ -84,6 +84,14 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (MSK: class quiz and crossword items removed, Claude Code)** — The DENT 2155 syllabus says graded Canvas
+  quiz questions and answers are confidential and must not be shared with later classes, and crosswords are graded
+  bonus work. The 59 MSK items sourced from them (`src:'quiz'`, 12 `qz-*` plus `dq-hcm`/`dq-ckd`; `src:'crossword'`,
+  47 `cw-*`) and their cues are gone, with the `quiz`/`crossword` source labels and drill reasons. Seven distractors
+  changed (`h-bd-ca2`, `h-tu-chondrosarc`, `h-tu-rhabdomyoma`, `h-nut-b12store`, `h-nut-selenium`, `h-nut-milk`, `ex-antiresorp`) to keep the longest-answer lint under 40%. Bank 302
+  → 243. **Standing rule: never put Canvas quiz, crossword or take-home content in a hub.** **MSK Project: drop these
+  from the split sources too.**
+
 - **2026-10-02 (TIMMY easter egg, Claude Code, #59)** — `widget/timmy.js`: typing TIMMY (outside a text field, or into a
   hub's Search box) runs a 15-second overlay show (dark fade, page crumbles, crowned Timmy with cursor-tracking eyes,
   letters slam in, mini-Timmy rain, "blessed this study session" banner, page restored). Esc / corner button ends it;
