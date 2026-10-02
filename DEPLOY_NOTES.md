@@ -84,6 +84,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (check-ins ask for topics, not exam questions, Claude Code)** — The exam check-in's last question is now
+  "Any topics or question formats the hub missed or barely covered?" with a note asking people not to write out exam
+  questions or answers (the honor code keeps exam content private; the DENT 2155 syllabus bans copying any part of an
+  exam). Answer key `missed` unchanged, so `review/` and the audit queries still read it. `/lessons-audit` now says to
+  use a check-in only as a topic or format, never to rebuild an exam question from one. About page entry updated.
+
 - **2026-10-02 (TIMMY easter egg, Claude Code, #59)** — `widget/timmy.js`: typing TIMMY (outside a text field, or into a
   hub's Search box) runs a 15-second overlay show (dark fade, page crumbles, crowned Timmy with cursor-tracking eyes,
   letters slam in, mini-Timmy rain, "blessed this study session" banner, page restored). Esc / corner button ends it;
