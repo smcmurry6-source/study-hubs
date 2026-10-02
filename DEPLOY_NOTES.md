@@ -84,6 +84,14 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (TIMMY easter egg, Claude Code, #59)** — `widget/timmy.js`: typing TIMMY (outside a text field, or into a
+  hub's Search box) runs a 15-second overlay show (dark fade, page crumbles, crowned Timmy with cursor-tracking eyes,
+  letters slam in, mini-Timmy rain, "blessed this study session" banner, page restored). Esc / corner button ends it;
+  reduced-motion skips crumble, starfield and rain. Separate from Timmy Tooth (`pet.js`), who gets an `EGG_LINES.timmy`
+  reaction via `sh:egg-local` when the show ends. Off with Surprises (`sh_pref_eggs`), never during a mock. Loaded by
+  `v3.js` in every hub and by `<script>` on the dashboard and review page. Per-device counter in `sh_timmy_count`.
+  Not yet listed on the About page's easter-egg table or given a trophy.
+
 - **2026-10-02 (MSK `nq-folate-case` explanation, Claude Code)** — Report #12: "is trouble concentrating not a neurologic
   symptom?" The stem lists trouble concentrating while the explanation said "without neurologic symptoms". Answer and
   stem unchanged; the explanation now says the concentrating trouble comes from the anemia (like the fatigue) and names
