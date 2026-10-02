@@ -51,6 +51,8 @@ does it differently.
    In a local session, still prefer a branch + PR over pushing `main` directly.
 3. Verify before pushing (see below).
 4. In the PR description, write what changed in plain, student-facing language.
+   **American English everywhere** (Sam's standing rule, 2026-10-02): color, favorite, center, millimeter,
+   labeled, organize — in site text, changelog entries, notices, replies and code comments alike.
 5. **Any student-visible feature, easter egg, trophy, holiday or setting goes on the About page
    (`about/index.html`) in the same PR** (Sam's standing rule, 2026-10-02): add or update its entry in the
    right part (with a "new" tag), keep counts like "All 24 trophies" true, and put anything that gives away a

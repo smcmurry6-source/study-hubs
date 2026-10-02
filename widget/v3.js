@@ -1140,7 +1140,7 @@
     flushBank();
   }
   /* start a moment after load so the hub's own scripts have rendered their
-     initial tabs -- otherwise the first (pre-credited) ping is labelled with
+     initial tabs -- otherwise the first (pre-credited) ping is labeled with
      the bare mode ("compendium") and the real sub-view double-counts. */
   var trackingArmed = false;
   setTimeout(function(){
@@ -1204,7 +1204,7 @@
     }, 1600);
   }
   function fireConfetti(){
-    /* a holiday (widget/eggs.js) swaps the colours and the paper strips for little shapes (candy corn, leaves, snow...) */
+    /* a holiday (widget/eggs.js) swaps the colors and the paper strips for little shapes (candy corn, leaves, snow...) */
     var theme = window.shConfettiTheme;
     var colors = (theme && theme.colors) || ["#3ecf7e", "#f0806b", "#e8c15a", "#8fb4e8", "#c58fe8"];
     for (var i = 0; i < 26; i++){
@@ -1422,7 +1422,7 @@
     var SRC_X = 176, SRC_Y = 47, SRC_W = 280, SRC_H = 280;
     var KEY_R = 0, KEY_G = 215, KEY_B = 0, TOL = 70, SOFT = 50;
     // From ~12.25 s the clip whites out on its own, lightening the green toward white,
-    // so a fixed key colour stopped matching and the lit-up screen showed as a pale
+    // so a fixed key color stopped matching and the lit-up screen showed as a pale
     // square around the icon until the blast at 13 s. Each frame is keyed against its
     // own background instead (sampled at the four corners), and as it whitens the icon
     // swells into this soft white disc, handing off to the full-screen flash.

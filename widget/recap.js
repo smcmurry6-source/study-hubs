@@ -59,7 +59,7 @@
     var ctx = canvas.getContext("2d");
     ctx.textBaseline = "alphabetic";
 
-    /* background: deep ink with a soft glow of the hub colour */
+    /* background: deep ink with a soft glow of the hub color */
     ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
     var g = ctx.createRadialGradient(W - 120, 60, 20, W - 120, 60, 760);
     g.addColorStop(0, hexA(accent, .30)); g.addColorStop(1, hexA(accent, 0));

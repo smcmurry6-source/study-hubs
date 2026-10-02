@@ -426,7 +426,7 @@
       '<path d="M212 104 V96 a8 6 0 0 1 16 0 V104 Z" fill="#B0672B" stroke="' + OUT + '" stroke-width="1.8"/><path d="M215 96 a5 3.6 0 0 1 10 0" stroke="#F2B884" stroke-width="1.2" fill="none"/>' +
       '<path d="M228 94 V86 L234 88 L228 90" fill="#E5484D" stroke="' + OUT + '" stroke-width="1.2" stroke-linejoin="round"/>';
     /* mastery pennants: a flagpole in the yard (between Timmy and the mailbox), one pennant per mastered hub in that
-       hub's medal colour, best at the top; a crowned one carries a little crown */
+       hub's medal color, best at the top; a crowned one carries a little crown */
     if (deco.flair.length) {
       var fl = deco.flair.slice().sort(function(a, b){ return b.lvl - a.lvl; }).slice(0, 4), px = 207;
       s += '<ellipse cx="' + px + '" cy="125" rx="5" ry="1.6" fill="#000" opacity=".12"/>' +
@@ -489,7 +489,7 @@
     "What do you call a bear with no teeth? A gummy bear.",
     "Why did the gingiva go to therapy? Attachment issues.",
     "Why did the smartphone need a dentist? Bluetooth.",
-    "What's a dentist's favourite movie? Plaque to the Future.",
+    "What's a dentist's favorite movie? Plaque to the Future.",
     "Why did the cookie go to the dentist? It lost its filling.",
     "What did the dentist say to the computer? This won't hurt a byte.",
     "My dentist says I need a crown. Finally, someone who gets me.",
@@ -502,7 +502,7 @@
     "Periodontists are great listeners. They hear you out, then probe a little deeper.",
     "I asked my dentist how to whiten my teeth. They said wear a brown shirt.",
     "What does a dentist call an X-ray? A tooth-pic.",
-    "What's a tooth's favourite dance? The floss. Obviously.",
+    "What's a tooth's favorite dance? The floss. Obviously.",
     "Why was the enamel so confident? It's the hardest thing in the body.",
     "What do you call a dentist who doesn't like tea? Denis.",
     "Do you swear to tell the tooth, the whole tooth, and nothing but the tooth?",
@@ -541,7 +541,7 @@
     [/cram/, ["The cram sheet? Exam must be close.", "Cram sheet. Highlights of the highlights."]],
     [/hint/, ["Exam hints: the professor literally told us. Pay attention!"]],
     [/(mind|map)/, ["Ooh, a mind map. Very organized of you."]],
-    [/review/, ["Review tables. My favourite kind of furniture."]],
+    [/review/, ["Review tables. My favorite kind of furniture."]],
     [/(notes|reading|lecture|compendium)/, ["Reading time. I'll be quiet. Mostly.", "Notes! Tap the Listen button if your eyes are tired."]]
   ];
   /* ---------- secret tips: Timmy tells you how to find every easter egg (widget/eggs.js) ----------
@@ -595,14 +595,14 @@
     boss: ["Plaque Boss is DOWN. That thing was my mortal enemy."],
     rootcanal: ["You went through the root canal and came out the other side. Respect."],
     owl: ["It's the middle of the night. I'm a tooth and even I'm tired."],
-    floss: ["Did somebody say floss?", "That's my favourite word."],
+    floss: ["Did somebody say floss?", "That's my favorite word."],
     flosschain: ["A FLOSS CHAIN. This is the best day of my life."],
     mirror: ["Everything's backwards. Is my good side still my good side?"],
     fullarch: ["A full arch! All 32 of my cousins, together at last."],
     cavity: ["You filled a cavity! Show-off. (I love it.)"],
     prof: ["Quoting the professor? Very on brand."],
     konami: ["Whoa. Am I... pixels?"],
-    holiday: ["Happy holidays from your favourite tooth!"],
+    holiday: ["Happy holidays from your favorite tooth!"],
     timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain."]
   };
   var HOLIDAY_HELLO = {
@@ -610,7 +610,7 @@
     thanksgiving: "Happy Thanksgiving! I'm thankful for you. And for fluoride.",
     winter: "Happy holidays! Finals first, cookies after.",
     newyear: "Happy New Year! Resolution: floss. Every day. I mean it.",
-    valentine: "Happy Valentine's! You're my favourite human.",
+    valentine: "Happy Valentine's! You're my favorite human.",
     dentist: "It's National Dentist's Day! That's you soon.",
     stpatrick: "Happy St. Patrick's! Lucky to have you.",
     easter: "Happy Easter! Go easy on the chocolate eggs."
