@@ -81,9 +81,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   **Remember it:** (`cueHTML(q)`, `.qx-cue`), shown only after a miss: a wrong MCQ pick, a partly wrong select-all, a
   sequence or matching with a mistake, or "I missed it" on a recall card (`markMissed()` adds `.missed` to the
   explanation). Works in the bank, the daily drill and the mock's missed-question review, which all use `qCardHTML`.
-  80 cues written for every perio item under 80% class accuracy with 8+ attempts (plus q5-01/q5-06). No reading text
-  changed, so no narration regenerated. **Perio Project: carry `cue` fields, `cueHTML`/`markMissed` and the CSS into
-  the split sources. A new hub gets cues by rendering `q.cue` the same way.**
+  80 cues written for every perio item under 80% class accuracy with 8+ attempts (plus q5-01/q5-06). **MSK** too: its
+  88 cues (items under 75%, 8+ attempts) live in one `QUESTION_CUES` map applied to `QUESTIONS` (its bank is built by
+  `mcq()`/`seq()` calls); `finishCard()` adds `.is-missed`, and the submitted mock marks missed cards the same way.
+  No reading text changed, so no narration regenerated. **Perio and MSK Projects: carry the cues, `cueHTML` and the
+  CSS into the split sources. A new hub gets cues by rendering `q.cue` the same way.**
 
 - **2026-10-01 (mastery flair, new eggs, Timmy Tooth, Claude Code)** — `migration_v31.sql` (**applied 2026-10-01 via the connector**):
   the leaderboards (`get_leaderboard`, `get_correct_streak_stats`, `get_arcade_leaderboard`, `get_rank_board`, `get_fairy_board`) gain a

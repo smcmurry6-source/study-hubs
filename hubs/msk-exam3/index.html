@@ -168,6 +168,10 @@ main{padding-top:20px}
 .qcard-hint{font-size:.8rem;color:var(--ink-faint);margin-bottom:8px}
 .qcard-explain{display:none;margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--surface-2);font-size:.9rem}
 .qcard.is-answered .qcard-explain{display:block}
+.qx-cue{display:none;margin-top:9px;padding:8px 11px;border-radius:8px;border-left:3px solid var(--accent);background:var(--accent-soft);color:var(--ink)}
+.qx-cue svg{width:15px;height:15px;vertical-align:-3px;margin-right:4px;color:var(--accent-ink)}
+.qx-cue b{color:var(--accent-ink)}
+.qcard.is-missed .qx-cue{display:block}
 .qcard-verdict{font-weight:700;margin-right:6px}
 .qcard-verdict.ok{color:var(--good)} .qcard-verdict.bad{color:var(--bad)}
 .qcard-classdata-row{margin-top:8px}
@@ -2351,6 +2355,98 @@ tumors: `
 };
 
 /* ---------- derived lookups ---------- */
+/* memory cues, shown only after a miss (cueHTML): one hook per question the class gets right under 75% of the time */
+var QUESTION_CUES = {
+  "h-jt-ra-seq":"Think of RA as an invasion: T cells sound the alarm, the synovium swells, pannus creeps over the cartilage, osteoclasts dig into bone, then the joint fuses, first with fibrous tissue and then with bone.",
+  "h-bd-endo-seq":"\"Model, Collar, Die, Vessels, Build, Ends\": a cartilage model, a bone collar, chondrocytes die, vessels invade, osteoblasts build, and secondary centres form at the ends.",
+  "h-he-fx-seq":"Fracture repair runs like a wound: blood clot, then signals, then a soft callus (week 1), then a hard callus (weeks 2-3), then bridging, then remodeling.",
+  "h-ca-collagen-seq":"\"Hydroxy, Sugar, Twist, Ship, Snip, Link\": hydroxylate (vit C), glycosylate, form the triple helix, secrete, cleave the propeptides, cross-link. The first four happen inside the cell.",
+  "h-bd-remodel":"\"A-R-R-F-M-Q\" (\"Always Remodel, Rarely Fail, Mostly Quiet\"): Activation, Resorption, Reversal, Formation, Mineralization, Quiescence.",
+  "h-tu-match":"Osteochondroma grows from the growth plate (knee); ENchondroma lives IN the small hand and foot bones; osteoma sits on the face and skull; chondrosarcoma is central (pelvis, shoulder, ribs); giant cell tumor sits at the bone ends (epiphysis) of the knee.",
+  "h-bd-oc-diff":"An osteoclast's life: stem cell, committed, pre-osteoclast, fuse (many nuclei), polarize (switch on), then apoptosis after 6-7 resorption cycles.",
+  "h-tu-mdm2":"\"MDM2 makes Lipo fat and malignant\": the 12q MDM2/CDK4 amplification marks well-differentiated liposarcoma and separates it from a lipoma.",
+  "ex-zinc":"Cheilosis and glossitis belong to the Bs (riboflavin). Zinc = skin around the mouth and anus, slow growth and healing, infertility, night blindness.",
+  "ex-gout":"High uric acid is the fuel, not the fire: decades of it, and only some people ever get gout.",
+  "h-bd-zones":"From the epiphysis down: \"Rest, Proliferate, Hypertrophy, Calcify, Ossify\". Cells sleep, multiply, swell, harden, then become bone.",
+  "h-ai-sle-ab":"\"SLE loves its DNA and Smith\": anti-dsDNA and anti-Smith. Ro/La is Sjogren; RF and anti-CCP are RA.",
+  "h-dr-hypoCa":"Low calcium = twitchy (tingling, spasms, tetany). High calcium = \"stones, bones, groans, moans\" and weak, slow reflexes.",
+  "dq-hcm":"Malignancy hypercalcemia: fluids first, then an IV bisphosphonate (zoledronic acid) to shut down the osteoclasts.",
+  "ex-osteosarc":"Osteosarcoma = Metaphysis by the knee; Ewing = diaphysis (Ewing Eats the middle of the shaft).",
+  "h-nut-iron-us":"In a US adult on a normal diet, iron-deficiency anemia means bleeding until proven otherwise. Look at the gut first.",
+  "cw-oi":"OI = imperfect type I collagen: the most common inherited connective-tissue disorder.",
+  "h-nut-vitA-epith":"Vitamin A keeps epithelium lining-type: without it, airways and urinary tract go squamous, so more lung infections and kidney stones.",
+  "h-tu-gct-arthritis":"Giant cell tumor = the \"arthritis\" that isn't: a lytic hole in the epiphysis at the knee in a 20-40-year-old.",
+  "h-ai-mikulicz":"Mikulicz = big glands (lacrimal and salivary swollen); Sicca = dry (eyes and mouth).",
+  "h-bo-alp":"ALP is the \"brake remover\": it clears pyrophosphate, which blocks mineral, so calcium phosphate can deposit.",
+  "sl-calcitriol":"Kidneys down means the last activation step is down, so give the finished product: calcitriol (\"tri\" for already done).",
+  "h-jt-gout-chronic":"\"Allo-long\": allopurinol is for the long haul (chronic). Acute flares get colchicine, NSAIDs, steroids.",
+  "h-dr-onj-rank":"Denosumab beats the bisphosphonates at ONJ risk: higher. Teriparatide is the ONJ-free one.",
+  "h-bo-ontogeny":"Stem cell, progenitor, pre-osteoblast, osteoblast, osteocyte: it ends up buried in its own bone.",
+  "h-dr-fx-site":"Postmenopausal hits trabecular bone (spine, wrist); age-related hits everything, and the Hip rises with age.",
+  "h-he-paget-tx":"Paget's bone is overactive, so calm the osteoclasts: bisphosphonates first, calcitonin as backup. Never teriparatide.",
+  "qz-rickets":"Rickets = soft bones: osteoid piles up but doesn't calcify. What goes down is the calcification.",
+  "h-bd-fgf23":"FGF-23 = \"Phosphate Goes Free\": made by osteocytes, it dumps phosphate in the urine and turns down 1-alpha hydroxylase.",
+  "ex-graves":"Graves Gets the TSH receptor Going (stimulates it); Hashimoto Halts it (blocks it).",
+  "h-tu-gct-demo":"Giant cell tumor = young-to-middle-aged adults, women 20-40 on the table. Boys under 25 is osteochondroma; boys 10-20 is osteosarcoma.",
+  "h-dr-vitD-act":"Vitamin D goes \"Skin, Liver, Kidney\": made by UVB, 25-hydroxylated in the liver, 1-alpha-hydroxylated in the kidney.",
+  "h-tu-osteoma":"Osteoma = bone on the face: a lump of dense mature bone on the skull, often poking into a sinus.",
+  "h-nut-vitE-cells":"Vitamin E guards membranes, so the cells living on their membranes break first: long axons and RBCs with no nucleus.",
+  "dq-cataract":"\"DenosuMAB clouds the lens\": cataracts (~5%) are denosumab's signature; bisphosphonates give uveitis.",
+  "h-bd-hormone-resorb":"Resorbers: PTH, glucocorticoids, thyroid hormone (and high-dose vitamin D). Calcitonin and sex steroids slow resorption.",
+  "h-he-op-hsct":"Osteopetrosis lacks working osteoclasts, which come from blood precursors, so a stem cell transplant brings them in. First genetic disease treated that way.",
+  "h-tu-chondrosarc":"Chondrosarcoma = the old person's bone cancer: over 50, in the central skeleton, runner-up to osteosarcoma.",
+  "h-ai-orchitis":"Testis antigens are hidden (sequestered); trauma lets them out and the immune system meets them for the first time.",
+  "h-bd-fgfr3":"FGFR3 is the growth plate's brake; in achondroplasia it's stuck ON, so chondrocytes stop multiplying.",
+  "h-ca-sed":"Aggrecan haploinsufficiency hits Spine and Epiphyses: SED = short stature plus early arthritis.",
+  "h-he-oi-type":"OI type II = \"Too severe to survive\": perinatal lethal. Type I is the mild one.",
+  "h-dr-bp-ae":"Bisphosphonates inflame the eye (uveitis); denosumab clouds it (cataracts).",
+  "h-tu-oring":"O-ring in a finger bone = a ring of calcifying cartilage = Enchondroma (\"EN\" = inside the hand bones).",
+  "h-dr-bp-renal":"Bisphosphonates leave by the kidney: below a clearance of about 30-35, don't give them.",
+  "h-bo-endocrine":"Osteocalcin talks to the pancreas and testes: beta cells, insulin, male fertility.",
+  "qz-osteopontin":"Osteopontin is a brick, not a boss: a structural matrix protein, not a remodeling regulator.",
+  "cw-rhabdo":"Rhabdomyosarcoma = the kids' soft tissue sarcoma (head and neck, sinuses, GU tract).",
+  "h-ai-graves-tx":"Plasma exchange cleans antibodies out of the blood for Goodpasture. Graves gets beta blockers, antithyroid drugs, radioiodine or surgery.",
+  "h-jt-hlab27":"B27 = \"PAIR\": Psoriatic, Ankylosing spondylitis, IBD-related, Reactive. All seronegative.",
+  "cw-endosteum":"ENDOsteum = lines the INside of bone (marrow side and Haversian canals); periosteum covers the outside.",
+  "h-ca-chondronectin":"Chondro-NECTIN connects: it sticks chondrocytes to their matrix (as fibronectin does for other cells).",
+  "ex-deno":"FPP synthase is the bisphosphonate target. Denosumab works one step up the line: it blocks RANKL.",
+  "h-ca-aggrecan":"Aggrecan = the bottle brush: a hyaluronan handle, link proteins, and GAG bristles that hold water.",
+  "h-bo-fates":"Osteoblast fates, most to fewest: die, rest on the surface (lining cells), or get buried (osteocytes).",
+  "h-dr-match":"Bisphosphonates block FPP; DenosuMAB blocks RANKL; TeriPARAtide = PARAthyroid hormone; RomoSOZumab blocks SclerOStin; calcitriol = active vitamin D.",
+  "h-jt-rf":"Rheumatoid factor is an antibody against antibodies: IgM aimed at IgG's tail (Fc).",
+  "h-ca-perichondrium":"New chondroblasts come from the inner (chondrogenic) layer of the perichondrium, which drives appositional growth.",
+  "h-he-pmo":"Menopause = estrogen drops, IL-1 rises, osteoclasts multiply: trabecular bone goes first, so spine and wrist break.",
+  "h-he-op-marrow":"Osteopetrosis = \"marble bone\": bone crowds out the marrow, so blood counts fall.",
+  "h-bo-cellpct":"Osteocytes are almost everyone (90-95%); blasts ~5%, clasts ~1-2%.",
+  "cw-osteosarcoma":"Osteosarcoma = malignant bone-maker at the knee metaphysis (Codman triangle). Osteoid osteoma is the small, benign one.",
+  "ex-antiresorp":"TeriPARAtide builds (anabolic); the rest stop the osteoclasts.",
+  "h-bd-pth-kidney":"PTH in the kidney: keep Calcium, dump Phosphate, activate vitamin D (\"PTH = Phosphate Trashing Hormone\").",
+  "dq-mevalonate":"Mevalonate/FPP = \"-dronate\": any bisphosphonate (alendronate, risedronate, zoledronate).",
+  "h-ai-sjogren-lymph":"Sjogren + a parotid that keeps growing = think lymphoma (B-cell, marginal zone).",
+  "h-ai-aire":"AIRE \"airs\" the body's self-antigens in the thymus so self-reactive T cells can be weeded out.",
+  "h-dr-bp-uses":"Bisphosphonates slow bone breakdown (osteoporosis, Paget, metastases); achondroplasia is a growth-plate problem.",
+  "h-dr-teri-avoid":"Teriparatide is for high-fracture-risk osteoporosis. Avoid it in bone metastases or skeletal cancer, other metabolic bone disease (like Paget) and hypercalcemia.",
+  "h-nut-ribo":"Riboflavin = the cornea (inflamed, ulcerated); niacin = dementia. The mouth signs are shared.",
+  "h-dr-vitD-risk":"Phenytoin revs up the liver enzymes that break down vitamin D.",
+  "h-bd-gc-form":"Glucocorticoids are bad news both ways: they cut formation and raise resorption, the top cause of drug-induced osteoporosis.",
+  "h-jt-match":"One word each: RA = Pannus, OA = Eburnation (polished bone), Gout = needles, AS = bamboo spine, Reactive = can't see, pee, climb a tree.",
+  "ex-sjogren":"Sjogren's antibodies are Ro/La (SS-A/SS-B); anti-dsDNA belongs to SLE.",
+  "h-ai-tensilon":"Tensilon test: a quick anticholinesterase, and a myasthenic patient's strength briefly comes back.",
+  "h-nut-selenium":"Selenium protects muscle: no selenium, weak skeletal and heart muscle.",
+  "cw-interstitial":"INterstitial = from INside (chondrocytes dividing in lacunae); appositional = adding to the surface.",
+  "h-dr-carbonate":"Carbonate needs acid: take it with food. Citrate goes in with or without acid.",
+  "sl-intramem":"Flat bones of the head (calvaria, face, mandible) are intramembranous; long bones and ribs grow on a cartilage model.",
+  "dq-ckd":"CKD + twitching, tingling, cataracts = low calcium from a vitamin D failure. Bad kidneys, bad vitamin D.",
+  "h-bd-hox":"HOX = shoulder to hand (proximal-distal). SHH = thumb to pinky. Wnt7a = knuckles to palm.",
+  "h-he-pseudo":"A pseudoarthrosis is a false joint: a broken callus that grows a synovial-like lining.",
+  "h-bo-sclerostin":"Sclerostin = \"stop building\": osteocytes use it to brake formation; romosozumab removes the brake.",
+  "cw-compound":"Compound = Complicated by an open wound: bone meets skin.",
+  "qz-il8":"IL-8 calls neutrophils (\"IL-8 = clean-up crew\"), not osteoclasts.",
+  "cw-ewing":"Ewing = small blue cells in the shaft (diaphysis) of a child's long bone; EWS-FLI1, t(11;22).",
+  "cw-achondro":"Achondroplasia is the top skeletal dysplasia: one FGFR3 point mutation in about 95% of cases.",
+  "qz-endogrowth":"Endochondral bone needs a cartilage model, and cartilage grows both ways: from inside (interstitial) and at the surface (appositional)."
+};
+QUESTIONS.forEach(function(q){ if(QUESTION_CUES[q.id]) q.cue = QUESTION_CUES[q.id]; });
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
@@ -2482,12 +2578,14 @@ function qCardHTML(q, opts){
   return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
-    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+
+    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
+/* memory cue (q.cue): a mnemonic or hook, shown only after a miss (student suggestion, 2026-10-02) */
+function cueHTML(q){ return q.cue ? '<div class="qx-cue" data-role="cue">'+icon('bulb')+'<b>Remember it:</b> '+escHtml(q.cue)+'</div>' : ''; }
 function finishCard(card, correct){
-  card.classList.add('is-answered');
+  card.classList.add('is-answered'); if(!correct) card.classList.add('is-missed');
   var v = card.querySelector('.qcard-verdict'); if(v){ v.textContent = correct ? 'Correct.' : 'Not quite.'; v.className = 'qcard-verdict ' + (correct ? 'ok' : 'bad'); }
   var q = QUESTIONS_BY_ID[card.getAttribute('data-qid')];
   var pk = card.getAttribute('data-pick');
@@ -2879,10 +2977,10 @@ function renderMock(body){
     }).join('');
     var verdict = !m.submitted ? '' : pick === null ? '<span class="qcard-verdict bad">Not answered.</span>' : m.res[id] ? '<span class="qcard-verdict ok">Correct.</span>' : '<span class="qcard-verdict bad">Missed.</span>';
     return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' +
-      '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
+      '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
       '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+
+      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';
