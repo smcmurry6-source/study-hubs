@@ -76,6 +76,15 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (memory cues on missed questions, Claude Code)** — From a student suggestion ("when you miss a question, give
+  a way to remember it"). A perio question can carry `cue:"..."`, a mnemonic or hook drawn inside the explanation as
+  **Remember it:** (`cueHTML(q)`, `.qx-cue`), shown only after a miss: a wrong MCQ pick, a partly wrong select-all, a
+  sequence or matching with a mistake, or "I missed it" on a recall card (`markMissed()` adds `.missed` to the
+  explanation). Works in the bank, the daily drill and the mock's missed-question review, which all use `qCardHTML`.
+  80 cues written for every perio item under 80% class accuracy with 8+ attempts (plus q5-01/q5-06). No reading text
+  changed, so no narration regenerated. **Perio Project: carry `cue` fields, `cueHTML`/`markMissed` and the CSS into
+  the split sources. A new hub gets cues by rendering `q.cue` the same way.**
+
 - **2026-10-01 (mastery flair, new eggs, Timmy Tooth, Claude Code)** — `migration_v31.sql` (**applied 2026-10-01 via the connector**):
   the leaderboards (`get_leaderboard`, `get_correct_streak_stats`, `get_arcade_leaderboard`, `get_rank_board`, `get_fairy_board`) gain a
   `flair` column ("perio:3,msk-exam3:1"; 1 bronze … 4 crown, from the mastery-* achievements via `sh_mastery_flair`), drawn as
