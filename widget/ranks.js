@@ -268,7 +268,7 @@
       TIERS[tier].name + ' handpiece' + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
   }
 
-  /* medallion interior: centre, mid, edge, spotlight colour */
+  /* medallion interior: center, mid, edge, spotlight color */
   var DISC = {
     antique: ["#6B4A26", "#3A2511", "#1A0F05", "#F0C98A"],
     stone:   ["#5C5851", "#34312D", "#171614", "#E8E2D6"],
@@ -393,7 +393,7 @@
       (list.length > max ? '<span class="sh-flair-more">+' + (list.length - max) + '</span>' : '') + '</span>';
   }
 
-  /* ---------- unlockable accent colours (cosmetic; each needs that tier or higher) ---------- */
+  /* ---------- unlockable accent colors (cosmetic; each needs that tier or higher) ---------- */
   var ACCENTS = {
     stone:   { tier: 0, L: ["#6F6A63", "#57524C", "#ECE8E2"], D: ["#B5AEA4", "#D2CCC3", "#2B2926"] },
     antique: { tier: 1, L: ["#8A5A32", "#6E4524", "#F1E4D6"], D: ["#D39A68", "#E8BD94", "#35251A"] },
@@ -405,7 +405,7 @@
   };
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
   /* the metal itself, for filled things (primary buttons, switches, progress bars): the medallions' own gradient and
-     texture filter drawn on a stretchable tile. Ink = text colour on top of it. */
+     texture filter drawn on a stretchable tile. Ink = text color on top of it. */
   var TEX_INK = {
     stone:   ["#1F1C19", "0 1px 0 rgba(255,255,255,.55)"],
     antique: ["#FFF6E6", "0 1px 1px rgba(30,15,0,.85)"],
@@ -490,15 +490,15 @@
     sec.innerHTML = '<div class="shstat-empty">Loading your rank…</div>';
     if (panel) { var first = panel.querySelector(".shstat-sec"); panel.insertBefore(sec, first || null); }
 
-    /* Settings: accent colours */
+    /* Settings: accent colors */
     var settings = document.getElementById("shstat-settingspanel");
     var accRow = document.createElement("div");
     accRow.className = "shset-row sh-accent-row";
     if (settings) { var eggsRow = settings.querySelector('[data-pref="eggs"]'); settings.insertBefore(accRow, eggsRow ? eggsRow.closest(".shset-row") : null); }
     function drawAccents(){
       var have = profile ? profile.tier : +(ls("sh_rank_tier") || 0), cur = ls("sh_pref_accent") || "default";
-      accRow.innerHTML = '<label>Accent colour</label><div class="sh-accent-swatches">' +
-        '<button type="button" data-acc="default" aria-pressed="' + (cur === "default") + '" title="The hub\'s own colour"><span class="sh-acc-dot sh-acc-default"></span>Hub</button>' +
+      accRow.innerHTML = '<label>Accent color</label><div class="sh-accent-swatches">' +
+        '<button type="button" data-acc="default" aria-pressed="' + (cur === "default") + '" title="The hub\'s own color"><span class="sh-acc-dot sh-acc-default"></span>Hub</button>' +
         Object.keys(ACCENTS).map(function(k){
           var a = ACCENTS[k], locked = have < a.tier;
           return '<button type="button" data-acc="' + k + '" aria-pressed="' + (cur === k) + '"' + (locked ? ' disabled title="Unlocks at ' + TIERS[a.tier].name + '"' : '') + '>' +
@@ -645,7 +645,7 @@
       var d = document.createElement("div");
       d.className = "sh-egg sh-rankup"; d.setAttribute("role", "status");
       d.innerHTML = '<div class="sh-rankup-card sh-tier-' + TIERS[t].key + '">' + art(t, 150, { animate: true }) + '<div class="sh-rank-eyebrow">New rank</div><div class="sh-rank-name">' +
-        TIERS[t].name + ' I</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent colour in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
+        TIERS[t].name + ' I</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent color in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
       document.body.appendChild(d);
       requestAnimationFrame(function(){ d.classList.add("is-shown"); });
       H.confetti(); setTimeout(H.confetti, 400);
