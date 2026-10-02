@@ -84,6 +84,17 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (memory cues on missed questions, Claude Code)** — From a student suggestion ("when you miss a question, give
+  a way to remember it"). A perio question can carry `cue:"..."`, a mnemonic or hook drawn inside the explanation as
+  **Remember it:** (`cueHTML(q)`, `.qx-cue`), shown only after a miss: a wrong MCQ pick, a partly wrong select-all, a
+  sequence or matching with a mistake, or "I missed it" on a recall card (`markMissed()` adds `.missed` to the
+  explanation). Works in the bank, the daily drill and the mock's missed-question review, which all use `qCardHTML`.
+  80 cues written for every perio item under 80% class accuracy with 8+ attempts (plus q5-01/q5-06). **MSK** too: its
+  88 cues (items under 75%, 8+ attempts) live in one `QUESTION_CUES` map applied to `QUESTIONS` (its bank is built by
+  `mcq()`/`seq()` calls); `finishCard()` adds `.is-missed`, and the submitted mock marks missed cards the same way.
+  No reading text changed, so no narration regenerated. **Perio and MSK Projects: carry the cues, `cueHTML` and the
+  CSS into the split sources. A new hub gets cues by rendering `q.cue` the same way.**
+
 - **2026-10-02 (Timmy + trophy follow-ups, Claude Code)** — `migration_v32.sql` (**applied 2026-10-02 via the connector**):
   `get_trophy_stats()` (public: people per trophy out of everyone who has answered, same rules as `get_rank_profile`),
   shown as a % pill under each trophy in the trophy case and in its detail line; `record_achievement` accepts
