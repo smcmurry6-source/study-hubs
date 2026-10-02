@@ -84,6 +84,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (MSK `nq-folate-case` explanation, Claude Code)** — Report #12: "is trouble concentrating not a neurologic
+  symptom?" The stem lists trouble concentrating while the explanation said "without neurologic symptoms". Answer and
+  stem unchanged; the explanation now says the concentrating trouble comes from the anemia (like the fatigue) and names
+  the B12 signs that do separate it (numbness/tingling, lost vibration/position sense, gait: subacute combined
+  degeneration). **MSK Project: carry this into the split sources.**
+
 - **2026-10-02 (undo on ordering questions, Claude Code)** — From suggestion #3 (MSK). Ordering (sequence) cards gain
   **Undo last step** and **Start over** under the steps, shown once a step is tapped and hidden once graded (the last
   step is forced, so it still grades on the final tap). MSK: `data-act="seq-undo"/"seq-clear"` in
