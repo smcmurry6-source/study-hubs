@@ -84,6 +84,14 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (archived banks and the MSK PollEv set off the public site, Claude Code)** — `question-banks/` (GI Exam 1
+  and 2 banks plus their extract scripts) deleted and gitignored, so past banks aren't publicly downloadable by later
+  classes; `review/`'s `ARCHIVE_BANK` is gone (an archived hub's recap there has no question text; publish with
+  `tools/publish-recap.js --bank <local file>` before the page comes down). The 23 MSK PollEv exam-review items
+  (`rv-*`, `src:'review'`) removed after Exam 3; the bank's "Exam review set" callout hides itself when empty, and the
+  source filter lists only sources that have questions. The files remain in git history. **MSK Project: drop the
+  `rv-*` items from the split sources too.**
+
 - **2026-10-02 (TIMMY easter egg, Claude Code, #59)** — `widget/timmy.js`: typing TIMMY (outside a text field, or into a
   hub's Search box) runs a 15-second overlay show (dark fade, page crumbles, crowned Timmy with cursor-tracking eyes,
   letters slam in, mini-Timmy rain, "blessed this study session" banner, page restored). Esc / corner button ends it;

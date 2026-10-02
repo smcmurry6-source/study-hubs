@@ -84,7 +84,7 @@ so say in the retro how many there were and that later ones go into the next aud
    `node tools/publish-recap.js <hub> --bank <banks>/<hub>.json --dry-run` to check the numbers and the featured
    question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
-4. Leave the hub page, its `question-banks/` export and the `ARCHIVED_HUBS`/`ARCHIVE_BANK` moves to the archiving
+4. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
    work itself (see `CLAUDE.md`); list them for Sam if they aren't done.
 
 ## 3. Read every hard question yourself

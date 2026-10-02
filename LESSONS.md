@@ -11,7 +11,8 @@ suggestions and ships small fixes to the live hubs. **Before building a new hub,
 
 ## When a hub is archived: the retrospective
 
-Do this in the same session that archives the hub (after its bank is saved to `question-banks/`), and tell Sam
+Do this in the same session that archives the hub (while its page is still up, so `tools/dump-banks.js` can read the bank
+locally; banks are no longer committed), and tell Sam
 what you found.
 
 1. **Pull everything.** Run the queries in `tools/retro.sql` with the Supabase connector (read-only) for that hub
