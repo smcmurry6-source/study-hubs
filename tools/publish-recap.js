@@ -1,6 +1,6 @@
 // Publish (or preview) a hub's recap to the dashboard's "Hub recaps" slideshow, the same way review/ → Recap → Publish does.
 //   node tools/publish-recap.js <hub> --bank <file> [--exam YYYY-MM-DD, default: its last exam in index.html] [--title "MSK Exam 3"] [--no-names] [--dry-run]
-// --bank: question-banks/<file>.json ({questions:[...]}) or a tools/dump-banks.js file ({Q:[...]}), for the toughest
+// --bank: a local bank file ({questions:[...]}) or a tools/dump-banks.js file ({Q:[...]}), for the toughest
 // question's text. Needs SB_KEY and ADMIN_SECRET in the environment (never printed). --dry-run prints what would go up.
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const args = process.argv.slice(2), hub = args[0];
