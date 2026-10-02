@@ -84,6 +84,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-02 (undo on ordering questions, Claude Code)** — From suggestion #3 (MSK). Ordering (sequence) cards gain
+  **Undo last step** and **Start over** under the steps, shown once a step is tapped and hidden once graded (the last
+  step is forced, so it still grades on the final tap). MSK: `data-act="seq-undo"/"seq-clear"` in
+  `wireQuestionContainer`, `[data-role="seq-tools"]`; perio: `.qcard-seq-tools [data-seq-tool]`, which restores each
+  step's text. About page entry added. **Perio and MSK Projects: carry this into the split sources.**
+
 - **2026-10-02 (memory cues on missed questions, Claude Code)** — From a student suggestion ("when you miss a question, give
   a way to remember it"). A perio question can carry `cue:"..."`, a mnemonic or hook drawn inside the explanation as
   **Remember it:** (`cueHTML(q)`, `.qx-cue`), shown only after a miss: a wrong MCQ pick, a partly wrong select-all, a

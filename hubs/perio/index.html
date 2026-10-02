@@ -292,6 +292,10 @@ main{padding-top:20px}
 .qcard-seq-fix{display:block;font-size:.78rem;font-weight:600;color:var(--bad);margin-top:2px}
 .qcard-seq-result{margin:8px 0 0;font-size:.88rem;font-weight:600}
 .qcard-seq-result.ok{color:var(--good)}.qcard-seq-result.miss{color:var(--bad)}
+.qcard-seq-tools{display:flex;gap:8px;margin-top:8px}
+.qcard-seq-tools[hidden]{display:none}
+.qcard-seq-tools button{font:inherit;font-size:.82rem;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.qcard-seq-tools button:hover{border-color:var(--ink)}
 .qcard-choice[disabled]{cursor:default}
 .qcard-match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .qcard-match-col{display:flex;flex-direction:column;gap:7px;min-width:0}
@@ -3483,7 +3487,8 @@ function qCardHTML(q){
     shuffled(q.steps.map(function(s,i){ return i; })).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-step-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.steps[i])+'</button>';
     });
-    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+cueHTML(q)+CLASS_ROW+'</div>';
+    /* undo / start over for a wrong tap (student suggestion, 2026-10-02); the last step is forced, so grading on it stays */
+    body += '</div><div class="qcard-seq-tools" data-qid="'+q.id+'" hidden><button type="button" data-seq-tool="undo">Undo last step</button><button type="button" data-seq-tool="clear">Start over</button></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+cueHTML(q)+CLASS_ROW+'</div>';
   } else if(q.type === 'match'){
     delete MATCH_STATE[q.id];
     body += '<div class="qcard-match-cols" data-qtype="match" data-qid="'+q.id+'"><div class="qcard-match-col" data-side="left">';
@@ -3551,6 +3556,16 @@ function wireQuestionContainer(container){
       else { mp.push(mi); mBtn.setAttribute('data-selected','true'); mBtn.setAttribute('aria-pressed','true'); }
       return;
     }
+    var seqTool = e.target.closest('.qcard-seq-tools [data-seq-tool]');
+    if(seqTool){
+      var tw = seqTool.closest('.qcard-seq-tools'), tq = QUESTIONS_BY_ID[tw.getAttribute('data-qid')];
+      var sw = tw.previousElementSibling, tp = tq && SEQ_STATE[tq.id];
+      if(!tq || !tp || !sw || !sw.classList.contains('qcard-seq-steps')) return;
+      var dropped = seqTool.getAttribute('data-seq-tool') === 'clear' ? tp.splice(0) : tp.splice(-1);
+      dropped.forEach(function(i){ var b = sw.querySelector('.qcard-choice[data-step-idx="'+i+'"]'); if(!b) return; b.removeAttribute('data-picked'); b.disabled = false; b.textContent = tq.steps[i]; });
+      tw.hidden = !tp.length;
+      return;
+    }
     var seqBtn = e.target.closest('.qcard-seq-steps[data-qtype="sequence"] .qcard-choice');
     if(seqBtn){
       var sq = QUESTIONS_BY_ID[seqBtn.getAttribute('data-qid')];
@@ -3560,6 +3575,8 @@ function wireQuestionContainer(container){
       picks.push(oi);
       seqBtn.setAttribute('data-picked','true'); seqBtn.disabled = true;
       seqBtn.textContent = picks.length + '. ' + sq.steps[oi];
+      var seqTools = seqBtn.closest('.qcard-seq-steps').nextElementSibling;
+      if(seqTools && seqTools.classList.contains('qcard-seq-tools')) seqTools.hidden = picks.length === sq.steps.length;
       if(picks.length === sq.steps.length){
         var ok = picks.every(function(v,i){ return v === i; });
         /* show the answer in the order it was tapped, each step marked right/wrong with where it belongs, plus a verdict */

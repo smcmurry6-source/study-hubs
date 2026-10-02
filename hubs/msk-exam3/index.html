@@ -159,6 +159,10 @@ main{padding-top:20px}
 .qcard-choice.is-wrong{background:var(--bad-soft);border-color:var(--bad)}
 .qcard-choice.is-picked{background:var(--surface-2);border-color:var(--ink)}
 .qcard-choice .ord{font-family:var(--font-mono);font-weight:700;margin-right:8px;color:var(--accent-ink)}
+.qcard-seq-tools{display:flex;gap:8px;margin-top:8px}
+.qcard-seq-tools[hidden],.qcard.is-answered .qcard-seq-tools{display:none}
+.qcard-seq-tools button{font:inherit;font-size:.82rem;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.qcard-seq-tools button:hover{border-color:var(--ink)}
 .qcard-choice:disabled{cursor:default}
 .qcard-match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .qcard-match-col{display:flex;flex-direction:column;gap:7px;min-width:0}
@@ -2564,7 +2568,8 @@ function qCardHTML(q, opts){
     shuffled(q.steps.map(function(s,i){ return i; })).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-act="seq" data-step-idx="'+i+'">'+escHtml(q.steps[i])+'</button>';
     });
-    body += '</div>';
+    /* undo / start over for a wrong tap (student suggestion #3, 2026-10-02); the last step is forced, so grading on it stays */
+    body += '</div><div class="qcard-seq-tools" data-role="seq-tools" hidden><button type="button" data-act="seq-undo">Undo last step</button><button type="button" data-act="seq-clear">Start over</button></div>';
   } else if(q.type === 'match'){
     MATCH_STATE[rid] = { sel:null, matched:0, errors:0 };
     body += '<div class="qcard-hint">Tap an item on the left, then its partner on the right.</div><div class="qcard-match-cols"><div class="qcard-match-col">';
@@ -2605,11 +2610,17 @@ function wireQuestionContainer(container){
       if(!ok) btn.classList.add('is-wrong');
       card.setAttribute('data-pick', btn.getAttribute('data-idx'));
       finishCard(card, ok);
+    } else if(act === 'seq-undo' || act === 'seq-clear'){
+      var us = SEQ_STATE[rid]; if(!us) return;
+      var drop = act === 'seq-clear' ? us.picks.splice(0) : us.picks.splice(-1);
+      drop.forEach(function(i){ var b = card.querySelector('[data-act="seq"][data-step-idx="'+i+'"]'); if(!b) return; b.disabled = false; b.classList.remove('is-picked'); var o = b.querySelector('.ord'); if(o) o.remove(); });
+      var ut = card.querySelector('[data-role="seq-tools"]'); if(ut) ut.hidden = !us.picks.length;
     } else if(act === 'seq'){
       var st = SEQ_STATE[rid]; if(!st) return;
       st.picks.push(+btn.getAttribute('data-step-idx'));
       btn.disabled = true; btn.classList.add('is-picked');
       btn.insertAdjacentHTML('afterbegin', '<span class="ord">'+st.picks.length+'</span>');
+      var tools = card.querySelector('[data-role="seq-tools"]'); if(tools) tools.hidden = false;
       if(st.picks.length === q.steps.length){
         var good = st.picks.every(function(v,i){ return v === i; }), inPlace = st.picks.filter(function(v,i){ return v === i; }).length;
         card.querySelectorAll('[data-act="seq"]').forEach(function(b){ var i = +b.getAttribute('data-step-idx'); var pos = st.picks.indexOf(i); b.classList.remove('is-picked'); b.classList.add(pos === i ? 'is-correct' : 'is-wrong'); });
