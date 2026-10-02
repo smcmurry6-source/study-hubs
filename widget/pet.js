@@ -565,8 +565,16 @@
     ["Answering questions between {2 and 4 am} earns a trophy. Please also sleep.", "2 and 4 am"],
     ["Get {100 right} in a row and you unlock a tactical nuke you can call in.", "100 right"],
     ["Get me to {100 HP} for a trophy. If I ever hit 0, nursing me back to 100 earns another one.", "100 HP"],
-    ["Your {trophy case} (Stats in any hub) has a clue for every secret you haven't found.", "trophy case"]
+    ["Your {trophy case} (Stats in any hub) has a clue for every secret you haven't found.", "trophy case"],
+    ["Whatever you do, do {NOT} type my name. Anywhere. Ever.", "NOT"]
   ];
+  /* reverse psychology: typing "timmy" summons the other Timmy (widget/timmy.js) */
+  var DONT_SAY = ["Whatever you do, do NOT type my name.",
+    "Whatever you do, do NOT type my name. I'm serious. Not even as a joke.",
+    "One rule in my house: nobody types my name. Nobody.",
+    "Don't type my name. The last person who did... we don't talk about it.",
+    "You can call me anything you like. Just never, ever type my name."];
+  function eggsOn(){ return ls("sh_pref_eggs") !== "off"; }
   function tipHTML(t){ return esc(t[0]).replace(/\{([^}]*)\}/g, function(_, x){ return "<b>" + x + "</b>"; }); }
   function nextTip(){
     if (ls("sh_pref_eggs") === "off") return "Surprises are off in Settings, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
@@ -904,6 +912,7 @@
       if (hol && HOLIDAY_HELLO[hol]) lines.push(HOLIDAY_HELLO[hol]);
       else if (st.missedYesterday && st.hp < 80) lines.push("You didn't visit yesterday. I missed you (and I'm a little plaquey).");
       else if (st.hp < 40) lines.push("I'm not feeling great. Can we study today?");
+      else if (eggsOn() && Math.random() < 0.2) lines.push(pick(DONT_SAY));
       else lines.push(pick(["Welcome home.", "Come in, come in.", "I was just tidying up.", "Ready to study?", "Good to see you."]));
       talk(lines.join(" "), "do-wave", 9000);
     } else {
@@ -911,6 +920,7 @@
       if (ex) talk(ex, "do-cheer", 8000);
       else if (h < 5) talk("It's late. Sleep is good for memory AND teeth. A few more, then bed?", "do-wave", 7000);
       else if (st.hp < 40) talk(statusLine(st), "do-flinch", 8000);
+      else if (eggsOn() && Math.random() < 0.12) talk(pick(DONT_SAY), "do-flinch", 7000);
       else if (Math.random() < 0.35) tellTip(9000);
       else talk(pick([part + "! Let's study.", "Ready when you are.", "Let's get some right answers. I could use the HP.", "I'll be down here cheering."]), "do-wave", 5000);
     }
