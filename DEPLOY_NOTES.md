@@ -32,6 +32,14 @@ sessions. Before editing or publishing anything in `hubs/*/index.html` or
    deploy — if someone else's change isn't reflected in your working copy yet,
    that's your signal to go back to step 1.
 
+## The About page lists everything (standing rule)
+
+`about/index.html` (the dashboard's "About" button) is the students' guide to every feature, easter egg, trophy,
+holiday and setting. **Every Project and session that ships something students can see adds it to that page in the
+same change** (or updates/removes the entry when a feature changes or goes away). Secrets go inside a `spoil` element
+so they stay hidden until someone ticks "Show spoilers". Hub-only content (new questions, notes, review tables) doesn't
+need an entry; a new hub mode, tab, game or question type does.
+
 ## Shared infrastructure (touch once, not per-hub)
 
 - **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
