@@ -2159,6 +2159,12 @@
     petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks }); };
     document.head.appendChild(petScript);
   }
+  /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
+  if (!EXPORT_ONLY && !window.__timmyLoaded) {
+    var timmyScript = document.createElement("script");
+    timmyScript.src = new URL("timmy.js", thisScript.src).href; timmyScript.async = true;
+    document.head.appendChild(timmyScript);
+  }
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {
     var drillScript = document.createElement("script");
