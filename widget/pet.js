@@ -605,16 +605,154 @@
     holiday: ["Happy holidays from your favorite tooth!"],
     timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain."]
   };
-  var HOLIDAY_HELLO = {
-    halloween: "Happy Halloween! Do you like my hat? Don't eat too much candy.",
-    thanksgiving: "Happy Thanksgiving! I'm thankful for you. And for fluoride.",
-    winter: "Happy holidays! Finals first, cookies after.",
-    newyear: "Happy New Year! Resolution: floss. Every day. I mean it.",
-    valentine: "Happy Valentine's! You're my favorite human.",
-    dentist: "It's National Dentist's Day! That's you soon.",
-    stpatrick: "Happy St. Patrick's! Lucky to have you.",
-    easter: "Happy Easter! Go easy on the chocolate eggs."
+  /* ---------- holiday talk: greetings, answer quips and jokes per holiday (holidayId()), plus a fall pool for the
+     autumn weeks no holiday covers (isFall()). Lines are dealt from a shuffled deck per pool (deal()), so every line
+     comes up before any repeats, and never the same one twice in a row. ---------- */
+  var HOLIDAY_TALK = {
+    halloween: {
+      hello: ["Happy Halloween! Do you like my hat? Don't eat too much candy.",
+        "Boo! Did I scare you? No? I'm a tooth. I'm doing my best.",
+        "It's spooky season. Do you know what's really scary? Untreated caries.",
+        "I'm dressing up as a wisdom tooth this year. Very mysterious. Nobody knows where I'll come in.",
+        "Trick or treat! The trick is flossing. The treat is passing your exam.",
+        "The candy aisle is my haunted house.",
+        "Something wicked this way comes. Plaque. It's plaque.",
+        "Happy Halloween! I carved a pumpkin. It has better teeth than most of my patients."],
+      right: ["Spooktacular!", "That answer was frightfully good.", "Bone-chilling accuracy. Literally, if it was MSK.", "Treat! Definitely a treat."],
+      wrong: ["Eek! A trick, not a treat.", "That one was haunted. Read the explanation and exorcise it.", "Boo. But a friendly boo."],
+      jokes: ["Why didn't the skeleton go to the dentist? He didn't have the guts. (He had great teeth, though.)",
+        "What's a vampire's least favorite exam? The blood test. Second least: the gingival bleeding index.",
+        "Why do ghosts make good periodontists? They see right through your excuses about flossing.",
+        "What does a vampire dentist call his patients? Necks in line.",
+        "Why did the candy corn go to the dentist? It was feeling a little corny. And a lot sticky."]
+    },
+    thanksgiving: {
+      hello: ["Happy Thanksgiving! I'm thankful for you. And for fluoride.",
+        "Gobble gobble! Save room for pie. And a little review.",
+        "I'm thankful for three things: you, your toothbrush, and the end of the semester getting closer.",
+        "Turkey, stuffing, cranberry sauce. My molars are ready.",
+        "Thanksgiving tip: floss between the turkey and the pie. Your gums will thank you.",
+        "Pass the gravy. And pass your exams."],
+      right: ["Gobble-worthy!", "That's a pie-chart-topping answer.", "Something to be thankful for.", "Stuffed with knowledge."],
+      wrong: ["That one got gobbled up. Next!", "No worries. There's always seconds.", "A little undercooked. Read the explanation."],
+      jokes: ["Why did the turkey refuse dessert? It was already stuffed.",
+        "What do you call a turkey with no teeth? A gobble-gummy.",
+        "Why did the cranberry blush? It saw the turkey dressing.",
+        "What's a dentist's favorite part of Thanksgiving? The floss-ing after. Okay, the pie."]
+    },
+    winter: {
+      hello: ["Happy holidays! Finals first, cookies after.",
+        "Let it snow, let it snow, let it floss.",
+        "All I want for the holidays is my two front teeth. I have them. I just like the song.",
+        "Peppermint season! Fresh breath for everyone.",
+        "It's cold outside. Good thing enamel is the hardest thing in the body.",
+        "Making a list, checking it twice: who's been flossing, who's been naughty.",
+        "Snow day? Study day. Okay, snowball fight first."],
+      right: ["Sleigh-ed it!", "Ho ho ho, that's correct.", "Merry and right.", "Cool as ice."],
+      wrong: ["Brr. That one was a little frosty.", "Coal in the stocking for that one. Shake it off.", "Snowed in on that one. Next!"],
+      jokes: ["What do snowmen eat for breakfast? Frosted flakes. Please brush after.",
+        "Why does Santa have three gardens? So he can ho, ho, ho.",
+        "What's a dentist's favorite holiday song? Jingle Bells, but with more floss.",
+        "Why was the gingerbread man at the dentist? He had a crumby filling."]
+    },
+    newyear: {
+      hello: ["Happy New Year! Resolution: floss. Every day. I mean it.",
+        "New year, same 32 teeth. Let's make them count.",
+        "Cheers! Here's to a year of right answers.",
+        "My New Year's resolution: get to 100 HP and stay there. Help me out?",
+        "Out with the old plaque, in with the new... no, wait. Out with all the plaque.",
+        "3, 2, 1... study!"],
+      right: ["Starting the year strong!", "That's a resolution I can get behind.", "Pop the confetti!"],
+      wrong: ["New year, new chances. Next one!", "Resolution: read that explanation."],
+      jokes: ["What did the dentist say on New Year's? Time to brush up on your resolutions.",
+        "Why do New Year's resolutions never stick? They don't floss between the good intentions.",
+        "What do you call a tooth at midnight on New Year's? A cheer-ful incisor."]
+    },
+    valentine: {
+      hello: ["Happy Valentine's! You're my favorite human.",
+        "Roses are red, gums should be pink. Floss every day, it's easier than you think.",
+        "Will you be my Valentine? I promise I'll never get a cavity. Probably.",
+        "Chocolate hearts are cute. Brush after.",
+        "I love you more than fluoride. And I really love fluoride.",
+        "You make my pulp flutter."],
+      right: ["I love that answer!", "Heart-eyes.", "You had me at that one.", "Be still, my pulp."],
+      wrong: ["Heartbreaking. But we'll get through it together.", "That one didn't love you back. Next!"],
+      jokes: ["What did one tooth say to the other on Valentine's Day? I'm so attached to you.",
+        "Why did the dentist fall in love? Someone finally said 'I floss you.'",
+        "What do you call two teeth in love? Molar-ly devoted."]
+    },
+    dentist: {
+      hello: ["It's National Dentist's Day! That's you soon.",
+        "Happy Dentist's Day! Hug a dentist. Gently. They've had a long day.",
+        "Today we celebrate the people who keep me alive. Thank you, future doctor.",
+        "National Dentist's Day! I made you a card. It's a drawing of me. Smiling."],
+      right: ["Spoken like a real dentist!", "Doctor-level answer.", "The profession is proud."],
+      wrong: ["Even real dentists miss one sometimes. Okay, rarely.", "Not quite, doctor. Next!"],
+      jokes: ["Why did the dentist win an award? For being outstanding in their filling.",
+        "How many dentists does it take to change a lightbulb? Just one, but it'll need a crown."]
+    },
+    stpatrick: {
+      hello: ["Happy St. Patrick's! Lucky to have you.",
+        "Wearing green? I'm wearing my best enamel.",
+        "Don't need luck. You've got study time. (A little luck never hurts.)",
+        "A pot of gold at the end of the rainbow? I'd rather have a gold crown.",
+        "Top of the morning! Let's get some right answers."],
+      right: ["Lucky you! Except it wasn't luck.", "Pot of gold!", "Four-leaf clover answer."],
+      wrong: ["The luck of the Irish skipped that one.", "No leprechaun can fix that one. The explanation can."],
+      jokes: ["Why can't you borrow money from a leprechaun? They're always a little short.",
+        "What do you call a fake Irish stone? A sham-rock.",
+        "Why did the leprechaun go to the dentist? He had a gold tooth and a green tongue."]
+    },
+    easter: {
+      hello: ["Happy Easter! Go easy on the chocolate eggs.",
+        "Hop to it! Let's study.",
+        "Jelly beans are sticky. Just saying.",
+        "Egg hunt today? Look for questions you haven't tried yet.",
+        "Some bunny loves you. It's me. I'm the bunny."],
+      right: ["Egg-cellent!", "Some bunny's smart.", "Hop-tastic!"],
+      wrong: ["That egg was a dud. Next!", "Hop back up. You've got this."],
+      jokes: ["Why shouldn't you tell an Easter egg a joke? It might crack up.",
+        "How does the Easter bunny keep his teeth white? Hare-floss.",
+        "What do you call a bunny with a cavity? A hole-y hopper."]
+    },
+    fall: {
+      hello: ["Sweater weather! Perfect for studying.",
+        "The leaves are falling. My grades never will. (Yours either.)",
+        "Pumpkin spice season. I'm more of a mint spice tooth.",
+        "Fall back... on the review tables when you get stuck.",
+        "Crunchy leaves, crunchy apples. Great for the gums."],
+      right: ["Crisp as a fall morning.", "Harvest time!", "You're on a roll. Like a leaf in the wind."],
+      wrong: ["That one fell flat. Like a leaf.", "Rake it up and try again."],
+      jokes: ["Why did the scarecrow win an award? He was outstanding in his field.",
+        "What's a tree's favorite drink? Root beer. Mine too, then I brush.",
+        "Why do trees hate exams? They get stumped."]
+    }
   };
+  /* one shuffled deck per pool in localStorage (sh_pet_deck_<key>): every line before a repeat, never twice in a row */
+  function deal(key, arr){
+    if (!arr || !arr.length) return "";
+    var k = "sh_pet_deck_" + key, deck, last = -1;
+    try { deck = JSON.parse(ls(k) || "null"); } catch (e) { deck = null; }
+    if (!deck || !deck.q || !deck.q.length || deck.n !== arr.length) {
+      last = deck && typeof deck.last === "number" ? deck.last : -1;
+      var q = []; for (var i = 0; i < arr.length; i++) q.push(i);
+      for (var j = q.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), t = q[j]; q[j] = q[r]; q[r] = t; }
+      if (q.length > 1 && q[0] === last) { var t2 = q[0]; q[0] = q[1]; q[1] = t2; }
+      deck = { n: arr.length, q: q };
+    }
+    var idx = deck.q.shift(); deck.last = idx;
+    ls(k, JSON.stringify(deck));
+    return arr[idx];
+  }
+  /* the current season's pool (a holiday, or fall between holidays), or null */
+  function seasonTalk(){
+    var h = holidayId();
+    if (h && HOLIDAY_TALK[h]) return { id: h, t: HOLIDAY_TALK[h] };
+    if (isFall()) return { id: "fall", t: HOLIDAY_TALK.fall };
+    return null;
+  }
+  function joke(){ return (seasonTalk() && Math.random() < (holidayId() ? 0.5 : 0.25) && seasonLine("jokes")) || deal("jokes", JOKES); }
+  function seasonLine(kind){ var s = seasonTalk(); return s && s.t[kind] ? deal(s.id + "-" + kind, s.t[kind]) : ""; }
   function statusLine(st, name){
     var hp = st.hp, n = name ? name + ". " : "";
     if (hp <= 0) return "0 HP. I'm in rough shape. I won't die, but getting me back takes a few solid study days, and I heal at half speed until 50.";
@@ -836,7 +974,7 @@
     else setTimeout(hello, 900);
   }
   function homeClick(e){
-    if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(pick(JOKES), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
+    if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(joke(), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
     else if (e.target.closest("[data-check]")) { hush(); checkup(); }
     else if (e.target.closest("[data-tip]")) tellTip();
   }
@@ -909,7 +1047,7 @@
     var lines = [];
     if (M.where === "dashboard") {
       lines.push(part + (nm ? ", " + nm : "") + "!");
-      if (hol && HOLIDAY_HELLO[hol]) lines.push(HOLIDAY_HELLO[hol]);
+      if (hol && HOLIDAY_TALK[hol] && Math.random() < 0.75) lines.push(seasonLine("hello"));
       else if (st.missedYesterday && st.hp < 80) lines.push("You didn't visit yesterday. I missed you (and I'm a little plaquey).");
       else if (st.hp < 40) lines.push("I'm not feeling great. Can we study today?");
       else if (eggsOn() && Math.random() < 0.2) lines.push(pick(DONT_SAY));
@@ -921,6 +1059,7 @@
       else if (h < 5) talk("It's late. Sleep is good for memory AND teeth. A few more, then bed?", "do-wave", 7000);
       else if (st.hp < 40) talk(statusLine(st), "do-flinch", 8000);
       else if (eggsOn() && Math.random() < 0.12) talk(pick(DONT_SAY), "do-flinch", 7000);
+      else if (seasonTalk() && Math.random() < (hol ? 0.4 : 0.15)) talk(seasonLine("hello"), "do-wave", 6500);
       else if (Math.random() < 0.35) tellTip(9000);
       else talk(pick([part + "! Let's study.", "Ready when you are.", "Let's get some right answers. I could use the HP.", "I'll be down here cheering."]), "do-wave", 5000);
     }
@@ -944,7 +1083,7 @@
     M.jokes = (M.jokes || 0) + 1;
     if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + '<br><button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
     else if (M.jokes % 4 === 2) tellTip();
-    else talk(esc(pick(JOKES)) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), 8500, true);
+    else talk(esc(joke()) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), 8500, true);
   }
 
   /* ---------- hub reactions ---------- */
@@ -961,19 +1100,19 @@
       if (ok) {
         M.run++; M.wrongRun = 0;
         if (CHEER[M.run]) talk(pick(CHEER[M.run]), "do-cheer", 5000);
-        else if (Math.random() < 0.16 && !busy()) talk(pick(RIGHT), "do-hop", 3200);
+        else if (Math.random() < 0.16 && !busy()) talk((holidayId() && Math.random() < 0.4 && seasonLine("right")) || pick(RIGHT), "do-hop", 3200);
         else act("do-hop");
       } else {
         var was = M.run; M.run = 0; M.wrongRun++;
         if (was >= 10) talk("Streak's over, but " + was + " in a row was incredible.", "do-flinch", 5000);
         else if (M.wrongRun === 3) talk(pick(WRONG3), "do-flinch", 6000);
-        else if (Math.random() < 0.25 && !busy()) talk(pick(WRONG), "do-flinch", 3600);
+        else if (Math.random() < 0.25 && !busy()) talk((holidayId() && Math.random() < 0.4 && seasonLine("wrong")) || pick(WRONG), "do-flinch", 3600);
         else act("do-flinch");
       }
     });
     document.addEventListener("sh:egg-local", function(e){
       var d = e.detail || {}, l = EGG_LINES[d.t]; if (!l) return;
-      setTimeout(function(){ talk(d.t === "holiday" && HOLIDAY_HELLO[d.id] ? HOLIDAY_HELLO[d.id] : pick(l), d.t === "floss" || d.t === "flosschain" ? "do-wiggle" : "do-cheer", 5500); }, 1200);
+      setTimeout(function(){ talk(d.t === "holiday" && HOLIDAY_TALK[d.id] ? deal(d.id + "-hello", HOLIDAY_TALK[d.id].hello) : pick(l), d.t === "floss" || d.t === "flosschain" ? "do-wiggle" : "do-cheer", 5500); }, 1200);
     });
     /* moving around the hub; hide during a mock exam */
     setInterval(function(){
