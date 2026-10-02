@@ -88,6 +88,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   winter covers the whole yard in snow with a snowman, and **fall** (Sep 22 - Nov 30, `isFall()`) adds a tree with
   turning leaves (try `localStorage.sh_egg_holiday_test = "fall"`). **Full Arch fix**: the teeth after #16 drew below
   the chart (the pop animation's CSS transform replaced each tooth's flip); each tooth now sits in a positioned group.
+  **About the hubs** (`about/index.html`, linked from an "About" button in the dashboard top bar and the footer): every
+  feature, easter egg, holiday and trophy with how to find it. Easter-egg walkthroughs and secret trophy names sit behind a
+  "Show spoilers" switch (`sh_about_spoilers`); trophy rates load live from `get_trophy_stats`. **When you add a feature,
+  egg or trophy, add it to this page too.** On phones under 430 px the dashboard wordmark shows only its rings so the top
+  bar fits on one line. `tools/ci/syntax.js` now checks `about/index.html`.
 
 - **2026-10-01 (mastery flair, new eggs, Timmy Tooth, Claude Code)** — `migration_v31.sql` (**applied 2026-10-01 via the connector**):
   the leaderboards (`get_leaderboard`, `get_correct_streak_stats`, `get_arcade_leaderboard`, `get_rank_board`, `get_fairy_board`) gain a
