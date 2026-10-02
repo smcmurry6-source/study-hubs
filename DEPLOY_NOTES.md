@@ -87,6 +87,24 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   No reading text changed, so no narration regenerated. **Perio and MSK Projects: carry the cues, `cueHTML` and the
   CSS into the split sources. A new hub gets cues by rendering `q.cue` the same way.**
 
+- **2026-10-02 (Timmy + trophy follow-ups, Claude Code)** — `migration_v32.sql` (**applied 2026-10-02 via the connector**):
+  `get_trophy_stats()` (public: people per trophy out of everyone who has answered, same rules as `get_rank_profile`),
+  shown as a % pill under each trophy in the trophy case and in its detail line; `record_achievement` accepts
+  `pet-adopt` (hub = the adoption day), so **adopting Timmy follows you to your other devices** (`shPet.syncBadges`,
+  called from the dashboard's `loadMyRank` and `widget/ranks.js`; existing adopters are backfilled once,
+  `sh_pet_adopt_sent`). Closing his introduction any way but "No thanks" now adopts him (he could stay stuck on your
+  name). **Secret tips**: a "Secret tip" button on his house, every 4th tap, and some hub greetings walk through how to
+  find each egg (`TIPS` in `widget/pet.js`; the current holiday's word first). **House**: mastery pennants fly from a
+  flagpole in the yard (were strung across the sky from nothing), the TIMMY nameplate is a plaque above the door,
+  winter covers the whole yard in snow with a snowman, and **fall** (Sep 22 - Nov 30, `isFall()`) adds a tree with
+  turning leaves (try `localStorage.sh_egg_holiday_test = "fall"`). **Full Arch fix**: the teeth after #16 drew below
+  the chart (the pop animation's CSS transform replaced each tooth's flip); each tooth now sits in a positioned group.
+  **About the hubs** (`about/index.html`, linked from an "About" button in the dashboard top bar and the footer): every
+  feature, easter egg, holiday and trophy with how to find it. Easter-egg walkthroughs and secret trophy names sit behind a
+  "Show spoilers" switch (`sh_about_spoilers`); trophy rates load live from `get_trophy_stats`. **When you add a feature,
+  egg or trophy, add it to this page too.** On phones under 430 px the dashboard wordmark shows only its rings so the top
+  bar fits on one line. `tools/ci/syntax.js` now checks `about/index.html`.
+
 - **2026-10-01 (mastery flair, new eggs, Timmy Tooth, Claude Code)** — `migration_v31.sql` (**applied 2026-10-01 via the connector**):
   the leaderboards (`get_leaderboard`, `get_correct_streak_stats`, `get_arcade_leaderboard`, `get_rank_board`, `get_fairy_board`) gain a
   `flair` column ("perio:3,msk-exam3:1"; 1 bronze … 4 crown, from the mastery-* achievements via `sh_mastery_flair`), drawn as

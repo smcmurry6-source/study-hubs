@@ -528,12 +528,32 @@
       MASTERY.forEach(function(m, i){ if (bank && pct >= m.pct) lvl = i; });
       return { bank: bank, got: got, pct: pct, lvl: lvl };
     }
+    /* how many people have each trophy (get_trophy_stats, migration_v32), out of everyone who has answered */
+    var tstats = null, tstatsAt = 0;
+    function loadTrophyStats(){
+      if (Date.now() - tstatsAt < 600000) return;
+      tstatsAt = Date.now();
+      rpc("get_trophy_stats", {}).then(function(rows){
+        if (!rows || !rows.length) { tstatsAt = 0; return; }
+        tstats = {}; rows.forEach(function(r){ tstats[r.kind] = { n: r.n | 0, total: r.total | 0 }; });
+        render();
+      });
+    }
+    function rarity(k){
+      if (!tstats) return null;
+      var any = null; for (var key in tstats) { any = tstats[key]; break; }
+      var r = tstats[k] || { n: 0, total: any ? any.total : 0 };
+      if (!r.total) return null;
+      var p = r.n / r.total * 100;
+      return { n: r.n, total: r.total, label: !r.n ? "nobody yet" : p < 1 ? "<1%" : Math.round(p) + "%" };
+    }
     function trophyHTML(tr, earned){
-      var hidden = tr.secret && !earned;
+      var hidden = tr.secret && !earned, rr = rarity(tr.k);
       return '<button type="button" class="sh-trophy' + (earned ? " is-earned" : "") + '" data-trophy="' + tr.k + '" title="' + esc(hidden ? "Secret: tap for a clue" : tr.d) + '">' +
         '<span class="sh-trophy-medal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
         (hidden ? '<path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"/>' : '<path d="' + tr.ic + '"/>') + '</svg></span>' +
-        '<span class="sh-trophy-name">' + esc(hidden ? "???" : tr.n) + '</span></button>';
+        '<span class="sh-trophy-name">' + esc(hidden ? "???" : tr.n) + '</span>' +
+        (rr ? '<span class="sh-trophy-pct" title="' + rr.n + ' of ' + rr.total + ' classmates have it">' + esc(rr.label) + '</span>' : '') + '</button>';
     }
     function render(){
       if (!profile) return;
@@ -616,8 +636,9 @@
       var tr = TROPHIES.filter(function(x){ return x.k === b.getAttribute("data-trophy"); })[0]; if (!tr) return;
       var got = (profile.badges || []).some(function(k){ return k.split(":")[0] === tr.k; });
       sec.querySelectorAll("[data-trophy]").forEach(function(x){ x.classList.toggle("is-sel", x === b); });
-      sec.querySelector(".sh-trophy-detail").innerHTML = got ? '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '. Earned.'
-        : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.';
+      var rr = rarity(tr.k), share = !rr ? '' : ' <span class="sh-trophy-hint">' + (rr.n ? rr.n + ' of ' + rr.total + ' classmates (' + rr.label + ') have it.' : 'Nobody has found this one yet.') + '</span>';
+      sec.querySelector(".sh-trophy-detail").innerHTML = (got ? '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '. Earned.'
+        : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
     });
     function celebrate(t){
       if (H.prefGet("sh_pref_eggs", "on") === "off") return;
@@ -634,10 +655,12 @@
     var loading = false;
     function load(){
       if (loading) return; loading = true;
+      loadTrophyStats();
       Promise.all([rpc("get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         profile = r[0]; mastery = r[1] || [];
+        if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
         var prev = ls("sh_rank_tier"), prevStep = ls("sh_rank_step"), stepNow = profile.step != null ? profile.step : (profile.tier || 0) * 3;
         ls("sh_rank_tier", String(profile.tier || 0)); ls("sh_rank_step", String(stepNow));
         if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
