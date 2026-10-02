@@ -594,7 +594,8 @@
     cavity: ["You filled a cavity! Show-off. (I love it.)"],
     prof: ["Quoting the professor? Very on brand."],
     konami: ["Whoa. Am I... pixels?"],
-    holiday: ["Happy holidays from your favourite tooth!"]
+    holiday: ["Happy holidays from your favourite tooth!"],
+    timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain."]
   };
   var HOLIDAY_HELLO = {
     halloween: "Happy Halloween! Do you like my hat? Don't eat too much candy.",
