@@ -325,9 +325,10 @@ table.data tr.group:hover td{background:none;}
       rpc("get_click_summary", { p_secret: secret, p_days: d }),
       rpc("get_survey_results", { p_secret: secret }),
       rpc("get_exam_debriefs", { p_secret: secret }),
-      rpc("get_search_terms", { p_secret: secret, p_days: d })
+      rpc("get_search_terms", { p_secret: secret, p_days: d }),
+      rpc("get_nuke_unlocks", { p_secret: secret, p_days: d })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15] };
       renderAll();
     });
   }
@@ -684,11 +685,15 @@ table.data tr.group:hover td{background:none;}
     var active = sRows.find(function(r){ return r.kind === "active"; });
     var record = sRows.find(function(r){ return r.kind === "record"; });
     var ns = (data.nukeSum.data && data.nukeSum.data[0]) || {};
+    /* unlocks are recorded from 2026-10-03 (migration_v33); "never used" = no launch before their next unlock */
+    var nu = (data.nukeUnlocks.data || []).filter(function(r){ return keepHub(r.hub); });
+    var nuSum = nu.reduce(function(s, r){ s.unlocks += r.unlocks; s.unused += r.unused; return s; }, { unlocks: 0, unused: 0 });
     out += '<div class="kpis">' +
       kpi("Longest active streak", active ? active.streak : 0, active ? esc(active.display_name) : "no one on a streak") +
       kpi("All-time streak record", record ? record.streak : 0, record ? esc(record.display_name) : "—") +
       kpi("Tactical nukes", fmtNum(ns.total_launches), rangeText()) +
       kpi("Unique launchers", fmtNum(ns.unique_launchers), rangeText()) +
+      kpi("Nukes unlocked", fmtNum(nuSum.unlocks), nuSum.unused + " never used · since Oct 3") +
     '</div>';
 
     /* mode opens grouped by hub */
@@ -716,8 +721,14 @@ table.data tr.group:hover td{background:none;}
     /* nukes */
     var nh = (data.nukeHub.data || []).filter(function(r){ return keepHub(r.hub); });
     var nr = data.nukeRecent.data || [];
-    var nukeBody = (nh.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Launches</th></tr></thead><tbody>' +
-        nh.map(function(r){ return '<tr><td class="lbl">' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.launches) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches in this range.</div>');
+    var unlockBy = {};
+    nu.forEach(function(r){ unlockBy[r.hub] = r; });
+    var nukeHubs = nh.map(function(r){ return r.hub; });
+    nu.forEach(function(r){ if (nukeHubs.indexOf(r.hub) < 0) nukeHubs.push(r.hub); });
+    var launchBy = {};
+    nh.forEach(function(r){ launchBy[r.hub] = r.launches; });
+    var nukeBody = (nukeHubs.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Unlocked</th><th class="n">Never used</th><th class="n">Launches</th></tr></thead><tbody>' +
+        nukeHubs.map(function(h){ var u = unlockBy[h] || {}; return '<tr><td class="lbl">' + hubCell(h) + '</td><td class="n">' + fmtNum(u.unlocks || 0) + '</td><td class="n">' + fmtNum(u.unused || 0) + '</td><td class="n">' + fmtNum(launchBy[h] || 0) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No unlocks or launches in this range.</div>');
     var recentBody = nr.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Who</th><th>Hub</th><th class="n">When</th></tr></thead><tbody>' +
         nr.map(function(r){ return '<tr><td class="lbl">' + esc(r.display_name) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtDate(r.launched_at) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches yet.</div>';
     out += '<div class="grid-2">' + card("Nukes by hub", rangeText(), nukeBody) + card("Recent nukes", "last 10", recentBody) + '</div>';
