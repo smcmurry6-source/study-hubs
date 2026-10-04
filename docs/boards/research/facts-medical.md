@@ -205,12 +205,69 @@ conditions* (2022/2023), https://pmc.ncbi.nlm.nih.gov/articles/PMC9828249/ .
   usually be done **24 hours** after the last stimulant (cocaine, crack, amphetamine) use (Periodontol 2000 review,
   section on dental management and Table 4: "avoid treatment at least 24 h from last drug use", "avoid local
   anesthetic with epinephrine"). Methamphetamine acts for about **8-12 hours** (same review, section 6.3).
-- **VC-8** Not every BP/cardiac limit exam stems use is in a current guideline: "0.04 mg" (VC-1) and "defer elective
-  care at 180/110" (BP-3) are the keyed numbers for this bank.
+- **VC-8** ADA Oral Health Topic "Hypertension" (see section 4): when the history calls for caution, a common
+  recommendation is to limit epinephrine to **0.04 mg** in adults = **1 cartridge of 1:50,000, 2 of 1:100,000 or 4
+  of 1:200,000**; epinephrine-impregnated retraction cord is discouraged in uncontrolled hypertension (ADA page,
+  "Local Anesthetics with Vasoconstrictors"). This is the keyed number for the bank.
 
 ## 4. Blood pressure, anticoagulants (INR, DOACs) and antiplatelets
 
-_pending_
+**Sources.** ADA Oral Health Topics, "Hypertension" (last updated Nov 1, 2022),
+https://www.ada.org/resources/ada-library/oral-health-topics/hypertension . 2025 AHA/ACC/multisociety High Blood
+Pressure Guideline (Jones DW et al., Hypertension/Circulation, Aug 2025) as summarized in Kanbay M, Copur S, Sarafidis P
+et al., ERBP commentary, Nephrol Dial Transplant 2026;41:1909-1918, https://europepmc.org/article/PMC/PMC13624793 (the
+guideline itself is on ahajournals.org, which blocks bots; **the full 2025 guideline text was not opened**). ADA Oral
+Health Topics, "Oral Anticoagulant and Antiplatelet Medications and Dental Procedures" (last updated Sep 28, 2022),
+https://www.ada.org/resources/ada-library/oral-health-topics/oral-anticoagulant-and-antiplatelet-medications-and-dental-procedures .
+
+**Blood pressure**
+
+- **BP-1** Adult BP categories (2017 ACC/AHA, ADA page Table 1): normal **<120 and <80**; elevated **120-129 and <80**;
+  stage 1 hypertension **130-139 or 80-89**; stage 2 **>=140 or >=90**; hypertensive crisis **>180 and/or >120**.
+- **BP-2** The 2025 AHA/ACC guideline kept the 2017 definition of hypertension (**>=130 or >=80**) and stage 1 =
+  130-139/80-89; target is SBP <130 and DBP <80, with SBP <120 encouraged (ERBP commentary, Abstract and
+  "Definition" discussion). Whether the 2025 guideline renamed "hypertensive crisis" or changed its numbers:
+  **UNVERIFIED**; use BP-1's crisis numbers only as "2017 ACC/AHA".
+- **BP-3** ADA Practical Guide thresholds for adult outpatient dental care (ADA page, Table 3):
+  under **160/100**: no modification for elective or emergency care. Over **160/100**: repeat the reading; if it comes
+  down, or is within a physician's written guidance, proceed; if confirmed, **no elective care** and refer to the
+  physician. Emergency care at a confirmed **160-180 systolic and/or 100-109 diastolic** when pain is driving the BP:
+  treat, check BP every **10-15 minutes**, use anxiety reduction. Confirmed **>180 systolic and/or >109 diastolic**:
+  consult the physician before proceeding. Systolic >180 and/or diastolic >100: refer as soon as possible, or urgent
+  medical evaluation if symptomatic (Table 3 footnote).
+- **BP-4** Separately, the 2017 ACC/AHA guideline says deferring **elective major surgery** may be considered at
+  **>=180 systolic or >=110 diastolic** (ADA page, same section). Many board review sources use "180/110 = defer
+  elective dental care"; when a stem uses that number, frame it as the ACC/AHA surgical threshold, and key ADA's 160/100
+  only when the stem names the ADA guide. Yarows et al. (JADA 2020) note there is no evidence-based BP cutoff for
+  deferring dental care (ADA page).
+- **BP-5** Diagnosis needs an average of 2 or more elevated readings on 2 or more occasions; orthostatic hypotension
+  risk is higher in older adults, diabetics and autonomic dysfunction when standing up from the chair (ADA page).
+  Most antihypertensive classes can cause dry mouth (ADA page, "Oral Effects of Hypertension Medications").
+- **BP-6** Epinephrine limit in cardiovascular disease: **0.04 mg** (see VC-1, VC-8).
+
+**Anticoagulants and antiplatelets**
+
+- **AC-1** Warfarin: continuing regular warfarin did not raise bleeding risk for single or multiple extractions versus
+  stopping or modifying (2009 meta-analysis, ADA page). A patient with an INR in therapeutic range (**3.0 or less**)
+  can continue warfarin before extractions (2015 systematic review, ADA page). The **American Academy of Oral Medicine
+  (2016)** found uncomplicated extraction safe at an **INR of 3.5**, some experts saying up to **4.0** (ADA page).
+  Keyed teaching rule for the bank: simple extractions without stopping warfarin when INR is **<=3.5**; above that,
+  consult the physician.
+- **AC-2** Typical therapeutic INR range is **2 to 3** (Oake 2008 meta-analysis cited on ADA page). Timing of the INR
+  check before surgery (often taught as within 24 hours): **UNVERIFIED** from an opened source.
+- **AC-3** DOACs (dabigatran = direct thrombin inhibitor; apixaban, rivaroxaban, edoxaban = factor Xa inhibitors):
+  fixed doses, shorter half-lives, little or no monitoring (no INR), fewer interactions (ADA page). For most dental
+  procedures, **no change** to the regimen; with higher bleeding risk, and only with the physician: delay the daily dose
+  until after the procedure, schedule as late as possible after the last dose, or interrupt **24-48 hours** (ADA page,
+  Conclusions). The European Heart Rhythm Association lists extraction of **1-3 teeth**, periodontal surgery, abscess
+  incision and implant placement as not necessarily requiring DOAC interruption (ADA page).
+- **AC-4** Antiplatelets (aspirin, clopidogrel, prasugrel, ticagrelor, ticlopidine), single or dual: do **not** stop
+  for dental procedures; bleeding rates after minor oral surgery were clinically similar with dual, single or no
+  antiplatelet therapy and were controlled locally (ADA page). Patients with **coronary stents** on dual antiplatelet
+  therapy: talk to the **cardiologist before** any change; premature stopping risks stent thrombosis, MI and death
+  (AHA/ACC/SCAI/ACS/ADA science advisory, cited on ADA page).
+- **AC-5** Local measures: pressure, Gelfoam or Surgicel, sutures, and antifibrinolytics such as **tranexamic acid**
+  (ADA page). The risks of stopping (thromboembolism, stroke, MI) generally outweigh prolonged bleeding (ADA page).
 
 ## 5. Diabetes and ASA physical status
 
