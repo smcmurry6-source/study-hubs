@@ -165,7 +165,48 @@ of Pediatric Dentistry 2025, pp. 407-414), https://www.aapd.org/globalassets/med
 
 ## 3. Vasoconstrictors in cardiac patients and drug interactions
 
-_pending_
+**Sources.** FDA labels already listed in section 2 (Xylocaine Dental, Precautions/Drug Interactions; Septocaine,
+5 Warnings and 7 Drug Interactions; Carbocaine, Precautions). Godzieba A et al. *Clinical assessment of the safe use
+local anaesthesia with vasoconstrictor agents in cardiovascular compromised patients: a systematic review.* Med Sci
+Monit 2014;20:393-398, https://pmc.ncbi.nlm.nih.gov/articles/PMC3958566/ . Saraghi M, Golden LR, Hersh EV.
+*Anesthetic Considerations for Patients on Antidepressant Therapy, Part I.* Anesth Prog 2017;64(4):253-261,
+https://pmc.ncbi.nlm.nih.gov/articles/PMC5715313/ . Periodontology 2000 review *Illegal drugs and periodontal
+conditions* (2022/2023), https://pmc.ncbi.nlm.nih.gov/articles/PMC9828249/ .
+
+- **VC-1** Cardiac dose ceiling: the healthy-adult maximum of epinephrine in dental anesthesia is commonly given as
+  **0.2 mg**, lowered to **0.04 mg** for patients with significant cardiovascular disease (ASA III-IV) (Godzieba 2014,
+  Background, citing earlier literature). 0.04 mg = about **2 cartridges of 1:100,000** (0.017-0.018 mg each; see LA-3,
+  LA-6) or about 4 cartridges of 1:200,000. Keep it as "0.04 mg"; the cartridge count is a derived teaching number.
+- **VC-2** The same review concluded that up to **4 cartridges of lidocaine with epinephrine 1:100,000** seemed
+  relatively safe in cardiovascular-compromised patients, that most arrhythmias seen were clinically insignificant, and
+  that ECG monitoring should be considered at higher doses (Godzieba 2014, Conclusions). AHA/ADA position cited there:
+  no contraindication to vasoconstrictor if given carefully with aspiration (Background).
+- **VC-3** Label interactions (epinephrine-containing dental LAs): with **MAO inhibitors, nonselective beta-blockers
+  or tricyclic antidepressants**, severe prolonged hypertension can occur; **phenothiazines and butyrophenones** may
+  reduce or reverse epinephrine's pressor effect; avoid concurrent use, or monitor closely if unavoidable
+  (Septocaine 5 and 7). Xylocaine Dental (Precautions): with a beta-blocker (propranolol, timolol), dose-dependent
+  **hypertension and bradycardia** with possible heart block. Vasopressors plus **ergot-type oxytocics**: severe
+  persistent hypertension or stroke (Xylocaine Dental; Carbocaine, Precautions).
+- **VC-4** Mechanism of the nonselective beta-blocker interaction: with beta-2 vasodilation blocked, epinephrine's
+  alpha-1 vasoconstriction is unopposed, so BP rises and a reflex bradycardia follows (consistent with the label's
+  "hypertension and bradycardia", VC-3). Cardioselective (beta-1) blockers such as metoprolol and atenolol are not
+  named in the labels' warning. (Mechanism wording is a teaching paraphrase; only the label effect is sourced.)
+- **VC-5** TCAs and SNRIs block norepinephrine reuptake, so injected epinephrine and especially **levonordefrin**
+  (mainly alpha effects, so the effect is mostly on BP) can have exaggerated, prolonged effects; minimize the
+  epinephrine dose and inject slowly (Saraghi 2017, "Drug interactions" section and Fig. 2). Amphetamines (e.g.,
+  Adderall) and atomoxetine share this concern; SSRIs, trazodone, mirtazapine and bupropion do not have significant
+  epinephrine interactions (same section).
+- **VC-6** MAOIs: pharmacologically no interaction with direct-acting agents like epinephrine is expected, but the
+  labels still advise caution (VC-3); the dangerous MAOI interaction is with **indirect-acting** sympathomimetics
+  (ephedrine, pseudoephedrine), which can cause hypertensive crisis and are contraindicated (Saraghi 2017, same
+  section). Don't stop an MAOI without the psychiatrist.
+- **VC-7** Cocaine and other stimulants: they are sympathomimetic, so epinephrine-containing LA, epinephrine
+  retraction cord and nitrous oxide may be contraindicated in a patient who has just used cocaine; elective care can
+  usually be done **24 hours** after the last stimulant (cocaine, crack, amphetamine) use (Periodontol 2000 review,
+  section on dental management and Table 4: "avoid treatment at least 24 h from last drug use", "avoid local
+  anesthetic with epinephrine"). Methamphetamine acts for about **8-12 hours** (same review, section 6.3).
+- **VC-8** Not every BP/cardiac limit exam stems use is in a current guideline: "0.04 mg" (VC-1) and "defer elective
+  care at 180/110" (BP-3) are the keyed numbers for this bank.
 
 ## 4. Blood pressure, anticoagulants (INR, DOACs) and antiplatelets
 
