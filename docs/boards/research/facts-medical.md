@@ -271,7 +271,71 @@ https://www.ada.org/resources/ada-library/oral-health-topics/oral-anticoagulant-
 
 ## 5. Diabetes and ASA physical status
 
-_pending_
+**Sources.** NIDDK, "Diabetes Tests & Diagnosis" (last reviewed July 2022),
+https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis ; NIDDK, "The A1C Test & Diabetes"
+(last reviewed April 2018), https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test ; NIDDK, "Low
+Blood Glucose (Hypoglycemia)" (last reviewed July 2021),
+https://www.niddk.nih.gov/health-information/diabetes/overview/preventing-problems/low-blood-glucose-hypoglycemia ;
+ADA Oral Health Topics, "Diabetes" (last updated Jan 24, 2022), https://www.ada.org/resources/ada-library/oral-health-topics/diabetes ;
+FDA labels: Glucagon for Injection kit (Amphastar, Aug 2026), https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8cc40354-b5ac-45b6-a211-93b44444f2a3 ;
+Baqsimi nasal glucagon (Amphastar, Aug 2025), https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=f1f5df9b-872f-44e5-a18f-f0b68e7e9254 .
+ASA Physical Status Classification System (ASA statement, last amended Dec 13, 2020), reproduced verbatim as Table A1
+of an open-access paper, Cancers (Basel) 2024;16:3484, https://europepmc.org/article/PMC/PMC11506449 (asahq.org itself
+blocks bots); OpenAnesthesia, "ASA Physical Status Classification" (Horvath and Kloesel, updated 2024-06-17),
+https://www.openanesthesia.org/keywords/asa-physical-status-classification/ . The ADA (American Diabetes Association)
+Standards of Care 2026 (Diabetes Care 2026;49 Suppl 1) were **not** opened (publisher blocks bots); hypoglycemia
+"levels 1-3" (<70 / <54 mg/dL / severe) are therefore **UNVERIFIED** here.
+
+**Diabetes**
+
+- **DM-1** Diagnosis (NIDDK table): **A1C** normal below **5.7%**, prediabetes **5.7-6.4%**, diabetes **6.5% or
+  above**. **Fasting plasma glucose** normal 99 mg/dL or below, prediabetes **100-125**, diabetes **126 or above**.
+  **2-hour OGTT** normal 139 or below, prediabetes **140-199**, diabetes **200 or above**. **Random plasma glucose**
+  **200 or above** (with symptoms) = diabetes.
+- **DM-2** A1C reflects average glucose over the past ~3 months; many people with diabetes aim for an A1C **below 7%**,
+  but the goal is individualized (a higher goal may be safer with a history of severe hypoglycemia, limited life
+  expectancy, etc.) (NIDDK A1C page, "What A1C goal should I have?").
+- **DM-3** Hypoglycemia = blood glucose **below 70 mg/dL** (NIDDK; ADA dental page says <=70). Symptoms: shaky,
+  sweaty, fast or irregular heartbeat, dizzy, hungry, nervous, lip/tongue tingling, blurred vision, headache,
+  confusion, irritable or combative, pale; severe = unable to eat or drink,
+  seizures, unconsciousness (ADA dental page, "Hypoglycemia").
+- **DM-4** The **15-15 rule** (NIDDK steps; ADA dental page): give **15-20 g** of fast carbohydrate (4 glucose tablets
+  or 1 tube of glucose gel; 1/2 cup (4 oz) fruit juice or regular soda; 1 tablespoon sugar, honey or corn syrup),
+  **wait 15 minutes**, recheck, and repeat until above 70 mg/dL. Patients with kidney disease
+  should avoid orange juice (potassium); apple, grape or cranberry are fine (NIDDK; ADA dental page).
+- **DM-5** Unconscious or unable to swallow: nothing by mouth; call EMS; give **glucagon** (ADA dental page; NIDDK).
+  Glucagon for injection (label 2): adults and children **20 kg or more: 1 mg** SC, IM (upper arm, thigh, buttocks) or
+  IV; children **under 20 kg: 0.5 mg** (or 20-30 mcg/kg). If no response after **15 minutes**, a second equal dose may
+  be given while waiting for EMS. Turn the person on their side to prevent choking (label, patient instructions) and give oral carbohydrate
+  once they can swallow (label 2). Nasal glucagon (Baqsimi): **3 mg** in one nostril, adults and children **1 year and
+  older**; repeat 3 mg after 15 minutes if no response (Baqsimi 1, 2.2). Glucagon is contraindicated with
+  pheochromocytoma and insulinoma (label 4).
+- **DM-6** IV dextrose (D50) as an office drug is for providers trained in IV access; its dose is **UNVERIFIED** here.
+- **DM-7** Dental relevance: diabetes and periodontitis are bidirectional; periodontitis is linked to higher A1C in
+  type 2 diabetes, and scaling and root planing reduces A1C at **3 months**, with more reduction at 6 months (ADA dental
+  page, citing 2018 systematic reviews). Ask about the most recent A1C at the health history (ADA page).
+
+**ASA physical status (2020 statement)**
+
+- **ASA-1** ASA I: normal healthy patient (healthy, nonsmoking, no or minimal alcohol).
+- **ASA-2** ASA II: **mild** systemic disease without substantive functional limitation, e.g., current smoker, social
+  drinker, **pregnancy**, obesity with **BMI over 30 and under 40**, **well-controlled** diabetes or hypertension, mild
+  lung disease.
+- **ASA-3** ASA III: **severe** systemic disease with substantive functional limitation, e.g., **poorly controlled**
+  diabetes or hypertension, **COPD**, morbid obesity **BMI 40 or more**, active hepatitis, alcohol dependence or abuse,
+  implanted pacemaker, moderately reduced ejection fraction, **ESRD on regularly scheduled dialysis**, premature
+  infant under 60 weeks post-conceptual age, and a history **more than 3 months ago** of MI, stroke, TIA or CAD/stents.
+- **ASA-4** ASA IV: severe systemic disease that is a **constant threat to life**, e.g., MI, stroke, TIA or CAD/stents
+  **within the last 3 months**, ongoing cardiac ischemia, severe valve dysfunction, severely reduced ejection fraction,
+  sepsis, DIC, ARD, or ESRD **not** on regularly scheduled dialysis.
+- **ASA-5** ASA V: moribund, not expected to survive without the operation (e.g., ruptured aortic aneurysm, massive
+  trauma, intracranial bleed with mass effect). **ASA VI**: declared brain-dead organ donor.
+- **ASA-6** "**E**" is added (to I-V) for an emergency, meaning delay would significantly increase the threat to life or
+  a body part (OpenAnesthesia, Introduction). The class alone is a poor predictor of an individual's operative risk
+  (OpenAnesthesia, Key Points).
+- **ASA-7** Dental teaching convention (not in the ASA statement): ASA I-II are usually fine for routine outpatient
+  care; ASA III calls for modifications/consult; ASA IV for elective care is generally deferred. Use as a reasoning
+  frame, not a cited rule.
 
 ## 6. MRONJ (AAOMS 2022), osteoradionecrosis, chemotherapy patients
 

@@ -1,6 +1,7 @@
 # ADEX dental exam series (American Board of Dental Examiners): research notes
 
-Status: first full draft 2026-10-04 (sections 1-5 written; gaps marked UNVERIFIED). Outline version: **ADEX 2026-2027 exam season**
+Status: full draft 2026-10-04, second pass the same day (thin DLOSCE areas filled: prosthodontics, perio case
+definitions, orthodontics, emergencies, infection control; remaining gaps marked UNVERIFIED). Outline version: **ADEX 2026-2027 exam season**
 (Aug 1, 2026 - Jul 31, 2027). Re-check every year: ADEX publishes a new manual set each August.
 
 All facts below are paraphrased from the sources listed; nothing is copied from exam items. Page numbers are the
@@ -208,6 +209,11 @@ Opened and read (cached text in the session scratchpad, `boards/cache/adex_pdfs/
   and reference material for a patient encounter. [DSM p.9]
 - Item types: single-answer MCQ, multiple-response, extended match, drop-down, fill-in-the-blank, hot spot,
   drag-and-drop. [DSM p.9; WEB-CBT]
+- Mechanics: an on-screen countdown timer per section; items can be skipped or flagged, and flagged items are
+  offered for review before a section closes; after a section is closed it cannot be reopened. The manual itself
+  prints no sample items; it points to the navigation/item-type tutorial on the ADEX Test Prep page, which is
+  also shown (timed 15 min, outside the test time) at the start of the session. [DSM p.9] So the only published
+  ADEX-style practice items are the DLOSCE practice set [PQ] described in 2a.
 - Content weights [DSM p.5]: **Patient Evaluation 20%** (pathology 10%, physical evaluation 10%: anatomy,
   systemic conditions, radiology, lab diagnostics, therapeutics); **Comprehensive Treatment Planning 60%**
   (systemic disease/medical emergencies/special care/oral medicine 20%, periodontal diagnosis and treatment
@@ -249,9 +255,27 @@ facts below come from the national guideline each topic rests on. Guideline sour
   meta-analysis. *Oral Dis* 2025. PMC11808172 (abstract).
 - **[WL]** Mortazavi H et al. Oral white lesions: an updated clinical diagnostic decision tree. *Dent J (Basel)*
   2019;7(1):15. PMC6473409.
+- **[SOC6]** ADA Professional Practice Committee, *Section 6: Glycemic Goals and Hypoglycemia* (Abridged Standards of
+  Care in Diabetes 2025). *Clin Diabetes* 2025, doi:10.2337/cd25-a006, PMC12022446 (hypoglycemia classification and
+  treatment recommendations). Full text read through NCBI E-utilities; the full Diabetes Care version (S128-S145) was
+  not reachable.
+- **[ADA-AP]** ADA Library, *Antibiotic Prophylaxis Prior to Dental Procedures* (last updated July 15, 2026):
+  https://www.ada.org/resources/ada-library/oral-health-topics/antibiotic-prophylaxis (cites Sollecito TP et al.,
+  JADA 2015;146(1):11-16).
+- **[TROM]** Trombelli L et al. Plaque-induced gingivitis: case definition and diagnostic considerations (2017 World
+  Workshop). *J Periodontol* 2018;89(Suppl 1), doi:10.1002/JPER.17-0576 (abstract; author copy at
+  https://iris.unife.it/retrieve/e309ade1-e65e-3969-e053-3a05fe0a2c94/Trombelli%20et%20al%202018%20%28JoP%29.pdf).
+- **[AO-AAP]** Wang HL, Avila-Ortiz G et al. AO/AAP consensus on prevention and management of peri-implant diseases
+  and conditions: summary report. *J Periodontol* 2025, doi:10.1002/JPER.25-0270, PMC12273748.
+- **[GPT10]** *The Glossary of Prosthodontic Terms 2023, Tenth Edition*. *J Prosthet Dent* 2023;130(4 Suppl 1):e1-e126,
+  doi:10.1016/j.prosdent.2023.03.003; open copy at https://archive-ouverte.unige.ch/unige:181660 (cited by entry).
+- **[IID]** The impact of a 1 mm interimplant distance on the interproximal crestal bone height: case report and
+  literature review. *Int J Implant Dent* 2025, doi:10.1186/s40729-025-00589-8, PMC11785880 (summarizes Tarnow's
+  3 mm guideline).
 - FDA labels on DailyMed (dailymed.nlm.nih.gov): **[EPI]** EpiPen/EpiPen Jr (setid 7560c201-...);
   **[NTG]** Nitrostat (9a52da75-...); **[ART]** Septocaine (0eba0bd2-...); **[LIDO]** Lignospan Standard
-  (f902d2b4-...); **[MEPI]** Carbocaine dental (1f2f9e40-...).
+  (f902d2b4-...); **[MEPI]** Carbocaine dental (1f2f9e40-...); **[XYLO]** Xylocaine Dental with epinephrine (14b55cf9-f7cd-4bb4-a7c5-aba61abadef1); **[PRIL]** Citanest
+  Plain Dental (db23a56f-1e41-4843-9220-1b2e3059db41).
 
 ### 3.1 Restorative (24%) [DSE: Restorative dentistry 18%]
 
@@ -300,7 +324,15 @@ done before a prosthesis; what complicates the plan. (Practice items ask these d
 11. Anterior all-ceramic prep: lingual wall at least 1 mm high. [PC]
 12. Bridge abutments must share a path of insertion; needing more reduction in the apical two-thirds to seat is critical. [PZM; CM p.16]
 13. Reduction guides: putty matrices sectioned faciolingually and mesiodistally let you measure reduction. [CM p.16]
-14. Implant, removable and occlusion facts: to be sourced in a later pass (no guideline opened yet). UNVERIFIED.
+14. Kennedy classification of partially edentulous arches: Class I = bilateral edentulous areas behind the remaining teeth; Class II = a unilateral area behind the remaining teeth; Class III = a unilateral area with teeth both in front of and behind it; Class IV = one area that crosses the midline in front of the remaining teeth. Extra edentulous areas are "modification spaces", and Applegate's rules govern how the system is applied (GPT-10 names the rules but does not list them; the individual rules are UNVERIFIED here). [GPT10, "Kennedy classification", "Applegate's Rules"]
+15. Guiding planes: two or more vertically parallel surfaces on abutments (or FDPs) that help set the path of placement and removal of an RPD. [GPT10, "guiding planes"]
+16. Indirect retainer: the RPD part that works by lever action on the far side of the fulcrum line to resist a distal-extension base lifting away from the tissue. [GPT10, "indirect retainer"]
+17. Minor connector: links the major connector or base to the clasp assembly, indirect retainers and rests; a rest seat is the prepared recess (occlusal, incisal, cingulum or lingual) that receives a rest. [GPT10, "minor connector", "rest seat"]
+18. Centric relation: a jaw relationship independent of tooth contact, with the condyles in the anterior-superior position against the posterior slopes of the articular eminences; the mandible can only rotate there; it is a repeatable reference position. [GPT10, "centric relation"]
+19. Vertical dimension of occlusion is measured between two marked points (usually nose tip and chin) with the teeth in maximal intercuspation; rest vertical dimension is the same measurement with the mandible in its relaxed upright postural position. The difference is the interocclusal rest space (its size in mm: UNVERIFIED, not stated in GPT-10's definitions read). [GPT10, "vertical dimension of occlusion", "rest vertical dimension"]
+20. A cantilever FDP has a pontic supported by abutment(s) on one side only. [GPT10, "cantilever fixed dental prosthesis"]
+21. Osseointegration: direct bone-to-implant contact without intervening fibrous connective tissue (Branemark). [GPT10, "osseointegration"]
+22. Implant spacing: the classic guideline (Tarnow) keeps at least 3 mm between two adjacent implants, because closer spacing was linked to loss of the interimplant bone crest; newer platform-switched, conical-connection implants may tolerate less, but the 3 mm rule is still advocated. [IID] The implant-to-tooth distance (often taught as 1.5 mm): UNVERIFIED.
 
 ### 3.3 Oral pathology, pain and TMD (13%) [DSE: Pathology 10%; oral medicine]
 
@@ -351,7 +383,13 @@ planning; on the clinical exam, calculus detection/removal and probing.
 13. ADEX calculus detection is scored on M, D, F and L of four maxillary teeth. [PR]
 14. Soft-tissue laceration over 3 mm, papilla amputation, or an unreported broken instrument tip is major tissue damage (automatic fail). [PR]
 15. Periodontal scalers are critical items: always heat-sterilize. [CDC16]
-16. Gingivitis/peri-implant case definitions from the 2017 workshop: to source (Wiley consensus papers blocked). UNVERIFIED.
+16. Gingivitis case (2017 workshop), intact periodontium: BOP score of 10% or more of sites; localized if 10-30%, generalized if over 30%. [TROM abstract]
+17. Gingivitis on a reduced periodontium (attachment loss but no current periodontitis): BOP 10% or more, with no bleeding at any site probing 4 mm or deeper. [TROM abstract]
+18. Peri-implant mucositis: a reversible inflammation of the peri-implant mucosa with no marginal bone loss beyond the initial remodeling; bleeding on gentle probing, with or without redness, swelling or suppuration. [AO-AAP]
+19. Peri-implantitis: persistent mucosal inflammation plus loss of supporting bone; it tends to progress faster than periodontitis, in a nonlinear, accelerating pattern. [AO-AAP]
+20. Risk factors for peri-implant disease: history of periodontitis, smoking (current, or quit under 10 years ago), uncontrolled diabetes (HbA1c over 7%), poor biofilm control, obesity/metabolic syndrome. Smoking cessation is strongly recommended before implant therapy. [AO-AAP]
+21. Reported patient-level incidence of peri-implantitis: about 12% at 5 years, 14% at 10 and 22% at 20 years; mucositis is far more common (about 46-61%). [AO-AAP]
+22. Treatment: mechanical debridement with implant-safe instruments (titanium curettes, ultrasonic tips, air abrasion) is the cornerstone for mucositis and the first step for peri-implantitis; adjuncts add little on average. If nonsurgical care fails, access flap with or without resective surgery; reconstructive surgery suits contained defects. [AO-AAP]
 
 ### 3.5 Oral surgery (9%) [DSE: Specialties, oral surgery]
 
@@ -410,6 +448,12 @@ Skills: screening and referral, space management (space maintainers), crossbites
 9. Ankylosed teeth sink below the occlusal plane (infraocclusion) as neighbors erupt; no physiologic mobility and a dull tone when tapped with a mirror handle point to ankylosis. [AAPD-DD]
 10. Dentition stages used in planning: primary, mixed, adolescent (permanent), adult. [AAPD-DD]
 11. Tooth notation on the DLOSCE: Universal system, permanent 1-32, primary A-T. [DLM p.5]
+12. Dentition timeline: primary begins about 6 months and is complete by about 2-6 years; mixed about 6-11 years; adolescent from about 11-12 years (all permanent teeth except third molars erupted or erupting). [AAPD-DD p.499]
+13. Hypodontia (permanent, excluding third molars) affects 4.4-13.4% depending on region; most often missing: mandibular second premolar, then maxillary lateral incisor, then maxillary second premolar; more common in females. In the primary dentition it is under 1%. A missing primary tooth strongly predicts a missing successor. [AAPD-DD p.501]
+14. Six or more missing teeth points to ectodermal dysplasia or another syndrome; missing laterals are also linked to cleft lip/palate. [AAPD-DD p.501]
+15. Missing maxillary lateral: either move the canine mesially to stand in as the lateral (little facial change, but canine guidance often not possible) or open space for a prosthesis/implant (less tooth movement, but the space must be held, ideally with an interim prosthesis). [AAPD-DD p.501]
+16. Supernumerary teeth: 5 times more common in the permanent dentition; 80-90% in the maxilla, half anterior, almost all palatal. Only about 25% of mesiodens erupt on their own; a mesiodens can block or deflect a central incisor. Locate it with CBCT or two films read with the parallax (buccal-object) rule. [AAPD-DD p.501]
+17. Maxillary canine impaction: 1-3% of people, 2-3 times more in females; suspect it when the canine bulge is not palpable, eruption is asymmetric, or a lateral is peg-shaped. [AAPD-DD p.502]
 
 ### 3.8 Medical emergencies (6%) [DSE: Cross-cutting medical emergencies; systemic disease]
 
@@ -422,7 +466,12 @@ Skills: recognize and manage office emergencies; drug doses for the emergency ki
 5. Penicillin allergy labels: about 90% of labeled patients test negative on skin testing. [AHA21 p.e972] About 10% self-report allergy but under 1% are truly allergic. [ADA-ABX]
 6. Fatal anaphylaxis after one cephalosporin dose in someone without a prior serious reaction: estimated under 1 per million doses. [AHA21]
 7. Azithromycin: caution with a prolonged QTc (over 450 ms). [AHA21]
-8. Hypoglycemia treatment (glucose dose and thresholds), syncope positioning, asthma (albuterol), aspirin for suspected MI, and CPR ratios: to be sourced (ADA Standards of Care and AHA CPR pages were blocked). UNVERIFIED.
+8. Hypoglycemia levels: Level 1 = glucose under 70 mg/dL but 54 or above; Level 2 = under 54 mg/dL; Level 3 = a severe event with altered mental and/or physical status needing someone else's help, whatever the glucose. [SOC6]
+9. A conscious patient with glucose under 70 mg/dL: give glucose (preferred; any glucose-containing carbohydrate works), avoid high-fat or high-protein foods for the first treatment, and re-test and re-treat if needed after 15 minutes. The gram amount was not in the section read: UNVERIFIED (often taught as 15-20 g). [SOC6]
+10. Glucagon should be prescribed for everyone on insulin or at high risk of hypoglycemia. [SOC6] Practical point for the dental chair: a Level 3 patient cannot swallow safely, so oral sugar is out.
+11. Local anesthetic systemic toxicity: early CNS signs include restlessness, anxiety, tinnitus, dizziness, blurred vision, tremor or drowsiness; it can progress to convulsions, respiratory depression/arrest and cardiovascular stimulation or depression. First step for a convulsion: secure the airway and ventilate with oxygen (positive pressure by mask available). [XYLO]
+12. Methemoglobinemia (prilocaine and other local anesthetics): higher risk with G6PD deficiency, congenital methemoglobinemia, heart or lung compromise, infants under 6 months, and oxidizing drugs; prilocaine is contraindicated in congenital/idiopathic methemoglobinemia. Signs: gray-blue skin (cyanosis), headache, fast heart rate, shortness of breath; levels under 20% usually cause no symptoms. Treatment in the label: methylene blue 1-2 mg/kg over 5 minutes. [PRIL]
+13. Still to source (AHA and diabetesjournals.org returned 403; PMC article pages blocked): syncope positioning, asthma (albuterol), aspirin dose for suspected MI, and CPR compression rate/depth/ratios. UNVERIFIED.
 
 ### 3.9 Prescriptions (5%) [DSE: Therapeutics]
 
@@ -443,7 +492,7 @@ dose and frequency/duration. [DLM p.9] Self-check: always write all four.
 12. **Clindamycin is no longer recommended for IE prophylaxis.** Do not give cephalosporins to anyone with anaphylaxis, angioedema or urticaria to penicillin. [AHA21 Table 5 notes]
 13. If the dose was missed, it can be given up to 2 hours after the procedure; if the patient is already on a short antibiotic course, choose a different class (or wait 10 days). [AHA21 p.e973]
 14. Analgesic task: NSAID first (ibuprofen 400 mg or naproxen sodium 440 mg), with acetaminophen 500 mg if needed; respect daily maximums (2,400 / 1,100 / 4,000 mg). [ADA-PAIN]
-15. Prosthetic joint prophylaxis (ADA 2015 says generally not indicated): ada.org blocked, not re-verified. UNVERIFIED.
+15. Prosthetic joints: the 2015 ADA guideline (from a 2014 systematic review that found no link between dental procedures and prosthetic joint infection) says prophylactic antibiotics are generally not recommended before dental procedures. Decisions for the rare exception are shared among dentist, orthopedic team and patient; if antibiotics are judged necessary, the orthopedic surgeon should choose the regimen and ideally write the prescription. [ADA-AP]
 
 ### 3.10 Infection control [DSE: Cross-cutting 20%; not a DLOSCE area, but enforced on the ADEX clinical floor]
 
@@ -457,6 +506,11 @@ dose and frequency/duration. [DLM p.9] Self-check: always write all four.
 8. Use single-dose vials for parenteral medications whenever possible. [CDC16]
 9. Hepatitis B vaccine is offered at no cost to at-risk staff; check anti-HBs 1-2 months after the 3-dose series. [CDC16 checklist]
 10. On the ADEX clinical exam, a dropped or contaminated instrument must be reported to the Chief Examiner; continuing to use it without that discussion is a 100-point penalty. [CM p.12]
+11. Hand hygiene: when hands are visibly soiled, after bare-handed contact with contaminated items, before and after each patient, and before gloving and right after removing gloves; soap and water if visibly soiled, otherwise an alcohol-based rub is fine. Surgical hand antisepsis before sterile gloves for oral surgery. [CDC16 p.7]
+12. Safe injections: never use a needle or syringe (this includes manufactured prefilled syringes and devices such as insulin pens) for more than one patient; enter every medication container with a new needle and new syringe, even for the same patient; wipe the vial septum with alcohol before piercing. [CDC16 p.10-11]
+13. Multidose vials: dedicate to one patient when possible; if shared, keep them in a central medication area out of the operatory; date on opening and discard within 28 days unless the maker says otherwise. [CDC16 p.11]
+14. Sterilization monitoring uses three kinds of indicator: mechanical (gauges/printouts of time, temperature, pressure), chemical (inside every package, plus an external one if the internal one is not visible) and biological (spore tests with Geobacillus or Bacillus species, at least weekly). If a chemical indicator did not change, do not use those instruments. [CDC16 p.13]
+15. Label packages with sterilizer, cycle/load number and date; store sterile packs in closed cabinets; any wet, torn or punctured pack is cleaned, repackaged and re-sterilized before use. [CDC16 p.13]
 
 ## 4. Clinical sections: grading criteria as self-check lists
 
@@ -735,11 +789,11 @@ penalty for any wrong pick [DLM p.7-8], so ADEX-tagged practice should include t
 - **UAB timing** (CIF at UAB? which year? which parts?): ask Sam or the school. The CIF rules allow D3/D4.
 - **AHA 2021 IE statement** was read from a third-party-hosted copy of the publisher PDF (ahajournals.org 403):
   verify against the journal before publishing items built on it.
-- Gaps marked UNVERIFIED in section 3 that still need a primary source: hypoglycemia management (ADA Standards
-  of Care), CPR/BLS steps (AHA), asthma, syncope, aspirin for suspected MI, prosthetic-joint prophylaxis (ADA
-  2015), 2017 gingivitis and peri-implant case definitions, implant spacing and removable-prosthodontics facts,
-  third molars, anticoagulants and dry socket. Prosthodontics (19% of the DLOSCE) is the thinnest area here
-  outside the ADEX crown-prep criteria, so it should be the next research target.
+- Gaps marked UNVERIFIED in section 3 that still need a primary source: CPR/BLS steps (AHA), asthma, syncope,
+  aspirin for suspected MI, the gram dose of glucose for hypoglycemia, Applegate's individual rules, the size of
+  the interocclusal rest space, implant-to-tooth distance, third molars, anticoagulants and dry socket.
+  Prosthodontics (19% of the DLOSCE) now has definitions (GPT-10) but still no complete-denture or RPD-design
+  guideline; occlusion and removable design remain the next research target.
 - The DSE OSCE content outline (section 2b) is obsolete for anyone registering after 6/1/2026; keep it only as a
   secondary map and drop it next season if ADEX removes the manual.
 - Yearly re-check: ADEX publishes new manuals and criteria sheets every August (this file = 2026-2027 season,
