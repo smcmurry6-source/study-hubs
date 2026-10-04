@@ -339,7 +339,92 @@ Standards of Care 2026 (Diabetes Care 2026;49 Suppl 1) were **not** opened (publ
 
 ## 6. MRONJ (AAOMS 2022), osteoradionecrosis, chemotherapy patients
 
-_pending_
+**Sources.** Ruggiero SL et al. *American Association of Oral and Maxillofacial Surgeons' Position Paper on
+Medication-Related Osteonecrosis of the Jaws, 2022 Update.* J Oral Maxillofac Surg 2022;80:920-943; PDF from
+https://aaoms.org/wp-content/uploads/2024/03/mronj_position_paper.pdf (page numbers below are the
+PDF's own "PAGE n" footers). NIDCR, *Oncology Pocket Guide to Oral Health* (dental provider version, marked
+**ARCHIVED** on the PDF), https://www.nidcr.nih.gov/sites/default/files/2020-06/oncology-guide-dental-provider.pdf .
+NCI PDQ, *Oral Complications of Chemotherapy and Head/Neck Radiation, Health Professional Version* (updated
+Feb 16, 2024), https://www.cancer.gov/about-cancer/treatment/side-effects/mouth-throat/oral-complications-hp-pdq .
+Duduveche AE et al., *Beyond Oral Health: Personalized Strategies for Managing Oral Infections in Neutropenic
+Patients*, J Pers Med 2026;16:53, https://europepmc.org/article/PMC/PMC12842819 . Implant-after-RT review, Healthcare
+(Basel) 2026, doi:10.3390/healthcare14182889, https://europepmc.org/article/PMC/PMC13606682 (secondary summary of the
+2024 ISOO-MASCC-ASCO ORN guideline, J Clin Oncol 2024, doi:10.1200/JCO.23.02750, **not opened**: publisher blocks bots).
+
+**MRONJ (AAOMS 2022)**
+
+- **MR-1** Case definition, all three required (p. 2): (1) current or previous **antiresorptive** therapy, alone or
+  with immune modulators or **antiangiogenic** drugs; (2) exposed bone, or bone that probes through an intraoral or
+  extraoral fistula, in the maxillofacial region persisting **more than 8 weeks**; (3) **no history of radiation**
+  to the jaws and no metastatic disease to the jaws. Unchanged from 2014.
+- **MR-2** Staging (pp. 2-3), unchanged from 2014:
+  **At risk**: no apparent necrotic bone, asymptomatic, treated with IV or oral antiresorptives.
+  **Stage 0** (nonexposed variant): no clinical necrotic bone, but nonspecific symptoms or clinical/radiographic
+  findings: unexplained odontalgia, dull jaw ache that may radiate to the TMJ, sinus pain, altered sensation;
+  tooth loosening not explained by periodontitis, intraoral or extraoral swelling; alveolar bone loss not explained by
+  periodontitis, sclerotic trabecular pattern, no new bone in extraction sockets, osteosclerosis, thickened lamina dura
+  and narrowed PDL space. Up to **50%** progress to stage 1 (p. 3).
+  **Stage 1**: exposed necrotic bone or a fistula probing to bone, **asymptomatic, no infection**.
+  **Stage 2**: the same **with infection/inflammation, symptomatic**.
+  **Stage 3**: stage 2 plus one or more of: necrosis beyond the alveolar bone (inferior border or ramus of the
+  mandible; maxillary sinus or zygoma), pathologic fracture, extraoral fistula, oral-antral or oral-nasal
+  communication, osteolysis to the inferior border of the mandible or the sinus floor.
+- **MR-3** Risk by indication (pp. 6-8): much higher in **cancer (<5%)** than in **osteoporosis (<0.05%)**.
+  Cancer: zoledronate risk is 2-10 times placebo; ranges about **1.6-4% after 2 years** and **3.8-18% beyond
+  2 years** of treatment (Ng et al. review); denosumab **0-6.9%** (most studies <5%), **1.9%** under 24 months and
+  **6.9%** over 24 months of exposure, comparable to zoledronate. Osteoporosis: IV zoledronate **<=0.02%**
+  (<=2 per 10,000); oral bisphosphonates **<=0.05%** (<=5 per 10,000); denosumab **0.3%** after 10 years (almost an
+  order of magnitude higher than bisphosphonates); romosozumab **0.03-0.05%**. Placebo groups in osteoporosis trials:
+  **0-0.02%**.
+- **MR-4** Other drugs implicated (low, level-5 evidence; p. 7): tyrosine kinase inhibitors (sunitinib), bevacizumab,
+  aflibercept, mTOR inhibitors (everolimus), radium 223, raloxifene, methotrexate and corticosteroids.
+- **MR-5** Drug holidays (p. 11): still **controversial**; the 2022 working group **could not reach consensus** (split
+  evenly between case-by-case holidays using prior recommendations and never offering them). Factors: cancer vs
+  osteoporosis, dosing frequency, duration, comorbidities, other drugs (chemotherapy, steroids, antiangiogenics),
+  infection, extent of surgery. **Denosumab** in osteoporosis: stopping risks rebound bone loss and multiple vertebral
+  fractures; if held, do the surgery **3-4 months after the last dose** and restart **6-8 weeks after** surgery.
+  Bone turnover markers (CTX) are **not** validated for decisions (p. 11; Table 2 p. 18). The older "4 years of oral
+  bisphosphonate" holiday trigger is from the 2014 paper and is **not** a 2022 recommendation.
+- **MR-6** Prevention (pp. 11-12; Table 2 p. 18): before antiresorptives for **cancer**, a full dental exam with
+  radiographs; extract nonrestorable or poor-prognosis teeth and finish needed surgery first; delay the drug, if the
+  systemic condition allows, until sites mucosalize or bone heals. For **osteoporosis**, dental optimization can run
+  concurrently with therapy. During cancer-dose therapy: avoid dentoalveolar surgery if possible, consider keeping
+  roots (root retention) instead of extracting, **implants are contraindicated**. Modifiable risk reducers: surgery
+  before therapy, pre/postoperative antibiotics and antimicrobial rinses, primary closure, good oral hygiene (p. 11).
+
+**Osteoradionecrosis (ORN)**
+
+- **ORN-1** ORN is excluded from the MRONJ definition: a history of jaw radiation rules MRONJ out (MR-1).
+- **ORN-2** Before head and neck radiation: exam about **1 month** ahead if possible; finish invasive procedures at
+  least **14 days before** radiation starts (NIDCR guide, "Pre-cancer Treatment"). After radiation: avoid elective
+  oral surgery on irradiated bone; if an extraction is unavoidable, keep it conservative with antibiotic coverage and
+  possibly hyperbaric oxygen (NIDCR guide, "After Radiation Therapy"); lifelong daily **fluoride gel** (1.1% neutral
+  sodium fluoride or 0.4% stannous fluoride gel, not rinses) for xerostomia; recall every **4-8 weeks** for the first
+  6 months; trismus exercises (NIDCR guide).
+- **ORN-3** Newer evidence: the HOPON randomized trial found **no reduction** in ORN with prophylactic hyperbaric
+  oxygen for extractions/implants in mandibular sites over **50 Gy**, and the 2024 ISOO-MASCC-ASCO guideline does
+  **not** recommend routine prophylactic HBO (selective use may be considered); it gives only a weak recommendation for
+  perioperative pentoxifylline (with tocopherol) in selected high-risk patients (Healthcare 2026 review, citing the
+  guideline). Risk rises with dose to the bone (implant failure strongly predicted above ~50 Gy at the site; same
+  review). For exam keys: "HBO before extraction in irradiated bone" is the older NIDCR teaching; avoid making it the
+  single right answer.
+
+**Chemotherapy patients**
+
+- **CH-1** Timing: invasive dental procedures **7-10 days before** myelosuppressive chemotherapy; postpone elective
+  oral surgery until cancer treatment is done (NIDCR guide, "Pre-cancer Treatment").
+- **CH-2** During chemotherapy: consult the oncologist before any procedure, including a prophylaxis; get blood work
+  **within 24 hours** before oral surgery or other invasive procedures; **postpone** if platelets are **under
+  75,000/mm3** (or clotting factors abnormal) or the **ANC is under 1,000/mm3** (or consider prophylactic
+  antibiotics) (NIDCR guide, "During Chemotherapy").
+- **CH-3** Infection risk climbs as ANC falls **below 1,000/uL**; spontaneous gingival oozing can occur when platelets
+  drop **below 20,000/uL**; thrombocytopenic patients needing extractions may need coordinated **platelet
+  transfusion** (NCI PDQ). Many teaching sources use **50,000/mm3** as the platelet floor for extractions; the opened
+  NIDCR guide uses 75,000 (key 75,000 when citing NIDCR; otherwise state the threshold in the stem).
+- **CH-4** IDSA/ASCO recommend systemic antibacterial prophylaxis (usually a fluoroquinolone) only for expected
+  profound, prolonged neutropenia (**ANC <500/uL for 7 days or more**), for the whole neutropenic period, **not**
+  specifically for dental procedures (J Pers Med 2026, Table 3). Central venous catheter: ask the oncologist about
+  prophylaxis (NIDCR guide; ADA page, PJ-4).
 
 ## 7. Pregnancy and lactation
 
