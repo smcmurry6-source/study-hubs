@@ -603,7 +603,8 @@
     prof: ["Quoting the professor? Very on brand."],
     konami: ["Whoa. Am I... pixels?"],
     holiday: ["Happy holidays from your favorite tooth!"],
-    timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain."]
+    timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain.",
+      "Did he curse you? Don't worry. His curses never work. I'm the good Timmy.", "I TOLD you not to type my name."]
   };
   /* ---------- holiday talk: greetings, answer quips and jokes per holiday (holidayId()), plus a fall pool for the
      autumn weeks no holiday covers (isFall()). Lines are dealt from a shuffled deck per pool (deal()), so every line
