@@ -428,11 +428,146 @@ Patients*, J Pers Med 2026;16:53, https://europepmc.org/article/PMC/PMC12842819 
 
 ## 7. Pregnancy and lactation
 
-_pending_
+**Sources.** ADA Oral Health Topics, "Pregnancy" (last updated July 14, 2025),
+https://www.ada.org/resources/ada-library/oral-health-topics/pregnancy (cites ACOG Committee Opinion 569, *Oral Health
+Care During Pregnancy and Through the Lifespan*, 2013, reaffirmed). FDA, "Pregnancy and Lactation Labeling Resources"
+(PLLR), https://www.fda.gov/drugs/labeling-information-drug-products/pregnancy-and-lactation-labeling-drugs-final-rule .
+FDA label, ibuprofen tablets 400/600/800 mg (Ascend, Sep 2026), https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=7c7b815b-d6f5-4ce6-b37f-f35d5c9f3254 ;
+FDA label, doxycycline hyclate, https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35 .
+
+- **PG-1** Timing: preventive, diagnostic and restorative care is safe **throughout** pregnancy; radiographs and local
+  anesthesia are safe **at any point**; ADA and ACOG agree that emergency care (extractions, root canals,
+  restorations) can be done during pregnancy and that delay can make problems worse (ADA page, Key Points and
+  "Dental Treatment"). The traditional "second trimester is the most comfortable time for elective care" is a
+  teaching convention, **not** in the opened ADA page; don't key a question that says care must wait for it.
+- **PG-2** Positioning to avoid supine hypotension (aortocaval compression, tilting toward the left side) late in
+  pregnancy is standard teaching but was **UNVERIFIED** in an opened source here.
+- **PG-3** Periodontitis that develops in pregnancy: scaling and root planing is safe; treating maternal periodontal
+  disease is not associated with adverse maternal or birth outcomes (ADA page quoting ACOG).
+- **PG-4** Safe choices named by ADA: **local anesthetics with or without epinephrine** (e.g., lidocaine,
+  mepivacaine, bupivacaine); antibiotics **penicillin, amoxicillin, cephalosporins, clindamycin, metronidazole**
+  (ADA page, "Medication Selection"). For pain relievers, consult the obstetrician: FDA said in 2015 that research was
+  too limited to make recommendations (ADA page).
+- **PG-5** Nitrous oxide: ADA recommends pregnant patients and staff avoid exposure (it lists N2O as old category C)
+  (ADA page, "Nitrous Oxide"). Radiographs: safe at any stage; **abdominal and thyroid shielding are no longer
+  recommended** (AAOMR 2023, cited on ADA page). Pregnant radiation workers should tell the employer in writing; a dental
+  worker is unlikely to approach the **1 mSv per year** exposure limit the page cites (ADA page, "Radiographs").
+- **PG-6** NSAIDs (ibuprofen label, Warnings and Precautions): avoid at **about 30 weeks and later** (premature closure
+  of the fetal **ductus arteriosus**); at **about 20 weeks or later** they can cause fetal renal dysfunction leading to
+  **oligohydramnios** and neonatal renal impairment; if needed between about 20 and 30 weeks, use the lowest dose for
+  the shortest time, and consider amniotic fluid ultrasound if use goes beyond **48 hours**.
+- **PG-7** Tetracyclines (doxycycline label, Warnings): use during tooth development (**last half of pregnancy,
+  infancy and childhood to age 8**) can cause permanent yellow-gray-brown tooth discoloration; avoid in pregnancy and
+  in children 8 and under unless benefits outweigh risks in severe infections.
+- **PG-8** FDA labeling: the **Pregnancy and Lactation Labeling Rule (PLLR)**, published Dec 2014, effective
+  **June 30, 2015**, **removed the letter categories A, B, C, D and X** from prescription drug labels and replaced
+  them with narrative subsections **8.1 Pregnancy** (with pregnancy exposure registry information), **8.2 Lactation**
+  (replacing "Nursing mothers") and **8.3 Females and Males of Reproductive Potential** (pregnancy testing,
+  contraception, infertility). New drugs after June 30, 2015 use it immediately; labels approved on or after
+  June 30, 2001 were phased in. **OTC labels are not affected** (FDA PLLR page). ADA gives a full compliance date of
+  June 2020 (ADA page).
+- **PG-9** Lactation: check the label's 8.2 section or NLM **LactMed** (ADA page, "Lactation").
 
 ## 8. Dental pharmacology: pain, opioids, antibiotics, antifungals, antivirals, interactions
 
-_pending_
+**Sources.** Carrasco-Labra A, Polk DE, Urquhart O, et al. *Evidence-based clinical practice guideline for the
+pharmacologic management of acute dental pain in adolescents, adults, and older adults: a report from the ADA
+Science & Research Institute, University of Pittsburgh and University of Pennsylvania.* JADA 2024;155(2):102-117.e9,
+https://pmc.ncbi.nlm.nih.gov/articles/PMC10919895/ . Lockhart PB, Tampi MP, Abt E, et al. *Evidence-based clinical
+practice guideline on antibiotic use for the urgent management of pulpal- and periapical-related dental pain and
+intraoral swelling.* JADA 2019;150(11):906-921.e12, https://pmc.ncbi.nlm.nih.gov/articles/PMC8270006/ .
+FDA labels (DailyMed): ibuprofen https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=7c7b815b-d6f5-4ce6-b37f-f35d5c9f3254 ; fluconazole https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=b5cfe0a1-f55c-41b1-8ad6-d1d0134a4d1d ;
+nystatin oral suspension https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=4a670371-d373-1ba6-e063-6394a90a13b6 ; valacyclovir https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=1ac7a13e-3f30-e140-e063-6394a90aa09d ;
+metronidazole https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=9ed89bfc-ccf3-4e6c-924f-2a14bf82163f ; clarithromycin https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=d836ae7e-fdbf-4dcb-a90d-ede1dcbc3e67 ;
+amoxicillin https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=9b3ab9ea-caee-4186-9068-43ca527c098d ; doxycycline (section 7).
+
+**Acute dental pain (ADA 2024)**
+
+- **RX-1** Scope: adolescents (12+), adults and older adults; after tooth extraction(s) and for **temporary**
+  management of toothache before definitive care (Recommendations, JADA 2024). Key message: **nonopioid** analgesics,
+  especially an **NSAID alone or with acetaminophen**, are first-line; opioids are reserved for when first-line therapy
+  is insufficient or contraindicated (Summary; Discussion).
+- **RX-2** Suggested starting doses (Recommendations 1.1, 2.1, toothache 2.1): **ibuprofen 400 mg** or **naproxen
+  sodium 440 mg**, alone or with **acetaminophen 500 mg**. NSAID contraindicated: acetaminophen alone at full dose
+  (e.g., **1,000 mg**) (1.4, 2.2).
+- **RX-3** Opioids: for **simple** extractions the panel recommends **against** opioids (rec. 2). For surgical
+  extractions or toothache, only in rare cases where NSAID ± acetaminophen fails: add or switch to acetaminophen
+  325 mg + an acetaminophen/opioid combination (e.g., **hydrocodone 5-7.5 mg** or **oxycodone 5 mg**) at the lowest
+  dose, fewest tablets and shortest duration, which **rarely exceeds 3 days** (1.2-1.4; toothache 2.2-2.4). Avoid
+  "just-in-case" delayed opioid prescriptions (Discussion).
+- **RX-4** Maximum daily doses in the guideline: **ibuprofen 2,400 mg**, **naproxen sodium 1,100 mg**,
+  **acetaminophen 4,000 mg** (footnotes to Table; good practice statements). Warn that acetaminophen-opioid
+  combinations also contain acetaminophen (cumulative dose). Note: the prescription ibuprofen label allows up to
+  **3,200 mg/day** for arthritis (ibuprofen label, Dosage and Administration); key 2,400 mg for dental pain.
+- **RX-5** Corticosteroids added to standard analgesia after surgical extraction: suggested **against** (1.5).
+  Long-acting LA after extraction: **bupivacaine 0.5% with epi 1:200,000** (block or infiltration) or articaine 4%
+  infiltration before discharge (rec. 3). Toothache: short-acting LA (lidocaine 2% or articaine 4% with 1:100,000)
+  for immediate relief (toothache rec. 1).
+- **RX-6** Opioid safety (good practice statements): shared decision making and informed consent covering dependence,
+  misuse, respiratory depression and driving, especially in adolescents and young adults; FDA (2020): discuss
+  **naloxone** with everyone prescribed an opioid; FDA (2018): **tramadol contraindicated under 18** after
+  tonsillectomy/adenoidectomy; codeine and tramadol not recommended in adolescents **12-18** who are obese or have
+  obstructive sleep apnea or severe lung disease; breastfeeding not recommended on codeine or tramadol. In 2019,
+  **39.5%** of dentists' opioid prescriptions were "high risk" (e.g., opioid-naive patients given more than a 3-day
+  supply) (Introduction).
+- **RX-7** NSAID cautions (ibuprofen label): boxed warning for cardiovascular thrombotic events (MI, stroke) and GI
+  bleeding; contraindicated around **CABG** surgery; ibuprofen can blunt low-dose aspirin's antiplatelet effect
+  (Clinical Pharmacology); pregnancy limits in PG-6.
+
+**Antibiotics for pulpal/periapical pain and swelling (ADA 2019), immunocompetent adults**
+
+- **AB-1** **Symptomatic irreversible pulpitis** (with or without symptomatic apical periodontitis): **no
+  antibiotics**, whether or not definitive care is immediately available (strong recommendation against when not
+  available; conditional against as an adjunct to definitive care) (Recs for Questions 1 and 4).
+- **AB-2** **Pulp necrosis with symptomatic apical periodontitis**: no antibiotics (conditional) when definitive care
+  is not immediately available; refer for definitive conservative treatment (Question 2).
+- **AB-3** **Pulp necrosis with localized acute apical abscess** (no fascial space spread, fever or malaise): if
+  definitive care is **not** immediately available, give **amoxicillin 500 mg three times a day, 3-7 days**, or
+  **penicillin VK 500 mg four times a day, 3-7 days** (conditional, possibly delayed prescription) (Question 2). As an
+  adjunct when definitive care (pulpectomy, RCT, incision and drainage) is done: **no antibiotics** (strong) (Question 3).
+- **AB-4** **Acute apical abscess with systemic involvement** (fever, malaise, lymph node or fascial space
+  involvement): urgent definitive conservative treatment **plus** amoxicillin or penicillin VK as in AB-3 (good practice
+  statements). Rapidly spreading swelling or airway risk goes to urgent care / ED (Table footnote).
+- **AB-5** Amoxicillin is preferred over penicillin VK (better against gram-negative anaerobes, fewer GI effects)
+  (Table 2 footnote). Penicillin allergy **without** anaphylaxis, angioedema or hives: **cephalexin 500 mg four times
+  a day, 3-7 days**. **With** anaphylaxis/angioedema/hives history: **azithromycin 500 mg day 1, then 250 mg daily for
+  4 more days**, or **clindamycin 300 mg four times a day, 3-7 days**; azithromycin has higher resistance and
+  clindamycin raises *C. difficile* risk even after one dose (Table 2 footnotes). About **10%** self-report penicillin
+  allergy; **under 1%** are truly allergic (Discussion).
+- **AB-6** No response to first-line: add **metronidazole 500 mg three times a day, 7 days**, or switch to
+  **amoxicillin/clavulanate 500/125 mg three times a day, 7 days** (Table 2 footnotes). Re-evaluate within **3 days**;
+  stop antibiotics **24 hours after symptoms completely resolve** (Table 2 footnotes; Discussion).
+- **AB-7** Definitive conservative dental treatment (DCDT) = pulpotomy, pulpectomy, root canal debridement, nonsurgical
+  RCT or incision and drainage; **extractions are outside this guideline's scope** (recommendation table footnote).
+
+**Antifungals and antivirals (labels)**
+
+- **AF-1** Nystatin oral suspension 100,000 units/mL: adults and children **4-6 mL (400,000-600,000 units) four times
+  daily**, half in each side of the mouth, held as long as possible before swallowing; infants 2 mL (200,000 units)
+  four times daily (nystatin label, Dosage and Administration).
+- **AF-2** Fluconazole for oropharyngeal candidiasis: **200 mg on day 1, then 100 mg once daily**, for **at least
+  2 weeks** to reduce relapse (fluconazole label, Dosage and Administration).
+- **AF-3** Clotrimazole troche (10 mg dissolved in the mouth five times a day for 14 days) is common teaching:
+  **UNVERIFIED** (label not opened).
+- **AV-1** Valacyclovir for cold sores (herpes labialis), adults and children **12 and older**: **2 g every 12 hours
+  for 1 day** (two doses), started at the earliest symptom (tingling, itching, burning) (valacyclovir label, Dosage
+  and Administration).
+
+**High-yield drug interactions (labels)**
+
+- **DI-1** **Metronidazole + warfarin**: potentiates warfarin and prolongs prothrombin time; monitor PT/INR
+  (metronidazole label, Precautions, Drug Interactions). **Metronidazole + alcohol**: disulfiram-like reaction
+  (cramps, nausea, vomiting, headache, flushing); no alcohol or propylene glycol during and for **at least 3 days**
+  after. Don't give within **2 weeks** of disulfiram (psychotic reactions). Can raise **lithium** levels (same label).
+- **DI-2** **Fluconazole (azoles) + warfarin**: raised prothrombin time and bleeding events; **+ sulfonylureas**
+  (glipizide, glyburide): clinically significant hypoglycemia; **+ statins** metabolized by CYP3A4 (atorvastatin,
+  simvastatin) or CYP2C9 (fluvastatin): myopathy and rhabdomyolysis; QT prolongation risk, and avoid with
+  erythromycin (fluconazole label, Warnings; Drug Interactions).
+- **DI-3** **Clarithromycin** is **contraindicated with lovastatin and simvastatin** (rhabdomyolysis), with lomitapide,
+  cisapride and pimozide (QT/arrhythmia), and with colchicine in renal or hepatic impairment (clarithromycin label,
+  4 Contraindications). Azithromycin/clarithromycin and QTc: see IE-8.
+- **DI-4** Tetracyclines: tooth discoloration (PG-7). NSAIDs blunt aspirin's antiplatelet effect (RX-7).
+  Epinephrine interactions: VC-3 to VC-7.
 
 ## 9. Medical emergencies, emergency kit, BLS/CPR
 

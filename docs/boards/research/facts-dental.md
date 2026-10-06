@@ -119,7 +119,64 @@ here first, then grep the bank for the id.
 
 ## 2. Endodontic diagnosis (AAE terminology) and pulp/periapical tests
 
-_(pending)_
+**Sources.** The AAE's own pages (aae.org: "Endodontic Diagnosis", Colleagues for Excellence, Fall 2013, and the AAE
+Consensus Conference Recommended Diagnostic Terminology, Glickman GN, J Endod 2009;35:1619-1620, PubMed 19932338)
+are **blocked by this environment's egress policy**, so the terms below come from two open-access papers that
+reproduce them:
+- Azim AA, Merdad K, Peters OA. Diagnosis consensus among endodontic specialists and general practitioners: an
+  international survey and a proposed modification. Int Endod J 2022;55:1202-1211, https://pmc.ncbi.nlm.nih.gov/articles/PMC9826047/ (Introduction; Table 3).
+  Cited as "IEJ 2022".
+- Symptomatic irreversible pulpitis and other orofacial pain: overcoming challenges in diagnosis and management.
+  Br Dent J 2025;238:517-, https://pmc.ncbi.nlm.nih.gov/articles/PMC11991903/ (Table 1, "Pulp and periapical
+  diagnosis based on the AAE classification"). Cited as "BDJ 2025".
+Before keying a question on a fine wording point, re-check against the AAE PDF from an unblocked network.
+
+**The terms**
+- **EN-1** The 2008 AAE consensus conference produced **13 diagnostic terms: 7 pulpal and 6 periapical** (IEJ 2022,
+  Introduction). Pulpal: normal pulp, reversible pulpitis, symptomatic irreversible pulpitis, asymptomatic irreversible
+  pulpitis, pulp necrosis, previously treated, previously initiated therapy. Apical: normal apical tissues,
+  symptomatic apical periodontitis, asymptomatic apical periodontitis, acute apical abscess, chronic apical abscess,
+  condensing osteitis (BDJ 2025, Table 1).
+- **EN-2** Normal pulp: symptom-free and responds normally to pulp testing; a cold response is felt but fades within
+  about 1-2 seconds (IEJ 2022, Table 3; BDJ 2025, Table 1).
+- **EN-3** Reversible pulpitis: inflammation expected to resolve once the cause (e.g., caries) is removed; no
+  spontaneous pain; cold/sweet discomfort that fades quickly (BDJ table: 2 seconds or less); no percussion tenderness;
+  no apical radiographic change (BDJ 2025, Table 1).
+- **EN-4** Symptomatic irreversible pulpitis: vital, inflamed pulp that cannot heal; descriptors are **lingering
+  thermal pain, spontaneous pain and referred pain** (IEJ 2022, Table 3). BDJ 2025 operationalizes "lingering" as
+  thermal pain lasting more than 30 seconds; EPT usually still positive; percussion pain in some cases (Table 1).
+- **EN-5** Asymptomatic irreversible pulpitis: vital, inflamed pulp that cannot heal but with no symptoms and normal
+  thermal responses; the clue is objective, e.g., deep caries or fracture encroaching on the pulp (IEJ 2022, Table 3;
+  BDJ 2025, Table 1).
+- **EN-6** Pulp necrosis: no response to sensibility testing; may carry an apical diagnosis (BDJ 2025, Table 1).
+- **EN-7** Previously treated = canals already obturated (with materials other than intracanal medicaments).
+  Previously initiated therapy = partial endodontic therapy already done (e.g., pulpotomy, pulpectomy, access)
+  (IEJ 2022, Table 3; BDJ 2025, Table 1).
+- **EN-8** Normal apical tissues: not sensitive to percussion or palpation; intact lamina dura and uniform PDL space
+  (BDJ 2025, Table 1).
+- **EN-9** Symptomatic apical periodontitis: apical inflammation of pulpal origin with a painful response to biting
+  and/or percussion or palpation; a radiolucency **may or may not** be present (IEJ 2022, Table 3).
+- **EN-10** Asymptomatic apical periodontitis: apical inflammation and destruction of pulpal origin that shows as an
+  apical radiolucency and causes no clinical symptoms (IEJ 2022, Table 3).
+- **EN-11** Acute apical abscess: rapid onset, spontaneous pain, tooth tender to pressure, pus and swelling (IEJ 2022,
+  Table 3). Chronic apical abscess: gradual onset, little or no discomfort, intermittent pus discharge through a
+  **sinus tract** (IEJ 2022, Table 3).
+- **EN-12** Condensing osteitis: diffuse radiopaque lesion at or around the root apex, a localized bone reaction to a
+  low-grade inflammatory stimulus (IEJ 2022, Table 3; BDJ 2025, Table 1).
+
+**Which test separates which**
+- **EN-13** Thermal (cold) response separates the pulpal categories: normal and reversible = brief response that
+  resolves; symptomatic irreversible = lingering pain; necrosis = no response (BDJ 2025, Table 1).
+- **EN-14** Percussion/bite tenderness points to the apical diagnosis (symptomatic apical periodontitis), not the
+  pulp diagnosis; a radiolucency with no tenderness = asymptomatic apical periodontitis; a sinus tract = chronic
+  apical abscess; swelling with rapid onset = acute apical abscess (BDJ 2025, Table 1; IEJ 2022, Table 3).
+- **EN-15** Endodontic diagnosis is stated as a pulpal diagnosis **and** an apical (periapical) diagnosis for the
+  tooth (BDJ 2025, text before Table 1; IEJ 2022, Introduction).
+- **EN-16** Teeth that are calcified, traumatized, irradiated or had vital pulp therapy may not respond to pulp
+  testing without being necrotic; IEJ 2022 proposes an "inconclusive pulp condition" term for them (a proposal, not
+  current AAE terminology) (IEJ 2022, Table 2).
+- **EN-17** UNVERIFIED (AAE source blocked): specific technique details such as cold refrigerant temperature, EPT
+  behavior in immature teeth, and the AAE's own wording of the cracked-tooth bite test. Do not key items on these yet.
 
 ## 3. Caries: ADA Caries Classification System, risk assessment, fluoride, SDF, sealants
 
