@@ -10,8 +10,8 @@ const { SB_KEY, ADMIN_SECRET } = process.env;
 if (!SB_KEY || !ADMIN_SECRET) { console.error('SB_KEY and ADMIN_SECRET must be set'); process.exit(1); }
 const BASE = 'https://thytmzsgymydbzcqdnix.supabase.co/rest/v1/rpc/';
 // same as review/index.html
-const HUB_COLOR = { hepatobiliary: '#DDAE52', 'gi-exam1': '#DDAE52', 'msk-exam3': '#DDAE52', perio: '#E88EA9', genetics: '#6FC2B8', 'fixed-pros': '#E08566' };
-const HUB_TITLE = { hepatobiliary: 'GI Exam 2', 'gi-exam1': 'GI Exam 1', 'msk-exam3': 'MSK Exam 3', perio: 'Periodontology', genetics: 'Genetics', 'fixed-pros': 'Fixed Pros' };
+const HUB_COLOR = { hepatobiliary: '#DDAE52', 'gi-exam1': '#DDAE52', 'msk-exam3': '#DDAE52', 'msk-exam4': '#DDAE52', perio: '#E88EA9', genetics: '#6FC2B8', 'fixed-pros': '#E08566' };
+const HUB_TITLE = { hepatobiliary: 'GI Exam 2', 'gi-exam1': 'GI Exam 1', 'msk-exam3': 'MSK Exam 3', 'msk-exam4': 'MSK Exam 4', perio: 'Periodontology', genetics: 'Genetics', 'fixed-pros': 'Fixed Pros' };
 
 // widget/recap.js's snapshot(): the fields the dashboard draws, names dropped when they're off
 const sandbox = { window: {} }; vm.createContext(sandbox);
