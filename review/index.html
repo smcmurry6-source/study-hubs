@@ -236,7 +236,7 @@ table.data tr.group:hover td{background:none;}
   var SESSION_KEY = "sh_admin_secret";
   var PREF_KEY = "sh_admin_prefs";
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", dashboard: "Dashboard" };
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", dashboard: "Dashboard" };
   /* hubs that are no longer on the live site -- hidden unless "Include archived hubs" is on */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
 
@@ -774,8 +774,8 @@ table.data tr.group:hover td{background:none;}
   }
 
   /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
-  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
-  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion Midterm", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
+  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
+  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion Midterm", "pcd-exam3": "PCD Fixed Pros Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
   /* archived hubs' questions live in question-banks/; live hubs publish theirs as SH_EXPORT */
   var ARCHIVE_BANK = { hepatobiliary: "gi2-question-bank.json", "gi-exam1": "gi1-question-bank.json" };
   var recapBanks = {};
