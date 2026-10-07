@@ -88,9 +88,9 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   histology (Herr), L29 derm pharm (Fasinu), L30 dermpath (Dababneh), L31 skeletal muscle (Latimer), L32 NMJ pharm
   (Wilborn) and Dr. Taylor's MSK & skin clinical application (labeled `CA` via a new `label` field and `lecLabel()`).
   Built on the MSK Exam 3 engine with a new palette/type ("dermis & myoglobin"; Newsreader / Instrument Sans / IBM Plex
-  Mono). 238 questions: 11 lecture self-checks, 44 rewritten from a classmate's study deck, 183 hub-written, including 15
-  two-statement (`fmt:'2stmt'`, fixed choice order), 13 EXCEPT, 7 Patient Box (`pbox`) and 2 select-all (`type:'multi'`,
-  perio-style partial credit) items, all ported into this engine (qCardHTML, the mock exam, arcade pools skip `fmt` items).
+  Mono). 223 questions: 11 lecture self-checks, 44 rewritten from a classmate's study deck, 168 hub-written, including
+  13 EXCEPT, 7 Patient Box (`pbox`) and 2 select-all (`type:'multi'`, perio-style partial credit) items, ported into this
+  engine (qCardHTML, the mock exam; arcade pools skip `pbox` items). **No two-statement items in this hub** (Sam, 10-07).
   **Last year's graded Canvas quiz screenshots in the Exam 4 study deck were deliberately left out** (syllabus rule, as in
   #64); their concepts are covered by new questions. As taught + Plain English notes for all six lectures with Kokoro
   narration, a "what's tested" box and comparison tables per lecture, a one-tap quick-start row on Compendium, 35 exam

@@ -597,9 +597,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .weak-meter{display:block;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:4px}
 .weak-meter i{display:block;height:100%;background:var(--t, var(--accent));border-radius:99px}
 
-/* ---------- Exam 4 additions: two-statement items, Patient Box, select-all, quick start, "what's tested" ---------- */
-.qcard-stem .stmt{display:block;padding:6px 10px;margin:4px 0;border-left:3px solid var(--line-strong);background:var(--surface-2);border-radius:0 8px 8px 0;font-weight:500}
-.qcard-stem .stmt b{font-family:var(--font-mono);font-size:.78rem;color:var(--accent-ink);margin-right:6px}
+/* ---------- Exam 4 additions: Patient Box, select-all, quick start, "what's tested" ---------- */
 .pbox{border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);padding:10px 14px;margin:0 0 12px}
 .pbox-head{display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
 .pbox-head .ic{width:14px;height:14px}
@@ -742,7 +740,6 @@ var LECTURES = [
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order.
-   Two-statement items (fmt:'2stmt') keep their four choices in a fixed order and carry their own answer index.
    type:'multi' = select all that apply (partial credit), correct:[indexes].
    pbox = Patient Box rows shown above the stem.
    src: lecture-quiz = self-check slide in the lecture deck, deck = rewritten from the class Exam 4 study deck
@@ -754,12 +751,6 @@ function mcq(id, lec, src, stem, choices, ex, extra){ var q = { id:id, lec:lec, 
 function seq(id, lec, src, stem, steps, ex, extra){ var q = { id:id, lec:lec, type:'sequence', stem:stem, steps:steps, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
 function match(id, lec, src, stem, pairs, ex, extra){ var q = { id:id, lec:lec, type:'match', stem:stem, pairs:pairs, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
 function multi(id, lec, src, stem, choices, correct, ex, extra){ var q = { id:id, lec:lec, type:'multi', stem:stem, choices:choices, correct:correct, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
-var TWO_CHOICES = ['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'];
-/* key: 'TT' | 'FF' | 'TF' | 'FT' */
-function two(id, lec, src, s1, s2, key, ex, extra){
-  var q = { id:id, lec:lec, type:'mcq', fmt:'2stmt', stem:'Statement 1: ' + s1 + '\nStatement 2: ' + s2, choices:TWO_CHOICES.slice(), answer:['TT','FF','TF','FT'].indexOf(key), ex:ex||'', src:src };
-  if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q);
-}
 
 /* =================================================================== L28 HISTOLOGY OF SKIN */
 mcq('sk-kc95','skin','deck','Which cell type makes up about 95% of the cells of the epidermis?',
@@ -892,12 +883,6 @@ mcq('sk-vitd','skin','hub','Which biotransformation function belongs to the skin
 match('sk-cells-match','skin','hub','Match each skin cell to its job.',
   [['Keratinocyte','Barrier and keratin'],['Melanocyte','Pigment to neighbors'],['Langerhans cell','Antigen presentation'],['Merkel cell','Light-touch sensing']],
   'Keratinocytes ~95% (basale to corneum); melanocytes 1-3% (basale); Langerhans 1-3% (spinosum, MHC I and II, migrate to lymphatics); Merkel cells (basale, with nerve endings).');
-two('sk-2s-desmo','skin','hub','Desmosomes attach basal keratinocytes to the basement membrane.','Melanocytes form desmosomal attachments with surrounding keratinocytes.','FF',
-  'Both false. Desmosomes join keratinocyte to keratinocyte; HEMIdesmosomes attach the basal cells to the basement membrane. Melanocytes do NOT form desmosomes with their neighbors (they attach to the basement membrane), which is why they can look pale on H&E.');
-two('sk-2s-reticular','skin','hub','The reticular dermis is thicker and less cellular than the papillary dermis.','The epidermis contains blood capillaries that supply the stratum basale.','TF',
-  'Statement 1 is true: reticular = thick, dense, mostly type I collagen. Statement 2 is false: the epidermis is avascular and fed by diffusion from dermal capillary loops.');
-two('sk-2s-lc','skin','hub','Langerhans cells are derived from bone marrow precursors.','Activated Langerhans cells leave the skin through lymphatics to activate the adaptive immune system.','TT',
-  'Both true. They seed the epidermis around 12 weeks of gestation, can self-renew, survey the epidermis at rest, and migrate to lymph nodes when activated by pathogen signals.');
 mcq('sk-ex-thick','skin','hub','All of the following describe thick skin EXCEPT:',
   ['Abundant hair follicles','A visible stratum lucidum','A very thick stratum corneum','Found on the palms and soles'],
   'Thick skin is hairless; hair follicles mean thin skin. Thick skin has a prominent corneum, a lucidum, eccrine glands and dermal ridges (fingerprints).');
@@ -1023,12 +1008,6 @@ mcq('dp-scabies','dermpharm','hub','A patient has scabies. Which product is appl
 match('dp-ecto','dermpharm','hub','Match each ectoparasiticide to the infestation it is listed for.',
   [['Crotamiton','Scabies only'],['Ivermectin lotion','Head lice'],['Malathion','Lice; comb out nits after 4-6 h'],['Spinosad','Head lice, 10-min suspension']],
   'Permethrin covers both (1% lice, 5% scabies). Crotamiton is scabies only. Ivermectin (Sklice), spinosad (Natroba) and benzyl alcohol (Ulesfia) are head-lice products. Malathion (Ovide) is applied to dry hair for pediculosis.');
-two('dp-2s-tret','dermpharm','hub','Tretinoin and isotretinoin are isomers of the same compound.','Tretinoin requires iPLEDGE registration because it is teratogenic.','TF',
-  'Statement 1 is true (Dr. Fasinu: "they just happen to be isomers"). Statement 2 is false: topical tretinoin is widely used and not under iPLEDGE; oral isotretinoin is the teratogen with iPLEDGE.');
-two('dp-2s-oint','dermpharm','hub','Ointments are oil-based and occlusive, giving slow release of drug.','Lotions are preferred for chronic, dry, cracked skin because their water base hydrates.','TF',
-  'Statement 1 true. Statement 2 false: water-based lotions evaporate; chronic dry conditions (psoriasis, dermatitis) get ointments.');
-two('dp-2s-broken','dermpharm','hub','Topical drugs should not be applied to broken skin because absorption increases.','Inflamed skin can change drug ionization because local pH changes.','TT',
-  'Both true. Trauma or disease lets drug reach dermal vessels, raising systemic absorption. Inflammation shifts skin pH, which changes how much of a weak acid or base is ionized (ionized drug stays local and crosses membranes poorly).');
 mcq('dp-ex-ecto','dermpharm','hub','All of the following are listed treatments for head lice EXCEPT:',
   ['Crotamiton','Permethrin 1% (Nix)','Spinosad','Benzyl alcohol'],
   'Crotamiton (Eurax) is listed for scabies only. Permethrin 1%, spinosad, ivermectin lotion, malathion and benzyl alcohol are pediculosis products.');
@@ -1186,12 +1165,6 @@ mcq('pa-dh','dermpath','hub','What is the diagnosis, and what treats both his sk
 mcq('pa-scleroderma','dermpath','deck','Systemic sclerosis is also known as:',
   ['Scleroderma','Lichen sclerosus','Morphea profunda','Sclerotic lupus'],
   'Scleroderma (systemic sclerosis) is excess collagen deposition. Dr. Taylor\'s oral findings: microstomia, limited opening, xerostomia and widening of the PDL space.');
-two('pa-2s-bcc','dermpath','hub','Basal cell carcinoma frequently metastasizes to regional lymph nodes.','Basal cell carcinoma occurs only in the skin.','FT',
-  'Statement 1 false: BCC is locally aggressive but rarely metastasizes. Statement 2 true: Dr. Dababneh called BCC restricted to the skin; you don\'t get it outside the skin.');
-two('pa-2s-pemph','dermpath','hub','In pemphigus vulgaris the blister forms above the basal layer.','In bullous pemphigoid the blisters are flaccid and rupture easily.','TF',
-  'Statement 1 true (suprabasal acantholysis). Statement 2 false: pemphigoid bullae are tense and resist rupture because the whole epidermis forms the roof.');
-two('pa-2s-psor','dermpath','hub','Psoriasis is mediated by IgE and mast cells.','About 30% of psoriasis patients have nail changes.','FT',
-  'Statement 1 false: psoriasis is T-cell mediated (urticaria is IgE). Statement 2 true per the slides.');
 mcq('pa-ex-sun','dermpath','hub','All of the following are caused mainly by sun (UV) exposure EXCEPT:',
   ['Seborrheic keratosis eruption as a paraneoplastic sign','Actinic keratosis on the backs of the hands and forearms','Squamous cell carcinoma of the helix of the ear','Basal cell carcinoma with a rolled border on the nose'],
   'Actinic keratosis, SCC and BCC are the classic sun-damage trio. A sudden eruption of many seborrheic keratoses is a paraneoplastic (Leser-Trelat) sign, not a sun effect.');
@@ -1300,10 +1273,6 @@ mcq('mu-spindle','muscle','deck','Which proprioceptor is made of intrafusal fibe
 mcq('mu-ap-short','muscle','hub','The skeletal muscle action potential lasts under 5 ms. Why does that matter?',
   ['Repeated stimulation can summate twitches into a stronger, sustained (tetanic) contraction','It prevents calcium release from the SR until the next action potential arrives','It lets skeletal muscle fibers act as a functional syncytium through gap junctions','It allows the fiber to contract without using ATP for the first few milliseconds'],
   'Because the AP is so short relative to the twitch (Ca2+ peaks ~20 ms), repeated firing raises force. Increasing tension by repetitive stimulation is tetany.');
-two('mu-2s-aband','muscle','hub','The A band changes length during contraction.','The H band contains myosin but no actin.','FT',
-  'Statement 1 false: the A band equals the thick filament length and never changes. Statement 2 true: the H band is the central part of the A band without thin-filament overlap; the M line runs through it.');
-two('mu-2s-nuclei','muscle','hub','Skeletal muscle fiber nuclei sit at the periphery, just beneath the sarcolemma.','Satellite cells lie inside the muscle fiber\'s cytoplasm.','TF',
-  'Statement 1 true. Statement 2 false: satellite cells are separate mononucleated cells between the sarcolemma and the external lamina.');
 mcq('mu-ex-thin','muscle','hub','All of the following are components of the thin filament EXCEPT:',
   ['Myosin II','F-actin','Tropomyosin','Troponin'],
   'Thin filament = actin (F-actin from G-actin), tropomyosin and the troponin complex. Myosin II makes the thick filament.');
@@ -1400,10 +1369,6 @@ mcq('nm-uses','nmj','hub','Neuromuscular blocking drugs are used for all of thes
 match('nm-drugs-match','nmj','hub','Match each drug to its mechanism.',
   [['Rocuronium','Competitive nicotinic antagonist'],['Sugammadex','Encapsulates steroidal blocker'],['Baclofen','GABA-B agonist'],['Dantrolene','Blocks ryanodine receptor']],
   'Plus: succinylcholine (depolarizing nicotinic agonist), neostigmine (AChE inhibitor), tizanidine (central alpha-2 agonist), botulinum toxin (cleaves SNARE).');
-two('nm-2s-sux','nmj','hub','Succinylcholine is metabolized by acetylcholinesterase at the neuromuscular junction.','Succinylcholine is contraindicated in patients with major burns.','FT',
-  'Statement 1 false: plasma pseudocholinesterase metabolizes it; AChE at the junction does not, which is why the depolarization lasts. Statement 2 true: burns, massive trauma and neuromuscular disease raise the hyperkalemia and cardiac arrest risk.');
-two('nm-2s-neo','nmj','hub','Neostigmine reverses a nondepolarizing block by increasing ACh at the end plate.','Atropine or glycopyrrolate is given with neostigmine to counter its muscarinic effects.','TT',
-  'Both true. Neostigmine can cause bradycardia and bronchospasm, so an antimuscarinic is given first.');
 mcq('nm-ex-sux','nmj','hub','All of the following are adverse effects of succinylcholine EXCEPT:',
   ['Hypokalemia','Myalgia','Increased intraocular pressure','Malignant hyperthermia with volatile anesthetics'],
   'Succinylcholine causes HYPERkalemia, plus myalgia, raised intraocular and intragastric pressure, hypersensitivity, bradycardia, and malignant hyperthermia with volatile anesthetics.');
@@ -1492,10 +1457,6 @@ mcq('ca-bcc-lip','clinical','hub','Which statement about basal cell carcinoma ap
 mcq('ca-pharm','clinical','hub','Which TMD drug class works by enhancing GABA to inhibit excitatory neurotransmission?',
   ['Muscle relaxants that enhance GABA','Nonsteroidal anti-inflammatory drugs','Disease-modifying antirheumatic drugs','Acetaminophen and other analgesics'],
   'Dr. Taylor\'s pharmacology slide: analgesics (acetaminophen, NSAIDs), anti-inflammatories (corticosteroids, DMARDs), muscle relaxants (general CNS depressants that reduce polysynaptic reflexes; GABA enhancers), and Botox (blocks ACh release at the NMJ).');
-two('ca-2s-paget','clinical','hub','Paget disease affects the maxilla more than the mandible.','Paget disease makes extractions easier because the bone is softer.','TF',
-  'Statement 1 true per the slide. Statement 2 false: hypercementosis makes extractions difficult, and surgery bleeds more.');
-two('ca-2s-osteo','clinical','hub','Osteomalacia is a defect of osteoid mineralization due to vitamin D deficiency.','Osteoporosis shows normal mineralization but reduced bone mass.','TT',
-  'Both true: osteomalacia = soft, poorly mineralized bone; osteoporosis = less bone with normal mineral ratio, resorption exceeding formation.');
 mcq('ca-ex-mronj','clinical','hub','All of the following are recommended for a patient starting an osteoporosis medication EXCEPT:',
   ['Postponing extractions until after therapy begins','Eliminating sources of infection','Maintaining excellent oral hygiene','Using atraumatic surgical techniques'],
   'Extractions should be completed BEFORE starting the drug.');
@@ -2301,8 +2262,7 @@ function qCardHTML(q, opts){
   var body = '';
   if(q.type === 'mcq'){
     body += '<div class="qcard-choices">';
-    /* two-statement items keep the four choices in their fixed order */
-    (q.fmt === '2stmt' ? q.choices.map(function(c,i){ return i; }) : shuffled(q.choices.map(function(c,i){ return i; }))).forEach(function(i){
+    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-act="mcq" data-idx="'+i+'" data-answer="'+(i===q.answer?1:0)+'">'+escHtml(q.choices[i])+'</button>';
     });
     body += '</div>';
@@ -2333,16 +2293,12 @@ function qCardHTML(q, opts){
   var status = seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
   return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
-    pboxHTML(q) + '<p class="qcard-stem">'+stemHTML(q)+'</p>' + body +
+    pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
-/* two-statement stems render each statement on its own line; Patient Box rows render above the stem */
-function stemHTML(q){
-  if(q.fmt !== '2stmt') return escHtml(q.stem);
-  return 'Read both statements.' + q.stem.split('\n').map(function(s){ var m = s.match(/^(Statement \d):\s*(.*)$/); return m ? '<span class="stmt"><b>'+m[1]+'</b>'+escHtml(m[2])+'</span>' : escHtml(s); }).join('');
-}
+/* Patient Box rows render above the stem */
 function pboxHTML(q){
   if(!q.pbox) return '';
   return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
@@ -2727,7 +2683,7 @@ function buildMock(){
     var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
     fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
   });
-  var order = {}; ids.forEach(function(id){ var qq = QUESTIONS_BY_ID[id], ks = qq.choices.map(function(c,k){ return k; }); order[id] = qq.fmt === '2stmt' ? ks : shuffled(ks); });
+  var order = {}; ids.forEach(function(id){ order[id] = shuffled(QUESTIONS_BY_ID[id].choices.map(function(c,k){ return k; })); });
   STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
   saveState();
 }
@@ -2745,7 +2701,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions (Exam 3 was 40), drawn only from the Exam 4 lectures: 7 each from skin histology, derm pharm, skeletal muscle and NMJ pharm, 8 from dermpath and 4 from the clinical application lecture. Patient Box and two-statement items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions (Exam 3 was 40), drawn only from the Exam 4 lectures: 7 each from skin histology, derm pharm, skeletal muscle and NMJ pharm, 8 from dermpath and 4 from the clinical application lecture. Patient Box items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
@@ -2779,7 +2735,7 @@ function renderMock(body){
     return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' +
       '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
-      pboxHTML(q) + '<p class="qcard-stem">'+stemHTML(q)+'</p><div class="qcard-choices">'+choices+'</div>' +
+      pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
       '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
@@ -3147,7 +3103,7 @@ var ARCADE = (function(){
     function pool(){
       var lec = STATE.arcade.snakeLec;
       return QUESTIONS.filter(function(q){
-        if((q.type !== 'mcq' || q.fmt) || q.choices.length < 4) return false;
+        if((q.type !== 'mcq' || q.pbox) || q.choices.length < 4) return false;
         if(lec !== 'all' && q.lec !== lec) return false;
         if(q.stem.length > 230) return false;
         return q.choices.every(function(c){ return c.length <= 64; });
@@ -3502,7 +3458,7 @@ var ARCADE = (function(){
   /* =================================================================== BONE TO PICK (hangman) */
   function hangmanPool(lec){
     return QUESTIONS.filter(function(q){
-      if((q.type !== 'mcq' || q.fmt)) return false;
+      if((q.type !== 'mcq' || q.pbox)) return false;
       if(lec !== 'all' && q.lec !== lec) return false;
       var a = q.choices[0];
       return /^[A-Za-z][A-Za-z '\-]{2,24}$/.test(a) && a.split(' ').length <= 3 && q.stem.length <= 200;
@@ -3662,7 +3618,7 @@ var ARCADE = (function(){
     var W = 720, H = 440, LANES = 4, COLORS = ['#ffd23f','#ff5c8a','#3fe0d0','#a98bff'], LETTERS = ['A','B','C','D'];
     function pool(){
       var lec = STATE.arcade.blastLec;
-      return QUESTIONS.filter(function(q){ return (q.type === 'mcq' && !q.fmt) && q.choices.length >= 4 && (lec === 'all' || q.lec === lec) && q.stem.length <= 230 && q.choices.every(function(c){ return c.length <= 64; }); });
+      return QUESTIONS.filter(function(q){ return (q.type === 'mcq' && !q.pbox) && q.choices.length >= 4 && (lec === 'all' || q.lec === lec) && q.stem.length <= 230 && q.choices.every(function(c){ return c.length <= 64; }); });
     }
     function laneX(i){ return (i + 0.5) * W / LANES; }
     function nextQ(){
@@ -3800,7 +3756,7 @@ var ARCADE = (function(){
   /* =================================================================== BONE SEARCH (word search on crossword answers) */
   function searchPool(lec){
     return QUESTIONS.filter(function(q){
-      if((q.type !== 'mcq' || q.fmt)) return false;
+      if((q.type !== 'mcq' || q.pbox)) return false;
       if(lec !== 'all' && q.lec !== lec) return false;
       var a = q.choices[0]; if(!/^[A-Za-z ]+$/.test(a)) return false;
       var w = a.replace(/ /g,''); return w.length >= 4 && w.length <= 11 && q.stem.length <= 150;
