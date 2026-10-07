@@ -660,7 +660,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1 title="Dr. Givan's five lectures · Midterm, Wed Oct 21">Occlusion Midterm</h1>
+        <h1 title="Dr. Givan's five lectures · Midterm, Wed Oct 21 · Final, Thu Nov 19">Occlusion Midterm</h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
         <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
@@ -752,6 +752,7 @@ function pixelHeart(){
 
 /* ---------- LECTURES ---------- */
 var EXAM_DATE = '2026-10-21';
+var FINAL_DATE = '2026-11-19';
 var LECTURES = [
   { id:'review',   num:1, title:'Review of Basic Occlusion',                        who:'Dr. Givan', tag:'blue',   source:'Occ Lec1 Review (slides + handout) + 9/17 recording + "What cusp hits where" help sheet', status:'taught' },
   { id:'anatomy',  num:2, title:'Functional TMJ Anatomy and the Muscles of Mastication', who:'Dr. Givan', tag:'red', source:'Occ Lec2-1 Anatomy (slides + handout) + 9/24 recording', status:'taught' },
@@ -2643,9 +2644,11 @@ function renderHeaderStats(){
   var sp = document.getElementById('streakPill'); if(sp){ var n = dayStreak(); sp.textContent = n + ' day streak'; sp.hidden = n < 2; }
   var cd = document.getElementById('countdownPill');
   if(cd){
-    var ex = new Date(EXAM_DATE + 'T08:00:00'); var now = new Date();
+    var now = new Date();
+    var finalNext = now >= new Date(EXAM_DATE + 'T22:00:00');
+    var ex = new Date((finalNext ? FINAL_DATE : EXAM_DATE) + 'T08:00:00'), what = finalNext ? 'final' : 'midterm';
     var days = Math.ceil((ex - now) / 864e5);
-    cd.textContent = days > 1 ? (days + ' days to exam') : days === 1 ? 'Exam tomorrow' : days === 0 ? 'Exam day!' : 'Exam done';
+    cd.textContent = days > 1 ? (days + ' days to ' + what) : days === 1 ? (what === 'final' ? 'Final tomorrow' : 'Midterm tomorrow') : days === 0 ? 'Exam day!' : 'Exams done';
   }
 }
 
@@ -4428,7 +4431,7 @@ window.SH_EXPORT = {
   }),
   sections: shSearchSections(),
   hints: HINTS.map(function(x){ return { lec:x.lec, quote:x.quote }; }),
-  exams: [ { label:'Midterm', date:EXAM_DATE } ]
+  exams: [ { label:'Midterm', date:EXAM_DATE }, { label:'Final', date:FINAL_DATE } ]
 };
 
 })();
