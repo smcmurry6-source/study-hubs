@@ -661,7 +661,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1 title="Six lectures and a video · Exam 3, Fri Oct 16 (Canvas, 8 am-8 pm)">PCD Fixed Pros Exam 3</h1>
+        <h1 title="Six lectures and a video · Exam 3, Thu Oct 15 (Canvas, 8 am-8 pm)">PCD Fixed Pros Exam 3</h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
         <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
@@ -752,7 +752,7 @@ function pixelHeart(){
 }
 
 /* ---------- LECTURES ---------- */
-var EXAM_DATE = '2026-10-16';
+var EXAM_DATE = '2026-10-15';
 var LECTURES = [
   { id:'cement',  num:1, title:'Cement and Cementation',              who:'Dr. Fu',       tag:'green',  source:'D2 PCD cement slides + 2026 lecture capture + 2021 recording (crown try-in and delivery)', status:'taught' },
   { id:'bonding', num:2, title:'Bonding Dental Ceramics',             who:'Dr. Lawson',   tag:'teal',   source:'Bonding for D2s slides + 2026 lecture capture + 2021 recording', status:'taught' },
@@ -853,7 +853,7 @@ var FIG_BY_LEC = { bonding:['lego'], removal:['cuts'], veneer:['veneerPrep','dog
    src: slides = a definition or fact from the lecture slides; rec = written for this hub from the recordings (the
         professor's emphasis, cases and stories); hint = built on the course's Exam 3 hint list (the topics the course
         director said are on the exam). Checked against last year's class Exam 3 study deck (a classmate's flashcards).
-   The exam (Fri Oct 16, Canvas, 8 am-8 pm) is 40 questions: 1 multiple answer, 4 matching, the rest multiple choice. */
+   The exam (Thu Oct 15, Canvas, 8 am-8 pm) is 40 questions: 1 multiple answer, 4 matching, the rest multiple choice. */
 var QUESTIONS = [];
 function mcq(id, lec, src, stem, choices, ex, extra){ var q = { id:id, lec:lec, type:'mcq', stem:stem, choices:choices, answer:0, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
 function seq(id, lec, src, stem, steps, ex, extra){ var q = { id:id, lec:lec, type:'sequence', stem:stem, steps:steps, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
@@ -2912,7 +2912,7 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Didactic Exam 3: Friday, October 16, 8 am-8 pm in Canvas (LockDown Browser).</b> 40 questions: 1 multiple answer, 4 matching, the rest multiple choice. Hints marked <span class="kind list">exam list</span> are the topics from the course\'s Exam 3 hint email; the rest are quotes from the lecture recordings.</span></div>' +
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Didactic Exam 3: Thursday, October 15, 8 am-8 pm in Canvas (LockDown Browser).</b> 40 questions: 1 multiple answer, 4 matching, the rest multiple choice. Hints marked <span class="kind list">exam list</span> are the topics from the course\'s Exam 3 hint email; the rest are quotes from the lecture recordings.</span></div>' +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Quotes from the lecture recordings marked <span class="kind emphasize">emphasize</span> are the points the lecturers stressed. Two lectures (cementation and onlays) were given in 2021 and again in 2026; the quotes come from both.</p>';
   LECTURES.forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
