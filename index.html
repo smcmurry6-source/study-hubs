@@ -1335,7 +1335,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
     { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
     { id:"match", kind:"choice", prompt:"How did the hub's questions compare with the real exam?", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
-    { id:"missed", kind:"text", prompt:"Anything on the exam the hub missed or barely covered?" }
+    { id:"missed", kind:"text", prompt:"Any topics or question formats the hub missed or barely covered?",
+      note:"Topics and formats only, please. Don't write out exam questions or answers: the honor code keeps exam content private." }
   ];
   var debriefSb = null;
   /* exams whose check-in is open, newest first: the card button from CHECKIN_HOUR on exam day, the pop-up from the
@@ -1387,7 +1388,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
         '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
-      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="Topics, question styles, anything">' + esc(v || "") + '</textarea>';
+      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
+        (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '');
       else if (q.kind === "scale") {
         h += '<div class="survey-opts survey-scale">';
         for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="' + (v === n) + '" data-sv="' + n + '">' + n + '</button>';
