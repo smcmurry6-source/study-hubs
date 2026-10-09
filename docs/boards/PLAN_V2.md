@@ -68,12 +68,13 @@ Modified:
 ## Who does what (v2.1, 2026-10-09: other agents run outside Claude)
 
 Principle: Claude's tokens go to judgment (briefs, final checks, risky reviews), never to supervising other agents.
-Codex and opencode run outside this environment, started by Sam; everything meets in GitHub.
+Codex and opencode both run locally on Sam's computer (Codex can't run cloud tasks on his plan), started by Sam;
+everything meets in GitHub.
 
 | Role | Who | Release 1 budget |
 |---|---|---|
 | Task briefs, final judgment on flagged / high-risk / sampled questions, review of risky diffs, database migration (Supabase connector), integration and merges | Claude Code (subscription), short fresh sessions | ~0.8-1M tokens |
-| Builder: build tool, hub screens, game modules, the review page, the migration draft; also drafts questions and notes from fact records and runs the lint before opening a PR | Codex ($100 credits) | ~$35-55 (estimate; measure on the first tasks) |
+| Builder: build tool, hub screens, game modules, the review page, the migration draft; also drafts questions and notes from fact records and runs the lint before opening a PR | Codex ($100 credits), local: Codex CLI or the VS Code extension, signed in with ChatGPT | ~$35-55 (estimate; measure on the first tasks) |
 | First-pass adversarial checker of every question (a plain script calling OpenRouter, started from opencode or a terminal), plus mechanical tasks (fact-record conversion, quote checks, small fixes) | Qwen via opencode + OpenRouter ($10) | ~$1-3 |
 | Dispatcher (start tasks, merge PRs into the boards branch), review of high-risk and escalated questions | Sam (plus a D4 or faculty reviewer if willing) | ~10 min per task + item review |
 
@@ -85,8 +86,9 @@ saves the most subscription usage.
 
 1. Claude writes briefs in batches: `docs/boards/tasks/T-NN.md` (goal, exact files, interface, acceptance tests, what
    not to touch, which model/tool).
-2. Sam tells Codex or opencode "Do docs/boards/tasks/T-NN.md". It opens a PR into `claude/boards-hub` with a short
-   self-report (what changed, tests run, risks); CI runs.
+2. On his computer Sam runs one helper command per task (`tools/boards/task T-NN codex|opencode`, written by
+   Claude): it branches from `claude/boards-hub`, hands the agent the brief, commits, pushes and opens the PR with
+   the agent's self-report (via the GitHub CLI). CI runs on the PR.
 3. Content PRs: Sam runs the checker (`node tools/boards/check-items.mjs --unit <unit>`), which writes
    `verdicts/<unit>.json` to the branch.
 4. Claude reviews in one batch per session: self-reports, risky diffs only, the verdict summary, and only the
@@ -99,9 +101,10 @@ files whole; the slow browser tests run free in GitHub CI, so agents run only th
 script, not an agent; cheap model first, a stronger model only for flagged questions; a credit limit on the OpenRouter
 key.
 
-**Setup (Sam, once):** Codex: connect the repo in Codex, Node 22 environment. opencode: install on your computer,
-clone the repo, add OpenRouter as a provider with your key inside opencode (the key never goes in the repo or this
-environment). `AGENTS.md` (written by Claude) gives Codex and opencode the repo rules.
+**Setup (Sam, once):** on your computer: Git, Node 22, the GitHub CLI (`gh auth login`) and a clone of the repo;
+Codex CLI (or the Codex extension in VS Code) signed in with ChatGPT; opencode with the OpenRouter key added inside it
+(the key never goes in the repo or the cloud environment). On Windows, WSL may be the smoother route for both agents
+(check their install pages). `AGENTS.md` (written by Claude) gives Codex and opencode the repo rules.
 
 ## Release 1, in order
 
@@ -119,9 +122,8 @@ environment). `AGENTS.md` (written by Claude) gives Codex and opencode the repo 
 2. Set up Codex (repo connected) and opencode (OpenRouter key inside opencode on your computer), then start a fresh
    Claude session for the build.
 3. ~~Codex credits usable outside ChatGPT?~~ Answered 2026-10-09: no, ChatGPT/Codex only. So GPT is not a scripted
-   checker candidate; Codex is used as the builder and question drafter through ChatGPT (repo connected), and the
-   checker runs on OpenRouter. Codex cloud tasks have internet off by default, which is fine: drafting only needs the
-   repo; the quote-check script (needs the web) runs from opencode on Sam's computer.
+   checker candidate; Codex is the builder and question drafter, run locally (no cloud tasks on this plan), and the
+   checker runs on OpenRouter. The quote-check script (needs the web) also runs on Sam's computer.
 4. Real openly licensed images: yes? Server backup of the review schedule (local-first): yes?
 5. Is there a D4 or faculty member who might glance at the high-risk items?
 6. Still open from before: unit order vs. course calendar, names ("Chairside", "Boards Hub: INBDE + ADEX").
