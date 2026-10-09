@@ -84,6 +84,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-09 (graded course work rule, Claude Code)** — Standing rule in `CLAUDE.md` → "Content from lecture
+  materials": graded quiz, crossword, take-home and exam questions are never copied into a hub; once closed they are
+  used as context so every topic they test is covered by hub-written questions; nothing still open is used at all;
+  and Sam is asked before any content is removed or excluded for these reasons. MSK Exam 4 already works this way.
+  MSK Exam 3 is unchanged (its exam has passed). No site change.
+
 - **2026-10-07 (new hub: PCD Fixed Pros Exam 3, Claude Code)** — `hubs/pcd-exam3/` for the D2 PCD Fixed Pros didactic Exam 3
   (Thu Oct 15, Canvas 8 am-8 pm, 40 questions: 1 multiple answer, 4 matching, the rest MCQ). Built from the Drive folder
   PCD Fixed Pros/Hubs/Exam 3: L1 Cement & Cementation (Dr. Fu; 2026 lecture capture + 2021 recording, which adds crown
