@@ -236,7 +236,7 @@ table.data tr.group:hover td{background:none;}
   var SESSION_KEY = "sh_admin_secret";
   var PREF_KEY = "sh_admin_prefs";
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", dashboard: "Dashboard" };
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", dashboard: "Dashboard" };
   /* hubs that are no longer on the live site -- hidden unless "Include archived hubs" is on */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
 
@@ -325,9 +325,10 @@ table.data tr.group:hover td{background:none;}
       rpc("get_click_summary", { p_secret: secret, p_days: d }),
       rpc("get_survey_results", { p_secret: secret }),
       rpc("get_exam_debriefs", { p_secret: secret }),
-      rpc("get_search_terms", { p_secret: secret, p_days: d })
+      rpc("get_search_terms", { p_secret: secret, p_days: d }),
+      rpc("get_nuke_unlocks", { p_secret: secret, p_days: d })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15] };
       renderAll();
     });
   }
@@ -684,11 +685,15 @@ table.data tr.group:hover td{background:none;}
     var active = sRows.find(function(r){ return r.kind === "active"; });
     var record = sRows.find(function(r){ return r.kind === "record"; });
     var ns = (data.nukeSum.data && data.nukeSum.data[0]) || {};
+    /* unlocks are recorded from 2026-10-03 (migration_v33); "never used" = no launch before their next unlock */
+    var nu = (data.nukeUnlocks.data || []).filter(function(r){ return keepHub(r.hub); });
+    var nuSum = nu.reduce(function(s, r){ s.unlocks += r.unlocks; s.unused += r.unused; return s; }, { unlocks: 0, unused: 0 });
     out += '<div class="kpis">' +
       kpi("Longest active streak", active ? active.streak : 0, active ? esc(active.display_name) : "no one on a streak") +
       kpi("All-time streak record", record ? record.streak : 0, record ? esc(record.display_name) : "—") +
       kpi("Tactical nukes", fmtNum(ns.total_launches), rangeText()) +
       kpi("Unique launchers", fmtNum(ns.unique_launchers), rangeText()) +
+      kpi("Nukes unlocked", fmtNum(nuSum.unlocks), nuSum.unused + " never used · since Oct 3") +
     '</div>';
 
     /* mode opens grouped by hub */
@@ -716,8 +721,14 @@ table.data tr.group:hover td{background:none;}
     /* nukes */
     var nh = (data.nukeHub.data || []).filter(function(r){ return keepHub(r.hub); });
     var nr = data.nukeRecent.data || [];
-    var nukeBody = (nh.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Launches</th></tr></thead><tbody>' +
-        nh.map(function(r){ return '<tr><td class="lbl">' + hubCell(r.hub) + '</td><td class="n">' + fmtNum(r.launches) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches in this range.</div>');
+    var unlockBy = {};
+    nu.forEach(function(r){ unlockBy[r.hub] = r; });
+    var nukeHubs = nh.map(function(r){ return r.hub; });
+    nu.forEach(function(r){ if (nukeHubs.indexOf(r.hub) < 0) nukeHubs.push(r.hub); });
+    var launchBy = {};
+    nh.forEach(function(r){ launchBy[r.hub] = r.launches; });
+    var nukeBody = (nukeHubs.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Hub</th><th class="n">Unlocked</th><th class="n">Never used</th><th class="n">Launches</th></tr></thead><tbody>' +
+        nukeHubs.map(function(h){ var u = unlockBy[h] || {}; return '<tr><td class="lbl">' + hubCell(h) + '</td><td class="n">' + fmtNum(u.unlocks || 0) + '</td><td class="n">' + fmtNum(u.unused || 0) + '</td><td class="n">' + fmtNum(launchBy[h] || 0) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No unlocks or launches in this range.</div>');
     var recentBody = nr.length ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Who</th><th>Hub</th><th class="n">When</th></tr></thead><tbody>' +
         nr.map(function(r){ return '<tr><td class="lbl">' + esc(r.display_name) + '</td><td>' + hubCell(r.hub) + '</td><td class="n">' + fmtDate(r.launched_at) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<div class="empty">No launches yet.</div>';
     out += '<div class="grid-2">' + card("Nukes by hub", rangeText(), nukeBody) + card("Recent nukes", "last 10", recentBody) + '</div>';
@@ -763,8 +774,8 @@ table.data tr.group:hover td{background:none;}
   }
 
   /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
-  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
-  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
+  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
+  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion Midterm", "pcd-exam3": "PCD Fixed Pros Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
   /* live hubs publish their questions as SH_EXPORT; archived hubs' banks are no longer kept in this public repo,
      so an archived hub's recap here has no question text (publish it with tools/publish-recap.js --bank <local file>) */
   var recapBanks = {};
