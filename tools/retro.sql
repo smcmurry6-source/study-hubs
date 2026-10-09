@@ -43,7 +43,7 @@ select target, sum(clicks) clicks from ui_clicks where hub = :hub
 group by 1 order by 2 desc;
 
 -- 4. Questions: hardest (20+ attempts), never-answered count is bank size minus rows here.
---    Join qids to the bank (question-banks/<hub>.json, or SH_EXPORT) locally for lecture/type/source splits.
+--    Join qids to the bank (tools/dump-banks.js output, or SH_EXPORT) locally for lecture/type/source splits.
 select qid, attempts, correct, round(100.0 * correct / attempts) pct from question_stats
 where hub = :hub and attempts >= 20 order by correct::float / attempts limit 25;
 select json_object_agg(qid, array[attempts, correct]) from question_stats where hub = :hub;  -- for local joins

@@ -21,8 +21,10 @@ does it differently.
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
-  recap (`tools/publish-recap.js`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it); add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
-  `question-banks/` — archived hubs' banks.
+  recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
+  the hub page comes down, while `tools/dump-banks.js` can still read its bank.
+  **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
+  2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
   hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
   runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in

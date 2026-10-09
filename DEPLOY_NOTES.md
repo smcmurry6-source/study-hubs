@@ -170,6 +170,21 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 - **2026-10-02 (Timmy Tooth "do NOT type my name", Claude Code, #61)** — Reverse-psychology hint for the TIMMY egg:
   `DONT_SAY` lines in `widget/pet.js`, used in ~20% of dashboard hellos (when no holiday/HP line takes the slot) and ~12%
   of hub hellos, plus the last entry of `TIPS`. Never with Surprises off (`eggsOn()`).
+- **2026-10-02 (archived banks and the MSK PollEv set off the public site, Claude Code)** — `question-banks/` (GI Exam 1
+  and 2 banks plus their extract scripts) deleted and gitignored, so past banks aren't publicly downloadable by later
+  classes; `review/`'s `ARCHIVE_BANK` is gone (an archived hub's recap there has no question text; publish with
+  `tools/publish-recap.js --bank <local file>` before the page comes down). The 23 MSK PollEv exam-review items
+  (`rv-*`, `src:'review'`) removed after Exam 3; the bank's "Exam review set" callout hides itself when empty, and the
+  source filter lists only sources that have questions. **To recover them** (they stay in git history):
+  `git checkout 1e6b580 -- question-banks` restores the folder; `git show 1e6b580:hubs/msk-exam3/index.html` has the
+  `rv-*` items (the block after "Exam review (PollEv review session"). Copy them somewhere private first if this repo
+  is ever recreated with fresh history. **MSK Project: drop the
+  `rv-*` items from the split sources too.**
+- **2026-10-02 (check-ins ask for topics, not exam questions, Claude Code)** — The exam check-in's last question is now
+  "Any topics or question formats the hub missed or barely covered?" with a note asking people not to write out exam
+  questions or answers (the honor code keeps exam content private; the DENT 2155 syllabus bans copying any part of an
+  exam). Answer key `missed` unchanged, so `review/` and the audit queries still read it. `/lessons-audit` now says to
+  use a check-in only as a topic or format, never to rebuild an exam question from one. About page entry updated.
 
 - **2026-10-02 (TIMMY easter egg, Claude Code, #59)** — `widget/timmy.js`: typing TIMMY (outside a text field, or into a
   hub's Search box) runs a 15-second overlay show (dark fade, page crumbles, crowned Timmy with cursor-tracking eyes,
