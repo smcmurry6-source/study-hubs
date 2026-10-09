@@ -118,8 +118,10 @@ environment). `AGENTS.md` (written by Claude) gives Codex and opencode the repo 
 1. Go-ahead for plan v2.
 2. Set up Codex (repo connected) and opencode (OpenRouter key inside opencode on your computer), then start a fresh
    Claude session for the build.
-3. Are the $100 Codex credits usable only inside Codex, or as general OpenAI API credit? (If general, GPT can also be a
-   verifier candidate directly.)
+3. ~~Codex credits usable outside ChatGPT?~~ Answered 2026-10-09: no, ChatGPT/Codex only. So GPT is not a scripted
+   checker candidate; Codex is used as the builder and question drafter through ChatGPT (repo connected), and the
+   checker runs on OpenRouter. Codex cloud tasks have internet off by default, which is fine: drafting only needs the
+   repo; the quote-check script (needs the web) runs from opencode on Sam's computer.
 4. Real openly licensed images: yes? Server backup of the review schedule (local-first): yes?
 5. Is there a D4 or faculty member who might glance at the high-risk items?
 6. Still open from before: unit order vs. course calendar, names ("Chairside", "Boards Hub: INBDE + ADEX").
