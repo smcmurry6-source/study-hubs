@@ -776,8 +776,8 @@ table.data tr.group:hover td{background:none;}
   /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
   var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566" };
   var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion Midterm", "pcd-exam3": "PCD Fixed Pros Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros" };
-  /* archived hubs' questions live in question-banks/; live hubs publish theirs as SH_EXPORT */
-  var ARCHIVE_BANK = { hepatobiliary: "gi2-question-bank.json", "gi-exam1": "gi1-question-bank.json" };
+  /* live hubs publish their questions as SH_EXPORT; archived hubs' banks are no longer kept in this public repo,
+     so an archived hub's recap here has no question text (publish it with tools/publish-recap.js --bank <local file>) */
   var recapBanks = {};
   function recapQuestions(hub){
     if (recapBanks[hub]) return recapBanks[hub];
@@ -786,9 +786,7 @@ table.data tr.group:hover td{background:none;}
       return { id: q.id, type: q.type || (choices ? "mcq" : ""), text: q.q || q.stem || q.text || "",
         choices: choices, answer: choices && typeof ai === "number" ? choices[ai] : (q.ans || ""), answerIndex: typeof ai === "number" ? ai : null };
     }
-    recapBanks[hub] = ARCHIVE_BANK[hub]
-      ? fetch("../question-banks/" + ARCHIVE_BANK[hub]).then(function(r){ return r.json(); }).then(function(b){ return (b.questions || []).map(norm); }, function(){ return []; })
-      : new Promise(function(resolve){
+    recapBanks[hub] = new Promise(function(resolve){
           var f = document.createElement("iframe");
           f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
           f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px"; f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
