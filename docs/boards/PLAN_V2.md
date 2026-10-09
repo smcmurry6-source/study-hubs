@@ -65,19 +65,43 @@ Modified:
 - **Model names in the Gemini review (GPT-4o, Gemini 1.5 Pro) are outdated;** the benchmark picks among current models
   on OpenRouter.
 
-## Who does what (resources Sam has)
+## Who does what (v2.1, 2026-10-09: other agents run outside Claude)
 
-| Role | Tool | Budget |
+Principle: Claude's tokens go to judgment (briefs, final checks, risky reviews), never to supervising other agents.
+Codex and opencode run outside this environment, started by Sam; everything meets in GitHub.
+
+| Role | Who | Release 1 budget |
 |---|---|---|
-| Architect, specs, briefs, risky code (scoring, review scheduling, migration, shared widget), final review and merge | Claude Code (subscription) | ~1.5-2M tokens for release 1 |
-| Question and notes writer (from fact records, compact single-agent runs, not multi-agent research) | Claude Code (subscription) | included above |
-| Independent adversarial checker | OpenRouter, non-Anthropic model picked by benchmark | ~$3-6 for release 1 |
-| Implementer of well-specified code: build tool, hub screens, game modules, the human review page, fact-record conversion | Codex ($100 credits), pull requests into `claude/boards-hub` | a fraction of $100 (to be measured) |
-| Cheap mechanical tasks (optional) | Qwen via OpenRouter | pennies |
-| High-risk and escalated items | Sam (and a D4 or faculty reviewer if one is willing) | a few hours per release |
+| Task briefs, final judgment on flagged / high-risk / sampled questions, review of risky diffs, database migration (Supabase connector), integration and merges | Claude Code (subscription), short fresh sessions | ~0.8-1M tokens |
+| Builder: build tool, hub screens, game modules, the review page, the migration draft; also drafts questions and notes from fact records and runs the lint before opening a PR | Codex ($100 credits) | ~$35-55 (estimate; measure on the first tasks) |
+| First-pass adversarial checker of every question (a plain script calling OpenRouter, started from opencode or a terminal), plus mechanical tasks (fact-record conversion, quote checks, small fixes) | Qwen via opencode + OpenRouter ($10) | ~$1-3 |
+| Dispatcher (start tasks, merge PRs into the boards branch), review of high-risk and escalated questions | Sam (plus a D4 or faculty reviewer if willing) | ~10 min per task + item review |
 
-Coordination is through GitHub: `AGENTS.md` (rules Codex reads, pointing to CLAUDE.md and this plan), one task brief
-per Codex job, each landing as a PR that CI checks and Claude reviews.
+Three independent model families at no extra cost: questions drafted by OpenAI (Codex), checked first by Qwen
+(Alibaba), judged by Claude (Anthropic) where it matters. Drafting is the output-heavy step, so moving it off Claude
+saves the most subscription usage.
+
+**Task loop**
+
+1. Claude writes briefs in batches: `docs/boards/tasks/T-NN.md` (goal, exact files, interface, acceptance tests, what
+   not to touch, which model/tool).
+2. Sam tells Codex or opencode "Do docs/boards/tasks/T-NN.md". It opens a PR into `claude/boards-hub` with a short
+   self-report (what changed, tests run, risks); CI runs.
+3. Content PRs: Sam runs the checker (`node tools/boards/check-items.mjs --unit <unit>`), which writes
+   `verdicts/<unit>.json` to the branch.
+4. Claude reviews in one batch per session: self-reports, risky diffs only, the verdict summary, and only the
+   flagged, high-risk and sampled questions; writes fix notes into the PR.
+5. Codex applies the fixes, the checker re-runs on changed questions, Sam reviews escalations in the review page, and
+   Claude merges.
+
+**Efficiency rules:** small tasks with exact paths and tests (agents burn credits exploring); never read the big hub
+files whole; the slow browser tests run free in GitHub CI, so agents run only the fast checks; the checker is a
+script, not an agent; cheap model first, a stronger model only for flagged questions; a credit limit on the OpenRouter
+key.
+
+**Setup (Sam, once):** Codex: connect the repo in Codex, Node 22 environment. opencode: install on your computer,
+clone the repo, add OpenRouter as a provider with your key inside opencode (the key never goes in the repo or this
+environment). `AGENTS.md` (written by Claude) gives Codex and opencode the repo rules.
 
 ## Release 1, in order
 
@@ -92,8 +116,8 @@ per Codex job, each landing as a PR that CI checks and Claude reviews.
 ## Decisions needed from Sam
 
 1. Go-ahead for plan v2.
-2. Add the OpenRouter key as an environment variable `OPENROUTER_API_KEY` (environment settings), then start a fresh
-   session for the build.
+2. Set up Codex (repo connected) and opencode (OpenRouter key inside opencode on your computer), then start a fresh
+   Claude session for the build.
 3. Are the $100 Codex credits usable only inside Codex, or as general OpenAI API credit? (If general, GPT can also be a
    verifier candidate directly.)
 4. Real openly licensed images: yes? Server backup of the review schedule (local-first): yes?
