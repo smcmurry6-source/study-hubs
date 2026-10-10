@@ -84,6 +84,13 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-10 (lessons audit + MSK Exam 4 dashboard date, Claude Code)** — The 10-08 PCD date fix (9d3463d) also moved
+  **MSK Exam 4's** `HUBS` date to 2026-10-15; the hub itself says Fri Oct 16. Back to `2026-10-16` in `index.html`, so
+  the card no longer auto-archives (no Open button) at 10 pm on MSK 4's exam eve and check-ins open on the real exam
+  day. `LESSONS.md` refreshed: MSK Exam 3 retrospective written (its recap was already on the dashboard since 10-09),
+  Live signals for PCD Exam 3 / MSK Exam 4 / Occlusion, new standing lesson on keeping a hub's two exam dates in step.
+  **Cleanup still manual:** `hubs/msk-exam3/` (card leaves the dashboard 10-12).
+
 - **2026-10-09 (graded course work rule, Claude Code)** — Standing rule in `CLAUDE.md` → "Content from lecture
   materials": graded quiz, crossword, take-home and exam questions are never copied into a hub; once closed they are
   used as context so every topic they test is covered by hub-written questions; nothing still open is used at all;
