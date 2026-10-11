@@ -1025,6 +1025,89 @@
     "adex"
    ],
    "recorded": "2026-10-11"
+  },
+  {
+   "id": "PK-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "CYP3A inhibitors in the FDA interaction table: clarithromycin and itraconazole are strong inhibitors; erythromycin, fluconazole (also a strong CYP2C19 inhibitor) and grapefruit juice are moderate. Simvastatin and midazolam are sensitive CYP3A substrates, so their levels rise with these inhibitors.",
+   "cites": [
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "clarithromycin 3A strong inhibitor"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "itraconazole 3A strong inhibitor"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "erythromycin 3A moderate inhibitor"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "fluconazole 2C19 strong inhibitor 3A; 2C9 moderate inhibitor"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "grapefruit juice 9 3A moderate inhibitor"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "simvastatin 3A sensitive substrate"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "midazolam 3A sensitive substrate"
+    }
+   ],
+   "see": [
+    "DI-2",
+    "DI-3"
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "cyp-interactions",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PK-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Strong CYP3A inducers in the FDA table include rifampin and carbamazepine; they lower the levels of CYP3A substrates.",
+   "cites": [
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "rifampin 3A; 2C19 strong inducer"
+    },
+    {
+     "src": "fda-ddi-table",
+     "loc": "Table",
+     "quote": "carbamazepine 2B6; 3A strong inducer"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "cyp-interactions",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
   }
  ]
 }
