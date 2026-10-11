@@ -7,6 +7,7 @@
 //   node tools/boards/lint-items.mjs --facts                 fact records only
 //   node tools/boards/lint-items.mjs --json out.json         also write the findings as JSON
 //   node tools/boards/lint-items.mjs --quiet                 errors only
+//   node tools/boards/lint-items.mjs --facts --facts-dir <folder>   lint a draft fact folder (sources.json + *.json)
 //
 // Item files are CommonJS: module.exports = { items: [...], cases: [...] } (BUILD_SPEC 4.4). Exit 1 on any error.
 // Warnings are for the verifier and the author to look at; errors block the build.
@@ -30,13 +31,14 @@ const SOURCE_MAX_AGE_Y = 8;
 
 // ---------- args ----------
 const argv = process.argv.slice(2);
-const opt = { files: [], unit: null, factsOnly: false, json: null, quiet: false };
+const opt = { files: [], unit: null, factsOnly: false, json: null, quiet: false, factsDir: FACTS_DIR };
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === '--unit') opt.unit = argv[++i];
   else if (a === '--facts') opt.factsOnly = true;
   else if (a === '--json') opt.json = argv[++i];
   else if (a === '--quiet') opt.quiet = true;
+  else if (a === '--facts-dir') opt.factsDir = path.resolve(argv[++i]);
   else if (a === '-h' || a === '--help') { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 13).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); process.exit(0); }
   else opt.files.push(a);
 }
@@ -49,10 +51,10 @@ const warn = (id, check, msg) => add('warn', id, check, msg);
 
 // ---------- facts ----------
 function loadFacts() {
-  const sources = JSON.parse(fs.readFileSync(path.join(FACTS_DIR, 'sources.json'), 'utf8'));
+  const sources = JSON.parse(fs.readFileSync(path.join(opt.factsDir, 'sources.json'), 'utf8'));
   const facts = new Map();
-  for (const f of fs.readdirSync(FACTS_DIR).filter(f => f.endsWith('.json') && f !== 'sources.json').sort()) {
-    const data = JSON.parse(fs.readFileSync(path.join(FACTS_DIR, f), 'utf8'));
+  for (const f of fs.readdirSync(opt.factsDir).filter(f => f.endsWith('.json') && f !== 'sources.json').sort()) {
+    const data = JSON.parse(fs.readFileSync(path.join(opt.factsDir, f), 'utf8'));
     for (const fact of data.facts || []) {
       if (facts.has(fact.id)) err(fact.id, 'fact-dup', `fact id in both ${facts.get(fact.id)._file} and ${f}`);
       facts.set(fact.id, { ...fact, _file: f });

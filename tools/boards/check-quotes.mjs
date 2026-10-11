@@ -10,6 +10,7 @@
 //   node tools/boards/check-quotes.mjs --grep <src> <regex>   search one source's text, print matches in context
 //   node tools/boards/check-quotes.mjs --propose       for cites without a quote, print the best-matching sentences
 //   node tools/boards/check-quotes.mjs --json <file>   also write the results as JSON
+//   node tools/boards/check-quotes.mjs --dir <folder>   read sources.json + facts from another folder (drafts)
 //
 // Sources live in src/boards/facts/sources.json; facts in src/boards/facts/<unit>.json. A source's `fetch` URL (a
 // machine-readable copy: DailyMed SPL XML, Europe PMC full text) is read instead of `url` when present. PDFs need
@@ -35,7 +36,7 @@ const MAX_AGE_MS = 7 * 24 * 3600 * 1000;
 
 // ---------- args ----------
 const argv = process.argv.slice(2);
-const opt = { fact: [], src: [], refresh: false, offline: false, fetchOnly: false, propose: false, json: null, grep: null };
+const opt = { fact: [], src: [], refresh: false, offline: false, fetchOnly: false, propose: false, json: null, grep: null, dir: FACTS_DIR };
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === '--fact') opt.fact.push(...argv[++i].split(','));
@@ -45,6 +46,7 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--fetch') opt.fetchOnly = true;
   else if (a === '--propose') opt.propose = true;
   else if (a === '--json') opt.json = argv[++i];
+  else if (a === '--dir') opt.dir = path.resolve(argv[++i]);
   else if (a === '--grep') { opt.grep = { src: argv[++i], re: argv[++i] }; }
   else if (a === '-h' || a === '--help') { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 22).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); process.exit(0); }
   else { console.error('unknown argument: ' + a); process.exit(2); }
@@ -191,7 +193,7 @@ function propose(claim, text, n = 2) {
 
 // ---------- main ----------
 async function main() {
-  const { sources, facts } = loadFacts();
+  const { sources, facts } = loadFacts(opt.dir);
   const texts = {}, failures = {};
   async function text(key) {
     if (key in texts || key in failures) return texts[key];
