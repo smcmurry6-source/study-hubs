@@ -42,7 +42,8 @@ for (let i = 0; i < argv.length; i++) {
 }
 
 const findings = [];
-const add = (sev, id, check, msg) => findings.push({ sev, id, check, msg });
+const seen = new Set();
+const add = (sev, id, check, msg) => { const k = sev + id + check + msg; if (!seen.has(k)) { seen.add(k); findings.push({ sev, id, check, msg }); } };
 const err = (id, check, msg) => add('error', id, check, msg);
 const warn = (id, check, msg) => add('warn', id, check, msg);
 
