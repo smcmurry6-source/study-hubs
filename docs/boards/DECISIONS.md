@@ -38,3 +38,5 @@ Living record of what Sam decided while this hub is being planned and built. New
 - **Interim mode: everything runs through Claude** until Sam has time to set up Codex and opencode locally. See
   `NEXT.md` for how to run the plan Claude-only without losing its quality checks.
 - **Free and public.** Selling is not being considered for now.
+- **Benchmark go** (Sam, 2026-10-11): scale question writing per `bench/REPORT.md`, with its conditions (code checks
+  first, two checker passes on high-risk items, every repaired item re-checked). Session 2 started the same day.

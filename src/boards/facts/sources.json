@@ -422,5 +422,204 @@
   "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/a0ebc83d-2892-40de-bc0a-775ce90b30db.xml",
   "kind": "spl",
   "date": "2026-08-17"
+ },
+ "ada-emergencies": {
+  "title": "Medical Emergencies in the Dental Office (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/medical-emergencies-in-the-dental-office",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
+ },
+ "ada-hepatitis": {
+  "title": "Hepatitis Viruses (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/hepatitis-viruses",
+  "kind": "html",
+  "date": "2022-04-01"
+ },
+ "ada-hiv": {
+  "title": "HIV (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/hiv",
+  "kind": "html",
+  "date": "2023-08-29"
+ },
+ "ada-tb": {
+  "title": "Tuberculosis: Overview and Dental Treatment Considerations (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/tuberculosis-overview-and-dental-treatment-conside",
+  "kind": "html",
+  "date": "2023-09-06"
+ },
+ "ada-tobacco": {
+  "title": "Tobacco Use and Cessation (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/tobacco-use-and-cessation",
+  "kind": "html",
+  "date": "2022-11-01"
+ },
+ "ada-meth": {
+  "title": "Methamphetamine (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/methamphetamine",
+  "kind": "html",
+  "date": "2023-07-12"
+ },
+ "ada-cannabis": {
+  "title": "Cannabis: Oral Health Effects (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/cannabis-oral-health-effects",
+  "kind": "html",
+  "date": "2023-10-26"
+ },
+ "ada-xerostomia": {
+  "title": "Xerostomia (Dry Mouth) (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/xerostomia",
+  "kind": "html",
+  "date": "2026-03-04"
+ },
+ "ada-stewardship": {
+  "title": "Antibiotic Stewardship (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/antibiotic-stewardship",
+  "kind": "html",
+  "date": "2026-10-01"
+ },
+ "ada-periodontitis": {
+  "title": "Periodontitis (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/periodontitis",
+  "kind": "html",
+  "date": "2022-06-09"
+ },
+ "ada-oral-systemic": {
+  "title": "Oral-Systemic Health (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/oral-systemic-health",
+  "kind": "html",
+  "date": "2023-09-11"
+ },
+ "ada-cardiac-devices": {
+  "title": "Cardiac Implanted Devices and Electronic Dental Instruments (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/cardiac-implanted-devices-and-electronic-dental-instruments",
+  "kind": "html",
+  "date": "2023-02-20"
+ },
+ "ada-cancer-therapies": {
+  "title": "Cancer Therapies and Dental Considerations (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/cancer-therapies-and-dental-considerations",
+  "kind": "html",
+  "date": "2021-07-14"
+ },
+ "efp-s3-2020": {
+  "title": "Treatment of stage I-III periodontitis: the EFP S3 level clinical practice guideline",
+  "org": "EFP",
+  "citation": "Sanz M, Herrera D, Kebschull M, et al. J Clin Periodontol 2020;47 Suppl 22:4-60",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7891343/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7891343/fullTextXML",
+  "kind": "xml",
+  "date": "2020-07"
+ },
+ "wws-herrera-2018": {
+  "title": "Acute periodontal lesions (periodontal abscesses and necrotizing periodontal diseases) and endo-periodontal lesions",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article6.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Herrera D, Retamal-Valdes B, Alonso B, Feres M. J Clin Periodontol 2018;45 Suppl 20:S78-S94 (university mirror)"
+ },
+ "wws-tonetti-2018": {
+  "title": "Staging and grading of periodontitis: framework and proposal of a new classification and case definition",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article7.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Tonetti MS, Greenwell H, Kornman KS. J Clin Periodontol 2018;45 Suppl 20:S149-S161 (university mirror)"
+ },
+ "wws-papapanou-2018": {
+  "title": "Periodontitis: consensus report of workgroup 2 of the 2017 World Workshop",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article8.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Papapanou PN, Sanz M, et al. J Clin Periodontol 2018;45 Suppl 20:S162-S170 (university mirror)"
+ },
+ "wws-murakami-2018": {
+  "title": "Dental plaque-induced gingival conditions",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article15.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Murakami S, Mealey BL, Mariotti A, Chapple ILC. J Periodontol 2018;89 Suppl 1:S17-S27 (university mirror)"
+ },
+ "wws-jepsen-2018": {
+  "title": "Periodontal manifestations of systemic diseases and developmental and acquired conditions: consensus report of workgroup 3",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article16.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Jepsen S, Caton JG, et al. J Periodontol 2018;89 Suppl 1:S237-S248 (university mirror)"
+ },
+ "wws-berglundh-2018": {
+  "title": "Peri-implant diseases and conditions: consensus report of workgroup 4",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article12.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Berglundh T, Armitage G, et al. J Clin Periodontol 2018;45 Suppl 20:S286-S291 (university mirror)"
+ },
+ "fda-ddi-table": {
+  "title": "Drug Development and Drug Interactions: Table of Substrates, Inhibitors and Inducers",
+  "org": "FDA",
+  "url": "https://www.fda.gov/drugs/drug-interactions-labeling/healthcare-professionals-fdas-examples-drugs-interact-cyp-enzymes-and-transporter-systems",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
+ },
+ "dm-albuterol": {
+  "title": "Albuterol sulfate inhalation aerosol (metered-dose inhaler)",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=52e209ac-7156-4496-ba5a-42ee59d45deb",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/52e209ac-7156-4496-ba5a-42ee59d45deb.xml",
+  "kind": "spl",
+  "date": "2026-10-01"
+ },
+ "dm-diphenhydramine-inj": {
+  "title": "Diphenhydramine hydrochloride injection",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=b6f7426f-157a-43c9-a3d3-9501a65c61c5",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/b6f7426f-157a-43c9-a3d3-9501a65c61c5.xml",
+  "kind": "spl",
+  "date": "2026-09-28"
+ },
+ "cdc-stroke": {
+  "title": "Signs and Symptoms of Stroke",
+  "org": "CDC",
+  "url": "https://www.cdc.gov/stroke/signs-symptoms/index.html",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
+ },
+ "cdc-seizure": {
+  "title": "First Aid for Seizures",
+  "org": "CDC",
+  "url": "https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
+ },
+ "redcross-cpr": {
+  "title": "CPR Steps",
+  "org": "American Red Cross",
+  "url": "https://www.redcross.org/take-a-class/cpr/performing-cpr/cpr-steps",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
+ },
+ "nhlbi-heart-attack": {
+  "title": "Heart Attack: Treatment",
+  "org": "NHLBI (NIH)",
+  "url": "https://www.nhlbi.nih.gov/health/heart-attack/treatment",
+  "kind": "html",
+  "date": "undated (checked 2026-10-11)"
  }
 }

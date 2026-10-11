@@ -170,6 +170,9 @@
    "status": "verified",
    "risk": "high",
    "claim": "ADA Practical Guide thresholds for adult outpatient dental care: under 160/100: no modification for elective or emergency care. Over 160/100: repeat the reading; if it comes down, or is within a physician's written guidance, proceed; if confirmed, no elective care and refer to the physician. Emergency care at a confirmed 160-180 systolic and/or 100-109 diastolic when pain is driving the BP: treat, check BP every 10-15 minutes, use anxiety reduction. Confirmed >180 systolic and/or >109 diastolic: consult the physician before proceeding. Systolic >180 and/or diastolic >100: refer as soon as possible, or urgent medical evaluation if symptomatic.",
+   "stem_names": [
+    "ADA"
+   ],
    "cites": [
     {
      "src": "ada-hypertension",
@@ -1080,6 +1083,9 @@
    "status": "verified",
    "risk": "high",
    "claim": "During chemotherapy: consult the oncologist before any procedure, including a prophylaxis; get blood work within 24 hours before oral surgery or other invasive procedures; postpone if platelets are under 75,000/mm3 (or clotting factors abnormal) or the ANC is under 1,000/mm3 (or consider prophylactic antibiotics).",
+   "stem_names": [
+    "NIDCR"
+   ],
    "cites": [
     {
      "src": "nidcr-oncology",
@@ -1499,6 +1505,389 @@
     "pharm"
    ],
    "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Office emergency preparedness (ADA): the team reviews emergency skills at least once a year, preferably more often, and manages every emergency with the basic P-C-A-B-D sequence (Positioning, Circulation, Airway, Breathing, Definitive care). Syncope, hypoglycemia and seizures are common causes of altered consciousness in the dental office.",
+   "cites": [
+    {
+     "src": "ada-emergencies",
+     "loc": "Introduction",
+     "quote": "regular review is necessary: at least annually but preferably more often"
+    },
+    {
+     "src": "ada-emergencies",
+     "loc": "ADA CE, Part 3",
+     "quote": "P-C-A-B-D (Positioning - Circulation - Airway - Breathing - Definitive Care)"
+    },
+    {
+     "src": "ada-emergencies",
+     "loc": "ADA CE, Part 4",
+     "quote": "Syncope, hypoglycemia and seizures are not uncommon emergencies in the dental office."
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Adult CPR (Red Cross): compressions at least 2 inches deep at 100 to 120 per minute, letting the chest return fully; cycles of 30 compressions and 2 breaths; use an AED as soon as one is available and keep pauses in compressions under 10 seconds.",
+   "conditions": "Red Cross wording; the AHA resuscitation guideline itself blocks scripts and was not opened.",
+   "cites": [
+    {
+     "src": "redcross-cpr",
+     "loc": "CPR steps 5-7",
+     "quote": "Compression depth: At least 2 inches Rate of compressions: 100 to 120 per minute Allow chest to return to normal position after each compression"
+    },
+    {
+     "src": "redcross-cpr",
+     "loc": "CPR steps 5-7",
+     "quote": "Continue giving sets of 30 chest compressions and 2 breaths. Use an AED as soon as one is available! Minimize interruptions to chest compressions to less than 10 seconds."
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Stroke warning signs (CDC): sudden numbness or weakness of the face, arm or leg, especially on one side; sudden confusion or trouble speaking; sudden trouble seeing; sudden dizziness, loss of balance or trouble walking; sudden severe headache with no known cause. B.E. F.A.S.T. (Balance, Eyes, Face, Arms, Speech, Time) screens for it. Call 911 right away.",
+   "cites": [
+    {
+     "src": "cdc-stroke",
+     "loc": "Signs and symptoms",
+     "quote": "Sudden numbness or weakness in the face, arm, or leg, especially on one side of the body. Sudden confusion, trouble speaking, or difficulty understanding speech."
+    },
+    {
+     "src": "cdc-stroke",
+     "loc": "Signs and symptoms",
+     "quote": "Call 9-1-1 right away if you or someone else has any of these symptoms."
+    },
+    {
+     "src": "cdc-stroke",
+     "loc": "B.E. F.A.S.T.",
+     "quote": "F—Face: Ask the person to smile. Does one side of the face droop? A—Arms: Ask the person to raise both arms. Does one arm drift downward?"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Seizure first aid (CDC): keep the person safe and the airway clear, and time the seizure. Most seizures do not need emergency care, but call 911 if it lasts longer than 5 minutes or another seizure follows soon after.",
+   "cites": [
+    {
+     "src": "cdc-seizure",
+     "loc": "First aid steps",
+     "quote": "Time the seizure to track if it lasts more than 5 minutes. If it does, seek immediate medical attention or call 911."
+    },
+    {
+     "src": "cdc-seizure",
+     "loc": "When to call for help",
+     "quote": "But you should call 911 if one or more of these things happen: The seizure lasts longer than 5 minutes. They have another seizure soon after the first one."
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-8",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Albuterol metered-dose inhaler (a short-acting beta-2 agonist) treats or prevents bronchospasm in adults and children 4 years and older: 2 inhalations every 4 to 6 hours.",
+   "cites": [
+    {
+     "src": "dm-albuterol",
+     "loc": "Highlights, 2.1",
+     "quote": "prevention of bronchospasm in adults and children 4 years of age and older: 2 inhalations every 4 to 6 hours."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-9",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Injectable diphenhydramine in anaphylaxis is an adjunct to epinephrine and other standard measures, given after the acute symptoms are controlled; adults 10 to 50 mg IV or deep IM (100 mg if required), up to 400 mg a day.",
+   "cites": [
+    {
+     "src": "dm-diphenhydramine-inj",
+     "loc": "Indications",
+     "quote": "in anaphylaxis as an adjunct to epinephrine and other standard measures after the acute symptoms have been controlled"
+    },
+    {
+     "src": "dm-diphenhydramine-inj",
+     "loc": "Dosage and Administration",
+     "quote": "Adults 10 to 50 mg intravenously at a rate generally not exceeding 25 mg/min, or deep intramuscularly, 100 mg if required; maximum daily dosage is 400 mg."
+    }
+   ],
+   "see": [
+    "EM-1"
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-10",
+   "status": "verified",
+   "risk": "high",
+   "claim": "In a heart attack, aspirin is given to keep more clots from forming (it can cause stomach bleeding in some people), and nitroglycerin improves blood flow to the heart.",
+   "conditions": "NHLBI patient page; the aspirin dose for a suspected heart attack is not in it.",
+   "cites": [
+    {
+     "src": "nhlbi-heart-attack",
+     "loc": "Emergency treatment",
+     "quote": "Aspirin or other medicines can prevent more blood clots from forming. In some people, aspirin may cause bleeding in the stomach."
+    }
+   ],
+   "see": [
+    "EM-2"
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "HEP-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Viral hepatitis: dentists and staff use standard precautions for all patients. Hepatitis B is preventable by vaccination (two or three injections over about 6 months); there is no hepatitis C vaccine, but current treatment cures more than 90% of cases.",
+   "cites": [
+    {
+     "src": "ada-hepatitis",
+     "loc": "Key Points",
+     "quote": "should comply with all standard precautions (e.g., wearing appropriate personal protective equipment and disinfecting equipment and surfaces after each patient) for all patients"
+    },
+    {
+     "src": "ada-hepatitis",
+     "loc": "Background",
+     "quote": "HBV infection is preventable through vaccination, most commonly administered in two or three injections over the course of six months. Although there is no vaccine for HCV, current treatment regimens can cure more than 90% of cases."
+    }
+   ],
+   "units": [
+    "medcx",
+    "infect"
+   ],
+   "topic": "infectious-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "HEP-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Oral signs of liver dysfunction include mucosal jaundice, bleeding problems with petechiae and easy bruising, gingival bleeding, fetor hepaticus, cheilitis and a smooth, atrophic tongue.",
+   "cites": [
+    {
+     "src": "ada-hepatitis",
+     "loc": "Oral manifestations",
+     "quote": "mucosal membrane jaundice, bleeding disorders, petechiae, increased vulnerability to bruising, gingivitis, gingival bleeding, fetor hepaticus"
+    }
+   ],
+   "units": [
+    "medcx",
+    "opath"
+   ],
+   "topic": "liver-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "HIV-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "AIDS is HIV infection with a CD4+ T-cell count under 200 cells/mm3 or one or more opportunistic infections.",
+   "cites": [
+    {
+     "src": "ada-hiv",
+     "loc": "Background",
+     "quote": "characterized by a low CD4+ T lymphocyte count (<200 cells/mm 3 ) or one or more opportunistic infections"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "infectious-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "HIV-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "In patients with HIV, lab values that may change dental care are a platelet count under 60,000 cells/mL (clotting) and a neutrophil count under 500 cells/mL (may need antibiotic prophylaxis); otherwise antibiotics are used judiciously, not routinely.",
+   "conditions": "The ADA page writes the units as cells/mL; the usual unit is cells/µL (per mm3).",
+   "cites": [
+    {
+     "src": "ada-hiv",
+     "loc": "Dental Care",
+     "quote": "et count <60,000 cells/mL, which may affect clotting, or white-blood-cell neutrophil counts <500 cells/mL, which may require antibiotic prophylaxis"
+    },
+    {
+     "src": "ada-hiv",
+     "loc": "Dental Care",
+     "quote": "so antibiotics should be used judiciously, not routinely"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "infectious-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "HIV-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "After an occupational exposure, antiretroviral post-exposure prophylaxis (PEP) is started within the first 72 hours, and the sooner it starts the better it works.",
+   "cites": [
+    {
+     "src": "ada-hiv",
+     "loc": "Occupational exposure",
+     "quote": "Antiretroviral drugs may be prescribed as post-exposure prophylaxis (PEP) within the first 72 hours of exposure in order to help prevent HIV infection."
+    },
+    {
+     "src": "ada-hiv",
+     "loc": "Occupational exposure",
+     "quote": "The sooner PEP is started, the more effective it is."
+    }
+   ],
+   "units": [
+    "medcx",
+    "infect"
+   ],
+   "topic": "infectious-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "TB-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Active tuberculosis: standard precautions are not enough to prevent transmission. Postpone non-urgent dental care; a patient who needs urgent care is referred promptly to a medical setting that can evaluate infectiousness (airborne infection isolation).",
+   "cites": [
+    {
+     "src": "ada-tb",
+     "loc": "Key Points",
+     "quote": "for a person with active tuberculosis, standard precautions are insufficient to prevent transmission of the bacterium"
+    },
+    {
+     "src": "ada-tb",
+     "loc": "Administrative controls",
+     "quote": "Postpone non-urgent dental treatment (patients requiring urgent care should be promptly referred to an appropriate medical setting for evaluation of possible infectiousness)"
+    }
+   ],
+   "units": [
+    "medcx",
+    "infect"
+   ],
+   "topic": "infectious-disease",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "CD-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Cardiac implanted devices (pacemakers, ICDs): some electronic dental devices can interfere, but modern devices are better shielded. Piezoelectric scalers may be safer than magnetostrictive ones; electrosurgery units carry the highest risk of interference. Correct use and keeping a distance reduce the risk.",
+   "cites": [
+    {
+     "src": "ada-cardiac-devices",
+     "loc": "Key Points",
+     "quote": "Modern cardiac devices are generally better shielded and may be less susceptible to interference. Piezoelectric dental scalers may be safer than magnetostrictive models. Electrosurgery devices have the highest potential for electromagnetic interference."
+    }
+   ],
+   "see": [
+    "IE-3"
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "cardiac-devices",
    "exam": [
     "inbde",
     "adex"

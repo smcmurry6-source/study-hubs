@@ -67,7 +67,7 @@ function lintFacts({ sources, facts }) {
     for (const f of ['title', 'url', 'kind']) if (!s[f]) err('src:' + k, 'source-schema', `missing ${f}`);
     if (s.url && !/^https:\/\//.test(s.url)) err('src:' + k, 'source-schema', 'url must be https');
     if (!s.date) warn('src:' + k, 'source-date', 'no date (publication, last update or label effective date)');
-    else if (+s.date.slice(0, 4) < new Date().getFullYear() - SOURCE_MAX_AGE_Y) warn('src:' + k, 'source-date', `source dated ${s.date}: check it is still current`);
+    else if (/^\d{4}/.test(s.date) && +s.date.slice(0, 4) < new Date().getFullYear() - SOURCE_MAX_AGE_Y) warn('src:' + k, 'source-date', `source dated ${s.date}: check it is still current`);
   }
   for (const f of facts.values()) {
     if (!/^[A-Z]{2,4}-\d+$/.test(f.id)) err(f.id, 'fact-schema', 'id must look like IE-5');
@@ -85,6 +85,7 @@ function lintFacts({ sources, facts }) {
       if (c.quote && c.quote.split(/\s+/).length > 70) warn(f.id, 'fact-quote', `quote from ${c.src} is ${c.quote.split(/\s+/).length} words; keep quotes short`);
     }
     for (const s of f.see || []) if (!facts.has(s)) err(f.id, 'fact-see', `see ${s}: no such fact`);
+    if (f.stem_names !== undefined && (!Array.isArray(f.stem_names) || !f.stem_names.length)) err(f.id, 'fact-schema', 'stem_names must be a non-empty array of names');
   }
 }
 
@@ -164,6 +165,7 @@ function lintItems(files, { facts, sources }) {
       if (f.status === 'proposal' || f.status === 'convention') warn(id, 'refs', `fact ${r} is a ${f.status}: make sure the key does not rest on it`);
       if (f.status === 'partial') warn(id, 'refs', `fact ${r} is partial: ${String(f.conditions || '').slice(0, 140)}`);
       if (!f.cites.some(c => c.quote)) warn(id, 'refs', `fact ${r} has no checked quote yet`);
+      if (f.stem_names && !f.stem_names.some(n => new RegExp('\\b' + n + '\\b', 'i').test(it.stem || ''))) err(id, 'stem-names', `fact ${r} needs the stem to name its source (${f.stem_names.join(' / ')}): other sources give different numbers`);
       if (f.risk === 'high' || (f.risk === 'medium' && risk === 'low')) risk = f.risk;
       for (const c of f.cites) { const s = sources[c.src]; if (s && s.date && +s.date.slice(0, 4) < new Date().getFullYear() - SOURCE_MAX_AGE_Y) warn(id, 'source-date', `${r} rests on ${c.src} dated ${s.date}`); }
     }
@@ -194,6 +196,11 @@ function lintItems(files, { facts, sources }) {
     // absolutes only in distractors
     const ABS = /\b(always|never|all|none|only|must|cannot)\b/i;
     if (Number.isInteger(it.answer) && !ABS.test(ch[it.answer] || '') && ch.filter((c, i) => i !== it.answer && ABS.test(c)).length >= 2) warn(id, 'absolutes', 'absolute words ("always", "never", "only"...) appear only in distractors');
+    // hedged key among categorical distractors (benchmark run 1: a key that alone says "is linked to")
+    const HEDGE = /\b(may|might|can|could|usually|often|generally|typically|linked|associated|suggest\w*|likely|about|consider\w*)\b/i;
+    const CATEG = /\b(no|not|never|none|always|only|all|must|cannot|any|every)\b/i;
+    if (Number.isInteger(it.answer) && ch.length >= 3 && HEDGE.test(ch[it.answer]) && !CATEG.test(ch[it.answer]) &&
+        ch.filter((c, i) => i !== it.answer && CATEG.test(c) && !HEDGE.test(c)).length >= ch.length - 2) warn(id, 'hedging', 'only the key is hedged; the distractors are categorical claims');
     // stem words echoed only by the key
     if (Number.isInteger(it.answer) && ch.length >= 3) {
       const stemW = new Set(words(it.stem).filter(w => w.length > 5));

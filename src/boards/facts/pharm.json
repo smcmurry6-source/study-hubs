@@ -911,6 +911,120 @@
     "adex"
    ],
    "recorded": "2026-10-04"
+  },
+  {
+   "id": "TOB-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "First-line drugs for smoking cessation are nicotine replacement therapy, bupropion (an atypical antidepressant) and varenicline (a nicotine receptor partial agonist). Free telephone counseling is available through state quitlines at 1-800-QUIT-NOW.",
+   "cites": [
+    {
+     "src": "ada-tobacco",
+     "loc": "Cessation",
+     "quote": "Nicotine-replacement therapy, bupropion (an atypical antidepressant), and varenicline (a selective nicotine receptor partial agonist) are first-line pharmacologic therapies to assist with smoking cessation"
+    },
+    {
+     "src": "ada-tobacco",
+     "loc": "Cessation",
+     "quote": "telephone counseling is available free through a system of state-based quitlines accessible with one toll-free number (1-800-QUIT-NOW [784-8669])"
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx",
+    "prof"
+   ],
+   "topic": "tobacco-cessation",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "SU-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Methamphetamine use causes rampant caries (\"meth mouth\"), said to resemble early childhood caries, along with bruxism and temporomandibular disorders; the drug blocks reuptake of dopamine, norepinephrine and serotonin.",
+   "cites": [
+    {
+     "src": "ada-meth",
+     "loc": "Oral effects",
+     "quote": "is referred to colloquially as \"meth mouth\" or \"crank decay\" and is said to resemble early childhood caries"
+    },
+    {
+     "src": "ada-meth",
+     "loc": "Pharmacology",
+     "quote": "blocks reuptake of neurotransmitters called monoamines (dopamine, norepinephrine and serotonin)"
+    }
+   ],
+   "see": [
+    "VC-7"
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "substance-use",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "XE-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Drug classes linked to dry mouth in older adults include urologic drugs, antidepressants and psycholeptics. The FDA has approved two oral sialogogues for dry mouth: pilocarpine and cevimeline.",
+   "cites": [
+    {
+     "src": "ada-xerostomia",
+     "loc": "Causes",
+     "quote": "urologic medications, antidepressants and psycholeptics were associated with dry mouth in older adults"
+    },
+    {
+     "src": "ada-xerostomia",
+     "loc": "Management",
+     "quote": "The FDA has approved two oral sialologues--pilocarpine (Salagen ® , Advanz Pharma and generics) 45 and cevimeline hydrochloride (Evoxac ® capsules, Daiichi-Sankyo and generics)"
+    }
+   ],
+   "units": [
+    "pharm",
+    "opath"
+   ],
+   "topic": "xerostomia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "ST-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Unnecessary antibiotic exposure raises the risk of adverse drug events and drug interactions and can delay definitive dental treatment, so dentists weigh avoiding unneeded use against treating infections that need it.",
+   "cites": [
+    {
+     "src": "ada-stewardship",
+     "loc": "Background",
+     "quote": "unnecessary exposure can increase the risk of adverse drug events, drug interactions, and delays in appropriate definitive treatment"
+    }
+   ],
+   "see": [
+    "AB-1",
+    "PT-7"
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "antibiotic-stewardship",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
   }
  ]
 }

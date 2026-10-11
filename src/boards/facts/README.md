@@ -22,6 +22,7 @@ notes: **edit the JSON, not the markdown**.
 | `risk` | `low` (stable basic facts), `medium` (diagnosis, treatment), `high` (doses, emergencies, contraindications, prophylaxis, medically complex). Sets how hard items citing it are checked (PLAN_V2 item 5). |
 | `claim` | The fact in our own words: the exact statement items may rely on. |
 | `conditions` | Qualifiers, exceptions, what not to key, gaps in the sourcing. |
+| `stem_names` | Names a stem must mention when an item cites this fact (`["ADA"]`): for facts whose numbers differ between sources. The lint fails an item that doesn't name one. |
 | `data` | Numbers in structured form, for calculation items (`lint-items.mjs` recomputes an item's `calc` from them). |
 | `cites` | `[{src, loc, quote}]`. `quote` is a short verbatim excerpt from the source (`null` when the source blocks scripts). |
 | `see` | Related fact ids. |

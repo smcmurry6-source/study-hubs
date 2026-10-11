@@ -29,12 +29,11 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
 - **Scripts:** `tools/boards/check-quotes.mjs` (fetch, cache, verify quotes; `--grep`/`--propose` to add new ones),
   `tools/boards/lint-items.mjs` (PLAN_V2 item 9 + BUILD_SPEC 4.7 checks, fact schema), `tools/boards/bench.mjs`.
 - **Benchmark:** `docs/boards/bench/REPORT.md`. Sonnet subagent checker caught 19/20 planted defects (code checks got
-  the 20th), 0 false alarms; my first-pass item quality was 55-70%; 9 real defects found and fixed. Recommendation:
-  go, with the conditions in the report. **Waiting on Sam's go/no-go.**
+  the 20th), 0 false alarms; my first-pass item quality was 55-70%; 9 real defects found, 8 fixed. Sam said **go** on 2026-10-11.
 
 ## Session 2: close the benchmark loop, then facts for release 1
 
-1. **Re-verify** the 9 repaired items in `docs/boards/bench/items.js` with a fresh checker (stage 4b; only the changed
+1. **Re-verify** the 8 repaired items in `docs/boards/bench/items.js` with a fresh checker (stage 4b; only the changed
    items). If an OpenRouter key exists by then, also run `run1/` through a non-Anthropic checker and add a run-2 row
    to the report.
 2. **Lint additions** from the benchmark: a fact field naming the guideline a stem must cite (BP-4, CH-2), a wider

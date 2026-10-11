@@ -4,6 +4,8 @@
 //
 //   node tools/boards/bench.mjs build --items docs/boards/bench/items.js --seeds docs/boards/bench/seeds.js --out <dir> [--rng 7]
 //       writes <dir>/batch-A.md, batch-B.md (what the checker reads), key.json (never shown to the checker)
+//   node tools/boards/bench.mjs render --items <file> --ids b-x-0001,b-y-0002 --out <dir> [--rng 7] [--name recheck]
+//       one batch of clean items (their whole case set comes along), for re-checking repaired items (stage 4b)
 //   node tools/boards/bench.mjs score --out <dir> [--label sonnet]
 //       reads <dir>/verdicts-A.json, verdicts-B.json, key.json and adjudication.json (optional: the author's call on
 //       each flag: {"Q07": {"caught": true} } for seeded items, {"Q03": {"real": true, "note": "..."}} for clean ones)
@@ -107,6 +109,37 @@ function build() {
   console.log(`wrote ${out}/batch-A.md, batch-B.md (${Object.keys(key).length} items, ${Object.values(key).filter(k => k.seeded).length} seeded) and key.json`);
 }
 
+function loadFacts() {
+  const FD = path.join(ROOT, 'src/boards/facts'), sources = JSON.parse(fs.readFileSync(path.join(FD, 'sources.json'), 'utf8')), facts = new Map();
+  for (const f of fs.readdirSync(FD).filter(f => f.endsWith('.json') && f !== 'sources.json')) for (const x of JSON.parse(fs.readFileSync(path.join(FD, f), 'utf8')).facts) facts.set(x.id, x);
+  return { facts, sources };
+}
+
+function render() {
+  const { items, cases } = require(path.resolve(opt.items)), { facts, sources } = loadFacts();
+  const want = new Set(String(opt.ids || '').split(',').filter(Boolean)), r = rng(opt.rng), name = opt.name || 'recheck';
+  const out = path.resolve(opt.out); fs.mkdirSync(out, { recursive: true });
+  const blocks = [], done = new Set();
+  for (const it of items) {
+    if (!want.size ? false : !want.has(it.id) || done.has(it.id)) continue;
+    const c = it.case && cases.find(x => x.id === it.case);
+    const block = c ? c.items.map(id => items.find(i => i.id === id)) : [it];
+    block.forEach(b => done.add(b.id)); blocks.push(block);
+  }
+  shuffle(blocks, r);
+  let n = 0, md = `# Batch ${name}\n\n`; const key = {};
+  for (const block of blocks) {
+    const c = block[0].case && cases.find(x => x.id === block[0].case);
+    if (c) md += `## Case set (the items below share this patient box)\n\n${boxMd(c.box)}\n`;
+    for (const q of block) {
+      const qid = `R${String(++n).padStart(2, '0')}`, { md: m, keyLetter } = itemMd(q, qid, r, facts, sources);
+      md += m + '\n'; key[qid] = { item: q.id, seeded: false, keyLetter, inCase: !!c, changed: want.has(q.id) };
+    }
+  }
+  fs.writeFileSync(path.join(out, `batch-${name}.md`), md); fs.writeFileSync(path.join(out, `key-${name}.json`), JSON.stringify(key, null, 1));
+  console.log(`wrote ${out}/batch-${name}.md (${n} items) and key-${name}.json`);
+}
+
 function score() {
   const out = path.resolve(opt.out), key = JSON.parse(fs.readFileSync(path.join(out, 'key.json'), 'utf8'));
   const adj = fs.existsSync(path.join(out, 'adjudication.json')) ? JSON.parse(fs.readFileSync(path.join(out, 'adjudication.json'), 'utf8')) : {};
@@ -135,5 +168,5 @@ function score() {
   console.log('by defect type: ' + Object.entries(byType).map(([t, s]) => `${t} ${s.caught}/${s.n}`).join('; '));
 }
 
-if (cmd === 'build') build(); else if (cmd === 'score') score();
+if (cmd === 'build') build(); else if (cmd === 'render') render(); else if (cmd === 'score') score();
 else { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 14).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); process.exit(cmd ? 2 : 0); }

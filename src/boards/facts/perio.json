@@ -502,12 +502,16 @@
    "status": "verified",
    "risk": "medium",
    "claim": "Without previous exam data, peri-implantitis can be diagnosed from bleeding/suppuration on gentle probing plus probing depths of 6 mm or more plus bone levels 3 mm or more apical to the most coronal part of the intraosseous portion of the implant.",
-   "conditions": "The 6 mm probing-depth part of the rule is in the same paragraph (quote not yet added).",
    "cites": [
     {
      "src": "efp-4",
      "loc": "p. 6",
      "quote": "bone levels ≥3mm apical of the most coronal portion of the intra-osseous part of the implant, together with bleeding and/or suppuration on probing, are consistent with the diagnosis of peri-implantitis"
+    },
+    {
+     "src": "wws-berglundh-2018",
+     "loc": "Case definitions (no previous data)",
+     "quote": "Probing depths of ≥6 mm. • Bone levels ≥3 mm apical of the most coronal portion of the in‐ traosseous part of the implant."
     }
    ],
    "units": [
@@ -701,6 +705,387 @@
     "adex"
    ],
    "recorded": "2026-10-04"
+  },
+  {
+   "id": "PT-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 1 of periodontitis therapy (for every patient, whatever the stage): supragingival biofilm control and risk-factor control, including smoking cessation and diabetes control interventions; it is re-evaluated often.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, step 1",
+     "quote": "This first step of therapy should be implemented in all periodontitis patients, irrespective of the stage of their disease"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.6",
+     "quote": "We recommend tobacco smoking cessation interventions to be implemented in patients undergoing periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.7",
+     "quote": "We recommend diabetes control interventions in patients undergoing periodontitis therapy."
+    }
+   ],
+   "units": [
+    "perio",
+    "medcx"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 2 (cause-related therapy) is subgingival instrumentation to remove subgingival biofilm and calculus. Hand or powered (sonic/ultrasonic) instruments, alone or combined, are both recommended, and it may be done quadrant by quadrant or as full-mouth delivery within 24 hours.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, step 2",
+     "quote": "The second step of therapy (cause‐related therapy) is aimed at controlling (reducing/eliminating) the subgingival biofilm and calculus (subgingival instrumentation)."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.2",
+     "quote": "We recommend that subgingival periodontal instrumentation is performed with hand or powered (sonic/ultrasonic) instruments, either alone or in combination."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.3",
+     "quote": "We suggest that subgingival periodontal instrumentation can be performed with either traditional quadrant‐wise or full mouth delivery within 24 hr."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Re-evaluation after steps 1-2: the endpoints of therapy are no pockets over 4 mm with bleeding on probing (and no deep pockets of 6 mm or more). If they are not reached, step 3 is considered; if they are, the patient enters supportive periodontal care.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, re-evaluation",
+     "quote": "If the endpoints of therapy (no periodontal pockets >4 mm with bleeding on probing or no deep periodontal pockets [≥6 mm]) have not been achieved, the third step of therapy should be considered."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, re-evaluation",
+     "quote": "If the treatment has been successful in achieving the endpoints of therapy, patients should be placed in a supportive periodontal care (SPC) programme."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 3: for deep residual pockets (6 mm or more) in stage III periodontitis after steps 1 and 2, access flap surgery is suggested; for moderately deep residual pockets (4-5 mm), repeated subgingival instrumentation.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.1",
+     "quote": "In the presence of deep residual pockets (PPD ≥ 6 mm) in patients with Stage III periodontitis after the first and second steps of periodontal therapy, we suggest performing access flap surgery."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.1",
+     "quote": "In the presence of moderately deep residual pockets (4–5 mm), we suggest repe"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Supportive periodontal care visits are scheduled every 3 months up to a maximum of 12 months, tailored to the patient's risk profile and periodontal condition after active therapy.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.1",
+     "quote": "We recommend that supportive periodontal care visits should be scheduled at intervals of 3 to a maximum of 12 months and ought to be tailored according to patient's risk profile and periodontal conditions after active"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Adjuncts to subgingival instrumentation that the EFP S3 guideline advises against: lasers, probiotics and sub-antimicrobial-dose doxycycline (suggests not), and systemic or local NSAIDs, local statin gels, omega-3 fatty acids and local metformin gel (recommends not). Locally delivered sustained-release chlorhexidine may be considered.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.4",
+     "quote": "We suggest not to use lasers as adjuncts to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.7",
+     "quote": "We suggest not to use probiotics as an adjunct to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.8",
+     "quote": "We suggest not to use systemic sub‐antimicrobial dose doxycycline (SDD) as an adjunct to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.10",
+     "quote": "We recommend not to use systemic or local non‐steroidal anti‐inflammatory drugs (NSAIDs) as an adjunct to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.6",
+     "quote": "We recommend not to use local administration of statin gels (atorvastatin, simvastatin, rosuvastatin) as adjuncts to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.14",
+     "quote": "Locally administered sustained‐release chlorhexidine as an adjunct to subgingival instrumentation in patients with periodontitis may be considered"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-adjuncts",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Adjunctive systemic antibiotics are not to be used routinely with subgingival instrumentation, because of concerns for the patient's health and for public health; they may be considered for specific patient categories, such as generalized stage III periodontitis in young adults.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.16",
+     "quote": "Due to concerns about patient's health and the impact of systemic antibiotic use to public health, its routine use as adjunct to su"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.16",
+     "quote": "systemic antibiotics may be considered for specific patient categories (e.g. generalized periodontitis Stage III in young adults)"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-adjuncts",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "A periodontal abscess is an acute lesion with a localized collection of pus in the gingival wall of the pocket or sulcus and rapid tissue destruction, with a risk of systemic spread; most arise in pre-existing periodontal pockets.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "Periodontal abscesses are defined as acute lesions characterized by localized accumulation of pus within the gingival wall of the periodontal pocket/sulcus, rapid tissue destruction and are associated with risk for systemic dissemination."
+    },
+    {
+     "src": "wws-herrera-2018",
+     "loc": "Abstract, Conclusions",
+     "quote": "with the most frequent being those occurring in pre‐existing periodontal pockets"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Necrotizing periodontal diseases form a distinct category with three typical features (papilla necrosis, bleeding and pain) and are associated with impaired host immune responses.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "papilla necrosis, bleeding, and pain) and are associated with host immune response impairments"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "An endo-periodontal lesion is a pathological communication between the pulpal and periodontal tissues of a tooth. Lesions with root damage (fractures, perforations) have the worst prognosis.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "Endodontic‐periodontal lesions, defined by a pathological communication between the pulpal and periodontal tissues at a given tooth"
+    },
+    {
+     "src": "wws-herrera-2018",
+     "loc": "Abstract, Results",
+     "quote": "Lesions associated with root damage, such as fractures and perforations, had the worst prognosis."
+    }
+   ],
+   "units": [
+    "perio",
+    "endo"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "GE-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Drugs linked to gingival enlargement: the antiseizure drugs phenytoin and sodium valproate; calcium channel blockers (nifedipine, verapamil, diltiazem, amlodipine, felodipine); cyclosporine; and high-dose oral contraceptives. A drug-influenced enlargement is larger than inflammation alone would produce.",
+   "cites": [
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Drug-influenced gingival enlargement",
+     "quote": "the antiepileptic drugs phenytoin and sodium valproate, certain calcium channel–blocking drugs (e.g., nifedipine, verapamil, diltiazem, amlodipine, felodipine), immunoregulating drugs (e.g., ciclosporine), and high-dose oral contraceptives"
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Drug-influenced gingival enlargement",
+     "quote": "the size of the gingival unit must be greater than would normally be expected from purely an inflammatory reaction in the gingival tissues"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "drug-gingival-enlargement",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PSY-1",
+   "status": "verified",
+   "risk": "low",
+   "claim": "About 42% of dentate US adults aged 30 or older have periodontitis; its attachment and bone loss result from the immune response to the plaque biofilm.",
+   "cites": [
+    {
+     "src": "ada-periodontitis",
+     "loc": "Key Points",
+     "quote": "Roughly 42 percent of all dentate U.S. adults 30 years of age or older have periodontitis"
+    },
+    {
+     "src": "ada-periodontitis",
+     "loc": "Key Points",
+     "quote": "Attachment and bone loss associated with periodontal disease are results of the body's immune response to plaque biofilm"
+    }
+   ],
+   "units": [
+    "perio",
+    "pubh"
+   ],
+   "topic": "perio-systemic",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PSY-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Periodontitis is associated with systemic conditions, especially cardiovascular disease and diabetes, but direct causality has not been shown; the diseases share risk factors such as smoking and poor diet.",
+   "cites": [
+    {
+     "src": "ada-oral-systemic",
+     "loc": "Key Points",
+     "quote": "of systemic diseases have been associated with oral health, particularly cardiovascular diseases and diabetes"
+    },
+    {
+     "src": "ada-oral-systemic",
+     "loc": "Key Points",
+     "quote": "finding direct causality remains elusive. Periodontal and systemic diseases share many common risk factors, including smoking and poor diet."
+    }
+   ],
+   "see": [
+    "DM-7"
+   ],
+   "units": [
+    "perio",
+    "medcx"
+   ],
+   "topic": "perio-systemic",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
   }
  ]
 }

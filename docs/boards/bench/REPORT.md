@@ -29,15 +29,15 @@ three units, check that an independent checker catches planted defects without c
 | Code checks alone (zero tokens) | 4 / 20 seeds: the 3 length cues (warnings) and the outdated calculation (error) |
 | Clean items passed (first-pass acceptance) | **14 / 20 (70%)** |
 | Flags on clean items | 6, **all real defects** in my items; **0 false alarms** |
-| Defects in clean items, all sources | 9 of 20 items: the 6 above plus 3 that the checker raised only on an item's seeded twin. So the clean-item pass missed about a third of the natural defects it could find, and true first-pass quality was 11/20 (55%). |
+| Defects in clean items, all sources | 9 of 20 items: the 6 above plus 3 that the checker raised only on an item's seeded twin (a key in an odd format, a box that left open whether a 4-mm site bled, and a threshold from an archived NIDCR guide). So the clean-item pass missed a third of the natural defects it could find, and true first-pass quality was 11/20 (55%). |
 | Cost | 343,623 subagent tokens for 40 item checks (174k + 169k), about 8.6k per item, ~5 minutes per batch. No dollars on the subscription; most of it is the batch file re-read on each tool call, so a scripted one-call-per-item checker should cost far less per item. |
 
-The 9 real defects, all fixed in `items.js` (re-verification pending): an explanation that named a stage IV trap that
+The 9 real defects: 8 fixed in `items.js` (re-verification pending): an explanation that named a stage IV trap that
 can't reach stage IV; a "why" line that used MRONJ's 8-week rule against an osteoradionecrosis case (now 4 months);
 a stem that didn't name the ADA guide although the fact record says it must; antibiotics added after incision and
 drainage, which the ADA guideline advises against; a misstated older drug-holiday rule; absolute-sounding distractors
 around a hedged key; a key whose format was the odd one out; and a patient box that left open whether a 4-mm site
-already bled. All were writer errors the fact records already guarded against, which is the argument for the pipeline.
+already bled. The ninth, `b-medcx-0008` keying a platelet cutoff from an archived NIDCR guide that other sources put lower, stays open until a current source is found. Most were writer errors the fact records already guarded against, which is the argument for the pipeline.
 
 ## Verdict: go, with conditions
 
