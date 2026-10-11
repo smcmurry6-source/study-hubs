@@ -1,0 +1,362 @@
+{
+ "A01": {
+  "item": "b-medcx-0002",
+  "bench": "clinical",
+  "seeded": true,
+  "type": "length-cue",
+  "note": "Key lengthened with qualifiers and its justification.",
+  "keyLetter": "D",
+  "inCase": false
+ },
+ "A02": {
+  "item": "b-pharm-0001",
+  "bench": "factual",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A03": {
+  "item": "b-endo-0001",
+  "bench": "factual",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "A04": {
+  "item": "b-medcx-0009",
+  "bench": "ambiguity",
+  "seeded": true,
+  "type": "outdated",
+  "note": "Key moved to \"wait for the second trimester\", an older convention the ADA and ACOG no longer apply to emergency care.",
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A05": {
+  "item": "b-pharm-0003",
+  "bench": "pharmacology",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "A06": {
+  "item": "b-anes-0002",
+  "bench": "calculation",
+  "seeded": true,
+  "type": "outdated",
+  "note": "Uses the older 36 mg per 1.8-mL lidocaine cartridge convention (US dental cartridges are 1.7 mL / 34 mg); key changed to 9.",
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A07": {
+  "item": "b-medcx-0008",
+  "bench": "ambiguity",
+  "seeded": true,
+  "type": "defensible-distractor",
+  "note": "A distractor now says to consult the oncologist about coordinated platelet transfusion support before extracting, which the NCI PDQ supports; its why line falsely limits transfusion to counts under 20,000.",
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A08": {
+  "item": "b-anes-0003",
+  "bench": "calculation",
+  "seeded": true,
+  "type": "missing-qualifier",
+  "note": "Patient weight removed; the 8 mg/kg calculation (key 6) can no longer be done, and 8 cartridges fits a 70-kg patient.",
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A09": {
+  "item": "b-medcx-0005",
+  "bench": "clinical",
+  "seeded": true,
+  "type": "wrong-key",
+  "note": "Key moved to glucagon for a conscious patient who can swallow.",
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "A10": {
+  "item": "b-pharm-0004",
+  "bench": "pharmacology",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "A11": {
+  "item": "b-perio-0001",
+  "bench": "factual",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "A12": {
+  "item": "b-medcx-0004",
+  "bench": "clinical",
+  "seeded": true,
+  "type": "rationale-contradicts-key",
+  "note": "Explanation now argues for extracting now and holding two injections, contradicting the key (3-4 months after the last dose).",
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "A13": {
+  "item": "b-medcx-0003",
+  "bench": "clinical",
+  "seeded": true,
+  "type": "defensible-distractor",
+  "note": "A distractor now also continues the DOAC with local measures (plus timing the visit after the dose), which is also acceptable; its why line falsely says timing around the dose is never recommended.",
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "A14": {
+  "item": "b-medcx-0001",
+  "bench": "factual",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "A15": {
+  "item": "b-anes-0001",
+  "bench": "pharmacology",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "A16": {
+  "item": "b-perio-0002",
+  "bench": "case",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": true
+ },
+ "A17": {
+  "item": "b-perio-0003",
+  "bench": "case",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": true
+ },
+ "A18": {
+  "item": "b-medcx-0006",
+  "bench": "case",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": true
+ },
+ "A19": {
+  "item": "b-medcx-0007",
+  "bench": "case",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "A",
+  "inCase": true
+ },
+ "A20": {
+  "item": "b-pharm-0002",
+  "bench": "pharmacology",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "B01": {
+  "item": "b-medcx-0009",
+  "bench": "ambiguity",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "B02": {
+  "item": "b-pharm-0004",
+  "bench": "pharmacology",
+  "seeded": true,
+  "type": "length-cue",
+  "note": "Key lengthened with its reason, so it is the longest and most specific option.",
+  "keyLetter": "D",
+  "inCase": false
+ },
+ "B03": {
+  "item": "b-endo-0001",
+  "bench": "factual",
+  "seeded": true,
+  "type": "wrong-key",
+  "note": "Key moved to normal apical tissues with a plausible but false rationale (a radiolucency required for symptomatic apical periodontitis).",
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "B04": {
+  "item": "b-medcx-0005",
+  "bench": "clinical",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "B05": {
+  "item": "b-anes-0002",
+  "bench": "calculation",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "B06": {
+  "item": "b-perio-0002",
+  "bench": "case",
+  "seeded": true,
+  "type": "outdated",
+  "note": "Key replaced by the 1999 classification term \"generalized severe chronic periodontitis\", dropped in 2017.",
+  "keyLetter": "D",
+  "inCase": true
+ },
+ "B07": {
+  "item": "b-perio-0003",
+  "bench": "case",
+  "seeded": true,
+  "type": "length-cue",
+  "note": "Key lengthened with its reason.",
+  "keyLetter": "C",
+  "inCase": true
+ },
+ "B08": {
+  "item": "b-medcx-0006",
+  "bench": "case",
+  "seeded": true,
+  "type": "wrong-key",
+  "note": "Key moved to \"no measurable effect\"; the ADA page reports A1C reductions after scaling and root planing.",
+  "keyLetter": "C",
+  "inCase": true
+ },
+ "B09": {
+  "item": "b-medcx-0007",
+  "bench": "case",
+  "seeded": true,
+  "type": "missing-qualifier",
+  "note": "Repeat reading and \"no written guidance\" removed; the ADA guide first calls for a repeat measurement before deferring.",
+  "keyLetter": "A",
+  "inCase": true
+ },
+ "B10": {
+  "item": "b-medcx-0004",
+  "bench": "clinical",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "B11": {
+  "item": "b-anes-0003",
+  "bench": "calculation",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "B12": {
+  "item": "b-medcx-0001",
+  "bench": "factual",
+  "seeded": true,
+  "type": "missing-qualifier",
+  "note": "Radiation history removed from the box; the key (osteoradionecrosis) now has no support and MRONJ stage 1 fits.",
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "B13": {
+  "item": "b-anes-0001",
+  "bench": "pharmacology",
+  "seeded": true,
+  "type": "rationale-contradicts-key",
+  "note": "Explanation now says the heart speeds up (tachycardia), contradicting the key (slower heart rate).",
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "B14": {
+  "item": "b-pharm-0001",
+  "bench": "factual",
+  "seeded": true,
+  "type": "rationale-contradicts-key",
+  "note": "Explanation says category X was kept, contradicting the key (all letters removed).",
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "B15": {
+  "item": "b-pharm-0003",
+  "bench": "pharmacology",
+  "seeded": true,
+  "type": "defensible-distractor",
+  "note": "A distractor is now clindamycin 300 mg four times a day for 3-7 days, which the 2019 ADA guideline also lists for this allergy; its why line falsely says the ADA no longer recommends it.",
+  "keyLetter": "D",
+  "inCase": false
+ },
+ "B16": {
+  "item": "b-medcx-0003",
+  "bench": "clinical",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "C",
+  "inCase": false
+ },
+ "B17": {
+  "item": "b-medcx-0008",
+  "bench": "ambiguity",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "B18": {
+  "item": "b-pharm-0002",
+  "bench": "pharmacology",
+  "seeded": true,
+  "type": "wrong-key",
+  "note": "Key moved to \"lower INR\" (metronidazole said to speed warfarin clearance); the label says it potentiates warfarin.",
+  "keyLetter": "A",
+  "inCase": false
+ },
+ "B19": {
+  "item": "b-medcx-0002",
+  "bench": "clinical",
+  "seeded": false,
+  "type": null,
+  "note": null,
+  "keyLetter": "B",
+  "inCase": false
+ },
+ "B20": {
+  "item": "b-perio-0001",
+  "bench": "factual",
+  "seeded": true,
+  "type": "defensible-distractor",
+  "note": "Distractor now describes gingivitis in a treated periodontitis patient (BOP 12% at 3-mm sites), which also ends periodontal health; its why line wrongly dismisses it.",
+  "keyLetter": "A",
+  "inCase": false
+ }
+}

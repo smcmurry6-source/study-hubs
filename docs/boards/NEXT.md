@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, 2026-10-11)
+# Boards hub: what the next session does (handoff, updated 2026-10-11 after Session 1)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -18,26 +18,38 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
 - **Code checks first:** never spend model tokens on what a script can prove.
 - When Codex/opencode arrive, switch drafting and building to them per `PLAN_V2.md` "Who does what".
 
-## Session 1: groundwork and the benchmark
+## Session 1 (done 2026-10-11)
 
-1. **Trim `DEPLOY_NOTES.md`** (about 17k tokens loaded into every session and agent). Move "Recent major changes"
-   entries older than about two weeks into a new `DEPLOY_HISTORY.md`, keep the rules sections and recent entries, and
-   leave a one-line pointer. Make sure CLAUDE.md's `@DEPLOY_NOTES.md` import still makes sense.
-2. **`AGENTS.md`** at the repo root: a short rules file for Codex/opencode (American English; no secrets; never push
-   `main`; PRs into `claude/boards-hub`; run `node tools/ci/syntax.js`; the About-page rule; text/audio drift rule;
-   point to `docs/boards/PLAN_V2.md`). Cheap now, needed later.
-3. **Fact records** for the release-1 units (medcx, pharm, perio): convert `research/facts-medical.md` and the
-   finished sections of `research/facts-dental.md` into structured records (`PLAN_V2.md` item 2), e.g.
-   `src/boards/facts/<unit>.json`; fill gaps from primary sources; mark risk tier per fact.
-4. **Scripts:** `tools/boards/check-quotes.mjs` (fetch each source, confirm the quote is there) and
-   `tools/boards/lint-items.mjs` (the checks in `PLAN_V2.md` item 9, on top of the repo's existing CI lint).
-5. **Benchmark** (`PLAN_V2.md` item 8): 20 deliberately hard items in INBDE style from the fact records, seeded-error
-   copies made by a script, the checker run on clean + seeded items. Report to Sam: catch rate, false alarms, first-pass
-   acceptance, defects found, tokens/dollars. Go/no-go before scaling.
+- `DEPLOY_NOTES.md` trimmed: entries from 2026-09-26 and earlier moved to `DEPLOY_HISTORY.md` (not imported).
+  Root `AGENTS.md` written for Codex/opencode.
+- **Fact records:** `src/boards/facts/` (`sources.json` + `pharm`, `medcx`, `anes`, `perio`, `endo`; schema in its
+  README), 152 facts with 266 verbatim quotes confirmed in their sources by `tools/boards/check-quotes.mjs`. Not yet
+  quoted: the AHA 2021 statement (ahajournals blocks scripts; 10 cites). Errata: LA-11 (phentolamine age), FM-4
+  (Miller grade 2, marked partial). New: EM-1 to EM-3 (EpiPen, nitroglycerin, naloxone labels).
+- **Scripts:** `tools/boards/check-quotes.mjs` (fetch, cache, verify quotes; `--grep`/`--propose` to add new ones),
+  `tools/boards/lint-items.mjs` (PLAN_V2 item 9 + BUILD_SPEC 4.7 checks, fact schema), `tools/boards/bench.mjs`.
+- **Benchmark:** `docs/boards/bench/REPORT.md`. Sonnet subagent checker caught 19/20 planted defects (code checks got
+  the 20th), 0 false alarms; my first-pass item quality was 55-70%; 9 real defects found and fixed. Recommendation:
+  go, with the conditions in the report. **Waiting on Sam's go/no-go.**
 
-Commit doc-only checkpoints with `[skip ci]`; let CI run on code changes.
+## Session 2: close the benchmark loop, then facts for release 1
 
-## Session 2 onward: release 1
+1. **Re-verify** the 9 repaired items in `docs/boards/bench/items.js` with a fresh checker (stage 4b; only the changed
+   items). If an OpenRouter key exists by then, also run `run1/` through a non-Anthropic checker and add a run-2 row
+   to the report.
+2. **Lint additions** from the benchmark: a fact field naming the guideline a stem must cite (BP-4, CH-2), a wider
+   hedging/absolutes check.
+3. **Fill fact gaps** for the release-1 units, quotes checked as you go (`check-quotes.mjs --grep/--propose`):
+   medcx (asthma/COPD, kidney, liver, thyroid/adrenal, infectious disease, sickle cell and transplant; emergencies:
+   syncope, seizure, stroke, chest pain, anaphylaxis follow-up, BLS; the AHA is blocked, so look for open
+   alternatives), pharm (pharmacokinetics/CYP, opioids and substance use, tobacco cessation, drug effects with oral
+   signs), perio (nonsurgical therapy and reevaluation, adjuncts, supportive therapy intervals, necrotizing disease
+   and abscesses, endo-perio lesions, prognosis, perio-systemic links). Also an ORN definition fact (the benchmark
+   item needs one).
+4. **AHA 2021 quotes:** if Sam puts the PDF in Google Drive, a session can save it as
+   `.cache/boards-sources/aha-ie-2021.local.pdf` (never committed) and add the 10 missing quotes with `--propose`.
+
+## Session 3 onward: release 1
 
 R1a, R1b, R1c as in `BUILD_SPEC.md` 8.2, with the `PLAN_V2.md` changes (local-first storage with server backup,
 review page for Sam, risk-tiered checking, item provenance). Before shipping each drop: About page entry, dashboard

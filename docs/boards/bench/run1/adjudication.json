@@ -1,0 +1,9 @@
+{
+ "A06": {"caught": false, "note": "flagged an arithmetic side effect of the seed (option 14 vs 13.9), not the outdated 36 mg/1.8 mL convention; the lint calc check catches this seed"},
+ "A14": {"real": true, "note": "D's why uses MRONJ's 8-week rule against an ORN case; ORN definitions use about 3 months, so 10 weeks is borderline"},
+ "A16": {"real": true, "note": "explanation's stage IV trap is wrong: 3 missing teeth is still 4 or fewer"},
+ "A18": {"real": true, "note": "key is the only hedged option; distractors are absolute claims"},
+ "A19": {"real": true, "note": "stem doesn't name the ADA guide although BP-4's conditions require it"},
+ "A20": {"real": true, "note": "adds metronidazole after incision and drainage, which AB-3 says not to do"},
+ "B10": {"real": true, "note": "the 2014 holiday was about 2 months, so 'the long holiday, an older approach' misstates it"}
+}
