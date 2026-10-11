@@ -1,5 +1,9 @@
 # Facts of record: dental and practice topics
 
+> **Converted 2026-10-11:** sections 1-2 of this file are now structured records in `src/boards/facts/*.json`, with
+> verbatim quotes checked by `tools/boards/check-quotes.mjs`. **The JSON is the authority; edit it, not this file.**
+> Corrections found during conversion are logged in each record's `errata`. Keep this file as background notes.
+
 Compiled 2026-10-04 for the boards hub (INBDE + ADEX). Every question and note that touches these topics must match
 the statements below. Each fact is paraphrased (no copied text) and cites the source opened, with page or section.
 Anything marked **UNVERIFIED** could not be confirmed from an opened source and must not be used as a keyed answer

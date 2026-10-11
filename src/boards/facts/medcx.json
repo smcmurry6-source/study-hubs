@@ -1,0 +1,1509 @@
+{
+ "unit": "medcx",
+ "note": "Fact records for the boards hub. Schema and rules: src/boards/facts/README.md. Quotes are verified by tools/boards/check-quotes.mjs.",
+ "facts": [
+  {
+   "id": "PJ-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "ADA 2015 clinical practice guideline (Sollecito et al., JADA 2015, from a 2014 systematic review): in general, prophylactic antibiotics are not recommended before dental procedures to prevent prosthetic joint infection; the review found no association between dental procedures and prosthetic joint infection.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Prevention of Prosthetic Joint Infection",
+     "quote": "The updated systematic review undertaken in 2014 and published in 2015 found no association between dental procedures and prosthetic joint infections."
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Prevention of Prosthetic Joint Infection",
+     "quote": "not recommended prior to dental procedures to prevent prosthetic joint infection"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "joint-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PJ-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "For a patient with a history of complications from the joint replacement surgery who needs procedures with gingival manipulation or mucosal incision, prophylaxis is only considered after consulting the patient and the orthopedic surgeon; if it is needed, the orthopedic surgeon should recommend the regimen and, when reasonable, write the prescription.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Key Points (ADA Chairside Guide)",
+     "quote": "for patients with a history of complications associated with their joint replacement surgery who are undergoing dental procedures that include gingival manipulation or mucosal incision, prophylactic antibiotics should only be considered after consultation with the patient and orthopedic surgeon"
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Key Points (ADA Chairside Guide)",
+     "quote": "it is most appropriate that the orthopedic surgeon recommend the appropriate antibiotic regimen and, when reasonable, write the prescription"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "joint-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PJ-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Newest ADA position (ADA Council on Scientific Affairs, JADA 2026;157(6):667-669): timing of dental care and any rare prophylaxis for joint-replacement patients rests on shared decision making among dentist, orthopedic team and patient, not routine delays or automatic premedication.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Key Points, ref. 4",
+     "quote": "decisions about timing of dental care and any rare use of prophylactic antibiotics should be based on shared decision making among the dentist, orthopedic team, and patient, rather than routine delays or automatic premedication"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "joint-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PJ-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Other implants (solid organ transplant, breast implants, penile implants): no general recommendation for prophylaxis; only if the treating physician judges the person predisposed to infection, and the physician prescribes. Chemotherapy patient with a central venous catheter: consult the oncologist about prophylaxis.",
+   "conditions": "The ADA quote names the implants asked about; the physician-decides rule is the ADA page's discussion of them (quote not yet added).",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Miscellaneous Indications",
+     "quote": "solid organ transplant, 14 breast augmentation with implants, 14 or penile implant"
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Miscellaneous Indications",
+     "quote": "in patients receiving chemotherapy who have a central venous catheter, dental professionals consult the treating oncologist about the need for antibiotic prophylaxis"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "joint-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Adult BP categories: normal <120 and <80; elevated 120-129 and <80; stage 1 hypertension 130-139 or 80-89; stage 2 >=140 or >=90; hypertensive crisis >180 and/or >120.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Table 1 (2017 ACC/AHA categories)",
+     "quote": "Elevated 120-129 and <80 Hypertension Stage 1 130-139 or 80-89 Stage 2 > 140 or > 90 Hypertensive Crisis >180 and/or >120"
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Diagnosis",
+     "quote": "hypertension is defined as a systolic pressure of 130 mmHg or greater or a diastolic blood pressure of 80 mmHg or greater"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-2",
+   "status": "partial",
+   "risk": "high",
+   "claim": "The 2025 AHA/ACC guideline kept the 2017 definition of hypertension (130 or more systolic, or 80 or more diastolic) and stage 1 = 130-139/80-89; the target is SBP under 130 and DBP under 80, with SBP under 120 encouraged.",
+   "conditions": "Whether the 2025 guideline renamed 'hypertensive crisis' or changed its numbers is UNVERIFIED: use BP-1's crisis numbers only as '2017 ACC/AHA'. The 2025 guideline itself was not opened (secondary source).",
+   "cites": [
+    {
+     "src": "erbp-2025-bp",
+     "loc": "Definition discussion",
+     "quote": "defined as SBP ≥130 mmHg or DBP ≥80 mmHg. The recommended (high CVD risk) or reasonable (not high CVD risk) target is SBP at least <130 mmHg, with encouragement to achieve SBP <120 mmHg, and DBP <80 mmHg"
+    },
+    {
+     "src": "erbp-2025-bp",
+     "loc": "Abstract",
+     "quote": "adults with stage 1 hypertension (SBP 130–39 mmHg, DBP 80–89 mmHg)"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "ADA Practical Guide thresholds for adult outpatient dental care: under 160/100: no modification for elective or emergency care. Over 160/100: repeat the reading; if it comes down, or is within a physician's written guidance, proceed; if confirmed, no elective care and refer to the physician. Emergency care at a confirmed 160-180 systolic and/or 100-109 diastolic when pain is driving the BP: treat, check BP every 10-15 minutes, use anxiety reduction. Confirmed >180 systolic and/or >109 diastolic: consult the physician before proceeding. Systolic >180 and/or diastolic >100: refer as soon as possible, or urgent medical evaluation if symptomatic.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Table 3 (ADA Practical Guide)",
+     "quote": "<160/100 No modification No modification >160/100* Repeat measurement If lowered or within written guidance from a physician, proceed If confirmed, no elective dental treatment"
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Table 3",
+     "quote": "initiate emergency care with blood pressure monitoring every 10 to 15 minutes during procedure; consider anxiety reduction techniques If confirmed systolic pressure >180 mmHg and/or diastolic pressure >109 mmHg, seek consultation with a physician before proceeding"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Separately, the 2017 ACC/AHA guideline says deferring elective major surgery may be considered at >=180 systolic or >=110 diastolic. Many board review sources use \"180/110 = defer elective dental care\"; when a stem uses that number, frame it as the ACC/AHA surgical threshold, and key ADA's 160/100 only when the stem names the ADA guide. Yarows et al. (JADA 2020) note there is no evidence-based BP cutoff for deferring dental care.",
+   "conditions": "Yarows et al. (no evidence-based cutoff) is cited on the same page; quote not yet added.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Dental treatment considerations",
+     "quote": "deferring surgery may be considered in persons with hypertension and planned elective major surgery who have a systolic pressure of 180 mm Hg or higher or diastolic pressure of 110 mm Hg or higher"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Diagnosis needs an average of 2 or more elevated readings on 2 or more occasions; orthostatic hypotension risk is higher in older adults, diabetics and autonomic dysfunction when standing up from the chair. Most antihypertensive classes can cause dry mouth.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Diagnosis",
+     "quote": "Diagnosis of hypertension is generally based on an average of two or more elevated measurement readings obtained on two or more occasions."
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Oral Effects of Hypertension Medications",
+     "quote": "Most classes of antihypertensive mediations can cause dry mouth"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "BP-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Epinephrine limit in significant cardiovascular disease: 0.04 mg.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Local Anesthetics with Vasoconstrictors",
+     "quote": "a common recommendation is to limit the epinephrine dose to 0.04 mg in adults"
+    }
+   ],
+   "see": [
+    "VC-1",
+    "VC-8"
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "blood-pressure",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AC-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Warfarin: continuing regular warfarin did not raise bleeding risk for single or multiple extractions versus stopping or modifying. A patient with an INR in therapeutic range (3.0 or less) can continue warfarin before extractions. The American Academy of Oral Medicine (2016) found uncomplicated extraction safe at an INR of 3.5, some experts saying up to 4.0. Keyed teaching rule for the bank: simple extractions without stopping warfarin when INR is <=3.5; above that, consult the physician.",
+   "cites": [
+    {
+     "src": "ada-anticoag",
+     "loc": "Warfarin",
+     "quote": "A 2009 systematic review and meta-analysis found no increased risk of bleeding associated with continuing regular doses of warfarin in comparison with discontinuing or modifying the dose"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Warfarin",
+     "quote": "was in therapeutic range (i.e., 3.0 or less) could continue their regular warfarin regimen prior to the procedure"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Warfarin",
+     "quote": "moderately invasive oral surgery (defined as \"uncomplicated tooth extraction\") is safe with an INR of 3.5, with some experts stating that it is safe up to 4.0"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "anticoagulants",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AC-2",
+   "status": "partial",
+   "risk": "high",
+   "claim": "The typical therapeutic INR range is 2 to 3.",
+   "conditions": "Timing of the INR check before surgery (often taught as within 24 hours) is UNVERIFIED: don't key an item on it.",
+   "cites": [
+    {
+     "src": "ada-anticoag",
+     "loc": "Warfarin",
+     "quote": "the risks of hemorrhage and thromboembolism are reduced at an INR range of 2 to 3"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "anticoagulants",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AC-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "DOACs (dabigatran = direct thrombin inhibitor; apixaban, rivaroxaban, edoxaban = factor Xa inhibitors): fixed doses, shorter half-lives, little or no monitoring (no INR), fewer interactions. For most dental procedures, no change to the regimen; with higher bleeding risk, and only with the physician: delay the daily dose until after the procedure, schedule as late as possible after the last dose, or interrupt 24-48 hours. The European Heart Rhythm Association lists extraction of 1-3 teeth, periodontal surgery, abscess incision and implant placement as not necessarily requiring DOAC interruption.",
+   "cites": [
+    {
+     "src": "ada-anticoag",
+     "loc": "Newer anticoagulants",
+     "quote": "consideration may be given, in consultation with and on advice of the patient's physician, to postponing the timing of the daily dose"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Conclusions",
+     "quote": "temporarily interrupting drug therapy for 24 to 48 hours"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Newer anticoagulants",
+     "quote": "interventions not necessarily requiring discontinuation of the newer anticoagulants include extraction of 1 to 3 teeth"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "anticoagulants",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AC-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Antiplatelets (aspirin, clopidogrel, prasugrel, ticagrelor, ticlopidine), single or dual: do not stop for dental procedures; bleeding rates after minor oral surgery were clinically similar with dual, single or no antiplatelet therapy and were controlled locally. Patients with coronary stents on dual antiplatelet therapy: talk to the cardiologist before any change; premature stopping risks stent thrombosis, MI and death.",
+   "cites": [
+    {
+     "src": "ada-anticoag",
+     "loc": "Antiplatelets",
+     "quote": "found clinically similar rates of bleeding across the three groups"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Antiplatelets",
+     "quote": "should contact the patient's cardiologist regarding the patient's antiplatelet regimen and discuss optimal patient management, before discontinuing the antiplatelet medications"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "anticoagulants",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AC-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Local measures: pressure, Gelfoam or Surgicel, sutures, and antifibrinolytics such as tranexamic acid. The risks of stopping (thromboembolism, stroke, MI) generally outweigh prolonged bleeding.",
+   "cites": [
+    {
+     "src": "ada-anticoag",
+     "loc": "Conclusions",
+     "quote": "which can be controlled with local measures such as mechanical pressure, hemostatic agents (e.g., Gelfoam® or Surgicel®), suturing, and/or antifibrinolytics"
+    },
+    {
+     "src": "ada-anticoag",
+     "loc": "Background",
+     "quote": "treatment regimens with these older anticoagulants/antiplatelet agents should not be altered before dental procedures"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "anticoagulants",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Diagnosis: A1C normal below 5.7%, prediabetes 5.7-6.4%, diabetes 6.5% or above. Fasting plasma glucose normal 99 mg/dL or below, prediabetes 100-125, diabetes 126 or above. 2-hour OGTT normal 139 or below, prediabetes 140-199, diabetes 200 or above. Random plasma glucose 200 or above (with symptoms) = diabetes.",
+   "cites": [
+    {
+     "src": "niddk-dx",
+     "loc": "Table: test results for diagnosis",
+     "quote": "Normal below 5.7% 99 mg/dL or below 139 mg/dL or below N/A Prediabetes 5.7% to 6.4% 100 to 125 mg/dL 140 to 199 mg/dL N/A Diabetes 6.5% or above 126 mg/dL or above 200 mg/dL or above"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "A1C reflects average glucose over the past ~3 months; many people with diabetes aim for an A1C below 7%, but the goal is individualized (a higher goal may be safer with a history of severe hypoglycemia, limited life expectancy, etc.).",
+   "cites": [
+    {
+     "src": "niddk-a1c",
+     "loc": "What A1C goal should I have?",
+     "quote": "some people with diabetes can reduce the risk of diabetes complications by keeping A1C levels below 7 percent"
+    },
+    {
+     "src": "niddk-a1c",
+     "loc": "What A1C goal should I have?",
+     "quote": "an A1C level that is safe for one person may not be safe for another"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Hypoglycemia = blood glucose below 70 mg/dL. Symptoms: shaky, sweaty, fast or irregular heartbeat, dizzy, hungry, nervous, lip/tongue tingling, blurred vision, headache, confusion, irritable or combative, pale; severe = unable to eat or drink, seizures, unconsciousness (ADA dental page, \"Hypoglycemia\").",
+   "cites": [
+    {
+     "src": "niddk-hypo",
+     "loc": "What should I do",
+     "quote": "If your blood glucose level is below your target or less than 70 mg/dL"
+    },
+    {
+     "src": "ada-diabetes",
+     "loc": "Hypoglycemia",
+     "quote": "Levels that are ≤70 mg/dL indicate hypoglycemia."
+    },
+    {
+     "src": "ada-diabetes",
+     "loc": "Hypoglycemia",
+     "quote": "Shakiness Sweating Fast or irregular heartbeat Dizziness or lightheadedness Hunger Nervousness"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "The 15-15 rule: give 15-20 g of fast carbohydrate (4 glucose tablets or 1 tube of glucose gel; 1/2 cup (4 oz) fruit juice or regular soda; 1 tablespoon sugar, honey or corn syrup), wait 15 minutes, recheck, and repeat until above 70 mg/dL. Patients with kidney disease should avoid orange juice (potassium); apple, grape or cranberry are fine.",
+   "cites": [
+    {
+     "src": "ada-diabetes",
+     "loc": "Hypoglycemia",
+     "quote": "Provide the patient with 15-20 grams of oral carbohydrates to eat or drink, such as: 12, 13 4 glucose tablets or one tube of glucose gel"
+    },
+    {
+     "src": "niddk-hypo",
+     "loc": "What should I do",
+     "quote": "Wait 15 minutes and check your blood glucose level again. If your glucose level is still low, eat or drink another 15 to 20 grams of glucose or carbohydrates."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Unconscious or unable to swallow: nothing by mouth; call EMS; give glucagon. Glucagon for injection: adults and children 20 kg or more: 1 mg SC, IM (upper arm, thigh, buttocks) or IV; children under 20 kg: 0.5 mg (or 20-30 mcg/kg). If no response after 15 minutes, a second equal dose may be given while waiting for EMS. Turn the person on their side to prevent choking and give oral carbohydrate once they can swallow. Nasal glucagon: 3 mg in one nostril, adults and children 1 year and older; repeat 3 mg after 15 minutes if no response. Glucagon is contraindicated with pheochromocytoma and insulinoma.",
+   "cites": [
+    {
+     "src": "niddk-hypo",
+     "loc": "Severe low blood glucose",
+     "quote": "is the best way to treat severely low blood glucose"
+    },
+    {
+     "src": "dm-glucagon",
+     "loc": "2 Dosage and Administration",
+     "quote": "Adults and Pediatric Patients Weighing 20 kg or More: ■ The recommended dosage is 1 mg (1 mL) injected subcutaneously or intramuscularly into the upper arm, thigh, or buttocks, or intravenously."
+    },
+    {
+     "src": "dm-glucagon",
+     "loc": "2 Dosage and Administration",
+     "quote": "Pediatric Patients Weighing Less Than 20 kg: ■ The recommended dosage is 0.5 mg (0.5 mL) or dose equivalent to 20 to 30 mcg/kg"
+    },
+    {
+     "src": "dm-glucagon",
+     "loc": "Patient instructions",
+     "quote": "Turn the person on their side to prevent them from choking."
+    },
+    {
+     "src": "dm-baqsimi",
+     "loc": "2.2",
+     "quote": "The recommended dose of BAQSIMI is 3 mg administered as one actuation of the intranasal device into one nostril."
+    },
+    {
+     "src": "dm-baqsimi",
+     "loc": "1 Indications",
+     "quote": "severe hypoglycemia in adults and pediatric patients aged 1 year and older"
+    },
+    {
+     "src": "dm-glucagon",
+     "loc": "4 Contraindications",
+     "quote": "Pheochromocytoma because of the risk of substantial increase in blood pressure"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-6",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "IV dextrose (D50) is an office drug only for providers trained in IV access.",
+   "conditions": "No source opened for the D50 dose. Don't key an item on it.",
+   "cites": [],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DM-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Diabetes and periodontitis are bidirectional: periodontitis is linked to higher A1C in type 2 diabetes, and scaling and root planing lowers A1C at 3 months, with more reduction at 6 months. Ask for the most recent A1C at the health history.",
+   "cites": [
+    {
+     "src": "ada-diabetes",
+     "loc": "Periodontal disease",
+     "quote": "periodontal treatment (i.e., scaling and root planing) significantly reduces HbA1c levels at 3 months, with even more reduction after 6 months"
+    },
+    {
+     "src": "ada-diabetes",
+     "loc": "Health history questions",
+     "quote": "What was your most recent HbA1c (A1C) result?"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "diabetes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ASA I: normal healthy patient (healthy, nonsmoking, no or minimal alcohol).",
+   "cites": [
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "ASA I A normal healthy patient Healthy, non-smoking, no or minimal alcohol use"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ASA II: mild systemic disease without substantive functional limitation, e.g., current smoker, social drinker, pregnancy, obesity with BMI over 30 and under 40, well-controlled diabetes or hypertension, mild lung disease.",
+   "cites": [
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "current smoker, social alcohol drinker, pregnancy, obesity (30 < BMI < 40), well-controlled diabetic disease/hypertension, mild lung disease"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ASA III: severe systemic disease with substantive functional limitation, e.g., poorly controlled diabetes or hypertension, COPD, morbid obesity BMI 40 or more, active hepatitis, alcohol dependence or abuse, implanted pacemaker, moderately reduced ejection fraction, ESRD on regularly scheduled dialysis, premature infant under 60 weeks post-conceptual age, and a history more than 3 months ago of MI, stroke, TIA or CAD/stents.",
+   "cites": [
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "poorly controlled diabetic disease or hypertension, chronic obstructive pulmonary disease, morbid obesity (BMI ≥ 40), active hepatitis, alcohol dependence or abuse, implanted pacemaker, moderate reduction in ejection fraction"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ASA IV: severe systemic disease that is a constant threat to life, e.g., MI, stroke, TIA or CAD/stents within the last 3 months, ongoing cardiac ischemia, severe valve dysfunction, severely reduced ejection fraction, sepsis, DIC, ARD, or ESRD not on regularly scheduled dialysis.",
+   "cites": [
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "A patient with severe systemic disease that is a constant threat to life Examples include (but not limited to): recent (<3 months) MI, CVA, TIA, or CAD/stents"
+    },
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "sepsis, DIC, ARD or ESRD not undergoing regularly scheduled dialysis"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ASA V: moribund, not expected to survive without the operation (e.g., ruptured aortic aneurysm, massive trauma, intracranial bleed with mass effect). ASA VI: declared brain-dead organ donor.",
+   "cites": [
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "A moribund patient who is not expected to survive without the operation"
+    },
+    {
+     "src": "asa-ps-2020",
+     "loc": "Table A1",
+     "quote": "A declared brain-dead patient whose organs are being removed for donor purposes"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "\"E\" is added (to I-V) for an emergency, meaning delay would significantly increase the threat to life or a body part. The class alone is a poor predictor of an individual's operative risk.",
+   "cites": [
+    {
+     "src": "openanesthesia-asa",
+     "loc": "Introduction",
+     "quote": "denotes emergency, which is defined as existing when a delay in treatment of the patient would lead to a significant increase in the threat to life or body part"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ASA-7",
+   "status": "convention",
+   "risk": "medium",
+   "claim": "Dental teaching convention (not in the ASA statement): ASA I-II are usually fine for routine outpatient care; ASA III calls for modifications/consult; ASA IV for elective care is generally deferred. Use as a reasoning frame, not a cited rule.",
+   "conditions": "Dental teaching convention, not in the ASA statement. A reasoning frame only: never cite it as the reason a key is right.",
+   "cites": [],
+   "units": [
+    "medcx"
+   ],
+   "topic": "asa-status",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Case definition, all three required: (1) current or previous antiresorptive therapy, alone or with immune modulators or antiangiogenic drugs; (2) exposed bone, or bone that probes through an intraoral or extraoral fistula, in the maxillofacial region persisting more than 8 weeks; (3) no history of radiation to the jaws and no metastatic disease to the jaws. Unchanged from 2014.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Case definition, p. 2",
+     "quote": "Current or previous treatment with antiresorptive therapy alone or in combination with immune modulators or antiangiogenic medications."
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Case definition, p. 2",
+     "quote": "in the maxillofacial region that has persisted for more than eight weeks"
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Case definition, p. 2",
+     "quote": "No history of radiation therapy to the jaws or metastatic disease to the jaws."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Staging, unchanged from 2014: At risk: no apparent necrotic bone, asymptomatic, treated with IV or oral antiresorptives. Stage 0 (nonexposed variant): no clinical necrotic bone, but nonspecific symptoms or clinical/radiographic findings: unexplained odontalgia, dull jaw ache that may radiate to the TMJ, sinus pain, altered sensation; tooth loosening not explained by periodontitis, intraoral or extraoral swelling; alveolar bone loss not explained by periodontitis, sclerotic trabecular pattern, no new bone in extraction sockets, osteosclerosis, thickened lamina dura and narrowed PDL space. Up to 50% progress to stage 1. Stage 1: exposed necrotic bone or a fistula probing to bone, asymptomatic, no infection. Stage 2: the same with infection/inflammation, symptomatic. Stage 3: stage 2 plus one or more of: necrosis beyond the alveolar bone (inferior border or ramus of the mandible; maxillary sinus or zygoma), pathologic fracture, extraoral fistula, oral-antral or oral-nasal communication, osteolysis to the inferior border of the mandible or the sinus floor.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Staging, p. 3",
+     "quote": "Progression to Stage 1 disease has been reported in up to 50 percent of patients with Stage 0 disease"
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Staging, p. 3",
+     "quote": "Stage 1 Exposed and necrotic bone or fistula that probes to the bone in patients who are asymptomatic and have no evidence of infection/inflammation."
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Staging, p. 3",
+     "quote": "Stage 2 Exposed and necrotic bone, or fistula that probes to the bone, with evidence of infection/inflammation. These patients are symptomatic."
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Staging, p. 3",
+     "quote": "Stage 3 Exposed and necrotic bone or fistulae that probes to the bone, with evidence of infection, and one or more of the following"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Risk by indication: much higher in cancer (<5%) than in osteoporosis (<0.05%). Cancer: zoledronate risk is 2-10 times placebo; ranges about 1.6-4% after 2 years and 3.8-18% beyond 2 years of treatment (Ng et al. review); denosumab 0-6.9% (most studies <5%), 1.9% under 24 months and 6.9% over 24 months of exposure, comparable to zoledronate. Osteoporosis: IV zoledronate <=0.02% (<=2 per 10,000); oral bisphosphonates <=0.05% (<=5 per 10,000); denosumab 0.3% after 10 years (almost an order of magnitude higher than bisphosphonates); romosozumab 0.03-0.05%. Placebo groups in osteoporosis trials: 0-0.02%.",
+   "conditions": "The per-drug percentages come from the paper's risk tables (pp. 6-8), which PDF extraction scrambles; key an item on the cancer (<5%) vs osteoporosis (<0.05%) contrast, not on a single table cell.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Risk, pp. 6-8",
+     "quote": "The risk of MRONJ is considerably higher in the malignancy group (<5%) than in the osteoporosis group (<0.05%)."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Other drugs implicated: tyrosine kinase inhibitors (sunitinib), bevacizumab, aflibercept, mTOR inhibitors (everolimus), radium 223, raloxifene, methotrexate and corticosteroids.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Other medications, p. 7",
+     "quote": "antiangiogenic medications, such as Vascular Endothelial Growth Factor (VEGF) inhibitors, tyrosine kinase receptor inhibitors and immunomodulatory drugs"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Drug holidays: still controversial; the 2022 working group could not reach consensus (split evenly between case-by-case holidays using prior recommendations and never offering them). Factors: cancer vs osteoporosis, dosing frequency, duration, comorbidities, other drugs (chemotherapy, steroids, antiangiogenics), infection, extent of surgery. Denosumab in osteoporosis: stopping risks rebound bone loss and multiple vertebral fractures; if held, do the surgery 3-4 months after the last dose and restart 6-8 weeks after surgery. Bone turnover markers (CTX) are not validated for decisions. The older \"4 years of oral bisphosphonate\" holiday trigger is from the 2014 paper and is not a 2022 recommendation.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Drug holidays, p. 11",
+     "quote": "the working group was unable to reach a consensus regarding a recommendation on drug holidays"
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Drug holidays, p. 11",
+     "quote": "The planned dentoalveolar surgery can be completed 3-4 months following the last dose of DMB when the level of osteoclast inhibition is waning. It can then be reinstituted 6-8 weeks postsurgery."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MR-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Prevention: before antiresorptives for cancer, a full dental exam with radiographs; extract nonrestorable or poor-prognosis teeth and finish needed surgery first; delay the drug, if the systemic condition allows, until sites mucosalize or bone heals. For osteoporosis, dental optimization can run concurrently with therapy. During cancer-dose therapy: avoid dentoalveolar surgery if possible, consider keeping roots (root retention) instead of extracting, implants are contraindicated. Modifiable risk reducers: surgery before therapy, pre/postoperative antibiotics and antimicrobial rinses, primary closure, good oral hygiene.",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Prevention, p. 11",
+     "quote": "including performing high-risk surgical procedures prior to initiating therapy"
+    },
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Table 2, p. 18",
+     "quote": "Consider root retention techniques to avoid extractions. • Dental implants are contraindicated."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm",
+    "oms"
+   ],
+   "topic": "mronj",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ORN-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "ORN is excluded from the MRONJ definition: a history of jaw radiation rules MRONJ out (MR-1).",
+   "cites": [
+    {
+     "src": "aaoms-mronj-2022",
+     "loc": "Case definition, p. 2",
+     "quote": "No history of radiation therapy to the jaws or metastatic disease to the jaws."
+    }
+   ],
+   "see": [
+    "MR-1"
+   ],
+   "units": [
+    "medcx",
+    "oms"
+   ],
+   "topic": "osteoradionecrosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ORN-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Before head and neck radiation: exam about 1 month ahead if possible; finish invasive procedures at least 14 days before radiation starts. After radiation: avoid elective oral surgery on irradiated bone; if an extraction is unavoidable, keep it conservative with antibiotic coverage and possibly hyperbaric oxygen; lifelong daily fluoride gel for xerostomia; recall every 4-8 weeks for the first 6 months; trismus exercises.",
+   "conditions": "NIDCR guide is marked ARCHIVED. Its hyperbaric-oxygen advice is older teaching (see ORN-3).",
+   "cites": [
+    {
+     "src": "nidcr-oncology",
+     "loc": "Pre-cancer Treatment",
+     "quote": "Complete invasive procedures at least 14 days before head/neck radiation therapy starts"
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "After Radiation Therapy",
+     "quote": "Recall the patient for prophylaxis and home care evaluation every 4 to 8 weeks or as needed for the first 6 months after cancer treatment."
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "After Radiation Therapy",
+     "quote": "Tooth extraction, if unavoidable, should be conservative, using antibiotic coverage and possibly hyperbaric oxygen therapy."
+    }
+   ],
+   "units": [
+    "medcx",
+    "oms"
+   ],
+   "topic": "osteoradionecrosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "ORN-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Newer evidence: the HOPON randomized trial found no reduction in ORN with prophylactic hyperbaric oxygen for extractions/implants in mandibular sites over 50 Gy, and the 2024 ISOO-MASCC-ASCO guideline does not recommend routine prophylactic HBO (selective use may be considered); it gives only a weak recommendation for perioperative pentoxifylline (with tocopherol) in selected high-risk patients. Risk rises with dose to the bone (implant failure strongly predicted above ~50 Gy at the site; same review). For exam keys: \"HBO before extraction in irradiated bone\" is the older NIDCR teaching; avoid making it the single right answer.",
+   "conditions": "Secondary source: the 2024 ISOO-MASCC-ASCO guideline itself was not opened. HOPON and pentoxifylline details are from the same review (quotes not yet added).",
+   "cites": [
+    {
+     "src": "healthcare-2026-orn",
+     "loc": "Discussion",
+     "quote": "the 2024 ISOO–MASCC–ASCO guideline does not recommend routine prophylactic HBO before invasive dental procedures after head and neck RT, although selective use may be considered in high-risk situations"
+    }
+   ],
+   "units": [
+    "medcx",
+    "oms"
+   ],
+   "topic": "osteoradionecrosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "CH-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Timing: invasive dental procedures 7-10 days before myelosuppressive chemotherapy; postpone elective oral surgery until cancer treatment is done.",
+   "cites": [
+    {
+     "src": "nidcr-oncology",
+     "loc": "Pre-cancer Treatment",
+     "quote": "7 to 10 days before myelosuppressive chemotherapy"
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "Pre-cancer Treatment",
+     "quote": "Postpone elective oral surgical procedures until cancer treatment is completed."
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "chemotherapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "CH-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "During chemotherapy: consult the oncologist before any procedure, including a prophylaxis; get blood work within 24 hours before oral surgery or other invasive procedures; postpone if platelets are under 75,000/mm3 (or clotting factors abnormal) or the ANC is under 1,000/mm3 (or consider prophylactic antibiotics).",
+   "cites": [
+    {
+     "src": "nidcr-oncology",
+     "loc": "During Chemotherapy",
+     "quote": "Ask the oncologist to order blood work 24 hours before oral surgery or other invasive procedures."
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "During Chemotherapy",
+     "quote": "the platelet count is less than 75,000/mm3 or abnormal clotting factors are present"
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "During Chemotherapy",
+     "quote": "absolute neutrophil count is less than 1,000/mm3, or consider prophylactic antibiotics"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "chemotherapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "CH-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Infection risk climbs as ANC falls below 1,000/uL; spontaneous gingival oozing can occur when platelets drop below 20,000/uL; thrombocytopenic patients needing extractions may need coordinated platelet transfusion. Many teaching sources use 50,000/mm3 as the platelet floor for extractions; the opened NIDCR guide uses 75,000.",
+   "conditions": "Many teaching sources use 50,000/mm3 as the platelet floor for extractions; NIDCR uses 75,000 (CH-2). Key 75,000 only when citing NIDCR; otherwise state the threshold in the stem.",
+   "cites": [
+    {
+     "src": "nci-pdq-oral",
+     "loc": "Infection",
+     "quote": "As the absolute neutrophil count falls below 1,000/µL, the incidence and severity of infection rise."
+    },
+    {
+     "src": "nci-pdq-oral",
+     "loc": "Bleeding",
+     "quote": "Spontaneous gingival oozing may occur when platelet counts drop below 20,000/µL"
+    },
+    {
+     "src": "nci-pdq-oral",
+     "loc": "Bleeding",
+     "quote": "may require coordinated platelet transfusion support"
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "chemotherapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "CH-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "IDSA/ASCO recommend systemic antibacterial prophylaxis (usually a fluoroquinolone) only for expected profound, prolonged neutropenia (ANC <500/uL for 7 days or more), for the whole neutropenic period, not specifically for dental procedures. Central venous catheter: ask the oncologist about prophylaxis.",
+   "cites": [
+    {
+     "src": "jpm-2026-neutropenia",
+     "loc": "Table 3",
+     "quote": "recommend systemic antibacterial prophylaxis (typically with a fluoroquinolone) only for patients expected to experience profound, prolonged neutropenia (ANC < 500/μL for ≥7 days), and not specifically for dental procedures"
+    },
+    {
+     "src": "nidcr-oncology",
+     "loc": "Pre-cancer Treatment",
+     "quote": "Consult the oncologist about the need for antibiotic prophylaxis before any dental procedures in patients with central venous catheters."
+    }
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "chemotherapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Timing: preventive, diagnostic and restorative care is safe throughout pregnancy; radiographs and local anesthesia are safe at any point; ADA and ACOG agree that emergency care (extractions, root canals, restorations) can be done during pregnancy and that delay can make problems worse. The traditional \"second trimester is the most comfortable time for elective care\" is a teaching convention, not in the opened ADA page; don't key a question that says care must wait for it.",
+   "conditions": "'Second trimester is the most comfortable time for elective care' is a teaching convention not in the ADA page: never key an item that says care must wait for it.",
+   "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Key Points",
+     "quote": "Preventive, diagnostic and restorative dental treatment is safe throughout pregnancy."
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Introduction",
+     "quote": "Oral health care, including having dental radiographs taken and being given local anesthesia, is safe at any point during pregnancy."
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Dental Treatment",
+     "quote": "agree that emergency treatments, such as extractions, root canals or restorations can be safely performed during pregnancy and that delaying treatment may result in more complex problems"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-2",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Late in pregnancy, position the patient to avoid supine hypotension (aortocaval compression), e.g., tilted toward the left side.",
+   "conditions": "Supine hypotension positioning is standard teaching but no opened source confirms it yet. Don't key an item on it.",
+   "cites": [],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Periodontitis that develops in pregnancy: scaling and root planing is safe; treating maternal periodontal disease is not associated with adverse maternal or birth outcomes.",
+   "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Periodontal disease",
+     "quote": "should periodontitis develop during pregnancy, scaling and root planing is recognized as safe to perform"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Safe choices named by ADA: local anesthetics with or without epinephrine (e.g., lidocaine, mepivacaine, bupivacaine); antibiotics penicillin, amoxicillin, cephalosporins, clindamycin, metronidazole. For pain relievers, consult the obstetrician: FDA said in 2015 that research was too limited to make recommendations.",
+   "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Medication Selection",
+     "quote": "Local anesthesia (with or without epinephrine) 1, 13-15 Antibiotics 13, 14, 16 Penicillin Amoxicillin Cephalosporins Clindamycin Metronidazole"
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Medication Selection",
+     "quote": "published research is \"too limited to make any recommendations\" on pain reliever use in this population"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Nitrous oxide: ADA recommends pregnant patients and staff avoid exposure (it lists N2O as old category C). Radiographs: safe at any stage; abdominal and thyroid shielding are no longer recommended. Pregnant radiation workers should tell the employer in writing; a dental worker is unlikely to approach the 1 mSv per year exposure limit the page cites.",
+   "conditions": "The nitrous oxide advice is on the same page (quote not yet added).",
+   "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Radiographs",
+     "quote": "at any stage during pregnancy; shielding (abdominal or thyroid) is no longer recommended"
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Radiographs",
+     "quote": "it is unlikely that a dental health care worker will approach the exposure limit of 1 mSv per year"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "NSAIDs: avoid at about 30 weeks and later (premature closure of the fetal ductus arteriosus); at about 20 weeks or later they can cause fetal renal dysfunction leading to oligohydramnios and neonatal renal impairment; if needed between about 20 and 30 weeks, use the lowest dose for the shortest time, and consider amniotic fluid ultrasound if use goes beyond 48 hours.",
+   "cites": [
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Warnings, Pregnancy",
+     "quote": "Avoid use of NSAIDs, including “ibuprofen”, in pregnant women at about 30 week’s gestation and later."
+    },
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Warnings, Pregnancy",
+     "quote": "between about 20 to 30 weeks gestation, advise her that she may need to be monitored for oligohydramnios, if treatment continues for longer than 48 hours"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Tetracyclines: use during tooth development (last half of pregnancy, infancy and childhood to age 8) can cause permanent yellow-gray-brown tooth discoloration; avoid in pregnancy and in children 8 and under unless benefits outweigh risks in severe infections.",
+   "cites": [
+    {
+     "src": "dm-doxycycline",
+     "loc": "Warnings",
+     "quote": "The use of drugs of the tetracycline class during tooth development (last half of pregnancy, infancy and childhood to the age of 8 years) may cause permanent discoloration of the teeth (yellow-gray-brown)."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-8",
+   "status": "verified",
+   "risk": "high",
+   "claim": "FDA labeling: the Pregnancy and Lactation Labeling Rule (PLLR), published Dec 2014, effective June 30, 2015, removed the letter categories A, B, C, D and X from prescription drug labels and replaced them with narrative subsections 8.1 Pregnancy (with pregnancy exposure registry information), 8.2 Lactation (replacing \"Nursing mothers\") and 8.3 Females and Males of Reproductive Potential (pregnancy testing, contraception, infertility). New drugs after June 30, 2015 use it immediately; labels approved on or after June 30, 2001 were phased in. OTC labels are not affected (FDA PLLR page). ADA gives a full compliance date of June 2020.",
+   "cites": [
+    {
+     "src": "fda-pllr",
+     "loc": "Overview",
+     "quote": "The PLLR removes pregnancy letter categories – A, B, C, D and X."
+    },
+    {
+     "src": "fda-pllr",
+     "loc": "Implementation",
+     "quote": "Prescription drugs and biologic products submitted after June 30, 2015, will use the new format immediately, while labeling for prescription drugs approved on or after June 30, 2001, will be phased in gradually."
+    },
+    {
+     "src": "fda-pllr",
+     "loc": "Implementation",
+     "quote": "OTC drug products are not affected by the final rule"
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Medication Selection",
+     "quote": "with a full compliance date of June 2020"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PG-9",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Lactation: check the label's 8.2 section or NLM LactMed.",
+   "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Lactation",
+     "quote": "The National Library of Medicine also provides a searchable database ( LactMed ) on this topic."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "pregnancy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "EM-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Epinephrine auto-injector for anaphylaxis: 0.3 mg (EpiPen) for patients 30 kg (66 lb) or more; 0.15 mg (EpiPen Jr) for patients 15 to 30 kg (33 to 66 lb); injected intramuscularly or subcutaneously into the anterolateral thigh, through clothing if necessary. Each device is a single dose.",
+   "cites": [
+    {
+     "src": "dm-epipen",
+     "loc": "2 Dosage and Administration",
+     "quote": "Patients greater than or equal to 30 kg (66 lbs): EpiPen 0.3 mg"
+    },
+    {
+     "src": "dm-epipen",
+     "loc": "2 Dosage and Administration",
+     "quote": "Patients 15 to 30 kg (33 lbs to 66 lbs): EpiPen Jr 0.15 mg"
+    },
+    {
+     "src": "dm-epipen",
+     "loc": "2 Dosage and Administration",
+     "quote": "Inject intramuscularly or subcutaneously into the anterolateral aspect of the thigh, through clothing if necessary."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Nitroglycerin sublingual tablets (0.3, 0.4 or 0.6 mg) for an anginal attack: let the tablet dissolve without swallowing; one more tablet may be given every 5 minutes until relief, but no more than 3 tablets in 15 minutes; pain that persists after 3 tablets in 15 minutes (or is different from usual) needs prompt medical attention. Contraindicated with PDE-5 inhibitors (avanafil, sildenafil, tadalafil, vardenafil) or sGC stimulators, severe anemia and increased intracranial pressure.",
+   "cites": [
+    {
+     "src": "dm-nitrostat",
+     "loc": "2 Dosage and Administration",
+     "quote": "One additional tablet may be administered every 5 minutes until relief is obtained. No more than three tablets are recommended within a 15-minute period. If the pain persists after a total of 3 tablets in a 15-minute period"
+    },
+    {
+     "src": "dm-nitrostat",
+     "loc": "3 Dosage Forms",
+     "quote": "Sublingual tablets, 0.3 mg; 0.4 mg; 0.6 mg"
+    },
+    {
+     "src": "dm-nitrostat",
+     "loc": "4 Contraindications",
+     "quote": "Use of phosphodiesterase type 5 (PDE-5) inhibitors, such as avanafil, sildenafil, tadalafil, or vardenafil, or soluble guanylate cyclase (sGC) stimulators."
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Naloxone nasal spray (4 mg) for suspected opioid overdose: give a dose, call 911 right away, wait 2-3 minutes; if the person does not wake up, keep giving doses every 2-3 minutes until they wake up or help arrives.",
+   "cites": [
+    {
+     "src": "dm-narcan",
+     "loc": "Quick Start Guide, Steps 3-4",
+     "quote": "WAIT 2-3 minutes after the"
+    },
+    {
+     "src": "dm-narcan",
+     "loc": "Quick Start Guide, Step 4",
+     "quote": "CONTINUE TO GIVE doses every 2-3 minutes until the person wakes up"
+    }
+   ],
+   "units": [
+    "medcx",
+    "pharm"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  }
+ ]
+}

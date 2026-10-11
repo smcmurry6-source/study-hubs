@@ -240,9 +240,9 @@ No `hubs/boards/audio/` in release 1 (section 5.5). Never put an `index.html` an
 ### 2.2 `tools/build-boards.js`
 
 1. Load `config.js`, then each unit in `UNITS` order (`require`), then `figures/`, `synonyms.js`.
-2. **Validate** (fail loudly with file and id): every rule in section 4.7 marked "build"; facts: parse
-   `docs/boards/research/facts-*.md` for `**XX-n**` ids and refuse a `refs` id that is missing or whose fact line says
-   UNVERIFIED; notes: every item's `sec` exists in its unit's notes, Core and Deep have the same section ids, every
+2. **Validate** (fail loudly with file and id): every rule in section 4.7 marked "build"; facts: read
+   `src/boards/facts/*.json` (since 2026-10-11; was `docs/boards/research/facts-*.md`) and refuse a `refs` id that is
+   missing or whose status is `unverified` (`tools/boards/lint-items.mjs` already does this); notes: every item's `sec` exists in its unit's notes, Core and Deep have the same section ids, every
    `data-practice`/`data-ref` resolves; cases: section 4.5 rules.
 3. **Publish filter**: only items and cases with `checked` set (passed verification) and units with `status:'taught'`
    are emitted; drafts stay in the sources. Print counts per unit: items, case items, cases, by FK, component, cog, exam tag.

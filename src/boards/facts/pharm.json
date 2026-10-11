@@ -1,0 +1,916 @@
+{
+ "unit": "pharm",
+ "note": "Fact records for the boards hub. Schema and rules: src/boards/facts/README.md. Quotes are verified by tools/boards/check-quotes.mjs.",
+ "facts": [
+  {
+   "id": "IE-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "The 2021 statement made no changes to the 2007 AHA recommendations; prophylaxis is still limited to the 4 categories at highest risk of a bad outcome from viridans streptococcal IE.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Background",
+     "quote": "These guidelines were updated by a 2021 scientific statement by the AHA that recommended no changes to the 2007 guideline recommendations."
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Abstract; Table 3, p. e971",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Conditions for which prophylaxis is suggested: (a) prosthetic cardiac valve or prosthetic material: a prosthetic valve, transcatheter-implanted prosthetic valves, valve repair with devices (annuloplasty rings, clips), and LVADs or implantable hearts; (b) previous, relapsed or recurrent IE; (c) congenital heart disease: unrepaired cyanotic CHD (including palliative shunts and conduits); a CHD defect completely repaired with prosthetic material or a device (surgical or transcatheter) during the first 6 months after the procedure; repaired CHD with residual defects at or next to a prosthetic patch or device; surgical or transcatheter pulmonary artery valve or conduit (e.g., Melody valve, Contegra conduit); (d) cardiac transplant recipients who develop valvulopathy.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Key Points / patient selection list",
+     "quote": "prosthetic cardiac valves, including transcatheter-implanted prostheses and homografts; prosthetic material used for cardiac valve repair, such as annuloplasty rings and chords; a history of infective endocarditis"
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "patient selection list",
+     "quote": "with valve regurgitation due to a structurally abnormal valve"
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "patient selection list",
+     "quote": "completely repaired with prosthetic material or a device for the first six months after the repair procedure"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Table 3, p. e971",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Prophylaxis is not suggested for: pacemakers and similar implantable electronic devices, septal closure devices once closure is complete, peripheral vascular grafts and patches (including hemodialysis grafts), coronary or other vascular stents, CNS ventriculoatrial shunts, vena cava filters, pledgets. Rheumatic heart disease, bicuspid aortic valve, mitral valve prolapse and other native valve disease were reviewed and not added.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "patient selection list, footnote b",
+     "quote": "Except for the conditions listed above, antibiotic prophylaxis is no longer recommended for any other form of congenital heart disease."
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Table 3 and 'Feasibility of including additional high-risk groups', p. e971",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Procedures: for the high-risk patients, prophylaxis is suggested for all dental procedures that manipulate gingival tissue or the periapical region of teeth, or perforate the oral mucosa. Not suggested: anesthetic injections through noninfected tissue, radiographs, placing removable prosthodontic or orthodontic appliances, adjusting orthodontic appliances, placing orthodontic brackets, shedding of primary teeth, bleeding from trauma to the lips or mucosa.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Dental procedures",
+     "quote": "prophylaxis is recommended for all dental procedures that involve manipulation of gingival tissue or the periapical region of teeth or perforation of the oral mucosa"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Table 4, p. e972",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Regimen: a single dose 30 to 60 minutes before the procedure. Oral: amoxicillin 2 g (child 50 mg/kg). Cannot take oral: ampicillin 2 g IM or IV (child 50 mg/kg), or cefazolin or ceftriaxone 1 g IM or IV (child 50 mg/kg). Penicillin or ampicillin allergy, oral: cephalexin 2 g (child 50 mg/kg) or another first- or second-generation oral cephalosporin in an equivalent dose; azithromycin or clarithromycin 500 mg (child 15 mg/kg); or doxycycline 100 mg (child under 45 kg: 2.2 mg/kg; 45 kg or more: 100 mg). Allergy and cannot take oral: cefazolin or ceftriaxone 1 g IM or IV (child 50 mg/kg).",
+   "conditions": "The doses in the table (2 g / 50 mg/kg, etc.) rest on AHA Table 5, which the quote checker cannot open (ahajournals blocks automated access); the ADA quotes confirm only the drug choices.",
+   "data": {
+    "timing_min": [
+     30,
+     60
+    ],
+    "amoxicillin": {
+     "adult_g": 2,
+     "child_mg_kg": 50
+    },
+    "ampicillin_im_iv": {
+     "adult_g": 2,
+     "child_mg_kg": 50
+    },
+    "cefazolin_or_ceftriaxone_im_iv": {
+     "adult_g": 1,
+     "child_mg_kg": 50
+    },
+    "cephalexin": {
+     "adult_g": 2,
+     "child_mg_kg": 50
+    },
+    "azithromycin_or_clarithromycin": {
+     "adult_mg": 500,
+     "child_mg_kg": 15
+    },
+    "doxycycline": {
+     "adult_mg": 100,
+     "child_mg_kg_under_45kg": 2.2
+    }
+   },
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Antibiotic regimens",
+     "quote": "cephalexin (or other first- or second-generation cephalosporins), azithromycin, clarithromycin, or doxycycline be used as alternatives"
+    },
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Antibiotic regimens",
+     "quote": "the AHA recommends cefazolin or ceftriaxone as alternatives"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Table 5, p. e973 (doses)",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Clindamycin is no longer recommended (oral or parenteral) for dental prophylaxis: it causes more frequent and severe reactions, including fatal C. difficile infection after a single dose; up to 15% of community-acquired C. difficile may trace to antibiotics prescribed for dental procedures.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Additional Considerations",
+     "quote": "no longer recommends use of clindamycin as an oral or parenteral alternative to amoxicillin or ampicillin in individuals with allergies to these drugs"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "p. e972; Table 5 footnote, p. e973",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Do not use a cephalosporin in someone whose penicillin/ampicillin reaction was anaphylaxis, angioedema or urticaria.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Antibiotic regimens",
+     "quote": "cephalosporins should not be used in an individual with a history of anaphylaxis, angioedema, or urticaria with penicillin or ampicillin"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Table 5 footnote, p. e973",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-8",
+   "status": "partial",
+   "risk": "high",
+   "claim": "Azithromycin/clarithromycin: caution with a known prolonged QTc (over 450 ms on ECG), torsades risk; doxycycline is the alternative when a penicillin, cephalosporin and macrolide can't be used. About 90% of people labeled penicillin-allergic have negative skin tests; skin testing is suggested if feasible.",
+   "conditions": "Rests on the AHA statement only (not quote-checked: source blocked to scripts). Don't key an item on the QTc number or the 90% figure until the quote is added.",
+   "cites": [
+    {
+     "src": "aha-ie-2021",
+     "loc": "p. e972",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-9",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Forgot the dose: it may be given up to 2 hours after the procedure.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Additional Considerations",
+     "quote": "the dosage may be administered up to 2 hours after the procedure"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "p. e973",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-10",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Patient already on a short (7-10 day) antibiotic course: pick an antibiotic from a different class; if possible, delay elective care until 10 days after the course ends. Serial appointments: if possible, wait 10 days after the last dose before the next procedure. Patient on parenteral therapy for IE or another infection: the same parenteral antibiotic may cover the procedure. ADA example: on amoxicillin, use azithromycin or clarithromycin.",
+   "conditions": "The 10-day waiting periods rest on the AHA statement only (not quote-checked).",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Additional Considerations",
+     "quote": "recommend that the dentist select an antibiotic from a different class than the one the patient is already taking"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "p. e973",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "IE-11",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Rationale: viridans strep IE is far more likely from daily activities (chewing, toothbrushing, flossing) than from dental procedures; prophylaxis may prevent an exceedingly small number of cases. Good oral health and regular dental care are emphasized.",
+   "cites": [
+    {
+     "src": "ada-abx-prophylaxis",
+     "loc": "Background",
+     "quote": "regularly exposed to oral bacteria during basic daily activities such as brushing or flossing"
+    },
+    {
+     "src": "aha-ie-2021",
+     "loc": "Abstract, p. e963",
+     "quote": null
+    }
+   ],
+   "units": [
+    "pharm",
+    "medcx"
+   ],
+   "topic": "ie-prophylaxis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Scope: adolescents (12+), adults and older adults; after tooth extraction(s) and for temporary management of toothache before definitive care. Key message: nonopioid analgesics, especially an NSAID alone or with acetaminophen, are first-line; opioids are reserved for when first-line therapy is insufficient or contraindicated.",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Discussion, Implications for practice and policy",
+     "quote": "nonopioid medications, particularly NSAIDs alone or in combination with acetaminophen, are first-line therapy for the management of acute dental pain after tooth extraction(s) and toothache in adolescents, adults, and older adults"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Suggested starting doses: ibuprofen 400 mg or naproxen sodium 440 mg, alone or with acetaminophen 500 mg. NSAID contraindicated: acetaminophen alone at full dose (e.g., 1,000 mg).",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Recommendation 1.1 / 2.1",
+     "quote": "the panel suggests initiating the pain management using an NSAID alone (eg, 400 mg of ibuprofen or 440 mg of naproxen sodium) or in combination with acetaminophen (eg, 500 mg)"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Opioids: for simple extractions the panel recommends against opioids (rec. 2). For surgical extractions or toothache, only in rare cases where NSAID ± acetaminophen fails: add or switch to acetaminophen 325 mg + an acetaminophen/opioid combination (e.g., hydrocodone 5-7.5 mg or oxycodone 5 mg) at the lowest dose, fewest tablets and shortest duration, which rarely exceeds 3 days. Avoid \"just-in-case\" delayed opioid prescriptions.",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Recommendation 2 (simple extraction)",
+     "quote": "recommends against the use of opioid analgesics (conditional, low certainty)"
+    },
+    {
+     "src": "ada-pain-2024",
+     "loc": "Recommendation 1.3",
+     "quote": "325 mg of acetaminophen plus a combination of 325 mg of acetaminophen with an opioid"
+    },
+    {
+     "src": "ada-pain-2024",
+     "loc": "Recommendations 1.2-1.4",
+     "quote": "the shortest duration, which rarely exceeds 3 days"
+    },
+    {
+     "src": "ada-pain-2024",
+     "loc": "Abstract",
+     "quote": "Clinicians should avoid the routine use of just-in-case prescribing of opioids"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Maximum daily doses in the guideline: ibuprofen 2,400 mg, naproxen sodium 1,100 mg, acetaminophen 4,000 mg. Warn that acetaminophen-opioid combinations also contain acetaminophen (cumulative dose). Note: the prescription ibuprofen label allows up to 3,200 mg/day for arthritis; key 2,400 mg for dental pain.",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Table footnotes / good practice statements",
+     "quote": "The maximum daily dose of ibuprofen is 2,400 mg, naproxen sodium is 1,100 mg, and acetaminophen is 4,000 mg."
+    },
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Dosage and Administration",
+     "quote": "Suggested Dosage: 1,200 mg - 3,200 mg daily"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Corticosteroids added to standard analgesia after surgical extraction: suggested against. Long-acting LA after extraction: bupivacaine 0.5% with epi 1:200,000 (block or infiltration) or articaine 4% infiltration before discharge (rec. 3). Toothache: short-acting LA (lidocaine 2% or articaine 4% with 1:100,000) for immediate relief (toothache rec. 1).",
+   "conditions": "The corticosteroid recommendation (1.5) and the toothache local-anesthetic recommendation are from the same guideline; quotes not yet added.",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Recommendation 3",
+     "quote": "0.5% bupivacaine plus 1:200,000 epinephrine by block or infiltration injection"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Opioid safety: shared decision making and informed consent covering dependence, misuse, respiratory depression and driving, especially in adolescents and young adults; FDA (2020): discuss naloxone with everyone prescribed an opioid; FDA (2018): tramadol contraindicated under 18 after tonsillectomy/adenoidectomy; codeine and tramadol not recommended in adolescents 12-18 who are obese or have obstructive sleep apnea or severe lung disease; breastfeeding not recommended on codeine or tramadol. In 2019, 39.5% of dentists' opioid prescriptions were \"high risk\" (e.g., opioid-naive patients given more than a 3-day supply).",
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Introduction",
+     "quote": "In 2019, 39.5% of all opioid prescriptions written by dentists were classified as high risk"
+    },
+    {
+     "src": "ada-pain-2024",
+     "loc": "Good practice statements",
+     "quote": "A new Contraindication to the tramadol label warning against its use in children younger than 18 years to treat pain after surgery to remove the tonsils and/or adenoids."
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "RX-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "NSAID cautions: boxed warning for cardiovascular thrombotic events (MI, stroke) and GI bleeding; contraindicated around CABG surgery; ibuprofen can blunt low-dose aspirin's antiplatelet effect; pregnancy limits in PG-6.",
+   "cites": [
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Boxed Warning",
+     "quote": "NSAIDs cause an increased risk of serious cardiovascular thrombotic events, including myocardial infarction and stroke, which can be fatal"
+    },
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Boxed Warning",
+     "quote": "in the setting of coronary artery bypass graft (CABG) surgery"
+    },
+    {
+     "src": "dm-ibuprofen",
+     "loc": "Clinical Pharmacology, Pharmacodynamics",
+     "quote": "showed an interaction with the antiplatelet activity of aspirin"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "acute-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Symptomatic irreversible pulpitis (with or without symptomatic apical periodontitis): no antibiotics, whether or not definitive care is immediately available (strong recommendation against when not available; conditional against as an adjunct to definitive care).",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Recommendation 4",
+     "quote": "The expert panel suggests dentists do not prescribe oral systemic antibiotics as an adjunct to definitive, conservative dental treatment for immunocompetent adults with symptomatic irreversible pulpitis"
+    },
+    {
+     "src": "ada-abx-2019",
+     "loc": "Recommendation 1",
+     "quote": "with or without symptomatic apical periodontitis ‡ (Strong recommendation, low certainty in the evidence)"
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Pulp necrosis with symptomatic apical periodontitis: no antibiotics (conditional) when definitive care is not immediately available; refer for definitive conservative treatment.",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Recommendation 2A",
+     "quote": "The expert panel suggests dentists do not prescribe oral systemic antibiotics for immunocompetent * adults with pulp necrosis and symptomatic apical periodontitis"
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Pulp necrosis with localized acute apical abscess (no fascial space spread, fever or malaise): if definitive care is not immediately available, give amoxicillin 500 mg three times a day, 3-7 days, or penicillin VK 500 mg four times a day, 3-7 days (conditional, possibly delayed prescription). As an adjunct when definitive care (pulpectomy, RCT, incision and drainage) is done: no antibiotics (strong).",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Recommendation 2b",
+     "quote": "prescribe oral amoxicillin (500 milligrams, three times a day, 3–7d) or oral penicillin VK (500 milligrams, four times a day, 3–7d) for immunocompetent adults with pulp necrosis and localized acute apical abscess"
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Acute apical abscess with systemic involvement (fever, malaise, lymph node or fascial space involvement): urgent definitive conservative treatment plus amoxicillin or penicillin VK as in AB-3. Rapidly spreading swelling or airway risk goes to urgent care / ED.",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Good practice statement",
+     "quote": "perform urgent definitive, conservative dental treatment in conjunction with prescribing oral amoxicillin (500 milligrams, three times a day, 3–7d) or oral penicillin VK (500 milligrams, four times a day, 3–7d) for immunocompetent adults with pulp necrosis and acute apical abscess with systemic"
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Amoxicillin is preferred over penicillin VK (better against gram-negative anaerobes, fewer GI effects). Penicillin allergy without anaphylaxis, angioedema or hives: cephalexin 500 mg four times a day, 3-7 days. With anaphylaxis/angioedema/hives history: azithromycin 500 mg day 1, then 250 mg daily for 4 more days, or clindamycin 300 mg four times a day, 3-7 days; azithromycin has higher resistance and clindamycin raises C. difficile risk even after one dose. About 10% self-report penicillin allergy; under 1% are truly allergic.",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Table 2 footnotes",
+     "quote": "the panel suggests dentists prescribe oral cephalexin (500 milligrams, four times a day, 3–7d)"
+    },
+    {
+     "src": "ada-abx-2019",
+     "loc": "Table 2 footnotes",
+     "quote": "with a history of anaphylaxis, angioedema, or hives with penicillin, ampicillin, or amoxicillin, the panel suggests dentists prescribe oral azithromycin (loading dose of 500 milligrams on day 1, followed by 250 milligrams for an additional four days)"
+    },
+    {
+     "src": "ada-abx-2019",
+     "loc": "Discussion",
+     "quote": "Although approximately 10% of the population self-reports a penicillin allergy, less than 1% of the entire population is truly allergic."
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "No response to first-line: add metronidazole 500 mg three times a day, 7 days, or switch to amoxicillin/clavulanate 500/125 mg three times a day, 7 days. Re-evaluate within 3 days; stop antibiotics 24 hours after symptoms completely resolve.",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Table 2 footnotes",
+     "quote": "complement first-line treatment with oral metronidazole (500 milligrams, three times a day, 7d), or discontinue first-line treatment and prescribe oral amoxicillin/clavulanate (500/125 milligrams, three times a day, 7d)"
+    },
+    {
+     "src": "ada-abx-2019",
+     "loc": "Discussion",
+     "quote": "instruct the patient to discontinue antibiotics 24 hours after complete resolution"
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AB-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Definitive conservative dental treatment (DCDT) = pulpotomy, pulpectomy, root canal debridement, nonsurgical RCT or incision and drainage; extractions are outside this guideline's scope.",
+   "cites": [
+    {
+     "src": "ada-abx-2019",
+     "loc": "Recommendation table footnote",
+     "quote": "Definitive, conservative dental treatment refers to pulpotomy, pulpectomy, root canal debridement, non-surgical root canal treatment, or incision for drainage of abscess."
+    }
+   ],
+   "units": [
+    "pharm",
+    "endo"
+   ],
+   "topic": "antibiotics-endo",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AF-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Nystatin oral suspension 100,000 units/mL: adults and children 4-6 mL (400,000-600,000 units) four times daily, half in each side of the mouth, held as long as possible before swallowing; infants 2 mL (200,000 units) four times daily.",
+   "cites": [
+    {
+     "src": "dm-nystatin",
+     "loc": "Dosage and Administration",
+     "quote": "CHILDREN AND ADULTS: 4-6 mL (400,000 to 600,000 units) four times daily (one-half of dose in each side of mouth)."
+    }
+   ],
+   "units": [
+    "pharm",
+    "opath"
+   ],
+   "topic": "antifungals",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AF-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Fluconazole for oropharyngeal candidiasis: 200 mg on day 1, then 100 mg once daily, for at least 2 weeks to reduce relapse.",
+   "cites": [
+    {
+     "src": "dm-fluconazole",
+     "loc": "Dosage and Administration",
+     "quote": "The recommended dosage of fluconazole for oropharyngeal candidiasis is 200 mg on the first day, followed by 100 mg once daily."
+    },
+    {
+     "src": "dm-fluconazole",
+     "loc": "Dosage and Administration",
+     "quote": "treatment should be continued for at least 2 weeks to decrease the likelihood of relapse"
+    }
+   ],
+   "units": [
+    "pharm",
+    "opath"
+   ],
+   "topic": "antifungals",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AF-3",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Clotrimazole troche 10 mg dissolved in the mouth five times a day for 14 days (common teaching).",
+   "conditions": "No clotrimazole troche label was found on DailyMed; not verified. Don't key an item on it.",
+   "cites": [],
+   "units": [
+    "pharm",
+    "opath"
+   ],
+   "topic": "antifungals",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "AV-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Valacyclovir for cold sores (herpes labialis), adults and children 12 and older: 2 g every 12 hours for 1 day (two doses), started at the earliest symptom (tingling, itching, burning).",
+   "cites": [
+    {
+     "src": "dm-valacyclovir",
+     "loc": "Dosage and Administration 2.1",
+     "quote": "Cold Sores 2 grams every 12 hours for 1 day"
+    },
+    {
+     "src": "dm-valacyclovir",
+     "loc": "Dosage and Administration 2.2",
+     "quote": "initiate treatment at the earliest symptom of a cold sore (e.g., tingling, itching, or burning)"
+    }
+   ],
+   "units": [
+    "pharm",
+    "opath"
+   ],
+   "topic": "antivirals",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DI-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Metronidazole + warfarin: potentiates warfarin and prolongs prothrombin time; monitor PT/INR. Metronidazole + alcohol: disulfiram-like reaction (cramps, nausea, vomiting, headache, flushing); no alcohol or propylene glycol during and for at least 3 days after. Don't give within 2 weeks of disulfiram (psychotic reactions). Can raise lithium levels.",
+   "cites": [
+    {
+     "src": "dm-metronidazole",
+     "loc": "Precautions, Drug Interactions",
+     "quote": "potentiate the anticoagulant effect of warfarin and other oral coumarin anticoagulants"
+    },
+    {
+     "src": "dm-metronidazole",
+     "loc": "Warnings",
+     "quote": "associated with a disulfiram-like reaction to alcohol, including abdominal cramps, nausea, vomiting, headaches, and flushing"
+    },
+    {
+     "src": "dm-metronidazole",
+     "loc": "Contraindications",
+     "quote": "during and for at least three days after therapy with metronidazole"
+    },
+    {
+     "src": "dm-metronidazole",
+     "loc": "Contraindications",
+     "quote": "patients who have taken disulfiram within the last two weeks"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "drug-interactions",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DI-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Fluconazole (azoles) + warfarin: raised prothrombin time and bleeding events; + sulfonylureas (glipizide, glyburide): clinically significant hypoglycemia; + statins metabolized by CYP3A4 (atorvastatin, simvastatin) or CYP2C9 (fluvastatin): myopathy and rhabdomyolysis; QT prolongation risk, and avoid with erythromycin.",
+   "cites": [
+    {
+     "src": "dm-fluconazole",
+     "loc": "Precautions, Drug Interactions",
+     "quote": "Clinically significant hypoglycemia may be precipitated by the use of fluconazole with oral hypoglycemic agents"
+    },
+    {
+     "src": "dm-fluconazole",
+     "loc": "Precautions, Drug Interactions",
+     "quote": "The risk of myopathy and rhabdomyolysis increases when fluconazole is coadministered with HMG-CoA reductase inhibitors metabolized through CYP3A4, such as atorvastatin and simvastatin, or through CYP2C9, such as fluvastatin"
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "drug-interactions",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "DI-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Clarithromycin is contraindicated with lovastatin and simvastatin (rhabdomyolysis), with lomitapide, cisapride and pimozide (QT/arrhythmia), and with colchicine in renal or hepatic impairment. Azithromycin/clarithromycin and QTc: see IE-8.",
+   "cites": [
+    {
+     "src": "dm-clarithromycin",
+     "loc": "4 Contraindications",
+     "quote": "(lovastatin or simvastatin) is contraindicated, due to the increased risk of myopathy, including rhabdomyolysis"
+    },
+    {
+     "src": "dm-clarithromycin",
+     "loc": "4.4 Contraindications",
+     "quote": "Concomitant administration of clarithromycin tablets and colchicine is contraindicated in patients with renal or hepatic impairment."
+    }
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "drug-interactions",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  }
+ ]
+}

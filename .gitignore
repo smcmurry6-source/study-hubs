@@ -1,2 +1,5 @@
 # Archived hubs' question banks stay off the public repo (exam integrity); keep them locally.
 question-banks/
+
+# Boards hub: cached copies of fact sources (tools/boards/check-quotes.mjs)
+.cache/

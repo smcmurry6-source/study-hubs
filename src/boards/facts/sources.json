@@ -1,0 +1,426 @@
+{
+ "aha-ie-2021": {
+  "title": "Prevention of Viridans Group Streptococcal Infective Endocarditis: A Scientific Statement From the American Heart Association",
+  "org": "AHA",
+  "url": "https://www.ahajournals.org/doi/10.1161/CIR.0000000000000969",
+  "kind": "pdf",
+  "date": "2021-04-15",
+  "citation": "Wilson WR et al. Circulation 2021;143:e963-e978. doi:10.1161/CIR.0000000000000969",
+  "blocked": "ahajournals.org blocks automated access; page numbers are the journal's (e963-e978)"
+ },
+ "ada-abx-prophylaxis": {
+  "title": "Antibiotic Prophylaxis Prior to Dental Procedures (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/antibiotic-prophylaxis",
+  "kind": "html",
+  "date": "2026-07-15"
+ },
+ "dm-xylocaine-dental": {
+  "title": "Xylocaine DENTAL (lidocaine HCl 2% and epinephrine 1:50,000 / 1:100,000), Dentsply",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=14b55cf9-f7cd-4bb4-a7c5-aba61abadef1",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/14b55cf9-f7cd-4bb4-a7c5-aba61abadef1.xml",
+  "kind": "spl",
+  "date": "2026-08-13"
+ },
+ "dm-septocaine": {
+  "title": "Septocaine (articaine HCl 4% and epinephrine 1:100,000 / 1:200,000), Septodont",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=0eba0bd2-ccb6-4f7e-8d0c-e4b4e6cdce03",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/0eba0bd2-ccb6-4f7e-8d0c-e4b4e6cdce03.xml",
+  "kind": "spl",
+  "date": "2024-10-23"
+ },
+ "dm-carbocaine": {
+  "title": "Carbocaine 3% and 2% with Neo-Cobefrin 1:20,000 (mepivacaine), Septodont",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=1f2f9e40-e437-4124-97b7-df67dbafd154",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/1f2f9e40-e437-4124-97b7-df67dbafd154.xml",
+  "kind": "spl",
+  "date": "2024-02-21"
+ },
+ "dm-polocaine": {
+  "title": "Polocaine DENTAL 3% and 2% with levonordefrin 1:20,000 (mepivacaine), Dentsply",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=25074a6a-7f67-4ad8-86e0-2afe23ec5d04",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/25074a6a-7f67-4ad8-86e0-2afe23ec5d04.xml",
+  "kind": "spl",
+  "date": "2024-02-21"
+ },
+ "dm-citanest-plain": {
+  "title": "Citanest Plain DENTAL (prilocaine HCl 4%), Dentsply",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=db23a56f-1e41-4843-9220-1b2e3059db41",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/db23a56f-1e41-4843-9220-1b2e3059db41.xml",
+  "kind": "spl",
+  "date": "2021-11-10"
+ },
+ "dm-citanest-forte": {
+  "title": "Citanest Forte DENTAL (prilocaine HCl 4% and epinephrine 1:200,000), Dentsply",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=60c8710b-ae55-4fdf-e053-2991aa0adc75",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/60c8710b-ae55-4fdf-e053-2991aa0adc75.xml",
+  "kind": "spl",
+  "date": "2024-02-29"
+ },
+ "dm-vivacaine": {
+  "title": "Vivacaine (bupivacaine HCl 0.5% and epinephrine 1:200,000), Septodont",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=b4c60d8e-e350-45b2-9d6b-5815eeb6c994",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/b4c60d8e-e350-45b2-9d6b-5815eeb6c994.xml",
+  "kind": "spl",
+  "date": "2024-02-16"
+ },
+ "aapd-la": {
+  "title": "Use of Local Anesthesia for Pediatric Dental Patients (Best Practices)",
+  "org": "AAPD",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/bp_localanesthesia.pdf",
+  "kind": "pdf",
+  "date": "2023",
+  "citation": "Reference Manual of Pediatric Dentistry 2025, pp. 407-414"
+ },
+ "godzieba-2014": {
+  "title": "Clinical assessment of the safe use local anaesthesia with vasoconstrictor agents in cardiovascular compromised patients: a systematic review",
+  "org": "Peer-reviewed review",
+  "citation": "Godzieba A et al. Med Sci Monit 2014;20:393-398",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3958566/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3958566/fullTextXML",
+  "kind": "xml",
+  "date": "2014-03"
+ },
+ "saraghi-2017": {
+  "title": "Anesthetic Considerations for Patients on Antidepressant Therapy, Part I",
+  "org": "Peer-reviewed review",
+  "citation": "Saraghi M, Golden LR, Hersh EV. Anesth Prog 2017;64(4):253-261",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5715313/",
+  "fetch": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5715313/",
+  "kind": "html",
+  "date": "2017"
+ },
+ "perio2000-illegal-drugs": {
+  "title": "Illegal drugs and periodontal conditions",
+  "org": "Peer-reviewed review",
+  "citation": "Periodontology 2000 (2022/2023)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9828249/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9828249/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "ada-hypertension": {
+  "title": "Hypertension (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/hypertension",
+  "kind": "html",
+  "date": "2022-11-01"
+ },
+ "erbp-2025-bp": {
+  "title": "ERBP commentary on the 2025 AHA/ACC High Blood Pressure Guideline",
+  "org": "Peer-reviewed commentary",
+  "citation": "Kanbay M, Copur S, Sarafidis P et al. Nephrol Dial Transplant 2026;41:1909-1918",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13624793/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13624793/fullTextXML",
+  "kind": "xml",
+  "date": "2026"
+ },
+ "ada-anticoag": {
+  "title": "Oral Anticoagulant and Antiplatelet Medications and Dental Procedures (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/oral-anticoagulant-and-antiplatelet-medications-and-dental-procedures",
+  "kind": "html",
+  "date": "2022-09-28"
+ },
+ "niddk-dx": {
+  "title": "Diabetes Tests & Diagnosis",
+  "org": "NIDDK",
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+  "kind": "html",
+  "date": "2022-07"
+ },
+ "niddk-a1c": {
+  "title": "The A1C Test & Diabetes",
+  "org": "NIDDK",
+  "url": "https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test",
+  "kind": "html",
+  "date": "2018-04"
+ },
+ "niddk-hypo": {
+  "title": "Low Blood Glucose (Hypoglycemia)",
+  "org": "NIDDK",
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/preventing-problems/low-blood-glucose-hypoglycemia",
+  "kind": "html",
+  "date": "2021-07"
+ },
+ "ada-diabetes": {
+  "title": "Diabetes (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/diabetes",
+  "kind": "html",
+  "date": "2022-01-24"
+ },
+ "dm-glucagon": {
+  "title": "Glucagon for Injection emergency kit, Amphastar",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8cc40354-b5ac-45b6-a211-93b44444f2a3",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/8cc40354-b5ac-45b6-a211-93b44444f2a3.xml",
+  "kind": "spl",
+  "date": "2026-08-11"
+ },
+ "dm-baqsimi": {
+  "title": "Baqsimi (glucagon) nasal powder, Amphastar",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=f1f5df9b-872f-44e5-a18f-f0b68e7e9254",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/f1f5df9b-872f-44e5-a18f-f0b68e7e9254.xml",
+  "kind": "spl",
+  "date": "2025-08-06"
+ },
+ "asa-ps-2020": {
+  "title": "ASA Physical Status Classification System (ASA statement, amended Dec 13, 2020), reproduced as Table A1",
+  "org": "ASA (via open-access reproduction)",
+  "citation": "Cancers (Basel) 2024;16:3484, Table A1",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11506449/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11506449/fullTextXML",
+  "kind": "xml",
+  "date": "2020-12-13"
+ },
+ "openanesthesia-asa": {
+  "title": "ASA Physical Status Classification (Horvath and Kloesel)",
+  "org": "OpenAnesthesia",
+  "url": "https://www.openanesthesia.org/keywords/asa-physical-status-classification/",
+  "kind": "html",
+  "date": "2024-06-17"
+ },
+ "aaoms-mronj-2022": {
+  "title": "AAOMS Position Paper on Medication-Related Osteonecrosis of the Jaws, 2022 Update",
+  "org": "AAOMS",
+  "url": "https://aaoms.org/wp-content/uploads/2024/03/mronj_position_paper.pdf",
+  "kind": "pdf",
+  "date": "2022",
+  "citation": "Ruggiero SL et al. J Oral Maxillofac Surg 2022;80:920-943 (page numbers: the PDF's 'PAGE n' footers)"
+ },
+ "nidcr-oncology": {
+  "title": "Oncology Pocket Guide to Oral Health (dental provider version; marked ARCHIVED)",
+  "org": "NIDCR",
+  "url": "https://www.nidcr.nih.gov/sites/default/files/2020-06/oncology-guide-dental-provider.pdf",
+  "kind": "pdf",
+  "date": "2020-06"
+ },
+ "nci-pdq-oral": {
+  "title": "Oral Complications of Chemotherapy and Head/Neck Radiation (PDQ), Health Professional Version",
+  "org": "NCI",
+  "url": "https://www.cancer.gov/about-cancer/treatment/side-effects/mouth-throat/oral-complications-hp-pdq",
+  "kind": "html",
+  "date": "2024-02-16"
+ },
+ "jpm-2026-neutropenia": {
+  "title": "Beyond Oral Health: Personalized Strategies for Managing Oral Infections in Neutropenic Patients",
+  "org": "Peer-reviewed review",
+  "citation": "Duduveche AE et al. J Pers Med 2026;16:53",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12842819/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12842819/fullTextXML",
+  "kind": "xml",
+  "date": "2026"
+ },
+ "healthcare-2026-orn": {
+  "title": "Implants after head and neck radiotherapy (review; summarizes the 2024 ISOO-MASCC-ASCO ORN guideline)",
+  "org": "Peer-reviewed review",
+  "citation": "Healthcare (Basel) 2026, doi:10.3390/healthcare14182889",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13606682/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13606682/fullTextXML",
+  "kind": "xml",
+  "date": "2026"
+ },
+ "ada-pregnancy": {
+  "title": "Pregnancy (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/pregnancy",
+  "kind": "html",
+  "date": "2025-07-14"
+ },
+ "fda-pllr": {
+  "title": "Pregnancy and Lactation Labeling (Drugs) Final Rule",
+  "org": "FDA",
+  "url": "https://www.fda.gov/drugs/labeling-information-drug-products/pregnancy-and-lactation-labeling-drugs-final-rule",
+  "kind": "html",
+  "date": "2014-12"
+ },
+ "dm-ibuprofen": {
+  "title": "Ibuprofen tablets 400/600/800 mg, Ascend",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=7c7b815b-d6f5-4ce6-b37f-f35d5c9f3254",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/7c7b815b-d6f5-4ce6-b37f-f35d5c9f3254.xml",
+  "kind": "spl",
+  "date": "2026-07-29"
+ },
+ "dm-doxycycline": {
+  "title": "Doxycycline hyclate",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35.xml",
+  "kind": "spl",
+  "date": "2026-09-29"
+ },
+ "ada-pain-2024": {
+  "title": "Evidence-based clinical practice guideline for the pharmacologic management of acute dental pain in adolescents, adults, and older adults",
+  "org": "ADA SRI / Pitt / Penn",
+  "citation": "Carrasco-Labra A, Polk DE, Urquhart O, et al. JADA 2024;155(2):102-117.e9",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10919895/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10919895/fullTextXML",
+  "kind": "xml",
+  "date": "2024-02"
+ },
+ "ada-abx-2019": {
+  "title": "Evidence-based clinical practice guideline on antibiotic use for the urgent management of pulpal- and periapical-related dental pain and intraoral swelling",
+  "org": "ADA",
+  "citation": "Lockhart PB, Tampi MP, Abt E, et al. JADA 2019;150(11):906-921.e12",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8270006/",
+  "fetch": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8270006/",
+  "kind": "html",
+  "date": "2019-11"
+ },
+ "dm-fluconazole": {
+  "title": "Fluconazole tablets",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=b5cfe0a1-f55c-41b1-8ad6-d1d0134a4d1d",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/b5cfe0a1-f55c-41b1-8ad6-d1d0134a4d1d.xml",
+  "kind": "spl",
+  "date": "2026-09-21"
+ },
+ "dm-nystatin": {
+  "title": "Nystatin oral suspension 100,000 units/mL",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=4a670371-d373-1ba6-e063-6394a90a13b6",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/4a670371-d373-1ba6-e063-6394a90a13b6.xml",
+  "kind": "spl",
+  "date": "2026-02-06"
+ },
+ "dm-valacyclovir": {
+  "title": "Valacyclovir tablets",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=1ac7a13e-3f30-e140-e063-6394a90aa09d",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/1ac7a13e-3f30-e140-e063-6394a90aa09d.xml",
+  "kind": "spl",
+  "date": "2026-09-29"
+ },
+ "dm-metronidazole": {
+  "title": "Metronidazole tablets",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=9ed89bfc-ccf3-4e6c-924f-2a14bf82163f",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/9ed89bfc-ccf3-4e6c-924f-2a14bf82163f.xml",
+  "kind": "spl",
+  "date": "2026-09-10"
+ },
+ "dm-clarithromycin": {
+  "title": "Clarithromycin tablets",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=d836ae7e-fdbf-4dcb-a90d-ede1dcbc3e67",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/d836ae7e-fdbf-4dcb-a90d-ede1dcbc3e67.xml",
+  "kind": "spl",
+  "date": "2026-09-16"
+ },
+ "dm-amoxicillin": {
+  "title": "Amoxicillin",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=9b3ab9ea-caee-4186-9068-43ca527c098d",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/9b3ab9ea-caee-4186-9068-43ca527c098d.xml",
+  "kind": "spl",
+  "date": "2026-09-29"
+ },
+ "aap-staging-chart": {
+  "title": "Staging and Grading Periodontitis (chart)",
+  "org": "AAP",
+  "url": "https://www.perio.org/wp-content/uploads/2019/08/Staging-and-Grading-Periodontitis.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Tables from Tonetti, Greenwell, Kornman, J Periodontol 2018;89 Suppl 1:S159-S172"
+ },
+ "chapple-2018": {
+  "title": "Periodontal health and gingival diseases and conditions on an intact and a reduced periodontium: consensus report of workgroup 1",
+  "org": "2017 World Workshop (AAP/EFP)",
+  "url": "https://www.umw.edu.pl/sites/default/files/2022-04/Article2.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Chapple ILC et al. J Clin Periodontol 2018;45(Suppl 20):S68-S77 (university mirror)"
+ },
+ "efp-2": {
+  "title": "Guidance for clinicians: report of workgroup 2 (periodontitis)",
+  "org": "EFP",
+  "url": "https://www.efp.org/publications/projects/new-classification/guidance/report-02.pdf",
+  "kind": "pdf",
+  "date": "2018"
+ },
+ "efp-3": {
+  "title": "Guidance for clinicians: report of workgroup 3 (systemic and other conditions, mucogingival)",
+  "org": "EFP",
+  "url": "https://www.efp.org/publications/projects/new-classification/guidance/report-03.pdf",
+  "kind": "pdf",
+  "date": "2018"
+ },
+ "efp-4": {
+  "title": "Guidance for clinicians: report of workgroup 4 (peri-implant diseases and conditions)",
+  "org": "EFP",
+  "url": "https://www.efp.org/publications/projects/new-classification/guidance/report-04.pdf",
+  "kind": "pdf",
+  "date": "2018",
+  "citation": "Summarizes Berglundh et al., J Clin Periodontol 2018;45 Suppl 20:S286-S291"
+ },
+ "pilloni-2018": {
+  "title": "Furcation involvement classification: a comprehensive review and a new system proposal",
+  "org": "Peer-reviewed review",
+  "citation": "Pilloni A, Rojas MA. Dentistry (Basel) 2018;6(3):34",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6162379/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6162379/fullTextXML",
+  "kind": "xml",
+  "date": "2018"
+ },
+ "jcm-2023-mobility": {
+  "title": "Narrative review of tooth-mobility indices",
+  "org": "Peer-reviewed review",
+  "citation": "J Clin Med 2023",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10779763/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10779763/fullTextXML",
+  "kind": "xml",
+  "date": "2023"
+ },
+ "iej-2022": {
+  "title": "Diagnosis consensus among endodontic specialists and general practitioners: an international survey and a proposed modification",
+  "org": "Peer-reviewed (reproduces AAE terminology)",
+  "citation": "Azim AA, Merdad K, Peters OA. Int Endod J 2022;55:1202-1211",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9826047/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9826047/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "bdj-2025": {
+  "title": "Symptomatic irreversible pulpitis and other orofacial pain: overcoming challenges in diagnosis and management",
+  "org": "Peer-reviewed review",
+  "citation": "Br Dent J 2025;238:517-",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11991903/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11991903/fullTextXML",
+  "kind": "xml",
+  "date": "2025"
+ },
+ "dm-epipen": {
+  "title": "EpiPen and EpiPen Jr (epinephrine auto-injector), Viatris",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=7560c201-9246-487c-a13b-6295db04274a",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/7560c201-9246-487c-a13b-6295db04274a.xml",
+  "kind": "spl",
+  "date": "2023-02-15"
+ },
+ "dm-nitrostat": {
+  "title": "Nitrostat (nitroglycerin sublingual tablets), Viatris",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=9a52da75-d0af-4237-96c0-0b12adfa8636",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/9a52da75-d0af-4237-96c0-0b12adfa8636.xml",
+  "kind": "spl",
+  "date": "2023-02-15"
+ },
+ "dm-narcan": {
+  "title": "Narcan (naloxone HCl) nasal spray 4 mg, Emergent",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=a0ebc83d-2892-40de-bc0a-775ce90b30db",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/a0ebc83d-2892-40de-bc0a-775ce90b30db.xml",
+  "kind": "spl",
+  "date": "2026-08-17"
+ }
+}
