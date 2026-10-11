@@ -170,6 +170,7 @@
    "status": "verified",
    "risk": "high",
    "claim": "ADA Practical Guide thresholds for adult outpatient dental care: under 160/100: no modification for elective or emergency care. Over 160/100: repeat the reading; if it comes down, or is within a physician's written guidance, proceed; if confirmed, no elective care and refer to the physician. Emergency care at a confirmed 160-180 systolic and/or 100-109 diastolic when pain is driving the BP: treat, check BP every 10-15 minutes, use anxiety reduction. Confirmed >180 systolic and/or >109 diastolic: consult the physician before proceeding. Systolic >180 and/or diastolic >100: refer as soon as possible, or urgent medical evaluation if symptomatic.",
+   "conditions": "The ADA table itself is inconsistent: its body uses >109 diastolic for \"consult before proceeding\", its footnote >100 for \"refer as soon as possible\". Key items on the body thresholds (160/100 and 180/109) and avoid diastolic values of 101-109 where the two disagree.",
    "stem_names": [
     "ADA"
    ],
@@ -183,6 +184,11 @@
      "src": "ada-hypertension",
      "loc": "Table 3",
      "quote": "initiate emergency care with blood pressure monitoring every 10 to 15 minutes during procedure; consider anxiety reduction techniques If confirmed systolic pressure >180 mmHg and/or diastolic pressure >109 mmHg, seek consultation with a physician before proceeding"
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Table 3 footnote",
+     "quote": "Patients with systolic pressure >180 mmHg and/or diastolic pressure >100 mmHg should be referred to their physician as soon as possible or sent for urgent medical evaluation, if symptomatic."
     }
    ],
    "units": [

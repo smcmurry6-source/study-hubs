@@ -254,13 +254,13 @@ const items = [
       'Periapical radiograph: caries approaching the pulp; widened PDL space at the mesial root apex'] },
   stem: 'Root canal treatment of tooth 19 is indicated. When is the most appropriate time to do it?',
   choices: ['Now, during the first trimester', 'In the second trimester, about 4 weeks from now',
-    'After delivery, with acetaminophen for pain until then', 'After written clearance from her obstetrician, in the second trimester'],
+    'Now, but without radiographs or local anesthesia', 'Once her obstetrician has given written clearance'],
   answer: 0,
   ex: 'Symptomatic irreversible pulpitis is a dental emergency. The ADA and ACOG agree that emergency care such as root canal treatment can be done safely during pregnancy, that radiographs and local anesthesia are safe at any point, and that delaying treatment can make problems worse. The tempting wrong answer is waiting for the second trimester, a convention for elective care that does not apply to an emergency.',
   why: ['Correct. Emergency treatment is safe in any trimester; radiographs and local anesthesia are safe at any point, and delay risks a more complex problem.',
     'Waiting is not needed for emergency care; "second trimester" is a convention for elective treatment.',
-    'Delaying definitive care for months risks a more complex problem; the ADA and ACOG support treating now.',
-    'Consulting the obstetrician is reasonable for medication choices, but emergency care does not wait for written clearance or a later trimester.'],
+    'Radiographs and local anesthesia are safe at any point in pregnancy; root canal treatment needs both.',
+    'Consulting the obstetrician is advised for medicines beyond the ones the ADA lists as safe, but emergency care does not wait for written clearance.'],
   cue: 'Pregnant with a toothache: treat now. The second-trimester habit is for elective care.',
   refs: ['PG-1', 'PG-4', 'EN-4'], cc: 'CC1', cc2: ['CC20'], fk: 'FK6', cog: 2, diff: 2, concept: 'pregnancy-emergency-timing', sec: 'medcx-pregnancy', phase: 'plan' },
 
@@ -328,7 +328,8 @@ const cases = [
 ];
 
 // Verification record (stage 4/4b): two independent checker passes, both pass (docs/boards/bench/recheck-*).
-const CHECKED = { 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2 };
+const CHECKED = { 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2,
+  'b-anes-0001': 1, 'b-anes-0002': 1, 'b-anes-0003': 1, 'b-endo-0001': 1, 'b-medcx-0002': 1, 'b-medcx-0003': 1, 'b-medcx-0005': 1, 'b-pharm-0001': 1, 'b-pharm-0004': 1, 'b-pharm-0003': 4 };
 for (const it of items) if (CHECKED[it.id]) it.checked = { on: '2026-10-11', by: 'claude-sonnet subagent x2 (same family as writer)', round: CHECKED[it.id] };
 
 // Spread the authored key position (BUILD_SPEC 4.7 rule 9): rotate options of these items before export.
