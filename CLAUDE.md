@@ -62,7 +62,8 @@ does it differently.
    or changed features come off or get rewritten there too.
 6. After merge, add a line to "Recent major changes" in `DEPLOY_NOTES.md` for
    anything non-trivial, and log it to the site changelog (below) if students
-   would notice it.
+   would notice it. Entries about two weeks old move to `DEPLOY_HISTORY.md` (not
+   imported; grep it when you touch an older feature).
 
 Never force-push `main`. If a PR conflicts, rebase and resolve deliberately —
 don't take one side wholesale; the other side is usually another session's work.
