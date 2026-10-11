@@ -1175,6 +1175,7 @@
       }
       if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady) {
         nukeReady = true;
+        safeRpc("record_nuke_unlock", { p_hub: HUB, p_visitor: VISITOR_ID });
         showNukeBadge();
         showStreakToast(shGreet("Tactical nuke ready"), '<span class="sh-nuke-icon sh-nuke-icon-sm"></span>');
       }

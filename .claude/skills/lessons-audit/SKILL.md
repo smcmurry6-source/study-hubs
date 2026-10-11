@@ -58,7 +58,10 @@ from exam_debriefs d order by d.hub, d.created_at;
 
 Group by `match` and `ready`: do the people who say "Hub was easier" or "Exam asked different things" study less, or
 the same? (First read, GI Exam 2: the three "About right" studied 631-980 min, the two "Hub was easier" 166-176 min;
-n = 6.) Every "missed" answer is a topic to add for the next hub of that course. Small numbers: say n every time.
+n = 6.) Every "missed" answer is a topic or format to cover in the next hub of that course. Small numbers: say n every time.
+**Never rebuild exam questions from check-ins** (Ethics Code III.A.1; the syllabus bans copying any part of an exam): use
+a "missed" answer only as a topic or a format. If one quotes or reconstructs an exam question, don't copy it into a hub,
+`LESSONS.md` or a PR; summarize it as a topic, and tell Sam.
 
 Also pull, for the live hubs: people/minutes/bounce (< 5 min) all-time and since, per day; time by section; click
 targets and reach for anything the last refresh changed (e.g. `practice=midterm`, `sh-drill=quick`); mocks
@@ -84,7 +87,7 @@ so say in the retro how many there were and that later ones go into the next aud
    `node tools/publish-recap.js <hub> --bank <banks>/<hub>.json --dry-run` to check the numbers and the featured
    question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
-4. Leave the hub page, its `question-banks/` export and the `ARCHIVED_HUBS`/`ARCHIVE_BANK` moves to the archiving
+4. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
    work itself (see `CLAUDE.md`); list them for Sam if they aren't done.
 
 ## 3. Read every hard question yourself

@@ -1,6 +1,6 @@
 // Publish (or preview) a hub's recap to the dashboard's "Hub recaps" slideshow, the same way review/ → Recap → Publish does.
 //   node tools/publish-recap.js <hub> --bank <file> [--exam YYYY-MM-DD, default: its last exam in index.html] [--title "MSK Exam 3"] [--no-names] [--dry-run]
-// --bank: question-banks/<file>.json ({questions:[...]}) or a tools/dump-banks.js file ({Q:[...]}), for the toughest
+// --bank: a local bank file ({questions:[...]}) or a tools/dump-banks.js file ({Q:[...]}), for the toughest
 // question's text. Needs SB_KEY and ADMIN_SECRET in the environment (never printed). --dry-run prints what would go up.
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const args = process.argv.slice(2), hub = args[0];
@@ -10,8 +10,8 @@ const { SB_KEY, ADMIN_SECRET } = process.env;
 if (!SB_KEY || !ADMIN_SECRET) { console.error('SB_KEY and ADMIN_SECRET must be set'); process.exit(1); }
 const BASE = 'https://thytmzsgymydbzcqdnix.supabase.co/rest/v1/rpc/';
 // same as review/index.html
-const HUB_COLOR = { hepatobiliary: '#DDAE52', 'gi-exam1': '#DDAE52', 'msk-exam3': '#DDAE52', perio: '#E88EA9', genetics: '#6FC2B8', 'fixed-pros': '#E08566' };
-const HUB_TITLE = { hepatobiliary: 'GI Exam 2', 'gi-exam1': 'GI Exam 1', 'msk-exam3': 'MSK Exam 3', perio: 'Periodontology', genetics: 'Genetics', 'fixed-pros': 'Fixed Pros' };
+const HUB_COLOR = { hepatobiliary: '#DDAE52', 'gi-exam1': '#DDAE52', 'msk-exam3': '#DDAE52', 'msk-exam4': '#DDAE52', occlusion: '#E08566', 'pcd-exam3': '#E08566', perio: '#E88EA9', genetics: '#6FC2B8', 'fixed-pros': '#E08566' };
+const HUB_TITLE = { hepatobiliary: 'GI Exam 2', 'gi-exam1': 'GI Exam 1', 'msk-exam3': 'MSK Exam 3', 'msk-exam4': 'MSK Exam 4', occlusion: 'Occlusion Midterm', 'pcd-exam3': 'PCD Fixed Pros Exam 3', perio: 'Periodontology', genetics: 'Genetics', 'fixed-pros': 'Fixed Pros' };
 
 // widget/recap.js's snapshot(): the fields the dashboard draws, names dropped when they're off
 const sandbox = { window: {} }; vm.createContext(sandbox);

@@ -166,9 +166,15 @@
 
     /* face */
     var f = '<g class="shpet-face">';
-    var cheek = mood === "sick" ? "#A9D18E" : "#FF8FA3";
+    var cheek = mood === "sick" ? "#A9D18E" : mood === "scared" ? "#C9D6E8" : "#FF8FA3";
     f += '<ellipse cx="66" cy="101" rx="8.5" ry="4.8" fill="' + cheek + '" opacity="' + (mood === "sick" ? ".45" : ".55") + '"/><ellipse cx="134" cy="101" rx="8.5" ry="4.8" fill="' + cheek + '" opacity="' + (mood === "sick" ? ".45" : ".55") + '"/>';
-    if (mood === "sleep") {
+    if (mood === "scared") {
+      /* after TIMMY: wide eyes with tiny pupils, worried brows, a wobbly mouth */
+      f += '<g class="shpet-eyes"><circle cx="80" cy="84" r="11" fill="#fff" stroke="' + OUT + '" stroke-width="3"/><circle class="shpet-pupil" cx="80" cy="85" r="3.4" fill="#2B2230"/>' +
+        '<circle cx="120" cy="84" r="11" fill="#fff" stroke="' + OUT + '" stroke-width="3"/><circle class="shpet-pupil" cx="120" cy="85" r="3.4" fill="#2B2230"/></g>' +
+        '<path d="M68 69 L88 62 M132 69 L112 62" stroke="' + OUT + '" stroke-width="3" stroke-linecap="round"/>' +
+        '<path d="M84 110 q4 -5 8 0 t8 0 t8 0 t8 0" stroke="' + OUT + '" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+    } else if (mood === "sleep") {
       f += '<path d="M72 85 Q80 91 88 85 M112 85 Q120 91 128 85" stroke="' + OUT + '" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
         '<ellipse cx="100" cy="107" rx="4" ry="3" fill="#6B2B3A"/>';
     } else {
@@ -181,7 +187,7 @@
       else if (mood === "sad") f += '<path d="M90 111 Q100 102 110 111" stroke="' + OUT + '" stroke-width="3.6" fill="none" stroke-linecap="round"/>';
       else f += '<ellipse cx="100" cy="108" rx="4.6" ry="5.6" fill="#6B2B3A" stroke="' + OUT + '" stroke-width="2.6"/>';
     }
-    if (mood === "sick") f += '<path class="shpet-sweat" d="M146 62 C146 62 140 70 140 74 A6 6 0 0 0 152 74 C152 70 146 62 146 62 Z" fill="#9ED8F5" stroke="#4A9BC4" stroke-width="1.6"/>';
+    if (mood === "sick" || mood === "scared") f += '<path class="shpet-sweat" d="M146 62 C146 62 140 70 140 74 A6 6 0 0 0 152 74 C152 70 146 62 146 62 Z" fill="#9ED8F5" stroke="#4A9BC4" stroke-width="1.6"/>';
     f += '</g>';
 
     var bodyG = '<g' + (has.fracture ? ' mask="url(#' + p + 'chip)"' : '') + '>' + body + '</g>' + f;
@@ -217,7 +223,7 @@
     if (mood === "sleep") x += '<g class="shpet-zz" fill="' + OUT + '" font-family="Georgia,serif" font-weight="700"><text x="150" y="40" font-size="20">z</text><text x="164" y="22" font-size="15">z</text></g>';
     x += hat(state.hat === undefined ? holidayId() : state.hat);
 
-    var cls = "shpet-art" + (has.perio ? " is-loose" : "") + (mood === "sick" ? " is-sick" : "");
+    var cls = "shpet-art" + (has.perio ? " is-loose" : "") + (mood === "sick" ? " is-sick" : "") + (mood === "scared" ? " is-scared" : "");
     return '<svg class="' + cls + '" viewBox="0 -30 200 262" width="' + (px || 100) + '" height="' + Math.round((px || 100) * 1.31) + '" aria-hidden="true">' + d +
       '<g class="shpet-bob"><g class="shpet-wobble">' + s + bodyG + calc + '</g>' + g + x + '</g></svg>';
   }
@@ -603,7 +609,8 @@
     prof: ["Quoting the professor? Very on brand."],
     konami: ["Whoa. Am I... pixels?"],
     holiday: ["Happy holidays from your favorite tooth!"],
-    timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain."]
+    timmy: ["Who was THAT Timmy? There's only room for one Timmy around here.", "He had a crown. I have a crown too. Sort of. It's porcelain.",
+      "Did he curse you? Don't worry. His curses never work. I'm the good Timmy.", "I TOLD you not to type my name."]
   };
   /* ---------- holiday talk: greetings, answer quips and jokes per holiday (holidayId()), plus a fall pool for the
      autumn weeks no holiday covers (isFall()). Lines are dealt from a shuffled deck per pool (deal()), so every line
@@ -782,6 +789,11 @@
       ".shpet-art .shpet-bob{transform-origin:100px 224px; animation:shpet-breathe 3.2s ease-in-out infinite;}",
       ".shpet-art.is-loose .shpet-wobble{transform-origin:100px 200px; animation:shpet-loose 2.4s ease-in-out infinite;}",
       ".shpet-art.is-sick .shpet-bob{animation:shpet-shiver 1.6s ease-in-out infinite;}",
+      ".shpet-art.is-scared .shpet-bob{animation:shpet-tremble .16s linear infinite;}",
+      ".shpet-art.is-scared .shpet-pupil{animation:shpet-dart 2.2s ease-in-out infinite;}",
+      "@keyframes shpet-tremble{0%,100%{transform:translate(0,0);} 25%{transform:translate(-1.4px,.6px);} 50%{transform:translate(1.2px,-.4px);} 75%{transform:translate(-.6px,-.6px);}}",
+      "@keyframes shpet-dart{0%,30%,100%{transform:translateX(0);} 40%,55%{transform:translateX(-4px);} 65%,85%{transform:translateX(4px);}}",
+      "@media (prefers-reduced-motion: reduce){.shpet-art.is-scared .shpet-bob,.shpet-art.is-scared .shpet-pupil{animation:none;}}",
       ".shpet-eye{transform-box:fill-box; transform-origin:center; animation:shpet-blink 5.5s infinite;}",
       ".shpet-eye + .shpet-eye{animation-delay:.04s;}",
       ".shpet-drop{animation:shpet-drip 2.6s ease-in infinite;} .shpet-drop2{animation-delay:1.3s;}",
@@ -912,6 +924,12 @@
     setInterval(load, 5 * 60 * 1000);
     window.addEventListener("resize", place);
     document.addEventListener("sh:pref", function(e){ if (e.detail && /^sh_pref_(pet|eggs)$/.test(e.detail.key)) refresh(); });
+    document.addEventListener("sh:egg-local", function(e){
+      if (!e.detail || e.detail.t !== "timmy") return;
+      scare();
+      if (where !== "hub" && visible()) setTimeout(function(){ talk(pick(EGG_LINES.timmy), "do-flinch", 5500); }, 1200);   /* hubs already react in wireHub */
+    });
+    calmLater();
     return M;
   }
   function visible(){
@@ -978,10 +996,27 @@
     else if (e.target.closest("[data-check]")) { hush(); checkup(); }
     else if (e.target.closest("[data-tip]")) tellTip();
   }
+  /* ---------- scared of TIMMY (widget/timmy.js): five minutes of trembling after the show, on every page ---------- */
+  var SCARED_MS = 5 * 60 * 1000;
+  var SCARED = ["Is he gone? Is he still here? Don't look behind you.", "I'm not scared. My enamel is just... vibrating.",
+    "Did you hear that? I definitely heard a crown.", "Let's study really quietly so he doesn't come back.",
+    "I told you. I TOLD you. Nobody listens to the tooth.", "Keep answering questions. He hates right answers. Probably."];
+  var CALM = ["Phew. I think he's gone.", "Okay. Okay. I'm fine. I'm totally fine.", "He's gone. Let's never speak of this again."];
+  function scaredLeft(){ return Math.max(0, (+ls("sh_pet_scared_until") || 0) - Date.now()); }
+  function calmLater(){
+    if (!M) return; clearTimeout(M.calmT);
+    var left = scaredLeft(); if (!left) return;
+    M.calmT = setTimeout(function(){ draw(); if (visible() && !document.hidden) talk(pick(CALM), "do-hop", 5000); }, left + 200);
+  }
+  function scare(){
+    ls("sh_pet_scared_until", String(Date.now() + SCARED_MS));
+    draw(); calmLater();
+  }
   function draw(){
     if (!M || !M.btn) return;
     var hp = adopted() ? M.st.hp : 85, mood = adopted() ? moodFor(hp) : "happy";
     if (M.sleeping) mood = "sleep";
+    else if (adopted() && scaredLeft() > 0) mood = "scared";
     M.btn.innerHTML = art({ hp: hp, mood: mood }, 100);
     M.btn.setAttribute("aria-label", adopted() ? petName() + ", your tooth buddy, " + hp + " HP. Tap for a joke." : "Timmy Tooth. Tap to meet him.");
     var bar = M.el.querySelector(".shpet-hp");
@@ -1030,6 +1065,7 @@
   }
   function idleLife(){
     if (!M || !M.btn || !visible() || document.hidden) return;
+    if (scaredLeft() > 0 && !M.sleeping && Math.random() < 0.35 && !busy()) act("do-look");
     if (M.where === "hub") {
       var quiet = Date.now() - M.lastInput;
       if (quiet > 180000 && !M.sleeping) { M.sleeping = true; draw(); if (!M.idleSaid) { M.idleSaid = true; talk("Still there? I'll just rest my enamel for a sec.", null, 5000); } return; }
@@ -1041,6 +1077,7 @@
   function hello(){
     if (!adopted()) return;
     if (M.skipHello) { M.skipHello = false; return; }
+    if (scaredLeft() > 0) { talk(pick(SCARED), "do-flinch", 6500); return; }
     var st = M.st, nm = (M.name && M.name()) || "";
     var h = new Date().getHours(), part = h < 5 ? "Up late" : h < 12 ? "Morning" : h < 17 ? "Hey" : "Evening";
     var hol = holidayId();
@@ -1083,6 +1120,7 @@
     M.jokes = (M.jokes || 0) + 1;
     if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + '<br><button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
     else if (M.jokes % 4 === 2) tellTip();
+    else if (scaredLeft() > 0 && Math.random() < 0.6) talk(pick(SCARED), "do-flinch", 6000);
     else talk(esc(joke()) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), 8500, true);
   }
 

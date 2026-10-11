@@ -21,8 +21,10 @@ does it differently.
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
-  recap (`tools/publish-recap.js`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it); add the hub to `ARCHIVE_BANK` there once its bank is in `question-banks/`.
-  `question-banks/` — archived hubs' banks.
+  recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
+  the hub page comes down, while `tools/dump-banks.js` can still read its bank.
+  **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
+  2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
   hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
   runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in
@@ -153,3 +155,15 @@ for them. Check Supabase reachability first:
 Lecture slides, PDFs and recordings are NOT in this repo and must not be
 committed (public repo, course material). If a task needs them, ask Sam to
 run it as a local session or provide the text.
+
+**Graded course work** (Canvas quizzes, crosswords, the take-home, exams; Sam's standing rule, 2026-10-09). The
+DENT 2155 syllabus keeps quiz and take-home questions and answers confidential and bans sharing them with later
+classes, and open quizzes allow no AI or collaboration. So:
+- Never copy a graded quiz, crossword, take-home or exam question into a hub, word for word or lightly reworded.
+- Once it has **closed** for the class, use it as **context**: check that every topic it tests is covered by
+  questions the hub writes itself, in new wording. Never leave a topic out because it appeared on a quiz.
+- Never use a quiz, crossword or take-home that is **still open**, even as context.
+- Never use **previous years'** graded quiz, take-home or exam content at all, not even as context (e.g. screenshots
+  of last year's Canvas quizzes in a passed-down class deck, or recalled exam questions): sharing it with a later class
+  is what the syllabus forbids. Cover those topics from the lectures instead.
+- **Ask Sam before removing or excluding any content** from a hub for these reasons.

@@ -273,6 +273,14 @@
     }
   }
 
+  /* he means harm, but his curses are terrible: a different one each time he's summoned on this device */
+  var CURSES = ["Any question you miss in the next hour is his fault, not yours.",
+    "Your next wrong answer will feel slightly more wrong than usual.",
+    "He will be watching you floss. Closely.",
+    "Every cavity in the class this week is on him.",
+    "Your coffee will be lukewarm. Forever. (Or until it cools down.)",
+    "You will mix up mesial and distal exactly once today."];
+
   /* ---------- the show ---------- */
   var timers = [], cleanups = [], pieces = [], root = null;
   function at(ms, fn){ timers.push(setTimeout(fn, ms)); }
@@ -343,13 +351,13 @@
       if (!REDUCED) rain(root, 60);
     });
 
-    /* 11.4s — the blessing, and the page puts itself back together */
+    /* 11.4s — the curse (a useless one), and the page puts itself back together */
     at(11400, function(){
       hue.classList.remove("on");
-      caption.innerHTML = "<b>TIMMY HAS BLESSED THIS STUDY SESSION</b><small>Every answer you get right in the next hour is " +
-        "slightly more correct than usual. &middot; Timmy summoned " + n + (n === 1 ? " time" : " times") + " on this device</small>";
+      caption.innerHTML = "<b>TIMMY HAS CURSED THIS STUDY SESSION</b><small>" + CURSES[(n - 1) % CURSES.length] +
+        " &middot; Timmy summoned " + n + (n === 1 ? " time" : " times") + " on this device. He will return.</small>";
       caption.classList.add("in");
-      [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function(f, i){ tone("triangle", f, 0, i * .09, .9, .22); });
+      [1318.5, 1046.5, 783.99, 622.25, 523.25].forEach(function(f, i){ tone("triangle", f, 0, i * .11, .9, .22); });
       if (pieces.length){ cleanups.forEach(function(fn){ fn(); }); cleanups = [trackEyes(big)]; rebuild(pieces, false); pieces = []; }
     });
 
