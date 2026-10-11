@@ -599,6 +599,9 @@
    "status": "verified",
    "risk": "high",
    "claim": "Pulp necrosis with localized acute apical abscess (no fascial space spread, fever or malaise): if definitive care is not immediately available, give amoxicillin 500 mg three times a day, 3-7 days, or penicillin VK 500 mg four times a day, 3-7 days (conditional, possibly delayed prescription). As an adjunct when definitive care (pulpectomy, RCT, incision and drainage) is done: no antibiotics (strong).",
+   "stem_names": [
+    "ADA"
+   ],
    "cites": [
     {
      "src": "ada-abx-2019",
@@ -645,6 +648,9 @@
    "status": "verified",
    "risk": "high",
    "claim": "Amoxicillin is preferred over penicillin VK (better against gram-negative anaerobes, fewer GI effects). Penicillin allergy without anaphylaxis, angioedema or hives: cephalexin 500 mg four times a day, 3-7 days. With anaphylaxis/angioedema/hives history: azithromycin 500 mg day 1, then 250 mg daily for 4 more days, or clindamycin 300 mg four times a day, 3-7 days; azithromycin has higher resistance and clindamycin raises C. difficile risk even after one dose. About 10% self-report penicillin allergy; under 1% are truly allergic.",
+   "stem_names": [
+    "ADA"
+   ],
    "cites": [
     {
      "src": "ada-abx-2019",

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The four options form a 2x2 matrix (IV/gen, III/loc, III/gen, II/gen). The keyed option C is the only one that shares one element with each of the others (Stage III with B, generalized with A and D), so a test-wise student can guess it by overlap. The content itself is sound: worst CAL 7 mm, 2 periodontitis tooth losses, stage III complexity only (probing depths 6 mm or more, 4-mm vertical defect, class II furcation, mobility 1, 25 teeth), 18/25 = 72% of teeth, so Stage III generalized is correct and no distractor is defensible.",
+        "suggestion": "Optional: break the matrix, e.g. replace D with 'Stage III, molar-incisor pattern' or 'Stage IV, localized', so the key does not stand out as the overlap option."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option D ('No grade until radiographs from 5 years apart exist') is implausible, is the only option that is not a single grade, and is by far the longest. It reduces the item to three real choices. The key itself is correct: 50/58 = 0.86 is grade B on the indirect ratio, and smoking of 10 or more cigarettes a day plus HbA1c of 7.0% or higher each shift the grade to C. Options A and B are not defensible.",
+        "suggestion": "Replace D with a plausible misconception of the same length as A to C, e.g. 'Grade B, because grade modifiers apply only when direct evidence of progression exists', and update the D why line."
+      },
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "PS-9 is flagged in its own conditions: the 0.25 and 1.0 ratio cut-offs have no verbatim quote (only the case-phenotype quote is attached). The A why line ('under 0.25') and the B why line ('0.25-1.0') rest on that unquoted grid. The key does not depend on it, because smoking and HbA1c are quoted in PS-10, but the numbers are cited as verified without a quote. I confirm from my own knowledge that the cut-offs are 0.25 and 1.0.",
+        "suggestion": "Add the chart's grid quote for the % bone loss / age cut-offs before release."
+      }
+    ]
+  },
+  {
+    "id": "R03",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The key is the only option that names a specific time point and magnitude of effect ('measurable drop by 3 months'), the most specific statement among the four. Option A is also an absolute-style one-way claim, which stands out against the bidirectional teaching. The stem names the ADA summary, which makes C the best answer; B is defensible only against the actual evidence, not against the ADA wording.",
+        "suggestion": "Give D or B a comparably specific detail (e.g. 'A1C falls only after 12 months') so the key is not the only one with a time frame."
+      },
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "The stem is framed as 'ADA's summary', so C is right. The explanation and C still state 'lowers A1C' without scale. Recent Cochrane-type reviews report a modest drop (about 0.3-0.4 percentage points) with low certainty and no clear effect at 12 months. Students could take away that SRP is a diabetes treatment.",
+        "suggestion": "Add one sentence to the explanation: the average drop is modest, so periodontal care supports but does not replace diabetes management."
+      }
+    ]
+  },
+  {
+    "id": "R04",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The confirming repeat reading (164/100) sits exactly on the diastolic cut-off. The explanation says 'over 160/100', and the ADA table reads systolic and/or diastolic, so 164 systolic is clearly above and the key holds. A student who reads '>160/100' as requiring both numbers to exceed their cut-off could argue the repeat is not 'confirmed'.",
+        "suggestion": "Change the repeat reading to 164/102 so both values clearly exceed the threshold."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Three options (A, B, D) proceed with treatment and only the key postpones and refers, so the 'safest, odd-one-out' option can be picked without knowing the ADA threshold. The stem also never says SRP is scheduled/elective; the key needs that classification (ADA: no elective care when confirmed over 160/100).",
+        "suggestion": "State 'scheduled' care in the stem. Optionally add a second conservative option (e.g. 'Complete the visit with no epinephrine and refer afterward') so postponing is not the lone cautious choice."
+      }
+    ]
+  },
+  {
+    "id": "R05",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The box gives no bleeding-on-probing data, yet the stem says 'Which finding at this visit would mean...'. Options B to D are hypothetical, while A (past attachment loss) and C (4-mm sites; the box says depths of 2-4 mm) are already true of this patient. The key matches the 2017 consensus for a treated, stable periodontitis patient (4 mm or less, no 4-mm site with BOP, BOP under 10%), and C and D are correctly still healthy.",
+        "suggestion": "Reword: 'Which finding, if present at this visit, would mean she no longer meets the 2017 AAP/EFP definition of periodontal health for a successfully treated periodontitis patient?'"
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "B and C are a minimal pair (4-mm bleeds vs does not bleed), which signals that bleeding is the discriminator, and D spells out 'all at 2-mm and 3-mm sites', which hints that the depth of the bleeding site matters. The key is still reached only by knowing the 'closed pocket' rule.",
+        "suggestion": "Optional: make C 'A few 4-mm sites, none bleeding' and D 'BOP at 8% of sites, none at 4 mm or deeper' so both are phrased alike."
+      }
+    ]
+  },
+  {
+    "id": "R06",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The history says amoxicillin was given 'for 3 days' and the complaint is 4 days old, so the course may already be finished, yet the stem says metronidazole is 'added to his amoxicillin'. It does not change the answer but is internally unclear.",
+        "suggestion": "Write 'Amoxicillin 500 mg three times daily, started 3 days ago at an urgent care clinic' in the box."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option A contains the absolute 'only' (only alcohol interacts), a common marker of a wrong option. The key C is the only option using the label term 'potentiates'.",
+        "suggestion": "Remove 'only' from A (e.g. 'No change in INR, because the metronidazole interaction concerns alcohol') and keep the 'because' clauses parallel."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The key is correct and well supported (metronidazole label: potentiates warfarin, prolongs PT). The stem presents adding metronidazole to a warfarin patient as the plan. The same ADA table footnote offers amoxicillin/clavulanate as the other option, and the explanation never says an alternative exists. Also, the B why line ('not an antiplatelet drug') is not backed by any cited fact, though it is true.",
+        "suggestion": "Add one sentence: the same guideline also allows switching to amoxicillin/clavulanate, which avoids the metronidazole-warfarin and alcohol problems, so he and his warfarin prescriber still need the INR plan if metronidazole is chosen."
+      }
+    ]
+  },
+  {
+    "id": "R07",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The stem asks for the 'most appropriate' regimen but never names the ADA guideline, although the explanation, the why lines and the cited facts all depend on it (why B: 'not one of the ADA regimens'). Without that frame, option B is defensible: doxycycline is widely used in penicillin-allergic odontogenic infection, and the labeled 200 mg then 100 mg daily regimen is a real one. Azithromycin is also the ADA's weakest-resistance-profile choice and clindamycin is not offered. Two answers can be argued unless the student knows to answer by the ADA guideline.",
+        "suggestion": "Add 'According to the ADA guideline on antibiotics for urgent pulpal and periapical pain and swelling,' to the stem, and state the guideline year. Alternatively keep the stem and replace B with a regimen that is clearly wrong for this patient (e.g. a fluoroquinolone)."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The ADA recommendation applies to immunocompetent adults. The box lists only treated hypothyroidism and does not say 'otherwise healthy', and the stem does not say the patient is immunocompetent.",
+        "suggestion": "Add 'otherwise healthy' or 'no immune compromise' to the history."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Options A and B share a parallel loading-dose format, and C and D share '3-7 days'. B is a realistic-looking decoy. Doxycycline given as 100 mg once daily after the loading dose is not how it is usually prescribed for odontogenic infection (100 mg twice daily).",
+        "suggestion": "If B is kept, write a regimen that is internally plausible, or accept the realistic decoy once the stem names the ADA guideline."
+      }
+    ]
+  },
+  {
+    "id": "R08",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "'Rules out MRONJ as the diagnosis' is true by the AAOMS case definition (no history of radiation to the jaws), which is how the key and ORN-1 treat it. The stem does not name the AAOMS case definition, so a student could argue that necrosis after alendronate in an irradiated jaw may still have a bisphosphonate contribution. The key matches the AAOMS 2022 text, and A, B and D are correctly not exclusions.",
+        "suggestion": "Start the stem with 'By the AAOMS case definition,' and keep the rest."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option A uses '6 months', a threshold that is not part of any current MRONJ definition (the definition uses more than 8 weeks). It reads as a made-up number, and C is the only option that is a history item rather than a finding or route.",
+        "suggestion": "Change A to '10 weeks of exposed bone, with biopsy-proven necrosis' or '12 weeks rather than 8 weeks', and make D a history-style item (e.g. 'Bisphosphonate therapy for osteoporosis rather than cancer')."
+      }
+    ]
+  }
+]

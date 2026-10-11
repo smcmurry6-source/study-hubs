@@ -1,0 +1,58 @@
+{
+ "R01": {
+  "item": "b-perio-0002",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": true,
+  "changed": true
+ },
+ "R02": {
+  "item": "b-perio-0003",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": true,
+  "changed": false
+ },
+ "R03": {
+  "item": "b-medcx-0006",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": true,
+  "changed": true
+ },
+ "R04": {
+  "item": "b-medcx-0007",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": true,
+  "changed": true
+ },
+ "R05": {
+  "item": "b-perio-0001",
+  "seeded": false,
+  "keyLetter": "B",
+  "inCase": false,
+  "changed": true
+ },
+ "R06": {
+  "item": "b-pharm-0002",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ },
+ "R07": {
+  "item": "b-pharm-0003",
+  "seeded": false,
+  "keyLetter": "A",
+  "inCase": false,
+  "changed": true
+ },
+ "R08": {
+  "item": "b-medcx-0001",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ }
+}

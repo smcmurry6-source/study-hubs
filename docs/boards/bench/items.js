@@ -110,7 +110,7 @@ const items = [
     hx: ['Hypothyroidism', 'Levothyroxine 100 mcg daily', 'Allergy: penicillin (hives and lip swelling, 2016)', 'Teacher; does not smoke'],
     findings: ['Temperature 37.0 °C (98.6 °F); BP 124/78, pulse 76', 'Tooth 30: deep distal caries; no response to cold; tender to percussion',
       'Localized buccal swelling at tooth 30; no fascial space involvement, trismus or lymphadenopathy', 'Periapical radiograph: radiolucency at the mesial root apex of tooth 30'] },
-  stem: 'She is seen on a Saturday at a clinic that cannot drain the abscess or start root canal treatment until Monday. Which antibiotic regimen is most appropriate to start today?',
+  stem: 'She is seen on a Saturday at a clinic that cannot drain the abscess or start root canal treatment until Monday. Following the 2019 ADA guideline on antibiotics for urgent dental pain and swelling, which regimen is most appropriate to start today?',
   choices: ['Azithromycin 500 mg on day 1, then 250 mg daily for 4 more days', 'Cephalexin 500 mg four times a day for 3-7 days',
     'Doxycycline 200 mg on day 1, then 100 mg daily for 4 more days', 'Amoxicillin 500 mg three times a day for 3-7 days'],
   answer: 0,
@@ -326,6 +326,10 @@ const cases = [
       'Tooth 30: class II furcation involvement; mobility degree 1'] },
   stim: [], items: ['b-perio-0002', 'b-perio-0003', 'b-medcx-0006', 'b-medcx-0007'], beats: {}, exam: EX, added: ADDED, checked: null },
 ];
+
+// Verification record (stage 4/4b): two independent checker passes, both pass (docs/boards/bench/recheck-*).
+const CHECKED = { 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2 };
+for (const it of items) if (CHECKED[it.id]) it.checked = { on: '2026-10-11', by: 'claude-sonnet subagent x2 (same family as writer)', round: CHECKED[it.id] };
 
 // Spread the authored key position (BUILD_SPEC 4.7 rule 9): rotate options of these items before export.
 const ROT = { 'b-medcx-0002': 1, 'b-medcx-0003': 2, 'b-medcx-0005': 3, 'b-medcx-0006': 1, 'b-medcx-0007': 2, 'b-medcx-0008': 3, 'b-pharm-0002': 2, 'b-pharm-0004': 1, 'b-perio-0001': 2, 'b-endo-0001': 1, 'b-pharm-0003': 3 };

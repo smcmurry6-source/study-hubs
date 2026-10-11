@@ -1,0 +1,146 @@
+[
+  {
+    "id": "R01",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The stem never names the guideline. The whole key (antibiotic indicated at all because definitive care is unavailable; azithromycin or clindamycin after hives/angioedema; cephalexin excluded; doxycycline absent) rests on the 2019 ADA CPG, and the explanation says 'the ADA suggests'. Without that anchor, option C (doxycycline 200 mg then 100 mg daily, built to mirror the azithromycin loading pattern) is defensible to students who learned doxycycline as a penicillin-allergy alternative, and other sources (e.g., endodontic guidance) say no antibiotic for a localized swelling at all. Why-C is wrong only because 'it is not an ADA regimen', which the stem never asks about. R05 in this same batch does name its guideline.",
+        "suggestion": "Reword the stem: 'According to the ADA's 2019 guideline on antibiotics for urgent pulpal and periapical conditions, which antibiotic regimen is most appropriate to start today?'"
+      },
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "The AB-3 quote supports the dose and duration but omits the condition the stem depends on ('if definitive care is not immediately available'); that condition appears only in the claim text. The clindamycin alternative named in the explanation and in the why-A line has no verbatim quote attached (only the azithromycin footnote is quoted).",
+        "suggestion": "Add the verbatim 'definitive care not immediately available' sentence and the clindamycin footnote quote to the cited facts."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "Radiograph shows a mesial root apex lesion while the caries is 'deep distal'. It is plausible for a necrotic molar but reads as a possible slip.",
+        "suggestion": "Say 'deep caries' or put the caries on the mesial surface."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option set is unbalanced: D (Stage III, generalized) shares one attribute with every other option (Stage III with C; generalized with A and B), so a test-wise student can pick the 'overlap' answer. Option A (Stage II) is also not credible with a 7-mm CAL and adds nothing.",
+        "suggestion": "Use a balanced 2x2: Stage III localized / Stage III generalized / Stage IV localized / Stage IV generalized."
+      }
+    ]
+  },
+  {
+    "id": "R03",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option D ('No grade until radiographs from 5 years apart exist') is structurally different from A-C, is the longest option, and is implausible because the chart explicitly provides indirect evidence and says to assume grade B and look for evidence. Nobody who has seen the chart picks it, so the item is effectively A/B/C.",
+        "suggestion": "Replace D with a real misconception, e.g. 'Grade B, because risk factors are applied only when 5-year radiographs exist'."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "The box says A1C while the explanation and cited facts say HbA1c; the key relies on the 7.0% cutoff for 'HbA1c in patients with diabetes'.",
+        "suggestion": "Use one term throughout (A1C or HbA1c)."
+      }
+    ]
+  },
+  {
+    "id": "R04",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option D ('briefly raises A1C, so his physician should adjust metformin first') is not a credible misconception and does not match any real teaching, so it adds no discrimination. Together with C and B (both obviously one-sided), the key is the only 'perio treatment helps both ways' statement and the only option with a specific effect and time point, so a student can reach it from the common idea that perio and diabetes are linked.",
+        "suggestion": "Replace D with a plausible error such as 'Treatment benefits A1C only if started after A1C is below 7.0%' or 'The A1C effect appears only after 12 months'."
+      },
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "The key is supported by the quoted ADA statement, but the stem is a bare recall of that one sentence. Larger Cochrane-type reviews report a modest drop (about 0.3-0.4%) with less certainty at 12 months. The stem already anchors to 'the ADA's summary', which keeps the key defensible.",
+        "suggestion": "Keep the 'ADA's summary' anchor; optionally add 'about 0.4%' to the explanation so students do not oversell the effect to patients."
+      }
+    ]
+  },
+  {
+    "id": "R05",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The repeat reading is 164/100. The threshold is written 'over 160/100' without and/or; the diastolic of exactly 100 is not over 100, so a student reading it as 'both' could hesitate. The key still holds because systolic 164 is over 160.",
+        "suggestion": "Make the repeat reading 164/102 so both values clearly exceed the cutoff."
+      },
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "The 160/100 deferral rule is the ADA practical guide, not an evidence-based cutoff (Yarows 2020, BP-4), and most board prep uses 180/110. The stem names the ADA guide and the why-C line explains the 180/110 source, so this is handled, but the explanation does not say the ADA threshold is a consensus rule.",
+        "suggestion": "Add a sentence to the explanation: 'This is the ADA guide's conservative rule; other sources use 180/110.'"
+      }
+    ]
+  },
+  {
+    "id": "R06",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "B ('a 4-mm site that bleeds') and D ('several 4-mm sites that do not bleed') are mirror-image minimal pairs, so the answer is B or D by structure; C is the only strong distractor.",
+        "suggestion": "Optional: change D to a different shape, such as 'Generalized 4-mm probing depths with 6% bleeding at 2-mm sites only'."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "'Which finding at this visit would mean...' is hypothetical, but the box already gives this visit's findings (2-4 mm at all sites, no BOP data), so students may look for the answer in the box.",
+        "suggestion": "Say 'Which finding, if present at this visit, would mean...' or add the BOP percentage to the box."
+      }
+    ]
+  },
+  {
+    "id": "R07",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option A ('platelet inhibition') is not a credible reading of metronidazole, and option D uses the absolute 'only'. The real decision is B versus C (direction of INR change), and A/D both say 'unchanged INR', which pair up and eliminate each other. The wine in the box is a deliberate lure toward D.",
+        "suggestion": "Replace A with a plausible interaction claim, e.g. 'A higher INR only if amoxicillin is stopped', and drop 'only' from D."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The stem presents adding metronidazole as the plan for a patient on warfarin whose general dentist could still open the tooth or drain; it reads as endorsing escalation instead of source control. The question itself (INR effect) is unaffected and the explanation correctly says to recheck the INR and notify the physician.",
+        "suggestion": "Optionally phrase it as 'If metronidazole 500 mg three times a day is added...' to separate the interaction question from the management plan."
+      }
+    ]
+  },
+  {
+    "id": "R08",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "'Rules out MRONJ as the diagnosis' is true by the AAOMS case definition, but the stem never says so; clinically, antiresorptive therapy can coexist with osteoradionecrosis, so 'rules out' is a definitional statement. No distractor becomes defensible, so the key stands.",
+        "suggestion": "Reword: 'By the AAOMS case definition, which item in his record excludes MRONJ as the diagnosis?'"
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The jaw radiation is the only history item that is not generic, and the biopsy line 'no tumor' exists only to remove the other exclusion, so the item is easy for anyone who recognizes osteoradionecrosis. Option B's '6 months' matches no criterion in the definition.",
+        "suggestion": "Optionally ask for the most likely diagnosis (ORN versus MRONJ stage 1 versus osteomyelitis), which tests the same fact at a higher level; if kept, drop the '6 months' contrast in B."
+      }
+    ]
+  }
+]

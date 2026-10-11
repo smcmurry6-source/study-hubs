@@ -31,24 +31,28 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
 - **Benchmark:** `docs/boards/bench/REPORT.md`. Sonnet subagent checker caught 19/20 planted defects (code checks got
   the 20th), 0 false alarms; my first-pass item quality was 55-70%; 9 real defects found, 8 fixed. Sam said **go** on 2026-10-11.
 
-## Session 2: close the benchmark loop, then facts for release 1
+## Session 2 (done 2026-10-11)
 
-1. **Re-verify** the 8 repaired items in `docs/boards/bench/items.js` with a fresh checker (stage 4b; only the changed
-   items). If an OpenRouter key exists by then, also run `run1/` through a non-Anthropic checker and add a run-2 row
-   to the report.
-2. **Lint additions** from the benchmark: a fact field naming the guideline a stem must cite (BP-4, CH-2), a wider
-   hedging/absolutes check.
-3. **Fill fact gaps** for the release-1 units, quotes checked as you go (`check-quotes.mjs --grep/--propose`):
-   medcx (asthma/COPD, kidney, liver, thyroid/adrenal, infectious disease, sickle cell and transplant; emergencies:
-   syncope, seizure, stroke, chest pain, anaphylaxis follow-up, BLS; the AHA is blocked, so look for open
-   alternatives), pharm (pharmacokinetics/CYP, opioids and substance use, tobacco cessation, drug effects with oral
-   signs), perio (nonsurgical therapy and reevaluation, adjuncts, supportive therapy intervals, necrotizing disease
-   and abscesses, endo-perio lesions, prognosis, perio-systemic links). Also an ORN definition fact (the benchmark
-   item needs one).
-4. **AHA 2021 quotes:** if Sam puts the PDF in Google Drive, a session can save it as
-   `.cache/boards-sources/aha-ie-2021.local.pdf` (never committed) and add the 10 missing quotes with `--propose`.
+- Sam said **go**. Repaired bench items re-checked twice (two passes each, `bench/REPORT.md`): 8 verified;
+  `b-pharm-0003` fixed a third time but not counted (failed two rounds); `b-medcx-0008` open (archived NIDCR source).
+- Lint: `stem_names` (BP-3 ADA, CH-2 NIDCR, AB-3/AB-5 ADA) and the hedged-key warning.
+- **33 new facts, 185 in all, 338 quotes confirmed**, from 27 new open sources: perio therapy (EFP S3 2020),
+  abscess / necrotizing disease / endo-perio lesions and drug-influenced enlargement (2017 World Workshop papers,
+  mirrored at umw.edu.pl), perio-systemic; emergencies (ADA, Red Cross CPR, CDC stroke and seizure, albuterol,
+  diphenhydramine, NHLBI); hepatitis, HIV, TB, cardiac devices; tobacco cessation, methamphetamine, xerostomia,
+  stewardship, CYP3A interactions (FDA table).
 
-## Session 3 onward: release 1
+## Session 3: last fact gaps, then the build tool
+
+1. **Remaining fact gaps** (no ADA topic page covers these; use open guidelines or reviews, quotes checked):
+   asthma and COPD, kidney disease and dialysis, liver disease beyond HEP-2, thyroid and adrenal disease (steroid
+   cover), sickle cell disease, transplant and immunosuppression; opioid prescribing beyond RX-3/RX-6 and opioid use
+   disorder; periodontal prognosis (PMC5900888 is open); a current (not archived) source for dental thresholds during
+   chemotherapy, then fix `b-medcx-0008`; an osteoradionecrosis definition; syncope management.
+2. **Second checker pass** for the 10 bench items checked once, plus `b-pharm-0003`, in **one** batch (overhead).
+3. Then R1a as below: `tools/build-boards.js` and the hub shell (BUILD_SPEC 2), units medcx and pharm.
+
+## Session 4 onward: release 1
 
 R1a, R1b, R1c as in `BUILD_SPEC.md` 8.2, with the `PLAN_V2.md` changes (local-first storage with server backup,
 review page for Sam, risk-tiered checking, item provenance). Before shipping each drop: About page entry, dashboard

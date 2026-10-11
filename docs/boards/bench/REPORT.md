@@ -53,3 +53,27 @@ already bled. The ninth, `b-medcx-0008` keying a platelet cutoff from an archive
 Files: `items.js` (repaired), `run1/items.js` (as checked), `run1/seeds.js`, `run1/batch-*.md`, `run1/key.json`,
 `run1/verdicts-*.json`, `run1/adjudication.json`. Score again with
 `node tools/boards/bench.mjs score --out docs/boards/bench/run1 --label sonnet`.
+
+## Re-checks of the repaired items (Session 2, 2026-10-11)
+
+Stage 4b, with the go conditions: every repaired item went to **two fresh checker passes** (Sonnet subagents, the
+prompt in `docs/boards/checker-prompt.md`, different option orders), rendered with `bench.mjs render`.
+
+| Round | Items | Result |
+|---|---|---|
+| Recheck 1 (`recheck-1/`) | the 8 repaired items + their case | 3 passed both passes. The passes disagreed on 4 of 8 items; the flags were real (an "additional" finding read as cumulative, an ORN key with no ORN definition in the facts, a stem that didn't name its evidence source, three options starting "Proceed", an invented cephalexin regimen). Fixed again; `b-medcx-0001` now asks what rules MRONJ out, which the facts support. |
+| Recheck 2 (`recheck-2/`) | the 7 re-fixed items | 6 passed both passes (low-severity notes only). Both passes flagged `b-pharm-0003` for the same reason: the stem must name the ADA 2019 guideline, or doxycycline is defensible. |
+
+Outcome: **8 items verified** by two passes (`checked` set in `items.js`). `b-pharm-0003` failed two re-check rounds,
+so by the pipeline rule it is not counted as verified; its stem now names the guideline and AB-3/AB-5 carry
+`stem_names: ["ADA"]`, so the lint enforces this for every future item. `b-medcx-0008` stays open (archived NIDCR
+source). The other 10 items passed one pass in run 1; as high-risk items they still need a second pass.
+
+What this adds to the benchmark:
+- **One pass is not enough.** Two passes on the same items disagreed on half of them in recheck 1, and every
+  disagreement was a real defect that one pass missed. Keep two passes on high-risk items.
+- **Most flags were sourcing problems the code could catch next time.** Two became lint rules (`stem_names`,
+  hedging). Writers should name the guideline whenever a fact's numbers differ between sources.
+- **Cost.** 571k subagent tokens for 4 passes over 15 item checks plus context. Each subagent carries about 120k
+  tokens of overhead whatever the batch size (run 1: about 170k for 20 items; rechecks: about 140k for 8), so check
+  in large batches (30-40 items per pass), and move to a scripted per-item checker on OpenRouter when a key exists.
