@@ -1,6 +1,7 @@
 # Boards hub: plan v2 after external review (2026-10-08)
 
-**Status: proposed, waiting for Sam's go-ahead.** Supersedes the content-pipeline and tooling parts of
+**Status: approved by Sam 2026-10-11.** Until Codex and opencode are set up, everything runs through Claude
+(interim mode, see `NEXT.md`). Supersedes the content-pipeline and tooling parts of
 `BUILD_SPEC.md` (sections 7-9) and the cost notes in `REVIEW_BRIEF.md`. Everything else in BUILD_SPEC stands.
 
 Inputs: two independent reviews of `REVIEW_BRIEF.md` (one from GPT, one from Gemini, PDFs kept by Sam), and Sam's

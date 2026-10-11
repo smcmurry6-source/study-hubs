@@ -29,3 +29,12 @@ Living record of what Sam decided while this hub is being planned and built. New
   yearly re-check catches outline changes.
 - The game needs long-term progression (months to years) and seasons or events, not just a single run.
 - A countdown to a date two years out isn't motivating; prefer readiness per unit.
+
+## 2026-10-11
+
+- **Plan v2 approved** (`PLAN_V2.md`, after the GPT and Gemini reviews). That includes openly licensed real images
+  (radiographs, photos, histology, credited) with code-drawn figures for diagrams, and local-first storage with the
+  server as backup.
+- **Interim mode: everything runs through Claude** until Sam has time to set up Codex and opencode locally. See
+  `NEXT.md` for how to run the plan Claude-only without losing its quality checks.
+- **Free and public.** Selling is not being considered for now.
