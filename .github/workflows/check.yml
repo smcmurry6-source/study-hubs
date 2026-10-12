@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Boards hub is built from src/boards (rebuild with node tools/build-boards.js)
+        run: node tools/build-boards.js --check
       - name: Syntax and merge markers
         run: node tools/ci/syntax.js
       - name: Install headless Chromium

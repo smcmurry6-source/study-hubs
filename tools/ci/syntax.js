@@ -1,4 +1,4 @@
-// Static checks: every inline <script> and the widget scripts parse, no leftover merge-conflict markers.
+// Static checks: every inline <script>, the widget scripts and generated game bundles parse; no leftover merge-conflict markers.
 const fs = require('fs'), path = require('path'), { execFileSync } = require('child_process'), os = require('os');
 const root = path.resolve(__dirname, '../..');
 const pages = ['index.html', 'review/index.html', 'about/index.html', ...fs.readdirSync(path.join(root, 'hubs')).map(h => `hubs/${h}/index.html`)].filter(p => fs.existsSync(path.join(root, p)));
@@ -10,6 +10,11 @@ for (const p of pages) {
   [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach((m, i) => { const f = path.join(tmp, p.replace(/\W+/g, '_') + i + '.js'); fs.writeFileSync(f, m[1]); check(f, `${p} inline script #${i + 1}`); });
   html.split('\n').forEach((line, n) => { if (/^(<<<<<<<|=======$|>>>>>>>)/.test(line)) { failed = true; console.error(`✗ ${p}:${n + 1} merge-conflict marker`); } });
 }
-for (const w of ['widget/v3.js', 'widget/eggs.js', 'widget/clicks.js', 'widget/replies.js', 'widget/ranks.js', 'widget/drill.js']) check(path.join(root, w), w);
+for (const w of ['widget/v3.js', 'widget/eggs.js', 'widget/clicks.js', 'widget/replies.js', 'widget/ranks.js', 'widget/drill.js', 'widget/pet.js', 'widget/timmy.js', 'widget/recap.js']) check(path.join(root, w), w);
+// generated game bundles (boards: hubs/boards/game/<bundle>.js, built by tools/build-boards.js)
+for (const h of fs.readdirSync(path.join(root, 'hubs'))) {
+  const g = path.join(root, 'hubs', h, 'game');
+  if (fs.existsSync(g)) for (const f of fs.readdirSync(g).filter(f => f.endsWith('.js')).sort()) check(path.join(g, f), `hubs/${h}/game/${f}`);
+}
 console.log(failed ? 'Syntax check failed' : `✓ ${pages.length} pages and the widget scripts parse`);
 process.exit(failed ? 1 : 0);

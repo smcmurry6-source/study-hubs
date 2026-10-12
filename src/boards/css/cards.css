@@ -1,0 +1,29 @@
+/* Item card (minimal standalone MCQ; the full card with cases, cover-the-options and Report comes in int-cards). */
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);min-width:0}
+.qcard-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pbox{border:1px solid var(--line-strong);border-radius:10px;margin:0 0 12px;overflow:hidden}
+.pbox dl{margin:0;display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr)}
+.pbox dt{font-weight:700;font-size:.82rem;color:var(--ink-soft);background:var(--surface-2);padding:7px 10px;border-top:1px solid var(--line)}
+.pbox dd{margin:0;padding:7px 10px;border-top:1px solid var(--line);font-size:.92rem}
+.pbox dt:first-of-type,.pbox dd:first-of-type{border-top:0}
+.pbox ul{margin:0;padding-left:18px}
+.qcard-stem{font-weight:700;margin:0 0 12px;white-space:pre-line}
+.qcard-choices{display:flex;flex-direction:column;gap:8px}
+.qchoice{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--line-strong);background:var(--surface);border-radius:10px;padding:10px 12px;cursor:pointer}
+.qchoice:hover:not(:disabled){border-color:var(--accent)}
+.qchoice:disabled{cursor:default}
+.qchoice .lt{font-family:var(--font-mono);font-weight:600;color:var(--ink-faint);flex:none}
+.qchoice[data-state="right"]{border-color:var(--good);background:var(--good-soft)}
+.qchoice[data-state="wrong"]{border-color:var(--bad);background:var(--bad-soft)}
+.qx{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:.94rem}
+.qx-verdict{font-weight:700;margin:0 0 6px}
+.qx-verdict.right{color:var(--good)}
+.qx-verdict.wrong{color:var(--bad)}
+.qx p{margin:0 0 8px}
+.qx-why{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.qx-why li{padding:6px 10px;border-radius:8px;background:var(--surface-2);font-size:.9rem}
+.qx-why li.is-picked{outline:2px solid var(--line-strong)}
+.qx-why li.is-key{background:var(--good-soft)}
+.qx-cue{background:var(--caution-soft);border-left:3px solid var(--caution);padding:8px 12px;border-radius:6px}
+.qx-refs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}

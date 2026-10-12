@@ -57,9 +57,27 @@ function lint(hub, A){
   if (pct > 40) problems.push(`${hub}: the correct answer is the longest choice in ${pct}% of MCQs (keep it under 40%; chance is ~25%)`);
   const audioDir = path.join(root, 'hubs', hub, 'audio');
   if (fs.existsSync(audioDir)) L.forEach(l => {
+    if (l.audio === false) return; /* boards: units without narration (BUILD_SPEC 5.3) */
     if (A.READINGS[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-full.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-full.mp3`);
     if (A.READINGS_PLAIN[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-plain.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-plain.mp3`);
   });
+  if (hub === 'boards') lintBoards(A);
+}
+
+/* boards hub: the BUILD_SPEC 4.7 item rules on the published data, through the same checks as the build
+   (tools/boards/lint-core.cjs) and the fact records in src/boards/facts */
+function lintBoards(A){
+  const core = require('../boards/lint-core.cjs'), cfg = require('../../src/boards/config.js');
+  const Q = A.QUESTIONS || [], C = A.CASES || [], L = A.LECTURES || [], R = A.READINGS || {}, D = A.READINGS_DEEP || {};
+  const secIds = html => [...String(html || '').matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map(m => m[1]);
+  const r = core.lintBoards({ items: Q, cases: C, enabledTypes: cfg.ENABLED_TYPES, lintFactRecords: false,
+    hasSec: (lec, sec) => R[lec] ? secIds(R[lec]).includes(sec) : null });
+  r.errors.forEach(f => problems.push(`boards: ${f.id} [${f.check}] ${f.msg}`));
+  const taught = new Set(L.filter(l => l.status === 'taught').map(l => l.id)), qids = new Set(Q.map(q => q.id));
+  Q.forEach(q => { if (!taught.has(q.lec)) problems.push(`boards: ${q.id} is published but unit ${q.lec} is not taught`); });
+  C.forEach(c => (c.items || []).forEach(id => { if (!qids.has(id)) problems.push(`boards: case ${c.id} lists ${id}, which is not published`); }));
+  Object.keys(R).forEach(u => { if (D[u] && secIds(R[u]).join() !== secIds(D[u]).join()) problems.push(`boards: ${u} Core and Deep dive notes have different section ids`); });
+  notes.push(`boards: lint of the published data: ${Q.length} items, ${C.length} cases, ${r.errors.length} errors, ${r.warnings.length} warnings`);
 }
 
 (async () => {
@@ -80,7 +98,7 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{} };\n' + h.slice(i);
+        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, CASES: typeof CASES!=="undefined"?CASES:[], READINGS_DEEP: typeof READINGS_DEEP!=="undefined"?READINGS_DEEP:{} };\n' + h.slice(i);
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);

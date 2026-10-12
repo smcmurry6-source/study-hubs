@@ -1,0 +1,806 @@
+<!doctype html>
+<!--
+  GENERATED FILE: built by tools/build-boards.js from src/boards/. Do not edit it by hand.
+  Edit src/boards/ and run: node tools/build-boards.js   (CI runs --check and fails when this file is stale.)
+  Merge conflict in this file? Resolve the sources, then rebuild.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="../../assets/favicon-64.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/apple-touch-icon.png?v=2">
+<meta name="apple-mobile-web-app-title" content="Study Hubs">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="../../manifest.webmanifest?v=2">
+<meta name="theme-color" content="#17212b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Boards Hub: INBDE + ADEX">
+<meta property="og:description" content="Boards Hub for the INBDE and ADEX: notes, a board-style question bank, timed exam blocks and Chairside, a clinic game built on the same questions. Grows unit by unit.">
+<meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/boards/">
+<title>Boards Hub</title>
+<meta name="description" content="Boards Hub for the INBDE and ADEX: notes, a board-style question bank, timed exam blocks and Chairside, a clinic game built on the same questions. Grows unit by unit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Literata:opsz,wght@7..72,600;7..72,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../widget/v3.css">
+<style>
+/* ==== css/tokens.css ==== */
+/* Boards hub tokens. Palette "chart and scrubs": a clean chart-paper ground, scrub-teal accent, ink-blue text.
+   Type: Literata (display) · Atkinson Hyperlegible (body, built for legibility) · JetBrains Mono (labels).
+   Token names follow the other hubs (--surface, --ink, --line, --accent...) because widget/v3.css reads them;
+   --card is an alias for older widget rules. Theme: sh_theme (system / light / dark) sets <html data-theme>. */
+:root{
+  color-scheme: light;
+  --bg:#f4f6f5; --surface:#ffffff; --surface-2:#eaefee; --surface-3:#dbe3e2; --card:var(--surface);
+  --ink:#17212b; --ink-soft:#46525e; --ink-faint:#68737e; --line:#d9e1e0; --line-strong:#bccaca;
+  --accent:#17666f; --accent-ink:#11545c; --accent-soft:#d8ecee; --on-accent:#ffffff;
+  --good:#2c7a4b; --good-soft:#dcefe3; --bad:#b4372f; --bad-soft:#f7dcd8; --caution:#946013; --caution-soft:#f5e8cc;
+  --tag-amber:#a8701a; --tag-sage:#57834f; --tag-blue:#2f62a8; --tag-teal:#1f7f78; --tag-violet:#6a4fa5; --tag-red:#b3352d; --tag-green:#4d7a22; --tag-rose:#b9436a;
+  --tag-amber-soft:#f5e6c8; --tag-sage-soft:#e1ecdc; --tag-blue-soft:#dce6f4; --tag-teal-soft:#d5ecea; --tag-violet-soft:#e7e0f3; --tag-red-soft:#f6dbd7; --tag-green-soft:#e2ecd2; --tag-rose-soft:#f5dbe3;
+  --c-boards:#17666f; --c-boards-soft:#d8ecee;
+  --shadow:0 1px 2px rgba(23,33,43,.06), 0 4px 14px rgba(23,33,43,.07);
+  --radius:12px;
+  --font-display:'Literata', Georgia, serif;
+  --font-body:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#10161b; --surface:#172027; --surface-2:#1e2931; --surface-3:#28353e; --card:var(--surface);
+    --ink:#e8eef1; --ink-soft:#b3bfc6; --ink-faint:#8a979f; --line:#2a3740; --line-strong:#3c4c56;
+    --accent:#6cc5cc; --accent-ink:#8fd6dc; --accent-soft:#16343a; --on-accent:#0b1a1d;
+    --good:#6fc28d; --good-soft:#1d3527; --bad:#ef8a78; --bad-soft:#40211c; --caution:#e2b056; --caution-soft:#3a2d15;
+    --tag-amber:#e0a64a; --tag-sage:#93bf89; --tag-blue:#7fa9e0; --tag-teal:#5cc2bb; --tag-violet:#ad95e0; --tag-red:#ec7f70; --tag-green:#9bc567; --tag-rose:#ec86a6;
+    --tag-amber-soft:#3a2c14; --tag-sage-soft:#223020; --tag-blue-soft:#1b2a3c; --tag-teal-soft:#15312f; --tag-violet-soft:#2a2240; --tag-red-soft:#3a1d19; --tag-green-soft:#25301a; --tag-rose-soft:#3a1c27;
+    --c-boards:#6cc5cc; --c-boards-soft:#16343a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#10161b; --surface:#172027; --surface-2:#1e2931; --surface-3:#28353e; --card:var(--surface);
+  --ink:#e8eef1; --ink-soft:#b3bfc6; --ink-faint:#8a979f; --line:#2a3740; --line-strong:#3c4c56;
+  --accent:#6cc5cc; --accent-ink:#8fd6dc; --accent-soft:#16343a; --on-accent:#0b1a1d;
+  --good:#6fc28d; --good-soft:#1d3527; --bad:#ef8a78; --bad-soft:#40211c; --caution:#e2b056; --caution-soft:#3a2d15;
+  --tag-amber:#e0a64a; --tag-sage:#93bf89; --tag-blue:#7fa9e0; --tag-teal:#5cc2bb; --tag-violet:#ad95e0; --tag-red:#ec7f70; --tag-green:#9bc567; --tag-rose:#ec86a6;
+  --tag-amber-soft:#3a2c14; --tag-sage-soft:#223020; --tag-blue-soft:#1b2a3c; --tag-teal-soft:#15312f; --tag-violet-soft:#2a2240; --tag-red-soft:#3a1d19; --tag-green-soft:#25301a; --tag-rose-soft:#3a1c27;
+  --c-boards:#6cc5cc; --c-boards-soft:#16343a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+}
+
+/* ==== css/base.css ==== */
+/* Boards hub base: page, header, mode tabs, sub-tabs, panels, buttons, empty states. */
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; scroll-behavior:auto!important;} }
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+a{color:var(--accent-ink)}
+[hidden]{display:none!important}
+.mono{font-family:var(--font-mono)}
+.ic{width:18px;height:18px;flex:none}
+
+/* ---------- header ---------- */
+#app{max-width:1120px;margin:0 auto;padding:0 20px 60px}
+.hub-header{position:sticky;top:0;z-index:30;background:color-mix(in srgb, var(--bg) 92%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin:0 -20px;padding:10px 20px}
+.hub-header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hub-title{display:flex;align-items:center;gap:10px;min-width:0}
+.hub-title h1{font-family:var(--font-display);font-weight:700;font-size:1.4rem;letter-spacing:-.01em;margin:0;white-space:nowrap}
+.hub-subtitle{color:var(--ink-soft);font-size:.82rem;font-family:var(--font-mono);white-space:nowrap}
+.hub-back-btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none;text-decoration:none}
+.hub-back-btn:hover{color:var(--ink);border-color:var(--line-strong)}
+.hub-back-btn svg{width:16px;height:16px}
+.hub-name-pill{appearance:none;cursor:pointer;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:700}
+.hub-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.8rem;color:var(--ink-soft);white-space:nowrap}
+.exam-pill{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft);font-weight:700}
+.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:34px;height:32px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-soft)}
+.theme-btn .ic{width:16px;height:16px}
+
+/* ---------- mode tabs ---------- */
+#modeSwitch{display:flex;gap:2px;background:var(--surface-2);border-radius:999px;padding:3px;min-width:0;flex:0 1 auto}
+#modeSwitch button{border:0;background:transparent;padding:6px 12px;border-radius:999px;cursor:pointer;font-weight:700;font-size:.88rem;color:var(--ink-soft);display:flex;align-items:center;gap:6px;white-space:nowrap}
+#modeSwitch button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#modeSwitch button:hover{color:var(--ink)}
+#modeSwitch .mode-icon{display:inline-flex}
+#modeSwitch .mode-icon .ic{width:16px;height:16px}
+@media (max-width: 1000px){ #modeSwitch button{padding:6px 9px} }
+
+main{padding-top:22px}
+.hub-footer{margin-top:50px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink-faint);font-size:.82rem}
+
+/* ---------- panels ---------- */
+.panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.panel-head h2{font-family:var(--font-display);font-size:1.5rem;line-height:1.2;margin:0}
+.panel-head p{margin:4px 0 0;color:var(--ink-soft);max-width:68ch}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.subtab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700;font-size:.88rem;color:var(--ink-soft)}
+.subtab.is-active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);min-width:0}
+.box + .box{margin-top:14px}
+.box h3{font-family:var(--font-display);font-size:1.15rem;margin:0 0 6px}
+.box p{margin:0 0 10px;max-width:72ch}
+.box p:last-child{margin-bottom:0}
+.muted{color:var(--ink-soft)}
+.faint{color:var(--ink-faint);font-size:.86rem}
+
+.empty{display:flex;gap:16px;align-items:flex-start;background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--radius);padding:22px 24px}
+.empty .ic{width:30px;height:30px;color:var(--accent);margin-top:2px}
+.empty h3{font-family:var(--font-display);font-size:1.15rem;margin:0 0 6px}
+.empty p{margin:0 0 8px;color:var(--ink-soft);max-width:66ch}
+.empty p:last-child{margin-bottom:0}
+
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:8px 15px;cursor:pointer;font-weight:700;font-size:.9rem;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--ink-faint)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.unit-card{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:14px 16px;min-width:0}
+.unit-card.is-preview{border-left-color:var(--line-strong)}
+.unit-card h4{margin:0;font-size:1rem}
+.unit-card .faint{margin:0}
+.bar{display:block;height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);white-space:nowrap}
+.chip.accent{background:var(--accent-soft);color:var(--accent-ink)}
+
+.field{display:flex;flex-direction:column;gap:4px;font-size:.84rem;color:var(--ink-soft);font-weight:700}
+.field select{font:inherit;font-weight:400;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:7px 10px;max-width:100%}
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+
+#toastHost{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.88rem;box-shadow:var(--shadow)}
+
+/* ==== css/cards.css ==== */
+/* Item card (minimal standalone MCQ; the full card with cases, cover-the-options and Report comes in int-cards). */
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);min-width:0}
+.qcard-top{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pbox{border:1px solid var(--line-strong);border-radius:10px;margin:0 0 12px;overflow:hidden}
+.pbox dl{margin:0;display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr)}
+.pbox dt{font-weight:700;font-size:.82rem;color:var(--ink-soft);background:var(--surface-2);padding:7px 10px;border-top:1px solid var(--line)}
+.pbox dd{margin:0;padding:7px 10px;border-top:1px solid var(--line);font-size:.92rem}
+.pbox dt:first-of-type,.pbox dd:first-of-type{border-top:0}
+.pbox ul{margin:0;padding-left:18px}
+.qcard-stem{font-weight:700;margin:0 0 12px;white-space:pre-line}
+.qcard-choices{display:flex;flex-direction:column;gap:8px}
+.qchoice{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--line-strong);background:var(--surface);border-radius:10px;padding:10px 12px;cursor:pointer}
+.qchoice:hover:not(:disabled){border-color:var(--accent)}
+.qchoice:disabled{cursor:default}
+.qchoice .lt{font-family:var(--font-mono);font-weight:600;color:var(--ink-faint);flex:none}
+.qchoice[data-state="right"]{border-color:var(--good);background:var(--good-soft)}
+.qchoice[data-state="wrong"]{border-color:var(--bad);background:var(--bad-soft)}
+.qx{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:.94rem}
+.qx-verdict{font-weight:700;margin:0 0 6px}
+.qx-verdict.right{color:var(--good)}
+.qx-verdict.wrong{color:var(--bad)}
+.qx p{margin:0 0 8px}
+.qx-why{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.qx-why li{padding:6px 10px;border-radius:8px;background:var(--surface-2);font-size:.9rem}
+.qx-why li.is-picked{outline:2px solid var(--line-strong)}
+.qx-why li.is-key{background:var(--good-soft)}
+.qx-cue{background:var(--caution-soft);border-left:3px solid var(--caution);padding:8px 12px;border-radius:6px}
+.qx-refs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+
+/* ==== css/notes.css ==== */
+/* Notes (minimal reader; int-notes-home adds tables in recall mode, refs chips and practice links). */
+.notes-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px}
+.unit-nav{display:flex;flex-direction:column;gap:6px;min-width:0}
+.unit-nav button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;cursor:pointer;font-weight:700;font-size:.9rem}
+.unit-nav button.is-active{border-color:var(--ink);box-shadow:var(--shadow)}
+.reading{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow);min-width:0;overflow-wrap:anywhere}
+.reading h2{font-family:var(--font-display);font-size:1.35rem;margin:24px 0 8px;line-height:1.25}
+.reading section:first-of-type h2{margin-top:0}
+.reading h3{font-size:1.02rem;margin:18px 0 6px}
+.reading p{margin:0 0 12px;max-width:74ch}
+.reading aside.hy{background:var(--accent-soft);border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.reading aside.hy h3{margin-top:0}
+.reading table{border-collapse:collapse;width:100%;font-size:.9rem;margin:10px 0 16px;display:block;overflow-x:auto}
+.reading caption{text-align:left;font-weight:700;padding-bottom:6px}
+.reading th,.reading td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.reading th{background:var(--surface-2)}
+.reading .ref{display:inline-block;font-family:var(--font-mono);font-size:.7rem;padding:0 6px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);vertical-align:1px}
+.reading .ref::before{content:attr(data-ref)}
+.reading footer.sources{font-size:.78rem;color:var(--ink-faint);margin:6px 0 18px}
+.reading figure{margin:12px 0}
+.reading figure svg{max-width:100%;height:auto}
+
+/* ==== css/phone.css ==== */
+/* Phone: mode tabs get their own labeled row (as perio), nothing under the widget's bottom bar or in Timmy's corner. */
+@media (max-width: 760px){
+  .notes-layout{grid-template-columns:minmax(0,1fr)}
+  .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .unit-nav button{flex:none}
+}
+@media (max-width: 560px){
+  #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
+  .hub-header{margin:0 -16px;padding:8px 16px}
+  .hub-header-top{flex-wrap:wrap;row-gap:6px}
+  .hub-title{flex:1 1 auto}
+  .hub-title h1{font-size:1.2rem}
+  .hub-subtitle{display:none}
+  .exam-pill{display:none}
+  #modeSwitch{order:3;flex:1 0 100%;border-radius:12px}
+  #modeSwitch button{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:2px;padding:6px 2px;border-radius:9px;font-size:.7rem;line-height:1.15;white-space:normal;text-align:center}
+  #modeSwitch .mode-label{display:block}
+  .box{padding:16px}
+  .reading{padding:16px}
+  .qcard{padding:14px}
+  .pbox dl{grid-template-columns:minmax(0,1fr)}
+  .pbox dd{border-top:0;padding-top:0}
+  .empty{padding:16px;gap:12px}
+  .panel-head h2{font-size:1.3rem}
+}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hub-header">
+    <div class="hub-header-top">
+      <div class="hub-title">
+        <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
+        <h1>Boards Hub</h1>
+        <span class="hub-subtitle">INBDE + ADEX</span>
+      </div>
+      <nav id="modeSwitch" role="tablist" aria-label="Study mode">
+      <button role="tab" type="button" data-mode="home" aria-selected="true"><span class="mode-icon" data-ic="today"></span><span class="mode-label">Today</span></button>
+      <button role="tab" type="button" data-mode="notes" aria-selected="false"><span class="mode-icon" data-ic="notes"></span><span class="mode-label">Notes</span></button>
+      <button role="tab" type="button" data-mode="bank" aria-selected="false"><span class="mode-icon" data-ic="bank"></span><span class="mode-label">Questions</span></button>
+      <button role="tab" type="button" data-mode="mock" aria-selected="false"><span class="mode-icon" data-ic="clock"></span><span class="mode-label">Exam blocks</span></button>
+      <button role="tab" type="button" data-mode="arcade" aria-selected="false"><span class="mode-icon" data-ic="clinic"></span><span class="mode-label">Clinic</span></button>
+      </nav>
+      <div class="hub-meta">
+        <button id="sh-ribbon-name" class="hub-name-pill" type="button" hidden></button>
+        <span class="pill exam-pill" id="examPill">INBDE + ADEX ~Aug 2028</span>
+        <button type="button" class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Theme: system / light / dark"></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="mode-panel" id="panel-home" data-mode-panel="home"></section>
+    <section class="mode-panel" id="panel-notes" data-mode-panel="notes" hidden></section>
+    <section class="mode-panel" id="panel-bank" data-mode-panel="bank" hidden></section>
+    <section class="mode-panel" id="panel-mock" data-mode-panel="mock" hidden></section>
+    <section class="mode-panel" id="panel-arcade" data-mode-panel="arcade" hidden></section>
+  </main>
+
+  <footer class="hub-footer">
+    Boards Hub &middot; INBDE + ADEX. Questions are written for this hub from public primary sources (guidelines, FDA labels,
+    professional organizations), never copied from exams, prep companies or course material; every answer cites its source.
+  </footer>
+</div>
+<div id="toastHost" aria-live="polite"></div>
+<script>
+'use strict';
+(function(){
+/* ==== data (generated from src/boards: units, facts, figures) ==== */
+window.SH_SRS = {"steps":[1,3,7,14,30,60,120],"examCap":false,"v":"boards-1","fuzz":0.1,"server":true};
+var CONFIG = {"hub":"boards","title":"Boards Hub","subtitle":"INBDE + ADEX","examNote":"INBDE + ADEX ~Aug 2028","stateKey":"boards-state-v1","enabledTypes":["mcq"],"budget":{"daily":12,"newPerDay":4,"governor":0.8,"retireStep":120,"retireStreak":3,"retiredSamplePerMonth":4},"mock":{"standaloneSec":63,"caseSec":95},"modes":[{"id":"home","label":"Today","subs":[["today","Today"],["readiness","Readiness"]]},{"id":"notes","label":"Notes","subs":[["core","Core"],["deep","Deep dive"]]},{"id":"bank","label":"Questions","subs":[["practice","Practice"],["cases","Cases"],["missed","Missed"]]},{"id":"mock","label":"Exam blocks","subs":[["setup","Set up a block"],["review","Past blocks"]]},{"id":"arcade","label":"Clinic","subs":[]}],"drafts":false};
+var LECTURES = [];
+var QUESTIONS = [];
+var CASES = [];
+var READINGS = {};
+var READINGS_DEEP = {};
+var READINGS_PLAIN = {};
+var SECTIONS = [];
+var REFS = {};
+var FIGURES = {};
+var GAME_BUNDLES = {};
+
+/* ==== app/00-util.js ==== */
+/* Small helpers shared by every app file. The build concatenates src/boards/app/*.js in name order into one IIFE,
+   after the data vars (CONFIG, LECTURES, QUESTIONS, CASES, READINGS, READINGS_DEEP, SECTIONS, REFS, FIGURES). */
+
+function esc(s){ return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+function $(sel, root){ return (root || document).querySelector(sel); }
+function $$(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+function dateKey(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function todayKey(){ return dateKey(new Date()); }
+
+/* seeded random (mulberry32 over a string hash), for anything that must repeat for the same seed */
+function hashStr(s){ var h = 2166136261; s = String(s); for(var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed){ var a = typeof seed === 'number' ? seed >>> 0 : hashStr(seed); return function(){ a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function shuffled(arr, rand){ var a = arr.slice(), r = rand || Math.random; for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(r() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pct(n, d){ return d ? Math.round(100 * n / d) : 0; }
+function plural(n, one, many){ return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+
+var LECTURE_BY_ID = {}; LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; });
+var QUESTION_BY_ID = {}; QUESTIONS.forEach(function(q){ QUESTION_BY_ID[q.id] = q; });
+var CASE_BY_ID = {}; CASES.forEach(function(c){ CASE_BY_ID[c.id] = c; });
+/* units whose content is published (status 'taught'); preview units are announced only */
+function taughtUnits(){ return LECTURES.filter(function(l){ return l.status === 'taught' || CONFIG.drafts; }); }
+function unitItems(unit){ return QUESTIONS.filter(function(q){ return q.lec === unit; }); }
+
+/* ---------- icons: 24px grid, 1.8 stroke, currentColor (no emoji) ---------- */
+var ICON_PATHS = {
+  today:  '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="m9 14.5 2 2 4-4"/>',
+  notes:  '<path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5A1.5 1.5 0 0 1 4 17.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z"/><path d="M6.5 8h2M15.5 8h2M6.5 11h2M15.5 11h2"/>',
+  bank:   '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  clock:  '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2.5M9.5 3h5"/>',
+  clinic: '<path d="M4 20V9l8-5 8 5v11"/><path d="M10 20v-5h4v5"/><path d="M12 8v4M10 10h4"/>',
+  sun:    '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  moon:   '<path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/>',
+  auto:   '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+  seed:   '<path d="M12 20v-8"/><path d="M12 12c0-4 3-7 7-7 0 4-3 7-7 7z"/><path d="M12 14c0-3-2.5-5.5-6-5.5 0 3.5 2.5 5.5 6 5.5z"/>',
+  arrow:  '<path d="M5 12h14M13 6l6 6-6 6"/>'
+};
+function icon(name){ return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATHS[name] || '') + '</svg>'; }
+
+function toast(msg){
+  var host = document.getElementById('toastHost'); if(!host) return;
+  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; host.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 2600);
+}
+
+/* the calm state every mode shows until its content exists */
+function emptyHTML(title, lines, ic){
+  return '<div class="empty">' + icon(ic || 'seed') + '<div><h3>' + esc(title) + '</h3>' +
+    lines.map(function(l){ return '<p>' + l + '</p>'; }).join('') + '</div></div>';
+}
+function subtabsHTML(mode, active){
+  var m = CONFIG.modes.filter(function(x){ return x.id === mode; })[0];
+  if(!m || !m.subs.length) return '';
+  return '<div class="subtabs" role="tablist">' + m.subs.map(function(s){
+    return '<button type="button" role="tab" class="subtab' + (s[0] === active ? ' is-active' : '') + '" aria-selected="' + (s[0] === active) + '" data-sub="' + s[0] + '">' + esc(s[1]) + '</button>';
+  }).join('') + '</div>';
+}
+
+/* ==== app/10-state.js ==== */
+/* ====================================================================
+   STATE: key boards-state-v1, perio's shape (answered / totalSeen / activeDates as a 'YYYY-MM-DD' -> true map),
+   so the dashboard's readProgress reads it unchanged (BUILD_SPEC 1.1). Keep these field names stable.
+   ==================================================================== */
+var STATE_KEY = CONFIG.stateKey;
+function defaultState(){
+  return {
+    answered:{},          // qid -> {lastCorrect:bool, n:int, t:'YYYY-MM-DD', first:bool}
+    totalSeen:0, totalCorrect:0,
+    activeDates:{},       // 'YYYY-MM-DD' -> true
+    lastActiveDate:null,
+    retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankAt:0 }
+  };
+}
+function loadState(){
+  var d = defaultState(), base = defaultState();
+  try{
+    var raw = localStorage.getItem(STATE_KEY);
+    if(raw){ var saved = JSON.parse(raw); if(saved && typeof saved === 'object') for(var k in saved) if(Object.prototype.hasOwnProperty.call(saved, k)) d[k] = saved[k]; }
+  }catch(e){}
+  if(!d.ui || typeof d.ui !== 'object') d.ui = base.ui;
+  for(var kk in base.ui) if(!(kk in d.ui)) d.ui[kk] = base.ui[kk];
+  if(!d.ui.sub || typeof d.ui.sub !== 'object') d.ui.sub = {};
+  ['answered', 'activeDates', 'retired'].forEach(function(k){ if(!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {}; });
+  return d;
+}
+function saveState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); }catch(e){} }
+var STATE = loadState();
+
+function touchActiveDay(){ var k = todayKey(); STATE.activeDates[k] = true; STATE.lastActiveDate = k; }
+
+/* One recorded answer. `choice` is the AUTHORED index of the option picked (the card maps the shuffled position
+   back), so question_choices rows mean the same thing whatever order a student saw. ctx: bank | case | mock | drill | game. */
+function recordAnswer(q, correct, choice, ctx, conf){
+  var a = STATE.answered[q.id], t = todayKey();
+  if(!a) a = STATE.answered[q.id] = { lastCorrect:false, n:0, t:t, first:!!correct };
+  a.lastCorrect = !!correct; a.n++; a.t = t;
+  STATE.totalSeen++; if(correct) STATE.totalCorrect++;
+  touchActiveDay(); saveState();
+  var detail = { qid:q.id, lec:q.lec, correct:!!correct, choice:choice, ctx:ctx || 'bank' };
+  if(conf) detail.conf = conf;
+  try{ document.dispatchEvent(new CustomEvent('boards:answered', { detail:detail })); }catch(e){}
+}
+
+/* ==== app/20-card.js ==== */
+/* ====================================================================
+   ITEM CARD (minimal): one standalone MCQ. Options are shuffled on every render unless `fixed`, with `pin`
+   indexes kept last; each button carries its AUTHORED index (data-i), which is what gets recorded.
+   Feedback at once for standalones: verdict, ex, then the picked option's why line, then the others, the cue
+   after a miss, source chips and "Read: <section>". int-cards replaces this with the full card (cases with
+   Rounds, cover the options, Report, class row, lockIn API).
+   ==================================================================== */
+var LETTERS = 'ABCDEFGHIJ';
+
+function choiceOrder(q){
+  var n = (q.choices || []).length, all = [], pins = (q.pin || []).filter(function(i){ return i >= 0 && i < n; });
+  for(var i = 0; i < n; i++) if(pins.indexOf(i) === -1) all.push(i);
+  return (q.fixed ? all : shuffled(all)).concat(pins);
+}
+
+function pboxHTML(b){
+  if(!b) return '';
+  function list(a){ return a && a.length ? '<ul>' + a.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : ''; }
+  return '<div class="pbox"><dl>' +
+    '<dt>Patient</dt><dd>' + esc(b.patient || '') + '</dd>' +
+    '<dt>Chief Complaint</dt><dd>' + esc(b.cc || '') + '</dd>' +
+    '<dt>Background and/or Patient History</dt><dd>' + list(b.hx) + '</dd>' +
+    '<dt>Current Findings</dt><dd>' + list(b.findings) + '</dd>' +
+    '</dl></div>';
+}
+
+function figureHTML(key){
+  var f = FIGURES[key]; if(!f) return '';
+  return '<figure class="qfig" role="img" aria-label="' + esc(f.alt) + '">' + f.svg + '</figure>';
+}
+
+function refChipsHTML(q){
+  return '<div class="qx-refs">' + (q.refs || []).map(function(r){
+    if(/^https:/.test(r)) return '<a class="chip" href="' + esc(r) + '" target="_blank" rel="noopener">Source</a>';
+    var f = REFS[r], s = f && f.src && f.src[0];
+    return s && s.u ? '<a class="chip" href="' + esc(s.u) + '" target="_blank" rel="noopener" title="' + esc(s.t || '') + '">' + esc(r) + '</a>' : '<span class="chip">' + esc(r) + '</span>';
+  }).join('') + '</div>';
+}
+
+function sectionTitle(unit, sec){
+  var html = READINGS[unit] || '', m = html.match(new RegExp('<section[^>]*id="' + sec.replace(/[^a-z0-9-]/g, '') + '"[^>]*>[\\s\\S]*?<h2[^>]*>([\\s\\S]*?)</h2>'));
+  return m ? m[1].replace(/<[^>]*>/g, '') : '';
+}
+
+function cardHTML(q, opts){
+  opts = opts || {};
+  var order = choiceOrder(q), u = LECTURE_BY_ID[q.lec];
+  return '<article class="qcard" data-qid="' + esc(q.id) + '" data-ctx="' + esc(opts.ctx || 'bank') + '">' +
+    '<div class="qcard-top"><span class="chip accent">' + esc(u ? u.short : q.lec) + '</span>' + (q.exam || []).map(function(e){ return '<span class="chip">' + esc(e.toUpperCase()) + '</span>'; }).join('') + '</div>' +
+    pboxHTML(q.pbox) + (q.img ? figureHTML(q.img) : '') +
+    '<p class="qcard-stem">' + esc(q.stem) + '</p>' +
+    '<div class="qcard-choices">' + order.map(function(i, k){
+      return '<button type="button" class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></button>';
+    }).join('') + '</div><div class="qx" hidden></div></article>';
+}
+
+function explainHTML(q, picked){
+  var right = picked === q.answer, rest = [];
+  for(var i = 0; i < q.choices.length; i++) if(i !== picked) rest.push(i);
+  var lines = [picked].concat(rest).map(function(i){
+    return '<li class="' + (i === picked ? 'is-picked ' : '') + (i === q.answer ? 'is-key' : '') + '"><b>' + esc(q.choices[i]) + ':</b> ' + esc((q.why || [])[i] || '') + '</li>';
+  }).join('');
+  var title = q.sec ? sectionTitle(q.lec, q.sec) : '';
+  return '<p class="qx-verdict ' + (right ? 'right' : 'wrong') + '">' + (right ? 'Correct.' : 'Not this time. The answer is ' + esc(q.choices[q.answer]) + '.') + '</p>' +
+    '<p>' + esc(q.ex || '') + '</p><ul class="qx-why">' + lines + '</ul>' +
+    (!right && q.cue ? '<p class="qx-cue"><b>Remember it:</b> ' + esc(q.cue) + '</p>' : '') +
+    refChipsHTML(q) +
+    (title ? '<div class="btn-row"><button type="button" class="btn" data-goto-sec="' + esc(q.sec) + '" data-goto-unit="' + esc(q.lec) + '">Read: ' + esc(title) + '</button></div>' : '');
+}
+
+/* wire every card inside `root`; onDone(q, correct) after an answer is recorded */
+function wireCards(root, onDone){
+  $$('.qcard', root).forEach(function(card){
+    if(card.getAttribute('data-wired')) return; card.setAttribute('data-wired', '1');
+    var q = QUESTION_BY_ID[card.getAttribute('data-qid')]; if(!q) return;
+    card.addEventListener('click', function(e){
+      var go = e.target.closest('[data-goto-sec]');
+      if(go){ window.SH_GOTO({ unit:go.getAttribute('data-goto-unit'), sec:go.getAttribute('data-goto-sec') }); return; }
+      var b = e.target.closest('.qchoice'); if(!b || card.getAttribute('data-done')) return;
+      card.setAttribute('data-done', '1');
+      var picked = +b.getAttribute('data-i'), right = picked === q.answer;
+      $$('.qchoice', card).forEach(function(x){
+        var i = +x.getAttribute('data-i'); x.disabled = true;
+        if(i === q.answer) x.setAttribute('data-state', 'right'); else if(i === picked) x.setAttribute('data-state', 'wrong');
+      });
+      var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
+      recordAnswer(q, right, picked, card.getAttribute('data-ctx') || 'bank');
+      if(onDone) onDone(q, right);
+    });
+  });
+}
+
+/* ==== app/30-notes.js ==== */
+/* ====================================================================
+   NOTES (minimal reader): unit list, Core / Deep dive (same section ids, so the toggle keeps the place),
+   "Practice this section" buttons. int-notes-home adds recall tables, source chips and Listen.
+   ==================================================================== */
+function notesUnits(){ return taughtUnits().filter(function(l){ return READINGS[l.id]; }); }
+
+function renderNotes(){
+  var el = document.getElementById('panel-notes'), level = STATE.ui.level === 'deep' ? 'deep' : 'core';
+  var list = notesUnits();
+  var head = '<div class="panel-head"><div><h2>Notes</h2><p>Core is what the exam asks, in plain words. Deep dive adds the mechanisms and the evidence behind each rule.</p></div></div>';
+  if(!list.length){
+    el.innerHTML = head + subtabsHTML('notes', level) + emptyHTML('Notes for the first units are on the way', [
+      'Each unit gets Core notes, a Deep dive with the same sections, and review tables for the look-alikes.',
+      'The hub grows unit by unit; nothing to catch up on yet.'
+    ], 'notes');
+    return;
+  }
+  var unit = LECTURE_BY_ID[STATE.ui.unit] && READINGS[STATE.ui.unit] ? STATE.ui.unit : list[0].id;
+  STATE.ui.unit = unit;
+  var body = level === 'deep' && READINGS_DEEP[unit] ? READINGS_DEEP[unit] : READINGS[unit];
+  el.innerHTML = head + subtabsHTML('notes', level) +
+    '<div class="notes-layout"><nav class="unit-nav" aria-label="Units">' + list.map(function(l){
+      return '<button type="button" data-unit="' + esc(l.id) + '" class="' + (l.id === unit ? 'is-active' : '') + '">' + esc(l.title) + '</button>';
+    }).join('') + '</nav><article class="reading">' +
+    (level === 'deep' && !READINGS_DEEP[unit] ? '<p class="faint">The Deep dive for this unit is still being written; here are the Core notes.</p>' : '') +
+    body + '</article></div>';
+  $$('figure[data-fig]', el).forEach(function(f){ var k = f.getAttribute('data-fig'); if(FIGURES[k]){ f.innerHTML = FIGURES[k].svg; f.setAttribute('role', 'img'); f.setAttribute('aria-label', FIGURES[k].alt); } });
+}
+
+function wireNotes(){
+  var el = document.getElementById('panel-notes');
+  el.addEventListener('click', function(e){
+    var u = e.target.closest('[data-unit]');
+    if(u){ STATE.ui.unit = u.getAttribute('data-unit'); saveState(); renderNotes(); window.scrollTo(0, 0); return; }
+    var p = e.target.closest('[data-practice]');
+    if(p){
+      var v = p.getAttribute('data-practice');
+      if(v.indexOf('sec:') === 0){ STATE.ui.bankSec = v.slice(4); STATE.ui.bankUnit = 'all'; }
+      else if(v.indexOf('unit:') === 0){ STATE.ui.bankSec = null; STATE.ui.bankUnit = v.slice(5); }
+      STATE.ui.bankAt = 0; STATE.ui.sub.bank = 'practice'; saveState(); setMode('bank');
+    }
+  });
+}
+
+/* ==== app/40-bank.js ==== */
+/* ====================================================================
+   QUESTIONS (minimal): Practice (one standalone at a time, filtered by unit or notes section), Cases and
+   Missed. int-cards replaces this with the full bank (filters, case sets in exam layout with Rounds).
+   ==================================================================== */
+var bankSearch = '';
+
+function bankPool(){
+  var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, q = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
+  return QUESTIONS.filter(function(x){
+    if(x.case) return false;
+    if(sec && x.sec !== sec) return false;
+    if(!sec && unit && unit !== 'all' && x.lec !== unit) return false;
+    if(q.length){ var t = (x.stem + ' ' + x.choices.join(' ')).toLowerCase(); if(!q.every(function(w){ return t.indexOf(w) !== -1; })) return false; }
+    return true;
+  });
+}
+
+function renderBank(){
+  var el = document.getElementById('panel-bank'), sub = STATE.ui.sub.bank || 'practice';
+  var head = '<div class="panel-head"><div><h2>Questions</h2><p>Board-style single-best-answer questions. Options are shuffled every time, so learn the reason, not the letter.</p></div></div>';
+  if(!QUESTIONS.length){
+    el.innerHTML = head + subtabsHTML('bank', sub) + emptyHTML('The first questions are being written and checked', [
+      'Every question is written for this hub from a checked fact with a public primary source, then verified by a second model and, for the risky ones, by a person.',
+      'Practice, case sets and your missed questions will live here.'
+    ], 'bank');
+    return;
+  }
+  var html = head + subtabsHTML('bank', sub);
+  if(sub === 'cases'){
+    html += CASES.length ? '<div class="box"><h3>' + plural(CASES.length, 'case set') + '</h3><p class="muted">Case sets in the exam layout, with every answer shown after the last question, arrive with the full bank.</p></div>'
+      : emptyHTML('No case sets yet', ['Case sets (one patient, 2-6 questions) arrive with the first units.'], 'bank');
+  } else if(sub === 'missed'){
+    var missed = QUESTIONS.filter(function(x){ var a = STATE.answered[x.id]; return a && !a.lastCorrect && !x.case; });
+    html += missed.length ? '<div class="qlist">' + missed.map(function(x){ return cardHTML(x, { ctx:'bank' }); }).join('') + '</div>'
+      : emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
+  } else {
+    var pool = bankPool(), at = Math.min(STATE.ui.bankAt || 0, Math.max(0, pool.length - 1));
+    var units = taughtUnits().filter(function(l){ return unitItems(l.id).length; });
+    html += '<div class="filters"><label class="field">Unit<select data-bank-unit><option value="all">All units</option>' + units.map(function(l){
+      return '<option value="' + esc(l.id) + '"' + (STATE.ui.bankUnit === l.id && !STATE.ui.bankSec ? ' selected' : '') + '>' + esc(l.title) + '</option>';
+    }).join('') + '</select></label>' + (STATE.ui.bankSec ? '<button type="button" class="btn" data-bank-clear>Section: ' + esc(sectionTitle(STATE.ui.bankSec.split('-')[0], STATE.ui.bankSec) || STATE.ui.bankSec) + ' &times;</button>' : '') +
+      (bankSearch ? '<button type="button" class="btn" data-bank-unsearch>Search: ' + esc(bankSearch) + ' &times;</button>' : '') + '</div>';
+    html += pool.length ? cardHTML(pool[at], { ctx:'bank' }) +
+      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + pool.length + '</span><span class="btn-row" style="margin:0">' +
+      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+      '<button type="button" class="btn primary" data-bank-step="1"' + (at < pool.length - 1 ? '' : ' disabled') + '>Next</button></span></div>'
+      : emptyHTML('No questions match', ['Try another unit or clear the filter.'], 'bank');
+  }
+  el.innerHTML = html;
+  wireCards(el);
+}
+
+function wireBank(){
+  var el = document.getElementById('panel-bank');
+  el.addEventListener('click', function(e){
+    var s = e.target.closest('[data-bank-step]');
+    if(s){ STATE.ui.bankAt = Math.max(0, (STATE.ui.bankAt || 0) + +s.getAttribute('data-bank-step')); saveState(); renderBank(); return; }
+    if(e.target.closest('[data-bank-clear]')){ STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
+    if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; renderBank(); }
+  });
+  el.addEventListener('change', function(e){
+    var s = e.target.closest('[data-bank-unit]');
+    if(s){ STATE.ui.bankUnit = s.value; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); }
+  });
+}
+
+/* ==== app/50-mock.js ==== */
+/* ====================================================================
+   EXAM BLOCKS (placeholder): timed INBDE-style blocks arrive in int-mock (50-mock.js, css/mock.css).
+   The mode id starts with "mock" on purpose: the widget stands eggs, Timmy and the nuke down there.
+   ==================================================================== */
+function renderMock(){
+  var el = document.getElementById('panel-mock'), sub = STATE.ui.sub.mock || 'setup';
+  var head = '<div class="panel-head"><div><h2>Exam blocks</h2><p>Timed blocks in the INBDE layout: no feedback until the block ends, then a full review.</p></div></div>';
+  el.innerHTML = head + subtabsHTML('mock', sub) + (sub === 'review'
+    ? emptyHTML('No blocks taken yet', ['Your finished blocks and their reviews will be listed here.'], 'clock')
+    : emptyHTML('Exam blocks open once the first units are in', [
+        'Standalone blocks give about ' + CONFIG.mock.standaloneSec + ' seconds a question and case blocks about ' + CONFIG.mock.caseSec + ' seconds, the pace of the real exam.',
+        'They need enough checked questions to be worth timing, so they unlock with the first released units.'
+      ], 'clock'));
+}
+
+/* ==== app/60-home.js ==== */
+/* ====================================================================
+   TODAY (minimal): exam note, units grid with how much you've seen, a start button. int-notes-home adds
+   Today's shift / Today's 12 (dailyPlan), Continue notes, readiness ("Likely right") and practice days.
+   ==================================================================== */
+function unitSeen(unit){
+  var list = unitItems(unit), seen = 0;
+  list.forEach(function(q){ if(STATE.answered[q.id]) seen++; });
+  return { seen:seen, total:list.length };
+}
+
+function unitCardHTML(l){
+  if(l.status !== 'taught' && !CONFIG.drafts) return '<div class="unit-card is-preview"><h4>' + esc(l.title) + '</h4><p class="faint">Coming soon</p></div>';
+  var s = unitSeen(l.id);
+  return '<div class="unit-card"><h4>' + esc(l.title) + '</h4><p class="faint">Seen ' + s.seen + ' of ' + s.total + '</p>' +
+    '<span class="bar"><i style="width:' + pct(s.seen, s.total) + '%"></i></span>' +
+    '<div class="btn-row" style="margin-top:6px"><button type="button" class="btn" data-home-practice="' + esc(l.id) + '">Practice</button>' +
+    (READINGS[l.id] ? '<button type="button" class="btn" data-home-notes="' + esc(l.id) + '">Notes</button>' : '') + '</div></div>';
+}
+
+function renderHome(){
+  var el = document.getElementById('panel-home'), sub = STATE.ui.sub.home || 'today';
+  var taught = taughtUnits(), days = Object.keys(STATE.activeDates).length;
+  var head = '<div class="panel-head"><div><h2>Today</h2><p>' + esc(CONFIG.examNote) + '. A little every day keeps two years of material in rotation.</p></div></div>';
+  var html = head + subtabsHTML('home', sub);
+  if(!taught.length){
+    html += emptyHTML('The first units are coming soon', [
+      'This hub is being built for the INBDE and ADEX, one unit at a time: notes, board-style questions that cite their sources, timed exam blocks, and Chairside, a clinic game that runs on the same questions.',
+      'Medically complex patients and pharmacology come first, then periodontics.',
+      'Your progress here will count toward the dashboard and the daily drill as soon as the first unit opens.'
+    ], 'seed');
+    if(LECTURES.length) html += '<div class="grid" style="margin-top:14px">' + LECTURES.map(unitCardHTML).join('') + '</div>';
+  } else if(sub === 'readiness'){
+    html += '<div class="box"><h3>Readiness by unit</h3><p class="muted">How much of each unit you have tried. "Likely right" estimates arrive with the daily plan.</p></div>' +
+      '<div class="grid" style="margin-top:14px">' + LECTURES.map(unitCardHTML).join('') + '</div>';
+  } else {
+    html += '<div class="box"><h3>Start here</h3><p class="muted">' + plural(QUESTIONS.length, 'question') + ' in ' + plural(taught.length, 'unit') + ' so far' + (days ? '; you have practiced on ' + plural(days, 'day') : '') + '.</p>' +
+      '<div class="btn-row"><button type="button" class="btn primary" data-home-practice="all">Practice questions</button>' +
+      (notesUnits().length ? '<button type="button" class="btn" data-home-notes="">Read the notes</button>' : '') + '</div></div>' +
+      '<div class="grid" style="margin-top:14px">' + LECTURES.map(unitCardHTML).join('') + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function wireHome(){
+  var el = document.getElementById('panel-home');
+  el.addEventListener('click', function(e){
+    var p = e.target.closest('[data-home-practice]');
+    if(p){ STATE.ui.bankUnit = p.getAttribute('data-home-practice'); STATE.ui.bankSec = null; STATE.ui.bankAt = 0; STATE.ui.sub.bank = 'practice'; saveState(); setMode('bank'); return; }
+    var n = e.target.closest('[data-home-notes]');
+    if(n){ if(n.getAttribute('data-home-notes')) STATE.ui.unit = n.getAttribute('data-home-notes'); saveState(); setMode('notes'); }
+  });
+}
+
+/* ==== app/80-clinic.js ==== */
+/* ====================================================================
+   CLINIC (placeholder lobby): Chairside arrives in R1c (80-game-adapter.js, the lazy loader and the
+   GAME_BUNDLES the build stamps with ?v=<hash>). The `arcade` mode id and the #panel-arcade .ar-grid lobby
+   are what tools/ci/smoke.js already enters.
+   ==================================================================== */
+function renderClinic(){
+  var el = document.getElementById('panel-arcade');
+  el.innerHTML = '<div class="panel-head"><div><h2>Clinic</h2><p>Chairside: a clinic shift built on the same questions and the same review schedule.</p></div></div>' +
+    '<div class="ar-grid"></div>' +
+    emptyHTML('The clinic opens after the first units', [
+      'Each shift is about ten minutes: today\'s due reviews and a few new patients, with answers recorded exactly as in Questions.',
+      'Nothing to set up; it will be here when it opens.'
+    ], 'clinic');
+}
+
+/* ==== app/90-boot.js ==== */
+/* ====================================================================
+   BOOT: theme (sh_theme, shared with the dashboard), mode tabs, sub-tabs, first render.
+   ==================================================================== */
+var RENDER = { home:renderHome, notes:renderNotes, bank:renderBank, mock:renderMock, arcade:renderClinic };
+var MODE_IDS = CONFIG.modes.map(function(m){ return m.id; });
+
+function setMode(mode){
+  if(MODE_IDS.indexOf(mode) === -1) mode = 'home';
+  if(window.shTTS && window.shTTS.stop) window.shTTS.stop();
+  STATE.ui.mode = mode; saveState();
+  $$('#modeSwitch [data-mode]').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-mode') === mode ? 'true' : 'false'); });
+  $$('[data-mode-panel]').forEach(function(p){ p.hidden = p.getAttribute('data-mode-panel') !== mode; });
+  RENDER[mode]();
+  window.scrollTo(0, 0);
+}
+
+function applyTheme(t){
+  if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
+  var b = document.getElementById('themeBtn'); if(b) b.innerHTML = icon(t === 'dark' ? 'moon' : t === 'light' ? 'sun' : 'auto');
+}
+
+function boot(){
+  var saved = null; try{ saved = localStorage.getItem('sh_theme'); }catch(e){}
+  if(saved !== 'light' && saved !== 'dark') saved = null;
+  $$('[data-ic]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-ic')); });
+  applyTheme(saved);
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = !cur ? 'light' : cur === 'light' ? 'dark' : null;
+    try{ localStorage.setItem('sh_theme', next || ''); }catch(e){}
+    applyTheme(next);
+  });
+  $$('#modeSwitch [data-mode]').forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
+  /* every panel's .subtabs: notes' tabs are the Core / Deep dive level, the rest are sub-views */
+  $$('[data-mode-panel]').forEach(function(p){
+    p.addEventListener('click', function(e){
+      var b = e.target.closest('.subtabs [data-sub]'); if(!b) return;
+      var mode = p.getAttribute('data-mode-panel'), sub = b.getAttribute('data-sub');
+      if(mode === 'notes') STATE.ui.level = sub; else STATE.ui.sub[mode] = sub;
+      saveState(); RENDER[mode]();
+    });
+  });
+  wireHome(); wireNotes(); wireBank();
+  var m = location.hash === '#drill' ? 'home' : STATE.ui.mode;
+  setMode(m);
+}
+/* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
+boot();
+
+/* ==== app/99-export.js ==== */
+/* ====================================================================
+   WIDGET HOOKS: SH_SECTION (activity_pings read as "notes/medcx/core", "bank/practice"...), SH_GOTO (search
+   results, "Read: <section>"), SH_DRILL (only once there are questions) and SH_EXPORT, which must stay the LAST
+   statement of the script: tools/ci/smoke.js injects its lint hook just before the SH_EXPORT assignment.
+   ==================================================================== */
+window.SH_SECTION = function(){
+  var m = STATE.ui.mode;
+  if(m === 'home') return 'home/' + (STATE.ui.sub.home || 'today');
+  if(m === 'notes') return 'notes/' + (notesUnits().length ? STATE.ui.unit || notesUnits()[0].id : 'none') + '/' + (STATE.ui.level === 'deep' ? 'deep' : 'core');
+  if(m === 'bank') return 'bank/' + (STATE.ui.sub.bank || 'practice');
+  if(m === 'mock') return 'mock/' + (STATE.ui.sub.mock || 'setup');
+  if(m === 'arcade') return 'arcade/lobby';
+  return m;
+};
+
+function flashIn(find){
+  setTimeout(function(){ var el = find(); if(!el) return; el.scrollIntoView({ block:'start' }); if(window.shFlash) window.shFlash(el); }, 60);
+}
+/* go: {unit, sec} (notes), {qid} (one question), or the widget search's {v:'bank', q} */
+window.SH_GOTO = function(go){
+  if(!go) return;
+  if(go.qid && QUESTION_BY_ID[go.qid]){
+    var q = QUESTION_BY_ID[go.qid];
+    STATE.ui.bankUnit = q.lec; STATE.ui.bankSec = null; STATE.ui.sub.bank = 'practice'; bankSearch = '';
+    STATE.ui.bankAt = Math.max(0, bankPool().indexOf(q)); saveState(); setMode('bank');
+  } else if(go.v === 'bank'){
+    bankSearch = go.q || ''; STATE.ui.bankUnit = 'all'; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; STATE.ui.sub.bank = 'practice'; saveState(); setMode('bank');
+  } else if(go.unit && READINGS[go.unit]){
+    STATE.ui.unit = go.unit; saveState(); setMode('notes');
+    if(go.sec) flashIn(function(){ return document.getElementById(go.sec); });
+  }
+};
+
+if(QUESTIONS.length){
+  window.SH_DRILL = {
+    size: CONFIG.budget.daily,
+    scope: 'all',
+    pool: function(){
+      return QUESTIONS.filter(function(q){ return !q.case; }).map(function(q){ var a = STATE.answered[q.id]; return { id:q.id, lec:q.lec, last: a ? !!a.lastCorrect : null, hy: q.hy || '' }; });
+    },
+    render: function(el, qid){ var q = QUESTION_BY_ID[qid]; if(!q || q.case) return false; el.innerHTML = cardHTML(q, { ctx:'drill' }); wireCards(el); return true; }
+  };
+}
+
+window.SH_EXPORT = {
+  lectures: LECTURES.map(function(l){ return { id:l.id, title:l.title, status:l.status }; }),
+  questions: QUESTIONS.map(function(q){ return { id:q.id, lec:q.lec, text:q.stem, hint:q.choices[q.answer] + (q.ex ? ' — ' + q.ex : ''), choices:q.choices, answer:q.answer }; }),
+  cases: CASES.map(function(c){ return { id:c.id, units:c.units, items:c.items }; }),
+  sections: SECTIONS,
+  hints: [],
+  exams: []
+};
+})();
+
+</script>
+<script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
+<script src="../../widget/v3.js" data-hub="boards" data-answered-event="boards:answered" data-default-mode="home" defer></script>
+</body>
+</html>
