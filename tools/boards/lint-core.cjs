@@ -19,7 +19,7 @@ const ENABLED_TYPES = ['mcq'];
 const OV_KNOWN = { inbde: ['DoD2018/CG2026'], adex: ['DLM2026-27'] };
 const REQUIRED = ['id', 'lec', 'type', 'stem', 'choices', 'answer', 'ex', 'why', 'refs', 'exam', 'ov', 'cc', 'fk', 'cog', 'diff', 'concept', 'sec', 'added'];
 const UNITS = ['anat', 'physio', 'micro', 'gpath', 'opath', 'rad', 'perio', 'endo', 'oper', 'pros', 'ortho', 'peds', 'oms', 'anes', 'pharm', 'medcx', 'infect', 'prof', 'pubh'];
-const BRITISH = /\b(colou?rs?|colour\w*|favour\w*|centre\w*|behaviour\w*|haem\w*|anaesth\w*|paediatric\w*|oesophag\w*|labelled|organis(e|ed|ing|ation)\w*|analys(e|ed|ing)|programme|licence|defence|tumour\w*|fibre\w*|litre\w*|metre\w*|grey|manoeuvre|orthopaedic\w*|ischaemi\w*|oedema|foetal|leukaemia|aetiology|practise[ds]?)\b/i;
+const BRITISH = /\b(colour\w*|favour\w*|centre\w*|behaviour\w*|haem\w*|anaesth\w*|paediatric\w*|oesophag\w*|labelled|organis(e|ed|ing|ation)\w*|analys(e|ed|ing)|programme|licence|defence|tumour\w*|fibre\w*|litre\w*|metre\w*|grey|manoeuvre|orthopaedic\w*|ischaemi\w*|oedema|foetal|leukaemia|aetiology|practise[ds]?)\b/i;
 const STEM_WORDS_MIN = 40, STEM_WORDS_MAX = 110;
 const SOURCE_MAX_AGE_Y = 8;
 

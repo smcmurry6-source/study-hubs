@@ -60,4 +60,8 @@ function main(argv) {
   if (errors.length) process.exitCode = 1;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main(process.argv.slice(2));
+// Run as a command (not when imported). realpath + case-folding on Windows, where argv[1] can differ from
+// import.meta.url in drive-letter case or through a symlinked folder.
+const samePath = (a, b) => { try { a = fs.realpathSync(a); b = fs.realpathSync(b); } catch (e) { /* keep as given */ }
+  return process.platform === 'win32' ? a.toLowerCase() === b.toLowerCase() : a === b; };
+if (process.argv[1] && samePath(path.resolve(process.argv[1]), fileURLToPath(import.meta.url))) main(process.argv.slice(2));

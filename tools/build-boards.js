@@ -443,7 +443,7 @@ function main() {
 
   for (const [p, content] of r.outputs) {
     fs.mkdirSync(path.dirname(p), { recursive: true });
-    const cur = exists(p) ? fs.readFileSync(p, 'utf8') : null;
+    const cur = exists(p) ? readText(p) : null;   // a CRLF checkout of an unchanged file is left alone
     if (cur !== content) fs.writeFileSync(p, content);
   }
   if (exists(r.gameOut)) for (const f of fs.readdirSync(r.gameOut).filter(f => f.endsWith('.js'))) {
