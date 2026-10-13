@@ -31,11 +31,15 @@ function createLinter() {
 }
 
 // ---------- facts ----------
+// BOM-tolerant (Windows PowerShell 5 writes one); a file that does not parse is named in the error.
+const readJson = p => JSON.parse(fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, ''));
 function loadFacts(L, factsDir = FACTS_DIR) {
-  const sources = JSON.parse(fs.readFileSync(path.join(factsDir, 'sources.json'), 'utf8'));
+  let sources;
+  try { sources = readJson(path.join(factsDir, 'sources.json')); } catch (e) { throw new Error(`${path.join(factsDir, 'sources.json')}: ${e.message}`); }
   const facts = new Map();
   for (const f of fs.readdirSync(factsDir).filter(f => f.endsWith('.json') && f !== 'sources.json').sort()) {
-    const data = JSON.parse(fs.readFileSync(path.join(factsDir, f), 'utf8'));
+    let data;
+    try { data = readJson(path.join(factsDir, f)); } catch (e) { L.err(f, 'load', e.message); continue; }
     for (const fact of data.facts || []) {
       if (facts.has(fact.id)) L.err(fact.id, 'fact-dup', `fact id in both ${facts.get(fact.id)._file} and ${f}`);
       facts.set(fact.id, { ...fact, _file: f });
@@ -256,6 +260,7 @@ function lintItems(L, { all, cases }, { facts, sources }, opts = {}) {
     list.forEach((iid, k) => {
       const it = all.find(x => x.id === iid);
       if (!it) { err(id, 'case', `item ${iid} not found`); return; }
+      if (it.type !== 'mcq' || (it.choices || []).length < 3 || (it.choices || []).length > 5) err(id, 'case', `item ${iid} is not game-eligible (mcq with 3-5 options)`);
       if (it.case !== c.id) err(id, 'case', `item ${iid} does not point back (case: ${it.case})`);
       if (used.has(iid)) err(id, 'case', `item ${iid} is also in case ${used.get(iid)}`); used.set(iid, id);
       if (k === 0 && it.fmt) err(iid, 'case', 'no negative in the first item of a case');

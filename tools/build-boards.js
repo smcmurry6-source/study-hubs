@@ -28,15 +28,20 @@ const lint = require('./boards/lint-core.cjs');
 // ---------- args ----------
 function parseArgs(argv) {
   const o = { check: false, report: false, unit: null, drafts: false, quiet: false, unitsDir: null, out: null };
+  const val = (i, what) => {
+    const v = argv[i + 1];
+    if (v == null || v.startsWith('--')) { console.error(`${argv[i]} needs ${what} (try --help)`); process.exit(2); }
+    return v;
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--check') o.check = true;
     else if (a === '--report') o.report = true;
-    else if (a === '--unit') o.unit = argv[++i];
+    else if (a === '--unit') o.unit = val(i++, 'a unit id');
     else if (a === '--include-drafts') o.drafts = true;
     else if (a === '--quiet') o.quiet = true;
-    else if (a === '--units-dir') o.unitsDir = path.resolve(argv[++i]);
-    else if (a === '--out') o.out = path.resolve(argv[++i]);
+    else if (a === '--units-dir') o.unitsDir = path.resolve(val(i++, 'a folder'));
+    else if (a === '--out') o.out = path.resolve(val(i++, 'a file path'));
     else if (a === '-h' || a === '--help') o.help = true;
     else { console.error(`Unknown argument ${a} (try --help)`); process.exit(2); }
   }
@@ -77,11 +82,17 @@ function build(opt) {
   let order;
   if (opt.unitsDir) {
     order = exists(unitsDir) ? fs.readdirSync(unitsDir).filter(d => exists(path.join(unitsDir, d, 'unit.js'))) : [];
-    order.sort((a, b) => ((freshRequire(path.join(unitsDir, a, 'unit.js')).num || 0) - (freshRequire(path.join(unitsDir, b, 'unit.js')).num || 0)) || (a < b ? -1 : a > b ? 1 : 0));
+    // an unreadable unit.js sorts last; the per-unit load below reports it
+    const num = d => { try { const n = freshRequire(path.join(unitsDir, d, 'unit.js')).num; return Number.isFinite(n) ? n : 0; } catch (e) { return Infinity; } };
+    const nums = new Map(order.map(d => [d, num(d)]));
+    order.sort((a, b) => (nums.get(a) === nums.get(b) ? 0 : nums.get(a) < nums.get(b) ? -1 : 1) || (a < b ? -1 : a > b ? 1 : 0));
   } else {
     order = (config.UNITS || []).slice();
     if (exists(unitsDir)) for (const d of fs.readdirSync(unitsDir).sort()) {
-      if (fs.statSync(path.join(unitsDir, d)).isDirectory() && !order.includes(d)) note(rel(path.join(unitsDir, d)), 'not in config.UNITS, so it is not built');
+      if (!fs.statSync(path.join(unitsDir, d)).isDirectory() || order.includes(d)) continue;
+      // --unit <id> validates a unit that is not in UNITS yet (it writes nothing, so nothing reaches the page)
+      if (opt.unit === d) { order.push(d); note(rel(path.join(unitsDir, d)), 'not in config.UNITS yet: validated for --unit only'); }
+      else note(rel(path.join(unitsDir, d)), 'not in config.UNITS, so it is not built');
     }
   }
   if (new Set(order).size !== order.length) fail('config.js', 'UNITS lists a unit twice');
@@ -94,6 +105,9 @@ function build(opt) {
     try { meta = freshRequire(path.join(dir, 'unit.js')); } catch (e) { fail(rel(path.join(dir, 'unit.js')), e.message); continue; }
     if (exists(path.join(dir, 'items.js'))) {
       try { data = freshRequire(path.join(dir, 'items.js')); } catch (e) { fail(rel(path.join(dir, 'items.js')), e.message); continue; }
+      if (!data || !Array.isArray(data.items || []) || !Array.isArray(data.cases || [])) { fail(rel(path.join(dir, 'items.js')), 'must export { items: [...], cases: [...] }'); data = { items: [], cases: [] }; }
+      const isObj = (x, i, kind) => { if (x && typeof x === 'object' && !Array.isArray(x)) return true; fail(rel(path.join(dir, 'items.js')), `${kind} entry ${i} is not an object`); return false; };
+      data = { items: (data.items || []).filter((x, i) => isObj(x, i, 'items')), cases: (data.cases || []).filter((x, i) => isObj(x, i, 'cases')) };
     }
     const core = exists(path.join(dir, 'notes.core.html')) ? readText(path.join(dir, 'notes.core.html')) : null;
     const deep = exists(path.join(dir, 'notes.deep.html')) ? readText(path.join(dir, 'notes.deep.html')) : null;
@@ -115,6 +129,11 @@ function build(opt) {
       if (/<script|\son\w+\s*=/i.test(svg)) fail(where, 'no scripts or event handlers in figures');
       figures[m.key] = { alt: String(m.alt), svg: svg.trim() };
     } catch (e) { fail(where, e.message); }
+  }
+
+  const synFile = path.join(SRC, 'synonyms.js');
+  if (exists(synFile)) {
+    try { freshRequire(synFile); note(rel(synFile), 'present but not used yet (the search work unit wires it in)'); } catch (e) { fail(rel(synFile), e.message); }
   }
 
   // 2. validate: units, notes, then the item lint (BUILD_SPEC 4.7 via tools/boards/lint-core.cjs)
@@ -245,6 +264,12 @@ function build(opt) {
     if (/<\/script/i.test(s)) fail(`src/boards/app/${f}`, 'contains "</script" (write it as "<\\/script")');
     const n = s.split(MARK).length - 1;
     if (f === appFiles[appFiles.length - 1] ? n !== 1 : n !== 0) fail(`src/boards/app/${f}`, `"${MARK}" must appear exactly once, as the last statement of the last app file (99-export.js)`);
+    else if (n === 1) {
+      // nothing but whitespace and comments may follow the "};" that closes the SH_EXPORT object (its first line-start "};")
+      const tail = s.slice(s.indexOf(MARK)), end = tail.search(/\n\};/);
+      const after = end < 0 ? null : tail.slice(end + 3).replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').trim();
+      if (after !== '') fail(`src/boards/app/${f}`, `"${MARK}" must be the last statement: end the file with the "};" that closes it`);
+    }
   }
   if (!appFiles.length || appFiles[appFiles.length - 1] !== '99-export.js') fail('src/boards/app', '99-export.js must be the last app file');
   const script = `'use strict';\n(function(){\n/* ==== data (generated from src/boards: units, facts, figures) ==== */\n` +
@@ -404,7 +429,8 @@ function report(r) {
 // ---------- main ----------
 function main() {
   const opt = parseArgs(process.argv.slice(2));
-  if (opt.help) { console.log(readText(__filename).split('\n').slice(1, 17).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); return 0; }
+  if (opt.help) { const ls = readText(__filename).split('\n'), end = ls.findIndex((l, i) => i > 0 && !l.startsWith('//')); console.log(ls.slice(1, end).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); return 0; }
+  if (opt.check && opt.unit) { console.error('build-boards: --unit validates one unit and writes nothing; it does not combine with --check (run --check on its own).'); return 2; }
   if (opt.check && opt.drafts) { console.error('build-boards: --include-drafts is a local preview; it refuses to run with --check (CI compares the clean build).'); return 2; }
 
   let r;
