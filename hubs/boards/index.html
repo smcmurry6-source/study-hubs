@@ -201,6 +201,7 @@ main{padding-top:22px}
 .missed-case-list,.case-list{display:flex;flex-direction:column;gap:10px}
 .case-list-card,.missed-case{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
 .case-list-card h3,.missed-case h4{margin:8px 0 3px;font-size:1rem}
+.case-list-actions{display:flex;align-items:center;gap:8px}
 .case-list-card p,.missed-case p{margin:0 0 4px;color:var(--ink-soft)}
 .case-view{min-width:0}
 .case-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
@@ -256,7 +257,7 @@ main{padding-top:22px}
   .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
   .unit-nav button{flex:none}
   .case-layout{grid-template-columns:minmax(0,1fr)}
-  .case-chart{position:static}
+  .case-chart{position:static;scroll-margin-top:130px}
   .case-chart summary{display:list-item;cursor:pointer;font-weight:700;color:var(--ink);padding:12px 15px}
   .case-chart[open] summary{border-bottom:1px solid var(--line)}
   .case-chart-body{padding:12px}
@@ -283,6 +284,8 @@ main{padding-top:22px}
   .case-title .btn{flex:none;padding:7px 10px}
   .case-list-card,.missed-case{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
   .case-list-card>.btn,.missed-case>.btn{align-self:flex-start}
+  .case-list-actions{align-self:stretch;flex-wrap:wrap}
+  .case-list-actions .btn{align-self:flex-start}
   .case-stage-head{align-items:flex-start;flex-direction:column}
   .case-round-item .qcard{padding:12px}
   .bank-filters{gap:9px}
@@ -506,7 +509,7 @@ function cardHTML(q, opts, order){
     (!opts.caseView ? pboxHTML(q.pbox) : '') + (q.img ? figureHTML(q.img) : '') +
     '<p class="qcard-stem">' + esc(q.stem) + '</p>' +
     (covered ? '<button type="button" class="btn qcard-show-options" data-show-options>Show options</button>' : '') +
-    '<div class="qcard-choices"' + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
+    '<div class="qcard-choices"' + (opts.review ? ' role="list"' : '') + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
       var key = tag === 'button' ? ' type="button"' : ' role="listitem"';
       return '<' + tag + key + ' class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></' + tag + '>';
     }).join('') + '</div><div class="qx" hidden></div></article>';
@@ -619,17 +622,15 @@ function wireCards(root, onDone){
    Progress lives under STATE.ui so it does not change the shared top-level state contract.
    ==================================================================== */
 function caseChartHTML(c){
-  return '<details class="case-chart" open><summary>Chart</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
+  return '<details class="case-chart" open><summary>Chart: ' + esc(c.box && c.box.patient || c.id) + '</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
     pboxHTML(c.box) + (c.stim || []).map(figureHTML).join('') + '</div></details>';
-}
-
-function caseHasAllAnswers(c){
-  return c.items.every(function(qid){ return !!STATE.answered[qid]; });
 }
 
 function caseProgress(c){
   if(!STATE.ui.caseProgress[c.id]) STATE.ui.caseProgress[c.id] = { next:0 };
-  return STATE.ui.caseProgress[c.id];
+  var p = STATE.ui.caseProgress[c.id];
+  if(p.pending) delete p.pending;
+  return p;
 }
 
 function renderCase(el, caseId, opts){
@@ -637,8 +638,7 @@ function renderCase(el, caseId, opts){
   var c = CASE_BY_ID[caseId];
   if(!c){ el.innerHTML = (opts.prefix || '') + emptyHTML('Case set unavailable', ['Choose another case set.'], 'bank'); return; }
   var p = caseProgress(c), itemIds = c.items || [], next = Math.max(0, Math.min(itemIds.length, +p.next || 0));
-  while(next < itemIds.length && STATE.answered[itemIds[next]]) next++;
-  var rounds = !!opts.review || next >= itemIds.length || caseHasAllAnswers(c);
+  var rounds = !!opts.review || next >= itemIds.length;
   var title = '<div class="case-title"><div><h3>' + esc(c.box && c.box.patient || c.id) + '</h3><p class="faint">' + plural(itemIds.length, 'question') + ' · ' + (rounds ? 'Rounds' : 'Question ' + (next + 1) + ' of ' + itemIds.length) + '</p></div>' +
     '<button type="button" class="btn" data-case-back>' + (opts.backLabel || 'Back to cases') + '</button></div>';
   var body = '';
@@ -655,6 +655,8 @@ function renderCase(el, caseId, opts){
   }
   el.innerHTML = (opts.prefix || '') + '<div class="case-view" data-case-id="' + esc(c.id) + '">' + title +
     '<div class="case-layout">' + caseChartHTML(c) + '<div class="case-content">' + body + '</div></div></div>';
+  var chart = $('.case-chart', el);
+  if(chart && window.matchMedia && window.matchMedia('(max-width: 639px)').matches && (rounds || next > 0)) chart.open = false;
   if(rounds){
     itemIds.forEach(function(id){ var host = $('[data-case-review-item="' + id + '"]', el); if(host) renderItem(host, id, { ctx:opts.ctx || 'case', review:true, caseView:true }); });
     return;
@@ -664,7 +666,7 @@ function renderCase(el, caseId, opts){
   current.addEventListener('click', function(){ lock.disabled = card.picked() == null; });
   lock.addEventListener('click', function(){
     if(!card.submit()) return;
-    p.next = next + 1; p.pending = true; saveState();
+    p.next = next + 1; saveState();
     lock.hidden = true; advance.hidden = false;
   });
 }
@@ -722,11 +724,13 @@ var bankSearch = '';
 var bankClassStats = {};
 var bankClassStatsSeen = {};
 var bankRenderToken = 0;
+var caseScrollAfterNext = false;
 
 function bankPoolBase(){
   var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, exam = STATE.ui.bankExam || 'all';
   var words = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
   return QUESTIONS.filter(function(x){
+    if(x.case) return false;
     if(sec && x.sec !== sec) return false;
     if(!sec && unit && unit !== 'all' && x.lec !== unit) return false;
     if(exam !== 'all' && (x.exam || []).indexOf(exam) === -1) return false;
@@ -769,31 +773,41 @@ function bankSections(){
 }
 
 function caseState(c){
-  var p = STATE.ui.caseProgress[c.id], n = c.items.length;
-  if((p && +p.next >= n) || caseHasAllAnswers(c)) return 'Done';
-  if((p && +p.next > 0) || c.items.some(function(id){ return !!STATE.answered[id]; })) return 'In progress';
+  var p = STATE.ui.caseProgress[c.id], n = c.items.length, next = p ? (+p.next || 0) : 0;
+  if(next >= n) return 'Done';
+  if(next > 0) return 'In progress';
   return 'New';
 }
 
 function renderCaseList(){
   if(!CASES.length) return emptyHTML('No case sets yet', ['Case sets will appear here when the first unit opens.'], 'bank');
   return '<div class="case-list">' + CASES.map(function(c){
-    var state = caseState(c), box = c.box || {};
+    var state = caseState(c), box = c.box || {}, actions;
+    if(state === 'Done'){
+      actions = '<div class="case-list-actions"><button type="button" class="btn" data-case-review="' + esc(c.id) + '">Review</button>' +
+        '<button type="button" class="btn primary" data-case-repeat="' + esc(c.id) + '">Do it again</button></div>';
+    } else actions = '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'In progress' ? 'Continue case' : 'Open case') + '</button>';
     return '<article class="case-list-card"><div><span class="chip">' + esc(state) + '</span><h3>' + esc(box.patient || c.id) + '</h3>' +
-      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' +
-      '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'Done' ? 'Review case' : 'Open case') + '</button></article>';
+      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' + actions + '</article>';
   }).join('') + '</div>';
 }
 
+function missedStandalonePool(){
+  return QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+}
+
 function renderMissed(){
-  var standalones = QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+  var standalones = missedStandalonePool();
   var missedCases = CASES.filter(function(c){ return c.items.some(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }); });
   if(!standalones.length && !missedCases.length) return emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
   var html = '';
   if(standalones.length){
-    html += '<h3 class="bank-section-title">Missed questions</h3><div class="qlist">' + standalones.map(function(q){
-      return '<div class="missed-item" data-missed-item="' + esc(q.id) + '"></div>';
-    }).join('') + '</div>';
+    var at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), standalones.length - 1), q = standalones[at];
+    STATE.ui.bankAt = at;
+    html += '<h3 class="bank-section-title">Missed questions</h3><div class="bank-practice"><div class="bank-card-host" data-bank-qid="' + esc(q.id) + '"></div>' +
+      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + standalones.length + '</span><span class="btn-row" style="margin:0">' +
+      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+      '<button type="button" class="btn primary" data-bank-step="1"' + (at < standalones.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>';
   }
   if(missedCases.length){
     html += '<h3 class="bank-section-title">Missed case items</h3><div class="missed-case-list">' + missedCases.map(function(c){
@@ -818,6 +832,13 @@ function renderBank(){
   }
   if(sub === 'cases' && STATE.ui.caseId && CASE_BY_ID[STATE.ui.caseId]){
     renderCase(el, STATE.ui.caseId, { ctx:'case', review:!!STATE.ui.caseReview, prefix:prefix, backLabel:'Back to cases' });
+    if(caseScrollAfterNext){
+      caseScrollAfterNext = false;
+      var question = $('.case-current', el) || $('.case-rounds', el), chart = $('.case-chart', el);
+      var phone = window.matchMedia && window.matchMedia('(max-width: 639px)').matches;
+      var target = phone && chart && !chart.open ? chart : question;
+      if(target && target.scrollIntoView) target.scrollIntoView({ block:'start', behavior:'smooth' });
+    }
     return;
   }
   if(sub === 'missed' && STATE.ui.caseId && STATE.ui.caseReview){
@@ -830,7 +851,8 @@ function renderBank(){
   }
   if(sub === 'missed'){
     el.innerHTML = prefix + renderMissed();
-    $$('.missed-item', el).forEach(function(host){ renderItem(host, host.getAttribute('data-missed-item'), { ctx:'bank', review:true }); });
+    var missedHost = $('.bank-card-host', el);
+    if(missedHost) renderItem(missedHost, missedHost.getAttribute('data-bank-qid'), { ctx:'bank' });
     return;
   }
 
@@ -840,9 +862,7 @@ function renderBank(){
     return;
   }
   var pool = bankPool(), at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), Math.max(0, pool.length - 1));
-  if(pool[at] && pool[at].case){
-    STATE.ui.caseId = pool[at].case; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'cases'; saveState(); renderBank(); return;
-  }
+  STATE.ui.bankAt = at;
   var html = prefix + bankFiltersHTML();
   html += pool.length ? '<div class="bank-practice">' +
     '<div class="bank-card-host" data-bank-qid="' + esc(pool[at].id) + '"></div>' +
@@ -882,15 +902,29 @@ function wireBank(){
   }, true);
   el.addEventListener('click', function(e){
     var step = e.target.closest('[data-bank-step]');
-    if(step){ STATE.ui.bankAt = Math.max(0, (+STATE.ui.bankAt || 0) + +step.getAttribute('data-bank-step')); saveState(); renderBank(); return; }
+    if(step){
+      var delta = +step.getAttribute('data-bank-step'), at = +STATE.ui.bankAt || 0;
+      var host = $('[data-bank-qid]', el), qid = host && host.getAttribute('data-bank-qid');
+      var available = (STATE.ui.sub.bank || 'practice') === 'missed' ? missedStandalonePool() : bankPool();
+      var currentStillAvailable = qid && available.some(function(q){ return q.id === qid; });
+      var keepIndex = delta > 0 && qid && !currentStillAvailable;
+      STATE.ui.bankAt = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
+    }
     if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
     var open = e.target.closest('[data-case-open]');
     if(open){ STATE.ui.caseId = open.getAttribute('data-case-open'); STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    var reviewCase = e.target.closest('[data-case-review]');
+    if(reviewCase){ STATE.ui.caseId = reviewCase.getAttribute('data-case-review'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    var repeatCase = e.target.closest('[data-case-repeat]');
+    if(repeatCase){
+      STATE.ui.caseId = repeatCase.getAttribute('data-case-repeat'); STATE.ui.caseReview = false;
+      STATE.ui.caseProgress[STATE.ui.caseId] = { next:0 }; saveState(); renderBank(); return;
+    }
     var missedCase = e.target.closest('[data-case-missed]');
     if(missedCase){ STATE.ui.caseId = missedCase.getAttribute('data-case-missed'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
     if(e.target.closest('[data-case-back]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; saveState(); renderBank(); return; }
     if(e.target.closest('[data-case-next]')){
-      var p = STATE.ui.caseProgress[STATE.ui.caseId]; if(p) delete p.pending;
+      caseScrollAfterNext = true;
       saveState(); renderBank(); return;
     }
   });

@@ -38,6 +38,7 @@
 .missed-case-list,.case-list{display:flex;flex-direction:column;gap:10px}
 .case-list-card,.missed-case{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
 .case-list-card h3,.missed-case h4{margin:8px 0 3px;font-size:1rem}
+.case-list-actions{display:flex;align-items:center;gap:8px}
 .case-list-card p,.missed-case p{margin:0 0 4px;color:var(--ink-soft)}
 .case-view{min-width:0}
 .case-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}

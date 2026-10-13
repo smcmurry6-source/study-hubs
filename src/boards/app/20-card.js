@@ -50,7 +50,7 @@ function cardHTML(q, opts, order){
     (!opts.caseView ? pboxHTML(q.pbox) : '') + (q.img ? figureHTML(q.img) : '') +
     '<p class="qcard-stem">' + esc(q.stem) + '</p>' +
     (covered ? '<button type="button" class="btn qcard-show-options" data-show-options>Show options</button>' : '') +
-    '<div class="qcard-choices"' + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
+    '<div class="qcard-choices"' + (opts.review ? ' role="list"' : '') + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
       var key = tag === 'button' ? ' type="button"' : ' role="listitem"';
       return '<' + tag + key + ' class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></' + tag + '>';
     }).join('') + '</div><div class="qx" hidden></div></article>';

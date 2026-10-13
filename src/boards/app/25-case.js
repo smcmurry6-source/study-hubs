@@ -3,17 +3,15 @@
    Progress lives under STATE.ui so it does not change the shared top-level state contract.
    ==================================================================== */
 function caseChartHTML(c){
-  return '<details class="case-chart" open><summary>Chart</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
+  return '<details class="case-chart" open><summary>Chart: ' + esc(c.box && c.box.patient || c.id) + '</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
     pboxHTML(c.box) + (c.stim || []).map(figureHTML).join('') + '</div></details>';
-}
-
-function caseHasAllAnswers(c){
-  return c.items.every(function(qid){ return !!STATE.answered[qid]; });
 }
 
 function caseProgress(c){
   if(!STATE.ui.caseProgress[c.id]) STATE.ui.caseProgress[c.id] = { next:0 };
-  return STATE.ui.caseProgress[c.id];
+  var p = STATE.ui.caseProgress[c.id];
+  if(p.pending) delete p.pending;
+  return p;
 }
 
 function renderCase(el, caseId, opts){
@@ -21,8 +19,7 @@ function renderCase(el, caseId, opts){
   var c = CASE_BY_ID[caseId];
   if(!c){ el.innerHTML = (opts.prefix || '') + emptyHTML('Case set unavailable', ['Choose another case set.'], 'bank'); return; }
   var p = caseProgress(c), itemIds = c.items || [], next = Math.max(0, Math.min(itemIds.length, +p.next || 0));
-  while(next < itemIds.length && STATE.answered[itemIds[next]]) next++;
-  var rounds = !!opts.review || next >= itemIds.length || caseHasAllAnswers(c);
+  var rounds = !!opts.review || next >= itemIds.length;
   var title = '<div class="case-title"><div><h3>' + esc(c.box && c.box.patient || c.id) + '</h3><p class="faint">' + plural(itemIds.length, 'question') + ' · ' + (rounds ? 'Rounds' : 'Question ' + (next + 1) + ' of ' + itemIds.length) + '</p></div>' +
     '<button type="button" class="btn" data-case-back>' + (opts.backLabel || 'Back to cases') + '</button></div>';
   var body = '';
@@ -39,6 +36,8 @@ function renderCase(el, caseId, opts){
   }
   el.innerHTML = (opts.prefix || '') + '<div class="case-view" data-case-id="' + esc(c.id) + '">' + title +
     '<div class="case-layout">' + caseChartHTML(c) + '<div class="case-content">' + body + '</div></div></div>';
+  var chart = $('.case-chart', el);
+  if(chart && window.matchMedia && window.matchMedia('(max-width: 639px)').matches && (rounds || next > 0)) chart.open = false;
   if(rounds){
     itemIds.forEach(function(id){ var host = $('[data-case-review-item="' + id + '"]', el); if(host) renderItem(host, id, { ctx:opts.ctx || 'case', review:true, caseView:true }); });
     return;
@@ -48,7 +47,7 @@ function renderCase(el, caseId, opts){
   current.addEventListener('click', function(){ lock.disabled = card.picked() == null; });
   lock.addEventListener('click', function(){
     if(!card.submit()) return;
-    p.next = next + 1; p.pending = true; saveState();
+    p.next = next + 1; saveState();
     lock.hidden = true; advance.hidden = false;
   });
 }

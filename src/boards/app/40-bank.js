@@ -5,11 +5,13 @@ var bankSearch = '';
 var bankClassStats = {};
 var bankClassStatsSeen = {};
 var bankRenderToken = 0;
+var caseScrollAfterNext = false;
 
 function bankPoolBase(){
   var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, exam = STATE.ui.bankExam || 'all';
   var words = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
   return QUESTIONS.filter(function(x){
+    if(x.case) return false;
     if(sec && x.sec !== sec) return false;
     if(!sec && unit && unit !== 'all' && x.lec !== unit) return false;
     if(exam !== 'all' && (x.exam || []).indexOf(exam) === -1) return false;
@@ -52,31 +54,41 @@ function bankSections(){
 }
 
 function caseState(c){
-  var p = STATE.ui.caseProgress[c.id], n = c.items.length;
-  if((p && +p.next >= n) || caseHasAllAnswers(c)) return 'Done';
-  if((p && +p.next > 0) || c.items.some(function(id){ return !!STATE.answered[id]; })) return 'In progress';
+  var p = STATE.ui.caseProgress[c.id], n = c.items.length, next = p ? (+p.next || 0) : 0;
+  if(next >= n) return 'Done';
+  if(next > 0) return 'In progress';
   return 'New';
 }
 
 function renderCaseList(){
   if(!CASES.length) return emptyHTML('No case sets yet', ['Case sets will appear here when the first unit opens.'], 'bank');
   return '<div class="case-list">' + CASES.map(function(c){
-    var state = caseState(c), box = c.box || {};
+    var state = caseState(c), box = c.box || {}, actions;
+    if(state === 'Done'){
+      actions = '<div class="case-list-actions"><button type="button" class="btn" data-case-review="' + esc(c.id) + '">Review</button>' +
+        '<button type="button" class="btn primary" data-case-repeat="' + esc(c.id) + '">Do it again</button></div>';
+    } else actions = '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'In progress' ? 'Continue case' : 'Open case') + '</button>';
     return '<article class="case-list-card"><div><span class="chip">' + esc(state) + '</span><h3>' + esc(box.patient || c.id) + '</h3>' +
-      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' +
-      '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'Done' ? 'Review case' : 'Open case') + '</button></article>';
+      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' + actions + '</article>';
   }).join('') + '</div>';
 }
 
+function missedStandalonePool(){
+  return QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+}
+
 function renderMissed(){
-  var standalones = QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+  var standalones = missedStandalonePool();
   var missedCases = CASES.filter(function(c){ return c.items.some(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }); });
   if(!standalones.length && !missedCases.length) return emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
   var html = '';
   if(standalones.length){
-    html += '<h3 class="bank-section-title">Missed questions</h3><div class="qlist">' + standalones.map(function(q){
-      return '<div class="missed-item" data-missed-item="' + esc(q.id) + '"></div>';
-    }).join('') + '</div>';
+    var at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), standalones.length - 1), q = standalones[at];
+    STATE.ui.bankAt = at;
+    html += '<h3 class="bank-section-title">Missed questions</h3><div class="bank-practice"><div class="bank-card-host" data-bank-qid="' + esc(q.id) + '"></div>' +
+      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + standalones.length + '</span><span class="btn-row" style="margin:0">' +
+      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+      '<button type="button" class="btn primary" data-bank-step="1"' + (at < standalones.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>';
   }
   if(missedCases.length){
     html += '<h3 class="bank-section-title">Missed case items</h3><div class="missed-case-list">' + missedCases.map(function(c){
@@ -101,6 +113,13 @@ function renderBank(){
   }
   if(sub === 'cases' && STATE.ui.caseId && CASE_BY_ID[STATE.ui.caseId]){
     renderCase(el, STATE.ui.caseId, { ctx:'case', review:!!STATE.ui.caseReview, prefix:prefix, backLabel:'Back to cases' });
+    if(caseScrollAfterNext){
+      caseScrollAfterNext = false;
+      var question = $('.case-current', el) || $('.case-rounds', el), chart = $('.case-chart', el);
+      var phone = window.matchMedia && window.matchMedia('(max-width: 639px)').matches;
+      var target = phone && chart && !chart.open ? chart : question;
+      if(target && target.scrollIntoView) target.scrollIntoView({ block:'start', behavior:'smooth' });
+    }
     return;
   }
   if(sub === 'missed' && STATE.ui.caseId && STATE.ui.caseReview){
@@ -113,7 +132,8 @@ function renderBank(){
   }
   if(sub === 'missed'){
     el.innerHTML = prefix + renderMissed();
-    $$('.missed-item', el).forEach(function(host){ renderItem(host, host.getAttribute('data-missed-item'), { ctx:'bank', review:true }); });
+    var missedHost = $('.bank-card-host', el);
+    if(missedHost) renderItem(missedHost, missedHost.getAttribute('data-bank-qid'), { ctx:'bank' });
     return;
   }
 
@@ -123,9 +143,7 @@ function renderBank(){
     return;
   }
   var pool = bankPool(), at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), Math.max(0, pool.length - 1));
-  if(pool[at] && pool[at].case){
-    STATE.ui.caseId = pool[at].case; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'cases'; saveState(); renderBank(); return;
-  }
+  STATE.ui.bankAt = at;
   var html = prefix + bankFiltersHTML();
   html += pool.length ? '<div class="bank-practice">' +
     '<div class="bank-card-host" data-bank-qid="' + esc(pool[at].id) + '"></div>' +
@@ -165,15 +183,29 @@ function wireBank(){
   }, true);
   el.addEventListener('click', function(e){
     var step = e.target.closest('[data-bank-step]');
-    if(step){ STATE.ui.bankAt = Math.max(0, (+STATE.ui.bankAt || 0) + +step.getAttribute('data-bank-step')); saveState(); renderBank(); return; }
+    if(step){
+      var delta = +step.getAttribute('data-bank-step'), at = +STATE.ui.bankAt || 0;
+      var host = $('[data-bank-qid]', el), qid = host && host.getAttribute('data-bank-qid');
+      var available = (STATE.ui.sub.bank || 'practice') === 'missed' ? missedStandalonePool() : bankPool();
+      var currentStillAvailable = qid && available.some(function(q){ return q.id === qid; });
+      var keepIndex = delta > 0 && qid && !currentStillAvailable;
+      STATE.ui.bankAt = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
+    }
     if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
     var open = e.target.closest('[data-case-open]');
     if(open){ STATE.ui.caseId = open.getAttribute('data-case-open'); STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    var reviewCase = e.target.closest('[data-case-review]');
+    if(reviewCase){ STATE.ui.caseId = reviewCase.getAttribute('data-case-review'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    var repeatCase = e.target.closest('[data-case-repeat]');
+    if(repeatCase){
+      STATE.ui.caseId = repeatCase.getAttribute('data-case-repeat'); STATE.ui.caseReview = false;
+      STATE.ui.caseProgress[STATE.ui.caseId] = { next:0 }; saveState(); renderBank(); return;
+    }
     var missedCase = e.target.closest('[data-case-missed]');
     if(missedCase){ STATE.ui.caseId = missedCase.getAttribute('data-case-missed'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
     if(e.target.closest('[data-case-back]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; saveState(); renderBank(); return; }
     if(e.target.closest('[data-case-next]')){
-      var p = STATE.ui.caseProgress[STATE.ui.caseId]; if(p) delete p.pending;
+      caseScrollAfterNext = true;
       saveState(); renderBank(); return;
     }
   });
