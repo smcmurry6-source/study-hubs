@@ -85,6 +85,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;
+  commit and what was trimmed in its `UPSTREAM.md`), so Claude Code sessions can draw accurate isometric SVG figures
+  (anatomy, cells, receptors, drug mechanisms) for the hubs' lecture notes and Review. `CLAUDE.md` → "Diagrams (the
+  anima skill)" says how a figure gets into a single-file hub. Cowork/Claude Projects don't load repo skills. No site
+  change.
+
 - **2026-10-13 (rank-up and level-up celebrations, Claude Code)** — New `widget/rankup.js`, fetched by `widget/ranks.js`
   the first time it's needed. **A new rank** (Silver -> Gold) is a full-screen cutscene (`shRankUp.tier`): letterbox bars,
   the old medallion shakes and charges while light streams in (canvas sparks), flickers between old and new, then a
