@@ -127,16 +127,25 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
     new case items are planned piecemeal; the monthly sample only fires on the 1st; band "Started" with nothing seen;
     ability replays only the latest try; same-day plans can differ (async class stats).
   - **Merge order:** #80, then #81 (Codex merges `claude/boards-hub` and reruns the build instead of resolving the
-    page), then #83 (touches only `src/boards/units/pharm/`; any time after its fixes). Each only after its fix round.
-- **T-03 (perio):** no PR yet at the end of the session.
+    page). #83 and #87 touch only their unit folders and can merge any time after their fixes. Each only after its
+    fix round.
+- **#87 (T-03 perio, arrived during the session):** reviewed the same way (`tools/boards/notes-sheet.js`). Scripted
+  checks pass and the notes keep their qualifiers, but one statement is wrong (Cairo recession types "do not predict
+  root coverage"), ~15 author-facing lines, and overlapping concepts (three on PH-5). Cases: two outlines where an
+  item keyed on access flap or one furcation technique conflicts with EFP's regeneration rule for mandibular molars
+  with Class II furcations (SX-1/SX-2/PR-6), an abscess and necrotizing disease in one box, a gingivitis case keyed on
+  the periodontitis steps, a missing enlargement finding. Fix prompt in `reviews/session-6.md`. Branched from current
+  `claude/boards-hub`; touches only `src/boards/units/perio/`, so it merges any time after its fixes.
 - **T-06 brief written** (`tasks/T-06.md`): the 60 medcx items from the merged blueprint, cases first, ids
   `b-medcx-0101`-`0160` (0001-0009 are the benchmark's), `checked: null`, a count-check script for quotas, siblings,
   case order, extra refs and key spread.
 - **Fact and spec notes:** the medcx blueprint's `warfarin-simple-extraction` cites `AC-2` (partial: the 2-3 range is
   verified, INR-check timing is not; T-06 says so). `PG-5`'s nitrous oxide advice still has no quote (Codex flagged
-  it; add one). If #80's fix keeps `likely` averaged over practiced items, update BUILD_SPEC 6.4 to say so.
+  it; add one). `DM-7` now lists `perio` in its `units` (T-03 assigns it to perio-systemic; done in Session 6). A
+  mucogingival fact on Cairo types and expected root coverage (open source) would let the notes say what #87 had to
+  delete. If #80's fix keeps `likely` averaged over practiced items, update BUILD_SPEC 6.4 to say so.
 
-## Session 7: re-review, check T-06, review T-03
+## Session 7: re-review the four PRs, check T-06
 
 1. **Revised #80, #81, #83:** check each against its list in `reviews/session-6.md` (only the changed parts; rerun the
    acceptance commands and, for #81, the walk-through: `docs/boards/reviews/walk-cards.js`, extended for Practice /
@@ -149,8 +158,8 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
    per item check at the benchmark's batch size, so up to ~1M for two passes. The writer is Codex (OpenAI) and the
    checker Claude, so this is the first cross-family check (the benchmark was Claude checking Claude). Then one fix
    prompt for Codex, and stage 4b (two fresh passes) on every changed item.
-3. **T-03 (perio notes)** when its PR arrives: same method as #83 (`node tools/boards/notes-sheet.js perio` makes the
-   sentence and fact sheets).
+3. **Revised #87 (perio notes)**: check against its list in `reviews/session-6.md` (`node tools/boards/notes-sheet.js
+   perio` makes the sentence and fact sheets). Small fact edit for Claude: the `PG-5` quote.
 4. Next briefs once these land: T-07 `items-pharm` (after #83 merges), `int-notes-home` (after #80 and #81), and
    `int-mock`. `int-v33` and `int-widget` stay with Claude.
 

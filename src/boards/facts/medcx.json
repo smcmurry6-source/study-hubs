@@ -625,7 +625,8 @@
    ],
    "units": [
     "medcx",
-    "pharm"
+    "pharm",
+    "perio"
    ],
    "topic": "diabetes",
    "exam": [

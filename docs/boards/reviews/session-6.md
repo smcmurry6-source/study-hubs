@@ -1,11 +1,12 @@
 # Session 6 reviews (2026-10-13): fix prompts sent to Codex
 
-Claude's reviews of Codex's PRs #83 (T-02), #81 (T-04) and #80 (T-05). The next session checks the revised PRs
-against these lists. Method: #83 as in Session 4 (every cited sentence of Core and Deep read beside its fact; the
-T-02 acceptance scripts, run on the branch merged with current `claude/boards-hub`); #81 and #80 checked out, merged
-with `claude/boards-hub`, built, tested, and #81 walked through in Playwright on the fixture build (desktop 1280 px,
-phone 390 px). All three merged together build cleanly and pass `--check`, `syntax.js`, the plan tests and the full
-`smoke.js`; the only conflict is the generated `hubs/boards/index.html`, which is rebuilt, never merged by hand.
+Claude's reviews of Codex's PRs #83 (T-02), #81 (T-04), #80 (T-05) and #87 (T-03, at the end). The next session checks
+the revised PRs against these lists. Method: #83 as in Session 4 (every cited sentence of Core and Deep read beside
+its fact; the T-02 acceptance scripts, run on the branch merged with current `claude/boards-hub`); #81 and #80 checked
+out, merged with `claude/boards-hub`, built, tested, and #81 walked through in Playwright on the fixture build
+(desktop 1280 px, phone 390 px). All three merged together build cleanly and pass `--check`, `syntax.js`, the plan
+tests and the full `smoke.js`; the only conflict is the generated `hubs/boards/index.html`, which is rebuilt, never
+merged by hand.
 
 What passed: #83's scripted checks (blueprint `total 60 cases 27`, no copy or stem-name lines, build valid) and no
 wrong facts; #81's shuffle with authored-index recording, deferred case feedback, Rounds, resume after leaving,
@@ -111,4 +112,43 @@ Revise PR #80 (T-05) on branch codex/t05-readiness-plan. Tests pass and the core
 7. ES5 style: the wrapper's function declarations sit inside if(typeof STATE !== 'undefined'){...}; make them function expressions (var boardsPlanStats = function(){...}).
 
 Then rerun the T-05 acceptance (test pass line with the new count, --check, syntax, the grep for Math.random / Date.now / new Date() in the core) and paste it in the PR, with one line per numbered point saying what changed.
+```
+
+## #87 (T-03 perio notes + blueprint)
+
+Arrived during the session. Same method as #83 (`node tools/boards/notes-sheet.js perio`); branched from current
+`claude/boards-hub`, so no merge needed. Scripted checks pass (build valid, `total 60 cases 30`, no copy or stem-name
+lines, Core 3,409 / Deep 5,423 words). The notes are careful with qualifiers; one statement is wrong.
+
+```text
+Revise PR #87 (T-03, perio notes + blueprint) on branch codex/boards-perio-t03. Claude read every cited sentence against its fact; the notes are careful, but fix these. Touch only src/boards/units/perio/*.
+
+1. One wrong statement. Core (mucogingival, after the Cairo paragraph) and Deep (the last mucogingival paragraph) say the classification "does not ... predict root coverage". Cairo's recession types were introduced partly to predict root coverage (RT1 best, RT3 worst), so this is wrong. Delete the sentence in both files; don't replace it (no fact covers root coverage yet).
+
+2. Author-facing or source-talk sentences, rewrite or delete:
+- Core exam: delete "A complete probing sequence and an arithmetic method for deriving CAL ... are not detailed here." Deep: delete "A complete probe path and site-by-site technique sequence are not detailed here." and "Probe angulation, walking strokes and a formula deriving CAL ... are not detailed here."
+- Mobility (Core and Deep): drop the talk about conflicting descriptions and "the available mobility review has a limitation". Write only: Miller grade 3 is the one with vertical (depressible) movement; the 2017 staging chart counts mobility of degree 2 or more as a stage IV complexity factor [FM-4][PS-5].
+- Deep biofilm: "The record cautions against using menstrual-cycle changes or current low-dose contraceptives..." -> "Menstrual cycle-associated gingivitis was dropped from the classification because its signs are rarely visible, and today's low-dose oral contraceptives don't cause the changes reported with the old high-dose pills" [BF-2]. Core: same idea in place of "should not be used as stand-alone diagnoses of visible gingivitis".
+- Deep biofilm: "Keep the age group, diabetes type and uncertainty attached to that observation. Do not extend it into a general rule..." -> "This applies to children with poorly controlled type 1 diabetes."
+- Deep radiographs: delete "while remembering that the chart source has a limitation in how its table was extracted"; "Therefore, avoid saying that a two-dimensional image always underestimates bone loss or assigning a fixed correction in millimeters" -> "so a 2D image can err in either direction, and there is no fixed correction in millimeters".
+- Deep grading: delete "Use the stated cutoffs without adding precision beyond those values."
+- Deep prognosis: "Teach the asymmetry:" -> "In short:"; "Because these are cohort observations rather than a universal guideline, use them to avoid deterministic language, not to promise..." -> "These are cohort findings: they argue against writing a tooth off, not for promising it will survive." Also "fewer than one-third were extracted for periodontal reasons" -> "most of the teeth extracted in one maintenance cohort were lost to fracture, caries or endodontic problems rather than periodontitis" (PR-7: teach the principle, not the number).
+- Deep therapy: "These recommendation categories should not be rewritten as proof of harm..." -> "A recommendation against is not proof of harm or a contraindication." Deep surgery: "so translate 'adequate' into the clinical care context rather than inventing a percentage" -> "The guideline sets no plaque-score cutoff for 'adequate'."
+- Deep therapy: "The calculus review specifically cautions that calculus is not itself the primary cause of periodontitis" is not something the source says (it is a note in the fact's conditions). Write instead: calculus matters as a rough, plaque-retentive surface; the disease is driven by the host response to the plaque biofilm [BF-5][PSY-1]. Core biofilm: replace "whose presence and host response matter more than calculus as a material" with the same idea.
+- Deep maintenance: drop "and potential additional improvement" (not in PT-11).
+- Core table: "localize at 10–30%" -> "localized at 10-30%". Core adjuncts table: "benefit is not a required standard" -> "a weak recommendation, not a standard of care" [PT-9]; "advises against" -> "suggests not using" for lasers, probiotics and sub-antimicrobial-dose doxycycline (PT-6's wording).
+- Deep PerioChip: say the label does not recommend it in an acute periodontal abscess (not studied) [LD-2].
+
+3. Blueprint concepts overlap (siblings in disguise): PH-5 carries three concepts (treated-periodontitis-status, health-on-reduced-periodontium, treated-periodontitis-stability), MG-1 two (recession-description, gingival-phenotype), PA-1 to PA-3 three (acute-lesion-features plus the abscess/necrotizing and endo-perio concepts), and BF-2/BF-3 two (gingivitis-modifying-factors, risk-modifiers-smoking-diabetes). Merge each group to one or two concepts and give the freed slots to the brief's priorities: peri-implant disease (4 items now, 6 facts) and staging/grading or therapy. Keep 60 items, 30 in 7-9 cases, 35-45 concepts, 8-12 hy.
+
+4. Case outlines:
+a. c-perio-0005: tooth 30 is a mandibular molar with a residual 6 mm pocket and Class II furcation, so EFP recommends regenerative surgery there (SX-1, PR-6), and a therapy-sequence item keyed on access flap surgery (PT-4) would have two defensible answers. Either put the residual 6 mm pocket on a tooth without a furcation or intrabony defect for the PT-4 item, or key the item on regeneration (regenerative-surgery-indications). The supportive-care item needs a stem that moves the story past step 3.
+b. c-perio-0008: "multiple Class II furcation sites" on tooth 18 (a mandibular molar) falls under both SX-1 (regeneration recommended) and SX-2 (several options may be considered, none the single answer). Make it a maxillary molar (e.g. tooth 3 with buccal and mesial Class II) and key the item on PR-6 (furcation is not a reason to extract; treat the tooth), never on one surgical technique (SX-2 conditions).
+c. c-perio-0003: the box has a periodontal abscess at tooth 19 and necrotic papillae in the same quadrant, so the acute item has two diagnoses. Keep the abscess and remove the necrotizing line (or split it into its own case with what PA-2 needs).
+d. c-perio-0004 (gingivitis, no periodontitis): the second item must not apply the EFP periodontitis steps (PT-1, PT-2: step 2 is subgingival instrumentation for periodontitis). Key it on BF-1 (gingivitis resolves when the inflammation is treated) or BF-5 (calculus as a plaque-retentive surface).
+e. c-perio-0006: give the baseline bone level so the bone loss beyond remodeling is explicit ("bone level 3 mm more apical than on the baseline radiograph"). The RAD-1 item clashes with "selected bitewing and periapical images are available": drop that line or replace the item. The two peri-implant items (site 19 and site 30) must test different decisions; the health one is nearly free once the first is answered, so consider moving it to a standalone.
+f. c-perio-0009: the chief complaint mentions enlarged gums but the findings don't describe any: add one ("Firm gingival enlargement of the anterior papillae, more than the plaque level would explain").
+g. c-perio-0001: interdental CAL 5 mm (stage III) with RBL 28% "in the coronal third" (stage II) is internally inconsistent. Make them agree (e.g. RBL 35% reaching the middle third), unless the item is meant to test that CAL outranks RBL, in which case say so in the outline. The RAD-1 item needs a stem that fits a box where bone loss is already measured.
+
+5. Rerun the T-03 / T-02 acceptance checks and paste the last lines; list in the PR what changed for each numbered point.
 ```
