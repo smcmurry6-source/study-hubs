@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 4)
+# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 6)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -81,17 +81,87 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   radiographs, surgery, local delivery and host modulation. Codex's T-01 fact problems (BP-2 crisis numbers, HIV-2
   units, IE-5 doses, DM-6, PG-2, ORN-3) are all already in those facts' `conditions`; nothing to change.
 
-## Session 5: facts, then medcx items
+## Session 5 (done 2026-10-13, #82)
 
-1. Sam merges this session's PR into `claude/boards-hub` (it includes #78) and starts T-02, T-04 and T-05 in Codex.
-2. Claude: `facts-perio` (BUILD_SPEC 9) plus the small top-ups above (seizure first aid from CDC; pharmacokinetics
-   basics from FDA labeling or an open pharmacology text with a stable URL), same pipeline as Session 3 (drafter,
-   independent verifier, quote check). Then lift the block in T-03.
-3. Brief T-06 `items-medcx` (60 items from `src/boards/units/medcx/blueprint.json`, `checked:null`) for Codex, then
-   the Claude-subagent checker with two passes on high-risk items (`bench/REPORT.md`).
-4. Review T-02/T-04/T-05 PRs as they arrive (same method as T-01: a sheet of each cited sentence beside its fact;
-   for code, run the fixture build in Playwright on desktop and phone).
-5. `int-v33` and `int-widget` stay with Claude.
+- **`facts-perio` done (step 2):** 15 new perio facts (`BF-1`-`BF-5`, `RAD-1`-`RAD-2`, `PT-8`-`PT-11`, `SX-1`-`SX-2`,
+  `LD-1`-`LD-2`), plus `EM-11` (CDC seizure "what to avoid") and `PK-3`-`PK-6` (half-life, bioavailability and first
+  pass, protein binding, liver/kidney and the lidocaine label). 337 facts, 1,179 cites (0 missing). 6 new sources (Arestin and
+  PerioChip labels, ADA/FDA 2012 radiograph guide, 2025 J Clin Periodontol imaging review, 2024 calculus review, OpenStax
+  *Pharmacology* 2.2). Pipeline: drafted by Claude; an independent verifier (5 pass, 15 fixed: dropped qualifiers,
+  causal links no source states, missing pregnancy/abscess/kidney warnings); a third check of the rewrites (14 pass, 6
+  fixed: BF-2 menstrual-cycle caution, BF-4/BF-5 wording, RAD-2 leaned on one study's table cell, LD-2 abscess
+  caution, PK-5 "some drugs"); quote check 105/105 exact on the new records. Weaknesses are in each record's
+  `conditions`.
+- **Gaps left (no open source good enough):** probing technique and the CAL arithmetic (CAL from probing depth and
+  recession; NCBI Bookshelf/PMC copies block scripts), peri-implant treatment (the EFP 2023 peri-implant S3 guideline
+  is not open on Europe PMC). Listed in T-03.
+- **Quote check fix:** fda.gov now answers Node's fetch with HTTP 401 (it serves curl), and the headless-browser
+  fallback dropped the FDA CYP table, so `PK-1`/`PK-2` showed 9 missing quotes. `check-quotes.mjs` now retries with
+  `curl` before the browser; both FDA sources read fine again.
+- **T-03 unblocked.** Follow-ups: when reviewing T-02, check the notes use `PK-3`-`PK-6` (they arrived after the brief);
+  the medcx notes' seizure paragraph can now cite `EM-11` (T-01 had to drop "do not restrain").
+- **Codex at the end of Session 5:** T-02 pharm notes = draft #83, T-04 cards = draft #81, T-05 readiness/plan =
+  draft #80 (all into `claude/boards-hub`, none reviewed or merged). T-03 perio notes sent to Codex 2026-10-13 (expect
+  a draft PR from `codex/boards-perio-t03`). #80 and #81 both regenerate `hubs/boards/index.html`: merge one, then
+  have Codex rebase the other and rerun `node tools/build-boards.js` instead of resolving that file by hand.
+
+## Session 6 (done 2026-10-13)
+
+- **Reviews, no merges** (fix prompts for Codex, verbatim, in `reviews/session-6.md`; check the revised PRs against
+  them). All three PRs were branched before #82/#86 and are behind `claude/boards-hub`; merged together with it they
+  build, pass `--check`, `syntax.js`, the plan tests and the full `smoke.js`. The only conflict is the generated page.
+  - **#83 (T-02 pharm):** scripted acceptance passes and no fact is wrong, but ~10 author-facing sentences, 13
+    claims pushed past their facts (END-11 "routine dental care" instead of procedures under local anesthesia, AC-4
+    implying antiplatelets may be stopped, "weak / very low quality" attached to the wrong END advice, CDC on
+    benzodiazepines inverted, a dropped "probably", "meth mouth" discouraged...), no PK-3-PK-6 yet, and Deep gaps
+    (codeine/tramadol in children, AB-5 doses, SSRIs vs epinephrine). Blueprint: a duplicated PG-7 concept, no PK,
+    MME or codeine-in-children concepts, and 5 of 7 cases with a problem (an allergy that rules out the AB-3 key, a
+    pregnant patient whose allergy key rests on facts we don't have, a dose-ceiling item at 26 weeks, a dry-mouth
+    item with no dry-mouth finding, two same-concept items that give each other away).
+  - **#81 (T-04 cards):** Playwright walk-through (desktop and 390 px phone, fixture build). Works: reshuffle with
+    authored-index recording, "Recorded" only until Rounds, resume at item 3, one event per item, Cover options.
+    Bugs: Practice jumps into Cases on a case item and then can't get back; New only skips the next item; Missed is
+    read-only; a done case can't be redone and a first attempt skips items answered elsewhere; on phones the open
+    chart pushes question 1 to ~1,300 px down.
+  - **#80 (T-05 plan):** 10 tests pass, core pure, CI step added. Logic fixes: retirement skips the 120-day review;
+    new case items are planned piecemeal; the monthly sample only fires on the 1st; band "Started" with nothing seen;
+    ability replays only the latest try; same-day plans can differ (async class stats).
+  - **Merge order:** #80, then #81 (Codex merges `claude/boards-hub` and reruns the build instead of resolving the
+    page). #83 and #87 touch only their unit folders and can merge any time after their fixes. Each only after its
+    fix round.
+- **#87 (T-03 perio, arrived during the session):** reviewed the same way (`tools/boards/notes-sheet.js`). Scripted
+  checks pass and the notes keep their qualifiers, but one statement is wrong (Cairo recession types "do not predict
+  root coverage"), ~15 author-facing lines, and overlapping concepts (three on PH-5). Cases: two outlines where an
+  item keyed on access flap or one furcation technique conflicts with EFP's regeneration rule for mandibular molars
+  with Class II furcations (SX-1/SX-2/PR-6), an abscess and necrotizing disease in one box, a gingivitis case keyed on
+  the periodontitis steps, a missing enlargement finding. Fix prompt in `reviews/session-6.md`. Branched from current
+  `claude/boards-hub`; touches only `src/boards/units/perio/`, so it merges any time after its fixes.
+- **T-06 brief written** (`tasks/T-06.md`): the 60 medcx items from the merged blueprint, cases first, ids
+  `b-medcx-0101`-`0160` (0001-0009 are the benchmark's), `checked: null`, a count-check script for quotas, siblings,
+  case order, extra refs and key spread.
+- **Fact and spec notes:** the medcx blueprint's `warfarin-simple-extraction` cites `AC-2` (partial: the 2-3 range is
+  verified, INR-check timing is not; T-06 says so). `PG-5`'s nitrous oxide advice still has no quote (Codex flagged
+  it; add one). `DM-7` now lists `perio` in its `units` (T-03 assigns it to perio-systemic; done in Session 6). A
+  mucogingival fact on Cairo types and expected root coverage (open source) would let the notes say what #87 had to
+  delete. If #80's fix keeps `likely` averaged over practiced items, update BUILD_SPEC 6.4 to say so.
+
+## Session 7: re-review the four PRs, check T-06
+
+1. **Revised #80, #81, #83:** check each against its list in `reviews/session-6.md` (only the changed parts; rerun the
+   acceptance commands and, for #81, the walk-through: `docs/boards/reviews/walk-cards.js`, extended for Practice /
+   New only / Missed / Do it again / phone chart). Tell Sam which are ready, in the order above.
+2. **T-06 (medcx items)** when its PR arrives: code checks first (lint, build `--unit medcx`, the count check), then
+   the checker: `node tools/boards/bench.mjs render --items src/boards/units/medcx/items.js --ids <ids> --out
+   docs/boards/verify/medcx-r1 --name <batch>` in batches of ~10 items (smaller batches cost less: most checker tokens
+   are re-reads of the batch file), a fresh Sonnet subagent per batch with `checker-prompt.md`, and **two passes on
+   every high-risk item** (56 of the 60 slots cite a high-risk fact), taking the union of flags. Budget: ~8.6k tokens
+   per item check at the benchmark's batch size, so up to ~1M for two passes. The writer is Codex (OpenAI) and the
+   checker Claude, so this is the first cross-family check (the benchmark was Claude checking Claude). Then one fix
+   prompt for Codex, and stage 4b (two fresh passes) on every changed item.
+3. **Revised #87 (perio notes)**: check against its list in `reviews/session-6.md` (`node tools/boards/notes-sheet.js
+   perio` makes the sentence and fact sheets). Small fact edit for Claude: the `PG-5` quote.
+4. Next briefs once these land: T-07 `items-pharm` (after #83 merges), `int-notes-home` (after #80 and #81), and
+   `int-mock`. `int-v33` and `int-widget` stay with Claude.
 
 ## Release 1
 

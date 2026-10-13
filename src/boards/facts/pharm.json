@@ -2477,6 +2477,233 @@
     "adex"
    ],
    "recorded": "2026-10-11"
+  },
+  {
+   "id": "PK-3",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Half-life is the time for the serum concentration of a drug to fall by 50% (a 500 mg dose with a 4-hour half-life leaves 250 mg after 4 hours). It helps set the dosing interval: short-half-life drugs need shorter intervals. After about five half-lives a drug is considered functionally eliminated (about 97%).",
+   "conditions": "Assumes first-order elimination; the source does not cover zero-order drugs or steady-state accumulation, so do not key either from this fact. \"Five half-lives = about 97%\" is an approximation. The textbook's 8-hour \"short half-life\" cutoff is its own teaching number; do not key it as a standard definition.",
+   "cites": [
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Half-Life",
+     "quote": "The half-life of a drug is the amount of time it takes for the serum concentration to reduce by 50%."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Half-Life",
+     "quote": "For example, if a client takes a 500 mg tablet with a half-life of 4 hours, then 4 hours after administration, the amount remaining of the drug will be 250 mg."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Half-Life",
+     "quote": "Half-life is important because it helps determine the dosing frequency of a medication."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Half-Life",
+     "quote": "Medications that have a short half-life leave the body quickly, in less than 8 hours, and will need to have short dosing intervals because the concentration quickly drops below the minimum effective concentration."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Half-Life",
+     "quote": "It takes approximately five half-lives for the drug to be considered functionally eliminated (or 97% eliminated) from the body."
+    }
+   ],
+   "see": [
+    "PK-6"
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "pk-basics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PK-4",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Bioavailability is the fraction of the active drug that reaches the systemic circulation unaltered. An IV drug is immediately 100% bioavailable. An oral drug absorbed from the small intestine passes through the portal system to the liver and can be metabolized there before reaching the systemic circulation (first-pass effect), which can lower its bioavailability a lot; some drugs are inactivated so completely that they cannot be given orally.",
+   "conditions": "Hepatic first pass only: do not key gut-wall metabolism, or sublingual, rectal or transdermal bypass, from this fact. Do not key bioavailability values for named drugs from it.",
+   "cites": [
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Bioavailability",
+     "quote": "the fraction of the active form of a drug that reaches system circulation unaltered"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Bioavailability",
+     "quote": "IV medications are immediately 100% bioavailable because there are no barriers to absorption."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "First-pass effect",
+     "quote": "Any medication ingested orally is most commonly absorbed in the small intestine and transported through the portal venous system to the liver"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "First-pass effect",
+     "quote": "After absorption, oral drugs can also be metabolized in the liver before entering systemic circulation, a process called first-pass metabolism."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "First-pass effect",
+     "quote": "The first-pass effect can potentially decrease the bioavailability of a drug significantly."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "First-pass effect",
+     "quote": "In some circumstances, the drug cannot be given orally at all due to being completely inactivated by the first-pass effect."
+    }
+   ],
+   "see": [
+    "PK-5"
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "pk-basics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PK-5",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Drugs in the blood are partly bound to plasma proteins, mainly albumin, and compete for the binding sites. Only the free (unbound) drug acts at its target or crosses into other compartments, so a decrease in protein binding increases the free drug, which can intensify its effects or even cause toxicity. The blood-brain barrier keeps many drugs out of the central nervous system; some drugs cross it readily, such as those that are lipid-soluble or poorly bound to proteins (for example sedatives, anticonvulsants and antianxiety agents), while many antimicrobials cannot.",
+   "conditions": "Key lipid solubility, not low protein binding alone, as the reason a drug crosses the blood-brain barrier. Do not key albumin as lidocaine's binding protein (PK-6).",
+   "cites": [
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "Drugs compete for protein-binding sites within the bloodstream, primarily albumin."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "Only a free drug can act at its target site of action, such as receptors, or cross into other fluid compartments within the body"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "If there is a decrease in the plasma protein binding, this increases the amount of free drug available."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "This will intensify the effects of the drug and may even lead to toxicity"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "The blood–brain barrier is a protective system that prevents many drugs (and foreign invaders or poisons) from entering the central nervous system."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "Some drugs readily cross the blood–brain barrier, such as those that are lipid-soluble or poorly bound to proteins"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Distribution",
+     "quote": "sedatives, anticonvulsants, and antianxiety agents); however, many antimicrobials are ineffective against central nervous system infections because they are unable to cross the blood–brain barrier."
+    }
+   ],
+   "see": [
+    "PK-4"
+   ],
+   "units": [
+    "pharm"
+   ],
+   "topic": "pk-basics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PK-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Drug metabolism happens mainly in the liver (the primary site of CYP activity), and drugs are removed mainly through the kidneys, so liver or kidney dysfunction (and the decline of both with age) can cause drug accumulation and toxicity; chronic kidney disease may increase a drug's action and duration, often needing dose adjustment. Example: lidocaine (FDA label) has an elimination half-life of about 1.5 to 2 hours after IV bolus, prolonged two-fold or more in liver dysfunction; renal dysfunction does not change lidocaine kinetics but may let its metabolites accumulate. At 1 to 4 µg/mL, 60 to 80% of lidocaine is protein bound, and the bound fraction falls as the concentration rises.",
+   "conditions": "The lidocaine half-life is from IV bolus studies in the label. Do not key a dental lidocaine dose reduction for liver disease from this fact; dosing rules live in the LA and LIV facts. Never key kidney disease as prolonging lidocaine's half-life. Do not key albumin as lidocaine's binding protein.",
+   "cites": [
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Metabolism",
+     "quote": "This process occurs primarily in the liver by enzymes that change medications into inactive forms of the drug"
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Metabolism",
+     "quote": "Cytochrome P450 (CYP) enzymes, for example, aid in the metabolism of drugs, and the liver is the primary site for CYP activity."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Excretion",
+     "quote": "Although the removal of a drug occurs primarily through the renal system, it may also occur through the lungs, skin, bile, or feces."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Special populations",
+     "quote": "As clients age, they experience a decline in both kidney and liver function, and the nurse must be alert to the possibility that the metabolism and excretion of drugs can be affected."
+    },
+    {
+     "src": "openstax-pharm-2-2",
+     "loc": "Excretion",
+     "quote": "Renal disorders such as chronic kidney disease may increase a drug’s action and duration, and clients will often need to have dosage adjustments to prevent toxicity."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Clinical pharmacology",
+     "quote": "the elimination half-life of this agent is typically 1.5 to 2.0 hours."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Clinical pharmacology",
+     "quote": "The half-life may be prolonged two-fold or more in patients with liver dysfunction."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Clinical pharmacology",
+     "quote": "Renal dysfunction does not affect lidocaine kinetics but may increase the accumulation of metabolites."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Clinical pharmacology",
+     "quote": "At concentration of 1 to 4 µg of free base per mL, 60 to 80 percent of lidocaine is protein bound."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Clinical pharmacology",
+     "quote": "The plasma binding of lidocaine is dependent on drug concentration, and the fraction bound decreases with increasing concentration."
+    }
+   ],
+   "see": [
+    "PK-3",
+    "PK-1",
+    "LA-1"
+   ],
+   "units": [
+    "pharm",
+    "anes"
+   ],
+   "topic": "pk-basics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
   }
  ]
 }
