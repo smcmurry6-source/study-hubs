@@ -101,6 +101,18 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   `shRanks.preview("tier", 3)` (Silver -> Gold), `shRanks.preview("level", 4, 2)` (Gold I -> II). `sw.js` -> `sh-v14`,
   CI syntax check and About page updated. No schema change.
 
+- **2026-10-13 (Timmy Tooth: holiday outfits and a lot more to say, Claude Code)** — `widget/pet.js`. **Outfits**: every
+  holiday has 3 outfits (Halloween 4) and the fall weeks between holidays have 3, replacing the single hat (`OUTFITS`,
+  28 in all). He wears the next one each time a page loads (`sh_pet_outfit_<season>`; first visit random). An outfit can
+  draw four layers in `art()`: `back` (cape, wings, tail feathers), `face` (glasses, a nose, fangs; may depend on mood),
+  `top` (hats; tips with `do-hat`, now wobbles with him) and `prop` (in his left hand, swings with that arm on
+  `do-cheer`). Each has `say` lines. **Lines**: 73 jokes (was 32), 30 true tooth facts, 30 musings, greetings and
+  small talk by time of day / weekday / month, situational lines (streak, big day, sharp day, second visit, away 3+ days
+  via `simulate().away`, exam in 2-7 days, adoption milestones once that day `sh_pet_anniv`, his house upgrades),
+  larger holiday pools, comeback / streak-over / long-session / nap / tickle pools. Everything is dealt from shuffled
+  decks (`deal()`), and hellos pick by weight (`smallTalk()`/`choose()`), so he talks no more often than before.
+  `tools/ci/syntax.js` now checks `widget/pet.js`. About page Parts 6 and 8 updated. No schema change.
+
 - **2026-10-13 (lessons audit, Claude Code)** — Two days before PCD Exam 3. **Select-all options now show a tick box**
   that fills when picked and stays after grading (green right, red wrong), in `pcd-exam3`, `msk-exam4` and `occlusion`
   (CSS only, `.qcard-choice[data-act="multi"]`), from PCD report #14 ("not very clear what options you have selected";
