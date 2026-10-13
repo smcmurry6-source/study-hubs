@@ -1,0 +1,44 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Options B and C both start with \"Now\", while A and D both delay. A test-wise student can lean toward \"now\" from that pattern alone. C also answers \"how\" (without radiographs or anesthesia) rather than \"when\", so it does not fit with the other timing options.",
+        "suggestion": "Replace C with another timing option, e.g. \"After delivery; give an analgesic and antibiotic until then\". That keeps four parallel 'when' answers and removes the 'Now' pairing."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The case fits symptomatic irreversible pulpitis with symptomatic apical periodontitis (percussion tenderness, widened PDL). The explanation names only the pulpitis. That does not change the key, but the full diagnosis would be more accurate.",
+        "suggestion": "In the explanation, say \"symptomatic irreversible pulpitis with symptomatic apical periodontitis\"."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "medium",
+        "detail": "B is the only option that mentions coordinating with the physician. For a child on chemotherapy with an abscess, \"coordinate with the physician\" is the safe answer at almost any blood count. Students can pick B without knowing the AAPD 60,000/mm3 threshold, which is the point the item means to test (55,000 vs 50,000 vs 60,000). A, C and D also each end with a \"; reason\" clause and B does not, so B looks different from the rest.",
+        "suggestion": "Make C include coordination too, so the only thing that separates B from C is the setting and the threshold. For example, C: \"Confirm with his oncologist, then extract in the office with local hemostatic measures; his platelets are above 50,000/mm3\". Give B a matching clause as well: \"...; his platelets are below 60,000/mm3\"."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "C is the right answer under the 50,000/mm3 floor that many teaching sources use. The item is fair only because the stem names AAPD; without that, two answers would be defensible. The patient also has a fluctuant swelling, and B says nothing about managing the infection (antibiotics, drainage) while the hospital extraction is arranged.",
+        "suggestion": "Keep the AAPD wording in the stem. In the explanation, add that antibiotic therapy and drainage are agreed with the oncologist while the hospital extraction is set up."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "The units are written \"mm3\" rather than with a superscript.",
+        "suggestion": "Write /mm³ (or /µL) throughout."
+      }
+    ]
+  }
+]

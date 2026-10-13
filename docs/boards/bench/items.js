@@ -237,18 +237,18 @@ const items = [
       'Fluctuant buccal swelling next to tooth 30; periapical radiolucency at both roots',
       'Blood counts drawn this morning: platelets 55,000/mm3; absolute neutrophil count 1,600/mm3'] },
   stem: 'Following the AAPD best practices for patients receiving immunosuppressive therapy, which is the most appropriate plan for tooth 30?',
-  choices: ['Coordinate with his physician and extract in a hospital setting with planned supportive measures',
-    'Extract today in the office with local hemostatic measures; his platelets are above 50,000/mm3',
-    'Extract today after a single dose of amoxicillin; his neutrophils are below 2,000/mm3',
+  choices: ['Plan with his physician, then extract in a hospital with supportive measures; his platelets are below 60,000/mm3',
+    'Confirm with his oncologist, then extract in the office with local hemostatic measures; his platelets are above 50,000/mm3',
+    'Give a single dose of amoxicillin and extract today in the office; his neutrophils are below 2,000/mm3',
     'Defer all dental treatment until chemotherapy ends; elective care waits during immunosuppression'],
   answer: 0,
-  ex: 'Below 60,000 platelets/mm3, the AAPD best practices defer elective care and avoid invasive procedures when possible; when treatment is medically necessary, it belongs in a hospital setting after the dentist and physician agree on supportive measures such as platelet transfusion. An abscessed, nonrestorable tooth with swelling is a dental emergency, so it cannot wait for chemotherapy to end. His neutrophil count (1,600/mm3) falls in the AAPD band where the dentist uses clinical judgment (1,000-2,000/mm3). The tempting wrong answer uses 50,000/mm3, a platelet floor many teaching sources give; the question names the AAPD guidance, which uses 60,000.',
+  ex: 'Below 60,000 platelets/mm3, the AAPD best practices defer elective care and avoid invasive procedures when possible; when treatment is medically necessary, it belongs in a hospital setting after the dentist and physician agree on supportive measures such as platelet transfusion. An abscessed, nonrestorable tooth with swelling is a dental emergency, so it cannot wait for chemotherapy to end. His neutrophil count (1,600/mm3) falls in the AAPD band where the dentist uses clinical judgment (1,000-2,000/mm3). While the hospital visit is arranged, antibiotic coverage for the infection is decided with the medical team. The tempting wrong answer uses 50,000/mm3, a platelet floor many teaching sources give; the question names the AAPD guidance, which uses 60,000.',
   why: ['Correct. Under 60,000/mm3, AAPD places medically necessary care in a hospital setting, after supportive measures such as platelet transfusion are planned with the physician.',
-    '50,000/mm3 is a common teaching floor, but the AAPD guidance named in the question treats counts under 60,000/mm3 as needing hospital-based care.',
-    'A neutrophil count of 1,000-2,000/mm3 calls for clinical judgment under AAPD, and an antibiotic dose does nothing about his low platelets.',
+    'Talking to the oncologist is right, but 50,000/mm3 is a common teaching floor; the AAPD guidance named in the question treats counts under 60,000/mm3 as needing hospital-based care.',
+    'A neutrophil count of 1,000-2,000/mm3 calls for clinical judgment under AAPD; the central line is a question for the oncologist, not a reason for a routine single dose; and an antibiotic does nothing about his low platelets.',
     'An abscessed, swollen, nonrestorable tooth is an emergency, not elective care; AAPD has the physician help plan its treatment rather than waiting out chemotherapy.'],
   cue: 'AAPD chemo counts: platelets under 60,000 = hospital + physician; ANC 1,000-2,000 = judgment; ANC under 1,000 = defer elective care.',
-  refs: ['CH-6', 'CH-5', 'CH-3'], cc: 'CC8', cc2: ['CC9'], fk: 'FK6', fk2: ['FK5'], cog: 2, diff: 3, concept: 'chemo-dental-thresholds', sec: 'medcx-cancer-mronj', phase: 'plan' },
+  refs: ['CH-6', 'CH-5', 'CH-3', 'CH-4'], cc: 'CC8', cc2: ['CC9'], fk: 'FK6', fk2: ['FK5'], cog: 2, diff: 3, concept: 'chemo-dental-thresholds', sec: 'medcx-cancer-mronj', phase: 'plan' },
 
 { ...base, id: 'b-medcx-0009', lec: 'medcx', bench: 'ambiguity',
   pbox: { patient: 'Female, 29 years old', cc: '"My tooth has been throbbing for three days and kept me up all night." (3 days)',
@@ -259,7 +259,7 @@ const items = [
   choices: ['Now, during the first trimester', 'In the second trimester, about 4 weeks from now',
     'Now, but without radiographs or local anesthesia', 'Once her obstetrician has given written clearance'],
   answer: 0,
-  ex: 'Symptomatic irreversible pulpitis is a dental emergency. The ADA and ACOG agree that emergency care such as root canal treatment can be done safely during pregnancy, that radiographs and local anesthesia are safe at any point, and that delaying treatment can make problems worse. The tempting wrong answer is waiting for the second trimester, a convention for elective care that does not apply to an emergency.',
+  ex: 'Symptomatic irreversible pulpitis with symptomatic apical periodontitis is a dental emergency. The ADA and ACOG agree that emergency care such as root canal treatment can be done safely during pregnancy, that radiographs and local anesthesia are safe at any point, and that delaying treatment can make problems worse. The tempting wrong answer is waiting for the second trimester, a convention for elective care that does not apply to an emergency.',
   why: ['Correct. Emergency treatment is safe in any trimester; radiographs and local anesthesia are safe at any point, and delay risks a more complex problem.',
     'Waiting is not needed for emergency care; "second trimester" is a convention for elective treatment.',
     'Radiographs and local anesthesia are safe at any point in pregnancy; root canal treatment needs both.',
@@ -331,9 +331,10 @@ const cases = [
 ];
 
 // Verification record (stage 4/4b): two independent checker passes, both pass (docs/boards/bench/recheck-*).
-const CHECKED = { 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2,
+const CHECKED = { 'b-medcx-0009': [2, '2026-10-13'], 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2,
   'b-anes-0001': 1, 'b-anes-0002': 1, 'b-anes-0003': 1, 'b-endo-0001': 1, 'b-medcx-0002': 1, 'b-medcx-0003': 1, 'b-medcx-0005': 1, 'b-pharm-0001': 1, 'b-pharm-0004': 1, 'b-pharm-0003': 4 };
-for (const it of items) if (CHECKED[it.id]) it.checked = { on: '2026-10-11', by: 'claude-sonnet subagent x2 (same family as writer)', round: CHECKED[it.id] };
+for (const it of items) if (CHECKED[it.id]) { const [round, on] = [].concat(CHECKED[it.id], '2026-10-11');
+  it.checked = { on, by: 'claude-sonnet subagent x2 (same family as writer)', round }; }
 
 // Spread the authored key position (BUILD_SPEC 4.7 rule 9): rotate options of these items before export.
 const ROT = { 'b-medcx-0002': 1, 'b-medcx-0003': 2, 'b-medcx-0005': 3, 'b-medcx-0006': 1, 'b-medcx-0007': 2, 'b-medcx-0008': 3, 'b-pharm-0002': 2, 'b-pharm-0004': 1, 'b-perio-0001': 2, 'b-endo-0001': 1, 'b-pharm-0003': 3 };

@@ -1091,8 +1091,8 @@
    "id": "PR-1",
    "status": "verified",
    "risk": "medium",
-   "claim": "Tooth-prognosis systems weigh tooth-level factors, and some also weigh patient-level factors. The conventional categories are good, fair, poor, questionable and hopeless. McGuire and Nunn (1996) assign prognosis from clinical attachment level, furcation involvement, mobility, crown-to-root ratio and root form, without patient factors. Kwok and Caton (2007) assign one of four categories and add general (patient) factors such as compliance, plaque control, smoking and diabetes to local factors such as probing depth, attachment loss, plaque-retentive anatomy, trauma from occlusion and habits, and mobility.",
-   "conditions": "The quotes do not name Kwok and Caton's four categories, so don't key their category names. The quote listing good/fair/poor/questionable/hopeless calls them the conventional categories without naming a system. Sources: two open-access J Clin Periodontol/Clin Oral Investig studies describing the systems, not the original 1996/2007 papers.",
+   "claim": "Tooth-prognosis systems weigh tooth-level factors, and some also weigh patient-level factors. The conventional categories are good, fair, poor, questionable and hopeless. The McGuire and Nunn (1996) system includes clinical attachment level, furcation involvement, mobility, crown-to-root ratio and root form to assign prognosis. Kwok and Caton (2007) assign one of four categories and add general (patient) factors such as compliance, plaque control, smoking and diabetes to local factors such as probing depth, attachment loss, plaque-retentive anatomy, trauma from occlusion and habits, and mobility.",
+   "conditions": "The quotes do not name Kwok and Caton's four categories, so don't key their category names. The quote listing good/fair/poor/questionable/hopeless calls them the conventional categories without naming a system. Don't key whether the McGuire and Nunn system leaves out patient factors: a 2022 comparison paper says so, but the original 1996 papers (not opened here) also analyzed patient-level parameters such as smoking. Sources: two open-access J Clin Periodontol/Clin Oral Investig studies describing the systems, not the original 1996/2007 papers.",
    "cites": [
     {
      "src": "jcp-prognosis-model-2018",
@@ -1113,11 +1113,6 @@
      "src": "cloi-toothloss-tool-2022",
      "loc": "Discussion",
      "quote": "A report by Kwok and Caton (2007) considered general (compliance, plaque accumulation, smoking, diabetes, and others) and local factors (PPD, attachment loss, anatomic plaque-retentive factors, trauma from occlusion and habits, mobility)"
-    },
-    {
-     "src": "jcp-prognosis-systems-2022",
-     "loc": "Introduction",
-     "quote": "Furthermore, patient factors were not considered."
     }
    ],
    "see": [
@@ -1267,6 +1262,16 @@
      "src": "jcp-prognosis-model-2018",
      "loc": "Discussion",
      "quote": "The simultaneous impact of smoking and bruxism might be much more relevant than previously suspected"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "Only a small percentage of teeth was lost during 10 years of supportive periodontal therapy"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "The risk factors abutment function, diabetes, and the risk indicator BL, FI, and age (≤ 61 vs. > 61) were identified to predict tooth loss."
     }
    ],
    "see": [

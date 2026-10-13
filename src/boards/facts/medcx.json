@@ -2625,6 +2625,11 @@
      "src": "bts-oxygen-2017",
      "loc": "Section C: hypoxaemia in acutely ill patients",
      "quote": "aim at a saturation of 88–92% pending blood gas results but adjust to 94–98% if the PCO 2 is normal"
+    },
+    {
+     "src": "bts-oxygen-2017",
+     "loc": "Table 2: Serious illnesses requiring moderate levels of supplemental oxygen",
+     "quote": "adjust to 94–98% if the PCO 2 is normal (unless there is a history of previous hypercapnic respiratory failure requiring NIV or IMV)"
     }
    ],
    "see": [
@@ -3029,6 +3034,12 @@
    "risk": "high",
    "claim": "Persistent vasovagal bradycardia with hypotension (rare): atropine 0.5 mg counters the vagal slowing and can be repeated up to 3 mg total (Becker, dental emergency kit: sublingual or IM every 5 minutes; Li and Ouanounou, citing the European Resuscitation Council: IV every 3-5 minutes). Doses below 0.5 mg can paradoxically slow the heart further. If the patient is hypotensive with a normal heart rate, atropine is ineffective and a vasopressor such as ephedrine is used instead.",
    "conditions": "Dental CE review (Becker 2014) and narrative review (Li and Ouanounou 2026, citing ERC IV dosing). The AHA 2020 adult bradycardia algorithm uses 1 mg IV (not quoted here): do not key 0.5 mg as wrong or right against 1 mg, and name the source in any stem that keys a dose, route or interval. Ephedrine doses differ (Becker 25 mg IM/sublingual; Li and Ouanounou 5 mg IV up to 50 mg): do not key an ephedrine dose. These drugs are rarely needed (SYN-5).",
+   "stem_names": [
+    "Becker",
+    "European Resuscitation Council",
+    "ERC",
+    "Li and Ouanounou"
+   ],
    "cites": [
     {
      "src": "anesthprog-drugkits-2014",
@@ -3821,7 +3832,7 @@
    "status": "verified",
    "risk": "high",
    "claim": "Platelets and dental surgery: a platelet count of 50,000/uL or more has traditionally been recommended before procedures that may bleed, such as extractions, and in many countries lower counts are corrected by platelet transfusion before surgery. A 2026 systematic review found more postoperative bleeding below 50,000/uL (12.9% vs 4.9%; risk ratio 2.95), mostly after oral surgery, but no evidence that a count under 50,000/uL is itself a contraindication to dental treatment; assess patients individually. For cirrhosis, an expert consensus set the lowest acceptable platelet count at 30 x 10^9/L (30,000/uL) for low-risk and 50 x 10^9/L (50,000/uL) for high-risk procedures; the same experts could not agree whether dental extractions are low- or high-risk.",
-   "conditions": "The review pooled thrombocytopenia from any cause (liver, hematologic, cancer), not only liver disease, and its evidence is case reports, case series, cohort studies and one trial, synthesized without meta-analysis. The NIDCR oncology guide uses 75,000 for invasive dental care during chemotherapy (CH-2, CH-3); state the threshold in the stem or key 50,000 only as the traditionally recommended level. Don't key a cirrhosis platelet threshold specifically for extractions.",
+   "conditions": "The review pooled thrombocytopenia from any cause (liver, hematologic, cancer), not only liver disease. Its evidence is case reports, case series, cohort studies and one trial; the risk ratio pools the 10 studies that had both a below- and an above-50,000 group with at least one bleed. The NIDCR oncology guide uses 75,000 for invasive dental care during chemotherapy (CH-2, CH-3); state the threshold in the stem or key 50,000 only as the traditionally recommended level. Don't key a cirrhosis platelet threshold specifically for extractions.",
    "data": {
     "traditional_min_platelets_per_uL": 50000,
     "postop_bleeding_rate_below_50k": 0.129,
@@ -3863,6 +3874,11 @@
      "src": "odis-2026-platelets-sr",
      "loc": "Abstract, Results",
      "quote": "Six case reports, four case series, nine cohort studies and one trial fulfilled the inclusion."
+    },
+    {
+     "src": "odis-2026-platelets-sr",
+     "loc": "Results",
+     "quote": "allowing for pooled risk ratio analysis and heterogeneity assessments"
     }
    ],
    "see": [
@@ -4813,6 +4829,16 @@
      "src": "jta-jes-thyroidstorm-2016",
      "loc": "Table 3 (JTA diagnostic criteria), TS1 alternate",
      "quote": "TS1 Alternate combination Thyrotoxicosis and at least three combinations of fever, tachycardia, CHF, or GI/ hapatic manifestations"
+    },
+    {
+     "src": "jta-jes-thyroidstorm-2016",
+     "loc": "Table 3 (JTA diagnostic criteria)",
+     "quote": "5. Gastrointestinal (GI)/hepatic manifestations : nausea , vomiting, diarrhea, or a total bilirubin level ≥ 3.0 mg/dL"
+    },
+    {
+     "src": "jta-jes-thyroidstorm-2016",
+     "loc": "Table 3 (JTA diagnostic criteria), footnote",
+     "quote": "TS1, “Definite” TS; TS2, “Suspected” TS."
     }
    ],
    "see": [
@@ -5153,6 +5179,11 @@
      "src": "ijd-medcompromised-2022",
      "loc": "2.3.3 Adrenal Gland Disorder",
      "quote": "Patients with high risk of adrenal suppression are those who have received a dose of 20 mg or more of cortisone or equivalent for 2 weeks or more within two years of dental treatment"
+    },
+    {
+     "src": "ese-es-giai-2024",
+     "loc": "Definitions",
+     "quote": "Glucocorticoid exposure via oral administration that poses risk for adrenal insufficiency, is expected to at least exceed both of the following thresholds"
     }
    ],
    "see": [
@@ -5174,7 +5205,7 @@
    "id": "END-11",
    "status": "verified",
    "risk": "high",
-   "claim": "Stress dosing for dental and other procedures under local anesthesia (Endocrine Society guidance): the 2024 ESE/Endocrine Society guideline treats minor surgery including any procedure requiring local anesthesia as minor stress for patients with or at risk of glucocorticoid-induced adrenal insufficiency. If not on daily glucocorticoids, or on less than hydrocortisone 40 mg a day: oral hydrocortisone 40 mg that day in three divided doses (e.g., 20 mg one hour before, 10 mg six hours after, 10 mg after a further six hours). On prednisone under 10 mg: raise to 10 mg one hour before; on dexamethasone under 1 mg: raise to 1 mg. Patients already taking hydrocortisone 40 mg, prednisone 10 mg or dexamethasone 1 mg daily or more typically need no increase. For patients with primary adrenal insufficiency on replacement therapy, the 2016 Endocrine Society guideline's sick day rule 1 is to double the routine oral glucocorticoid dose before a small outpatient procedure (e.g., dental work).",
+   "claim": "Stress dosing for dental and other procedures under local anesthesia (Endocrine Society guidance): the 2024 ESE/Endocrine Society guideline treats minor surgery including any procedure requiring local anesthesia as minor stress for patients with or at risk of glucocorticoid-induced adrenal insufficiency. If not on daily glucocorticoids, or on less than hydrocortisone 40 mg a day: oral hydrocortisone 40 mg that day in three divided doses (e.g., 20 mg one hour before, 10 mg six hours after, 10 mg after a further six hours). On prednisone under 10 mg: raise to 10 mg one hour before; on dexamethasone under 1 mg: raise to 1 mg. Patients already taking hydrocortisone 40 mg, prednisone 10 mg or dexamethasone 1 mg daily or more typically need no increase unless there are signs of hemodynamic instability. For patients with primary adrenal insufficiency on replacement therapy, the 2016 Endocrine Society guideline's sick day rule 1 is to double the routine oral glucocorticoid dose before a small outpatient procedure (e.g., dental work).",
    "conditions": "The guideline says practice varies and robust evidence is lacking. Older dental teaching (no supplement for routine nonsurgical dental care; supplement only for major surgery) is not in an open source in this set and conflicts with these guidelines: items must name the Endocrine Society and must not key 'no supplementation is needed for dental care'. Who prescribes the extra dose is not addressed here. Major surgery: END-12.",
    "stem_names": [
     "Endocrine Society",

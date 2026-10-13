@@ -1,0 +1,44 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option A (root canal treatment now but without radiographs or local anesthesia) is not a plausible plan; no examinee would choose it. Because A and D both begin with 'Now', the real choice comes down to D versus waiting (B or C).",
+        "suggestion": "Replace A with a plausible wrong timing that tests the same content, e.g. 'After delivery, managing pain with analgesics until then', and keep its why line about delay making problems worse."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "Percussion tenderness and a widened apical PDL space also make this symptomatic apical periodontitis. The explanation names only symptomatic irreversible pulpitis.",
+        "suggestion": "Say 'symptomatic irreversible pulpitis with symptomatic apical periodontitis' in the explanation."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The item depends on a platelet count of 55,000/mm3, which falls between the AAPD floor (60,000) and the common teaching floor (50,000). Naming AAPD in the stem makes the key defensible, but the item is testing a source-specific cutoff that conflicts with what many students learn, so option C is tempting for reasons of source rather than clinical reasoning.",
+        "suggestion": "Either keep it and accept that it tests the AAPD number specifically, or lower the count (e.g. 40,000/mm3) so that hospital-based care is correct under every common source and the item tests management rather than which threshold applies."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The box lists an indwelling central venous catheter, but neither the explanation nor any why line mentions it. A student might pick D thinking the catheter calls for antibiotic prophylaxis.",
+        "suggestion": "Add a clause to D's why line saying the catheter does not by itself call for a single prophylactic dose; the decision is made with the medical team. Or remove the catheter from the box."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "A is the longest option and the only one that says to coordinate with the physician (the classic safe answer). B, C and D each end in a '; justification' clause and A does not, so A stands apart in structure.",
+        "suggestion": "Give A a matching justification clause (e.g. '; his platelets are below 60,000/mm3') or remove the justification clauses from B-D, and trim A so it is not the longest option."
+      }
+    ]
+  }
+]

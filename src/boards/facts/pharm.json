@@ -1415,8 +1415,8 @@
    "id": "OPI-7",
    "status": "verified",
    "risk": "high",
-   "claim": "Morphine milligram equivalents (MME, CDC 2022 table): multiply the daily dose of each opioid by its conversion factor: codeine 0.15, tramadol 0.2, hydrocodone 1.0, morphine 1.0, oxycodone 1.5, methadone 4.7, hydromorphone 5.0. Examples: hydrocodone 5 mg four times a day = 20 mg/day = 20 MME/day; oxycodone 10 mg twice a day = 20 mg/day = 30 MME/day. Before raising a total dosage to 50 MME/day or more, pause and carefully reassess benefits and risks. The factors are estimates, do not cover buprenorphine, and are not used for dosing in opioid use disorder treatment.",
-   "conditions": "Conversion factors differ between published tables, so a calculation item names CDC 2022. Overdose risk rises continuously with dosage and CDC says no single threshold eliminates risk: 50 MME/day is a point to pause and reassess, not a limit. Don't test the fentanyl, oxymorphone or tapentadol factors.",
+   "claim": "Morphine milligram equivalents (MME, CDC 2022 table): multiply the daily dose of each opioid by its conversion factor: codeine 0.15, tramadol 0.2, hydrocodone 1.0, morphine 1.0, oxycodone 1.5, methadone 4.7, hydromorphone 5.0. Examples: hydrocodone 5 mg four times a day = 20 mg/day = 20 MME/day; oxycodone 10 mg twice a day = 20 mg/day = 30 MME/day. When opioids are continued for subacute or chronic pain, CDC says to use caution at any dosage, generally avoid dosage increases, and pause and carefully reassess benefits and risks before raising the total dosage to 50 MME/day or more. The factors are estimates, do not cover buprenorphine, are not used to work out doses when converting one opioid to another, and are not used for dosing in opioid use disorder treatment.",
+   "conditions": "Conversion factors differ between published tables, so a calculation item names CDC 2022. Overdose risk rises continuously with dosage and CDC says no single threshold eliminates risk: 50 MME/day is a point to pause and reassess for subacute or chronic opioid therapy, not a limit. Don't key an opioid-to-opioid dose conversion from MMEs (CDC says not to use them for that). Don't test the fentanyl, oxymorphone or tapentadol factors.",
    "stem_names": [
     "CDC"
    ],
@@ -1500,6 +1500,16 @@
      "src": "cdc-opioids-2022",
      "loc": "Table (MME conversion factors)",
      "quote": "Oxymorphone 3.0 Tapentadol † 0.4"
+    },
+    {
+     "src": "cdc-opioids-2022",
+     "loc": "Recommendation 4, implementation considerations",
+     "quote": "If opioids are continued for subacute or chronic pain, clinicians should use caution when prescribing opioids at any dosage and should generally avoid dosage increases when possible."
+    },
+    {
+     "src": "cdc-opioids-2022",
+     "loc": "Table footnote",
+     "quote": "Do not use the calculated dose in MMEs to determine the doses to use when converting one opioid to another"
     }
    ],
    "see": [
