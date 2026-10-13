@@ -13,6 +13,13 @@ notes: **edit the JSON, not the markdown**.
 - `<unit>.json`: facts homed in that unit (`pharm`, `medcx`, `anes`, `perio`, `endo`). `units` lists every unit that
   may cite the fact.
 
+## Perio prefixes (`perio.json`)
+
+`PH` health and gingivitis, `BF` biofilm, calculus and modifying factors, `FM` furcation and mobility, `RAD`
+radiographs, `PS` staging and grading, `PA` acute lesions, `MG` mucogingival, `PI` peri-implant, `PR` prognosis, `PT`
+therapy steps and adjuncts (EFP S3), `SX` surgery, `LD` local-delivery labels, `PSY` perio and systemic health, `GE`
+drug-influenced enlargement. Pharmacokinetics basics are `PK-3` onward in `pharm.json` (`PK-1`/`PK-2` are CYP3A).
+
 ## A fact
 
 | Field | Meaning |
@@ -42,5 +49,8 @@ notes: **edit the JSON, not the markdown**.
 - **Blocked sources** (`blocked` set, e.g. the AHA 2021 statement on ahajournals.org): save the PDF from a browser as
   `.cache/boards-sources/<key>.local.pdf`; the checker reads that copy. Until then those cites carry `quote: null`
   and the fact's `conditions` say what rests on them alone.
+  Some blocked sources keep their quotes because a saved copy works: `ada-fda-radiographs-2012` (fda.gov answers
+  Node's fetch with HTTP 401 but serves curl), so `curl -L -o .cache/boards-sources/ada-fda-radiographs-2012.local.pdf
+  https://www.fda.gov/media/84818/download` once before the quote check.
 - **Never** cite a prep company, a forum, a released exam item or a textbook we can't link. Items never reuse 8 or
   more consecutive words from a quote (the copy guard in `tools/boards/lint-items.mjs`).
