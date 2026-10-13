@@ -621,5 +621,554 @@
   "url": "https://www.nhlbi.nih.gov/health/heart-attack/treatment",
   "kind": "html",
   "date": "undated (checked 2026-10-11)"
+ },
+ "jdapm-syncope-2026": {
+  "title": "Syncope in dentistry: risk factors, preventive strategies, and management",
+  "org": "Journal of Dental Anesthesia and Pain Medicine (peer-reviewed review)",
+  "citation": "Li JX, Ouanounou A. J Dent Anesth Pain Med 2026;26(1):29-40",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12865304/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12865304/fullTextXML",
+  "kind": "xml",
+  "date": "2026-02"
+ },
+ "errev-dysfunctional-breathing-2016": {
+  "title": "Dysfunctional breathing: a review of the literature and proposal for classification",
+  "org": "European Respiratory Review (ERS; peer-reviewed review)",
+  "citation": "Boulding R, Stacey R, Niven R, Fowler SJ. Eur Respir Rev 2016;25(141):287-294",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9487208/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9487208/fullTextXML",
+  "kind": "xml",
+  "date": "2016-09"
+ },
+ "ijcpd-asthma-2021": {
+  "title": "Dental Management of Pediatric Patients with Bronchial Asthma",
+  "org": "International Journal of Clinical Pediatric Dentistry (peer-reviewed narrative review)",
+  "citation": "Chhabra K, Sood S, Sharma N, et al. Int J Clin Pediatr Dent 2021;14(5):715-718",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8645623/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8645623/fullTextXML",
+  "kind": "xml",
+  "date": "2021-09"
+ },
+ "esc-syncope-2009": {
+  "title": "Guidelines for the diagnosis and management of syncope (version 2009)",
+  "org": "European Society of Cardiology",
+  "citation": "Task Force for the Diagnosis and Management of Syncope of the ESC. Eur Heart J 2009;30(21):2631-2671",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3295536/",
+  "kind": "html",
+  "date": "2009-11"
+ },
+ "nhlbi-asthma-epr3-2007": {
+  "title": "Expert Panel Report 3: Guidelines for the Diagnosis and Management of Asthma (Full Report 2007)",
+  "org": "NHLBI (National Asthma Education and Prevention Program)",
+  "url": "https://www.nhlbi.nih.gov/sites/default/files/media/docs/EPR-3_Asthma_Full_Report_2007.pdf",
+  "kind": "pdf",
+  "date": "2007-08"
+ },
+ "ijd-medcompromised-2022": {
+  "title": "Management of Medically Compromised Prosthodontic Patients",
+  "org": "International Journal of Dentistry (peer-reviewed narrative review)",
+  "citation": "Ghimire P, Suwal P, Basnet BB. Int J Dent 2022;2022:7510578",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8767402/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8767402/fullTextXML",
+  "kind": "xml",
+  "date": "2022-01"
+ },
+ "anesthprog-preop-pulm-2009": {
+  "title": "Preoperative medical evaluation: part 2: pulmonary, endocrine, renal, and miscellaneous considerations",
+  "org": "Anesthesia Progress (peer-reviewed CE review)",
+  "citation": "Becker DE. Anesth Prog 2009;56(4):135-144",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2796383/",
+  "kind": "html",
+  "date": "2009"
+ },
+ "bts-oxygen-2017": {
+  "title": "BTS guideline for oxygen use in adults in healthcare and emergency settings",
+  "org": "British Thoracic Society",
+  "citation": "O'Driscoll BR, Howard LS, Earis J, Mak V. BMJ Open Respir Res 2017;4:e000170",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5531304/",
+  "kind": "html",
+  "date": "2017-05"
+ },
+ "dm-triazolam": {
+  "title": "Triazolam tablets (Mylan)",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=5add318e-11b9-42f8-b052-0d8cebb32fcf",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/5add318e-11b9-42f8-b052-0d8cebb32fcf.xml",
+  "kind": "spl",
+  "date": "2026-07-10"
+ },
+ "dm-hydrocodone-apap": {
+  "title": "Hydrocodone bitartrate and acetaminophen tablets (SpecGx)",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=d621b526-4d9a-48a9-9a3e-d29d6aea2f31",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/d621b526-4d9a-48a9-9a3e-d29d6aea2f31.xml",
+  "kind": "spl",
+  "date": "2026-04-30"
+ },
+ "aapd-n2o-2023": {
+  "title": "Use of Nitrous Oxide for Pediatric Dental Patients (Best Practices)",
+  "org": "AAPD",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/bp_useofnitrous25.pdf",
+  "kind": "pdf",
+  "date": "2023",
+  "citation": "The Reference Manual of Pediatric Dentistry 2025, pp. 415-422 (latest revision 2023)"
+ },
+ "anesthprog-sedation-resp-2011": {
+  "title": "Recognition and management of complications during moderate and deep sedation part 1: respiratory considerations",
+  "org": "Anesthesia Progress (peer-reviewed CE review)",
+  "citation": "Becker DE, Haas DA. Anesth Prog 2011;58(2):82-92",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3198131/",
+  "kind": "html",
+  "date": "2011"
+ },
+ "anesthprog-drugkits-2014": {
+  "title": "Emergency drug kits: pharmacological and technical considerations",
+  "org": "Anesthesia Progress (peer-reviewed CE review)",
+  "citation": "Becker DE. Anesth Prog 2014;61(4):171-179",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4269359/",
+  "kind": "html",
+  "date": "2014"
+ },
+ "dm-fluticasone-hfa": {
+  "title": "Fluticasone propionate HFA inhalation aerosol (authorized generic of Flovent HFA)",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=99249b31-bf0a-464f-8335-845279350dbe",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/99249b31-bf0a-464f-8335-845279350dbe.xml",
+  "kind": "spl",
+  "date": "2023-09-28"
+ },
+ "niddk-cirrhosis-tx": {
+  "title": "Treatment for Cirrhosis",
+  "org": "NIDDK (NIH)",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/cirrhosis/treatment",
+  "kind": "html",
+  "date": "2023-06 (last reviewed)"
+ },
+ "jgim-2026-cirrhosis-coag": {
+  "title": "Managing Coagulation Abnormalities, Bleeding, and Thrombosis in Patients with Cirrhosis",
+  "org": "Peer-reviewed review",
+  "citation": "Tripodi A, La Mura V, Piscaglia F, et al. J Gen Intern Med 2026;41(10):2937-2946",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13421529/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13421529/fullTextXML",
+  "kind": "xml",
+  "date": "2026-05-07"
+ },
+ "sdj-2024-renal-dental": {
+  "title": "Dental management of patients with renal diseases or undergoing renal transplant",
+  "org": "Peer-reviewed narrative review",
+  "citation": "Albagieh H, Alosimi A, Aldhuhayan A, et al. Saudi Dent J 2024;36(2):270-276",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10897630/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10897630/fullTextXML",
+  "kind": "xml",
+  "date": "2024-01-09"
+ },
+ "dm-cyklokapron": {
+  "title": "Cyklokapron (tranexamic acid) injection",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=6e89a7d9-4da4-42aa-b7f8-c602c24eefe5",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/6e89a7d9-4da4-42aa-b7f8-c602c24eefe5.xml",
+  "kind": "spl",
+  "date": "2025-09-03"
+ },
+ "odis-2026-platelets-sr": {
+  "title": "Platelet Levels Associated With Bleeding Risk for Dental Interventions: A Systematic Review",
+  "org": "Peer-reviewed systematic review",
+  "citation": "Lim GXD, Al Sarraf F, Cho H, Kumar N. Oral Dis 2026;32(6):1506-1517",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13457668/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13457668/fullTextXML",
+  "kind": "xml",
+  "date": "2026-01-29"
+ },
+ "niddk-hemodialysis": {
+  "title": "Hemodialysis",
+  "org": "NIDDK (NIH)",
+  "url": "https://www.niddk.nih.gov/health-information/kidney-disease/kidney-failure/hemodialysis",
+  "kind": "html",
+  "date": "2018-01 (last reviewed)"
+ },
+ "haem-2025-dental-sr": {
+  "title": "Dental Management for People With Congenital Haemophilia: A Systematic Review of the Existing Dental Recommendations",
+  "org": "Peer-reviewed systematic review",
+  "citation": "Kumar M, Badagabettu S, Pai KM, et al. Haemophilia 2025;31(5):830-839",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12462548/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12462548/fullTextXML",
+  "kind": "xml",
+  "date": "2025-08-21"
+ },
+ "wfh-hemophilia-2020": {
+  "title": "WFH Guidelines for the Management of Hemophilia, 3rd edition",
+  "org": "World Federation of Hemophilia",
+  "citation": "Srivastava A, Santagostino E, Dougall A, et al. Haemophilia 2020;26(Suppl 6):1-158. doi:10.1111/hae.14046",
+  "url": "https://www1.wfh.org/publications/files/pdf-1863.pdf",
+  "kind": "pdf",
+  "date": "2020-08"
+ },
+ "dm-ddavp-inj": {
+  "title": "DDAVP (desmopressin acetate) injection",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=651f6fee-a2c7-431b-8d5d-58b156c72244",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/651f6fee-a2c7-431b-8d5d-58b156c72244.xml",
+  "kind": "spl",
+  "date": "2022-09-28"
+ },
+ "nkf-hd-access": {
+  "title": "Hemodialysis Access",
+  "org": "National Kidney Foundation",
+  "url": "https://www.kidney.org/kidney-topics/hemodialysis-access",
+  "kind": "html",
+  "date": "2026-08-20"
+ },
+ "ash-vwd-2021": {
+  "title": "ASH ISTH NHF WFH 2021 guidelines on the management of von Willebrand disease",
+  "org": "ASH / ISTH / NHF / WFH",
+  "citation": "Connell NT, Flood VH, Brignardello-Petersen R, et al. Blood Adv 2021;5(1):301-325",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7805326/",
+  "kind": "html",
+  "date": "2021-01-12"
+ },
+ "chr-2026-cirrhosis-pain": {
+  "title": "Navigating Chronic Pain in Patients with Cirrhosis: Unique Analgesic Considerations and Non-Pharmacologic Options",
+  "org": "Peer-reviewed review",
+  "citation": "Deng LX, Rubin JB. Curr Hepatol Rep 2026;25(1):15",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13135597/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13135597/fullTextXML",
+  "kind": "xml",
+  "date": "2026-05-02"
+ },
+ "niddk-ckd-managing": {
+  "title": "Managing Chronic Kidney Disease",
+  "org": "NIDDK (NIH)",
+  "url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/managing",
+  "kind": "html",
+  "date": "2016-10 (last reviewed)"
+ },
+ "hepatmon-2014-analgesics": {
+  "title": "The therapeutic use of analgesics in patients with liver cirrhosis: a literature review and evidence-based recommendations",
+  "org": "Peer-reviewed literature review",
+  "citation": "Imani F, Motavaf M, Safari S, Alavian SM. Hepat Mon 2014;14(10):e23539",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4250965/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4250965/fullTextXML",
+  "kind": "xml",
+  "date": "2014-10-11"
+ },
+ "jcm-2026-ckd-oral": {
+  "title": "The Impact of Chronic Kidney Disease on Oral Health: A Narrative Review",
+  "org": "Peer-reviewed narrative review",
+  "citation": "Kes PM, Krndelj A, Juric S, et al. J Clin Med 2026;15(13):4940",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13361670/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13361670/fullTextXML",
+  "kind": "xml",
+  "date": "2026-06-25"
+ },
+ "dm-tylenol-es": {
+  "title": "Tylenol Extra Strength (acetaminophen 500 mg) tablets, OTC Drug Facts label",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=103d109d-f520-409c-8da2-eb6b0fbec891",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/103d109d-f520-409c-8da2-eb6b0fbec891.xml",
+  "kind": "spl",
+  "date": "2026-07-22"
+ },
+ "nhlbi-bleeding-tx": {
+  "title": "Bleeding Disorders: Treatment",
+  "org": "NHLBI (NIH)",
+  "url": "https://www.nhlbi.nih.gov/health/bleeding-disorders/treatment",
+  "kind": "html",
+  "date": "2023-08-07"
+ },
+ "kdigo-ckd-2024": {
+  "title": "KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease",
+  "org": "KDIGO (Kidney Disease: Improving Global Outcomes)",
+  "url": "https://kdigo.org/wp-content/uploads/2024/03/KDIGO-2024-CKD-Guideline.pdf",
+  "kind": "pdf",
+  "date": "2024-04",
+  "citation": "KDIGO CKD Work Group. Kidney Int 2024;105(4S):S117-S314"
+ },
+ "ijcpd-scd-2015": {
+  "title": "Oral and Dental Considerations in Management of Sickle Cell Anemia",
+  "org": "International Journal of Clinical Pediatric Dentistry (case report with review)",
+  "citation": "Acharya S. Int J Clin Pediatr Dent 2015;8(2):141-144",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4562049/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4562049/fullTextXML",
+  "kind": "xml",
+  "date": "2015-05"
+ },
+ "nhlbi-scd-symptoms-2024": {
+  "title": "Sickle Cell Disease: Symptoms",
+  "org": "NHLBI",
+  "url": "https://www.nhlbi.nih.gov/health/sickle-cell-disease/symptoms",
+  "kind": "html",
+  "date": "2024-08-20"
+ },
+ "dm-neoral": {
+  "title": "Neoral (cyclosporine) capsules and oral solution, Novartis",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=94461af3-11f1-4670-95d4-2965b9538ae3",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/94461af3-11f1-4670-95d4-2965b9538ae3.xml",
+  "kind": "spl",
+  "date": "2026-08-10"
+ },
+ "jta-jes-thyroidstorm-2016": {
+  "title": "2016 Guidelines for the management of thyroid storm from The Japan Thyroid Association and Japan Endocrine Society (First edition)",
+  "org": "Japan Thyroid Association and Japan Endocrine Society",
+  "url": "https://www.jstage.jst.go.jp/article/endocrj/63/12/63_EJ16-0336/_article",
+  "fetch": "https://www.jstage.jst.go.jp/article/endocrj/63/12/63_EJ16-0336/_pdf",
+  "kind": "pdf",
+  "date": "2016-12",
+  "citation": "Satoh T, Isozaki O, Suzuki A, et al. Endocr J 2016;63(12):1025-1064"
+ },
+ "dm-prograf": {
+  "title": "Prograf (tacrolimus) capsules, injection and granules, Astellas",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=7f667de1-9dfa-4bd6-8ba0-15ee2d78873b",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/7f667de1-9dfa-4bd6-8ba0-15ee2d78873b.xml",
+  "kind": "spl",
+  "date": "2023-08-25"
+ },
+ "anemia-scd-dental-2021": {
+  "title": "Orofacial Manifestation and Dental Management of Sickle Cell Disease: A Scoping Review",
+  "org": "Anemia (peer-reviewed scoping review)",
+  "citation": "Kakkar M, Holderle K, Sheth M, Arany S, Schiff L, Planerova A. Anemia 2021;2021:5556708",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8556080/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8556080/fullTextXML",
+  "kind": "xml",
+  "date": "2021-10-22"
+ },
+ "aapd-abx-2022": {
+  "title": "Antibiotic Prophylaxis for Dental Patients at Risk for Infection (Best Practices)",
+  "org": "AAPD",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/bp_prophylaxis.pdf",
+  "kind": "pdf",
+  "date": "2022",
+  "citation": "The Reference Manual of Pediatric Dentistry 2025, pp. 564-570 (latest revision 2022)"
+ },
+ "nhlbi-scd-living-2024": {
+  "title": "Sickle Cell Disease: Living With Sickle Cell Disease",
+  "org": "NHLBI",
+  "url": "https://www.nhlbi.nih.gov/health/sickle-cell-disease/living-with",
+  "kind": "html",
+  "date": "2024-08-22"
+ },
+ "bor-scd-2024": {
+  "title": "Validating evidence for the knowledge, management and involvement of dentists in a dental approach to sickle-cell disease",
+  "org": "Brazilian Oral Research (peer-reviewed instrument validation study)",
+  "citation": "Ancillotti LHDSF, Abreu MHNG, Marinho AMCL, Santos MPAD. Braz Oral Res 2024;38:e026",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11376614/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11376614/fullTextXML",
+  "kind": "xml",
+  "date": "2024-04-05"
+ },
+ "dm-synthroid": {
+  "title": "Synthroid (levothyroxine sodium) tablets, AbbVie",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=1e11ad30-1041-4520-10b0-8f9d30d30fcc",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/1e11ad30-1041-4520-10b0-8f9d30d30fcc.xml",
+  "kind": "spl",
+  "date": "2024-02-20"
+ },
+ "cdc-opioids-2022": {
+  "title": "CDC Clinical Practice Guideline for Prescribing Opioids for Pain - United States, 2022",
+  "org": "CDC",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9639433/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9639433/fullTextXML",
+  "kind": "xml",
+  "date": "2022-11-04",
+  "citation": "Dowell D, Ragan KR, Jones CM, Baldwin GT, Chou R. MMWR Recomm Rep 2022;71(No. RR-3):1-95. PMC9639433"
+ },
+ "niddk-hyperthyroid-2021": {
+  "title": "Hyperthyroidism (Overactive Thyroid)",
+  "org": "NIDDK",
+  "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hyperthyroidism",
+  "kind": "html",
+  "date": "2021-08"
+ },
+ "es-pai-2016": {
+  "title": "Diagnosis and Treatment of Primary Adrenal Insufficiency: An Endocrine Society Clinical Practice Guideline",
+  "org": "Endocrine Society",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4880116/",
+  "fetch": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4880116/",
+  "kind": "html",
+  "date": "2016-02",
+  "citation": "Bornstein SR, Allolio B, Arlt W, et al. J Clin Endocrinol Metab 2016;101(2):364-389"
+ },
+ "aapd-immunosupp-2022": {
+  "title": "Dental Management of Pediatric Patients Receiving Immunosuppressive Therapy and/or Head and Neck Radiation (Best Practices)",
+  "org": "AAPD",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/bp_chemo.pdf",
+  "kind": "pdf",
+  "date": "2022",
+  "citation": "The Reference Manual of Pediatric Dentistry 2025, pp. 571-579 (latest revision 2022)"
+ },
+ "niddk-hypothyroid-2021": {
+  "title": "Hypothyroidism (Underactive Thyroid)",
+  "org": "NIDDK",
+  "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hypothyroidism",
+  "kind": "html",
+  "date": "2021-03"
+ },
+ "ata-hypothyroid-2014": {
+  "title": "Guidelines for the Treatment of Hypothyroidism: Prepared by the American Thyroid Association Task Force on Thyroid Hormone Replacement",
+  "org": "American Thyroid Association",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409/",
+  "fetch": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4267409/",
+  "kind": "html",
+  "date": "2014-12",
+  "citation": "Jonklaas J, Bianco AC, Bauer AJ, et al. Thyroid 2014;24(12):1670-1751"
+ },
+ "nhlbi-scd-treatment-2024": {
+  "title": "Sickle Cell Disease: Treatment",
+  "org": "NHLBI",
+  "url": "https://www.nhlbi.nih.gov/health/sickle-cell-disease/treatment",
+  "kind": "html",
+  "date": "2024-09-30"
+ },
+ "ese-es-giai-2024": {
+  "title": "European Society of Endocrinology and Endocrine Society Joint Clinical Guideline: Diagnosis and Therapy of Glucocorticoid-induced Adrenal Insufficiency",
+  "org": "European Society of Endocrinology and Endocrine Society",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11180513/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11180513/fullTextXML",
+  "kind": "xml",
+  "date": "2024-06-01",
+  "citation": "Beuschlein F, Else T, Bancos I, et al. J Clin Endocrinol Metab 2024;109(7):1657-1683"
+ },
+ "dm-apap-codeine": {
+  "title": "Acetaminophen and codeine phosphate tablets (CIII), SpecGx",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=eadc80fa-13c3-471a-a22f-6fe7e1ab290f",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/eadc80fa-13c3-471a-a22f-6fe7e1ab290f.xml",
+  "kind": "spl",
+  "date": "2026-06-12"
+ },
+ "dm-methadone": {
+  "title": "Methadone hydrochloride tablets (CII), SpecGx",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=eddf7077-02fb-4771-9823-31984f4ff2bb",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/eddf7077-02fb-4771-9823-31984f4ff2bb.xml",
+  "kind": "spl",
+  "date": "2026-04-27"
+ },
+ "ada-oral-analgesics": {
+  "title": "Oral Analgesics for Acute Dental Pain (Oral Health Topics)",
+  "org": "ADA",
+  "url": "https://www.ada.org/resources/ada-library/oral-health-topics/oral-analgesics-for-acute-dental-pain",
+  "kind": "html",
+  "date": "2024-02-02"
+ },
+ "ada-sud-guide": {
+  "title": "Helping Dental Professionals Identify and Support Patients with Substance Use",
+  "org": "ADA",
+  "url": "https://www.ada.org/-/media/project/ada-organization/ada/ada-org/files/resources/practice/health-and-wellness/helping_dental_professionals_identify_and_sup.pdf",
+  "kind": "pdf",
+  "date": "2023-08-25"
+ },
+ "dm-tramadol": {
+  "title": "Tramadol hydrochloride tablets (CIV), Teva",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=561f00e5-f69c-4369-ae4d-5eff86c4499f",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/561f00e5-f69c-4369-ae4d-5eff86c4499f.xml",
+  "kind": "spl",
+  "date": "2025-12-31"
+ },
+ "cdc-overdose-response": {
+  "title": "What to Do If You Think Someone Is Overdosing",
+  "org": "CDC",
+  "url": "https://www.cdc.gov/stop-overdose/response/index.html",
+  "kind": "html",
+  "date": "2024-04-02"
+ },
+ "dm-vivitrol": {
+  "title": "Vivitrol (naltrexone for extended-release injectable suspension), Alkermes",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=cd11c435-b0f0-4bb9-ae78-60f101f3703f",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/cd11c435-b0f0-4bb9-ae78-60f101f3703f.xml",
+  "kind": "spl",
+  "date": "2026-05-31"
+ },
+ "dm-naltrexone": {
+  "title": "Naltrexone hydrochloride tablets, SpecGx",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=06ff2d5a-e62b-4fa4-bbdb-01938535bc65",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/06ff2d5a-e62b-4fa4-bbdb-01938535bc65.xml",
+  "kind": "spl",
+  "date": "2026-09-04"
+ },
+ "dm-suboxone": {
+  "title": "Suboxone (buprenorphine and naloxone) sublingual film (CIII), Indivior",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8a5edcf9-828c-4f97-b671-268ab13a8ecd",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/8a5edcf9-828c-4f97-b671-268ab13a8ecd.xml",
+  "kind": "spl",
+  "date": "2025-12-22"
+ },
+ "cancers-orn-extraction-2021": {
+  "title": "Osteoradionecrosis of the Jaws Due to Teeth Extractions during and after Radiotherapy: A Systematic Review",
+  "org": "Peer-reviewed systematic review",
+  "citation": "Lajolo C, Rupe C, Gioco G, et al. Cancers (Basel) 2021;13(22):5798",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8616343/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8616343/fullTextXML",
+  "kind": "xml",
+  "date": "2021-11"
+ },
+ "jcp-prognosis-systems-2022": {
+  "title": "Comparison of the efficacy of periodontal prognostic systems in predicting tooth loss",
+  "org": "Peer-reviewed cohort study",
+  "citation": "Saydzai S, Buontempo Z, Patel P, et al. J Clin Periodontol 2022;49(8):740-748",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9543611/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9543611/fullTextXML",
+  "kind": "xml",
+  "date": "2022-08"
+ },
+ "ijrobp-orn-consensus-2025": {
+  "title": "International Expert-Based Consensus Definition, Classification Criteria, and Minimum Data Elements for Osteoradionecrosis of the Jaw: An Interdisciplinary Modified Delphi Study",
+  "org": "Peer-reviewed international consensus (Delphi)",
+  "citation": "Moreno AC, Watson EE, Humbert-Vidan L, et al. Int J Radiat Oncol Biol Phys 2025;122(2):341-354",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12303726/",
+  "fetch": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12303726/",
+  "kind": "html",
+  "date": "2025-06"
+ },
+ "bdj-hnc-primarycare-2022": {
+  "title": "The role of primary dental care practitioners in the long-term management of patients treated for head and neck cancer",
+  "org": "Peer-reviewed review (UK consultants in restorative dentistry)",
+  "citation": "Kalsi H, McCaul LK, Rodriguez JM. Br Dent J 2022;233(9):765-768",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9650164/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9650164/fullTextXML",
+  "kind": "xml",
+  "date": "2022-11"
+ },
+ "jcp-prognosis-model-2018": {
+  "title": "Introduction of a prediction model to assigning periodontal prognosis based on survival time",
+  "org": "Peer-reviewed multicenter study",
+  "citation": "Martinez-Canut P, Alcaraz J, Alcaraz J Jr, et al. J Clin Periodontol 2018;45(1):46-55",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5767737/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5767737/fullTextXML",
+  "kind": "xml",
+  "date": "2018-01"
+ },
+ "cloi-toothloss-tool-2022": {
+  "title": "Development of a prognostic tool: based on risk factors for tooth loss after active periodontal therapy",
+  "org": "Peer-reviewed cohort study",
+  "citation": "Rahim-Wostefeld S, Kronsteiner D, ElSayed S, et al. Clin Oral Investig 2022;26(1):813-822",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8791882/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8791882/fullTextXML",
+  "kind": "xml",
+  "date": "2022-01"
+ },
+ "bmcoh-rt-oral-2026": {
+  "title": "Radiation-induced oral side effects in head and neck cancer: a scoping review and interdisciplinary recommendations",
+  "org": "Peer-reviewed scoping review",
+  "citation": "Gerlach T, Brunello G, Tenbrink C, et al. BMC Oral Health 2026;26(1):617",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13064208/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13064208/fullTextXML",
+  "kind": "xml",
+  "date": "2026-03"
+ },
+ "jcp-prognosis-approach-2018": {
+  "title": "A comprehensive approach to assigning periodontal prognosis",
+  "org": "Peer-reviewed case series",
+  "citation": "Martinez-Canut P, Llobell A. J Clin Periodontol 2018;45(4):431-439",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5900888/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5900888/fullTextXML",
+  "kind": "xml",
+  "date": "2018-04"
  }
 }

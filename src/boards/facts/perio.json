@@ -1086,6 +1086,331 @@
     "adex"
    ],
    "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth-prognosis systems weigh tooth-level factors, and some also weigh patient-level factors. The conventional categories are good, fair, poor, questionable and hopeless. McGuire and Nunn (1996) assign prognosis from clinical attachment level, furcation involvement, mobility, crown-to-root ratio and root form, without patient factors. Kwok and Caton (2007) assign one of four categories and add general (patient) factors such as compliance, plaque control, smoking and diabetes to local factors such as probing depth, attachment loss, plaque-retentive anatomy, trauma from occlusion and habits, and mobility.",
+   "conditions": "The quotes do not name Kwok and Caton's four categories, so don't key their category names. The quote listing good/fair/poor/questionable/hopeless calls them the conventional categories without naming a system. Sources: two open-access J Clin Periodontol/Clin Oral Investig studies describing the systems, not the original 1996/2007 papers.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Discussion",
+     "quote": "conventional prognostic categories (good, fair, poor, questionable and hopeless)"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "includes CAL, FI, mobility, crown‐to‐root ratio and initial root form to assign prognosis"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Introduction",
+     "quote": "developed another prognostic system that incorporated several systemic and local factors, assigning one of four prognostic categories to each tooth"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "A report by Kwok and Caton (2007) considered general (compliance, plaque accumulation, smoking, diabetes, and others) and local factors (PPD, attachment loss, anatomic plaque-retentive factors, trauma from occlusion and habits, mobility)"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Introduction",
+     "quote": "Furthermore, patient factors were not considered."
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PR-3",
+    "PR-4"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Prognosis systems are better at predicting which teeth will be kept than which will be lost. In a 5-year cohort in supportive periodontal care, teeth in the worst category were lost 14 to 77 times as often as teeth in the best category, yet most teeth labeled hopeless were still retained: specificity and negative predictive value were good, sensitivity and positive predictive value low. Older studies found that a hopeless prognosis wrongly predicted loss in 19.6% to 38% of cases and a questionable prognosis in 37% to 74%, while a prediction that a tooth would not be lost failed only 0.46% to 2% of the time.",
+   "conditions": "Cohort of compliant maintenance patients (97 patients, UK practice) with few teeth in the worst categories; teach the direction (good specificity, low sensitivity: many hopeless teeth survive with maintenance), not the exact multipliers.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Abstract",
+     "quote": "could identify teeth at higher risk of being lost during 5 years of SPC"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Abstract",
+     "quote": "Although specificity and negative predictive values were good, low sensitivity and positive predictive values were detected for all systems."
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "The risk of tooth loss for teeth in the worst prognostic category was 14–77 times higher than teeth in the best prognostic category"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "the majority of “hopeless” teeth were still retained"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "For hopeless prognosis, tooth loss due to periodontal disease (TLPD) prediction failed, implying a False +, in between 19.6% and 38% of the cases"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "These percentages were much higher for questionable prognosis: the TLPD prediction failed in between 37% and 74% of cases"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "This prediction only failed between 0.46% and 2% of times"
+    }
+   ],
+   "see": [
+    "PR-1",
+    "PR-5"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth-level factors that predict tooth loss in treated periodontitis patients: bone loss, furcation involvement, probing depth, mobility, tooth type, crown-to-root ratio, and use of the tooth as an abutment. In a 10-year maintenance cohort, abutment function, diabetes, bone loss, furcation involvement and age predicted tooth loss. Even teeth with very advanced bone loss (over 75%) have been kept for 10 years or more.",
+   "conditions": "Prediction models from cohort studies (Germany, Spain), not guideline statements. The direction of the age effect differs between studies; don't key age.",
+   "cites": [
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Introduction",
+     "quote": "variables such as bone loss (BL), furcation involvement (FI), probing pocket depth (PPD), number of teeth lost (due to periodontitis), and patient-related factors such as smoking, age, and diabetes affect tooth retention"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Methods",
+     "quote": "six TRFs: type of tooth, furcation involvement, probing pocket depth, bone loss, mobility and C/R ratio"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "The risk factors abutment function, diabetes, and the risk indicator BL, FI, and age (≤ 61 vs. > 61) were identified to predict tooth loss."
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "severe periodontal BL (> 75%)"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "several studies have shown that teeth with such BL can be retained over a long period (10 years and more)"
+    }
+   ],
+   "see": [
+    "PR-4",
+    "PR-6",
+    "FM-1",
+    "FM-4"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Patient-level factors that worsen tooth prognosis: a systematic review (cited by a 2018 prediction-model study) found older age and smoking to be the only patient factors clearly associated with tooth loss from periodontitis during maintenance, and diabetes predicted tooth loss in a 10-year maintenance cohort. A 2018 prediction model also used heavy smoking, bruxism, severe periodontitis and the baseline number of teeth as patient-related predictors; its authors suggest the combined impact of smoking and bruxism may matter more than previously suspected.",
+   "conditions": "The systematic review (Chambrone 2010) is cited by the model paper, not opened here. Age direction differs between studies (older age in the review, younger age in the Martinez-Canut model); don't key age. Smoking and HbA1c also set the periodontitis grade (PS-10).",
+   "cites": [
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Introduction",
+     "quote": "the only patient‐related factors (PRFs) that are clearly associated with TLPD were older age and smoking"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Introduction",
+     "quote": "patient-related factors such as smoking, age, and diabetes affect tooth retention"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Methods",
+     "quote": "Five PRFs: age, severe periodontitis, heavy smoking, bruxism and baseline number of teeth"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Discussion",
+     "quote": "The simultaneous impact of smoking and bruxism might be much more relevant than previously suspected"
+    }
+   ],
+   "see": [
+    "PR-3",
+    "PS-10",
+    "PT-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "EFP S3 guideline: at any step of periodontal therapy, extraction may be considered for teeth judged to have a hopeless prognosis. The authors of a 2022 cohort study read this as discouraging early extraction of questionable teeth, so telling questionable from hopeless teeth apart is a key prognostic decision.",
+   "conditions": "The sentence on questionable teeth is the cohort authors' reading of the EFP guideline (Sanz 2020), not a verbatim guideline recommendation.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Introduction, steps of therapy",
+     "quote": "In any of the steps of therapy, tooth extraction may be considered if the affected teeth are considered with a hopeless prognosis."
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "it is crucial to distinguish between questionable and hopeless teeth, as early extraction of questionable teeth is discouraged, and only “hopeless” teeth should be extracted"
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PT-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "EFP S3 guideline (R3.10, grade A): molars with Class II or III furcation involvement and residual pockets should receive periodontal therapy, and furcation involvement is no reason for extraction. After treatment, furcation-involved molars showed reasonable survival over 4 to 30.8 years, better with Class II than Class III involvement. For mandibular molars with residual pockets and Class II furcation involvement, periodontal regenerative surgery is recommended (R3.11).",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10",
+     "quote": "We recommend that molars with Class II and III furcation involvement and residual pockets receive periodontal therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10",
+     "quote": "Furcation involvement is no reason for extraction."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10, clinical relevance",
+     "quote": "Following treatment, reasonable survival rates were observed over 4–30.8 years. Overall, the observed tooth survival rates were better in Class II furcation involvement than Class III."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.11",
+     "quote": "We recommend treating mandibular molars with residual pockets associated with Class II furcation involvement with periodontal regenerative surgery."
+    }
+   ],
+   "see": [
+    "FM-1",
+    "FM-2",
+    "PT-4",
+    "PR-3"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-7",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth prognosis is not fixed. Teeth can move between categories as periodontal and restorative status changes (attachment or bone gain, less mobility or furcation involvement), and patient factors such as motivation, stress or diabetes control can change during maintenance. A questionable tooth in a motivated patient with a good overall prognosis can do better than the same tooth in a noncompliant patient with other risk factors. Non-periodontal factors also decide survival: in one 5-year cohort, only 9 of 31 extracted teeth were lost for periodontal reasons (others: fracture, caries, endodontic pathology), so restorability and endodontic status belong in the prognosis.",
+   "conditions": "The 9-of-31 figure comes from one cohort of compliant patients in supportive care; teach the principle, not the number.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "the possibility of moving teeth from one prognostic category to another during follow‐up, according to changes in periodontal and restorative status (for example, attachment/bone gain or reduced mobility or FI), should also be considered"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "patient factors may also vary during maintenance (e.g., changes in stress levels, motivation or in diabetes control), which could have an unexpected impact on the original prognosis"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "a questionable tooth in the mouth of a “good prognosis” and very motivated patient"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "can have a better prognosis than in the mouth of a non‐compliant patient with other risk factors"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Results",
+     "quote": "Reasons for tooth loss during SPC were progressing periodontal disease ( n = 9), tooth fracture ( n = 7), endodontic pathology ( n = 4), caries ( n = 6)"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "only 9 of 31 of extracted teeth were lost for periodontal reasons, emphasizing the importance of a 360° look at the conditions of teeth, including restorability, endodontic status"
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PR-4",
+    "PA-3"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
   }
  ]
 }
