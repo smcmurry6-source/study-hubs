@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 during Session 5)
+# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 5)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -81,7 +81,7 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   radiographs, surgery, local delivery and host modulation. Codex's T-01 fact problems (BP-2 crisis numbers, HIV-2
   units, IE-5 doses, DM-6, PG-2, ORN-3) are all already in those facts' `conditions`; nothing to change.
 
-## Session 5 (2026-10-13, in progress)
+## Session 5 (done 2026-10-13, #82)
 
 - **`facts-perio` done (step 2):** 15 new perio facts (`BF-1`-`BF-5`, `RAD-1`-`RAD-2`, `PT-8`-`PT-11`, `SX-1`-`SX-2`,
   `LD-1`-`LD-2`), plus `EM-11` (CDC seizure "what to avoid") and `PK-3`-`PK-6` (half-life, bioavailability and first
@@ -100,21 +100,32 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   `curl` before the browser; both FDA sources read fine again.
 - **T-03 unblocked.** Follow-ups: when reviewing T-02, check the notes use `PK-3`-`PK-6` (they arrived after the brief);
   the medcx notes' seizure paragraph can now cite `EM-11` (T-01 had to drop "do not restrain").
-- **Codex at the time of writing:** T-04 draft #81, T-05 draft #80 (CI green); no T-02 branch pushed yet. #80 and #81
-  both regenerate `hubs/boards/index.html`: whichever merges second rebuilds it with `node tools/build-boards.js`
-  instead of resolving the conflict by hand.
+- **Codex at the end of Session 5:** T-02 pharm notes = draft #83, T-04 cards = draft #81, T-05 readiness/plan =
+  draft #80 (all into `claude/boards-hub`, none reviewed or merged). T-03 perio notes sent to Codex 2026-10-13 (expect
+  a draft PR from `codex/boards-perio-t03`). #80 and #81 both regenerate `hubs/boards/index.html`: merge one, then
+  have Codex rebase the other and rerun `node tools/build-boards.js` instead of resolving that file by hand.
 
-## Session 5 plan: facts, then medcx items
+## Session 6: review the Codex PRs, then T-06
 
-1. Sam merges this session's PR into `claude/boards-hub` (it includes #78) and starts T-02, T-04 and T-05 in Codex.
-2. Claude: `facts-perio` (BUILD_SPEC 9) plus the small top-ups above (seizure first aid from CDC; pharmacokinetics
-   basics from FDA labeling or an open pharmacology text with a stable URL), same pipeline as Session 3 (drafter,
-   independent verifier, quote check). Then lift the block in T-03.
-3. Brief T-06 `items-medcx` (60 items from `src/boards/units/medcx/blueprint.json`, `checked:null`) for Codex, then
-   the Claude-subagent checker with two passes on high-risk items (`bench/REPORT.md`).
-4. Review T-02/T-04/T-05 PRs as they arrive (same method as T-01: a sheet of each cited sentence beside its fact;
-   for code, run the fixture build in Playwright on desktop and phone).
+Start here. Read `DECISIONS.md`, then only what each step needs. Don't merge anything yourself: write a fix prompt
+for Codex per PR (one block Sam can paste) and tell Sam which PRs are ready to merge and in what order.
+
+1. **#83 (T-02 pharm notes + blueprint).** Same method as T-01 (Session 4): a sheet of every cited sentence in Core
+   and Deep beside the fact it cites; check wording stays inside the fact (qualifiers, `conditions`, `stem_names`),
+   student-facing tone (no "the fact record says"), American English, no 8+ word runs copied from a quote, and the
+   T-02 acceptance checks. Blueprint: section quotas match concept siblings, every case has every number its key
+   needs, and the blueprint check prints `total 60 cases 27` with no `MISMATCH` or `OVER` lines (T-02 acceptance 5). `PK-3`-`PK-6` arrived after the brief: say where the
+   notes should use them.
+2. **#81 (T-04 cards) and #80 (T-05 readiness/plan).** Check out each branch, `node tools/build-boards.js --check`,
+   `node tools/ci/syntax.js`, the boards tests, then the fixture build in Playwright on desktop and phone (screenshots
+   to the scratchpad). Read the diffs for the brief's "do not touch" list and spec drift. Decide the merge order.
+3. **T-03 (perio)** when its PR arrives: same method as #83.
+4. **Brief T-06** `items-medcx` (60 items from `src/boards/units/medcx/blueprint.json`, `checked:null`) for Codex,
+   then the Claude-subagent checker, two passes on high-risk items (`bench/REPORT.md`).
 5. `int-v33` and `int-widget` stay with Claude.
+
+Fact follow-ups: the medcx notes' seizure paragraph can now cite `EM-11`; the CAL arithmetic and peri-implant
+treatment still need an open source.
 
 ## Release 1
 
