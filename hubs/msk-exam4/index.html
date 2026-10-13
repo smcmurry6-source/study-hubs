@@ -607,6 +607,14 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 @media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
 .qcard-choice.is-selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .qcard-choice.is-missed-right{border-color:var(--good);border-style:dashed}
+/* select-all: a tick box on each option so it is obvious what is picked (report #14) */
+.qcard-choice[data-act="multi"]{position:relative;padding-left:40px}
+.qcard-choice[data-act="multi"]::before{content:"";position:absolute;left:12px;top:50%;width:18px;height:18px;margin-top:-9px;box-sizing:border-box;border:2px solid var(--line-strong);border-radius:4px;background:var(--surface)}
+.qcard-choice[data-act="multi"].is-selected{background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+.qcard-choice[data-act="multi"].is-selected::before,.qcard-choice[data-act="multi"].is-correct::before,.qcard-choice[data-act="multi"].is-wrong::before{background:var(--accent);border-color:var(--accent)}
+.qcard-choice[data-act="multi"].is-correct::before{background:var(--good);border-color:var(--good)}
+.qcard-choice[data-act="multi"].is-wrong::before{background:var(--bad);border-color:var(--bad)}
+.qcard-choice[data-act="multi"].is-selected::after,.qcard-choice[data-act="multi"].is-correct::after,.qcard-choice[data-act="multi"].is-wrong::after{content:"";position:absolute;left:18px;top:50%;width:5px;height:10px;margin-top:-7px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .multi-check{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .multi-score{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft)}
 .quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
@@ -794,7 +802,7 @@ mcq('sk-col17','skin','hub','Dr. Herr said the thing to remember about the dermo
   'Type XVII collagen (BP180) is the hemidesmosome protein he named. It is also the bullous pemphigoid antigen, which is why the blister in pemphigoid splits below the basal layer. Type I is the reticular dermis; type IV is the basement membrane itself.');
 mcq('sk-lamellar','skin','deck','Lamellar bodies that contain glycosphingolipids, phospholipids and ceramides are produced by which cells?',
   ['Keratinocytes','Melanocytes','Fibroblasts','Langerhans cells'],
-  'Keratinocytes make lamellar (membrane-coating) bodies from the Golgi and secrete them between the stratum granulosum and stratum corneum, forming the lipid "mortar" of the water barrier.');
+  'Keratinocytes make lamellar (membrane-coating) bodies from the Golgi and secrete them between the stratum granulosum and stratum corneum, forming the lipid "mortar" of the water barrier. Langerhans cells are a different 1-3% of the epidermis: they live in the stratum spinosum and present antigen, and they do not make the barrier lipids.');
 mcq('sk-barrier-site','skin','hub','Where is the lipid content of lamellar bodies released to form the epidermal water barrier?',
   ['Between the stratum granulosum and stratum corneum','Between the stratum basale and the basement membrane','Between the papillary and reticular dermis','Into the lumen of eccrine sweat glands'],
   'The barrier sits between the last two living and dead layers: lamellar body lipids fill the intercellular space, and insoluble proteins line the inner plasma membrane. Water barrier = cell envelope + lipid envelope ("bricks and mortar").');
@@ -986,7 +994,7 @@ mcq('dp-metronidazole','dermpharm','hub','Topical metronidazole helps inflammato
   'The slide: metronidazole acts as an anti-inflammatory agent by a direct effect on neutrophil cellular function, in addition to being anti-infective.');
 mcq('dp-clinda','dermpharm','hub','Clindamycin is a common topical antibiotic for mild to moderate inflammatory acne. What is its mechanism?',
   ['Inhibits bacterial protein synthesis','Inhibits bacterial cell wall synthesis','Disrupts the bacterial cell membrane','Competitively blocks PABA utilization'],
-  'Clindamycin (like erythromycin) inhibits protein synthesis. Note: the slide groups it with the macrolides, but Dr. Fasinu pointed out it is "actually not a macrolide, strictly speaking" (it\'s a lincosamide). Sodium sulfacetamide is the PABA blocker.');
+  'Clindamycin (like erythromycin) inhibits protein synthesis. Note: the slide groups it with the macrolides, but Dr. Fasinu pointed out it is "actually not a macrolide, strictly speaking" (it\'s a lincosamide). Sodium sulfacetamide is the PABA blocker, and bacitracin is the topical that blocks cell wall synthesis.');
 match('dp-abx-moa','dermpharm','hub','Match each topical antibiotic to its mechanism.',
   [['Bacitracin','Cell wall synthesis'],['Gramicidin','Membrane disruption'],['Mupirocin','Protein synthesis'],['Sodium sulfacetamide','Blocks PABA use']],
   'Bacitracin (peptide; cuts, burns, scrapes), gramicidin (inserts into gram-positive membranes; topical combos only), mupirocin (impetigo), sodium sulfacetamide (sulfonamide, competitive PABA inhibition). Retapamulin, neomycin and gentamicin are protein-synthesis inhibitors too.');

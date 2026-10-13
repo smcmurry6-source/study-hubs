@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-10** (seventh refresh, full `/lessons-audit`, Saturday 5 pm Central; includes the MSK Exam 3
-retrospective). Sam runs
+**Last refreshed: 2026-10-13** (eighth refresh, full `/lessons-audit`, Tuesday 6:30 am Central, two days before PCD
+Exam 3). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,40 +79,40 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-10, 5 pm Central; "since" = 10-03 (the last refresh that pulled full data). Live hubs: **PCD Fixed
-Pros Exam 3 (Thu Oct 15)**, **MSK Exam 4 (Fri Oct 16)**, **Occlusion midterm (Wed Oct 21, final Nov 19)**, perio
-(final Nov 19). MSK Exam 3 is archived (retrospective below; its recap went on the dashboard 10-09). No new reports or
-suggestions since 10-03, none open; no new survey answers; no searches since 10-01.
+Refreshed 2026-10-13, 6:30 am Central; "since" = 10-10. Live hubs: **PCD Fixed Pros Exam 3 (Thu Oct 15)**, **MSK Exam 4
+(Fri Oct 16)**, **Occlusion midterm (Wed Oct 21, final Nov 19)**, perio (final Nov 19). No hub was newly archived (MSK
+Exam 3's retrospective is below; its page `hubs/msk-exam3/` is still up, card gone from the dashboard 10-12). Two new
+reports (both PCD, both answered in this run), no suggestions, no survey answers, one late perio check-in.
 
-**Did the last fixes work?** The 10-04 and 10-07 runs shipped no hub fixes, so there is nothing new to measure; the
-10-01 fixes were measured on 10-04 (above-the-line MCQ explanation fixes worked, the matching item didn't). What can be
-checked is whether the three hubs built 10-07 follow the standing lessons: every ordering is 5 steps or fewer, every
-select-all has 5 options, all three have EXCEPT and Patient Box items, and PCD's and Occlusion's diagram questions answer
-the "image labeling" asks. First reads, tiny n: PCD orderings 85% (5 items, ~13 tries each), MSK 4 orderings 50%.
+**Did the last fixes work?** The 10-10 run fixed only MSK Exam 4's dashboard date (back to Oct 16; confirmed in
+`index.html`). No question was changed, so nothing to measure.
 
-**Dashboard bug fixed in this run:** the 10-08 PCD date fix also changed **MSK Exam 4's** dashboard date to Oct 15
-(the hub, its ribbon and the notes say Fri Oct 16). The dashboard would have archived the MSK 4 card, with no Open
-button, at 10 pm on exam eve, the night that carries ~40% of a hub's study time, and opened check-ins a day early.
-Back to 2026-10-16. Lesson: when a date fix touches the `HUBS` array, diff every entry it changed.
+**PCD Fixed Pros Exam 3** (2 days out): 30 people, 51 h, **2,990 answers from 22 people, 79%**. Use is ramping like
+every hub before it: 4-6 people a day 10-08 to 10-10, 11 on Sunday, **26 people and 32 h on Monday**, two days out.
+Bank 1,691 min (21 people), notes 1,156 (29), Daily Drill 54 (9), Weak Spots 85 (2); exam hints, cram sheet and review
+tables 5-11 min each; no mock exams yet. 7 of 30 under 5 minutes. By lecture: Bonding Ceramics 76%, Cement & Cementation
+76% (15 tries per question, the most practised), Glaze video 74%, Color 79%, Onlays 80%, Veneers 83%, Removing a Crown
+90%. Matching 66%, ordering 67%, select-all 73%, MCQ 79%. Hardest (12+ tries): `ce-irm` 33% (TempBond NE picked 7 of
+16 misses), `on-cement-match` 33% and `ce-cure-match` 44% (matching), `ve-pbox-3` 40% (light try-in paste), `ce-sbu`
+44%, `ce-contact-open` 50%, `ce-burnish` 53%, `ce-isolation` 58%. Explanations now name the favorite wrong answer on
+`ce-irm`, `ve-pbox-3`, `ce-contact-open`, `ce-burnish`, `ce-isolation`; check them in the next run (expect the eve to
+inflate everything). The two matching items stay as they are before the exam (explanation fixes don't move matching
+items, standing lesson); after the exam, consider splitting them into MCQs. Reports #13 and #14 (below) fixed.
 
-**PCD Fixed Pros Exam 3** (5 days out): 6 people, 9 h, 690 answers from 5 people, **79%**. Bank 454 min of 537 (one or
-two heavy users), notes 57 min (all 6 people), drill 12 min (3). By lecture: Cement & Cementation 72% and Bonding
-Ceramics 73% lowest; Removing a Crown 95%. Matching 62%, select-all 60%, MCQ 80%. No item has more than 4 tries, so no
-question-level fixes yet. Watch Cementation (the biggest lecture, 68 items) after the weekend.
+**MSK Exam 4** (3 days out): 17 people, 14 h, 692 answers from 9 people, **68%** (up from 59% on 10-10; MSK 3 ran ~75%
+at the same point). Notes 415 min (16 people), bank 380 (10), drill 10 (3); no mocks. 5 of 17 under 5 minutes. By
+lecture: Pathology of the Skin 57% and Skeletal Muscle 58% lowest, but at 1-1.5 tries per question; Clinical
+Application 90% (first answers). No item has 12+ tries. Items under 50% at 6-10 tries: `sk-lamellar` 3/10 (Langerhans
+cells picked 5 times; explanation now says why not), `sk-granulosum` 4/10, `dp-contact-urticaria` 1/7 (allergic contact
+dermatitis picked 6 times: the explanation already says it is type IV), `dp-clinda` 1/6 (now names bacitracin as the
+cell-wall drug), `dp-azelaic` 2/7, `sk-merkel` 3/7. Run the next audit Wednesday morning (PCD eve, MSK eve-1) to catch
+these at 12+ tries.
 
-**MSK Exam 4** (6 days out): 10 people, 4 h; 236 answers from 4 people, **59%** (MSK 3 ran ~75% at the same point).
-Bank 139 min (5 people), notes 102 min (all 10). 4 of 10 visitors left within 5 minutes. **The 29 Clinical Application
-(`CA`) items have no answers yet**, and 38 of 223 items are untried: expected this early. Skin histology layer items
-(`sk-granulosum`, `sk-spinosum`, `sk-thin-clue`) are 1 of 4 each; too few tries to act on, check in the next run.
+**Occlusion midterm** (8 days out): 7 people, 2 h, 30 answers from 1 person. Nothing to read yet; it fills after the
+PCD and MSK exams (Fri-Tue).
 
-**Occlusion midterm** (11 days out): 2 people, 41 min, 10 answers. Nothing to read yet.
-
-**Perio**: still idle after the midterm (1-2 people a day, under 25 minutes in a week) with the final 6 weeks out.
-S5-S9 still have only exam-review-guide items; add them as each session is taught.
-
-**What to expect next week:** two exams on consecutive days (PCD Thu, MSK 4 Fri) split the eve crowd. Expect PCD's eve
-on Wed 10-14 and MSK 4's on Thu 10-15, with people doing both on Wednesday. Run the next audit Monday or Tuesday, when
-the items have 12+ tries, so explanation fixes land before the eve.
+**Perio**: idle (1-2 people a day, under a minute) with the final 5 weeks out. One more midterm check-in (10-11): Hub was
+easier, readiness 5, went as expected (n = 25 now).
 
 ## Standing lessons (read before building a hub)
 
@@ -158,7 +158,7 @@ the items have 12+ tries, so explanation fixes land before the eve.
 - **Write questions in the exam's formats, not just its content.** The perio midterm used two-statement items
   (two numbered statements; choices: both true / both false / 1 true 2 false / 1 false 2 true), "all of the following
   EXCEPT" and "which is NOT true", and suture pictures; the hub had none of them, and 6 of 14 check-ins said it went
-  worse than expected despite everyone feeling ready (4-5 of 5), heavy users included. Final perio count, n = 24 check-ins: Hub was easier 9, Exam asked different
+  worse than expected despite everyone feeling ready (4-5 of 5), heavy users included. Final perio count, n = 25 check-ins: Hub was easier 10, Exam asked different
   things 4, About right 11; MSK Exam 3's check-ins (n = 8: About right 4, harder 2, easier 1, different 1) asked for EXCEPT items, image labeling and Patient Box items that test mechanisms. Every hub gets a share of
   two-statement and EXCEPT/NOT items from the start (render two-statement choices in that fixed order:
   `fmt:'2stmt'` in perio), and asks Sam early whether the professor uses images. When a class table simplifies a
@@ -192,7 +192,11 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   questions didn't say clearly whether the order was right (perio `q4-49`, fixed 2026-09-29 in #19: finished
   sequences turn green/red, show where each misplaced step belongs and a verdict line; the "picked" style had been
   overriding the result colours). Before shipping a new question type, answer one right
-  and one wrong on a phone and check the result is unmistakable.
+  and one wrong on a phone and check the result is unmistakable. The same goes for the state **before** grading: PCD report #14 (select-all `ce-reqs`)
+  said it wasn't clear which options were picked (only a thin accent border); select-all options now show a tick box
+  that fills when picked (PCD, MSK 4, Occlusion, 2026-10-13).
+- **A short stem with a coined term reads as unclear.** PCD `co-afterimage` ("The color opponent afterimage is:") was
+  reported as hard to understand (#13); stems now say where the idea comes up ("During shade matching, what is...").
 - **Answer choices must not give the answer away.** Perio `q2-02` labelled the wrong choices "(… monofilament)"
   while the stem asked for the braided suture. An audit then found 24 more giveaways (labels that rule a choice out,
   stem words echoed only by the answer, throwaway distractors). Write distractors that are the same category,

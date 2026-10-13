@@ -607,6 +607,14 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 @media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
 .qcard-choice.is-selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .qcard-choice.is-missed-right{border-color:var(--good);border-style:dashed}
+/* select-all: a tick box on each option so it is obvious what is picked (report #14) */
+.qcard-choice[data-act="multi"]{position:relative;padding-left:40px}
+.qcard-choice[data-act="multi"]::before{content:"";position:absolute;left:12px;top:50%;width:18px;height:18px;margin-top:-9px;box-sizing:border-box;border:2px solid var(--line-strong);border-radius:4px;background:var(--surface)}
+.qcard-choice[data-act="multi"].is-selected{background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+.qcard-choice[data-act="multi"].is-selected::before,.qcard-choice[data-act="multi"].is-correct::before,.qcard-choice[data-act="multi"].is-wrong::before{background:var(--accent);border-color:var(--accent)}
+.qcard-choice[data-act="multi"].is-correct::before{background:var(--good);border-color:var(--good)}
+.qcard-choice[data-act="multi"].is-wrong::before{background:var(--bad);border-color:var(--bad)}
+.qcard-choice[data-act="multi"].is-selected::after,.qcard-choice[data-act="multi"].is-correct::after,.qcard-choice[data-act="multi"].is-wrong::after{content:"";position:absolute;left:18px;top:50%;width:5px;height:10px;margin-top:-7px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .multi-check{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .multi-score{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft)}
 .quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
