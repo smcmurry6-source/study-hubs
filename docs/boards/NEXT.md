@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 3)
+# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 4)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -63,15 +63,35 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   them (rebuilt by replaying the drafters' commands). Every agent prompt now names its own scratch subfolder and forbids
   touching anything else.
 
-## Session 4: Codex PRs in, next briefs out
+## Session 4 (done 2026-10-13)
 
-1. Review Codex's T-01 PR: notes against the fact records (every `data-ref` supports its sentence; `conditions` and
-   `stem_names` respected), blueprint quotas. Fix notes go in the PR; merge into `claude/boards-hub` when clean.
-2. Write the next briefs in one batch: T-02 pharm notes + blueprint, T-03 perio notes + blueprint, T-04 `int-cards`,
-   T-05 `int-plan` (BUILD_SPEC 9). Briefs name exact files, acceptance commands and what not to touch, like T-01.
-3. medcx items from the merged blueprint (Codex drafts, `checked:null`), then the Claude-subagent checker, two passes
-   on high-risk items, per `bench/REPORT.md`.
-4. `int-v33` (next free migration number; `migration_v33.sql` is taken) and `int-widget` stay with Claude.
+- **T-01 reviewed** (Codex PR #78, medcx notes + blueprint). Every cited sentence of Core (3,356 words) and Deep
+  (6,834) was read against its fact: no wrong facts. Fixed on `claude/eloquent-cerf-7v4iqg` (PR into
+  `claude/boards-hub`, which carries Codex's commit too, so merging it also lands #78): about 25 author-facing
+  phrases ("the fact record says", "not verified") rewritten for students; missing `stem_names` (WFH, Endocrine
+  Society, NIDCR/AAPD, BTS); 5 near-verbatim phrases; three claims pulled back inside their facts (prilocaine
+  "relatively" contraindicated, the HIV lab values and unit, no "do not restrain" in seizure first aid). Blueprint:
+  section quotas didn't match concept siblings in 10 of 14 sections; one case used the ADA table's self-contradicting
+  diastolic range; one keyed pediatric AAPD counts for a 59-year-old. All fixed; still 60 items, 30 in 8 cases.
+- **Briefs out:** T-02 pharm notes + blueprint (with the T-01 lessons and two check scripts as acceptance), T-03
+  perio notes + blueprint (**blocked on `facts-perio`**), T-04 `int-cards`, T-05 `int-plan`. T-02, T-04 and T-05
+  can run in parallel.
+- **Fact gaps found:** seizure first aid has no "do not restrain / nothing in the mouth" fact (EM-7 is CDC's short
+  list); pharm has only PK-1/PK-2 for pharmacokinetics; perio lacks the healthy periodontium, biofilm and calculus,
+  radiographs, surgery, local delivery and host modulation. Codex's T-01 fact problems (BP-2 crisis numbers, HIV-2
+  units, IE-5 doses, DM-6, PG-2, ORN-3) are all already in those facts' `conditions`; nothing to change.
+
+## Session 5: facts, then medcx items
+
+1. Sam merges this session's PR into `claude/boards-hub` (it includes #78) and starts T-02, T-04 and T-05 in Codex.
+2. Claude: `facts-perio` (BUILD_SPEC 9) plus the small top-ups above (seizure first aid from CDC; pharmacokinetics
+   basics from FDA labeling or an open pharmacology text with a stable URL), same pipeline as Session 3 (drafter,
+   independent verifier, quote check). Then lift the block in T-03.
+3. Brief T-06 `items-medcx` (60 items from `src/boards/units/medcx/blueprint.json`, `checked:null`) for Codex, then
+   the Claude-subagent checker with two passes on high-risk items (`bench/REPORT.md`).
+4. Review T-02/T-04/T-05 PRs as they arrive (same method as T-01: a sheet of each cited sentence beside its fact;
+   for code, run the fixture build in Playwright on desktop and phone).
+5. `int-v33` and `int-widget` stay with Claude.
 
 ## Release 1
 
