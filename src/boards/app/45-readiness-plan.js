@@ -91,28 +91,28 @@ var BoardsPlan = (function(){
     return rank;
   }
   function historyEvents(items, history, siblingRank){
-    var rows = [], map = objectMap(history);
+    var rows = [], map = objectMap(history), order = 0;
     items.forEach(function(q){
       var h = map[q.id];
       if(!h) return;
       if(Array.isArray(h)){
         h.forEach(function(e){
-          rows.push({ qid:q.id, correct:!!(e && e.correct), day:(e && (e.day || e.t)) || '', first:!!(e && e.first), sibling:!!siblingRank[q.id] });
+          rows.push({ qid:q.id, correct:!!(e && e.correct), day:(e && (e.day || e.t)) || '', first:!!(e && e.first), sibling:!!siblingRank[q.id], order:order++ });
         });
       } else {
-        rows.push({
-          qid:q.id,
-          correct:!!(h.correct != null ? h.correct : h.lastCorrect),
-          day:h.day || h.t || '',
-          first:h.n != null ? Number(h.n) <= 1 : !!h.first,
-          sibling:!!siblingRank[q.id]
-        });
+        var n = Number(h.n) || 1, day = h.day || h.t || '';
+        var firstCorrect = h.first != null ? !!h.first : !!(h.correct != null ? h.correct : h.lastCorrect);
+        var latestCorrect = h.lastCorrect != null ? !!h.lastCorrect : !!h.correct;
+        rows.push({ qid:q.id, correct:firstCorrect, day:day, first:true, sibling:!!siblingRank[q.id], order:order++ });
+        if(n > 1) rows.push({ qid:q.id, correct:latestCorrect, day:day, first:false, sibling:!!siblingRank[q.id], order:order++ });
       }
     });
     rows.sort(function(a, b){
       if(a.day < b.day) return -1;
       if(a.day > b.day) return 1;
-      return a.qid < b.qid ? -1 : (a.qid > b.qid ? 1 : 0);
+      if(a.qid < b.qid) return -1;
+      if(a.qid > b.qid) return 1;
+      return a.order - b.order;
     });
     return rows;
   }
@@ -142,7 +142,7 @@ var BoardsPlan = (function(){
     var byId = itemsById(items), events = historyEvents(unitItems, history, siblingRank);
     var theta = ability(events, byId, stats), lastDay = '', i, eventDay, gap, thetaEff;
     var seen = countSeen(unitItems, history), likelyItems, total = unitItems.length, probabilities = [];
-    var casesSeen, likely, band = 'Started', caseThreshold;
+    var casesSeen, likely, coverage, band = null, caseThreshold;
     events.forEach(function(e){
       if(e.day && (!lastDay || e.day > lastDay)) lastDay = e.day;
     });
@@ -150,7 +150,7 @@ var BoardsPlan = (function(){
     if(gap == null || gap < 0) gap = 0;
     thetaEff = theta * Math.exp(-gap / 120);
 
-    /* New unseen content changes coverage, while practiced items define the learner's current estimate. */
+    /* Average practiced items only: unseen additions change coverage, not likely. */
     likelyItems = unitItems.filter(function(q){ return own(history, q.id); });
     if(!likelyItems.length) likelyItems = unitItems;
     for(i = 0; i < likelyItems.length; i++){
@@ -158,11 +158,13 @@ var BoardsPlan = (function(){
       probabilities.push(sigmoid(thetaEff - eventDay.b));
     }
     likely = probabilities.length ? probabilities.reduce(function(sum, value){ return sum + value; }, 0) / probabilities.length : 0;
+    coverage = seen / Math.max(1, total);
+    if(coverage >= 0.10) band = 'Started';
     casesSeen = caseSeen(unitItems, ctx.cases, history);
     caseThreshold = Math.ceil(casesSeen.total / 2);
-    if(seen / Math.max(1, total) >= 0.70 && likely >= 0.75 && casesSeen.seen >= caseThreshold) band = 'Board-ready';
-    else if(seen / Math.max(1, total) >= 0.50 && likely >= 0.65) band = 'Solid';
-    else if(seen / Math.max(1, total) >= 0.25 && likely >= 0.55) band = 'Practicing';
+    if(coverage >= 0.70 && likely >= 0.75 && casesSeen.seen >= caseThreshold) band = 'Board-ready';
+    else if(coverage >= 0.50 && likely >= 0.65) band = 'Solid';
+    else if(coverage >= 0.25 && likely >= 0.55) band = 'Practicing';
     return { likely:likely, seen:seen, total:total, band:band };
   }
 
@@ -183,7 +185,6 @@ var BoardsPlan = (function(){
       return ar === br ? (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)) : ar - br;
     });
   }
-  function dateDay(value){ return String(value || '').slice(8, 10); }
   function isDue(entry, day){
     return !!(entry && entry.due && day && String(entry.due) <= String(day));
   }
@@ -197,20 +198,6 @@ var BoardsPlan = (function(){
     var sure = objectMap(ctx.sureWrong)[q.id] ? 1 : 0;
     var classDifficulty = 1 - diff.acc;
     return (1 + Math.log(1 + overdue) / Math.LN2) * (1 + classDifficulty) * (1 + 0.5 * sure);
-  }
-  function hasRightStreak(historyEntry, srsEntry, streak){
-    var records, i;
-    if(!historyEntry) return false;
-    records = historyEntry.results || historyEntry.events || historyEntry.recent;
-    if(Array.isArray(records)){
-      if(records.length < streak) return false;
-      for(i = records.length - streak; i < records.length; i++){
-        if(!(records[i] === true || (records[i] && records[i].correct))) return false;
-      }
-      return true;
-    }
-    /* The widget resets b on a miss; reaching the last interval therefore proves a longer right streak. */
-    return !!historyEntry.lastCorrect && Number(srsEntry && srsEntry.b) >= DEFAULT_STEPS.length;
   }
   function stepDueOffset(entry, day){
     var diff = daysBetween(entry && entry.due, day);
@@ -253,39 +240,39 @@ var BoardsPlan = (function(){
   function dailyPlan(ctx){
     ctx = ctx || {};
     var items = listItems(ctx), srs = objectMap(ctx.srs), history = objectMap(ctx.history);
-    var retired = objectMap(ctx.retired), budget = objectMap(ctx.budget), steps = srsSteps(budget);
+    var retired = objectMap(ctx.retired), finalReview = objectMap(ctx.finalReview), budget = objectMap(ctx.budget), steps = srsSteps(budget);
     var size = finite(Number(ctx.size)) ? Math.max(0, Math.floor(Number(ctx.size))) : (Number(budget.daily) || 12);
     var newPerDay = Number(budget.newPerDay);
     var governor = finite(Number(budget.governor)) ? Number(budget.governor) : 0.8;
-    var retireStep = Number(budget.retireStep) || steps[steps.length - 1];
-    var retireStreak = Number(budget.retireStreak) || 3;
     var sampleLimit = Math.max(0, Number(budget.retiredSamplePerMonth) || 0);
     var seed = ctx.seed == null ? ctx.day : ctx.seed;
-    var retire = [], plan = [], selected = {}, caseCounts = {}, dueRows = [], loads, i, q;
+    var retire = [], finalDue = [], plan = [], selected = {}, caseCounts = {}, dueRows = [], loads, i, q;
     var candidate, sampleRows, samplesUsed = 0, newRows, newCounts = {}, conceptRank = siblings(items);
-    var maxNew, projection, readyToRetire;
+    var maxNew, projection, month;
 
-    if(!ctx.day || !size) return { plan:plan, retire:retire };
+    if(!ctx.day || !size) return { plan:plan, retire:retire, finalDue:finalDue };
     if(!finite(newPerDay) || newPerDay < 0) newPerDay = Number(budget.daily) || 12;
 
     items.forEach(function(item){
       var sr = srs[item.id], hist = history[item.id], days;
-      if(retired[item.id] || !isDue(sr, ctx.day)) return;
-      readyToRetire = Number(sr.b) >= steps.length &&
-        Number(steps[Math.max(0, Math.min(steps.length - 1, Number(sr.b) - 1))]) >= retireStep &&
-        hasRightStreak(hist, sr, retireStreak);
-      if(readyToRetire){
+      if(retired[item.id]) return;
+      if(finalReview[item.id] && Number(sr && sr.b) === steps.length && sr.t &&
+         String(sr.t) >= String(finalReview[item.id]) && hist && hist.lastCorrect){
         retire.push(item.id);
         return;
       }
+      if(!isDue(sr, ctx.day)) return;
       days = daysBetween(ctx.day, sr.due);
       dueRows.push({ id:item.id, q:item, entry:sr, days:Math.max(0, days || 0) });
     });
     dueRows = sortSeeded(dueRows, seed, function(row){ return priority(row.q, row.entry, ctx); });
-    dueRows.forEach(function(row){ appendPlan(row.q, plan, selected, caseCounts, size); });
+    dueRows.forEach(function(row){
+      if(appendPlan(row.q, plan, selected, caseCounts, size) && Number(row.entry.b) === steps.length) finalDue.push(row.id);
+    });
 
-    /* On the first plan of a month, retired items are sampled as low-priority review candidates. */
-    if(dateDay(ctx.day) === '01' && sampleLimit && plan.length < size){
+    /* Sample retired items on the first plan of a new month, whichever date that is. */
+    month = String(ctx.day).slice(0, 7);
+    if(month && ctx.lastPlanMonth !== month && sampleLimit && plan.length < size){
       sampleRows = sortSeeded(items.filter(function(item){ return !!retired[item.id]; }).map(function(item){ return { id:item.id, q:item }; }), seed, function(){ return 0; });
       for(i = 0; i < sampleRows.length && samplesUsed < sampleLimit && plan.length < size; i++){
         candidate = sampleRows[i].q;
@@ -298,7 +285,7 @@ var BoardsPlan = (function(){
     /* A new question's first correct review is due tomorrow, then three days later. */
     maxNew = Math.min(Math.floor(newPerDay), size - plan.length);
     newRows = items.filter(function(item){
-      return !selected[item.id] && !retired[item.id] && !srs[item.id] && !history[item.id];
+      return !item.case && !selected[item.id] && !retired[item.id] && !srs[item.id] && !history[item.id];
     });
     for(i = 0; i < maxNew && plan.length < size; i++){
       var eligible = sortSeeded(newRows, seed, function(row){
@@ -308,7 +295,6 @@ var BoardsPlan = (function(){
       candidate = null;
       for(var j = 0; j < eligible.length; j++){
         q = eligible[j];
-        if(q.case && (caseCounts[q.case] || 0) >= 3) continue;
         var testLoads = projection.slice();
         testLoads[1]++; testLoads[4]++;
         if(projectedUnderGovernor(testLoads, Number(budget.daily) || size, governor)){
@@ -323,7 +309,7 @@ var BoardsPlan = (function(){
       newRows = newRows.filter(function(row){ return row.id !== candidate.id; });
     }
 
-    return { plan:plan, retire:retire };
+    return { plan:plan, retire:retire, finalDue:finalDue };
   }
 
   return {
@@ -340,7 +326,7 @@ if(typeof STATE !== 'undefined'){
   var BOARDS_PLAN_CLASS_CACHE = {};
   var BOARDS_PLAN_CLASS_REQUESTED = {};
 
-  function boardsPlanStats(){
+  var boardsPlanStats = function(){
     var out = {}, qids = [];
     Object.keys(BOARDS_PLAN_CLASS_CACHE).forEach(function(qid){
       var stat = BOARDS_PLAN_CLASS_CACHE[qid];
@@ -362,18 +348,19 @@ if(typeof STATE !== 'undefined'){
       }
     }
     return out;
-  }
+  };
 
-  function boardsPlanSrs(){
+  var boardsPlanSrs = function(){
     try{
       if(typeof localStorage !== 'undefined') return JSON.parse(localStorage.getItem('sh_srs_boards') || '{}') || {};
     }catch(e){}
     return {};
-  }
+  };
 
-  function boardsPlanContext(opts){
+  var boardsPlanContext = function(opts){
     opts = opts || {};
     var day = opts.day || todayKey();
+    var ui = STATE.ui || {};
     return {
       day:day,
       seed:day,
@@ -383,25 +370,45 @@ if(typeof STATE !== 'undefined'){
       srs:boardsPlanSrs(),
       stats:boardsPlanStats(),
       retired:STATE.retired,
+      finalReview:ui.finalReview || {},
+      lastPlanMonth:ui.planMonth || '',
       sureWrong:{},
       budget:CONFIG.budget,
       size:opts.size == null ? CONFIG.budget.daily : opts.size
     };
-  }
+  };
 
   readiness = function(unit){
     return BoardsPlan.readiness(unit, boardsPlanContext({}));
   };
 
   dailyPlan = function(opts){
-    var ctx = boardsPlanContext(opts), result = BoardsPlan.dailyPlan(ctx), changed = false;
+    opts = opts || {};
+    var day = opts.day || todayKey();
+    var size = opts.size == null ? CONFIG.budget.daily : Number(opts.size);
+    var ui = STATE.ui = STATE.ui || {};
+    var frozen = ui.plan;
+    var ctx, result;
+    if(frozen && frozen.day === day && frozen.size === size && Array.isArray(frozen.ids)) return frozen.ids;
+    ctx = boardsPlanContext({ day:day, size:size });
+    result = BoardsPlan.dailyPlan(ctx);
+    ui.finalReview = ui.finalReview || {};
     result.plan.forEach(function(qid){
-      if(STATE.retired[qid]) { delete STATE.retired[qid]; changed = true; }
+      if(STATE.retired[qid]) {
+        delete STATE.retired[qid];
+        delete ui.finalReview[qid];
+      }
     });
     result.retire.forEach(function(qid){
-      if(STATE.retired[qid] !== ctx.day) { STATE.retired[qid] = ctx.day; changed = true; }
+      STATE.retired[qid] = ctx.day;
+      delete ui.finalReview[qid];
     });
-    if(changed) saveState();
-    return result.plan;
+    result.finalDue.forEach(function(qid){
+      if(!ui.finalReview[qid]) ui.finalReview[qid] = ctx.day;
+    });
+    ui.planMonth = String(ctx.day).slice(0, 7);
+    ui.plan = { day:ctx.day, size:ctx.size, ids:result.plan.slice() };
+    saveState();
+    return ui.plan.ids;
   };
 }

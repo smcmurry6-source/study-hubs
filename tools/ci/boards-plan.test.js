@@ -35,6 +35,8 @@ function makeCtx(overrides){
     srs:{},
     stats:{},
     retired:{},
+    finalReview:{},
+    lastPlanMonth:'',
     sureWrong:{},
     budget:copy(baseBudget),
     size:12
@@ -61,6 +63,17 @@ check('difficulty uses the cog prior and ability weights first attempts, sibling
   const repeat = plan.ability([{ qid:'q', correct:true, day:'2026-10-13', first:false, sibling:false }], byId, {});
   assert(first > sibling);
   assert(sibling > repeat);
+
+  const item = [{ id:'q', lec:'medcx', cog:2 }];
+  const firstRight = plan.readiness('medcx', makeCtx({
+    items:item,
+    history:{ q:{ n:2, first:true, lastCorrect:true, t:'2026-10-13' } }
+  }));
+  const firstWrong = plan.readiness('medcx', makeCtx({
+    items:item,
+    history:{ q:{ n:2, first:false, lastCorrect:true, t:'2026-10-13' } }
+  }));
+  assert(firstRight.likely > firstWrong.likely);
 });
 
 check('same input is repeatable and a seed only reorders equal-priority due items', function(){
@@ -155,19 +168,36 @@ check('the governor blocks new items under a heavy forecast and allows the empty
   assert.strictEqual(ids(plan.dailyPlan(empty)).length, Math.min(empty.budget.newPerDay, empty.size));
 });
 
-check('a mature 120-day review retires after its right streak and monthly samples return', function(){
+check('the last review is planned before retirement and monthly samples return on the first plan of the month', function(){
   const mature = makeCtx({
     items:[{ id:'mature', lec:'medcx', cog:1 }],
     srs:{ mature:{ b:7, due:'2026-10-13', t:'2026-06-15' } },
     history:{ mature:{ lastCorrect:true, n:7, t:'2026-06-15' } }
   });
-  const retired = plan.dailyPlan(mature);
+  const finalReview = plan.dailyPlan(mature);
+  assert.deepStrictEqual(ids(finalReview), ['mature']);
+  assert.deepStrictEqual(Array.prototype.slice.call(finalReview.finalDue), ['mature']);
+  assert.deepStrictEqual(Array.prototype.slice.call(finalReview.retire), []);
+
+  const answered = makeCtx({
+    day:'2026-10-14',
+    items:mature.items,
+    srs:{ mature:{ b:7, due:'2027-02-10', t:'2026-10-13' } },
+    finalReview:{ mature:'2026-10-13' },
+    history:{ mature:{ lastCorrect:true, n:8, t:'2026-10-13' } }
+  });
+  const retired = plan.dailyPlan(answered);
   assert.deepStrictEqual(Array.prototype.slice.call(retired.retire), ['mature']);
   assert(!ids(retired).includes('mature'));
+  const answeredWrong = Object.assign({}, answered, {
+    history:{ mature:{ lastCorrect:false, n:8, t:'2026-10-13' } }
+  });
+  assert.deepStrictEqual(Array.prototype.slice.call(plan.dailyPlan(answeredWrong).retire), []);
 
   const sampleItems = Array.from({ length:6 }, (_, i) => ({ id:'old-' + i, lec:'medcx', cog:2 }));
   const sampleCtx = makeCtx({
-    day:'2026-11-01',
+    day:'2026-11-03',
+    lastPlanMonth:'2026-10',
     items:sampleItems,
     retired:Object.fromEntries(sampleItems.map((q) => [q.id, '2026-10-01'])),
     size:8
@@ -197,6 +227,22 @@ check('case plans never include more than three items from one case', function()
   assert(result.filter((id) => /^case-/.test(id)).length <= 3);
 });
 
+check('new-item picks contain standalones only', function(){
+  const items = [
+    { id:'case-new-a', lec:'medcx', cog:2, case:'c1' },
+    { id:'case-new-b', lec:'medcx', cog:2, case:'c1' },
+    { id:'case-new-c', lec:'medcx', cog:2, case:'c1' },
+    { id:'standalone-a', lec:'pharm', cog:1 },
+    { id:'standalone-b', lec:'medcx', cog:2 },
+    { id:'standalone-c', lec:'pharm', cog:1 }
+  ];
+  const ctx = makeCtx({ items:items, size:3 });
+  ctx.budget.newPerDay = 3;
+  const result = ids(plan.dailyPlan(ctx));
+  assert.strictEqual(result.length, 3);
+  assert(result.every((id) => /^standalone-/.test(id)));
+});
+
 check('readiness uses the four coverage bands and unseen additions do not lower likely', function(){
   const items = Array.from({ length:10 }, (_, i) => ({
     id:'q' + i,
@@ -211,6 +257,7 @@ check('readiness uses the four coverage bands and unseen additions do not lower 
     for(let i = 0; i < count; i++) history['q' + i] = { n:1, lastCorrect:true, t:'2026-10-13' };
     return plan.readiness('medcx', makeCtx({ items:items, cases:cases, stats:stats, history:history }));
   }
+  assert.strictEqual(readinessFor(0).band, null);
   assert.strictEqual(readinessFor(1).band, 'Started');
   assert.strictEqual(readinessFor(3).band, 'Practicing');
   assert.strictEqual(readinessFor(5).band, 'Solid');
@@ -239,6 +286,45 @@ check('a unit unpracticed for 120 days drifts toward its cog prior', function(){
   const stale = plan.readiness('medcx', makeCtx({ items:items, history:history, day:'2027-02-10' }));
   const prior = plan.difficulty(null, 1).acc;
   assert(Math.abs(stale.likely - prior) < Math.abs(fresh.likely - prior));
+});
+
+check('hub wrapper stores final-review and month state and freezes same-day plans', function(){
+  const state = {
+    answered:{ mature:{ n:7, first:true, lastCorrect:true, t:'2026-06-15' } },
+    retired:{},
+    ui:{ finalReview:{}, planMonth:'2026-09' }
+  };
+  const srs = { mature:{ b:7, due:'2026-10-13', t:'2026-06-15' } };
+  let statsCallback = null;
+  let saveCount = 0;
+  const wrapper = {
+    STATE:state,
+    QUESTIONS:[{ id:'mature', lec:'medcx', cog:1 }],
+    CASES:[],
+    CONFIG:{ budget:Object.assign(copy(baseBudget), { steps:[1,3,7,14,30,60,120] }) },
+    todayKey:function(){ return '2026-10-13'; },
+    saveState:function(){ saveCount++; },
+    localStorage:{ getItem:function(){ return JSON.stringify(srs); } },
+    window:{ shGetClassStats:function(qids, callback){ statsCallback = callback; } }
+  };
+  vm.runInNewContext(source, wrapper, { filename:'45-readiness-plan-wrapper.js' });
+  const first = Array.prototype.slice.call(wrapper.dailyPlan({ day:'2026-10-13', size:1 }));
+  assert.deepStrictEqual(first, ['mature']);
+  assert.strictEqual(state.ui.finalReview.mature, '2026-10-13');
+  assert.strictEqual(state.ui.planMonth, '2026-10');
+  assert.strictEqual(state.ui.plan.day, '2026-10-13');
+  assert.strictEqual(state.ui.plan.size, 1);
+  assert.strictEqual(typeof statsCallback, 'function');
+
+  statsCallback({ mature:{ total:100, correct:0 } });
+  wrapper.QUESTIONS.push({ id:'new-due', lec:'pharm', cog:1 });
+  srs['new-due'] = { b:1, due:'2026-10-13', t:'2026-10-12' };
+  assert.deepStrictEqual(Array.prototype.slice.call(wrapper.dailyPlan({ day:'2026-10-13', size:1 })), first);
+
+  srs.mature = { b:7, due:'2027-02-10', t:'2026-10-13' };
+  assert.deepStrictEqual(Array.prototype.slice.call(wrapper.dailyPlan({ day:'2026-10-14', size:1 })), ['new-due']);
+  assert.strictEqual(state.retired.mature, '2026-10-14');
+  assert(saveCount >= 2);
 });
 
 console.log('✓ boards plan: ' + checks + ' checks passed');
