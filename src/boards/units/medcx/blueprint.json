@@ -3,19 +3,19 @@
   "items_total": 60,
   "case_items": 30,
   "sections": [
-    { "sec": "medcx-history-asa", "standalone": 3, "in_cases": 1, "fk": ["FK6"], "cc": ["CC8"] },
-    { "sec": "medcx-vitals-bp", "standalone": 3, "in_cases": 3, "fk": ["FK6"], "cc": ["CC8"] },
-    { "sec": "medcx-cardio-ie", "standalone": 4, "in_cases": 3, "fk": ["FK8", "FK6"], "cc": ["CC1", "CC8"] },
+    { "sec": "medcx-history-asa", "standalone": 1, "in_cases": 1, "fk": ["FK6"], "cc": ["CC8"] },
+    { "sec": "medcx-vitals-bp", "standalone": 1, "in_cases": 3, "fk": ["FK6"], "cc": ["CC8"] },
+    { "sec": "medcx-cardio-ie", "standalone": 5, "in_cases": 3, "fk": ["FK8", "FK6"], "cc": ["CC1", "CC8"] },
     { "sec": "medcx-prosthetic-joints", "standalone": 1, "in_cases": 1, "fk": ["FK6"], "cc": ["CC8"] },
-    { "sec": "medcx-bleeding", "standalone": 4, "in_cases": 4, "fk": ["FK6", "FK8"], "cc": ["CC8"] },
-    { "sec": "medcx-diabetes", "standalone": 3, "in_cases": 3, "fk": ["FK5", "FK6"], "cc": ["CC9"] },
+    { "sec": "medcx-bleeding", "standalone": 5, "in_cases": 4, "fk": ["FK6", "FK8"], "cc": ["CC8"] },
+    { "sec": "medcx-diabetes", "standalone": 2, "in_cases": 3, "fk": ["FK5", "FK6"], "cc": ["CC9"] },
     { "sec": "medcx-asthma-copd", "standalone": 2, "in_cases": 2, "fk": ["FK5", "FK6"], "cc": ["CC9"] },
-    { "sec": "medcx-kidney-liver-endocrine", "standalone": 1, "in_cases": 1, "fk": ["FK6", "FK8"], "cc": ["CC8", "CC9"] },
-    { "sec": "medcx-cancer-mronj", "standalone": 3, "in_cases": 2, "fk": ["FK6", "FK5"], "cc": ["CC1", "CC8"] },
+    { "sec": "medcx-kidney-liver-endocrine", "standalone": 3, "in_cases": 1, "fk": ["FK6", "FK8"], "cc": ["CC8", "CC9"] },
+    { "sec": "medcx-cancer-mronj", "standalone": 4, "in_cases": 2, "fk": ["FK6", "FK5"], "cc": ["CC1", "CC8"] },
     { "sec": "medcx-pregnancy", "standalone": 1, "in_cases": 1, "fk": ["FK8"], "cc": ["CC8"] },
     { "sec": "medcx-infectious", "standalone": 1, "in_cases": 1, "fk": ["FK5", "FK6"], "cc": ["CC1"] },
-    { "sec": "medcx-sickle-transplant", "standalone": 1, "in_cases": 1, "fk": ["FK5", "FK6"], "cc": ["CC1", "CC8"] },
-    { "sec": "medcx-emergency-prep", "standalone": 1, "in_cases": 1, "fk": ["FK6"], "cc": ["CC8"] },
+    { "sec": "medcx-sickle-transplant", "standalone": 2, "in_cases": 1, "fk": ["FK5", "FK6"], "cc": ["CC1", "CC8"] },
+    { "sec": "medcx-emergency-prep", "standalone": 0, "in_cases": 1, "fk": ["FK6"], "cc": ["CC8"] },
     { "sec": "medcx-emergencies", "standalone": 2, "in_cases": 6, "fk": ["FK5", "FK6", "FK8"], "cc": ["CC1", "CC8", "CC9"] }
   ],
   "concepts": [
@@ -23,8 +23,7 @@
     { "concept": "history-conditions-and-current-function", "sec": "medcx-history-asa", "refs": ["ASA-2", "ASA-3", "ASA-4"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "blood-pressure-categories", "sec": "medcx-vitals-bp", "refs": ["BP-1", "BP-5"], "hy": null, "siblings": 1, "cog": 1, "phase": "clear" },
     { "concept": "ada-dental-bp-action", "sec": "medcx-vitals-bp", "refs": ["BP-3", "BP-4"], "hy": "The ADA dental guide and the surgical guideline use different thresholds, so the source must be recognized.", "siblings": 3, "cog": 2, "phase": "plan" },
-    { "concept": "orthostatic-chair-transfer", "sec": "medcx-vitals-bp", "refs": ["BP-5", "SYN-10"], "hy": null, "siblings": 1, "cog": 2, "phase": "prev" },
-    { "concept": "ie-prophylaxis-high-risk-cardiac-history", "sec": "medcx-cardio-ie", "refs": ["IE-1", "IE-2", "IE-3"], "hy": "Only four defined cardiac groups qualify, making familiar implants and valve diagnoses important distractors.", "siblings": 3, "cog": 2, "phase": "clear" },
+    { "concept": "ie-prophylaxis-high-risk-cardiac-history", "sec": "medcx-cardio-ie", "refs": ["IE-1", "IE-2", "IE-3"], "hy": "Only four defined cardiac groups qualify, making familiar implants and valve diagnoses important distractors.", "siblings": 2, "cog": 2, "phase": "clear" },
     { "concept": "ie-prophylaxis-procedure-indication", "sec": "medcx-cardio-ie", "refs": ["IE-4"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "ie-prophylaxis-regimen-and-allergy", "sec": "medcx-cardio-ie", "refs": ["IE-5", "IE-6", "IE-7"], "hy": "The timing, drug choice, allergy history, and removal of clindamycin are commonly tested together.", "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "cardiovascular-epinephrine-limit", "sec": "medcx-cardio-ie", "refs": ["VC-1", "VC-8", "BP-6"], "hy": "The 0.04 mg teaching limit is easy to confuse with cartridge counts and another review's observation.", "siblings": 2, "cog": 2, "phase": "plan" },
@@ -32,12 +31,12 @@
     { "concept": "prosthetic-joint-prophylaxis", "sec": "medcx-prosthetic-joints", "refs": ["PJ-1", "PJ-2", "PJ-3"], "hy": "A joint prosthesis is easily confused with the cardiac-valve indication for IE prophylaxis.", "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "warfarin-simple-extraction", "sec": "medcx-bleeding", "refs": ["AC-1", "AC-2"], "hy": "The INR threshold tests whether students preserve anticoagulation while managing local bleeding.", "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "doac-dental-management", "sec": "medcx-bleeding", "refs": ["AC-3"], "hy": "Most dental procedures do not require a DOAC change; a higher-risk plan needs the physician.", "siblings": 2, "cog": 2, "phase": "plan" },
-    { "concept": "antiplatelet-and-coronary-stent", "sec": "medcx-bleeding", "refs": ["AC-4"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "antiplatelet-and-coronary-stent", "sec": "medcx-bleeding", "refs": ["AC-4"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "local-hemostasis", "sec": "medcx-bleeding", "refs": ["AC-5"], "hy": null, "siblings": 1, "cog": 1, "phase": "tx" },
     { "concept": "hemophilia-dental-procedure-planning", "sec": "medcx-bleeding", "refs": ["BLD-1", "BLD-2", "BLD-3"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "von-willebrand-minor-procedure-plan", "sec": "medcx-bleeding", "refs": ["BLD-10", "BLD-11"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "diabetes-diagnostic-cutoffs", "sec": "medcx-diabetes", "refs": ["DM-1", "DM-2"], "hy": null, "siblings": 1, "cog": 1, "phase": "clear" },
-    { "concept": "conscious-hypoglycemia-15-15", "sec": "medcx-diabetes", "refs": ["DM-3", "DM-4"], "hy": "Recognizing glucose below 70 and choosing oral carbohydrate is a frequent chairside decision.", "siblings": 3, "cog": 2, "phase": "tx" },
+    { "concept": "conscious-hypoglycemia-15-15", "sec": "medcx-diabetes", "refs": ["DM-3", "DM-4"], "hy": "Recognizing glucose below 70 and choosing oral carbohydrate is a frequent chairside decision.", "siblings": 2, "cog": 2, "phase": "tx" },
     { "concept": "severe-hypoglycemia-glucagon", "sec": "medcx-diabetes", "refs": ["DM-5"], "hy": null, "siblings": 1, "cog": 2, "phase": "tx" },
     { "concept": "diabetes-periodontal-relationship", "sec": "medcx-diabetes", "refs": ["DM-7", "PT-1"], "hy": null, "siblings": 1, "cog": 1, "phase": "prev" },
     { "concept": "asthma-control-and-appointment", "sec": "medcx-asthma-copd", "refs": ["RES-1", "RES-2", "RES-3"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
@@ -51,8 +50,8 @@
     { "concept": "cancer-treatment-blood-counts", "sec": "medcx-cancer-mronj", "refs": ["CH-2", "CH-5", "CH-6", "CH-7"], "hy": "Numeric blood-count cutoffs differ by source, so source attribution is essential to safe planning.", "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "cancer-oral-care-and-mucositis", "sec": "medcx-cancer-mronj", "refs": ["CH-13", "CH-14"], "hy": null, "siblings": 1, "cog": 1, "phase": "prev" },
     { "concept": "radiation-and-orn-prevention", "sec": "medcx-cancer-mronj", "refs": ["ORN-2", "ORN-3", "ORN-5", "ORN-9"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
-    { "concept": "pregnancy-dental-care-and-medications", "sec": "medcx-pregnancy", "refs": ["PG-1", "PG-4", "PG-6", "PG-8", "PG-9"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
-    { "concept": "infectious-disease-precautions-and-pep", "sec": "medcx-infectious", "refs": ["HEP-1", "HIV-1", "HIV-2", "HIV-3", "TB-1"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "pregnancy-dental-care-and-medications", "sec": "medcx-pregnancy", "refs": ["PG-1", "PG-4", "PG-6", "PG-8", "PG-9"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "infectious-disease-precautions-and-pep", "sec": "medcx-infectious", "refs": ["HEP-1", "HIV-1", "HIV-2", "HIV-3", "TB-1"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
     { "concept": "sickle-cell-dental-planning", "sec": "medcx-sickle-transplant", "refs": ["SCD-1", "SCD-3", "SCD-5", "SCD-6"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "transplant-dental-timing-and-prophylaxis", "sec": "medcx-sickle-transplant", "refs": ["TX-1", "TX-2", "TX-4", "PJ-4"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
     { "concept": "transplant-drug-interactions", "sec": "medcx-sickle-transplant", "refs": ["TX-5", "TX-6"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
@@ -104,7 +103,7 @@
         "patient": "Male, 72 years old",
         "cc": "\"I am here for a cleaning and checkup.\" (routine visit)",
         "hx": ["Prosthetic knee replacement 4 years ago; no prior joint infection", "Transcatheter pulmonary valve", "Takes lisinopril and low-dose aspirin", "No known drug allergies"],
-        "findings": ["Blood pressure 172/102 mm Hg, repeated after rest", "No oral pain or acute infection", "Patient reports comfortable walking and climbing one flight of stairs"]
+        "findings": ["Blood pressure 172/98 mm Hg, repeated after rest", "No oral pain or acute infection", "Patient reports comfortable walking and climbing one flight of stairs"]
       },
       "items": [
         { "phase": "plan", "concept": "blood-pressure-categories", "refs": ["BP-1"] },
@@ -140,7 +139,7 @@
       },
       "items": [
         { "phase": "plan", "concept": "cancer-treatment-blood-counts", "refs": ["CH-2", "CH-7"] },
-        { "phase": "plan", "concept": "cancer-treatment-blood-counts", "refs": ["CH-5", "CH-6", "CH-7"] },
+        { "phase": "plan", "concept": "cancer-treatment-blood-counts", "refs": ["CH-7"] },
         { "phase": "plan", "concept": "ckd-medication-and-analgesic-choice", "refs": ["CKD-2", "CKD-3"] }
       ]
     },
@@ -181,7 +180,7 @@
         "patient": "Male, 27 years old",
         "cc": "\"This tooth has been sore when I bite.\" (4 days)",
         "hx": ["Sickle cell disease; last crisis 2 years ago", "Takes hydroxyurea", "No drug allergies", "No history of coronary artery disease"],
-        "findings": ["During a planned extraction the patient becomes pale and nauseated, then briefly loses consciousness with arm jerks", "He wakes within 30 seconds but has new right-arm weakness and difficulty speaking", "A pulse is present and breathing is normal", "Tooth 19 has a fractured restoration without acute infection"]
+        "findings": ["During the local anesthetic injection for a planned restoration the patient becomes pale and nauseated, then briefly loses consciousness with arm jerks", "He wakes within 30 seconds but has new right-arm weakness and difficulty speaking", "A pulse is present and breathing is normal", "Tooth 19 has a fractured restoration; no acute infection"]
       },
       "items": [
         { "phase": "plan", "concept": "sickle-cell-dental-planning", "refs": ["SCD-1", "SCD-3"] },
