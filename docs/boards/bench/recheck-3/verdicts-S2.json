@@ -1,0 +1,151 @@
+[
+ {
+  "id": "R01",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "B is the only option that restates the source's full 'A, B, C, D and X' list, and A and C both claim letters survive, so B is the odd one out. B also mirrors the FDA phrase 'removes pregnancy letter categories A, B, C, D and X'. D is a separate false claim about OTC labels.",
+    "suggestion": "Optional polish: shorten B to 'Prescription labels no longer use letter categories' and reword it so it is not a near-quote of the FDA page."
+   }
+  ]
+ },
+ {
+  "id": "R02",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The stem hands over the 7 mg/kg figure, so the item tests arithmetic only. Many US dental pharmacology texts teach 4.4 mg/kg (2 mg/lb, 300 mg cap) as the adult lidocaine maximum, and that gives option B (6 cartridges). The B 'why' calls 4.4 mg/kg only 'the AAPD pediatric maximum', which can read as dismissing a figure students may have been taught for adults.",
+    "suggestion": "Keep the stem's 'label maximum of 7 mg/kg'. In the B 'why' or the explanation, note that other references use the more conservative 4.4 mg/kg (about 300 mg), so students see why the stem names the label."
+   }
+  ]
+ },
+ {
+  "id": "R03",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "citation",
+    "severity": "low",
+    "detail": "The quoted ADA Table 3 text does not itself contain the '160-180 / 100-109' band or the 'when pain is driving the BP' condition that the key, the A 'why' and the cue rely on. They appear only in the BP-3 summary. BP-3 also contains a contradictory sentence ('diastolic >100: refer as soon as possible') that is probably a typo for >109.",
+    "suggestion": "Confirm the band and pain wording against the ADA table and add a verbatim quote. If the pain condition is not in the source, drop 'when pain contributes' from the A 'why' and the cue."
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "C (sublingual nitroglycerin to lower BP, then start below 140/90) is not a real option for this patient. Anyone who knows nitroglycerin is for angina eliminates it at once, so it adds little.",
+    "suggestion": "Replace it with a more plausible wrong plan, such as 'Treat after she takes her missed hydrochlorothiazide and waits 30 minutes'."
+   }
+  ]
+ },
+ {
+  "id": "R04",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "current",
+    "severity": "low",
+    "detail": "The stem anchors to the 2019 ADA guideline, so the key is defensible. Other sources prefer clindamycin to azithromycin, and many would first delabel a 2016 penicillin allergy. The item stays safe only because the stem names the 2019 ADA regimens.",
+    "suggestion": "Before release, check whether the ADA has published an update to this guideline. If it has, keep the '2019' label only if that version still stands."
+   }
+  ]
+ },
+ {
+  "id": "R05",
+  "verdict": "pass",
+  "issues": []
+ },
+ {
+  "id": "R06",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "citation",
+    "severity": "low",
+    "detail": "The apical definitions are cited to a survey/consensus-modification paper rather than the AAE consensus nomenclature that INBDE-style items follow. The wording matches AAE here, but the cited source is secondary.",
+    "suggestion": "Add the AAE Consensus Conference definitions as the primary citation."
+   }
+  ]
+ },
+ {
+  "id": "R07",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "B and C both say 'second trimester' and D is absurd (months of delay). The chief complaint 'kept me up all night' signals an emergency, so A is easy to find by elimination. Difficulty 2 is accurate.",
+    "suggestion": "Optional: make one delay option more tempting, such as 'Place a temporary medicament now and complete root canal treatment in the second trimester'. That tests whether students know definitive care should not wait."
+   }
+  ]
+ },
+ {
+  "id": "R08",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "The box lists the brand name 'Xarelto\u00ae' beside the generic. The style rule asks for generic names.",
+    "suggestion": "Write 'Rivaroxaban 20 mg once daily with the evening meal'."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The C 'why' says days off a DOAC 'with bridging' are not needed, which implies bridging is sometimes used with DOACs. DOACs are not bridged with heparin, and C is wrong for that reason too.",
+    "suggestion": "Reword it to 'DOACs are not bridged, and stopping for 5 days exposes a patient with atrial fibrillation to stroke risk for no benefit with 1-3 simple extractions.'"
+   },
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "B is the only option that continues the drug and the only one without a number. A, C and D each stop or modify it, so it reads as the odd one out.",
+    "suggestion": "Optional: add a numeric detail to B, such as 'Continue it as prescribed, take the evening dose after the extractions, and control bleeding with local measures'."
+   }
+  ]
+ },
+ {
+  "id": "R09",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The D 'why' explains only why finishing the filling is wrong. It never says that a granola bar is a slow, mixed carbohydrate (and unsuitable for his celiac disease), which is the other reason D fails.",
+    "suggestion": "Add 'a granola bar is slow-acting and contains gluten, whereas fast carbohydrate (glucose tablets, gel or juice) acts within minutes.'"
+   },
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "The skipped lunch and the noon insulin are history, but they sit under Current Findings.",
+    "suggestion": "Move 'Took his lunchtime insulin at noon but skipped lunch' to the history section."
+   }
+  ]
+ },
+ {
+  "id": "R10",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "A and B are an opposite pair (high or low glucose). The glipizide and the 142 mg/dL reading make the glucose axis the obvious topic. C and D are generic fluconazole-class traps for drugs he does not take.",
+    "suggestion": "Optional: make one distractor a real fluconazole effect that does not apply here, such as QT prolongation (no QT drugs listed) or the CYP3A4 effect on inhaled fluticasone."
+   }
+  ]
+ },
+ {
+  "id": "R11",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "'with his medication' is singular, but he takes two drugs (propranolol and omeprazole). Only propranolol is relevant, and this makes the target less clear.",
+    "suggestion": "Say 'with one of his medications', or 'with his beta-blocker' if the clue is acceptable."
+   }
+  ]
+ }
+]

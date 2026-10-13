@@ -1,0 +1,691 @@
+{
+ "unit": "anes",
+ "note": "Fact records for the boards hub. Schema and rules: src/boards/facts/README.md. Quotes are verified by tools/boards/check-quotes.mjs.",
+ "facts": [
+  {
+   "id": "LA-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Adult label maximums and drug content per US dental cartridge. Lidocaine 2% with epinephrine 1:100,000 or 1:50,000: 34 mg per 1.7 mL (20 mg/mL); not over 7 mg/kg (3.2 mg/lb), and keep the total below 500 mg in a healthy adult. Articaine 4% with epinephrine 1:100,000 or 1:200,000: 68 mg per 1.7 mL (40 mg/mL); 7 mg/kg, with no absolute mg cap on the label. Mepivacaine 3% plain (51 mg per 1.7 mL) and 2% with levonordefrin 1:20,000 (34 mg per 1.7 mL): up to 3 mg/lb (6.6 mg/kg), never more than 400 mg per sitting. Prilocaine 4% plain or with epinephrine 1:200,000: 72 mg per 1.8 mL; 8 mg/kg (4 mg/lb) under 70 kg (150 lb), 600 mg (8 cartridges) at 70 kg or more. Bupivacaine 0.5% with epinephrine 1:200,000: 9 mg per 1.8 mL; ordinarily no more than 90 mg per sitting in a healthy adult (ten 1.8 mL cartridges).",
+   "conditions": "US dental lidocaine and mepivacaine cartridges are labeled 1.7 mL; prilocaine and bupivacaine 1.8 mL. Items that say '1.8 mL of 2% lidocaine = 36 mg' follow an older convention: prefer the label's 34 mg per 1.7 mL, or state the volume in the stem.",
+   "data": {
+    "lidocaine_2_epi": {
+     "mg_per_ml": 20,
+     "cart_ml": 1.7,
+     "mg_per_cart": 34,
+     "max_mg_kg": 7,
+     "max_mg": 500
+    },
+    "articaine_4_epi": {
+     "mg_per_ml": 40,
+     "cart_ml": 1.7,
+     "mg_per_cart": 68,
+     "max_mg_kg": 7,
+     "max_mg": null
+    },
+    "mepivacaine_3": {
+     "mg_per_ml": 30,
+     "cart_ml": 1.7,
+     "mg_per_cart": 51,
+     "max_mg_lb": 3,
+     "max_mg_kg": 6.6,
+     "max_mg": 400
+    },
+    "mepivacaine_2_levo": {
+     "mg_per_ml": 20,
+     "cart_ml": 1.7,
+     "mg_per_cart": 34,
+     "max_mg_lb": 3,
+     "max_mg_kg": 6.6,
+     "max_mg": 400
+    },
+    "prilocaine_4": {
+     "mg_per_ml": 40,
+     "cart_ml": 1.8,
+     "mg_per_cart": 72,
+     "max_mg_kg": 8,
+     "max_mg": 600
+    },
+    "bupivacaine_05_epi": {
+     "mg_per_ml": 5,
+     "cart_ml": 1.8,
+     "mg_per_cart": 9,
+     "max_mg": 90
+    }
+   },
+   "cites": [
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Dosage and Administration",
+     "quote": "the amount of lidocaine HCI administered should be kept below 500 mg, and in any case, should not exceed 7 mg/kg (3.2 mg/lb) of body weight"
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "How Supplied",
+     "quote": "Lidocaine HCl 2% (34 mg/1.7 mL) (20 mg/mL) and Epinephrine 1:100,000"
+    },
+    {
+     "src": "dm-septocaine",
+     "loc": "2.2 Maximum recommended dosages",
+     "quote": "Healthy adults: 7 mg/kg of articaine HCl and 0.0017mg/kg of epineprhine"
+    },
+    {
+     "src": "dm-septocaine",
+     "loc": "3 Dosage forms",
+     "quote": "Articaine hydrochloride 4% (68 mg/1.7mL) (40 mg/mL) and epinephrine 1:100,000"
+    },
+    {
+     "src": "dm-carbocaine",
+     "loc": "Dosage and Administration",
+     "quote": "Each cartridge contains 1.7 mL (34 mg of 2% or 51 mg of 3%)."
+    },
+    {
+     "src": "dm-polocaine",
+     "loc": "Dosage and Administration",
+     "quote": "A dose of up to 3 mg per pound of body weight may be administered. At any single dental sitting the total dose for all injected sites should not exceed 400 mg in adults."
+    },
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Dosage and Administration",
+     "quote": "<150 lb (<70 kg) 4 mg/lb (8 mg/kg) ≥150 lb (≥70 kg) 600 mg (15 mL) or 8 cartridges"
+    },
+    {
+     "src": "dm-citanest-plain",
+     "loc": "How Supplied",
+     "quote": "4% (72 mg/1.8 mL) (40 mg/mL)"
+    },
+    {
+     "src": "dm-vivacaine",
+     "loc": "Dosage and Administration",
+     "quote": "the total dose for all injection sites, spread out over a single dental sitting, should not ordinarily exceed 90 mg for a healthy adult patient (ten 1.8 mL injections of bupivacaine with epinephrine)"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Mepivacaine labels: 5.3 cartridges (270 mg of 3% or 180 mg of 2%) is usually enough to anesthetize the whole mouth; 1 cartridge usually suffices for an infiltration or block.",
+   "cites": [
+    {
+     "src": "dm-carbocaine",
+     "loc": "Dosage and Administration",
+     "quote": "5.3 cartridges (180 mg of the 2% solution or 270 mg of the 3% solution) are usually adequate to effect anesthesia of the entire oral cavity"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Septocaine epinephrine ceiling: 0.0017 mg/kg epinephrine; 1:100,000 = 0.018 mg/mL and 1:200,000 = 0.009 mg/mL of epinephrine. Indicated for adults and children 4 years and older; safety below age 4 not established.",
+   "cites": [
+    {
+     "src": "dm-septocaine",
+     "loc": "2.2",
+     "quote": "0.0017mg/kg of epineprhine"
+    },
+    {
+     "src": "dm-septocaine",
+     "loc": "1 Indications and Usage",
+     "quote": "in adults and pediatric patients 4 years of age or older"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-4",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Children under 10: rarely more than half a cartridge per procedure for a single tooth. Label pediatric maximums use a weight formula (Clark's rule); for a 5-year-old weighing 50 lb, the lidocaine label example gives 75-100 mg and the prilocaine label 150-200 mg. Mepivacaine pediatric max = child's weight (lb) / 150 x 400 mg.",
+   "cites": [
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Dosage and Administration, Pediatric",
+     "quote": "it is rarely necessary to administer more than one-half cartridge (0.9 - 1.0 mL or 18 - 20 mg of lidocaine) per procedure"
+    },
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Dosage and Administration",
+     "quote": "In children under 10 years of age it is rarely necessary to administer more than onehalf cartridge (40 mg)"
+    },
+    {
+     "src": "dm-carbocaine",
+     "loc": "Dosage and Administration",
+     "quote": "Maximum dose for pediatric population = Child's Weight (lbs.) × Maximum Recommended Dose for Adults (400 mg) 150"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "AAPD pediatric maximums: lidocaine 4.4 mg/kg (2 mg/lb), articaine 7 mg/kg (3.2 mg/lb), mepivacaine 4.4 mg/kg (2 mg/lb), bupivacaine 1.3 mg/kg (0.6 mg/lb). The AAPD notes the label (manufacturer) maximum for lidocaine is 7 mg/kg. Reduce the amide maximum by 30% in infants under 6 months. Articaine is not recommended under age 4; bupivacaine not under age 12. AAPD's table gives no prilocaine row; no AAPD mg/kg value for prilocaine was verified.",
+   "conditions": "AAPD table text is scrambled by PDF extraction (the quotes are table cells). No AAPD mg/kg value for prilocaine was verified.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "Mepivacaine 120-240 4.4 2"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "BupivacaineE 180-600 1.3 0.6"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table footnote D-E, p. 408",
+     "quote": "Use in pediatric patients under 4 years of age is not recommended."
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 411",
+     "quote": "Doses of amides should be decreased by 30%"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "AAPD vasoconstrictor per 1.7 mL cartridge: epi 1:50,000 = 0.034 mg; 1:100,000 = 0.017 mg; 1:200,000 = 0.0085 mg; levonordefrin 1:20,000 = 0.085 mg. Bupivacaine 0.5% = 8.5 mg per 1.7 mL in the AAPD table.",
+   "conditions": "Table cells (PDF extraction). 1:50,000 = 0.034 mg per 1.7 mL is in the same table.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "34 0.017 mg 2%+1:100,000 epinephrine"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "2%+1:20,000 levonordefrin 34 0.085 mg"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "68 0.0085 mg 4%+1:200,000 epinephrine"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Early CNS toxicity signs: restlessness, anxiety, tinnitus, dizziness, blurred vision, tremors, depression or drowsiness. AAPD: toxicity is biphasic (excitation then depression); early subjective signs are dizziness, anxiety, confusion, then diplopia, tinnitus, drowsiness, circumoral numbness/tingling; objective signs are muscle twitching, tremor, talkativeness, slowed speech, shivering, then a generalized tonic-clonic seizure (the classic overdose reaction), loss of consciousness and respiratory arrest. Cardiovascular: HR and BP may rise at first (epinephrine), then vasodilation, myocardial depression, falling BP, bradycardia and arrest. Most reactions come during the injection or within 5-10 minutes.",
+   "cites": [
+    {
+     "src": "dm-septocaine",
+     "loc": "5.2",
+     "quote": "Restlessness, anxiety, tinnitus, dizziness, blurred vision, tremors, depression, or drowsiness may be early warning signs of central nervous system toxicity."
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 409",
+     "quote": "Most adverse drug reactions develop either during the injection or within 5 to 10 minutes."
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-8",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Toxicity management: stop the anesthetic, airway and ventilation first; anticonvulsant if seizures persist despite ventilation; CPR if arrest. AAPD: early IV lipid emulsion is a priority in potentially serious LAST; activate EMS by severity. Prevention: aspirate, inject slowly, calculate the maximum by weight. Small dental doses can cause toxic reactions through intra-arterial injection with retrograde flow to the brain.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 410",
+     "quote": "Early treatment with intravenous lipid emulsion therapy is a priority in potentially serious cases of LAST."
+    },
+    {
+     "src": "dm-septocaine",
+     "loc": "5.1",
+     "quote": "These reactions may be due to intra-arterial injection of the local anesthetic with retrograde flow to the cerebral circulation."
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-9",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Methemoglobinemia: any LA can cause it; higher risk with G6PD deficiency, congenital or idiopathic methemoglobinemia, cardiac or pulmonary compromise, infants under 6 months, and other oxidizing drugs. Signs: cyanosis (gray/blue skin, nail beds, lips), abnormally colored blood, headache, tachycardia, shortness of breath, fatigue; can appear immediately or hours later. Treat: stop the drug, oxygen, and for severe cases IV methylene blue 1-2 mg/kg over 5 minutes, exchange transfusion or hyperbaric oxygen. Prilocaine's metabolite o-toluidine forms methemoglobin; prilocaine is contraindicated in congenital or idiopathic methemoglobinemia. AAPD: benzocaine contraindicated with a history of methemoglobinemia and under age 2; prilocaine relatively contraindicated in G6PD deficiency, sickle cell anemia, anemia, very young patients or hypoxia.",
+   "conditions": "The methylene blue dose (1-2 mg/kg IV over 5 minutes) is in the label text but not yet quoted.",
+   "cites": [
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Clinical Pharmacology",
+     "quote": "O-toluidine has been found to produce methemoglobin, both in vitro and in vivo"
+    },
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Contraindications",
+     "quote": "in those rare patients with congenital or idiopathic methemoglobinemia"
+    },
+    {
+     "src": "dm-citanest-forte",
+     "loc": "Overdosage",
+     "quote": "A more severe clinical presentation may require treatment with methylene blue exchange transfusion, or hyperbaric oxygen."
+    },
+    {
+     "src": "dm-carbocaine",
+     "loc": "Warnings",
+     "quote": "The clinical signs of methemoglobinemia are cyanosis of the nail beds and lips, fatigue and weakness."
+    },
+    {
+     "src": "aapd-la",
+     "loc": "pp. 407-408",
+     "quote": "glucose-6-phosphate dehydrogenase deficiency"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-10",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Sulfite: dental LA cartridges with epinephrine contain a bisulfite/metabisulfite antioxidant that can cause allergic-type reactions and asthma attacks in sulfite-sensitive people. Plain mepivacaine 3% and plain prilocaine 4% contain no vasoconstrictor.",
+   "cites": [
+    {
+     "src": "dm-septocaine",
+     "loc": "Description / ingredients",
+     "quote": "Sodium metabisulfite"
+    },
+    {
+     "src": "dm-carbocaine",
+     "loc": "Description",
+     "quote": "CARBOCAINE 3% (30 mg/mL) is SULFITE FREE."
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-11",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Paresthesia is reported more often with 4% solutions (articaine, prilocaine) than with lower concentrations. Phentolamine mesylate, used in patients over age 6 or weighing at least 15 kg (33 lb), shortened soft-tissue anesthesia by about 47% in the maxilla and 67% in the mandible.",
+   "conditions": "The 4% paresthesia statement is on the same page (quote not yet added).",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 410",
+     "quote": "Use of phentolamine mesylate injections in patients over age 6 years or at least 15 kg has been shown to reduce the duration of effects of local anesthetic by about 47% in the maxilla and 67% in the mandible."
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "errata": "2026-10-11: the research note said phentolamine was 'not recommended under age 3 or under 15 kg'; the AAPD text says it was studied in patients over age 6 or at least 15 kg. Claim corrected.",
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-12",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Plain prilocaine 4%: about 10 minutes of pulpal anesthesia by maxillary infiltration; by IANB, onset under 3 minutes and soft-tissue anesthesia about 2.5 hours.",
+   "cites": [
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Clinical Pharmacology",
+     "quote": "provides a duration of pulpal anesthesia of approximately 10 minutes in maxillary infiltration injections"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "local-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Cardiac dose ceiling: the healthy-adult maximum of epinephrine in dental anesthesia is commonly given as 0.2 mg, lowered to 0.04 mg for patients with significant cardiovascular disease (ASA III-IV). 0.04 mg = about 2 cartridges of 1:100,000 (0.017-0.018 mg each; see LA-3, LA-6) or about 4 cartridges of 1:200,000. Keep it as \"0.04 mg\"; the cartridge count is a derived teaching number.",
+   "conditions": "0.04 mg is about 2 cartridges of 1:100,000 (derived teaching number; VC-8 gives ADA's own conversion).",
+   "cites": [
+    {
+     "src": "godzieba-2014",
+     "loc": "Background",
+     "quote": "The maximum dose of epinephrine in local anaesthesia for a healthy subject is 0.2 mg, though this can be lowered to 0.04 mg if patient has severe cardiovascular disease (ASA III and IV)"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "The same review concluded that up to 4 cartridges of lidocaine with epinephrine 1:100,000 seemed relatively safe in cardiovascular-compromised patients, that most arrhythmias seen were clinically insignificant, and that ECG monitoring should be considered at higher doses. AHA/ADA position cited there: no contraindication to vasoconstrictor if given carefully with aspiration (Background).",
+   "conditions": "Most arrhythmias seen were clinically insignificant (same conclusions). ECG monitoring at higher doses is the review's suggestion.",
+   "cites": [
+    {
+     "src": "godzieba-2014",
+     "loc": "Abstract, Conclusions",
+     "quote": "The use of ≤4 ampules of lignocaine with epinephrine 1:100000 as a dental anaesthetic seems to be relatively safe for cardiovascular compromised patients."
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-3",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Label interactions (epinephrine-containing dental LAs): with MAO inhibitors, nonselective beta-blockers or tricyclic antidepressants, severe prolonged hypertension can occur; phenothiazines and butyrophenones may reduce or reverse epinephrine's pressor effect; avoid concurrent use, or monitor closely if unavoidable. Xylocaine Dental: with a beta-blocker (propranolol, timolol), dose-dependent hypertension and bradycardia with possible heart block. Vasopressors plus ergot-type oxytocics: severe persistent hypertension or stroke.",
+   "cites": [
+    {
+     "src": "dm-septocaine",
+     "loc": "5 / 7 Drug Interactions",
+     "quote": "monoamine oxidase inhibitors, nonselective beta-adrenergic antagonists, or tricyclic antidepressants may produce severe, prolonged hypertension. Phenothiazines and butyrophenones may reduce or reverse the pressor effect of epinephrine."
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Precautions",
+     "quote": "concurrent use of either with a Beta-adrenergic blocking agent (propranolol, timolol, etc.) may result in dose-dependent hypertension and bradycardia with possible heart block"
+    },
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Precautions",
+     "quote": "Concurrent administration of vasopressor drugs and ergot-type oxytocic drugs may cause severe, persistent hypertension or cerebrovascular accidents."
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-4",
+   "status": "partial",
+   "risk": "high",
+   "claim": "Mechanism of the nonselective beta-blocker interaction: with beta-2 vasodilation blocked, epinephrine's alpha-1 vasoconstriction is unopposed, so BP rises and a reflex bradycardia follows. Cardioselective (beta-1) blockers such as metoprolol and atenolol are not named in the labels' warning.",
+   "conditions": "The mechanism (unopposed alpha-1 with beta-2 blocked, reflex bradycardia) is a teaching paraphrase; only the label effect is sourced.",
+   "cites": [
+    {
+     "src": "dm-xylocaine-dental",
+     "loc": "Precautions",
+     "quote": "may result in dose-dependent hypertension and bradycardia with possible heart block"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-5",
+   "status": "verified",
+   "risk": "high",
+   "claim": "TCAs and SNRIs block norepinephrine reuptake, so injected epinephrine and especially levonordefrin (mainly alpha effects, so the effect is mostly on BP) can have exaggerated, prolonged effects; minimize the epinephrine dose and inject slowly. Amphetamines (e.g., Adderall) and atomoxetine share this concern; SSRIs, trazodone, mirtazapine and bupropion do not have significant epinephrine interactions.",
+   "cites": [
+    {
+     "src": "saraghi-2017",
+     "loc": "Drug interactions",
+     "quote": "drugs that inhibit this process (SNRIs and TCAs) also may prolong and exaggerate epinephrine activity"
+    },
+    {
+     "src": "saraghi-2017",
+     "loc": "Drug interactions",
+     "quote": "The SSRIs and other atypical antidepressants (eg, trazadone, mirtazapine, bupropion) do not have significant epinephrine or ephedrine interactions"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-6",
+   "status": "verified",
+   "risk": "high",
+   "claim": "MAOIs: pharmacologically no interaction with direct-acting agents like epinephrine is expected, but the labels still advise caution (VC-3); the dangerous MAOI interaction is with indirect-acting sympathomimetics (ephedrine, pseudoephedrine), which can cause hypertensive crisis and are contraindicated. Don't stop an MAOI without the psychiatrist.",
+   "conditions": "The MAOI / indirect-acting sympathomimetic hypertensive-crisis wording is in the same section (quote not yet added).",
+   "cites": [
+    {
+     "src": "saraghi-2017",
+     "loc": "Drug interactions",
+     "quote": "do not have the same hemodynamic concerns as TCAs, SNRIs, or MAOIs with respect to the concomitant use of direct- or indirect-acting sympathomimetics"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Cocaine and other stimulants: they are sympathomimetic, so epinephrine-containing LA, epinephrine retraction cord and nitrous oxide may be contraindicated in a patient who has just used cocaine; elective care can usually be done 24 hours after the last stimulant (cocaine, crack, amphetamine) use. Methamphetamine acts for about 8-12 hours.",
+   "cites": [
+    {
+     "src": "perio2000-illegal-drugs",
+     "loc": "Table 4",
+     "quote": "Avoid local anesthetic with epinephrine"
+    },
+    {
+     "src": "perio2000-illegal-drugs",
+     "loc": "Table 4",
+     "quote": "Avoid treatment at least 24 h from last drug use"
+    },
+    {
+     "src": "perio2000-illegal-drugs",
+     "loc": "Section 6.3",
+     "quote": "The average duration of action of methamphetamines is 8‐12 hours."
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "VC-8",
+   "status": "verified",
+   "risk": "high",
+   "claim": "ADA Oral Health Topic \"Hypertension\": when the history calls for caution, a common recommendation is to limit epinephrine to 0.04 mg in adults = 1 cartridge of 1:50,000, 2 of 1:100,000 or 4 of 1:200,000; epinephrine-impregnated retraction cord is discouraged in uncontrolled hypertension. This is the keyed number for the bank.",
+   "cites": [
+    {
+     "src": "ada-hypertension",
+     "loc": "Local Anesthetics with Vasoconstrictors",
+     "quote": "limit the epinephrine dose to 0.04 mg in adults"
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Local Anesthetics with Vasoconstrictors",
+     "quote": "cartridge of anesthetic containing 1:50,000 epinephrine; Two cartridges of anesthetic containing 1:100,000 epinephrine; or Four cartridges of anesthetic containing 1:200,000 epinephrine"
+    },
+    {
+     "src": "ada-hypertension",
+     "loc": "Local Anesthetics with Vasoconstrictors",
+     "quote": "their use has been discouraged"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  }
+ ]
+}

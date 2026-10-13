@@ -1,0 +1,1421 @@
+{
+ "unit": "perio",
+ "note": "Fact records for the boards hub. Schema and rules: src/boards/facts/README.md. Quotes are verified by tools/boards/check-quotes.mjs.",
+ "facts": [
+  {
+   "id": "PH-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Gingival health on an intact periodontium: no attachment loss, probing depths of 3 mm or less (no pseudo pockets), bleeding on probing (BOP) at fewer than 10% of sites, no radiographic bone loss.",
+   "conditions": "Table 1 cells are interleaved by PDF extraction; the prose quote carries the <10% BOP and ≤3 mm rule.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "p. S71",
+     "quote": "gingival health is defined as < 10% bleeding sites"
+    },
+    {
+     "src": "chapple-2018",
+     "loc": "Table 1, p. S74",
+     "quote": "Probing pocket depths (all sites & assuming no pseudo pockets)a ≤4 mm (no site ≥ 4 mm with BOP)b ≤3 mm Bleeding on probinga <10%"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PH-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Plaque-induced gingivitis (intact periodontium or reduced periodontium in a non-periodontitis patient): BOP at 10% of sites or more with probing depths of 3 mm or less and no periodontitis.",
+   "conditions": "Gingivitis = BOP at 10% or more with probing depths ≤3 mm (Chapple p. S73, Table 1); the threshold quote is the health definition's mirror image.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "p. S71",
+     "quote": "gingival health is defined as < 10% bleeding sites"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PH-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Extent of gingivitis: localized = 10% to 30% of sites bleeding; generalized = more than 30%.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "p. S73",
+     "quote": "Localized gingivitis is defined as 10%‐30% bleeding sites"
+    },
+    {
+     "src": "chapple-2018",
+     "loc": "p. S73",
+     "quote": "gingivitis is defined as > 30% bleeding sites"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PH-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Health on a reduced periodontium in a non-periodontitis patient (e.g., recession, after crown lengthening): attachment loss present, probing depths 3 mm or less, BOP under 10%, bone loss possible.",
+   "conditions": "Table 1 text is interleaved by PDF extraction; read the reduced-periodontium columns in the PDF itself before keying a fine point.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "Table 1, p. S74",
+     "quote": "Successfully treated stable periodontitis patient Health Gingivitis in a patient with a history of periodontitis Probing attachment loss Yes Yes"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PH-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Successfully treated, stable periodontitis patient: health = all probing depths 4 mm or less with no site of 4 mm or more that bleeds, BOP under 10%; gingivitis in such a patient = BOP at 10% or more at sites of 3 mm or less. A 4 mm site that bleeds is no longer a \"closed pocket\". The patient remains a periodontitis patient for life.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "Table 1 notes, p. S74",
+     "quote": "Where the probing depth is 4 mm or higher with bleeding, this is no longer a “closed pocket.”"
+    },
+    {
+     "src": "chapple-2018",
+     "loc": "p. S73",
+     "quote": "the treated and stable periodontitis patient with current gingival health remains at increased risk of recurrent periodontitis"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PH-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Table 1 assumes light probing force of 0.2 to 0.25 N.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "Table 1 footnote a, p. S74",
+     "quote": "Assumes a light probing pressure of 0.2 to 0.25 N."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-health-gingivitis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Three forms of periodontitis are recognized: periodontitis, necrotizing periodontitis, and periodontitis as a direct manifestation of systemic disease; the \"chronic\" vs \"aggressive\" split was dropped.",
+   "cites": [
+    {
+     "src": "efp-2",
+     "loc": "p. 1",
+     "quote": "Three forms of periodontitis have been identified: (1) periodontitis, (2) necrotising periodontitis, (3) periodontitis as a direct manifestation of systemic diseases."
+    },
+    {
+     "src": "efp-2",
+     "loc": "p. 1",
+     "quote": "evidence to support differentiating “chronic” and “aggressive” periodontitis"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "A patient is a periodontitis case when interdental CAL is detectable at 2 or more non-adjacent teeth, or buccal/oral CAL of 3 mm or more with pocketing over 3 mm is found at 2 or more teeth, and the CAL cannot be explained by non-periodontal causes (traumatic recession, cervical caries, distal of a second molar from third-molar malposition or extraction, an endodontic lesion draining through the marginal periodontium, a vertical root fracture).",
+   "cites": [
+    {
+     "src": "efp-2",
+     "loc": "p. 3",
+     "quote": "Interdental CAL is detectable at ≥2 non-adjacent teeth, or • Buccal/oral CAL of ≥3mm with pocketing of >3mm is detectable at ≥2 teeth"
+    },
+    {
+     "src": "efp-2",
+     "loc": "p. 3",
+     "quote": "1. Gingival recession of traumatic origin; 2. Dental caries extending in the cervical area of the tooth; 3. The presence of CAL on the distal aspect of a second molar and associated with malposition or extraction of a third molar"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Stage is set first by interdental CAL at the site of greatest loss; if CAL is unavailable, use radiographic bone loss (RBL). Tooth loss from periodontitis can modify the stage, and one or more complexity factors can shift the stage higher.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1",
+     "quote": "If CAL is not available, radiographic bone loss (RBL) should be used. Tooth loss due to periodontitis may modify stage definition. One or more complexity factors may shift the stage to a higher level."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Severity by stage: Stage I: CAL 1-2 mm; RBL coronal third (<15%); no tooth loss from periodontitis. Stage II: CAL 3-4 mm; RBL coronal third (15%-33%); no tooth loss. Stage III: CAL 5 mm or more; RBL to the middle third of the root and beyond; tooth loss of 4 teeth or fewer. Stage IV: CAL 5 mm or more; RBL to the middle third and beyond; tooth loss of 5 teeth or more.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Severity",
+     "quote": "Interdental CAL (at site of greatest loss) 1 – 2 mm 3 – 4 mm ≥5 mm ≥5 mm RBL Coronal third (<15%) Coronal third (15% - 33%) Extending to middle third of root and beyond"
+    },
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Severity",
+     "quote": "Tooth loss (due to periodontitis) No tooth loss ≤4 teeth ≥5 teeth"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Complexity: Stage I: max probing depth 4 mm or less, mostly horizontal bone loss. Stage II: max probing depth 5 mm or less, mostly horizontal bone loss. Stage III (in addition to stage II complexity): probing depths 6 mm or more; vertical bone loss 3 mm or more; furcation involvement class II or III; moderate ridge defects. Stage IV (in addition to stage III complexity): need for complex rehabilitation because of masticatory dysfunction, secondary occlusal trauma (tooth mobility degree 2 or more), severe ridge defects, bite collapse/drifting/flaring, fewer than 20 remaining teeth (10 opposing pairs).",
+   "conditions": "Chart cells are interleaved by PDF extraction; the quotes confirm the numbers, the stage each belongs to comes from the chart layout.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Complexity",
+     "quote": "Max. probing depth • Max. probing depth In addition to In addition to ≤4 mm ≤5 mm"
+    },
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Complexity",
+     "quote": "Secondary occlusal trauma Complexity • Furcation involvement (tooth mobility degree ≥2) Class II or III"
+    },
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Complexity",
+     "quote": "< 20 remaining teeth (10 opposing pairs)"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Extent (added to the stage): localized = fewer than 30% of teeth involved; generalized; or molar/incisor pattern.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 1, Extent",
+     "quote": "Localized (<30% of teeth involved);"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-7",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Grading estimates rate of progression, response to standard therapy, and possible systemic impact. Start by assuming grade B and look for evidence to move to A or C.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 2",
+     "quote": "Grading aims to indicate the rate of periodontitis progression, responsiveness to standard therapy, and potential impact on systemic health."
+    },
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 2",
+     "quote": "Clinicians should initially assume grade B disease and seek specific evidence to shift to grade A or C."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-8",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Direct evidence (radiographic bone loss or CAL over 5 years) is used whenever available: A = no loss over 5 years; B = less than 2 mm over 5 years; C = 2 mm or more over 5 years.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 2",
+     "quote": "Primary criteria No loss over 5 years <2 mm over 5 years ≥2 mm over 5 years"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-9",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Indirect evidence, % bone loss divided by age: A = under 0.25; B = 0.25 to 1.0; C = over 1.0. Case phenotype: A = heavy biofilm with little destruction; B = destruction in line with biofilm; C = destruction exceeds what the biofilm would predict, or patterns suggesting rapid progression or early onset.",
+   "conditions": "The % bone loss / age cut-offs (<0.25, 0.25-1.0, >1.0) are in the chart's grid, which PDF extraction scrambles; quote not yet added.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 2",
+     "quote": "Heavy biofilm deposits Destruction commensurate Destruction exceeds"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-10",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Grade modifiers: smoking: non-smoker = A, fewer than 10 cigarettes/day = B, 10 or more/day = C. Diabetes: normoglycemic / no diabetes = A, HbA1c under 7.0% in a patient with diabetes = B, HbA1c 7.0% or higher = C.",
+   "cites": [
+    {
+     "src": "aap-staging-chart",
+     "loc": "p. 2, Grade modifiers",
+     "quote": "cigarettes/day ≥10 cigarettes/day Normoglycemic/no diagnosis of diabetes HbA1c <7.0% in patients with diabetes HbA1c ≥7.0% in patients with diabetes"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PS-11",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "\"Biologic width\" is renamed supracrestal tissue attachment (junctional epithelium plus supracrestal connective tissue); placing restoration margins within the supracrestal connective-tissue attachment is associated with inflammation and loss of support.",
+   "cites": [
+    {
+     "src": "efp-3",
+     "loc": "p. 5",
+     "quote": "The term “biologic width” is replaced by “supracrestal tissue attachment”, consisting of junctional-epithelium and supracrestal connective tissue."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-staging-grading",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Peri-implant health: no clinical signs of inflammation, no bleeding/suppuration on gentle probing, no increase in probing depth over previous exams, no bone loss (beyond initial remodeling). No range of probing depths defines health, and health can exist around implants with reduced bone support.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "p. 3",
+     "quote": "Peri-implant health is characterised by the absence of clinical signs of inflammation, such as swelling, redness, and BoP. It is not possible, however, to define a range of probing depths that are compatible with health."
+    },
+    {
+     "src": "efp-4",
+     "loc": "p. 3",
+     "quote": "peri-implant health can exist around implants with reduced bone support"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Peri-implant mucositis: bleeding and/or suppuration on gentle probing with no bone loss beyond initial remodeling; plaque is the cause, and it can resolve when plaque control is restored.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "Table 1, p. 6",
+     "quote": "Peri-implant health Peri-implant mucositis Peri-implantitis No BoP BoP BoP No bone loss* No bone loss* Bone loss*"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Peri-implantitis: bleeding and/or suppuration on gentle probing, increased probing depth compared with previous exams, and bone loss beyond initial remodeling.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "p. 6",
+     "quote": "Peri-implantitis sites exhibit clinical signs of inflammation including bleeding on probing and/or suppuration, increased probing depths and/or recession of the mucosal margin, and radiographic bone loss compared to previous examinations."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Without previous exam data, peri-implantitis can be diagnosed from bleeding/suppuration on gentle probing plus probing depths of 6 mm or more plus bone levels 3 mm or more apical to the most coronal part of the intraosseous portion of the implant.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "p. 6",
+     "quote": "bone levels ≥3mm apical of the most coronal portion of the intra-osseous part of the implant, together with bleeding and/or suppuration on probing, are consistent with the diagnosis of peri-implantitis"
+    },
+    {
+     "src": "wws-berglundh-2018",
+     "loc": "Case definitions (no previous data)",
+     "quote": "Probing depths of ≥6 mm. • Bone levels ≥3 mm apical of the most coronal portion of the in‐ traosseous part of the implant."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Mucositis is assumed to precede peri-implantitis; peri-implantitis progresses faster than periodontitis, in a non-linear, accelerating pattern. Strong evidence links a history of severe periodontitis, poor plaque control and missed maintenance to peri-implantitis; evidence for smoking and diabetes is inconclusive.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "p. 5",
+     "quote": "The progression of peri-implantitis is faster than that observed in periodontitis and occurs in a non-linear and accelerating pattern."
+    },
+    {
+     "src": "efp-4",
+     "loc": "p. 5",
+     "quote": "an increased risk for peri-implantitis in patients who have a history of severe periodontitis. Data identifying smoking and diabetes as potential risk indicators for peri-implantitis are inconclusive."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PI-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Clinicians should record baseline radiographs and probing after the implant prosthesis is completed; epidemiologic bone-loss thresholds should exceed the mean measurement error of 0.5 mm.",
+   "cites": [
+    {
+     "src": "efp-4",
+     "loc": "p. 7",
+     "quote": "Bone loss should be reported using thresholds exceeding the measurement error (mean 0.5mm)."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MG-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Gingival phenotype (thickness and width of keratinized gingiva) is now part of the classification; recession is described by recession depth, gingival thickness, keratinized tissue width, whether the CEJ is detectable (class A detectable / B not) and whether a cervical step over 0.5 mm is present (+/-).",
+   "cites": [
+    {
+     "src": "efp-3",
+     "loc": "p. 3",
+     "quote": "Step = root-surface concavity (Class + = presence of a cervical step > 0.5mm. Class – = absence of a cervical step > 0.5mm)"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "mucogingival",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "MG-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Cairo recession types: RT1 = recession with no interproximal attachment loss (interproximal CEJ not visible); RT2 = interproximal attachment loss less than or equal to the buccal attachment loss; RT3 = interproximal attachment loss greater than the buccal attachment loss.",
+   "cites": [
+    {
+     "src": "efp-3",
+     "loc": "p. 4",
+     "quote": "RT1 -- REC with no loss of interproximal CAL -- Interproximal CEJ is not visible RT2 -- REC with loss of interproximal CAL -- Interproximal loss of CAL is less than or equal to buccal C"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "mucogingival",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "FM-1",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Glickman (1953) furcation grades: I = incipient, suprabony pocket, slight furcal bone loss; II = loss of interradicular bone with pocketing but part of the bone/PDL remains (cul-de-sac, not through); III = through-and- through; IV = through-and-through with recession so the furcation is clearly visible.",
+   "cites": [
+    {
+     "src": "pilloni-2018",
+     "loc": "Table 1",
+     "quote": "Grade III: Through-and-through lesion. Grade IV: Through-and-through lesion with gingival recession, leading to a clearly visible furcation area."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "furcation-mobility",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "FM-2",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Hamp, Nyman and Lindhe (1975), horizontal attachment loss in the furcation: degree I = under 3 mm; degree II = over 3 mm but not the total width; degree III = through-and-through.",
+   "cites": [
+    {
+     "src": "pilloni-2018",
+     "loc": "Classifications",
+     "quote": "Degree I: horizontal attachment loss < 3 mm of the total width of the furcation area. Degree II: horizontal attachment loss > 3 mm but not encompassing the total width of the furcation area."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "furcation-mobility",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "FM-3",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Tarnow and Fletcher vertical subclass (from the fornix): A = 3 mm or less; B = 4-6 mm; C = 7 mm or more.",
+   "cites": [
+    {
+     "src": "pilloni-2018",
+     "loc": "Classifications",
+     "quote": "Subclass A: vertical bone loss 3 mm or less. Subclass B: vertical bone loss from 4 to 6 mm. Subclass C: bone loss from the fornix of 7 mm or more."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "furcation-mobility",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "FM-4",
+   "status": "partial",
+   "risk": "low",
+   "claim": "Miller mobility index: 0 = physiologic; 1 = first sign of more-than-normal movement; 2 = up to 1 mm buccolingually; 3 = over 1 mm buccolingually and/or depressible (vertical movement). Grades 1-2 are horizontal only; grade 3 includes vertical movement. Note: the 2017 staging chart uses \"mobility degree 2 or more\" as a stage IV complexity factor (PS-5).",
+   "conditions": "The review's prose says Miller grade 2 may include 'possible vertical or axial displacement', which disagrees with the usual teaching (grades 1-2 horizontal, grade 3 adds vertical/depressible) and its own table. Key only 'grade 3 includes vertical movement'; don't key the 1 mm cut-off or grade 2's direction until a primary source is opened.",
+   "cites": [
+    {
+     "src": "jcm-2023-mobility",
+     "loc": "Text",
+     "quote": "Grade 3 signifies severe mobility, where the tooth exhibits significant movement, both horizontally and vertically"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "furcation-mobility",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-04"
+  },
+  {
+   "id": "PT-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 1 of periodontitis therapy (for every patient, whatever the stage): supragingival biofilm control and risk-factor control, including smoking cessation and diabetes control interventions; it is re-evaluated often.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, step 1",
+     "quote": "This first step of therapy should be implemented in all periodontitis patients, irrespective of the stage of their disease"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.6",
+     "quote": "We recommend tobacco smoking cessation interventions to be implemented in patients undergoing periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.7",
+     "quote": "We recommend diabetes control interventions in patients undergoing periodontitis therapy."
+    }
+   ],
+   "units": [
+    "perio",
+    "medcx"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 2 (cause-related therapy) is subgingival instrumentation to remove subgingival biofilm and calculus. Hand or powered (sonic/ultrasonic) instruments, alone or combined, are both recommended, and it may be done quadrant by quadrant or as full-mouth delivery within 24 hours.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, step 2",
+     "quote": "The second step of therapy (cause‐related therapy) is aimed at controlling (reducing/eliminating) the subgingival biofilm and calculus (subgingival instrumentation)."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.2",
+     "quote": "We recommend that subgingival periodontal instrumentation is performed with hand or powered (sonic/ultrasonic) instruments, either alone or in combination."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.3",
+     "quote": "We suggest that subgingival periodontal instrumentation can be performed with either traditional quadrant‐wise or full mouth delivery within 24 hr."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Re-evaluation after steps 1-2: the endpoints of therapy are no pockets over 4 mm with bleeding on probing (and no deep pockets of 6 mm or more). If they are not reached, step 3 is considered; if they are, the patient enters supportive periodontal care.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, re-evaluation",
+     "quote": "If the endpoints of therapy (no periodontal pockets >4 mm with bleeding on probing or no deep periodontal pockets [≥6 mm]) have not been achieved, the third step of therapy should be considered."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Steps of therapy, re-evaluation",
+     "quote": "If the treatment has been successful in achieving the endpoints of therapy, patients should be placed in a supportive periodontal care (SPC) programme."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 3: for deep residual pockets (6 mm or more) in stage III periodontitis after steps 1 and 2, access flap surgery is suggested; for moderately deep residual pockets (4-5 mm), repeated subgingival instrumentation.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.1",
+     "quote": "In the presence of deep residual pockets (PPD ≥ 6 mm) in patients with Stage III periodontitis after the first and second steps of periodontal therapy, we suggest performing access flap surgery."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.1",
+     "quote": "In the presence of moderately deep residual pockets (4–5 mm), we suggest repe"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Supportive periodontal care visits are scheduled every 3 months up to a maximum of 12 months, tailored to the patient's risk profile and periodontal condition after active therapy.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.1",
+     "quote": "We recommend that supportive periodontal care visits should be scheduled at intervals of 3 to a maximum of 12 months and ought to be tailored according to patient's risk profile and periodontal conditions after active"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Adjuncts to subgingival instrumentation that the EFP S3 guideline advises against: lasers, probiotics and sub-antimicrobial-dose doxycycline (suggests not), and systemic or local NSAIDs, local statin gels, omega-3 fatty acids and local metformin gel (recommends not). Locally delivered sustained-release chlorhexidine may be considered.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.4",
+     "quote": "We suggest not to use lasers as adjuncts to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.7",
+     "quote": "We suggest not to use probiotics as an adjunct to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.8",
+     "quote": "We suggest not to use systemic sub‐antimicrobial dose doxycycline (SDD) as an adjunct to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.10",
+     "quote": "We recommend not to use systemic or local non‐steroidal anti‐inflammatory drugs (NSAIDs) as an adjunct to subgingival instrumentation"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.6",
+     "quote": "We recommend not to use local administration of statin gels (atorvastatin, simvastatin, rosuvastatin) as adjuncts to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.14",
+     "quote": "Locally administered sustained‐release chlorhexidine as an adjunct to subgingival instrumentation in patients with periodontitis may be considered"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-adjuncts",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PT-7",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Adjunctive systemic antibiotics are not to be used routinely with subgingival instrumentation, because of concerns for the patient's health and for public health; they may be considered for specific patient categories, such as generalized stage III periodontitis in young adults.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.16",
+     "quote": "Due to concerns about patient's health and the impact of systemic antibiotic use to public health, its routine use as adjunct to su"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.16",
+     "quote": "systemic antibiotics may be considered for specific patient categories (e.g. generalized periodontitis Stage III in young adults)"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-adjuncts",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "A periodontal abscess is an acute lesion with a localized collection of pus in the gingival wall of the pocket or sulcus and rapid tissue destruction, with a risk of systemic spread; most arise in pre-existing periodontal pockets.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "Periodontal abscesses are defined as acute lesions characterized by localized accumulation of pus within the gingival wall of the periodontal pocket/sulcus, rapid tissue destruction and are associated with risk for systemic dissemination."
+    },
+    {
+     "src": "wws-herrera-2018",
+     "loc": "Abstract, Conclusions",
+     "quote": "with the most frequent being those occurring in pre‐existing periodontal pockets"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Necrotizing periodontal diseases form a distinct category with three typical features (papilla necrosis, bleeding and pain) and are associated with impaired host immune responses.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "papilla necrosis, bleeding, and pain) and are associated with host immune response impairments"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PA-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "An endo-periodontal lesion is a pathological communication between the pulpal and periodontal tissues of a tooth. Lesions with root damage (fractures, perforations) have the worst prognosis.",
+   "cites": [
+    {
+     "src": "wws-papapanou-2018",
+     "loc": "Abstract",
+     "quote": "Endodontic‐periodontal lesions, defined by a pathological communication between the pulpal and periodontal tissues at a given tooth"
+    },
+    {
+     "src": "wws-herrera-2018",
+     "loc": "Abstract, Results",
+     "quote": "Lesions associated with root damage, such as fractures and perforations, had the worst prognosis."
+    }
+   ],
+   "units": [
+    "perio",
+    "endo"
+   ],
+   "topic": "perio-acute",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "GE-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Drugs linked to gingival enlargement: the antiseizure drugs phenytoin and sodium valproate; calcium channel blockers (nifedipine, verapamil, diltiazem, amlodipine, felodipine); cyclosporine; and high-dose oral contraceptives. A drug-influenced enlargement is larger than inflammation alone would produce.",
+   "cites": [
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Drug-influenced gingival enlargement",
+     "quote": "the antiepileptic drugs phenytoin and sodium valproate, certain calcium channel–blocking drugs (e.g., nifedipine, verapamil, diltiazem, amlodipine, felodipine), immunoregulating drugs (e.g., ciclosporine), and high-dose oral contraceptives"
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Drug-influenced gingival enlargement",
+     "quote": "the size of the gingival unit must be greater than would normally be expected from purely an inflammatory reaction in the gingival tissues"
+    }
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "drug-gingival-enlargement",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PSY-1",
+   "status": "verified",
+   "risk": "low",
+   "claim": "About 42% of dentate US adults aged 30 or older have periodontitis; its attachment and bone loss result from the immune response to the plaque biofilm.",
+   "cites": [
+    {
+     "src": "ada-periodontitis",
+     "loc": "Key Points",
+     "quote": "Roughly 42 percent of all dentate U.S. adults 30 years of age or older have periodontitis"
+    },
+    {
+     "src": "ada-periodontitis",
+     "loc": "Key Points",
+     "quote": "Attachment and bone loss associated with periodontal disease are results of the body's immune response to plaque biofilm"
+    }
+   ],
+   "units": [
+    "perio",
+    "pubh"
+   ],
+   "topic": "perio-systemic",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PSY-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Periodontitis is associated with systemic conditions, especially cardiovascular disease and diabetes, but direct causality has not been shown; the diseases share risk factors such as smoking and poor diet.",
+   "cites": [
+    {
+     "src": "ada-oral-systemic",
+     "loc": "Key Points",
+     "quote": "of systemic diseases have been associated with oral health, particularly cardiovascular diseases and diabetes"
+    },
+    {
+     "src": "ada-oral-systemic",
+     "loc": "Key Points",
+     "quote": "finding direct causality remains elusive. Periodontal and systemic diseases share many common risk factors, including smoking and poor diet."
+    }
+   ],
+   "see": [
+    "DM-7"
+   ],
+   "units": [
+    "perio",
+    "medcx"
+   ],
+   "topic": "perio-systemic",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth-prognosis systems weigh tooth-level factors, and some also weigh patient-level factors. The conventional categories are good, fair, poor, questionable and hopeless. The McGuire and Nunn (1996) system includes clinical attachment level, furcation involvement, mobility, crown-to-root ratio and root form to assign prognosis. Kwok and Caton (2007) assign one of four categories and add general (patient) factors such as compliance, plaque control, smoking and diabetes to local factors such as probing depth, attachment loss, plaque-retentive anatomy, trauma from occlusion and habits, and mobility.",
+   "conditions": "The quotes do not name Kwok and Caton's four categories, so don't key their category names. The quote listing good/fair/poor/questionable/hopeless calls them the conventional categories without naming a system. Don't key whether the McGuire and Nunn system leaves out patient factors: a 2022 comparison paper says so, but the original 1996 papers (not opened here) also analyzed patient-level parameters such as smoking. Sources: two open-access J Clin Periodontol/Clin Oral Investig studies describing the systems, not the original 1996/2007 papers.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Discussion",
+     "quote": "conventional prognostic categories (good, fair, poor, questionable and hopeless)"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "includes CAL, FI, mobility, crown‐to‐root ratio and initial root form to assign prognosis"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Introduction",
+     "quote": "developed another prognostic system that incorporated several systemic and local factors, assigning one of four prognostic categories to each tooth"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "A report by Kwok and Caton (2007) considered general (compliance, plaque accumulation, smoking, diabetes, and others) and local factors (PPD, attachment loss, anatomic plaque-retentive factors, trauma from occlusion and habits, mobility)"
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PR-3",
+    "PR-4"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Prognosis systems are better at predicting which teeth will be kept than which will be lost. In a 5-year cohort in supportive periodontal care, teeth in the worst category were lost 14 to 77 times as often as teeth in the best category, yet most teeth labeled hopeless were still retained: specificity and negative predictive value were good, sensitivity and positive predictive value low. Older studies found that a hopeless prognosis wrongly predicted loss in 19.6% to 38% of cases and a questionable prognosis in 37% to 74%, while a prediction that a tooth would not be lost failed only 0.46% to 2% of the time.",
+   "conditions": "Cohort of compliant maintenance patients (97 patients, UK practice) with few teeth in the worst categories; teach the direction (good specificity, low sensitivity: many hopeless teeth survive with maintenance), not the exact multipliers.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Abstract",
+     "quote": "could identify teeth at higher risk of being lost during 5 years of SPC"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Abstract",
+     "quote": "Although specificity and negative predictive values were good, low sensitivity and positive predictive values were detected for all systems."
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "The risk of tooth loss for teeth in the worst prognostic category was 14–77 times higher than teeth in the best prognostic category"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "the majority of “hopeless” teeth were still retained"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "For hopeless prognosis, tooth loss due to periodontal disease (TLPD) prediction failed, implying a False +, in between 19.6% and 38% of the cases"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "These percentages were much higher for questionable prognosis: the TLPD prediction failed in between 37% and 74% of cases"
+    },
+    {
+     "src": "jcp-prognosis-approach-2018",
+     "loc": "Introduction",
+     "quote": "This prediction only failed between 0.46% and 2% of times"
+    }
+   ],
+   "see": [
+    "PR-1",
+    "PR-5"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth-level factors that predict tooth loss in treated periodontitis patients: bone loss, furcation involvement, probing depth, mobility, tooth type, crown-to-root ratio, and use of the tooth as an abutment. In a 10-year maintenance cohort, abutment function, diabetes, bone loss, furcation involvement and age predicted tooth loss. Even teeth with very advanced bone loss (over 75%) have been kept for 10 years or more.",
+   "conditions": "Prediction models from cohort studies (Germany, Spain), not guideline statements. The direction of the age effect differs between studies; don't key age.",
+   "cites": [
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Introduction",
+     "quote": "variables such as bone loss (BL), furcation involvement (FI), probing pocket depth (PPD), number of teeth lost (due to periodontitis), and patient-related factors such as smoking, age, and diabetes affect tooth retention"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Methods",
+     "quote": "six TRFs: type of tooth, furcation involvement, probing pocket depth, bone loss, mobility and C/R ratio"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "The risk factors abutment function, diabetes, and the risk indicator BL, FI, and age (≤ 61 vs. > 61) were identified to predict tooth loss."
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "severe periodontal BL (> 75%)"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Discussion",
+     "quote": "several studies have shown that teeth with such BL can be retained over a long period (10 years and more)"
+    }
+   ],
+   "see": [
+    "PR-4",
+    "PR-6",
+    "FM-1",
+    "FM-4"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Patient-level factors that worsen tooth prognosis: a systematic review (cited by a 2018 prediction-model study) found older age and smoking to be the only patient factors clearly associated with tooth loss from periodontitis during maintenance, and diabetes predicted tooth loss in a 10-year maintenance cohort. A 2018 prediction model also used heavy smoking, bruxism, severe periodontitis and the baseline number of teeth as patient-related predictors; its authors suggest the combined impact of smoking and bruxism may matter more than previously suspected.",
+   "conditions": "The systematic review (Chambrone 2010) is cited by the model paper, not opened here. Age direction differs between studies (older age in the review, younger age in the Martinez-Canut model); don't key age. Smoking and HbA1c also set the periodontitis grade (PS-10).",
+   "cites": [
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Introduction",
+     "quote": "the only patient‐related factors (PRFs) that are clearly associated with TLPD were older age and smoking"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Introduction",
+     "quote": "patient-related factors such as smoking, age, and diabetes affect tooth retention"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Methods",
+     "quote": "Five PRFs: age, severe periodontitis, heavy smoking, bruxism and baseline number of teeth"
+    },
+    {
+     "src": "jcp-prognosis-model-2018",
+     "loc": "Discussion",
+     "quote": "The simultaneous impact of smoking and bruxism might be much more relevant than previously suspected"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "Only a small percentage of teeth was lost during 10 years of supportive periodontal therapy"
+    },
+    {
+     "src": "cloi-toothloss-tool-2022",
+     "loc": "Abstract, Results",
+     "quote": "The risk factors abutment function, diabetes, and the risk indicator BL, FI, and age (≤ 61 vs. > 61) were identified to predict tooth loss."
+    }
+   ],
+   "see": [
+    "PR-3",
+    "PS-10",
+    "PT-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-5",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "EFP S3 guideline: at any step of periodontal therapy, extraction may be considered for teeth judged to have a hopeless prognosis. The authors of a 2022 cohort study read this as discouraging early extraction of questionable teeth, so telling questionable from hopeless teeth apart is a key prognostic decision.",
+   "conditions": "The sentence on questionable teeth is the cohort authors' reading of the EFP guideline (Sanz 2020), not a verbatim guideline recommendation.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Introduction, steps of therapy",
+     "quote": "In any of the steps of therapy, tooth extraction may be considered if the affected teeth are considered with a hopeless prognosis."
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "it is crucial to distinguish between questionable and hopeless teeth, as early extraction of questionable teeth is discouraged, and only “hopeless” teeth should be extracted"
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PT-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-6",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "EFP S3 guideline (R3.10, grade A): molars with Class II or III furcation involvement and residual pockets should receive periodontal therapy, and furcation involvement is no reason for extraction. After treatment, furcation-involved molars showed reasonable survival over 4 to 30.8 years, better with Class II than Class III involvement. For mandibular molars with residual pockets and Class II furcation involvement, periodontal regenerative surgery is recommended (R3.11).",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10",
+     "quote": "We recommend that molars with Class II and III furcation involvement and residual pockets receive periodontal therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10",
+     "quote": "Furcation involvement is no reason for extraction."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.10, clinical relevance",
+     "quote": "Following treatment, reasonable survival rates were observed over 4–30.8 years. Overall, the observed tooth survival rates were better in Class II furcation involvement than Class III."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.11",
+     "quote": "We recommend treating mandibular molars with residual pockets associated with Class II furcation involvement with periodontal regenerative surgery."
+    }
+   ],
+   "see": [
+    "FM-1",
+    "FM-2",
+    "PT-4",
+    "PR-3"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  },
+  {
+   "id": "PR-7",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Tooth prognosis is not fixed. Teeth can move between categories as periodontal and restorative status changes (attachment or bone gain, less mobility or furcation involvement), and patient factors such as motivation, stress or diabetes control can change during maintenance. A questionable tooth in a motivated patient with a good overall prognosis can do better than the same tooth in a noncompliant patient with other risk factors. Non-periodontal factors also decide survival: in one 5-year cohort, only 9 of 31 extracted teeth were lost for periodontal reasons (others: fracture, caries, endodontic pathology), so restorability and endodontic status belong in the prognosis.",
+   "conditions": "The 9-of-31 figure comes from one cohort of compliant patients in supportive care; teach the principle, not the number.",
+   "cites": [
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "the possibility of moving teeth from one prognostic category to another during follow‐up, according to changes in periodontal and restorative status (for example, attachment/bone gain or reduced mobility or FI), should also be considered"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "patient factors may also vary during maintenance (e.g., changes in stress levels, motivation or in diabetes control), which could have an unexpected impact on the original prognosis"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "a questionable tooth in the mouth of a “good prognosis” and very motivated patient"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "can have a better prognosis than in the mouth of a non‐compliant patient with other risk factors"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Results",
+     "quote": "Reasons for tooth loss during SPC were progressing periodontal disease ( n = 9), tooth fracture ( n = 7), endodontic pathology ( n = 4), caries ( n = 6)"
+    },
+    {
+     "src": "jcp-prognosis-systems-2022",
+     "loc": "Discussion",
+     "quote": "only 9 of 31 of extracted teeth were lost for periodontal reasons, emphasizing the importance of a 360° look at the conditions of teeth, including restorability, endodontic status"
+    }
+   ],
+   "see": [
+    "PR-2",
+    "PR-4",
+    "PA-3"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-prognosis",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-11"
+  }
+ ]
+}

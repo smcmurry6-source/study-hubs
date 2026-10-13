@@ -1,0 +1,26 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The choice between A and B depends only on which platelet floor the source uses (50,000 in many teaching sources, 60,000 in AAPD, 75,000 in NIDCR). The stem fixes this by naming the AAPD best practices, and the patient is 15, so the pediatric AAPD document applies. Still, a student taught the 50,000 floor would find A clinically defensible if the source were not named.",
+        "suggestion": "Keep 'Following the AAPD best practices' in the stem, and never drop it in later edits. You could also add 'for pediatric patients' so it is explicit that the 60,000 cutoff comes from that one source."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option C uses the absolute words 'Defer all dental treatment', and no other option has an absolute word. This lets a test-wise student rule C out without knowing the content.",
+        "suggestion": "Reword C without the absolute, e.g. 'Defer extraction until chemotherapy ends and manage the tooth with antibiotics alone'. This also gives C a more tempting, nonsurgical rationale."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Under AAPD, invasive care is avoided 'when possible'. A less invasive first step for an abscess, such as incision and drainage or pulpal debridement with antibiotics, could be argued, but none of the options offers it, so no distractor becomes correct. Each option also ends in a justification clause. A's clause (platelets above 50,000) and D's clause (neutrophils below 2,000) are both true statements, so these options are wrong because of the plan they give, not because of their stated reason.",
+        "suggestion": "Optional: in A's why line, say directly that the clause is a true fact but the wrong threshold for this guideline. This is how the explanation already frames it."
+      }
+    ]
+  }
+]

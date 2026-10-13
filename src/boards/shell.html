@@ -1,0 +1,65 @@
+<!doctype html>
+{{BANNER}}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="../../assets/favicon-64.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/apple-touch-icon.png?v=2">
+<meta name="apple-mobile-web-app-title" content="Study Hubs">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="../../manifest.webmanifest?v=2">
+<meta name="theme-color" content="#17212b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{TITLE}}: {{SUBTITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/{{HUB}}/">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Literata:opsz,wght@7..72,600;7..72,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../widget/v3.css">
+<style>
+{{STYLE}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hub-header">
+    <div class="hub-header-top">
+      <div class="hub-title">
+        <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
+        <h1>{{TITLE}}</h1>
+        <span class="hub-subtitle">{{SUBTITLE}}</span>
+      </div>
+      <nav id="modeSwitch" role="tablist" aria-label="Study mode">
+{{NAV}}
+      </nav>
+      <div class="hub-meta">
+        <button id="sh-ribbon-name" class="hub-name-pill" type="button" hidden></button>
+        <span class="pill exam-pill" id="examPill">{{EXAM_NOTE}}</span>
+        <button type="button" class="theme-btn" id="themeBtn" aria-label="Toggle theme" title="Theme: system / light / dark"></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+{{BODY}}
+  </main>
+
+  <footer class="hub-footer">
+    {{TITLE}} &middot; {{SUBTITLE}}. Questions are written for this hub from public primary sources (guidelines, FDA labels,
+    professional organizations), never copied from exams, prep companies or course material; every answer cites its source.
+  </footer>
+</div>
+<div id="toastHost" aria-live="polite"></div>
+<script>
+{{SCRIPT}}
+</script>
+<script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
+<script src="../../widget/v3.js" data-hub="boards" data-answered-event="boards:answered" data-default-mode="home" defer></script>
+</body>
+</html>

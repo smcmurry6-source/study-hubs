@@ -1,0 +1,188 @@
+[
+  {
+    "id": "R01",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "high",
+        "detail": "The stem asks which ADDITIONAL finding would end periodontal health, but the box already records bleeding on probing at 6% of sites. Read literally, option A (bleeding at 8% of sites) is additional to the 6%, giving about 14%, which is 10% or more and means she no longer meets the health definition (gingivitis on a reduced periodontium). Under that reading A and C are both correct. The explanation only works if A means a total of 8%, which the stem never says.",
+        "suggestion": "Reword the stem as 'Which single change in her findings would mean she no longer meets the definition...' and state option A as an overall figure, e.g. 'Overall bleeding on probing at 8% of sites, with none of it at 4-mm sites'. Alternatively drop the 6% from the box and put the percentage only in the options."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "Option D ('Several 4-mm sites that do not bleed') is not an additional finding. The box already says probing depths are 2-4 mm and that bleeding occurs only at 2-mm and 3-mm sites, so non-bleeding 4-mm sites are already present.",
+        "suggestion": "Either keep it as a deliberate 'already true' distractor and say so in the stem ('if she also had...'), or change it to 'More 4-mm sites that do not bleed'."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "The stem is phrased as a negative ('no longer meets'). The memory cue uses informal 'dry' for non-bleeding sites.",
+        "suggestion": "Rewrite positively ('Which finding would change her status from periodontal health to disease or gingivitis?') and use 'does not bleed' in the cue."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Convergence cue: key C ('Stage III, generalized') shares 'Stage III' with B and 'generalized' with A and D, so a test-wise student can pick the option that overlaps most with the others without staging anything.",
+        "suggestion": "Vary the distractor pairings, e.g. replace A with 'Stage II, localized' or add a molar/incisor pattern option, so the key is not the median combination."
+      }
+    ]
+  },
+  {
+    "id": "R03",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option D ('No grade until radiographs from 5 years apart exist') is an implausible waiting-style distractor and the longest option. It adds almost no discrimination because anyone who remembers that indirect evidence exists rejects it.",
+        "suggestion": "Replace it with a plausible wrong rule, e.g. 'Grade B, because grade modifiers are used only when direct evidence exists' or 'Grade B, since the bone-loss-to-age ratio is the only criterion that counts'."
+      }
+    ]
+  },
+  {
+    "id": "R04",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The stem says 'best supported by current evidence' with no source. Evidence on periodontal treatment and A1C is mixed: the large DPTT randomized trial (Engebretson 2013) found no A1C improvement at 6 months, and Cochrane reviews rate certainty as low. This makes D ('has not been shown to change A1C') defensible for a student who knows the trial. The cited fact (DM-7) is the ADA Oral Health Topic wording, so the stem should name it.",
+        "suggestion": "Reword the stem: 'According to the ADA Oral Health Topics page on diabetes, which statement about periodontal treatment and A1C is best supported?' Also make the D 'why' say that systematic reviews, not every single trial, show a reduction."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Key A is the longest and the only option with a specific time point ('about 3 months later'). B, C and D are all wrong in absolute or one-directional ways ('briefly raises', 'does not affect', 'has not been shown'), so A is the only balanced, hedged statement ('is linked to').",
+        "suggestion": "Give the distractors comparable specificity (e.g. 'lowers A1C within 2 weeks', 'lowers A1C only if the patient also stops smoking') and consider adding the size of the effect to the key. Check any figure against the cited source first."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The key says 'linked to a lower A1C' but the cited source and the explanation say scaling and root planing 'significantly reduces' A1C. The memory cue 'A1C down at 3 months' omits that the effect is modest and gets larger by 6 months.",
+        "suggestion": "Align the key and cue with the source wording, e.g. 'is followed by a lower A1C at 3 months, with more reduction at 6 months'."
+      }
+    ]
+  },
+  {
+    "id": "R05",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "medium",
+        "detail": "Options A, B and C all begin 'Proceed,' and only the key D begins 'Postpone'. The odd-one-out structure lets a student answer without knowing the ADA thresholds. Option C also contains the absolute word 'only', which appears in a distractor alone.",
+        "suggestion": "Make the action verbs parallel and mixed: e.g. A 'Defer scaling and root planing but provide the other visit tasks with epinephrine limited to 0.04 mg', B 'Proceed with BP checks every 10 to 15 minutes', C 'Postpone only if the pressure reaches 180/110', D 'Postpone and refer to his physician'. Drop 'only' or use it in more than one option."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The repeat reading of 164/100 has a diastolic of exactly 100, which is not 'over 100'. The ADA row reads '>160/100', so the item depends on the systolic of 164 alone. Students who read the cutoff as both numbers must be exceeded may hesitate.",
+        "suggestion": "Use readings clearly above both numbers, e.g. 168/104 and 166/102, or state in the explanation that either number over the cutoff counts."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "BP-4 notes there is no evidence-based cutoff for deferring dental care. The stem correctly names the ADA guide, but the explanation never says the 160/100 line is a guideline choice rather than a proven threshold.",
+        "suggestion": "Add one clause to the explanation noting the ADA guide is a practical, consensus threshold."
+      }
+    ]
+  },
+  {
+    "id": "R06",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "medium",
+        "detail": "Option C ('Cephalexin 1,000 mg on day 1, then 500 mg four times a day for 4 more days') is an invented regimen that copies azithromycin's loading-dose pattern. The ADA regimen is cephalexin 500 mg four times a day for 3-7 days (the item's own why line says so). Students who know the real cephalexin dose can reject C on the dose alone, without the allergy reasoning the explanation says is the point. It also teaches a made-up dosing scheme.",
+        "suggestion": "Use the real regimen: 'Cephalexin 500 mg four times a day for 3-7 days'. The allergy history (hives and lip swelling) then does the work, as the explanation intends."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The stem says 'until then' (Monday), but the keyed azithromycin course lasts 5 days. The explanation does not say the antibiotic should stop once definitive treatment is done. The cited guideline strongly recommends no antibiotics as an adjunct to definitive care.",
+        "suggestion": "Add a sentence: once the pulpectomy or root canal treatment is done on Monday, the antibiotic is no longer needed and should be stopped, per the ADA guideline."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The stem says the clinic cannot 'drain the abscess', yet the box describes only 'localized buccal swelling' with no mention of fluctuance. The benefit of an antibiotic here is a conditional, low-certainty recommendation, and the item offers no 'no antibiotic' option, so it tests the regimen only.",
+        "suggestion": "Add 'fluctuant' to the findings if drainage is the plan, or drop 'drain the abscess' from the stem."
+      }
+    ]
+  },
+  {
+    "id": "R07",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The stem presents adding metronidazole to a patient on warfarin as the given plan, and the explanation says only to 'check' the INR. It gives no management step: contact the prescriber or physician, recheck the INR within a few days, or choose amoxicillin/clavulanate (AB-6's other option) instead.",
+        "suggestion": "Add one sentence on management, e.g. alert the physician managing his warfarin and recheck the INR in 3-5 days, or choose another regimen."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Brand name 'Coumadin®' is in the patient box. House style prefers generic names. Key phrase 'potentiates warfarin' echoes the label wording.",
+        "suggestion": "Use 'Warfarin 5 mg daily' alone, and paraphrase the key as 'Higher INR, because metronidazole increases warfarin's effect'."
+      }
+    ]
+  },
+  {
+    "id": "R08",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The 3-4 month / 6-8 week timing appears in the AAOMS section on drug holidays, where the working group could not agree on a recommendation. 'Follows the AAOMS 2022 position paper' is fair because the stem names the paper and says they will time the surgery around injections. The explanation does not say this is a conditional option, not a mandate, and that in osteoporosis the extraction can often go ahead without changing the schedule.",
+        "suggestion": "Add a clause to the explanation: for osteoporosis doses MRONJ risk is low, and the schedule applies when the team chooses to time surgery."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Brand name 'Prolia®' in the patient box. The key's phrase 'resume 6-8 weeks after surgery' suggests a pause, although her next dose (due at 6 months) falls at about the same time.",
+        "suggestion": "Use 'Denosumab 60 mg injection every 6 months' alone. Optionally say in the explanation that resuming lines up with her next scheduled dose."
+      }
+    ]
+  },
+  {
+    "id": "R09",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "He has squamous cell carcinoma of the floor of the mouth and exposed jaw bone. Osteoradionecrosis is only diagnosed once recurrent or persistent tumor is excluded, and the box says nothing about a biopsy or surveillance. The usual ORN time criterion is also inconsistent in the literature (3 or 6 months of exposed irradiated bone), and the box gives only 4 months since the extraction. As written, B ('delayed socket healing that does not yet meet a necrosis definition') is defensible under a 6-month definition, and classifying as ORN without excluding recurrence is unsafe teaching.",
+        "suggestion": "Add to the box 'biopsy of the area negative for tumor recurrence' and state the time criterion, or reword the stem: 'According to the AAOMS 2022 case definition, why can this exposed bone not be called MRONJ?' Add a line to the explanation that exposed bone in an irradiated cancer patient needs recurrence ruled out."
+      },
+      {
+        "check": "citation",
+        "severity": "medium",
+        "detail": "The cited facts (MR-1, ORN-1, MR-2) only show that a history of jaw radiation excludes MRONJ. No cited fact defines osteoradionecrosis or gives its time criterion. The key (C: 'is osteoradionecrosis') and the B why line ('well past ordinary delayed healing') rely on unsourced claims.",
+        "suggestion": "Add a verified ORN definition (source and quote) to the facts, or narrow the key to what the sources support (MRONJ is excluded by radiation history)."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The box says 'radiation therapy to the jaws', which echoes the AAOMS exclusion wording. Options A and D are both MRONJ stages, so a test-wise student can drop both. The key alone contains 'rather than', a contrast cue.",
+        "suggestion": "Make the radiation history less verbatim (e.g. 'radiation to the neck and mandible'). Add a non-MRONJ alternative such as recurrent carcinoma to the options."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Brand name 'Fosamax®' in the patient box.",
+        "suggestion": "Use 'Alendronate 70 mg weekly since 2022' alone."
+      }
+    ]
+  }
+]

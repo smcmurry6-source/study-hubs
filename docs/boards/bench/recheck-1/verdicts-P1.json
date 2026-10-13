@@ -1,0 +1,176 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The explanation's trap arithmetic is internally inconsistent: it says the caries extraction does not count, then describes the wrong path as 'counting the third molars as tooth loss from periodontitis (3 + 4 = 7)'. He has 2 perio extractions (teeth 3 and 14); adding the 4 third molars gives 6, not 7. The 3 appears to include tooth 19 (caries), which the same paragraph excludes. The key is unaffected (6 is still 5 or more, so stage IV).",
+        "suggestion": "Change to '(2 + 4 = 6, which would pass the 5-tooth cutoff for stage IV)'."
+      }
+    ]
+  },
+  {
+    "id": "R02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option D ('No grade until radiographs from 5 years apart exist') is a strawman: it contradicts the stem's premise and the chart's own instruction to assume grade B and use indirect evidence and modifiers. It is also the longest option and will almost never be chosen, so the item works as a 3-option question. Options A and C are the only real contrast.",
+        "suggestion": "Replace D with a believable misconception about modifiers or the ratio, for example a statement that risk-factor modifiers apply only after 5-year progression data exist. Make sure it names a different grade or reasoning from B."
+      },
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "The why lines for A and B give the ratio cutoffs (under 0.25 = A, 0.25-1.0 = B). PS-9 is marked verified, but its own condition note says the cutoff quote is not yet added, so no verbatim quote supports those numbers. The numbers match the 2018 AAP/EFP grading table.",
+        "suggestion": "Add the verbatim % bone loss/age row from the chart to PS-9 before release."
+      }
+    ]
+  },
+  {
+    "id": "R03",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "The explanation and the why line for A both say 'with more reduction at 6 months'. That comes from the ADA page, but the 2022 Cochrane update reports a modest effect of roughly 0.4 percentage points at 3-4 months and a similar or smaller effect at 6 months, with lower certainty. As written it presents a stronger, cumulative claim than the current evidence supports. The keyed 3-month claim is fine.",
+        "suggestion": "Drop 'with more reduction at 6 months' from the explanation and the why line for A. Say instead 'about a 0.4-point lower A1C at 3 months in systematic reviews'."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The stem asks for what 'current evidence' supports but names no source. Option C ('has not been shown to change A1C') is the pre-2013 position and is still echoed by the one large negative RCT, so it is the only real competitor. D is invented and B is the one-way view, so both are easy to eliminate. A also says 'is linked to', which is correlational wording for what the reviews show from randomized trials.",
+        "suggestion": "Add 'According to systematic reviews' (or 'according to the ADA') to the stem. Reword A to 'lowers A1C by a modest amount about 3 months later'."
+      }
+    ]
+  },
+  {
+    "id": "R04",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The ADA cutoff is written '>160/100'. The repeat reading of 164/100 has a diastolic of exactly 100, which is not over 100. The systolic of 164 is over 160, so the key still holds, but a careful student can question whether the reading is confirmed 'over 160/100' if the cutoff means both numbers.",
+        "suggestion": "Make the repeat reading 164/102 so both numbers are clearly over the cutoff."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Three options begin 'Proceed' and the key is the only one that begins 'Postpone'. A test-wise student can pick the odd one out without knowing the ADA thresholds.",
+        "suggestion": "Make the action options parallel. For example, give two distractors that postpone or refer with a wrong detail (such as starting him on an antihypertensive in the office), or make the key one of several 'proceed' or 'defer' options."
+      }
+    ]
+  },
+  {
+    "id": "R05",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "The stem asks which ADDITIONAL finding would end health. Option A ('several 4-mm sites that do not bleed') is already true in the box (probing depths 2-4 mm at all sites, bleeding only at 2- and 3-mm sites), so it is not additional. Option B (residual attachment loss) is true of every treated periodontitis patient. Both are easy to eliminate, which leaves C as the only real competitor to D.",
+        "suggestion": "Replace A or B with new findings that are plausible but compatible with health in a reduced periodontium, or reword the stem to 'Which single finding would mean...'."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "Option C says 'bleeding on probing at 8% of sites' while the box says 6%. It is not stated whether the extra sites are 3 mm or less or include 4-mm sites. A student who assumes the new sites are 4 mm deep has a reason to doubt C.",
+        "suggestion": "Write C as 'Bleeding on probing at 8% of sites, none of them 4 mm or deeper'."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The box says her bleeding sites are 'all at 2-mm and 3-mm sites'. The detail is needed for consistency, but it points straight at 4-mm bleeding as the only variable. A and D also form a minimal pair that differs only by bleeding.",
+        "suggestion": "Optional: keep the detail but add a distractor that tests a different threshold, such as a 5-mm site that does not bleed."
+      }
+    ]
+  },
+  {
+    "id": "R06",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The explanation never says that the 2022 AAOMS working group could not reach consensus on drug holidays (MR-5), or that for osteoporosis dental work can run alongside therapy (MR-6). A student can leave thinking every denosumab patient needs a 3-4 month delay. 'Wanes toward the end of each dosing interval' is also loose, since 3-4 months is mid-interval for a 6-month schedule. The rebound-fracture sentence is repeated twice in the explanation.",
+        "suggestion": "Add one sentence: 'AAOMS reached no consensus on holidays; if a timed schedule is chosen with the physician, this is the one AAOMS gives.' Replace 'toward the end' with 'as the effect wanes', and remove the duplicate sentence."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Options A (hold the next two injections) and D (stop for 1 year, then extract) are both a year-long drug holiday and are wrong for the same reason, so they act as near-duplicates. The 'a year off' gloss in the why line for A also understates holding two injections. Option C is the only one with matched numeric ranges, which is a mild specificity cue.",
+        "suggestion": "Make A a different error, for example a different interval such as extracting right after the next injection. Keep D as the long-holiday distractor."
+      }
+    ]
+  },
+  {
+    "id": "R07",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The stem asks for the 'most appropriate' regimen but does not name the ADA 2019 guideline. The explanation says clindamycin 300 mg four times a day is an equally valid option there, and many clinicians prefer it over azithromycin because of resistance. The item works only because the clindamycin option is mis-dosed. Also, 'deep distal caries' with a radiolucency at the mesial root apex of tooth 30 is slightly odd.",
+        "suggestion": "Add 'According to the 2019 ADA guideline' to the stem. Change the findings to 'deep caries' or make the radiolucency match the caries site."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option C ('cephalexin 1,000 mg on day 1, then 500 mg four times a day for 4 more days') is a regimen that appears in no guideline. It copies the azithromycin loading pattern, and students may remember it as real. The why line says the ADA dose is 500 mg four times a day for 3-7 days, so C is wrong on two counts. B and C also share a 'day 1 then X' shape.",
+        "suggestion": "Use the ADA cephalexin regimen (500 mg four times a day for 3-7 days) so the allergy is the only thing that makes C wrong."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The memory cue 'skip the cephalosporin too' over-generalizes. The guideline's statement concerns cephalexin, which shares a side chain with amoxicillin and ampicillin. It does not say all cephalosporins are excluded.",
+        "suggestion": "Reword the cue to 'Hives or swelling with penicillin: skip cephalexin too. Azithromycin 500, then 250 for 4 days.'"
+      },
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "The clindamycin 300 mg four times a day regimen in the explanation and in the why line for A is supported only by the AB-5 claim text. None of the verbatim quotes mention clindamycin.",
+        "suggestion": "Add the guideline's clindamycin quote to AB-5."
+      }
+    ]
+  },
+  {
+    "id": "R08",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "The stem presents adding metronidazole to a patient on warfarin as the plan. The ADA alternative in AB-6 (switch to amoxicillin/clavulanate) avoids the warfarin interaction, but the explanation does not mention it. The explanation says only that the INR 'should be checked'. A student could take away that the combination is routine.",
+        "suggestion": "Add to the explanation: 'Amoxicillin/clavulanate, the ADA alternative, avoids this interaction; if metronidazole is used, recheck the INR within a few days and tell the prescribing physician.' Or reword the stem to 'A colleague adds metronidazole...'."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option A contains the absolute word 'only', which marks it as wrong. Option D's 'platelet inhibition' mechanism is not credible for this drug, so only B and C are real contenders and C has the wrong direction. The item is a plain recall of one interaction.",
+        "suggestion": "Reword A without 'only'. Make D a more tempting wrong answer, such as 'A higher INR, but only if he also drinks alcohol'."
+      }
+    ]
+  },
+  {
+    "id": "R09",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The key rests on excluding MRONJ, which is well supported (MR-1 and ORN-1). Calling it osteoradionecrosis needs an ORN definition, and no cited fact gives one. The classic Marx definition requires exposed irradiated bone for 6 months and more than 1 cm. Newer definitions use 3 months. The box gives 4 months of exposure and 6 mm across, and the dose to the mandible and the exclusion of recurrent tumor are not stated. Under the older definition, option D (delayed healing that does not yet meet a necrosis definition) is defensible. The why line for D ('well past ordinary delayed healing') is unsourced.",
+        "suggestion": "Add a cited ORN definition fact. In the box, state the radiation dose or field covering the mandible and that a biopsy showed no recurrent tumor. Lengthen the interval so D cannot be defended under either definition (for example, bone exposed for 7 months, or 'extracted 8 months ago')."
+      },
+      {
+        "check": "rationale",
+        "severity": "low",
+        "detail": "He has a history of squamous cell carcinoma of the floor of the mouth, and exposed bone in an irradiated jaw calls for excluding recurrent tumor (a biopsy and imaging). The explanation does not mention this, and it is part of the ORN definition and of the MRONJ definition's 'no metastatic disease to the jaws' clause.",
+        "suggestion": "Add a sentence on ruling out recurrence or metastasis before labeling ORN."
+      }
+    ]
+  }
+]

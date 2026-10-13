@@ -1,0 +1,176 @@
+[
+ {
+  "id": "R01",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The 'why' line for D is garbled and never says why a granola bar is wrong: 'Treatment should stop until he is treated with fast carbohydrate...'. A granola bar's fat, fiber and protein slow absorption, so it is not a fast carbohydrate. He is also symptomatic, so the procedure must stop. The bar may also contain gluten, and he has celiac disease.",
+    "suggestion": "Rewrite D's why: 'A granola bar absorbs too slowly to treat a symptomatic low, and the procedure should not continue while he is hypoglycemic. Give fast sugar and recheck in 15 minutes.'"
+   },
+   {
+    "id": "R01",
+    "check": "distractor",
+    "severity": "low",
+    "detail": "C ('nothing by mouth... start oxygen') is a generic unconscious-patient reflex and is implausible for a sweaty, shaky, awake patient. It adds little discrimination beyond B.",
+    "suggestion": "Optional: replace C with 'Have him lie down, call his physician and reschedule without giving anything by mouth'."
+   }
+  ]
+ },
+ {
+  "id": "R02",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "D copies the azithromycin pattern ('day 1, then ... for 4 more days'), and 200 mg then 100 mg daily is not a standard doxycycline course (usually 100 mg twice daily). A and C are both beta-lactams, so students can narrow to B or D by elimination. In real practice doxycycline is a recognized alternative, so D is excluded only because the stem anchors to the ADA guideline, which it does.",
+    "suggestion": "Keep the guideline anchor in the stem. Optionally write D as a standard regimen (e.g., 'Doxycycline 100 mg twice daily for 7 days')."
+   },
+   {
+    "id": "R02",
+    "check": "current",
+    "severity": "low",
+    "detail": "The stem names the 2019 ADA guideline. Confirm that no later ADA update changed the penicillin-allergy regimens, and relabel the year if one exists. The keyed regimen matches the quoted Table 2 footnote.",
+    "suggestion": "Verify the guideline page for an update and adjust the year in the stem if needed."
+   }
+  ]
+ },
+ {
+  "id": "R03",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A (2) is reachable only by importing the cardiac-caution epinephrine limit that the stem rules out by saying 'healthy adult', so it is a weak distractor. A more realistic error is missing: rounding 10.3 up to 11 despite 'full cartridges'.",
+    "suggestion": "Replace A with 11 (rounded up). Keep the epinephrine-limit idea in the rationale only if wanted."
+   },
+   {
+    "id": "R03",
+    "check": "copy",
+    "severity": "low",
+    "detail": "R03 and R05 are the same skill (mg/kg x kg / mg per cartridge) with parallel stems. Make sure the set does not carry both as near duplicates.",
+    "suggestion": "Differentiate by agent or add a twist (a weight given in lb only), or keep only one in a given exam."
+   }
+  ]
+ },
+ {
+  "id": "R04",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A (sublingual nitroglycerin to get below 140/90 before starting) is not a plausible dental-office response to asymptomatic hypertension. B is a strawman because no one would monitor only at the end. In practice the item is C versus D. C is also the most specific option (it has the 10-15 minute interval), and D is the only one with an absolute ('all').",
+    "suggestion": "Replace A with a plausible error such as 'Give an extra dose of her hydrochlorothiazide, wait 30 minutes and recheck before starting'. Drop 'all' from D."
+   },
+   {
+    "id": "R04",
+    "check": "citation",
+    "severity": "low",
+    "detail": "The BP-3 summary contains a line ('Systolic >180 and/or diastolic >100: refer as soon as possible') that conflicts with the quoted >109 threshold used in the explanation. The quotes support the key. The summary line is internally inconsistent.",
+    "suggestion": "Correct the fact record to >109 (or remove that line) so reviewers and writers do not copy a wrong cutoff."
+   }
+  ]
+ },
+ {
+  "id": "R05",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "citation",
+    "severity": "low",
+    "detail": "The label's '4 mg/lb (8 mg/kg)' is not an exact conversion (8 mg/kg is about 3.6 mg/lb). At 55 kg (121 lb) both routes give 6 cartridges (440/72 = 6.1 and about 484/72 = 6.7), so the key is safe. The explanation and memory cue present 8 mg/kg as exact.",
+    "suggestion": "Keep this weight, since it is robust to either reading. Add a note not to change it to a weight where the two routes diverge."
+   },
+   {
+    "id": "R05",
+    "check": "copy",
+    "severity": "low",
+    "detail": "Near-duplicate format of R03; prilocaine dosing is also low-yield for the INBDE.",
+    "suggestion": "Consider one dosing calculation per set, or fold prilocaine into a mixed-agent item."
+   }
+  ]
+ },
+ {
+  "id": "R06",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "A, B and C are all variants of 'wait' (after clearance in the second trimester, after delivery, in the second trimester). Only D says 'Now'. A student can pick D as the odd one out, or by 'don't delay a toothache', without knowing the ADA/ACOG position. The distractors test no different misconceptions (radiographs, local anesthesia, epinephrine, clearance, medication).",
+    "suggestion": "Make the options differ on content. For example: 'Now, but without radiographs or local anesthesia'; 'Now, but only after the obstetrician gives written clearance'; 'Start a course of antibiotics and wait for the second trimester'; 'Now, using local anesthetic with epinephrine'. Keep exactly one correct option."
+   },
+   {
+    "id": "R06",
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A is double-barreled (written obstetric clearance and second trimester), so a student can reject it on either half. Neither the ADA nor ACOG requires written clearance for routine or emergency dental care.",
+    "suggestion": "Split it into two single-flaw options or drop one half."
+   }
+  ]
+ },
+ {
+  "id": "R07",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "The stem restricts the question to prescription labels, so A (over-the-counter labels) is a different kind of option from B, C and D. B, C and D all concern the letter categories and D denies the other two, which gives mild structural support to D. The topic is regulatory recall with little clinical decision content.",
+    "suggestion": "Optional: swap A for a prescription-label error, e.g., 'The rule applies only to drugs approved after 2015', and keep the letter-category options."
+   }
+  ]
+ },
+ {
+  "id": "R08",
+  "verdict": "pass",
+  "issues": []
+ },
+ {
+  "id": "R09",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "The history lists the brand name 'Xarelto\u00ae' beside the generic. The style rule is generic names only.",
+    "suggestion": "Write 'Rivaroxaban 20 mg once daily with the evening meal'."
+   },
+   {
+    "id": "R09",
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "Teeth fractured to the gingival margin often need a flap or bone removal, which raises bleeding risk, yet the stem says 'simple extraction'. B ('skip tomorrow's dose') overlaps the legitimate ADA option of postponing the daily dose, so only 'restart 1 week after' makes it wrong. Renal function is not given for a patient on a DOAC and metformin.",
+    "suggestion": "Say 'extraction of two nonrestorable premolars with forceps' and add 'creatinine clearance 85 mL/min'. Change B to 'Stop it for 1 week before and after'."
+   }
+  ]
+ },
+ {
+  "id": "R10",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The inhaled fluticasone is a CYP3A4 substrate, and fluconazole is a moderate CYP3A4 inhibitor, so a knowledgeable student could argue for systemic corticosteroid effects and hyperglycemia (C). The label-supported key (hypoglycemia with an oral hypoglycemic agent) is still clearly best, and A and C are antonyms, so the pair also cues the answer.",
+    "suggestion": "Optional: add 'albuterol inhaler' instead of fluticasone, or replace C with 'Hypotension'. The stem could say 'with his glipizide' only if the item should test recall rather than recognition."
+   }
+  ]
+ },
+ {
+  "id": "R11",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "'his medication' is singular, but the history lists two drugs (propranolol and omeprazole), so the stem is slightly ambiguous. The sulfa allergy and omeprazole are fine as noise.",
+    "suggestion": "Use 'his current medications'."
+   }
+  ]
+ }
+]

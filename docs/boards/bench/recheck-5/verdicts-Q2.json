@@ -1,0 +1,26 @@
+[
+  {
+    "id": "R01",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Every option ends with its own justification clause (e.g., A 'his platelets are below 60,000/mm3', B 'his platelets are above 50,000/mm3'). Both clauses are true statements about 55,000, so the A-vs-B decision is pure recall of the AAPD number. That is the intended test, but the attached reasons lean on test-taking cues: the more cautious option looks safer.",
+        "suggestion": "Consider removing the trailing reason clauses so students must apply the threshold themselves, e.g., A 'Plan supportive measures with his physician, then extract in a hospital setting' vs B 'Confirm with his oncologist, then extract in the office with local hemostatic measures'."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The finding is a fluctuant buccal swelling, but none of the options covers interim care (drainage, or starting antibiotics with the medical team) while the hospital extraction is arranged. The explanation covers this ('antibiotic coverage ... is decided with the medical team'), so the key still holds as the best of the four.",
+        "suggestion": "Optionally add to A 'and coordinate interim antibiotic coverage', or keep the explanation sentence as is."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Units are written 'mm3' throughout the box, options and explanation instead of mm³ (or /µL).",
+        "suggestion": "Render as /mm³ for consistency with exam formatting."
+      }
+    ]
+  }
+]

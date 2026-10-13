@@ -1,0 +1,361 @@
+[
+  {
+    "id": "A01",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "medium",
+        "detail": "Option D (the key) is by far the longest and most specific option, and it carries its own justification clause ('as the ADA guide allows in this band when pain contributes') that echoes the stem's 'ADA guide' wording and the explanation. A student can pick it by length and by the built-in rationale without knowing the 160-180/100-109 band. The other options are short, and B ('Defer all treatment') and C (nitroglycerin to lower BP) are easy to rule out.",
+        "suggestion": "Shorten D to 'Start emergency care, checking her blood pressure every 10 to 15 minutes and using anxiety reduction'. Drop the 'as the ADA guide allows...' clause. Lengthen A and B to similar length. Make B less absolute (for example 'Postpone treatment until her blood pressure is controlled and refer her to her physician')."
+      },
+      {
+        "check": "distractor",
+        "severity": "low",
+        "detail": "Option C (sublingual nitroglycerin before dental care) is implausible for a student who knows what nitroglycerin is for. Option B uses the absolute 'all treatment', which the stem's own emergency context rules out.",
+        "suggestion": "Replace C with a plausible mistake, such as giving an antihypertensive from the emergency kit or using a local anesthetic without epinephrine and skipping monitoring."
+      }
+    ]
+  },
+  {
+    "id": "A02",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Options B, C and D all concern the letter categories, and C is the one statement that, if true, makes both B and D false. A test-wise student can find the key from the structure alone. Option A (OTC labels) is the odd one out.",
+        "suggestion": "Make one distractor independent of the letters, such as 'Narrative subsections 8.1 to 8.3 replaced the letters only for drugs approved after 2015', so the options do not collapse into one claim and its denials."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "'No longer carry' is a universal claim, but PG-8 describes a phase-in (drugs approved on or after June 30, 2001, and the ADA's full compliance date of June 2020). The cited facts do not say what happens to pre-2001 legacy labels. The item is cognitive level 1 and low yield for the INBDE.",
+        "suggestion": "Add 'current' to the stem ('Current prescription drug labels...') or cite the pre-2001 label rule. Consider replacing this with an applied pregnancy-prescribing item."
+      }
+    ]
+  },
+  {
+    "id": "A03",
+    "verdict": "pass",
+    "issues": []
+  },
+  {
+    "id": "A04",
+    "verdict": "reject",
+    "issues": [
+      {
+        "check": "key",
+        "severity": "high",
+        "detail": "The key (wait about 4 weeks for the second trimester) is wrong and unsafe for this patient. She has 3 days of throbbing pain that keeps her awake, lingering cold pain and percussion tenderness (symptomatic irreversible pulpitis with apical involvement). ADA and ACOG say emergency care, including root canals, can be done safely during pregnancy and that delay can lead to more complex problems (PG-1 quotes this). Option D ('now') is the best answer, and at 10 weeks organogenesis is essentially complete anyway.",
+        "suggestion": "Re-key to treat now (urgent pulpectomy or root canal with local anesthesia, with epinephrine acceptable) and rewrite the explanation. Or rewrite the stem as a non-urgent elective case and ask something that does not depend on the 'second trimester' convention."
+      },
+      {
+        "check": "citation",
+        "severity": "high",
+        "detail": "The cited record PG-1 states that 'second trimester is the most comfortable time for elective care' is a teaching convention, not in the ADA page, and says never to key an item that says care must wait for it. This item does exactly that. The cited quotes ('safe throughout pregnancy', 'emergency treatments... root canals... delaying treatment may result in more complex problems') support D, not C.",
+        "suggestion": "Follow PG-1: key the item to emergency or definitive care without waiting."
+      },
+      {
+        "check": "rationale",
+        "severity": "high",
+        "detail": "The why lines contradict each other. B's line says emergency care does not wait for a later trimester, and A's line says the ADA and ACOG support treating now. Yet C is keyed as correct for waiting about 4 weeks. D's line ('root canal treatment should wait for the second trimester') is unsupported and contradicts PG-1. The memory cue ('second trimester for dental treatment') teaches a false rule that care must wait.",
+        "suggestion": "Rewrite explanation, why lines and cue around: pregnancy is not a reason to delay urgent endodontic treatment; confirm medications with the obstetrician; local anesthetics with or without epinephrine are safe."
+      },
+      {
+        "check": "distractor",
+        "severity": "high",
+        "detail": "Option D is the correct teaching, and B ('after written clearance... in the second trimester') and A (wait until after delivery, acetaminophen only) are unsafe or unnecessary delays. If the item is re-keyed, B and C also need to be made clearly wrong.",
+        "suggestion": "After re-keying to D, make the distractors clearly wrong: wait until delivery, wait for written obstetric clearance, refuse local anesthetic with epinephrine."
+      }
+    ]
+  },
+  {
+    "id": "A05",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The key B is the longest and most specific regimen (loading dose plus a 4-day taper). D is a recognizable prophylaxis pattern, not a treatment pattern, so it is easy to rule out. Clindamycin 300 mg four times a day is an equally correct ADA alternative; it is only absent because D is mangled.",
+        "suggestion": "Optional: write D as a standard-looking but wrong clindamycin regimen (for example 600 mg four times a day) so that D is not eliminated by the 'one dose' cue, and make A and C equally long."
+      }
+    ]
+  },
+  {
+    "id": "A06",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "medium",
+        "detail": "Option D (14) is miscomputed. 500 mg / 36 mg = 13.9, and the item's own memory cue says to round down, so the 'ignore the weight' error gives 13, not 14. Fourteen cartridges would be 504 mg, over the 500-mg ceiling that the distractor supposedly uses. The why line also says '13.9' next to the option '14', which contradicts the cue and teaches rounding up.",
+        "suggestion": "Change D to 13, or switch to the label cartridge (34 mg per 1.7 mL, see the next issue), where 500/34 = 14.7 gives 14 and 14 is a legitimate distractor."
+      },
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "The stem uses '36 mg per 1.8-mL cartridge'. LA-1's conditions say this is an older convention. The US label (Xylocaine Dental) is 34 mg per 1.7 mL. Some US 1.8-mL lidocaine cartridges exist, and the stem states its numbers, so the item is answerable. It does not teach the label content that the 'label maximum' phrasing implies.",
+        "suggestion": "Use 34 mg per 1.7 mL. Then 350/34 = 10.3, so the key becomes 10; B = 220/34 = 6; D = 500/34 = 14; A = 2 still works. Update the explanation and why lines."
+      }
+    ]
+  },
+  {
+    "id": "A07",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "high",
+        "detail": "Option A ('consult her oncologist about coordinated platelet transfusion support before extracting') is defensible. CH-3, cited by this item, says thrombocytopenic patients needing extractions may require coordinated platelet transfusion support. The patient has a nonrestorable, mobile tooth with 8-9 mm pockets that is a chronic infection source in an AML patient with a central line, so an oncologist-coordinated plan is exactly what many would do. Option C also says to consult the oncologist, so A and C differ only in 'postpone' versus 'coordinate support'.",
+        "suggestion": "Make A clearly wrong, for example 'Extract today without contacting her oncologist, since her neutrophil count is above 1,000/mm3'. Or restructure the stem to ask which laboratory value is the barrier under the named guide."
+      },
+      {
+        "check": "rationale",
+        "severity": "high",
+        "detail": "The why line for A says platelet transfusion is 'reserved for counts below 20,000/mm3 and is not coordinated for dental extractions'. That is unsupported by the cited facts and contradicts CH-3, which says coordinated transfusion support may be required for extractions. The 20,000 figure in CH-3 refers to spontaneous gingival oozing, not a transfusion rule.",
+        "suggestion": "Rewrite the A line to match the facts, or replace the option as above."
+      },
+      {
+        "check": "current",
+        "severity": "medium",
+        "detail": "The key rests on the NIDCR Oncology Pocket Guide, which CH-2 marks as ARCHIVED, and on a 75,000/mm3 cutoff. The explanation admits that most teaching sources use 50,000/mm3. The stem names the guide, which keeps the item technically answerable. It still teaches a number that students will see contradicted elsewhere, from a withdrawn source.",
+        "suggestion": "Either state the threshold the item expects in the stem, or key the principle that holds across sources (counts within 24 hours, oncologist consultation, postpone if below the threshold) rather than a number from an archived guide. If the guide is kept, say 'archived' in the explanation."
+      }
+    ]
+  },
+  {
+    "id": "A08",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "high",
+        "detail": "The stem never gives the patient's weight ('A healthy adult needs anesthesia...'), but the answer and every why line depend on 55 kg (8 x 55 = 440 mg; 220 mg; 385 mg). Without a weight the question cannot be answered, and the label has two regimens (8 mg/kg under 70 kg, a flat 600 mg at 70 kg or more). The weight was apparently dropped when the stem was written.",
+        "suggestion": "Add the weight to the stem: 'A healthy adult weighing 55 kg (121 lb) needs...'. The arithmetic then holds (key 6; A = 3, B = 5, D = 8)."
+      }
+    ]
+  },
+  {
+    "id": "A09",
+    "verdict": "reject",
+    "issues": [
+      {
+        "check": "key",
+        "severity": "high",
+        "detail": "The key is wrong and unsafe. The patient is awake, can swallow and has a glucose of 54 mg/dL. The 15-15 rule applies: 15-20 g of fast carbohydrate by mouth, recheck in 15 minutes and repeat until above 70 mg/dL (DM-4, quoted from the ADA page). Glucagon and EMS are for a patient who cannot swallow or is unconscious (DM-5). Option A is the correct answer.",
+        "suggestion": "Re-key to A. For a glucagon item, change the stem so that the patient cannot swallow or is unresponsive."
+      },
+      {
+        "check": "rationale",
+        "severity": "high",
+        "detail": "The explanation, the A and B lines and the memory cue ('Insulin user with symptoms: glucagon first') teach incorrect and dangerous content. 'Oral carbohydrate acts too slowly for a symptomatic patient on insulin' is false for a conscious patient. The C line states the 15-15 rule correctly, which contradicts the key. The D line also says oral sugar is the treatment while he can swallow, which contradicts B being correct.",
+        "suggestion": "Rewrite the explanation, A/B lines and cue: conscious and able to swallow = oral carbohydrate and recheck; glucagon IM and EMS only if he cannot swallow or loses consciousness."
+      },
+      {
+        "check": "distractor",
+        "severity": "high",
+        "detail": "The correct treatment (A) is presented as a wrong option, and the keyed option B is the response for a different scenario. Option D (nothing by mouth) would be wrong for the same reason as the original reading, so a redesigned item needs fresh distractors.",
+        "suggestion": "After re-keying, keep C (finish the filling, recheck at the end) and D, and add a real error such as a large amount of carbohydrate that is not rechecked, or glucagon given to a conscious patient."
+      }
+    ]
+  },
+  {
+    "id": "A10",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "A (low glucose) and C (high glucose) are direct opposites, which signals that the key is one of the pair. The option 'Low blood glucose' is also the intuitive answer for a patient on a sulfonylurea. B and D are easy to eliminate.",
+        "suggestion": "Optional: make C a plausible effect instead of the mirror image, for example 'Prolonged bleeding' or 'Loss of taste', or restate A as the specific interaction ('Raised glipizide levels with hypoglycemia')."
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The stem treats systemic fluconazole as the plan for a denture-related candidiasis in a patient who also uses an inhaled steroid. Topical antifungals are usually tried first for mild oral candidiasis. The item is about the interaction, so this does not affect the key.",
+        "suggestion": "Optional: say 'extensive lesions' or 'topical treatment has failed' to justify the systemic drug."
+      }
+    ]
+  },
+  {
+    "id": "A11",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "Stem and options do not fit together. The box gives BOP of 6% and PD 2-4 mm, so B ('bleeding at 8% of sites') is not an 'additional finding' but a change in a stated value, and A (attachment loss from before treatment) is not a finding of this visit at all.",
+        "suggestion": "Reword the stem to 'Which finding, if present at this visit, would mean...' and consider replacing A with a real new finding, such as a 5-mm site that does not bleed."
+      }
+    ]
+  },
+  {
+    "id": "A12",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "high",
+        "detail": "The explanation contradicts the key. It says AAOMS 2022 'suggests extracting promptly and holding the next two injections until the socket heals' and calls waiting 3 to 4 months the tempting wrong answer, which describes option D and rejects option B. The why lines, the memory cue and the cited quote (3-4 months after the last dose, reinstitute 6-8 weeks after surgery) all support B. A student reading the explanation is told the wrong thing.",
+        "suggestion": "Rewrite the explanation: AAOMS 2022 says planned dentoalveolar surgery can be completed 3-4 months after the last denosumab dose, when osteoclast inhibition is waning, and the drug is reinstituted 6-8 weeks after surgery. The tempting wrong answer is a long holiday as with bisphosphonates, or extracting right after an injection."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Brand name 'Prolia' appears in the history and the stem is otherwise generic. Same for the other brand names in this batch.",
+        "suggestion": "Use 'Denosumab 60 mg every 6 months' without the brand."
+      }
+    ]
+  },
+  {
+    "id": "A13",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "distractor",
+        "severity": "high",
+        "detail": "Option D ('continue it, schedule the visit as long after the last dose as possible, and use local measures') is defensible. AC-3, quoting the ADA, says consideration may be given, with the physician, to timing the visit as late as possible after the last dose or postponing the daily dose. D differs from the key B only by that timing step, and the visit is already planned for the morning after an evening dose. A student who knows the ADA text can reasonably choose D.",
+        "suggestion": "Make D clearly wrong, for example 'Stop it 2 weeks before and restart the day after' or 'Replace it with warfarin for the week'. Or make B and D mutually exclusive by naming the timing approach in B's own text."
+      },
+      {
+        "check": "rationale",
+        "severity": "high",
+        "detail": "The D line says 'Timing a visit around the dose is never recommended for DOACs; it only delays care.' That is false and contradicts AC-3 (schedule as late as possible after the last dose is a named option, with the physician).",
+        "suggestion": "Remove the absolute. If D is kept as a distractor, say that the timing step is optional and the regimen does not need to change for 1-3 extractions."
+      },
+      {
+        "check": "style",
+        "severity": "low",
+        "detail": "Brand name 'Xarelto' in the history.",
+        "suggestion": "Use the generic name only."
+      }
+    ]
+  },
+  {
+    "id": "A14",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The exposed bone is 10 weeks old. The 8-week figure belongs to the MRONJ definition. ORN is classically defined as exposed irradiated bone that fails to heal for about 3 months, so option B ('delayed socket healing that does not yet meet a necrosis definition') is defensible at 10 weeks. None of the cited facts defines ORN or its time criterion (ORN-1 only says radiation excludes MRONJ).",
+        "suggestion": "Move the interval to 3-4 months (or state the extraction was 'more than 3 months ago') so that both the 8-week MRONJ and the 3-month ORN criteria are met. Add an ORN definition fact."
+      },
+      {
+        "check": "rationale",
+        "severity": "medium",
+        "detail": "The B line says bone exposed for more than 8 weeks is 'past the time point the definition uses'. That applies to the MRONJ definition, which does not apply to this patient. As written, it uses the wrong definition to reject B. The AAOMS case definition also does not say an irradiated patient on an antiresorptive cannot have a drug contribution, only that it is excluded from the MRONJ case definition.",
+        "suggestion": "Rewrite B's line around the ORN time criterion, and word the key as 'does not meet the MRONJ case definition; fits osteoradionecrosis'."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The key is the only option that is neither MRONJ nor delayed healing, and its 'rather than' phrasing echoes the stem's radiation history.",
+        "suggestion": "Optional: phrase A as 'Osteoradionecrosis of the mandible'."
+      }
+    ]
+  },
+  {
+    "id": "A15",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "The explanation presents the unopposed alpha-1 and reflex bradycardia mechanism as sourced, but VC-4 is only 'partial': the mechanism is a teaching paraphrase and only the label effect (dose-dependent hypertension and bradycardia) is quoted. The key itself is supported.",
+        "suggestion": "Keep the mechanism, but label it as the usual explanation, not the label's words."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "The 2x2 set (BP up or down x pulse up or down) lets a student who remembers only one half still narrow to two options.",
+        "suggestion": "Acceptable for a recall item; no change needed."
+      }
+    ]
+  },
+  {
+    "id": "A16",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "rationale",
+        "severity": "medium",
+        "detail": "The explanation says stage IV is 'reached by counting all three missing teeth'. Three teeth is still within the stage III limit of 4 or fewer, so counting all three missing teeth does not give stage IV. Stage IV needs 5 or more teeth lost to periodontitis. The trap that actually reaches 5 or more is counting the four teenage third molars too, or treating the class II furcation as a stage IV factor. A student could take away the wrong threshold.",
+        "suggestion": "Rewrite: 'The tempting wrong answer is stage IV, reached by counting the third molars and the caries extraction as periodontal losses (7 teeth), or by treating the class II furcation as a stage IV factor.'"
+      }
+    ]
+  },
+  {
+    "id": "A17",
+    "verdict": "pass",
+    "issues": [
+      {
+        "check": "citation",
+        "severity": "low",
+        "detail": "PS-9's ratio cutoffs (under 0.25, 0.25 to 1.0, over 1.0) have no verbatim quote ('quote not yet added') because the chart text is scrambled. The cutoffs match the 2017 chart and the key follows from them (50/58 = 0.86, grade B before modifiers).",
+        "suggestion": "Add a verbatim quote for the ratio cells before release."
+      }
+    ]
+  },
+  {
+    "id": "A18",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "giveaway",
+        "severity": "medium",
+        "detail": "The key is the only hedged, specific statement ('is linked to a lower A1C about 3 months later'). The distractors use absolutes or implausible claims: 'no measurable effect', 'one way... but not the reverse', and 'raises A1C for 3 months, so metformin must be increased first'. A student can choose B without any knowledge of the content.",
+        "suggestion": "Rewrite the distractors in the same register as the key, for example 'SRP lowers A1C within 1 week and the effect lasts a year', 'The effect on A1C appears only after surgical therapy', 'Periodontal therapy changes A1C only in type 1 diabetes'. Or make the options effect sizes."
+      },
+      {
+        "check": "current",
+        "severity": "low",
+        "detail": "'Best supported by current evidence' is true at the meta-analysis level (about 0.3-0.4 percentage point lower HbA1c, ADA quote), but the trial literature is mixed in size, so a distractor like A is not absurd. The stem does not say the effect is modest.",
+        "suggestion": "Add 'modest' to the key ('is linked to a modestly lower A1C') or give the effect size."
+      }
+    ]
+  },
+  {
+    "id": "A19",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "high",
+        "detail": "The stem does not name the ADA guide. BP-4 explicitly says to key the ADA 160/100 rule only when the stem names the ADA guide, because many board and textbook sources defer elective care at 180/110 and the JADA 2020 review (Yarows) found no evidence-based cutoff. Without a named source, option B (proceed; defer only at 180/110) is defensible, and C or D can be defended under common stress-reduction advice for stage 2 hypertension.",
+        "suggestion": "Add the source to the stem: 'According to the ADA guide for adult outpatients with hypertension, which is the most appropriate action?'"
+      },
+      {
+        "check": "ambiguity",
+        "severity": "low",
+        "detail": "The repeat reading is 164/100. The ADA row is '>160/100'. The systolic value is over 160 but the diastolic is exactly 100, so a literal-minded student can argue the reading is not confirmed above the threshold.",
+        "suggestion": "Make the repeat reading 164/102 so that both values exceed the threshold."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option B contains 'only', an absolute that signals a distractor.",
+        "suggestion": "Reword B: 'Proceed, since elective care is deferred at 180/110 or higher'."
+      }
+    ]
+  },
+  {
+    "id": "A20",
+    "verdict": "fix",
+    "issues": [
+      {
+        "check": "ambiguity",
+        "severity": "medium",
+        "detail": "The scenario has the abscess incised and drained and then metronidazole added for an afebrile patient with a localized swelling and no fascial space involvement. AB-3 states that antibiotics are not recommended as an adjunct to definitive care, including incision and drainage (strong). AB-6 covers adding metronidazole when there is no response to first-line antibiotics, not after drainage. The stem therefore presents guideline-discordant prescribing, and in an anticoagulated patient where the added drug raises bleeding risk.",
+        "suggestion": "Change the setup so adding metronidazole is justified, for example fever and fascial space involvement, or say 'his oral surgeon adds metronidazole' and make the question only about the interaction. Remove the drainage step if the item is meant to follow the AB-6 pathway."
+      },
+      {
+        "check": "giveaway",
+        "severity": "low",
+        "detail": "Option C contains 'only', an absolute used to flag a distractor.",
+        "suggestion": "Reword C: 'No change in INR, because metronidazole interacts with alcohol and not with warfarin'."
+      }
+    ]
+  }
+]

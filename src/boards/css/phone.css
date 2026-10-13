@@ -1,0 +1,25 @@
+/* Phone: mode tabs get their own labeled row (as perio), nothing under the widget's bottom bar or in Timmy's corner. */
+@media (max-width: 760px){
+  .notes-layout{grid-template-columns:minmax(0,1fr)}
+  .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .unit-nav button{flex:none}
+}
+@media (max-width: 560px){
+  #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
+  .hub-header{margin:0 -16px;padding:8px 16px}
+  .hub-header-top{flex-wrap:wrap;row-gap:6px}
+  .hub-title{flex:1 1 auto}
+  .hub-title h1{font-size:1.2rem}
+  .hub-subtitle{display:none}
+  .exam-pill{display:none}
+  #modeSwitch{order:3;flex:1 0 100%;border-radius:12px}
+  #modeSwitch button{flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:2px;padding:6px 2px;border-radius:9px;font-size:.7rem;line-height:1.15;white-space:normal;text-align:center}
+  #modeSwitch .mode-label{display:block}
+  .box{padding:16px}
+  .reading{padding:16px}
+  .qcard{padding:14px}
+  .pbox dl{grid-template-columns:minmax(0,1fr)}
+  .pbox dd{border-top:0;padding-top:0}
+  .empty{padding:16px;gap:12px}
+  .panel-head h2{font-size:1.3rem}
+}

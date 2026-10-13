@@ -1,0 +1,21 @@
+/* Notes (minimal reader; int-notes-home adds tables in recall mode, refs chips and practice links). */
+.notes-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px}
+.unit-nav{display:flex;flex-direction:column;gap:6px;min-width:0}
+.unit-nav button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;cursor:pointer;font-weight:700;font-size:.9rem}
+.unit-nav button.is-active{border-color:var(--ink);box-shadow:var(--shadow)}
+.reading{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow);min-width:0;overflow-wrap:anywhere}
+.reading h2{font-family:var(--font-display);font-size:1.35rem;margin:24px 0 8px;line-height:1.25}
+.reading section:first-of-type h2{margin-top:0}
+.reading h3{font-size:1.02rem;margin:18px 0 6px}
+.reading p{margin:0 0 12px;max-width:74ch}
+.reading aside.hy{background:var(--accent-soft);border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.reading aside.hy h3{margin-top:0}
+.reading table{border-collapse:collapse;width:100%;font-size:.9rem;margin:10px 0 16px;display:block;overflow-x:auto}
+.reading caption{text-align:left;font-weight:700;padding-bottom:6px}
+.reading th,.reading td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.reading th{background:var(--surface-2)}
+.reading .ref{display:inline-block;font-family:var(--font-mono);font-size:.7rem;padding:0 6px;border-radius:999px;background:var(--surface-2);color:var(--ink-soft);vertical-align:1px}
+.reading .ref::before{content:attr(data-ref)}
+.reading footer.sources{font-size:.78rem;color:var(--ink-faint);margin:6px 0 18px}
+.reading figure{margin:12px 0}
+.reading figure svg{max-width:100%;height:auto}
