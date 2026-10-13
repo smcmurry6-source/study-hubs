@@ -625,7 +625,8 @@
    ],
    "units": [
     "medcx",
-    "pharm"
+    "pharm",
+    "perio"
    ],
    "topic": "diabetes",
    "exam": [
@@ -7019,6 +7020,50 @@
     "adex"
    ],
    "recorded": "2026-10-11"
+  },
+  {
+   "id": "EM-11",
+   "status": "verified",
+   "risk": "high",
+   "claim": "During a seizure (CDC): do not hold the person down or stop their movements, do not put anything in their mouth, and do not give mouth-to-mouth breaths during the seizure (breathing usually restarts on its own). Turn the person gently onto one side with the mouth pointing to the ground to keep the airway clear, and give no water or food until they are fully alert.",
+   "conditions": "CDC first aid for bystanders. It is not the dental-office protocol (stopping treatment, positioning in the chair, suction, oxygen, emergency drugs): never key it as the full in-chair sequence or as a ban on emergency medication or on clearing the airway after the seizure. Timing and when to call 911 are in EM-7.",
+   "stem_names": [
+    "CDC"
+   ],
+   "cites": [
+    {
+     "src": "cdc-seizure",
+     "loc": "What to avoid",
+     "quote": "Don't hold the person down or stop their movements. This could injure you or them. Don't put anything in their mouth."
+    },
+    {
+     "src": "cdc-seizure",
+     "loc": "What to avoid",
+     "quote": "Don't give mouth-to-mouth breaths during the seizure. People usually start breathing again on their own after a seizure."
+    },
+    {
+     "src": "cdc-seizure",
+     "loc": "What to avoid",
+     "quote": "Don't offer water or food until they are fully alert."
+    },
+    {
+     "src": "cdc-seizure",
+     "loc": "Generalized seizures",
+     "quote": "Turn them gently onto one side with their mouth pointing to the ground. This will keep their airway clear."
+    }
+   ],
+   "see": [
+    "EM-7"
+   ],
+   "units": [
+    "medcx"
+   ],
+   "topic": "medical-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
   }
  ]
 }

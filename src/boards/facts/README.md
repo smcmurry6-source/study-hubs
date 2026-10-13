@@ -13,6 +13,13 @@ notes: **edit the JSON, not the markdown**.
 - `<unit>.json`: facts homed in that unit (`pharm`, `medcx`, `anes`, `perio`, `endo`). `units` lists every unit that
   may cite the fact.
 
+## Perio prefixes (`perio.json`)
+
+`PH` health and gingivitis, `BF` biofilm, calculus and modifying factors, `FM` furcation and mobility, `RAD`
+radiographs, `PS` staging and grading, `PA` acute lesions, `MG` mucogingival, `PI` peri-implant, `PR` prognosis, `PT`
+therapy steps and adjuncts (EFP S3), `SX` surgery, `LD` local-delivery labels, `PSY` perio and systemic health, `GE`
+drug-influenced enlargement. Pharmacokinetics basics are `PK-3` onward in `pharm.json` (`PK-1`/`PK-2` are CYP3A).
+
 ## A fact
 
 | Field | Meaning |
@@ -36,7 +43,8 @@ notes: **edit the JSON, not the markdown**.
   prints matches in context; `--propose` suggests sentences for cites without one). Keep each one short (one clause
   to two sentences) and pick the words that carry the fact's numbers and qualifiers.
 - **Run `node tools/boards/check-quotes.mjs` after any change.** It fetches each source (cached 7 days in `.cache/`,
-  not committed) and confirms every quote is there. Exit code 1 = a quote is missing.
+  not committed) and confirms every quote is there. Exit code 1 = a quote is missing. Sites that refuse Node's fetch
+  (fda.gov answers it with HTTP 401) are retried with `curl`, then in headless Chromium.
 - **Changing a fact:** update the record first (and add an `errata` line if the old claim was wrong), rerun the quote
   check, then grep `src/boards` for the id and send every item citing it back through verification.
 - **Blocked sources** (`blocked` set, e.g. the AHA 2021 statement on ahajournals.org): save the PDF from a browser as

@@ -14,7 +14,8 @@
 //
 // Sources live in src/boards/facts/sources.json; facts in src/boards/facts/<unit>.json. A source's `fetch` URL (a
 // machine-readable copy: DailyMed SPL XML, Europe PMC full text) is read instead of `url` when present. PDFs need
-// `pdftotext` (poppler) or Python with pypdf. Sites that block plain requests are retried in headless Chromium when
+// `pdftotext` (poppler) or Python with pypdf. Sites that block plain requests are retried with curl (fda.gov answers
+// Node's fetch with 401 but serves curl), then in headless Chromium when
 // Playwright is installed (PLAYWRIGHT_PATH / CHROMIUM_PATH as for tools/ci/smoke.js). For a source marked `blocked`
 // (e.g. aha-ie-2021), save its PDF from a browser as .cache/boards-sources/<key>.local.pdf and the check reads that.
 //
@@ -92,6 +93,19 @@ function pdfToText(file) {
   throw new Error('cannot read PDF: install poppler (pdftotext) or Python with pypdf');
 }
 
+// Second try for sites that refuse Node's fetch: the curl binary (Linux, macOS, Windows 10+). Returns a fetch-like
+// response, or null when curl is missing or the site refuses it too.
+function curlFetch(url) {
+  const tmp = path.join(CACHE, '.curl-' + process.pid);
+  try {
+    const out = execFileSync('curl', ['-sS', '-L', '--max-time', '60', '-A', UA, '-o', tmp, '-w', '%{http_code} %{content_type}', url]).toString().trim();
+    const [code, type = ''] = out.split(' ');
+    if (!/^2\d\d$/.test(code)) return null;
+    const buf = fs.readFileSync(tmp);
+    return { ok: true, status: +code, headers: { get: () => type }, arrayBuffer: async () => buf, text: async () => buf.toString('utf8') };
+  } catch (e) { return null; } finally { try { fs.unlinkSync(tmp); } catch (e) { /* none */ } }
+}
+
 async function browserText(url) {
   const req = createRequire(import.meta.url);
   let chromium;
@@ -124,7 +138,8 @@ export async function getSourceText(key, src, { refresh = false, offline = false
   if (src.blocked) throw new Error('blocks scripts; save the PDF from a browser as .cache/boards-sources/' + key + '.local.pdf');
   const url = src.fetch || src.url;
   let text, info = { url, fetched: new Date().toISOString() };
-  const res = await fetch(url, { headers: { 'user-agent': UA, accept: '*/*' }, redirect: 'follow' }).catch(e => ({ ok: false, status: 0, err: e }));
+  let res = await fetch(url, { headers: { 'user-agent': UA, accept: '*/*' }, redirect: 'follow' }).catch(e => ({ ok: false, status: 0, err: e }));
+  if (!res.ok) { const c = curlFetch(url); if (c) { res = c; info.via = 'curl'; } }   // fda.gov answers Node's fetch with 401 but serves curl
   if (!res.ok) {
     if (src.kind === 'pdf' || res.status === 0) throw new Error('HTTP ' + (res.status || (res.err && res.err.message)));
     text = await browserText(url); info.via = 'browser';
