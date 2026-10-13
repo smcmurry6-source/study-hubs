@@ -331,7 +331,7 @@ const cases = [
 ];
 
 // Verification record (stage 4/4b): two independent checker passes, both pass (docs/boards/bench/recheck-*).
-const CHECKED = { 'b-medcx-0009': [2, '2026-10-13'], 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2,
+const CHECKED = { 'b-medcx-0008': [2, '2026-10-13'], 'b-medcx-0009': [2, '2026-10-13'], 'b-medcx-0004': 1, 'b-perio-0003': 1, 'b-perio-0002': 2, 'b-medcx-0001': 2, 'b-medcx-0006': 2, 'b-medcx-0007': 2, 'b-perio-0001': 2, 'b-pharm-0002': 2,
   'b-anes-0001': 1, 'b-anes-0002': 1, 'b-anes-0003': 1, 'b-endo-0001': 1, 'b-medcx-0002': 1, 'b-medcx-0003': 1, 'b-medcx-0005': 1, 'b-pharm-0001': 1, 'b-pharm-0004': 1, 'b-pharm-0003': 4 };
 for (const it of items) if (CHECKED[it.id]) { const [round, on] = [].concat(CHECKED[it.id], '2026-10-11');
   it.checked = { on, by: 'claude-sonnet subagent x2 (same family as writer)', round }; }

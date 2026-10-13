@@ -77,3 +77,17 @@ What this adds to the benchmark:
 - **Cost.** 571k subagent tokens for 4 passes over 15 item checks plus context. Each subagent carries about 120k
   tokens of overhead whatever the batch size (run 1: about 170k for 20 items; rechecks: about 140k for 8), so check
   in large batches (30-40 items per pass), and move to a scripted per-item checker on OpenRouter when a key exists.
+
+## Last two items (Session 3, 2026-10-13)
+
+| Round | Items | Result |
+|---|---|---|
+| Recheck 4 (`recheck-4/`) | `b-medcx-0009` (options rewritten in Session 2); `b-medcx-0008` rewritten to key the AAPD 2022 counts (CH-5, CH-6) for a 15-year-old on chemotherapy, replacing the archived NIDCR guide | `b-medcx-0009` passed both passes (low notes only; the explanation now names symptomatic apical periodontitis too). `b-medcx-0008`: one pass "fix", one "pass", both naming the same giveaway: the key was the only option that mentioned the physician, the safe-looking answer at any blood count. |
+| Recheck 5 (`recheck-5/`) | `b-medcx-0008` repaired: every option ends with a matching reason clause and the 50,000/mm3 distractor also involves the oncologist, so the platelet threshold is what separates them | Passed both passes (low notes only: the item tests the AAPD number specifically, which the stem names). |
+
+**All 20 benchmark items are verified** by two independent passes. Cost: recheck 4 ran in one workflow with the fact rechecks
+(567k subagent tokens for four agents); recheck 5 took 185k for two passes on one item, so each checker pass still
+carries about 90k tokens of overhead whatever the batch size.
+
+Lesson: two checkers flagged the same giveaway from different angles. A "coordinate with the physician" option is
+the classic safe answer, so when the key involves the physician, give a distractor the same move.

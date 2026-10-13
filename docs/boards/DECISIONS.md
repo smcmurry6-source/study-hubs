@@ -40,3 +40,9 @@ Living record of what Sam decided while this hub is being planned and built. New
 - **Free and public.** Selling is not being considered for now.
 - **Benchmark go** (Sam, 2026-10-11): scale question writing per `bench/REPORT.md`, with its conditions (code checks
   first, two checker passes on high-risk items, every repaired item re-checked). Session 2 started the same day.
+
+## 2026-10-13
+
+- **Codex is connected to the repo** (Sam). Interim mode ends for building and drafting: Codex takes briefs from
+  `docs/boards/tasks/T-NN.md` and opens PRs into `claude/boards-hub`; Claude writes the briefs, reviews the PRs and
+  keeps the independent checking. Still no OpenRouter key, so the first-pass checker stays a separate Claude subagent.
