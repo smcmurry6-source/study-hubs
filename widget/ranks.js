@@ -474,6 +474,54 @@
   function svgDataUri(svg){ return 'url("data:image/svg+xml,' + encodeURIComponent(svg.replace(/ class="[^"]*"/, ' xmlns="http://www.w3.org/2000/svg"')) + '")'; }
   function fmt(n){ return Math.round(n || 0).toLocaleString(); }
 
+  /* ---------- rank-up celebrations (widget/rankup.js, fetched the first time one is needed) ----------
+     track(profile) compares the rank with the last one this device saw (sh_rank_tier / sh_rank_step) and plays the
+     full cutscene for a new rank (Silver -> Gold) or the smaller coin flip for a new level (Gold I -> Gold II).
+     The hub widget and the dashboard both call it, so a rank-up shows on whichever page sees it first. It waits for
+     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Surprises off skips it. */
+  var RANKUP_SRC = (function(){
+    var src = (document.currentScript && document.currentScript.src) || "";
+    if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : ""; }
+    try { return src ? new URL("rankup.js", src).href : ""; } catch (e) { return ""; }
+  })();
+  var rankUpLoading = null;
+  function withRankUp(cb){
+    if (window.shRankUp) { cb(window.shRankUp); return; }
+    if (!RANKUP_SRC) return;
+    if (!rankUpLoading) {
+      rankUpLoading = [];
+      var s = document.createElement("script"); s.src = RANKUP_SRC; s.async = true;
+      s.onload = function(){ var q = rankUpLoading; rankUpLoading = null; if (window.shRankUp) q.forEach(function(f){ f(window.shRankUp); }); };
+      s.onerror = function(){ rankUpLoading = null; };
+      document.head.appendChild(s);
+    }
+    rankUpLoading.push(cb);
+  }
+  function playRankUp(kind, d, busy){
+    if (document.hidden || (busy && busy())) { setTimeout(function(){ playRankUp(kind, d, busy); }, 3000); return; }
+    withRankUp(function(U){ U[kind](d); });
+  }
+  function track(p, opt){
+    if (!p) return;
+    opt = opt || {};
+    var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
+    ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
+    if (pt === null || (ls("sh_pref_eggs") || "on") === "off") return;
+    pt = +pt; ps = ps === null ? NaN : +ps;
+    var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
+    var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
+    if (t > pt) playRankUp("tier", d, opt.busy);
+    else if (t === pt && step > from) playRankUp("level", d, opt.busy);
+  }
+  /* try them from the console: shRanks.preview("tier", 3) (Silver -> Gold), shRanks.preview("level", 4, 2) (Gold I -> II) */
+  function preview(kind, a, b){
+    a = a == null ? 3 : Math.max(0, Math.min(6, a | 0));
+    var d = kind === "level" ? { from: a, to: a, level: Math.max(2, Math.min(3, b || 2)) }
+      : { from: a, fromLevel: 3, to: Math.max(1, Math.min(6, b == null ? a + 1 : b | 0)), level: 1 };
+    if (kind !== "level" && d.to <= d.from) d.from = d.to - 1;
+    withRankUp(function(U){ U[kind === "level" ? "level" : "tier"](d); });
+  }
+
   /* ---------- the hub widget: rank card, hub mastery, trophy case, link devices, accent unlocks ---------- */
   function mount(H){
     if (!H || window.__shRanksMounted) return;
@@ -613,15 +661,6 @@
       setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 6500);
     }
 
-    function levelToast(t, lvl){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      var d = document.createElement("div");
-      d.className = "sh-egg sh-egg-toast is-gold"; d.setAttribute("role", "status");
-      d.innerHTML = '<span class="sh-egg-ic" style="width:44px;height:44px">' + art(t, 44, { level: lvl }) + '</span><span><b>' + rankName(t, lvl) + '</b><small>Level up. Keep going.</small></span>';
-      document.body.appendChild(d);
-      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
-      setTimeout(function(){ d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 350); }, 4200);
-    }
     /* a clue for one secret you haven't found yet, different on each open */
     function psst(earned){
       var left = TROPHIES.filter(function(x){ return x.secret && !earned[x.k]; });
@@ -640,17 +679,6 @@
       sec.querySelector(".sh-trophy-detail").innerHTML = (got ? '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '. Earned.'
         : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
     });
-    function celebrate(t){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      var d = document.createElement("div");
-      d.className = "sh-egg sh-rankup"; d.setAttribute("role", "status");
-      d.innerHTML = '<div class="sh-rankup-card sh-tier-' + TIERS[t].key + '">' + art(t, 150, { animate: true }) + '<div class="sh-rank-eyebrow">New rank</div><div class="sh-rank-name">' +
-        TIERS[t].name + ' I</div><p>' + (ACCENTS[TIERS[t].key] ? "You also unlocked the " + TIERS[t].name + " accent color in Settings." : "Keep going.") + '</p><button type="button">Nice</button></div>';
-      document.body.appendChild(d);
-      requestAnimationFrame(function(){ d.classList.add("is-shown"); });
-      H.confetti(); setTimeout(H.confetti, 400);
-      d.addEventListener("click", function(e){ if (e.target === d || e.target.closest("button")) { d.classList.remove("is-shown"); setTimeout(function(){ d.remove(); }, 300); } });
-    }
 
     var loading = false;
     function load(){
@@ -661,10 +689,7 @@
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         profile = r[0]; mastery = r[1] || [];
         if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-        var prev = ls("sh_rank_tier"), prevStep = ls("sh_rank_step"), stepNow = profile.step != null ? profile.step : (profile.tier || 0) * 3;
-        ls("sh_rank_tier", String(profile.tier || 0)); ls("sh_rank_step", String(stepNow));
-        if (prev !== null && (profile.tier || 0) > +prev) celebrate(profile.tier);
-        else if (prevStep !== null && stepNow > +prevStep) levelToast(profile.tier || 0, profile.level || 1);
+        track(profile, { busy: function(){ try { return /(^|\/)mock/.test(String(H.section ? H.section() : "")); } catch (e) { return false; } } });
         badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
         /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
         if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
@@ -731,7 +756,7 @@
         (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>');
     },
     flair: flair, flairFromBadges: flairFromBadges, medal: medalSvg, hubName: hubName,
-    mount: mount, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
+    mount: mount, track: track, preview: preview, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },
     levelFor: function(xp){ var t = this.tierFor(xp), lo = TIERS[t].at, hi = t < 6 ? TIERS[t + 1].at : 125000; return Math.min(3, 1 + Math.floor((xp - lo) * 3 / (hi - lo))); },
     shade: shade
