@@ -83,6 +83,23 @@ It is also refreshed between archivings, by hand when Sam asks a Claude Code ses
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
+## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
+
+Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
+lecture for places where a drawn diagram would teach better than text: a structure, a mechanism, where a drug acts,
+a sequence that happens in space, two structures side by side. Draw these from the hub's own notes and check them
+against the questions it tests. **Then ask Sam to approve each candidate separately before drawing any of them.**
+For each candidate, give:
+
+- what it shows, and any interaction (a toggle, a slider, stepping through a sequence, hover labels);
+- why it helps, with the question ids it supports;
+- where it goes: under a lecture's notes, in Review, or as a diagram question;
+- its size and rough build time.
+
+Only approved figures are built; note the skipped ones in the PR so the next session doesn't propose them again.
+Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` → "Diagrams (the anima skill)").
+Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
+
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-10-14 (calmer right-answer feedback, Claude Code)** — Sam found the right-answer "pop" shaky: `pop()` in
@@ -139,6 +156,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
   matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
   `LESSONS.md` refreshed.
+
+- **2026-10-13 (diagram review rule, Claude Code)** — New standing rule above ("Building a hub = diagram review"):
+  every hub build, or new lectures added to a hub, includes a review for diagram candidates, and each one goes to Sam
+  for approval before it is drawn. `CLAUDE.md` → "Diagrams (the anima skill)" says how a Claude Code session asks.
+  No site change.
 
 - **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;
   commit and what was trimmed in its `UPSTREAM.md`), so Claude Code sessions can draw accurate isometric SVG figures

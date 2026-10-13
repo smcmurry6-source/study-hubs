@@ -118,6 +118,12 @@ foreground/polled; an idle cloud VM is reclaimed and background work is lost.
 `.claude/skills/anima/` (vendored from Garinmckayl/anima, see its `UPSTREAM.md`) draws accurate isometric SVG
 figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagrams, with these house rules:
 
+- **Building a hub, or adding lectures to one, includes a diagram review** (`DEPLOY_NOTES.md` → "Building a hub =
+  diagram review"; Sam's standing rule, 2026-10-13). Once the notes are written, list the candidates, ranked by what
+  the questions test and where the class struggles (`question_stats` for a live hub). Ask Sam about **each one
+  separately** with AskUserQuestion: one question per candidate, with the options Build / Skip / Change it, up to 4
+  per call. Draw only what Sam approves.
+
 - Hubs are single files, so a figure is built offline and pasted in: keep its Node build script in
   `tools/figures/<hub>/` (importing `.claude/skills/anima/kit/`) and put the static SVG and the CSS it needs into the
   hub, the way the existing drawn figures are (`FIGS`/`figHTML()`, `FIG_BY_LEC` in `occlusion` and `pcd-exam3`).
