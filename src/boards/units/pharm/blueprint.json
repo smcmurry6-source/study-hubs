@@ -1,0 +1,178 @@
+{
+  "unit": "pharm",
+  "items_total": 60,
+  "case_items": 27,
+  "sections": [
+    { "sec": "pharm-interactions", "standalone": 3, "in_cases": 3, "fk": ["FK8"], "cc": ["CC25", "CC26"] },
+    { "sec": "pharm-analgesics", "standalone": 5, "in_cases": 3, "fk": ["FK8"], "cc": ["CC27"] },
+    { "sec": "pharm-opioids", "standalone": 4, "in_cases": 5, "fk": ["FK8"], "cc": ["CC27"] },
+    { "sec": "pharm-antibiotics", "standalone": 4, "in_cases": 4, "fk": ["FK8"], "cc": ["CC26"] },
+    { "sec": "pharm-prophylaxis", "standalone": 3, "in_cases": 4, "fk": ["FK8"], "cc": ["CC26"] },
+    { "sec": "pharm-antifungal-antiviral", "standalone": 3, "in_cases": 1, "fk": ["FK8"], "cc": ["CC25"] },
+    { "sec": "pharm-drugs-change-care", "standalone": 4, "in_cases": 3, "fk": ["FK8"], "cc": ["CC26"] },
+    { "sec": "pharm-oral-effects", "standalone": 2, "in_cases": 1, "fk": ["FK8"], "cc": ["CC25"] },
+    { "sec": "pharm-substance-tobacco", "standalone": 2, "in_cases": 1, "fk": ["FK8"], "cc": ["CC27"] },
+    { "sec": "pharm-pregnancy", "standalone": 3, "in_cases": 2, "fk": ["FK8"], "cc": ["CC25"] }
+  ],
+  "concepts": [
+    { "concept": "cyp3a-inhibitor-substrate-interactions", "sec": "pharm-interactions", "refs": ["PK-1", "DI-3", "TX-5", "OPI-22"], "hy": "CYP3A inhibitors can raise the levels of several medicines used in dentistry and medical care.", "siblings": 3, "cog": 2, "phase": "plan" },
+    { "concept": "warfarin-antimicrobial-interactions", "sec": "pharm-interactions", "refs": ["DI-1", "DI-2"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "cyp3a-inducers-lower-substrate-levels", "sec": "pharm-interactions", "refs": ["PK-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+
+    { "concept": "ada-first-line-acute-dental-pain", "sec": "pharm-analgesics", "refs": ["RX-1", "RX-2"], "hy": "NSAID-based treatment is first-line for acute dental pain in the ADA guideline.", "siblings": 3, "cog": 2, "phase": "plan" },
+    { "concept": "acute-dental-analgesic-dose-ceilings", "sec": "pharm-analgesics", "refs": ["RX-2", "RX-4"], "hy": null, "siblings": 2, "cog": 1, "phase": "tx" },
+    { "concept": "analgesia-in-kidney-and-liver-disease", "sec": "pharm-analgesics", "refs": ["CKD-3", "LIV-5", "RX-2"], "hy": "Kidney and liver disease change the NSAID and acetaminophen plan.", "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "nsaid-sensitivity-and-asthma", "sec": "pharm-analgesics", "refs": ["RES-4", "RES-5"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+
+    { "concept": "acute-dental-opioid-reserve-and-duration", "sec": "pharm-opioids", "refs": ["RX-3", "OPI-1", "OPI-3"], "hy": "Opioids are reserved for rare acute dental pain situations when first-line care is insufficient.", "siblings": 3, "cog": 2, "phase": "plan" },
+    { "concept": "opioid-and-cns-depressant-risk", "sec": "pharm-opioids", "refs": ["OPI-6", "RES-12"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "opioid-use-disorder-medication-continuity", "sec": "pharm-opioids", "refs": ["OPI-11", "OPI-13"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "overdose-response-and-naloxone", "sec": "pharm-opioids", "refs": ["OPI-17", "OPI-18", "EM-3"], "hy": null, "siblings": 1, "cog": 2, "phase": "tx" },
+    { "concept": "opioid-risk-review-and-pdmp", "sec": "pharm-opioids", "refs": ["OPI-4", "OPI-5", "RX-6"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+
+    { "concept": "pulpitis-and-apical-periodontitis-antibiotic-stewardship", "sec": "pharm-antibiotics", "refs": ["AB-1", "AB-2"], "hy": "Pulpitis and symptomatic apical periodontitis do not become antibiotic indications merely because care is delayed.", "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "apical-abscess-antibiotic-regimens", "sec": "pharm-antibiotics", "refs": ["AB-3", "AB-4", "AB-7"], "hy": "Systemic signs and availability of definitive care change the antibiotic plan.", "siblings": 3, "cog": 3, "phase": "plan" },
+    { "concept": "penicillin-allergy-antibiotic-alternatives", "sec": "pharm-antibiotics", "refs": ["AB-5"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "antibiotic-reassessment-and-stop-timing", "sec": "pharm-antibiotics", "refs": ["AB-6"], "hy": null, "siblings": 1, "cog": 2, "phase": "fu" },
+
+    { "concept": "aha-prophylaxis-regimen-and-timing", "sec": "pharm-prophylaxis", "refs": ["IE-5"], "hy": "AHA prophylaxis uses a single preprocedure regimen, with route and allergy history shaping the drug.", "siblings": 2, "cog": 2, "phase": "prev" },
+    { "concept": "prophylaxis-penicillin-allergy-options", "sec": "pharm-prophylaxis", "refs": ["IE-5", "IE-6", "IE-7"], "hy": "Severe penicillin reactions rule out cephalosporins, and clindamycin is no longer recommended.", "siblings": 2, "cog": 2, "phase": "prev" },
+    { "concept": "prophylaxis-with-current-antibiotic-course", "sec": "pharm-prophylaxis", "refs": ["IE-9", "IE-10"], "hy": null, "siblings": 1, "cog": 2, "phase": "prev" },
+    { "concept": "prosthetic-joint-prophylaxis-shared-decision", "sec": "pharm-prophylaxis", "refs": ["PJ-1", "PJ-2", "PJ-3"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+
+    { "concept": "inhaled-steroid-related-candidiasis", "sec": "pharm-antifungal-antiviral", "refs": ["RES-6", "AF-1"], "hy": null, "siblings": 2, "cog": 2, "phase": "prev" },
+    { "concept": "oral-candidiasis-antifungal-regimens", "sec": "pharm-antifungal-antiviral", "refs": ["AF-1", "AF-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "tx" },
+    { "concept": "herpes-labialis-valacyclovir", "sec": "pharm-antifungal-antiviral", "refs": ["AV-1"], "hy": null, "siblings": 1, "cog": 2, "phase": "tx" },
+
+    { "concept": "anticoagulant-and-antiplatelet-medication-management", "sec": "pharm-drugs-change-care", "refs": ["AC-1", "AC-3", "AC-4", "AC-5"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "calcineurin-inhibitor-dental-drug-interactions", "sec": "pharm-drugs-change-care", "refs": ["TX-5", "TX-6"], "hy": "Macrolides, azoles and NSAIDs can change risk for patients taking cyclosporine or tacrolimus.", "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "vasoconstrictor-drug-interactions", "sec": "pharm-drugs-change-care", "refs": ["VC-3", "VC-5"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "glucocorticoid-adrenal-risk-and-dental-stress", "sec": "pharm-drugs-change-care", "refs": ["END-10", "END-11"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "glucagon-for-severe-hypoglycemia", "sec": "pharm-drugs-change-care", "refs": ["DM-5"], "hy": null, "siblings": 1, "cog": 2, "phase": "tx" },
+
+    { "concept": "drug-associated-dry-mouth", "sec": "pharm-oral-effects", "refs": ["XE-1"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "drug-associated-gingival-enlargement", "sec": "pharm-oral-effects", "refs": ["GE-1"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "tetracycline-tooth-discoloration", "sec": "pharm-oral-effects", "refs": ["PG-7"], "hy": null, "siblings": 1, "cog": 1, "phase": "clear" },
+
+    { "concept": "tobacco-cessation-medicines-and-support", "sec": "pharm-substance-tobacco", "refs": ["TOB-1"], "hy": "Medication and quitline support are available options for smoking cessation.", "siblings": 2, "cog": 2, "phase": "prev" },
+    { "concept": "methamphetamine-associated-oral-findings", "sec": "pharm-substance-tobacco", "refs": ["SU-1"], "hy": null, "siblings": 1, "cog": 1, "phase": "dx" },
+
+    { "concept": "dental-care-and-medicine-safety-in-pregnancy", "sec": "pharm-pregnancy", "refs": ["PG-1", "PG-4", "PG-5"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "nsaid-timing-in-pregnancy", "sec": "pharm-pregnancy", "refs": ["PG-6"], "hy": "The NSAID risk changes around 20 and 30 weeks of gestation.", "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "tetracycline-during-tooth-development", "sec": "pharm-pregnancy", "refs": ["PG-7"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "pregnancy-lactation-drug-labeling", "sec": "pharm-pregnancy", "refs": ["PG-8", "PG-9"], "hy": null, "siblings": 1, "cog": 1, "phase": "clear" }
+  ],
+  "cases": [
+    {
+      "id": "c-pharm-0001",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Female, 58 years old",
+        "cc": "\"The back tooth aches when I chew.\" (4 days)",
+        "hx": ["Stage 3 chronic kidney disease", "Warfarin for atrial fibrillation", "Metronidazole started yesterday by another clinician", "Amoxicillin allergy: hives"],
+        "findings": ["Localized swelling adjacent to a nonvital molar", "No fever, malaise, lymph-node enlargement or fascial-space swelling", "Definitive dental treatment is not available until tomorrow"]
+      },
+      "items": [
+        { "phase": "plan", "concept": "warfarin-antimicrobial-interactions", "refs": ["DI-1"] },
+        { "phase": "plan", "concept": "analgesia-in-kidney-and-liver-disease", "refs": ["CKD-3", "RX-2"] },
+        { "phase": "plan", "concept": "apical-abscess-antibiotic-regimens", "refs": ["AB-3", "AB-7"] },
+        { "phase": "plan", "concept": "penicillin-allergy-antibiotic-alternatives", "refs": ["AB-5"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0002",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Female, 32 years old, 18 weeks pregnant",
+        "cc": "\"I need the tooth fixed before my trip.\" (1 week)",
+        "hx": ["Prosthetic cardiac valve", "Amoxicillin allergy: hives and lip swelling", "Propranolol 20 mg twice daily"],
+        "findings": ["Scaling and root planing is scheduled", "No fever or acute dental infection", "BP 118/74 mm Hg, pulse 66"]
+      },
+      "items": [
+        { "phase": "prev", "concept": "aha-prophylaxis-regimen-and-timing", "refs": ["IE-5"] },
+        { "phase": "prev", "concept": "prophylaxis-penicillin-allergy-options", "refs": ["IE-5", "IE-6", "IE-7"] },
+        { "phase": "plan", "concept": "vasoconstrictor-drug-interactions", "refs": ["VC-3"] },
+        { "phase": "plan", "concept": "dental-care-and-medicine-safety-in-pregnancy", "refs": ["PG-1", "PG-4"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0003",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Male, 55 years old",
+        "cc": "\"This molar has been throbbing since yesterday.\" (1 day)",
+        "hx": ["Chronic obstructive pulmonary disease", "Clonazepam 0.5 mg at bedtime", "Simvastatin 20 mg nightly", "Clarithromycin started this morning for a respiratory infection"],
+        "findings": ["Deep caries with spontaneous pain", "No facial swelling, fever or malaise", "Extraction is planned after medical clearance"]
+      },
+      "items": [
+        { "phase": "plan", "concept": "ada-first-line-acute-dental-pain", "refs": ["RX-1", "RX-2"] },
+        { "phase": "plan", "concept": "acute-dental-opioid-reserve-and-duration", "refs": ["RX-3", "OPI-1"] },
+        { "phase": "plan", "concept": "opioid-and-cns-depressant-risk", "refs": ["OPI-6", "RES-12"] },
+        { "phase": "plan", "concept": "cyp3a-inhibitor-substrate-interactions", "refs": ["PK-1", "DI-3"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0004",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Female, 67 years old",
+        "cc": "\"My mouth is sore and the tooth still hurts.\" (5 days)",
+        "hx": ["Asthma treated with an inhaled corticosteroid", "Oxybutynin for urinary urgency", "Amoxicillin started 3 days ago for a dental infection"],
+        "findings": ["Deep caries with localized apical swelling", "No improvement after the first antibiotic", "Definitive treatment is scheduled for tomorrow", "Pseudomembranous plaques on the buccal mucosa", "No fever or spreading facial swelling"]
+      },
+      "items": [
+        { "phase": "fu", "concept": "antibiotic-reassessment-and-stop-timing", "refs": ["AB-6"] },
+        { "phase": "plan", "concept": "apical-abscess-antibiotic-regimens", "refs": ["AB-3", "AB-7"] },
+        { "phase": "plan", "concept": "acute-dental-opioid-reserve-and-duration", "refs": ["RX-3"] },
+        { "phase": "tx", "concept": "inhaled-steroid-related-candidiasis", "refs": ["RES-6", "AF-1"] },
+        { "phase": "dx", "concept": "drug-associated-dry-mouth", "refs": ["XE-1"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0005",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Male, 49 years old",
+        "cc": "\"I need an extraction and something for the pain.\" (3 days)",
+        "hx": ["Kidney transplant 4 years ago", "Cyclosporine", "Glucocorticoid-induced adrenal insufficiency treated with prednisone 5 mg daily", "Alprazolam as needed for panic symptoms", "Fluconazole prescribed yesterday for oral candidiasis"],
+        "findings": ["A nonrestorable molar is planned for extraction", "No fever or spreading infection", "Serum creatinine is at the patient's usual level"]
+      },
+      "items": [
+        { "phase": "plan", "concept": "cyp3a-inhibitor-substrate-interactions", "refs": ["TX-5"] },
+        { "phase": "plan", "concept": "calcineurin-inhibitor-dental-drug-interactions", "refs": ["TX-6"] },
+        { "phase": "plan", "concept": "glucocorticoid-adrenal-risk-and-dental-stress", "refs": ["END-10", "END-11"] },
+        { "phase": "plan", "concept": "opioid-and-cns-depressant-risk", "refs": ["OPI-6"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0006",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Male, 70 years old",
+        "cc": "\"The broken tooth is keeping me from eating.\" (1 week)",
+        "hx": ["Prosthetic knee replacement complicated by infection and revision", "Buprenorphine for opioid use disorder", "Smokes 8 cigarettes per day"],
+        "findings": ["A fractured premolar requires extraction", "No acute infection", "No fever or systemic symptoms"]
+      },
+      "items": [
+        { "phase": "plan", "concept": "prosthetic-joint-prophylaxis-shared-decision", "refs": ["PJ-1"] },
+        { "phase": "plan", "concept": "prosthetic-joint-prophylaxis-shared-decision", "refs": ["PJ-2", "PJ-3"] },
+        { "phase": "plan", "concept": "opioid-use-disorder-medication-continuity", "refs": ["OPI-11"] },
+        { "phase": "prev", "concept": "tobacco-cessation-medicines-and-support", "refs": ["TOB-1"] }
+      ]
+    },
+    {
+      "id": "c-pharm-0007",
+      "units": ["pharm"],
+      "box": {
+        "patient": "Female, 29 years old, 26 weeks pregnant",
+        "cc": "\"My toothache is keeping me awake.\" (2 days)",
+        "hx": ["No known drug allergies", "No kidney or liver disease"],
+        "findings": ["Deep caries with spontaneous pain", "No fever, swelling or malaise", "Definitive care is scheduled for the next morning"]
+      },
+      "items": [
+        { "phase": "tx", "concept": "acute-dental-analgesic-dose-ceilings", "refs": ["RX-2", "RX-4"] },
+        { "phase": "plan", "concept": "nsaid-timing-in-pregnancy", "refs": ["PG-6"] }
+      ]
+    }
+  ]
+}
