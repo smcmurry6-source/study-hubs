@@ -607,6 +607,14 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 @media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
 .qcard-choice.is-selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .qcard-choice.is-missed-right{border-color:var(--good);border-style:dashed}
+/* select-all: a tick box on each option so it is obvious what is picked (report #14) */
+.qcard-choice[data-act="multi"]{position:relative;padding-left:40px}
+.qcard-choice[data-act="multi"]::before{content:"";position:absolute;left:12px;top:50%;width:18px;height:18px;margin-top:-9px;box-sizing:border-box;border:2px solid var(--line-strong);border-radius:4px;background:var(--surface)}
+.qcard-choice[data-act="multi"].is-selected{background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+.qcard-choice[data-act="multi"].is-selected::before,.qcard-choice[data-act="multi"].is-correct::before,.qcard-choice[data-act="multi"].is-wrong::before{background:var(--accent);border-color:var(--accent)}
+.qcard-choice[data-act="multi"].is-correct::before{background:var(--good);border-color:var(--good)}
+.qcard-choice[data-act="multi"].is-wrong::before{background:var(--bad);border-color:var(--bad)}
+.qcard-choice[data-act="multi"].is-selected::after,.qcard-choice[data-act="multi"].is-correct::after,.qcard-choice[data-act="multi"].is-wrong::after{content:"";position:absolute;left:18px;top:50%;width:5px;height:10px;margin-top:-7px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .multi-check{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .multi-score{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft)}
 .quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
@@ -881,7 +889,7 @@ mcq('ce-eugenol','cement','slides','Why does the UAB clinic stock zinc oxide NON
   { cue:'Eugenol "embalms" the resin: it never sets.' });
 mcq('ce-irm','cement','rec','A patient needs a provisional crown for several months while waiting on crown lengthening to heal, and the tooth was sensitive after the prep. Of the temporary cements Dr. Fu described, which one stays longer and has a sedative effect?',
   ['IRM','Zinc oxide non-eugenol (TempBond NE)','Resin-modified glass ionomer (RelyX Luting Plus)','Zinc phosphate mixed on a cool glass slab'],
-  'IRM is the stronger, higher-viscosity ZOE: it stays longer and its eugenol calms a sensitive tooth. The catch is the same eugenol problem: a later reline of the provisional may not set. Regular temporary cement starts to leak and loosen after about a month.');
+  'IRM is the stronger, higher-viscosity ZOE: it stays longer and its eugenol calms a sensitive tooth. The catch is the same eugenol problem: a later reline of the provisional may not set. Regular temporary cement starts to leak and loosen after about a month. TempBond NE, the clinic cement, leaves the eugenol out so a provisional can be relined later; without eugenol it has no sedative effect, so it is not the answer here.');
 mcq('ce-durelon','cement','rec','At UAB, polycarboxylate cement (Durelon) is designated mainly for:',
   ['Long-term provisionals, e.g., a provisional bridge while a socket heals','Definitive cementation of feldspathic porcelain laminate veneers','Bonding a non-retentive lithium disilicate onlay under a dam','Cementing orthodontic brackets onto existing gold crowns'],
   'Durelon has low film thickness, releases fluoride, has a near-neutral pH, no eugenol, and was the first cement with a chemical adhesion to enamel and dentin. The clinic uses it for provisionals that must stay on for a long time (implant or extraction-socket healing, ortho). Veneers and onlays need resin cement.');
@@ -1044,7 +1052,7 @@ mcq('ce-residual','cement','rec','Residual cement left at a subgingival margin c
   { fmt:'except' });
 mcq('ce-isolation','cement','rec','You cannot keep saliva and sulcular fluid away from a deep subgingival margin on #31. Which cement choice follows the lecture?',
   ['RMGI: resin needs isolation, and subgingival resin cannot be cleaned','A self-cured resin cement, because chemical-cure resins set even when they are wet','A light-cured resin cement, because it gives the most working time for the clean-up','Zinc oxide eugenol as the permanent cement, because eugenol is moisture tolerant'],
-  'Isolation is the number one problem with resin cement, and you can never clean subgingival resin cement. RMGI is moisture tolerant and its excess cleans off easily. Dr. Lawson\'s slide says the same: "If you can\'t get isolation from saliva, don\'t bother to use a resin cement."');
+  'Isolation is the number one problem with resin cement, and you can never clean subgingival resin cement. RMGI is moisture tolerant and its excess cleans off easily. Dr. Lawson\'s slide says the same: "If you can\'t get isolation from saliva, don\'t bother to use a resin cement." A self-cured resin sets without light, but it still bonds poorly when wet (saliva cut resin cement retention to less than half), so self-cure does not solve isolation.');
 /* ---------- try-in and delivery ---------- */
 mcq('ce-fitchecker','cement','rec','Why did the clinic switch to a black (and then blue) Fit Checker for all-ceramic crowns?',
   ['White Fit Checker is hard to read inside a white ceramic crown','The white version sets too fast to be used inside zirconia crowns','The black version contains a lubricant that helps the crown seat fully','The black version also marks the occlusal contacts at the same time'],
@@ -1063,7 +1071,7 @@ mcq('ce-contact-check','cement','rec','How does Dr. Fu check a proximal contact 
   'Floss should pass with resistance (snap). To find a tight spot, put a strip of AccuFilm (articulating film) in the contact, hold the crown down lightly and pull; the mark on the crown shows where to adjust, little by little.');
 mcq('ce-contact-open','cement','rec','If a proximal contact on a new crown is open, Dr. Fu says the gap is better if it is:',
   ['Larger than 2 mm, so food passes through','Exactly 0.5 mm, so floss can always clean it easily','Closed with composite added to the adjacent tooth','Left alone, since open contacts close by themselves'],
-  'A contact should be tight enough to floss smoothly without food trapping, or else wide open (more than 2 mm) so food passes. A slightly open contact is the worst of both. Adding porcelain to a zirconia crown to close a contact is possible, but how long it lasts is unknown, so adjust contacts carefully.');
+  'A contact should be tight enough to floss smoothly without food trapping, or else wide open (more than 2 mm) so food passes. A slightly open contact is the worst of both. Adding porcelain to a zirconia crown to close a contact is possible, but how long it lasts is unknown, so adjust contacts carefully. Bonding composite onto the neighboring tooth is not the rule Dr. Fu gives: the crown contact either flosses smoothly or is left wide open.');
 mcq('ce-multi-crowns','cement','rec','You are delivering crowns #7-10. In what order does Dr. Fu adjust the proximal contacts?',
   ['#8-9 first, then work outward to #7 and #10','#7 first, then #8, #9 and #10 in order','All contacts at the same time with all four crowns seated','Distal of #10 first, then mesial'],
   'Start in the middle (8-9) and work outward. She also asks the lab for a solid study cast (not sectioned) so the lab can check the contacts of all the crowns together before sending them; you still try them in.');
@@ -1078,7 +1086,7 @@ mcq('ce-occl-goal','cement','rec','When adjusting a posterior crown\'s occlusion
   'Goals: stable centric contacts, forces along the long axis, no balancing (non-working) contacts, mutually protected occlusion, and point contacts. Broad flat contacts create interferences in lateral excursions. Hold the bur at an angle and remove a little at a time; the adjacent teeth must hold shimstock too.');
 mcq('ce-burnish','cement','rec','At try-in an explorer catches on an open margin of a zirconia crown. What does Dr. Fu say?',
   ['It cannot be burnished like gold; if not fixable, it goes back','Burnish the zirconia margin closed with a ball burnisher on slow speed','Seal the gap with flowable composite after the crown is cemented','Cement with zinc phosphate so its thicker film seals the open margin'],
-  'Gold margins could be burnished to the tooth; zirconia and e.max cannot. A small overhang can be adjusted from the crown toward the tooth (supragingival margins on the tooth, proximal and subgingival ones on the die), but an open margin with a catch goes back to the lab.');
+  'Gold margins could be burnished to the tooth; zirconia and e.max cannot. A small overhang can be adjusted from the crown toward the tooth (supragingival margins on the tooth, proximal and subgingival ones on the die), but an open margin with a catch goes back to the lab. Flowable composite over the gap after cementation does not fix it either: the crown itself is open, so it is remade.');
 mcq('ce-try-order','cement','rec','A crown will not go all the way down at try-in, and floss will not pass the mesial contact. What does Dr. Fu check first?',
   ['The proximal contact, then the margin','The margin with an explorer, before any contact','The occlusion in maximum intercuspation','The shade under the operatory light'],
   'There is no fixed order. If the crown seats and floss passes, go straight to the margins. If it will not seat, the contact is usually the culprit: adjust the contact first, then check the margin, then occlusion, then axial contours and polish.');
@@ -1644,7 +1652,7 @@ mcq('ve-pbox-2','veneer','hint','Based on the Patient Box, which plan fits Dr. F
   { pbox:[['Tooth','#7 peg lateral, unrestored'],['Space','Adequate mesial and distal space for a normal-size lateral'],['Enamel','Intact'],['Occlusion','Normal overbite and overjet; no parafunction']] });
 mcq('ve-pbox-3','veneer','hint','Based on the Patient Box, what is the best approach?',
   ['Bleach first, or plan a more opaque crown','Two veneers, each about 0.3 mm thick','Use the light try-in paste to reach B1','Use a dual-cure cement to lighten them'],
-  'The darker the starting shade, the deeper you prep (about 0.2 mm per shade) and the deeper the margin, until no enamel is left. Bleach first; for a very dark tooth, a more opaque all-ceramic crown (zirconia-based or PFM) masks it. Try-in paste only nudges the shade.',
+  'The darker the starting shade, the deeper you prep (about 0.2 mm per shade) and the deeper the margin, until no enamel is left. Bleach first; for a very dark tooth, a more opaque all-ceramic crown (zirconia-based or PFM) masks it. Light try-in paste only nudges the shade, never from A4 to B1. Here bleaching has already been tried, so the opaque crown is the realistic plan.',
   { pbox:[['Teeth','#8 and #9, vital'],['Current shade','A4 (after an attempt at bleaching)'],['Desired shade','B1'],['Enamel','Normal thickness']] });
 mcq('ve-figure-prep','veneer','hint','In the diagram of three veneer preparations, which one has the highest fracture rate and is no longer used?',
   ['C: lingual chamfer wrap','A: the window prep','B: incisal butt joint','All three equally'],
@@ -1794,7 +1802,7 @@ mcq('co-rods-cones','color','hint','Which statement about the eye is correct?',
 mcq('co-yellow','color','rec','Why can\'t the eye tell spectral yellow light apart from a mix of red and green light?',
   ['Both stimulate red and green cones the same way','The eye has a separate cone just for yellow','Red and green light cancel each other out','Only the rods are able to detect yellow'],
   'With three cone types, any combination of stimulation is just interpreted. That is how a screen made of RGB pixels shows yellow, and why objects with different spectra can look identical (metamerism).');
-mcq('co-afterimage','color','slides','The color opponent afterimage is:',
+mcq('co-afterimage','color','slides','During shade matching, what is the "color opponent afterimage" that Dr. Givan warns about?',
   ['A complementary-colored ghost after staring','A permanent blind spot for one color','The gloss seen on a polished crown','A shade that shifts under black light'],
   'After staring at a bright color, its complementary color lingers. It does not happen with neutral gray (no complement). Avoid bright, glossy glare during shade matching and let your eyes reset.');
 mcq('co-metamerism','color','hint','Metamerism is when:',

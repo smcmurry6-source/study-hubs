@@ -84,6 +84,14 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-13 (lessons audit, Claude Code)** — Two days before PCD Exam 3. **Select-all options now show a tick box**
+  that fills when picked and stays after grading (green right, red wrong), in `pcd-exam3`, `msk-exam4` and `occlusion`
+  (CSS only, `.qcard-choice[data-act="multi"]`), from PCD report #14 ("not very clear what options you have selected";
+  the picked state was only a thin accent border). PCD `co-afterimage` stem reworded (report #13; same answer and
+  choices). Explanations now name the favorite wrong answer on PCD `ce-irm` (TempBond NE), `ve-pbox-3` (light try-in
+  paste), `ce-contact-open`, `ce-burnish`, `ce-isolation` and MSK 4 `sk-lamellar` (Langerhans), `dp-clinda`
+  (bacitracin). No reading text changed, so no narration regenerated. `LESSONS.md` refreshed.
+
 - **2026-10-10 (lessons audit + MSK Exam 4 dashboard date, Claude Code)** — The 10-08 PCD date fix (9d3463d) also moved
   **MSK Exam 4's** `HUBS` date to 2026-10-15; the hub itself says Fri Oct 16. Back to `2026-10-16` in `index.html`, so
   the card no longer auto-archives (no Open button) at 10 pm on MSK 4's exam eve and check-ins open on the real exam
