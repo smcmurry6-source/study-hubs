@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 5)
+# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 6)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -105,27 +105,63 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   a draft PR from `codex/boards-perio-t03`). #80 and #81 both regenerate `hubs/boards/index.html`: merge one, then
   have Codex rebase the other and rerun `node tools/build-boards.js` instead of resolving that file by hand.
 
-## Session 6: review the Codex PRs, then T-06
+## Session 6 (done 2026-10-13)
 
-Start here. Read `DECISIONS.md`, then only what each step needs. Don't merge anything yourself: write a fix prompt
-for Codex per PR (one block Sam can paste) and tell Sam which PRs are ready to merge and in what order.
+- **Reviews, no merges** (fix prompts for Codex, verbatim, in `reviews/session-6.md`; check the revised PRs against
+  them). All three PRs were branched before #82/#86 and are behind `claude/boards-hub`; merged together with it they
+  build, pass `--check`, `syntax.js`, the plan tests and the full `smoke.js`. The only conflict is the generated page.
+  - **#83 (T-02 pharm):** scripted acceptance passes and no fact is wrong, but ~10 author-facing sentences, 13
+    claims pushed past their facts (END-11 "routine dental care" instead of procedures under local anesthesia, AC-4
+    implying antiplatelets may be stopped, "weak / very low quality" attached to the wrong END advice, CDC on
+    benzodiazepines inverted, a dropped "probably", "meth mouth" discouraged...), no PK-3-PK-6 yet, and Deep gaps
+    (codeine/tramadol in children, AB-5 doses, SSRIs vs epinephrine). Blueprint: a duplicated PG-7 concept, no PK,
+    MME or codeine-in-children concepts, and 5 of 7 cases with a problem (an allergy that rules out the AB-3 key, a
+    pregnant patient whose allergy key rests on facts we don't have, a dose-ceiling item at 26 weeks, a dry-mouth
+    item with no dry-mouth finding, two same-concept items that give each other away).
+  - **#81 (T-04 cards):** Playwright walk-through (desktop and 390 px phone, fixture build). Works: reshuffle with
+    authored-index recording, "Recorded" only until Rounds, resume at item 3, one event per item, Cover options.
+    Bugs: Practice jumps into Cases on a case item and then can't get back; New only skips the next item; Missed is
+    read-only; a done case can't be redone and a first attempt skips items answered elsewhere; on phones the open
+    chart pushes question 1 to ~1,300 px down.
+  - **#80 (T-05 plan):** 10 tests pass, core pure, CI step added. Logic fixes: retirement skips the 120-day review;
+    new case items are planned piecemeal; the monthly sample only fires on the 1st; band "Started" with nothing seen;
+    ability replays only the latest try; same-day plans can differ (async class stats).
+  - **Merge order:** #80, then #81 (Codex merges `claude/boards-hub` and reruns the build instead of resolving the
+    page). #83 and #87 touch only their unit folders and can merge any time after their fixes. Each only after its
+    fix round.
+- **#87 (T-03 perio, arrived during the session):** reviewed the same way (`tools/boards/notes-sheet.js`). Scripted
+  checks pass and the notes keep their qualifiers, but one statement is wrong (Cairo recession types "do not predict
+  root coverage"), ~15 author-facing lines, and overlapping concepts (three on PH-5). Cases: two outlines where an
+  item keyed on access flap or one furcation technique conflicts with EFP's regeneration rule for mandibular molars
+  with Class II furcations (SX-1/SX-2/PR-6), an abscess and necrotizing disease in one box, a gingivitis case keyed on
+  the periodontitis steps, a missing enlargement finding. Fix prompt in `reviews/session-6.md`. Branched from current
+  `claude/boards-hub`; touches only `src/boards/units/perio/`, so it merges any time after its fixes.
+- **T-06 brief written** (`tasks/T-06.md`): the 60 medcx items from the merged blueprint, cases first, ids
+  `b-medcx-0101`-`0160` (0001-0009 are the benchmark's), `checked: null`, a count-check script for quotas, siblings,
+  case order, extra refs and key spread.
+- **Fact and spec notes:** the medcx blueprint's `warfarin-simple-extraction` cites `AC-2` (partial: the 2-3 range is
+  verified, INR-check timing is not; T-06 says so). `PG-5`'s nitrous oxide advice still has no quote (Codex flagged
+  it; add one). `DM-7` now lists `perio` in its `units` (T-03 assigns it to perio-systemic; done in Session 6). A
+  mucogingival fact on Cairo types and expected root coverage (open source) would let the notes say what #87 had to
+  delete. If #80's fix keeps `likely` averaged over practiced items, update BUILD_SPEC 6.4 to say so.
 
-1. **#83 (T-02 pharm notes + blueprint).** Same method as T-01 (Session 4): a sheet of every cited sentence in Core
-   and Deep beside the fact it cites; check wording stays inside the fact (qualifiers, `conditions`, `stem_names`),
-   student-facing tone (no "the fact record says"), American English, no 8+ word runs copied from a quote, and the
-   T-02 acceptance checks. Blueprint: section quotas match concept siblings, every case has every number its key
-   needs, and the blueprint check prints `total 60 cases 27` with no `MISMATCH` or `OVER` lines (T-02 acceptance 5). `PK-3`-`PK-6` arrived after the brief: say where the
-   notes should use them.
-2. **#81 (T-04 cards) and #80 (T-05 readiness/plan).** Check out each branch, `node tools/build-boards.js --check`,
-   `node tools/ci/syntax.js`, the boards tests, then the fixture build in Playwright on desktop and phone (screenshots
-   to the scratchpad). Read the diffs for the brief's "do not touch" list and spec drift. Decide the merge order.
-3. **T-03 (perio)** when its PR arrives: same method as #83.
-4. **Brief T-06** `items-medcx` (60 items from `src/boards/units/medcx/blueprint.json`, `checked:null`) for Codex,
-   then the Claude-subagent checker, two passes on high-risk items (`bench/REPORT.md`).
-5. `int-v33` and `int-widget` stay with Claude.
+## Session 7: re-review the four PRs, check T-06
 
-Fact follow-ups: the medcx notes' seizure paragraph can now cite `EM-11`; the CAL arithmetic and peri-implant
-treatment still need an open source.
+1. **Revised #80, #81, #83:** check each against its list in `reviews/session-6.md` (only the changed parts; rerun the
+   acceptance commands and, for #81, the walk-through: `docs/boards/reviews/walk-cards.js`, extended for Practice /
+   New only / Missed / Do it again / phone chart). Tell Sam which are ready, in the order above.
+2. **T-06 (medcx items)** when its PR arrives: code checks first (lint, build `--unit medcx`, the count check), then
+   the checker: `node tools/boards/bench.mjs render --items src/boards/units/medcx/items.js --ids <ids> --out
+   docs/boards/verify/medcx-r1 --name <batch>` in batches of ~10 items (smaller batches cost less: most checker tokens
+   are re-reads of the batch file), a fresh Sonnet subagent per batch with `checker-prompt.md`, and **two passes on
+   every high-risk item** (56 of the 60 slots cite a high-risk fact), taking the union of flags. Budget: ~8.6k tokens
+   per item check at the benchmark's batch size, so up to ~1M for two passes. The writer is Codex (OpenAI) and the
+   checker Claude, so this is the first cross-family check (the benchmark was Claude checking Claude). Then one fix
+   prompt for Codex, and stage 4b (two fresh passes) on every changed item.
+3. **Revised #87 (perio notes)**: check against its list in `reviews/session-6.md` (`node tools/boards/notes-sheet.js
+   perio` makes the sentence and fact sheets). Small fact edit for Claude: the `PG-5` quote.
+4. Next briefs once these land: T-07 `items-pharm` (after #83 merges), `int-notes-home` (after #80 and #81), and
+   `int-mock`. `int-v33` and `int-widget` stay with Claude.
 
 ## Release 1
 
