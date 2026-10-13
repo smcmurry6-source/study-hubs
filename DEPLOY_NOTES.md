@@ -42,7 +42,8 @@ need an entry; a new hub mode, tab, game or question type does.
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself) — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself; `widget/rankup.js` is
+  fetched by ranks.js only when someone ranks up) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -83,6 +84,22 @@ live hubs. **Before building a new hub** (any session, hub Projects included), i
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-13 (rank-up and level-up celebrations, Claude Code)** — New `widget/rankup.js`, fetched by `widget/ranks.js`
+  the first time it's needed. **A new rank** (Silver -> Gold) is a full-screen cutscene (`shRankUp.tier`): letterbox bars,
+  the old medallion shakes and charges while light streams in (canvas sparks), flickers between old and new, then a
+  white flash, shockwave rings and a spark burst reveal the new one in front of turning light rays; "RANK UP" ("MAX
+  RANK" for Dark Matter) slams in with the new name, old -> new, XP and class place, and what it unlocked (accent
+  metal swatch, Timmy Tooth's house upgrade if adopted, next rank). Synthesized riser, boom and fanfare. A tap during
+  the build-up skips to the reveal; "Let's go", Esc or a tap outside closes it. **A new level** (Gold I -> Gold II) is
+  a non-blocking card (`shRankUp.level`): coin-flip medallion, rolling numeral, the level's bar segment fills, a few
+  sparks and a chime; gone after ~6 s or on tap. Both carry their own CSS (the dashboard doesn't load `v3.css`; the old
+  `.sh-rankup` rules are gone) and keep only fades under reduced motion. **`shRanks.track(profile)`** now owns the
+  "did the rank change?" check (`sh_rank_tier` + `sh_rank_step`) for the hub widget **and the dashboard**, which used to
+  overwrite `sh_rank_tier` silently and swallow the celebration if you went there first. It waits for a visible tab and
+  for a hub's mock exam to end; Surprises off skips it, as before. Try them from the console:
+  `shRanks.preview("tier", 3)` (Silver -> Gold), `shRanks.preview("level", 4, 2)` (Gold I -> II). `sw.js` -> `sh-v14`,
+  CI syntax check and About page updated. No schema change.
 
 - **2026-10-13 (Timmy Tooth: holiday outfits and a lot more to say, Claude Code)** — `widget/pet.js`. **Outfits**: every
   holiday has 3 outfits (Halloween 4) and the fall weeks between holidays have 3, replacing the single hat (`OUTFITS`,
