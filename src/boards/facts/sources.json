@@ -606,7 +606,7 @@
   "org": "CDC",
   "url": "https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html",
   "kind": "html",
-  "date": "undated (checked 2026-10-11)"
+  "date": "2024-05-15"
  },
  "redcross-cpr": {
   "title": "CPR Steps",
@@ -1170,5 +1170,53 @@
   "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5900888/fullTextXML",
   "kind": "xml",
   "date": "2018-04"
+ },
+ "dm-arestin": {
+  "title": "ARESTIN (minocycline hydrochloride) microspheres, 1 mg",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8515df41-1936-4f3b-86ba-d2bb2a8441fb",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/8515df41-1936-4f3b-86ba-d2bb2a8441fb.xml",
+  "kind": "spl",
+  "date": "2024-05-31"
+ },
+ "dm-periochip": {
+  "title": "PerioChip (chlorhexidine gluconate) 2.5 mg",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=c40ab6ac-8987-42d2-a95b-95fbfd3b0162",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/c40ab6ac-8987-42d2-a95b-95fbfd3b0162.xml",
+  "kind": "spl",
+  "date": "2010-03-05"
+ },
+ "ada-fda-radiographs-2012": {
+  "title": "Dental Radiographic Examinations: Recommendations for Patient Selection and Limiting Radiation Exposure",
+  "org": "ADA Council on Scientific Affairs and FDA",
+  "url": "https://www.fda.gov/media/84818/download",
+  "kind": "pdf",
+  "date": "2012"
+ },
+ "jcp-imaging-accuracy-2025": {
+  "title": "Accuracy of ionizing-radiation-based and non-ionizing imaging assessments for the diagnosis of periodontitis: systematic review and meta-analysis",
+  "org": "Peer-reviewed systematic review",
+  "citation": "Discepoli N, De Rubertis I, Wasielewski C, Troiano G, Carra MC. J Clin Periodontol 2025;52 Suppl 29:74-124",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12286653/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12286653/fullTextXML",
+  "kind": "xml",
+  "date": "2025"
+ },
+ "npj-calculus-2024": {
+  "title": "Recent advances in the pathogenesis and prevention strategies of dental calculus",
+  "org": "Peer-reviewed review",
+  "citation": "Wei Y, Dang GP, Ren ZY, et al. NPJ Biofilms Microbiomes 2024;10:56",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11246453/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11246453/fullTextXML",
+  "kind": "xml",
+  "date": "2024-07"
+ },
+ "openstax-pharm-2-2": {
+  "title": "Pharmacology (OpenStax), section 2.2 Pharmacokinetics and Pharmacodynamics",
+  "org": "OpenStax, Rice University (open textbook, CC BY-NC-SA 4.0)",
+  "url": "https://openstax.org/books/pharmacology/pages/2-2-pharmacokinetics-and-pharmacodynamics",
+  "kind": "html",
+  "date": "2024"
  }
 }

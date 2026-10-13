@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 4)
+# Boards hub: what the next session does (handoff, updated 2026-10-13 during Session 5)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -81,7 +81,30 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   radiographs, surgery, local delivery and host modulation. Codex's T-01 fact problems (BP-2 crisis numbers, HIV-2
   units, IE-5 doses, DM-6, PG-2, ORN-3) are all already in those facts' `conditions`; nothing to change.
 
-## Session 5: facts, then medcx items
+## Session 5 (2026-10-13, in progress)
+
+- **`facts-perio` done (step 2):** 15 new perio facts (`BF-1`-`BF-5`, `RAD-1`-`RAD-2`, `PT-8`-`PT-11`, `SX-1`-`SX-2`,
+  `LD-1`-`LD-2`), plus `EM-11` (CDC seizure "what to avoid") and `PK-3`-`PK-6` (half-life, bioavailability and first
+  pass, protein binding, liver/kidney and the lidocaine label). 337 facts, 1,179 cites (0 missing). 6 new sources (Arestin and
+  PerioChip labels, ADA/FDA 2012 radiograph guide, 2025 J Clin Periodontol imaging review, 2024 calculus review, OpenStax
+  *Pharmacology* 2.2). Pipeline: drafted by Claude; an independent verifier (5 pass, 15 fixed: dropped qualifiers,
+  causal links no source states, missing pregnancy/abscess/kidney warnings); a third check of the rewrites (14 pass, 6
+  fixed: BF-2 menstrual-cycle caution, BF-4/BF-5 wording, RAD-2 leaned on one study's table cell, LD-2 abscess
+  caution, PK-5 "some drugs"); quote check 105/105 exact on the new records. Weaknesses are in each record's
+  `conditions`.
+- **Gaps left (no open source good enough):** probing technique and the CAL arithmetic (CAL from probing depth and
+  recession; NCBI Bookshelf/PMC copies block scripts), peri-implant treatment (the EFP 2023 peri-implant S3 guideline
+  is not open on Europe PMC). Listed in T-03.
+- **Quote check fix:** fda.gov now answers Node's fetch with HTTP 401 (it serves curl), and the headless-browser
+  fallback dropped the FDA CYP table, so `PK-1`/`PK-2` showed 9 missing quotes. `check-quotes.mjs` now retries with
+  `curl` before the browser; both FDA sources read fine again.
+- **T-03 unblocked.** Follow-ups: when reviewing T-02, check the notes use `PK-3`-`PK-6` (they arrived after the brief);
+  the medcx notes' seizure paragraph can now cite `EM-11` (T-01 had to drop "do not restrain").
+- **Codex at the time of writing:** T-04 draft #81, T-05 draft #80 (CI green); no T-02 branch pushed yet. #80 and #81
+  both regenerate `hubs/boards/index.html`: whichever merges second rebuilds it with `node tools/build-boards.js`
+  instead of resolving the conflict by hand.
+
+## Session 5 plan: facts, then medcx items
 
 1. Sam merges this session's PR into `claude/boards-hub` (it includes #78) and starts T-02, T-04 and T-05 in Codex.
 2. Claude: `facts-perio` (BUILD_SPEC 9) plus the small top-ups above (seizure first aid from CDC; pharmacokinetics

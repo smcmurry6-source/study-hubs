@@ -1416,6 +1416,715 @@
     "adex"
    ],
    "recorded": "2026-10-11"
+  },
+  {
+   "id": "BF-1",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Gingivitis is reversible: treatment that resolves the gingival inflammation returns the site to health. Once gingivitis progresses to periodontitis, the attachment loss is (at present) irreversible.",
+   "conditions": "Consensus statement on the course of the disease. Do not key \"lost attachment can never be regained by any treatment\": regenerative surgery gains some attachment in selected defects (SX-1). A treated, stable periodontitis patient has gingival health on a reduced periodontium but stays a periodontitis patient (PH-5); never key them as healthy on an intact periodontium or as a plain gingivitis case.",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "Figure 1",
+     "quote": "The transition from periodontal health to gingivitis is reversible following treatment that resolves gingival inflammation."
+    },
+    {
+     "src": "chapple-2018",
+     "loc": "Figure 1",
+     "quote": "The transition to periodontitis results in attachment loss which, at the present time is irreversible."
+    }
+   ],
+   "see": [
+    "PH-2",
+    "PSY-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-biofilm",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "BF-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "In the 2017 World Workshop classification, plaque-induced gingivitis can be modified by local (oral) factors that enhance plaque accumulation (prominent subgingival restoration margins, hyposalivation) and by potential systemic modifying factors: sex steroid hormones (puberty, menstrual cycle, pregnancy, oral contraceptives), hyperglycemia, leukemia, smoking and malnutrition. These factors can affect the extent, severity and progression of the gingivitis.",
+   "conditions": "Listed as potential modifying factors, unranked. Current oral contraceptives do not cause the gingival changes reported with the old high-dose pills, and menstrual cycle-associated gingivitis was dropped from the classification because its clinical signs are rarely visible: never key either as a diagnosis or as visible gingivitis. Smoking masks gingival inflammation (BF-3): never key smoking as increasing gingival redness or bleeding. Malnutrition here is mainly vitamin C deficiency. Drug-influenced gingival enlargement is a separate entry (GE-1).",
+   "cites": [
+    {
+     "src": "chapple-2018",
+     "loc": "Text",
+     "quote": "Dental plaque‐induced gingivitis has a variety of clinical signs and symptoms, and both local predisposing factors and systemic modifying factors can affect its extent, severity, and progression."
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Table",
+     "quote": "Oral factors enhancing plaque accumulation a) Prominent subgingival restoration margins b) Hyposalivation"
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Table",
+     "quote": "Systemic conditions a) Sex steroid hormones 1) Puberty 2) Menstrual cycle 3) Pregnancy 4) Oral contraceptives b) Hyperglycemia c) Leukemia d) Smoking e) Malnutrition"
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Sex steroid hormones",
+     "quote": "current formulations of oral contraceptive do not induce the clinical changes in gingiva that were reported with high-dose contraceptives."
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Sex steroid hormones",
+     "quote": "menstrual cycle–associated gingivitis was discarded because overt, clinical signs of the disease rarely"
+    }
+   ],
+   "see": [
+    "GE-1",
+    "PS-11"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-biofilm",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "BF-3",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Smoking mutes the gingival inflammatory response to plaque, so a smoker can show less gingival inflammation than the plaque would suggest. In children with poorly controlled type 1 diabetes, gingivitis is a consistent feature, and the level of glycemic control may matter more for its severity than the quality of plaque control.",
+   "conditions": "The muted response is qualitative; do not key a bleeding percentage for smokers. Smoking hides inflammation but does not protect: never key it as protective (BF-4). The diabetes statement is about children with poorly controlled type 1 diabetes and keeps its \"may\".",
+   "cites": [
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Significance of gingival inflammation",
+     "quote": "during cigarette smoking, the gingival inflammatory response to plaque accumulation on teeth will be muted"
+    },
+    {
+     "src": "wws-murakami-2018",
+     "loc": "Hyperglycemia",
+     "quote": "Gingivitis is a consistent feature found in children with poorly controlled type 1 diabetes mellitus, and the level of glycemic control may be more important in determining the severity of gingival inflammation than the quality of plaque control."
+    }
+   ],
+   "see": [
+    "PS-10",
+    "BF-4"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-biofilm",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "BF-4",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Smoking and diabetes are proven risk factors for periodontitis, two of the main ones, and both are part of its grading. EFP S3 recommends risk-factor control (smoking cessation, better metabolic control of diabetes) as part of the first step of therapy and again in supportive periodontal care. For exercise, dietary counseling and weight loss the guideline says it does not know whether they help periodontitis therapy.",
+   "conditions": "Never key exercise, dietary counseling or weight loss as proven or recommended periodontal interventions (EFP: \"We do not know whether\", Grade 0). Do not key smoking and diabetes as the only risk factors.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "R4.17 background",
+     "quote": "Smoking and diabetes are two of the main risk factors for periodontitis, and they are currently included in the grading of periodontitis"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R1.5 background",
+     "quote": "Smoking and diabetes are two proven risk factors in the etiopathogenesis of periodontitis"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.5",
+     "quote": "We recommend risk factor control interventions in periodontitis patients, as part of the first step of therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.6",
+     "quote": "We recommend tobacco smoking cessation interventions to be implemented in patients undergoing periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.7",
+     "quote": "We recommend diabetes control interventions in patients undergoing periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Supportive care",
+     "quote": "We recommend risk factor control interventions in periodontitis patients in supportive periodontal care."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendations 1.8-1.10",
+     "quote": "We do not know whether interventions aimed to increasing the physical exercise (activity) have a positive impact in periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendations 1.8-1.10",
+     "quote": "We do not know whether dietary counselling may have a positive impact in periodontitis therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendations 1.8-1.10",
+     "quote": "We do not know whether interventions aimed to weight loss through lifestyle modification may have a positive impact in periodontitis therapy."
+    }
+   ],
+   "see": [
+    "PS-10",
+    "PT-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-risk",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "BF-5",
+   "status": "verified",
+   "risk": "low",
+   "claim": "Dental calculus forms when dental plaque mineralizes; a mature plaque biofilm is the platform for mineralization. Calculus has a rough surface that gives good conditions for bacterial adhesion and growth. In the EFP S3 steps, supragingival plaque and calculus (and plaque-retentive factors) are removed by professional mechanical plaque removal in step 1; subgingival biofilm and calculus are removed by subgingival instrumentation in step 2.",
+   "conditions": "The calculus review covers mechanisms: do not key mineral phases, crystal names or supragingival/subgingival differences from it. Do not key calculus itself, rather than the biofilm on it, as the primary cause of periodontitis.",
+   "cites": [
+    {
+     "src": "npj-calculus-2024",
+     "loc": "Bacterial factors",
+     "quote": "Dental calculus forms through the mineralization of dental plaque"
+    },
+    {
+     "src": "npj-calculus-2024",
+     "loc": "Mechanism",
+     "quote": "Mature biofilms provide a platform for mineralization"
+    },
+    {
+     "src": "npj-calculus-2024",
+     "loc": "Introduction",
+     "quote": "Its rough surface provides good conditions for bacteria adhesion and growth."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Definitions",
+     "quote": "Professional mechanical plaque removal (PMPR), which includes the professional interventions aimed at removing supragingival plaque and calculus, as well as possible plaque‐retentive factors that impair oral hygiene practices."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Second step",
+     "quote": "The second step of therapy (cause‐related therapy) is aimed at controlling (reducing/eliminating) the subgingival biofilm and calculus (subgingival instrumentation)."
+    }
+   ],
+   "see": [
+    "PT-8"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-biofilm",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "RAD-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "ADA/FDA radiograph selection (2012): for patients with clinical evidence or a history of periodontal disease or treatment, the need for and type of radiographs is a clinical judgment based on the periodontal exam. Imaging may consist of, but is not limited to, selected bitewing and/or periapical images of areas where periodontal disease (other than nonspecific gingivitis) can be identified clinically. The images assess the level of supporting alveolar bone, the interproximal bony crest, root length and shape, bone loss in furcations, and calculus deposits.",
+   "conditions": "The 2012 guide (still the version FDA posts, checked 2026-10-13) sets no fixed interval for periodontal recall radiographs; never key one. Nonspecific gingivitis is not by itself a reason for periodontal images, but it does not rule out radiographs needed for caries or as a new patient. \"Not limited to\": do not key bitewings or periapicals as the only acceptable choice.",
+   "stem_names": [
+    "ADA",
+    "FDA"
+   ],
+   "cites": [
+    {
+     "src": "ada-fda-radiographs-2012",
+     "loc": "Recall patient with periodontal disease",
+     "quote": "Structures or conditions to be assessed should include the level of supporting alveolar bone, condition of the interproximal bony crest, length and shape of roots, bone loss in furcations, and calculus deposits."
+    },
+    {
+     "src": "ada-fda-radiographs-2012",
+     "loc": "Recall patient with periodontal disease",
+     "quote": "Imaging may consist of, but is not limited to, selected bitewing and/or periapical images of areas where periodontal disease (other than nonspecific gingivitis) can be identified clinically."
+    },
+    {
+     "src": "ada-fda-radiographs-2012",
+     "loc": "Recall patient with periodontal disease",
+     "quote": "it is recommended that clinical judgment be used in determining the need for, and type of radiographic images necessary for, evaluation of periodontal disease."
+    }
+   ],
+   "see": [
+    "PS-3",
+    "RAD-2"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-radiographs",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "RAD-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "A 2025 systematic review (J Clin Periodontol) concluded that standard 2D radiographs appear to have adequate diagnostic accuracy for periodontitis. For furcations, agreement between clinical measures and 2D radiographs is highly heterogeneous, with a tendency to underestimate the defects. CBCT is highly sensitive and specific for detecting and classifying furcation involvement, but its use should be decided case by case, weighing risk/benefit and cost/benefit. (The review's introduction also notes the classical teaching that radiographs usually underestimate the true amount of bone loss.)",
+   "conditions": "The pooled 2D estimate rests on three studies, and many included studies had unclear or high risk of bias. Radiographic limits cut both ways: the review lists underestimation of initial bone loss and overestimation of severe bone loss, so never key \"radiographs always (or consistently) underestimate bone loss\" or a number of millimeters. Do not key CBCT as routine or standard imaging for periodontitis staging.",
+   "cites": [
+    {
+     "src": "jcp-imaging-accuracy-2025",
+     "loc": "Conclusions",
+     "quote": "Standard 2D radiographs appear to have adequate diagnostic accuracy for periodontitis, while CBCT is highly sensitive and specific to detect and classify furcation involvement."
+    },
+    {
+     "src": "jcp-imaging-accuracy-2025",
+     "loc": "Discussion",
+     "quote": "In the evaluation of furcation areas, the correlation between clinical measures and 2D radiography is highly heterogeneous with a tendency to underestimate the defects."
+    },
+    {
+     "src": "jcp-imaging-accuracy-2025",
+     "loc": "Discussion",
+     "quote": "its use should be considered on a case‐by‐case basis by weighing the risk/benefit and costs/benefit ratios"
+    },
+    {
+     "src": "jcp-imaging-accuracy-2025",
+     "loc": "Introduction",
+     "quote": "Classical literature on radiographic interpretation points out that radiographs usually underestimate the true amount of bone loss"
+    },
+    {
+     "src": "jcp-imaging-accuracy-2025",
+     "loc": "Discussion",
+     "quote": "underestimation of initial alveolar bone loss, overestimation of severe bone loss"
+    }
+   ],
+   "see": [
+    "RAD-1",
+    "FM-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-radiographs",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PT-8",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Step 1 also includes supragingival professional mechanical plaque removal and control of plaque-retentive factors, plus oral hygiene instruction that engages the patient in behavior change; in supportive care the instruction (including interdental cleaning) is repeated and tailored to the patient.",
+   "conditions": "Expert-consensus recommendations. Do not key motivational interviewing or cognitive behavioral therapy as proven to improve oral hygiene. Step-1 plaque removal is supragingival; subgingival calculus belongs to step 2 (BF-5).",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.x",
+     "quote": "We recommend supragingival professional mechanical plaque removal (PMPR) and control of retentive factors, as part of the first step of therapy."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 1.x",
+     "quote": "We recommend emphasizing the importance of oral hygiene and engaging the periodontitis patient in behavioural change for oral hygiene improvement."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "We recommend repeated individually tailored instructions in mechanical oral hygiene, including interdental cleaning, in order to control inflammation and avoid potential damage for patients in periodontal SPC."
+    }
+   ],
+   "see": [
+    "PT-1",
+    "BF-5"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-therapy",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PT-9",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "EFP S3 on other adjuncts to subgingival instrumentation: specific locally administered sustained-release antibiotics, and locally administered sustained-release chlorhexidine, may be considered; chlorhexidine mouth rinses may be considered for a limited time in specific cases; locally delivered or systemic bisphosphonates and local metformin gel are recommended against.",
+   "conditions": "\"May be considered\" is a weak recommendation (Grade 0) from studies with a high risk of bias, and the benefit was short term: never key a local antibiotic or chlorhexidine product as required, as the standard of care, or as better in the long term. Chlorhexidine rinses are for a limited time in specific cases, not routine. The recommendations against bisphosphonates and local metformin are strong.",
+   "stem_names": [
+    "EFP"
+   ],
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.x",
+     "quote": "Specific locally administered sustained‐release antibiotics as an adjunct to subgingival instrumentation in patients with periodontitis may be considered"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.x",
+     "quote": "Adjunctive antiseptics may be considered , specifically chlorhexidine mouth rinses for a limited period of time, in periodontitis therapy, as adjuncts to mechanical debridement, in specific cases."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.x",
+     "quote": "We recommend not to use locally delivered bisphosphonate (BP) gels or systemic BPs as an adjunct to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.x",
+     "quote": "We recommend not to use local administration of metformin gel as adjunct to subgingival instrumentation."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 2.14",
+     "quote": "Locally administered sustained‐release chlorhexidine as an adjunct to subgingival instrumentation in patients with periodontitis may be considered"
+    }
+   ],
+   "see": [
+    "PT-6",
+    "PT-7",
+    "LD-1",
+    "LD-2"
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-adjuncts",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PT-10",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Periodontal surgery, including implant surgery, is not performed in patients who do not achieve and maintain adequate self-performed oral hygiene.",
+   "conditions": "The recommendation sets no plaque-score number for \"adequate\" hygiene (the background text mentions plaque scores under 20%-25%): never key a fixed plaque-score cutoff from this fact.",
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Step 3",
+     "quote": "We recommend not to perform periodontal (including implant) surgery in patients not achieving and maintaining adequate levels of self‐performed oral hygiene."
+    }
+   ],
+   "see": [
+    "PT-4",
+    "SX-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-surgery",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "SX-1",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Regenerative surgery (EFP S3), for pockets remaining after steps 1 and 2: recommended for teeth with residual deep pockets associated with intrabony defects 3 mm or deeper, and for mandibular molars with residual pockets and Class II furcation involvement; suggested for maxillary buccal Class II furcations. For intrabony defects, barrier membranes or enamel matrix derivative, with or without bone-derived grafts, are recommended; enamel matrix derivative and guided tissue regeneration showed no statistically significant difference in CAL gain, and the biomaterial is chosen by defect configuration. Flap designs that preserve the interdental papilla are recommended.",
+   "conditions": "Only for residual pockets after adequate steps 1 and 2: never key regeneration as initial therapy. Class = furcation class as in FM-1/FM-2. The guideline does not say how the 3 mm defect depth is measured; do not key a measuring method. Say \"no significant difference\", not \"equivalent\", for EMD vs GTR. Maxillary buccal Class II is the weaker \"suggest\".",
+   "stem_names": [
+    "EFP"
+   ],
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "We recommend treating teeth with residual deep pockets associated with intrabony defects 3 mm or deeper with periodontal regenerative surgery."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "We recommend treating mandibular molars with residual pockets associated with Class II furcation involvement with periodontal regenerative surgery."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "We suggest treating molars with residual pockets associated with maxillary buccal Class II furcation involvement with periodontal regenerative surgery."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.8",
+     "quote": "we recommend the use of either barrier membranes or enamel matrix derivative with or without the addition of bone‐derived grafts"
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "R3.8 evidence",
+     "quote": "The comparison between EMD versus GTR resulted in no statistically significant difference in CAL gain. The choice of biomaterial or possible combinations should be based on defect configuration."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.9",
+     "quote": "We recommend the use of specific flap designs with maximum preservation of interdental soft tissue such as papilla preservation flaps."
+    }
+   ],
+   "see": [
+    "PT-4",
+    "PR-6",
+    "FM-1"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-surgery",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "SX-2",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "For deep residual pockets (6 mm or more) in stage III periodontitis after an adequate second step, resective periodontal surgery is suggested, keeping in mind that it may increase gingival recession. For mandibular Class III furcations, maxillary Class III furcations, or several Class II furcations on one tooth, nonsurgical instrumentation, open flap debridement, tunneling, root separation or root resection may be considered; no tooth-survival advantage of resection, separation or tunneling over scaling and root planing or open flap debridement can be stated.",
+   "conditions": "All of the Class III options are \"may be considered\" (observational evidence): never key one as the single correct treatment. Resective surgery is a \"suggest\" whose advantage over access flaps faded by 3-5 years: never key it as clearly superior. \"Resective periodontal surgery\" (pocket elimination by reshaping tissue) is not root resection. Furcation involvement alone is no reason to extract (PR-6).",
+   "stem_names": [
+    "EFP"
+   ],
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "In cases of deep (PPD ≥ 6 mm) residual pockets in patients with Stage III periodontitis after an adequate second step of periodontal therapy, we suggest using resective periodontal surgery, yet considering the potential increase of gingival recession."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "In mandibular Class III and multiple Class II furcation involvement in the same tooth nonsurgical instrumentation, OFD, tunneling, root separation or root resection may be considered ."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 3.x",
+     "quote": "In maxillary Class III and multiple Class II furcation involvement in the same tooth nonsurgical instrumentation, OFD, tunneling, root separation or root resection may be considered ."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Evidence",
+     "quote": "Regarding tooth survival, a benefit of root amputation/resection, root separation or tunnelling compared to SRP or OFD cannot be currently stated."
+    }
+   ],
+   "see": [
+    "PT-4",
+    "SX-1",
+    "PR-6"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-surgery",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PT-11",
+   "status": "verified",
+   "risk": "medium",
+   "claim": "Supportive periodontal care (EFP S3): adherence should be strongly promoted because it is crucial for long-term periodontal stability; routine professional mechanical plaque removal is suggested to limit tooth loss and keep the periodontium stable; the guideline suggests not using sub-antimicrobial-dose doxycycline or photodynamic therapy as adjuncts to plaque removal in supportive care, and suggests not replacing conventional plaque removal with Er:YAG laser. A powered toothbrush may be considered as an alternative to a manual one.",
+   "conditions": "The doxycycline, photodynamic and Er:YAG statements are weak recommendations against: never key them as contraindicated or harmful. Never key a powered toothbrush as better than a manual one. Other bodies grade some adjuncts differently (sub-antimicrobial-dose doxycycline in particular), so an item must name EFP.",
+   "stem_names": [
+    "EFP"
+   ],
+   "cites": [
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "We recommend that adherence to supportive periodontal care should be strongly promoted, since it is crucial for long‐term periodontal stability and potential further improvements in periodontal status."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "We suggest performing routine professional mechanical plaque removal (PMPR) to limit the rate of tooth loss and provide periodontal stability/improvement, as part of a supportive periodontal care program."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "We suggest not to use adjunctive methods (sub‐antimicrobial dose doxycycline, photodynamic therapy) to professional mechanical plaque removal (PMPR) in supportive periodontal care."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "We suggest not to replace conventional professional mechanical plaque removal (PMPR) with the use of alternative methods (Er:YAG laser treatment) in supportive periodontal care."
+    },
+    {
+     "src": "efp-s3-2020",
+     "loc": "Recommendation 4.x",
+     "quote": "The use of a powered toothbrush may be considered as an alternative to manual tooth brushing for periodontal maintenance patients."
+    }
+   ],
+   "see": [
+    "PT-5",
+    "PH-5",
+    "PT-6"
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "perio-maintenance",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LD-1",
+   "status": "verified",
+   "risk": "high",
+   "claim": "Arestin (FDA label): minocycline hydrochloride in bioresorbable microspheres, 1 mg (minocycline free-base equivalent) per unit-dose cartridge, placed subgingivally by the clinician as a sustained-release antibiotic; the total dose varies with the size, shape and number of pockets treated. Indicated as an adjunct to scaling and root planing to reduce pocket depth in adult periodontitis. Contraindicated with known sensitivity to minocycline or tetracyclines. In US trials it was placed in pockets of 5 mm or more, up to 3 treatments at 3-month intervals. Tetracycline-class drugs during tooth development (last half of pregnancy, infancy and childhood to age 8) may permanently discolor teeth, so the label says not to use them in that age group or in pregnant or nursing women unless the benefits outweigh the risks; Arestin has not been clinically tested in pregnant women.",
+   "conditions": "Pregnancy, nursing and age under 8 are warnings (avoid unless benefit outweighs risk), not labeled contraindications: never key pregnancy as an absolute contraindication from this fact, nor as safe. The 1 mg is per cartridge, not per patient. \"Adult periodontitis\" is the label's older term; use the 2017 terms elsewhere in the item. The 5 mm and 3-month numbers describe the US trials, not a labeled minimum pocket depth.",
+   "cites": [
+    {
+     "src": "dm-arestin",
+     "loc": "Description",
+     "quote": "ARESTIN (minocycline hydrochloride) microspheres, 1 mg is a subgingival sustained-release product containing the antibiotic minocycline hydrochloride incorporated into a bioresorbable polymer"
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Dosage",
+     "quote": "Each unit-dose cartridge delivers minocycline hydrochloride equivalent to 1 mg of minocycline free base."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Dosage",
+     "quote": "ARESTIN is a variable dose product, dependent on the size, shape, and number of pockets being treated."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Indications",
+     "quote": "ARESTIN is indicated as an adjunct to scaling and root planing procedures for reduction of pocket depth in patients with adult periodontitis."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Contraindications",
+     "quote": "ARESTIN should not be used in any patient who has a known sensitivity to minocycline or tetracyclines."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Dosage",
+     "quote": "up to 3 treatments, at 3-month intervals, were administered in pockets with pocket depth of 5 mm or greater."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Warnings",
+     "quote": "THE USE OF DRUGS OF THE TETRACYCLINE CLASS DURING TOOTH DEVELOPMENT (LAST HALF OF PREGNANCY, INFANCY, AND CHILDHOOD TO THE AGE OF 8 YEARS) MAY CAUSE PERMANENT DISCOLORATION OF THE TEETH"
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Warnings",
+     "quote": "SHOULD NOT BE USED IN THIS AGE GROUP, OR IN PREGNANT OR NURSING WOMEN, UNLESS THE POTENTIAL BENEFITS ARE CONSIDERED TO OUTWEIGH THE POTENTIAL RISKS."
+    },
+    {
+     "src": "dm-arestin",
+     "loc": "Pregnancy",
+     "quote": "ARESTIN has not been clinically tested in pregnant women."
+    }
+   ],
+   "see": [
+    "PT-9",
+    "LD-2",
+    "AB-1"
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-local-delivery",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LD-2",
+   "status": "verified",
+   "risk": "high",
+   "claim": "PerioChip (FDA label): a biodegradable chip with 2.5 mg chlorhexidine gluconate, indicated as an adjunct to scaling and root planing to reduce pocket depth in adult periodontitis. One chip goes into a pocket with probing depth of 5 mm or more, and treatment is recommended once every three months in pockets still 5 mm or more. The patient avoids flossing that site for 10 days. Contraindicated with known sensitivity to chlorhexidine.",
+   "conditions": "Label effective 2010 (the only PerioChip label on DailyMed as of 2026-10-13). \"Adult periodontitis\" is the label's older term. The no-floss rule is for the treated site only. EFP S3 rates sustained-release chlorhexidine \"may be considered\" (PT-9): never key it as the standard of care. Its use in an acutely abscessed periodontal pocket has not been studied and is not recommended: never key PerioChip for a periodontal abscess.",
+   "cites": [
+    {
+     "src": "dm-periochip",
+     "loc": "Indications",
+     "quote": "PerioChip is indicated as an adjunct to scaling and root planing procedures for reduction of pocket depth in patients with adult periodontitis."
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Description",
+     "quote": "contains 2.5 mg of chlorhexidine gluconate in a biodegradable matrix of hydrolyzed gelatin"
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Dosage",
+     "quote": "One PerioChip is inserted into a periodontal pocket with probing pocket depth (PD) ≥ 5 mm."
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Dosage",
+     "quote": "Treatment is recommended to be administered once every three months in pockets with PD remaining ≥ 5 mm."
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Patient information",
+     "quote": "Patients should avoid dental floss at the site of PerioChip insertion for 10 days after placement, because flossing might dislodge the chip."
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Contraindications",
+     "quote": "PerioChip should not be used in any patient who has a known sensitivity to chlorhexidine."
+    },
+    {
+     "src": "dm-periochip",
+     "loc": "Precautions",
+     "quote": "The use of PerioChip in an acutely abscessed periodontal pocket has not been studied and therefore is not recommended."
+    }
+   ],
+   "see": [
+    "PT-6",
+    "LD-1"
+   ],
+   "units": [
+    "perio",
+    "pharm"
+   ],
+   "topic": "perio-local-delivery",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
   }
  ]
 }
