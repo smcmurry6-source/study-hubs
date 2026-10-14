@@ -216,8 +216,11 @@ function promptFor(template, batchContent) {
   const tick = String.fromCharCode(96);
   const marker = 'INPUT: read exactly one file: ' + tick + '{BATCH}' + tick + '.';
   if (!template.includes(marker)) throw new Error('checker prompt is missing its INPUT batch placeholder');
-  return template.replace(marker, 'INPUT: read exactly one file:\n\n' + batchContent.trimEnd() + '\n')
-    .replaceAll('{OUT}', 'the response body');
+  const filled = template.replace(marker, 'INPUT: read exactly one file:\n\n' + batchContent.trimEnd() + '\n');
+  const outMarker = tick + '{OUT}' + tick;
+  const outIndex = filled.lastIndexOf(outMarker);
+  if (outIndex < 0) throw new Error('checker prompt is missing its OUTPUT path placeholder');
+  return filled.slice(0, outIndex) + 'the response body' + filled.slice(outIndex + outMarker.length);
 }
 
 function splitBenchmarkBatch(markdown, key) {
