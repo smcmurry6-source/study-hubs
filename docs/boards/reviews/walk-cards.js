@@ -1,113 +1,361 @@
-// Session 6 walk-through of the T-04 card/case/bank UI (PR #81) on a fixture build, desktop and phone.
+// Fixture walkthrough of the T-04 fixes for PR #81.
 // Build first: node tools/build-boards.js --units-dir tools/ci/fixtures/boards/units --out <dir>/fx81/index.html --include-drafts
-// Run: node docs/boards/reviews/walk-cards.js <dir>   (Playwright from the global install; Chromium from /opt/pw-browsers)
-const { chromium } = require('/opt/node22/lib/node_modules/playwright');
-const S = process.argv[2], url = 'file://' + S + '/fx81/index.html';
-const log = (...a) => console.log(...a);
-(async () => {
-  const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' }).catch(async () => chromium.launch());
-  for (const vp of [{ name: 'desktop', w: 1280, h: 900 }, { name: 'phone', w: 390, h: 844 }]) {
-    const ctx = await br.newContext({ viewport: { width: vp.w, height: vp.h } });
-    const pg = await ctx.newPage(); const errs = [];
-    pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-    await pg.addInitScript(() => { window.__ev = []; document.addEventListener('boards:answered', e => window.__ev.push(e.detail)); });
-    await pg.goto(url); await pg.waitForTimeout(300);
-    log(`\n=== ${vp.name}`);
-    await pg.click('[data-mode="bank"]'); await pg.waitForTimeout(200);
-    const panel = '#panel-bank';
-    // shuffle on re-render
-    const orders = [];
-    for (let k = 0; k < 4; k++) {
-      orders.push(await pg.$$eval(`${panel} .qchoice`, bs => bs.map(b => b.getAttribute('data-i')).join('')));
-      await pg.click(`${panel} .subtabs [data-sub="missed"]`); await pg.waitForTimeout(80);
-      await pg.click(`${panel} .subtabs [data-sub="practice"]`); await pg.waitForTimeout(80);
+// Run: PLAYWRIGHT_PATH=<Playwright entry point> CHROMIUM_PATH=<installed Chromium> node docs/boards/reviews/walk-cards.js <dir>
+'use strict';
+
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const chromiumPath = process.env.CHROMIUM_PATH || undefined;
+const buildRoot = process.argv[2];
+if (!buildRoot) throw new Error('Pass the fixture build directory used by --out.');
+const fixture = path.resolve(buildRoot, 'fx81', 'index.html');
+if (!fs.existsSync(fixture)) throw new Error('Fixture build not found: ' + fixture);
+const screenshotDir = path.resolve(process.env.WALK_SCREENSHOTS_DIR || path.join(__dirname, 'walk-81'));
+fs.mkdirSync(screenshotDir, { recursive: true });
+const url = pathToFileURL(fixture).href;
+const panel = '#panel-bank';
+
+const viewports = [
+  { name: 'desktop', width: 1280, height: 900 },
+  { name: 'phone', width: 390, height: 844 }
+];
+
+const steps = [
+  {
+    slug: 'practice-case-return',
+    name: 'Practice can return after opening a case item',
+    run: async function (page) {
+      await enterBank(page, 'cases');
+      const caseId = await page.locator(panel + ' [data-case-open]').first().getAttribute('data-case-open');
+      assert.ok(caseId, 'Fixture needs a case');
+      await page.locator(panel + ' [data-case-open="' + caseId + '"]').click();
+      const firstQid = await currentQid(page);
+      await page.locator(panel + ' [data-case-back]').click();
+      await page.waitForSelector(panel + ' [data-case-open="' + caseId + '"]');
+      await page.evaluate(function (qid) { window.SH_GOTO({ qid: qid }); }, firstQid);
+      await page.waitForSelector(panel + ' .case-view [data-case-current]');
+      assert.equal(await activeSub(page), 'cases', 'Opening a case item should use Cases');
+      await page.locator(panel + ' [data-case-back]').click();
+      await page.waitForSelector(panel + ' [data-case-open="' + caseId + '"]');
+      await page.locator(panel + ' .subtabs [data-sub="practice"]').click();
+      await waitForSub(page, 'practice');
+      assert.equal(await page.locator(panel + ' .case-view').count(), 0, 'Practice must not bounce back into the case');
+      assert.equal(await page.evaluate(function () {
+        const card = document.querySelector('#panel-bank .qcard');
+        return card && card.getAttribute('data-qid') !== null && !card.closest('.case-view');
+      }), true, 'Practice should render a standalone card');
+      for (let i = 0; i < 4; i++) {
+        const next = page.locator(panel + ' [data-bank-step="1"]');
+        assert.equal(await next.isEnabled(), true, 'Expected another standalone Practice item');
+        await next.click();
+        await waitForSub(page, 'practice');
+        assert.equal(await page.locator(panel + ' .case-view').count(), 0, 'Practice Next must stay in Practice');
+      }
+      return 'opened a case item, returned to Practice, and stayed there across Next';
     }
-    log('orders on re-render of item 1:', orders.join(' '));
-    const qid1 = await pg.$eval(`${panel} .qcard`, c => c.getAttribute('data-qid'));
-    const pick = await pg.$eval(`${panel} .qchoice:nth-child(2)`, b => b.getAttribute('data-i'));
-    await pg.click(`${panel} .qchoice:nth-child(2)`); await pg.waitForTimeout(100);
-    let ev = await pg.evaluate(() => window.__ev.slice(-1)[0]);
-    log('standalone', qid1, 'clicked authored', pick, '-> event', JSON.stringify(ev));
-    const verdict = await pg.$eval(`${panel} .qx-verdict`, e => e.textContent).catch(() => null);
-    log('verdict shown:', verdict);
-    // step through practice to see if a case item yanks us into cases
-    let jumped = null;
-    for (let k = 0; k < 40; k++) {
-      const sub = await pg.$eval(`${panel} .subtab.is-active`, b => b.getAttribute('data-sub'));
-      if (sub !== 'practice') { jumped = { at: k, sub, title: await pg.$eval(`${panel} .case-title h3`, e => e.textContent).catch(() => '') }; break; }
-      const nxt = await pg.$(`${panel} [data-bank-step="1"]:not([disabled])`); if (!nxt) break;
-      await nxt.click(); await pg.waitForTimeout(60);
+  },
+  {
+    slug: 'new-only-no-skips',
+    name: 'New only reaches every unanswered item without skips',
+    run: async function (page) {
+      await enterBank(page, 'practice');
+      await page.locator(panel + ' [data-bank-new]').check();
+      const counter = await page.locator(panel + ' .qnav .faint').innerText();
+      const match = counter.match(/of\s+(\d+)/);
+      assert.ok(match, 'New only should show its item count');
+      const total = Number(match[1]);
+      assert.ok(total > 1, 'Fixture should contain multiple new standalone items');
+      const expected = [];
+      for (let i = 0; i < total; i++) {
+        const qid = await currentQid(page);
+        assert.equal(expected.indexOf(qid), -1, 'New only repeated an item before answering');
+        expected.push(qid);
+        if (i + 1 < total) {
+          await page.locator(panel + ' [data-bank-step="1"]').click();
+          await page.waitForFunction(function (oldQid) {
+            const card = document.querySelector('#panel-bank .qcard');
+            return card && card.getAttribute('data-qid') !== oldQid;
+          }, qid, { timeout: 5000 });
+        }
+      }
+      for (let i = total - 1; i > 0; i--) {
+        const qid = await currentQid(page);
+        await page.locator(panel + ' [data-bank-step="-1"]').click();
+        await page.waitForFunction(function (oldQid) {
+          const card = document.querySelector('#panel-bank .qcard');
+          return card && card.getAttribute('data-qid') !== oldQid;
+        }, qid, { timeout: 5000 });
+      }
+      assert.equal(await currentQid(page), expected[0], 'Reset to the first unanswered item before answering');
+      for (let i = 0; i < expected.length; i++) {
+        assert.equal(await currentQid(page), expected[i], 'Unexpected or skipped new item at position ' + (i + 1));
+        await page.locator(panel + ' .qcard .qchoice').first().click();
+        assert.ok(await savedAnswer(page, expected[i]), 'Answer should persist for ' + expected[i]);
+        if (i + 1 < expected.length) {
+          await page.locator(panel + ' [data-bank-step="1"]').click();
+          await waitForQid(page, panel + ' .qcard', expected[i + 1]);
+        }
+      }
+      await page.locator(panel + ' [data-bank-new]').uncheck();
+      await page.locator(panel + ' [data-bank-new]').check();
+      assert.equal(await page.locator(panel + ' .qcard').count(), 0, 'No unanswered items should remain in New only');
+      assert.match(await page.locator(panel + ' .empty').innerText(), /No questions match/);
+      return 'answered all ' + expected.length + ' new items in order; New only is empty';
     }
-    log('practice Next stepping:', jumped ? `jumped to ${jumped.sub} (${jumped.title}) after ${jumped.at} Next taps` : 'stayed in practice');
-    // Cases
-    await pg.click(`${panel} .subtabs [data-sub="cases"]`); await pg.waitForTimeout(150);
-    if (await pg.$(`${panel} [data-case-back]`)) { await pg.click(`${panel} [data-case-back]`); await pg.waitForTimeout(100); }
-    const list = await pg.$$eval(`${panel} [data-case-open]`, bs => bs.map(b => b.getAttribute('data-case-open')));
-    log('case list:', list.join(', '));
-    const cid = 'c-perio-0001';
-    await pg.click(`${panel} [data-case-open="${cid}"]`); await pg.waitForTimeout(150);
-    const evBefore = await pg.evaluate(() => window.__ev.length);
-    async function doItem(i) {
-      const head = await pg.$eval(`${panel} .case-stage-head .chip`, e => e.textContent);
-      await pg.click(`${panel} [data-case-current] .qchoice:nth-child(1)`); await pg.click(`${panel} [data-case-current] .qchoice:nth-child(2)`);
-      await pg.click(`${panel} [data-case-lock]`); await pg.waitForTimeout(80);
-      const qx = await pg.$eval(`${panel} [data-case-current] .qx`, e => e.textContent.trim());
-      const states = await pg.$$eval(`${panel} [data-case-current] .qchoice[data-state="right"], ${panel} [data-case-current] .qchoice[data-state="wrong"]`, x => x.length);
-      log(`  ${head}: after lock qx="${qx}", verdict-colored choices=${states}`);
+  },
+  {
+    slug: 'missed-retry',
+    name: 'Missed items are live, and a correct retry updates the list',
+    run: async function (page) {
+      await enterBank(page, 'practice');
+      const ids = [];
+      ids.push(await currentQid(page));
+      await page.locator(panel + ' [data-bank-step="1"]').click();
+      ids.push(await currentQid(page));
+      assert.ok(ids[0] && ids[1] && ids[0] !== ids[1], 'Fixture needs two standalone questions');
+      await page.evaluate(function (data) {
+        const state = JSON.parse(localStorage.getItem('boards-state-v1'));
+        data.ids.forEach(function (id) {
+          state.answered[id] = { lastCorrect: false, n: 1, t: '2026-10-13', first: false, choice: 0 };
+        });
+        localStorage.setItem('boards-state-v1', JSON.stringify(state));
+      }, { ids: ids });
+      await page.reload({ waitUntil: 'load' });
+      await waitForPublicApp(page);
+      await enterBank(page, 'missed');
+      await waitForQid(page, panel + ' .qcard', ids[1]);
+      await page.locator(panel + ' [data-bank-step="-1"]').click();
+      await waitForQid(page, panel + ' .qcard', ids[0]);
+      const card = page.locator(panel + ' .qcard');
+      assert.equal(await card.getAttribute('data-ctx'), 'bank', 'Missed retry should use live bank context');
+      assert.equal(await card.getAttribute('data-lock-in'), 'false', 'Missed standalone should not be locked as review');
+      assert.equal(await page.locator(panel + ' .qcard .qchoice').first().evaluate(function (button) {
+        return button.tagName === 'BUTTON' && !button.disabled;
+      }), true, 'Missed choices must be answerable buttons');
+
+      const choices = await page.locator(panel + ' .qcard .qchoice').evaluateAll(function (buttons) {
+        return buttons.map(function (button) { return Number(button.getAttribute('data-i')); }).sort(function (a, b) { return a - b; });
+      });
+      let corrected = false;
+      for (const choice of choices) {
+        await page.locator(panel + ' .qcard .qchoice[data-i="' + choice + '"]').click();
+        const saved = await savedAnswer(page, ids[0]);
+        if (saved && saved.lastCorrect) { corrected = true; break; }
+        await page.locator(panel + ' .subtabs [data-sub="practice"]').click();
+        await waitForSub(page, 'practice');
+        await page.locator(panel + ' .subtabs [data-sub="missed"]').click();
+        await waitForSub(page, 'missed');
+        await waitForQid(page, panel + ' .qcard', ids[0]);
+      }
+      assert.equal(corrected, true, 'One of the live choices should correctly answer the missed item');
+      const saved = await savedAnswer(page, ids[0]);
+      assert.equal(saved.lastCorrect, true, 'Correct retry should update the saved answer');
+      assert.ok(saved.n > 1, 'Correct retry should record a new attempt');
+      await page.locator(panel + ' [data-bank-step="1"]').click();
+      await waitForQid(page, panel + ' .qcard', ids[1]);
+      return 'correct retry updated the saved answer and advanced to the remaining missed item';
     }
-    await doItem(1); await pg.click(`${panel} [data-case-next]`); await pg.waitForTimeout(100);
-    await doItem(2);
-    // leave before Next
-    await pg.click(`${panel} [data-case-back]`); await pg.waitForTimeout(100);
-    const st = await pg.$eval(`${panel} [data-case-open="${cid}"]`, b => b.closest('article').querySelector('.chip').textContent);
-    log('  left after item 2; list state:', st);
-    await pg.click(`${panel} [data-case-open="${cid}"]`); await pg.waitForTimeout(150);
-    const resume = await pg.$eval(`${panel} .case-stage-head .chip`, e => e.textContent).catch(() => 'ROUNDS?');
-    log('  reopened at:', resume);
-    if (vp.name === 'desktop') await pg.screenshot({ path: `${S}/81-desktop-case.png`, fullPage: false });
-    let n = 3;
-    while (await pg.$(`${panel} [data-case-lock]`)) { await doItem(n++); const nx = await pg.$(`${panel} [data-case-next]:not([hidden])`); if (!nx) break; await nx.click(); await pg.waitForTimeout(120); if (await pg.$(`${panel} .case-rounds`)) break; }
-    const rounds = await pg.$$eval(`${panel} .case-round-item`, x => x.length).catch(() => 0);
-    const roundsVerdicts = await pg.$$eval(`${panel} .case-round-item .qx-verdict`, x => x.map(e => e.textContent.slice(0, 20)));
-    const evs = await pg.evaluate(n0 => window.__ev.slice(n0), evBefore);
-    const per = {}; evs.forEach(e => per[e.qid] = (per[e.qid] || 0) + 1);
-    log('  Rounds items:', rounds, roundsVerdicts.join(' | '));
-    log('  events in case:', JSON.stringify(per), 'ctx', [...new Set(evs.map(e => e.ctx))].join());
-    if (vp.name === 'phone') { await pg.screenshot({ path: `${S}/81-phone-rounds.png`, fullPage: true }); }
-    // reopen done case
-    await pg.click(`${panel} [data-case-back]`); await pg.waitForTimeout(100);
-    const btn = await pg.$eval(`${panel} [data-case-open="${cid}"]`, b => b.textContent);
-    log('  done case button:', btn, '(any way to redo it?)', !!(await pg.$(`${panel} [data-case-redo]`)));
-    // Missed
-    await pg.click(`${panel} .subtabs [data-sub="missed"]`); await pg.waitForTimeout(150);
-    const missed = await pg.$$eval(`${panel} [data-missed-item]`, x => x.map(e => e.getAttribute('data-missed-item')));
-    const missedCases = await pg.$$eval(`${panel} [data-case-missed]`, x => x.map(e => e.getAttribute('data-case-missed')));
-    const missedLive = await pg.$$eval(`${panel} [data-missed-item] button.qchoice`, x => x.length);
-    log('  Missed standalones:', missed.join(','), '| missed cases:', missedCases.join(','), '| answerable buttons in Missed:', missedLive);
-    // Cover options
-    await pg.click(`${panel} .subtabs [data-sub="practice"]`); await pg.waitForTimeout(150);
-    log('  after tapping Practice, active tab =', await pg.$eval(`${panel} .subtab.is-active`, b => b.getAttribute('data-sub')), '| case open:', !!(await pg.$(`${panel} .case-view`)));
-    await pg.evaluate(() => { const s = JSON.parse(localStorage.getItem('boards-state-v1')); s.ui.bankAt = 0; s.ui.sub.bank='practice'; s.ui.caseId=null; localStorage.setItem('boards-state-v1', JSON.stringify(s)); });
-    await pg.reload(); await pg.waitForTimeout(300); await pg.click('[data-mode="bank"]'); await pg.waitForTimeout(150);
-    await pg.check(`${panel} [data-bank-cover]`); await pg.waitForTimeout(100);
-    const covered = await pg.$eval(`${panel} .qcard-choices`, e => e.hidden);
-    await pg.click(`${panel} [data-show-options]`); const shown = await pg.$eval(`${panel} .qcard-choices`, e => !e.hidden);
-    await pg.uncheck(`${panel} [data-bank-cover]`); await pg.waitForTimeout(100);
-    const uncovered = await pg.$eval(`${panel} .qcard-choices`, e => !e.hidden);
-    log('  cover options: hidden', covered, '-> show', shown, '-> off', uncovered);
-    // New only skip check
-    await pg.check(`${panel} [data-bank-new]`); await pg.waitForTimeout(100);
-    const a = await pg.$eval(`${panel} .qcard`, c => c.getAttribute('data-qid'));
-    const poolIds = await pg.evaluate(() => null);
-    await pg.click(`${panel} .qchoice:nth-child(1)`); await pg.waitForTimeout(60);
-    // what was the next new item before answering? read "x of N"
-    const posAfter = await pg.$eval(`${panel} .qnav .faint`, e => e.textContent);
-    await pg.click(`${panel} [data-bank-step="1"]`); await pg.waitForTimeout(80);
-    const b = await pg.$eval(`${panel} .qcard`, c => c.getAttribute('data-qid')).catch(() => 'none');
-    const posB = await pg.$eval(`${panel} .qnav .faint`, e => e.textContent).catch(() => '');
-    log('  New only: answered', a, '(', posAfter, ') then Next ->', b, '(', posB, ')');
-    log('  errors:', errs.length ? errs.slice(0, 5) : 'none');
-    await ctx.close();
+  },
+  {
+    slug: 'case-repeat-no-skip',
+    name: 'Done cases restart at question 1 without skipping prior answers',
+    run: async function (page) {
+      await enterBank(page, 'cases');
+      const caseId = await page.locator(panel + ' [data-case-open]').first().getAttribute('data-case-open');
+      assert.ok(caseId, 'Fixture needs a case');
+      const listText = await page.locator(panel + ' .case-list-card .faint').first().innerText();
+      const countMatch = listText.match(/(\d+)\s+questions?/);
+      assert.ok(countMatch, 'Case list should show the case question count');
+      const itemCount = Number(countMatch[1]);
+      await page.locator(panel + ' [data-case-open="' + caseId + '"]').click();
+      const firstQid = await currentQid(page);
+      await page.locator(panel + ' [data-case-back]').click();
+      await page.waitForSelector(panel + ' [data-case-open="' + caseId + '"]');
+      await page.evaluate(function (qid) {
+        const state = JSON.parse(localStorage.getItem('boards-state-v1'));
+        state.answered[qid] = { lastCorrect: true, n: 1, t: '2026-10-13', first: true, choice: 0 };
+        localStorage.setItem('boards-state-v1', JSON.stringify(state));
+      }, firstQid);
+      await page.reload({ waitUntil: 'load' });
+      await waitForPublicApp(page);
+      await enterBank(page, 'cases');
+      await page.locator(panel + ' [data-case-open="' + caseId + '"]').click();
+      await waitForQid(page, panel + ' [data-case-current] .qcard', firstQid);
+      const visited = [];
+      for (let i = 1; i <= itemCount; i++) {
+        const qid = await currentQid(page);
+        assert.ok(visited.indexOf(qid) === -1, 'Case repeated an item before Rounds');
+        visited.push(qid);
+        const chip = await page.locator(panel + ' .case-stage-head .chip').innerText();
+        assert.match(chip, new RegExp('Question ' + i + ' of '), 'First attempt should follow case order');
+        if (i === 1) assert.equal(qid, firstQid, 'Answering elsewhere must not skip case question 1');
+        await answerCaseItem(page);
+        await page.locator(panel + ' [data-case-next]').click();
+      }
+      assert.equal(await page.locator(panel + ' .case-round-item').count(), itemCount,
+        'Finished case should show Rounds for every item');
+      assert.equal(visited.length, itemCount, 'First attempt should visit every case item');
+      await page.locator(panel + ' [data-case-back]').click();
+      await page.waitForSelector(panel + ' [data-case-repeat="' + caseId + '"]');
+      assert.equal(await page.locator(panel + ' [data-case-review="' + caseId + '"]').count(), 1,
+        'Done case should offer Review');
+      await page.locator(panel + ' [data-case-repeat="' + caseId + '"]').click();
+      await waitForQid(page, panel + ' [data-case-current] .qcard', firstQid);
+      assert.match(await page.locator(panel + ' .case-stage-head .chip').innerText(), /Question 1 of/,
+        'Do it again should restart at question 1');
+      return 'visited all ' + itemCount + ' case items despite a prior answer; Do it again reopened question 1';
+    }
+  },
+  {
+    slug: 'case-question-1-visible',
+    name: 'Case question 1 stays within the first screen with the chart open',
+    run: async function (page) {
+      await enterBank(page, 'cases');
+      const caseId = await page.locator(panel + ' [data-case-open]').first().getAttribute('data-case-open');
+      await page.locator(panel + ' [data-case-open="' + caseId + '"]').click();
+      await waitForSelectorVisible(page, panel + ' [data-case-current] .qcard');
+      assert.equal(await page.locator(panel + ' .case-chart').evaluate(function (chart) { return chart.open; }), true,
+        'Chart should be open for question 1');
+      const box = await page.locator(panel + ' .case-current .qcard').boundingBox();
+      assert.ok(box, 'Question 1 should have a bounding box');
+      assert.ok(box.y < 900, 'Question 1 top should be before y=900 (actual y=' + Math.round(box.y) + ')');
+      return 'question 1 top y=' + Math.round(box.y) + ' with chart open';
+    }
   }
-  await br.close();
-})();
+];
+
+async function enterBank(page, sub) {
+  await page.locator('[data-mode="bank"]').click();
+  await page.locator(panel + ' .subtabs [data-sub="' + sub + '"]').click();
+  await waitForSub(page, sub);
+}
+
+async function waitForPublicApp(page) {
+  await page.waitForFunction(function () { return typeof window.SH_GOTO === 'function'; }, null, { timeout: 8000 });
+}
+
+async function waitForSub(page, expected) {
+  await page.waitForFunction(function (sub) {
+    const active = document.querySelector('#panel-bank .subtab.is-active');
+    return active && active.getAttribute('data-sub') === sub;
+  }, expected, { timeout: 5000 });
+}
+
+async function activeSub(page) {
+  return page.locator(panel + ' .subtab.is-active').getAttribute('data-sub');
+}
+
+async function currentQid(page) {
+  return page.locator(panel + ' .qcard').getAttribute('data-qid');
+}
+
+async function waitForQid(page, selector, qid) {
+  await page.waitForFunction(function (arg) {
+    const card = document.querySelector(arg.selector);
+    return card && (!arg.qid || card.getAttribute('data-qid') === arg.qid);
+  }, { selector: selector, qid: qid || '' }, { timeout: 5000 });
+}
+
+async function waitForSelectorVisible(page, selector) {
+  await page.waitForFunction(function (s) {
+    const element = document.querySelector(s);
+    return element && element.getBoundingClientRect().width > 0;
+  }, selector, { timeout: 5000 });
+}
+
+async function savedAnswer(page, qid) {
+  return page.evaluate(function (id) {
+    const state = JSON.parse(localStorage.getItem('boards-state-v1'));
+    return state && state.answered && state.answered[id];
+  }, qid);
+}
+
+async function answerCaseItem(page) {
+  const choice = page.locator(panel + ' [data-case-current] .qchoice').first();
+  assert.equal(await choice.evaluate(function (button) { return button.tagName === 'BUTTON' && !button.disabled; }), true,
+    'Case question should be answerable');
+  await choice.click();
+  await page.locator(panel + ' [data-case-lock]').click();
+  await page.waitForFunction(function () {
+    const button = document.querySelector('#panel-bank [data-case-next]');
+    return button && !button.hidden;
+  }, null, { timeout: 5000 });
+}
+
+(async function main() {
+  let browser;
+  try {
+    const launch = { headless: true };
+    if (chromiumPath) launch.executablePath = chromiumPath;
+    browser = await chromium.launch(launch);
+  } catch (error) {
+    for (const viewport of viewports) {
+      for (const step of steps) console.error('FAIL [' + viewport.name + '] ' + step.name + ' — browser launch failed: ' + error.message);
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  let failures = 0;
+  const screenshotFiles = [];
+  try {
+    for (const viewport of viewports) {
+      for (const step of steps) {
+        const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height } });
+        const page = await context.newPage();
+        page.setDefaultTimeout(6000);
+        page.on('pageerror', function (error) { page.__walkPageErrors = page.__walkPageErrors || []; page.__walkPageErrors.push(error.message); });
+        await page.addInitScript(function () {
+          window.__walkAnswered = [];
+          document.addEventListener('boards:answered', function (event) { window.__walkAnswered.push(event.detail); });
+        });
+        let detail = '';
+        let failure = null;
+        try {
+          await page.goto(url, { waitUntil: 'load' });
+          await waitForPublicApp(page);
+          detail = await step.run(page, viewport) || '';
+          assert.deepEqual(page.__walkPageErrors || [], [], 'Page JavaScript errors');
+        } catch (error) {
+          failure = error;
+        }
+        const screenshotPath = path.join(screenshotDir, viewport.name + '-' + step.slug + '.jpg');
+        try {
+          await page.screenshot({ path: screenshotPath, type: 'jpeg', quality: 40, fullPage: false });
+          screenshotFiles.push(screenshotPath);
+        } catch (error) {
+          if (!failure) failure = error;
+        }
+        if (failure) {
+          failures++;
+          console.error('FAIL [' + viewport.name + '] ' + step.name + ' — ' + String(failure.message || failure).replace(/\s+/g, ' ').trim());
+        } else {
+          console.log('PASS [' + viewport.name + '] ' + step.name + (detail ? ' — ' + detail : ''));
+        }
+        await context.close();
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+
+  const screenshotBytes = screenshotFiles.reduce(function (sum, file) { return sum + fs.statSync(file).size; }, 0);
+  console.log('Screenshots: ' + screenshotFiles.length + ' files, ' + (screenshotBytes / 1024).toFixed(1) + ' KB');
+  if (screenshotBytes > 1024 * 1024) {
+    failures++;
+    console.error('FAIL screenshots — total exceeds 1 MB');
+  }
+  if (failures) {
+    console.error('FAIL: ' + failures + ' step(s)');
+    process.exitCode = 1;
+  } else {
+    console.log('PASS: all ' + (viewports.length * steps.length) + ' viewport steps');
+  }
+})().catch(function (error) {
+  console.error('FAIL: walkthrough crashed — ' + error.stack);
+  process.exitCode = 1;
+});

@@ -260,7 +260,7 @@ main{padding-top:22px}
   .case-chart{position:static;scroll-margin-top:130px}
   .case-chart summary{display:list-item;cursor:pointer;font-weight:700;color:var(--ink);padding:12px 15px}
   .case-chart[open] summary{border-bottom:1px solid var(--line)}
-  .case-chart-body{padding:12px}
+  .case-chart-body{padding:12px;max-height:38vh;overflow-y:auto;overscroll-behavior:contain}
 }
 @media (max-width: 560px){
   #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
