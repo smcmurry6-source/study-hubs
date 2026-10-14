@@ -164,14 +164,13 @@
         "findings": [
           "Tooth 30 has a residual pocket measuring 6 mm after subgingival instrumentation",
           "Tooth 30 is a mandibular molar; furcation examination shows 4 mm horizontal loss without through-and-through passage and a 5 mm vertical subclass depth",
-          "No other pocket of 6 mm or more; plaque control has been maintained",
-          "After regenerative surgery (step 3), later reevaluation finds no bleeding pocket deeper than 4 mm and no pocket measuring 6 mm or more; the patient is ready for supportive care"
+          "No other pocket of 6 mm or more; plaque control has been maintained"
         ]
       },
       "items": [
         { "phase": "plan", "concept": "regenerative-surgery-indications", "refs": ["SX-1", "PR-6"] },
         { "phase": "plan", "concept": "surgical-hygiene-readiness", "refs": ["PT-10"] },
-        { "phase": "fu", "concept": "supportive-care-interval", "refs": ["PT-5", "PT-11"] },
+        { "phase": "fu", "concept": "supportive-care-interval", "refs": ["PT-5", "PT-11"], "stem": "Three months after regenerative surgery, reevaluation finds no bleeding pocket deeper than 4 mm and no pocket measuring 6 mm or more." },
         { "phase": "dx", "concept": "furcation-classification", "refs": ["FM-1", "FM-2", "FM-3"] }
       ]
     },
