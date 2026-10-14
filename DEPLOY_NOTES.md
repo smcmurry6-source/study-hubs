@@ -102,6 +102,10 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (PCD Exam 3 check-in waits for 8 pm, Claude Code)** — PCD Exam 3 is a Canvas exam open 8 am-8 pm, so
+  its dashboard "Check in" button now appears at 8 pm, not 8 am. New optional per-exam `checkinHour` in `HUBS` (default
+  `CHECKIN_HOUR`); the pop-up still goes out from `ARCHIVE_HOUR` (10 pm). About page updated. No schema change.
+
 - **2026-10-14 (MSK 4: L31 and L32 recordings, Claude Code)** — Sam added the 10/13 class recordings of L31 Skeletal
   Muscle and L32 NMJ Pharmacology to the Drive (Exam 4 folder; both VTTs are labeled "Michael Herr", the room's Zoom
   account). Both lectures go from "Slides only" to "Recording + slides". Notes at both levels gain what the lectures
