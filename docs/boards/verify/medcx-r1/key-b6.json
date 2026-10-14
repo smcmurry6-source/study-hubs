@@ -1,0 +1,72 @@
+{
+ "R01": {
+  "item": "b-medcx-0154",
+  "seeded": false,
+  "keyLetter": "D",
+  "inCase": false,
+  "changed": true
+ },
+ "R02": {
+  "item": "b-medcx-0160",
+  "seeded": false,
+  "keyLetter": "D",
+  "inCase": false,
+  "changed": true
+ },
+ "R03": {
+  "item": "b-medcx-0156",
+  "seeded": false,
+  "keyLetter": "A",
+  "inCase": false,
+  "changed": true
+ },
+ "R04": {
+  "item": "b-medcx-0152",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ },
+ "R05": {
+  "item": "b-medcx-0158",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ },
+ "R06": {
+  "item": "b-medcx-0151",
+  "seeded": false,
+  "keyLetter": "A",
+  "inCase": false,
+  "changed": true
+ },
+ "R07": {
+  "item": "b-medcx-0157",
+  "seeded": false,
+  "keyLetter": "B",
+  "inCase": false,
+  "changed": true
+ },
+ "R08": {
+  "item": "b-medcx-0155",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ },
+ "R09": {
+  "item": "b-medcx-0159",
+  "seeded": false,
+  "keyLetter": "B",
+  "inCase": false,
+  "changed": true
+ },
+ "R10": {
+  "item": "b-medcx-0153",
+  "seeded": false,
+  "keyLetter": "C",
+  "inCase": false,
+  "changed": true
+ }
+}

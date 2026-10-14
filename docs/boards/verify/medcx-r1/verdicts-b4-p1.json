@@ -1,0 +1,212 @@
+[
+ {
+  "id": "R01",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "high",
+    "detail": "The box already states 'INR 3.7 measured today', and 3.7 is the only option above the usual cutoff, so the key is found by matching the box with no knowledge of the threshold. The stem also asks about hypothetical INRs that have nothing to do with this patient.",
+    "suggestion": "Ask about the patient: 'What is the most appropriate plan for his warfarin?' (or remove the INR from the box and ask which INR value requires consultation), with plausible options such as continue and use local measures / consult the prescriber first / stop for 5 days / bridge with heparin."
+   },
+   {
+    "check": "key",
+    "severity": "medium",
+    "detail": "The 3.5 cutoff is a 'keyed teaching rule for the bank'. The cited sources say 3.0 or less is therapeutic and can continue, and AAOM found 3.5 safe with some experts saying up to 4.0. A 3.7 INR on a hematology-managed patient is therefore not clearly 'unsupported' for a simple extraction, and the options 3.2 and 3.5 are both above the quoted ADA 3.0 figure, so B and C are only 'within threshold' under the bank's own rule.",
+    "suggestion": "State the threshold in the stem ('Using a 3.5 cutoff') or move the options clear of the 3.0 to 4.0 gray zone; the explanation should say 3.5 is the conservative teaching value."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "Explanation says 'Cited guidance supports ... 3.5 or less; above that, consult', but the quotes do not say that. Why-lines for A and B are identical and do not mention that 3.2 is above the ADA's 3.0 therapeutic figure.",
+    "suggestion": "Reword to 'AAOM (2016) found 3.5 safe for uncomplicated extraction; above 3.5, consult the prescriber (conservative rule)'."
+   }
+  ]
+ },
+ {
+  "id": "R02",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "Key D is the longest and the only option with hedged, multi-part wording. A uses the absolute 'all dental care whenever'; B pairs 'long appointment' with 'restrict fluids', both obviously wrong; C is a crisis case the stem excludes ('stable'). Students can answer without knowing the content.",
+    "suggestion": "Make all options similar in length and plausibility, e.g. morning short visit with physician confirmation vs. routine long visit vs. nitrous oxide for all vs. antibiotic premedication."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The box says the syncope episode already happened during the injection for this restoration, yet the stem asks about planning 'before an elective restoration'. The faint is not accounted for in the plan (resume vs. reschedule).",
+    "suggestion": "Say 'Once he has recovered, which plan best fits his sickle cell disease for the rest of care?' or move this item ahead of the emergency items with a separate box."
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "B 'restrict fluids' is an implausible, unsafe-sounding option that no one would pick.",
+    "suggestion": "Use a plausible error, e.g. 'Schedule a long afternoon visit to finish in one session'."
+   }
+  ]
+ },
+ {
+  "id": "R03",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "The stem names P-C-A-B-D and option C is the only one whose letter label is P ('Positioning'), and the options spell out the whole expansion. A student can answer by matching the first letter of the acronym to the option, without clinical reasoning.",
+    "suggestion": "Drop the acronym from the stem ('What is the first action when he loses consciousness in the chair?') and use unlabeled action options, e.g. lay him supine with legs level or slightly raised / check the carotid pulse / head tilt chin lift / give oxygen."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "Why-lines say B 'follows positioning and circulation' and A 'follows positioning, circulation and airway', which only restates the acronym. Memory cue is a restatement of the key.",
+    "suggestion": "Add the clinical reason: supine positioning restores cerebral blood flow and is needed before airway and pulse checks."
+   }
+  ]
+ },
+ {
+  "id": "R04",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The box says he lost consciousness 'with arm jerks'. The stem drops that finding, so students are not asked to weigh convulsive syncope against seizure. B is defensible on the box as written, and the explanation and the B why-line never address the arm jerks. R05 then treats recurring arm jerks as a seizure.",
+    "suggestion": "Add to the stem or explanation that brief myoclonic jerks occur in convulsive syncope; the discriminators are the trigger, pallor and nausea prodrome, and recovery within 30 seconds without postictal confusion. Add 'no tongue biting, incontinence or confusion afterward' to the box."
+   },
+   {
+    "check": "rationale",
+    "severity": "medium",
+    "detail": "Why-line D ('not the pattern asked about here') and C are circular or vague; D does not say why stroke is wrong (transient, trigger-linked, full recovery, young patient). Why B only says 'fits better'.",
+    "suggestion": "Give a concrete reason for each distractor (stroke gives persistent focal deficits; seizure gives postictal confusion and longer unresponsiveness; hypoglycemia needs a glucose disorder or fasting and recovers with sugar)."
+   }
+  ]
+ },
+ {
+  "id": "R05",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "Distractors are all 'don'ts' that are widely known; C ('before he has fully regained alertness') is long and signals the error.",
+    "suggestion": "Shorten C to 'Give him water to drink'. Optionally add 'call 911 if it lasts over 5 minutes' to key to match the cited fact."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "CDC bystander guidance is not the dental-office protocol (the fact record warns about this); the stem names CDC, so the key stands.",
+    "suggestion": "Optionally add 'in the chair' realism in the explanation (stop treatment, remove instruments, protect from the chair, then CDC steps)."
+   }
+  ]
+ },
+ {
+  "id": "R06",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "Three distractors are absurd: observing 20 minutes, calling the physician tomorrow, and resuming the restoration. Only C names an emergency action, so students can answer from common sense without knowing stroke management.",
+    "suggestion": "Use plausible office errors: give aspirin 325 mg, lay him supine and monitor with oxygen for 20 minutes, check a fingerstick glucose first and treat if low, give nitroglycerin."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The stem introduces a new event not in the box (a stroke after the faint). Plausible in sickle cell disease, but the box lists no stroke risk, and the earlier arm jerks could be read as a first sign.",
+    "suggestion": "Put 'He then develops...' in the box findings or tie it to sickle cell stroke risk."
+   },
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "'B.E. F.A.S.T.' is typed with a stray space and dotted style in the option and why-line; the CDC says 'BE FAST'.",
+    "suggestion": "Write 'BE FAST' consistently."
+   }
+  ]
+ },
+ {
+  "id": "R07",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "Key C is a straw man: 'antibiotics at each visit and delay care for one year' is absurd and the only option with absolutes ('each visit'); A, B and D are near restatements of ADA wording. Students can pick it without knowing the guideline.",
+    "suggestion": "Replace with a subtler unsupported plan, e.g. 'Prescribe amoxicillin 2 g one hour before every visit for the life of the implant' alongside plausible options, or make it a positive-wording question."
+   },
+   {
+    "check": "distractor",
+    "severity": "medium",
+    "detail": "C bundles two ideas (each-visit antibiotics and a one-year delay), so the reason it is unsupported is unclear. The 'one-year' delay is not in any cited fact and matches no current ADA recommendation (older advice was 2 years).",
+    "suggestion": "Test one idea per option."
+   },
+   {
+    "check": "rationale",
+    "severity": "medium",
+    "detail": "The explanation calls the 'tempting wrong answer' a blanket precaution, which is the keyed option itself, confusing students in a NOT item. It also says 'ADA guidance does not support ... routine delays' only through PJ-3, whose quote concerns shared decision making.",
+    "suggestion": "Rewrite: 'C is the only plan the ADA does not support; prosthetic joint alone does not call for prophylaxis or a fixed delay.'"
+   }
+  ]
+ },
+ {
+  "id": "R08",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "Why-lines for B and C ('not identified as highest-risk') are vague; curing lights and manual instruments are not in the cited source.",
+    "suggestion": "Say that manual instruments are non-electric and a LED curing light emits no meaningful electromagnetic field."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "'Greatest reported risk' wording matches the ADA key point; the stable ICD patient with scaling planned makes the item relevant. Fine as a level-1 recall item.",
+    "suggestion": "None required."
+   }
+  ]
+ },
+ {
+  "id": "R09",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "INR 3.4 is above the ADA 'therapeutic range (3.0 or less)' quoted in the same fact record; continuing warfarin rests on the AAOM 3.5 figure, which the bank adopts as a teaching rule. The box gives no INR target (AF target is usually 2.0 to 3.0), so a supratherapeutic INR could reasonably prompt a call to the prescriber, and a student who recalls the ADA 3.0 figure could argue against D. R01 simultaneously teaches 3.5 as the line.",
+    "suggestion": "Add that the prescriber targets INR 2.0 to 3.5 or state the 3.5 limit, or use an INR of 2.8; explanation should note the 3.0 versus 3.5 sources."
+   },
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "Distractors A, B and C are implausible (7-day stop with heparin bridge, swapping to aspirin, no hemostatic measures); the key is the only option containing 'local hemostatic measures'.",
+    "suggestion": "Use plausible alternatives: stop warfarin 2 days, reduce the dose, obtain a repeat INR first, refer to hospital."
+   },
+   {
+    "check": "copy",
+    "severity": "low",
+    "detail": "Duplicates the R01 teaching point (same drug, same rule, same condition); the two items cue each other if both appear in a set.",
+    "suggestion": "Differentiate (for example this item covers DOACs, or the extraction is surgical)."
+   }
+  ]
+ },
+ {
+  "id": "R10",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The cartridge volume is not stated (1.7 to 1.8 mL); 0.04 mg is about 2.2 cartridges at 0.018 mg, so 'about 2' relies on the ADA conversion. The box does not say the patient needs the limit (stable CAD, ASA II to III), but the stem sets the premise.",
+    "suggestion": "Add 'standard 1.8 mL cartridges'."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "Why-line A says one cartridge is 'about half' of 0.04 mg (actually about 45 percent).",
+    "suggestion": "Say 'a bit under half'."
+   }
+  ]
+ }
+]

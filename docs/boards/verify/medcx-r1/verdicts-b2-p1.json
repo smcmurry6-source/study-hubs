@@ -1,0 +1,224 @@
+[
+ {
+  "id": "R01",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "medium",
+    "detail": "The explanation calls clindamycin 'the tempting wrong answer', but clindamycin (option B) is the keyed answer. A reader is told the key is wrong.",
+    "suggestion": "Rewrite: 'The tempting choice is to treat clindamycin as the standard penicillin-allergy alternative, but the AHA no longer recommends it.'"
+   },
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "Stem 'Each of the following statements matches ... EXCEPT one. Which is the EXCEPTION?' is wordy and redundant.",
+    "suggestion": "Use: 'All of the following match the AHA dental prophylaxis recommendations for an adult with a prosthetic valve EXCEPT:'"
+   }
+  ]
+ },
+ {
+  "id": "R02",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A (aspirin swap) and D (stop a week and bridge with heparin) are weak, and B is easily eliminated if the student knows apixaban needs no INR.",
+    "suggestion": "Optionally make a distractor more tempting, e.g. 'Hold the morning dose on the day of extraction without calling the physician'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The patient takes a DOAC plus clopidogrel, which raises bleeding risk. The cited fact allows delaying the dose with physician input for higher-risk procedures. 'Continue' is still best for one simple extraction, but the combination is not acknowledged.",
+    "suggestion": "Optionally add to the stem 'with local hemostatic measures available' or note in the explanation that any timing change would go through the physician."
+   }
+  ]
+ },
+ {
+  "id": "R03",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "medium",
+    "detail": "The explanation says a short drug holiday 'changes dual therapy'. This patient is on clopidogrel plus apixaban, which is not dual antiplatelet therapy.",
+    "suggestion": "Replace 'dual therapy' with 'her stent-protecting antiplatelet therapy'."
+   },
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "B is the only option that involves the cardiologist and the only one that does not change the drug; A says 'without contacting the cardiologist', which marks it wrong. A student can pick B without knowing the content.",
+    "suggestion": "Make the wrong options plausible, e.g. 'Stop it 7 days after the extraction is planned, after telling the patient'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "Case-set leak: the R04 stem ('avoid an uncoordinated interruption') reveals R03's answer.",
+    "suggestion": "Reword R04 so it does not presuppose that interruption is to be avoided."
+   }
+  ]
+ },
+ {
+  "id": "R04",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "key",
+    "severity": "medium",
+    "detail": "The stem says 'her dual antiplatelet therapy', but the box lists one antiplatelet (clopidogrel) plus an anticoagulant (apixaban). This is a false premise, and the cited fact (AC-4) is about DAPT.",
+    "suggestion": "Change to 'stopping her clopidogrel early after a coronary stent'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The stem presupposes that an uncoordinated interruption should be avoided, which gives away R03's answer.",
+    "suggestion": "Ask neutrally: 'What is the most serious risk of prematurely stopping clopidogrel 5 months after a coronary stent?'"
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A (rebound hypertension) and D (reduced anesthetic duration) are implausible, and C (INR) is weak.",
+    "suggestion": "Use more plausible risks, e.g. prolonged bleeding after the extraction, or infective endocarditis."
+   }
+  ]
+ },
+ {
+  "id": "R05",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "The stem asks for a 'local approach', so A (systemic vitamin K) is excluded by its wording. B and C are absurd strawmen. D is the only sensible choice, so a student can answer without content knowledge.",
+    "suggestion": "Make the distractors plausible local or related measures, e.g. 'Delay extraction until the stent is 12 months old', 'Place a figure-eight suture only and no hemostatic agent', or 'Use topical epinephrine alone'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The stem phrase 'while her antithrombotic medicines are continued' reveals the answers to R02 and R03.",
+    "suggestion": "Reword to 'Which local measure helps control post-extraction bleeding in this patient?'"
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The why line for A ('not the local hemostasis approach') is not the real reason. Vitamin K does not reverse apixaban or clopidogrel and would remove protection.",
+    "suggestion": "State that vitamin K does not reverse either drug and that reversal is not needed."
+   }
+  ]
+ },
+ {
+  "id": "R06",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "style",
+    "severity": "medium",
+    "detail": "C 'Neither' works as 'none of the above' (and the list has three items, so 'Neither' is also imprecise). The rules prohibit that option form. A student can also eliminate A, because aspirin use is not a cardiac history.",
+    "suggestion": "Rewrite as: 'Which finding in this history is an AHA high-risk category for infective endocarditis prophylaxis?' with options such as coronary stent, pacemaker, prior infective endocarditis, or a prosthetic cardiac valve. Make one of the real categories the key, or ask the NOT form in capitals."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "'Routine prophylaxis and cleaning are planned' can be read as antibiotic prophylaxis already planned, which contradicts the key.",
+    "suggestion": "Use 'A dental prophylaxis (cleaning) is planned'."
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "A (aspirin use) is not a cardiac history, so it fails the stem's own wording.",
+    "suggestion": "Replace with a plausible condition, e.g. mitral valve prolapse or rheumatic heart disease."
+   }
+  ]
+ },
+ {
+  "id": "R07",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "citation",
+    "severity": "low",
+    "detail": "The cited quote prints 'Stage 2 > 140 or > 90', while the guideline is >=140 or >=90. The item's why-lines use 'at least', which is correct.",
+    "suggestion": "No change to the item; fix the fact record."
+   }
+  ]
+ },
+ {
+  "id": "R08",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The ADA table says '>160/100'. The reading is 172/98, so only the systolic value exceeds the cutoff. Students may wonder whether the diastolic must also exceed 100.",
+    "suggestion": "Make the box reading 172/102, or have the stem say 'systolic above 160 mm Hg'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The stem should name the 'ADA Practical Guide' so D (180/110, the ACC/AHA surgical threshold) cannot be argued.",
+    "suggestion": "Reword: 'According to the ADA Practical Guide, for a confirmed pressure before a routine cleaning...'"
+   },
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "C is the longest and most specific option.",
+    "suggestion": "Shorten C or lengthen the others."
+   }
+  ]
+ },
+ {
+  "id": "R09",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "citation",
+    "severity": "medium",
+    "detail": "The why line for D says removable-appliance adjustment is 'not an indicated procedure'. The cited facts (IE-4) list only placing removable appliances and adjusting orthodontic appliances. Adjusting a denture or removable appliance is not supported, and an adjustment that involves gingival contact could be argued.",
+    "suggestion": "Use 'Placing a removable prosthodontic appliance' or 'Adjusting an orthodontic appliance', which are in IE-4."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The stem is vague ('procedure feature', 'qualifying cardiac group') and sits apart from the box. Option A, checking blood pressure, is not a dental procedure at all.",
+    "suggestion": "Reword: 'Because of his cardiac history, which planned procedure would call for antibiotic prophylaxis?' with real dental procedures as distractors: radiographs, an anesthetic injection through noninfected tissue, placing a removable appliance, and scaling."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The cleaning in the box already implies the key.",
+    "suggestion": "Optional."
+   }
+  ]
+ },
+ {
+  "id": "R10",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "PJ-2 makes prophylaxis a consideration for a history of complications from the joint surgery. The box says only 'no prior joint infection', which does not rule out other complications such as loosening or revision.",
+    "suggestion": "Change the box to 'Prosthetic knee replacement 4 years ago; no complications since surgery'."
+   },
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "A and C are direct opposites. C's 'solely because a joint was replaced' is a transparent strawman that points to the key as its mirror image. The stem's verb 'require' sits oddly with a key that says no requirement.",
+    "suggestion": "Reword the stem as 'Which statement about the knee replacement alone is correct?' and make the distractors independent: a dental-consult requirement, a delay after surgery, or antibiotics only for a crown."
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "D (one-year delay) and B (antibiotics if a crown is present) are not realistic distractors.",
+    "suggestion": "Use known myths, e.g. 'Prophylaxis for 2 years after the replacement' (an older ADA/AAOS rule)."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "The why line for A mixes in the complication case, which the box does not describe.",
+    "suggestion": "Keep the why line to the 2015 ADA finding."
+   }
+  ]
+ }
+]
