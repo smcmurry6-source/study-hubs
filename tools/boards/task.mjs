@@ -94,11 +94,8 @@ function promptFor(briefPath, base) {
 }
 
 function startTask({ briefPath, branch, base, dryRun }) {
-  const existingRef = run('git', ['show-ref', '--verify', `refs/heads/${branch}`], {
-    capture: true,
-    allowedExitCodes: [0, 1],
-  });
-  if (existingRef) throw new Error(`Branch already exists: ${branch}`);
+  const existingBranch = run('git', ['branch', '--list', branch], { capture: true });
+  if (existingBranch) throw new Error(`Branch already exists: ${branch}`);
 
   const commands = [
     ['git', ['fetch', 'origin', base]],
