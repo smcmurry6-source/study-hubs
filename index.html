@@ -206,6 +206,12 @@ button{font:inherit; color:inherit; cursor:pointer;}
   font-size:clamp(76px, 12vw, 136px); margin:14px 0 4px; display:flex; align-items:baseline; gap:.16em;
 }
 .hero-count small{font-size:.36em; letter-spacing:0; color:var(--ink-2);}
+/* the departure-board flip (heroFlap): four stacked copies, top and bottom halves, the old top folds down onto the new */
+.flap{display:inline-grid; perspective:700px;}
+.flap-l{grid-area:1 / 1; backface-visibility:hidden;}
+.flap-top, .flap-fold{clip-path:inset(-10% -10% 50% -10%);}
+.flap-bot, .flap-unfold{clip-path:inset(50% -10% -10% -10%);}
+.flap-fold, .flap-unfold{transform-origin:50% 50%;}
 .hero-title{font-size:clamp(20px, 2.4vw, 25px); font-weight:600; letter-spacing:-.01em; line-height:1.25; max-width:26ch;}
 .hero-date{color:var(--ink-2); font-size:15px; margin-top:4px;}
 .hero-actions{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:26px;}
@@ -1049,6 +1055,32 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){});
   });
   setInterval(function(){ if (!document.hidden) loadLuck(); }, 90 * 1000);
+  /* the countdown flips like a departure board: through each day that has passed since your last visit (and live at
+     midnight), or in from blank when nothing changed. The last number shown is kept in sh_dash_flap. */
+  var flapShown = {};
+  function heroFlap(first){
+    var el = document.querySelector("#heroMain .flap"); if (!el) return;
+    var to = el.getAttribute("data-flap"), k = first.hub.id + "|" + first.exam.date, seen = null;
+    try{ seen = JSON.parse(localStorage.getItem("sh_dash_flap") || "null"); }catch(e){}
+    try{ localStorage.setItem("sh_dash_flap", JSON.stringify({ k:k, v:to })); }catch(e){}
+    var again = flapShown[k] === to; flapShown[k] = to;
+    if (again || !el.animate || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    var from = seen && seen.k === k && String(seen.v) !== to ? String(seen.v) : "", steps = [];
+    var a = parseInt(from, 10), b = to === "Today" ? 0 : parseInt(to, 10);
+    if (!isNaN(a) && !isNaN(b) && a > b + 1 && a - b <= 8) for (var v = a - 1; v > b; v--) steps.push(v === 0 ? "Today" : String(v));
+    steps.push(to);
+    var cur = from, i = 0, half = steps.length > 1 ? 120 : 190;
+    (function next(){
+      if (!el.isConnected) return;
+      if (i >= steps.length){ el.textContent = to; return; }
+      var nx = steps[i++];
+      el.innerHTML = '<span class="flap-l flap-top">' + esc(nx) + '</span><span class="flap-l flap-bot">' + esc(cur) + '</span>' +
+        '<span class="flap-l flap-fold">' + esc(cur) + '</span><span class="flap-l flap-unfold">' + esc(nx) + '</span>';
+      el.querySelector(".flap-fold").animate([{ transform:"rotateX(0deg)", opacity:1 }, { transform:"rotateX(-90deg)", opacity:.55 }], { duration:half, easing:"ease-in", fill:"forwards" });
+      el.querySelector(".flap-unfold").animate([{ transform:"rotateX(90deg)", opacity:.55 }, { transform:"rotateX(0deg)", opacity:1 }],
+        { duration:half * 1.3, delay:half, easing:"cubic-bezier(.3,1.6,.6,1)", fill:"both" }).onfinish = function(){ cur = nx; next(); };
+    })();
+  }
   function renderHero(){
     var up = upcomingExams(), first = up[0] || null, hub, cls;
     if (first) hub = first.hub;
@@ -1067,7 +1099,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var also = up.slice(1).filter(function(x){ return x.d <= 14; });
       html =
         '<div class="hero-kicker"><span class="code">' + esc(first.exam.code || hub.code) + '</span><span>Next exam</span></div>' +
-        '<div class="hero-count">' + (d === 0 ? "Today" : d + "<small>" + (d === 1 ? "day to go" : "days to go") + "</small>") + '</div>' +
+        '<div class="hero-count"><span class="flap" data-flap="' + (d === 0 ? "Today" : d) + '">' + (d === 0 ? "Today" : d) + '</span>' + (d === 0 ? "" : "<small>" + (d === 1 ? "day to go" : "days to go") + "</small>") + '</div>' +
         '<div class="hero-title">' + esc((d === 0 ? "" : "until ") + first.exam.name) + '</div>' +
         '<div class="hero-date">' + esc(longDate(first.exam.date)) + '</div>' +
         '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
@@ -1087,6 +1119,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a>' + heroDrill(hub) + '</div>';
     }
     $("heroMain").innerHTML = html;
+    if (first) heroFlap(first);
     luckFor = first && luckTime(first.d) ? { hub:hub.id, date:first.exam.date, name:first.exam.name, d:first.d } : null;
     drawLuck(); loadLuck();
 
