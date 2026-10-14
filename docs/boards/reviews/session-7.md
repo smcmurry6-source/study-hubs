@@ -52,7 +52,7 @@ Revise PR #81 (T-04) on branch codex/boards-t04-int-cards. All six Session 6 poi
 
 Practice and Missed share STATE.ui.bankAt, so opening Missed clamps it to the missed list and going back to Practice lands on the wrong question (Practice at item 12, open Missed with 2 items, back to Practice: item 2). Give Missed its own index (STATE.ui.missedAt), with the same keep-index-when-the-item-left-the-pool rule on Next. Add a walk-through step: Practice to item 3, open Missed, back to Practice, still item 3.
 
-Then merge claude/boards-hub (after #80 lands, rerun node tools/build-boards.js instead of resolving hubs/boards/index.html), node tools/build-boards.js --check, node tools/ci/syntax.js, the walk-through, and paste the results.
+Then merge claude/boards-hub (#80 has landed, so hubs/boards/index.html will conflict: take either side and rerun node tools/build-boards.js, never resolve it by hand), node tools/build-boards.js --check, node tools/ci/syntax.js, the walk-through, and paste the results.
 ```
 
 ### #87 (T-03)
