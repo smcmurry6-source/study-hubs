@@ -1218,5 +1218,230 @@
   "url": "https://openstax.org/books/pharmacology/pages/2-2-pharmacokinetics-and-pharmacodynamics",
   "kind": "html",
   "date": "2024"
+ },
+ "aae-diagnosis-2013": {
+  "title": "Endodontic Diagnosis: ENDODONTICS: Colleagues for Excellence",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/newsletter/endodontic-diagnosis/",
+  "fetch": "https://www.aae.org/specialty/wp-content/uploads/sites/2/2023/12/Fall2013-EndoDiagnosis.pdf",
+  "kind": "pdf",
+  "date": "2013"
+ },
+ "endo-pulp-tests-2010": {
+  "title": "Dental Pulp Testing: A Review",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "citation": "Jafarzadeh H, Rosenberg PA. Int Endod J 2010;43:738-762",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2837315/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC2837315/fullTextXML",
+  "kind": "xml",
+  "date": "2010"
+ },
+ "aae-antibiotics-2017": {
+  "title": "AAE Guidance on the Use of Systemic Antibiotics in Endodontics",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/wp-content/uploads/sites/2/2017/06/aae_systemic-antibiotics.pdf",
+  "kind": "pdf",
+  "date": "2017"
+ },
+ "endo-cracked-tooth-2012": {
+  "title": "Diagnosis of cracked tooth syndrome",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3467890/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3467890/fullTextXML",
+  "kind": "xml",
+  "date": "2012"
+ },
+ "endo-vrf-2022": {
+  "title": "Vertical Root Fracture in Non-Endodontically and Endodontically Treated Teeth: Current Understanding and Future Challenge",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8707645/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8707645/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "aae-cracks-2022": {
+  "title": "Cracked Teeth and Vertical Root Fractures: A New Look at a Growing Problem",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/wp-content/uploads/sites/2/2022/12/ecfe-2022-edition-FINAL.pdf",
+  "kind": "pdf",
+  "date": "2022"
+ },
+ "endo-nonodontogenic-2013": {
+  "title": "Diagnostic challenges of nonodontogenic toothache",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3569403/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3569403/fullTextXML",
+  "kind": "xml",
+  "date": "2013"
+ },
+ "endo-odontogenic-sinusitis-2022": {
+  "title": "Odontogenic sinusitis: A state-of-the-art review",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9126162/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9126162/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "aae-vpt-2021": {
+  "title": "AAE Position Statement on Vital Pulp Therapy",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/wp-content/uploads/2021/05/VitalPulpTherapyPositionStatement_v2.pdf",
+  "kind": "pdf",
+  "date": "2021"
+ },
+ "aae-glossary-2020": {
+  "title": "Glossary of Endodontic Terms, Tenth Edition",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/clinical-resources/glossary-endodontic-terms/",
+  "fetch": "https://www.aae.org/specialty/?wpdmdl=11847",
+  "kind": "pdf",
+  "date": "2020"
+ },
+ "endo-phenotype-anatomy-2021": {
+  "title": "A novel system for classifying tooth root phenotypes",
+  "org": "Peer-reviewed anatomy study (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8570528/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8570528/fullTextXML",
+  "kind": "xml",
+  "date": "2021"
+ },
+ "endo-mandibular-incisors-2022": {
+  "title": "Root canal anatomy of human permanent mandibular incisors and mandibular canines: A systematic review",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9274686/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9274686/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "endo-premolar-anatomy-2024": {
+  "title": "Systematic review and meta-analysis of root morphology and canal configuration of permanent premolars using cone-beam computed tomography",
+  "org": "Peer-reviewed systematic review and meta-analysis (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11149329/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11149329/fullTextXML",
+  "kind": "xml",
+  "date": "2024"
+ },
+ "endo-mandibular-premolars-2013": {
+  "title": "Root Anatomy and Root Canal Configuration of Human Permanent Mandibular Premolars: A Systematic Review",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3881342/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3881342/fullTextXML",
+  "kind": "xml",
+  "date": "2013"
+ },
+ "endo-maxillary-first-molar-2022": {
+  "title": "Evaluation of Root Anatomy and Canal Configuration of Human Permanent Maxillary First Molar Using Cone-Beam Computed Tomography: A Systematic Review",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9408299/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9408299/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "endo-maxillary-molar-mb2-2018": {
+  "title": "Locating the second mesiobuccal canal in maxillary molars: challenges and solutions",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6159800/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6159800/fullTextXML",
+  "kind": "xml",
+  "date": "2018"
+ },
+ "endo-mandibular-first-molar-2023": {
+  "title": "Root and canal anatomy of mandibular first molars using micro-computed tomography: a systematic review",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10228077/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10228077/fullTextXML",
+  "kind": "xml",
+  "date": "2023"
+ },
+ "endo-mandibular-second-molar-2022": {
+  "title": "Root anatomy and canal configuration of human permanent mandibular second molar: A systematic review",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8896125/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8896125/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "endo-working-length-2016": {
+  "title": "Determination of Working Length of Root Canal",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4921252/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4921252/fullTextXML",
+  "kind": "xml",
+  "date": "2016"
+ },
+ "endo-imaging-2025": {
+  "title": "The role of imaging in endodontics",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11991906/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11991906/fullTextXML",
+  "kind": "xml",
+  "date": "2025"
+ },
+ "endo-irrigation-2024": {
+  "title": "Expert consensus on irrigation and intracanal medication in root canal therapy",
+  "org": "Peer-reviewed expert consensus (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10907616/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10907616/fullTextXML",
+  "kind": "xml",
+  "date": "2024"
+ },
+ "endo-obturation-2014": {
+  "title": "Ability of New Obturation Materials to Improve the Seal of the Root Canal System: A Review",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3939610/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3939610/fullTextXML",
+  "kind": "xml",
+  "date": "2014"
+ },
+ "endo-resorption-2022": {
+  "title": "Present status and future directions: Root resorption",
+  "org": "Peer-reviewed review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9790676/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9790676/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "iadt-fractures-2020": {
+  "title": "IADT Guidelines: Fractures and Luxations of Permanent Teeth",
+  "org": "International Association of Dental Traumatology; endorsed by the American Academy of Pediatric Dentistry",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/e_iadt-fractures.pdf",
+  "kind": "pdf",
+  "date": "2020"
+ },
+ "iadt-avulsion-2020": {
+  "title": "IADT Guidelines: Avulsion of Permanent Teeth",
+  "org": "International Association of Dental Traumatology; endorsed by the American Academy of Pediatric Dentistry",
+  "url": "https://www.aapd.org/globalassets/media/policies_guidelines/e_iadt-avulsion.pdf",
+  "kind": "pdf",
+  "date": "2020"
+ },
+ "aae-retreatment-2019": {
+  "title": "Treatment Standards: Standards in Endodontic Retreatment",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/wp-content/uploads/sites/2/2019/11/TreatmentStandards_2019.pdf",
+  "kind": "pdf",
+  "date": "2019"
+ },
+ "endo-outcomes-cos-2025": {
+  "title": "COS-ENDO: Elevating Evidence-Based Endodontics Through Standardized Outcomes",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/cos-endo-elevating-evidence-based-endodontics-through-standardized-outcomes/",
+  "kind": "html",
+  "date": "2025"
+ },
+ "aae-competency-2017": {
+  "title": "Endodontic Competency White Paper",
+  "org": "American Association of Endodontists",
+  "url": "https://www.aae.org/specialty/wp-content/uploads/sites/2/2017/09/EndodonticCompetency_WhitePaper_v2.pdf",
+  "kind": "pdf",
+  "date": "2017"
+ },
+ "endo-restoration-2013": {
+  "title": "Impact of the quality of coronal restoration versus the quality of root canal fillings on success of root canal treatment: a systematic review and meta-analysis",
+  "org": "Peer-reviewed systematic review (open access, Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3815527/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3815527/fullTextXML",
+  "kind": "xml",
+  "date": "2013"
  }
 }
