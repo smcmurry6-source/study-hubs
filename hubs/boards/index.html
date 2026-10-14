@@ -421,7 +421,7 @@ function defaultState(){
     activeDates:{},       // 'YYYY-MM-DD' -> true
     lastActiveDate:null,
     retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
-    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, caseProgress:{}, caseId:null, caseReview:false }
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, missedAt:0, caseProgress:{}, caseId:null, caseReview:false }
   };
 }
 function loadState(){
@@ -802,8 +802,8 @@ function renderMissed(){
   if(!standalones.length && !missedCases.length) return emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
   var html = '';
   if(standalones.length){
-    var at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), standalones.length - 1), q = standalones[at];
-    STATE.ui.bankAt = at;
+    var at = Math.min(Math.max(0, +STATE.ui.missedAt || 0), standalones.length - 1), q = standalones[at];
+    STATE.ui.missedAt = at;
     html += '<h3 class="bank-section-title">Missed questions</h3><div class="bank-practice"><div class="bank-card-host" data-bank-qid="' + esc(q.id) + '"></div>' +
       '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + standalones.length + '</span><span class="btn-row" style="margin:0">' +
       '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
@@ -903,12 +903,13 @@ function wireBank(){
   el.addEventListener('click', function(e){
     var step = e.target.closest('[data-bank-step]');
     if(step){
-      var delta = +step.getAttribute('data-bank-step'), at = +STATE.ui.bankAt || 0;
+      var delta = +step.getAttribute('data-bank-step'), isMissed = (STATE.ui.sub.bank || 'practice') === 'missed';
+      var indexKey = isMissed ? 'missedAt' : 'bankAt', at = +STATE.ui[indexKey] || 0;
       var host = $('[data-bank-qid]', el), qid = host && host.getAttribute('data-bank-qid');
-      var available = (STATE.ui.sub.bank || 'practice') === 'missed' ? missedStandalonePool() : bankPool();
+      var available = isMissed ? missedStandalonePool() : bankPool();
       var currentStillAvailable = qid && available.some(function(q){ return q.id === qid; });
       var keepIndex = delta > 0 && qid && !currentStillAvailable;
-      STATE.ui.bankAt = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
+      STATE.ui[indexKey] = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
     }
     if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
     var open = e.target.closest('[data-case-open]');

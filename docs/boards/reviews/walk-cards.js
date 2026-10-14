@@ -59,6 +59,47 @@ const steps = [
     }
   },
   {
+    slug: 'missed-preserves-practice-index',
+    name: 'Missed preserves the current Practice question',
+    run: async function (page) {
+      await enterBank(page, 'practice');
+      const missedIds = [await currentQid(page)];
+      for (let i = 0; i < 2; i++) {
+        const oldQid = await currentQid(page);
+        await page.locator(panel + ' [data-bank-step="1"]').click();
+        await page.waitForFunction(function (qid) {
+          const card = document.querySelector('#panel-bank .qcard');
+          return card && card.getAttribute('data-qid') !== qid;
+        }, oldQid, { timeout: 5000 });
+      }
+      const thirdQid = await currentQid(page);
+      missedIds.push(thirdQid);
+      assert.ok(missedIds[0] && thirdQid && missedIds[0] !== thirdQid, 'Fixture needs at least three standalone Practice items');
+      await page.evaluate(function (ids) {
+        const state = JSON.parse(localStorage.getItem('boards-state-v1'));
+        ids.forEach(function (id) {
+          state.answered[id] = { lastCorrect: false, n: 1, t: '2026-10-14', first: false, choice: 0 };
+        });
+        localStorage.setItem('boards-state-v1', JSON.stringify(state));
+      }, missedIds);
+      await page.reload({ waitUntil: 'load' });
+      await waitForPublicApp(page);
+      await enterBank(page, 'missed');
+      await waitForQid(page, panel + ' .qcard', missedIds[0]);
+      assert.equal(await page.locator(panel + ' .qnav .faint').innerText(), '1 of 2', 'Missed should open at its independent first item');
+      const indexes = await page.evaluate(function () {
+        const ui = JSON.parse(localStorage.getItem('boards-state-v1')).ui;
+        return { practice: ui.bankAt, missed: ui.missedAt };
+      });
+      assert.equal(indexes.practice, 2, 'Opening Missed must preserve Practice item 3');
+      assert.equal(indexes.missed, 0, 'Missed should keep its own independent first index');
+      await page.locator(panel + ' .subtabs [data-sub="practice"]').click();
+      await waitForSub(page, 'practice');
+      await waitForQid(page, panel + ' .qcard', thirdQid);
+      return 'Practice item 3 stayed selected after opening Missed with two items';
+    }
+  },
+  {
     slug: 'new-only-no-skips',
     name: 'New only reaches every unanswered item without skips',
     run: async function (page) {
@@ -122,6 +163,7 @@ const steps = [
         data.ids.forEach(function (id) {
           state.answered[id] = { lastCorrect: false, n: 1, t: '2026-10-13', first: false, choice: 0 };
         });
+        state.ui.missedAt = 1;
         localStorage.setItem('boards-state-v1', JSON.stringify(state));
       }, { ids: ids });
       await page.reload({ waitUntil: 'load' });
