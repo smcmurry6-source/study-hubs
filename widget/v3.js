@@ -1167,6 +1167,7 @@
     else if (Array.isArray(d.picks) && d.picks.length) safeRpc("record_choices", { p_hub: HUB, p_qid: String(d.qid || ""), p_choices: d.picks });
     safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
+    var prevStreak = sessionCorrectStreak;
     if (isCorrect) {
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
@@ -1182,6 +1183,8 @@
     } else {
       sessionCorrectStreak = 0;
     }
+    /* the streak flame (widget/fx.js) follows this same in-page run */
+    try { document.dispatchEvent(new CustomEvent("sh:streak", { detail: { n: sessionCorrectStreak, prev: prevStreak } })); } catch (e) {}
   });
   /* ---------- progress sync across devices (migration_v34) ----------
      Every answer is saved per person in personal_answers (above), and "Link my devices" moves a device's rows
@@ -2229,6 +2232,13 @@
     var timmyScript = document.createElement("script");
     timmyScript.src = new URL("timmy.js", thisScript.src).href; timmyScript.async = true;
     document.head.appendChild(timmyScript);
+  }
+  /* motion (widget/fx.js): answer feedback, the streak flame, bar fills, view fades, the exam-day countdown pill and the mock results card */
+  if (!EXPORT_ONLY) {
+    var fxScript = document.createElement("script");
+    fxScript.src = new URL("fx.js", thisScript.src).href; fxScript.async = true;
+    fxScript.onload = function(){ if (window.shFx) window.shFx.mount(window.shEggHooks); };
+    document.head.appendChild(fxScript);
   }
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {

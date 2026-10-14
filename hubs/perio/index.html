@@ -4020,9 +4020,13 @@ function submitMockExam(){
   EXAM_STATE.finishedElapsed = Date.now() - EXAM_STATE.startedAt;
   if(EXAM_STATE.timer){ clearInterval(EXAM_STATE.timer); EXAM_STATE.timer = null; }
   EXAM_STATE.pool.forEach(function(q){ recordAnswer(q.id, q.lec, examPoints(q) === 1, (q.type === 'mcq' || q.type === 'multi') ? EXAM_STATE.answers[q.id] : undefined); });
-  /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) */
+  /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) and its results card (widget/fx.js) */
   var nRight = EXAM_STATE.pool.filter(function(q){ return examPoints(q) === 1; }).length;
-  document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:EXAM_STATE.pool.length } }));
+  var byLec = LECTURES.map(function(l){
+    var qs = EXAM_STATE.pool.filter(function(q){ return q.lec === l.id; });
+    return { label: 'S' + l.num + ' · ' + l.title.split(':')[0].split(',')[0], correct: qs.filter(function(q){ return examPoints(q) === 1; }).length, total: qs.length };
+  }).filter(function(x){ return x.total; });
+  document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:EXAM_STATE.pool.length, byLec:byLec } }));
   EXAM_STATE.phase = 'results'; renderCompendiumContent(); window.scrollTo({top:0});
 }
 var EXAM_KIND_LABEL = { mcq:'Multiple choice', multi:'Multiple answer', match:'Matching', order:'Ordering' };

@@ -39,6 +39,7 @@
   var IC_SKIP = svg('<path d="M6 12h12"/>');
   var IC_FLAME = svg('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
+  function still(){ try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } }
   function hook(){ var d = window.SH_DRILL; return d && typeof d.pool === "function" && typeof d.render === "function" ? d : null; }
   function esc(s){ return H.esc(s); }
   function today(){ return H.day(0); }
@@ -138,10 +139,12 @@
     return '<div class="shd-top"><span class="shd-kicker">' + IC_BOLT + 'Daily drill</span>' + (right || '') +
       '<button type="button" class="shd-x" data-shd="close" aria-label="Close the daily drill">&times;</button></div>';
   }
-  function streakLine(done){
+  /* roll: the set that was just finished started today's streak day, so the number rolls up from yesterday's */
+  function streakLine(done, roll){
     var n = streak(), counted = !!(lsGet(DAYS_KEY) || {})[today()];
     if (!n) return done ? '' : '<p class="shd-streak">' + IC_FLAME + 'Finish a set today to start a drill streak.</p>';
-    if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
+    var num = roll ? '<span class="shd-roll"><i class="o" aria-hidden="true">' + (n - 1) + '</i><i class="n">' + n + '</i></span>' : n;
+    if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + num + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
     return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak. Finish today\'s set to make it ' + (n + 1) + '.</span></p>';
   }
   function questionText(id){
@@ -195,9 +198,10 @@
     for (j = s.start || 0; j < i; j++) if (!has(s, s.items[j].id)) return j;
     return -1;
   }
+  var freshDay = false;   // the set just finished was the first one today (showDone rolls the streak number)
   function finishCheck(s){
     if (firstOpen(s) >= 0) return;
-    if (!s.done) { s.done = true; markDay(); }
+    if (!s.done) { s.done = true; freshDay = !(lsGet(DAYS_KEY) || {})[today()]; markDay(); }
   }
   function next(){
     var s = loadSet(); if (!s) { close(); return; }
@@ -214,21 +218,33 @@
     cur = -1;
     var items = round(s), right = 0, wrong = 0, skipped = 0;
     items.forEach(function(it){ var r = s.res[it.id]; if (r === 1) right++; else if (r === 0) wrong++; else skipped++; });
-    var extra = (s.start || 0) > 0;
-    body.innerHTML = top() +
-      '<div class="shd-done-mark">' + IC_CHECK + '</div>' +
+    var extra = (s.start || 0) > 0, fresh = s.cheer !== s.items.length && right + wrong > 0, roll = fresh && freshDay;
+    freshDay = false;
+    /* the check draws itself, the score counts up, the results tick in one by one (CSS in v3.css) */
+    body.innerHTML = top() + '<div class="shd-done' + (fresh ? ' is-fresh' : '') + '">' +
+      '<div class="shd-done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="m5 12.5 4.2 4.2L19 7"/></svg></div>' +
       '<h2 id="shd-title">' + (extra ? 'Extra set done' : 'Drill done for today') + '</h2>' +
-      '<p class="shd-lead">' + (right + wrong ? right + ' of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
+      '<p class="shd-lead">' + (right + wrong ? '<b class="shd-cnt">' + right + '</b> of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
       '<p class="shd-how">' + (wrong ? (wrong === 1 ? 'The one you missed comes back tomorrow. ' : 'The ' + wrong + ' you missed come back tomorrow. ') : '') +
         (right ? 'The ones you got right come back in a day or two, a little later each time, and before the exam.' : '') + '</p>' +
-      streakLine(true) +
+      streakLine(true, roll) +
       '<div class="shd-actions"><button type="button" class="shd-btn is-primary" data-shd="more">' + SIZE + ' more</button>' +
       '<button type="button" class="shd-btn" data-shd="close">Close</button></div>' +
-      '<ol class="shd-results" aria-label="How you did">' + items.map(function(it){
+      '<ol class="shd-results" aria-label="How you did">' + items.map(function(it, i){
         var r = s.res[it.id], cls = r === 1 ? "ok" : r === 0 ? "bad" : "skip";
-        return '<li class="is-' + cls + '"><span class="shd-res-ic" role="img" aria-label="' + (r === 1 ? 'Right' : r === 0 ? 'Missed' : 'Skipped') + '">' + (r === 1 ? IC_CHECK : r === 0 ? IC_X : IC_SKIP) + '</span><span>' + esc(questionText(it.id)) + '</span></li>';
-      }).join("") + '</ol>';
-    if (s.cheer !== s.items.length && right + wrong) { s.cheer = s.items.length; saveSet(s); try { H.confetti(); } catch (e) {} }
+        return '<li class="is-' + cls + '" style="--i:' + Math.min(i, 14) + '"><span class="shd-res-ic" role="img" aria-label="' + (r === 1 ? 'Right' : r === 0 ? 'Missed' : 'Skipped') + '">' + (r === 1 ? IC_CHECK : r === 0 ? IC_X : IC_SKIP) + '</span><span>' + esc(questionText(it.id)) + '</span></li>';
+      }).join("") + '</ol></div>';
+    var cnt = body.querySelector(".shd-cnt");
+    if (cnt && right > 1 && !still()) {
+      var t0 = performance.now() + 250;
+      cnt.textContent = "0";
+      (function tick(now){
+        var u = Math.max(0, Math.min(1, (now - t0) / 700));
+        cnt.textContent = Math.round(right * (1 - Math.pow(1 - u, 3)));
+        if (u < 1 && cnt.isConnected) requestAnimationFrame(tick);
+      })(performance.now());
+    }
+    if (fresh) { s.cheer = s.items.length; saveSet(s); try { H.confetti(); } catch (e) {} }
     focusPanel();
   }
   function more(){

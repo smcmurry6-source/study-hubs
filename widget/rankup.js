@@ -11,7 +11,14 @@
                         medallion like a coin, rolls the numeral, fills that level's segment and throws a few sparks.
                         It doesn't block the page and goes away by itself.
    d = { from, fromLevel, to, level, xp, next_at, position, of } (the profile fields are optional).
-   Both bring their own CSS (the dashboard doesn't load widget/v3.css) and a short synthesized sound.
+   shRankUp.trophy(t) -> a trophy or hub mastery medal: the same kind of card as a level, the medal spins in like a
+                        coin, a shine sweeps across, sparks fly and it says how many classmates have it.
+                        t = { name, desc, eyebrow, ic (24-box icon path) or art (svg), pal (a PAL key), rarity: { n, total, label } or a function returning it }.
+   shRankUp.mock(m)  -> the mock exam results card: the score counts up while a ring fills, a verdict line, your best
+                        mock in this hub, one bar per lecture growing in turn, and a celebration at 90%+.
+                        m = { correct, total, hub, byLec: [{ label, correct, total }], prev (best score before, 0-1), quiet, missed() }.
+   All of them bring their own CSS (the dashboard doesn't load widget/v3.css) and a short synthesized sound, and they
+   take turns: one that arrives while another is showing waits for it to close.
    Reduced motion keeps the cards and fades and drops the shake, flash, flip and particles. */
 (function(){
   "use strict";
@@ -154,9 +161,56 @@
     '.sh-ru-fly{position:fixed; inset:0; z-index:10031; width:100%; height:100%; pointer-events:none;}' +
     '@media (prefers-reduced-motion: reduce){ .sh-ru *, .sh-ru-lv *{animation-duration:.01ms !important; animation-iteration-count:1 !important; animation-delay:0s !important; transition-duration:.01ms !important; transition-delay:0s !important;}' +
     '  .sh-ru-rays i{animation:none !important;} }';
+  /* the trophy card reuses the level card; the mock card is its own dialog */
+  var CSS2 =
+    '.sh-ru-tr .sh-ru-lv-medal{width:84px; height:84px;}' +
+    '.sh-ru-tr-name{display:block; margin-top:2px; font:400 25px/1.15 var(--font-display, Georgia, "Times New Roman", serif);}' +
+    '.sh-ru-tr-desc{margin-top:3px; font-size:13px; line-height:1.35; color:rgba(255,255,255,.82);}' +
+    '.sh-ru-tr-rare{margin-top:6px; font-size:12px; color:rgba(255,255,255,.66);} .sh-ru-tr-rare b{color:#fff; font-variant-numeric:tabular-nums;}' +
+    '.sh-ru-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}' +
+    '.sh-mk{position:fixed; inset:0; z-index:10040; color:#fff; opacity:0; transition:opacity .3s; -webkit-tap-highlight-color:transparent;' +
+    '  font-family:var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);}' +
+    '.sh-mk *{box-sizing:border-box;} .sh-mk.is-on{opacity:1;} .sh-mk.is-out{opacity:0;}' +
+    '.sh-mk-bg{position:absolute; inset:0; background:radial-gradient(60% 50% at 50% 38%, var(--mk-g, rgba(62,207,142,.18)), transparent 70%), rgba(7,5,12,.84);}' +
+    '.sh-mk .sh-ru-cv{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}' +
+    '.sh-mk-stage{position:absolute; inset:0; display:flex; overflow-y:auto; padding:24px 16px;}' +
+    '.sh-mk-card{position:relative; margin:auto; width:100%; max-width:440px; padding:22px 22px 20px; border-radius:24px; text-align:center;' +
+    '  background:linear-gradient(170deg, #211D29, #120F18); border:1px solid rgba(255,255,255,.12); box-shadow:0 30px 80px -20px rgba(0,0,0,.7), 0 0 60px -20px var(--mk-c);' +
+    '  transform:translateY(18px) scale(.96); transition:transform .5s cubic-bezier(.2,1.2,.4,1);}' +
+    '.sh-mk.is-on .sh-mk-card{transform:none;}' +
+    '.sh-mk-eye{font-size:11.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.62);}' +
+    '.sh-mk-ring{position:relative; width:168px; height:168px; margin:14px auto 4px;}' +
+    '.sh-mk-ring svg{display:block; width:100%; height:100%; transform:rotate(-90deg); overflow:visible;}' +
+    '.sh-mk-ring circle{fill:none; stroke-width:9; stroke-linecap:round;} .sh-mk-ring .bg{stroke:rgba(255,255,255,.1);}' +
+    '.sh-mk-ring .fg{stroke:var(--mk-c); stroke-dasharray:100; stroke-dashoffset:100; filter:drop-shadow(0 0 6px var(--mk-c)); transition:stroke-dashoffset 1.25s cubic-bezier(.25,.8,.25,1);}' +
+    '.sh-mk-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:400 54px/1 var(--font-display, Georgia, "Times New Roman", serif); font-variant-numeric:tabular-nums;}' +
+    '.sh-mk-num span{font-size:.45em; margin-left:2px; color:rgba(255,255,255,.7);}' +
+    '.sh-mk.is-done .sh-mk-num b{animation:sh-mk-thump .45s cubic-bezier(.2,1.6,.4,1);}' +
+    '.sh-mk-frac{font-size:14px; color:rgba(255,255,255,.75); font-variant-numeric:tabular-nums;}' +
+    '.sh-mk-verdict{margin-top:10px; font:400 22px/1.25 var(--font-display, Georgia, "Times New Roman", serif); opacity:0; animation:sh-ru-up .5s 1.15s both;}' +
+    '.sh-mk-best{display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:4px 12px; border-radius:99px; font-size:13px; color:rgba(255,255,255,.8);' +
+    '  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); opacity:0; animation:sh-ru-up .5s 1.3s both;}' +
+    '.sh-mk-best.is-new{color:#17110A; font-weight:800; background:linear-gradient(180deg, #FFF1C2, #F6CD55); border-color:transparent; position:relative; overflow:hidden;}' +
+    '.sh-mk-best.is-new::after{content:""; position:absolute; top:0; bottom:0; left:-40%; width:30%; background:linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent); transform:skewX(-20deg); animation:sh-mk-shine 2.6s 1.8s ease-in-out infinite;}' +
+    '.sh-mk-lecs{list-style:none; margin:16px 0 0; padding:12px 0 0; border-top:1px solid rgba(255,255,255,.1); display:grid; gap:7px; text-align:left;}' +
+    '.sh-mk-lecs li{display:grid; grid-template-columns:minmax(0, 1fr) 34% 40px; align-items:center; gap:10px; font-size:13px; color:rgba(255,255,255,.82); opacity:0;' +
+    '  animation:sh-ru-left .45s both; animation-delay:calc(1.05s + var(--i) * .08s);}' +
+    '.sh-mk-lecs .l{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}' +
+    '.sh-mk-lecs .b{height:7px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden;}' +
+    '.sh-mk-lecs .b i{display:block; height:100%; width:var(--w); border-radius:inherit; background:var(--c); transform-origin:left; animation:sh-mk-grow .8s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(1.15s + var(--i) * .08s);}' +
+    '.sh-mk-lecs .n{text-align:right; font-variant-numeric:tabular-nums; color:rgba(255,255,255,.65);}' +
+    '.sh-mk-actions{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:18px; opacity:0; animation:sh-ru-up .45s 1.4s both;}' +
+    '.sh-mk-actions button{font:inherit; font-size:14.5px; font-weight:800; padding:11px 22px; border-radius:99px; cursor:pointer; border:1px solid rgba(255,255,255,.22); background:transparent; color:#fff;}' +
+    '.sh-mk-actions .sh-mk-go{border:0; color:#17110A; background:linear-gradient(180deg, #fff, var(--mk-c)); box-shadow:0 8px 24px -8px var(--mk-c);}' +
+    '.sh-mk-actions button:focus-visible{outline:3px solid #fff; outline-offset:3px;}' +
+    '@media (max-width:420px){ .sh-mk-card{padding:18px 16px;} .sh-mk-ring{width:140px; height:140px;} .sh-mk-num{font-size:46px;} .sh-mk-lecs li{grid-template-columns:minmax(0, 1fr) 30% 36px; gap:8px;} }' +
+    '@keyframes sh-mk-grow{from{transform:scaleX(0);}}' +
+    '@keyframes sh-mk-thump{0%{transform:scale(1);} 40%{transform:scale(1.14);} 100%{transform:scale(1);}}' +
+    '@keyframes sh-mk-shine{0%{left:-40%;} 60%,100%{left:130%;}}' +
+    '@media (prefers-reduced-motion: reduce){ .sh-mk *, .sh-mk{animation-duration:.01ms !important; animation-delay:0s !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;} }';
   function css(){
     if (document.getElementById("sh-ru-css")) return;
-    var s = document.createElement("style"); s.id = "sh-ru-css"; s.textContent = CSS;
+    var s = document.createElement("style"); s.id = "sh-ru-css"; s.textContent = CSS + CSS2;
     document.head.appendChild(s);
   }
 
@@ -369,8 +423,21 @@
     return out.map(function(h, i){ return '<li style="--i:' + i + '">' + h + '</li>'; }).join("");
   }
 
+  /* one celebration at a time: a mock result, a trophy, a level and a rank that land together play in turn */
+  var queue = [], playing = false;
+  function enqueue(run){ queue.push(run); if (!playing) nextUp(); }
+  function nextUp(){
+    var run = queue.shift();
+    if (!run) { playing = false; return; }
+    playing = true;
+    var called = false;
+    try { run(function(){ if (called) return; called = true; setTimeout(nextUp, 380); }); }
+    catch (e) { playing = false; nextUp(); }
+  }
+
   var open = null;
-  function tier(d){
+  function tier(d){ enqueue(function(done){ tierNow(d, done); }); }
+  function tierNow(d, done){
     css();
     if (open) open(true);
     var to = T[d.to], key = to.key, P = PAL[key], lvl = d.level || 1, fromLvl = d.fromLevel || 3, still = reduced();
@@ -420,6 +487,7 @@
       el.classList.add("is-out");
       setTimeout(function(){ if (sp) sp.kill(); el.remove(); }, now ? 0 : 480);
       if (prevFocus && prevFocus.focus && document.contains(prevFocus)) { try { prevFocus.focus({ preventScroll: true }); } catch (e) {} }
+      if (done) done();
     }
     open = close;
     function onKey(e){
@@ -498,7 +566,8 @@
 
   /* ---------- the level-up card ---------- */
   var lvClose = null;
-  function level(d){
+  function level(d){ enqueue(function(done){ levelNow(d, done); }); }
+  function levelNow(d, done){
     css();
     if (lvClose) lvClose(true);
     var t = T[d.to], key = t.key, P = PAL[key], lv = d.level || 2, old = d.fromLevel && d.fromLevel < lv ? d.fromLevel : Math.max(1, lv - 1), still = reduced();
@@ -523,6 +592,7 @@
       if (now || still || !el.animate) done();
       else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = done;
       if (sp) setTimeout(function(){ sp.kill(); cv.remove(); }, now ? 0 : 1600);
+      if (done) done();
     }
     lvClose = close;
     el.addEventListener("click", function(){ close(); });
@@ -556,5 +626,177 @@
     };
   }
 
-  window.shRankUp = { tier: tier, level: level };
+  /* ---------- the trophy card ---------- */
+  function sfxTrophy(){
+    var a = audio(); if (!a) return;
+    try {
+      var m = bus(a, .17), t = a.currentTime + .02;
+      [1046.5, 1318.5, 1568, 2093].forEach(function(f, i){ bell(a, m, f, t + i * .085, .9 + i * .15, .26); });
+      [3136, 2637, 3520, 4186].forEach(function(f, i){ bell(a, m, f, t + .42 + i * .06, .35, .06); });
+    } catch (e) {}
+  }
+  /* a medal with ribbon tails and the trophy's own icon engraved on it, in a rank's metal (gold by default) */
+  var tuid = 0;
+  function trophyArt(ic, px, key){
+    var P = PAL[key] || PAL.gold, id = "shtr" + (++tuid), ink = R.shade ? R.shade(P.n[0], -.55) : "#4A3405";
+    return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 80 80" aria-hidden="true"><defs>' +
+      '<radialGradient id="' + id + 'g" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="' + P.n[1] + '"/><stop offset=".55" stop-color="' + P.n[2] + '"/><stop offset="1" stop-color="' + P.n[0] + '"/></radialGradient>' +
+      '<linearGradient id="' + id + 'r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + P.n[1] + '"/><stop offset="1" stop-color="' + ink + '"/></linearGradient></defs>' +
+      '<path d="M27 50 18 77l10-4.6 5.6 7.6L39.5 57z" fill="#C2414B"/><path d="M53 50l9 27-10-4.6-5.6 7.6L40.5 57z" fill="#2F5FA8"/>' +
+      '<circle cx="40" cy="34" r="27" fill="url(#' + id + 'r)"/><circle cx="40" cy="34" r="23" fill="url(#' + id + 'g)"/>' +
+      '<circle cx="40" cy="34" r="19" fill="none" stroke="' + ink + '" stroke-opacity=".35" stroke-width="1.2"/>' +
+      '<g transform="translate(26 20) scale(1.1667)" fill="none" stroke="' + ink + '" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="' + ic + '"/></g>' +
+      '<path d="M23.5 27a17.5 17.5 0 0 1 12-11" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  }
+  function rarityLine(r){
+    if (!r || !r.total) return "";
+    if (!r.n) return "You're the first in the class to earn it.";
+    return "Earned by <b>" + fmt(r.n) + " of " + fmt(r.total) + "</b> classmates so far (" + esc(r.label) + ").";
+  }
+  function trophy(t){ enqueue(function(done){ trophyNow(t || {}, done); }); }
+  function trophyNow(t, done){
+    css();
+    var key = PAL[t.pal] ? t.pal : "gold", P = PAL[key], still = reduced(), eye = t.eyebrow || "Trophy unlocked";
+    var rare = typeof t.rarity === "function" ? t.rarity() : t.rarity;   // looked up now: class stats may have loaded since it was queued
+    var el = document.createElement("div");
+    el.className = "sh-ru-lv sh-ru-tr"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
+    el.setAttribute("aria-label", eye + ": " + (t.name || "") + (t.desc ? ". " + t.desc : ""));
+    vars(el, key);
+    el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' +
+        (t.art || trophyArt(t.ic || "M5 12l4 4 10-10", 84, key)) + '</div></div>' +
+      '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + esc(eye) + '</div>' +
+      '<span class="sh-ru-tr-name sh-ru-mt">' + esc(t.name || "") + '</span>' +
+      (t.desc ? '<div class="sh-ru-tr-desc">' + esc(t.desc) + '</div>' : '') +
+      (rare && rare.total ? '<div class="sh-ru-tr-rare">' + rarityLine(rare) + '</div>' : '') + '</div>' +
+      '<i class="sh-ru-lv-shine" aria-hidden="true"></i>';
+    document.body.appendChild(el);
+    var cv = null, sp = null, timers = [], closed = false;
+    if (!still) { cv = document.createElement("canvas"); cv.className = "sh-ru-fly"; cv.setAttribute("aria-hidden", "true"); document.body.appendChild(cv); sp = Sparks(cv, false); }
+    function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+    function close(now){
+      if (closed) return; closed = true; timers.forEach(clearTimeout);
+      var gone = function(){ el.remove(); };
+      if (now || still || !el.animate) gone();
+      else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = gone;
+      if (sp) setTimeout(function(){ sp.kill(); cv.remove(); }, now ? 0 : 1600);
+      if (done) done();
+    }
+    el.addEventListener("click", function(){ close(); });
+    var coin = el.querySelector(".sh-ru-lv-coin");
+    function land(){
+      if (closed) return;
+      if (!t.quiet) sfxTrophy();
+      if (!still) {
+        el.querySelectorAll(".sh-ru-lv-ring").forEach(function(r, i){
+          r.animate([{ transform: "scale(.9)", opacity: .95 }, { transform: "scale(" + (1.9 + i * .5) + ")", opacity: 0 }], { duration: 750 + i * 200, delay: i * 110, easing: "cubic-bezier(.1,.7,.3,1)", fill: "both" });
+        });
+        el.querySelector(".sh-ru-lv-shine").animate([{ opacity: 1, transform: "skewX(-20deg) translateX(0)" }, { opacity: 1, transform: "skewX(-20deg) translateX(720%)" }],
+          { duration: 900, delay: 100, easing: "cubic-bezier(.3,.6,.3,1)", fill: "both" });
+        if (!t.quiet) {
+          var c = sp.at(coin), cols = P.c.concat([P.n[1], P.glow, "#FFFFFF"]);
+          sp.burst(c.x, c.y, 52, { min: 160, max: 620, types: ["streak", "star", "star", "dot"], colors: cols, drag: .92, g: 360, life: [.6, 1.3], size: [1.6, 5.5], r: 28 });
+        }
+      }
+      later(close, 6200);
+    }
+    if (still || !el.animate) { land(); return; }
+    el.animate([{ opacity: 0, transform: "translateY(-30px) scale(.9)" }, { opacity: 1, transform: "none" }], { duration: 480, easing: "cubic-bezier(.2,1.3,.4,1)", fill: "both" });
+    /* the medal spins in edge-first, overshoots and settles */
+    coin.animate([{ transform: "rotateY(-720deg) scale(.15)", opacity: 0 }, { transform: "rotateY(-180deg) scale(.9)", opacity: 1, offset: .55 },
+      { transform: "rotateY(0deg) scale(1.22)", offset: .82 }, { transform: "none" }], { duration: 1150, delay: 120, easing: "cubic-bezier(.25,.6,.3,1)", fill: "both" })
+      .onfinish = land;
+  }
+
+  /* ---------- the mock exam results card ---------- */
+  var BAND = [[.9, "#F6CD55", "rgba(246,205,85,.22)"], [.75, "#3ECF8E", "rgba(62,207,142,.18)"], [.6, "#F0B44A", "rgba(240,180,74,.16)"], [0, "#F0806B", "rgba(240,128,107,.16)"]];
+  function band(p){ for (var i = 0; i < BAND.length; i++) if (p >= BAND[i][0]) return BAND[i]; return BAND[3]; }
+  function verdict(p){
+    return p >= .9 ? "Exam ready." : p >= .8 ? "Strong. Polish what you missed." : p >= .7 ? "Solid. Review the misses, then try another."
+      : p >= .6 ? "Getting there. The misses show you where to look." : "Good practice. Every miss is something you'll know next time.";
+  }
+  function sfxScore(top){
+    var a = audio(); if (!a) return;
+    try {
+      var m = bus(a, .16), t = a.currentTime + .02;
+      if (top) { [523.25, 659.25, 783.99, 1046.5].forEach(function(f, i){ brass(a, m, f, t + i * .085, .22, .07); }); [523.25, 659.25, 783.99, 1046.5].forEach(function(f){ brass(a, m, f, t + .36, 1.6, .05); }); }
+      else { bell(a, m, 1046.5, t, .7, .22); bell(a, m, 1568, t + .09, .9, .18); }
+    } catch (e) {}
+  }
+  function mock(m){ enqueue(function(done){ mockNow(m || {}, done); }); }
+  function mockNow(m, done){
+    css();
+    var total = Math.max(1, m.total | 0), right = Math.max(0, Math.min(total, m.correct | 0)), p = right / total, pct = Math.round(p * 100);
+    var B = band(p), still = reduced(), loud = !m.quiet, top = p >= .9;
+    var isBest = m.prev != null && pct > Math.round(m.prev * 100);
+    var bestLine = m.prev == null ? "Your first mock in this hub." : isBest ? "New personal best, up from " + Math.round(m.prev * 100) + "%" : "Your best here: " + Math.round(Math.max(m.prev, p) * 100) + "%";
+    var lecs = (m.byLec || []).filter(function(x){ return x && x.total > 0; });
+    var el = document.createElement("div");
+    el.className = "sh-mk"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "sh-mk-t"); el.tabIndex = -1;
+    el.style.setProperty("--mk-c", B[1]); el.style.setProperty("--mk-g", B[2]);
+    el.innerHTML = '<div class="sh-mk-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
+      '<div class="sh-mk-stage"><div class="sh-mk-card">' +
+        '<div class="sh-mk-eye">Mock exam' + (m.hub ? ' · ' + esc(m.hub) : '') + '</div>' +
+        '<h2 id="sh-mk-t" class="sh-ru-sr">Mock exam score: ' + pct + '%, ' + right + ' of ' + total + ' right. ' + esc(verdict(p)) + '</h2>' +
+        '<div class="sh-mk-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52" pathLength="100"/></svg>' +
+          '<div class="sh-mk-num"><b>' + (still ? pct : 0) + '</b><span>%</span></div></div>' +
+        '<div class="sh-mk-frac" aria-hidden="true">' + right + ' of ' + total + ' right</div>' +
+        '<div class="sh-mk-verdict" aria-hidden="true">' + esc(verdict(p)) + '</div>' +
+        '<div class="sh-mk-best' + (isBest ? ' is-new' : '') + '">' + esc(bestLine) + '</div>' +
+        (lecs.length > 1 ? '<ul class="sh-mk-lecs" aria-label="By lecture">' + lecs.map(function(x, i){
+          var q = x.correct / x.total;
+          return '<li style="--i:' + i + '"><span class="l">' + esc(x.label) + '</span><span class="b"><i style="--w:' + Math.max(2, Math.round(q * 100)) + '%; --c:' + band(q)[1] + '"></i></span><span class="n">' + x.correct + '/' + x.total + '</span></li>';
+        }).join("") + '</ul>' : '') +
+        '<div class="sh-mk-actions"><button type="button" class="sh-mk-go">Review answers</button>' +
+          (right < total && typeof m.missed === "function" ? '<button type="button" class="sh-mk-miss">See what I missed</button>' : '') + '</div>' +
+      '</div></div>';
+    document.body.appendChild(el);
+    var sp = still || !loud ? null : Sparks(el.querySelector(".sh-ru-cv"), false), num = el.querySelector(".sh-mk-num b"), fg = el.querySelector(".sh-mk-ring .fg");
+    var prevFocus = document.activeElement, closed = false, raf = 0, timers = [];
+    function close(after){
+      if (closed) return; closed = true;
+      cancelAnimationFrame(raf); timers.forEach(clearTimeout);
+      document.removeEventListener("keydown", onKey, true);
+      el.classList.add("is-out");
+      setTimeout(function(){ if (sp) sp.kill(); el.remove(); }, 320);
+      if (prevFocus && prevFocus.focus && document.contains(prevFocus)) { try { prevFocus.focus({ preventScroll: true }); } catch (e) {} }
+      if (after) { try { after(); } catch (e) {} }
+      if (done) done();
+    }
+    function onKey(e){
+      if (e.key === "Escape") { e.preventDefault(); close(); }
+      else if (e.key === "Tab") { var bs = el.querySelectorAll(".sh-mk-actions button"), i = Array.prototype.indexOf.call(bs, document.activeElement); e.preventDefault(); bs[(i + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus(); }
+    }
+    document.addEventListener("keydown", onKey, true);
+    el.addEventListener("click", function(e){
+      if (e.target.closest(".sh-mk-miss")) close(m.missed);
+      else if (e.target.closest(".sh-mk-go") || !e.target.closest(".sh-mk-card")) close();
+    });
+    try { el.querySelector(".sh-mk-go").focus({ preventScroll: true }); } catch (e) {}
+    function finish(){
+      num.textContent = pct; el.classList.add("is-done");
+      if (loud) sfxScore(top);
+      if (sp && top) {
+        var c = sp.at(el.querySelector(".sh-mk-ring")), cols = ["#FFE08A", "#F6CD55", "#FFF6CF", "#3ECF8E", "#8FB4E8", "#FFFFFF"];
+        sp.burst(c.x, c.y, 90, { min: 220, max: 900, types: ["streak", "star", "dot"], colors: cols, drag: .91, g: 300, life: [.7, 1.5], size: [1.6, 5], r: 60 });
+        timers.push(setTimeout(function(){ sp.rain(cols, 2.2); }, 200));
+      } else if (sp && isBest) {
+        var c2 = sp.at(el.querySelector(".sh-mk-best"));
+        sp.burst(c2.x, c2.y, 26, { min: 90, max: 380, types: ["star", "dot"], colors: ["#FFE08A", "#FFF6CF", "#FFFFFF"], drag: .92, g: 200, life: [.5, 1.1], size: [1.5, 4.5], r: 20 });
+      }
+    }
+    requestAnimationFrame(function(){
+      el.classList.add("is-on");
+      fg.style.strokeDashoffset = String(100 - pct);
+      if (still) { finish(); return; }
+      var t0 = performance.now(), D = 1250;
+      (function tick(now){
+        if (closed) return;
+        var u = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - u, 3);
+        num.textContent = Math.round(pct * e);
+        if (u < 1) raf = requestAnimationFrame(tick); else finish();
+      })(t0);
+    });
+  }
+
+  window.shRankUp = { tier: tier, level: level, trophy: trophy, mock: mock, trophyArt: trophyArt };
 })();

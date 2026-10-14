@@ -2769,9 +2769,13 @@ function renderMock(body){
         m.res[id] = ok;
         if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock', m.picks[id]);
       });
-      /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) */
+      /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) and its results card (widget/fx.js) */
       var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
-      document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:m.ids.length } }));
+      var byLec = Object.keys(MOCK_BLUEPRINT).map(function(lec){
+        var l = LECTURE_BY_ID[lec], qs = m.ids.filter(function(id){ return QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].lec === lec; });
+        return { label: l ? lecLabel(l) + ' · ' + l.title.split(':')[0].split(',')[0] : lec, correct: qs.filter(function(id){ return m.res[id]; }).length, total: qs.length };
+      });
+      document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:m.ids.length, byLec:byLec } }));
       saveState(); renderMock(body); window.scrollTo(0,0);
     };
   } else {
