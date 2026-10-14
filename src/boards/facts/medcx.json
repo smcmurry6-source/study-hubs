@@ -1288,8 +1288,13 @@
    "status": "verified",
    "risk": "high",
    "claim": "Nitrous oxide: ADA recommends pregnant patients and staff avoid exposure (it lists N2O as old category C). Radiographs: safe at any stage; abdominal and thyroid shielding are no longer recommended. Pregnant radiation workers should tell the employer in writing; a dental worker is unlikely to approach the 1 mSv per year exposure limit the page cites.",
-   "conditions": "The nitrous oxide advice is on the same page (quote not yet added).",
+   "conditions": "ADA wording; Category C is the old FDA letter system, so do not key the letter as a current FDA category.",
    "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Nitrous Oxide",
+     "quote": "It is recommended that pregnant individuals, both patients and staff, avoid exposure to nitrous oxide."
+    },
     {
      "src": "ada-pregnancy",
      "loc": "Radiographs",

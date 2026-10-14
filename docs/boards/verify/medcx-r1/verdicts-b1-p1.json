@@ -1,0 +1,236 @@
+[
+ {
+  "id": "R01",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "Repeat diastolic readings are 104 and 102 mm Hg. The fact record says to avoid diastolic values of 101-109 because the ADA table is internally inconsistent (body: 100-109 emergency band; footnote: diastolic >100 = refer as soon as possible / urgent evaluation if symptomatic). A student can defend 'refer' from the footnote.",
+    "suggestion": "Use diastolic values under 100 (e.g., 168/96 and 166/94) so only the systolic 160-180 band applies, and update the explanation."
+   },
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "The stem sentence 'Urgent pain needs treatment' hands over the pathway, and C is the only option that says treat and monitor. D ('ignore the pain') and B (120/80 for an infection) are implausible, so a test-wise student gets it without knowing the ADA band.",
+    "suggestion": "Drop the first stem sentence (the box already shows pain/swelling); make distractors realistic, e.g. 'Defer all care and refer to the physician today' and 'Treat only after BP is below 140/90'."
+   },
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "Option A uses an absolute ('unmonitored') and D mixes two ideas (180/110 threshold plus ignoring pain), making them easy to rule out.",
+    "suggestion": "Rewrite D as a single plausible error, e.g. 'Defer treatment because BP exceeds 140/90'."
+   }
+  ]
+ },
+ {
+  "id": "R02",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "'What A1C threshold meets the laboratory criterion for diabetes?' - options B, C and D all meet the criterion (D's own why line says it 'also indicates diabetes'). Only the lowest cutoff is meant, and the stem never says 'lowest' or 'diagnostic cutoff'.",
+    "suggestion": "Reword: 'What is the lowest A1C value that meets the diagnostic criterion for diabetes?'"
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The item ignores the case-set patient (already diagnosed, A1C 7.4%); it is a pure recall item with no link to the box, and 7.4% in the box makes 7.0% a tempting but irrelevant cue.",
+    "suggestion": "Tie it to the patient (e.g., what 7.4% means for control vs diagnosis) or move it out of the case set."
+   },
+   {
+    "check": "tags",
+    "severity": "low",
+    "detail": "Level 1 recall with the case box adds nothing; check the CC/phase tags (phase dx) fit a patient already treated with insulin.",
+    "suggestion": "Retag or standalone."
+   }
+  ]
+ },
+ {
+  "id": "R03",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The case-set patient box is a 67-year-old male, but the stem (and explanation) say 'she/her'.",
+    "suggestion": "Use 'he' in the stem and 'his' in the explanation."
+   },
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "C is the longest and most specific option (amount, timing). Distractor A (withhold carbohydrate for potassium) is implausible and B/D both end 'continue the appointment', which is a visible cue for wrong.",
+    "suggestion": "Make A realistic (e.g., 'Give 15 to 20 g of orange juice, then recheck in 15 minutes' is arguably a trap worth testing given CKD) and vary the endings."
+   },
+   {
+    "check": "rationale",
+    "severity": "low",
+    "detail": "Explanation says to choose gel rather than orange juice for CKD, but no option involves juice, so the CKD teaching point is not tested.",
+    "suggestion": "Add a juice option or drop that sentence from the explanation."
+   }
+  ]
+ },
+ {
+  "id": "R04",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The case-set patient box is a 67-year-old male, but the stem (and explanation) say 'she/her'.",
+    "suggestion": "Use 'he'."
+   },
+   {
+    "check": "distractor",
+    "severity": "medium",
+    "detail": "Option A (gel between cheek and gum) is a real buccal-gel practice that some sources use in a drowsy patient; the item relies on 'nothing by mouth' without saying the patient is at aspiration risk beyond 'cannot swallow safely'. It is the only plausible distractor.",
+    "suggestion": "Reword A as 'Orange juice by mouth' or 'Glucose tablets under the tongue', or state in the stem that he is obtunded and cannot protect his airway."
+   },
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "B (more insulin) and D (water) are absurd and the stem's 'glucose-raising' phrase eliminates both; effectively a 2-option item. Key also carries dose and route (most specific).",
+    "suggestion": "Replace B and D with plausible dental-office options (e.g., 'IV dextrose via IV access' only if appropriate, 'Epinephrine 0.3 mg IM', 'Albuterol inhaler')."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "Glucagon route is not given in C (IM/SC per label) although 1 mg is stated; stem does not say help is already called vs. being called, which collides with R05.",
+    "suggestion": "State 'Glucagon 1 mg IM' and make EMS timing consistent across R04/R05."
+   }
+  ]
+ },
+ {
+  "id": "R05",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "Sequence contradiction with R04 (which says help is being called) and with the source (call EMS immediately for severe hypoglycemia). R05 treats 'Call EMS' as a new action 15 minutes later, teaching that EMS can wait; and key D hedges 'if needed' while the stem already states no response.",
+    "suggestion": "Make R05 about the repeat dose / airway and monitoring while EMS is en route; key e.g. 'Give a second equal glucagon dose and keep monitoring until EMS arrives'."
+   },
+   {
+    "check": "giveaway",
+    "severity": "high",
+    "detail": "A (wait without seeking help), B (juice while unable to swallow) and C (resume treatment) are all clearly unsafe and are contradicted by R04, so D is the only sensible choice without any knowledge of the repeat-dose rule.",
+    "suggestion": "Use plausible distractors, e.g. 'Give 2 mg glucagon (double dose)', 'Give oral glucose gel buccally', 'Wait 30 minutes before repeating', 'Give IV insulin'."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "low",
+    "detail": "The case-set patient box is a 67-year-old male, but the stem (and explanation) say 'she/her'.",
+    "suggestion": "Use 'he'."
+   }
+  ]
+ },
+ {
+  "id": "R06",
+  "verdict": "reject",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "high",
+    "detail": "B is the only option that is a real clinical-history answer; A (age only), C (tooth number) and D (morning appointment) are absurd, and B is the longest and a generic list ('control, recent care, medicines, function'). A student passes with no ASA knowledge. The item does not test ASA classification at all.",
+    "suggestion": "Rewrite as 'What ASA status best describes this patient?' with the box supplying COPD, exertional dyspnea after one flight, and a recent hospital visit, options ASA II/III/IV/V, key ASA III (or clarify the hospitalization to justify IV)."
+   },
+   {
+    "check": "citation",
+    "severity": "medium",
+    "detail": "Cited ASA-2/3/4 records list class examples; none supports 'review disease control, recent care, medicines, function' as the keyed content.",
+    "suggestion": "Cite the ASA statement text that fits the rewritten question."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "'Medicines' is already fully listed in the box, so 'additional history' about medicines is redundant; 'additional history' is undefined.",
+    "suggestion": "Remove the 'clarify' framing."
+   },
+   {
+    "check": "style",
+    "severity": "low",
+    "detail": "Chief complaint is medical, not a dental complaint, for a dental patient box.",
+    "suggestion": "Use a dental complaint and move dyspnea to history."
+   }
+  ]
+ },
+ {
+  "id": "R07",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "rationale",
+    "severity": "high",
+    "detail": "Explanation says 'Her controlled hypertension', but the box shows BP 166/96 on repeat (and R08 treats it as above the ADA threshold). Hypertension is not controlled here, so the rationale contradicts the box.",
+    "suggestion": "Say 'hypertension that is not currently controlled' or change the box; better, ask the ASA class (ASA III for uncontrolled HTN plus prosthetic valve)."
+   },
+   {
+    "check": "giveaway",
+    "severity": "high",
+    "detail": "A ('Ignore'), B ('stand-alone prediction') and C ('solely') are absolute/extreme wording, while D is the hedged, balanced, longest option. Answerable by style alone; the item tests a generic principle, not ASA knowledge.",
+    "suggestion": "Make distractors moderate and concrete, or convert to 'What ASA class fits this patient?' with options II-V."
+   },
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "D ('plan from function and clinical details') is vague; the ASA statement itself says only that the class describes physical status, so 'best' rests on subjective phrasing.",
+    "suggestion": "Anchor the key to the ASA statement (class does not predict operative risk)."
+   },
+   {
+    "check": "tags",
+    "severity": "low",
+    "detail": "Phase 'clear' and cognitive level 2 do not match a definition-recall item.",
+    "suggestion": "Retag."
+   }
+  ]
+ },
+ {
+  "id": "R08",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "ambiguity",
+    "severity": "medium",
+    "detail": "The box gives a 3-day chewing pain with a tooth planned for extraction, yet the stem declares the extraction 'elective'. By R01's own logic, pain-driven urgent care at 160-180 systolic follows the emergency pathway (option A), so a defensible reading conflicts with the keyed answer; the explanation's 'no acute infection' is not in the stem.",
+    "suggestion": "Change the chief complaint to a non-urgent one (e.g., 'I want this broken tooth taken out', no pain) or state no pain/infection in the box."
+   },
+   {
+    "check": "giveaway",
+    "severity": "low",
+    "detail": "The stem states 'repeat systolic above 160' and names the ADA guide, so the numeric rule can be applied without the box.",
+    "suggestion": "Give the actual readings in the stem or leave them to the box."
+   }
+  ]
+ },
+ {
+  "id": "R09",
+  "verdict": "fix",
+  "issues": [
+   {
+    "check": "giveaway",
+    "severity": "medium",
+    "detail": "The answer is in the box verbatim ('Transcatheter prosthetic aortic valve') and the three distractors are non-cardiac or irrelevant lines pulled from the same box (activity level, hypertension, caries). No realistic confounder (coronary stent, pacemaker, mitral valve prolapse, rheumatic disease) is tested.",
+    "suggestion": "Use cardiac distractors, e.g. coronary stent, pacemaker, mitral valve prolapse, and keep the valve in the box."
+   },
+   {
+    "check": "tags",
+    "severity": "low",
+    "detail": "Cognitive level 2 is generous for simple recall of a listed category.",
+    "suggestion": "Retag level 1 or add application."
+   }
+  ]
+ },
+ {
+  "id": "R10",
+  "verdict": "pass",
+  "issues": [
+   {
+    "check": "distractor",
+    "severity": "low",
+    "detail": "B and D fail mainly on timing and do not test drug choice; only A tests the clindamycin change. Consider an allergy-appropriate cephalexin/doxycycline-before-treatment option as a distractor.",
+    "suggestion": "Optional: replace D with 'Cephalexin 30 to 60 minutes before treatment'."
+   }
+  ]
+ }
+]

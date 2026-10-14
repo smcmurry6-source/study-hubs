@@ -1,4 +1,4 @@
-# Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 6)
+# Boards hub: what the next session does (handoff, updated 2026-10-14 after Session 7)
 
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
@@ -145,23 +145,52 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   mucogingival fact on Cairo types and expected root coverage (open source) would let the notes say what #87 had to
   delete. If #80's fix keeps `likely` averaged over practiced items, update BUILD_SPEC 6.4 to say so.
 
-## Session 7: re-review the four PRs, check T-06
+## Session 7 (done 2026-10-14)
 
-1. **Revised #80, #81, #83:** check each against its list in `reviews/session-6.md` (only the changed parts; rerun the
-   acceptance commands and, for #81, the walk-through: `docs/boards/reviews/walk-cards.js`, extended for Practice /
-   New only / Missed / Do it again / phone chart). Tell Sam which are ready, in the order above.
-2. **T-06 (medcx items)** when its PR arrives: code checks first (lint, build `--unit medcx`, the count check), then
-   the checker: `node tools/boards/bench.mjs render --items src/boards/units/medcx/items.js --ids <ids> --out
-   docs/boards/verify/medcx-r1 --name <batch>` in batches of ~10 items (smaller batches cost less: most checker tokens
-   are re-reads of the batch file), a fresh Sonnet subagent per batch with `checker-prompt.md`, and **two passes on
-   every high-risk item** (56 of the 60 slots cite a high-risk fact), taking the union of flags. Budget: ~8.6k tokens
-   per item check at the benchmark's batch size, so up to ~1M for two passes. The writer is Codex (OpenAI) and the
-   checker Claude, so this is the first cross-family check (the benchmark was Claude checking Claude). Then one fix
-   prompt for Codex, and stage 4b (two fresh passes) on every changed item.
-3. **Revised #87 (perio notes)**: check against its list in `reviews/session-6.md` (`node tools/boards/notes-sheet.js
-   perio` makes the sentence and fact sheets). Small fact edit for Claude: the `PG-5` quote.
-4. Next briefs once these land: T-07 `items-pharm` (after #83 merges), `int-notes-home` (after #80 and #81), and
-   `int-mock`. `int-v33` and `int-widget` stay with Claude.
+- **Re-reviews** (verdicts and fix prompts, verbatim, in `reviews/session-7.md`):
+  - **#83 (T-02 pharm): ready to merge.** Every Session 6 point done, acceptance passes, the new PK paragraphs stay
+    inside PK-3 to PK-6. Two leftovers for Claude after merge: Deep's methamphetamine line still lacks "rampant caries,
+    often called meth mouth"; the c-pharm-0005 TX-6 note goes into the T-07 brief (the blueprint has no note field).
+  - **#80 (T-05):** all 7 points done, 12 tests pass; one new bug, reproduced: a stale `finalReview` mark (left after
+    a missed final review) retires the item the moment it climbs back to the last step. One small fix.
+  - **#81 (T-04):** all 6 points done; Codex's walk-through 10/10, plus Claude's phone check of question 2 (chart
+    collapsed, summary shows the patient). One small fix: Practice and Missed share `bankAt`.
+  - **#87 (T-03):** all points done; new giveaway in c-perio-0005's box ("After regenerative surgery") and one
+    subjectless Deep sentence. One small fix.
+- **#91 (T-06, 60 medcx items), stage 4a done:** code checks pass; checker = fresh Sonnet agent per batch of 10, two
+  passes on all six batches (`verify/medcx-r1/`), union of flags, every medium/high flag adjudicated. 16 clean, 44 to
+  fix, 7 with a high flag (two defensible keys on 0124, box states the key on 0140/0159/0124, an anaphylaxis box with
+  an "elective care" stem on 0120, 0132 in BP-3's forbidden diastolic band, 0144 hinging on 70 vs 72 mg/dL). Main
+  pattern: throwaway distractors in ~30 items (T-06 rule 6). Fix prompt sent via Sam. **Budget note:** the 12 agents
+  hit the account's session limit right after writing their files; 2 passes x 60 items is about the most one session
+  can run.
+- **PG-5:** nitrous oxide quote added (ADA, exact), conditions updated.
+- **Not reviewed:** Codex opened #94-#106 (item sheets, game core and art, migration draft v34, task helper, scripted
+  checker, perio chart figure, Exam blocks, endo/anes facts, fact gaps) outside the Session 7 plan. Triage them next.
+  Note: `migration_v34.sql` already exists on main (`get_my_answers`), so #97's v34 must be renumbered.
+
+## Session 8: merge what's ready, stage 4b, triage the new PRs
+
+1. Ask Sam to merge #83. Then the two #83 leftovers on a Claude branch.
+2. Revised #80, #81, #87: check only the fix in `reviews/session-7.md`; merge order #80, #81 (rebuild the page), #87.
+3. Revised #91: rerun lint/build/count check, then **stage 4b**: two fresh checker passes on every changed item only
+   (`bench.mjs render --ids <changed>`; batches of ~10). Items clean in 4a and unchanged are done. Then T-06 can merge.
+4. Triage #94-#106: for each, does it match a brief in `tasks/`? If not, ask Sam whether Sam asked for it before
+   reviewing. Facts PRs (#103, #104, #106) get the usual quote check (`check-quotes.mjs --dir`) and a verifier pass.
+5. Briefs: T-07 `items-pharm` (after #83; add the c-pharm-0005 TX-6 note), `int-notes-home` (after #80 and #81).
+   `int-mock` may already be #102: check before writing it.
+
+## Session 7b (2026-10-14, parallel Claude session; details in `reviews/session-7b.md`)
+
+- Sam asked for #94-#106 (Codex prompts from this session), so step 4's "ask Sam" is answered: review them.
+- Scripted checks on every branch; walk-throughs for #81 (10/10) and #102 (pass, desktop and phone); reads of #97,
+  #99, #94. #95, #100, #101 fail `--check` (generated bundles not committed; rebuild only).
+- **#80 was merged by this session** (39db637) before it saw Session 7's stale-`finalReview` bug. Follow-up prompt
+  in `session-7b.md`; don't revert. Merges now need Sam's OK per PR (auto-mode flagged the merge).
+- #97: renumber to v35 (main has v34); `upsert_srs` drops same-day changes (`>` should be `>=`); cap game-save slots.
+- #99: bench catch rate counts any flag as a catch; must count the planted defect. #94: drop the inline-citation flag
+  (spec puts cites in `refs`), stop truncating facts, print each fact once.
+- Not yet read: #98 and #102's code; facts PRs #103, #104, #106 (step 4 applies).
 
 ## Release 1
 
