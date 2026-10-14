@@ -102,6 +102,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (perio S5: Furcation Management recording, Claude Code)** — Dr. Litz's recorded Furcation Management
+  lecture (Drive: Periodontology/hubs, `Furcation_Management_Dr. Litz.mp4` + slide PDF; transcribed in-session with
+  faster-whisper) is in `hubs/perio` before the Oct 15 quiz on it. Session 5 keeps its id `resective-furcation` (audio
+  file names) and is now "Furcation Management & Resective Surgery", status `taught`, with a new lecture field `note`
+  (shown as the notes banner instead of the status notice): only the furcation half is lectured; Resective Osseous
+  Surgery is taught in class after the quiz and its short section still comes from the exam-review guide. Both reading
+  levels rewritten and both mp3s regenerated. Entrance depths now follow the lecture (Bower: maxillary 3.6 / 4.2 /
+  4.8 mm, mandibular 2.4 / 2.5 mm; the guide's 3 / 3.5 / 5 mm noted). 68 new questions (`q5-L01`-`q5-L50`, 4 Patient
+  Box `q5-P*`, 3 select-all `q5-M*`, 5 two-statement `q5-S*`, 5 EXCEPT `q5-E*`, 1 matching `q5-X01`; bank 357 → 425);
+  `q5-01`/`02`/`04` explanations and `q5-07` (stem and choices) updated to match the lecture. 10 exam hints quoted from
+  the recording, 6 Review sections (terms, anatomy + root depressions, contributing factors, CEPs, classifications +
+  detection, treatment options), cram sheet, mind map, 6 arcade words and 2 Quadrants groups. Course Home shows a
+  **quiz card** until `NEXT_QUIZ.date` passes (set the next one there). Diagram review: Sam skipped all three candidates
+  (Glickman grades, entrance map, CEP grades); don't re-propose them. **Perio Project: carry all of this into the
+  split sources.**
+
 - **2026-10-14 (PCD Exam 3 check-in waits for 8 pm, Claude Code)** — PCD Exam 3 is a Canvas exam open 8 am-8 pm, so
   its dashboard "Check in" button now appears at 8 pm, not 8 am. New optional per-exam `checkinHour` in `HUBS` (default
   `CHECKIN_HOUR`); the pop-up still goes out from `ARCHIVE_HOUR` (10 pm). About page updated. No schema change.
