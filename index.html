@@ -750,7 +750,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Skin histology, dermatological pharmacology, dermatopathology, skeletal muscle, neuromuscular junction drugs, and MSK and skin in the dental chair. Notes in two reading levels, Patient Box and two-statement questions, exam hints from the recordings, a timed mock exam, review tables and the Skin Deep Arcade.",
       modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade"], stateKey:"msk4-state-v1" },
     { id:"pcd-exam3", cls:"fixedpros", title:"PCD Fixed Pros Exam 3 Hub", code:"PCD Fixed Pros · Exam 3",
-      exams:[ { name:"PCD Fixed Pros didactic Exam 3", label:"Exam", date:"2026-10-15" } ], updated:"2026-10-08",
+      exams:[ { name:"PCD Fixed Pros didactic Exam 3", label:"Exam", date:"2026-10-15", checkinHour:20 } ], updated:"2026-10-08",
       desc:"Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen"], stateKey:"pcd3-state-v1" },
     { id:"occlusion", cls:"occlusion", title:"Occlusion Midterm Hub", code:"Occlusion · Midterm",
@@ -773,7 +773,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
-     until the final). Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm). Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [
@@ -1372,12 +1372,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       note:"Topics and formats only, please. Don't write out exam questions or answers: the honor code keeps exam content private." }
   ];
   var debriefSb = null;
-  /* exams whose check-in is open, newest first: the card button from CHECKIN_HOUR on exam day, the pop-up from the
+  /* exams whose check-in is open, newest first: the card button from the exam's checkinHour (default CHECKIN_HOUR) on exam day, the pop-up from the
      exam's promptHour (default ARCHIVE_HOUR); both until DEBRIEF_DAYS after it */
   function pastExams(hub, forPopup){
     var now = new Date();
     return (hub.exams || []).filter(function(x){
-      var hour = forPopup ? (x.promptHour != null ? x.promptHour : ARCHIVE_HOUR) : CHECKIN_HOUR;
+      var hour = forPopup ? (x.promptHour != null ? x.promptHour : ARCHIVE_HOUR) : (x.checkinHour != null ? x.checkinHour : CHECKIN_HOUR);
       return x.date && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS;
     })
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
