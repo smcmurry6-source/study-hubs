@@ -99,15 +99,25 @@
     }
     exs.forEach(function(ex){ openExplain(ex, lag); });
   }
+  /* a right answer: a soft wash of its own color sweeps across it and fades, with one quick glow. The option itself
+     never moves or scales (scaling a block of text makes it wobble). */
   function pop(el, delay){
-    var w = el.offsetWidth || 300, s = 1 + Math.min(.035, 9 / w);
-    anim(el, [{ transform: "scale(1)" }, { transform: "scale(" + s.toFixed(4) + ")", offset: .35 }, { transform: "scale(.997)", offset: .7 }, { transform: "scale(1)" }],
-      { duration: 420, delay: delay, easing: "cubic-bezier(.3,.7,.3,1)" });
-    ring(el, delay, 700);
+    if (still() || !el.animate) return;
+    var c = getComputedStyle(el).borderTopColor, w = document.createElement("span");
+    w.className = "sh-fx-sweep";
+    w.setAttribute("aria-hidden", "true");
+    w.style.background = "linear-gradient(90deg, " + rgba(c, .22) + ", " + rgba(c, .1) + ")";
+    el.classList.add("sh-fx-host");
+    el.appendChild(w);
+    var a = anim(w, [{ transform: "scaleX(0)", opacity: 1, easing: "cubic-bezier(.22,.8,.3,1)" }, { transform: "scaleX(1)", opacity: 1, offset: .32 },
+      { transform: "scaleX(1)", opacity: 1, offset: .5, easing: "ease-in-out" }, { transform: "scaleX(1)", opacity: 0 }],
+      { duration: 720, delay: delay, fill: "both" });
+    if (a) a.onfinish = a.oncancel = function(){ w.remove(); }; else w.remove();
+    ring(el, delay, 520);
   }
   function ring(el, delay, dur){
     var c = getComputedStyle(el).borderTopColor;
-    anim(el, [{ boxShadow: "0 0 0 0 " + rgba(c, .5) }, { boxShadow: "0 0 0 9px " + rgba(c, 0) }], { duration: dur, delay: delay, easing: "ease-out" });
+    anim(el, [{ boxShadow: "0 0 0 0 " + rgba(c, .45) }, { boxShadow: "0 0 0 6px " + rgba(c, 0) }], { duration: dur, delay: delay, easing: "cubic-bezier(.22,.8,.3,1)" });
   }
   function shake(el, delay, isMatch){
     /* the class-based hubs already shake a wrong matching pick in their own CSS */

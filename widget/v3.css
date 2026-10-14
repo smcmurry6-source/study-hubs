@@ -773,9 +773,10 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .sh-fx-mark.is-ok{background:var(--good, #1F8A5B);}
 .sh-fx-mark.is-bad{background:var(--bad, #B3261E);}
 .sh-fx-mark svg{width:14px; height:14px; display:block; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
-.sh-fx-mark.is-anim{animation:sh-fx-badge .45s cubic-bezier(.2,1.6,.4,1) var(--d, 0ms) both;}
-.sh-fx-mark.is-anim path{stroke-dasharray:1; animation:sh-fx-draw .3s ease-out both; animation-delay:calc(var(--d, 0ms) + 140ms + var(--d2, 0ms));}
-@keyframes sh-fx-badge{from{transform:scale(0); opacity:0;} to{transform:none; opacity:1;}}
+.sh-fx-mark.is-anim{animation:sh-fx-badge .28s cubic-bezier(.22,1.15,.36,1) var(--d, 0ms) both;}
+.sh-fx-sweep{position:absolute; inset:0; border-radius:inherit; pointer-events:none; transform-origin:left center; transform:scaleX(0);}
+.sh-fx-mark.is-anim path{stroke-dasharray:1; animation:sh-fx-draw .24s ease-out both; animation-delay:calc(var(--d, 0ms) + 90ms + var(--d2, 0ms));}
+@keyframes sh-fx-badge{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
 @keyframes sh-fx-draw{from{stroke-dashoffset:1;} to{stroke-dashoffset:0;}}
 
 /* the streak flame: from 3 right in a row, bottom-right, above the launcher (desktop) or the bottom bar (phones) */
