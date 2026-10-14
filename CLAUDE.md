@@ -132,6 +132,10 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
 - The first ones are in MSK Exam 4: copy `tools/figures/msk-exam4/` (`shared.mjs` maps the kit's tokens onto the hub's
   palette; `build.mjs` rewrites the hub's `anima:css`/`anima:js` blocks, `--preview` writes standalone pages for anima's
   checks, `--check` fails if the blocks are stale). As root, anima's Chrome scripts need a `--no-sandbox` wrapper as `CHROME_PATH`.
+  Every copy a page draws gets its own SVG ids (`uniq()` in the build), because hidden mode panels stay in the page and
+  `url(#id)` would point into the first copy: give new ids the figure's prefix (`nm-`, `sc-`), and in live code or CSS
+  never hard-code one (read it from the markup, or match `[id^="sc-actin-p"]`). In Review a figure goes in the group it
+  belongs to, as a section of type `figs` (MSK 4: the NMJ under Drugs, the sarcomere under Muscle).
 - Under a lecture's notes, figures go outside `.reading-prose` (the narrated text), so the narration doesn't drift.
 - **Picture questions never give the answer away** (Sam's standing rule, 2026-10-14). The diagram sits above the stem only
   when the question can't be answered without it (name the highlighted part, read arrow B, which suture is shown).

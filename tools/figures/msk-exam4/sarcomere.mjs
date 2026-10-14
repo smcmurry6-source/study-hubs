@@ -71,7 +71,7 @@ const mid = `<g class="sc-mid">${ROWS_THICK.map((z) => thick(0, z)).join("")}${l
 // (0 relaxed, 1 fully contracted); the build bakes c = 0 into the SVG and the live code calls the same function.
 const STRIP = { z0: -76, z1: -90 };
 const DATA = { kx: KX, U, THIN, THICK, BARE, SL0, SL1, SPAN,
-  wide: `0 0 ${W} ${H}`, narrow: (() => { const [a, b] = [S(-1.45 * U, 82), S(1.45 * U, -102)]; return `${a[0]} ${a[1]} ${f1(b[0] - a[0])} ${f1(b[1] - a[1])}`; })(),
+  wide: `0 0 ${W} ${H}`, narrow: (() => { const [a, b] = [S(-1.45 * U, 82), S(1.45 * U, -102)]; return `${a[0]} 0 ${f1(b[0] - a[0])} ${H}`; })(), // cropped sideways only: the labels need the full height
   zs: { strip: STRIP, top: 70 },
   pt: (() => { const o = S(0, 0); return { ox: o[0], oy: o[1], kz: S(0, 1)[1] - o[1] }; })() };
 function geomAt(c, DATA) {
@@ -161,6 +161,8 @@ function sarcLive(root, DATA) {
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var moves = {}; Array.prototype.forEach.call(svg.querySelectorAll("[data-move]"), function(g){ moves[g.getAttribute("data-move")] = g; });
   var heads = Array.prototype.slice.call(svg.querySelectorAll(".sc-head"));
+  // ids carry a per-copy suffix (ANIMA.html), so read the rest shape's href instead of hard-coding it
+  var HR = heads.length ? heads[0].getAttribute("href") : "#sc-hr", HA = HR.replace("#sc-hr", "#sc-ha");
   var rs = {}; Array.prototype.forEach.call(root.querySelectorAll("[data-r]"), function(e){ rs[e.getAttribute("data-r")] = e; });
   var U = DATA.U, geomAt = DATA.geomAt;
   var c = 0, target = 0, prev = 0, playing = false, tourT = 0, frame = 0, last = 0, visible = true;
@@ -176,7 +178,7 @@ function sarcLive(root, DATA) {
     var ca = c > 0.01 || target > 0.01;
     svg.dataset.ca = ca ? "1" : "";
     var tip = SL / 2 - DATA.THIN;
-    heads.forEach(function(h){ var x = Math.abs(parseFloat(h.getAttribute("data-x"))), href = ca && x >= tip && x <= tip + DATA.THIN ? "#sc-ha" : "#sc-hr"; if(h.getAttribute("href") !== href) h.setAttribute("href", href); });
+    heads.forEach(function(h){ var x = Math.abs(parseFloat(h.getAttribute("data-x"))), href = ca && x >= tip && x <= tip + DATA.THIN ? HA : HR; if(h.getAttribute("href") !== href) h.setAttribute("href", href); });
     var I = SL - DATA.THICK, Hh = Math.max(0, SL - 2 * DATA.THIN);
     var I0 = DATA.SL0 - DATA.THICK, H0 = DATA.SL0 - 2 * DATA.THIN;
     rs.A.textContent = "same";
@@ -225,11 +227,11 @@ function sarcLive(root, DATA) {
 const CSS = `
 .anima .sc-aband-bg{fill:var(--anatomy-shade-1);opacity:.9}
 .anima .sc-hband-bg{fill:var(--anatomy-card)}
-.anima #sc-actin-p circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
+.anima [id^="sc-actin-p"] circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
 .anima .sc-s1-att{fill:var(--anatomy-lit);stroke:var(--anatomy-lit)}
 .anima .sc-tm{fill:none;stroke:var(--anatomy-mid);stroke-width:1.3;stroke-linecap:round;transition:transform .3s}
 .anima .sc-fig[data-ca="1"] .sc-tm{transform:translateY(-1.6px)}
-.anima #sc-tn-p circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
+.anima [id^="sc-tn-p"] circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
 .anima .sc-fig[data-ca="1"] .sc-tnc{fill:var(--anatomy-lit);stroke:var(--anatomy-lit)}
 .anima .sc-nb{opacity:.45}
 .anima .sc-rod{fill:var(--anatomy-shade-0);stroke:var(--anatomy-hi);stroke-width:1}
@@ -256,7 +258,7 @@ const CSS = `
 .anima .sc-bands{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px 14px;margin:6px 0 2px;font:.8rem var(--font-mono);color:var(--ink-soft)}
 .anima .sc-bands b{color:var(--ink);font-weight:600}
 .anima .sc-bands em{font-style:normal}
-@media (prefers-reduced-motion:reduce){.anima #sc-actin-p circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
+@media (prefers-reduced-motion:reduce){.anima [id^="sc-actin-p"] circle{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:.7}
 .anima .sc-s1-att{fill:var(--anatomy-lit);stroke:var(--anatomy-lit)}
 .anima .sc-tm{transition:none}}
 `;
