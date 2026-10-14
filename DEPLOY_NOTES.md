@@ -42,8 +42,8 @@ need an entry; a new hub mode, tab, game or question type does.
 
 ## Shared infrastructure (touch once, not per-hub)
 
-- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js` and `widget/drill.js`, which v3.js loads itself; `widget/rankup.js` is
-  fetched by ranks.js only when someone ranks up) — loaded by every hub (`fixed-pros`,
+- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js`, `widget/drill.js` and `widget/fx.js`, which v3.js loads itself; `widget/rankup.js` is
+  fetched by ranks.js only when a celebration card is needed) — loaded by every hub (`fixed-pros`,
   `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
   `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
   Cross-hub functionality (search, class-wide correctness, streaks, activity
@@ -84,6 +84,29 @@ live hubs. **Before building a new hub** (any session, hub Projects included), i
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-14 (motion pass, Claude Code)** — New `widget/fx.js` (loaded by v3.js, `shFx.mount(shEggHooks)`), one
+  MutationObserver plus a capture-phase click listener, so **hubs need no changes**: **answer feedback** (right after a tap
+  inside a `.qcard`, an option that turns `.is-correct`/`.is-matched`/`data-state="correct"` pops with a ring and gets a
+  `.sh-fx-mark` check that draws itself; `.is-wrong`/`incorrect` shakes and gets an X; the right answer then lights up;
+  select-all and ordering cards mark each option in turn; the explanation grows open; cards drawn already answered stay
+  still), **streak flame** (`#sh-flame`, from v3.js's new `sh:streak {n, prev}` event: 3+ in a row, ring toward 100,
+  colors at 5/10/25/50/100, fizzles on a miss; Surprises off hides it; hidden on the mock tab), **bar fills** (`.bar`,
+  `.weak-meter`, rank, mastery and drill bars animate from their last width, keyed by container), **view fades** (after a
+  `[data-mode]`/`[data-sub]`/`[data-view]`/... click, the largest redrawn area without that row of tabs fades in) and the
+  **countdown pill** (`#countdownPill` gets `.sh-cd-eve`/`.sh-cd-day` from `SH_EXPORT.exams`). `widget/rankup.js` gains a
+  **queue** (cards take turns), **`shRankUp.trophy`** (coin-spin medal card with rarity) and **`shRankUp.mock`** (results
+  card: count-up ring, verdict, best in this hub from `sh_mock_best_<hub>`, bars from the hubs' new `sh:mock-done`
+  `byLec`, celebration at 90%+, "See what I missed" clicks `#mockMissed` or scrolls to perio's `#examMissedList`).
+  `widget/ranks.js`: `track()` announces newly seen **non-secret trophies** (`sh_trophy_seen`; the first look only records;
+  secret ones keep their egg/Timmy moment), the mastery toast is now a trophy card, celebrations wait only while a mock is
+  **in progress** (open `[data-mock-pick]`/perio exam choices), `shRanks.celebrate(kind, d)`, previews
+  `shRanks.preview("trophy", i)`, `("mastery", 0-3)`, `("mock", right, total)`, and `HUB_NAMES` gains MSK 4, Occlusion and
+  PCD 3 (they showed as "Pcd Exam3"). `widget/drill.js`: animated finish screen (check draws, count-up, rows tick in,
+  streak rolls up). Dashboard: the hero countdown flips like a departure board (`heroFlap`, `sh_dash_flap`). Hubs
+  (`pcd-exam3`, `occlusion`, `msk-exam4`, `perio`) pass `byLec` with `sh:mock-done`. `sw.js` -> `sh-v15`, CI syntax check
+  and About page updated. No schema change. **A new hub gets all of this** if its cards use `.qcard` / `.qcard-choice`
+  with those state classes, its countdown pill is `#countdownPill`, and its `sh:mock-done` carries `byLec`.
 
 - **2026-10-13 (rank-up and level-up celebrations, Claude Code)** — New `widget/rankup.js`, fetched by `widget/ranks.js`
   the first time it's needed. **A new rank** (Silver -> Gold) is a full-screen cutscene (`shRankUp.tier`): letterbox bars,

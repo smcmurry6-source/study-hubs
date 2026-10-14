@@ -13,7 +13,7 @@
    d = { from, fromLevel, to, level, xp, next_at, position, of } (the profile fields are optional).
    shRankUp.trophy(t) -> a trophy or hub mastery medal: the same kind of card as a level, the medal spins in like a
                         coin, a shine sweeps across, sparks fly and it says how many classmates have it.
-                        t = { name, desc, eyebrow, art (svg), pal (a PAL key), rarity: { n, total, label } }.
+                        t = { name, desc, eyebrow, ic (24-box icon path) or art (svg), pal (a PAL key), rarity: { n, total, label } or a function returning it }.
    shRankUp.mock(m)  -> the mock exam results card: the score counts up while a ring fills, a verdict line, your best
                         mock in this hub, one bar per lecture growing in turn, and a celebration at 90%+.
                         m = { correct, total, hub, byLec: [{ label, correct, total }], prev (best score before, 0-1), quiet, missed() }.
@@ -657,6 +657,7 @@
   function trophyNow(t, done){
     css();
     var key = PAL[t.pal] ? t.pal : "gold", P = PAL[key], still = reduced(), eye = t.eyebrow || "Trophy unlocked";
+    var rare = typeof t.rarity === "function" ? t.rarity() : t.rarity;   // looked up now: class stats may have loaded since it was queued
     var el = document.createElement("div");
     el.className = "sh-ru-lv sh-ru-tr"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
     el.setAttribute("aria-label", eye + ": " + (t.name || "") + (t.desc ? ". " + t.desc : ""));
@@ -666,7 +667,7 @@
       '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + esc(eye) + '</div>' +
       '<span class="sh-ru-tr-name sh-ru-mt">' + esc(t.name || "") + '</span>' +
       (t.desc ? '<div class="sh-ru-tr-desc">' + esc(t.desc) + '</div>' : '') +
-      (t.rarity && t.rarity.total ? '<div class="sh-ru-tr-rare">' + rarityLine(t.rarity) + '</div>' : '') + '</div>' +
+      (rare && rare.total ? '<div class="sh-ru-tr-rare">' + rarityLine(rare) + '</div>' : '') + '</div>' +
       '<i class="sh-ru-lv-shine" aria-hidden="true"></i>';
     document.body.appendChild(el);
     var cv = null, sp = null, timers = [], closed = false;

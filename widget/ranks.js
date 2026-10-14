@@ -328,7 +328,8 @@
   /* ---------- mastery flair: a medal per hub mastered, next to your name on every leaderboard ----------
      The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31). */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
-    "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros" };
+    "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
+    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3" };
   function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -507,7 +508,7 @@
      device remembers which it has seen in sh_trophy_seen; the first look only records them. */
   var rarityOf = null;   // set by the hub widget once trophy stats load: kind -> { n, total, label }
   function trophyCard(tr){
-    return { name: tr.n, desc: tr.d, eyebrow: "Trophy unlocked", ic: tr.ic, pal: "gold", rarity: rarityOf ? rarityOf(tr.k) : null };
+    return { name: tr.n, desc: tr.d, eyebrow: "Trophy unlocked", ic: tr.ic, pal: "gold", rarity: function(){ return rarityOf ? rarityOf(tr.k) : null; } };
   }
   function trackTrophies(p, busy){
     var kinds = {}; (p.badges || []).forEach(function(b){ kinds[String(b).split(":")[0]] = 1; });
@@ -534,15 +535,15 @@
   /* try them from the console: shRanks.preview("tier", 3) (Silver -> Gold), shRanks.preview("level", 4, 2) (Gold I -> II),
      shRanks.preview("trophy", 6) (a TROPHIES index), shRanks.preview("mastery", 2) (Gold), shRanks.preview("mock", 37, 40) */
   function preview(kind, a, b){
-    a = a == null ? 3 : Math.max(0, Math.min(6, a | 0));
-    var d = kind === "level" ? { from: a, to: a, level: Math.max(2, Math.min(3, b || 2)) }
-      : { from: a, fromLevel: 3, to: Math.max(1, Math.min(6, b == null ? a + 1 : b | 0)), level: 1 };
-    if (kind !== "level" && d.to <= d.from) d.from = d.to - 1;
     if (kind === "trophy") { var tr = TROPHIES[Math.max(0, Math.min(TROPHIES.length - 1, a | 0))]; withRankUp(function(U){ U.trophy(trophyCard(tr)); }); return; }
     if (kind === "mastery") { withRankUp(function(U){ U.trophy(masteryCard(Math.max(0, Math.min(3, a | 0)), "this hub")); }); return; }
     if (kind === "mock") { var tot = b || 40, c = Math.min(tot, a == null ? 34 : a | 0); withRankUp(function(U){ U.mock({ correct: c, total: tot, hub: "Preview", prev: .8,
       byLec: [{ label: "L1 · Lecture one", correct: 7, total: 8 }, { label: "L2 · Lecture two", correct: 5, total: 7 }, { label: "L3 · Lecture three", correct: 2, total: 3 }],
       missed: function(){} }); }); return; }
+    a = a == null ? 3 : Math.max(0, Math.min(6, a | 0));
+    var d = kind === "level" ? { from: a, to: a, level: Math.max(2, Math.min(3, b || 2)) }
+      : { from: a, fromLevel: 3, to: Math.max(1, Math.min(6, b == null ? a + 1 : b | 0)), level: 1 };
+    if (kind !== "level" && d.to <= d.from) d.from = d.to - 1;
     withRankUp(function(U){ U[kind === "level" ? "level" : "tier"](d); });
   }
   /* a hub mastery medal (Bronze 50% ... Crown 100%), as a trophy card */
@@ -550,7 +551,7 @@
   function masteryCard(i, hub){
     return { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hub : ""), art: medalSvg(i + 1, 84), pal: MASTERY_PAL[i],
       desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal now shows next to your name on every leaderboard.",
-      rarity: rarityOf ? rarityOf(MASTERY[i].k) : null };
+      rarity: function(){ return rarityOf ? rarityOf(MASTERY[i].k) : null; } };
   }
 
   /* ---------- the hub widget: rank card, hub mastery, trophy case, link devices, accent unlocks ---------- */

@@ -9,7 +9,7 @@
      that card, so hubs need no changes and cards drawn already answered (filters, mock results) stay still.
    - Streak flame. From 3 right in a row (v3.js's session streak, sent as sh:streak) a flame in the bottom-right counts
      the run, with a ring filling toward 100 (the tactical nuke). It grows and changes color at 5, 10, 25, 50 and 100
-     and fizzles out when the run breaks. Off with Settings -> Surprises; hidden on the mock exam tab.
+     and fizzles out when the run breaks. Off with Settings -> Surprises; hidden on the mock exam tab and in the arcade.
    - Progress bars (.bar, .weak-meter, the rank, mastery and drill bars) fill from where they were, or from empty the
      first time they show, instead of jumping.
    - Switching modes, tabs and lectures fades the new content in.
@@ -156,22 +156,31 @@
   }
 
   /* ---------- view fades: modes, tabs, lectures ---------- */
-  var NAV_SEL = '[data-mode], [data-sub], [data-lec], [data-go], [data-group], [data-qs], [data-view], [data-goto-lecture], [data-rv-lec], [role="tab"], .subtab';
+  var NAV_ATTRS = ["data-mode", "data-sub", "data-lec", "data-go", "data-group", "data-qs", "data-view", "data-goto-lecture", "data-rv-lec"];
+  var NAV_SEL = NAV_ATTRS.map(function(a){ return "[" + a + "]"; }).join(", ") + ', [role="tab"], .subtab';
   var NAV_SKIP = ".qcard, #shstat-root, .sh-drill, .gm-stage, [data-overlay], .sh-mk, .sh-ru";
   var nav = null;
   function navClick(e){
     var b = e.target && e.target.closest ? e.target.closest(NAV_SEL) : null;
     if (!b || b.closest(NAV_SKIP)) return;
-    nav = { added: [], shown: [] };
+    var kind = '[role="tab"]';
+    for (var i = 0; i < NAV_ATTRS.length; i++) if (b.hasAttribute(NAV_ATTRS[i])) { kind = "[" + NAV_ATTRS[i] + "]"; break; }
+    if (kind === '[role="tab"]' && b.classList.contains("subtab")) kind = ".subtab";
+    nav = { added: [], shown: [], kind: kind };
     requestAnimationFrame(function(){ var n = nav; nav = null; if (n) fadeIn(n); });
   }
   function fadeIn(n){
     if (still()) return;
-    var els = n.shown.length ? n.shown : n.added.filter(function(el){
-      return el !== document.body && el.isConnected && !el.closest(NAV_SKIP) && el.offsetHeight >= 80;
+    var els = n.shown.length ? n.shown : n.added.filter(function(el, i){
+      return n.added.indexOf(el) === i && el !== document.body && el.isConnected && !el.closest(NAV_SKIP) && el.offsetHeight >= 80;
     });
-    /* only the innermost containers that were redrawn, so the tabs themselves don't blink */
-    els = els.filter(function(el, i){ return els.indexOf(el) === i && !els.some(function(o){ return o !== el && el.contains(o); }); });
+    if (!n.shown.length) {
+      /* the largest redrawn area that doesn't hold the row of tabs that was tapped (so the tabs don't blink);
+         if every redrawn area holds them, the innermost one */
+      var rest = els.filter(function(el){ return !el.querySelector(n.kind); });
+      els = rest.length ? rest.filter(function(el){ return !rest.some(function(o){ return o !== el && o.contains(el); }); })
+        : els.filter(function(el){ return !els.some(function(o){ return o !== el && el.contains(o); }); });
+    }
     els.forEach(function(el){ anim(el, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.2,.8,.3,1)" }); });
   }
 
@@ -293,8 +302,8 @@
       else if (prev >= 3) flameFizzle();
     });
     document.addEventListener("sh:pref", function(){ if (!eggsOn()) flameHide(); });
-    /* like Timmy Tooth, the flame steps aside on the mock exam tab */
-    setInterval(function(){ if (flame) flame.classList.toggle("is-away", /(^|\/)mock/.test(section())); }, 1500);
+    /* like Timmy Tooth, the flame steps aside on the mock exam tab, and it stays off arcade boards and fullscreen */
+    setInterval(function(){ if (flame) flame.classList.toggle("is-away", /(^|\/)(mock|arcade)/.test(section()) || !!document.fullscreenElement); }, 1500);
     countdownPill();
     setInterval(countdownPill, 10 * 60 * 1000);
     document.addEventListener("sh:mock-done", mockDone);

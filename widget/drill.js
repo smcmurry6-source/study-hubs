@@ -143,7 +143,7 @@
   function streakLine(done, roll){
     var n = streak(), counted = !!(lsGet(DAYS_KEY) || {})[today()];
     if (!n) return done ? '' : '<p class="shd-streak">' + IC_FLAME + 'Finish a set today to start a drill streak.</p>';
-    var num = roll ? '<span class="shd-roll"><i class="o">' + (n - 1) + '</i><i class="n">' + n + '</i></span>' : n;
+    var num = roll ? '<span class="shd-roll"><i class="o" aria-hidden="true">' + (n - 1) + '</i><i class="n">' + n + '</i></span>' : n;
     if (done || counted) return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + num + '-day</b> drill streak' + (n === 1 ? '. Come back tomorrow to keep it going.' : '. A set in any hub counts.') + '</span></p>';
     return '<p class="shd-streak">' + IC_FLAME + '<span><b>' + n + '-day</b> drill streak. Finish today\'s set to make it ' + (n + 1) + '.</span></p>';
   }
