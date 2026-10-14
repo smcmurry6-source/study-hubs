@@ -301,6 +301,22 @@ language sql security definer set search_path = public as $$
   order by answer_date;
 $$;
 
+-- migration_v34: read back your own answers (cross-device progress sync)
+create or replace function public.get_my_answers(p_visitor text, p_hub text)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_array(x.qid, x.t, x.c) order by x.t, x.id), '[]'::jsonb)
+  from (
+    select a.id, a.qid, floor(extract(epoch from a.answered_at))::bigint as t, case when a.correct then 1 else 0 end as c
+    from personal_answers a
+    where p_visitor is not null and length(p_visitor) between 1 and 80 and length(coalesce(p_hub, '')) between 1 and 40
+      and a.visitor_id = p_visitor and a.hub = p_hub
+    order by a.answered_at desc, a.id desc
+    limit 5000
+  ) x;
+$$;
+
+grant execute on function public.get_my_answers(text, text) to anon, authenticated;
+
 create or replace function public.get_leaderboard(p_limit integer default 10)
 returns table(display_name text, streak integer, total_answered integer)
 language plpgsql security definer set search_path = public as $$

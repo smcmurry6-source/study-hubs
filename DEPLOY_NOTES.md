@@ -85,6 +85,19 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (question progress syncs across devices, Claude Code)** — Every answer was already saved per person
+  (`personal_answers`) and "Link my devices" moves a device's rows onto the linked id, but nothing read them back, so a
+  hub's own progress stayed per device. `migration_v34.sql` (**applied 2026-10-14 via the connector**) adds public
+  `get_my_answers(p_visitor, p_hub)` (one jsonb array `[[qid, epoch s, 1/0], ...]`, oldest first, latest 5000).
+  `widget/v3.js` calls it when a hub opens (and when the tab comes back after 3+ minutes), replays the history into
+  spaced review (`sh_srs_<hub>`, so the Daily Drill sees misses from every device) and hands per-question totals
+  `{qid: {n, c, last, t}}` plus local study days to the hub's **`window.SH_SYNC.merge(byQid, days)`**. The hub keeps
+  whichever copy has more tries (nothing local is lost; re-opening doesn't double count), updates its totals, lecture
+  stats and days, toasts "Synced N questions from your other devices" and redraws Compendium only in the first 8 s
+  (never during a mock or narration). In `occlusion`, `pcd-exam3`, `msk-exam4` and `perio` (its `answered` shape).
+  **A new hub gets sync by defining `SH_SYNC` (copy it from `occlusion`).** Link-devices text, About page, `sw.js` →
+  `sh-v15`. **Perio Project: carry `SH_SYNC` into the split sources.**
+
 - **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;
   commit and what was trimmed in its `UPSTREAM.md`), so Claude Code sessions can draw accurate isometric SVG figures
   (anatomy, cells, receptors, drug mechanisms) for the hubs' lecture notes and Review. `CLAUDE.md` → "Diagrams (the

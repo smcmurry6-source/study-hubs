@@ -1183,6 +1183,70 @@
       sessionCorrectStreak = 0;
     }
   });
+  /* ---------- progress sync across devices (migration_v34) ----------
+     Every answer is saved per person in personal_answers (above), and "Link my devices" moves a device's rows
+     onto the linked id, so the server holds the whole history. When a hub opens (and when it comes back after
+     a few minutes in the background) this reads it back with get_my_answers and
+       1. hands each question's totals to the hub's window.SH_SYNC.merge(byQid, days) to fold into its own
+          saved progress (the hub keeps whichever copy has more tries, so nothing local is lost), and
+       2. replays the history into spaced review (sh_srs_<hub>), so the Daily Drill sees misses from every device.
+     byQid = { qid: { n: tries, c: right, last: latest try right?, t: latest try (ms) } }; days = local dates. */
+  var syncAnsweredNow = {}, lastSync = 0, syncBusy = false;
+  document.addEventListener(ANSWERED_EVENT, function(e){ var q = e && e.detail && e.detail.qid; if (q && syncBusy) syncAnsweredNow[String(q)] = 1; });
+  function localDay(ms){ var d = new Date(ms); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function addDays(day, n){ var p = day.split("-").map(Number), d = new Date(p[0], p[1] - 1, p[2] + n); return localDay(d.getTime()); }
+  function applySync(rows){
+    var byQid = {}, hist = {}, daySet = {};
+    rows.forEach(function(r){
+      if (!Array.isArray(r) || r.length < 3) return;
+      var q = String(r[0]), ms = Number(r[1]) * 1000, ok = r[2] === 1 || r[2] === true;
+      if (!q || !isFinite(ms)) return;
+      var s = byQid[q] || (byQid[q] = { n: 0, c: 0, last: null, t: 0 });
+      s.n++; if (ok) s.c++; s.last = ok; s.t = ms;
+      (hist[q] || (hist[q] = [])).push([localDay(ms), ok]);
+      daySet[localDay(ms)] = 1;
+    });
+    /* spaced review: same rules as srsRecord, replayed over the full history */
+    try {
+      var all = srsLoad(), eve = srsExamEve(), changed = false, known = null;
+      if (window.SH_EXPORT && Array.isArray(window.SH_EXPORT.questions)) { known = {}; window.SH_EXPORT.questions.forEach(function(x){ if (x && x.id) known[x.id] = 1; }); }
+      Object.keys(hist).forEach(function(q){
+        if (syncAnsweredNow[q] || (known && !known[q])) return;
+        var r = { b: 0 };
+        hist[q].forEach(function(h){
+          if (h[1]) { if (r.t === h[0] && r.b) return; r.b = Math.min(r.b + 1, SRS_STEPS.length); } else r.b = 0;
+          r.t = h[0];
+        });
+        var cur = all[q];
+        if (cur && cur.t && cur.t > r.t) return;
+        r.due = addDays(r.t, r.b ? SRS_STEPS[r.b - 1] : 1);
+        if (eve && r.due > eve && r.due > srsDay(0)) r.due = eve < srsDay(0) ? srsDay(0) : eve;
+        if (!cur || cur.b !== r.b || cur.due !== r.due || cur.t !== r.t) { all[q] = r; changed = true; }
+      });
+      if (changed) localStorage.setItem(SRS_KEY, JSON.stringify(all));
+    } catch (e) {}
+    var sync = window.SH_SYNC;
+    if (sync && typeof sync.merge === "function") {
+      Object.keys(syncAnsweredNow).forEach(function(q){ delete byQid[q]; });
+      try { sync.merge(byQid, Object.keys(daySet).sort()); } catch (e) { if (window.console) console.warn("SH_SYNC.merge failed", e); }
+    }
+  }
+  function syncProgress(){
+    if (!supabase || syncBusy || EXPORT_ONLY) return;
+    syncBusy = true; syncAnsweredNow = {}; lastSync = Date.now();
+    try {
+      supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
+        syncBusy = false;
+        if (res && !res.error && Array.isArray(res.data) && res.data.length) applySync(res.data);
+      }, function(){ syncBusy = false; });
+    } catch (e) { syncBusy = false; }
+  }
+  window.shSyncProgress = syncProgress;
+  setTimeout(syncProgress, 300);
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "visible" && Date.now() - lastSync > 3 * 60 * 1000) syncProgress();
+  });
+
   if (modeSwitchEl) {
     modeSwitchEl.addEventListener("click", function(e){
       var t = e.target.closest("[data-" + modeAttr + "]");
