@@ -1287,9 +1287,14 @@
    "id": "PG-5",
    "status": "verified",
    "risk": "high",
-   "claim": "Nitrous oxide: ADA recommends pregnant patients and staff avoid exposure (it lists N2O as old category C). Radiographs: safe at any stage; abdominal and thyroid shielding are no longer recommended. Pregnant radiation workers should tell the employer in writing; a dental worker is unlikely to approach the 1 mSv per year exposure limit the page cites.",
-   "conditions": "The nitrous oxide advice is on the same page (quote not yet added).",
+   "claim": "The ADA's Pregnancy Oral Health Topics page says pregnant patients and staff should avoid nitrous oxide exposure. It also says dental radiographs are safe at any stage of pregnancy and abdominal and thyroid shielding are no longer recommended. Pregnant dental professionals who take radiographs should tell their employer in writing; the page says a dental worker is unlikely to approach the 1 mSv per year exposure limit.",
+   "conditions": "The page does not quantify risk from a specific nitrous oxide exposure or distinguish risk by trimester. Its statement that a dental worker is unlikely to approach 1 mSv per year is not permission to skip the facility's radiation-protection procedures: the page also advises pregnant operators to follow those procedures and use dosimeters.",
    "cites": [
+    {
+     "src": "ada-pregnancy",
+     "loc": "Nitrous Oxide",
+     "quote": "It is recommended that pregnant individuals, both patients and staff, avoid exposure to nitrous oxide."
+    },
     {
      "src": "ada-pregnancy",
      "loc": "Radiographs",
@@ -1298,7 +1303,17 @@
     {
      "src": "ada-pregnancy",
      "loc": "Radiographs",
+     "quote": "Dental professionals who take radiographs should inform their employer in writing that they are pregnant as soon as they are aware of the pregnancy."
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Radiographs",
      "quote": "it is unlikely that a dental health care worker will approach the exposure limit of 1 mSv per year"
+    },
+    {
+     "src": "ada-pregnancy",
+     "loc": "Radiographs",
+     "quote": "it is recommended that operators of radiographic equipment who are pregnant firmly adhere to shielding procedures as specified in the facility’s radiation protection documentation and always use dosimeters to monitor exposure."
     }
    ],
    "units": [
