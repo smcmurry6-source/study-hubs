@@ -4017,6 +4017,34 @@ window.SH_GOTO = function(g){
   else if(g.v === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'all'; bankSearch = g.q || ''; bankShown = BANK_PAGE; saveState(); setMode('compendium'); }
 };
 
+/* Progress sync (widget/v3.js, migration_v34): the widget reads back every answer saved for you on the server,
+   including from your linked devices, and hands each question's totals here. Keep whichever copy has more tries,
+   so answers made only on this device are never lost. */
+var SYNC_LOADED = Date.now();
+window.SH_SYNC = {
+  merge: function(byQid, days){
+    var changed = false, added = 0;
+    Object.keys(byQid).forEach(function(id){
+      var q = QUESTIONS_BY_ID[id]; if(!q) return;
+      var sv = byQid[id], s = STATE.seen[id] || { n:0, c:0, last:null };
+      if(sv.n <= s.n) return;
+      var dn = sv.n - s.n, dc = Math.max(0, sv.c - s.c);
+      if(!s.n) added++;
+      STATE.totalAnswered += dn; STATE.totalCorrect += dc;
+      var ls = STATE.lecStats[q.lec] || { a:0, c:0 }; ls.a += dn; ls.c += dc; STATE.lecStats[q.lec] = ls;
+      STATE.seen[id] = { n:sv.n, c:Math.max(sv.c, s.c), last:sv.last };
+      changed = true;
+    });
+    (days || []).forEach(function(d){ if(STATE.days.indexOf(d) === -1){ STATE.days.push(d); changed = true; } });
+    if(!changed) return;
+    STATE.days.sort();
+    checkAchievements(); saveState(); renderHeaderStats();
+    if(added) toast('Synced ' + added + ' question' + (added === 1 ? '' : 's') + ' from your other devices', 'check');
+    /* redraw the page only right after it opens, so nobody loses a question they're in the middle of */
+    if(Date.now() - SYNC_LOADED < 8000 && STATE.ui.mode === 'compendium' && STATE.ui.sub !== 'mock' && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())) renderCompendium();
+  }
+};
+
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
    draw each card, so answers go through recordAnswer like anywhere else. */
 var DRILL_HY = { 'lecture-quiz':'a self-check question from the lecture slides', deck:'from the class study deck' };

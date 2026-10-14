@@ -1,2 +1,4 @@
 # Archived hubs' question banks stay off the public repo (exam integrity); keep them locally.
 question-banks/
+# Pages the anima skill's example build scripts write (regenerate with node .claude/skills/anima/examples/<name>/build.mjs)
+.claude/skills/anima/examples/*/*.html

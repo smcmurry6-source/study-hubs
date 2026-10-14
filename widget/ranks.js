@@ -746,7 +746,7 @@
       var body = sec.querySelector(".sh-link-body");
       if (tg) {
         var open = body.hidden; body.hidden = !open; tg.setAttribute("aria-expanded", String(open));
-        if (open) body.innerHTML = '<p>Use one rank, streak and trophy case on your phone and laptop. Your in-hub progress bars stay per device.</p>' +
+        if (open) body.innerHTML = '<p>Use one rank, streak, trophy case and question progress on your phone and laptop. Questions you answer on one show up as tried on the other the next time you open that hub.</p>' +
           '<div class="sh-link-step"><b>1. On the device you use most</b><button type="button" class="sh-link-make">Get a code</button><div class="sh-link-code" aria-live="polite"></div></div>' +
           '<div class="sh-link-step"><b>2. On your other device</b><div class="sh-link-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" placeholder="Code" aria-label="Link code"><button type="button" class="sh-link-go">Link</button></div>' +
           '<div class="sh-link-msg" aria-live="polite"></div></div>';
