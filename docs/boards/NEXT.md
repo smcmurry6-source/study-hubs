@@ -180,6 +180,18 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
 5. Briefs: T-07 `items-pharm` (after #83; add the c-pharm-0005 TX-6 note), `int-notes-home` (after #80 and #81).
    `int-mock` may already be #102: check before writing it.
 
+## Session 7b (2026-10-14, parallel Claude session; details in `reviews/session-7b.md`)
+
+- Sam asked for #94-#106 (Codex prompts from this session), so step 4's "ask Sam" is answered: review them.
+- Scripted checks on every branch; walk-throughs for #81 (10/10) and #102 (pass, desktop and phone); reads of #97,
+  #99, #94. #95, #100, #101 fail `--check` (generated bundles not committed; rebuild only).
+- **#80 was merged by this session** (39db637) before it saw Session 7's stale-`finalReview` bug. Follow-up prompt
+  in `session-7b.md`; don't revert. Merges now need Sam's OK per PR (auto-mode flagged the merge).
+- #97: renumber to v35 (main has v34); `upsert_srs` drops same-day changes (`>` should be `>=`); cap game-save slots.
+- #99: bench catch rate counts any flag as a catch; must count the planted defect. #94: drop the inline-citation flag
+  (spec puts cites in `refs`), stop truncating facts, print each fact once.
+- Not yet read: #98 and #102's code; facts PRs #103, #104, #106 (step 4 applies).
+
 ## Release 1
 
 R1a, R1b, R1c as in `BUILD_SPEC.md` 8.2, with the `PLAN_V2.md` changes (local-first storage with server backup,
