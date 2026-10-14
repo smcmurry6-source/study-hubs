@@ -2,3 +2,6 @@
 question-banks/
 # Pages the anima skill's example build scripts write (regenerate with node .claude/skills/anima/examples/<name>/build.mjs)
 .claude/skills/anima/examples/*/*.html
+
+# Built preview pages of the hub figures (node tools/figures/<hub>/build.mjs --preview)
+tools/figures/*/dist/

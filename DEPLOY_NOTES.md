@@ -83,7 +83,46 @@ It is also refreshed between archivings, by hand when Sam asks a Claude Code ses
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
+## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
+
+Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
+lecture for places where a drawn diagram would teach better than text: a structure, a mechanism, where a drug acts,
+a sequence that happens in space, two structures side by side. Draw these from the hub's own notes and check them
+against the questions it tests. **Then ask Sam to approve each candidate separately before drawing any of them.**
+For each candidate, give:
+
+- what it shows, and any interaction (a toggle, a slider, stepping through a sequence, hover labels);
+- why it helps, with the question ids it supports;
+- where it goes: under a lecture's notes, in Review, or as a diagram question;
+- its size and rough build time.
+
+Only approved figures are built; note the skipped ones in the PR so the next session doesn't propose them again.
+Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` → "Diagrams (the anima skill)").
+Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
+
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-14 (diagrams after answering, Claude Code)** — Sam: in the question bank, don't show a diagram before the
+  question is answered unless it's needed, so it can't give the answer away (standing rule, now in `CLAUDE.md` →
+  "Diagrams"). New question field `imgAfter:true`: the diagram opens inside the explanation (after the verdict) instead
+  of above the stem, in the bank, the Daily Drill and the mock review. Applied to every picture question that can be
+  answered from its stem: MSK 4 `nm-fig-ache`, `nm-fig-rec`, `nm-fig-ves`, `nm-fig-na`, `mu-fig-a` (stems reworded to
+  stand alone; `mu-fig-h` keeps its picture first), PCD `ve-dogleg`, `ve-papilla`, `co-munsell-coords`, `co-specular`,
+  and perio `q2-D14` (stem reworded; its "Diagram" chip hides too). Occlusion's 20 and the rest of PCD's and perio's ask
+  you to read the diagram, so they keep it above the stem. Same ids and answers. **Perio Project: carry `figAfter`,
+  `imgAfter` on `q2-D14` and its new stem into the split sources.**
+
+- **2026-10-14 (first anima figures: MSK Exam 4, Claude Code)** — From the first diagram review (Sam approved 2 of 16
+  candidates across the live hubs; skipped: all 4 PCD Exam 3, MSK 4's melanin unit and blister split, all 4 Occlusion and
+  all 4 Perio, so don't re-propose them for those exams). `hubs/msk-exam4` gets two interactive figures under the notes
+  (outside `.reading-prose`, so no narration change): **the neuromuscular junction** (L32; selector for no drug /
+  succinylcholine / rocuronium / roc + neostigmine / roc + sugammadex / botulinum toxin, with end plate, Na+ channel
+  inactivation gates, a qualitative train of four and a small particle model) and **the sliding sarcomere** (L31; slider
+  and Play; A band constant, I and H shrink, cross-bridges when Ca2+ is on troponin C). Six picture questions
+  (`nm-fig-ache`, `nm-fig-rec`, `nm-fig-ves`, `nm-fig-na`, `mu-fig-h`, `mu-fig-a`; `img:` = an `ANIMA` still with one part
+  highlighted, labels hidden) render above the stem in the bank, drill and mock; arcade pools skip `q.img`. Bank 223 → 229.
+  Built by `tools/figures/msk-exam4/build.mjs` (kit tokens mapped onto the hub palette in `shared.mjs`), which rewrites the
+  `anima:css` / `anima:js` blocks in the hub: edit the build, never those blocks. About page Diagrams entry updated.
 
 - **2026-10-14 (calmer right-answer feedback, Claude Code)** — Sam found the right-answer "pop" shaky: `pop()` in
   `widget/fx.js` scaled the whole option (1 -> 1.035 -> .997 -> 1), which wobbles its text, and the check badge
@@ -139,6 +178,11 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
   matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
   `LESSONS.md` refreshed.
+
+- **2026-10-13 (diagram review rule, Claude Code)** — New standing rule above ("Building a hub = diagram review"):
+  every hub build, or new lectures added to a hub, includes a review for diagram candidates, and each one goes to Sam
+  for approval before it is drawn. `CLAUDE.md` → "Diagrams (the anima skill)" says how a Claude Code session asks.
+  No site change.
 
 - **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;
   commit and what was trimmed in its `UPSTREAM.md`), so Claude Code sessions can draw accurate isometric SVG figures
