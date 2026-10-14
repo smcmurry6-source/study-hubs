@@ -574,6 +574,108 @@
    "recorded": "2026-10-04"
   },
   {
+   "id": "PI-7",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For peri-implant mucositis, the EFP recommends self-performed effective oral hygiene along with professional mechanical plaque removal. Evaluate treatment endpoints after 2–3 months; if there are at least two bleeding-on-probing sites, at least one site with profuse bleeding, or suppuration, provide retreatment.",
+   "conditions": "These are the EFP guideline's implant-level treatment endpoints for mucositis. The guideline does not specify one required instrument for professional plaque removal.",
+   "cites": [
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R6.1",
+     "quote": "≤1 point of BOP and absence of suppuration"
+    },
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R6.1",
+     "quote": "evaluate these end points 2–3 months after the intervention, and in presence of ≥2 BOP sites, or ≥1 sites with profuse BOP, or presence of suppuration, re-treatment should be rendered."
+    },
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R6.2",
+     "quote": "we recommend self-performed effective OH along with PMPR"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PI-8",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For an individually acceptable implant/prosthesis affected by peri-implantitis, the EFP recommends a first-line attempt to retain it, starting with nonsurgical therapy and then reevaluating before deciding whether to proceed to surgery or supportive peri-implant care.",
+   "conditions": "This is a stepwise treatment recommendation, not a guarantee that an implant can be retained or that lost tissue support can be restored; the next step depends on the treatment outcome.",
+   "cites": [
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R7.1",
+     "quote": "we recommend therapy to retain an individually acceptable implant/prosthesis as the first line of treatment. We recommend that peri-implantitis therapy starts with a non-surgical step, followed by re-evaluation and, depending on the outcomes, progress to the surgical step or to SPIC."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PI-9",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "The EFP's nonsurgical step for peri-implantitis includes oral-hygiene instruction and motivation, risk-factor control, prosthesis cleaning/removal/modification when needed and feasible, supramarginal and submarginal instrumentation, and periodontal therapy when needed.",
+   "conditions": "Prosthesis changes are conditional on need and feasibility; this recommendation does not require removal or modification for every patient.",
+   "cites": [
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R7.2",
+     "quote": "OH instructions and motivation. Risk factor control. Prosthesis cleaning/removal/modification including controlling biofilm retentive factors and evaluation of the components of the prosthesis, whenever needed and feasible. Supramarginal and sub-marginal instrumentation. Concomitant periodontal therapy as needed."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "PI-10",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For peri-implantitis, the EFP recommends surgical therapy when nonsurgical treatment endpoints—probing depth of 5 mm or less and bleeding on probing at no more than one point—have not been achieved.",
+   "conditions": "This is a treatment-escalation criterion, not a case definition for diagnosing peri-implantitis or a guarantee of disease resolution.",
+   "cites": [
+    {
+     "src": "efp-peri-implant-s3-2023",
+     "loc": "R8.5",
+     "quote": "In peri-implantitis patients in whom end points of non-surgical therapy (PD ≤5 mm and ≤1 point of BOP) have not been achieved, we recommend performing surgical therapy."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "peri-implant",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
    "id": "MG-1",
    "status": "verified",
    "risk": "medium",
@@ -600,11 +702,22 @@
    "status": "verified",
    "risk": "medium",
    "claim": "Cairo recession types: RT1 = recession with no interproximal attachment loss (interproximal CEJ not visible); RT2 = interproximal attachment loss less than or equal to the buccal attachment loss; RT3 = interproximal attachment loss greater than the buccal attachment loss.",
+   "conditions": "These are clinical classification definitions based on interproximal and buccal attachment measurements. The type alone does not select a surgical procedure or guarantee an individual root-coverage outcome (MG-3).",
    "cites": [
     {
-     "src": "efp-3",
-     "loc": "p. 4",
-     "quote": "RT1 -- REC with no loss of interproximal CAL -- Interproximal CEJ is not visible RT2 -- REC with loss of interproximal CAL -- Interproximal loss of CAL is less than or equal to buccal C"
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "Recession Type 1 (RT1): Gingival recession with no loss of interproximal attachment. Interproximal CEJ is clinically not detectable at both mesial and distal aspects of the tooth."
+    },
+    {
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "Recession Type 2 (RT2): Gingival recession associated with loss of interproximal attachment. The amount of interproximal attachment loss (measured from the interproximal CEJ to the depth of the interproximal sulcus/pocket) is less than or equal to the buccal attachment loss (measured from the buccal CEJ to the apical end of the buccal sulcus/pocket)."
+    },
+    {
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "Recession Type 3 (RT3): Gingival recession associated with loss of interproximal attachment. The amount of interproximal attachment loss (measured from the interproximal CEJ to the apical end of the sulcus/pocket) is greater than the buccal attachment loss (measured from the buccal CEJ to the apical end of the buccal sulcus/pocket)."
     }
    ],
    "units": [
@@ -616,6 +729,105 @@
     "adex"
    ],
    "recorded": "2026-10-04"
+  },
+  {
+   "id": "MG-3",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Cairo recession type estimates root-coverage potential: RT1 supports predicting 100% root coverage; for RT2, 100% coverage may be predictable when interproximal attachment loss is limited; RT3 does not permit full root coverage.",
+   "conditions": "These are class-level expectations, not a guarantee for an individual site or a recommendation for a specific procedure. The RT2 expectation depends on the amount of interproximal attachment loss and the root-coverage procedure.",
+   "cites": [
+    {
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "In the Cairo RT1 (Miller Class I and II) 100% root coverage can be predicted"
+    },
+    {
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "in the Cairo RT2 (overlapping the Miller class III) some randomized clinical trials indicate the limit of interdental CAL loss within which 100% root coverage is predictable applying different root coverage procedures"
+    },
+    {
+     "src": "aap-mucogingival-2018",
+     "loc": "Interdental clinical attachment level (CAL)",
+     "quote": "in the Cairo RT3 (overlapping the Miller class IV) full root coverage is not achievable"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "mucogingival",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "MG-4",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "During manual periodontal probing, align the probe parallel to the tooth's long axis when measuring probing depth. A full-mouth clinical attachment level assessment uses a calibrated examiner and standard periodontal probe at six sites per tooth.",
+   "conditions": "The cited sources describe probe orientation in a standardized probing protocol and six-site full-mouth assessment; they do not specify one preferred probe design or an exact insertion force for every clinical setting.",
+   "cites": [
+    {
+     "src": "manual-probing-2022",
+     "loc": "Methods, periodontal probing",
+     "quote": "with the probe inserted with its long axis aligned parallel to the long axis of the tooth"
+    },
+    {
+     "src": "europepmc-periodontal-diagnosis-2025",
+     "loc": "§4.2",
+     "quote": "clinical attachment levels are assessed in a full‐mouth examination involving six sites per tooth at all teeth present by a calibrated examiner using a standard periodontal probe."
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-examination",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "MG-5",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For an indirect calculation, CAL = probing depth + recession when the gingival margin is apical to the CEJ; if the gingival margin is coronal to the CEJ, CAL = probing depth minus the CEJ-to-margin distance.",
+   "conditions": "These are common indirect formulas. The study reports that adding probing depth and recession can overestimate direct CAL because both measurements have error; do not treat the arithmetic as a direct measurement or a diagnosis threshold.",
+   "cites": [
+    {
+     "src": "cal-indirect-2022",
+     "loc": "Introduction",
+     "quote": "in the absence of GR [i.e. when the gingival margin is coronal to the cemento–enamel junction (CEJ)], CAL is commonly measured by subtracting the distance between the CEJ and the free gingival margin (FGM) from the PPD value"
+    },
+    {
+     "src": "cal-indirect-2022",
+     "loc": "Introduction",
+     "quote": "in the presence of GR, although it is still possible to measure the extent of CAL directly"
+    },
+    {
+     "src": "cal-indirect-2022",
+     "loc": "Introduction",
+     "quote": "from the sum of the PPD and GR values"
+    },
+    {
+     "src": "cal-indirect-2022",
+     "loc": "Introduction",
+     "quote": "The indirect method overestimated CAL compared with the direct method"
+    }
+   ],
+   "units": [
+    "perio"
+   ],
+   "topic": "periodontal-examination",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
   },
   {
    "id": "FM-1",
