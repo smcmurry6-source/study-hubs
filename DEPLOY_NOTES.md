@@ -102,6 +102,12 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (PCD Exam 3: staining recommendations, Claude Code)** — A course email says the two exam questions from
+  James Bradley's glaze video are on its staining recommendations. Checked the hub against the video transcript (Drive,
+  `13 Glaze and Add Porcelain Contacts ... .txt`): the notes already covered every step. 7 new questions (`gl-email`,
+  `gl-c-shade`, `gl-occlusal`, `gl-white`, `gl-texture`, `gl-ln-thin`, `gl-gingival-where`; bank 328 -> 335), the email
+  and 3 video quotes as exam hints, 3 Review rows and 2 cram lines. Notes text unchanged, so no narration regenerated.
+
 - **2026-10-14 (MSK 4: clinical lecture off, official exam counts, Claude Code)** — Sam: Dr. Taylor's MSK & Skin
   Clinical Application lecture (`clinical`, label `CA`) is not on Exam 4, so it is gone from `hubs/msk-exam4`: the
   lecture, its 29 `ca-*` questions (bank 249 → 220), both reading levels and their mp3s, the "Dental clinic" Review
