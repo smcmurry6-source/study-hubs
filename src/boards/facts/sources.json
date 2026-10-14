@@ -1218,5 +1218,104 @@
   "url": "https://openstax.org/books/pharmacology/pages/2-2-pharmacokinetics-and-pharmacodynamics",
   "kind": "html",
   "date": "2024"
+ },
+ "local-anesthesia-review": {
+  "title": "Local Anaesthesia in Dentistry: A Review",
+  "org": "Open-access review (Europe PMC)",
+  "citation": "Decloux D, Ouanounou A. Int Dent J. 2021;71(2):87-95. doi:10.1111/idj.12615",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9275172/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9275172/fullTextXML",
+  "kind": "xml",
+  "date": "2021"
+ },
+ "topical-anesthetics-review": {
+  "title": "The efficiency of topical anesthetics as antimicrobial agents: A review of use in dentistry",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6115368/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6115368/fullTextXML",
+  "kind": "xml",
+  "date": "2018"
+ },
+ "ianb-review": {
+  "title": "A basic review on the inferior alveolar nerve block techniques",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4173572/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4173572/fullTextXML",
+  "kind": "xml",
+  "date": "2014"
+ },
+ "mandibular-block-review": {
+  "title": "Neural Blockade Anaesthesia of the Mandibular Nerve and Its Terminal Branches: Rationale for Different Anaesthetic Techniques Including Their Advantages and Disadvantages",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3119427/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3119427/fullTextXML",
+  "kind": "xml",
+  "date": "2011"
+ },
+ "local-anesthesia-techniques": {
+  "title": "Local Anesthesia Part 2: Technical Considerations",
+  "org": "Open-access review (Europe PMC)",
+  "citation": "Reed KL, Malamed SF, Fonner AM. Anesth Prog. 2012;59(3):127-137.",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3468291/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3468291/fullTextXML",
+  "kind": "xml",
+  "date": "2012"
+ },
+ "regional-anesthesia-review": {
+  "title": "Regional anesthesia for maxillofacial surgery in developing countries",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5564189/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5564189/fullTextXML",
+  "kind": "xml",
+  "date": "2017"
+ },
+ "local-anesthesia-advances": {
+  "title": "Advances in dental local anesthesia techniques and devices: An update",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3800379/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3800379/fullTextXML",
+  "kind": "xml",
+  "date": "2013"
+ },
+ "alternative-dental-anesthesia": {
+  "title": "Alternative practices of achieving anaesthesia for dental procedures: a review",
+  "org": "Open-access review (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5932994/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5932994/fullTextXML",
+  "kind": "xml",
+  "date": "2018"
+ },
+ "intravascular-dental": {
+  "title": "Accidental Intravascular Local Anesthetic Injection of the Facial Artery",
+  "org": "Open-access case report (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8033576/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8033576/fullTextXML",
+  "kind": "xml",
+  "date": "2021"
+ },
+ "facial-palsy-dental": {
+  "title": "Transient facial nerve palsy following dental local anaesthesia",
+  "org": "Open-access case report (Europe PMC)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7478029/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7478029/fullTextXML",
+  "kind": "xml",
+  "date": "2020"
+ },
+ "dm-oraverse": {
+  "title": "OraVerse (phentolamine mesylate) injection, solution for submucosal use",
+  "org": "FDA label (DailyMed)",
+  "url": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=38be9414-87c4-4a8a-9f17-99be0d0a33fa",
+  "fetch": "https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/38be9414-87c4-4a8a-9f17-99be0d0a33fa.xml",
+  "kind": "spl",
+  "date": "2008-05-23"
+ },
+ "ada-sedation-2025": {
+  "title": "Guidelines for the Use of Sedation and General Anesthesia by Dentists",
+  "org": "American Dental Association",
+  "url": "https://www.ada.org/-/media/project/ada-organization/ada/ada-org/files/resources/library/oral-health-topics/ada_sedation_use_guidelines.pdf?hash=12AD34F236D560A8417855F10DFF4FF5&rev=b08b8eb5e859419383ec19fa99248db3",
+  "fetch": "https://www.ada.org/-/media/project/ada-organization/ada/ada-org/files/resources/library/oral-health-topics/ada_sedation_use_guidelines.pdf?hash=12AD34F236D560A8417855F10DFF4FF5&rev=b08b8eb5e859419383ec19fa99248db3",
+  "kind": "pdf",
+  "date": "2025-10",
+  "citation": "Adopted by the ADA House of Delegates, October 2025"
  }
 }

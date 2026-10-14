@@ -244,12 +244,22 @@
    "status": "verified",
    "risk": "high",
    "claim": "AAPD vasoconstrictor per 1.7 mL cartridge: epi 1:50,000 = 0.034 mg; 1:100,000 = 0.017 mg; 1:200,000 = 0.0085 mg; levonordefrin 1:20,000 = 0.085 mg. Bupivacaine 0.5% = 8.5 mg per 1.7 mL in the AAPD table.",
-   "conditions": "Table cells (PDF extraction). 1:50,000 = 0.034 mg per 1.7 mL is in the same table.",
+   "conditions": "These are per-cartridge amounts from the AAPD table, not patient-specific maximum doses; the bupivacaine row separately lists 8.5 mg anesthetic and 0.0085 mg epinephrine.",
    "cites": [
     {
      "src": "aapd-la",
      "loc": "Table, p. 408",
-     "quote": "34 0.017 mg 2%+1:100,000 epinephrine"
+     "quote": "2%+1:50,000 epinephrine 34 0.034 mg"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "2%+1:100,000 epinephrine 34 0.017 mg"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table, p. 408",
+     "quote": "4%+1:200,000 epinephrine 68 0.0085 mg"
     },
     {
      "src": "aapd-la",
@@ -259,7 +269,12 @@
     {
      "src": "aapd-la",
      "loc": "Table, p. 408",
-     "quote": "68 0.0085 mg 4%+1:200,000 epinephrine"
+     "quote": "0.5%+1:200,000 epinephrine 8.5 0.0085 mg"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "Table heading, p. 408",
+     "quote": "1.7 mL cartridge"
     }
    ],
    "units": [
@@ -686,6 +701,1555 @@
     "adex"
    ],
    "recorded": "2026-10-04"
+  },
+  {
+   "id": "LA-13",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Local anesthetics reversibly interrupt impulse conduction by binding neuronal sodium channels and inhibiting sodium influx, which prevents depolarization and onward action-potential transmission.",
+   "conditions": "The review describes the shared mechanism; it does not rank the clinical effectiveness of individual agents.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Mechanism of action",
+     "quote": "they bind to cellular sodium channels and inhibit the influx of sodium into the cell which prevents cell depolarisation and subsequent transmission of the previously propagating action potential"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-mechanism",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-14",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Common dental amides include lidocaine, mepivacaine, bupivacaine, prilocaine, and articaine; benzocaine and tetracaine are esters. Articaine is an amide-type agent that also contains an ester linkage.",
+   "conditions": "The AAPD examples include pediatric dental agents; articaine’s additional linkage does not make it a conventional ester-class drug.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 407, chemical formulations",
+     "quote": "esters (eg, procaine, benzocaine, tetracaine) and (2) amides"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Injectable local anesthetic agents",
+     "quote": "Amide local anesthetics available for dental usage include lidocaine, mepivacaine, articaine, prilocaine, and bupivacaine"
+    },
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Chemical structure",
+     "quote": "though there are some amide-type local anaesthetics that also contain an additional ester linkage (articaine)"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-classes",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-15",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "As a class-level rule, ester local anesthetics are hydrolyzed by plasma esterases, while amide local anesthetics are metabolized mainly in the liver.",
+   "conditions": "This class-level summary does not fully describe each agent or articaine’s additional ester linkage; use the individual product label for agent-specific pharmacokinetics.",
+   "cites": [
+    {
+     "src": "topical-anesthetics-review",
+     "loc": "Classification of anesthetics and their effectiveness",
+     "quote": "esters are hydrolyzed in blood plasma by plasma esterases, whereas amides are metabolized in the liver"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-metabolism",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-16",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A lower local-anesthetic pKa generally supports a faster onset at physiologic pH because a greater fraction is in the lipid-soluble, uncharged form that crosses the nerve membrane.",
+   "conditions": "The review gives a general relationship and does not establish a universal onset time or an agent ranking for every injection technique.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Onset",
+     "quote": "for a rapid onset of action, the lower the pKa of a local anaesthetic, the more ionised drug is present in normal tissue and the faster the onset of blockade"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-onset",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-17",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Inflamed or infected tissue can be harder to anesthetize because its lower pH shifts more local anesthetic into the water-soluble ionized form, which crosses the nerve membrane less readily.",
+   "conditions": "The pH value is an approximate example in the review, not a universal measurement for every infection or a prediction that anesthesia will always fail.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Onset",
+     "quote": "This is why it is harder to anaesthetise a patient with an infection, as the environment pH is much lower (around pH of 5.2) and this favours the water-soluble state"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-infection",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-18",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Longer local-anesthetic duration is associated with greater protein binding; local vascularity and redistribution away from the target also affect how long anesthesia lasts.",
+   "conditions": "These are general pharmacologic factors; the review does not give a guaranteed pulpal or soft-tissue duration for every agent and technique.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Duration of action",
+     "quote": "the more protein-bound a drug is, the longer the duration of action"
+    },
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Duration of action",
+     "quote": "Duration of action on dental pulp and soft tissues is contingent almost completely on diffusion away from the site of action"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-duration",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-19",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Common topical dental anesthetic agents include 20% benzocaine, 5% lidocaine, and 4% tetracaine; topical application may reduce discomfort from needle penetration.",
+   "conditions": "These examples and concentrations are from the AAPD pediatric reference; the quote does not establish that each formulation is appropriate for every age or patient.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Topical anesthetics",
+     "quote": "Single drugs which are often used as topical anesthetics in dentistry include 20% benzocaine, 5% lidocaine, and 4% tetracaine"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "topical-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-20",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Dental topical anesthetics act mainly in surface tissues, approximately 2–3 mm deep, to reduce pain from oral-mucosal needle penetration.",
+   "conditions": "This statement concerns mucosal penetration discomfort; it does not say topical agents provide pulpal anesthesia.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Topical anesthetics",
+     "quote": "Topical anesthetics are effective on surface tissues (up to 2 mm to 3 mm in depth) to reduce pain from needle penetration of the oral mucosa"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "topical-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-21",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Topical anesthetic formulations typically have higher concentrations than injectable solutions, so careful application helps reduce toxicity risk.",
+   "conditions": "The source does not supply one universal topical dose; follow the specific product labeling and patient-specific limits.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Topical anesthetics",
+     "quote": "The concentration of local anesthetics typically is higher in topical formulations than in injectable solutions, and judicious application will reduce potential for toxicity"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "topical-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-22",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Benzocaine and prilocaine are associated with acquired methemoglobinemia risk; AAPD states they are contraindicated in patients with a history of methemoglobinemia.",
+   "conditions": "The quote identifies a risk and a history-based contraindication; it does not quantify incidence or replace product-specific warnings in LA-9.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Topical anesthetics",
+     "quote": "Benzocaine and prilocaine both have been associated with a risk of acquired methemoglobinemia, and their use is contraindicated in patients with a history of methemoglobinemia"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "methemoglobinemia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-23",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "FDA warns against topical benzocaine products, including over-the-counter teething products, in children younger than 2 years.",
+   "conditions": "This is the AAPD summary of FDA guidance and applies to topical benzocaine products; it is not a general age limit for all local anesthetics.",
+   "stem_names": [
+    "AAPD",
+    "FDA"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Topical anesthetics",
+     "quote": "the US Food and Drug Administration (FDA) warns against use of topical anesthetics (including over-the-counter teething products) containing benzocaine for children younger than 2 years"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds",
+    "medcx"
+   ],
+   "topic": "topical-anesthetics",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-24",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "The prolonged soft-tissue effect of bupivacaine may be useful for postoperative pain in adults, but AAPD says its increased soft-tissue injury risk makes it contraindicated for children or intellectually disabled patients.",
+   "conditions": "This is AAPD guidance for pediatric dental care and the named patient groups; the source does not provide a duration in hours here.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 409, patient selection",
+     "quote": "While the prolonged effect of a long-acting local anesthetic (ie, bupivacaine) can be beneficial for postoperative pain in adults, the concomitant increased risk of self-inflicted injury infers that it is contraindicated for children or intellectually disabled patients"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds",
+    "medcx"
+   ],
+   "topic": "long-acting-local-anesthetic",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-25",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "When local anesthetic is used with sedative drugs, sedative effects may be enhanced; AAPD advises calculating the maximum total LA dose before treatment and keeping a time-based record of all agents.",
+   "conditions": "The source does not give a dose-adjustment formula for this combination; use the individual LA and sedation guidance.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 409, documentation",
+     "quote": "Because there may be enhanced sedative effects when local anesthetics are administered in conjunction with sedative drugs, recording doses of all agents on a time-based record can help ensure patient safety"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "local-anesthetics-and-sedation",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-26",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Citanest Plain 4% label: dental infiltration onset averages under 2 minutes with soft-tissue anesthesia around 2 hours; for an inferior alveolar block, onset averages under 3 minutes and soft-tissue anesthesia around 2.5 hours.",
+   "conditions": "These are label averages for plain prilocaine in the named techniques; they do not establish duration for another concentration or vasoconstrictor formulation.",
+   "cites": [
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Clinical Pharmacology / Onset and Duration of Action",
+     "quote": "When used for infiltration injection in dental patients, the time of onset of anesthesia averages less than 2 minutes with an average duration of soft tissue anesthesia of approximately 2 hours"
+    },
+    {
+     "src": "dm-citanest-plain",
+     "loc": "Clinical Pharmacology / Onset and Duration of Action",
+     "quote": "averages less than three minutes with an average duration of soft tissue anesthesia of approximately 2 1/2 hours"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "prilocaine-onset-duration",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-27",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A conventional inferior alveolar nerve block deposits anesthetic near the mandibular foramen before the inferior alveolar nerve enters it. Clinical landmarks include the coronoid notch and pterygomandibular raphe; the target territory is ipsilateral mandibular teeth to the midline.",
+   "conditions": "Anatomic variation affects the foramen and block success; the cited review does not guarantee complete anesthesia for every mandibular tooth.",
+   "cites": [
+    {
+     "src": "ianb-review",
+     "loc": "Conventional inferior alveolar nerve block / landmarks",
+     "quote": "The conventional method of blocking the inferior alveolar nerve involves the insertion of the dental needle near the area of the mandibular foramen, where the inferior alveolar nerve is located before it enters the foramen"
+    },
+    {
+     "src": "ianb-review",
+     "loc": "Location of landmarks for conventional IANB",
+     "quote": "The most important clinical landmarks used in the location of the inferior alveolar nerve block are the coronoid notch and the pterygomandibular raphe"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-28",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For extraction of lower posterior teeth, an inferior alveolar block alone may not anesthetize all required soft tissues; the lingual and long buccal nerves may also need anesthesia.",
+   "conditions": "This statement is for lower posterior tooth extraction and does not say every procedure needs a separate injection to each nerve.",
+   "cites": [
+    {
+     "src": "mandibular-block-review",
+     "loc": "Direct inferior alveolar nerve block",
+     "quote": "the long buccal nerve and the lingual nerve must be anaesthetised, in addition to the IAN, if lower posterior teeth are to be extracted"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-29",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A posterior superior alveolar block anesthetizes maxillary molars except the mesiobuccal aspect of the first molar; the insertion point is in the buccal vestibule just distal to the malar process.",
+   "conditions": "Supplementary anesthesia may be needed for the first molar mesiobuccal root.",
+   "cites": [
+    {
+     "src": "local-anesthesia-techniques",
+     "loc": "Techniques / Posterior Superior Alveolar",
+     "quote": "The posterior superior alveolar (PSA) injection will anesthetize the maxillary molars except for the mesiobuccal aspect of the first molar"
+    },
+    {
+     "src": "local-anesthesia-techniques",
+     "loc": "Techniques / Posterior Superior Alveolar",
+     "quote": "the insertion point at the height of the buccal vestibule at a point just distal to the malar process"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-30",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A middle superior alveolar block from the buccal vestibule near the maxillary second premolar anesthetizes both premolars and the mesiobuccal aspect of the first molar with adjacent buccal tissues; the MSA nerve may be absent.",
+   "conditions": "If the MSA nerve is absent, the source says the ASA block may anesthetize the premolar region; innervation varies among patients.",
+   "cites": [
+    {
+     "src": "local-anesthesia-techniques",
+     "loc": "Techniques / Middle Superior Alveolar",
+     "quote": "The middle superior alveolar (MSA) injection will anesthetize the mesiobuccal aspect of the maxillary first molar, both premolars"
+    },
+    {
+     "src": "local-anesthesia-techniques",
+     "loc": "Techniques / Middle Superior Alveolar",
+     "quote": "In many patients, the MSA nerve is absent"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-31",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "An anterior superior alveolar block near the maxillary canine anesthetizes teeth from the canine to the midline and their periodontal ligament, alveolar bone, periosteum, and buccal soft tissues.",
+   "conditions": "Crossover innervation near the midline can leave incomplete anesthesia; this source describes usual distribution, not a guarantee.",
+   "cites": [
+    {
+     "src": "local-anesthesia-techniques",
+     "loc": "Techniques / Anterior Superior Alveolar",
+     "quote": "The ASA injection will anesthetize the PDL, alveolar bone, periosteum, buccal soft tissue, and teeth from the canine to the midline"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-32",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "An infraorbital block targets the infraorbital nerve as it exits the infraorbital foramen; described sensory areas include cheek, nasal sidewall, part of nasal tip, half of the upper lip, and vestibular mucosa related to upper teeth.",
+   "conditions": "The review describes facial and mucosal territory; it does not guarantee pulpal anesthesia of every maxillary anterior tooth.",
+   "cites": [
+    {
+     "src": "regional-anesthesia-review",
+     "loc": "Infraorbital nerve",
+     "quote": "the infraorbital nerve exits the maxillary bone at a point several centimeters just below the pupil, and can be targeted with an infraorbital nerve block to anesthetize the cheek, nasal sidewall, a portion of the nasal tip, one half of the upper lip, and vestibular mucosa related to the upper teeth"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-33",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "The Gow-Gates mandibular block uses an open-mouth approach and targets the anterolateral condylar neck below the lateral pterygoid insertion; it anesthetizes a broader mandibular-nerve distribution, including auriculotemporal and long buccal nerves in most cases.",
+   "conditions": "The block has a learning curve and can have a slower onset than a conventional IANB; “most cases” is not universal coverage.",
+   "cites": [
+    {
+     "src": "mandibular-block-review",
+     "loc": "3.4 Gow-Gates Mandibular Block Technique",
+     "quote": "The Gow-Gates mandibular block is often referred to as a true mandibular block as the distribution of its effect is larger than that of lower-level nerve block techniques and it anaesthetises the auriculotemporal and long buccal nerves in most cases"
+    },
+    {
+     "src": "mandibular-block-review",
+     "loc": "3.4 Gow-Gates Mandibular Block Technique",
+     "quote": "the intraoral insertion of a needle through the pterygomandibular space until bony contact is made with the anterolateral condylar neck"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-34",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "The Vazirani-Akinosi technique is a closed-mouth mandibular block option for limited mouth opening; the needle is placed in the pterygomandibular space without a bony-contact endpoint.",
+   "conditions": "The review notes that absent bony contact removes a tactile endpoint; this fact is not a complete step-by-step injection protocol.",
+   "cites": [
+    {
+     "src": "mandibular-block-review",
+     "loc": "3.5 Akinosi Closed-Mouth Technique",
+     "quote": "The Akinosi closed-mouth mandibular block approach provides an alternate technique for individuals who have limited mouth opening"
+    },
+    {
+     "src": "mandibular-block-review",
+     "loc": "3.5 Akinosi Closed-Mouth Technique",
+     "quote": "This technique does not involve bony contact"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-35",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A periodontal ligament (intraligamentary) injection delivers anesthetic through the PDL to produce pulpal anesthesia for the target tooth, with only localized soft-tissue anesthesia.",
+   "conditions": "The review describes the anesthetized area, not a universal success rate or required volume.",
+   "cites": [
+    {
+     "src": "local-anesthesia-advances",
+     "loc": "PDL injection",
+     "quote": "The PDL injection provides pulpal anesthesia to the tooth, with only localized soft tissue anesthesia developing"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-36",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Intraosseous anesthesia deposits local anesthetic into cancellous alveolar bone adjacent to the target tooth and can produce rapid pulpal anesthesia with less soft-tissue anesthesia than a conventional block or infiltration.",
+   "conditions": "The cited review discusses intraosseous delivery methods and does not establish a fixed duration or guarantee success for every system.",
+   "cites": [
+    {
+     "src": "alternative-dental-anesthesia",
+     "loc": "Computer-Controlled Intraosseous Anaesthesia System",
+     "quote": "Intraosseous anaesthesia (IA) is a technique whereby an anaesthetic solution is injected into the cancellous alveolar bone supporting the teeth"
+    },
+    {
+     "src": "alternative-dental-anesthesia",
+     "loc": "Computer-Controlled Intraosseous Anaesthesia System",
+     "quote": "rapid onset of profound pulpal anaesthesia"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-37",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Blood return on aspiration is a positive aspiration. Abort that injection attempt, reposition the needle, and reaspirate before depositing anesthetic.",
+   "conditions": "A negative aspiration can be false-negative; aspiration lowers risk but cannot rule out every intravascular injection.",
+   "cites": [
+    {
+     "src": "intravascular-dental",
+     "loc": "Positive aspiration",
+     "quote": "Blood inside the dental cartridge indicates an extravasation of blood from a vessel"
+    },
+    {
+     "src": "intravascular-dental",
+     "loc": "Positive aspiration",
+     "quote": "If a positive aspiration occurs, the injection attempt should be aborted and the needle repositioned"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "injection-techniques",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-38",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "A hematoma after dental local-anesthetic injection can result from vascular puncture and cause localized swelling, soreness, and trismus; initial care is firm pressure to help stop bleeding.",
+   "conditions": "The review recommends pressure and observation; it does not give a single management plan for rapidly expanding hematoma or airway symptoms, which require urgent assessment.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Complications / Haematoma",
+     "quote": "This can be associated with facial swelling, soreness, and trismus from the expansion of the potential space where the bleeding from the insult occurred"
+    },
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Complications / Haematoma",
+     "quote": "If a haematoma is suspected, a dentist should immediately apply pressure to the area in order to aid in haemostasis of the punctured vessel"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-complications",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-39",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Trismus after a dental injection may follow needle passage through a muscle of mastication or a hematoma; acute-phase measures described in the review include analgesics and a soft diet, with gradual return to function and physiotherapy if needed.",
+   "conditions": "The review describes common causes and supportive care; it does not give time to resolution or cover infectious and other causes of restricted opening.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Complications / Trismus",
+     "quote": "Trismus, a reduction in the range of mandibular motion, can occur after a dental injection"
+    },
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Complications / Trismus",
+     "quote": "Analgesics and a soft diet are mainstay therapies in the acute phase of trismus following a dental injection"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-complications",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-40",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "A mandibular block placed too far posteriorly may deposit local anesthetic in the parotid region and block the facial nerve, causing immediate facial palsy; when caused by local anesthetic, the palsy is expected to last about as long as its anesthetic effect.",
+   "conditions": "This rare complication is described in a case report; incidence is unknown, and a new facial deficit still needs assessment for other causes.",
+   "cites": [
+    {
+     "src": "facial-palsy-dental",
+     "loc": "Discussion / Immediate type",
+     "quote": "we suspect the local anaesthetic may have reached the facial nerve due to the injection being too posterior on this side and entering the parotid gland"
+    },
+    {
+     "src": "facial-palsy-dental",
+     "loc": "Discussion / Immediate type",
+     "quote": "the paralysis would be expected to last as long as the local anaesthetic agent"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-complications",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-41",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Paresthesia is persistent anesthesia beyond the expected duration. Needle trauma can injure a nerve, and an electric-shock sensation during injection may precede persistent altered sensation.",
+   "conditions": "AAPD describes possible causes and symptoms; the source does not give an individual prognosis.",
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 410, Paresthesia",
+     "quote": "Paresthesia is persistent anesthesia beyond the expected duration"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 410, Paresthesia",
+     "quote": "Patients who initially experience an electric shock sensation during injection may have persistent anesthesia"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "local-anesthetic-complications",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-42",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "OraVerse is labeled to reverse lip and tongue soft-tissue anesthesia and associated functional deficits after an intraoral submucosal injection of local anesthetic containing a vasoconstrictor.",
+   "conditions": "The label indication is soft-tissue anesthesia; it does not claim reversal of pulpal or tooth anesthesia.",
+   "cites": [
+    {
+     "src": "dm-oraverse",
+     "loc": "1 Indications and Usage",
+     "quote": "OraVerse is indicated for reversal of the soft-tissue anesthesia, i.e., anesthesia of the lip and tongue, and the associated functional deficits resulting from an intraoral submucosal injection of a local anesthetic containing a vasoconstrictor"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "reversal-of-soft-tissue-anesthesia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-43",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "The OraVerse label bases the recommended dose on the number of vasoconstrictor-containing local-anesthetic cartridges given and directs administration after the procedure at the same location and by the same technique.",
+   "conditions": "This is the product-label dosing schedule for studied cartridge counts; it does not authorize use outside the label population.",
+   "cites": [
+    {
+     "src": "dm-oraverse",
+     "loc": "2.1 General Dosing Information",
+     "quote": "The recommended dose of OraVerse is based on the number of cartridges of local anesthetic with vasoconstrictor administered"
+    },
+    {
+     "src": "dm-oraverse",
+     "loc": "2.1 General Dosing Information",
+     "quote": "OraVerse should be administered following the dental procedure using the same location(s) and technique(s) (infiltration or block injection) employed for the administration of the local anesthetic"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "reversal-of-soft-tissue-anesthesia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-44",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "OraVerse is not recommended below age 6 or below 15 kg (33 lb); for children weighing 15–30 kg, the labeled maximum is one-half cartridge (0.2 mg), and more than one cartridge has not been studied below age 12.",
+   "conditions": "This is label-specific pediatric evidence; it does not set a dose for other populations.",
+   "stem_names": [
+    "OraVerse"
+   ],
+   "cites": [
+    {
+     "src": "dm-oraverse",
+     "loc": "1 Indications and Usage",
+     "quote": "OraVerse is not recommended for use in children less than 6 years of age or weighing less than 15 kg (33 lbs)"
+    },
+    {
+     "src": "dm-oraverse",
+     "loc": "2.2 Dosing in Special Populations",
+     "quote": "In pediatric patients weighing 15-30 kg, the maximum dose of OraVerse recommended is 1/2 cartridge (0.2 mg)"
+    },
+    {
+     "src": "dm-oraverse",
+     "loc": "2.2 Dosing in Special Populations",
+     "quote": "A dose of more than 1 cartridge [0.4 mg] of OraVerse has not been studied in children less than 12 years of age"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "reversal-of-soft-tissue-anesthesia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-45",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "The OraVerse label says its effect on reversal of local anesthesia of the teeth, mandible, and maxilla has not been assessed.",
+   "conditions": "Absence of assessment is not evidence that pulpal anesthesia is reversed.",
+   "cites": [
+    {
+     "src": "dm-oraverse",
+     "loc": "14 Clinical Studies",
+     "quote": "The efficacy of OraVerse on reversal of local anesthesia of the teeth, mandible and maxilla has not been assessed"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "reversal-of-soft-tissue-anesthesia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-46",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "OraVerse may cause tachycardia or cardiac arrhythmias; the label advises clinicians to watch for these events, particularly in patients with prior cardiovascular disease.",
+   "conditions": "These warnings concern OraVerse and do not establish event frequency in every patient.",
+   "cites": [
+    {
+     "src": "dm-oraverse",
+     "loc": "5.1 Cardiovascular Events",
+     "quote": "Tachycardia and cardiac arrhythmias may occur with the use of phentolamine or other alpha-adrenergic blocking agents"
+    },
+    {
+     "src": "dm-oraverse",
+     "loc": "5.1 Cardiovascular Events",
+     "quote": "clinicians should be alert to the signs and symptoms of these events, particularly in patients with a prior history of cardiovascular disease"
+    }
+   ],
+   "units": [
+    "anes"
+   ],
+   "topic": "reversal-of-soft-tissue-anesthesia",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-47",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "During ADA minimal sedation, continuously assess level of consciousness and pulse-oximetry oxygen saturation; observe chest movement and verify respirations, with blood pressure and heart rate evaluated before and after treatment and intraoperatively as needed.",
+   "conditions": "The ADA minimal-sedation guideline does not require the same ventilation monitors as its moderate-sedation section; circulation checks are specified as needed.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.4 Monitoring and Documentation",
+     "quote": "Level of sedation (e.g., responsiveness to verbal commands) must be continually assessed"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.4 Monitoring and Documentation",
+     "quote": "Oxygen saturation by pulse oximetry"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.4 Monitoring and Documentation",
+     "quote": "The qualified dentist and/or appropriately trained individual must observe chest excursions"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-monitoring",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-48",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Before moderate sedation, ADA calls for review of medical history, medication use, and NPO status; patients with significant medical considerations such as ASA III–IV should have physician or specialist consultation.",
+   "conditions": "This is the ADA moderate-sedation guideline; it does not specify fasting intervals in this passage.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.B.1 Patient History and Evaluation",
+     "quote": "This should consist of at least a review at an appropriate time of their medical history and medication use and NPO (nothing by mouth) status"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.B.1 Patient History and Evaluation",
+     "quote": "patients with significant medical considerations (e.g., ASA III, IV) should also require consultation with their primary care physician or consulting medical specialist"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-safety",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-49",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "For ADA moderate sedation, the qualified dentist must remain in the operatory and continuously assess consciousness and oxygen saturation by pulse oximetry; ventilation must be monitored with end-tidal CO2 unless precluded or invalidated.",
+   "conditions": "The ADA exception for end-tidal CO2 is explicit; local regulations may impose additional requirements.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.B.4 Monitoring and Documentation",
+     "quote": "A qualified dentist administering moderate sedation must remain in the operatory room to monitor the patient continuously"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.B.4 Monitoring and Documentation",
+     "quote": "Oxygen saturation must be evaluated by pulse oximetry continuously"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.B.4 Monitoring and Documentation",
+     "quote": "The dentist must monitor ventilation and/or breathing by monitoring end-tidal CO2 unless precluded or invalidated by the nature of the patient, procedure or equipment"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-monitoring",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-50",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "If a patient enters a deeper sedation level than the dentist is qualified to provide, ADA directs the dentist to stop dental treatment until the patient returns to the intended level.",
+   "conditions": "This is one immediate ADA instruction; it does not replace separate rescue and emergency-management requirements.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.6 Emergency Management",
+     "quote": "If a patient enters a deeper level of sedation than the dentist is qualified to provide, the dentist must stop the dental procedure until the patient returns to the intended level of sedation"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-emergencies",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-51",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "AAPD reports that nitrous oxide titration can begin with 100% oxygen for 1–2 minutes followed by 10% nitrous-oxide increments; 30–40% usually achieves analgesia/anxiolysis, and concentration should not routinely exceed 50%.",
+   "conditions": "These are AAPD pediatric dental recommendations; they are not a direct conversion to an ADA sedation depth or an adult drug dose.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Technique of N2O/O2 administration",
+     "quote": "introduction of 100% oxygen for 1 to 2 minutes followed by titration of nitrous oxide in 10% intervals"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Technique of N2O/O2 administration",
+     "quote": "Administration of 30 to 40% nitrous oxide usually can achieve analgesia/anxiolysis"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Technique of N2O/O2 administration",
+     "quote": "the concentration of nitrous oxide should not routinely exceed 50%"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds",
+    "medcx"
+   ],
+   "topic": "nitrous-oxide",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-52",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "After nitrous oxide is stopped, AAPD recommends 100% oxygen for at least 5 minutes until the patient returns to pretreatment status; the patient must return to pretreatment responsiveness before discharge.",
+   "conditions": "This is AAPD guidance for pediatric nitrous use; the passage does not define discharge requirements for other sedation methods.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recovery",
+     "quote": "Once the nitrous oxide flow is terminated, 100% oxygen should be administered for at least 5 minutes until the patient has returned to pretreatment status"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recovery",
+     "quote": "The patient must return to pretreatment responsiveness before discharge"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds",
+    "medcx"
+   ],
+   "topic": "nitrous-oxide",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-53",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "AAPD lists chronic obstructive pulmonary disease, upper respiratory illness or conditions that prevent nasal breathing, recent middle-ear problems, first-trimester pregnancy, bleomycin treatment, and untreated vitamin B12 deficiency among possible contraindications or cautions for nitrous oxide/oxygen inhalation.",
+   "conditions": "AAPD says contraindications “may include”; significant medical conditions may require specialist consultation, so this list is not exhaustive or an automatic rule for every patient.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recommendations / Contraindications",
+     "quote": "Contraindications for use of nitrous oxide/oxygen inhalation may include"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recommendations / Contraindications",
+     "quote": "chronic obstructive pulmonary diseases"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recommendations / Contraindications",
+     "quote": "untreated cobalamin (vitamin B12) deficiency"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds",
+    "medcx"
+   ],
+   "topic": "nitrous-oxide",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-54",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "U14 acute-pain overlap: the ADA pharmacologic guideline covers acute pain after tooth extraction and temporary toothache management before definitive care in adolescents, adults, and older adults. Drug recommendations and doses are in pharm facts RX-1 through RX-4, so this record does not duplicate them.",
+   "conditions": "The cited ADA guideline covers adolescents age 12 and older; this record maps the overlapping topic only and adds no medication-selection or dose recommendation.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-pain-2024",
+     "loc": "Guideline scope / first-line therapy",
+     "quote": "nonopioid medications, particularly NSAIDs alone or in combination with acetaminophen, are first-line therapy for the management of acute dental pain after tooth extraction(s) and toothache in adolescents, adults, and older adults"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm"
+   ],
+   "topic": "acute-dental-pain",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "see": [
+    "RX-1",
+    "RX-2",
+    "RX-3",
+    "RX-4"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-55",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "For local-anesthetic injection planning, AAPD identifies age-appropriate nonthreatening terminology, distraction, topical anesthetic, proper injection technique, and pharmacologic management as ways to support a positive patient experience.",
+   "conditions": "This AAPD statement concerns injection experience in pediatric dentistry; it does not say communication or topical anesthetic alone provides procedural pulpal anesthesia.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 407, behavior guidance",
+     "quote": "Age-appropriate nonthreatening terminology, distraction, topical anesthetics, proper injection technique, and pharmacologic management can help the patient have a positive experience"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds"
+   ],
+   "topic": "anxiety-and-pain-control",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-56",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "AAPD lists a fearful or anxious patient and a patient with a strong or hypersensitive gag reflex as candidates for nitrous oxide/oxygen analgesia/anxiolysis; nitrous oxide raises the pain-reaction threshold but does not affect pulpal sensitivity.",
+   "conditions": "This summarizes AAPD pediatric dental guidance; nitrous analgesia/anxiolysis does not replace local anesthesia when pulpal anesthesia is needed.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recommendations / Indications",
+     "quote": "a fearful or anxious patient"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Recommendations / Indications",
+     "quote": "a patient whose strong or hypersensitive gag reflex interferes with dental care"
+    },
+    {
+     "src": "aapd-n2o-2023",
+     "loc": "Mechanisms / Effects",
+     "quote": "it increases reaction time and reduces pressure-induced pain but does not affect pulpal sensitivity"
+    }
+   ],
+   "units": [
+    "anes",
+    "peds"
+   ],
+   "topic": "anxiety-and-pain-control",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-57",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "ADA minimal sedation is a pharmacologically produced minimally depressed level of consciousness in which the patient retains a normal response to verbal command, can independently maintain an airway, and has unaffected ventilatory and cardiovascular function.",
+   "conditions": "This is the ADA definition of minimal sedation; it describes actual patient response, not a particular drug or dose.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Minimal sedation",
+     "quote": "a minimally depressed level of consciousness, produced by a pharmacological method, that retains the patient’s normal response to verbal command"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Minimal sedation",
+     "quote": "They will also retain the ability to independently and continuously maintain an airway"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-levels",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-58",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "ADA moderate sedation is drug-induced depression of consciousness with purposeful response to verbal command, alone or with light tactile stimulation; no airway intervention is required, spontaneous ventilation is adequate, and cardiovascular function is usually maintained.",
+   "conditions": "This is the ADA definition; response to painful stimulus alone does not meet its definition of moderate sedation.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Moderate sedation",
+     "quote": "patients respond purposefully to verbal commands, either alone or accompanied by light tactile stimulation"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Moderate sedation",
+     "quote": "No interventions are required to maintain a patent airway, and spontaneous ventilation is adequate"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-levels",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-59",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "For ADA minimal sedation, enteral dosing may be given singly or in divided doses without exceeding the FDA maximum recommended dose for unmonitored home use; exceeding that dose during one appointment is considered moderate sedation and the moderate-sedation guidelines apply.",
+   "conditions": "This definition concerns enteral drug dosing in one appointment; the MRD is the FDA-labeled dose for unmonitored home use.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Minimal sedation",
+     "quote": "not to exceed the maximum recommended dose (MRD)"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Minimal sedation",
+     "quote": "The administration of an enteral drug exceeding the maximum recommended dose for unmonitored home use during a single appointment is considered to be moderate sedation"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx",
+    "pharm"
+   ],
+   "topic": "sedation-levels",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-60",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Nitrous oxide/oxygen combined with one or more sedative agents may produce minimal, moderate, deep sedation, or general anesthesia; classify and monitor according to the actual depth reached.",
+   "conditions": "The ADA statement does not assign a fixed sedation level to nitrous oxide alone or give a concentration-to-level conversion.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Minimal sedation",
+     "quote": "Nitrous oxide/oxygen when used in combination with sedative agent(s) may produce minimal, moderate, deep sedation or general anesthesia"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-levels",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-61",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "For moderate or deeper sedation, ADA defines titration as giving incremental IV or inhaled doses until the effect is reached; before another increment, allow the prior dose to reach its full effect and account for onset, peak, and duration.",
+   "conditions": "The guideline does not give one fixed waiting period; timing depends on the drug and route.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Titration",
+     "quote": "Knowledge of each drug’s time of onset, peak response and duration of action is essential to avoid over sedation"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "II. Definitions / Titration",
+     "quote": "one must know whether the previous dose has taken full effect before administering an additional drug increment"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-safety",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-62",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "Before minimal sedation, ADA requires a suitable evaluation. For healthy or medically stable ASA I–II patients this includes current medical history and medication use; patients with significant medical considerations such as ASA III–IV may need consultation with a physician or specialist.",
+   "conditions": "The ADA says consultation may be required for significant medical considerations; the passage does not replace individualized assessment.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.1 Patient History and Evaluation",
+     "quote": "Patients considered for minimal sedation must be suitably evaluated prior to the start of any sedative procedure"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.1 Patient History and Evaluation",
+     "quote": "In healthy or medically stable individuals (ASA I, II) this should consist of a review of their current medical history and medication use"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-safety",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "LA-63",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "ADA minimal-sedation preparation includes baseline weight, height, BMI, blood pressure, pulse, and respiratory rate unless invalidated; at least one additional person trained in BLS and positive-pressure oxygen equipment must be immediately available.",
+   "conditions": "The ADA states exceptions for invalid measurements and specifies a separate equipment list; requirements differ by sedation depth and applicable law.",
+   "stem_names": [
+    "ADA"
+   ],
+   "cites": [
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.2 Pre-Operative Evaluation and Preparation",
+     "quote": "Baseline vital signs including body weight, height, BMI, blood pressure, pulse rate, and respiration rate must be obtained"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.3 Personnel and Equipment Requirements",
+     "quote": "At least one additional person trained in Basic Life Support must be present in addition to the dentist"
+    },
+    {
+     "src": "ada-sedation-2025",
+     "loc": "IV.A.3 Personnel and Equipment Requirements",
+     "quote": "A positive-pressure oxygen delivery system suitable for the patient being treated must be immediately available"
+    }
+   ],
+   "units": [
+    "anes",
+    "medcx"
+   ],
+   "topic": "sedation-safety",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "VC-9",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Adding a vasoconstrictor such as epinephrine or levonordefrin slows local-anesthetic absorption into the bloodstream and can lengthen local duration at the target site.",
+   "conditions": "The review describes a general local effect; the product label still governs each agent’s maximum dose and contraindications.",
+   "cites": [
+    {
+     "src": "local-anesthesia-review",
+     "loc": "Pharmacology / Duration of action",
+     "quote": "the surrounding vascular beds will vasoconstrict, the drug will be more slowly absorbed into the circulating bloodstream, and the duration of action of the local anaesthetic will be increased"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "VC-10",
+   "status": "unverified",
+   "risk": "medium",
+   "claim": "Epinephrine-containing local-anesthetic solutions are more acidic to prolong vasoconstrictor shelf life; this acidity may increase injection pain and may slow anesthetic onset.",
+   "conditions": "AAPD describes a possible effect; it does not quantify a delay for each cartridge or patient.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Injectable local anesthetic agents",
+     "quote": "Agents that include epinephrine are formulated to an approximate pH of 4.5 in order to prolong the shelf life of the vasoconstrictor, but this may activate acid-sensing nociceptors and lead to increased pain"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 408, Injectable local anesthetic agents",
+     "quote": "The higher acidity of local anesthetics with vasoconstrictor also may slow the onset of the anesthetic"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
+  },
+  {
+   "id": "VC-11",
+   "status": "unverified",
+   "risk": "high",
+   "claim": "For a patient with bisulfite allergy, AAPD indicates using a local anesthetic without a vasoconstrictor because epinephrine-containing agents may include metabisulfite preservative.",
+   "conditions": "This recommendation concerns bisulfite sensitivity; distinguish it from a true allergy to the local-anesthetic molecule.",
+   "stem_names": [
+    "AAPD"
+   ],
+   "cites": [
+    {
+     "src": "aapd-la",
+     "loc": "p. 410, Allergy to local anesthetics",
+     "quote": "Patients may report an allergy to local anesthetic agents even though they experienced a reaction to the vasoconstrictor, a sensitivity to a preservative (metabisulfite) in agents containing epinephrine"
+    },
+    {
+     "src": "aapd-la",
+     "loc": "p. 410, Allergy to local anesthetics",
+     "quote": "For patients having an allergy to bisulfites, use of a local anesthetic without vasoconstrictor is indicated"
+    }
+   ],
+   "units": [
+    "anes",
+    "pharm",
+    "medcx"
+   ],
+   "topic": "vasoconstrictors",
+   "exam": [
+    "inbde",
+    "adex"
+   ],
+   "recorded": "2026-10-13"
   }
  ]
 }
