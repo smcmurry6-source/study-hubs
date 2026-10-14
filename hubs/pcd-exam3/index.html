@@ -1933,6 +1933,28 @@ mcq('gl-tight','glaze','rec','After the add-on firing, the crown\'s facial margi
 mcq('gl-rough','glaze','rec','After firing, the added contact has a rough surface. Why, according to James?',
   ['It was blotted with tissue to remove moisture','The furnace was too cold to glaze it','Zirconia dust contaminated the porcelain','Rough contacts are normal and left alone'],
   'James dries the porcelain while building it (blotting removes moisture). The blotted area comes out rough; it gets adjusted and polished with glazing wheels anyway.');
+mcq('gl-email','glaze','hint','The course email says two exam questions come from James\'s video. Which part of it does the email single out?',
+  ['His staining recommendations','His furnace maintenance tips','His shade guide conversion chart','His articulating film thicknesses'],
+  'The course email: "Please also review the staining recommendations mentioned in the video, as two questions on the didactic exam will be based on these recommendations." So know the steps: margins and contacts, diluting liquid, LN, copper + A at the gingival third, blue at the incisal, dry under the muffle, fire at 1650 °F.',
+  { cue:'Video = staining. Margins, liquid, LN, copper-A low, blue high, dry, 1650.' });
+mcq('gl-c-shade','glaze','rec','James uses incisal blue on almost every crown. What changes when the crown is a C shade?',
+  ['He uses a deeper blue at the incisal','He switches to copper at the incisal','He leaves the incisal unstained','He uses white opaquer at the incisal'],
+  'One incisal blue "seems to work best across the board for almost all of them," but the C shades need "a color that\'s a little deeper blue." Lavender also simulates translucency, but blue is his usual choice.');
+mcq('gl-occlusal','glaze','rec','Some people stain the occlusal anatomy to mimic a natural tooth. What does James need before he will do it?',
+  ['A photo or diagram to go by','A second shade tab in 3D-Master','A higher glaze firing program','A sandblasted occlusal surface'],
+  '"If I don\'t have a picture or some kind of a diagram, I can\'t do that for you all. I need something to go by." Occlusal staining is optional: some people like it, some don\'t. Send a photo if you want it.');
+mcq('gl-white','glaze','rec','After drying under the muffle, the stained crown looks completely white. What does that let James check?',
+  ['Whether any spot was missed','That the shade is now correct','That the glaze has already fired','That the margins have no chips'],
+  'Dried stain turns white, so any bare spot stands out before firing. It dries quickly and may smoke a little; held too close it can blister, leaving little pits after glazing.');
+mcq('gl-texture','glaze','rec','The stain paste on the palette has dried out. How does James bring it back?',
+  ['A little refreshing liquid, to a workable texture','Water, until it is runny enough to flow','LN glaze, mixed in until it is soupy','Nothing; dried paste is thrown away'],
+  'The kit\'s diluting and refreshing liquid brings it back: "you don\'t want to get it too soupy," just a texture where you can see the color going on. The same liquid, in a very thin layer, breaks the crown\'s surface tension first.');
+mcq('gl-ln-thin','glaze','rec','How does James apply the LN (Lustre Neutral) layer?',
+  ['Thin, over the whole crown, lightly vibrated in','Thick, only on the occlusal and the incisal','Only where the stain will go, then wiped off','After the stains, as a final coat on top'],
+  'LN goes on first, over the entire surface, not too thick, and is lightly vibrated so it reaches every crevice. The colors go on top of it, and each one is vibrated too so it does not clump.');
+mcq('gl-gingival-where','glaze','rec','Where does James apply the copper + A mix on the A2 crown?',
+  ['The gingival third, all the way around','The incisal third, facial only','The occlusal fossae and grooves','The proximal contacts only'],
+  '"Apply some to the gingival one third all the way around the restoration." When it looked a little light he mixed a bit more and vibrated it so the color did not clump, then checked the shade guide: "right on an A2."');
 mcq('gl-shrink','glaze','rec','Why is shrinkage less of a worry with the add-on porcelain?',
   ['Small amounts, fired at a low temperature','It is a composite, not a porcelain','Zirconia expands to make up for it','It is fired under high pressure'],
   'Porcelain shrinks when fired, which is why James checks it on the model and adds back where needed. Small amounts at 1290 °F make it manageable.');
@@ -2396,7 +2418,7 @@ var REVIEW = [
 { id:'glazing', title:'Glaze and contacts', icon:'bulb', blurb:'James Bradley\'s video, step by step (two exam questions).',
   sections:[
   { title:'Numbers and rules', type:'table', head:['Item','Value'], rows:[
-    ['Glaze system','GC Initial Lustre Paste NF (+ GC gum kit)'],['Clear glaze layer','LN (Lustre Neutral)'],['Glaze firing','~1650 °F'],['Add-on porcelain firing','1290 °F (699 °C), ~7 min'],['Max unsupported porcelain','2 mm'],['Show the lab a shy contact','Bard-Parker blade swipes on the model'],['Veneered zirconia','Different program with a slow cool-down'],['Incisal stain','Blue (or lavender); deeper blue for C shades'],['Gingival third (A2)','Copper + A range']
+    ['Glaze system','GC Initial Lustre Paste NF (+ GC gum kit)'],['Clear glaze layer','LN (Lustre Neutral)'],['Glaze firing','~1650 °F'],['Add-on porcelain firing','1290 °F (699 °C), ~7 min'],['Max unsupported porcelain','2 mm'],['Show the lab a shy contact','Bard-Parker blade swipes on the model'],['Veneered zirconia','Different program with a slow cool-down'],['Incisal stain','Blue (or lavender); deeper blue for C shades'],['Gingival third (A2)','Copper + A range'],['Occlusal stain','Only with a photo or diagram'],['Stain paste','Refresh with liquid; not soupy'],['Dried stain looks','White: shows missed spots']
   ]}
   ]},
 { id:'processes', title:'Processes', icon:'cycle', blurb:'Ordered steps from the lectures (also the Stack game\'s pool).',
@@ -2425,7 +2447,7 @@ removal:['Diamond cuts porcelain; 557 carbide cuts metal; zirconia bur for zirco
 onlay:['Onlay = one or more cusps, or the whole occlusal','Crownlay/vonlay/tabletop/overlay = all onlays','Indications: big failed filling, weak cusps, cracked cusps, alter occlusion','Split tooth = hopeless; isolated deep probe = crack below bone','Crown removes ~14× more tooth; vitality loss 14.5% vs 5.5%','Vitality FIRST; seal dentin; round; cap 2 mm on anatomy; divergent; smooth margins','No divergence, no onlay','Gold: RMGI / zinc phosphate. Traditional ceramic: RMGI or resin. Adhesive ceramic: MUST bond','Pink for gold, green for onlays','e.max = most promising onlay material; not zirconia (rigid, microcracks)','Survival 90%+ at 10 yr; e.max 96.5% at 16.9 yr, full = partial'],
 veneer:['Resin-bonded, replaces facial enamel, changes shade/contour','≥ 50% enamel after prep; gingival enamel ~0.25 mm','0.5-0.6 mm thick, min 0.3; > 1 mm = dentin (yellow)','+0.2 mm per shade lighter; pick final shade before prep','Indications: shade, malformed (peg lateral!), malaligned, diastema, length','Contra: bruxism, AI, little tooth left, mand incisors no clearance, severe facial position','Wax-up on mounted casts → matrix → mock-up → photos + shade','Window (edge kept) vs incisal butt joint 1-2 mm (taught); no lingual wrap','Dog leg = finish line lingual under a kept contact; open contact for diastema','Contact ≤ 5 mm to bone → papilla fills','Integrity: 60-90 s, bench 5 min, don\'t press facial; spot etch + flowable','Can\'t isolate → don\'t cement','Veneer: HF if not etched, silane 60 s no rinse; light-cure cement; centrals first','Occlusion, occlusion, occlusion'],
 color:['Color is light','Hue = family; chroma = intensity; value = lightness (most important)','Too much value = common error; miss darker','Munsell polar (H V/C); CIELAB Cartesian (L*, a* red-green, b* yellow-blue)','ΔE 1 = seen by 50%','Incident (source), refracted (through, additive), reflected (off, subtractive)','Additive RGB → white; subtractive CMY → black','Specular = gloss; diffuse = color','3 factors: light, observer, object (light + observer vary most)','CRI 0-100; want ≥ 90 at ~5000-5500 K','Incandescent (yellow) and fluorescent (blue) = improper','Glossy darker/more chroma; matte lighter/less chroma; curves darker','Metamerism; fluorescence (UV → blue-white); opalescence (bluish scatter)','8% males, 0.5% females color blind; achromatism = grayscale','Vita Classical uneven; 3D-Master even; instruments ~70-80% accurate'],
-glaze:['Universal GC Initial Lustre Paste NF','Check margins and contacts first','Diluting liquid breaks surface tension','LN = clear super glaze','Copper + A at gingival; blue at incisal','Dry under the muffle so stains don\'t slump','Glaze ~1650 °F; add-on 1290 °F (699 °C)','Bard-Parker blade swipes show the lab a shy contact','Never > 2 mm unsupported porcelain','Veneered zirconia needs a cool-down']
+glaze:['Universal GC Initial Lustre Paste NF','Check margins and contacts first','Diluting liquid breaks surface tension','LN = clear super glaze','Copper + A at gingival; blue at incisal','C shades: deeper blue','Occlusal stain only with a photo','Dry under the muffle so stains don\'t slump','Glaze ~1650 °F; add-on 1290 °F (699 °C)','Bard-Parker blade swipes show the lab a shy contact','Never > 2 mm unsupported porcelain','Veneered zirconia needs a cool-down']
 };
 
 /* ---------- EXAM HINTS ----------
@@ -2480,6 +2502,10 @@ var HINTS = [
   { lec:'color', kind:'emphasize', quote:'Having a whole bunch of light doesn\'t help us pick color better.', take:'Intensity doesn\'t matter.' },
   { lec:'color', kind:'emphasize', quote:'Many of our dental stains are metameric. In fact, the majority of them are.', take:'Check under more than one light.' },
   { lec:'glaze', kind:'list', quote:'Two questions from James\' video: "Glaze and Add Porcelain Contacts Lecture James Bradley". It has been published.', take:'Watch it once; the Review tab has the numbers.' },
+  { lec:'glaze', kind:'list', quote:'Please also review the staining recommendations mentioned in the video, as two questions on the didactic exam will be based on these recommendations.', take:'Course email, 10/14: the two video questions are on staining.' },
+  { lec:'glaze', kind:'emphasize', quote:'Most of the time, we\'re going to go with this incisal blue.', take:'Lavender also works; deeper blue for C shades.' },
+  { lec:'glaze', kind:'emphasize', quote:'If I don\'t have a picture or some kind of a diagram, I can\'t do that for you all.', take:'Occlusal staining needs a photo.' },
+  { lec:'glaze', kind:'emphasize', quote:'We\'re going to dry those colors, dry those colors, freeze those colors so that they don\'t end up at the very bottom.', take:'Dry below the muffle before firing.' },
   { lec:'glaze', kind:'emphasize', quote:'The rule of thumb, you never want to add any more than two millimeters of unsupported porcelain to any kind of framework.', take:'2 mm max.' },
   { lec:'glaze', kind:'emphasize', quote:'Take a Bard-Parker blade chairside and run a couple of swipes across the contact that\'s shy.', take:'Shows the tech how much to add.' },
   { lec:'glaze', kind:'emphasize', quote:'Anything that is veneered zirconia is a different program and a cool-down period.', take:'Or the porcelain cracks or separates.' }
