@@ -129,6 +129,9 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   hub, the way the existing drawn figures are (`FIGS`/`figHTML()`, `FIG_BY_LEC` in `occlusion` and `pcd-exam3`).
   Never load anything from `.claude/` at runtime.
 - The kit's CSS switches themes on `.iso[data-theme="light"]`; hubs set `data-theme` on `<html>`, so scope it to that.
+- The first ones are in MSK Exam 4: copy `tools/figures/msk-exam4/` (`shared.mjs` maps the kit's tokens onto the hub's
+  palette; `build.mjs` rewrites the hub's `anima:css`/`anima:js` blocks, `--preview` writes standalone pages for anima's
+  checks, `--check` fails if the blocks are stale). As root, anima's Chrome scripts need a `--no-sandbox` wrapper as `CHROME_PATH`.
 - Under a lecture's notes, figures go outside `.reading-prose` (the narrated text), so the narration doesn't drift.
 - Draw from the hub's own lecture notes: labels and numbers match what was taught, and the caption names the lecture.
   Anything beyond the lecture needs an authoritative source (anima's sourcing rule).

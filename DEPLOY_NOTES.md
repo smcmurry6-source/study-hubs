@@ -102,6 +102,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (first anima figures: MSK Exam 4, Claude Code)** — From the first diagram review (Sam approved 2 of 16
+  candidates across the live hubs; skipped: all 4 PCD Exam 3, MSK 4's melanin unit and blister split, all 4 Occlusion and
+  all 4 Perio, so don't re-propose them for those exams). `hubs/msk-exam4` gets two interactive figures under the notes
+  (outside `.reading-prose`, so no narration change): **the neuromuscular junction** (L32; selector for no drug /
+  succinylcholine / rocuronium / roc + neostigmine / roc + sugammadex / botulinum toxin, with end plate, Na+ channel
+  inactivation gates, a qualitative train of four and a small particle model) and **the sliding sarcomere** (L31; slider
+  and Play; A band constant, I and H shrink, cross-bridges when Ca2+ is on troponin C). Six picture questions
+  (`nm-fig-ache`, `nm-fig-rec`, `nm-fig-ves`, `nm-fig-na`, `mu-fig-h`, `mu-fig-a`; `img:` = an `ANIMA` still with one part
+  highlighted, labels hidden) render above the stem in the bank, drill and mock; arcade pools skip `q.img`. Bank 223 → 229.
+  Built by `tools/figures/msk-exam4/build.mjs` (kit tokens mapped onto the hub palette in `shared.mjs`), which rewrites the
+  `anima:css` / `anima:js` blocks in the hub: edit the build, never those blocks. About page Diagrams entry updated.
+
 - **2026-10-14 (calmer right-answer feedback, Claude Code)** — Sam found the right-answer "pop" shaky: `pop()` in
   `widget/fx.js` scaled the whole option (1 -> 1.035 -> .997 -> 1), which wobbles its text, and the check badge
   overshot. Now the option never moves: a `.sh-fx-sweep` wash in the option's own (green) color sweeps left to right in
@@ -156,7 +168,6 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
   matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
   `LESSONS.md` refreshed.
-
 - **2026-10-13 (diagram review rule, Claude Code)** — New standing rule above ("Building a hub = diagram review"):
   every hub build, or new lectures added to a hub, includes a review for diagram candidates, and each one goes to Sam
   for approval before it is drawn. `CLAUDE.md` → "Diagrams (the anima skill)" says how a Claude Code session asks.
