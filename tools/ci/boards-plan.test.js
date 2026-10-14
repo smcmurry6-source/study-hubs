@@ -194,6 +194,17 @@ check('the last review is planned before retirement and monthly samples return o
   });
   assert.deepStrictEqual(Array.prototype.slice.call(plan.dailyPlan(answeredWrong).retire), []);
 
+  const missedFinal = makeCtx({
+    day:'2027-06-10',
+    items:[{ id:'q', lec:'medcx', cog:1 }],
+    srs:{ q:{ b:0, due:'2027-10-07', t:'2027-06-09' } },
+    history:{ q:{ lastCorrect:true, n:8, t:'2027-06-09' } },
+    finalReview:{ q:'2027-01-05' }
+  });
+  const clearedFinal = plan.dailyPlan(missedFinal);
+  assert.deepStrictEqual(Array.prototype.slice.call(clearedFinal.retire), []);
+  assert.deepStrictEqual(Array.prototype.slice.call(clearedFinal.finalClear), ['q']);
+
   const sampleItems = Array.from({ length:6 }, (_, i) => ({ id:'old-' + i, lec:'medcx', cog:2 }));
   const sampleCtx = makeCtx({
     day:'2026-11-03',
@@ -324,6 +335,13 @@ check('hub wrapper stores final-review and month state and freezes same-day plan
   srs.mature = { b:7, due:'2027-02-10', t:'2026-10-13' };
   assert.deepStrictEqual(Array.prototype.slice.call(wrapper.dailyPlan({ day:'2026-10-14', size:1 })), ['new-due']);
   assert.strictEqual(state.retired.mature, '2026-10-14');
+
+  delete state.retired.mature;
+  state.ui.finalReview.mature = '2026-10-13';
+  srs.mature = { b:0, due:'2027-02-10', t:'2026-10-14' };
+  wrapper.dailyPlan({ day:'2026-10-15', size:1 });
+  assert.strictEqual(state.ui.finalReview.mature, undefined);
+
   assert(saveCount >= 2);
 });
 

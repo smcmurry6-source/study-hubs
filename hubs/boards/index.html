@@ -857,15 +857,16 @@ var BoardsPlan = (function(){
     var governor = finite(Number(budget.governor)) ? Number(budget.governor) : 0.8;
     var sampleLimit = Math.max(0, Number(budget.retiredSamplePerMonth) || 0);
     var seed = ctx.seed == null ? ctx.day : ctx.seed;
-    var retire = [], finalDue = [], plan = [], selected = {}, caseCounts = {}, dueRows = [], loads, i, q;
+    var retire = [], finalDue = [], finalClear = [], plan = [], selected = {}, caseCounts = {}, dueRows = [], loads, i, q;
     var candidate, sampleRows, samplesUsed = 0, newRows, newCounts = {}, conceptRank = siblings(items);
     var maxNew, projection, month;
 
-    if(!ctx.day || !size) return { plan:plan, retire:retire, finalDue:finalDue };
+    if(!ctx.day || !size) return { plan:plan, retire:retire, finalDue:finalDue, finalClear:finalClear };
     if(!finite(newPerDay) || newPerDay < 0) newPerDay = Number(budget.daily) || 12;
 
     items.forEach(function(item){
       var sr = srs[item.id], hist = history[item.id], days;
+      if(finalReview[item.id] && sr && Number(sr.b) < steps.length) finalClear.push(item.id);
       if(retired[item.id]) return;
       if(finalReview[item.id] && Number(sr && sr.b) === steps.length && sr.t &&
          String(sr.t) >= String(finalReview[item.id]) && hist && hist.lastCorrect){
@@ -920,7 +921,7 @@ var BoardsPlan = (function(){
       newRows = newRows.filter(function(row){ return row.id !== candidate.id; });
     }
 
-    return { plan:plan, retire:retire, finalDue:finalDue };
+    return { plan:plan, retire:retire, finalDue:finalDue, finalClear:finalClear };
   }
 
   return {
@@ -1012,6 +1013,9 @@ if(typeof STATE !== 'undefined'){
     });
     result.retire.forEach(function(qid){
       STATE.retired[qid] = ctx.day;
+      delete ui.finalReview[qid];
+    });
+    result.finalClear.forEach(function(qid){
       delete ui.finalReview[qid];
     });
     result.finalDue.forEach(function(qid){
