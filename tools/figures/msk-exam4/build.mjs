@@ -26,7 +26,7 @@ const STILLS = {
 
 const STILL_CSS = `
 .anima.am-still{margin:0}
-.anima.am-still svg{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+.anima.am-still svg{display:block;width:100%;max-width:560px;height:auto;margin:0 auto;overflow:hidden}
 .anima.am-still .am-callout,.anima.am-still .nm-particles,.anima.am-still .sc-band-t,.anima.am-still .sc-sarc-t{display:none}
 .anima.am-still [data-part]{opacity:.55}
 .anima.am-still[data-q="ache"] [data-part="ache"],.anima.am-still[data-q="rec"] [data-part="rec"],.anima.am-still[data-q="ves"] [data-part="ves"],.anima.am-still[data-q="na"] [data-part="na"]{opacity:1;filter:drop-shadow(0 0 2.5px var(--anatomy-lit)) drop-shadow(0 0 1px var(--anatomy-lit))}
@@ -59,11 +59,16 @@ const js = (() => {
 ${figs}
   var BY_LEC = ${JSON.stringify(BY_LEC)};
   var STILLS = ${JSON.stringify(STILLS)};
+  // Each copy gets its own SVG ids and radio group: the same figure can sit in Notes and Review at once (the hidden
+  // panel stays in the page), and url(#id) would otherwise point into whichever copy comes first.
+  var copies = 0;
+  function uniq(s){ var k = "-" + (++copies); return s.replace(/(id="|url\\(#|href="#)((?:nm|sc)-[a-z0-9-]+)/g, "$1$2" + k).replace(/name="((?:nm|sc)-[a-z0-9-]+)"/g, 'name="$1' + k + '"'); }
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-  function html(key){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig"><h4>' + esc(f.title) + '</h4><p class="lec-fig-cap">' + esc(f.caption) + '</p>' + f.shell.replace("@@SVG@@", f.svg) + '</figure>'; }
-  function still(key){ var s = STILLS[key]; if(!s || !FIGS[s.fig]) return ""; var f = FIGS[s.fig], svg = f.svg.replace('viewBox="' + f.data.wide + '"', 'viewBox="' + f.data.narrow + '"'); (s.rep || []).forEach(function(r){ svg = svg.split(r[0]).join(r[1]); }); return '<div class="anima am-still" data-q="' + s.part + '">' + svg + '</div>'; }
+  function html(key){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig"><h4>' + esc(f.title) + '</h4><p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
+  function still(key){ var s = STILLS[key]; if(!s || !FIGS[s.fig]) return ""; var f = FIGS[s.fig], svg = f.svg.replace('viewBox="' + f.data.wide + '"', 'viewBox="' + f.data.narrow + '"'); (s.rep || []).forEach(function(r){ svg = svg.split(r[0]).join(r[1]); }); return '<div class="anima am-still" data-q="' + s.part + '">' + uniq(svg) + '</div>'; }
   function mount(scope){ Array.prototype.forEach.call(scope.querySelectorAll("[data-anima]"), function(el){ if(el.__animaOn) return; var f = FIGS[el.getAttribute("data-anima")]; if(!f) return; el.__animaOn = 1; try { f.live(el, f.data); } catch(e){ if(window.console) console.error("anima figure failed", e); } }); }
-  return { byLec: BY_LEC, html: html, still: still, mount: mount, has: function(k){ return !!STILLS[k]; } };
+  function meta(key){ var f = FIGS[key]; return f ? { title: f.title, caption: f.caption } : null; }
+  return { byLec: BY_LEC, html: html, still: still, mount: mount, meta: meta, has: function(k){ return !!STILLS[k]; } };
 })();`;
 })();
 

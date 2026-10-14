@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (MSK 4 Review → Diagrams, Claude Code)** — Sam asked for the drawn figures in Review too. `hubs/msk-exam4`
+  Review gains a **Diagrams** group (new section type `figs`: `{ type:'figs', lec, figs:[ANIMA keys] }`, a `diagram`
+  icon) holding the sliding sarcomere (L31) and the NMJ drug selector (L32), both live, numbered Fig 1-2 there. Review
+  search and the widget's site search find them by title or caption. Because the hidden Notes panel stays in the page,
+  the build now gives every copy of a figure its own SVG ids and radio group (`uniq()` in `build.mjs`; the sarcomere's
+  live code and CSS no longer hard-code `#sc-…` ids). Side effects, both fixes: troponin C now lights up when Ca2+ is
+  bound (an id selector was outranking that rule), and on phones the cropped figures no longer draw past their frame
+  (the sarcomere's crop keeps its full height so its labels show). No question or notes text changed. About page updated.
+
 - **2026-10-14 (diagrams after answering, Claude Code)** — Sam: in the question bank, don't show a diagram before the
   question is answered unless it's needed, so it can't give the answer away (standing rule, now in `CLAUDE.md` →
   "Diagrams"). New question field `imgAfter:true`: the diagram opens inside the explanation (after the verdict) instead

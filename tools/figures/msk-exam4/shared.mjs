@@ -44,7 +44,7 @@ const HUB = `
 .anima .iso-plate-corners{inset:14px 16px}
 .anima .iso-plate-corner{font-size:10.5px}
 @media (max-width:560px){.anima .iso-plate{padding:36px 6px 54px}.anima .iso-plate-corner[data-corner="hint"]{bottom:16px}.anima .iso-plate-corner[data-corner="readout"]{white-space:normal;text-align:right;max-width:58%}}
-.anima .am-svg svg{display:block;width:100%;height:auto}
+.anima .am-svg svg{display:block;width:100%;height:auto;overflow:hidden}
 .anima .am-label{fill:var(--anatomy-text);font:12px var(--anatomy-mono)}
 .anima .am-leader{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
 .anima .am-dot{fill:var(--anatomy-dot)}
