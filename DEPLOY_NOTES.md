@@ -105,7 +105,10 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   explanation says why RMGI counts as moisture tolerant despite its resin (#16). Explanations now answer the class's
   favorite wrong choice on PCD `ce-sbu`, `co-translucent`, `bo-zprime`, `bo-adh-thick`, `co-correct-high`; MSK 4
   `dp-impetigo` no longer quotes the lecture's "option B and D" (not this hub's letters). `question_choices` rows before
-  today for the three keys refer to the old wording. No reading text changed, so no narration regenerated.
+  today for the three keys refer to the old wording. **At Sam's request:** `rm-why-now` removed (report #17, "not
+  relevant"), and the two matching items `on-cement-match` and `ce-cure-match` (48-50%) split into MCQs: each pair already
+  had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
+  matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
   `LESSONS.md` refreshed.
 
 - **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;

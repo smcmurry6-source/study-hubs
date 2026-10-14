@@ -988,9 +988,12 @@ mcq('ce-dual-light','cement','hint','Dual-cured resin cements typically have hig
 mcq('ce-never-lc','cement','hint','Which pairing breaks one of Dr. Fu\'s "choice of cement" rules?',
   ['A light-cure-only resin cement under a 3Y zirconia crown','A dual-cured resin cement under a lithium disilicate onlay','A light-cured resin cement under a feldspathic porcelain veneer','Resin-modified glass ionomer under a porcelain-fused-to-metal bridge'],
   'Never use a light-cured-only resin cement with an opaque silica- or zirconia-based restoration: the light cannot get through to set it. Use dual- or self-cure there.');
-match('ce-cure-match','cement','slides','Match each restoration with the resin cement curing type Dr. Fu lists for it.',
-  [['Feldspathic laminate veneer','Light-cured'],['e.max onlay','Dual-cured'],['Cast post down a long canal','Self-cured'],['Zirconia crown with good retention','RMGI (no resin needed)']],
-  'Light-cured where light passes and working time matters (veneers); dual-cured for inlays, onlays and all-ceramic crowns; self-cured where no light reaches (metal, deep posts). A retentive zirconia crown does not need resin at all.');
+mcq('ce-cure-emax','cement','slides','Which resin cement curing type does Dr. Fu list for an e.max onlay?',
+  ['Dual-cured','Light-cured','Self-cured','No resin: RMGI'],
+  'Dual-cured for inlays, onlays and all-ceramic crowns: the light reaches through some of the ceramic, and the chemical cure sets the rest. Light-cured is for thin veneers (working time, color stability); self-cured is for places no light reaches (under metal, down a post space); RMGI is for a well-retained zirconia crown that needs no resin.');
+mcq('ce-cure-zr','cement','slides','A zirconia crown sits on a tall prep with little taper and good retention. Which cement fits Dr. Fu\'s list?',
+  ['RMGI, since it needs no resin cement','Light-cured resin, cured through it','Self-cured resin after a silane coat','Dual-cured resin after HF etching'],
+  'A retentive zirconia crown does not need resin at all: RMGI is easier and forgiving. Resin is for short or over-tapered preps (under 4 mm, convergence over 20 degrees). Light alone does not cure well under opaque zirconia, silane does nothing for it (zirconia takes MDP) and HF does not etch it.');
 mcq('ce-totaletch','cement','slides','A resin cement system where you etch, rinse, prime and bond as separate steps is called:',
   ['Total-etch','Self-etch','Self-adhesive','Glass ionomer'],
   'Total-etch: etch, rinse, then primer/adhesive, then cement. Self-etch: acid and primer in one bottle, no rinse. Self-adhesive: everything is in the cement itself. Dr. Fu: total-etch still gives the best retention, especially on enamel, but it is the most time-consuming and technique sensitive.');
@@ -1303,9 +1306,6 @@ mcq('rm-reasons-except','removal','slides','Each of the following is a reason to
 mcq('rm-consent','removal','rec','Before you touch an existing crown, what does Dr. Fu insist on?',
   ['Signed consent, and a plan for what the patient leaves with','Only a current periapical radiograph of the tooth','A verbal OK from the patient while in the chair','Nothing, since removing a failing crown is always indicated'],
   'Never touch a tooth without signed consent; and agree beforehand on how the patient leaves (provisional crown from a vacuum-formed matrix, Essix retainer, flipper, or a tooth temporarily bonded to its neighbors).');
-mcq('rm-why-now','removal','rec','Why does Dr. Fu say your generation will cut off many zirconia crowns?',
-  ['Zirconia crowns took off around 2007 and are now wearing out','Zirconia crowns all fail within about two years of delivery','Zirconia cannot be repaired, so every small chip means removal','Labs stopped making PFM and gold crowns entirely in 2007'],
-  'Her generation cut off gold and PFM crowns; yours will cut off the first wave of zirconia crowns. That is why the school bought zirconia burs and kits.');
 mcq('rm-figure','removal','hint','The diagram shows two crowns seen from the occlusal. Which cut path is the right one for a monolithic zirconia crown?',
   ['Path B: facial, whole occlusal and lingual','Path A: the facial and halfway across the occlusal','Either path; the crown material does not matter here','Neither; zirconia crowns are tapped off with a remover'],
   'Path A is enough for a PFM: the metal coping flexes open once cut that far. Zirconia does not flex; cut through and through (Path B) and use the spreader.',
@@ -1396,9 +1396,6 @@ mcq('on-no-zr','onlay','hint','Why does Dr. Robles not use zirconia for onlays?'
 mcq('on-elbow','onlay','rec','Dr. Robles\' aluminum patch on a skinned elbow makes which point?',
   ['A restoration should flex like the tissue it replaces','Metal restorations always outlast ceramic ones','Bonding works better on deliberately rough surfaces','Patients usually prefer rigid, heavy restorations'],
   '"What you need is something that works like the tooth." So: seal and rebuild the dentin with composite (flexes like dentin), then bond glass ceramic on top (behaves like enamel).');
-match('on-cement-match','onlay','hint','Match each onlay type to its cement of choice.',
-  [['Gold onlay','High-friction cement (RMGI; zinc phosphate in the past)'],['Ceramic onlay, traditional prep','RMGI or resin cement, by the number of walls'],['Ceramic onlay, non-retentive prep','Must be bonded with resin cement'],['Composite core under a ceramic onlay','Etch, bond and flowable (immediate dentin sealing)']],
-  'Dr. Robles\' slide: gold onlays need a cement that makes high friction (RMGI today, zinc phosphate traditionally); traditionally prepped ceramic onlays can go on with RMGI (RelyX Luting Plus) or resin (RelyX Ultimate) depending on how many walls; adhesive, non-retentive ceramic onlays MUST be bonded under a rubber dam.');
 mcq('on-cement-adhesive','onlay','hint','A ceramic onlay on a non-retentive (adhesive) preparation must be cemented with:',
   ['Resin cement, bonded under a dam','Resin-modified glass ionomer','Zinc phosphate, for its friction','Zinc oxide non-eugenol cement'],
   'Nothing holds a flat adhesive onlay except the bond: "if you sneeze, it falls off." Rubber dam, etch, bond, resin cement. Dr. Robles\' color hint: pink box (RelyX Luting Plus) for gold, green box (RelyX Ultimate) for ceramic onlays.',

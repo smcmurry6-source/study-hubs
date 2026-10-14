@@ -81,7 +81,7 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 Refreshed 2026-10-13, 9 pm Central; "since" = this morning's fixes, live from ~7 am. Live hubs: **PCD Fixed Pros Exam 3
 (Thu Oct 15)**, **MSK Exam 4 (Fri Oct 16)**, **Occlusion midterm (Wed Oct 21, final Nov 19)**, perio (final Nov 19). No
-hub newly archived. **Four new PCD reports today (#15-#18), all on question wording; three fixed in this run.** No
+hub newly archived. **Four new PCD reports today (#15-#18), all on question wording; all four fixed and answered in this run.** No
 suggestions, surveys or zero-result searches; four late check-ins (perio 2, MSK Exam 3 2).
 
 **Did this morning's fixes work?** (answers since ~7 am vs before, `personal_answers`; small n, and exam-eve-1 inflates
@@ -100,7 +100,8 @@ disilicate, 8 picks; the explanation already lists it as feldspathic), `ce-sbu` 
 44% (opaque, 6), `ce-isolation` 47%, `on-telio` 47%, `on-cement-match` and `ve-pbox-3` 48%, `bo-zprime` 50% (eugenol,
 all 9 misses), `bo-adh-thick` 50% (flat occlusal, 5), `co-correct-high` 50% (the reverse, 6). Explanations now answer
 the favorite wrong choice on `ce-sbu`, `co-translucent`, `bo-zprime`, `bo-adh-thick`, `co-correct-high`; reports #15,
-#16 and #18 fixed (below). Matching items left as they are until after the exam.
+#16 and #18 fixed. At Sam's request the two weakest matching items (`on-cement-match`, `ce-cure-match`) are now MCQs (their pairs already had
+MCQs except two, added as `ce-cure-emax` and `ce-cure-zr`), and `rm-why-now` (report #17) is removed.
 
 **MSK Exam 4** (2.5 days out): 22 people, 22 h; today 18 people, 8 h, 482 answers from 9 people at 72%. Notes 236 min
 (16), bank 202 (12), drill 24 (2). All time 1,174 answers from 14 people, 69%. By lecture: NMJ Pharm 64% and Skeletal
