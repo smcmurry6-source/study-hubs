@@ -108,6 +108,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   `gl-c-shade`, `gl-occlusal`, `gl-white`, `gl-texture`, `gl-ln-thin`, `gl-gingival-where`; bank 328 -> 335), the email
   and 3 video quotes as exam hints, 3 Review rows and 2 cram lines. Notes text unchanged, so no narration regenerated.
 
+- **2026-10-14 (MSK 4: clinical lecture off, official exam counts, Claude Code)** — Sam: Dr. Taylor's MSK & Skin
+  Clinical Application lecture (`clinical`, label `CA`) is not on Exam 4, so it is gone from `hubs/msk-exam4`: the
+  lecture, its 29 `ca-*` questions (bank 249 → 220), both reading levels and their mp3s, the "Dental clinic" Review
+  group, its cram lines, the MRONJ ordering and the osteoporosis/osteomalacia sort. Three dermpath explanations no
+  longer cite Dr. Taylor's slides (same answers). The mock now uses the official counts, **30 questions: L28 6, L29 3,
+  L30 6, L31 11, L32 4**. Saved views or an unfinished mock pointing at the lecture reset on load. Dashboard card text
+  updated. Recover the lecture from git history (`git show ed35097:hubs/msk-exam4/index.html`) if a later exam needs it.
+  **MSK Project: carry this into the split sources.**
+
 - **2026-10-14 (perio S5: Furcation Management recording, Claude Code)** — Dr. Litz's recorded Furcation Management
   lecture (Drive: Periodontology/hubs, `Furcation_Management_Dr. Litz.mp4` + slide PDF; transcribed in-session with
   faster-whisper) is in `hubs/perio` before the Oct 15 quiz on it. Session 5 keeps its id `resective-furcation` (audio
