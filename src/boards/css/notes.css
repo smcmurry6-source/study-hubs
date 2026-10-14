@@ -18,4 +18,5 @@
 .reading .ref::before{content:attr(data-ref)}
 .reading footer.sources{font-size:.78rem;color:var(--ink-faint);margin:6px 0 18px}
 .reading figure{margin:12px 0}
-.reading figure svg{max-width:100%;height:auto}
+.reading figure[data-fig]{max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
+.reading figure[data-fig] svg{display:block;max-width:none;height:auto}
