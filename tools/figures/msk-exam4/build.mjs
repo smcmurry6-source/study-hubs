@@ -64,7 +64,8 @@ ${figs}
   var copies = 0;
   function uniq(s){ var k = "-" + (++copies); return s.replace(/(id="|url\\(#|href="#)((?:nm|sc)-[a-z0-9-]+)/g, "$1$2" + k).replace(/name="((?:nm|sc)-[a-z0-9-]+)"/g, 'name="$1' + k + '"'); }
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-  function html(key){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig"><h4>' + esc(f.title) + '</h4><p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
+  // noTitle: the caller heads it (Review sections use their own h3)
+  function html(key, noTitle){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig">' + (noTitle ? '' : '<h4>' + esc(f.title) + '</h4>') + '<p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
   function still(key){ var s = STILLS[key]; if(!s || !FIGS[s.fig]) return ""; var f = FIGS[s.fig], svg = f.svg.replace('viewBox="' + f.data.wide + '"', 'viewBox="' + f.data.narrow + '"'); (s.rep || []).forEach(function(r){ svg = svg.split(r[0]).join(r[1]); }); return '<div class="anima am-still" data-q="' + s.part + '">' + uniq(svg) + '</div>'; }
   function mount(scope){ Array.prototype.forEach.call(scope.querySelectorAll("[data-anima]"), function(el){ if(el.__animaOn) return; var f = FIGS[el.getAttribute("data-anima")]; if(!f) return; el.__animaOn = 1; try { f.live(el, f.data); } catch(e){ if(window.console) console.error("anima figure failed", e); } }); }
   function meta(key){ var f = FIGS[key]; return f ? { title: f.title, caption: f.caption } : null; }

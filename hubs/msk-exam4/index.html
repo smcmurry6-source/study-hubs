@@ -939,7 +939,6 @@ var ICON_PATHS = {
   arcade:   '<rect x="3" y="11" width="18" height="9" rx="3"/><path d="M12 11V7"/><circle cx="12" cy="5.5" r="2.2"/><path d="M7 15.5h3M8.5 14v3"/><circle cx="15.5" cy="15" r=".9" fill="currentColor"/><circle cx="17.5" cy="16.8" r=".9" fill="currentColor"/>',
   capsule:  '<rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.9 9.1l4.2 5.8"/><path d="M6.8 11.6l1.4-1.2"/>',
   hormone:  '<path d="M12 3.5l4.3 2.5v5L12 13.5 7.7 11V6z"/><path d="M12 13.5v3"/><circle cx="12" cy="18.5" r="2"/><path d="M16.3 6l2.7-1.5M7.7 6L5 4.5"/>',
-  diagram:  '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="12" r="2.8"/><path d="M11.8 12h2.4M14.5 9h3M14.5 12h3M14.5 15h3"/>',
   cell:     '<path d="M12 3.5c4.6 0 8.5 3.4 8.5 8.2 0 4.6-3.7 8.8-8.6 8.8S3.5 16.7 3.5 12C3.5 7.1 7.4 3.5 12 3.5z"/><circle cx="12.5" cy="11.5" r="3"/><circle cx="12.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="7.2" cy="15.6" r=".8" fill="currentColor"/><circle cx="16.8" cy="16.2" r=".8" fill="currentColor"/>',
   helix:    '<path d="M7 3c0 4 10 5 10 9s-10 5-10 9"/><path d="M17 3c0 4-10 5-10 9s10 5 10 9"/><path d="M9 5.5h6M8.5 18.5h7M9.5 9.5h5M9.5 14.5h5"/>',
   gene:     '<path d="M6 3v18M18 3v18"/><path d="M6 6h12M6 10h12M6 14h12M6 18h12"/><circle cx="12" cy="10" r="1.4" fill="currentColor"/>',
@@ -2155,7 +2154,7 @@ clinical: `
 };
 
 /* ---------- REVIEW: grouped reference ----------
-   Section types: cards | table | flows | list | figs (drawn ANIMA figures, by key). Every card/row carries a lecture id for its color tag. */
+   Section types: cards | table | flows | list | figs (a live ANIMA figure by key; find = extra search words). Every card/row carries a lecture id for its color tag. */
 function C(name, sub, lec, facts, tip){ return { name:name, sub:sub||'', lec:lec, facts:facts||[], tip:tip||'' }; }
 
 var REVIEW = [
@@ -2202,6 +2201,7 @@ var REVIEW = [
     C('Botulinum toxin A (Botox)','Presynaptic blocker','nmj',[['Mechanism','Cleaves SNARE: no ACh release'],['Use','Dystonia, hyperhidrosis, blepharospasm, migraine, wrinkles, refractory bruxism'],['AEs','Dysphagia, weakness, dyspnea']]),
     C('Cyclobenzaprine · Methocarbamol · Carisoprodol','Central muscle relaxants','nmj',[['Mechanism','Sedation with some relaxation (poorly understood)'],['Use','Acute spasm from injury, not CNS spasticity'],['AEs','Sedation; antimuscarinic (cyclobenzaprine); dependence (carisoprodol)']])
   ]},
+  { title:'The neuromuscular junction and its drugs (L32)', type:'figs', lec:'nmj', figs:['nmj'], find:'succinylcholine rocuronium neostigmine sugammadex botulinum toxin acetylcholine AChE nicotinic receptor end plate train of four' },
   { title:'Which skin factor is it? (L29)', type:'table', head:['Scenario','Principle'], rows:[
     ['Same plaque, 0.5% → 2% of the same steroid','Concentration gradient'],
     ['New lesion on the palm, so a stronger steroid','Regional variation in penetration'],
@@ -2303,6 +2303,7 @@ var REVIEW = [
   { title:'Sarcomere bands', type:'table', head:['Band','Contains','On contraction'], rows:[
     ['A band','Thick filament length','Unchanged'],['I band','Thin filaments only','Shortens'],['H band','Thick filaments only','Shortens'],['Z line','Thin filament anchor','Lines move closer'],['M line','Thick filament anchor','Center stays']
   ]},
+  { title:'The sliding sarcomere (L31)', type:'figs', lec:'muscle', figs:['sarcomere'], find:'A band I band H band Z line M line actin myosin troponin tropomyosin cross-bridge contraction' },
   { title:'Proteins and receptors', type:'table', head:['Protein','Job'], rows:[
     ['Troponin T','Attaches troponin to tropomyosin'],['Troponin C','Binds Ca2+'],['Troponin I','Inhibits actin-myosin interaction'],['Tropomyosin','Covers myosin sites on actin'],
     ['DHP receptor','T-tubule voltage sensor'],['Ryanodine receptor','SR Ca2+ release channel'],['SERCA','Pumps Ca2+ back into SR'],['Calsequestrin','Stores Ca2+ inside SR'],['Myoglobin','Stores O2 in slow fibers'],['GLUT4','Insulin-driven glucose uptake']
@@ -2353,13 +2354,7 @@ var REVIEW = [
 ]},
 /* =================================================================== PROCESSES */
 { id:'processes', title:'Processes', icon:'cycle', blurb:'Every ordered process in the unit (also the Stack game\'s pool). Long chains are trimmed to their tested steps.',
-  sections:[ { title:'', type:'flows' } ]},
-/* =================================================================== DIAGRAMS (the same figures as under the notes) */
-{ id:'diagrams', title:'Diagrams', icon:'diagram', blurb:'The drawn figures from the lecture notes, in one place. Slide a sarcomere through a contraction and watch which bands shrink, then pick a drug and see what it does at the neuromuscular junction.',
-  sections:[
-  { type:'figs', lec:'muscle', figs:['sarcomere'] },
-  { type:'figs', lec:'nmj', figs:['nmj'] }
-]}
+  sections:[ { title:'', type:'flows' } ]}
 ];
 
 /* ---------- SEQUENCES (Review > Processes and the stack game) ---------- */
@@ -3144,7 +3139,8 @@ var ANIMA = (function(){
   var copies = 0;
   function uniq(s){ var k = "-" + (++copies); return s.replace(/(id="|url\(#|href="#)((?:nm|sc)-[a-z0-9-]+)/g, "$1$2" + k).replace(/name="((?:nm|sc)-[a-z0-9-]+)"/g, 'name="$1' + k + '"'); }
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-  function html(key){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig"><h4>' + esc(f.title) + '</h4><p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
+  // noTitle: the caller heads it (Review sections use their own h3)
+  function html(key, noTitle){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig">' + (noTitle ? '' : '<h4>' + esc(f.title) + '</h4>') + '<p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
   function still(key){ var s = STILLS[key]; if(!s || !FIGS[s.fig]) return ""; var f = FIGS[s.fig], svg = f.svg.replace('viewBox="' + f.data.wide + '"', 'viewBox="' + f.data.narrow + '"'); (s.rep || []).forEach(function(r){ svg = svg.split(r[0]).join(r[1]); }); return '<div class="anima am-still" data-q="' + s.part + '">' + uniq(svg) + '</div>'; }
   function mount(scope){ Array.prototype.forEach.call(scope.querySelectorAll("[data-anima]"), function(el){ if(el.__animaOn) return; var f = FIGS[el.getAttribute("data-anima")]; if(!f) return; el.__animaOn = 1; try { f.live(el, f.data); } catch(e){ if(window.console) console.error("anima figure failed", e); } }); }
   function meta(key){ var f = FIGS[key]; return f ? { title: f.title, caption: f.caption } : null; }
@@ -3261,7 +3257,6 @@ function sectionCount(sec){
   if(sec.type === 'cards' || sec.type === 'list') return sec.items.length;
   if(sec.type === 'table') return sec.rows.length;
   if(sec.type === 'flows') return SEQUENCES.length;
-  if(sec.type === 'figs') return sec.figs.length;
   return 0;
 }
 function groupCount(g){ return g.sections.reduce(function(n, s){ return n + sectionCount(s); }, 0); }
@@ -3308,9 +3303,9 @@ function sectionHTML(sec, term){
     var seqs = SEQUENCES.filter(function(s){ return m(s.title) || s.steps.some(m); }); if(!seqs.length) return '';
     inner = flowsHTML(seqs, term);
   } else if(sec.type === 'figs'){
-    var l = LECTURE_BY_ID[sec.lec];
-    var figs = sec.figs.filter(function(k){ var f = ANIMA.meta(k); return f && (m(f.title) || m(f.caption) || (l && m(l.title))); }); if(!figs.length) return '';
-    return '<section class="rv-section rv-figs">' + (l ? '<h3>'+escHtml(lecLabel(l)+' '+l.title)+'</h3>' : '') + figs.map(ANIMA.html).join('') + '</section>';
+    /* the live figure from the notes, headed like any other section (its own title would repeat the h3) */
+    var figs = sec.figs.filter(function(k){ var f = ANIMA.meta(k); return f && (m(sec.title) || m(f.title) || m(f.caption) || m(sec.find || '')); }); if(!figs.length) return '';
+    return '<section class="rv-section rv-figs"><h3>'+escHtml(sec.title)+'</h3>' + figs.map(function(k){ return ANIMA.html(k, true); }).join('') + '</section>';
   }
   return '<section class="rv-section">' + (sec.title ? '<h3>'+escHtml(sec.title)+'</h3>' : '') + inner + '</section>';
 }
@@ -4668,7 +4663,7 @@ function shSearchSections(){
       if(sec.type === 'cards') sec.items.forEach(function(c){ out.push({ kind:'Review', where:g.title, title:c.name, text:clean(c.name + ' ' + c.sub + ' ' + c.facts.map(function(f){ return f[0] + ': ' + f[1]; }).join('; ') + ' ' + c.tip), go:{ v:'review', q:c.name } }); });
       else if(sec.type === 'table') sec.rows.forEach(function(r){ out.push({ kind:'Review', where:g.title + (sec.title ? ' · ' + sec.title : ''), title:r[0], text:clean(r.join(' · ')), go:{ v:'review', q:r[0] } }); });
       else if(sec.type === 'list') sec.items.forEach(function(it){ out.push({ kind:'Review', where:g.title, text:clean(it), go:{ v:'review', q:clean(it).split(' ').slice(0, 4).join(' ') } }); });
-      else if(sec.type === 'figs') sec.figs.forEach(function(k){ var f = ANIMA.meta(k); if(f) out.push({ kind:'Review', where:g.title, title:f.title, text:clean(f.title + ' ' + f.caption), lec:sec.lec, go:{ v:'review', q:f.title } }); });
+      else if(sec.type === 'figs') sec.figs.forEach(function(k){ var f = ANIMA.meta(k); if(f) out.push({ kind:'Review', where:g.title, title:f.title, text:clean(f.title + ' ' + f.caption + ' ' + (sec.find || '')), lec:sec.lec, go:{ v:'review', q:f.title } }); });
     });
   });
   SEQUENCES.forEach(function(sq){ out.push({ kind:'Review', where:'Processes', title:sq.title, text:clean(sq.title + ': ' + sq.steps.join(' → ')), go:{ v:'review', q:sq.title } }); });
