@@ -10,7 +10,7 @@ function defaultState(){
     activeDates:{},       // 'YYYY-MM-DD' -> true
     lastActiveDate:null,
     retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
-    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankAt:0 }
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, missedAt:0, caseProgress:{}, caseId:null, caseReview:false }
   };
 }
 function loadState(){
@@ -22,6 +22,7 @@ function loadState(){
   if(!d.ui || typeof d.ui !== 'object') d.ui = base.ui;
   for(var kk in base.ui) if(!(kk in d.ui)) d.ui[kk] = base.ui[kk];
   if(!d.ui.sub || typeof d.ui.sub !== 'object') d.ui.sub = {};
+  if(!d.ui.caseProgress || typeof d.ui.caseProgress !== 'object' || Array.isArray(d.ui.caseProgress)) d.ui.caseProgress = {};
   ['answered', 'activeDates', 'retired'].forEach(function(k){ if(!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {}; });
   return d;
 }
@@ -36,6 +37,7 @@ function recordAnswer(q, correct, choice, ctx, conf){
   var a = STATE.answered[q.id], t = todayKey();
   if(!a) a = STATE.answered[q.id] = { lastCorrect:false, n:0, t:t, first:!!correct };
   a.lastCorrect = !!correct; a.n++; a.t = t;
+  if(typeof choice === 'number' && choice >= 0) a.choice = choice;
   STATE.totalSeen++; if(correct) STATE.totalCorrect++;
   touchActiveDay(); saveState();
   var detail = { qid:q.id, lec:q.lec, correct:!!correct, choice:choice, ctx:ctx || 'bank' };

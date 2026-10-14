@@ -178,10 +178,13 @@ main{padding-top:22px}
 .qchoice .lt{font-family:var(--font-mono);font-weight:600;color:var(--ink-faint);flex:none}
 .qchoice[data-state="right"]{border-color:var(--good);background:var(--good-soft)}
 .qchoice[data-state="wrong"]{border-color:var(--bad);background:var(--bad-soft)}
+.qchoice[data-state="selected"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent)}
+.qcard-show-options{margin:0 0 12px}
 .qx{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:.94rem}
 .qx-verdict{font-weight:700;margin:0 0 6px}
 .qx-verdict.right{color:var(--good)}
 .qx-verdict.wrong{color:var(--bad)}
+.qx-verdict.review{color:var(--accent-ink)}
 .qx p{margin:0 0 8px}
 .qx-why{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:6px}
 .qx-why li{padding:6px 10px;border-radius:8px;background:var(--surface-2);font-size:.9rem}
@@ -190,6 +193,39 @@ main{padding-top:22px}
 .qx-cue{background:var(--caution-soft);border-left:3px solid var(--caution);padding:8px 12px;border-radius:6px}
 .qx-refs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.qx-class{margin:10px 0 0!important;color:var(--ink-soft);font-size:.86rem}
+
+.bank-check{display:flex;align-items:center;gap:7px;padding:7px 0;color:var(--ink-soft);font-size:.86rem;font-weight:700}
+.bank-check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.bank-section-title{font-family:var(--font-display);font-size:1.1rem;margin:20px 0 10px}
+.missed-case-list,.case-list{display:flex;flex-direction:column;gap:10px}
+.case-list-card,.missed-case{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.case-list-card h3,.missed-case h4{margin:8px 0 3px;font-size:1rem}
+.case-list-actions{display:flex;align-items:center;gap:8px}
+.case-list-card p,.missed-case p{margin:0 0 4px;color:var(--ink-soft)}
+.case-view{min-width:0}
+.case-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
+.case-title h3{font-family:var(--font-display);font-size:1.2rem;margin:0}
+.case-title p{margin:4px 0 0}
+.case-layout{display:grid;grid-template-columns:minmax(250px, 0.72fr) minmax(0, 1.6fr);align-items:start;gap:16px}
+.case-chart{position:sticky;top:14px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);min-width:0}
+.case-chart summary{display:none}
+.case-chart-body{padding:16px}
+.case-chart-body>h3{font-family:var(--font-display);font-size:1.05rem;margin:0 0 10px}
+.case-chart .pbox{margin:0}
+.case-chart .pbox dl{grid-template-columns:minmax(0,1fr)}
+.case-chart .pbox dd{border-top:0;padding-top:0}
+.case-chart .qfig{margin-top:12px}
+.case-content{min-width:0}
+.case-title+.case-layout{margin-top:0}
+.case-stage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.case-controls{justify-content:flex-end}
+.case-rounds>h3{font-family:var(--font-display);font-size:1.2rem;margin:0 0 4px}
+.case-rounds>p{margin:0 0 12px}
+.case-round-items{display:flex;flex-direction:column;gap:12px}
+.case-round-item{min-width:0}
+.case-round-item>h4{font-size:.92rem;color:var(--ink-soft);margin:0 0 6px}
+.case-round-item .qcard{padding:15px 17px}
 
 /* ==== css/notes.css ==== */
 /* Notes (minimal reader; int-notes-home adds tables in recall mode, refs chips and practice links). */
@@ -220,6 +256,11 @@ main{padding-top:22px}
   .notes-layout{grid-template-columns:minmax(0,1fr)}
   .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
   .unit-nav button{flex:none}
+  .case-layout{grid-template-columns:minmax(0,1fr)}
+  .case-chart{position:static;scroll-margin-top:130px}
+  .case-chart summary{display:list-item;cursor:pointer;font-weight:700;color:var(--ink);padding:12px 15px}
+  .case-chart[open] summary{border-bottom:1px solid var(--line)}
+  .case-chart-body{padding:12px;max-height:38vh;overflow-y:auto;overscroll-behavior:contain}
 }
 @media (max-width: 560px){
   #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
@@ -239,6 +280,16 @@ main{padding-top:22px}
   .pbox dd{border-top:0;padding-top:0}
   .empty{padding:16px;gap:12px}
   .panel-head h2{font-size:1.3rem}
+  .case-title{align-items:flex-start}
+  .case-title .btn{flex:none;padding:7px 10px}
+  .case-list-card,.missed-case{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
+  .case-list-card>.btn,.missed-case>.btn{align-self:flex-start}
+  .case-list-actions{align-self:stretch;flex-wrap:wrap}
+  .case-list-actions .btn{align-self:flex-start}
+  .case-stage-head{align-items:flex-start;flex-direction:column}
+  .case-round-item .qcard{padding:12px}
+  .bank-filters{gap:9px}
+  .bank-filters .field{flex:1 1 145px;min-width:0}
 }
 
 </style>
@@ -370,7 +421,7 @@ function defaultState(){
     activeDates:{},       // 'YYYY-MM-DD' -> true
     lastActiveDate:null,
     retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
-    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankAt:0 }
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, missedAt:0, caseProgress:{}, caseId:null, caseReview:false }
   };
 }
 function loadState(){
@@ -382,6 +433,7 @@ function loadState(){
   if(!d.ui || typeof d.ui !== 'object') d.ui = base.ui;
   for(var kk in base.ui) if(!(kk in d.ui)) d.ui[kk] = base.ui[kk];
   if(!d.ui.sub || typeof d.ui.sub !== 'object') d.ui.sub = {};
+  if(!d.ui.caseProgress || typeof d.ui.caseProgress !== 'object' || Array.isArray(d.ui.caseProgress)) d.ui.caseProgress = {};
   ['answered', 'activeDates', 'retired'].forEach(function(k){ if(!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {}; });
   return d;
 }
@@ -396,6 +448,7 @@ function recordAnswer(q, correct, choice, ctx, conf){
   var a = STATE.answered[q.id], t = todayKey();
   if(!a) a = STATE.answered[q.id] = { lastCorrect:false, n:0, t:t, first:!!correct };
   a.lastCorrect = !!correct; a.n++; a.t = t;
+  if(typeof choice === 'number' && choice >= 0) a.choice = choice;
   STATE.totalSeen++; if(correct) STATE.totalCorrect++;
   touchActiveDay(); saveState();
   var detail = { qid:q.id, lec:q.lec, correct:!!correct, choice:choice, ctx:ctx || 'bank' };
@@ -405,16 +458,14 @@ function recordAnswer(q, correct, choice, ctx, conf){
 
 /* ==== app/20-card.js ==== */
 /* ====================================================================
-   ITEM CARD (minimal): one standalone MCQ. Options are shuffled on every render unless `fixed`, with `pin`
-   indexes kept last; each button carries its AUTHORED index (data-i), which is what gets recorded.
-   Feedback at once for standalones: verdict, ex, then the picked option's why line, then the others, the cue
-   after a miss, source chips and "Read: <section>". int-cards replaces this with the full card (cases with
-   Rounds, cover the options, Report, class row, lockIn API).
+   ITEM CARD: one rendering and recording path for Questions, cases, the drill and the game adapter.
+   Choice buttons always carry their authored index, even when their displayed order is shuffled.
    ==================================================================== */
 var LETTERS = 'ABCDEFGHIJ';
 
 function choiceOrder(q){
-  var n = (q.choices || []).length, all = [], pins = (q.pin || []).filter(function(i){ return i >= 0 && i < n; });
+  var n = (q.choices || []).length, pins = [], all = [];
+  (q.pin || []).forEach(function(i){ if(i >= 0 && i < n && pins.indexOf(i) === -1) pins.push(i); });
   for(var i = 0; i < n; i++) if(pins.indexOf(i) === -1) all.push(i);
   return (q.fixed ? all : shuffled(all)).concat(pins);
 }
@@ -444,55 +495,179 @@ function refChipsHTML(q){
 }
 
 function sectionTitle(unit, sec){
-  var html = READINGS[unit] || '', m = html.match(new RegExp('<section[^>]*id="' + sec.replace(/[^a-z0-9-]/g, '') + '"[^>]*>[\\s\\S]*?<h2[^>]*>([\\s\\S]*?)</h2>'));
+  var html = READINGS[unit] || '', safe = sec.replace(/[^a-z0-9-]/gi, ''), re = new RegExp('<section[^>]*id="' + safe + '"[^>]*>[\\s\\S]*?<h2[^>]*>([\\s\\S]*?)</h2>', 'i');
+  var m = html.match(re);
   return m ? m[1].replace(/<[^>]*>/g, '') : '';
 }
 
-function cardHTML(q, opts){
-  opts = opts || {};
-  var order = choiceOrder(q), u = LECTURE_BY_ID[q.lec];
-  return '<article class="qcard" data-qid="' + esc(q.id) + '" data-ctx="' + esc(opts.ctx || 'bank') + '">' +
+function cardHTML(q, opts, order){
+  opts = opts || {}; order = order || choiceOrder(q);
+  var u = LECTURE_BY_ID[q.lec], covered = !!STATE.ui.coverOptions && !opts.review;
+  var tag = opts.review ? 'div' : 'button';
+  return '<article class="qcard" data-qid="' + esc(q.id) + '" data-ctx="' + esc(opts.ctx || 'bank') + '" data-lock-in="' + (!!opts.lockIn) + '">' +
     '<div class="qcard-top"><span class="chip accent">' + esc(u ? u.short : q.lec) + '</span>' + (q.exam || []).map(function(e){ return '<span class="chip">' + esc(e.toUpperCase()) + '</span>'; }).join('') + '</div>' +
-    pboxHTML(q.pbox) + (q.img ? figureHTML(q.img) : '') +
+    (!opts.caseView ? pboxHTML(q.pbox) : '') + (q.img ? figureHTML(q.img) : '') +
     '<p class="qcard-stem">' + esc(q.stem) + '</p>' +
-    '<div class="qcard-choices">' + order.map(function(i, k){
-      return '<button type="button" class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></button>';
+    (covered ? '<button type="button" class="btn qcard-show-options" data-show-options>Show options</button>' : '') +
+    '<div class="qcard-choices"' + (opts.review ? ' role="list"' : '') + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
+      var key = tag === 'button' ? ' type="button"' : ' role="listitem"';
+      return '<' + tag + key + ' class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></' + tag + '>';
     }).join('') + '</div><div class="qx" hidden></div></article>';
 }
 
 function explainHTML(q, picked){
-  var right = picked === q.answer, rest = [];
+  var hasPick = typeof picked === 'number' && picked >= 0 && picked < q.choices.length;
+  var right = hasPick && picked === q.answer, rest = [];
   for(var i = 0; i < q.choices.length; i++) if(i !== picked) rest.push(i);
-  var lines = [picked].concat(rest).map(function(i){
+  var order = hasPick ? [picked].concat(rest) : [q.answer].concat(rest.filter(function(x){ return x !== q.answer; }));
+  var lines = order.map(function(i){
     return '<li class="' + (i === picked ? 'is-picked ' : '') + (i === q.answer ? 'is-key' : '') + '"><b>' + esc(q.choices[i]) + ':</b> ' + esc((q.why || [])[i] || '') + '</li>';
   }).join('');
   var title = q.sec ? sectionTitle(q.lec, q.sec) : '';
-  return '<p class="qx-verdict ' + (right ? 'right' : 'wrong') + '">' + (right ? 'Correct.' : 'Not this time. The answer is ' + esc(q.choices[q.answer]) + '.') + '</p>' +
+  var verdict = hasPick ? (right ? 'Correct.' : 'Not this time. The answer is ' + esc(q.choices[q.answer]) + '.') : 'Answer: ' + esc(q.choices[q.answer]) + '.';
+  return '<p class="qx-verdict ' + (hasPick ? (right ? 'right' : 'wrong') : 'review') + '">' + verdict + '</p>' +
     '<p>' + esc(q.ex || '') + '</p><ul class="qx-why">' + lines + '</ul>' +
-    (!right && q.cue ? '<p class="qx-cue"><b>Remember it:</b> ' + esc(q.cue) + '</p>' : '') +
+    (hasPick && !right && q.cue ? '<p class="qx-cue"><b>Remember it:</b> ' + esc(q.cue) + '</p>' : '') +
     refChipsHTML(q) +
-    (title ? '<div class="btn-row"><button type="button" class="btn" data-goto-sec="' + esc(q.sec) + '" data-goto-unit="' + esc(q.lec) + '">Read: ' + esc(title) + '</button></div>' : '');
+    (title ? '<div class="btn-row"><button type="button" class="btn" data-goto-sec="' + esc(q.sec) + '" data-goto-unit="' + esc(q.lec) + '">Read: ' + esc(title) + '</button></div>' : '') +
+    (typeof window.shOpenFlag === 'function' ? '<div class="btn-row"><button type="button" class="btn qx-report" data-report>Report</button></div>' : '');
 }
 
-/* wire every card inside `root`; onDone(q, correct) after an answer is recorded */
+function setChoiceStates(card, q, picked){
+  $$('.qchoice', card).forEach(function(b){
+    var i = +b.getAttribute('data-i');
+    if(i === q.answer) b.setAttribute('data-state', 'right');
+    else if(i === picked) b.setAttribute('data-state', 'wrong');
+    if(b.tagName === 'BUTTON') b.disabled = true;
+  });
+}
+
+function showClassStats(card, q){
+  if(typeof window.shGetClassStats !== 'function') return;
+  window.shGetClassStats([q.id], function(byQid){
+    if(!card.parentNode) return;
+    var stat = byQid && byQid[q.id]; if(!stat || stat.total < 8) return;
+    var qx = $('.qx', card); if(!qx || $('[data-class-stats]', qx)) return;
+    var row = document.createElement('p'); row.className = 'qx-class'; row.setAttribute('data-class-stats', '1');
+    row.textContent = 'Class: ' + pct(stat.correct, stat.total) + '% right (' + stat.total + ' answers)'; qx.appendChild(row);
+  });
+}
+
+function wireCard(card, q, opts, onDone){
+  opts = opts || {};
+  var picked = null, recorded = false, dead = false;
+  var old = STATE.answered[q.id];
+  if(opts.review){
+    picked = old && typeof old.choice === 'number' ? old.choice : null;
+    setChoiceStates(card, q, picked);
+    var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
+    showClassStats(card, q);
+  }
+  function feedback(){
+    var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
+    setChoiceStates(card, q, picked); showClassStats(card, q);
+  }
+  function submit(conf){
+    if(dead || opts.review || recorded || picked == null) return false;
+    recorded = true; card.setAttribute('data-recorded', '1');
+    var right = picked === q.answer;
+    recordAnswer(q, right, picked, opts.ctx || card.getAttribute('data-ctx') || 'bank', conf);
+    if(opts.deferFeedback){ var qx = $('.qx', card); qx.textContent = 'Recorded'; qx.hidden = false; }
+    else feedback();
+    if(onDone) onDone(q, right);
+    return true;
+  }
+  function click(e){
+    var go = e.target.closest('[data-goto-sec]');
+    if(go){ window.SH_GOTO({ unit:go.getAttribute('data-goto-unit'), sec:go.getAttribute('data-goto-sec') }); return; }
+    var report = e.target.closest('[data-report]');
+    if(report){ if(typeof window.shOpenFlag === 'function') window.shOpenFlag(q.id); return; }
+    var reveal = e.target.closest('[data-show-options]');
+    if(reveal){ var list = $('.qcard-choices', card); if(list) list.hidden = false; reveal.hidden = true; return; }
+    var b = e.target.closest('.qchoice'); if(!b || opts.review || recorded || !card.contains(b)) return;
+    picked = +b.getAttribute('data-i');
+    $$('.qchoice', card).forEach(function(x){ x.removeAttribute('data-state'); });
+    b.setAttribute('data-state', 'selected');
+    if(!opts.lockIn) submit();
+  }
+  card.addEventListener('click', click);
+  return {
+    picked:function(){ return picked; },
+    submit:submit,
+    destroy:function(){ dead = true; card.removeEventListener('click', click); }
+  };
+}
+
+function renderItem(el, qid, opts){
+  opts = opts || {};
+  var q = QUESTION_BY_ID[qid];
+  if(!q){ el.innerHTML = ''; return { picked:function(){ return null; }, submit:function(){ return false; }, destroy:function(){} }; }
+  var order = choiceOrder(q); el.innerHTML = cardHTML(q, opts, order);
+  return wireCard($('.qcard', el), q, opts, opts.onDone);
+}
+
+/* Compatibility for the daily drill, which supplies its own host around cardHTML. */
 function wireCards(root, onDone){
   $$('.qcard', root).forEach(function(card){
-    if(card.getAttribute('data-wired')) return; card.setAttribute('data-wired', '1');
+    if(card.getAttribute('data-wired')) return;
+    card.setAttribute('data-wired', '1');
     var q = QUESTION_BY_ID[card.getAttribute('data-qid')]; if(!q) return;
-    card.addEventListener('click', function(e){
-      var go = e.target.closest('[data-goto-sec]');
-      if(go){ window.SH_GOTO({ unit:go.getAttribute('data-goto-unit'), sec:go.getAttribute('data-goto-sec') }); return; }
-      var b = e.target.closest('.qchoice'); if(!b || card.getAttribute('data-done')) return;
-      card.setAttribute('data-done', '1');
-      var picked = +b.getAttribute('data-i'), right = picked === q.answer;
-      $$('.qchoice', card).forEach(function(x){
-        var i = +x.getAttribute('data-i'); x.disabled = true;
-        if(i === q.answer) x.setAttribute('data-state', 'right'); else if(i === picked) x.setAttribute('data-state', 'wrong');
-      });
-      var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
-      recordAnswer(q, right, picked, card.getAttribute('data-ctx') || 'bank');
-      if(onDone) onDone(q, right);
-    });
+    wireCard(card, q, { ctx:card.getAttribute('data-ctx') || 'bank' }, onDone);
+  });
+}
+
+/* ==== app/25-case.js ==== */
+/* ====================================================================
+   CASE SETS: one patient chart, visit-order questions with no verdicts, then a full review in Rounds.
+   Progress lives under STATE.ui so it does not change the shared top-level state contract.
+   ==================================================================== */
+function caseChartHTML(c){
+  return '<details class="case-chart" open><summary>Chart: ' + esc(c.box && c.box.patient || c.id) + '</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
+    pboxHTML(c.box) + (c.stim || []).map(figureHTML).join('') + '</div></details>';
+}
+
+function caseProgress(c){
+  if(!STATE.ui.caseProgress[c.id]) STATE.ui.caseProgress[c.id] = { next:0 };
+  var p = STATE.ui.caseProgress[c.id];
+  if(p.pending) delete p.pending;
+  return p;
+}
+
+function renderCase(el, caseId, opts){
+  opts = opts || {};
+  var c = CASE_BY_ID[caseId];
+  if(!c){ el.innerHTML = (opts.prefix || '') + emptyHTML('Case set unavailable', ['Choose another case set.'], 'bank'); return; }
+  var p = caseProgress(c), itemIds = c.items || [], next = Math.max(0, Math.min(itemIds.length, +p.next || 0));
+  var rounds = !!opts.review || next >= itemIds.length;
+  var title = '<div class="case-title"><div><h3>' + esc(c.box && c.box.patient || c.id) + '</h3><p class="faint">' + plural(itemIds.length, 'question') + ' · ' + (rounds ? 'Rounds' : 'Question ' + (next + 1) + ' of ' + itemIds.length) + '</p></div>' +
+    '<button type="button" class="btn" data-case-back>' + (opts.backLabel || 'Back to cases') + '</button></div>';
+  var body = '';
+  if(rounds){
+    body = '<section class="case-rounds"><h3>Rounds</h3><p class="muted">Review the answers, reasons and cues from the whole visit.</p><div class="case-round-items">' + itemIds.map(function(qid, i){
+      return '<div class="case-round-item"><h4>Question ' + (i + 1) + '</h4><div data-case-review-item="' + esc(qid) + '"></div></div>';
+    }).join('') + '</div></section>';
+  } else {
+    var qid = itemIds[next];
+    body = '<section class="case-current"><div class="case-stage-head"><span class="chip accent">Question ' + (next + 1) + ' of ' + itemIds.length + '</span><span class="faint">Lock in your answer to continue.</span></div>' +
+      '<div data-case-current="' + esc(qid) + '"></div><div class="btn-row case-controls">' +
+      '<button type="button" class="btn primary" data-case-lock disabled>Lock answer</button>' +
+      '<button type="button" class="btn primary" data-case-next hidden>' + (next === itemIds.length - 1 ? 'See Rounds' : 'Next question') + '</button></div></section>';
+  }
+  el.innerHTML = (opts.prefix || '') + '<div class="case-view" data-case-id="' + esc(c.id) + '">' + title +
+    '<div class="case-layout">' + caseChartHTML(c) + '<div class="case-content">' + body + '</div></div></div>';
+  var chart = $('.case-chart', el);
+  if(chart && window.matchMedia && window.matchMedia('(max-width: 639px)').matches && (rounds || next > 0)) chart.open = false;
+  if(rounds){
+    itemIds.forEach(function(id){ var host = $('[data-case-review-item="' + id + '"]', el); if(host) renderItem(host, id, { ctx:opts.ctx || 'case', review:true, caseView:true }); });
+    return;
+  }
+  var current = $('[data-case-current]', el), card = renderItem(current, qid, { ctx:opts.ctx || 'case', lockIn:true, deferFeedback:true, caseView:true });
+  var lock = $('[data-case-lock]', el), advance = $('[data-case-next]', el);
+  current.addEventListener('click', function(){ lock.disabled = card.picked() == null; });
+  lock.addEventListener('click', function(){
+    if(!card.submit()) return;
+    p.next = next + 1; saveState();
+    lock.hidden = true; advance.hidden = false;
   });
 }
 
@@ -543,68 +718,243 @@ function wireNotes(){
 
 /* ==== app/40-bank.js ==== */
 /* ====================================================================
-   QUESTIONS (minimal): Practice (one standalone at a time, filtered by unit or notes section), Cases and
-   Missed. int-cards replaces this with the full bank (filters, case sets in exam layout with Rounds).
+   QUESTIONS: filtered one-at-a-time practice, case sets with Rounds, and missed-item review.
    ==================================================================== */
 var bankSearch = '';
+var bankClassStats = {};
+var bankClassStatsSeen = {};
+var bankRenderToken = 0;
+var caseScrollAfterNext = false;
 
-function bankPool(){
-  var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, q = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
+function bankPoolBase(){
+  var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, exam = STATE.ui.bankExam || 'all';
+  var words = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
   return QUESTIONS.filter(function(x){
     if(x.case) return false;
     if(sec && x.sec !== sec) return false;
     if(!sec && unit && unit !== 'all' && x.lec !== unit) return false;
-    if(q.length){ var t = (x.stem + ' ' + x.choices.join(' ')).toLowerCase(); if(!q.every(function(w){ return t.indexOf(w) !== -1; })) return false; }
+    if(exam !== 'all' && (x.exam || []).indexOf(exam) === -1) return false;
+    if(STATE.ui.bankNewOnly && STATE.answered[x.id]) return false;
+    if(words.length){ var t = (x.stem + ' ' + x.choices.join(' ')).toLowerCase(); if(!words.every(function(w){ return t.indexOf(w) !== -1; })) return false; }
     return true;
   });
 }
 
+function bankPool(){
+  var list = bankPoolBase();
+  if(STATE.ui.bankHardOnly) list = list.filter(function(x){ var s = bankClassStats[x.id]; return s && s.total >= 8 && (s.correct / s.total) < 0.5; });
+  return list;
+}
+
+function ensureBankStats(ids, done){
+  var missing = ids.filter(function(id){ return !bankClassStatsSeen[id]; });
+  if(!missing.length) return true;
+  if(typeof window.shGetClassStats !== 'function'){
+    missing.forEach(function(id){ bankClassStatsSeen[id] = true; }); return true;
+  }
+  window.shGetClassStats(missing, function(byQid){
+    missing.forEach(function(id){ bankClassStatsSeen[id] = true; });
+    Object.keys(byQid || {}).forEach(function(id){ bankClassStats[id] = byQid[id]; });
+    done();
+  });
+  return false;
+}
+
+function bankSections(){
+  var out = [];
+  Object.keys(READINGS).forEach(function(unit){
+    var html = READINGS[unit] || '', re = /<section\b([^>]*)>([\s\S]*?)<\/section>/gi, m;
+    while((m = re.exec(html))){
+      var id = (m[1].match(/\bid="([^"]+)"/) || [])[1], title = (m[2].match(/<h2[^>]*>([\s\S]*?)<\/h2>/i) || [])[1];
+      if(id && title) out.push({ id:id, unit:unit, title:title.replace(/<[^>]*>/g, '') });
+    }
+  });
+  return out;
+}
+
+function caseState(c){
+  var p = STATE.ui.caseProgress[c.id], n = c.items.length, next = p ? (+p.next || 0) : 0;
+  if(next >= n) return 'Done';
+  if(next > 0) return 'In progress';
+  return 'New';
+}
+
+function renderCaseList(){
+  if(!CASES.length) return emptyHTML('No case sets yet', ['Case sets will appear here when the first unit opens.'], 'bank');
+  return '<div class="case-list">' + CASES.map(function(c){
+    var state = caseState(c), box = c.box || {}, actions;
+    if(state === 'Done'){
+      actions = '<div class="case-list-actions"><button type="button" class="btn" data-case-review="' + esc(c.id) + '">Review</button>' +
+        '<button type="button" class="btn primary" data-case-repeat="' + esc(c.id) + '">Do it again</button></div>';
+    } else actions = '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'In progress' ? 'Continue case' : 'Open case') + '</button>';
+    return '<article class="case-list-card"><div><span class="chip">' + esc(state) + '</span><h3>' + esc(box.patient || c.id) + '</h3>' +
+      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' + actions + '</article>';
+  }).join('') + '</div>';
+}
+
+function missedStandalonePool(){
+  return QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+}
+
+function renderMissed(){
+  var standalones = missedStandalonePool();
+  var missedCases = CASES.filter(function(c){ return c.items.some(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }); });
+  if(!standalones.length && !missedCases.length) return emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
+  var html = '';
+  if(standalones.length){
+    var at = Math.min(Math.max(0, +STATE.ui.missedAt || 0), standalones.length - 1), q = standalones[at];
+    STATE.ui.missedAt = at;
+    html += '<h3 class="bank-section-title">Missed questions</h3><div class="bank-practice"><div class="bank-card-host" data-bank-qid="' + esc(q.id) + '"></div>' +
+      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + standalones.length + '</span><span class="btn-row" style="margin:0">' +
+      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+      '<button type="button" class="btn primary" data-bank-step="1"' + (at < standalones.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>';
+  }
+  if(missedCases.length){
+    html += '<h3 class="bank-section-title">Missed case items</h3><div class="missed-case-list">' + missedCases.map(function(c){
+      var count = c.items.filter(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }).length;
+      return '<article class="missed-case"><div><h4>' + esc(c.box && c.box.patient || c.id) + '</h4><p>' + count + ' missed ' + (count === 1 ? 'item' : 'items') + ' · ' + plural(c.items.length, 'question') + '</p></div>' +
+        '<button type="button" class="btn" data-case-missed="' + esc(c.id) + '">Review case</button></article>';
+    }).join('') + '</div>';
+  }
+  return html;
+}
+
 function renderBank(){
   var el = document.getElementById('panel-bank'), sub = STATE.ui.sub.bank || 'practice';
-  var head = '<div class="panel-head"><div><h2>Questions</h2><p>Board-style single-best-answer questions. Options are shuffled every time, so learn the reason, not the letter.</p></div></div>';
+  var head = '<div class="panel-head"><div><h2>Questions</h2><p>Practice one question at a time, review complete case visits, and revisit questions you missed.</p></div></div>';
+  var prefix = head + subtabsHTML('bank', sub);
   if(!QUESTIONS.length){
-    el.innerHTML = head + subtabsHTML('bank', sub) + emptyHTML('The first questions are being written and checked', [
+    el.innerHTML = prefix + emptyHTML('The first questions are being written and checked', [
       'Every question is written for this hub from a checked fact with a public primary source, then verified by a second model and, for the risky ones, by a person.',
       'Practice, case sets and your missed questions will live here.'
     ], 'bank');
     return;
   }
-  var html = head + subtabsHTML('bank', sub);
-  if(sub === 'cases'){
-    html += CASES.length ? '<div class="box"><h3>' + plural(CASES.length, 'case set') + '</h3><p class="muted">Case sets in the exam layout, with every answer shown after the last question, arrive with the full bank.</p></div>'
-      : emptyHTML('No case sets yet', ['Case sets (one patient, 2-6 questions) arrive with the first units.'], 'bank');
-  } else if(sub === 'missed'){
-    var missed = QUESTIONS.filter(function(x){ var a = STATE.answered[x.id]; return a && !a.lastCorrect && !x.case; });
-    html += missed.length ? '<div class="qlist">' + missed.map(function(x){ return cardHTML(x, { ctx:'bank' }); }).join('') + '</div>'
-      : emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
-  } else {
-    var pool = bankPool(), at = Math.min(STATE.ui.bankAt || 0, Math.max(0, pool.length - 1));
-    var units = taughtUnits().filter(function(l){ return unitItems(l.id).length; });
-    html += '<div class="filters"><label class="field">Unit<select data-bank-unit><option value="all">All units</option>' + units.map(function(l){
-      return '<option value="' + esc(l.id) + '"' + (STATE.ui.bankUnit === l.id && !STATE.ui.bankSec ? ' selected' : '') + '>' + esc(l.title) + '</option>';
-    }).join('') + '</select></label>' + (STATE.ui.bankSec ? '<button type="button" class="btn" data-bank-clear>Section: ' + esc(sectionTitle(STATE.ui.bankSec.split('-')[0], STATE.ui.bankSec) || STATE.ui.bankSec) + ' &times;</button>' : '') +
-      (bankSearch ? '<button type="button" class="btn" data-bank-unsearch>Search: ' + esc(bankSearch) + ' &times;</button>' : '') + '</div>';
-    html += pool.length ? cardHTML(pool[at], { ctx:'bank' }) +
-      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + pool.length + '</span><span class="btn-row" style="margin:0">' +
-      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
-      '<button type="button" class="btn primary" data-bank-step="1"' + (at < pool.length - 1 ? '' : ' disabled') + '>Next</button></span></div>'
-      : emptyHTML('No questions match', ['Try another unit or clear the filter.'], 'bank');
+  if(sub === 'cases' && STATE.ui.caseId && CASE_BY_ID[STATE.ui.caseId]){
+    renderCase(el, STATE.ui.caseId, { ctx:'case', review:!!STATE.ui.caseReview, prefix:prefix, backLabel:'Back to cases' });
+    if(caseScrollAfterNext){
+      caseScrollAfterNext = false;
+      var question = $('.case-current', el) || $('.case-rounds', el), chart = $('.case-chart', el);
+      var phone = window.matchMedia && window.matchMedia('(max-width: 639px)').matches;
+      var target = phone && chart && !chart.open ? chart : question;
+      if(target && target.scrollIntoView) target.scrollIntoView({ block:'start', behavior:'smooth' });
+    }
+    return;
   }
+  if(sub === 'missed' && STATE.ui.caseId && STATE.ui.caseReview){
+    renderCase(el, STATE.ui.caseId, { ctx:'case', review:true, prefix:prefix, backLabel:'Back to missed' });
+    return;
+  }
+  if(sub === 'cases'){
+    el.innerHTML = prefix + renderCaseList();
+    return;
+  }
+  if(sub === 'missed'){
+    el.innerHTML = prefix + renderMissed();
+    var missedHost = $('.bank-card-host', el);
+    if(missedHost) renderItem(missedHost, missedHost.getAttribute('data-bank-qid'), { ctx:'bank' });
+    return;
+  }
+
+  var base = bankPoolBase(), token = ++bankRenderToken;
+  if(STATE.ui.bankHardOnly && !ensureBankStats(base.map(function(q){ return q.id; }), function(){ if(token === bankRenderToken) renderBank(); })){
+    el.innerHTML = prefix + bankFiltersHTML() + emptyHTML('Checking class accuracy', ['Hard only shows questions answered correctly by fewer than half of at least 8 classmates.'], 'bank');
+    return;
+  }
+  var pool = bankPool(), at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), Math.max(0, pool.length - 1));
+  STATE.ui.bankAt = at;
+  var html = prefix + bankFiltersHTML();
+  html += pool.length ? '<div class="bank-practice">' +
+    '<div class="bank-card-host" data-bank-qid="' + esc(pool[at].id) + '"></div>' +
+    '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + pool.length + '</span><span class="btn-row" style="margin:0">' +
+    '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+    '<button type="button" class="btn primary" data-bank-step="1"' + (at < pool.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>'
+    : emptyHTML('No questions match', ['Try another unit or clear a filter.'], 'bank');
   el.innerHTML = html;
-  wireCards(el);
+  if(pool.length) renderItem($('.bank-card-host', el), pool[at].id, { ctx:'bank' });
+}
+
+function bankFiltersHTML(){
+  var units = taughtUnits().filter(function(l){ return unitItems(l.id).length; }), sections = bankSections();
+  var sectionUnits = STATE.ui.bankUnit && STATE.ui.bankUnit !== 'all' ? STATE.ui.bankUnit : null;
+  if(sectionUnits) sections = sections.filter(function(s){ return s.unit === sectionUnits; });
+  var selectedSection = STATE.ui.bankSec || '';
+  return '<div class="filters bank-filters">' +
+    '<label class="field">Unit<select data-bank-unit><option value="all"' + ((!STATE.ui.bankUnit || STATE.ui.bankUnit === 'all') ? ' selected' : '') + '>All units</option>' + units.map(function(l){
+      return '<option value="' + esc(l.id) + '"' + (STATE.ui.bankUnit === l.id && !STATE.ui.bankSec ? ' selected' : '') + '>' + esc(l.title) + '</option>';
+    }).join('') + '</select></label>' +
+    '<label class="field">Notes section<select data-bank-section><option value="">All sections</option>' + sections.map(function(s){
+      return '<option value="' + esc(s.id) + '"' + (selectedSection === s.id ? ' selected' : '') + '>' + esc(s.unit + ' · ' + s.title) + '</option>';
+    }).join('') + '</select></label>' +
+    '<label class="field">Exam<select data-bank-exam><option value="all"' + ((STATE.ui.bankExam || 'all') === 'all' ? ' selected' : '') + '>INBDE + ADEX</option><option value="inbde"' + (STATE.ui.bankExam === 'inbde' ? ' selected' : '') + '>INBDE</option><option value="adex"' + (STATE.ui.bankExam === 'adex' ? ' selected' : '') + '>ADEX</option></select></label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-new' + (STATE.ui.bankNewOnly ? ' checked' : '') + '> New only</label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-hard' + (STATE.ui.bankHardOnly ? ' checked' : '') + '> Hard only</label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-cover' + (STATE.ui.coverOptions ? ' checked' : '') + '> Cover options</label>' +
+    (bankSearch ? '<button type="button" class="btn" data-bank-unsearch>Search: ' + esc(bankSearch) + ' &times;</button>' : '') +
+    '</div>';
 }
 
 function wireBank(){
   var el = document.getElementById('panel-bank');
+  /* Clear an open case before the boot handler renders a different bank sub-view. */
   el.addEventListener('click', function(e){
-    var s = e.target.closest('[data-bank-step]');
-    if(s){ STATE.ui.bankAt = Math.max(0, (STATE.ui.bankAt || 0) + +s.getAttribute('data-bank-step')); saveState(); renderBank(); return; }
-    if(e.target.closest('[data-bank-clear]')){ STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
-    if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; renderBank(); }
+    if(e.target.closest('.subtabs [data-sub]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; }
+  }, true);
+  el.addEventListener('click', function(e){
+    var step = e.target.closest('[data-bank-step]');
+    if(step){
+      var delta = +step.getAttribute('data-bank-step'), isMissed = (STATE.ui.sub.bank || 'practice') === 'missed';
+      var indexKey = isMissed ? 'missedAt' : 'bankAt', at = +STATE.ui[indexKey] || 0;
+      var host = $('[data-bank-qid]', el), qid = host && host.getAttribute('data-bank-qid');
+      var available = isMissed ? missedStandalonePool() : bankPool();
+      var currentStillAvailable = qid && available.some(function(q){ return q.id === qid; });
+      var keepIndex = delta > 0 && qid && !currentStillAvailable;
+      STATE.ui[indexKey] = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
+    }
+    if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
+    var open = e.target.closest('[data-case-open]');
+    if(open){ STATE.ui.caseId = open.getAttribute('data-case-open'); STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    var reviewCase = e.target.closest('[data-case-review]');
+    if(reviewCase){ STATE.ui.caseId = reviewCase.getAttribute('data-case-review'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    var repeatCase = e.target.closest('[data-case-repeat]');
+    if(repeatCase){
+      STATE.ui.caseId = repeatCase.getAttribute('data-case-repeat'); STATE.ui.caseReview = false;
+      STATE.ui.caseProgress[STATE.ui.caseId] = { next:0 }; saveState(); renderBank(); return;
+    }
+    var missedCase = e.target.closest('[data-case-missed]');
+    if(missedCase){ STATE.ui.caseId = missedCase.getAttribute('data-case-missed'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    if(e.target.closest('[data-case-back]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    if(e.target.closest('[data-case-next]')){
+      caseScrollAfterNext = true;
+      saveState(); renderBank(); return;
+    }
   });
   el.addEventListener('change', function(e){
-    var s = e.target.closest('[data-bank-unit]');
-    if(s){ STATE.ui.bankUnit = s.value; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); }
+    var t = e.target;
+    if(t.closest('[data-bank-unit]')){ STATE.ui.bankUnit = t.value; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-section]')){ STATE.ui.bankSec = t.value || null; STATE.ui.bankUnit = 'all'; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-exam]')){ STATE.ui.bankExam = t.value; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-new]')){ STATE.ui.bankNewOnly = t.checked; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-hard]')){ STATE.ui.bankHardOnly = t.checked; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-cover]')){ STATE.ui.coverOptions = t.checked; }
+    else return;
+    saveState(); renderBank();
+  });
+  /* The generated export script defines SH_GOTO after this file. Wrap it once DOM parsing is complete so
+     searches and notes can land on a standalone or open a case in its case-set view. */
+  document.addEventListener('DOMContentLoaded', function(){
+    var original = window.SH_GOTO; if(typeof original !== 'function' || original._bankWrapped) return;
+    var wrapped = function(go){
+      if(go && go.qid && QUESTION_BY_ID[go.qid]){
+        var q = QUESTION_BY_ID[go.qid]; bankSearch = '';
+        STATE.ui.bankExam = 'all'; STATE.ui.bankNewOnly = false; STATE.ui.bankHardOnly = false; STATE.ui.bankAt = 0;
+        if(q.case){ STATE.ui.caseId = q.case; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'cases'; saveState(); setMode('bank'); return; }
+        STATE.ui.caseId = null; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'practice'; STATE.ui.bankUnit = q.lec; STATE.ui.bankSec = null;
+        var pool = bankPool(); STATE.ui.bankAt = Math.max(0, pool.indexOf(q)); saveState(); setMode('bank'); return;
+      }
+      return original(go);
+    };
+    wrapped._bankWrapped = true; window.SH_GOTO = wrapped;
   });
 }
 
