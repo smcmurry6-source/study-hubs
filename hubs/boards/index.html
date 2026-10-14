@@ -178,10 +178,13 @@ main{padding-top:22px}
 .qchoice .lt{font-family:var(--font-mono);font-weight:600;color:var(--ink-faint);flex:none}
 .qchoice[data-state="right"]{border-color:var(--good);background:var(--good-soft)}
 .qchoice[data-state="wrong"]{border-color:var(--bad);background:var(--bad-soft)}
+.qchoice[data-state="selected"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent)}
+.qcard-show-options{margin:0 0 12px}
 .qx{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);font-size:.94rem}
 .qx-verdict{font-weight:700;margin:0 0 6px}
 .qx-verdict.right{color:var(--good)}
 .qx-verdict.wrong{color:var(--bad)}
+.qx-verdict.review{color:var(--accent-ink)}
 .qx p{margin:0 0 8px}
 .qx-why{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:6px}
 .qx-why li{padding:6px 10px;border-radius:8px;background:var(--surface-2);font-size:.9rem}
@@ -190,6 +193,124 @@ main{padding-top:22px}
 .qx-cue{background:var(--caution-soft);border-left:3px solid var(--caution);padding:8px 12px;border-radius:6px}
 .qx-refs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.qx-class{margin:10px 0 0!important;color:var(--ink-soft);font-size:.86rem}
+
+.bank-check{display:flex;align-items:center;gap:7px;padding:7px 0;color:var(--ink-soft);font-size:.86rem;font-weight:700}
+.bank-check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.bank-section-title{font-family:var(--font-display);font-size:1.1rem;margin:20px 0 10px}
+.missed-case-list,.case-list{display:flex;flex-direction:column;gap:10px}
+.case-list-card,.missed-case{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.case-list-card h3,.missed-case h4{margin:8px 0 3px;font-size:1rem}
+.case-list-actions{display:flex;align-items:center;gap:8px}
+.case-list-card p,.missed-case p{margin:0 0 4px;color:var(--ink-soft)}
+.case-view{min-width:0}
+.case-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
+.case-title h3{font-family:var(--font-display);font-size:1.2rem;margin:0}
+.case-title p{margin:4px 0 0}
+.case-layout{display:grid;grid-template-columns:minmax(250px, 0.72fr) minmax(0, 1.6fr);align-items:start;gap:16px}
+.case-chart{position:sticky;top:14px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);min-width:0}
+.case-chart summary{display:none}
+.case-chart-body{padding:16px}
+.case-chart-body>h3{font-family:var(--font-display);font-size:1.05rem;margin:0 0 10px}
+.case-chart .pbox{margin:0}
+.case-chart .pbox dl{grid-template-columns:minmax(0,1fr)}
+.case-chart .pbox dd{border-top:0;padding-top:0}
+.case-chart .qfig{margin-top:12px}
+.case-content{min-width:0}
+.case-title+.case-layout{margin-top:0}
+.case-stage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.case-controls{justify-content:flex-end}
+.case-rounds>h3{font-family:var(--font-display);font-size:1.2rem;margin:0 0 4px}
+.case-rounds>p{margin:0 0 12px}
+.case-round-items{display:flex;flex-direction:column;gap:12px}
+.case-round-item{min-width:0}
+.case-round-item>h4{font-size:.92rem;color:var(--ink-soft);margin:0 0 6px}
+.case-round-item .qcard{padding:15px 17px}
+
+/* ==== css/mock.css ==== */
+/* Exam blocks: timed exam controls, question navigation, and full block review. */
+.mock-setup-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr);gap:14px;align-items:start}
+.mock-setup-card h3,.mock-unit-card h3,.mock-history h3{font-family:var(--font-display);font-size:1.1rem;margin:0 0 5px}
+.mock-setup-card>p,.mock-unit-card>p{margin:0 0 13px}
+.mock-kind-switch{display:flex;gap:8px;flex-wrap:wrap}
+.mock-kind-switch .btn{flex:1 1 130px;justify-content:center}
+.mock-kind-switch .btn.is-selected{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.mock-length-field{margin:13px 0 8px}
+.mock-length-field select,.mock-review-filters select{width:100%}
+.mock-availability-count{font-size:.86rem;color:var(--ink-soft);margin:0 0 12px!important}
+.mock-setup-card>[data-mock-start]{width:100%;justify-content:center}
+.mock-unit-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.mock-unit-check{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-size:.86rem;color:var(--ink);cursor:pointer}
+.mock-unit-check input{width:16px;height:16px;flex:none;margin:0;accent-color:var(--accent)}
+.mock-unit-check span{min-width:0;overflow-wrap:anywhere}
+.mock-unavailable{margin-top:14px}
+.mock-active{min-width:0}
+.mock-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+.mock-toolbar>div:first-child{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.mock-block-units{font-size:.86rem;color:var(--ink-soft)}
+.mock-countdown{display:flex;align-items:center;gap:9px;flex:none;padding:4px 11px;border-radius:9px;background:var(--caution-soft);color:var(--ink)}
+.mock-countdown span{font-size:.8rem;color:var(--ink-soft)}
+.mock-countdown strong{font-family:var(--font-mono);font-size:1.18rem;font-variant-numeric:tabular-nums}
+.mock-instructions{margin:12px 0;color:var(--ink-soft);font-size:.9rem}
+.mock-navigator{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;margin:0 0 14px}
+.mock-question-link{min-height:40px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);font-family:var(--font-mono);font-weight:700;cursor:pointer}
+.mock-question-link:hover{border-color:var(--accent)}
+.mock-question-link.is-answered{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.mock-question-link.is-flagged{border-color:var(--caution);box-shadow:inset 0 0 0 1px var(--caution)}
+.mock-question-link[aria-current="step"]{outline:2px solid var(--accent);outline-offset:1px}
+.mock-question-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;color:var(--ink-soft);font-size:.88rem;font-weight:700}
+.mock-question-actions{display:flex;justify-content:flex-end;margin:11px 0 0}
+.mock-flag-button.is-flagged{border-color:var(--caution);background:var(--caution-soft);color:var(--ink)}
+.mock-submit-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 0;padding:12px 0;border-top:1px solid var(--line)}
+.mock-active-notice{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;padding:10px 13px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2)}
+.mock-review-layout{display:grid;grid-template-columns:minmax(190px,.32fr) minmax(0,1fr);gap:14px;align-items:start}
+.mock-history{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;box-shadow:var(--shadow)}
+.mock-history-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.mock-history-item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:9px 10px;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;color:var(--ink)}
+.mock-history-item>span{font-size:.78rem;color:var(--ink-soft)}
+.mock-history-item b{font-size:.88rem}
+.mock-history-item.is-active{border-color:var(--accent);background:var(--accent-soft)}
+.mock-history-item.is-active>span,.mock-history-item.is-active b{color:var(--accent-ink)}
+.mock-review-detail{min-width:0}
+.mock-review-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+.mock-review-summary h3{font-family:var(--font-display);font-size:1.25rem;margin:7px 0 2px}
+.mock-review-summary p{margin:0 0 4px}
+.mock-review-metrics{display:flex;gap:8px;margin:0}
+.mock-review-metrics>div{min-width:84px;padding:8px 10px;border-radius:8px;background:var(--surface-2)}
+.mock-review-metrics dt{font-size:.74rem;color:var(--ink-soft)}
+.mock-review-metrics dd{margin:2px 0 0;font-family:var(--font-mono);font-weight:700}
+.mock-review-filters{margin:12px 0}
+.mock-review-filters .field{min-width:min(100%,210px)}
+.mock-review-items{display:flex;flex-direction:column;gap:12px}
+.mock-review-list{display:flex;flex-direction:column;gap:12px}
+.mock-review-case+.mock-review-case{margin-top:12px}
+.mock-review-item{min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+.mock-review-item-head{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.mock-review-item-head h4{margin:0 auto 0 0;font-size:.92rem;color:var(--ink-soft)}
+.mock-flag-chip{background:var(--caution-soft);color:var(--ink)}
+.mock-review-item .qcard{box-shadow:none}
+.mock-review-item .qx{margin-top:10px}
+
+@media (max-width:760px){
+  .mock-setup-layout,.mock-review-layout{grid-template-columns:minmax(0,1fr)}
+  .mock-history-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}
+}
+@media (max-width:560px){
+  .mock-unit-list{grid-template-columns:minmax(0,1fr)}
+  .mock-toolbar{align-items:flex-start;flex-direction:column}
+  .mock-countdown{align-self:stretch;justify-content:space-between}
+  .mock-navigator{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .mock-question-link{min-height:42px}
+  .mock-submit-row{align-items:stretch;flex-direction:column}
+  .mock-submit-row .btn{justify-content:center}
+  .mock-active-notice{align-items:stretch;flex-direction:column}
+  .mock-active-notice .btn{justify-content:center}
+  .mock-review-summary{flex-direction:column;padding:14px}
+  .mock-review-metrics{width:100%}
+  .mock-review-metrics>div{flex:1}
+  .mock-review-item{padding:9px}
+  .mock-review-item .qcard{padding:12px}
+}
 
 /* ==== css/notes.css ==== */
 /* Notes (minimal reader; int-notes-home adds tables in recall mode, refs chips and practice links). */
@@ -220,6 +341,11 @@ main{padding-top:22px}
   .notes-layout{grid-template-columns:minmax(0,1fr)}
   .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
   .unit-nav button{flex:none}
+  .case-layout{grid-template-columns:minmax(0,1fr)}
+  .case-chart{position:static;scroll-margin-top:130px}
+  .case-chart summary{display:list-item;cursor:pointer;font-weight:700;color:var(--ink);padding:12px 15px}
+  .case-chart[open] summary{border-bottom:1px solid var(--line)}
+  .case-chart-body{padding:12px}
 }
 @media (max-width: 560px){
   #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
@@ -239,6 +365,16 @@ main{padding-top:22px}
   .pbox dd{border-top:0;padding-top:0}
   .empty{padding:16px;gap:12px}
   .panel-head h2{font-size:1.3rem}
+  .case-title{align-items:flex-start}
+  .case-title .btn{flex:none;padding:7px 10px}
+  .case-list-card,.missed-case{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
+  .case-list-card>.btn,.missed-case>.btn{align-self:flex-start}
+  .case-list-actions{align-self:stretch;flex-wrap:wrap}
+  .case-list-actions .btn{align-self:flex-start}
+  .case-stage-head{align-items:flex-start;flex-direction:column}
+  .case-round-item .qcard{padding:12px}
+  .bank-filters{gap:9px}
+  .bank-filters .field{flex:1 1 145px;min-width:0}
 }
 
 </style>
@@ -370,7 +506,8 @@ function defaultState(){
     activeDates:{},       // 'YYYY-MM-DD' -> true
     lastActiveDate:null,
     retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
-    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankAt:0 }
+    mockBlocks:[],         // completed exam blocks, newest first
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, caseProgress:{}, caseId:null, caseReview:false, mockSetup:{kind:'standalone', length:5, units:null}, mockActive:null, mockReviewId:null, mockFilter:'all' }
   };
 }
 function loadState(){
@@ -382,6 +519,13 @@ function loadState(){
   if(!d.ui || typeof d.ui !== 'object') d.ui = base.ui;
   for(var kk in base.ui) if(!(kk in d.ui)) d.ui[kk] = base.ui[kk];
   if(!d.ui.sub || typeof d.ui.sub !== 'object') d.ui.sub = {};
+  if(!d.ui.caseProgress || typeof d.ui.caseProgress !== 'object' || Array.isArray(d.ui.caseProgress)) d.ui.caseProgress = {};
+  if(!Array.isArray(d.mockBlocks)) d.mockBlocks = [];
+  else d.mockBlocks = d.mockBlocks.filter(function(b){ return b && typeof b === 'object' && Array.isArray(b.questions); });
+  if(!d.ui.mockSetup || typeof d.ui.mockSetup !== 'object' || Array.isArray(d.ui.mockSetup)) d.ui.mockSetup = base.ui.mockSetup;
+  if(d.ui.mockActive && (typeof d.ui.mockActive !== 'object' || Array.isArray(d.ui.mockActive))) d.ui.mockActive = null;
+  if(typeof d.ui.mockReviewId !== 'string' && d.ui.mockReviewId !== null) d.ui.mockReviewId = null;
+  if(['all', 'missed', 'flagged', 'missed-flagged'].indexOf(d.ui.mockFilter) === -1) d.ui.mockFilter = 'all';
   ['answered', 'activeDates', 'retired'].forEach(function(k){ if(!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {}; });
   return d;
 }
@@ -396,6 +540,7 @@ function recordAnswer(q, correct, choice, ctx, conf){
   var a = STATE.answered[q.id], t = todayKey();
   if(!a) a = STATE.answered[q.id] = { lastCorrect:false, n:0, t:t, first:!!correct };
   a.lastCorrect = !!correct; a.n++; a.t = t;
+  if(typeof choice === 'number' && choice >= 0) a.choice = choice;
   STATE.totalSeen++; if(correct) STATE.totalCorrect++;
   touchActiveDay(); saveState();
   var detail = { qid:q.id, lec:q.lec, correct:!!correct, choice:choice, ctx:ctx || 'bank' };
@@ -405,16 +550,14 @@ function recordAnswer(q, correct, choice, ctx, conf){
 
 /* ==== app/20-card.js ==== */
 /* ====================================================================
-   ITEM CARD (minimal): one standalone MCQ. Options are shuffled on every render unless `fixed`, with `pin`
-   indexes kept last; each button carries its AUTHORED index (data-i), which is what gets recorded.
-   Feedback at once for standalones: verdict, ex, then the picked option's why line, then the others, the cue
-   after a miss, source chips and "Read: <section>". int-cards replaces this with the full card (cases with
-   Rounds, cover the options, Report, class row, lockIn API).
+   ITEM CARD: one rendering and recording path for Questions, cases, the drill and the game adapter.
+   Choice buttons always carry their authored index, even when their displayed order is shuffled.
    ==================================================================== */
 var LETTERS = 'ABCDEFGHIJ';
 
 function choiceOrder(q){
-  var n = (q.choices || []).length, all = [], pins = (q.pin || []).filter(function(i){ return i >= 0 && i < n; });
+  var n = (q.choices || []).length, pins = [], all = [];
+  (q.pin || []).forEach(function(i){ if(i >= 0 && i < n && pins.indexOf(i) === -1) pins.push(i); });
   for(var i = 0; i < n; i++) if(pins.indexOf(i) === -1) all.push(i);
   return (q.fixed ? all : shuffled(all)).concat(pins);
 }
@@ -444,55 +587,184 @@ function refChipsHTML(q){
 }
 
 function sectionTitle(unit, sec){
-  var html = READINGS[unit] || '', m = html.match(new RegExp('<section[^>]*id="' + sec.replace(/[^a-z0-9-]/g, '') + '"[^>]*>[\\s\\S]*?<h2[^>]*>([\\s\\S]*?)</h2>'));
+  var html = READINGS[unit] || '', safe = sec.replace(/[^a-z0-9-]/gi, ''), re = new RegExp('<section[^>]*id="' + safe + '"[^>]*>[\\s\\S]*?<h2[^>]*>([\\s\\S]*?)</h2>', 'i');
+  var m = html.match(re);
   return m ? m[1].replace(/<[^>]*>/g, '') : '';
 }
 
-function cardHTML(q, opts){
-  opts = opts || {};
-  var order = choiceOrder(q), u = LECTURE_BY_ID[q.lec];
-  return '<article class="qcard" data-qid="' + esc(q.id) + '" data-ctx="' + esc(opts.ctx || 'bank') + '">' +
+function cardHTML(q, opts, order){
+  opts = opts || {}; order = order || choiceOrder(q);
+  var u = LECTURE_BY_ID[q.lec], covered = !!STATE.ui.coverOptions && !opts.review;
+  var tag = opts.review ? 'div' : 'button';
+  return '<article class="qcard" data-qid="' + esc(q.id) + '" data-ctx="' + esc(opts.ctx || 'bank') + '" data-lock-in="' + (!!opts.lockIn) + '">' +
     '<div class="qcard-top"><span class="chip accent">' + esc(u ? u.short : q.lec) + '</span>' + (q.exam || []).map(function(e){ return '<span class="chip">' + esc(e.toUpperCase()) + '</span>'; }).join('') + '</div>' +
-    pboxHTML(q.pbox) + (q.img ? figureHTML(q.img) : '') +
+    (!opts.caseView ? pboxHTML(q.pbox) : '') + (q.img ? figureHTML(q.img) : '') +
     '<p class="qcard-stem">' + esc(q.stem) + '</p>' +
-    '<div class="qcard-choices">' + order.map(function(i, k){
-      return '<button type="button" class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></button>';
+    (covered ? '<button type="button" class="btn qcard-show-options" data-show-options>Show options</button>' : '') +
+    '<div class="qcard-choices"' + (opts.review ? ' role="list"' : '') + (covered ? ' hidden' : '') + '>' + order.map(function(i, k){
+      var key = tag === 'button' ? ' type="button"' : ' role="listitem"';
+      return '<' + tag + key + ' class="qchoice" data-i="' + i + '"><span class="lt">' + LETTERS[k] + '</span><span>' + esc(q.choices[i]) + '</span></' + tag + '>';
     }).join('') + '</div><div class="qx" hidden></div></article>';
 }
 
 function explainHTML(q, picked){
-  var right = picked === q.answer, rest = [];
+  var hasPick = typeof picked === 'number' && picked >= 0 && picked < q.choices.length;
+  var right = hasPick && picked === q.answer, rest = [];
   for(var i = 0; i < q.choices.length; i++) if(i !== picked) rest.push(i);
-  var lines = [picked].concat(rest).map(function(i){
+  var order = hasPick ? [picked].concat(rest) : [q.answer].concat(rest.filter(function(x){ return x !== q.answer; }));
+  var lines = order.map(function(i){
     return '<li class="' + (i === picked ? 'is-picked ' : '') + (i === q.answer ? 'is-key' : '') + '"><b>' + esc(q.choices[i]) + ':</b> ' + esc((q.why || [])[i] || '') + '</li>';
   }).join('');
   var title = q.sec ? sectionTitle(q.lec, q.sec) : '';
-  return '<p class="qx-verdict ' + (right ? 'right' : 'wrong') + '">' + (right ? 'Correct.' : 'Not this time. The answer is ' + esc(q.choices[q.answer]) + '.') + '</p>' +
+  var verdict = hasPick ? (right ? 'Correct.' : 'Not this time. The answer is ' + esc(q.choices[q.answer]) + '.') : 'Answer: ' + esc(q.choices[q.answer]) + '.';
+  return '<p class="qx-verdict ' + (hasPick ? (right ? 'right' : 'wrong') : 'review') + '">' + verdict + '</p>' +
     '<p>' + esc(q.ex || '') + '</p><ul class="qx-why">' + lines + '</ul>' +
-    (!right && q.cue ? '<p class="qx-cue"><b>Remember it:</b> ' + esc(q.cue) + '</p>' : '') +
+    (hasPick && !right && q.cue ? '<p class="qx-cue"><b>Remember it:</b> ' + esc(q.cue) + '</p>' : '') +
     refChipsHTML(q) +
-    (title ? '<div class="btn-row"><button type="button" class="btn" data-goto-sec="' + esc(q.sec) + '" data-goto-unit="' + esc(q.lec) + '">Read: ' + esc(title) + '</button></div>' : '');
+    (title ? '<div class="btn-row"><button type="button" class="btn" data-goto-sec="' + esc(q.sec) + '" data-goto-unit="' + esc(q.lec) + '">Read: ' + esc(title) + '</button></div>' : '') +
+    (typeof window.shOpenFlag === 'function' ? '<div class="btn-row"><button type="button" class="btn qx-report" data-report>Report</button></div>' : '');
 }
 
-/* wire every card inside `root`; onDone(q, correct) after an answer is recorded */
+function setChoiceStates(card, q, picked){
+  $$('.qchoice', card).forEach(function(b){
+    var i = +b.getAttribute('data-i');
+    if(i === q.answer) b.setAttribute('data-state', 'right');
+    else if(i === picked) b.setAttribute('data-state', 'wrong');
+    if(b.tagName === 'BUTTON') b.disabled = true;
+  });
+}
+
+function showClassStats(card, q){
+  if(typeof window.shGetClassStats !== 'function') return;
+  window.shGetClassStats([q.id], function(byQid){
+    if(!card.parentNode) return;
+    var stat = byQid && byQid[q.id]; if(!stat || stat.total < 8) return;
+    var qx = $('.qx', card); if(!qx || $('[data-class-stats]', qx)) return;
+    var row = document.createElement('p'); row.className = 'qx-class'; row.setAttribute('data-class-stats', '1');
+    row.textContent = 'Class: ' + pct(stat.correct, stat.total) + '% right (' + stat.total + ' answers)'; qx.appendChild(row);
+  });
+}
+
+function wireCard(card, q, opts, onDone){
+  opts = opts || {};
+  var picked = null, recorded = false, dead = false;
+  var old = STATE.answered[q.id];
+  if(opts.review){
+    picked = Object.prototype.hasOwnProperty.call(opts, 'reviewChoice')
+      ? (typeof opts.reviewChoice === 'number' ? opts.reviewChoice : null)
+      : (old && typeof old.choice === 'number' ? old.choice : null);
+    setChoiceStates(card, q, picked);
+    var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
+    showClassStats(card, q);
+  } else if(typeof opts.initialPick === 'number' && opts.initialPick >= 0 && opts.initialPick < q.choices.length){
+    picked = opts.initialPick;
+    var selected = $('.qchoice[data-i="' + picked + '"]', card); if(selected) selected.setAttribute('data-state', 'selected');
+  }
+  function feedback(){
+    var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
+    setChoiceStates(card, q, picked); showClassStats(card, q);
+  }
+  function submit(conf){
+    if(dead || opts.review || recorded || picked == null) return false;
+    recorded = true; card.setAttribute('data-recorded', '1');
+    var right = picked === q.answer;
+    recordAnswer(q, right, picked, opts.ctx || card.getAttribute('data-ctx') || 'bank', conf);
+    if(opts.deferFeedback){ var qx = $('.qx', card); qx.textContent = 'Recorded'; qx.hidden = false; }
+    else feedback();
+    if(onDone) onDone(q, right);
+    return true;
+  }
+  function click(e){
+    var go = e.target.closest('[data-goto-sec]');
+    if(go){ window.SH_GOTO({ unit:go.getAttribute('data-goto-unit'), sec:go.getAttribute('data-goto-sec') }); return; }
+    var report = e.target.closest('[data-report]');
+    if(report){ if(typeof window.shOpenFlag === 'function') window.shOpenFlag(q.id); return; }
+    var reveal = e.target.closest('[data-show-options]');
+    if(reveal){ var list = $('.qcard-choices', card); if(list) list.hidden = false; reveal.hidden = true; return; }
+    var b = e.target.closest('.qchoice'); if(!b || opts.review || recorded || !card.contains(b)) return;
+    picked = +b.getAttribute('data-i');
+    $$('.qchoice', card).forEach(function(x){ x.removeAttribute('data-state'); });
+    b.setAttribute('data-state', 'selected');
+    if(!opts.lockIn) submit();
+  }
+  card.addEventListener('click', click);
+  return {
+    picked:function(){ return picked; },
+    submit:submit,
+    destroy:function(){ dead = true; card.removeEventListener('click', click); }
+  };
+}
+
+function renderItem(el, qid, opts){
+  opts = opts || {};
+  var q = QUESTION_BY_ID[qid];
+  if(!q){ el.innerHTML = ''; return { picked:function(){ return null; }, submit:function(){ return false; }, destroy:function(){} }; }
+  var order = choiceOrder(q); el.innerHTML = cardHTML(q, opts, order);
+  return wireCard($('.qcard', el), q, opts, opts.onDone);
+}
+
+/* Compatibility for the daily drill, which supplies its own host around cardHTML. */
 function wireCards(root, onDone){
   $$('.qcard', root).forEach(function(card){
-    if(card.getAttribute('data-wired')) return; card.setAttribute('data-wired', '1');
+    if(card.getAttribute('data-wired')) return;
+    card.setAttribute('data-wired', '1');
     var q = QUESTION_BY_ID[card.getAttribute('data-qid')]; if(!q) return;
-    card.addEventListener('click', function(e){
-      var go = e.target.closest('[data-goto-sec]');
-      if(go){ window.SH_GOTO({ unit:go.getAttribute('data-goto-unit'), sec:go.getAttribute('data-goto-sec') }); return; }
-      var b = e.target.closest('.qchoice'); if(!b || card.getAttribute('data-done')) return;
-      card.setAttribute('data-done', '1');
-      var picked = +b.getAttribute('data-i'), right = picked === q.answer;
-      $$('.qchoice', card).forEach(function(x){
-        var i = +x.getAttribute('data-i'); x.disabled = true;
-        if(i === q.answer) x.setAttribute('data-state', 'right'); else if(i === picked) x.setAttribute('data-state', 'wrong');
-      });
-      var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
-      recordAnswer(q, right, picked, card.getAttribute('data-ctx') || 'bank');
-      if(onDone) onDone(q, right);
-    });
+    wireCard(card, q, { ctx:card.getAttribute('data-ctx') || 'bank' }, onDone);
+  });
+}
+
+/* ==== app/25-case.js ==== */
+/* ====================================================================
+   CASE SETS: one patient chart, visit-order questions with no verdicts, then a full review in Rounds.
+   Progress lives under STATE.ui so it does not change the shared top-level state contract.
+   ==================================================================== */
+function caseChartHTML(c){
+  return '<details class="case-chart" open><summary>Chart: ' + esc(c.box && c.box.patient || c.id) + '</summary><div class="case-chart-body"><h3>Patient chart</h3>' +
+    pboxHTML(c.box) + (c.stim || []).map(figureHTML).join('') + '</div></details>';
+}
+
+function caseProgress(c){
+  if(!STATE.ui.caseProgress[c.id]) STATE.ui.caseProgress[c.id] = { next:0 };
+  var p = STATE.ui.caseProgress[c.id];
+  if(p.pending) delete p.pending;
+  return p;
+}
+
+function renderCase(el, caseId, opts){
+  opts = opts || {};
+  var c = CASE_BY_ID[caseId];
+  if(!c){ el.innerHTML = (opts.prefix || '') + emptyHTML('Case set unavailable', ['Choose another case set.'], 'bank'); return; }
+  var p = caseProgress(c), itemIds = c.items || [], next = Math.max(0, Math.min(itemIds.length, +p.next || 0));
+  var rounds = !!opts.review || next >= itemIds.length;
+  var title = '<div class="case-title"><div><h3>' + esc(c.box && c.box.patient || c.id) + '</h3><p class="faint">' + plural(itemIds.length, 'question') + ' · ' + (rounds ? 'Rounds' : 'Question ' + (next + 1) + ' of ' + itemIds.length) + '</p></div>' +
+    '<button type="button" class="btn" data-case-back>' + (opts.backLabel || 'Back to cases') + '</button></div>';
+  var body = '';
+  if(rounds){
+    body = '<section class="case-rounds"><h3>Rounds</h3><p class="muted">Review the answers, reasons and cues from the whole visit.</p><div class="case-round-items">' + itemIds.map(function(qid, i){
+      return '<div class="case-round-item"><h4>Question ' + (i + 1) + '</h4><div data-case-review-item="' + esc(qid) + '"></div></div>';
+    }).join('') + '</div></section>';
+  } else {
+    var qid = itemIds[next];
+    body = '<section class="case-current"><div class="case-stage-head"><span class="chip accent">Question ' + (next + 1) + ' of ' + itemIds.length + '</span><span class="faint">Lock in your answer to continue.</span></div>' +
+      '<div data-case-current="' + esc(qid) + '"></div><div class="btn-row case-controls">' +
+      '<button type="button" class="btn primary" data-case-lock disabled>Lock answer</button>' +
+      '<button type="button" class="btn primary" data-case-next hidden>' + (next === itemIds.length - 1 ? 'See Rounds' : 'Next question') + '</button></div></section>';
+  }
+  el.innerHTML = (opts.prefix || '') + '<div class="case-view" data-case-id="' + esc(c.id) + '">' + title +
+    '<div class="case-layout">' + caseChartHTML(c) + '<div class="case-content">' + body + '</div></div></div>';
+  var chart = $('.case-chart', el);
+  if(chart && window.matchMedia && window.matchMedia('(max-width: 639px)').matches && (rounds || next > 0)) chart.open = false;
+  if(rounds){
+    itemIds.forEach(function(id){ var host = $('[data-case-review-item="' + id + '"]', el); if(host) renderItem(host, id, { ctx:opts.ctx || 'case', review:true, caseView:true }); });
+    return;
+  }
+  var current = $('[data-case-current]', el), card = renderItem(current, qid, { ctx:opts.ctx || 'case', lockIn:true, deferFeedback:true, caseView:true });
+  var lock = $('[data-case-lock]', el), advance = $('[data-case-next]', el);
+  current.addEventListener('click', function(){ lock.disabled = card.picked() == null; });
+  lock.addEventListener('click', function(){
+    if(!card.submit()) return;
+    p.next = next + 1; saveState();
+    lock.hidden = true; advance.hidden = false;
   });
 }
 
@@ -543,85 +815,603 @@ function wireNotes(){
 
 /* ==== app/40-bank.js ==== */
 /* ====================================================================
-   QUESTIONS (minimal): Practice (one standalone at a time, filtered by unit or notes section), Cases and
-   Missed. int-cards replaces this with the full bank (filters, case sets in exam layout with Rounds).
+   QUESTIONS: filtered one-at-a-time practice, case sets with Rounds, and missed-item review.
    ==================================================================== */
 var bankSearch = '';
+var bankClassStats = {};
+var bankClassStatsSeen = {};
+var bankRenderToken = 0;
+var caseScrollAfterNext = false;
 
-function bankPool(){
-  var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, q = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
+function bankPoolBase(){
+  var sec = STATE.ui.bankSec, unit = STATE.ui.bankUnit, exam = STATE.ui.bankExam || 'all';
+  var words = bankSearch.toLowerCase().split(/\s+/).filter(Boolean);
   return QUESTIONS.filter(function(x){
     if(x.case) return false;
     if(sec && x.sec !== sec) return false;
     if(!sec && unit && unit !== 'all' && x.lec !== unit) return false;
-    if(q.length){ var t = (x.stem + ' ' + x.choices.join(' ')).toLowerCase(); if(!q.every(function(w){ return t.indexOf(w) !== -1; })) return false; }
+    if(exam !== 'all' && (x.exam || []).indexOf(exam) === -1) return false;
+    if(STATE.ui.bankNewOnly && STATE.answered[x.id]) return false;
+    if(words.length){ var t = (x.stem + ' ' + x.choices.join(' ')).toLowerCase(); if(!words.every(function(w){ return t.indexOf(w) !== -1; })) return false; }
     return true;
   });
 }
 
+function bankPool(){
+  var list = bankPoolBase();
+  if(STATE.ui.bankHardOnly) list = list.filter(function(x){ var s = bankClassStats[x.id]; return s && s.total >= 8 && (s.correct / s.total) < 0.5; });
+  return list;
+}
+
+function ensureBankStats(ids, done){
+  var missing = ids.filter(function(id){ return !bankClassStatsSeen[id]; });
+  if(!missing.length) return true;
+  if(typeof window.shGetClassStats !== 'function'){
+    missing.forEach(function(id){ bankClassStatsSeen[id] = true; }); return true;
+  }
+  window.shGetClassStats(missing, function(byQid){
+    missing.forEach(function(id){ bankClassStatsSeen[id] = true; });
+    Object.keys(byQid || {}).forEach(function(id){ bankClassStats[id] = byQid[id]; });
+    done();
+  });
+  return false;
+}
+
+function bankSections(){
+  var out = [];
+  Object.keys(READINGS).forEach(function(unit){
+    var html = READINGS[unit] || '', re = /<section\b([^>]*)>([\s\S]*?)<\/section>/gi, m;
+    while((m = re.exec(html))){
+      var id = (m[1].match(/\bid="([^"]+)"/) || [])[1], title = (m[2].match(/<h2[^>]*>([\s\S]*?)<\/h2>/i) || [])[1];
+      if(id && title) out.push({ id:id, unit:unit, title:title.replace(/<[^>]*>/g, '') });
+    }
+  });
+  return out;
+}
+
+function caseState(c){
+  var p = STATE.ui.caseProgress[c.id], n = c.items.length, next = p ? (+p.next || 0) : 0;
+  if(next >= n) return 'Done';
+  if(next > 0) return 'In progress';
+  return 'New';
+}
+
+function renderCaseList(){
+  if(!CASES.length) return emptyHTML('No case sets yet', ['Case sets will appear here when the first unit opens.'], 'bank');
+  return '<div class="case-list">' + CASES.map(function(c){
+    var state = caseState(c), box = c.box || {}, actions;
+    if(state === 'Done'){
+      actions = '<div class="case-list-actions"><button type="button" class="btn" data-case-review="' + esc(c.id) + '">Review</button>' +
+        '<button type="button" class="btn primary" data-case-repeat="' + esc(c.id) + '">Do it again</button></div>';
+    } else actions = '<button type="button" class="btn primary" data-case-open="' + esc(c.id) + '">' + (state === 'In progress' ? 'Continue case' : 'Open case') + '</button>';
+    return '<article class="case-list-card"><div><span class="chip">' + esc(state) + '</span><h3>' + esc(box.patient || c.id) + '</h3>' +
+      '<p>' + esc(box.cc || '') + '</p><p class="faint">' + plural(c.items.length, 'question') + ' · ' + (c.units || []).map(esc).join(' / ') + '</p></div>' + actions + '</article>';
+  }).join('') + '</div>';
+}
+
+function missedStandalonePool(){
+  return QUESTIONS.filter(function(q){ return !q.case && STATE.answered[q.id] && !STATE.answered[q.id].lastCorrect; });
+}
+
+function renderMissed(){
+  var standalones = missedStandalonePool();
+  var missedCases = CASES.filter(function(c){ return c.items.some(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }); });
+  if(!standalones.length && !missedCases.length) return emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
+  var html = '';
+  if(standalones.length){
+    var at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), standalones.length - 1), q = standalones[at];
+    STATE.ui.bankAt = at;
+    html += '<h3 class="bank-section-title">Missed questions</h3><div class="bank-practice"><div class="bank-card-host" data-bank-qid="' + esc(q.id) + '"></div>' +
+      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + standalones.length + '</span><span class="btn-row" style="margin:0">' +
+      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+      '<button type="button" class="btn primary" data-bank-step="1"' + (at < standalones.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>';
+  }
+  if(missedCases.length){
+    html += '<h3 class="bank-section-title">Missed case items</h3><div class="missed-case-list">' + missedCases.map(function(c){
+      var count = c.items.filter(function(id){ var a = STATE.answered[id]; return a && !a.lastCorrect; }).length;
+      return '<article class="missed-case"><div><h4>' + esc(c.box && c.box.patient || c.id) + '</h4><p>' + count + ' missed ' + (count === 1 ? 'item' : 'items') + ' · ' + plural(c.items.length, 'question') + '</p></div>' +
+        '<button type="button" class="btn" data-case-missed="' + esc(c.id) + '">Review case</button></article>';
+    }).join('') + '</div>';
+  }
+  return html;
+}
+
 function renderBank(){
   var el = document.getElementById('panel-bank'), sub = STATE.ui.sub.bank || 'practice';
-  var head = '<div class="panel-head"><div><h2>Questions</h2><p>Board-style single-best-answer questions. Options are shuffled every time, so learn the reason, not the letter.</p></div></div>';
+  var head = '<div class="panel-head"><div><h2>Questions</h2><p>Practice one question at a time, review complete case visits, and revisit questions you missed.</p></div></div>';
+  var prefix = head + subtabsHTML('bank', sub);
   if(!QUESTIONS.length){
-    el.innerHTML = head + subtabsHTML('bank', sub) + emptyHTML('The first questions are being written and checked', [
+    el.innerHTML = prefix + emptyHTML('The first questions are being written and checked', [
       'Every question is written for this hub from a checked fact with a public primary source, then verified by a second model and, for the risky ones, by a person.',
       'Practice, case sets and your missed questions will live here.'
     ], 'bank');
     return;
   }
-  var html = head + subtabsHTML('bank', sub);
-  if(sub === 'cases'){
-    html += CASES.length ? '<div class="box"><h3>' + plural(CASES.length, 'case set') + '</h3><p class="muted">Case sets in the exam layout, with every answer shown after the last question, arrive with the full bank.</p></div>'
-      : emptyHTML('No case sets yet', ['Case sets (one patient, 2-6 questions) arrive with the first units.'], 'bank');
-  } else if(sub === 'missed'){
-    var missed = QUESTIONS.filter(function(x){ var a = STATE.answered[x.id]; return a && !a.lastCorrect && !x.case; });
-    html += missed.length ? '<div class="qlist">' + missed.map(function(x){ return cardHTML(x, { ctx:'bank' }); }).join('') + '</div>'
-      : emptyHTML('Nothing missed', ['Questions you get wrong come back here until you get them right.'], 'bank');
-  } else {
-    var pool = bankPool(), at = Math.min(STATE.ui.bankAt || 0, Math.max(0, pool.length - 1));
-    var units = taughtUnits().filter(function(l){ return unitItems(l.id).length; });
-    html += '<div class="filters"><label class="field">Unit<select data-bank-unit><option value="all">All units</option>' + units.map(function(l){
-      return '<option value="' + esc(l.id) + '"' + (STATE.ui.bankUnit === l.id && !STATE.ui.bankSec ? ' selected' : '') + '>' + esc(l.title) + '</option>';
-    }).join('') + '</select></label>' + (STATE.ui.bankSec ? '<button type="button" class="btn" data-bank-clear>Section: ' + esc(sectionTitle(STATE.ui.bankSec.split('-')[0], STATE.ui.bankSec) || STATE.ui.bankSec) + ' &times;</button>' : '') +
-      (bankSearch ? '<button type="button" class="btn" data-bank-unsearch>Search: ' + esc(bankSearch) + ' &times;</button>' : '') + '</div>';
-    html += pool.length ? cardHTML(pool[at], { ctx:'bank' }) +
-      '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + pool.length + '</span><span class="btn-row" style="margin:0">' +
-      '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
-      '<button type="button" class="btn primary" data-bank-step="1"' + (at < pool.length - 1 ? '' : ' disabled') + '>Next</button></span></div>'
-      : emptyHTML('No questions match', ['Try another unit or clear the filter.'], 'bank');
+  if(sub === 'cases' && STATE.ui.caseId && CASE_BY_ID[STATE.ui.caseId]){
+    renderCase(el, STATE.ui.caseId, { ctx:'case', review:!!STATE.ui.caseReview, prefix:prefix, backLabel:'Back to cases' });
+    if(caseScrollAfterNext){
+      caseScrollAfterNext = false;
+      var question = $('.case-current', el) || $('.case-rounds', el), chart = $('.case-chart', el);
+      var phone = window.matchMedia && window.matchMedia('(max-width: 639px)').matches;
+      var target = phone && chart && !chart.open ? chart : question;
+      if(target && target.scrollIntoView) target.scrollIntoView({ block:'start', behavior:'smooth' });
+    }
+    return;
   }
+  if(sub === 'missed' && STATE.ui.caseId && STATE.ui.caseReview){
+    renderCase(el, STATE.ui.caseId, { ctx:'case', review:true, prefix:prefix, backLabel:'Back to missed' });
+    return;
+  }
+  if(sub === 'cases'){
+    el.innerHTML = prefix + renderCaseList();
+    return;
+  }
+  if(sub === 'missed'){
+    el.innerHTML = prefix + renderMissed();
+    var missedHost = $('.bank-card-host', el);
+    if(missedHost) renderItem(missedHost, missedHost.getAttribute('data-bank-qid'), { ctx:'bank' });
+    return;
+  }
+
+  var base = bankPoolBase(), token = ++bankRenderToken;
+  if(STATE.ui.bankHardOnly && !ensureBankStats(base.map(function(q){ return q.id; }), function(){ if(token === bankRenderToken) renderBank(); })){
+    el.innerHTML = prefix + bankFiltersHTML() + emptyHTML('Checking class accuracy', ['Hard only shows questions answered correctly by fewer than half of at least 8 classmates.'], 'bank');
+    return;
+  }
+  var pool = bankPool(), at = Math.min(Math.max(0, +STATE.ui.bankAt || 0), Math.max(0, pool.length - 1));
+  STATE.ui.bankAt = at;
+  var html = prefix + bankFiltersHTML();
+  html += pool.length ? '<div class="bank-practice">' +
+    '<div class="bank-card-host" data-bank-qid="' + esc(pool[at].id) + '"></div>' +
+    '<div class="qnav"><span class="faint">' + (at + 1) + ' of ' + pool.length + '</span><span class="btn-row" style="margin:0">' +
+    '<button type="button" class="btn" data-bank-step="-1"' + (at ? '' : ' disabled') + '>Previous</button>' +
+    '<button type="button" class="btn primary" data-bank-step="1"' + (at < pool.length - 1 ? '' : ' disabled') + '>Next</button></span></div></div>'
+    : emptyHTML('No questions match', ['Try another unit or clear a filter.'], 'bank');
   el.innerHTML = html;
-  wireCards(el);
+  if(pool.length) renderItem($('.bank-card-host', el), pool[at].id, { ctx:'bank' });
+}
+
+function bankFiltersHTML(){
+  var units = taughtUnits().filter(function(l){ return unitItems(l.id).length; }), sections = bankSections();
+  var sectionUnits = STATE.ui.bankUnit && STATE.ui.bankUnit !== 'all' ? STATE.ui.bankUnit : null;
+  if(sectionUnits) sections = sections.filter(function(s){ return s.unit === sectionUnits; });
+  var selectedSection = STATE.ui.bankSec || '';
+  return '<div class="filters bank-filters">' +
+    '<label class="field">Unit<select data-bank-unit><option value="all"' + ((!STATE.ui.bankUnit || STATE.ui.bankUnit === 'all') ? ' selected' : '') + '>All units</option>' + units.map(function(l){
+      return '<option value="' + esc(l.id) + '"' + (STATE.ui.bankUnit === l.id && !STATE.ui.bankSec ? ' selected' : '') + '>' + esc(l.title) + '</option>';
+    }).join('') + '</select></label>' +
+    '<label class="field">Notes section<select data-bank-section><option value="">All sections</option>' + sections.map(function(s){
+      return '<option value="' + esc(s.id) + '"' + (selectedSection === s.id ? ' selected' : '') + '>' + esc(s.unit + ' · ' + s.title) + '</option>';
+    }).join('') + '</select></label>' +
+    '<label class="field">Exam<select data-bank-exam><option value="all"' + ((STATE.ui.bankExam || 'all') === 'all' ? ' selected' : '') + '>INBDE + ADEX</option><option value="inbde"' + (STATE.ui.bankExam === 'inbde' ? ' selected' : '') + '>INBDE</option><option value="adex"' + (STATE.ui.bankExam === 'adex' ? ' selected' : '') + '>ADEX</option></select></label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-new' + (STATE.ui.bankNewOnly ? ' checked' : '') + '> New only</label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-hard' + (STATE.ui.bankHardOnly ? ' checked' : '') + '> Hard only</label>' +
+    '<label class="bank-check"><input type="checkbox" data-bank-cover' + (STATE.ui.coverOptions ? ' checked' : '') + '> Cover options</label>' +
+    (bankSearch ? '<button type="button" class="btn" data-bank-unsearch>Search: ' + esc(bankSearch) + ' &times;</button>' : '') +
+    '</div>';
 }
 
 function wireBank(){
   var el = document.getElementById('panel-bank');
+  /* Clear an open case before the boot handler renders a different bank sub-view. */
   el.addEventListener('click', function(e){
-    var s = e.target.closest('[data-bank-step]');
-    if(s){ STATE.ui.bankAt = Math.max(0, (STATE.ui.bankAt || 0) + +s.getAttribute('data-bank-step')); saveState(); renderBank(); return; }
-    if(e.target.closest('[data-bank-clear]')){ STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
-    if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; renderBank(); }
+    if(e.target.closest('.subtabs [data-sub]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; }
+  }, true);
+  el.addEventListener('click', function(e){
+    var step = e.target.closest('[data-bank-step]');
+    if(step){
+      var delta = +step.getAttribute('data-bank-step'), at = +STATE.ui.bankAt || 0;
+      var host = $('[data-bank-qid]', el), qid = host && host.getAttribute('data-bank-qid');
+      var available = (STATE.ui.sub.bank || 'practice') === 'missed' ? missedStandalonePool() : bankPool();
+      var currentStillAvailable = qid && available.some(function(q){ return q.id === qid; });
+      var keepIndex = delta > 0 && qid && !currentStillAvailable;
+      STATE.ui.bankAt = Math.max(0, at + (keepIndex ? 0 : delta)); saveState(); renderBank(); return;
+    }
+    if(e.target.closest('[data-bank-unsearch]')){ bankSearch = ''; STATE.ui.bankAt = 0; saveState(); renderBank(); return; }
+    var open = e.target.closest('[data-case-open]');
+    if(open){ STATE.ui.caseId = open.getAttribute('data-case-open'); STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    var reviewCase = e.target.closest('[data-case-review]');
+    if(reviewCase){ STATE.ui.caseId = reviewCase.getAttribute('data-case-review'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    var repeatCase = e.target.closest('[data-case-repeat]');
+    if(repeatCase){
+      STATE.ui.caseId = repeatCase.getAttribute('data-case-repeat'); STATE.ui.caseReview = false;
+      STATE.ui.caseProgress[STATE.ui.caseId] = { next:0 }; saveState(); renderBank(); return;
+    }
+    var missedCase = e.target.closest('[data-case-missed]');
+    if(missedCase){ STATE.ui.caseId = missedCase.getAttribute('data-case-missed'); STATE.ui.caseReview = true; saveState(); renderBank(); return; }
+    if(e.target.closest('[data-case-back]')){ STATE.ui.caseId = null; STATE.ui.caseReview = false; saveState(); renderBank(); return; }
+    if(e.target.closest('[data-case-next]')){
+      caseScrollAfterNext = true;
+      saveState(); renderBank(); return;
+    }
   });
   el.addEventListener('change', function(e){
-    var s = e.target.closest('[data-bank-unit]');
-    if(s){ STATE.ui.bankUnit = s.value; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; saveState(); renderBank(); }
+    var t = e.target;
+    if(t.closest('[data-bank-unit]')){ STATE.ui.bankUnit = t.value; STATE.ui.bankSec = null; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-section]')){ STATE.ui.bankSec = t.value || null; STATE.ui.bankUnit = 'all'; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-exam]')){ STATE.ui.bankExam = t.value; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-new]')){ STATE.ui.bankNewOnly = t.checked; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-hard]')){ STATE.ui.bankHardOnly = t.checked; STATE.ui.bankAt = 0; }
+    else if(t.closest('[data-bank-cover]')){ STATE.ui.coverOptions = t.checked; }
+    else return;
+    saveState(); renderBank();
+  });
+  /* The generated export script defines SH_GOTO after this file. Wrap it once DOM parsing is complete so
+     searches and notes can land on a standalone or open a case in its case-set view. */
+  document.addEventListener('DOMContentLoaded', function(){
+    var original = window.SH_GOTO; if(typeof original !== 'function' || original._bankWrapped) return;
+    var wrapped = function(go){
+      if(go && go.qid && QUESTION_BY_ID[go.qid]){
+        var q = QUESTION_BY_ID[go.qid]; bankSearch = '';
+        STATE.ui.bankExam = 'all'; STATE.ui.bankNewOnly = false; STATE.ui.bankHardOnly = false; STATE.ui.bankAt = 0;
+        if(q.case){ STATE.ui.caseId = q.case; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'cases'; saveState(); setMode('bank'); return; }
+        STATE.ui.caseId = null; STATE.ui.caseReview = false; STATE.ui.sub.bank = 'practice'; STATE.ui.bankUnit = q.lec; STATE.ui.bankSec = null;
+        var pool = bankPool(); STATE.ui.bankAt = Math.max(0, pool.indexOf(q)); saveState(); setMode('bank'); return;
+      }
+      return original(go);
+    };
+    wrapped._bankWrapped = true; window.SH_GOTO = wrapped;
   });
 }
 
 /* ==== app/50-mock.js ==== */
 /* ====================================================================
-   EXAM BLOCKS (placeholder): timed INBDE-style blocks arrive in int-mock (50-mock.js, css/mock.css).
-   The mode id starts with "mock" on purpose: the widget stands eggs, Timmy and the nuke down there.
+   EXAM BLOCKS: timed standalone and case blocks. Cards stay silent until a block is submitted.
+   Keep this mode id starting with "mock" so the widget suppresses eggs, Timmy and the nuke.
    ==================================================================== */
+var MOCK_LENGTHS = [5, 10, 20, 40, 60];
+var mockTimer = null, mockCards = {}, mockWired = false;
+
+function mockUnits(){ return LECTURES.filter(function(l){ return l.status === 'taught'; }); }
+
+function mockSetup(){
+  var s = STATE.ui.mockSetup, units = mockUnits(), valid = {};
+  units.forEach(function(l){ valid[l.id] = true; });
+  if(!s || typeof s !== 'object' || Array.isArray(s)) s = STATE.ui.mockSetup = { kind:'standalone', length:5, units:null };
+  if(s.kind !== 'case' && s.kind !== 'standalone') s.kind = 'standalone';
+  if(!Number.isInteger(+s.length) || +s.length < 1) s.length = 5;
+  s.length = +s.length;
+  if(!Array.isArray(s.units)) s.units = units.map(function(l){ return l.id; });
+  else s.units = s.units.filter(function(id, i, all){ return valid[id] && all.indexOf(id) === i; });
+  return s;
+}
+
+function mockUnitMap(unitIds){
+  var out = {};
+  (unitIds || []).forEach(function(id){ out[id] = true; });
+  return out;
+}
+
+function mockCasesForUnits(unitMap){
+  return CASES.filter(function(c){
+    return (c.items || []).length && c.items.every(function(id){ var q = QUESTION_BY_ID[id]; return q && unitMap[q.lec]; });
+  });
+}
+
+function mockEligibleCount(kind, unitIds){
+  var unitMap = mockUnitMap(unitIds);
+  if(kind === 'case') return mockCasesForUnits(unitMap).reduce(function(n, c){ return n + c.items.length; }, 0);
+  return QUESTIONS.filter(function(q){ return !q.case && unitMap[q.lec]; }).length;
+}
+
+function mockLengthChoices(count){ return MOCK_LENGTHS.filter(function(n){ return n <= count; }); }
+
+function mockEmptyHTML(){
+  return emptyHTML('Exam blocks open once the first units are in', [
+    'Standalone blocks give about ' + CONFIG.mock.standaloneSec + ' seconds a question and case blocks about ' + CONFIG.mock.caseSec + ' seconds, the pace of the real exam.',
+    'They need enough checked questions to be worth timing, so they unlock with the first released units.'
+  ], 'clock');
+}
+
+function mockTime(seconds){
+  seconds = Math.max(0, Math.floor(+seconds || 0));
+  return Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+}
+
+function mockBlockDate(block){
+  var at = new Date(block.submittedAt || block.startedAt || Date.now());
+  return at.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function mockBlockLabel(block){
+  return (block.kind === 'case' ? 'Case block' : 'Standalone block') + ' · ' + plural((block.questions || []).length, 'question');
+}
+
+function mockUnitNames(unitIds){
+  return (unitIds || []).map(function(id){ var l = LECTURE_BY_ID[id]; return l && (l.short || l.title); }).filter(Boolean).join(', ');
+}
+
+function mockSetupHTML(){
+  var units = mockUnits(), s = mockSetup();
+  if(!units.length) return mockEmptyHTML();
+  var count = mockEligibleCount(s.kind, s.units), lengths = mockLengthChoices(count);
+  if(lengths.indexOf(s.length) === -1 && lengths.length){
+    var smaller = lengths.filter(function(n){ return n <= s.length; });
+    s.length = smaller.length ? smaller[smaller.length - 1] : lengths[0];
+  }
+  var kindText = s.kind === 'case' ? 'questions in complete cases' : 'standalone questions';
+  var lengthOptions = lengths.map(function(n){
+    var estimate = n * CONFIG.mock[s.kind + 'Sec'];
+    return '<option value="' + n + '"' + (s.length === n ? ' selected' : '') + '>' + n + ' questions · about ' + mockTime(estimate) + '</option>';
+  }).join('');
+  var unitsHTML = units.map(function(l){
+    return '<label class="mock-unit-check"><input type="checkbox" data-mock-unit value="' + esc(l.id) + '"' + (s.units.indexOf(l.id) !== -1 ? ' checked' : '') + '><span>' + esc(l.title) + '</span></label>';
+  }).join('');
+  var html = '<div class="mock-setup-layout">' +
+    '<section class="box mock-setup-card"><h3>Choose a block</h3><p class="muted">Set the block type and length. Your answers are recorded when you submit.</p>' +
+    '<div class="mock-kind-switch" role="group" aria-label="Block type">' +
+      '<button type="button" class="btn' + (s.kind === 'standalone' ? ' is-selected' : '') + '" data-mock-kind="standalone" aria-pressed="' + (s.kind === 'standalone') + '">Standalone</button>' +
+      '<button type="button" class="btn' + (s.kind === 'case' ? ' is-selected' : '') + '" data-mock-kind="case" aria-pressed="' + (s.kind === 'case') + '">Cases</button>' +
+    '</div>' +
+    '<label class="field mock-length-field">Block length<select data-mock-length' + (!lengths.length ? ' disabled' : '') + '>' +
+      (lengthOptions || '<option value="">No available lengths</option>') + '</select></label>' +
+    '<p class="mock-availability-count">' + count + ' ' + kindText + ' available' + (s.kind === 'case' ? ' · complete cases stay together' : '') + '</p>' +
+    '<button type="button" class="btn primary" data-mock-start' + (!lengths.length ? ' disabled' : '') + '>Start ' + (s.kind === 'case' ? 'case' : 'standalone') + ' block</button></section>' +
+    '<section class="box mock-unit-card"><h3>Units</h3><p class="muted">Choose from published units.</p><div class="mock-unit-list">' + unitsHTML + '</div></section>' +
+    '</div>';
+  if(!lengths.length) html += '<div class="mock-unavailable">' + mockEmptyHTML() + '</div>';
+  return html;
+}
+
+function mockCasePlan(unitIds, wanted){
+  var cases = shuffled(mockCasesForUnits(mockUnitMap(unitIds))), chosen = [], qids = [], at = 0;
+  while(qids.length < wanted && at < cases.length){
+    var c = cases[at++]; chosen.push(c); qids = qids.concat(c.items);
+  }
+  return { cases:chosen, questions:qids };
+}
+
+function startMockBlock(){
+  var s = mockSetup(), count = mockEligibleCount(s.kind, s.units), lengths = mockLengthChoices(count);
+  if(!lengths.length || lengths.indexOf(s.length) === -1) return;
+  var qids, cases = [];
+  if(s.kind === 'case'){
+    var plan = mockCasePlan(s.units, s.length); qids = plan.questions; cases = plan.cases.map(function(c){ return c.id; });
+  } else {
+    qids = shuffled(QUESTIONS.filter(function(q){ return !q.case && s.units.indexOf(q.lec) !== -1; })).slice(0, s.length).map(function(q){ return q.id; });
+  }
+  if(!qids || qids.length < s.length) return;
+  var startedAt = Date.now(), secondsPerItem = CONFIG.mock[s.kind + 'Sec'];
+  STATE.ui.mockActive = {
+    id:'mock-' + startedAt + '-' + Math.random().toString(36).slice(2, 8),
+    kind:s.kind, length:s.length, units:s.units.slice(), cases:cases, questions:qids,
+    answers:{}, flags:{}, index:0, startedAt:startedAt, secondsPerItem:secondsPerItem,
+    timeLimit:qids.length * secondsPerItem
+  };
+  STATE.ui.mockReviewId = null; STATE.ui.sub.mock = 'setup'; saveState(); renderMock();
+}
+
+function mockActiveHTML(active){
+  var count = active.questions.length, at = Math.max(0, Math.min(count - 1, +active.index || 0));
+  active.index = at;
+  var nav = active.questions.map(function(qid, i){
+    var q = QUESTION_BY_ID[qid], answered = typeof active.answers[qid] === 'number', flagged = !!active.flags[qid];
+    return '<button type="button" class="mock-question-link' + (answered ? ' is-answered' : '') + (flagged ? ' is-flagged' : '') + '" data-mock-jump="' + i + '" aria-label="Question ' + (i + 1) + (answered ? ', answered' : ', not answered') + (flagged ? ', flagged for review' : '') + '"' + (i === at ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>';
+  }).join('');
+  var screens = active.questions.map(function(qid, i){
+    var q = QUESTION_BY_ID[qid], c = active.kind === 'case' ? mockCaseForQuestion(qid, active) : null;
+    return '<section class="mock-question-screen" data-mock-screen="' + i + '"' + (i === at ? '' : ' hidden') + '>' +
+      '<div class="mock-question-meta"><span>Question ' + (i + 1) + ' of ' + count + '</span>' + (c ? '<span class="chip">' + esc(c.box && c.box.patient || c.id) + '</span>' : '') + '</div>' +
+      (c ? '<div class="case-layout">' + caseChartHTML(c) + '<div class="case-content">' : '') +
+      '<div data-mock-card-host="' + esc(qid) + '"></div>' +
+      '<div class="mock-question-actions"><button type="button" class="btn mock-flag-button' + (active.flags[qid] ? ' is-flagged' : '') + '" data-mock-flag="' + esc(qid) + '" aria-pressed="' + (!!active.flags[qid]) + '">' + (active.flags[qid] ? 'Flagged for review' : 'Flag for review') + '</button></div>' +
+      (c ? '</div></div>' : '') + '</section>';
+  }).join('');
+  return '<section class="mock-active" aria-label="Timed exam block">' +
+    '<div class="mock-toolbar"><div><span class="chip accent">' + (active.kind === 'case' ? 'Case block' : 'Standalone block') + '</span><span class="mock-block-units">' + esc(mockUnitNames(active.units)) + '</span></div>' +
+      '<div class="mock-countdown"><span>Time left</span><strong data-mock-countdown aria-live="off">' + mockTime(active.timeLimit) + '</strong></div></div>' +
+    '<p class="mock-instructions">Choose one answer for each question. Answers and feedback stay hidden until you submit the block.</p>' +
+    '<nav class="mock-navigator" aria-label="Question navigator">' + nav + '</nav>' +
+    '<div class="mock-question-stack">' + screens + '</div>' +
+    '<div class="mock-submit-row"><span class="muted">' + count + ' questions · ' + mockTime(active.timeLimit) + ' total</span><button type="button" class="btn primary" data-mock-submit>Submit block</button></div>' +
+    '</section>';
+}
+
+function mockCaseForQuestion(qid, block){
+  var q = QUESTION_BY_ID[qid], c = q && q.case && CASE_BY_ID[q.case];
+  if(c) return c;
+  for(var i = 0; i < (block.cases || []).length; i++){
+    var byId = CASE_BY_ID[block.cases[i]];
+    if(byId && (byId.items || []).indexOf(qid) !== -1) return byId;
+  }
+  return null;
+}
+
+function mockRenderActive(el, active){
+  mockCards = {};
+  active.questions.forEach(function(qid){
+    var host = $('[data-mock-card-host="' + qid + '"]', el), q = QUESTION_BY_ID[qid];
+    if(!host || !q) return;
+    mockCards[qid] = renderItem(host, qid, {
+      ctx:'mock', lockIn:true, deferFeedback:true, caseView:active.kind === 'case',
+      initialPick:typeof active.answers[qid] === 'number' ? active.answers[qid] : null
+    });
+  });
+  var current = $('[data-mock-screen="' + active.index + '"] .case-chart', el);
+  if(current && window.matchMedia && window.matchMedia('(max-width: 639px)').matches) current.open = false;
+  mockSyncNavigator(); mockUpdateCountdown();
+}
+
+function mockSyncNavigator(){
+  var active = STATE.ui.mockActive; if(!active) return;
+  $$('#panel-mock [data-mock-jump]').forEach(function(b){
+    var i = +b.getAttribute('data-mock-jump'), qid = active.questions[i], answered = typeof active.answers[qid] === 'number', flagged = !!active.flags[qid];
+    b.classList.toggle('is-answered', answered); b.classList.toggle('is-flagged', flagged);
+    b.setAttribute('aria-label', 'Question ' + (i + 1) + (answered ? ', answered' : ', not answered') + (flagged ? ', flagged for review' : ''));
+    if(i === active.index) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+  });
+}
+
+function mockUpdateCountdown(){
+  var active = STATE.ui.mockActive; if(!active) return;
+  var remaining = Math.max(0, active.startedAt + active.timeLimit * 1000 - Date.now());
+  var node = $('#panel-mock [data-mock-countdown]'); if(node) node.textContent = mockTime(Math.ceil(remaining / 1000));
+  if(remaining <= 0) submitMockBlock(true);
+}
+
+function mockStopTimer(){ if(mockTimer){ clearInterval(mockTimer); mockTimer = null; } }
+function mockStartTimer(){ mockStopTimer(); if(STATE.ui.mockActive) mockTimer = setInterval(mockUpdateCountdown, 250); }
+
+function submitMockBlock(expired){
+  var active = STATE.ui.mockActive; if(!active || active.submitting) return;
+  active.submitting = true; mockStopTimer();
+  var submittedAt = Date.now(), correct = 0, answers = {};
+  active.questions.forEach(function(qid){
+    var q = QUESTION_BY_ID[qid], picked = typeof active.answers[qid] === 'number' ? active.answers[qid] : null;
+    answers[qid] = picked;
+    if(!q) return;
+    if(picked === q.answer) correct++;
+  });
+  var timeUsed = Math.min(active.timeLimit, Math.max(0, Math.floor((submittedAt - active.startedAt) / 1000)));
+  var block = {
+    id:active.id, kind:active.kind, length:active.length, units:active.units.slice(), cases:active.cases.slice(),
+    questions:active.questions.slice(), answers:answers, flags:Object.assign({}, active.flags),
+    correct:correct, total:active.questions.length, startedAt:active.startedAt, submittedAt:submittedAt,
+    timeLimit:active.timeLimit, timeUsed:timeUsed, expired:!!expired
+  };
+  /* Clear the active block before the cards record, so a second submit cannot record the same picks again. */
+  STATE.ui.mockActive = null; saveState();
+  active.questions.forEach(function(qid){
+    if(answers[qid] === null) return;
+    var card = mockCards[qid], q = QUESTION_BY_ID[qid];
+    if(card) card.submit();
+    else if(q) recordAnswer(q, answers[qid] === q.answer, answers[qid], 'mock');
+  });
+  STATE.mockBlocks.unshift(block); if(STATE.mockBlocks.length > 25) STATE.mockBlocks.length = 25;
+  STATE.ui.mockReviewId = block.id; STATE.ui.mockFilter = 'all'; STATE.ui.sub.mock = 'review'; saveState();
+  document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:correct, total:block.total } }));
+  renderMock();
+}
+
+function mockReviewFilterItems(block){
+  var filter = STATE.ui.mockFilter || 'all';
+  return (block.questions || []).filter(function(qid){
+    var q = QUESTION_BY_ID[qid], answer = block.answers && block.answers[qid], missed = !q || answer !== q.answer, flagged = !!(block.flags && block.flags[qid]);
+    if(filter === 'missed') return missed;
+    if(filter === 'flagged') return flagged;
+    if(filter === 'missed-flagged') return missed || flagged;
+    return true;
+  });
+}
+
+function mockReviewItemHTML(block, qid, i){
+  var q = QUESTION_BY_ID[qid]; if(!q) return '';
+  var answer = block.answers && Object.prototype.hasOwnProperty.call(block.answers, qid) ? block.answers[qid] : null;
+  var missed = answer !== q.answer, flagged = !!(block.flags && block.flags[qid]);
+  return '<article class="mock-review-item' + (missed ? ' is-missed' : ' is-correct') + (flagged ? ' is-flagged' : '') + '">' +
+    '<div class="mock-review-item-head"><h4>Question ' + i + '</h4><span class="chip' + (missed ? '' : ' accent') + '">' + (missed ? (answer === null ? 'Unanswered' : 'Missed') : 'Correct') + '</span>' +
+    (flagged ? '<span class="chip mock-flag-chip">Flagged for review</span>' : '') + '</div>' +
+    '<div data-mock-review-host="' + esc(qid) + '"></div></article>';
+}
+
+function mockReviewGroups(block, ids){
+  if(block.kind !== 'case') return [{ case:null, ids:ids }];
+  var groups = [], byId = {};
+  ids.forEach(function(qid){
+    var c = mockCaseForQuestion(qid, block), key = c ? c.id : '_other';
+    if(!byId[key]){ byId[key] = { case:c, ids:[] }; groups.push(byId[key]); }
+    byId[key].ids.push(qid);
+  });
+  return groups;
+}
+
+function mockReviewDetailHTML(block){
+  var ids = mockReviewFilterItems(block), total = block.total || (block.questions || []).length;
+  var filter = STATE.ui.mockFilter || 'all', groups = mockReviewGroups(block, ids), index = {};
+  (block.questions || []).forEach(function(qid, i){ index[qid] = i + 1; });
+  var items = groups.map(function(group){
+    var cards = group.ids.map(function(qid){ return mockReviewItemHTML(block, qid, index[qid] || 1); }).join('');
+    return group.case ? '<section class="mock-review-case"><div class="case-layout">' + caseChartHTML(group.case) + '<div class="case-content">' + cards + '</div></div></section>' : '<div class="mock-review-list">' + cards + '</div>';
+  }).join('');
+  if(!ids.length) items = emptyHTML('No questions match this filter', ['Choose another review filter to see more of this block.'], 'clock');
+  var unitNames = mockUnitNames(block.units);
+  return '<section class="mock-review-detail"><div class="mock-review-summary">' +
+    '<div><span class="chip accent">' + (block.kind === 'case' ? 'Case block' : 'Standalone block') + '</span><h3>' + (block.correct || 0) + ' of ' + total + ' correct</h3><p class="muted">' + pct(block.correct || 0, total) + '% · ' + (block.expired ? 'Time expired' : 'Submitted') + ' · ' + mockBlockDate(block) + '</p>' +
+    (unitNames ? '<p class="faint">' + esc(unitNames) + '</p>' : '') + '</div>' +
+    '<dl class="mock-review-metrics"><div><dt>Time used</dt><dd>' + mockTime(block.timeUsed || 0) + '</dd></div><div><dt>Block time</dt><dd>' + mockTime(block.timeLimit || 0) + '</dd></div></dl></div>' +
+    '<div class="filters mock-review-filters"><label class="field">Show<select data-mock-filter><option value="all"' + (filter === 'all' ? ' selected' : '') + '>All questions</option><option value="missed"' + (filter === 'missed' ? ' selected' : '') + '>Missed</option><option value="flagged"' + (filter === 'flagged' ? ' selected' : '') + '>Flagged</option><option value="missed-flagged"' + (filter === 'missed-flagged' ? ' selected' : '') + '>Missed or flagged</option></select></label></div>' +
+    '<div class="mock-review-items">' + items + '</div></section>';
+}
+
+function mockReviewHTML(){
+  var blocks = STATE.mockBlocks || [], selected = null;
+  for(var i = 0; i < blocks.length; i++) if(blocks[i].id === STATE.ui.mockReviewId){ selected = blocks[i]; break; }
+  if(!selected && blocks.length){ selected = blocks[0]; STATE.ui.mockReviewId = selected.id; }
+  var active = STATE.ui.mockActive ? '<div class="mock-active-notice"><span>Block in progress · <b data-mock-countdown>' + mockTime(Math.max(0, Math.ceil((STATE.ui.mockActive.startedAt + STATE.ui.mockActive.timeLimit * 1000 - Date.now()) / 1000))) + '</b> left</span><button type="button" class="btn" data-mock-return>Return to block</button></div>' : '';
+  if(!blocks.length) return active + emptyHTML('No blocks taken yet', ['Your finished blocks and their reviews will be listed here.'], 'clock');
+  var nav = blocks.map(function(b){
+    var current = selected && selected.id === b.id;
+    return '<button type="button" class="mock-history-item' + (current ? ' is-active' : '') + '" data-mock-review="' + esc(b.id) + '"' + (current ? ' aria-current="true"' : '') + '><span>' + esc(mockBlockDate(b)) + '</span><b>' + esc(mockBlockLabel(b)) + '</b><span>' + (b.correct || 0) + ' / ' + (b.total || b.questions.length) + ' correct</span></button>';
+  }).join('');
+  return active + '<div class="mock-review-layout"><aside class="mock-history"><h3>Past blocks</h3><div class="mock-history-list">' + nav + '</div></aside>' + mockReviewDetailHTML(selected) + '</div>';
+}
+
+function mockRenderReviewCards(el, block){
+  if(!block) return;
+  $$('[data-mock-review-host]', el).forEach(function(host){
+    var qid = host.getAttribute('data-mock-review-host'), q = QUESTION_BY_ID[qid];
+    if(!q) return;
+    var answer = block.answers && Object.prototype.hasOwnProperty.call(block.answers, qid) ? block.answers[qid] : null;
+    renderItem(host, qid, { ctx:'mock', review:true, caseView:block.kind === 'case', reviewChoice:answer });
+  });
+}
+
 function renderMock(){
   var el = document.getElementById('panel-mock'), sub = STATE.ui.sub.mock || 'setup';
-  var head = '<div class="panel-head"><div><h2>Exam blocks</h2><p>Timed blocks in the INBDE layout: no feedback until the block ends, then a full review.</p></div></div>';
-  el.innerHTML = head + subtabsHTML('mock', sub) + (sub === 'review'
-    ? emptyHTML('No blocks taken yet', ['Your finished blocks and their reviews will be listed here.'], 'clock')
-    : emptyHTML('Exam blocks open once the first units are in', [
-        'Standalone blocks give about ' + CONFIG.mock.standaloneSec + ' seconds a question and case blocks about ' + CONFIG.mock.caseSec + ' seconds, the pace of the real exam.',
-        'They need enough checked questions to be worth timing, so they unlock with the first released units.'
-      ], 'clock'));
+  mockStopTimer();
+  if(!mockWired) wireMock(el);
+  var head = '<div class="panel-head"><div><h2>Exam blocks</h2><p>Timed INBDE-style blocks with a full review after you submit.</p></div></div>';
+  var prefix = head + subtabsHTML('mock', sub);
+  if(sub === 'review'){
+    el.innerHTML = prefix + mockReviewHTML();
+    var selected = (STATE.mockBlocks || []).filter(function(b){ return b.id === STATE.ui.mockReviewId; })[0] || (STATE.mockBlocks || [])[0];
+    mockRenderReviewCards(el, selected);
+    if(STATE.ui.mockActive) mockStartTimer();
+    return;
+  }
+  if(STATE.ui.mockActive){
+    el.innerHTML = prefix + mockActiveHTML(STATE.ui.mockActive);
+    mockRenderActive(el, STATE.ui.mockActive); mockStartTimer();
+    return;
+  }
+  el.innerHTML = prefix + mockSetupHTML();
+}
+
+function wireMock(el){
+  if(!el) return; mockWired = true;
+  el.addEventListener('click', function(e){
+    var active = STATE.ui.mockActive;
+    var kind = e.target.closest('[data-mock-kind]');
+    if(kind){ var s = mockSetup(); s.kind = kind.getAttribute('data-mock-kind'); saveState(); renderMock(); return; }
+    var start = e.target.closest('[data-mock-start]'); if(start){ startMockBlock(); return; }
+    var jump = e.target.closest('[data-mock-jump]');
+    if(jump && active){ active.index = +jump.getAttribute('data-mock-jump'); saveState(); renderMock(); return; }
+    var flag = e.target.closest('[data-mock-flag]');
+    if(flag && active){
+      var qid = flag.getAttribute('data-mock-flag'); active.flags[qid] = !active.flags[qid]; saveState();
+      flag.classList.toggle('is-flagged', !!active.flags[qid]); flag.setAttribute('aria-pressed', String(!!active.flags[qid]));
+      flag.textContent = active.flags[qid] ? 'Flagged for review' : 'Flag for review'; mockSyncNavigator(); return;
+    }
+    if(e.target.closest('[data-mock-submit]')){ submitMockBlock(false); return; }
+    if(e.target.closest('[data-mock-return]')){ STATE.ui.sub.mock = 'setup'; saveState(); renderMock(); return; }
+    var review = e.target.closest('[data-mock-review]');
+    if(review){ STATE.ui.mockReviewId = review.getAttribute('data-mock-review'); STATE.ui.mockFilter = 'all'; saveState(); renderMock(); return; }
+    var choice = e.target.closest('.qchoice');
+    if(choice && active){
+      var card = choice.closest('.qcard'), selectedQid = card && card.getAttribute('data-qid'), controller = selectedQid && mockCards[selectedQid];
+      if(controller){ active.answers[selectedQid] = controller.picked(); saveState(); mockSyncNavigator(); }
+    }
+  });
+  el.addEventListener('change', function(e){
+    var target = e.target, s = mockSetup();
+    if(target.matches('[data-mock-length]')) s.length = +target.value;
+    else if(target.matches('[data-mock-unit]')){
+      if(target.checked && s.units.indexOf(target.value) === -1) s.units.push(target.value);
+      if(!target.checked) s.units = s.units.filter(function(id){ return id !== target.value; });
+    } else if(target.matches('[data-mock-filter]')) STATE.ui.mockFilter = target.value;
+    else return;
+    saveState(); renderMock();
+  });
 }
 
 /* ==== app/60-home.js ==== */
