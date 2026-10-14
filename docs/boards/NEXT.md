@@ -165,19 +165,18 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
   hit the account's session limit right after writing their files; 2 passes x 60 items is about the most one session
   can run.
 - **PG-5:** nitrous oxide quote added (ADA, exact), conditions updated.
-- **Not reviewed:** Codex opened #94-#106 (item sheets, game core and art, migration draft v34, task helper, scripted
-  checker, perio chart figure, Exam blocks, endo/anes facts, fact gaps) outside the Session 7 plan. Triage them next.
-  Note: `migration_v34.sql` already exists on main (`get_my_answers`), so #97's v34 must be renumbered.
+- **Merged 2026-10-14:** #80 (before its stale-mark fix; the fix goes in a follow-up PR) and #83 (Deep "meth mouth"
+  leftover fixed on the Session 7 branch).
+- **#94-#106** are Codex tasks Sam asked for, reviewed in another thread (not here). Note for that thread:
+  `migration_v34.sql` already exists on main (`get_my_answers`), so #97's v34 must be renumbered.
 
-## Session 8: merge what's ready, stage 4b, triage the new PRs
+## Session 8: merge what's ready, stage 4b
 
-1. Ask Sam to merge #83. Then the two #83 leftovers on a Claude branch.
-2. Revised #80, #81, #87: check only the fix in `reviews/session-7.md`; merge order #80, #81 (rebuild the page), #87.
-3. Revised #91: rerun lint/build/count check, then **stage 4b**: two fresh checker passes on every changed item only
+1. The #80 follow-up PR (stale `finalReview` fix), revised #81 and #87: check only the fix in `reviews/session-7.md`;
+   merge #80's fix, then #81 (rebuild the page), then #87.
+2. Revised #91: rerun lint/build/count check, then **stage 4b**: two fresh checker passes on every changed item only
    (`bench.mjs render --ids <changed>`; batches of ~10). Items clean in 4a and unchanged are done. Then T-06 can merge.
-4. Triage #94-#106: for each, does it match a brief in `tasks/`? If not, ask Sam whether Sam asked for it before
-   reviewing. Facts PRs (#103, #104, #106) get the usual quote check (`check-quotes.mjs --dir`) and a verifier pass.
-5. Briefs: T-07 `items-pharm` (after #83; add the c-pharm-0005 TX-6 note), `int-notes-home` (after #80 and #81).
+3. Briefs: T-07 `items-pharm` (after #83; add the c-pharm-0005 TX-6 note), `int-notes-home` (after #80 and #81).
    `int-mock` may already be #102: check before writing it.
 
 ## Session 7b (2026-10-14, parallel Claude session; details in `reviews/session-7b.md`)

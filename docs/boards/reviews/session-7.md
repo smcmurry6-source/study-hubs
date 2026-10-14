@@ -14,11 +14,11 @@ send to Codex. Next session checks the revised PRs against them.
 | #87 T-03 perio | all of 1-4 done; acceptance: valid, `total 60 cases 30`, no COPY/STEM lines, Core 3,332 / Deep 5,267 words, 35 concepts, 10 hy, peri-implant now 6 slots | c-perio-0005's box now says "After regenerative surgery (step 3)", which gives away its own regeneration item; Deep's diabetes paragraph lost its subject | one small fix, then ready |
 | #91 T-06 medcx items | code checks pass: lint 0 errors (47 warnings, all older-source notices), build valid, `--check`, syntax, count check `items 60 in-cases 30 cases 8 negatives 7 key-index 15/16/14/9` (one EXTRA-REF, EM-11 on 0129, which is fine) | checker: 16 clean on both passes, 44 need fixes, 7 with a high flag | fix round, then stage 4b |
 
-Merge order unchanged: #80, then #81 (Codex merges `claude/boards-hub` and reruns the build, never resolving
-`hubs/boards/index.html` by hand); #83 now; #87 after its fix.
+Merged on 2026-10-14: #80 (before its fix, which now goes in a follow-up PR) and #83. Next: #81 (Codex merges
+`claude/boards-hub` and reruns the build, never resolving `hubs/boards/index.html` by hand), then #87 after its fix.
 
-**#83 leftovers Claude does after merge:** Deep methamphetamine paragraph still says "severe caries" without the term
-(3j asked for "rampant caries, often called meth mouth" in both files); 5h (the TX-6 outline note) has no field in the
+**#83 leftovers:** the Deep methamphetamine line now reads "rampant caries, often called meth mouth" (done in this
+PR); 5h (the TX-6 outline note) has no field in the
 blueprint schema, so it goes into the T-07 brief instead: "c-pharm-0005's TX-6 item keys the NSAID kidney risk, not
 acetaminophen as the choice".
 
@@ -38,11 +38,11 @@ files are complete.
 ### #80 (T-05)
 
 ```text
-Revise PR #80 (T-05) on branch codex/t05-readiness-plan. All seven Session 6 points are done and the tests pass. One bug left:
+#80 (T-05) is already merged into claude/boards-hub, but one bug remains. Fix it on a new branch from the current claude/boards-hub (e.g. codex/t05-final-review-fix) and open a PR into claude/boards-hub.
 
 A stale final-review mark retires an item without its 120-day review. STATE.ui.finalReview[qid] is only cleared on retire or unretire. If the item is missed at its final review (b resets to 0), the old mark stays; when the item climbs back to the last step, t is already on or after the old day and lastCorrect is true, so the next plan retires it at once. Reproduced with the core: srs {b:7, t:'2027-06-09', due:'2027-10-07'}, history {lastCorrect:true}, finalReview {q:'2027-01-05'}, day '2027-06-10' -> retire ['q'].
 
-Fix: in the core, ignore a finalReview mark when srs b < steps.length and return those ids as finalClear; the wrapper deletes them from STATE.ui.finalReview. Add that scenario as a test (expect no retirement and q in finalClear). Touch only src/boards/app/45-readiness-plan.js, tools/ci/boards-plan.test.js and the regenerated page. Then rerun the plan tests, --check and syntax, and paste the lines.
+Fix: in the core, ignore a finalReview mark when srs b < steps.length and return those ids as finalClear; the wrapper deletes them from STATE.ui.finalReview. Add that scenario as a test (expect no retirement and q in finalClear). Touch only src/boards/app/45-readiness-plan.js, tools/ci/boards-plan.test.js and the regenerated page (rebuild it with node tools/build-boards.js, never edit it by hand). Then run the plan tests, node tools/build-boards.js --check and node tools/ci/syntax.js, and paste the lines in the PR.
 ```
 
 ### #81 (T-04)
