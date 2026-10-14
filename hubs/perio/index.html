@@ -5749,6 +5749,33 @@ window.SH_GOTO = function(g){
   else if(g.v === 'bank'){ QBANK_FILTER = { search:g.q || '', lec:'all', type:'all', status:'all' }; setMode('compendium'); setView('question-bank'); }
 };
 
+/* Progress sync (widget/v3.js, migration_v34): the widget reads back every answer saved for you on the server,
+   including from your linked devices, and hands each question's totals here. Keep whichever copy has more tries,
+   so answers made only on this device are never lost. */
+var SYNC_LOADED = Date.now();
+window.SH_SYNC = {
+  merge: function(byQid, days){
+    var changed = false, added = 0;
+    Object.keys(byQid).forEach(function(id){
+      if(!QUESTIONS_BY_ID[id]) return;
+      var sv = byQid[id], a = STATE.answered[id] || { correct:false, seen:0, lastCorrect:null };
+      if(sv.n <= a.seen) return;
+      if(!a.seen) added++;
+      STATE.totalSeen += sv.n - a.seen;
+      if(sv.c > 0 && !a.correct){ a.correct = true; STATE.totalCorrect += 1; }
+      a.seen = sv.n; a.lastCorrect = sv.last;
+      STATE.answered[id] = a;
+      changed = true;
+    });
+    (days || []).forEach(function(d){ if(!STATE.activeDates[d]){ STATE.activeDates[d] = true; changed = true; } });
+    if(!changed) return;
+    saveState(); checkAchievements(); renderHeaderMeta();
+    if(added) showToast(icon('check') + ' Synced ' + added + ' question' + (added === 1 ? '' : 's') + ' from your other devices');
+    /* redraw the page only right after it opens, so nobody loses a question they're in the middle of */
+    if(Date.now() - SYNC_LOADED < 8000 && STATE.ui.mode === 'compendium' && COMPENDIUM_VIEW !== 'mock-exam' && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())) renderCompendiumContent();
+  }
+};
+
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
    draw each card, so answers go through recordAnswer like anywhere else. All 9 sessions (the final is cumulative). */
 window.SH_DRILL = {
