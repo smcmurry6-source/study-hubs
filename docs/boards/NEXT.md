@@ -1,5 +1,12 @@
 # Boards hub: what the next session does (handoff, updated 2026-10-13 after Session 6)
 
+## How Sam starts a task
+
+From a clean checkout on a branch other than `main`, run `node tools/boards/task.mjs T-NN` (add `--dry-run` to preview
+the commands). Paste the printed prompt into Codex. After the task is committed, run
+`node tools/boards/task.mjs T-NN --finish` to run the fast checks, push the branch, and open a draft PR into
+`claude/boards-hub`.
+
 Start here. Branch `claude/boards-hub`, draft PR #70. Read, in order: `DECISIONS.md`, `PLAN_V2.md` (approved), then
 only the parts of `BUILD_SPEC.md` and `research/*.md` the current step needs (grep headings; never read big files
 whole). Nothing on the live site has changed yet.

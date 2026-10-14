@@ -87,9 +87,11 @@ saves the most subscription usage.
 
 1. Claude writes briefs in batches: `docs/boards/tasks/T-NN.md` (goal, exact files, interface, acceptance tests, what
    not to touch, which model/tool).
-2. On his computer Sam runs one helper command per task (`tools/boards/task T-NN codex|opencode`, written by
-   Claude): it branches from `claude/boards-hub`, hands the agent the brief, commits, pushes and opens the PR with
-   the agent's self-report (via the GitHub CLI). CI runs on the PR.
+2. On his computer Sam runs `node tools/boards/task.mjs T-NN` (optionally `--base claude/boards-hub` or
+   `--dry-run`). The helper fetches the base, creates `codex/boards-<slug>` from the brief title, and prints the
+   prompt to paste into Codex. After the agent commits, Sam runs `node tools/boards/task.mjs T-NN --finish`: it runs
+   the fast checks, pushes the branch, and opens a draft PR into the base with the last commit body as the self-report
+   (via the GitHub CLI). CI runs on the PR.
 3. Content PRs: Sam runs the checker (`node tools/boards/check-items.mjs --unit <unit>`), which writes
    `verdicts/<unit>.json` to the branch.
 4. Claude reviews in one batch per session: self-reports, risky diffs only, the verdict summary, and only the
