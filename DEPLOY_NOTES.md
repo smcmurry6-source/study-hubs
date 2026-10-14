@@ -168,6 +168,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
   matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
   `LESSONS.md` refreshed.
+
 - **2026-10-13 (diagram review rule, Claude Code)** — New standing rule above ("Building a hub = diagram review"):
   every hub build, or new lectures added to a hub, includes a review for diagram candidates, and each one goes to Sam
   for approval before it is drawn. `CLAUDE.md` → "Diagrams (the anima skill)" says how a Claude Code session asks.
