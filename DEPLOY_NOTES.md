@@ -121,6 +121,19 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
   **A new hub gets sync by defining `SH_SYNC` (copy it from `occlusion`).** Link-devices text, About page, `sw.js` →
   `sh-v15`. **Perio Project: carry `SH_SYNC` into the split sources.**
 
+- **2026-10-13 evening (lessons audit, Claude Code)** — A day and a half before PCD Exam 3. Three PCD reports fixed
+  (same ids and answer positions): `on-crack-types` no longer labels a choice "Cracked tooth (treatable)" (#18);
+  `ve-pbox-3`'s key is now "Plan a more opaque all-ceramic crown", since the Patient Box says bleaching was already
+  tried (#15); `ce-isolation`'s key reads "RMGI, because it tolerates moisture and its excess cleans off easily" and the
+  explanation says why RMGI counts as moisture tolerant despite its resin (#16). Explanations now answer the class's
+  favorite wrong choice on PCD `ce-sbu`, `co-translucent`, `bo-zprime`, `bo-adh-thick`, `co-correct-high`; MSK 4
+  `dp-impetigo` no longer quotes the lecture's "option B and D" (not this hub's letters). `question_choices` rows before
+  today for the three keys refer to the old wording. **At Sam's request:** `rm-why-now` removed (report #17, "not
+  relevant"), and the two matching items `on-cement-match` and `ce-cure-match` (48-50%) split into MCQs: each pair already
+  had its own MCQ except two, now `ce-cure-emax` (dual-cured) and `ce-cure-zr` (retentive zirconia: RMGI). Bank 329 -> 328,
+  matching 10 -> 8 (the arcade's Shade Match uses the 8 left). No reading text changed, so no narration regenerated.
+  `LESSONS.md` refreshed.
+
 - **2026-10-13 (anima diagram skill, Claude Code)** — `.claude/skills/anima/`, vendored from Garinmckayl/anima (MIT;
   commit and what was trimmed in its `UPSTREAM.md`), so Claude Code sessions can draw accurate isometric SVG figures
   (anatomy, cells, receptors, drug mechanisms) for the hubs' lecture notes and Review. `CLAUDE.md` → "Diagrams (the
