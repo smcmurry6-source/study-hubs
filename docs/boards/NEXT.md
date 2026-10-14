@@ -167,8 +167,7 @@ Sam will set up Codex and opencode later. Until then Claude does every role in `
 - **PG-5:** nitrous oxide quote added (ADA, exact), conditions updated.
 - **Merged 2026-10-14:** #80 (before its stale-mark fix; the fix goes in a follow-up PR) and #83 (Deep "meth mouth"
   leftover fixed on the Session 7 branch).
-- **#94-#106** are Codex tasks Sam asked for, reviewed in another thread (not here). Note for that thread:
-  `migration_v34.sql` already exists on main (`get_my_answers`), so #97's v34 must be renumbered.
+- **#94-#106** are Codex tasks Sam asked for, reviewed in Session 7b (below), not here.
 
 ## Session 8: merge what's ready, stage 4b
 
