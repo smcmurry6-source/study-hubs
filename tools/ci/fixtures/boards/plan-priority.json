@@ -1,0 +1,28 @@
+{
+  "day": "2026-10-13",
+  "seed": "fixture-priority",
+  "size": 2,
+  "budget": {
+    "daily": 12,
+    "newPerDay": 0,
+    "governor": 0.8,
+    "retireStep": 120,
+    "retireStreak": 3,
+    "retiredSamplePerMonth": 4
+  },
+  "items": [
+    { "id": "q-overdue-hard", "lec": "medcx", "cog": 3 },
+    { "id": "q-overdue", "lec": "medcx", "cog": 2 },
+    { "id": "q-due-today", "lec": "pharm", "cog": 1 }
+  ],
+  "history": {},
+  "srs": {
+    "q-overdue-hard": { "b": 2, "due": "2026-10-05", "t": "2026-10-03" },
+    "q-overdue": { "b": 1, "due": "2026-10-11", "t": "2026-10-10" },
+    "q-due-today": { "b": 1, "due": "2026-10-13", "t": "2026-10-12" }
+  },
+  "stats": {},
+  "retired": {},
+  "sureWrong": {},
+  "expectedPlan": ["q-overdue-hard", "q-overdue"]
+}
