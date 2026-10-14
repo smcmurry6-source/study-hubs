@@ -36,8 +36,8 @@ function thin(xz, dir, z) {
   const x0 = dir > 0 ? 2 : -L - 2;
   return `<g class="sc-thin" transform="translate(${o[0]} ${o[1]})"><rect class="sc-actin" x="${x0}" y="-6" width="${L}" height="12" fill="url(#sc-actin-p)"/><path class="sc-tm" d="M${x0} ${f1(-3.2 * KZA)}h${L}"/><rect class="sc-tn" x="${x0}" y="-${f1(4.6 * KZA + 4)}" width="${L}" height="8" fill="url(#sc-tn-p)"/></g>`;
 }
-// Thick filament centred at xc (µm): a myosin II rod, bare in the middle, heads on both halves pointing away from M.
-// `reach` limits the heads to what can come into view (the neighbours are mostly cropped).
+// Thick filament centered at xc (µm): a myosin II rod, bare in the middle, heads on both halves pointing away from M.
+// `reach` limits the heads to what can come into view (the neighbors are mostly cropped).
 function thick(xc, z, reach = Infinity) {
   const x0 = X(xc - THICK / 2), x1 = X(xc + THICK / 2);
   let heads = "";
@@ -60,7 +60,7 @@ function zDisc(x) {
 }
 
 const LZ = X(-SL0 / 2), RZ = X(SL0 / 2);
-// groups that move: left Z (+ its thin filaments both ways), right Z, neighbour thick filaments
+// groups that move: left Z (+ its thin filaments both ways), right Z, neighbor thick filaments
 const leftZ = `<g class="sc-move" data-move="lz">${ROWS_THIN.map((z) => thin(LZ, 1, z) + thin(LZ, -1, z)).join("")}${zDisc(LZ)}</g>`;
 const rightZ = `<g class="sc-move" data-move="rz">${ROWS_THIN.map((z) => thin(RZ, -1, z) + thin(RZ, 1, z)).join("")}${zDisc(RZ)}</g>`;
 const nbL = `<g class="sc-move sc-nb" data-move="ln">${ROWS_THICK.map((z) => thick(-SL0, z, 2.5)).join("")}</g>`;
