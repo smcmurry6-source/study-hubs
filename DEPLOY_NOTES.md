@@ -85,6 +85,12 @@ date isn't today, do steps 1-3 of that runbook first so the new hub is built fro
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (calmer right-answer feedback, Claude Code)** — Sam found the right-answer "pop" shaky: `pop()` in
+  `widget/fx.js` scaled the whole option (1 -> 1.035 -> .997 -> 1), which wobbles its text, and the check badge
+  overshot. Now the option never moves: a `.sh-fx-sweep` wash in the option's own (green) color sweeps left to right in
+  ~230 ms, holds, and fades by 720 ms, with a smaller, shorter glow; the check badge scales in from .4 with only a slight
+  settle and draws faster. Wrong answers still shake. About page wording, `sw.js` -> `sh-v17`. No hub changes.
+
 - **2026-10-14 (motion pass, Claude Code)** — New `widget/fx.js` (loaded by v3.js, `shFx.mount(shEggHooks)`), one
   MutationObserver plus a capture-phase click listener, so **hubs need no changes**: **answer feedback** (right after a tap
   inside a `.qcard`, an option that turns `.is-correct`/`.is-matched`/`data-state="correct"` pops with a ring and gets a
