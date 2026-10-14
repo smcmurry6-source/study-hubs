@@ -10,7 +10,8 @@ function defaultState(){
     activeDates:{},       // 'YYYY-MM-DD' -> true
     lastActiveDate:null,
     retired:{},           // qid -> 'YYYY-MM-DD' (dailyPlan, BUILD_SPEC 1.5)
-    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, caseProgress:{}, caseId:null, caseReview:false }
+    mockBlocks:[],         // completed exam blocks, newest first
+    ui:{ mode:'home', sub:{}, level:'core', coverOptions:false, unit:null, bankUnit:'all', bankSec:null, bankExam:'all', bankNewOnly:false, bankHardOnly:false, bankAt:0, caseProgress:{}, caseId:null, caseReview:false, mockSetup:{kind:'standalone', length:5, units:null}, mockActive:null, mockReviewId:null, mockFilter:'all' }
   };
 }
 function loadState(){
@@ -23,6 +24,12 @@ function loadState(){
   for(var kk in base.ui) if(!(kk in d.ui)) d.ui[kk] = base.ui[kk];
   if(!d.ui.sub || typeof d.ui.sub !== 'object') d.ui.sub = {};
   if(!d.ui.caseProgress || typeof d.ui.caseProgress !== 'object' || Array.isArray(d.ui.caseProgress)) d.ui.caseProgress = {};
+  if(!Array.isArray(d.mockBlocks)) d.mockBlocks = [];
+  else d.mockBlocks = d.mockBlocks.filter(function(b){ return b && typeof b === 'object' && Array.isArray(b.questions); });
+  if(!d.ui.mockSetup || typeof d.ui.mockSetup !== 'object' || Array.isArray(d.ui.mockSetup)) d.ui.mockSetup = base.ui.mockSetup;
+  if(d.ui.mockActive && (typeof d.ui.mockActive !== 'object' || Array.isArray(d.ui.mockActive))) d.ui.mockActive = null;
+  if(typeof d.ui.mockReviewId !== 'string' && d.ui.mockReviewId !== null) d.ui.mockReviewId = null;
+  if(['all', 'missed', 'flagged', 'missed-flagged'].indexOf(d.ui.mockFilter) === -1) d.ui.mockFilter = 'all';
   ['answered', 'activeDates', 'retired'].forEach(function(k){ if(!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) d[k] = {}; });
   return d;
 }

@@ -99,10 +99,15 @@ function wireCard(card, q, opts, onDone){
   var picked = null, recorded = false, dead = false;
   var old = STATE.answered[q.id];
   if(opts.review){
-    picked = old && typeof old.choice === 'number' ? old.choice : null;
+    picked = Object.prototype.hasOwnProperty.call(opts, 'reviewChoice')
+      ? (typeof opts.reviewChoice === 'number' ? opts.reviewChoice : null)
+      : (old && typeof old.choice === 'number' ? old.choice : null);
     setChoiceStates(card, q, picked);
     var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
     showClassStats(card, q);
+  } else if(typeof opts.initialPick === 'number' && opts.initialPick >= 0 && opts.initialPick < q.choices.length){
+    picked = opts.initialPick;
+    var selected = $('.qchoice[data-i="' + picked + '"]', card); if(selected) selected.setAttribute('data-state', 'selected');
   }
   function feedback(){
     var qx = $('.qx', card); qx.innerHTML = explainHTML(q, picked); qx.hidden = false;
