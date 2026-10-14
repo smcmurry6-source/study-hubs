@@ -1218,5 +1218,43 @@
   "url": "https://openstax.org/books/pharmacology/pages/2-2-pharmacokinetics-and-pharmacodynamics",
   "kind": "html",
   "date": "2024"
+ },
+ "aap-mucogingival-2018": {
+  "title": "Mucogingival conditions in the natural dentition: Narrative review, case definitions, and diagnostic considerations",
+  "org": "American Academy of Periodontology (2017 World Workshop report)",
+  "url": "https://aap.onlinelibrary.wiley.com/doi/full/10.1002/JPER.16-0671",
+  "kind": "html",
+  "date": "2018"
+ },
+ "cal-indirect-2022": {
+  "title": "Clinical attachment loss: estimation by direct and indirect methods",
+  "org": "Peer-reviewed observational study",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9376648/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9376648/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
+ },
+ "efp-peri-implant-s3-2023": {
+  "title": "Prevention and treatment of peri-implant diseases—The EFP S3 level clinical practice guideline",
+  "org": "European Federation of Periodontology",
+  "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/jcpe.13823",
+  "kind": "html",
+  "date": "2023"
+ },
+ "europepmc-periodontal-diagnosis-2025": {
+  "title": "Consensus Report of the 20th European Workshop on Periodontology: Contemporary and Emerging Technologies in Periodontal Diagnosis",
+  "org": "20th European Workshop on Periodontology (consensus report)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12286652/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12286652/fullTextXML",
+  "kind": "xml",
+  "date": "2025"
+ },
+ "manual-probing-2022": {
+  "title": "Reproducibility of Manual Periodontal Probing Following a Comprehensive Standardization and Calibration Training Program",
+  "org": "Peer-reviewed clinical methods study",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9552317/",
+  "fetch": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9552317/fullTextXML",
+  "kind": "xml",
+  "date": "2022"
  }
 }
