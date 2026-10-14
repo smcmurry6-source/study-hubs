@@ -102,6 +102,19 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (MSK 4: L31 and L32 recordings, Claude Code)** — Sam added the 10/13 class recordings of L31 Skeletal
+  Muscle and L32 NMJ Pharmacology to the Drive (Exam 4 folder; both VTTs are labeled "Michael Herr", the room's Zoom
+  account). Both lectures go from "Slides only" to "Recording + slides". Notes at both levels gain what the lectures
+  added (muscle: adult regeneration and satellite cells with age, M line and the overlap zone, the weak/strong
+  cross-bridge cycle, actin sliding toward the M line, twitch vs AP and tetany, ~80% of glucose kept as glucose-6-phosphate,
+  fiber types by job and IIx switching, myokine modes, sarcopenia and innervation; NMJ: "paralytics", pseudocholinesterase
+  genetics (up to ~8 h, dibucaine), bradycardia far more common, tubocurarine from curare, train-of-four thresholds,
+  glycopyrrolate first for heart, airways and gut, sugammadex only for -curonium drugs plus backup contraception,
+  tizanidine tried first, Botox for migraine via CGRP, descending botulism). Where the recording and slides differ
+  (where the T tubules sit) the notes give both and no question turns on it. All four L31/L32 mp3s regenerated.
+  20 exam hints quoted from the recordings, 20 new questions (src `rec`, "10/13 recording"; bank 229 → 249), new cram
+  lines. No other lecture changed. **MSK Project: carry these into the split sources.**
+
 - **2026-10-14 (MSK 4 diagrams in Review, Claude Code)** — Sam asked for the drawn figures in Review too, in the
   sections they belong to. `hubs/msk-exam4` Review: **The neuromuscular junction and its drugs (L32)** sits in Drugs right
   after the L32 drug cards, **The sliding sarcomere (L31)** in Muscle right after the Sarcomere bands table, both live.
