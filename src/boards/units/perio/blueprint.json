@@ -1,0 +1,274 @@
+{
+  "unit": "perio",
+  "items_total": 60,
+  "case_items": 30,
+  "sections": [
+    { "sec": "perio-health-gingivitis", "standalone": 2, "in_cases": 2, "fk": ["FK5"], "cc": ["CC22"] },
+    { "sec": "perio-biofilm-risk", "standalone": 2, "in_cases": 2, "fk": ["FK5", "FK7"], "cc": ["CC22"] },
+    { "sec": "perio-exam", "standalone": 2, "in_cases": 2, "fk": ["FK6"], "cc": ["CC22", "CC36"] },
+    { "sec": "perio-radiographs", "standalone": 2, "in_cases": 2, "fk": ["FK1"], "cc": ["CC22"] },
+    { "sec": "perio-staging-grading", "standalone": 5, "in_cases": 6, "fk": ["FK6"], "cc": ["CC22"] },
+    { "sec": "perio-acute", "standalone": 1, "in_cases": 3, "fk": ["FK7", "FK6"], "cc": ["CC22", "CC36"] },
+    { "sec": "perio-mucogingival", "standalone": 2, "in_cases": 1, "fk": ["FK1"], "cc": ["CC22"] },
+    { "sec": "perio-peri-implant", "standalone": 5, "in_cases": 1, "fk": ["FK5"], "cc": ["CC22", "CC36"] },
+    { "sec": "perio-prognosis", "standalone": 2, "in_cases": 2, "fk": ["FK6"], "cc": ["CC22", "CC37"] },
+    { "sec": "perio-therapy", "standalone": 4, "in_cases": 2, "fk": ["FK7", "FK6"], "cc": ["CC22", "CC36"] },
+    { "sec": "perio-surgery", "standalone": 1, "in_cases": 3, "fk": ["FK6"], "cc": ["CC22", "CC37"] },
+    { "sec": "perio-maintenance", "standalone": 1, "in_cases": 2, "fk": ["FK5"], "cc": ["CC22", "CC37"] },
+    { "sec": "perio-systemic", "standalone": 1, "in_cases": 2, "fk": ["FK5"], "cc": ["CC22"] }
+  ],
+  "concepts": [
+    { "concept": "intact-health-and-gingivitis", "sec": "perio-health-gingivitis", "refs": ["PH-1", "PH-2", "PH-3"], "hy": "Health, gingivitis and extent use related but distinct bleeding thresholds.", "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "health-on-reduced-periodontium", "sec": "perio-health-gingivitis", "refs": ["PH-4", "PH-5", "BF-1"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "calculus-and-plaque-removal", "sec": "perio-biofilm-risk", "refs": ["BF-5", "PT-1", "PT-2"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "gingivitis-and-periodontitis-risk-modifiers", "sec": "perio-biofilm-risk", "refs": ["BF-2", "BF-3", "BF-4", "PS-10"], "hy": "Smoking can mute visible inflammation while increasing periodontitis risk.", "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "periodontitis-case-definition", "sec": "perio-exam", "refs": ["PS-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "furcation-classification", "sec": "perio-exam", "refs": ["FM-1", "FM-2", "FM-3"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "mobility-and-probing-limits", "sec": "perio-exam", "refs": ["FM-4", "PH-6", "PS-5"], "hy": null, "siblings": 1, "cog": 1, "phase": "clear" },
+    { "concept": "periodontal-radiograph-selection", "sec": "perio-radiographs", "refs": ["RAD-1"], "hy": "The ADA/FDA selection guide relies on clinical judgment and sets no recall interval.", "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "radiographic-assessment-limits", "sec": "perio-radiographs", "refs": ["RAD-2"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "radiographic-bone-loss-in-classification", "sec": "perio-radiographs", "refs": ["PS-3", "PS-4", "PS-9", "RAD-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "stage-severity-and-complexity", "sec": "perio-staging-grading", "refs": ["PS-2", "PS-3", "PS-4", "PS-5"], "hy": "Stage uses the worst site, tooth loss and complexity factors.", "siblings": 4, "cog": 3, "phase": "dx" },
+    { "concept": "grade-evidence-and-modifiers", "sec": "perio-staging-grading", "refs": ["PS-7", "PS-8", "PS-9", "PS-10"], "hy": "Use longitudinal evidence first, then indirect evidence and smoking or diabetes modifiers.", "siblings": 4, "cog": 3, "phase": "dx" },
+    { "concept": "extent-and-periodontitis-forms", "sec": "perio-staging-grading", "refs": ["PS-1", "PS-6"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "supracrestal-tissue-attachment", "sec": "perio-staging-grading", "refs": ["PS-11"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "acute-abscess-and-necrotizing-patterns", "sec": "perio-acute", "refs": ["PA-1", "PA-2"], "hy": "Abscess and necrotizing disease have distinct acute clinical patterns.", "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "endo-perio-lesion-prognosis", "sec": "perio-acute", "refs": ["PA-3"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "recession-and-gingival-phenotype", "sec": "perio-mucogingival", "refs": ["MG-1"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "cairo-recession-types", "sec": "perio-mucogingival", "refs": ["MG-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "peri-implant-diagnosis-patterns", "sec": "perio-peri-implant", "refs": ["PI-1", "PI-2", "PI-3", "PI-4"], "hy": "Baseline comparison and bone changes separate implant health, mucositis and peri-implantitis.", "siblings": 2, "cog": 3, "phase": "dx" },
+    { "concept": "peri-implant-progression-risks", "sec": "perio-peri-implant", "refs": ["PI-5"], "hy": null, "siblings": 2, "cog": 2, "phase": "dx" },
+    { "concept": "peri-implant-baseline-monitoring", "sec": "perio-peri-implant", "refs": ["PI-6"], "hy": null, "siblings": 2, "cog": 2, "phase": "prev" },
+    { "concept": "tooth-and-patient-prognosis-factors", "sec": "perio-prognosis", "refs": ["PR-1", "PR-3", "PR-4", "PR-7"], "hy": "Tooth and patient factors both shape a prognosis that can change.", "siblings": 2, "cog": 3, "phase": "dx" },
+    { "concept": "prognosis-prediction-limits", "sec": "perio-prognosis", "refs": ["PR-2", "PR-7"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" },
+    { "concept": "furcation-and-prognosis", "sec": "perio-prognosis", "refs": ["PR-5", "PR-6"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "therapy-sequence-and-reevaluation", "sec": "perio-therapy", "refs": ["PT-1", "PT-2", "PT-3", "PT-4", "BF-5"], "hy": "Reevaluation determines whether residual pockets need step 3 or supportive care.", "siblings": 2, "cog": 3, "phase": "plan" },
+    { "concept": "adjuncts-and-antibiotics", "sec": "perio-therapy", "refs": ["PT-6", "PT-7", "PT-9", "PT-11"], "hy": null, "siblings": 2, "cog": 2, "phase": "plan" },
+    { "concept": "local-delivery-labels", "sec": "perio-therapy", "refs": ["LD-1", "LD-2", "PT-9"], "hy": null, "siblings": 2, "cog": 2, "phase": "tx" },
+    { "concept": "surgical-hygiene-readiness", "sec": "perio-surgery", "refs": ["PT-10"], "hy": null, "siblings": 1, "cog": 2, "phase": "plan" },
+    { "concept": "regenerative-surgery-indications", "sec": "perio-surgery", "refs": ["SX-1", "PR-6"], "hy": null, "siblings": 2, "cog": 3, "phase": "plan" },
+    { "concept": "furcation-treatment-not-extraction", "sec": "perio-surgery", "refs": ["PR-6"], "hy": null, "siblings": 1, "cog": 3, "phase": "plan" },
+    { "concept": "supportive-care-interval", "sec": "perio-maintenance", "refs": ["PT-5", "PT-11"], "hy": "Supportive care intervals are individualized within a 3- to 12-month range.", "siblings": 2, "cog": 2, "phase": "fu" },
+    { "concept": "maintenance-instruction-and-plaque-removal", "sec": "perio-maintenance", "refs": ["PT-8", "PT-11"], "hy": null, "siblings": 1, "cog": 2, "phase": "fu" },
+    { "concept": "periodontitis-systemic-association", "sec": "perio-systemic", "refs": ["PSY-1", "PSY-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "clear" },
+    { "concept": "diabetes-periodontal-relationship", "sec": "perio-systemic", "refs": ["DM-7", "PSY-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "prev" },
+    { "concept": "drug-influenced-gingival-enlargement", "sec": "perio-systemic", "refs": ["GE-1", "BF-2"], "hy": null, "siblings": 1, "cog": 2, "phase": "dx" }
+  ],
+  "cases": [
+    {
+      "id": "c-perio-0001",
+      "units": ["perio"],
+      "box": {
+        "patient": "Female, 50 years old",
+        "cc": "\"My gums bleed when I brush.\" (6 months)",
+        "hx": [
+          "Type 2 diabetes; recent HbA1c 6.8%",
+          "Smokes 5 cigarettes per day",
+          "Four teeth were removed for orthodontic treatment; no teeth were lost to periodontitis",
+          "No comparable periodontal charts or images from the prior five years; no medication allergies"
+        ],
+        "findings": [
+          "Tooth 3 mesiobuccal: PD 6 mm, interdental CAL 5 mm, BOP present, RBL 35% reaching the middle third on a 2D radiograph",
+          "Tooth 14 distal: PD 5 mm, CAL 4 mm, BOP present, RBL 18%",
+          "Eight of 28 present teeth are involved; 28 teeth remain",
+          "No vertical bone loss of 3 mm or more, no Class II or III furcation, no moderate ridge defect, stable bite, no mobility degree 2 or greater",
+          "No prior five-year progression measurement is available"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "stage-severity-and-complexity", "refs": ["PS-3", "PS-4", "PS-5"] },
+        { "phase": "dx", "concept": "grade-evidence-and-modifiers", "refs": ["PS-7", "PS-8", "PS-9", "PS-10"] },
+        { "phase": "dx", "concept": "extent-and-periodontitis-forms", "refs": ["PS-6"] },
+        { "phase": "dx", "concept": "radiographic-assessment-limits", "refs": ["RAD-2"] }
+      ]
+    },
+    {
+      "id": "c-perio-0002",
+      "units": ["perio"],
+      "box": {
+        "patient": "Male, 58 years old",
+        "cc": "\"My gums bleed and several teeth feel loose.\" (4 months)",
+        "hx": [
+          "Type 2 diabetes; recent HbA1c 7.2%",
+          "Smokes 12 cigarettes per day",
+          "Five teeth have been lost to periodontitis; 17 teeth remain",
+          "No comparable periodontal chart or radiograph from the prior five years"
+        ],
+        "findings": [
+          "Tooth 14 mesiobuccal: PD 7 mm, interdental CAL 6 mm, BOP present, RBL 46% reaching the middle third",
+          "Vertical bone loss 3 mm; Class II furcation involvement; moderate ridge defect",
+          "Bite is stable; no complex rehabilitation need or mobility degree 2 or greater documented",
+          "Thirteen of 17 present teeth show periodontitis involvement"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "stage-severity-and-complexity", "refs": ["PS-3", "PS-4", "PS-5"] },
+        { "phase": "dx", "concept": "grade-evidence-and-modifiers", "refs": ["PS-7", "PS-9", "PS-10"] },
+        { "phase": "plan", "concept": "therapy-sequence-and-reevaluation", "refs": ["PT-3", "PT-4"] },
+        { "phase": "dx", "concept": "tooth-and-patient-prognosis-factors", "refs": ["PR-1", "PR-3", "PR-4"] },
+        { "phase": "dx", "concept": "extent-and-periodontitis-forms", "refs": ["PS-6"] }
+      ]
+    },
+    {
+      "id": "c-perio-0003",
+      "units": ["perio"],
+      "box": {
+        "patient": "Male, 43 years old",
+        "cc": "\"The gum by this molar is very sore.\" (2 days)",
+        "hx": [
+          "Periodontitis is recorded in the dental history",
+          "No medication allergies; no current fever"
+        ],
+        "findings": [
+          "Tooth 19 has an established periodontal pocket with localized purulent drainage from the gingival wall",
+          "Tooth 19 furcation: 4 mm horizontal attachment loss without through-and-through passage; vertical subclass depth 5 mm from the fornix"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "acute-abscess-and-necrotizing-patterns", "refs": ["PA-1"] },
+        { "phase": "dx", "concept": "furcation-classification", "refs": ["FM-1", "FM-2", "FM-3"] }
+      ]
+    },
+    {
+      "id": "c-perio-0004",
+      "units": ["perio"],
+      "box": {
+        "patient": "Female, 29 years old",
+        "cc": "\"My gums bleed when I brush.\" (2 weeks)",
+        "hx": [
+          "No history of periodontitis, recession treatment or crown lengthening",
+          "Does not smoke; no medications or known allergies"
+        ],
+        "findings": [
+          "Plaque and supragingival calculus are present",
+          "BOP at 22% of sites; all probing depths are 3 mm or less",
+          "No attachment loss or radiographic bone loss"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "intact-health-and-gingivitis", "refs": ["PH-1", "PH-2", "PH-3"] },
+        { "phase": "clear", "concept": "calculus-and-plaque-removal", "refs": ["BF-5"] }
+      ]
+    },
+    {
+      "id": "c-perio-0005",
+      "units": ["perio"],
+      "box": {
+        "patient": "Male, 46 years old",
+        "cc": "\"One area still feels deep after the cleaning visits.\" (3 weeks)",
+        "hx": [
+          "Stage III periodontitis; completed step 1 and step 2 therapy",
+          "Reports consistent home care and attends follow-up appointments",
+          "No medication allergies"
+        ],
+        "findings": [
+          "Tooth 30 has a residual pocket measuring 6 mm after subgingival instrumentation",
+          "Tooth 30 is a mandibular molar; furcation examination shows 4 mm horizontal loss without through-and-through passage and a 5 mm vertical subclass depth",
+          "No other pocket of 6 mm or more; plaque control has been maintained"
+        ]
+      },
+      "items": [
+        { "phase": "plan", "concept": "regenerative-surgery-indications", "refs": ["SX-1", "PR-6"] },
+        { "phase": "plan", "concept": "surgical-hygiene-readiness", "refs": ["PT-10"] },
+        { "phase": "fu", "concept": "supportive-care-interval", "refs": ["PT-5", "PT-11"], "stem": "Three months after regenerative surgery, reevaluation finds no bleeding pocket deeper than 4 mm and no pocket measuring 6 mm or more." },
+        { "phase": "dx", "concept": "furcation-classification", "refs": ["FM-1", "FM-2", "FM-3"] }
+      ]
+    },
+    {
+      "id": "c-perio-0006",
+      "units": ["perio"],
+      "box": {
+        "patient": "Female, 62 years old",
+        "cc": "\"The implant area bleeds when I clean it.\" (1 month)",
+        "hx": [
+          "History of stage III periodontitis; currently in supportive care",
+          "Smokes 3 cigarettes per day",
+          "Implant prosthesis completed three years ago; baseline probing and radiograph were recorded then"
+        ],
+        "findings": [
+          "Implant at site 19: bleeding on gentle probing, probing depth increased from 4 mm at baseline to 7 mm, bone level is 3 mm more apical than on the baseline radiograph",
+          "Implant at site 30: no bleeding or suppuration, no depth increase, and no bone loss beyond initial remodeling",
+          "Tooth 3: PD 5 mm, CAL 4 mm, Class II furcation involvement"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "peri-implant-diagnosis-patterns", "refs": ["PI-1", "PI-3"] },
+        { "phase": "plan", "concept": "periodontal-radiograph-selection", "refs": ["RAD-1"] },
+        { "phase": "dx", "concept": "tooth-and-patient-prognosis-factors", "refs": ["PR-1", "PR-3", "PR-4"] }
+      ]
+    },
+    {
+      "id": "c-perio-0007",
+      "units": ["perio"],
+      "box": {
+        "patient": "Male, 55 years old",
+        "cc": "\"I am here for my maintenance visit.\" (scheduled visit)",
+        "hx": [
+          "Successfully treated periodontitis; completed steps 1 and 2",
+          "Type 2 diabetes; recent HbA1c 8.1%",
+          "Smokes 12 cigarettes per day",
+          "Reports taking medicines as prescribed and attends supportive care"
+        ],
+        "findings": [
+          "All probing depths are 4 mm or less; no 4 mm site bleeds; BOP at 6% of sites",
+          "Plaque is visible at several sites; no deep residual pocket is recorded",
+          "The patient asks whether an adjunct medicine should be added to maintenance care"
+        ]
+      },
+      "items": [
+        { "phase": "clear", "concept": "periodontitis-systemic-association", "refs": ["PSY-1", "PSY-2"] },
+        { "phase": "dx", "concept": "gingivitis-and-periodontitis-risk-modifiers", "refs": ["BF-3", "BF-4", "PS-10"] },
+        { "phase": "dx", "concept": "health-on-reduced-periodontium", "refs": ["PH-4", "PH-5"] },
+        { "phase": "fu", "concept": "adjuncts-and-antibiotics", "refs": ["PT-7", "PT-11"] }
+      ]
+    },
+    {
+      "id": "c-perio-0008",
+      "units": ["perio"],
+      "box": {
+        "patient": "Female, 44 years old",
+        "cc": "\"The gum around this tooth suddenly became painful.\" (1 day)",
+        "hx": [
+          "Stage III periodontitis; completed step 1 and step 2",
+          "Plaque control has been maintained",
+          "No known medication allergies"
+        ],
+        "findings": [
+          "A pre-existing pocket at tooth 3, a maxillary molar has localized pus in the gingival wall and rapid tissue change",
+          "Residual pocket at tooth 3 measures 6 mm after the acute lesion has been controlled",
+          "Class II furcation involvement is present at the buccal and mesial sites of tooth 3",
+          "The patient reports reliable home care; no other pocket of 6 mm or more"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "acute-abscess-and-necrotizing-patterns", "refs": ["PA-1"] },
+        { "phase": "plan", "concept": "furcation-treatment-not-extraction", "refs": ["PR-6"] },
+        { "phase": "fu", "concept": "supportive-care-interval", "refs": ["PT-5", "PT-11"] }
+      ]
+    },
+    {
+      "id": "c-perio-0009",
+      "units": ["perio"],
+      "box": {
+        "patient": "Male, 38 years old",
+        "cc": "\"The gum looks enlarged and one tooth has receded.\" (6 months)",
+        "hx": [
+          "Takes phenytoin for seizure prevention",
+          "Tooth 8 has been evaluated for pulpal-periodontal communication",
+          "No known medication allergies"
+        ],
+        "findings": [
+          "Tooth 8 has a vertical root fracture and a pathologic communication between pulpal and periodontal tissues",
+          "At tooth 10, buccal recession is 3 mm and interproximal attachment loss is 2 mm",
+          "CEJ is detectable; cervical step is 0.6 mm; gingival thickness and keratinized-tissue width are recorded",
+          "Firm gingival enlargement of the anterior papillae, more than the plaque level would explain"
+        ]
+      },
+      "items": [
+        { "phase": "dx", "concept": "drug-influenced-gingival-enlargement", "refs": ["GE-1"] },
+        { "phase": "dx", "concept": "recession-and-gingival-phenotype", "refs": ["MG-1"] },
+        { "phase": "dx", "concept": "endo-perio-lesion-prognosis", "refs": ["PA-3"] }
+      ]
+    }
+  ]
+}
