@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-14 (diagrams after answering, Claude Code)** — Sam: in the question bank, don't show a diagram before the
+  question is answered unless it's needed, so it can't give the answer away (standing rule, now in `CLAUDE.md` →
+  "Diagrams"). New question field `imgAfter:true`: the diagram opens inside the explanation (after the verdict) instead
+  of above the stem, in the bank, the Daily Drill and the mock review. Applied to every picture question that can be
+  answered from its stem: MSK 4 `nm-fig-ache`, `nm-fig-rec`, `nm-fig-ves`, `nm-fig-na`, `mu-fig-a` (stems reworded to
+  stand alone; `mu-fig-h` keeps its picture first), PCD `ve-dogleg`, `ve-papilla`, `co-munsell-coords`, `co-specular`,
+  and perio `q2-D14` (stem reworded; its "Diagram" chip hides too). Occlusion's 20 and the rest of PCD's and perio's ask
+  you to read the diagram, so they keep it above the stem. Same ids and answers. **Perio Project: carry `figAfter`,
+  `imgAfter` on `q2-D14` and its new stem into the split sources.**
+
 - **2026-10-14 (first anima figures: MSK Exam 4, Claude Code)** — From the first diagram review (Sam approved 2 of 16
   candidates across the live hubs; skipped: all 4 PCD Exam 3, MSK 4's melanin unit and blister split, all 4 Occlusion and
   all 4 Perio, so don't re-propose them for those exams). `hubs/msk-exam4` gets two interactive figures under the notes

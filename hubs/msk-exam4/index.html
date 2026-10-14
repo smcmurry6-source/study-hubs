@@ -890,6 +890,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .lec-fig > h4{margin:0 0 4px;font-size:1rem}
 .lec-fig > .lec-fig-cap{margin:0 0 10px;font-size:.86rem;color:var(--ink-soft)}
 .qcard-figure{margin:0 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 6px}
+.qcard-figure-after{margin:10px 0 12px}
 /* anima:css:end */
 </style>
 </head>
@@ -1636,30 +1637,30 @@ mcq('nm-ex-sux','nmj','hub','All of the following are adverse effects of succiny
   'Succinylcholine causes HYPERkalemia, plus myalgia, raised intraocular and intragastric pressure, hypersensitivity, bradycardia, and malignant hyperthermia with volatile anesthetics.');
 
 /* Picture questions on the anima figures (img = an ANIMA still: one part highlighted, labels hidden). */
-mcq('nm-fig-ache','nmj','hub','The highlighted molecules sit in the synaptic cleft and break down acetylcholine. Which drug inhibits them to reverse a rocuronium block?',
+mcq('nm-fig-ache','nmj','hub','Which drug inhibits the enzyme in the synaptic cleft that breaks down acetylcholine, and so reverses a rocuronium block?',
   ['Neostigmine','Sugammadex','Dantrolene','Succinylcholine','Tizanidine'],
-  'They are acetylcholinesterase (AChE). Neostigmine inhibits AChE, so ACh builds up and outcompetes rocuronium at the nicotinic receptors (atropine or glycopyrrolate goes first for the extra ACh\'s muscarinic effects). Sugammadex also reverses rocuronium, but by encapsulating the drug, not by acting on AChE. AChE doesn\'t break down succinylcholine; plasma pseudocholinesterase does.',
-  { img:'nmj-ache' });
-mcq('nm-fig-rec','nmj','hub','Rocuronium acts at the highlighted structures on the junctional folds. What does it do there?',
+  'The enzyme is acetylcholinesterase (AChE), highlighted in the diagram. Neostigmine inhibits AChE, so ACh builds up and outcompetes rocuronium at the nicotinic receptors (atropine or glycopyrrolate goes first for the extra ACh\'s muscarinic effects). Sugammadex also reverses rocuronium, but by encapsulating the drug, not by acting on AChE. AChE doesn\'t break down succinylcholine; plasma pseudocholinesterase does.',
+  { img:'nmj-ache', imgAfter:true });
+mcq('nm-fig-rec','nmj','hub','Unlike succinylcholine, rocuronium paralyzes without fasciculations first. What does it do at the nicotinic receptors on the junctional folds?',
   ['Blocks them, so ACh can\'t open them','Opens them and keeps the end plate depolarized','Breaks down the ACh bound to them','Cleaves the SNARE protein that docks vesicles','Holds their Na+ inactivation gates shut'],
-  'These are the postjunctional nicotinic ACh receptors. Rocuronium, vecuronium and cisatracurium are competitive antagonists: they sit on the receptors without opening them, so there are no fasciculations, just paralysis. Opening the receptors and holding the end plate depolarized is what succinylcholine does.',
-  { img:'nmj-rec' });
-mcq('nm-fig-ves','nmj','hub','Botulinum toxin acts on the highlighted structures. What happens at the junction?',
+  'The diagram highlights those postjunctional nicotinic ACh receptors. Rocuronium, vecuronium and cisatracurium are competitive antagonists: they sit on the receptors without opening them, so there are no fasciculations, just paralysis. Opening the receptors and holding the end plate depolarized is what succinylcholine does.',
+  { img:'nmj-rec', imgAfter:true });
+mcq('nm-fig-ves','nmj','hub','A patient gets botulinum toxin injected into the masseter for refractory bruxism. What happens at those neuromuscular junctions?',
   ['Vesicles can\'t fuse, so no ACh is released','ACh is released but can\'t bind its receptors','ACh is released but isn\'t broken down','The end plate stays depolarized','The Schwann cell stops covering the terminal'],
-  'The highlighted structures are the ACh vesicles, docked on the terminal membrane by SNARE proteins. Botulinum toxin A cleaves the SNARE docking protein, so the vesicles can\'t fuse and no ACh is released: the nerve still fires, but the muscle stays relaxed. ACh that is released but can\'t bind its receptors is a nondepolarizer\'s effect.',
-  { img:'nmj-ves' });
-mcq('nm-fig-na','nmj','hub','After succinylcholine, the highlighted channels beside the end plate look like this. Why can\'t they fire another action potential?',
+  'The diagram highlights the ACh vesicles, docked on the terminal membrane by SNARE proteins. Botulinum toxin A cleaves the SNARE docking protein, so the vesicles can\'t fuse and no ACh is released: the nerve still fires, but the muscle stays relaxed. ACh that is released but can\'t bind its receptors is a nondepolarizer\'s effect.',
+  { img:'nmj-ves', imgAfter:true });
+mcq('nm-fig-na','nmj','hub','After succinylcholine, why can\'t the perijunctional voltage-gated Na+ channels fire another action potential?',
   ['Lasting depolarization keeps their inactivation gates shut','Succinylcholine blocks their pores from outside the fiber','Acetylcholinesterase has cleared all the ACh from the cleft','Rocuronium given with succinylcholine occupies these channels','Calcium can no longer leave the sarcoplasmic reticulum'],
-  'These are the perijunctional voltage-gated Na+ channels; the inactivation gate is drawn as a ball plugging the pore. Succinylcholine opens the nicotinic receptors and isn\'t broken down by AChE, so the end plate stays depolarized, the Na+ channels\' inactivation gates stay shut, and after the first fasciculations the muscle goes flaccid (phase I block).',
-  { img:'nmj-na' });
+  'The diagram highlights those channels, each inactivation gate drawn as a ball plugging the pore. Succinylcholine opens the nicotinic receptors and isn\'t broken down by AChE, so the end plate stays depolarized, the Na+ channels\' inactivation gates stay shut, and after the first fasciculations the muscle goes flaccid (phase I block).',
+  { img:'nmj-na', imgAfter:true });
 mcq('mu-fig-h','muscle','hub','Which part of the sarcomere is highlighted (in the band strip and behind the filaments)?',
   ['H band','A band','I band','Z line','M line'],
   'The H band: the pale middle of the A band, where the thick filaments have no thin-filament overlap. It shortens during contraction and is gone at full contraction. The M line runs through its middle; the A band is the whole length of the thick filaments.',
   { img:'sarc-h' });
-mcq('mu-fig-a','muscle','hub','The highlighted band keeps the same length when the sarcomere contracts. What does it contain?',
+mcq('mu-fig-a','muscle','hub','One band of the sarcomere keeps the same length when the muscle contracts. What does that band contain?',
   ['The whole length of the thick filaments','Thin filaments only','Only the Z line and the actin anchored to it','Thick filaments only, with no thin-filament overlap','The terminal cisternae of the SR'],
-  'It\'s the A band: the full length of the thick (myosin) filaments, including where they overlap the thin filaments. The filaments slide rather than shorten, so the A band never changes; the I band (thin filaments only) and the H band (thick filaments only) shorten.',
-  { img:'sarc-a' });
+  'It\'s the A band (highlighted in the diagram): the full length of the thick (myosin) filaments, including where they overlap the thin filaments. The filaments slide rather than shorten, so the A band never changes; the I band (thin filaments only) and the H band (thick filaments only) shorten.',
+  { img:'sarc-a', imgAfter:true });
 
 /* =================================================================== CA MSK & SKIN: CLINICAL APPLICATION FOR DENTISTRY */
 mcq('ca-lat-pteryg','clinical','hub','Which is the only muscle of mastication associated with opening the mouth?',
@@ -2582,13 +2583,16 @@ function qCardHTML(q, opts){
   return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
-    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
+    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
 /* Patient Box rows render above the stem */
-/* picture question (q.img = an ANIMA still key): the figure with one part highlighted, labels hidden */
-function figHTML(q){ return q.img && ANIMA.has(q.img) ? '<figure class="qcard-figure" aria-label="Diagram for this question">' + ANIMA.still(q.img) + '</figure>' : ''; }
+/* picture question (q.img = an ANIMA still key): the figure with one part highlighted, labels hidden. It sits above the
+   stem only when the question needs it; with q.imgAfter it appears in the explanation, after answering, so it can't give
+   the answer away (Sam, 2026-10-14). */
+function figHTML(q){ return q.img && !q.imgAfter && ANIMA.has(q.img) ? '<figure class="qcard-figure" aria-label="Diagram for this question">' + ANIMA.still(q.img) + '</figure>' : ''; }
+function figAfterHTML(q){ return q.img && q.imgAfter && ANIMA.has(q.img) ? '<figure class="qcard-figure qcard-figure-after" aria-label="Diagram">' + ANIMA.still(q.img) + '</figure>' : ''; }
 function pboxHTML(q){
   if(!q.pbox) return '';
   return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
@@ -3386,7 +3390,7 @@ function renderMock(body){
       '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
       figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+cueHTML(q)+
+      '<div class="qcard-explain" data-role="explain">'+verdict+figAfterHTML(q)+escHtml(q.ex||'')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';

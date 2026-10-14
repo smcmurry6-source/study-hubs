@@ -41,6 +41,7 @@ const SECTION_CSS = `
 .lec-fig > h4{margin:0 0 4px;font-size:1rem}
 .lec-fig > .lec-fig-cap{margin:0 0 10px;font-size:.86rem;color:var(--ink-soft)}
 .qcard-figure{margin:0 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 6px}
+.qcard-figure-after{margin:10px 0 12px}
 `;
 
 const css = baseCss() + FIGS.map((f) => f.css).join("") + STILL_CSS + SECTION_CSS;

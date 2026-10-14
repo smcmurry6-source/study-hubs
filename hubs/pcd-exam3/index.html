@@ -640,6 +640,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 
 /* ---------- Drawn figures (questions, notes, Review) ---------- */
 .qcard-figure{margin:0 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:8px 10px}
+.qcard-figure-after{margin:10px 0 12px}
 .qcard-figure svg,.fig-card svg{display:block;width:100%;max-width:400px;height:auto;margin:0 auto}
 .fg-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
 .fg-soft{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:4 3}
@@ -1542,7 +1543,7 @@ mcq('ve-lingual-wrap','veneer','rec','Why does Dr. Fu no longer use the facial-i
 mcq('ve-dogleg','veneer','hint','In a veneer prep that preserves the proximal contact, the "dog leg" is:',
   ['The proximal finish line carried lingually under the contact','A small notch cut at the incisal edge to seat the try-in paste','A step in the facial reduction between its two planes','The groove between two cusps where an onlay margin is hidden'],
   'Preserve the contact (the patient flosses normally), but extend the finish line toward the lingual just under the contact so the junction is not visible from the front or the side.',
-  { img:'dogleg' });
+  { img:'dogleg', imgAfter:true });
 mcq('ve-open-contact','veneer','hint','When do you OPEN the proximal contact in a veneer preparation?',
   ['For diastema or space closure','For every veneer, to get good impressions','Only when the tooth is rotated','Never; contacts are always preserved'],
   'If you are not moving the contact, preserve it (dog leg). To close a space you must move the contact, so cut through it flat ("like cutting a cake") and drop the margin so the veneer can build a gradual emergence profile.');
@@ -1632,7 +1633,7 @@ mcq('ve-diastema-ratio','veneer','hint','Why are long teeth with a small space t
 mcq('ve-papilla','veneer','hint','After closing a diastema with veneers, the papilla is likely to fill the embrasure when the distance from the contact point to the bone crest is:',
   ['5 mm or less','8 mm or more','At least 10 mm','Exactly 7 mm'],
   'Contact to bone crest ≤ 5 mm: the papilla fills nearly always; 6 mm: sometimes; 7 mm or more: rarely. Veneers can move the contact apically to close a black triangle. If it is too far, tell the patient beforehand.',
-  { img:'papilla', cue:'5 or less, the papilla fills.' });
+  { img:'papilla', imgAfter:true, cue:'5 or less, the papilla fills.' });
 mcq('ve-black-triangle','veneer','rec','How did multiple veneers make a black triangle disappear in Dr. Fu\'s case?',
   ['They moved the contact apically, closer to the bone','Bone was grafted between the teeth first','The teeth were pushed together orthodontically','The veneers were made in a pink porcelain'],
   'Reshaping the proximal contours moves the contact toward the alveolar crest. Bone cannot be regenerated between teeth, so ortho (moving teeth and bone) or veneers (moving the contact) are the options.');
@@ -1692,7 +1693,7 @@ mcq('co-tooth-range','color','slides','Natural tooth shades in the Munsell syste
 mcq('co-munsell-coords','color','slides','The Munsell system and the CIE L*a*b* system differ in that:',
   ['Munsell is polar (a wheel); CIELAB is Cartesian (a box)','Munsell measures hue only; CIELAB measures value only','Munsell is used by instruments; CIELAB is only visual','They are the same system under two different names'],
   'Both build a three-dimensional color space. Munsell: a sphere/wheel of hue (around), chroma (out from the center) and value (up the pole). CIELAB: L*, a*, b* axes, which makes it easy to calculate differences.',
-  { img:'munsell' });
+  { img:'munsell', imgAfter:true });
 mcq('co-lab-axes','color','hint','In the CIE L*a*b* system, a* and b* describe:',
   ['a*: red-green; b*: yellow-blue','a*: lightness; b*: darkness','a*: hue; b*: chroma','a*: gloss; b*: translucency'],
   'L* = lightness (like value). a* = relative redness/greenness. b* = relative yellowness/blueness. Instruments measure these three numbers.');
@@ -1742,7 +1743,7 @@ mcq('co-stain-darker','color','hint','A ceramist keeps adding surface stain to a
 mcq('co-specular','color','hint','Specular reflection is responsible for:',
   ['Gloss: angle in equals angle out','The color of the crown body','Translucency at the incisal edge','Glow under a black light'],
   'Specular reflection is mirror-like and carries little color, but gives shine. Diffuse reflection scatters light in many directions and gives the object its color. A crown has both; its color comes from the diffuse part.',
-  { img:'reflect' });
+  { img:'reflect', imgAfter:true });
 mcq('co-diffuse','color','hint','The color we see on a crown comes mainly from:',
   ['Diffuse reflection','Specular reflection','Incident light','Opalescence'],
   'Color is in the diffuse reflection; gloss is in the specular reflection. Matte paints are almost all diffuse; glossy paints have both.');
@@ -2638,12 +2639,14 @@ function qCardHTML(q, opts){
   return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
-    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
+    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
-/* drawn figure (q.img = a FIGS key) renders above the Patient Box and stem */
-function figHTML(q){ var f = q.img && FIGS[q.img]; return f ? '<figure class="qcard-figure" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
+/* drawn figure (q.img = a FIGS key) renders above the Patient Box and stem when the question needs it; with q.imgAfter it
+   appears in the explanation, after answering, so it can't give the answer away (Sam, 2026-10-14) */
+function figHTML(q){ var f = q.img && !q.imgAfter && FIGS[q.img]; return f ? '<figure class="qcard-figure" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
+function figAfterHTML(q){ var f = q.img && q.imgAfter && FIGS[q.img]; return f ? '<figure class="qcard-figure qcard-figure-after" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
 function figCardHTML(key){ var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p></figure>' : ''; }
 /* Patient Box rows render above the stem */
 function pboxHTML(q){
@@ -3087,7 +3090,7 @@ function renderMock(body){
       '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
       figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+cueHTML(q)+
+      '<div class="qcard-explain" data-role="explain">'+verdict+figAfterHTML(q)+escHtml(q.ex||'')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';

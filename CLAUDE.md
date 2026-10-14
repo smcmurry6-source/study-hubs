@@ -133,6 +133,11 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   palette; `build.mjs` rewrites the hub's `anima:css`/`anima:js` blocks, `--preview` writes standalone pages for anima's
   checks, `--check` fails if the blocks are stale). As root, anima's Chrome scripts need a `--no-sandbox` wrapper as `CHROME_PATH`.
 - Under a lecture's notes, figures go outside `.reading-prose` (the narrated text), so the narration doesn't drift.
+- **Picture questions never give the answer away** (Sam's standing rule, 2026-10-14). The diagram sits above the stem only
+  when the question can't be answered without it (name the highlighted part, read arrow B, which suture is shown).
+  Otherwise write a stem that stands on its own and set `imgAfter:true`: the diagram then opens with the explanation,
+  after answering (`figAfterHTML` in `msk-exam4`/`pcd-exam3`, `figAfter` in `perio`). Also check that a diagram shown
+  first doesn't draw or label the answer.
 - Draw from the hub's own lecture notes: labels and numbers match what was taught, and the caption names the lecture.
   Anything beyond the lecture needs an authoritative source (anima's sourcing rule).
 - Run anima's own checks, look at it at 390 px wide and in both themes, and give Sam the screenshots in the PR:
