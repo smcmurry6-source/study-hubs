@@ -102,6 +102,20 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (Timmy Time podcast, Claude Code)** — A last-minute audio review episode for MSK Exam 4, hosted by Timmy
+  Tooth: `hubs/msk-exam4/audio/timmy-time.mp3` (~42 min, 96 kbps stereo, -16 LUFS), built by the new `tools/podcast/`
+  (script `tools/podcast/msk-exam4/script.md`, written from the hub's notes and exam hints; Kokoro voice
+  `am_michael:0.6,am_onyx:0.4` with `lexicon.json` for ~100 drug/anatomy words espeak mispronounces; synthesized lo-fi
+  music, stingers, a bell on each lightning-round answer, ducking and mastering in `produce.py`; see its README). Player:
+  new shared `widget/podcast.js` (loaded by v3.js when the hub defines `window.SH_PODCAST`): an episode card in any
+  `[data-sh-podcast]` slot (MSK 4: top of Compendium), one `<audio>` on `<body>` so playback survives tab/mode switches,
+  a pinned player when no card is on screen, chapters, 1-2× speed, ±15/30 s, resume (`sh_pod_pos:<hub>:<id>`, speed
+  `sh_pod_rate`), Media Session lock-screen controls, preload none. `#timmy` opens the hub on Compendium at the card; the
+  widget menu gains a Timmy Time item; the dashboard's MSK 4 card gets a Timmy Time row and the hero a button (`hub.podcast`).
+  Listening counts as study time (idle rule) and logs as `podcast/<id>`. A lecture's Listen pauses the episode.
+  About page, CI syntax check, `sw.js` -> `sh-v20` (the mp3 is never cached). **When the notes change, fix the script and
+  rebuild the episode in the same PR.** No schema change.
+
 - **2026-10-15 (Listen dock + highlighter, Claude Code)** — Two student suggestions, built at Sam's request.
   **Listen dock** (#4): `shTTS` in `widget/v3.js` now remembers the current narration (`cur`) and, while it plays or is
   paused and the lecture's Listen row and player are out of view (IntersectionObserver), shows `.sh-tts-dock` pinned to the

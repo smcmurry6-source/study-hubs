@@ -2724,7 +2724,8 @@ function renderCompendium(){
   var sub = STATE.ui.sub;
   var left = QUESTIONS.filter(function(q){ return !STATE.seen[q.id]; }).length, cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   /* one-tap start (LESSONS.md: 26-40% of visitors leave within 5 minutes; get them to a question or the notes in one tap) */
-  var h = '<div class="quick-start" aria-label="Start studying">' +
+  /* Timmy Time episode card (widget/podcast.js fills this in) */
+  var h = '<div data-sh-podcast></div><div class="quick-start" aria-label="Start studying">' +
     '<button type="button" class="qs-btn primary" data-qs="bank"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-qs="notes"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>'+lecLabel(cont)+' '+escHtml(cont.title)+'</small></span></button></div>';
@@ -4659,6 +4660,7 @@ function boot(){
   document.querySelectorAll('#modeSwitch [data-mode]').forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
   renderHeaderStats();
   var m = STATE.ui.mode; if(['compendium','review','arcade'].indexOf(m) === -1) m = 'compendium';
+  if(location.hash === '#timmy') m = 'compendium'; /* the dashboard's Timmy Time link: the episode card is on Compendium */
   setMode(m);
 }
 /* Section label for the shared widget's per-section time tracking (adds the arcade game). */
@@ -4745,6 +4747,23 @@ window.SH_DRILL = {
     return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
   },
   render: function(el, qid){ var q = QUESTIONS_BY_ID[qid]; if(!q) return false; el.innerHTML = qCardHTML(q, { ctx:'drill' }); wireQuestionContainer(el); return true; }
+};
+
+/* Timmy Time (widget/podcast.js): the last-minute review episode. Script, voice and music are built by
+   tools/podcast/ (source: tools/podcast/msk-exam4/script.md); rebuild the mp3 when the script changes. */
+window.SH_PODCAST = {
+  id:'exam4-review', show:'Timmy Time', title:'MSK Exam 4: the last-minute review', src:'audio/timmy-time.mp3', duration:2498.1,
+  blurb:'42 min with Timmy Tooth: all five lectures, what the professors said to know, and a lightning round to finish.',
+  chapters:[
+    { t:0.0, title:'Cold open' },
+    { t:75.85, title:'Skin histology' },
+    { t:568.02, title:'Dermatology pharmacology' },
+    { t:901.29, title:'Dermatopathology' },
+    { t:1338.3, title:'Skeletal muscle' },
+    { t:1870.82, title:'Neuromuscular junction pharmacology' },
+    { t:2215.44, title:'Lightning round' },
+    { t:2449.09, title:'Sign-off' }
+  ]
 };
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
