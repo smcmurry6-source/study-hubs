@@ -553,6 +553,8 @@ table.data tr.group:hover td{background:none;}
           Object.keys(counts).forEach(function(k){ if (keys.indexOf(String(k)) < 0) keys.push(String(k)); });
           var max = Math.max.apply(null, keys.map(function(k){ return counts[k] || 0; }).concat([0]));
           body += keys.map(function(k){ return '<div class="sv-ans"><span>' + esc(k) + '</span><span style="flex:1;max-width:50%">' + bar(counts[k] || 0, max, false, (counts[k] || 0) + " votes") + '</span><b>' + (counts[k] || 0) + '</b></div>'; }).join("");
+          var others = ans.map(function(a){ return a && a[id + "_other"]; }).filter(Boolean);
+          if (others.length) body += '<p class="note">“Other” answers:</p>' + others.slice(0, 60).map(function(v){ return '<div class="sv-text">' + esc(v) + '</div>'; }).join("");
           if (q.kind === "scale" && vals.length) body += '<p class="note">Average ' + (vals.reduce(function(s, v){ return s + Number(v); }, 0) / vals.length).toFixed(1) + ' / 5</p>';
         }
       });
@@ -562,7 +564,7 @@ table.data tr.group:hover td{background:none;}
     });
     var qRow = function(n){ return '<div class="sv-q"><input class="sv-prompt" placeholder="Question ' + n + (n > 1 ? ' (optional)' : '') + '"><select class="sv-kind"><option value="choice">Pick one</option><option value="multi">Pick any</option><option value="scale">1–5 scale</option><option value="text">Written answer</option></select><input class="sv-opts" placeholder="Options, comma-separated (for pick one / pick any)"></div>'; };
     out += card("New survey", "Shows once to each person on the dashboard, bottom corner; answering or “No thanks” both hide it for good. Only one survey is live at a time.",
-      '<form class="sv-form" id="svForm"><input id="svTitle" placeholder="Title, e.g. “Help shape the hubs”" required maxlength="80">' + qRow(1) + qRow(2) + qRow(3) +
+      '<form class="sv-form" id="svForm"><input id="svTitle" placeholder="Title, e.g. “Help shape the hubs”" required maxlength="80">' + qRow(1) + qRow(2) + qRow(3) + qRow(4) + qRow(5) +
       '<div class="row"><label class="switch"><input type="checkbox" id="svLive" checked> Go live now</label><button class="icon-btn" type="submit">Publish survey</button><span id="svMsg" class="note" style="margin:0"></span></div></form>');
     if (!list.length) out = card("Surveys", "", '<div class="empty">No surveys yet. Publish one below, or ask a Claude session to write one.</div>') + out;
     el.innerHTML = renderDebriefs() + renderSearches() + out;

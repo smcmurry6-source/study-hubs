@@ -437,6 +437,7 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .survey-opt[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--on-ink);}
 .survey-scale .survey-opt{min-width:40px; text-align:center;}
 .survey-scale-ends{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-3); margin-top:4px;}
+.survey-other{margin-top:8px;}
 .survey textarea{width:100%; min-height:64px; font:inherit; font-size:14px; padding:8px 10px; border-radius:10px; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); resize:vertical;}
 .survey-foot{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;
   /* Send and Not now stay in view even when the card has to scroll */
@@ -1486,7 +1487,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){
       var sv = res && res.data && res.data[0];
       if (!sv || ls("sh_survey_done_" + sv.id)) return;
-      var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 3) : [];
+      var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
       if (!qs.length) return;
       var answers = {};
       var box = document.createElement("section");
@@ -1502,7 +1503,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + n + '">' + n + '</button>';
           h += '</div><div class="survey-scale-ends"><span>' + esc((q.ends && q.ends[0]) || "Not at all") + '</span><span>' + esc((q.ends && q.ends[1]) || "Very") + '</span></div>';
         } else {
-          h += '<div class="survey-opts">' + (q.options || []).map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+          h += '<div class="survey-opts">' + (q.options || []).map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="false" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") +
+            (q.other ? '<button type="button" class="survey-opt" aria-pressed="false" data-sv="Other" data-other>Other</button>' : '') + '</div>';
+          // "other": true adds an Other option whose text box opens when it is picked (saved as <id>_other)
+          if (q.other) h += '<textarea class="survey-other" maxlength="300" hidden aria-label="Other: type your answer" placeholder="Type your answer"></textarea>';
         }
         h += '</div>';
       });
@@ -1512,7 +1516,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       requestAnimationFrame(function(){ box.classList.add("is-shown"); });
       var send = box.querySelector(".survey-send");
       function refresh(){
-        box.querySelectorAll("textarea").forEach(function(t){ var id = t.closest(".survey-q").getAttribute("data-sq"); var v = t.value.trim(); if (v) answers[id] = v.slice(0, 600); else delete answers[id]; });
+        box.querySelectorAll("textarea").forEach(function(t){
+          var id = t.closest(".survey-q").getAttribute("data-sq"), other = t.classList.contains("survey-other");
+          if (other) id += "_other";
+          var v = other && t.hidden ? "" : t.value.trim();
+          if (v) answers[id] = v.slice(0, other ? 300 : 600); else delete answers[id];
+        });
         send.disabled = !Object.keys(answers).length;
       }
       function done(payload, thanks){
@@ -1530,6 +1539,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           var on = opt.getAttribute("aria-pressed") !== "true";
           if (!multi) q.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
           opt.setAttribute("aria-pressed", String(on));
+          var otherBox = q.querySelector(".survey-other");
+          if (otherBox){
+            otherBox.hidden = !q.querySelector('.survey-opt[data-other][aria-pressed="true"]');
+            if (!otherBox.hidden && opt.hasAttribute("data-other")) otherBox.focus();
+          }
           var picked = Array.prototype.map.call(q.querySelectorAll('.survey-opt[aria-pressed="true"]'), function(b){ return b.getAttribute("data-sv"); });
           if (!picked.length) delete answers[id];
           else answers[id] = multi ? picked : (q.getAttribute("data-kind") === "scale" ? +picked[0] : picked[0]);
