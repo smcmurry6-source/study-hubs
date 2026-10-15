@@ -266,6 +266,7 @@
 
     function setState(btn, state){
       if (!btn) return;
+      setTimeout(dockSync, 0);
       btn.setAttribute("data-state", state);
       btn.setAttribute("aria-label", state === "playing" ? "Pause reading" : (state === "paused" ? "Resume reading" : "Listen to this"));
     }
@@ -281,6 +282,7 @@
       if (activeBtn) setState(activeBtn, "idle");
       clearHighlight();
       activeBtn = null; activeWords = null; wordCursor = -1;
+      dockSync();
     }
 
     // Wrap each word of a container's text in its own span so it can be
@@ -332,10 +334,11 @@
         clearHighlight();
         var w = words[wordCursor];
         if (w) w.el.classList.add("sh-tts-active");
+        dockProgress(words.length ? (wordCursor + 1) / words.length : 0, "");
       };
       u.onend = function(){
         if (handledError) return;
-        if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; clearHighlight(); }
+        if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; clearHighlight(); dockSync(); }
       };
       // Some cloud-backed voices ("Online"/"Natural") can silently fail if
       // their network call doesn't go through. Rather than going dead with
@@ -422,6 +425,7 @@
       });
       audio.addEventListener("timeupdate", function(){
         paint();
+        if (activeAudioEl === audio && audio.duration) dockProgress(audio.currentTime / audio.duration, fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration));
         var now = Date.now(); if (now - lastSave > 4000) { lastSave = now; savePos(audioUrl, audio.currentTime); }
       });
       audio.addEventListener("pause", function(){ savePos(audioUrl, audio.currentTime); if (activeAudioEl === audio && activeBtn === btn) setState(btn, "paused"); });
@@ -434,6 +438,7 @@
         savePos(audioUrl, 0);
         if (activeAudioEl === audio) activeAudioEl = null;
         if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; }
+        dockSync();
       });
       audio.addEventListener("error", function(){
         if (activeAudioEl === audio) activeAudioEl = null;
@@ -466,6 +471,78 @@
         });
       }
     }
+
+    /* Floating Listen dock (student suggestion #4, 2026-10-15): while a lecture is being read aloud and its own Listen
+       button and player have scrolled out of view, a small bar pinned to the bottom of the screen keeps play/pause, the
+       progress (seekable for narration files), the time and a stop button in reach. Tapping the title scrolls back. */
+    var cur = null, dock = null, anchorSeen = true, io = null, ioTarget = null;
+    function dockEl(){
+      if (dock) return dock;
+      dock = document.createElement("div");
+      dock.className = "sh-tts-dock"; dock.hidden = true;
+      dock.setAttribute("role", "region"); dock.setAttribute("aria-label", "Narration controls");
+      dock.innerHTML =
+        '<button type="button" class="sh-tts-dock-play" aria-label="Pause reading"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/><path class="i-play" d="M8 5.5v13l10.5-6.5z"/></svg></button>' +
+        '<div class="sh-tts-dock-mid"><button type="button" class="sh-tts-dock-title" title="Back to the notes"></button>' +
+        '<input type="range" class="sh-tts-dock-seek" min="0" max="1000" value="0" step="1" aria-label="Position in the narration"></div>' +
+        '<span class="sh-tts-dock-time"></span>' +
+        '<button type="button" class="sh-tts-dock-close" aria-label="Stop reading">&times;</button>';
+      dock.querySelector(".sh-tts-dock-play").onclick = function(){ if (cur && activeBtn) speak(cur.container, cur.btn, cur.url); };
+      dock.querySelector(".sh-tts-dock-close").onclick = function(){ stop(); };
+      dock.querySelector(".sh-tts-dock-title").onclick = function(){
+        var t = cur && cur.btn && cur.btn.isConnected ? cur.btn : null;
+        if (t) try { t.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) { t.scrollIntoView(); }
+      };
+      var seek = dock.querySelector(".sh-tts-dock-seek");
+      seek.onchange = function(){
+        var a = activeAudioEl;
+        if (a && a.duration) a.currentTime = seek.value / 1000 * a.duration;
+      };
+      seek.oninput = function(){ dock.__drag = true; };
+      seek.addEventListener("change", function(){ dock.__drag = false; });
+      document.body.appendChild(dock);
+      return dock;
+    }
+    function dockProgress(frac, label){
+      if (!dock || dock.hidden) return;
+      var seek = dock.querySelector(".sh-tts-dock-seek");
+      if (!dock.__drag) seek.value = String(Math.round(Math.max(0, Math.min(1, frac)) * 1000));
+      dock.querySelector(".sh-tts-dock-time").textContent = label || "";
+    }
+    function watchAnchor(btn){
+      var target = btn ? (btn.closest(".reading-tools, .sh-tts-row") || btn) : null;
+      if (target === ioTarget) return;
+      if (io) { try { io.disconnect(); } catch (e) {} }
+      ioTarget = target; anchorSeen = true;
+      if (!target || typeof IntersectionObserver === "undefined") return;
+      io = new IntersectionObserver(function(entries){
+        anchorSeen = entries.some(function(e){ return e.isIntersecting; });
+        dockSync();
+      });
+      io.observe(target);
+      if (btn.__shPlayer) io.observe(btn.__shPlayer);
+    }
+    function dockSync(){
+      if (typeof document === "undefined" || !document.body) return;
+      var on = !!(activeBtn && cur && cur.btn === activeBtn);
+      if (on) watchAnchor(activeBtn);
+      var gone = on && !activeBtn.isConnected;
+      var show = on && (!anchorSeen || gone);
+      if (!show) { if (dock) dock.hidden = true; return; }
+      var d = dockEl();
+      var playing = activeBtn.getAttribute("data-state") === "playing";
+      d.setAttribute("data-state", playing ? "playing" : "paused");
+      d.querySelector(".sh-tts-dock-play").setAttribute("aria-label", playing ? "Pause reading" : "Resume reading");
+      var head = cur.container && cur.container.closest ? cur.container.closest("article, section, .reading, .notes") : null;
+      var h = head && head.querySelector("h1, h2, h3");
+      var title = "";
+      if (h) { var hc = h.cloneNode(true); Array.prototype.forEach.call(hc.querySelectorAll("[class*=badge],[class*=chip],[class*=pill],[class*=status],[class*=tag]"), function(x){ x.remove(); }); title = hc.textContent.replace(/\s+/g, " ").trim(); }
+      d.querySelector(".sh-tts-dock-title").textContent = title || "Lecture notes";
+      var seek = d.querySelector(".sh-tts-dock-seek");
+      seek.disabled = !activeAudioEl;
+      if (activeAudioEl && activeAudioEl.duration) dockProgress(activeAudioEl.currentTime / activeAudioEl.duration, fmtTime(activeAudioEl.currentTime) + " / " + fmtTime(activeAudioEl.duration));
+      d.hidden = false;
+    }
     function prefGetSafe(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
 
     // Public entry point. audioUrl is optional — pass it when a hub has a
@@ -474,6 +551,7 @@
     // voice, unchanged from before.
     function speak(container, btn, audioUrl){
       if (!container) return;
+      cur = { container: container, btn: btn, url: audioUrl || "" };
       if (activeBtn === btn) {
         if (activeAudioEl) {
           if (activeAudioEl.paused) { activeAudioEl.play(); setState(btn, "playing"); }
@@ -2244,6 +2322,13 @@
     fxScript.src = new URL("fx.js", thisScript.src).href; fxScript.async = true;
     fxScript.onload = function(){ if (window.shFx) window.shFx.mount(window.shEggHooks); };
     document.head.appendChild(fxScript);
+  }
+  /* highlighter (widget/highlight.js): select text in the lecture notes to highlight it, saved on this device */
+  if (!EXPORT_ONLY) {
+    var hlScript = document.createElement("script");
+    hlScript.src = new URL("highlight.js", thisScript.src).href; hlScript.async = true;
+    hlScript.onload = function(){ if (window.shHighlight) window.shHighlight.mount(HUB); };
+    document.head.appendChild(hlScript);
   }
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {

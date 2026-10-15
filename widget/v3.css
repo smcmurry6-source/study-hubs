@@ -835,3 +835,34 @@ html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}
 .pill.countdown.sh-cd-day{font-weight:800;}
 @keyframes sh-cd-glow{0%, 100%{box-shadow:0 0 0 0 transparent;} 50%{box-shadow:0 0 0 3px color-mix(in srgb, var(--accent, #2F6FD6) 20%, transparent), 0 0 14px color-mix(in srgb, var(--accent, #2F6FD6) 40%, transparent);}}
 @keyframes sh-cd-pulse{0%, 100%{transform:scale(1); box-shadow:0 0 0 0 color-mix(in srgb, var(--accent, #2F6FD6) 45%, transparent);} 50%{transform:scale(1.07); box-shadow:0 0 0 6px transparent, 0 0 18px color-mix(in srgb, var(--accent, #2F6FD6) 45%, transparent);}}
+
+/* ================= Floating Listen dock (shTTS in v3.js): shown while narration runs and its player is off screen ================= */
+.sh-tts-dock{position:fixed; z-index:9990; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px)); width:min(560px, calc(100% - 24px)); box-sizing:border-box;
+  display:flex; align-items:center; gap:10px; padding:8px 10px 8px 8px; border-radius:16px; border:1px solid var(--line-strong, rgba(0,0,0,.16));
+  background:var(--surface, #fff); color:var(--ink, #222); box-shadow:0 10px 30px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08); font-family:var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);}
+.sh-tts-dock[hidden]{display:none;}
+.sh-tts-dock-play{flex:none; width:40px; height:40px; border-radius:50%; border:0; display:grid; place-items:center; cursor:pointer; background:#3ecf7e; color:#0b1a12;}
+.sh-tts-dock[data-state="paused"] .sh-tts-dock-play{background:#e8c15a; color:#231a04;}
+.sh-tts-dock-play svg{width:18px; height:18px; fill:currentColor;}
+.sh-tts-dock .i-play{display:none;} .sh-tts-dock[data-state="paused"] .i-play{display:inline;} .sh-tts-dock[data-state="paused"] .i-pause{display:none;}
+.sh-tts-dock-mid{flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;}
+.sh-tts-dock-title{appearance:none; border:0; background:none; padding:0; text-align:left; color:inherit; font:600 12.5px/1.25 inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;}
+.sh-tts-dock-title:hover{text-decoration:underline;}
+.sh-tts-dock-seek{width:100%; margin:0; accent-color:var(--accent, #2F6FD6);}
+.sh-tts-dock-seek:disabled{opacity:.7;}
+.sh-tts-dock-time{flex:none; font:500 11.5px/1 var(--font-mono, monospace); color:var(--ink-soft, #555); font-variant-numeric:tabular-nums;}
+.sh-tts-dock-close{flex:none; width:30px; height:30px; border-radius:50%; border:1px solid var(--line, rgba(0,0,0,.12)); background:transparent; color:inherit; font-size:18px; line-height:1; cursor:pointer;}
+@media (max-width:760px){
+  .sh-tts-dock{bottom:calc(var(--sh-tabbar-h) + 10px + env(safe-area-inset-bottom,0px));}
+  .sh-tts-dock-time{display:none;}
+}
+
+/* ================= Highlighter (widget/highlight.js) ================= */
+mark.sh-hl{background:rgba(255,212,0,.45); color:inherit; border-radius:2px; padding:0; -webkit-box-decoration-break:clone; box-decoration-break:clone; cursor:pointer;}
+[data-theme="dark"] mark.sh-hl{background:rgba(255,205,40,.30);}
+.sh-hl-pop{position:fixed; z-index:10005; display:flex; gap:6px; padding:5px; border-radius:12px; border:1px solid var(--line-strong, rgba(0,0,0,.16));
+  background:var(--surface, #fff); box-shadow:0 8px 24px rgba(0,0,0,.18); font-family:var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);}
+.sh-hl-pop[hidden]{display:none;}
+.sh-hl-btn{appearance:none; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:8px; padding:8px 12px; font:600 13px/1 inherit; cursor:pointer; background:var(--ink, #222); color:var(--surface, #fff);}
+.sh-hl-btn.sh-hl-quiet{background:transparent; color:var(--ink, #222); border:1px solid var(--line, rgba(0,0,0,.14));}
+.sh-hl-swatch{width:12px; height:12px; border-radius:3px; background:#ffd400;}
