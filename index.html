@@ -749,7 +749,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"msk-exam4", cls:"gi", title:"Musculoskeletal Exam 4 Hub", code:"GI & MSK · Exam 4",
       exams:[ { name:"Musculoskeletal Exam 4", label:"Exam", date:"2026-10-16" } ], updated:"2026-10-08",
       desc:"Skin histology, dermatological pharmacology, dermatopathology, skeletal muscle, and neuromuscular junction drugs. Notes in two reading levels, Patient Box and two-statement questions, exam hints from the recordings, a timed mock exam, review tables and the Skin Deep Arcade.",
-      modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade"], stateKey:"msk4-state-v1" },
+      modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Timmy Time"], stateKey:"msk4-state-v1",
+      podcast:{ name:"Timmy Time", sub:"The last-minute review, 42 min" } },
     { id:"pcd-exam3", cls:"fixedpros", title:"PCD Fixed Pros Exam 3 Hub", code:"PCD Fixed Pros · Exam 3",
       exams:[ { name:"PCD Fixed Pros didactic Exam 3", label:"Exam", date:"2026-10-15", checkinHour:20 } ], updated:"2026-10-08",
       desc:"Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
@@ -838,6 +839,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   function ringVars(r){ return "--ring:var(--c-"+r+");--ring-ink:var(--c-"+r+");--ring-soft:var(--c-"+r+"-soft);"; }
   function hourLabel(h){ return h === 0 ? "12 am" : h < 12 ? h + " am" : h === 12 ? "12 pm" : (h - 12) + " pm"; }
   var ICON = {
+    headphones:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.6"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.6"/></svg>',
     clover:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 11c-1.5-3-5.5-3.5-5.5-.5S10 13 12 11zM12 11c3-1.5 3.5-5.5.5-5.5S10 9 12 11zM12 11c1.5 3 5.5 3.5 5.5.5S14 9 12 11zM12 11c-3 1.5-3.5 5.5-.5 5.5S14 13 12 11z"/><path d="M12 11c0 4 1 7 3 10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>',
     arrow:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>',
     cal:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg>',
@@ -997,6 +999,19 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<span class="drill-go">' + go + ICON.arrow + '</span></a>';
   }
 
+  /* Timmy Time (widget/podcast.js): a hub's audio review episode. hub.podcast = { name, sub }; the link opens the
+     hub at #timmy, which scrolls to the episode card. */
+  function podRowHTML(hub){
+    if (!hub.podcast) return "";
+    return '<a class="drill-row pod-row" href="hubs/' + hub.id + '/#timmy" data-hub="' + hub.id + '" data-pod="dash">' +
+      '<span class="drill-ic">' + ICON.headphones + '</span>' +
+      '<span class="drill-txt"><b>' + esc(hub.podcast.name) + '</b><span>' + esc(hub.podcast.sub) + '</span></span>' +
+      '<span class="drill-go">Listen' + ICON.arrow + '</span></a>';
+  }
+  function heroPod(hub){
+    return hub.podcast ? '<a class="btn btn-quiet hero-drill hero-pod" href="hubs/' + hub.id + '/#timmy" data-hub="' + hub.id + '" data-pod="hero">' + ICON.headphones + esc(hub.podcast.name) + '</a>' : '';
+  }
+
   /* ====================================================================
      HERO — the next exam with a date, else the hub you last opened
      ==================================================================== */
@@ -1104,7 +1119,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         '<div class="hero-title">' + esc((d === 0 ? "" : "until ") + first.exam.name) + '</div>' +
         '<div class="hero-date">' + esc(longDate(first.exam.date)) + '</div>' +
         '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
-        (p ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' + heroDrill(hub) +
+        (p ? "Continue studying" : "Start studying") + ICON.arrow + '</a>' + heroDrill(hub) + heroPod(hub) +
         (opened ? '<span class="hero-note">You last opened it ' + esc(opened) + '</span>' : '') + '</div>' +
         (luckTime(d) ? '<div class="hero-luck" id="heroLuck"></div>' : '') +
         (also.length ? '<ul class="hero-also">' + also.map(function(x){
@@ -1117,7 +1132,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         '<div class="hero-title">' + esc(hub.title) + '</div>' +
         '<div class="hero-date">' + esc(opened ? "You last opened this " + opened : "No exams scheduled right now") + '</div>' +
         '<div class="hero-actions"><a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">' +
-        (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a>' + heroDrill(hub) + '</div>';
+        (p ? "Continue studying" : "Open hub") + ICON.arrow + '</a>' + heroDrill(hub) + heroPod(hub) + '</div>';
     }
     $("heroMain").innerHTML = html;
     if (first) heroFlap(first);
@@ -1176,6 +1191,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       (p ? '<div class="mine">You\'ve tried <b>' + p.seen + '</b> ' + (p.seen === 1 ? "question" : "questions") + ', <b>' + p.pct + '%</b> ' + esc(p.pctLabel) + '<div class="meter" aria-hidden="true"><i data-w="' + p.pct + '"></i></div></div>'
          : '<div class="mine">Not started on this device yet.</div>') +
       drillRowHTML(hub) +
+      podRowHTML(hub) +
       checkinButtonsHTML(hub) +
       '<div class="hub-foot"><span class="updated" data-updated="' + hub.updated + '" data-hub="' + hub.id + '">Updated ' + esc(relDay(parseYmd(hub.updated))) + '</span>' +
       '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">Open' + ICON.arrow + '</a></div>' +
@@ -1247,7 +1263,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (!e.persisted) return;
     HUBS.forEach(function(h){
       document.querySelectorAll('.drill-row[data-hub="' + h.id + '"]').forEach(function(a){ a.outerHTML = drillRowHTML(h); });
-      document.querySelectorAll('.hero-drill[data-hub="' + h.id + '"]').forEach(function(a){ a.outerHTML = heroDrill(h); });
+      document.querySelectorAll('.hero-drill:not(.hero-pod)[data-hub="' + h.id + '"]').forEach(function(a){ a.outerHTML = heroDrill(h); });
     });
   });
 

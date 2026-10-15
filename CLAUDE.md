@@ -16,7 +16,7 @@ does it differently.
   arrays near the top of the script; add or archive a hub there, not in markup.
 - `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades) — shared cross-hub layer (search, class stats,
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics, `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
@@ -25,6 +25,10 @@ does it differently.
   the hub page comes down, while `tools/dump-banks.js` can still read its bank.
   **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
   2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
+- `tools/podcast/` — Timmy Time, a hub's audio review episode hosted by Timmy Tooth: the script (`<hub>/script.md`),
+  Kokoro voice with a pronunciation lexicon, synthesized music and mastering (its `README.md`). The mp3 goes in
+  `hubs/<hub-id>/audio/timmy-time.mp3`; the hub defines `window.SH_PODCAST` and a `<div data-sh-podcast>` slot.
+  Like narration, the episode must not drift from the notes: fix both in the same PR.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
   hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
   runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in
@@ -77,7 +81,7 @@ in more than 40% of MCQs). Run both locally before pushing; the smoke test needs
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
 
-- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/rankup.js` / `widget/drill.js` / `widget/fx.js`.
+- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/rankup.js` / `widget/drill.js` / `widget/fx.js` / `widget/podcast.js`.
 - Question / lecture counts match what you expect; no duplicate ids.
 - Grep that the feature you added (and anything from a merged-in branch) is present.
 - Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —

@@ -1145,6 +1145,7 @@
   function currentSection(){
     try {
       if (window.shDrill && window.shDrill.isOpen()) return "drill/daily";
+      if (window.shPodcast && window.shPodcast.playing()) return "podcast/" + window.shPodcast.id();
       if (typeof window.SH_SECTION === "function") {
         var custom = window.SH_SECTION();
         if (custom) return String(custom).slice(0, 80);
@@ -1168,7 +1169,7 @@
      worth is rounded up so short stints aren't systematically dropped. */
   var TICK_MS = 1000;
   /* Idle rule: after 15 minutes with no input (tap, click, key, scroll) time stops counting until
-     the next input, unless a lecture is playing in Listen. A visible tab left open on a desk
+     the next input, unless a lecture is playing in Listen or a Timmy Time episode is playing. A visible tab left open on a desk
      used to count as study time for as long as it sat there. */
   var IDLE_MS = 15 * 60 * 1000;
   var lastInput = Date.now();
@@ -1178,6 +1179,7 @@
   function isIdle(now){
     if (now - lastInput < IDLE_MS) return false;
     try { if (window.shTTS && window.shTTS.listening && window.shTTS.listening()) { lastInput = now; return false; } } catch (e) {}
+    try { if (window.shPodcast && window.shPodcast.playing()) { lastInput = now; return false; } } catch (e) {}
     return true;
   }
   var sectionBank = {};
@@ -1654,6 +1656,7 @@
   /* the site's mark: the four class ring bands, as on the dashboard wordmark */
   var ICON_MARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="3" height="14" rx="1.5" fill="#C28A2E"/><rect x="8.6" y="5" width="3" height="14" rx="1.5" fill="#C85A7C"/><rect x="13.2" y="5" width="3" height="14" rx="1.5" fill="#2E8A80"/><rect x="17.8" y="5" width="3" height="14" rx="1.5" fill="#C06544"/></svg>';
   var ICON_BOLT = shIcon('<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>');
+  var ICON_HEADPHONES = shIcon('<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.6"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.6"/>');
   var ICON_FLAME = shIcon('<path d="M12 21c3.6 0 6-2.4 6-5.6 0-3.4-2.4-5.3-3.4-8.4-.4 1.9-1.4 3.1-2.6 3.7.2-2.7-.9-5.3-3.2-6.7.3 3.1-2.8 5.4-2.8 9.3C6 18.6 8.4 21 12 21z"/>');
 
   var backdrop = document.createElement("div");
@@ -1752,6 +1755,7 @@
       '<button class="shstat-pill shm-more" id="shstat-more-pill" type="button" aria-expanded="false"><span class="shstat-pill-icon">' + ICON_MORE + '</span><span class="shstat-pill-label">More</span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
       '<div class="shm-group">' +
         '<div class="shm-live" id="shstat-online-pill"><span class="shstat-dot"></span><span><b id="shstat-online-n">1</b> studying now</span></div>' +
+        '<button class="shstat-pill" id="shstat-podcast-pill" type="button" data-sh-podcast-open hidden><span class="shstat-pill-icon">' + ICON_HEADPHONES + '</span><span class="shstat-pill-label">Timmy Time</span></button>' +
         '<button class="shstat-pill" id="shstat-inbox-pill" type="button" data-sh-inbox><span class="shstat-pill-icon">' + ICON_INBOX + '</span><span class="shstat-pill-label">Inbox</span><span class="shd-badge sh-inbox-badge" hidden></span></button>' +
         '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label">Settings</span></button>' +
         '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label">Suggest something</span></button>' +
@@ -2329,6 +2333,13 @@
     hlScript.src = new URL("highlight.js", thisScript.src).href; hlScript.async = true;
     hlScript.onload = function(){ if (window.shHighlight) window.shHighlight.mount(HUB); };
     document.head.appendChild(hlScript);
+  }
+  /* Timmy Time (widget/podcast.js): a hub's audio review episode, if the hub defines window.SH_PODCAST */
+  if (!EXPORT_ONLY && window.SH_PODCAST) {
+    var podScript = document.createElement("script");
+    podScript.src = new URL("podcast.js", thisScript.src).href; podScript.async = true;
+    podScript.onload = function(){ if (window.shPodcast) window.shPodcast.mount(HUB); };
+    document.head.appendChild(podScript);
   }
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {
