@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (surveys: 5 questions + Other, Claude Code, #120)** — `migration_v35.sql` (**applied via the connector**):
+  `admin_upsert_survey` takes 1-5 questions (was 3); the dashboard card shows up to 5. A pick-one / pick-any question with
+  `"other": true` gets an **Other** button that opens a text box, saved as `answers["<id>_other"]` (300 chars); `review/` →
+  Surveys lists those answers and its form has 5 rows. Survey 3, "Help shape the hubs, round 2" (question formats incl.
+  Quizlet/Anki, routine on the hub, guided tutorial yes/no, what's annoying, what to do about the games), is live and
+  replaced survey 2. About page updated.
+
 - **2026-10-15 (Timmy Time podcast, Claude Code)** — A last-minute audio review episode for MSK Exam 4, hosted by Timmy
   Tooth: `hubs/msk-exam4/audio/timmy-time.mp3` (~42 min, 96 kbps stereo, -16 LUFS), built by the new `tools/podcast/`
   (script `tools/podcast/msk-exam4/script.md`, written from the hub's notes and exam hints; Kokoro voice
