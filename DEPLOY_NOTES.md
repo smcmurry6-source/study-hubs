@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (surveys: 5 questions + Other, Claude Code, #120)** — `migration_v35.sql` (**applied via the connector**):
+  `admin_upsert_survey` takes 1-5 questions (was 3); the dashboard card shows up to 5. A pick-one / pick-any question with
+  `"other": true` gets an **Other** button that opens a text box, saved as `answers["<id>_other"]` (300 chars); `review/` →
+  Surveys lists those answers and its form has 5 rows. Survey 3, "Help shape the hubs, round 2" (question formats incl.
+  Quizlet/Anki, routine on the hub, guided tutorial yes/no, what's annoying, what to do about the games), is live and
+  replaced survey 2. About page updated.
+
 - **2026-10-15 (Listen dock + highlighter, Claude Code)** — Two student suggestions, built at Sam's request.
   **Listen dock** (#4): `shTTS` in `widget/v3.js` now remembers the current narration (`cur`) and, while it plays or is
   paused and the lecture's Listen row and player are out of view (IntersectionObserver), shows `.sh-tts-dock` pinned to the
