@@ -30,6 +30,7 @@
   window.shClicks = {
     start: function(o){
       if (!o || !o.sb || !o.hub) return;
+      try { if (navigator.webdriver) return; } catch (e) {} /* automated browsers are not counted */
       var pending = {}, count = 0;
       function flush(){
         if (!count) return;
