@@ -1727,6 +1727,50 @@ mcq('mu-fig-a','muscle','hub','One band of the sarcomere keeps the same length w
   'It\'s the A band (highlighted in the diagram): the full length of the thick (myosin) filaments, including where they overlap the thin filaments. The filaments slide rather than shorten, so the A band never changes; the I band (thin filaments only) and the H band (thick filaments only) shorten.',
   { img:'sarc-a', imgAfter:true });
 
+/* ---- In-class review questions (Exam 4 practice questions doc, Drive Exam 4 folder, 10/14). Stems and choices as
+   given (typos fixed). The two picture questions (skin block "1.", sarcomere "E") are worded to stand alone, since the
+   slide images can't go in this public repo. Where the shared doc's marks disagree with the lectures, the key follows
+   the lectures and the explanation says so. */
+mcq('rv-corneum','skin','review','The layer of skin that contains the most dead keratinocytes is the:',
+  ['Stratum corneum','Stratum lucidum','Stratum granulosum','Stratum basale'],
+  'The stratum corneum is many layers of flattened, dead, anucleate keratinocytes full of keratin, shed as they reach the surface. The stratum lucidum is a thin clear band of dead cells found only in thick skin; granulosum cells are still dying (keratohyalin granules); basale cells are alive and dividing.');
+mcq('rv-gland','skin','review','In a skin block diagram, label "1." points to a coiled tube deep in the dermis whose duct climbs straight through the epidermis and opens at a pore on the surface, not into a hair follicle. The structure labeled "1." is a:',
+  ['Merocrine (eccrine) sweat gland','Sebaceous (oil) gland','Sweat pore','Hair follicle'],
+  'A coiled secretory tube deep in the dermis with its own duct to a surface pore is a merocrine (eccrine) sweat gland. Sebaceous glands sit beside the hair follicle and empty into it; the sweat pore is only the duct\'s opening at the surface.');
+mcq('rv-fibroblast','skin','review','Which constituent of the dermis produces collagen, elastin, and proteoglycans?',
+  ['Fibroblast cells','Mast cells','Immune cells','Langerhans cells','Keratinocytes'],
+  'Fibroblasts make the dermal matrix: collagen, elastic fibers and the proteoglycan ground substance. Mast cells release histamine; Langerhans cells present antigen in the epidermis; keratinocytes make keratin, not dermal matrix.');
+mcq('rv-sux-intubate','nmj','review','The surgical team for Tyler (55 years old) has decided to intubate him to maintain oxygenation, as part of his management. They want a depolarizing neuromuscular blocker. Which of the following is a GOOD choice?',
+  ['Succinylcholine','Atracurium','Neostigmine','Cyclobenzaprine'],
+  'Succinylcholine is the only depolarizing blocker, and its fast onset and short action suit intubation. Atracurium is a nondepolarizing (competitive) blocker; neostigmine is an AChE inhibitor that reverses nondepolarizers; cyclobenzaprine is a centrally acting relaxant for acute muscle spasm.');
+mcq('rv-spasm','nmj','review','Gabby is a soccer player who has missed multiple matches due to recurrent muscle spasm. Which of the following drugs will be MOST helpful for Gabby?',
+  ['Baclofen','Ibuprofen','Cisatracurium','Succinylcholine'],
+  'Baclofen (GABA-B agonist) is the only spasmolytic among the choices. Cisatracurium and succinylcholine are neuromuscular blockers used for surgery and intubation (they paralyze, and need a ventilator), so they never treat spasm; ibuprofen eases pain but doesn\'t relax muscle. (The lecture files baclofen under spasticity and cyclobenzaprine, methocarbamol and carisoprodol under acute spasm, but of these four, baclofen is the one that relaxes muscle.)',
+  { cue:'"-curium" and succinylcholine are for the OR, not the soccer field.' });
+mcq('rv-apocrine','skin','review','Which sweat glands respond to emotional and sensory stimuli but not to heat?',
+  ['Apocrine','Eccrine','Sebaceous'],
+  'Apocrine glands (axilla, areola and nipple, perianal skin, external genitalia; they open into hair follicles) respond to emotional and sensory stimuli, not heat. Eccrine glands handle thermoregulatory sweating. Sebaceous glands make sebum, not sweat.');
+mcq('rv-vitiligo','dermpath','review','Which describes a common disorder with partial or complete loss of pigment-producing melanocytes within the epidermis?',
+  ['Vitiligo','Ephelis','Lentigo','Malignant melanoma','Nevocellular nevus'],
+  'Vitiligo: flat, well-demarcated depigmented macules from autoimmune loss of melanocytes. Ephelis (freckle) and lentigo are hyperpigmented; nevi and melanoma are melanocyte growths, not losses.');
+mcq('rv-scc-sun','dermpath','review','What is the most common tumor arising on sun-exposed sites in older individuals? Most of these tumors are cured by resection.',
+  ['Squamous cell carcinoma','Basal cell carcinoma','Melanoma','Trichoepithelioma','Merkel cell carcinoma'],
+  'This wording is Dr. Dababneh\'s slide on squamous cell carcinoma: the most common tumor on sun-exposed sites in older people, most cured by resection, only ~5% metastasized at discovery. A search engine will often say basal cell carcinoma, which is the most common skin cancer overall, but on this exam the phrase points to SCC.',
+  { cue:'"Sun-exposed sites, older people, cured by resection" is the SCC slide, word for word.' });
+mcq('rv-urticaria','dermpath','review','Which of the following acute inflammatory diseases is IgE-mediated and caused by localized mast cell degranulation?',
+  ['Urticaria','Acute eczematous dermatitis','Erythema multiforme'],
+  'Urticaria (hives) is type I: IgE on mast cells, localized degranulation, edematous wheals that come and go within hours. Acute eczematous dermatitis is mostly type IV (delayed); erythema multiforme is a self-limited hypersensitivity to infections (often herpes) or drugs, with target-shaped lesions.');
+mcq('rv-psoriasis','dermpath','review','Which is a chronic dermatosis affecting 1-2% of the population, marked by Auspitz sign?',
+  ['Psoriasis','Lichen planus','Bullous pemphigoid','Dermatitis herpetiformis','Spongiotic dermatitis'],
+  'Psoriasis: chronic, T-cell-mediated, 1-2% of people. Auspitz sign is pinpoint bleeding when a scale is scraped off, because the dermal papillae and their vessels reach up under a thinned epidermis. Lichen planus is the other chronic dermatosis, but it shows purple, flat-topped papules with Wickham striae, not Auspitz.');
+mcq('rv-mline','muscle','review','In a labeled sarcomere, letter "E" points to the thin line that runs down the very middle of the H zone, holding the thick filaments in register. What is it?',
+  ['M line','H zone','A band','Z line','I band'],
+  'The M line sits in the middle of the H zone (itself the middle of the A band) and links the thick filaments to one another. Z lines are the sarcomere\'s ends, where thin filaments anchor; the I band is thin filaments only, on either side of a Z line.');
+mcq('rv-sugammadex','nmj','review','Which drug reverses the "-curonium" drugs by binding to them, decreasing the amount available to the nicotinic receptor?',
+  ['Sugammadex','Neostigmine','Edrophonium','Pyridostigmine','Physostigmine'],
+  'Sugammadex is a cyclodextrin that encapsulates rocuronium and vecuronium, so less drug reaches the nicotinic receptor. Neostigmine, edrophonium, pyridostigmine and physostigmine all reverse a block the other way: they inhibit acetylcholinesterase so more ACh competes with the blocker.',
+  { cue:'Sugammadex is a sugar cage (cyclodextrin) for -curonium. The -stigmines just add more ACh.' });
+
 /* ---------- READINGS (lecture notes synthesized from the recordings + slides) ----------
    Each lecture opens with a short "what's tested" list (LESSONS.md: lead with it) and puts its look-alikes in a table. */
 var READINGS = {
@@ -2349,7 +2393,9 @@ var SORT_SETS = [
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
-var SRC_LABEL = { 'lecture-quiz':'Lecture self-check', 'deck':'Class study deck', 'hub':'Hub-authored', 'rec':'10/13 recording' };
+var SRC_LABEL = { 'review':'In-class review', 'lecture-quiz':'Lecture self-check', 'deck':'Class study deck', 'hub':'Hub-authored', 'rec':'10/13 recording' };
+/* Sources offered in the bank's source filter (the 10/13-recording items are spread across L31/L32 and aren't a set anyone studies by itself). */
+var SRC_FILTER = ['review','lecture-quiz','deck','hub'];
 /* lecture label: L28-L32 (a lecture can set its own label) */
 function lecLabel(l){ return l.label || ('L' + l.num); }
 
@@ -2387,6 +2433,8 @@ function loadState(){
   return base;
 }
 var STATE = loadState();
+/* the bank's source filter no longer offers the 10/13 recording (2026-10-15): reset a saved pick of it */
+if(STATE.ui.qsrc !== 'all' && SRC_FILTER.indexOf(STATE.ui.qsrc) < 0) STATE.ui.qsrc = 'all';
 /* the clinical application lecture (Dr. Taylor) was removed 2026-10-14: drop saved views and a mock that point at it */
 if(STATE.ui.lec === 'clinical') STATE.ui.lec = 'skin';
 if(STATE.ui.qlec === 'clinical') STATE.ui.qlec = 'all';
@@ -3118,7 +3166,7 @@ function bankFiltered(search){
 var bankSearch = '';
 function renderBank(body){
   var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
-  var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
+  var srcOpts = '<option value="all">All sources</option>' + SRC_FILTER.map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   body.innerHTML = '<div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   var list = document.getElementById('qList'); wireQuestionContainer(list);
@@ -4618,7 +4666,7 @@ window.SH_SYNC = {
 
 /* Daily drill (widget/drill.js): the widget picks each day's questions from this pool and asks the hub to
    draw each card, so answers go through recordAnswer like anywhere else. */
-var DRILL_HY = { 'lecture-quiz':'a self-check question from the lecture slides', deck:'from the class study deck' };
+var DRILL_HY = { review:'from the in-class review', 'lecture-quiz':'a self-check question from the lecture slides', deck:'from the class study deck' };
 window.SH_DRILL = {
   pool: function(){
     return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
