@@ -102,6 +102,19 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (MSK 4: in-class review questions, Claude Code)** — The 12 in-class review questions (Drive, Exam 4
+  folder, "Exam 4 Practice questions") are in `hubs/msk-exam4` as `rv-*` with a new source `review` ("In-class review"),
+  stems and choices as given (typos fixed). The two picture items use the hub's own drawings instead of the slide
+  images (public repo): `rv-gland` shows a new anima **skin block** (`tools/figures/msk-exam4/skin.mjs`, still
+  `skin-gland`: layers, follicle + sebaceous gland + arrector pili, eccrine coil labeled "1." with its duct to a pore,
+  plexuses, a Pacinian corpuscle; still only, not under the notes), `rv-mline` the sarcomere with the M line lit
+  (`sarc-m`). Approved by Sam 2026-10-15; About page Diagrams entry updated. The shared doc's marks were wrong on two (spasm: keyed
+  Baclofen, not cisatracurium; "-curonium" reversal: Sugammadex, not pyridostigmine) and blank on the sun-exposed-tumor
+  one, keyed SCC as Dr. Dababneh's slide says (`pa-scc-common`). The bank's source filter drops "10/13 recording" (those
+  items keep their chip) and gains "In-class review" first (`SRC_FILTER`; a saved pick of `rec` resets); the Daily Drill
+  counts the set as high-yield. Bank 220 -> 232. No notes text changed, so no narration regenerated.
+  **MSK Project: carry these into the split sources.**
+
 - **2026-10-14 (PCD Exam 3: staining recommendations, Claude Code)** — A course email says the two exam questions from
   James Bradley's glaze video are on its staining recommendations. Checked the hub against the video transcript (Drive,
   `13 Glaze and Add Porcelain Contacts ... .txt`): the notes already covered every step. 7 new questions (`gl-email`,

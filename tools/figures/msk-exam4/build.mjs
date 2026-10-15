@@ -9,10 +9,11 @@ import { fileURLToPath } from "node:url";
 import { baseCss } from "./shared.mjs";
 import { nmj } from "./nmj.mjs";
 import { sarcomere } from "./sarcomere.mjs";
+import { skin } from "./skin.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const HUB = join(HERE, "../../../hubs/msk-exam4/index.html");
-const FIGS = [nmj(), sarcomere()];
+const FIGS = [nmj(), sarcomere(), skin()];
 const BY_LEC = { muscle: ["sarcomere"], nmj: ["nmj"] };
 // Picture questions: a still of a figure with one part highlighted and the labels hidden (q.img = key).
 const STILLS = {
@@ -22,6 +23,9 @@ const STILLS = {
   "nmj-na": { fig: "nmj", part: "na", rep: [['class="nm-na"', 'class="nm-na" data-st="inact"'], ['class="iso-svg nm-fig"', 'class="iso-svg nm-fig" data-drug="sux"']] },
   "sarc-h": { fig: "sarcomere", part: "band-H" },
   "sarc-a": { fig: "sarcomere", part: "band-A" },
+  "sarc-m": { fig: "sarcomere", part: "m" },
+  // the skin block is only a still (in-class review rv-gland): its "1." tag stays, layer names too
+  "skin-gland": { fig: "skin", part: "skin" },
 };
 
 const STILL_CSS = `
@@ -31,6 +35,10 @@ const STILL_CSS = `
 .anima.am-still [data-part]{opacity:.55}
 .anima.am-still[data-q="ache"] [data-part="ache"],.anima.am-still[data-q="rec"] [data-part="rec"],.anima.am-still[data-q="ves"] [data-part="ves"],.anima.am-still[data-q="na"] [data-part="na"]{opacity:1;filter:drop-shadow(0 0 2.5px var(--anatomy-lit)) drop-shadow(0 0 1px var(--anatomy-lit))}
 .anima.am-still[data-q^="band"] [data-part]{opacity:1}
+.anima.am-still[data-q="skin"] [data-part],.anima.am-still[data-q="m"] [data-part]{opacity:1}
+.anima.am-still[data-q="m"] .sc-m{stroke:var(--anatomy-lit);stroke-width:3.6;filter:drop-shadow(0 0 2.5px var(--anatomy-lit))}
+.anima.am-still[data-q="m"] .sc-tick-t{display:none}
+.anima.am-still[data-q="skin"] svg{max-width:600px}
 .anima.am-still[data-q="band-H"] [data-band="H"],.anima.am-still[data-q="band-A"] [data-band="A"]{fill:var(--anatomy-lit);stroke:var(--anatomy-lit);opacity:.85}
 .anima.am-still[data-q="band-H"] [data-band-bg="H"],.anima.am-still[data-q="band-A"] [data-band-bg="A"]{fill:color-mix(in srgb,var(--anatomy-lit) 22%,var(--anatomy-card))}
 `;
@@ -62,7 +70,7 @@ ${figs}
   // Each copy gets its own SVG ids and radio group: the same figure can sit in Notes and Review at once (the hidden
   // panel stays in the page), and url(#id) would otherwise point into whichever copy comes first.
   var copies = 0;
-  function uniq(s){ var k = "-" + (++copies); return s.replace(/(id="|url\\(#|href="#)((?:nm|sc)-[a-z0-9-]+)/g, "$1$2" + k).replace(/name="((?:nm|sc)-[a-z0-9-]+)"/g, 'name="$1' + k + '"'); }
+  function uniq(s){ var k = "-" + (++copies); return s.replace(/(id="|url\\(#|href="#)((?:nm|sc|sk)-[a-z0-9-]+)/g, "$1$2" + k).replace(/name="((?:nm|sc|sk)-[a-z0-9-]+)"/g, 'name="$1' + k + '"'); }
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   // noTitle: the caller heads it (Review sections use their own h3)
   function html(key, noTitle){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig">' + (noTitle ? '' : '<h4>' + esc(f.title) + '</h4>') + '<p class="lec-fig-cap">' + esc(f.caption) + '</p>' + uniq(f.shell.replace("@@SVG@@", f.svg)) + '</figure>'; }
