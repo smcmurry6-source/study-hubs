@@ -102,6 +102,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 morning (lessons audit, Claude Code)** — MSK Exam 4 eve-1; PCD Exam 3 is open today. `hubs/msk-exam4`,
+  same ids and answer positions: `sk-keratinization`'s key reworded (report #21: "Programmed cell death that removes the
+  nucleus but leaves the cell intact"); `sk-ex-func`'s throwaway key "Producing bile" is now "Activating vitamin D to
+  calcitriol" (report #22, "too easy"; the explanation says the kidney does that step, as `sk-vitd` already teaches);
+  explanations now answer the favorite wrong choice on `dp-clinda` (gramicidin = membrane), `dp-terb-pk` (not converted to
+  an azole), `mu-dhpr` (SERCA pumps calcium back) and `nm-sux-cv` (no beta-1 block; hyperkalemia). Picture questions
+  `mu-fig-h` and `mu-fig-a` (report #25, "can't tell what is highlighted"): the lit band gets a dashed outline and a stronger
+  fill, the A-band still now lights its H zone too, and the H-band still drops the A-band tint (`STILL_CSS` in
+  `tools/figures/msk-exam4/build.mjs`, rebuilt). `question_choices` rows before today for `sk-keratinization` and
+  `sk-ex-func` refer to the old key wording. No reading text changed, so no narration regenerated. `LESSONS.md` refreshed.
+  **MSK Project: carry these into the split sources.**
+
 - **2026-10-15 (MSK 4: in-class review questions, Claude Code)** — The 12 in-class review questions (Drive, Exam 4
   folder, "Exam 4 Practice questions") are in `hubs/msk-exam4` as `rv-*` with a new source `review` ("In-class review"),
   stems and choices as given (typos fixed). The two picture items use the hub's own drawings instead of the slide

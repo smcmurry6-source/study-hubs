@@ -933,7 +933,10 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .anima.am-still[data-q="m"] .sc-tick-t{display:none}
 .anima.am-still[data-q="skin"] svg{max-width:600px}
 .anima.am-still[data-q="band-H"] [data-band="H"],.anima.am-still[data-q="band-A"] [data-band="A"]{fill:var(--anatomy-lit);stroke:var(--anatomy-lit);opacity:.85}
-.anima.am-still[data-q="band-H"] [data-band-bg="H"],.anima.am-still[data-q="band-A"] [data-band-bg="A"]{fill:color-mix(in srgb,var(--anatomy-lit) 22%,var(--anatomy-card))}
+.anima.am-still[data-q="band-H"] [data-band-bg="H"],.anima.am-still[data-q="band-A"] [data-band-bg="A"]{fill:color-mix(in srgb,var(--anatomy-lit) 34%,var(--anatomy-card));stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:5 3}
+.anima.am-still[data-q="band-H"] [data-band-bg="A"]{fill:none}
+.anima.am-still[data-q="band-A"] [data-band="H"]{fill:var(--anatomy-lit);opacity:.85}
+.anima.am-still[data-q="band-A"] [data-band-bg="H"]{fill:none}
 
 .lec-figs{margin:26px 0 6px}
 .lec-figs > h3{margin:0 0 10px}
@@ -1112,7 +1115,7 @@ mcq('sk-barrier-site','skin','hub','Where is the lipid content of lamellar bodie
   ['Between the stratum granulosum and stratum corneum','Between the stratum basale and the basement membrane','Between the papillary and reticular dermis','Into the lumen of eccrine sweat glands'],
   'The barrier sits between the last two living and dead layers: lamellar body lipids fill the intercellular space, and insoluble proteins line the inner plasma membrane. Water barrier = cell envelope + lipid envelope ("bricks and mortar").');
 mcq('sk-keratinization','skin','hub','Which statement about keratinization is correct?',
-  ['It is programmed cell death in which the DNA fragments but the cell does not','It begins in the stratum corneum and moves downward','It produces cells that keep their nuclei for UV protection','It is driven by melanocytes releasing keratin into keratinocytes'],
+  ['Programmed cell death that removes the nucleus but leaves the cell intact','It begins in the stratum corneum and moves downward','It produces cells that keep their nuclei for UV protection','It is driven by melanocytes releasing keratin into keratinocytes'],
   'Keratinization (cornification) is terminal differentiation by controlled apoptosis: DNA fragments, the nucleus is lost, but the cell stays intact and becomes ~85% keratin. It starts in the stratum basale as daughter cells move up.');
 mcq('sk-desquam','skin','hub','What regulates the normal shedding (desquamation) of corneocytes from the skin surface?',
   ['Proteolytic breakdown of desmosomes, triggered by the falling pH near the surface','Contraction of arrector pili muscles that tug the surface cells loose from below','UV energy absorbed by melanin that cracks the keratin plates at the surface','Sebum from the hair follicles dissolving the lamellar body lipids between cells'],
@@ -1203,8 +1206,8 @@ mcq('sk-ex-apocrine','skin','hub','Apocrine sweat glands are found in all of the
   ['The palms','The axilla','Skin around the anus','The areola and nipple'],
   'Apocrine glands are limited to the axilla, areola/nipple, perianal skin and external genitalia. The palms have eccrine glands (where emotional sweating starts).');
 mcq('sk-ex-func','skin','hub','All of the following are functions of the skin EXCEPT:',
-  ['Producing bile for fat digestion','Thermoregulation through blood flow and sweat','Synthesizing vitamin D3 with UV light','First-line immune defense'],
-  'The skin\'s listed functions: barrier and protection, immunologic, sensation, thermoregulation, water regulation, exocrine (sweat, sebum), endocrine, biotransformation (vitamin D3, P450), and social/sexual identity. Bile is hepatic.');
+  ['Activating vitamin D to calcitriol','Thermoregulation through blood flow and sweat','Synthesizing vitamin D3 with UV light','First-line immune defense'],
+  'The skin\'s listed functions: barrier and protection, immunologic, sensation, thermoregulation, water regulation, exocrine (sweat, sebum), endocrine, biotransformation (vitamin D3, P450), and social/sexual identity. The skin makes vitamin D3 from 7-dehydrocholesterol with UV, but the kidney does the final 1-alpha hydroxylation to calcitriol, so that step is not a skin function.');
 mcq('sk-ridges','skin','hub','Fingerprints (dermatoglyphics) come from which structures?',
   ['Dermal ridges interlocking with epidermal (rete) ridges in thick skin','Langer\'s lines formed by collagen bundles of the reticular dermis','Folds of the stratum lucidum that form only on the palms and soles','The fixed spacing of eccrine duct openings across the skin surface'],
   'Downward epidermal (rete) ridges interlock with upward dermal ridges and papillae, strengthening the junction and producing unique friction ridges that stay stable for life.');
@@ -1299,7 +1302,7 @@ mcq('dp-metronidazole','dermpharm','hub','Topical metronidazole helps inflammato
   'The slide: metronidazole acts as an anti-inflammatory agent by a direct effect on neutrophil cellular function, in addition to being anti-infective.');
 mcq('dp-clinda','dermpharm','hub','Clindamycin is a common topical antibiotic for mild to moderate inflammatory acne. What is its mechanism?',
   ['Inhibits bacterial protein synthesis','Inhibits bacterial cell wall synthesis','Disrupts the bacterial cell membrane','Competitively blocks PABA utilization'],
-  'Clindamycin (like erythromycin) inhibits protein synthesis. Note: the slide groups it with the macrolides, but Dr. Fasinu pointed out it is "actually not a macrolide, strictly speaking" (it\'s a lincosamide). Sodium sulfacetamide is the PABA blocker, and bacitracin is the topical that blocks cell wall synthesis.');
+  'Clindamycin (like erythromycin) inhibits protein synthesis. Note: the slide groups it with the macrolides, but Dr. Fasinu pointed out it is "actually not a macrolide, strictly speaking" (it\'s a lincosamide). Sodium sulfacetamide is the PABA blocker, bacitracin is the topical that blocks cell wall synthesis, and gramicidin is the one that disrupts the membrane.');
 match('dp-abx-moa','dermpharm','hub','Match each topical antibiotic to its mechanism.',
   [['Bacitracin','Cell wall synthesis'],['Gramicidin','Membrane disruption'],['Mupirocin','Protein synthesis'],['Sodium sulfacetamide','Blocks PABA use']],
   'Bacitracin (peptide; cuts, burns, scrapes), gramicidin (inserts into gram-positive membranes; topical combos only), mupirocin (impetigo), sodium sulfacetamide (sulfonamide, competitive PABA inhibition). Retapamulin, neomycin and gentamicin are protein-synthesis inhibitors too.');
@@ -1311,7 +1314,7 @@ mcq('dp-azoles','dermpharm','hub','How do the topical azole antifungals (miconaz
   'Azoles block ergosterol synthesis and are active against dermatophytes (Epidermophyton, Microsporum, Trichophyton) and yeasts (Candida). Most topical azoles are OTC; fluconazole tablets are prescription (candidiasis, thrush).');
 mcq('dp-terb-pk','dermpharm','hub','Why does oral terbinafine work for toenail onychomycosis when most topicals fail?',
   ['It distributes widely to the extremities and is incorporated into the new nail as it grows','It dissolves the infected nail plate directly and kills the fungus trapped inside it','It is converted to an azole in the nail bed, which then blocks ergosterol synthesis','It stimulates the nail matrix to grow twice as fast so the fungus is pushed out'],
-  'The nail is essentially nonliving and grows slowly, so creams can\'t penetrate it. Terbinafine (and the older griseofulvin) has a large volume of distribution and is built into newly formed nail; the infected nail grows out over months (up to ~6 months to see good improvement).');
+  'The nail is essentially nonliving and grows slowly, so creams can\'t penetrate it. Terbinafine (and the older griseofulvin) has a large volume of distribution and is built into newly formed nail; the infected nail grows out over months (up to ~6 months to see good improvement). It is not turned into an azole: the azoles are a separate drug class, and terbinafine reaches the nail as itself.');
 mcq('dp-acyclovir','dermpharm','hub','Acyclovir, valacyclovir, penciclovir and famciclovir treat herpes simplex skin infections. What are they?',
   ['Synthetic guanine analogs that inhibit herpesvirus replication','Neuraminidase inhibitors that block release of new virions','Immunostimulants that induce interferon-alpha in the skin','Calcineurin inhibitors that calm the T-cell response to virus'],
   'They are guanine analogs active against the herpesvirus family (HSV-1 and -2). Valacyclovir lasts longer because it is better absorbed.');
@@ -1517,7 +1520,7 @@ mcq('mu-triad','muscle','deck','The complex of one T tubule flanked by two termi
   'The triad (at the A-I junction in skeletal muscle) is where T-tubule depolarization is passed to the SR. Two T tubules supply each sarcomere.');
 mcq('mu-dhpr','muscle','hub','How does T-tubule depolarization open the SR calcium channels in skeletal muscle?',
   ['Voltage-sensing dihydropyridine receptors physically open ryanodine receptors','Acetylcholine diffuses into the T tubule and binds the ryanodine receptor','Calcium entering through the sarcolemma triggers SERCA','IP3 generated at the sarcolemma opens IP3 receptors'],
-  'DHP receptors in the T tubule sit directly against ryanodine receptors (RyR) in the SR; their conformational change opens RyR by protein-protein contact, releasing Ca2+.');
+  'DHP receptors in the T tubule sit directly against ryanodine receptors (RyR) in the SR; their conformational change opens RyR by protein-protein contact, releasing Ca2+. SERCA does the opposite job: it pumps Ca2+ back into the SR so the muscle relaxes, and it never releases calcium.');
 seq('mu-ecc','muscle','hub','Put excitation-contraction coupling in order.',
   ['ACh opens nicotinic receptors; sarcolemma depolarizes','Action potential travels down the T tubules','DHP receptors open ryanodine receptors at the triad','Ca2+ binds troponin C','Myosin heads bind actin (cross-bridges)'],
   'Relaxation reverses it: SERCA pumps Ca2+ back into the SR (calsequestrin stores it) and tropomyosin covers the binding sites again.');
@@ -1665,7 +1668,7 @@ mcq('nm-dantrolene','nmj','deck','Which direct-acting spasmolytic is used to tre
   { cue:'DANTROlene shuts the SR Door: it is the ryanodine receptor blocker.' });
 mcq('nm-sux-cv','nmj','hub','Succinylcholine can cause bradycardia. Why?',
   ['It stimulates cardiac muscarinic receptors and vagal activity','It blocks cardiac beta-1 adrenergic receptors at the SA node','It depletes ATP in cardiac pacemaker cells within minutes','It causes hypokalemia that slows conduction through the AV node'],
-  'Succinylcholine stimulates all ACh receptors to some degree, including cardiac muscarinic receptors in the SA node (bradycardia) and autonomic ganglia; higher doses can raise sympathetic activity, tachycardia and hypertension.');
+  'Succinylcholine stimulates all ACh receptors to some degree, including cardiac muscarinic receptors in the SA node (bradycardia) and autonomic ganglia; higher doses can raise sympathetic activity, tachycardia and hypertension. It does not block beta-1 receptors (that is what beta blockers do); the slow heart rate is a muscarinic, vagal-like effect. It also raises potassium (hyperkalemia) rather than lowering it.');
 mcq('nm-ndb','nmj','hub','How do rocuronium, vecuronium and cisatracurium work?',
   ['They competitively block ACh at the nicotinic receptor of the end plate','They open the nicotinic channel and hold the end plate depolarized','They block ACh release from the motor nerve terminal','They inhibit acetylcholinesterase'],
   'Nondepolarizing blockers are competitive nicotinic antagonists (prototype tubocurarine). Clue to the names: they end in "-curium" or "-curonium."');

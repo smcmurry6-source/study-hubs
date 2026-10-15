@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-13, evening** (ninth refresh, full `/lessons-audit`, Tuesday 9 pm Central, a day and a half
-before PCD Exam 3; the eighth ran the same morning). Sam runs
+**Last refreshed: 2026-10-15, morning** (tenth refresh, full `/lessons-audit`, Thursday 8 am Central: PCD Exam 3 is open
+on Canvas today until 8 pm, MSK Exam 4 is tomorrow). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,43 +79,56 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-13, 9 pm Central; "since" = this morning's fixes, live from ~7 am. Live hubs: **PCD Fixed Pros Exam 3
-(Thu Oct 15)**, **MSK Exam 4 (Fri Oct 16)**, **Occlusion midterm (Wed Oct 21, final Nov 19)**, perio (final Nov 19). No
-hub newly archived. **Four new PCD reports today (#15-#18), all on question wording; all four fixed and answered in this run.** No
-suggestions, surveys or zero-result searches; four late check-ins (perio 2, MSK Exam 3 2).
+Refreshed 2026-10-15, 8 am Central; "since" = the 10-13 evening fixes, live from 9:40 pm 10-13. Live hubs: **PCD Fixed Pros
+Exam 3 (today, Canvas 8 am-8 pm; archives itself at 10 pm)**, **MSK Exam 4 (Fri Oct 16)**, **Occlusion midterm (Wed
+Oct 21, final Nov 19)**, perio (final Nov 19). No hub newly archived yet: **run the PCD Exam 3 retrospective and recap in
+the next audit, after 10 pm tonight** (check-ins open at 8 pm, the pop-up at 10 pm). Since the last refresh: 7 new reports
+(MSK 4 #19-#22, #25; PCD #23-#24), 2 suggestions (#4 floating Listen controls, #5 a highlighter in the notes), 1 late MSK
+Exam 3 check-in, no surveys, no zero-result searches.
 
-**Did this morning's fixes work?** (answers since ~7 am vs before, `personal_answers`; small n, and exam-eve-1 inflates
-everything.) `ce-irm` 8/24 (33%) -> **6/10 (60%)**; `ve-pbox-3` 6/15 (40%) -> 5/8 (63%); `ce-contact-open` 6/12 (50%)
--> **5/6 (83%)**; `ce-burnish` 8/15 -> 3/6 (flat); MSK `sk-lamellar` 3/10 -> **4/7 (57%)**; `dp-clinda` 1/6 -> 1/4.
-`ce-isolation` went the other way, 7/12 (58%) -> **1/5**, and report #16 explains why: the key read "RMGI: resin needs
-isolation", and RMGI has resin in its name. Select-all tick boxes: `ce-reqs` 68% -> 70% (the reporter of #14 saw the
-reply). `co-afterimage`'s new stem: 4/4 before, 2/4 since (too few to read).
+**Fake visitors from automated sessions.** MSK 4 showed 54 people on 10-14 with 42 under 5 minutes, but 24 of them were
+single-ping visitors arriving every ~7 s between 7:18 and 7:28 am (a browser session working on the live site, each page
+a fresh visitor id); the same pattern put 12 on PCD on 10-13 and 15-16 on perio on 09-24/25. **Real MSK 4 on 10-14: ~30
+people, 18 under 5 minutes.** Until the widget skips automated browsers, drop bursts of one-ping visitors before reading
+people or bounce counts.
 
-**PCD Fixed Pros Exam 3** (1.5 days out): 49 people, 89 h all time; **today 39 people, 38 h**, 2,156 answers from 25
-people at 82%. Bank 1,097 min (24 people), notes 956 (33), Daily Drill 80 (9), Weak Spots 41, mock 39 (3 people; 2 mocks
-saved, 84%). 11 of 49 under 5 minutes. All time 5,141 answers from 31 people, 80%. By lecture: Cement 76% (21 tries per
-question), Bonding 78%, Color 79%, Glaze video 79%, Onlays 83%, Veneers 85%, Removing a Crown 89%. Matching 69%,
-ordering 69%, select-all 76%, MCQ 81%. Hardest (12+ tries): `on-materials-list` 37% (VitaBlocs Mark II as lithium
-disilicate, 8 picks; the explanation already lists it as feldspathic), `ce-sbu` 41%, `ce-irm` 41%, `co-translucent`
-44% (opaque, 6), `ce-isolation` 47%, `on-telio` 47%, `on-cement-match` and `ve-pbox-3` 48%, `bo-zprime` 50% (eugenol,
-all 9 misses), `bo-adh-thick` 50% (flat occlusal, 5), `co-correct-high` 50% (the reverse, 6). Explanations now answer
-the favorite wrong choice on `ce-sbu`, `co-translucent`, `bo-zprime`, `bo-adh-thick`, `co-correct-high`; reports #15,
-#16 and #18 fixed. At Sam's request the two weakest matching items (`on-cement-match`, `ce-cure-match`) are now MCQs (their pairs already had
-MCQs except two, added as `ce-cure-emax` and `ce-cure-zr`), and `rm-why-now` (report #17) is removed.
+**Did the 10-13 evening fixes work?** (`personal_answers` before vs since; the whole PCD bank rose from 81% on 10-13 to
+86% on 10-14, so only gains well above +5 points count.) Key rewrites from reports: `ce-isolation` 8/17 (47%) -> **14/14**
+(#16), `ve-pbox-3` 11/23 (48%) -> **16/23 (70%)** (#15), `on-crack-types` 17/19 -> 13/13 (#18). Explanations naming the
+favorite wrong answer: `ce-sbu` 11/27 (41%) -> **16/26 (62%)**, `co-translucent` 9/18 (50%) -> **14/20 (70%)**; flat on
+`bo-zprime` 9/18 -> 5/10, `bo-adh-thick` 9/18 -> 8/17, `co-correct-high` 8/14 -> 11/19. Matching split into MCQs:
+`ce-cure-match` was 11/21 (52%); its new MCQs `ce-cure-emax` 15/20 (75%) and `ce-cure-zr` 13/18 (72%). The 10-13 morning
+batch held up: `ce-irm` 14/34 -> 14/21 (67%), `ce-contact-open` 11/18 -> 7/8, select-all `ce-reqs` with tick boxes
+22/32 (69%) -> **22/24 (92%)**, `co-afterimage` 14/14 since its new stem. MSK 4: `dp-impetigo` 5/13 -> 4/7, `sk-lamellar`
+7/17 -> 3/7 and `dp-clinda` 2/10 -> 2/6 (both still stuck; `dp-clinda`'s two favorite wrong answers split evenly).
 
-**MSK Exam 4** (2.5 days out): 22 people, 22 h; today 18 people, 8 h, 482 answers from 9 people at 72%. Notes 236 min
-(16), bank 202 (12), drill 24 (2). All time 1,174 answers from 14 people, 69%. By lecture: NMJ Pharm 64% and Skeletal
-Muscle 66% (2-2.5 tries per question: barely practised yet), Derm Pharm 65%, Dermpath 68%, Skin Histology 73% (10 tries
-per question), Clinical Application 88%. Select-all 33% (2 items, 12 tries each), matching 56%. Hardest at 12+ tries:
-select-all `dp-impetigo` 5/13 (its explanation quoted the lecture's "option B and D", which are not this hub's letters;
-now says it in words), `sk-lamellar` 41%, `sk-thin-clue` 53% (thick skin, 6: explanation already says why), then the
-epidermis-layer items at 57-69%. Run the next audit Thursday morning (MSK eve-1) for the late lectures.
+**PCD Fixed Pros Exam 3** (exam today): 76 people, 168 h all time; 10-14 (eve) 55 people, 61 h, 4,605 answers from 43 at
+86%; this morning 22 people so far, 90%. Eve time: bank 2,143 min (42 people), notes 1,171 (47), cram 256 (14), Weak Spots
+165, mock 136 (9 people; 7 mocks at 76%), Daily Drill 126 (12). 7 of 55 under 5 minutes on the eve. All time 11,001
+answers from 60 people, 83%. By lecture: Cement 78% and Bonding 80% (33-37 tries per question), Color 84%, Onlays 84%,
+glaze video 83%, Veneers 86%, Removing a Crown 91%. Still hardest: `on-telio` 14/32 (44%; 8/17 -> 6/15 since, not yet
+fixed), `on-materials-list` 18/37, `bo-zprime`, `bo-adh-thick`, `ce-burnish`, `ve-same-day` 14/24, `gl-c-shade` 11/19.
+The 7 new staining questions (`gl-*`, 10-14) were answered 13-21 times each at 58-100%; `gl-email` drew two "not useful"
+reports (#23, #24).
 
-**Occlusion midterm** (8 days out): 8 people, 2 h, 30 answers from 1 person. Fills after PCD and MSK.
+**MSK Exam 4** (tomorrow; 30 questions: L28 6, L29 3, L30 6, L31 11, L32 4): ~33 real people, 35 h; 10-14 ~30 people, 13 h,
+1,018 answers from 13 people at 75%. All time 2,307 answers from 20 people, 72%. **The late lectures are barely
+practised, and L31 is over a third of the exam:** tries per question Skin Histology 15.5 (77%), Derm Pharm 14.2 (65%),
+Dermpath 8.1 (71%), Skeletal Muscle 7.4 (73%), NMJ Pharm 4.7 (72%); in-class review set 2.4 (83%). Time on the eve-1:
+bank 374 min (23), notes 295 (25), Review drugs 25 (12), Diagrams 5 (13). Hardest with 10+ tries: matching `pa-warts-match`
+2/10 and `dp-ecto` 4/15, ordering `mu-hierarchy` 3/13, `dp-clinda` 4/16, select-all `dp-toenail` 6/20, `dp-contact-urticaria`
+7/21 (allergic contact dermatitis picked 12 times, more than the key; the explanation already says it's type IV),
+`pa-lichenif` 5/15 (hyperkeratosis 8), `pa-pagetoid` 4/12, `dp-terb-pk` 4/11 (the "converted to an azole" choice 5),
+`mu-functional-syncytium` 4/10, `mu-dhpr` 5/11 (SERCA 5). Explanations now answer the favorite wrong choice on
+`dp-clinda` (membrane: gramicidin), `dp-terb-pk`, `mu-dhpr`, `nm-sux-cv`; reports #21 (`sk-keratinization` key reworded),
+#22 (`sk-ex-func` key no longer a throwaway) and #25 (`mu-fig-h`/`mu-fig-a`: the highlighted band now has a dashed outline
+and a stronger fill, and the A band still lights the H zone too) fixed. **Run the next audit Friday night or Saturday for
+the PCD retro and the first MSK 4 check-ins.**
 
-**Perio**: idle with the final 5 weeks out. Two more midterm check-ins (n = 27): Hub was easier, readiness 5, as expected;
-and Exam asked different things, readiness 3, worse than expected, missed "cases with pictures, charts and radiographs".
-**MSK Exam 3**: two more check-ins (n = 10), both About right (readiness 5 and 2; better than / as expected).
+**Occlusion midterm** (6 days out): 9 people, 2 h; 30 answers from 1 person. Fills after MSK 4.
+
+**Perio**: 15 people, 6 h on 10-14 (the S5 Furcation quiz is today), 366 answers from 4 people at 72%.
+**MSK Exam 3**: one more check-in (n = 11), About right, readiness 4, as expected.
 
 ## Standing lessons (read before building a hub)
 
@@ -184,6 +197,14 @@ and Exam asked different things, readiness 3, worse than expected, missed "cases
   five MCQs went from 35-52% to 67-82% within a day (`h-nut-vitA-epith`, `h-tu-gct-demo`, `h-ai-mikulicz`, `qz-rickets`,
   `sl-calcitriol`), while the matching item `h-tu-match` went from 46% to 34%. Fix matching items by shortening them or
   splitting them into MCQs, not by rewriting the explanation.
+
+- **A report that says the key contradicts the case moves accuracy more than an added sentence.** 10-13 evening: the two
+  keys rewritten from reports went 47% -> 14/14 (`ce-isolation`) and 48% -> 70% (`ve-pbox-3`); of five explanations that
+  only added a line about the favorite wrong answer, two rose 20 points and three stayed flat while the bank rose 5. And the
+  matching item `ce-cure-match` (52%) did better as two MCQs (72-75%), as the 10-01 MSK data predicted.
+- **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
+  visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
+  drop bursts of one-ping visitors until the widget ignores automated browsers.
 
 ## What student reports and surveys have taught (keep adding)
 

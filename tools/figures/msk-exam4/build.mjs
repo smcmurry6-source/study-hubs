@@ -40,7 +40,10 @@ const STILL_CSS = `
 .anima.am-still[data-q="m"] .sc-tick-t{display:none}
 .anima.am-still[data-q="skin"] svg{max-width:600px}
 .anima.am-still[data-q="band-H"] [data-band="H"],.anima.am-still[data-q="band-A"] [data-band="A"]{fill:var(--anatomy-lit);stroke:var(--anatomy-lit);opacity:.85}
-.anima.am-still[data-q="band-H"] [data-band-bg="H"],.anima.am-still[data-q="band-A"] [data-band-bg="A"]{fill:color-mix(in srgb,var(--anatomy-lit) 22%,var(--anatomy-card))}
+.anima.am-still[data-q="band-H"] [data-band-bg="H"],.anima.am-still[data-q="band-A"] [data-band-bg="A"]{fill:color-mix(in srgb,var(--anatomy-lit) 34%,var(--anatomy-card));stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:5 3}
+.anima.am-still[data-q="band-H"] [data-band-bg="A"]{fill:none}
+.anima.am-still[data-q="band-A"] [data-band="H"]{fill:var(--anatomy-lit);opacity:.85}
+.anima.am-still[data-q="band-A"] [data-band-bg="H"]{fill:none}
 `;
 const SECTION_CSS = `
 .lec-figs{margin:26px 0 6px}
