@@ -1508,7 +1508,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var answers = {};
       var box = document.createElement("section");
       box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Quick survey");
-      var h = '<button type="button" class="survey-x" aria-label="No thanks">×</button><div class="survey-eyebrow">Quick survey · ' +
+      var h = '<button type="button" class="survey-x" aria-label="Later">×</button><div class="survey-eyebrow">Quick survey · ' +
         (qs.length === 1 ? "1 question" : qs.length + " questions") + '</div><h3>' + esc(sv.title) + '</h3>';
       qs.forEach(function(q, qi){
         var id = String(q.id || ("q" + (qi + 1)));
@@ -1526,7 +1526,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         }
         h += '</div>';
       });
-      h += '<div class="survey-foot"><button type="button" class="survey-skip">No thanks</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+      h += '<div class="survey-foot"><button type="button" class="survey-skip">Later</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
       box.innerHTML = h;
       document.body.appendChild(box);
       requestAnimationFrame(function(){ box.classList.add("is-shown"); });
@@ -1542,12 +1542,23 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       }
       function done(payload, thanks){
         try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
-        sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){}, function(){});
-        if (!thanks){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); return; }
+        /* "Later" (null) stops the pop-up, but the survey waits in the Inbox (widget/replies.js) until it's answered */
+        sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){
+          if (window.shReplies && window.shReplies.refresh) window.shReplies.refresh();
+        }, function(){});
+        if (!thanks){
+          box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Saved to your Inbox.</b> Answer it there anytime.</p>';
+          setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2200);
+          return;
+        }
         box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
         setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
       }
       box.addEventListener("input", refresh);
+      /* answered from the Inbox while this card is still open */
+      document.addEventListener("sh:survey-done", function(e){
+        if (e.detail && e.detail.id === sv.id && box.isConnected){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+      });
       box.addEventListener("click", function(e){
         var opt = e.target.closest(".survey-opt");
         if (opt){

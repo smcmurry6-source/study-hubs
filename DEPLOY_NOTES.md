@@ -102,6 +102,14 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (unanswered survey waits in the Inbox, Claude Code)** — The dashboard survey pop-up's "No thanks" is now
+  **Later** (it still records a null row so the pop-up doesn't come back, then says "Saved to your Inbox"). The live survey
+  the visitor hasn't answered sits at the top of the Inbox on every hub and the dashboard (`widget/replies.js`,
+  `get_my_survey`), unread (badge/dot) until the Inbox is opened (`sh_survey_seen`), and is answered right there with the
+  same question kinds (Other included). `migration_v36.sql` (**applied via the connector**): `get_my_survey`, and
+  `submit_survey` now lets answers replace an earlier null "Later" row. `shReplies.refresh()`; `sh:survey-done` closes the
+  dashboard card if it was answered from the Inbox. About page, `sw.js` -> `sh-v21`.
+
 - **2026-10-15 (surveys: 5 questions + Other, Claude Code, #120)** — `migration_v35.sql` (**applied via the connector**):
   `admin_upsert_survey` takes 1-5 questions (was 3); the dashboard card shows up to 5. A pick-one / pick-any question with
   `"other": true` gets an **Other** button that opens a text box, saved as `answers["<id>_other"]` (300 chars); `review/` →
