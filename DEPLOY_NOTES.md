@@ -102,6 +102,20 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-15 (Listen dock + highlighter, Claude Code)** — Two student suggestions, built at Sam's request.
+  **Listen dock** (#4): `shTTS` in `widget/v3.js` now remembers the current narration (`cur`) and, while it plays or is
+  paused and the lecture's Listen row and player are out of view (IntersectionObserver), shows `.sh-tts-dock` pinned to the
+  bottom of the screen (above the phone bar via `--sh-tabbar-h`): play/pause, the lecture title (tap to scroll back),
+  a seek bar (narration files; read-only progress for the browser voice), the time and a stop button. It also shows if
+  the hub re-renders and the Listen button leaves the page while audio keeps going. **Highlighter** (#5): new
+  `widget/highlight.js`, loaded by v3.js (`shHighlight.mount(HUB)`): selecting text inside any `.reading-prose` shows a
+  "Highlight" button; highlights are `<mark class="sh-hl">` wrapped around existing text nodes (notes text and narration
+  unchanged; Listen word-highlighting still works inside them), saved per device in `sh_hl:<hub>:<hash of the notes
+  text>` as merged [start, end] offsets, redrawn by a MutationObserver whenever a hub renders notes, and dropped if the
+  text changes (the hash). Tapping a highlight offers Remove / Clear all. Works in every hub with no hub changes; a new
+  hub gets both if its notes use `.reading-prose` and its Listen button `.sh-tts-btn`. About page, CI syntax check,
+  `sw.js` precache -> `sh-v19`. No schema change.
+
 - **2026-10-15 morning (lessons audit, Claude Code)** — MSK Exam 4 eve-1; PCD Exam 3 is open today. `hubs/msk-exam4`,
   same ids and answer positions: `sk-keratinization`'s key reworded (report #21: "Programmed cell death that removes the
   nucleus but leaves the cell intact"); `sk-ex-func`'s throwaway key "Producing bile" is now "Activating vitamin D to
