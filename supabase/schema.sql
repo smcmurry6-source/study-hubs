@@ -719,8 +719,8 @@ returns bigint language plpgsql security definer set search_path = public as $$
 declare v bigint;
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
-  if jsonb_typeof(p_questions) <> 'array' or jsonb_array_length(p_questions) not between 1 and 3 then
-    raise exception 'questions must be an array of 1-3 items'; end if;
+  if jsonb_typeof(p_questions) <> 'array' or jsonb_array_length(p_questions) not between 1 and 5 then
+    raise exception 'questions must be an array of 1-5 items'; end if;
   insert into surveys (slug, title, questions, active, ends_at) values (p_slug, p_title, p_questions, p_active, p_ends_at)
   on conflict (slug) do update set title = excluded.title, questions = excluded.questions, active = excluded.active, ends_at = excluded.ends_at
   returning id into v;
