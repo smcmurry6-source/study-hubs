@@ -89,8 +89,8 @@ Exam 3 check-in, no surveys, no zero-result searches.
 **Fake visitors from automated sessions.** MSK 4 showed 54 people on 10-14 with 42 under 5 minutes, but 24 of them were
 single-ping visitors arriving every ~7 s between 7:18 and 7:28 am (a browser session working on the live site, each page
 a fresh visitor id); the same pattern put 12 on PCD on 10-13 and 15-16 on perio on 09-24/25. **Real MSK 4 on 10-14: ~30
-people, 18 under 5 minutes.** Until the widget skips automated browsers, drop bursts of one-ping visitors before reading
-people or bounce counts.
+people, 18 under 5 minutes.** From 10-15 the widget no longer records automated browsers (`navigator.webdriver`); drop such bursts from earlier
+data before reading people or bounce counts.
 
 **Did the 10-13 evening fixes work?** (`personal_answers` before vs since; the whole PCD bank rose from 81% on 10-13 to
 86% on 10-14, so only gains well above +5 points count.) Key rewrites from reports: `ce-isolation` 8/17 (47%) -> **14/14**
@@ -109,7 +109,8 @@ answers from 60 people, 83%. By lecture: Cement 78% and Bonding 80% (33-37 tries
 glaze video 83%, Veneers 86%, Removing a Crown 91%. Still hardest: `on-telio` 14/32 (44%; 8/17 -> 6/15 since, not yet
 fixed), `on-materials-list` 18/37, `bo-zprime`, `bo-adh-thick`, `ce-burnish`, `ve-same-day` 14/24, `gl-c-shade` 11/19.
 The 7 new staining questions (`gl-*`, 10-14) were answered 13-21 times each at 58-100%; `gl-email` drew two "not useful"
-reports (#23, #24).
+reports (#23, #24) and is removed; explanations now answer the favorite wrong choice on `on-telio`,
+`on-materials-list`, `ve-same-day`, `ce-short-prep`, `on-isthmus`, `gl-system`, `ve-zenith` and `gl-c-shade`.
 
 **MSK Exam 4** (tomorrow; 30 questions: L28 6, L29 3, L30 6, L31 11, L32 4): ~33 real people, 35 h; 10-14 ~30 people, 13 h,
 1,018 answers from 13 people at 75%. All time 2,307 answers from 20 people, 72%. **The late lectures are barely
@@ -119,7 +120,8 @@ bank 374 min (23), notes 295 (25), Review drugs 25 (12), Diagrams 5 (13). Hardes
 2/10 and `dp-ecto` 4/15, ordering `mu-hierarchy` 3/13, `dp-clinda` 4/16, select-all `dp-toenail` 6/20, `dp-contact-urticaria`
 7/21 (allergic contact dermatitis picked 12 times, more than the key; the explanation already says it's type IV),
 `pa-lichenif` 5/15 (hyperkeratosis 8), `pa-pagetoid` 4/12, `dp-terb-pk` 4/11 (the "converted to an azole" choice 5),
-`mu-functional-syncytium` 4/10, `mu-dhpr` 5/11 (SERCA 5). Explanations now answer the favorite wrong choice on
+`mu-functional-syncytium` 4/10, `mu-dhpr` 5/11 (SERCA 5). At Sam's request the two matching items are now MCQs
+(`pa-wart-plana`/`-plantar`/`-condyloma`, `dp-ecto-malathion`/`-spinosad`/`-ivermectin`). Explanations now answer the favorite wrong choice on
 `dp-clinda` (membrane: gramicidin), `dp-terb-pk`, `mu-dhpr`, `nm-sux-cv`; reports #21 (`sk-keratinization` key reworded),
 #22 (`sk-ex-func` key no longer a throwaway) and #25 (`mu-fig-h`/`mu-fig-a`: the highlighted band now has a dashed outline
 and a stronger fill, and the A band still lights the H zone too) fixed. **Run the next audit Friday night or Saturday for
@@ -204,7 +206,7 @@ the PCD retro and the first MSK 4 check-ins.**
   matching item `ce-cure-match` (52%) did better as two MCQs (72-75%), as the 10-01 MSK data predicted.
 - **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
-  drop bursts of one-ping visitors until the widget ignores automated browsers.
+  the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
 
 ## What student reports and surveys have taught (keep adding)
 

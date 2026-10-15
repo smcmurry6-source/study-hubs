@@ -1321,9 +1321,15 @@ mcq('dp-acyclovir','dermpharm','hub','Acyclovir, valacyclovir, penciclovir and f
 mcq('dp-scabies','dermpharm','hub','A patient has scabies. Which product is applied from the neck down and left on 8-14 hours?',
   ['Permethrin 5% cream (Elimite)','Permethrin 1% cream rinse (Nix)','Ivermectin 0.5% lotion (Sklice)','Benzyl alcohol 5% lotion (Ulesfia)'],
   'Scabies: permethrin 5% from the neck down for 8-14 hours, or crotamiton (Eurax) 10% from the chin down, twice 24 hours apart. Nix, Sklice and Ulesfia are head-lice products rinsed off after about 10 minutes.');
-match('dp-ecto','dermpharm','hub','Match each ectoparasiticide to the infestation it is listed for.',
-  [['Crotamiton','Scabies only'],['Ivermectin lotion','Head lice'],['Malathion','Lice; comb out nits after 4-6 h'],['Spinosad','Head lice, 10-min suspension']],
-  'Permethrin covers both (1% lice, 5% scabies). Crotamiton is scabies only. Ivermectin (Sklice), spinosad (Natroba) and benzyl alcohol (Ulesfia) are head-lice products. Malathion (Ovide) is applied to dry hair for pediculosis.');
+mcq('dp-ecto-malathion','dermpharm','hub','Which head-lice product is applied to dry hair, with the nits combed out after 4-6 hours?',
+  ['Malathion (Ovide)','Spinosad (Natroba)','Ivermectin lotion (Sklice)','Crotamiton (Eurax)'],
+  'Malathion (Ovide) goes on dry hair for pediculosis, and the nits are combed out after 4-6 hours. Spinosad and ivermectin lotion are head-lice products rinsed off after about 10 minutes, and crotamiton is for scabies only.');
+mcq('dp-ecto-spinosad','dermpharm','hub','How is spinosad (Natroba) used for head lice?',
+  ['As a 10-minute suspension, then rinsed off','From the neck down, left on 8-14 hours','From the chin down, twice, 24 hours apart','On dry hair, nits combed out after 4-6 hours'],
+  'Spinosad is a 10-minute suspension for head lice. Neck down for 8-14 hours is permethrin 5% for scabies, chin down twice 24 hours apart is crotamiton for scabies, and dry hair with combing after 4-6 hours is malathion.');
+mcq('dp-ecto-ivermectin','dermpharm','hub','Ivermectin 0.5% lotion (Sklice) is listed for:',
+  ['Head lice','Scabies only','Impetigo','Onychomycosis'],
+  'Ivermectin lotion (Sklice), spinosad (Natroba) and benzyl alcohol (Ulesfia) are head-lice products. Crotamiton is the one listed for scabies only; impetigo takes a topical antibiotic such as mupirocin or retapamulin, and onychomycosis takes terbinafine.');
 mcq('dp-ex-ecto','dermpharm','hub','All of the following are listed treatments for head lice EXCEPT:',
   ['Crotamiton','Permethrin 1% (Nix)','Spinosad','Benzyl alcohol'],
   'Crotamiton (Eurax) is listed for scabies only. Permethrin 1%, spinosad, ivermectin lotion, malathion and benzyl alcohol are pediculosis products.');
@@ -1405,9 +1411,15 @@ mcq('pa-wart-hpv','dermpath','deck','The most common type of wart, verruca vulga
   ['HPV 2 and 4','HPV 6 and 11','HPV 3 and 10','HPV 16 and 18'],
   'Vulgaris: HPV 2 and 4 (hands, pebbly). Plana (flat, face/hands): 3 and 10. Plantaris/palmaris: 1 (and 60 per the slide). Condyloma acuminatum: 6 and 11. All are low-risk types; 16 and 18 are high-risk.',
   { cue:'Common wart = 2 and 4 ("too-four common"). Genital = 6 and 11.' });
-match('pa-warts-match','dermpath','hub','Match each wart to its HPV types.',
-  [['Verruca vulgaris','HPV 2 and 4'],['Verruca plana','HPV 3 and 10'],['Verruca plantaris','HPV 1'],['Condyloma acuminatum','HPV 6 and 11']],
-  'All are low-risk HPV, spread by direct contact, and usually regress in 6 months to 2 years. Condylomas are cauliflower-like genital warts.');
+mcq('pa-wart-plana','dermpath','hub','Flat warts (verruca plana) are caused by which HPV types?',
+  ['HPV 3 and 10','HPV 2 and 4','HPV 6 and 11','HPV 1'],
+  'Verruca plana: HPV 3 and 10. Verruca vulgaris is HPV 2 and 4, plantar warts HPV 1, and condyloma acuminatum HPV 6 and 11. All are low-risk HPV, spread by direct contact, and usually regress in 6 months to 2 years.');
+mcq('pa-wart-plantar','dermpath','hub','Plantar warts (verruca plantaris) are caused by which HPV type?',
+  ['HPV 1','HPV 3 and 10','HPV 2 and 4','HPV 6 and 11'],
+  'Verruca plantaris: HPV 1. Flat warts are HPV 3 and 10, common warts HPV 2 and 4, and condylomas HPV 6 and 11.');
+mcq('pa-wart-condyloma','dermpath','hub','Condyloma acuminatum, the cauliflower-like genital wart, is caused by which HPV types?',
+  ['HPV 6 and 11','HPV 2 and 4','HPV 3 and 10','HPV 1'],
+  'Condyloma acuminatum: HPV 6 and 11, low-risk types like the other warts. Common warts are HPV 2 and 4, flat warts HPV 3 and 10, plantar warts HPV 1.');
 mcq('pa-koilocyte','dermpath','hub','Which histologic features identify a verruca?',
   ['Epidermal hyperplasia, koilocytes and prominent keratohyalin granules','Band-like lymphocytes at the dermoepidermal junction','Peripheral palisading with clefting','Neutrophilic microabscesses in the dermal papillae'],
   'Warts show papillary epidermal hyperplasia, heavy keratin, hypergranulosis with big keratohyalin granules, and koilocytes (clear cytoplasm, wrinkled raisinoid nucleus from HPV). The oral counterpart is the squamous papilloma.');
@@ -3476,7 +3488,7 @@ var ARCADE = (function(){
     { id:'sort',  name:'SPLIT DECISION', color:'var(--ar-yellow)', desc:'Cards rain down. Fling each one into the right bin before it hits the floor: pemphigus vs pemphigoid, BCC vs SCC, depolarizing vs nondepolarizing, and more.', thumb:thumbSort },
     { id:'snake', name:'SARCO SNAKE',  color:'var(--ar-green)',  desc:'Relaxed snake with a twist: read the clue, then eat the lettered dot with the right answer. It moves slowly, wraps around the edges, and gives you five lives. Answers count toward class stats.', thumb:thumbSnake },
     { id:'stack', name:'Z-LINE STACK', color:'var(--ar-cyan)',   desc:'Steps of a process ride the conveyor. Grab them in order to build the tower: epidermal layers, excitation-contraction coupling, the succinylcholine block, the calcineurin pathway.', thumb:thumbStack },
-    { id:'match', name:'MELANIN MATCH', color:'var(--ar-violet)', desc:'Memory flip. Find each term and its partner: drug and mechanism, wart and HPV type, blister disease and its antibody. Clear boards to buy more time.', thumb:thumbMatch },
+    { id:'match', name:'MELANIN MATCH', color:'var(--ar-violet)', desc:'Memory flip. Find each term and its partner: drug and mechanism, skin cell and its job, blister disease and its antibody. Clear boards to buy more time.', thumb:thumbMatch },
     { id:'hangman', name:'SKELETON KEY', color:'var(--ar-orange)', desc:'Hangman with a skeleton. Spell the answer to a clue one letter at a time before all six bones fall off. Answers count toward class stats.', thumb:thumbHang },
     { id:'fact', name:'FACT OR FLAKE', color:'var(--ar-pink)', desc:'60-second rush. Is the detail on the card true, or a flake swapped in from a look-alike drug or disease? Streaks multiply your score.', thumb:thumbFact },
     { id:'blaster', name:'LANGERHANS LASER', color:'var(--ar-green)', desc:'Shooter. Germs carrying answers drift down toward the skin; blast the one with the right answer before it lands. Answers count toward class stats.', thumb:thumbBlaster },

@@ -982,15 +982,20 @@
   });
   channel.subscribe(function(status){
     if (status === "SUBSCRIBED") {
-      channel.track({ online_at: new Date().toISOString() });
+      if (!AUTOMATED) channel.track({ online_at: new Date().toISOString() });
       safeRpc("record_presence_ping", { p_hub: HUB });
     }
   });
   }
 
   /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
+  /* Automated browsers (Playwright, Puppeteer, Selenium: navigator.webdriver) don't count in the analytics: sessions that
+     test or screenshot the live site made a new visitor per page and inflated people and bounce counts (LESSONS.md). */
+  var AUTOMATED = (function(){ try { return !!navigator.webdriver; } catch (e) { return false; } })();
+  window.shAutomated = AUTOMATED;
   function safeRpc(fn, args){
     if (!supabase) return;
+    if (AUTOMATED && /^record_/.test(fn)) return;
     try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
   }
 

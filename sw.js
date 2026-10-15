@@ -2,7 +2,7 @@
    Pages, scripts and styles are network-first (so every deploy shows up right away) and fall
    back to the last copy when offline. Narration mp3s and Supabase class data are never cached:
    audio streams in byte ranges, and class data should never be stale. Bump VERSION to drop old caches. */
-var VERSION = 'sh-v17';
+var VERSION = 'sh-v18';
 var PRECACHE = ['./', 'index.html', 'widget/v3.js', 'widget/eggs.js', 'widget/clicks.js', 'widget/replies.js', 'widget/ranks.js', 'widget/rankup.js', 'widget/drill.js', 'widget/fx.js', 'widget/v3.css', 'widget/vendor/supabase-2.117.2.js',
   'assets/icon.svg', 'hubs/msk-exam3/', 'hubs/msk-exam4/', 'hubs/occlusion/', 'hubs/pcd-exam3/', 'hubs/perio/'];
 self.addEventListener('install', function(e){
