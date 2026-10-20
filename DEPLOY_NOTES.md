@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion: several questions per patient, Claude Code)** — At Sam's suggestion, every Patient Box case is now
+  a shared patient: `CASES` (defined once, after the question helpers) holds each box and its drawn findings, and
+  `pc('<key>')` gives a question that box plus `pcase`. `pboxHTML` shows "Same patient · k of n" (`caseSet()`), and the
+  bank's Shuffle keeps a set together in its own order. 18 cases, 30 new questions written from the L1-L5 notes (bank
+  319 -> 349), e.g. `cs-div2-vo`/`-teeth`/`-molar`, `cs-nw-side`/`-incline`, `cs-pro-incline`/`-christ`, `cs-worn-vdo`/`-weeks`,
+  `cs-record-best`/`-check`; each explanation answers every wrong choice, and each has its `QUESTION_WHY` row (#129's rule). `cs-upright` and `cs-reorg` now show the full
+  shared box, so their stems no longer say "the previous case" (same ids, keys and answer positions). About page updated.
+  No notes text changed, so no narration regenerated.
+
 - **2026-10-20 (Occlusion Review: one tab per lecture, Claude Code)** — Sam asked for one Review tab per lecture. L1's
   four groups (Positions and terms, What cusp hits where, Guidance and determinants, Envelope of motion) are now one
   tab, "Review of Basic Occlusion" (id still `positions`, so saved picks and `review/positions` time carry over; old
