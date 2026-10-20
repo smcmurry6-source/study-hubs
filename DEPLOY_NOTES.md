@@ -102,6 +102,17 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion midterm eve, Claude Code, #125)** — From the lessons audit, the day before the midterm.
+  `hubs/occlusion`, same ids and answer positions: explanations now answer the class's favorite wrong choice on
+  `an-compound` (4/27; "hinge and gliding" is the ginglymoarthrodial definition), `fp-m2`, `fp-post`, `fp-c2-pm`,
+  `rv-ch-spee`, `fig-pmand-a`, `fig-incl-w`, `fp-arrow`, `cc-parfitt`, `cc-cingulum`. **Diagram keys** (suggestion #6): a
+  FIGS entry can carry `key:[[label, text], ...]`, drawn by `figKeyHTML()` as a folded "Show the key" under the copies in
+  the notes and Review (`figCardHTML`) only, never on a question's picture (`figHTML`); envSag, envHoriz, envFront,
+  pathMax, pathMand and inclines have one. New `rv-thielmann-f` asks for Thielmann's formula itself (report #26). 11 more
+  help-sheet items (suggestion #8; the help-sheet source was the weakest at 60%): `fp-pm1b`, `fp-pm2l`, `fp-l-pm2b`,
+  `fp-l-ml`, `fp-l-m2`, `fp-c2-pm1b`, `fp-c2-pm1l`, `fp-l-c2`, `fp-c3-pm1l` (fence post: other cusps, the left side, Class
+  II/III) and `fp-facet`, `fp-path14` (inclines and cusp paths applied). Bank 296 -> 308. About page: the diagram key. No
+  notes text changed, so no narration regenerated.
 - **2026-10-20 (Occlusion midterm: Dr. Givan's exam email, Claude Code)** — The email: Wed Oct 21, 6:30 pm, Canvas with
   LockDown Browser + Monitor, 40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1, i.e. all five
   lectures already in the hub; the Drive Midterm folder holds exactly those three recordings), one hour, log in from 6:25,
