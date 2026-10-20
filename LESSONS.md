@@ -116,7 +116,7 @@ move, and do the check-ins ask for application questions (#7)?**
   brought him back from 0 HP. **Turned off after adopting: 2** used "Turn off Timmy"; 3 more pressed an "Off" in Settings,
   which may have been his or another setting. **"No thanks" in his introduction: at most 1 person** (every other dashboard
   "No thanks" matches a survey skip that day). So the ~50 dashboard users who haven't adopted him never opened his
-  introduction: he is still perched on their name on the dashboard (he only follows you into hubs once adopted).
+  introduction: he is still perched on their name on the dashboard (he only follows you into hubs once adopted). Sam (10-20): he stays there and keeps asking to be tapped.
 - **Listen**: 23 people have ever pressed it (MSK 3 11, perio 9, Occlusion 7, PCD 6, MSK 4 6); ~4 used the floating dock.
   **Mind maps**: 36 people (MSK 3 23, PCD 14, perio 11, Occlusion 4, MSK 4 2). **Highlighter** (10-15): 12 people (Occlusion 5
   with 133 highlights, MSK 4 6, PCD 1).
@@ -173,6 +173,10 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
 - **Look-alike conditions need a side-by-side table, not just paragraphs.** GI2's two Crohn vs UC matching items
   were the hardest in the bank (5-7%) and its GIST/interstitial-cell items were all under 35%. Notes for any
   lecture with paired look-alikes should have a comparison table and a question per distinguishing feature.
+  Students ask for them too (survey round 2: "comparative summary charts of related material to help recognize
+  patterns"), so every hub's Review gets a **Side by side** group of comparison charts built from its hardest items
+  (Occlusion has the first, 2026-10-20), and every Review group is labeled with its lecture ("Review section should
+  match lecture titles"): name a group after its lecture when it covers one lecture.
 - **Many visitors bounce.** All time, 26-40% of each hub's visitors spent under 5 minutes in it (GI2 31 of 78, MSK 23
   of 87, perio 46 of 120), and about half came on one day only (37 of 78, 40 of 87, 65 of 120). Bounces are lowest on
   the exam eve (perio 3 of 57, MSK 5 of 61) and highest on exam morning (MSK 15 of 47). The landing view should get someone to a question or the notes in one tap.
@@ -279,7 +283,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   make it easier to find), Review titles that match the lecture titles, no recall/flashcard items when the exam is all
   MCQ, cloze (fill-in-the-blank), and on games: filter by lecture or missed questions, quiz-based games, or get rid of
   them. Sam opened separate work for highlight colors, the tutorial, Patient Box questions, games and a place to ask
-  questions (10-20).
+  questions (10-20). Done the same day: the Daily Drill takes 10, 20 or 30 questions; Review groups carry their lecture
+  number and title; Occlusion's Review has a Side by side group of comparison charts. Cloze items: not now (Sam).
 - **What check-ins say the hub missed lines up with the weakest data.** MSK's check-ins asked for "location of bone
   formation and differentiation", the lowest lecture (Bone Development 71%, its orderings 18-48%); perio's asked for
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.

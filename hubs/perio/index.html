@@ -4139,7 +4139,7 @@ function renderCourseInfo(){
   var left = QUESTIONS.filter(function(q){ return !STATE.answered[q.id]; }).length;
   var h = '<div class="quick-start" aria-label="Start studying">' +
     '<button type="button" class="qs-btn primary" data-practice="all"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' you haven\'t tried</small></span></button>' +
-    '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>10 questions: misses + high-yield</small></span></button>' +
+    '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>10, 20 or 30 questions: misses + high-yield</small></span></button>' +
     '<button type="button" class="qs-btn" data-goto-lecture="'+cont.id+'"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>S'+cont.num+' '+escHtml(shortTitle(cont))+'</small></span></button>' +
     '</div>';
   var qd = NEXT_QUIZ ? daysUntil(NEXT_QUIZ.date) : null;

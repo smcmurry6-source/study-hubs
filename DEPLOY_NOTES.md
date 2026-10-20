@@ -102,6 +102,19 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (longer drill, Review by lecture, comparison charts, Claude Code)** — From survey round 2, at Sam's
+  request. **Daily Drill length** (`widget/drill.js`): 10, 20 or 30 questions, picked on the intro screen before the day's
+  first set starts (`sh_drill_size`, every hub); switching grows the saved set (keeps the picks, adds more) or trims it;
+  the caps scale with the length (spaced review up to 60%, misses 80%, 30% per lecture); the finish screen offers 10, 20
+  or 30 more. Tracked as `drill:size=<n>` / `drill:more=<n>`. **Occlusion Review**: each group has a `lec` and shows that
+  lecture's L-number in its color on the chip and heading (`groupLecTag()`); groups that cover one lecture take its title
+  (L2-L5), the L1 ones say "From L1 · Review of Basic Occlusion". New group **Side by side** (`compare`): the four
+  movements from every angle, Class I vs II vs III cusp by cusp, joint words, the four curves, and the pairs the class
+  mixes up (from the hardest items), all from the hub's notes. Perio's Review already filters by session title, so it
+  is unchanged. About page (Daily drill, Review), perio's drill button text, `sw.js` -> `sh-v23`. No schema change.
+  Sam's calls the same day: the archived hub folders stay; Timmy Tooth keeps asking unadopted visitors to tap him;
+  no cloze items for now.
+
 - **2026-10-20 (lessons audit + feature events, Claude Code)** — `LESSONS.md` refreshed: retrospectives for **PCD Exam 3**
   and **MSK Exam 4** (both recaps were already on the dashboard), the 10-15 fixes checked, Occlusion's eve signals, a
   feature-use summary (podcast, Timmy Tooth, Listen, mind maps, names, diagrams) and new standing lessons (heaviest users
