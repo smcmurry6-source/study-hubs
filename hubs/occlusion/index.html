@@ -637,6 +637,20 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .reading-prose table.rv-table{min-width:520px}
 .exam-banner{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--accent);color:var(--ink);border-radius:10px;padding:10px 14px;margin:0 0 20px;font-size:.92rem}
 .exam-banner b{color:var(--accent-ink)}
+/* midterm format and logistics (Dr. Givan's email), a card at the top of Compendium */
+.exam-card{border:1px solid var(--accent);background:var(--surface);border-radius:12px;padding:10px 14px;margin:0 0 18px;font-size:.92rem;box-shadow:var(--shadow)}
+.exam-card summary{display:flex;gap:10px;align-items:center;cursor:pointer;list-style:none;color:var(--ink)}
+.exam-card summary::-webkit-details-marker{display:none}
+.exam-card summary::after{content:"";flex:none;margin-left:auto;width:8px;height:8px;border:solid var(--ink-soft);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .15s}
+.exam-card[open] summary::after{transform:rotate(-135deg)}
+.exam-card summary b{color:var(--accent-ink)}
+.exam-card summary .ic{flex:none;color:var(--accent-ink)}
+.exam-info{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:10px 0 4px}
+.exam-info dt{font-family:var(--font-mono);font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);padding-top:2px}
+.exam-info dd{margin:0;color:var(--ink)}
+.exam-card .reading-actions{margin-top:8px}
+@media (max-width:560px){.exam-info{grid-template-columns:1fr;gap:2px}.exam-info dd{margin-bottom:6px}}
+.pill.is-over{border-color:var(--bad);color:var(--bad);background:var(--bad-soft);font-weight:600}
 
 /* ---------- Occlusion additions: drawn figures (questions, notes, Review) ---------- */
 .qcard-figure{margin:0 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:8px 10px}
@@ -668,7 +682,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1 title="Dr. Givan's five lectures · Midterm, Wed Oct 21 · Final, Thu Nov 19">Occlusion Midterm</h1>
+        <h1 title="Dr. Givan's five lectures · Midterm, Wed Oct 21, 6:30 pm · Final, Thu Nov 19">Occlusion Midterm</h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
         <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
@@ -761,6 +775,16 @@ function pixelHeart(){
 /* ---------- LECTURES ---------- */
 var EXAM_DATE = '2026-10-21';
 var FINAL_DATE = '2026-11-19';
+/* Dr. Givan's midterm email (10/20): Canvas with LockDown Browser + Monitor, 6:30 pm, one hour, log in from 6:25,
+   window closes 7:45. Shown on Compendium until the window closes (examCardHTML). */
+var EXAM_TIME = '18:30', EXAM_CLOSES = '19:45';
+var EXAM_INFO = [
+  ['What', '40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1): all five lectures in this hub.'],
+  ['When', 'Wednesday, October 21, 6:30 pm, one hour. You can log in from 6:25. The window closes at 7:45, so start by 6:45 at the latest to get the full hour.'],
+  ['Before', 'Update LockDown Browser and Monitor to the latest versions. Charge your laptop or plug it in.'],
+  ['Allowed', 'One sheet of blank paper. During the environmental scan, show BOTH sides of it to the camera.'],
+  ['Tip', 'Dr. Givan: "The only thing you really have to remember on fence posts is how to draw fence posts." The blank sheet is the place to draw them.']
+];
 var LECTURES = [
   { id:'review',   num:1, title:'Review of Basic Occlusion',                        who:'Dr. Givan', tag:'blue',   source:'Occ Lec1 Review (slides + handout) + 9/17 recording + "What cusp hits where" help sheet', status:'taught' },
   { id:'anatomy',  num:2, title:'Functional TMJ Anatomy and the Muscles of Mastication', who:'Dr. Givan', tag:'red', source:'Occ Lec2-1 Anatomy (slides + handout) + 9/24 recording', status:'taught' },
@@ -2646,6 +2670,8 @@ function dayStreak(){
   for(;;){ var k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); if(set[k]){ n++; d.setDate(d.getDate()-1); } else break; }
   return n;
 }
+/* whole calendar days from today to a 'YYYY-MM-DD' date (0 = today) */
+function calDays(now, ymd){ return Math.round((new Date(ymd + 'T00:00:00') - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5); }
 function renderHeaderStats(){
   var seenCount = QUESTIONS.filter(function(q){ return STATE.seen[q.id]; }).length;
   var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + '/' + QUESTIONS.length;
@@ -2653,10 +2679,10 @@ function renderHeaderStats(){
   var cd = document.getElementById('countdownPill');
   if(cd){
     var now = new Date();
-    var finalNext = now >= new Date(EXAM_DATE + 'T22:00:00');
-    var ex = new Date((finalNext ? FINAL_DATE : EXAM_DATE) + 'T08:00:00'), what = finalNext ? 'final' : 'midterm';
-    var days = Math.ceil((ex - now) / 864e5);
-    cd.textContent = days > 1 ? (days + ' days to ' + what) : days === 1 ? (what === 'final' ? 'Final tomorrow' : 'Midterm tomorrow') : days === 0 ? 'Exam day!' : 'Exams done';
+    var finalNext = now >= new Date(EXAM_DATE + 'T' + EXAM_CLOSES + ':00');
+    var what = finalNext ? 'final' : 'midterm';
+    var days = calDays(now, finalNext ? FINAL_DATE : EXAM_DATE);
+    cd.textContent = days > 1 ? (days + ' days to ' + what) : days === 1 ? (finalNext ? 'Final tomorrow' : 'Midterm tomorrow') : days === 0 ? (finalNext ? 'Exam day!' : 'Midterm tonight') : 'Exams done';
   }
 }
 
@@ -2806,7 +2832,17 @@ function setMode(mode){
 /* ===================================================================
    COMPENDIUM
    =================================================================== */
-var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (40)'] ];
+var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (45)'] ];
+function examInfoHTML(){ return '<dl class="exam-info">' + EXAM_INFO.map(function(r){ return '<dt>'+r[0]+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>'; }
+/* the midterm's format and logistics, open until the student closes it (STATE.ui.examCard), gone once the window closes */
+function examCardHTML(){
+  var now = new Date(), close = new Date(EXAM_DATE + 'T' + EXAM_CLOSES + ':00');
+  if(now >= close) return '';
+  var d = calDays(now, EXAM_DATE);
+  var when = d === 0 ? (now >= new Date(EXAM_DATE + 'T' + EXAM_TIME + ':00') ? 'Midterm now, until 7:45 pm' : 'Midterm tonight, 6:30 pm') : d === 1 ? 'Midterm tomorrow, 6:30 pm' : 'Midterm: Wed Oct 21, 6:30 pm';
+  return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · 40-45 multiple choice · 1 hour · LockDown Browser + Monitor</span></summary>' +
+    examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-qs="mock">Take the 45-question mock</button></div></details>';
+}
 var BANK_PAGE = 30, bankShown = BANK_PAGE;
 
 function renderCompendium(){
@@ -2819,15 +2855,19 @@ function renderCompendium(){
     '<button type="button" class="qs-btn primary" data-qs="bank"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-qs="notes"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>'+lecLabel(cont)+' '+escHtml(cont.title)+'</small></span></button></div>';
+  h += examCardHTML();
   h += '<div class="subtabs">' + SUBTABS.map(function(t){ return '<button type="button" class="subtab'+(t[0]===sub?' is-active':'')+'" data-sub="'+t[0]+'">'+t[1]+'</button>'; }).join('') + '</div><div id="compBody"></div>';
   p.innerHTML = h;
   p.querySelectorAll('[data-sub]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.sub = b.getAttribute('data-sub'); saveState(); renderCompendium(); }); });
   p.querySelectorAll('[data-qs]').forEach(function(b){ b.addEventListener('click', function(){
     var g = b.getAttribute('data-qs');
     if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
+    else if(g === 'mock') STATE.ui.sub = 'mock';
     else STATE.ui.sub = 'notes';
     saveState(); renderCompendium(); var sb = document.querySelector('#panel-compendium .subtabs'); if(sb) sb.scrollIntoView({ block:'start' });
   }); });
+  var ec = document.getElementById('examCard');
+  if(ec) ec.addEventListener('toggle', function(){ STATE.ui.examCard = ec.open ? 'open' : 'closed'; saveState(); });
   var body = document.getElementById('compBody');
   if(sub === 'notes') renderNotes(body);
   else if(sub === 'bank') renderBank(body);
@@ -2980,8 +3020,8 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion midterm: Wednesday, October 21.</b> Dr. Givan\'s five lectures (9/17, 9/24, 10/1). The final is not comprehensive, but it builds on this material. Every hint below is a quote from the recordings.</span></div>' +
-    '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Direct quotes from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion midterm: Wednesday, October 21, 6:30 pm.</b> 40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1), Dr. Givan\'s five lectures. The final is not comprehensive, but it builds on this material.</span></div>' +
+    '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   LECTURES.forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
     h += '<div class="hint-group tag-'+l.tag+'"><h3><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title)+' <a class="linkbtn" href="#" data-lec="'+l.id+'">read notes</a></h3>' +
@@ -3086,9 +3126,11 @@ function renderReview(){
 }
 
 /* ===================================================================
-   MOCK EXAM: 40 MCQs weighted by lecture length (no official counts yet; L1 is the longest lecture and the help-sheet material)
+   MOCK EXAM: 45 MCQs in an hour, the top of the 40-45 Dr. Givan's email (10/20) promises. No official counts per
+   lecture, so the three sessions get 15 each: session 1 = L1, session 2 = L2 + L3, session 3 = L4 + L5
    =================================================================== */
-var MOCK_BLUEPRINT = { review:12, anatomy:8, function:7, concepts:7, applying:6 };
+var MOCK_BLUEPRINT = { review:15, anatomy:8, function:7, concepts:8, applying:7 };
+var MOCK_LIMIT = 60 * 60; /* seconds, as on the real exam */
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
@@ -3115,7 +3157,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions weighted by lecture: 12 from the review (with the fence post and diagram questions), 8 from TMJ anatomy and muscles, 7 each from function and occlusal concepts, and 6 from applying occlusion. Patient Box and diagram items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the most the midterm will have (40-45), spread evenly over the three sessions it covers: 15 from the review (with the fence post and diagram questions), 15 from session 2 (8 TMJ anatomy and muscles, 7 chewing, swallowing and speech) and 15 from session 3 (8 occlusal concepts, 7 applying occlusion). Patient Box and diagram items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. The real exam gives you one hour, so the clock counts against 60:00 and turns red if you go over. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
@@ -3189,7 +3231,7 @@ function renderMock(body){
   }
   document.getElementById('mockNew').onclick = function(){ STATE.mock = null; saveState(); renderMock(body); };
   var clock = document.getElementById('mockClock');
-  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'); }
+  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + ' / 60:00'; clock.classList.toggle('is-over', sec > MOCK_LIMIT); }
   tick(); if(!m.submitted) mockTimer = setInterval(tick, 1000);
 }
 
