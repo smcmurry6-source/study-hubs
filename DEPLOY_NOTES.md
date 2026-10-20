@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion Review: one tab per lecture, Claude Code)** — Sam asked for one Review tab per lecture. L1's
+  four groups (Positions and terms, What cusp hits where, Guidance and determinants, Envelope of motion) are now one
+  tab, "Review of Basic Occlusion" (id still `positions`, so saved picks and `review/positions` time carry over; old
+  `contacts`/`guidance`/`motion` picks fall back to it). A section's `part` field draws a part heading, and a tab with
+  2+ parts opens with jump links (`partNavHTML()`). The "Processes (all lectures)" tab is gone: each lecture's tab ends
+  with its own processes (a `flows` section with `lec`, filtered by `seqsOf()`). Side by side stays as the one
+  cross-lecture tab. Content unchanged. About page, `sw.js` -> `sh-v26`. No schema change.
 - **2026-10-20 (why each choice, highlighter colors, egg refresh, hub trophies, Claude Code)** — Sam's list.
   **Why each choice**: every mcq/multi in `occlusion` (317, incl. #128's 11 new cases) and `perio` (388) has a `QUESTION_WHY` row (one line per
   choice, same order as `choices`, written from each question's explanation and the hub's notes), applied as `q.why`
