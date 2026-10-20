@@ -76,7 +76,7 @@ don't take one side wholesale; the other side is usually another session's work.
 GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/syntax.js`
 (every inline script parses, no conflict markers) and `node tools/ci/smoke.js` (headless click-through
 of the dashboard and every hub on desktop and phone, plus a question-bank lint: duplicate ids, answer
-ranges, missing explanations, missing narration files, and the correct answer being the longest choice
+ranges, missing explanations, a missing "why" for any choice, missing narration files, and the correct answer being the longest choice
 in more than 40% of MCQs). Run both locally before pushing; the smoke test needs Playwright
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
@@ -89,6 +89,16 @@ data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line a
 - If both `widget/v3.js` and `widget/v3.css` changed, make sure both are committed.
 - Smoke test with Playwright against the file (`file://.../hubs/<id>/index.html`),
   clicking through each mode tab. The Supabase-backed widget parts only work live.
+
+## Every choice gets a why (standing rule)
+
+Every multiple-choice and select-all question explains **each** of its choices, not only the right one (Sam's standing
+rule, 2026-10-20): a `QUESTION_WHY` row per question (`id: [one line per choice]`, same order as `choices`), drawn as
+"Why each choice" under the explanation once the student answers (`whyHTML`). For the right choice say why it's right;
+for each wrong one say what it actually is or what it's confused with. Don't start with "Correct"/"Wrong" (the list
+draws its own marks) or refer to letters or positions (choices are shuffled). Draw it from the hub's own notes. **Any
+question you write or edit gets its row in the same change**; the CI lint fails without it. Hubs archived before the
+rule (`WHY_EXEMPT` in `tools/ci/smoke.js`) are exempt; a new hub copies `whyHTML` from `occlusion` and is not.
 
 ## Text and audio must never drift
 

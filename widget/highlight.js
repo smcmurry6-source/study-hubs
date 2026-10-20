@@ -4,11 +4,22 @@
    (and its narration) never changes, and the Listen word-highlighting keeps working inside them.
    Saved on this device only (localStorage "sh_hl:<hub>:<hash of the notes text>", a list of [start, end] character
    offsets in the notes' textContent). If a lecture's text is rewritten, its hash changes and old highlights drop off
-   rather than landing on the wrong words. */
+   rather than landing on the wrong words.
+   Colors (2026-10-20): five pens (COLORS). A saved range may carry a third item, the color key ([start, end, "g"]);
+   no key means yellow, so older highlights keep working. The last pen used is remembered (sh_hl_pen). */
 (function(){
   if (window.shHighlight) return;
   var HUB = "hub", SEL = ".reading-prose";
   var bar = null, pending = null, menu = null;
+  var COLORS = [["y", "Yellow"], ["g", "Green"], ["b", "Blue"], ["p", "Pink"], ["o", "Orange"]];
+  function pen(){ try { var v = localStorage.getItem("sh_hl_pen"); return COLORS.some(function(c){ return c[0] === v; }) ? v : "y"; } catch (e) { return "y"; } }
+  function setPen(v){ try { localStorage.setItem("sh_hl_pen", v); } catch (e) {} }
+  function colorOf(r){ return r[2] || "y"; }
+  function swatches(act, cur){
+    return '<span class="sh-hl-pens" role="group" aria-label="Highlight color">' + COLORS.map(function(c){
+      return '<button type="button" class="sh-hl-pen sh-hl-c-' + c[0] + (c[0] === cur ? ' is-on' : '') + '" data-hl-act="' + act + '" data-hl-c="' + c[0] + '" aria-label="' + c[1] + '" title="' + c[1] + '"></button>';
+    }).join("") + '</span>';
+  }
 
   function hash(s){ var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + s.length.toString(36); }
   function keyOf(el){ return "sh_hl:" + HUB + ":" + hash(el.textContent || ""); }
@@ -34,15 +45,30 @@
   function merge(list){
     list = list.filter(function(r){ return r[1] > r[0]; }).sort(function(a, b){ return a[0] - b[0]; });
     var out = [];
-    list.forEach(function(r){ var last = out[out.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else out.push([r[0], r[1]]); });
+    list.forEach(function(r){
+      var last = out[out.length - 1];
+      if (last && r[0] <= last[1] && colorOf(last) === colorOf(r)) last[1] = Math.max(last[1], r[1]);
+      else out.push(colorOf(r) === "y" ? [r[0], r[1]] : [r[0], r[1], colorOf(r)]);
+    });
     return out;
+  }
+  /* a new stroke paints over whatever it covers: cut the old ranges around it, then add it */
+  function addRange(list, s, e, c){
+    var out = [];
+    list.forEach(function(r){
+      if (r[1] <= s || r[0] >= e) { out.push(r); return; }
+      if (r[0] < s) out.push([r[0], s, colorOf(r)]);
+      if (r[1] > e) out.push([e, r[1], colorOf(r)]);
+    });
+    out.push([s, e, c]);
+    return merge(out);
   }
   function unwrap(el){
     Array.prototype.slice.call(el.querySelectorAll("mark.sh-hl")).forEach(function(m){
       var p = m.parentNode; while (m.firstChild) p.insertBefore(m.firstChild, m); p.removeChild(m);
     });
   }
-  function wrap(el, start, end, idx){
+  function wrap(el, start, end, idx, c){
     var nodes = textNodes(el), sum = 0;
     nodes.forEach(function(n){
       var len = n.nodeValue.length, a = Math.max(start, sum), b = Math.min(end, sum + len);
@@ -50,7 +76,7 @@
         var mid = n;
         if (a - sum > 0) mid = mid.splitText(a - sum);
         if (b - a < mid.nodeValue.length) mid.splitText(b - a);
-        var m = document.createElement("mark"); m.className = "sh-hl"; m.setAttribute("data-hl", String(idx));
+        var m = document.createElement("mark"); m.className = "sh-hl sh-hl-c-" + (c || "y"); m.setAttribute("data-hl", String(idx));
         mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
       }
       sum += len;
@@ -59,7 +85,7 @@
   function paint(el){
     unwrap(el);
     var k = keyOf(el), list = load(k);
-    list.forEach(function(r, i){ wrap(el, r[0], r[1], i); });
+    list.forEach(function(r, i){ wrap(el, r[0], r[1], i, colorOf(r)); });
     el.__shHlKey = k;
   }
 
@@ -77,14 +103,16 @@
   function barEl(){
     if (bar) return bar;
     bar = document.createElement("div"); bar.className = "sh-hl-pop"; bar.hidden = true;
-    bar.innerHTML = '<button type="button" class="sh-hl-btn"><span class="sh-hl-swatch"></span>Highlight</button>';
     var keep = function(e){ e.preventDefault(); };
     bar.addEventListener("mousedown", keep); bar.addEventListener("touchstart", keep, { passive: false });
-    bar.querySelector("button").addEventListener("click", function(){
-      if (!pending) return;
-      var p = pending, k = keyOf(p.el), list = load(k);
-      list.push([p.start, p.end]); save(k, merge(list)); paint(p.el);
-      try { window.getSelection().removeAllRanges(); } catch (e) {}
+    bar.addEventListener("click", function(e){
+      var b = e.target.closest("[data-hl-act]"); if (!b || !pending) return;
+      var c = b.getAttribute("data-hl-c") || pen();
+      setPen(c);
+      var p = pending, k = keyOf(p.el);
+      save(k, addRange(load(k), p.start, p.end, c)); paint(p.el);
+      if (window.shTrack) window.shTrack("hl:" + c);
+      try { window.getSelection().removeAllRanges(); } catch (e2) {}
       hideBar();
     });
     document.body.appendChild(bar);
@@ -100,6 +128,8 @@
     if (start < 0 || end <= start || !/\S/.test(r.toString())) { hideBar(); return; }
     pending = { el: el, start: start, end: end };
     hideMenu();
+    var b = barEl(), cur = pen();
+    b.innerHTML = '<button type="button" class="sh-hl-btn" data-hl-act="add"><span class="sh-hl-swatch sh-hl-c-' + cur + '"></span>Highlight</button>' + swatches("add", cur);
     var rects = r.getClientRects(), last = rects.length ? rects[rects.length - 1] : r.getBoundingClientRect();
     place(barEl(), last);
   }
@@ -108,12 +138,11 @@
   function menuEl(){
     if (menu) return menu;
     menu = document.createElement("div"); menu.className = "sh-hl-pop"; menu.hidden = true;
-    menu.innerHTML = '<button type="button" class="sh-hl-btn" data-hl-act="remove">Remove highlight</button>' +
-      '<button type="button" class="sh-hl-btn sh-hl-quiet" data-hl-act="clear">Clear all on this page</button>';
     menu.addEventListener("click", function(e){
       var b = e.target.closest("[data-hl-act]"); if (!b || !menu.__el) return;
-      var el = menu.__el, k = keyOf(el), list = load(k);
-      if (b.getAttribute("data-hl-act") === "clear") { if (!window.confirm("Clear every highlight in these notes?")) return; list = []; }
+      var el = menu.__el, k = keyOf(el), list = load(k), act = b.getAttribute("data-hl-act");
+      if (act === "clear") { if (!window.confirm("Clear every highlight in these notes?")) return; list = []; }
+      else if (act === "recolor") { var r = list[menu.__idx]; if (r) { var c = b.getAttribute("data-hl-c"); setPen(c); list = addRange(list, r[0], r[1], c); } }
       else list.splice(menu.__idx, 1);
       save(k, list); paint(el); hideMenu();
     });
@@ -128,6 +157,10 @@
     if (sel && !sel.isCollapsed) return;
     var el = m.closest(SEL); if (!el) return;
     var box = menuEl(); box.__el = el; box.__idx = +m.getAttribute("data-hl");
+    var r = load(keyOf(el))[box.__idx];
+    box.innerHTML = swatches("recolor", r ? colorOf(r) : "y") +
+      '<button type="button" class="sh-hl-btn" data-hl-act="remove">Remove</button>' +
+      '<button type="button" class="sh-hl-btn sh-hl-quiet" data-hl-act="clear">Clear all on this page</button>';
     hideBar(); box.__y = window.scrollY; place(box, m.getBoundingClientRect());
   });
 

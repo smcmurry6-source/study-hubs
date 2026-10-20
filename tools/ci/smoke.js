@@ -27,6 +27,9 @@ async function stub(context){
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
 const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
+/* every multiple-choice and select-all question explains each of its choices (q.why, one line per choice, same order;
+   Sam's standing rule, 2026-10-20). Hubs archived before the rule are exempt: their exams are over. */
+const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
   Q.forEach(q => {
@@ -39,6 +42,10 @@ function lint(hub, A){
       const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${q.id} has duplicate choices`);
     }
     if (q.type !== 'recall' && !String(q.ex || '').trim()) problems.push(`${hub}: ${q.id} has no explanation`);
+    if ((q.type === 'mcq' || q.type === 'multi') && !WHY_EXEMPT.has(hub)) {
+      const w = q.why || [];
+      if (w.length !== (q.choices || []).length || w.some(x => !String(x || '').trim())) problems.push(`${hub}: ${q.id} needs a why for every choice (q.why: ${w.length} of ${(q.choices || []).length}; add its row to QUESTION_WHY)`);
+    }
     if (q.type === 'match') {
       /* two items with the same answer: grading by index marks the other copy wrong (perio q4-L27, LESSONS.md) */
       ['left', 'right'].forEach((side, k) => {

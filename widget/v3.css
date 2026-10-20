@@ -393,6 +393,23 @@ body.sh-nuke-active{overflow:hidden;}
 .sh-egg-fairy.is-caught{animation:none; transform:scale(1.8); opacity:0; transition:transform .45s, opacity .45s;}
 @keyframes sh-egg-fly{0%{left:-80px; translate:0 0;} 25%{translate:0 -40px;} 50%{translate:0 20px;} 75%{translate:0 -30px;} 100%{left:calc(100vw + 20px); translate:0 0;}}
 @keyframes sh-egg-flap{from{transform:scaleY(1);} to{transform:scaleY(.45);}}
+/* her flight paths (2026-10-20): wave is the original; she also loops, zigzags, swoops down and up, or flies right to left */
+.sh-egg-fairy{width:76px; height:64px;}
+.sh-egg-fairy.is-loop{animation-name:sh-egg-fly-loop;}
+.sh-egg-fairy.is-zigzag{animation-name:sh-egg-fly-zig;}
+.sh-egg-fairy.is-swoop{animation-name:sh-egg-fly-swoop;}
+.sh-egg-fairy.is-back{animation-name:sh-egg-fly-back;}
+.sh-egg-fairy.is-golden{filter:drop-shadow(0 0 12px #FFD54A) drop-shadow(0 0 4px #FFF3B0);}
+@keyframes sh-egg-fly-loop{0%{left:-80px; translate:0 0;} 35%{left:40vw; translate:0 0;} 45%{left:46vw; translate:0 -70px;} 55%{left:40vw; translate:0 -110px;} 62%{left:36vw; translate:0 -60px;} 70%{left:44vw; translate:0 0;} 100%{left:calc(100vw + 20px); translate:0 10px;}}
+@keyframes sh-egg-fly-zig{0%{left:-80px; translate:0 0;} 15%{translate:0 -60px;} 30%{translate:0 40px;} 45%{translate:0 -60px;} 60%{translate:0 40px;} 75%{translate:0 -60px;} 100%{left:calc(100vw + 20px); translate:0 20px;}}
+@keyframes sh-egg-fly-swoop{0%{left:-80px; translate:0 -60px;} 50%{translate:0 120px;} 100%{left:calc(100vw + 20px); translate:0 -80px;}}
+@keyframes sh-egg-fly-back{0%{left:calc(100vw + 20px); translate:0 0; scale:-1 1;} 30%{translate:0 30px;} 60%{translate:0 -40px;} 100%{left:-80px; translate:0 0; scale:-1 1;}}
+.sh-egg-dust{position:fixed; z-index:10001; width:5px; height:5px; margin:-2.5px 0 0 -2.5px; border-radius:50%; pointer-events:none; box-shadow:0 0 6px currentColor; color:#FFE36B;
+  animation:sh-egg-dust .9s ease-out forwards;}
+@keyframes sh-egg-dust{from{opacity:1; transform:scale(1);} to{opacity:0; transform:translateY(18px) scale(.2);}}
+.sh-egg-fairy .egg-fx-dust{animation:sh-egg-twinkle .6s ease-in-out infinite alternate;}
+@keyframes sh-egg-twinkle{from{opacity:.25;} to{opacity:1;}}
+.sh-egg-board-fairy{display:inline-block; width:30px; height:25px;}
 
 .sh-egg-boss{position:fixed; z-index:9990; left:50%; bottom:16px; display:flex; align-items:center; gap:10px; width:min(380px, calc(100vw - 24px)); padding:8px 8px 8px 10px;
   border-radius:14px; background:var(--shw-bg); border:1px solid var(--shw-line); box-shadow:var(--shw-shadow); font-size:14px;
@@ -404,6 +421,14 @@ body.sh-nuke-active{overflow:hidden;}
 .sh-egg-boss-bar i{display:block; height:100%; background:var(--shw-bad); border-radius:99px; transition:width .3s;}
 .sh-egg-boss.is-hit .sh-egg-boss-face{animation:sh-egg-shake .35s;}
 .sh-egg-boss.is-dead{opacity:0; transform:translate(-50%, 0) scale(1.15); transition:opacity .8s, transform .8s;}
+.sh-egg-boss-face{position:relative; width:44px; height:44px;}
+.sh-egg-boss.is-low .sh-egg-boss-face{animation:sh-egg-wobble 1.2s ease-in-out infinite;}
+.sh-egg-boss.is-low .sh-egg-boss-bar i{animation:sh-egg-pulse .8s ease-in-out infinite alternate;}
+.sh-egg-boss-dmg{position:absolute; top:-4px; font:800 13px/1 var(--shw-font); color:var(--shw-bad); pointer-events:none; animation:sh-egg-dmg .9s ease-out forwards; text-shadow:0 1px 0 var(--shw-bg);}
+.sh-egg-boss-dmg.is-crit{color:var(--egg-gold); font-size:15px;}
+@keyframes sh-egg-dmg{from{opacity:1; transform:translateY(0) scale(1);} to{opacity:0; transform:translateY(-30px) scale(1.25);}}
+@keyframes sh-egg-wobble{0%,100%{transform:rotate(-4deg);} 50%{transform:rotate(4deg) scale(.96);}}
+@keyframes sh-egg-pulse{from{opacity:1;} to{opacity:.45;}}
 @keyframes sh-egg-shake{0%,100%{transform:none;} 25%{transform:translateX(-4px) rotate(-6deg);} 75%{transform:translateX(4px) rotate(6deg);}}
 
 .sh-egg-floss{position:fixed; z-index:10002; left:50%; bottom:calc(var(--sh-tabbar-h) + 30px); width:110px; height:124px; margin-left:-55px; pointer-events:none; color:var(--shw-ink);
@@ -484,7 +509,9 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 
 @media (prefers-reduced-motion: reduce){
   .sh-egg-fairy{animation-duration:12s;}
-  .sh-egg-fairy .egg-wl, .sh-egg-fairy .egg-wr, .sh-egg-floss *{animation:none !important;}
+  .sh-egg-fairy .egg-wl, .sh-egg-fairy .egg-wr, .sh-egg-fairy .egg-fx-dust, .sh-egg-floss *{animation:none !important;}
+  .sh-egg-boss.is-low .sh-egg-boss-face, .sh-egg-boss.is-low .sh-egg-boss-bar i, .sh-egg-boss-dmg{animation:none !important;}
+  .sh-egg-boss-dmg{display:none;}
   .sh-egg-floss{animation:none; opacity:1;}
 }
 @media (max-width:760px){
@@ -551,6 +578,14 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
 .sh-trophies-h{display:flex; justify-content:space-between; margin:16px 2px 8px; font-size:13px; font-weight:700; color:var(--shw-ink2); text-transform:uppercase; letter-spacing:.05em;}
 .sh-trophies-h b{color:var(--shw-ink);}
 .sh-trophies{display:grid; grid-template-columns:repeat(auto-fill, minmax(76px, 1fr)); gap:8px;}
+.sh-hubcase{margin:0 0 8px; border:1px solid var(--shw-line); border-radius:12px; padding:0 8px;}
+.sh-hubcase > summary{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 4px; cursor:pointer; font-weight:700; font-size:13.5px; color:var(--shw-ink); list-style:none;}
+.sh-hubcase > summary::-webkit-details-marker{display:none;}
+.sh-hubcase > summary em{font-style:normal; font-weight:600; font-size:11.5px; color:var(--shw-ink3); margin-left:4px;}
+.sh-hubcase[open] > summary{border-bottom:1px solid var(--shw-line); margin-bottom:8px;}
+.sh-hubcase .sh-trophies{padding-bottom:8px;}
+.sh-hubcase-found{margin:0 2px 10px; font-size:12px; color:var(--shw-ink2);}
+.sh-hubcase .sh-hubcase-detail{margin:0 2px 10px;}
 .sh-trophy{display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; padding:8px 4px; border-radius:12px; font-size:11.5px; line-height:1.2; color:var(--shw-ink3);}
 .sh-trophy-pct{font-size:10.5px; font-weight:700; color:var(--shw-ink3); font-variant-numeric:tabular-nums; padding:1px 6px; border-radius:99px; background:var(--shw-bg2);}
 .sh-trophy.is-earned .sh-trophy-pct{color:var(--shw-ink2);}
@@ -936,6 +971,16 @@ html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}
 /* ================= Highlighter (widget/highlight.js) ================= */
 mark.sh-hl{background:rgba(255,212,0,.45); color:inherit; border-radius:2px; padding:0; -webkit-box-decoration-break:clone; box-decoration-break:clone; cursor:pointer;}
 [data-theme="dark"] mark.sh-hl{background:rgba(255,205,40,.30);}
+mark.sh-hl.sh-hl-c-g{background:rgba(70,200,90,.36);} [data-theme="dark"] mark.sh-hl.sh-hl-c-g{background:rgba(80,210,110,.28);}
+mark.sh-hl.sh-hl-c-b{background:rgba(60,150,255,.30);} [data-theme="dark"] mark.sh-hl.sh-hl-c-b{background:rgba(90,165,255,.30);}
+mark.sh-hl.sh-hl-c-p{background:rgba(255,90,170,.30);} [data-theme="dark"] mark.sh-hl.sh-hl-c-p{background:rgba(255,110,185,.28);}
+mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.sh-hl.sh-hl-c-o{background:rgba(255,150,50,.30);}
+.sh-hl-pens{display:inline-flex; align-items:center; gap:6px; padding:0 4px;}
+.sh-hl-pen{appearance:none; width:26px; height:26px; border-radius:50%; border:2px solid transparent; padding:0; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);}
+.sh-hl-pen.is-on{border-color:var(--ink, #222);}
+.sh-hl-pen.sh-hl-c-y, .sh-hl-swatch.sh-hl-c-y{background:#ffd400;} .sh-hl-pen.sh-hl-c-g, .sh-hl-swatch.sh-hl-c-g{background:#4cc85e;}
+.sh-hl-pen.sh-hl-c-b, .sh-hl-swatch.sh-hl-c-b{background:#4a9bff;} .sh-hl-pen.sh-hl-c-p, .sh-hl-swatch.sh-hl-c-p{background:#ff5fae;}
+.sh-hl-pen.sh-hl-c-o, .sh-hl-swatch.sh-hl-c-o{background:#ff8c1e;}
 .sh-hl-pop{position:fixed; z-index:10005; display:flex; gap:6px; padding:5px; border-radius:12px; border:1px solid var(--line-strong, rgba(0,0,0,.16));
   background:var(--surface, #fff); box-shadow:0 8px 24px rgba(0,0,0,.18); font-family:var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);}
 .sh-hl-pop[hidden]{display:none;}

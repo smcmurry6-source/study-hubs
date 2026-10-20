@@ -1906,7 +1906,8 @@ begin
   if p_visitor is null or length(p_visitor) not between 1 and 80 then return false; end if;
   if p_kind not in ('boss', 'owl', 'rootcanal', 'mock90', 'konami', 'floss', 'prof',
                     'mastery-bronze', 'mastery-silver', 'mastery-gold', 'mastery-crown',
-                    'mirror', 'fullarch', 'flosschain', 'holiday', 'pet-revive', 'pet-perfect', 'pet-adopt') then return false; end if;
+                    'mirror', 'fullarch', 'flosschain', 'holiday', 'pet-revive', 'pet-perfect', 'pet-adopt',
+                    'seen-all', 'mock-perfect') then return false; end if;  -- seen-all, mock-perfect: migration_v38
   insert into achievements (visitor_id, kind, hub) values (p_visitor, p_kind, left(coalesce(p_hub, ''), 40))
     on conflict do nothing;
   return found;
