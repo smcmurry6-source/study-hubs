@@ -681,6 +681,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .fig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
 .fig-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;margin:0}
 .fig-card h4{margin:0 0 8px;font-size:.95rem}
+.fig-anima{margin:0 0 6px}
 .fig-card p{font-size:.84rem;color:var(--ink-soft);margin:8px 0 0}
 .fig-key{margin:8px 0 0;font-size:.84rem}
 .fig-key summary{cursor:pointer;color:var(--accent);font-weight:600;padding:4px 0}
@@ -825,6 +826,187 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .cg-end .cg-big{font:800 2.2rem var(--font-display);margin:6px 0 2px}
 @media (prefers-reduced-motion: reduce){ .cg-low,.cg-all{transition:none} .cg-src-ring,.cg-lines{animation:none} }
 /* od:css end */
+/* anima:css begin */
+
+.anima{--anatomy-page:var(--bg);--anatomy-card:var(--surface);--anatomy-paper:var(--surface);
+  --anatomy-text:var(--ink-soft);--anatomy-strong:var(--ink);--anatomy-muted:var(--ink-faint);
+  --anatomy-lit:var(--accent);--anatomy-weight:.6px;--anatomy-mono:var(--font-mono);
+  --anatomy-shade-0:#e3dccd;--anatomy-shade-1:#ebe5d8;--anatomy-shade-2:#f2ede3;--anatomy-shade-3:#f8f5ee;
+  --anatomy-face:#fffdf8;--anatomy-top:#ffffff;--anatomy-hi:#1d2230;--anatomy-mid:#6f7486;--anatomy-lo:#b3ad9f;--anatomy-faint:#e1d9c8;
+  --anatomy-dot:#1d2230;--tm-bone:#e9e1cf;--tm-bone-in:#f3ecdc;--tm-trab:#d8ccb2;--tm-cart:#cfe0ea;--tm-disc:#c9d6e8;--tm-disc-mid:#e3eaf4;
+  --tm-retro:#f1c9c4;--tm-vessel:#c0544c;--tm-muscle:#d98e86;--tm-muscle-fib:#b5655d;--tm-lig:#b98a2e;--tm-air:#3b3f4c;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima{--anatomy-shade-0:#1a1e2a;--anatomy-shade-1:#1f2431;--anatomy-shade-2:#242a38;--anatomy-shade-3:#2a3040;
+  --anatomy-face:#2a3040;--anatomy-top:#323a4d;--anatomy-hi:#eceef4;--anatomy-mid:#9aa0b3;--anatomy-lo:#596075;--anatomy-faint:#3a4256;
+  --anatomy-dot:#eceef4;--tm-bone:#5a5446;--tm-bone-in:#6a6352;--tm-trab:#4c4739;--tm-cart:#5f7a8a;--tm-disc:#6d82a3;--tm-disc-mid:#8fa3c2;
+  --tm-retro:#8a4f4a;--tm-vessel:#e07a70;--tm-muscle:#a8605a;--tm-muscle-fib:#d48a82;--tm-lig:#e2b056;--tm-air:#0e1016;} }
+:root[data-theme="dark"] .anima{--anatomy-shade-0:#1a1e2a;--anatomy-shade-1:#1f2431;--anatomy-shade-2:#242a38;--anatomy-shade-3:#2a3040;
+  --anatomy-face:#2a3040;--anatomy-top:#323a4d;--anatomy-hi:#eceef4;--anatomy-mid:#9aa0b3;--anatomy-lo:#596075;--anatomy-faint:#3a4256;
+  --anatomy-dot:#eceef4;--tm-bone:#5a5446;--tm-bone-in:#6a6352;--tm-trab:#4c4739;--tm-cart:#5f7a8a;--tm-disc:#6d82a3;--tm-disc-mid:#8fa3c2;
+  --tm-retro:#8a4f4a;--tm-vessel:#e07a70;--tm-muscle:#a8605a;--tm-muscle-fib:#d48a82;--tm-lig:#e2b056;--tm-air:#0e1016;}
+
+
+
+.iso-svg{display:block;width:100%;height:auto;overflow:visible}
+.iso-svg path,.iso-svg circle{vector-effect:non-scaling-stroke}
+.iso-fill{fill:var(--anatomy-paper);stroke:none}
+.iso-solid[data-lit]>.iso-fill{fill:var(--anatomy-face)}
+.iso-shade,.iso-top{stroke:none}
+.iso-shade[data-shade="0"]{fill:var(--anatomy-shade-0)}
+.iso-shade[data-shade="1"]{fill:var(--anatomy-shade-1)}
+.iso-shade[data-shade="2"]{fill:var(--anatomy-shade-2)}
+.iso-shade[data-shade="3"]{fill:var(--anatomy-shade-3)}
+.iso-top{fill:var(--anatomy-top)}
+.iso-solid[data-lit]>.iso-top{fill:var(--anatomy-lit-top)}
+.iso-solid[data-lit]>.iso-shade{fill:var(--anatomy-lit-shade)}
+.iso-solid[data-seamless]>.iso-shade,.iso-solid[data-seamless]>.iso-top{stroke-width:.4;stroke-linejoin:round}
+.iso-solid[data-seamless]>.iso-shade[data-shade="0"]{stroke:var(--anatomy-shade-0)}
+.iso-solid[data-seamless]>.iso-shade[data-shade="1"]{stroke:var(--anatomy-shade-1)}
+.iso-solid[data-seamless]>.iso-shade[data-shade="2"]{stroke:var(--anatomy-shade-2)}
+.iso-solid[data-seamless]>.iso-shade[data-shade="3"]{stroke:var(--anatomy-shade-3)}
+.iso-solid[data-seamless]>.iso-top{stroke:var(--anatomy-top)}
+.iso-solid[data-seamless][data-lit]>.iso-top{stroke:var(--anatomy-lit-top)}
+.iso-solid[data-seamless][data-lit]>.iso-shade{stroke:var(--anatomy-lit-shade)}
+.iso-solid[data-lit]>.iso-edge{stroke:var(--anatomy-lit)}
+.iso-halo{fill:var(--anatomy-halo);stroke:none;filter:blur(9px);opacity:var(--anatomy-halo-opacity);transform:translateY(3px)}
+.iso-line{fill:none;stroke:var(--anatomy-lo);stroke-width:var(--anatomy-weight);stroke-linecap:round;stroke-linejoin:round}
+.iso-line[data-tone="hi"]{stroke:var(--anatomy-hi)}
+.iso-line[data-tone="mid"]{stroke:var(--anatomy-mid)}
+.iso-line[data-tone="lo"]{stroke:var(--anatomy-lo)}
+.iso-line[data-tone="faint"]{stroke:var(--anatomy-faint)}
+.iso-line[data-tone="lit"]{stroke:var(--anatomy-lit)}
+.iso-line[data-tone="red"]{stroke:var(--anatomy-red)}
+.iso-line[data-tone="green"]{stroke:var(--anatomy-green)}
+.iso-line[data-tone="blue"]{stroke:var(--anatomy-blue)}
+.iso-line[data-dotted]{stroke-dasharray:.01 3.5;stroke-width:1}
+.iso-line[data-dashed]{stroke-dasharray:3 3}
+.iso-line[data-flow]{stroke-dasharray:2 6}
+.iso-wire-end{fill:var(--anatomy-paper);stroke:var(--anatomy-lo);stroke-width:var(--anatomy-weight)}
+.iso-wire[data-tone="hi"] .iso-wire-end{stroke:var(--anatomy-hi)}
+.iso-wire[data-tone="mid"] .iso-wire-end{stroke:var(--anatomy-mid)}
+.iso-wire[data-tone="faint"] .iso-wire-end{stroke:var(--anatomy-faint)}
+.iso-wire[data-tone="lit"] .iso-wire-end{stroke:var(--anatomy-lit)}
+.iso-dots circle{fill:var(--anatomy-dot);stroke:none;opacity:.32}
+.iso-dots[data-tone="hi"] circle{opacity:.85}
+.iso-dots[data-tone="mid"] circle{opacity:.45}
+.iso-dots[data-tone="lo"] circle{opacity:.22}
+.iso-dots[data-tone="faint"] circle{opacity:.12}
+.iso-face-text{fill:var(--anatomy-mid);font-family:var(--anatomy-mono);letter-spacing:.04em}
+.iso-face-text[data-tone="hi"]{fill:var(--anatomy-hi)}
+.iso-face-text[data-tone="lo"]{fill:var(--anatomy-lo)}
+.iso-face-text[data-tone="faint"]{fill:var(--anatomy-faint)}
+.tb-body{fill:var(--anatomy-shade-2);stroke:none}
+.tb-shine{fill:var(--anatomy-top);stroke:none}
+.tb-shade{fill:var(--anatomy-shade-0);stroke:none}
+.tb-ring{fill:none;stroke:var(--anatomy-lo);stroke-width:.45;stroke-linecap:butt;stroke-linejoin:round}
+.tb-ring[data-tone="mid"]{stroke:var(--anatomy-mid)}
+.tb-ring[data-tone="faint"]{stroke:var(--anatomy-faint)}
+.tb-ring[data-tone="hi"]{stroke:var(--anatomy-hi)}
+@keyframes iso-flow{to{stroke-dashoffset:-32}}
+@keyframes iso-pulse{0%,100%{opacity:.18}12%{opacity:1}40%{opacity:.18}}
+.iso-line[data-flow]{animation:iso-flow 1600ms linear infinite}
+.iso-dots circle[data-pulse]{animation:iso-pulse 1600ms steps(1,end) infinite;animation-delay:var(--pulse-at,0ms)}
+.iso-figure{margin:32px 0 36px}
+.iso-plate{position:relative;padding:52px 24px;border-radius:0;background:var(--anatomy-card);box-shadow:0 0 0 1px var(--anatomy-mid);--anatomy-paper:var(--anatomy-card)}
+.iso-plate-corners{position:absolute;inset:18px 20px;pointer-events:none}
+.iso-plate-corner{position:absolute;color:var(--anatomy-muted);font-family:var(--anatomy-mono);font-size:10.5px;line-height:1;letter-spacing:.04em;white-space:nowrap}
+.iso-plate-corner[data-corner="fig"]{top:0;left:0;color:var(--anatomy-text)}
+.iso-plate-corner[data-corner="title"]{top:0;right:0;text-transform:uppercase;letter-spacing:.1em}
+.iso-plate-corner[data-corner="hint"]{bottom:0;left:0;text-transform:uppercase;letter-spacing:.1em}
+.iso-plate-corner[data-corner="readout"]{right:0;bottom:0;color:var(--anatomy-text);font-variant-numeric:tabular-nums}
+.iso-plate .iso-svg{margin:0 auto}
+.iso-legend{display:grid;gap:8px;margin-top:12px;color:var(--anatomy-muted);font-size:13px;line-height:1.55}
+.iso-keys{display:flex;flex-wrap:wrap;gap:6px 18px}
+.iso-key{display:inline-flex;align-items:center;gap:7px}
+.iso-swatch{width:16px;height:10px;flex:none;overflow:visible}
+.iso-swatch path{fill:none;stroke:var(--anatomy-hi);stroke-width:1;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.iso-swatch[data-mark="raised"] path,.iso-swatch[data-mark="flat"] path{stroke:var(--anatomy-mid)}
+.iso-swatch[data-mark="lit"] path{stroke:var(--anatomy-lit)}
+.iso-swatch[data-mark="dim"] path{stroke:var(--anatomy-lo)}
+.iso-swatch[data-mark="dotted"] path{stroke-dasharray:.01 3;stroke-width:1.4}
+.iso-swatch[data-mark="dashed"] path{stroke-dasharray:3 2.5}
+.iso-swatch[data-mark="red"] path{stroke:var(--anatomy-red)}
+.iso-swatch[data-mark="green"] path{stroke:var(--anatomy-green)}
+.iso-swatch[data-mark="blue"] path{stroke:var(--anatomy-blue)}
+.iso-swatch-crease{stroke:var(--anatomy-lo)!important}
+@media (max-width:560px){.iso-plate{padding:48px 12px 70px}.iso-plate-corner[data-corner="hint"]{bottom:18px}}
+@media (prefers-reduced-motion:reduce){.iso-line[data-flow],.iso-dots circle[data-pulse]{animation:none}}
+
+.anima{color:var(--anatomy-text)}
+.anima .iso-figure{margin:0}
+.anima .iso-plate{border-radius:var(--radius);box-shadow:0 0 0 1px var(--line);padding:40px 12px 40px;background:var(--surface)}
+.anima .iso-plate-corners{inset:14px 16px}
+.anima .iso-plate-corner{font-size:10.5px}
+@media (max-width:560px){.anima .iso-plate{padding:36px 6px 54px}.anima .iso-plate-corner[data-corner="hint"]{bottom:16px}.anima .iso-plate-corner[data-corner="readout"]{white-space:normal;text-align:right;max-width:58%}}
+.anima .am-svg svg{display:block;width:100%;height:auto;overflow:hidden}
+.anima .am-label{fill:var(--anatomy-text);font:11.5px var(--anatomy-mono)}
+.anima .am-label.strong{fill:var(--anatomy-strong);font-weight:600}
+.anima .am-leader{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
+.anima .am-dot{fill:var(--anatomy-dot)}
+@media (max-width:560px){.anima .am-callout{display:none}}
+.anima .hot{cursor:help;outline:none}
+.anima .hot.is-hot{filter:drop-shadow(0 0 3px var(--anatomy-lit))}
+.anima .hot:focus-visible{outline:2px solid var(--anatomy-lit);outline-offset:3px}
+.anima .am-controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:12px 0 6px;font:13px var(--font-body);color:var(--ink)}
+.anima .am-slider{display:flex;align-items:center;gap:10px;flex:1 1 300px;font:.78rem var(--font-mono);color:var(--ink-soft)}
+.anima .am-slider input{flex:1;accent-color:var(--accent);min-width:120px}
+.anima .am-btn{border:1px solid var(--line-strong);border-radius:8px;background:transparent;color:var(--ink-soft);font:500 .8rem var(--font-body);padding:5px 10px;cursor:pointer}
+.anima .am-btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+.anima .am-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.anima .am-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 14px;margin:6px 0 2px;font:.8rem var(--font-mono);color:var(--ink-soft)}
+.anima .am-stats b{color:var(--ink);font-weight:600}
+.anima .am-stats em{font-style:normal}
+.anima .am-summary{font-size:.92rem;line-height:1.55;color:var(--ink);margin:8px 0;min-height:4.6em}
+.anima .am-info{font-size:.86rem;line-height:1.5;color:var(--ink-soft);margin:6px 0;border-left:2px solid var(--line-strong);padding-left:10px;min-height:3em}
+.anima .am-sources{font-size:.82rem;line-height:1.55;color:var(--ink-soft);margin:8px 0 0}
+.anima .am-sources summary{cursor:pointer;font-weight:600;color:var(--ink-soft)}
+.anima .am-sources ul{padding-left:18px;margin:6px 0}
+.anima .am-sources li{margin:4px 0}
+.lec-fig{margin:0}
+.lec-fig > h4{margin:0 0 4px;font-size:1rem}
+.lec-fig > .lec-fig-cap{margin:0 0 10px;font-size:.86rem;color:var(--ink-soft)}
+
+.anima .tm-air{fill:var(--tm-air)}
+.anima .tm-bone{fill:var(--tm-bone)}
+.anima .tm-trab{fill:var(--tm-trab);opacity:.7}
+.anima .tm-cortex{fill:none;stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linejoin:round}
+.anima .tm-cart{fill:none;stroke:var(--tm-cart);stroke-width:5;stroke-linecap:round}
+.anima .tm-eam{fill:var(--tm-air);stroke:var(--anatomy-hi);stroke-width:1.4}
+.anima .tm-mandible{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linejoin:round}
+.anima .tm-headcap{fill:none;stroke:var(--tm-cart);stroke-width:4;stroke-linecap:round}
+.anima .tm-fovea{fill:none;stroke:var(--anatomy-mid);stroke-width:1.2;stroke-linecap:round}
+.anima .tm-disc-body{fill:var(--tm-disc);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
+.anima .tm-disc-iz{fill:var(--tm-disc-mid);stroke:none}
+.anima .tm-space{fill:none;stroke:var(--anatomy-lit);stroke-width:3;stroke-linecap:round;opacity:0;transition:opacity .3s}
+.anima .tm-fig[data-phase="rot"] .tm-space.lo,.anima .tm-fig[data-phase="trans"] .tm-space.up{opacity:.9}
+.anima .tm-fig[data-phase="trans"] .tm-space.lo{opacity:.45}
+.anima .tm-retro{fill:var(--tm-retro);stroke:none;opacity:.9}
+.anima .tm-vessel{fill:var(--tm-vessel)}
+.anima .tm-suplam{fill:none;stroke:var(--anatomy-hi);stroke-width:1.4;stroke-linejoin:round}
+.anima .tm-inflam{fill:none;stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linecap:round}
+.anima .tm-muscle{fill:var(--tm-muscle);stroke:var(--anatomy-hi);stroke-width:1;stroke-linejoin:round;opacity:.85;transition:filter .2s,opacity .2s}
+.anima .tm-fib{fill:none;stroke:var(--tm-muscle-fib);stroke-width:.9;opacity:.8}
+.anima .tm-fig[data-dir="open"] .tm-lpi,.anima .tm-fig[data-dir="close"] .tm-lps{opacity:1;stroke:var(--anatomy-lit);stroke-width:2.2}
+.anima .tm-lig{fill:none;stroke:var(--tm-lig);stroke-width:5;stroke-linecap:round;opacity:.75;stroke-dasharray:3 4;transition:opacity .2s}
+.anima .tm-fig[data-lig="taut"] .tm-tmlo{stroke-dasharray:none;opacity:1;stroke-width:6}
+.anima .tm-lig-dot{fill:var(--anatomy-hi)}
+.anima .tm-gauge-bg{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:.8}
+.anima .tm-gauge-rot{fill:var(--anatomy-faint)}
+.anima .tm-gauge-fill{fill:var(--anatomy-lit);opacity:.55}
+.anima .tm-gauge-tick{fill:none;stroke:var(--anatomy-mid);stroke-width:1}
+.anima .tm-gauge-mark{fill:none;stroke:var(--anatomy-lit);stroke-width:3;stroke-linecap:round}
+.anima .tm-gauge .am-label{fill:#eceef4}
+.anima .tm-gauge-note{font-size:10px}
+.anima .tm-fig .am-callout .am-label{fill:var(--anatomy-hi)}
+.anima .tm-fig .am-callout.on-dark .am-label{fill:#eceef4}
+.anima .tm-fig .am-leader{stroke:var(--anatomy-mid)}
+.anima .tm-fig .am-callout.on-dark .am-leader{stroke:#9aa0b3}
+.anima .tm-fig .am-dot{fill:var(--anatomy-hi)}
+.anima .tm-fig .am-callout.on-dark .am-dot{fill:#eceef4}
+.anima .tm-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid var(--line-strong)}
+@media (max-width:560px){.anima .tm-gauge{display:none}}
+@media (prefers-reduced-motion:reduce){.anima .tm-space,.anima .tm-muscle,.anima .tm-lig{transition:none}}
+
+/* anima:css end */
 </style>
 </head>
 <body>
@@ -1231,9 +1413,12 @@ var FIG_PLACE = {
     { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
+  ],
+  anatomy: [
+    { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'], anatomy:['tmj'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
@@ -1724,6 +1909,139 @@ var CUSP_GAME = (function(){
   return { mount:mount, open:open };
 })();
 /* od:kit end */
+/* anima:js begin (built from tools/figures/occlusion/anima; edit there) */
+var ANIMA = (function(){
+  var FIGS = {};
+  FIGS["tmj"] = { title: "TMJ opening: rotation, then translation", caption: "Drag the slider to open the mouth from 0 to 50 mm. Schematic sagittal section of the right joint, patient facing right; drawn from the L2 notes.", lec: "anatomy",
+    html: "<div class=\"anima\" data-anima=\"tmj\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 1</span><span class=\"iso-plate-corner\" data-corner=\"title\">TMJ opening: rotation, then translation</span><span class=\"iso-plate-corner\" data-corner=\"hint\">drag the slider</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>closed</span></div><div class=\"am-svg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg tm-fig\" viewBox=\"0 0 640 420\" role=\"img\" aria-label=\"Schematic sagittal section of the right temporomandibular joint, patient facing right: temporal bone with the glenoid fossa, articular eminence and external auditory meatus; the mandibular condyle with its neck and ramus; the biconcave articular disc with its thick posterior band, thin intermediate zone and anterior band; the retrodiscal tissue with its superior and inferior laminae; the superior and inferior heads of the lateral pterygoid; and the outer oblique and inner horizontal portions of the TM ligament. A slider opens the mouth from 0 to 50 millimeters: the condyle first rotates in the lower joint space, then the condyle and disc translate down the eminence in the upper joint space.\"><rect class=\"tm-air\" x=\"0\" y=\"0\" width=\"640\" height=\"420\"/><g class=\"hot\" tabindex=\"0\" data-part=\"bone\" data-info=\"Temporal bone: the glenoid (mandibular) fossa, and in front of it the articular eminence, whose posterior slope the condyle and disc slide down when the jaw translates. Behind the fossa: the postglenoid process and the external auditory meatus.\"><path class=\"tm-bone\" d=\"M0 214 C18.3 214.3 81.7 217 110 216 C138.3 215 151.3 208.7 170 208 C188.7 207.3 210.7 212.5 222 212 C233.3 211.5 233.3 209 238 205 C242.7 201 246 194.5 250 188 C254 181.5 258.2 172 262 166 C265.8 160 271.2 155.4 272.8 152.3 C274.4 149.2 271.7 149 271.5 147.3 C271.3 145.7 271.2 143.8 271.6 142.4 C272 141 273.2 140.3 274 139.1 C274.8 137.9 275.4 136.5 276.2 135.2 C277 134 277.8 132.5 278.9 131.5 C280 130.5 281.4 129.7 282.8 129.3 C284.1 128.8 285.8 128.8 287.3 128.9 C288.8 128.9 290.4 129.4 291.8 129.5 C293.3 129.7 294.6 129.5 296 129.7 C297.3 129.9 298.7 130 300 130.5 C301.3 131.1 302.5 132.2 303.7 133 C304.8 133.7 305.9 134.6 307 135.1 C308.1 135.7 309.2 135.8 310.3 136.3 C311.4 136.8 312.4 137.4 313.3 138 C314.3 138.6 315.3 139.3 316.3 139.9 C317.2 140.4 318.3 140.9 319.3 141.5 C320.3 142 321.4 142.5 322.3 143.2 C323.3 143.9 324.5 145.5 325 145.5 C325.5 145.6 323.7 143.2 325.4 143.5 C327.1 143.8 331.7 145.8 335.4 147.3 C339 148.8 343.1 150.5 347.2 152.3 C351.3 154.2 355.7 156.3 359.8 158.5 C364 160.7 368.2 163 372.1 165.3 C376 167.6 379.9 170 383.2 172.1 C386.5 174.3 389.6 176.5 392.1 178.2 C394.6 179.9 396.7 181.5 398 182.5 C399.4 183.5 397.2 183.4 400.2 184.2 C403.3 185 409.6 187.7 416.2 187.2 C422.9 186.7 430.9 185 440.2 181.2 C449.6 177.3 458.9 170 472.2 164.2 C485.6 158.3 492.3 150.2 520.2 146.2 C548.2 142.2 620 141.2 640 140.2L640 0L0 0Z\"/><ellipse class=\"tm-trab\" cx=\"8\" cy=\"118.5\" rx=\"4.7\" ry=\"2.1\" transform=\"rotate(131 8 118.5)\"/><ellipse class=\"tm-trab\" cx=\"340.4\" cy=\"47.5\" rx=\"7.5\" ry=\"3.4\" transform=\"rotate(98 340.4 47.5)\"/><ellipse class=\"tm-trab\" cx=\"435.1\" cy=\"84.3\" rx=\"7.9\" ry=\"2.2\" transform=\"rotate(67 435.1 84.3)\"/><ellipse class=\"tm-trab\" cx=\"449.7\" cy=\"91.8\" rx=\"3.3\" ry=\"3.2\" transform=\"rotate(84 449.7 91.8)\"/><ellipse class=\"tm-trab\" cx=\"583.6\" cy=\"104.9\" rx=\"3.7\" ry=\"2.8\" transform=\"rotate(166 583.6 104.9)\"/><ellipse class=\"tm-trab\" cx=\"437.6\" cy=\"85.3\" rx=\"6.5\" ry=\"3.8\" transform=\"rotate(164 437.6 85.3)\"/><ellipse class=\"tm-trab\" cx=\"240.3\" cy=\"48.2\" rx=\"8\" ry=\"2.4\" transform=\"rotate(27 240.3 48.2)\"/><ellipse class=\"tm-trab\" cx=\"193.7\" cy=\"59.4\" rx=\"4.8\" ry=\"3.8\" transform=\"rotate(100 193.7 59.4)\"/><ellipse class=\"tm-trab\" cx=\"463.1\" cy=\"113.3\" rx=\"3.4\" ry=\"2.3\" transform=\"rotate(101 463.1 113.3)\"/><ellipse class=\"tm-trab\" cx=\"325.5\" cy=\"58.6\" rx=\"4.2\" ry=\"3.8\" transform=\"rotate(10 325.5 58.6)\"/><ellipse class=\"tm-trab\" cx=\"236\" cy=\"49.3\" rx=\"7\" ry=\"3.8\" transform=\"rotate(93 236 49.3)\"/><ellipse class=\"tm-trab\" cx=\"111.3\" cy=\"56.7\" rx=\"4.7\" ry=\"2.5\" transform=\"rotate(76 111.3 56.7)\"/><ellipse class=\"tm-trab\" cx=\"215.5\" cy=\"71.8\" rx=\"6.7\" ry=\"2.2\" transform=\"rotate(163 215.5 71.8)\"/><ellipse class=\"tm-trab\" cx=\"293.7\" cy=\"111.6\" rx=\"6.8\" ry=\"3.1\" transform=\"rotate(93 293.7 111.6)\"/><ellipse class=\"tm-trab\" cx=\"323.1\" cy=\"90.7\" rx=\"8.6\" ry=\"2.6\" transform=\"rotate(127 323.1 90.7)\"/><ellipse class=\"tm-trab\" cx=\"164.7\" cy=\"78.4\" rx=\"5.1\" ry=\"2.4\" transform=\"rotate(70 164.7 78.4)\"/><ellipse class=\"tm-trab\" cx=\"503.9\" cy=\"113.3\" rx=\"3.7\" ry=\"3.6\" transform=\"rotate(14 503.9 113.3)\"/><ellipse class=\"tm-trab\" cx=\"261.8\" cy=\"26.4\" rx=\"3.5\" ry=\"4\" transform=\"rotate(40 261.8 26.4)\"/><ellipse class=\"tm-trab\" cx=\"402.6\" cy=\"25.3\" rx=\"5.7\" ry=\"3\" transform=\"rotate(25 402.6 25.3)\"/><ellipse class=\"tm-trab\" cx=\"583.2\" cy=\"114.1\" rx=\"8.3\" ry=\"3.7\" transform=\"rotate(163 583.2 114.1)\"/><ellipse class=\"tm-trab\" cx=\"482.9\" cy=\"41.1\" rx=\"3.1\" ry=\"2.2\" transform=\"rotate(14 482.9 41.1)\"/><ellipse class=\"tm-trab\" cx=\"9\" cy=\"82\" rx=\"4.4\" ry=\"3.4\" transform=\"rotate(88 9 82)\"/><ellipse class=\"tm-trab\" cx=\"437\" cy=\"36.6\" rx=\"8.3\" ry=\"2.2\" transform=\"rotate(67 437 36.6)\"/><ellipse class=\"tm-trab\" cx=\"566\" cy=\"22.2\" rx=\"5.9\" ry=\"1.6\" transform=\"rotate(164 566 22.2)\"/><ellipse class=\"tm-trab\" cx=\"405.4\" cy=\"118.7\" rx=\"3.1\" ry=\"3.8\" transform=\"rotate(34 405.4 118.7)\"/><ellipse class=\"tm-trab\" cx=\"612.5\" cy=\"75.8\" rx=\"7.1\" ry=\"2.2\" transform=\"rotate(40 612.5 75.8)\"/><ellipse class=\"tm-trab\" cx=\"138.4\" cy=\"75.7\" rx=\"3.3\" ry=\"3.4\" transform=\"rotate(126 138.4 75.7)\"/><ellipse class=\"tm-trab\" cx=\"453.6\" cy=\"67.8\" rx=\"3.2\" ry=\"1.9\" transform=\"rotate(165 453.6 67.8)\"/><ellipse class=\"tm-trab\" cx=\"89.6\" cy=\"90.5\" rx=\"8.4\" ry=\"1.7\" transform=\"rotate(159 89.6 90.5)\"/><ellipse class=\"tm-trab\" cx=\"545.5\" cy=\"127.1\" rx=\"8.7\" ry=\"3.4\" transform=\"rotate(76 545.5 127.1)\"/><ellipse class=\"tm-trab\" cx=\"162.9\" cy=\"95.3\" rx=\"8.3\" ry=\"2.6\" transform=\"rotate(42 162.9 95.3)\"/><ellipse class=\"tm-trab\" cx=\"260.6\" cy=\"114.4\" rx=\"6.4\" ry=\"2.4\" transform=\"rotate(112 260.6 114.4)\"/><ellipse class=\"tm-trab\" cx=\"466.6\" cy=\"48.2\" rx=\"7.4\" ry=\"2.6\" transform=\"rotate(36 466.6 48.2)\"/><ellipse class=\"tm-trab\" cx=\"202.5\" cy=\"126.3\" rx=\"9\" ry=\"3.1\" transform=\"rotate(157 202.5 126.3)\"/><ellipse class=\"tm-trab\" cx=\"581\" cy=\"31.9\" rx=\"6.9\" ry=\"1.9\" transform=\"rotate(90 581 31.9)\"/><ellipse class=\"tm-trab\" cx=\"355.8\" cy=\"100.6\" rx=\"8.7\" ry=\"2.8\" transform=\"rotate(34 355.8 100.6)\"/><ellipse class=\"tm-trab\" cx=\"286.7\" cy=\"27.9\" rx=\"7\" ry=\"2.9\" transform=\"rotate(101 286.7 27.9)\"/><ellipse class=\"tm-trab\" cx=\"324.2\" cy=\"98.9\" rx=\"5.2\" ry=\"3.4\" transform=\"rotate(5 324.2 98.9)\"/><ellipse class=\"tm-trab\" cx=\"194.5\" cy=\"73\" rx=\"4.2\" ry=\"3.3\" transform=\"rotate(52 194.5 73)\"/><ellipse class=\"tm-trab\" cx=\"155.1\" cy=\"87.1\" rx=\"5.6\" ry=\"1.8\" transform=\"rotate(139 155.1 87.1)\"/><ellipse class=\"tm-trab\" cx=\"521.5\" cy=\"117.9\" rx=\"8.5\" ry=\"3.2\" transform=\"rotate(173 521.5 117.9)\"/><ellipse class=\"tm-trab\" cx=\"23.7\" cy=\"99.4\" rx=\"6.6\" ry=\"3.3\" transform=\"rotate(162 23.7 99.4)\"/><ellipse class=\"tm-trab\" cx=\"31.1\" cy=\"24.3\" rx=\"3.5\" ry=\"1.9\" transform=\"rotate(15 31.1 24.3)\"/><ellipse class=\"tm-trab\" cx=\"13.9\" cy=\"80.6\" rx=\"8.7\" ry=\"2.1\" transform=\"rotate(24 13.9 80.6)\"/><ellipse class=\"tm-trab\" cx=\"134.2\" cy=\"89\" rx=\"4.5\" ry=\"2.7\" transform=\"rotate(179 134.2 89)\"/><ellipse class=\"tm-trab\" cx=\"271.7\" cy=\"88.9\" rx=\"7.6\" ry=\"2.6\" transform=\"rotate(75 271.7 88.9)\"/><ellipse class=\"tm-trab\" cx=\"46.2\" cy=\"35.6\" rx=\"7.8\" ry=\"3.9\" transform=\"rotate(27 46.2 35.6)\"/><ellipse class=\"tm-trab\" cx=\"585.5\" cy=\"69\" rx=\"3.7\" ry=\"2.1\" transform=\"rotate(108 585.5 69)\"/><ellipse class=\"tm-trab\" cx=\"114.4\" cy=\"17.4\" rx=\"4.6\" ry=\"3.2\" transform=\"rotate(100 114.4 17.4)\"/><ellipse class=\"tm-trab\" cx=\"307.9\" cy=\"127.3\" rx=\"3.5\" ry=\"2.6\" transform=\"rotate(57 307.9 127.3)\"/><ellipse class=\"tm-trab\" cx=\"10.6\" cy=\"8.7\" rx=\"5.5\" ry=\"1.8\" transform=\"rotate(42 10.6 8.7)\"/><ellipse class=\"tm-trab\" cx=\"584.6\" cy=\"101.3\" rx=\"7.6\" ry=\"2.6\" transform=\"rotate(154 584.6 101.3)\"/><ellipse class=\"tm-trab\" cx=\"608.6\" cy=\"104.1\" rx=\"7\" ry=\"3\" transform=\"rotate(63 608.6 104.1)\"/><ellipse class=\"tm-trab\" cx=\"262\" cy=\"67.6\" rx=\"6\" ry=\"3\" transform=\"rotate(130 262 67.6)\"/><ellipse class=\"tm-trab\" cx=\"423\" cy=\"83.9\" rx=\"7.4\" ry=\"3.7\" transform=\"rotate(152 423 83.9)\"/><ellipse class=\"tm-trab\" cx=\"624.7\" cy=\"60.6\" rx=\"5.9\" ry=\"3.9\" transform=\"rotate(176 624.7 60.6)\"/><ellipse class=\"tm-trab\" cx=\"231.2\" cy=\"17.5\" rx=\"5.1\" ry=\"3.7\" transform=\"rotate(128 231.2 17.5)\"/><ellipse class=\"tm-trab\" cx=\"468.6\" cy=\"122.6\" rx=\"7.7\" ry=\"2.1\" transform=\"rotate(43 468.6 122.6)\"/><ellipse class=\"tm-trab\" cx=\"506.3\" cy=\"20.5\" rx=\"8.5\" ry=\"3.5\" transform=\"rotate(114 506.3 20.5)\"/><ellipse class=\"tm-trab\" cx=\"452\" cy=\"72.3\" rx=\"5.7\" ry=\"3.7\" transform=\"rotate(101 452 72.3)\"/><ellipse class=\"tm-trab\" cx=\"553.2\" cy=\"40.5\" rx=\"7.1\" ry=\"2.6\" transform=\"rotate(71 553.2 40.5)\"/><ellipse class=\"tm-trab\" cx=\"125\" cy=\"78.7\" rx=\"4.4\" ry=\"3.8\" transform=\"rotate(148 125 78.7)\"/><ellipse class=\"tm-trab\" cx=\"218.9\" cy=\"89.9\" rx=\"8.3\" ry=\"1.9\" transform=\"rotate(55 218.9 89.9)\"/><ellipse class=\"tm-trab\" cx=\"582.7\" cy=\"8.2\" rx=\"3.8\" ry=\"2.6\" transform=\"rotate(4 582.7 8.2)\"/><ellipse class=\"tm-trab\" cx=\"440.3\" cy=\"115.7\" rx=\"4\" ry=\"2.1\" transform=\"rotate(171 440.3 115.7)\"/><ellipse class=\"tm-trab\" cx=\"444.7\" cy=\"29\" rx=\"3.7\" ry=\"3.1\" transform=\"rotate(3 444.7 29)\"/><ellipse class=\"tm-trab\" cx=\"514.6\" cy=\"79\" rx=\"7.5\" ry=\"1.9\" transform=\"rotate(60 514.6 79)\"/><ellipse class=\"tm-trab\" cx=\"454\" cy=\"122.6\" rx=\"6.3\" ry=\"3\" transform=\"rotate(140 454 122.6)\"/><ellipse class=\"tm-trab\" cx=\"446.4\" cy=\"96\" rx=\"6.6\" ry=\"1.8\" transform=\"rotate(8 446.4 96)\"/><ellipse class=\"tm-trab\" cx=\"390.7\" cy=\"35\" rx=\"6.5\" ry=\"2.2\" transform=\"rotate(40 390.7 35)\"/><path class=\"tm-cart\" d=\"M262 166 C263.8 163.7 271.2 155.4 272.8 152.3 C274.4 149.2 271.7 149 271.5 147.3 C271.3 145.7 271.2 143.8 271.6 142.4 C272 141 273.2 140.3 274 139.1 C274.8 137.9 275.4 136.5 276.2 135.2 C277 134 277.8 132.5 278.9 131.5 C280 130.5 281.4 129.7 282.8 129.3 C284.1 128.8 285.8 128.8 287.3 128.9 C288.8 128.9 290.4 129.4 291.8 129.5 C293.3 129.7 294.6 129.5 296 129.7 C297.3 129.9 298.7 130 300 130.5 C301.3 131.1 302.5 132.2 303.7 133 C304.8 133.7 305.9 134.6 307 135.1 C308.1 135.7 309.2 135.8 310.3 136.3 C311.4 136.8 312.4 137.4 313.3 138 C314.3 138.6 315.3 139.3 316.3 139.9 C317.2 140.4 318.3 140.9 319.3 141.5 C320.3 142 321.4 142.5 322.3 143.2 C323.3 143.9 324.5 145.5 325 145.5 C325.5 145.6 323.7 143.2 325.4 143.5 C327.1 143.8 331.7 145.8 335.4 147.3 C339 148.8 343.1 150.5 347.2 152.3 C351.3 154.2 355.7 156.3 359.8 158.5 C364 160.7 368.2 163 372.1 165.3 C376 167.6 379.9 170 383.2 172.1 C386.5 174.3 389.6 176.5 392.1 178.2 C394.6 179.9 396.7 181.5 398 182.5 C399.4 183.5 397.2 183.4 400.2 184.2 C403.3 185 409.6 187.7 416.2 187.2 C422.9 186.7 430.9 185 440.2 181.2 C449.6 177.3 466.9 167 472.2 164.2\"/><path class=\"tm-cortex\" d=\"M0 214 C18.3 214.3 81.7 217 110 216 C138.3 215 151.3 208.7 170 208 C188.7 207.3 210.7 212.5 222 212 C233.3 211.5 233.3 209 238 205 C242.7 201 246 194.5 250 188 C254 181.5 258.2 172 262 166 C265.8 160 271.2 155.4 272.8 152.3 C274.4 149.2 271.7 149 271.5 147.3 C271.3 145.7 271.2 143.8 271.6 142.4 C272 141 273.2 140.3 274 139.1 C274.8 137.9 275.4 136.5 276.2 135.2 C277 134 277.8 132.5 278.9 131.5 C280 130.5 281.4 129.7 282.8 129.3 C284.1 128.8 285.8 128.8 287.3 128.9 C288.8 128.9 290.4 129.4 291.8 129.5 C293.3 129.7 294.6 129.5 296 129.7 C297.3 129.9 298.7 130 300 130.5 C301.3 131.1 302.5 132.2 303.7 133 C304.8 133.7 305.9 134.6 307 135.1 C308.1 135.7 309.2 135.8 310.3 136.3 C311.4 136.8 312.4 137.4 313.3 138 C314.3 138.6 315.3 139.3 316.3 139.9 C317.2 140.4 318.3 140.9 319.3 141.5 C320.3 142 321.4 142.5 322.3 143.2 C323.3 143.9 324.5 145.5 325 145.5 C325.5 145.6 323.7 143.2 325.4 143.5 C327.1 143.8 331.7 145.8 335.4 147.3 C339 148.8 343.1 150.5 347.2 152.3 C351.3 154.2 355.7 156.3 359.8 158.5 C364 160.7 368.2 163 372.1 165.3 C376 167.6 379.9 170 383.2 172.1 C386.5 174.3 389.6 176.5 392.1 178.2 C394.6 179.9 396.7 181.5 398 182.5 C399.4 183.5 397.2 183.4 400.2 184.2 C403.3 185 409.6 187.7 416.2 187.2 C422.9 186.7 430.9 185 440.2 181.2 C449.6 177.3 458.9 170 472.2 164.2 C485.6 158.3 492.3 150.2 520.2 146.2 C548.2 142.2 620 141.2 640 140.2\"/><ellipse class=\"tm-eam\" cx=\"192\" cy=\"168\" rx=\"20\" ry=\"17\"/></g><g class=\"hot\" tabindex=\"0\" data-part=\"retro\" data-info=\"Retrodiscal tissues: loaded with vessels and nerves, so functioning on them hurts. The superior retrodiscal lamina is elastic (it stretches here as the disc goes forward); the inferior lamina is collagenous and ties the disc to the back of the condyle.\"><path class=\"tm-retro\" d=\"M286.6 131.2L282.8 129.3L278.9 131.5L276.2 135.2L274 139.1L271.6 142.4L271.5 147.3L272.8 152.3L262 166L250 188L252 178L246 202L281 198L278.4 157.5L274.8 155.7L273.1 145.5L275.7 141L278.4 136L282.5 132Z\"/><circle class=\"tm-vessel\" cx=\"244\" cy=\"196\" r=\"2.4\"/><circle class=\"tm-vessel\" cx=\"236\" cy=\"203\" r=\"1.8\"/><path class=\"tm-inflam\" d=\"M278.4 157.5L276.7 179.7L281 198\"/><path class=\"tm-suplam\" d=\"M274.8 155.7L272.7 156.8L272.5 159.9L268.6 159.1L270 163.8L264.7 161.7L267.2 167.5L261.2 164.6L263.9 170.6L258.2 168L260.2 173.4L255.5 171.8L256.2 175.8L253.1 175.9L252 178\"/></g><g class=\"hot\" tabindex=\"0\" data-part=\"lpi\" data-info=\"Inferior head of the lateral pterygoid: from the lateral surface of the lateral pterygoid plate to the pterygoid fovea of the condylar neck. Active in OPENING and protrusion: it pulls the condyle forward down the eminence.\"><path class=\"tm-muscle tm-lpi\" d=\"M314 202L640 246L640 284L316 216Z\"/><path class=\"tm-fib tm-lpi-f\" d=\"M314.4 204.8L640 253.6M314.8 207.6L640 261.2M315.2 210.4L640 268.8M315.6 213.2L640 276.4\"/></g><g class=\"hot\" tabindex=\"0\" data-part=\"condyle\" data-info=\"Condyle: in the first 20-25 mm it only rotates, about the transverse horizontal axis, in the lower joint space. Centric relation is this seated, anterosuperior position against the eminence slope, on the thinnest avascular part of the disc.\"><g class=\"tm-mand\" transform=\"translate(300 168) rotate(0)\"><path class=\"tm-mandible\" d=\"M-21 6 C-20.8 10.7 -19.5 20 -20 34 C-20.5 48 -22.3 67.3 -24 90 C-25.7 112.7 -28.3 138.3 -30 170 C-31.7 201.7 -65.7 261.7 -34 280 C-2.3 298.3 128 306.7 160 280 C192 253.3 159.7 157 158 120 C156.3 83 153.3 73.7 150 58 C146.7 42.3 141.7 28.3 138 26 C134.3 23.7 133.7 34.7 128 44 C122.3 53.3 113 73 104 82 C95 91 84 97.3 74 98 C64 98.7 52.3 93.7 44 86 C35.7 78.3 29.2 60.3 24 52 C18.8 43.7 14 41.7 13 36 C12 30.3 16.7 23.3 18 18 C19.3 12.7 20.5 6.3 21 4A22 21 0 1 0 -21 6Z\"/><ellipse class=\"tm-trab\" cx=\"-15.1\" cy=\"43.6\" rx=\"3.2\" ry=\"1.3\"/><ellipse class=\"tm-trab\" cx=\"15.8\" cy=\"39\" rx=\"4.1\" ry=\"2\"/><ellipse class=\"tm-trab\" cx=\"1.5\" cy=\"23.8\" rx=\"2.9\" ry=\"2.5\"/><ellipse class=\"tm-trab\" cx=\"-10.2\" cy=\"35.6\" rx=\"4.4\" ry=\"2.7\"/><ellipse class=\"tm-trab\" cx=\"-2.2\" cy=\"0.2\" rx=\"2.9\" ry=\"2.5\"/><ellipse class=\"tm-trab\" cx=\"6.5\" cy=\"56.5\" rx=\"3.9\" ry=\"1.6\"/><ellipse class=\"tm-trab\" cx=\"-3.2\" cy=\"85.5\" rx=\"2\" ry=\"1.5\"/><ellipse class=\"tm-trab\" cx=\"6.2\" cy=\"75.6\" rx=\"2.1\" ry=\"1.9\"/><ellipse class=\"tm-trab\" cx=\"17\" cy=\"52.7\" rx=\"2.4\" ry=\"2.3\"/><ellipse class=\"tm-trab\" cx=\"19.1\" cy=\"28.5\" rx=\"5.6\" ry=\"1.2\"/><ellipse class=\"tm-trab\" cx=\"11.6\" cy=\"87\" rx=\"5.8\" ry=\"1.7\"/><ellipse class=\"tm-trab\" cx=\"-8.3\" cy=\"85.9\" rx=\"5.8\" ry=\"2.5\"/><ellipse class=\"tm-trab\" cx=\"21.7\" cy=\"86.1\" rx=\"3.7\" ry=\"1.7\"/><ellipse class=\"tm-trab\" cx=\"6\" cy=\"-7.1\" rx=\"5.8\" ry=\"2.7\"/><ellipse class=\"tm-trab\" cx=\"-1.4\" cy=\"94.9\" rx=\"2\" ry=\"2.4\"/><ellipse class=\"tm-trab\" cx=\"19.4\" cy=\"56\" rx=\"4.7\" ry=\"2.1\"/><ellipse class=\"tm-trab\" cx=\"15.6\" cy=\"42\" rx=\"5.7\" ry=\"3\"/><ellipse class=\"tm-trab\" cx=\"1.1\" cy=\"87.3\" rx=\"4\" ry=\"1.6\"/><ellipse class=\"tm-trab\" cx=\"-14.4\" cy=\"-3.8\" rx=\"5.3\" ry=\"1.4\"/><ellipse class=\"tm-trab\" cx=\"-2.2\" cy=\"56.1\" rx=\"3.5\" ry=\"2.1\"/><ellipse class=\"tm-trab\" cx=\"-11.5\" cy=\"35.5\" rx=\"2.7\" ry=\"2.2\"/><ellipse class=\"tm-trab\" cx=\"5.8\" cy=\"101\" rx=\"2.4\" ry=\"3\"/><ellipse class=\"tm-trab\" cx=\"21.4\" cy=\"82.9\" rx=\"4.3\" ry=\"1.9\"/><ellipse class=\"tm-trab\" cx=\"16.4\" cy=\"67.5\" rx=\"4\" ry=\"1.8\"/><ellipse class=\"tm-trab\" cx=\"3.6\" cy=\"20.8\" rx=\"5.8\" ry=\"2.2\"/><ellipse class=\"tm-trab\" cx=\"16.9\" cy=\"7.7\" rx=\"2.6\" ry=\"2.9\"/><path class=\"tm-headcap\" d=\"M-20.5 -2A22 21 0 0 1 21 -1\"/><path class=\"tm-fovea\" d=\"M13 32 Q9 38 16 44\"/></g></g><g class=\"hot\" tabindex=\"0\" data-part=\"disc\" data-info=\"Articular disc: dense fibrous connective tissue that functions like a third bone, which makes the TMJ a compound joint. Biconcave: a thick anterior border, a thin intermediate zone (avascular, no nerves) where the condyle sits, and an even thicker posterior border. Thicker medially, so a displaced disc tends to go forward or medially. Not a meniscus.\"><g class=\"tm-disc\" transform=\"translate(300 168) rotate(0)\"><path class=\"tm-disc-body\" d=\"M-24.7 -12.1 C-25.2 -12.6 -24.5 -13.4 -24.6 -14.2 C-24.8 -15.1 -25.2 -16.2 -25.5 -17.2 C-25.8 -18.3 -26.3 -19.6 -26.4 -20.6 C-26.5 -21.7 -26.5 -22.8 -26.2 -23.6 C-25.9 -24.4 -25.2 -24.9 -24.7 -25.6 C-24.3 -26.3 -23.8 -27 -23.3 -27.8 C-22.9 -28.6 -22.5 -29.5 -22 -30.3 C-21.6 -31.2 -21.1 -32.1 -20.5 -32.8 C-19.9 -33.5 -19.2 -34.3 -18.5 -34.8 C-17.8 -35.3 -16.9 -35.7 -16 -36 C-15.1 -36.3 -14.2 -36.3 -13.2 -36.3 C-12.3 -36.4 -11.3 -36.2 -10.3 -36 C-9.4 -35.9 -8.4 -35.7 -7.6 -35.5 C-6.7 -35.4 -5.8 -35.3 -5 -35.3 C-4.1 -35.2 -3.3 -35.4 -2.5 -35.3 C-1.6 -35.2 -0.8 -34.9 0 -34.5 C0.8 -34.1 1.6 -33.5 2.3 -32.9 C3 -32.4 3.7 -31.7 4.4 -31.2 C5.1 -30.7 5.7 -30.3 6.4 -30 C7 -29.6 7.7 -29.5 8.4 -29.3 C9.1 -29 9.7 -28.7 10.3 -28.4 C10.9 -28 11.5 -27.6 12.1 -27.2 C12.7 -26.8 13.3 -26.4 13.9 -26.1 C14.5 -25.7 15 -25.4 15.7 -25 C16.3 -24.7 16.9 -24.4 17.5 -24.1 C18.1 -23.8 18.8 -23.5 19.4 -23.1 C20 -22.8 20.6 -22.4 21.2 -21.9 C21.7 -21.5 22.2 -20.9 22.8 -20.5 C23.4 -20.1 24.1 -19.7 24.8 -19.3 C25.5 -19 26.3 -18.7 27 -18.2 C27.7 -17.8 28.4 -17.3 28.9 -16.7 C29.4 -16.1 29.7 -15.4 30.2 -14.7 C30.6 -14.1 31.1 -13.4 31.5 -12.7 C32 -12.1 32.4 -11.4 32.7 -10.6 C33.1 -9.9 33.3 -9.1 33.4 -8.3 C33.4 -7.5 33.2 -6.7 33.1 -5.8 C32.9 -5 32.5 -4.2 32.2 -3.4 C32 -2.6 31.8 -1.8 31.6 -1.1 C31.4 -0.4 31.6 0.4 31.2 1.1 C30.8 1.8 30 2.5 29.3 3.1 C28.7 3.7 28.2 4.6 27.3 4.8 C26.5 5 24.6 4.6 24.1 4.3 C23.6 3.9 24.3 3.1 24.4 2.6 C24.4 2 24.5 1.4 24.5 0.9 C24.5 0.3 24.5 -0.3 24.5 -0.9 C24.5 -1.4 24.4 -2 24.4 -2.6 C24.3 -3.1 24.2 -3.7 24.1 -4.3 C24 -4.8 23.9 -5.4 23.8 -5.9 C23.6 -6.5 23.5 -7 23.3 -7.6 C23.1 -8.1 22.9 -8.6 22.7 -9.2 C22.5 -9.7 22.3 -10.2 22 -10.7 C21.8 -11.3 21.5 -11.8 21.2 -12.3 C20.9 -12.7 20.6 -13.2 20.3 -13.7 C20 -14.2 19.7 -14.6 19.3 -15.1 C19 -15.5 18.6 -16 18.2 -16.4 C17.8 -16.8 17.4 -17.2 17 -17.6 C16.6 -18 16.2 -18.4 15.7 -18.8 C15.3 -19.1 14.9 -19.5 14.4 -19.8 C13.9 -20.2 13.5 -20.5 13 -20.8 C12.5 -21.1 12 -21.4 11.5 -21.6 C11 -21.9 10.5 -22.2 10 -22.4 C9.4 -22.6 8.9 -22.8 8.4 -23 C7.8 -23.2 7.3 -23.4 6.8 -23.6 C6.2 -23.7 5.7 -23.8 5.1 -24 C4.5 -24.1 4 -24.2 3.4 -24.3 C2.8 -24.3 2.3 -24.4 1.7 -24.4 C1.1 -24.5 0.6 -24.5 0 -24.5 C-0.6 -24.5 -1.1 -24.5 -1.7 -24.4 C-2.3 -24.4 -2.8 -24.3 -3.4 -24.3 C-4 -24.2 -4.5 -24.1 -5.1 -24 C-5.7 -23.8 -6.2 -23.7 -6.8 -23.6 C-7.3 -23.4 -7.8 -23.2 -8.4 -23 C-8.9 -22.8 -9.4 -22.6 -10 -22.4 C-10.5 -22.2 -11 -21.9 -11.5 -21.6 C-12 -21.4 -12.5 -21.1 -13 -20.8 C-13.5 -20.5 -13.9 -20.2 -14.4 -19.8 C-14.9 -19.5 -15.3 -19.1 -15.7 -18.8 C-16.2 -18.4 -16.6 -18 -17 -17.6 C-17.4 -17.2 -17.8 -16.8 -18.2 -16.4 C-18.6 -16 -19 -15.5 -19.3 -15.1 C-19.7 -14.6 -20 -14.2 -20.3 -13.7 C-20.6 -13.2 -20.9 -12.7 -21.2 -12.3 C-21.5 -11.8 -21.4 -10.8 -22 -10.7 C-22.6 -10.7 -24.3 -11.5 -24.7 -12.1Z\"/><path class=\"tm-disc-iz\" d=\"M9.1 -28.1 C9.5 -28.7 9.8 -27.8 10.1 -27.6 C10.4 -27.4 10.6 -27.3 10.9 -27.1 C11.2 -26.9 11.5 -26.7 11.8 -26.5 C12.1 -26.3 12.4 -26.1 12.6 -25.9 C12.9 -25.7 13.2 -25.6 13.5 -25.4 C13.8 -25.2 14.1 -25 14.3 -24.9 C14.6 -24.7 14.9 -24.5 15.2 -24.4 C15.5 -24.2 15.8 -24.1 16.1 -23.9 C16.4 -23.8 16.7 -23.6 17.1 -23.5 C17.4 -23.3 17.7 -23.2 18 -23 C18.3 -22.9 18.6 -22.7 18.9 -22.5 C19.2 -22.3 19.5 -22.2 19.8 -22 C20.1 -21.8 21 -22 20.6 -21.3 C20.2 -20.7 18.2 -18.6 17.6 -18.2 C17 -17.8 17.1 -18.6 16.9 -18.8 C16.7 -19 16.5 -19.2 16.3 -19.4 C16 -19.6 15.8 -19.8 15.6 -19.9 C15.3 -20.1 15.1 -20.3 14.9 -20.5 C14.6 -20.6 14.4 -20.8 14.1 -21 C13.9 -21.1 13.7 -21.3 13.4 -21.5 C13.2 -21.6 12.9 -21.8 12.6 -21.9 C12.4 -22.1 12.1 -22.2 11.9 -22.3 C11.6 -22.5 11.4 -22.6 11.1 -22.7 C10.8 -22.9 10.6 -23 10.3 -23.1 C10 -23.2 9.8 -23.3 9.5 -23.5 C9.2 -23.6 8.9 -23.7 8.7 -23.8 C8.4 -23.9 7.7 -23.3 7.8 -24.1 C7.9 -24.8 8.8 -27.5 9.1 -28.1Z\"/><path class=\"tm-space up\" d=\"M-26.9 -18.1 C-27 -18.6 -27.4 -19.9 -27.5 -20.7 C-27.7 -21.6 -27.8 -22.5 -27.7 -23.2 C-27.6 -24 -27.4 -24.7 -27.1 -25.3 C-26.8 -25.8 -26.2 -26.2 -25.8 -26.8 C-25.4 -27.3 -25.1 -27.8 -24.7 -28.4 C-24.4 -29 -24 -29.7 -23.7 -30.3 C-23.3 -31 -23 -31.6 -22.6 -32.3 C-22.2 -32.9 -21.8 -33.6 -21.3 -34.2 C-20.9 -34.7 -20.4 -35.3 -19.8 -35.8 C-19.3 -36.2 -18.7 -36.6 -18 -36.9 C-17.4 -37.3 -16.7 -37.5 -16 -37.6 C-15.3 -37.8 -14.5 -37.8 -13.8 -37.8 C-13 -37.9 -12.3 -37.8 -11.5 -37.7 C-10.8 -37.6 -10 -37.5 -9.3 -37.3 C-8.6 -37.2 -7.9 -37.1 -7.2 -37 C-6.5 -36.9 -5.8 -36.8 -5.2 -36.8 C-4.5 -36.8 -3.9 -37 -3.2 -36.9 C-2.6 -36.9 -1.9 -36.8 -1.3 -36.6 C-0.6 -36.4 0 -36.1 0.6 -35.7 C1.2 -35.4 1.8 -34.9 2.4 -34.5 C3 -34.1 3.5 -33.6 4.1 -33.2 C4.6 -32.8 5.1 -32.4 5.7 -32.1 C6.2 -31.8 6.7 -31.5 7.2 -31.3 C7.8 -31.1 8.3 -31 8.8 -30.8 C9.4 -30.6 9.9 -30.4 10.4 -30.1 C10.9 -29.9 11.4 -29.6 11.8 -29.3 C12.3 -29 12.8 -28.7 13.2 -28.4 C13.7 -28.1 14.2 -27.8 14.6 -27.5 C15.1 -27.2 15.5 -26.9 16 -26.7 C16.5 -26.4 17 -26.2 17.5 -25.9 C18 -25.7 18.5 -25.4 19 -25.2 C19.5 -24.9 20 -24.6 20.4 -24.4 C20.9 -24.1 21.4 -23.8 21.8 -23.4 C22.3 -23.1 22.7 -22.7 23.1 -22.3 C23.5 -21.9 23.9 -21.6 24.4 -21.2 C24.9 -20.9 25.5 -20.6 26 -20.3 C26.6 -20 27.2 -19.8 27.8 -19.4 C28.3 -19.1 28.9 -18.8 29.4 -18.4 C29.9 -18 30.3 -17.5 30.7 -17 C31 -16.5 31.3 -15.9 31.6 -15.4 C31.9 -14.9 32.3 -14.4 32.7 -13.9 C33 -13.3 33.4 -12.8 33.7 -12.3 C34 -11.7 34.3 -11.1 34.5 -10.5 C34.7 -10 34.9 -9.3 34.9 -8.7 C35 -8.1 34.9 -7.4 34.8 -6.8 C34.7 -6.1 34.5 -5.5 34.3 -4.8 C34.1 -4.2 33.8 -3.6 33.6 -2.9 C33.5 -2.3 33.3 -1.7 33.2 -1.2 C33.1 -0.6 33.2 0 33 0.6 C32.8 1.1 32.5 1.7 32 2.2 C31.6 2.8 30.6 3.5 30.4 3.7\"/><path class=\"tm-space lo\" d=\"M-19.8 -12.3 C-19.6 -12.5 -19.3 -13 -19.1 -13.4 C-18.9 -13.7 -18.6 -14 -18.4 -14.3 C-18.1 -14.7 -17.9 -15 -17.6 -15.3 C-17.3 -15.6 -17 -15.9 -16.8 -16.2 C-16.5 -16.5 -16.2 -16.8 -15.9 -17 C-15.6 -17.3 -15.3 -17.6 -15 -17.8 C-14.7 -18.1 -14.3 -18.4 -14 -18.6 C-13.7 -18.9 -13.4 -19.1 -13 -19.3 C-12.7 -19.5 -12.3 -19.8 -12 -20 C-11.7 -20.2 -11.3 -20.4 -10.9 -20.6 C-10.6 -20.8 -10.2 -20.9 -9.8 -21.1 C-9.5 -21.3 -9.1 -21.5 -8.7 -21.6 C-8.4 -21.8 -8 -21.9 -7.6 -22 C-7.2 -22.2 -6.8 -22.3 -6.4 -22.4 C-6 -22.5 -5.6 -22.6 -5.2 -22.7 C-4.8 -22.8 -4.4 -22.9 -4 -22.9 C-3.6 -23 -3.2 -23.1 -2.8 -23.1 C-2.4 -23.2 -2 -23.2 -1.6 -23.2 C-1.2 -23.3 -0.8 -23.3 -0.4 -23.3 C0 -23.3 0.4 -23.3 0.8 -23.3 C1.2 -23.3 1.6 -23.2 2 -23.2 C2.4 -23.2 2.8 -23.1 3.2 -23.1 C3.6 -23 4 -22.9 4.4 -22.9 C4.8 -22.8 5.2 -22.7 5.6 -22.6 C6 -22.5 6.4 -22.4 6.8 -22.3 C7.2 -22.2 7.6 -22 8 -21.9 C8.4 -21.8 8.7 -21.6 9.1 -21.4 C9.5 -21.3 9.8 -21.1 10.2 -20.9 C10.6 -20.8 10.9 -20.6 11.3 -20.4 C11.7 -20.2 12 -20 12.3 -19.8 C12.7 -19.5 13 -19.3 13.4 -19.1 C13.7 -18.9 14 -18.6 14.3 -18.4 C14.7 -18.1 15 -17.9 15.3 -17.6 C15.6 -17.3 15.9 -17 16.2 -16.8 C16.5 -16.5 16.8 -16.2 17 -15.9 C17.3 -15.6 17.6 -15.3 17.8 -15 C18.1 -14.7 18.4 -14.3 18.6 -14 C18.9 -13.7 19.1 -13.4 19.3 -13 C19.5 -12.7 19.8 -12.3 20 -12 C20.2 -11.7 20.4 -11.3 20.6 -10.9 C20.8 -10.6 20.9 -10.2 21.1 -9.8 C21.3 -9.5 21.5 -9.1 21.6 -8.7 C21.8 -8.4 21.9 -8 22 -7.6 C22.2 -7.2 22.3 -6.8 22.4 -6.4 C22.5 -6 22.6 -5.6 22.7 -5.2 C22.8 -4.8 22.9 -4.4 22.9 -4 C23 -3.6 23.1 -3.2 23.1 -2.8 C23.2 -2.4 23.2 -2 23.2 -1.6 C23.3 -1.2 23.3 -0.8 23.3 -0.4 C23.3 0 23.3 0.4 23.3 0.8 C23.3 1.2 23.2 1.6 23.2 2 C23.2 2.4 23.1 3 23.1 3.2\"/></g></g><g class=\"hot\" tabindex=\"0\" data-part=\"lps\" data-info=\"Superior head of the lateral pterygoid: from the greater wing of the sphenoid (infratemporal crest) to the capsule and disc. Active in CLOSING, steadying the disc against the pull of the retrodiscal tissue.\"><path class=\"tm-muscle tm-lps\" d=\"M326.9 173.7L640 182L640 202L324 173.1Z\"/><path class=\"tm-fib tm-lps-f\" d=\"M326.2 173.6L640 187M325.4 173.4L640 192M324.7 173.2L640 197\"/></g><g class=\"hot\" tabindex=\"0\" data-part=\"tmlo\" data-info=\"TM ligament, outer oblique portion: a sling from the articular eminence to the back of the condylar neck. It limits rotational opening: once it is taut (about 20-25 mm), the jaw can only open further if the condyle translates forward.\"><path class=\"tm-lig tm-tmlo\" d=\"M442.2 185.2L288 214\"/><circle class=\"tm-lig-dot tm-tmlo-dot\" r=\"2.6\" cx=\"288\" cy=\"214\"/></g><g class=\"hot\" tabindex=\"0\" data-part=\"tmli\" data-info=\"TM ligament, inner horizontal portion: from the eminence back to the lateral pole of the condyle and the disc. It limits posterior movement of the condyle and disc, protecting the retrodiscal tissue from a blow to the chin.\"><path class=\"tm-lig tm-tmli\" d=\"M440.2 181.2L309 164\"/><circle class=\"tm-lig-dot tm-tmli-dot\" r=\"2.2\" cx=\"309\" cy=\"164\"/></g><circle class=\"tm-lig-dot\" cx=\"442.2\" cy=\"185.2\" r=\"2.8\"/><g class=\"am-callout\"><path class=\"am-leader\" d=\"M178 160L144 124\"/><circle class=\"am-dot\" cx=\"178\" cy=\"160\" r=\"2\"/><text class=\"am-label \" x=\"140\" y=\"128\" text-anchor=\"end\"><tspan x=\"140\" dy=\"0\">EAM</tspan></text></g><g class=\"am-callout\"><path class=\"am-leader\" d=\"M294 120L236 60\"/><circle class=\"am-dot\" cx=\"294\" cy=\"120\" r=\"2\"/><text class=\"am-label \" x=\"232\" y=\"64\" text-anchor=\"end\"><tspan x=\"232\" dy=\"0\">glenoid fossa</tspan></text></g><g class=\"am-callout\"><path class=\"am-leader\" d=\"M414.2 179.2L442.2 108\"/><circle class=\"am-dot\" cx=\"414.2\" cy=\"179.2\" r=\"2\"/><text class=\"am-label \" x=\"446.2\" y=\"112\" text-anchor=\"start\"><tspan x=\"446.2\" dy=\"0\">articular eminence</tspan></text></g><g class=\"am-callout\"><path class=\"am-leader\" d=\"M612 189L632 120\"/><circle class=\"am-dot\" cx=\"612\" cy=\"189\" r=\"2\"/><text class=\"am-label \" x=\"628\" y=\"124\" text-anchor=\"end\"><tspan x=\"628\" dy=\"0\">LP, superior head</tspan></text></g><g class=\"am-callout on-dark\"><path class=\"am-leader\" d=\"M600 266L604 302\"/><circle class=\"am-dot\" cx=\"600\" cy=\"266\" r=\"2\"/><text class=\"am-label \" x=\"600\" y=\"306\" text-anchor=\"end\"><tspan x=\"600\" dy=\"0\">LP, inferior head</tspan></text></g><g class=\"tm-gauge\"><rect class=\"tm-gauge-bg\" x=\"47\" y=\"270\" width=\"10\" height=\"110\" rx=\"3\"/><rect class=\"tm-gauge-rot\" x=\"47\" y=\"314\" width=\"10\" height=\"11\"/><rect class=\"tm-gauge-fill\" x=\"47\" width=\"10\" y=\"270\" height=\"0\"/><path class=\"tm-gauge-tick\" d=\"M57 270h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"274\">0</text><path class=\"tm-gauge-tick\" d=\"M57 292h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"296\">10</text><path class=\"tm-gauge-tick\" d=\"M57 314h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"318\">20</text><path class=\"tm-gauge-tick\" d=\"M57 336h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"340\">30</text><path class=\"tm-gauge-tick\" d=\"M57 358h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"362\">40</text><path class=\"tm-gauge-tick\" d=\"M57 380h5\"/><text class=\"am-label tm-gauge-t\" x=\"65\" y=\"384\">50</text><path class=\"tm-gauge-mark\" d=\"M45 270H59\"/><text class=\"am-label strong\" x=\"44\" y=\"260\">Incisal opening (mm)</text><text class=\"am-label tm-gauge-note\" x=\"86\" y=\"319.5\">end of rotation</text></g></svg></div></div></figure><div class=\"am-controls\"><label class=\"am-slider\"><span>Closed</span><input type=\"range\" min=\"0\" max=\"50\" step=\"0.5\" value=\"0\" aria-label=\"Incisal opening in millimeters, 0 to 50\"><span>50 mm</span></label><button type=\"button\" class=\"am-btn tm-play\" aria-pressed=\"false\">Play</button></div>\n<div class=\"am-stats\" aria-live=\"polite\"><span><b>Opening</b> <em data-r=\"mm\"></em></span><span><b>Movement</b> <em data-r=\"phase\"></em></span><span><b>Working space</b> <em data-r=\"space\"></em></span><span><b>Outer TM ligament</b> <em data-r=\"lig\"></em></span><span><b>Lateral pterygoid</b> <em data-r=\"lp\"></em></span></div>\n<div class=\"am-stats tm-legend\"><span><i class=\"sw\" style=\"background:var(--tm-disc)\"></i><b>Disc</b> <em>thick posterior band, thin intermediate zone, anterior band</em></span><span><i class=\"sw\" style=\"background:var(--tm-retro)\"></i><b>Retrodiscal tissue</b></span><span><i class=\"sw\" style=\"background:var(--tm-muscle)\"></i><b>Lateral pterygoid</b> <em>superior and inferior heads</em></span><span><i class=\"sw\" style=\"background:var(--tm-lig)\"></i><b>TM ligament</b> <em>outer oblique, inner horizontal</em></span></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Tap or hover any part for what it is.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>Drawn from the hub's L2 notes (Functional TMJ Anatomy, Dr. Givan): the biconcave disc and its zones, upper and lower joint spaces, the retrodiscal laminae, both heads of the lateral pterygoid and what each portion of the TM ligament limits; and the L1 handout's numbers: pure rotation to about 20-25 mm at the incisors, maximum opening about 40-60 mm.</li>\n<li>Schematic, not to scale: the angles of rotation, how far the disc turns on the condyle, the path down the eminence and the ligament's tension are drawn to show the relationships, not measured. The ligaments and lateral pterygoid sit lateral and medial to this plane in a real joint; they are drawn over it.</li>\n<li>Muscle activity follows the slider: moving it toward open lights the inferior head (opening), toward closed the superior head (closing).</li></ul></details></div>",
+    data: (function(){ var d = {"C0":[300,168],"CC":[352,186],"C1":[398,216],"R":22,"RI":24.5,"GAP":3,"TH1":13,"TH2":26,"PSI":26,"DT":[[-64,3],[-46,11],[-26,15],[-6,11],[14,6],[30,5],[46,6],[62,9],[74,10],[90,7],[102,3]],"FOVEA":[14,34],"NECK_P":[-19,30],"TML_NECK":[-12,46],"POLE":[9,-4],"SL":[252,178],"LPS0":[[640,182],[640,202]],"LPI0":[[640,246],[640,284]],"wide":"0 0 640 420","narrow":"150 40 420 330","FOSSA":[[250,188],[262,166],[272.8,152.3],[271.5,147.3],[271.6,142.4],[274,139.1],[276.2,135.2],[278.9,131.5],[282.8,129.3],[287.3,128.9],[291.8,129.5],[296,129.7],[300,130.5],[303.7,133],[307,135.1],[310.3,136.3],[313.3,138],[316.3,139.9],[319.3,141.5],[322.3,143.2],[325,145.5],[325.4,143.5],[335.4,147.3],[347.2,152.3],[359.8,158.5],[372.1,165.3],[383.2,172.1],[392.1,178.2],[398,182.5],[400.2,184.2]],"TUB":[442.2,185.2],"GAUGE":[52,270,380]};
+    function discT(a, D) {
+  var k = D.DT, i;
+  if (a <= k[0][0]) return k[0][1];
+  for (i = 1; i < k.length; i++) if (a <= k[i][0]) { var u = (a - k[i - 1][0]) / (k[i][0] - k[i - 1][0]); u = (1 - Math.cos(u * Math.PI)) / 2; return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * u; }
+  return k[k.length - 1][1];
+}
+    function tmjModel(mm, D) {
+  var th = Math.min(mm, 25) / 25 * D.TH1 + Math.max(0, mm - 25) / 25 * (D.TH2 - D.TH1);
+  var u = Math.max(0, Math.min(1, (mm - 25) / 25)), t = u * u * (3 - 2 * u);
+  var a = D.C0, b = D.CC, c = D.C1, s = 1 - t;
+  return { C: [s * s * a[0] + 2 * s * t * b[0] + t * t * c[0], s * s * a[1] + 2 * s * t * b[1] + t * t * c[1]], th: th, psi: -D.PSI * t, t: t };
+}
+    function tmjFrame(mm, D) {
+  var m = tmjModel(mm, D), C = m.C;
+  function rot(p, deg) { var r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return [C[0] + p[0] * c - p[1] * s, C[1] + p[0] * s + p[1] * c]; }
+  function polar(a, r) { var q = a * Math.PI / 180; return [r * Math.sin(q), -r * Math.cos(q)]; }
+  function f(v) { return Math.round(v * 10) / 10; }
+  function P(pts) { return "M" + pts.map(function (p) { return f(p[0]) + " " + f(p[1]); }).join("L"); }
+  var dPostO = rot(polar(-64, D.RI + discT(-64, D) + .5), m.psi), dPostI = rot(polar(-64, D.RI - .5), m.psi);
+  var dAntO = rot(polar(102, D.RI + discT(102, D)), m.psi), dAntI = rot(polar(102, D.RI), m.psi);
+  var neckP = rot(D.NECK_P, m.th), fovea = rot(D.FOVEA, m.th), fovea2 = rot([D.FOVEA[0] + 2, D.FOVEA[1] + 14], m.th);
+  var tmlNeck = rot(D.TML_NECK, m.th), pole = rot(D.POLE, m.th);
+  var sl = D.SL, mid = [(dPostO[0] + sl[0]) / 2 - 4, (dPostO[1] + sl[1]) / 2 - 6];
+  /* superior lamina is elastic: drawn wavy, its waves smoothing out as it stretches */
+  var n = 7, wav = [], dx = sl[0] - dPostO[0], dy = sl[1] - dPostO[1], len = Math.sqrt(dx * dx + dy * dy), amp = Math.max(0.6, 4.2 - len / 30);
+  for (var i = 0; i <= n * 2; i++) { var u = i / (n * 2), w = (i % 2 ? 1 : -1) * amp * Math.sin(u * Math.PI); wav.push([dPostO[0] + dx * u - dy / len * w, dPostO[1] + dy * u + dx / len * w]); }
+  var lowPost = [sl[0] - 6, sl[1] + 24];
+  /* it fills the fossa behind the disc up to the disc's top, so no gap opens on the eminence slope as the disc slides
+     forward (the disc is drawn over it) */
+  function discOut(a) { return rot(polar(a, D.RI + discT(a, D) + .5), m.psi); }
+  var aTop = Math.min(16, -20 + 50 * m.t), rim = [];
+  for (var ra = -50; ra < aTop; ra += 8) rim.push(discOut(ra));
+  var top = discOut(aTop);
+  var behind = D.FOSSA.filter(function (p) { return p[0] < top[0]; }).reverse();
+  var retro = [top].concat(behind, [sl, lowPost, neckP, dPostI, dPostO], rim);
+  function band(a0, a1, b0, b1) { return P([a0, b0, b1, a1]) + "Z"; }
+  var lps = band(dAntO, dAntI, D.LPS0[0], D.LPS0[1]);
+  var lpi = band(fovea, fovea2, D.LPI0[0], D.LPI0[1]);
+  function fibers(a0, a1, b0, b1, k) { var out = ""; for (var j = 1; j < k; j++) { var u = j / k, p = [a0[0] + (a1[0] - a0[0]) * u, a0[1] + (a1[1] - a0[1]) * u], q = [b0[0] + (b1[0] - b0[0]) * u, b0[1] + (b1[1] - b0[1]) * u]; out += "M" + f(p[0]) + " " + f(p[1]) + "L" + f(q[0]) + " " + f(q[1]); } return out; }
+  var A = {};
+  A[".tm-mand"] = { transform: "translate(" + f(C[0]) + " " + f(C[1]) + ") rotate(" + f(m.th) + ")" };
+  A[".tm-disc"] = { transform: "translate(" + f(C[0]) + " " + f(C[1]) + ") rotate(" + f(m.psi) + ")" };
+  A[".tm-retro"] = { d: (function () { var s = "M" + f(retro[0][0]) + " " + f(retro[0][1]); for (var k = 1; k < retro.length; k++) s += "L" + f(retro[k][0]) + " " + f(retro[k][1]); return s + "Z"; })() };
+  A[".tm-suplam"] = { d: P(wav) };
+  A[".tm-inflam"] = { d: P([dPostI, [(dPostI[0] + neckP[0]) / 2 - 3, (dPostI[1] + neckP[1]) / 2 + 2], neckP]) };
+  A[".tm-lps"] = { d: lps }; A[".tm-lps-f"] = { d: fibers(dAntO, dAntI, D.LPS0[0], D.LPS0[1], 4) };
+  A[".tm-lpi"] = { d: lpi }; A[".tm-lpi-f"] = { d: fibers(fovea, fovea2, D.LPI0[0], D.LPI0[1], 5) };
+  A[".tm-tmlo"] = { d: P([D.TUB, tmlNeck]) };
+  A[".tm-tmli"] = { d: P([[D.TUB[0] - 2, D.TUB[1] - 4], pole]) };
+  A[".tm-tmlo-dot"] = { cx: f(tmlNeck[0]), cy: f(tmlNeck[1]) };
+  A[".tm-tmli-dot"] = { cx: f(pole[0]), cy: f(pole[1]) };
+  var gy = D.GAUGE[1] + (D.GAUGE[2] - D.GAUGE[1]) * mm / 50;
+  A[".tm-gauge-mark"] = { d: "M" + (D.GAUGE[0] - 7) + " " + f(gy) + "H" + (D.GAUGE[0] + 7) };
+  A[".tm-gauge-fill"] = { y: D.GAUGE[1], height: f(Math.max(0, gy - D.GAUGE[1])) };
+  return { m: m, attrs: A };
+}
+    d.discT = discT; d.tmjModel = tmjModel; d.tmjFrame = tmjFrame; return d; })(),
+    live: function tmjLive(root, D) {
+  var svg = root.querySelector(".tm-fig");
+  var slider = root.querySelector('input[type="range"]');
+  var playBtn = root.querySelector(".tm-play");
+  var readout = root.querySelector("[data-readout]");
+  var summary = root.querySelector(".am-summary");
+  var infoEl = root.querySelector(".am-info");
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var rs = {}; Array.prototype.forEach.call(root.querySelectorAll("[data-r]"), function (e) { rs[e.getAttribute("data-r")] = e; });
+  var els = {};
+  var mm = 0, target = 0, prev = 0, dir = 0, playing = false, tourT = 0, frame = 0, last = 0, visible = true;
+  function draw() {
+    var F = D.tmjFrame(mm, D);
+    Object.keys(F.attrs).forEach(function (sel) { var el = els[sel] || (els[sel] = svg.querySelector(sel)); if (!el) return; var a = F.attrs[sel]; for (var k in a) el.setAttribute(k, a[k]); });
+    var rot = mm <= 25, taut = mm >= 22;
+    dir = mm > prev + 1e-3 ? 1 : mm < prev - 1e-3 ? -1 : (Math.abs(target - mm) < 1e-3 ? 0 : dir);
+    svg.setAttribute("data-phase", mm < .3 ? "closed" : rot ? "rot" : "trans");
+    svg.setAttribute("data-lig", taut ? "taut" : "slack");
+    svg.setAttribute("data-dir", dir > 0 ? "open" : dir < 0 ? "close" : "");
+    rs.mm.textContent = mm.toFixed(0) + " mm";
+    rs.phase.textContent = mm < .3 ? "closed (teeth together)" : rot ? "rotation only" : "rotation + translation";
+    rs.space.textContent = mm < .3 ? "none" : rot ? "lower (disc to condyle)" : "upper (disc to eminence) and lower";
+    rs.lig.textContent = mm < 18 ? "slack" : mm < 22 ? "tightening" : "taut";
+    rs.lp.textContent = dir > 0 ? "inferior head (opening)" : dir < 0 ? "superior head (closing)" : "at rest";
+    var st = mm < .3 ? "closed" : (rot ? "rotation" : "translation") + " · " + mm.toFixed(0) + " mm";
+    if (readout.textContent !== st) readout.textContent = st;
+    var text = mm < .3 ? "Closed: the condyle is seated in the fossa against the posterior slope of the eminence, on the thin intermediate zone of the disc, with the thick posterior band above it. Drag the slider to open." :
+      rot ? "Pure rotation (hinge movement) about the transverse horizontal axis: the condyle turns inside the disc, in the lower joint space, while the disc stays put in the fossa. This carries the incisors to about 20-25 mm, when the outer oblique part of the TM ligament goes taut." :
+      "Rotation plus translation: with the ligament taut, the jaw can only open further if the condyle-disc complex slides forward and down the posterior slope of the eminence, in the upper joint space. The disc rotates posteriorly on the condyle, so its thin intermediate zone stays between condyle and eminence, and the elastic superior retrodiscal lamina stretches behind it. Maximum opening is about 40-60 mm.";
+    if (summary.textContent !== text) summary.textContent = text;
+    prev = mm;
+  }
+  function step(dt) {
+    if (playing) { tourT += dt; var u = (tourT % 8) / 8; target = u < .1 ? 0 : u < .5 ? (u - .1) / .4 : u < .6 ? 1 : u < .95 ? 1 - (u - .6) / .35 : 0; target = 50 * target * target * (3 - 2 * target); slider.value = target; }
+    mm += (target - mm) * (1 - Math.exp(-dt / .16));
+    if (Math.abs(target - mm) < .02) mm = target;
+  }
+  function tick(now) {
+    frame = 0;
+    if (!root.isConnected || !visible) return;
+    var dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+    step(dt); draw();
+    if (playing || Math.abs(target - mm) > .02) frame = requestAnimationFrame(tick);
+    else { dir = 0; draw(); }
+  }
+  function kick() { if (!frame && visible) { last = 0; frame = requestAnimationFrame(tick); } }
+  slider.addEventListener("input", function () { if (playing) setPlaying(false); target = +slider.value; if (reduce.matches) { prev = mm; mm = target; draw(); } else kick(); });
+  function setPlaying(v) { playing = v && !reduce.matches; playBtn.textContent = playing ? "Pause" : "Play"; playBtn.setAttribute("aria-pressed", String(playing)); if (playing) { tourT = 0; kick(); } }
+  playBtn.addEventListener("click", function () { setPlaying(!playing); });
+  if (reduce.matches) playBtn.hidden = true;
+  Array.prototype.forEach.call(svg.querySelectorAll(".hot"), function (el) {
+    var on = function () { infoEl.textContent = el.getAttribute("data-info"); el.classList.add("is-hot"); };
+    var off = function () { el.classList.remove("is-hot"); };
+    el.addEventListener("pointerenter", on); el.addEventListener("pointerleave", off);
+    el.addEventListener("focus", on); el.addEventListener("blur", off); el.addEventListener("click", on);
+  });
+  if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting; if (visible) kick(); }).observe(svg);
+  var mq = window.matchMedia ? window.matchMedia("(max-width:560px)") : null;
+  var fit = function () { svg.setAttribute("viewBox", mq && mq.matches ? D.narrow : D.wide); };
+  if (mq) { fit(); if (mq.addEventListener) mq.addEventListener("change", fit); }
+  draw();
+} };
+  function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  /* noTitle: the caller heads it (Review sections use their own h3). The figures use no SVG ids, so copies can repeat. */
+  function html(key, noTitle){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig">' + (noTitle ? '' : '<h4>' + esc(f.title) + '</h4>') + '<p class="lec-fig-cap">' + esc(f.caption) + '</p>' + f.html + '</figure>'; }
+  function mount(scope){ Array.prototype.forEach.call(scope.querySelectorAll("[data-anima]"), function(el){ if(el.__animaOn) return; var f = FIGS[el.getAttribute("data-anima")]; if(!f) return; el.__animaOn = 1; try { f.live(el, f.data); } catch(e){ if(window.console) console.error("anima figure failed", e); } }); }
+  function meta(key){ var f = FIGS[key]; return f ? { title: f.title, caption: f.caption, lec: f.lec } : null; }
+  return { html: html, mount: mount, meta: meta };
+})();
+/* anima:js end */
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order.
@@ -3439,6 +3757,7 @@ var REVIEW = [
 /* =================================================================== MUSCLES */
 { id:'muscles', lec:'anatomy', title:'Functional TMJ Anatomy and the Muscles of Mastication', icon:'dumbbell', blurb:'The disc, the ligaments, the four muscles of mastication and the exam slide of muscles for each movement.',
   sections:[
+  { title:'Diagrams', type:'figs', figs:['tmj'] },
   { title:'Exam slide: muscles for each movement', type:'table', head:['Movement','Muscles'], rows:[
     ['Elevation','Temporalis, medial pterygoid, masseter'],
     ['Depression','Inferior lateral pterygoid + suprahyoids and infrahyoids'],
@@ -4215,7 +4534,7 @@ function figHTML(q){ var f = q.img && !q.imgAfter && FIGS[q.img]; return f ? '<f
 /* the key (what each letter or number is) sits folded under the notes/Review copy, so you can test yourself first; question pictures show it only after answering */
 function figKeyHTML(f, open){ return f.key ? '<details class="fig-key"'+(open?' open':'')+'><summary>'+(open?'Key':'Show the key')+'</summary><dl>' + f.key.map(function(k){ return '<dt>'+escHtml(k[0])+'</dt><dd>'+escHtml(k[1])+'</dd>'; }).join('') + '</dl></details>' : ''; }
 function figAfterHTML(q){ var f = q.img && FIGS[q.img]; return f && (q.imgAfter || f.key) ? '<figure class="qcard-figure qcard-figure-after" aria-label="'+escHtml(f.title)+'">'+f.svg+figKeyHTML(f, true)+'</figure>' : ''; }
-function figCardHTML(key){ if(key === 'cuspMap') return cuspMapHTML(1); var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
+function figCardHTML(key){ if(key === 'cuspMap') return cuspMapHTML(1); if(ANIMA.meta(key)) return '<div class="fig-anima">' + ANIMA.html(key) + '</div>'; var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
 /* Patient Box rows render above the stem */
 var CASE_SETS = null;
 function caseSet(key){
@@ -4509,7 +4828,7 @@ function placeLectureFigs(prose, lecId, level, rest){
     if(pl.end || /^H[1-6]$/.test(el.tagName)){ var j = kids.indexOf(el) + 1; while(j < kids.length && !/^H[1-6]$/.test(kids[j].tagName)) j++; el = kids[j - 1]; }
     var keys = pl.widget ? [pl.widget] : pl.figs, box = document.createElement('div');
     box.className = 'lec-fig-inline'; box.setAttribute('data-sh-noread', '');
-    box.innerHTML = '<div class="fig-grid">' + keys.map(figCardHTML).join('') + '</div>';
+    box.innerHTML = keys.every(function(k){ return ANIMA.meta(k); }) ? keys.map(figCardHTML).join('') : '<div class="fig-grid">' + keys.map(figCardHTML).join('') + '</div>';
     /* several figures after the same paragraph keep their order */
     var after = el; while(after.nextElementSibling && after.nextElementSibling.classList.contains('lec-fig-inline')) after = after.nextElementSibling;
     after.parentNode.insertBefore(box, after.nextSibling);
@@ -4517,6 +4836,7 @@ function placeLectureFigs(prose, lecId, level, rest){
   });
   var left = (FIG_BY_LEC[lecId] || []).filter(function(k){ return !placed[k] && !(k === 'fence' && placed.cuspMap); });
   if(rest && left.length){ rest.hidden = false; rest.querySelector('.fig-grid').innerHTML = left.map(figCardHTML).join(''); }
+  ANIMA.mount(prose.parentNode);
 }
 
 function bankFiltered(search){
@@ -4631,8 +4951,9 @@ function sectionHTML(sec, term){
     var li = sec.items.filter(m); if(!li.length) return '';
     inner = '<ul class="rv-list">' + li.map(function(x){ return '<li>'+hl(x, term)+'</li>'; }).join('') + '</ul>';
   } else if(sec.type === 'figs'){
-    var fk = sec.figs.filter(function(k){ return k === 'cuspMap' ? m('What cusp hits where: fence post, contacts, Class I II III') : m(FIGS[k].title) || m(FIGS[k].caption); }); if(!fk.length) return '';
-    inner = '<div class="fig-grid">' + fk.map(figCardHTML).join('') + '</div>';
+    var fk = sec.figs.filter(function(k){ var am = ANIMA.meta(k); return k === 'cuspMap' ? m('What cusp hits where: fence post, contacts, Class I II III') : am ? m(am.title) || m(am.caption) : m(FIGS[k].title) || m(FIGS[k].caption); }); if(!fk.length) return '';
+    var fa = fk.filter(function(k){ return ANIMA.meta(k); }), fs = fk.filter(function(k){ return !ANIMA.meta(k); });
+    inner = fa.map(figCardHTML).join('') + (fs.length ? '<div class="fig-grid">' + fs.map(figCardHTML).join('') + '</div>' : '');
   } else if(sec.type === 'flows'){
     var seqs = seqsOf(sec).filter(function(s){ return m(s.title) || s.steps.some(m); }); if(!seqs.length) return '';
     inner = flowsHTML(seqs, term);
@@ -4668,9 +4989,10 @@ function renderReview(){
     }
   }
   draw();
+  ANIMA.mount(rb);
   rb.addEventListener('click', function(e){ var b = e.target.closest('[data-part]'); if(!b) return; var h = document.getElementById('rvPart' + b.getAttribute('data-part')); if(h) h.scrollIntoView({ behavior:'smooth', block:'start' }); });
   p.querySelectorAll('[data-group]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.group = b.getAttribute('data-group'); reviewSearch = ''; saveState(); renderReview(); }); });
-  var t; document.getElementById('rvSearch').addEventListener('input', function(e){ reviewSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ draw(); p.querySelectorAll('.group-chip').forEach(function(c){ c.classList.toggle('is-active', !reviewSearch && c.getAttribute('data-group') === g.id); }); }, 200); });
+  var t; document.getElementById('rvSearch').addEventListener('input', function(e){ reviewSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ draw(); ANIMA.mount(rb); p.querySelectorAll('.group-chip').forEach(function(c){ c.classList.toggle('is-active', !reviewSearch && c.getAttribute('data-group') === g.id); }); }, 200); });
   document.getElementById('rvRecall').addEventListener('click', function(){ STATE.ui.recall = !STATE.ui.recall; saveState(); renderReview(); });
   rb.addEventListener('click', function(e){
     if(!rb.classList.contains('recall')) return;

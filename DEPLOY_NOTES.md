@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion anima 1 of 10: TMJ opening, Claude Code)** — First of the 10 approved Occlusion figures, in the L2
+  notes after the disc/compartments paragraph (plain: end of "The jaw joint") and in Review → Functional TMJ Anatomy. Slider
+  0-50 mm and Play: pure rotation in the lower joint space to 25 mm (outer TM ligament taut from about 20-22 mm), then
+  rotation + translation down the eminence in the upper joint space with the disc rotating posteriorly on the condyle and the
+  retrodiscal tissue filling the fossa; LP inferior head lit while opening, superior head while closing; tap-to-explain
+  parts. Built by `tools/figures/occlusion/anima/` (one model, `tmjModel`/`tmjFrame`, drives the built SVG and the live
+  figure; the temporal bone's articular surface is molded to the disc along the path) via the same `build.mjs`, which now
+  also fills the hub's `anima:js`/`anima:css` markers (`--preview` writes dist pages). No SVG ids. About page updated.
+
 - **2026-10-20 (Occlusion: several questions per patient, Claude Code)** — At Sam's suggestion, every Patient Box case is now
   a shared patient: `CASES` (defined once, after the question helpers) holds each box and its drawn findings, and
   `pc('<key>')` gives a question that box plus `pcase`. `pboxHTML` shows "Same patient · k of n" (`caseSet()`), and the
