@@ -211,7 +211,37 @@
       said: ["P. gingivalis, T. forsythia and T. denticola walked in together. Break them up.", "The complex is falling apart!", "Last of the red complex. Get it!"] }
   ];
   function bossKind(id){ return BOSSES[hash(String(id || bossId())) % BOSSES.length]; }
-  function bossName(k){ k = k || bossKind(); return HOLIDAY && on() && k.id === "plaque" ? HOLIDAY.boss : k.name; }
+  /* every boss has a regular version and a seasonal one: during a holiday it wears that holiday's costume (bossIcon)
+     and goes by its seasonal name, with an opening line for the season */
+  var SEASONAL = {
+    halloween:    { plaque: "Count Plaqula", tartar: "Tartar-stein", biofilm: "The Biofilm Ghoul", mutans: "Strep Mummy-tans",
+                    caries: "The Crypt Cavity", gingivitis: "The Gingi-witch", halitosis: "The Halitosis Haunt", redcomplex: "The Red Complex Coven",
+                    line: "Trick or treat. Mostly treats, which is exactly the problem." },
+    thanksgiving: { plaque: "Pilgrim Plaque", tartar: "Tartar Turkey", biofilm: "Gravy Biofilm", mutans: "The Stuffing Swarm",
+                    caries: "Cranberry Cavity", gingivitis: "The Gingi-gobbler", halitosis: "Green Bean Halitosis", redcomplex: "The Red Complex Cornucopia",
+                    line: "Back for seconds, and thirds. Answer it back to the kids' table." },
+    winter:       { plaque: "Plaque Claus", tartar: "Tartar the Snowman", biofilm: "Biofilm Frost", mutans: "The Mutans Elves",
+                    caries: "Candy Cane Cavity", gingivitis: "The Grinch-ivitis", halitosis: "The Halitosis Blizzard", redcomplex: "The Red-Nosed Complex",
+                    line: "It's been naughty all year. Right answers go on the nice list." },
+    newyear:      { plaque: "Party Plaque", tartar: "Auld Lang Tartar", biofilm: "Bubbly Biofilm", mutans: "The Confetti Swarm",
+                    caries: "Midnight Cavity", gingivitis: "Gingivitis Hangover", halitosis: "New Year's Halitosis", redcomplex: "The Red Complex Ball Drop",
+                    line: "Its resolution was to stick around. Make yours to knock it out." },
+    valentine:    { plaque: "Plaque-entine", tartar: "Tartar Sweetheart", biofilm: "Biofilm, Be Mine", mutans: "The Mutans Cupids",
+                    caries: "Candy Heart Cavity", gingivitis: "Gingi-love-itis", halitosis: "The Halitosis Kiss", redcomplex: "The Red Rose Complex",
+                    line: "It has a crush on your enamel. Let it down with right answers." },
+    dentist:      { plaque: "Plaque Boss (very nervous)", tartar: "Tartar Titan (dreading the scaler)", biofilm: "Biofilm Blob (hiding from the floss)",
+                    mutans: "Strep Mutans Swarm (out of sugar)", caries: "Cavity Creep (hears the drill)", gingivitis: "Gingivitis Goblin (bleeding nervously)",
+                    halitosis: "Halitosis Haze (mouthwash panic)", redcomplex: "The Red Complex (on probation)",
+                    line: "It knows what day it is. Happy National Dentist's Day." },
+    stpatrick:    { plaque: "Plaquerechaun", tartar: "Tartar o' Gold", biofilm: "Shamrock Biofilm", mutans: "The Clover Swarm",
+                    caries: "Cavity at the End of the Rainbow", gingivitis: "Gingi-green-itis", halitosis: "Halitosis O'Haze", redcomplex: "The Green Complex (in disguise)",
+                    line: "It's hiding its pot of gold in a deep pocket. Go get it." },
+    easter:       { plaque: "Plaque Bunny", tartar: "Tartar Egg", biofilm: "Biofilm Basket", mutans: "The Mutans Peeps",
+                    caries: "Chocolate Bunny Cavity", gingivitis: "Gingivitis Hare", halitosis: "Jellybean Halitosis", redcomplex: "The Red Complex Egg Hunt",
+                    line: "It hid in the grass with the jellybeans. Hunt it down." }
+  };
+  function season(){ return HOLIDAY && on() ? SEASONAL[HOLIDAY.id] : null; }
+  function bossName(k){ k = k || bossKind(); var se = season(); return se && se[k.id] ? se[k.id] : k.name; }
   /* the boss in costume: drawn into the same 40x40 frame as IC.blob */
   function bossIcon(k){
     k = k || bossKind();
@@ -388,7 +418,8 @@
     if (!boss) return;
     var f = boss.hp / boss.max, said = boss.k.said;
     boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
-    boss.el.querySelector("small").textContent = boss.hp + " / " + boss.max + " HP · " + (f > .6 ? said[0] : f > .25 ? said[1] : said[2]);
+    var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
+    boss.el.querySelector("small").textContent = boss.hp + " / " + boss.max + " HP · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
     boss.el.classList.toggle("is-low", f <= .25);
     boss.el.classList.toggle("is-shown", !bossHidden && ok());
   }
@@ -858,7 +889,8 @@
     }, 60);
   });
   /* try them from the console: shEggs.preview("fairy", 5, "loop") (look 0-5, 5 = golden), shEggs.preview("boss", 3) (0-7),
-     shEggs.preview("golden"). Previews record nothing and never broadcast. */
+     shEggs.preview("golden"). Previews record nothing and never broadcast. Seasonal versions: set
+     localStorage.sh_egg_holiday_test = "winter" (any holiday id, or "none" for the regular ones) and reload. */
   window.shEggs = { BOSSES: BOSSES, FAIRY_LOOKS: FAIRY_LOOKS, preview: function(kind, a, b){
     if (kind === "fairy") maybeFairy({ look: a, path: b });
     else if (kind === "boss") { bossHidden = false; spawnBoss(0, { k: BOSSES[(a | 0) % BOSSES.length] }); }

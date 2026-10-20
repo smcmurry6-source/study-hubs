@@ -117,7 +117,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   catch lines; still one `record_fairy` per catch); **8 bosses** (`BOSSES`: Plaque Boss, Tartar Titan, Biofilm Blob,
   Strep Mutans Swarm, Cavity Creep, Gingivitis Goblin, Halitosis Haze, The Red Complex), one per 2-hour window picked
   from the window id so everyone fights the same one, own HP and lines by health, floating damage, a crit for 2 on
-  every 5th right in a row, holiday costumes on all. Console previews record nothing: `shEggs.preview("boss", 0-7)`,
+  every 5th right in a row; each boss has a regular and a seasonal version (`SEASONAL`: per holiday, a name for every boss plus an opening line, worn with that holiday's costume). Console previews record nothing: `shEggs.preview("boss", 0-7)`,
   `("fairy", look 0-5, "wave|loop|zigzag|swoop|back")`, `("golden")`. **Hub trophies** (`widget/ranks.js`
   `HUB_TROPHIES`): the trophy case gains a section per hub (this hub open first, then every hub you studied or earned
   in): Bronze/Silver/Gold Mastery, Crown, Seen It All (new), Full Arch, Mock Ace, Perfect Mock (new), Final Blow, plus
