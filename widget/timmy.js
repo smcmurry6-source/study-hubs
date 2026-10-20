@@ -287,6 +287,7 @@
 
   function summon(){
     running = true; injectCSS(); startAudio();
+    try { if (window.shTrack) window.shTrack("egg:timmy-start"); } catch (e) {}
     var n = 1; try{ n = (+localStorage.getItem("sh_timmy_count") || 0) + 1; localStorage.setItem("sh_timmy_count", String(n)); }catch(e){}
 
     root = document.createElement("div"); root.id = "tm-root";

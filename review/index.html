@@ -236,7 +236,7 @@ table.data tr.group:hover td{background:none;}
   var SESSION_KEY = "sh_admin_secret";
   var PREF_KEY = "sh_admin_prefs";
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", dashboard: "Dashboard" };
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", dashboard: "Dashboard", about: "About page" };
   /* hubs that are no longer on the live site -- hidden unless "Include archived hubs" is on */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
 
@@ -326,9 +326,10 @@ table.data tr.group:hover td{background:none;}
       rpc("get_survey_results", { p_secret: secret }),
       rpc("get_exam_debriefs", { p_secret: secret }),
       rpc("get_search_terms", { p_secret: secret, p_days: d }),
-      rpc("get_nuke_unlocks", { p_secret: secret, p_days: d })
+      rpc("get_nuke_unlocks", { p_secret: secret, p_days: d }),
+      rpc("get_feature_events", { p_secret: secret, p_days: d })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15], features: r[16] };
       renderAll();
     });
   }
@@ -467,6 +468,57 @@ table.data tr.group:hover td{background:none;}
     else if (/^\./.test(x)) x = x.slice(1).replace(/[-_]/g, " ") + " (any)";
     return (w ? "Tools menu › " : "") + x;
   }
+  /* ---------- feature events (migration_v37): what clicks and study time can't show ---------- */
+  var FEATURE_GROUPS = [
+    [/^view$/, "Page loads"],
+    [/^tts:/, "Listen (lecture narration)"], [/^pod:/, "Timmy Time podcast"], [/^mmap:/, "Mind maps"],
+    [/^fig/, "Diagrams"], [/^pet:/, "Timmy Tooth"], [/^egg:/, "Easter eggs"], [/^name:/, "Names"],
+    [/^pref:/, "Settings changed"], [/^about:/, "About page"], [/^state:/, "Settings people have (daily snapshot)"], [/./, "Other"]
+  ];
+  var FEATURE_NOTES = {
+    "tts:secs": "seconds of narration heard", "tts:end": "listened to the end", "tts:start-full": "started (As taught)", "tts:start-plain": "started (Plain English)", "tts:start-voice": "started (browser voice)",
+    "egg:timmy-start": "typed TIMMY", "egg:timmy": "watched TIMMY to the end", "pet:intro": "opened his introduction", "pet:no-thanks": "said No thanks",
+    "pet:adopt-button": "adopted (Adopt button)", "mmap:open": "opened a mind map", "name:set": "picked a name", "name:reset": "back to a random name", "view": "page loads"
+  };
+  function featureLabel(k){
+    var m = /^pod:(.+):(play|secs|q1|q2|q3|q4)$/.exec(k);
+    if (m) return m[1] + ": " + { play: "pressed play", secs: "seconds heard", q1: "heard 25%", q2: "heard 50%", q3: "heard 75%", q4: "heard 95% (finished)" }[m[2]];
+    if (/^pet:no-thanks/.test(k)) return "said No thanks (" + k.split("-").pop() + ")";
+    if (/^pet:adopt-closed/.test(k)) return "adopted by closing the intro (" + k.split("-").pop() + ")";
+    if (/^fig-seen:/.test(k)) return k.slice(9) + " (on screen)";
+    if (/^fig-part:/.test(k)) return k.slice(9) + " (tapped a part)";
+    if (/^fig:/.test(k)) return k.slice(4) + " (moved a control)";
+    return FEATURE_NOTES[k] || k.replace(/^[a-z]+:/, "");
+  }
+  function renderFeatures(){
+    var f = data.features;
+    if (!f || f.error) return card("Features", "", '<div class="err">Couldn’t load feature events (migration_v37).</div>');
+    var rows = (f.data || []).filter(function(r){ return (keepHub(r.hub) || r.hub === "dashboard" || r.hub === "about") && !/^zz-/.test(r.hub); });
+    if (!rows.length) return card("Features", rangeText(), '<div class="empty">No feature events yet. Tracking started 2026-10-20.</div>');
+    /* people per kind across pages (a person on two hubs counts on each; the per-page split is in the tag) */
+    var by = {};
+    rows.forEach(function(r){
+      var k = by[r.kind] || (by[r.kind] = { kind: r.kind, people: 0, total: 0, pages: {} });
+      k.people = Math.max(k.people, Number(r.people) || 0); k.total += Number(r.total) || 0; k.pages[r.hub] = Number(r.people) || 0;
+    });
+    var groups = {};
+    Object.keys(by).forEach(function(k){
+      var g = FEATURE_GROUPS.filter(function(x){ return x[0].test(k); })[0][1];
+      (groups[g] = groups[g] || []).push(by[k]);
+    });
+    var out = FEATURE_GROUPS.map(function(x){ return x[1]; }).filter(function(g, i, a){ return groups[g] && a.indexOf(g) === i; }).map(function(g){
+      var list = groups[g].sort(function(a, b){ return b.people - a.people || b.total - a.total; });
+      var body = '<div class="tbl-wrap"><table class="data"><thead><tr><th>Event</th><th class="n">People</th><th class="n">Count</th></tr></thead><tbody>' +
+        list.slice(0, 40).map(function(k){
+          var where = Object.keys(k.pages).sort(function(a, b){ return k.pages[b] - k.pages[a]; }).slice(0, 3).map(function(h){ return hubLabel(h) + " " + k.pages[h]; }).join(", ");
+          var count = /secs$/.test(k.kind) ? fmtMin(k.total / 60) : fmtNum(k.total);
+          return '<tr><td class="lbl">' + esc(featureLabel(k.kind)) + '<span class="tag">' + esc(where) + '</span></td><td class="n">' + fmtNum(k.people) + '</td><td class="n">' + count + '</td></tr>';
+        }).join("") + '</tbody></table></div>';
+      return card(esc(g), rangeText(), body);
+    }).join("");
+    return out + '<p class="note">From widget/clicks.js (<code>shTrack</code>), 2026-10-20 on. “People” is the most on any one page (distinct devices); the tag splits it by page. Settings snapshots are sent once a day per page, so “Settings people have” compares how many have each value.</p>';
+  }
+
   function renderClicks(){
     var el = $('[data-panel="clicks"]');
     if (!data.clicks || data.clicks.error) { el.innerHTML = card("Clicks", "", '<div class="err">Couldn’t load click data (migration_v14).</div>'); return; }
@@ -479,7 +531,7 @@ table.data tr.group:hover td{background:none;}
       t.clicks += c; t.sections[r.section || ""] = (t.sections[r.section || ""] || 0) + c;
     });
     var hubs = Object.keys(byHub).map(function(k){ return byHub[k]; }).sort(function(a, b){ return b.total - a.total; });
-    if (!hubs.length) { el.innerHTML = card("Clicks", rangeText(), '<div class="empty">No clicks recorded yet. Tracking started 2026-09-25.</div>'); return; }
+    if (!hubs.length) { el.innerHTML = renderFeatures() + card("Clicks", rangeText(), '<div class="empty">No clicks recorded yet. Tracking started 2026-09-25.</div>'); return; }
     var out = "";
     hubs.forEach(function(h){
       var ts = Object.keys(h.targets).map(function(k){ return h.targets[k]; }).sort(function(a, b){ return b.clicks - a.clicks; });
@@ -491,6 +543,7 @@ table.data tr.group:hover td{background:none;}
       out += card(hubCell(h.hub), fmtNum(h.total) + " clicks · " + rangeText() + (ts.length > 40 ? " · top 40 of " + ts.length : ""),
         '<div class="tbl-wrap"><table class="data"><thead><tr><th>Button / tab</th><th class="n">Clicks</th><th class="n">People</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>');
     });
+    out = renderFeatures() + out;
     out += '<p class="note">Counted per button, tab or link (answer choices are grouped, never logged one by one). “People” is distinct devices. Pair this with Time by section: something with lots of time but few clicks is being read; something nobody opens is a candidate to cut.</p>';
     el.innerHTML = out;
   }
