@@ -103,7 +103,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-10-20 (why each choice, highlighter colors, egg refresh, hub trophies, Claude Code)** — Sam's list.
-  **Why each choice**: every mcq/multi in `occlusion` (306) and `perio` (388) has a `QUESTION_WHY` row (one line per
+  **Why each choice**: every mcq/multi in `occlusion` (317, incl. #128's 11 new cases) and `perio` (388) has a `QUESTION_WHY` row (one line per
   choice, same order as `choices`, written from each question's explanation and the hub's notes), applied as `q.why`
   and drawn by `whyHTML()` under the explanation after answering (bank, drill, Weak Spots, mock review), right choices
   first, the student's pick marked (a document click listener marks it). **Standing rule** (`CLAUDE.md` → "Every choice
@@ -122,8 +122,30 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   `HUB_TROPHIES`): the trophy case gains a section per hub (this hub open first, then every hub you studied or earned
   in): Bronze/Silver/Gold Mastery, Crown, Seen It All (new), Full Arch, Mock Ace, Perfect Mock (new), Final Blow, plus
   "Secrets found here". `migration_v38.sql` (**applied via the connector**) whitelists `seen-all` and `mock-perfect` in
-  `record_achievement`. About page, `sw.js` -> `sh-v24`. **Perio Project: carry `QUESTION_WHY`, `whyHTML` and the mock
+  `record_achievement`. About page, `sw.js` -> `sh-v25`. **Perio Project: carry `QUESTION_WHY`, `whyHTML` and the mock
   footer into the split sources.**
+
+- **2026-10-20 (Occlusion: accurate diagrams in the notes, cusp game, image cases, Claude Code)** — Midterm eve. All seven
+  Occlusion figures redrawn from Dr. Givan's help sheet (Drive: Occlusion/Hubs, `Occ Lec0 help`) by one plain-JS kit,
+  `tools/figures/occlusion/` (`build.mjs` pastes it between the hub's `od:kit`/`od:css` markers; `--check`): real occlusal
+  anatomy, #3/#30 cusp pathways with a movement **key** (A protrusive, B working leaning slightly mesial on the upper tooth as
+  the help sheet's pathway pictures draw it, C non-working, D retrusive and short; a student asked for the key), the
+  help-sheet zigzag fence post, colored inclines in the frontal section, labeled envelopes. Keys use the folded
+  `figKeyHTML` from #125 (each FIG's `key`); after answering, the explanation now shows the figure again with its key open
+  (`figAfterHTML`, which also handles `imgAfter`); in-picture `fg-hint` labels hide above a question stem.
+  New **fence post + contact map** widget with Class I/II/III tabs (`OD.CONTACTS`, read off the help sheet's three contact
+  pictures). Figures now sit **inside the L1 notes** next to their paragraph (`FIG_PLACE`, both reading levels) in a
+  `data-sh-noread` wrapper: `widget/v3.js` (browser-voice word wrapping) and `widget/highlight.js` (text, hash, offsets) skip
+  it, `SH_GOTO` note jumps too, and READINGS text is unchanged, so no narration was regenerated. **"What cusp hits where?"**
+  game at the top of the Question Bank (`CUSP_GAME`; Contacts and Movements, 10 rounds, best in `STATE.cusp`; not bank
+  questions, no class stats). **Patient cases with drawn findings** (`pimg:[CASE_IMG keys]` inside the Patient Box): perio
+  charts, periapical/bitewing/TMJ films (maxillary films crown-down), intraoral views, articulating paper, shimstock, mounted
+  casts, a PVS record. 9 Patient Box items enriched (same ids and keys: `pb-div2`, `pb-upright`, `pb-slide`, `an-pb-lock`,
+  `fn-pb-aob`, `cc-pb-sda`, `ap-pb-crown`, `ap-pb-agt`, `ap-pb-c4`) and 11 new (`cs-upright`, `cs-reorg`, `cs-trauma`, `cs-nw`,
+  `cs-pro`, `cs-implant`, `cs-implant6`, `cs-worn`, `cs-record`, `cs-group6`, `cs-fricative`); bank 308 -> 319. Diagram-question
+  stems name #3/#30 (same ids and keys). Sam approved all 10 anima candidates for Occlusion (TMJ opening, cusp pathways in
+  motion, inclines, muscles by movement, cusp-height determinants, envelope tracer, CR-MIP slide, guidance, swallowing, tooth vs
+  implant); they ship in follow-up PRs. About page, `CLAUDE.md` (inline-figure rule), `sw.js` -> `sh-v22`.
 
 - **2026-10-20 (longer drill, Review by lecture, comparison charts, Claude Code)** — From survey round 2, at Sam's
   request. **Daily Drill length** (`widget/drill.js`): 10, 20 or 30 questions, picked on the intro screen before the day's

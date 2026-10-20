@@ -693,6 +693,133 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .qx-why li.is-picked span:last-child{color:var(--ink)}
 .qx-why-mark{flex:0 0 auto;font-weight:800;width:1em;text-align:center}
 .qx-why-you{font-style:normal;font-size:.8em;font-weight:700;opacity:.8}
+/* od:css begin */
+/* ============ DRAWING KIT, CASE IMAGES, CUSP GAME (2026-10-20) ============ */
+/* teeth, gums and films keep natural colors in both themes; only the ink around them follows the theme */
+.od-crown{fill:#e9dcbf;stroke:#8b7653;stroke-width:1.5;stroke-linejoin:round}
+.od-rim{fill:#f3e9d2;stroke:none}
+.od-cusp{fill:#fffaf2;opacity:.8}
+.od-tri{fill:none;stroke:#fffaf2;stroke-width:3.2;stroke-linecap:round;opacity:.9}
+.od-tip{fill:#fffdf8}
+.od-ridge{fill:none;stroke:#fffaf0;stroke-width:5;stroke-linecap:round;opacity:.9}
+.od-mr{fill:none;stroke:#d8c7a2;stroke-width:2.2;stroke-linecap:round}
+.od-groove{fill:none;stroke:#7c6644;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.od-pit{fill:#6f5c3c;opacity:.8}
+.od-cl{fill:#4a3d26 !important;font-size:10px !important}
+.od-ghost{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-dasharray:3 3}
+.od-num{fill:var(--ink-soft)}
+.od-sec{fill:#e9dcbf;stroke:#8b7653;stroke-width:2;stroke-linejoin:round}
+.od-sec.low{fill:#e2d3b2}
+.od-cej{fill:none;stroke:#b39d74;stroke-width:1.2;stroke-dasharray:4 3}
+.od-cline{fill:none;stroke:var(--tag-red);stroke-width:2;opacity:.85}
+.od-cline.up{stroke:var(--tag-blue)}
+.od-cline.dim{opacity:.22}
+.od-cline.on{stroke:var(--accent);stroke-width:3.4;opacity:1}
+.od-cdot{fill:var(--ink)}
+.od-cdot.on{fill:var(--accent)}
+.fg-acc-head{fill:var(--accent)}
+.fg-incl{fill:none;stroke-width:5.5;stroke-linecap:round}
+.fg-incl.max{stroke:var(--tag-blue)}
+.fg-incl.mand{stroke:var(--tag-red)}
+.fp-zig{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:miter}
+.fp-post{fill:none;stroke:var(--tag-blue);stroke-width:2.4}
+.fp-post.low{stroke:var(--tag-red)}
+.fp-lab{font:600 11px var(--font-mono)}
+.fp-lab.max{fill:var(--tag-blue)}
+.fp-lab.mand{fill:var(--tag-red)}
+.fp-lab.on{fill:var(--accent);font-weight:800;font-size:12.5px}
+.fp-peak{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5}
+.qcard-figure:not(.qcard-figure-after) .fg-hint{display:none}
+.qcard-figure-after{margin:10px 0 12px}
+/* figures inside the notes (outside the narration: data-sh-noread) */
+.lec-fig-inline{margin:16px 0 18px}
+.lec-fig-inline .fig-card h4{margin-top:0}
+.reading-prose .lec-fig-inline .fig-card p{text-indent:0}
+.cmap-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.cmap-tabs button{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:5px 12px;font:600 .82rem var(--font-body);cursor:pointer}
+.cmap-tabs button.is-active{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.cmap-svg svg{max-width:560px !important}
+.cmap .cmap-src{font-size:.78rem;color:var(--ink-faint)}
+/* case images in the Patient Box */
+.pimg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px;margin:10px 0 4px}
+.pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
+.pimg figcaption{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;line-height:1.3}
+.pimg svg{display:block;width:100%;height:auto;max-width:440px;margin:0 auto}
+.pimg-cap{font-size:.76rem;color:var(--ink-soft);margin-top:6px;line-height:1.35}
+.pchart.shim th,.pchart.shim td{white-space:normal}
+.pimg-note{font-size:.72rem;color:var(--ink-faint);margin:2px 0 0}
+.xr-film{fill:#141414}.xr-bone{fill:#5c5c5c}.xr-tb{fill:#7a7a7a;opacity:.55}.xr-tb2{fill:#3a3a3a;opacity:.5}
+.xr-lam{fill:#d6d6d6}.xr-pdl{fill:#262626}.xr-dentin{fill:#b4b4b4}.xr-enamel{fill:#ececec}.xr-pulp{fill:#4d4d4d}
+.xr-canal{fill:none;stroke:#4d4d4d;stroke-width:3;stroke-linecap:round}.xr-metal{fill:#fbfbfb}.xr-comp{fill:#d0d0d0}
+.xr-thread{stroke:#141414;stroke-width:1.4;opacity:.65}.xr-crown{fill:#e2e2e2;stroke:#fff;stroke-width:1.5}
+.xr-dark{fill:#1c1c1c}.xr-defect{fill:#232323}.xr-condyle{fill:#9a9a9a;stroke:#d0d0d0;stroke-width:2}.xr-dot{fill:#f3f3f3}
+.xr-lab{fill:#f1f1f1;font:600 11px var(--font-body)}
+.io-bg{fill:#3a1f24}.io-gum{fill:#d9848a}.io-gum.low{fill:#d47c83}.io-tongue{fill:#c4545e}
+.io-tooth{fill:#efe6d2;stroke:#9a8562;stroke-width:1.4;stroke-linejoin:round}.io-tooth.low{fill:#e6dcc4}
+.io-tooth.worn{fill:#ece0c2}.io-tooth.pfm{fill:#f4f2ea}.io-tooth.amalgam{fill:#efe6d2}
+.io-shade{fill:#c9b993;opacity:.55}.io-margin{fill:none;stroke:#5c5f66;stroke-width:3;stroke-linecap:round}
+.io-dentin{fill:#c99d4a;opacity:.85}.io-comp{fill:#e4dcc0;stroke:#b6a57d;stroke-width:1}.io-crack{fill:none;stroke:#6b4a2a;stroke-width:1.5;stroke-dasharray:3 2}
+.io-groove{fill:none;stroke:#8f7a55;stroke-width:1.6}.io-mark{fill:#2a5fd0}.io-mark2{fill:#d03a2a}
+.io-plane{fill:none;stroke:#fff;stroke-width:1.6;stroke-dasharray:6 4;opacity:.9}
+.io-lab{fill:#fff;font:600 11px var(--font-body)}
+.io-plate{fill:var(--surface-2)}
+.io-lip{fill:#c8737a}.io-lip.low{fill:#c26c74}.io-wet{fill:none;stroke:#7a3036;stroke-width:2.5;stroke-dasharray:4 3}.io-press{fill:none;stroke:#7a3036;stroke-width:3}
+.ap-blue{fill:#2a5fd0;opacity:.85}.ap-blue.big{fill:#1b3f9a}.ap-blue-ring{fill:none;stroke:#2a5fd0;stroke-width:2.5;opacity:.6}
+.ap-red{fill:none;stroke:#d0302a;stroke-width:5.5;stroke-linecap:round;opacity:.9}
+.ap-wear{fill:#fbfbf7;stroke:#9ea3ad;stroke-width:1.5}.ap-crack{fill:none;stroke:#3b2a17;stroke-width:2}
+.ar-metal{fill:#9ea6b3;stroke:#6d7480;stroke-width:1}.ar-joint{fill:#c7ccd4;stroke:#6d7480;stroke-width:2}.ar-stone{fill:#e8e2f2;stroke:#b7aed0;stroke-width:1}
+.pv-body{fill:#9cc9a6;stroke:#5d9269;stroke-width:1.5}.pv-flash{fill:#b9dcc0;opacity:.9}.pv-imp{fill:#6fa77c;opacity:.75}.pv-prep{fill:#e8efe9;stroke:#5d9269;stroke-width:1.5}
+.pchart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pchart{border-collapse:collapse;font:500 .78rem var(--font-mono);color:var(--ink);min-width:100%}
+.pchart th,.pchart td{border:1px solid var(--line);padding:4px 5px;text-align:center;white-space:nowrap}
+.pchart thead th{background:var(--surface-2);font-weight:700}
+.pchart tbody th{text-align:left;font-family:var(--font-body);font-weight:600;color:var(--ink-soft);background:var(--surface-2)}
+.pchart .pc-pd span{display:inline-block;min-width:.9em;margin:0 1px}
+.pchart .deep,.pchart-key .deep{font-weight:800}
+.pchart .bop,.pchart-key .bop{color:var(--bad)}
+.pchart .pc-flag{font-weight:800;color:var(--caution)}
+.pchart .pc-miss{color:var(--ink-faint);background:var(--surface-3)}
+.pchart.shim td.sh-hold{color:var(--good);font-weight:700}.pchart.shim td.sh-pull{color:var(--ink-faint)}
+.pchart-key{font-size:.72rem;color:var(--ink-faint);margin-top:4px;line-height:1.35}
+/* cusp game */
+.cg-host{margin:0 0 16px}
+.cg-launch{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between;border:1px solid var(--line-strong);border-left:5px solid var(--tag-blue);border-radius:12px;background:var(--surface);padding:12px 14px}
+.cg-launch-t{flex:1 1 280px;display:flex;flex-direction:column;gap:3px}
+.cg-launch-t span{font-size:.86rem;color:var(--ink-soft)}
+.cg-card{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);padding:12px 14px}
+.cg-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.cg-head b{font-family:var(--font-display);font-size:1.05rem}
+.cg-meta{font:600 .76rem var(--font-mono);color:var(--ink-faint);margin-left:auto}
+.cg-x{border:0;background:transparent;color:var(--ink-soft);font-size:1.4rem;line-height:1;cursor:pointer;padding:2px 6px;border-radius:6px}
+.cg-x:hover{background:var(--surface-2)}
+.cg-q{margin:4px 0 8px;font-size:.98rem}
+.cg-tag{display:inline-block;font:700 .7rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);border-radius:6px;padding:2px 7px;margin-right:4px}
+.cg-sub{display:block;font-size:.82rem;color:var(--ink-faint);margin-top:2px}
+.cg-stage{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:6px}
+.cg-svg{display:block;width:100%;height:auto;max-width:620px;margin:0 auto}
+.cg-hot{fill:var(--accent);fill-opacity:.12;stroke:var(--accent);stroke-width:1.8;cursor:pointer;transition:fill-opacity .15s}
+.cg-hot:hover,.cg-hot:focus{fill-opacity:.38;outline:none;stroke-width:2.6}
+.cg-hot.off{fill:none;stroke:none;pointer-events:none}
+.cg-hot.ok{fill:var(--good);fill-opacity:.55;stroke:var(--good);stroke-width:3}
+.cg-hot.bad{fill:var(--bad);fill-opacity:.5;stroke:var(--bad);stroke-width:3}
+.cg-src{fill:var(--caution);opacity:.9}
+.cg-src-ring{fill:none;stroke:var(--caution);stroke-width:2.5;animation:cgPulse 1.3s ease-in-out infinite}
+@keyframes cgPulse{0%,100%{opacity:.9}50%{opacity:.25}}
+.cg-low,.cg-all{transition:transform .8s cubic-bezier(.3,.8,.3,1)}
+.cg-lines{animation:cgFade .5s .7s both}
+@keyframes cgFade{from{opacity:0}to{opacity:1}}
+.cg-fb{margin:10px 0 0;padding:9px 12px;border-radius:10px;font-size:.9rem;line-height:1.45}
+.cg-fb.ok{background:var(--good-soft)}.cg-fb.bad{background:var(--bad-soft)}
+.cg-fp{margin:8px 0 0;border:1px dashed var(--line-strong);border-radius:10px;padding:6px;background:var(--surface)}
+.cg-fp svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.cg-opts{display:grid;gap:8px;margin-top:10px}
+@media (min-width:640px){ .cg-opts{grid-template-columns:1fr 1fr} }
+.cg-opts .qcard-choice.ok{border-color:var(--good);background:var(--good-soft)}
+.cg-opts .qcard-choice.bad{border-color:var(--bad);background:var(--bad-soft)}
+.cg-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cg-end .cg-big{font:800 2.2rem var(--font-display);margin:6px 0 2px}
+@media (prefers-reduced-motion: reduce){ .cg-low,.cg-all{transition:none} .cg-src-ring,.cg-lines{animation:none} }
+/* od:css end */
 </style>
 </head>
 <body>
@@ -812,76 +939,786 @@ var LECTURES = [
   { id:'applying', num:5, title:'Applying Occlusion: Operative, Fixed and Implants', who:'Dr. Givan', tag:'amber',  source:'Occ Lec3-2 Occlusal Correlations (slides + handout) + 10/1 recording', status:'taught' }
 ];
 
+/* od:kit begin (built from tools/figures/occlusion; edit there) */
+/* ---------- DRAWING KIT + FIGURES (redrawn 2026-10-20) ----------
+   One small kit draws every occlusal tooth, quadrant, fence post, cusp pathway and case image in this hub, all drawn
+   for the hub from Dr. Givan's lectures and his "Help! What cusp hits where?" sheet (Occ Lec0), not copied from slides.
+   Occlusal rows follow the help sheet's layout: upper teeth buccal side up, lower teeth buccal side down, mesial at the
+   LEFT, which is the patient's RIGHT side (#6-#2 over #27-#31); side 'L' mirrors it (#11-#15 over #22-#18).
+   Contacts per Angle class (CONTACTS) are read off the help sheet's Class I, II and III contact pictures (cusp-fossa).
+   No SVG ids or url(#...) references, so every copy renders even when another copy sits in a hidden panel.
+   A figure's key (FIGS[k].key, drawn by figKeyHTML) is folded under the notes and Review copies and opens in the
+   explanation after answering; in-picture labels with class fg-hint (border names, the opposing cusp) hide while the figure
+   sits above a question stem. */
+var OD = (function(){
+  function f1(n){ return Math.round(n * 10) / 10; }
+  /* smooth path through points (Catmull-Rom as cubic Bezier) */
+  function smooth(pts, closed){
+    var n = pts.length, d = 'M' + f1(pts[0][0]) + ' ' + f1(pts[0][1]), last = closed ? n : n - 1;
+    for(var i = 0; i < last; i++){
+      var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      if(!closed){ if(i === 0) p0 = p1; if(i + 2 >= n) p3 = p2; }
+      d += ' C' + f1(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f1(p1[1] + (p2[1] - p0[1]) / 6) + ' ' + f1(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f1(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f1(p2[0]) + ' ' + f1(p2[1]);
+    }
+    return d + (closed ? 'Z' : '');
+  }
+  function arrow(x1, y1, x2, y2, cls, head){
+    head = head || 10;
+    var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / L, uy = dy / L;
+    var bx = x2 - ux * head, by = y2 - uy * head, px = -uy * head * 0.55, py = ux * head * 0.55;
+    return '<path class="' + cls + '" d="M' + f1(x1) + ' ' + f1(y1) + 'L' + f1(bx) + ' ' + f1(by) + '"/>' +
+      '<path class="' + cls + '-head" d="M' + f1(x2) + ' ' + f1(y2) + 'L' + f1(bx + px) + ' ' + f1(by + py) + 'L' + f1(bx - px) + ' ' + f1(by - py) + 'Z"/>';
+  }
+  function pin(x, y, t, cls){ return '<g class="fg-pin' + (cls ? ' ' + cls : '') + '"><circle cx="' + f1(x) + '" cy="' + f1(y) + '" r="11"/><text x="' + f1(x) + '" y="' + f1(y + 4) + '" text-anchor="middle">' + t + '</text></g>'; }
+  function txt(x, y, t, cls, anchor){ return '<text class="' + (cls || 'fg-t') + '" x="' + f1(x) + '" y="' + f1(y) + '"' + (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + t + '</text>'; }
+
+  /* Occlusal outlines, normalized: x 0 = mesial -> 1 = distal, y 0 = buccal -> 1 = lingual. md/bl = crown size in mm
+     (average values). cusps [x, y, r]; fossae are where opposing centric cusps land (cusp-fossa). */
+  var SPEC = {
+    maxC:   { md:7.5, bl:8,  out:[[.12,.22],[.45,0],[.88,.2],[.97,.5],[.75,.9],[.47,1],[.2,.9],[.02,.52]], cusps:{ T:[.46,.2,.16] }, fossae:{},
+              ridges:[[[.13,.25],[.46,.2],[.86,.23]],[[.46,.22],[.47,.82]]], grooves:[], mr:[] },
+    maxPM1: { md:7,   bl:9,  out:[[.18,.03],[.5,0],[.82,.03],[.97,.22],[1,.47],[.93,.74],[.73,.95],[.46,1],[.22,.93],[.05,.72],[0,.45],[.04,.2]],
+              cusps:{ B:[.51,.22,.2], L:[.46,.79,.15] }, fossae:{ m:[.27,.48], d:[.73,.48] },
+              grooves:[[[.07,.46],[.27,.48],[.5,.51],[.73,.48]],[[.27,.48],[.17,.3]],[[.27,.48],[.17,.66]],[[.73,.48],[.84,.31]],[[.73,.48],[.84,.65]]],
+              mr:[[[.1,.26],[.08,.48],[.11,.7]],[[.9,.26],[.92,.48],[.89,.7]]] },
+    maxPM2: { md:6.5, bl:9,  out:[[.2,.03],[.5,0],[.8,.03],[.97,.25],[1,.5],[.97,.75],[.8,.97],[.5,1],[.2,.97],[.03,.75],[0,.5],[.03,.25]],
+              cusps:{ B:[.5,.22,.2], L:[.5,.79,.18] }, fossae:{ m:[.32,.5], d:[.68,.5] },
+              grooves:[[[.32,.5],[.5,.51],[.68,.5]],[[.32,.5],[.22,.34]],[[.32,.5],[.22,.66]],[[.68,.5],[.78,.34]],[[.68,.5],[.78,.66]]],
+              mr:[[[.1,.28],[.08,.5],[.1,.72]],[[.9,.28],[.92,.5],[.9,.72]]] },
+    maxM1:  { md:10,  bl:11, out:[[.01,.1],[.2,0],[.38,.03],[.5,.07],[.66,.02],[.86,.05],[.96,.2],[1,.48],[.99,.74],[.92,.93],[.74,1],[.58,.94],[.38,1],[.18,.95],[.08,.76],[0,.42]],
+              cusps:{ MB:[.26,.19,.17], DB:[.73,.21,.15], ML:[.34,.75,.21], DL:[.79,.8,.12] }, fossae:{ m:[.13,.44], c:[.45,.43], d:[.76,.6] },
+              ridges:[[[.36,.72],[.55,.47],[.72,.24]]],
+              grooves:[[[.13,.44],[.3,.47],[.45,.43]],[[.45,.43],[.5,.05]],[[.76,.6],[.66,.8],[.62,.97]],[[.76,.6],[.88,.48]]],
+              mr:[[[.06,.22],[.04,.46],[.07,.68]],[[.92,.25],[.95,.46],[.9,.7]]] },
+    maxM2:  { md:9,   bl:11, out:[[.04,.1],[.28,0],[.5,.06],[.75,.02],[.95,.15],[.99,.45],[.92,.74],[.74,.95],[.48,1],[.18,.9],[.02,.62],[0,.32]],
+              cusps:{ MB:[.28,.19,.17], DB:[.74,.22,.14], ML:[.38,.75,.2], DL:[.76,.76,.1] }, fossae:{ m:[.14,.44], c:[.47,.44], d:[.74,.6] },
+              ridges:[[[.4,.72],[.57,.48],[.72,.25]]],
+              grooves:[[[.14,.44],[.32,.47],[.47,.44]],[[.47,.44],[.5,.06]],[[.74,.6],[.62,.8],[.56,.97]],[[.74,.6],[.87,.5]]],
+              mr:[[[.07,.22],[.05,.46],[.08,.68]],[[.92,.27],[.94,.47],[.87,.7]]] },
+    manC:   { md:7,   bl:7.5, out:[[.15,.2],[.45,0],[.85,.2],[.95,.5],[.75,.88],[.47,1],[.2,.88],[.03,.5]], cusps:{ T:[.46,.25,.16] }, fossae:{},
+              ridges:[[[.15,.24],[.46,.25],[.84,.25]],[[.46,.27],[.47,.84]]], grooves:[], mr:[] },
+    manPM1: { md:7,   bl:7.5, out:[[.15,.14],[.5,0],[.85,.14],[1,.45],[.88,.8],[.5,1],[.12,.8],[0,.45]],
+              cusps:{ B:[.5,.32,.24], L:[.5,.85,.11] }, fossae:{ m:[.3,.62], d:[.7,.62] },
+              ridges:[[[.5,.36],[.5,.82]]], grooves:[[[.3,.62],[.2,.5]],[[.3,.62],[.34,.8]],[[.7,.62],[.8,.5]]],
+              mr:[[[.13,.42],[.16,.7]],[[.87,.42],[.84,.7]]] },
+    manPM2: { md:7,   bl:8,  out:[[.12,.1],[.5,0],[.88,.1],[1,.45],[.95,.85],[.72,1],[.3,1],[.05,.85],[0,.45]],
+              cusps:{ B:[.5,.28,.22], ML:[.3,.8,.13], DL:[.72,.82,.11] }, fossae:{ m:[.26,.5], d:[.74,.5] },
+              grooves:[[[.26,.5],[.5,.57],[.74,.5]],[[.5,.57],[.52,.98]],[[.26,.5],[.16,.36]],[[.74,.5],[.84,.36]]],
+              mr:[[[.1,.3],[.08,.55],[.12,.75]],[[.9,.3],[.92,.55],[.88,.75]]] },
+    manM1:  { md:11,  bl:10.5, out:[[.04,.12],[.18,0],[.34,.05],[.5,0],[.67,.06],[.84,.08],[.97,.22],[1,.5],[.97,.8],[.85,.97],[.68,1],[.47,.97],[.25,1],[.08,.9],[0,.6],[0,.34]],
+              cusps:{ MB:[.18,.21,.15], DB:[.5,.19,.14], D:[.84,.27,.1], ML:[.24,.8,.16], DL:[.68,.8,.15] }, fossae:{ m:[.12,.5], c:[.46,.52], d:[.87,.52] },
+              grooves:[[[.12,.5],[.3,.53],[.46,.52],[.67,.5],[.87,.52]],[[.3,.53],[.34,.05]],[[.67,.5],[.68,.06]],[[.46,.52],[.47,.97]]],
+              mr:[[[.05,.28],[.04,.5],[.06,.74]],[[.95,.3],[.96,.52],[.94,.74]]] },
+    manM2:  { md:10.5, bl:10, out:[[.04,.1],[.25,0],[.5,.04],[.75,0],[.96,.1],[1,.5],[.96,.9],[.75,1],[.5,.97],[.25,1],[.04,.9],[0,.5]],
+              cusps:{ MB:[.25,.22,.16], DB:[.74,.22,.15], ML:[.26,.78,.16], DL:[.74,.78,.15] }, fossae:{ m:[.12,.5], c:[.5,.5], d:[.88,.5] },
+              grooves:[[[.12,.5],[.5,.5],[.88,.5]],[[.5,.5],[.5,.04]],[[.5,.5],[.5,.97]]],
+              mr:[[[.05,.27],[.04,.5],[.05,.73]],[[.95,.27],[.96,.5],[.95,.73]]] }
+  };
+  /* one tooth: o = { x, y, k (px per mm), flip (lower tooth: buccal down), mirror (left side: mesial right), cls } */
+  function tooth(key, o){
+    var s = SPEC[key], w = s.md * o.k, h = s.bl * o.k;
+    function P(p){ return [o.x + (o.mirror ? 1 - p[0] : p[0]) * w, o.y + (o.flip ? 1 - p[1] : p[1]) * h]; }
+    var g = '<g class="od-tooth' + (o.cls ? ' ' + o.cls : '') + '">';
+    g += '<path class="od-crown" d="' + smooth(s.out.map(P), true) + '"/>';
+    g += '<path class="od-rim" d="' + smooth(s.out.map(function(p){ return P([.5 + (p[0] - .5) * .9, .5 + (p[1] - .5) * .88]); }), true) + '"/>';
+    Object.keys(s.cusps).forEach(function(c){ var v = s.cusps[c], p = P(v), r = v[2] * Math.min(w, h) * 1.25, q = P([v[0] + (.5 - v[0]) * .55, v[1] + (.5 - v[1]) * .7]);
+      g += '<ellipse class="od-cusp" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" rx="' + f1(r) + '" ry="' + f1(r * .86) + '"/>';
+      g += '<path class="od-tri" d="M' + f1(p[0]) + ' ' + f1(p[1]) + 'L' + f1(q[0]) + ' ' + f1(q[1]) + '"/>';
+      g += '<circle class="od-tip" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="' + f1(Math.max(1.4, o.k * .22)) + '"/>'; });
+    (s.ridges || []).forEach(function(r){ g += '<path class="od-ridge" d="' + smooth(r.map(P), false) + '"/>'; });
+    (s.mr || []).forEach(function(r){ g += '<path class="od-mr" d="' + smooth(r.map(P), false) + '"/>'; });
+    s.grooves.forEach(function(r){ g += '<path class="od-groove" d="' + smooth(r.map(P), false) + '"/>'; });
+    Object.keys(s.fossae).forEach(function(f){ var p = P(s.fossae[f]); g += '<circle class="od-pit" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="' + f1(Math.max(1.2, o.k * .2)) + '"/>'; });
+    g += '</g>';
+    var pt = {};
+    Object.keys(s.cusps).forEach(function(c){ pt[c] = P(s.cusps[c]); });
+    Object.keys(s.fossae).forEach(function(f){ pt[f] = P(s.fossae[f]); });
+    return { svg:g, pt:pt, x:o.x, y:o.y, w:w, h:h, cx:o.x + w / 2, cy:o.y + h / 2, P:P };
+  }
+
+  var ORDER = ['C', 'PM1', 'PM2', 'M1', 'M2'];
+  var NUMS = { max:{ R:{ C:6, PM1:5, PM2:4, M1:3, M2:2 }, L:{ C:11, PM1:12, PM2:13, M1:14, M2:15 } },
+               mand:{ R:{ C:27, PM1:28, PM2:29, M1:30, M2:31 }, L:{ C:22, PM1:21, PM2:20, M1:19, M2:18 } } };
+  var TOOTH_NAME = { C:'canine', PM1:'first premolar', PM2:'second premolar', M1:'first molar', M2:'second molar' };
+  var CUSP_NAME = { B:'buccal', L:'lingual', MB:'mesiobuccal', DB:'distobuccal', D:'distal', ML:'mesiolingual', DL:'distolingual', T:'cusp tip' };
+  var FOSSA_NAME = { m:'mesial fossa', c:'central fossa', d:'distal fossa' };
+  /* one row of a quadrant. o = { x0, yc, k, gap (mm), W (full width, for mirroring), cls:{ type:'class' } } */
+  function row(arch, side, o){
+    var x = o.x0, teeth = {}, svg = '';
+    ORDER.forEach(function(t){
+      var key = (arch === 'max' ? 'max' : 'man') + t, s = SPEC[key], w = s.md * o.k, h = s.bl * o.k;
+      var tx = side === 'L' ? o.W - x - w : x;
+      var tt = tooth(key, { x:tx, y:o.yc - h / 2, k:o.k, flip:arch === 'mand', mirror:side === 'L', cls:(o.cls && o.cls[t]) || '' });
+      tt.num = NUMS[arch][side][t]; tt.type = t; tt.arch = arch;
+      teeth[t] = tt; svg += tt.svg;
+      x += w + (o.gap == null ? .4 : o.gap) * o.k;
+    });
+    return { svg:svg, teeth:teeth, width:x - o.x0 };
+  }
+  /* Cusp-fossa contacts in MIP for the patient's right side, from the help sheet's Class I, II and III pictures:
+     [cusp's arch, its tooth, cusp, opposing tooth, opposing fossa, also accepted]. "Also accepted" = the posterior contact
+     on a maxillary molar, which the sheet calls "highly variable ... ranges from oblique ridge to distal fossa".
+     Class III leaves out #28 (it meets the canine) and #2's lingual cusps (they meet #32). */
+  var CONTACTS = {
+    1: [ ['mand','PM1','B','PM1','m'], ['mand','PM2','B','PM2','m'], ['mand','M1','MB','M1','m'], ['mand','M1','DB','M1','c','d'], ['mand','M2','MB','M2','m'], ['mand','M2','DB','M2','c','d'],
+         ['max','PM1','L','PM1','d'], ['max','PM2','L','PM2','d'], ['max','M1','ML','M1','c'], ['max','M1','DL','M1','d'], ['max','M2','ML','M2','c'], ['max','M2','DL','M2','d'] ],
+    2: [ ['mand','PM1','B','PM1','d'], ['mand','PM2','B','PM2','d'], ['mand','M1','MB','M1','c'], ['mand','M1','DB','M1','d'], ['mand','M2','MB','M2','c'], ['mand','M2','DB','M2','d'],
+         ['max','PM1','L','PM1','m'], ['max','PM2','L','PM2','m'], ['max','M1','ML','M1','m'], ['max','M1','DL','M1','c'], ['max','M2','ML','M2','m'], ['max','M2','DL','M2','c'] ],
+    3: [ ['mand','PM2','B','PM1','m'], ['mand','M1','MB','PM2','m'], ['mand','M1','DB','M1','m'], ['mand','M2','MB','M1','c','d'], ['mand','M2','DB','M2','m'],
+         ['max','PM1','L','PM2','d'], ['max','PM2','L','M1','m'], ['max','M1','ML','M1','d'], ['max','M1','DL','M2','c'] ]
+  };
+  var ROMAN = { 1:'I', 2:'II', 3:'III' };
+  /* both rows with the lower row shifted to its class position (lines near vertical); returns the svg and geometry */
+  function quad(cls, side, o){
+    o = o || {}; var k = o.k || 8.5, W = o.W || 470, yMax = o.yMax || 70, yMand = o.yMand || 212;
+    var mx = row('max', side, { x0:o.x0 || 30, yc:yMax, k:k, W:W, cls:o.clsMax });
+    var md = row('mand', side, { x0:o.x0 || 30, yc:yMand, k:k, W:W, cls:o.clsMand });
+    var dx = 0, n = 0;
+    CONTACTS[cls].forEach(function(c){ if(c[0] !== 'mand') return; dx += mx.teeth[c[3]].pt[c[4]][0] - md.teeth[c[1]].pt[c[2]][0]; n++; });
+    dx = n ? dx / n : 0;
+    return { max:mx, mand:md, dx:dx, k:k, W:W, side:side };
+  }
+  function contactLines(q, cls, opts){
+    opts = opts || {}; var s = '';
+    CONTACTS[cls].forEach(function(c, i){
+      var from = (c[0] === 'mand' ? q.mand : q.max).teeth[c[1]].pt[c[2]], to = (c[0] === 'mand' ? q.max : q.mand).teeth[c[3]].pt[c[4]];
+      var fx = from[0] + (c[0] === 'mand' ? q.dx : 0), tx = to[0] + (c[0] === 'mand' ? 0 : q.dx);
+      var on = opts.hl === i;
+      s += '<path class="od-cline' + (c[0] === 'max' ? ' up' : '') + (on ? ' on' : '') + (opts.hl != null && !on ? ' dim' : '') + '" d="M' + f1(fx) + ' ' + f1(from[1]) + 'L' + f1(tx) + ' ' + f1(to[1]) + '"/>' +
+        '<circle class="od-cdot' + (on ? ' on' : '') + '" cx="' + f1(fx) + '" cy="' + f1(from[1]) + '" r="3.4"/><circle class="od-cdot' + (on ? ' on' : '') + '" cx="' + f1(tx) + '" cy="' + f1(to[1]) + '" r="3.4"/>';
+    });
+    return s;
+  }
+  function numLabels(r, y, below){
+    var s = ''; ORDER.forEach(function(t){ var tt = r.teeth[t]; s += txt(tt.cx, below ? tt.y + tt.h + 15 : tt.y - 6, '#' + tt.num, 'fg-t sm od-num', 'middle'); }); return s;
+  }
+
+  /* Fence post as the help sheet draws it: one zigzag; maxillary cusps are the V's (labels above), mandibular cusps the
+     peaks (labels below); posts mark where one tooth ends and the next begins. Class II steps the lower row back one post,
+     Class III brings it forward one. o = { u, x0, y, hl:{ mand:'P2' }, hlMax:['P1','P2'] } */
+  var FP_UNITS = ['C', 'P1', 'P2', 'm-M1', 'd-M1', 'm-M2', 'd-M2'], FP_BOUND = [0, 1, 2, 3, 5, 7];
+  function fencePost(cls, o){
+    o = o || {}; var u = o.u || 46, yT = o.y || 44, amp = u * .52, x0 = o.x0 || 70;
+    var sh = cls === 2 ? 1 : cls === 3 ? -1 : 0;
+    var t0 = Math.min(-.5, sh - .5), t1 = Math.max(7.5, 7 + sh), pts = [];
+    for(var t = t0; t <= t1 + 1e-6; t += .5) pts.push([x0 + t * u, Math.abs(t - Math.round(t)) < .01 ? yT : yT + amp]);
+    var s = '<path class="fp-zig" d="M' + pts.map(function(p){ return f1(p[0]) + ' ' + f1(p[1]); }).join('L') + '"/>';
+    FP_BOUND.forEach(function(b){ var x = x0 + b * u; s += '<path class="fp-post" d="M' + f1(x) + ' ' + f1(yT) + 'L' + f1(x) + ' ' + f1(yT - amp * .9) + '"/>'; });
+    FP_BOUND.forEach(function(b){ var x = x0 + (b + sh - .5) * u; s += '<path class="fp-post low" d="M' + f1(x) + ' ' + f1(yT + amp) + 'L' + f1(x) + ' ' + f1(yT + amp * 1.9) + '"/>'; });
+    FP_UNITS.forEach(function(lab, i){ var on = (o.hlMax || []).indexOf(lab) > -1; s += txt(x0 + (i + .5) * u, yT + amp * .3, lab, 'fp-lab max' + (on ? ' on' : ''), 'middle'); });
+    FP_UNITS.forEach(function(lab, j){ var x = x0 + (j + sh) * u, on = o.hl && o.hl.mand === lab;
+      if(on) s += '<path class="fp-peak" d="M' + f1(x - u / 2) + ' ' + f1(yT + amp) + 'L' + f1(x) + ' ' + f1(yT) + 'L' + f1(x + u / 2) + ' ' + f1(yT + amp) + '"/>';
+      s += txt(x, yT + amp * .92, lab, 'fp-lab mand' + (on ? ' on' : ''), 'middle'); });
+    s += txt(x0 + t1 * u + 12, yT + amp * .3, 'Maxillary', 'fg-t sm', 'start') + txt(x0 + t1 * u + 12, yT + amp * .95, 'Mandibular', 'fg-t sm', 'start');
+    return { svg:s, w:x0 + t1 * u + 96, h:yT + amp * 2 + 8, x0:x0, u:u };
+  }
+  function fencePostSVG(cls, o){ var f = fencePost(cls, o); return '<svg viewBox="0 0 ' + f1(f.w) + ' ' + f1(f.h) + '" role="img" aria-label="Fence post, Class ' + ROMAN[cls] + '">' + f.svg + '</svg>'; }
+  /* the help sheet's contact map: fence post on top, the two rows below with every cusp-fossa contact drawn */
+  function contactMapSVG(cls, side){
+    var fp = fencePost(cls, { u:42, x0:66, y:36 });
+    var top = fp.h + 14, q = quad(cls, side || 'R', { yMax:top + 60, yMand:top + 196 });
+    var shift = Math.min(0, q.dx), W = Math.max(q.W, fp.w), H = top + 262;
+    return '<svg viewBox="0 0 ' + f1(W) + ' ' + f1(H) + '" role="img" aria-label="Class ' + ROMAN[cls] + ' fence post and cusp-fossa contacts">' + fp.svg +
+      '<g transform="translate(' + f1(-shift) + ' 0)">' + q.max.svg + numLabels(q.max, 0, false) +
+      '<g transform="translate(' + f1(q.dx) + ' 0)">' + q.mand.svg + numLabels(q.mand, 0, true) + '</g>' + contactLines(q, cls) + '</g>' +
+      txt(8, top + 64, 'Upper', 'fg-t sm') + txt(8, top + 200, 'Lower', 'fg-t sm') + '</svg>';
+  }
+  return { f1:f1, smooth:smooth, arrow:arrow, pin:pin, txt:txt, SPEC:SPEC, tooth:tooth, row:row, quad:quad, contactLines:contactLines, numLabels:numLabels,
+    CONTACTS:CONTACTS, NUMS:NUMS, ORDER:ORDER, TOOTH_NAME:TOOTH_NAME, CUSP_NAME:CUSP_NAME, FOSSA_NAME:FOSSA_NAME, ROMAN:ROMAN,
+    fencePost:fencePost, fencePostSVG:fencePostSVG, contactMapSVG:contactMapSVG, FP_UNITS:FP_UNITS };
+})();
+
 /* ---------- FIGURES ----------
-   Drawn for this hub as inline SVG (not copied from the slides or board items). Strokes and text use the hub's
-   color tokens, so they follow light and dark mode. A question with img:'<key>' draws the figure above its stem
-   (figHTML); every figure also sits under its lecture's notes (FIG_BY_LEC). */
-var FIG_DEFS = '<defs><marker id="fgArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fg-head" d="M0 0L10 5L0 10z"/></marker></defs>';
-function fgPin(x, y, t){ return '<g class="fg-pin"><circle cx="'+x+'" cy="'+y+'" r="11"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle">'+t+'</text></g>'; }
-var FIGS = {
-  envSag: { key:[['A','Centric relation, condyles seated (centric occlusion if the teeth touch here)'],['B','Maximum intercuspation (MICP)'],['C','Incisors edge to edge'],['D','Maximum protrusion'],['E','End of pure rotation, about 20-25 mm'],['F','Maximum opening, 40-60 mm']],
-    title:'Envelope of motion, sagittal view', caption:'Traced at the mandibular central incisor, patient facing right. A-E-F is the posterior opening border, F-D the anterior opening border, A-B-C-D the superior contact border; the dashed teardrop is where chewing happens.',
-    svg: '<svg viewBox="0 0 360 380" role="img" aria-label="Sagittal envelope of motion with points A to F">'+FIG_DEFS+
-      '<path class="fg-soft" d="M112 40 C92 72 98 118 118 124 C138 118 136 72 112 40Z"/>'+
-      '<path class="fg-line" d="M90 60 L112 40 L160 72 L178 74 L196 64 L235 64"/>'+
-      '<path class="fg-line" d="M90 60 C80 100 76 140 80 170 C86 240 104 300 130 340"/>'+
-      '<path class="fg-line" d="M130 340 C220 300 270 190 235 64"/>'+
-      '<text class="fg-t" x="250" y="30">Anterior</text><path class="fg-acc" d="M250 38 L330 38" marker-end="url(#fgArrow)"/>'+
-      '<text class="fg-t" x="94" y="150">20-25 mm</text><text class="fg-t" x="160" y="368">40-60 mm opening</text>'+
-      fgPin(76,60,'A')+fgPin(112,22,'B')+fgPin(160,92,'C')+fgPin(252,72,'D')+fgPin(64,172,'E')+fgPin(130,358,'F')+'</svg>' },
-  envHoriz: { key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']],
-    title:'Envelope of motion, horizontal view', caption:'Seen from above at the incisor point, anterior at the top. The apex at the back is centric relation; each lettered line is one border.',
-    svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Horizontal envelope of motion with borders A to D">'+FIG_DEFS+
-      '<path class="fg-line" d="M180 250 L80 190 L180 60 L280 190 Z"/>'+
-      '<circle class="fg-dot" cx="180" cy="250" r="5"/><text class="fg-t" x="192" y="272">CR</text>'+
-      '<text class="fg-t" x="150" y="40">Anterior</text>'+
-      '<text class="fg-t" x="6" y="150">Patient&#8217;s</text><text class="fg-t" x="6" y="166">LEFT</text>'+
-      '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">RIGHT</text>'+
-      fgPin(118,236,'A')+fgPin(112,112,'B')+fgPin(248,112,'C')+fgPin(242,236,'D')+'</svg>' },
-  envFront: { key:[['A','Left lateral superior'],['B','Left lateral opening'],['C','Right lateral superior'],['D','Right lateral opening'],['PP','Postural position, 2-4 mm below MICP']],
-    title:'Envelope of motion, frontal view', caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP is the postural position.',
-    svg: '<svg viewBox="0 0 360 330" role="img" aria-label="Frontal envelope of motion with borders A to D and PP">'+
-      '<path class="fg-line" d="M180 40 L270 98 C268 180 230 250 180 296 C130 250 92 180 90 98 Z"/>'+
-      '<circle class="fg-dot" cx="180" cy="40" r="5"/><text class="fg-t" x="192" y="34">ICP</text>'+
-      '<circle class="fg-dot" cx="180" cy="74" r="4"/><text class="fg-t" x="190" y="82">PP</text>'+
-      '<text class="fg-t" x="8" y="150">Patient&#8217;s</text><text class="fg-t" x="8" y="166">RIGHT</text><text class="fg-t" x="288" y="150">Patient&#8217;s</text><text class="fg-t" x="288" y="166">LEFT</text>'+
-      fgPin(238,58,'A')+fgPin(268,206,'B')+fgPin(122,58,'C')+fgPin(92,206,'D')+'</svg>' },
-  pathMax: { key:[['A','Protrusive (toward mesial)'],['B','Laterotrusive, working (toward buccal)'],['C','Mediotrusive, non-working (toward mesiopalatal)'],['D','Retrusive (toward distal)']],
-    title:'Cusp pathways on a maxillary first molar', caption:'Occlusal view. The dot is where an opposing mandibular buccal cusp sits in MIP; each arrow is the path that cusp takes across this tooth in one movement (the MIP contact is at the base of the arrow).',
-    svg: '<svg viewBox="0 0 340 300" role="img" aria-label="Maxillary molar occlusal outline with arrows A to D">'+FIG_DEFS+
-      '<path class="fg-tooth" d="M70 70 C110 40 230 38 268 64 C292 82 292 200 270 228 C236 262 104 262 72 232 C46 206 44 92 70 70Z"/>'+
-      '<path class="fg-soft-line" d="M120 72 C140 120 150 150 170 150 C200 150 210 120 222 74 M170 150 C160 190 150 210 140 236"/>'+
-      '<text class="fg-t" x="150" y="26">BUCCAL</text><text class="fg-t" x="138" y="292">PALATAL (lingual)</text><text class="fg-t" x="288" y="146">MESIAL</text><text class="fg-t" x="2" y="146">DISTAL</text>'+
-      '<path class="fg-acc" d="M170 150 L250 150" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L170 78" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L232 210" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L96 150" marker-end="url(#fgArrow)"/>'+
-      '<circle class="fg-dot" cx="170" cy="150" r="6"/>'+fgPin(262,128,'A')+fgPin(190,76,'B')+fgPin(246,226,'C')+fgPin(84,128,'D')+'</svg>' },
-  pathMand: { key:[['A','Protrusive (toward distal)'],['B','Laterotrusive, working (toward lingual)'],['C','Mediotrusive, non-working (toward distobuccal)'],['D','Retrusive (toward mesial)']],
-    title:'Cusp pathways on a mandibular first molar', caption:'Occlusal view. The dot is where an opposing maxillary lingual (palatal) cusp sits in MIP; each arrow is the path that cusp takes across this tooth (MIP contact at the base of the arrow).',
-    svg: '<svg viewBox="0 0 340 300" role="img" aria-label="Mandibular molar occlusal outline with arrows A to D">'+FIG_DEFS+
-      '<path class="fg-tooth" d="M60 82 C96 52 246 50 280 80 C300 104 298 196 278 222 C242 254 98 254 62 222 C40 196 40 108 60 82Z"/>'+
-      '<path class="fg-soft-line" d="M70 150 C120 146 220 146 272 150 M130 150 C126 120 124 90 120 66 M210 150 C214 182 216 210 218 236"/>'+
-      '<text class="fg-t" x="150" y="26">BUCCAL</text><text class="fg-t" x="150" y="292">LINGUAL</text><text class="fg-t" x="288" y="146">MESIAL</text><text class="fg-t" x="2" y="146">DISTAL</text>'+
-      '<path class="fg-acc" d="M170 150 L94 150" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L170 224" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L108 92" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L246 150" marker-end="url(#fgArrow)"/>'+
-      '<circle class="fg-dot" cx="170" cy="150" r="6"/>'+fgPin(82,128,'A')+fgPin(192,222,'B')+fgPin(94,76,'C')+fgPin(258,128,'D')+'</svg>' },
-  inclines: { key:[['1','Facial incline of the maxillary palatal cusp'],['2','Lingual incline of the maxillary palatal cusp'],['3','Lingual incline of the mandibular buccal cusp'],['4','Facial incline of the mandibular buccal cusp'],['5','Lingual incline of the maxillary buccal cusp'],['6','Buccal incline of the mandibular lingual cusp'],['Right working','2 with 6, and 4 with 5'],['Left working (right side non-working)','1 with 3']],
-    title:'Right first molars in MIP, frontal section', caption:'Cut through the right molars, seen from the front: buccal on the left, lingual on the right. The numbers mark cusp inclines that can meet when the mandible moves.',
-    svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Frontal section of right molars with inclines numbered 1 to 6">'+
-      '<path class="fg-tooth" d="M80 30 L240 30 C246 60 244 100 232 120 L200 158 L150 122 L100 150 L80 124 C70 96 72 60 80 30Z"/>'+
-      '<path class="fg-tooth2" d="M120 270 L290 270 C298 230 296 190 284 170 L252 128 L205 165 L150 132 L120 165 C112 190 112 230 120 270Z"/>'+
-      '<text class="fg-t" x="104" y="22">Maxillary molar</text><text class="fg-t" x="150" y="292">Mandibular molar</text>'+
-      '<text class="fg-t" x="2" y="200">BUCCAL</text><text class="fg-t" x="292" y="112">LINGUAL</text>'+
-      fgPin(168,122,'1')+fgPin(210,126,'2')+fgPin(184,170,'3')+fgPin(146,176,'4')+fgPin(116,118,'5')+fgPin(240,162,'6')+'</svg>' },
-  fence: { title:'The fence post, Class I', caption:'Each post is a cusp position, anterior at the left. Top row: maxillary canine, premolars, then the mesial and distal halves of each molar; bottom row the same for the mandible. In Class I every mandibular post sits a half step mesial (in front) of its maxillary partner.',
-    svg: '<svg viewBox="0 0 470 214" role="img" aria-label="Fence post diagram, Class I">'+FIG_DEFS+
-      '<path class="fg-line" d="M20 40 L372 40 M20 170 L372 170"/>'+
-      (function(){ var top=['C','PM1','PM2','M1m','M1d','M2m','M2d'], s='';
-        top.forEach(function(t,i){ var xm = 70+i*48, xd = 46+i*48;
-          s += '<path class="fg-post" d="M'+xm+' 40 L'+xm+' 104"/><text class="fg-t sm" x="'+(xm-10)+'" y="30">'+t+'</text>';
-          s += '<path class="fg-post2" d="M'+xd+' 170 L'+xd+' 106"/><text class="fg-t sm" x="'+(xd-10)+'" y="192">'+t+'</text>'; });
-        return s; })()+
-      '<text class="fg-t" x="380" y="76">Maxillary</text><text class="fg-t" x="380" y="146">Mandibular</text>'+
-      '<path class="fg-acc" d="M300 204 L220 204" marker-end="url(#fgArrow)"/><text class="fg-t sm" x="308" y="208">anterior</text></svg>' }
+   A question with img:'<key>' draws the figure above its stem (figHTML) without its key; after answering, the
+   explanation shows it again with the key open (figAfterHTML). imgAfter:true keeps it out of the question entirely.
+   FIG_PLACE puts each figure inside the lecture notes next to the paragraph it explains. */
+var FIGS = (function(){
+  var A = OD.arrow, T = OD.txt, f1 = OD.f1, F = {};
+  /* cusp pathways: on an upper tooth you watch a lower cusp (protrusive mesial, working buccal and a little mesial,
+     non-working mesiopalatal, retrusive distal and short); on a lower tooth everything reverses. Arrow angles follow the
+     help sheet's pathway pictures; the working path leans about 15 degrees toward the protrusive path. */
+  function paths(arch){
+    var max = arch === 'max', t = OD.tooth(max ? 'maxM1' : 'manM1', { x:96, y:max ? 52 : 58, k:max ? 18 : 16.5, flip:!max }), b = t.pt.c;
+    var mes = -1, buc = max ? -1 : 1, s = '';
+    var r15 = 15 * Math.PI / 180;
+    var P = [b[0] + mes * (max ? 100 : -100), b[1]];
+    var W = max ? [b[0] + mes * 104 * Math.sin(r15), b[1] + buc * 104 * Math.cos(r15)] : [b[0] - mes * 100 * Math.sin(r15), b[1] - buc * 100 * Math.cos(r15)];
+    var NW = max ? [b[0] + mes * 80, b[1] - buc * 80] : [b[0] - mes * 78, b[1] + buc * 78];
+    var R = [b[0] - (max ? mes : -mes) * 40, b[1]];
+    s += t.svg;
+    Object.keys(t.pt).forEach(function(c){ if(OD.CUSP_NAME[c] && c !== 'B' && c !== 'L') s += T(t.pt[c][0], t.pt[c][1] + 4, c, 'fg-t sm od-cl', 'middle'); });
+    s += '<circle class="od-ghost" cx="' + f1(b[0]) + '" cy="' + f1(b[1]) + '" r="11"/>';
+    s += A(b[0], b[1], P[0], P[1], 'fg-acc', 11) + A(b[0], b[1], W[0], W[1], 'fg-acc', 11) + A(b[0], b[1], NW[0], NW[1], 'fg-acc', 11) + A(b[0], b[1], R[0], R[1], 'fg-acc', 11);
+    s += '<circle class="fg-dot" cx="' + f1(b[0]) + '" cy="' + f1(b[1]) + '" r="5"/>';
+    function lab(p, l, dx, dy){ return OD.pin(p[0] + dx, p[1] + dy, l); }
+    s += lab(P, 'A', max ? -13 : 13, max ? -14 : -14) + lab(W, 'B', max ? -16 : 16, max ? -6 : 6) + lab(NW, 'C', max ? -12 : 12, max ? 12 : -12) + lab(R, 'D', max ? 14 : -14, -14);
+    var top = max ? 'BUCCAL' : 'LINGUAL', bot = max ? 'PALATAL' : 'BUCCAL';
+    s += T(t.cx, 22, top, 'fg-t', 'middle') + T(t.cx, (max ? 52 + t.h : 58 + t.h) + 28, bot, 'fg-t', 'middle') +
+      T(8, t.cy + 4, 'MESIAL', 'fg-t sm') + T(t.x + t.w + 26, t.cy + 4, 'DISTAL', 'fg-t sm');
+    s += T(b[0] + 14, b[1] + 26, max ? 'DB of #30' : 'ML of #3', 'fg-t sm fg-hint');
+    return '<svg viewBox="0 0 380 ' + f1((max ? 52 : 58) + t.h + 40) + '" role="img" aria-label="' + (max ? 'Maxillary right first molar #3' : 'Mandibular right first molar #30') + ', occlusal view, with cusp pathway arrows A to D">' + s + '</svg>';
+  }
+  F.pathMax = { title:'Cusp pathways on #3 (maxillary right first molar)',
+    caption:'Occlusal view, buccal at the top, mesial at the left. The dot is the MIP contact: the distobuccal cusp of #30 sitting in the central fossa (Class I). Each arrow is the path that lower cusp takes across #3 in one movement; the MIP contact is at the BASE of the arrow (help sheet). Retrusion is only about a millimeter, so its arrow is short.',
+    svg: paths('max'), key:[['A','Protrusive: toward mesial'],['B','Laterotrusive (working): toward buccal, leaning a little mesial'],['C','Mediotrusive (non-working): toward mesiopalatal'],['D','Retrusive: toward distal (short)']] };
+  F.pathMand = { title:'Cusp pathways on #30 (mandibular right first molar)',
+    caption:'Occlusal view, lingual at the top, buccal at the bottom, mesial at the left (the help sheet\'s layout for lower teeth). The dot is the MIP contact: the mesiolingual cusp of #3 in the central fossa. On a LOWER tooth you watch an UPPER cusp, so every path reverses: "if I\'m looking at the mandibular arch and the mandible is sliding forward, the contacts are going toward the posterior."',
+    svg: paths('mand'), key:[['A','Protrusive: toward distal'],['B','Laterotrusive (working): toward lingual, leaning a little distal'],['C','Mediotrusive (non-working): toward distobuccal'],['D','Retrusive: toward mesial (short)']] };
+
+  /* frontal section of the right first molars in MIP (help sheet "Draw this"): buccal on the left */
+  (function(){
+    var mx = [[96,8],[84,34],[72,72],[78,112],[90,142],[101,160],[126,150],[150,128],[176,146],[204,170],[234,160],[256,128],[266,86],[258,44],[244,8]];
+    var md = [[132,318],[118,286],[104,242],[106,200],[118,172],[130,156],[150,136],[178,160],[205,178],[232,160],[262,140],[276,160],[282,204],[276,252],[262,288],[252,318]];
+    function seg(a, b, cls){ return '<path class="' + cls + '" d="M' + a[0] + ' ' + a[1] + 'L' + b[0] + ' ' + b[1] + '"/>'; }
+    var s = '<path class="od-sec" d="' + OD.smooth(mx, true) + '"/><path class="od-sec low" d="' + OD.smooth(md, true) + '"/>' +
+      '<path class="od-cej" d="M84 36 Q170 44 258 40"/><path class="od-cej" d="M118 286 Q190 278 262 288"/>' +
+      seg([150,128],[204,170],'fg-incl max') + seg([204,170],[252,124],'fg-incl max') + seg([101,160],[150,128],'fg-incl max') +
+      seg([150,136],[205,178],'fg-incl mand') + seg([150,136],[110,190],'fg-incl mand') + seg([205,178],[262,140],'fg-incl mand') +
+      OD.pin(188,141,'1') + OD.pin(219,137,'2') + OD.pin(173,169,'3') + OD.pin(147,159,'4') + OD.pin(118,133,'5') + OD.pin(241,170,'6') +
+      T(88,108,'buccal','fg-t sm') + T(88,120,'cusp','fg-t sm') + T(212,86,'palatal','fg-t sm') + T(212,98,'cusp','fg-t sm') +
+      T(118,232,'buccal','fg-t sm') + T(118,244,'cusp','fg-t sm') + T(222,232,'lingual','fg-t sm') + T(222,244,'cusp','fg-t sm') +
+      T(270,26,'Maxillary #3','fg-t sm') + T(286,300,'Mandibular #30','fg-t sm') +
+      T(2,178,'BUCCAL','fg-t sm') + T(296,178,'LINGUAL','fg-t sm') + T(296,192,'(tongue)','fg-t sm');
+    F.inclines = { title:'Right first molars in MIP, frontal section',
+      caption:'Cut through #3 and #30 and seen from the front: buccal (cheek) on the left, lingual (tongue) on the right. Upper inclines are blue, lower inclines red. To find an interference, picture the LOWER tooth moving: toward the cheek in a right working move, toward the tongue when the right side is non-working (a left move).',
+      svg:'<svg viewBox="0 0 380 324" role="img" aria-label="Frontal section of the right first molars with inclines numbered 1 to 6">' + s + '</svg>' , key:[['1','Facial incline of the maxillary palatal cusp'],['2','Lingual incline of the maxillary palatal cusp'],['3','Lingual incline of the mandibular buccal cusp'],['4','Facial incline of the mandibular buccal cusp'],['5','Lingual incline of the maxillary buccal cusp'],['6','Buccal incline of the mandibular lingual cusp'],['Left move (right side non-working)','1 meets 3'],['Right move (working)','2 meets 6, and 4 meets 5 (an interference, or group function if you wanted it)']] };
+  })();
+
+  F.envSag = { title:'Envelope of motion, sagittal view',
+    caption:'Traced at the lower central incisor, patient facing right. Opening borders are set by ligaments and joint anatomy; the superior border by the teeth. Chewing happens in the small teardrop under MICP.',
+    svg: '<svg viewBox="0 0 360 384" role="img" aria-label="Sagittal envelope of motion with points A to F">' +
+      '<path class="fg-soft" d="M112 40 C92 72 98 118 118 124 C138 118 136 72 112 40Z"/>' +
+      '<path class="fg-line" d="M90 60 L112 40 L160 72 L178 74 L196 64 L235 64"/>' +
+      '<path class="fg-line" d="M90 60 C80 100 76 140 80 170 C86 240 104 300 130 340"/>' +
+      '<path class="fg-line" d="M130 340 C220 300 270 190 235 64"/>' +
+      '<text class="fg-t" x="262" y="16">Anterior</text>' + A(262, 24, 340, 24, 'fg-acc', 9) +
+      '<text class="fg-t sm" x="6" y="112">20-25 mm</text><text class="fg-t sm" x="6" y="124">(rotation)</text><text class="fg-t" x="150" y="374">40-60 mm opening</text>' +
+      '<text class="fg-t sm fg-hint" x="196" y="56">superior contact border</text><text class="fg-t sm fg-hint" x="16" y="260">posterior</text><text class="fg-t sm fg-hint" x="16" y="272">opening</text><text class="fg-t sm fg-hint" x="16" y="284">border</text>' +
+      '<text class="fg-t sm fg-hint" x="232" y="250">anterior</text><text class="fg-t sm fg-hint" x="232" y="262">opening</text><text class="fg-t sm fg-hint" x="232" y="274">border</text><text class="fg-t sm fg-hint" x="122" y="142">chewing</text>' +
+      OD.pin(76,60,'A') + OD.pin(112,22,'B') + OD.pin(160,92,'C') + OD.pin(252,72,'D') + OD.pin(64,172,'E') + OD.pin(130,358,'F') + '</svg>' , key:[['A','Centric relation (CR); a tooth contact here is centric occlusion (CO)'],['B','Maximum intercuspation (MICP), up and forward from CO'],['C','Incisors edge to edge, at the end of the anterior guidance'],['D','Maximum protrusion'],['E','End of pure rotation, about 20-25 mm'],['F','Maximum opening, about 40-60 mm (rotation plus translation)'],['A-E-F','Posterior opening border'],['F-D','Anterior opening border'],['A-B-C-D','Superior contact border (the teeth)']] };
+  F.envHoriz = { title:'Envelope of motion, horizontal view',
+    caption:'Seen from above at the incisor point, anterior at the top, so the patient\'s left is on your left. The back apex is centric relation; the front apex is maximum protrusion.',
+    svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Horizontal envelope of motion with borders A to D">' +
+      '<path class="fg-line" d="M180 250 L80 190 L180 60 L280 190 Z"/>' +
+      '<circle class="fg-dot" cx="180" cy="250" r="5"/><text class="fg-t" x="192" y="272">CR</text><circle class="fg-dot" cx="180" cy="60" r="4"/>' +
+      '<text class="fg-t" x="150" y="40">Anterior</text><text class="fg-t sm fg-hint" x="190" y="58">max protrusion</text>' +
+      '<text class="fg-t" x="6" y="150">Patient&#8217;s</text><text class="fg-t" x="6" y="166">LEFT</text>' +
+      '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">RIGHT</text>' +
+      OD.pin(118,236,'A') + OD.pin(112,112,'B') + OD.pin(248,112,'C') + OD.pin(242,236,'D') + '</svg>' , key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']] };
+  F.envFront = { title:'Envelope of motion, frontal view',
+    caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP, the postural position, sits about 2-4 mm below it.',
+    svg: '<svg viewBox="0 0 360 330" role="img" aria-label="Frontal envelope of motion with borders A to D and PP">' +
+      '<path class="fg-line" d="M180 40 L270 98 C268 180 230 250 180 296 C130 250 92 180 90 98 Z"/>' +
+      '<circle class="fg-dot" cx="180" cy="40" r="5"/><text class="fg-t" x="192" y="34">ICP</text>' +
+      '<circle class="fg-dot" cx="180" cy="56" r="4"/><text class="fg-t" x="190" y="66">PP</text><text class="fg-t sm fg-hint" x="150" y="318">max opening</text>' +
+      '<text class="fg-t" x="8" y="150">Patient&#8217;s</text><text class="fg-t" x="8" y="166">RIGHT</text><text class="fg-t" x="288" y="150">Patient&#8217;s</text><text class="fg-t" x="288" y="166">LEFT</text>' +
+      OD.pin(238,58,'A') + OD.pin(268,206,'B') + OD.pin(122,58,'C') + OD.pin(92,206,'D') + '</svg>' , key:[['A','Left lateral superior'],['B','Left lateral opening'],['C','Right lateral superior'],['D','Right lateral opening'],['PP','Postural position, about 2-4 mm below MICP (not the clinical rest position, about 8 mm down)']] };
+  F.fence = { title:'The fence post, Class I',
+    caption:'Drawn the way the help sheet draws it, anterior at the left. Upper cusps are the V\'s, lower cusps the peaks; the posts mark where one tooth ends and the next begins. In Class I each lower cusp sits a half step in front (mesial) of its upper partner. It shows which cusp comes CLOSEST, not the anatomy: the questions are cusp-fossa.',
+    svg: OD.fencePostSVG(1), key:[['Read it','Lower P2 points at the post between upper P1 and P2: by the premolar rule it lands in the MESIAL fossa of the upper second premolar (#29 on #4)'],['Class II','Lower row one post back'],['Class III','Lower row one post forward']] };
+  return F;
+})();
+/* figures placed inside the notes: after the paragraph or heading whose text starts with `at` (both reading levels) */
+var FIG_PLACE = {
+  review: [
+    { full:'What cusp hits where: the fence post', plain:'Which cusp hits where', end:true, widget:'cuspMap' },
+    { full:'Help sheet method for interferences', plain:'To figure out which slopes touch', figs:['inclines'] },
+    { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand'] },
+    { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
+    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
+  ]
 };
 var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'] };
+/* fence post + contact map with Class I / II / III tabs (notes and Review) */
+function cuspMapHTML(cls){
+  cls = cls || 1;
+  return '<figure class="fig-card cmap" data-cmap>' +
+    '<h4>What cusp hits where: fence post and contacts</h4>' +
+    '<div class="cmap-tabs" role="group" aria-label="Angle class">' + [1,2,3].map(function(c){ return '<button type="button" data-cmap-cls="'+c+'" aria-pressed="'+(c===cls)+'"'+(c===cls?' class="is-active"':'')+'>Class '+OD.ROMAN[c]+'</button>'; }).join('') + '</div>' +
+    '<div class="cmap-svg">' + OD.contactMapSVG(cls, 'R') + '</div>' +
+    '<p>' + CMAP_NOTE[cls] + '</p>' +
+    '<p class="cmap-src">Cusp-fossa contacts in MIP for the right side, read off the help sheet\'s Class I, II and III pictures. Each line joins a centric cusp to the fossa it sits in. Want to drill it? Play "What cusp hits where?" at the top of the Question Bank.</p></figure>';
+}
+var CMAP_NOTE = {
+  1:'<b>Class I.</b> Upper premolars take their contacts in the MESIAL fossae, lower premolars in the DISTAL fossae. Each molar has an anterior and a posterior contact; anchor on the first molar\'s posterior contact (the DB cusp of #30 on #3, anywhere from the central fossa and oblique ridge back to the distal fossa) and step back: the MB cusp of #31 goes to the mesial fossa of #2.',
+  2:'<b>Class II</b> steps the lower row back one post, and the premolar rule flips: upper premolars take contacts in their DISTAL fossae, lower premolars in their MESIAL fossae. #29\'s buccal cusp lands in the distal fossa of #4, #30\'s MB cusp in the central fossa of #3, and #3\'s ML cusp in the mesial fossa of #30.',
+  3:'<b>Class III</b> brings the lower row forward one post. The premolar rule is the same as Class I (upper mesial, lower distal), one tooth over: #29\'s buccal cusp lands in the mesial fossa of #5, #30\'s MB cusp in the mesial fossa of #4, and #3\'s ML cusp in the distal fossa of #30.'
+};
+function wireCuspMaps(root){
+  if(!root || root.__cmap) return; root.__cmap = true;
+  root.addEventListener('click', function(e){
+    var b = e.target.closest('[data-cmap-cls]'); if(!b) return;
+    var card = b.closest('[data-cmap]'), c = +b.getAttribute('data-cmap-cls');
+    card.querySelectorAll('[data-cmap-cls]').forEach(function(x){ var on = x === b; x.classList.toggle('is-active', on); x.setAttribute('aria-pressed', String(on)); });
+    card.querySelector('.cmap-svg').innerHTML = OD.contactMapSVG(c, 'R');
+    card.querySelector('p').innerHTML = CMAP_NOTE[c];
+  });
+}
+/* ---------- CASE IMAGES (2026-10-20) ----------
+   The patient cases show their findings as images: perio charts, periapical and TMJ radiographs, intraoral views,
+   articulating-paper marks, mounted casts and a bite record. All drawn for this hub as illustrations (not patient
+   photos or real radiographs); what they show follows the lectures. A question with pimg:['key', ...] draws these
+   inside its Patient Box. Radiographs keep their own dark film colors in both themes. */
+var CASE_IMG = (function(){
+  var f1 = OD.f1, T = OD.txt, I = {};
+  /* deterministic speckle for bone trabeculae */
+  function rnd(seed){ var s = seed % 2147483647; if(s <= 0) s += 2147483646; return function(){ s = s * 16807 % 2147483647; return (s - 1) / 2147483646; }; }
+  function trabeculae(x, y, w, h, seed, n){
+    var r = rnd(seed), s = '';
+    for(var i = 0; i < n; i++){ var cx = x + r() * w, cy = y + r() * h, rx = 2 + r() * 7, ry = 1.5 + r() * 4, a = Math.round(r() * 180);
+      s += '<ellipse class="' + (r() < .55 ? 'xr-tb' : 'xr-tb2') + '" cx="' + f1(cx) + '" cy="' + f1(cy) + '" rx="' + f1(rx) + '" ry="' + f1(ry) + '" transform="rotate(' + a + ' ' + f1(cx) + ' ' + f1(cy) + ')"/>'; }
+    return s;
+  }
+  function film(w, h, inner, label){
+    return '<svg class="xr" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + label + '"><rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>' + inner + '<circle class="xr-dot" cx="18" cy="18" r="4"/></svg>';
+  }
+  /* one tooth on a film, drawn crown-up (a maxillary film flips the whole picture). o = { x (center), crest (alveolar
+     crest y), kind:'molar'|'premolar'|'incisor'|'canine', pdl:'wide'|'funnel', lamina:'thick', bone (px of crestal bone
+     lost around this tooth), resto:'amalgam'|'pfm', plunge (px a cusp rises above the plane), root (root length scale) } */
+  var DIM = { molar:{ hw:42, rw:11, cr:58, rl:112 }, premolar:{ hw:24, rw:12, cr:58, rl:120 }, canine:{ hw:21, rw:12, cr:70, rl:150 }, incisor:{ hw:29, rw:13, cr:66, rl:122 } };
+  function paTooth(o){
+    var d = DIM[o.kind], x = o.x, cej = o.crest - 14, top = cej - d.cr, tip = cej + d.rl * (o.root || 1), s = '';
+    var pdl = o.pdl === 'wide' ? 5 : 2.2, lam = o.lamina === 'thick' ? 6 : 2.2, bone = o.bone || 0;
+    var roots = o.kind === 'molar' ? [[-22, -8, -.12], [22, 0, .1]] : [[0, 0, 0]];
+    if(bone) s += '<path class="xr-defect" d="M' + f1(x - d.hw - 16) + ' ' + f1(o.crest - 6) + ' Q' + f1(x) + ' ' + f1(o.crest + bone * 1.25) + ' ' + f1(x + d.hw + 16) + ' ' + f1(o.crest - 6) + 'Z"/>';
+    roots.forEach(function(rt){
+      var bx = x + rt[0], t = tip + rt[1], lean = rt[2] * d.rl, b0 = o.crest + bone;
+      function sock(k, fun){ return [[bx - d.rw - k - fun, b0], [bx - d.rw * .78 - k + lean * .5, t - 36], [bx + lean, t + k], [bx + d.rw * .78 + k + lean * .5, t - 36], [bx + d.rw + k + fun, b0]]; }
+      var fun = o.pdl === 'funnel' ? 10 : 0;
+      s += '<path class="xr-lam" d="' + OD.smooth(sock(pdl + lam, fun), false) + 'Z"/><path class="xr-pdl" d="' + OD.smooth(sock(pdl, fun * .8), false) + 'Z"/>';
+    });
+    roots.forEach(function(rt){
+      var bx = x + rt[0], t = tip + rt[1], lean = rt[2] * d.rl;
+      s += '<path class="xr-dentin" d="' + OD.smooth([[bx - d.rw, cej - 2], [bx - d.rw * .82 + lean * .5, t - 34], [bx + lean, t], [bx + d.rw * .82 + lean * .5, t - 34], [bx + d.rw, cej - 2]], false) + 'Z"/>';
+      s += '<path class="xr-canal" d="' + OD.smooth([[bx, cej + 4], [bx + lean * .55, t - 30], [bx + lean, t - 6]], false) + '"/>';
+    });
+    var hw = d.hw, pl = o.plunge || 0, crown;
+    if(o.kind === 'molar') crown = [[x - hw + 8, cej], [x - hw - 1, cej - 24], [x - hw + 2, top + 12], [x - hw * .5, top - 2], [x - 3, top + 9], [x + hw * .5, top - 2 - pl], [x + hw - 2, top + 12], [x + hw + 1, cej - 24], [x + hw - 8, cej]];
+    else if(o.kind === 'premolar') crown = [[x - hw + 6, cej], [x - hw - 1, cej - 26], [x - hw + 5, top + 8], [x, top - 2], [x + hw - 5, top + 8], [x + hw + 1, cej - 26], [x + hw - 6, cej]];
+    else if(o.kind === 'canine') crown = [[x - hw + 6, cej], [x - hw - 2, cej - 30], [x - hw + 6, top + 14], [x, top - 6], [x + hw - 6, top + 14], [x + hw + 2, cej - 30], [x + hw - 6, cej]];
+    else crown = [[x - hw + 7, cej], [x - hw - 1, cej - 30], [x - hw + 1, top + 3], [x - hw + 6, top], [x + hw - 6, top], [x + hw - 1, top + 3], [x + hw + 1, cej - 30], [x + hw - 7, cej]];
+    s += '<path class="xr-enamel" d="' + OD.smooth(crown, true) + '"/>';
+    var inner = crown.map(function(p){ return [x + (p[0] - x) * .8, cej + (p[1] - cej) * .84]; });
+    s += '<path class="xr-dentin" d="' + OD.smooth(inner, true) + '"/>';
+    s += '<path class="xr-pulp" d="' + OD.smooth(o.kind === 'molar' ? [[x - 20, cej + 6], [x - 20, cej - 18], [x - 12, cej - 26], [x, cej - 22], [x + 12, cej - 26], [x + 20, cej - 18], [x + 20, cej + 6]] : [[x - 5, cej + 8], [x - 6, cej - 18], [x, cej - d.cr * .55], [x + 6, cej - 18], [x + 5, cej + 8]], true) + '"/>';
+    if(o.resto === 'amalgam') s += '<path class="xr-metal" d="' + OD.smooth([[x - hw * .62, top + 6], [x - hw * .55, cej - 30], [x, cej - 24], [x + hw * .58, cej - 30], [x + hw * .62, top + 8], [x + hw * .3, top + 18 + (o.scoop || 0)], [x - hw * .3, top + 10]], true) + '"/>';
+    if(o.resto === 'pfm') s += '<path class="xr-metal" d="' + OD.smooth(crown.map(function(p){ return [x + (p[0] - x) * .9, cej + (p[1] - cej) * .92]; }), true) + '"/>';
+    return s;
+  }
+  function implant(x, crest, o){
+    o = o || {}; var s = '', top = crest - 2, len = 116, cej = crest - 12;
+    s += '<path class="xr-lam" style="opacity:.35" d="M' + f1(x - 16) + ' ' + f1(top) + 'L' + f1(x - 14) + ' ' + f1(top + len) + 'Q' + f1(x) + ' ' + f1(top + len + 10) + ' ' + f1(x + 14) + ' ' + f1(top + len) + 'L' + f1(x + 16) + ' ' + f1(top) + 'Z"/>';
+    s += '<path class="xr-metal" d="M' + f1(x - 12) + ' ' + f1(top) + 'L' + f1(x - 11) + ' ' + f1(top + len - 6) + 'Q' + f1(x) + ' ' + f1(top + len + 4) + ' ' + f1(x + 11) + ' ' + f1(top + len - 6) + 'L' + f1(x + 12) + ' ' + f1(top) + 'Z"/>';
+    for(var i = 0; i < 12; i++){ var y = top + 8 + i * 9.2; s += '<path class="xr-thread" d="M' + f1(x - 13) + ' ' + f1(y) + 'L' + f1(x + 13) + ' ' + f1(y + 4) + '"/>'; }
+    s += '<path class="xr-metal" d="M' + f1(x - 8) + ' ' + f1(top) + 'L' + f1(x - 9) + ' ' + f1(cej - 4) + 'L' + f1(x + 9) + ' ' + f1(cej - 4) + 'L' + f1(x + 8) + ' ' + f1(top) + 'Z"/>';
+    var hw = o.canine ? 21 : 40, cr = o.canine ? 70 : 58, t0 = cej - cr;
+    s += '<path class="xr-crown" d="' + OD.smooth(o.canine ? [[x - 10, cej], [x - hw - 2, cej - 30], [x - hw + 6, t0 + 14], [x, t0 - 6], [x + hw - 6, t0 + 14], [x + hw + 2, cej - 30], [x + 10, cej]]
+      : [[x - 14, cej], [x - hw - 1, cej - 24], [x - hw + 2, t0 + 12], [x - hw * .5, t0 - 2], [x - 3, t0 + 9], [x + hw * .5, t0 - 2], [x + hw - 2, t0 + 12], [x + hw + 1, cej - 24], [x + 14, cej]], true) + '"/>';
+    return s;
+  }
+  /* periapical film. o.max = maxillary film (crowns point down); teeth = [ paTooth options | {implant:true,...} ] */
+  function pa(w, h, crest, teeth, seed, label, o){
+    o = o || {};
+    var inner = '<path class="xr-bone" d="M0 ' + f1(crest) + ' L' + w + ' ' + f1(crest) + ' L' + w + ' ' + h + ' L0 ' + h + 'Z"/>' + trabeculae(4, crest + 4, w - 8, h - crest - 8, seed, 190);
+    inner += teeth.map(function(t){ return t.implant ? implant(t.x, crest, t) : paTooth(Object.assign({ crest:crest }, t)); }).join('');
+    if(o.max) inner = '<g transform="translate(0 ' + h + ') scale(1 -1)">' + inner + '</g>';
+    return film(w, h, inner, label);
+  }
+  /* incisors overlap their neighbors on a film, so space them by crown width */
+  I.paTrauma = { kind:'Periapical radiograph', title:'Maxillary centrals, #8 and #9',
+    note:'Look at the dark line around each root (the PDL space) and the white line outside it (the lamina dura), next to the neighbors.',
+    svg: pa(360, 300, 150, [{ x:42, kind:'incisor' }, { x:136, kind:'incisor', pdl:'funnel', lamina:'thick' }, { x:226, kind:'incisor', pdl:'funnel', lamina:'thick' }, { x:320, kind:'incisor' }], 11, 'Periapical radiograph of the maxillary central incisors', { max:true }) };
+  I.paImplant30 = { kind:'Periapical radiograph', title:'#29, implant crown #30, #31',
+    svg: pa(380, 300, 150, [{ x:58, kind:'premolar' }, { x:172, implant:true }, { x:300, kind:'molar' }], 23, 'Periapical radiograph with an implant crown between a premolar and a molar') };
+  I.paImplant6 = { kind:'Periapical radiograph', title:'#5, implant crown #6, #7',
+    svg: pa(360, 300, 146, [{ x:62, kind:'premolar' }, { x:170, implant:true, canine:true }, { x:276, kind:'incisor' }], 37, 'Periapical radiograph of an implant in the canine position', { max:true }) };
+  I.paCanine6 = { kind:'Periapical radiograph', title:'#5, #6, #7',
+    note:'Compare the bone level around #6 with its neighbors.',
+    svg: pa(360, 300, 138, [{ x:64, kind:'premolar' }, { x:172, kind:'canine', bone:58 }, { x:278, kind:'incisor' }], 51, 'Periapical radiograph of the canine region', { max:true }) };
+  I.bwOver = { kind:'Bitewing radiograph', title:'Right molars, #2-#3 over #30-#31',
+    note:'Follow the plane of occlusion from the premolars back, and look at the distobuccal cusp of #30.',
+    svg: (function(){
+      var w = 420, h = 250, mid = 125, crest = mid + 2 + 58 + 14;
+      function half(teeth, seed){ return '<path class="xr-bone" d="M0 ' + crest + ' L' + w + ' ' + crest + ' L' + w + ' ' + (h + 60) + ' L0 ' + (h + 60) + 'Z"/>' + trabeculae(2, crest + 2, w - 4, h - crest, seed, 50) + teeth.map(function(t){ return paTooth(Object.assign({ crest:crest }, t)); }).join(''); }
+      /* both rows drawn crown-up; the upper one is flipped about the plane of occlusion so its crowns point down */
+      var up = half([{ x:56, kind:'premolar' }, { x:162, kind:'molar', resto:'amalgam', scoop:14 }, { x:282, kind:'molar' }, { x:398, kind:'molar' }], 5);
+      var lo = half([{ x:44, kind:'premolar' }, { x:150, kind:'molar', plunge:16 }, { x:270, kind:'molar' }, { x:386, kind:'molar' }], 6);
+      var s = '<g transform="translate(0 ' + (2 * mid) + ') scale(1 -1)">' + up + '</g>' + lo;
+      return '<svg class="xr" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Bitewing radiograph of the right molars"><rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>' + s + T(18, 238, 'R', 'xr-lab') + '</svg>';
+    })() };
+  /* TMJ, lateral view (radiograph style): condyle position relative to fossa and eminence */
+  function tmj(pos){
+    var w = 380, h = 280, s = '<rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>';
+    s += '<path class="xr-bone" d="M0 0 L380 0 L380 120 C330 120 300 104 270 128 C246 150 226 156 206 140 C180 118 170 74 140 70 C108 66 96 104 84 120 C70 140 30 138 0 132Z"/>';
+    s += trabeculae(6, 6, 368, 90, 77, 90);
+    s += '<ellipse class="xr-dark" cx="62" cy="92" rx="22" ry="18"/>' + T(48, 128, 'EAM', 'xr-lab');
+    var cx = pos === 'seated' ? 140 : 296, cy = pos === 'seated' ? 92 : 130, ang = pos === 'seated' ? 0 : 30;
+    s += '<g transform="rotate(' + ang + ' ' + cx + ' ' + cy + ')"><path class="xr-condyle" d="M' + (cx - 26) + ' ' + (cy + 8) + ' C' + (cx - 28) + ' ' + (cy - 22) + ' ' + (cx + 28) + ' ' + (cy - 22) + ' ' + (cx + 26) + ' ' + (cy + 8) + ' L' + (cx + 18) + ' ' + (cy + 150) + ' L' + (cx - 30) + ' ' + (cy + 150) + 'Z"/></g>';
+    s += T(214, 126, 'articular eminence', 'xr-lab', 'middle') + T(150, 52, 'glenoid fossa', 'xr-lab', 'middle');
+    return '<svg class="xr" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Lateral TMJ view">' + s + '<circle class="xr-dot" cx="18" cy="262" r="4"/></svg>';
+  }
+  I.tmjOpen = { kind:'TMJ radiograph, lateral view', title:'Right side, attempting to close', svg: tmj('front') };
+  /* ---------- intraoral views (drawn) ---------- */
+  function gums(w, h){ return '<rect class="io-bg" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>'; }
+  /* frontal view (cheek retractors), first premolar to first premolar, patient's right on YOUR left.
+     o = { ov: vertical overlap in px (5 px ~ 1 mm; negative = open), aob (incisors open, back teeth together, tongue),
+     deep + retro + flare (Class II div 2), worn, c4 (Class IV composite at #8's mesioincisal corner), pfm (#6-#11 PFMs) } */
+  function front(o){
+    var w = 420, h = 250, mid = 210, occ = 124, s = gums(w, h);
+    var U = [['8',-1,40,52],['9',1,40,52],['7',-1,31,44],['10',1,31,44],['6',-1,33,50],['11',1,33,50],['5',-1,28,40],['12',1,28,40]];
+    var L = [['25',-1,25,38],['24',1,25,38],['26',-1,27,40],['23',1,27,40],['27',-1,31,46],['22',1,31,46],['28',-1,29,38],['21',1,29,38]];
+    function lay(list, k){ var xl = mid, xr = mid; return list.map(function(t){ var wd = t[2] * k, x; if(t[1] < 0){ x = xl - wd - 1.5; xl = x; } else { x = xr + 1.5; xr = x + wd; } return { n:t[0], side:t[1], x:x, w:wd, h:t[3] }; }); }
+    var K = 1.3; U.concat(L).forEach(function(t){ t[3] *= K; }); var up = lay(U, K), lo = lay(L, K * 1.08);
+    function isInc(n){ return ['7','8','9','10','23','24','25','26'].indexOf(n) > -1; }
+    function isCan(n){ return n === '6' || n === '11' || n === '22' || n === '27'; }
+    function edgeUp(t){ return occ - (o.aob && isInc(t.n) ? 6 : 0); }
+    function edgeLo(t){ var ov = o.ov == null ? 16 : o.ov; if(o.aob) ov = isInc(t.n) ? -24 : isCan(t.n) ? -8 : 10; return occ - ov; }
+    function hUp(t){ return t.h * (o.worn ? (isInc(t.n) ? .7 : isCan(t.n) ? .78 : .92) : o.retro && (t.n === '8' || t.n === '9') ? .86 : 1); }
+    function hLo(t){ return t.h * (o.worn ? (isInc(t.n) ? .74 : .84) : 1); }
+    function crown(x, wd, yE, yC, up, pointy){
+      var d = up ? 1 : -1, ht = Math.abs(yE - yC);
+      return OD.smooth([[x + 3, yC], [x, yC + d * ht * .45], [x + 2, yE - d * 3], [x + wd * .5, yE + d * (pointy || 0)], [x + wd - 2, yE - d * 3], [x + wd, yC + d * ht * .45], [x + wd - 3, yC]], true);
+    }
+    var cU = edgeUp(up[0]) - hUp(up[0]), cL = edgeLo(lo[0]) + hLo(lo[0]);
+    s += '<path class="io-gum" d="M8 8 L412 8 L412 ' + f1(cU + 26) + ' Q210 ' + f1(cU - 2) + ' 8 ' + f1(cU + 26) + 'Z"/>';
+    s += '<path class="io-gum low" d="M8 242 L412 242 L412 ' + f1(cL - 22) + ' Q210 ' + f1(cL + 2) + ' 8 ' + f1(cL - 22) + 'Z"/>';
+    if(o.aob) s += '<path class="io-tongue" d="M118 ' + (occ - 2) + ' Q210 ' + (occ - 14) + ' 302 ' + (occ - 2) + ' Q302 ' + (occ + 22) + ' 210 ' + (occ + 26) + ' Q118 ' + (occ + 22) + ' 118 ' + (occ - 2) + 'Z"/>';
+    /* lower teeth first: the upper teeth overlap them in front */
+    lo.forEach(function(t){ var yE = edgeLo(t), arc = Math.abs(t.x + t.w / 2 - mid) * .06; s += '<path class="io-tooth low' + (o.worn ? ' worn' : '') + '" d="' + crown(t.x, t.w, yE + arc * .3, yE + hLo(t) - arc, false, isCan(t.n) && !o.worn ? 5 : 0) + '"/>';
+      if(o.worn && (isInc(t.n) || isCan(t.n))) s += '<ellipse class="io-dentin" cx="' + f1(t.x + t.w / 2) + '" cy="' + f1(yE + 3) + '" rx="' + f1(t.w * .26) + '" ry="1.8"/>'; });
+    var order = up.slice().sort(function(a, b){ var r = function(n){ return n === '8' || n === '9' ? (o.flare ? 0 : 1) : n === '7' || n === '10' ? (o.flare ? 2 : 0) : -1; }; return r(a.n) - r(b.n); });
+    order.forEach(function(t){
+      var yE = edgeUp(t), arc = Math.abs(t.x + t.w / 2 - mid) * .06, yC = yE - hUp(t) + arc, lat = t.n === '7' || t.n === '10', cen = t.n === '8' || t.n === '9';
+      var x = t.x + (o.flare && lat ? -t.side * 4 : 0), pfm = o.pfm && ['6','7','8','9','10','11'].indexOf(t.n) > -1;
+      s += '<path class="io-tooth' + (o.worn ? ' worn' : '') + (pfm ? ' pfm' : '') + '" d="' + crown(x, t.w, yE - arc * .3, yC, true, isCan(t.n) && !o.worn ? 7 : 0) + '"/>';
+      if(o.retro && cen) s += '<path class="io-shade" d="M' + f1(x + 4) + ' ' + f1(yE - 16) + ' L' + f1(x + t.w - 4) + ' ' + f1(yE - 16) + ' L' + f1(x + t.w - 3) + ' ' + f1(yE - 3) + ' L' + f1(x + 3) + ' ' + f1(yE - 3) + 'Z"/>';
+      if(pfm) s += '<path class="io-margin" d="M' + f1(x + 3) + ' ' + f1(yC + 2) + ' Q' + f1(x + t.w / 2) + ' ' + f1(yC + 6) + ' ' + f1(x + t.w - 3) + ' ' + f1(yC + 2) + '"/>';
+      if(o.worn && (cen || lat || isCan(t.n))) s += '<ellipse class="io-dentin" cx="' + f1(x + t.w / 2) + '" cy="' + f1(yE - 3) + '" rx="' + f1(t.w * .28) + '" ry="2"/>';
+      if(o.c4 && t.n === '8'){ var xm = x + t.w; s += '<path class="io-comp" d="M' + f1(xm - 15) + ' ' + f1(yE - 2) + ' L' + f1(xm - 2) + ' ' + f1(yE - 20) + ' L' + f1(xm - 1) + ' ' + f1(yE - 3) + 'Z"/><path class="io-crack" d="M' + f1(xm - 15) + ' ' + f1(yE - 2) + ' L' + f1(xm - 2) + ' ' + f1(yE - 20) + '"/>'; }
+    });
+    s += T(10, 16, 'patient’s right', 'io-lab') + T(410, 16, 'patient’s left', 'io-lab', 'end');
+    return '<svg class="io" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + (o.aria || 'Frontal intraoral view') + '">' + s + '</svg>';
+  }
+  I.frontDiv2 = { kind:'Intraoral photo (drawn)', title:'Frontal view in MIP', svg: front({ ov:34, retro:true, flare:true, aria:'Frontal view: upper centrals tipped back covering most of the lower incisors, laterals flared' }) };
+  I.frontAOB = { kind:'Intraoral photo (drawn)', title:'Frontal view, swallowing', svg: front({ aob:true, aria:'Frontal view: front teeth apart with the tongue between them while the back teeth touch' }) };
+  I.frontE2E = { kind:'Intraoral photo (drawn)', title:'Frontal view in MIP', svg: front({ ov:0, c4:true, aria:'Frontal view: incisors meeting edge to edge; the mesioincisal corner of #8 is a composite with a fracture line' }) };
+  I.frontWorn = { kind:'Intraoral photo (drawn)', title:'Frontal view in MIP', svg: front({ ov:4, worn:true, aria:'Frontal view: incisors and canines worn flat and short, dentin showing on the edges' }) };
+  I.frontPFM = { kind:'Intraoral photo (drawn)', title:'Frontal view in MIP', svg: front({ pfm:true, aria:'Frontal view: six upper anterior crowns with gray margins at the gums' }) };
+  /* buccal (side) view of the right posterior teeth in MIP: molar relation and plane of occlusion */
+  function buccal(o){
+    var w = 440, h = 240, occ = 120, s = gums(w, h);
+    s += '<path class="io-gum" d="M10 22 L430 22 L430 ' + (occ - 52) + ' L10 ' + (occ - 52) + 'Z"/><path class="io-gum low" d="M10 ' + (h - 22) + ' L430 ' + (h - 22) + ' L430 ' + (occ + 52) + ' L10 ' + (occ + 52) + 'Z"/>';
+    /* upper: canine, PM1, PM2, M1, M2 from left (mesial) to right; lower shifted by o.shift px (Class II = positive = back) */
+    var U = [['6',58,'C'],['5',48,'P'],['4',46,'P'],['3',72,'M'],['2',64,'M']], L = [['27',50,'C'],['28',48,'P'],['29',50,'P'],['30',78,'M'],['31',72,'M']];
+    function crown(x, wd, kind, upper, plunge){
+      var e = occ, r = upper ? occ - 60 : occ + 60, d = upper ? 1 : -1, pts;
+      if(kind === 'M') pts = [[x, r], [x - 2, e - d * 24], [x + 3, e - d * 3], [x + wd * .25, e + d * 3], [x + wd * .5, e - d * 4], [x + wd * .75, e + d * (3 + (plunge || 0))], [x + wd - 3, e - d * 3], [x + wd + 2, e - d * 24], [x + wd, r]];
+      else if(kind === 'P') pts = [[x, r], [x - 2, e - d * 24], [x + 4, e - d * 4], [x + wd * .5, e + d * 4], [x + wd - 4, e - d * 4], [x + wd + 2, e - d * 24], [x + wd, r]];
+      else pts = [[x, r], [x - 3, e - d * 26], [x + 6, e - d * 8], [x + wd * .5, e + d * 9], [x + wd - 6, e - d * 8], [x + wd + 3, e - d * 26], [x + wd, r]];
+      return pts;
+    }
+    var xu = 26, xl = 26 + (o.shift || 0), lowerSvg = '', upperSvg = '', marks = '';
+    L.forEach(function(t){
+      var pts = crown(xl, t[1], t[2], false, o.plunge && t[0] === '30' ? o.plunge : 0);
+      lowerSvg += '<path class="io-tooth low" d="' + OD.smooth(pts, false) + 'Z"/>';
+      if(t[0] === '30'){ lowerSvg += '<path class="io-groove" d="M' + f1(xl + t[1] * .4) + ' ' + f1(occ + 4) + ' L' + f1(xl + t[1] * .43) + ' ' + f1(occ + 34) + '"/>'; marks += '<circle class="io-mark2" cx="' + f1(xl + t[1] * .4) + '" cy="' + f1(occ + 6) + '" r="3.5"/>'; }
+      xl += t[1] + 2;
+    });
+    U.forEach(function(t){
+      var pts = crown(xu, t[1], t[2], true, 0);
+      upperSvg += '<path class="io-tooth' + (o.resto3 && t[0] === '3' ? ' amalgam' : '') + '" d="' + OD.smooth(pts, false) + 'Z"/>';
+      if(t[0] === '3') marks += '<circle class="io-mark" cx="' + f1(xu + t[1] * .25) + '" cy="' + f1(occ - 4) + '" r="4"/>';
+      xu += t[1] + 2;
+    });
+    s += lowerSvg + upperSvg + marks;
+    if(o.plane) s += '<path class="io-plane" d="M14 ' + occ + ' L426 ' + occ + '"/>';
+    s += T(28, 16, 'mesial ←', 'io-lab') + T(380, 16, '→ distal', 'io-lab');
+    (o.labels || []).forEach(function(l){ s += T(l[0], l[1], l[2], 'io-lab', 'middle'); });
+    return '<svg class="io" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + (o.aria || 'Right buccal view in MIP') + '">' + s + '</svg>';
+  }
+  I.buccalII = { kind:'Intraoral photo (drawn)', title:'Right buccal view in MIP', svg: buccal({ shift:30, aria:'Right buccal view: the blue dot marks the mesiobuccal cusp of #3, the red dot the buccal groove of #30', labels:[[170, 232, 'blue: MB cusp of #3   red: buccal groove of #30']] }) };
+  I.buccalOver = { kind:'Intraoral photo (drawn)', title:'Right buccal view in MIP', svg: buccal({ shift:-12, plunge:16, plane:true, resto3:true, aria:'Right buccal view: the distobuccal cusp of #30 rises above the occlusal plane line into #3', labels:[[220, 232, 'dashed line: the plane of occlusion']] }) };
+  /* ---------- articulating paper and shimstock on occlusal rows ---------- */
+  /* marks: [ arch, toothType, kind, at ] kind 'blue' (MIP, closing) | 'red' (excursion streak from at[0] to at[1]) | 'wear' */
+  function marksRow(arch, side, marks, o){
+    o = o || {}; var k = o.k || 10, W = 470, r = OD.row(arch, side, { x0:o.x0 || 24, yc:o.yc || 80, k:k, W:W }), s = '<rect class="io-plate" x="0" y="0" width="' + W + '" height="' + (o.h || 160) + '" rx="14"/>' + r.svg;
+    s += OD.numLabels(r, 0, arch === 'mand');
+    function at(t, p){ var tt = r.teeth[t]; return typeof p === 'string' ? tt.pt[p] : tt.P(p); }
+    marks.forEach(function(m){
+      var t = m[0], kind = m[1];
+      if(kind === 'blue'){ var p = at(t, m[2]); s += '<circle class="ap-blue' + (m[3] ? ' big' : '') + '" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="' + (m[3] ? 9 : 5) + '"/>' + (m[3] ? '<circle class="ap-blue-ring" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="15"/>' : ''); }
+      else if(kind === 'red'){ var a = at(t, m[2]), b = at(t, m[3]); s += '<path class="ap-red" d="M' + f1(a[0]) + ' ' + f1(a[1]) + 'L' + f1(b[0]) + ' ' + f1(b[1]) + '"/>'; }
+      else if(kind === 'wear'){ var c = at(t, m[2]); s += '<ellipse class="ap-wear" cx="' + f1(c[0]) + '" cy="' + f1(c[1]) + '" rx="' + (m[3] || 9) + '" ry="' + ((m[3] || 9) * .7) + '"/>'; }
+      else if(kind === 'crack'){ var c1 = at(t, m[2]), c2 = at(t, m[3]); s += '<path class="ap-crack" d="M' + f1(c1[0]) + ' ' + f1(c1[1]) + 'L' + f1((c1[0] + c2[0]) / 2 + 3) + ' ' + f1((c1[1] + c2[1]) / 2 - 2) + 'L' + f1(c2[0]) + ' ' + f1(c2[1]) + '"/>'; }
+    });
+    (o.labels || []).forEach(function(l){ s += T(l[0], l[1], l[2], 'fg-t sm', l[3] || 'start'); });
+    return '<svg viewBox="0 0 ' + W + ' ' + (o.h || 160) + '" role="img" aria-label="' + (o.aria || 'Occlusal view with articulating paper marks') + '">' + s + '</svg>';
+  }
+  I.marksNW3 = { note:'Blue = tapping closed in MIP. Red = marks made in a LEFT lateral excursion.', kind:'Articulating paper', title:'#3 after the new crown (blue = closing, red = excursions)',
+    svg: marksRow('max', 'R', [['M1','blue','m'],['M1','blue','c'],['M1','blue','ML'],['PM2','blue','m'],['M2','blue','m'],['M2','blue','c'],['PM1','blue','m'],
+      ['M1','red',[.36,.68],[.46,.5]]], { aria:'Upper right teeth #6 to #2 with blue closing marks and one red excursion streak on #3' }) };
+  I.marksPro = { note:'Upper left quadrant, #11 to #15. Blue = closing in MIP. Red = the patient sliding straight forward to edge to edge.', kind:'Articulating paper', title:'Upper left, protrusion (red) over closing (blue)',
+    svg: marksRow('max', 'L', [['M1','blue','m'],['M1','blue','c'],['M2','blue','m'],['M2','blue','c'],['PM2','blue','m'],['PM1','blue','m'],
+      ['M2','red',[.54,.7],[.42,.73]], ['M2','red',[.88,.72],[.78,.75]], ['M1','red',[.5,.7],[.38,.72]]], { aria:'Upper left teeth with red protrusive streaks on the molars' }) };
+  I.marksUpright = { note:'Lower left quadrant, #22 to #18, marked while he taps closed sitting up. The big dark marks are on the new MO composite on #19.', kind:'Shimstock and articulating paper', title:'Lower left, sitting upright',
+    svg: marksRow('mand', 'L', [['M1','blue','c',1],['M1','blue','MB',1],['PM2','blue','B'],['M2','blue','MB'],['PM1','blue','B']], { yc:72, aria:'Lower left teeth with large dark marks on #19 and faint marks elsewhere' }) };
+  I.marksWear = { note:'Gray = shiny, flat wear facets. The distolingual cusp of #2 is cracked. The big blue mark is the first contact when the jaw is guided closed with the joints seated.', kind:'Clinical findings (drawn)', title:'Upper right, occlusal view',
+    svg: marksRow('max', 'R', [['M2','wear','ML',10],['M2','wear','DB',8],['M1','wear','ML',9],['C','wear','T',10],['M2','crack',[.62,.9],[.8,.58]],['M2','blue','m',1]], { aria:'Upper right teeth with wear facets, a cracked cusp on #2 and a first contact mark on #2' }) };
+  /* ---------- periodontal chart (HTML: stays readable on phones) ----------
+     rows: { teeth:['6',...], mob:[...], frem:[...], fac:[[3 depths],...], lin:[[3],...], rec:[...], bop:[[...],...], missing:['2',...] } */
+  function chart(c){
+    function cell(v, i, kind){ if(c.missing && c.missing.indexOf(c.teeth[i]) > -1) return '<td class="pc-miss">X</td>';
+      if(kind === 'pd') return '<td class="pc-pd">' + v.map(function(n, j){ var b = c.bop && c.bop[i] && c.bop[i][j]; return '<span class="' + (n >= 5 ? 'deep' : '') + (b ? ' bop' : '') + '">' + n + '</span>'; }).join('') + '</td>';
+      return '<td' + (v && v !== '0' && v !== '-' ? ' class="pc-flag"' : '') + '>' + (v == null ? '' : v) + '</td>'; }
+    var h = '<div class="pchart-wrap"><table class="pchart"><thead><tr><th>Tooth</th>' + c.teeth.map(function(t){ return '<th>#' + t + '</th>'; }).join('') + '</tr></thead><tbody>';
+    h += '<tr><th>Mobility</th>' + c.mob.map(function(v, i){ return cell(String(v), i); }).join('') + '</tr>';
+    if(c.frem) h += '<tr><th>Fremitus</th>' + c.frem.map(function(v, i){ return cell(v, i); }).join('') + '</tr>';
+    h += '<tr><th>Probing, facial</th>' + c.fac.map(function(v, i){ return cell(v, i, 'pd'); }).join('') + '</tr>';
+    h += '<tr><th>Probing, lingual</th>' + c.lin.map(function(v, i){ return cell(v, i, 'pd'); }).join('') + '</tr>';
+    if(c.rec) h += '<tr><th>Recession</th>' + c.rec.map(function(v, i){ return cell(String(v), i); }).join('') + '</tr>';
+    h += '</tbody></table></div><div class="pchart-key">Depths in mm, three sites per surface; <span class="deep">5+</span> in bold, <span class="bop">red</span> = bleeding on probing. Mobility 0-3; fremitus + = vibration felt when the patient taps or grinds.</div>';
+    return h;
+  }
+  I.chartTrauma = { kind:'Periodontal chart', title:'Maxillary anteriors', html: chart({ teeth:['6','7','8','9','10','11'], mob:[0,0,1,1,0,0], frem:['-','-','+','+','-','-'],
+    fac:[[2,1,2],[2,2,2],[2,1,3],[3,1,2],[2,2,2],[2,1,2]], lin:[[2,2,3],[2,2,2],[3,2,3],[3,2,3],[2,2,2],[3,2,2]], rec:[0,0,0,0,0,0] }) };
+  I.chartSlide = { kind:'Periodontal chart', title:'Right molars', html: chart({ teeth:['2','3','30','31'], mob:[0,0,0,1], frem:['+','-','-','+'],
+    fac:[[3,2,3],[2,2,3],[3,2,2],[3,2,3]], lin:[[3,2,3],[3,2,2],[2,2,3],[3,3,3]], rec:[0,0,0,1] }) };
+  I.chartCanine = { kind:'Periodontal chart', title:'Upper right', html: chart({ teeth:['3','4','5','6','7','8'], mob:[0,0,0,2,0,0],
+    fac:[[3,2,3],[2,2,3],[3,2,3],[6,4,6],[2,2,3],[2,1,2]], lin:[[3,2,3],[3,2,3],[3,2,3],[7,5,6],[3,2,2],[2,2,2]], bop:[null,null,null,[1,0,1],null,null], rec:[0,0,0,3,0,0] }) };
+  I.chartSDA = { kind:'Periodontal chart', title:'Upper arch (X = missing)', html: chart({ teeth:['2','3','4','5','6','7','8','9','10','11','12','13','14','15'], missing:['2','3','4','5','12','13','14','15'],
+    mob:[0,0,0,0,1,2,2,2,2,1,0,0,0,0], fac:[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[3,2,3],[3,2,4],[4,3,4],[4,3,4],[3,2,4],[3,2,3],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],
+    lin:[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[3,2,3],[4,3,4],[4,3,5],[5,3,4],[4,3,4],[3,2,3],[0,0,0],[0,0,0],[0,0,0],[0,0,0]], rec:[0,0,0,0,1,1,2,2,1,1,0,0,0,0] }) };
+  /* shimstock results (HTML table) */
+  function shim(rows, note){ return '<div class="pchart-wrap"><table class="pchart shim"><thead><tr><th>Tooth</th><th>Light closure</th><th>Firm clench</th></tr></thead><tbody>' +
+    rows.map(function(r){ return '<tr><th>#' + r[0] + '</th><td class="' + (r[1] === 'holds' ? 'sh-hold' : 'sh-pull') + '">' + r[1] + '</td><td class="' + (r[2] === 'holds' ? 'sh-hold' : 'sh-pull') + '">' + r[2] + '</td></tr>'; }).join('') + '</tbody></table></div>' + (note ? '<div class="pchart-key">' + note + '</div>' : ''); }
+  I.shimImplant = { kind:'Shimstock test (12 µm)', title:'At delivery', html: shim([['29','holds','holds'],['30 (implant crown)','holds','holds'],['31','holds','holds']], 'Right lateral excursion with red articulating paper: a mark on the buccal incline of the implant crown\'s distobuccal cusp, along with the canine.') };
+  I.shimUpright = { kind:'Shimstock test (12 µm)', title:'Sitting upright, tapping closed', html: shim([['18','pulls through','pulls through'],['19 (new MO composite)','holds','holds'],['20','pulls through','pulls through'],['21','pulls through','holds']]) };
+  /* mounted casts, side view: o.mode 'cr' = closed on the centric latch until the first contact */
+  I.castsCR = { kind:'Mounted diagnostic casts', title:'Right side, mounted in CR (centric latch locked)',
+    svg: (function(){
+      var w = 440, h = 250, s = '<rect class="io-plate" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>';
+      s += '<rect class="ar-metal" x="60" y="20" width="330" height="22" rx="6"/><rect class="ar-metal" x="60" y="214" width="330" height="22" rx="6"/>';
+      s += '<rect class="ar-metal" x="372" y="38" width="18" height="180"/><circle class="ar-joint" cx="381" cy="128" r="16"/><text class="fg-t sm" x="402" y="132">condyle</text>';
+      s += '<rect class="ar-metal" x="58" y="40" width="8" height="64"/><rect class="ar-metal" x="40" y="194" width="44" height="10" rx="3"/><text class="fg-t sm" x="8" y="62">guide</text><text class="fg-t sm" x="8" y="74">pin</text>';
+      s += '<path class="ar-stone" d="M90 42 L350 42 L350 92 L300 108 L90 104Z"/><path class="ar-stone" d="M90 212 L350 212 L350 160 L300 150 L90 156Z"/>';
+      function row(y0, up){
+        var x = 104, out = '';
+        [[30,'I'],[30,'C'],[34,'P'],[34,'P'],[52,'M'],[52,'M']].forEach(function(t, i){
+          var wd = t[0], e = up ? y0 : y0, r = up ? y0 - 28 : y0 + 28, d = up ? 1 : -1;
+          var pts = t[1] === 'M' ? [[x, r], [x - 2, e - d * 12], [x + 4, e], [x + wd * .5, e - d * 3], [x + wd - 4, e], [x + wd + 2, e - d * 12], [x + wd, r]]
+                                 : [[x, r], [x - 2, e - d * 12], [x + wd * .5, e + d * 3], [x + wd + 2, e - d * 12], [x + wd, r]];
+          out += '<path class="io-tooth' + (up ? '' : ' low') + '" d="' + OD.smooth(pts, false) + 'Z"/>'; x += wd + 3;
+        });
+        return out;
+      }
+      /* closed in CR: the jaw rotates open around the condyle until the second molars touch, so the front is open */
+      s += row(124, true);
+      s += '<g transform="rotate(-3.2 381 128)">' + row(121, false) + '</g>';
+      s += '<circle class="ap-blue big" cx="318" cy="127" r="6"/><circle class="ap-blue-ring" cx="318" cy="127" r="12"/>';
+      s += '<path class="ar-metal" d="M62 104 L62 182" style="stroke-width:5"/><text class="fg-t sm" x="76" y="186">pin off the table</text>';
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Casts on an articulator in centric relation: the second molars touch first and the front teeth are apart">' + s + '</svg>';
+    })() };
+  /* bite registration, occlusal view of the record as it came back with the casts */
+  I.recordFull = { kind:'Bite registration sent to the lab', title:'Occlusal view of the PVS record',
+    svg: (function(){
+      var w = 420, h = 250, s = '<rect class="io-plate" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>';
+      s += '<path class="pv-body" d="M46 226 C24 120 70 26 210 22 C350 26 396 120 374 226 L322 226 C336 134 300 78 210 76 C120 78 84 134 98 226Z"/>';
+      s += '<path class="pv-flash" d="M98 226 C84 134 120 78 210 76 C300 78 336 134 322 226 L292 226 C300 160 270 120 210 118 C150 120 120 160 128 226Z"/>';
+      var r = rnd(9);
+      for(var i = 0; i < 14; i++){ var a = Math.PI * (0.06 + i * 0.0632), cx = 210 - Math.cos(a) * 140, cy = 220 - Math.sin(a) * 160; s += '<ellipse class="pv-imp" cx="' + f1(cx) + '" cy="' + f1(cy) + '" rx="' + f1(9 + r() * 5) + '" ry="' + f1(6 + r() * 3) + '"/>'; }
+      s += '<ellipse class="pv-prep" cx="98" cy="170" rx="14" ry="10"/>';
+      s += T(210, 240, 'Full arch, untrimmed, with flash onto the palate', 'fg-t sm', 'middle') + T(98, 196, '#30 prep', 'fg-t sm', 'middle');
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="A horseshoe PVS bite record covering every tooth with excess onto the palate">' + s + '</svg>';
+    })() };
+  /* "f" sound, side view of the lips and upper central */
+  I.lipF = { kind:'Phonetics check (drawn)', title:'Patient says "fifty-five"',
+    svg: (function(){
+      var w = 380, h = 230, s = '<rect class="io-plate" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>';
+      s += '<path class="io-lip" d="M90 40 C150 30 220 40 250 62 C262 72 258 86 240 90 C200 96 150 92 90 96Z"/>';
+      s += '<path class="io-tooth" d="M170 60 C182 62 190 80 196 108 L204 146 C205 152 196 154 192 150 L174 120 C166 102 160 80 160 66Z"/>';
+      s += '<path class="io-lip low" d="M80 150 C150 132 220 128 262 140 C276 146 276 166 258 174 C210 190 150 192 80 190Z"/>';
+      s += '<path class="io-wet" d="M200 136 C226 134 248 136 262 142" />';
+      s += '<path class="io-press" d="M188 146 C196 152 204 154 212 150"/>';
+      s += T(296, 150, 'wet-dry line', 'fg-t sm') + T(214, 30, 'upper lip', 'fg-t sm') + T(240, 210, 'lower lip', 'fg-t sm') + T(100, 128, 'new crown #8', 'fg-t sm');
+      return '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Side view: the incisal edge of the new crown presses into the lower lip inside the wet-dry line">' + s + '</svg>';
+    })() };
+  return I;
+})();
+function caseImgHTML(q){
+  if(!q.pimg) return '';
+  return '<div class="pimg-grid">' + q.pimg.map(function(k){ var c = CASE_IMG[k]; if(!c) return '';
+    return '<figure class="pimg"><figcaption><b>' + escHtml(c.kind) + '</b> · ' + escHtml(c.title) + '</figcaption>' + (c.svg || c.html) + (c.note ? '<div class="pimg-cap">' + escHtml(c.note) + '</div>' : '') + '</figure>'; }).join('') +
+    '</div><div class="pimg-note">Drawn for this hub to show the findings; not a patient image.</div>';
+}
+/* ---------- "WHAT CUSP HITS WHERE?" (mini game at the top of the Question Bank, 2026-10-20) ----------
+   Two modes, 10 rounds each, built on the help sheet's rules (OD.CONTACTS):
+   - Contacts: a cusp on one arch is lit; tap the fossa it lands in on the other arch. Class I most often, II and III too,
+     right and left sides. After each tap the lower row slides into its class position and the contact lines appear.
+   - Movements: "What is the cusp and motion in this picture?" One tooth, one arrow from its MIP contact (the base of
+     the arrow): name the movement first, then the cusp that made it (the help sheet's two-step method).
+   Rounds are generated, not bank questions, so they don't count in class stats; the best score is kept in STATE.cusp. */
+var CUSP_GAME = (function(){
+  var R = 10, st = null, host = null;
+  function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
+  function cname(arch, t, c, side){ return OD.CUSP_NAME[c] + ' cusp of #' + OD.NUMS[arch][side][t]; }
+  function fname(arch, t, f, side){ return OD.FOSSA_NAME[f] + ' of #' + OD.NUMS[arch][side][t]; }
+  function best(){ if(!STATE.cusp) STATE.cusp = { best:{ contacts:0, moves:0 }, plays:0 }; return STATE.cusp; }
+  function classPick(){ var r = Math.random(); return r < .5 ? 1 : r < .75 ? 2 : 3; }
+  /* ---- contacts ---- */
+  function newContact(){
+    var cls = classPick(), side = Math.random() < .6 ? 'R' : 'L', list = OD.CONTACTS[cls], c;
+    do { c = pick(list); } while(st.last && st.last === cls + c.join());
+    st.last = cls + c.join();
+    return { mode:'contacts', cls:cls, side:side, c:c, done:false };
+  }
+  function contactSVG(rd, reveal){
+    var q = OD.quad(rd.cls, rd.side, { x0:40, k:8.2, yMax:72, yMand:214, W:480 }), c = rd.c, from = c[0], to = from === 'mand' ? 'max' : 'mand';
+    var src = q[from].teeth[c[1]].pt[c[2]], s = '';
+    /* before answering the rows are lined up at the canines (no hint); the reveal slides the lower row to its class position */
+    var dx = q.dx, shiftAll = rd.side === 'R' ? Math.max(0, -(40 + dx - 6)) : -Math.max(0, dx - 34);
+    /* reveal: drawn at the canine-aligned start, then slid into place (CUSP_GAME.draw sets the target transform) */
+    s += '<g class="cg-all" data-to="' + OD.f1(reveal ? shiftAll : 0) + '" style="transform:translateX(0px)">' + q.max.svg + OD.numLabels(q.max, 0, false);
+    s += '<g class="cg-low" data-to="' + OD.f1(reveal ? dx : 0) + '" style="transform:translateX(0px)">' + q.mand.svg + OD.numLabels(q.mand, 0, true);
+    var mandTargets = '', maxTargets = '';
+    ['max', 'mand'].forEach(function(a){
+      OD.ORDER.forEach(function(t){ if(t === 'C') return; var tt = q[a].teeth[t];
+        Object.keys(OD.SPEC[(a === 'max' ? 'max' : 'man') + t].fossae).forEach(function(f){
+          var p = tt.pt[f], ok = to === a && t === c[3] && (f === c[4] || f === c[5]), chosen = rd.tap && rd.tap.t === t && rd.tap.f === f && rd.tap.a === a;
+          var cls = 'cg-hot' + (rd.done ? (ok ? ' ok' : chosen ? ' bad' : '') : '') + (to !== a ? ' off' : '');
+          var g = '<circle class="' + cls + '" data-cg-hot="' + a + ':' + t + ':' + f + '" cx="' + OD.f1(p[0]) + '" cy="' + OD.f1(p[1]) + '" r="12.5" tabindex="' + (to === a && !rd.done ? 0 : -1) + '" role="button" aria-label="' + escHtml(fname(a, t, f, rd.side)) + '"/>';
+          if(a === 'mand') mandTargets += g; else maxTargets += g;
+        });
+      });
+    });
+    s += mandTargets;
+    var sp = src, srcMark = '<circle class="cg-src" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="9"/><circle class="cg-src-ring" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="15"/>';
+    if(from === 'mand') s += srcMark;
+    s += '</g>' + maxTargets + (from === 'max' ? srcMark : '');
+    if(reveal){ var hl = OD.CONTACTS[rd.cls].indexOf(c); s += '<g class="cg-lines">' + OD.contactLines(q, rd.cls, { hl:hl }) + '</g>'; }
+    s += '</g>';
+    s += OD.txt(6, 76, 'Upper', 'fg-t sm') + OD.txt(6, 218, 'Lower', 'fg-t sm');
+    return '<svg class="cg-svg" viewBox="0 0 480 280" role="img" aria-label="Upper and lower posterior teeth, occlusal views">' + s + '</svg>';
+  }
+  function contactExplain(rd){
+    var c = rd.c, cls = rd.cls, from = c[0], to = from === 'mand' ? 'max' : 'mand';
+    var right = fname(to, c[3], c[4], rd.side) + (c[5] ? ' (or as far back as the ' + OD.FOSSA_NAME[c[5]] + ': the help sheet calls this posterior contact "highly variable")' : '');
+    var why = '';
+    if(c[3].indexOf('PM') === 0) why = cls === 2 ? 'Class II flips the premolar rule: upper premolars take contacts in their DISTAL fossae, lower premolars in their MESIAL fossae.' : 'Class I and III premolars: upper contacts in the MESIAL fossae, lower contacts in the DISTAL fossae.';
+    else why = 'Molars have an anterior and a posterior opposing contact. ' + (cls === 1 ? 'Anchor on the first molar\'s posterior contact (the DB cusp of #30 on #3) and step from there.' : cls === 2 ? 'In Class II everything steps back one post from Class I.' : 'In Class III everything comes forward one post from Class I.');
+    return 'The <b>' + escHtml(cname(from, c[1], c[2], rd.side)) + '</b> lands in the <b>' + escHtml(right) + '</b>. ' + why + ' The fence post only shows which cusp comes closest; the anatomy (cusp-fossa) names the spot.';
+  }
+  /* ---- movements ---- */
+  var MOVES = [['P','Protrusive'],['W','Working (laterotrusive)'],['NW','Non-working (mediotrusive)'],['R','Retrusive']];
+  function newMove(){
+    var arch = Math.random() < .5 ? 'max' : 'mand', side = Math.random() < .6 ? 'R' : 'L';
+    /* a Class I contact landing on this arch */
+    var list = OD.CONTACTS[1].filter(function(c){ return (c[0] === 'mand') === (arch === 'max') && c[3].indexOf('M') === 0; });
+    var c = pick(list), mv = pick(['P','W','NW','R','P','W','NW']);
+    return { mode:'moves', arch:arch, side:side, c:c, mv:mv, step:1, done:false };
+  }
+  function moveVec(arch, mv){
+    /* tooth-relative unit vector [mesial+, buccal+] for the opposing cusp's path */
+    var s15 = Math.sin(15 * Math.PI / 180), c15 = Math.cos(15 * Math.PI / 180), r = Math.SQRT1_2;
+    if(arch === 'max') return { P:[1,0], W:[s15,c15], NW:[r,-r], R:[-.42,0] }[mv];
+    return { P:[-1,0], W:[-s15,-c15], NW:[-r,r], R:[.42,0] }[mv];
+  }
+  function moveSVG(rd){
+    var arch = rd.arch, key = (arch === 'max' ? 'max' : 'man') + rd.c[3], mirror = rd.side === 'L';
+    var t = OD.tooth(key, { x:110, y:60, k:16, flip:arch === 'mand', mirror:mirror }), b = t.pt[rd.c[4]];
+    var v = moveVec(arch, rd.mv), mx = mirror ? 1 : -1, by = arch === 'max' ? -1 : 1, L = 96;
+    var e = [b[0] + v[0] * mx * L, b[1] + v[1] * by * L];
+    var s = t.svg + '<circle class="od-ghost" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="11"/>' + OD.arrow(b[0], b[1], e[0], e[1], 'fg-acc', 12) + '<circle class="fg-dot" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="5"/>';
+    var top = arch === 'max' ? 'BUCCAL' : 'LINGUAL', bot = arch === 'max' ? 'PALATAL' : 'BUCCAL';
+    s += OD.txt(t.cx, 34, top, 'fg-t', 'middle') + OD.txt(t.cx, 60 + t.h + 26, bot, 'fg-t', 'middle');
+    s += OD.txt(mirror ? t.x + t.w + 14 : 8, t.cy + 4, 'MESIAL', 'fg-t sm') + OD.txt(mirror ? 8 : t.x + t.w + 14, t.cy + 4, 'DISTAL', 'fg-t sm');
+    s += OD.txt(t.cx, 16, '#' + OD.NUMS[arch][rd.side][rd.c[3]] + ' (' + (arch === 'max' ? 'maxillary ' : 'mandibular ') + (rd.side === 'R' ? 'right ' : 'left ') + OD.TOOTH_NAME[rd.c[3]] + '), occlusal view', 'fg-t sm', 'middle');
+    return '<svg class="cg-svg" viewBox="0 0 420 ' + OD.f1(60 + t.h + 40) + '" role="img" aria-label="Occlusal view of one tooth with a cusp pathway arrow">' + s + '</svg>';
+  }
+  function cuspChoices(rd){
+    var c = rd.c, from = c[0], side = rd.side, right = cname(from, c[1], c[2], side);
+    var pool = [];
+    OD.CONTACTS[1].forEach(function(x){ if(x[0] === from && x.join() !== c.join()) pool.push(cname(from, x[1], x[2], side)); });
+    /* a non-centric cusp of the same opposing tooth is the classic trap */
+    var nonCentric = from === 'mand' ? (c[1].indexOf('M') === 0 ? 'ML' : 'L') : (c[1].indexOf('M') === 0 ? 'MB' : 'B');
+    var opts = [right, cname(from, c[1], nonCentric, side)];
+    pool = shuffled(pool.filter(function(p){ return opts.indexOf(p) === -1; }));
+    while(opts.length < 4 && pool.length) opts.push(pool.shift());
+    return { right:right, opts:shuffled(opts) };
+  }
+  function moveExplain(rd){
+    var nm = MOVES.filter(function(m){ return m[0] === rd.mv; })[0][1];
+    var rule = rd.arch === 'max' ? 'On an UPPER tooth you watch a lower cusp: protrusive runs mesial, working toward buccal (leaning a little mesial), non-working mesiopalatal, retrusive a short way distal.'
+                                 : 'On a LOWER tooth you watch an upper cusp, so it all reverses: protrusive runs distal, working toward lingual (leaning a little distal), non-working distobuccal, retrusive a short way mesial.';
+    return '<b>' + nm + '</b>, made by the <b>' + escHtml(cname(rd.c[0], rd.c[1], rd.c[2], rd.side)) + '</b> (in MIP it sits in the ' + escHtml(fname(rd.arch, rd.c[3], rd.c[4], rd.side)) + ', the base of the arrow). ' + rule;
+  }
+  /* ---- shell ---- */
+  function start(mode){ st = { mode:mode, n:0, score:0, streak:0, rd:null, last:null }; next(); }
+  function next(){ st.n++; st.rd = st.mode === 'contacts' ? newContact() : newMove(); if(st.rd.mode === 'moves') st.rd.choices = cuspChoices(st.rd); draw(); }
+  function finish(){
+    var b = best(); b.plays = (b.plays || 0) + 1; var isBest = st.score > (b.best[st.mode] || 0); if(isBest) b.best[st.mode] = st.score; saveState();
+    host.innerHTML = '<div class="cg-card cg-end"><div class="cg-head"><b>What cusp hits where?</b><button type="button" class="cg-x" data-cg="close" aria-label="Close the game">' + '&times;' + '</button></div>' +
+      '<p class="cg-big">' + st.score + ' / ' + R + '</p><p>' + (isBest ? 'New best for ' + (st.mode === 'contacts' ? 'Contacts' : 'Movements') + '.' : 'Best: ' + b.best[st.mode] + ' / ' + R + '.') + ' ' +
+      (st.score >= 9 ? 'Board-ready.' : st.score >= 6 ? 'Solid. One more round locks it in.' : 'Open the fence post in the L1 notes, then try again.') + '</p>' +
+      '<div class="cg-btns"><button type="button" class="btn primary" data-cg="again">Play again</button><button type="button" class="btn" data-cg="' + (st.mode === 'contacts' ? 'moves' : 'contacts') + '">Try ' + (st.mode === 'contacts' ? 'Movements' : 'Contacts') + '</button></div></div>';
+  }
+  function draw(){
+    var rd = st.rd, h = '<div class="cg-card" data-cg-mode="' + st.mode + '"><div class="cg-head"><b>What cusp hits where?</b><span class="cg-meta">Round ' + st.n + ' / ' + R + ' · ' + st.score + ' right' + (st.streak >= 3 ? ' · ' + st.streak + ' in a row' : '') + '</span><button type="button" class="cg-x" data-cg="close" aria-label="Close the game">' + '&times;' + '</button></div>';
+    if(rd.mode === 'contacts'){
+      var c = rd.c;
+      h += '<p class="cg-q"><span class="cg-tag">Class ' + OD.ROMAN[rd.cls] + ' · cusp-fossa</span> Where does the <b>' + escHtml(cname(c[0], c[1], c[2], rd.side)) + '</b> land? <span class="cg-sub">Tap the fossa on the ' + (c[0] === 'mand' ? 'upper' : 'lower') + ' teeth.</span></p>';
+      h += '<div class="cg-stage">' + contactSVG(rd, rd.done) + '</div>';
+      if(!rd.done) h += '<div class="cg-btns"><button type="button" class="btn" data-cg="hint" aria-expanded="' + (!!rd.hint) + '">' + (rd.hint ? 'Hide' : 'Show') + ' the Class ' + OD.ROMAN[rd.cls] + ' fence post</button></div>' + (rd.hint ? '<div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40, x0:60 }) + '</div>' : '');
+      else h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + (rd.ok ? 'Right.' : 'Not quite.') + '</b> ' + contactExplain(rd) + '</div><div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40, x0:60, hl:{ mand:c[0] === 'mand' ? fpUnit(c[1], c[2]) : null }, hlMax:c[0] === 'max' ? [fpUnit(c[1], c[2])] : [] }) + '</div>';
+    } else {
+      h += '<p class="cg-q"><span class="cg-tag">' + (rd.step === 1 ? 'Step 1 of 2' : 'Step 2 of 2') + '</span> ' + (rd.step === 1 ? 'Which movement does this arrow show?' : 'Which cusp makes this path?') + ' <span class="cg-sub">Class I. The MIP contact is at the base of the arrow.</span></p>';
+      h += '<div class="cg-stage">' + moveSVG(rd) + '</div><div class="cg-opts">';
+      if(rd.step === 1) h += MOVES.map(function(m){ var cls = rd.mvPick ? (m[0] === rd.mv ? ' ok' : m[0] === rd.mvPick ? ' bad' : '') : ''; return '<button type="button" class="qcard-choice' + cls + '" data-cg-mv="' + m[0] + '"' + (rd.mvPick ? ' disabled' : '') + '>' + m[1] + '</button>'; }).join('');
+      else h += rd.choices.opts.map(function(o){ var cls = rd.cPick ? (o === rd.choices.right ? ' ok' : o === rd.cPick ? ' bad' : '') : ''; return '<button type="button" class="qcard-choice' + cls + '" data-cg-cusp="' + escHtml(o) + '"' + (rd.cPick ? ' disabled' : '') + '>' + escHtml(o) + '</button>'; }).join('');
+      h += '</div>';
+      if(rd.step === 1 && rd.mvPick) h += '<div class="cg-fb ' + (rd.mvPick === rd.mv ? 'ok' : 'bad') + '"><b>' + (rd.mvPick === rd.mv ? 'Right movement.' : 'Not that one.') + '</b> Now the cusp.</div>';
+      if(rd.done) h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + (rd.ok ? 'Both right.' : 'Not quite.') + '</b> ' + moveExplain(rd) + '</div>';
+    }
+    if(rd.done || (rd.mode === 'moves' && rd.step === 1 && rd.mvPick)) h += '<div class="cg-btns"><button type="button" class="btn primary" data-cg="' + (rd.mode === 'moves' && !rd.done ? 'step2' : 'next') + '">' + (rd.mode === 'moves' && !rd.done ? 'Next: the cusp' : st.n >= R ? 'See my score' : 'Next round') + '</button></div>';
+    h += '</div>';
+    host.innerHTML = h;
+    var moving = host.querySelectorAll('.cg-svg [data-to]');
+    if(moving.length) requestAnimationFrame(function(){ requestAnimationFrame(function(){ moving.forEach(function(g){ g.style.transform = 'translateX(' + g.getAttribute('data-to') + 'px)'; }); }); });
+    var f = host.querySelector(rd.done ? '[data-cg="next"]' : rd.mode === 'contacts' ? '.cg-hot:not(.off)' : 'button:not([disabled])');
+    if(f && st.focus){ try{ f.focus({ preventScroll:true }); }catch(e){} }
+  }
+  function fpUnit(t, c){ if(t === 'PM1') return 'P1'; if(t === 'PM2') return 'P2'; return (c === 'MB' || c === 'ML' ? 'm-' : 'd-') + t; }
+  function grade(ok){ if(ok){ st.score++; st.streak++; } else st.streak = 0; }
+  function onClick(e){
+    var hot = e.target.closest('[data-cg-hot]'), btn = e.target.closest('[data-cg],[data-cg-mv],[data-cg-cusp]');
+    if(!st && !btn) return;
+    st && (st.focus = e.detail === 0);
+    if(hot && st && st.rd.mode === 'contacts' && !st.rd.done && !hot.classList.contains('off')){
+      var p = hot.getAttribute('data-cg-hot').split(':'), c = st.rd.c, to = c[0] === 'mand' ? 'max' : 'mand';
+      st.rd.tap = { a:p[0], t:p[1], f:p[2] }; st.rd.ok = p[0] === to && p[1] === c[3] && (p[2] === c[4] || p[2] === c[5]); st.rd.done = true; grade(st.rd.ok); draw(); return;
+    }
+    if(!btn) return;
+    var a = btn.getAttribute('data-cg');
+    if(a === 'contacts' || a === 'moves'){ open(a); return; }
+    if(a === 'close'){ st = null; renderLauncher(); return; }
+    if(a === 'again'){ start(st.mode); return; }
+    if(a === 'hint'){ st.rd.hint = !st.rd.hint; draw(); return; }
+    if(a === 'next'){ if(st.n >= R) finish(); else next(); return; }
+    if(a === 'step2'){ st.rd.step = 2; draw(); return; }
+    if(btn.hasAttribute('data-cg-mv') && !st.rd.mvPick){ st.rd.mvPick = btn.getAttribute('data-cg-mv'); draw(); return; }
+    if(btn.hasAttribute('data-cg-cusp') && !st.rd.cPick){ st.rd.cPick = btn.getAttribute('data-cg-cusp'); st.rd.ok = st.rd.mvPick === st.rd.mv && st.rd.cPick === st.rd.choices.right; st.rd.done = true; grade(st.rd.ok); draw(); }
+  }
+  function onKey(e){ var hot = e.target.closest && e.target.closest('[data-cg-hot]'); if(hot && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); hot.dispatchEvent(new MouseEvent('click', { bubbles:true })); } }
+  function renderLauncher(){
+    if(!host) return; var b = best();
+    host.innerHTML = '<div class="cg-launch"><div class="cg-launch-t"><b>What cusp hits where?</b><span>Dr. Givan\'s help-sheet questions as a quick game: tap where a cusp lands (Class I, II and III), or name the movement and cusp in a pathway picture. 10 rounds.' +
+      ((b.best.contacts || b.best.moves) ? ' Your best: Contacts ' + (b.best.contacts || 0) + '/10, Movements ' + (b.best.moves || 0) + '/10.' : '') + '</span></div>' +
+      '<div class="cg-btns"><button type="button" class="btn primary" data-cg="contacts">Play: Contacts</button><button type="button" class="btn" data-cg="moves">Play: Movements</button></div></div>';
+  }
+  function open(mode){ start(mode); if(host) host.scrollIntoView({ block:'nearest' }); }
+  function mount(el){ host = el; if(!el.__cg){ el.__cg = true; el.addEventListener('click', onClick); el.addEventListener('keydown', onKey); } if(st) draw(); else renderLauncher(); }
+  return { mount:mount, open:open };
+})();
+/* od:kit end */
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order.
@@ -1236,27 +2073,27 @@ mcq('fp-path14','review','help','Watching a mandibular buccal cusp on #14 (maxil
   'On a maxillary tooth you watch a mandibular cusp: working (laterotrusive) runs toward the buccal, non-working toward the mesiopalatal, protrusive toward the mesial, retrusive toward the distal. #14 is a LEFT tooth, so a working path on it means the left side is working: the mandible moved left. A move to the right would make the left side non-working and send the cusp mesiopalatally.');
 
 /* ---------- cusp pathways and inclines (diagrams) ---------- */
-mcq('fig-pmax-a','review','help','In the diagram of a maxillary first molar, which movement does arrow A (toward mesial) show?',
+mcq('fig-pmax-a','review','help','In the diagram of #3 (maxillary right first molar), which movement does arrow A (toward mesial) show?',
   ['Protrusive','Laterotrusive (working)','Mediotrusive (non-working)','Retrusive'],
   'On a MAXILLARY tooth you are watching a mandibular buccal cusp. In protrusion the mandible moves forward, so the mandibular cusp travels MESIALLY across the maxillary tooth. Working = toward buccal; non-working = toward mesiopalatal; retrusion = distal.',
   { img:'pathMax' });
-mcq('fig-pmax-b','review','help','In the diagram of a maxillary first molar, arrow B (straight toward buccal) is the path of the mandibular buccal cusp in which movement?',
+mcq('fig-pmax-b','review','help','In the diagram of #3, arrow B (toward buccal, leaning slightly mesial) is the path of the mandibular buccal cusp in which movement?',
   ['Laterotrusive (working)','Mediotrusive (non-working)','Protrusive','Retrusive'],
-  'When this side is the working side, the mandible moves laterally (toward this tooth\'s buccal), so the mandibular buccal cusp slides out toward the maxillary buccal. The non-working path heads the other way, toward the palate and mesially.',
+  'When this side is the working side, the mandible moves laterally (toward this tooth\'s buccal), so the mandibular buccal cusp slides out toward the maxillary buccal; the help sheet\'s pathway pictures draw it leaning a little mesially, because the jaw swings around the working condyle. The non-working path heads the other way, toward the palate and mesially.',
   { img:'pathMax' });
-mcq('fig-pmax-c','review','help','In the diagram of a maxillary first molar, arrow C (toward mesiopalatal) shows which movement?',
+mcq('fig-pmax-c','review','help','In the diagram of #3, arrow C (toward mesiopalatal) shows which movement?',
   ['Mediotrusive (non-working)','Laterotrusive (working)','Protrusive','Retrusive'],
   'On the non-working side the mandible moves toward the midline AND forward (the orbiting condyle comes down and forward), so the mandibular cusp travels mesially and toward the palate across the maxillary tooth.',
   { img:'pathMax', cue:'Non-working = the jaw swings in and forward: on the upper tooth, the path runs mesio-palatal.' });
-mcq('fig-pmand-a','review','help','In the diagram of a mandibular first molar, arrow A (toward distal) is the path of the maxillary lingual cusp in which movement?',
+mcq('fig-pmand-a','review','help','In the diagram of #30 (mandibular right first molar), arrow A (toward distal) is the path of the maxillary lingual cusp in which movement?',
   ['Protrusive','Retrusive','Laterotrusive (working)','Mediotrusive (non-working)'],
   'On a MANDIBULAR tooth you watch a maxillary cusp, and everything is relative: when the mandible goes forward, the maxillary cusp travels DISTALLY across the mandibular tooth. "If I\'m looking at the mandibular arch and the mandible is sliding forward, the contacts are going toward the posterior." Retrusive is the opposite: the mandible moves back, so the maxillary cusp travels MESIALLY (arrow D).',
   { img:'pathMand' });
-mcq('fig-pmand-b','review','help','In the diagram of a mandibular first molar, arrow B (straight toward lingual) shows which movement?',
+mcq('fig-pmand-b','review','help','In the diagram of #30, arrow B (toward lingual, leaning slightly distal) shows which movement?',
   ['Laterotrusive (working)','Mediotrusive (non-working)','Protrusive','Retrusive'],
   'On the working side the mandibular tooth moves out to the buccal, so the maxillary lingual cusp travels lingually across it.',
   { img:'pathMand' });
-mcq('fig-pmand-c','review','help','In the diagram of a mandibular first molar, arrow C (toward distobuccal) shows which movement?',
+mcq('fig-pmand-c','review','help','In the diagram of #30, arrow C (toward distobuccal) shows which movement?',
   ['Mediotrusive (non-working)','Laterotrusive (working)','Protrusive','Retrusive'],
   'On the non-working side the mandibular tooth moves medially and forward, so relative to it the maxillary cusp travels buccally and distally. Compare the maxillary molar, where the non-working path runs mesiopalatally: the same movement, seen from the other arch.',
   { img:'pathMand' });
@@ -1317,24 +2154,32 @@ mcq('fig-front-pp','review','hub','In the frontal envelope, the point marked PP 
   ['The postural position, about 2-4 mm below MICP','The clinical rest position, about 8 mm below MICP','Centric relation','The end of pure rotation'],
   'PP = postural position, the usual resting posture of the mandible (2-4 mm below MICP), kept by a myotactic reflex so the teeth can be brought into function immediately.',
   { img:'envFront' });
-mcq('fig-fence','review','help','In the Class I fence post shown, which maxillary posts does the mandibular PM2 post fall between?',
+mcq('fig-fence','review','help','In the Class I fence post shown, the mandibular P2 cusp points at the post between which two maxillary teeth?',
   ['Maxillary PM1 and PM2','Maxillary PM2 and M1 mesial','Maxillary canine and PM1','Maxillary M1 mesial and M1 distal'],
   'In Class I each mandibular post sits a half step mesial to its maxillary partner, so mandibular PM2 falls between maxillary PM1 and PM2. In cusp-fossa terms its buccal cusp goes to the mesial fossa of the maxillary PM2 (#29 on #4). "The only thing you really have to remember on fence posts is how to draw fence posts and what their canine relationships are."',
   { img:'fence' });
 
 /* ---------- Patient Box cases ---------- */
-mcq('pb-div2','review','hub','Which classification fits this patient?',
+mcq('pb-div2','review','hub','She asks for longer, whiter crowns on #8 and #9. Which classification fits?',
   ['Class II division 2','Class II division 1','Class III','Class I malocclusion'],
-  'Distal molars on both sides = Class II. A square arch, retroclined centrals, labially flared laterals and a deep vertical overlap = division 2. Division 1 has a narrow arch and protruding incisors.',
-  { pbox:[['Molars','Mandibular first molars distal to the maxillary first molars, both sides'],['Arch form','Square, normal width'],['Incisors','Maxillary centrals tipped back; laterals flared labially'],['Overlap','Vertical overlap 7 mm']] });
+  'In the side view the blue dot (mesiobuccal cusp of #3) sits in front of the red one (buccal groove of #30): the lower first molar is distal to the upper, so Class II. A square arch, retroclined centrals, labially flared laterals and a deep vertical overlap make it division 2; division 1 has a narrow arch and protruding incisors. Class III puts the lower molar mesial with the incisors edge to edge or in crossbite, and "Class I malocclusion" needs a normal molar relationship. Expect a hard restoration: Dr. Givan calls division 2 "a very tight occlusion to work with," with little room to lengthen or thicken the centrals.',
+  { pbox:[['Patient','34-year-old woman'],['Chief complaint','"My two front teeth look short and worn"'],['History','No jaw pain, clicking or orthodontics'],['Exam','Square arch of normal width; vertical overlap 7 mm; the same molar relationship on both sides; see the photos']], pimg:['frontDiv2','buccalII'] });
 mcq('pb-upright','review','hub','What is the most likely reason for this complaint?',
-  ['Upright head posture changed the path of closure, shifting contacts anteriorly','The MIP record was taken with the condyles seated in centric relation instead of in MIP','The crown was made on a fully adjustable articulator','The patient has a 2-6 mm freeway space'],
-  'Contacts recorded supine can shift anteriorly when the patient sits up; posture changes the path of closure. Dr. Givan sits every patient up after a restoration and asks if it feels the same. The fix is to recheck and adjust upright, not to assume the lab made an error.',
-  { pbox:[['Procedure','Class II composite #19, adjusted to even contacts with the chair reclined'],['After','Sitting upright to sign the chart'],['Complaint','"That tooth hits first now"'],['Shimstock','Holds on #19 only, upright']] });
+  ['Upright head posture changed the path of closure, shifting contacts anteriorly','The MIP record was taken with the condyles seated in centric relation instead of in MIP','The composite was made too thin, so it flexes onto the opposing tooth','The patient has a 2-6 mm freeway space'],
+  'Contacts recorded supine can shift anteriorly when the patient sits up; posture changes the path of closure ("REALLY IMPORTANT" on the handout). That is why the marks and shimstock taken upright show #19 alone in contact. Dr. Givan sits every patient up after a restoration and asks if it feels the same. A direct composite has no MIP record or lab step to blame, and a 2-6 mm freeway space is normal rest posture, not a high contact.',
+  { pbox:[['Patient','45-year-old man'],['Today','MO composite on #19, adjusted with the chair reclined until the contacts looked even'],['After','Sat up to sign the chart: "That tooth hits first now"'],['Findings','See the marks and shimstock, taken sitting upright']], pimg:['marksUpright','shimUpright'] });
+mcq('cs-upright','review','hub','Same patient: shimstock holds on #19 and pulls through #18 and #20 while he sits upright. What do you do before he leaves?',
+  ['Re-mark #19 with him sitting upright and adjust it until shimstock holds on #18 and #20 again','Reassure him: a slightly high composite wears in on its own within a few days','Recline the chair again, confirm the contacts look even there, and dismiss him','Reduce the opposing cusps on #14 so the new restoration keeps its anatomy'],
+  'Adjust where the problem shows: upright, the posture he eats in (the "alert feeding position" is about 30° face-down). A high restoration is a deflective contact; it does not "wear in" (the PDL senses about 20 µm), rechecking reclined repeats the original error, and the fix belongs on the new restoration, not on the healthy opposing tooth.',
+  { pbox:[['Patient','45-year-old man, MO composite on #19 today'],['Upright','Shimstock: holds on #19 only (see the previous case for the marks)'],['Symptoms','"That tooth hits first now"']], pimg:['shimUpright'] });
 mcq('pb-slide','review','hub','What do these findings suggest?',
   ['Damaging closure into unstable centric occlusion contacts','A healthy patient whose CO and MIP coincide','Excess freeway space from overclosure','Canine guidance that is too steep'],
-  'A CO-to-MIP slide that deviates to one side, with wear facets, a fractured cusp and mobility, fits Dr. Givan\'s description: the muscles seat the joints (especially in sleep), the teeth meet in an unstable CO contact, and wear, fracture and mobility follow.',
-  { pbox:[['Seated (CR) contact','First contact on #2 and #31 only'],['Slide','1.5 mm to MIP, deviating to the left'],['Findings','Wear facets on #2, #31; fractured DL cusp #2; #31 mobility class I'],['Habits','Partner reports grinding at night']] });
+  'Mounted in CR, only the second molars touch (front teeth apart, guide pin off the table); in the mouth the jaw then slides 1.5 mm, to the left, into MIP. Add wear facets, the cracked distolingual cusp of #2, fremitus and class I mobility on #31 with healthy probing depths, and you have Dr. Givan\'s picture: the muscles seat the joints (especially asleep), the teeth meet in an unstable CO contact, and wear, fracture and mobility follow. A slide that deviates left or right tends to be more problematic. Only about 10% have CO = MIP, overclosure is lost vertical dimension from missing or drifting back teeth (he has them all), and nothing here involves the canine guidance.',
+  { pbox:[['Patient','52-year-old man'],['Chief complaint','"My back teeth are sore in the morning, and I chipped a tooth"'],['Habits','Partner reports grinding at night'],['Guided closure','Bimanual manipulation: first contact on #2 and #31 only, then a 1.5 mm slide into MIP, deviating to the left'],['Findings','See the occlusal view, the perio chart and the mounted casts']], pimg:['marksWear','chartSlide','castsCR'] });
+mcq('cs-reorg','applying','hub','The same patient now needs crowns on #2, #3, #14, #15, #18, #19, #30 and #31. Which approach and records fit?',
+  ['Reorganized: seat the joints first, record CR by bimanual manipulation, and mount the casts in CR','Conformative: copy MIP with an MIP record, because he has adapted to his bite over the years','Conformative: take a full-arch PVS registration in MIP so the lab can see every tooth in contact','Reorganized: take an MIP record and build the new crowns to his current maximum intercuspation'],
+  'Copying is not safe here. At diagnosis the CO contact and MIP differ by a big, deviating slide, with wear, fractures and mobility, and he needs posterior crowns in several quadrants: the reorganized approach. Start "from ground zero" with the joints seated for a reproducible starting point, take a CR record (bimanual manipulation, also used to mount diagnostic casts) and build an even, stable occlusion with no deflective contacts. Conformative with an MIP record is for healthy, asymptomatic occlusions; a full-arch registration is a classic record error (material between teeth that should touch); and an MIP record would copy the unstable position.',
+  { pbox:[['Patient','52-year-old man (the previous case), a month later'],['Plan','Eight posterior crowns for fractured, worn cusps'],['Guided closure','First contact on #2 and #31; 1.5 mm slide to MIP, deviating left'],['Symptoms','Morning muscle soreness; no joint pain']], pimg:['castsCR'] });
 
 
 /* =================================================================== L2 FUNCTIONAL TMJ ANATOMY + MUSCLES */
@@ -1480,8 +2325,8 @@ mcq('an-animals','anatomy','hub','Dr. Givan compared jaws: dogs and alligators v
   'Carnivores like dogs (and alligators) are locked into hinging and tear with powerful neck muscles; grazers like cows and camels have enormous lateral movement to grind plants. Humans are in between, which makes our motion complex and harder to predict.');
 mcq('an-pb-lock','anatomy','hub','What is happening, and what should you do?',
   ['Open lock (condyle in front of the eminence): press down on the buccal shelf','The disc is displaced posteriorly; push the chin firmly back','The patient is locked in centric relation; have them bite firmly on a cotton roll','The masseter is in spasm; inject local anesthetic into it'],
-  'Long wide-open appointment + can\'t close + condyle palpable in front of the eminence = open lock. Distract the condyle downward via the buccal shelf; never push posteriorly against the eminence.',
-  { pbox:[['Procedure','3-hour appointment with a rubber dam, mouth wide open'],['After','Cannot bring teeth together'],['Palpation','Condyles felt anterior to the articular eminences'],['Pain','Mild, anxious patient']] });
+  'Long wide-open appointment + can\'t close + the condyle sitting in front of the articular eminence (empty glenoid fossa on the view) = open lock. Distract the condyle downward via the buccal shelf, "not a posterior force": pushing the chin back drives the condyle into the eminence it has to get under. CR is the seated position, the opposite of this.',
+  { pbox:[['Patient','47-year-old woman, anxious'],['Procedure','3-hour appointment with a rubber dam, mouth wide open'],['After','Cannot bring her teeth together; mild pain'],['Imaging','See the lateral TMJ view, taken while she tries to close']], pimg:['tmjOpen'] });
 
 /* =================================================================== L3 MASTICATION, DEGLUTITION AND SPEECH */
 mcq('fn-primary','function','handout','Which are the three PRIMARY functions of the masticatory system?',
@@ -1618,8 +2463,12 @@ mcq('fn-sibilant','function','handout','During sibilant sounds such as "s," the 
   'From the speech table (Table 11-3): sibilants (s, sh, ch, z) have a minimal separation of about 1-1.5 mm, which is why "s" is used for closest speaking space. Nasal consonants about 2-4 mm; diphthongs ("eight," "nine") about 5-10 mm.');
 mcq('fn-pb-aob','function','hub','What best explains this patient\'s anterior open bite?',
   ['An over-retained visceral (infantile) swallow with a forward tongue','Over-erupted posterior teeth that prop the anterior teeth apart in MIP','A somatic swallow in MIP','A steep articular eminence'],
-  'A visceral swallow braces the mandible by pushing the tongue forward between the arches. Retained past childhood, that constant forward pressure can displace the anterior teeth (anterior open bite), a neutral zone imbalance that orthodontics alone may not fix.',
-  { pbox:[['Age','16'],['Finding','No anterior contact in any closing position'],['Swallow','Teeth apart; tongue pushes forward between the incisors'],['Molars','Class I']] });
+  'The photo, taken mid-swallow, shows the back teeth together and the tongue pushed forward between the incisors. A visceral swallow braces the mandible with the tongue instead of the teeth; normal until the posterior teeth erupt, but retained it keeps pressing the anterior teeth apart (anterior open bite), a neutral zone imbalance that orthodontics alone may not fix. An adult somatic swallow closes the teeth in MIP with the tongue behind them.',
+  { pbox:[['Patient','16-year-old'],['Chief complaint','"My front teeth don\'t touch, and I can\'t bite through a sandwich"'],['Molars','Class I; posterior teeth meet in MIP'],['Finding','No anterior contact in any closing position; see the photo, taken while swallowing']], pimg:['frontAOB'] });
+mcq('cs-fricative','function','hub','What does this tell you about the provisionals?',
+  ['They are too long: on "f" the edges should only lightly touch the wet-dry line of the lower lip','They are too short: she can\'t reach the lower lip, so the "f" sound is lost','The closest speaking space is too small, so she will whistle on "s"','Nothing: on "f" and "v" the incisal edges should press firmly into the lower lip'],
+  'Fricatives (f, v): the maxillary incisal edge should lightly touch the wet-dry line (vermilion border) of the lower lip. Here the edge presses into the lip, so the crowns are too long (L3: "depressing the lip: too long"); too short shows as being unable to make the sound at all. The closest speaking space is checked with "s" (teeth about 1-1.5 mm apart), not with "f".',
+  { pbox:[['Patient','33-year-old woman'],['Today','Try-in of provisional crowns on #8 and #9'],['Complaint','"My lip feels pushed out when I talk"'],['Phonetics','See the drawing of her saying "fifty-five"']], pimg:['lipF'] });
 
 
 /* =================================================================== L4 OCCLUSAL CONCEPTS */
@@ -1764,8 +2613,8 @@ mcq('cc-lip-bulge','concepts','handout','A bulge toward the gingival on anterior
   'Step 2 (lip support): a gingival bulge usually means the lab lacked room because the tooth was under-prepared. Measure the thickness of contoured temporaries to check preparation depth.');
 mcq('cc-pb-sda','concepts','hub','What should the treatment plan address first?',
   ['Posterior support, e.g. implants or a partial in the posterior areas','Veneers on #6-11 first, to meet the patient\'s main goal and build trust','Equilibrating the anterior guidance','A fully adjustable articulator mounting'],
-  'With no posterior support the anteriors are being destroyed. Support first, disclusion second; and the shortened dental arch means support only to the second premolars may be enough, which fits a limited budget ("putting in two implants down in the lower is going to be life-changing").',
-  { pbox:[['Missing','#2-5, #12-15, #18-21, #28-31'],['Anteriors','Flared, worn and mobile; diastemas opening'],['Chief complaint','"I want my front teeth to look nice"'],['Budget','Limited']] });
+  'The chart shows why: every posterior tooth in the upper arch is missing (lower too), and the six anteriors left carry the whole bite, so they are mobile (class 1-2), flaring and opening diastemas. With no posterior support the anteriors are being destroyed. Support first, disclusion second; and the shortened dental arch means support only to the second premolars may be enough, which fits a limited budget ("putting in two implants down in the lower is going to be life-changing"). Veneers on mobile, flaring teeth with no back support would fail.',
+  { pbox:[['Missing','#2-5, #12-15, #18-21, #28-31'],['Chief complaint','"I want my front teeth to look nice"'],['Anteriors','Flared and worn; diastemas opening; see the chart'],['Budget','Limited']], pimg:['chartSDA'] });
 
 /* =================================================================== L5 APPLYING OCCLUSION */
 mcq('ap-schemes','applying','handout','Which are the three accepted occlusal schemes listed in Lec3-2?',
@@ -1905,16 +2754,48 @@ mcq('ap-diag','applying','hub','How do you decide whether the conformative appro
   'At diagnosis, compare the CO contact with the MIP contact: a large or deviating discrepancy plus wear, fractures, mobility or tooth movement warns that copying MIP is not safe. If the occlusion is healthy and asymptomatic, conformative is the way to go.');
 mcq('ap-pb-crown','applying','hub','What is the right approach for this crown?',
   ['Conformative: fix #30\'s plunging cusp, then an MIP record and copied contacts','Reorganized: a CR record and a full-mouth rehabilitation at a new vertical dimension','Leave #3 in slight infraocclusion to protect the crown','Give #3 the working-side contacts in a right excursion'],
-  'Asymptomatic, healthy, with canine guidance: copy what is there (conformative). But first remove the localized problem: the over-erupted DB cusp of #30 is a plunger cusp. Use an MIP record limited to the prepared area.',
-  { pbox:[['Tooth','#3, large failing amalgam; crown planned'],['Opposing','#30, distobuccal cusp over-erupted into the #3 restoration'],['Guidance','Canine guidance both sides; no mobility, no wear facets'],['Symptoms','None']] });
+  'On the bitewing the distobuccal cusp of #30 rises above the plane into a scooped-out amalgam on #3: a plunger cusp (a cusp violating the plane of occlusion). Asymptomatic, healthy, with canine guidance: copy what is there (conformative), but first make the localized change L5 allows, reshaping the opposing cusp. Then use an MIP record limited to the prepared area. Infraocclusion lets #30 supererupt further ("it never supererupts in a good contact"), and adding working contacts would change guidance that is healthy.',
+  { pbox:[['Patient','44-year-old man'],['Tooth','#3, large failing amalgam; crown planned'],['Guidance','Canine guidance both sides; no mobility, no wear facets'],['Symptoms','None'],['Imaging','See the bitewing']], pimg:['bwOver'] });
 mcq('ap-pb-agt','applying','hub','The patient likes her current guidance and wants it unchanged. When do you make the impression for the custom anterior guide table?',
   ['Before preparing #6-11','After preparing #6-11','After cementing the final crowns','Never; copying guidance doesn\'t need one'],
-  'Both centrals and both canines are being restored, so a custom anterior guide table is needed, and to copy the guidance unchanged you must capture it before the teeth are cut.',
-  { pbox:[['Plan','Crowns #6-11 (failing, discolored PFMs)'],['Guidance','Canine guidance, comfortable for years'],['Symptoms','None'],['Patient wish','"Same bite, better color"']] });
+  'Both centrals and both canines are being restored, so L5 calls for a customized anterior guide table, and to copy the guidance unchanged you must capture it before the teeth are cut; once they are prepped, the guiding surfaces are gone. The guide pin\'s pathways then carry the full functional range of her guidance onto the new lingual contours.',
+  { pbox:[['Patient','56-year-old woman'],['Plan','Crowns #6-11 (failing, discolored PFMs; see the photo)'],['Guidance','Canine guidance, comfortable for years'],['Symptoms','None'],['Patient wish','"Same bite, better color"']], pimg:['frontPFM'] });
 mcq('ap-pb-c4','applying','hub','How should the occlusion on this restoration be finished?',
   ['Share centric and protrusive contacts between composite and tooth','Put all protrusive contact on the composite','Leave #8 just out of contact in both protrusion and centric to protect it','Give #8 all the anterior guidance'],
-  'Edge-to-edge Class IV: simultaneous centric and protrusive contact on natural tooth AND restoration, to reduce the chance of fracture and differential wear. All guidance on the composite is "a recipe for disaster."',
-  { pbox:[['Restoration','Class IV composite #8, mesioincisal corner'],['Incisor relationship','Edge to edge'],['History','Same corner fractured twice before']] });
+  'The incisors meet edge to edge, and the fracture line runs through the old composite at the mesioincisal corner of #8. For a Class IV: simultaneous centric and protrusive contact on the natural tooth AND the restoration, to reduce fracture and differential wear. All the guidance on the composite is "a recipe for disaster," and leaving #8 out of contact lets it supererupt into the same trouble.',
+  { pbox:[['Patient','27-year-old man'],['Restoration','Class IV composite on #8, mesioincisal corner, replacing one that broke'],['History','Same corner fractured twice before'],['Findings','See the photo']], pimg:['frontE2E'] });
+mcq('cs-trauma','applying','hub','She needs a crown on #8. Before you prepare it, what do you do?',
+  ['Correct the posterior deflective contact that drives the mandible forward into the incisors','Splint #8 and #9 together with the crowns, since the mobility means they need support','Refer for periodontal surgery on #8 and #9 before any restorative work','Make the new #8 crown thicker lingually so it can take the force'],
+  'The chart shows fremitus and class I mobility on #8 and #9 with healthy 1-3 mm probing depths and no bleeding; the radiograph shows widened, funnel-shaped PDL spaces and thickened lamina dura on the same two teeth. Those are signs of force, not periodontal disease, and the force is the slide from the first molar contact forward into the incisors. L5 (single anterior crown): in harmony with the existing occlusion, but "correct posterior deflective contacts that slide the mandible forward into the incisors, especially with a history of fracture." Replacing a fractured crown doesn\'t fix the force that broke it; splinting, surgery or a bulkier crown leave the cause in place.',
+  { pbox:[['Patient','41-year-old woman'],['Chief complaint','"The edge of my front tooth broke again" (third time on #8)'],['Guided closure','First contact on #2 and #31; the jaw then slides forward about 1.5 mm and the lower incisors strike #8 and #9'],['Findings','See the perio chart and the radiograph']], pimg:['chartTrauma','paTrauma'] });
+mcq('cs-nw','applying','hub','What is causing it, and what do you do?',
+  ['A non-working contact on the new crown: remove it in the left excursion and keep its MIP contacts','A working interference on #3: add group function on the right so the load is shared','Nothing yet: non-working contacts are common, and patients adapt to them over a few weeks','A high MIP contact on #3: remake the crown from a full-arch MIP registration'],
+  'In a LEFT excursion the right side is the non-working (mediotrusive) side, and the red streak sits on the facial incline of #3\'s mesiolingual (palatal) cusp, where the help sheet says a right-side non-working contact lands (against the lingual incline of the mandibular buccal cusp). L5: a patient who has adapted to a non-working contact over years can keep it, but "patients don\'t tolerate one you introduce in an afternoon"; the new mobility is the warning. Adjust the crown so the left excursion is free and keep the blue MIP contacts. Group function is a working-side scheme, and the MIP contacts are not the problem.',
+  { pbox:[['Patient','38-year-old woman'],['Two weeks ago','PFM crown cemented on #3'],['Chief complaint','"#3 aches when I chew on the LEFT side, and it feels a little loose"'],['Findings','#3 mobility class I (was 0); see the articulating paper']], pimg:['marksNW3'] });
+mcq('cs-pro','applying','hub','He wants veneers on #7-#10. What has to happen before you prepare the incisors?',
+  ['Eliminate the protrusive contacts on the molars before restoring the anteriors','Nothing: give the veneers steeper guidance, which will lift the molars apart in protrusion','Keep them: back teeth that touch in protrusion are part of a balanced occlusion','Splint #14 and #15 to the premolars so the protrusive load spreads over more roots'],
+  'Red streaks on the distal inclines of the upper molars\' lingual cusps are protrusive contacts (protrusion runs the mandibular mesial inclines into the maxillary distal inclines), here from the mesially tipped #18. L5: "posterior protrusive interferences must be eliminated before restoring the anterior teeth." Sometimes anterior contours give enough separation, but "you can\'t make guidance steep enough to clear a badly tipped molar," and veneers asked to do it will fail. Balanced occlusion is for dentures, and splinting treats mobility, not the interference.',
+  { pbox:[['Patient','60-year-old man'],['Plan','Porcelain veneers on #7-#10'],['History','#19 was extracted years ago and never replaced; #18 has tipped mesially into the space'],['Protrusion','He slides straight forward to edge to edge; see the red marks']], pimg:['marksPro'] });
+mcq('cs-implant','applying','hub','What do you adjust before you seat it for good?',
+  ['Lighten it until shimstock drags through on light closure but holds on a clench; remove the excursive mark','Nothing: shimstock holding on all three teeth in both closures is the goal for an implant','Take #30 out of contact entirely, in MIP and excursions, so the implant can never be overloaded','Keep the excursive contact on #30 so it shares the working load with the canine'],
+  'An implant has no PDL: under about 10 lb it moves about 2-3 µm apically against a tooth\'s 28 µm. So a posterior implant crown is very light in casual closure and equal in maximum intercuspation: on a light closure shimstock (about 12 µm) holds on the neighbors and pulls through the implant with some resistance; on a clench the teeth drop into their PDL and it holds on all of them. Here it holds on the implant at a light closure, so the crown is too heavy, and posterior implants should avoid contact in excursions. No contact at all lets the opposing tooth supererupt.',
+  { pbox:[['Patient','58-year-old man'],['Today','Delivering a screw-retained implant crown on #30'],['Neighbors','#29 and #31 natural and healthy'],['Findings','See the shimstock test and the radiograph']], pimg:['shimImplant','paImplant30'] });
+mcq('cs-implant6','applying','hub','How should the #6 implant crown behave in a right lateral excursion?',
+  ['Share the working contacts with the natural teeth (group function), not guide alone','Give it steep canine guidance to match #11, so the right side discludes at once','Keep it out of every excursion and let the premolars take all the working contacts','Give it the heaviest contact in MIP, since the implant can barely move'],
+  'L5: anterior implants have a very light centric contact in casual closure (equal to the neighbors in maximum intercuspation), and in excursions you "avoid immediate canine disclusion" and share the load with the natural teeth, which have proprioception. A missing or implant canine is the textbook case for group function (L1). Copying #11\'s steep guidance puts all the excursive force on the one tooth with no ligament or proprioception; avoiding excursive contact altogether is the rule for POSTERIOR implants; and a heavy MIP contact is backwards.',
+  { pbox:[['Patient','29-year-old woman'],['History','#6 lost to trauma; implant placed and integrated'],['Left side','Canine guidance on her natural #11'],['Right side','#5 and #7 healthy, no mobility'],['Imaging','See the radiograph']], pimg:['paImplant6'] });
+mcq('cs-worn','applying','hub','He wants the anterior teeth rebuilt. What sequence does Dr. Givan use?',
+  ['Wax-up at a tentative VDO, provisionals from it, months of wear-testing, then a guide table from those','Make a custom anterior guide table from the worn teeth before prep, then copy that guidance exactly','Prepare and deliver the final crowns at the current height in one visit, then adjust','Open the VDO by the full freeway space, then restore the anteriors to that height'],
+  'Worn-down anteriors with no guidance left = inadequate anterior guidance (L5): a diagnostic wax-up at a tentative VDO (set with the closest speaking space, about 1-2 mm between the incisal edges on "s"), provisionals from its matrix for guidance and esthetics, observation for several weeks (at least three if mild and asymptomatic; months for a bruxer like him), then a custom anterior guide table from the corrected provisionals, which the definitive lingual contours follow. Copying the worn teeth copies the guidance he lost, one-visit finals skip the test drive, and the 2-6 mm freeway space is not a target to open by.',
+  { pbox:[['Patient','63-year-old man who grinds at night'],['Chief complaint','"My front teeth have gotten so short"'],['Findings','Incisors and canines worn flat; no canine guidance left; see the photo'],['Symptoms','None in the joints']], pimg:['frontWorn'] });
+mcq('cs-record','applying','hub','What went wrong, and what should the record have been?',
+  ['A full-arch, untrimmed record held the casts apart; send a small one over the prep, trimmed to cusp tips','The PVS set too slowly in the mouth; switch to a full-arch plaster of Paris record instead','Nothing in the record: a high crown is always a lab error, so return it to the lab','The record was fine, but he bit too lightly; next time have him clench as hard as he can into it'],
+  'Two of L5\'s common record errors are in the photo: a full-arch registration ("you\'ve put material between teeth that should touch") and untrimmed excess onto the palate (you can\'t verify the mounting). A correct MIP record sits only where teeth are not in contact (the prep), is trimmed to the cusp tips and kept off soft tissue, and the contacts you see in the mouth must show on the mounting. With elastomers, keep constant occlusal pressure while it sets and press the casts while mounting to avoid rebound. Best of all, hand-articulate when you can: "any material that we use is going to increase error."',
+  { pbox:[['Patient','50-year-old man'],['Problem','The #30 crown fits the mounted casts but is about 0.5 mm high in the mouth'],['Record sent','See the photo of the PVS registration']], pimg:['recordFull'] });
+mcq('cs-group6','applying','hub','What guidance should the new #6 crown have?',
+  ['Group function: share the right working contacts with #7 and #5, since #6 has lost much of its support','Canine guidance copied exactly, because you copy the existing guidance when restoring','Balanced occlusion, with contacts on the left molars during the right excursion','No working contact on #6 at all; let the right molars guide the excursion'],
+  'Copying the existing guidance is the rule only "in the absence of signs or symptoms." Here #6 has 6-7 mm pockets with bleeding, 3 mm of recession, class 2 mobility and bone loss on the radiograph, and it aches after chewing. Group function is "sometimes desired if cuspid has compromised periodontal support and would like to share the occlusal load with adjacent teeth" (handout: e.g. #7-6-5); today that means a few anterior teeth and maybe the first premolar, not every tooth. Balanced occlusion is for dentures (non-working contacts are interferences), and molars guiding the excursion puts the force on the teeth least suited to it.',
+  { pbox:[['Patient','66-year-old woman'],['Plan','Crown on #6 (large failing restoration)'],['Now','Canine guidance on the right; #6 aches after chewing'],['Findings','See the perio chart and the radiograph']], pimg:['chartCanine','paCanine6'] });
 
 
 /* ---------- READINGS (lecture notes synthesized from the recordings, slides and Dr. Givan's handouts) ----------
@@ -2335,6 +3216,7 @@ var REVIEW = [
 /* =================================================================== CONTACTS */
 { id:'contacts', lec:'review', title:'What cusp hits where', icon:'tooth', blurb:'The help-sheet rules: Angle class, the fence post, premolar fossae, cusp pathways and which inclines collide. Assume Class I and cusp-fossa unless told otherwise.',
   sections:[
+  { title:'Diagrams', type:'figs', figs:['cuspMap','pathMax','pathMand','inclines'] },
   { title:'Angle classes', type:'table', head:['Class','Molars','Share','Look for'], rows:[
     ['Class I','Normal interdigitation','About 70%','Class I malocclusion = crowding elsewhere'],
     ['Class II div 1','Mandibular first molar distal','About 25% (all Class II)','Narrow arch, protruding incisors'],
@@ -2821,7 +3703,6 @@ var QUESTION_WHY = {
   "fig-front-pp":["PP is the postural position, about 2-4 mm below MICP, held by a myotactic reflex so the teeth can come into function at once.", "The clinical rest position (least EMG activity) is lower, about 8 mm below and 3 mm in front; the postural position is often wrongly called by that name.", "Centric relation is a condylar position at the top of the posterior border, not a resting point below MICP.", "The end of pure rotation is 20-25 mm of opening, far below a point just under MICP."],
   "fig-fence":["In Class I each mandibular post sits a half step mesial to its maxillary partner, so mandibular PM2 falls between maxillary PM1 and PM2.", "Between maxillary PM2 and M1 mesial is where the mandibular M1 mesial post falls in Class I.", "Between the maxillary canine and PM1 is where mandibular PM1 falls in Class I.", "Between the maxillary M1 posts falls a mandibular molar post; mandibular PM2 is a whole step farther mesial."],
   "pb-div2":["Distal molars on both sides make it Class II; a square arch, retroclined centrals, flared laterals and a deep overlap make it division 2.", "Division 1 has a narrow arch and protruding incisors, not retroclined centrals with a square arch.", "Class III would have the mandibular first molars mesial to the maxillary ones, not distal.", "Class I needs the molars in normal relation; distal mandibular molars on both sides are Class II."],
-  "pb-upright":["Contacts adjusted supine can shift anteriorly when the patient sits up, because head posture changes the path of closure; recheck upright.", "Nothing here was a lab record; the composite was adjusted chairside, and the issue is the reclined posture during adjustment.", "A direct composite involves no articulator; the cause is adjusting contacts with the chair reclined.", "A 2-6 mm freeway space is the normal range and doesn't make one tooth hit first."],
   "pb-slide":["A seated contact on #2/#31 that slides and deviates to MIP, with wear, a fractured cusp, mobility and grinding, fits closure into unstable CO contacts.", "A 1.5 mm slide shows CO and MIP don't coincide, and the wear, fracture and mobility aren't healthy findings.", "Overclosure concerns vertical dimension; nothing here describes lost vertical or excess freeway space.", "The findings center on posterior teeth hitting first in CR, not on the steepness of canine guidance."],
   "an-ginglymus":["Ginglymus is a synovial joint with uniaxial hinge movement in one plane: elbow, knee and finger joints.", "Free gliding between flat surfaces (wrist, ankle, spine) describes an arthrodial joint.", "Rotation around a single pivot describes a pivot (trochoid) joint like the atlantoaxial, not a ginglymus.", "An immovable fibrous joint like a suture is a synarthrosis, not a ginglymus, which is a movable hinge."],
   "an-arthrodial":["Sliding of the condyle and disc down the eminence (translation) is the arthrodial, gliding part.", "Rotation about the hinge axis is the ginglymus (hinge) part of the joint.", "Elevation by the masseter is a muscle action, not one of the joint's two movement types.", "Opening by the digastric is a muscle action; the gliding component is translation in the upper compartment."],
@@ -3000,7 +3881,19 @@ var QUESTION_WHY = {
   "ap-diag":["Compare the CO and MIP contacts and look for wear, fracture and mobility; a big discrepancy with damage says conformative isn't safe.", "Group function is a perfectly healthy scheme; canine guidance isn't the test for conformative safety.", "Freeway space doesn't tell you whether copying MIP is safe.", "Having all teeth doesn't rule out wear, fracture or mobility."],
   "ap-pb-crown":["Asymptomatic with healthy canine guidance: stay conformative, but first fix #30's over-erupted (plunger) cusp, then use an MIP record.", "A healthy, asymptomatic patient needs no full-mouth reorganization.", "Infraocclusion would let teeth supererupt, and #30 has already over-erupted.", "Canine guidance already protects the posteriors; adding working contacts on #3 makes an interference."],
   "ap-pb-agt":["Restoring both centrals and both canines needs a custom guide, and copying requires capturing it before #6-11 are cut.", "After preparation, the guidance she likes is gone.", "After cementation is too late; the table guides how the crowns are built.", "Copying still needs a custom anterior guide table, because both centrals and canines are being restored."],
-  "ap-pb-c4":["Edge to edge with a history of fracture: share centric and protrusive contacts between composite and natural tooth.", "All protrusive contact on the composite is \"a recipe for disaster,\" especially with prior fractures.", "Leaving #8 out of contact lets it drift or supererupt and shifts load elsewhere.", "All the anterior guidance on #8 would overload the restoration."]
+  "ap-pb-c4":["Edge to edge with a history of fracture: share centric and protrusive contacts between composite and natural tooth.", "All protrusive contact on the composite is \"a recipe for disaster,\" especially with prior fractures.", "Leaving #8 out of contact lets it drift or supererupt and shifts load elsewhere.", "All the anterior guidance on #8 would overload the restoration."],
+  "pb-upright":["Contacts set with the chair reclined can shift anteriorly once he sits up; upright posture changes the path of closure.", "A direct composite has no MIP record or lab step, so a record taken in CR can't be the cause.", "A thin composite would chip or fracture; flexing doesn't make one tooth hit first.", "A 2-6 mm freeway space is normal rest posture, not a high contact."],
+  "cs-upright":["Adjust where the problem shows: upright, the posture he eats in, until shimstock holds on #18 and #20 again.", "A high restoration is a deflective contact; it doesn't wear in, and the PDL senses about 20 µm.", "Checking reclined again repeats the original error: the contacts only looked even lying back.", "The fix belongs on the new restoration, not on the healthy opposing tooth."],
+  "cs-reorg":["A big deviating slide, wear, fractures and posterior crowns in several quadrants call for reorganizing from seated joints with a CR record.", "Conformative copying of MIP is for healthy, asymptomatic occlusions; his is unstable.", "A full-arch registration is a classic record error: material between teeth that should touch.", "An MIP record would copy the unstable position the reorganized approach is meant to replace."],
+  "cs-fricative":["On \"f\" the incisal edge should lightly touch the wet-dry line; pressing into the lip means the crowns are too long.", "Too short shows as being unable to make the \"f\" sound, not as the lip feeling pushed out.", "The closest speaking space is checked with \"s\", not \"f\".", "The edges should only lightly touch the lower lip; pressing into it is the sign of crowns that are too long."],
+  "cs-trauma":["Fremitus and mobility with healthy probing point to force from the slide into the incisors; correct that deflective contact first.", "Splinting supports the teeth but leaves the force that keeps breaking #8 in place.", "Probing depths are 1-3 mm with no bleeding: this isn't periodontal disease, so surgery treats the wrong problem.", "A bulkier crown still takes the same force from the slide and will fracture again."],
+  "cs-nw":["In a left excursion the right side is non-working; a newly added non-working contact on #3 must be removed while keeping its MIP contacts.", "Group function is a working-side scheme; in a left excursion #3 is on the non-working side.", "Patients can adapt to old non-working contacts, but not to one introduced in an afternoon; the new mobility is the warning.", "The blue MIP contacts aren't the problem, and a full-arch registration is a record error, not a fix."],
+  "cs-pro":["Posterior protrusive interferences must be eliminated before restoring the anterior teeth.", "Steeper guidance can't clear a badly tipped molar, and veneers asked to do it will fail.", "Balanced occlusion is for dentures; in natural teeth, molar contacts in protrusion are interferences.", "Splinting treats mobility, not the interference itself."],
+  "cs-implant":["An implant has no PDL, so it should be light on casual closure, equal on a clench, and out of excursions.", "Shimstock holding on the implant at light closure means the crown is too heavy, not that it's right.", "No contact at all lets the opposing tooth supererupt; the goal is light, not none.", "Posterior implants should avoid contact in excursions; the excursive mark has to go."],
+  "cs-implant6":["An anterior implant shares working contacts with the natural teeth (group function) instead of guiding alone.", "Steep canine guidance would put all the excursive force on the one tooth with no ligament or proprioception.", "Keeping out of every excursion is the rule for posterior implants, not anterior ones.", "Anterior implants get a very light centric contact on casual closure; a heavy one is backwards."],
+  "cs-worn":["Inadequate anterior guidance is rebuilt by testing: wax-up at a tentative VDO, provisionals worn for months, then a guide table from them.", "A guide table from the worn teeth copies the guidance he has already lost.", "Delivering finals in one visit skips the test drive the provisionals provide.", "The 2-6 mm freeway space is normal rest posture, not a target to open the VDO by."],
+  "cs-record":["A full-arch, untrimmed record holds the casts apart; a small record over the prep, trimmed to cusp tips, keeps teeth that touch in contact.", "Slow setting isn't the problem, and a full-arch record of any material repeats the same error.", "The crown fits the mounted casts, so the error came in with the record, not the lab.", "Clenching harder doesn't fix material sitting between teeth that should touch."],
+  "cs-group6":["#6 has lost much of its periodontal support, so group function shares the working load with #7 and #5.", "Copying the existing guidance applies only without signs or symptoms; #6 has deep pockets, mobility and pain.", "Balanced occlusion is for dentures; left molar contacts in a right excursion are non-working interferences.", "Letting the molars guide puts the excursive force on the teeth least suited to it."]
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
@@ -3146,19 +4039,21 @@ function qCardHTML(q, opts){
   return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
-    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
+    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
-/* drawn figure (q.img = a FIGS key) renders above the Patient Box and stem */
-function figHTML(q){ var f = q.img && FIGS[q.img]; return f ? '<figure class="qcard-figure" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
-/* the key (what each letter or number is) sits folded under the notes/Review copy only, so you can test yourself first; question pictures never show it */
-function figKeyHTML(f){ return f.key ? '<details class="fig-key"><summary>Show the key</summary><dl>' + f.key.map(function(k){ return '<dt>'+escHtml(k[0])+'</dt><dd>'+escHtml(k[1])+'</dd>'; }).join('') + '</dl></details>' : ''; }
-function figCardHTML(key){ var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
+/* drawn figure (q.img = a FIGS key) renders above the Patient Box and stem without its key; after answering, the
+   explanation shows it again with the key open (figures with a key) or for the first time (imgAfter: the stem stands on its own) */
+function figHTML(q){ var f = q.img && !q.imgAfter && FIGS[q.img]; return f ? '<figure class="qcard-figure" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
+/* the key (what each letter or number is) sits folded under the notes/Review copy, so you can test yourself first; question pictures show it only after answering */
+function figKeyHTML(f, open){ return f.key ? '<details class="fig-key"'+(open?' open':'')+'><summary>'+(open?'Key':'Show the key')+'</summary><dl>' + f.key.map(function(k){ return '<dt>'+escHtml(k[0])+'</dt><dd>'+escHtml(k[1])+'</dd>'; }).join('') + '</dl></details>' : ''; }
+function figAfterHTML(q){ var f = q.img && FIGS[q.img]; return f && (q.imgAfter || f.key) ? '<figure class="qcard-figure qcard-figure-after" aria-label="'+escHtml(f.title)+'">'+f.svg+figKeyHTML(f, true)+'</figure>' : ''; }
+function figCardHTML(key){ if(key === 'cuspMap') return cuspMapHTML(1); var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
 /* Patient Box rows render above the stem */
 function pboxHTML(q){
   if(!q.pbox) return '';
-  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
+  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + caseImgHTML(q) + '</div>';
 }
 /* select-all partial credit (Canvas-style): +1/n per right pick, -1/n per wrong pick, floor 0; full credit counts as correct */
 var MULTI_STATE = {};
@@ -3396,11 +4291,13 @@ function renderNotes(body){
       (READINGS[lec.id] ? '<button type="button" class="sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : '') + '</div>' +
     (hasPlain ? '<div class="level-switch" role="group" aria-label="Reading level"><button type="button" data-level="full" class="'+(level==='full'?'is-active':'')+'" aria-pressed="'+(level==='full')+'">As Taught</button><button type="button" data-level="plain" class="'+(level==='plain'?'is-active':'')+'" aria-pressed="'+(level==='plain')+'">Plain English</button></div>' : '') +
     '<div class="reading-prose">' + (text || '<p>Notes coming soon.</p>') + '</div>' +
-    (FIG_BY_LEC[lec.id] ? '<div class="lec-figs"><h3>Diagrams</h3><div class="fig-grid">' + FIG_BY_LEC[lec.id].map(figCardHTML).join('') + '</div></div>' : '') +
+    '<div class="lec-figs" id="lecFigsRest" hidden><h3>Diagrams</h3><div class="fig-grid"></div></div>' +
     '<div class="mmap-block"><button type="button" class="btn" id="sh-mmap-toggle" aria-expanded="false">Show mind map</button><div id="sh-mmap-container" hidden></div></div>' +
     '<div class="reading-actions"><button type="button" class="btn primary" data-go="bank">Practice '+lecLabel(lec)+' questions</button><button type="button" class="btn" data-go="cram">Cram bullets</button><button type="button" class="btn" data-go="review">Open Review tables</button></div>' +
   '</article>';
   body.innerHTML = '<div class="notes-layout">'+nav+art+'</div>';
+  placeLectureFigs(body.querySelector('.reading-prose'), lec.id, level, body.querySelector('#lecFigsRest'));
+  wireCuspMaps(body);
   body.querySelectorAll('[data-lec]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.lec = b.getAttribute('data-lec'); saveState(); renderNotes(body); }); });
   body.querySelectorAll('.level-switch [data-level]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.level = b.getAttribute('data-level'); saveState(); renderNotes(body); }); });
   var mmBtn = body.querySelector('#sh-mmap-toggle');
@@ -3426,6 +4323,30 @@ function renderNotes(body){
   }); });
 }
 
+/* Put each figure inside the notes after the paragraph (or at the end of the section) it explains. The wrapper carries
+   data-sh-noread, so narration, the highlighter and note search skip it and the notes text itself is unchanged.
+   Figures in FIG_BY_LEC that no anchor places land in a Diagrams block after the notes. */
+function placeLectureFigs(prose, lecId, level, rest){
+  if(!prose) return;
+  var placed = {}, kids = Array.prototype.slice.call(prose.children);
+  function norm(t){ return String(t || '').replace(/\s+/g, ' ').trim(); }
+  (FIG_PLACE[lecId] || []).forEach(function(pl){
+    var at = pl[level] || pl.full, el = null, i;
+    for(i = 0; i < kids.length; i++){ if(norm(kids[i].textContent).indexOf(at) === 0){ el = kids[i]; break; } }
+    if(!el) return;
+    if(pl.end || /^H[1-6]$/.test(el.tagName)){ var j = kids.indexOf(el) + 1; while(j < kids.length && !/^H[1-6]$/.test(kids[j].tagName)) j++; el = kids[j - 1]; }
+    var keys = pl.widget ? [pl.widget] : pl.figs, box = document.createElement('div');
+    box.className = 'lec-fig-inline'; box.setAttribute('data-sh-noread', '');
+    box.innerHTML = '<div class="fig-grid">' + keys.map(figCardHTML).join('') + '</div>';
+    /* several figures after the same paragraph keep their order */
+    var after = el; while(after.nextElementSibling && after.nextElementSibling.classList.contains('lec-fig-inline')) after = after.nextElementSibling;
+    after.parentNode.insertBefore(box, after.nextSibling);
+    keys.forEach(function(k){ placed[k] = 1; });
+  });
+  var left = (FIG_BY_LEC[lecId] || []).filter(function(k){ return !placed[k] && !(k === 'fence' && placed.cuspMap); });
+  if(rest && left.length){ rest.hidden = false; rest.querySelector('.fig-grid').innerHTML = left.map(figCardHTML).join(''); }
+}
+
 function bankFiltered(search){
   var s = (search||'').toLowerCase().trim();
   return QUESTIONS.filter(function(q){
@@ -3443,7 +4364,8 @@ function renderBank(body){
   var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   var order = null;
   function draw(){
@@ -3531,7 +4453,7 @@ function sectionHTML(sec, term){
     var li = sec.items.filter(m); if(!li.length) return '';
     inner = '<ul class="rv-list">' + li.map(function(x){ return '<li>'+hl(x, term)+'</li>'; }).join('') + '</ul>';
   } else if(sec.type === 'figs'){
-    var fk = sec.figs.filter(function(k){ return m(FIGS[k].title) || m(FIGS[k].caption); }); if(!fk.length) return '';
+    var fk = sec.figs.filter(function(k){ return k === 'cuspMap' ? m('What cusp hits where: fence post, contacts, Class I II III') : m(FIGS[k].title) || m(FIGS[k].caption); }); if(!fk.length) return '';
     inner = '<div class="fig-grid">' + fk.map(figCardHTML).join('') + '</div>';
   } else if(sec.type === 'flows'){
     var seqs = SEQUENCES.filter(function(s){ return m(s.title) || s.steps.some(m); }); if(!seqs.length) return '';
@@ -3550,6 +4472,7 @@ function renderReview(){
     '<nav class="group-nav" aria-label="Review groups">' + REVIEW.map(function(x){ return '<button type="button" class="group-chip'+(x.id===g.id && !reviewSearch?' is-active':'')+'" data-group="'+x.id+'">'+(x.lec ? groupLecTag(x.lec) : icon(x.icon))+escHtml(x.title)+'<span class="n">'+groupCount(x)+'</span></button>'; }).join('') + '</nav>' +
     '<div id="rvBody" class="'+(STATE.ui.recall?'recall':'')+'"></div>';
   var rb = document.getElementById('rvBody');
+  wireCuspMaps(rb);
   function draw(){
     var term = reviewSearch.trim();
     if(term){
@@ -3638,7 +4561,7 @@ function renderMock(body){
       '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
       figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, pick === null ? [] : [pick]) : '')+cueHTML(q)+
+      '<div class="qcard-explain" data-role="explain">'+verdict+(m.submitted ? figAfterHTML(q) : '')+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, pick === null ? [] : [pick]) : '')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';
@@ -4906,7 +5829,7 @@ function shFlashIn(sel){ setTimeout(function(){ var el = typeof sel === 'string'
 window.SH_GOTO = function(g){
   if(!g) return;
   if(g.v === 'notes'){ STATE.ui.lec = g.lec; STATE.ui.sub = 'notes'; STATE.ui.level = 'full'; saveState(); setMode('compendium');
-    shFlashIn(function(){ var p = document.querySelector('#compBody .reading-prose'); return p && p.querySelectorAll('p, li, h3, h4')[g.k]; }); }
+    shFlashIn(function(){ var p = document.querySelector('#compBody .reading-prose'); return p && Array.prototype.filter.call(p.querySelectorAll('p, li, h3, h4'), function(el){ return !el.closest('[data-sh-noread]'); })[g.k]; }); }
   else if(g.v === 'cram'){ STATE.ui.sub = 'cram'; saveState(); setMode('compendium'); shFlashIn('#cram-' + g.lec); }
   else if(g.v === 'hints'){ STATE.ui.sub = 'hints'; saveState(); setMode('compendium');
     shFlashIn(function(){ var a = document.querySelector('#compBody .hint-group [data-lec="' + g.lec + '"]'); return a && a.closest('.hint-group'); }); }

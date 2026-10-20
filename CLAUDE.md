@@ -150,7 +150,15 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   `url(#id)` would point into the first copy: give new ids the figure's prefix (`nm-`, `sc-`), and in live code or CSS
   never hard-code one (read it from the markup, or match `[id^="sc-actin-p"]`). In Review a figure goes in the group it
   belongs to, as a section of type `figs` (MSK 4: the NMJ under Drugs, the sarcomere under Muscle).
-- Under a lecture's notes, figures go outside `.reading-prose` (the narrated text), so the narration doesn't drift.
+- Under a lecture's notes, figures go outside `.reading-prose` (the narrated text), so the narration doesn't drift, or
+  inside the notes next to the paragraph they explain, inserted at render time in a wrapper with `data-sh-noread`
+  (Occlusion's `FIG_PLACE`, 2026-10-20): the browser voice, the highlighter and note-search jumps skip it, and the
+  READINGS text itself never changes. Never paste a figure into the READINGS strings.
+- Occlusion's figures, case images (drawn perio charts, radiographs, intraoral views) and the "What cusp hits where?"
+  game come from one plain-JS kit in `tools/figures/occlusion/` (`build.mjs` pastes it between the hub's `od:kit` /
+  `od:css` markers; `--check` fails if they are stale). Contacts per Angle class are read off the help sheet's own
+  pictures (`CONTACTS`). A figure's `key` is folded under the notes/Review copy (`figKeyHTML`) and opens in the explanation
+  after answering (`figAfterHTML`); in-picture labels with class `fg-hint` hide while the figure sits above a question stem.
 - **Picture questions never give the answer away** (Sam's standing rule, 2026-10-14). The diagram sits above the stem only
   when the question can't be answered without it (name the highlighted part, read arrow B, which suture is shown).
   Otherwise write a stem that stands on its own and set `imgAfter:true`: the diagram then opens with the explanation,
