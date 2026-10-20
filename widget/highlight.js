@@ -11,21 +11,23 @@
   var bar = null, pending = null, menu = null;
 
   function hash(s){ var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + s.length.toString(36); }
-  function keyOf(el){ return "sh_hl:" + HUB + ":" + hash(el.textContent || ""); }
+  /* the notes' own text: figures placed inside the notes (data-sh-noread) are left out, so placing one doesn't drop highlights */
+  function textOf(el){ return textNodes(el).map(function(n){ return n.nodeValue; }).join(""); }
+  function keyOf(el){ return "sh_hl:" + HUB + ":" + hash(textOf(el)); }
   function load(k){ try { var v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
   function save(k, list){ try { if (list.length) localStorage.setItem(k, JSON.stringify(list)); else localStorage.removeItem(k); } catch (e) {} }
 
   function textNodes(el){
     var out = [], w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: function(n){
-      var p = n.parentNode; return p && /^(SCRIPT|STYLE)$/i.test(p.nodeName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } });
+      var p = n.parentNode; return p && (/^(SCRIPT|STYLE)$/i.test(p.nodeName) || (p.closest && p.closest("[data-sh-noread]"))) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } });
     while (w.nextNode()) out.push(w.currentNode);
     return out;
   }
   function offsetOf(el, node, off){
     if (node.nodeType !== 3) {
-      // a range boundary on an element: count the text before its off-th child
-      var r = document.createRange(); r.selectNodeContents(el); r.setEnd(node, off);
-      return r.toString().length;
+      // a range boundary on an element: count the notes text (figures left out) before its off-th child
+      var b = document.createRange(); b.setStart(node, off); b.collapse(true);
+      return textNodes(el).reduce(function(sum, t){ return b.comparePoint(t, t.nodeValue.length) < 0 ? sum + t.nodeValue.length : sum; }, 0);
     }
     var nodes = textNodes(el), sum = 0;
     for (var i = 0; i < nodes.length; i++) { if (nodes[i] === node) return sum + off; sum += nodes[i].nodeValue.length; }

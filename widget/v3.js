@@ -312,7 +312,8 @@
             words.push({ el: span, text: part });
           });
           node.parentNode.replaceChild(frag, node);
-        } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE)$/i.test(node.tagName)) {
+        } else if (node.nodeType === 1 && !/^(SCRIPT|STYLE)$/i.test(node.tagName) && !node.hasAttribute("data-sh-noread")) {
+          // figures placed inside the notes carry data-sh-noread: they are not part of the narrated text
           Array.prototype.slice.call(node.childNodes).forEach(walk);
         }
       }
