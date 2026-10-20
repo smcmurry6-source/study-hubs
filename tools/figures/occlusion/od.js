@@ -284,9 +284,12 @@ var FIG_PLACE = {
     { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
+  ],
+  anatomy: [
+    { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'], anatomy:['tmj'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

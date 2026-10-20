@@ -156,7 +156,8 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   READINGS text itself never changes. Never paste a figure into the READINGS strings.
 - Occlusion's figures, case images (drawn perio charts, radiographs, intraoral views) and the "What cusp hits where?"
   game come from one plain-JS kit in `tools/figures/occlusion/` (`build.mjs` pastes it between the hub's `od:kit` /
-  `od:css` markers; `--check` fails if they are stale). Contacts per Angle class are read off the help sheet's own
+  `od:css` markers, and the anima figures from `anima/` between the `anima:js` / `anima:css` markers; `--check` fails if
+  any block is stale; `--preview` writes standalone pages for anima's checks). Contacts per Angle class are read off the help sheet's own
   pictures (`CONTACTS`). A figure's `key` is folded under the notes/Review copy (`figKeyHTML`) and opens in the explanation
   after answering (`figAfterHTML`); in-picture labels with class `fg-hint` hide while the figure sits above a question stem.
 - **Picture questions never give the answer away** (Sam's standing rule, 2026-10-14). The diagram sits above the stem only
