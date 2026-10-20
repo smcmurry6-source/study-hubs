@@ -47,7 +47,7 @@
   }
 
   var IC = {
-    probe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-9"/><path d="M12 12l3-3c1-1 1-3 3-4l2-1"/><path d="M14 16l1.5 1.5M16 14l1.5 1.5M18 12l1.5 1.5"/></svg>',
+    get probe(){ return probeArt(); },
     tooth: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/></svg>',
     wing: '<svg viewBox="0 0 48 40"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path class="egg-wl" d="M18 16C10 4 1 6 2 14c1 6 9 7 16 4"/><path class="egg-wr" d="M30 16C38 4 47 6 46 14c-1 6-9 7-16 4"/><path fill="var(--egg-fairy-fill,#fff)" d="M17 9c-2 0-3.5 1.5-3.5 3.5 0 2 1 3 1.4 4.8.4 2.2.7 4.7 1.8 4.7s1.3-2.2 1.6-3.6c.1-.7.4-1.1 1.7-1.1s1.6.4 1.7 1.1c.3 1.4.5 3.6 1.6 3.6s1.4-2.5 1.8-4.7c.4-1.8 1.4-2.8 1.4-4.8C30 10.5 28.5 9 26.5 9c-1.5 0-2.2.7-3.6.7S18.5 9 17 9z" transform="translate(2 8)"/></g><g fill="currentColor"><circle cx="8" cy="30" r="1"/><circle cx="41" cy="33" r="1.2"/><circle cx="24" cy="4" r="1"/></g></svg>',
     blob: '<svg viewBox="0 0 40 40"><path fill="currentColor" d="M20 4c6 0 8 4 12 5s5 6 4 10 2 8-2 12-9 2-14 4-9-1-12-5-4-8-3-12 2-9 6-11 5-3 9-3z"/><circle cx="14" cy="17" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="26" cy="17" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="14.6" cy="17.6" r="1.4"/><circle cx="26.6" cy="17.6" r="1.4"/><path d="M13 27c3-2.5 11-2.5 14 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
@@ -58,6 +58,61 @@
     cavity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M12.6 7.4c1.4-.2 2.4.8 2 2-.5 1.2-2.2 1.4-2.8.4-.5-.8-.2-2.2.8-2.4z" fill="currentColor"/></svg>',
     root: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M9.5 8.5l1 8M14.5 8.5l-1 8"/></svg>'
   };
+
+  /* ---------- drawn art (2026-10-20): the Golden Probe, the Tooth Fairy and the boss lineup ----------
+     Each copy gets its own gradient ids (uid), because a toast that defined them can leave the page. */
+  var UID = 0;
+  function uid(p){ return p + (++UID).toString(36); }
+  function sparkle(x, y, r, fill){ return '<path d="M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'Z" fill="' + fill + '"/>'; }
+  /* a gold periodontal probe: knurled handle, ferrule, a bent shank and a tip banded at the millimeter marks */
+  function probeArt(){
+    var g = uid("gp"), h = uid("gh");
+    return '<svg viewBox="0 0 48 48" aria-hidden="true"><defs>' +
+      '<linearGradient id="' + g + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".35" stop-color="#F5C842"/><stop offset=".7" stop-color="#C08A12"/><stop offset="1" stop-color="#8A5E06"/></linearGradient>' +
+      '<radialGradient id="' + h + '" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE68A" stop-opacity=".75"/><stop offset="1" stop-color="#FFE68A" stop-opacity="0"/></radialGradient></defs>' +
+      '<circle cx="24" cy="24" r="22" fill="url(#' + h + ')"/>' +
+      '<g transform="rotate(-42 24 24)">' +
+        '<rect x="1" y="20.6" width="23" height="6.8" rx="3.4" fill="url(#' + g + ')" stroke="#7A5205" stroke-width=".8"/>' +
+        '<path d="M5 21.2v5.6M8 21v6M11 21v6M14 21v6M17 21v6M20 21.2v5.6" stroke="#8A5E06" stroke-width=".9" opacity=".55"/>' +
+        '<path d="M3 22.4h19" stroke="#FFF8D6" stroke-width="1" stroke-linecap="round" opacity=".8"/>' +
+        '<rect x="23.4" y="21.8" width="3.6" height="4.4" rx="1" fill="url(#' + g + ')" stroke="#7A5205" stroke-width=".7"/>' +
+        '<path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="#7A5205" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="url(#' + g + ')" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M42.3 28.7l.7 1.4M43.2 30.5l.5 1M44 32.1l.5 1" stroke="#3A2A05" stroke-width="1.7" stroke-linecap="butt"/>' +
+      '</g>' +
+      sparkle(37, 8, 4.2, "#FFE36B") + sparkle(43.5, 17, 2.6, "#FFF3B0") + sparkle(9, 9, 2.8, "#FFE36B") + sparkle(30, 41, 2.2, "#FFF3B0") +
+      '</svg>';
+  }
+  /* the Tooth Fairy: a little tooth with a face, veined wings, a wand and a crown; v = her look for this flight */
+  var FAIRY_LOOKS = [
+    { id: "rose",  wing: "#FFB8D9", vein: "#E0609E", cheek: "#FF8FB1", crown: "tiara" },
+    { id: "lilac", wing: "#D9C2FF", vein: "#8E62D9", cheek: "#FF9EC4", crown: "flowers" },
+    { id: "mint",  wing: "#BFF3DC", vein: "#2FA77A", cheek: "#FF9EB0", crown: "bow" },
+    { id: "sky",   wing: "#BFE3FF", vein: "#3F8FD9", cheek: "#FFA3B5", crown: "tiara" },
+    { id: "peach", wing: "#FFD6B0", vein: "#E07A2F", cheek: "#FF8F8F", crown: "flowers" },
+    { id: "gold",  wing: "#FFE68A", vein: "#C08A12", cheek: "#FFB070", crown: "tiara", rare: true }
+  ];
+  function fairyArt(v){
+    var w = uid("fw"), b = uid("fb");
+    var crown = v.crown === "tiara" ? '<path d="M27.5 13.2l1.4-3.6 1.8 2.4 1.3-3.4 1.3 3.4 1.8-2.4 1.4 3.6z" fill="#F6CD55" stroke="#B8860B" stroke-width=".6" stroke-linejoin="round"/><circle cx="32" cy="8.6" r=".9" fill="#FF5FAE"/>'
+      : v.crown === "flowers" ? '<g stroke="none"><circle cx="27.8" cy="12.6" r="1.6" fill="#FF8FB1"/><circle cx="31" cy="11.4" r="1.7" fill="#FFE36B"/><circle cx="34.4" cy="11.6" r="1.6" fill="#B08CFF"/><circle cx="37" cy="13" r="1.4" fill="#8FD3F5"/></g>'
+      : '<path d="M29 12.4l-3-2v4zM35 12.4l3-2v4z" fill="' + v.vein + '"/><circle cx="32" cy="12.4" r="1.3" fill="' + v.vein + '"/>';
+    return '<svg viewBox="0 0 64 54" aria-hidden="true"><defs>' +
+      '<linearGradient id="' + w + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="' + v.wing + '" stop-opacity=".85"/></linearGradient>' +
+      '<linearGradient id="' + b + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="' + (v.rare ? "#FFE9A8" : "#EEF2F6") + '"/></linearGradient></defs>' +
+      '<g class="egg-wl"><path d="M26 22C17 6 4 6 4 15c0 7 11 10 22 8z" fill="url(#' + w + ')" stroke="' + v.vein + '" stroke-width="1"/><path d="M25 21.5C17 12 10 11 8 14M25 22.4C16 19 11 18 8.4 19" stroke="' + v.vein + '" stroke-width=".7" fill="none" opacity=".7"/>' +
+        '<path d="M26 25C19 30 11 35 9 30c-1.5-4 8-6 17-5z" fill="url(#' + w + ')" stroke="' + v.vein + '" stroke-width=".9"/></g>' +
+      '<g class="egg-wr"><path d="M38 22C47 6 60 6 60 15c0 7-11 10-22 8z" fill="url(#' + w + ')" stroke="' + v.vein + '" stroke-width="1"/><path d="M39 21.5C47 12 54 11 56 14M39 22.4C48 19 53 18 55.6 19" stroke="' + v.vein + '" stroke-width=".7" fill="none" opacity=".7"/>' +
+        '<path d="M38 25C45 30 53 35 55 30c1.5-4-8-6-17-5z" fill="url(#' + w + ')" stroke="' + v.vein + '" stroke-width=".9"/></g>' +
+      '<path d="M25.6 14c-3 0-4.6 2.2-4.6 5 0 3.4 1.7 5 2.3 7.8.6 3.2 1 7.4 2.7 7.4s2-3.2 2.4-5.3c.2-1.1.6-1.6 3.6-1.6s3.4.5 3.6 1.6c.4 2.1.7 5.3 2.4 5.3s2.1-4.2 2.7-7.4c.6-2.8 2.3-4.4 2.3-7.8 0-2.8-1.6-5-4.6-5-2.3 0-3.2 1-6.4 1s-4.1-1-6.4-1z" fill="url(#' + b + ')" stroke="#6B7C8C" stroke-width="1.1" stroke-linejoin="round"/>' +
+      crown +
+      '<circle cx="28.6" cy="20.4" r="1.25" fill="#2B2B33"/><circle cx="35.4" cy="20.4" r="1.25" fill="#2B2B33"/><circle cx="29" cy="20" r=".4" fill="#fff"/><circle cx="35.8" cy="20" r=".4" fill="#fff"/>' +
+      '<ellipse cx="26.4" cy="23" rx="1.6" ry="1" fill="' + v.cheek + '" opacity=".7"/><ellipse cx="37.6" cy="23" rx="1.6" ry="1" fill="' + v.cheek + '" opacity=".7"/>' +
+      '<path d="M29.8 23.4q2.2 2 4.4 0" stroke="#2B2B33" stroke-width="1" fill="none" stroke-linecap="round"/>' +
+      '<path d="M40.4 24.6l7.6-6.4" stroke="#8A5E06" stroke-width="1.2" stroke-linecap="round"/>' + sparkle(48.6, 17.6, 3.6, "#FFE36B") +
+      '<g class="egg-fx-dust">' + sparkle(53, 26, 1.6, "#fff") + sparkle(45, 10, 1.3, "#FFF3B0") + '</g>' +
+      '</svg>';
+  }
 
   /* ================= Holidays =================
      A holiday week dresses the hubs up: themed confetti (window.shConfettiTheme, read by v3.js), a costumed Plaque Boss,
@@ -125,9 +180,72 @@
   }
   applyHoliday();
   document.addEventListener("sh:pref", applyHoliday);
-  function bossName(){ return HOLIDAY && on() ? HOLIDAY.boss : "Plaque Boss"; }
-  /* the boss blob in costume: drawn into the same 40x40 frame as IC.blob */
-  function bossIcon(){
+  /* the boss lineup (2026-10-20): each 2-hour window brings one of these, picked from the window's id, so classmates
+     online together all fight the same one. Every body is drawn in the blob's 40x40 frame with its head near the top,
+     so the holiday hats still fit. HP differs; lines change as it weakens (said[0] full, [1] under 60%, [2] under 25%). */
+  function eyes(y, mad){ return '<circle cx="14" cy="' + y + '" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="26" cy="' + y + '" r="3" fill="var(--egg-boss-eye,#fff)"/><circle cx="14.6" cy="' + (y + .6) + '" r="1.4"/><circle cx="26.6" cy="' + (y + .6) + '" r="1.4"/>' +
+    (mad ? '<path d="M10 ' + (y - 5) + 'l7 2.4M30 ' + (y - 5) + 'l-7 2.4" stroke="#2B2B33" stroke-width="1.8" stroke-linecap="round"/>' : ''); }
+  var BOSSES = [
+    { id: "plaque", name: "Plaque Boss", hp: 40, color: "#B8A04A", svg: null,
+      said: ["Every correct answer from anyone here hits it", "It's getting sticky in here. Keep answering!", "It's crumbling. Finish it off!"] },
+    { id: "tartar", name: "Tartar Titan", hp: 50, color: "#A8946A",
+      svg: '<path fill="currentColor" stroke="rgba(0,0,0,.35)" stroke-width="1" stroke-linejoin="round" d="M8 9l7-5 6 3 7-3 6 6 2 9-3 6 2 7-7 5-6-2-6 3-7-4-3-8 2-6z"/><path d="M13 30l3-4 3 3M24 7l-2 5 3 3M31 25l-3 2" stroke="rgba(0,0,0,.35)" stroke-width="1.2" fill="none"/>' + eyes(17, true) + '<path d="M13 28h14" stroke="var(--egg-boss-eye,#fff)" stroke-width="2.2" stroke-linecap="round"/>',
+      said: ["Calcified and proud. It takes a scaler, or a lot of right answers.", "Chips are flying. Keep scaling!", "One more pass and it's root planed."] },
+    { id: "biofilm", name: "Biofilm Blob", hp: 40, color: "#6DBE5B",
+      svg: '<path fill="currentColor" d="M20 5c7 0 12 4 13 10 1 4 3 8 1 12-1 2 0 6-2 6s-2-3-3-3-1 5-3 5-2-4-4-4-2 6-4 6-2-5-4-5-1 3-3 3-2-4-2-7c-2-4-1-8 0-12C10 9 13 5 20 5z"/><circle cx="29" cy="11" r="2" fill="#fff" opacity=".5"/><circle cx="11" cy="24" r="1.4" fill="#fff" opacity=".45"/>' + eyes(17) + '<path d="M14 26q6 4 12 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/>',
+      said: ["A whole slimy city of bacteria. Disrupt it with right answers.", "The matrix is breaking up!", "Almost disrupted. Don't stop now."] },
+    { id: "mutans", name: "Strep Mutans Swarm", hp: 36, color: "#9B6BD6",
+      svg: '<g fill="currentColor" stroke="rgba(0,0,0,.3)" stroke-width=".8"><circle cx="20" cy="18" r="11"/><circle cx="6" cy="28" r="4"/><circle cx="12" cy="33" r="4"/><circle cx="20" cy="35" r="4"/><circle cx="28" cy="33" r="4"/><circle cx="34" cy="28" r="4"/><circle cx="35" cy="9" r="3"/><circle cx="5" cy="10" r="3"/></g>' + eyes(16, true) + '<path d="M15 23q5-3 10 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/>',
+      said: ["They turn sugar into acid. Starve them with right answers.", "The chain is breaking!", "Only a few cocci left!"] },
+    { id: "caries", name: "Cavity Creep", hp: 40, color: "#8C5A3C",
+      svg: '<path fill="currentColor" d="M20 4c6 0 8 4 12 5s5 6 4 10 2 8-2 12-9 2-14 4-9-1-12-5-4-8-3-12 2-9 6-11 5-3 9-3z"/><path d="M27 25c3-1 5 1 4 4-1 2-4 3-6 1-1-2 0-4 2-5z" fill="#2B1A10"/><circle cx="10" cy="9" r="1.2" fill="#2B1A10"/>' + eyes(16, true) + '<path d="M12 25l3-2 3 2 3-2 3 2" stroke="var(--egg-boss-eye,#fff)" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+      said: ["It's digging into enamel. Every right answer is a restoration.", "It hears the handpiece. Keep going!", "Prep it out. One more push!"] },
+    { id: "gingivitis", name: "Gingivitis Goblin", hp: 44, color: "#D9534F",
+      svg: '<path fill="currentColor" d="M4 10l7 4c2-5 5-8 9-8s7 3 9 8l7-4-3 9c1 2 1 4 1 6 0 7-7 11-14 11S6 32 6 25c0-2 0-4 1-6z"/><path d="M9 31q11 6 22 0" stroke="#fff" stroke-width="1.6" fill="none" stroke-dasharray="1.6 1.6" opacity=".7"/>' + eyes(19, true) + '<path d="M15 26q5 3 10 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M17 27.4l1 2 1-2M21 27.4l1 2 1-2" fill="#fff"/>',
+      said: ["Red, puffy and it bleeds on probing. Calm it down with right answers.", "The swelling's going down!", "Nearly reversible. Finish it!"] },
+    { id: "halitosis", name: "Halitosis Haze", hp: 34, color: "#8FA37A",
+      svg: '<path fill="currentColor" d="M10 32c-5 0-8-3-8-7s3-6 6-6c0-6 5-10 11-10 4 0 8 2 10 6 1-1 2-1 3-1 4 0 7 3 7 7 0 6-4 11-9 11z"/><path d="M8 7q2-3 0-5M20 5q2-3 0-5M32 8q2-3 0-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".7"/>' + eyes(21) + '<ellipse cx="20" cy="28" rx="3.4" ry="2.2" fill="var(--egg-boss-eye,#fff)"/>',
+      said: ["Volatile sulfur compounds, mostly. Clear the air with right answers.", "It's thinning out!", "Just a whiff left!"] },
+    { id: "redcomplex", name: "The Red Complex", hp: 48, color: "#A3263A",
+      svg: '<g fill="currentColor" stroke="rgba(0,0,0,.35)" stroke-width=".8"><rect x="8" y="8" width="24" height="26" rx="12"/><path d="M33 16c4-2 5 2 7 0M33 26c4 2 5-2 7 0M7 16c-4-2-5 2-7 0M7 26c-4 2-5-2-7 0" fill="none" stroke="currentColor" stroke-width="1.4"/></g>' + eyes(18, true) + '<path d="M14 27q6-3 12 0" stroke="var(--egg-boss-eye,#fff)" stroke-width="2" fill="none" stroke-linecap="round"/>',
+      said: ["P. gingivalis, T. forsythia and T. denticola walked in together. Break them up.", "The complex is falling apart!", "Last of the red complex. Get it!"] }
+  ];
+  function bossKind(id){ return BOSSES[hash(String(id || bossId())) % BOSSES.length]; }
+  /* every boss has a regular version and a seasonal one: during a holiday it wears that holiday's costume (bossIcon)
+     and goes by its seasonal name, with an opening line for the season */
+  var SEASONAL = {
+    halloween:    { plaque: "Count Plaqula", tartar: "Tartar-stein", biofilm: "The Biofilm Ghoul", mutans: "Strep Mummy-tans",
+                    caries: "The Crypt Cavity", gingivitis: "The Gingi-witch", halitosis: "The Halitosis Haunt", redcomplex: "The Red Complex Coven",
+                    line: "Trick or treat. Mostly treats, which is exactly the problem." },
+    thanksgiving: { plaque: "Pilgrim Plaque", tartar: "Tartar Turkey", biofilm: "Gravy Biofilm", mutans: "The Stuffing Swarm",
+                    caries: "Cranberry Cavity", gingivitis: "The Gingi-gobbler", halitosis: "Green Bean Halitosis", redcomplex: "The Red Complex Cornucopia",
+                    line: "Back for seconds, and thirds. Answer it back to the kids' table." },
+    winter:       { plaque: "Plaque Claus", tartar: "Tartar the Snowman", biofilm: "Biofilm Frost", mutans: "The Mutans Elves",
+                    caries: "Candy Cane Cavity", gingivitis: "The Grinch-ivitis", halitosis: "The Halitosis Blizzard", redcomplex: "The Red-Nosed Complex",
+                    line: "It's been naughty all year. Right answers go on the nice list." },
+    newyear:      { plaque: "Party Plaque", tartar: "Auld Lang Tartar", biofilm: "Bubbly Biofilm", mutans: "The Confetti Swarm",
+                    caries: "Midnight Cavity", gingivitis: "Gingivitis Hangover", halitosis: "New Year's Halitosis", redcomplex: "The Red Complex Ball Drop",
+                    line: "Its resolution was to stick around. Make yours to knock it out." },
+    valentine:    { plaque: "Plaque-entine", tartar: "Tartar Sweetheart", biofilm: "Biofilm, Be Mine", mutans: "The Mutans Cupids",
+                    caries: "Candy Heart Cavity", gingivitis: "Gingi-love-itis", halitosis: "The Halitosis Kiss", redcomplex: "The Red Rose Complex",
+                    line: "It has a crush on your enamel. Let it down with right answers." },
+    dentist:      { plaque: "Plaque Boss (very nervous)", tartar: "Tartar Titan (dreading the scaler)", biofilm: "Biofilm Blob (hiding from the floss)",
+                    mutans: "Strep Mutans Swarm (out of sugar)", caries: "Cavity Creep (hears the drill)", gingivitis: "Gingivitis Goblin (bleeding nervously)",
+                    halitosis: "Halitosis Haze (mouthwash panic)", redcomplex: "The Red Complex (on probation)",
+                    line: "It knows what day it is. Happy National Dentist's Day." },
+    stpatrick:    { plaque: "Plaquerechaun", tartar: "Tartar o' Gold", biofilm: "Shamrock Biofilm", mutans: "The Clover Swarm",
+                    caries: "Cavity at the End of the Rainbow", gingivitis: "Gingi-green-itis", halitosis: "Halitosis O'Haze", redcomplex: "The Green Complex (in disguise)",
+                    line: "It's hiding its pot of gold in a deep pocket. Go get it." },
+    easter:       { plaque: "Plaque Bunny", tartar: "Tartar Egg", biofilm: "Biofilm Basket", mutans: "The Mutans Peeps",
+                    caries: "Chocolate Bunny Cavity", gingivitis: "Gingivitis Hare", halitosis: "Jellybean Halitosis", redcomplex: "The Red Complex Egg Hunt",
+                    line: "It hid in the grass with the jellybeans. Hunt it down." }
+  };
+  function season(){ return HOLIDAY && on() ? SEASONAL[HOLIDAY.id] : null; }
+  function bossName(k){ k = k || bossKind(); var se = season(); return se && se[k.id] ? se[k.id] : k.name; }
+  /* the boss in costume: drawn into the same 40x40 frame as IC.blob */
+  function bossIcon(k){
+    k = k || bossKind();
+    var base = k.svg ? '<svg viewBox="0 0 40 40">' + k.svg + '</svg>' : IC.blob;
     var id = HOLIDAY && on() ? HOLIDAY.id : "", under = "", over = "";
     if (id === "halloween") {
       under = '<path d="M5 14 C1 22 2 33 7 38 L12 31 L16 37 L20 31 L24 37 L28 31 L33 38 C38 33 39 22 35 14 Z" fill="#4A1A6B"/><path d="M5 14 C1 22 2 33 7 38" stroke="#C21E56" stroke-width="1.4" fill="none"/>';
@@ -149,8 +267,8 @@
       over = '<path d="M13 9 C9 -4 11 -10 14 -10 C17 -10 18 -2 17 8" fill="#fff" stroke="#E7B9C8" stroke-width="1"/><path d="M13.6 5 C12.6 -2 13 -6 14 -6 C15 -6 15.6 -1 15.4 5" fill="#FFB3C7"/>' +
         '<path d="M27 9 C31 -4 29 -10 26 -10 C23 -10 22 -2 23 8" fill="#fff" stroke="#E7B9C8" stroke-width="1"/><path d="M26.4 5 C27.4 -2 27 -6 26 -6 C25 -6 24.4 -1 24.6 5" fill="#FFB3C7"/>';
     }
-    if (!id) return IC.blob;
-    return IC.blob.replace('<svg viewBox="0 0 40 40">', '<svg viewBox="0 -12 40 52" style="overflow:visible">' + under).replace(/<\/svg>$/, over + '</svg>');
+    if (!id) return base;
+    return base.replace('<svg viewBox="0 0 40 40">', '<svg viewBox="0 -12 40 52" style="overflow:visible">' + under).replace(/<\/svg>$/, over + '</svg>');
   }
   /* the magic word's parade: a burst of the holiday's shape across the screen */
   function parade(h){
@@ -229,79 +347,110 @@
   }
 
   /* ================= Tooth Fairy ================= */
-  function maybeFairy(){
-    if (Math.random() >= 1 / 400) return;
-    var last = +(ls("sh_egg_fairy_t") || 0);
-    if (Date.now() - last < 10 * 60 * 1000) return;
-    ls("sh_egg_fairy_t", String(Date.now()));
+  function maybeFairy(test){
+    if (!test) {
+      if (Math.random() >= 1 / 400) return;
+      var last = +(ls("sh_egg_fairy_t") || 0);
+      if (Date.now() - last < 10 * 60 * 1000) return;
+      ls("sh_egg_fairy_t", String(Date.now()));
+    }
+    /* her look and her flight path change every visit; one flight in ten she is the Golden Fairy */
+    var looks = FAIRY_LOOKS.filter(function(v){ return !v.rare; });
+    var v = test && test.look != null ? FAIRY_LOOKS[test.look % FAIRY_LOOKS.length] : Math.random() < .1 ? FAIRY_LOOKS[FAIRY_LOOKS.length - 1] : looks[Math.floor(Math.random() * looks.length)];
+    var path = test && test.path || ["wave", "loop", "zigzag", "swoop", "back"][Math.floor(Math.random() * 5)];
     var f = document.createElement("button");
     f.type = "button";
-    f.className = "sh-egg sh-egg-fairy";
-    f.setAttribute("aria-label", "Catch the Tooth Fairy");
+    f.className = "sh-egg sh-egg-fairy is-" + path + (v.rare ? " is-golden" : "");
+    f.setAttribute("aria-label", v.rare ? "Catch the Golden Tooth Fairy" : "Catch the Tooth Fairy");
     f.style.top = (18 + Math.random() * 45) + "vh";
-    f.innerHTML = IC.wing;
+    f.innerHTML = fairyArt(v);
     document.body.appendChild(f);
-    var gone = setTimeout(function(){ f.remove(); }, 7600);
+    /* a sparkle trail behind her */
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var trail = reduce ? 0 : setInterval(function(){
+      if (!f.isConnected) { clearInterval(trail); return; }
+      var r = f.getBoundingClientRect(), d = document.createElement("span");
+      d.className = "sh-egg sh-egg-dust"; d.setAttribute("aria-hidden", "true");
+      d.style.left = (r.left + r.width / 2 + (Math.random() - .5) * 16) + "px"; d.style.top = (r.top + r.height * .6 + (Math.random() - .5) * 12) + "px";
+      d.style.background = Math.random() < .5 ? v.wing : "#FFE36B";
+      document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 900);
+    }, 110);
+    var gone = setTimeout(function(){ clearInterval(trail); f.remove(); }, 7600);
+    var CAUGHT = v.rare ? ["She left a gold crown behind. Lucky you.", "The rarest flight of all, and you caught it."]
+      : ["She dropped a coin and flew off giggling.", "She says your enamel looks fantastic.", "She's off to find a loose tooth somewhere.", "She tried to take your notes. You said no."];
     f.addEventListener("click", function(){
-      clearTimeout(gone);
+      clearTimeout(gone); clearInterval(trail);
       f.classList.add("is-caught");
       setTimeout(function(){ f.remove(); }, 500);
-      announce("fairy");
+      if (v.rare) { H.confetti(); }
+      announce("fairy", { look: v.id });
+      if (test) { toast(row(fairyArt(v), "Preview: Tooth Fairy caught", v.id + " · " + path), 4000); return; }
       rpc("record_fairy", { p_hub: HUB, p_visitor: VISITOR }).then(function(n){
-        toast(row(IC.tooth, "You caught the Tooth Fairy!", n ? "That's " + n + " caught so far. Collectors are listed under Stats." : "She'll be back."), 5000);
+        var line = CAUGHT[Math.floor(Math.random() * CAUGHT.length)];
+        toast(row(fairyArt(v), v.rare ? "You caught the Golden Tooth Fairy!" : "You caught the Tooth Fairy!", line + (n ? " That's " + n + " caught so far. Collectors are listed under Stats." : "")), 5600, v.rare ? "is-gold" : "");
       });
     });
   }
 
   /* ================= Plaque Boss ================= */
-  var BOSS_HP = 40, boss = null, bossHidden = false, lastHitSend = 0;
+  var boss = null, bossHidden = false, lastHitSend = 0;
   function bossId(){ var c = centralParts(); return HUB + "|" + c.day + "|" + Math.floor(c.hour / 2); }
   function bossDown(id){ return ls("sh_egg_boss_down") === id; }
-  function spawnBoss(hp){
+  function spawnBoss(hp, test){
     var id = bossId();
-    if (boss && boss.id === id) return;
-    if (bossDown(id)) return;
+    if (!test && boss && boss.id === id) return;
+    if (!test && bossDown(id)) return;
     if (boss) boss.el.remove();
+    var k = test ? test.k : bossKind(id);
     var el = document.createElement("div");
-    el.className = "sh-egg sh-egg-boss";
-    el.innerHTML = '<span class="sh-egg-boss-face">' + bossIcon() + '</span>' +
-      '<span class="sh-egg-boss-body"><b>' + bossName() + '</b><small>Every correct answer from anyone in the hub hits it</small>' +
+    el.className = "sh-egg sh-egg-boss sh-egg-boss-" + k.id;
+    el.innerHTML = '<span class="sh-egg-boss-face" style="color:' + k.color + '">' + bossIcon(k) + '</span>' +
+      '<span class="sh-egg-boss-body"><b>' + bossName(k) + '</b><small>Every correct answer from anyone in the hub hits it</small>' +
       '<span class="sh-egg-boss-bar"><i></i></span></span>' +
       '<button type="button" class="sh-egg-x" aria-label="Hide the boss">×</button>';
     document.body.appendChild(el);
     el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); });
-    boss = { id: id, hp: Math.min(BOSS_HP, hp || BOSS_HP), el: el };
+    boss = { id: id, k: k, max: k.hp, hp: Math.min(k.hp, hp || k.hp), el: el, test: !!test };
     drawBoss();
     requestAnimationFrame(function(){ if (!bossHidden && ok()) el.classList.add("is-shown"); });
   }
   function drawBoss(){
     if (!boss) return;
-    boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * boss.hp / BOSS_HP) + "%";
-    boss.el.querySelector("small").textContent = boss.hp + " / " + BOSS_HP + " HP · every correct answer from anyone here hits it";
+    var f = boss.hp / boss.max, said = boss.k.said;
+    boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
+    var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
+    boss.el.querySelector("small").textContent = boss.hp + " / " + boss.max + " HP · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
+    boss.el.classList.toggle("is-low", f <= .25);
     boss.el.classList.toggle("is-shown", !bossHidden && ok());
   }
   function defeatBoss(by){
     if (!boss) return;
     ls("sh_egg_boss_down", boss.id);
-    var el = boss.el; boss = null;
+    var el = boss.el, k = boss.k; boss = null;
     el.classList.add("is-dead");
     setTimeout(function(){ el.remove(); }, 900);
     if (!on()) return;
     H.confetti(); setTimeout(H.confetti, 350); setTimeout(H.confetti, 700);
-    toast(row(bossIcon(), bossName() + " defeated!", "Final blow: " + esc(by || "someone") + ". Nice teamwork."), 6000, "is-gold");
-    announce("boss");
+    toast(row('<span style="color:' + k.color + ';display:block;width:100%;height:100%">' + bossIcon(k) + '</span>', bossName(k) + " defeated!", "Final blow: " + esc(by || "someone") + ". Nice teamwork."), 6000, "is-gold");
+    announce("boss", { kind: k.id });
   }
-  function hitBoss(){
+  /* every 5th right answer in a row lands a critical hit for 2 */
+  function hitBoss(streak){
     if (!boss || boss.id !== bossId()) return;
-    boss.hp = Math.max(0, boss.hp - 1);
+    var crit = streak > 0 && streak % 5 === 0, dmg = crit ? 2 : 1;
+    boss.hp = Math.max(0, boss.hp - dmg);
     boss.el.classList.remove("is-hit"); void boss.el.offsetWidth; boss.el.classList.add("is-hit");
+    var pop = document.createElement("span"); pop.className = "sh-egg-boss-dmg" + (crit ? " is-crit" : ""); pop.textContent = crit ? "CRIT -2" : "-1";
+    pop.style.left = (14 + Math.random() * 16) + "px";
+    boss.el.appendChild(pop); setTimeout(function(){ pop.remove(); }, 900);
     drawBoss();
+    if (boss.hp === 0 && boss.test) { defeatBoss("you (preview)"); return; }
     if (boss.hp === 0) {
       var me = H.name();
       H.send({ t: "boss-down", id: boss.id, by: me });
       rpc("record_achievement", { p_visitor: VISITOR, p_kind: "boss", p_hub: HUB });
       defeatBoss(me);
-    } else if (Date.now() - lastHitSend > 600) {
+    } else if (!boss.test && Date.now() - lastHitSend > 600) {
       lastHitSend = Date.now();
       H.send({ t: "hit", id: boss.id, hp: boss.hp });
     }
@@ -328,12 +477,13 @@
   });
 
   /* ================= answer-driven eggs ================= */
-  var wrongRun = 0, rightAfter = 0;
+  var wrongRun = 0, rightAfter = 0, rightRun = 0;
   document.addEventListener(H.answeredEvent, function(e){
     var d = (e && e.detail) || {};
     if (!ok()) return;
     var correct = !!d.correct;
-    if (correct) { checkGolden(String(d.qid || "")); hitBoss(); if (sh8bit) blip(); }
+    rightRun = correct ? rightRun + 1 : 0;
+    if (correct) { checkGolden(String(d.qid || "")); hitBoss(rightRun); if (sh8bit) blip(); }
     archAnswer(correct);
     /* Through the Root Canal: 10 misses in a row, then 10 right in a row */
     if (!correct) { if (rightAfter) { wrongRun = 0; rightAfter = 0; } wrongRun++; }
@@ -733,9 +883,17 @@
             (cav.length ? "This week's cavity was restored by <b>" + cav.map(function(c){ return esc(c.display_name); }).join("</b>, <b>") + "</b>." +
               (cav.length < 5 ? " " + (5 - cav.length) + " more can still fill it." : " All five fillings are done. A new one hides next week.")
               : "A tiny cavity is hiding somewhere in this hub's Lecture Notes this week. The first five to tap it restore it.") + '</p>' : "") +
-          (fairies.length ? '<div class="sh-egg-board-h">' + IC.tooth + '<span>Tooth Fairy collectors</span></div><ol>' +
+          (fairies.length ? '<div class="sh-egg-board-h"><span class="sh-egg-board-fairy">' + fairyArt(FAIRY_LOOKS[0]) + '</span><span>Tooth Fairy collectors</span></div><ol>' +
             fairies.map(function(f){ return '<li><span>' + esc(f.display_name) + fl(f.flair) + '</span><b>' + f.catches + '</b></li>'; }).join("") + '</ol>' : "");
       });
     }, 60);
   });
+  /* try them from the console: shEggs.preview("fairy", 5, "loop") (look 0-5, 5 = golden), shEggs.preview("boss", 3) (0-7),
+     shEggs.preview("golden"). Previews record nothing and never broadcast. Seasonal versions: set
+     localStorage.sh_egg_holiday_test = "winter" (any holiday id, or "none" for the regular ones) and reload. */
+  window.shEggs = { BOSSES: BOSSES, FAIRY_LOOKS: FAIRY_LOOKS, preview: function(kind, a, b){
+    if (kind === "fairy") maybeFairy({ look: a, path: b });
+    else if (kind === "boss") { bossHidden = false; spawnBoss(0, { k: BOSSES[(a | 0) % BOSSES.length] }); }
+    else if (kind === "golden") toast(row(IC.probe, "You found today's Golden Probe!", "Preview. First in the class to answer it right gets their name on the dashboard."), 7000, "is-gold");
+  } };
 })();

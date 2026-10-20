@@ -102,6 +102,29 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (why each choice, highlighter colors, egg refresh, hub trophies, Claude Code)** — Sam's list.
+  **Why each choice**: every mcq/multi in `occlusion` (317, incl. #128's 11 new cases) and `perio` (388) has a `QUESTION_WHY` row (one line per
+  choice, same order as `choices`, written from each question's explanation and the hub's notes), applied as `q.why`
+  and drawn by `whyHTML()` under the explanation after answering (bank, drill, Weak Spots, mock review), right choices
+  first, the student's pick marked (a document click listener marks it). **Standing rule** (`CLAUDE.md` → "Every choice
+  gets a why"): new questions need their row; the CI lint fails without it, except the archived `WHY_EXEMPT` hubs
+  (msk-exam3, msk-exam4, pcd-exam3). **Highlighter** (`widget/highlight.js`): five pens (yellow, green, blue, pink,
+  orange; `sh_hl_pen` remembers the last), saved ranges may carry a color key (`[s, e, "g"]`; none = yellow, so old
+  highlights still load), a new stroke paints over what it covers, tapping a highlight can recolor it. **Mock exams**:
+  a second Submit (with the answered count) after the last question (`.mock-foot`, all hub engines incl. perio).
+  **Eggs** (`widget/eggs.js`): a drawn gold periodontal probe (`probeArt()`, also on the dashboard's Golden Probe line);
+  a redrawn Tooth Fairy (`fairyArt()`, 5 looks + a rare Golden Fairy 1 in 10, 5 flight paths, sparkle trail, varied
+  catch lines; still one `record_fairy` per catch); **8 bosses** (`BOSSES`: Plaque Boss, Tartar Titan, Biofilm Blob,
+  Strep Mutans Swarm, Cavity Creep, Gingivitis Goblin, Halitosis Haze, The Red Complex), one per 2-hour window picked
+  from the window id so everyone fights the same one, own HP and lines by health, floating damage, a crit for 2 on
+  every 5th right in a row; each boss has a regular and a seasonal version (`SEASONAL`: per holiday, a name for every boss plus an opening line, worn with that holiday's costume). Console previews record nothing: `shEggs.preview("boss", 0-7)`,
+  `("fairy", look 0-5, "wave|loop|zigzag|swoop|back")`, `("golden")`. **Hub trophies** (`widget/ranks.js`
+  `HUB_TROPHIES`): the trophy case gains a section per hub (this hub open first, then every hub you studied or earned
+  in): Bronze/Silver/Gold Mastery, Crown, Seen It All (new), Full Arch, Mock Ace, Perfect Mock (new), Final Blow, plus
+  "Secrets found here". `migration_v38.sql` (**applied via the connector**) whitelists `seen-all` and `mock-perfect` in
+  `record_achievement`. About page, `sw.js` -> `sh-v25`. **Perio Project: carry `QUESTION_WHY`, `whyHTML` and the mock
+  footer into the split sources.**
+
 - **2026-10-20 (Occlusion: accurate diagrams in the notes, cusp game, image cases, Claude Code)** — Midterm eve. All seven
   Occlusion figures redrawn from Dr. Givan's help sheet (Drive: Occlusion/Hubs, `Occ Lec0 help`) by one plain-JS kit,
   `tools/figures/occlusion/` (`build.mjs` pastes it between the hub's `od:kit`/`od:css` markers; `--check`): real occlusal

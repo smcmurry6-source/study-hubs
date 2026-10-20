@@ -946,6 +946,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .qcard-figure{margin:0 0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 6px}
 .qcard-figure-after{margin:10px 0 12px}
 /* anima:css:end */
+.mock-foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:10px; margin:22px 0 8px; padding:14px 0 0; border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
@@ -3410,7 +3411,7 @@ function renderMock(body){
   var h = '<div class="qfilters" style="padding:4px 0"><span class="pill" id="mockClock">'+icon('clock')+'0:00</span>' +
     (m.submitted ? '<span class="pill countdown">Score '+correct+' / '+m.ids.length+' · '+Math.round(correct/m.ids.length*100)+'%</span>' +
                    '<button type="button" class="btn" id="mockMissed" aria-pressed="'+(!!m.onlyMissed)+'">'+(m.onlyMissed?'Show all questions':'Show only missed')+'</button>'
-                 : '<span class="pill" id="mockProg">'+picked+' / '+m.ids.length+' answered</span><button type="button" class="btn primary" id="mockSubmit">Submit exam</button>') +
+                 : '<span class="pill" id="mockProg">'+picked+' / '+m.ids.length+' answered</span><button type="button" class="btn primary" id="mockSubmit" data-mock-submit>Submit exam</button>') +
     '<button type="button" class="btn" id="mockNew">New mock</button></div>';
   if(m.submitted){
     h += '<div class="rv-table-wrap" style="margin-bottom:24px"><table class="rv-table"><thead><tr><th>Lecture</th><th>Correct</th><th>Score</th></tr></thead><tbody>' +
@@ -3440,6 +3441,8 @@ function renderMock(body){
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';
+  /* a second Submit at the bottom, so you don't have to scroll back up after the last question (2026-10-20) */
+  if(!m.submitted) h += '<div class="mock-foot"><span class="pill" data-mock-prog>'+picked+' / '+m.ids.length+' answered</span><button type="button" class="btn primary" data-mock-submit>Submit exam</button></div>';
   body.innerHTML = h;
   var list = document.getElementById('mockList');
   if(!m.submitted){
@@ -3448,10 +3451,10 @@ function renderMock(body){
       var id = b.getAttribute('data-qid');
       m.picks[id] = +b.getAttribute('data-mock-pick'); saveState();
       b.parentNode.querySelectorAll('[data-mock-pick]').forEach(function(x){ x.classList.toggle('is-picked', x === b); x.setAttribute('aria-pressed', String(x === b)); });
-      var pr = document.getElementById('mockProg'); if(pr) pr.textContent = Object.keys(m.picks).length + ' / ' + m.ids.length + ' answered';
-      var sb = document.getElementById('mockSubmit'); if(sb && sb.getAttribute('data-confirm')){ sb.removeAttribute('data-confirm'); sb.textContent = 'Submit exam'; }
+      body.querySelectorAll('#mockProg, [data-mock-prog]').forEach(function(pr){ pr.textContent = Object.keys(m.picks).length + ' / ' + m.ids.length + ' answered'; });
+      body.querySelectorAll('[data-mock-submit][data-confirm]').forEach(function(sb){ sb.removeAttribute('data-confirm'); sb.textContent = 'Submit exam'; });
     });
-    document.getElementById('mockSubmit').onclick = function(){
+    var submitMock = function(){
       var left = m.ids.length - Object.keys(m.picks).length;
       if(left > 0 && !this.getAttribute('data-confirm')){ this.setAttribute('data-confirm','1'); this.textContent = left + ' unanswered: submit anyway?'; return; }
       m.submitted = true; m.tEnd = Date.now(); m.res = {};
@@ -3470,6 +3473,7 @@ function renderMock(body){
       document.dispatchEvent(new CustomEvent('sh:mock-done', { detail:{ correct:nRight, total:m.ids.length, byLec:byLec } }));
       saveState(); renderMock(body); window.scrollTo(0,0);
     };
+    body.querySelectorAll('[data-mock-submit]').forEach(function(sb){ sb.onclick = submitMock; });
   } else {
     document.getElementById('mockMissed').onclick = function(){ m.onlyMissed = !m.onlyMissed; saveState(); renderMock(body); };
   }

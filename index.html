@@ -460,7 +460,7 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
   .survey textarea{min-height:52px;}
 }
 .golden-line{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:-6px 0 16px; padding:10px 14px; border-radius:12px; border:1px solid color-mix(in srgb, #C9971C 45%, var(--line)); background:color-mix(in srgb, #C9971C 8%, var(--surface)); font-size:14px; color:var(--ink-2);}
-.golden-line svg{flex:0 0 auto; width:18px; height:18px; color:#C9971C;}
+.golden-line svg{flex:0 0 auto; width:24px; height:24px; color:#C9971C;}
 .golden-line b{color:var(--ink);}
 .panel .panel-sub{font-size:13px; color:var(--ink-3); margin-top:2px;}
 .p-ranks{grid-column:1 / -1;}
@@ -1789,7 +1789,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         return r ? esc(h.title) + ": found by <b>" + esc(r.display_name) + "</b>" : esc(h.title) + ": still hidden";
       });
       var el = $("goldenLine");
-      el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 21l9-9"/><path d="M12 12l3-3c1-1 1-3 3-4l2-1"/><path d="M14 16l1.5 1.5M16 14l1.5 1.5M18 12l1.5 1.5"/></svg><span><b>Today\'s Golden Probe</b> · ' + parts.join(" · ") + '</span>';
+      el.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gpDash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".35" stop-color="#F5C842"/><stop offset=".7" stop-color="#C08A12"/><stop offset="1" stop-color="#8A5E06"/></linearGradient></defs><g transform="rotate(-42 24 24)"><rect x="1" y="20.6" width="23" height="6.8" rx="3.4" fill="url(#gpDash)" stroke="#7A5205" stroke-width=".8"/><path d="M5 21.2v5.6M8 21v6M11 21v6M14 21v6M17 21v6M20 21.2v5.6" stroke="#8A5E06" stroke-width=".9" opacity=".55"/><rect x="23.4" y="21.8" width="3.6" height="4.4" rx="1" fill="url(#gpDash)" stroke="#7A5205" stroke-width=".7"/><path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="#7A5205" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="url(#gpDash)" stroke-width="1.5" stroke-linecap="round"/><path d="M42.3 28.7l.7 1.4M43.2 30.5l.5 1M44 32.1l.5 1" stroke="#3A2A05" stroke-width="1.7"/></g><path d="M37 3.8Q37 8 41.2 8Q37 8 37 12.2Q37 8 32.8 8Q37 8 37 3.8Z" fill="#FFE36B"/></svg><span><b>Today\'s Golden Probe</b> · ' + parts.join(" · ") + '</span>';
       el.hidden = false;
     }, function(){});
 

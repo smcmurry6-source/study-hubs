@@ -320,6 +320,19 @@
     { k: "pet-perfect",  n: "Pearly Whites",        d: "Keep your tooth buddy at full health", ic: "M12 3l1.8 4.2 4.6.4-3.5 3 1 4.4L12 12.8 8.1 15l1-4.4-3.5-3 4.6-.4z", secret: true, clue: "Got a tooth buddy on the dashboard? Get them to 100 HP." },
     { k: "pet-revive",   n: "Full Recovery",        d: "Nurse your tooth buddy from 0 HP back to 100", ic: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10zM9 11h6M12 8v6", secret: true, clue: "Even a tooth at rock bottom can come back. It takes a real treatment plan." }
   ];
+  /* hub trophies (2026-10-20): earned once in each hub and shown in that hub's own section of the trophy case.
+     They are the per-hub achievements the server already keeps (kind:hub badges) plus two new ones (migration_v38). */
+  var HUB_TROPHIES = [
+    { k: "mastery-bronze", n: "Bronze Mastery", d: "Get 50% of this hub's questions right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#B0672B" },
+    { k: "mastery-silver", n: "Silver Mastery", d: "Get 75% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#8E98A3" },
+    { k: "mastery-gold",   n: "Gold Mastery",   d: "Get 90% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#C9971C" },
+    { k: "mastery-crown",  n: "Crown",          d: "Get every question in the hub right on your latest try", ic: "M3 18l1-11 5 4 3-7 3 7 5-4 1 11z", c: "#E0A800" },
+    { k: "seen-all",       n: "Seen It All",    d: "Answer every question in the hub at least once", ic: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" },
+    { k: "fullarch",       n: "Full Arch",      d: "Grow all 32 teeth of the arch in this hub", ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
+    { k: "mock90",         n: "Mock Ace",       d: "90%+ on a mock exam of 20+ questions here", ic: "M12 4a8 8 0 1 0 0 16 8 8 0 1 0 0-16zM12 8v4l3 2" },
+    { k: "mock-perfect",   n: "Perfect Mock",   d: "Every question right on a mock exam of 20+ questions here", ic: "M12 3l2.6 5.5 6 .8-4.4 4.2 1 6-5.2-2.9-5.2 2.9 1-6L3.4 9.3l6-.8z", c: "#E0A800" },
+    { k: "boss",           n: "Final Blow",     d: "Land the last hit on a boss in this hub", ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." }
+  ];
   var MASTERY = [
     { k: "mastery-bronze", n: "Bronze", pct: .5 }, { k: "mastery-silver", n: "Silver", pct: .75 },
     { k: "mastery-gold", n: "Gold", pct: .9 }, { k: "mastery-crown", n: "Crown", pct: 1 }
@@ -674,6 +687,7 @@
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
         '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
+        hubCases(badges, m) +
         '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
         TIERS.map(function(x){ return x.name + ' ' + fmt(x.at); }).join(" · ") + ' XP.</p></details>' +
         '<div class="sh-link"><button type="button" class="sh-link-toggle" aria-expanded="false">Link my devices</button><div class="sh-link-body" hidden></div></div>';
@@ -688,12 +702,50 @@
         }
       }
       if (fresh >= 0) masteryToast(fresh);
+      var srow = (mastery || []).filter(function(r){ return r.hub === H.hub; })[0];
+      if (m.bank && srow && srow.seen >= m.bank && badges.indexOf("seen-all:" + H.hub) < 0) {
+        badges.push("seen-all:" + H.hub);
+        rpc("record_achievement", { p_visitor: H.visitor, p_kind: "seen-all", p_hub: H.hub });
+        hubTrophyCard("seen-all");
+      }
+    }
+    function hubTrophyCard(k){
+      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
+      playRankUp("trophy", trophyCard({ k: t.k, n: t.n, d: t.d + " (" + hubName(H.hub) + ")", ic: t.ic }), mockBusy);
     }
     function masteryToast(i){
       if (H.prefGet("sh_pref_eggs", "on") === "off") return;
       playRankUp("trophy", masteryCard(i, hubName(H.hub)), mockBusy);
     }
 
+    /* one section per hub in the trophy case: this hub first (open), then every other hub you've studied or earned in */
+    function hubCases(badges, m){
+      var byHub = {}, here = H.hub;
+      badges.forEach(function(b){ var i = String(b).indexOf(":"); if (i < 0) return; var k = b.slice(0, i), hb = b.slice(i + 1);
+        if (HUB_TROPHIES.some(function(t){ return t.k === k; }) || TROPHIES.some(function(t){ return t.k === k; })) (byHub[hb] = byHub[hb] || {})[k] = 1; });
+      /* the current hub's mastery and coverage count right away, before the server has the badge */
+      var mine = byHub[here] = byHub[here] || {};
+      for (var i = 0; i <= m.lvl; i++) mine[MASTERY[i].k] = 1;
+      var row = (mastery || []).filter(function(r){ return r.hub === here; })[0];
+      if (m.bank && row && row.seen >= m.bank) mine["seen-all"] = 1;
+      (mastery || []).forEach(function(r){ if (r.seen > 0 && /^[a-z0-9-]+$/.test(r.hub) && HUB_NAMES[r.hub]) byHub[r.hub] = byHub[r.hub] || {}; });
+      var hubs = Object.keys(byHub).filter(function(hb){ return hb === here || HUB_NAMES[hb]; }).sort(function(a, b){ return (a === here ? -1 : b === here ? 1 : 0) || (a < b ? -1 : 1); });
+      return '<div class="sh-trophies-h"><span>Hub trophies</span></div>' + hubs.map(function(hb){
+        var got = byHub[hb], n = HUB_TROPHIES.filter(function(t){ return got[t.k]; }).length;
+        var found = TROPHIES.filter(function(t){ return t.secret && got[t.k] && !HUB_TROPHIES.some(function(x){ return x.k === t.k; }); });
+        return '<details class="sh-hubcase"' + (hb === here ? ' open' : '') + '><summary><span>' + esc(hubName(hb)) + (hb === here ? ' <em>this hub</em>' : '') + '</span><b>' + n + ' / ' + HUB_TROPHIES.length + '</b></summary>' +
+          '<div class="sh-trophies">' + HUB_TROPHIES.map(function(t){
+            var e = !!got[t.k], hidden = t.secret && !e;
+            return '<button type="button" class="sh-trophy' + (e ? ' is-earned' : '') + '" data-htrophy="' + t.k + '" data-hub="' + esc(hb) + '" title="' + esc(hidden ? "Secret: tap for a clue" : t.d) + '">' +
+              '<span class="sh-trophy-medal"' + (e && t.c ? ' style="color:' + t.c + '"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+              (hidden ? '<path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"/>' : '<path d="' + t.ic + '"/>') + '</svg></span>' +
+              '<span class="sh-trophy-name">' + esc(hidden ? "???" : t.n) + '</span></button>';
+          }).join("") + '</div>' +
+          (found.length ? '<p class="sh-hubcase-found">Secrets found here: ' + found.map(function(t){ return esc(t.n); }).join(", ") + '</p>' : '') +
+          '</details>';
+      }).join("");
+    }
     /* a clue for one secret you haven't found yet, different on each open */
     function psst(earned){
       var left = TROPHIES.filter(function(x){ return x.secret && !earned[x.k]; });
@@ -703,6 +755,15 @@
     }
     sec.addEventListener("click", function(e){ if (e.target.closest(".sh-rank-rename") && window.shEditName) window.shEditName(); });
     document.addEventListener("sh:name", function(){ render(); });
+    sec.addEventListener("click", function(e){
+      var hb = e.target.closest("[data-htrophy]"); if (!hb || !profile) return;
+      var t = HUB_TROPHIES.filter(function(x){ return x.k === hb.getAttribute("data-htrophy"); })[0]; if (!t) return;
+      var e2 = hb.classList.contains("is-earned"), det = hb.closest(".sh-hubcase").querySelector(".sh-hubcase-detail");
+      sec.querySelectorAll("[data-htrophy], [data-trophy]").forEach(function(x){ x.classList.toggle("is-sel", x === hb); });
+      if (!det) { det = document.createElement("p"); det.className = "sh-trophy-detail sh-hubcase-detail"; hb.closest(".sh-trophies").insertAdjacentElement("afterend", det); }
+      det.innerHTML = e2 ? '<b>' + esc(t.n) + '.</b> ' + esc(t.d) + '. Earned in ' + esc(hubName(hb.getAttribute("data-hub"))) + '.'
+        : t.secret ? '<b>Secret.</b> ' + esc(t.clue) : '<b>' + esc(t.n) + '.</b> ' + esc(t.d) + '.';
+    });
     sec.addEventListener("click", function(e){
       var b = e.target.closest("[data-trophy]"); if (!b || !profile) return;
       var tr = TROPHIES.filter(function(x){ return x.k === b.getAttribute("data-trophy"); })[0]; if (!tr) return;
@@ -738,6 +799,7 @@
       var d = e.detail || {};
       if (d.total > 0 && !window.shAutomated) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
       if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(load, 800); });
+      if (d.total >= 20 && d.correct === d.total) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock-perfect", p_hub: H.hub });
     });
 
     /* link my devices */
@@ -780,7 +842,7 @@
 
   var miniCache = {};
   window.shRanks = {
-    TIERS: TIERS, TROPHIES: TROPHIES, MASTERY: MASTERY,
+    TIERS: TIERS, TROPHIES: TROPHIES, HUB_TROPHIES: HUB_TROPHIES, MASTERY: MASTERY,
     art: art,
     mini: function(tier, level){
       tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
