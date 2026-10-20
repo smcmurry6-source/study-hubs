@@ -674,6 +674,11 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .fig-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:12px 14px;margin:0}
 .fig-card h4{margin:0 0 8px;font-size:.95rem}
 .fig-card p{font-size:.84rem;color:var(--ink-soft);margin:8px 0 0}
+.fig-key{margin:8px 0 0;font-size:.84rem}
+.fig-key summary{cursor:pointer;color:var(--accent);font-weight:600;padding:4px 0}
+.fig-key dl{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:6px 0 0}
+.fig-key dt{font-weight:700;font-family:var(--font-mono)}
+.fig-key dd{margin:0;color:var(--ink-soft)}
 </style>
 </head>
 <body>
@@ -800,7 +805,8 @@ var LECTURES = [
 var FIG_DEFS = '<defs><marker id="fgArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="fg-head" d="M0 0L10 5L0 10z"/></marker></defs>';
 function fgPin(x, y, t){ return '<g class="fg-pin"><circle cx="'+x+'" cy="'+y+'" r="11"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle">'+t+'</text></g>'; }
 var FIGS = {
-  envSag: { title:'Envelope of motion, sagittal view', caption:'Traced at the mandibular central incisor, patient facing right. A-E-F is the posterior opening border, F-D the anterior opening border, A-B-C-D the superior contact border; the dashed teardrop is where chewing happens.',
+  envSag: { key:[['A','Centric relation, condyles seated (centric occlusion if the teeth touch here)'],['B','Maximum intercuspation (MICP)'],['C','Incisors edge to edge'],['D','Maximum protrusion'],['E','End of pure rotation, about 20-25 mm'],['F','Maximum opening, 40-60 mm']],
+    title:'Envelope of motion, sagittal view', caption:'Traced at the mandibular central incisor, patient facing right. A-E-F is the posterior opening border, F-D the anterior opening border, A-B-C-D the superior contact border; the dashed teardrop is where chewing happens.',
     svg: '<svg viewBox="0 0 360 380" role="img" aria-label="Sagittal envelope of motion with points A to F">'+FIG_DEFS+
       '<path class="fg-soft" d="M112 40 C92 72 98 118 118 124 C138 118 136 72 112 40Z"/>'+
       '<path class="fg-line" d="M90 60 L112 40 L160 72 L178 74 L196 64 L235 64"/>'+
@@ -809,7 +815,8 @@ var FIGS = {
       '<text class="fg-t" x="250" y="30">Anterior</text><path class="fg-acc" d="M250 38 L330 38" marker-end="url(#fgArrow)"/>'+
       '<text class="fg-t" x="94" y="150">20-25 mm</text><text class="fg-t" x="160" y="368">40-60 mm opening</text>'+
       fgPin(76,60,'A')+fgPin(112,22,'B')+fgPin(160,92,'C')+fgPin(252,72,'D')+fgPin(64,172,'E')+fgPin(130,358,'F')+'</svg>' },
-  envHoriz: { title:'Envelope of motion, horizontal view', caption:'Seen from above at the incisor point, anterior at the top. The apex at the back is centric relation; each lettered line is one border.',
+  envHoriz: { key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']],
+    title:'Envelope of motion, horizontal view', caption:'Seen from above at the incisor point, anterior at the top. The apex at the back is centric relation; each lettered line is one border.',
     svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Horizontal envelope of motion with borders A to D">'+FIG_DEFS+
       '<path class="fg-line" d="M180 250 L80 190 L180 60 L280 190 Z"/>'+
       '<circle class="fg-dot" cx="180" cy="250" r="5"/><text class="fg-t" x="192" y="272">CR</text>'+
@@ -817,28 +824,32 @@ var FIGS = {
       '<text class="fg-t" x="6" y="150">Patient&#8217;s</text><text class="fg-t" x="6" y="166">LEFT</text>'+
       '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">RIGHT</text>'+
       fgPin(118,236,'A')+fgPin(112,112,'B')+fgPin(248,112,'C')+fgPin(242,236,'D')+'</svg>' },
-  envFront: { title:'Envelope of motion, frontal view', caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP is the postural position.',
+  envFront: { key:[['A','Left lateral superior'],['B','Left lateral opening'],['C','Right lateral superior'],['D','Right lateral opening'],['PP','Postural position, 2-4 mm below MICP']],
+    title:'Envelope of motion, frontal view', caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP is the postural position.',
     svg: '<svg viewBox="0 0 360 330" role="img" aria-label="Frontal envelope of motion with borders A to D and PP">'+
       '<path class="fg-line" d="M180 40 L270 98 C268 180 230 250 180 296 C130 250 92 180 90 98 Z"/>'+
       '<circle class="fg-dot" cx="180" cy="40" r="5"/><text class="fg-t" x="192" y="34">ICP</text>'+
       '<circle class="fg-dot" cx="180" cy="74" r="4"/><text class="fg-t" x="190" y="82">PP</text>'+
       '<text class="fg-t" x="8" y="150">Patient&#8217;s</text><text class="fg-t" x="8" y="166">RIGHT</text><text class="fg-t" x="288" y="150">Patient&#8217;s</text><text class="fg-t" x="288" y="166">LEFT</text>'+
       fgPin(238,58,'A')+fgPin(268,206,'B')+fgPin(122,58,'C')+fgPin(92,206,'D')+'</svg>' },
-  pathMax: { title:'Cusp pathways on a maxillary first molar', caption:'Occlusal view. The dot is where an opposing mandibular buccal cusp sits in MIP; each arrow is the path that cusp takes across this tooth in one movement (the MIP contact is at the base of the arrow).',
+  pathMax: { key:[['A','Protrusive (toward mesial)'],['B','Laterotrusive, working (toward buccal)'],['C','Mediotrusive, non-working (toward mesiopalatal)'],['D','Retrusive (toward distal)']],
+    title:'Cusp pathways on a maxillary first molar', caption:'Occlusal view. The dot is where an opposing mandibular buccal cusp sits in MIP; each arrow is the path that cusp takes across this tooth in one movement (the MIP contact is at the base of the arrow).',
     svg: '<svg viewBox="0 0 340 300" role="img" aria-label="Maxillary molar occlusal outline with arrows A to D">'+FIG_DEFS+
       '<path class="fg-tooth" d="M70 70 C110 40 230 38 268 64 C292 82 292 200 270 228 C236 262 104 262 72 232 C46 206 44 92 70 70Z"/>'+
       '<path class="fg-soft-line" d="M120 72 C140 120 150 150 170 150 C200 150 210 120 222 74 M170 150 C160 190 150 210 140 236"/>'+
       '<text class="fg-t" x="150" y="26">BUCCAL</text><text class="fg-t" x="138" y="292">PALATAL (lingual)</text><text class="fg-t" x="288" y="146">MESIAL</text><text class="fg-t" x="2" y="146">DISTAL</text>'+
       '<path class="fg-acc" d="M170 150 L250 150" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L170 78" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L232 210" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L96 150" marker-end="url(#fgArrow)"/>'+
       '<circle class="fg-dot" cx="170" cy="150" r="6"/>'+fgPin(262,128,'A')+fgPin(190,76,'B')+fgPin(246,226,'C')+fgPin(84,128,'D')+'</svg>' },
-  pathMand: { title:'Cusp pathways on a mandibular first molar', caption:'Occlusal view. The dot is where an opposing maxillary lingual (palatal) cusp sits in MIP; each arrow is the path that cusp takes across this tooth (MIP contact at the base of the arrow).',
+  pathMand: { key:[['A','Protrusive (toward distal)'],['B','Laterotrusive, working (toward lingual)'],['C','Mediotrusive, non-working (toward distobuccal)'],['D','Retrusive (toward mesial)']],
+    title:'Cusp pathways on a mandibular first molar', caption:'Occlusal view. The dot is where an opposing maxillary lingual (palatal) cusp sits in MIP; each arrow is the path that cusp takes across this tooth (MIP contact at the base of the arrow).',
     svg: '<svg viewBox="0 0 340 300" role="img" aria-label="Mandibular molar occlusal outline with arrows A to D">'+FIG_DEFS+
       '<path class="fg-tooth" d="M60 82 C96 52 246 50 280 80 C300 104 298 196 278 222 C242 254 98 254 62 222 C40 196 40 108 60 82Z"/>'+
       '<path class="fg-soft-line" d="M70 150 C120 146 220 146 272 150 M130 150 C126 120 124 90 120 66 M210 150 C214 182 216 210 218 236"/>'+
       '<text class="fg-t" x="150" y="26">BUCCAL</text><text class="fg-t" x="150" y="292">LINGUAL</text><text class="fg-t" x="288" y="146">MESIAL</text><text class="fg-t" x="2" y="146">DISTAL</text>'+
       '<path class="fg-acc" d="M170 150 L94 150" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L170 224" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L108 92" marker-end="url(#fgArrow)"/><path class="fg-acc" d="M170 150 L246 150" marker-end="url(#fgArrow)"/>'+
       '<circle class="fg-dot" cx="170" cy="150" r="6"/>'+fgPin(82,128,'A')+fgPin(192,222,'B')+fgPin(94,76,'C')+fgPin(258,128,'D')+'</svg>' },
-  inclines: { title:'Right first molars in MIP, frontal section', caption:'Cut through the right molars, seen from the front: buccal on the left, lingual on the right. The numbers mark cusp inclines that can meet when the mandible moves.',
+  inclines: { key:[['1','Facial incline of the maxillary palatal cusp'],['2','Lingual incline of the maxillary palatal cusp'],['3','Lingual incline of the mandibular buccal cusp'],['4','Facial incline of the mandibular buccal cusp'],['5','Lingual incline of the maxillary buccal cusp'],['6','Buccal incline of the mandibular lingual cusp'],['Right working','2 with 6, and 4 with 5'],['Left working (right side non-working)','1 with 3']],
+    title:'Right first molars in MIP, frontal section', caption:'Cut through the right molars, seen from the front: buccal on the left, lingual on the right. The numbers mark cusp inclines that can meet when the mandible moves.',
     svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Frontal section of right molars with inclines numbered 1 to 6">'+
       '<path class="fg-tooth" d="M80 30 L240 30 C246 60 244 100 232 120 L200 158 L150 122 L100 150 L80 124 C70 96 72 60 80 30Z"/>'+
       '<path class="fg-tooth2" d="M120 270 L290 270 C298 230 296 190 284 170 L252 128 L205 165 L150 132 L120 165 C112 190 112 230 120 270Z"/>'+
@@ -1048,6 +1059,10 @@ multi('rv-goals','review','hub','Select every item on Dr. Givan\'s list of goals
 mcq('rv-thielmann','review','handout','In Thielmann\'s formula, balanced occlusion = (CG × AG) / (CH × CC × PO). What does CC stand for?',
   ['Compensating curvature','Condylar curvature','Cusp contact','Centric contact'],
   'CG condylar guidance, AG anterior guidance, CH cusp height, CC compensating curvature (in natural teeth, the analog is the curves of Spee and Wilson), PO plane of occlusion. The factors are interrelated: change one and the others must change to keep balance.');
+mcq('rv-thielmann-f','review','handout','Which is Thielmann\'s formula for balanced occlusion?',
+  ['(CG × AG) / (CH × CC × PO)','(CH × CC × PO) / (CG × AG)','(CG × CH) / (AG × CC × PO)','(CG × AG × PO) / (CH × CC)'],
+  'Balanced occlusion = (condylar guidance × anterior guidance) / (cusp height × compensating curvature × plane of occlusion). The two guidances go on top; the three things you shape on the teeth go below. Change one factor and the others must change to keep the balance.',
+  { cue:'The two Guidances Go on top; Cusp height, Compensating curve and Plane of occlusion below.' });
 mcq('rv-ch-cg','review','handout','If the condylar guidance (eminence) is steeper, the posterior cusps can be:',
   ['Taller','Shorter','Unchanged','Flattened to zero'],
   'Steeper condylar guidance drops the back of the mandible more in protrusion, so taller posterior cusps can still clear. Dr. Givan: you can\'t change a patient\'s condylar guidance without surgery, but it tells you how cuspy your crowns can be.');
@@ -1062,7 +1077,7 @@ mcq('rv-ch-po','review','handout','The more parallel the plane of occlusion is t
   'When the occlusal plane parallels the condylar path, the teeth slide along rather than separate, so cusps must be shorter. A flatter plane relative to the condylar path allows taller cusps.');
 mcq('rv-ch-spee','review','handout','A more acute (sharper) curve of Spee means the most posterior cusps must be:',
   ['Shorter','Taller','Unchanged','Taller only on the non-working side'],
-  'A more acute curve brings the posterior teeth up toward the path of the condyle, so the last molars must have shorter cusps to clear in protrusion.');
+  'A more acute curve brings the posterior teeth up toward the path of the condyle, so the last molars must have shorter cusps to clear in protrusion. Do not mix it up with condylar guidance, where steeper means taller: a more acute curve of Spee is on the shorter side of the table.');
 mcq('rv-ch-bennett','review','handout','A greater immediate side shift (Bennett movement) means the posterior cusps must be:',
   ['Shorter','Taller','Unchanged','Shorter on the working side only'],
   'More lateral translation, and a more superior movement of the rotating condyle, both call for shorter posterior cusps. On the vertical determinants table, Bennett movement in every row means "shorter."');
@@ -1127,7 +1142,7 @@ mcq('rv-micron','review','hub','Dr. Givan: "In occlusion, we\'re talking in the 
 /* ---------- fence post and "what cusp hits where" (help sheet) ---------- */
 mcq('fp-m2','review','help','Class I, cusp-fossa. The mesiobuccal cusp of #31 contacts:',
   ['The mesial fossa of #2','The distal fossa of #3','The central fossa of #3','The distal marginal ridge of #3'],
-  'The help sheet\'s own example. The fence post makes it look like a cusp-marginal ridge contact between #3 and #2, but exam questions are cusp-fossa. Anchor on the first molar: its posterior contact is the DB cusp of #30 on #3; moving back from there, the MB cusp of #31 must be in the mesial fossa of #2.',
+  'The help sheet\'s own example. The fence post makes it look like a cusp-marginal ridge contact between #3 and #2, but exam questions are cusp-fossa. Anchor on the first molar: its posterior contact is the DB cusp of #30 on #3; moving back from there, the MB cusp of #31 must be in the mesial fossa of #2. Not the central fossa of #3: #3 takes its contacts from #30, so the next cusp back, on #31, has to reach the next maxillary molar, #2.',
   { cue:'Mandibular molar cusps go to the SAME-numbered maxillary molar (#30 on #3, #31 on #2): mesial cusp to mesial fossa.' });
 mcq('fp-pm2b','review','help','Class I, cusp-fossa. The buccal cusp of #29 (mandibular right second premolar) contacts:',
   ['The mesial fossa of #4','The distal fossa of #5','The distal fossa of #4','The mesial fossa of #3'],
@@ -1141,13 +1156,13 @@ mcq('fp-ml','review','help','Class I. The mesiolingual cusp of #3 occludes in:',
   'The maxillary first molar\'s mesiolingual (centric) cusp sits in the central fossa of the mandibular first molar in Class I. The buccal groove of #30 receives the MESIOBUCCAL cusp tip of #3 in the classic Class I molar relationship, but that is a non-centric cusp.');
 mcq('fp-post','review','help','In Class I, which cusp makes the posterior contact on the maxillary first molar?',
   ['The distobuccal cusp of the mandibular first molar','The mesiobuccal cusp of the mandibular second molar','The distolingual cusp of the mandibular first molar','The buccal cusp of the mandibular second premolar'],
-  'Help sheet: "the first molar posterior contact in the fencepost (which is the DB cusp of #30)." Molars have an anterior and a posterior opposing contact; the posterior one on the maxillary first molar is variable, anywhere from the oblique ridge to the distal fossa.');
+  'Help sheet: "the first molar posterior contact in the fencepost (which is the DB cusp of #30)." Molars have an anterior and a posterior opposing contact; the posterior one on the maxillary first molar is variable, anywhere from the oblique ridge to the distal fossa. The MB cusp of the mandibular second molar (#31) is the next cusp back: it lands on #2 (its mesial fossa), not on #3.');
 mcq('fp-post-var','review','help','On which tooth is the location of the posterior opposing contact most variable?',
   ['The maxillary first molar (from the oblique ridge to the distal fossa)','The mandibular canine','The maxillary first premolar','The mandibular second premolar'],
   'Help sheet: molars have an anterior and a posterior opposing contact, and "the location of the posterior contact is highly variable, especially in the maxillary first molar (ranges from oblique ridge to distal fossa)."');
 mcq('fp-c2-pm','review','help','Class II, cusp-fossa. The buccal cusp of #29 contacts:',
   ['The distal fossa of #4','The mesial fossa of #4','The mesial fossa of #3','The distal fossa of #5'],
-  'Class II steps the mandible back one post, and the premolar rule flips: maxillary premolars receive contacts in their DISTAL fossae, mandibular premolars in their MESIAL fossae. #29 now sits between #4 and #3, so it lands in the distal fossa of #4.',
+  'Class II steps the mandible back one post, and the premolar rule flips: maxillary premolars receive contacts in their DISTAL fossae, mandibular premolars in their MESIAL fossae. #29 now sits between #4 and #3, so it lands in the distal fossa of #4. The mesial fossa of #3 is the other side of the same embrasure: the Class II rule (maxillary premolars take contacts in their DISTAL fossae) puts the contact on #4.',
   { cue:'Class II flips it: Maxillary Distal, mandibular Mesial.' });
 mcq('fp-c2-max','review','help','Class II, cusp-fossa. The lingual cusp of #4 contacts:',
   ['The mesial fossa of #29','The distal fossa of #29','The distal fossa of #28','The mesial fossa of #30'],
@@ -1166,7 +1181,45 @@ mcq('fp-what','review','help','What does the fence post method tell you?',
   'Help sheet: "The fencepost is a guide to \'what cusp comes closest\' to the anatomical location, but the fenceposts are NOT anatomical. You must REMEMBER your tooth anatomy." They look like cusp-marginal ridge, but the questions are usually cusp-fossa.');
 mcq('fp-arrow','review','help','In a "cusp pathway" picture, where is the MIP contact, and what should you identify first?',
   ['At the base of the arrow; identify the movement first, then the cusp','At the arrowhead; identify the cusp first, then the movement','At the base of the arrow; identify the cusp first, then the movement','At the arrowhead; identify the Angle class first'],
-  '"Remember the MIP contact is at the BASE OF THE ARROW." Treat these as two questions: first identify the movement and cross off every choice with the wrong movement; then identify the opposing cusp.');
+  '"Remember the MIP contact is at the BASE OF THE ARROW." Treat these as two questions: first identify the movement and cross off every choice with the wrong movement; then identify the opposing cusp. Starting with the cusp is the common slip: movement first, then cusp.');
+
+/* more fence-post practice (suggestion #8, 2026-10-20): the same help-sheet rules on other cusps, the left side and Class II/III */
+mcq('fp-pm1b','review','help','Class I, cusp-fossa. The buccal cusp of #28 (mandibular right first premolar) contacts:',
+  ['The mesial fossa of #5','The distal fossa of #5','The mesial fossa of #4','The distal fossa of #4'],
+  'In Class I the mandibular first premolar post sits a half step in front of the maxillary first premolar, between the maxillary canine and #5. Maxillary premolars take contacts in their MESIAL fossae in Class I, so the buccal cusp of #28 lands in the mesial fossa of #5. (#29 does the same one tooth back, in the mesial fossa of #4.)');
+mcq('fp-pm2l','review','help','Class I, cusp-fossa. The lingual cusp of #4 (maxillary right second premolar) contacts:',
+  ['The distal fossa of #29','The mesial fossa of #29','The mesial fossa of #30','The distal fossa of #28'],
+  'Mandibular premolars take contacts in their DISTAL fossae in Class I. #4 sits a half tooth behind #29 (between #29 and #30), so its lingual cusp falls in the distal fossa of #29. The mesial fossa of #30 is the same embrasure read the wrong way.');
+mcq('fp-l-pm2b','review','help','Class I, cusp-fossa. The buccal cusp of #20 (mandibular left second premolar) contacts:',
+  ['The mesial fossa of #13','The distal fossa of #12','The distal fossa of #13','The mesial fossa of #14'],
+  'The left side mirrors the right: #20 is the twin of #29, and #13 (maxillary left second premolar) the twin of #4. In Class I maxillary premolars take contacts in their MESIAL fossae, so #20 lands in the mesial fossa of #13. "Distal fossa of #12" is the same embrasure read as cusp-marginal ridge.');
+mcq('fp-l-ml','review','help','Class I. The mesiolingual cusp of #14 (maxillary left first molar) occludes in:',
+  ['The central fossa of #19','The mesial fossa of #19','The buccal groove of #19','The distal fossa of #20'],
+  'The left-side twin of #3 on #30: the maxillary first molar\'s mesiolingual (centric) cusp sits in the central fossa of the mandibular first molar in Class I. The buccal groove of #19 receives the MESIOBUCCAL cusp tip of #14, a non-centric cusp.');
+mcq('fp-l-m2','review','help','Class I, cusp-fossa. The mesiobuccal cusp of #18 (mandibular left second molar) contacts:',
+  ['The mesial fossa of #15','The distal fossa of #14','The central fossa of #14','The mesial fossa of #14'],
+  'The left-side twin of the help sheet\'s own example (#31 on #2). Anchor on the first molar: #14 takes its contacts from #19 (its posterior one from the DB cusp of #19), so the MB cusp of #18, one tooth back, lands in the mesial fossa of #15, the maxillary left second molar.',
+  { cue:'Mandibular molar cusps go to the SAME-numbered maxillary molar: #19 on #14, #18 on #15.' });
+mcq('fp-c2-pm1b','review','help','Class II, cusp-fossa. The buccal cusp of #28 contacts:',
+  ['The distal fossa of #5','The mesial fossa of #5','The mesial fossa of #4','The distal fossa of #4'],
+  'Class II steps the mandible back one post and flips the premolar rule: maxillary premolars take contacts in their DISTAL fossae. #28 now sits between #5 and #4, so its buccal cusp lands in the distal fossa of #5 (in Class I it was the mesial fossa of #5).',
+  { cue:'Class II flips it: Maxillary Distal, mandibular Mesial.' });
+mcq('fp-c2-pm1l','review','help','Class II, cusp-fossa. The lingual cusp of #5 contacts:',
+  ['The mesial fossa of #28','The distal fossa of #28','The mesial fossa of #29','The distal fossa of #29'],
+  'In Class II mandibular premolars take contacts in their MESIAL fossae. With the mandible stepped back, #28 sits just behind #5, so the lingual cusp of #5 falls in the mesial fossa of #28. In Class I the same cusp sits in the DISTAL fossa of #28.',
+  { cue:'Class II flips it: Maxillary Distal, mandibular Mesial.' });
+mcq('fp-l-c2','review','help','Class II, cusp-fossa. The buccal cusp of #20 contacts:',
+  ['The distal fossa of #13','The mesial fossa of #13','The mesial fossa of #14','The distal fossa of #12'],
+  'The left-side twin of #29 in Class II: the mandible steps back one post, #20 sits between #13 and #14, and the Class II rule (maxillary premolars take contacts in their DISTAL fossae) puts it in the distal fossa of #13. The mesial fossa of #14 is the other side of the same embrasure.');
+mcq('fp-c3-pm1l','review','help','Class III, cusp-fossa. The lingual cusp of #5 contacts:',
+  ['The distal fossa of #29','The distal fossa of #28','The mesial fossa of #29','The mesial fossa of #28'],
+  'Class III brings the mandible forward one tooth and keeps the Class I rule (mandibular premolars take contacts in their DISTAL fossae). In Class I the lingual cusp of #5 sits in the distal fossa of #28; with every mandibular tooth one tooth forward, the tooth under it is now #29, so it lands in the distal fossa of #29.');
+mcq('fp-facet','review','help','A crown on #3 shows a shiny contact on the FACIAL incline of its palatal cusp during an excursion. Which movement made it?',
+  ['A left lateral movement (the right side is non-working)','A right lateral movement (the right side is working)','Straight protrusion','Closing into MIP'],
+  'Help sheet method: draw the right molars in MIP and move the mandibular tooth. The facial incline of the maxillary palatal cusp meets the lingual incline of the mandibular buccal cusp only when the right side is the NON-working side, that is, when the mandible moves LEFT. In a right working movement the palatal cusp contacts on its LINGUAL incline instead (against the buccal incline of the mandibular lingual cusp). Protrusion uses the distal inclines of the maxillary teeth.');
+mcq('fp-path14','review','help','Watching a mandibular buccal cusp on #14 (maxillary left first molar), you see it travel straight toward the BUCCAL of #14. Which way did the mandible move?',
+  ['To the left (the left side is working)','To the right (the left side is non-working)','Straight forward (protrusive)','Straight back (retrusive)'],
+  'On a maxillary tooth you watch a mandibular cusp: working (laterotrusive) runs toward the buccal, non-working toward the mesiopalatal, protrusive toward the mesial, retrusive toward the distal. #14 is a LEFT tooth, so a working path on it means the left side is working: the mandible moved left. A move to the right would make the left side non-working and send the cusp mesiopalatally.');
 
 /* ---------- cusp pathways and inclines (diagrams) ---------- */
 mcq('fig-pmax-a','review','help','In the diagram of a maxillary first molar, which movement does arrow A (toward mesial) show?',
@@ -1183,7 +1236,7 @@ mcq('fig-pmax-c','review','help','In the diagram of a maxillary first molar, arr
   { img:'pathMax', cue:'Non-working = the jaw swings in and forward: on the upper tooth, the path runs mesio-palatal.' });
 mcq('fig-pmand-a','review','help','In the diagram of a mandibular first molar, arrow A (toward distal) is the path of the maxillary lingual cusp in which movement?',
   ['Protrusive','Retrusive','Laterotrusive (working)','Mediotrusive (non-working)'],
-  'On a MANDIBULAR tooth you watch a maxillary cusp, and everything is relative: when the mandible goes forward, the maxillary cusp travels DISTALLY across the mandibular tooth. "If I\'m looking at the mandibular arch and the mandible is sliding forward, the contacts are going toward the posterior."',
+  'On a MANDIBULAR tooth you watch a maxillary cusp, and everything is relative: when the mandible goes forward, the maxillary cusp travels DISTALLY across the mandibular tooth. "If I\'m looking at the mandibular arch and the mandible is sliding forward, the contacts are going toward the posterior." Retrusive is the opposite: the mandible moves back, so the maxillary cusp travels MESIALLY (arrow D).',
   { img:'pathMand' });
 mcq('fig-pmand-b','review','help','In the diagram of a mandibular first molar, arrow B (straight toward lingual) shows which movement?',
   ['Laterotrusive (working)','Mediotrusive (non-working)','Protrusive','Retrusive'],
@@ -1199,7 +1252,7 @@ mcq('fig-incl-nw','review','help','The diagram shows the RIGHT molars. In a LEFT
   { img:'inclines', cue:'Non-working contacts are on the INNER inclines of the two centric cusps.' });
 mcq('fig-incl-w','review','help','The diagram shows the RIGHT molars. In a RIGHT working movement, which contacts could occur?',
   ['2 with 6, and 4 with 5','1 with 3 only','2 with 6 only','1 with 3, and 4 with 5'],
-  'Right working: the right mandibular molar moves buccally. The buccal incline of its lingual cusp (6) meets the lingual incline of the maxillary palatal cusp (2), AND the facial incline of its buccal cusp (4) meets the lingual incline of the maxillary buccal cusp (5). The second pair is an interference if unwanted, or part of group function if wanted.',
+  'Right working: the right mandibular molar moves buccally. The buccal incline of its lingual cusp (6) meets the lingual incline of the maxillary palatal cusp (2), AND the facial incline of its buccal cusp (4) meets the lingual incline of the maxillary buccal cusp (5). The second pair is an interference if unwanted, or part of group function if wanted. 1 with 3 is the NON-working pair: on these right molars it can only happen when the mandible moves LEFT.',
   { img:'inclines' });
 mcq('rv-incl-pro','review','help','To answer an interference question about a protrusive movement, the help sheet suggests you:',
   ['Draw a sagittal view and move the mandibular tooth forward','Draw a frontal view and move the mandibular tooth lingually','Draw a horizontal view and rotate around the working condyle','Assume Class II, because protrusion only occurs there'],
@@ -1294,7 +1347,7 @@ mcq('an-meniscus','anatomy','handout','Why is it improper to call the TMJ disc a
   'A meniscus is crescent-shaped with a convex and a concave side (knee). The TMJ disc is a biconcave disc of dense fibrous connective tissue that functions like a bone, making the TMJ a compound joint.');
 mcq('an-compound','anatomy','handout','The TMJ is called a compound joint because:',
   ['The disc functions like a third bone between the condyle and the temporal bone','It has both a hinge and a gliding component, rotating below and translating above the disc','The mandible forms two joints','It contains both cartilage and bone surfaces'],
-  'A compound joint has at least three bones; the disc, though dense fibrous connective tissue, functions as the third. (Hinge + glide = ginglymoarthrodial; one bone two joints = bilateral.)');
+  'The tempting choice is true of the TMJ but explains a different word: hinge + glide is why it is GINGLYMOARTHRODIAL, not why it is compound. A compound joint has at least three bones; the TMJ has only two, but the disc, though dense fibrous connective tissue, functions as the third. (One bone, two joints = bilateral.)');
 mcq('an-compartments','anatomy','handout','Where does rotation occur in the TMJ, and where does translation occur?',
   ['Rotation in the lower compartment; translation in the upper compartment','Rotation in the upper (superior) compartment; translation in the lower compartment','Both occur in the upper compartment','Both occur in the lower compartment'],
   'The disc divides the joint into an upper (disc-to-fossa) and lower (disc-to-condyle) compartment. Hinge rotation happens between condyle and disc (lower); sliding out of the fossa happens between disc and temporal bone (upper). So the disc stays over the condyle wherever it goes.',
@@ -1574,7 +1627,7 @@ mcq('cc-christensen','concepts','handout','Carl Christensen (1901) is best known
   'Christensen described an arc of mandibular movement and posterior separation in protrusion (Christensen\'s phenomenon), and developed a protrusive record, which lets you estimate the angle of the articular eminence.');
 mcq('cc-parfitt','concepts','handout','Who first intentionally put curved condylar paths on an articulator (1902)?',
   ['J.B. Parfitt','I.M. Bromill','George Monson','W.G.A. Bonwill'],
-  'Parfitt of England (1902) was first to place curved condylar paths on an articulator ("Parfitt Placed Paths"). Bromill (1897) diagrammed facial planes and used anatomic landmarks for tooth positions.');
+  'Parfitt of England (1902) was first to place curved condylar paths on an articulator ("Parfitt Placed Paths"). Bromill (1897) diagrammed facial planes and used anatomic landmarks for tooth positions. Monson came later (ca. 1916) with the 4-inch sphere; Bonwill gave us the 4-inch triangle and bilateral balance.');
 mcq('cc-monson','concepts','handout','George Monson\'s spherical theory (ca. 1916) combined all of these EXCEPT:',
   ['A fully adjustable articulator that reproduced condylar motion','Bonwill\'s 4-inch triangle','Bilaterally balanced occlusion','Von Spee\'s curve and Balkwill\'s and Christensen\'s condylar observations'],
   'Monson combined the 4-inch triangle, bilateral balance, the curve of Spee and Balkwill/Christensen\'s condylar observations into a 4-inch sphere. His "mandibulo-maxillary instrument" did NOT reproduce the condyles: it used a central rotational center with set screws to vary the radius. Vestiges of the theory are still used today.',
@@ -1691,7 +1744,7 @@ mcq('cc-lisp','concepts','handout','Testing new anterior provisionals with "s" s
   '"Let /s/ be your guide." Too much space = lisp; too little = teeth bump or whistle. If all steps are followed, the contours stay within the neutral zone.');
 mcq('cc-cingulum','concepts','handout','A rounded cingulum is preferred for normal "d" and "t" sounds. What risk comes with over-bulking it on a tongue-thrust patient?',
   ['Labial movement of the tooth','Lingual tipping of the mandibular incisors','Loss of the incisal edge on "f"','A deeper curve of Spee'],
-  'Over-bulked cingulum + tongue thrust = labial tooth movement. You may still need some bulk for a proper holding contact ("vitally important"); explain that "d" and "t" take time to readjust.');
+  'Over-bulked cingulum + tongue thrust = labial tooth movement. You may still need some bulk for a proper holding contact ("vitally important"); explain that "d" and "t" take time to readjust. The tongue pushes on the extra bulk from behind, so it is THIS tooth that moves outward (labially); lingual tipping of the mandibular incisors is not the risk.');
 mcq('cc-lip-bulge','concepts','handout','A bulge toward the gingival on anterior crowns is a common lab "mistake." What is it usually compensating for?',
   ['The clinician under-preparing the tooth','Too much lip support','A short incisal edge','A deep vertical overlap'],
   'Step 2 (lip support): a gingival bulge usually means the lab lacked room because the tooth was under-prepared. Measure the thickness of contoured temporaries to check preparation depth.');
@@ -2733,7 +2786,9 @@ function qCardHTML(q, opts){
 }
 /* drawn figure (q.img = a FIGS key) renders above the Patient Box and stem */
 function figHTML(q){ var f = q.img && FIGS[q.img]; return f ? '<figure class="qcard-figure" aria-label="'+escHtml(f.title)+'">'+f.svg+'</figure>' : ''; }
-function figCardHTML(key){ var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p></figure>' : ''; }
+/* the key (what each letter or number is) sits folded under the notes/Review copy only, so you can test yourself first; question pictures never show it */
+function figKeyHTML(f){ return f.key ? '<details class="fig-key"><summary>Show the key</summary><dl>' + f.key.map(function(k){ return '<dt>'+escHtml(k[0])+'</dt><dd>'+escHtml(k[1])+'</dd>'; }).join('') + '</dl></details>' : ''; }
+function figCardHTML(key){ var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
 /* Patient Box rows render above the stem */
 function pboxHTML(q){
   if(!q.pbox) return '';
