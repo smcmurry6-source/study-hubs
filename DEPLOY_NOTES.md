@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion anima 3 of 10: working and non-working interferences, Claude Code)** — In the L1 notes right after the
+  static frontal-section figure (`FIG_PLACE` 'Help sheet method for interferences', both levels) and in Review (L1 tab, What cusp
+  hits where, Diagrams). Front view: the same #3/#30 section as `inclines` (outlines copied from `od.js`); a slider slides the lower
+  molar toward the cheek (right working: 2-6 and 4-5 light up) or the tongue (left move: 1-3); side tab: protrusive in a schematic
+  Class I buccal view (mandibular mesial on maxillary distal inclines). One model (`ixRide`, sampled crown profiles) rides the lower
+  tooth down whatever it touches and marks the contact; "Let the guidance lift the teeth apart" removes all contact. Built by
+  `tools/figures/occlusion/anima/interferences.mjs`. **Inside the notes a figure's controls must not use `data-go`, `data-view`,
+  `data-tab`, `data-sub`, `data-mode`, `data-lec` or `data-group`**: the notes wire every `[data-go]` as navigation and
+  `widget/fx.js`/`v3.js` read the others (this one uses `data-ixgo`/`data-ixv`/`data-ixtab`). About page updated.
+
 - **2026-10-20 (Occlusion anima 2 of 10: cusp pathways in motion, Claude Code)** — In the L1 notes after the static
   pathway figures (`FIG_PLACE` 'Cusp pathways:', both levels) and in Review (L1 tab, part What cusp hits where, Diagrams). Fig 2: #3 and
   #30 drawn by the hub's own kit (`od.js` loaded at build time with `vm`, so teeth and arrows match `pathMax`/`pathMand`);
