@@ -38,6 +38,23 @@
   function rate(){ var r = parseFloat(ls("sh_pod_rate")); return RATES.indexOf(r) >= 0 ? r : 1; }
   function chapterAt(t){ var c = 0; (P.chapters || []).forEach(function(ch, i){ if (t + 0.5 >= ch.t) c = i; }); return c; }
   function finished(){ return ls(posKey() + ":done") === "1"; }
+  /* feature events (widget/clicks.js, migration_v37): seconds of the episode heard ("pod:<id>:secs", content time,
+     seeks excluded) and, once per device, when the total heard passes 25 / 50 / 75 / 95% of it ("pod:<id>:q1".."q4") */
+  function track(k, n){ try { if (window.shTrack) window.shTrack("pod:" + P.id + ":" + k, n); } catch (e) {} }
+  var lastT = null;
+  function heard(){
+    var t = audio.currentTime;
+    if (lastT !== null && !audio.paused && !audio.seeking) {
+      var dt = t - lastT, d = duration();
+      if (dt > 0 && dt < 3) {
+        track("secs", dt);
+        var key = "sh_pod_heard:" + HUB + ":" + P.id, was = parseFloat(ls(key)) || 0, now = was + dt;
+        ls(key, now.toFixed(1));
+        if (d) [0.25, 0.5, 0.75, 0.95].forEach(function(f, i){ if (was < f * d && now >= f * d) track("q" + (i + 1)); });
+      }
+    }
+    lastT = t;
+  }
 
   function ensureAudio(){
     if (audio) return audio;
@@ -47,7 +64,8 @@
     document.body.appendChild(audio);
     ["play", "pause", "ended", "ratechange"].forEach(function(ev){ audio.addEventListener(ev, refresh); });
     audio.addEventListener("pause", function(){ tick(true); });
-    audio.addEventListener("timeupdate", function(){ tick(); });
+    audio.addEventListener("timeupdate", function(){ tick(); heard(); });
+    audio.addEventListener("seeking", function(){ lastT = null; });
     audio.addEventListener("ended", function(){ ls(posKey(), null); ls(posKey() + ":done", "1"); });
     audio.addEventListener("loadedmetadata", function(){ refresh(); });
     audio.addEventListener("error", function(){ setNote("The episode didn't load. Check your connection and try again."); refresh(); });
@@ -70,6 +88,7 @@
 
   function play(){
     load();
+    track("play");
     try { if (window.shTTS) window.shTTS.stop(); } catch (e) {}
     ls(posKey() + ":done", null);
     audio.playbackRate = rate();

@@ -144,6 +144,8 @@
      Instead this picks the best already-installed voice at no extra cost:
      Chrome/Edge ship free cloud-backed "Natural"/"Online" voices alongside
      the classic ones, just never selected by default. ---------- */
+  /* feature events go through widget/clicks.js (window.shTrack); it may load after us, so look it up each time */
+  function shTrackSafe(k, n){ try { if (window.shTrack) window.shTrack(k, n); } catch (e) {} }
   window.shTTS = (function(){
     var synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
     var activeBtn = null, activeWords = null, wordCursor = -1;
@@ -412,7 +414,8 @@
       var player = ensurePlayer(btn), seek = player.querySelector(".sh-tts-seek"), time = player.querySelector(".sh-tts-time"), rateSel = player.querySelector(".sh-tts-rate");
       rateSel.value = String(rate);
       player.hidden = false;
-      var dragging = false, lastSave = 0;
+      var dragging = false, lastSave = 0, lastT = null;
+      audio.addEventListener("seeking", function(){ lastT = null; });
       function paint(){
         if (!audio.duration || !isFinite(audio.duration)) return;
         if (!dragging) seek.value = String(Math.round(audio.currentTime / audio.duration * 1000));
@@ -425,6 +428,9 @@
       });
       audio.addEventListener("timeupdate", function(){
         paint();
+        /* seconds of narration heard (content time; seeks don't count) */
+        if (lastT !== null && !audio.paused) { var dt = audio.currentTime - lastT; if (dt > 0 && dt < 3) shTrackSafe("tts:secs", dt); }
+        lastT = audio.currentTime;
         if (activeAudioEl === audio && audio.duration) dockProgress(audio.currentTime / audio.duration, fmtTime(audio.currentTime) + " / " + fmtTime(audio.duration));
         var now = Date.now(); if (now - lastSave > 4000) { lastSave = now; savePos(audioUrl, audio.currentTime); }
       });
@@ -435,6 +441,7 @@
       player.querySelectorAll("[data-skip]").forEach(function(b){ b.onclick = function(){ if (audio.duration) audio.currentTime = Math.min(audio.duration - 1, Math.max(0, audio.currentTime + (+b.getAttribute("data-skip")))); paint(); }; });
       rateSel.onchange = function(){ var r = parseFloat(rateSel.value) || 1; audio.playbackRate = r; try { localStorage.setItem(RATE_KEY, String(r)); } catch (e) {} };
       audio.addEventListener("ended", function(){
+        shTrackSafe("tts:end");
         savePos(audioUrl, 0);
         if (activeAudioEl === audio) activeAudioEl = null;
         if (activeBtn === btn) { setState(btn, "idle"); activeBtn = null; }
@@ -564,6 +571,10 @@
         }
       }
       stop();
+      /* feature events (widget/clicks.js, migration_v37): who starts narration, at which level, for which lecture */
+      var file = audioUrl ? String(audioUrl).split("/").pop().replace(/\.mp3.*$/, "") : "";
+      shTrackSafe("tts:start-" + (!audioUrl ? "voice" : /-plain$/.test(file) ? "plain" : "full"));
+      if (file) shTrackSafe("tts:lec=" + file);
       if (audioUrl) { playAudioFile(container, btn, audioUrl); return; }
       speakWithSynth(container, btn);
     }
@@ -820,6 +831,7 @@
     name = String(name || "").trim().slice(0, 24);
     if (!name) return false;
     safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+    shTrackSafe("name:set");
     prefSet(SH_NAME_KEY, name);
     renderNameBadge(); syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: name } })); } catch (e) {}
@@ -827,6 +839,7 @@
   }
   function resetName(){
     try { localStorage.removeItem(SH_NAME_KEY); } catch (e) {}
+    shTrackSafe("name:reset");
     if (supabase) try {
       supabase.rpc("clear_display_name", { p_visitor: VISITOR_ID }).then(function(res){
         if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); }
@@ -2142,6 +2155,7 @@
   window.shMindMap = {
     render: function(container, tree, opts){
       if (!container || !tree || !tree.label) return;
+      shTrackSafe("mmap:open");
       opts = opts || {};
       var COL_W = opts.colWidth || 210;
       var ROW_GAP = opts.rowGap || 14;

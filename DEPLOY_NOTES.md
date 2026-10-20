@@ -102,6 +102,24 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (lessons audit + feature events, Claude Code)** — `LESSONS.md` refreshed: retrospectives for **PCD Exam 3**
+  and **MSK Exam 4** (both recaps were already on the dashboard), the 10-15 fixes checked, Occlusion's eve signals, a
+  feature-use summary (podcast, Timmy Tooth, Listen, mind maps, names, diagrams) and new standing lessons (heaviest users
+  ask for application questions; build on a course's hint email; the extras each reach a minority). **New tracking**:
+  `migration_v37.sql` (**applied via the connector**) adds `feature_events` (one row per day, page, kind and visitor, `n`
+  summed), public `record_events` and admin `get_feature_events`. `widget/clicks.js` defines `window.shTrack(kind, n)`
+  (lowercase kinds, sent with the click batch; automated browsers send nothing) and counts on every page: `view`, a daily
+  `state:<setting>=<value>` snapshot (pet, pet-adopted, eggs, theme, font, size, music, accent, nuke, own-name),
+  `pref:<setting>=<value>` on change (`sh:pref`, never the display name; the dashboard's Settings call it directly),
+  `egg:<t>` from `sh:egg-local`, `fig-seen:` / `fig:` / `fig-part:` for diagrams (`[data-anima]`, `figure.fig-card`).
+  Hooks: `widget/timmy.js` `egg:timmy-start` on every summon; `widget/pet.js` `pet:intro`, `pet:adopt-button`,
+  `pet:adopt-closed-stepN`, `pet:no-thanks-stepN`; `widget/podcast.js` `pod:<id>:play`, `:secs` (content seconds heard, seeks
+  excluded) and `:q1`-`:q4` (25/50/75/95% heard, once per device, `sh_pod_heard:<hub>:<id>`); `shTTS` in `widget/v3.js`
+  `tts:start-full|plain|voice`, `tts:lec=<file>`, `tts:secs`, `tts:end`; `mmap:open`; `name:set` / `name:reset`. The About
+  page now loads `clicks.js` too (hub `about`, `about:spoilers=on|off`). `review/` -> Clicks opens with a **Features**
+  section. `supabase/schema.sql` updated, `sw.js` -> `sh-v22`. Not student-visible. **A new feature: add a `shTrack` call
+  for whatever a click can't show.**
+
 - **2026-10-20 (Occlusion midterm eve, Claude Code, #125)** — From the lessons audit, the day before the midterm.
   `hubs/occlusion`, same ids and answer positions: explanations now answer the class's favorite wrong choice on
   `an-compound` (4/27; "hinge and gliding" is the ginglymoarthrodial definition), `fp-m2`, `fp-post`, `fp-c2-pm`,

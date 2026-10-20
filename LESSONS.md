@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-15, morning** (tenth refresh, full `/lessons-audit`, Thursday 8 am Central: PCD Exam 3 is open
-on Canvas today until 8 pm, MSK Exam 4 is tomorrow). Sam runs
+**Last refreshed: 2026-10-20, early morning** (eleventh refresh, full `/lessons-audit`, Tuesday 4:40 am Central: the
+Occlusion midterm is tomorrow; PCD Exam 3 and MSK Exam 4 are archived, retrospectives below). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,58 +79,60 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-15, 8 am Central; "since" = the 10-13 evening fixes, live from 9:40 pm 10-13. Live hubs: **PCD Fixed Pros
-Exam 3 (today, Canvas 8 am-8 pm; archives itself at 10 pm)**, **MSK Exam 4 (Fri Oct 16)**, **Occlusion midterm (Wed
-Oct 21, final Nov 19)**, perio (final Nov 19). No hub newly archived yet: **run the PCD Exam 3 retrospective and recap in
-the next audit, after 10 pm tonight** (check-ins open at 8 pm, the pop-up at 10 pm). Since the last refresh: 7 new reports
-(MSK 4 #19-#22, #25; PCD #23-#24), 2 suggestions (#4 floating Listen controls, #5 a highlighter in the notes), 1 late MSK
-Exam 3 check-in, no surveys, no zero-result searches.
+Refreshed 2026-10-20, 4:40 am Central; "since" = the 10-15 morning fixes (live 8:27 am 10-15). Live hubs: **Occlusion
+midterm (Wed Oct 21; final Nov 19)** and perio (final Nov 19). Archived since last time: **PCD Exam 3** (10-15) and **MSK
+Exam 4** (10-16), retrospectives below; both recaps were already on the dashboard (published 10-15 and 10-16). Since the
+last refresh: 1 report (#26), 4 suggestions (#5 resolved; #6-#8 open, all Occlusion), 17 check-ins (PCD 7, MSK 4 8, one
+late each for MSK 3 and perio), 9 answers to survey round 2, no zero-result searches.
 
-**Fake visitors from automated sessions.** MSK 4 showed 54 people on 10-14 with 42 under 5 minutes, but 24 of them were
-single-ping visitors arriving every ~7 s between 7:18 and 7:28 am (a browser session working on the live site, each page
-a fresh visitor id); the same pattern put 12 on PCD on 10-13 and 15-16 on perio on 09-24/25. **Real MSK 4 on 10-14: ~30
-people, 18 under 5 minutes.** From 10-15 the widget no longer records automated browsers (`navigator.webdriver`); drop such bursts from earlier
-data before reading people or bounce counts.
+**Did the 10-15 fixes work?** (`personal_answers` before vs since; both banks rose 6 points on the eve and exam morning, so
+only gains well above +6 count.) MSK 4: `dp-terb-pk` 4/11 (36%) -> **16/17 (94%)**, `nm-sux-cv` 3/7 -> 15/23 (65%),
+`dp-clinda` 4/16 (25%) -> 15/32 (47%, still weak), `mu-dhpr` 45% -> 55% (flat once the baseline is taken out). Report #25's
+picture fix: `mu-fig-h` 3/5 -> 30/39 (77%). The two matching items split into MCQs beat the matching (20% and 27%): warts
+96% (condyloma), 70% (plana), 55% (plantar); lice products 77% (ivermectin), 52% (spinosad) and **34% for malathion (12 of
+32 picked ivermectin lotion)**. `sk-ex-func` went 10/10 -> 20/23 once its key stopped being a throwaway, as intended. PCD:
+only exam-day answers since (4-8 per item: `on-telio` 44% -> 5/8, `on-materials-list` 49% -> 3/4, `gl-system` 62% -> 2/5),
+too few to call.
 
-**Did the 10-13 evening fixes work?** (`personal_answers` before vs since; the whole PCD bank rose from 81% on 10-13 to
-86% on 10-14, so only gains well above +5 points count.) Key rewrites from reports: `ce-isolation` 8/17 (47%) -> **14/14**
-(#16), `ve-pbox-3` 11/23 (48%) -> **16/23 (70%)** (#15), `on-crack-types` 17/19 -> 13/13 (#18). Explanations naming the
-favorite wrong answer: `ce-sbu` 11/27 (41%) -> **16/26 (62%)**, `co-translucent` 9/18 (50%) -> **14/20 (70%)**; flat on
-`bo-zprime` 9/18 -> 5/10, `bo-adh-thick` 9/18 -> 8/17, `co-correct-high` 8/14 -> 11/19. Matching split into MCQs:
-`ce-cure-match` was 11/21 (52%); its new MCQs `ce-cure-emax` 15/20 (75%) and `ce-cure-zr` 13/18 (72%). The 10-13 morning
-batch held up: `ce-irm` 14/34 -> 14/21 (67%), `ce-contact-open` 11/18 -> 7/8, select-all `ce-reqs` with tick boxes
-22/32 (69%) -> **22/24 (92%)**, `co-afterimage` 14/14 since its new stem. MSK 4: `dp-impetigo` 5/13 -> 4/7, `sk-lamellar`
-7/17 -> 3/7 and `dp-clinda` 2/10 -> 2/6 (both still stuck; `dp-clinda`'s two favorite wrong answers split evenly).
+**Occlusion midterm** (tomorrow, 6:30 pm on Canvas: 40-45 multiple choice in one hour, per Dr. Givan's email): 60 people, 96 h; the usual curve (13 people on 10-17, 30 on 10-18, 51 and 58 h on 10-19;
+22 of the 60 first opened it yesterday). 4,945 answers from 42 people, 77%. Time: bank 3,300 min (40 people), notes 2,056
+(59), Daily Drill 244 (13), mock 49 (**4 people**, 3 mocks at 80%), hints 32, Review ~60. By lecture: TMJ anatomy 70% (16.8
+tries per question), Concepts 77% (9.2), Review of Basic Occlusion 77% (25.5), Mastication 80% (10.4), Applying Occlusion
+82% (**7.7**: the last lecture gets the least practice again). By source: **help-sheet items 60%** (21.9 tries) vs 78-79%;
+the fence-post items `fp-m2`, `fp-post`, `fp-c2-pm` sit at 35-36%. Hardest: `an-compound` 4/27 (23 picked "hinge and
+gliding", which is the ginglymoarthrodial definition), `an-tml-outer` 5/21, `rv-ch-spee` 12/28 (16 picked Taller). Shipped
+10-20 (#125): 10 explanations answer the favorite wrong choice, a folded key under the lettered diagrams in the notes and
+Review (#6), `rv-thielmann-f` (#26), 11 more help-sheet items (#8). **Next audit, after the midterm: did the fence items
+move, and do the check-ins ask for application questions (#7)?**
 
-**PCD Fixed Pros Exam 3** (exam today): 76 people, 168 h all time; 10-14 (eve) 55 people, 61 h, 4,605 answers from 43 at
-86%; this morning 22 people so far, 90%. Eve time: bank 2,143 min (42 people), notes 1,171 (47), cram 256 (14), Weak Spots
-165, mock 136 (9 people; 7 mocks at 76%), Daily Drill 126 (12). 7 of 55 under 5 minutes on the eve. All time 11,001
-answers from 60 people, 83%. By lecture: Cement 78% and Bonding 80% (33-37 tries per question), Color 84%, Onlays 84%,
-glaze video 83%, Veneers 86%, Removing a Crown 91%. Still hardest: `on-telio` 14/32 (44%; 8/17 -> 6/15 since, not yet
-fixed), `on-materials-list` 18/37, `bo-zprime`, `bo-adh-thick`, `ce-burnish`, `ve-same-day` 14/24, `gl-c-shade` 11/19.
-The 7 new staining questions (`gl-*`, 10-14) were answered 13-21 times each at 58-100%; `gl-email` drew two "not useful"
-reports (#23, #24) and is removed; explanations now answer the favorite wrong choice on `on-telio`,
-`on-materials-list`, `ve-same-day`, `ce-short-prep`, `on-isthmus`, `gl-system`, `ve-zenith` and `gl-c-shade`.
+**Perio** (final Nov 19): 22 people, 7 h since 10-15 (the S5 Furcation quiz was that day); 438 answers from 6 people, 70%.
 
-**MSK Exam 4** (tomorrow; 30 questions: L28 6, L29 3, L30 6, L31 11, L32 4): ~33 real people, 35 h; 10-14 ~30 people, 13 h,
-1,018 answers from 13 people at 75%. All time 2,307 answers from 20 people, 72%. **The late lectures are barely
-practised, and L31 is over a third of the exam:** tries per question Skin Histology 15.5 (77%), Derm Pharm 14.2 (65%),
-Dermpath 8.1 (71%), Skeletal Muscle 7.4 (73%), NMJ Pharm 4.7 (72%); in-class review set 2.4 (83%). Time on the eve-1:
-bank 374 min (23), notes 295 (25), Review drugs 25 (12), Diagrams 5 (13). Hardest with 10+ tries: matching `pa-warts-match`
-2/10 and `dp-ecto` 4/15, ordering `mu-hierarchy` 3/13, `dp-clinda` 4/16, select-all `dp-toenail` 6/20, `dp-contact-urticaria`
-7/21 (allergic contact dermatitis picked 12 times, more than the key; the explanation already says it's type IV),
-`pa-lichenif` 5/15 (hyperkeratosis 8), `pa-pagetoid` 4/12, `dp-terb-pk` 4/11 (the "converted to an azole" choice 5),
-`mu-functional-syncytium` 4/10, `mu-dhpr` 5/11 (SERCA 5). At Sam's request the two matching items are now MCQs
-(`pa-wart-plana`/`-plantar`/`-condyloma`, `dp-ecto-malathion`/`-spinosad`/`-ivermectin`). Explanations now answer the favorite wrong choice on
-`dp-clinda` (membrane: gramicidin), `dp-terb-pk`, `mu-dhpr`, `nm-sux-cv`; reports #21 (`sk-keratinization` key reworded),
-#22 (`sk-ex-func` key no longer a throwaway) and #25 (`mu-fig-h`/`mu-fig-a`: the highlighted band now has a dashed outline
-and a stronger fill, and the A band still lights the H zone too) fixed. **Run the next audit Friday night or Saturday for
-the PCD retro and the first MSK 4 check-ins.**
+**Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
+- **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
+  all; 15 on the eve (of 58 MSK 4 visitors that day), 7 on exam morning. 10 listened under 5 min, 5 for 5-15, 2 for 15-30
+  and **3 for 40+ min** (the whole 42-minute episode). Speed button 16 people, chapters 13.
+- **Timmy Tooth**: **35 adopted** (15 on launch day, 10-01; 28 with the Adopt button, 7 by closing the introduction, which
+  also adopts). 33 of them studied in the last week, 25 tapped him since 10-13, 16 earned the perfect-health trophy, 3
+  brought him back from 0 HP. **Turned off after adopting: 2** used "Turn off Timmy"; 3 more pressed an "Off" in Settings,
+  which may have been his or another setting. **"No thanks" in his introduction: at most 1 person** (every other dashboard
+  "No thanks" matches a survey skip that day). So the ~50 dashboard users who haven't adopted him never opened his
+  introduction: he is still perched on their name on the dashboard (he only follows you into hubs once adopted).
+- **Listen**: 23 people have ever pressed it (MSK 3 11, perio 9, Occlusion 7, PCD 6, MSK 4 6); ~4 used the floating dock.
+  **Mind maps**: 36 people (MSK 3 23, PCD 14, perio 11, Occlusion 4, MSK 4 2). **Highlighter** (10-15): 12 people (Occlusion 5
+  with 133 highlights, MSK 4 6, PCD 1).
+- **Names**: 12 people have a name of their own (2 set today); 47 have opened the name editor.
+- **MSK 4 interactive diagrams**: 18 of 71 visitors used them (10 the junction's drug picker, 14 the sarcomere slider or
+  Play); its 8 picture questions got 19-45 tries each, 62-89% right.
+- **Typing TIMMY**: never recorded (the count lived only on each device), so unknown before 10-20.
 
-**Occlusion midterm** (6 days out): 9 people, 2 h; 30 answers from 1 person. Fills after MSK 4.
-
-**Perio**: 15 people, 6 h on 10-14 (the S5 Furcation quiz is today), 366 answers from 4 people at 72%.
-**MSK Exam 3**: one more check-in (n = 11), About right, readiness 4, as expected.
+**New tracking from 10-20** (`migration_v37`, table `feature_events`, `window.shTrack` in `widget/clicks.js`): page loads
+on every page (dashboard and About included), a once-a-day snapshot of each visitor's settings (Timmy Tooth on, dashboard
+only or off; adopted; surprises, theme, font, size, music, accent, own name), settings changes, every easter egg (TIMMY
+summons as `egg:timmy-start`), how Timmy Tooth's introduction ends (Adopt, closed, No thanks, at which step), podcast play,
+seconds heard and 25/50/75/95% of the episode heard, Listen starts by level and lecture, minutes heard and finishes,
+diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read it in `review/` -> Clicks -> Features, or
+`select hub, kind, count(distinct visitor_id), sum(n) from feature_events group by 1, 2`. (Three test rows under hub
+`zz-test` can be deleted.)
 
 ## Standing lessons (read before building a hub)
 
@@ -142,7 +144,9 @@ the PCD retro and the first MSK 4 check-ins.**
 - **Lecture notes and the question bank are the hub.** In perio and MSK (per-section data, 2026-09-23 on) notes +
   bank are ~80% of time; the first survey's "most helpful" answers were Question bank 4, Lecture notes 1. Arcade,
   review tables, mock exams and Atlas-style extras each get a few people. Build and polish notes + bank first. Final numbers: MSK bank 99 h + notes 62 h of
-  204 h; perio bank 98 h + notes 51 h of 217 h. **Both arcades together got 1.4-1.7% of hub time** (MSK 19 people, 3 h;
+  204 h; perio bank 98 h + notes 51 h of 217 h; PCD 3 bank 106 h + notes 77 h of 212 h; MSK 4 bank 60 h + notes 45 h of 131 h.
+  **The extras each reach a minority**: across all hubs to 10-19, Listen 23 people ever, mind maps 36, the highlighter 12,
+  MSK 4's interactive diagrams 18 of 71, the Timmy Time podcast 20 (a third of the MSK 4 eve crowd; 3 heard it all). **Both arcades together got 1.4-1.7% of hub time** (MSK 19 people, 3 h;
   perio 30 people, 4 h), and the people who played most were heavy studiers anyway (top 5 arcade players: 31-61 arcade
   minutes each inside 191-631 total). Of 18 arcade games, the most-played had 9 people and 50 runs (MSK Sort Storm);
   only 3 people saved a score in the same game on two different days.
@@ -159,10 +163,13 @@ the PCD retro and the first MSK 4 check-ins.**
   the same right-hand answer** unless grading compares text: perio `q4-L27` had "4-6 weeks" twice, and picking
   the other copy was marked wrong (20% correct; grading compares text since 2026-09-29).
 - **The last lectures before the exam get the least practice and score lowest.** GI2's GI Pharm and GI Path were
-  answered ~17 times per question vs ~30 for the early lectures, at 71-73% vs 81-84%. The Daily Drill and mock
+  answered ~17 times per question vs ~30 for the early lectures, at 71-73% vs 81-84%. Still true: MSK 4's last lecture
+  (NMJ) got 26 tries per question vs 38-45, and Occlusion's Applying Occlusion 7.7 vs 25.5 for Lecture 1 on its eve-1. The Daily Drill and mock
   exams should lean toward late-added lectures; say on Course Home when new questions land.
 - **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
-  attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them.
+  attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them. The same goes for the
+  professors' own hints: PCD 3's `hint` items (from the course's exam-hint email) got 49 tries per question vs 35-40, and
+  a check-in said "the exam followed the hints a lot". When a course sends hints, build the blueprint and questions on them.
 - **Look-alike conditions need a side-by-side table, not just paragraphs.** GI2's two Crohn vs UC matching items
   were the hardest in the bank (5-7%) and its GIST/interstitial-cell items were all under 35%. Notes for any
   lecture with paired look-alikes should have a comparison table and a question per distinguishing feature.
@@ -204,6 +211,13 @@ the PCD retro and the first MSK 4 check-ins.**
   keys rewritten from reports went 47% -> 14/14 (`ce-isolation`) and 48% -> 70% (`ve-pbox-3`); of five explanations that
   only added a line about the favorite wrong answer, two rose 20 points and three stayed flat while the bank rose 5. And the
   matching item `ce-cure-match` (52%) did better as two MCQs (72-75%), as the 10-01 MSK data predicted.
+- **The heaviest users are the ones who say "Exam asked different things"; read their "missed" first.** MSK 3: the one
+  such check-in was the heaviest user. MSK 4: all three (215-450 min, 504-653 answers, 77-87%). PCD 3: the person with the
+  most answers (933 at 91%). What they ask for is consistent: **application questions** (PCD: "what cement for what type of
+  crown"; Occlusion suggestion #7; perio "more diagnostic questions"; MSK 3 and GI 2 Patient Box items that test how
+  things work) and the lecture's emphasis over its details (MSK 4: "more specific definitions, pathways", "the hub asked
+  more low-yield questions"). Write fewer product-trivia items and more decision items (this patient, this restoration,
+  which material or drug and why).
 - **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
@@ -253,11 +267,125 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 - **Students ask for ways to remember, not just to be told.** Suggestion #2 (MSK, exam eve): "when you missed a
   question, the explanation gave you a way to remember it... a mnemonic or cue" (memory cues shipped 10-02 for perio and
   MSK). Suggestion #3: an undo / start-over button for ordering questions (shipped 10-02). Build both in from the start.
+- **A diagram with letters or numbers needs a key somewhere you study.** Occlusion suggestion #6 asked for a key to the
+  cusp-pathway arrows; the picture questions must hide it, but the copies under the notes and in Review now fold one out
+  ("Show the key", 2026-10-20). Draw new lettered figures with a key from the start.
+- **Test the formula, not only a piece of it.** Occlusion report #26: a stem that gives Thielmann's formula and asks what
+  CC stands for "would be better if it asked us what the formula is". When the lecture teaches a formula or a rule, ask for
+  the whole thing too.
+- **Survey round 2** (live 10-15, n = 9 answers by 10-19): question formats: "good the way they are" 6, Quizlet flashcards
+  or Learn 3, Anki 1, one loves the lecture notes most; a guided tutorial: yes 3, no 2. Asks: a place to ask questions about
+  confusing topics, comparative summary charts, highlight colors, drills longer than 10 (the drill's "10 more" exists:
+  make it easier to find), Review titles that match the lecture titles, no recall/flashcard items when the exam is all
+  MCQ, cloze (fill-in-the-blank), and on games: filter by lecture or missed questions, quiz-based games, or get rid of
+  them. Sam opened separate work for highlight colors, the tutorial, Patient Box questions, games and a place to ask
+  questions (10-20).
 - **What check-ins say the hub missed lines up with the weakest data.** MSK's check-ins asked for "location of bone
   formation and differentiation", the lowest lecture (Bone Development 71%, its orderings 18-48%); perio's asked for
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.
 
 ## Hub retrospectives
+
+### MSK Exam 4 (`msk-exam4`), exam 2026-10-16, archived 2026-10-16 (written 2026-10-20)
+
+Data (28 automated one-ping visitors from 10-14 dropped): 71 people, 131 h; 26 came on one day only, 25 on 3+ days, median 59
+min each, 13 under 5 min. **8,969 answers from 43 people** (median 180, most 653; 26 answered on 2+ days), 78% overall.
+Night before (10-15): 3,795 min from 58 people (**48% of all time**), **31 of them first-time visitors**; exam morning
+1,926 min from 47; 13 studied after midnight. 17 mocks from 12 people, 80% average. Daily Drill 11 people. Arcade 14 runs
+from ~5 people. Recap on the dashboard since 10-16.
+
+| Section | Minutes | People |
+|---|---|---|
+| Question bank | 3,583 | 42 |
+| Lecture notes | 2,689 | 71 |
+| Timmy Time podcast | 287 | 20 |
+| Cram sheet | 220 | 25 |
+| Daily Drill | 191 | 11 |
+| Review: drugs | 186 | 13 |
+| Weak Spots | 183 | 11 |
+| Mock exam | 174 | 13 |
+| Exam hints | 103 | 14 |
+| Review: rest | ~170 | 9 (skin) |
+
+Notes: lecture picks Derm Pharm 119, Dermpath 100, Muscle 97, NMJ 83, Skin 82 opens; Plain English 17 vs As taught 16;
+Listen 6 people, mind map 2, highlighter 6. Interactive diagrams 18 people (above).
+
+| By lecture | Accuracy | Tries per question |
+|---|---|---|
+| Dermatological Pharmacology | 69% | 37.5 |
+| Pathology of the Skin | 77% | 37.8 |
+| Pharmacology of the NMJ | 78% | 26.1 |
+| Skeletal Muscle | 81% | 40.5 |
+| Histology of Skin | 83% | 44.7 |
+
+By type: MCQ 80%, matching 69% (8), sequence 57% (7, all 3-5 steps), select-all 43% (2, both Patient Box drug picks). By
+source: lecture self-checks 72%, hub-written 76%, recording 78%, classmate's deck 84%, in-class review 90%. Hardest:
+`dp-ecto-malathion` 34% (ivermectin lotion picked 12 times), `pa-blister-match` 40%, `dp-clinda` 40% (cell wall 13),
+`dp-toenail` 41% and `dp-impetigo` 44% (select-alls), `mu-hierarchy` 43% (ordering), `dp-contact-urticaria` 44% (allergic
+contact dermatitis 21), `sk-lamellar` 45% (Langerhans cells 21).
+
+Check-ins, **n = 8** (later ones go into the next audit): About right 5, Exam asked different things 3; went as expected 5,
+better 1, worse 2; readiness 3-5 (average 3.9). Against each person's use: the three "different things" were heavy users
+(215-450 min, 504-653 answers, 77-87%); the two "worse than expected" called the hub about right and had the lowest hub
+accuracy of the eight (68-70%; 83 and 526 min). Missed (as topics): "more specific definitions, pathways"; "the hub tended
+to ask more low-yield questions based on the lectures; it was good to read over".
+
+What changes because of it: (1) in drug lectures, fewer product details (how each lice product is applied, which ointment
+goes in the nose) and more mechanism, pathway and definition items, weighted by what the lecture stresses (standing lesson
+above); (2) the last lecture again got the least practice: put late lectures first in the Daily Drill and mock; (3) the
+podcast reached a third of the eve crowd: repeat it only when there's a session to spare for it; (4) select-all Patient Box
+drug picks stay the weakest format: keep them few, 5 options, 3 correct. Cleanup still to do by hand: remove
+`hubs/msk-exam4/` (its card leaves the dashboard 10-26) and optionally move its entry into `ARCHIVED_HUBS`.
+
+### PCD Fixed Pros Exam 3 (`pcd-exam3`), exam 2026-10-15 (Canvas, 8 am-8 pm), archived 2026-10-15 (written 2026-10-20)
+
+Data (12 automated one-ping visitors from 10-13 dropped): 79 people, 212 h; 26 came on one day only, **37 on 3+ days**,
+median 95 min each, 10 under 5 min. **14,092 answers from 72 people** (median 117, most 933; 36 answered on 2+ days), 84%.
+Studying started earlier than in other hubs: 25 people and 32 h three days out (10-12), 40 people two days out. Night
+before (10-14): 3,648 min from 55 (29% of all time), 15 of them first-time visitors; exam day 3,097 min from 62 (24%: the
+Canvas exam was open all day); 9 studied after midnight. 16 mocks from 14 people, 79%. **Daily Drill 24 people on 42
+person-days**, the most of any hub. Arcade ~24 runs from ~7 people. Recap on the dashboard since the evening of 10-15.
+
+| Section | Minutes | People |
+|---|---|---|
+| Question bank | 6,377 | 59 |
+| Lecture notes | 4,598 | 77 |
+| Daily Drill | 411 | 24 |
+| Cram sheet | 398 | 28 |
+| Weak Spots | 329 | 16 |
+| Mock exam | 297 | 16 |
+| Review (all) | ~160 | 16 (cements) |
+| Exam hints | 78 | 27 |
+
+Notes: Plain English 26 clicks (15 people) vs As taught 19 (13); mind map 14 people; Listen 6 people (57 clicks).
+
+| By lecture | Accuracy | Tries per question |
+|---|---|---|
+| Cement & Cementation | 80% | 47.0 |
+| Bonding Dental Ceramics | 82% | 42.4 |
+| Glaze & add contacts (video) | 83% | 35.3 |
+| Color | 85% | 42.2 |
+| Onlays | 86% | 40.9 |
+| Laminate Veneers | 88% | 39.4 |
+| Removing a Crown | 92% | 40.2 |
+
+By type: MCQ 85%, matching 85% (8 items of 4 pairs), select-all 83% (5 options, 3 correct, with tick boxes), sequence 76%
+(3-5 steps). By source: slides 82%, recordings 82%, **hint email 87% with the most practice (49 tries per question)**.
+Hardest: `on-telio` 48% (bis-acryl 13), `bo-zprime` 50% (eugenol 14), `ce-irm` 51% (RMGI 13), `on-materials-list` 51%,
+`bo-adh-thick` 52%, `co-uranium` 53% (cobalt 10), `ce-sbu` 57%.
+
+Check-ins, **n = 7**: About right 4, Hub was harder 2, Exam asked different things 1; went better 3, as expected 3, worse 1;
+readiness 3-5 (average 3.9). Against use: the one "different things" had the most answers of anyone (933 at 91%, 377 min)
+and asked for application ("what cement for what type of crown"); both "Hub was harder" were 91-93% accurate (64-245 min);
+the one "worse than expected" studied the most (682 min, 86%) and still called the hub about right. One wrote that the
+exam "followed the hints a lot so the questions around those were very helpful."
+
+What changes because of it: (1) for Fixed Pros, build again from the course's hint email (blueprint, `hint` source, Exam
+Hints tab): it matched the exam; (2) add decision items (which cement for this crown and situation, which material for this
+onlay), the most common ask across courses (standing lesson above); (3) short select-alls with tick boxes worked (83%), as
+did 4-pair matching; (4) a Canvas exam open all day puts a quarter of the time on exam day, so keep fixes and the Daily
+Drill fresh through that day. Cleanup still to do by hand: remove `hubs/pcd-exam3/` (its card leaves the dashboard 10-25)
+and optionally move its entry into `ARCHIVED_HUBS`.
 
 ### MSK Exam 3 (`msk-exam3`), exam 2026-10-02, archived 2026-10-02 (written 2026-10-10)
 

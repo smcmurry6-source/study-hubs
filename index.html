@@ -939,6 +939,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       else lsSet(key, val);
       if (key === "sh_pref_font" || key === "sh_pref_size") applyReadingPrefs();
       if (key === "sh_pref_pet" && window.shPet) window.shPet.refresh();
+      /* feature events (widget/clicks.js, migration_v37): the dashboard sets these without the hubs' sh:pref event */
+      if (window.shTrack && /^(sh_pref_[a-z_]+|theme)$/.test(key)) window.shTrack("pref:" + key.replace(/^sh_pref_/, "") + "=" + val);
       b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
     });
   }
@@ -1343,6 +1345,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (e.target === d || e.target.closest(".survey-x")) { close(); return; }
       if (e.target.closest(".name-reset")){
         localName = ""; try{ localStorage.removeItem("sh_display_name"); }catch(err){}
+        if (window.shTrack) window.shTrack("name:reset");
         if (nameSb) nameSb.rpc("clear_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } }, function(){});
         greet(); close();
       }
@@ -1352,6 +1355,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var v = input.value.trim().slice(0, 24);
       if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
       if (nameSb) nameSb.rpc("set_display_name", { p_visitor:VISITOR, p_name:v }).then(function(){}, function(){});
+      if (window.shTrack) window.shTrack("name:set");
       localName = v; lsSet("sh_display_name", v); greet();
       msg.textContent = "Saved. Hi, " + v + "!";
       setTimeout(close, 700);

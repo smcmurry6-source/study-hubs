@@ -1848,8 +1848,11 @@
     setTimeout(function(){ var f = d.querySelector("input, .shpet-go"); if (f) try { f.focus(); } catch (e) {} }, 40);
     return d;
   }
+  /* feature events (widget/clicks.js, migration_v37) */
+  function track(k){ try { if (window.shTrack) window.shTrack(k); } catch (e) {} }
   function intro(){
     hush();
+    track("pet:intro");
     var step = 0;
     var stages = '<div class="shpet-stages">' + [[90, "Healthy"], [60, "Plaque"], [33, "Caries"], [8, "Fractured"]].map(function(x){
       return '<div>' + art({ hp: x[0], hat: "" }, 72) + x[1] + '</div>'; }).join("") + '</div>';
@@ -1872,8 +1875,9 @@
       d.querySelector("[data-next]").textContent = step === STEPS.length - 1 ? "Adopt Timmy" : "Next";
     }
     var done = false;
-    function finish(){
+    function finish(how){
       if (done) return; done = true;
+      track("pet:adopt-" + (how || "closed-step" + (step + 1)));  /* closing the intro any other way adopts him too */
       ls("sh_pet_born", centralDay());
       award("pet-adopt", centralDay());
       M.skipHello = true;
@@ -1882,9 +1886,9 @@
       setTimeout(function(){ talk("I'm home! Go answer some questions and I'll feel great.", "do-cheer", 7000); }, 700);
     }
     d.addEventListener("click", function(e){
-      if (e.target.closest("[data-next]")) { if (step === STEPS.length - 1) finish(); else { step++; show(); } }
+      if (e.target.closest("[data-next]")) { if (step === STEPS.length - 1) finish("button"); else { step++; show(); } }
       else if (e.target.closest("[data-back]")) { if (step) { step--; show(); } }
-      else if (e.target.closest("[data-no]")) { done = true; setPref("off"); d.remove(); }
+      else if (e.target.closest("[data-no]")) { done = true; track("pet:no-thanks-step" + (step + 1)); setPref("off"); d.remove(); }
       /* closing the introduction any other way still adopts him, so he never stays stuck on your name */
       else if (e.target === d || e.target.closest(".shpet-x")) finish();
     });

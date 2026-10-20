@@ -320,6 +320,16 @@ td .spoil-ph{font-style:italic}
       });
       var asof = document.getElementById("pctAsOf"); if (asof) asof.textContent = " (" + total + " people right now)";
     }, function(){});
+  /* who reads this page, and which spoilers they open (widget/clicks.js: clicks plus feature events, migration_v37) */
+  function startClicks(){
+    if (!window.shClicks) return;
+    var me = null; try { me = localStorage.getItem("sh_visitor_id"); } catch (e) {}
+    var sb = { rpc: function(fn, args){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", keepalive: true,
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(args) }); } };
+    window.shClicks.start({ sb: sb, hub: "about", visitor: me, section: function(){ return "about"; } });
+    box.addEventListener("change", function(){ if (window.shTrack) window.shTrack("about:spoilers=" + (box.checked ? "on" : "off")); });
+  }
+  var cs = document.createElement("script"); cs.src = "../widget/clicks.js"; cs.onload = startClicks; document.head.appendChild(cs);
 })();
 </script>
 </body>
