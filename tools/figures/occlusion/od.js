@@ -281,7 +281,7 @@ var FIG_PLACE = {
   review: [
     { full:'What cusp hits where: the fence post', plain:'Which cusp hits where', end:true, widget:'cuspMap' },
     { full:'Help sheet method for interferences', plain:'To figure out which slopes touch', figs:['inclines'] },
-    { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand'] },
+    { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand','cuspmotion'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
   ],
@@ -289,7 +289,7 @@ var FIG_PLACE = {
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'], anatomy:['tmj'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines'], anatomy:['tmj'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

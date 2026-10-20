@@ -1006,6 +1006,45 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 @media (max-width:560px){.anima .tm-gauge{display:none}}
 @media (prefers-reduced-motion:reduce){.anima .tm-space,.anima .tm-muscle,.anima .tm-lig{transition:none}}
 
+.anima .cm-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px 14px}
+.anima .cm-tooth .fg-t{fill:var(--anatomy-text);font:11px var(--anatomy-mono)}
+.anima .cm-tooth .fg-t.sm{font-size:10px}
+.anima .cm-tooth .cm-who{fill:var(--anatomy-muted)}
+.anima .cm-g{fill:none;stroke:var(--anatomy-mid);stroke-width:2;stroke-linecap:round;opacity:.5}
+.anima .cm-g-head{fill:var(--anatomy-mid);opacity:.5}
+.anima .cm-ghost{transition:opacity .25s}
+.anima .cm-tooth[data-all="0"] .cm-ghost{opacity:0}
+.anima .cm-tooth[data-move]:not([data-move=""]) .cm-ghost{opacity:.35}
+.anima .cm-tooth[data-all="0"][data-move]:not([data-move=""]) .cm-ghost{opacity:0}
+.anima .cm-tooth .fg-pin.cm-pin circle{fill:var(--surface);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .cm-tooth .fg-pin.cm-pin text{fill:var(--anatomy-strong);font:600 11px var(--anatomy-mono)}
+.anima .cm-tooth[data-move="pro"] .cm-ghost[data-m="pro"],.anima .cm-tooth[data-move="work"] .cm-ghost[data-m="work"],.anima .cm-tooth[data-move="nonwork"] .cm-ghost[data-m="nonwork"],.anima .cm-tooth[data-move="retro"] .cm-ghost[data-m="retro"]{opacity:1}
+.anima .cm-tooth[data-move="pro"] .cm-ghost[data-m="pro"] .cm-g,.anima .cm-tooth[data-move="work"] .cm-ghost[data-m="work"] .cm-g,.anima .cm-tooth[data-move="nonwork"] .cm-ghost[data-m="nonwork"] .cm-g,.anima .cm-tooth[data-move="retro"] .cm-ghost[data-m="retro"] .cm-g{opacity:0}
+.anima .cm-tooth[data-move]:not([data-move=""]) .cm-pin circle{stroke:var(--anatomy-lit)}
+.anima .cm-trace{fill:none;stroke:var(--anatomy-lit);stroke-width:3.4;stroke-linecap:round}
+.anima .cm-head{fill:var(--anatomy-lit)}
+.anima .cm-cusp{fill:var(--anatomy-lit);stroke:var(--surface);stroke-width:2}
+.anima .cm-moves .am-btn{white-space:nowrap}
+.anima .cm-jawbox{max-width:460px;margin:0 auto}
+.anima .cm-jaw .fg-t{fill:var(--anatomy-text);font:10px var(--anatomy-mono)}
+.anima .cj-mid{fill:none;stroke:var(--anatomy-faint);stroke-width:1;stroke-dasharray:4 4}
+.anima .cj-jaw{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.4;stroke-linejoin:round;fill-rule:evenodd}
+.anima .cj-cond{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.4}
+.anima .cj-rest{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:2 2}
+.anima .cj-spin{fill:none;stroke:var(--anatomy-lit);stroke-width:2;stroke-dasharray:3 3;transition:opacity .2s}
+.anima .cj-molar{fill:#e9dcbf;stroke:#8b7653;stroke-width:1.2}
+.anima .cj-cusp{fill:var(--anatomy-strong)}
+.anima .cj-path{fill:none;stroke-width:3.4;stroke-linecap:round}
+.anima .cj-path.lat{stroke:var(--anatomy-lit)}.anima .cj-head.lat{fill:var(--anatomy-lit)}
+.anima .cj-path.med{stroke:var(--tag-red)}.anima .cj-head.med{fill:var(--tag-red)}
+.anima .cj-angle{fill:none;stroke:var(--anatomy-strong);stroke-width:1.2}
+.anima .cj-deg{fill:var(--anatomy-strong);font:600 12px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.anima .cm-jawctl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center}
+.anima .cm-legend .sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin:0 5px 2px 0;vertical-align:middle}.anima .cm-legend .sw.lat{background:var(--anatomy-lit)}.anima .cm-legend .sw.med{background:var(--tag-red);margin-left:10px}
+.anima .cm-slab{font:.78rem var(--font-body);color:var(--ink-soft)}
+@media (max-width:560px){.anima .cm-jawctl{grid-template-columns:1fr}.anima .cm-slab{margin:-4px 0 6px}}
+@media (prefers-reduced-motion:reduce){.anima .cm-ghost,.anima .cj-spin{transition:none}}
+
 /* anima:css end */
 </style>
 </head>
@@ -1410,7 +1449,7 @@ var FIG_PLACE = {
   review: [
     { full:'What cusp hits where: the fence post', plain:'Which cusp hits where', end:true, widget:'cuspMap' },
     { full:'Help sheet method for interferences', plain:'To figure out which slopes touch', figs:['inclines'] },
-    { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand'] },
+    { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand','cuspmotion'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
   ],
@@ -1418,7 +1457,7 @@ var FIG_PLACE = {
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','inclines'], anatomy:['tmj'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines'], anatomy:['tmj'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
@@ -2033,6 +2072,148 @@ var ANIMA = (function(){
   var fit = function () { svg.setAttribute("viewBox", mq && mq.matches ? D.narrow : D.wide); };
   if (mq) { fit(); if (mq.addEventListener) mq.addEventListener("change", fit); }
   draw();
+} };
+  FIGS["cuspmotion"] = { title: "Cusp pathways in motion", caption: "Pick a movement and watch the opposing cusp leave its MIP contact on #3 and on #30 at once: every path reverses on the lower tooth. Below, the jaw from above shows why the working and non-working paths spread apart.", lec: "review",
+    html: "<div class=\"anima\" data-anima=\"cuspmotion\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 2</span><span class=\"iso-plate-corner\" data-corner=\"title\">Cusp pathways in motion</span><span class=\"iso-plate-corner\" data-corner=\"hint\">pick a movement</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>MIP</span></div><div class=\"cm-pair\"><div class=\"am-svg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg cm-tooth\" viewBox=\"0 0 380 290\" role=\"img\" aria-label=\"Maxillary right first molar #3, occlusal view, buccal at the top and mesial at the left. A dot marks the distobuccal cusp of #30 in the central fossa; picking a movement draws that cusp's path across #3.\"><g class=\"od-tooth\"><path class=\"od-crown\" d=\"M97.8 71.8 C103.8 57.9 120.9 54.3 132 52 C143.1 49.7 155.4 55.6 164.4 57.9 C173.4 60.3 177.6 66.2 186 65.9 C194.4 65.5 204 56.6 214.8 56 C225.6 55.3 241.8 56 250.8 61.9 C259.8 67.8 264.6 77.4 268.8 91.6 C273 105.8 275.1 129.2 276 147 C276.9 164.9 276.6 183.7 274.2 198.5 C271.8 213.4 269.1 227.6 261.6 236.1 C254.1 244.7 239.4 249.7 229.2 250 C219 250.3 211.2 238.1 200.4 238.1 C189.6 238.1 176.4 249.7 164.4 250 C152.4 250.3 137.4 248 128.4 240.1 C119.4 232.2 115.8 220 110.4 202.5 C105 185 98.1 156.9 96 135.2 C93.9 113.4 91.8 85.7 97.8 71.8Z\"/><path class=\"od-rim\" d=\"M106.6 81.3 C112 69.1 127.4 65.9 137.4 63.9 C147.4 61.8 158.5 67.1 166.6 69.1 C174.7 71.1 178.4 76.4 186 76.1 C193.6 75.8 202.2 67.9 211.9 67.4 C221.6 66.8 236.2 67.4 244.3 72.6 C252.4 77.8 256.7 86.2 260.5 98.7 C264.3 111.2 266.2 131.8 267 147.5 C267.8 163.2 267.5 179.7 265.4 192.8 C263.2 205.9 260.8 218.4 254 225.9 C247.3 233.5 234.1 237.8 224.9 238.1 C215.7 238.4 208.7 227.7 199 227.7 C189.2 227.7 177.4 237.8 166.6 238.1 C155.8 238.4 142.3 236.4 134.2 229.4 C126.1 222.4 122.8 211.7 118 196.3 C113.1 180.9 106.9 156.2 105 137.1 C103.1 117.9 101.2 93.5 106.6 81.3Z\"/><ellipse class=\"od-cusp\" cx=\"142.8\" cy=\"89.6\" rx=\"38.3\" ry=\"32.9\"/><path class=\"od-tri\" d=\"M142.8 89.6L166.6 132.6\"/><circle class=\"od-tip\" cx=\"142.8\" cy=\"89.6\" r=\"4\"/><ellipse class=\"od-cusp\" cx=\"227.4\" cy=\"93.6\" rx=\"33.8\" ry=\"29\"/><path class=\"od-tri\" d=\"M227.4 93.6L204.6 133.8\"/><circle class=\"od-tip\" cx=\"227.4\" cy=\"93.6\" r=\"4\"/><ellipse class=\"od-cusp\" cx=\"157.2\" cy=\"200.5\" rx=\"47.3\" ry=\"40.6\"/><path class=\"od-tri\" d=\"M157.2 200.5L173 165.9\"/><circle class=\"od-tip\" cx=\"157.2\" cy=\"200.5\" r=\"4\"/><ellipse class=\"od-cusp\" cx=\"238.2\" cy=\"210.4\" rx=\"27\" ry=\"23.2\"/><path class=\"od-tri\" d=\"M238.2 210.4L209.5 168.8\"/><circle class=\"od-tip\" cx=\"238.2\" cy=\"210.4\" r=\"4\"/><path class=\"od-ridge\" d=\"M160.8 194.6 C166.5 186.3 184.2 160.9 195 145.1 C205.8 129.2 220.5 107.1 225.6 99.5\"/><path class=\"od-mr\" d=\"M106.8 95.6 C106.2 103.5 102.9 127.9 103.2 143.1 C103.5 158.3 107.7 179.4 108.6 186.6\"/><path class=\"od-mr\" d=\"M261.6 101.5 C262.5 108.4 267.6 128.2 267 143.1 C266.4 157.9 259.5 182.7 258 190.6\"/><path class=\"od-groove\" d=\"M119.4 139.1 C124.5 140.1 140.4 145.4 150 145.1 C159.6 144.7 172.5 138.5 177 137.1\"/><path class=\"od-groove\" d=\"M177 137.1 C178.5 124.6 184.5 74.4 186 61.9\"/><path class=\"od-groove\" d=\"M232.8 170.8 C229.8 177.4 219 198.2 214.8 210.4 C210.6 222.6 208.8 238.5 207.6 244.1\"/><path class=\"od-groove\" d=\"M232.8 170.8 C236.4 166.8 250.8 151 254.4 147\"/><circle class=\"od-pit\" cx=\"119.4\" cy=\"139.1\" r=\"3.6\"/><circle class=\"od-pit\" cx=\"177\" cy=\"137.1\" r=\"3.6\"/><circle class=\"od-pit\" cx=\"232.8\" cy=\"170.8\" r=\"3.6\"/></g><text class=\"fg-t sm od-cl\" x=\"142.8\" y=\"93.6\" text-anchor=\"middle\">MB</text><text class=\"fg-t sm od-cl\" x=\"227.4\" y=\"97.6\" text-anchor=\"middle\">DB</text><text class=\"fg-t sm od-cl\" x=\"157.2\" y=\"204.5\" text-anchor=\"middle\">ML</text><text class=\"fg-t sm od-cl\" x=\"238.2\" y=\"214.4\" text-anchor=\"middle\">DL</text><circle class=\"od-ghost\" cx=\"177\" cy=\"137.1\" r=\"11\"/><g class=\"cm-ghost\" data-m=\"pro\"><path class=\"cm-g\" d=\"M177 137.1L87 137.1\"/><path class=\"cm-g-head\" d=\"M77 137.1L87 131.6L87 142.6Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"64\" cy=\"123.1\" r=\"11\"/><text x=\"64\" y=\"127.1\" text-anchor=\"middle\">A</text></g></g><g class=\"cm-ghost\" data-m=\"work\"><path class=\"cm-g\" d=\"M177 137.1L152.7 46.4\"/><path class=\"cm-g-head\" d=\"M150.1 36.7L158 44.9L147.4 47.8Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"134.1\" cy=\"30.7\" r=\"11\"/><text x=\"134.1\" y=\"34.7\" text-anchor=\"middle\">B</text></g></g><g class=\"cm-ghost\" data-m=\"nonwork\"><path class=\"cm-g\" d=\"M177 137.1L104.1 210\"/><path class=\"cm-g-head\" d=\"M97 217.1L100.2 206.1L108 213.9Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"85\" cy=\"229.1\" r=\"11\"/><text x=\"85\" y=\"233.1\" text-anchor=\"middle\">C</text></g></g><g class=\"cm-ghost\" data-m=\"retro\"><path class=\"cm-g\" d=\"M177 137.1L207 137.1\"/><path class=\"cm-g-head\" d=\"M217 137.1L207 142.6L207 131.6Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"231\" cy=\"123.1\" r=\"11\"/><text x=\"231\" y=\"127.1\" text-anchor=\"middle\">D</text></g></g><path class=\"cm-trace\" d=\"M177 137.1L177 137.1\"/><path class=\"cm-head\" d=\"M0 0\"/><circle class=\"cm-cusp\" cx=\"177\" cy=\"137.1\" r=\"7\"/><text class=\"fg-t\" x=\"186\" y=\"22\" text-anchor=\"middle\">BUCCAL</text><text class=\"fg-t\" x=\"186\" y=\"278\" text-anchor=\"middle\">PALATAL</text><text class=\"fg-t sm\" x=\"8\" y=\"155\">MESIAL</text><text class=\"fg-t sm\" x=\"302\" y=\"155\">DISTAL</text><text class=\"fg-t sm cm-who\" x=\"14\" y=\"278\">#3 stays put</text></svg></div><div class=\"am-svg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg cm-tooth\" viewBox=\"0 0 380 271.3\" role=\"img\" aria-label=\"Mandibular right first molar #30, occlusal view, lingual at the top and mesial at the left. A dot marks the mesiolingual cusp of #3 in the central fossa; picking a movement draws that cusp's path across #30, the reverse of the path on #3.\"><g class=\"od-tooth\"><path class=\"od-crown\" d=\"M103.3 210.5 C108.7 220.3 119.6 229.2 128.7 231.3 C137.7 233.3 148 222.6 157.7 222.6 C167.4 222.6 176.8 231.5 186.8 231.3 C196.7 231 207.3 223.2 217.6 220.9 C227.9 218.5 239.4 222 248.5 217.4 C257.5 212.8 267.2 205.3 272.1 193.1 C276.9 181 277.5 161.4 277.5 144.6 C277.5 127.9 276.6 106.2 272.1 92.6 C267.5 79.1 259 69 250.3 63.2 C241.5 57.4 230.9 58 219.4 58 C207.9 58 194.3 63.2 181.3 63.2 C168.3 63.2 153.2 56 141.4 58 C129.6 60 118.1 63.8 110.5 75.3 C103 86.9 98.4 111.1 96 127.3 C93.6 143.5 94.8 158.5 96 172.3 C97.2 186.2 97.8 200.6 103.3 210.5Z\"/><path class=\"od-rim\" d=\"M111.6 202.6 C116.5 211.2 126.3 219.1 134.5 220.9 C142.6 222.6 151.9 213.2 160.6 213.2 C169.3 213.2 177.8 221.1 186.8 220.9 C195.7 220.6 205.3 213.7 214.5 211.7 C223.8 209.7 234.1 212.7 242.3 208.7 C250.5 204.6 259.2 198 263.5 187.3 C267.9 176.6 268.4 159.4 268.4 144.6 C268.4 129.9 267.6 110.8 263.5 98.9 C259.4 86.9 251.8 78.1 243.9 73 C236 67.9 226.5 68.4 216.2 68.4 C205.8 68.4 193.6 73 181.8 73 C170.1 73 156.5 66.6 145.9 68.4 C135.3 70.2 124.9 73.5 118.1 83.6 C111.3 93.8 107.3 115.1 105.1 129.4 C102.9 143.6 104 156.8 105.1 169 C106.2 181.2 106.7 193.9 111.6 202.6Z\"/><ellipse class=\"od-cusp\" cx=\"128.7\" cy=\"194.9\" rx=\"32.5\" ry=\"27.9\"/><path class=\"od-tri\" d=\"M128.7 194.9L160.6 159.7\"/><circle class=\"od-tip\" cx=\"128.7\" cy=\"194.9\" r=\"3.6\"/><ellipse class=\"od-cusp\" cx=\"186.8\" cy=\"198.3\" rx=\"30.3\" ry=\"26.1\"/><path class=\"od-tri\" d=\"M186.8 198.3L186.8 160.7\"/><circle class=\"od-tip\" cx=\"186.8\" cy=\"198.3\" r=\"3.6\"/><ellipse class=\"od-cusp\" cx=\"248.5\" cy=\"184.5\" rx=\"21.7\" ry=\"18.6\"/><path class=\"od-tri\" d=\"M248.5 184.5L214.5 156.6\"/><circle class=\"od-tip\" cx=\"248.5\" cy=\"184.5\" r=\"3.6\"/><ellipse class=\"od-cusp\" cx=\"139.6\" cy=\"92.6\" rx=\"34.7\" ry=\"29.8\"/><path class=\"od-tri\" d=\"M139.6 92.6L165.5 129\"/><circle class=\"od-tip\" cx=\"139.6\" cy=\"92.6\" r=\"3.6\"/><ellipse class=\"od-cusp\" cx=\"219.4\" cy=\"92.6\" rx=\"32.5\" ry=\"27.9\"/><path class=\"od-tri\" d=\"M219.4 92.6L201.5 129\"/><circle class=\"od-tip\" cx=\"219.4\" cy=\"92.6\" r=\"3.6\"/><path class=\"od-mr\" d=\"M105.1 182.7 C104.8 176.4 103 157.9 103.3 144.6 C103.6 131.3 106.3 110 106.9 103\"/><path class=\"od-mr\" d=\"M268.4 179.3 C268.7 172.9 270.5 153.9 270.2 141.2 C269.9 128.5 267.2 109.4 266.6 103\"/><path class=\"od-groove\" d=\"M117.8 144.6 C123.2 143.8 140.2 140 150.5 139.4 C160.7 138.9 168.3 140.3 179.5 141.2 C190.7 142 205.2 144.6 217.6 144.6 C230 144.6 247.9 141.7 253.9 141.2\"/><path class=\"od-groove\" d=\"M150.5 139.4 C151.7 153.3 156.5 208.7 157.7 222.6\"/><path class=\"od-groove\" d=\"M217.6 144.6 C217.9 157.3 219.1 208.2 219.4 220.9\"/><path class=\"od-groove\" d=\"M179.5 141.2 C179.8 128.2 181 76.2 181.3 63.2\"/><circle class=\"od-pit\" cx=\"117.8\" cy=\"144.6\" r=\"3.3\"/><circle class=\"od-pit\" cx=\"179.5\" cy=\"141.2\" r=\"3.3\"/><circle class=\"od-pit\" cx=\"253.9\" cy=\"141.2\" r=\"3.3\"/></g><text class=\"fg-t sm od-cl\" x=\"128.7\" y=\"198.9\" text-anchor=\"middle\">MB</text><text class=\"fg-t sm od-cl\" x=\"186.8\" y=\"202.3\" text-anchor=\"middle\">DB</text><text class=\"fg-t sm od-cl\" x=\"248.5\" y=\"188.5\" text-anchor=\"middle\">D</text><text class=\"fg-t sm od-cl\" x=\"139.6\" y=\"96.6\" text-anchor=\"middle\">ML</text><text class=\"fg-t sm od-cl\" x=\"219.4\" y=\"96.6\" text-anchor=\"middle\">DL</text><circle class=\"od-ghost\" cx=\"179.5\" cy=\"141.2\" r=\"11\"/><g class=\"cm-ghost\" data-m=\"pro\"><path class=\"cm-g\" d=\"M179.5 141.2L269.5 141.2\"/><path class=\"cm-g-head\" d=\"M279.5 141.2L269.5 146.7L269.5 135.7Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"292.5\" cy=\"127.2\" r=\"11\"/><text x=\"292.5\" y=\"131.2\" text-anchor=\"middle\">A</text></g></g><g class=\"cm-ghost\" data-m=\"work\"><path class=\"cm-g\" d=\"M179.5 141.2L203.8 50.4\"/><path class=\"cm-g-head\" d=\"M206.4 40.7L209.1 51.8L198.5 48.9Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"222.4\" cy=\"46.7\" r=\"11\"/><text x=\"222.4\" y=\"50.7\" text-anchor=\"middle\">B</text></g></g><g class=\"cm-ghost\" data-m=\"nonwork\"><path class=\"cm-g\" d=\"M179.5 141.2L252.4 214.1\"/><path class=\"cm-g-head\" d=\"M259.5 221.2L248.5 218L256.3 210.2Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"271.5\" cy=\"209.2\" r=\"11\"/><text x=\"271.5\" y=\"213.2\" text-anchor=\"middle\">C</text></g></g><g class=\"cm-ghost\" data-m=\"retro\"><path class=\"cm-g\" d=\"M179.5 141.2L149.5 141.2\"/><path class=\"cm-g-head\" d=\"M139.5 141.2L149.5 135.7L149.5 146.7Z\"/><g class=\"fg-pin cm-pin\"><circle cx=\"125.5\" cy=\"127.2\" r=\"11\"/><text x=\"125.5\" y=\"131.2\" text-anchor=\"middle\">D</text></g></g><path class=\"cm-trace\" d=\"M179.5 141.2L179.5 141.2\"/><path class=\"cm-head\" d=\"M0 0\"/><circle class=\"cm-cusp\" cx=\"179.5\" cy=\"141.2\" r=\"7\"/><text class=\"fg-t\" x=\"186.8\" y=\"22\" text-anchor=\"middle\">LINGUAL</text><text class=\"fg-t\" x=\"186.8\" y=\"259.3\" text-anchor=\"middle\">BUCCAL</text><text class=\"fg-t sm\" x=\"8\" y=\"148.6\">MESIAL</text><text class=\"fg-t sm\" x=\"303.5\" y=\"148.6\">DISTAL</text><text class=\"fg-t sm cm-who\" x=\"14\" y=\"259.3\">#30 moves with the jaw</text></svg></div></div></div></figure><div class=\"am-controls cm-moves\" role=\"group\" aria-label=\"Movement\"><button type=\"button\" class=\"am-btn\" data-move=\"pro\" aria-pressed=\"false\">A · Protrusive</button><button type=\"button\" class=\"am-btn\" data-move=\"work\" aria-pressed=\"false\">B · Right move (working)</button><button type=\"button\" class=\"am-btn\" data-move=\"nonwork\" aria-pressed=\"false\">C · Left move (right side non-working)</button><button type=\"button\" class=\"am-btn\" data-move=\"retro\" aria-pressed=\"false\">D · Retrusive</button><button type=\"button\" class=\"am-btn cm-all\" aria-pressed=\"true\">Show all four</button></div>\n<div class=\"am-stats\" aria-live=\"polite\"><span><b>Movement</b> <em data-r=\"move\">none: teeth in MIP</em></span><span><b>On #3 (upper)</b> <em data-r=\"up\">the DB cusp of #30 sits in the central fossa</em></span><span><b>On #30 (lower)</b> <em data-r=\"low\">the ML cusp of #3 sits in the central fossa</em></span></div>\n<p class=\"am-summary\" aria-live=\"polite\">Pick a movement. The dot on each tooth is the opposing cusp in MIP, at the base of every arrow (the help sheet's rule); watch where it goes on the upper tooth and on the lower one.</p><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 2b</span><span class=\"iso-plate-corner\" data-corner=\"title\">Why the paths spread apart</span><span class=\"iso-plate-corner\" data-corner=\"hint\">drag the sliders</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout></span></div><div class=\"am-svg cm-jawbox\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg cm-jaw\" viewBox=\"0 0 380 330\" role=\"img\" aria-label=\"The mandible seen from above, anterior at the top, with both condyles and a right mandibular molar cusp. Two arrows show the cusp's path in a right move and in a left move, with the angle between them. Sliders move the cusp farther from the condyles or the midline, widen or narrow the intercondylar distance, or add a side shift.\"><path class=\"cj-mid\" d=\"M190 18V312\"/><text class=\"fg-t sm\" x=\"190\" y=\"14\" text-anchor=\"middle\">ANTERIOR</text><text class=\"fg-t sm\" x=\"8\" y=\"320\">Patient's LEFT</text><text class=\"fg-t sm\" x=\"372\" y=\"320\" text-anchor=\"end\">Patient's RIGHT</text><circle class=\"cj-rest l\" cx=\"60\" cy=\"290\" r=\"3\"/><circle class=\"cj-rest r\" cx=\"320\" cy=\"290\" r=\"3\"/><circle class=\"cj-rest p\" cx=\"255\" cy=\"170.4\" r=\"3\"/><g class=\"hot\" tabindex=\"0\" data-info=\"The mandible seen from above. In a lateral move it swings around the condyle on the side it moves toward (the working condyle), while the other condyle orbits forward and medially.\"><path class=\"cj-jaw\" d=\"M49.6 295.2C50.9 290 52.6 277 57.4 264C62.2 251 70.8 232.8 78.2 217.2C85.6 201.6 96.4 186 101.6 170.4C106.8 154.8 104.6 139.6 109.4 123.6C114.2 107.6 122 86.8 130.2 74.2C138.4 61.6 148.8 53.8 158.8 48.2C168.8 42.6 179.6 40.4 190 40.4C200.4 40.4 211.2 42.6 221.2 48.2C231.2 53.8 241.6 61.6 249.8 74.2C258 86.8 265.8 107.6 270.6 123.6C275.4 139.6 273.2 154.8 278.4 170.4C283.6 186 294.4 201.6 301.8 217.2C309.2 232.8 317.8 251 322.6 264C327.4 277 329.1 290 330.4 295.2L299.2 295.2C299.2 290.9 302.5 280.5 299.2 269.2C296 257.9 289.7 243.2 279.7 227.6C269.7 212 247 190.3 239.4 175.6C231.8 160.9 236.4 151.3 234.2 139.2C232 127.1 230.3 113.2 226.4 102.8C222.5 92.4 216.9 82.4 210.8 76.8C204.7 71.2 196.9 69 190 69C183.1 69 175.3 71.2 169.2 76.8C163.1 82.4 157.5 92.4 153.6 102.8C149.7 113.2 148 127.1 145.8 139.2C143.6 151.3 148.2 160.9 140.6 175.6C133 190.3 110.3 212 100.3 227.6C90.3 243.2 84.1 257.9 80.8 269.2C77.6 280.5 80.8 290.9 80.8 295.2Z\"/></g><circle class=\"cj-spin\" opacity=\"0\" r=\"13\"/><g class=\"hot\" tabindex=\"0\" data-info=\"Left condyle. In a LEFT move it is the working condyle and mostly rotates; in a right move it is the non-working condyle and orbits forward, down and medially.\"><ellipse class=\"cj-cond l\" cx=\"60\" cy=\"290\" rx=\"10\" ry=\"6\"/></g><g class=\"hot\" tabindex=\"0\" data-info=\"Right condyle. In a RIGHT move it is the working condyle and mostly rotates; in a left move it is the non-working condyle and orbits forward, down and medially.\"><ellipse class=\"cj-cond r\" cx=\"320\" cy=\"290\" rx=\"10\" ry=\"6\"/></g><g class=\"cj-tooth\" transform=\"translate(255 170.4) rotate(0)\"><rect x=\"-12\" y=\"-11\" width=\"24\" height=\"22\" rx=\"7\" class=\"cj-molar\"/></g><g class=\"hot\" tabindex=\"0\" data-info=\"Path of the cusp in a RIGHT move (laterotrusive, working): the jaw rotates about the right condyle, so the cusp swings toward the cheek and a little forward.\"><path class=\"cj-path lat\" d=\"M255 170.4L257 169.4L258.9 168.4L260.9 167.4L262.9 166.4L264.9 165.5L267 164.6L269 163.8L271.1 163L273.1 162.2L275.2 161.5L277.3 160.7L279.4 160.1L281.5 159.4L283.6 158.8L285.8 158.2L287.9 157.7\"/><path class=\"cj-head lat\" d=\"M287.9 157.7L280.6 164.9L277.9 155.3Z\"/></g><g class=\"hot\" tabindex=\"0\" data-info=\"Path of the cusp in a LEFT move (mediotrusive, non-working): the jaw rotates about the left condyle, so the cusp swings toward the tongue and forward.\"><path class=\"cj-path med\" d=\"M255 170.4L253 167.2L251 164.1L248.9 161L246.8 158L244.6 155L242.4 152L240.2 149L237.9 146.1L235.5 143.3L233.1 140.4L230.6 137.6L228.1 134.9L225.6 132.2L223 129.5L220.4 126.9L217.7 124.3\"/><path class=\"cj-head med\" d=\"M217.7 124.3L227.6 127.1L220.6 134.2Z\"/></g><circle class=\"cj-cusp\" cx=\"255\" cy=\"170.4\" r=\"4.5\"/><path class=\"cj-angle\" d=\"M270.9 164.3A17 17 0 0 0 244.3 157.2\"/><text class=\"cj-deg\" x=\"263.3\" y=\"143.5\" text-anchor=\"middle\">108°</text></svg></div></div></figure><div class=\"am-controls cm-jawctl\"><label class=\"am-slider\"><span>closer</span><input type=\"range\" data-s=\"dist\" min=\"0\" max=\"100\" step=\"1\" value=\"50\" aria-label=\"Cusp distance from the rotating condyle\"><span>farther</span></label><span class=\"cm-slab\">Distance from the rotating condyle</span><label class=\"am-slider\"><span>near</span><input type=\"range\" data-s=\"mid\" min=\"0\" max=\"100\" step=\"1\" value=\"50\" aria-label=\"Cusp distance from the midsagittal plane\"><span>far</span></label><span class=\"cm-slab\">Distance from the midline</span><label class=\"am-slider\"><span>narrow</span><input type=\"range\" data-s=\"icd\" min=\"0\" max=\"100\" step=\"1\" value=\"50\" aria-label=\"Intercondylar distance\"><span>wide</span></label><span class=\"cm-slab\">Intercondylar distance</span></div>\n<div class=\"am-controls\"><button type=\"button\" class=\"am-btn\" data-swing=\"1\">Right move</button><button type=\"button\" class=\"am-btn\" data-swing=\"-1\">Left move</button><button type=\"button\" class=\"am-btn cm-shift\" aria-pressed=\"false\">Add side shift (Bennett)</button></div>\n<div class=\"am-stats\" aria-live=\"polite\"><span><b>Angle between the paths</b> <em data-r=\"deg\">108°</em></span><span><b>Compared with the start</b> <em data-r=\"cmp\">the starting setting</em></span><span class=\"cm-legend\"><i class=\"sw lat\"></i><b>Right move</b> <em>working</em> <i class=\"sw med\"></i><b>Left move</b> <em>non-working</em></span></div>\n<p class=\"am-summary cm-sum2\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Tap or hover the condyles and the paths for what they are.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>Drawn from the hub's L1 notes and Dr. Givan's \"What cusp hits where?\" help sheet: on a maxillary tooth you watch a mandibular cusp (protrusive mesial, working buccal, non-working mesiopalatal); on a mandibular tooth you watch a maxillary cusp, and everything reverses (protrusive distal, working lingual, non-working distobuccal). The MIP contact is at the base of each arrow. The teeth and arrows are the same as in the Cusp pathways figures above, including the help sheet's slight mesial lean of the working path on the upper tooth; retrusion is only about a millimeter, so its arrow is short.</li>\n<li>Fig 2b follows the notes on horizontal determinants: a greater distance from the rotating condyle, a greater distance from the midsagittal plane and a greater Bennett movement all increase the angle between a cusp's laterotrusive and mediotrusive paths; a greater intercondylar distance decreases it. It is a geometric model (the jaw rotating about one condyle, plus an optional side shift), with schematic distances, so the angle shows the trend, not a patient's value, and it won't match the help sheet's drawing exactly.</li>\n<li>Paths are drawn in the horizontal plane only; in the mouth the cusps also separate vertically as the condyle moves down the eminence.</li></ul></details></div>",
+    data: (function(){ var d = {"teeth":{"max":{"base":[177,137.1],"end":{"pro":[77,137.1],"work":[150.1,36.7],"nonwork":[97,217.1],"retro":[217,137.1]}},"mand":{"base":[179.5,141.2],"end":{"pro":[279.5,141.2],"work":[206.4,40.7],"nonwork":[259.5,221.2],"retro":[139.5,141.2]}}},"letters":{"pro":"A","work":"B","nonwork":"C","retro":"D"},"S":2.6,"OX":190,"OY":290,"AMAX":0.26,"SHIFT":3.5,"dist":[30,46,66],"mid":[18,25,32],"icd":[84,100,118]};
+    function jawMove(p, o, side, u, D) {
+  var cx = side * o.icd / 2, a = -side * D.AMAX * u, c = Math.cos(a), s = Math.sin(a), dx = p[0] - cx, dy = p[1];
+  var sh = o.shift ? side * D.SHIFT * Math.min(1, u * 3) : 0;
+  return [cx + dx * c - dy * s + sh, dx * s + dy * c];
+}
+    function jawAngles(o, D) {
+  var P = [o.mid, o.dist], L = jawMove(P, o, 1, 1, D), M = jawMove(P, o, -1, 1, D);
+  var a = [L[0] - P[0], L[1] - P[1]], b = [M[0] - P[0], M[1] - P[1]];
+  var cos = (a[0] * b[0] + a[1] * b[1]) / Math.sqrt((a[0] * a[0] + a[1] * a[1]) * (b[0] * b[0] + b[1] * b[1]));
+  return { P: P, L: L, M: M, deg: Math.acos(Math.max(-1, Math.min(1, cos))) * 180 / Math.PI };
+}
+    function jawFrame(o, side, u, D) {
+  function f(v) { return Math.round(v * 10) / 10; }
+  function X(p) { return [f(D.OX + p[0] * D.S), f(D.OY - p[1] * D.S)]; }
+  function poly(pts) { return "M" + pts.map(function (p) { var q = X(p); return q[0] + " " + q[1]; }).join("L"); }
+  var h = o.icd / 2;
+  /* outline of the mandible from above: condyles, rami and the body curving to the chin */
+  /* right half, buccal border from the condyle forward to the chin and lingual border back; the rami flare out behind
+     the body, which carries the teeth (schematic) */
+  var outR = [[h + 4, -2], [h + 1, 10], [(h + 34) / 2 + 1, 28], [34, 46], [31, 64], [23, 83], [12, 93], [0, 96]];
+  var inR = [[0, 85], [8, 82], [14, 72], [17, 58], [19, 44], [(h + 19) / 2, 24], [h - 8, 8], [h - 8, -2]];
+  function mir(a) { return a.map(function (p) { return [-p[0], p[1]]; }); }
+  var out = mir(outR).concat(outR.slice().reverse().slice(1)), inn = inR.slice().reverse().concat(mir(inR).slice(1));
+  function sm(pts) { var n = pts.length, d = "M" + X(pts[0]).join(" "); for (var i = 0; i < n - 1; i++) { var p0 = X(pts[Math.max(0, i - 1)]), p1 = X(pts[i]), p2 = X(pts[i + 1]), p3 = X(pts[Math.min(n - 1, i + 2)]);
+    d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + p2[0] + " " + p2[1]; } return d; }
+  var ang = jawAngles(o, D), P = ang.P;
+  function mv(p) { return side ? jawMove(p, o, side, u, D) : p; }
+  var A = {};
+  var oi = inn.map(mv), ip = X(oi[0]);
+  A[".cj-jaw"] = { d: sm(out.map(mv)) + "L" + ip[0] + " " + ip[1] + sm(oi).replace(/^M[^C]*/, "") + "Z" };
+  var cl = X(mv([-h, 0])), cr = X(mv([h, 0])), cp = X(mv(P));
+  A[".cj-cond.l"] = { cx: cl[0], cy: cl[1] }; A[".cj-cond.r"] = { cx: cr[0], cy: cr[1] };
+  A[".cj-cusp"] = { cx: cp[0], cy: cp[1] };
+  A[".cj-tooth"] = { transform: "translate(" + cp[0] + " " + cp[1] + ") rotate(" + f(side ? D.AMAX * u * side * 180 / Math.PI : 0) + ")" };
+  /* fixed reference marks where the condyles and the cusp sit at rest */
+  var rl = X([-h, 0]), rr = X([h, 0]), rp = X(P);
+  A[".cj-rest.l"] = { cx: rl[0], cy: rl[1] }; A[".cj-rest.r"] = { cx: rr[0], cy: rr[1] }; A[".cj-rest.p"] = { cx: rp[0], cy: rp[1] };
+  /* each path as an arc of the move, plus its chord arrowhead; the angle between them at the cusp */
+  function arc(sd) { var pts = []; for (var i = 0; i <= 16; i++) pts.push(jawMove(P, o, sd, i / 16, D)); return poly(pts); }
+  function head(sd) { var e = X(jawMove(P, o, sd, 1, D)), q = X(jawMove(P, o, sd, .82, D)), dx = e[0] - q[0], dy = e[1] - q[1], L = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / L, uy = dy / L;
+    return "M" + e[0] + " " + e[1] + "L" + f(e[0] - ux * 9 - uy * 5) + " " + f(e[1] - uy * 9 + ux * 5) + "L" + f(e[0] - ux * 9 + uy * 5) + " " + f(e[1] - uy * 9 - ux * 5) + "Z"; }
+  A[".cj-path.lat"] = { d: arc(1) }; A[".cj-head.lat"] = { d: head(1) };
+  A[".cj-path.med"] = { d: arc(-1) }; A[".cj-head.med"] = { d: head(-1) };
+  var a1 = Math.atan2(-(ang.L[1] - P[1]), ang.L[0] - P[0]), a2 = Math.atan2(-(ang.M[1] - P[1]), ang.M[0] - P[0]), R = 17;
+  var p1 = [rp[0] + R * Math.cos(a1), rp[1] + R * Math.sin(a1)], p2 = [rp[0] + R * Math.cos(a2), rp[1] + R * Math.sin(a2)];
+  var da = a2 - a1; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+  A[".cj-angle"] = { d: "M" + f(p1[0]) + " " + f(p1[1]) + "A" + R + " " + R + " 0 0 " + (da > 0 ? 1 : 0) + " " + f(p2[0]) + " " + f(p2[1]) };
+  var am = a1 + da / 2;
+  A[".cj-deg"] = { x: f(rp[0] + (R + 15) * Math.cos(am)), y: f(rp[1] + (R + 15) * Math.sin(am) + 4) };
+  var spin = side === 1 ? cr : side === -1 ? cl : null;
+  A[".cj-spin"] = spin ? { cx: spin[0], cy: spin[1], opacity: 1 } : { opacity: 0 };
+  return { attrs: A, deg: ang.deg };
+}
+    d.jawMove = jawMove; d.jawAngles = jawAngles; d.jawFrame = jawFrame; return d; })(),
+    live: function cmLive(root, D) {
+  var svgs = root.querySelectorAll(".cm-tooth"), jaw = root.querySelector(".cm-jaw");
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var rs = {}; Array.prototype.forEach.call(root.querySelectorAll("[data-r]"), function (e) { rs[e.getAttribute("data-r")] = e; });
+  var ros = root.querySelectorAll("[data-readout]"), readout = ros[0], readout2 = ros[1], sum1 = root.querySelector(".am-summary"), sum2 = root.querySelector(".cm-sum2"), infoEl = root.querySelector(".am-info");
+  var allBtn = root.querySelector(".cm-all"), shiftBtn = root.querySelector(".cm-shift");
+  var TXT = {
+    pro: ["protrusive (jaw slides straight forward)", "the lower cusp runs MESIAL (A)", "the upper cusp runs DISTAL (A)",
+      "Protrusive: the mandible slides forward. On #3, which stays put, the distobuccal cusp of #30 runs mesial. On #30, which moves forward with the jaw, the mesiolingual cusp of #3 is left behind, so its path runs distal: \"if I'm looking at the mandibular arch and the mandible is sliding forward, the contacts are going toward the posterior.\""],
+    work: ["right move: the right side is working (laterotrusive)", "the lower cusp runs BUCCAL, a little mesial (B)", "the upper cusp runs LINGUAL, a little distal (B)",
+      "Right working move: the chin swings toward the right cheek. On #3 the lower cusp runs buccal, leaning a little mesial; on #30 the upper cusp runs lingual, leaning a little distal. The working condyle mostly rotates."],
+    nonwork: ["left move: the right side is non-working (mediotrusive)", "the lower cusp runs MESIOPALATAL (C)", "the upper cusp runs DISTOBUCCAL (C)",
+      "Left move, so the right side is non-working: the right condyle orbits forward, down and medially, carrying the right molars toward the tongue and forward. On #3 the lower cusp runs mesiopalatal; on #30 the upper cusp runs distobuccal. Contacts here are non-working interferences."],
+    retro: ["retrusive (jaw moves slightly back)", "the lower cusp runs DISTAL, short (D)", "the upper cusp runs MESIAL, short (D)",
+      "Retrusive: the mandible moves only slightly back (about a millimeter, posterior temporalis). On #3 the lower cusp runs distal; on #30 the upper cusp runs mesial."]
+  };
+  var move = null, t = 0, frame = 0, last = 0, showAll = true;
+  function f(v) { return Math.round(v * 10) / 10; }
+  function drawTeeth() {
+    Array.prototype.forEach.call(svgs, function (svg, i) {
+      var T = D.teeth[i ? "mand" : "max"], b = T.base, e = move ? T.end[move] : b, u = move ? t : 0;
+      var p = [b[0] + (e[0] - b[0]) * u, b[1] + (e[1] - b[1]) * u];
+      svg.querySelector(".cm-cusp").setAttribute("cx", f(p[0])); svg.querySelector(".cm-cusp").setAttribute("cy", f(p[1]));
+      svg.querySelector(".cm-trace").setAttribute("d", "M" + b[0] + " " + b[1] + "L" + f(p[0]) + " " + f(p[1]));
+      var hd = svg.querySelector(".cm-head");
+      if (move && u > .97) { var dx = e[0] - b[0], dy = e[1] - b[1], L = Math.sqrt(dx * dx + dy * dy), ux = dx / L, uy = dy / L, h = 11;
+        hd.setAttribute("d", "M" + e[0] + " " + e[1] + "L" + f(e[0] - ux * h - uy * h * .55) + " " + f(e[1] - uy * h + ux * h * .55) + "L" + f(e[0] - ux * h + uy * h * .55) + " " + f(e[1] - uy * h - ux * h * .55) + "Z"); }
+      else hd.setAttribute("d", "M0 0");
+      svg.setAttribute("data-move", move || ""); svg.setAttribute("data-all", showAll ? "1" : "0");
+    });
+    root.querySelectorAll("[data-move]").forEach(function (bt) { if (bt.tagName === "BUTTON") bt.setAttribute("aria-pressed", String(bt.getAttribute("data-move") === move)); });
+    var x = move ? TXT[move] : null;
+    rs.move.textContent = x ? x[0] : "none: teeth in MIP";
+    rs.up.textContent = x ? x[1] : "the DB cusp of #30 sits in the central fossa";
+    rs.low.textContent = x ? x[2] : "the ML cusp of #3 sits in the central fossa";
+    if (readout) readout.textContent = move ? D.letters[move] + " · " + (move === "work" ? "working" : move === "nonwork" ? "non-working" : move === "pro" ? "protrusive" : "retrusive") : "MIP";
+    if (x && sum1.textContent !== x[3]) sum1.textContent = x[3];
+  }
+  function tick(now) {
+    frame = 0; if (!root.isConnected) return;
+    var dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+    t = Math.min(1, t + dt / 1.3); drawTeeth();
+    if (t < 1) frame = requestAnimationFrame(tick);
+  }
+  function pick(k) { move = k; t = reduce.matches ? 1 : 0; last = 0; drawTeeth(); if (!reduce.matches && !frame) frame = requestAnimationFrame(tick); }
+  root.querySelectorAll("button[data-move]").forEach(function (bt) { bt.addEventListener("click", function () { pick(bt.getAttribute("data-move")); }); });
+  allBtn.addEventListener("click", function () { showAll = !showAll; allBtn.setAttribute("aria-pressed", String(showAll)); drawTeeth(); });
+
+  /* panel 2 */
+  var o = { dist: D.dist[1], mid: D.mid[1], icd: D.icd[1], shift: false }, base = D.jawAngles({ dist: D.dist[1], mid: D.mid[1], icd: D.icd[1], shift: false }, D).deg;
+  var side = 0, u = 0, jf = 0, jl = 0, els = {};
+  function val(k, v) { var r = D[k]; return v <= 50 ? r[0] + (r[1] - r[0]) * v / 50 : r[1] + (r[2] - r[1]) * (v - 50) / 50; }
+  function drawJaw() {
+    var F = D.jawFrame(o, side, u, D);
+    Object.keys(F.attrs).forEach(function (sel) { var el = els[sel] || (els[sel] = jaw.querySelector(sel)); if (!el) return; var a = F.attrs[sel]; for (var k in a) el.setAttribute(k, a[k]); });
+    var deg = Math.round(F.deg); jaw.querySelector(".cj-deg").textContent = deg + "°";
+    rs.deg.textContent = deg + "°"; if (readout2) readout2.textContent = deg + "° between the paths";
+    var dd = deg - Math.round(base);
+    rs.cmp.textContent = dd > 0 ? dd + "° wider" : dd < 0 ? (-dd) + "° narrower" : "the starting setting";
+    jaw.setAttribute("data-side", side > 0 ? "r" : side < 0 ? "l" : "");
+    var s2 = "The two arrows are the paths a right mandibular molar cusp takes across the upper tooth: in a right move the jaw swings around the right (working) condyle; in a left move, around the left one. ";
+    s2 += "Farther from the rotating condyle, farther from the midline or with more side shift, the paths spread wider; a wider intercondylar distance brings them closer. That is why an articulator much smaller than the patient makes crowns you have to adjust.";
+    if (sum2.textContent !== s2) sum2.textContent = s2;
+  }
+  function jtick(now) {
+    jf = 0; if (!root.isConnected) return;
+    var dt = Math.min(.05, (now - (jl || now)) / 1000); jl = now;
+    u = Math.min(2, u + dt / .9); var uu = u <= 1 ? u : 2 - u; var save = u; u = uu * uu * (3 - 2 * uu); drawJaw(); u = save;
+    if (save < 2) jf = requestAnimationFrame(jtick); else { side = 0; u = 0; drawJaw(); }
+  }
+  root.querySelectorAll("[data-swing]").forEach(function (bt) { bt.addEventListener("click", function () {
+    side = +bt.getAttribute("data-swing");
+    if (reduce.matches) { u = 1; drawJaw(); return; }
+    u = 0; jl = 0; if (!jf) jf = requestAnimationFrame(jtick);
+  }); });
+  root.querySelectorAll("input[data-s]").forEach(function (inp) { inp.addEventListener("input", function () { o[inp.getAttribute("data-s")] = val(inp.getAttribute("data-s"), +inp.value); if (!jf) { side = 0; u = 0; } drawJaw(); }); });
+  shiftBtn.addEventListener("click", function () { o.shift = !o.shift; shiftBtn.setAttribute("aria-pressed", String(o.shift)); if (!jf) { side = 0; u = 0; } drawJaw(); });
+  Array.prototype.forEach.call(jaw.querySelectorAll(".hot"), function (el) {
+    var on = function () { infoEl.textContent = el.getAttribute("data-info"); el.classList.add("is-hot"); };
+    var off = function () { el.classList.remove("is-hot"); };
+    el.addEventListener("pointerenter", on); el.addEventListener("pointerleave", off);
+    el.addEventListener("focus", on); el.addEventListener("blur", off); el.addEventListener("click", on);
+  });
+  drawTeeth(); drawJaw();
 } };
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   /* noTitle: the caller heads it (Review sections use their own h3). The figures use no SVG ids, so copies can repeat. */
@@ -3678,7 +3859,7 @@ var REVIEW = [
     ['Closest speaking space','1-2 mm on "s"'],
     ['Implant vs tooth (apical)','2-3 µm vs 28 µm']
   ]},
-  { part:'What cusp hits where', title:'Diagrams', type:'figs', figs:['cuspMap','pathMax','pathMand','inclines'] },
+  { part:'What cusp hits where', title:'Diagrams', type:'figs', figs:['cuspMap','pathMax','pathMand','cuspmotion','inclines'] },
   { title:'Angle classes', type:'table', head:['Class','Molars','Share','Look for'], rows:[
     ['Class I','Normal interdigitation','About 70%','Class I malocclusion = crowding elsewhere'],
     ['Class II div 1','Mandibular first molar distal','About 25% (all Class II)','Narrow arch, protruding incisors'],
