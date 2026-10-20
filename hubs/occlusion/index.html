@@ -209,6 +209,9 @@ main{padding-top:20px}
 .group-chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:.86rem;display:flex;align-items:center;gap:7px;white-space:nowrap}
 .group-chip .n{font-family:var(--font-mono);font-size:.7rem;color:var(--ink-faint)}
 .group-chip.is-active{background:var(--ink);color:var(--bg);border-color:var(--ink)} .group-chip.is-active .n{color:var(--bg);opacity:.7}
+.gc-lec{font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--ts);color:var(--t)}
+.group-chip.is-active .gc-lec{background:var(--bg);color:var(--ink)}
+.group-lec{margin:4px 0 6px}
 .group-head h2{font-family:var(--font-display);font-size:1.7rem;margin:4px 0 4px}
 .group-head p{color:var(--ink-soft);margin:0 0 20px;max-width:80ch}
 .rv-section{margin-bottom:38px}
@@ -2269,7 +2272,7 @@ function C(name, sub, lec, facts, tip){ return { name:name, sub:sub||'', lec:lec
 
 var REVIEW = [
 /* =================================================================== POSITIONS */
-{ id:'positions', title:'Positions and terms', icon:'target', blurb:'The positions and words that get confused most, side by side. "Centric" always means the joint.',
+{ id:'positions', lec:'review', title:'Positions and terms', icon:'target', blurb:'The positions and words that get confused most, side by side. "Centric" always means the joint.',
   sections:[
   { title:'Jaw positions', type:'cards', items:[
     C('Maximum intercuspation (MIP, MICP, ICP)','Tooth-determined','review',[['Defined as','Complete intercuspation of the teeth, independent of condylar position'],['Set by','Neuromuscular feedback (engrams)'],['Stable?','No: changes with every restoration or tooth change'],['Key number','Differs from CO in about 90% of people']],'Chewing and swallowing return here: "home plate"'),
@@ -2319,7 +2322,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== CONTACTS */
-{ id:'contacts', title:'What cusp hits where', icon:'tooth', blurb:'The help-sheet rules: Angle class, the fence post, premolar fossae, cusp pathways and which inclines collide. Assume Class I and cusp-fossa unless told otherwise.',
+{ id:'contacts', lec:'review', title:'What cusp hits where', icon:'tooth', blurb:'The help-sheet rules: Angle class, the fence post, premolar fossae, cusp pathways and which inclines collide. Assume Class I and cusp-fossa unless told otherwise.',
   sections:[
   { title:'Angle classes', type:'table', head:['Class','Molars','Share','Look for'], rows:[
     ['Class I','Normal interdigitation','About 70%','Class I malocclusion = crowding elsewhere'],
@@ -2359,7 +2362,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== GUIDANCE */
-{ id:'guidance', title:'Guidance and determinants', icon:'layers', blurb:'What separates the back teeth, which factor wins, and how each one changes posterior cusp height and groove direction.',
+{ id:'guidance', lec:'review', title:'Guidance and determinants', icon:'layers', blurb:'What separates the back teeth, which factor wins, and how each one changes posterior cusp height and groove direction.',
   sections:[
   { title:'Schemes', type:'cards', items:[
     C('Canine guidance','Canine-protected articulation','review',[['What','Canine overlap disengages the posterior teeth in excursions'],['Why','Buttressing bone and proprioception'],['When','First choice in natural teeth']]),
@@ -2389,7 +2392,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== MOTION */
-{ id:'motion', title:'Envelope of motion', icon:'cycle', blurb:'Posselt\'s envelope in three planes, drawn for this hub. Name every border and point.',
+{ id:'motion', lec:'review', title:'Envelope of motion', icon:'cycle', blurb:'Posselt\'s envelope in three planes, drawn for this hub. Name every border and point.',
   sections:[
   { title:'Diagrams', type:'figs', figs:['envSag','envHoriz','envFront'] },
   { title:'Sagittal view', type:'table', head:['Part','What it is'], rows:[
@@ -2405,7 +2408,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== MUSCLES */
-{ id:'muscles', title:'Joint and muscles', icon:'dumbbell', blurb:'The disc, the ligaments, the four muscles of mastication and the exam slide of muscles for each movement.',
+{ id:'muscles', lec:'anatomy', title:'Functional TMJ Anatomy and the Muscles of Mastication', icon:'dumbbell', blurb:'The disc, the ligaments, the four muscles of mastication and the exam slide of muscles for each movement.',
   sections:[
   { title:'Exam slide: muscles for each movement', type:'table', head:['Movement','Muscles'], rows:[
     ['Elevation','Temporalis, medial pterygoid, masseter'],
@@ -2441,7 +2444,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== FUNCTION */
-{ id:'function', title:'Chewing, swallowing, speech', icon:'cycle', blurb:'The numbers and stages from Lec2-2.',
+{ id:'function', lec:'function', title:'Mastication, Deglutition and Speech', icon:'cycle', blurb:'The numbers and stages from Lec2-2.',
   sections:[
   { title:'Bite force', type:'table', head:['Where / who','Force'], rows:[
     ['Greatest measured','975 lb'],['Male maximum','118-142 lb'],['Female maximum','79-99 lb'],['First molar','91-198 lb'],['Incisor','29-51 lb'],['Carrots','About 30 lb'],['Meat','About 16 lb'],['Dentures','About 25% (Givan: ~15%)']
@@ -2473,7 +2476,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== HISTORY */
-{ id:'history', title:'Concepts and history', icon:'book', blurb:'Who contributed what, the two schools, and today\'s competing ideas.',
+{ id:'history', lec:'concepts', title:'Occlusal Concepts: How We Got Here', icon:'book', blurb:'Who contributed what, the two schools, and today\'s competing ideas.',
   sections:[
   { title:'Who did what', type:'table', head:['Who','Contribution'], rows:[
     ['Bonwill (ca. 1858)','4-inch equilateral triangle; occlusal plane; bilateral balance'],
@@ -2506,7 +2509,7 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== RESTORING */
-{ id:'restoring', title:'Restoring occlusion', icon:'shield', blurb:'Lec3-2 restoration by restoration: approach, record, articulator and the rules.',
+{ id:'restoring', lec:'applying', title:'Applying Occlusion: Operative, Fixed and Implants', icon:'shield', blurb:'Lec3-2 restoration by restoration: approach, record, articulator and the rules.',
   sections:[
   { title:'Approach by restoration', type:'table', head:['Restoration','Approach and rules'], rows:[
     ['Small intracoronal','Fit the existing relationships'],
@@ -2545,7 +2548,47 @@ var REVIEW = [
   ]}
 ]},
 /* =================================================================== PROCESSES */
-{ id:'processes', title:'Processes', icon:'cycle', blurb:'Ordered steps from the five lectures (also the Stack game\'s pool).',
+/* =================================================================== SIDE BY SIDE (comparison charts, 2026-10-20) */
+{ id:'compare', title:'Side by side', icon:'layers', blurb:'Comparison charts across the lectures: the same few patterns from every angle, and the pairs the class mixes up most. Everything here is also in the notes.',
+  sections:[
+  { title:'The four movements, every angle', type:'table', head:['Movement','Condyles','Main muscles','Cusp path: maxillary / mandibular molar','Inclines that can meet'], rows:[
+    ['Protrusive','Both come down the articular eminence, carrying the disc','Inferior lateral pterygoid + superficial masseter','Mesial / distal','Distal inclines of maxillary cusps + mesial inclines of mandibular cusps'],
+    ['Retrusive','Slightly back','Temporalis (posterior fibers) + deep masseter','Distal / mesial','-'],
+    ['Working side (laterotrusive)','Its condyle mostly rotates','That side\'s temporalis + masseter','Buccal / lingual','Lingual incline of the maxillary palatal cusp + buccal incline of the mandibular lingual cusp; facial incline of the mandibular buccal cusp + lingual incline of the maxillary buccal cusp (group function if wanted)'],
+    ['Non-working side (mediotrusive)','Its condyle orbits: forward, down and medially along the eminence','That side\'s lateral + medial pterygoids','Mesiopalatal / distobuccal','Facial incline of the maxillary palatal cusp + lingual incline of the mandibular buccal cusp (an interference)']
+  ]},
+  { title:'Class I vs II vs III, cusp by cusp (cusp-fossa)', type:'table', head:['','Class I','Class II','Class III'], rows:[
+    ['Mandible sits','Each post a half step in front (mesial)','Back one post','Forward one tooth'],
+    ['Maxillary premolars receive in','Mesial fossae','Distal fossae','Mesial fossae'],
+    ['Mandibular premolars receive in','Distal fossae','Mesial fossae','Distal fossae'],
+    ['Buccal cusp of #28','Mesial fossa of #5','Distal fossa of #5','-'],
+    ['Buccal cusp of #29','Mesial fossa of #4','Distal fossa of #4','Mesial fossa of #5'],
+    ['Lingual cusp of #5','Distal fossa of #28','Mesial fossa of #28','Distal fossa of #29'],
+    ['Lingual cusp of #4','Distal fossa of #29','Mesial fossa of #29','-']
+  ]},
+  { title:'Joint words', type:'table', head:['Word','Means','In the TMJ'], rows:[
+    ['Ginglymus','A hinge: moves in one plane (elbow, knee, finger joints)','The rotation, in the lower compartment (condyle against disc)'],
+    ['Arthrodial','Glides between flat surfaces (wrist, ankle, spine)','The translation, in the upper compartment (disc against temporal bone)'],
+    ['Ginglymoarthrodial','Hinges and glides','Why the TMJ is called ginglymoarthrodial'],
+    ['Compound','At least three bones','Only two bones, but the disc functions as the third'],
+    ['Bilateral','One bone, two joints','Neither TMJ moves without the other']
+  ]},
+  { title:'The four curves', type:'table', head:['Curve','Seen in','What it is','Applies to'], rows:[
+    ['Curve of Spee','Sagittal','From the mandibular canine tip along the buccal cusp tips to the front of the condyle','Natural teeth ("specific for teeth")'],
+    ['Curve of Wilson','Frontal','Mediolateral curve of the cusps: concave in the mandibular arch, convex in the maxillary','Natural teeth (posteriors erupt tipped)'],
+    ['Compensating curve','Both','Anteroposterior and mediolateral curving of artificial teeth','Dentures, to build balanced occlusion'],
+    ['Sphere of Monson','Three-dimensional','Every cusp on an imaginary sphere of about 4-inch radius centered near the glabella','Monson\'s theory (ca. 1916); dentures built on it did well']
+  ]},
+  { title:'Pairs the class mixes up', type:'table', head:['Pair','One','The other'], rows:[
+    ['TM ligament portions','Outer oblique: limits rotational opening (why pure rotation stops at 20-25 mm)','Inner horizontal: limits posterior movement of the condyle and disc'],
+    ['Lateral pterygoid heads','Superior: to the capsule and disc; active in closure, stabilizing the disc','Inferior: to the pterygoid fovea of the condylar neck; opening and protrusion'],
+    ['Taller or shorter posterior cusps','Steeper condylar guidance or more vertical overlap: taller','More acute curve of Spee, more horizontal overlap or more Bennett movement: shorter'],
+    ['The laterotrusive-mediotrusive angle','More intercondylar distance: the angle DECREASES','More distance from the rotating condyle or the midline, or more Bennett movement: it INCREASES'],
+    ['MIP vs CO','MIP: complete intercuspation, set by the teeth (neuromuscular)','CO: tooth contact with the joints seated in CR'],
+    ['Class II div 1 vs div 2','Div 1: narrow arch, protruding incisors','Div 2: square arch, retruded centrals, flared laterals, deep overlap']
+  ]}
+]},
+{ id:'processes', title:'Processes (all lectures)', icon:'cycle', blurb:'Ordered steps from the five lectures (also the Stack game\'s pool).',
   sections:[ { title:'', type:'flows' } ]}
 ];
 
@@ -3151,13 +3194,15 @@ function sectionHTML(sec, term){
   }
   return '<section class="rv-section">' + (sec.title ? '<h3>'+escHtml(sec.title)+'</h3>' : '') + inner + '</section>';
 }
+/* each Review group names the lecture it comes from, in that lecture's color (as in the notes) */
+function groupLecTag(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? '<span class="gc-lec tag-'+l.tag+'">'+lecLabel(l)+'</span>' : ''; }
 var reviewSearch = '';
 function renderReview(){
   var p = document.getElementById('panel-review');
   var g = REVIEW.filter(function(x){ return x.id === STATE.ui.group; })[0] || REVIEW[0];
   p.innerHTML = '<div class="review-top"><input id="rvSearch" type="search" placeholder="Search every table and card (e.g. fence post, Bennett, digastric)…" value="'+escHtml(reviewSearch)+'">' +
     '<button type="button" class="toggle'+(STATE.ui.recall?' on':'')+'" id="rvRecall" aria-pressed="'+(STATE.ui.recall?'true':'false')+'"><span class="sw"></span>Recall mode: hide answers</button></div>' +
-    '<nav class="group-nav" aria-label="Review groups">' + REVIEW.map(function(x){ return '<button type="button" class="group-chip'+(x.id===g.id && !reviewSearch?' is-active':'')+'" data-group="'+x.id+'">'+icon(x.icon)+escHtml(x.title)+'<span class="n">'+groupCount(x)+'</span></button>'; }).join('') + '</nav>' +
+    '<nav class="group-nav" aria-label="Review groups">' + REVIEW.map(function(x){ return '<button type="button" class="group-chip'+(x.id===g.id && !reviewSearch?' is-active':'')+'" data-group="'+x.id+'">'+(x.lec ? groupLecTag(x.lec) : icon(x.icon))+escHtml(x.title)+'<span class="n">'+groupCount(x)+'</span></button>'; }).join('') + '</nav>' +
     '<div id="rvBody" class="'+(STATE.ui.recall?'recall':'')+'"></div>';
   var rb = document.getElementById('rvBody');
   function draw(){
@@ -3167,7 +3212,8 @@ function renderReview(){
       REVIEW.forEach(function(x){ var s = x.sections.map(function(sec){ return sectionHTML(sec, term); }).join(''); if(s) html += '<div class="group-head"><h2>'+icon(x.icon)+escHtml(x.title)+'</h2></div>' + s; });
       rb.innerHTML = html || '<div class="rv-empty">Nothing matches “'+escHtml(term)+'”.</div>';
     } else {
-      rb.innerHTML = '<div class="group-head"><h2>'+icon(g.icon)+escHtml(g.title)+'</h2><p>'+escHtml(g.blurb)+'</p></div>' + g.sections.map(function(sec){ return sectionHTML(sec, ''); }).join('');
+      var gl = g.lec && LECTURE_BY_ID[g.lec];
+      rb.innerHTML = '<div class="group-head"><h2>'+(gl ? groupLecTag(g.lec) : icon(g.icon))+escHtml(g.title)+'</h2>'+(gl && gl.title !== g.title ? '<p class="group-lec">From '+lecChip(g.lec)+'</p>' : '')+'<p>'+escHtml(g.blurb)+'</p></div>' + g.sections.map(function(sec){ return sectionHTML(sec, ''); }).join('');
     }
   }
   draw();

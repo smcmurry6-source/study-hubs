@@ -682,6 +682,13 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .shd-mix-hy, .shd-why-hy{--shd-c:var(--caution, #A2660E);}
 .shd-mix-fresh, .shd-why-fresh{--shd-c:var(--shw-good);}
 .shd-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;}
+/* drill length: 10 / 20 / 30 (widget/drill.js) */
+.shd-len{display:flex; align-items:center; gap:6px; margin-top:16px; font-size:13.5px; color:var(--shw-ink2);}
+.shd-len > span{margin-right:4px;}
+.shd-len-btn{min-width:46px; min-height:38px; padding:0 12px; border-radius:999px; border:1px solid var(--shw-line); background:var(--shw-bg); color:var(--shw-ink); font:inherit; font-weight:600; cursor:pointer; font-variant-numeric:tabular-nums;}
+.shd-len-btn:hover{border-color:var(--shw-ink);}
+.shd-len-btn[aria-pressed="true"]{background:var(--shw-ink); color:var(--shw-bg); border-color:var(--shw-ink);}
+.shd-len-btn:focus-visible{outline:2px solid var(--shw-accent); outline-offset:2px;}
 .shd-btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 22px; border-radius:999px; cursor:pointer;
   font:600 15px/1 var(--shw-font); background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line2); -webkit-tap-highlight-color:transparent;}
 .shd-btn:hover{border-color:var(--shw-ink);}
