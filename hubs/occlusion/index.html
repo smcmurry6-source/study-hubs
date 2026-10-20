@@ -214,6 +214,10 @@ main{padding-top:20px}
 .group-lec{margin:4px 0 6px}
 .group-head h2{font-family:var(--font-display);font-size:1.7rem;margin:4px 0 4px}
 .group-head p{color:var(--ink-soft);margin:0 0 20px;max-width:80ch}
+.rv-parts{display:flex;flex-wrap:wrap;gap:6px;margin:-8px 0 22px}
+.rv-part-link{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 11px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
+.rv-part-link:hover{border-color:var(--accent);color:var(--accent)}
+.rv-part{font-family:var(--font-display);font-size:1.35rem;margin:6px 0 16px;padding-top:4px;scroll-margin-top:90px;color:var(--accent)}
 .rv-section{margin-bottom:38px}
 .rv-section > h3{font-family:var(--font-display);font-size:1.18rem;margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .rv-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
@@ -3164,9 +3168,9 @@ function C(name, sub, lec, facts, tip){ return { name:name, sub:sub||'', lec:lec
 
 var REVIEW = [
 /* =================================================================== POSITIONS */
-{ id:'positions', lec:'review', title:'Positions and terms', icon:'target', blurb:'The positions and words that get confused most, side by side. "Centric" always means the joint.',
+{ id:'positions', lec:'review', title:'Review of Basic Occlusion', icon:'target', blurb:'Positions and terms, what cusp hits where (the help sheet), guidance and determinants, and the envelope of motion. "Centric" always means the joint; assume Class I and cusp-fossa unless told otherwise.',
   sections:[
-  { title:'Jaw positions', type:'cards', items:[
+  { part:'Positions and terms', title:'Jaw positions', type:'cards', items:[
     C('Maximum intercuspation (MIP, MICP, ICP)','Tooth-determined','review',[['Defined as','Complete intercuspation of the teeth, independent of condylar position'],['Set by','Neuromuscular feedback (engrams)'],['Stable?','No: changes with every restoration or tooth change'],['Key number','Differs from CO in about 90% of people']],'Chewing and swallowing return here: "home plate"'),
     C('Centric occlusion (CO)','Tooth contact with the joints seated','review',[['Defined as','Tooth contact when the mandible is in centric relation'],['Set by','The seated joint (structural)'],['Stable?','The joint is; the tooth contact is often unstable'],['Key number','Slide to MIP averages 1.25 ± 1 mm']],'On the exam CO never means MIP'),
     C('Centric relation (CR)','Joint position','review',[['Defined as','Condyles on the thinnest avascular part of the discs, anterior-superior against the eminences'],['Set by','Joint anatomy; independent of teeth'],['Stable?','Yes: the reproducible starting point'],['Key number','Pure rotation to about 20-25 mm']],'Found by bimanual manipulation (or a leaf gauge / Lucia jig)'),
@@ -3211,12 +3215,8 @@ var REVIEW = [
     ['PDL detects','About 20 µm'],
     ['Closest speaking space','1-2 mm on "s"'],
     ['Implant vs tooth (apical)','2-3 µm vs 28 µm']
-  ]}
-]},
-/* =================================================================== CONTACTS */
-{ id:'contacts', lec:'review', title:'What cusp hits where', icon:'tooth', blurb:'The help-sheet rules: Angle class, the fence post, premolar fossae, cusp pathways and which inclines collide. Assume Class I and cusp-fossa unless told otherwise.',
-  sections:[
-  { title:'Diagrams', type:'figs', figs:['cuspMap','pathMax','pathMand','inclines'] },
+  ]},
+  { part:'What cusp hits where', title:'Diagrams', type:'figs', figs:['cuspMap','pathMax','pathMand','inclines'] },
   { title:'Angle classes', type:'table', head:['Class','Molars','Share','Look for'], rows:[
     ['Class I','Normal interdigitation','About 70%','Class I malocclusion = crowding elsewhere'],
     ['Class II div 1','Mandibular first molar distal','About 25% (all Class II)','Narrow arch, protruding incisors'],
@@ -3252,12 +3252,8 @@ var REVIEW = [
     'Mesiolingual cusp of #3 sits in the central fossa of #30',
     'Anchor on the first molar\'s posterior contact, then step: MB cusp of #31 → mesial fossa of #2',
     'Arrow pictures: identify the movement first, then the cusp'
-  ]}
-]},
-/* =================================================================== GUIDANCE */
-{ id:'guidance', lec:'review', title:'Guidance and determinants', icon:'layers', blurb:'What separates the back teeth, which factor wins, and how each one changes posterior cusp height and groove direction.',
-  sections:[
-  { title:'Schemes', type:'cards', items:[
+  ]},
+  { part:'Guidance and determinants', title:'Schemes', type:'cards', items:[
     C('Canine guidance','Canine-protected articulation','review',[['What','Canine overlap disengages the posterior teeth in excursions'],['Why','Buttressing bone and proprioception'],['When','First choice in natural teeth']]),
     C('Group function','Shared working contacts','review',[['What','Several teeth share working-side contact (e.g. #7-6-5)'],['Why','Spreads load'],['When','Compromised canine support, missing canine, canine implant']],'Today: a few anterior teeth and maybe PM1, not every tooth'),
     C('Mutually protected occlusion','D\'Amico','review',[['What','Posteriors take force in MIP; anteriors disclude in excursions'],['Why','Anterior teeth handle off-axis forces and see less force'],['When','The goal for natural teeth']]),
@@ -3282,12 +3278,8 @@ var REVIEW = [
     'Thielmann: balanced occlusion = (CG × AG) / (CH × CC × PO)',
     'Goals: stable simultaneous centric contacts, force down the long axis, no balancing contacts, canine or anterior group disclusion',
     'Anterior guidance is set mostly by the lingual contours of the maxillary incisors'
-  ]}
-]},
-/* =================================================================== MOTION */
-{ id:'motion', lec:'review', title:'Envelope of motion', icon:'cycle', blurb:'Posselt\'s envelope in three planes, drawn for this hub. Name every border and point.',
-  sections:[
-  { title:'Diagrams', type:'figs', figs:['envSag','envHoriz','envFront'] },
+  ]},
+  { part:'Envelope of motion', title:'Diagrams', type:'figs', figs:['envSag','envHoriz','envFront'] },
   { title:'Sagittal view', type:'table', head:['Part','What it is'], rows:[
     ['Posterior opening border','Pure rotation in CR (20-25 mm), then rotation + translation to max opening'],
     ['Anterior opening border','Closing from max opening with the jaw fully protruded'],
@@ -3481,11 +3473,9 @@ var REVIEW = [
     ['Class II div 1 vs div 2','Div 1: narrow arch, protruding incisors','Div 2: square arch, retruded centrals, flared laterals, deep overlap']
   ]}
 ]},
-{ id:'processes', title:'Processes (all lectures)', icon:'cycle', blurb:'Ordered steps from the five lectures (also the Stack game\'s pool).',
-  sections:[ { title:'', type:'flows' } ]}
 ];
 
-/* ---------- SEQUENCES (Review > Processes and the stack game) ---------- */
+/* ---------- SEQUENCES (Processes at the end of each lecture's Review tab, and the stack game) ---------- */
 var SEQUENCES = [
   { id:'chew', lec:'function', title:'One chewing cycle', steps:['Open, mostly vertical','Lateral shift at the end','Crushing on closure','Grinding slide','Back to ICP'] },
   { id:'swallow', lec:'function', title:'A swallow', steps:['Lips seal, teeth together','Tongue pushes bolus back','Pharyngeal constrictors squeeze','Bolus enters esophagus','Cardiac sphincter relaxes'] },
@@ -3498,6 +3488,8 @@ var SEQUENCES = [
   { id:'smile', lec:'concepts', title:'Smile design, steps 1-5', steps:['Centric stops','Lip support','Lip closure','Tooth to lip (f, v)','Lingual contours'] },
   { id:'open', lec:'anatomy', title:'Opening the jaw', steps:['Infrahyoids fix the hyoid','Suprahyoids pull down','Inferior LPt pulls condyle forward','Condyle translates','Wide opening'] }
 ];
+/* each lecture's tab ends with its ordered steps */
+REVIEW.forEach(function(g){ if(g.lec && SEQUENCES.some(function(q){ return q.lec === g.lec; })) g.sections.push({ title:'Processes', type:'flows', lec:g.lec }); });
 
 /* ---------- CRAM SHEET ---------- */
 var CRAM = {
@@ -4408,10 +4400,11 @@ function renderCram(body){
 function sectionCount(sec){
   if(sec.type === 'cards' || sec.type === 'list') return sec.items.length;
   if(sec.type === 'table') return sec.rows.length;
-  if(sec.type === 'flows') return SEQUENCES.length;
+  if(sec.type === 'flows') return seqsOf(sec).length;
   if(sec.type === 'figs') return sec.figs.length;
   return 0;
 }
+function seqsOf(sec){ return SEQUENCES.filter(function(s){ return !sec.lec || s.lec === sec.lec; }); }
 function groupCount(g){ return g.sections.reduce(function(n, s){ return n + sectionCount(s); }, 0); }
 function hl(text, term){
   var safe = escHtml(text);
@@ -4456,13 +4449,18 @@ function sectionHTML(sec, term){
     var fk = sec.figs.filter(function(k){ return k === 'cuspMap' ? m('What cusp hits where: fence post, contacts, Class I II III') : m(FIGS[k].title) || m(FIGS[k].caption); }); if(!fk.length) return '';
     inner = '<div class="fig-grid">' + fk.map(figCardHTML).join('') + '</div>';
   } else if(sec.type === 'flows'){
-    var seqs = SEQUENCES.filter(function(s){ return m(s.title) || s.steps.some(m); }); if(!seqs.length) return '';
+    var seqs = seqsOf(sec).filter(function(s){ return m(s.title) || s.steps.some(m); }); if(!seqs.length) return '';
     inner = flowsHTML(seqs, term);
   }
   return '<section class="rv-section">' + (sec.title ? '<h3>'+escHtml(sec.title)+'</h3>' : '') + inner + '</section>';
 }
 /* each Review group names the lecture it comes from, in that lecture's color (as in the notes) */
 function groupLecTag(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? '<span class="gc-lec tag-'+l.tag+'">'+lecLabel(l)+'</span>' : ''; }
+/* a lecture's tab that covers several topics opens with a row of jump links, one per part */
+function partNavHTML(g){
+  var parts = []; g.sections.forEach(function(sec, i){ if(sec.part) parts.push('<button type="button" class="rv-part-link" data-part="'+i+'">'+escHtml(sec.part)+'</button>'); });
+  return parts.length > 1 ? '<nav class="rv-parts" aria-label="Parts of this tab">' + parts.join('') + '</nav>' : '';
+}
 var reviewSearch = '';
 function renderReview(){
   var p = document.getElementById('panel-review');
@@ -4481,10 +4479,11 @@ function renderReview(){
       rb.innerHTML = html || '<div class="rv-empty">Nothing matches “'+escHtml(term)+'”.</div>';
     } else {
       var gl = g.lec && LECTURE_BY_ID[g.lec];
-      rb.innerHTML = '<div class="group-head"><h2>'+(gl ? groupLecTag(g.lec) : icon(g.icon))+escHtml(g.title)+'</h2>'+(gl && gl.title !== g.title ? '<p class="group-lec">From '+lecChip(g.lec)+'</p>' : '')+'<p>'+escHtml(g.blurb)+'</p></div>' + g.sections.map(function(sec){ return sectionHTML(sec, ''); }).join('');
+      rb.innerHTML = '<div class="group-head"><h2>'+(gl ? groupLecTag(g.lec) : icon(g.icon))+escHtml(g.title)+'</h2>'+(gl && gl.title !== g.title ? '<p class="group-lec">From '+lecChip(g.lec)+'</p>' : '')+'<p>'+escHtml(g.blurb)+'</p>' + partNavHTML(g) + '</div>' + g.sections.map(function(sec, i){ return (sec.part ? '<h2 class="rv-part" id="rvPart'+i+'">'+escHtml(sec.part)+'</h2>' : '') + sectionHTML(sec, ''); }).join('');
     }
   }
   draw();
+  rb.addEventListener('click', function(e){ var b = e.target.closest('[data-part]'); if(!b) return; var h = document.getElementById('rvPart' + b.getAttribute('data-part')); if(h) h.scrollIntoView({ behavior:'smooth', block:'start' }); });
   p.querySelectorAll('[data-group]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.group = b.getAttribute('data-group'); reviewSearch = ''; saveState(); renderReview(); }); });
   var t; document.getElementById('rvSearch').addEventListener('input', function(e){ reviewSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ draw(); p.querySelectorAll('.group-chip').forEach(function(c){ c.classList.toggle('is-active', !reviewSearch && c.getAttribute('data-group') === g.id); }); }, 200); });
   document.getElementById('rvRecall').addEventListener('click', function(){ STATE.ui.recall = !STATE.ui.recall; saveState(); renderReview(); });
@@ -5822,7 +5821,7 @@ function shSearchSections(){
       else if(sec.type === 'list') sec.items.forEach(function(it){ out.push({ kind:'Review', where:g.title, text:clean(it), go:{ v:'review', q:clean(it).split(' ').slice(0, 4).join(' ') } }); });
     });
   });
-  SEQUENCES.forEach(function(sq){ out.push({ kind:'Review', where:'Processes', title:sq.title, text:clean(sq.title + ': ' + sq.steps.join(' → ')), go:{ v:'review', q:sq.title } }); });
+  SEQUENCES.forEach(function(sq){ var sg = REVIEW.filter(function(x){ return x.lec === sq.lec; })[0]; out.push({ kind:'Review', where:(sg ? sg.title + ' · ' : '') + 'Processes', title:sq.title, text:clean(sq.title + ': ' + sq.steps.join(' → ')), go:{ v:'review', q:sq.title } }); });
   return out;
 }
 function shFlashIn(sel){ setTimeout(function(){ var el = typeof sel === 'string' ? document.querySelector(sel) : sel(); if(el && window.shFlash) window.shFlash(el); }, 60); }
