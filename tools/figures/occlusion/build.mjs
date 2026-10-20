@@ -69,7 +69,7 @@ if (process.argv.includes("--preview")) {
   for (const theme of ["light", "dark"]) for (const f of FIGURES) {
     const page = `<!doctype html><html lang="en" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${f.title}</title><style>${tokens}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,sans-serif}main{max-width:760px;margin:24px auto;padding:0 16px}
-${animaCss()}</style></head><body><main id="figs"></main><script>${animaJs()}
+${read("od.css")}${animaCss()}</style></head><body><main id="figs"></main><script>${animaJs()}
 document.getElementById("figs").innerHTML = ANIMA.html(${JSON.stringify(f.id)}); ANIMA.mount(document);
 </script></body></html>`;
     writeFileSync(join(HERE, "dist", `${f.id}-${theme}.html`), page);

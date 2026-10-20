@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion anima 2 of 10: cusp pathways in motion, Claude Code)** — In the L1 notes after the static
+  pathway figures (`FIG_PLACE` 'Cusp pathways:', both levels) and in Review (L1 tab, part What cusp hits where, Diagrams). Fig 2: #3 and
+  #30 drawn by the hub's own kit (`od.js` loaded at build time with `vm`, so teeth and arrows match `pathMax`/`pathMand`);
+  pick A-D and the opposing cusp leaves its MIP contact on both teeth at once (+d on the upper tooth, -d on the lower).
+  Fig 2b: the mandible from above rotating about the working condyle (`jawMove`/`jawAngles`/`jawFrame`), sliders for
+  distance from the rotating condyle, from the midline and intercondylar distance plus a Bennett side-shift toggle; the
+  angle between the paths follows the L1 horizontal-determinants rule (schematic distances, so it shows the trend). Built by
+  `tools/figures/occlusion/anima/cuspmotion.mjs`; `build.mjs --preview` now includes `od.css`. About page updated.
+
 - **2026-10-20 (Occlusion anima 1 of 10: TMJ opening, Claude Code)** — First of the 10 approved Occlusion figures, in the L2
   notes after the disc/compartments paragraph (plain: end of "The jaw joint") and in Review → Functional TMJ Anatomy. Slider
   0-50 mm and Play: pure rotation in the lower joint space to 25 mm (outer TM ligament taut from about 20-22 mm), then
