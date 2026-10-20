@@ -102,6 +102,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 (Occlusion midterm: Dr. Givan's exam email, Claude Code)** — The email: Wed Oct 21, 6:30 pm, Canvas with
+  LockDown Browser + Monitor, 40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1, i.e. all five
+  lectures already in the hub; the Drive Midterm folder holds exactly those three recordings), one hour, log in from 6:25,
+  window closes 7:45, one blank sheet shown on both sides in the environmental scan. `hubs/occlusion`: a collapsible
+  **exam card** under the quick-start row on Compendium (`EXAM_INFO`, `examCardHTML()`; closing it is remembered in
+  `STATE.ui.examCard`; gone once the window closes at `EXAM_CLOSES`), with a button to the mock; the ribbon countdown counts
+  calendar days and says "Midterm tonight" on exam day, switching to the final at 7:45 pm (was 10 pm); the Exam Hints banner
+  and header tooltip give the time. **Mock is now 45 questions** (`MOCK_BLUEPRINT` 15/8/7/8/7, 15 per session; no official
+  per-lecture counts) and its clock reads against 60:00, turning red past the hour (`MOCK_LIMIT`). Dashboard: the midterm's
+  Check in button and pop-up wait for 8 pm (`checkinHour:20, promptHour:20`). No notes text changed, so no narration
+  regenerated. No schema change.
+
 - **2026-10-15 (unanswered survey waits in the Inbox, Claude Code)** — The dashboard survey pop-up's "No thanks" is now
   **Later** (it still records a null row so the pop-up doesn't come back, then says "Saved to your Inbox"). The live survey
   the visitor hasn't answered sits at the top of the Inbox on every hub and the dashboard (`widget/replies.js`,
