@@ -27,3 +27,5 @@
 .qx-cue{background:var(--caution-soft);border-left:3px solid var(--caution);padding:8px 12px;border-radius:6px}
 .qx-refs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .qnav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.qfig{max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
+.qfig>svg{display:block;max-width:none;height:auto}
