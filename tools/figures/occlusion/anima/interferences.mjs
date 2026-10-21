@@ -10,11 +10,12 @@
 // the figure shows which inclines face each other, not how far a jaw moves.
 import { figureSvg, plateHtml, f1, smooth } from "./shared.mjs";
 
-/* frontal section, from od.js F.inclines (help sheet "Draw this") */
-const MX = [[96,8],[84,34],[72,72],[78,112],[90,142],[101,160],[126,150],[150,128],[176,146],[204,170],[234,160],[256,128],[266,86],[258,44],[244,8]];
+/* frontal section, from od.js F.inclines (help sheet "Draw this"); the maxillary buccal cusp sits a little longer here
+   ([90,148],[100,168] instead of [90,142],[101,160]) so that, as on the help sheet, 4 meets 5 at the end of a working move */
+const MX = [[96,8],[84,34],[72,72],[78,112],[90,148],[100,168],[126,150],[150,128],[176,146],[204,170],[234,160],[256,128],[266,86],[258,44],[244,8]];
 const MD = [[132,318],[118,286],[104,242],[106,200],[118,172],[130,156],[150,136],[178,160],[205,178],[232,160],[262,140],[276,160],[282,204],[276,252],[262,288],[252,318]];
 const FR_INCL = {
-  max: { 5: [[101,160],[150,128]], 1: [[150,128],[204,170]], 2: [[204,170],[252,124]] },
+  max: { 5: [[100,168],[150,128]], 1: [[150,128],[204,170]], 2: [[204,170],[252,124]] },
   mand: { 4: [[150,136],[110,190]], 3: [[150,136],[205,178]], 6: [[205,178],[262,140]] },
 };
 const FR_PIN = { 1: [188,141], 2: [219,137], 3: [173,169], 4: [147,159], 5: [118,133], 6: [241,170] };
@@ -51,7 +52,7 @@ function profile(pts, bottom, yLim) {
 }
 
 const D = {
-  fr: { up: profile(MX, true, 100), lo: profile(MD, false, 220), max: 36, tol: 1.4, lift: 0.75,
+  fr: { up: profile(MX, true, 100), lo: profile(MD, false, 220), max: 36, tol: 1.6, lift: 0.75,
     pairs: { work: [[2, 6], [4, 5]], non: [[1, 3]] } },
   sa: { up: profile(SU, true, 120), lo: profile(SL, false, 190), max: 32, tol: 1.4, lift: 0.75,
     pairs: { pro: [["mbd", "dbm"], ["dbd", "dm"]] } },
@@ -117,7 +118,7 @@ const controls = `<div class="am-controls ix-tabs" role="tablist" aria-label="Vi
 
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>Drawn from the hub's L1 notes and Dr. Givan's help sheet method: draw the molars in MIP, then move the mandibular tooth in your mind's eye. Right molars, left move (right side non-working): the facial incline of the maxillary palatal cusp (1) meets the lingual incline of the mandibular buccal cusp (3). Right move (working): the lingual incline of the maxillary palatal cusp (2) meets the buccal incline of the mandibular lingual cusp (6), and the facial incline of the mandibular buccal cusp (4) meets the lingual incline of the maxillary buccal cusp (5), an interference if unwanted, group function if wanted. Protrusive: the distal inclines of the maxillary cusps meet the mesial inclines of the mandibular cusps.</li>
-<li>The front view is the same section as the "Right first molars in MIP" figure; the side view is a schematic Class I buccal view (the MB cusp of #3 over the buccal groove of #30). In the model the lower tooth slides and rides down whatever it touches, so the spark shows the pair that meets first in this drawing; on the working side 4 and 5 stay a hair apart here, but taller buccal cusps or flatter guidance bring them together.</li>
+<li>The front view is the same section as the "Right first molars in MIP" figure; the side view is a schematic Class I buccal view (the MB cusp of #3 over the buccal groove of #30). In the model the lower tooth slides and rides down whatever it touches, so a spark shows each pair it has touching. On the working side 2 and 6 touch first and 4 and 5 join them at the end of the move (the maxillary buccal cusp is drawn slightly longer than in the static section for that); with shorter buccal cusps or steeper guidance, 4 and 5 would stay apart.</li>
 <li>Movements are drawn as a pure slide in one plane, with schematic distances. In the mouth the condyles move too: the non-working condyle comes down the eminence, and canine or anterior guidance and Christensen's phenomenon (the space opening between the back teeth as the condyle drops in protrusion) normally lift the posterior teeth apart. "Let the guidance lift the teeth apart" shows that: no contact, no interference.</li></ul></details>`;
 
 function ixLive(root, D) {
@@ -157,7 +158,7 @@ function ixLive(root, D) {
       "The same molars from the cheek side, mesial at the left. Slide the lower molar forward, as in protrusion, and watch which inclines meet.";
     else if (guided) t = k === "pro" ? "With the incisors guiding and the condyle coming down the eminence, the back teeth separate as the jaw moves forward (Christensen's phenomenon), so the inclines never touch: no protrusive interference." :
       "Canine (or anterior) guidance lifts the back teeth apart, so these inclines never touch. That is the goal: posterior teeth disengaged in every excursion, no interferences.";
-    else if (k === "work") t = "Right working move: the lower molar slides toward the cheek. Its lingual cusp's buccal incline (6) runs into the lingual incline of the upper palatal cusp (2), and its buccal cusp's facial incline (4) heads for the lingual incline of the upper buccal cusp (5). Wanted, that is group function; unwanted, a working interference.";
+    else if (k === "work") t = "Right working move: the lower molar slides toward the cheek. Its lingual cusp's buccal incline (6) runs into the lingual incline of the upper palatal cusp (2), and by the end of the move its buccal cusp's facial incline (4) meets the lingual incline of the upper buccal cusp (5). Wanted, that is group function; unwanted, a working interference.";
     else if (k === "non") t = "Left move, so the right side is non-working: the lower molar slides toward the tongue (the right condyle orbits forward, down and in). The lingual incline of its buccal cusp (3) rides up the facial incline of the upper palatal cusp (1): a non-working (balancing) interference.";
     else t = "Protrusive: the lower molar slides mesially under the upper one, so the MESIAL inclines of the mandibular cusps run into the DISTAL inclines of the maxillary cusps. If the back teeth don't separate, those are the contacts.";
     if (sum.textContent !== t) sum.textContent = t;
