@@ -836,6 +836,8 @@
     prefSet(SH_NAME_KEY, name);
     renderNameBadge(); syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: name } })); } catch (e) {}
+    /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
+    if (window.shLinkAsk) window.shLinkAsk.check(name);
     return true;
   }
   function resetName(){
@@ -2420,5 +2422,12 @@
     replyScript.src = new URL("replies.js", thisScript.src).href; replyScript.async = true;
     replyScript.onload = function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB }); };
     document.head.appendChild(replyScript);
+  }
+  /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */
+  if (!EXPORT_ONLY && supabase) {
+    var linkAskScript = document.createElement("script");
+    linkAskScript.src = new URL("linkask.js", thisScript.src).href; linkAskScript.async = true;
+    linkAskScript.onload = function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection }); };
+    document.head.appendChild(linkAskScript);
   }
 })();

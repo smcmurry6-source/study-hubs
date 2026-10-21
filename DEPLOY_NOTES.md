@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 ("Is this your other device?", Claude Code)** — Sam: 16 ids had a custom name but only 13 names (Dr Winters
+  on 3, LeSunshine on 2), likely the same people on unlinked devices. New `widget/linkask.js` (loaded by v3.js and the dashboard):
+  saving a name another, unlinked id already uses keeps the name and opens a card ("Yes, link them" → get a code or enter one
+  right there, same RPCs as Stats → Link my devices; "No, that's someone else", remembered per name in `sh_link_ask_no`; "Not
+  now", 3 days in `sh_link_ask_later`). A device whose saved name is shared is also asked once a day on load (`sh_link_ask_day`),
+  never during a mock, the tour, a survey or the Inbox. `migration_v41.sql` (**applied via the connector**): public
+  `name_shared(p_visitor, p_name)` (case-insensitive, follows `visitor_links`). The random class names aren't checked (computing
+  `anon_name` for everyone is too slow). Tracked as `link-ask:shown|yes|no|later|code|linked`. About page, CI syntax check,
+  `sw.js` -> `sh-v32`.
+
 - **2026-10-21 afternoon (lessons audit: horizontal envelope matches the slide, Claude Code)** — Occlusion exam day.
   Suggestion #11: the horizontal envelope of motion was upside down and mirrored compared with Dr. Givan's slide 71. Codex's
   #155 swapped left and right in the built hub only (CR stayed at the bottom, and a rebuild would revert it); now `envHoriz`
