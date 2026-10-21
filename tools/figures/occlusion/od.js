@@ -291,7 +291,8 @@ var FIG_PLACE = {
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envelope'] }
   ],
   applying: [
-    { full:'Schemes and guidance', plain:'Guidance and MIP', figs:['guidance'] }
+    { full:'Schemes and guidance', plain:'Guidance and MIP', figs:['guidance'] },
+    { full:'Implants', plain:'Implants', figs:['implant'] }
   ],
   function: [
     { full:'Part 2: swallowing', plain:'Swallowing', figs:['swallow'] }
@@ -301,7 +302,7 @@ var FIG_PLACE = {
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance'], function:['swallow'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

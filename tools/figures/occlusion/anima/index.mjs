@@ -8,4 +8,5 @@ import { envelope } from "./envelope.mjs";
 import { crslide } from "./crslide.mjs";
 import { guidance } from "./guidance.mjs";
 import { swallow } from "./swallow.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow()];
+import { implant } from "./implant.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant()];
