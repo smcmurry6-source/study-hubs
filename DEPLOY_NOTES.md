@@ -102,6 +102,21 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (perio S5: Resective Osseous Surgery from the Oct 15 class, Claude Code)** — Drive: Periodontology/hubs,
+  `en-FA2026_DENT2145-VT_Lecturecapture_AVLC.txt` (the Oct 15 class capture, base64 text: Dr. Litz's in-person review of
+  furcations, then Resective Osseous Surgery) and `Resective Periodontal Surgery_Dr. Litz.pdf` (text only: 16 MB is over the
+  connector's 10 MB download limit; its picture slides are the surgical cases he talked through). Session 5's resective half
+  is no longer the exam-review stub: status note gone, source updated, both reading levels rewritten from "In class: the
+  furcation points he repeated" to the end (Phase I and re-evaluation paths, the 11 surgery indications, the 1981 SRP
+  study, why bone must follow the scalloped gingiva, positive/flat/negative architecture, 0.6 mm and the 1-year mobility,
+  indications and contraindications, ostectomy vs osteoplasty, the 4 steps, sparing furcation bone) and both mp3s
+  regenerated. 30 new questions (`q5-R01`-`R24`, 2 two-statement `q5-RS*`, 2 select-all `q5-RM*`, 2 Patient Box `q5-RP*`;
+  `q5-R05`/`R08` are EXCEPT; src `lecture`; bank 479 → 509), 7 exam hints quoted from the capture, 2 Review sections
+  (phases + re-evaluation, resective osseous surgery), cram lines, a mind-map branch and 4 arcade words. Not changed: in
+  class another instructor described Hamp as "three millimeter increments" (1-3, 4-6, >6 mm), which is Tarnow and
+  Fletcher's vertical scale; the hub keeps Hamp as under 3 / over 3 / through. **Perio Project: carry all of this into the
+  split sources.**
+
 - **2026-10-21 (boss costumes match their seasonal names, Claude Code)** — `widget/eggs.js`: the one-costume-per-holiday
   block in `bossIcon` is replaced by `COSTUMES[holiday][boss]`, 64 outfits that match each seasonal name (Strep
   Mummy-tans in bandages instead of the vampire cape, Tartar-stein's bolts, the Gingi-witch's hat, Tartar the Snowman,
