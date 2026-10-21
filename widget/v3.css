@@ -807,6 +807,8 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .sh-ribbon-inbox svg{width:16px; height:16px;}
 .sh-ribbon-inbox .sh-inbox-dot{top:-2px; right:-2px; background:var(--accent, #2F6FD6); box-shadow:0 0 0 2px var(--surface, #fff);}
 @media (max-width:760px){ .sh-ribbon-inbox{width:28px; height:26px;} .sh-ribbon-inbox svg{width:14px; height:14px;} }
+.sh-ribbon-tour{cursor:pointer;}
+@media (max-width:1000px){ .sh-ribbon-tour{display:none;} }   /* narrower screens: the top bar is full; "Take the tour" is in the menu / More sheet */
 
 /* ================= motion (widget/fx.js) ================= */
 /* answer feedback: a check or an X that draws itself on the edge of the option */

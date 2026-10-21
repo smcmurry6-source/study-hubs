@@ -316,7 +316,11 @@
         var fresh = rows.filter(function(r){
           return r.kind !== "survey" && isUnread(r) && (r.kind !== "notice" || !r.expires_at || new Date(r.expires_at).getTime() > now);
         }).reverse();  /* oldest first */
-        if (fresh.length && !document.querySelector(".sh-inbox")) popup(fresh.slice(0, 10));
+        if (!fresh.length) return;
+        /* on the dashboard, wait while the guided tour (widget/tour.js) is on screen */
+        (window.shTour ? window.shTour.whenIdle : function(fn){ fn(); })(function(){
+          if (!document.querySelector(".sh-inbox")) popup(fresh.slice(0, 10));
+        });
       });
     }, 1500);
   }

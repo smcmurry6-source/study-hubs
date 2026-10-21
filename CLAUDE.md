@@ -16,7 +16,7 @@ does it differently.
   arrays near the top of the script; add or archive a hub there, not in markup.
 - `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player) — shared cross-hub layer (search, class stats,
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by

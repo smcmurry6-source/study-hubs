@@ -1652,6 +1652,7 @@
   var ICON_SEARCH = shIcon('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/>');
   var ICON_STATS = shIcon('<rect x="4" y="12" width="4" height="8" rx="1.2"/><rect x="10" y="5" width="4" height="15" rx="1.2"/><rect x="16" y="9" width="4" height="11" rx="1.2"/>');
   var ICON_BULB = shIcon('<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4 3.5V15h0a2 2 0 0 1-2-2z"/><path d="M12 7.5v5M9.5 10h5"/>');
+  var ICON_COMPASS = shIcon('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>');
   var ICON_INBOX = shIcon('<path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/>');
   /* the inbox also sits in the hub's top bar, beside your name, so it's one tap away on every page (widget/replies.js opens it) */
   (function(){
@@ -1663,6 +1664,12 @@
     var theme = document.getElementById("themeBtn");
     if (theme && theme.parentNode === nameBadge.parentNode) theme.parentNode.insertBefore(btn, theme);
     else nameBadge.parentNode.insertBefore(btn, nameBadge.nextSibling);
+    /* and the guided tour (widget/tour.js) beside it; on phones it lives in the More sheet instead */
+    var tour = document.createElement("button");
+    tour.type = "button"; tour.className = "sh-ribbon-inbox sh-ribbon-tour"; tour.setAttribute("data-sh-tour", "");
+    tour.setAttribute("aria-label", "Take the tour"); tour.title = "Take the tour of this hub";
+    tour.innerHTML = ICON_COMPASS;
+    btn.parentNode.insertBefore(tour, btn);
   })();
   var ICON_FLAG = shIcon('<path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/>');
   var ICON_GEAR = shIcon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
@@ -1774,6 +1781,7 @@
         '<button class="shstat-pill" id="shstat-settings-pill" type="button"><span class="shstat-pill-icon">' + ICON_GEAR + '</span><span class="shstat-pill-label">Settings</span></button>' +
         '<button class="shstat-pill" id="shstat-suggest-pill" type="button"><span class="shstat-pill-icon">' + ICON_BULB + '</span><span class="shstat-pill-label">Suggest something</span></button>' +
         '<button class="shstat-pill" id="shstat-flag-pill" type="button"><span class="shstat-pill-icon">' + ICON_FLAG + '</span><span class="shstat-pill-label">Report an issue</span></button>' +
+        '<button class="shstat-pill" id="shstat-tour-pill" type="button" data-sh-tour><span class="shstat-pill-icon">' + ICON_COMPASS + '</span><span class="shstat-pill-label">Take the tour</span></button>' +
       '</div>' +
     '</div>' +
     /* desktop: today's drill sits beside the launcher until it's done (widget/drill.js fills it in) */
@@ -2356,6 +2364,17 @@
     podScript.onload = function(){ if (window.shPodcast) window.shPodcast.mount(HUB); };
     document.head.appendChild(podScript);
   }
+  /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time */
+  if (!EXPORT_ONLY) {
+    var tourScript = document.createElement("script");
+    tourScript.src = new URL("tour.js", thisScript.src).href; tourScript.async = true;
+    tourScript.onload = function(){ if (window.shTour) window.shTour.mount({ where: "hub", hub: HUB, section: currentSection }); };
+    document.head.appendChild(tourScript);
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest("[data-sh-tour]");
+    if (b && window.shTour) setTimeout(function(){ window.shTour.start(); }, 0);    /* after the menu has closed */
+  });
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {
     var drillScript = document.createElement("script");

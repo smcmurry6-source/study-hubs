@@ -102,6 +102,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (guided tours: dashboard and every hub, Claude Code)** — New `widget/tour.js`, loaded by `index.html` and by
+  `widget/v3.js` in every hub (`shTour.mount({where:"hub"})`). Each place asks once, "Want a quick tour?" (Show me around / No thanks),
+  remembered in `sh_tour` (dashboard) and `sh_tour_hub` (all hubs together): `done` | `skipped` | `no`. Tour buttons: `#tourBtn` in
+  the dashboard top bar; in a hub, `.sh-ribbon-tour` in the top bar (hidden under 1000 px, the bar is full) and "Take the tour"
+  (`#shstat-tour-pill`) in the widget menu / phone More sheet; any `[data-sh-tour]` starts it. Dashboard: 20 steps (a spotlight on
+  each part, then five "Inside every hub" cards). Hub: up to 19 steps found by shared markup (`#modeSwitch`, `#countdownPill`,
+  `#sh-ribbon-name`, `[data-sh-podcast]`, `.quick-start`, `#examCard`, the Compendium `.subtabs` buttons by label, `.sh-tts-btn`,
+  `.reading-prose`, `.qcard`, `#panel-review`, `#panel-arcade`, the launcher menu, `.shpet-home`, `#sh-ribbon-back`); a step can
+  switch mode/tab or open the menu first, missing parts are skipped, and the hub goes back to its starting mode, tab and scroll at
+  the end. The hub question is not asked on an archived hub, a page opened with a #hash, during a mock, or with the drill open.
+  While a question or tour is up, the survey/check-in pop-up and `widget/replies.js` pop-ups wait (`shTour.whenIdle`), and an open
+  survey or reply card is hidden (`html.sh-touring`). The dimming is four plain panels around the spotlight (a huge box-shadow didn't
+  paint on hub pages). Tracked as `tour:` / `tour-hub:` + `prompt`, `start`, `decline`, `done`, `quit@<step>`.
+  **A new dashboard section, hub mode, Compendium tab or widget tool: add a step or a line in `dashSteps()` / `hubSteps()` /
+  `SUB_INFO` in `widget/tour.js`.** About page, CI syntax check, `sw.js` -> `sh-v28`. No schema change.
+
 - **2026-10-21 (mastery medals: one per row, unique per hub, Claude Code, #145)** — Leaderboard rows showed up to three 16px medals that got cut off (in the hub arcade boards they sat inside the name's ellipsis). `shRanks.flair()` in `widget/ranks.js` now draws one tappable medal per row (this page's hub first, else the best) plus "+N"; tapping opens a card with every medal (`openFlair`, a fixed inset:0 layer, tracked `flair:open`). `{ list:true }` gives the rank cards one chip per hub with its name. `medalSvg(lvl, px, hub)`: the metal is the tier, the emblem and ribbons are the hub's (`HUB_MEDAL`; unknown hubs get the tooth), Crown wears a crown on top; the mastery card uses it. Hubs' arcade `row()` puts the flair after `.lb-nm`. **A new hub: add its emblem and ribbons to `HUB_MEDAL`. Perio and MSK Projects: carry the arcade row change into the split sources.** About page, `sw.js` -> `sh-v27`. No schema change.
 
 - **2026-10-21 morning (lessons audit, Claude Code)** — Occlusion midterm day. **"What cusp hits where?" Movements**

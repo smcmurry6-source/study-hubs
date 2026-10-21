@@ -131,6 +131,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .icon-btn:hover{color:var(--ink); border-color:var(--line-2);}
 .icon-btn svg{width:18px; height:18px;}
 .about-btn{width:auto; padding:0 12px 0 10px; gap:7px; font-size:14px; font-weight:600; text-decoration:none;}
+.tour-btn{cursor:pointer;}
 #inboxBtn{position:relative;}
 .inbox-badge{position:absolute; top:-6px; right:-6px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:var(--focus); color:var(--on-ink,#fff);
   font:700 11px/18px var(--sans); text-align:center; box-shadow:0 0 0 2px var(--bg);}
@@ -575,6 +576,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   #wrap{padding:0 16px 64px;}
   .topbar{padding-top:14px; gap:8px;}
   .about-btn{width:38px; padding:0;} .about-btn .about-lbl{display:none;}
+  .topbar{gap:6px;}
   .live-pill, .wordmark{white-space:nowrap;}
   .live-pill .lp-long{display:none;}
   .greeting{margin-top:28px;}
@@ -602,6 +604,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     <div class="wordmark"><span class="rings" aria-hidden="true"><i style="background:var(--c-gi)"></i><i style="background:var(--c-perio)"></i><i style="background:var(--c-genetics)"></i><i style="background:var(--c-pros)"></i></span><span class="wm-text">Study Hubs</span></div>
     <span class="live-pill" title="People with a hub open right now"><span class="live-dot"></span><span><b id="liveCount">–</b> <span class="lp-long">studying </span>now</span></span>
     <a class="icon-btn about-btn" id="aboutBtn" href="about/" title="About the hubs: every feature, easter egg and trophy" aria-label="About the hubs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M12 7.5v.01M12 10.5v4"/></svg><span class="about-lbl">About</span></a>
+    <button class="icon-btn about-btn tour-btn" id="tourBtn" type="button" title="Take the guided tour of the hubs" aria-label="Take the tour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg><span class="about-lbl">Tour</span></button>
     <button class="icon-btn" id="inboxBtn" type="button" aria-label="Inbox" title="Inbox" data-sh-inbox><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/></svg><span class="inbox-badge sh-inbox-badge" hidden></span></button>
     <button class="icon-btn" id="setBtn" type="button" aria-label="Settings" title="Settings"></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme"></button>
@@ -718,6 +721,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 <script src="widget/ranks.js" defer></script>
 <script src="widget/pet.js" defer></script>
 <script src="widget/timmy.js" defer></script>
+<script src="widget/tour.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -1780,7 +1784,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
     /* after an exam, an exam check-in takes the survey's place for that visit */
     debriefSb = sb;
-    setTimeout(function(){ if (!autoDebrief()) startSurvey(sb); }, 4000);
+    /* both wait while the first-visit tour question or the tour itself is on screen (widget/tour.js) */
+    setTimeout(function(){ tourIdle(function(){ if (!autoDebrief()) startSurvey(sb); }); }, 4000);
 
     /* Golden Probe (an easter egg in the hubs): who found today's, per hub */
     sb.rpc("get_golden_today").then(function(res){
@@ -1947,6 +1952,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }
     check(); setInterval(check, 4 * 60 * 1000);
   })();
+
+  /* guided tour (widget/tour.js): asked once on a first visit, and the Tour button runs it any time */
+  function tourIdle(fn){ if (window.shTour) window.shTour.whenIdle(fn); else fn(); }
+  $("tourBtn").addEventListener("click", function(){ if (window.shTour) window.shTour.start(); });
+  function startTour(){ setTimeout(function(){ if (window.shTour) window.shTour.maybePrompt(); }, 1200); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startTour); else startTour();
 
   /* offline copy of the dashboard and hubs (sw.js); best-effort */
   if ("serviceWorker" in navigator && window.isSecureContext) { try { navigator.serviceWorker.register("sw.js"); } catch (e) {} }
