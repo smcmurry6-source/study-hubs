@@ -169,3 +169,19 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
   .sg-cat{font-size:.58rem;padding:5px 2px}
   .sg-code{width:28px;height:34px}
 }
+/* the game-over card can be taller than a short game: scroll it instead of squashing the missed list */
+#panel-arcade .sg-stage .gm-overlay,#panel-arcade .cx-stage .gm-overlay,#panel-arcade .gm-stage:has(.ms-stage) .gm-overlay{overflow-y:auto;justify-content:safe center}
+#panel-arcade .sg-stage .gm-overlay > *,#panel-arcade .cx-stage .gm-overlay > *,#panel-arcade .gm-stage:has(.ms-stage) .gm-overlay > *{flex-shrink:0}
+/* Million-Dollar Smile: the show's marquee (bulbs chase around the frame) and grin */
+.ms-banner{position:relative;display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:18px;background:radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--sg-gold) 28%, transparent), transparent 60%), linear-gradient(180deg, color-mix(in srgb, var(--sg-blue) 22%, var(--ar-panel-2)), var(--ar-bg));border:3px solid var(--sg-gold);overflow:hidden}
+.ms-grin{flex:none;width:150px;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+.ms-title{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ms-title b{font-family:var(--sg-display);font-weight:400;color:var(--sg-gold);font-size:1.35rem;line-height:1.15;text-shadow:0 3px 0 color-mix(in srgb, var(--sg-warm) 70%, #000)}
+.ms-title span{color:var(--ar-dim);font-family:var(--sg-mono);font-size:.82rem} .ms-title span b{font-family:inherit;font-size:inherit;color:var(--ar-ink);text-shadow:none}
+.ms-banner::before,.ms-banner::after{content:"";position:absolute;left:10px;right:10px;height:8px;pointer-events:none;background:radial-gradient(circle, var(--sg-gold) 0 2.6px, transparent 3.2px) 0 50%/16px 8px repeat-x;filter:drop-shadow(0 0 3px var(--sg-gold));animation:ms-chase .9s steps(2) infinite}
+.ms-banner::before{top:3px} .ms-banner::after{bottom:3px;animation-direction:reverse}
+@keyframes ms-chase{to{background-position:16px 50%}}
+.sg-spark{transform-box:fill-box;transform-origin:center;animation:sg-twinkle 1.6s ease-in-out infinite}
+@keyframes sg-twinkle{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+@media (prefers-reduced-motion: reduce){ .ms-banner::before,.ms-banner::after,.sg-spark{animation:none;opacity:1} }
+@media (max-width: 760px){ .ms-grin{width:96px} .ms-title b{font-size:1rem} .ms-banner{padding:10px 12px;gap:10px} }
