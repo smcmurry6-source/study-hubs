@@ -102,6 +102,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (perio S6: Periodontal Regeneration slide deck, Claude Code)** — Dr. Geurs' slide deck (Drive:
+  Periodontology/hubs, `Periodontal_regeneration_Dr. Geurs.pdf`; downloaded through the Drive connector and its
+  pages rendered with `pdftoppm`, so the image-only slides were read too) is in `hubs/perio` ahead of the lecture. Session 6 goes from `upcoming` to
+  `preview` ("Slides only so far"). Both reading levels rewritten (definition vs repair, the four factors, defect
+  morphology with the slide's odds ratios and Nibali's pooled numbers, the strategy map (tissue engineering vs
+  endogenous regeneration), Levine's regeneration risk assessment, the AAP (Reynolds 2015) decision tree, the toolbox, the open-flap-debridement table, evaluation and subtraction
+  radiography; the exam-review guide's EMD / rhPDGF-BB / β-TCP kept) and both mp3s regenerated. The angle is now
+  "≤25°" as on the slides (`q6-01`, `q6-06` choice text; same ids and positions). 54 new questions (`q6-L01`-`L38`,
+  4 two-statement `q6-S*`, 4 EXCEPT `q6-E*`, 3 select-all `q6-M*`, 4 Patient Box `q6-P*`, 1 matching `q6-X01`; bank
+  425 → 479), each with its `QUESTION_WHY` row; 4 Review sections (definition and case selection, risk assessment +
+  decision tree, toolbox + graft sources, OFD baseline + evaluation), cram sheet, mind map and 5 arcade words
+  (the Quadrants group was dropped in the merge with #151, which retired that game). `NEXT_QUIZ` not set
+  (date unknown). No diagrams drawn; the diagram review is still to be put to Sam. **When the recording arrives: flip to
+  `taught`, add what the lecture emphasizes, exam hints, and regenerate both mp3s. Perio Project: carry all of this
+  into the split sources.**
+
 - **2026-10-21 (arcade revamp: six games, shared `widget/games.js`, Claude Code)** — Sam: the games were a bust; cut nine to six and
   make them playable. Data behind the pick: the arcade was under 2% of study time in every hub; only the sort game (Sort Storm 50
   plays/9 people, Split Decision, Silane Sort), Perio's Cross-Section (12/6), Calculus Crusher (10/8) and Million-Dollar Smile got
