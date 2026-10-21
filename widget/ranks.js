@@ -338,8 +338,11 @@
     { k: "mastery-gold", n: "Gold", pct: .9 }, { k: "mastery-crown", n: "Crown", pct: 1 }
   ];
 
-  /* ---------- mastery flair: a medal per hub mastered, next to your name on every leaderboard ----------
-     The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31). */
+  /* ---------- mastery flair: one medal per hub mastered, shown with your name on every leaderboard ----------
+     The leaderboards return `flair` as "perio:3,msk-exam3:1" (1 bronze, 2 silver, 3 gold, 4 crown; migration_v31).
+     The metal is the tier; the emblem in the middle and the ribbon colors are the hub's (HUB_MEDAL), so a Gold in
+     Perio and a Gold in Occlusion look different. A board row shows one medal (this hub's, else your best) and "+N";
+     tapping it opens the full set. */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
     "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
     "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3" };
@@ -347,31 +350,53 @@
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
     2: ["#3E4650", "#8E98A3", "#E4E9EE", "#FFFFFF"],
-    3: ["#5A3905", "#B58309", "#F6CD55", "#FFF6CF"]
+    3: ["#5A3905", "#B58309", "#F6CD55", "#FFF6CF"],
+    4: ["#6B4A05", "#C99A12", "#FFD84A", "#FFFBE0"]
   };
+  /* per hub: ribbon colors [left, right] and an emblem drawn on a 24-unit grid ("f" = filled shape, "s" = stroke,
+     "l" = a dark detail line on top). Hubs without an entry get the tooth. */
+  var TOOTH = [["f", "M7.2 4.6c-1.8 0-3 1.4-3 3.4 0 2.2 1.2 3.2 1.6 5 .4 2.2.8 4.6 1.8 4.6s1.4-2.2 1.6-3.6c.2-.8.6-1.2 1.8-1.2s1.6.4 1.8 1.2c.2 1.4.6 3.6 1.6 3.6s1.4-2.4 1.8-4.6c.4-1.8 1.6-2.8 1.6-5 0-2-1.2-3.4-3-3.4-1.6 0-2.4.8-4.8.8s-3-.8-4.8-.8z"]];
+  var HUB_MEDAL = {
+    "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
+    "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },
+    "msk-exam3":    { rib: ["#6B5B95", "#D9C79A"], g: [["s", "M8 16 16 8"], ["f", "M5.2 14.9a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"], ["f", "M14.9 5.2a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"]] },
+    "msk-exam4":    { rib: ["#A3453A", "#E2A07E"], g: [["f", "M3.5 21v-5.6c0-3.2 2-5.4 4.6-5.6l1.8-5.6c.4-1.2 1.8-1.6 2.7-.8l1.6 1.4c.7.6.4 1.8-.5 2l-1.6.4-.7 2.8c2-1 4.8-1 6.8.4 2.4 1.7 2.8 4.8 1.5 7.2-1.2 2.2-3.8 3.4-6.6 3.4z"], ["l", "M10.2 15.2c1.2-1.4 3.6-1.8 5.4-.8"]] },
+    "pcd-exam3":    { rib: ["#2D7F8C", "#E8DCC3"], g: [["f", "M8.6 15.4h6.8l-1.3 5.6H9.9z"], ["f", "M4.6 13.6V9.8c0-3.4 1.6-6.2 3.9-6.2 1.5 0 2.3 1.1 3.5 1.1s2-1.1 3.5-1.1c2.3 0 3.9 2.8 3.9 6.2v3.8z"]] },
+    "fixed-pros":   { rib: ["#2D7F8C", "#E8DCC3"], g: [["f", "M2.5 7.5h19v4.6c0 1.3-.9 1.9-1.3 3.3l-.9 4c-.3 1-1.4 1-1.7 0l-.7-3.3h-9.8l-.7 3.3c-.3 1-1.4 1-1.7 0l-.9-4c-.4-1.4-1.3-2-1.3-3.3z"], ["l", "M8.8 7.8v4.6M15.2 7.8v4.6"]] },
+    "gi-exam1":     { rib: ["#C46A1E", "#E8B04B"], g: [["f", "M9 2.5h3.4v4.6c0 2 1.4 2.8 3 2.4 2.4-.6 5.1.4 5.1 3.4 0 4.6-4.4 8.6-9.6 8.6-4.2 0-7.4-2.8-7.4-6.6 0-4.2 4.5-4.6 5.5-7.4z"]] },
+    "gi-exam2":     { rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
+    "hepatobiliary":{ rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
+    "genetics":     { rib: ["#3A6FD8", "#E05A9C"], g: [["s", "M7 3c0 6 10 6 10 12v6"], ["s", "M17 3c0 6-10 6-10 12v6"], ["l", "M8.4 5.8h7.2M8.4 18h7.2"]] }
+  };
+  function hubMedal(h){ return HUB_MEDAL[h] || { rib: ["#C2414B", "#2F5FA8"], g: TOOTH }; }
+  function emblem(g, ink, cx, cy, s){
+    var t = 'transform="translate(' + cx + ' ' + cy + ') scale(' + s + ') translate(-12 -12)"', back = "", front = "", line = "";
+    g.forEach(function(p){
+      if (p[0] === "f") { back += '<path d="' + p[1] + '" fill="' + ink + '" stroke="' + ink + '" stroke-width="2.4" stroke-linejoin="round"/>'; front += '<path d="' + p[1] + '" fill="#fff"/>'; }
+      else if (p[0] === "s") { back += '<path d="' + p[1] + '" fill="none" stroke="' + ink + '" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/>'; front += '<path d="' + p[1] + '" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>'; }
+      else line += '<path d="' + p[1] + '" fill="none" stroke="' + ink + '" stroke-width="1.3" stroke-linecap="round" opacity=".8"/>';
+    });
+    return '<g ' + t + ' opacity=".96">' + back + front + line + '</g>';
+  }
   var fuid = 0;
-  function medalSvg(lvl, px){
-    var p = "shfl" + (++fuid) + "-";
-    if (lvl >= 4) {
-      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
-        '<linearGradient id="' + p + 'c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B8"/><stop offset=".45" stop-color="#F2C230"/><stop offset="1" stop-color="#A6740A"/></linearGradient></defs>' +
-        '<path d="M2.6 15.4 L3.4 6.2 L7.4 9.8 L10 3.6 L12.6 9.8 L16.6 6.2 L17.4 15.4 Z" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1" stroke-linejoin="round"/>' +
-        '<rect x="2.6" y="14.2" width="14.8" height="3" rx="1" fill="url(#' + p + 'c)" stroke="#6B4A05" stroke-width="1"/>' +
-        '<circle cx="10" cy="3.4" r="1.2" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".7"/><circle cx="3.3" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/><circle cx="16.7" cy="6" r="1" fill="#FFF3B8" stroke="#6B4A05" stroke-width=".6"/>' +
-        '<circle cx="10" cy="15.7" r="1" fill="#E0457B"/><circle cx="6.2" cy="15.7" r=".8" fill="#3FA7E0"/><circle cx="13.8" cy="15.7" r=".8" fill="#3FA7E0"/>' +
-        '<path d="M5 8.6 L6.6 13" stroke="#FFFBE6" stroke-width=".8" stroke-linecap="round" opacity=".8"/></svg>';
-    }
-    var m = MEDAL[lvl] || MEDAL[1];
+  /* medalSvg(lvl, px, hub): the tier's metal with the hub's emblem and ribbons; the Crown tier wears a crown on top */
+  function medalSvg(lvl, px, hub){
+    var p = "shfl" + (++fuid) + "-", m = MEDAL[lvl] || MEDAL[1], H = hubMedal(hub), crown = lvl >= 4;
+    var cy = crown ? 10 : 8.4, r = crown ? 6.4 : 7;
     return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 20 20" aria-hidden="true"><defs>' +
       '<radialGradient id="' + p + 'm" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="' + m[3] + '"/><stop offset=".45" stop-color="' + m[2] + '"/><stop offset="1" stop-color="' + m[1] + '"/></radialGradient></defs>' +
-      '<path d="M6 12.5 L4.6 19 L7.2 17.6 L8.6 19.6 L9.6 13.4 Z" fill="#C2414B"/><path d="M14 12.5 L15.4 19 L12.8 17.6 L11.4 19.6 L10.4 13.4 Z" fill="#2F5FA8"/>' +
-      '<circle cx="10" cy="8.4" r="7" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width="1"/>' +
-      '<circle cx="10" cy="8.4" r="5.1" fill="none" stroke="' + m[0] + '" stroke-opacity=".45" stroke-width=".7"/>' +
-      '<path d="M7.6 5.6c-.9 0-1.5.7-1.5 1.7 0 1.1.6 1.6.8 2.5.2 1.1.4 2.3.9 2.3s.7-1.1.8-1.8c.1-.4.3-.6.9-.6s.8.2.9.6c.1.7.3 1.8.8 1.8s.7-1.2.9-2.3c.2-.9.8-1.4.8-2.5 0-1-.6-1.7-1.5-1.7-.8 0-1.2.4-2.4.4s-1.5-.4-2.4-.4z" fill="#fff" fill-opacity=".92" stroke="' + m[0] + '" stroke-width=".55" stroke-linejoin="round"/></svg>';
+      '<path d="M6 13 L4.6 19.4 L7.2 18 L8.6 19.9 L9.6 13.8 Z" fill="' + H.rib[0] + '" stroke="rgba(0,0,0,.25)" stroke-width=".4"/>' +
+      '<path d="M14 13 L15.4 19.4 L12.8 18 L11.4 19.9 L10.4 13.8 Z" fill="' + H.rib[1] + '" stroke="rgba(0,0,0,.25)" stroke-width=".4"/>' +
+      '<circle cx="10" cy="' + cy + '" r="' + r + '" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width="1"/>' +
+      '<circle cx="10" cy="' + cy + '" r="' + (r - 1.9) + '" fill="none" stroke="' + m[0] + '" stroke-opacity=".45" stroke-width=".7"/>' +
+      emblem(H.g, m[0], 10, cy, crown ? .4 : .44) +
+      (crown ? '<path d="M5.6 4.6 L5.9 .9 L8 2.6 L10 .3 L12 2.6 L14.1 .9 L14.4 4.6 Z" fill="url(#' + p + 'm)" stroke="' + m[0] + '" stroke-width=".8" stroke-linejoin="round"/>' +
+        '<circle cx="10" cy="3.4" r=".75" fill="#E0457B"/>' : '') + '</svg>';
   }
   function parseFlair(s){
     return String(s || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
-      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
+      .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; })
+      .sort(function(a, b){ return b.lvl - a.lvl || (a.hub < b.hub ? -1 : 1); });
   }
   /* the badges list from get_rank_profile ("mastery-gold:perio", ...) -> the same flair string the boards return */
   function flairFromBadges(badges){
@@ -383,28 +408,79 @@
     });
     return Object.keys(best).sort(function(a, b){ return best[b] - best[a] || (a < b ? -1 : 1); }).map(function(h){ return h + ":" + best[h]; }).join(",");
   }
+  /* the hub this page belongs to (the widget's data-hub), so its own medal leads on its boards */
+  function pageHub(){ var s = document.querySelector("script[data-hub]"); return s ? s.getAttribute("data-hub") : ""; }
+  function flairLabel(x){ return hubName(x.hub) + ": " + MASTERY[x.lvl - 1].n + " mastery"; }
   function flairCss(){
     if (document.getElementById("sh-flair-css")) return;
     var st = document.createElement("style"); st.id = "sh-flair-css";
-    st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-3px;margin:0 3px;white-space:nowrap}' +
-      '.sh-flair-m{display:inline-flex;width:16px;height:16px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
+    st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-4px;margin:0 3px;white-space:nowrap;flex:none}' +
+      'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
+      'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
+      'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
+      '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
       '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
-      '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.65;margin-left:1px}' +
-      '.sh-flair.is-big{gap:4px}.sh-flair.is-big .sh-flair-m{width:24px;height:24px}' +
+      '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
+      /* the showcase (your rank card): every medal with its hub's name */
+      '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
+      '.sh-flair-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:999px;background:rgba(127,127,127,.13);font-size:12px;font-weight:600;line-height:1.2}' +
+      '.sh-flair.is-big .sh-flair-m{width:24px;height:24px}' +
+      /* the pop-up: a fixed inset:0 layer (no vh/vw, which overshoot when the text-size setting zooms <html>) */
+      '.sh-flair-pop{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,16,.45);animation:sh-flair-in .16s ease-out}' +
+      '.sh-flair-card{width:100%;max-width:340px;max-height:100%;overflow:auto;box-sizing:border-box;background:#1C1F26;color:#F3F1EC;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px 16px 12px;box-shadow:0 18px 50px rgba(0,0,0,.45);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}' +
+      '.sh-flair-card h3{margin:0 0 2px;font-size:16px;font-weight:700}' +
+      '.sh-flair-card p{margin:0 0 10px;font-size:12.5px;color:#B9B5AD}' +
+      '.sh-flair-card ul{list-style:none;margin:0;padding:0}' +
+      '.sh-flair-card li{display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.08)}' +
+      '.sh-flair-card li:first-child{border-top:0}' +
+      '.sh-flair-card li .sh-flair-m{width:40px;height:40px}' +
+      '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
+      '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
+      '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
       '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown{animation:none}}';
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
     (document.head || document.documentElement).appendChild(st);
+    document.addEventListener("click", function(e){
+      var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
+      if (b) { e.preventDefault(); e.stopPropagation(); openFlair(b.getAttribute("data-flair-list"), b.getAttribute("data-flair-who")); }
+    }, true);
   }
-  /* shRanks.flair(str, { max, big }) -> inline medals; empty string when there's nothing to show */
+  function openFlair(s, who){
+    var list = parseFlair(s); if (!list.length) return;
+    var old = document.querySelector(".sh-flair-pop"); if (old) old.remove();
+    var back = document.activeElement, pop = document.createElement("div");
+    pop.className = "sh-flair-pop";
+    pop.innerHTML = '<div class="sh-flair-card" role="dialog" aria-modal="true" aria-label="Mastery medals">' +
+      '<h3>' + (who ? esc(who) + "'s mastery" : "Mastery medals") + '</h3><p>One medal per hub: the metal is how much of that hub\'s bank was right on the latest try (Bronze 50%, Silver 75%, Gold 90%, Crown 100%).</p><ul>' +
+      list.map(function(x){ return '<li><span class="sh-flair-m">' + medalSvg(x.lvl, 40, x.hub) + '</span><span><b>' + esc(hubName(x.hub)) + '</b><small>' + MASTERY[x.lvl - 1].n + ' mastery · ' + Math.round(MASTERY[x.lvl - 1].pct * 100) + '%</small></span></li>'; }).join("") +
+      '</ul><button type="button" class="sh-flair-x">Close</button></div>';
+    function close(){ pop.remove(); document.removeEventListener("keydown", key, true); try { if (back && back.focus) back.focus(); } catch (e) {} }
+    function key(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } }
+    pop.addEventListener("click", function(e){ if (e.target === pop || e.target.closest(".sh-flair-x")) close(); });
+    document.addEventListener("keydown", key, true);
+    document.body.appendChild(pop);
+    var x = pop.querySelector(".sh-flair-x"); if (x) x.focus();
+    try { if (window.shTrack) window.shTrack("flair:open"); } catch (e) {}
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  /* shRanks.flair(str, opt) -> mastery medals; empty string when there's nothing to show.
+     Default (board rows): one tappable medal, this page's hub first (else the best), then "+N"; fixed small width.
+     opt.list: every medal with its hub's name (the rank cards); opt.big: larger medals there.
+     opt.who: whose medals, for the pop-up's title. */
   function flair(s, opt){
     opt = opt || {};
     var list = parseFlair(s); if (!list.length) return "";
     flairCss();
-    var max = opt.max || 3, px = opt.big ? 24 : 16;
-    var label = list.map(function(x){ return hubName(x.hub) + ": " + MASTERY[x.lvl - 1].n + " mastery"; }).join(" · ");
-    return '<span class="sh-flair' + (opt.big ? ' is-big' : '') + '" role="img" aria-label="' + label + '" title="' + label + '">' +
-      list.slice(0, max).map(function(x){ return '<span class="sh-flair-m' + (x.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(x.lvl, px) + '</span>'; }).join("") +
-      (list.length > max ? '<span class="sh-flair-more">+' + (list.length - max) + '</span>' : '') + '</span>';
+    if (opt.list) {
+      return '<span class="sh-flair is-list' + (opt.big ? ' is-big' : '') + '">' + list.map(function(x){
+        return '<span class="sh-flair-chip" title="' + esc(flairLabel(x)) + '"><span class="sh-flair-m' + (x.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(x.lvl, opt.big ? 24 : 18, x.hub) + '</span>' + esc(hubName(x.hub)) + '</span>';
+      }).join("") + '</span>';
+    }
+    var here = pageHub(), lead = list.filter(function(x){ return x.hub === here; })[0] || list[0];
+    var label = "Mastery medals: " + list.map(flairLabel).join(" · ");
+    return '<button type="button" class="sh-flair" data-sh-flair="medals" data-flair-list="' + esc(s) + '"' + (opt.who ? ' data-flair-who="' + esc(opt.who) + '"' : '') +
+      ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="sh-flair-m' + (lead.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(lead.lvl, 18, lead.hub) + '</span>' +
+      (list.length > 1 ? '<span class="sh-flair-more">+' + (list.length - 1) + '</span>' : '') + '</button>';
   }
 
   /* ---------- unlockable accent colors (cosmetic; each needs that tier or higher) ---------- */
@@ -549,7 +625,7 @@
      shRanks.preview("trophy", 6) (a TROPHIES index), shRanks.preview("mastery", 2) (Gold), shRanks.preview("mock", 37, 40) */
   function preview(kind, a, b){
     if (kind === "trophy") { var tr = TROPHIES[Math.max(0, Math.min(TROPHIES.length - 1, a | 0))]; withRankUp(function(U){ U.trophy(trophyCard(tr)); }); return; }
-    if (kind === "mastery") { withRankUp(function(U){ U.trophy(masteryCard(Math.max(0, Math.min(3, a | 0)), "this hub")); }); return; }
+    if (kind === "mastery") { withRankUp(function(U){ U.trophy(masteryCard(Math.max(0, Math.min(3, a | 0)), pageHub())); }); return; }
     if (kind === "mock") { var tot = b || 40, c = Math.min(tot, a == null ? 34 : a | 0); withRankUp(function(U){ U.mock({ correct: c, total: tot, hub: "Preview", prev: .8,
       byLec: [{ label: "L1 · Lecture one", correct: 7, total: 8 }, { label: "L2 · Lecture two", correct: 5, total: 7 }, { label: "L3 · Lecture three", correct: 2, total: 3 }],
       missed: function(){} }); }); return; }
@@ -562,8 +638,8 @@
   /* a hub mastery medal (Bronze 50% ... Crown 100%), as a trophy card */
   var MASTERY_PAL = ["bronze", "silver", "gold", "gold"];
   function masteryCard(i, hub){
-    return { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hub : ""), art: medalSvg(i + 1, 84), pal: MASTERY_PAL[i],
-      desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal now shows next to your name on every leaderboard.",
+    return { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hubName(hub) : ""), art: medalSvg(i + 1, 84, hub), pal: MASTERY_PAL[i],
+      desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal with this hub's emblem now shows next to your name on every leaderboard.",
       rarity: function(){ return rarityOf ? rarityOf(MASTERY[i].k) : null; } };
   }
 
@@ -682,7 +758,7 @@
       var myFlair = flairFromBadges(badges.concat(m.lvl >= 0 ? [MASTERY[m.lvl].k + ":" + H.hub] : []));
       /* Timmy Tooth's house (widget/pet.js) hangs a pennant per mastered hub */
       if ((ls("sh_rank_flair") || "") !== myFlair) { ls("sh_rank_flair", myFlair || null); try { document.dispatchEvent(new CustomEvent("sh:rank")); } catch (e) {} }
-      if (myFlair) h += '<div class="sh-flair-row"><span>Your leaderboard flair</span>' + flair(myFlair, { max: 8, big: true }) + '</div>';
+      if (myFlair) h += '<div class="sh-flair-row"><span>Your mastery medals</span>' + flair(myFlair, { list: true, big: true }) + '</div>';
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
@@ -716,7 +792,7 @@
     }
     function masteryToast(i){
       if (H.prefGet("sh_pref_eggs", "on") === "off") return;
-      playRankUp("trophy", masteryCard(i, hubName(H.hub)), mockBusy);
+      playRankUp("trophy", masteryCard(i, H.hub), mockBusy);
     }
 
     /* one section per hub in the trophy case: this hub first (open), then every other hub you've studied or earned in */

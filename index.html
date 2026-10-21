@@ -143,7 +143,8 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .me-rank-body{flex:1; min-width:0;}
 .me-rank-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
 .me-rank-name{font-family:var(--serif); font-size:24px; line-height:1.1;}
-.me-rank-flair{font-size:12.5px; color:var(--ink-3); margin-top:6px; display:flex; align-items:center; gap:2px;}
+.me-rank-flair{font-size:12.5px; color:var(--ink-3); margin-top:8px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
+.me-rank-flair .sh-flair-chip{color:var(--ink-2);}
 .me-rank-xp{font-size:13.5px; color:var(--ink-2); font-variant-numeric:tabular-nums;}
 .me-rank-xp b{color:var(--ink);}
 .me-rank-bar{position:relative; height:10px; margin:9px 0 6px; border-radius:99px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden;}
@@ -1704,7 +1705,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<span class="me-rank-xp"><b>' + Number(xp).toLocaleString() + '</b> XP' + (p.position ? ' · #' + p.position + ' of ' + p.of : '') + '</span></div>' +
       '<div class="me-rank-bar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
       '<div class="me-rank-next">' + (!xp ? 'Answer a question in any hub to start earning XP.' : next ? '<b>' + Number(next - xp).toLocaleString() + ' XP</b> to ' + esc(nextName) : 'The highest rank there is.') + '</div>' +
-      (R.flair && R.flairFromBadges(p.badges) ? '<div class="me-rank-flair">Mastery ' + R.flair(R.flairFromBadges(p.badges), { max: 8 }) + '</div>' : '') + '</div>';
+      (R.flair && R.flairFromBadges(p.badges) ? '<div class="me-rank-flair"><span>Mastery</span>' + R.flair(R.flairFromBadges(p.badges), { list: true }) + '</div>' : '') + '</div>';
     el.hidden = false;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = el.querySelector(".me-rank-bar i"); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
   }
@@ -1723,7 +1724,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
   /* a board row's name with its mastery medals (migration_v31 `flair`); the caller adds the "has-flair" class via nmClass */
   function nameFlair(r, extra){
-    var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair) : "";
+    var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair, { who: r.display_name }) : "";
     return f ? '<span class="nm-t">' + esc(r.display_name) + (extra || "") + '</span>' + f : esc(r.display_name) + (extra || "");
   }
   function nmClass(r, base){ return base + (r.flair && window.shRanks && window.shRanks.flair ? " has-flair" : ""); }
