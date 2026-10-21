@@ -255,14 +255,14 @@ var FIGS = (function(){
       '<text class="fg-t sm fg-hint" x="232" y="250">anterior</text><text class="fg-t sm fg-hint" x="232" y="262">opening</text><text class="fg-t sm fg-hint" x="232" y="274">border</text><text class="fg-t sm fg-hint" x="122" y="142">chewing</text>' +
       OD.pin(76,60,'A') + OD.pin(112,22,'B') + OD.pin(160,92,'C') + OD.pin(252,72,'D') + OD.pin(64,172,'E') + OD.pin(130,358,'F') + '</svg>' , key:[['A','Centric relation (CR); a tooth contact here is centric occlusion (CO)'],['B','Maximum intercuspation (MICP), up and forward from CO'],['C','Incisors edge to edge, at the end of the anterior guidance'],['D','Maximum protrusion'],['E','End of pure rotation, about 20-25 mm'],['F','Maximum opening, about 40-60 mm (rotation plus translation)'],['A-E-F','Posterior opening border'],['F-D','Anterior opening border'],['A-B-C-D','Superior contact border (the teeth)']] };
   F.envHoriz = { title:'Envelope of motion, horizontal view',
-    caption:'Seen from above at the incisor point, anterior at the top, so the patient\'s left is on your left. The back apex is centric relation; the front apex is maximum protrusion.',
-    svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Horizontal envelope of motion with borders A to D">' +
-      '<path class="fg-line" d="M180 250 L80 190 L180 60 L280 190 Z"/>' +
-      '<circle class="fg-dot" cx="180" cy="250" r="5"/><text class="fg-t" x="192" y="272">CR</text><circle class="fg-dot" cx="180" cy="60" r="4"/>' +
-      '<text class="fg-t" x="150" y="40">Anterior</text><text class="fg-t sm fg-hint" x="190" y="58">max protrusion</text>' +
-      '<text class="fg-t" x="6" y="150">Patient&#8217;s</text><text class="fg-t" x="6" y="166">LEFT</text>' +
-      '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">RIGHT</text>' +
-      OD.pin(118,236,'A') + OD.pin(112,112,'B') + OD.pin(248,112,'C') + OD.pin(242,236,'D') + '</svg>' , key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']] };
+    caption:'Seen from above at the incisor point, drawn as on Dr. Givan\'s slide: the patient faces the bottom of the page, so the patient\'s left is on your right. The top (back) apex is centric relation; the bottom (front) apex is maximum protrusion.',
+    svg: '<svg viewBox="0 0 360 300" role="img" aria-label="Horizontal envelope of motion seen from above, anterior at the bottom, patient\'s left on the right, borders A to D">' +
+      '<path class="fg-line" d="M180 50 L280 110 L180 240 L80 110 Z"/>' +
+      '<circle class="fg-dot" cx="180" cy="50" r="5"/><text class="fg-t" x="192" y="38">CR</text><circle class="fg-dot" cx="180" cy="240" r="4"/>' +
+      '<text class="fg-t" x="150" y="290">Anterior</text><text class="fg-t sm fg-hint" x="190" y="262">max protrusion</text>' +
+      '<text class="fg-t" x="6" y="150">Patient&#8217;s</text><text class="fg-t" x="6" y="166">RIGHT</text>' +
+      '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">LEFT</text>' +
+      OD.pin(242,64,'A') + OD.pin(248,188,'B') + OD.pin(112,188,'C') + OD.pin(118,64,'D') + '</svg>' , key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']] };
   F.envFront = { title:'Envelope of motion, frontal view',
     caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP, the postural position, sits about 2-4 mm below it.',
     svg: '<svg viewBox="0 0 360 330" role="img" aria-label="Frontal envelope of motion with borders A to D and PP">' +

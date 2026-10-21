@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 afternoon (lessons audit: horizontal envelope matches the slide, Claude Code)** — Occlusion exam day.
+  Suggestion #11: the horizontal envelope of motion was upside down and mirrored compared with Dr. Givan's slide 71. Codex's
+  #155 swapped left and right in the built hub only (CR stayed at the bottom, and a rebuild would revert it); now `envHoriz`
+  (`tools/figures/occlusion/od.js`) and the envelope tracer's horizontal tab (`anima/envelope.mjs`) draw CR at the top,
+  maximum protrusion at the bottom and the patient's left on your right, as the slide does, rebuilt with `build.mjs` (same
+  A-D letters, so `fig-hor-b`/`fig-hor-d` are unchanged). `cs-pro-incline`'s key now reads "Distal inclines of the maxillary
+  palatal cusps against mesial inclines of the mandibular cusps" (same position; 8/20 since this morning's explanation fix),
+  with its explanation and `QUESTION_WHY` row. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed
+  (first read of the guided tours: 5 students took one on exam day).
+
 - **2026-10-21 (arcade skins: every hub's games look like that hub, Claude Code)** — Sam: copy the new games to Perio but not as a
   copy-paste; same ideas, visually unique, and the same for every new hub (now a standing rule in `CLAUDE.md` → "Every hub's arcade
   looks like that hub"). `widget/games.js` takes `C.skin` (`{ id, board, cloze, escape }`) and tags each game root

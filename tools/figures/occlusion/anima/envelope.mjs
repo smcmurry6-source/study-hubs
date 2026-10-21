@@ -25,15 +25,15 @@ const VIEWS = {
       ["L112 40", "C → B · up the anterior guidance", "Up the anterior guidance into maximum intercuspation, MICP (B).", { t: 0.06, th: 0.5 }],
       ["L90 60", "B → A · the slide to CO/CR", "From MICP down and back to CO, the first contact with the condyles seated in CR (A). About 90% of people have this slide, around 1.25 mm; if CO equals MICP, the border runs straight from CR into the anterior guidance and this step is gone.", { t: 0, th: 0 }],
     ] },
-  hor: { w: 360, h: 300, start: [180, 250],
-    shape: '<circle class="en-dot0" cx="180" cy="250" r="5"/><text class="en-t" x="192" y="272">CR</text><circle class="en-dot0" cx="180" cy="60" r="4"/><text class="en-t en-mut" x="190" y="56">max protrusion</text>',
-    pins: [[118, 236, "A"], [112, 112, "B"], [248, 112, "C"], [242, 236, "D"]],
-    extra: '<text class="en-t" x="150" y="36">Anterior</text><text class="en-t" x="6" y="150">Patient&#8217;s</text><text class="en-t" x="6" y="166">LEFT</text><text class="en-t" x="290" y="150">Patient&#8217;s</text><text class="en-t" x="290" y="166">RIGHT</text>',
+  hor: { w: 360, h: 300, start: [180, 50],
+    shape: '<circle class="en-dot0" cx="180" cy="50" r="5"/><text class="en-t" x="192" y="38">CR</text><circle class="en-dot0" cx="180" cy="240" r="4"/><text class="en-t en-mut" x="190" y="262">max protrusion</text>',
+    pins: [[242, 64, "A"], [248, 188, "B"], [112, 188, "C"], [118, 64, "D"]],
+    extra: '<text class="en-t" x="150" y="290">Anterior</text><text class="en-t" x="6" y="150">Patient&#8217;s</text><text class="en-t" x="6" y="166">RIGHT</text><text class="en-t" x="290" y="150">Patient&#8217;s</text><text class="en-t" x="290" y="166">LEFT</text>',
     steps: [
-      ["L80 190", "A · left lateral", "Seen from above, from CR the incisor point swings to the patient's left: the left lateral border (A). The left condyle is the working one; the right (non-working) condyle comes forward and down the eminence."],
-      ["L180 60", "B · left lateral with protrusion", "From the far left, protrude along the left lateral border with protrusion (B) to maximum protrusion at the front apex."],
-      ["L280 190", "C · right lateral with protrusion", "From maximum protrusion back to the far right: the right lateral border with protrusion (C)."],
-      ["L180 250", "D · right lateral", "And back to CR along the right lateral border (D). Most chewing happens well inside these borders."],
+      ["L280 110", "A · left lateral", "Seen from above with the patient facing the bottom of the page (as on Dr. Givan's slide, so their left is on your right), from CR the incisor point swings to the patient's left: the left lateral border (A). The left condyle is the working one; the right (non-working) condyle comes forward and down the eminence."],
+      ["L180 240", "B · left lateral with protrusion", "From the far left, protrude along the left lateral border with protrusion (B) to maximum protrusion at the bottom (front) apex."],
+      ["L80 110", "C · right lateral with protrusion", "From maximum protrusion back to the far right: the right lateral border with protrusion (C)."],
+      ["L180 50", "D · right lateral", "And back to CR along the right lateral border (D). Most chewing happens well inside these borders."],
     ] },
   fro: { w: 360, h: 330, start: [180, 40],
     shape: '<circle class="en-dot0" cx="180" cy="40" r="5"/><text class="en-t" x="192" y="34">ICP</text><circle class="en-dot0" cx="180" cy="56" r="4"/><text class="en-t" x="190" y="66">PP</text><text class="en-t en-mut" x="150" y="318">max opening</text>',
@@ -78,7 +78,7 @@ function viewSvg(key) {
   const body = v.shape.includes("en-soft") ? v.shape : "";
   const rest = v.shape.includes("en-soft") ? "" : v.shape;
   return figureSvg({ width: v.w, height: v.h, className: `en-svg en-${key}`,
-    label: { sag: "Sagittal envelope of motion traced at the lower incisor, points A to F", hor: "Horizontal envelope of motion seen from above, borders A to D", fro: "Frontal envelope of motion seen from the front, borders A to D" }[key],
+    label: { sag: "Sagittal envelope of motion traced at the lower incisor, points A to F", hor: "Horizontal envelope of motion seen from above, anterior at the bottom, patient's left on the right, borders A to D", fro: "Frontal envelope of motion seen from the front, borders A to D" }[key],
     body: body + `<path class="en-track" d="${d}"/>` + segs + rest + v.extra + v.pins.map((p) => pin(...p)).join("") +
       `<g class="en-pen"><circle r="9" class="en-pen-halo"/><circle r="4.5" class="en-pen-dot"/></g>` });
 }
@@ -124,7 +124,7 @@ function enLive(root, D) {
     var step = D.VIEWS[view].steps[i];
     rs.step.textContent = u <= 0 ? "not started" : u >= N ? "done: the whole envelope" : step.label;
     if (readout) readout.textContent = u <= 0 ? "" : u >= N ? "envelope closed" : step.label.split(" · ")[0];
-    var t = u <= 0 ? ({ sag: "Press Next step (or drag) and the pen on the lower incisor traces the sagittal envelope from centric relation, one border at a time.", hor: "From above: the pen starts at CR, the back apex.", fro: "From the front: the pen starts at the intercuspal position at the top." })[view] : u >= N ? "That closes the envelope. Everything the jaw can do lies inside it; function happens in a small teardrop below MICP." : step.text;
+    var t = u <= 0 ? ({ sag: "Press Next step (or drag) and the pen on the lower incisor traces the sagittal envelope from centric relation, one border at a time.", hor: "From above, patient facing the bottom of the page: the pen starts at CR, the top (back) apex.", fro: "From the front: the pen starts at the intercuspal position at the top." })[view] : u >= N ? "That closes the envelope. Everything the jaw can do lies inside it; function happens in a small teardrop below MICP." : step.text;
     if (sum.textContent !== t) sum.textContent = t;
     jbox.hidden = view !== "sag"; jrow.hidden = view !== "sag";
     if (view === "sag") {
