@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-21, early morning** (thirteenth refresh, full `/lessons-audit`, Wednesday 4:40 am Central:
-the Occlusion midterm is tonight at 6:30 pm). Sam runs
+**Last refreshed: 2026-10-21, afternoon** (fourteenth refresh, `/lessons-audit`, Wednesday 2:30 pm Central: the
+Occlusion midterm is tonight at 6:30 pm). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,43 +79,54 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-21, 4:40 am Central; "since" = the 10-20 evening fixes (#142, live 9:07 pm). Live hubs: **Occlusion
-midterm (today, 6:30 pm; final Nov 19)** and perio (final Nov 19). Nothing newly archived. Since last night: 1 report (#28,
-the cusp game, below), 1 late PCD 3 check-in (ready 4, "about what I expected", "Hub was easier"), 1 survey round 2
-answer (Quizlet Learn + Anki; no tutorial), no zero-result searches.
+Refreshed 2026-10-21, 2:30 pm Central (exam day); "since" = this morning's 4:40 am audit (#144). Live hubs: **Occlusion
+midterm (tonight, 6:30 pm; final Nov 19)** and perio (final Nov 19). Nothing newly archived. Since this morning: 2 Occlusion
+suggestions (#10, #11, below), 2 late check-ins (perio midterm: ready 5, better than expected, "Hub was easier"; PCD 3: ready
+5, better than expected, "About right"), 1 survey round 2 answer (Quizlet Learn; no tutorial), no zero-result searches.
 
-**Did last night's fixes work?** Too early to say: since 9:07 pm `fp-post` 2/4, `cc-parfitt` 2/4, `ap-quad` 7/11 (64%, was
-48% before); the whole bank 82% (81% before). Read them again after the midterm.
+**Did this morning's fixes work?** `cs-record-best` (stem "prefer over using any registration material"): 12/26 then, 23/42
+now, so **11/16 since (69%, was 46%)**. `cs-pro-incline` (explanation on the palatal-cusp streaks): 12/30 then, 20/50 now, so
+**8/20 since (40%): no change**, and the facial-incline (non-working) pairing is still the pick (14 of 50). The drawing is right
+(the streaks sit on the distal slopes of the palatal cusps), but the key said "distal inclines of the maxillary cusps" while
+the trap named the palatal cusps the student can see, so it read as palatal vs distal. Its key now reads "Distal inclines of
+the maxillary **palatal** cusps against mesial inclines of the mandibular cusps" (same position), so the choice is distal vs
+facial incline of the same cusp. Read it after the exam. Movements in the cusp game (says which step missed): no new report.
 
-**Occlusion, midterm eve to 4:40 am:** 10-20 ended at **81 people, 145 h** (the biggest day of any hub; MSK 3's eve was 89 h).
-After 9 pm: 41 people at 9 pm, 29 at 10, 14 at 11, 7 after midnight; 1,605 answers from 31 people at 82%; 6 mocks at 76%.
-Time since 9 pm: bank 1,187 min (38 people), notes 557 (27), mock 166 (10), Review L1 tab 143 (13). All time: 89 people,
-246 h. By lecture (cumulative): TMJ anatomy 78%, Review of Basic Occlusion 80%, Concepts 81%, Applying 83% (28 tries per
-question, up from 18 on the eve; still the least practiced), Mastication 86%. Help-sheet source 67%.
-Hardest now: `an-compound` 37% (the ginglymoarthrodial definition still picked 44 times), **three new patient cases
-from 10-20**: `cs-pro-incline` 12/30 (9 picked the non-working pairing; the red streaks sit on the palatal cusps),
-`cs-record-best` 12/26 (13 picked Aluwax; the stem "prefer to any registration material" can be read as "prefer for"),
-`cs-record-check` 11/24; then `fp-post` 41%, `cc-parfitt` 42%, `fp-c2-pm` 43%, `an-tml-outer` 44%, `fp-m2` 45%.
+**Occlusion, exam day to 2:30 pm:** 76 people, 93 h (all time 102 people, 333 h); 4,732 answers from 58 people at 86% (82% on
+the eve); 17 mocks from 15 people at 88%. Since 4:40 am: bank 1,101 min (39 people), notes 822 (30), mock 190 (10), Review L1
+192 (10), Daily Drill 130 (9), Timmy Time 87 (8). **Timmy Time all time: 13 people pressed play, 283 min heard, 4 reached 95%.**
+The new arcade (live from 10 am): 5 people opened the lobby, 1 played Lab Escape for 9 min. By lecture (cumulative): TMJ anatomy
+80%, Review of Basic Occlusion 81%, Concepts 83%, Applying 84% (39 tries per question vs 48-59: still the least practiced),
+Mastication 87%; help-sheet source 70% (67% this morning). Hardest (12+ tries): `cs-pro-incline` 40%, `an-compound` 41% (the
+ginglymoarthrodial definition picked 52 times; the explanation already answers it), `fp-post` 42%, `cc-parfitt` 46% (Monson 26),
+`fp-c2-pm` 49%, `ap-inadequate` 49% (ordering), `ex-nm` 50%, `cs-record-check` 50% (10/18 since this morning), `an-tml-outer` 51%.
 
-Shipped this morning: **"What cusp hits where?" Movements** now says which step missed (report #28: a round counts only when
-both the movement and the cusp are right, so a right cusp after a wrong movement turned green under "Not quite." and the
-explanation named the cusp the student picked; now "Right cusp, but step 1 missed. The arrow shows ..."). 17 people have
-played Movements, 22 Contacts. `cs-record-best`'s stem now says "prefer over using any registration material";
-`cs-pro-incline`'s explanation says why the palatal-cusp streaks are still protrusive (they run front to back; a
-non-working streak crosses the cusp at an angle). Same ids and answer positions.
+**Suggestion #11 (exam day): the horizontal envelope was drawn upside down and mirrored compared with Dr. Givan's slide**
+(slide 71, "Mandibular Border Movements in the Horizontal Plane": ICP at the top apex, anterior at the bottom, so the patient's
+left is on your right; 1 left lateral runs down to the right). Ours had CR at the bottom, anterior at the top, patient's left on
+the left: correct from above, but the opposite of his picture, and "he's more likely to ask questions from his version". A
+Codex PR (#155, 11:45 am) swapped left and right but left CR at the bottom (so its caption, "seen from above, anterior at the
+top, patient's left on your right", described a view from below), and edited only the built hub, so the next
+`build.mjs` run would have reverted it. Now both the static figure (`envHoriz` in `tools/figures/occlusion/od.js`) and the
+envelope tracer's horizontal tab (`anima/envelope.mjs`) match the slide: CR on top, maximum protrusion at the bottom, patient's
+left on your right, same A-D letters (`fig-hor-b`, `fig-hor-d` unchanged). The frontal view already matched slide 72.
 
-**Diagrams, all time** (`feature_events`, Occlusion): the static L1 figures were on screen for 32-38 people; the 10 anima
-figures that went live on the eve 14-25 people seen, 5-20 moved (cusp pathways in motion 20, CR-MIP slide 17, TMJ 14).
-Timmy Time (live 9:48 pm on the eve): 2 people.
-**Next audit, after the midterm: read the check-ins (from 8 pm tonight) against the fence-post, patient-case and
-application items, and the anima figures' use.**
+**Suggestion #10: "more frequent review of missed questions instead of having to wait until the very end to get reps"**
+(Occlusion practice questions). Built the same afternoon at Sam's request: a missed bank question now comes back as a fresh
+"Try it again" card 5 cards further down (`bank:retry-*` in `feature_events`). Read after the midterm whether retries get
+answered and how often the second try is right; Perio's bank could get it next.
 
-**First day of feature tracking** (`feature_events`, Occlusion, 10-20): the Plaque Boss reached 63 of 72 visitors; drawn
-figures under the notes 20-27 people each (the static ones), the interactive cusp-pathway figure 9, TMJ opening 7 (the
-other eight anima figures went live at 8:55 pm); Full Arch 18; highlighter 5; Listen 2 (24 min); mind map 2; drill length
-30 picked once. Settings snapshot, all pages: Timmy Tooth adopted 25 of 76, nuke alerts on 70 of 73, own name 9.
+**Guided tours (live from 5 am today, first day):** the dashboard asked 25 people (19 No thanks, 4 started); a hub asked 42
+(all Occlusion; 38 No thanks, 4 started). Leaving out one visitor with no answers who started them 7 times (testing), **5 students
+have taken a tour**: 3 finished the dashboard tour, 2 finished the Occlusion tour, 1 quit the hub tour at step 6 and 1 the dashboard
+tour at step 3 before finishing it on a second try. All 5 are regulars (100-3,741 answers), not newcomers; 27 people declined
+both. Exam day is the worst day to ask (people came to study); read it again on a quiet week. Survey round 2's tutorial question
+leans "No" too.
 
-**Perio** (final Nov 19): quiet; 1 person overnight. 22 people, 7 h from 10-15 to 10-20 (the S5 Furcation quiz was 10-15).
+**Perio** (final Nov 19): 2 people today. S5 Resective Osseous Surgery and S6 Regeneration landed this morning (bank 509).
+
+**Next audit, after the midterm: the Occlusion check-ins (from 8 pm tonight) against the fence-post, patient-case and application
+items, the horizontal-envelope questions, `cs-pro-incline`'s new key, and the tours once the exam rush is over.**
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
@@ -207,6 +218,11 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
 
+- **Draw a figure the way the professor's slide draws it.** A view can be correct and still the opposite of the slide:
+  Occlusion's horizontal envelope had anterior at the top (true from above), Dr. Givan's slide has it at the bottom, and on exam
+  day a student wrote that it was confusing because "he's more likely to ask questions from his version" (suggestion #11).
+  Before a figure ships, put it next to the slide: same orientation, same sides, same numbering where possible, and say in the
+  caption which way it faces. Fix figures in their build source, never only in the built hub.
 - **Dates live in two places; check both.** A hub's own `EXAM_DATE` / `SH_EXPORT.exams` and its dashboard `HUBS` entry
   must agree: the dashboard entry drives the auto-archive (10 pm on the last exam day) and check-ins. On 10-08 a PCD
   date fix moved MSK Exam 4's dashboard date a day early by mistake, which would have archived its card on exam eve
