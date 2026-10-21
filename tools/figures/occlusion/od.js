@@ -279,6 +279,7 @@ var FIGS = (function(){
 /* figures placed inside the notes: after the paragraph or heading whose text starts with `at` (both reading levels) */
 var FIG_PLACE = {
   review: [
+    { full:'MIP, centric occlusion and centric relation', plain:'Three positions people confuse', figs:['crslide'] },
     { full:'What cusp hits where: the fence post', plain:'Which cusp hits where', end:true, widget:'cuspMap' },
     { full:'Help sheet method for interferences', plain:'To figure out which slopes touch', figs:['inclines'] },
     { full:'Help sheet method for interferences', plain:'To figure out which slopes touch', figs:['interferences'] },
@@ -293,7 +294,7 @@ var FIG_PLACE = {
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

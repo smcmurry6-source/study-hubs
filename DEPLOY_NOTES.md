@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 7 of 10: CR to MIP slide, Claude Code)** — In the L1 notes at 'MIP, centric occlusion and centric
+  relation' (plain 'Three positions people confuse'; a heading anchor, so it lands at the end of that section) and in Review (L1 tab,
+  Positions and terms, before Terms). Side view: hinge closure with the condyle seated (CR) until the first contact, then the slide up the
+  inclines into MIP while the condyle comes off its seat along the eminence; toggle for CO = MIP (the 10%). One model: lower teeth drawn
+  in MIP, any pose = condyle offset + rotation about it, the rotation solved by bisection so the teeth just touch (`crContactRot`); the
+  first contact falls on the second molars (asserted at build time, matching `pb-slide`). The slide is to scale (1.25 mm at 6 px/mm)
+  with ×4 zoom panels that reuse the same markup in a zoomed viewBox. **Lesson: exaggerating a slide past half a cusp pitch lands cusps
+  tip on tip; keep the teeth far enough from the hinge (here M2 about 140 px from the condyle) or the CO rotation balloons.** Built by
+  `tools/figures/occlusion/anima/crslide.mjs`. About page updated.
+
 - **2026-10-21 (Occlusion anima 6 of 10: envelope of motion tracer, Claude Code)** — In the L1 notes after the static envelope
   figures (`FIG_PLACE` second entry on 'Horizontal view (from above)', plain 'The envelope of motion') and in Review (L1 tab, Envelope
   of motion, after Diagrams). A pen on the lower incisor traces each border of the static `envSag`/`envHoriz`/`envFront` outlines
