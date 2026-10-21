@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (guided tour on the dashboard, Claude Code)** — New `widget/tour.js`, loaded by `index.html` only. The first
+  dashboard visit asks "Want a quick tour?" (Show me around / No thanks); either answer, finishing or ending the tour is saved
+  in `sh_tour` (`done` | `skipped` | `no`) so it never asks again, and a **Tour** button (`#tourBtn`, compass) in the top bar runs
+  it any time (`shTour.start()`). 20 steps: a spotlight on each dashboard part (top-bar buttons, name, rank, Timmy, hero, hubs,
+  the class, recaps, what's new; parts not on screen are skipped), then five "Inside every hub" cards. While the question or the
+  tour is up, the survey/check-in pop-up and `widget/replies.js` pop-ups wait (`shTour.whenIdle`), and an open survey or reply card
+  is hidden (`html.sh-touring`). Tracked as `tour:prompt`, `tour:start`, `tour:decline`, `tour:done`, `tour:quit@<step>`.
+  **A new dashboard section or hub-wide feature: add a step (or a line in a card) to `steps()` in `widget/tour.js`.** About page,
+  CI syntax check, `sw.js` -> `sh-v28`. No schema change.
+
 - **2026-10-21 (mastery medals: one per row, unique per hub, Claude Code, #145)** — Leaderboard rows showed up to three 16px medals that got cut off (in the hub arcade boards they sat inside the name's ellipsis). `shRanks.flair()` in `widget/ranks.js` now draws one tappable medal per row (this page's hub first, else the best) plus "+N"; tapping opens a card with every medal (`openFlair`, a fixed inset:0 layer, tracked `flair:open`). `{ list:true }` gives the rank cards one chip per hub with its name. `medalSvg(lvl, px, hub)`: the metal is the tier, the emblem and ribbons are the hub's (`HUB_MEDAL`; unknown hubs get the tooth), Crown wears a crown on top; the mastery card uses it. Hubs' arcade `row()` puts the flair after `.lb-nm`. **A new hub: add its emblem and ribbons to `HUB_MEDAL`. Perio and MSK Projects: carry the arcade row change into the split sources.** About page, `sw.js` -> `sh-v27`. No schema change.
 
 - **2026-10-21 morning (lessons audit, Claude Code)** — Occlusion midterm day. **"What cusp hits where?" Movements**
