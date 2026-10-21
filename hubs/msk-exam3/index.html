@@ -150,6 +150,9 @@ main{padding-top:20px}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
 .qcard-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.qcard.is-retry{border-style:dashed}
+.retry-chip{display:inline-flex;align-items:center;gap:4px;color:var(--accent);white-space:normal;max-width:100%;text-align:left}
+.retry-chip svg{width:13px;height:13px}
 .src-chip{font-family:var(--font-mono);font-size:.68rem;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
 .qcard-stem{font-weight:600;margin:0 0 12px}
 .qcard-choices,.qcard-seq-steps{display:flex;flex-direction:column;gap:7px}
@@ -2509,8 +2512,8 @@ function qCardHTML(q, opts){
     body += '</div></div>';
   }
   var seen = STATE.seen[q.id];
-  var status = seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
-  return '<div class="qcard tag-'+tagOf(q.lec)+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
+  var status = opts.retry ? '<span class="src-chip retry-chip">'+icon('cycle')+'Try it again: you missed this a few questions ago</span>' : seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
+  return '<div class="qcard tag-'+tagOf(q.lec)+(opts.retry?' is-retry':'')+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
     '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+cueHTML(q)+
@@ -2525,6 +2528,8 @@ function finishCard(card, correct){
   var q = QUESTIONS_BY_ID[card.getAttribute('data-qid')];
   var pk = card.getAttribute('data-pick');
   if(q) recordAnswer(q.id, q.lec, correct, card.getAttribute('data-ctx') || 'bank', pk === null ? null : +pk);
+  if(card.classList.contains('is-retry') && window.shTrack) window.shTrack('bank:retry-' + (correct ? 'right' : 'missed'));
+  var host = card.parentNode; if(q && !correct && host && host.__retry) host.__retry(card, q);
 }
 function wireQuestionContainer(container){
   if(container.__wired) return; container.__wired = true;
@@ -2592,7 +2597,7 @@ function setMode(mode){
    COMPENDIUM
    =================================================================== */
 var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (40)'] ];
-var BANK_PAGE = 30, bankShown = BANK_PAGE;
+var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
 function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();
@@ -2738,6 +2743,19 @@ function renderBank(body){
   var rvSet = !rvN ? '' : '<div class="rv-set"><div><b>Exam review set ('+rvN+' questions)</b><span>From the PollEv review. Six of these are word for word on the exam and the rest are very close.</span></div><button type="button" class="btn'+(rvOn?'':' primary')+'" id="fReview">'+(rvOn?'Show all questions':'Practice the review set')+'</button></div>';
   body.innerHTML = rvSet + '<div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   var list = document.getElementById('qList'); wireQuestionContainer(list);
+  /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
+     instead of only through the "Missed last time" filter at the end (student suggestion #10, 2026-10-21). A patient's
+     questions stay together: the retry never lands inside a set. Missed again, it comes back again. */
+  list.__retry = function(card, q){
+    if(list.querySelector('.qcard.is-retry:not(.is-answered)[data-qid="'+q.id+'"]')) return;
+    var cards = Array.prototype.filter.call(list.children, function(c){ return c.classList.contains('qcard'); });
+    var i = cards.indexOf(card) + RETRY_GAP + 1;
+    function pc(c){ var x = c && QUESTIONS_BY_ID[c.getAttribute('data-qid')]; return x && x.pcase; }
+    while(i < cards.length && pc(cards[i]) && pc(cards[i]) === pc(cards[i - 1])) i++;
+    var box = document.createElement('div'); box.innerHTML = qCardHTML(q, { ctx:'bank', retry:true });
+    list.insertBefore(box.firstChild, cards[i] || null);
+    if(window.shTrack) window.shTrack('bank:retry-shown');
+  };
   var order = null;
   function draw(){
     var qs = bankFiltered(bankSearch);

@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Try it again in every hub's Question Bank, Claude Code)** — Sam: apply #156's missed-question retry
+  everywhere. `pcd-exam3`, `msk-exam4` and `msk-exam3` (same engine as Occlusion) get the identical change: `RETRY_GAP`,
+  `list.__retry` in `renderBank`, the hook at the end of `finishCard`, `qCardHTML(q, {retry:true})` and the CSS. **Perio**
+  (its own engine): `markMissed` hands the miss to `list.__retry` (set in `renderQuestionBank`), which renders `qCardHTML(q)`,
+  adds `is-retry` and the chip; a copy counts as pending until its explanation is shown, and a second click listener counts
+  `bank:retry-right` / `-missed` once (recall cards when graded); new `cycle` icon. The chip wraps on phones in every hub.
+  Tested in all five: miss, retry 5 cards down; miss the retry, another; right, none. About page now says every hub.
+  **A new hub: copy the retry from `occlusion`. Perio and MSK Projects: carry it into the split sources.**
+
 - **2026-10-21 ("Is this your other device?", Claude Code)** — Sam: 16 ids had a custom name but only 13 names (Dr Winters
   on 3, LeSunshine on 2), likely the same people on unlinked devices. New `widget/linkask.js` (loaded by v3.js and the dashboard):
   saving a name another, unlinked id already uses keeps the name and opens a card ("Yes, link them" → get a code or enter one
