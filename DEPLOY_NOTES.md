@@ -102,19 +102,25 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (tour fixes and a faster streak board, Claude Code)** — `widget/tour.js`: the dim layer is one element with a
+  rounded `clip-path` hole matching the spotlight ring (the four panels showed seams and square corners when zoomed in); short
+  screens (under 560 px tall, e.g. a laptop at 200%+ zoom) get compact card type, and a docked card may use up to 60% of the
+  height. The dashboard tour no longer explains hub features (the five "Inside every hub" cards are gone); one step on a hub's
+  Open button points to the hub's own tour. `sw.js` -> `sh-v29`. `migration_v39.sql`: `get_correct_streak_stats` timed out
+  (57014) because it ran `sh_visitor_xp` for every `correct_streaks` row before `limit 1`; it now picks the two top rows first.
 - **2026-10-21 (guided tours: dashboard and every hub, Claude Code)** — New `widget/tour.js`, loaded by `index.html` and by
   `widget/v3.js` in every hub (`shTour.mount({where:"hub"})`). Each place asks once, "Want a quick tour?" (Show me around / No thanks),
   remembered in `sh_tour` (dashboard) and `sh_tour_hub` (all hubs together): `done` | `skipped` | `no`. Tour buttons: `#tourBtn` in
   the dashboard top bar; in a hub, `.sh-ribbon-tour` in the top bar (hidden under 1000 px, the bar is full) and "Take the tour"
-  (`#shstat-tour-pill`) in the widget menu / phone More sheet; any `[data-sh-tour]` starts it. Dashboard: 20 steps (a spotlight on
-  each part, then five "Inside every hub" cards). Hub: up to 19 steps found by shared markup (`#modeSwitch`, `#countdownPill`,
+  (`#shstat-tour-pill`) in the widget menu / phone More sheet; any `[data-sh-tour]` starts it. Dashboard: up to 16 steps (a spotlight on
+  each part; what's inside a hub is left to the hub's own tour). Hub: up to 19 steps found by shared markup (`#modeSwitch`, `#countdownPill`,
   `#sh-ribbon-name`, `[data-sh-podcast]`, `.quick-start`, `#examCard`, the Compendium `.subtabs` buttons by label, `.sh-tts-btn`,
   `.reading-prose`, `.qcard`, `#panel-review`, `#panel-arcade`, the launcher menu, `.shpet-home`, `#sh-ribbon-back`); a step can
   switch mode/tab or open the menu first, missing parts are skipped, and the hub goes back to its starting mode, tab and scroll at
   the end. The hub question is not asked on an archived hub, a page opened with a #hash, during a mock, or with the drill open.
   While a question or tour is up, the survey/check-in pop-up and `widget/replies.js` pop-ups wait (`shTour.whenIdle`), and an open
-  survey or reply card is hidden (`html.sh-touring`). The dimming is four plain panels around the spotlight (a huge box-shadow didn't
-  paint on hub pages). Tracked as `tour:` / `tour-hub:` + `prompt`, `start`, `decline`, `done`, `quit@<step>`.
+  survey or reply card is hidden (`html.sh-touring`). The dimming is one full-screen layer with a rounded hole cut by `clip-path: path(evenodd, …)`
+  (a huge box-shadow didn't paint on hub pages; four panels left seams and square corners when zoomed). Tracked as `tour:` / `tour-hub:` + `prompt`, `start`, `decline`, `done`, `quit@<step>`.
   **A new dashboard section, hub mode, Compendium tab or widget tool: add a step or a line in `dashSteps()` / `hubSteps()` /
   `SUB_INFO` in `widget/tour.js`.** About page, CI syntax check, `sw.js` -> `sh-v28`. No schema change.
 

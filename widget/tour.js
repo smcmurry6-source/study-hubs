@@ -33,8 +33,11 @@
     "  --sht-font:var(--font-body, var(--sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif)); --sht-display:var(--font-display, var(--serif, Georgia, serif));}",
     ".sh-tour-block{position:fixed; inset:0; z-index:20000; background:transparent;}",
     ".sh-tour-block.is-dim{background:rgba(8,14,18,.55);}",
-    ".sh-tour-dim{position:fixed; z-index:20000; background:rgba(8,14,18,.55); pointer-events:none; transition:left .3s ease, top .3s ease, width .3s ease, height .3s ease;}",     /* four panels around the spotlight (a huge box-shadow doesn't paint on every page) */
+    /* one dim layer with a rounded hole cut where the spotlight is (a huge box-shadow doesn't paint on every page, and
+       four panels around the spot left seams and square corners when zoomed in) */
+    ".sh-tour-dim{position:fixed; inset:0; z-index:20000; background:rgba(8,14,18,.55); pointer-events:none; transition:clip-path .3s ease;}",
     ".sh-tour-dim[hidden]{display:none;}",
+    "html.sh-tour-follow .sh-tour-dim, html.sh-tour-follow .sh-tour-spot, html.sh-tour-follow .sh-tour{transition:none;}",   /* while the page scrolls: stick to the part, don't trail it */
     "html.sh-touring .survey, html.sh-touring .sh-reply{visibility:hidden;}",     /* an open survey or reply card steps aside */
     ".sh-tour-spot{position:fixed; z-index:20001; border-radius:14px; pointer-events:none; box-shadow:0 0 0 2px var(--focus, var(--accent,#2F6FD6));",
     "  transition:left .3s ease, top .3s ease, width .3s ease, height .3s ease, opacity .2s;}",
@@ -71,6 +74,13 @@
     "  .sh-tour h3{font-size:22px;} .sh-tour-body{font-size:14px;}",
     "  .sh-tour:not(.is-center) .sh-tour-foot{margin:10px -16px -14px; padding:8px 16px 14px; bottom:-14px;}",
     "}",
+    /* short screens (a laptop zoomed to 200% or more, a phone on its side): smaller type so the card isn't all scrollbar */
+    "@media (max-height:560px){",
+    "  .sh-tour{padding:14px 16px 12px;} .sh-tour h3{font-size:19px; margin:2px 32px 6px 0;} .sh-tour-body{font-size:13.5px; line-height:1.45;}",
+    "  .sh-tour-eyebrow{font-size:11px;} .sh-tour-bar{margin-top:8px;} .sh-tour-x{top:6px; right:6px;}",
+    "  .sh-tour-foot, .sh-tour:not(.is-center) .sh-tour-foot{margin:8px -16px -12px; padding:6px 16px 12px; bottom:-12px;}",
+    "  .sh-tour-btn{padding:7px 13px; font-size:13.5px;}",
+    "}",
     "@media (prefers-reduced-motion: reduce){ .sh-tour, .sh-tour-spot, .sh-tour-dim, .sh-tour-bar i, .sh-tour-toast{transition:none;} }"
   ].join("\n");
 
@@ -92,11 +102,11 @@
     return false;
   }
 
-  /* ---------- the dashboard's steps (top bar, then top to bottom, then what's inside a hub) ---------- */
+  /* ---------- the dashboard's steps (top bar, then top to bottom; what's inside a hub is the hub's own tour) ---------- */
   function dashSteps(){
     var S = [];
     S.push({ title: "Welcome to Study Hubs",
-      body: "<p>This tour shows you everything on this page and inside every hub. It takes about two minutes.</p>" +
+      body: "<p>This tour shows you everything on this page. It takes about a minute, and each hub has its own tour inside it.</p>" +
         "<p>Use <b>Next</b> and <b>Back</b> (or the arrow keys). You can leave any time, and start it again from the <b>Tour</b> button at the top.</p>" });
     S.push({ el: ".live-pill", title: "Studying now",
       body: "<p>The green dot counts classmates who have a hub open right now, live.</p>" });
@@ -135,33 +145,13 @@
     S.push({ el: "#changelog", title: "What's new",
       body: "<p>Every update to the hubs, newest first. Updates go live at this same link, so bookmark this page rather than a single hub.</p>" });
 
-    var IN = "Inside every hub";
-    S.push({ eyebrow: IN, title: "Three modes",
-      body: "<p>Every hub has three modes in its top bar:</p><ul>" +
-        "<li><b>Compendium</b>: Course Home, Lecture Notes, Question Bank, Mock Exam, Weak Spots, Active Recall flashcards, Cram Sheet and Exam Hints (the professors' own words).</li>" +
-        "<li><b>Review</b>: every reference table in one searchable place, with a <b>hide answers</b> switch to quiz yourself.</li>" +
-        "<li><b>Arcade</b>: nine games built on the material, each with a class high-score board.</li></ul><p>Tabs vary a little from hub to hub.</p>" });
-    S.push({ eyebrow: IN, title: "Lecture Notes",
-      body: "<ul><li><b>As taught / Plain English</b>: the professor's wording, or a plain rewrite.</li>" +
-        "<li><b>Listen</b>: recorded narration of every lecture at both levels, with speed control. It remembers where you stopped, and a small player follows you as you scroll.</li>" +
-        "<li><b>Highlighter</b>: select any text, tap Highlight, pick a color. Highlights stay on that device.</li>" +
-        "<li><b>Mind maps</b> and drawn <b>diagrams</b>, some you can play with.</li>" +
-        "<li><b>Timmy Time</b>: in some hubs, a podcast review episode for the night before the exam.</li></ul>" });
-    S.push({ eyebrow: IN, title: "Practice that adapts to you",
-      body: "<ul><li><b>Daily drill</b>: 10, 20 or 30 questions a day, picked from what's due, what you missed and what the class finds hard.</li>" +
-        "<li><b>Spaced review</b>: questions you get right come back after 1, 2, 4 and 7 days; misses come back sooner.</li>" +
-        "<li><b>Weak Spots</b>: your misses and what's due, in one place.</li>" +
-        "<li><b>Mock Exam</b>: timed and exam-length, with a results card that shows your score by lecture.</li></ul>" +
-        "<p>After every answer you see what percent of the class got it right, and why each choice is right or wrong.</p>" });
-    S.push({ eyebrow: IN, title: "The launcher",
-      body: "<p>On a computer it's the button in the bottom-right corner of a hub; on a phone it's the bottom bar (Search, Drill, Stats, More).</p><ul>" +
-        "<li><b>Search</b> finds any word in the notes, review tables, hints and questions, and jumps right to it.</li>" +
-        "<li><b>Stats</b>: your mastery, the trophy case, and <b>Link my devices</b>, so your phone and laptop count as one you.</li>" +
-        "<li><b>Report</b> a mistake on any question, or <b>Suggest</b> an idea. Replies come to your Inbox.</li></ul>" });
-    S.push({ eyebrow: IN, title: "Trophies and surprises",
+    S.push({ title: "Trophies and surprises",
       body: "<p>There are 24 trophies to earn, plus 9 in every hub, and many of them are secret. The hubs also hide easter eggs, a daily Golden Probe question, and bosses the whole class fights together when five or more of you are online.</p>" +
-        "<p>Timmy's <b>Secret tip</b> gives hints. Rather study in peace? <b>Settings → Surprises</b> turns them off.</p>" +
-        "<p>Each hub also has its own tour, with a spotlight on the real buttons, the first time you open one.</p>" });
+        "<p>Timmy's <b>Secret tip</b> gives hints. Rather study in peace? <b>Settings → Surprises</b> turns them off.</p>" });
+    /* what's inside a hub is the hub's own tour, on the real buttons; this one only points there */
+    S.push({ el: function(){ var b = $("#hubs a.btn-primary[data-hub]"); return visible(b) ? b : $("#hubs"); }, title: "Inside a hub",
+      body: "<p>The first time you open a hub, it offers its own tour: a spotlight on the real buttons for the notes and narration, the question bank, mock exam, daily drill, Review, Arcade and search.</p>" +
+        "<p>Take it again any time from the hub's <b>Tour</b> button, or <b>Take the tour</b> under <b>More</b> on a phone.</p>" });
     S.push({ el: "#tourBtn", title: "That's the tour", last: true, about: "about/",
       body: "<p>Start it again any time from this <b>Tour</b> button. For every detail, open <b>About</b>.</p><p>Happy studying!</p>" });
     return S;
@@ -302,15 +292,19 @@
     });
     var back = document.activeElement;
     var block = document.createElement("div"); block.className = "sh-tour-block is-dim";
-    var dims = [0, 1, 2, 3].map(function(){ var d = document.createElement("div"); d.className = "sh-tour-dim"; d.hidden = true; document.body.appendChild(d); return d; });
+    var dim = document.createElement("div"); dim.className = "sh-tour-dim"; dim.hidden = true; document.body.appendChild(dim);
     var spot = document.createElement("div"); spot.className = "sh-tour-spot"; spot.hidden = true;
     var card = document.createElement("section"); card.className = "sh-tour";
     card.setAttribute("role", "dialog"); card.setAttribute("aria-modal", "true"); card.setAttribute("aria-labelledby", "shTourH");
     document.body.appendChild(block); document.body.appendChild(spot); document.body.appendChild(card);
-    T = { list: list, i: 0, block: block, dims: dims, spot: spot, card: card, back: back, raf: 0, seq: 0 };
+    T = { list: list, i: 0, block: block, dim: dim, spot: spot, card: card, back: back, raf: 0, seq: 0 };
     track("start");
 
-    function onMove(){ if (T && !T.raf) T.raf = requestAnimationFrame(function(){ if (T) { T.raf = 0; place(); } }); }
+    function onMove(){
+      var h = document.documentElement; h.classList.add("sh-tour-follow");
+      clearTimeout(T && T.follow); if (T) T.follow = setTimeout(function(){ h.classList.remove("sh-tour-follow"); }, 160);
+      if (T && !T.raf) T.raf = requestAnimationFrame(function(){ if (T) { T.raf = 0; place(); } });
+    }
     T.onMove = onMove;
     window.addEventListener("scroll", onMove, { passive: true });
     window.addEventListener("resize", onMove);
@@ -385,8 +379,8 @@
     var s = T.list[T.i], card = T.card, spot = T.spot;
     var vw = window.innerWidth, vh = window.innerHeight;
     if (!s || !s.node || !document.contains(s.node)) {
-      spot.hidden = true; T.block.classList.add("is-dim"); T.dims.forEach(function(d){ d.hidden = true; });
-      card.classList.add("is-center"); card.classList.remove("is-top"); card.style.left = card.style.top = "";
+      spot.hidden = true; T.block.classList.add("is-dim"); T.dim.hidden = true;
+      card.classList.add("is-center"); card.classList.remove("is-top"); card.style.left = card.style.top = card.style.maxHeight = "";
       return;
     }
     T.block.classList.remove("is-dim"); card.classList.remove("is-center");
@@ -396,16 +390,27 @@
     spot.hidden = false;
     spot.style.left = left + "px"; spot.style.top = top + "px";
     spot.style.width = Math.max(0, right - left) + "px"; spot.style.height = Math.max(0, bottom - top) + "px";
-    var d = T.dims; d.forEach(function(x){ x.hidden = false; });      /* above, below, left of and right of the spotlight */
-    box(d[0], 0, 0, vw, top); box(d[1], 0, bottom, vw, vh - bottom); box(d[2], 0, top, left, bottom - top); box(d[3], right, top, vw - right, bottom - top);
-    if (vw <= 640) { card.classList.toggle("is-top", (top + bottom) / 2 > vh * .5); return; }   /* phones: docked by CSS, away from the part */
+    T.dim.hidden = false; hole(T.dim, vw, vh, left, top, right, bottom);
+    if (vw <= 640) {      /* phones: docked by CSS, away from the part; a short screen lets it use more of the height */
+      var low = (top + bottom) / 2 > vh * .5;
+      card.classList.toggle("is-top", low);
+      card.style.maxHeight = vh < 560 ? Math.round(Math.max(low ? top : vh - bottom, vh * .6) - 16) + "px" : "";
+      return;
+    }
+    card.style.maxHeight = "";
     var cw = card.offsetWidth, ch = card.offsetHeight, gap = 14, y, x = Math.min(Math.max(16, r.left), vw - cw - 16);
     if (vh - bottom >= ch + gap + 16) y = bottom + gap;
     else if (top >= ch + gap + 16) y = top - gap - ch;
     else { y = vh - ch - 16; x = r.left > vw / 2 ? 16 : vw - cw - 16; }     /* no room either side: a bottom corner, over the part */
     card.style.left = x + "px"; card.style.top = Math.max(16, y) + "px";
   }
-  function box(el, x, y, w, h){ el.style.left = x + "px"; el.style.top = y + "px"; el.style.width = Math.max(0, w) + "px"; el.style.height = Math.max(0, h) + "px"; }
+  /* the whole screen minus a rounded rectangle the shape of the spotlight ring (evenodd: the inner path is the hole) */
+  function hole(el, vw, vh, l, t, r, b){
+    var k = Math.max(0, Math.min(14, (r - l) / 2, (b - t) / 2)), f = function(n){ return Math.round(n * 10) / 10; };
+    var a = " A" + k + " " + k + " 0 0 1 ";
+    el.style.clipPath = 'path(evenodd, "M0 0H' + vw + "V" + vh + 'H0Z M' + f(l + k) + " " + f(t) + "H" + f(r - k) + a + f(r) + " " + f(t + k) +
+      "V" + f(b - k) + a + f(r - k) + " " + f(b) + "H" + f(l + k) + a + f(l) + " " + f(b - k) + "V" + f(t + k) + a + f(l + k) + " " + f(t) + 'Z")';
+  }
   function finish(how){
     if (!T) return;
     var t = T; T = null;
@@ -414,8 +419,8 @@
     window.removeEventListener("scroll", t.onMove); window.removeEventListener("resize", t.onMove);
     document.removeEventListener("keydown", onKey, true);
     if (t.raf) cancelAnimationFrame(t.raf);
-    t.block.remove(); t.spot.remove(); t.card.remove(); t.dims.forEach(function(d){ d.remove(); });
-    document.documentElement.classList.remove("sh-touring");
+    t.block.remove(); t.spot.remove(); t.card.remove(); t.dim.remove();
+    document.documentElement.classList.remove("sh-touring", "sh-tour-follow"); clearTimeout(t.follow);
     if (WHERE === "hub") {
       launcherOpen(false); restore();
       if (home) { var y = home.y; setTimeout(function(){ window.scrollTo({ top: y, behavior: "auto" }); }, 60); }
