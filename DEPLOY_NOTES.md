@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 morning (lessons audit, Claude Code)** — Occlusion midterm day. **"What cusp hits where?" Movements**
+  (`tools/figures/occlusion/game.js`, rebuilt into the hub's `od:kit` block): the round's verdict now says which step missed
+  ("Right cusp, but step 1 missed. The arrow shows ...", "Right movement, wrong cusp.", "Both missed.") instead of a bare
+  "Not quite." (report #28: a right cusp after a wrong movement lit green under "Not quite."). Scoring unchanged (both steps
+  needed). `cs-record-best`'s stem now reads "prefer over using any registration material" (was "prefer to", readable as
+  "prefer for"; 13 of 26 picked Aluwax); `cs-pro-incline`'s explanation and `QUESTION_WHY` row say why streaks on the
+  palatal cusps are still protrusive. Same ids and answer positions. No notes text changed, so no narration regenerated.
+  `LESSONS.md` refreshed.
+
 - **2026-10-21 (Timmy Time: Occlusion midterm episode, Claude Code)** — A 45-minute last-minute review for the Occlusion
   midterm, hosted by Timmy Tooth: `hubs/occlusion/audio/timmy-time.mp3` (~32 MB, -16 LUFS), script
   `tools/podcast/occlusion/script.md`, written from the hub's notes (As taught), exam hints and cram sheet, in exam-weight order

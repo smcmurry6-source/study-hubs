@@ -124,7 +124,13 @@ var CUSP_GAME = (function(){
       else h += rd.choices.opts.map(function(o){ var cls = rd.cPick ? (o === rd.choices.right ? ' ok' : o === rd.cPick ? ' bad' : '') : ''; return '<button type="button" class="qcard-choice' + cls + '" data-cg-cusp="' + escHtml(o) + '"' + (rd.cPick ? ' disabled' : '') + '>' + escHtml(o) + '</button>'; }).join('');
       h += '</div>';
       if(rd.step === 1 && rd.mvPick) h += '<div class="cg-fb ' + (rd.mvPick === rd.mv ? 'ok' : 'bad') + '"><b>' + (rd.mvPick === rd.mv ? 'Right movement.' : 'Not that one.') + '</b> Now the cusp.</div>';
-      if(rd.done) h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + (rd.ok ? 'Both right.' : 'Not quite.') + '</b> ' + moveExplain(rd) + '</div>';
+      if(rd.done){
+        /* the round needs both steps; say which one missed, so a right cusp after a wrong movement doesn't read as marked wrong (report #28) */
+        var mvOk = rd.mvPick === rd.mv, cOk = rd.cPick === rd.choices.right, mvName = function(k){ return MOVES.filter(function(m){ return m[0] === k; })[0][1]; };
+        var verdict = rd.ok ? 'Both right.' : cOk ? 'Right cusp, but step 1 missed.' : mvOk ? 'Right movement, wrong cusp.' : 'Both missed.';
+        var why = !mvOk ? ' The arrow shows <b>' + mvName(rd.mv) + '</b>, not ' + mvName(rd.mvPick) + '; a round counts when both steps are right.' : '';
+        h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + verdict + '</b>' + why + ' ' + moveExplain(rd) + '</div>';
+      }
     }
     if(rd.done || (rd.mode === 'moves' && rd.step === 1 && rd.mvPick)) h += '<div class="cg-btns"><button type="button" class="btn primary" data-cg="' + (rd.mode === 'moves' && !rd.done ? 'step2' : 'next') + '">' + (rd.mode === 'moves' && !rd.done ? 'Next: the cusp' : st.n >= R ? 'See my score' : 'Next round') + '</button></div>';
     h += '</div>';
