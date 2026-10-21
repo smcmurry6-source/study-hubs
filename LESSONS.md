@@ -112,8 +112,9 @@ envelope tracer's horizontal tab (`anima/envelope.mjs`) match the slide: CR on t
 left on your right, same A-D letters (`fig-hor-b`, `fig-hor-d` unchanged). The frontal view already matched slide 72.
 
 **Suggestion #10: "more frequent review of missed questions instead of having to wait until the very end to get reps"**
-(Occlusion practice questions). For Sam: bring a missed question back a few questions later in the bank (and the drill), not
-only at the end or in Weak Spots.
+(Occlusion practice questions). Built the same afternoon at Sam's request: a missed bank question now comes back as a fresh
+"Try it again" card 5 cards further down (`bank:retry-*` in `feature_events`). Read after the midterm whether retries get
+answered and how often the second try is right; Perio's bank could get it next.
 
 **Guided tours (live from 5 am today, first day):** the dashboard asked 25 people (19 No thanks, 4 started); a hub asked 42
 (all Occlusion; 38 No thanks, 4 started). Leaving out one visitor with no answers who started them 7 times (testing), **5 students

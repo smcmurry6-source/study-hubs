@@ -111,6 +111,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   palatal cusps against mesial inclines of the mandibular cusps" (same position; 8/20 since this morning's explanation fix),
   with its explanation and `QUESTION_WHY` row. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed
   (first read of the guided tours: 5 students took one on exam day).
+  **Missed it? Try it again** (suggestion #10, at Sam's request): in the Occlusion Question Bank a missed question comes back
+  as a fresh card `RETRY_GAP` (5) cards further down (`list.__retry` in `renderBank`, called from `finishCard`; `qCardHTML(q,
+  {retry:true})` draws a dashed card with a "Try it again" chip). Missed again, it comes back again; one pending retry per
+  question; never inside a patient's case set. Answers count as normal bank answers (ctx `bank`); tracked as
+  `bank:retry-shown` / `bank:retry-right` / `bank:retry-missed`. About page updated. Perio's bank doesn't have it yet.
 
 - **2026-10-21 (arcade skins: every hub's games look like that hub, Claude Code)** — Sam: copy the new games to Perio but not as a
   copy-paste; same ideas, visually unique, and the same for every new hub (now a standing rule in `CLAUDE.md` → "Every hub's arcade
