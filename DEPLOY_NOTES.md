@@ -102,6 +102,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (arcade skins: every hub's games look like that hub, Claude Code)** — Sam: copy the new games to Perio but not as a
+  copy-paste; same ideas, visually unique, and the same for every new hub (now a standing rule in `CLAUDE.md` → "Every hub's arcade
+  looks like that hub"). `widget/games.js` takes `C.skin` (`{ id, board, cloze, escape }`) and tags each game root
+  `data-sg-skin="<id>"`. The escape room's plain room is now a set of parts (`BASE_PARTS`: room, clock, decor, xray, poster, door,
+  monitor, chair, chart, cabinet, drawer, sink) that a skin replaces whole (`escape.scene(api)`) or in part (`escape.parts`), with
+  helpers `api.spot / hand / digit / check / keypad / padlock / slotColor / digitOf`; spot labels, flavor text, the item and its
+  reveal, the intro and the wager-round names come from the skin. **Perio** (`PERIO_SKIN` + `[data-sg-skin="perio"]` CSS): Perio Clinic
+  Escape (panoramic film, charting computer, perio chart on the bracket table, a sealed instrument cassette holding disclosing tablets
+  that stain the hidden digit onto a typodont, corkboard hint, frosted PERIO door), Pocket Showdown drawn as a perio chart whose
+  teeth bleed on a miss (Deep Pocket, Final Probe), Mind the Pocket with a UNC-15 probe as its clock. **Occlusion** (`OCCL_SKIN`): Lab
+  Escape (an occlusion lab; articulating paper from the drawer marks the digit on casts mounted on an articulator), articulating-paper
+  board strips (Centric Double, Final Contact). New lobby thumbnails per hub. **Million-Dollar Smile art redrawn** (Sam: "terrible"): a
+  quiz-show marquee above the question (chasing bulbs, `grinSVG()`: lips, gums, two rows of teeth, a gold tooth that sparkles from
+  rung 6), colored by `skin.smile`; Perio's thumbnail is a spotlit studio stage, Occlusion's a pixel-art grin. Game-over cards in the shared games scroll instead of
+  squashing the missed list. Dashboard `ARCADES` and About page names updated. **Perio Project: carry `PERIO_SKIN` and its CSS into the split sources.**
+
 - **2026-10-21 (arcade revamp: six games, shared `widget/games.js`, Claude Code)** — Sam: the games were a bust; cut nine to six and
   make them playable. Data behind the pick: the arcade was under 2% of study time in every hub; only the sort game (Sort Storm 50
   plays/9 people, Split Decision, Silane Sort), Perio's Cross-Section (12/6), Calculus Crusher (10/8) and Million-Dollar Smile got

@@ -420,6 +420,19 @@ main{padding-top:16px}
 .gm-lb{width:100%;max-width:420px;background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:12px;padding:10px 12px;text-align:left}
 .gm-lb h4{margin:0 0 6px;font-family:var(--font-arcade);font-size:.58rem;color:var(--ar-yellow)}
 
+/* ---------- Occlusion skin for the shared games (widget/games.js): articulating-paper strips, pixel type ---------- */
+[data-sg-skin="occlusion"] .sg-cat{font-family:var(--font-arcade);font-weight:400;font-size:.52rem;line-height:1.6;border-style:dashed}
+[data-sg-skin="occlusion"] .sg-tile{border-radius:4px;background:repeating-linear-gradient(90deg,#c8102e 0 6px,#d7263d 6px 12px);color:#fff;box-shadow:0 4px 0 #6d0a1a;text-shadow:0 2px 0 rgba(0,0,0,.35);font-size:.8rem}
+[data-sg-skin="occlusion"] .sg-tile:hover{background:repeating-linear-gradient(90deg,#1f4fd1 0 6px,#2b62f0 6px 12px);box-shadow:0 4px 0 #0d2266;filter:none}
+[data-sg-skin="occlusion"] .sg-tile.done.ok{background:#1f4fd1;color:#fff;opacity:.55}
+[data-sg-skin="occlusion"] .sg-tile.done.bad{background:#c8102e;color:#fff;opacity:.55}
+[data-sg-skin="occlusion"] .sg-wager h3,[data-sg-skin="occlusion"] .sg-wager-amt{font-size:1.1rem;line-height:1.6}
+[data-sg-skin="occlusion"] .sg-bar{height:10px;border-radius:2px;background:#c8102e}
+[data-sg-skin="occlusion"] .sg-bar i{background:#2b62f0;border-radius:2px}
+[data-sg-skin="occlusion"] .sg-slot{border-bottom:4px solid #2b62f0;color:#8fb0ff}
+[data-sg-skin="occlusion"] .sg-mark.ok{background:#2b62f0;color:#fff} [data-sg-skin="occlusion"] .sg-mark.bad{background:#c8102e;color:#fff}
+[data-sg-skin="occlusion"] .sg-esc-card{border-radius:6px;border-style:dashed}
+[data-sg-skin="occlusion"] .sg-esc-head h3{font-size:.72rem;line-height:1.6}
 /* ---------- fullscreen arcade ---------- */
 .gm-fs{margin-left:auto;order:3}
 .gm-bar .gm-title{margin-right:0}
@@ -6166,8 +6179,8 @@ var ARCADE = (function(){
   var panel, active = null;
   var GAMES = [
     { id:'sort',  name:'CUSP SORT', color:'var(--ar-yellow)', desc:'Cards rain down. Fling each one into the right bin before it hits the floor: centric vs non-centric cusp, MIP vs centric occlusion, working vs non-working, and more.', thumb:thumbSort },
-    { id:'board', name:'FREEWAY SHOWDOWN', color:'var(--ar-cyan)', desc:'A quiz board: one column per lecture, $100 to $500, two Daily Doubles and a Final wager. Answers count toward class stats.', thumb:thumbBoard },
-    { id:'escape', name:'OPERATORY ESCAPE', color:'var(--ar-green)', desc:'Point-and-click escape room. Questions from the bank unlock the four digits of the door code. You have six minutes.', thumb:thumbEscape },
+    { id:'board', name:'FREEWAY SHOWDOWN', color:'var(--ar-cyan)', desc:'A board of articulating-paper strips, one column per lecture. Two Centric Doubles to wager on, then the Final Contact. Answers count toward class stats.', thumb:thumbBoard },
+    { id:'escape', name:'LAB ESCAPE', color:'var(--ar-green)', desc:'Locked in the occlusion lab. Answer what locks the view box, the chart and the drawer, then mark the casts to find the door code. Six minutes.', thumb:thumbEscape },
     { id:'cloze', name:'MIND THE GAP', color:'var(--ar-pink)', desc:'Type the key term missing from a sentence in Dr. Givan\'s notes, Anki cloze style, before the clock runs out.', thumb:thumbGap },
     { id:'smile', name:'MILLION-DOLLAR SMILE', color:'var(--ar-orange)', desc:'Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven. Answers count toward class stats.', thumb:thumbSmile },
     { id:'cross', name:'CROSS-SECTION', color:'var(--ar-violet)', desc:'A fresh mini crossword every game, from the bank\'s one-word answers and the key terms in the notes.', thumb:thumbCross }
@@ -6253,11 +6266,13 @@ var ARCADE = (function(){
 
   /* thumbnails for the shared games (widget/games.js); P = this arcade's colors */
   function thumbBoardP(P){
-    var h = '', cols = 5;
-    for(var c=0;c<cols;c++){ h += '<rect x="'+(14+c*60)+'" y="12" width="54" height="26" rx="5" fill="'+P.panel+'" stroke="'+P.a2+'" stroke-width="2"/><rect x="'+(22+c*60)+'" y="22" width="38" height="5" rx="2" fill="'+P.dim+'"/>';
-      for(var r=0;r<4;r++){ var gone = (c===1&&r===0)||(c===3&&r===1)||(c===0&&r===2); h += '<rect x="'+(14+c*60)+'" y="'+(44+r*30)+'" width="54" height="25" rx="5" fill="'+(gone?P.bg:P.a4)+'"/>' + (gone ? '' : '<text x="'+(41+c*60)+'" y="'+(62+r*30)+'" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.a1+'">$'+((r+1)*100)+'</text>'); } }
+    var h = '';
+    for(var c=0;c<5;c++){ h += '<rect x="'+(14+c*60)+'" y="12" width="54" height="24" rx="3" fill="'+P.panel+'" stroke="'+P.a3+'" stroke-width="2" stroke-dasharray="4 3"/>';
+      for(var r=0;r<4;r++){ var used = (c===1&&r===0)||(c===3&&r===1)||(c===0&&r===2);
+        h += '<rect x="'+(14+c*60)+'" y="'+(44+r*30)+'" width="54" height="24" rx="2" fill="'+(used?'#2b62f0':'#c8102e')+'" opacity="'+(used?.55:1)+'"/>' + (used ? '' : '<text x="'+(41+c*60)+'" y="'+(61+r*30)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="800" fill="#fff">$'+((r+1)*100)+'</text>'); } }
     return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/>'+h+'</svg>';
   }
+
   function thumbGapP(P){
     var slots = ''; for(var i=0;i<7;i++) slots += '<rect x="'+(128+i*17)+'" y="70" width="13" height="3" fill="'+P.a1+'"/>' + (i<2 ? '<text x="'+(134+i*17)+'" y="66" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="'+P.a1+'">'+'CO'[i]+'</text>' : '');
     return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/><rect x="18" y="20" width="284" height="80" rx="10" fill="'+P.panel+'"/>' +
@@ -6266,27 +6281,36 @@ var ARCADE = (function(){
       '<rect x="238" y="114" width="64" height="38" rx="9" fill="'+P.a2+'"/><text x="270" y="138" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.bg+'">ENTER</text></svg>';
   }
   function thumbEscapeP(P){
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#cfe1e8"/><rect y="132" width="320" height="38" fill="#8fa6b2"/>' +
-      '<rect x="16" y="20" width="96" height="60" rx="5" fill="#e9eef2" stroke="#4d5d69" stroke-width="3"/><rect x="23" y="27" width="82" height="46" fill="#1e2a33"/>' + [36,56,76,96].map(function(x){ return '<path d="M'+(x-6)+' 36c4-2 8-2 12 0 2 9-1 22-3 28h-6c-2-6-5-19-3-28z" fill="#c9d6de" opacity=".8"/>'; }).join('') +
-      '<circle cx="98" cy="34" r="9" fill="'+P.a2+'" stroke="#10202e" stroke-width="2"/><text x="98" y="38" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="800" fill="#10202e">7</text>' +
-      '<path d="M128 70c-4 1-5 6-3 10l18 46c2 4 5 6 10 6h56c7 0 9-3 9-7s-3-7-9-7h-44z" fill="#2f9e98" stroke="#1f6e69" stroke-width="3"/>' +
-      '<rect x="234" y="16" width="70" height="128" fill="#8a6a4f" stroke="#5c4330" stroke-width="4"/><rect x="246" y="4" width="46" height="13" rx="3" fill="#163b2a"/><text x="269" y="14" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="900" fill="#58f29a">EXIT</text>' +
-      '<rect x="282" y="64" width="18" height="28" rx="3" fill="#2c3e50"/>' + ['#4FB6F0','#FF6FA3','#FFC93C','#3DD39B'].map(function(c,i){ return '<circle cx="'+(287+(i%2)*8)+'" cy="'+(71+Math.floor(i/2)*9)+'" r="3" fill="'+c+'"/>'; }).join('') + '</svg>';
+    var teeth = function(y, up){ var t = ''; for(var i=0;i<6;i++){ var x = 112 + i*16; t += '<path d="M'+x+' '+y+(up ? 'v-12q8 -8 16 0v12z' : 'v12q8 8 16 0v-12z')+'" fill="#fbf7ee" stroke="#5c5478" stroke-width="2"/>'; } return t; };
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#e4e0f3"/><rect y="138" width="320" height="32" fill="#9a93b8"/>' +
+      '<rect x="100" y="120" width="120" height="10" rx="3" fill="#b9b2d6" stroke="#5c5478" stroke-width="2"/><rect x="200" y="30" width="10" height="90" fill="#7a729c"/><circle cx="205" cy="30" r="10" fill="#cfc9e6" stroke="#5c5478" stroke-width="3"/>' +
+      '<rect x="106" y="22" width="104" height="14" rx="4" fill="#7a729c"/><rect x="108" y="36" width="98" height="20" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(56, false) + '<rect x="108" y="92" width="98" height="24" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(92, true) +
+      '<text x="150" y="86" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#2b62f0">7</text><rect x="30" y="62" width="50" height="34" rx="2" fill="#c8102e" transform="rotate(-12 55 79)"/><rect x="34" y="70" width="42" height="18" fill="#2b62f0" transform="rotate(-12 55 79)"/>' +
+      '<rect x="244" y="20" width="62" height="118" fill="#8a6a4f" stroke="#5c4330" stroke-width="3"/><rect x="250" y="6" width="50" height="13" rx="3" fill="#163b2a"/><text x="275" y="16" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="900" fill="#58f29a">EXIT</text>' +
+      '<rect x="284" y="66" width="16" height="26" rx="3" fill="#2c3e50"/>' + ['#4FB6F0','#FF6FA3','#FFC93C','#3DD39B'].map(function(c,i){ return '<circle cx="'+(288+(i%2)*8)+'" cy="'+(73+Math.floor(i/2)*9)+'" r="3" fill="'+c+'"/>'; }).join('') + '</svg>';
   }
+
   var THUMB_P = { bg:'#282050', panel:'#1d1838', ink:'#f4f1ff', dim:'#a79fcf', a1:'#ffd23f', a2:'#ff5c8a', a3:'#3fe0d0', a4:'#3b3270' };
   function thumbBoard(){ return thumbBoardP(THUMB_P); }
   function thumbGap(){ return thumbGapP(THUMB_P); }
   function thumbEscape(){ return thumbEscapeP(THUMB_P); }
   function svgWrap(inner){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+inner+'</svg>'; }
   function thumbSmile(){
-    var h = ''; ['$125,000','$64,000','$32,000','$16,000','$8,000'].forEach(function(t,i){ h += '<text x="300" y="'+(28+i*18)+'" text-anchor="end" font-family="monospace" font-size="11" fill="'+(i===2?'#0B1A2A':'#9CB3C8')+'">'+t+'</text>'; if(i===2) h = '<rect x="236" y="'+(16+i*18)+'" width="70" height="16" rx="6" fill="#FF8A5B"/>' + h; });
-    return svgWrap(h + '<path d="M40 70 q70 50 140 0" stroke="#fffaf0" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M40 70 q70 -6 140 0" stroke="#FF6FA3" stroke-width="8" fill="none" stroke-linecap="round"/>' + [0,1,2,3,4].map(function(i){ return '<rect x="'+(62+i*20)+'" y="'+(74 + (i===0||i===4?4:8))+'" width="16" height="14" rx="3" fill="#fffaf0"/>'; }).join('') +
-      '<rect x="20" y="120" width="98" height="30" rx="15" fill="#10263e" stroke="#5CC8FF" stroke-width="2"/><text x="69" y="140" text-anchor="middle" font-family="Bungee,Impact" font-size="11" fill="#FFD84D">50:50</text><rect x="126" y="120" width="98" height="30" rx="15" fill="#10263e" stroke="#5CC8FF" stroke-width="2"/><text x="175" y="140" text-anchor="middle" font-family="Bungee,Impact" font-size="10" fill="#FFD84D">ASK CLASS</text>');
+    var px = 6, h = '', lad = '';
+    /* a pixel grin on an 18 x 9 grid: L lips, D dark lip, M mouth, T tooth, G gold tooth, B lower tooth */
+    var rows = ['..LLLLL....LLLLL..','.LDDDDDLLLLDDDDDL.','LMTTMTTMTTMGGMTTML','LMTTMTTMTTMGGMTTML','LMMMMMMMMMMMMMMMML','.LMMBBMBBMBBMBBML.','..LLMMMMMMMMMMLL..','...LLLLLLLLLLLL...','.....LLLLLLLL.....'];
+    var col = { L:'#ff5c8a', D:'#c23a66', M:'#26102e', T:'#f4f1ff', G:'#ffd23f', B:'#d9d4ee' };
+    rows.forEach(function(r, y){ for(var x=0;x<r.length;x++){ var c = col[r[x]]; if(c) h += '<rect x="'+(40+x*px*1.5)+'" y="'+(46+y*px*1.5)+'" width="'+(px*1.5+.3)+'" height="'+(px*1.5+.3)+'" fill="'+c+'"/>'; } });
+    ['$125K','$64K','$32K','$16K','$8K'].forEach(function(t, k){ lad += (k===2?'<rect x="232" y="'+(22+k*22)+'" width="74" height="18" fill="#ff9b3f"/>':'') + '<text x="300" y="'+(36+k*22)+'" text-anchor="end" font-family="monospace" font-size="12" font-weight="700" fill="'+(k===2?'#120f24':k<2?'#ffd23f':'#a79fcf')+'">'+t+'</text>'; });
+    var bulbs = ''; for(var i=0;i<13;i++) bulbs += '<rect x="'+(18+i*15)+'" y="12" width="6" height="6" fill="'+(i%2?'#ffd23f':'#ff9b3f')+'"/><rect x="'+(18+i*15)+'" y="150" width="6" height="6" fill="'+(i%2?'#ff9b3f':'#ffd23f')+'"/>';
+    return '<svg viewBox="0 0 320 170" aria-hidden="true" shape-rendering="crispEdges"><rect width="320" height="170" fill="#282050"/><rect x="10" y="8" width="210" height="154" fill="#1d1838" stroke="#ffd23f" stroke-width="2"/>' + bulbs + h +
+      '<rect x="150" y="30" width="6" height="18" fill="#ffd23f"/><rect x="144" y="36" width="18" height="6" fill="#ffd23f"/>' + lad + '</svg>';
   }  function thumbCross(){
     var h = '', cells = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[3,0],[3,2],[3,3],[3,4],[6,2],[6,3],[5,3],[7,3],[8,3]], letters = {'1,1':'G','2,1':'R','3,1':'A','4,1':'C','5,1':'E','6,1':'Y','3,0':'P','3,2':'P','3,3':'E','3,4':'R','6,2':'O','6,3':'U'};
     cells.forEach(function(c){ var x = 50+c[0]*26, y = 20+c[1]*26; h += '<rect x="'+x+'" y="'+y+'" width="24" height="24" rx="3" fill="'+(c[1]===1?'#ffe9a8':'#f5f1e6')+'"/>'; var L = letters[c[0]+','+c[1]]; if(L) h += '<text x="'+(x+12)+'" y="'+(y+18)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="13" fill="#1a2533">'+L+'</text>'; });
     return svgWrap(h + '<text x="20" y="160" font-family="monospace" font-size="10" fill="#9CB3C8">1 ACROSS · Area-specific curette family</text>');
   }
+
   /* ---------- fullscreen ---------- */
   function fsSupported(){ return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen); }
   function toggleFullscreen(root){
@@ -6415,9 +6439,44 @@ var ARCADE = (function(){
     var isBest = finish(g, score);
     host.insertAdjacentHTML('beforeend', gameOverHTML(g, score, isBest, missed || [], extra));
   }
+  /* ---------- Occlusion's own look for the shared games (widget/games.js skin): the occlusion lab, with an articulator whose
+     casts show the hidden digit under articulating paper; a board of articulating-paper strips. Never copy another hub's skin. */
+  var OCCL_SKIN = {
+    id:'occlusion',
+    smile:{ lips:'#ff5c8a', lipsDark:'#c23a66', gum:'#ff9ab6', gold:'#ffd23f', inside:'#26102e' },
+    board:{ dd:'Centric Double', final:'Final Contact', start:'Mount the board',
+      intro:'A quiz board: one column per lecture, five strips each from <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Right marks the strip blue and adds its value; wrong marks it red and takes it away. Two strips hide a <b>Centric Double</b> where you set the wager, and the <b>Final Contact</b> lets you bet everything on one hard question.' },
+    cloze:{ start:'Close the gap',
+      intro:'Freeway space, but for words: each card is a sentence from Dr. Givan\'s notes with a <b>key term</b> taken out. Type it before the clock runs down. The marks show how many letters it has; showing one costs points. Two misses, a give-up or the clock costs a life, and you have three.' },
+    escape:{
+      room:'the occlusion lab', start:'Start the clock',
+      intro:'After hours in the occlusion lab. Your patient\'s casts are mounted, the lights are buzzing, and the door just locked behind you. The keypad wants a <b>four-digit code</b>, one digit per colored slot, hidden around the room. Tap things to look at them; most are locked behind a question from the bank.',
+      item:{ name:'Articulating paper',
+        found:'The padlock pops open. Inside: a pad of <b>articulating paper</b>. It only marks where teeth actually meet.',
+        reveal:'You slide articulating paper between the mounted casts and tap them together. The blue contact marks spell out a number:' },
+      spots:{
+        poster:{ label:'Articulator', locked:'A semi-adjustable articulator with the patient\'s casts mounted in MIP. The cusps look untouched; there is no way to see where they meet. Yet.' },
+        sink:{ text:'<p>The faucet drips. A sticky note on the mirror, in Dr. Givan\'s handwriting:</p><p class="sg-note">“Shimstock tells you if they hold. Paper tells you where. Check the casts.”</p>' },
+        drawer:{ flavor:'The top drawer is padlocked. Behind the glass you can see shimstock and a pad of something red and blue. The lock asks one question.' }
+      },
+      parts:{
+        room:function(){ return '<rect width="800" height="450" fill="#e4e0f3"/><rect y="0" width="800" height="18" fill="#d3cdea"/>' +
+          '<rect y="372" width="800" height="78" fill="#9a93b8"/><path d="M0 372H800" stroke="#7a729c" stroke-width="4"/>' +
+          [0,1,2,3,4,5,6,7].map(function(i){ return '<rect x="' + (i*100) + '" y="372" width="50" height="78" fill="#8f88ae"/>'; }).join(''); },
+        poster:function(a){ var on = a.solved.poster, c = on ? a.slotColor('poster') : '';
+          var teeth = function(y, flip){ var t = ''; for(var i=0;i<6;i++){ var x = 470 + i*14; t += '<path d="M' + x + ' ' + y + (flip ? 'v-12q7 -7 14 0v12z' : 'v12q7 7 14 0v-12z') + '" fill="#fbf7ee" stroke="#5c5478" stroke-width="2"/>'; } return t; };
+          return a.spot('poster', 446, 34, 136, 152, '<rect x="452" y="170" width="124" height="10" rx="3" fill="#b9b2d6" stroke="#5c5478" stroke-width="2.5"/>' +
+            '<rect x="470" y="150" width="90" height="20" rx="4" fill="#7a729c"/><rect x="548" y="66" width="10" height="90" fill="#7a729c"/><circle cx="553" cy="66" r="10" fill="#cfc9e6" stroke="#5c5478" stroke-width="3"/>' +
+            '<rect x="466" y="54" width="94" height="14" rx="4" fill="#7a729c"/><rect x="468" y="68" width="88" height="22" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(90, false) +
+            '<rect x="468" y="124" width="88" height="24" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(124, true) +
+            (on ? '<text x="504" y="122" text-anchor="middle" font-size="20" font-weight="900" fill="' + c + '" stroke="#1d1838" stroke-width="1">' + a.digitOf('poster') + '</text>' + a.digit('poster', 538, 46, 13) : '<path d="M466 108H560" stroke="#5c5478" stroke-width="1.5" stroke-dasharray="3 3"/>')); }
+      }
+    }
+  };
   var CTX = { A:STATE.arcade, bankPool:bankPool, termPool:termPool, notes:notesFor, scopeSelectHTML:scopeSelectHTML, currentScope:currentScope,
     shell:sharedShell, setHud:setHud, introHTML:introHTML, finish:sharedFinish, lecName:lecName, lecOrder:LECTURES.map(function(l){ return l.id; }),
     record:function(q, ok, choice){ recordAnswer(q.id, q.lec, ok, 'arcade', choice); },
+    skin:OCCL_SKIN,
     SFX:{ good:sGood, bad:sBad, tick:function(){ beep(880, .03, 'square', .025); }, over:function(){}, win:function(){ [523, 659, 784, 1047].forEach(function(f, i){ setTimeout(function(){ beep(f, .12); }, i * 90); }); } } };
 
   /* =================================================================== SORT STORM */
