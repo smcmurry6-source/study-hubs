@@ -287,10 +287,11 @@ var FIG_PLACE = {
     { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
   ],
   anatomy: [
-    { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] }
+    { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
+    { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences'], anatomy:['tmj'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
