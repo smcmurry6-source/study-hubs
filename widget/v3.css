@@ -523,8 +523,9 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
   .sh-mirror-flip{animation:none;}
   .sh-egg-chain *, .sh-egg-arch *{animation:none !important;}
 }
-/* mastery flair row in the hub's rank card */
-.sh-flair-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 4px; font-size:13px; color:var(--shw-ink2);}
+/* mastery medals in the hub's rank card: the label, then one chip per hub (they wrap) */
+.sh-flair-row{display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin:12px 0 4px; font-size:13px; color:var(--shw-ink2);}
+.sh-flair-row .sh-flair-chip{color:var(--shw-ink, inherit);}
 
 /* ================= handpiece ranks (widget/ranks.js) ================= */
 .sh-rank-art{display:block; overflow:visible;}
