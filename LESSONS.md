@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-20, evening** (twelfth refresh, full `/lessons-audit`, Tuesday 9 pm Central: the
-Occlusion midterm is tomorrow at 6:30 pm). Sam runs
+**Last refreshed: 2026-10-21, early morning** (thirteenth refresh, full `/lessons-audit`, Wednesday 4:40 am Central:
+the Occlusion midterm is tonight at 6:30 pm). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,40 +79,43 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-20, 9 pm Central; "since" = the morning fixes (#125, live 5:17 am 10-20). Live hubs: **Occlusion
-midterm (Wed Oct 21, 6:30 pm; final Nov 19)** and perio (final Nov 19). Nothing newly archived. Since the morning: 1
-report (#27, `fp-post`), 1 suggestion (#9, a thank-you), 5 late check-ins (MSK 4 3, PCD 2; folded into their retros
-below), 3 survey round 2 answers, no zero-result searches.
+Refreshed 2026-10-21, 4:40 am Central; "since" = the 10-20 evening fixes (#142, live 9:07 pm). Live hubs: **Occlusion
+midterm (today, 6:30 pm; final Nov 19)** and perio (final Nov 19). Nothing newly archived. Since last night: 1 report (#28,
+the cusp game, below), 1 late PCD 3 check-in (ready 4, "about what I expected", "Hub was easier"), 1 survey round 2
+answer (Quizlet Learn + Anki; no tutorial), no zero-result searches.
 
-**Did the morning fixes work?** (`personal_answers` before vs since 5:17 am; the whole bank went 77% -> 83% on the eve, so
-only gains well above +6 count.) Worked: `an-compound` 4/27 (15%) -> 15/32 (47%), `fig-incl-w` 48% -> 19/20 (95%),
-`fp-m2` 35% -> 14/24 (58%), `cc-cingulum` 46% -> 68%, `fig-pmand-a` 48% -> 68%, `rv-ch-spee` 43% -> 61%; `an-tml-outer`
-(not edited) 24% -> 57%. Flat: `fp-arrow` 46% -> 47%, `cc-parfitt` 36% -> 41% (Monson still picked 20 times), `fp-post`
-35% -> 44% (then reported, see below), `fp-c2-pm` 36% -> 48%. **The 11 new help-sheet items** scored 63-87% (15-24 tries
-each), and the help-sheet source rose from 60% to 67% overall; `rv-thielmann-f` (report #26) 25/28.
+**Did last night's fixes work?** Too early to say: since 9:07 pm `fp-post` 2/4, `cc-parfitt` 2/4, `ap-quad` 7/11 (64%, was
+48% before); the whole bank 82% (81% before). Read them again after the midterm.
 
-**Occlusion midterm eve** (10-20): **74 people, 113 h, the biggest day of any hub so far** (MSK 3's eve was 89 h); 27 of
-them opened it for the first time today; 11 of 74 under 5 min. 6,903 answers from 56 people at 83%. All time: 86 people,
-209 h, 11,801 answers from 64 people. Time today: bank 4,492 min (57 people), notes 1,549 (62), mock 295 (10 people,
-10 mocks at 83%, 45-question version), Daily Drill 164 (9), Review ~210 (10), Weak Spots 60, cram 10, hints 1. By lecture
-(cumulative): TMJ anatomy 77% (39.6 tries per question), Review of Basic Occlusion 80% (41.6), Concepts 81%, **Applying
-Occlusion 84% with 18.2 tries** (the last lecture is again the least practiced), Mastication 85%. Hardest now:
-`an-compound` 32% overall, `cc-parfitt`, `fp-post` and `fp-c2-pm` 40-42%, `an-tml-outer` 43%, `fp-m2` 46%, `fp-arrow` 47%,
-`rv-class3` 49% (13 picked the Class II division 2 incisors), `rv-div2` 53% (22 picked Class III edge-to-edge).
+**Occlusion, midterm eve to 4:40 am:** 10-20 ended at **81 people, 145 h** (the biggest day of any hub; MSK 3's eve was 89 h).
+After 9 pm: 41 people at 9 pm, 29 at 10, 14 at 11, 7 after midnight; 1,605 answers from 31 people at 82%; 6 mocks at 76%.
+Time since 9 pm: bank 1,187 min (38 people), notes 557 (27), mock 166 (10), Review L1 tab 143 (13). All time: 89 people,
+246 h. By lecture (cumulative): TMJ anatomy 78%, Review of Basic Occlusion 80%, Concepts 81%, Applying 83% (28 tries per
+question, up from 18 on the eve; still the least practiced), Mastication 86%. Help-sheet source 67%.
+Hardest now: `an-compound` 37% (the ginglymoarthrodial definition still picked 44 times), **three new patient cases
+from 10-20**: `cs-pro-incline` 12/30 (9 picked the non-working pairing; the red streaks sit on the palatal cusps),
+`cs-record-best` 12/26 (13 picked Aluwax; the stem "prefer to any registration material" can be read as "prefer for"),
+`cs-record-check` 11/24; then `fp-post` 41%, `cc-parfitt` 42%, `fp-c2-pm` 43%, `an-tml-outer` 44%, `fp-m2` 45%.
 
-Shipped tonight: `fp-post`'s stem now says "cusp-fossa" and spells out the anterior/posterior contacts (report #27: the
-favorite wrong answer, the MB cusp of #31, is right in a cusp-marginal ridge reading, the one the fence post looks like);
-`cc-parfitt` (Monson had no condyles, so no condylar paths) and `ap-quad` (root canal therapy is on the lecture's list)
-now answer their favorite wrong choice. Same ids and answer positions.
+Shipped this morning: **"What cusp hits where?" Movements** now says which step missed (report #28: a round counts only when
+both the movement and the cusp are right, so a right cusp after a wrong movement turned green under "Not quite." and the
+explanation named the cusp the student picked; now "Right cusp, but step 1 missed. The arrow shows ..."). 17 people have
+played Movements, 22 Contacts. `cs-record-best`'s stem now says "prefer over using any registration material";
+`cs-pro-incline`'s explanation says why the palatal-cusp streaks are still protrusive (they run front to back; a
+non-working streak crosses the cusp at an angle). Same ids and answer positions.
+
+**Diagrams, all time** (`feature_events`, Occlusion): the static L1 figures were on screen for 32-38 people; the 10 anima
+figures that went live on the eve 14-25 people seen, 5-20 moved (cusp pathways in motion 20, CR-MIP slide 17, TMJ 14).
+Timmy Time (live 9:48 pm on the eve): 2 people.
+**Next audit, after the midterm: read the check-ins (from 8 pm tonight) against the fence-post, patient-case and
+application items, and the anima figures' use.**
 
 **First day of feature tracking** (`feature_events`, Occlusion, 10-20): the Plaque Boss reached 63 of 72 visitors; drawn
 figures under the notes 20-27 people each (the static ones), the interactive cusp-pathway figure 9, TMJ opening 7 (the
 other eight anima figures went live at 8:55 pm); Full Arch 18; highlighter 5; Listen 2 (24 min); mind map 2; drill length
 30 picked once. Settings snapshot, all pages: Timmy Tooth adopted 25 of 76, nuke alerts on 70 of 73, own name 9.
-**Next audit, after the midterm: read the check-ins (from 8 pm on 10-21) against the fence-post and application items, and
-whether the late anima figures were used.**
 
-**Perio** (final Nov 19): 22 people, 7 h since 10-15 (the S5 Furcation quiz was that day); 438 answers from 6 people, 70%.
+**Perio** (final Nov 19): quiet; 1 person overnight. 22 people, 7 h from 10-15 to 10-20 (the S5 Furcation quiz was 10-15).
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
@@ -247,6 +250,10 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   and one wrong on a phone and check the result is unmistakable. The same goes for the state **before** grading: PCD report #14 (select-all `ce-reqs`)
   said it wasn't clear which options were picked (only a thin accent border); select-all options now show a tick box
   that fills when picked (PCD, MSK 4, Occlusion, 2026-10-13).
+- **A multi-step item must say which step missed.** Occlusion report #28 (exam morning): the cusp game's Movements round
+  scores only when both the movement and the cusp are right, so a right cusp after a wrong movement lit green under "Not
+  quite." and the explanation named the cusp the student had picked, which read as being marked wrong. Any item with
+  steps (two-part rounds, orderings, case sets) gets a verdict per step, and the final line says what counted.
 - **A stem must state the assumption its key depends on.** Occlusion `fp-post` ("which cusp makes the posterior contact on
   the maxillary first molar?") left out "cusp-fossa", which its siblings say; under the cusp-marginal ridge reading the fence
   post suggests, the favorite wrong answer (21 of 50) is defensible, and a student reported it as confusing (#27, exam eve).
