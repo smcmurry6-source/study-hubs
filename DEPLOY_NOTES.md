@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 6 of 10: envelope of motion tracer, Claude Code)** — In the L1 notes after the static envelope
+  figures (`FIG_PLACE` second entry on 'Horizontal view (from above)', plain 'The envelope of motion') and in Review (L1 tab, Envelope
+  of motion, after Diagrams). A pen on the lower incisor traces each border of the static `envSag`/`envHoriz`/`envFront` outlines
+  (copied, same A-F/A-D points) in the notes' order; sagittal: A→E rotation, E→F rotation + translation, F→D closing protruded, D→C,
+  C→B up the guidance, B→A the CO-MIP slide. A joint view uses `tmjModel` (now exported from `tmj.mjs` with `TMJ_D`) for the opening
+  steps. **Lesson: the anima kit sets `vector-effect:non-scaling-stroke` on every path, which measures dashes in screen pixels; a
+  path drawn with `stroke-dasharray`/`getTotalLength` needs `vector-effect:none`.** Controls use `data-entab`/`data-enstep`/`data-enplay`.
+  About page updated.
+
 - **2026-10-21 (Occlusion anima 5 of 10: determinants of cusp height, Claude Code)** — In the L1 notes after the determinants
   section (`FIG_PLACE` 'The determinants of posterior morphology', plain 'How tall can back cusps be?') and in Review (L1 tab, Guidance
   and determinants, after the vertical determinants table). Side view: condyle on the eminence, M2-PM1, canines, central incisors.

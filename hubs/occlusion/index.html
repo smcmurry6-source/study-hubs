@@ -1128,6 +1128,28 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .anima .ch-sl{flex-wrap:wrap;gap:2px 8px}
 .anima .ch-sl .ch-sl-n{flex-basis:100%;color:var(--ink);font-weight:600}
 
+.anima .en-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 18px;align-items:center}
+.anima .en-grid [hidden]{display:none}
+.anima .en-view{max-width:420px;margin:0 auto;width:100%}
+.anima .en-jbox{max-width:300px;margin:0 auto;width:100%}
+.anima .en-svg .en-t,.anima .en-joint .en-t{fill:var(--anatomy-text);font:13px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.anima .en-t.en-mut{fill:var(--anatomy-muted)}
+.anima .en-svg .en-soft{fill:var(--accent-soft);stroke:none}
+.anima .en-svg .en-track{fill:none;stroke:var(--anatomy-lo);stroke-width:1.6;stroke-dasharray:3 4}
+.anima .en-svg .en-seg{vector-effect:none;fill:none;stroke:var(--anatomy-strong);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.anima .en-svg .en-seg.is-now{stroke:var(--anatomy-lit)}
+.anima .en-svg .en-dot0{fill:var(--anatomy-strong)}
+.anima .en-svg .en-pin circle{fill:var(--surface);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .en-svg .en-pin text{fill:var(--anatomy-strong);font:600 12px var(--anatomy-mono)}
+.anima .en-svg .en-pen-halo{fill:var(--anatomy-lit);opacity:.22}
+.anima .en-svg .en-pen-dot{fill:var(--anatomy-lit)}
+.anima .en-joint .en-jbone{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
+.anima .en-joint .en-ramus{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.2}
+.anima .en-joint .en-chead{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.4}
+.anima .en-joint .en-tick{stroke:var(--anatomy-lit);stroke-width:2.4;stroke-linecap:round}
+.anima .en-joint .en-jlab{fill:var(--anatomy-strong);font-weight:600}
+.anima .en-tabs .am-btn{white-space:nowrap}
+
 /* anima:css end */
 </style>
 </head>
@@ -1536,14 +1558,15 @@ var FIG_PLACE = {
     { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand','cuspmotion'] },
     { full:'The determinants of posterior morphology', plain:'How tall can back cusps be?', figs:['cuspheight'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
-    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
+    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] },
+    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envelope'] }
   ],
   anatomy: [
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
@@ -2573,6 +2596,82 @@ var ANIMA = (function(){
   Object.keys(inputs).forEach(function (k) { inputs[k].addEventListener("input", function () { stop(); st[k] = +inputs[k].value; last = k; draw(); }); });
   function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && svg.contains(el)) infoEl.textContent = el.getAttribute("data-info"); }
   svg.addEventListener("pointerover", hot); svg.addEventListener("click", hot);
+  draw();
+} };
+  FIGS["envelope"] = { title: "Envelope of motion, traced", caption: "Step through Posselt's envelope with a pen on the lower incisor, border by border, in the sagittal, horizontal and frontal views; on the sagittal view a joint view shows the condyle rotating or sliding at each step.", lec: "review",
+    html: "<div class=\"anima\" data-anima=\"envelope\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 6</span><span class=\"iso-plate-corner\" data-corner=\"title\">Envelope tracer</span><span class=\"iso-plate-corner\" data-corner=\"hint\">step through the borders</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout></span></div><div class=\"en-grid\"><div class=\"am-svg en-view\" data-enview=\"sag\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg en-svg en-sag\" viewBox=\"0 0 360 384\" role=\"img\" aria-label=\"Sagittal envelope of motion traced at the lower incisor, points A to F\"><path class=\"en-soft\" d=\"M112 40 C92 72 98 118 118 124 C138 118 136 72 112 40Z\"/><path class=\"en-track\" d=\"M90 60 C80 100 76 140 80 170 C86 240 104 300 130 340 C220 300 270 190 235 64 L196 64 L178 74 L160 72 L112 40 L90 60\"/><path class=\"en-seg\" data-enseg=\"0\" d=\"M90 60 C80 100 76 140 80 170\"/><path class=\"en-seg\" data-enseg=\"1\" d=\"M80 170 C86 240 104 300 130 340\"/><path class=\"en-seg\" data-enseg=\"2\" d=\"M130 340 C220 300 270 190 235 64\"/><path class=\"en-seg\" data-enseg=\"3\" d=\"M235 64 L196 64 L178 74 L160 72\"/><path class=\"en-seg\" data-enseg=\"4\" d=\"M160 72 L112 40\"/><path class=\"en-seg\" data-enseg=\"5\" d=\"M112 40 L90 60\"/><text class=\"en-t\" x=\"262\" y=\"16\">Anterior →</text><text class=\"en-t en-mut\" x=\"122\" y=\"142\">chewing</text><g class=\"en-pin\"><circle cx=\"76\" cy=\"60\" r=\"9\"/><text x=\"76\" y=\"64\" text-anchor=\"middle\">A</text></g><g class=\"en-pin\"><circle cx=\"112\" cy=\"22\" r=\"9\"/><text x=\"112\" y=\"26\" text-anchor=\"middle\">B</text></g><g class=\"en-pin\"><circle cx=\"160\" cy=\"92\" r=\"9\"/><text x=\"160\" y=\"96\" text-anchor=\"middle\">C</text></g><g class=\"en-pin\"><circle cx=\"252\" cy=\"72\" r=\"9\"/><text x=\"252\" y=\"76\" text-anchor=\"middle\">D</text></g><g class=\"en-pin\"><circle cx=\"64\" cy=\"172\" r=\"9\"/><text x=\"64\" y=\"176\" text-anchor=\"middle\">E</text></g><g class=\"en-pin\"><circle cx=\"130\" cy=\"358\" r=\"9\"/><text x=\"130\" y=\"362\" text-anchor=\"middle\">F</text></g><g class=\"en-pen\"><circle r=\"9\" class=\"en-pen-halo\"/><circle r=\"4.5\" class=\"en-pen-dot\"/></g></svg></div><div class=\"am-svg en-view\" data-enview=\"hor\" hidden><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg en-svg en-hor\" viewBox=\"0 0 360 300\" role=\"img\" aria-label=\"Horizontal envelope of motion seen from above, borders A to D\"><path class=\"en-track\" d=\"M180 250 L80 190 L180 60 L280 190 L180 250\"/><path class=\"en-seg\" data-enseg=\"0\" d=\"M180 250 L80 190\"/><path class=\"en-seg\" data-enseg=\"1\" d=\"M80 190 L180 60\"/><path class=\"en-seg\" data-enseg=\"2\" d=\"M180 60 L280 190\"/><path class=\"en-seg\" data-enseg=\"3\" d=\"M280 190 L180 250\"/><circle class=\"en-dot0\" cx=\"180\" cy=\"250\" r=\"5\"/><text class=\"en-t\" x=\"192\" y=\"272\">CR</text><circle class=\"en-dot0\" cx=\"180\" cy=\"60\" r=\"4\"/><text class=\"en-t en-mut\" x=\"190\" y=\"56\">max protrusion</text><text class=\"en-t\" x=\"150\" y=\"36\">Anterior</text><text class=\"en-t\" x=\"6\" y=\"150\">Patient&#8217;s</text><text class=\"en-t\" x=\"6\" y=\"166\">LEFT</text><text class=\"en-t\" x=\"290\" y=\"150\">Patient&#8217;s</text><text class=\"en-t\" x=\"290\" y=\"166\">RIGHT</text><g class=\"en-pin\"><circle cx=\"118\" cy=\"236\" r=\"9\"/><text x=\"118\" y=\"240\" text-anchor=\"middle\">A</text></g><g class=\"en-pin\"><circle cx=\"112\" cy=\"112\" r=\"9\"/><text x=\"112\" y=\"116\" text-anchor=\"middle\">B</text></g><g class=\"en-pin\"><circle cx=\"248\" cy=\"112\" r=\"9\"/><text x=\"248\" y=\"116\" text-anchor=\"middle\">C</text></g><g class=\"en-pin\"><circle cx=\"242\" cy=\"236\" r=\"9\"/><text x=\"242\" y=\"240\" text-anchor=\"middle\">D</text></g><g class=\"en-pen\"><circle r=\"9\" class=\"en-pen-halo\"/><circle r=\"4.5\" class=\"en-pen-dot\"/></g></svg></div><div class=\"am-svg en-view\" data-enview=\"fro\" hidden><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg en-svg en-fro\" viewBox=\"0 0 360 330\" role=\"img\" aria-label=\"Frontal envelope of motion seen from the front, borders A to D\"><path class=\"en-track\" d=\"M180 40 L270 98 C268 180 230 250 180 296 C130 250 92 180 90 98 L180 40\"/><path class=\"en-seg\" data-enseg=\"0\" d=\"M180 40 L270 98\"/><path class=\"en-seg\" data-enseg=\"1\" d=\"M270 98 C268 180 230 250 180 296\"/><path class=\"en-seg\" data-enseg=\"2\" d=\"M180 296 C130 250 92 180 90 98\"/><path class=\"en-seg\" data-enseg=\"3\" d=\"M90 98 L180 40\"/><circle class=\"en-dot0\" cx=\"180\" cy=\"40\" r=\"5\"/><text class=\"en-t\" x=\"192\" y=\"34\">ICP</text><circle class=\"en-dot0\" cx=\"180\" cy=\"56\" r=\"4\"/><text class=\"en-t\" x=\"190\" y=\"66\">PP</text><text class=\"en-t en-mut\" x=\"150\" y=\"318\">max opening</text><text class=\"en-t\" x=\"8\" y=\"150\">Patient&#8217;s</text><text class=\"en-t\" x=\"8\" y=\"166\">RIGHT</text><text class=\"en-t\" x=\"288\" y=\"150\">Patient&#8217;s</text><text class=\"en-t\" x=\"288\" y=\"166\">LEFT</text><g class=\"en-pin\"><circle cx=\"238\" cy=\"58\" r=\"9\"/><text x=\"238\" y=\"62\" text-anchor=\"middle\">A</text></g><g class=\"en-pin\"><circle cx=\"268\" cy=\"206\" r=\"9\"/><text x=\"268\" y=\"210\" text-anchor=\"middle\">B</text></g><g class=\"en-pin\"><circle cx=\"122\" cy=\"58\" r=\"9\"/><text x=\"122\" y=\"62\" text-anchor=\"middle\">C</text></g><g class=\"en-pin\"><circle cx=\"92\" cy=\"206\" r=\"9\"/><text x=\"92\" y=\"210\" text-anchor=\"middle\">D</text></g><g class=\"en-pen\"><circle r=\"9\" class=\"en-pen-halo\"/><circle r=\"4.5\" class=\"en-pen-dot\"/></g></svg></div><div class=\"am-svg en-jbox\" data-enjoint><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg en-joint\" viewBox=\"0 0 260 210\" role=\"img\" aria-label=\"The right temporomandibular joint from the side, with the condyle's position at each step\"><g transform=\"translate(-226 -104)\"><path class=\"en-jbone\" d=\"M226 104L226 188L250 188L262 166L272.8 152.3L271.5 147.3L271.6 142.4L274 139.1L276.2 135.2L278.9 131.5L282.8 129.3L287.3 128.9L291.8 129.5L296 129.7L300 130.5L303.7 133L307 135.1L310.3 136.3L313.3 138L316.3 139.9L319.3 141.5L322.3 143.2L325 145.5L325.4 143.5L335.4 147.3L347.2 152.3L359.8 158.5L372.1 165.3L383.2 172.1L392.1 178.2L398 182.5L400.2 184.2L442.2 185.2L486 172L486 104Z\"/><g class=\"en-cond\" transform=\"translate(300 168)\"><path class=\"en-ramus\" d=\"M-21 6L-24 96L22 96L21 6Z\"/><circle class=\"en-chead\" r=\"22\"/><path class=\"en-tick\" d=\"M0 0V-17\"/></g></g><text class=\"en-t en-jlab\" x=\"10\" y=\"200\">seated</text><text class=\"en-t en-mut\" x=\"250\" y=\"200\" text-anchor=\"end\">right TMJ</text></svg></div></div></div></figure><div class=\"am-controls en-tabs\" role=\"group\" aria-label=\"View\"><button type=\"button\" class=\"am-btn\" data-entab=\"sag\" aria-pressed=\"true\">Sagittal</button><button type=\"button\" class=\"am-btn\" data-entab=\"hor\" aria-pressed=\"false\">Horizontal</button><button type=\"button\" class=\"am-btn\" data-entab=\"fro\" aria-pressed=\"false\">Frontal</button></div>\n<div class=\"am-controls\"><label class=\"am-slider\"><span>start</span><input type=\"range\" min=\"0\" max=\"600\" step=\"1\" value=\"0\" aria-label=\"How far along the borders the pen has traced\"><span>end</span></label></div>\n<div class=\"am-controls\"><button type=\"button\" class=\"am-btn\" data-enstep=\"-1\">Back</button><button type=\"button\" class=\"am-btn\" data-enstep=\"1\">Next step</button><button type=\"button\" class=\"am-btn\" data-enplay aria-pressed=\"false\">Play all</button></div>\n<div class=\"am-stats\" aria-live=\"polite\"><span><b>Step</b> <em data-r=\"step\">not started</em></span><span data-enjrow><b>Condyles</b> <em data-r=\"joint\">seated in CR</em></span></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>The outlines and the lettered points are the same as the static envelope figures above (the notes' Posselt envelope), traced in the order the L1 notes describe. The pen is the lower central incisor.</li>\n<li>The joint view uses the TMJ figure's model (L2) for the opening steps: rotation only to about 20-25 mm, then translation down the eminence to maximum opening. For the protruded steps the condyle is drawn forward on the eminence; its exact position and angle are schematic. The disc is left out.</li>\n<li>The borders are limits: the opening borders are set by ligaments and joint anatomy, the superior border by the teeth. We rarely function at a border except the superior one; chewing happens in the small teardrop below MICP.</li></ul></details></div>",
+    data: (function(){ var d = {"VIEWS":{"sag":{"n":6,"steps":[{"label":"A → E · pure rotation","text":"From CR (A), with the condyles seated, the jaw only rotates (the hinge movement) to about 20-25 mm at the incisors (E).","j":{"mm":25}},{"label":"E → F · rotation + translation","text":"Past 20-25 mm the condyles must translate down and forward on the eminence while still rotating, to maximum opening, about 40-60 mm (F). A → E → F is the posterior opening border.","j":{"mm":50}},{"label":"F → D · closing fully protruded","text":"Closing with the jaw held fully protruded traces the anterior opening border, up to maximum protrusion (D). The condyles stay forward on the eminence and rotate back.","j":{"t":0.92,"th":2}},{"label":"D → C · past the incisal edges","text":"Now the superior contact border, which the teeth set: back from maximum protrusion, flat past the incisal edges, to edge to edge (C).","j":{"t":0.3,"th":3}},{"label":"C → B · up the anterior guidance","text":"Up the anterior guidance into maximum intercuspation, MICP (B).","j":{"t":0.06,"th":0.5}},{"label":"B → A · the slide to CO/CR","text":"From MICP down and back to CO, the first contact with the condyles seated in CR (A). About 90% of people have this slide, around 1.25 mm; if CO equals MICP, the border runs straight from CR into the anterior guidance and this step is gone.","j":{"t":0,"th":0}}]},"hor":{"n":4,"steps":[{"label":"A · left lateral","text":"Seen from above, from CR the incisor point swings to the patient's left: the left lateral border (A). The left condyle is the working one; the right (non-working) condyle comes forward and down the eminence.","j":null},{"label":"B · left lateral with protrusion","text":"From the far left, protrude along the left lateral border with protrusion (B) to maximum protrusion at the front apex.","j":null},{"label":"C · right lateral with protrusion","text":"From maximum protrusion back to the far right: the right lateral border with protrusion (C).","j":null},{"label":"D · right lateral","text":"And back to CR along the right lateral border (D). Most chewing happens well inside these borders.","j":null}]},"fro":{"n":4,"steps":[{"label":"A · left lateral superior","text":"From the front (so the patient's left is on YOUR right), from the intercuspal position the incisor point slides out to the left along the left lateral superior border (A).","j":null},{"label":"B · left lateral opening","text":"From the far left it opens down the left lateral opening border (B) to maximum opening.","j":null},{"label":"D · right lateral opening","text":"Closing up the right lateral opening border (D) to the far right.","j":null},{"label":"C · right lateral superior","text":"And back along the right lateral superior border (C) to the intercuspal position. PP, the postural position, sits about 2-4 mm below it, held by a myotactic reflex.","j":null}]}},"C0":[300,168],"CC":[352,186],"C1":[398,216],"TH1":13,"TH2":26,"PSI":26,"R":22};
+    function tmjModel(mm, D) {
+  var th = Math.min(mm, 25) / 25 * D.TH1 + Math.max(0, mm - 25) / 25 * (D.TH2 - D.TH1);
+  var u = Math.max(0, Math.min(1, (mm - 25) / 25)), t = u * u * (3 - 2 * u);
+  var a = D.C0, b = D.CC, c = D.C1, s = 1 - t;
+  return { C: [s * s * a[0] + 2 * s * t * b[0] + t * t * c[0], s * s * a[1] + 2 * s * t * b[1] + t * t * c[1]], th: th, psi: -D.PSI * t, t: t };
+}
+    function enJoint(u, D) {
+  var st = D.VIEWS.sag.steps, i = Math.min(st.length - 1, Math.floor(u)), f = u - i;
+  function at(k) {
+    if (k < 0) return { C: D.C0, th: 0 };
+    var j = st[k].j;
+    if (j.mm != null) { var m = tmjModel(j.mm, D); return { C: m.C, th: m.th }; }
+    var t = j.t, s = 1 - t, a = D.C0, b = D.CC, c = D.C1;
+    return { C: [s * s * a[0] + 2 * s * t * b[0] + t * t * c[0], s * s * a[1] + 2 * s * t * b[1] + t * t * c[1]], th: j.th };
+  }
+  /* inside a step the opening steps follow tmjModel continuously; the others blend their end states */
+  var j = st[i].j;
+  if (j.mm != null) { var mm0 = i ? st[i - 1].j.mm || 0 : 0, m = tmjModel(mm0 + (j.mm - mm0) * f, D); return { C: m.C, th: m.th }; }
+  var p = at(i - 1), q = at(i);
+  return { C: [p.C[0] + (q.C[0] - p.C[0]) * f, p.C[1] + (q.C[1] - p.C[1]) * f], th: p.th + (q.th - p.th) * f };
+}
+    d.tmjModel = tmjModel; d.enJoint = enJoint; return d; })(),
+    live: function enLive(root, D) {
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var view = "sag", u = 0, tgt = 0, frame = 0, last = 0, playing = false;
+  var slider = root.querySelector('input[type="range"]'), sum = root.querySelector(".am-summary"), readout = root.querySelector("[data-readout]");
+  var rs = {}; Array.prototype.forEach.call(root.querySelectorAll("[data-r]"), function (e) { rs[e.getAttribute("data-r")] = e; });
+  var jbox = root.querySelector("[data-enjoint]"), jrow = root.querySelector("[data-enjrow]"), cond = root.querySelector(".en-cond"), jlab = root.querySelector(".en-jlab"), play = root.querySelector("[data-enplay]");
+  var cache = {};
+  function segs(k) {
+    if (cache[k]) return cache[k];
+    var box = root.querySelector('[data-enview="' + k + '"]'), list = Array.prototype.map.call(box.querySelectorAll("[data-enseg]"), function (p) { var L = p.getTotalLength(); p.style.strokeDasharray = L + " " + L; return { el: p, L: L }; });
+    return (cache[k] = { box: box, list: list, pen: box.querySelector(".en-pen") });
+  }
+  function n() { return D.VIEWS[view].n; }
+  function draw() {
+    var S = segs(view), N = n(), i = Math.min(N - 1, Math.floor(u)), f = u - i;
+    S.list.forEach(function (s, k) { var part = k < i ? 1 : k > i ? 0 : f; s.el.style.strokeDashoffset = String(s.L * (1 - part)); s.el.classList.toggle("is-now", k === i && u > 0 && u < N); });
+    var seg = S.list[i], pt = seg.el.getPointAtLength(seg.L * f);
+    S.pen.setAttribute("transform", "translate(" + pt.x.toFixed(1) + " " + pt.y.toFixed(1) + ")");
+    var step = D.VIEWS[view].steps[i];
+    rs.step.textContent = u <= 0 ? "not started" : u >= N ? "done: the whole envelope" : step.label;
+    if (readout) readout.textContent = u <= 0 ? "" : u >= N ? "envelope closed" : step.label.split(" · ")[0];
+    var t = u <= 0 ? ({ sag: "Press Next step (or drag) and the pen on the lower incisor traces the sagittal envelope from centric relation, one border at a time.", hor: "From above: the pen starts at CR, the back apex.", fro: "From the front: the pen starts at the intercuspal position at the top." })[view] : u >= N ? "That closes the envelope. Everything the jaw can do lies inside it; function happens in a small teardrop below MICP." : step.text;
+    if (sum.textContent !== t) sum.textContent = t;
+    jbox.hidden = view !== "sag"; jrow.hidden = view !== "sag";
+    if (view === "sag") {
+      var J = D.enJoint(Math.min(u, N - 0.0001), D);
+      cond.setAttribute("transform", "translate(" + J.C[0].toFixed(1) + " " + J.C[1].toFixed(1) + ") rotate(" + J.th.toFixed(2) + ")");
+      var moved = Math.hypot(J.C[0] - D.C0[0], J.C[1] - D.C0[1]) > 1.5, turned = J.th > 0.8;
+      var js = !moved && !turned ? "seated in CR" : !moved ? "rotating in the fossa" : u > 1 && u < 2 ? "rotating and sliding down the eminence" : "forward on the eminence";
+      rs.joint.textContent = js; jlab.textContent = { "seated in CR": "seated", "rotating in the fossa": "rotating", "rotating and sliding down the eminence": "rotating + sliding", "forward on the eminence": "forward" }[js];
+    }
+  }
+  function stop() { playing = false; cancelAnimationFrame(frame); play.setAttribute("aria-pressed", "false"); }
+  function tick(now) {
+    var dt = Math.min(64, now - (last || now)); last = now;
+    var dir = tgt > u ? 1 : -1, sp = playing ? 0.00055 : 0.0022;
+    u = dir > 0 ? Math.min(tgt, u + dt * sp) : Math.max(tgt, u - dt * sp);
+    slider.value = Math.round(u * 600 / n()); draw();
+    if (u !== tgt) frame = requestAnimationFrame(tick); else { if (playing) stop(); }
+  }
+  function go(to) { tgt = Math.max(0, Math.min(n(), to)); cancelAnimationFrame(frame); if (reduce.matches) { u = tgt; slider.value = Math.round(u * 600 / n()); draw(); return; } last = 0; frame = requestAnimationFrame(tick); }
+  root.querySelectorAll("[data-enstep]").forEach(function (b) { b.addEventListener("click", function () { stop(); var d = +b.getAttribute("data-enstep"); go(d > 0 ? Math.floor(u + 1e-6) + 1 : Math.ceil(u - 1e-6) - 1); }); });
+  play.addEventListener("click", function () { if (playing) { stop(); return; } if (u >= n()) u = 0; playing = true; play.setAttribute("aria-pressed", "true"); go(n()); });
+  slider.addEventListener("input", function () { stop(); cancelAnimationFrame(frame); u = tgt = +slider.value / 600 * n(); draw(); });
+  root.querySelectorAll("[data-entab]").forEach(function (b) { b.addEventListener("click", function () {
+    stop(); cancelAnimationFrame(frame); view = b.getAttribute("data-entab"); u = tgt = 0; slider.value = 0;
+    root.querySelectorAll("[data-enview]").forEach(function (v) { v.hidden = v.getAttribute("data-enview") !== view; });
+    root.querySelectorAll("[data-entab]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    draw(); }); });
   draw();
 } };
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -4284,6 +4383,7 @@ var REVIEW = [
     'Anterior guidance is set mostly by the lingual contours of the maxillary incisors'
   ]},
   { part:'Envelope of motion', title:'Diagrams', type:'figs', figs:['envSag','envHoriz','envFront'] },
+  { title:'Envelope of motion, traced', type:'figs', figs:['envelope'] },
   { title:'Sagittal view', type:'table', head:['Part','What it is'], rows:[
     ['Posterior opening border','Pure rotation in CR (20-25 mm), then rotation + translation to max opening'],
     ['Anterior opening border','Closing from max opening with the jaw fully protruded'],
