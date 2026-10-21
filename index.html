@@ -718,6 +718,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 <script src="widget/vendor/supabase-2.117.2.js" defer></script>
 <script src="widget/clicks.js" defer></script>
 <script src="widget/replies.js" defer></script>
+<script src="widget/linkask.js" defer></script>
 <script src="widget/ranks.js" defer></script>
 <script src="widget/pet.js" defer></script>
 <script src="widget/timmy.js" defer></script>
@@ -1361,6 +1362,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (nameSb) nameSb.rpc("set_display_name", { p_visitor:VISITOR, p_name:v }).then(function(){}, function(){});
       if (window.shTrack) window.shTrack("name:set");
       localName = v; lsSet("sh_display_name", v); greet();
+      /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
+      if (window.shLinkAsk) window.shLinkAsk.check(v);
       msg.textContent = "Saved. Hi, " + v + "!";
       setTimeout(close, 700);
     });
@@ -1778,6 +1781,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (window.shClicks) window.shClicks.start({ sb:sb, hub:"dashboard", visitor:surveyVisitor(), section:function(){ return "dashboard"; } });
     /* "your report was addressed" and notices to everyone (widget/replies.js) */
     if (window.shReplies) window.shReplies.start({ sb:sb, visitor:VISITOR || null, hub:"dashboard" });
+    /* "Is this your other device?" when your name is also used by another, unlinked device (widget/linkask.js) */
+    if (window.shLinkAsk) window.shLinkAsk.start({ sb:sb, hub:"dashboard" });
 
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
     /* after an exam, an exam check-in takes the survey's place for that visit */
