@@ -117,6 +117,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   Fletcher's vertical scale; the hub keeps Hamp as under 3 / over 3 / through. **Perio Project: carry all of this into the
   split sources.**
 
+- **2026-10-21 (boss costumes match their seasonal names, Claude Code)** — `widget/eggs.js`: the one-costume-per-holiday
+  block in `bossIcon` is replaced by `COSTUMES[holiday][boss]`, 64 outfits that match each seasonal name (Strep
+  Mummy-tans in bandages instead of the vampire cape, Tartar-stein's bolts, the Gingi-witch's hat, Tartar the Snowman,
+  the Red-Nosed Complex's antlers, etc.). `FIT` places hats, glasses and noses per body. `bossIcon(k, hid)` takes an
+  optional holiday id for previewing. About page Part 8 note updated.
 - **2026-10-21 (perio S6: Periodontal Regeneration slide deck, Claude Code)** — Dr. Geurs' slide deck (Drive:
   Periodontology/hubs, `Periodontal_regeneration_Dr. Geurs.pdf`; downloaded through the Drive connector and its
   pages rendered with `pdftoppm`, so the image-only slides were read too) is in `hubs/perio` ahead of the lecture. Session 6 goes from `upcoming` to
