@@ -293,12 +293,15 @@ var FIG_PLACE = {
   applying: [
     { full:'Schemes and guidance', plain:'Guidance and MIP', figs:['guidance'] }
   ],
+  function: [
+    { full:'Part 2: swallowing', plain:'Swallowing', figs:['swallow'] }
+  ],
   anatomy: [
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance'], function:['swallow'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

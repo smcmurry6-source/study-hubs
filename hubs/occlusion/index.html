@@ -1186,6 +1186,26 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .anima .gu-svg .gu-gap{stroke:var(--anatomy-lit);stroke-width:2;stroke-linecap:round}
 .anima .gu-svg .gu-arc{fill:none;stroke:var(--anatomy-lit);stroke-width:1.6}
 
+.anima .sw-box{max-width:460px;margin:0 auto}
+.anima .sw-svg .sw-t{fill:var(--anatomy-text);font:14px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.anima .sw-svg .sw-mut{fill:var(--anatomy-muted)}
+.anima .sw-svg .sw-key{fill:var(--anatomy-lit);font-weight:600;font-size:12px}
+.anima .sw-svg .sw-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
+.anima .sw-svg .sw-dot{fill:var(--anatomy-dot)}
+.anima .sw-svg .sw-skin{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:1}
+.anima .sw-svg .sw-air{fill:var(--tm-air);opacity:.16;stroke:none}
+.anima .sw-svg .sw-bone{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1}
+.anima .sw-svg .sw-tooth{fill:#f6efe0;stroke:#8b7653;stroke-width:1}
+.anima .sw-svg .sw-soft{fill:var(--tm-retro);stroke:var(--tm-muscle-fib);stroke-width:1}
+.anima .sw-svg .sw-lip{fill:var(--tm-retro);stroke:var(--tm-muscle-fib);stroke-width:1}
+.anima .sw-svg .sw-tongue{fill:var(--tm-muscle);stroke:var(--tm-muscle-fib);stroke-width:1.2}
+.anima .sw-svg .sw-cart{fill:var(--tm-cart);stroke:var(--anatomy-hi);stroke-width:1}
+.anima .sw-svg .sw-ring{stroke:var(--tm-cart);stroke-width:3;stroke-linecap:round}
+.anima .sw-svg .sw-eso{fill:none;stroke:var(--tm-muscle-fib);stroke-width:2}
+.anima .sw-svg .sw-et{fill:var(--tm-air);stroke:var(--anatomy-hi);stroke-width:1}
+.anima .sw-svg .sw-et.is-open{fill:var(--anatomy-lit)}
+.anima .sw-svg .sw-bolus{fill:#c9a23a;stroke:#8a6d1f;stroke-width:1.2}
+
 /* anima:css end */
 </style>
 </head>
@@ -1602,12 +1622,15 @@ var FIG_PLACE = {
   applying: [
     { full:'Schemes and guidance', plain:'Guidance and MIP', figs:['guidance'] }
   ],
+  function: [
+    { full:'Part 2: swallowing', plain:'Swallowing', figs:['swallow'] }
+  ],
   anatomy: [
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance'], function:['swallow'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
@@ -2936,6 +2959,107 @@ var ANIMA = (function(){
   root.querySelectorAll("[data-gumode]").forEach(function (b) { b.addEventListener("click", function () { mode = b.getAttribute("data-gumode"); root.querySelectorAll("[data-gumode]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); draw(); }); });
   function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && side.contains(el)) infoEl.textContent = el.getAttribute("data-info"); }
   side.addEventListener("pointerover", hot); side.addEventListener("click", hot);
+  draw();
+} };
+  FIGS["swallow"] = { title: "Swallowing, stage by stage", caption: "Step through the three stages of a swallow in a midline view of the mouth and throat, and compare the adult somatic swallow (teeth together in MIP) with the visceral (infantile) swallow, tongue forward between the arches.", lec: "function",
+    html: "<div class=\"anima\" data-anima=\"swallow\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 9</span><span class=\"iso-plate-corner\" data-corner=\"title\">Swallowing</span><span class=\"iso-plate-corner\" data-corner=\"hint\">step through the stages</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>ready</span></div><div class=\"am-svg sw-box\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg sw-svg\" viewBox=\"0 0 420 430\" role=\"img\" aria-label=\"Midline side view of the mouth and throat, patient facing right: nasal cavity, palate, tongue, pharynx, epiglottis, hyoid, trachea and esophagus, with a bolus.\"><path class=\"sw-skin\" d=\"M120 40C153.3 6 258 31 300 36C342 41 356.3 56.3 372 70C387.7 83.7 388 106.3 394 118C400 129.7 409 134.7 408 140C407 145.3 392 145.7 388 150C384 154.3 385.3 159.7 384 166C382.7 172.3 380 180.3 380 188C380 195.7 384.7 203.7 384 212C383.3 220.3 379 228.7 376 238C373 247.3 373.7 259 366 268C358.3 277 342.7 286 330 292C317.3 298 300.3 292.7 290 304C279.7 315.3 272.7 339.3 268 360C263.3 380.7 288.3 416.7 262 428C235.7 439.3 137 459.3 110 428C83 396.7 98.3 304.7 100 240C101.7 175.3 86.7 74 120 40Z\"/><rect class=\"sw-bone\" x=\"122\" y=\"110\" width=\"34\" height=\"42\" rx=\"6\"/><rect class=\"sw-bone\" x=\"122\" y=\"162\" width=\"34\" height=\"42\" rx=\"6\"/><rect class=\"sw-bone\" x=\"122\" y=\"214\" width=\"34\" height=\"42\" rx=\"6\"/><rect class=\"sw-bone\" x=\"122\" y=\"266\" width=\"34\" height=\"42\" rx=\"6\"/><rect class=\"sw-bone\" x=\"122\" y=\"318\" width=\"34\" height=\"42\" rx=\"6\"/><rect class=\"sw-bone\" x=\"122\" y=\"370\" width=\"34\" height=\"42\" rx=\"6\"/><path class=\"sw-air\" d=\"M172 84C184.7 77.3 223.7 78.7 250 80C276.3 81.3 308.3 85.3 330 92C351.7 98.7 370.3 112 380 120C389.7 128 389.7 135.3 388 140C386.3 144.7 384.7 147 370 148C355.3 149 321.7 146.3 300 146C278.3 145.7 256.7 146.3 240 146C223.3 145.7 210 143.3 200 144C190 144.7 184 140.7 180 150C176 159.3 176.7 178.3 176 200C175.3 221.7 175.7 263.3 176 280C176.3 296.7 174 295.7 178 300C182 304.3 196.3 301 200 306C203.7 311 195.7 326 200 330C204.3 334 221.3 335.7 226 330C230.7 324.3 228.7 305 228 296C227.3 287 224.3 286 222 276C219.7 266 214 249.3 214 236C214 222.7 217.7 204.3 222 196C226.3 187.7 227 188.7 240 186C253 183.3 282 180 300 180C318 180 338.7 184.3 348 186C357.3 187.7 357.3 194.3 356 190C354.7 185.7 349.3 166.3 340 160C330.7 153.7 316.7 153.3 300 152C283.3 150.7 257.3 151.3 240 152C222.7 152.7 207 161.3 196 156C185 150.7 178 132 174 120C170 108 159.3 90.7 172 84Z\"/><path class=\"sw-air\" d=\"M200 320L204 430L234 430L228 320Z\"/><path class=\"sw-ring\" d=\"M202 344L230 344\"/><path class=\"sw-ring\" d=\"M202 366L230 366\"/><path class=\"sw-ring\" d=\"M202 388L230 388\"/><path class=\"sw-ring\" d=\"M202 410L230 410\"/><path class=\"sw-eso\" d=\"M172 300L172 430M194 300L194 430\"/><path class=\"sw-bone hot\" data-info=\"Hard palate: the bolus is pressed against it in stage 1.\" d=\"M236 150C246.3 147.7 280.7 146.3 300 146C319.3 145.7 341 146.3 352 148C363 149.7 365.7 153.7 366 156C366.3 158.3 365 161.7 354 162C343 162.3 319.3 158.3 300 158C280.7 157.7 248.7 161.3 238 160C227.3 158.7 225.7 152.3 236 150Z\"/><path class=\"sw-tooth\" d=\"M352 156C353.7 151.3 362.7 150.7 366 156C369.3 161.3 372.3 181.7 372 188C371.7 194.3 366.7 194.7 364 194C361.3 193.3 358 190.3 356 184C354 177.7 350.3 160.7 352 156Z\"/><path class=\"sw-soft hot\" data-info=\"Soft palate (velum): rises in stage 2 to seal off the nasal passage.\" d=\"M236 152C232.3 151 220.7 156 214 160C207.3 164 200 170.7 196 176C192 181.3 189.7 188.7 190 192C190.3 195.3 194.3 197.7 198 196C201.7 194.3 205.7 187 212 182C218.3 177 232 171 236 166C240 161 239.7 153 236 152Z\"/><ellipse class=\"sw-et hot\" data-info=\"Eustachian tube opening: normally closed, it opens during stage 2.\" cx=\"196\" cy=\"122\" rx=\"6\" ry=\"2.5\"/><g transform=\"translate(0 0)\"><path class=\"sw-bone\" d=\"M338 214C343 208.3 351.7 203.3 356 206C360.3 208.7 363 220.7 364 230C365 239.3 364.7 254.3 362 262C359.3 269.7 353.3 274.7 348 276C342.7 277.3 333.7 276 330 270C326.3 264 324.7 249.3 326 240C327.3 230.7 333 219.7 338 214Z\"/><path class=\"sw-tooth\" d=\"M348 214C348 209 353.7 194 356 190C358.3 186 361 186.3 362 190C363 193.7 363 207 362 212C361 217 358.3 219.7 356 220C353.7 220.3 348 219 348 214Z\"/></g><path class=\"sw-lip\" d=\"M368 150C371 148 381.3 154 384 160C386.7 166 386 181 384 186C382 191 375 192.3 372 190C369 187.7 366.7 178.7 366 172C365.3 165.3 365 152 368 150Z\"/><path class=\"sw-lip\" d=\"M366 194C369 191 378.7 188.7 382 192C385.3 195.3 387.7 209 386 214C384.3 219 375.7 222.7 372 222C368.3 221.3 365 214.7 364 210C363 205.3 363 197 366 194Z\"/><path class=\"sw-tongue hot\" data-info=\"The tongue: in stage 1 it presses the bolus against the palate from front to back and thrusts it into the pharynx. In the visceral (infantile) swallow its tip pushes forward between the arches to brace the mandible.\" d=\"M340 196C336.7 191.3 331.8 189 326 186C320.2 183 312 178 305 178C298 178 291.2 185.3 284 186C276.8 186.7 269.3 182 262 182C254.7 182 246.7 183 240 186C233.3 189 227 194 222 200C217 206 212.3 214 210 222C207.7 230 207.3 240.3 208 248C208.7 255.7 207 262.3 214 268C221 273.7 235.7 280.7 250 282C264.3 283.3 286 281.3 300 276C314 270.7 326.3 260.3 334 250C341.7 239.7 345 223 346 214C347 205 343.3 200.7 340 196Z\"/><ellipse class=\"sw-bone hot\" data-info=\"Hyoid: pulled up and forward in stage 2, lifting the larynx under the epiglottis. Stabilizing the mandible is what lets the hyoid move.\" cx=\"248\" cy=\"292\" rx=\"12\" ry=\"5\"/><path class=\"sw-cart hot\" data-info=\"Epiglottis: closes over the trachea in stage 2 so the bolus goes down the esophagus.\" d=\"M214 296C211.7 292 207.7 278 206 270C204.3 262 203.3 251 204 248C204.7 245 208.3 248 210 252C211.7 256 212.3 265 214 272C215.7 279 220 290 220 294C220 298 216.3 300 214 296Z\"/><circle class=\"sw-bolus\" cx=\"286\" cy=\"176\" r=\"9\"/><path class=\"sw-lead\" d=\"M297 68L300 110\"/><circle class=\"sw-dot\" cx=\"300\" cy=\"110\" r=\"1.8\"/><text class=\"sw-t sw-mut\" x=\"300\" y=\"72\" text-anchor=\"start\">nasal cavity</text><path class=\"sw-lead\" d=\"M413 104L330 152\"/><circle class=\"sw-dot\" cx=\"330\" cy=\"152\" r=\"1.8\"/><text class=\"sw-t\" x=\"410\" y=\"108\" text-anchor=\"end\">hard palate</text><path class=\"sw-lead\" d=\"M177 56L204 179\"/><circle class=\"sw-dot\" cx=\"204\" cy=\"179\" r=\"1.8\"/><text class=\"sw-t\" x=\"180\" y=\"60\" text-anchor=\"start\">soft palate</text><path class=\"sw-lead\" d=\"M297 226L290 210\"/><circle class=\"sw-dot\" cx=\"290\" cy=\"210\" r=\"1.8\"/><text class=\"sw-t\" x=\"300\" y=\"230\" text-anchor=\"middle\">tongue</text><path class=\"sw-lead\" d=\"M123 258L205 259\"/><circle class=\"sw-dot\" cx=\"205\" cy=\"259\" r=\"1.8\"/><text class=\"sw-t\" x=\"120\" y=\"262\" text-anchor=\"end\">epiglottis</text><path class=\"sw-lead\" d=\"M297 318L256 294\"/><circle class=\"sw-dot\" cx=\"256\" cy=\"294\" r=\"1.8\"/><text class=\"sw-t\" x=\"300\" y=\"322\" text-anchor=\"start\">hyoid</text><path class=\"sw-lead\" d=\"M247 396L222 392\"/><circle class=\"sw-dot\" cx=\"222\" cy=\"392\" r=\"1.8\"/><text class=\"sw-t\" x=\"250\" y=\"400\" text-anchor=\"start\">trachea</text><path class=\"sw-lead\" d=\"M123 406L176 404\"/><circle class=\"sw-dot\" cx=\"176\" cy=\"404\" r=\"1.8\"/><text class=\"sw-t\" x=\"120\" y=\"410\" text-anchor=\"end\">esophagus</text><path class=\"sw-lead\" d=\"M123 206L178 210\"/><circle class=\"sw-dot\" cx=\"178\" cy=\"210\" r=\"1.8\"/><text class=\"sw-t\" x=\"120\" y=\"210\" text-anchor=\"end\">pharynx</text></svg></div></div></figure><div class=\"am-controls\"><label class=\"am-slider\"><span>ready</span><input type=\"range\" min=\"0\" max=\"300\" step=\"1\" value=\"0\" aria-label=\"Swallowing stage, from ready to the end of stage 3\"><span>stage 3</span></label></div>\n<div class=\"am-controls\"><button type=\"button\" class=\"am-btn\" data-swstep=\"-1\">Back</button><button type=\"button\" class=\"am-btn\" data-swstep=\"1\">Next stage</button><button type=\"button\" class=\"am-btn\" data-swplay aria-pressed=\"false\">Swallow</button></div>\n<div class=\"am-controls\" role=\"group\" aria-label=\"Swallow type\"><button type=\"button\" class=\"am-btn\" data-swmode=\"s\" aria-pressed=\"true\">Somatic (adult)</button><button type=\"button\" class=\"am-btn\" data-swmode=\"v\" aria-pressed=\"false\">Visceral (infantile)</button></div>\n<div class=\"am-stats\"><span><b>Force</b> <em>about 66.5 lb for about 683 ms, in ICP (7.8 lb more than chewing)</em></span><span><b>How often</b> <em>about 590 a day: 146 at meals, 394 awake between meals, 50 asleep</em></span><span><b>Timing</b> <em>stages 1 + 2 about 1 s; stage 3 6-7 s</em></span></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Tap or hover the tongue, the soft palate, the epiglottis, the hyoid or the Eustachian tube opening.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>The three stages, the somatic and visceral swallows, and every number are from the L3 notes (Dr. Givan). Swallowing contacts are heavy and long and happen in ICP, not a retruded position as once thought.</li>\n<li>The drawing is a schematic midline section: shapes are drawn for clarity, not traced from imaging (swallowing is studied by videofluoroscopic swallowing study, dynamic MRI and, historically, cinefluorography). The Eustachian tube opening is on the side wall of the nasopharynx, shown here as a mark.</li></ul></details></div>",
+    data: (function(){ var d = {"W":420,"H":430,"TONGUE":[[[340,196],[326,186],[305,178],[284,186],[262,182],[240,186],[222,200],[210,222],[208,248],[214,268],[250,282],[300,276],[334,250],[346,214]],[[338,190],[326,166],[305,160],[284,160],[262,162],[238,168],[214,184],[200,214],[200,244],[210,268],[250,280],[300,274],[334,248],[344,212]],[[338,190],[326,166],[305,160],[284,160],[262,162],[238,167],[212,182],[196,212],[196,242],[210,266],[250,278],[300,272],[334,246],[344,212]],[[340,196],[326,184],[305,176],[284,180],[262,180],[240,184],[222,198],[210,222],[208,248],[214,268],[250,282],[300,276],[334,250],[346,214]]],"TIPV":[[366,197],[356,186]],"VELUM":[[[236,152],[214,160],[196,176],[190,192],[198,196],[212,182],[236,166]],[[236,152],[212,150],[186,148],[178,152],[184,160],[212,162],[236,166]]],"EPI":[[[214,296],[206,270],[204,248],[210,252],[214,272],[220,294]],[[214,296],[204,290],[186,286],[188,280],[206,282],[220,292]]],"HYOID":[[248,292],[258,280]],"BOLUS":[[[286,176],[252,172],[222,188],[200,214]],[[200,214],[188,246],[182,278],[182,314]],[[182,314],[182,350],[182,390],[182,440]]],"STAGES":["Ready: the food is chewed and the bolus is on the tongue. The not-necessarily-conscious decision to swallow depends on the fineness of the food, the intensity of taste extracted and the lubrication of the bolus.","Stage 1 (voluntary): the tongue separates the food and presses the bolus lightly against the palate, tongue tip behind the incisors; lips sealed, teeth closed; a reflex wave pushes the bolus back into the pharynx.","Stage 2: pharyngeal constrictor peristalsis carries the bolus to the esophagus. The soft palate rises and seals the nasal passage, the epiglottis closes over the trachea, and the Eustachian tube openings open (normally closed). Stages 1 + 2 take about a second.","Stage 3: peristalsis carries the bolus down the esophagus to the cardiac sphincter, which relaxes into the stomach: 6-7 seconds. The upper esophagus has some voluntary control, to return food for more chewing."]};
+    function swLerp(A, B, u) { return A.map(function (p, i) { return [p[0] + (B[i][0] - p[0]) * u, p[1] + (B[i][1] - p[1]) * u]; }); }
+    function swState(s, visceral, D) {
+  var T = D.TONGUE, k = Math.min(2, Math.floor(s)), u = s - k, tongue = s >= 3 ? T[3] : swLerp(T[k], T[k + 1], u);
+  if (visceral && s < 2.5) { tongue = tongue.slice(); var w = s < 2 ? 1 : 1 - (s - 2) / 0.5; tongue[0] = [tongue[0][0] + (D.TIPV[0][0] - tongue[0][0]) * w, tongue[0][1] + (D.TIPV[0][1] - tongue[0][1]) * w]; tongue[1] = [tongue[1][0] + (D.TIPV[1][0] - tongue[1][0]) * w, tongue[1][1] + (D.TIPV[1][1] - tongue[1][1]) * w]; }
+  /* the soft palate starts rising late in stage 1, up through stage 2, back down in stage 3 */
+  var v = s < 0.6 ? 0 : s < 1.2 ? (s - 0.6) / 0.6 : s < 2.2 ? 1 : s < 2.8 ? 1 - (s - 2.2) / 0.6 : 0;
+  var e = s < 1 ? 0 : s < 1.3 ? (s - 1) / 0.3 : s < 2 ? 1 : s < 2.4 ? 1 - (s - 2) / 0.4 : 0;
+  var b = D.BOLUS, seg = Math.min(2, Math.floor(s)), bu = s - seg, path = b[seg], n = path.length - 1, i = Math.min(n - 1, Math.floor(bu * n)), f = bu * n - i;
+  var bolus = s >= 3 ? null : [path[i][0] + (path[i + 1][0] - path[i][0]) * f, path[i][1] + (path[i + 1][1] - path[i][1]) * f];
+  return { tongue: tongue, velum: swLerp(D.VELUM[0], D.VELUM[1], v), epi: swLerp(D.EPI[0], D.EPI[1], e), hy: e, open: e > 0.5, bolus: bolus, jaw: visceral && s < 2.5 ? 7 : 0 };
+}
+    function swSvg(s, visceral, D) {
+  var S = swState(s, visceral, D), f = function (n) { return Math.round(n * 10) / 10; }, o = "";
+  function C(pts) { var n = pts.length, d = "M" + f(pts[0][0]) + " " + f(pts[0][1]);
+    for (var i = 0; i < n; i++) { var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + f(p2[0]) + " " + f(p2[1]); }
+    return d + "Z"; }
+  function tx(x, y, t, cls, a) { return '<text class="sw-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  function lab(t, x, y, px, py, a, k) { return '<path class="sw-lead" d="M' + f(a === "end" ? x + 3 : x - 3) + " " + f(y - 4) + "L" + f(px) + " " + f(py) + '"/><circle class="sw-dot" cx="' + f(px) + '" cy="' + f(py) + '" r="1.8"/>' + tx(x, y, t, k || "", a); }
+  var hy = S.hy, lift = [10 * hy, -12 * hy], jaw = S.jaw;
+  /* head and neck profile (soft tissue) */
+  o += '<path class="sw-skin" d="' + C([[120, 40], [300, 36], [372, 70], [394, 118], [408, 140], [388, 150], [384, 166], [380, 188 + jaw / 2], [384, 212 + jaw], [376, 238 + jaw], [366, 268 + jaw], [330, 292], [290, 304], [268, 360], [262, 428], [110, 428], [100, 240]]) + '"/>';
+  /* cervical vertebrae */
+  for (var v = 0; v < 6; v++) o += '<rect class="sw-bone" x="122" y="' + (110 + v * 52) + '" width="34" height="42" rx="6"/>';
+  /* airway: nasal cavity, pharynx and the trachea (moves up with the larynx) */
+  o += '<path class="sw-air" d="' + C([[172, 84], [250, 80], [330, 92], [380, 120], [388, 140], [370, 148], [300, 146], [240, 146], [200, 144], [180, 150], [176, 200], [176, 280], [178, 300], [200 + lift[0], 306 + lift[1]], [200 + lift[0], 330 + lift[1]], [226 + lift[0], 330 + lift[1]], [228 + lift[0], 296 + lift[1]], [222, 276], [214, 236], [222, 196], [240, 186], [300, 180], [348, 186], [356, 190], [340, 160], [300, 152], [240, 152], [196, 156], [174, 120]]) + '"/>';
+  o += '<path class="sw-air" d="M' + f(200 + lift[0]) + " " + f(320 + lift[1]) + "L" + f(204 + lift[0] * 0.4) + " 430L234 430L" + f(228 + lift[0]) + " " + f(320 + lift[1]) + 'Z"/>';
+  /* trachea rings */
+  for (var r = 0; r < 4; r++) { var ry = 344 + r * 22 + lift[1] * (1 - r / 4); o += '<path class="sw-ring" d="M' + f(202 + lift[0] * 0.6) + " " + f(ry) + "L" + f(230 + lift[0] * 0.6) + " " + f(ry) + '"/>'; }
+  /* esophagus: closed tube behind the trachea, opening around the bolus */
+  var bw = S.bolus && S.bolus[1] > 300 ? S.bolus : null;
+  o += '<path class="sw-eso" d="M172 300L172 430M194 300L194 430"/>';
+  if (bw) o += '<ellipse class="sw-air" cx="183" cy="' + f(bw[1]) + '" rx="10" ry="16"/>';
+  /* hard palate and its incisors */
+  o += '<path class="sw-bone hot" data-info="Hard palate: the bolus is pressed against it in stage 1." d="' + C([[236, 150], [300, 146], [352, 148], [366, 156], [354, 162], [300, 158], [238, 160]]) + '"/>';
+  o += '<path class="sw-tooth" d="' + C([[352, 156], [366, 156], [372, 188], [364, 194], [356, 184]]) + '"/>';
+  /* soft palate */
+  o += '<path class="sw-soft hot" data-info="Soft palate (velum): rises in stage 2 to seal off the nasal passage." d="' + C(S.velum) + '"/>';
+  /* Eustachian tube opening on the nasopharynx wall */
+  o += '<ellipse class="sw-et' + (S.open ? " is-open" : "") + ' hot" data-info="Eustachian tube opening: normally closed, it opens during stage 2." cx="196" cy="122" rx="6" ry="' + (S.open ? 6 : 2.5) + '"/>';
+  /* mandible symphysis, lower incisor, lips (moved down a little when the teeth are apart) */
+  o += '<g transform="translate(0 ' + jaw + ')"><path class="sw-bone" d="' + C([[338, 214], [356, 206], [364, 230], [362, 262], [348, 276], [330, 270], [326, 240]]) + '"/>';
+  o += '<path class="sw-tooth" d="' + C([[348, 214], [356, 190], [362, 190], [362, 212], [356, 220]]) + '"/></g>';
+  o += '<path class="sw-lip" d="' + C([[368, 150], [384, 160], [384, 186 + jaw / 2], [372, 190 + jaw / 2], [366, 172]]) + '"/><path class="sw-lip" d="' + C([[366, 194 + jaw], [382, 192 + jaw / 2], [386, 214 + jaw], [372, 222 + jaw], [364, 210 + jaw]]) + '"/>';
+  /* tongue */
+  o += '<path class="sw-tongue hot" data-info="The tongue: in stage 1 it presses the bolus against the palate from front to back and thrusts it into the pharynx. In the visceral (infantile) swallow its tip pushes forward between the arches to brace the mandible." d="' + C(S.tongue) + '"/>';
+  /* hyoid and epiglottis (with the larynx) */
+  var H0 = D.HYOID, hp = [H0[0][0] + (H0[1][0] - H0[0][0]) * hy, H0[0][1] + (H0[1][1] - H0[0][1]) * hy];
+  o += '<ellipse class="sw-bone hot" data-info="Hyoid: pulled up and forward in stage 2, lifting the larynx under the epiglottis. Stabilizing the mandible is what lets the hyoid move." cx="' + f(hp[0]) + '" cy="' + f(hp[1]) + '" rx="12" ry="5"/>';
+  o += '<path class="sw-cart hot" data-info="Epiglottis: closes over the trachea in stage 2 so the bolus goes down the esophagus." d="' + C(S.epi) + '"/>';
+  /* bolus */
+  if (S.bolus) o += '<circle class="sw-bolus" cx="' + f(S.bolus[0]) + '" cy="' + f(S.bolus[1]) + '" r="9"/>';
+  /* labels */
+  o += lab("nasal cavity", 300, 72, 300, 110, "start", "sw-mut");
+  o += lab("hard palate", 410, 108, 330, 152, "end");
+  o += lab("soft palate", 180, 60, (S.velum[2][0] + S.velum[5][0]) / 2, (S.velum[2][1] + S.velum[5][1]) / 2, "start");
+  o += lab("tongue", 300, 230, 290, 210, "middle");
+  o += lab("epiglottis", 120, 262, (S.epi[1][0] + S.epi[2][0]) / 2, (S.epi[1][1] + S.epi[2][1]) / 2, "end");
+  o += lab("hyoid", 300, 322, hp[0] + 8, hp[1] + 2, "start");
+  o += lab("trachea", 250, 400, 222, 392, "start");
+  o += lab("esophagus", 120, 410, 176, 404, "end");
+  o += lab("pharynx", 120, 210, 178, 210, "end");
+  if (S.open) o += tx(206, 127, "Eustachian tube opens", "sw-key");
+  return o;
+}
+    d.swLerp = swLerp; d.swState = swState; d.swSvg = swSvg; return d; })(),
+    live: function swLive(root, D) {
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var svg = root.querySelector(".sw-svg"), slider = root.querySelector('input[type="range"]'), play = root.querySelector("[data-swplay]");
+  var sum = root.querySelector(".am-summary"), infoEl = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
+  var s = 0, tgt = 0, vis = false, frame = 0, last = 0, playing = false;
+  function draw() {
+    svg.innerHTML = D.swSvg(s, vis, D);
+    var k = s <= 0 ? 0 : Math.min(3, Math.ceil(s - 1e-6));
+    var t = D.STAGES[k];
+    if (vis) t = (k === 1 || k === 0 ? "Visceral (infantile) swallow: instead of the teeth meeting in MIP, the tongue pushes forward between the arches to brace the mandible. Normal until the posterior teeth erupt (and when swallowing liquids); over-retained, it displaces teeth anteriorly, e.g. an anterior open bite. " : "") + t.replace("lips sealed, teeth closed", "here the teeth stay apart with the tongue between them");
+    else if (k === 0) t = "Somatic (adult) swallow: the teeth come together in MIP and the elevators hold the mandible there; stabilizing the mandible is what matters most, so the hyoid can move. " + t;
+    if (sum.textContent !== t) sum.textContent = t;
+    if (readout) readout.textContent = k === 0 ? "ready" : "stage " + k;
+  }
+  function stop() { playing = false; cancelAnimationFrame(frame); play.setAttribute("aria-pressed", "false"); }
+  function tick(now) {
+    var dt = Math.min(64, now - (last || now)); last = now;
+    /* stages 1 + 2 take about a second in life; slowed down here so they can be followed */
+    var sp = playing ? (s < 2 ? 0.0006 : 0.0009) : 0.0025;
+    s = tgt > s ? Math.min(tgt, s + dt * sp) : Math.max(tgt, s - dt * sp);
+    slider.value = Math.round(s * 100); draw();
+    if (s !== tgt) frame = requestAnimationFrame(tick); else if (playing) stop();
+  }
+  function go(to) { tgt = Math.max(0, Math.min(3, to)); cancelAnimationFrame(frame); if (reduce.matches) { s = tgt; slider.value = Math.round(s * 100); draw(); return; } last = 0; frame = requestAnimationFrame(tick); }
+  root.querySelectorAll("[data-swstep]").forEach(function (b) { b.addEventListener("click", function () { stop(); var d = +b.getAttribute("data-swstep"); go(d > 0 ? Math.floor(s + 1e-6) + 1 : Math.ceil(s - 1e-6) - 1); }); });
+  play.addEventListener("click", function () { if (playing) { stop(); return; } if (s >= 3) { s = 0; } playing = true; play.setAttribute("aria-pressed", "true"); go(3); });
+  slider.addEventListener("input", function () { stop(); cancelAnimationFrame(frame); s = tgt = +slider.value / 100; draw(); });
+  root.querySelectorAll("[data-swmode]").forEach(function (b) { b.addEventListener("click", function () { vis = b.getAttribute("data-swmode") === "v"; root.querySelectorAll("[data-swmode]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); draw(); }); });
+  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && svg.contains(el)) infoEl.textContent = el.getAttribute("data-info"); }
+  svg.addEventListener("pointerover", hot); svg.addEventListener("click", hot);
   draw();
 } };
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
@@ -4711,6 +4835,7 @@ var REVIEW = [
     ['2','Pharyngeal constrictors; soft palate seals nose; epiglottis closes; Eustachian tubes open','1 + 2 together about 1 s'],
     ['3','Esophageal peristalsis to the cardiac sphincter','6-7 s']
   ]},
+  { title:'Swallowing, stage by stage', type:'figs', figs:['swallow'] },
   { title:'Speech sounds', type:'table', head:['Sound','What happens'], rows:[
     ['F, V (fricatives)','Maxillary incisal edge on the wet-dry line of the lower lip'],
     ['S (sibilant)','Closest speaking space, about 1-2 mm'],
