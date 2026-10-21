@@ -102,6 +102,21 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (perio S6: Periodontal Regeneration slide deck, Claude Code)** — Dr. Geurs' slide deck (Drive:
+  Periodontology/hubs, `Periodontal_regeneration_Dr. Geurs.pdf`; read as text through the Drive connector, so slides that
+  are only images, such as Reynolds' defect classification, Levine's risk-assessment chart and the non-contained defect
+  slide, are named but not transcribed) is in `hubs/perio` ahead of the lecture. Session 6 goes from `upcoming` to
+  `preview` ("Slides only so far"). Both reading levels rewritten (definition vs repair, the four factors, defect
+  morphology with the slide's odds ratios, the toolbox, the open-flap-debridement table, evaluation and subtraction
+  radiography; the exam-review guide's EMD / rhPDGF-BB / β-TCP kept) and both mp3s regenerated. The angle is now
+  "≤25°" as on the slides (`q6-01`, `q6-06` choice text; same ids and positions). 40 new questions (`q6-L01`-`L26`,
+  4 two-statement `q6-S*`, 3 EXCEPT `q6-E*`, 3 select-all `q6-M*`, 3 Patient Box `q6-P*`, 1 matching `q6-X01`; bank
+  425 → 465), each with its `QUESTION_WHY` row; 3 Review sections (definition and case selection, toolbox + graft
+  sources, OFD baseline + evaluation), cram sheet, mind map, 4 arcade words and a Quadrants group. `NEXT_QUIZ` not set
+  (date unknown). No diagrams drawn; the diagram review is still to be put to Sam. **When the recording arrives: flip to
+  `taught`, add what the lecture emphasizes, exam hints, and regenerate both mp3s. Perio Project: carry all of this
+  into the split sources.**
+
 - **2026-10-21 (tour fixes and a faster streak board, Claude Code)** — `widget/tour.js`: the dim layer is one element with a
   rounded `clip-path` hole matching the spotlight ring (the four panels showed seams and square corners when zoomed in); short
   screens (under 560 px tall, e.g. a laptop at 200%+ zoom) get compact card type, and a docked card may use up to 60% of the
