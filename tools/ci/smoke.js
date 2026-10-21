@@ -23,6 +23,8 @@ async function stub(context){
     return route.abort();
   });
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  // the first-visit "Want a quick tour?" prompt dims the page and would block the clicks below; answer it up front
+  await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); } catch (e) {} });
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
