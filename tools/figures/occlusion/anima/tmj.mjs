@@ -24,7 +24,7 @@ function discT(a, D) {
   for (i = 1; i < k.length; i++) if (a <= k[i][0]) { var u = (a - k[i - 1][0]) / (k[i][0] - k[i - 1][0]); u = (1 - Math.cos(u * Math.PI)) / 2; return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * u; }
   return k[k.length - 1][1];
 }
-function tmjModel(mm, D) {
+export function tmjModel(mm, D) {
   var th = Math.min(mm, 25) / 25 * D.TH1 + Math.max(0, mm - 25) / 25 * (D.TH2 - D.TH1);
   var u = Math.max(0, Math.min(1, (mm - 25) / 25)), t = u * u * (3 - 2 * u);
   var a = D.C0, b = D.CC, c = D.C1, s = 1 - t;
@@ -91,6 +91,8 @@ const crestIdx = surf.reduce((bi, p, i) => (i > 20 && p[1] > surf[bi][1] ? i : b
 D.FOSSA = surf.slice(5, fossaEnd).map((p) => [f1(p[0]), f1(p[1])]);
 D.TUB = [f1(surf[crestIdx][0] + 26), f1(surf[crestIdx][1] - 2)];
 D.GAUGE = [52, 270, 380];
+/* the joint model, shared with the envelope tracer (envelope.mjs) */
+export { D as TMJ_D };
 const surfD = smooth(surf, false);
 const boneD = surfD + `L640 0L0 0Z`;
 // cartilage lining on the articular surface (fossa to just past the eminence crest), as a stroke under the outline

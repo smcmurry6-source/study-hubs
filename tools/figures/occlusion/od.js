@@ -285,14 +285,15 @@ var FIG_PLACE = {
     { full:'Cusp pathways:', plain:'To figure out which slopes touch', figs:['pathMax','pathMand','cuspmotion'] },
     { full:'The determinants of posterior morphology', plain:'How tall can back cusps be?', figs:['cuspheight'] },
     { full:'Sagittal view, tracing', plain:'The envelope of motion', end:true, figs:['envSag'] },
-    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] }
+    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envHoriz','envFront'] },
+    { full:'Horizontal view (from above)', plain:'The envelope of motion', end:true, figs:['envelope'] }
   ],
   anatomy: [
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope'], anatomy:['tmj','muscles'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
