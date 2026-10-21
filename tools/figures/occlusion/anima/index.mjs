@@ -3,4 +3,5 @@ import { tmj } from "./tmj.mjs";
 import { cuspmotion } from "./cuspmotion.mjs";
 import { interferences } from "./interferences.mjs";
 import { muscles } from "./muscles.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles()];
+import { cuspheight } from "./cuspheight.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight()];
