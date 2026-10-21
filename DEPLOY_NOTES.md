@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-20 evening (lessons audit, Claude Code)** — Occlusion midterm eve. `hubs/occlusion`, same ids and answer
+  positions: `fp-post`'s stem now says "Class I, cusp-fossa" and names the anterior/posterior contacts on #3 (report #27; its
+  favorite wrong answer, the MB cusp of #31, is right in a cusp-marginal ridge reading), and its explanation says why that cusp
+  tempts; `cc-parfitt` (Monson, picked 20 times: no condyles, so no condylar paths) and `ap-quad` (root canal therapy is on the
+  lecture's list) answer their favorite wrong choice; `QUESTION_WHY` rows updated to match. `question_choices` rows for
+  `fp-post` before today go with the old stem. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed.
+
 - **2026-10-21 (Occlusion anima 10 of 10: tooth vs implant under load, Claude Code)** — In the L5 notes at 'Implants' (both levels;
   a heading anchor, so after the table and the anterior/posterior paragraph) and in Review (L5 tab, before Registration). A tooth in its
   PDL beside an osseointegrated implant: Under load (push down: about 28 µm vs about 2-3 µm; sideways: 56-75 vs 10-50 µm; the PDL's

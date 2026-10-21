@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-20, early morning** (eleventh refresh, full `/lessons-audit`, Tuesday 4:40 am Central: the
-Occlusion midterm is tomorrow; PCD Exam 3 and MSK Exam 4 are archived, retrospectives below). Sam runs
+**Last refreshed: 2026-10-20, evening** (twelfth refresh, full `/lessons-audit`, Tuesday 9 pm Central: the
+Occlusion midterm is tomorrow at 6:30 pm). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,31 +79,38 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-20, 4:40 am Central; "since" = the 10-15 morning fixes (live 8:27 am 10-15). Live hubs: **Occlusion
-midterm (Wed Oct 21; final Nov 19)** and perio (final Nov 19). Archived since last time: **PCD Exam 3** (10-15) and **MSK
-Exam 4** (10-16), retrospectives below; both recaps were already on the dashboard (published 10-15 and 10-16). Since the
-last refresh: 1 report (#26), 4 suggestions (#5 resolved; #6-#8 open, all Occlusion), 17 check-ins (PCD 7, MSK 4 8, one
-late each for MSK 3 and perio), 9 answers to survey round 2, no zero-result searches.
+Refreshed 2026-10-20, 9 pm Central; "since" = the morning fixes (#125, live 5:17 am 10-20). Live hubs: **Occlusion
+midterm (Wed Oct 21, 6:30 pm; final Nov 19)** and perio (final Nov 19). Nothing newly archived. Since the morning: 1
+report (#27, `fp-post`), 1 suggestion (#9, a thank-you), 5 late check-ins (MSK 4 3, PCD 2; folded into their retros
+below), 3 survey round 2 answers, no zero-result searches.
 
-**Did the 10-15 fixes work?** (`personal_answers` before vs since; both banks rose 6 points on the eve and exam morning, so
-only gains well above +6 count.) MSK 4: `dp-terb-pk` 4/11 (36%) -> **16/17 (94%)**, `nm-sux-cv` 3/7 -> 15/23 (65%),
-`dp-clinda` 4/16 (25%) -> 15/32 (47%, still weak), `mu-dhpr` 45% -> 55% (flat once the baseline is taken out). Report #25's
-picture fix: `mu-fig-h` 3/5 -> 30/39 (77%). The two matching items split into MCQs beat the matching (20% and 27%): warts
-96% (condyloma), 70% (plana), 55% (plantar); lice products 77% (ivermectin), 52% (spinosad) and **34% for malathion (12 of
-32 picked ivermectin lotion)**. `sk-ex-func` went 10/10 -> 20/23 once its key stopped being a throwaway, as intended. PCD:
-only exam-day answers since (4-8 per item: `on-telio` 44% -> 5/8, `on-materials-list` 49% -> 3/4, `gl-system` 62% -> 2/5),
-too few to call.
+**Did the morning fixes work?** (`personal_answers` before vs since 5:17 am; the whole bank went 77% -> 83% on the eve, so
+only gains well above +6 count.) Worked: `an-compound` 4/27 (15%) -> 15/32 (47%), `fig-incl-w` 48% -> 19/20 (95%),
+`fp-m2` 35% -> 14/24 (58%), `cc-cingulum` 46% -> 68%, `fig-pmand-a` 48% -> 68%, `rv-ch-spee` 43% -> 61%; `an-tml-outer`
+(not edited) 24% -> 57%. Flat: `fp-arrow` 46% -> 47%, `cc-parfitt` 36% -> 41% (Monson still picked 20 times), `fp-post`
+35% -> 44% (then reported, see below), `fp-c2-pm` 36% -> 48%. **The 11 new help-sheet items** scored 63-87% (15-24 tries
+each), and the help-sheet source rose from 60% to 67% overall; `rv-thielmann-f` (report #26) 25/28.
 
-**Occlusion midterm** (tomorrow, 6:30 pm on Canvas: 40-45 multiple choice in one hour, per Dr. Givan's email): 60 people, 96 h; the usual curve (13 people on 10-17, 30 on 10-18, 51 and 58 h on 10-19;
-22 of the 60 first opened it yesterday). 4,945 answers from 42 people, 77%. Time: bank 3,300 min (40 people), notes 2,056
-(59), Daily Drill 244 (13), mock 49 (**4 people**, 3 mocks at 80%), hints 32, Review ~60. By lecture: TMJ anatomy 70% (16.8
-tries per question), Concepts 77% (9.2), Review of Basic Occlusion 77% (25.5), Mastication 80% (10.4), Applying Occlusion
-82% (**7.7**: the last lecture gets the least practice again). By source: **help-sheet items 60%** (21.9 tries) vs 78-79%;
-the fence-post items `fp-m2`, `fp-post`, `fp-c2-pm` sit at 35-36%. Hardest: `an-compound` 4/27 (23 picked "hinge and
-gliding", which is the ginglymoarthrodial definition), `an-tml-outer` 5/21, `rv-ch-spee` 12/28 (16 picked Taller). Shipped
-10-20 (#125): 10 explanations answer the favorite wrong choice, a folded key under the lettered diagrams in the notes and
-Review (#6), `rv-thielmann-f` (#26), 11 more help-sheet items (#8). **Next audit, after the midterm: did the fence items
-move, and do the check-ins ask for application questions (#7)?**
+**Occlusion midterm eve** (10-20): **74 people, 113 h, the biggest day of any hub so far** (MSK 3's eve was 89 h); 27 of
+them opened it for the first time today; 11 of 74 under 5 min. 6,903 answers from 56 people at 83%. All time: 86 people,
+209 h, 11,801 answers from 64 people. Time today: bank 4,492 min (57 people), notes 1,549 (62), mock 295 (10 people,
+10 mocks at 83%, 45-question version), Daily Drill 164 (9), Review ~210 (10), Weak Spots 60, cram 10, hints 1. By lecture
+(cumulative): TMJ anatomy 77% (39.6 tries per question), Review of Basic Occlusion 80% (41.6), Concepts 81%, **Applying
+Occlusion 84% with 18.2 tries** (the last lecture is again the least practiced), Mastication 85%. Hardest now:
+`an-compound` 32% overall, `cc-parfitt`, `fp-post` and `fp-c2-pm` 40-42%, `an-tml-outer` 43%, `fp-m2` 46%, `fp-arrow` 47%,
+`rv-class3` 49% (13 picked the Class II division 2 incisors), `rv-div2` 53% (22 picked Class III edge-to-edge).
+
+Shipped tonight: `fp-post`'s stem now says "cusp-fossa" and spells out the anterior/posterior contacts (report #27: the
+favorite wrong answer, the MB cusp of #31, is right in a cusp-marginal ridge reading, the one the fence post looks like);
+`cc-parfitt` (Monson had no condyles, so no condylar paths) and `ap-quad` (root canal therapy is on the lecture's list)
+now answer their favorite wrong choice. Same ids and answer positions.
+
+**First day of feature tracking** (`feature_events`, Occlusion, 10-20): the Plaque Boss reached 63 of 72 visitors; drawn
+figures under the notes 20-27 people each (the static ones), the interactive cusp-pathway figure 9, TMJ opening 7 (the
+other eight anima figures went live at 8:55 pm); Full Arch 18; highlighter 5; Listen 2 (24 min); mind map 2; drill length
+30 picked once. Settings snapshot, all pages: Timmy Tooth adopted 25 of 76, nuke alerts on 70 of 73, own name 9.
+**Next audit, after the midterm: read the check-ins (from 8 pm on 10-21) against the fence-post and application items, and
+whether the late anima figures were used.**
 
 **Perio** (final Nov 19): 22 people, 7 h since 10-15 (the S5 Furcation quiz was that day); 438 answers from 6 people, 70%.
 
@@ -240,6 +247,10 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   and one wrong on a phone and check the result is unmistakable. The same goes for the state **before** grading: PCD report #14 (select-all `ce-reqs`)
   said it wasn't clear which options were picked (only a thin accent border); select-all options now show a tick box
   that fills when picked (PCD, MSK 4, Occlusion, 2026-10-13).
+- **A stem must state the assumption its key depends on.** Occlusion `fp-post` ("which cusp makes the posterior contact on
+  the maxillary first molar?") left out "cusp-fossa", which its siblings say; under the cusp-marginal ridge reading the fence
+  post suggests, the favorite wrong answer (21 of 50) is defensible, and a student reported it as confusing (#27, exam eve).
+  When a question's answer rests on a convention (Class I, cusp-fossa, the patient's right side), put it in the stem.
 - **A short stem with a coined term reads as unclear.** PCD `co-afterimage` ("The color opponent afterimage is:") was
   reported as hard to understand (#13); stems now say where the idea comes up ("During shade matching, what is...").
 - **Answer choices must not give the answer away.** Perio `q2-02` labelled the wrong choices "(… monofilament)"
@@ -379,8 +390,8 @@ By type: MCQ 85%, matching 85% (8 items of 4 pairs), select-all 83% (5 options, 
 Hardest: `on-telio` 48% (bis-acryl 13), `bo-zprime` 50% (eugenol 14), `ce-irm` 51% (RMGI 13), `on-materials-list` 51%,
 `bo-adh-thick` 52%, `co-uranium` 53% (cobalt 10), `ce-sbu` 57%.
 
-Check-ins, **n = 7**: About right 4, Hub was harder 2, Exam asked different things 1; went better 3, as expected 3, worse 1;
-readiness 3-5 (average 3.9). Against use: the one "different things" had the most answers of anyone (933 at 91%, 377 min)
+Check-ins, **n = 7** (two more on 10-20, n = 9: one About right, 325 min at 83%, went better; one Hub was easier, 384 min at 88%, as expected): About
+right 4, Hub was harder 2, Exam asked different things 1; went better 3, as expected 3, worse 1; readiness 3-5 (average 3.9). Against use: the one "different things" had the most answers of anyone (933 at 91%, 377 min)
 and asked for application ("what cement for what type of crown"); both "Hub was harder" were 91-93% accurate (64-245 min);
 the one "worse than expected" studied the most (682 min, 86%) and still called the hub about right. One wrote that the
 exam "followed the hints a lot so the questions around those were very helpful."
