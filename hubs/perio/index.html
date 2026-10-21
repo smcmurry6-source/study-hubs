@@ -588,138 +588,11 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
 @keyframes gmpop{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-48px) scale(1.2)}}
 .gm-shake{animation:shake .3s}
 
-/* Pocket Probe */
-.pp-stage{padding:18px;display:flex;flex-direction:column;gap:14px;min-height:430px}
-.pp-timer{height:8px;background:var(--ar-bg);border-radius:5px;overflow:hidden}
-.pp-timer i{display:block;height:100%;background:linear-gradient(90deg,var(--ar-mint),var(--ar-lemon),var(--ar-pink));transform-origin:left;width:100%}
-.pp-kind{font-family:var(--font-arcade);font-size:.8rem;color:var(--c)}
-.pp-prompt{font-size:1.08rem;font-weight:700;line-height:1.4}
-.pp-card{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:center}
-.pp-card.solo{grid-template-columns:minmax(0,1fr)}
-.pp-chart{border-collapse:separate;border-spacing:4px;font-family:var(--font-mono)}
-.pp-chart th{font-size:.7rem;color:var(--ar-dim);font-weight:500;text-align:left;padding-right:8px;text-transform:uppercase;letter-spacing:.05em}
-.pp-chart td{width:52px;height:40px;text-align:center;background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:9px;font-size:1.15rem;font-weight:600}
-.pp-chart td.hl{border-color:var(--ar-lemon);color:var(--ar-lemon)}
-.pp-chart td.q{border-style:dashed;border-color:var(--ar-lemon);color:var(--ar-lemon)}
-.pp-facts{display:flex;flex-direction:column;gap:6px;font-size:.95rem}
-.pp-facts div{background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:10px;padding:7px 11px}
-.pp-facts b{color:var(--ar-lemon)}
-.pp-answers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.pp-ans{appearance:none;cursor:pointer;background:var(--ar-panel-2);border:3px solid var(--ar-line);color:var(--ar-ink);border-radius:14px;padding:14px 6px;font-family:var(--font-arcade);font-size:1.15rem;box-shadow:0 5px 0 #06101b}
-.pp-ans:hover{border-color:var(--c)}
-.pp-ans.right{background:var(--ar-mint);color:var(--ar-bg);border-color:var(--ar-mint)}
-.pp-ans.wrong{background:var(--ar-pink);color:var(--ar-bg);border-color:var(--ar-pink)}
-.pp-ans kbd{display:block;font-family:var(--font-mono);font-size:.62rem;opacity:.6;margin-top:3px}
-
-/* Quadrants */
-.qd-stage{padding:16px;display:flex;flex-direction:column;gap:12px}
-.qd-solved{display:flex;flex-direction:column;gap:8px}
-.qd-band{border-radius:12px;padding:10px 12px;text-align:center;color:var(--ar-bg);animation:drop .3s ease-out}
-.qd-band b{display:block;font-family:var(--font-arcade);font-weight:400;font-size:.95rem}
-.qd-band span{font-size:.84rem;font-weight:600}
-@keyframes drop{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}
-.qd-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.qd-tile{appearance:none;cursor:pointer;min-height:70px;background:var(--ar-panel-2);border:3px solid var(--ar-line);color:var(--ar-ink);border-radius:12px;padding:8px 6px;font-weight:700;font-size:.9rem;line-height:1.2;box-shadow:0 4px 0 #06101b;overflow-wrap:anywhere}
-.qd-tile:hover{border-color:var(--c)}
-.qd-tile[aria-pressed="true"]{background:var(--c);color:var(--ar-bg);border-color:var(--c);transform:translateY(2px);box-shadow:0 2px 0 #06101b}
-.qd-dots{display:flex;gap:6px;align-items:center;justify-content:center;font-size:.85rem;color:var(--ar-dim)}
-.qd-dots i{width:12px;height:12px;border-radius:50%;background:var(--ar-pink)}
-.qd-dots i.used{background:var(--ar-line)}
-
-/* Perdle */
-.pd-stage{padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.pd-clue{background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:12px;padding:9px 14px;font-weight:600;max-width:560px;text-align:center}
-.pd-board{display:grid;gap:6px}
-.pd-row{display:grid;gap:6px}
-.pd-cell{width:48px;height:48px;border:3px solid var(--ar-line);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-arcade);font-size:1.3rem;color:var(--ar-ink);background:var(--ar-bg)}
-.pd-cell.filled{border-color:var(--ar-dim)}
-.pd-cell.g{background:var(--ar-mint);border-color:var(--ar-mint);color:var(--ar-bg)}
-.pd-cell.y{background:var(--ar-lemon);border-color:var(--ar-lemon);color:var(--ar-bg)}
-.pd-cell.x{background:#2c3f53;border-color:#2c3f53;color:var(--ar-dim)}
-.pd-kb{display:flex;flex-direction:column;gap:6px;width:100%;max-width:560px}
-.pd-kb div{display:flex;gap:5px;justify-content:center}
-.pd-key{appearance:none;cursor:pointer;flex:1;max-width:44px;height:48px;border:0;border-radius:8px;background:var(--ar-panel-2);color:var(--ar-ink);font-family:var(--font-arcade);font-size:.85rem;box-shadow:0 3px 0 #06101b}
-.pd-key.wide{max-width:74px;font-size:.62rem}
-.pd-key.g{background:var(--ar-mint);color:var(--ar-bg)} .pd-key.y{background:var(--ar-lemon);color:var(--ar-bg)} .pd-key.x{background:#1a2837;color:#5a7288}
-
-/* Root Planer */
-.rp-stage{height:470px}
-.rp-canvas-wrap{position:absolute;inset:0}
-.rp-dep{position:absolute;left:0;top:0;max-width:min(260px,44%);background:#e8dca9;color:#2a2110;border-radius:16px 20px 14px 22px;padding:9px 12px;font-weight:700;font-size:.86rem;line-height:1.3;box-shadow:0 5px 0 #b6a56a, 0 8px 18px rgba(0,0,0,.35);text-align:center;will-change:transform}
-.rp-dep small{display:block;font-family:var(--font-mono);font-size:.66rem;font-weight:500;color:#6d5f33;margin-top:3px;letter-spacing:.05em}
-.rp-dep.hot{background:#f2c79a;box-shadow:0 5px 0 #c98f55, 0 8px 18px rgba(0,0,0,.35)}
-.rp-dep.gone{transition:transform .25s, opacity .25s;opacity:0}
-.rp-gum{position:absolute;left:0;right:0;bottom:0;height:54px;background:linear-gradient(180deg,#ff8fb3,#e0668f);border-top:4px solid #ffb3cb}
-.rp-input{display:flex;gap:8px}
-.rp-input input{flex:1;min-width:0;background:var(--ar-bg);border:3px solid var(--ar-line);color:var(--ar-ink);border-radius:12px;padding:10px 14px;font-family:var(--font-mono);font-size:1.05rem;text-transform:uppercase;letter-spacing:.08em}
-.rp-input input:focus{outline:none;border-color:var(--c)}
-
-/* Million-Dollar Smile */
-.ms-stage{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:16px;padding:16px}
-.ms-main{display:flex;flex-direction:column;gap:12px;min-width:0}
-.ms-q{font-size:1.1rem;font-weight:700;line-height:1.4;background:linear-gradient(180deg,#183a5c,#10263e);border:3px solid var(--ar-sky);border-radius:40px;padding:16px 26px;text-align:center}
-.ms-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ms-opt{appearance:none;cursor:pointer;text-align:left;background:linear-gradient(180deg,#183a5c,#10263e);border:3px solid var(--ar-line);color:var(--ar-ink);border-radius:30px;padding:11px 18px;font-size:.95rem;line-height:1.3;display:flex;gap:10px;align-items:center}
-.ms-opt b{font-family:var(--font-arcade);color:var(--ar-lemon);font-weight:400}
-.ms-opt:hover{border-color:var(--ar-lemon)}
-.ms-opt.locked{background:var(--ar-coral);border-color:var(--ar-coral);color:var(--ar-bg)} .ms-opt.locked b{color:var(--ar-bg)}
-.ms-opt.right{background:var(--ar-mint);border-color:var(--ar-mint);color:var(--ar-bg)} .ms-opt.right b{color:var(--ar-bg)}
-.ms-opt.gone{visibility:hidden}
-.ms-life{display:flex;gap:8px;flex-wrap:wrap}
-.ms-lifebtn{appearance:none;cursor:pointer;border:3px solid var(--ar-sky);background:var(--ar-bg);color:var(--ar-sky);border-radius:999px;padding:6px 12px;font-family:var(--font-arcade);font-size:.72rem}
-.ms-lifebtn[disabled]{opacity:.3;text-decoration:line-through;cursor:default}
-.ms-note{font-size:.88rem;color:var(--ar-dim);min-height:1.3em}
-.ms-note b{color:var(--ar-lemon)}
-.ms-ladder{list-style:none;margin:0;padding:10px;background:var(--ar-bg);border:2px solid var(--ar-line);border-radius:14px;display:flex;flex-direction:column-reverse;gap:2px;font-family:var(--font-mono);font-size:.82rem}
-.ms-ladder li{display:flex;justify-content:space-between;padding:3px 10px;border-radius:8px;color:var(--ar-dim)}
-.ms-ladder li.safe{color:var(--ar-ink);font-weight:600}
-.ms-ladder li.on{background:var(--ar-coral);color:var(--ar-bg)}
-.ms-ladder li.done{color:var(--ar-mint)}
-
-/* Probe Sweeper */
-.sw-stage{padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.sw-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
-.sw-grid{display:grid;gap:3px;background:var(--ar-line);padding:3px;border-radius:12px;touch-action:manipulation}
-.sw-cell{appearance:none;width:36px;height:36px;border:0;border-radius:6px;background:linear-gradient(180deg,#ff9cbe,#e7719a);cursor:pointer;font-family:var(--font-arcade);font-size:.9rem;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ar-bg);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
-.sw-cell:hover{filter:brightness(1.08)}
-.sw-cell.open{background:#f6efe2;box-shadow:none;cursor:default}
-.sw-cell.n1{color:#2e62a0} .sw-cell.n2{color:#2a7858} .sw-cell.n3{color:#b0393a} .sw-cell.n4{color:#6a4e9f} .sw-cell.n5{color:#98640f} .sw-cell.n6{color:#1c7a6d}
-.sw-cell.flag{background:linear-gradient(180deg,#ffe07a,#f2c02b)}
-.sw-cell.bleed{background:#c41e3a;color:#fff}
-.sw-cell.ctrl{background:#fff;color:#2a7858}
-.sw-cell .ic{width:18px;height:18px}
-.sw-modal{position:absolute;inset:0;background:rgba(6,14,24,.92);display:flex;align-items:center;justify-content:center;z-index:7;padding:16px}
-.sw-modal .gm-q{max-width:620px;width:100%}
-.sw-modal .gm-opt{cursor:pointer;text-align:left;color:var(--ar-ink);font:inherit;font-size:.9rem}
-
-/* Cross-Section */
-.cx-stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;padding:16px;align-items:start}
-.cx-grid{display:grid;gap:2px;background:var(--ar-bg);padding:3px;border-radius:10px;touch-action:manipulation}
-.cx-cell{position:relative;width:34px;height:34px;background:transparent;border-radius:4px}
-.cx-cell.on{background:#f5f1e6;cursor:pointer}
-.cx-cell.on.word{background:#ffe9a8}
-.cx-cell.on.cur{background:var(--ar-lemon)}
-.cx-cell.on.bad{background:#ffb0c6}
-.cx-cell.on.ok{background:#b8f0d9}
-.cx-cell span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-arcade);font-size:1rem;color:#1a2533}
-.cx-cell em{position:absolute;top:1px;left:3px;font-style:normal;font-family:var(--font-mono);font-size:.56rem;color:#56606b}
-.cx-clues{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-width:0}
-.cx-clues h4{font-family:var(--font-arcade);font-weight:400;color:var(--c);margin:0 0 6px;font-size:.9rem}
-.cx-clues ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
-.cx-clue{appearance:none;display:block;width:100%;text-align:left;cursor:pointer;background:transparent;border:0;color:var(--ar-dim);padding:5px 8px;border-radius:8px;font-size:.87rem;line-height:1.35}
-.cx-clue b{color:var(--ar-ink);font-family:var(--font-mono);margin-right:5px}
-.cx-clue.cur{background:var(--ar-panel-2);color:var(--ar-ink)}
-.cx-clue.done{text-decoration:line-through;opacity:.55}
-.cx-hidden{position:absolute;opacity:0;width:1px;height:1px;left:0;top:0;pointer-events:none}
-.cx-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.cx-cur{background:var(--ar-bg);border:2px solid var(--ar-lemon);border-radius:10px;padding:8px 12px;font-weight:600;margin-bottom:12px;font-size:.92rem}
-
 /* fullscreen */
 .gm-fs{margin-left:0}
 .ar-wrap:fullscreen,.ar-wrap:-webkit-full-screen{background:var(--ar-bg);padding:18px 24px;max-width:none;overflow:auto;color:var(--ar-ink)}
 .ar-wrap.is-fs{position:fixed;inset:0;z-index:200;background:var(--ar-bg);padding:18px 24px;max-width:none;overflow:auto}
 .ar-wrap.fs-on .gm{max-width:1300px;margin:0 auto}
-.ar-wrap.fs-on .rp-stage{height:calc(100vh - 260px)}
 .ar-wrap.fs-on .gm-canvas{max-height:calc(100vh - 300px);width:auto;max-width:100%;margin:0 auto}
 
 @media (max-width: 760px){
@@ -730,28 +603,10 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
   .ar-feature h3{font-size:1.5rem}
   .ar-board-body{grid-template-columns:minmax(0,1fr)}
   .gm-legend{grid-template-columns:minmax(0,1fr)}
-  .pp-card{grid-template-columns:minmax(0,1fr)}
-  .pp-answers{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ms-stage{grid-template-columns:minmax(0,1fr)}
-  .ms-ladder{flex-direction:column-reverse;display:grid;grid-template-columns:repeat(4,1fr);font-size:.7rem}
-  .ms-opts{grid-template-columns:minmax(0,1fr)}
-  .cx-stage{grid-template-columns:minmax(0,1fr);justify-items:center}
-  .cx-clues{grid-template-columns:minmax(0,1fr);width:100%}
-  .cx-cell{width:26px;height:26px}
-  .cx-cell span{font-size:.8rem}
-  .sw-cell{width:31px;height:31px}
-  .pd-cell{width:40px;height:40px;font-size:1.05rem}
-  .qd-tile{min-height:62px;font-size:.78rem}
   .gm-title{font-size:1rem;width:100%;order:-1}
 }
 @media (max-width: 420px){
-  .sw-cell{width:28px;height:28px;font-size:.75rem}
-  .pd-cell{width:34px;height:34px}
-  .cx-cell{width:22px;height:22px}
-  .qd-grid{gap:5px}
 }
-.rp-canvas-wrap::before{content:"";position:absolute;left:14%;right:14%;top:0;bottom:54px;background:linear-gradient(90deg,#16304b,#20405f 50%,#16304b);border-radius:0 0 46% 46%/0 0 10% 10%;opacity:.8}
-.rp-canvas-wrap::after{content:"ROOT SURFACE";position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;color:#3d6284}
 
 
 /* ---------- tabs: phones get a full-width labeled mode row; laptops wrap the compendium sub-tabs
@@ -5009,7 +4864,7 @@ function renderCompendium(){
 
 
 /* ====================================================================
-   POCKET ARCADE — game-only data (terms + groups). The MCQ-based games
+   POCKET ARCADE — game-only data (crossword terms). The MCQ-based games
    read the shared QUESTIONS bank directly; nothing here duplicates it.
    Every term/clue traces back to this hub's own notes and tables.
    ==================================================================== */
@@ -5110,59 +4965,27 @@ var PERIO_TERMS = [
   { w:'PAPILLA', c:'Interdental tissue a ___-sparing flap keeps intact', lec:'perio-plastic-esthetics' }
 ];
 
-/* Quadrants (Connections-style): each group is four items that share a category. */
-var QUAD_GROUPS = [
-  { name:'Resorbable sutures', lec:'incisions-flaps-sutures', items:['Chromic gut','PGA','PGCL','Monocryl'] },
-  { name:'Non-resorbable sutures', lec:'incisions-flaps-sutures', items:['Silk','PTFE','Polypropylene','Nylon'] },
-  { name:'Flap designs', lec:'incisions-flaps-sutures', items:['Sulcular','Pyramidal','Trapezoidal','Envelope'] },
-  { name:'Named incisions', lec:'incisions-flaps-sutures', items:['Intrasulcular','Crestal','Vertical release','Sub-marginal'] },
-  { name:'Suture techniques', lec:'incisions-flaps-sutures', items:['Sling','Criss-cross','Horizontal mattress','Continuous locking'] },
-  { name:'Finger rests', lec:'phase1-therapy', items:['Conventional','Cross-arch','Opposite-arch','Finger-on-finger'] },
-  { name:'Area-specific Graceys', lec:'phase1-therapy', items:['Gracey 3/4','Gracey 11/12','Gracey 13/14','Gracey 15/16'] },
-  { name:'Exam kit', lec:'phase1-therapy', items:['UNC-15 probe','ODU 11/12','Nabers probe','Cotton pliers'] },
-  { name:'Most-missed SRP areas', lec:'phase1-therapy', items:['CEJ','Furcation entrance','Line angle','Posterior distal'] },
-  { name:'Occlusal trauma signs', lec:'phase1-therapy', items:['Fremitus','Wear facets','Widened PDL','Tooth migration'] },
-  { name:'Re-evaluation measures', lec:'phase1-therapy', items:['BOP','Probing depth','Suppuration','Plaque score'] },
-  { name:'Glickman furcation classes', lec:'phase1-therapy', items:['Incipient catch','Cul-de-sac','Through-and-through','Visible through-and-through'] },
-  { name:'Furcation contributing factors', lec:'resective-furcation', items:['Cervical enamel projection','Enamel pearl','Restoration overhang','Intermediate bifurcation ridge'] },
-  { name:'Surgical furcation options', lec:'resective-furcation', items:['Open flap debridement','Tunnel preparation','Root resection','Hemisection'] },
-  { name:'Hide the CEJ from your probe', lec:'phase1-therapy', items:['Inflammation','Drug-induced overgrowth','Altered passive eruption','Restorative margin'] },
-  { name:'SRP limitations', lec:'phase1-therapy', items:['Blinded procedure','Motile bacteria','Root concavities','Operator skill'] },
-  { name:'McGuire & Nunn categories', lec:'risk-assessment', items:['Good','Fair','Poor','Hopeless'] },
-  { name:'P4 medicine', lec:'risk-assessment', items:['Personalized','Preventive','Predictive','Participatory'] },
-  { name:'Risk-scoring tools', lec:'risk-assessment', items:['UniFe','PRA','PreViser','Overjet'] },
-  { name:'Automatic Stage 3/4', lec:'diagnosis-tx-planning', items:['Vertical loss ≥3 mm','Class II furcation','Class III furcation','Tooth lost to perio'] },
-  { name:'Point to Grade C', lec:'diagnosis-tx-planning', items:['>10 cigarettes/day','HbA1c ≥7%','Ratio >1.0','Rapid progression'] },
-  { name:'Bactericidal', lec:'antibiotics-host-mod', items:['Amoxicillin','Augmentin','Metronidazole','Ciprofloxacin'] },
-  { name:'Bacteriostatic', lec:'antibiotics-host-mod', items:['Tetracycline','Doxycycline','Erythromycin','Azithromycin'] },
-  { name:'Regeneration toolkit', lec:'periodontal-regeneration', items:['EMD','rhPDGF-BB','β-TCP','Barrier membrane'] },
-  { name:'Implant success criteria', lec:'implants-perio', items:['Immobile','No radiolucency','No paresthesia','<0.2 mm/yr loss'] }
-];
-
 /* ====================================================================
-   POCKET ARCADE — nine perio mini games, coolmath-style lobby,
+   POCKET ARCADE — six perio games, coolmath-style lobby,
    class-wide leaderboards (Supabase submit_arcade_score /
    get_arcade_leaderboard, p_hub 'perio'; game ids whitelisted in
-   migration_v11). Bank-based games route every answer through
+   migration_v11, v40). Board, cloze, escape, smile and cross live in the
+   shared widget/games.js (shGames.make). Bank-based games route every answer through
    recordAnswer(), so they count toward class stats and Weak Spots.
    ==================================================================== */
 var GAME_IMPL = {};   // id -> factory(ctx) returning { mount(root), stop() }
 var ARCADE = (function(){
   var HUB_ID = 'perio';
   var GAMES = [
-    { id:'flappy',    name:'Flappy Flap',          cat:'action', kind:'Action',     color:'var(--ar-sky)',   hex:'#5CC8FF', bank:true,  desc:'Flap a tiny tooth through the gap with the right answer. Tap, click or press space.', thumb:thumbFlappy },
-    { id:'crusher',   name:'Calculus Crusher',     cat:'action', kind:'Action',     color:'var(--ar-lemon)', hex:'#FFD84D', bank:true,  desc:'Breakout on a wall of calculus. Bounce the ball into the brick with the right answer.', thumb:thumbCrusher },
-    { id:'probe',     name:'Pocket Probe',         cat:'puzzle', kind:'Chart rush', color:'var(--ar-mint)',  hex:'#43E0AC', bank:false, desc:'Read the chart against the clock: CAL, stage, grade and Miller mobility.', thumb:thumbProbe },
-    { id:'quadrants', name:'Quadrants',            cat:'puzzle', kind:'Puzzle',     color:'var(--ar-lilac)', hex:'#B69CFF', bank:false, desc:'Sixteen perio terms, four hidden groups of four. Four mistakes and you\'re out.', thumb:thumbQuadrants },
-    { id:'perdle',    name:'Perdle',               cat:'word',   kind:'Word',       color:'var(--ar-coral)', hex:'#FF8A5B', bank:false, desc:'Guess the perio word from its clue in six tries. Chain words for a streak.', thumb:thumbPerdle },
-    { id:'planer',    name:'Root Planer',          cat:'word',   kind:'Typing',     color:'var(--ar-pink)',  hex:'#FF6FA3', bank:false, desc:'Deposits slide down the root carrying clues. Type the answer to plane them off.', thumb:thumbPlaner },
-    { id:'smile',     name:'Million-Dollar Smile', cat:'quiz',   kind:'Quiz show',  color:'var(--ar-lemon)', hex:'#FFD84D', bank:true,  desc:'Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven.', thumb:thumbSmile },
-    { id:'sweeper',   name:'Probe Sweeper',        cat:'puzzle', kind:'Puzzle',     color:'var(--ar-sky)',   hex:'#5CC8FF', bank:true,  desc:'Minesweeper on gingiva. Probe a bleeding site and you must answer a question to control it.', thumb:thumbSweeper },
-    { id:'cross',     name:'Cross-Section',        cat:'word',   kind:'Crossword',  color:'var(--ar-mint)',  hex:'#43E0AC', bank:false, desc:'A fresh mini crossword built from the course terms every game.', thumb:thumbCross }
+    { id:'board',   name:'Pocket Showdown',      color:'var(--ar-lemon)', hex:'#FFD84D', bank:true,  desc:'A quiz board: one column per session, $100 to $500, two Daily Doubles and a Final wager.', thumb:thumbBoard },
+    { id:'escape',  name:'Operatory Escape',     color:'var(--ar-sky)',   hex:'#5CC8FF', bank:true,  desc:'Point-and-click escape room. Questions unlock the four digits of the door code. Six minutes.', thumb:thumbEscape },
+    { id:'cloze',   name:'Mind the Gap',         color:'var(--ar-pink)',  hex:'#FF6FA3', bank:false, desc:'Type the key term missing from a sentence in your notes, Anki cloze style, before the clock runs out.', thumb:thumbGap },
+    { id:'smile',   name:'Million-Dollar Smile', color:'var(--ar-lemon)', hex:'#FFD84D', bank:true,  desc:'Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven.', thumb:thumbSmile },
+    { id:'cross',   name:'Cross-Section',        color:'var(--ar-mint)',  hex:'#43E0AC', bank:false, desc:'A fresh mini crossword built from the course terms every game.', thumb:thumbCross },
+    { id:'crusher', name:'Calculus Crusher',     color:'var(--ar-coral)', hex:'#FF8A5B', bank:true,  desc:'Breakout on a wall of calculus. Bounce the ball into the brick with the right answer.', thumb:thumbCrusher }
   ];
   var BY_ID = {}; GAMES.forEach(function(g){ BY_ID[g.id] = g; });
-  var CATS = [['all','All games'],['action','Action'],['puzzle','Puzzle'],['word','Word'],['quiz','Quiz show']];
-  var panel = null, active = null, activeId = null, lobbyCat = 'all', boardGame = null;
+  var panel = null, active = null, activeId = null, boardGame = null;
   var A = STATE.arcade;
   if(!A.scope || A.scope === 'midterm') A.scope = 'all';
 
@@ -5195,17 +5018,23 @@ var ARCADE = (function(){
     if(scope === 'all') return LECTURES.map(function(l){ return l.id; });
     return [scope];
   }
-  function bankPool(scope){ var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return q.type === 'mcq' && !q.pbox && !q.img && q.fmt !== '2stmt' && ids.indexOf(q.lec) > -1; }); }
+  function arcadeQ(q){ return q.type === 'mcq' && !q.pbox && !q.img && q.fmt !== '2stmt'; }
+  function bankPool(scope){
+    if(scope === 'missed') return QUESTIONS.filter(function(q){ var a = STATE.answered[q.id]; return arcadeQ(q) && a && a.lastCorrect === false; });
+    var ids = scopeLecs(scope); return QUESTIONS.filter(function(q){ return arcadeQ(q) && ids.indexOf(q.lec) > -1; });
+  }
+  function notesFor(scope){ return scopeLecs(scope === 'missed' ? 'all' : scope).map(function(id){ return { lec:id, html:READINGS[id] || '' }; }); }
   function termPool(scope, filter){ var ids = scopeLecs(scope); return PERIO_TERMS.filter(function(t){ return ids.indexOf(t.lec) > -1 && (!filter || filter(t)); }); }
   function scopeSelectHTML(kind, min){
     min = min || 6;
-    var count = function(s){ return kind === 'bank' ? bankPool(s).length : termPool(s).length; };
-    var opts = [['all','All 9 sessions']].concat(LECTURES.map(function(l){ return [l.id, 'S'+l.num+' · '+shortTitle(l)]; }))
+    if(kind === 'cloze' && !window.shGames) kind = 'terms';
+    var count = function(s){ return kind === 'bank' ? bankPool(s).length : kind === 'cloze' ? window.shGames.clozePool(notesFor(s)).length : termPool(s).length; };
+    var opts = [['all','All 9 sessions']].concat(kind === 'bank' ? [['missed','Questions I missed']] : []).concat(LECTURES.map(function(l){ return [l.id, 'S'+l.num+' · '+shortTitle(l)]; }))
       .filter(function(o){ return count(o[0]) >= min; });
     var cur = opts.some(function(o){ return o[0] === A.scope; }) ? A.scope : 'all';
     return '<label for="gmScope">Questions from</label><select id="gmScope" data-scope>' + opts.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===cur?' selected':'')+'>'+escHtml(o[1])+' ('+count(o[0])+')</option>'; }).join('') + '</select>';
   }
-  function currentScope(root){ var s = root && root.querySelector('[data-scope]'); return s ? s.value : A.scope; }
+  function currentScope(root){ var s = root && root.querySelector('[data-scope]'); return s ? s.value : (A.scope === 'missed' ? 'all' : A.scope); }
   /* Pull shuffled items without repeats until the pool runs dry, then reshuffle. */
   function dealer(items){ var deck = []; return function(){ if(!deck.length) deck = shuffled(items); return deck.pop(); }; }
   /* MCQ with its choices shuffled into lettered options: { q, opts:[{text, idx}], right } */
@@ -5253,51 +5082,42 @@ var ARCADE = (function(){
   /* ---------- thumbnails (inline SVG, decorative) ---------- */
   function svgWrap(inner){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="170" fill="#19344F"/>'+inner+'</svg>'; }
   function toothPath(x, y, s, fill){ s = s || 1; return '<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-14 -16c5 0 9 3 14 3s9-3 14-3c7 0 11 6 11 13 0 9-5 13-6 23-1 8-3 15-7 15-5 0-5-13-12-13s-7 13-12 13c-4 0-6-7-7-15-1-10-6-14-6-23 0-7 4-13 11-13z" fill="'+(fill||'#fffaf0')+'" stroke="#0B1A2A" stroke-width="3"/><circle cx="-5" cy="-3" r="2.6" fill="#0B1A2A"/><circle cx="6" cy="-3" r="2.6" fill="#0B1A2A"/><path d="M-4 5q5 4 10 0" stroke="#0B1A2A" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>'; }
-  function thumbFlappy(){
-    var h = ''; [[70,0,62],[200,0,40]].forEach(function(p){ h += '<rect x="'+p[0]+'" y="0" width="34" height="'+(p[2])+'" fill="#43E0AC"/><rect x="'+(p[0]-4)+'" y="'+(p[2]-12)+'" width="42" height="12" rx="3" fill="#2fb88a"/>'; h += '<rect x="'+p[0]+'" y="'+(p[2]+50)+'" width="34" height="18" fill="#43E0AC"/><rect x="'+p[0]+'" y="'+(p[2]+106)+'" width="34" height="80" fill="#43E0AC"/>'; });
-    h += '<text x="87" y="'+(62+32)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="16" fill="#FFD84D">A</text><text x="87" y="'+(62+90)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="16" fill="#FF6FA3">B</text>';
-    return svgWrap('<circle cx="270" cy="34" r="16" fill="#FFD84D" opacity=".85"/>' + h + '<rect y="156" width="320" height="14" fill="#ff8fb3"/>' + toothPath(148, 86, 1, '#fffaf0') + '<path d="M128 80c-10-8-18-4-20 2 6 0 12 2 16 6" fill="#5CC8FF" stroke="#0B1A2A" stroke-width="2.5"/>');
-  }
   function thumbCrusher(){
     var h = '', cols = ['#e8dca9','#d8c78a','#e8dca9','#cbb877'];
     for(var r=0;r<3;r++) for(var c=0;c<8;c++) h += '<rect x="'+(12+c*37)+'" y="'+(44+r*18)+'" width="33" height="14" rx="4" fill="'+cols[(r+c)%4]+'"/>';
     ['#FFD84D','#FF6FA3','#43E0AC','#B69CFF'].forEach(function(col,i){ h += '<rect x="'+(18+i*74)+'" y="14" width="64" height="22" rx="6" fill="'+col+'"/><text x="'+(50+i*74)+'" y="31" text-anchor="middle" font-family="Bungee,Impact" font-size="14" fill="#0B1A2A">'+LETTERS[i]+'</text>'; });
     return svgWrap(h + '<circle cx="176" cy="120" r="7" fill="#fff"/><path d="M176 120 L150 150" stroke="#fff" stroke-dasharray="3 5" stroke-width="2"/><rect x="118" y="150" width="84" height="10" rx="5" fill="#5CC8FF"/>');
   }
-  function thumbProbe(){
-    var cells = ''; [['PD',[3,7,4]],['GM',[-1,2,0]],['CAL',['?','9','4']]].forEach(function(r,ri){ cells += '<text x="40" y="'+(52+ri*38)+'" font-family="monospace" font-size="12" fill="#9CB3C8">'+r[0]+'</text>'; r[1].forEach(function(v,ci){ var hl = ri===2 && ci===0; cells += '<rect x="'+(78+ci*48)+'" y="'+(30+ri*38)+'" width="42" height="30" rx="6" fill="#0B1A2A" stroke="'+(hl?'#FFD84D':'#254A68')+'" stroke-width="2.5" '+(hl?'stroke-dasharray="4 3"':'')+'/><text x="'+(99+ci*48)+'" y="'+(51+ri*38)+'" text-anchor="middle" font-family="monospace" font-size="16" font-weight="700" fill="'+(hl?'#FFD84D':'#F2F8FF')+'">'+v+'</text>'; }); });
-    return svgWrap(cells + '<g transform="translate(250 30) rotate(20)"><rect x="-4" y="0" width="8" height="110" rx="4" fill="#dbe7f3"/>' + [0,1,2,3,4,5].map(function(i){ return '<rect x="-4" y="'+(60+i*8)+'" width="8" height="3" fill="'+(i%2?'#0B1A2A':'#43E0AC')+'"/>'; }).join('') + '</g>');
+  /* thumbnails for the shared games (widget/games.js); P = this arcade's colors */
+  function thumbBoardP(P){
+    var h = '', cols = 5;
+    for(var c=0;c<cols;c++){ h += '<rect x="'+(14+c*60)+'" y="12" width="54" height="26" rx="5" fill="'+P.panel+'" stroke="'+P.a2+'" stroke-width="2"/><rect x="'+(22+c*60)+'" y="22" width="38" height="5" rx="2" fill="'+P.dim+'"/>';
+      for(var r=0;r<4;r++){ var gone = (c===1&&r===0)||(c===3&&r===1)||(c===0&&r===2); h += '<rect x="'+(14+c*60)+'" y="'+(44+r*30)+'" width="54" height="25" rx="5" fill="'+(gone?P.bg:P.a4)+'"/>' + (gone ? '' : '<text x="'+(41+c*60)+'" y="'+(62+r*30)+'" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.a1+'">$'+((r+1)*100)+'</text>'); } }
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/>'+h+'</svg>';
   }
-  function thumbQuadrants(){
-    var h = '', words = ['Sling','Silk','PTFE','Good','Fair','Crestal','PGA','Poor'], cols = ['#B69CFF','#FFD84D','#43E0AC','#FF6FA3'];
-    h += '<rect x="20" y="14" width="280" height="30" rx="8" fill="#FFD84D"/><text x="160" y="34" text-anchor="middle" font-family="Bungee,Impact" font-size="12" fill="#0B1A2A">NON-RESORBABLE SUTURES</text>';
-    for(var i=0;i<8;i++){ var x = 20 + (i%4)*71, y = 54 + Math.floor(i/4)*54, on = i===1||i===6; h += '<rect x="'+x+'" y="'+y+'" width="65" height="46" rx="8" fill="'+(on?'#B69CFF':'#122840')+'" stroke="'+(on?'#B69CFF':'#254A68')+'" stroke-width="2.5"/><text x="'+(x+32)+'" y="'+(y+28)+'" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="12" fill="'+(on?'#0B1A2A':'#F2F8FF')+'">'+words[i]+'</text>'; }
-    return svgWrap(h);
+  function thumbGapP(P){
+    var slots = ''; for(var i=0;i<7;i++) slots += '<rect x="'+(128+i*17)+'" y="70" width="13" height="3" fill="'+P.a1+'"/>' + (i<2 ? '<text x="'+(134+i*17)+'" y="66" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="'+P.a1+'">'+'CO'[i]+'</text>' : '');
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/><rect x="18" y="20" width="284" height="80" rx="10" fill="'+P.panel+'"/>' +
+      '<rect x="32" y="40" width="200" height="6" rx="3" fill="'+P.dim+'"/><rect x="32" y="62" width="88" height="6" rx="3" fill="'+P.dim+'"/>'+slots+'<rect x="252" y="62" width="36" height="6" rx="3" fill="'+P.dim+'"/><rect x="32" y="82" width="150" height="6" rx="3" fill="'+P.dim+'"/>' +
+      '<rect x="18" y="114" width="210" height="38" rx="9" fill="'+P.bg+'" stroke="'+P.a2+'" stroke-width="3"/><text x="32" y="139" font-family="monospace" font-size="15" fill="'+P.ink+'">co</text><rect x="54" y="124" width="3" height="20" fill="'+P.a2+'"/>' +
+      '<rect x="238" y="114" width="64" height="38" rx="9" fill="'+P.a2+'"/><text x="270" y="138" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.bg+'">ENTER</text></svg>';
   }
-  function thumbPerdle(){
-    var rows = [['S','L','I','N','G','x','x','y','x','x'],['G','R','A','C','E','g','g','g','g','x'],['G','R','A','C','E','g','g','g','g','g']], h = '', col = {g:'#43E0AC',y:'#FFD84D',x:'#2c3f53'};
-    rows.slice(0,2).forEach(function(r,ri){ for(var i=0;i<5;i++){ var x = 70+i*38, y = 26+ri*42; h += '<rect x="'+x+'" y="'+y+'" width="34" height="34" rx="6" fill="'+col[r[5+i]]+'"/><text x="'+(x+17)+'" y="'+(y+24)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="17" fill="'+(r[5+i]==='x'?'#9CB3C8':'#0B1A2A')+'">'+r[i]+'</text>'; } });
-    for(var i=0;i<6;i++){ h += '<rect x="'+(51+i*38)+'" y="112" width="34" height="34" rx="6" fill="none" stroke="#254A68" stroke-width="3"/>'; }
-    return svgWrap(h);
+  function thumbEscapeP(P){
+    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#cfe1e8"/><rect y="132" width="320" height="38" fill="#8fa6b2"/>' +
+      '<rect x="16" y="20" width="96" height="60" rx="5" fill="#e9eef2" stroke="#4d5d69" stroke-width="3"/><rect x="23" y="27" width="82" height="46" fill="#1e2a33"/>' + [36,56,76,96].map(function(x){ return '<path d="M'+(x-6)+' 36c4-2 8-2 12 0 2 9-1 22-3 28h-6c-2-6-5-19-3-28z" fill="#c9d6de" opacity=".8"/>'; }).join('') +
+      '<circle cx="98" cy="34" r="9" fill="'+P.a2+'" stroke="#10202e" stroke-width="2"/><text x="98" y="38" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="800" fill="#10202e">7</text>' +
+      '<path d="M128 70c-4 1-5 6-3 10l18 46c2 4 5 6 10 6h56c7 0 9-3 9-7s-3-7-9-7h-44z" fill="#2f9e98" stroke="#1f6e69" stroke-width="3"/>' +
+      '<rect x="234" y="16" width="70" height="128" fill="#8a6a4f" stroke="#5c4330" stroke-width="4"/><rect x="246" y="4" width="46" height="13" rx="3" fill="#163b2a"/><text x="269" y="14" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="900" fill="#58f29a">EXIT</text>' +
+      '<rect x="282" y="64" width="18" height="28" rx="3" fill="#2c3e50"/>' + ['#4FB6F0','#FF6FA3','#FFC93C','#3DD39B'].map(function(c,i){ return '<circle cx="'+(287+(i%2)*8)+'" cy="'+(71+Math.floor(i/2)*9)+'" r="3" fill="'+c+'"/>'; }).join('') + '</svg>';
   }
-  function thumbPlaner(){
-    var h = '<rect x="120" y="0" width="80" height="140" fill="#f6efe2"/><rect y="140" width="320" height="30" fill="#ff8fb3"/><rect y="137" width="320" height="4" fill="#ffb3cb"/>';
-    [[70,30,'Curved furcation probe'],[210,78,'Universal 13/14']].forEach(function(d){ h += '<rect x="'+(d[0]-58)+'" y="'+d[1]+'" width="116" height="30" rx="12" fill="#e8dca9"/><text x="'+d[0]+'" y="'+(d[1]+19)+'" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="10" fill="#2a2110">'+d[2]+'</text>'; });
-    return svgWrap(h + '<rect x="60" y="114" width="200" height="20" rx="8" fill="#0B1A2A" stroke="#FF6FA3" stroke-width="2"/><text x="72" y="128" font-family="monospace" font-size="11" fill="#FF6FA3">NABERS_</text>');
-  }
+  var THUMB_P = { bg:'#19344F', panel:'#122840', ink:'#F2F8FF', dim:'#9CB3C8', a1:'#FFD84D', a2:'#FF6FA3', a3:'#43E0AC', a4:'#254A68' };
+  function thumbBoard(){ return thumbBoardP(THUMB_P); }
+  function thumbGap(){ return thumbGapP(THUMB_P); }
+  function thumbEscape(){ return thumbEscapeP(THUMB_P); }
   function thumbSmile(){
     var h = ''; ['$125,000','$64,000','$32,000','$16,000','$8,000'].forEach(function(t,i){ h += '<text x="300" y="'+(28+i*18)+'" text-anchor="end" font-family="monospace" font-size="11" fill="'+(i===2?'#0B1A2A':'#9CB3C8')+'">'+t+'</text>'; if(i===2) h = '<rect x="236" y="'+(16+i*18)+'" width="70" height="16" rx="6" fill="#FF8A5B"/>' + h; });
     return svgWrap(h + '<path d="M40 70 q70 50 140 0" stroke="#fffaf0" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M40 70 q70 -6 140 0" stroke="#FF6FA3" stroke-width="8" fill="none" stroke-linecap="round"/>' + [0,1,2,3,4].map(function(i){ return '<rect x="'+(62+i*20)+'" y="'+(74 + (i===0||i===4?4:8))+'" width="16" height="14" rx="3" fill="#fffaf0"/>'; }).join('') +
       '<rect x="20" y="120" width="98" height="30" rx="15" fill="#10263e" stroke="#5CC8FF" stroke-width="2"/><text x="69" y="140" text-anchor="middle" font-family="Bungee,Impact" font-size="11" fill="#FFD84D">50:50</text><rect x="126" y="120" width="98" height="30" rx="15" fill="#10263e" stroke="#5CC8FF" stroke-width="2"/><text x="175" y="140" text-anchor="middle" font-family="Bungee,Impact" font-size="10" fill="#FFD84D">ASK CLASS</text>');
-  }
-  function thumbSweeper(){
-    var h = '', nums = {'1,1':'1','2,1':'2','3,2':'1','1,2':'1'};
-    for(var y=0;y<4;y++) for(var x=0;x<8;x++){ var open = x>0 && x<4 && y>0 && y<3, k = x+','+y; var px = 26+x*34, py = 18+y*34;
-      h += '<rect x="'+px+'" y="'+py+'" width="31" height="31" rx="5" fill="'+(open?'#f6efe2':'#e7719a')+'"/>';
-      if(open && nums[k]) h += '<text x="'+(px+15)+'" y="'+(py+22)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="15" fill="'+(nums[k]==='2'?'#2a7858':'#2e62a0')+'">'+nums[k]+'</text>';
-      if(x===5 && y===1) h += '<rect x="'+px+'" y="'+py+'" width="31" height="31" rx="5" fill="#f2c02b"/><path d="M'+(px+11)+' '+(py+24)+'V'+(py+7)+'l11 5-11 5" fill="#c41e3a" stroke="#0B1A2A" stroke-width="1.5"/>';
-      if(x===6 && y===2) h += '<rect x="'+px+'" y="'+py+'" width="31" height="31" rx="5" fill="#c41e3a"/><circle cx="'+(px+15)+'" cy="'+(py+15)+'" r="7" fill="#ff8a8a"/>'; }
-    return svgWrap(h + '<rect y="154" width="320" height="16" fill="#0B1A2A"/>');
   }
   function thumbCross(){
     var h = '', cells = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[3,0],[3,2],[3,3],[3,4],[6,2],[6,3],[5,3],[7,3],[8,3]], letters = {'1,1':'G','2,1':'R','3,1':'A','4,1':'C','5,1':'E','6,1':'Y','3,0':'P','3,2':'P','3,3':'E','3,4':'R','6,2':'O','6,3':'U'};
@@ -5328,7 +5148,7 @@ var ARCADE = (function(){
   function shell(g, o){
     o = o || {};
     var hudItems = (o.hud || ['score','lives','level']).map(function(k){
-      var lab = { score:'Score', lives:'', level:'Lvl', best:'Best', streak:'Streak', time:'Time', words:'Words', mistakes:'Misses', rung:'Rung', board:'Board' }[k];
+      var lab = { score:'Score', lives:'', level:'Lvl', best:'Best', streak:'Streak', time:'Time', words:'Words', mistakes:'Misses', rung:'Rung', board:'Board', tiles:'Tiles', locks:'Digits' }[k];
       return '<span>'+(lab?lab+' ':'')+'<b data-hud="'+k+'">'+(k==='best'?(A.best[g.id]||0):'')+'</b></span>';
     }).join('');
     return '<div class="ar-wrap"><div class="gm" style="--c:'+g.color+'"><div class="gm-bar"><button type="button" class="gm-back" data-back>'+icon('back')+'Arcade</button><span class="gm-title">'+escHtml(g.name)+'</span>' +
@@ -5386,7 +5206,10 @@ var ARCADE = (function(){
     ctx.restore();
   }
   var CTX = { A:A, SFX:SFX, bankPool:bankPool, termPool:termPool, scopeSelectHTML:scopeSelectHTML, currentScope:currentScope, dealer:dealer, dealMCQ:dealMCQ, LETTERS:LETTERS, OPT_COLORS:OPT_COLORS,
-    shell:shell, setHud:setHud, introHTML:introHTML, finish:finish, popAt:popAt, legendHTML:legendHTML, qBoxHTML:qBoxHTML, makeCanvas:makeCanvas, roundRect:roundRect, drawTooth:drawTooth, hearts:hearts, fetchBoard:fetchBoard, boardRows:boardRows };
+    shell:shell, setHud:setHud, introHTML:introHTML, finish:finish, popAt:popAt, legendHTML:legendHTML, qBoxHTML:qBoxHTML, makeCanvas:makeCanvas, roundRect:roundRect, drawTooth:drawTooth, hearts:hearts, fetchBoard:fetchBoard, boardRows:boardRows,
+    notes:notesFor, lecOrder:LECTURES.map(function(l){ return l.id; }),
+    lecName:function(id){ var l = LECTURE_BY_ID[id]; return l ? 'S'+l.num+' · '+shortTitle(l) : ''; },
+    record:function(q, ok, choice){ recordAnswer(q.id, q.lec, ok, choice); } };
 
   /* ---------- lobby ---------- */
   function dayIndex(){ var d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5); }
@@ -5402,13 +5225,12 @@ var ARCADE = (function(){
     var feat = GAMES[dayIndex() % GAMES.length];
     var plays = GAMES.reduce(function(n,g){ return n + (A.plays[g.id]||0); }, 0);
     if(!boardGame) boardGame = feat.id;
-    var h = '<div class="ar-wrap"><div class="ar-hero"><div>'+logoHTML()+'<div class="ar-tag">Nine quick games · Perio D2 material · class leaderboards</div></div>' +
+    var h = '<div class="ar-wrap"><div class="ar-hero"><div>'+logoHTML()+'<div class="ar-tag">Six games · Perio D2 material · class leaderboards</div></div>' +
       '<div class="ar-stats"><span class="ar-stat">Plays<b>'+plays+'</b></span><span class="ar-stat">Answer streak<b>'+STATE.streak+'</b></span><button type="button" class="ar-iconbtn" id="arMute" aria-label="Toggle sound">'+icon(A.muted?'soundOff':'soundOn')+(A.muted?'Muted':'Sound')+'</button></div></div>' +
       '<button type="button" class="ar-feature" style="--c:'+feat.color+'" data-game="'+feat.id+'"><span class="ar-thumb">'+feat.thumb()+'</span><span class="ar-feature-body"><span class="badge">Game of the day</span><h3>'+escHtml(feat.name)+'</h3><p>'+escHtml(feat.desc)+'</p><span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="ar-play">Play now'+icon('play')+'</span><span class="ar-best">Your best <b>'+fmtScore(feat, A.best[feat.id]||0)+'</b></span></span></span></button>' +
-      '<div class="ar-cats" role="group" aria-label="Filter games">' + CATS.map(function(c){ return '<button type="button" class="ar-cat" data-cat="'+c[0]+'" aria-pressed="'+(lobbyCat===c[0])+'">'+c[1]+'</button>'; }).join('') + '</div>' +
-      '<div class="ar-grid" id="arGrid">' + GAMES.filter(function(g){ return lobbyCat === 'all' || g.cat === lobbyCat; }).map(tileHTML).join('') + '</div>' +
+      '<div class="ar-grid" id="arGrid">' + GAMES.map(tileHTML).join('') + '</div>' +
       '<section class="ar-boards" id="arBoards"><h3 class="ar-sub">'+icon('trophy')+'Class leaderboards</h3><div class="ar-board-tabs" role="tablist">' + GAMES.map(function(g){ return '<button type="button" role="tab" class="ar-board-tab" style="--c:'+g.color+'" data-board="'+g.id+'" aria-selected="'+(g.id===boardGame)+'">'+escHtml(g.name)+'</button>'; }).join('') + '</div><div class="ar-board-body" id="arBoardBody"></div></section>' +
-      '<div class="ar-how"><b>How these help.</b> Flappy Flap, Calculus Crusher, Million-Dollar Smile and Probe Sweeper run the real question bank, and those answers count toward your Weak Spots and the class-wide stats. Pocket Probe drills the chart math (CAL, stage, grade, mobility). Quadrants drills the categories the exam loves to mix up. Perdle, Root Planer and Cross-Section drill the key terms from each session. Every game ends with what you missed and posts your score to the class board.</div></div>';
+      '<div class="ar-how"><b>How these help.</b> Pocket Showdown, Operatory Escape, Million-Dollar Smile and Calculus Crusher run the real question bank, and those answers count toward your Weak Spots and the class-wide stats; pick <b>Questions I missed</b> to replay only what you got wrong. Mind the Gap pulls sentences straight from the lecture notes and blanks out the key terms. Cross-Section drills the terms from each session. Every game ends with what you missed and posts your score to the class board.</div></div>';
     panel.innerHTML = h;
     renderBoard();
     if(!panel.__wired){
@@ -5416,7 +5238,6 @@ var ARCADE = (function(){
       panel.addEventListener('click', function(e){
         if(activeId) return;
         var gb = e.target.closest('[data-game]'); if(gb){ start(gb.getAttribute('data-game')); return; }
-        var cb = e.target.closest('[data-cat]'); if(cb){ lobbyCat = cb.getAttribute('data-cat'); lobby(); return; }
         var bb = e.target.closest('[data-board]'); if(bb){ boardGame = bb.getAttribute('data-board'); panel.querySelectorAll('[data-board]').forEach(function(b){ b.setAttribute('aria-selected', String(b === bb)); }); renderBoard(); return; }
         if(e.target.closest('#arMute')){ A.muted = !A.muted; saveState(); lobby(); }
       });
@@ -5430,10 +5251,12 @@ var ARCADE = (function(){
   }
   function start(id){
     stop();
-    var g = BY_ID[id]; if(!g || !GAME_IMPL[id]) return;
+    var g = BY_ID[id]; if(!g) return;
+    var make = GAME_IMPL[id] || (window.shGames && function(g2, C2){ return window.shGames.make(id, g2, C2); });
+    if(!make){ showToast('That game is still loading. Try again in a moment.'); return; }
     panel = document.getElementById('panel-arcade');
     activeId = id;
-    active = GAME_IMPL[id](g, CTX);
+    active = make(g, CTX);
     active.mount(panel);
     var root = panel.querySelector('.gm');
     root.addEventListener('click', function(e){
@@ -5447,157 +5270,6 @@ var ARCADE = (function(){
   function stop(){ if(active && active.stop) active.stop(); active = null; activeId = null; }
   return { lobby:lobby, stop:stop, start:start, current:function(){ return activeId; }, games:GAMES };
 })();
-
-/* =================================================================== FLAPPY FLAP
-   Flappy Bird on the question bank: each gate is a probe column with three
-   gaps (A/B/C). Fly through the gap whose letter matches the right answer. */
-GAME_IMPL.flappy = function(g, C){
-  var W = 800, H = 450, GROUND = 404, GAP = 92, PW = 64, BIRD_X = 190, R = 17;
-  var root, stage, cv, ctx, raf = 0, last = 0, running = false, paused = false;
-  var S, deal, draw;
-  function reset(){
-    var pool = C.bankPool(C.currentScope(root));
-    draw = C.dealer(pool);
-    S = { y:H/2 - 40, vy:0, wing:0, score:0, lives:3, level:1, streak:0, right:0, gates:[], missed:[], freeze:0, t:0, flash:0, stars:[] };
-    for(var i=0;i<40;i++) S.stars.push({ x:Math.random()*W, y:Math.random()*(GROUND-40), r:Math.random()*1.6+.4 });
-    nextQuestion();
-  }
-  function speed(){ return 2.1 + (S.level-1) * 0.28; }
-  function nextQuestion(){
-    deal = C.dealMCQ(draw(), 3);
-    var qb = root.querySelector('[data-q]'); qb.innerHTML = C.qBoxHTML(deal);
-    spawnGate();
-  }
-  function spawnGate(){
-    var top = 30, span = GROUND - 30 - top, n = deal.opts.length, slot = span / n;
-    var gaps = deal.opts.map(function(o,i){ var cy = top + slot*i + slot/2; return { y:cy - GAP/2, h:GAP, i:i }; });
-    S.gates = [{ x:W + 60, gaps:gaps, done:false }];
-  }
-  function hud(){ C.setHud(root, { score:S.score, lives:[S.lives,3], level:S.level }); }
-  function flap(){
-    if(!running || paused) return;
-    S.vy = -6.1; C.SFX.flap();
-  }
-  function loseLife(msg){
-    S.lives--; S.streak = 0; S.flash = 18; C.SFX.bad(); hud();
-    fb(msg, 'bad');
-    if(S.lives <= 0){ end(); return true; }
-    return false;
-  }
-  function fb(msg, cls){ var el = root.querySelector('[data-fb]'); if(el){ el.className = 'gm-feedback ' + cls; el.textContent = msg; } }
-  function markLegend(pick){
-    root.querySelectorAll('[data-opt]').forEach(function(o){ var i = +o.getAttribute('data-opt'); if(i === deal.right) o.classList.add('is-right'); else if(i === pick) o.classList.add('is-wrong'); });
-  }
-  function step(k){
-    S.t += k;
-    if(S.freeze > 0){ S.freeze -= k; return; }
-    S.vy += 0.34 * k; if(S.vy > 9) S.vy = 9;
-    S.y += S.vy * k; S.wing += 0.35 * k;
-    if(S.y < R){ S.y = R; S.vy = 0; }
-    var gate = S.gates[0];
-    if(gate){
-      gate.x -= speed() * k;
-      var inX = BIRD_X + R > gate.x && BIRD_X - R < gate.x + PW;
-      if(inX && !gate.done){
-        var inside = gate.gaps.some(function(gp){ return S.y - R > gp.y && S.y + R < gp.y + gp.h; });
-        if(!inside){
-          gate.done = true; markLegend(-1);
-          S.missed.push({ q:deal.q.stem, a:deal.q.choices[deal.q.answer] });
-          recordAnswer(deal.q.id, deal.q.lec, false);
-          if(loseLife('Crashed into the probe. Answer: ' + deal.opts[deal.right].text)) return;
-          S.y = H/2 - 40; S.vy = 0; S.freeze = 50;
-          setTimeout(function(){ if(running) nextQuestion(); }, 900);
-          return;
-        }
-      }
-      if(!gate.done && BIRD_X - R > gate.x + PW){
-        gate.done = true;
-        var gp = gate.gaps.filter(function(x){ return S.y > x.y && S.y < x.y + x.h; })[0];
-        var pick = gp ? gp.i : -1, ok = pick === deal.right;
-        markLegend(pick);
-        recordAnswer(deal.q.id, deal.q.lec, ok);
-        if(ok){
-          S.streak++; S.right++;
-          var pts = Math.round(100 * (1 + Math.min(S.streak-1, 10) * 0.2)); S.score += pts;
-          if(S.right % 5 === 0) S.level++;
-          C.SFX.good(); fb('Correct! +' + pts + (S.streak > 1 ? '  (streak ' + S.streak + ')' : ''), 'ok'); hud();
-        } else {
-          S.missed.push({ q:deal.q.stem, a:deal.q.choices[deal.q.answer] });
-          if(loseLife('Wrong gap. Answer: ' + deal.opts[deal.right].text)) return;
-        }
-        setTimeout(function(){ if(running) nextQuestion(); }, 700);
-      }
-      if(gate.x + PW < -10) S.gates = [];
-    }
-    if(S.y + R > GROUND){
-      S.y = GROUND - R;
-      if(loseLife('Hit the gumline! Keep tapping to stay up.')) return;
-      S.y = H/2 - 40; S.vy = 0; S.freeze = 45;
-    }
-  }
-  function render(){
-    var c = ctx, sky = c.createLinearGradient(0,0,0,H); sky.addColorStop(0,'#0B1A2A'); sky.addColorStop(1,'#16395a');
-    c.fillStyle = sky; c.fillRect(0,0,W,H);
-    c.fillStyle = 'rgba(255,255,255,.55)'; S.stars.forEach(function(s){ var x = (s.x - S.t * .15) % W; if(x < 0) x += W; c.beginPath(); c.arc(x, s.y, s.r, 0, Math.PI*2); c.fill(); });
-    var gate = S.gates[0];
-    if(gate){
-      var ys = [0]; gate.gaps.forEach(function(gp){ ys.push(gp.y); ys.push(gp.y + gp.h); }); ys.push(GROUND);
-      for(var i=0;i<ys.length;i+=2){
-        var y0 = ys[i], y1 = ys[i+1]; if(y1 - y0 < 1) continue;
-        c.fillStyle = '#43E0AC'; c.fillRect(gate.x, y0, PW, y1 - y0);
-        c.fillStyle = '#2fb88a'; c.fillRect(gate.x + PW - 12, y0, 12, y1 - y0);
-        c.fillStyle = 'rgba(11,26,42,.55)'; for(var m = y0 + 8; m < y1 - 4; m += 14) c.fillRect(gate.x + 6, m, 16, 3);
-        if(i > 0){ c.fillStyle = '#2fb88a'; C.roundRect(c, gate.x - 5, y0, PW + 10, 10, 3); c.fill(); }
-        if(i < ys.length - 2){ c.fillStyle = '#2fb88a'; C.roundRect(c, gate.x - 5, y1 - 10, PW + 10, 10, 3); c.fill(); }
-      }
-      gate.gaps.forEach(function(gp){
-        var cx = gate.x + PW/2, cy = gp.y + gp.h/2;
-        c.fillStyle = C.OPT_COLORS[gp.i]; c.beginPath(); c.arc(cx, cy, 17, 0, Math.PI*2); c.fill();
-        c.fillStyle = '#0B1A2A'; c.font = '18px Bungee, Impact, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(C.LETTERS[gp.i], cx, cy + 1);
-      });
-    }
-    c.fillStyle = '#e0668f'; c.fillRect(0, GROUND, W, H - GROUND);
-    c.fillStyle = '#ff8fb3'; c.fillRect(0, GROUND, W, 8);
-    c.fillStyle = 'rgba(255,255,255,.18)'; for(var x = -((S.t*speed()) % 40); x < W; x += 40){ c.beginPath(); c.ellipse(x, GROUND + 26, 12, 5, 0, 0, Math.PI*2); c.fill(); }
-    C.drawTooth(c, BIRD_X, S.y, 0.72, Math.max(-0.5, Math.min(0.9, S.vy * 0.07)), S.flash > 0 && Math.floor(S.flash/3)%2 ? '#ff9cbe' : '#fffaf0', S.wing);
-    if(S.flash > 0) S.flash--;
-    if(!running || paused){ c.fillStyle = 'rgba(6,14,24,.35)'; c.fillRect(0,0,W,H); }
-  }
-  function loop(ts){
-    if(!running) return;
-    var k = last ? Math.min(2.5, (ts - last) / 16.67) : 1; last = ts;
-    if(!paused) step(k);
-    if(running) render();
-    raf = requestAnimationFrame(loop);
-  }
-  function begin(){
-    var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove();
-    reset(); hud(); running = true; paused = false; last = 0; S.freeze = 40;
-    cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
-  }
-  function end(){ running = false; cancelAnimationFrame(raf); render(); C.finish(g, root, S.score, S.missed); }
-  function key(e){
-    if(!root || !document.body.contains(root)) return;
-    if(e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')) return;
-    if(e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W'){ e.preventDefault(); if(!running){ var b = stage.querySelector('[data-start]'); if(b) b.click(); return; } flap(); }
-    if(e.key === 'p' || e.key === 'P'){ paused = !paused; }
-  }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { select:C.scopeSelectHTML('bank'), above:'<div class="gm-q" data-q><div class="gm-q-stem">Press play to get your first question.</div></div>', stage:'<div class="gm-stage" data-stage></div>', keys:'<kbd>Space</kbd> / tap to flap · <kbd>P</kbd> pause · fly through the lettered gap with the right answer' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      cv = C.makeCanvas(stage, W, H); ctx = cv.ctx;
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Read the question, then flap the tooth through the probe gap lettered with the right answer. Three lives. Every fifth right answer speeds things up.', 'Play'));
-      reset(); render(); hud();
-      stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')){ begin(); return; } });
-      cv.el.addEventListener('pointerdown', function(e){ e.preventDefault(); flap(); });
-      document.addEventListener('keydown', key);
-    },
-    rescope:function(){ if(!running){ reset(); render(); } },
-    pause:function(){ if(running) paused = true; },
-    stop:function(){ running = false; cancelAnimationFrame(raf); document.removeEventListener('keydown', key); }
-  };
-};
 
 /* =================================================================== CALCULUS CRUSHER
    Breakout: four lettered answer bricks sit above a wall of calculus. */
@@ -5730,689 +5402,6 @@ GAME_IMPL.crusher = function(g, C){
     pause:function(){ if(running) paused = true; },
     stop:function(){ running = false; cancelAnimationFrame(raf); document.removeEventListener('keydown', kd); document.removeEventListener('keyup', ku); }
   };
-};
-
-/* =================================================================== POCKET PROBE
-   Chart rush: rounds are generated from the course's own rules (CAL = PD +
-   recession, the staging and grading tables, the Miller mobility scale). */
-GAME_IMPL.probe = function(g, C){
-  var root, stage, S, timer = 0, running = false, cur = null;
-  function rnd(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
-  function uniqNums(correct, cands){ var out = [correct]; shuffled(cands).forEach(function(v){ if(out.length < 4 && v >= 0 && out.indexOf(v) === -1) out.push(v); }); var k = 1; while(out.length < 4){ if(out.indexOf(correct + k) === -1) out.push(correct + k); k++; } return shuffled(out); }
-  var KINDS = {
-    cal:function(){
-      var sites = ['D','B','M'].map(function(){ var pd = rnd(1, 9), gm = rnd(-3, 5); if(pd + gm < 0) gm = -pd; return { pd:pd, gm:gm }; });
-      var ask = rnd(0, 2), s = sites[ask], cal = s.pd + s.gm;
-      var cells = function(key){ return sites.map(function(x, i){ return '<td class="'+(i===ask?'hl':'')+'">'+(x[key] > 0 && key === 'gm' ? '+' : '')+x[key]+'</td>'; }).join(''); };
-      var calRow = sites.map(function(x, i){ return '<td class="'+(i===ask?'q':'')+'">'+(i===ask?'?':'')+'</td>'; }).join('');
-      return { kind:'Clinical attachment level', prompt:'What is the CAL at the highlighted site?',
-        visual:'<table class="pp-chart"><tr><th></th><th>D</th><th>B</th><th>M</th></tr><tr><th>PD</th>'+cells('pd')+'</tr><tr><th>GM</th>'+cells('gm')+'</tr><tr><th>CAL</th>'+calRow+'</tr></table>',
-        facts:['<b>GM</b> is recession: <b>+</b> margin apical to the CEJ, <b>−</b> margin coronal to it (overgrowth)','CAL = PD + GM'],
-        answers:uniqNums(cal, [s.pd, s.pd - s.gm, cal + 1, cal - 1, Math.abs(s.gm), cal + 2]).map(function(v){ return { label:v + ' mm', ok:v === cal }; }),
-        why:'CAL = ' + s.pd + ' + (' + s.gm + ') = ' + cal + ' mm' };
-    },
-    stage:function(){
-      var cal = rnd(1, 8), lost = 0, trig = null, st;
-      var r = Math.random();
-      if(cal >= 5 && r < 0.35) lost = rnd(1, 8);
-      else if(cal <= 4 && r < 0.45) trig = pick(['vertical bone loss of ' + rnd(3,5) + ' mm','a Class ' + pick(['II','III']) + ' furcation','one tooth lost to periodontitis']);
-      if(trig) st = 3;
-      else st = cal <= 2 ? 1 : cal <= 4 ? 2 : (lost >= 5 ? 4 : 3);
-      if(trig && lost >= 5) st = 4;
-      var facts = ['Worst interdental CAL: <b>' + cal + ' mm</b>'];
-      if(lost) facts.push('Teeth lost to periodontitis: <b>' + lost + '</b>');
-      if(trig) facts.push('Also found: <b>' + trig + '</b>');
-      var why = trig ? trig.charAt(0).toUpperCase() + trig.slice(1) + ' makes it at least Stage 3.' : cal <= 2 ? 'CAL 1-2 mm is Stage 1.' : cal <= 4 ? 'CAL 3-4 mm is Stage 2.' : lost >= 5 ? 'CAL ≥5 with 5 or more teeth lost is Stage 4.' : 'CAL ≥5 mm with 4 or fewer teeth lost is Stage 3.';
-      return { kind:'Stage it', prompt:'What stage is this periodontitis?', visual:'', facts:facts,
-        answers:['I','II','III','IV'].map(function(v, i){ return { label:'Stage ' + v, ok:i+1 === st }; }), why:why };
-    },
-    grade:function(){
-      var age = rnd(25, 70), ratio = pick([0.12, 0.18, 0.4, 0.55, 0.7, 0.85, 1.3, 1.6]), bl = Math.max(5, Math.min(90, Math.round(ratio * age)));
-      ratio = bl / age;
-      var mod = null, r = Math.random();
-      if(r < 0.2) mod = { t:'Smokes <b>' + rnd(12, 25) + ' cigarettes/day</b>', c:true };
-      else if(r < 0.35) mod = { t:'HbA1c <b>' + (7 + rnd(1, 20)/10).toFixed(1) + '%</b>', c:true };
-      else if(r < 0.5) mod = { t:'Non-smoker, HbA1c <b>' + (5 + rnd(0, 15)/10).toFixed(1) + '%</b>', c:false };
-      var gr = mod && mod.c ? 'C' : ratio < 0.25 ? 'A' : ratio <= 1.0 ? 'B' : 'C';
-      var facts = ['Age <b>' + age + '</b>', 'Bone loss at the worst tooth <b>' + bl + '%</b>'];
-      if(mod) facts.push(mod.t);
-      var why = 'Ratio ' + bl + ' ÷ ' + age + ' = ' + ratio.toFixed(2) + (mod && mod.c ? ', but the modifier forces Grade C.' : ' → Grade ' + gr + (mod && !mod.c ? ' (no modifier: they only push a grade up, never down).' : '.'));
-      return { kind:'Grade it', prompt:'Which grade?', visual:'', facts:facts, answers:['A','B','C'].map(function(v){ return { label:'Grade ' + v, ok:v === gr }; }), why:why };
-    },
-    mobility:function(){
-      var opts = [
-        { t:'Only normal, physiologic movement', c:0 },
-        { t:'Moves about <b>0.5 mm</b> faciolingually', c:1 },
-        { t:'Moves slightly more than normal, <b>under 1 mm</b>', c:1 },
-        { t:'Moves about <b>1.5 mm</b> faciolingually, no vertical movement', c:2 },
-        { t:'Moves <b>between 1 and 2 mm</b> mesiodistally', c:2 },
-        { t:'Moves severely faciolingually <b>and is depressible</b> (vertical displacement)', c:3 }
-      ];
-      var o = pick(opts);
-      return { kind:'Miller mobility', prompt:'Tested with two rigid instrument handles. Which Miller class?', visual:'', facts:[o.t],
-        answers:[0,1,2,3].map(function(v){ return { label:'Class ' + v, ok:v === o.c }; }), why:'Miller: 0 normal · 1 <1 mm · 2 >1 but <2 mm · 3 severe with vertical displacement.' };
-    }
-  };
-  function nextRound(){
-    var kinds = S.level < 2 ? ['cal','cal','stage','mobility'] : ['cal','stage','grade','mobility','cal','grade'];
-    cur = KINDS[pick(kinds)]();
-    S.limit = Math.max(6, 13 - S.level * 0.8); S.left = S.limit; S.locked = false;
-    var body = root.querySelector('[data-body]');
-    body.innerHTML = '<div class="pp-kind">'+escHtml(cur.kind)+'</div><div class="pp-prompt">'+cur.prompt+'</div>' +
-      '<div class="pp-card'+(cur.visual?'':' solo')+'">'+(cur.visual ? '<div>'+cur.visual+'</div>' : '')+'<div class="pp-facts">'+cur.facts.map(function(f){ return '<div>'+f+'</div>'; }).join('')+'</div></div>' +
-      '<div class="pp-answers">'+cur.answers.map(function(a, i){ return '<button type="button" class="pp-ans" data-ans="'+i+'">'+escHtml(a.label)+'<kbd>'+(i+1)+'</kbd></button>'; }).join('')+'</div><div class="gm-feedback" data-fb></div>';
-    tick();
-  }
-  function hud(){ C.setHud(root, { score:S.score, lives:[S.lives,3], level:S.level }); }
-  function tick(){
-    clearInterval(timer);
-    var bar = root.querySelector('[data-timer]');
-    timer = setInterval(function(){
-      if(!running || S.locked) return;
-      S.left -= 0.1; if(bar) bar.style.transform = 'scaleX(' + Math.max(0, S.left / S.limit) + ')';
-      if(S.left <= 0) answer(-1);
-    }, 100);
-  }
-  function answer(i){
-    if(S.locked) return; S.locked = true;
-    var ok = i >= 0 && cur.answers[i].ok;
-    root.querySelectorAll('[data-ans]').forEach(function(b, j){ b.disabled = true; if(cur.answers[j].ok) b.classList.add('right'); else if(j === i) b.classList.add('wrong'); });
-    var fb = root.querySelector('[data-fb]');
-    if(ok){
-      S.streak++; S.right++;
-      var pts = Math.round((100 + Math.round(S.left * 10)) * (1 + Math.min(S.streak - 1, 10) * 0.1)); S.score += pts;
-      if(S.right % 5 === 0) S.level++;
-      C.SFX.good(); fb.className = 'gm-feedback ok'; fb.textContent = 'Right! +' + pts + ' · ' + cur.why;
-    } else {
-      S.streak = 0; S.lives--; C.SFX.bad();
-      S.missed.push({ q:cur.kind + ': ' + cur.facts.map(function(f){ return f.replace(/<[^>]+>/g,''); }).join(', '), a:cur.answers.filter(function(a){ return a.ok; })[0].label + ' (' + cur.why + ')' });
-      fb.className = 'gm-feedback bad'; fb.textContent = (i < 0 ? 'Time! ' : 'Not quite. ') + cur.why;
-    }
-    hud();
-    if(S.lives <= 0){ setTimeout(end, 1300); return; }
-    setTimeout(function(){ if(running) nextRound(); }, ok ? 1300 : 2300);
-  }
-  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); S = { score:0, lives:3, level:1, streak:0, right:0, missed:[] }; running = true; hud(); nextRound(); }
-  function end(){ running = false; clearInterval(timer); C.finish(g, root, S.score, S.missed); }
-  function kd(e){ if(!running || !root || !document.body.contains(root)) return; var n = parseInt(e.key, 10); if(n >= 1 && n <= cur.answers.length){ e.preventDefault(); answer(n - 1); } }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { stage:'<div class="gm-stage pp-stage" data-stage><div class="pp-timer"><i data-timer></i></div><div data-body style="display:flex;flex-direction:column;gap:14px"></div></div>', keys:'Tap an answer or press <kbd>1</kbd>-<kbd>4</kbd> · faster answers score more' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Quick chart reads from the course rules: <b>CAL</b> from PD and recession, <b>stage</b> from worst interdental CAL and tooth loss, <b>grade</b> from % bone loss ÷ age and modifiers, and <b>Miller mobility</b>. The clock shrinks as you level up. Three lives.', 'Start probing'));
-      S = { score:0, lives:3, level:1 }; hud();
-      stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')){ begin(); return; } var a = e.target.closest('[data-ans]'); if(a && running) answer(+a.getAttribute('data-ans')); });
-      document.addEventListener('keydown', kd);
-    },
-    stop:function(){ running = false; clearInterval(timer); document.removeEventListener('keydown', kd); }
-  };
-};
-
-/* =================================================================== QUADRANTS
-   Connections-style: 16 tiles, four hidden groups of four. */
-GAME_IMPL.quadrants = function(g, C){
-  var root, stage, S, running = false;
-  var BAND = ['#FFD84D','#43E0AC','#5CC8FF','#B69CFF'];
-  function groupPool(){
-    return QUAD_GROUPS.slice();
-  }
-  function newBoard(){
-    var pool = shuffled(groupPool().filter(function(gr){ return S.used.indexOf(gr.name) === -1; }));
-    if(pool.length < 4){ S.used = []; pool = shuffled(groupPool()); }
-    var chosen = [], seen = {};
-    pool.forEach(function(gr){ if(chosen.length < 4 && gr.items.every(function(it){ return !seen[it]; })){ chosen.push(gr); gr.items.forEach(function(it){ seen[it] = 1; }); } });
-    chosen.forEach(function(gr){ S.used.push(gr.name); });
-    S.groups = chosen; S.solved = []; S.sel = []; S.boardMistakes = 0;
-    S.tiles = shuffled([].concat.apply([], chosen.map(function(gr, gi){ return gr.items.map(function(it){ return { t:it, g:gi }; }); })));
-    render();
-  }
-  function hud(){ C.setHud(root, { score:S.score, board:S.board }); }
-  function render(){
-    var body = root.querySelector('[data-body]');
-    var solved = S.solved.map(function(gi){ var gr = S.groups[gi]; return '<div class="qd-band" style="background:'+BAND[S.solved.indexOf(gi)]+'"><b>'+escHtml(gr.name)+'</b><span>'+gr.items.map(escHtml).join(' · ')+'</span></div>'; }).join('');
-    var tiles = S.tiles.filter(function(t){ return S.solved.indexOf(t.g) === -1; });
-    body.innerHTML = '<div class="qd-solved">'+solved+'</div><div class="qd-grid">' + tiles.map(function(t){ var on = S.sel.indexOf(t.t) > -1; return '<button type="button" class="qd-tile" data-tile="'+escHtml(t.t)+'" aria-pressed="'+on+'">'+escHtml(t.t)+'</button>'; }).join('') + '</div>' +
-      '<div class="qd-dots">Mistakes left '+[0,1,2,3].map(function(i){ return '<i class="'+(i < S.mistakes ? 'used' : '')+'"></i>'; }).join('')+'</div><div class="gm-feedback" data-fb style="text-align:center"></div>' +
-      '<div class="gm-row"><button type="button" class="gm-btn alt" data-q-act="shuffle">Shuffle</button><button type="button" class="gm-btn alt" data-q-act="clear">Deselect</button><button type="button" class="gm-btn" data-q-act="submit"'+(S.sel.length===4?'':' disabled')+'>Submit</button></div>';
-  }
-  function fb(t, cls){ var el = root.querySelector('[data-fb]'); if(el){ el.className = 'gm-feedback ' + cls; el.textContent = t; } }
-  function submit(){
-    var gis = S.sel.map(function(t){ return S.tiles.filter(function(x){ return x.t === t; })[0].g; });
-    var counts = {}; gis.forEach(function(x){ counts[x] = (counts[x]||0) + 1; });
-    var best = Math.max.apply(null, Object.keys(counts).map(function(k){ return counts[k]; }));
-    if(best === 4){
-      S.solved.push(gis[0]); S.sel = []; var pts = 100 * S.board; S.score += pts; C.SFX.good(); render(); fb('Found it! +' + pts, 'ok');
-      if(S.solved.length === 3){ var last = [0,1,2,3].filter(function(x){ return S.solved.indexOf(x) === -1; })[0]; S.solved.push(last); S.score += 100 * S.board; render(); }
-      if(S.solved.length === 4){
-        var bonus = S.boardMistakes === 0 ? 300 : 0; S.score += bonus; hud();
-        fb('Board cleared!' + (bonus ? ' Perfect board +' + bonus : ''), 'ok');
-        if(S.board >= 5){ setTimeout(function(){ end(true); }, 1200); return; }
-        setTimeout(function(){ if(!running) return; S.board++; hud(); newBoard(); }, 1500);
-      }
-      hud();
-    } else {
-      S.mistakes++; S.boardMistakes++; C.SFX.bad();
-      var t = S.tiles.filter(function(x){ return S.sel.indexOf(x.t) > -1; });
-      var grid = root.querySelector('.qd-grid'); if(grid){ grid.classList.remove('gm-shake'); void grid.offsetWidth; grid.classList.add('gm-shake'); }
-      S.sel = []; render(); fb(best === 3 ? 'One away…' : 'Not a group.', 'bad');
-      if(S.mistakes >= 4){
-        S.missed = S.groups.filter(function(gr, gi){ return S.solved.indexOf(gi) === -1; }).map(function(gr){ return { q:gr.name, a:gr.items.join(', ') }; });
-        S.solved = [0,1,2,3]; render(); setTimeout(function(){ end(false); }, 1600);
-      }
-    }
-  }
-  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); S = { score:0, board:1, mistakes:0, used:[], missed:[] }; running = true; hud(); newBoard(); }
-  function end(win){ running = false; C.finish(g, root, S.score, S.missed, win ? { title:'All five boards!', win:true } : null); }
-  return {
-    mount:function(panel){
-      var sel = '<label for="gmScope">Groups from</label><select id="gmScope" data-scope><option value="all" selected>All 9 sessions</option></select>';
-      panel.innerHTML = C.shell(g, { hud:['score','board'], select:sel, stage:'<div class="gm-stage qd-stage" data-stage style="--c:'+g.color+'"><div data-body style="display:flex;flex-direction:column;gap:12px;min-height:380px"></div></div>', keys:'Pick four tiles that share a category, then Submit · four mistakes per game · up to five boards' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Sixteen terms, four hidden groups of four: suture families, flap designs, finger rests, prognosis categories, antibiotic classes and more. Watch for red herrings. Four mistakes and the game ends.', 'Start'));
-      S = { score:0, board:1 }; hud();
-      stage.addEventListener('click', function(e){
-        if(e.target.closest('[data-start]')){ begin(); return; }
-        if(!running) return;
-        var t = e.target.closest('[data-tile]');
-        if(t){ var v = t.getAttribute('data-tile'), i = S.sel.indexOf(v); if(i > -1) S.sel.splice(i,1); else if(S.sel.length < 4) S.sel.push(v); C.SFX.tick(); render(); return; }
-        var a = e.target.closest('[data-q-act]');
-        if(a){ var act = a.getAttribute('data-q-act'); if(act === 'shuffle'){ S.tiles = shuffled(S.tiles); render(); } else if(act === 'clear'){ S.sel = []; render(); } else if(act === 'submit' && S.sel.length === 4) submit(); }
-      });
-    },
-    stop:function(){ running = false; }
-  };
-};
-
-/* =================================================================== PROBE SWEEPER
-   Minesweeper on gingiva: bleeding sites are the mines. Probe one and you
-   must answer a bank question to control the bleed. */
-GAME_IMPL.sweeper = function(g, C){
-  var root, stage, S, running = false, clock = 0, draw, lpTimer = 0, lpFired = false;
-  var N = 9;
-  function levelBleeders(){ return [10, 13, 16, 19][Math.min(3, S.level - 1)]; }
-  function newBoard(){
-    S.cells = []; for(var i=0;i<N*N;i++) S.cells.push({ b:false, open:false, flag:false, n:0, st:'' });
-    S.placed = false; S.opened = 0; S.flagMode = false; render();
-  }
-  function nb(i){ var x = i % N, y = Math.floor(i / N), out = []; for(var dy=-1;dy<=1;dy++) for(var dx=-1;dx<=1;dx++){ if(!dx && !dy) continue; var nx = x+dx, ny = y+dy; if(nx>=0 && ny>=0 && nx<N && ny<N) out.push(ny*N+nx); } return out; }
-  function place(safe){
-    var ban = [safe].concat(nb(safe)), idx = shuffled(S.cells.map(function(c,i){ return i; }).filter(function(i){ return ban.indexOf(i) === -1; })).slice(0, levelBleeders());
-    idx.forEach(function(i){ S.cells[i].b = true; });
-    S.cells.forEach(function(c, i){ c.n = nb(i).filter(function(j){ return S.cells[j].b; }).length; });
-    S.placed = true;
-  }
-  function open(i){
-    var c = S.cells[i]; if(c.open || c.flag) return;
-    if(!S.placed) place(i);
-    if(c.b){ c.open = true; c.st = 'bleed'; render(); ask(i); return; }
-    var stack = [i];
-    while(stack.length){
-      var k = stack.pop(), cc = S.cells[k]; if(cc.open || cc.flag || cc.b) continue;
-      cc.open = true; S.opened++; S.score += 5;
-      if(cc.n === 0) nb(k).forEach(function(j){ if(!S.cells[j].open) stack.push(j); });
-    }
-    C.SFX.pop(); hud(); render(); checkWin();
-  }
-  function checkWin(){
-    var safe = N*N - levelBleeders();
-    if(S.opened >= safe){
-      var tb = Math.max(0, 240 - Math.round((Date.now() - S.boardStart)/1000)) * 2, bonus = 400 * S.level + tb;
-      S.score += bonus; C.SFX.win(); hud();
-      S.cells.forEach(function(c){ if(c.b && !c.st) c.flag = true; }); render();
-      var fb = root.querySelector('[data-fb]'); if(fb){ fb.className = 'gm-feedback ok'; fb.textContent = 'Board cleared! +' + bonus + ' (time bonus ' + tb + ')'; }
-      if(S.level >= 4){ setTimeout(function(){ end(true); }, 1200); return; }
-      setTimeout(function(){ if(!running) return; S.level++; S.boardStart = Date.now(); hud(); newBoard(); if(fb) fb.textContent = 'Level ' + S.level + ': ' + levelBleeders() + ' bleeding sites.'; }, 1600);
-    }
-  }
-  function ask(i){
-    var deal = C.dealMCQ(draw(), 4), l = LECTURE_BY_ID[deal.q.lec];
-    S.asking = true;
-    var m = document.createElement('div'); m.className = 'sw-modal';
-    m.innerHTML = '<div class="gm-q"><div class="gm-feedback bad" style="font-family:var(--font-arcade);font-weight:400">Bleeding on probing! Answer to control it.</div><div class="gm-q-stem">'+sessChip(l)+'<span>'+escHtml(deal.q.stem)+'</span></div><div class="gm-legend">' +
-      deal.opts.map(function(o, k){ return '<button type="button" class="gm-opt" data-sw-ans="'+k+'"><i style="background:'+C.OPT_COLORS[k]+'">'+C.LETTERS[k]+'</i><span>'+escHtml(o.text)+'</span></button>'; }).join('') + '</div><div class="gm-feedback" data-swfb></div></div>';
-    stage.appendChild(m);
-    m.addEventListener('click', function(e){
-      var b = e.target.closest('[data-sw-ans]'); if(!b || m.__done) return; m.__done = true;
-      var k = +b.getAttribute('data-sw-ans'), ok = k === deal.right;
-      recordAnswer(deal.q.id, deal.q.lec, ok);
-      m.querySelectorAll('[data-sw-ans]').forEach(function(x, j){ if(j === deal.right) x.classList.add('is-right'); else if(j === k) x.classList.add('is-wrong'); });
-      var f = m.querySelector('[data-swfb]');
-      if(ok){ S.cells[i].st = 'ctrl'; S.score += 100; C.SFX.good(); f.className = 'gm-feedback ok'; f.textContent = 'Controlled. +100'; }
-      else { S.lives--; C.SFX.bad(); S.missed.push({ q:deal.q.stem, a:deal.q.choices[deal.q.answer] }); f.className = 'gm-feedback bad'; f.textContent = 'Still bleeding: you used a gauze. Answer: ' + deal.opts[deal.right].text; }
-      hud();
-      setTimeout(function(){ m.remove(); S.asking = false; render(); if(S.lives <= 0) end(false); }, ok ? 900 : 2200);
-    });
-  }
-  function toggleFlag(i){ var c = S.cells[i]; if(c.open) return; c.flag = !c.flag; C.SFX.tick(); render(); }
-  function hud(){ C.setHud(root, { score:S.score, lives:[Math.max(0,S.lives),3], level:S.level }); }
-  function render(){
-    var host = root.querySelector('[data-grid]'); if(!host) return;
-    host.style.gridTemplateColumns = 'repeat(' + N + ', auto)';
-    host.innerHTML = S.cells.map(function(c, i){
-      var cls = 'sw-cell', inner = '';
-      if(c.open){ if(c.st === 'bleed'){ cls += ' bleed'; inner = icon('heart'); } else if(c.st === 'ctrl'){ cls += ' ctrl'; inner = icon('check'); } else { cls += ' open' + (c.n ? ' n' + c.n : ''); inner = c.n || ''; } }
-      else if(c.flag){ cls += ' flag'; inner = icon('flag'); }
-      return '<button type="button" class="'+cls+'" data-cell="'+i+'" aria-label="site '+(i+1)+'">'+inner+'</button>';
-    }).join('');
-    var fm = root.querySelector('[data-flagmode]'); if(fm){ fm.setAttribute('aria-pressed', String(S.flagMode)); fm.textContent = S.flagMode ? 'Flag mode: ON' : 'Flag mode: off'; }
-    var bl = root.querySelector('[data-left]'); if(bl){ var flags = S.cells.filter(function(c){ return c.flag || c.st; }).length; bl.textContent = Math.max(0, levelBleeders() - flags) + ' bleeding sites unmarked'; }
-  }
-  function begin(){
-    var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove();
-    draw = C.dealer(C.bankPool(C.currentScope(root)));
-    S = { score:0, lives:3, level:1, missed:[], boardStart:Date.now() }; running = true; hud(); newBoard();
-  }
-  function end(win){ running = false; C.finish(g, root, S.score, S.missed, win ? { title:'Full mouth charted!', win:true } : null); }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { select:C.scopeSelectHTML('bank'), stage:'<div class="gm-stage sw-stage" data-stage><div class="sw-tools"><button type="button" class="gm-btn alt" data-flagmode aria-pressed="false">Flag mode: off</button><span class="faint mono" data-left style="color:var(--ar-dim);font-size:.8rem"></span></div><div class="sw-grid" data-grid></div><div class="gm-feedback" data-fb></div></div>', keys:'Tap to probe · right-click, long-press or Flag mode to flag a bleeder · numbers count bleeding sites next door' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      S = { score:0, lives:3, level:1, missed:[], cells:[] }; for(var i=0;i<N*N;i++) S.cells.push({ open:false, flag:false, n:0 });
-      render(); hud();
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Probe every healthy site without hitting the bleeders. The numbers tell you how many bleeding sites touch a square. Probe a bleeder by accident and you get one question: answer it to control the bleed, miss it and you lose a gauze. Three gauze, four boards.', 'Start charting'));
-      stage.addEventListener('click', function(e){
-        if(e.target.closest('[data-start]')){ begin(); return; }
-        if(!running || S.asking) return;
-        if(e.target.closest('[data-flagmode]')){ S.flagMode = !S.flagMode; render(); return; }
-        var c = e.target.closest('[data-cell]'); if(!c) return;
-        if(lpFired){ lpFired = false; return; }
-        var i = +c.getAttribute('data-cell');
-        if(S.flagMode) toggleFlag(i); else open(i);
-      });
-      stage.addEventListener('contextmenu', function(e){ var c = e.target.closest('[data-cell]'); if(!c || !running || S.asking) return; e.preventDefault(); toggleFlag(+c.getAttribute('data-cell')); });
-      stage.addEventListener('touchstart', function(e){ var c = e.target.closest('[data-cell]'); if(!c || !running) return; lpFired = false; clearTimeout(lpTimer); lpTimer = setTimeout(function(){ lpFired = true; toggleFlag(+c.getAttribute('data-cell')); }, 450); }, { passive:true });
-      stage.addEventListener('touchend', function(){ clearTimeout(lpTimer); });
-      stage.addEventListener('touchmove', function(){ clearTimeout(lpTimer); }, { passive:true });
-    },
-    stop:function(){ running = false; clearTimeout(lpTimer); }
-  };
-};
-
-function normWord(s){ return String(s || '').toUpperCase().replace(/[^A-Z]/g, ''); }
-
-/* =================================================================== PERDLE
-   Wordle on the course terms, with the clue shown. Chain words for a streak. */
-GAME_IMPL.perdle = function(g, C){
-  var root, stage, S, running = false, draw;
-  var ROWS = 6, KB = ['QWERTYUIOP','ASDFGHJKL','>ZXCVBNM<'];
-  function pool(){ return C.termPool(C.currentScope(root), function(t){ return t.w.length >= 4 && t.w.length <= 8; }); }
-  function newWord(){
-    S.t = draw(); S.rows = []; S.cur = ''; S.keys = {}; S.done = false; render();
-  }
-  function score(guess, word){
-    var res = Array(word.length).fill('x'), left = {};
-    for(var i=0;i<word.length;i++){ if(guess[i] === word[i]) res[i] = 'g'; else left[word[i]] = (left[word[i]]||0) + 1; }
-    for(var j=0;j<word.length;j++){ if(res[j] !== 'g' && left[guess[j]]){ res[j] = 'y'; left[guess[j]]--; } }
-    return res;
-  }
-  function render(){
-    var n = S.t.w.length, l = LECTURE_BY_ID[S.t.lec];
-    var board = '';
-    for(var r=0;r<ROWS;r++){
-      var row = S.rows[r], cells = '';
-      for(var i=0;i<n;i++){
-        var ch = row ? row.g[i] : (r === S.rows.length ? (S.cur[i] || '') : ''), cls = row ? row.r[i] : (ch ? 'filled' : '');
-        cells += '<div class="pd-cell '+cls+'">'+ch+'</div>';
-      }
-      board += '<div class="pd-row" style="grid-template-columns:repeat('+n+',auto)">'+cells+'</div>';
-    }
-    var kb = KB.map(function(r){ return '<div>' + r.split('').map(function(k){
-      if(k === '>') return '<button type="button" class="pd-key wide" data-key="ENTER">Enter</button>';
-      if(k === '<') return '<button type="button" class="pd-key wide" data-key="BACK">Del</button>';
-      return '<button type="button" class="pd-key '+(S.keys[k]||'')+'" data-key="'+k+'">'+k+'</button>'; }).join('') + '</div>'; }).join('');
-    root.querySelector('[data-body]').innerHTML = '<div class="pd-clue">'+sessChip(l)+' '+escHtml(S.t.c)+' <span class="mono" style="color:var(--ar-dim)">('+n+' letters)</span></div><div class="pd-board">'+board+'</div><div class="gm-feedback" data-fb style="text-align:center"></div>' +
-      (S.done ? '<div class="gm-row">'+(S.won ? '<button type="button" class="gm-btn" data-next>Next word</button>' : '')+'</div>' : '') + '<div class="pd-kb">'+kb+'</div>';
-  }
-  function fb(t, cls){ var el = root.querySelector('[data-fb]'); if(el){ el.className = 'gm-feedback ' + cls; el.textContent = t; } }
-  function press(k){
-    if(!running || S.done) return;
-    var n = S.t.w.length;
-    if(k === 'ENTER'){
-      if(S.cur.length !== n){ fb('Need ' + n + ' letters', 'bad'); var b = root.querySelector('.pd-board'); if(b){ b.classList.remove('gm-shake'); void b.offsetWidth; b.classList.add('gm-shake'); } return; }
-      var r = score(S.cur, S.t.w); S.rows.push({ g:S.cur, r:r });
-      var RANK = { x:1, y:2, g:3 };
-      for(var i=0;i<n;i++){ var ch = S.cur[i], st = r[i], prev = S.keys[ch]; if(!prev || RANK[st] > RANK[prev]) S.keys[ch] = st; }
-      var won = S.cur === S.t.w; S.cur = '';
-      if(won){
-        S.done = true; S.won = true; S.streak++; S.words++;
-        var pts = (ROWS + 1 - S.rows.length) * 50 + n * 10, mult = 1 + Math.min(S.streak - 1, 8) * 0.25; pts = Math.round(pts * mult);
-        S.score += pts; C.SFX.good(); hud(); render(); fb('Got it in ' + S.rows.length + '! +' + pts, 'ok');
-      } else if(S.rows.length >= ROWS){
-        S.done = true; S.won = false; C.SFX.bad(); S.missed.push({ q:S.t.c, a:S.t.w }); render(); fb('The word was ' + S.t.w, 'bad');
-        setTimeout(end, 1800);
-      } else { C.SFX.tick(); render(); }
-      return;
-    }
-    if(k === 'BACK'){ S.cur = S.cur.slice(0, -1); render(); return; }
-    if(/^[A-Z]$/.test(k) && S.cur.length < n){ S.cur += k; render(); }
-  }
-  function hud(){ C.setHud(root, { score:S.score, words:S.words, streak:S.streak }); }
-  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); draw = C.dealer(pool()); S = { score:0, words:0, streak:0, missed:[] }; running = true; hud(); newWord(); }
-  function end(){ running = false; C.finish(g, root, S.score, S.missed, { note:'You solved <b>' + S.words + '</b> word' + (S.words === 1 ? '' : 's') + ' in a row.' }); }
-  function kd(e){
-    if(!running || !root || !document.body.contains(root)) return;
-    if(e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')) return;
-    if(e.ctrlKey || e.metaKey || e.altKey) return;
-    if(e.key === 'Enter'){ e.preventDefault(); if(S.done && S.won){ newWord(); return; } press('ENTER'); }
-    else if(e.key === 'Backspace'){ e.preventDefault(); press('BACK'); }
-    else if(/^[a-zA-Z]$/.test(e.key)) press(e.key.toUpperCase());
-  }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { hud:['score','words','streak'], select:C.scopeSelectHTML('terms', 4), stage:'<div class="gm-stage pd-stage" data-stage><div data-body style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;min-height:420px"></div></div>', keys:'Type or tap letters · <kbd>Enter</kbd> to guess · green = right spot, yellow = in the word' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Guess the perio term in six tries from its clue. <b>Green</b>: right letter, right spot. <b>Yellow</b>: in the word, wrong spot. Solve it to move on; words keep coming until one stumps you.', 'Start'));
-      S = { score:0, words:0, streak:0 }; hud();
-      stage.addEventListener('click', function(e){
-        if(e.target.closest('[data-start]')){ begin(); return; }
-        if(e.target.closest('[data-next]')){ newWord(); return; }
-        var k = e.target.closest('[data-key]'); if(k) press(k.getAttribute('data-key'));
-      });
-      document.addEventListener('keydown', kd);
-    },
-    stop:function(){ running = false; document.removeEventListener('keydown', kd); }
-  };
-};
-
-/* =================================================================== ROOT PLANER
-   Typing game: calculus deposits carrying clues slide down the root; type the
-   answer to plane each one off before it reaches the gumline. */
-GAME_IMPL.planer = function(g, C){
-  var root, stage, field, input, S, running = false, raf = 0, last = 0, draw, paused = false;
-  function pool(){ return C.termPool(C.currentScope(root)); }
-  function spawn(){
-    var t = draw(); if(!t) return;
-    var lanes = [0.2, 0.5, 0.8], used = S.deps.filter(function(d){ return d.y < 120; }).map(function(d){ return d.lane; });
-    var free = [0,1,2].filter(function(i){ return used.indexOf(i) === -1; }); if(!free.length) return;
-    var lane = pick(free), el = document.createElement('div');
-    el.className = 'rp-dep'; el.innerHTML = escHtml(t.c) + '<small>' + t.w.length + ' letters</small>';
-    field.appendChild(el);
-    S.deps.push({ t:t, el:el, lane:lane, y:-10, x:lanes[lane], hint:false });
-  }
-  function hud(){ C.setHud(root, { score:S.score, lives:[S.lives,3], level:S.level }); }
-  function step(dt){
-    var h = field.clientHeight, w = field.clientWidth, floor = h - 54 - 40;
-    S.spawnIn -= dt;
-    var maxOn = Math.min(2 + S.level, 5);
-    if(S.spawnIn <= 0 && S.deps.length < maxOn){ spawn(); S.spawnIn = Math.max(1.6, 4.2 - S.level * 0.35); }
-    var v = 14 + S.level * 4.5;
-    for(var i=S.deps.length-1;i>=0;i--){
-      var d = S.deps[i]; d.y += v * dt;
-      if(!d.hint && d.y > floor * 0.55){ d.hint = true; d.el.classList.add('hot'); d.el.querySelector('small').textContent = 'starts with ' + d.t.w[0] + ' · ' + d.t.w.length + ' letters'; }
-      var ew = d.el.offsetWidth, px = Math.max(6, Math.min(w - ew - 6, d.x * w - ew/2));
-      d.el.style.transform = 'translate(' + px + 'px,' + d.y + 'px)';
-      if(d.y > floor){
-        d.el.remove(); S.deps.splice(i,1); S.lives--; S.streak = 0; C.SFX.bad(); S.missed.push({ q:d.t.c, a:d.t.w }); hud();
-        if(S.lives <= 0){ end(); return; }
-      }
-    }
-  }
-  function loop(ts){ if(!running) return; var dt = last ? Math.min(0.1, (ts - last)/1000) : 0; last = ts; if(!paused) step(dt); if(running) raf = requestAnimationFrame(loop); }
-  function submit(){
-    var v = normWord(input.value); if(!v) return;
-    var hit = -1; S.deps.forEach(function(d, i){ if(hit < 0 && normWord(d.t.w) === v) hit = i; });
-    if(hit > -1){
-      var d = S.deps[hit]; S.deps.splice(hit, 1); S.streak++; S.planed++;
-      var h = field.clientHeight, pts = Math.round((40 + d.t.w.length * 6 + Math.max(0, (h - d.y)) * 0.15) * (1 + Math.min(S.streak-1, 10) * 0.1));
-      S.score += pts; C.SFX.good();
-      C.popAt(field, d.x * field.clientWidth - 20, Math.max(10, d.y), '+' + pts, 'var(--ar-mint)');
-      d.el.classList.add('gone'); d.el.style.transform += ' scale(.6)'; setTimeout(function(){ d.el.remove(); }, 260);
-      if(S.planed % 6 === 0) S.level++;
-      hud(); input.value = '';
-    } else {
-      S.streak = 0; C.SFX.bad(); input.classList.remove('gm-shake'); void input.offsetWidth; input.classList.add('gm-shake'); input.select();
-    }
-  }
-  function begin(){
-    var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove();
-    field.querySelectorAll('.rp-dep').forEach(function(x){ x.remove(); });
-    draw = C.dealer(pool()); S = { score:0, lives:3, level:1, streak:0, planed:0, deps:[], missed:[], spawnIn:0.3 };
-    running = true; paused = false; last = 0; hud(); input.value = ''; input.disabled = false; input.focus();
-    cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
-  }
-  function end(){ running = false; cancelAnimationFrame(raf); input.disabled = true; C.finish(g, root, S.score, S.missed, { note:'You planed <b>' + S.planed + '</b> deposit' + (S.planed === 1 ? '' : 's') + '.' }); }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { select:C.scopeSelectHTML('terms', 6), stage:'<div class="gm-stage rp-stage" data-stage><div class="rp-canvas-wrap" data-field></div><div class="rp-gum"></div></div>', below:'<form class="rp-input" data-form autocomplete="off"><input type="text" data-in placeholder="Type the answer and press Enter" autocapitalize="characters" spellcheck="false" disabled><button type="submit" class="gm-btn">Plane</button></form>', keys:'Type the term for any deposit and press <kbd>Enter</kbd> · deposits get a first-letter hint halfway down' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]'); field = root.querySelector('[data-field]'); input = root.querySelector('[data-in]');
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Calculus deposits slide down the root, each carrying a clue. Type the term it describes and press Enter to plane it off. Let one reach the gumline and you lose a life. Three lives; it speeds up as you go.', 'Start planing'));
-      S = { score:0, lives:3, level:1 }; hud();
-      stage.addEventListener('click', function(e){ if(e.target.closest('[data-start]')) begin(); else if(running) input.focus(); });
-      root.querySelector('[data-form]').addEventListener('submit', function(e){ e.preventDefault(); if(running) submit(); });
-    },
-    pause:function(){ if(running) paused = true; },
-    stop:function(){ running = false; cancelAnimationFrame(raf); }
-  };
-};
-
-/* =================================================================== CROSS-SECTION
-   A fresh mini crossword generated from the course terms every game. */
-GAME_IMPL.cross = function(g, C){
-  var root, stage, S, running = false, hidden, clockT = 0;
-  function build(words){
-    var best = null;
-    for(var attempt=0; attempt<40; attempt++){
-      var list = shuffled(words).slice(0, 16), G = {}, placed = [];
-      function get(x,y){ return G[x+','+y]; }
-      function canPlace(w, x, y, dir){
-        var dx = dir === 'A' ? 1 : 0, dy = dir === 'D' ? 1 : 0, cross = 0;
-        if(get(x - dx, y - dy) || get(x + dx*w.length, y + dy*w.length)) return -1;
-        for(var i=0;i<w.length;i++){
-          var cx = x + dx*i, cy = y + dy*i, ch = get(cx, cy);
-          if(ch){ if(ch !== w[i]) return -1; cross++; }
-          else { if(get(cx + dy, cy + dx) || get(cx - dy, cy - dx)) return -1; }
-        }
-        return cross;
-      }
-      function put(t, x, y, dir){ var dx = dir === 'A' ? 1 : 0, dy = dir === 'D' ? 1 : 0; for(var i=0;i<t.w.length;i++) G[(x+dx*i)+','+(y+dy*i)] = t.w[i]; placed.push({ t:t, x:x, y:y, dir:dir }); }
-      put(list[0], 0, 0, 'A');
-      for(var k=1;k<list.length && placed.length < 9;k++){
-        var t = list[k], w = t.w, opts = [];
-        Object.keys(G).forEach(function(key){
-          var p = key.split(','), gx = +p[0], gy = +p[1], ch = G[key];
-          for(var i=0;i<w.length;i++){ if(w[i] !== ch) continue;
-            ['A','D'].forEach(function(dir){ var x = dir === 'A' ? gx - i : gx, y = dir === 'D' ? gy - i : gy, c = canPlace(w, x, y, dir); if(c > 0) opts.push({ x:x, y:y, dir:dir, c:c }); }); }
-        });
-        if(!opts.length) continue;
-        opts.sort(function(a,b){ return b.c - a.c; });
-        var o = opts[Math.floor(Math.random() * Math.min(3, opts.length))];
-        var xs = Object.keys(G).map(function(k2){ return +k2.split(',')[0]; }).concat([o.x, o.dir === 'A' ? o.x + w.length - 1 : o.x]);
-        var ys = Object.keys(G).map(function(k2){ return +k2.split(',')[1]; }).concat([o.y, o.dir === 'D' ? o.y + w.length - 1 : o.y]);
-        if(Math.max.apply(null, xs) - Math.min.apply(null, xs) > 12 || Math.max.apply(null, ys) - Math.min.apply(null, ys) > 11) continue;
-        put(t, o.x, o.y, o.dir);
-      }
-      if(!best || placed.length > best.placed.length) best = { placed:placed, G:G };
-      if(placed.length >= 8) break;
-    }
-    var xs = [], ys = [];
-    Object.keys(best.G).forEach(function(k){ var p = k.split(','); xs.push(+p[0]); ys.push(+p[1]); });
-    var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys);
-    var W = Math.max.apply(null, xs) - minX + 1, H = Math.max.apply(null, ys) - minY + 1;
-    var sol = {}; Object.keys(best.G).forEach(function(k){ var p = k.split(','); sol[(+p[0]-minX)+','+(+p[1]-minY)] = best.G[k]; });
-    var entries = best.placed.map(function(p){ return { t:p.t, x:p.x - minX, y:p.y - minY, dir:p.dir }; });
-    var starts = {}; entries.forEach(function(e){ starts[e.x+','+e.y] = 1; });
-    var num = 0, nums = {};
-    for(var y=0;y<H;y++) for(var x=0;x<W;x++) if(starts[x+','+y]) nums[x+','+y] = ++num;
-    entries.forEach(function(e){ e.n = nums[e.x+','+e.y]; });
-    entries.sort(function(a,b){ return a.n - b.n; });
-    return { W:W, H:H, sol:sol, entries:entries, nums:nums };
-  }
-  function cellsOf(e){ var out = []; for(var i=0;i<e.t.w.length;i++) out.push(e.dir === 'A' ? (e.x+i)+','+e.y : e.x+','+(e.y+i)); return out; }
-  function newPuzzle(){
-    var words = C.termPool(C.currentScope(root), function(t){ return t.w.length >= 3 && t.w.length <= 11; });
-    if(words.length < 8) words = C.termPool('all', function(t){ return t.w.length >= 3 && t.w.length <= 11; });
-    S.P = build(words); S.fill = {}; S.marks = {}; S.cur = 0; S.pos = 0; S.pen = 0; S.start = Date.now(); render();
-  }
-  function curEntry(){ return S.P.entries[S.cur]; }
-  function render(){
-    var P = S.P, e = curEntry(), wc = cellsOf(e), at = wc[S.pos];
-    var grid = '';
-    for(var y=0;y<P.H;y++) for(var x=0;x<P.W;x++){
-      var k = x+','+y;
-      if(!P.sol[k]){ grid += '<div class="cx-cell"></div>'; continue; }
-      var cls = 'cx-cell on' + (wc.indexOf(k) > -1 ? ' word' : '') + (k === at ? ' cur' : '') + (S.marks[k] ? ' ' + S.marks[k] : '');
-      grid += '<div class="'+cls+'" data-cx="'+k+'">'+(P.nums[k] ? '<em>'+P.nums[k]+'</em>' : '')+'<span>'+(S.fill[k]||'')+'</span></div>';
-    }
-    function clueList(dir){ return P.entries.map(function(en, i){ if(en.dir !== dir) return ''; var done = cellsOf(en).every(function(k){ return S.fill[k] === P.sol[k]; }); return '<li><button type="button" class="cx-clue'+(i===S.cur?' cur':'')+(done?' done':'')+'" data-clue="'+i+'"><b>'+en.n+'</b>'+escHtml(en.t.c)+' <span class="mono">('+en.t.w.length+')</span></button></li>'; }).join(''); }
-    root.querySelector('[data-body]').innerHTML = '<div><div class="cx-grid" style="grid-template-columns:repeat('+P.W+',auto)">'+grid+'</div>' +
-      '<div class="cx-tools"><button type="button" class="gm-btn alt" data-cx-act="check">Check (−25)</button><button type="button" class="gm-btn alt" data-cx-act="letter">Reveal letter (−15)</button><button type="button" class="gm-btn alt" data-cx-act="word">Reveal word (forfeits it)</button></div></div>' +
-      '<div style="min-width:0"><div class="cx-cur">'+e.n+(e.dir==='A'?' Across':' Down')+' · '+escHtml(e.t.c)+'</div><div class="cx-clues"><div><h4>Across</h4><ol>'+clueList('A')+'</ol></div><div><h4>Down</h4><ol>'+clueList('D')+'</ol></div></div></div>';
-  }
-  function hud(){ C.setHud(root, { score:S.total, words:S.P ? S.P.entries.length : 0, time:S.start ? Math.floor((Date.now() - S.start)/1000) + 's' : '0s' }); }
-  function select(i, pos){ S.cur = i; S.pos = pos || 0; var wc = cellsOf(curEntry()); while(S.pos < wc.length - 1 && S.fill[wc[S.pos]] && pos === undefined) S.pos++; render(); focusHidden(); }
-  function focusHidden(){ try{ hidden.focus({ preventScroll:true }); }catch(e){ hidden.focus(); } }
-  function typeLetter(L){
-    var wc = cellsOf(curEntry()), k = wc[S.pos]; S.fill[k] = L; delete S.marks[k];
-    if(S.pos < wc.length - 1) S.pos++;
-    else { var nxt = S.P.entries.findIndex(function(en, i){ return i > S.cur && cellsOf(en).some(function(c){ return !S.fill[c]; }); }); if(nxt > -1){ select(nxt); return; } }
-    render(); checkDone();
-  }
-  function back(){ var wc = cellsOf(curEntry()), k = wc[S.pos]; if(S.fill[k]){ delete S.fill[k]; } else if(S.pos > 0){ S.pos--; delete S.fill[wc[S.pos]]; } render(); }
-  function checkDone(){
-    var all = Object.keys(S.P.sol).every(function(k){ return S.fill[k] === S.P.sol[k]; });
-    if(!all) return;
-    var secs = Math.round((Date.now() - S.start)/1000), n = S.P.entries.length, earned = n - (S.revealed || 0);
-    var pts = Math.max(0, earned * 120 + Math.round(Math.max(0, 480 - secs) * earned / n) - S.pen);
-    S.total += pts; running = false; clearInterval(clockT); C.SFX.win(); hud();
-    Object.keys(S.P.sol).forEach(function(k){ S.marks[k] = 'ok'; }); render();
-    C.finish(g, root, S.total, S.missed, { title:'Solved!', win:earned === n, note:n + ' words in ' + secs + 's' + (S.revealed ? ' · ' + S.revealed + ' revealed' : '') + (S.pen ? ' · penalties −' + S.pen : '') });
-  }
-  function act(a){
-    var P = S.P, e = curEntry(), wc = cellsOf(e);
-    if(a === 'check'){ S.pen += 25; Object.keys(S.fill).forEach(function(k){ S.marks[k] = S.fill[k] === P.sol[k] ? 'ok' : 'bad'; }); C.SFX.tick(); }
-    if(a === 'letter'){ var k = wc[S.pos]; S.pen += 15; S.fill[k] = P.sol[k]; S.marks[k] = 'ok'; }
-    if(a === 'word'){ if(wc.every(function(k3){ return S.fill[k3] === P.sol[k3]; })) return; S.revealed = (S.revealed||0) + 1; wc.forEach(function(k2){ S.fill[k2] = P.sol[k2]; S.marks[k2] = 'ok'; }); S.missed.push({ q:e.t.c, a:e.t.w }); }
-    render(); checkDone(); focusHidden();
-  }
-  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); S = { total:0, missed:[] }; running = true; newPuzzle(); hud(); clearInterval(clockT); clockT = setInterval(function(){ if(running) hud(); }, 1000); focusHidden(); }
-  function kd(e){
-    if(!running || !root || !document.body.contains(root)) return;
-    if(e.target && e.target.tagName === 'SELECT') return;
-    if(e.ctrlKey || e.metaKey || e.altKey) return;
-    var wc = cellsOf(curEntry());
-    if(/^[a-zA-Z]$/.test(e.key)){ e.preventDefault(); typeLetter(e.key.toUpperCase()); }
-    else if(e.key === 'Backspace'){ e.preventDefault(); back(); }
-    else if(e.key === 'Tab' || e.key === 'Enter'){ e.preventDefault(); select((S.cur + (e.shiftKey ? S.P.entries.length - 1 : 1)) % S.P.entries.length); }
-    else if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ e.preventDefault(); if(S.pos < wc.length - 1){ S.pos++; render(); } }
-    else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ e.preventDefault(); if(S.pos > 0){ S.pos--; render(); } }
-  }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { hud:['score','words','time'], select:C.scopeSelectHTML('terms', 8), stage:'<div class="gm-stage cx-stage" data-stage><input class="cx-hidden" data-hidden autocapitalize="characters" autocomplete="off" aria-label="Crossword input"><div data-body style="display:contents"></div></div>', keys:'Tap a square or clue, then type · <kbd>Tab</kbd> next clue · <kbd>⌫</kbd> erase · checks and reveals cost points' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]'); hidden = root.querySelector('[data-hidden]');
-      S = { total:0, missed:[] };
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'A new mini crossword from the course terms every game. Fill every square; the faster you finish, the bigger the time bonus. Checking and revealing letters costs points.', 'New puzzle'));
-      stage.addEventListener('click', function(e){
-        if(e.target.closest('[data-start]')){ begin(); return; }
-        if(!running) return;
-        var cl = e.target.closest('[data-clue]'); if(cl){ select(+cl.getAttribute('data-clue')); return; }
-        var a = e.target.closest('[data-cx-act]'); if(a){ act(a.getAttribute('data-cx-act')); return; }
-        var c = e.target.closest('[data-cx]');
-        if(c){
-          var k = c.getAttribute('data-cx'), cands = [];
-          S.P.entries.forEach(function(en, i){ var p = cellsOf(en).indexOf(k); if(p > -1) cands.push({ i:i, p:p }); });
-          var curHas = cands.filter(function(x){ return x.i === S.cur; })[0];
-          var choice = curHas && cands.length > 1 && cellsOf(curEntry())[S.pos] === k ? cands.filter(function(x){ return x.i !== S.cur; })[0] : (curHas || cands[0]);
-          if(choice) select(choice.i, choice.p);
-        }
-      });
-      hidden.addEventListener('input', function(){ var v = normWord(hidden.value); hidden.value = ''; if(!running) return; v.split('').forEach(typeLetter); });
-      document.addEventListener('keydown', kd);
-    },
-    stop:function(){ running = false; clearInterval(clockT); document.removeEventListener('keydown', kd); }
-  };
-};
-
-/* =================================================================== MILLION-DOLLAR SMILE
-   Quiz-show ladder on the question bank: 12 rungs, safe havens at $1,000 and
-   $32,000, three lifelines (50:50, Ask the Class, Swap). */
-GAME_IMPL.smile = function(g, C){
-  var LADDER = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000], SAFE = [4, 9];
-  var root, stage, S, running = false, draw;
-  function money(n){ return '$' + Number(n).toLocaleString(); }
-  function banked(){ return S.rung > 0 ? LADDER[S.rung - 1] : 0; }
-  function safeAmount(){ var s = 0; SAFE.forEach(function(i){ if(S.rung > i) s = LADDER[i]; }); return s; }
-  function ladderHTML(){ return '<ol class="ms-ladder">' + LADDER.map(function(v, i){ return '<li class="'+(SAFE.indexOf(i) > -1 ? 'safe ' : '')+(i === S.rung ? 'on' : i < S.rung ? 'done' : '')+'"><span>'+(i+1)+'</span><span>'+money(v)+'</span></li>'; }).join('') + '</ol>'; }
-  function newQ(){ S.deal = C.dealMCQ(draw(), 4); S.gone = []; S.locked = -1; S.note = ''; render(); }
-  function render(){
-    var d = S.deal, l = LECTURE_BY_ID[d.q.lec];
-    root.querySelector('[data-body]').innerHTML = '<div class="ms-main"><div class="ms-life">' +
-      '<button type="button" class="ms-lifebtn" data-life="fifty"'+(S.used.fifty?' disabled':'')+'>50:50</button>' +
-      '<button type="button" class="ms-lifebtn" data-life="class"'+(S.used.class?' disabled':'')+'>Ask the class</button>' +
-      '<button type="button" class="ms-lifebtn" data-life="swap"'+(S.used.swap?' disabled':'')+'>Swap question</button>' +
-      '<button type="button" class="ms-lifebtn" data-walk style="margin-left:auto;border-color:var(--ar-coral);color:var(--ar-coral)"'+(S.rung === 0 ? ' disabled' : '')+'>Walk away with '+money(banked())+'</button></div>' +
-      '<div class="ms-q"><div style="font-family:var(--font-mono);font-size:.72rem;color:var(--ar-dim);margin-bottom:6px">FOR '+money(LADDER[S.rung])+' · S'+l.num+' '+escHtml(shortTitle(l))+'</div>'+escHtml(d.q.stem)+'</div>' +
-      '<div class="ms-opts">' + d.opts.map(function(o, i){ return '<button type="button" class="ms-opt'+(S.gone.indexOf(i) > -1 ? ' gone' : '')+(S.locked === i ? ' locked' : '')+'" data-ms="'+i+'"><b>'+C.LETTERS[i]+':</b><span>'+escHtml(o.text)+'</span></button>'; }).join('') + '</div>' +
-      '<div class="ms-note" data-note>'+S.note+'</div></div>' + ladderHTML();
-  }
-  function hud(){ C.setHud(root, { score:money(banked()), rung:(S.rung + 1) + '/12' }); }
-  function lock(i){
-    if(S.locked > -1 || S.gone.indexOf(i) > -1) return;
-    S.locked = i; render(); C.SFX.tick();
-    var d = S.deal;
-    setTimeout(function(){
-      if(!running) return;
-      var ok = i === d.right;
-      recordAnswer(d.q.id, d.q.lec, ok);
-      var btns = root.querySelectorAll('[data-ms]');
-      btns[d.right].classList.remove('locked'); btns[d.right].classList.add('right');
-      if(ok){
-        C.SFX.good(); S.rung++; hud();
-        if(S.rung >= LADDER.length){ setTimeout(function(){ end(LADDER[LADDER.length-1], true); }, 1000); return; }
-        var note = root.querySelector('[data-note]'); if(note) note.innerHTML = '<b>Correct!</b> ' + (SAFE.indexOf(S.rung - 1) > -1 ? money(LADDER[S.rung - 1]) + ' is now safe. ' : '') + (d.q.ex ? escHtml(d.q.ex) : '');
-        setTimeout(function(){ if(running) newQ(); }, d.q.ex ? 2600 : 1400);
-      } else {
-        C.SFX.bad(); S.missed.push({ q:d.q.stem, a:d.q.choices[d.q.answer] });
-        var n2 = root.querySelector('[data-note]'); if(n2) n2.innerHTML = 'The answer was <b>' + escHtml(d.opts[d.right].text) + '</b>. You leave with ' + money(safeAmount()) + '.';
-        setTimeout(function(){ end(safeAmount(), false); }, 2600);
-      }
-    }, 1100);
-  }
-  function lifeline(k){
-    if(S.used[k] || S.locked > -1) return;
-    S.used[k] = true; var d = S.deal;
-    if(k === 'fifty'){
-      S.gone = shuffled([0,1,2,3].filter(function(i){ return i !== d.right; })).slice(0, 2);
-      S.note = 'Two wrong answers removed.'; render();
-    } else if(k === 'swap'){
-      newQ(); S.note = 'Fresh question, same rung.'; render();
-    } else if(k === 'class'){
-      var wrong = [0,1,2,3].filter(function(i){ return i !== d.right && S.gone.indexOf(i) === -1; });
-      if(wrong.length > 1) S.gone.push(pick(wrong));
-      S.note = 'The class rules one answer out. Checking how classmates did on this question…'; render();
-      var qid = d.q.id;
-      if(window.shGetClassStats) window.shGetClassStats([qid], function(by){
-        if(!running || S.deal.q.id !== qid) return;
-        var r = by[qid];
-        S.note = 'The class rules one answer out. ' + (r && r.total ? '<b>' + Math.round(100 * r.correct / r.total) + '%</b> of classmates got this one right (n=' + r.total + ').' : 'Not enough class data on this question yet.');
-        var n = root.querySelector('[data-note]'); if(n) n.innerHTML = S.note;
-      });
-    }
-  }
-  function begin(){
-    var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove();
-    draw = C.dealer(C.bankPool(C.currentScope(root)));
-    S = { rung:0, used:{}, missed:[] }; running = true; hud(); newQ();
-  }
-  function end(amount, win){ running = false; C.finish(g, root, amount, S.missed, win ? { title:'Million-dollar smile!', win:true, note:'You climbed all 12 rungs.' } : { title: amount === banked() && S.walked ? 'You walked away' : 'Game over', note:'You reached rung <b>' + (S.rung + (win ? 0 : 1)) + '</b> of 12.' }); }
-  return {
-    mount:function(panel){
-      panel.innerHTML = C.shell(g, { hud:['score','rung'], select:C.scopeSelectHTML('bank', 12), stage:'<div class="gm-stage" data-stage><div class="ms-stage" data-body style="min-height:430px"></div></div>', keys:'Tap an answer to lock it in · <kbd>1</kbd>-<kbd>4</kbd> also work · safe havens at $1,000 and $32,000' });
-      root = panel.querySelector('.gm'); stage = root.querySelector('[data-stage]');
-      S = { rung:0, used:{} }; hud();
-      stage.insertAdjacentHTML('beforeend', C.introHTML(g, 'Twelve questions from the bank stand between you and <b>$125,000</b>. Miss one and you drop to your last safe haven ($1,000 or $32,000). Three lifelines: <b>50:50</b>, <b>Ask the class</b> (rules one out and shows how classmates did on it) and <b>Swap</b>. You can walk away with what you\'ve banked at any time.', 'Let\'s play'));
-      stage.addEventListener('click', function(e){
-        if(e.target.closest('[data-start]')){ begin(); return; }
-        if(!running) return;
-        var o = e.target.closest('[data-ms]'); if(o){ lock(+o.getAttribute('data-ms')); return; }
-        var lf = e.target.closest('[data-life]'); if(lf){ lifeline(lf.getAttribute('data-life')); return; }
-        if(e.target.closest('[data-walk]') && S.locked < 0 && S.rung > 0){ S.walked = true; end(banked(), false); }
-      });
-      document.addEventListener('keydown', kd);
-    },
-    stop:function(){ running = false; document.removeEventListener('keydown', kd); }
-  };
-  function kd(e){ if(!running || !root || !document.body.contains(root)) return; if(e.target && e.target.tagName === 'SELECT') return; var n = parseInt(e.key, 10); if(n >= 1 && n <= 4){ e.preventDefault(); lock(n - 1); } }
 };
 
 /* ====================================================================
@@ -6553,6 +5542,7 @@ window.SH_EXPORT = {
 })();
 </script>
 <script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
+<script defer src="../../widget/games.js"></script>
 <script defer src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="compendium"></script>
 <script>document.addEventListener("DOMContentLoaded", function(){ if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]"); });</script>
 </body>

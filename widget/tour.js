@@ -231,7 +231,7 @@
     S.push({ before: function(){ press(modeTab("review")); }, wait: 450, el: "#panel-review", title: "Review",
       body: "<p>Every reference table for the course in one place: comparisons, drug cards, processes, look-alikes side by side. Search it, or switch on <b>hide answers</b> to quiz yourself.</p>" });
     S.push({ before: function(){ press(modeTab("arcade")); }, wait: 450, el: function(){ return $("#panel-arcade .ar-grid") || $("#panel-arcade"); }, title: "Arcade",
-      body: "<p>Nine games built on this hub's material, each with a class high-score board. The ones that use the question bank count toward your stats and XP.</p>" });
+      body: "<p>Six games built on this hub's material, each with a class high-score board: a quiz board, an escape room, fill-in-the-blank and more. The ones that use the question bank count toward your stats and XP, and you can replay just the questions you missed.</p>" });
     S.push({ before: function(){ restore(); launcherOpen(true); }, wait: 350,
       el: function(){ return phone() ? $("#shstat-root .shm-group") : $("#shstat-menu"); }, title: phone() ? "More" : "Study tools",
       body: "<ul><li><b>Search</b> finds any word in the notes, review tables, hints and questions, and jumps right to it.</li>" +
