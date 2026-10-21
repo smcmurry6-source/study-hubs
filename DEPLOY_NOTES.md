@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 10 of 10: tooth vs implant under load, Claude Code)** — In the L5 notes at 'Implants' (both levels;
+  a heading anchor, so after the table and the anterior/posterior paragraph) and in Review (L5 tab, before Registration). A tooth in its
+  PDL beside an osseointegrated implant: Under load (push down: about 28 µm vs about 2-3 µm; sideways: 56-75 vs 10-50 µm; the PDL's
+  "felt" signal), drawn ×500 (0.5 px/µm) with the notes' numbers at full load; Shimstock check (12 µm): light closure holds on the tooth
+  and pulls through the implant, clench holds on both. Controls use `data-imtab`/`data-imdir`/`data-implay`. Built by
+  `tools/figures/occlusion/anima/implant.mjs`. About page updated. **This completes the 10 Occlusion figures Sam approved on 2026-10-20.**
+
 - **2026-10-21 (Occlusion anima 9 of 10: swallowing, stage by stage, Claude Code)** — In the L3 notes after 'Part 2: swallowing'
   (plain 'Swallowing'; new `FIG_PLACE.function` / `FIG_BY_LEC.function`) and in Review (L3 tab, after Swallowing stages). Schematic
   midline section: tongue, palates, pharynx, epiglottis, hyoid, trachea, esophagus, cervical spine. A stage slider (0-3) blends
