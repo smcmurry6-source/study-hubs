@@ -112,11 +112,35 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   "≤25°" as on the slides (`q6-01`, `q6-06` choice text; same ids and positions). 54 new questions (`q6-L01`-`L38`,
   4 two-statement `q6-S*`, 4 EXCEPT `q6-E*`, 3 select-all `q6-M*`, 4 Patient Box `q6-P*`, 1 matching `q6-X01`; bank
   425 → 479), each with its `QUESTION_WHY` row; 4 Review sections (definition and case selection, risk assessment +
-  decision tree, toolbox + graft sources, OFD baseline + evaluation), cram sheet, mind map, 5 arcade words and a
-  Quadrants group. `NEXT_QUIZ` not set
+  decision tree, toolbox + graft sources, OFD baseline + evaluation), cram sheet, mind map and 5 arcade words
+  (the Quadrants group was dropped in the merge with #151, which retired that game). `NEXT_QUIZ` not set
   (date unknown). No diagrams drawn; the diagram review is still to be put to Sam. **When the recording arrives: flip to
   `taught`, add what the lecture emphasizes, exam hints, and regenerate both mp3s. Perio Project: carry all of this
   into the split sources.**
+
+- **2026-10-21 (arcade revamp: six games, shared `widget/games.js`, Claude Code)** — Sam: the games were a bust; cut nine to six and
+  make them playable. Data behind the pick: the arcade was under 2% of study time in every hub; only the sort game (Sort Storm 50
+  plays/9 people, Split Decision, Silane Sort), Perio's Cross-Section (12/6), Calculus Crusher (10/8) and Million-Dollar Smile got
+  repeat plays; snake, flappy, whack, blaster, search, sweeper, perdle and planer each got about one. Survey 3's games question asked
+  for fewer games, a Jeopardy board by lecture with wagers, cloze fill-in-the-blank, quiz-based games and a lecture / missed-question
+  filter. New **`widget/games.js`** (+ `widget/games.css`, linked by the script; each hub loads it with `<script defer>` before v3.js):
+  `shGames.make(id, g, C)` for **board** (Showdown: one column per lecture, $100-$500 sorted by class accuracy via
+  `shGetClassStats`, 2 Daily Doubles, a Final wager on one of the hardest leftovers), **cloze** (Mind the Gap: a sentence from the
+  notes with a bolded term blanked out, typed answer, `grade()` allows a letter or two of typos and plurals, 3 lives, clock tightens
+  from 32 s to 16 s), **escape** (Operatory Escape: an SVG operatory with hotspots; X-ray viewer, patient chart and drawer are MCQ
+  locks, the computer's password is a cloze term, the drawer gives a curing light that reveals the poster's digit; 4 colored digits
+  open the door; 6 min, -20 s per wrong answer), plus **smile** and **cross** moved out of Perio. Cloze items come from
+  `clozePool(notes)`: `<b>` terms in `p`/`li` (not the "What's tested" box or tables), 3-36 chars, at most 4 words, with a stop list
+  for emphasis words. Each hub passes a context `C` (contract at the top of games.js): bank/terms/notes pools, the scope select
+  (now with **Questions I missed**: last answer wrong), shell, HUD, finish (best score + leaderboard) and `record` (its answer choke
+  point, so class stats and Weak Spots update). **Occlusion**: Cusp Sort + Freeway Showdown, Operatory Escape, Mind the Gap,
+  Million-Dollar Smile, Cross-Section (crossword words = one-word bank answers + one-word bolded terms); snake, stack, match, hangman,
+  fact, blaster, search and whack removed with their CSS. **Perio**: Calculus Crusher + Pocket Showdown, Operatory Escape, Mind the
+  Gap, Smile, Cross-Section; flappy, probe, quadrants, perdle, planer and sweeper removed (and `QUAD_GROUPS`); the category filter row
+  is gone. Archived MSK 3/4 and PCD 3 keep their nine games. `migration_v40.sql` (**applied via the connector**) whitelists `board`,
+  `cloze`, `escape`. Dashboard `ARCADES`, About page Part 4, `widget/tour.js` arcade step, CI syntax check, `sw.js` -> `sh-v30`.
+  **A new hub: load `widget/games.js` and build `C` like Occlusion's (`CTX` in its ARCADE). Perio Project: carry the arcade into the
+  split sources.**
 
 - **2026-10-21 (tour fixes and a faster streak board, Claude Code)** — `widget/tour.js`: the dim layer is one element with a
   rounded `clip-path` hole matching the spotlight ring (the four panels showed seams and square corners when zoomed in); short

@@ -367,7 +367,8 @@ begin
   if p_visitor is null or length(trim(p_visitor)) = 0 then return; end if;
   if p_game not in (
     'sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack',          -- msk-exam3 Bone Zone Arcade
-    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross'   -- perio Pocket Arcade
+    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross',  -- perio Pocket Arcade
+    'board', 'cloze', 'escape'                                                                   -- shared games (widget/games.js, migration_v40)
   ) then return; end if;
   if p_score is null or p_score < 1 or p_score > 200000 then return; end if;
   if exists (select 1 from arcade_scores where visitor_id = p_visitor and hub = coalesce(p_hub, '') and game = p_game
