@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Timmy Time: Occlusion midterm episode, Claude Code)** — A 45-minute last-minute review for the Occlusion
+  midterm, hosted by Timmy Tooth: `hubs/occlusion/audio/timmy-time.mp3` (~32 MB, -16 LUFS), script
+  `tools/podcast/occlusion/script.md`, written from the hub's notes (As taught), exam hints and cram sheet, in exam-weight order
+  (L1 split into terms, what cusp hits where with the fence post walked through, and guidance/determinants/envelope), 28-question
+  lightning round. Light lore building on the MSK 4 episode (his house, his costume, he's a lower first molar, the other TIMMY).
+  `lexicon.json` gains 49 occlusion/anatomy words (condyle, pterygoid, masseter, temporalis, the hyoid muscles, mesio-/disto-
+  words, Givan with a hard G, Schuyler, D'Amico, ginglymoarthrodial). Hub: `window.SH_PODCAST` (id `midterm-review`) and a
+  `data-sh-podcast` slot at the top of Compendium, `#timmy` opens Compendium; dashboard card gets `podcast`; About page updated.
+  **When the notes change, fix the script and rebuild the episode in the same PR.**
+
 - **2026-10-20 evening (lessons audit, Claude Code)** — Occlusion midterm eve. `hubs/occlusion`, same ids and answer
   positions: `fp-post`'s stem now says "Class I, cusp-fossa" and names the anterior/posterior contacts on #3 (report #27; its
   favorite wrong answer, the MB cusp of #31, is right in a cusp-marginal ridge reading), and its explanation says why that cusp
