@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 5 of 10: determinants of cusp height, Claude Code)** — In the L1 notes after the determinants
+  section (`FIG_PLACE` 'The determinants of posterior morphology', plain 'How tall can back cusps be?') and in Review (L1 tab, Guidance
+  and determinants, after the vertical determinants table). Side view: condyle on the eminence, M2-PM1, canines, central incisors.
+  Sliders for CG, VO, HO, plane of occlusion and curve of Spee, plus protrusion (Play). One model (`chModel`): the jaw's path at each
+  tooth blends the condylar slope and the incisor slope (VO/HO) by distance from the condyle; allowed incline = path angle minus the
+  local occlusal angle (plane + Spee). Solid teeth are built from the starting settings, the dashed outline is the cusp that would just
+  clear, too-tall cusps turn red, and in protrusion the gap (Christensen) and any overlap are filled per column. All numbers schematic;
+  the module throws at build time if the trends ever stop matching the notes' table. Controls use `data-ch`/`data-chplay`.
+  Built by `tools/figures/occlusion/anima/cuspheight.mjs`. About page updated.
+
 - **2026-10-21 (Occlusion anima 4 of 10: muscles by movement, Claude Code)** — In the L2 notes after the exam-slide table
   (`FIG_PLACE` 'The exam slide: muscles for each movement', plain 'The exam chart') and in Review (Functional TMJ Anatomy, a
   "Muscles by movement" `figs` section after the exam-slide table). Schematic side view of the right side (superficial:
