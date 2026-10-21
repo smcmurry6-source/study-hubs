@@ -5,4 +5,5 @@ import { interferences } from "./interferences.mjs";
 import { muscles } from "./muscles.mjs";
 import { cuspheight } from "./cuspheight.mjs";
 import { envelope } from "./envelope.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope()];
+import { crslide } from "./crslide.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide()];
