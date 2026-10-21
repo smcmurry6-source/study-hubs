@@ -102,6 +102,8 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (mastery medals: one per row, unique per hub, Claude Code, #145)** — Leaderboard rows showed up to three 16px medals that got cut off (in the hub arcade boards they sat inside the name's ellipsis). `shRanks.flair()` in `widget/ranks.js` now draws one tappable medal per row (this page's hub first, else the best) plus "+N"; tapping opens a card with every medal (`openFlair`, a fixed inset:0 layer, tracked `flair:open`). `{ list:true }` gives the rank cards one chip per hub with its name. `medalSvg(lvl, px, hub)`: the metal is the tier, the emblem and ribbons are the hub's (`HUB_MEDAL`; unknown hubs get the tooth), Crown wears a crown on top; the mastery card uses it. Hubs' arcade `row()` puts the flair after `.lb-nm`. **A new hub: add its emblem and ribbons to `HUB_MEDAL`. Perio and MSK Projects: carry the arcade row change into the split sources.** About page, `sw.js` -> `sh-v27`. No schema change.
+
 - **2026-10-21 morning (lessons audit, Claude Code)** — Occlusion midterm day. **"What cusp hits where?" Movements**
   (`tools/figures/occlusion/game.js`, rebuilt into the hub's `od:kit` block): the round's verdict now says which step missed
   ("Right cusp, but step 1 missed. The arrow shows ...", "Right movement, wrong cusp.", "Both missed.") instead of a bare
