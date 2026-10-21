@@ -102,6 +102,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 4 of 10: muscles by movement, Claude Code)** — In the L2 notes after the exam-slide table
+  (`FIG_PLACE` 'The exam slide: muscles for each movement', plain 'The exam chart') and in Review (Functional TMJ Anatomy, a
+  "Muscles by movement" `figs` section after the exam-slide table). Schematic side view of the right side (superficial:
+  temporalis anterior/middle/posterior, masseter superficial/deep, digastric, hyoid, infrahyoids; deep, cropped to the jaw, arch
+  removed: lateral pterygoid superior and inferior heads, medial pterygoid). Pick a movement and the exam slide's muscles light up
+  with an arrow along each line of pull (`D.LIT`, exactly the slide; the superior head shows dashed as "also active" in closing, per
+  the notes); a toggle mirrors to the left side for the lateral moves. Controls use `data-mumove`/`data-muside-btn`. Built by
+  `tools/figures/occlusion/anima/muscles.mjs`. About page updated.
+
 - **2026-10-20 (Occlusion anima 3 of 10: working and non-working interferences, Claude Code)** — In the L1 notes right after the
   static frontal-section figure (`FIG_PLACE` 'Help sheet method for interferences', both levels) and in Review (L1 tab, What cusp
   hits where, Diagrams). Front view: the same #3/#30 section as `inclines` (outlines copied from `od.js`); a slider slides the lower
