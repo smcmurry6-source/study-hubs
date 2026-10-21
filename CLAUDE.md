@@ -109,6 +109,8 @@ gives them **its own look and story** through `skin` in the context its arcade p
 - **Escape room**: its own room and props drawn for that course (`escape.scene(api)` for a whole room, or `escape.parts` to swap
   single parts), its own spot labels and flavor text, and its own key item and reveal (Occlusion: articulating paper on the
   mounted casts; Perio: disclosing tablets on a typodont). Every hotspot goes through `api.spot()`, the clock hand through `api.hand()`.
+  A room can be a painted backdrop (`hubs/<hub>/img/*.webp`, Sam generates them from prompts) with the hotspots measured onto it
+  (Occlusion's `lab-escape.webp`); keep the overlays that show a lock's state (dark screen until solved, the digit badges).
 - **Board, Mind the Gap**: names for the wager rounds (`board.dd`, `board.final`), intros and button labels, and CSS keyed on
   `[data-sg-skin="<hub>"]` in the hub's own stylesheet (Occlusion: articulating-paper strips; Perio: a perio chart whose teeth bleed,
   a probe-ruler clock).

@@ -6459,17 +6459,20 @@ var ARCADE = (function(){
         sink:{ text:'<p>The faucet drips. A sticky note on the mirror, in Dr. Givan\'s handwriting:</p><p class="sg-note">“Shimstock tells you if they hold. Paper tells you where. Check the casts.”</p>' },
         drawer:{ flavor:'The top drawer is padlocked. Behind the glass you can see shimstock and a pad of something red and blue. The lock asks one question.' }
       },
-      parts:{
-        room:function(){ return '<rect width="800" height="450" fill="#e4e0f3"/><rect y="0" width="800" height="18" fill="#d3cdea"/>' +
-          '<rect y="372" width="800" height="78" fill="#9a93b8"/><path d="M0 372H800" stroke="#7a729c" stroke-width="4"/>' +
-          [0,1,2,3,4,5,6,7].map(function(i){ return '<rect x="' + (i*100) + '" y="372" width="50" height="78" fill="#8f88ae"/>'; }).join(''); },
-        poster:function(a){ var on = a.solved.poster, c = on ? a.slotColor('poster') : '';
-          var teeth = function(y, flip){ var t = ''; for(var i=0;i<6;i++){ var x = 470 + i*14; t += '<path d="M' + x + ' ' + y + (flip ? 'v-12q7 -7 14 0v12z' : 'v12q7 7 14 0v-12z') + '" fill="#fbf7ee" stroke="#5c5478" stroke-width="2"/>'; } return t; };
-          return a.spot('poster', 446, 34, 136, 152, '<rect x="452" y="170" width="124" height="10" rx="3" fill="#b9b2d6" stroke="#5c5478" stroke-width="2.5"/>' +
-            '<rect x="470" y="150" width="90" height="20" rx="4" fill="#7a729c"/><rect x="548" y="66" width="10" height="90" fill="#7a729c"/><circle cx="553" cy="66" r="10" fill="#cfc9e6" stroke="#5c5478" stroke-width="3"/>' +
-            '<rect x="466" y="54" width="94" height="14" rx="4" fill="#7a729c"/><rect x="468" y="68" width="88" height="22" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(90, false) +
-            '<rect x="468" y="124" width="88" height="24" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(124, true) +
-            (on ? '<text x="504" y="122" text-anchor="middle" font-size="20" font-weight="900" fill="' + c + '" stroke="#1d1838" stroke-width="1">' + a.digitOf('poster') + '</text>' + a.digit('poster', 538, 46, 13) : '<path d="M466 108H560" stroke="#5c5478" stroke-width="1.5" stroke-dasharray="3 3"/>')); }
+      /* the room is a painted backdrop (img/lab-escape.webp, 1024x572, drawn to 800x450); hotspots sit over the painted props */
+      scene:function(a){
+        var sv = a.solved, h = '<rect width="800" height="450" fill="#a29ccf"/><image href="img/lab-escape.webp" x="0" y="0" width="800" height="450" preserveAspectRatio="none"/>';
+        h += a.spot('xray', 38, 44, 200, 124, sv.xray ? a.digit('xray', 226, 58, 15) :
+          '<rect x="46" y="50" width="184" height="98" rx="3" fill="#141826" opacity=".86"/><text x="138" y="104" text-anchor="middle" font-size="13" font-weight="800" fill="#8e8bb3" letter-spacing="1">VIEW BOX OFF</text>');
+        h += '<g aria-hidden="true">' + a.hand(312, 68, 'x="310.5" y="44" width="3" height="26" rx="1.5" fill="#e8475f"') + '<circle cx="312" cy="68" r="3" fill="#e8475f"/></g>';
+        h += a.spot('poster', 440, 72, 166, 84, sv.poster ? '<g opacity=".9"><circle cx="512" cy="100" r="3" fill="#2b62f0"/><circle cx="522" cy="104" r="3" fill="#2b62f0"/><circle cx="532" cy="99" r="3" fill="#2b62f0"/></g>' + a.digit('poster', 470, 88, 15) : '');
+        h += a.spot('door', 634, 58, 148, 324, '<rect class="sg-hit" x="590" y="178" width="40" height="46" rx="6"/>');
+        h += a.spot('monitor', 52, 176, 120, 78, sv.monitor ? '<rect x="64" y="184" width="94" height="62" rx="2" fill="#0f3d2c" opacity=".88"/><text x="104" y="212" text-anchor="middle" font-size="11" font-weight="800" fill="#58f29a">ACCESS OK</text>' + a.digit('monitor', 140, 230, 13)
+          : '<rect x="64" y="184" width="94" height="62" rx="2" fill="#0b1424" opacity=".93"/><text x="111" y="208" text-anchor="middle" font-size="11" font-weight="800" fill="#7fd1ff">LOCKED</text><rect x="80" y="216" width="62" height="14" rx="3" fill="#163248" stroke="#7fd1ff" stroke-width="1.5"/><text x="86" y="227" font-size="10" fill="#7fd1ff">••••_</text>');
+        h += a.spot('chart', 290, 254, 72, 70, sv.chart ? a.digit('chart', 354, 262, 13) : '');
+        h += a.spot('sink', 432, 196, 160, 54, '');
+        h += a.spot('drawer', 430, 254, 148, 42, a.check('drawer', 562, 262));
+        return h;
       }
     }
   };

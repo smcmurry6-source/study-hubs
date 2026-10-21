@@ -115,7 +115,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   Escape (an occlusion lab; articulating paper from the drawer marks the digit on casts mounted on an articulator), articulating-paper
   board strips (Centric Double, Final Contact). New lobby thumbnails per hub. **Million-Dollar Smile art redrawn** (Sam: "terrible"): a
   quiz-show marquee above the question (chasing bulbs, `grinSVG()`: lips, gums, two rows of teeth, a gold tooth that sparkles from
-  rung 6), colored by `skin.smile`; Perio's thumbnail is a spotlit studio stage, Occlusion's a pixel-art grin. Game-over cards in the shared games scroll instead of
+  rung 6), colored by `skin.smile`; Perio's thumbnail is a spotlit studio stage, Occlusion's a pixel-art grin. **Painted escape rooms**: Sam makes backdrops with an image model
+  (Argon); Occlusion's Lab Escape now draws `hubs/occlusion/img/lab-escape.webp` (1024x572, stretched to the 800x450 scene) with
+  invisible hotspots placed over the painted props (`OCCL_SKIN.escape.scene`; a dark overlay switches the view box and computer off
+  until solved, a red countdown hand rides the painted clock). A new backdrop means re-measuring every `api.spot()` rectangle on a grid
+  overlay. Perio still uses its drawn room until its backdrop is added. Game-over cards in the shared games scroll instead of
   squashing the missed list. Dashboard `ARCADES` and About page names updated. **Perio Project: carry `PERIO_SKIN` and its CSS into the split sources.**
 
 - **2026-10-21 (arcade revamp: six games, shared `widget/games.js`, Claude Code)** — Sam: the games were a bust; cut nine to six and
