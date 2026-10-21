@@ -102,6 +102,14 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 9 of 10: swallowing, stage by stage, Claude Code)** — In the L3 notes after 'Part 2: swallowing'
+  (plain 'Swallowing'; new `FIG_PLACE.function` / `FIG_BY_LEC.function`) and in Review (L3 tab, after Swallowing stages). Schematic
+  midline section: tongue, palates, pharynx, epiglottis, hyoid, trachea, esophagus, cervical spine. A stage slider (0-3) blends
+  keyframes (`swState`): stage 1 tongue presses the bolus back; stage 2 soft palate up, hyoid up and forward, epiglottis over the
+  inlet, Eustachian tube opening opens; stage 3 down the esophagus. Somatic vs visceral toggle (tongue tip between the incisors,
+  teeth apart). Only the notes' numbers (66.5 lb / 683 ms, 590 a day, 1 s, 6-7 s). Controls use `data-swstep`/`data-swplay`/`data-swmode`.
+  Built by `tools/figures/occlusion/anima/swallow.mjs`. About page updated.
+
 - **2026-10-21 (Occlusion anima 8 of 10: canine guidance vs group function, Claude Code)** — In the L1 notes at 'Guidance and the
   goals of ideal occlusion' (plain 'Guidance and the ideal'), in the L5 notes at 'Schemes and guidance' (plain 'Guidance and MIP'; new
   `FIG_PLACE.applying` and `FIG_BY_LEC.applying`), and in Review in both tabs (L1 Guidance and determinants after Schemes; L5 before
