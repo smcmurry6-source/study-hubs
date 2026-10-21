@@ -242,33 +242,181 @@
   };
   function season(){ return HOLIDAY && on() ? SEASONAL[HOLIDAY.id] : null; }
   function bossName(k){ k = k || bossKind(); var se = season(); return se && se[k.id] ? se[k.id] : k.name; }
-  /* the boss in costume: drawn into the same 40x40 frame as IC.blob */
-  function bossIcon(k){
+  /* the boss in costume (2026-10-21): every boss dresses as its seasonal name, so Strep Mummy-tans is wrapped in bandages
+     and Tartar the Snowman gets a top hat and a carrot. COSTUMES[holiday][boss](fit) returns [under, over]: drawn behind
+     and in front of the body, in the blob's 40x40 frame with room above for hats. FIT is where each body's head, eyes
+     and mouth are: t nudges hats down onto a lower head, e is the eye line, m the mouth line. */
+  var FIT = { plaque: { t: 0, e: 17, m: 27 }, tartar: { t: 0, e: 17, m: 28 }, biofilm: { t: 0, e: 17, m: 27 }, mutans: { t: 0, e: 16, m: 22 },
+    caries: { t: 0, e: 16, m: 25 }, gingivitis: { t: 2, e: 19, m: 26 }, halitosis: { t: 3, e: 21, m: 29 }, redcomplex: { t: 1, e: 18, m: 27 } };
+  function place(x, y, s, r){ return '<g transform="translate(' + x + ' ' + y + ')' + (r ? ' rotate(' + r + ')' : '') + (s ? ' scale(' + s + ')' : '') + '">'; }
+  function hat(f, svg){ return place(0, f.t) + svg + '</g>'; }
+  function heart(x, y, s, fill, r){ return place(x, y, s, r) + '<path d="M0 3C-4 0-5-3-2.6-4.4-1.4-5 0-4 0-3 0-4 1.4-5 2.6-4.4 5-3 4 0 0 3Z" fill="' + fill + '"/></g>'; }
+  function shamrock(x, y, s){ return place(x, y, s) + '<path d="M0 0q1 4 3 6" stroke="#1B6E2E" stroke-width="1" fill="none"/>' +
+    heart(0, -2.6, .6, "#2F9E44", 180) + heart(-2.4, .6, .6, "#2F9E44", 60) + heart(2.4, .6, .6, "#2F9E44", -60) + '</g>'; }
+  function flake(x, y, s){ return place(x, y, s) + '<path d="M0-3v6M-2.6-1.5l5.2 3M-2.6 1.5l5.2-3" stroke="#fff" stroke-width=".9" stroke-linecap="round"/></g>'; }
+  function star(x, y, R, fill, stroke){ var p = []; for (var i = 0; i < 10; i++) { var a = Math.PI / 5 * i - Math.PI / 2, d = i % 2 ? R * .45 : R; p.push((x + d * Math.cos(a)).toFixed(1) + " " + (y + d * Math.sin(a)).toFixed(1)); }
+    return '<path d="M' + p.join("L") + 'Z" fill="' + fill + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="1.4"' : '') + '/>'; }
+  function egg(x, y, s, fill, band){ return place(x, y, s) + '<ellipse rx="3" ry="4" fill="' + fill + '"/><path d="M-2.9-.6q1.5 1.4 2.9 0t2.9 0" stroke="' + band + '" stroke-width="1" fill="none"/></g>'; }
+  function bean(x, y, r, fill){ return place(x, y, 0, r) + '<rect x="-2.6" y="-1.5" width="5.2" height="3" rx="1.5" fill="' + fill + '"/><rect x="-1.6" y="-1" width="1.8" height=".7" rx=".35" fill="#fff" opacity=".6"/></g>'; }
+  function sweat(x, y){ return '<path d="M' + x + ' ' + y + 'c-1.6 2.4-1.6 4 0 4s1.6-1.6 0-4z" fill="#8FD3F5"/>'; }
+  function blush(f, dx){ dx = dx || 10; return '<ellipse cx="' + (20 - dx) + '" cy="' + (f.e + 5) + '" rx="2.6" ry="1.4" fill="#FF8FB1" opacity=".75"/><ellipse cx="' + (20 + dx) + '" cy="' + (f.e + 5) + '" rx="2.6" ry="1.4" fill="#FF8FB1" opacity=".75"/>'; }
+  /* the shared hats: each draws its brim around y 8 to 11, on top of a head near y 4 (hat() lowers it for the others) */
+  var HAT = {
+    witch: function(c, band){ return '<path d="M12 9L19-6Q21-11 28-9 23-8 22-4L28 9Z" fill="' + c + '"/><ellipse cx="20" cy="9" rx="16" ry="2.6" fill="' + c + '"/><path d="M14.4 4.6h11.4l.9 2.6H13.5z" fill="' + band + '"/>'; },
+    top: function(c, band){ return '<rect x="11" y="-7" width="18" height="14" rx="1" fill="' + c + '"/><rect x="6" y="6" width="28" height="3" rx="1.4" fill="' + c + '"/><rect x="11" y="2.6" width="18" height="2.8" fill="' + band + '"/>'; },
+    bowler: function(c, band){ return '<path d="M10 9C10-1 30-1 30 9Z" fill="' + c + '"/><ellipse cx="20" cy="9" rx="14" ry="2.2" fill="' + c + '"/><rect x="10.4" y="5.6" width="19.2" height="2.2" fill="' + band + '"/>'; },
+    pilgrim: '<path d="M9 9L11-2H29L31 9Z" fill="#2B2B2B"/><rect x="5" y="7.6" width="30" height="3.4" rx="1.6" fill="#2B2B2B"/><rect x="10.4" y="3" width="19.2" height="3" fill="#8C6B3E"/><rect x="17" y="2.4" width="6" height="4.2" rx=".6" fill="none" stroke="#F6CD55" stroke-width="1.3"/>',
+    santa: '<path d="M8 10C10 1 22-3 32 3 30 5 30 8 31 10Z" fill="#D6363C"/><path d="M31 3C35 4 37 8 36 12" stroke="#D6363C" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="36" cy="13" r="3" fill="#fff"/><rect x="6" y="8.6" width="28" height="4.4" rx="2.2" fill="#fff"/>',
+    party: '<path d="M13 9L20-6 27 9Z" fill="#B08CFF"/><path d="M15.6 3.4H24.4M14.2 6.6H25.8" stroke="#F6CD55" stroke-width="1.6"/><circle cx="20" cy="-6" r="2.4" fill="#F6CD55"/>',
+    leprechaun: '<path d="M10 9L12-3H28L30 9Z" fill="#2F9E44"/><rect x="5" y="7.4" width="30" height="3.4" rx="1.6" fill="#1B6E2E"/><rect x="11.4" y="3.2" width="17.2" height="2.8" fill="#2B2B2B"/><rect x="17.4" y="2.6" width="5.2" height="4" rx=".6" fill="none" stroke="#F6CD55" stroke-width="1.2"/>',
+    ears: function(fur, inner, line){ return '<path d="M13 9C9-4 11-10 14-10 17-10 18-2 17 8" fill="' + fur + '" stroke="' + line + '" stroke-width="1"/><path d="M13.6 5C12.6-2 13-6 14-6 15-6 15.6-1 15.4 5" fill="' + inner + '"/>' +
+      '<path d="M27 9C31-4 29-10 26-10 23-10 22-2 23 8" fill="' + fur + '" stroke="' + line + '" stroke-width="1"/><path d="M26.4 5C27.4-2 27-6 26-6 25-6 24.4-1 24.6 5" fill="' + inner + '"/>'; }
+  };
+  var COSTUMES = {
+    halloween: {
+      plaque: function(f){ return ['<path d="M5 14C1 22 2 33 7 38L12 31 16 37 20 31 24 37 28 31 33 38C38 33 39 22 35 14Z" fill="#4A1A6B"/><path d="M5 14C1 22 2 33 7 38" stroke="#C21E56" stroke-width="1.4" fill="none"/>',
+        '<path d="M16.6 27.4L18 31 19.2 27.6M20.8 27.6L22 31 23.4 27.4" fill="#fff" stroke="#fff" stroke-width=".8" stroke-linejoin="round"/><path d="M8 9L13 3 20 7 27 3 32 9" fill="none" stroke="#2B1B3D" stroke-width="2.2" stroke-linejoin="round"/>']; },
+      tartar: function(f){ return ['', '<path d="M7 9V1H33V9L29 6 25 9 20 6 15 9 11 6Z" fill="#1E2A1E"/><rect x="0" y="20" width="6" height="3.4" rx="1" fill="#8A8F98"/><rect x="34" y="20" width="6" height="3.4" rx="1" fill="#8A8F98"/>' +
+        '<path d="M25 33l7-4M26.6 30.2l1.4 2.4M28.8 29l1.4 2.4" stroke="#2B2B2B" stroke-width="1" stroke-linecap="round"/>']; },
+      biofilm: function(f){ return ['<path d="M6 12C0 20 1 32 3 38L8 34 11 39 15 35 20 39 25 35 29 39 32 34 37 38C39 32 40 20 34 12Z" fill="#3A3F4A"/>',
+        '<path d="M5 17C5 4 12-1 20-1S35 4 35 17C32 9 27 5 20 5S8 9 5 17Z" fill="#3A3F4A"/><path d="M4 4q2-3 0-5M36 3q-2-3 0-5" stroke="#9BE58A" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"/>']; },
+      mutans: function(f){ return ['', '<g stroke="#EFE7D2" stroke-linecap="round" fill="none"><path d="M13.4 9.6L26.6 7.6M10.4 26.4L29.6 24.6" stroke-width="2.6"/><path d="M9.6 13.4l2.2 5M30.4 13.4l-2.2 5" stroke-width="2"/>' +
+        '<path d="M3 26l6 3.6M9 31.6l6 2.4M17 33l6 3.6M25 31.6l6 2.4M31 30l6-3.6M33 7l4 3.6M3 11l4-3" stroke-width="2"/><path d="M37 26.4q2.6 3 0 6t1 6" stroke-width="1.6"/></g>' +
+        '<path d="M13.4 9.6L26.6 7.6M10.4 26.4L29.6 24.6" stroke="#B9AE91" stroke-width=".5" stroke-dasharray="1.4 2.2"/>']; },
+      caries: function(f){ return ['<path d="M9 38V2C9-11 31-11 31 2V38Z" fill="#8A8F98" stroke="#5E636B" stroke-width="1"/><text x="20" y="1" font-size="5.4" font-weight="700" text-anchor="middle" fill="#4A4E55" font-family="serif">RIP</text>',
+        '<path d="M1 40C3 34 9 32 14 34 20 31 28 32 32 35 36 33 39 36 39 40Z" fill="#5A3E26"/><path d="M5 34l-1-3M8 33l.6-3M32 34l1.4-3M35 35l2-2.4" stroke="#4E8C3A" stroke-width="1.2" stroke-linecap="round"/>']; },
+      gingivitis: function(f){ return ['<path d="M30 30L39 39M33 37l4-4M34 39l5-5" stroke="#8C6B3E" stroke-width="1.6" stroke-linecap="round"/>', hat(f, HAT.witch("#2B1B3D", "#8E44AD"))]; },
+      halitosis: function(f){ return ['<path d="M3 26C1 12 9 2 20 2S39 12 37 26C37 32 38 36 39 39L35 36 31 39 27 36 23 39 19 36 15 39 11 36 7 39 3 36 1 39C2 35 3 31 3 26Z" fill="#F4F4F8" opacity=".9"/>',
+        '<g fill="none" stroke="#6B6F78" stroke-width="1.2"><ellipse cx="6" cy="35" rx="2" ry="1.3"/><ellipse cx="9.4" cy="36.6" rx="2" ry="1.3"/><ellipse cx="12.8" cy="37.6" rx="2" ry="1.3"/></g><circle cx="17" cy="38" r="2.4" fill="#4A4E55"/>']; },
+      redcomplex: function(f){ return ['', hat(f, HAT.witch("#1E3A2B", "#9BE58A")) + '<path d="M9 31h22c0 6-4 8-11 8S9 37 9 31Z" fill="#2B2B2B"/><rect x="8" y="29.6" width="24" height="2.6" rx="1.3" fill="#3A3A3A"/>' +
+        '<circle cx="15" cy="29" r="1.4" fill="#9BE58A"/><circle cx="23" cy="28.4" r="1" fill="#9BE58A"/><circle cx="27" cy="29.2" r="1.2" fill="#9BE58A"/>']; }
+    },
+    thanksgiving: {
+      plaque: function(f){ return ['', HAT.pilgrim + '<path d="M10 32Q20 29 30 32L27 38 20 34.6 13 38Z" fill="#fff" stroke="#D9D9D9" stroke-width=".6"/>']; },
+      tartar: function(f){ return ['<g transform="rotate(-40 6 12)"><ellipse cx="6" cy="12" rx="4.4" ry="6" fill="#B5651D"/><rect x="5" y="-1" width="2" height="8" fill="#F3E9D2"/><circle cx="5" cy="-1.4" r="1.6" fill="#F3E9D2"/><circle cx="7" cy="-1.4" r="1.6" fill="#F3E9D2"/></g>' +
+        '<g transform="rotate(40 34 12)"><ellipse cx="34" cy="12" rx="4.4" ry="6" fill="#B5651D"/><rect x="33" y="-1" width="2" height="8" fill="#F3E9D2"/><circle cx="33" cy="-1.4" r="1.6" fill="#F3E9D2"/><circle cx="35" cy="-1.4" r="1.6" fill="#F3E9D2"/></g>',
+        '<ellipse cx="20" cy="38" rx="19" ry="2.6" fill="#DDE3EA" stroke="#AEB6C0" stroke-width=".6"/><path d="M4 36q2-3 4 0M32 36q2-3 4 0" fill="#4E9A2E"/>']; },
+      biofilm: function(f){ return ['', '<path d="M8 9C10 3 15 2 20 2S31 4 33 9C33 12 31 12.4 31 10 31 13 28 13 28 10.4 26 10 25 10.6 24 9.6 22 9.6 21 12.4 19 9.6 17 9.6 15 11 13 10 12 13 9 13 9.6 10Z" fill="#7A4B22"/><path d="M13 5q4-2 8-1" stroke="#C08A52" stroke-width="1" fill="none" stroke-linecap="round"/>' +
+        '<path d="M28 33h9l-1 3c-1 2-6 2-7 0z" fill="#F3E9D2" stroke="#AEB6C0" stroke-width=".6"/><path d="M37 33.6q2.4 0 2 2" stroke="#AEB6C0" stroke-width=".8" fill="none"/>']; },
+      mutans: function(f){ return ['', '<path d="M20 7.4q-5-4-2-8 4 3 2 8z" fill="#7FA36B"/><path d="M20 7q3-5 6-5-1 4-6 5z" fill="#93B97E"/>' +
+        '<g fill="#D9A55B" stroke="#A9773A" stroke-width=".4"><rect x="4" y="25" width="2.6" height="2.6" transform="rotate(15 5 26)"/><rect x="18.6" y="32.6" width="2.6" height="2.6"/><rect x="32" y="25.4" width="2.6" height="2.6" transform="rotate(-20 33 26)"/>' +
+        '<rect x="10.6" y="31" width="2.4" height="2.4" transform="rotate(30 12 32)"/><rect x="27" y="31.6" width="2.4" height="2.4"/><rect x="34" y="7.8" width="2" height="2"/><rect x="4" y="8.8" width="2" height="2"/></g>']; },
+      caries: function(f){ return ['', '<rect x="11" y="-6" width="18" height="14" rx="2" fill="#A3123A"/><path d="M11-2h18M11 2h18" stroke="#7A0E2B" stroke-width="1"/><ellipse cx="20" cy="-6" rx="9" ry="1.8" fill="#C2185B"/>' +
+        '<circle cx="3" cy="36" r="2" fill="#C2185B"/><circle cx="37" cy="35" r="2" fill="#C2185B"/><circle cx="34" cy="38" r="1.6" fill="#A3123A"/>']; },
+      gingivitis: function(f){ var fan = ""; ["#8C5A2B", "#D35400", "#E6A23C", "#B5651D", "#E6A23C", "#D35400", "#8C5A2B"].forEach(function(c, i){ fan += '<ellipse cx="20" cy="8" rx="4.2" ry="14" fill="' + c + '" transform="rotate(' + (i * 22 - 66) + ' 20 24)"/>'; });
+        return [fan, '<path d="M18.2 21.4L21.8 21.4 20 24.6Z" fill="#F39C12"/><path d="M21 23.6q2.4 2.4.6 5.4-1.8-2 -.6-5.4z" fill="#8B0000"/>']; },
+      halitosis: function(f){ return ['', hat(f, '<g fill="none" stroke="#4E9A2E" stroke-width="2.4" stroke-linecap="round"><path d="M7 9q6-5 12-2"/><path d="M17 7q7-4 14 1"/><path d="M12 6q5-6 10-4"/></g><g fill="none" stroke="#C9934A" stroke-width="1"><ellipse cx="11" cy="6.4" rx="1.6" ry="1"/><ellipse cx="22" cy="4.4" rx="1.6" ry="1"/><ellipse cx="28" cy="6" rx="1.6" ry="1"/><ellipse cx="16" cy="3.6" rx="1.4" ry=".9"/></g>') +
+        '<path d="M5 33h30l-2 6H7z" fill="#E8E1D6" stroke="#B9AE91" stroke-width=".6"/><path d="M8 35.6h24" stroke="#4E9A2E" stroke-width="1.2" stroke-dasharray="3 1.6"/>']; },
+      redcomplex: function(f){ return ['', hat(f, '<path d="M2 4Q4-9 22-7L27 7Q12 1 2 4Z" fill="#C8963E" stroke="#8C6B3E" stroke-width=".8"/><path d="M2 4q-3-2-1-5" stroke="#8C6B3E" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M7-1l3 5M13-4l2 6M18-6l2 7" stroke="#8C6B3E" stroke-width=".6"/>' +
+        '<g fill="#7D3C98"><circle cx="27" cy="-4" r="1.6"/><circle cx="29.6" cy="-4" r="1.6"/><circle cx="28.3" cy="-1.6" r="1.6"/></g><circle cx="33" cy="1" r="3" fill="#D35400"/><path d="M33-2v-1.6" stroke="#4E9A2E" stroke-width="1"/><circle cx="26.6" cy="2.6" r="2.4" fill="#C0392B"/><ellipse cx="36.4" cy="5.6" rx="2.6" ry="1.8" fill="#F1C40F"/>')]; }
+    },
+    winter: {
+      plaque: function(f){ return ['', HAT.santa + '<rect x="6" y="31" width="28" height="3.4" fill="#2B2B2B"/><rect x="17.4" y="30.4" width="5.2" height="4.6" fill="none" stroke="#F6CD55" stroke-width="1.2"/>']; },
+      tartar: function(f){ return ['', HAT.top("#1E1E24", "#C0392B") + '<path d="M19 20.6L29 22.6 19 24.2Z" fill="#F39C12"/><path d="M7 31Q20 36 33 31V34.6Q20 39 7 34.6Z" fill="#2E86C1"/><path d="M26 34.4l2 5.6 3.2-1-2-5.2z" fill="#2E86C1"/>']; },
+      biofilm: function(f){ return ['', '<path d="M9 9L11 0 14 6 17-3 20 5 23-3 26 6 29 0 31 9Z" fill="#BFE9FF" stroke="#7FC8F0" stroke-width=".8" stroke-linejoin="round"/>' +
+        '<g opacity=".95">' + flake(4, 8, 1.2) + flake(36, 12, 1) + flake(3, 30, 1) + flake(37, 32, 1.2) + '</g><path d="M10 31v4M15 33v3M26 34v3" stroke="#BFE9FF" stroke-width="1.4" stroke-linecap="round"/>']; },
+      mutans: function(f){ return ['<path d="M9.6 15L3 11.6 9.8 20.4ZM30.4 15L37 11.6 30.2 20.4Z" fill="currentColor" stroke="rgba(0,0,0,.3)" stroke-width=".8"/>',
+        '<path d="M9 10C10 2 18-4 30-6 25-2 29 4 31 10Z" fill="#2E9E4F"/><rect x="8" y="7.6" width="24" height="3.4" rx="1.6" fill="#D6363C"/><circle cx="30.4" cy="-6" r="2.2" fill="#F6CD55"/>' +
+        '<path d="M32 7L35.6 1 38 7Z" fill="#2E9E4F"/><path d="M2 8L4.6 2 8 8Z" fill="#2E9E4F"/><circle cx="35.6" cy="1" r="1" fill="#F6CD55"/><circle cx="4.6" cy="2" r="1" fill="#F6CD55"/>']; },
+      caries: function(f){ return ['', '<path d="M35 39V2a5 5 0 0 0-10 0" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M35 39V2a5 5 0 0 0-10 0" stroke="#D6363C" stroke-width="3.2" fill="none" stroke-dasharray="2 2.4"/>' +
+        '<path d="M5 30Q18 35 31 30V33.6Q18 38 5 33.6Z" fill="#fff"/><path d="M8 30.6v4.4M14 31.8v4.6M20 32v4.6M26 31.4v4.4" stroke="#D6363C" stroke-width="2"/>']; },
+      gingivitis: function(f){ return ['<path d="M1 18C-1 26 1 34 8 36 4 30 4 24 6 18Z" fill="#B08A5A"/><path d="M1 18q3-3 5 0" stroke="#8C6B3E" stroke-width="1.2" fill="none"/>',
+        hat(f, '<path d="M8 10C8 0 20-6 29 1 34 6 36 14 33 21L30 19C32 12 29 6 22 6 16 6 12 8 12 10Z" fill="#D6363C"/><circle cx="32" cy="22" r="3" fill="#fff"/><rect x="6" y="8.6" width="28" height="4" rx="2" fill="#fff"/>') +
+        '<path d="M13 15.6l5 1.6M27 15.6l-5 1.6" stroke="#2E9E4F" stroke-width="1.4" stroke-linecap="round"/>']; },
+      halitosis: function(f){ return ['', '<path d="M6 14C8 8 14 7 18 9 21 6 28 6 31 10 34 9 37 12 35 15 30 13 26 14 22 12 18 14 12 12 6 14Z" fill="#fff"/>' +
+        flake(4, 4, 1.1) + flake(36, 3, 1.3) + flake(1, 16, .9) + flake(39, 22, 1) + flake(6, 38, 1) + flake(33, 37, 1.1) + '<path d="M26 1h8M28 -2h6M0 10h5" stroke="#BFE9FF" stroke-width="1" stroke-linecap="round"/>']; },
+      redcomplex: function(f){ return ['', hat(f, '<g stroke="#8B5A2B" stroke-width="2" stroke-linecap="round" fill="none"><path d="M12 9L8-3M9.6 1.6L4 0M10.6 4.6L5 6M28 9L32-3M30.4 1.6L36 0M29.4 4.6L35 6"/></g>') +
+        '<circle cx="20" cy="' + (f.e + 4.4) + '" r="4.6" fill="#FF6B6B" opacity=".35"/><circle cx="20" cy="' + (f.e + 4.4) + '" r="2.8" fill="#FF2D2D" stroke="#7A0E1E" stroke-width=".6"/><circle cx="19" cy="' + (f.e + 3.4) + '" r=".8" fill="#fff"/>']; }
+    },
+    newyear: {
+      plaque: function(f){ return ['', HAT.party + '<path d="M26 27L33 24" stroke="#F6CD55" stroke-width="2.4" stroke-linecap="round"/><path d="M33 24c3-1 5 1 3 3-2 1-1 4 2 3" stroke="#B08CFF" stroke-width="2" fill="none" stroke-linecap="round"/>']; },
+      tartar: function(f){ return ['', place(0, 0, 0, -8) + HAT.top("#1E1E24", "#F6CD55") + '</g><circle cx="26" cy="17" r="4.6" fill="none" stroke="#F6CD55" stroke-width="1.2"/><path d="M30.4 18.4q3 6 1 12" stroke="#F6CD55" stroke-width=".7" fill="none"/>' +
+        '<path d="M14.6 31L20 33.6 14.6 36.2ZM25.4 31L20 33.6 25.4 36.2Z" fill="#1E1E24"/><circle cx="20" cy="33.6" r="1.3" fill="#1E1E24"/>']; },
+      biofilm: function(f){ return ['', '<path d="M32 17h7l-2 8q-1.5 2-3 0z" fill="#F6CD55" opacity=".85" stroke="#E8E8E8" stroke-width=".8"/><path d="M35.5 26v8M32.6 34h5.8" stroke="#E8E8E8" stroke-width="1.2" stroke-linecap="round"/>' +
+        '<g fill="none" stroke="#F6CD55" stroke-width=".8"><circle cx="35" cy="13" r="1.2"/><circle cx="37" cy="9" r=".9"/><circle cx="14" cy="1" r="1.4"/><circle cx="20" cy="-4" r="1.8"/><circle cx="26" cy="0" r="1.2"/><circle cx="17" cy="-9" r="1"/><circle cx="24" cy="-8" r="1.4"/></g>']; },
+      mutans: function(f){ var bits = "", cs = ["#F6CD55", "#B08CFF", "#FF8FB1", "#5BC0EB", "#6DBE5B"];
+        [[8, -2, 20], [14, -8, -30], [22, -4, 45], [30, -9, 10], [34, -2, -40], [2, 2, 60], [26, 3, -15], [38, 18, 30], [1, 20, -50]].forEach(function(p, i){ bits += '<rect x="' + p[0] + '" y="' + p[1] + '" width="2.2" height="1.2" fill="' + cs[i % 5] + '" transform="rotate(' + p[2] + ' ' + p[0] + ' ' + p[1] + ')"/>'; });
+        return ['', bits + '<path d="M1 31q4-4 8 0t8 0 8 0 8 0 6 0" stroke="#FF8FB1" stroke-width="1.4" fill="none"/><path d="M2 26q4 3 8 0" stroke="#5BC0EB" stroke-width="1.2" fill="none"/>']; },
+      caries: function(f){ return ['', '<circle cx="13" cy="-7" r="3" fill="#C0392B"/><circle cx="27" cy="-7" r="3" fill="#C0392B"/><circle cx="20" cy="-1" r="7" fill="#fff" stroke="#2B2B33" stroke-width="1.4"/>' +
+        '<path d="M20-1V-6.4M20-1v-4" stroke="#2B2B33" stroke-width="1.2" stroke-linecap="round"/><path d="M20-7v1M20 4.6v1M13.6-1h1M25.4-1h1" stroke="#2B2B33" stroke-width=".8"/><path d="M15 6l-1 2M25 6l1 2" stroke="#2B2B33" stroke-width="1.2" stroke-linecap="round"/>' +
+        '<path d="M4 4a4 4 0 1 0 4-4 3.2 3.2 0 1 1-4 4z" fill="#F6CD55"/>' + star(35, 5, 2, "#F6CD55")]; },
+      gingivitis: function(f){ return ['', hat(f, '<path d="M9 7C10-1 30-1 31 7 26 9.6 14 9.6 9 7Z" fill="#7FB3E6" stroke="#4A7FB3" stroke-width=".8"/><rect x="18" y="-3.4" width="4" height="3.4" rx=".6" fill="#4A7FB3"/><path d="M14 3l2 2M24 2l2 2M19 5l2 2" stroke="#fff" stroke-width=".7" opacity=".7"/>') +
+        star(4, 4, 1.8, "#F6CD55") + star(36, 6, 1.6, "#F6CD55") + star(37, 0, 1.2, "#F6CD55") + '<path d="M2 -2q3-3 6 0" stroke="#F6CD55" stroke-width=".8" fill="none"/>']; },
+      halitosis: function(f){ return ['', star(14, f.e, 6, "rgba(246,205,85,.18)", "#F6CD55") + star(26, f.e, 6, "rgba(246,205,85,.18)", "#F6CD55") + '<path d="M8.6 ' + (f.e - 1) + 'L3 ' + (f.e - 3) + 'M31.4 ' + (f.e - 1) + 'L37 ' + (f.e - 3) + '" stroke="#F6CD55" stroke-width="1.4"/>' +
+        '<path d="M6 11Q20 4 34 11" stroke="#F6CD55" stroke-width="2" fill="none"/><text x="20" y="7" font-size="3.4" font-weight="700" text-anchor="middle" fill="#F6CD55" font-family="sans-serif">HAPPY NEW YEAR</text>']; },
+      redcomplex: function(f){ return ['', hat(f, '<path d="M20-12V-6" stroke="#8A8F98" stroke-width="1.2"/><circle cx="20" cy="0" r="6.4" fill="#C9D1DA" stroke="#8A8F98" stroke-width=".8"/><path d="M13.8 0h12.4M14.6-3.2h10.8M14.6 3.2h10.8M20-6.4v12.8M16.4-5.4q-2 5.4 0 10.8M23.6-5.4q2 5.4 0 10.8" stroke="#8A8F98" stroke-width=".5" fill="none"/>' +
+        '<path d="M8-4l-3-1M8 1H4M32-4l3-1M32 1h4" stroke="#F6CD55" stroke-width="1" stroke-linecap="round"/><circle cx="17.6" cy="-2.6" r="1" fill="#fff"/>')]; }
+    },
+    valentine: {
+      plaque: function(f){ return ['', '<path d="M7 22c-1.6-1-2.6-2.2-2.6-3.4a1.6 1.6 0 0 1 2.6-1 1.6 1.6 0 0 1 2.6 1c0 1.2-1 2.4-2.6 3.4zM33 22c-1.6-1-2.6-2.2-2.6-3.4a1.6 1.6 0 0 1 2.6-1 1.6 1.6 0 0 1 2.6 1c0 1.2-1 2.4-2.6 3.4z" fill="#FF8FB1"/>' +
+        '<path d="M14 6Q12 1 10-2M26 6Q28 1 30-2" stroke="#2B2B2B" stroke-width="1.1" fill="none"/>' + heart(10, -2.4, .9, "#E0245E") + heart(30, -2.4, .9, "#E0245E")]; },
+      tartar: function(f){ return ['', heart(14, f.e - .6, 1.5, "rgba(255,92,138,.55)") + heart(26, f.e - .6, 1.5, "rgba(255,92,138,.55)") + '<path d="M17.6 ' + (f.e - 2) + 'q2.4-1.4 4.8 0M8 ' + (f.e - 2) + 'L5 ' + (f.e - 3.4) + 'M32 ' + (f.e - 2) + 'L35 ' + (f.e - 3.4) + '" stroke="#E0245E" stroke-width="1.1" fill="none"/>' +
+        heart(20, 0, 1, "#E0245E")]; },
+      biofilm: function(f){ return ['', heart(32, 29, 1.9, "#FFC1D6") + '<text x="32" y="27.6" font-size="2.6" font-weight="700" text-anchor="middle" fill="#C2185B" font-family="sans-serif">BE</text><text x="32" y="30.6" font-size="2.6" font-weight="700" text-anchor="middle" fill="#C2185B" font-family="sans-serif">MINE</text>' + blush(f, 9)]; },
+      mutans: function(f){ return ['<path d="M10 14C4 8-2 10 0 16 2 20 7 20 10 18ZM30 14C36 8 42 10 40 16 38 20 33 20 30 18Z" fill="#fff" stroke="#E7B9C8" stroke-width=".8"/>',
+        '<ellipse cx="20" cy="4" rx="7" ry="1.6" fill="none" stroke="#F6CD55" stroke-width="1.2"/><path d="M2 38L36 22" stroke="#8C6B3E" stroke-width="1.2"/>' + heart(37, 21.4, .8, "#E0245E", -115) + '<path d="M2 38l-1 -3M2 38l3 0" stroke="#FF8FB1" stroke-width="1.2"/>']; },
+      caries: function(f){ return ['', heart(5, 3, 1, "#FFC1D6", -15) + heart(35, 3, 1, "#C9F0D6", 15) + heart(20, -2, 1.1, "#FFF3B0") + heart(3, 34, 1, "#D7C9F5", -10) + heart(37, 34, 1, "#FFD8B5", 10) + heart(31, 25, .8, "#FFC1D6") +
+        '<path d="M18.4-2.6h3.2M3.4 33.6h3.2" stroke="#C2185B" stroke-width=".5"/>']; },
+      gingivitis: function(f){ return ['', heart(8, 2, .9, "#FF5C8A", -20) + heart(20, -3, 1.1, "#E0245E") + heart(32, 2, .9, "#FF5C8A", 20) + heart(14, -6, .6, "#FF8FB1") + heart(27, -6, .6, "#FF8FB1") + blush(f, 9)]; },
+      halitosis: function(f){ return ['', place(31, 23, 1.1, -15) + '<path d="M-5 0Q-2.5-3 0-1 2.5-3 5 0 2.5 3.6 0 3.2-2.5 3.6-5 0Z" fill="#E0245E"/><path d="M-5 0Q0 1 5 0" stroke="#9E1040" stroke-width=".7" fill="none"/></g>' +
+        '<text x="33" y="7" font-size="5" font-weight="800" text-anchor="middle" fill="#E0245E" font-family="sans-serif">XO</text>']; },
+      redcomplex: function(f){ return ['', '<path d="M11 ' + (f.m + .4) + 'L33 ' + (f.m - .6) + '" stroke="#2E7D32" stroke-width="1.6" stroke-linecap="round"/><path d="M24 ' + (f.m - .2) + 'q3-4 6-2-3 3-6 2zM17 ' + f.m + 'q2 4 5 3-2-4-5-3z" fill="#43A047"/>' +
+        '<circle cx="8" cy="' + (f.m - .6) + '" r="4.6" fill="#E0103A" stroke="#7A0E1E" stroke-width=".7"/><path d="M8 ' + (f.m - .6) + 'm-2 0a2 2 0 1 1 2 2 3 3 0 1 1-2.6-3.6" stroke="#7A0E1E" stroke-width=".7" fill="none"/>']; }
+    },
+    dentist: {
+      plaque: function(f){ return ['', '<path d="M30 30c2 2 4 2 5 0" stroke="#8FD3F5" stroke-width="1.6" fill="none"/>' + sweat(34, 21) + sweat(6, 12)]; },
+      tartar: function(f){ return ['', '<path d="M0-10L13 2" stroke="#9AA5B1" stroke-width="2.6" stroke-linecap="round"/><path d="M1-9l2-2M4-6.2l2-2M7-3.4l2-2" stroke="#6B7580" stroke-width=".8"/><path d="M13 2q4 2 2 6.4" stroke="#9AA5B1" stroke-width="1.2" fill="none" stroke-linecap="round"/>' + sweat(35, 12) + sweat(33, 22)]; },
+      biofilm: function(f){ return ['', '<path d="M-1 9Q20 1 41 9" stroke="#fff" stroke-width=".9" fill="none"/><rect x="33" y="3" width="6" height="7" rx="1.4" fill="#5BC0EB" stroke="#2E86C1" stroke-width=".6"/><path d="M1 34Q20 40 39 32" stroke="#fff" stroke-width=".9" fill="none"/>' + sweat(6, 14)]; },
+      mutans: function(f){ return ['', place(33, 1, 0, 160) + '<rect x="-4" y="-3" width="8" height="6" fill="#fff" stroke="#AEB6C0" stroke-width=".6"/><text x="0" y="1" font-size="2.2" font-weight="700" text-anchor="middle" fill="#C0392B" font-family="sans-serif">SUGAR</text></g>' +
+        '<circle cx="31" cy="6" r=".5" fill="#fff"/><circle cx="32.4" cy="7.4" r=".4" fill="#fff"/>' + sweat(9, 8) + sweat(31, 12)]; },
+      caries: function(f){ return ['', place(30, 2, 0, -35) + '<rect x="-2" y="-12" width="4" height="12" rx="1.6" fill="#D5DBE1" stroke="#8A8F98" stroke-width=".6"/><rect x="-2.6" y="0" width="5.2" height="3.6" rx="1" fill="#8A8F98"/><path d="M0 3.6v3" stroke="#6B7580" stroke-width=".8"/></g>' +
+        '<path d="M36 6q2 1 1 3M38 4q3 2 1.4 5.4" stroke="#8A8F98" stroke-width=".8" fill="none"/><text x="5" y="3" font-size="4" font-weight="700" fill="#8A8F98" font-family="sans-serif">bzz</text>' + sweat(6, 12)]; },
+      gingivitis: function(f){ return ['', '<path d="M25 ' + (f.m + .6) + 'c-1.4 2.2-1.4 3.6 0 3.6s1.4-1.4 0-3.6z" fill="#8B0000"/>' + sweat(35, 18) + sweat(5, 20) + sweat(30, 8)]; },
+      halitosis: function(f){ return ['', '<rect x="31" y="22" width="8" height="13" rx="2" fill="#3FC1C9" stroke="#2A8F96" stroke-width=".6"/><rect x="32.6" y="18.6" width="4.8" height="3.6" rx=".6" fill="#fff"/><rect x="32" y="26" width="6" height="4" fill="#fff" opacity=".7"/>' + sweat(4, 14) + sweat(24, 4)]; },
+      redcomplex: function(f){ return ['', '<path d="M32-6L37 30" stroke="#9AA5B1" stroke-width="1.6" stroke-linecap="round"/><path d="M36 22.6l.4 1.6M36.6 26.4l.4 1.6" stroke="#2B2B33" stroke-width="1.8"/>' + sweat(4, 10) + sweat(27, 3)]; }
+    },
+    stpatrick: {
+      plaque: function(f){ return ['', HAT.leprechaun + '<path d="M6 29Q7 39 20 40 33 39 34 29 28 33 20 33 12 33 6 29Z" fill="#E67E22"/>']; },
+      tartar: function(f){ return ['', shamrock(30, 4, 1.4) + '<path d="M24 32h15c0 5-3 7-7.5 7S24 37 24 32Z" fill="#2B2B2B"/><rect x="23" y="30.4" width="17" height="2.4" rx="1.2" fill="#3A3A3A"/>' +
+        '<g fill="#F6CD55" stroke="#C99A1E" stroke-width=".5"><ellipse cx="27" cy="29.6" rx="2" ry="1"/><ellipse cx="31" cy="29" rx="2" ry="1"/><ellipse cx="35" cy="29.6" rx="2" ry="1"/><ellipse cx="29" cy="28" rx="2" ry="1"/><ellipse cx="33" cy="27.6" rx="2" ry="1"/></g>']; },
+      biofilm: function(f){ return ['', '<path d="M13 6Q11 1 8-2M27 6Q29 1 32-2" stroke="#1B6E2E" stroke-width="1.1" fill="none"/>' + shamrock(8, -2, 1.4) + shamrock(32, -2, 1.4) + shamrock(4, 30, 1) + shamrock(36, 30, 1)]; },
+      mutans: function(f){ return ['', HAT.bowler("#2F9E44", "#1B6E2E") + shamrock(6, 28, .9) + shamrock(12, 33, .9) + shamrock(20, 35, .9) + shamrock(28, 33, .9) + shamrock(34, 28, .9)]; },
+      caries: function(f){ var bow = ""; ["#E74C3C", "#F39C12", "#F1C40F", "#2ECC71", "#3498DB", "#9B59B6"].forEach(function(c, i){ bow += '<path d="M' + (1 + i * 1.6) + ' 16A' + (19 - i * 1.6) + ' 19 0 0 1 ' + (39 - i * 1.6) + ' 16" stroke="' + c + '" stroke-width="1.6" fill="none"/>'; });
+        return [bow, '<path d="M28 33h11c0 4-2 6-5.5 6S28 37 28 33Z" fill="#2B2B2B"/><rect x="27.4" y="31.6" width="12.2" height="2" rx="1" fill="#3A3A3A"/><g fill="#F6CD55"><circle cx="30.6" cy="31" r="1.2"/><circle cx="33.4" cy="30.4" r="1.2"/><circle cx="36.2" cy="31" r="1.2"/></g>']; },
+      gingivitis: function(f){ return ['', hat(f, HAT.top("#2F9E44", "#F6CD55")) + shamrock(30, f.e + 5, .9) + '<path d="M14.6 31.4L20 33.6 14.6 35.8ZM25.4 31.4L20 33.6 25.4 35.8Z" fill="#2F9E44"/><circle cx="20" cy="33.6" r="1.2" fill="#1B6E2E"/>']; },
+      halitosis: function(f){ return ['', hat(f, HAT.bowler("#2F9E44", "#F6CD55")) + '<path d="M23 ' + (f.m + .4) + 'L31 ' + (f.m + 1.4) + '" stroke="#5A3E26" stroke-width="1.4" stroke-linecap="round"/><path d="M30 ' + (f.m - 2) + 'h4v3.4q0 1.4-1.4 1.4h-1.2q-1.4 0-1.4-1.4z" fill="#8C5A2B"/>' +
+        '<path d="M32 ' + (f.m - 3) + 'q-1.4-2 0-4t0-4" stroke="#C9CDD3" stroke-width="1" fill="none"/>']; },
+      redcomplex: function(f){ var e = f.e; return ['', hat(f, HAT.bowler("#2F9E44", "#1B6E2E")) + '<g fill="none" stroke="#1E1E24" stroke-width="1.4"><circle cx="14" cy="' + e + '" r="4"/><circle cx="26" cy="' + e + '" r="4"/><path d="M18 ' + e + 'h4M10 ' + (e - 1) + 'L7 ' + (e - 2) + 'M30 ' + (e - 1) + 'L33 ' + (e - 2) + '"/></g>' +
+        '<path d="M14 ' + (e - 5.4) + 'q-3 1-3 3M26 ' + (e - 5.4) + 'q3 1 3 3" stroke="#1E1E24" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="' + (e + 4) + '" rx="2.4" ry="2.8" fill="#F2B8A0"/>' +
+        '<path d="M13 ' + (e + 7.6) + 'q3.6-2.4 7-1 3.4-1.4 7 1-3.6 1.4-7 0-3.4 1.4-7 0z" fill="#2F9E44"/>']; }
+    },
+    easter: {
+      plaque: function(f){ return ['', HAT.ears("#fff", "#FFB3C7", "#E7B9C8") + '<ellipse cx="20" cy="22" rx="1.8" ry="1.3" fill="#FFB3C7"/><path d="M17 22.6l-7-1M17 23.6l-7 1.4M23 22.6l7-1M23 23.6l7 1.4" stroke="#fff" stroke-width=".6" opacity=".9"/>']; },
+      tartar: function(f){ return ['', '<path d="M11 6C12-4 28-4 29 6L26 3.6 23 6.6 20 3.4 17 6.6 14 3.6Z" fill="#BDE3FF" stroke="#7FB8E0" stroke-width=".6"/><path d="M15-1q5 2 10 0" stroke="#FF8FB1" stroke-width="1" fill="none"/>' +
+        '<path d="M3 32L7 30 11 32.6 15 30 19 32.6 23 30 27 32.6 31 30 35 32.6 37 31.6C37 37 31 40 20 40S3 37 3 32Z" fill="#FFF3C4" stroke="#E0C77A" stroke-width=".6"/><path d="M5 36q4-2 7 0t7 0 7 0 7 0 3 0" stroke="#B08CFF" stroke-width="1" fill="none"/>']; },
+      biofilm: function(f){ return ['<path d="M4 33C4-12 36-12 36 33" stroke="#A9773A" stroke-width="2.4" fill="none"/>',
+        '<path d="M2 32h36l-3 8H5Z" fill="#C8963E"/><path d="M3 35h34M4 37.6h32M9 32l1 8M15 32l.6 8M21 32v8M27 32l-.6 8M33 32l-1 8" stroke="#A9773A" stroke-width=".7"/>' +
+        '<path d="M2 32l1-3 1.4 3 1.4-3.4L7 32l1.6-3 1 3M30 32l1.4-3.4 1 3.4 1.4-3 1 3 1.4-3.4.8 3.4" stroke="#6DBE5B" stroke-width="1" fill="none"/>' + egg(9, 31, .7, "#FFB3C7", "#fff") + egg(32, 31, .7, "#BDE3FF", "#fff")]; },
+      mutans: function(f){ return ['<path d="M10 20C4 18 2 24 6 26 9 26 10 24 11 23ZM30 20C36 18 38 24 34 26 31 26 30 24 29 23Z" fill="currentColor" stroke="rgba(0,0,0,.3)" stroke-width=".8"/>',
+        '<path d="M18 7.4q0-4 2-5 0 3 1 5M20 7.4q1-3 3-3.4-1 2-1.4 3.6" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M18.4 18.8h3.2L20 21Z" fill="#F39C12"/>' +
+        '<g fill="#fff" opacity=".8"><circle cx="12" cy="11" r=".5"/><circle cx="28" cy="12" r=".5"/><circle cx="24" cy="26" r=".5"/><circle cx="15" cy="25" r=".5"/><circle cx="6" cy="27" r=".4"/><circle cx="34" cy="29" r=".4"/><circle cx="20" cy="34" r=".4"/></g>']; },
+      caries: function(f){ return ['', '<path d="M13 9C9-4 10-8 12-9L13-6 14.6-8.4 16-5.6 17 8" fill="#5D3A1A" stroke="#3E2510" stroke-width=".8"/>' +
+        '<path d="M27 9C31-4 29-10 26-10 23-10 22-2 23 8" fill="#5D3A1A" stroke="#3E2510" stroke-width=".8"/><path d="M26.4 5C27.4-2 27-6 26-6" stroke="#8C5A2B" stroke-width="1" fill="none"/>' +
+        '<path d="M20 31l-6-3v6ZM20 31l6-3v6Z" fill="#F6CD55" stroke="#C99A1E" stroke-width=".5"/><circle cx="20" cy="31" r="1.4" fill="#C0392B"/>']; },
+      gingivitis: function(f){ return ['', hat(f, place(0, 0, 0, -6) + HAT.ears("#B08A6A", "#F2B8A0", "#8C6B4E") + '</g>') + '<path d="M17 ' + (f.e + 4.4) + 'l-8-1.4M17 ' + (f.e + 5.4) + 'l-8 1.6M23 ' + (f.e + 4.4) + 'l8-1.4M23 ' + (f.e + 5.4) + 'l8 1.6" stroke="#fff" stroke-width=".6"/>' +
+        '<ellipse cx="20" cy="' + (f.e + 4.6) + '" rx="1.6" ry="1.1" fill="#FFB3C7"/>']; },
+      halitosis: function(f){ return ['', bean(5, 6, 30, "#E74C3C") + bean(12, 2, -20, "#F1C40F") + bean(28, 3, 15, "#2ECC71") + bean(36, 8, -35, "#9B59B6") + bean(3, 36, 10, "#F39C12") + bean(37, 36, -15, "#FF8FB1") + bean(20, 36, 40, "#3498DB") + bean(1, 18, 70, "#2ECC71") + bean(39, 22, -60, "#E74C3C")]; },
+      redcomplex: function(f){ return ['', hat(f, '<path d="M9 9C9-3 31-3 31 9Z" fill="#C9B27C"/><ellipse cx="20" cy="9" rx="15" ry="2.4" fill="#B39A62"/><rect x="9.4" y="5.4" width="21.2" height="2" fill="#8C6B3E"/><circle cx="20" cy="-1.6" r="1" fill="#B39A62"/>') +
+        '<circle cx="33" cy="27" r="4" fill="rgba(191,233,255,.35)" stroke="#5A3E26" stroke-width="1.4"/><path d="M35.8 29.8L39.4 33.4" stroke="#5A3E26" stroke-width="2" stroke-linecap="round"/>' + egg(4, 34, .9, "#FFB3C7", "#fff") + egg(11, 36, .8, "#C9F0D6", "#B08CFF")]; }
+    }
+  };
+  function bossIcon(k, hid){
     k = k || bossKind();
     var base = k.svg ? '<svg viewBox="0 0 40 40">' + k.svg + '</svg>' : IC.blob;
-    var id = HOLIDAY && on() ? HOLIDAY.id : "", under = "", over = "";
-    if (id === "halloween") {
-      under = '<path d="M5 14 C1 22 2 33 7 38 L12 31 L16 37 L20 31 L24 37 L28 31 L33 38 C38 33 39 22 35 14 Z" fill="#4A1A6B"/><path d="M5 14 C1 22 2 33 7 38" stroke="#C21E56" stroke-width="1.4" fill="none"/>';
-      over = '<path d="M16.6 27.4 L18 31 L19.2 27.6 M20.8 27.6 L22 31 L23.4 27.4" fill="#fff" stroke="#fff" stroke-width=".8" stroke-linejoin="round"/>' +
-        '<path d="M8 9 L13 3 L20 7 L27 3 L32 9" fill="none" stroke="#2B1B3D" stroke-width="2.2" stroke-linejoin="round"/>';
-    } else if (id === "thanksgiving") {
-      over = '<path d="M9 9 L11 -2 L29 -2 L31 9 Z" fill="#2B2B2B"/><rect x="5" y="7.6" width="30" height="3.4" rx="1.6" fill="#2B2B2B"/><rect x="10.4" y="3" width="19.2" height="3" fill="#8C6B3E"/><rect x="17" y="2.4" width="6" height="4.2" rx=".6" fill="none" stroke="#F6CD55" stroke-width="1.3"/>';
-    } else if (id === "winter") {
-      over = '<path d="M8 10 C10 1 22 -3 32 3 C30 5 30 8 31 10 Z" fill="#D6363C"/><path d="M31 3 C35 4 37 8 36 12" stroke="#D6363C" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="36" cy="13" r="3" fill="#fff"/><rect x="6" y="8.6" width="28" height="4.4" rx="2.2" fill="#fff"/>';
-    } else if (id === "newyear") {
-      over = '<path d="M13 9 L20 -6 L27 9 Z" fill="#B08CFF"/><path d="M15.6 3.4 L24.4 3.4 M14.2 6.6 L25.8 6.6" stroke="#F6CD55" stroke-width="1.6"/><circle cx="20" cy="-6" r="2.4" fill="#F6CD55"/>';
-    } else if (id === "valentine") {
-      over = '<path d="M7 22 c-1.6-1-2.6-2.2-2.6-3.4 a1.6 1.6 0 0 1 2.6-1 a1.6 1.6 0 0 1 2.6 1 c0 1.2-1 2.4-2.6 3.4z M33 22 c-1.6-1-2.6-2.2-2.6-3.4 a1.6 1.6 0 0 1 2.6-1 a1.6 1.6 0 0 1 2.6 1 c0 1.2-1 2.4-2.6 3.4z" fill="#FF8FB1"/>';
-    } else if (id === "dentist") {
-      over = '<path d="M30 30 c2 2 4 2 5 0" stroke="#8FD3F5" stroke-width="1.6" fill="none"/><circle cx="34" cy="24" r="1.4" fill="#8FD3F5"/>';
-    } else if (id === "stpatrick") {
-      over = '<path d="M10 9 L12 -3 L28 -3 L30 9 Z" fill="#2F9E44"/><rect x="5" y="7.4" width="30" height="3.4" rx="1.6" fill="#1B6E2E"/><rect x="11.4" y="3.2" width="17.2" height="2.8" fill="#2B2B2B"/><rect x="17.4" y="2.6" width="5.2" height="4" rx=".6" fill="none" stroke="#F6CD55" stroke-width="1.2"/>';
-    } else if (id === "easter") {
-      over = '<path d="M13 9 C9 -4 11 -10 14 -10 C17 -10 18 -2 17 8" fill="#fff" stroke="#E7B9C8" stroke-width="1"/><path d="M13.6 5 C12.6 -2 13 -6 14 -6 C15 -6 15.6 -1 15.4 5" fill="#FFB3C7"/>' +
-        '<path d="M27 9 C31 -4 29 -10 26 -10 C23 -10 22 -2 23 8" fill="#fff" stroke="#E7B9C8" stroke-width="1"/><path d="M26.4 5 C27.4 -2 27 -6 26 -6 C25 -6 24.4 -1 24.6 5" fill="#FFB3C7"/>';
-    }
-    if (!id) return base;
-    return base.replace('<svg viewBox="0 0 40 40">', '<svg viewBox="0 -12 40 52" style="overflow:visible">' + under).replace(/<\/svg>$/, over + '</svg>');
+    var id = hid || (HOLIDAY && on() ? HOLIDAY.id : ""), dress = COSTUMES[id] && COSTUMES[id][k.id];
+    if (!dress) return base;
+    var c = dress(FIT[k.id]);
+    return base.replace('<svg viewBox="0 0 40 40">', '<svg viewBox="0 -12 40 52" style="overflow:visible">' + c[0]).replace(/<\/svg>$/, c[1] + '</svg>');
   }
   /* the magic word's parade: a burst of the holiday's shape across the screen */
   function parade(h){
