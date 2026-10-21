@@ -102,6 +102,14 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 (Occlusion anima 8 of 10: canine guidance vs group function, Claude Code)** — In the L1 notes at 'Guidance and the
+  goals of ideal occlusion' (plain 'Guidance and the ideal'), in the L5 notes at 'Schemes and guidance' (plain 'Guidance and MIP'; new
+  `FIG_PLACE.applying` and `FIG_BY_LEC.applying`), and in Review in both tabs (L1 Guidance and determinants after Schemes; L5 before
+  Conformative vs reorganized). The patient's right side from the cheek in a right working move plus a front view of the canines; canine
+  guidance (#6 with #27, steep) vs group function (#7-6-5 with #26-27-28, flatter, the notes' example). The lower jaw is one rigid piece
+  that drops by slope × travel at the canine, less toward the back (turning about the working condyle). Slopes and gaps schematic.
+  Controls use `data-gumode`/`data-guplay`. Built by `tools/figures/occlusion/anima/guidance.mjs`. About page updated.
+
 - **2026-10-21 (Occlusion anima 7 of 10: CR to MIP slide, Claude Code)** — In the L1 notes at 'MIP, centric occlusion and centric
   relation' (plain 'Three positions people confuse'; a heading anchor, so it lands at the end of that section) and in Review (L1 tab,
   Positions and terms, before Terms). Side view: hinge closure with the condyle seated (CR) until the first contact, then the slide up the
