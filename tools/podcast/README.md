@@ -8,7 +8,7 @@ tools/podcast/
   render_podcast.py   script -> per-segment voice stems (kokoro-onnx), with lexicon.json for hard words
   produce.py          stems -> finished mp3: voice chain, music, ducking, stingers, loudness; writes <out>.json (chapters)
   lexicon.json        exact Kokoro phonemes for drug/anatomy words espeak gets wrong
-  <hub>/script.md     one episode's script
+  <hub>/script.md     one episode's script (msk-exam4, occlusion)
 ```
 
 ## Build an episode
