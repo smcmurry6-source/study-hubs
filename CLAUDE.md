@@ -100,6 +100,25 @@ draws its own marks) or refer to letters or positions (choices are shuffled). Dr
 question you write or edit gets its row in the same change**; the CI lint fails without it. Hubs archived before the
 rule (`WHY_EXEMPT` in `tools/ci/smoke.js`) are exempt; a new hub copies `whyHTML` from `occlusion` and is not.
 
+## Two-statement and true/false questions (standing rule)
+
+Sam's rule, 2026-10-22: **every lecture's questions include two-statement and true/false items**, for every new hub, every
+lecture added to a hub and every lecture that goes from slides-only to taught. Aim for about 5 two-statement and 8
+true/false per lecture (Occlusion has 27 and 42 over its five lectures). CI fails a taught lecture with fewer than 3 and 5
+(`FORMAT_MIN` in `tools/ci/smoke.js`; archived hubs and perio S1-S5, taught before the rule, are exempt).
+- Build them with Occlusion's helpers (copy `two()`, `tf()`, `TWO_CHOICES` and `choiceOrder()` into a hub that lacks them):
+  `two(id, lec, src, s1, s2, t1, t2, ex, r1, r2)` writes the stem "Read the two statements." with each statement on a line
+  starting "1. " / "2. ", the four fixed choices and the key; `tf(id, lec, src, statement, isTrue, ex, whyTrue, whyFalse)`
+  writes "True or false: …" with the choices True, False. Their choices never shuffle (bank, drill, Weak Spots, mock),
+  `.qcard-stem` keeps line breaks, and the arcade skips both (`arcadeQ`).
+- Spread two-statement keys over all four choices and keep true/false keys near half True (CI: 35-65% per hub).
+- A false statement changes one detail that was taught (a number, a side, a swapped pair, who said it); never make it
+  false through a trick of wording. Write each statement so it stands alone.
+- Every choice still gets its why: `two()` builds the four lines from one reason per statement (write each reason so it
+  reads after "Statement 1 is true:"), `tf()` takes one line for True and one for False. Draw them from the hub's notes.
+- The graded-coursework rules below apply as to any question. Perio: its engine has two-statement items but no true/false
+  yet, so add `tf()` (from `occlusion`) before Session 6 or any later session is marked taught.
+
 ## Every hub's arcade looks like that hub (standing rule)
 
 Sam's rule, 2026-10-21: arcade games are never copied and pasted from one hub to the next. The rules of a game live once in

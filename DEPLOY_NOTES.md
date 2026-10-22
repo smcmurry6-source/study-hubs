@@ -83,6 +83,13 @@ It is also refreshed between archivings, by hand when Sam asks a Claude Code ses
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
+## Every lecture gets two-statement and true/false questions (standing rule, 2026-10-22)
+
+Every session that writes questions for a lecture (hub Projects included) adds two-statement and true/false items: about 5
+and 8 per lecture, at least 3 and 5 for any taught lecture, or CI fails. Fixed choice order, balanced keys, a why for every
+choice, false statements that change one taught detail. How to build them: `CLAUDE.md` → "Two-statement and true/false
+questions" (copy `two()`/`tf()` from `occlusion`). **Perio Project: add true/false (`tf()`) before Session 6 goes to taught.**
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
@@ -116,6 +123,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   `ok()`. One-time carry-over (`sh_pref_extras_v`): Surprises off sets the six keys it used to cover off; nuke alerts off becomes
   `mine`. Turning a feature off hides it at once (boss, arch, nuke badge, flame). `widget/clicks.js` snapshots the new keys. About
   page, `sw.js` -> `sh-v33`. No schema change. **A new optional feature: give it a key and a row in both `EXTRAS` lists.**
+
+- **2026-10-22 (rule: every lecture gets two-statement and true/false questions, Claude Code)** — Sam: follow the
+  Occlusion question formats for the upcoming lectures. New standing rule (above, and `CLAUDE.md`). `tools/ci/smoke.js`
+  now fails a taught lecture with fewer than 3 two-statement or 5 true/false items (`FORMAT_MIN`; exempt: archived hubs and
+  perio S1-S5 via `FORMAT_GRANDFATHERED`), a two-statement item whose choices or "1. / 2." stem lines differ from the
+  standard, a true/false item not choosing True / False, and a hub whose true/false keys are under 35% or over 65% True.
+  No site change.
 
 - **2026-10-21 night (MSK Exam 4 and PCD Exam 3 check-ins closed, cards off the dashboard, Claude Code)** — Sam: close both
   check-ins (`checkinClosed:true` on each exam in `HUBS`) and take both archived cards off the dashboard now
