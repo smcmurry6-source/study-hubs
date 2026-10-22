@@ -762,7 +762,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen"], stateKey:"pcd3-state-v1" },
     { id:"occlusion", cls:"occlusion", title:"Occlusion Midterm Hub", code:"Occlusion · Midterm",
-      exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19 },
+      exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19,
+                extraQs:[ { id:"diagrams", kind:"scale", prompt:"How helpful were the hub's diagrams?", ends:["Not helpful","Very helpful"] },
+                          { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ] },
               { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-07",
       desc:"Dr. Givan's five midterm lectures: the review of basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, chewing, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Notes in two reading levels, drawn diagrams of the envelope of motion and cusp pathways, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"occl-state-v1",
@@ -1431,6 +1433,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     openDebrief(best.h, best.x);
     return true;
   }
+  /* an exam's extraQs (e.g. Occlusion's diagram ratings) go just before the closing text question, which stays last */
+  function debriefQs(x){ var n = DEBRIEF_QS.length - 1; return DEBRIEF_QS.slice(0, n).concat(x.extraQs || [], DEBRIEF_QS.slice(n)); }
   /* One question per step (with a progress bar) so the card stays short on any screen instead of scrolling.
      Tapping a choice moves on by itself; the text question at the end has Send. Every question is optional. */
   function openDebrief(hub, x){
@@ -1438,14 +1442,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (!me) return;
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
     var old = document.querySelector(".survey"); if (old) old.remove();
-    var answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = DEBRIEF_QS.length - 1, timer = null;
+    var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
     var box = document.createElement("section");
     box.className = "survey debrief"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
     document.body.appendChild(box);
     function render(){
-      var q = DEBRIEF_QS[step], v = answers[q.id], h = '<button type="button" class="survey-x" aria-label="Close">×</button>' +
-        '<div class="survey-eyebrow">Exam check-in · ' + (step + 1) + ' of ' + DEBRIEF_QS.length + '</div>' +
-        '<div class="debrief-steps" aria-hidden="true">' + DEBRIEF_QS.map(function(_, i){ return '<i' + (i <= step ? ' class="on"' : '') + '></i>'; }).join("") + '</div>';
+      var q = QS[step], v = answers[q.id], h = '<button type="button" class="survey-x" aria-label="Close">×</button>' +
+        '<div class="survey-eyebrow">Exam check-in · ' + (step + 1) + ' of ' + QS.length + '</div>' +
+        '<div class="debrief-steps" aria-hidden="true">' + QS.map(function(_, i){ return '<i' + (i <= step ? ' class="on"' : '') + '></i>'; }).join("") + '</div>';
       if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
         '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
@@ -1476,7 +1480,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     box.addEventListener("click", function(e){
       var opt = e.target.closest(".survey-opt");
       if (opt){
-        var q = DEBRIEF_QS[step], on = opt.getAttribute("aria-pressed") !== "true";
+        var q = QS[step], on = opt.getAttribute("aria-pressed") !== "true";
         box.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
         opt.setAttribute("aria-pressed", String(on));
         if (on) answers[q.id] = q.kind === "scale" ? +opt.getAttribute("data-sv") : opt.getAttribute("data-sv");

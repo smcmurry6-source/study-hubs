@@ -549,6 +549,7 @@ table.data tr.group:hover td{background:none;}
   }
 
   /* ---------- exam check-ins + search terms (migration_v23): read when a hub is archived, see LESSONS.md ---------- */
+  var DEBRIEF_EXTRA = { diagrams:"Diagrams helpful", pbox_img:"Patient Box pictures helpful" };
   function renderDebriefs(){
     var d = data.debriefs;
     if (!d || d.error) return card("Exam check-ins", "", '<div class="err">Couldn’t load exam check-ins (migration_v23).</div>');
@@ -565,6 +566,12 @@ table.data tr.group:hover td{background:none;}
       var ready = ans.filter(function(r){ return r.answers.ready; });
       var avg = ready.length ? (ready.reduce(function(s, r){ return s + Number(r.answers.ready); }, 0) / ready.length).toFixed(1) : "—";
       var body = '<p><b>Ready (1–5):</b> average ' + avg + ' · ' + tally("ready") + '</p><p><b>How it went:</b> ' + tally("went") + '</p><p><b>Hub vs exam:</b> ' + tally("match") + '</p>';
+      /* any other 1-5 rating an exam added (extraQs in index.html, e.g. Occlusion's diagrams / pbox_img) */
+      var extra = {}; ans.forEach(function(r){ Object.keys(r.answers).forEach(function(id){ if (id !== "ready" && typeof r.answers[id] === "number") extra[id] = 1; }); });
+      Object.keys(extra).forEach(function(id){
+        var vs = ans.filter(function(r){ return typeof r.answers[id] === "number"; });
+        body += '<p><b>' + esc(DEBRIEF_EXTRA[id] || id) + ' (1–5):</b> average ' + (vs.reduce(function(s, r){ return s + r.answers[id]; }, 0) / vs.length).toFixed(1) + ' · ' + tally(id) + '</p>';
+      });
       var notes = ans.filter(function(r){ return r.answers.missed; });
       body += '<h4 style="margin:14px 0 6px">Missed or barely covered</h4>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<div class="empty">No written answers.</div>');
       var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "—") + '</td><td>' + esc(r.answers.went || "—") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "—" : r.accuracy + "%") + '</td></tr>'; }).join("");
