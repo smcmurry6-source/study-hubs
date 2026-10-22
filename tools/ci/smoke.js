@@ -32,6 +32,13 @@ const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
 /* every multiple-choice and select-all question explains each of its choices (q.why, one line per choice, same order;
    Sam's standing rule, 2026-10-20). Hubs archived before the rule are exempt: their exams are over. */
 const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
+/* every taught lecture's questions include two-statement and true/false items (Sam's standing rule, 2026-10-22; CLAUDE.md
+   "Two-statement and true/false questions"). Archived hubs are exempt, and so are the perio sessions taught before the
+   rule (its engine has no true/false yet): a lecture taught after it, in any live or new hub, needs both formats. */
+const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
+const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
+const FORMAT_MIN = { '2stmt': 3, tf: 5 };
+const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
   Q.forEach(q => {
@@ -55,10 +62,26 @@ function lint(hub, A){
         if (new Set(vals).size !== vals.length && !SAME_ANSWER_OK.has(`${hub}:${q.id}`)) problems.push(`${hub}: ${q.id} matching has the same ${side}-hand item twice (give each pair a distinct answer)`);
       });
     }
+    if (q.fmt === '2stmt') {
+      if ((q.choices || []).join('|') !== TWO_CHOICES.join('|')) problems.push(`${hub}: ${q.id} two-statement choices must be exactly: ${TWO_CHOICES.join(' / ')}`);
+      if (!/\n1\. [^]*\n2\. /.test(q.stem || '')) problems.push(`${hub}: ${q.id} two-statement stem needs its statements on lines starting "1. " and "2. "`);
+    }
+    if (q.fmt === 'tf' && (q.choices || []).join('|') !== 'True|False') problems.push(`${hub}: ${q.id} true/false choices must be exactly True / False`);
     if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
     if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
   if (longItems.length) notes.push(`${hub}: heads-up, long ordering/select-all items score very low (LESSONS.md): ${longItems.join(', ')}`);
+  if (!FORMAT_EXEMPT.has(hub)) {
+    L.forEach(l => {
+      const lq = Q.filter(q => q.lec === l.id);
+      if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
+      Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
+        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${f === 'tf' ? 'true/false' : 'two-statement'} questions (needs at least ${FORMAT_MIN[f]}; CLAUDE.md "Two-statement and true/false questions")`); });
+    });
+    const tfq = Q.filter(q => q.fmt === 'tf');
+    if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);
+      if (t < 35 || t > 65) problems.push(`${hub}: ${t}% of true/false answers are True (keep it between 35% and 65%)`); }
+  }
   const mc = Q.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
   const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
   const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
