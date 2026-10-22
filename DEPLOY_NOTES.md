@@ -102,9 +102,9 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-10-21 evening (perio midterm check-in closed, Claude Code)** — Sam: the Periodontology midterm's check-in is closed
+- **2026-10-21 evening (perio midterm and PCD Exam 3 check-ins closed, Claude Code)** — Sam: the Periodontology midterm's and PCD Exam 3's check-ins are closed
   (`checkinClosed:true` on that exam in `HUBS`; `pastExams()` skips it, so no card button and no pop-up). The perio final's
-  check-in will still open on Nov 19. The 28 answers already sent stay on `review/`.
+  check-in will still open on Nov 19. Answers already sent (perio 28, PCD 10) stay on `review/`.
 
 - **2026-10-21 evening (exam check-in changes, Claude Code, #160-#162, #164)** — Sam: the Occlusion midterm check-in opened at 7 pm
   (`checkinHour`/`promptHour` 19). An exam in `HUBS` can carry `extraQs`, inserted before the closing text question
