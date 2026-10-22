@@ -102,7 +102,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-10-21 evening (exam check-in changes, Claude Code, #160-#163)** — Sam: the Occlusion midterm check-in opened at 7 pm
+- **2026-10-21 evening (exam check-in changes, Claude Code, #160-#162, #164)** — Sam: the Occlusion midterm check-in opened at 7 pm
   (`checkinHour`/`promptHour` 19). An exam in `HUBS` can carry `extraQs`, inserted before the closing text question
   (`debriefQs()`); Occlusion's midterm asks 1-5 `diagrams` ("How helpful were the hub's diagrams?") and `pbox_img` (the
   Patient Box questions with pictures), shown as averages on `review/`. **Every check-in's last question is now "Anything the
