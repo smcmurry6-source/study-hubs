@@ -764,7 +764,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { id:"occlusion", cls:"occlusion", title:"Occlusion Midterm Hub", code:"Occlusion · Midterm",
       exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19,
                 extraQs:[ { id:"diagrams", kind:"scale", prompt:"How helpful were the hub's diagrams?", ends:["Not helpful","Very helpful"] },
-                          { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ] },
+                          { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ],
+                lastPrompt:"Anything the hub could do better?" },
               { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-07",
       desc:"Dr. Givan's five midterm lectures: the review of basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, chewing, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Notes in two reading levels, drawn diagrams of the envelope of motion and cusp pathways, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"occl-state-v1",
@@ -1433,8 +1434,13 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     openDebrief(best.h, best.x);
     return true;
   }
-  /* an exam's extraQs (e.g. Occlusion's diagram ratings) go just before the closing text question, which stays last */
-  function debriefQs(x){ var n = DEBRIEF_QS.length - 1; return DEBRIEF_QS.slice(0, n).concat(x.extraQs || [], DEBRIEF_QS.slice(n)); }
+  /* an exam's extraQs (e.g. Occlusion's diagram ratings) go just before the closing text question, which stays last;
+     its lastPrompt rewords that question (answers still save as "missed") */
+  function debriefQs(x){
+    var n = DEBRIEF_QS.length - 1, end = DEBRIEF_QS[n];
+    if (x.lastPrompt) end = Object.assign({}, end, { prompt:x.lastPrompt });
+    return DEBRIEF_QS.slice(0, n).concat(x.extraQs || [], [end]);
+  }
   /* One question per step (with a progress bar) so the card stays short on any screen instead of scrolling.
      Tapping a choice moves on by itself; the text question at the end has Send. Every question is optional. */
   function openDebrief(hub, x){
