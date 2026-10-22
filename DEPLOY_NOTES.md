@@ -112,6 +112,17 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   Question Bank gains a **format filter** (`STATE.ui.qfmt`: two statements, true or false, EXCEPT / NOT, Patient Box, select
   all). About page updated. No notes text changed, so no narration or podcast rebuild.
 
+- **2026-10-21 evening (perio midterm check-in closed, Claude Code)** — Sam: the Periodontology midterm's check-in is closed
+  (`checkinClosed:true` on that exam in `HUBS`; `pastExams()` skips it, so no card button and no pop-up). The perio final's
+  check-in will still open on Nov 19. The 28 answers already sent stay on `review/`.
+
+- **2026-10-21 evening (exam check-in changes, Claude Code, #160-#162, #164)** — Sam: the Occlusion midterm check-in opened at 7 pm
+  (`checkinHour`/`promptHour` 19). An exam in `HUBS` can carry `extraQs`, inserted before the closing text question
+  (`debriefQs()`); Occlusion's midterm asks 1-5 `diagrams` ("How helpful were the hub's diagrams?") and `pbox_img` (the
+  Patient Box questions with pictures), shown as averages on `review/`. **Every check-in's last question is now "Anything the
+  hub could do better?"** (still saved as `missed`; before today it asked what topics or formats the hub missed). About page
+  and `/lessons-audit` updated. No schema change.
+
 - **2026-10-21 (Try it again in every hub's Question Bank, Claude Code)** — Sam: apply #156's missed-question retry
   everywhere. `pcd-exam3`, `msk-exam4` and `msk-exam3` (same engine as Occlusion) get the identical change: `RETRY_GAP`,
   `list.__retry` in `renderBank`, the hook at the end of `finishCard`, `qCardHTML(q, {retry:true})` and the CSS. **Perio**
