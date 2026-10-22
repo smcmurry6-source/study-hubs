@@ -102,6 +102,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-22 (MSK Exam 4 and PCD Exam 3 check-ins closed, cards off the dashboard, Claude Code)** — Sam: close both
+  check-ins (`checkinClosed:true` on each exam in `HUBS`) and take both archived cards off the dashboard today
+  (`hideCardOn:"2026-10-22"`, ahead of the usual `CARD_DAYS`). Answers already sent stay on `review/`. The hub pages
+  stay up; retrospective and folder cleanup are still manual.
+
 - **2026-10-22 (Occlusion: two-statement and true/false questions, Claude Code)** — Sam asked for both formats in
   `hubs/occlusion`. New helpers `two(id, lec, src, s1, s2, t1, t2, ex, r1, r2)` (`fmt:'2stmt'`, the four fixed choices in
   `TWO_CHOICES`, answer computed from t1/t2, its "why each choice" lines built from one reason per statement) and
