@@ -102,6 +102,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-21 evening (exam check-in changes, Claude Code, #160-#163)** — Sam: the Occlusion midterm check-in opened at 7 pm
+  (`checkinHour`/`promptHour` 19). An exam in `HUBS` can carry `extraQs`, inserted before the closing text question
+  (`debriefQs()`); Occlusion's midterm asks 1-5 `diagrams` ("How helpful were the hub's diagrams?") and `pbox_img` (the
+  Patient Box questions with pictures), shown as averages on `review/`. **Every check-in's last question is now "Anything the
+  hub could do better?"** (still saved as `missed`; before today it asked what topics or formats the hub missed). About page
+  and `/lessons-audit` updated. No schema change.
+
 - **2026-10-21 (Try it again in every hub's Question Bank, Claude Code)** — Sam: apply #156's missed-question retry
   everywhere. `pcd-exam3`, `msk-exam4` and `msk-exam3` (same engine as Occlusion) get the identical change: `RETRY_GAP`,
   `list.__retry` in `renderBank`, the hook at the end of `finishCard`, `qCardHTML(q, {retry:true})` and the CSS. **Perio**

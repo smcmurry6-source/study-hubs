@@ -573,7 +573,7 @@ table.data tr.group:hover td{background:none;}
         body += '<p><b>' + esc(DEBRIEF_EXTRA[id] || id) + ' (1–5):</b> average ' + (vs.reduce(function(s, r){ return s + r.answers[id]; }, 0) / vs.length).toFixed(1) + ' · ' + tally(id) + '</p>';
       });
       var notes = ans.filter(function(r){ return r.answers.missed; });
-      body += '<h4 style="margin:14px 0 6px">Missed or barely covered</h4>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<div class="empty">No written answers.</div>');
+      body += '<h4 style="margin:14px 0 6px">What the hub could do better (before 2026-10-21: what it missed)</h4>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<div class="empty">No written answers.</div>');
       var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "—") + '</td><td>' + esc(r.answers.went || "—") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "—" : r.accuracy + "%") + '</td></tr>'; }).join("");
       body += '<h4 style="margin:14px 0 6px">Each answer next to that person’s use of the hub</h4><div class="tbl-wrap"><table class="data"><thead><tr><th class="n">Ready</th><th>How it went</th><th class="n">Time in hub</th><th class="n">Answers</th><th class="n">Accuracy</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
       var who = {}; ans.forEach(function(r){ who[r.visitor_id] = 1; });
