@@ -102,6 +102,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-22 (Occlusion: two-statement and true/false questions, Claude Code)** — Sam asked for both formats in
+  `hubs/occlusion`. New helpers `two(id, lec, src, s1, s2, t1, t2, ex, r1, r2)` (`fmt:'2stmt'`, the four fixed choices in
+  `TWO_CHOICES`, answer computed from t1/t2, its "why each choice" lines built from one reason per statement) and
+  `tf(id, lec, src, statement, isTrue, ex, whyTrue, whyFalse)` (`fmt:'tf'`, stem "True or false: …", choices True/False);
+  both set `q.why` themselves instead of a `QUESTION_WHY` row. `choiceOrder(q)` keeps their choices unshuffled in the bank,
+  drill, Weak Spots and the mock; the arcade skips them (`arcadeQ`); `.qcard-stem` keeps line breaks. 27 two-statement and
+  42 true/false items written from the L1-L5 notes (`*-2s-*`, `*-tf-*`; keys balanced, 21 true / 21 false); bank 349 → 418.
+  Question Bank gains a **format filter** (`STATE.ui.qfmt`: two statements, true or false, EXCEPT / NOT, Patient Box, select
+  all). About page updated. No notes text changed, so no narration or podcast rebuild.
+
 - **2026-10-21 (Try it again in every hub's Question Bank, Claude Code)** — Sam: apply #156's missed-question retry
   everywhere. `pcd-exam3`, `msk-exam4` and `msk-exam3` (same engine as Occlusion) get the identical change: `RETRY_GAP`,
   `list.__retry` in `renderBank`, the hook at the end of `finishCard`, `qCardHTML(q, {retry:true})` and the CSS. **Perio**
