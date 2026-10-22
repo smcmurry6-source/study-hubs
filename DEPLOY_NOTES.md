@@ -102,6 +102,21 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-22 (Settings → Extras: every optional feature has its own switch, Claude Code)** — Sam asked to be able to turn the
+  bosses, nukes, Tooth Fairy, rank-up animations and the rest off one by one, plus one button that turns everything optional off.
+  Each hub's Settings panel (`EXTRAS` / `extrasHTML()` in `widget/v3.js`) and the dashboard's Settings (`EXTRAS` in `index.html`;
+  **keep the two lists in step**) now end with an **Extras** section: **All on / All off** at the top (lit only when every extra
+  matches), then one row per feature, each its own localStorage key (default `on`): `sh_pref_boss` (Plaque bosses), `sh_pref_fairy`,
+  `sh_pref_probe` (Golden Probe), `sh_pref_arch` (Full Arch), `sh_pref_nuke` (`on` | `mine` = no classmates' strikes | `off` = no
+  unlock at all; replaces `sh_pref_nuke_alerts`), `sh_pref_celebrate` (rank-up cutscene, level-up, trophy and medal cards in
+  `widget/ranks.js`; the mock results card goes quiet), `sh_pref_cheers` (confetti + toast every 5 in a row), `sh_pref_flame`,
+  `sh_pref_fx` (Answer animations: `widget/fx.js` treats it like reduced motion, so marks stay), `sh_pref_pet` (unchanged) and
+  `sh_pref_eggs`, now **"Hidden secrets"**: only the eggs without a switch of their own (holidays, magic words, TIMMY, Night Owl,
+  professor quotes, root canal, Cavity Search, Floss Chain). `widget/eggs.js` gates the four with `feat(k)` instead of
+  `ok()`. One-time carry-over (`sh_pref_extras_v`): Surprises off sets the six keys it used to cover off; nuke alerts off becomes
+  `mine`. Turning a feature off hides it at once (boss, arch, nuke badge, flame). `widget/clicks.js` snapshots the new keys. About
+  page, `sw.js` -> `sh-v33`. No schema change. **A new optional feature: give it a key and a row in both `EXTRAS` lists.**
+
 - **2026-10-21 night (MSK Exam 4 and PCD Exam 3 check-ins closed, cards off the dashboard, Claude Code)** — Sam: close both
   check-ins (`checkinClosed:true` on each exam in `HUBS`) and take both archived cards off the dashboard now
   (`hideCardOn:"2026-10-21"`, ahead of the usual `CARD_DAYS`). Answers already sent stay on `review/`. The hub pages
