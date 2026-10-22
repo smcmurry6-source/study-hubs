@@ -155,7 +155,7 @@ main{padding-top:20px}
 .retry-chip{display:inline-flex;align-items:center;gap:4px;color:var(--accent);white-space:normal;max-width:100%;text-align:left}
 .retry-chip svg{width:13px;height:13px}
 .src-chip{font-family:var(--font-mono);font-size:.68rem;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
-.qcard-stem{font-weight:600;margin:0 0 12px}
+.qcard-stem{font-weight:600;margin:0 0 12px;white-space:pre-line}
 .qcard-choices,.qcard-seq-steps{display:flex;flex-direction:column;gap:7px}
 .qcard-choice,.qcard-match-item{text-align:left;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:9px 12px;cursor:pointer;line-height:1.35}
 .qcard-choice:hover,.qcard-match-item:hover{border-color:var(--ink)}
@@ -3108,6 +3108,26 @@ function mcq(id, lec, src, stem, choices, ex, extra){ var q = { id:id, lec:lec, 
 function seq(id, lec, src, stem, steps, ex, extra){ var q = { id:id, lec:lec, type:'sequence', stem:stem, steps:steps, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
 function match(id, lec, src, stem, pairs, ex, extra){ var q = { id:id, lec:lec, type:'match', stem:stem, pairs:pairs, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
 function multi(id, lec, src, stem, choices, correct, ex, extra){ var q = { id:id, lec:lec, type:'multi', stem:stem, choices:choices, correct:correct, ex:ex||'', src:src }; if(extra) Object.keys(extra).forEach(function(k){ q[k] = extra[k]; }); QUESTIONS.push(q); }
+/* Two-statement (fmt '2stmt') and true/false (fmt 'tf') items keep their choices in a fixed order (choiceOrder), so the
+   answer is not authored first. Their "why each choice" lines are built here instead of in QUESTION_WHY:
+   two() takes one reason per statement, tf() one line for True and one for False. */
+var TWO_CHOICES = ['Both statements are true','Both statements are false','Statement 1 is true; statement 2 is false','Statement 1 is false; statement 2 is true'];
+function two(id, lec, src, s1, s2, t1, t2, ex, r1, r2, extra){
+  var claims = [[true,true],[false,false],[true,false],[false,true]], tv = function(b){ return b ? 'true' : 'false'; };
+  var why = claims.map(function(c){
+    if(c[0] === t1 && c[1] === t2) return 'Statement 1 is ' + tv(t1) + ': ' + r1 + ' Statement 2 is ' + tv(t2) + ': ' + r2;
+    var out = [];
+    if(c[0] !== t1) out.push('Statement 1 is ' + tv(t1) + ', not ' + tv(c[0]) + ': ' + r1);
+    if(c[1] !== t2) out.push('Statement 2 is ' + tv(t2) + ', not ' + tv(c[1]) + ': ' + r2);
+    return out.join(' ');
+  });
+  mcq(id, lec, src, 'Read the two statements.\n1. ' + s1 + '\n2. ' + s2, TWO_CHOICES.slice(), ex, extra);
+  var q = QUESTIONS[QUESTIONS.length - 1]; q.fmt = '2stmt'; q.answer = claims.findIndex(function(c){ return c[0] === t1 && c[1] === t2; }); q.why = why;
+}
+function tf(id, lec, src, statement, isTrue, ex, whyTrue, whyFalse, extra){
+  mcq(id, lec, src, 'True or false: ' + statement, ['True','False'], ex, extra);
+  var q = QUESTIONS[QUESTIONS.length - 1]; q.fmt = 'tf'; q.answer = isTrue ? 0 : 1; q.why = [whyTrue, whyFalse];
+}
 /* Patient cases: one Patient Box (and its drawn findings) shared by every question on that patient. pc(key) gives
    a question the box and its pcase, so the box says "Same patient · 2 of 3" and Shuffle keeps the set together. */
 var CASES = {
@@ -3600,6 +3620,97 @@ mcq('cs-reorg','applying','hub','A month later he needs crowns on #2, #3, #14, #
   pc('slide'));
 
 
+/* L1 two-statement and true/false items (2026-10-22): written from the notes; choices stay in a fixed order */
+two('rv-2s-curves','review','handout',
+  'The curve of Spee is seen in the sagittal plane.',
+  'The curve of Wilson is seen in the frontal plane.',
+  true, true,
+  'Both are true. Spee is the anteroposterior curve (side view), from the mandibular canine cusp tip back to the front of the condyle. Wilson is the mediolateral curve (front view): concave in the mandibular arch, convex in the maxillary.',
+  'it runs from the mandibular canine cusp tip along the buccal cusp tips to the condyle, seen from the side.',
+  'it is the mediolateral curve of the posterior cusps, seen from the front.');
+two('rv-2s-cusps','review','handout',
+  'Non-centric cusps maintain the vertical dimension of occlusion.',
+  'Centric cusps are broad and rounded, about 1/3 of the buccolingual width.',
+  false, true,
+  'Statement 1 is false: maintaining VDO is the centric (supporting) cusps\' job. Non-centric cusps are sharper, about 1/6 of the width; they shear food, keep the cheek and tongue out of the way and hold the bolus on the table. Statement 2 is true.',
+  'maintaining VDO is the job of the centric (supporting) cusps; non-centric cusps shear food and protect the cheek and tongue.',
+  'the supporting cusps are the broad ones, about 1/3 of the width, while non-centric cusps are about 1/6.');
+two('rv-2s-co','review','hub',
+  'On Dr. Givan\'s exams, centric occlusion means the tooth contact with the joints seated, never MIP.',
+  'MIP is structurally determined, while centric occlusion is neuromuscularly determined.',
+  true, false,
+  'Statement 1 is true: "when you hear centric, you immediately turn on, oh, we\'re talking joint." Statement 2 reverses the pair: MIP is neuromuscularly determined (a tooth-to-tooth position set by muscle engrams), CO is structurally determined by the seated joint.',
+  'he would erase the term if he could, because so many people use it for MIP, but on his exams it always means the joints are seated.',
+  'it is the other way round: MIP is set by neuromuscular feedback, CO by the seated joint.');
+two('rv-2s-slide','review','handout',
+  'About 90% of people have a slide between the CO contact and MIP.',
+  'That slide averages about 1.25 ± 1 mm.',
+  true, true,
+  'Both are true. Only about 10% have CO and MIP coincident, which is also where full reconstructions are deliberately rebuilt. A slide that deviates left or right tends to be more problematic.',
+  'only about 10% have CO and MIP coincident.',
+  'the average slide is about 1.25 mm, and one that deviates left or right tends to be more problematic.');
+two('rv-2s-angle','review','handout',
+  'Class II (distoclusion) is found in about 5% of people.',
+  'In Class III, the mandibular first molar is distal to the maxillary first molar.',
+  false, false,
+  'Both are false. Class II is about 25% (Class I about 70%, Class III about 5%). Class III is mesioclusion: the mandibular first molar sits mesial to the maxillary first molar; distal is Class II.',
+  'Class II is about 25%; it is Class III that is about 5%, and Class I about 70%.',
+  'Class III (mesioclusion) puts the mandibular first molar mesial to the maxillary one; distal is Class II.');
+two('rv-2s-group','review','handout',
+  'Balanced occlusion is the goal for natural teeth.',
+  'Group function is useful when the canine is an implant or has compromised periodontal support.',
+  false, true,
+  'Statement 1 is false: balanced occlusion is for dentures; for natural teeth the goal is mutually protected articulation. Statement 2 is true: group function shares the working contacts among a few teeth (e.g. #7-6-5) when the canine can\'t guide alone.',
+  'balanced occlusion is for dentures; natural teeth aim for mutually protected articulation.',
+  'the working contacts are then shared among a few teeth, e.g. #7-6-5, instead of the canine alone.');
+two('rv-2s-freeway','review','handout',
+  'Freeway space is VDO minus VDR.',
+  'A freeway space of 2 mm is healthier than one of 6 mm.',
+  false, false,
+  'Both are false. Freeway (interocclusal rest) space is VDR minus VDO, usually 2-6 mm, and neither 2 nor 6 mm is "better."',
+  'it is VDR minus VDO: the measurement at rest is the larger one.',
+  'freeway space is usually 2-6 mm, and neither end of that range is better.');
+tf('rv-tf-artic','review','handout','Occlusion and articulation mean the same thing.', false,
+  'False. Occlusion is the static relationship of the incising or masticating surfaces; articulation is the static AND dynamic contact relationship during function. People use them interchangeably, "but they\'re not quite the same."',
+  'People use the words interchangeably, but articulation adds the dynamic contact of function.',
+  'Occlusion is static contact; articulation is static and dynamic contact during function.');
+tf('rv-tf-neutral','review','handout','Restored or orthodontically moved teeth should be placed within the neutral zone.', true,
+  'True. The neutral zone is where the forces of the tongue and of the lips and cheeks balance. Put a tooth in the way of those muscles "and they\'ll just sort of knock it out of the way."',
+  'Teeth outside the zone get pushed by the tongue, lips and cheeks.',
+  'The neutral zone is exactly where restored and moved teeth belong; outside it the muscles displace them.');
+tf('rv-tf-monson','review','handout','The sphere of Monson has a radius of about 4 inches, centered near the glabella.', true,
+  'True. Monson\'s spherical theory: each cusp conforms to an imaginary sphere of about 4-inch radius centered near the glabella.',
+  'That is Monson\'s sphere as taught: about 4 inches, centered near the glabella.',
+  'The 4-inch radius and the glabella center are both right; the condyles are not the center.');
+tf('rv-tf-crossbite','review','hub','A posterior crossbite is a functional problem that should be corrected before posterior implant crowns are made.', false,
+  'False. "There is absolutely functionally no problem with this." After bone loss most posterior implant crowns have to be built in crossbite; just design them so they don\'t trap the cheek.',
+  'Crossbite is functionally fine, and posterior implant crowns are often built in crossbite on purpose.',
+  'Dr. Givan: no functional problem; it comes from arch size or eruption, and implant crowns are often made in crossbite.');
+tf('rv-tf-embrasure','review','handout','Because posterior contacts sit buccal to the central fossa line, the buccal embrasures are larger than the lingual ones.', false,
+  'False. With the contacts buccal to the central fossa line, the LINGUAL embrasures are larger, which returns food toward the tongue.',
+  'Contacts buccal to the fossa line make the lingual embrasures larger, not the buccal ones.',
+  'The lingual embrasures are the larger ones, so food falls back toward the tongue.');
+tf('rv-tf-classI','review','hub','If an exam question does not name the Angle class, assume Class I.', true,
+  'True. Dr. Givan\'s exam rule: assume Class I (and, on the help sheet, an idealized cusp-fossa occlusion) unless the question says or implies otherwise.',
+  'That is his exam rule, after checking the class isn\'t implied indirectly.',
+  'Unless told or shown otherwise, his questions are Class I.');
+tf('rv-tf-cr-rot','review','handout','In centric relation the mandible is restricted to pure rotation about the transverse horizontal axis.', true,
+  'True. CR is independent of tooth contact, with the condyle-disc complexes anterior-superior against the eminences, and it is restricted to pure rotation about the transverse horizontal axis (up to about 20-25 mm of opening).',
+  'That is part of the definition of CR.',
+  'CR allows only rotation about the transverse horizontal axis; translation means the condyles have left it.');
+tf('rv-tf-nw','review','handout','Non-working contacts are considered interferences.', true,
+  'True. Working-side contacts are on the side of the movement; non-working (mediotrusive, "balancing") contacts are considered interferences, and eliminating them is on the list of goals.',
+  'Eliminating balancing (non-working) contacts is one of the goals of ideal occlusion.',
+  'Non-working contacts are interferences; only dentures want balancing contacts.');
+tf('rv-tf-hinge','review','handout','Pure rotation with the condyles seated opens the incisors about 40-60 mm.', false,
+  'False. Rotation with the condyles seated opens the incisors about 20-25 mm. Opening to about 40-60 mm needs rotation plus translation down and forward.',
+  'Pure rotation stops at about 20-25 mm; 40-60 mm takes translation too.',
+  'Rotation alone gives about 20-25 mm; rotation plus translation reaches 40-60 mm.');
+tf('rv-tf-pp','review','handout','The postural position and the clinical rest position are the same thing.', false,
+  'False. The postural position is about 2-4 mm below MICP, held by a myotactic reflex. The clinical rest position is the position of least EMG activity, about 8 mm inferior and 3 mm anterior. The first is often wrongly called the second.',
+  'They are often confused, but postural is 2-4 mm below MICP and clinical rest about 8 mm down.',
+  'Postural position is reflex-held 2-4 mm below MICP; clinical rest is least EMG activity, about 8 mm inferior.');
+
 /* =================================================================== L2 FUNCTIONAL TMJ ANATOMY + MUSCLES */
 mcq('an-ginglymus','anatomy','handout','A ginglymus joint:',
   ['Moves in one plane like a hinge, e.g. the elbow, knee and finger joints','Glides freely between flat surfaces, e.g. the wrist, the ankle and the spine','Rotates around a single pivot, e.g. the atlantoaxial joint','Is a fibrous joint with no movement, e.g. a cranial suture'],
@@ -3749,6 +3860,75 @@ mcq('cs-lock-down','anatomy','hub','Why press down on the buccal shelf instead o
   ['Downward force distracts the condyle so it can come back over the eminence','A backward push works too, but it is slower and tires the masseter','Downward pressure stretches the superior head of the lateral pterygoid','The TM ligament attaches at the buccal shelf, so pressing there pulls the disc back'],
   'In an open lock the condyle is stuck in front of the eminence. Gentle downward pressure on the buccal shelf distracts it so it can clear the eminence and return. Dr. Givan: "Not a posterior force, because you don\'t want to push it back against it." A backward push is the mistake, not a slower option. The superior head of the lateral pterygoid isn\'t what you are working on (it is active in closing), and the TM ligament runs from the eminence to the condylar neck, not the buccal shelf.',
   pc('lock'));
+
+/* L2 two-statement and true/false items (2026-10-22): written from the notes; choices stay in a fixed order */
+two('an-2s-comp','anatomy','handout',
+  'Translation happens in the upper (superior) compartment of the TMJ.',
+  'Rotation happens in the lower (inferior) compartment.',
+  true, true,
+  'Both are true. The disc divides the joint: the upper compartment (disc to temporal bone) translates, the lower compartment (disc to condyle) rotates, so the disc stays over the condyle wherever it goes.',
+  'translation is between the disc and the temporal bone.',
+  'rotation is between the disc and the condyle.');
+two('an-2s-disc','anatomy','handout',
+  'The intermediate zone is the thickest part of the disc.',
+  'The disc is slightly thicker medially than laterally.',
+  false, true,
+  'Statement 1 is false: from the side the disc is biconcave, with a thick anterior border, a thinner intermediate zone and an even thicker posterior border; the condyle sits in the avascular intermediate zone. Statement 2 is true, so a disc that slips tends to go forward or medially.',
+  'the intermediate zone is the thinnest part; the posterior border is the thickest.',
+  'the thicker medial side is why a slipped disc tends to go forward or medially.');
+two('an-2s-lamina','anatomy','handout',
+  'The superior retrodiscal lamina is collagenous.',
+  'The retrodiscal tissues have no blood vessels or nerves.',
+  false, false,
+  'Both are false. The superior retrodiscal lamina is elastic and the inferior one collagenous. The retrodiscal tissues are loaded with vessels and nerves, so functioning on them causes substantial pain; the avascular part is the disc\'s intermediate zone.',
+  'the superior lamina is elastic; the inferior lamina is the collagenous one.',
+  'they are loaded with vessels and nerves; the disc\'s intermediate zone is the avascular part.');
+two('an-2s-latpt','anatomy','handout',
+  'The inferior head of the lateral pterygoid opens and protrudes the mandible.',
+  'Contracting the right inferior lateral pterygoid alone moves the jaw to the right.',
+  true, false,
+  'Statement 1 is true: it pulls the condyle forward, down and toward the midline. Statement 2 is false: one side alone swings the chin to the opposite side. "If I contract on the right side, I will move my jaw to the left."',
+  'it pulls the condyle forward, down and toward the midline.',
+  'one side alone moves the jaw to the opposite side, so the right muscle moves it to the left.');
+two('an-2s-temp','anatomy','handout',
+  'The temporalis is the jaw\'s power closer.',
+  'The masseter\'s fibers push the mandible up and forward, toward the seated position.',
+  false, true,
+  'Statement 1 is false: the temporalis inserts on the thin coronoid process, "not a power position"; it is the major, fast positioner. The masseter is the power closer. Statement 2 is true: its fibers run up and forward, pushing the mandible superiorly and anteriorly, which is the seated (CR) position.',
+  'the temporalis is a positioner on the thin coronoid process; the masseter is the power closer.',
+  'its fibers run up and forward, which seats the condyles.');
+tf('an-tf-meniscus','anatomy','handout','The TMJ disc is properly called a meniscus.', false,
+  'False. It is improper to call the disc a meniscus, which is crescent-shaped (one convex and one concave side), as in the knee. The TMJ disc is biconcave dense fibrous connective tissue.',
+  'A meniscus is crescent-shaped, as in the knee; the TMJ disc is biconcave.',
+  'Dr. Givan: calling it a meniscus is improper; it is a biconcave disc.');
+tf('an-tf-onebone','anatomy','handout','Neither TMJ can move independently of the other.', true,
+  'True. One bone, two joints: no movement of one side happens without the other.',
+  'The mandible is one bone with two joints, so the joints always move together.',
+  'Both condyles belong to one mandible, so one can\'t move without the other.');
+tf('an-tf-ginglymo','anatomy','handout','The TMJ is a ginglymoarthrodial joint: it both hinges and glides.', true,
+  'True. A ginglymus joint hinges in one plane (elbow, knee); an arthrodial joint glides (wrist, ankle). The TMJ does both.',
+  'It hinges (ginglymus) and glides (arthrodial).',
+  'Hinging and gliding together is exactly what ginglymoarthrodial means.');
+tf('an-tf-tmouter','anatomy','handout','The outer oblique portion of the TM ligament limits rotational opening.', true,
+  'True. The outer oblique portion slings around the posterior condylar neck to the eminence and limits rotational opening; the inner horizontal portion limits posterior movement of the condyle and disc.',
+  'That is the outer oblique portion\'s job.',
+  'The outer oblique portion does limit rotational opening; posterior movement is the inner horizontal portion.');
+tf('an-tf-stylo','anatomy','handout','The stylomandibular ligament limits posterior movement of the condyle.', false,
+  'False. The stylomandibular (and sphenomandibular) ligaments limit opening and forward motion. Posterior movement of the condyle and disc is limited by the inner horizontal portion of the TM ligament.',
+  'It limits opening and forward motion; the inner horizontal TM ligament limits posterior movement.',
+  'Posterior movement is the inner horizontal TM ligament\'s job; the stylomandibular limits opening and forward motion.');
+tf('an-tf-openlock','anatomy','hub','To reduce an open lock, push the mandible straight back.', false,
+  'False. Apply gentle downward pressure on the buccal shelf to distract the condyle from in front of the eminence, "not a posterior force."',
+  'Dr. Givan: gentle downward pressure on the buccal shelf, not a posterior force.',
+  'The condyle is stuck in front of the eminence, so you distract it downward on the buccal shelf.');
+tf('an-tf-sling','anatomy','handout','The medial pterygoid and the masseter form the pterygomasseteric sling.', true,
+  'True. The medial pterygoid, "the unsung hero," is a meaty elevator on the inside of the ramus; with the masseter outside it forms the powerful pterygomasseteric sling.',
+  'Inside and outside the ramus, they make the sling together.',
+  'That is the sling: medial pterygoid inside the ramus, masseter outside.');
+tf('an-tf-hyoid','anatomy','handout','To open, the suprahyoid muscles fix the hyoid first, then the infrahyoids pull the mandible down.', false,
+  'False, it is reversed. The infrahyoids first fix the hyoid "like a rock," then the suprahyoids (digastric, geniohyoid, mylohyoid, stylohyoid) pull the mandible down.',
+  'The roles are swapped: infrahyoids stabilize, suprahyoids open.',
+  'Infrahyoids fix the hyoid first; then the suprahyoids pull the mandible down.');
 
 /* =================================================================== L3 MASTICATION, DEGLUTITION AND SPEECH */
 mcq('fn-primary','function','handout','Which are the three PRIMARY functions of the masticatory system?',
@@ -3909,6 +4089,75 @@ mcq('cs-aob-guide','concepts','hub','With no anterior contact, what separates he
   pc('aob'));
 
 
+/* L3 two-statement and true/false items (2026-10-22): written from the notes; choices stay in a fixed order */
+two('fn-2s-apart','function','handout',
+  'When the teeth are apart, the jaw\'s position is set by the muscles and ligaments.',
+  'Speech normally includes light tooth contact.',
+  true, false,
+  'Statement 1 is true: anterior and condylar guidance only influence motion when the teeth touch. Statement 2 is false: tooth contacts do not normally occur in speech; it is too rapid, and contact would damage teeth.',
+  'guidance only matters when the teeth touch.',
+  'speech is too rapid for contact, and contact would damage the teeth.');
+two('fn-2s-stroke','function','handout',
+  'Chewing opens only about 16-18 mm.',
+  'Chewing moves the mandible about 5-6 mm laterally.',
+  true, true,
+  'Both are true. The chewing stroke stays far from the borders: about 16-18 mm open and 5-6 mm lateral, returning to ICP every time.',
+  'chewing opens only about 16-18 mm, far from maximum opening.',
+  'the lateral movement is about 5-6 mm.');
+two('fn-2s-force','function','handout',
+  'Bite force at the central incisor is about three to five times that at the first molar.',
+  'A restoration left 0.5 mm high doubles the force on it.',
+  false, true,
+  'Statement 1 is reversed: force drops the farther you are from the condyles, so the first molar has about three to five times the force of the central incisor. Statement 2 is true.',
+  'it is the first molar that has three to five times the incisor\'s force, being closer to the condyles.',
+  'half a millimeter high doubles the force.');
+two('fn-2s-swallow','function','handout',
+  'Swallowing contacts happen in a retruded position.',
+  'Swallowing contacts are lighter than chewing contacts.',
+  false, false,
+  'Both are false. Swallowing contacts happen in ICP, not a retruded position as once thought, and they are heavy and long: about 66.5 lb for about 683 ms, 7.8 lb more than chewing.',
+  'they happen in ICP, not a retruded position as once thought.',
+  'they are heavier, about 66.5 lb, 7.8 lb more than chewing.');
+two('fn-2s-fric','function','handout',
+  'For f and v, the maxillary incisal edge lightly touches the wet-dry line of the lower lip.',
+  'On "s" the teeth come about 5-10 mm apart.',
+  true, false,
+  'Statement 1 is true: incisors too short can\'t make the sound, too long depress the lip. Statement 2 is false: on "s" the teeth come closest, about 1-1.5 mm apart. Wide-open vowels and diphthongs ("eight," "nine") separate them 5-10 mm.',
+  'too short and the sound can\'t be made; too long and the lip is depressed.',
+  'on "s" the teeth are closest, about 1-1.5 mm; 5-10 mm is the wide-open vowels.');
+tf('fn-tf-primary','function','handout','Respiration is one of the three primary functions of the masticatory system.', false,
+  'False. The three primary functions are mastication, swallowing and speech. Respiration and expression of emotions are the two secondary functions.',
+  'Respiration is a secondary function, with expression of emotions.',
+  'The primary three are mastication, swallowing and speech; respiration is secondary.');
+tf('fn-tf-cpg','function','handout','A central pattern generator creates learned chewing patterns called engrams.', true,
+  'True. It times activity between antagonistic muscles and creates engrams; mostly subconscious, it can be brought under conscious control and adjusts the stroke from feedback such as particle size.',
+  'That is what the central pattern generator does.',
+  'Engrams are the learned patterns the central pattern generator creates.');
+tf('fn-tf-onesided','function','handout','About 78% of patients chew mostly on one side.', true,
+  'True. Usually on the side with the most contacts in lateral glide. The TMJs are loaded unequally, normally without problems because the superior lateral pterygoids stabilize the discs.',
+  'About 78% chew mostly on one side, usually the side with the most lateral-glide contacts.',
+  'The 78% figure is right; one-sided chewing is the norm.');
+tf('fn-tf-icp','function','handout','In chewing, the teeth come back to ICP at the end of each stroke that reaches contact.', true,
+  'True. "No matter how you run around the bases, you always come back to home plate." Contact increases as the bolus breaks down, to nearly every stroke before the swallow.',
+  'Contacts return to ICP every time: home plate.',
+  'Some tooth contact does occur in chewing, and it returns to ICP.');
+tf('fn-tf-tmjpain','function','handout','Patients with TMJ pain chew with faster, longer and more repeatable strokes.', false,
+  'False. Patients with TMJ pain chew with less repeatable, slower, shorter and more irregular strokes.',
+  'Painful joints make strokes slower, shorter and less repeatable.',
+  'Their strokes are less repeatable, slower, shorter and more irregular.');
+tf('fn-tf-visceral','function','handout','A visceral (infantile) swallow is normal until the posterior teeth erupt.', true,
+  'True. The tongue pushes forward between the arches to brace the mandible. It is normal until the posterior teeth erupt (and when swallowing liquids); over-retained, it can displace teeth anteriorly, e.g. an anterior open bite.',
+  'It is normal in infants until the posterior teeth erupt.',
+  'Only when it is over-retained does it become a problem, such as an anterior open bite.');
+tf('fn-tf-somatic','function','handout','In an adult somatic swallow, the tongue pushes forward between the arches to brace the mandible.', false,
+  'False. That is the visceral (infantile) swallow. In the adult somatic swallow the teeth come together in MIP and the elevators hold the mandible there.',
+  'Tongue between the arches is the visceral swallow; adults brace on the teeth in MIP.',
+  'The somatic swallow stabilizes on the teeth in MIP, held by the elevators.');
+tf('fn-tf-fma','function','handout','A high FMA (divergent jaws, a long face) goes with higher bite forces.', false,
+  'False. A high FMA means lower forces; a square, low-angle face means high forces.',
+  'Long, divergent faces have lower forces; square, low-angle faces have high ones.',
+  'High FMA goes with lower bite force.');
+
 /* =================================================================== L4 OCCLUSAL CONCEPTS */
 mcq('cc-bonwill','concepts','handout','Who is called "the father of articulation," and what was his theory?',
   ['W.G.A. Bonwill: the 4-inch equilateral triangle','George Monson: the 4-inch sphere centered near the glabella','Carl Christensen: posterior separation in protrusion','Norman Bennett: lateral translation of the mandible'],
@@ -4061,6 +4310,75 @@ mcq('cs-sda-flare','concepts','hub','Why are her anterior teeth flaring and spre
   ['They carry all the force with no posterior support','An over-retained visceral swallow is pushing them forward','Her canine guidance is too steep for her chewing pattern','A posterior crossbite that forces the anterior teeth apart'],
   'Without posterior teeth the anteriors take all the force and chewing work and decline fast, and the jaw overcloses (posterior overclosure, old term posterior bite collapse), leaving less room to restore. That is why posterior support comes first. A retained visceral swallow shows up early as an anterior open bite; nothing here points to too-steep guidance; and she has no posterior teeth to be in crossbite (a crossbite is "absolutely functionally no problem" anyway).',
   pc('sda'));
+
+/* L4 two-statement and true/false items (2026-10-22): written from the notes; choices stay in a fixed order */
+two('cc-2s-bonwill','concepts','handout',
+  'Bonwill\'s equilateral triangle runs about 4 inches from condyle to condyle to the mandibular symphysis.',
+  'Balkwill described the medial movement of the translating condyle about 40 years before Bennett.',
+  true, true,
+  'Both are true. Bonwill (ca. 1858) measured the 4-inch (110 mm) triangle from thousands of skulls; articulators still use 110 mm intercondylar widths. Balkwill (1866) saw the translating condyle move medially in lateral movement, 40 years before Bennett (1908).',
+  'Bonwill\'s triangle is about 4 inches (110 mm) on each side.',
+  'Balkwill (1866) came about 40 years before Bennett (1908).');
+two('cc-2s-pms','concepts','handout',
+  'Pankey, Mann and Schuyler programmed a fully adjustable articulator from pantograph tracings.',
+  'Gnathology\'s early goal put MICP coincident with CR in the rearmost, uppermost, midmost position.',
+  false, true,
+  'Statement 1 is false: that is gnathology. PMS argued an instrument reproducing condylar motion was unnecessary because Meyer\'s functionally generated path recorded it, and used a simple suspension articulator. Statement 2 is true (RUM, wrong by today\'s understanding).',
+  'PMS relied on the functionally generated path and a simple articulator; the pantograph and fully adjustable articulator are gnathology.',
+  'that was the RUM position: "you need a good glass of rum."');
+two('cc-2s-keyword','concepts','handout',
+  'Stallard and Stuart\'s keyword was force.',
+  'D\'Amico\'s keyword was disclusion.',
+  false, false,
+  'Both are false; the keywords are swapped. Stallard and Stuart: cuspid protection, keyword disclusion. D\'Amico: mutually protected occlusion, keyword force (anterior teeth handle off-axis forces better).',
+  'Stallard and Stuart\'s keyword was disclusion (cuspid protection).',
+  'D\'Amico\'s keyword was force (anterior teeth handle off-axis forces better).');
+two('cc-2s-support','concepts','handout',
+  'Posterior support is usually the first consideration in a restorative plan.',
+  'Restoring only to the second premolar (a shortened dental arch) worsens chewing ability and TMD.',
+  true, false,
+  'Statement 1 is true: "support first, disclusion second." Statement 2 is false: restoring to the second premolar shows no difference in chewing ability, TMD, tooth migration, periodontal support or comfort.',
+  '"support first, disclusion second."',
+  'the shortened dental arch shows no difference in chewing ability, TMD, migration, periodontal support or comfort.');
+two('cc-2s-tripod','concepts','handout',
+  'Tripodization gives horizontal freedom for an immediate lateral translation.',
+  'Point-to-surface contacts direct force down the long axis of the tooth.',
+  false, true,
+  'Statement 1 is false: tripodization has no wiggle room and requires immediate disclusion. Point to surface is the contact that gives horizontal freedom. Statement 2 is true: a cusp tip on a flat surface sends force down the long axis.',
+  'tripodization leaves no wiggle room; point-to-surface contacts give the freedom.',
+  'a cusp tip on a flat surface sends force down the long axis.');
+tf('cc-tf-conform','concepts','handout','Conformative dentistry covers about 90-98% of general dentistry.', true,
+  'True. Match what is there and don\'t change the existing occlusion, when the patient is healthy and asymptomatic.',
+  'About 90-98% of general dentistry is conformative.',
+  'Most general dentistry (about 90-98%) is conformative.');
+tf('cc-tf-nmuab','concepts','handout','The neuromuscular concept is taught at UAB.', false,
+  'False. Neuromuscular dentistry (Jankelson, the LVI) restores at a TENS-found "myocentric point," which requires an increased vertical and a more forward position without joint stability. It is not taught at UAB.',
+  'It is described in lecture but not taught at UAB.',
+  'Dr. Givan described it as not taught at UAB.');
+tf('cc-tf-tens','concepts','handout','Neuromuscular dentistry restores at a "myocentric point" of least muscle activity found with a TENS unit.', true,
+  'True. The Myo-Monitor (a TENS unit) is used to find it; it requires an increased vertical dimension, i.e. full-mouth rehabilitation.',
+  'That is the neuromuscular idea (Jankelson, the LVI).',
+  'The myocentric point and the TENS unit are the core of that concept.');
+tf('cc-tf-antguide','concepts','handout','Modern philosophy sides with the gnathologists that posterior guidance matters more than anterior guidance.', false,
+  'False. Gnathologists focused on posterior guidance; modern philosophy sides with Schuyler that anterior guidance matters more. It is the most important determinant and the one you control most.',
+  'Modern philosophy sides with Schuyler: anterior guidance matters more.',
+  'Anterior guidance is the most important determinant and the one you control most.');
+tf('cc-tf-pkt','concepts','handout','Peter K. Thomas is known for cusp-fossa waxing.', true,
+  'True. P.K. Thomas, one of the gnathologists, gave us cusp-fossa waxing (your PKT instruments).',
+  'Cusp-fossa waxing is his contribution.',
+  'His name is on your PKT waxing instruments.');
+tf('cc-tf-who','concepts','handout','The WHO considers at least 20 natural teeth functional and esthetic.', true,
+  'True. That supports the shortened dental arch concept: restoring to the second premolar can be enough, though esthetics may suffer where first molars show.',
+  'That is the WHO figure quoted in lecture.',
+  'At least 20 natural teeth is the WHO\'s functional and esthetic threshold.');
+tf('cc-tf-cingulum','concepts','handout','Over-bulking the cingulum on a tongue-thrust patient tends to move the tooth lingually.', false,
+  'False. An over-bulked cingulum on a tongue-thrust patient moves the tooth LABIALLY. The cingulum should be rounded for normal d and t sounds, but the holding contact is still vital.',
+  'The tongue pushes the bulky cingulum forward, so the tooth moves labially.',
+  'Tongue pressure on the extra bulk moves the tooth labially.');
+tf('cc-tf-lisp','concepts','handout','Too much closest speaking space causes a whistle.', false,
+  'False. Too much space gives a lisp; too little and the teeth bump or whistle.',
+  'Too much space is a lisp; a whistle comes from too little.',
+  'A whistle (or bumping teeth) means too little space.');
 
 /* =================================================================== L5 APPLYING OCCLUSION */
 mcq('ap-schemes','applying','handout','Which are the three accepted occlusal schemes listed in Lec3-2?',
@@ -4315,6 +4633,76 @@ mcq('cs-record-check','applying','hub','How do you confirm the casts are mounted
   'A correct MIP record sits only where teeth are not in contact (the preps), trimmed to the cusp tips and off soft tissue, and the contacts you see in the mouth (e.g. #26 on #8) must show on the mounting; untrimmed excess means you can\'t verify it. A record that seats firmly can still hold the casts apart (this one did), the guide pin in excursions is about guidance rather than the MIP contacts, and the crown fitting the casts is exactly what fooled everyone here.',
   pc('record'));
 
+
+
+/* L5 two-statement and true/false items (2026-10-22): written from the notes; choices stay in a fixed order */
+two('ap-2s-mip','applying','handout',
+  'The teeth meet in MIP for only about 17.5 minutes a day.',
+  'The PDL can detect material down to about 20 µm.',
+  true, true,
+  'Both are true. About 1,800 chewing strokes and 500 swallowing contacts a day add up to about 17.5 minutes in MIP; clenching is the pathologic exception. The PDL senses about 20 µm.',
+  'about 1,800 chewing strokes plus 500 swallowing contacts.',
+  'the ligament senses material as thin as about 20 µm.');
+two('ap-2s-nw','applying','handout',
+  'A patient who has adapted to a non-working contact over years can keep it.',
+  'Patients usually tolerate a non-working contact introduced by a new restoration.',
+  true, false,
+  'Statement 1 is true. Statement 2 is false: patients don\'t tolerate one you introduce in an afternoon; reshape with enameloplasty when needed.',
+  'an adapted, long-standing contact can stay.',
+  'a non-working contact you introduce in an afternoon is not tolerated.');
+two('ap-2s-record','applying','handout',
+  'A reorganized approach starts from an MIP record.',
+  'In the conformative approach, the MIP record is kept as minimal as required.',
+  false, true,
+  'Statement 1 is false: reorganizing starts "from ground zero" with the joints seated, so it uses a CR record (bimanual manipulation). Statement 2 is true: conformative work uses an MIP record for the working casts, as minimal as required.',
+  'reorganizing starts with the joints seated, so it uses a CR record.',
+  'conformative work uses a minimal MIP record for the working casts.');
+two('ap-2s-pvs','applying','handout',
+  'A PVS registration sets in 1-2 seconds.',
+  'A full-arch registration is the most accurate MIP record.',
+  false, false,
+  'Both are false. PVS sets in 20-30 seconds while the patient moves; warmed wax chilled with the air-water syringe hardens in 1-2 seconds. A full-arch registration is a common error: it puts material between teeth that should touch.',
+  'PVS takes 20-30 seconds; chilled wax is the one that hardens in 1-2 seconds.',
+  'a full-arch record puts material between teeth that should touch, a common error.');
+two('ap-2s-comp','applying','handout',
+  'A Class III composite should carry the centric and protrusive contacts.',
+  'A Class IV composite shares centric and protrusive contact with the natural tooth.',
+  false, true,
+  'Statement 1 is false: on a Class III, copy the existing contacts and avoid centric and protrusive contact on the restorative material. Statement 2 is true: a Class IV gets simultaneous contact on the tooth AND the restoration to reduce fracture and differential wear; all the guidance on it is "a recipe for disaster."',
+  'a Class III keeps centric and protrusive contact off the composite.',
+  'shared contact on tooth and composite reduces fracture and differential wear.');
+tf('ap-tf-copy','applying','handout','In the absence of signs or symptoms, copy the existing guidance when restorations are needed.', true,
+  'True. Group function or canine guidance? Without signs or symptoms, copy what the patient has: that is conformative dentistry.',
+  'That is the conformative rule.',
+  'Without signs or symptoms you copy the existing guidance.');
+tf('ap-tf-proint','applying','handout','Posterior protrusive interferences must be eliminated before restoring the anterior teeth.', true,
+  'True. Sometimes anterior contours give enough separation, but you can\'t make guidance steep enough to clear a badly tipped molar.',
+  'Eliminate them first; steeper anterior guidance can\'t clear a badly tipped molar.',
+  'The rule is to remove posterior protrusive interferences before anterior restorations.');
+tf('ap-tf-infra','applying','handout','A posterior restoration left slightly out of occlusion is safe, because the tooth will settle into a good contact.', false,
+  'False. Infraocclusion lets the tooth supererupt, "and it never supererupts in a good contact."',
+  'The tooth supererupts, and never into a good contact.',
+  'Infraocclusion is on the list of things you don\'t want; supereruption follows.');
+tf('ap-tf-hinge','applying','handout','A small hinge articulator gives the dentist an advantage over one the size of the patient.', false,
+  'False. "There\'s never an advantage to the dentist" of a small hinge articulator; the advantage is the laboratory\'s. One the size of the patient makes arcs closer to the patient\'s, so less adjusting beside the tongue.',
+  'The only advantage is the lab\'s; the dentist ends up adjusting more in the mouth.',
+  'Dr. Givan: never an advantage to the dentist.');
+tf('ap-tf-guideimp','applying','handout','To copy the existing anterior guidance with a custom guide table, make its impression before preparing the teeth.', true,
+  'True. Once the teeth are cut the guidance is gone, so capture it first.',
+  'The guidance has to be captured before the teeth are cut.',
+  'After preparation the guidance you wanted to copy no longer exists.');
+tf('ap-tf-4unit','applying','handout','A four-unit bridge replaces about half the patient\'s occlusion.', true,
+  'True, which is why Dr. Givan asks "what do you put back?" Three-unit posterior bridges are generally fine conformatively.',
+  'So it raises the question of what occlusion to put back.',
+  'That is the figure from lecture; three units are usually still conformative.');
+tf('ap-tf-implat','applying','handout','Under about 10 lb, an implant moves sideways about as much as a natural tooth.', false,
+  'False. Laterally a natural tooth moves 56-75 µm (posterior) or 90-108 µm (anterior); an implant moves 10-50 µm, because it has no PDL.',
+  'With no PDL, an implant moves 10-50 µm against a tooth\'s 56-108 µm.',
+  'An implant moves far less: 10-50 µm laterally against 56-75 µm for a posterior tooth.');
+tf('ap-tf-shim','applying','handout','On a firm clench, shimstock should pull through a posterior implant crown while holding on the natural teeth.', false,
+  'False. On a light closure shimstock holds on the neighbors and pulls through the implant with some resistance; on a clench the teeth drop into their PDL and it holds on all of them.',
+  'On a clench it should hold on all of them; pulling through belongs to the light closure.',
+  'A clench drops the teeth into their PDL, so shimstock holds on the implant too.');
 
 /* ---------- READINGS (lecture notes synthesized from the recordings, slides and Dr. Givan's handouts) ----------
    Each lecture opens with a short "what's tested" list (LESSONS.md: lead with it) and puts look-alikes in a table.
@@ -5448,6 +5836,7 @@ function lecLabel(l){ return l.label || ('L' + l.num); }
 
 /* ---------- utils ---------- */
 function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function choiceOrder(q){ var idx = q.choices.map(function(c,i){ return i; }); return q.fmt === '2stmt' || q.fmt === 'tf' ? idx : shuffled(idx); }
 function shuffled(arr){ var a = arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function tagOf(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? l.tag : 'blue'; }
 function lecChip(lecId){ var l = LECTURE_BY_ID[lecId]; if(!l) return ''; return '<span class="lec-chip tag-'+l.tag+'">'+lecLabel(l)+' · '+escHtml(l.title.split(':')[0].split(',')[0])+'</span>'; }
@@ -5552,7 +5941,7 @@ function qCardHTML(q, opts){
   var body = '';
   if(q.type === 'mcq'){
     body += '<div class="qcard-choices">';
-    shuffled(q.choices.map(function(c,i){ return i; })).forEach(function(i){
+    choiceOrder(q).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-act="mcq" data-idx="'+i+'" data-answer="'+(i===q.answer?1:0)+'">'+escHtml(q.choices[i])+'</button>';
     });
     body += '</div>';
@@ -5753,7 +6142,7 @@ function renderCompendium(){
   p.querySelectorAll('[data-sub]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.sub = b.getAttribute('data-sub'); saveState(); renderCompendium(); }); });
   p.querySelectorAll('[data-qs]').forEach(function(b){ b.addEventListener('click', function(){
     var g = b.getAttribute('data-qs');
-    if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
+    if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
     else if(g === 'mock') STATE.ui.sub = 'mock';
     else STATE.ui.sub = 'notes';
     saveState(); renderCompendium(); var sb = document.querySelector('#panel-compendium .subtabs'); if(sb) sb.scrollIntoView({ block:'start' });
@@ -5907,6 +6296,8 @@ function bankFiltered(search){
   return QUESTIONS.filter(function(q){
     if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
+    var fm = STATE.ui.qfmt || 'all';
+    if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
     var seen = STATE.seen[q.id];
     if(STATE.ui.qstatus === 'unseen' && seen) return false;
     if(STATE.ui.qstatus === 'missed' && !(seen && seen.last === false)) return false;
@@ -5918,8 +6309,9 @@ var bankSearch = '';
 function renderBank(body){
   var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
+  var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -5950,6 +6342,7 @@ function renderBank(body){
   }
   document.getElementById('fLec').onchange = function(e){ STATE.ui.qlec = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
   document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
+  document.getElementById('fFmt').onchange = function(e){ STATE.ui.qfmt = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
   document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
   var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; bankShown = BANK_PAGE; draw(); }, 180); };
   document.getElementById('fShuffle').onclick = function(){ order = shuffled(QUESTIONS.map(function(q){ return q.id; })); draw(); };
@@ -6090,7 +6483,7 @@ function buildMock(){
     var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
     fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
   });
-  var order = {}; ids.forEach(function(id){ order[id] = shuffled(QUESTIONS_BY_ID[id].choices.map(function(c,k){ return k; })); });
+  var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QUESTIONS_BY_ID[id]); });
   STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
   saveState();
 }
@@ -6418,7 +6811,7 @@ var ARCADE = (function(){
   }
 
   /* ---------- context for the shared games (widget/games.js) ---------- */
-  function arcadeQ(q){ return q.type === 'mcq' && !q.pbox && !q.img && !q.pimg; }
+  function arcadeQ(q){ return q.type === 'mcq' && !q.pbox && !q.img && !q.pimg && q.fmt !== '2stmt' && q.fmt !== 'tf'; }
   function scopeIds(scope){ return LECTURE_BY_ID[scope] ? [scope] : LECTURES.map(function(l){ return l.id; }); }
   function bankPool(scope){
     if(scope === 'missed') return QUESTIONS.filter(function(q){ var s = STATE.seen[q.id]; return arcadeQ(q) && !!s && s.last === false; });
@@ -6675,7 +7068,7 @@ window.SH_GOTO = function(g){
   else if(g.v === 'hints'){ STATE.ui.sub = 'hints'; saveState(); setMode('compendium');
     shFlashIn(function(){ var a = document.querySelector('#compBody .hint-group [data-lec="' + g.lec + '"]'); return a && a.closest('.hint-group'); }); }
   else if(g.v === 'review'){ reviewSearch = g.q || ''; setMode('review'); }
-  else if(g.v === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qstatus = 'all'; bankSearch = g.q || ''; bankShown = BANK_PAGE; saveState(); setMode('compendium'); }
+  else if(g.v === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'all'; bankSearch = g.q || ''; bankShown = BANK_PAGE; saveState(); setMode('compendium'); }
 };
 
 /* Progress sync (widget/v3.js, migration_v34): the widget reads back every answer saved for you on the server,
