@@ -188,8 +188,9 @@
     S.push({ title: "Welcome to " + name,
       body: "<p>This tour shows you where everything in this hub is, with a spotlight on the real buttons. It takes about two minutes, and it'll switch tabs for you along the way, then bring you back.</p>" +
         "<p>Every hub works the same way, so you only need it once. Start it again any time from " + (phone() ? "<b>Take the tour</b> under <b>More</b>" : "the <b>Tour</b> button") + ".</p>" });
-    S.push({ el: "#modeSwitch", title: "Three modes",
-      body: "<ul><li><b>Compendium</b>: notes, questions, the mock exam and the rest of the course.</li>" +
+    S.push({ el: "#modeSwitch", title: modeTab("home") ? "Four modes" : "Three modes",
+      body: (modeTab("home") ? "<ul><li><b>Home</b>: this hub's own front page, with the countdown, your progress by lecture and where to go next.</li>" : "<ul>") +
+        "<li><b>Compendium</b>: notes, questions, the mock exam and the rest of the course.</li>" +
         "<li><b>Review</b>: every reference table, searchable, with a switch to hide the answers and quiz yourself.</li>" +
         "<li><b>Arcade</b>: games built on the material, with class high scores.</li></ul>" });
     S.push({ el: "#countdownPill", title: "Exam countdown",
@@ -198,9 +199,14 @@
       body: "<p>The name classmates see on the leaderboards, with your handpiece rank. Tap it to pick your own name.</p>" });
     S.push({ el: ".sh-ribbon-inbox[data-sh-inbox]", title: "Inbox",
       body: "<p>Replies to anything you report or suggest, notices to the class, and the occasional survey. A dot means something new.</p>" });
+    /* a hub with its own Home page (Heme & Endo Exam 1 on): the countdown, deadlines, progress by lecture, what's next */
+    S.push({ before: function(){ press(modeTab("home")); }, wait: 350, el: "#panel-home .home-hero", title: "Home",
+      body: "<p>This hub's front page: the countdown to the exam and what's on it, deadlines coming up, how much of the bank you've gotten right, and your progress lecture by lecture.</p>" });
+    S.push({ el: "#panel-home .home-next", title: "Where to next",
+      body: "<p>Your weakest lecture, the questions you missed, and the lectures you haven't started, each one tap away. It changes as you study.</p>" });
     S.push({ before: function(){ press(modeTab("compendium")); }, el: "[data-sh-podcast] > *", title: "Timmy Time",
       body: "<p>A podcast review of the whole exam, hosted by Timmy Tooth: every lecture in the order the exam weighs them, what the professors said to know, and a lightning round at the end. It keeps playing while you switch tabs.</p>" });
-    S.push({ before: function(){ press(modeTab("compendium")); }, el: "#panel-compendium .quick-start", title: "Quick start",
+    S.push({ before: function(){ press(modeTab("home") || modeTab("compendium")); }, el: function(){ return $("#panel-home .quick-start") || $("#panel-compendium .quick-start"); }, title: "Quick start",
       body: "<p>One tap to the questions you haven't tried, today's Daily drill, or the next lecture's notes.</p>" });
     S.push({ el: "#examCard", title: "Exam details",
       body: "<p>When and where the exam is, how many questions and what kind, and tips from the professor. Tap the header to fold it away.</p>" });
