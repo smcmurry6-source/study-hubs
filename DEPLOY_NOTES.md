@@ -109,6 +109,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (arcade art: painted rooms, banners and stages, Claude Code)** — More of Sam's Argon art. **Perio Clinic Escape**
+  now draws `hubs/perio/img/clinic-escape.webp` (stretched to the 800x450 scene) with every hotspot measured onto the painted
+  props (`PERIO_SKIN.escape.scene`): panoramic viewer (dark "VIEWER OFF" overlay until solved), charting computer, perio chart on
+  the clipboard, instrument cassette, typodont (the tablets stain its digit pink), corkboard, door; the clock hand rides the
+  painted clock. The drawn `perioTooth` room is gone. **Arcade hero banners** (`img/arcade-hero.webp`, `.ar-hero` background in
+  both hubs). **Million-Dollar Smile**: a skin's `smile.bg` paints the marquee with a stage picture (`img/smile-stage.webp`,
+  `.ms-banner--art`) instead of the drawn grin; `smile.art()` (Heme & Endo's gland) still works, and `bg` wins if both are set.
+  **Lobby thumbnails** for Smile and the escape room are painted too (`img/thumb-smile.webp`, `img/thumb-escape.webp`). A new
+  backdrop means re-measuring every `api.spot()` rectangle. `sw.js` -> `sh-v35`. No schema change.
+
 - **2026-10-27 (Occlusion switches to the final: L6 Occlusal Instrumentation, Claude Code)** — Sam: "Occlusion can now
   switch to final exam." The final (Thu Nov 19) is not comprehensive: Dr. Givan's lectures from 10/22 on, building on the
   midterm material; its time and format aren't announced yet (update `EXAM_INFO` and the mock clock when they are). New
@@ -274,7 +284,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   (Argon); Occlusion's Lab Escape now draws `hubs/occlusion/img/lab-escape.webp` (1024x572, stretched to the 800x450 scene) with
   invisible hotspots placed over the painted props (`OCCL_SKIN.escape.scene`; a dark overlay switches the view box and computer off
   until solved, a red countdown hand rides the painted clock). A new backdrop means re-measuring every `api.spot()` rectangle on a grid
-  overlay. Perio still uses its drawn room until its backdrop is added. Game-over cards in the shared games scroll instead of
+  overlay. Perio's Clinic Escape got its own painted backdrop on 2026-10-27 (entry above). Game-over cards in the shared games scroll instead of
   squashing the missed list. Dashboard `ARCADES` and About page names updated. **Perio Project: carry `PERIO_SKIN` and its CSS into the split sources.**
 
 - **2026-10-21 (perio S5: Resective Osseous Surgery from the Oct 15 class, Claude Code)** — Drive: Periodontology/hubs,
