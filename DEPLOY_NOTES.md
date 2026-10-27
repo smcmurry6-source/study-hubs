@@ -109,6 +109,25 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (Heme & Endo Exam 1: L3, L4, L9, L10 from their recordings, Claude Code)** — Sam posted the missing
+  recordings to the Drive Heme/Endo folder: `Growth_Hormone.mp3` and `Thyroid_Hormone.mp3` (transcribed in-session with
+  faster-whisper small.en) and the 10/27 Zoom VTTs (`GMT20261027-180303` = L9, `-183636` = L10). **L3's recording is Dr.
+  Madison giving the lecture** (he signs off for male reproductive physiology; this year's slides are Dr. Galin's) and both
+  mp3s look like another year's run (morning times), so L3's notes say so and quote "the recording", not Dr. Galin. All four
+  go to `status:'taught'`: both reading levels rewritten (status banners gone; where recording and slides differ the notes
+  give both: GH's sleep pulses REM vs deep sleep, NIS 20-50x vs "tens to hundreds", zone shares 15/65-80/10 vs the slides'
+  ranges; Dr. Herr calling the somatostatin cell "gamma" is noted, the table keeps delta) and all eight mp3s regenerated.
+  `NOTE_TABLES` rebuilt for the four lectures (growth gains a GH-by-tissue table). 72 new questions (`gr-r-*`, `th-r-*`,
+  `h2-r-*`, `ca-r-*`, src `rec`: 8 two-statement, 16 true/false, 1 ordering; each MCQ with its `QUESTION_WHY` row); bank
+  508 → 580. `h2-dual` and `h2-spongio` now quote Dr. Herr ("the question that's going to be on your exam"; spongiocytes
+  "the thing to remember for the exam") and carry src `rec`. 36 exam hints, cram lines, `EXAM_INFO` and `COURSE_DATES` gain
+  the Wed 10/28 1:00-1:50 review with Dr. Galin and Dr. Madison. Figures (`tools/figures/heme-endo-exam1`, rebuilt): thyroid
+  adds sodium riding in through NIS, the TSH receptor with its NADPH → H2O2 supply, the deiodinases and a **Low iodide**
+  case; calcium adds **High phosphate (soda)** and **Menopause** cases, estrogen's brake in the panel, the recording's
+  wording on the kidney exception and the osteoblast's PTH receptor; adrenal adds a **Dual blood supply** view, the three
+  arterial sources and the T1-L2 preganglionic fiber; the pituitary's GHRH row adds Gs/Gi and somatostatin feedback.
+  About page (Diagrams). No schema change.
+
 - **2026-10-27 (arcade art: painted rooms, banners and stages, Claude Code)** — More of Sam's Argon art. **Perio Clinic Escape**
   now draws `hubs/perio/img/clinic-escape.webp` (stretched to the 800x450 scene) with every hotspot measured onto the painted
   props (`PERIO_SKIN.escape.scene`): panoramic viewer (dark "VIEWER OFF" overlay until solved), charting computer, perio chart on
