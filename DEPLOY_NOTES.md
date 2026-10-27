@@ -109,6 +109,20 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (Heme & Endo Exam 1: six animated diagrams, Claude Code)** — Sam: "Yes to all animations." Built with the
+  anima skill in `tools/figures/heme-endo-exam1/` (`build.mjs` fills the hub's `anima:js` / `anima:css` markers; `--check`,
+  `--preview`), each from the hub's own notes: **beta** (L5: glucose → GLUT2 → ATP → K-ATP closes → depolarization → Ca2+ →
+  insulin, low glucose and sulfonylurea toggles), **thyroid** (L4: the seven synthesis steps in a follicular cell; methimazole/PTU
+  and an iodide load show where they block), **hpa** (L2/L6/L7: normal, Addison's, Cushing's disease, adrenal tumor, prednisone
+  on / stopped suddenly / tapered; feedback loops, α-MSH on the skin, an HTML lab panel that reads primary vs secondary),
+  **calcium** (L10: calcium falls / rises / primary hyperparathyroidism; CaSR on chief cells, PTH on kidney and bone, 1α- vs
+  24-hydroxylase, calcitriol in the enterocyte, calcitonin on osteoclasts), **pituitary** (L1/L2: the portal route with a
+  releasing-hormone picker lighting its target cell, and the long-axon route with Herring bodies and pituicytes) and **adrenal**
+  (L6/L9: zones with their shares, cortex-to-medulla blood flow, a stress response turning on PNMT). In the notes via `FIG_PLACE`
+  (each at the end of the section it explains, both levels; `data-sh-noread`, so narration is unchanged) and in Review (a `figs`
+  section in each lecture's tab). Levels are qualitative (no lab values); `calcium` reuses the lab-panel CSS `hpa` defines. No
+  SVG ids, so copies don't clash. About page (Diagrams). No questions or notes text changed; no schema change.
+
 - **2026-10-27 (new hub: Heme & Endo Exam 1, with its own Home page, Claude Code)** — `hubs/heme-endo-exam1/` for DENT 2160
   Hematology & Endocrinology Exam 1 (Fri Oct 30, 8:00-9:30 am dental, 55 MCQ, in person on Canvas with LockDown Browser,
   lectures 1-10), built on the Occlusion engine (without its figure kit: `FIGS`/`ANIMA` are empty stubs) with a new palette
