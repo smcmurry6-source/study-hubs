@@ -109,6 +109,34 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (new hub: Heme & Endo Exam 1, with its own Home page, Claude Code)** — `hubs/heme-endo-exam1/` for DENT 2160
+  Hematology & Endocrinology Exam 1 (Fri Oct 30, 8:00-9:30 am dental, 55 MCQ, in person on Canvas with LockDown Browser,
+  lectures 1-10), built on the Occlusion engine (without its figure kit: `FIGS`/`ANIMA` are empty stubs) with a new palette
+  ("H&E"; Young Serif / Atkinson Hyperlegible / Spline Sans Mono). Sources (Drive, Heme/Endo Exam 1 folder): every slide deck,
+  the 10/20 (L1, L2) and 10/23 (L5-L8) recordings, transcribed in-session. **The 10/21 recordings (L3 Growth, L4 Thyroid) have
+  no sound**, so those two and L9/L10 (10/27) are `status:'slides'` ("Slides only"): when their recordings arrive, flip to
+  `taught`, add exam hints, rewrite the notes and regenerate both mp3s. **Not used, by the syllabus rule:** last year's D3
+  "Endocrinology Exam 1" study doc and D3 Anki deck (they reproduce last year's graded quizzes and crossword), this year's
+  Quizzes 1-2 (open until Oct 29), and the password-protected Quizlet folder (quizlet.com blocks this container). 508 questions
+  (src `slides` / `rec` / `class` = the professors' own in-class cases, rewritten / `hub`), each with its why; 49 two-statement,
+  80 true/false (46 True) and 17 **numbered-statement** items (`fmt:'numbered'`, "Which statements are true? 1-4", combinations
+  in a fixed canonical order via `choiceOrder`, keys spread over all four positions; Question Bank format filter), Patient Box
+  cases (Dr. Fasinu's lab-value style), EXCEPT items; correct answer longest in 19%. Notes at two levels with Kokoro narration
+  for all 10, 36 exam hints quoted from the recordings, cram sheet, Review (each lecture's own note tables via `NOTE_TABLES`
+  plus written tables, a Side by side tab: reading labs, which receptor, look-alikes), a 55-question / 90-minute mock.
+  **Home mode** (Sam: "its own dashboard/homepage"): a fourth mode, the default, `renderHome()`: live countdown, exam facts,
+  the quiz-deadline alert (until `QUIZ_DUE`), a readiness ring (right on latest try), quick start, the exam card, Where to next
+  (weakest lecture, misses, unstarted lecture), progress by lecture, course timeline (`COURSE_DATES`), last 14 days. Section
+  `home/dashboard`. `widget/tour.js` gains Home steps (skipped in hubs without `#panel-home`). Arcade: the **Feedback Loop
+  Arcade** with its own skin (`ENDO_SKIN`, `[data-sg-skin="endo"]`): Axis Showdown (glass slides stained purple/pink; Hormone
+  Surge, Final Feedback), Endo Lab Escape (drawn endocrine lab; Lugol's iodine turns starch paper blue-black), Fill the Receptor,
+  The Golden Gland (a thyroid that turns gold), Cross-Stain, Feedback Sort. `widget/games.js` lets a skin draw the quiz-ladder
+  marquee (`skin.smile.art`, `winTitle`). Dashboard `HUBS` (`checkinHour:10`: the exam ends at 9:30), new class `hemeendo` on a
+  new `endo` ring (`--c-endo`), `ARCADES`; `review/` and `tools/publish-recap.js` labels; `widget/ranks.js` name and medal;
+  `sw.js` -> `sh-v34`; About page (Home page, numbered statements, the arcade table); `assets/og-heme-endo-exam1.png`. Build sources and
+  the build script stay in the session (the hub is a single file; edit it directly from here on). **Diagram review still to be
+  put to Sam.** No schema change.
+
 - **2026-10-22 (Settings → Extras: every optional feature has its own switch, Claude Code)** — Sam asked to be able to turn the
   bosses, nukes, Tooth Fairy, rank-up animations and the rest off one by one, plus one button that turns everything optional off.
   Each hub's Settings panel (`EXTRAS` / `extrasHTML()` in `widget/v3.js`) and the dashboard's Settings (`EXTRAS` in `index.html`;
