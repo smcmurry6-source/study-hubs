@@ -967,7 +967,7 @@
   function eggsOn(){ return ls("sh_pref_eggs") !== "off"; }
   function tipHTML(t){ return esc(t[0]).replace(/\{([^}]*)\}/g, function(_, x){ return "<b>" + x + "</b>"; }); }
   function nextTip(){
-    if (ls("sh_pref_eggs") === "off") return "Surprises are off in Settings, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
+    if (ls("sh_pref_eggs") === "off") return "Hidden secrets are off in Settings → Extras, so the easter eggs are hiding. Turn them back on and I'll tell you where to look.";
     var hol = holidayId(), list = TIPS.slice();
     if (hol && HOLIDAY_WORD[hol]) list.unshift(["It's " + HOLIDAY_NAME[hol] + "! Type {" + HOLIDAY_WORD[hol] + "} in any hub and see what happens.", HOLIDAY_WORD[hol]]);
     var i = (+(ls("sh_pet_tip") || 0)) % list.length;
@@ -1859,7 +1859,7 @@
     var STEPS = [
       '<h3>Hi! I\'m Timmy Tooth.</h3><p>I\'m going to hang out with you while you study: in my little home here on the dashboard, and in the bottom corner of every hub.</p><p><b>Keeping me healthy is your job now.</b> No pressure.</p>',
       '<h3>How you take care of me</h3><p>Every question you get <b>right</b> heals me a little, and studying on <b>back-to-back days</b> adds a streak bonus.</p><p>Skip days and I start to slip: plaque first, then stains and puffy gums, then cavities, periodontitis, and eventually fractures.</p>' + stages,
-      '<h3>The fine print</h3><p>I <b>can\'t die</b>. But if you let me hit 0 HP, I need a real treatment plan: I heal at half speed until I\'m back to 50.</p><p>Tap me any time for a dental joke or a checkup, and I\'ll cheer you on during streaks.</p><p>Don\'t want me around? <b>Settings → Timmy Tooth</b> turns me off, or keeps me on the dashboard only. It\'s also the "No thanks" button below.</p>',
+      '<h3>The fine print</h3><p>I <b>can\'t die</b>. But if you let me hit 0 HP, I need a real treatment plan: I heal at half speed until I\'m back to 50.</p><p>Tap me any time for a dental joke or a checkup, and I\'ll cheer you on during streaks.</p><p>Don\'t want me around? <b>Settings → Extras → Timmy Tooth</b> turns me off, or keeps me on the dashboard only. It\'s also the "No thanks" button below.</p>',
       '<h3>Can I move in?</h3><p>I\'ve got a little house all picked out on your dashboard. I\'ll be there whenever you stop by, and I\'ll come along into the hubs to cheer you on.</p><div class="shpet-hero">' + houseSvg() + '</div>'
     ];
     var d = dialog('<button class="shpet-x" type="button" aria-label="Close">&times;</button><div class="shpet-hero"><span class="shpet-btn do-wave"></span></div><div class="shpet-step"></div>' +

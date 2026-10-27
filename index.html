@@ -167,6 +167,15 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .set-hint{font-size:12.5px; color:var(--ink-3); margin:7px 0 0; line-height:1.4;}
 .set-name{display:flex; align-items:center; justify-content:space-between; gap:10px;}
 .set-name b{font-size:15px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.set-xhead{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.set-xhead .set-lab{margin:0;}
+.set-x{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid var(--line);}
+.set-xtxt{min-width:0; flex:1 1 150px;}
+.set-xtxt b{display:block; font-size:13.5px; color:var(--ink);}
+.set-xtxt small{display:block; font-size:12px; color:var(--ink-3); line-height:1.4; margin-top:2px;}
+.set-x .set-seg{flex:none; gap:4px;}
+.set-x .set-seg button{padding:5px 10px; font-size:12.5px;}
+@media (max-width:420px){ .set-x{flex-wrap:wrap;} }
 .set-row input[type=range]{width:100%; margin-top:10px; accent-color:var(--ink);}
 
 /* ================= HERO ================= */
@@ -900,11 +909,46 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { key:"sh_pref_font", label:"Reading font", def:"default", opts:[["default","Default"],["serif","Serif"],["sans","Sans"]] },
     { key:"sh_pref_size", label:"Text size", def:"default", opts:[["small","Small"],["default","Default"],["large","Large"],["xlarge","X-Large"],["xxlarge","XX-Large"]] },
     { key:"sh_pref_accent", label:"Accent color", def:"default", accent:true, hint:"Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal." },
-    { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." },
-    { key:"sh_pref_eggs", label:"Surprises", def:"on", opts:[["on","On"],["off","Off"]], hint:"Little hidden extras around the hubs. Stuck? The trophy case in each hub's Stats has clues." },
-    { key:"sh_pref_pet", label:"Timmy Tooth", def:"on", opts:[["on","Everywhere"],["dash","Dashboard only"],["off","Off"]], hint:"Your cartoon tooth buddy. Right answers and study streaks keep him healthy; skipped days give him plaque, cavities and worse." },
-    { key:"sh_pref_nuke_alerts", label:"Tactical nuke alerts", def:"on", opts:[["on","On"],["off","Off"]], hint:"Turn off to skip seeing other people's strikes (yours still work)." }
+    { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." }
   ];
+  /* Extras: every optional feature with its own switch, plus All on / All off. widget/v3.js (EXTRAS) draws the same
+     list in each hub's Settings; keep the two in step. */
+  var EXTRAS = [
+    { key:"sh_pref_boss", label:"Plaque bosses", hint:"A boss the whole class fights with right answers when 5+ people are online." },
+    { key:"sh_pref_fairy", label:"Tooth Fairy", hint:"Flies across the page now and then. Catch her for the fairy board." },
+    { key:"sh_pref_probe", label:"Golden Probe", hint:"One question a day is golden. First to get it right wins." },
+    { key:"sh_pref_arch", label:"Full Arch chart", hint:"A 32-tooth chart in the corner that fills as you answer right." },
+    { key:"sh_pref_nuke", label:"Tactical nukes", opts:[["on","On"],["mine","Mine only"],["off","Off"]], hint:"100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes." },
+    { key:"sh_pref_celebrate", label:"Rank-up and trophy cards", hint:"The rank-up cutscene, level-up, trophy and medal cards." },
+    { key:"sh_pref_cheers", label:"Streak cheers", hint:"Confetti and a toast every 5 right in a row." },
+    { key:"sh_pref_flame", label:"Streak flame", hint:"The flame that counts your run from 3 in a row." },
+    { key:"sh_pref_fx", label:"Answer animations", hint:"Pops, shakes, sweeps and fades. Off keeps the check and X marks." },
+    { key:"sh_pref_pet", label:"Timmy Tooth", opts:[["on","Everywhere"],["dash","Dashboard only"],["off","Off"]], hint:"Your cartoon tooth buddy. Right answers and study streaks keep him healthy." },
+    { key:"sh_pref_eggs", label:"Hidden secrets", hint:"Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case." }
+  ];
+  /* one time: Surprises off used to hide the bosses, fairy, probe, arch, flame and celebration cards, and nuke alerts
+     off meant "mine only" (same carry-over as widget/v3.js) */
+  (function(){
+    if (ls("sh_pref_extras_v") === "1") return;
+    if (ls("sh_pref_eggs") === "off") ["sh_pref_boss","sh_pref_fairy","sh_pref_probe","sh_pref_arch","sh_pref_celebrate","sh_pref_flame"].forEach(function(k){ if (ls(k) === null) lsSet(k, "off"); });
+    if (ls("sh_pref_nuke_alerts") === "off" && ls("sh_pref_nuke") === null) lsSet("sh_pref_nuke", "mine");
+    lsSet("sh_pref_extras_v", "1");
+  })();
+  function extrasAll(){
+    var v = EXTRAS.map(function(x){ return ls(x.key) || "on"; });
+    return v.every(function(x){ return x === "on"; }) ? "on" : v.every(function(x){ return x === "off"; }) ? "off" : "";
+  }
+  function extrasHTML(){
+    var all = extrasAll();
+    return '<div class="set-row set-extras"><div class="set-xhead"><span class="set-lab">Extras</span><div class="set-seg" data-extras-all>' +
+      [["on","All on"],["off","All off"]].map(function(o){ return '<button type="button" data-val="' + o[0] + '"' + (all === o[0] ? ' class="is-on"' : '') + '>' + o[1] + '</button>'; }).join("") +
+      '</div></div><p class="set-hint">The fun stuff that isn\'t studying, in every hub. Switch it all off here, or one at a time below.</p>' +
+      EXTRAS.map(function(x){
+        var cur = ls(x.key) || "on";
+        return '<div class="set-x"><div class="set-xtxt"><b>' + x.label + '</b><small>' + x.hint + '</small></div><div class="set-seg" data-set="' + x.key + '">' +
+          (x.opts || [["on","On"],["off","Off"]]).map(function(o){ return '<button type="button" data-val="' + o[0] + '"' + (cur === o[0] ? ' class="is-on"' : '') + '>' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
+      }).join("") + '</div>';
+  }
   function settingValue(x){ return x.key === "theme" ? theme.current() : (ls(x.key) || x.def); }
   function openSettings(){
     var d = document.createElement("div");
@@ -930,7 +974,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<button class="survey-x" type="button" aria-label="Close">&times;</button>' +
       '<h3 id="setH">Settings</h3><p>Saved on this device and used in every hub.</p>' +
       '<div class="set-row"><span class="set-lab">Your name</span><div class="set-name"><b>' + esc(localName || randomName || "Not set") + '</b><button type="button" class="greet-edit" data-rename>' + PENCIL + (localName ? "Change" : "Pick a name") + '</button></div></div>' +
-      SETTINGS.map(rowHTML).join("") + '</div>';
+      SETTINGS.map(rowHTML).join("") + extrasHTML() + '</div>';
     document.body.appendChild(d);
     var closeBtn = d.querySelector(".survey-x"); setTimeout(function(){ try{ closeBtn.focus(); }catch(e){} }, 30);
     function close(){ d.remove(); try{ $("setBtn").focus(); }catch(e){} }
@@ -939,6 +983,16 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     d.addEventListener("click", function(e){
       if (e.target === d || e.target.closest(".survey-x")) { close(); return; }
       if (e.target.closest("[data-rename]")) { close(); openNameEditor(); return; }
+      var all = e.target.closest("[data-extras-all] button");
+      if (all) {
+        var v = all.getAttribute("data-val");
+        EXTRAS.forEach(function(x){ lsSet(x.key, v); });
+        if (window.shPet) window.shPet.refresh();
+        if (window.shTrack) window.shTrack("pref:extras=" + v);
+        d.querySelectorAll(".set-x [data-set] button").forEach(function(x){ x.classList.toggle("is-on", x.getAttribute("data-val") === v); });
+        all.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === all); });
+        return;
+      }
       var b = e.target.closest("[data-set] button"); if (!b || b.disabled) return;
       var key = b.parentNode.getAttribute("data-set"), val = b.getAttribute("data-val");
       if (key === "theme") theme.set(val);
@@ -949,6 +1003,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       /* feature events (widget/clicks.js, migration_v37): the dashboard sets these without the hubs' sh:pref event */
       if (window.shTrack && /^(sh_pref_[a-z_]+|theme)$/.test(key)) window.shTrack("pref:" + key.replace(/^sh_pref_/, "") + "=" + val);
       b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
+      var allNow = extrasAll();
+      d.querySelectorAll("[data-extras-all] button").forEach(function(x){ x.classList.toggle("is-on", x.getAttribute("data-val") === allNow); });
     });
   }
   $("setBtn").innerHTML = ICON.gear;

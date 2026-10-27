@@ -147,7 +147,7 @@
 
     S.push({ title: "Trophies and surprises",
       body: "<p>There are 24 trophies to earn, plus 9 in every hub, and many of them are secret. The hubs also hide easter eggs, a daily Golden Probe question, and bosses the whole class fights together when five or more of you are online.</p>" +
-        "<p>Timmy's <b>Secret tip</b> gives hints. Rather study in peace? <b>Settings → Surprises</b> turns them off.</p>" });
+        "<p>Timmy's <b>Secret tip</b> gives hints. Rather study in peace? <b>Settings → Extras</b> turns them off, one at a time or all at once.</p>" });
     /* what's inside a hub is the hub's own tour, on the real buttons; this one only points there */
     S.push({ el: function(){ var b = $("#hubs a.btn-primary[data-hub]"); return visible(b) ? b : $("#hubs"); }, title: "Inside a hub",
       body: "<p>The first time you open a hub, it offers its own tour: a spotlight on the real buttons for the notes and narration, the question bank, mock exam, daily drill, Review, Arcade and search.</p>" +

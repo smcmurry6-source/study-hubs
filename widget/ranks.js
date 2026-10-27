@@ -568,7 +568,7 @@
      track(profile) compares the rank with the last one this device saw (sh_rank_tier / sh_rank_step) and plays the
      full cutscene for a new rank (Silver -> Gold) or the smaller coin flip for a new level (Gold I -> Gold II).
      The hub widget and the dashboard both call it, so a rank-up shows on whichever page sees it first. It waits for
-     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Surprises off skips it. */
+     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Extras -> Rank-up and trophy cards off skips it. */
   var RANKUP_SRC = (function(){
     var src = (document.currentScript && document.currentScript.src) || "";
     if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : ""; }
@@ -604,7 +604,7 @@
     var have = Object.keys(kinds).sort().join(","), seen = ls("sh_trophy_seen");
     if (have === seen) return;
     ls("sh_trophy_seen", have);
-    if (seen === null || (ls("sh_pref_eggs") || "on") === "off") return;
+    if (seen === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     var old = {}; seen.split(",").forEach(function(k){ old[k] = 1; });
     TROPHIES.forEach(function(tr){ if (!tr.secret && kinds[tr.k] && !old[tr.k]) playRankUp("trophy", trophyCard(tr), busy); });
   }
@@ -614,7 +614,7 @@
     trackTrophies(p, opt.busy);
     var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
     ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
-    if (pt === null || (ls("sh_pref_eggs") || "on") === "off") return;
+    if (pt === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     pt = +pt; ps = ps === null ? NaN : +ps;
     var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
     var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
@@ -786,12 +786,12 @@
       }
     }
     function hubTrophyCard(k){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
       playRankUp("trophy", trophyCard({ k: t.k, n: t.n, d: t.d + " (" + hubName(H.hub) + ")", ic: t.ic }), mockBusy);
     }
     function masteryToast(i){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       playRankUp("trophy", masteryCard(i, H.hub), mockBusy);
     }
 

@@ -59,7 +59,9 @@
     try { localStorage.setItem(key, day); } catch (e) {}
     var S = { theme: ls("sh_theme") || "auto", pet: ls("sh_pref_pet") || "on", eggs: ls("sh_pref_eggs") || "on", music: ls("sh_pref_music") || "off",
       font: ls("sh_pref_font") || "default", size: ls("sh_pref_size") || "default", accent: ls("sh_pref_accent") || "default",
-      nuke: ls("sh_pref_nuke_alerts") || "on", "pet-adopted": ls("sh_pet_born") ? "yes" : "no", "own-name": ls("sh_display_name") ? "yes" : "no" };
+      nuke: ls("sh_pref_nuke") || (ls("sh_pref_nuke_alerts") === "off" ? "mine" : "on"), boss: ls("sh_pref_boss") || "on", fairy: ls("sh_pref_fairy") || "on",
+      probe: ls("sh_pref_probe") || "on", arch: ls("sh_pref_arch") || "on", celebrate: ls("sh_pref_celebrate") || "on", cheers: ls("sh_pref_cheers") || "on",
+      flame: ls("sh_pref_flame") || "on", fx: ls("sh_pref_fx") || "on", "pet-adopted": ls("sh_pet_born") ? "yes" : "no", "own-name": ls("sh_display_name") ? "yes" : "no" };
     Object.keys(S).forEach(function(k){ track("state:" + k + "=" + slug(S[k])); });
   }
   function watchFigures(){

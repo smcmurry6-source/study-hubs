@@ -3,7 +3,7 @@
    Loaded directly by the dashboard and review pages, and injected into every
    hub by widget/v3.js. Fully self-contained and self-cleaning: every inline
    style it touches is saved and put back afterwards, and Esc ends it early.
-   Like the eggs in widget/eggs.js: off with Settings → Surprises, never during a
+   Like the eggs in widget/eggs.js: off with Settings → Extras → Hidden secrets, never during a
    mock exam, also works typed into a hub's Search box (phones), and announces
    itself as "sh:egg-local" so the tooth buddy (widget/pet.js) can react. */
 (function(){

@@ -9,22 +9,24 @@
      that card, so hubs need no changes and cards drawn already answered (filters, mock results) stay still.
    - Streak flame. From 3 right in a row (v3.js's session streak, sent as sh:streak) a flame in the bottom-right counts
      the run, with a ring filling toward 100 (the tactical nuke). It grows and changes color at 5, 10, 25, 50 and 100
-     and fizzles out when the run breaks. Off with Settings -> Surprises; hidden on the mock exam tab and in the arcade.
+     and fizzles out when the run breaks. Off with Settings -> Extras -> Streak flame; hidden on the mock exam tab and in the arcade.
    - Progress bars (.bar, .weak-meter, the rank, mastery and drill bars) fill from where they were, or from empty the
      first time they show, instead of jumping.
    - Switching modes, tabs and lectures fades the new content in.
    - The ribbon's exam countdown pill (#countdownPill) glows the day before an exam and pulses on exam day.
    - Mock exams. On sh:mock-done ({ correct, total, byLec }) it asks widget/rankup.js for the results card, with this
      device's best score in the hub (sh_mock_best_<hub>).
-   Reduced motion keeps the check and X marks and the results card and drops the rest. */
+   Reduced motion (or Settings -> Extras -> Answer animations off) keeps the check and X marks and the results card and drops the rest. */
 (function(){
   "use strict";
   if (window.shFx) return;
   var H = null;
   var RM = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
-  function still(){ return !!(RM && RM.matches); }
+  /* Settings → Extras → Answer animations off works like reduced motion: marks and the results card stay, motion goes */
+  function still(){ return !!(RM && RM.matches) || pref("sh_pref_fx") === "off"; }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
-  function eggsOn(){ try { return H.prefGet("sh_pref_eggs", "on") !== "off"; } catch (e) { return true; } }
+  function pref(k){ try { return localStorage.getItem(k) || "on"; } catch (e) { return "on"; } }
+  function flameOn(){ return pref("sh_pref_flame") !== "off"; }
   function section(){ try { return String(H && H.section ? H.section() : "").toLowerCase(); } catch (e) { return ""; } }
   function rgba(color, a){
     var m = /rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/.exec(color || "");
@@ -296,7 +298,7 @@
     try { var v = JSON.parse(ls(key) || "null"); if (v && typeof v.p === "number") prev = v.p; } catch (er) {}
     if (prev === null || p > prev) ls(key, JSON.stringify({ p: p, n: d.total, at: Date.now() }));
     window.shRanks.celebrate("mock", {
-      correct: d.correct | 0, total: d.total | 0, prev: prev, quiet: !eggsOn(), missed: showMissed,
+      correct: d.correct | 0, total: d.total | 0, prev: prev, quiet: pref("sh_pref_celebrate") === "off", missed: showMissed,
       hub: window.shRanks.hubName ? window.shRanks.hubName(H.hub) : "", byLec: Array.isArray(d.byLec) ? d.byLec : []
     });
   }
@@ -307,11 +309,11 @@
     watch();
     document.addEventListener("sh:streak", function(e){
       var d = e.detail || {}, n = d.n | 0, prev = d.prev | 0;
-      if (!eggsOn()) { flameHide(); return; }
+      if (!flameOn()) { flameHide(); return; }
       if (n > prev) { if (n >= 3) flameGrow(n, prev); }
       else if (prev >= 3) flameFizzle();
     });
-    document.addEventListener("sh:pref", function(){ if (!eggsOn()) flameHide(); });
+    document.addEventListener("sh:pref", function(){ if (!flameOn()) flameHide(); });
     /* like Timmy Tooth, the flame steps aside on the mock exam tab, and it stays off arcade boards and fullscreen */
     setInterval(function(){ if (flame) flame.classList.toggle("is-away", /(^|\/)(mock|arcade)/.test(section()) || !!document.fullscreenElement); }, 1500);
     countdownPill();
