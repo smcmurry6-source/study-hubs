@@ -300,9 +300,14 @@ var FIG_PLACE = {
   anatomy: [
     { full:'The disc is attached front and back', plain:'The jaw joint', figs:['tmj'] },
     { full:'The exam slide: muscles for each movement', plain:'The exam chart', figs:['muscles'] }
+  ],
+  instruments: [
+    { full:'The facebow transfer', plain:'The facebow', figs:['mounterr'] },
+    { full:'Eccentric records and programming the articulator', plain:'Forward and side records', figs:['scirec', 'bennett'] },
+    { full:'Fully adjustable articulators', plain:'Fully adjustable', figs:['hingearc'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

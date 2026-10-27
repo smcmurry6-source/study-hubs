@@ -216,6 +216,22 @@ main{padding-top:20px}
 .cm-milestone .ic{width:16px;height:16px}
 .home-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:start}
 .home-grid > *{min-width:0}
+/* Home: Where to next and the last two weeks (layout from heme-endo-exam1's Home) */
+.home-row{margin-bottom:24px}
+.home-next{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.home-next li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;background:var(--surface-2)}
+.home-next li > span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+.home-next small{color:var(--ink-soft);font-size:.82rem}
+.home-next .btn{flex:none}
+.hn-num{flex:none;font-family:var(--font-mono);font-size:.75rem;font-weight:700;padding:2px 6px;border-radius:6px;background:var(--t);color:#fff}
+.hn-ic{flex:none;width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-ink)}
+.hn-ic .ic{width:18px;height:18px}
+.home-days{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin:4px 0 10px}
+.hd-day{aspect-ratio:1;border-radius:4px;background:var(--surface-3)}
+.hd-day.on{background:var(--accent)}
+.hd-day.today{outline:2px solid var(--ink-soft);outline-offset:1px}
+.hd-note{margin:0;font-size:.86rem;color:var(--ink-soft)}
+@media (max-width:560px){.home-next li{flex-wrap:wrap}.home-next .btn{margin-left:auto}}
 
 .grade-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 0;border-bottom:1px dashed var(--line)}
 .grade-row:last-child{border-bottom:0}
@@ -677,7 +693,8 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
         <h1 title="Periodontology D2 Compendium · Course #2145">Perio <i>D2</i></h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
-        <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
+        <button role="tab" type="button" data-mode="home" aria-selected="true"><span class="mode-icon" data-ic="home"></span><span class="mode-label">Home</span></button>
+        <button role="tab" type="button" data-mode="compendium" aria-selected="false"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
         <button role="tab" type="button" data-mode="review" aria-selected="false"><span class="mode-icon" data-ic="table"></span><span class="mode-label">Review</span></button>
         <button role="tab" type="button" data-mode="arcade" aria-selected="false"><span class="mode-icon" data-ic="arcade"></span><span class="mode-label">Arcade</span></button>
       </nav>
@@ -691,7 +708,8 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
   </header>
 
   <main>
-    <section class="mode-panel" id="panel-compendium" data-mode-panel="compendium"></section>
+    <section class="mode-panel" id="panel-home" data-mode-panel="home"></section>
+    <section class="mode-panel" id="panel-compendium" data-mode-panel="compendium" hidden></section>
     <section class="mode-panel" id="panel-review" data-mode-panel="review" hidden></section>
     <section class="mode-panel" id="panel-arcade" data-mode-panel="arcade" hidden></section>
   </main>
@@ -4307,7 +4325,7 @@ function defaultState(){
     theme:null,
     lastActiveDate:null,
     activeDates:{},       // 'YYYY-MM-DD' -> true
-    ui:{ mode:'compendium', view:'course-info', lec:'diagnosis-tx-planning', review:'all', level:'full' },
+    ui:{ mode:'home', view:'lecture-notes', lec:'diagnosis-tx-planning', review:'all', level:'full' }, /* no homeOn here: it marks a one-time move, and defaults are merged into saved state */
     arcade:{ best:{}, plays:{}, muted:false }
   };
 }
@@ -4329,6 +4347,8 @@ function loadState(){
 }
 function saveState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); }catch(e){} }
 var STATE = loadState();
+/* 2026-10-27: Course Home became the Home mode (every hub has one); returning visitors open on it once */
+if(!STATE.ui.homeOn){ STATE.ui.homeOn = 1; STATE.ui.mode = 'home'; if(STATE.ui.view === 'course-info') STATE.ui.view = 'lecture-notes'; saveState(); }
 
 function dateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function todayKey(){ return dateKey(new Date()); }
@@ -4827,7 +4847,6 @@ var CRAM_CONTENT = [
 ];
 
 var COMPENDIUM_VIEWS = [
-  { id:'course-info',  label:'Course Home',  ic:'home',   fn:renderCourseInfo },
   { id:'lecture-notes',label:'Lecture Notes',ic:'notes',  fn:renderLectureNotes },
   { id:'question-bank',label:'Question Bank',ic:'bank',   fn:renderQuestionBank },
   { id:'mock-exam',    label:'Mock Exam',    ic:'timer',  fn:renderMockExam },
@@ -4836,7 +4855,7 @@ var COMPENDIUM_VIEWS = [
   { id:'cram-sheet',   label:'Cram Sheet',   ic:'bolt',   fn:renderCramSheet },
   { id:'exam-hints',   label:'Exam Hints',   ic:'quote',  fn:renderExamHints }
 ];
-var COMPENDIUM_VIEW = COMPENDIUM_VIEWS.some(function(v){ return v.id === STATE.ui.view; }) ? STATE.ui.view : 'course-info';
+var COMPENDIUM_VIEW = COMPENDIUM_VIEWS.some(function(v){ return v.id === STATE.ui.view; }) ? STATE.ui.view : 'lecture-notes';
 var COMPENDIUM_SELECTED_LEC = LECTURE_BY_ID[STATE.ui.lec] ? STATE.ui.lec : LECTURES[0].id;
 var QBANK_FILTER = { search:'', lec:'all', type:'all', status:'all' };
 
@@ -4849,8 +4868,37 @@ function setView(id){
 }
 function gotoLecture(lecId){ COMPENDIUM_SELECTED_LEC = lecId; STATE.ui.lec = lecId; setView('lecture-notes'); }
 
-/* ---------- Course home ---------- */
-function renderCourseInfo(){
+/* ---------- Home: the hub's own front page (Sam's standing rule, 2026-10-27; was Compendium's Course Home) ---------- */
+function homeLecRows(){
+  return LECTURES.map(function(l){
+    var tried = 0, right = 0, open = 0;
+    (QUESTIONS_BY_LECTURE[l.id] || []).forEach(function(q){ var a = STATE.answered[q.id]; if(a){ tried++; if(a.lastCorrect) right++; if(!a.correct) open++; } });
+    return { l:l, tried:tried, right:right, open:open, pct: tried ? Math.round(100 * right / tried) : null };
+  });
+}
+function homeNextHTML(){
+  var rows = homeLecRows(), out = [], lec = function(l){ return '<span class="hn-num tag-' + l.tag + '">S' + l.num + '</span>'; };
+  var weak = rows.filter(function(r){ return r.tried >= 5; }).sort(function(a, b){ return a.pct - b.pct; })[0];
+  if(weak && weak.pct < 80) out.push('<li>' + lec(weak.l) + '<span><b>Your weakest session: ' + escHtml(shortTitle(weak.l)) + '</b><small>' + weak.pct + '% right on your latest try, over ' + weak.tried + ' questions</small></span><button type="button" class="btn primary" data-drill="' + weak.l.id + '">Drill it</button></li>');
+  var open = rows.reduce(function(n, r){ return n + r.open; }, 0);
+  if(open) out.push('<li><span class="hn-ic">' + icon('cycle') + '</span><span><b>' + open + ' question' + (open === 1 ? '' : 's') + ' you haven\'t gotten right yet</b><small>Try them again while they\'re fresh</small></span><button type="button" class="btn" data-home-missed>Retry</button></li>');
+  var fresh = rows.filter(function(r){ return !r.tried && r.l.status !== 'upcoming'; })[0];
+  if(fresh) out.push('<li>' + lec(fresh.l) + '<span><b>Not started: ' + escHtml(shortTitle(fresh.l)) + '</b><small>' + (fresh.l.status === 'taught' ? 'Lectured' : 'Slides only so far') + '</small></span><button type="button" class="btn" data-goto-lecture="' + fresh.l.id + '">Read the notes</button></li>');
+  if(!out.length) out.push('<li><span class="hn-ic">' + icon('medal') + '</span><span><b>Every session started and nothing waiting.</b><small>Take a mock exam to check yourself</small></span><button type="button" class="btn primary" data-set-view="mock-exam">Mock exam</button></li>');
+  return '<div class="card"><div class="eyebrow">' + icon('target') + 'Where to next</div><ul class="home-next">' + out.join('') + '</ul></div>';
+}
+function homeDaysHTML(){
+  var cells = '', d = new Date(); d.setDate(d.getDate() - 13);
+  for(var i = 0; i < 14; i++){
+    var k = dateKey(d), on = !!STATE.activeDates[k];
+    cells += '<span class="hd-day' + (on ? ' on' : '') + (i === 13 ? ' today' : '') + '" title="' + d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + (on ? ': studied' : '') + '"></span>';
+    d.setDate(d.getDate() + 1);
+  }
+  var n = currentStreakDays();
+  return '<div class="card"><div class="eyebrow">' + icon('cal') + 'Your last two weeks</div><div class="home-days" aria-label="Days you answered questions in this hub, the last 14 days">' + cells + '</div>' +
+    '<p class="hd-note">' + (n > 1 ? '<b>' + n + '-day streak.</b> ' : '') + STATE.totalSeen + ' answers so far, ' + STATE.bestStreak + ' right in a row at best.</p></div>';
+}
+function renderHome(){
   var fin = daysUntil(FINAL_DATE);
   var mastered = STATE.totalCorrect, total = QUESTIONS.length;
   var taught = LECTURES.filter(function(l){ return l.status === 'taught'; }).length;
@@ -4877,6 +4925,7 @@ function renderCourseInfo(){
       '<div class="hh-stat"><div class="k">Your progress</div><div class="v">'+mastered+'<small>of '+total+' questions correct</small></div><div class="bar" style="margin-top:8px"><i style="width:'+(total?Math.round(100*mastered/total):0)+'%"></i></div></div>' +
       '<div class="hh-stat"><div class="k">Lectured so far</div><div class="v">'+taught+'<small>of '+LECTURES.length+' sessions · '+currentStreakDays()+'-day streak</small></div></div>' +
     '</div></div>';
+  h += '<div class="home-grid home-row">' + homeNextHTML() + homeDaysHTML() + '</div>';
   h += '<div class="home-grid"><div class="card"><div class="eyebrow">'+icon('cal')+'Course map</div><div class="course-map">';
   LECTURES.forEach(function(l){
     var p = lectureProgress(l.id);
@@ -4888,7 +4937,21 @@ function renderCourseInfo(){
     COURSE_GRADING.map(function(g){ return '<div class="grade-row"><b>'+escHtml(g.component)+'</b><span class="w">'+escHtml(g.weight)+'</span><p>'+escHtml(g.note)+'</p></div>'; }).join('') + '</div>' +
     '<div class="card section-block"><div class="eyebrow">'+icon('shield')+'Must-pass, separate from your grade</div><p>These three PCD competencies must each be passed whatever your course grade. If one isn\'t shown by the third PCD session, the fourth gives you a chance to relearn and retest.</p>' + ulOf(PCD_COMPETENCIES) + '</div>' +
     '<div class="card section-block"><div class="eyebrow">How sources are labeled</div><p style="margin:0">'+statusHTML({status:'taught'})+' built from the recording, slides and in-class sessions.<br>'+statusHTML({status:'preview'})+' built from the slide deck ahead of the lecture.<br>'+statusHTML({status:'upcoming'})+' thin notes from the class exam-review guide until the lecture happens.</p></div></div></div>';
-  content().innerHTML = h;
+  var panel = document.getElementById('panel-home');
+  panel.innerHTML = h;
+  if(!panel.__wired){
+    panel.__wired = true;
+    /* Home's buttons open the right part of Compendium (or another mode) */
+    panel.addEventListener('click', function(e){
+      function open(view){ COMPENDIUM_VIEW = view; STATE.ui.view = view; saveState(); setMode('compendium'); window.scrollTo(0, 0); }
+      var gm = e.target.closest('[data-goto-mode]'); if(gm){ setMode(gm.getAttribute('data-goto-mode')); return; }
+      var lb = e.target.closest('[data-goto-lecture]'); if(lb){ COMPENDIUM_SELECTED_LEC = STATE.ui.lec = lb.getAttribute('data-goto-lecture'); open('lecture-notes'); return; }
+      var pr = e.target.closest('[data-practice]'); if(pr){ QBANK_FILTER = { search:'', lec:pr.getAttribute('data-practice'), type:'all', status:'all' }; open('question-bank'); return; }
+      var hm = e.target.closest('[data-home-missed]'); if(hm){ QBANK_FILTER = { search:'', lec:'all', type:'all', status:'missed' }; open('question-bank'); return; }
+      var dr = e.target.closest('[data-drill]'); if(dr){ WEAK_DRILL_LEC = dr.getAttribute('data-drill'); open('weak-spots'); return; }
+      var sv = e.target.closest('[data-set-view]'); if(sv){ if(sv.getAttribute('data-set-view') === 'weak-spots') WEAK_DRILL_LEC = null; open(sv.getAttribute('data-set-view')); return; }
+    });
+  }
 }
 
 /* ---------- Lecture notes ---------- */
@@ -5911,9 +5974,9 @@ GAME_IMPL.crusher = function(g, C){
    BOOT / MODE SWITCHING
    ==================================================================== */
 var CURRENT_MODE = null;
-var MODE_RENDERERS = { compendium:renderCompendium, review:renderReview, arcade:function(){ ARCADE.lobby(); } };
+var MODE_RENDERERS = { home:renderHome, compendium:renderCompendium, review:renderReview, arcade:function(){ ARCADE.lobby(); } };
 function setMode(mode){
-  if(!MODE_RENDERERS[mode]) mode = 'compendium';
+  if(!MODE_RENDERERS[mode]) mode = 'home';
   if(CURRENT_MODE === 'arcade' && mode !== 'arcade') ARCADE.stop();
   if(window.shTTS && mode !== 'compendium') window.shTTS.stop();
   CURRENT_MODE = mode; STATE.ui.mode = mode; saveState();
@@ -5927,7 +5990,8 @@ function applyTheme(t){
 }
 /* Section label for the shared widget's per-section time tracking. */
 window.SH_SECTION = function(){
-  var m = CURRENT_MODE || 'compendium';
+  var m = CURRENT_MODE || 'home';
+  if(m === 'home') return 'home/dashboard';
   if(m === 'compendium') return 'compendium/' + COMPENDIUM_VIEW;
   if(m === 'arcade') return 'arcade/' + (ARCADE.current() || 'lobby');
   if(m === 'review') return 'review/' + (REVIEW.lec || 'all');
@@ -5949,7 +6013,7 @@ function boot(){
   renderHeaderMeta();
   var m = STATE.ui.mode;
   if(location.hash){ var h = location.hash.slice(1); if(MODE_RENDERERS[h]) m = h; }
-  setMode(m || 'compendium');
+  setMode(m || 'home');
 }
 /* the markup above is already parsed, so render now; the deferred widget and supabase scripts load after */
 boot();
@@ -6012,7 +6076,7 @@ window.SH_SYNC = {
     saveState(); checkAchievements(); renderHeaderMeta();
     if(added) showToast(icon('check') + ' Synced ' + added + ' question' + (added === 1 ? '' : 's') + ' from your other devices');
     /* redraw the page only right after it opens, so nobody loses a question they're in the middle of */
-    if(Date.now() - SYNC_LOADED < 8000 && STATE.ui.mode === 'compendium' && COMPENDIUM_VIEW !== 'mock-exam' && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())) renderCompendiumContent();
+    if(Date.now() - SYNC_LOADED < 8000 && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())){ if(STATE.ui.mode === 'home') renderHome(); else if(STATE.ui.mode === 'compendium' && COMPENDIUM_VIEW !== 'mock-exam') renderCompendiumContent(); }
   }
 };
 
@@ -6046,7 +6110,7 @@ window.SH_EXPORT = {
 </script>
 <script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
 <script defer src="../../widget/games.js"></script>
-<script defer src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="compendium"></script>
+<script defer src="../../widget/v3.js" data-hub="perio" data-answered-event="perio:answered" data-default-mode="home"></script>
 <script>document.addEventListener("DOMContentLoaded", function(){ if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]"); });</script>
 </body>
 </html>

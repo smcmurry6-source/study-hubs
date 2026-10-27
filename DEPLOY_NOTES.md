@@ -83,6 +83,13 @@ It is also refreshed between archivings, by hand when Sam asks a Claude Code ses
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
+## Every hub opens on its own Home page (standing rule, 2026-10-27)
+
+Every hub (hub Projects included) has a **Home** mode, first and default: the exam countdown and facts, deadlines, quick start,
+readiness, Where to next, progress by lecture, the course timeline and the last 14 days. Copy it from `heme-endo-exam1` or
+`occlusion`; the full list is in `CLAUDE.md` → "Every hub opens on its own Home page". **Perio Project: carry the Home mode into the
+split sources** (Course Home is no longer a Compendium tab).
+
 ## Every lecture gets two-statement and true/false questions (standing rule, 2026-10-22)
 
 Every session that writes questions for a lecture (hub Projects included) adds two-statement and true/false items: about 5
@@ -108,6 +115,30 @@ Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` �
 Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-27 (every hub opens on a Home page, Claude Code)** — Sam: "build a home page into each hub as a rule going forward".
+  New standing rule (above, and `CLAUDE.md`). **Occlusion** gets a Home mode (first tab, default, `home/dashboard`): the final's
+  countdown (days; `FINAL_TIME`/`FINAL_CLOSES` are null until the time is announced, then it counts hours and minutes), chips,
+  a ring for the final's questions right on the latest try, a "more lectures are coming" note, quick start (practice, drill,
+  notes, the 20-question mock), the exam card (moved from Compendium, along with the quick-start row; the Timmy Time card stays
+  on Compendium), Where to next (final lectures first, then midterm misses), progress by lecture grouped "On the final" /
+  "Midterm lectures", `COURSE_DATES` (L1-L6, the midterm, the final), the last two weeks and links. **Perio**: Compendium's Course
+  Home is now the Home mode (same content, plus Where to next and the last two weeks); `course-info` is gone from
+  `COMPENDIUM_VIEWS` and old saved views fall back to Lecture Notes. Returning visitors open on Home once (`STATE.ui.homeOn`).
+  **Fix**: #173's `finalOn` flag sat in Occlusion's `defaultState()`, which `loadState()` merges into saved state, so the
+  switch to the final never ran for returning visitors; it's out of the defaults now (visitors who opened the hub since
+  then already saved the flag). Heme & Endo's Home now redraws after a sync. Time on Perio's Course Home was logged as
+  `compendium/course-info`; from today it's `home/dashboard`. About page, `sw.js` -> `sh-v36`. No schema change.
+
+- **2026-10-27 (Occlusion L6: four animated diagrams, Claude Code)** — From L6's diagram review (Sam approved all four):
+  `mounterr` (the maxillary cast at the facebow position or too far back / high / forward / low; in the mouth the most anterior
+  or most posterior teeth hit, the slide's rule), `hingearc` (one model, `hgModel`: the patient's arc about PHA vs the articulator's
+  about an AHA 5 mm off; a thicker CR record leaves the molar farther off, shown magnified with no number; "restore at this
+  vertical" and "kinematic facebow" zero it), `scirec` (protrusive vs lateral reading vs arbitrary 30°/20°; a crown built at the
+  setting discludes or hits when the patient protrudes along their real eminence; the lateral reading is drawn 8° steeper only to
+  show "steeper") and `bennett` (the orbiting path bows medially, so a record at 3-5 mm reads a larger angle than at 7-10 mm, and
+  the fossa built from the smaller one is too narrow). Built in `tools/figures/occlusion/anima/`; placed with `FIG_PLACE.instruments`
+  in `od.js` (FIG_PLACE lives in the generated kit block: edit it there, not in the hub) and a Review `figs` section. About page.
 
 - **2026-10-27 (Heme & Endo Exam 1: L3, L4, L9, L10 from their recordings, Claude Code)** — Sam posted the missing
   recordings to the Drive Heme/Endo folder: `Growth_Hormone.mp3` and `Thyroid_Hormone.mp3` (transcribed in-session with

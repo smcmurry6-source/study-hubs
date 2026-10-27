@@ -9,4 +9,9 @@ import { crslide } from "./crslide.mjs";
 import { guidance } from "./guidance.mjs";
 import { swallow } from "./swallow.mjs";
 import { implant } from "./implant.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant()];
+// L6 (final), approved by Sam 2026-10-27
+import { mounterr } from "./mounterr.mjs";
+import { hingearc } from "./hingearc.mjs";
+import { scirec } from "./scirec.mjs";
+import { bennett } from "./bennett.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett()];
