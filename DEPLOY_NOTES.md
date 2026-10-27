@@ -109,6 +109,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (Occlusion L6: four animated diagrams, Claude Code)** — From L6's diagram review (Sam approved all four):
+  `mounterr` (the maxillary cast at the facebow position or too far back / high / forward / low; in the mouth the most anterior
+  or most posterior teeth hit, the slide's rule), `hingearc` (one model, `hgModel`: the patient's arc about PHA vs the articulator's
+  about an AHA 5 mm off; a thicker CR record leaves the molar farther off, shown magnified with no number; "restore at this
+  vertical" and "kinematic facebow" zero it), `scirec` (protrusive vs lateral reading vs arbitrary 30°/20°; a crown built at the
+  setting discludes or hits when the patient protrudes along their real eminence; the lateral reading is drawn 8° steeper only to
+  show "steeper") and `bennett` (the orbiting path bows medially, so a record at 3-5 mm reads a larger angle than at 7-10 mm, and
+  the fossa built from the smaller one is too narrow). Built in `tools/figures/occlusion/anima/`; placed with `FIG_PLACE.instruments`
+  in `od.js` (FIG_PLACE lives in the generated kit block: edit it there, not in the hub) and a Review `figs` section. About page.
+
 - **2026-10-27 (Heme & Endo Exam 1: L3, L4, L9, L10 from their recordings, Claude Code)** — Sam posted the missing
   recordings to the Drive Heme/Endo folder: `Growth_Hormone.mp3` and `Thyroid_Hormone.mp3` (transcribed in-session with
   faster-whisper small.en) and the 10/27 Zoom VTTs (`GMT20261027-180303` = L9, `-183636` = L10). **L3's recording is Dr.
