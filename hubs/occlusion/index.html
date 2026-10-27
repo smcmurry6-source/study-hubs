@@ -1435,9 +1435,9 @@ var LECTURES = [
   { id:'applying', num:5, title:'Applying Occlusion: Operative, Fixed and Implants', who:'Dr. Givan', tag:'amber',  source:'Occ Lec3-2 Occlusal Correlations (slides + handout) + 10/1 recording', status:'taught', exam:'midterm' },
   { id:'instruments', num:6, title:'Occlusal Instrumentation: Articulators, Facebows and Records', who:'Dr. Givan', tag:'green', source:'Occ Lec4 Occlusal Instrumentation (slides + handout) + 10/22 recording', status:'taught', exam:'final' }
 ];
-/* the final is not comprehensive: its lectures come first in the notes and hints, and the bank, drill and mock default to them */
+/* lectures always list in course order (midterm L1-L5, then the final's); the bank, drill and mock still default to the final's */
 function isFinalLec(id){ var l = LECTURE_BY_ID[id]; return !!(l && l.exam === 'final'); }
-function lecOrder(){ return LECTURES.filter(function(l){ return l.exam === 'final'; }).concat(LECTURES.filter(function(l){ return l.exam !== 'final'; })); }
+function lecOrder(){ return LECTURES.slice(); }
 
 /* od:kit begin (built from tools/figures/occlusion; edit there) */
 /* ---------- DRAWING KIT + FIGURES (redrawn 2026-10-20) ----------
@@ -7346,7 +7346,8 @@ function renderNotes(body){
   var lec = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   var nav = '<nav class="lec-nav" aria-label="Lectures">' + lecOrder().map(function(l, i, arr){
     var st = STATE.lecStats[l.id]; var pct = st && st.a >= 5 ? st.c+'/'+st.a : '';
-    var head = (i === 0 && l.exam === 'final') ? '<p class="lec-nav-h">Final</p>' : (l.exam !== 'final' && (i === 0 || arr[i-1].exam === 'final')) ? '<p class="lec-nav-h">Midterm<span class="nh-long"> lectures (done; the final builds on them)</span></p>' : '';
+    var fin = l.exam === 'final', newGrp = i === 0 || (arr[i-1].exam === 'final') !== fin;
+    var head = !newGrp ? '' : fin ? '<p class="lec-nav-h">Final</p>' : '<p class="lec-nav-h">Midterm<span class="nh-long"> lectures (done; the final builds on them)</span></p>';
     return head + '<button type="button" class="tag-'+l.tag+(l.id===lec.id?' is-active':'')+'" data-lec="'+l.id+'"><span class="lec-num">'+lecLabel(l)+'</span><span><span class="t">'+escHtml(l.title)+'</span><br><span class="w">'+escHtml(l.who)+(pct?' · '+pct+' correct':'')+'</span></span></button>';
   }).join('') + '</nav>';
   var nq = (QUESTIONS_BY_LECTURE[lec.id]||[]).length;
