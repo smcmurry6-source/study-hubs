@@ -109,6 +109,24 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (Occlusion switches to the final: L6 Occlusal Instrumentation, Claude Code)** — Sam: "Occlusion can now
+  switch to final exam." The final (Thu Nov 19) is not comprehensive: Dr. Givan's lectures from 10/22 on, building on the
+  midterm material; its time and format aren't announced yet (update `EXAM_INFO` and the mock clock when they are). New
+  **L6 `instruments`**, "Occlusal Instrumentation: Articulators, Facebows and Records" (`exam:'final'`; L1-L5 now carry
+  `exam:'midterm'`), from the Drive Final folder (Occ Lec4 slides + handout, the 10/22 lecture capture): notes at both levels
+  and both mp3s (`audio/instruments-full.mp3`, 27.6 min; `-plain`, 9.3 min), 92 questions (`in-*`, `cs-in-*` on 3 new Patient
+  Box cases `incrown`/`inrehab`/`inhigh`, 8 two-statement, 10 true/false (6 True), 1 select-all, 1 ordering, 2 EXCEPT; each with
+  its why; correct answer longest in 26% of L6's MCQs), 17 exam hints quoted from the recording (two de-emphasized: the slide's
+  "Not on test" Handulator, and balanced-denture SCI), a cram list, a Review tab (articulator kinds, the records, where mounting
+  errors show, MIP record rules, Dr. Givan's selection table, 3 processes) and 2 sort sets. Bank 418 → 510. **The hub now leans to
+  the final**: `isFinalLec()` / `lecOrder()`; notes and hints list the final's lectures first under "Final" / "Midterm" labels;
+  the bank's lecture filter gains "For the final" (default) and "Midterm lectures"; the quick-start count, Daily Drill pool and
+  mock (`MOCK_BLUEPRINT = { instruments:20 }`, clock at the midterm's 80 s a question) use the final's lectures only; the exam
+  card and hints banner describe the final. Returning visitors are moved once (`STATE.ui.finalOn`: L6, bank scope final, the
+  closed-card flag and any old mock cleared). Titles: "Occlusion Final Hub" (dashboard card, `<title>`, ribbon); recap label
+  "Occlusion". The midterm Timmy Time episode stays (dashboard row now "The midterm review"). **Each new final lecture: add it
+  with `exam:'final'` and to `MOCK_BLUEPRINT`, and update `EXAM_INFO`.** Diagram review for L6 still to be put to Sam.
+
 - **2026-10-27 (Heme & Endo Exam 1: six animated diagrams, Claude Code)** — Sam: "Yes to all animations." Built with the
   anima skill in `tools/figures/heme-endo-exam1/` (`build.mjs` fills the hub's `anima:js` / `anima:css` markers; `--check`,
   `--preview`), each from the hub's own notes: **beta** (L5: glucose → GLUT2 → ATP → K-ATP closes → depolarization → Ca2+ →
