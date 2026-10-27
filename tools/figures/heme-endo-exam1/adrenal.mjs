@@ -3,7 +3,8 @@
 // fasciculata's straight cords of spongiocytes with sinusoids between them, the reticularis' network and the medulla's
 // chromaffin cells around the central vein, with each zone's share, product and stimulus beside it. Blood runs from
 // capsule to medulla (sinusoids) and straight through (long medullary arteries); in a stress response cortisol rides
-// that blood down to the medulla and turns on PNMT. Shares are the notes' own; the rest is schematic, not to scale.
+// that blood down to the medulla and turns on PNMT. A third view lights the medulla's dual supply, the one adrenal
+// question Dr. Herr said is on the exam (10/27 recording). Shares are the notes' own; the rest is schematic, not to scale.
 import { figureSvg, plateHtml } from "./shared.mjs";
 
 const W = 540, H = 460;
@@ -14,10 +15,12 @@ const D = {
   CLUS: [[82, 318], [252, 318], [116, 400], [244, 404]],
   FIBER: [[4, 296], [40, 300], [70, 312]],
   SC: {
-    rest: { name: "at rest", stress: 0,
+    rest: { name: "at rest", stress: 0, dual: 0,
       text: "Blood runs from the capsule inward. Arteries form a subcapsular plexus; short cortical arteries become sinusoids that run through all three zones and drain at the corticomedullary junction into the medulla, carrying cortical hormones with them; long medullary arteries pass straight through and capillarize in the medulla. So the medulla has a dual supply. Its sinusoids collect into a central vein, which leaves as the suprarenal vein." },
-    stress: { name: "stress · cortisol → PNMT", stress: 1,
-      text: "Stress response: ACTH drives the fasciculata, and the cortisol it makes flows with the blood from cortex to medulla, where it activates PNMT (norepinephrine → epinephrine). Sympathetic preganglionic fibers release acetylcholine onto chromaffin cells: they depolarize, calcium flows in, and they release epinephrine and norepinephrine, about 80% epinephrine. Acetylcholine and ACTH also activate tyrosine hydroxylase and dopamine beta-hydroxylase." },
+    dual: { name: "the medulla's dual supply", stress: 0, dual: 1,
+      text: "\"Here's the question that's going to be on your exam\": the medulla receives a dual blood supply, arterial blood from the medullary arterioles (the long medullary arteries) and venous blood from the cortical sinusoids, which carries cortisol with it. Both drain into the central (adrenomedullary) vein and out through the suprarenal vein. The arteries themselves come from three sources: superior suprarenal (inferior phrenic artery), middle suprarenal (abdominal aorta) and inferior suprarenal (renal artery)." },
+    stress: { name: "stress · cortisol → PNMT", stress: 1, dual: 0,
+      text: "Stress response: ACTH drives the fasciculata, and the cortisol it makes flows with the blood from cortex to medulla, where it activates PNMT (norepinephrine → epinephrine). Preganglionic sympathetic fibers (T1 to L2, myelinated, through white rami and the chain without synapsing) release acetylcholine onto chromaffin cells: they depolarize, calcium flows in, and they release epinephrine and norepinephrine, about 80% epinephrine. Acetylcholine and ACTH also activate tyrosine hydroxylase and dopamine beta-hydroxylase." },
   },
 };
 
@@ -28,20 +31,20 @@ function adBase(D) {
   /* zone backgrounds */
   o += '<rect class="ad-zg" x="20" y="38" width="310" height="32"/><rect class="ad-zf" x="20" y="70" width="310" height="182"/><rect class="ad-zr" x="20" y="252" width="310" height="24"/><rect class="ad-med" x="20" y="276" width="310" height="170" rx="0"/>';
   /* capsule and subcapsular plexus */
-  o += '<g class="hot" data-info="Capsule: connective tissue around both cortex and medulla. Arteries penetrate it and form a subcapsular plexus."><rect class="ad-cap" x="20" y="18" width="310" height="20" rx="4"/>';
+  o += '<g class="hot" data-info="Capsule: connective tissue around both cortex and medulla. Arteries from three sources (superior suprarenal from the inferior phrenic, middle suprarenal from the abdominal aorta, inferior suprarenal from the renal artery) penetrate it and form a subcapsular plexus."><rect class="ad-cap" x="20" y="18" width="310" height="20" rx="4"/>';
   for (var c = 0; c < 6; c++) o += '<path class="ad-fib" d="M' + (30 + c * 50) + " 24q20 4 40 0" + '"/>';
   o += '</g><path class="ad-plex" d="M22 37H328"/>';
   /* zona glomerulosa: arches of cells */
-  o += '<g class="hot" data-info="Zona glomerulosa (outer, about 10-15% of the cortex): cells in arches. The only zone with aldosterone synthase, so the sole source of aldosterone; driven by angiotensin II and potassium (ACTH only a little).">';
+  o += '<g class="hot" data-info="Zona glomerulosa (outer, about 15% of the cortex in the lecture, 10-15% on the slides): cells in arches. The only zone with aldosterone synthase, so the sole source of aldosterone; driven by angiotensin II and potassium (ACTH only a little).">';
   for (var g = 0; g < 5; g++) { var x = 52 + g * 60; o += '<path class="ad-arch" d="M' + (x - 20) + " 70Q" + (x - 20) + " 44 " + x + " 44Q" + (x + 20) + " 44 " + (x + 20) + ' 70"/>'; for (var n = 0; n < 5; n++) { var a = Math.PI * (n / 4); o += '<circle class="ad-n" cx="' + f(x - Math.cos(a) * 20) + '" cy="' + f(70 - Math.sin(a) * 26 + 2) + '" r="2.2"/>'; } }
   o += "</g>";
   /* zona fasciculata: straight cords of spongiocytes, sinusoids between */
-  o += '<g class="hot" data-info="Zona fasciculata (middle, 65-80%, the largest): straight cords of spongiocytes, full of lipid droplets (stored cholesterol). Makes cortisol (and corticosterone, some androgens) in response to ACTH.">';
+  o += '<g class="hot" data-info="Zona fasciculata (middle, 65-80%, the largest): straight cords of spongiocytes (“the thing to remember for the exam”), full of lipid droplets (stored cholesterol), with straight sinusoids between them. Makes cortisol (and corticosterone, some androgens) in response to ACTH.">';
   for (var k = 0; k < 10; k++) for (var r = 0; r < 12; r++) { var cx = 26 + k * 30, cy = 73 + r * 15; o += '<rect class="ad-spong" x="' + cx + '" y="' + cy + '" width="22" height="13" rx="3"/><circle class="ad-lip" cx="' + (cx + 5) + '" cy="' + (cy + 4.5) + '" r="2"/><circle class="ad-lip" cx="' + (cx + 17) + '" cy="' + (cy + 8.5) + '" r="2"/><circle class="ad-n" cx="' + (cx + 11) + '" cy="' + (cy + 6.5) + '" r="2"/>'; }
   o += "</g>";
   for (var s = 0; s < 9; s++) o += '<path class="ad-sin" d="M' + (51 + s * 30) + " 40V276" + '"/>';
   /* zona reticularis: a network of cords */
-  o += '<g class="hot" data-info="Zona reticularis (inner, about 5-10%): a network of anastomosing cords. Makes weak androgens (DHEA, androstenedione) in response to ACTH."><path class="ad-ret" d="M20 258L50 270L80 258L110 270L140 258L170 270L200 258L230 270L260 258L290 270L320 258"/><path class="ad-ret" d="M20 272L50 260L80 272L110 260L140 272L170 260L200 272L230 260L260 272L290 260L320 272"/></g>';
+  o += '<g class="hot" data-info="Zona reticularis (inner, about 10% in the lecture, 5-10% on the slides): a network of anastomosing cords, where the sinusoids drain into collecting veins. Makes weak androgens (DHEA, androstenedione) in response to ACTH."><path class="ad-ret" d="M20 258L50 270L80 258L110 270L140 258L170 270L200 258L230 270L260 258L290 270L320 258"/><path class="ad-ret" d="M20 272L50 260L80 272L110 260L140 272L170 260L200 272L230 260L260 272L290 260L320 272"/></g>';
   /* medulla: sinusoids, central vein, chromaffin clusters, sympathetic fiber */
   o += '<path class="ad-msin" d="M55 278Q90 330 150 372M85 278Q110 330 150 362M205 278Q200 320 178 352M295 278Q260 330 200 364"/>';
   o += '<path class="ad-art" d="M262 18V300Q240 340 200 368"/>';
@@ -49,25 +52,30 @@ function adBase(D) {
   o += '<g class="hot" data-info="Chromaffin cells: modified postganglionic sympathetic neurons with no axons. Acetylcholine from preganglionic fibers depolarizes them, calcium flows in, and they release epinephrine and norepinephrine into the blood (about 80% epinephrine, because they are rich in PNMT).">';
   D.CLUS.forEach(function (c) { for (var i = 0; i < 6; i++) { var a = i * 1.047, x = c[0] + Math.cos(a) * 15, y = c[1] + Math.sin(a) * 11; o += '<circle class="ad-chrom" cx="' + f(x) + '" cy="' + f(y) + '" r="8.5"/><circle class="ad-gran" cx="' + f(x - 2) + '" cy="' + f(y - 2) + '" r="1.4"/><circle class="ad-gran" cx="' + f(x + 2.5) + '" cy="' + f(y + 1.5) + '" r="1.4"/>'; } });
   o += "</g>";
-  o += '<path class="ad-nerve" d="M4 296Q40 300 70 312"/><circle class="ad-bouton" cx="70" cy="312" r="3.6"/>';
+  o += '<g class="hot" data-info="Preganglionic sympathetic fiber: it leaves the spinal cord between T1 and L2, enters the sympathetic chain through a white ramus (white because it is myelinated) and passes through without synapsing, straight to the medulla. It synapses on the chromaffin cells, which stand in for postganglionic neurons."><path class="ad-nerve" d="M4 296Q40 300 70 312"/><circle class="ad-bouton" cx="70" cy="312" r="3.6"/></g>';
   /* side column: zone, share, product, stimulus */
   function brace(y0, y1) { return '<path class="ad-brace" d="M338 ' + (y0 + 1) + "H342V" + (y1 - 1) + "H338" + '"/>'; }
   o += brace(18, 38) + tx(350, 32, "capsule", "ad-zn", "start");
-  o += brace(38, 70) + tx(350, 50, "glomerulosa · 10-15%", "ad-zn", "start") + tx(350, 65, "aldosterone · Ang II, K⁺", "ad-zs", "start");
+  o += brace(38, 70) + tx(350, 50, "glomerulosa · ~15%", "ad-zn", "start") + tx(350, 65, "aldosterone · Ang II, K⁺", "ad-zs", "start");
   o += brace(70, 252) + tx(350, 140, "fasciculata · 65-80%", "ad-zn", "start") + tx(350, 156, "cortisol · ACTH", "ad-zs", "start") + tx(350, 172, "spongiocytes:", "ad-zs", "start") + tx(350, 186, "lipid droplets", "ad-zs", "start");
-  o += brace(252, 276) + tx(350, 262, "reticularis · 5-10%", "ad-zn", "start") + tx(350, 276, "DHEA · ACTH", "ad-zs", "start");
+  o += brace(252, 276) + tx(350, 262, "reticularis · ~10%", "ad-zn", "start") + tx(350, 276, "DHEA · ACTH", "ad-zs", "start");
   o += brace(276, 446) + tx(350, 312, "medulla", "ad-zn", "start") + tx(350, 328, "chromaffin cells", "ad-zs", "start") + tx(350, 344, "~80% epinephrine", "ad-zs", "start") + tx(350, 360, "ACh from sympathetic", "ad-zs", "start") + tx(350, 374, "preganglionic fibers", "ad-zs", "start");
   /* callouts */
   function lab(txt, x, y, px, py, a) { return '<g class="am-callout"><path class="ad-lead" d="M' + f(a === "end" ? x + 3 : x - 3) + " " + f(y - 4) + "L" + f(px) + " " + f(py) + '"/><circle class="ad-dot" cx="' + f(px) + '" cy="' + f(py) + '" r="1.8"/>' + tx(x, y, txt, "ad-cl", a) + "</g>"; }
   o += lab("central vein", 350, 410, 202, 370, "start");
   o += lab("suprarenal vein", 350, 440, 177, 446, "start");
   o += lab("long medullary artery", 350, 228, 263, 214, "start");
-  o += lab("sympathetic fiber", 8, 288, 30, 298, "start");
+  o += lab("preganglionic fiber (T1-L2)", 8, 288, 30, 298, "start");
   return o;
 }
 
 function adDyn(v, t, D) {
-  var f = function (n) { return Math.round(n * 10) / 10; }, o = "", st = v.stress;
+  var f = function (n) { return Math.round(n * 10) / 10; }, o = "", st = v.stress, du = v.dual || 0;
+  if (du > .02) {
+    o += '<path class="ad-dual-a" opacity="' + f(du) + '" d="M262 22V300Q240 340 200 368"/>';
+    o += '<path class="ad-dual-v" opacity="' + f(du) + '" d="M55 278Q90 330 150 372M85 278Q110 330 150 362M205 278Q200 320 178 352M295 278Q260 330 200 364"/>';
+    o += '<text class="ad-t ad-dl" x="268" y="296" opacity="' + f(du) + '">arterial</text><text class="ad-t ad-dl ad-dlv" x="26" y="271" opacity="' + f(du) + '">venous, from the cortex</text>';
+  }
   function along(p, u) {
     var L = [], tot = 0;
     for (var i = 1; i < p.length; i++) { var d = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); L.push(d); tot += d; }
@@ -93,19 +101,19 @@ function adDyn(v, t, D) {
 
 const svg = figureSvg({ width: W, height: H, className: "ad-svg", label: "A column through the adrenal: capsule, zona glomerulosa, fasciculata and reticularis, and the medulla with its central vein, each zone labeled with its share and product.", body: adBase(D) + '<g class="ad-dyn">' + adDyn({ stress: 0 }, 0, D) + "</g>" });
 const plate = plateHtml({ fig: "Fig 6", title: "Capsule to medulla", hint: "pick a state · hover a zone", readout: "at rest", body: `<div class="am-svg ad-box">${svg}</div>` });
-const controls = `<div class="am-controls" role="group" aria-label="State"><button type="button" class="am-btn" data-adcase="rest" aria-pressed="true">At rest</button><button type="button" class="am-btn" data-adcase="stress" aria-pressed="false">Stress response</button></div>
+const controls = `<div class="am-controls" role="group" aria-label="State"><button type="button" class="am-btn" data-adcase="rest" aria-pressed="true">At rest</button><button type="button" class="am-btn" data-adcase="dual" aria-pressed="false">Dual blood supply</button><button type="button" class="am-btn" data-adcase="stress" aria-pressed="false">Stress response</button></div>
 <div class="ad-key"><span><i class="ad-k-rbc"></i>blood</span><span><i class="ad-k-aldo"></i>aldosterone</span><span><i class="ad-k-cort"></i>cortisol</span><span><i class="ad-k-acth"></i>ACTH</span><span><i class="ad-k-ach"></i>acetylcholine</span><span><i class="ad-k-epi"></i>epinephrine</span><span><i class="ad-k-ne"></i>norepinephrine</span></div>
 <p class="am-summary" aria-live="polite"></p>
-<p class="am-info">Hover or tap the capsule, a zone, the chromaffin cells, PNMT or the central vein.</p>`;
+<p class="am-info">Hover or tap the capsule, a zone, the chromaffin cells, the preganglionic fiber, PNMT or the central vein.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>Zones, shares, spongiocytes, the blood supply and chromaffin secretion are from the L9 notes (Dr. Herr's slides; recording not in yet); products, stimuli, PNMT and cortisol's role in the medulla from the L6 notes (Dr. Madison). L9 lists ACTH among the glomerulosa's stimuli; L6 says ACTH acts there only a little, which is what's shown.</li>
+<li>Zones, shares, spongiocytes, the blood supply (its three arterial sources and the dual supply) and chromaffin secretion (the T1-L2 preganglionic fiber) are from the L9 notes (Dr. Herr's slides and 10/27 lecture); products, stimuli, PNMT and cortisol's role in the medulla from the L6 notes (Dr. Madison). L9 lists ACTH among the glomerulosa's stimuli; L6 says ACTH acts there only a little, which is what's shown.</li>
 <li>Schematic: the zones' heights follow their shares, but cells, vessels and the medulla aren't to scale, and one column stands for the whole gland. Educational, not medical advice.</li></ul></details>`;
 
 function adLive(root, D) {
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var svg = root.querySelector(".ad-svg"), dyn = svg.querySelector(".ad-dyn"), sum = root.querySelector(".am-summary"), infoEl = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
-  var key = "rest", v = { stress: 0 }, frame = 0, visible = true, t0 = performance.now(), last = t0;
-  function step(now) { var k = 1 - Math.exp(-(now - last) / 300); last = now; v.stress += (D.SC[key].stress - v.stress) * (reduce.matches ? 1 : k); dyn.innerHTML = D.adDyn(v, reduce.matches ? 0 : now - t0, D); }
+  var key = "rest", v = { stress: 0, dual: 0 }, frame = 0, visible = true, t0 = performance.now(), last = t0;
+  function step(now) { var k = 1 - Math.exp(-(now - last) / 300); last = now; ["stress", "dual"].forEach(function (n) { v[n] += (D.SC[key][n] - v[n]) * (reduce.matches ? 1 : k); }); dyn.innerHTML = D.adDyn(v, reduce.matches ? 0 : now - t0, D); }
   function loop(now) { step(now); frame = visible && !reduce.matches ? requestAnimationFrame(loop) : 0; }
   function kick() { last = performance.now(); if (!frame && visible && !reduce.matches) frame = requestAnimationFrame(loop); else if (reduce.matches) step(performance.now()); }
   function set(k) { key = k; sum.textContent = D.SC[k].text; if (readout) readout.textContent = D.SC[k].name; root.querySelectorAll("[data-adcase]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-adcase") === k)); }); kick(); }
@@ -128,6 +136,10 @@ const CSS = `
 .anima .ad-svg .ad-zs{font-size:11px;fill:var(--anatomy-muted)}
 .anima .ad-svg .ad-cl{font-size:11px;paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
 .anima .ad-svg .ad-pt{font-size:10.5px;font-weight:700}
+.anima .ad-svg .ad-dual-a{fill:none;stroke:var(--he-rbc);stroke-width:5;stroke-linecap:round;opacity:.8}
+.anima .ad-svg .ad-dual-v{fill:none;stroke:var(--he-hormone);stroke-width:4;stroke-linecap:round;stroke-dasharray:6 4}
+.anima .ad-svg .ad-dl{font-size:11px;font-weight:700;fill:var(--he-rbc);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.anima .ad-svg .ad-dlv{fill:var(--he-hormone)}
 .anima .ad-svg .ad-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
 .anima .ad-svg .ad-dot{fill:var(--anatomy-dot)}
 .anima .ad-svg .ad-brace{fill:none;stroke:var(--anatomy-mid);stroke-width:1.2}
@@ -166,7 +178,7 @@ export function adrenal() {
   return {
     id: "adrenal", lec: "adrenal",
     title: "The adrenal from capsule to medulla",
-    caption: "The three cortical zones and the medulla with their shares and products, the blood that runs from cortex to medulla, and what a stress response adds.",
+    caption: "The three cortical zones and the medulla with their shares and products, the blood that runs from cortex to medulla (the medulla's dual supply), and what a stress response adds.",
     html: `<div class="anima" data-anima="adrenal">${plate}${controls}${SOURCES}</div>`,
     css: CSS,
     live: adLive.toString(),

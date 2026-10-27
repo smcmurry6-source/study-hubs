@@ -1,8 +1,9 @@
-// Fig: who raises and lowers blood calcium (Heme & Endo Exam 1, L10 Calcium Regulation, slides only so far). A
+// Fig: who raises and lowers blood calcium (Heme & Endo Exam 1, L10 Calcium Regulation: slides + 10/27 recording). A
 // schematic body map: the parathyroid's chief cells with their calcium-sensing receptor and the thyroid's C cells on
 // top, the blood across the middle, and the three sites of control below (kidney, gut, bone), each with the cells and
 // transporters the notes name. Pick a case and the hormones and calcium movements follow it, beside an HTML panel
-// (it reflows under the drawing on phones). Levels are qualitative; the notes give no plasma values.
+// (it reflows under the drawing on phones). The recording added the soda (high phosphate) case and estrogen's brake on
+// bone (menopause). Levels are qualitative; the notes give no plasma values.
 import { figureSvg, plateHtml } from "./shared.mjs";
 
 const W = 400, H = 440;
@@ -17,16 +18,22 @@ const D = {
   SC: {
     low: { name: "calcium falls · PTH up", v: { pth: .92, d3: .85, ctn: .06, gut: .9, rca: .9, rp: .9, res: .85, ca: .15 }, en: "1a", pit: "ok",
       trig: "Blood Ca²⁺ low", net: "Net: calcium back up, phosphate down",
-      text: "Blood calcium falls: the calcium-sensing receptor on chief cells isn't stimulated, intracellular calcium doesn't rise, and PTH secretion goes up. Kidney: more calcium reabsorbed in the distal tubule, phosphate excreted, and 1α-hydroxylase makes calcitriol, which turns on the gut's apical calcium channels, calbindin and basolateral pump. Bone: PTH stimulates osteoblasts, whose paracrine factors stimulate osteoclasts to resorb bone. Net: calcium up, phosphate down." },
+      text: "Blood calcium falls (nerves fire too easily: tetany, Trousseau's and Chvostek's signs): the calcium-sensing receptor on chief cells isn't stimulated, intracellular calcium doesn't rise, and PTH secretion goes up. Kidney: more calcium reabsorbed in the distal tubule, phosphate excreted, and 1α-hydroxylase makes calcitriol, which turns on the gut's apical calcium channels, calbindin and basolateral pump. Bone: PTH binds osteoblasts (osteoclasts have no PTH receptor), whose paracrine cytokines and growth factors stimulate osteoclasts to resorb bone. Net: calcium up, phosphate down, though calcitriol's phosphate absorption in the gut evens the phosphate out in normal times." },
     normal: { name: "normal", v: { pth: .5, d3: .5, ctn: .5, gut: .5, rca: .5, rp: .5, res: .5, ca: .5 }, en: "both", pit: "ok",
       trig: "Blood Ca²⁺ normal", net: "Formation and resorption balance",
-      text: "Normal: plasma calcium is about 50% ionized, 40% protein-bound and 10% complexed, and the hormones control the ionized calcium at three sites: the gut, bone and kidney. Osteoblasts carry receptors for PTH, vitamin D3 and estrogen; osteoclasts carry the calcitonin receptor. The whole skeleton is replaced about every 7 years." },
+      text: "Normal: plasma calcium is about 50% ionized, 40% protein-bound and 10% complexed, and the hormones control the ionized calcium at three sites: the gut, bone and kidney. Calcium and phosphate usually move the same way; the one exception is the kidney under PTH. Osteoblasts carry receptors for PTH, vitamin D3 and estrogen; osteoclasts carry the calcitonin receptor (\"put a star by this\"). The whole skeleton is replaced about every 7 years." },
     high: { name: "calcium rises · PTH down", v: { pth: .08, d3: .12, ctn: .9, gut: .15, rca: .2, rp: .2, res: .1, ca: .88 }, en: "24", pit: "ok",
       trig: "Blood Ca²⁺ high", net: "Net: calcium falls back",
-      text: "Blood calcium rises: calcium stimulates the Gq-coupled calcium-sensing receptor, intracellular calcium rises, and that inhibits PTH secretion (\"PTH is different (need to know!)\": a rise in intracellular calcium normally stimulates secretion). The kidney's 24-hydroxylase makes inactive 24,25-(OH)2-D3 instead of calcitriol. The C cells release calcitonin, which inhibits osteoclasts. Calcium falls back." },
+      text: "Blood calcium rises: calcium stimulates the Gq-coupled calcium-sensing receptor, intracellular calcium rises, and that inhibits PTH secretion: \"the one caveat in endocrinology where a rise in intracellular calcium actually inhibits the secretory pathway.\" High calcium also dulls nerves: lethargy, weakness, sleepiness. The kidney's 24-hydroxylase makes inactive 24,25-(OH)2-D3 instead of calcitriol. The C cells release calcitonin, which inhibits osteoclasts. Calcium falls back." },
     hyper: { name: "primary hyperparathyroidism", v: { pth: .95, d3: .85, ctn: .75, gut: .85, rca: .9, rp: .9, res: .95, ca: .9 }, en: "1a", pit: "adenoma", stones: true,
       trig: "A parathyroid adenoma", net: "PTH high despite high Ca²⁺; phosphate low",
-      text: "Primary hyperparathyroidism: one or more parathyroid glands (hyperplasia or a benign tumor) make too much PTH: PTH high despite high calcium, with low phosphate. PTH drives bone resorption (bone pain, fractures, vertebral compression), and more calcium in the urine causes kidney stones. Treatment: calcitonin, bisphosphonates." },
+      text: "Primary hyperparathyroidism: one or more parathyroid glands (hyperplasia or a benign tumor) make too much PTH: PTH high despite high calcium, with low phosphate. It is the most common disorder of calcium regulation. High calcium brings lethargy, weakness and constipation; PTH drives bone resorption (bone pain, fractures, vertebral compression); and so much calcium is filtered that it spills over, meets phosphate and forms kidney stones, again and again. Treatment: calcitonin, and bisphosphonates, which bind hydroxyapatite so osteoclasts can't break it down." },
+    soda: { name: "high phosphate (lots of soda)", v: { pth: .5, d3: .12, ctn: .5, gut: .18, rca: .5, rp: .6, res: .5, ca: .4 }, en: "24", pit: "ok",
+      trig: "Blood phosphate high", net: "Less calcitriol: less calcium absorbed",
+      text: "The \"real thing\" or a bad thing? Sodas get their caramel color and fizz from phosphate. In a growing child who drinks a lot of it, hyperphosphatemia turns off renal 1α-hydroxylase and switches on 24-hydroxylase, so the child makes inactive 24,25-(OH)2-D3 instead of calcitriol, absorbs less calcium and phosphate from the gut, and has less to build hydroxyapatite for lengthening bones." },
+    meno: { name: "menopause · estrogen falls", v: { pth: .5, d3: .5, ctn: .5, gut: .5, rca: .5, rp: .5, res: .9, ca: .5 }, en: "both", pit: "ok", noE: true,
+      trig: "Estrogen falls", net: "Blood calcium normal, bone lost",
+      text: "Normally estrogen keeps bone breakdown in check by blocking PTH's ability to make osteoblasts activate osteoclasts. At menopause (around 50) estrogen drops off a cliff, the brake comes off, and resorption runs ahead of formation: osteoporosis, often first seen as dorsal kyphosis. Men are spared until andropause, around 75 to 80. Long-term glucocorticoids do something similar: they put osteoblasts \"in overdrive,\" continuously stimulating osteoclasts." },
   },
 };
 
@@ -63,7 +70,7 @@ function caSvg(v, key, t, D) {
   o += '<rect class="ca-tile" x="12" y="212" width="118" height="216" rx="10"/><rect class="ca-tile" x="141" y="212" width="118" height="216" rx="10"/><rect class="ca-tile" x="270" y="212" width="118" height="216" rx="10"/>';
   o += tx(71, 230, "kidney", "ca-head", "middle") + tx(200, 230, "gut", "ca-head", "middle") + tx(329, 230, "bone", "ca-head", "middle");
   /* kidney: distal tubule, Ca back to blood, phosphate to urine, the two hydroxylases */
-  o += '<g class="hot" data-info="Kidney: PTH increases calcium reabsorption in the distal tubule and decreases phosphate reabsorption, so phosphate is excreted (calcium and phosphate move opposite ways only here, which keeps calcium-phosphate salts from precipitating). PTH also turns on 1α-hydroxylase."><path class="ca-tube" d="M34 240V408H58V240Z"/><path class="ca-tubel" d="M46 244V404"/></g>';
+  o += '<g class="hot" data-info="Kidney: PTH increases calcium reabsorption in the distal tubule and decreases phosphate reabsorption, so phosphate is excreted (calcium and phosphate move opposite ways only here, “hint, hint, put a star by it”: it keeps them from meeting and forming kidney stones). PTH also turns on 1α-hydroxylase. Kidney disease can cut calcitriol production."><path class="ca-tube" d="M34 240V408H58V240Z"/><path class="ca-tubel" d="M46 244V404"/></g>';
   o += tx(46, 424, "urine", "ca-sm", "middle");
   o += flow(D.RCA, v.rca, "ca-ion", 1600, 4) + flow(D.RP, v.rp, "ca-po4", 1800, 4);
   if (sc.stones) o += '<path class="ca-stone" d="M40 372l6 -5l7 3l-1 7l-7 3l-6 -3Z"/><path class="ca-stone" d="M44 392l4 -3l5 2l-1 5l-5 1Z"/>';
@@ -74,15 +81,15 @@ function caSvg(v, key, t, D) {
   o += '<path class="ca-path" d="' + poly(D.D3) + '"/>' + flow(D.D3, v.d3, "ca-d3", 1400, 3, 3.4);
   /* gut: enterocyte with apical channel, calbindin and basolateral pump */
   o += '<rect class="ca-lumen" x="147" y="384" width="106" height="38" rx="6"/>' + tx(232, 412, "lumen", "ca-sm", "middle");
-  o += '<g class="hot" data-info="Enterocyte: calcitriol binds its receptor and turns on three things: apical calcium channels (calcium in from the lumen), calbindin (carries calcium across the cell so it doesn\'t interfere with signaling) and a basolateral active pump into the blood. It also raises phosphate absorption."><rect class="ca-cell" x="174" y="252" width="52" height="130" rx="8"/><ellipse class="ca-nuc" cx="190" cy="300" rx="11" ry="15"/></g>';
+  o += '<g class="hot" data-info="Enterocyte: calcitriol binds its receptor and turns on three things: apical calcium channels (calcium in from the lumen), calbindin (carries calcium across the cell so it doesn\'t interfere with signaling) and a basolateral active pump into the blood. Its receptor is intranuclear: it works by turning genes on. Phosphate absorption rises too (how is still being worked out)."><rect class="ca-cell" x="174" y="252" width="52" height="130" rx="8"/><ellipse class="ca-nuc" cx="190" cy="300" rx="11" ry="15"/></g>';
   o += '<rect class="ca-chan' + (v.gut > .66 ? " is-act" : "") + '" x="192" y="374" width="16" height="16" rx="4"/><path class="ca-pump' + (v.gut > .66 ? " is-act" : "") + '" d="M190 252a10 10 0 0 1 20 0Z"/>';
   o += flow(D.GUT, v.gut, "ca-ion", 2000, 5);
   /* bone: matrix, osteoblast (PTH receptor), osteoclast (calcitonin receptor) */
   o += '<path class="ca-bone" d="M276 372H322Q330 388 346 388Q362 388 368 372H382V422H276Z"/>';
   for (var l = 0; l < 3; l++) o += '<path class="ca-lam" d="M282 ' + (398 + l * 8) + "H376" + '"/>';
-  o += '<g class="hot" data-info="Osteoblasts build bone and carry the receptors for PTH, vitamin D3 and estrogen. PTH stimulates them to release paracrine factors that stimulate osteoclasts."><rect class="ca-ob" x="280" y="346" width="26" height="24" rx="5"/><circle class="ca-nuc" cx="293" cy="358" r="5"/></g>';
+  o += '<g class="hot" data-info="Osteoblasts build bone and carry the receptors for PTH, vitamin D3 and estrogen. PTH binds them, and they release paracrine cytokines and growth factors (RANK ligand among them) that activate osteoclasts. Estrogen blocks that signal; at menopause the brake is lost."><rect class="ca-ob" x="280" y="346" width="26" height="24" rx="5"/><circle class="ca-nuc" cx="293" cy="358" r="5"/></g>';
   var supp = v.res < .3;
-  o += '<g class="hot" data-info="Osteoclasts (myeloid lineage) resorb bone, releasing calcium and phosphate into the blood. They carry the calcitonin receptor: calcitonin inhibits them." opacity="' + (supp ? .55 : 1) + '"><path class="ca-oc" d="M318 360Q318 328 346 326Q376 328 378 360Q370 372 362 366Q354 374 346 368Q338 374 330 366Q322 372 318 360Z"/><circle class="ca-nuc" cx="334" cy="344" r="4.5"/><circle class="ca-nuc" cx="348" cy="340" r="4.5"/><circle class="ca-nuc" cx="362" cy="346" r="4.5"/></g>';
+  o += '<g class="hot" data-info="Osteoclasts come from the hematopoietic lineage, like monocytes and macrophages, and resorb bone, releasing calcium and phosphate into the blood. They have no PTH receptor (“It doesn’t”); they carry the calcitonin receptor: calcitonin stops bone turnover." opacity="' + (supp ? .55 : 1) + '"><path class="ca-oc" d="M318 360Q318 328 346 326Q376 328 378 360Q370 372 362 366Q354 374 346 368Q338 374 330 366Q322 372 318 360Z"/><circle class="ca-nuc" cx="334" cy="344" r="4.5"/><circle class="ca-nuc" cx="348" cy="340" r="4.5"/><circle class="ca-nuc" cx="362" cy="346" r="4.5"/></g>';
   o += flow(D.PARA, v.pth, "ca-para-d", 900, 2, 2.6);
   o += flow(D.BONE, v.res, "ca-ion", 1700, 4) + flow(D.BONE, v.res * .7, "ca-po4", 2100, 3);
   /* hormones on their way */
@@ -108,16 +115,17 @@ function caLabs(v, key, D) {
   });
   o += '<div class="hp-axis"><span>low</span><span>normal</span><span>high</span></div>';
   o += '<p class="hp-read"><b>' + sc.net + "</b></p>";
+  o += '<p class="ca-brake">Estrogen\'s brake on bone: <b>' + (sc.noE ? "off" : "on") + "</b></p>";
   return o + '<div class="ca-key"><span><i class="ca-k-ca"></i>Ca²⁺</span><span><i class="ca-k-p"></i>phosphate</span><span><i class="ca-k-pth"></i>PTH</span><span><i class="ca-k-d3"></i>calcitriol</span><span><i class="ca-k-ctn"></i>calcitonin</span></div>';
 }
 
 const svg = figureSvg({ width: W, height: H, className: "ca-svg", label: "Calcium control: the parathyroid and thyroid C cells above the blood, and the kidney, gut and bone below.", body: caSvg(D.SC.normal.v, "normal", 0, D) });
 const plate = plateHtml({ fig: "Fig 4", title: "Who moves blood calcium", hint: "pick a case · hover a part", readout: "normal", body: `<div class="hp-wrap"><div class="am-svg hp-box">${svg}</div><div class="hp-labs">${caLabs(D.SC.normal.v, "normal", D)}</div></div>` });
-const controls = `<div class="am-controls" role="group" aria-label="Case"><button type="button" class="am-btn" data-cacase="low" aria-pressed="false">Calcium falls</button><button type="button" class="am-btn" data-cacase="normal" aria-pressed="true">Normal</button><button type="button" class="am-btn" data-cacase="high" aria-pressed="false">Calcium rises</button><button type="button" class="am-btn" data-cacase="hyper" aria-pressed="false">Primary hyperparathyroidism</button></div>
+const controls = `<div class="am-controls" role="group" aria-label="Case"><button type="button" class="am-btn" data-cacase="low" aria-pressed="false">Calcium falls</button><button type="button" class="am-btn" data-cacase="normal" aria-pressed="true">Normal</button><button type="button" class="am-btn" data-cacase="high" aria-pressed="false">Calcium rises</button><button type="button" class="am-btn" data-cacase="hyper" aria-pressed="false">Primary hyperparathyroidism</button><button type="button" class="am-btn" data-cacase="soda" aria-pressed="false">High phosphate (soda)</button><button type="button" class="am-btn" data-cacase="meno" aria-pressed="false">Menopause</button></div>
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Hover or tap the chief cells, the receptor, the C cells, the tubule, the hydroxylases, the enterocyte, the osteoblast or the osteoclast.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>Everything here is from the L10 notes (Dr. Galin's slides and speaker notes; the lecture recording isn't in yet): the calcium-sensing receptor paradox, PTH on kidney and bone, the two hydroxylases and what turns each on, calcitriol in the enterocyte, calcitonin, and primary hyperparathyroidism.</li>
+<li>Everything here is from the L10 notes (Dr. Galin's slides and his 10/27 lecture): the calcium-sensing receptor paradox, PTH on kidney and bone (through the osteoblast), the kidney as the one place calcium and phosphate part ways, the two hydroxylases and what turns each on, calcitriol in the enterocyte, calcitonin, estrogen's brake, the soda example and primary hyperparathyroidism.</li>
 <li>Schematic and qualitative: levels are low / normal / high, not lab values; one tile per site, not to scale. Vitamin D's skin and liver steps (UV light, 25-hydroxylation) aren't drawn. Educational, not medical advice.</li></ul></details>`;
 
 function caLive(root, D) {
@@ -179,6 +187,7 @@ const CSS = `
 .anima .ca-svg .ca-bone{fill:var(--he-bone);stroke:var(--he-bone-line);stroke-width:1.2}
 .anima .ca-svg .ca-lam{stroke:var(--he-bone-line);stroke-width:.8;opacity:.6}
 .anima .ca-svg .ca-ob{fill:var(--he-cyto);stroke:var(--he-mem);stroke-width:1.4}
+.anima .ca-brake{margin:6px 0 0;font-size:12px;color:var(--anatomy-muted)}
 .anima .ca-svg .ca-oc{fill:var(--he-cyto);stroke:var(--he-nuc-line);stroke-width:1.6}
 .anima .ca-svg .ca-ion{fill:var(--he-ca)}
 .anima .ca-svg .ca-po4{fill:var(--he-k)}
@@ -202,7 +211,7 @@ export function calcium() {
   return {
     id: "calcium", lec: "calcium",
     title: "Who moves blood calcium",
-    caption: "Let blood calcium fall or rise, or switch on a parathyroid adenoma, and follow PTH, calcitriol and calcitonin to the kidney, gut and bone.",
+    caption: "Let blood calcium fall or rise, switch on a parathyroid adenoma, or try a soda habit or menopause, and follow PTH, calcitriol and calcitonin to the kidney, gut and bone.",
     html: `<div class="anima" data-anima="calcium">${plate}${controls}${SOURCES}</div>`,
     css: CSS,
     live: caLive.toString(),

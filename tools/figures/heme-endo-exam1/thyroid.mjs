@@ -2,34 +2,37 @@
 // schematic section through the wall of a follicle: the colloid on top, one follicular cell (apical membrane with
 // pendrin, thyroperoxidase and megalin; basolateral membrane with NIS) between two neighbors, and a capillary below.
 // Step through the seven steps as the L4 notes give them; a selector shows where methimazole/PTU and an iodide load
-// act (L4 Wolff-Chaikoff, L8 iodides). Numbers are only the notes' own (20-50x, about 90% T4 / 10% T3). Schematic.
+// act (L4 Wolff-Chaikoff, L8 iodides), and what low iodide does. The 10/27-posted recording of L4 added sodium riding in
+// with iodide, the TSH receptor's NADPH -> H2O2 supply for thyroperoxidase, and the deiodinases in the tissues.
+// Numbers are only the notes' own (20-50x, about 90% T4 / 10% T3). Schematic.
 import { figureSvg, plateHtml } from "./shared.mjs";
 
 const W = 640, H = 430;
 const D = {
   W, H, AP: 128, BL: 330, X0: 176, X1: 464,
-  NIS: [232, 330], PEN: [250, 128], TPO: [322, 128], TGX: [392, 128], MEG: [432, 128], NUC: [300, 272], LYS: [392, 236],
+  NIS: [232, 330], TSHR: 200, PEN: [250, 128], TPO: [322, 128], TGX: [392, 128], MEG: [432, 128], NUC: [300, 272], LYS: [392, 236],
   STEPS: [
-    "Ready: the wall of a follicle. Follicular cells line the colloid; thyroid hormone is made outside the cell, in the colloid. Step through.",
-    "1. Iodide trapping: the sodium-iodide symporter (NIS) on the basolateral membrane pumps iodide in, driven by the sodium gradient, concentrating it 20 to 50 times above plasma.",
+    "Ready: the wall of a follicle. Follicular cells line the colloid; thyroid hormone is the only endocrine hormone made outside the cell, in the colloid. TSH reaches the basolateral side (a Gs receptor) and speeds every step. Step through.",
+    "1. Iodide trapping: the sodium-iodide symporter (NIS) on the basolateral membrane carries sodium and iodide in together. Sodium runs down its gradient and drags iodide in against its own, concentrating it 20 to 50 times above plasma (the slides; \"tens to hundreds of times\" in the lecture).",
     "2. Thyroglobulin: the cell makes thyroglobulin (Tg) and secretes it into the colloid. Its tyrosines are the substrate, and it stores the hormones and iodine in the follicle.",
-    "3. Iodide to iodine: iodide crosses the apical membrane through pendrin, and thyroperoxidase oxidizes it to iodine, which needs H2O2.",
-    "4. Organification and coupling: thyroperoxidase adds iodine to thyroglobulin's tyrosines (MIT, DIT), then couples them: MIT + DIT = T3, DIT + DIT = T4, still attached to thyroglobulin.",
+    "3. Iodide to iodine (alphabetical order): iodide crosses the apical membrane through pendrin, and thyroperoxidase oxidizes it to iodine. Its substrate is H2O2, made with the NADPH that TSH's glucose oxidation supplies.",
+    "4. Organification and coupling: thyroperoxidase adds iodine to thyroglobulin's tyrosines (MIT, DIT), then couples them: MIT + DIT = T3, DIT + DIT = T4, still attached to thyroglobulin. Three jobs for one enzyme.",
     "5. Endocytosis: the cell takes colloid back in through megalin, the thyroglobulin receptor.",
-    "6. Proteolysis: lysosomes digest thyroglobulin, freeing T4 (about 90%) and T3 (about 10%).",
-    "7. Secretion and recycling: free T4 and T3 diffuse into the blood; leftover MIT and DIT are deiodinated so their iodine is reused.",
+    "6. Proteolysis: lysosomes digest thyroglobulin, freeing T4 (about 90%) and T3 (about 10%). It's messy: leftover thyroglobulin, MIT and DIT remain. This is the only time T4 and T3 are inside the cell.",
+    "7. Secretion and recycling: free T4 and T3 cross into the blood; leftover MIT and DIT are deiodinated so their iodine is reused. In the tissues, 5'-deiodinase (outer ring) turns T4 into active T3, and 5-deiodinase (inner ring) makes inactive reverse T3.",
   ],
   DRUGS: {
     none: "",
     thio: "Methimazole and PTU interfere with iodination of thyroglobulin's tyrosines and with coupling (step 4), so no new T3 or T4 is made. PTU also blocks T4 to T3 conversion in the tissues.",
-    iodide: "A large iodide load blocks organification for a while (the Wolff-Chaikoff effect) and lowers NIS; the gland escapes it. Given as a drug (Lugol's solution), iodide also inhibits hormone release (step 7): used before thyroid surgery and in thyroid storm.",
+    iodide: "A large iodide load blocks organification for a while (the Wolff-Chaikoff effect) and lowers NIS; the gland escapes it. Before antithyroid drugs it was a treatment for hyperthyroidism. Given as a drug (Lugol's solution), iodide also inhibits hormone release (step 7): used before thyroid surgery and in thyroid storm.",
+    lowiod: "Low iodide: NIS speeds up and traps iodide faster, keeping hormone production going. If iodide stays too low, T4 and T3 fall, TSH rises, and TSH's growth signal (hypertrophy and hyperplasia) enlarges the gland: a goiter.",
   },
 };
 
 /* which steps run, and which a drug blocks */
 function thState(s, drug) {
   var k = Math.floor(s + 1e-6), blk4 = drug === "thio" || drug === "iodide", blk7 = drug === "iodide";
-  return { k: k, iod: k >= 1, tg: k >= 2, pen: k >= 3, org: k >= 4 && !blk4, blk4: blk4 && k >= 4, endo: k >= 5, lys: k >= 6, rel: k >= 7 && !blk7, blk7: blk7 && k >= 7, hormone: k >= 4 && !blk4 };
+  return { low: drug === "lowiod", k: k, iod: k >= 1, tg: k >= 2, pen: k >= 3, org: k >= 4 && !blk4, blk4: blk4 && k >= 4, endo: k >= 5, lys: k >= 6, rel: k >= 7 && !blk7, blk7: blk7 && k >= 7, hormone: k >= 4 && !blk4 };
 }
 
 function thSvg(s, drug, t, D) {
@@ -67,7 +70,9 @@ function thSvg(s, drug, t, D) {
   for (var er = 0; er < 3; er++) o += '<path class="th-er" d="M' + (270) + " " + (166 + er * 9) + "q12 -6 24 0t24 0t24 0" + '"/>';
   o += "</g>";
   /* step 1: iodide from the blood through NIS into the cell */
-  if (S.iod) for (var i1 = 0; i1 < 4; i1++) { var q = along([[D.NIS[0], 392], [D.NIS[0], BL], [D.NIS[0] - 8, 268], [D.PEN[0] - 6, 176]], ph(2400, i1 / 4)); o += ion(q[0], q[1], "th-i"); }
+  if (S.iod) for (var i1 = 0; i1 < 4; i1++) { var q = along([[D.NIS[0], 392], [D.NIS[0], BL], [D.NIS[0] - 8, 268], [D.PEN[0] - 6, 176]], ph(S.low ? 1100 : 2400, i1 / 4)); o += ion(q[0], q[1], "th-i"); }
+  /* sodium rides in with each iodide (symport), then stays in the cytoplasm */
+  if (S.k === 1) for (var n1 = 0; n1 < 3; n1++) { var qn = along([[D.NIS[0] + 10, 392], [D.NIS[0] + 10, BL], [D.NIS[0] + 22, 288]], ph(S.low ? 1100 : 2400, n1 / 3 + .1)); o += ion(qn[0], qn[1], "th-na", 2.6); }
   /* step 2: a thyroglobulin vesicle from the Golgi to the apical membrane */
   if (S.k === 2) { var q2 = along([[382, 178], [388, 150], [D.TGX[0], AP + 6]], ph(1800)); o += '<circle class="th-ves" cx="' + f(q2[0]) + '" cy="' + f(q2[1]) + '" r="8"/>'; }
   /* step 3: iodide out through pendrin into the colloid, to thyroperoxidase */
@@ -94,6 +99,9 @@ function thSvg(s, drug, t, D) {
   o += '<g class="hot" data-info="Thyroperoxidase (TPO): on the apical surface, facing the colloid. It oxidizes iodide to iodine (needs H2O2), iodinates thyroglobulin\'s tyrosines and couples MIT and DIT. Methimazole and PTU act here."><path class="th-prot th-tpo' + (S.k === 3 || S.k === 4 ? " is-act" : "") + '" d="M' + (T[0] - 16) + " " + (T[1] + 8) + "V" + (T[1] - 6) + "Q" + T[0] + " " + (T[1] - 26) + " " + (T[0] + 16) + " " + (T[1] - 6) + "V" + (T[1] + 8) + 'Z"/>' + (S.blk4 ? cross(T[0], T[1] - 22) : "") + "</g>";
   o += '<g class="hot" data-info="Megalin: the thyroglobulin receptor that lets the cell take colloid back in by endocytosis."><path class="th-prot' + (S.k === 5 ? " is-act" : "") + '" d="M' + (Mg[0] - 12) + " " + (Mg[1] + 10) + "V" + (Mg[1] - 4) + "L" + Mg[0] + " " + (Mg[1] - 14) + "L" + (Mg[0] + 12) + " " + (Mg[1] - 4) + "V" + (Mg[1] + 10) + 'Z"/></g>';
   if (S.blk7) o += cross(D.LYS[0] + 22, BL);
+  o += '<g class="hot" data-info="TSH receptor (Gs): cAMP and protein kinase A turn up NIS, thyroglobulin, pendrin, thyroperoxidase and megalin, and drive glucose oxidation and NADPH, which make the H2O2 thyroperoxidase needs. Its growth signal (hypertrophy, hyperplasia) is why a goiter forms. In Graves disease, antibodies switch it on."><path class="th-prot th-tshr" d="M' + (D.TSHR - 8) + " " + (BL + 10) + "V" + (BL - 8) + "Q" + D.TSHR + " " + (BL - 20) + " " + (D.TSHR + 8) + " " + (BL - 8) + "V" + (BL + 10) + 'Z"/></g>';
+  if (S.pen) o += '<path class="th-recyc" d="M' + D.TSHR + " " + (BL - 22) + "Q" + (D.TSHR + 36) + " 210 " + (D.TPO[0] - 4) + " " + (AP + 14) + '"/>' + tx(D.X0 - 8, 214, "NADPH → H₂O₂", "th-key", "end");
+  if (S.rel && S.hormone) o += tx(330, 388, "in the tissues: T4 → T3 (5′-deiodinase) or rT3 (5-deiodinase)", "th-key-h", "middle");
   /* capillary */
   o += '<path class="th-cap hot" data-info="Capillary: iodide comes in from the blood, and T4 and T3 leave into it. In the blood, more than 99% is bound to thyroxine-binding globulin, transthyretin and albumin." d="M14 346H626Q636 346 636 356V408Q636 418 626 418H14Q4 418 4 408V356Q4 346 14 346Z"/>';
   for (var r = 0; r < 5; r++) o += '<ellipse class="th-rbc" cx="' + (60 + r * 128) + '" cy="' + (r % 2 ? 396 : 372) + '" rx="13" ry="6"/>';
@@ -104,8 +112,10 @@ function thSvg(s, drug, t, D) {
   o += lab("megalin", 500, 100, Mg[0] + 8, Mg[1] - 10, "start");
   o += lab("lysosome", 500, 250, D.LYS[0] + 24, D.LYS[1] + 6, "start");
   o += lab("nucleus", 470, 300, D.NUC[0] + 40, D.NUC[1] + 10, "start");
+  o += lab("TSH receptor", 150, 318, D.TSHR - 6, BL - 8, "end");
   o += tx(596, 412, "capillary", "th-mut", "end");
   if (S.pen) o += tx(T[0] + 22, T[1] - 30, "H₂O₂", "th-key", "start");
+  if (S.k === 1) o += tx(D.NIS[0] + 28, 318, "Na⁺", "th-key-na", "start");
   if (S.hormone) o += tx(612, 112, "T4 · T3 on Tg", "th-key-h", "end");
   return o;
 }
@@ -114,12 +124,12 @@ const svg = figureSvg({ width: W, height: H, className: "th-svg", label: "The wa
 const plate = plateHtml({ fig: "Fig 2", title: "Making thyroid hormone", hint: "step through · hover a part", readout: "ready", body: `<div class="am-svg th-box">${svg}</div>` });
 const controls = `<div class="am-controls"><label class="am-slider"><span>ready</span><input type="range" min="0" max="7" step="1" value="0" aria-label="Step, from ready to step 7"><span>step 7</span></label></div>
 <div class="am-controls"><button type="button" class="am-btn" data-thstep="-1">Back</button><button type="button" class="am-btn" data-thstep="1">Next step</button><button type="button" class="am-btn" data-thplay aria-pressed="false">Play</button></div>
-<div class="am-controls" role="group" aria-label="Drug"><button type="button" class="am-btn" data-thdrug="none" aria-pressed="true">No drug</button><button type="button" class="am-btn" data-thdrug="thio" aria-pressed="false">Methimazole or PTU</button><button type="button" class="am-btn" data-thdrug="iodide" aria-pressed="false">Iodide load</button></div>
+<div class="am-controls" role="group" aria-label="Drug or iodide supply"><button type="button" class="am-btn" data-thdrug="none" aria-pressed="true">No drug</button><button type="button" class="am-btn" data-thdrug="thio" aria-pressed="false">Methimazole or PTU</button><button type="button" class="am-btn" data-thdrug="iodide" aria-pressed="false">Iodide load</button><button type="button" class="am-btn" data-thdrug="lowiod" aria-pressed="false">Low iodide</button></div>
 <p class="am-summary" aria-live="polite"></p>
-<p class="am-info">Hover or tap NIS, pendrin, thyroperoxidase, megalin, the colloid, the nucleus or the capillary.</p>`;
+<p class="am-info">Hover or tap NIS, pendrin, thyroperoxidase, megalin, the TSH receptor, the colloid, the nucleus or the capillary.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>The seven steps, the proteins at each and the numbers (20-50x, about 90% T4 and 10% T3) are from the L4 notes (Dr. Galin's slides); the drug actions are from the L4 (Wolff-Chaikoff) and L8 (Dr. Fasinu) notes.</li>
-<li>Schematic: one cell between two neighbors, not to scale; thyroglobulin is drawn as a short bead chain. TSH (through a Gs receptor on the basolateral side) speeds every step; it isn't drawn. Educational, not medical advice.</li></ul></details>`;
+<li>The seven steps, the proteins at each and the numbers (20-50x, about 90% T4 and 10% T3) are from the L4 notes (Dr. Galin's slides and the recording of his lecture: sodium riding in with iodide, TSH's NADPH and H2O2, low iodide speeding NIS, the deiodinases); the drug actions are from the L4 (Wolff-Chaikoff) and L8 (Dr. Fasinu) notes.</li>
+<li>Schematic: one cell between two neighbors, not to scale; thyroglobulin is drawn as a short bead chain; the TSH receptor is drawn but TSH itself isn't. Educational, not medical advice.</li></ul></details>`;
 
 function thLive(root, D) {
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
@@ -131,6 +141,7 @@ function thLive(root, D) {
     var S = D.thState(s, drug), txt = D.STEPS[S.k];
     if ((S.blk4 && S.k === 4) || S.blk7) txt = "Blocked here. " + D.DRUGS[drug];
     else if (S.blk4) txt = txt + " With the drug on, thyroglobulin carries no new T4 or T3.";
+    else if (drug === "lowiod" && (S.k === 0 || S.k === 1)) txt = (S.k ? txt + " " : "") + D.DRUGS.lowiod;
     else if (drug !== "none" && !S.k) txt = D.DRUGS[drug] + " Step through to see where.";
     if (sum.textContent !== txt) sum.textContent = txt;
     if (readout) readout.textContent = (S.blk4 && S.k === 4) || S.blk7 ? NAMES[S.k] + " blocked" : S.blk4 ? NAMES[S.k] + " · no new T4/T3" : NAMES[S.k];
@@ -173,6 +184,8 @@ const CSS = `
 .anima .th-svg .th-golgi,.anima .th-svg .th-er{fill:none;stroke:var(--he-cyto-line);stroke-width:2;stroke-linecap:round}
 .anima .th-svg .th-i{fill:var(--he-nuc)}
 .anima .th-svg .th-i0{fill:var(--anatomy-lit)}
+.anima .th-svg .th-na{fill:var(--he-glu)}
+.anima .th-svg .th-key-na{fill:var(--he-glu);font-weight:600;font-size:11px}
 .anima .th-svg .th-ves{fill:var(--he-colloid);stroke:var(--he-cyto-line);stroke-width:1.4}
 .anima .th-svg .th-drop{fill:var(--he-colloid);stroke:var(--he-cyto-line);stroke-width:1.4}
 .anima .th-svg .th-lyso{fill:var(--he-nuc-line);opacity:.8}
@@ -188,7 +201,7 @@ export function thyroid() {
   return {
     id: "thyroid", lec: "thyroid",
     title: "Making thyroid hormone, step by step",
-    caption: "Step through the seven steps in a follicular cell, from iodide trapping to secretion, and see where methimazole or PTU and an iodide load act.",
+    caption: "Step through the seven steps in a follicular cell, from iodide trapping to secretion, and see where methimazole or PTU and an iodide load act, and what low iodide does.",
     html: `<div class="anima" data-anima="thyroid">${plate}${controls}${SOURCES}</div>`,
     css: CSS,
     live: thLive.toString(),
