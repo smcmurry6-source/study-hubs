@@ -32,9 +32,10 @@ const D = {
 
 /* what the cell is doing at step s (0..6) with high or low glucose and with or without a sulfonylurea */
 function btState(s, glu, su) {
-  var k = Math.floor(s + 1e-6), inG = glu && k >= 1, atp = glu && k >= 2;
+  /* GLUT2 carries glucose in proportion to blood glucose, so some always enters; low glucose = a trickle and too little ATP */
+  var k = Math.floor(s + 1e-6), inG = k >= 1, atp = glu && k >= 2, lowAtp = !glu && k >= 2;
   var closed = (atp && k >= 3) || (su && k >= 3), depol = closed && k >= 4, ca = depol && k >= 5, rel = ca && k >= 6;
-  return { k: k, inG: inG, atp: atp, closed: closed, depol: depol, ca: ca, rel: rel };
+  return { k: k, inG: inG, atp: atp, lowAtp: lowAtp, closed: closed, depol: depol, ca: ca, rel: rel };
 }
 
 function btSvg(s, glu, su, t, D) {
@@ -66,9 +67,11 @@ function btSvg(s, glu, su, t, D) {
     o += '<g class="bt-gran-g hot" data-info="Secretory granules: insulin stored in a complex with zinc, together with the C-peptide cut from proinsulin. They are secreted together, 1:1."><circle class="bt-gran" cx="' + f(x) + '" cy="' + f(y) + '" r="10"/><circle class="bt-core" cx="' + f(x) + '" cy="' + f(y) + '" r="4.6"/></g>';
   });
   /* glucose comes in through GLUT2 and goes to the mitochondrion */
-  if (S.inG) { var GP = [[148, 356], [148, 322], [156, 286], [176, 230], [196, 186]]; for (var e = 0; e < 3; e++) { var q = along(GP, ph(2200, e / 3)); o += hex(q[0], q[1], 5); } }
+  if (S.inG) { var GP = [[148, 356], [148, 322], [156, 286], [176, 230], [196, 186]], ne = glu ? 3 : 1; for (var e = 0; e < ne; e++) { var q = along(GP, ph(glu ? 2200 : 3600, e / ne)); o += hex(q[0], q[1], 5); } }
   /* ATP to the K-ATP channel */
   if (S.atp) { var AP = [[238, 152], [262, 112], [286, 78], [298, 50]]; for (var a2 = 0; a2 < 4; a2++) { var qa = along(AP, ph(1800, a2 / 4)); o += '<circle class="bt-atp" cx="' + f(qa[0]) + '" cy="' + f(qa[1]) + '" r="3.6"/>'; } }
+  /* low glucose: a little ATP is made but the ratio stays too low to reach and close K-ATP */
+  if (S.lowAtp) { var qa0 = along([[238, 152], [250, 131], [262, 112]], ph(3000)); o += '<circle class="bt-atp" cx="' + f(qa0[0]) + '" cy="' + f(qa0[1]) + '" r="3.6" opacity="' + f(1 - ph(3000)) + '"/>'; }
   /* K+ leaves through the open K-ATP channel */
   if (!S.closed) for (var kk = 0; kk < 3; kk++) { var qk = along([[300, 92], [300, 40], [300, 4]], ph(1500, kk / 3)); o += '<circle class="bt-k" cx="' + f(qk[0]) + '" cy="' + f(qk[1]) + '" r="3.4"/>'; }
   /* Ca2+ comes in through the voltage-dependent channel toward the granules */
@@ -119,11 +122,13 @@ function btLive(root, D) {
   var s = 0, glu = true, su = false, frame = 0, playing = false, timer = 0, visible = true, t0 = performance.now();
   function text() {
     var S = D.btState(s, glu, su), k = S.k, txt = D.STEPS[k];
-    if (k >= 2 && !glu && !su) txt = "With low glucose little enters, ATP stays low, K-ATP stays open and K+ keeps leaving: the cell stays at rest and doesn't release insulin.";
+    if (k === 1 && !glu) txt = "1. With low glucose only a trickle enters: GLUT2 carries glucose in proportion to blood glucose.";
+    else if (k >= 2 && !glu && !su) txt = "With low glucose little enters, ATP stays low, K-ATP stays open and K+ keeps leaving: the cell stays at rest and doesn't release insulin.";
+    else if (k === 2 && su && !glu) txt = "With low glucose only a trickle enters and ATP stays low, so ATP alone won't close K-ATP.";
     else if (k >= 3 && su && !glu) txt = "A sulfonylurea closes the K-ATP channel directly, so the cell depolarizes, opens its Ca2+ channels and releases insulin even without the glucose signal. " + (k >= 4 ? "Then " + D.STEPS[k].charAt(3).toLowerCase() + D.STEPS[k].slice(4) : "");
     else if (k >= 3 && su) txt += " The sulfonylurea closes the same channels.";
     if (sum.textContent !== txt) sum.textContent = txt;
-    if (readout) readout.textContent = k === 0 ? (glu ? "glucose high" : "glucose low") : (S.rel ? "insulin out" : S.ca ? "Ca²⁺ in" : S.depol ? "depolarized" : S.closed ? "K-ATP closed" : S.atp ? "ATP:ADP up" : S.inG ? "glucose in" : "at rest");
+    if (readout) readout.textContent = k === 0 ? (glu ? "glucose high" : "glucose low") : (S.rel ? "insulin out" : S.ca ? "Ca²⁺ in" : S.depol ? "depolarized" : S.closed ? "K-ATP closed" : S.atp ? "ATP:ADP up" : S.lowAtp ? "ATP:ADP low" : S.inG ? (glu ? "glucose in" : "a little glucose in") : "at rest");
   }
   function draw(now) { svg.innerHTML = D.btSvg(s, glu, su, reduce.matches ? 0 : now - t0, D); }
   function loop(now) { draw(now); frame = visible && !reduce.matches ? requestAnimationFrame(loop) : 0; }
