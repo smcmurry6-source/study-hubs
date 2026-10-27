@@ -345,7 +345,7 @@
      tapping it opens the full set. */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
     "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
-    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3" };
+    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1" };
   function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -357,6 +357,7 @@
      "l" = a dark detail line on top). Hubs without an entry get the tooth. */
   var TOOTH = [["f", "M7.2 4.6c-1.8 0-3 1.4-3 3.4 0 2.2 1.2 3.2 1.6 5 .4 2.2.8 4.6 1.8 4.6s1.4-2.2 1.6-3.6c.2-.8.6-1.2 1.8-1.2s1.6.4 1.8 1.2c.2 1.4.6 3.6 1.6 3.6s1.4-2.4 1.8-4.6c.4-1.8 1.6-2.8 1.6-5 0-2-1.2-3.4-3-3.4-1.6 0-2.4.8-4.8.8s-3-.8-4.8-.8z"]];
   var HUB_MEDAL = {
+    "heme-endo-exam1": { rib: ["#6B3FA0", "#E86A9E"], g: [["f", "M11.2 13.6C10.8 8.6 9.4 4.4 7.2 4.4 4.6 4.4 4 9 4.9 12.7c.9 3.5 3.6 5.2 5.9 3.9z"], ["f", "M12.8 13.6c.4-5 1.8-9.2 4-9.2 2.6 0 3.2 4.6 2.3 8.3-.9 3.5-3.6 5.2-5.9 3.9z"], ["f", "M10 12.4h4v3.4h-4z"]] },
     "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
     "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },
     "msk-exam3":    { rib: ["#6B5B95", "#D9C79A"], g: [["s", "M8 16 16 8"], ["f", "M5.2 14.9a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"], ["f", "M14.9 5.2a2.1 2.1 0 1 1 3.9 3.9 2.1 2.1 0 1 1-3.9-3.9z"]] },
@@ -568,7 +569,7 @@
      track(profile) compares the rank with the last one this device saw (sh_rank_tier / sh_rank_step) and plays the
      full cutscene for a new rank (Silver -> Gold) or the smaller coin flip for a new level (Gold I -> Gold II).
      The hub widget and the dashboard both call it, so a rank-up shows on whichever page sees it first. It waits for
-     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Surprises off skips it. */
+     a visible tab and for opt.busy() (a mock exam) to be false; Settings -> Extras -> Rank-up and trophy cards off skips it. */
   var RANKUP_SRC = (function(){
     var src = (document.currentScript && document.currentScript.src) || "";
     if (!src) { var el = document.querySelector('script[src*="ranks.js"]'); src = el ? el.src : ""; }
@@ -604,7 +605,7 @@
     var have = Object.keys(kinds).sort().join(","), seen = ls("sh_trophy_seen");
     if (have === seen) return;
     ls("sh_trophy_seen", have);
-    if (seen === null || (ls("sh_pref_eggs") || "on") === "off") return;
+    if (seen === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     var old = {}; seen.split(",").forEach(function(k){ old[k] = 1; });
     TROPHIES.forEach(function(tr){ if (!tr.secret && kinds[tr.k] && !old[tr.k]) playRankUp("trophy", trophyCard(tr), busy); });
   }
@@ -614,7 +615,7 @@
     trackTrophies(p, opt.busy);
     var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
     ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
-    if (pt === null || (ls("sh_pref_eggs") || "on") === "off") return;
+    if (pt === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     pt = +pt; ps = ps === null ? NaN : +ps;
     var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
     var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
@@ -786,12 +787,12 @@
       }
     }
     function hubTrophyCard(k){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
       playRankUp("trophy", trophyCard({ k: t.k, n: t.n, d: t.d + " (" + hubName(H.hub) + ")", ic: t.ic }), mockBusy);
     }
     function masteryToast(i){
-      if (H.prefGet("sh_pref_eggs", "on") === "off") return;
+      if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       playRankUp("trophy", masteryCard(i, H.hub), mockBusy);
     }
 

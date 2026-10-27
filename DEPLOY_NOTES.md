@@ -109,6 +109,81 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 (Occlusion switches to the final: L6 Occlusal Instrumentation, Claude Code)** — Sam: "Occlusion can now
+  switch to final exam." The final (Thu Nov 19) is not comprehensive: Dr. Givan's lectures from 10/22 on, building on the
+  midterm material; its time and format aren't announced yet (update `EXAM_INFO` and the mock clock when they are). New
+  **L6 `instruments`**, "Occlusal Instrumentation: Articulators, Facebows and Records" (`exam:'final'`; L1-L5 now carry
+  `exam:'midterm'`), from the Drive Final folder (Occ Lec4 slides + handout, the 10/22 lecture capture): notes at both levels
+  and both mp3s (`audio/instruments-full.mp3`, 27.6 min; `-plain`, 9.3 min), 92 questions (`in-*`, `cs-in-*` on 3 new Patient
+  Box cases `incrown`/`inrehab`/`inhigh`, 8 two-statement, 10 true/false (6 True), 1 select-all, 1 ordering, 2 EXCEPT; each with
+  its why; correct answer longest in 26% of L6's MCQs), 17 exam hints quoted from the recording (two de-emphasized: the slide's
+  "Not on test" Handulator, and balanced-denture SCI), a cram list, a Review tab (articulator kinds, the records, where mounting
+  errors show, MIP record rules, Dr. Givan's selection table, 3 processes) and 2 sort sets. Bank 418 → 510. **The hub now leans to
+  the final**: `isFinalLec()` / `lecOrder()`; notes and hints list the final's lectures first under "Final" / "Midterm" labels;
+  the bank's lecture filter gains "For the final" (default) and "Midterm lectures"; the quick-start count, Daily Drill pool and
+  mock (`MOCK_BLUEPRINT = { instruments:20 }`, clock at the midterm's 80 s a question) use the final's lectures only; the exam
+  card and hints banner describe the final. Returning visitors are moved once (`STATE.ui.finalOn`: L6, bank scope final, the
+  closed-card flag and any old mock cleared). Titles: "Occlusion Final Hub" (dashboard card, `<title>`, ribbon); recap label
+  "Occlusion". The midterm Timmy Time episode stays (dashboard row now "The midterm review"). **Each new final lecture: add it
+  with `exam:'final'` and to `MOCK_BLUEPRINT`, and update `EXAM_INFO`.** Diagram review for L6 still to be put to Sam.
+
+- **2026-10-27 (Heme & Endo Exam 1: six animated diagrams, Claude Code)** — Sam: "Yes to all animations." Built with the
+  anima skill in `tools/figures/heme-endo-exam1/` (`build.mjs` fills the hub's `anima:js` / `anima:css` markers; `--check`,
+  `--preview`), each from the hub's own notes: **beta** (L5: glucose → GLUT2 → ATP → K-ATP closes → depolarization → Ca2+ →
+  insulin, low glucose and sulfonylurea toggles), **thyroid** (L4: the seven synthesis steps in a follicular cell; methimazole/PTU
+  and an iodide load show where they block), **hpa** (L2/L6/L7: normal, Addison's, Cushing's disease, adrenal tumor, prednisone
+  on / stopped suddenly / tapered; feedback loops, α-MSH on the skin, an HTML lab panel that reads primary vs secondary),
+  **calcium** (L10: calcium falls / rises / primary hyperparathyroidism; CaSR on chief cells, PTH on kidney and bone, 1α- vs
+  24-hydroxylase, calcitriol in the enterocyte, calcitonin on osteoclasts), **pituitary** (L1/L2: the portal route with a
+  releasing-hormone picker lighting its target cell, and the long-axon route with Herring bodies and pituicytes) and **adrenal**
+  (L6/L9: zones with their shares, cortex-to-medulla blood flow, a stress response turning on PNMT). In the notes via `FIG_PLACE`
+  (each at the end of the section it explains, both levels; `data-sh-noread`, so narration is unchanged) and in Review (a `figs`
+  section in each lecture's tab). Levels are qualitative (no lab values); `calcium` reuses the lab-panel CSS `hpa` defines. No
+  SVG ids, so copies don't clash. About page (Diagrams). No questions or notes text changed; no schema change.
+
+- **2026-10-27 (new hub: Heme & Endo Exam 1, with its own Home page, Claude Code)** — `hubs/heme-endo-exam1/` for DENT 2160
+  Hematology & Endocrinology Exam 1 (Fri Oct 30, 8:00-9:30 am dental, 55 MCQ, in person on Canvas with LockDown Browser,
+  lectures 1-10), built on the Occlusion engine (without its figure kit: `FIGS`/`ANIMA` are empty stubs) with a new palette
+  ("H&E"; Young Serif / Atkinson Hyperlegible / Spline Sans Mono). Sources (Drive, Heme/Endo Exam 1 folder): every slide deck,
+  the 10/20 (L1, L2) and 10/23 (L5-L8) recordings, transcribed in-session. **The 10/21 recordings (L3 Growth, L4 Thyroid) have
+  no sound**, so those two and L9/L10 (10/27) are `status:'slides'` ("Slides only"): when their recordings arrive, flip to
+  `taught`, add exam hints, rewrite the notes and regenerate both mp3s. **Not used, by the syllabus rule:** last year's D3
+  "Endocrinology Exam 1" study doc and D3 Anki deck (they reproduce last year's graded quizzes and crossword), this year's
+  Quizzes 1-2 (open until Oct 29), and the password-protected Quizlet folder (quizlet.com blocks this container). 508 questions
+  (src `slides` / `rec` / `class` = the professors' own in-class cases, rewritten / `hub`), each with its why; 49 two-statement,
+  80 true/false (46 True) and 17 **numbered-statement** items (`fmt:'numbered'`, "Which statements are true? 1-4", combinations
+  in a fixed canonical order via `choiceOrder`, keys spread over all four positions; Question Bank format filter), Patient Box
+  cases (Dr. Fasinu's lab-value style), EXCEPT items; correct answer longest in 19%. Notes at two levels with Kokoro narration
+  for all 10, 36 exam hints quoted from the recordings, cram sheet, Review (each lecture's own note tables via `NOTE_TABLES`
+  plus written tables, a Side by side tab: reading labs, which receptor, look-alikes), a 55-question / 90-minute mock.
+  **Home mode** (Sam: "its own dashboard/homepage"): a fourth mode, the default, `renderHome()`: live countdown, exam facts,
+  the quiz-deadline alert (until `QUIZ_DUE`), a readiness ring (right on latest try), quick start, the exam card, Where to next
+  (weakest lecture, misses, unstarted lecture), progress by lecture, course timeline (`COURSE_DATES`), last 14 days. Section
+  `home/dashboard`. `widget/tour.js` gains Home steps (skipped in hubs without `#panel-home`). Arcade: the **Feedback Loop
+  Arcade** with its own skin (`ENDO_SKIN`, `[data-sg-skin="endo"]`): Axis Showdown (glass slides stained purple/pink; Hormone
+  Surge, Final Feedback), Endo Lab Escape (drawn endocrine lab; Lugol's iodine turns starch paper blue-black), Fill the Receptor,
+  The Golden Gland (a thyroid that turns gold), Cross-Stain, Feedback Sort. `widget/games.js` lets a skin draw the quiz-ladder
+  marquee (`skin.smile.art`, `winTitle`). Dashboard `HUBS` (`checkinHour:10`: the exam ends at 9:30), new class `hemeendo` on a
+  new `endo` ring (`--c-endo`), `ARCADES`; `review/` and `tools/publish-recap.js` labels; `widget/ranks.js` name and medal;
+  `sw.js` -> `sh-v34`; About page (Home page, numbered statements, the arcade table); `assets/og-heme-endo-exam1.png`. Build sources and
+  the build script stay in the session (the hub is a single file; edit it directly from here on). **Diagram review still to be
+  put to Sam.** No schema change.
+
+- **2026-10-22 (Settings → Extras: every optional feature has its own switch, Claude Code)** — Sam asked to be able to turn the
+  bosses, nukes, Tooth Fairy, rank-up animations and the rest off one by one, plus one button that turns everything optional off.
+  Each hub's Settings panel (`EXTRAS` / `extrasHTML()` in `widget/v3.js`) and the dashboard's Settings (`EXTRAS` in `index.html`;
+  **keep the two lists in step**) now end with an **Extras** section: **All on / All off** at the top (lit only when every extra
+  matches), then one row per feature, each its own localStorage key (default `on`): `sh_pref_boss` (Plaque bosses), `sh_pref_fairy`,
+  `sh_pref_probe` (Golden Probe), `sh_pref_arch` (Full Arch), `sh_pref_nuke` (`on` | `mine` = no classmates' strikes | `off` = no
+  unlock at all; replaces `sh_pref_nuke_alerts`), `sh_pref_celebrate` (rank-up cutscene, level-up, trophy and medal cards in
+  `widget/ranks.js`; the mock results card goes quiet), `sh_pref_cheers` (confetti + toast every 5 in a row), `sh_pref_flame`,
+  `sh_pref_fx` (Answer animations: `widget/fx.js` treats it like reduced motion, so marks stay), `sh_pref_pet` (unchanged) and
+  `sh_pref_eggs`, now **"Hidden secrets"**: only the eggs without a switch of their own (holidays, magic words, TIMMY, Night Owl,
+  professor quotes, root canal, Cavity Search, Floss Chain). `widget/eggs.js` gates the four with `feat(k)` instead of
+  `ok()`. One-time carry-over (`sh_pref_extras_v`): Surprises off sets the six keys it used to cover off; nuke alerts off becomes
+  `mine`. Turning a feature off hides it at once (boss, arch, nuke badge, flame). `widget/clicks.js` snapshots the new keys. About
+  page, `sw.js` -> `sh-v33`. No schema change. **A new optional feature: give it a key and a row in both `EXTRAS` lists.**
+
 - **2026-10-22 (rule: every lecture gets two-statement and true/false questions, Claude Code)** — Sam: follow the
   Occlusion question formats for the upcoming lectures. New standing rule (above, and `CLAUDE.md`). `tools/ci/smoke.js`
   now fails a taught lecture with fewer than 3 two-statement or 5 true/false items (`FORMAT_MIN`; exempt: archived hubs and

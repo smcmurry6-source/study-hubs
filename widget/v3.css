@@ -99,6 +99,18 @@
 .shset-seg button.is-active{background:var(--shw-ink); color:var(--shw-bg); border-color:var(--shw-ink);}
 #shset-volume{width:100%; margin-top:12px; accent-color:var(--shw-accent);}
 .shset-hint{font-size:12px; color:var(--shw-ink2); margin-top:8px; line-height:1.45;}
+/* Extras: All on / All off, then one compact row per optional feature */
+.shset-extras{border-top:1px solid var(--shw-line2); padding-top:16px;}
+.shset-xhead{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.shset-xhead > label{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--shw-ink3); font-weight:700;}
+.shset-x{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-top:1px solid var(--shw-line2);}
+.shset-extras .shset-hint{margin-bottom:6px;}
+.shset-xtxt{min-width:0; flex:1 1 150px;}
+.shset-xtxt b{display:block; font-size:13px; color:var(--shw-ink);}
+.shset-xtxt small{display:block; font-size:11.5px; color:var(--shw-ink2); line-height:1.4; margin-top:2px;}
+.shset-x .shset-seg{flex:none; flex-wrap:nowrap; gap:4px;}
+.shset-x .shset-seg button{padding:5px 10px; font-size:12px;}
+@media (max-width:420px){ .shset-x{flex-wrap:wrap;} .shset-x .shset-seg{flex-wrap:wrap;} }
 
 /* ---------- search ---------- */
 #shstat-searchpanel input[type="text"]{width:100%; background:var(--shw-bg2); border:1px solid var(--shw-line); border-radius:10px; color:var(--shw-ink); font:inherit; font-size:15px; padding:9px 11px; margin-bottom:12px;}

@@ -12,13 +12,13 @@
 <link rel="manifest" href="../../manifest.webmanifest?v=2">
 <meta name="theme-color" content="#1d2230">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Occlusion Midterm Hub">
-<meta property="og:description" content="D2 Occlusion midterm: the review of basic occlusion, TMJ anatomy and the muscles, mastication, swallowing and speech, occlusal concepts, and applying occlusion. Notes, a question bank with drawn diagrams, an exam-style mock and review tables.">
+<meta property="og:title" content="Occlusion Final Hub">
+<meta property="og:description" content="D2 Occlusion final: occlusal instrumentation (articulators, the facebow and records), with the midterm lectures kept for review: the review of basic occlusion, TMJ anatomy and the muscles, mastication, swallowing and speech, occlusal concepts, and applying occlusion. Notes, a question bank with drawn diagrams, an exam-style mock and review tables.">
 <meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/occlusion/">
 <meta property="og:image" content="https://smcmurry6-source.github.io/study-hubs/assets/og-occlusion.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Occlusion Midterm Hub</title>
-<meta name="description" content="D2 Occlusion midterm study hub (Dr. Givan): review of basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, mastication, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Lecture notes at two reading levels, a question bank with diagrams, exam hints, an exam-style mock, review tables and nine arcade games.">
+<title>Occlusion Final Hub</title>
+<meta name="description" content="D2 Occlusion final study hub (Dr. Givan): occlusal instrumentation (articulators, facebows and records), plus the midterm lectures for review: basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, mastication, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Lecture notes at two reading levels, a question bank with diagrams, exam hints, an exam-style mock, review tables and nine arcade games.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -335,6 +335,8 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
   .notes-layout{grid-template-columns:minmax(0,1fr)}
   .lec-nav{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px}
   .lec-nav button{flex:none;width:210px}
+  .lec-nav .lec-nav-h{flex:none;align-self:center;margin:0 2px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:.66rem;max-height:120px}
+  .lec-nav .lec-nav-h .nh-long{display:none}
   .reading{padding:18px 16px}
 }
 @media (max-width: 520px){
@@ -527,6 +529,8 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .qcard-choice[data-act="multi"].is-selected::after,.qcard-choice[data-act="multi"].is-correct::after,.qcard-choice[data-act="multi"].is-wrong::after{content:"";position:absolute;left:18px;top:50%;width:5px;height:10px;margin-top:-7px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .multi-check{margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .multi-score{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft)}
+.lec-nav-h{margin:12px 4px 4px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.lec-nav-h:first-child{margin-top:0}
 .quick-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .qs-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 16px;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;box-shadow:var(--shadow);min-width:0}
 .qs-btn:hover{border-color:var(--accent)}
@@ -1139,7 +1143,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1 title="Dr. Givan's five lectures · Midterm, Wed Oct 21, 6:30 pm · Final, Thu Nov 19">Occlusion Midterm</h1>
+        <h1 title="Dr. Givan's lectures · Final, Thu Nov 19 (not comprehensive: the lectures from 10/22 on) · Midterm done Oct 21">Occlusion Final</h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
         <button role="tab" type="button" data-mode="compendium" aria-selected="true"><span class="mode-icon" data-ic="book"></span><span class="mode-label">Compendium</span></button>
@@ -1163,7 +1167,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
   </main>
 
   <footer class="hub-footer">
-    Occlusion Midterm Hub &middot; built from Dr. Givan's five midterm lectures (slides, handouts and the 9/17, 9/24 and 10/1 recordings) and his "What cusp hits where?" help sheet, checked against last year's class study deck. Diagrams are drawn for this hub; board-exam items are not reproduced.
+    Occlusion Hub &middot; built from Dr. Givan's lectures (slides, handouts and the 9/17, 9/24, 10/1 and 10/22 recordings) and his "What cusp hits where?" help sheet, checked against last year's class study deck. Diagrams are drawn for this hub; board-exam items are not reproduced.
   </footer>
 </div>
 <div id="toastHost"></div>
@@ -1235,20 +1239,25 @@ var FINAL_DATE = '2026-11-19';
 /* Dr. Givan's midterm email (10/20): Canvas with LockDown Browser + Monitor, 6:30 pm, one hour, log in from 6:25,
    window closes 7:45. Shown on Compendium until the window closes (examCardHTML). */
 var EXAM_TIME = '18:30', EXAM_CLOSES = '19:45';
+/* The final (Thu Nov 19): not comprehensive, Dr. Givan's lectures from 10/22 on, building on the midterm material.
+   Time and format not announced yet; update FINAL_INFO when the email comes. */
 var EXAM_INFO = [
-  ['What', '40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1): all five lectures in this hub.'],
-  ['When', 'Wednesday, October 21, 6:30 pm, one hour. You can log in from 6:25. The window closes at 7:45, so start by 6:45 at the latest to get the full hour.'],
-  ['Before', 'Update LockDown Browser and Monitor to the latest versions. Charge your laptop or plug it in.'],
-  ['Allowed', 'One sheet of blank paper. During the environmental scan, show BOTH sides of it to the camera.'],
-  ['Tip', 'Dr. Givan: "The only thing you really have to remember on fence posts is how to draw fence posts." The blank sheet is the place to draw them.']
+  ['What', 'Dr. Givan\'s lectures from 10/22 on: L6 so far, with more added here as they are taught. The final is not comprehensive, but it builds on the midterm material.'],
+  ['When', 'Thursday, November 19. The time and format haven\'t been announced yet; this card will change when they are.'],
+  ['So far', 'L6, Occlusal Instrumentation (10/22): the three kinds of articulator, the facebow, CR, MIP and eccentric records, and how to choose an articulator.'],
+  ['Midterm lectures', 'L1-L5 stay in the hub for review. The final builds on them, so the terms (CR, CO, MIP), guidance and the determinants still matter.']
 ];
 var LECTURES = [
-  { id:'review',   num:1, title:'Review of Basic Occlusion',                        who:'Dr. Givan', tag:'blue',   source:'Occ Lec1 Review (slides + handout) + 9/17 recording + "What cusp hits where" help sheet', status:'taught' },
-  { id:'anatomy',  num:2, title:'Functional TMJ Anatomy and the Muscles of Mastication', who:'Dr. Givan', tag:'red', source:'Occ Lec2-1 Anatomy (slides + handout) + 9/24 recording', status:'taught' },
-  { id:'function', num:3, title:'Mastication, Deglutition and Speech',              who:'Dr. Givan', tag:'teal',   source:'Occ Lec2-2 (slides + handout) + 9/24 recording', status:'taught' },
-  { id:'concepts', num:4, title:'Occlusal Concepts: How We Got Here',               who:'Dr. Givan', tag:'violet', source:'Occ Lec3-1 Occlusal Concepts (slides + handout) + 10/1 recording', status:'taught' },
-  { id:'applying', num:5, title:'Applying Occlusion: Operative, Fixed and Implants', who:'Dr. Givan', tag:'amber',  source:'Occ Lec3-2 Occlusal Correlations (slides + handout) + 10/1 recording', status:'taught' }
+  { id:'review',   num:1, title:'Review of Basic Occlusion',                        who:'Dr. Givan', tag:'blue',   source:'Occ Lec1 Review (slides + handout) + 9/17 recording + "What cusp hits where" help sheet', status:'taught', exam:'midterm' },
+  { id:'anatomy',  num:2, title:'Functional TMJ Anatomy and the Muscles of Mastication', who:'Dr. Givan', tag:'red', source:'Occ Lec2-1 Anatomy (slides + handout) + 9/24 recording', status:'taught', exam:'midterm' },
+  { id:'function', num:3, title:'Mastication, Deglutition and Speech',              who:'Dr. Givan', tag:'teal',   source:'Occ Lec2-2 (slides + handout) + 9/24 recording', status:'taught', exam:'midterm' },
+  { id:'concepts', num:4, title:'Occlusal Concepts: How We Got Here',               who:'Dr. Givan', tag:'violet', source:'Occ Lec3-1 Occlusal Concepts (slides + handout) + 10/1 recording', status:'taught', exam:'midterm' },
+  { id:'applying', num:5, title:'Applying Occlusion: Operative, Fixed and Implants', who:'Dr. Givan', tag:'amber',  source:'Occ Lec3-2 Occlusal Correlations (slides + handout) + 10/1 recording', status:'taught', exam:'midterm' },
+  { id:'instruments', num:6, title:'Occlusal Instrumentation: Articulators, Facebows and Records', who:'Dr. Givan', tag:'green', source:'Occ Lec4 Occlusal Instrumentation (slides + handout) + 10/22 recording', status:'taught', exam:'final' }
 ];
+/* the final is not comprehensive: its lectures come first in the notes and hints, and the bank, drill and mock default to them */
+function isFinalLec(id){ var l = LECTURE_BY_ID[id]; return !!(l && l.exam === 'final'); }
+function lecOrder(){ return LECTURES.filter(function(l){ return l.exam === 'final'; }).concat(LECTURES.filter(function(l){ return l.exam !== 'final'; })); }
 
 /* od:kit begin (built from tools/figures/occlusion; edit there) */
 /* ---------- DRAWING KIT + FIGURES (redrawn 2026-10-20) ----------
@@ -3149,7 +3158,10 @@ var CASES = {
   implant6: { pbox:[['Patient','29-year-old woman'],['History','#6 lost to trauma; implant placed and integrated'],['Left side','Canine guidance on her natural #11'],['Right side','#5 and #7 healthy, no mobility'],['Imaging','See the radiograph']], pimg:['paImplant6'] },
   worn: { pbox:[['Patient','63-year-old man who grinds at night'],['Chief complaint','"My front teeth have gotten so short"'],['Findings','Incisors and canines worn flat; no canine guidance left; see the photo'],['Symptoms','None in the joints']], pimg:['frontWorn'] },
   record: { pbox:[['Patient','50-year-old man'],['Problem','The #30 crown fits the mounted casts but is about 0.5 mm high in the mouth'],['Record sent','See the photo of the PVS registration']], pimg:['recordFull'] },
-  group6: { pbox:[['Patient','66-year-old woman'],['Plan','Crown on #6 (large failing restoration)'],['Now','Canine guidance on the right; #6 aches after chewing'],['Findings','See the perio chart and the radiograph']], pimg:['chartCanine','paCanine6'] }
+  group6: { pbox:[['Patient','66-year-old woman'],['Plan','Crown on #6 (large failing restoration)'],['Now','Canine guidance on the right; #6 aches after chewing'],['Findings','See the perio chart and the radiograph']], pimg:['chartCanine','paCanine6'] },
+  incrown: { pbox:[['Patient','47-year-old man'],['Planned','Full-coverage crown on #30 for a cracked cusp'],['Occlusion','Canine guidance with 4 mm of vertical overlap; the posterior teeth disclude in every excursion'],['Casts','Full-arch casts that hand-articulate firmly in MIP'],['Lab','Usually mounts on a small hinge articulator glued to the back of the casts']] },
+  inrehab: { pbox:[['Patient','61-year-old woman'],['Findings','Generalized severe wear; lost vertical dimension; CO and MIP differ'],['Plan','Full-mouth reconstruction, 28 crowns, at an increased VDO'],['Articulator','Denar 320 (semi-adjustable)'],['Esthetics','Wants an even smile line; her incisal plane looks slightly canted']] },
+  inhigh: { pbox:[['Patient','38-year-old woman'],['Delivered','Crown on #19, about 0.5 mm high in MIP; most of its occlusal anatomy was ground away'],['Impression','Checked: margins and die accurate'],['Mounting','Heavy-body VPS MIP record over the whole lower arch, including #18, #20 and the lingual gingiva'],['Casts','Full-arch casts that would have hand-articulated stably']] }
 };
 function pc(key){ var c = CASES[key]; return { pcase:key, pbox:c.pbox, pimg:c.pimg }; }
 
@@ -4705,6 +4717,298 @@ tf('ap-tf-shim','applying','handout','On a firm clench, shimstock should pull th
   'On a clench it should hold on all of them; pulling through belongs to the light closure.',
   'A clench drops the teeth into their PDL, so shimstock holds on the implant too.');
 
+/* =================================================================== L6 OCCLUSAL INSTRUMENTATION (final) */
+mcq('in-cr-mount','instruments','handout','For diagnosis, why is a CR mounting more useful than an MIP mounting?',
+  ['It can close into CO and still move into MIP, so every contact and slide can be seen','It is simpler to take, because MICP is usually more stable than CO, so the casts rarely rock','It records the patient\'s chewing paths along with the closed position','It needs no interocclusal record whenever the casts hand-articulate'],
+  'A CR mounting starts with the joints seated: you can evaluate the CO contact (often unstable), the slide and MIP, the fullest range of movement. An MIP mounting can\'t put the condyles back in CR to show the CO contacts.');
+mcq('in-mip-limit','instruments','handout','What is the significant limitation of mounting casts in MIP?',
+  ['The casts can\'t move posteriorly-superiorly to show any slide from CO to MICP','The casts can\'t be moved into any eccentric position at all on the articulator','The record must be taken in wax, which is too brittle to ship to the lab','MICP is usually less stable than CO, so the mounting drifts over time'],
+  'From MIP the articulator can\'t go back up and back to CO, so the slide is invisible; eccentric motion is also inaccurate unless it is tooth guided, because the start isn\'t joint-seated.');
+mcq('in-pathologic','instruments','handout','Why can properly mounted casts show pathologic contacts that a clinical exam misses?',
+  ['Protective neuromuscular reflexes steer the patient around damaging contacts in the mouth','Stone casts expand slightly as they set, which exaggerates every contact on the articulator','Articulating paper marks stone more clearly than it marks enamel','Casts are always mounted in MIP, which is where those contacts occur'],
+  'In the mouth the neuromuscular system avoids damaging contacts, so you can\'t see them; on mounted casts nothing is avoiding them.');
+mcq('in-most-use','instruments','handout','What is the most common use of an articulator?',
+  ['Treatment: fabricating restorations and prostheses indirectly','Diagnosis of temporomandibular disorders','Diagnostic waxing, to explain the treatment plan to the patient','Recording the timing of mandibular movement'],
+  'Treatment is the most common use: some materials and methods for making a prosthesis aren\'t appropriate for the mouth, and moving the articulator helps build it.');
+mcq('in-waxing','instruments','handout','A diagnostic wax-up is used for all of the following EXCEPT:',
+  ['Locating the patient\'s exact transverse hinge axis','Visualizing the final treatment goal and its problems','Planning spacing, orthodontics and tissue grafting','Addressing the patient\'s expectations'],
+  'Diagnostic waxing develops tooth forms to see the goal and the problems, plans spacing, orthodontics, grafting, the occlusion and the prostheses, and helps with patient expectations. The hinge axis is found with a kinematic facebow.',
+  { fmt:'except' });
+mcq('in-arcon','instruments','handout','In an arcon articulator, where are the condylar and fossa elements?',
+  ['Condylar element on the lower member, fossa element on the upper member','Condylar element on the upper member, fossa element on the lower member','Both elements on the upper member, with the lower member on a simple hinge','Neither: arcon articulators are hinges without condylar elements'],
+  'ARCON = ARticulating CONdyle: the condyle on the lower member and the fossa on the upper, as in the patient. The reverse arrangement is non-arcon.');
+mcq('in-uab-class','instruments','handout','In the UAB accepted classification, the Denar 320 you use is:',
+  ['Semi-adjustable','Fully adjustable','Non-adjustable, average value','Non-adjustable, hinge only'],
+  'Semi-adjustable: some settings, some averages. Non-adjustable covers hinge and average-value articulators; fully adjustable means everything is programmed.');
+mcq('in-nonadj-acc','instruments','handout','A non-adjustable articulator is accurate in which position?',
+  ['MICP only','CR and MICP','Every eccentric position, from averages','Protrusion only'],
+  'However different they look, non-adjustable articulators are accurate in one contact position, MICP; their opening, closing and eccentric paths don\'t reflect the patient.');
+mcq('in-nonadj-record','instruments','handout','Why does an interocclusal record that separates the teeth add error on a non-adjustable articulator?',
+  ['Once it is removed, the articulator closes on a different arc from the patient\'s mandible','The record material shrinks after the casts have been mounted','A non-adjustable articulator can\'t hold a record between the casts','The record resets the articulator\'s condylar guidance each time the casts are closed onto it'],
+  'A record opens the vertical; when it is taken out the articulator closes along its own arc, not the patient\'s, landing in a new position. The smaller the articulator, the bigger the error.');
+mcq('in-nonadj-who','instruments','handout','Who benefits when the lab uses a non-adjustable articulator?',
+  ['The lab: it is quick, inexpensive and cheap to ship','The dentist: less chair time at delivery','The patient: the crown matches their movements','All three equally, for any single crown'],
+  '"The benefit is to the lab, not the dentist." It doesn\'t replicate the patient, so the dentist adjusts the restoration in the mouth.');
+mcq('in-zirconia','instruments','hub','A zirconia crown made on a small hinge articulator usually costs the dentist time at delivery. Why?',
+  ['Its eccentric contacts get ground in the mouth, and zirconia adjusts poorly','Zirconia shrinks on firing unless the articulator has been calibrated','Zirconia crowns can only be designed digitally, so the mounting is ignored','The hinge forces the lab to leave every zirconia crown out of occlusion'],
+  'The hinge doesn\'t follow the patient\'s paths, so the crown hits in excursions and has to be ground; zirconia "doesn\'t adjust easily" or polish well, and grinding loses anatomic form.');
+mcq('in-partial','instruments','handout','What does a partial-arch articulator not allow?',
+  ['Checking the mounting cross-arch, or copying the other side','Mounting the casts in MICP','Hand articulation of the casts','Mounting by a lab that works without a facebow or mounting stand'],
+  'With only part of the arch you can\'t check the mounting across the arch or copy the occlusal form from the other side, so crowns often don\'t match it.');
+mcq('in-4inch','instruments','handout','When can a non-adjustable articulator still build a crown that roughly matches the patient\'s movement?',
+  ['When its condyles are about 4 inches apart and the cast is oriented to them','When its hinge sits directly behind the second molar, close to the teeth','When the casts are mounted with a thick interocclusal record to open the bite','When it is a partial-arch articulator glued to the back of the cast'],
+  'An articulator about the size of a person (for example the Hanau-Mate) with the cast in roughly the right place follows paths close to the patient\'s. A hinge behind the second molar never will.');
+mcq('in-110','instruments','handout','To mount casts without a facebow, the articulator should have an intercondylar distance of about:',
+  ['110 mm (4 inches)','60 mm (2.5 inches)','150 mm (6 inches)','80 mm (3 inches)'],
+  'About 110 mm, 4 inches: the size of a person. Used with a universal mounting stand, it puts the casts in the Bonwill position.');
+mcq('in-bonwill','instruments','handout','Casts mounted on a universal mounting stand end up in which position, where average settings can be used without patient records?',
+  ['The Bonwill position','The terminal hinge position','Centric relation','The neutral zone'],
+  'The mounting stand places the maxillary cast in the Bonwill position (the 4-inch triangle), where the average protrusive angle, immediate side shift and progressive side shift work.');
+mcq('in-sci-def','instruments','handout','Sagittal condylar inclination (condylar guidance) is:',
+  ['The angle at which the condyle descends the articular eminence in the sagittal plane','The angle of the orbiting condyle\'s inward path in the horizontal plane','The tilt of the occlusal plane relative to Frankfort horizontal','The distance the working condyle shifts sideways right at the start of a lateral move'],
+  'SCI is the descent down the eminence, seen from the side. The inward path is the Bennett angle; the sideways jump is the immediate side shift.');
+mcq('in-sci-controls','instruments','handout','What does the SCI setting control on a semi-adjustable articulator?',
+  ['Posterior disclusion with little anterior guidance; cusp height and fossa depth','The width of the central fossae, which follows the orbiting condyle\'s inward path','The vertical dimension of occlusion at which the casts are mounted','The groove and ridge positions set by the intercondylar distance'],
+  'Condylar guidance controls posterior disclusion if there is little or no anterior guidance and affects cusp height and fossa depth. Fossa width is the Bennett angle; groove positions follow the intercondylar distance (fully adjustable).');
+mcq('in-sci-arb','instruments','handout','When the SCI is set arbitrarily for fixed restorations, what range is common?',
+  ['20-30°','0-5°','45-50°','60-70°'],
+  'Fixed: 20-30° is common. About 0° is used for neutrocentric dentures.');
+mcq('in-neutro','instruments','handout','For neutrocentric dentures, the SCI is set to about:',
+  ['0°','20°','30°','45°'],
+  'Neutrocentric dentures use a flat (about 0°) setting; 20-30° is the common arbitrary setting for fixed work.');
+mcq('in-bennett','instruments','handout','The Bennett angle setting mainly affects which feature of the posterior teeth?',
+  ['The width of the central fossae','Cusp height','The curve of Wilson','Marginal ridge height'],
+  'In mediotrusion the orbiting condyle moves inward; the angle of that path sets how wide the central fossae must be. Cusp height follows the SCI.');
+mcq('in-bennett-off','instruments','hub','Which articulator adjustment did Dr. Givan say he would leave off first, because the average values are close enough for most general dentistry?',
+  ['The Bennett angle','Sagittal condylar inclination','The incisal guide pin','The centric latch'],
+  '"If I was going to leave any feature off of an articulator, I\'d probably leave this one": the Bennett angle is less commonly adjusted.');
+mcq('in-iss','instruments','handout','Immediate lateral mandibular translation is also called:',
+  ['Immediate side shift','Progressive side shift','The Bennett angle','Condylar guidance'],
+  'Immediate lateral mandibular translation = immediate side shift (ISS), set on more sophisticated instruments along with the Bennett angle on the medial wall.');
+mcq('in-fb-cast','instruments','handout','Which cast does a facebow transfer mount?',
+  ['The maxillary cast','The mandibular cast','Both casts at the same time','Neither; it only programs the SCI'],
+  'The facebow is for the maxillary cast only. The mandibular cast is related with CR or MIP records.');
+mcq('in-fb-points','instruments','handout','A facebow\'s reference plane is defined by which three points?',
+  ['Both auditory canals and one anterior point such as nasion or orbitale','Both condyles found with a hinge-axis locator and the incisive papilla','Both hamular notches and the incisive papilla','Both mental foramina and the chin'],
+  'Two posterior points (usually the ear canals, estimating the transverse horizontal hinge axis) and one anterior point that varies by system: nasion, orbitale, or a set distance from the maxillary teeth.');
+mcq('in-frankfort','instruments','handout','The reference plane a facebow uses is usually:',
+  ['Frankfort horizontal','The occlusal plane','The midsagittal plane','The curve of Spee'],
+  'Typically the Frankfort horizontal plane; some systems use Camper\'s plane.');
+mcq('in-indirect','instruments','handout','In an indirect facebow mounting, what is attached to the articulator to mount the cast?',
+  ['Only the transfer assembly, on the lower member of the articulator','The whole ear-bow, clipped onto the condylar elements','The patient\'s CR record, on the upper member','A universal mounting stand in place of the bite plate'],
+  'Indirect mounting uses only the transfer assembly (with the bite plate) on the lower member: simpler, and the ear-bow stays in the clinic.');
+mcq('in-arb-mm','instruments','handout','An arbitrary facebow typically places the articulator\'s hinge axis how close to the patient\'s?',
+  ['Within 2-5 mm','Exactly on it','Within 10-15 mm','Within 20-25 mm'],
+  'It estimates an arbitrary point near the transverse horizontal hinge axis, typically within 2-5 mm: much more accurate than a mounting stand, and clinically insignificant for nearly every patient.');
+mcq('in-kinematic','instruments','handout','A kinematic facebow is one that:',
+  ['Locates the patient\'s exact hinge axis','Uses the ear canals as the hinge axis','Records chewing paths with six styli','Is built into an intraoral scanner'],
+  'A bow that finds the exact hinge axis is kinematic (AHA = PHA). One that uses the ear canals and anatomic averages is arbitrary. Six styli on six tables is a pantograph.');
+mcq('in-slidematic','instruments','handout','With the Denar Slidematic facebow, where is the anterior reference point marked?',
+  ['43 mm above the incisal edge of the right lateral incisor (#7)','43 mm above the incisal edge of the right central incisor (#8)','At nasion, the bridge of the nose between the eyes','At orbitale, the lowest point on the rim of the orbit'],
+  'The Slidematic ruler rests on #7\'s incisal edge and marks a point 43 mm above it (adjacent teeth or the upper lip at rest if #7 is missing). Nasion and orbitale are other systems\' anterior points.');
+mcq('in-level','instruments','handout','What does the horizontal level on the Slidematic facebow capture?',
+  ['The esthetic planes: incisal cant and occlusal-plane tilt','The patient\'s exact transverse horizontal hinge axis','The sagittal condylar inclination of both condyles at once','The vertical dimension of occlusion at rest'],
+  'The level parallels the bench top the articulator sits on, so any incisal cant and occlusal-plane tilt come to the articulator where you can see them.');
+mcq('in-nofb','instruments','handout','Mounting the maxillary cast without a facebow risks all of the following EXCEPT:',
+  ['A CR record that can no longer be verified in the mouth','An occlusal cant in the esthetic plane','Protrusive, working and non-working interferences','Cusp heights and groove positions that don\'t match'],
+  'Wrong maxillary orientation errs in the esthetic plane (cant), the occlusal plane (interferences), cusp height and cusp and groove positions, and adds chairside adjustment. Verifying a CR record has nothing to do with the facebow.',
+  { fmt:'except' });
+mcq('in-mt-post','instruments','handout','In protrusion and laterotrusion, a maxillary cast mounted too far posterior or too high causes:',
+  ['Premature or heavy contacts on the most anterior teeth','Premature or heavy contacts on the most posterior teeth','No error, as long as the MIP record is accurate','An occlusal cant toward the side of the error'],
+  'Too posterior or too superior: the most anterior teeth hit early or hard. Too anterior or too inferior: the most posterior teeth.');
+mcq('in-cr-wax','instruments','handout','Why is wax often preferred for a CR record?',
+  ['It sets instantly with the air-water syringe','It captures fine anatomy better than VPS does','It flexes, so it survives shipping without breaking','It can be used with the teeth in light contact'],
+  'Wax: immediate set, minimal trimming, repeatable for verification, and because it doesn\'t capture fine anatomy the cusp tips seat in it well. Its weakness is that it is fragile.');
+mcq('in-cr-contact','instruments','handout','Why is a CR record made without tooth contact?',
+  ['Contact triggers neuromuscular reflexes that deviate the jaw toward MIP','Contact compresses the wax, so the record ends up below the patient\'s VDO','Contact makes the wax set too slowly to use','The articulator can\'t close past the first contact'],
+  'The record is meant to capture the seated joints. Once teeth touch, the neuromuscular system guides the jaw to the safe, stable position, MIP.');
+mcq('in-cr-open','instruments','handout','On a semi-adjustable articulator, at what opening should a CR record be made?',
+  ['The smallest opening that avoids contact, or the VDO you plan to restore','About 20 mm, still within the pure rotation of the condyles','Any opening at all, because the thickness of a CR record doesn\'t affect its accuracy','Maximum opening, so the condyles are fully translated'],
+  'The arbitrary axis means the articulator\'s arc differs from the patient\'s, so error grows with the opening. At the vertical you will restore, the arcs meet. Thickness doesn\'t matter only on a fully adjustable articulator.');
+mcq('in-90','instruments','handout','In roughly what share of people is MIP not the same as CO?',
+  ['About 90%','About 10%','About 50%','About 25%'],
+  'MIP ≠ CO in about 90% of people, so CO is usually unstable and a CR mounting matters for diagnosis.');
+mcq('in-co-mip','instruments','handout','The closure from CO into MIP does what?',
+  ['Decreases the VDO and positions the mandible anteriorly','Increases the VDO and positions the mandible posteriorly','Keeps the VDO and shifts the mandible to the working side','Seats the condyles further up into the fossae'],
+  'Sliding from the first seated-joint contact into MIP closes the vertical and brings the mandible forward, with many potential interferences.');
+mcq('in-mip-misused','instruments','hub','Dr. Givan called the MIP record the most common record, and also:',
+  ['The most misused record','The most accurate record','The record labs won\'t accept','The hardest record to take'],
+  '"I will suggest to you it is also the most misused record. It\'s also the record that gets you in most trouble."');
+mcq('in-lab-errors','instruments','hub','According to Dr. Givan, what are the first and second most common causes of lab problems?',
+  ['A bad impression, then the mounting (usually a misused MIP record)','The mounting, then a bad impression','A bad shade selection, then a bad impression','The technician\'s skill, then the articulator\'s calibration'],
+  'Number one: a bad impression (a margin not captured won\'t appear on the die). Number two: the mounting, usually from misusing MIP records.');
+mcq('in-hand-artic','instruments','hub','What did Dr. Givan call the most important rule for MIP records?',
+  ['Hand-articulate whenever you can; use a record only when needed','Always send a full-arch VPS record so the lab has every contact','Always use wax, because VPS is never accurate for mounting','Take two records and let the lab choose the one that fits'],
+  '"If possible, don\'t use a record. Hand articulate always when you can." If you send the lab a record, they will mount with it.');
+mcq('in-vps-time','instruments','handout','Per the slides, the minimum removal time of a VPS bite registration is about:',
+  ['1 minute 30 seconds','10 seconds','5 minutes','30 seconds'],
+  'Working time 30-60 seconds from the start of the mix at 72°F; minimum removal time 1 minute 30 seconds. Hard to keep still that long, which is why wax sets "instantly" by comparison.');
+mcq('in-vps-where','instruments','handout','For a VPS MIP record for a crown on #19, where should the material NOT go?',
+  ['On the occluding surfaces of unprepared teeth such as #18 and #20','Over the #19 preparation, where there is space for it','Into the record\'s trimmed windows around the prep','On the opposing cusp tips that occlude over the prep'],
+  'In MIP the unprepared teeth are supposed to touch; material on them props the casts open. Over the prep is fine, trimmed to the cusp tips and off soft tissue.');
+mcq('in-vps-fit','instruments','handout','Why does a registration rarely fit the stone casts, even when trimmed?',
+  ['The material is resilient and records more detail than the stone does','The stone expands while the registration shrinks overnight','The record is taken at a higher VDO than the casts are mounted','Registrations cool on the bench and curl at the edges'],
+  'Two reasons, regardless of material: resilience, and replication of detail greater than the stone model. Occlusion is in microns; 20 µm off and the crown is out of occlusion.');
+mcq('in-wax-dis','instruments','handout','What are the disadvantages of waxes such as Aluwax or Delar for MIP records?',
+  ['They need a water bath and they are brittle','They set slowly and need heavy trimming','They cost more than VPS and stick to stone','They can\'t be chilled with an air-water syringe'],
+  'Waxes set instantly with the air-water syringe, need little trimming and cost much less; the drawbacks are the water bath and brittleness (and they can get too thin).');
+multi('in-five-req','instruments','handout','Select every item that is one of the five requirements of interocclusal records.',
+  ['It must not move teeth or displace soft tissue','It must fit the casts as accurately as it fits the mouth','It must not distort in storage or on the way to the lab','It must cover every occluding surface in the arch','It must be made of a material that sets in under 10 seconds'],
+  [0,1,2],
+  'The five (Dawson): no tooth movement or soft-tissue displacement; verifiable in the mouth; fits the casts as accurately as the mouth; verifiable on the casts; no distortion in storage or transport. Covering every occluding surface is the classic error, and no set time is required.');
+mcq('in-rec-base','instruments','handout','If missing teeth don\'t allow a stable MIP mounting, what should you use?',
+  ['A record base','A thicker VPS record over every tooth','A pantograph','A kinematic facebow'],
+  '"If missing teeth does not allow stable mounting, must use a record base." Thickening the VPS only adds error.');
+mcq('in-prot-rec','instruments','handout','A protrusive record is taken:',
+  ['3-5 mm forward from CR without lateral deviation; it sets both SCIs','7-10 mm forward from MIP; it sets the Bennett angle','3-5 mm to each side; it takes two records','At maximum protrusion; it sets the incisal guide table'],
+  'Straight forward 3-5 mm from CR, no deviation; one record sets the SCI on both sides. Lateral records need two and set the contralateral side.');
+mcq('in-lat-sets','instruments','handout','A right lateral record sets which settings on a semi-adjustable articulator?',
+  ['The left SCI and the left Bennett angle and side shift','The right SCI and the right Bennett angle and side shift','Both SCIs, the same as a protrusive record','Only the incisal guide table'],
+  'Each lateral record sets the contralateral (orbiting) side: moving right, the left condyle slides down its medial wall, so the left settings are set.');
+mcq('in-why-prot','instruments','handout','Why are protrusive records preferred over lateral records for setting the SCI?',
+  ['The lateral SCI is steeper; building at the shallower protrusive SCI keeps crowns discluded','The protrusive SCI is the steeper one, which builds taller and more esthetic posterior cusps','Lateral records can\'t be taken for a semi-adjustable articulator','Protrusive records take two records, so each side is checked twice'],
+  'Down the medial wall (lateral record) the angle is steeper than down the eminence (protrusive). Built at the shallower angle, contacts avoided in protrusion also miss in laterotrusion, so the patient gets disclusion.');
+mcq('in-30deg','instruments','hub','Many clinicians set an arbitrary 30° SCI for fixed work. Why does it tend to work?',
+  ['Most patients\' eminences are steeper (often 35-40°), so crowns built at 30° still disclude','Most patients\' eminences are flatter (10-20°), so 30° adds disclusion in the mouth','30° matches the angle of Bonwill\'s equilateral triangle','30° matches the curve of Spee in most adults'],
+  'Protrusive angles range about 20-60°, commonly 35-40°. An articulator shallower than the patient means more disclusion in the mouth; 30° still leaves decent anatomy (20° makes the cusps too shallow).');
+mcq('in-3to5','instruments','handout','If a lateral record is taken at 7-10 mm of condylar movement instead of 3-5 mm, the Bennett angle set is:',
+  ['Smaller, building narrower fossae and more likely interferences','Larger, building wider fossae and fewer interferences','The same, because the orbiting condyle\'s path is straight','Larger, building taller posterior cusps'],
+  'The orbiting condyle\'s path curves: at 3-5 mm the angle is larger, at 7-10 mm smaller, which narrows the fossae. So make records at 3-5 mm.');
+mcq('in-interchange','instruments','handout','What does interchangeability (for example the calibrated Denar 320) allow?',
+  ['Moving mounted casts between articulators without losing accuracy','Using one facebow with any brand of articulator','Programming the articulator without eccentric records','Mounting the mandibular cast without any record'],
+  'Calibrated articulators exchange mounted casts accurately: the articulator doesn\'t travel to the lab, fewer are needed, and less damage happens.');
+mcq('in-full-adj','instruments','handout','Which setting is found on a fully adjustable articulator but not on a semi-adjustable one?',
+  ['The intercondylar distance','Sagittal condylar inclination','The Bennett angle','The incisal guide table'],
+  'Fully adjustable articulators add the intercondylar distance, curved paths and the rotating condyle\'s movement. SCI and the Bennett angle are the semi-adjustable articulator\'s two common settings.');
+mcq('in-icd','instruments','handout','Changing the intercondylar distance on a fully adjustable articulator affects:',
+  ['The paths of the opposing cusps, so groove and ridge positions','The vertical dimension of occlusion at which the casts are mounted','Only the esthetic plane','The SCI on the working side'],
+  'Not everyone is 4 inches; the distance changes the paths of the opposing cusps across the tooth, and so the groove and ridge positions.');
+mcq('in-locator','instruments','handout','How is the exact hinge axis found for a kinematic facebow?',
+  ['Hinge the jaw in CR until the stylus only rotates','Seat the bow\'s earpieces in both auditory canals and level the bow','Mark a point 43 mm above the lateral incisor','Trace protrusive and lateral paths on six recording tables'],
+  'A hinge-axis locator: the upper bow holds a grid, the lower a stylus; when the stylus rotates without arcing it sits on the axis, which was once tattooed on the skin.');
+mcq('in-panto','instruments','handout','What does a pantograph capture that positional records can\'t?',
+  ['The timing of mandibular movement along each path','The patient\'s exact hinge axis, marked on the skin','The esthetic plane and any cant','The MIP contacts of the teeth'],
+  'Positional records capture end points; the pantograph traces how the jaw gets there (protrusive and right and left laterotrusive) so a fully adjustable articulator can be tuned to reproduce it.');
+mcq('in-cbd','instruments','handout','Why does a pantograph use a central bearing device?',
+  ['To keep the teeth apart so they can\'t influence the recorded motion','To hold the six recording tables level during movement','To mark the hinge axis on the patient\'s skin','To measure the intercondylar distance'],
+  'The central bearing device separates the teeth, so the tracings show joint- and muscle-guided motion, not tooth guidance.');
+mcq('in-thick','instruments','handout','Why doesn\'t the thickness of a CR record affect accuracy on a fully adjustable articulator?',
+  ['The exact hinge axis is captured, so both open and close on the same arc','Fully adjustable articulators are always mounted in MIP, never in centric relation','The pantograph tracing corrects for the record\'s thickness','Records for fully adjustable articulators are always under 1 mm'],
+  'With a kinematic facebow, AHA = PHA, so the terminal hinge arc is the same; on a semi-adjustable the arcs differ and thicker records add error.');
+mcq('in-sel-strong','instruments','handout','A patient with strong anterior guidance needs a single crown on #20. What articulator is enough?',
+  ['A simpler one: the anterior guidance will disclude the crown','A fully adjustable one, programmed with a pantograph','A semi-adjustable one, set with two lateral records','None: a crown on #20 has to be designed digitally'],
+  'With strong anterior guidance a less sophisticated articulator can be used for posterior teeth; as long as the crown is within anatomic norms it will disclude.');
+mcq('in-sel-poor','instruments','handout','Which patient most needs a more sophisticated articulator for posterior restorations?',
+  ['An edge-to-edge Class III patient with little anterior guidance','A patient with 4 mm of vertical overlap and canine guidance','A patient with a crown planned on #20 and strong guidance','A patient with normal overlap and intact anterior teeth'],
+  'With poor anterior guidance (little overlap, edge-to-edge, malaligned or missing teeth) the posterior determinant controls more of the movement, so the articulator must reproduce it.');
+mcq('in-ag-nonadj','instruments','handout','It is hard to justify a non-adjustable articulator for:',
+  ['Teeth that are part of the anterior guidance','A single posterior crown under strong guidance','Diagnostic casts kept for records','A small intracoronal inlay'],
+  'Teeth in the anterior guidance need an articulator that moves in eccentric paths like the patient; "why on earth would you ever use a non-adjustable on anterior teeth?"');
+mcq('in-skill','instruments','handout','According to the JPO quote Dr. Givan cited, which is likely to help more in treatment?',
+  ['A semi-adjustable articulator in the hands of a knowledgeable clinician','A fully adjustable articulator in the hands of an inexperienced operator','A non-adjustable articulator in any hands, since it needs no records','A fully adjustable articulator in any hands, since it copies the patient'],
+  '"A semi-adjustable articulator in the hands of a knowledgeable clinician may be of greater assistance in treatment than a fully adjustable articulator in the hands of an inexperienced operator." Add to that, a careless one.');
+mcq('in-job','instruments','handout','Dr. Givan\'s rule for choosing instrumentation: "The ___ dictates the tool, not the other way around."',
+  ['job','lab','budget','patient\'s age'],
+  'The job dictates the tool: minor procedures can use simpler instruments; complex reconstruction needs more sophisticated ones.');
+mcq('in-virtual','instruments','handout','What do virtual articulators still lack, per the slides?',
+  ['Placing the models relative to the patient\'s joints (a digital facebow)','Software that can replicate a mechanical articulator\'s shape and contours','A way to bring in intraoral scans and CBCT data','Any way to capture eccentric records'],
+  'Software can replicate articulators and combine scans, CBCT and facial landmarks, and some capture eccentric records; what\'s missing is placing the maxillary teeth in the same 3-D relation to the joints (a digital facebow).');
+mcq('in-semi-records','instruments','handout','Which set of procedures goes with a semi-adjustable articulator?',
+  ['Facebow transfer, CR record and eccentric records','Kinematic facebow, pantograph and CR record','Mounting stand and an MIP record only','Hand articulation only, with no records'],
+  'Semi-adjustable: facebow, CR record, eccentric records (MIP, lateral, protrusive). Fully adjustable: exact hinge axis, pantographic recording, CR record. Non-adjustable: an arbitrary MICP mounting.');
+mcq('in-panto-tables','instruments','handout','A pantograph has how many recording tables and styli?',
+  ['6 tables and 6 styli','2 tables and 2 styli','3 tables and 6 styli','4 tables and 4 styli'],
+  'The lower bow carries 6 recording tables and the upper bow 6 styli, marking in all three planes.');
+
+/* patient cases (shared Patient Boxes) */
+mcq('cs-in-crown-art','instruments','hub','Which mounting fits this crown?',
+  ['Hand-articulate in MIP; under strong guidance, simple instrumentation works','Take a CR record and program a fully adjustable articulator with a pantograph','Send a full-arch VPS MIP record so the lab mounts with it','Take protrusive and both lateral records before mounting'],
+  'A single posterior crown under strong canine guidance, with casts that hand-articulate: no record is needed, and the guidance will disclude the crown. A full-arch record is the classic mounting error.',
+  pc('incrown'));
+mcq('cs-in-crown-lab','instruments','hub','The lab says it will mount on its small hinge articulator glued to the back of the casts. What is the problem, and the fix?',
+  ['It helps the lab, not the dentist; ask for a semi-adjustable mounting','The hinge is fine for any posterior crown; no change is needed','The hinge can\'t mount in MICP, so send a CR record and mount in CR instead','The hinge needs a pantograph tracing to be accurate'],
+  'Small hinges are accurate only in MICP, can\'t verify cross-arch and don\'t follow the patient\'s paths; the dentist pays in chair time. "All you have to do is ask": mount on a semi-adjustable articulator.',
+  pc('incrown'));
+mcq('cs-in-rehab-rec','instruments','hub','How should her CR record be made for the semi-adjustable articulator?',
+  ['At the vertical dimension she will be restored to, without tooth contact','At the smallest opening that avoids contact, then opened on the articulator','Hand-articulated in MIP, with no record','In VPS with the teeth lightly touching in MIP'],
+  'She is being restored at a new, increased VDO. On an arbitrary axis the arcs differ, so take the record at the treatment vertical, where the arcs meet. Opening it later on the articulator adds error.',
+  pc('inrehab'));
+mcq('cs-in-rehab-sci','instruments','hub','To set the SCI for her crowns, what record is preferred?',
+  ['One protrusive record, 3-5 mm forward from CR','Right and left lateral records at 7-10 mm','A pantograph tracing','An MIP record'],
+  'A protrusive record sets both SCIs at the shallower eminence angle, so restorations disclude; lateral records give a steeper SCI and 7-10 mm is too far.',
+  pc('inrehab'));
+mcq('cs-in-rehab-fb','instruments','hub','Why use a facebow in her case?',
+  ['To orient the maxillary cast to her hinge axis and capture the esthetic planes','To locate her exact hinge axis so that record thickness won\'t matter on the articulator','To program the Bennett angle on both sides','To mount the mandibular cast in CR'],
+  'Twenty-eight crowns with esthetics: the facebow places the maxillary cast relative to her joints and brings any cant or occlusal-plane tilt to the articulator. Only a kinematic bow finds the exact axis.',
+  pc('inrehab'));
+mcq('cs-in-high','instruments','hub','What most likely made the crown high?',
+  ['The record covered unprepared teeth and soft tissue, so the casts didn\'t seat','The articulator\'s SCI was set steeper than her articular eminence, so the crown hit','The lab mounted the maxillary cast too far posterior','The crown was milled from zirconia, which expands'],
+  'Material on #18, #20 and the gingiva props the casts apart by microns you can\'t see; the crown is then built into that space and comes back high. The impression was checked, so the mounting is next in line.',
+  pc('inhigh'));
+mcq('cs-in-high-fix','instruments','hub','How should the next mounting be done?',
+  ['Hand-articulate if stable; if not, VPS over the prep only, trimmed and off soft tissue','A thicker full-arch VPS record covering every tooth, so the casts can\'t rock on the articulator','A wax CR record at 20 mm of opening','Two lateral records to program the articulator'],
+  'First choice: no record. If one is needed, only where teeth don\'t touch (the prep), trimmed with windows to the cusp tips and kept off the gingiva and palate.',
+  pc('inhigh'));
+
+/* two-statement and true/false */
+two('in-2s-1','instruments','handout','A non-adjustable articulator is accurate only in MICP.','An interocclusal record that separates the teeth makes a non-adjustable articulator more accurate.', true, false,
+  'Non-adjustable articulators are accurate in one position, MICP; a record that separates the teeth adds error, because the articulator closes on a different arc.',
+  'it is accurate only in that one closed position.', 'a separating record adds error, because the articulator closes on a different arc than the mandible.');
+two('in-2s-2','instruments','handout','The facebow is used to mount the mandibular cast.','An arbitrary facebow places the hinge axis within about 2-5 mm of the patient\'s.', false, true,
+  'The facebow mounts the maxillary cast; the mandibular cast is related with CR or MIP records. Arbitrary bows are typically within 2-5 mm.',
+  'the facebow mounts the maxillary cast only.', 'an arbitrary facebow typically lands within 2-5 mm of the true hinge axis.');
+two('in-2s-3','instruments','handout','One protrusive record sets the SCI on both sides.','A lateral record sets the SCI on the side the jaw moves toward.', true, false,
+  'A protrusive record sets both SCIs; each lateral record sets the contralateral (orbiting) side.',
+  'a protrusive record sets both sides at once.', 'a lateral record sets the opposite side, where the condyle orbits.');
+two('in-2s-4','instruments','handout','MIP differs from CO in about 90% of people.','Wax is often preferred for CR records because it sets immediately.', true, true,
+  'Both are on the slides: MIP ≠ CO in about 90%, and wax is preferred for CR records for its immediate set and minimal trimming.',
+  'MIP and CO differ in about 90% of people.', 'wax sets instantly with the air-water syringe and needs little trimming.');
+two('in-2s-5','instruments','handout','On a fully adjustable articulator, the thickness of a CR record affects accuracy.','A maxillary cast mounted too far anterior gives heavy contacts on the most anterior teeth.', false, false,
+  'With the exact hinge axis captured, thickness doesn\'t matter. Too anterior or too inferior loads the most posterior teeth; too posterior or superior loads the most anterior.',
+  'with the exact hinge axis, the arcs match and thickness doesn\'t matter.', 'too far anterior gives heavy contacts on the most posterior teeth.');
+two('in-2s-6','instruments','handout','In an arcon articulator, the condylar element is on the upper member.','The Bennett angle affects the width of the central fossae of the posterior teeth.', false, true,
+  'Arcon: condylar element on the lower member, fossa on the upper. The Bennett angle (mediotrusion of the orbiting condyle) affects fossa width.',
+  'in an arcon the condylar element is on the lower member, as in the patient.', 'the orbiting condyle\'s inward path sets how wide the central fossae must be.');
+two('in-2s-7','instruments','handout','A VPS registration records more detail than the stone cast does.','A semi-adjustable articulator in knowledgeable hands may help more than a fully adjustable one in inexperienced hands.', true, true,
+  'VPS replicates detail beyond the stone model, one reason it rarely fits even trimmed; and the JPO quote ranks the knowledgeable clinician over the instrument.',
+  'its detail exceeds the stone\'s, so it rarely fits the cast exactly.', 'that is the JPO quote Dr. Givan cited.');
+two('in-2s-8','instruments','hub','Labs prefer semi-adjustable articulators because they are cheaper to ship.','Lateral records are preferred over protrusive records for setting the SCI.', false, false,
+  'Labs like non-adjustable articulators (quick, cheap, small to ship). Protrusive records are preferred, because lateral records give a steeper SCI.',
+  'labs prefer small non-adjustable articulators for low cost and shipping.', 'protrusive records are preferred, since the lateral SCI is steeper.');
+tf('in-tf-1','instruments','handout','The most common use of an articulator is treatment.', true,
+  'Treatment (indirect fabrication) is the most common use; diagnosis and treatment planning are the others.',
+  'Treatment is the most common use: building restorations and prostheses outside the mouth.', 'Diagnosis and planning matter, but treatment is the most common use.');
+tf('in-tf-2','instruments','handout','A CR mounting can be moved into MIP, but an MIP mounting can\'t be moved back to CO.', true,
+  'From CR you can close into CO and slide to MIP; from MIP the articulator can\'t move posteriorly-superiorly to CO.',
+  'CR mountings reach MIP; MIP mountings can\'t reach CO.', 'An MIP mounting can\'t go up and back to the seated-joint contact.');
+tf('in-tf-3','instruments','hub','Hand articulation should be avoided, because an MIP record is always more accurate.', false,
+  'The reverse: "If possible, don\'t use a record. Hand articulate always when you can."',
+  'A record is not always more accurate; it is a common source of error.', 'Hand articulation is preferred whenever the casts are stable.');
+tf('in-tf-4','instruments','handout','Protrusive and lateral records are taken about 3-5 mm from CR.', true,
+  'Both are made at 3-5 mm: farther out the paths curve (and the teeth separate anyway), changing the angles set.',
+  'Both are taken 3-5 mm from CR.', 'Going farther changes the angles: at 7-10 mm the Bennett angle is smaller.');
+tf('in-tf-5','instruments','handout','The SCI from a lateral record is usually shallower than the SCI from a protrusive record.', false,
+  'It is steeper: the lateral record measures the path down the medial wall, which is steeper than the articular eminence.',
+  'The lateral SCI is steeper, not shallower.', 'The medial wall is steeper than the eminence, so the lateral SCI is steeper.');
+tf('in-tf-6','instruments','handout','A pantograph has six recording tables and six styli.', true,
+  'The lower bow carries 6 recording tables and the upper bow 6 styli, so movement is seen in three dimensions.',
+  'Six tables and six styli record the motion in all three planes.', 'The count is six and six.');
+tf('in-tf-7','instruments','handout','A maxillary cast mounted too far posterior gives heavy contacts on the most posterior teeth.', false,
+  'Too posterior or too superior loads the most anterior teeth; too anterior or too inferior loads the most posterior.',
+  'Too posterior loads the most anterior teeth.', 'Too posterior or superior: heavy anterior contacts; too anterior or inferior: heavy posterior contacts.');
+tf('in-tf-8','instruments','handout','Partial-arch articulators allow cross-arch verification of the mounting.', false,
+  'They don\'t: with part of the arch you can\'t verify the mounting cross-arch or model from the opposite side.',
+  'Partial-arch articulators can\'t verify cross-arch.', 'Only a full-arch mounting can be checked across the arch.');
+tf('in-tf-9','instruments','handout','An articulator has its best value when it is similar in size to the patient.', true,
+  'His one line to remember: "an articulator has best value if similar size to patient."',
+  'That is the line on every objectives slide.', 'Size matters: a small hinge never follows the patient\'s arcs.');
+tf('in-tf-10','instruments','handout','With strong anterior guidance, a less sophisticated articulator can be used for posterior teeth.', true,
+  'Anterior guidance predominates in eccentric contact; with strong guidance a posterior restoration will disclude.',
+  'Strong anterior guidance discludes the posterior teeth, so simpler instrumentation can work.', 'It\'s poor anterior guidance that calls for a more sophisticated articulator.');
+seq('in-seq-prog','instruments','handout','Put the steps for setting a semi-adjustable articulator from a protrusive record in order.',
+  ['Release the centric latch and loosen both SCI settings','Seat the record on the upper cast and the lower cast into it','See the gap: the condylar elements don\'t touch the fossae','Adjust each SCI until its element touches the superior fossa','Tighten both SCI settings'],
+  'Loosen, seat the record, find the gap, close the fossa down onto the condylar element, tighten. A protrusive record does both sides at once; for a lateral record you would also set the contralateral medial wall, then repeat with the other side.');
+
 /* ---------- READINGS (lecture notes synthesized from the recordings, slides and Dr. Givan's handouts) ----------
    Each lecture opens with a short "what's tested" list (LESSONS.md: lead with it) and puts look-alikes in a table.
    Narration (audio/<id>-full.mp3, -plain.mp3) is generated from this text: edit a level, regenerate its mp3. */
@@ -4951,6 +5255,60 @@ applying: `
 </tbody></table></div>
 <p><b>Anterior implants:</b> centric contact very light in casual intercuspation and equal to the neighbors in maximum intercuspation; in excursions <b>avoid immediate canine disclusion</b> and share the load with the natural teeth, which have proprioception. <b>Posterior implants:</b> very light in casual closure, equal in maximum intercuspation (no contact lets the opposing tooth supererupt); <b>avoid contact in excursions</b> if possible; mutually protected occlusion. Test with <b>shimstock</b> (about 12 µm): on a light closure it holds on the neighbors and pulls through the implant with some resistance; on a clench the teeth drop into their PDL and it holds on all of them.</p>
 <p class="reading-note">Summary: most of general dentistry is conformative, but look first. Check the opposing plane of occlusion, the contacts, any deflections and the direction of forces; copy what the patient has only if it is asymptomatic and healthy.</p>
+`,
+instruments: `
+<div class="tested"><b>What's tested</b><ul><li>Why we mount casts: diagnosis (CR vs MIP mountings), treatment planning, diagnostic waxing, treatment</li><li>Arcon vs non-arcon; the UAB classification (non-adjustable, semi-adjustable, fully adjustable)</li><li>Non-adjustable articulators: accurate in one position only, who benefits, mounting without a facebow</li><li>Semi-adjustable: sagittal condylar inclination and the Bennett angle; the facebow, CR record, MIP record and eccentric records, and the errors each one prevents or causes</li><li>Fully adjustable: kinematic facebow, pantograph, why record thickness doesn't matter there but does on a semi-adjustable</li><li>Choosing an articulator: the patient's occlusion, the extent of the work, the instrument's limits, the clinician</li></ul></div>
+<p>Dr. Givan opened the second half of the course (10/22) with the devices we use to relate the arches. "It seems every concept of occlusal therapy developed an articulator": many of the old concepts were driven by what a machine could do. Today it is much simpler, and he sorts everything into three groups: you can't adjust it, you can adjust some of it, or you program all of it. The equipment is only a tool; the goal is to treat the patient. His one line to remember: <b>an articulator has its best value when it is similar in size to the patient.</b></p>
+<h4>What we use articulators for</h4>
+<p><b>Diagnosis.</b> Mounted diagnostic casts improve visualization of the static and functional relationships of the teeth and make it easier to replicate mandibular movement and the contacts it produces. Pathologic contacts often can't be seen clinically, because protective neuromuscular reflexes steer the patient around them, but properly mounted casts show them. A <b>CR mounting</b> is the most useful for diagnosis: it allows the fullest range of movement, so you can evaluate every contact and slide, close into CO (often unstable) and still move into MIP. An <b>MIP mounting</b> can't reposition the condyles to CR, so it can't show the CO contacts. From a CR mounting you can always find MIP; from an MIP mounting you can't get back to CO.</p>
+<p><b>Treatment planning.</b> Mounted casts help build a sequential plan that removes the causes of disease and restores function and esthetics: you can visualize each step on the articulator first, for example a selective grinding (equilibration). <b>Diagnostic waxing</b> develops the tooth forms in wax to see the final goal and the problems that may come up, and to plan spacing, orthodontics, hard and soft tissue grafting, the occlusion, fixed and removable tooth-, implant- and tissue-supported prostheses, and esthetics. It is also used to address the patient's expectations: a patient who doesn't understand dentistry understands a cast in front of them.</p>
+<p><b>Treatment.</b> The most common use of an articulator is treatment: some materials and methods for making a prosthesis aren't appropriate for the mouth (indirect fabrication), and moving the articulator helps build it. "If I could get one point across today": <b>your choice of articulator will make or break your time treating the patient.</b> Anything you can do outside an appointment to make the appointment faster is money well spent; an articulator that replicates the patient makes crown and denture deliveries go much faster.</p>
+<h4>Classifying articulators</h4>
+<p><b>Arcon</b> stands for ARticulating CONdyle: the condylar element is on the <b>lower</b> member of the articulator and the fossa element on the <b>upper</b> member, as in the patient. A <b>non-arcon</b> articulator has them the other way around; it is often cheaper, but, for example, you can't change the vertical dimension as easily without throwing off your records.</p>
+<p>The <b>UAB accepted classification</b> has three groups. <b>Non-adjustable</b>: hinge and average-value articulators (not programmable). <b>Semi-adjustable</b>: some settings, some averages (for example the <b>Denar 320</b>, the one you have). <b>Fully adjustable</b>: everything is programmed. Articulators don't fit neatly into these groups: it's a continuum, and some semi-adjustable articulators are nearly fully adjustable.</p>
+<p><b>Virtual articulators</b> in digital dentistry are "not quite yet, but close." Software can replicate a mechanical articulator's shape and motion, and digital work can combine intraoral scans, CBCT data and facial and esthetic landmarks. What they still lack is accurately positioning the models to the patient, the equivalent of a facebow (a digital facebow that puts the maxillary teeth in the same 3-D relation to the joints). Digital is pushing dentistry back toward fully adjustable articulation, which the mechanical world had drifted away from because it was so hard to do.</p>
+<h4>Non-adjustable articulators</h4>
+<p>No adjustment can bring a non-adjustable articulator closer to the patient. Its movements range from a hinge only to eccentric movements based on averages. However different they look (a palm-sized hinge, one glued to the back of the cast, one that looks like yours with no adjustments), they are all <b>accurate in only one contact position, MICP</b>. Their opening and closing paths and all their eccentric motions don't reflect the patient.</p>
+<p>The procedure is an arbitrary mounting in MICP. <b>Any interocclusal record that separates the teeth increases the error</b>, because when it is removed the articulator closes along a different arc from the patient's mandible. The smaller the articulator compared with the patient, the larger that error.</p>
+<p>Advantages: low expense and little effort. But that <b>benefits the lab, not the dentist</b>: labs like these because they are quick, inexpensive and small (low shipping costs), and dentists often don't ask for more ("all you have to do is ask"). Because the articulator doesn't replicate the patient, the restoration can't meet the occlusal requirements of the patient's eccentric movements, so the dentist spends chair time adjusting it, and grinding often destroys anatomic contour and leaves poor occlusal relationships (zirconia, which doesn't adjust or polish well, makes this worse). <b>Partial-arch</b> articulators also can't verify the mounting cross-arch or let you model the occlusal form from the opposite side. "There is never an advantage to the dentist for the lab to use this articulator": its hinge axis can be very different from the anatomic one, sometimes directly behind the second molar, and it can't move in pathways like the patient's. Dentists seem to accept that adjusting crowns is normal: "NO!"</p>
+<p>The exception: a non-adjustable articulator about the size of a person, with the condyles roughly <b>4 inches</b> apart and the maxillary cast placed in about the right orientation to them (for example the Hanau-Mate from Whip Mix), builds crowns that roughly match the patient's movement.</p>
+<p><b>Mounting without a facebow.</b> Use an articulator with an intercondylar distance of about <b>110 mm (4 inches)</b> and a universal mounting stand. Secure the stand's platform to the lower member; center the maxillary cast on its positioning lines; fix it with utility wax, sticky wax or hot glue; attach it to the upper member's mounting plate with stone or plaster; when that has set, remove the platform; relate the mandibular cast with a bite registration if needed; with the articulator inverted, attach the lower cast to the lower mounting plate; when that has set, turn it upright and remove the registration. The casts are now in the <b>Bonwill position</b>, where the average protrusive angle (condylar inclination), immediate side shift (Bennett movement) and progressive side shift can be used without patient records.</p>
+<h4>Semi-adjustable articulators</h4>
+<p>Some settings let a semi-adjustable articulator resemble the patient more closely (how many depends on the model), so occlusal contacts <i>and</i> eccentric motions can be replicated to nearly match the patient. One semi-adjustable articulator can be used for almost anything, from a single crown to a full-mouth reconstruction with a change in vertical dimension, if you know how to use it. Why would you ever restore anterior teeth on a non-adjustable articulator when a semi-adjustable one moves in the right direction? The two common adjustments:</p>
+<p><b>1. Sagittal condylar inclination (SCI)</b>, also called <b>condylar guidance</b>: the angle at which the condyle descends the articular eminence in the sagittal plane. It controls the disclusion of the posterior teeth when there is little or no anterior guidance, and it affects <b>cusp height and fossa depth</b>. It can be customized to the patient's eminence (one <b>protrusive record sets both sides</b>) or set arbitrarily: <b>20-30°</b> is common for fixed work, and about <b>0°</b> for neutrocentric dentures. Matching the patient's protrusive function is especially helpful for bilateral balanced occlusion in dentures. (Desired touching is a "contact"; undesired touching is an "interference".)</p>
+<p><b>2. Bennett angle</b>: in mediotrusion the orbiting condyle moves inward (anterior, inferior and medial), which affects the <b>width of the central fossae</b> of the posterior teeth. It is the angle of that inward path in the horizontal plane relative to a straight protrusive path, set on the <b>medial wall</b> of the fossa. More sophisticated instruments can also set the <b>immediate lateral mandibular translation</b> (immediate side shift, ISS). The Bennett angle is <b>less commonly adjusted</b>: "if I was going to leave any feature off of an articulator, I'd probably leave this one," because the average values are close enough for most general dentistry.</p>
+<p>Because the articulator can be adjusted, information must be gathered from the patient: <b>1. a facebow transfer</b> (mounts the maxillary cast), <b>2. a centric relation record</b> and <b>3. eccentric records</b> (MIP, lateral, protrusive), which mount the mandibular cast and program the articulator. The goal is opening and closing paths as close as possible to the patient's, to minimize interferences.</p>
+<h4>The facebow transfer</h4>
+<p>The facebow mounts the <b>maxillary cast</b> (never the mandibular) in a similar relation to the patient's hinge axis, for function and esthetics. It consists of an ear-bow (caliper), a transfer assembly and a bite plate, and it needs a <b>reference plane</b> defined by three points on the patient that are calibrated to the articulator: <b>two posterior points</b>, usually the auditory canals, which estimate the transverse horizontal hinge axis, and <b>one anterior point</b>, which depends on the system (nasion, orbitale, or a set distance from the edge of the maxillary teeth). The reference plane is usually the <b>Frankfort horizontal</b> (some use Camper's plane). In an <b>indirect mounting</b> only the transfer assembly is attached to the lower member of the articulator to mount the cast, which simplifies mounting and lets the ear-bow stay in the clinic.</p>
+<p>Facebows for semi-adjustable articulators don't try to locate the exact hinge axis: they estimate an arbitrary posterior point near it, typically <b>within 2-5 mm</b>, much more accurate than a mounting stand. The auditory canals are the clinical reference, but the bow is designed with an arbitrary hinge axis in front of the ears. That is an <b>arbitrary facebow</b>; a bow that locates the exact hinge axis is a <b>kinematic facebow</b>. "99.9% of patients" are treated well with an arbitrary facebow; the small error is clinically insignificant.</p>
+<p>The school's clinical guideline for the <b>Denar Slidematic facebow</b> (about 1.5 minutes; in class he said 30-50 seconds): the anterior reference point is <b>43 mm above the right lateral incisal edge</b> (#7), marked with a ruler (adjacent teeth or the lower border of the upper lip at rest if #7 is missing); PVS on the bite plate captures the cusp tips and incisal edges, held with cotton rolls; the transfer assembly goes on the ear-bow, then into the ear canals; the pointer is aimed at the mark, the bow is checked level (its horizontal level parallels the bench top) and in the facial midline, the clamps are tightened, and the transfer jig goes to the mounting table. The level is what captures the <b>esthetic planes</b>: a cant of the incisal plane and the tilt of the occlusal plane come to the articulator, where you can see them.</p>
+<p><b>Without a facebow</b> the instrument loses much of its value. Incorrect maxillary orientation gives an error in the esthetic plane (risk of an <b>occlusal cant</b>: you hesitate to hand the patient the mirror), an error in the occlusal plane (risk of protrusive, non-working and working interferences), possibly incorrect cusp height, and grooves and cusps that don't match the patient. The result is more chairside adjustment, often ablating anatomic form: more work for the dentist to fix, if possible, what was easily avoided.</p>
+<p><b>Hinge axis and facebow.</b> The facebow relates the maxilla to both the patient's hinge axis (PHA) and the articulator's hinge axis (AHA). With a kinematic facebow, AHA = PHA; with an arbitrary facebow, AHA is near PHA. Mounting errors show up in protrusion and laterotrusion: a cast mounted <b>too posterior or too superior</b> gives premature or heavy contacts on the <b>most anterior teeth</b>; <b>too anterior or too inferior</b> gives premature or heavy contacts on the <b>most posterior teeth</b>.</p>
+<h4>The centric relation record</h4>
+<p>CO is often unstable, so an interocclusal record is needed to mount in CR, and from a CR mounting you can easily move to MICP. It is most appropriate for <b>diagnosis</b>, for <b>reorganized</b> dentistry and for <b>changes in VDO</b>. <b>Wax</b> is often preferred: an immediate set (soften it, hit it with the air-water syringe), minimal trimming, repeatable for verification, and because it doesn't capture fine anatomy, the opposing cusp tips seat into it "like clockwork". It is fragile. Some techniques use VPS (the Lucia jig, the leaf gauge).</p>
+<p>The record is made <b>without tooth contact</b>, because contact triggers the neuromuscular reflexes that deviate the jaw toward MIP, and at the <b>smallest opening</b> that avoids tooth contact: the more the vertical is opened, the larger the error, because an arbitrary axis is being used. Or make it at the vertical dimension you intend to restore.</p>
+<p><b>Stability of CO.</b> When <b>MIP = CO</b>, the contacts are stable and distributed and the vertical is stable: the ideal mounted relationship for reorganized treatment (dentures, full-mouth rehabilitation, full-arch implant work). But <b>MIP ≠ CO in about 90% of people</b>. Closing with the joints seated, neuromuscular control may not bring the jaw to MIP (sleep, rapid closure), and the resulting interferences lead to wear facets, tooth and cusp fracture, mobility and pain. The closure from CO to MIP decreases the VDO, positions the mandible anteriorly and has many potential interferences. So the CR mounting matters most for diagnosis, while treatment is usually conformative.</p>
+<h4>The MIP record</h4>
+<p>Mounting in MIP (also called MICP or ICP) is simpler than a CR mounting, because MICP is often more stable than CO, and it is the most appropriate for <b>conformative</b> restorative dentistry. Its significant limitation: the casts <b>can't move posteriorly-superiorly</b> to show any slide from CO to MICP, and since the start isn't joint-seated, eccentric motion is inaccurate unless it is tooth guided.</p>
+<p>It is the most common record and "also the most misused record." The <b>number one</b> cause of lab problems is a bad impression; the <b>second</b> is the mounting, usually from misusing MIP records. The most important rule: <b>hand-articulate the casts whenever you can</b>, and use a registration only if they are unstable. If you send the lab a record, they will mount with it, so don't send one "just in case."</p>
+<p><b>VPS</b> (vinyl polysiloxane, polyvinyl siloxane) is the common material, but it must be trimmed to seat accurately, and its resilience is a problem without adequate posterior stops. Its working time is <b>30-60 seconds</b> minimum from the start of the mix at 72°F (22°C) and its <b>minimum removal time 1 minute 30 seconds</b>: hard to hold still, and a patient who moves as it sets distorts it invisibly. It is also hard to reseat clinically to confirm the registration. <b>Waxes</b> are generally easier and highly accurate: aluminous wax (<b>Aluwax</b>) or resinous wax (<b>Delar</b>), an instant set with the air-water syringe, little or no trimming, much lower cost; but they need a water bath, are brittle, and can get too thin for an MIP record.</p>
+<p>If you use VPS: <b>don't cover the occluding surfaces of unprepared teeth</b> (in MIP they are supposed to touch; material over the prep is fine), <b>don't register soft tissue</b> (it moves in the mouth but not in stone), and if missing teeth don't allow a stable mounting, use a <b>record base</b>. Two reasons a registration, whatever the material, rarely fits even when trimmed: the material's <b>resilience</b>, and <b>detail greater than the stone cast's</b>. Occlusion is measured in microns; 20 µm off and the crown is out of occlusion. Used with care, VPS can be very accurate; otherwise it adds error. Trim windows so you can see the cusps seat.</p>
+<p><b>Five requirements of interocclusal records</b> (Dawson): 1. the record must not move teeth or displace soft tissue; 2. its accuracy must be verifiable in the mouth; 3. it must fit the casts as accurately as it fits the mouth; 4. its accuracy must be verifiable on the casts; 5. it must not distort in storage or transport to the lab.</p>
+<h4>Eccentric records and programming the articulator</h4>
+<p>Eccentric records program the articulator to follow the patient's condylar movement. They are most meaningful when mounted in CR (bilateral balanced occlusion in dentures, reorganized treatment). The <b>protrusive record</b>: the mandible moves forward from CR <b>3-5 mm</b>, without lateral deviation; one record sets the SCI on <b>both</b> sides. <b>Lateral records</b>: the mandible moves in laterotrusion 3-5 mm; you need <b>two</b> (left and right working motion), and each sets the <b>contralateral</b> SCI and the contralateral medial-wall settings (Bennett angle and immediate side shift): a right lateral record sets the left side.</p>
+<p><b>Protrusive records are preferred.</b> The SCI measured with a lateral record (down the medial wall) is <b>steeper</b> than the SCI from a protrusive record (down the articular eminence). If the goal is posterior disclusion, contacts that are avoided in protrusion will also miss in right and left laterotrusion, so the shallower protrusive SCI is the safer setting: if the articulator is shallower than the patient, the patient just gets more disclusion; if it is steeper, the restoration may hit. For the same reason many clinicians set an arbitrary <b>30°</b>: most patients' protrusive angles range from about 20 to 60° (commonly 35-40°), so a 30° setting gives decent anatomy and still discludes in the mouth (20° makes the cusps too shallow). For a bilateral balanced denture you would do the opposite; that comes later.</p>
+<p>Why <b>3-5 mm</b>? Beyond that the condyle's path is curving and the teeth are separated anyway. The orbiting condyle's path curves, so the Bennett angle measured depends on where the record is taken: at <b>3-5 mm</b> of condylar movement the angle is <b>larger</b>; at <b>7-10 mm</b> it is smaller, which builds <b>narrower fossae</b> on the posterior teeth and more likely interferences.</p>
+<p>To program: release the centric latch and loosen the settings (both SCIs for a protrusive record; the contralateral SCI and the Bennett and side-shift settings for a lateral); seat the record on the upper cast and the lower cast into it; the condylar element now touches neither the superior fossa nor the medial wall; adjust the SCI until the element touches the superior fossa surface, then tighten (a protrusive record is done here); for a lateral record, adjust the Bennett angle and/or immediate side shift until the medial wall touches the element, tighten, and repeat with the other side's record.</p>
+<p>Semi-adjustable articulators adapt to patient-specific condylar movement, a significant advantage over non-adjustable ones. They take more time, "but well worth the effort," because they minimize intraoral adjustment, and they cost more. Some models (including the <b>Denar 320</b>, calibrated) are <b>interchangeable</b>: mounted casts move between articulators without losing accuracy, so the articulator doesn't travel to the lab (Oral Arts keeps calibrated Denar 320s), fewer articulators are needed and less damage happens. As a resident, before interchangeability, he used 17 articulators to run his cases.</p>
+<h4>Fully adjustable articulators</h4>
+<p>The most sophisticated instruments in dentistry for reproducing mandibular movement, with precise adjustments for the <b>condylar inclination</b> (lateral and protrusive paths separately, not just sagittal), the <b>Bennett angle and immediate lateral shift</b> (curved or custom paths, not straight), the <b>rotating condyle</b> (its small superior-inferior and anterior-posterior motion affects cusp height and fossa depth on the working side) and the <b>intercondylar distance</b> (not everyone is 4 inches; it changes the eccentric paths of opposing cusps, so the groove and ridge positions). The Denar D5A is one; the Denar 330 is a semi-adjustable that comes close.</p>
+<p>Programming them takes complex procedures: <b>1. the exact hinge axis</b> with a kinematic facebow (a hinge-axis locator: the upper bow holds a grid, the lower a stylus; hinge the mandible in CR and adjust the stylus until it only rotates; the point was once <b>tattooed</b> on the skin); <b>2. dynamic capture of mandibular movement</b>, because positional records can't show it: the <b>pantograph</b> captures the "timing" of movement, with a lower bow carrying <b>6 recording tables</b> and an upper bow <b>6 styli</b>, the teeth separated by a <b>central bearing device</b> so they can't influence the motion, through protrusive and right and left laterotrusive movements, then transferred to the articulator and adjusted until it reproduces the tracings (hours of work); <b>3. a CR record</b>. Today's jaw-tracking systems (SAM Axioquick, ModJaw 4D, Whip Mix Cadiax, KaVo Protar, the 3Shape Trios's patient-specific motion) capture the same thing in minutes and feed a virtual articulator. Any record is influenced by the patient knowing it is being taken, so practice and relaxation help.</p>
+<p><b>Record thickness.</b> On a fully adjustable articulator the exact hinge axis is captured, so the arc of opening and closing in terminal hinge movement is the same on the patient and the articulator, and the <b>thickness of the CR record doesn't affect accuracy</b>. On a <b>semi-adjustable</b> articulator the arbitrary facebow gives an AHA that only estimates the PHA, so the arcs differ and the thicker the record, the more error. So on a semi-adjustable: make CR records with <b>minimal thickness</b>, or at the <b>vertical dimension you intend to treat</b>, where the two arcs meet and the articulator is "dead on."</p>
+<p>The major advantage of a fully adjustable articulator is duplicating the patient, in the hope of minimal intraoral adjustment. The disadvantages: time-consuming, technique-sensitive instrumentation and significant expense. In the analog world that hope rarely came true; digital workflows are making the concept a reality.</p>
+<h4>Selecting an articulator</h4>
+<p><b>1. The patient's occlusion.</b> Anterior guidance usually predominates in eccentric tooth contact, because it is closer to the teeth. With <b>strong anterior guidance</b>, a less sophisticated articulator can be used for posterior teeth (a crown on #20 will disclude). With <b>poor anterior guidance</b> (little vertical or horizontal overlap, malaligned or missing teeth, pathology; skeletal Class II arch discrepancies, edge-to-edge Class III), the posterior determinant controls more of the movement and a more sophisticated articulator is needed. It is hard to justify a non-adjustable articulator for any tooth that is part of the anterior guidance.</p>
+<p><b>2. The extent of the restorative work.</b> The more the articulator mimics the patient, the less intraoral adjustment. Minor procedures can use simpler instruments; complex reconstruction (a four-unit bridge from #22 to #18 replaces half the posterior occlusion) needs more sophisticated ones. "The job dictates the tool, not the other way around." <b>3. The limits of the articulator system</b>, in how much intraoral adjustment will be needed. <b>4. The skill of the clinician</b>: "A semi-adjustable articulator in the hands of a knowledgeable clinician may be of greater assistance in treatment than a fully adjustable articulator in the hands of an inexperienced operator" (add to that, a careless one), and if the records are careless or the casts inaccurately mounted, any articulator loses its usefulness.</p>
+<p>His selection table, in short: a restoration discluded significantly by anterior guidance can go on any of the three; a restoration that is minimally discluded (eccentric interferences likely), part of the anterior guidance, one of several units, crossing the midline, with a change of VDO, a diagnostic CR mounting, steep or flat eminence, acute or flat curve of Spee, a steep occlusal plane or anatomic cusp height all call for at least a semi-adjustable (a fully adjustable does them best). The non-adjustable wins only on ease of lab use (expense) and ease of clinician use. "Anything that you can do in the laboratory that saves you clinic time is well worth the investment."</p>
 `
 };
 
@@ -5061,6 +5419,37 @@ applying: `
 <p>Small front fillings (Class III) copy the old contacts and keep the bite off the filling. Corner fillings (Class IV) should share contacts between filling and tooth. For one front crown, first fix any back-tooth bump that slides the jaw forward. When crowning both upper centrals or a canine, use a <b>custom guide table</b>; to copy the existing guidance, take its impression <b>before</b> trimming the teeth. If the guidance is poor, wax it up, wear temporaries for at least three weeks (months for grinders), record them, and copy them. Use "s" to check bite height: the front teeth should come within 1-2 mm.</p>
 <h4>Implants</h4>
 <p>An implant is fused to bone with no cushioning ligament, so it barely moves (2-3 microns down vs about 28 for a tooth). Its bite is built light: on a gentle close it barely touches, and on a hard clench it touches equally with the teeth, which sink a little. A front implant shouldn't do the canine guiding alone; it shares the load with natural teeth. A back implant should avoid contact in sideways and forward movements. Shimstock (a 12-micron strip) helps you check this.</p>
+`,
+instruments: `
+<div class="tested"><b>What's tested</b><ul><li>Why we mount models on an articulator</li><li>The three kinds of articulator and what each can and can't do</li><li>The facebow and the bite records: what each one is for and the mistakes that ruin a mounting</li><li>Why a forward (protrusive) record is preferred, and why records are taken 3-5 mm out</li><li>How to choose an articulator for a patient</li></ul></div>
+<p>This opens the second half of the course. An articulator is a hinge that holds the upper and lower models so you can study the bite and build restorations outside the mouth. Dr. Givan sorts them into three kinds: ones you can't adjust, ones you can partly adjust, and ones you set up completely for the patient. The machine is only a tool. His one line to remember: <b>an articulator works best when it is about the size of the patient.</b></p>
+<h4>Why mount models</h4>
+<p>Mounted models let you see how the teeth fit, still and moving, from any angle. They show harmful contacts the patient avoids by reflex, so you can't see them in the mouth. For diagnosis, a <b>CR mounting</b> (jaw joints seated) is the most useful: you can see the first contact with the joints seated, the slide, and still close into MIP. An <b>MIP mounting</b> can't go back to the seated-joint contact.</p>
+<p>Models also help plan treatment (try a grinding plan on the models first), make a <b>diagnostic wax-up</b> to see the end result and explain it to the patient, and most commonly build the restoration itself. The big point: <b>the articulator you pick decides how long you spend adjusting the work at delivery.</b> Time saved outside the appointment is money well spent.</p>
+<h4>Kinds of articulators</h4>
+<p>An <b>arcon</b> articulator (ARticulating CONdyle) has the condyle part on the lower member and the socket part on the upper member, like a real jaw. A <b>non-arcon</b> is the reverse and is usually cheaper. UAB groups articulators as <b>non-adjustable</b> (a hinge or average values), <b>semi-adjustable</b> (some settings, some averages, like your Denar 320) and <b>fully adjustable</b> (everything set for the patient). Real articulators sit on a sliding scale. Digital (virtual) articulators are close but still can't place the models relative to the patient's joints as well as a facebow does.</p>
+<h4>Non-adjustable</h4>
+<p>These are only accurate in one position: the teeth fully closed together (MIP). Their opening and side-to-side paths don't match the patient. Any bite record that props the teeth apart adds error, because the hinge closes along a different arc than the jaw, and the smaller the articulator, the bigger the error. They're cheap, quick and small, which <b>helps the lab, not the dentist</b>: the crown won't match the patient's movements, so you grind it in the mouth, losing its shape (and zirconia is hard to adjust and polish). Small partial-arch ones also can't show the other side. One that is about the size of a person, with the condyles about 4 inches apart, does a decent job.</p>
+<p>Without a facebow, you can use a mounting stand on an articulator about <b>110 mm (4 inches)</b> wide: center the upper model on the stand, plaster it to the upper arm, relate the lower model (with a bite record only if needed), and plaster it to the lower arm. That puts the models in an average position where average settings work.</p>
+<h4>Semi-adjustable</h4>
+<p>These can be set to move much like the patient, so both closing and side-to-side movements come out nearly right, from a single crown to a full-mouth rebuild. The two common settings:</p>
+<p><b>1. Condylar guidance</b> (sagittal condylar inclination): how steeply the condyle slides down the bump in front of the socket. It decides how much the back teeth separate when there's little front-tooth guidance, and how tall the cusps and how deep the grooves can be. One forward bite record sets both sides, or you pick a number: <b>20-30°</b> is common for crowns, about 0° for one kind of flat denture.</p>
+<p><b>2. Bennett angle</b>: how far the condyle on the other side swings inward during a side move. It changes how wide the grooves in the back teeth are. It's adjusted less often; Dr. Givan would leave this one off first.</p>
+<p>To use these settings you need information from the patient: a <b>facebow</b> for the upper model, and bite records for the lower model and the settings.</p>
+<h4>The facebow</h4>
+<p>The facebow places the <b>upper model</b> on the articulator in the same position it has relative to the patient's jaw joints. It uses three points: the two ear canals (close to the jaw's hinge) and one point in front (for your facebow, a mark 43 mm above the upper right lateral incisor's edge). The front point and a bubble level also capture the smile line and the tilt of the bite. It takes a minute or so. Ours is an <b>arbitrary</b> facebow: it guesses the hinge within about 2-5 mm, which is fine for nearly every patient. A <b>kinematic</b> facebow finds the exact hinge.</p>
+<p>Skip the facebow and the upper model sits wrong: the smile line can come out tilted (a cant), the back teeth may hit in side and forward movements, the cusps can be the wrong height, and you grind more in the mouth. A model mounted too far back or too high makes the front-most teeth hit first or hard; too far forward or too low makes the back-most teeth hit.</p>
+<h4>Bite records</h4>
+<p>A <b>CR record</b> is taken with the joints seated and the teeth <b>not touching</b> (touching makes the jaw slide toward MIP), opened as little as possible, or at the height you plan to restore. Wax is often best: it sets in a second with air and water and the cusp tips seat in it well, but it's fragile. Use CR for diagnosis, full rebuilds and changes in bite height. In about 90% of people the seated-joint contact (CO) isn't the same as MIP.</p>
+<p>The <b>MIP record</b> is the most common record and the most misused. Bad mounting is the second most common cause of lab problems, after bad impressions. <b>If the models fit together by hand, don't use a record at all</b>, because the lab will use whatever you send. If you need one: rubbery bite material (VPS) records more detail than stone and is springy, so it rarely fits the models unless trimmed; it takes 30-60 seconds to work and about 1.5 minutes before it can come out, and any movement distorts it. Don't cover the biting surfaces of teeth that aren't being prepared, keep it off the gums, and use a record base if too many teeth are missing. Wax sets instantly and needs little trimming, but needs a water bath and breaks easily.</p>
+<p>Five rules for any bite record: it doesn't move teeth or squash the gums; you can check it in the mouth; it fits the models as well as the mouth; you can check it on the models; it doesn't distort on the way to the lab.</p>
+<h4>Forward and side records</h4>
+<p>These set up the articulator's movements. A <b>forward (protrusive) record</b> is taken with the jaw pushed straight forward 3-5 mm and sets the condylar guidance on both sides at once. <b>Side (lateral) records</b> need two, one each way, and each sets the opposite side's guidance and Bennett settings. <b>Forward records are preferred</b>: side records give a steeper angle, and if the articulator is steeper than the patient, the crown may hit in the mouth; if it's flatter, the back teeth just separate more. That's also why many people simply set 30°. Records are taken 3-5 mm out because the condyle's path curves; a record taken farther out gives a smaller Bennett angle and narrower grooves that are more likely to hit.</p>
+<p>Calibrated articulators like the Denar 320 are interchangeable: the mounted models move between articulators (yours and the lab's) without losing accuracy.</p>
+<h4>Fully adjustable</h4>
+<p>These can copy almost everything: curved condyle paths, the side shift, the small wobble of the working-side condyle, and the distance between the condyles. Setting one up used to mean finding the exact hinge (once marked with a tattoo), then tracing jaw movements with a <b>pantograph</b> (six styluses drawing on six tables while a central pin keeps the teeth apart), which took hours. Today camera and scanner systems record jaw movements in minutes and feed digital articulators. Because the hinge is exact, the thickness of a CR record doesn't matter there. On a semi-adjustable one it does: keep CR records thin, or take them at the height you plan to restore.</p>
+<h4>Choosing one</h4>
+<p>Four things decide: <b>the patient's bite</b> (strong front-tooth guidance lets a simple articulator work for a back crown; weak guidance, as in edge-to-edge bites or very little overlap of the front teeth, needs a better one, and never use a non-adjustable for teeth that are part of the guidance), <b>how much work</b> you're doing (the job picks the tool), <b>what the articulator can do</b>, and <b>the skill of the clinician</b>: a semi-adjustable articulator in knowledgeable hands beats a fully adjustable one in inexperienced hands.</p>
 `
 };
 
@@ -5344,6 +5733,51 @@ var REVIEW = [
     'A hinge articulator only helps the lab'
   ]}
 ]},
+{ id:'instruments', lec:'instruments', title:'Occlusal Instrumentation: Articulators, Facebows and Records', icon:'target', blurb:'Occ Lec4 (10/22), the first lecture for the final: the three kinds of articulator, the facebow and the records, and how to choose.',
+  sections:[
+  { title:'The three kinds of articulator', type:'table', head:['','Non-adjustable','Semi-adjustable','Fully adjustable'], rows:[
+    ['Adjusts','Nothing (hinge or average values)','Some settings: SCI, Bennett angle (some: ISS)','Everything: curved paths, rotating condyle, intercondylar distance'],
+    ['Accurate in','MICP only','Contacts and eccentric motions nearly match the patient','Duplicates the patient (if programmed well)'],
+    ['Procedures','Arbitrary MICP mounting (or a mounting stand)','Facebow, CR record, eccentric records','Kinematic facebow, pantograph, CR record'],
+    ['Good for','The lab (cheap, quick, small to ship)','Almost anything, single crown to full-mouth','Complex reconstruction; digital is reviving it'],
+    ['Downside','Intraoral grinding; can\'t meet eccentric needs','More time and cost than non-adjustable','Time, technique sensitivity, expense']
+  ]},
+  { title:'The records', type:'table', head:['Record','Does','Taken','Key points'], rows:[
+    ['Facebow','Mounts the maxillary cast','Ear canals + one anterior point (Slidematic: 43 mm above #7)','Arbitrary within 2-5 mm; captures the esthetic planes'],
+    ['CR record','Relates the mandibular cast with the joints seated','No tooth contact, minimal opening or at the treatment VDO','Diagnosis, reorganized work, VDO changes; wax preferred'],
+    ['MIP record','Relates the mandibular cast in MIP','Only if the casts won\'t hand-articulate','Conformative work; most misused; over preps only, trimmed, off soft tissue'],
+    ['Protrusive','Sets both SCIs','3-5 mm straight forward from CR','Preferred: shallower SCI keeps restorations discluded'],
+    ['Lateral (x2)','Sets the contralateral SCI, Bennett angle and ISS','3-5 mm to each side','Steeper SCI; at 7-10 mm the Bennett angle reads smaller']
+  ]},
+  { title:'Where the error shows', type:'table', head:['Mounting error','Result'], rows:[
+    ['Maxillary cast too posterior or too superior','Premature or heavy contacts on the most anterior teeth'],
+    ['Maxillary cast too anterior or too inferior','Premature or heavy contacts on the most posterior teeth'],
+    ['No facebow','Occlusal cant, plane errors and interferences, wrong cusp height, grooves that don\'t match'],
+    ['Separating record on a non-adjustable articulator','The articulator closes on a different arc: a new, wrong position'],
+    ['Thick CR record on a semi-adjustable','Arbitrary axis: the arcs differ, more error'],
+    ['VPS over unprepared teeth or soft tissue','Casts don\'t seat; the crown comes back high']
+  ]},
+  { title:'MIP record rules', type:'list', items:[
+    'Hand-articulate whenever you can; send no record "just in case"',
+    'VPS: work time 30-60 s at 72°F; minimum removal time 1 min 30 s',
+    'Wax (Aluwax, Delar): instant set, little trimming, cheap; needs a water bath, brittle',
+    'Never cover the occluding surfaces of unprepared teeth; keep off soft tissue',
+    'Missing teeth make it unstable: use a record base',
+    'It rarely fits even trimmed: resilience, and more detail than the stone',
+    'Five requirements (Dawson): no tooth or tissue movement; verifiable in the mouth; fits the casts as well as the mouth; verifiable on the casts; no distortion in transport'
+  ]},
+  { title:'Choosing an articulator', type:'table', head:['Situation','Non-adj','Semi-adj','Fully adj'], rows:[
+    ['Restoration discluded significantly by anterior guidance','+','+','+'],
+    ['Minimally discluded (eccentric interferences)','−','+','+'],
+    ['Part of the anterior guidance','−','+','+'],
+    ['Multiple units; change of VDO','−','+','++'],
+    ['Diagnostic CR mounting','−','+','++'],
+    ['Steep or flat eminence','− −','+','++'],
+    ['Reducing intraoral adjustment','− −','+','++'],
+    ['Ease of clinician use','++','+','− −'],
+    ['Ease of lab use (expense)','+++','+','n/a']
+  ]}
+]},
 /* =================================================================== PROCESSES */
 /* =================================================================== SIDE BY SIDE (comparison charts, 2026-10-20) */
 { id:'compare', title:'Side by side', icon:'layers', blurb:'Comparison charts across the lectures: the same few patterns from every angle, and the pairs the class mixes up most. Everything here is also in the notes.',
@@ -5398,7 +5832,10 @@ var SEQUENCES = [
   { id:'reorg', lec:'applying', title:'Reorganized approach', steps:['Seat the joints (CR)','CR record','Build in provisionals','Test and adjust','Duplicate in finals'] },
   { id:'tryin', lec:'applying', title:'Crown try-in', steps:['Seat fully','Proximal contacts','MIP contacts','Excursions','Recheck upright'] },
   { id:'smile', lec:'concepts', title:'Smile design, steps 1-5', steps:['Centric stops','Lip support','Lip closure','Tooth to lip (f, v)','Lingual contours'] },
-  { id:'open', lec:'anatomy', title:'Opening the jaw', steps:['Infrahyoids fix the hyoid','Suprahyoids pull down','Inferior LPt pulls condyle forward','Condyle translates','Wide opening'] }
+  { id:'open', lec:'anatomy', title:'Opening the jaw', steps:['Infrahyoids fix the hyoid','Suprahyoids pull down','Inferior LPt pulls condyle forward','Condyle translates','Wide opening'] },
+  { id:'facebow', lec:'instruments', title:'A Slidematic facebow transfer', steps:['Mark the point 43 mm above #7','PVS on the bite plate, cotton rolls to hold it','Transfer assembly on the ear-bow, into the ear canals','Aim the pointer, check level and midline, tighten clamps','Remove; transfer jig to the mounting table'] },
+  { id:'program', lec:'instruments', title:'Setting the SCI from a protrusive record', steps:['Release the centric latch, loosen both SCIs','Seat the record between the casts','See the gap above each condylar element','Adjust each SCI until the fossa touches','Tighten'] },
+  { id:'nofacebow', lec:'instruments', title:'Mounting without a facebow', steps:['Mounting stand on the lower member','Center the maxillary cast on its lines','Stone it to the upper member','Relate the lower cast (record only if needed)','Invert and stone the lower cast'] }
 ];
 /* each lecture's tab ends with its ordered steps */
 REVIEW.forEach(function(g){ if(g.lec && SEQUENCES.some(function(q){ return q.lec === g.lec; })) g.sections.push({ title:'Processes', type:'flows', lec:g.lec }); });
@@ -5409,7 +5846,8 @@ review:['Occlusion = static; articulation = static + dynamic','Neutral zone: ton
 anatomy:['Ginglymoarthrodial; one bone, two joints','Rotation lower compartment; translation upper','Condyle in avascular intermediate zone; posterior band thickest; disc thicker medially','Disc, not meniscus; compound joint','Retrodiscal: vascular, painful; SRL elastic, IRL collagenous','Capsular = wraps; discal = disc on condyle (clicking)','Stylo- and sphenomandibular: opening + forward','TM outer oblique: rotational opening. Inner horizontal: posterior movement','Open lock: push DOWN on the buccal shelf','Masseter: superficial elevates + protrudes; deep elevates + retrudes; seats the joint','Temporalis: positioner; posterior fibers retrude','Inferior LPt: opens, protrudes, chin to the other side. Superior LPt: closing, holds disc','Medial pterygoid + masseter = pterygomasseteric sling','EXAM SLIDE: elevate T, MPt, M. Depress inf LPt + supra/infrahyoids. Protrude inf LPt + superficial M. Retrude posterior T + deep M','To the right: right T + right M, left LPt + left MPt','Suprahyoid: digastric, geniohyoid, mylohyoid, stylohyoid. Infrahyoid fixes the hyoid','No innervation questions'],
 function:['Primary: chew, swallow, speak. Secondary: breathe, emote','Teeth apart: muscles + ligaments position the jaw','Central pattern generator; engrams','Opening → crushing → grinding; 16-18 mm open, 5-6 mm lateral','Back to ICP every time; 194 ms contacts; more contact as bolus breaks down','Working side opens anteriorly, closes posteriorly','78% chew on one side','Tall cusps = vertical stroke; flat = broad','TMJ pain: slower, shorter, irregular','Molar 3-5× incisor force; men 118-142, women 79-99, max 975 lb','High FMA = low force; 0.5 mm high = 2× force','Chew on PM2-M1','Swallow decision: fineness, taste, lubrication','Somatic (MIP) vs visceral (tongue; retained = open bite)','Swallow: 66.5 lb, 683 ms; 590/day','Stage 1+2 ≈ 1 s; stage 3 = 6-7 s','No tooth contact in speech','F/V: incisal edge on the wet-dry line; S: closest speaking space'],
 concepts:['Bonwill: 4-inch triangle, occlusal plane, bilateral balance ("father of articulation")','Balkwill 1866 medial condyle; Spee 1890; Christensen 1901; Parfitt 1902; Bennett 1908','Monson: 4-inch sphere, central rotation center, no condyles','PMS: Monson lowers + FGP uppers; Schuyler dropped balance, raised anterior guidance','Gnathology: pantograph + fully adjustable articulator; RUM + balance were wrong','Stuart = disclusion (canine guidance); D\'Amico = force (mutually protected)','Conformative ~90-98% of dentistry','Neuromuscular: myocentric point, TENS, raises VDO, not taught','All agree: all teeth touch at once; back teeth don\'t interfere','Speer: all patients? without restoring?','Support first, disclusion second','Shortened dental arch to PM2','Fix the plane: enameloplasty, crown, extraction','Tripodization: stable, hard, needs immediate disclusion','Point to surface: long axis + freedom; long centric','Anterior guidance = most important + most controllable','Smile design: stops, lip support, closure, f/v, lingual, cingulum (d/t), s','Lisp = too much space; whistle = too little'],
-applying:['Schemes: balanced, mutually protected, group function','No symptoms = copy existing guidance','MIP: 17.5 min/day, 1,800 strokes, 500 swallows','PDL detects 20 µm','Posterior protrusive interferences out BEFORE anterior work','Conformative = local fixes, MIP record. Reorganized = CR first, CR record','Errors: full-arch record, untrimmed excess','No infraocclusion: it supererupts','Large filling: check opposing cusp first; plunger cusps','Single crown: hand articulate, no face-bow, hinge OK','End of arch: adjust retruded contact, use a record','3-unit: conformative, semi-adjustable','Hinge articulator only helps the lab','Class III: keep contacts off composite. Class IV: share contacts','Both centrals or a canine: custom anterior guide table, impression before prep','Poor guidance: wax-up → provisionals ≥3 weeks → guide table → finals','Closest speaking space 1-2 mm','Implant 2-3 µm vs tooth 28 µm','Implant: light on tapping, equal on clenching; no immediate canine disclusion; posterior no excursive contact']
+applying:['Schemes: balanced, mutually protected, group function','No symptoms = copy existing guidance','MIP: 17.5 min/day, 1,800 strokes, 500 swallows','PDL detects 20 µm','Posterior protrusive interferences out BEFORE anterior work','Conformative = local fixes, MIP record. Reorganized = CR first, CR record','Errors: full-arch record, untrimmed excess','No infraocclusion: it supererupts','Large filling: check opposing cusp first; plunger cusps','Single crown: hand articulate, no face-bow, hinge OK','End of arch: adjust retruded contact, use a record','3-unit: conformative, semi-adjustable','Hinge articulator only helps the lab','Class III: keep contacts off composite. Class IV: share contacts','Both centrals or a canine: custom anterior guide table, impression before prep','Poor guidance: wax-up → provisionals ≥3 weeks → guide table → finals','Closest speaking space 1-2 mm','Implant 2-3 µm vs tooth 28 µm','Implant: light on tapping, equal on clenching; no immediate canine disclusion; posterior no excursive contact'],
+instruments:['Best value: articulator about the size of the patient (about 110 mm, 4 inches between condyles)','Arcon: condyle on the LOWER member, fossa on the upper','Non-adjustable: accurate in MICP only; any separating record adds error; benefits the lab','Semi-adjustable: SCI (condylar guidance: cusp height, fossa depth, disclusion) + Bennett angle (fossa width; least needed)','Arbitrary SCI 20-30° fixed; 0° neutrocentric dentures; 30° works because most patients are 35-40°','Facebow = maxillary cast only; ear canals + 1 anterior point; Frankfort; arbitrary within 2-5 mm; kinematic = exact axis','Slidematic: 43 mm above #7; the level captures cant and occlusal-plane tilt','Mounted too posterior/superior: heavy anterior contacts; too anterior/inferior: heavy posterior contacts','CR record: no tooth contact, minimal opening (or at the treatment VDO); wax; MIP ≠ CO in about 90%','MIP record: most common, most misused; hand-articulate when you can; VPS only over preps, off soft tissue; removal 1:30','Five record requirements: no movement, verify in mouth, fits casts like mouth, verify on casts, no distortion','Protrusive 3-5 mm sets both SCIs; lateral x2 set the contralateral side; protrusive preferred (lateral SCI steeper)','Fully adjustable: kinematic bow, pantograph (6 tables, 6 styli, central bearing device); CR thickness doesn\'t matter there','Choose by: the patient\'s guidance, the extent of work, the instrument\'s limits, the clinician']
 };
 
 /* ---------- EXAM HINTS (quotes from the 9/17, 9/24 and 10/1 recordings; obvious transcription errors in terms corrected, e.g. "central occlusion" → "centric occlusion") ---------- */
@@ -5457,7 +5895,24 @@ var HINTS = [
   { lec:'applying', kind:'emphasize', quote:'The hinge articulator does not help you as the dentist ever... The advantage is entirely to the laboratory.', take:'Use an articulator about the patient\'s size.' },
   { lec:'applying', kind:'emphasize', quote:'I would not want all of my guidance to be on a Class 4 restoration. That would be a recipe for disaster.', take:'Class IV: share contacts with natural tooth.' },
   { lec:'applying', kind:'emphasize', quote:'If you do a four-unit bridge in the posterior, you just replace 50% of a patient\'s occlusion.', take:'Big posterior work: decide what to rebuild, don\'t just copy.' },
-  { lec:'applying', kind:'emphasize', quote:'Typically, at a minimum, I would give three weeks if everything was very mild and asymptomatic. On a bruxing patient... sometimes go months.', take:'Time in provisionals before copying guidance.' }
+  { lec:'applying', kind:'emphasize', quote:'Typically, at a minimum, I would give three weeks if everything was very mild and asymptomatic. On a bruxing patient... sometimes go months.', take:'Time in provisionals before copying guidance.' },
+  { lec:'instruments', kind:'emphasize', quote:'Slide: "Remember this if nothing else… an articulator has best value if similar size to patient."', take:'On every objectives slide. A small hinge never follows the patient\'s arcs.' },
+  { lec:'instruments', kind:'emphasize', quote:'And this, if I could get one point across today, it was that one, okay? Your selection of the right articulator is going to make or break your time treating a patient.', take:'The articulator decides how much you adjust at delivery: chair time is money.' },
+  { lec:'instruments', kind:'emphasize', quote:'Non-adjustable articulators is primarily an advantage to the laboratory, not to you.', take:'Cheap, quick, small to ship: good for the lab, not for the dentist or the patient.' },
+  { lec:'instruments', kind:'emphasize', quote:'Why on earth would you ever use a non-adjustable on an anterior teeth when a semi-adjustable is going to move in the right direction?', take:'Teeth in the anterior guidance need at least a semi-adjustable articulator.' },
+  { lec:'instruments', kind:'emphasize', quote:'If I was going to leave any feature off of an articulator, I\'d probably leave this one because, again, the average values are close enough to allow us to do good clinical dentistry.', take:'The Bennett angle is the less commonly adjusted setting; SCI matters more.' },
+  { lec:'instruments', kind:'emphasize', quote:'This is for the maxillary cast. That\'s what it\'s for. It is not involved with the mandibular cast, only the maxillary.', take:'Facebow = maxillary cast. CR or MIP records relate the mandibular cast.' },
+  { lec:'instruments', kind:'emphasize', quote:'99.9% of patients, maybe 99.99% of patients, are easily treated with an arbitrary facebow.', take:'Arbitrary (ear-canal) bows are within 2-5 mm: clinically insignificant.' },
+  { lec:'instruments', kind:'emphasize', quote:'When you\'re hesitant to hand the patient the mirror, you\'ve got a problem.', take:'Skip the facebow and you risk an occlusal cant in the esthetic plane.' },
+  { lec:'instruments', kind:'emphasize', quote:'The most common record that you will use is an MIP record. And I will suggest to you it is also the most misused record.', take:'Most common, most misused: the second most common cause of lab problems after a bad impression.' },
+  { lec:'instruments', kind:'emphasize', quote:'Probably the most important thing I can tell you is, if possible, don\'t use a record. Hand articulate always when you can.', take:'Use an MIP record only when the casts won\'t hand-articulate. The lab mounts with whatever you send.' },
+  { lec:'instruments', kind:'emphasize', quote:'Normally we would never want to put something on the occlusal surface of an unprepped tooth.', take:'VPS MIP records go over the prep only, trimmed to the cusp tips and off soft tissue.' },
+  { lec:'instruments', kind:'emphasize', quote:'I can\'t think of the last time I took lateral records doing full mouth reconstruction. As a prosthodontist, I do those. You know, I do protrusive records.', take:'Protrusive records are preferred: the lateral SCI is steeper, the protrusive one keeps restorations discluded.' },
+  { lec:'instruments', kind:'emphasize', quote:'So 3 to 5 millimeters is pretty good. I don\'t want to deviate to the left or right.', take:'Protrusive and lateral records: 3-5 mm. Farther out the Bennett angle reads smaller and the fossae come out narrow.' },
+  { lec:'instruments', kind:'emphasize', quote:'The job dictates the tool, okay, not the other way around.', take:'Choose by the patient\'s guidance and the extent of the work.' },
+  { lec:'instruments', kind:'emphasize', quote:'Anything that you can do in the laboratory that saves you clinic time is well worth the investment.', take:'His closing line: the facebow and the right records pay for themselves at delivery.' },
+  { lec:'instruments', kind:'deemphasize', quote:'Slide: "Not on test" (Example Non-Adjustable: The UAB Handulator, developed by Fu and Givan in 2007).', take:'The Handulator itself isn\'t tested; the principle (accurate only in MICP) is.' },
+  { lec:'instruments', kind:'deemphasize', quote:'If I turn around and I do a denture occlusion with bilateral balance, I would do the exact opposite. We\'ll cover that in the last session. Don\'t worry about that.', take:'How to set the SCI for a balanced denture comes in the course\'s last session.' }
 ];
 
 /* ---------- SORT SETS (sort and whack games) ---------- */
@@ -5472,7 +5927,9 @@ var SORT_SETS = [
   { id:'school', lec:'concepts', title:'Pankey-Mann-Schuyler or gnathology?', bins:['PMS','Gnathology'], items:[['Functionally generated path',0],['Monson curve, lower teeth',0],['Suspension articulator',0],['Hanau H2 articulator',0],['Broadrick analyzer',0],['Pantograph',1],['Fully adjustable articulator',1],['RUM position',1],['Cuspid protection',1],['P.K. Thomas waxing',1]] },
   { id:'contact', lec:'concepts', title:'Tripodization or point to surface?', bins:['Tripodization','Point to surface'], items:[['Three contacts per cusp',0],['Needs immediate disclusion',0],['From gnathology',0],['Very hard in porcelain',0],['Horizontal freedom',1],['Allows a long centric',1],['Suits immediate side shift',1],['Any size restoration',1]] },
   { id:'approach', lec:'applying', title:'Conformative or reorganized?', bins:['Conformative','Reorganized'], items:[['MIP record',0],['Localized adjustments',0],['Single bounded crown',0],['Three-unit bridge',0],['Small fillings',0],['CR record',1],['Joints seated first',1],['Multiple large posterior work',1],['Severe destruction',1],['New jaw relationship',1]] },
-  { id:'implant', lec:'applying', title:'Natural tooth or implant?', bins:['Natural tooth','Implant'], items:[['28 µm apical',0],['PDL proprioception',0],['Can carry canine guidance',0],['90-108 µm lateral',0],['2-3 µm apical',1],['No ligament',1],['Light on casual closure',1],['Share the canine load',1],['No posterior excursive contact',1]] }
+  { id:'implant', lec:'applying', title:'Natural tooth or implant?', bins:['Natural tooth','Implant'], items:[['28 µm apical',0],['PDL proprioception',0],['Can carry canine guidance',0],['90-108 µm lateral',0],['2-3 µm apical',1],['No ligament',1],['Light on casual closure',1],['Share the canine load',1],['No posterior excursive contact',1]] },
+  { id:'records', lec:'instruments', title:'Protrusive or lateral record?', bins:['Protrusive','Lateral'], items:[['One record',0],['Sets both SCIs',0],['Preferred for the SCI',0],['Shallower SCI',0],['Straight forward 3-5 mm',0],['Two records',1],['Sets the contralateral side',1],['Sets the Bennett angle',1],['Steeper SCI',1],['Uses the medial wall',1]] },
+  { id:'artic', lec:'instruments', title:'Non-adjustable or semi-adjustable?', bins:['Non-adjustable','Semi-adjustable'], items:[['Accurate only in MICP',0],['Benefits the lab',0],['Cheap to ship',0],['Hinge may sit behind M2',0],['Any record adds error',0],['Denar 320',1],['Uses a facebow',1],['Set SCI and Bennett angle',1],['Programmed with eccentric records',1],['Interchangeable mountings',1]] }
 ];
 
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
@@ -5481,6 +5938,79 @@ LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id
    every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), with your
    pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
 var QUESTION_WHY = {
+  "in-cr-mount":["Starting with the joints seated, you see the CO contact, the slide and MIP: the fullest range of movement.", "That is the MIP mounting's advantage: simpler, because MICP is often more stable than CO.", "Positional records don't capture movement paths; that takes jaw tracking or a pantograph.", "Hand articulation is how you mount in MIP; a CR mounting always needs a record, because CO is unstable."],
+  "in-mip-limit":["From MIP the articulator can't go up and back to CO, so the slide can't be seen.", "It can still move eccentrically; those movements are just inaccurate unless tooth guided.", "VPS is the most common MIP material; wax is optional, not required.", "The reverse: MICP is often more stable than CO, which is why MIP mounting is simpler."],
+  "in-pathologic":["The neuromuscular system avoids damaging contacts in the mouth; on the casts nothing avoids them.", "Stone expansion isn't the reason given; the reason is protective reflexes.", "Marking quality isn't the point; the patient's reflexes hide the contacts clinically.", "A CR mounting shows them best; an MIP mounting can't show CO contacts at all."],
+  "in-most-use":["Some materials and methods aren't appropriate for the mouth, so the work is built on the articulator.", "TMD diagnosis isn't listed; diagnosis is a use, but not the most common.", "Diagnostic waxing is a treatment-planning use, not the most common one.", "That is a pantograph or jaw tracking, not the articulator's common use."],
+  "in-waxing":["The hinge axis is found with a kinematic facebow, not a wax-up, so this is the exception.", "Developing tooth forms to see the final goal and its problems is what a wax-up is for.", "Planning spacing, orthodontics and hard and soft tissue grafting is on the list.", "Addressing patient expectations is on the list: a wax-up shows them the result."],
+  "in-arcon":["ARticulating CONdyle: condyle below, fossa above, as in the patient.", "That reversed arrangement is a non-arcon articulator.", "Arcon means the condyle articulates on the lower member, not both elements above.", "Arcon articulators have condylar elements; that is what the name means."],
+  "in-uab-class":["Semi-adjustable: some settings, some averages; the Denar 320 is the slide's example.", "Fully adjustable means everything is programmed; the Denar 330 comes close, not the 320.", "Average-value articulators are non-adjustable; the 320 has settings you program.", "Hinge-only articulators have no eccentric paths at all."],
+  "in-nonadj-acc":["Non-adjustable articulators are accurate in one position: MICP.", "They can't be set to CR; any record that opens the teeth adds error.", "Average eccentric paths don't reflect the patient.", "They don't reproduce protrusion; only the closed MICP position is accurate."],
+  "in-nonadj-record":["The record opens the vertical; removed, the articulator closes on its own arc, landing somewhere new.", "Shrinkage isn't the mechanism; the mismatched closing arc is.", "It can hold one; the record simply introduces error.", "A non-adjustable articulator has no condylar guidance to reset."],
+  "in-nonadj-who":["Labs like them: quick, inexpensive, small and cheap to ship.", "The dentist loses chair time adjusting the work, so the dentist doesn't benefit.", "The patient sits through intraoral grinding; the crown doesn't match their movements.", "\"There is never an advantage to the dentist\" for the lab to use one."],
+  "in-zirconia":["The hinge doesn't follow the patient's paths, so eccentric contacts are ground, and zirconia adjusts and polishes poorly.", "Calibration doesn't control firing shrinkage; the problem is the mismatched paths.", "Zirconia crowns are made on mounted casts too; the mounting still matters.", "The crown isn't left out of occlusion; it is usually high in excursions."],
+  "in-partial":["With only part of the arch you can't check the mounting across the arch or copy the other side.", "They mount in MICP; that is the one position they handle.", "Partial-arch casts can still be hand-articulated.", "The limitation is cross-arch, not facebow use."],
+  "in-4inch":["An articulator the size of a person, with the cast oriented to its condyles, builds a crown that roughly follows the patient.", "A hinge behind the second molar can never replicate the patient's arcs.", "A thick record adds error on a non-adjustable articulator.", "Partial-arch articulators glued to casts are the ones that don't match the patient."],
+  "in-110":["About 110 mm, 4 inches: roughly the distance between a person's condyles.", "Far smaller than a person; a small articulator magnifies the closing-arc error.", "Wider than a person's condyles.", "Smaller than the 110 mm the procedure calls for."],
+  "in-bonwill":["The mounting stand places the casts in the Bonwill position, where average settings work.", "The terminal hinge position is where the condyles rotate in CR, not where the stand places the cast.", "CR is a joint position, not where a mounting stand places the maxillary cast.", "The neutral zone is the space where tongue and lip forces balance."],
+  "in-sci-def":["The condyle's descent down the eminence in the sagittal plane is the SCI.", "The inward path in the horizontal plane is the Bennett angle.", "The plane's tilt is captured by the facebow, not the SCI.", "The sideways jump at the start of a move is the immediate side shift."],
+  "in-sci-controls":["Condylar guidance controls posterior disclusion when anterior guidance is minimal, and cusp height and fossa depth.", "Fossa width follows the Bennett angle.", "The VDO is set by the records and the incisal pin, not the SCI.", "Groove and ridge positions follow the intercondylar distance on a fully adjustable articulator."],
+  "in-sci-arb":["Fixed work: 20-30° is the common arbitrary setting.", "About 0° is for neutrocentric dentures, not fixed work.", "Steeper than the common arbitrary setting; it risks posterior interferences.", "Far steeper than any common arbitrary setting."],
+  "in-neutro":["Neutrocentric dentures use a flat, about 0°, setting.", "20° is within the common range for fixed work, not neutrocentric dentures.", "30° is the common arbitrary fixed setting.", "Steeper than any setting the slides give for dentures."],
+  "in-bennett":["The orbiting condyle's inward path sets how wide the central fossae must be.", "Cusp height follows the SCI.", "The curve of Wilson is a frontal curve of the teeth, not an articulator setting.", "Marginal ridges aren't set by the Bennett angle."],
+  "in-bennett-off":["He would leave the Bennett angle off first: average values are close enough for most work.", "Condylar guidance is one of the two settings that matter most.", "The incisal guide pin wasn't the feature he named.", "The centric latch holds the condyles in CR; it isn't an average-value setting."],
+  "in-iss":["Immediate lateral mandibular translation is the immediate side shift (ISS).", "Progressive side shift is the gradual part of the movement, not the immediate jump.", "The Bennett angle is the angle of the inward path, a separate setting.", "Condylar guidance is the SCI."],
+  "in-fb-cast":["The facebow is for the maxillary cast only.", "The mandibular cast is related with CR or MIP records, not the facebow.", "It mounts one cast, the maxillary.", "It mounts the maxillary cast; eccentric records program the SCI."],
+  "in-fb-points":["Two ear canals estimate the hinge axis; one anterior point (nasion, orbitale or a set distance) completes the plane.", "Locating the condyles exactly is a kinematic hinge-axis locator, not the reference plane.", "Hamular notches and the papilla are denture landmarks, not facebow points.", "The mental foramina aren't facebow reference points."],
+  "in-frankfort":["Usually Frankfort horizontal (some systems use Camper's plane).", "The occlusal plane is what the facebow transfers, not its reference plane.", "The midsagittal plane isn't the facebow's reference plane.", "The curve of Spee is a curve of the teeth, not a reference plane."],
+  "in-indirect":["Only the transfer assembly goes on the lower member: simpler, and the ear-bow stays in the clinic.", "The ear-bow stays in the clinic in an indirect mounting.", "The CR record relates the mandibular cast; it isn't part of the facebow mounting.", "A mounting stand is the no-facebow method."],
+  "in-arb-mm":["Typically within 2-5 mm: close enough to be clinically insignificant.", "Only a kinematic facebow lands exactly on the axis.", "Farther than an arbitrary bow usually is.", "20-25 mm is about the rotational opening, not facebow error."],
+  "in-kinematic":["A kinematic bow finds the exact hinge axis (AHA = PHA).", "Using the ear canals and averages is an arbitrary facebow.", "Six styli on six tables is a pantograph.", "Scanners capture motion, but a kinematic facebow is the hinge-axis locator."],
+  "in-slidematic":["43 mm above #7's incisal edge, found with the Slidematic ruler.", "It is the lateral incisor, #7, not the central.", "Nasion is another system's anterior point.", "Orbitale is another system's anterior point."],
+  "in-level":["The level parallels the bench top, so incisal cant and occlusal-plane tilt reach the articulator.", "An arbitrary bow doesn't find the exact axis; that is a kinematic bow.", "The SCI is set with a protrusive record or an arbitrary value.", "The facebow doesn't record the vertical dimension."],
+  "in-nofb":["Verifying a CR record has nothing to do with the facebow, so this is the exception.", "Wrong maxillary orientation risks an occlusal cant.", "An occlusal-plane error risks protrusive, working and non-working interferences.", "Cusp height and groove and cusp positions may not match the patient."],
+  "in-mt-post":["Too posterior or too superior: premature or heavy contacts on the most anterior teeth.", "The most posterior teeth are loaded when the cast is too anterior or too inferior.", "An MIP record can't correct a wrong maxillary mounting in excursions.", "A cant comes from a tilted esthetic plane, not an anteroposterior error."],
+  "in-cr-wax":["Wax sets instantly with the air-water syringe and needs little trimming.", "Wax captures less anatomy than VPS, which is why cusp tips seat in it well.", "Wax is brittle and fragile, not flexible.", "CR records are made without tooth contact."],
+  "in-cr-contact":["Contact lets the neuromuscular system guide the jaw to MIP instead of the seated position.", "Compression isn't the reason; deflection by reflexes is.", "Contact doesn't change wax's set.", "The articulator can close; the issue is the patient's jaw position."],
+  "in-cr-open":["Minimal opening, or the vertical you will restore at, keeps the arbitrary-axis error small.", "20 mm is the rotational range, far too thick for a record.", "Thickness doesn't matter only on a fully adjustable articulator with the exact axis.", "Records are never taken at maximum opening."],
+  "in-90":["MIP ≠ CO in about 90% of people.", "About 10% have MIP = CO; that is the minority.", "Not half; about nine in ten differ.", "Not a quarter; about nine in ten differ."],
+  "in-co-mip":["Sliding from CO to MIP closes the vertical and brings the mandible forward.", "The slide goes forward and closes, not back and open.", "The slide is up and forward, with a change in vertical.", "In MIP the condyles come off their seat; they don't seat further."],
+  "in-mip-misused":["\"It is also the most misused record\" and \"the record that gets you in most trouble.\"", "Used properly it can be accurate, but he called it the most misused.", "Labs mount with whatever record they are sent.", "It is a simple record; the trouble is misuse."],
+  "in-lab-errors":["Number one is a bad impression; number two is the mounting, usually a misused MIP record.", "The order is the other way around: the impression comes first.", "Shade wasn't on his list.", "He blamed the dentist's impression and mounting, not the technician."],
+  "in-hand-artic":["\"If possible, don't use a record. Hand articulate always when you can.\"", "Full-arch records are the classic mounting error.", "VPS can be very accurate if used with care.", "If you send the lab a record, they will mount with it; send none \"just in case.\""],
+  "in-vps-time":["Minimum removal time is 1 minute 30 seconds (working time 30-60 s).", "Wax sets in about a second; VPS takes far longer than 10 s.", "Longer than the slides' 1.5 minutes.", "30 seconds is about the start of the working time, not removal."],
+  "in-vps-where":["Unprepared teeth are supposed to touch in MIP; material on them props the casts open.", "Over the prep is fine: there is space there.", "Trimmed windows are how you see the cusps seat.", "The opposing cusps over the prep are what the record should capture."],
+  "in-vps-fit":["Resilience plus more detail than the stone cast: it rarely fits, even trimmed.", "The slides blame resilience and detail, not expansion or shrinkage.", "VDO isn't the reason a registration fails to fit.", "Curling isn't the issue; resilience and detail are."],
+  "in-wax-dis":["Waxes need a water bath and are brittle.", "Waxes set instantly and need little trimming.", "Waxes are comparatively much cheaper than VPS.", "The air-water syringe is exactly how wax is set."],
+  "in-five-req":["Requirement 1: no tooth movement or soft-tissue displacement.", "Requirement 3: it fits the casts as accurately as the mouth.", "Requirement 5: no distortion in storage or transport.", "Covering every occluding surface is the error to avoid, not a requirement.", "No set time is among the five requirements."],
+  "in-rec-base":["Too few teeth for a stable mounting: use a record base.", "More VPS over more teeth only adds error.", "A pantograph records movement; it doesn't stabilize a mounting.", "A kinematic facebow finds the hinge axis; it doesn't relate the mandibular cast."],
+  "in-prot-rec":["Straight forward 3-5 mm from CR, one record, both SCIs set.", "7-10 mm is too far, and the Bennett angle is set with lateral records.", "Side records come in pairs; that describes lateral records.", "Records are taken at 3-5 mm, not maximum protrusion."],
+  "in-lat-sets":["Moving right, the left condyle orbits down its medial wall, so the left SCI and medial-wall settings are set.", "The working-side (right) condyle mostly rotates; it isn't what a right record sets.", "Only a protrusive record sets both SCIs.", "Lateral records set condylar settings, not the incisal table."],
+  "in-why-prot":["The medial wall is steeper than the eminence; building at the shallower protrusive angle keeps restorations discluded.", "The protrusive SCI is the shallower one, not the steeper.", "They can be; protrusive is simply preferred.", "A protrusive record is one record, not two."],
+  "in-30deg":["Patients are usually steeper (20-60°, often 35-40°), so 30° still discludes in the mouth with decent anatomy.", "If patients were flatter than the articulator, crowns would hit, not disclude.", "Bonwill's triangle is about distances, not this angle.", "The curve of Spee isn't the reason for 30°."],
+  "in-3to5":["Taken at 7-10 mm the angle is smaller, narrowing the fossae and inviting interferences.", "That is what happens at 3-5 mm: a larger angle and wider fossae.", "The orbiting path curves, so where you take it matters.", "The Bennett angle affects fossa width, not cusp height."],
+  "in-interchange":["Calibrated articulators exchange mounted casts accurately, so yours doesn't travel to the lab.", "Interchangeability is about mounted casts, not facebows.", "Programming still needs records or averages.", "The mandibular cast is still related with a record or by hand."],
+  "in-full-adj":["Intercondylar distance is set on fully adjustable instruments; semi-adjustable ones use about 4 inches.", "SCI is one of the semi-adjustable articulator's two common settings.", "The Bennett angle is the other common semi-adjustable setting.", "Semi-adjustable articulators have incisal guide tables too."],
+  "in-icd":["It changes the eccentric paths of opposing cusps, so groove and ridge positions.", "The VDO isn't set by the intercondylar distance.", "It affects function, not only esthetics.", "The SCI is a separate setting."],
+  "in-locator":["The stylus is adjusted until it only rotates as the mandible hinges in CR: that point is the axis.", "Ear canals give an arbitrary axis, not the exact one.", "43 mm above #7 is the Slidematic's anterior reference point.", "Six tables record movement with a pantograph."],
+  "in-panto":["It records how the jaw moves along each path: the timing positional records can't show.", "The hinge axis is found with a kinematic locator first.", "The esthetic plane is a facebow's job.", "MIP contacts come from the casts, not the pantograph."],
+  "in-cbd":["Separating the teeth keeps tooth guidance out of the tracings.", "The tables are on the bows; the bearing device separates the teeth.", "Marking the axis is the hinge-axis locator's job.", "Intercondylar distance is set on the articulator."],
+  "in-thick":["AHA = PHA with a kinematic bow, so the terminal hinge arcs match.", "Fully adjustable articulators are mounted in CR.", "The pantograph records movement, not record thickness.", "No such limit; thickness simply doesn't matter there."],
+  "in-sel-strong":["Strong anterior guidance discludes the posterior teeth, so simpler instrumentation can work.", "A pantograph is unnecessary for a single crown under strong guidance.", "Lateral records aren't needed when the guidance discludes the crown.", "Mechanical articulators work fine for a single posterior crown."],
+  "in-sel-poor":["Little anterior guidance means the condyles control posterior disclusion, so the articulator must reproduce them.", "Deep overlap and canine guidance disclude the posterior teeth.", "Strong guidance over #20 needs only simple instrumentation.", "Normal overlap and intact anterior teeth give good guidance."],
+  "in-ag-nonadj":["Teeth in the anterior guidance need eccentric paths that match the patient.", "A posterior crown under strong guidance can use simpler instrumentation.", "Record casts don't need eccentric accuracy.", "A small intracoronal restoration under good guidance is low risk."],
+  "in-skill":["The JPO quote: a knowledgeable clinician with a semi-adjustable beats an inexperienced one with a fully adjustable.", "That is the comparison the quote rejects.", "Non-adjustable articulators still need skill and don't replicate the patient.", "A fully adjustable articulator only helps if programmed correctly."],
+  "in-job":["\"The job dictates the tool, not the other way around.\"", "The lab's preference shouldn't pick the articulator.", "Cost matters, but he said the job dictates the tool.", "The extent of the work, not age, sets the instrumentation."],
+  "in-virtual":["Positioning the models to the patient, the digital facebow, is what's still missing.", "Software can already replicate an articulator's shape and contours.", "Combining scans, CBCT and facial landmarks is listed as possible.", "Some virtual systems capture eccentric records."],
+  "in-semi-records":["Semi-adjustable: facebow, CR record, eccentric records.", "Kinematic facebow and pantograph go with fully adjustable articulators.", "A mounting stand and MIP record is the non-adjustable approach.", "Adjustable articulators need patient information to be set."],
+  "in-panto-tables":["6 recording tables on the lower bow, 6 styli on the upper.", "Fewer than the slides' six and six.", "There is a stylus for each table: six and six.", "Six and six, in three planes."],
+  "cs-in-crown-art":["Casts that hand-articulate need no record, and strong canine guidance discludes the crown.", "A fully adjustable setup is far beyond what one posterior crown under strong guidance needs.", "Full-arch records are the classic mounting error.", "Eccentric records aren't needed when the guidance discludes the crown."],
+  "cs-in-crown-lab":["Small hinges benefit the lab; the dentist can simply ask for a semi-adjustable mounting.", "A hinge doesn't follow the patient's paths, so the crown gets adjusted in the mouth.", "Hinges do mount in MICP; that is their one accurate position.", "Pantographs program fully adjustable articulators, not hinges."],
+  "cs-in-rehab-rec":["At her treatment vertical the patient's and articulator's arcs meet, so the mounting is accurate.", "Opening an arbitrary-axis mounting later adds error for a new VDO.", "Reorganized work at a new vertical needs a CR record.", "CR records are made without tooth contact."],
+  "cs-in-rehab-sci":["One protrusive record sets both SCIs at the shallower, safer angle.", "Lateral records give a steeper SCI, and 7-10 mm is too far.", "A pantograph programs fully adjustable articulators.", "An MIP record mounts casts; it doesn't set the SCI."],
+  "cs-in-rehab-fb":["The facebow orients the maxillary cast to her joints and transfers the cant and occlusal-plane tilt.", "Only a kinematic bow finds the exact axis; hers is arbitrary.", "The Bennett angle is set with lateral records or averages.", "The facebow mounts the maxillary cast, not the mandibular."],
+  "cs-in-high":["Material on unprepared teeth and the gingiva props the casts apart, so the crown is built high.", "A steep SCI causes eccentric problems, not a high crown in MIP.", "A maxillary mounting error shows in excursions, and the mandibular record is the obvious flaw.", "Zirconia doesn't expand; the mounting was wrong."],
+  "cs-in-high-fix":["No record if stable; otherwise VPS only over the prep, trimmed to cusp tips, off soft tissue.", "A thicker full-arch record repeats the error.", "A 20 mm wax record is a CR record far too thick, and this is conformative work.", "Lateral records program eccentrics; they don't fix an MIP mounting."],
   "cs-div2-vo":["Vertical overlap of 3-5 mm is normal (3 mm the most accepted), so 7 mm is deep, as division 2 usually is.", "Normal vertical overlap is 3-5 mm; 7 mm is past that range.", "Shallow would mean less than normal; 7 mm is more than the 3-5 mm norm.", "Orthodontists may accept as little as 1 mm to fit brackets; that is a minimum, not a rule that any depth is normal."],
   "cs-div2-teeth":["Division 2: retroclined centrals and labially flared laterals over a deep overlap, as the photo shows.", "Protruding incisors with a narrow arch are division 1, not division 2.", "Lower incisors in front of the uppers (anterior crossbite) go with Class III.", "Edge-to-edge incisors go with Class III; division 2 has a deep overlap instead."],
   "cs-div2-molar":["The blue dot (MB cusp of #3) sits in front of the red buccal groove of #30: the lower molar is distal, Class II.", "In Class I the groove receives the cusp; here the dot sits in front of the groove.", "That would be Class III, with the lower molar forward; in the side view the cusp is mesial to the groove.", "If the lower molar sat mesial, its groove would be in front of the cusp; the two halves of this choice contradict each other."],
@@ -5848,7 +6378,7 @@ function toast(msg, ic){ var host = document.getElementById('toastHost'); if(!ho
 var STATE_KEY = 'occl-state-v1';
 function defaultState(){
   return { v:1, seen:{}, streak:0, bestStreak:0, totalCorrect:0, totalAnswered:0, lecStats:{}, days:[], ach:{},
-    ui:{ mode:'compendium', sub:'notes', lec:'review', level:'full', group:'positions', recall:false, qlec:'all', qsrc:'all', qstatus:'all' },
+    ui:{ mode:'compendium', sub:'notes', lec:'instruments', level:'full', group:'instruments', recall:false, qlec:'final', qsrc:'all', qstatus:'all', finalOn:1 },
     arcade:{ best:{ sort:0, board:0, escape:0, cloze:0, smile:0, cross:0 }, plays:{ sort:0, board:0, escape:0, cloze:0, smile:0, cross:0 }, muted:false, scope:'all', sortSet:'mix', snakeLec:'all', stackSet:'mix', matchSet:'mix', hangLec:'all', blastLec:'all', searchLec:'all', whackSet:'mix' } };
 }
 function loadState(){
@@ -5870,6 +6400,9 @@ function loadState(){
   return base;
 }
 var STATE = loadState();
+/* 2026-10-27: the hub switched to the final. Returning visitors land on L6, the bank opens on the final's lectures,
+   a closed midterm card doesn't hide the final's, and an old midterm mock is cleared (its answers still count). */
+if(!STATE.ui.finalOn){ STATE.ui.finalOn = 1; STATE.ui.lec = 'instruments'; STATE.ui.group = 'instruments'; if(STATE.ui.qlec === 'all') STATE.ui.qlec = 'final'; delete STATE.ui.examCard; STATE.mock = null; saveState(); }
 function saveState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(STATE)); }catch(e){ /* storage unavailable */ } }
 
 /* ---------- achievements ---------- */
@@ -6113,16 +6646,15 @@ function setMode(mode){
 /* ===================================================================
    COMPENDIUM
    =================================================================== */
-var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (45)'] ];
+var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (20)'] ];
 function examInfoHTML(){ return '<dl class="exam-info">' + EXAM_INFO.map(function(r){ return '<dt>'+r[0]+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>'; }
-/* the midterm's format and logistics, open until the student closes it (STATE.ui.examCard), gone once the window closes */
+/* the final's facts, open until the student closes it (STATE.ui.examCard), gone after exam day */
 function examCardHTML(){
-  var now = new Date(), close = new Date(EXAM_DATE + 'T' + EXAM_CLOSES + ':00');
-  if(now >= close) return '';
-  var d = calDays(now, EXAM_DATE);
-  var when = d === 0 ? (now >= new Date(EXAM_DATE + 'T' + EXAM_TIME + ':00') ? 'Midterm now, until 7:45 pm' : 'Midterm tonight, 6:30 pm') : d === 1 ? 'Midterm tomorrow, 6:30 pm' : 'Midterm: Wed Oct 21, 6:30 pm';
-  return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · 40-45 multiple choice · 1 hour · LockDown Browser + Monitor</span></summary>' +
-    examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-qs="mock">Take the 45-question mock</button></div></details>';
+  var d = calDays(new Date(), FINAL_DATE);
+  if(d < 0) return '';
+  var when = d === 0 ? 'Final today' : d === 1 ? 'Final tomorrow' : 'Final: Thu Nov 19';
+  return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · not comprehensive · the lectures from 10/22 on · format not announced yet</span></summary>' +
+    examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-qs="mock">Take the '+mockTotal()+'-question mock</button></div></details>';
 }
 var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
@@ -6130,11 +6662,11 @@ function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();
   var p = document.getElementById('panel-compendium');
   var sub = STATE.ui.sub;
-  var left = QUESTIONS.filter(function(q){ return !STATE.seen[q.id]; }).length, cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
+  var left = QUESTIONS.filter(function(q){ return !STATE.seen[q.id] && isFinalLec(q.lec); }).length, cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   /* one-tap start (LESSONS.md: 26-40% of visitors leave within 5 minutes; get them to a question or the notes in one tap) */
   /* Timmy Time episode card (widget/podcast.js fills this in) */
   var h = '<div data-sh-podcast></div><div class="quick-start" aria-label="Start studying">' +
-    '<button type="button" class="qs-btn primary" data-qs="bank"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' you haven\'t tried</small></span></button>' +
+    '<button type="button" class="qs-btn primary" data-qs="bank"><span class="qs-ic">'+icon('bank')+'</span><span><b>Practice questions</b><small>'+left+' for the final you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="quick"><span class="qs-ic">'+icon('bolt')+'</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-qs="notes"><span class="qs-ic">'+icon('notes')+'</span><span><b>Lecture notes</b><small>'+lecLabel(cont)+' '+escHtml(cont.title)+'</small></span></button></div>';
   h += examCardHTML();
@@ -6143,7 +6675,7 @@ function renderCompendium(){
   p.querySelectorAll('[data-sub]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.sub = b.getAttribute('data-sub'); saveState(); renderCompendium(); }); });
   p.querySelectorAll('[data-qs]').forEach(function(b){ b.addEventListener('click', function(){
     var g = b.getAttribute('data-qs');
-    if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
+    if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'final'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
     else if(g === 'mock') STATE.ui.sub = 'mock';
     else STATE.ui.sub = 'notes';
     saveState(); renderCompendium(); var sb = document.querySelector('#panel-compendium .subtabs'); if(sb) sb.scrollIntoView({ block:'start' });
@@ -6221,9 +6753,10 @@ function renderWeak(body){
 function renderNotes(body){
   if(window.shTTS) window.shTTS.stop();
   var lec = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
-  var nav = '<nav class="lec-nav" aria-label="Lectures">' + LECTURES.map(function(l){
+  var nav = '<nav class="lec-nav" aria-label="Lectures">' + lecOrder().map(function(l, i, arr){
     var st = STATE.lecStats[l.id]; var pct = st && st.a >= 5 ? st.c+'/'+st.a : '';
-    return '<button type="button" class="tag-'+l.tag+(l.id===lec.id?' is-active':'')+'" data-lec="'+l.id+'"><span class="lec-num">'+lecLabel(l)+'</span><span><span class="t">'+escHtml(l.title)+'</span><br><span class="w">'+escHtml(l.who)+(pct?' · '+pct+' correct':'')+'</span></span></button>';
+    var head = (i === 0 && l.exam === 'final') ? '<p class="lec-nav-h">Final</p>' : (l.exam !== 'final' && (i === 0 || arr[i-1].exam === 'final')) ? '<p class="lec-nav-h">Midterm<span class="nh-long"> lectures (done; the final builds on them)</span></p>' : '';
+    return head + '<button type="button" class="tag-'+l.tag+(l.id===lec.id?' is-active':'')+'" data-lec="'+l.id+'"><span class="lec-num">'+lecLabel(l)+'</span><span><span class="t">'+escHtml(l.title)+'</span><br><span class="w">'+escHtml(l.who)+(pct?' · '+pct+' correct':'')+'</span></span></button>';
   }).join('') + '</nav>';
   var nq = (QUESTIONS_BY_LECTURE[lec.id]||[]).length;
   var hasPlain = !!READINGS_PLAIN[lec.id];
@@ -6295,7 +6828,8 @@ function placeLectureFigs(prose, lecId, level, rest){
 function bankFiltered(search){
   var s = (search||'').toLowerCase().trim();
   return QUESTIONS.filter(function(q){
-    if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
+    if(STATE.ui.qlec === 'final' || STATE.ui.qlec === 'midterm'){ if(isFinalLec(q.lec) !== (STATE.ui.qlec === 'final')) return false; }
+    else if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
     var fm = STATE.ui.qfmt || 'all';
     if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
@@ -6308,7 +6842,7 @@ function bankFiltered(search){
 }
 var bankSearch = '';
 function renderBank(body){
-  var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
+  var lecOpts = '<option value="final"'+(STATE.ui.qlec==='final'?' selected':'')+'>For the final (L6 on)</option><option value="midterm"'+(STATE.ui.qlec==='midterm'?' selected':'')+'>Midterm lectures (L1-L5)</option><option value="all"'+(STATE.ui.qlec==='all'?' selected':'')+'>All lectures</option>' + lecOrder().map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
@@ -6352,9 +6886,9 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion midterm: Wednesday, October 21, 6:30 pm.</b> 40-45 multiple-choice questions on the first three sessions (9/17, 9/24, 10/1), Dr. Givan\'s five lectures. The final is not comprehensive, but it builds on this material.</span></div>' +
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Thursday, November 19.</b> Not comprehensive: Dr. Givan\'s lectures from 10/22 on (L6 so far), building on the midterm material. The time and format haven\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
-  LECTURES.forEach(function(l){
+  lecOrder().forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
     h += '<div class="hint-group tag-'+l.tag+'"><h3><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title)+' <a class="linkbtn" href="#" data-lec="'+l.id+'">read notes</a></h3>' +
       items.map(function(x){ return '<div class="hint"><blockquote>“'+escHtml(x.quote)+'”</blockquote><div class="take"><span class="kind '+x.kind+'">'+x.kind+'</span>'+escHtml(x.take)+'</div></div>'; }).join('') + '</div>';
@@ -6474,8 +7008,10 @@ function renderReview(){
    MOCK EXAM: 45 MCQs in an hour, the top of the 40-45 Dr. Givan's email (10/20) promises. No official counts per
    lecture, so the three sessions get 15 each: session 1 = L1, session 2 = L2 + L3, session 3 = L4 + L5
    =================================================================== */
-var MOCK_BLUEPRINT = { review:15, anatomy:8, function:7, concepts:8, applying:7 };
-var MOCK_LIMIT = 60 * 60; /* seconds, as on the real exam */
+/* the final's lectures only (not comprehensive); add each new lecture here as it is taught. The clock keeps the midterm's
+   pace (45 questions in an hour, 80 s each) until Dr. Givan sends the final's format. */
+var MOCK_BLUEPRINT = { instruments:20 };
+var MOCK_LIMIT = 20 * 80;
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
@@ -6502,7 +7038,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions, the most the midterm will have (40-45), spread evenly over the three sessions it covers: 15 from the review (with the fence post and diagram questions), 15 from session 2 (8 TMJ anatomy and muscles, 7 chewing, swallowing and speech) and 15 from session 3 (8 occlusal concepts, 7 applying occlusion). Patient Box and diagram items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. The real exam gives you one hour, so the clock counts against 60:00 and turns red if you go over. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions from the final\'s lectures so far (L6, Occlusal Instrumentation); it grows as Dr. Givan\'s next lectures are added. The final is not comprehensive, so the midterm lectures aren\'t in it. Patient Box items are included, and questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. The final\'s format hasn\'t been announced, so the clock keeps the midterm\'s pace (about 80 seconds a question) and turns red past '+Math.round(MOCK_LIMIT/60)+' minutes. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
@@ -6579,7 +7115,7 @@ function renderMock(body){
   }
   document.getElementById('mockNew').onclick = function(){ STATE.mock = null; saveState(); renderMock(body); };
   var clock = document.getElementById('mockClock');
-  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + ' / 60:00'; clock.classList.toggle('is-over', sec > MOCK_LIMIT); }
+  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + ' / ' + Math.floor(MOCK_LIMIT/60) + ':' + String(MOCK_LIMIT%60).padStart(2,'0'); clock.classList.toggle('is-over', sec > MOCK_LIMIT); }
   tick(); if(!m.submitted) mockTimer = setInterval(tick, 1000);
 }
 
@@ -7089,7 +7625,7 @@ window.SH_SYNC = {
 var DRILL_HY = { help:'built on Dr. Givan\'s "What cusp hits where?" help sheet' };
 window.SH_DRILL = {
   pool: function(){
-    return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
+    return QUESTIONS.filter(function(q){ return isFinalLec(q.lec); }).map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
   },
   render: function(el, qid){ var q = QUESTIONS_BY_ID[qid]; if(!q) return false; el.innerHTML = qCardHTML(q, { ctx:'drill' }); wireQuestionContainer(el); return true; }
 };

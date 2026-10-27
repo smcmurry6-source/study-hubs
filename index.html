@@ -52,6 +52,7 @@
   --c-perio:#A23F5E;   --c-perio-soft:#F5E1E7;
   --c-genetics:#246B64;--c-genetics-soft:#DCEBE8;
   --c-pros:#A94E34;    --c-pros-soft:#F3DED4;
+  --c-endo:#7E3F8F;    --c-endo-soft:#EEDFF2;
 
   --shadow:0 1px 1px rgba(21,32,42,.04), 0 8px 24px -16px rgba(21,32,42,.35);
   --shadow-lift:0 2px 4px rgba(21,32,42,.06), 0 18px 36px -18px rgba(21,32,42,.45);
@@ -69,6 +70,7 @@
     --c-perio:#E88EA9;   --c-perio-soft:#351D26;
     --c-genetics:#6FC2B8;--c-genetics-soft:#132C29;
     --c-pros:#E08566;    --c-pros-soft:#36221A;
+    --c-endo:#C99BE0;    --c-endo-soft:#2C1B33;
     --shadow:0 1px 1px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
     --shadow-lift:0 2px 4px rgba(0,0,0,.35), 0 18px 36px -18px rgba(0,0,0,.8);
   }
@@ -82,6 +84,7 @@
   --c-perio:#E88EA9;   --c-perio-soft:#351D26;
   --c-genetics:#6FC2B8;--c-genetics-soft:#132C29;
   --c-pros:#E08566;    --c-pros-soft:#36221A;
+  --c-endo:#C99BE0;    --c-endo-soft:#2C1B33;
   --shadow:0 1px 1px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.7);
   --shadow-lift:0 2px 4px rgba(0,0,0,.35), 0 18px 36px -18px rgba(0,0,0,.8);
 }
@@ -167,6 +170,15 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .set-hint{font-size:12.5px; color:var(--ink-3); margin:7px 0 0; line-height:1.4;}
 .set-name{display:flex; align-items:center; justify-content:space-between; gap:10px;}
 .set-name b{font-size:15px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.set-xhead{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.set-xhead .set-lab{margin:0;}
+.set-x{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid var(--line);}
+.set-xtxt{min-width:0; flex:1 1 150px;}
+.set-xtxt b{display:block; font-size:13.5px; color:var(--ink);}
+.set-xtxt small{display:block; font-size:12px; color:var(--ink-3); line-height:1.4; margin-top:2px;}
+.set-x .set-seg{flex:none; gap:4px;}
+.set-x .set-seg button{padding:5px 10px; font-size:12.5px;}
+@media (max-width:420px){ .set-x{flex-wrap:wrap;} }
 .set-row input[type=range]{width:100%; margin-top:10px; accent-color:var(--ink);}
 
 /* ================= HERO ================= */
@@ -636,7 +648,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       <span class="aside" id="hubsAside"></span>
     </div>
     <div id="terms"></div>
-    <noscript><p><a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Midterm Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
+    <noscript><p><a href="hubs/heme-endo-exam1/">Heme &amp; Endo Exam 1 Hub</a> · <a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Final Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
   </section>
 
   <!-- ============ HUB RECAPS: archived hubs, as a slideshow ============ -->
@@ -738,6 +750,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      show a visitor's personal progress on the card.
      ==================================================================== */
   var CLASSES = {
+    hemeendo: { name:"Hematology & Endocrinology", ring:"endo",
+                egg:"Negative feedback: every question you answer lowers exam-day cortisol.",
+                icon:'<path d="M11 13.5C10.6 8.6 9.2 4.5 7.1 4.5 4.6 4.5 4 9 4.9 12.6c.9 3.4 3.4 5 5.6 3.8"/><path d="M13 13.5c.4-4.9 1.8-9 3.9-9 2.5 0 3.1 4.5 2.2 8.1-.9 3.4-3.4 5-5.6 3.8"/><path d="M10.3 12.6h3.4v3h-3.4z"/><path d="M12 2.5v2.2M12 17v4.5"/>' },
     gi:       { name:"GI & Musculoskeletal", ring:"gi",
                 egg:"Peristalsis activated. Moving right along.",
                 icon:'<path d="M7.6 10.9 10.9 7.6"/><path d="M9.1 12.4l3.3-3.3"/><path d="M7.6 10.9a2 2 0 1 0-2.4 2.4 2 2 0 1 0 2.4 2.4l1.5-3.3"/><path d="M12.4 9.1a2 2 0 1 0 2.4-2.4 2 2 0 1 0-2.4-2.4l-1.5 3.3"/>' },
@@ -752,6 +767,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
                 icon:'<path d="M5.6 4.2c1.5-1.7 3.1-1.2 4.4-.4 1.3-.8 2.9-1.3 4.4.4 1.3 1.6.9 4-.1 6-.7 1.4-1 3.2-1.3 5.1-.2 1.2-1.6 1.4-2 .1l-.6-2.5c-.2-.8-1-.8-1.2 0l-.6 2.5c-.4 1.3-1.8 1.1-2-.1-.3-1.9-.6-3.7-1.3-5.1-1-2-1.4-4.4-.1-6z"/><path d="M8 5.4c.8.4 1.4.5 2 .1"/>' }
   };
   var HUBS = [
+    { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
+      exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:10 } ], updated:"2026-10-27",
+      desc:"Lectures 1-10: endocrine histology, the hypothalamus and pituitary, growth, thyroid, the endocrine pancreas, the adrenal gland, corticosteroid and thyroid drugs, and calcium and phosphate. Its own home page with your countdown and progress by lecture, notes in two reading levels with narration, two-statement, true/false and numbered-statement questions, exam hints from the recordings, a 55-question mock and the Feedback Loop Arcade.",
+      modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"endo1-state-v1" },
     { id:"msk-exam4", cls:"gi", title:"Musculoskeletal Exam 4 Hub", code:"GI & MSK · Exam 4",
       exams:[ { name:"Musculoskeletal Exam 4", label:"Exam", date:"2026-10-16", checkinClosed:true } ], updated:"2026-10-08", hideCardOn:"2026-10-21",
       desc:"Skin histology, dermatological pharmacology, dermatopathology, skeletal muscle, and neuromuscular junction drugs. Notes in two reading levels, Patient Box and two-statement questions, exam hints from the recordings, a timed mock exam, review tables and the Skin Deep Arcade.",
@@ -761,14 +780,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       exams:[ { name:"PCD Fixed Pros didactic Exam 3", label:"Exam", date:"2026-10-15", checkinHour:20, checkinClosed:true } ], updated:"2026-10-08", hideCardOn:"2026-10-21",
       desc:"Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen"], stateKey:"pcd3-state-v1" },
-    { id:"occlusion", cls:"occlusion", title:"Occlusion Midterm Hub", code:"Occlusion · Midterm",
+    { id:"occlusion", cls:"occlusion", title:"Occlusion Final Hub", code:"Occlusion · Final",
       exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19,
                 extraQs:[ { id:"diagrams", kind:"scale", prompt:"How helpful were the hub's diagrams?", ends:["Not helpful","Very helpful"] },
                           { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ] },
-              { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-07",
-      desc:"Dr. Givan's five midterm lectures: the review of basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, chewing, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Notes in two reading levels, drawn diagrams of the envelope of motion and cusp pathways, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
+              { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-27",
+      desc:"Now for the final (Thu Nov 19, not comprehensive): L6 Occlusal Instrumentation, with articulators, the facebow and the CR, MIP and eccentric records. New lectures are added as they are taught. The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"occl-state-v1",
-      podcast:{ name:"Timmy Time", sub:"The last-minute review, 45 min" } },
+      podcast:{ name:"Timmy Time", sub:"The midterm review, 45 min" } },
     { id:"msk-exam3", cls:"gi", title:"Musculoskeletal Exam 3 Hub", code:"GI & MSK · Exam 3",
       exams:[ { name:"Musculoskeletal Exam 3", label:"Exam", date:"2026-10-02" } ], updated:"2026-09-23",
       desc:"Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
@@ -803,15 +822,17 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (a && new Date() >= a){ ARCHIVED_HUBS.push(h); return false; }
     return true;
   });
-  var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3", "msk-exam4":"MSK Exam 4", occlusion:"Occlusion", "pcd-exam3":"PCD Exam 3" };
-  var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "msk-exam4":"gi", occlusion:"pros", "pcd-exam3":"pros", "fixed-pros":"pros", perio:"perio" };
+  var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3", "msk-exam4":"MSK Exam 4", occlusion:"Occlusion", "pcd-exam3":"PCD Exam 3", "heme-endo-exam1":"Heme & Endo 1" };
+  var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "msk-exam4":"gi", occlusion:"pros", "pcd-exam3":"pros", "fixed-pros":"pros", perio:"perio", "heme-endo-exam1":"endo" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
   /* Arcade high-score panel: one entry per hub arcade (p_hub for get_arcade_leaderboard). */
   var ARCADES = [
+    { hub:"heme-endo-exam1", title:"Feedback Loop Arcade", from:"Heme & Endo Exam 1 hub", money:["smile"], games:[
+      ["board","Axis Showdown"],["escape","Endo Lab Escape"],["cloze","Fill the Receptor"],["smile","The Golden Gland"],["cross","Cross-Stain"],["sort","Feedback Sort"] ] },
     { hub:"pcd-exam3", title:"Bond Street Arcade", from:"PCD Fixed Pros Exam 3 hub", games:[
       ["sort","Silane Sort"],["snake","Slurry Snake"],["stack","Layer Stack"],["match","Shade Match"],["hangman","Hanging Margin"],
       ["fact","Etch or Sketch"],["blaster","Sandblaster"],["search","Primer Search"],["whack","Whack-a-Crown"] ] },
-    { hub:"occlusion", title:"Freeway Space Arcade", from:"Occlusion Midterm hub", money:["smile"], games:[
+    { hub:"occlusion", title:"Freeway Space Arcade", from:"Occlusion hub", money:["smile"], games:[
       ["board","Freeway Showdown"],["escape","Lab Escape"],["cloze","Mind the Gap"],["smile","Million-Dollar Smile"],["cross","Cross-Section"],["sort","Cusp Sort"] ] },
     { hub:"msk-exam4", title:"Skin Deep Arcade", from:"Musculoskeletal Exam 4 hub", games:[
       ["sort","Split Decision"],["snake","Sarco Snake"],["stack","Z-Line Stack"],["match","Melanin Match"],["hangman","Skeleton Key"],
@@ -900,11 +921,46 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { key:"sh_pref_font", label:"Reading font", def:"default", opts:[["default","Default"],["serif","Serif"],["sans","Sans"]] },
     { key:"sh_pref_size", label:"Text size", def:"default", opts:[["small","Small"],["default","Default"],["large","Large"],["xlarge","X-Large"],["xxlarge","XX-Large"]] },
     { key:"sh_pref_accent", label:"Accent color", def:"default", accent:true, hint:"Unlocked by your handpiece rank. Buttons, switches and progress bars in every hub take on that metal." },
-    { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." },
-    { key:"sh_pref_eggs", label:"Surprises", def:"on", opts:[["on","On"],["off","Off"]], hint:"Little hidden extras around the hubs. Stuck? The trophy case in each hub's Stats has clues." },
-    { key:"sh_pref_pet", label:"Timmy Tooth", def:"on", opts:[["on","Everywhere"],["dash","Dashboard only"],["off","Off"]], hint:"Your cartoon tooth buddy. Right answers and study streaks keep him healthy; skipped days give him plaque, cavities and worse." },
-    { key:"sh_pref_nuke_alerts", label:"Tactical nuke alerts", def:"on", opts:[["on","On"],["off","Off"]], hint:"Turn off to skip seeing other people's strikes (yours still work)." }
+    { key:"sh_pref_music", label:"Background music", def:"off", opts:[["off","Off"],["rain","Soft rain"],["waves","Ocean waves"],["cafe","Coffee shop"],["lofi","Lo-fi keys"],["piano","Piano"]], hint:"Plays while you're in a hub. Browsers block autoplay, so it starts once you tap something there." }
   ];
+  /* Extras: every optional feature with its own switch, plus All on / All off. widget/v3.js (EXTRAS) draws the same
+     list in each hub's Settings; keep the two in step. */
+  var EXTRAS = [
+    { key:"sh_pref_boss", label:"Plaque bosses", hint:"A boss the whole class fights with right answers when 5+ people are online." },
+    { key:"sh_pref_fairy", label:"Tooth Fairy", hint:"Flies across the page now and then. Catch her for the fairy board." },
+    { key:"sh_pref_probe", label:"Golden Probe", hint:"One question a day is golden. First to get it right wins." },
+    { key:"sh_pref_arch", label:"Full Arch chart", hint:"A 32-tooth chart in the corner that fills as you answer right." },
+    { key:"sh_pref_nuke", label:"Tactical nukes", opts:[["on","On"],["mine","Mine only"],["off","Off"]], hint:"100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes." },
+    { key:"sh_pref_celebrate", label:"Rank-up and trophy cards", hint:"The rank-up cutscene, level-up, trophy and medal cards." },
+    { key:"sh_pref_cheers", label:"Streak cheers", hint:"Confetti and a toast every 5 right in a row." },
+    { key:"sh_pref_flame", label:"Streak flame", hint:"The flame that counts your run from 3 in a row." },
+    { key:"sh_pref_fx", label:"Answer animations", hint:"Pops, shakes, sweeps and fades. Off keeps the check and X marks." },
+    { key:"sh_pref_pet", label:"Timmy Tooth", opts:[["on","Everywhere"],["dash","Dashboard only"],["off","Off"]], hint:"Your cartoon tooth buddy. Right answers and study streaks keep him healthy." },
+    { key:"sh_pref_eggs", label:"Hidden secrets", hint:"Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case." }
+  ];
+  /* one time: Surprises off used to hide the bosses, fairy, probe, arch, flame and celebration cards, and nuke alerts
+     off meant "mine only" (same carry-over as widget/v3.js) */
+  (function(){
+    if (ls("sh_pref_extras_v") === "1") return;
+    if (ls("sh_pref_eggs") === "off") ["sh_pref_boss","sh_pref_fairy","sh_pref_probe","sh_pref_arch","sh_pref_celebrate","sh_pref_flame"].forEach(function(k){ if (ls(k) === null) lsSet(k, "off"); });
+    if (ls("sh_pref_nuke_alerts") === "off" && ls("sh_pref_nuke") === null) lsSet("sh_pref_nuke", "mine");
+    lsSet("sh_pref_extras_v", "1");
+  })();
+  function extrasAll(){
+    var v = EXTRAS.map(function(x){ return ls(x.key) || "on"; });
+    return v.every(function(x){ return x === "on"; }) ? "on" : v.every(function(x){ return x === "off"; }) ? "off" : "";
+  }
+  function extrasHTML(){
+    var all = extrasAll();
+    return '<div class="set-row set-extras"><div class="set-xhead"><span class="set-lab">Extras</span><div class="set-seg" data-extras-all>' +
+      [["on","All on"],["off","All off"]].map(function(o){ return '<button type="button" data-val="' + o[0] + '"' + (all === o[0] ? ' class="is-on"' : '') + '>' + o[1] + '</button>'; }).join("") +
+      '</div></div><p class="set-hint">The fun stuff that isn\'t studying, in every hub. Switch it all off here, or one at a time below.</p>' +
+      EXTRAS.map(function(x){
+        var cur = ls(x.key) || "on";
+        return '<div class="set-x"><div class="set-xtxt"><b>' + x.label + '</b><small>' + x.hint + '</small></div><div class="set-seg" data-set="' + x.key + '">' +
+          (x.opts || [["on","On"],["off","Off"]]).map(function(o){ return '<button type="button" data-val="' + o[0] + '"' + (cur === o[0] ? ' class="is-on"' : '') + '>' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
+      }).join("") + '</div>';
+  }
   function settingValue(x){ return x.key === "theme" ? theme.current() : (ls(x.key) || x.def); }
   function openSettings(){
     var d = document.createElement("div");
@@ -930,7 +986,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<button class="survey-x" type="button" aria-label="Close">&times;</button>' +
       '<h3 id="setH">Settings</h3><p>Saved on this device and used in every hub.</p>' +
       '<div class="set-row"><span class="set-lab">Your name</span><div class="set-name"><b>' + esc(localName || randomName || "Not set") + '</b><button type="button" class="greet-edit" data-rename>' + PENCIL + (localName ? "Change" : "Pick a name") + '</button></div></div>' +
-      SETTINGS.map(rowHTML).join("") + '</div>';
+      SETTINGS.map(rowHTML).join("") + extrasHTML() + '</div>';
     document.body.appendChild(d);
     var closeBtn = d.querySelector(".survey-x"); setTimeout(function(){ try{ closeBtn.focus(); }catch(e){} }, 30);
     function close(){ d.remove(); try{ $("setBtn").focus(); }catch(e){} }
@@ -939,6 +995,16 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     d.addEventListener("click", function(e){
       if (e.target === d || e.target.closest(".survey-x")) { close(); return; }
       if (e.target.closest("[data-rename]")) { close(); openNameEditor(); return; }
+      var all = e.target.closest("[data-extras-all] button");
+      if (all) {
+        var v = all.getAttribute("data-val");
+        EXTRAS.forEach(function(x){ lsSet(x.key, v); });
+        if (window.shPet) window.shPet.refresh();
+        if (window.shTrack) window.shTrack("pref:extras=" + v);
+        d.querySelectorAll(".set-x [data-set] button").forEach(function(x){ x.classList.toggle("is-on", x.getAttribute("data-val") === v); });
+        all.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === all); });
+        return;
+      }
       var b = e.target.closest("[data-set] button"); if (!b || b.disabled) return;
       var key = b.parentNode.getAttribute("data-set"), val = b.getAttribute("data-val");
       if (key === "theme") theme.set(val);
@@ -949,6 +1015,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       /* feature events (widget/clicks.js, migration_v37): the dashboard sets these without the hubs' sh:pref event */
       if (window.shTrack && /^(sh_pref_[a-z_]+|theme)$/.test(key)) window.shTrack("pref:" + key.replace(/^sh_pref_/, "") + "=" + val);
       b.parentNode.querySelectorAll("button").forEach(function(x){ x.classList.toggle("is-on", x === b); });
+      var allNow = extrasAll();
+      d.querySelectorAll("[data-extras-all] button").forEach(function(x){ x.classList.toggle("is-on", x.getAttribute("data-val") === allNow); });
     });
   }
   $("setBtn").innerHTML = ICON.gear;

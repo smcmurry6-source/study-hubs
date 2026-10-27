@@ -597,7 +597,7 @@
   var SH_VOLUME_KEY = "sh_pref_volume";
   var SH_NAME_KEY = "sh_display_name";
   var SH_VISITS_KEY = "sh_visit_count";
-  var SH_NUKE_PREF_KEY = "sh_pref_nuke_alerts";
+  var SH_NUKE_PREF_KEY = "sh_pref_nuke";   // on | mine (no classmates' strikes) | off (was sh_pref_nuke_alerts on/off)
   var NUKE_STREAK_THRESHOLD = 100;
   var NUKE_IMG_BASE = (function(){
     try { return new URL("img/", thisScript.src).href; } catch (e) { return "img/"; }
@@ -619,6 +619,51 @@
     /* eggs.js (holiday theme) and pet.js (tooth buddy on/off) follow settings live */
     try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: key, val: val } })); } catch (e) {}
   }
+
+  /* ---------- Extras: everything optional, each with its own switch in Settings, plus All on / All off.
+     The dashboard's Settings (index.html, EXTRAS) keeps the same list and keys; keep the two in step.
+     sh_pref_eggs ("Hidden secrets") now covers only the easter eggs that have no switch of their own. ---------- */
+  var EXTRAS = [
+    { key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online." },
+    { key: "sh_pref_fairy", label: "Tooth Fairy", hint: "Flies across the page now and then. Catch her for the fairy board." },
+    { key: "sh_pref_probe", label: "Golden Probe", hint: "One question a day is golden. First to get it right wins." },
+    { key: "sh_pref_arch", label: "Full Arch chart", hint: "A 32-tooth chart in the corner that fills as you answer right." },
+    { key: "sh_pref_nuke", label: "Tactical nukes", opts: [["on", "On"], ["mine", "Mine only"], ["off", "Off"]],
+      hint: "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes." },
+    { key: "sh_pref_celebrate", label: "Rank-up and trophy cards", hint: "The rank-up cutscene, level-up, trophy and medal cards." },
+    { key: "sh_pref_cheers", label: "Streak cheers", hint: "Confetti and a toast every 5 right in a row." },
+    { key: "sh_pref_flame", label: "Streak flame", hint: "The flame that counts your run from 3 in a row." },
+    { key: "sh_pref_fx", label: "Answer animations", hint: "Pops, shakes, sweeps and fades. Off keeps the check and X marks." },
+    { key: "sh_pref_pet", label: "Timmy Tooth", opts: [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]],
+      hint: "Your cartoon tooth buddy. He hides during mock exams." },
+    { key: "sh_pref_eggs", label: "Hidden secrets", hint: "Holidays, magic words and the other easter eggs. Clues are in the trophy case." }
+  ];
+  /* one time: Surprises off used to hide the bosses, fairy, probe, arch, flame and the celebration cards, and
+     nuke alerts off meant "mine only"; carry both over to the new switches */
+  (function(){
+    if (prefGet("sh_pref_extras_v", "") === "1") return;
+    try {
+      if (localStorage.getItem("sh_pref_eggs") === "off")
+        ["sh_pref_boss", "sh_pref_fairy", "sh_pref_probe", "sh_pref_arch", "sh_pref_celebrate", "sh_pref_flame"].forEach(function(k){
+          if (localStorage.getItem(k) === null) localStorage.setItem(k, "off");
+        });
+      if (localStorage.getItem("sh_pref_nuke_alerts") === "off" && localStorage.getItem("sh_pref_nuke") === null) localStorage.setItem("sh_pref_nuke", "mine");
+      localStorage.setItem("sh_pref_extras_v", "1");
+    } catch (e) {}
+  })();
+  function extrasHTML(){
+    function seg(key, opts){
+      return '<div class="shset-seg" data-key="' + key + '">' + opts.map(function(o){ return '<button type="button" data-val="' + o[0] + '">' + o[1] + '</button>'; }).join("") + '</div>';
+    }
+    return '<div class="shset-extras"><div class="shset-xhead"><label>Extras</label>' +
+      '<div class="shset-seg" data-extras-all><button type="button" data-val="on">All on</button><button type="button" data-val="off">All off</button></div></div>' +
+      '<div class="shset-hint">The fun stuff that isn\'t studying. Switch it all off here, or one at a time below. None of it shows during a mock exam.</div>' +
+      EXTRAS.map(function(x){
+        return '<div class="shset-x"><div class="shset-xtxt"><b>' + x.label + '</b><small>' + x.hint + '</small></div>' + seg(x.key, x.opts || [["on", "On"], ["off", "Off"]]) + '</div>';
+      }).join("") + '</div>';
+  }
+  function extraOn(key){ return prefGet(key, "on") !== "off"; }
+  function nukePref(){ return prefGet(SH_NUKE_PREF_KEY, "on"); }
 
   function applyFontPref(){
     var stack = FONT_STACKS[prefGet(SH_FONT_KEY, "default")];
@@ -1069,7 +1114,7 @@
     document.dispatchEvent(new CustomEvent("sh:egg", { detail: (msg && msg.payload) || {} }));
   });
   channel.on("broadcast", { event: "nuke" }, function(msg){
-    if (prefGet(SH_NUKE_PREF_KEY, "on") !== "on") return;
+    if (nukePref() !== "on") return;
     if (isExamDay()) return;
     var payload = (msg && msg.payload) || {};
     playNukeSequence(payload.name || "Someone");
@@ -1271,11 +1316,11 @@
     var prevStreak = sessionCorrectStreak;
     if (isCorrect) {
       sessionCorrectStreak++;
-      if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0) {
+      if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0 && extraOn("sh_pref_cheers")) {
         fireConfetti();
         showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "!", ICON_FLAME);
       }
-      if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady) {
+      if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady && nukePref() !== "off") {
         nukeReady = true;
         safeRpc("record_nuke_unlock", { p_hub: HUB, p_visitor: VISITOR_ID });
         showNukeBadge();
@@ -1446,6 +1491,10 @@
     el.classList.remove("is-shown");
     setTimeout(function(){ el.remove(); }, 300);
   }
+  /* switched off in Settings while the badge is up: put it away (the streak still counts) */
+  document.addEventListener("sh:pref", function(e){
+    if (e.detail && e.detail.key === SH_NUKE_PREF_KEY && e.detail.val === "off") { hideNukeBadge(); nukeReady = false; }
+  });
   function handleNukeBadgeClick(){
     if (!nukeBadgeEl) return;
     if (!nukeArmed) {
@@ -1746,28 +1795,7 @@
     '<input type="range" id="shset-volume" min="0" max="100" aria-label="Music volume">' +
     '<div class="shset-hint">Browsers block audio from autoplaying — reopen Settings each visit to resume it.</div>' +
     '</div>' +
-    '<div class="shset-row"><label>Surprises</label>' +
-    '<div class="shset-seg" data-pref="eggs">' +
-    '<button type="button" data-val="on">On</button>' +
-    '<button type="button" data-val="off">Off</button>' +
-    '</div>' +
-    '<div class="shset-hint">Little hidden extras around the hubs, including a few you share live with classmates. Stuck? The trophy case in Stats has clues. They never appear during a mock exam.</div>' +
-    '</div>' +
-    '<div class="shset-row"><label>Timmy Tooth</label>' +
-    '<div class="shset-seg" data-pref="pet">' +
-    '<button type="button" data-val="on">Everywhere</button>' +
-    '<button type="button" data-val="dash">Dashboard only</button>' +
-    '<button type="button" data-val="off">Off</button>' +
-    '</div>' +
-    '<div class="shset-hint">Your cartoon tooth buddy, in the bottom corner. Right answers and study streaks keep him healthy; skipped days give him plaque, cavities and worse. Meet him on the dashboard. He hides during mock exams.</div>' +
-    '</div>' +
-    '<div class="shset-row"><label>Tactical nuke alerts</label>' +
-    '<div class="shset-seg" data-pref="nuke">' +
-    '<button type="button" data-val="on">On</button>' +
-    '<button type="button" data-val="off">Off</button>' +
-    '</div>' +
-    '<div class="shset-hint">Get ' + NUKE_STREAK_THRESHOLD + ' questions right in a row to unlock a tactical nuke you can call in. Turn this off to skip seeing other people\'s strikes (yours will still work).</div>' +
-    '</div>' +
+    extrasHTML() +
     '</div>' +
     /* Desktop: one launcher button that opens this menu. Phones: the menu is a three-item
        bottom bar (Search, Stats, More) and More opens the rest as a small sheet. */
@@ -2131,23 +2159,25 @@
   var SEG_PREF_MAP = {
     font: { key: SH_FONT_KEY, def: "default" },
     size: { key: SH_SIZE_KEY, def: "default" },
-    music: { key: SH_MUSIC_KEY, def: "off" },
-    nuke: { key: SH_NUKE_PREF_KEY, def: "on" },
-    eggs: { key: "sh_pref_eggs", def: "on" },
-    pet: { key: "sh_pref_pet", def: "on" }
+    music: { key: SH_MUSIC_KEY, def: "off" }
   };
   function syncSettingsSegUI(){
     document.querySelectorAll(".shset-seg").forEach(function(seg){
-      var pref = seg.getAttribute("data-pref");
-      var map = SEG_PREF_MAP[pref];
-      if (!map) return;
-      var cur = prefGet(map.key, map.def);
+      var pref = seg.getAttribute("data-pref"), key = seg.getAttribute("data-key");
+      var map = key ? { key: key, def: "on" } : SEG_PREF_MAP[pref];
+      var cur = map ? prefGet(map.key, map.def) : seg.hasAttribute("data-extras-all") ? extrasAll() : null;
+      if (cur === null) return;
       seg.querySelectorAll("button").forEach(function(b){
         b.classList.toggle("is-active", b.getAttribute("data-val") === cur);
       });
     });
     var volEl = document.getElementById("shset-volume");
     if (volEl) volEl.value = prefGet(SH_VOLUME_KEY, "35");
+  }
+  /* "on" or "off" when every extra is, else "" (a mix: neither All button lit) */
+  function extrasAll(){
+    var v = EXTRAS.map(function(x){ return prefGet(x.key, "on"); });
+    return v.every(function(x){ return x === "on"; }) ? "on" : v.every(function(x){ return x === "off"; }) ? "off" : "";
   }
   function syncSettingsUI(){
     syncNameInputs();
@@ -2283,14 +2313,13 @@
     seg.addEventListener("click", function(e){
       var btn = e.target.closest("button[data-val]");
       if (!btn) return;
-      var pref = seg.getAttribute("data-pref");
+      var pref = seg.getAttribute("data-pref"), key = seg.getAttribute("data-key");
       var val = btn.getAttribute("data-val");
-      if (pref === "font") { prefSet(SH_FONT_KEY, val); applyFontPref(); }
+      if (key) prefSet(key, val);
+      else if (seg.hasAttribute("data-extras-all")) EXTRAS.forEach(function(x){ prefSet(x.key, val); });
+      else if (pref === "font") { prefSet(SH_FONT_KEY, val); applyFontPref(); }
       else if (pref === "size") { prefSet(SH_SIZE_KEY, val); applySizePref(); }
       else if (pref === "music") { prefSet(SH_MUSIC_KEY, val); shMusic.setTrack(val); }
-      else if (pref === "nuke") { prefSet(SH_NUKE_PREF_KEY, val); }
-      else if (pref === "eggs") { prefSet("sh_pref_eggs", val); }
-      else if (pref === "pet") { prefSet("sh_pref_pet", val); }
       syncSettingsSegUI();
     });
   });

@@ -1,5 +1,5 @@
 /* study-hubs easter eggs. Loaded by widget/v3.js, which hands over window.shEggHooks.
-   Everything here is optional fun: it switches off with Settings → Surprises, never shows
+   Everything here is optional fun: it switches off with Settings → Extras (bosses, fairy, Golden Probe and Full Arch have their own switches; the rest is "Hidden secrets"), never shows
    during a mock exam, and every network call is best-effort.
 
    - Golden Probe: one taught question per hub per day is secretly golden; first right answer claims it
@@ -27,6 +27,8 @@
   function on(){ return H.prefGet("sh_pref_eggs", "on") !== "off"; }
   function inMock(){ try { return /(^|\/)mock/.test(String(H.section() || "")); } catch (e) { return false; } }
   function ok(){ return on() && !inMock(); }
+  /* the eggs with their own switch in Settings → Extras (bosses, fairy, Golden Probe, Full Arch) don't follow "Hidden secrets" */
+  function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   function rpc(name, args){
     if (!SB) return Promise.resolve(null);
@@ -560,7 +562,7 @@
     el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); });
     boss = { id: id, k: k, max: k.hp, hp: Math.min(k.hp, hp || k.hp), el: el, test: !!test };
     drawBoss();
-    requestAnimationFrame(function(){ if (!bossHidden && ok()) el.classList.add("is-shown"); });
+    requestAnimationFrame(function(){ if (!bossHidden && feat("boss")) el.classList.add("is-shown"); });
   }
   function drawBoss(){
     if (!boss) return;
@@ -569,7 +571,7 @@
     var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
     boss.el.querySelector("small").textContent = boss.hp + " / " + boss.max + " HP · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
     boss.el.classList.toggle("is-low", f <= .25);
-    boss.el.classList.toggle("is-shown", !bossHidden && ok());
+    boss.el.classList.toggle("is-shown", !bossHidden && feat("boss"));
   }
   function defeatBoss(by){
     if (!boss) return;
@@ -605,9 +607,16 @@
   }
   setInterval(function(){
     if (boss && boss.id !== bossId()) { boss.el.remove(); boss = null; }
-    if (!boss && on() && H.online() >= 5) spawnBoss();
+    if (!boss && feat("boss") && H.online() >= 5) spawnBoss();
     drawBoss();
   }, 15000);
+
+  /* switched off in Settings → Extras: put them away now instead of on the next tick */
+  document.addEventListener("sh:pref", function(e){
+    var k = e.detail && e.detail.key;
+    if (k === "sh_pref_boss") drawBoss();
+    else if (k === "sh_pref_arch" && archEl && !feat("arch")) archEl.classList.remove("is-shown");
+  });
 
   /* ================= broadcasts from classmates ================= */
   document.addEventListener("sh:egg", function(e){
@@ -619,7 +628,7 @@
     } else if (d.t === "boss-down" && d.id === bossId()) {
       if (!boss) { ls("sh_egg_boss_down", d.id); return; }
       defeatBoss(String(d.by || "a classmate").slice(0, 40));
-    } else if (d.t === "golden" && ok()) {
+    } else if (d.t === "golden" && feat("probe")) {
       toast(row(IC.probe, esc(String(d.name || "A classmate").slice(0, 40)) + " just found today's Golden Probe", "One question here is golden each day. Tomorrow it could be you."), 5000, "is-gold");
     }
   });
@@ -628,11 +637,14 @@
   var wrongRun = 0, rightAfter = 0, rightRun = 0;
   document.addEventListener(H.answeredEvent, function(e){
     var d = (e && e.detail) || {};
-    if (!ok()) return;
     var correct = !!d.correct;
     rightRun = correct ? rightRun + 1 : 0;
-    if (correct) { checkGolden(String(d.qid || "")); hitBoss(rightRun); if (sh8bit) blip(); }
-    archAnswer(correct);
+    if (correct && feat("probe")) checkGolden(String(d.qid || ""));
+    if (correct && feat("boss")) hitBoss(rightRun);
+    if (feat("arch")) archAnswer(correct);
+    if (feat("fairy")) maybeFairy();
+    if (!ok()) return;
+    if (correct && sh8bit) blip();
     /* Through the Root Canal: 10 misses in a row, then 10 right in a row */
     if (!correct) { if (rightAfter) { wrongRun = 0; rightAfter = 0; } wrongRun++; }
     else if (wrongRun >= 10) {
@@ -656,7 +668,6 @@
         announce("owl");
       }
     }
-    maybeFairy();
   });
 
   /* ================= Professor soundboard: tap a name 5 times ================= */
@@ -916,7 +927,7 @@
     setTimeout(function(){ f.remove(); }, 900);
   }
   function archAnswer(correct){
-    if (archDone() || !ok()) return;
+    if (archDone() || !feat("arch")) return;
     if (!archEl) archShow();
     if (correct) { archN++; archShow(); archDraw(archN); }
     else if (archN > 0) { archShow(); knockOut(archN); archN--; archDraw(0); }
