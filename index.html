@@ -648,7 +648,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       <span class="aside" id="hubsAside"></span>
     </div>
     <div id="terms"></div>
-    <noscript><p><a href="hubs/heme-endo-exam1/">Heme &amp; Endo Exam 1 Hub</a> · <a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Midterm Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
+    <noscript><p><a href="hubs/heme-endo-exam1/">Heme &amp; Endo Exam 1 Hub</a> · <a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Final Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
   </section>
 
   <!-- ============ HUB RECAPS: archived hubs, as a slideshow ============ -->
@@ -780,14 +780,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       exams:[ { name:"PCD Fixed Pros didactic Exam 3", label:"Exam", date:"2026-10-15", checkinHour:20, checkinClosed:true } ], updated:"2026-10-08", hideCardOn:"2026-10-21",
       desc:"Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen"], stateKey:"pcd3-state-v1" },
-    { id:"occlusion", cls:"occlusion", title:"Occlusion Midterm Hub", code:"Occlusion · Midterm",
+    { id:"occlusion", cls:"occlusion", title:"Occlusion Final Hub", code:"Occlusion · Final",
       exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19,
                 extraQs:[ { id:"diagrams", kind:"scale", prompt:"How helpful were the hub's diagrams?", ends:["Not helpful","Very helpful"] },
                           { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ] },
-              { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-07",
-      desc:"Dr. Givan's five midterm lectures: the review of basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, chewing, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Notes in two reading levels, drawn diagrams of the envelope of motion and cusp pathways, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
+              { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-27",
+      desc:"Now for the final (Thu Nov 19, not comprehensive): L6 Occlusal Instrumentation, with articulators, the facebow and the CR, MIP and eccentric records. New lectures are added as they are taught. The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"occl-state-v1",
-      podcast:{ name:"Timmy Time", sub:"The last-minute review, 45 min" } },
+      podcast:{ name:"Timmy Time", sub:"The midterm review, 45 min" } },
     { id:"msk-exam3", cls:"gi", title:"Musculoskeletal Exam 3 Hub", code:"GI & MSK · Exam 3",
       exams:[ { name:"Musculoskeletal Exam 3", label:"Exam", date:"2026-10-02" } ], updated:"2026-09-23",
       desc:"Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
@@ -832,7 +832,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     { hub:"pcd-exam3", title:"Bond Street Arcade", from:"PCD Fixed Pros Exam 3 hub", games:[
       ["sort","Silane Sort"],["snake","Slurry Snake"],["stack","Layer Stack"],["match","Shade Match"],["hangman","Hanging Margin"],
       ["fact","Etch or Sketch"],["blaster","Sandblaster"],["search","Primer Search"],["whack","Whack-a-Crown"] ] },
-    { hub:"occlusion", title:"Freeway Space Arcade", from:"Occlusion Midterm hub", money:["smile"], games:[
+    { hub:"occlusion", title:"Freeway Space Arcade", from:"Occlusion hub", money:["smile"], games:[
       ["board","Freeway Showdown"],["escape","Lab Escape"],["cloze","Mind the Gap"],["smile","Million-Dollar Smile"],["cross","Cross-Section"],["sort","Cusp Sort"] ] },
     { hub:"msk-exam4", title:"Skin Deep Arcade", from:"Musculoskeletal Exam 4 hub", games:[
       ["sort","Split Decision"],["snake","Sarco Snake"],["stack","Z-Line Stack"],["match","Melanin Match"],["hangman","Skeleton Key"],
