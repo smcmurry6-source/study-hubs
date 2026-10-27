@@ -5051,19 +5051,11 @@ function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();
   var p = document.getElementById('panel-compendium');
   var sub = STATE.ui.sub;
-  var left = QUESTIONS.filter(function(q){ return !STATE.seen[q.id]; }).length, cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0];
   /* the one-tap start row and the exam card live on Home */
   var h = '';
   h += '<div class="subtabs">' + SUBTABS.map(function(t){ return '<button type="button" class="subtab'+(t[0]===sub?' is-active':'')+'" data-sub="'+t[0]+'">'+t[1]+'</button>'; }).join('') + '</div><div id="compBody"></div>';
   p.innerHTML = h;
   p.querySelectorAll('[data-sub]').forEach(function(b){ b.addEventListener('click', function(){ STATE.ui.sub = b.getAttribute('data-sub'); saveState(); renderCompendium(); }); });
-  p.querySelectorAll('[data-qs]').forEach(function(b){ b.addEventListener('click', function(){
-    var g = b.getAttribute('data-qs');
-    if(g === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
-    else if(g === 'mock') STATE.ui.sub = 'mock';
-    else STATE.ui.sub = 'notes';
-    saveState(); renderCompendium(); var sb = document.querySelector('#panel-compendium .subtabs'); if(sb) sb.scrollIntoView({ block:'start' });
-  }); });
   var ec = document.getElementById('examCard');
   if(ec) ec.addEventListener('toggle', function(){ STATE.ui.examCard = ec.open ? 'open' : 'closed'; saveState(); });
   var body = document.getElementById('compBody');
@@ -6041,7 +6033,7 @@ window.SH_SYNC = {
     checkAchievements(); saveState(); renderHeaderStats();
     if(added) toast('Synced ' + added + ' question' + (added === 1 ? '' : 's') + ' from your other devices', 'check');
     /* redraw the page only right after it opens, so nobody loses a question they're in the middle of */
-    if(Date.now() - SYNC_LOADED < 8000 && STATE.ui.mode === 'compendium' && STATE.ui.sub !== 'mock' && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())) renderCompendium();
+    if(Date.now() - SYNC_LOADED < 8000 && !(window.shTTS && window.shTTS.listening && window.shTTS.listening())){ if(STATE.ui.mode === 'home') renderHome(); else if(STATE.ui.mode === 'compendium' && STATE.ui.sub !== 'mock') renderCompendium(); }
   }
 };
 
