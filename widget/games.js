@@ -24,7 +24,7 @@
      record(q, correct, choiceIdx)            the hub's answer choke point (class stats, Weak Spots, streaks)
      lecName(lecId)             short label, e.g. "L2 · TMJ Anatomy" or "S3 · Risk Assessment"
      lecOrder                   lecture ids in course order
-     skin                       the hub's own look and story for these games (standing rule: every hub's arcade looks
+     skin                       the hub's own look and story for these games (smile:{ bg } swaps the drawn grin for a painted stage) (standing rule: every hub's arcade looks
                                 like that hub, never a copy of another hub's). { id, board:{ dd, final, intro },
                                 cloze:{ intro, placeholder }, escape:{ intro, room, item:{ name, found, reveal },
                                 spots:{ <id>:{ label, flavor, locked, text } }, scene(api) or parts:{ <part>(api) } } }.
@@ -831,7 +831,10 @@
       '<ellipse cx="120" cy="96" rx="40" ry="5" fill="#fff" opacity=".28"/>' +
       (goldOn ? '<path class="sg-spark" d="M152 18l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="' + gold + '" stroke="#fff" stroke-width="1"/><circle class="sg-spark" cx="170" cy="30" r="2.5" fill="#fff"/>' : "") + "</svg>";
   }
+  /* o.bg: a painted stage (the hub's own art, e.g. img/smile-stage.webp) that replaces the drawn grin */
   function marqueeHTML(o, title, sub, goldOn){
+    if (o.bg) return '<div class="ms-banner ms-banner--art" style="background-image:url(&quot;' + esc(o.bg) + '&quot;)">' +
+      '<div class="ms-title"><b>' + esc(title) + "</b><span>" + sub + "</span></div></div>";
     return '<div class="ms-banner">' + grinSVG(o, "ms-grin", goldOn) +
       '<div class="ms-title"><b>' + esc(title) + "</b><span>" + sub + "</span></div></div>";
   }
