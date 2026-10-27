@@ -264,7 +264,8 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 #panel-arcade{background:var(--ar-bg);color:var(--ar-ink);margin:-16px -20px 0;padding:24px 20px 40px;min-height:70vh;border-radius:0 0 18px 18px;position:relative;overflow:hidden}
 #panel-arcade::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);background-size:22px 22px;pointer-events:none}
 .ar-wrap{position:relative;max-width:1060px;margin:0 auto}
-.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px;min-height:230px;padding:22px 24px;border-radius:16px;border:2px solid var(--ar-line);background:linear-gradient(90deg, var(--ar-bg) 0 28%, rgba(18,15,36,.55) 48%, transparent 66%), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)}
+@media (max-width: 760px){ .ar-hero{min-height:170px;padding:16px;background:linear-gradient(90deg, var(--ar-bg) 0 40%, rgba(18,15,36,.6) 70%, rgba(18,15,36,.3)), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)} }
 .ar-logo{font-family:var(--font-arcade);font-size:1.35rem;line-height:1.5;color:var(--ar-yellow);text-shadow:3px 3px 0 var(--ar-pink);margin:0}
 .ar-logo small{display:block;font-size:.55rem;color:var(--ar-dim);text-shadow:none;margin-top:6px;letter-spacing:.06em}
 .ar-stats{display:flex;gap:8px;flex-wrap:wrap}
@@ -7227,32 +7228,16 @@ var ARCADE = (function(){
       '<rect x="18" y="114" width="210" height="38" rx="9" fill="'+P.bg+'" stroke="'+P.a2+'" stroke-width="3"/><text x="32" y="139" font-family="monospace" font-size="15" fill="'+P.ink+'">co</text><rect x="54" y="124" width="3" height="20" fill="'+P.a2+'"/>' +
       '<rect x="238" y="114" width="64" height="38" rx="9" fill="'+P.a2+'"/><text x="270" y="138" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.bg+'">ENTER</text></svg>';
   }
-  function thumbEscapeP(P){
-    var teeth = function(y, up){ var t = ''; for(var i=0;i<6;i++){ var x = 112 + i*16; t += '<path d="M'+x+' '+y+(up ? 'v-12q8 -8 16 0v12z' : 'v12q8 8 16 0v-12z')+'" fill="#fbf7ee" stroke="#5c5478" stroke-width="2"/>'; } return t; };
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#e4e0f3"/><rect y="138" width="320" height="32" fill="#9a93b8"/>' +
-      '<rect x="100" y="120" width="120" height="10" rx="3" fill="#b9b2d6" stroke="#5c5478" stroke-width="2"/><rect x="200" y="30" width="10" height="90" fill="#7a729c"/><circle cx="205" cy="30" r="10" fill="#cfc9e6" stroke="#5c5478" stroke-width="3"/>' +
-      '<rect x="106" y="22" width="104" height="14" rx="4" fill="#7a729c"/><rect x="108" y="36" width="98" height="20" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(56, false) + '<rect x="108" y="92" width="98" height="24" rx="4" fill="#e9e5d8" stroke="#5c5478" stroke-width="2"/>' + teeth(92, true) +
-      '<text x="150" y="86" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="900" fill="#2b62f0">7</text><rect x="30" y="62" width="50" height="34" rx="2" fill="#c8102e" transform="rotate(-12 55 79)"/><rect x="34" y="70" width="42" height="18" fill="#2b62f0" transform="rotate(-12 55 79)"/>' +
-      '<rect x="244" y="20" width="62" height="118" fill="#8a6a4f" stroke="#5c4330" stroke-width="3"/><rect x="250" y="6" width="50" height="13" rx="3" fill="#163b2a"/><text x="275" y="16" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="900" fill="#58f29a">EXIT</text>' +
-      '<rect x="284" y="66" width="16" height="26" rx="3" fill="#2c3e50"/>' + ['#4FB6F0','#FF6FA3','#FFC93C','#3DD39B'].map(function(c,i){ return '<circle cx="'+(288+(i%2)*8)+'" cy="'+(73+Math.floor(i/2)*9)+'" r="3" fill="'+c+'"/>'; }).join('') + '</svg>';
-  }
+  function thumbEscapeP(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-escape.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
+
 
   var THUMB_P = { bg:'#282050', panel:'#1d1838', ink:'#f4f1ff', dim:'#a79fcf', a1:'#ffd23f', a2:'#ff5c8a', a3:'#3fe0d0', a4:'#3b3270' };
   function thumbBoard(){ return thumbBoardP(THUMB_P); }
   function thumbGap(){ return thumbGapP(THUMB_P); }
   function thumbEscape(){ return thumbEscapeP(THUMB_P); }
   function svgWrap(inner){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+inner+'</svg>'; }
-  function thumbSmile(){
-    var px = 6, h = '', lad = '';
-    /* a pixel grin on an 18 x 9 grid: L lips, D dark lip, M mouth, T tooth, G gold tooth, B lower tooth */
-    var rows = ['..LLLLL....LLLLL..','.LDDDDDLLLLDDDDDL.','LMTTMTTMTTMGGMTTML','LMTTMTTMTTMGGMTTML','LMMMMMMMMMMMMMMMML','.LMMBBMBBMBBMBBML.','..LLMMMMMMMMMMLL..','...LLLLLLLLLLLL...','.....LLLLLLLL.....'];
-    var col = { L:'#ff5c8a', D:'#c23a66', M:'#26102e', T:'#f4f1ff', G:'#ffd23f', B:'#d9d4ee' };
-    rows.forEach(function(r, y){ for(var x=0;x<r.length;x++){ var c = col[r[x]]; if(c) h += '<rect x="'+(40+x*px*1.5)+'" y="'+(46+y*px*1.5)+'" width="'+(px*1.5+.3)+'" height="'+(px*1.5+.3)+'" fill="'+c+'"/>'; } });
-    ['$125K','$64K','$32K','$16K','$8K'].forEach(function(t, k){ lad += (k===2?'<rect x="232" y="'+(22+k*22)+'" width="74" height="18" fill="#ff9b3f"/>':'') + '<text x="300" y="'+(36+k*22)+'" text-anchor="end" font-family="monospace" font-size="12" font-weight="700" fill="'+(k===2?'#120f24':k<2?'#ffd23f':'#a79fcf')+'">'+t+'</text>'; });
-    var bulbs = ''; for(var i=0;i<13;i++) bulbs += '<rect x="'+(18+i*15)+'" y="12" width="6" height="6" fill="'+(i%2?'#ffd23f':'#ff9b3f')+'"/><rect x="'+(18+i*15)+'" y="150" width="6" height="6" fill="'+(i%2?'#ff9b3f':'#ffd23f')+'"/>';
-    return '<svg viewBox="0 0 320 170" aria-hidden="true" shape-rendering="crispEdges"><rect width="320" height="170" fill="#282050"/><rect x="10" y="8" width="210" height="154" fill="#1d1838" stroke="#ffd23f" stroke-width="2"/>' + bulbs + h +
-      '<rect x="150" y="30" width="6" height="18" fill="#ffd23f"/><rect x="144" y="36" width="18" height="6" fill="#ffd23f"/>' + lad + '</svg>';
-  }  function thumbCross(){
+  function thumbSmile(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-smile.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
+  function thumbCross(){
     var h = '', cells = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[3,0],[3,2],[3,3],[3,4],[6,2],[6,3],[5,3],[7,3],[8,3]], letters = {'1,1':'G','2,1':'R','3,1':'A','4,1':'C','5,1':'E','6,1':'Y','3,0':'P','3,2':'P','3,3':'E','3,4':'R','6,2':'O','6,3':'U'};
     cells.forEach(function(c){ var x = 50+c[0]*26, y = 20+c[1]*26; h += '<rect x="'+x+'" y="'+y+'" width="24" height="24" rx="3" fill="'+(c[1]===1?'#ffe9a8':'#f5f1e6')+'"/>'; var L = letters[c[0]+','+c[1]]; if(L) h += '<text x="'+(x+12)+'" y="'+(y+18)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="13" fill="#1a2533">'+L+'</text>'; });
     return svgWrap(h + '<text x="20" y="160" font-family="monospace" font-size="10" fill="#9CB3C8">1 ACROSS · Area-specific curette family</text>');
@@ -7390,7 +7375,7 @@ var ARCADE = (function(){
      casts show the hidden digit under articulating paper; a board of articulating-paper strips. Never copy another hub's skin. */
   var OCCL_SKIN = {
     id:'occlusion',
-    smile:{ lips:'#ff5c8a', lipsDark:'#c23a66', gum:'#ff9ab6', gold:'#ffd23f', inside:'#26102e' },
+    smile:{ bg:'img/smile-stage.webp', lips:'#ff5c8a', lipsDark:'#c23a66', gum:'#ff9ab6', gold:'#ffd23f', inside:'#26102e' },
     board:{ dd:'Centric Double', final:'Final Contact', start:'Mount the board',
       intro:'A quiz board: one column per lecture, five strips each from <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Right marks the strip blue and adds its value; wrong marks it red and takes it away. Two strips hide a <b>Centric Double</b> where you set the wager, and the <b>Final Contact</b> lets you bet everything on one hard question.' },
     cloze:{ start:'Close the gap',

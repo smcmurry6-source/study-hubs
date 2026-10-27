@@ -185,3 +185,8 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 @keyframes sg-twinkle{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1.15);opacity:1}}
 @media (prefers-reduced-motion: reduce){ .ms-banner::before,.ms-banner::after,.sg-spark{animation:none;opacity:1} }
 @media (max-width: 760px){ .ms-grin{width:96px} .ms-title b{font-size:1rem} .ms-banner{padding:10px 12px;gap:10px} }
+/* a painted Smile stage (skin.smile.bg): the art sits right, the title on a dark fade on the left */
+.ms-banner.ms-banner--art{min-height:0;aspect-ratio:4/1;background-size:cover;background-position:right center;background-color:var(--ar-bg);padding:14px 20px;border-width:3px}
+.ms-banner.ms-banner--art::before,.ms-banner.ms-banner--art::after{display:none}
+.ms-banner--art .ms-title{position:relative;max-width:42%;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+@media (max-width: 760px){ .ms-banner.ms-banner--art{aspect-ratio:auto;min-height:96px;background-size:auto 100%} .ms-banner--art .ms-title{max-width:46%} }
