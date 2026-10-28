@@ -124,6 +124,14 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (arcade art, round 2: Showdown stages and painted lobby pictures, Claude Code)** — More of Sam's Argon art.
+  **Showdown stage**: a skin's `board.bg` paints a stage behind the quiz board (`.sg-stage` in `widget/games.css`, dimmed so the
+  tiles stay readable): Occlusion's Freeway Showdown stage, Perio's Pocket Showdown stage (`img/showdown-stage.webp`).
+  **Lobby pictures** are now painted (`thumbImg(f)` in each hub, files in `img/`): Occlusion Cusp Sort, Freeway Showdown,
+  Mind the Gap and Cross-Section; Perio Pocket Showdown, Cross-Section and Calculus Crusher (each Showdown picture is
+  cropped from its stage). Perio's Mind the Pocket keeps its drawn picture until it has art. The pictures now fill Perio's
+  wider frames (`preserveAspectRatio` slice; they sat between side bars). `sw.js` -> `sh-v42`. No schema change.
+
 - **2026-10-28 (Special Patient Care check-in and archiving wait for the exam to close, Claude Code)** — Sam: no check-in until the exam
   closes. The exam is due Fri Nov 13 at 11:59 pm, so its `HUBS` entry sets `checkinHour:24, promptHour:24` (`setHours(24)` = midnight
   starting Sat Nov 14): no "Check in" button at 8 am and no pop-up at 10 pm on the due date. The card also stays live until then:

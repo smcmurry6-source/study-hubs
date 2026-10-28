@@ -190,3 +190,9 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .ms-banner.ms-banner--art::before,.ms-banner.ms-banner--art::after{display:none}
 .ms-banner--art .ms-title{position:relative;max-width:42%;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 @media (max-width: 760px){ .ms-banner.ms-banner--art{aspect-ratio:auto;min-height:96px;background-size:auto 100%} .ms-banner--art .ms-title{max-width:46%} }
+/* a skin's painted Showdown stage (skin.board.bg) behind the board, dimmed so the tiles stay readable */
+.sg-stage{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:14px;background-color:var(--ar-bg);background-size:cover;background-position:center}
+.sg-stage::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(10,8,24,.35),rgba(10,8,24,.62))}
+.sg-stage>*{position:relative}
+.sg-stage .sg-board-foot,.sg-stage .sg-board-foot span{color:#f4f1ff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+@media (max-width: 760px){ .sg-stage{padding:4px;gap:8px} }
