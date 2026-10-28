@@ -770,7 +770,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   };
   var HUBS = [
     { id:"special-patient-care", cls:"spc", title:"Special Patient Care Hub", code:"Special Patient Care",
-      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinHour:24, promptHour:24 } ], updated:"2026-10-28",
+      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinHour:24, promptHour:24, archiveHour:24 } ], updated:"2026-10-28",
       desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Nov 6 to Nov 13. Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a mock exam, review tables and the Sparks Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
@@ -805,7 +805,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       modes:["Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"perio-d2-compendium-state-v1" }
   ];
   /* Archiving is automatic: a hub in HUBS turns into an archived card (no Open button) at ARCHIVE_HOUR on the day
-     of its last exam, and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
+     of its last exam (that exam's archiveHour overrides it; 24 = midnight after, for an exam due at 11:59 pm; give the hub's
+     SH_EXPORT.exams entry the same archiveHour so its "archived" notice agrees), and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
@@ -818,7 +819,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   ];
   function examAt(x, hour){ var d = parseYmd(x.date); d.setHours(hour, 0, 0, 0); return d; }
   function lastExam(hub){ return (hub.exams || []).filter(function(x){ return x.date; }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null; }
-  function archiveAt(hub){ var x = lastExam(hub); return x ? examAt(x, ARCHIVE_HOUR) : null; }
+  function archiveAt(hub){ var x = lastExam(hub); return x ? examAt(x, x.archiveHour != null ? x.archiveHour : ARCHIVE_HOUR) : null; }
   function cardGoneAt(hub){
     if (hub.hideCardOn) return parseYmd(hub.hideCardOn);
     var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;

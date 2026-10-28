@@ -2413,14 +2413,15 @@
     drillScript.onload = function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); };
     document.head.appendChild(drillScript);
   }
-  /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR);
+  /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
+     archiveHour overrides it, e.g. 24 for one due at 11:59 pm);
      a hub page still reachable after that says so once per visit, with a way back to the dashboard. */
   (function(){
     if (EXPORT_ONLY) return;
     var last = null;
     ((window.SH_EXPORT && window.SH_EXPORT.exams) || []).forEach(function(x){
       var p = String((x && x.date) || "").split("-").map(Number); if (p.length !== 3 || !p[0]) return;
-      var d = new Date(p[0], p[1] - 1, p[2], 22);
+      var d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22);
       if (!last || d > last.at) last = { at: d, x: x };
     });
     if (!last || new Date() < last.at) return;
