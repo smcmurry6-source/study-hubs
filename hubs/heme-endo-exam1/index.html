@@ -156,6 +156,19 @@ main{padding-top:20px}
 .qcard.is-retry{border-style:dashed}
 .retry-chip{display:inline-flex;align-items:center;gap:4px;color:var(--accent);white-space:normal;max-width:100%;text-align:left}
 .retry-chip svg{width:13px;height:13px}
+.likely-box{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);padding:10px 14px;margin:0 0 16px}
+.likely-box > summary{display:flex;gap:8px;align-items:flex-start;cursor:pointer;list-style:none}
+.likely-box > summary .ic{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent-ink)}
+.likely-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.likely-lec{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.likely-lec h4{margin:0 0 6px;font-size:.95rem}
+.likely-lec h4 .lec-num{margin-right:6px}
+.likely-lec h4 small{display:block;font-weight:600;color:var(--ink-soft);font-size:.78rem;margin-top:2px}
+.likely-lec ol{margin:0 0 10px;padding-left:20px;font-size:.88rem}
+.likely-lec li{margin:3px 0}
+.likely-basis{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-soft);background:var(--surface-2);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.likely-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+.likely-chip .ic{width:12px;height:12px}
 .src-chip{font-family:var(--font-mono);font-size:.68rem;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--ink-soft)}
 .qcard-stem{font-weight:600;margin:0 0 12px;white-space:pre-line}
 .qcard-choices,.qcard-seq-steps{display:flex;flex-direction:column;gap:7px}
@@ -1201,6 +1214,7 @@ var EXAM_TIME = '08:00', EXAM_CLOSES = '09:30';
 var QUIZ_DUE = '2026-10-29T23:59:00';
 var EXAM_INFO = [
   ['What', '55 multiple-choice questions on lectures 1-10: all ten lectures in this hub.'],
+  ['Per lecture', 'L1 6 · L2 6 · L3 6 · L4 8 · L5 6 · L6 5 · L7 3 · L8 5 · L9 4 · L10 6. The four Patient Box questions are all from L4 (Thyroid Physiology).'],
   ['When', 'Friday, October 30, 8:00-9:30 am (the dental students\' time).'],
   ['Where', 'In person, on Canvas with Respondus LockDown Browser. Update LockDown Browser and charge your laptop the night before.'],
   ['Review', 'Wednesday, October 28, 1:00-1:50 pm, with Dr. Galin and Dr. Madison. Bring your own questions: they asked for them.'],
@@ -3847,6 +3861,95 @@ tf("ca-r-tf-4", "calcium", "rec", "Andropause usually comes around age 50, at ab
   "Andropause comes much later, around 75 to 80, which is why osteoporosis is less common in men.",
   "Menopause comes around 50; andropause comes around 75 to 80.", "Andropause comes decades later, around 75 to 80.");
 
+/* ---------- IN-CLASS REVIEW: the 10/28 PollEv questions with Dr. Galin and Dr. Madison (src review; stems and keys as
+   given, typos fixed; explanations use the class notes on what the professors said). rv-sst's last choice reads
+   "stimulated by ... amino acids and fatty acids" (the doc had "inhibited by ... ketoacids", which would make two
+   choices untrue). Then L4 Patient Box cases: the exam's four Patient Box questions are all on L4. ---------- */
+mcq("rv-sst", "pancreas", "review", "Which of the following statements is NOT true of pancreatic somatostatin?",
+  ["It stimulates glucagon secretion", "It is stimulated by increases in blood glucose", "It slows motility and nutrient absorption in the gastrointestinal tract", "It suppresses insulin secretion", "It is stimulated by elevated plasma amino acids and fatty acids"],
+  "At the review: somatostatin is always a negative regulator; it never increases a hormone. Delta-cell somatostatin is the paracrine brake on both insulin and glucagon. It rises when fuel comes in (glucose, amino acids, fatty acids) and slows the gut, so nutrients arrive more slowly.", {"fmt": "except"});
+mcq("rv-ins-muscle", "pancreas", "review", "Which of the following would be a muscle-specific effect of insulin?",
+  ["Glycogen storage", "Lipolysis", "Gluconeogenesis", "Catabolism of protein", "Ketone body formation"],
+  "At the review: insulin is the signal to use and store (anabolic): protein synthesis, glycogen, fat storage. In muscle it brings glucose in through GLUT4 and stores it as glycogen. The other choices are breakdown processes, or liver jobs that glucagon and cortisol drive.");
+mcq("rv-aldo-high", "adrenal", "review", "In diseases associated with aldosterone hypersecretion, which of the following would you expect?",
+  ["Low plasma potassium levels", "Low blood sodium levels", "Hypotension", "Immunosuppression", "Gonadal dysfunction"],
+  "Aldosterone makes the principal cells reabsorb sodium (water follows) and secrete potassium into the urine. Too much of it: potassium falls, sodium is kept and blood pressure rises.");
+mcq("rv-cort-reg", "adrenal", "review", "Which of the following is the primary regulator of cortisol production?",
+  ["ACTH", "Aldosterone", "Angiotensin II", "Androstenedione", "Renin"],
+  "ACTH from the anterior pituitary's corticotrophs drives the zona fasciculata through a Gs receptor. Angiotensin II (made after renin) and potassium drive aldosterone in the glomerulosa instead.");
+mcq("rv-cort-met", "adrenal", "review", "Which of the following is a metabolic effect exerted by cortisol?",
+  ["Elevated gluconeogenesis in the liver", "Increased utilization of glucose by muscle tissue", "Decreased lipolysis in the peripheral adipose tissue", "Elevated protein synthesis in the skeletal muscle", "Decrease in plasma amino acids"],
+  "At the review: under stress cortisol wants blood glucose up so the brain has fuel. It raises gluconeogenesis in the liver, breaks down muscle protein (amino acids go to the liver as substrate), promotes lipolysis in the extremities (glycerol as substrate) and lowers glucose use by muscle.");
+mcq("rv-gh-except", "growth", "review", "All of the following are true about growth hormone in humans EXCEPT:",
+  ["Somatostatin withdrawal is sufficient to induce GH secretion", "Much of our daily GH secretion occurs when we first enter deep sleep", "Integrated daily GH secretion is highest during the pubertal growth spurt", "Only human-derived GH is clinically useful", "Thyroid hormones increase pituitary GH synthesis"],
+  "At the review: somatostatin is a negative regulator and can suppress GH, but taking it away is not enough by itself; GH secretion needs the hypothalamus's GHRH signal. The biggest pulse comes soon after sleep begins, GH output peaks at puberty, GH is species-specific (only human GH works in people), and thyroid hormone supports GH synthesis.", {"fmt": "except"});
+mcq("rv-vitd", "calcium", "review", "In response to low serum calcium, which of the following sequences best explains how vitamin D becomes activated and where it acts to restore calcium levels?",
+  ["PTH activates 1α-hydroxylase in the kidney, increasing calcitriol, which enhances calcium absorption in the intestines", "Low calcium directly activates 1α-hydroxylase in the kidney, producing calcitonin to increase bone resorption", "Low calcium stimulates vitamin D receptors in the bone to release stored calcium", "PTH inhibits vitamin D activation to promote renal calcium reabsorption", "Vitamin D acts on the kidney to increase calcium reabsorption via 1α-hydroxylase activity"],
+  "Low calcium releases PTH; PTH turns on 1α-hydroxylase in the proximal tubule, making calcitriol (1,25-(OH)2-D3), whose main job is calcium absorption in the gut (calbindin).");
+mcq("rv-gh-linear", "growth", "review", "Which of the following best explains how growth hormone (GH) promotes linear growth during childhood?",
+  ["GH induces IGF-1 production, which then promotes growth plate activity", "GH directly stimulates chondrocytes at the growth plate", "GH increases calcium absorption in the intestines to strengthen bones", "GH directly lengthens long bones via osteoblast activation", "GH stimulates adrenal androgens, which drive skeletal growth"],
+  "At the review: GH's effect on linear growth is indirect, through IGF-1 (the somatomedin hypothesis); its main direct effect is on blood glucose. GH does tell plate precursors to commit to becoming chondrocytes, but the proliferation that lengthens bone is driven by IGF-1.");
+mcq("rv-laron", "growth", "review", "A 10-year-old child has normal GH levels but presents with short stature and reduced growth velocity; IGF-1 levels are abnormally low. Which of the following is the most likely explanation?",
+  ["Growth hormone receptor insensitivity", "Primary GH excess", "Pituitary adenoma secreting prolactin", "Thyroid hormone excess", "Adrenal insufficiency"],
+  "Normal GH with low IGF-1 means the tissues can't respond to GH: a GH receptor defect gives the picture of GH deficiency even though GH is present.");
+mcq("rv-gs", "hypopit", "review", "Which of the following best describes the intracellular mechanism by which a hormone using a G\u03b1s-coupled receptor stimulates secretion of a protein hormone?",
+  ["Activation of adenylate cyclase, increased cAMP, and stimulation of PKA", "Activation of phospholipase C and increased intracellular calcium", "Direct gene transcription via nuclear hormone receptor binding", "Opening of voltage-gated sodium channels on the secretory vesicle membrane", "Inhibition of tyrosine kinase activity to prevent hormone degradation"],
+  "Gs activates adenylate cyclase: cAMP rises, PKA phosphorylates proteins and secretion follows. Gq is the phospholipase C / IP3 / calcium route; Gi lowers cAMP.");
+mcq("rv-casr", "calcium", "review", "Which of the following best describes how the calcium-sensing receptor (CaSR) regulates PTH secretion?",
+  ["It inhibits PTH secretion when bound by calcium via activation of Gαq pathways", "It stimulates PTH release in response to low calcium by activating Gαs signaling", "It increases PTH gene transcription in response to high serum calcium", "It senses intracellular calcium to stimulate PTH exocytosis", "It activates vitamin D synthesis directly to lower calcium"],
+  "At the review: \"the one contradiction in all of endocrinology.\" Usually a rise in intracellular calcium drives secretion; on the chief cell, calcium binding the CaSR (a Gq receptor) raises intracellular calcium and that blocks PTH release. It makes sense: high blood calcium doesn't need more PTH.");
+mcq("rv-glucagon", "pancreas", "review", "Which of the following situations will result in stimulation of glucagon secretion?",
+  ["High levels of plasma insulin in the absence of insulin resistance", "Decreased plasma amino acid concentration", "Increased somatostatin secretion within the islets", "Increased plasma glucose, especially above 70 mg/dL", "Decreased plasma insulin when peripheral insulin resistance occurs"],
+  "At the review: it's not a direct effect. High insulin in a body that responds to it lowers blood glucose, and falling glucose is the main stimulus for glucagon. (Directly, insulin modestly inhibits glucagon.)");
+mcq("rv-th-anabolic", "thyroid", "review", "Which of the following hormones is anabolic on muscle protein at physiologic concentrations, but is catabolic at very high levels?",
+  ["Thyroid hormone", "Insulin", "GH", "Testosterone"],
+  "Thyroid hormone raises both protein synthesis and breakdown. At normal levels it supports growth and protein synthesis (with GH); in excess breakdown wins. At the review: hyperthyroid patients lose weight very quickly, because the high metabolic rate has to be fed.");
+mcq("rv-gh-excess", "growth", "review", "Excess secretion of growth hormone in prepubertal individuals can cause which of the following abnormal states?",
+  ["Gigantism and hyperglycemia", "Gigantism", "Acromegaly", "Hyperglycemia", "Gigantism and acromegaly"],
+  "At the review: before the plates close, excess GH gives gigantism; acromegaly is the same excess after puberty. GH's main direct effect is on blood glucose: over time it is diabetogenic, so blood glucose rises too.");
+mcq("rv-tpo", "thyroid", "review", "Thyroperoxidase functions in:",
+  ["Iodination of thyroglobulin", "Thyroxine's action on body cells", "Hydrolysis of thyroglobulin", "Release of thyroxine from thyroglobulin", "Conversion of T4 to T3"],
+  "At the review: thyroperoxidase, at the apical membrane facing the colloid, turns iodide into iodine, iodinates thyroglobulin's tyrosines (MIT, DIT) and couples them into T3 and T4. It has nothing to do with how T3 and T4 act; T4 to T3 is 5'-deiodinase.");
+mcq("rv-steroid-except", "hypopit", "review", "The following are characteristics of steroid hormones, EXCEPT:",
+  ["They are synthesized, for the most part, continuously", "They have a relatively long half-life", "Most are bound to protein in the blood", "They bind to cytoplasmic receptors", "Their early action is on mRNA synthesis"],
+  "Steroids are made from cholesterol when they are needed and diffuse out right away (they aren't stored or made steadily). They ride the blood bound to proteins, which gives them a longer half-life, bind intracellular receptors and change gene transcription.", {"fmt": "except"});
+mcq("rv-acth-epi", "adrenal", "review", "Which anterior pituitary hormone increases epinephrine secretion during stress?",
+  ["ACTH", "CRH", "GH", "GnRH"],
+  "At the review: cortisol belongs to the stress response, and every releasing hormone (CRH, GnRH) comes from the hypothalamus, so those are out for \"anterior pituitary.\" ACTH raises cortisol, which flows from cortex to medulla and activates PNMT, the enzyme that makes epinephrine from norepinephrine.");
+mcq("rv-neuroendo", "hypopit", "review", "Release of which hormone is an example of neuroendocrine secretion?",
+  ["Oxytocin", "GH", "Cortisol", "Prolactin", "ACTH"],
+  "Neuroendocrine hormones are made by neurons and released into the blood: the hypothalamic releasing hormones and the posterior pituitary hormones (oxytocin and ADH), which hypothalamic neurons make and release from their axon endings.");
+mcq("rv-paracrine", "hypopit", "review", "Which of the following pairs is an example of paracrine regulation?",
+  ["Somatostatin - insulin secretion", "Somatostatin - GH secretion", "Norepinephrine - CRH secretion", "CRH - ACTH secretion", "Dopamine - prolactin secretion"],
+  "At the review: paracrine means signaling to neighboring cells. Delta cells and beta cells sit side by side in the islet, so somatostatin reaches the beta cells locally; the other pairs travel too far (portal blood or nerves) to count.");
+mcq("rv-graves", "thyroid", "review", "Serum levels of which of the following substances are decreased in Graves disease?",
+  ["TSH", "Triiodothyronine (T3)", "Thyroxine (T4)", "Diiodotyrosine"],
+  "Graves antibodies activate the TSH receptor, so T3 and T4 rise; the pituitary is fine, so feedback drives TSH down.");
+mcq("th-pb-graves", "thyroid", "hub", "What is driving her thyroid?",
+  ["Antibodies that bind and activate the TSH receptor", "A pituitary adenoma secreting excess TSH into the blood", "Autoimmune destruction of her thyroid follicles", "Too little iodine in her diet to make hormone"],
+  "High T4 with low TSH is primary hyperthyroidism; with a goiter and bulging eyes it is Graves disease: autoantibodies act like TSH on its receptor. The pituitary is fine, so feedback drives TSH low.", {"pbox": [["Patient", "34-year-old woman"], ["History", "Hungry all the time, yet has lost 6 kg in two months; can't stand the heat, sweats"], ["Exam", "Smooth, enlarged thyroid; eyes bulging forward; fine tremor; HR 112"], ["Labs", "TSH low; free T4 high"]], "pcase": "graves"});
+mcq("th-pb-graves-eyes", "thyroid", "hub", "Why are her eyes pushed forward?",
+  ["The antibodies cross-react with the muscles behind the eye", "Myxedema deposits in the orbit attract water", "The goiter presses on the veins that drain the orbit", "Her high TSH makes the fat behind the eye grow"],
+  "Exophthalmos in Graves disease: the same antibodies cross-react with the muscles behind the eye, and the inflammation pushes the eyeballs forward.", {"pbox": [["Patient", "34-year-old woman"], ["History", "Hungry all the time, yet has lost 6 kg in two months; can't stand the heat, sweats"], ["Exam", "Smooth, enlarged thyroid; eyes bulging forward; fine tremor; HR 112"], ["Labs", "TSH low; free T4 high"]], "pcase": "graves"});
+mcq("th-pb-hashi", "thyroid", "hub", "What is the most likely cause of her condition?",
+  ["Hashimoto's disease", "Graves disease", "Pituitary failure (secondary hypothyroidism)", "A thyroid tumor"],
+  "Low T4 with high TSH is primary hypothyroidism: the gland is failing and the pituitary keeps pushing. Hashimoto's, autoimmune destruction of the thyroid, is the most common cause.", {"pbox": [["Patient", "56-year-old woman"], ["History", "LDL cholesterol normal for years, now sharply higher; no response to a statin"], ["Symptoms", "Always cold, sleepy, slowed thinking; puffy skin"], ["Vitals and labs", "HR 54; TSH high; free T4 low"]], "pcase": "hashi"});
+mcq("th-pb-hashi-chol", "thyroid", "hub", "Why has her cholesterol climbed?",
+  ["Without enough thyroid hormone, too few LDL receptors are kept up to clear it", "Her high TSH stimulates the liver to make LDL", "Thyroid hormone excess speeds cholesterol synthesis", "Myxedema deposits release cholesterol into the blood"],
+  "Thyroid hormone keeps up the LDL receptors that clear cholesterol, so hypothyroid patients have very high cholesterol (Dr. Galin: \"often a board type question\"). New high cholesterol that ignores a statin: check the thyroid.", {"pbox": [["Patient", "56-year-old woman"], ["History", "LDL cholesterol normal for years, now sharply higher; no response to a statin"], ["Symptoms", "Always cold, sleepy, slowed thinking; puffy skin"], ["Vitals and labs", "HR 54; TSH high; free T4 low"]], "pcase": "hashi"});
+mcq("th-pb-iodine", "thyroid", "hub", "Why is his thyroid enlarged?",
+  ["Persistently high TSH drives follicular cell hypertrophy and hyperplasia", "Stimulating antibodies bind his TSH receptors", "Iodide collects in the colloid and swells each follicle", "Low T4 makes the follicular cells divide on its own"],
+  "Too little iodide means too little hormone; the working pituitary raises TSH, and TSH is a growth signal for the gland: bigger cells, more cells, new follicles. That is a goiter with too little hormone.", {"pbox": [["Patient", "40-year-old man"], ["Diet", "Lives inland, eats almost no seafood, uses non-iodized salt"], ["Exam", "Large, smooth goiter; tired, always cold"], ["Labs", "TSH high; T4 low"]]});
+mcq("th-pb-secondary", "thyroid", "hub", "Where is the problem?",
+  ["The pituitary: too little TSH reaches the thyroid", "The thyroid gland itself is failing (primary)", "Autoantibodies are stimulating the TSH receptor", "Her tissues are making too much reverse T3"],
+  "Low T4 with a low TSH means the pituitary isn't pushing: secondary hypothyroidism, here after pituitary surgery. In primary hypothyroidism TSH would be high. Primary causes are far more common, which is why the labs matter.", {"pbox": [["Patient", "47-year-old woman"], ["History", "Pituitary tumor removed 6 months ago"], ["Symptoms", "Tired, cold intolerant, slowed thinking"], ["Labs", "TSH low; free T4 low"]]});
+mcq("th-pb-newborn", "thyroid", "hub", "Why does the pediatrician start thyroid hormone right away?",
+  ["T3 is required for brain development, and replacement works only if it is caught early", "Thyroid hormone's main job in infancy is to close the growth plates on time", "A newborn's high TSH turns into Graves disease if it is left untreated", "Newborns can't make reverse T3, so they need extra T4"],
+  "T3 is absolutely required for perinatal brain development. Untreated congenital hypothyroidism means growth retardation and severe intellectual disability; a few weeks of replacement \"can work wonders,\" but only if caught in time. That is why newborns are screened.", {"pbox": [["Patient", "Newborn, routine newborn screen"], ["Mother", "Ate little iodine during pregnancy"], ["Labs", "TSH high; T4 low"], ["Exam", "Large tongue, small goiter"]]});
+mcq("th-pb-tpo", "thyroid", "hub", "Which steps of thyroid hormone synthesis fail in this child?",
+  ["Oxidizing iodide, iodinating thyroglobulin and coupling MIT and DIT", "Trapping iodide through the sodium-iodide symporter", "Taking colloid back in through megalin", "Converting T4 to T3 in the tissues"],
+  "Thyroperoxidase does three jobs: iodide to iodine (with H2O2), organification (MIT, DIT) and coupling (T3, T4). Iodide is still trapped (NIS works, so uptake is high), but nothing is made from it; low T4 raises TSH, and the high TSH grows a goiter.", {"pbox": [["Patient", "8-year-old with short stature and a goiter"], ["Labs", "TSH high; T4 low"], ["Radioactive iodide uptake", "High (iodide is trapped)"], ["Genetic testing", "Loss-of-function mutation in thyroperoxidase"]]});
+
 /* ---------- READINGS (lecture notes from the slides, speaker notes and recordings) ----------
    Each lecture opens with a short "what's tested" list. Narration (audio/<id>-full.mp3, -plain.mp3) is generated from
    this text: edit a level, regenerate its mp3. */
@@ -4236,13 +4339,78 @@ var SORT_SETS = [
   { id:'prim', lec:'hypopit', title:'Primary or secondary?', bins:['Primary','Secondary'], items:[['High cortisol, low ACTH',0],['Low T4, high TSH',0],['Low cortisol, high ACTH',0],['The gland itself fails',0],['High cortisol, high ACTH',1],['Low T4, low TSH',1],['Pituitary tumor',1],['The pituitary fails',1]] }
 ];
 
-/* ---------- source labels and the Daily drill's high-yield flag ---------- */
-var SRC_LABEL = { 'slides':'Slides', 'rec':'From the recording', 'class':'Asked in class', 'hub':'Hub case' };
-var DRILL_HY = { 'class':'one of the professors\' own in-class questions' };
+/* ---------- MOST LIKELY EXAM QUESTIONS: Exam 1's count per lecture (Sam, 10/28: 6/6/6/8/6/5/3/5/4/6; L4's 8 include all
+   four Patient Box questions) crossed with the exam hints and the 10/28 review. Each lecture gets as many predicted topics
+   as it has exam questions, ranked by evidence (basis: review = asked at the 10/28 review, hint = flagged in a recording,
+   tested = the notes' "What's tested" box). The listed questions carry the "High Likelihood Exam Question" tag in the
+   bank (q.likely) and can be sorted first. Edit the topics here, not on the questions. ---------- */
+var EXAM_COUNTS = { histo1:6, hypopit:6, growth:6, thyroid:8, pancreas:6, adrenal:5, steroids:3, thydrugs:5, histo2:4, calcium:6 };
+var LIKELY_TOPICS = [
+  { lec:'histo1', t:'Gs, Gi and Gq: what each does to cAMP, IP3 and calcium', basis:'hint', ids:['h1-gq','h1-gi','h1-2s-4'] },
+  { lec:'histo1', t:'FLAT PiG: which pars distalis cells are acidophils and basophils', basis:'hint', ids:['h1-acidophils','h1-2s-2'] },
+  { lec:'histo1', t:'The posterior pituitary: Herring bodies, pituicytes, ADH = vasopressin', basis:'hint', ids:['h1-herring','h1-pituicyte','h1-nuclei','h1-tf-3'] },
+  { lec:'histo1', t:'Anterior vs posterior pituitary: names, parts and the portal system', basis:'hint', ids:['h1-adeno-parts','h1-portal','h1-num-1','h1-tf-8'] },
+  { lec:'histo1', t:'Parathyroid chief cells make PTH (oxyphils: function unknown)', basis:'hint', ids:['h1-chief','h1-casr','h1-2s-5'] },
+  { lec:'histo1', t:'Thyroid follicles: follicular cells, C cells and colloid', basis:'tested', ids:['h1-ccell','h1-2s-3','h1-num-2'] },
+  { lec:'hypopit', t:'Paracrine vs neuroendocrine vs endocrine', basis:'review', ids:['rv-paracrine','rv-neuroendo','hp-neuroendo'] },
+  { lec:'hypopit', t:'Receptors: Gs, Gq and Gi; insulin is a tyrosine kinase, GH uses JAK2', basis:'review + hint', ids:['rv-gs','hp-gs-ca','hp-ins-vs-gh','hp-2s-4'] },
+  { lec:'hypopit', t:'Steroid vs peptide vs amine hormones: storage, transport, receptor', basis:'review', ids:['rv-steroid-except','hp-steroid-store','hp-peptide-store','hp-num-1'] },
+  { lec:'hypopit', t:'Primary vs secondary from the labs', basis:'hint', ids:['hp-primary-cort','hp-secondary-fail','hp-num-2','hp-2s-3'] },
+  { lec:'hypopit', t:'Feedback: what feeds back, and where (short and long loops)', basis:'hint', ids:['hp-glucagon-fb','hp-positive'] },
+  { lec:'hypopit', t:'The posterior pituitary only stores and releases; dopamine holds prolactin down', basis:'hint', ids:['hp-pp-none','hp-2s-2','hp-tf-3'] },
+  { lec:'growth', t:'GHRH vs somatostatin: somatostatin alone can\'t start GH', basis:'review + hint', ids:['rv-gh-except','gr-ss-gi','gr-ghrh-gs','gr-num-1'] },
+  { lec:'growth', t:'Linear growth runs through IGF-1 (somatomedin)', basis:'review + hint', ids:['rv-gh-linear','gr-somatomedin','gr-diff','gr-r-2s-1'] },
+  { lec:'growth', t:'GH is diabetogenic', basis:'review + hint', ids:['rv-gh-excess','gr-diabetogenic','gr-r-glucose'] },
+  { lec:'growth', t:'Normal GH, low IGF-1: a GH receptor defect', basis:'review', ids:['rv-laron','gr-laron'] },
+  { lec:'growth', t:'GH and IGF-1 feed back by raising somatostatin', basis:'hint', ids:['gr-r-ssfb','gr-igf-fb','gr-ss-glucose'] },
+  { lec:'growth', t:'Gigantism before the plates close, acromegaly after', basis:'review', ids:['gr-giant','gr-2s-3','gr-num-2','gr-acro-sx-ex'] },
+  { lec:'thyroid', t:'Biosynthesis: NIS, pendrin, thyroperoxidase, megalin', basis:'review + hint', ids:['rv-tpo','th-tpo','th-r-nis','th-megalin'] },
+  { lec:'thyroid', t:'Thyroid hormone is made in the colloid, not inside the cell', basis:'hint', ids:['th-extracell','th-r-2s-1','th-num-1'] },
+  { lec:'thyroid', t:'5\'-deiodinase (active T3) vs 5-deiodinase (reverse T3)', basis:'hint', ids:['th-rt3','th-2s-1','th-t3'] },
+  { lec:'thyroid', t:'Metabolism: more beta receptors, catabolic in excess', basis:'review + hint', ids:['rv-th-anabolic','th-bmr','th-r-myosin','th-2s-5'] },
+  { lec:'thyroid', t:'Patient Box: Graves disease (high T4, low TSH)', basis:'review + hint', ids:['th-pb-graves','th-pb-graves-eyes','rv-graves','th-graves-labs'] },
+  { lec:'thyroid', t:'Patient Box: Hashimoto\'s and the high cholesterol', basis:'hint', ids:['th-pb-hashi','th-pb-hashi-chol','th-r-ldl'] },
+  { lec:'thyroid', t:'Patient Box: a goiter from iodine lack or a synthesis defect', basis:'tested', ids:['th-pb-iodine','th-pb-tpo','th-goiter'] },
+  { lec:'thyroid', t:'Patient Box: children and newborns; primary vs secondary', basis:'hint', ids:['th-pb-newborn','th-pb-secondary','th-congenital-tx','th-child-growth'] },
+  { lec:'pancreas', t:'Somatostatin, the paracrine brake on insulin and glucagon', basis:'review', ids:['rv-sst','pa-ss','pa-ss-stim'] },
+  { lec:'pancreas', t:'What stimulates glucagon (falling glucose, even when insulin caused it)', basis:'review', ids:['rv-glucagon','pa-glucagon-stim','pa-tf-5'] },
+  { lec:'pancreas', t:'Insulin in liver, muscle and fat', basis:'review + hint', ids:['rv-ins-muscle','pa-glut4','pa-insulin-muscle','pa-insulin-fat'] },
+  { lec:'pancreas', t:'Glucagon in the liver: glycogenolysis, gluconeogenesis, ketogenesis', basis:'hint', ids:['pa-ketogenesis','pa-num-2','pa-glucagon-muscle'] },
+  { lec:'pancreas', t:'Glucose-induced insulin secretion: K-ATP channels', basis:'tested', ids:['pa-katp','pa-sulfonyl'] },
+  { lec:'pancreas', t:'Islet layout and blood flow; C-peptide', basis:'hint', ids:['pa-tf-3','pa-cpeptide'] },
+  { lec:'adrenal', t:'Aldosterone: keep sodium, lose potassium', basis:'review + hint', ids:['rv-aldo-high','ad-aldo-excess','ad-aldo-k','ad-angII'] },
+  { lec:'adrenal', t:'Cortisol reaches the medulla and turns on PNMT', basis:'review + hint', ids:['rv-acth-epi','ad-pnmt-reg','ad-pnmt','ad-2s-4'] },
+  { lec:'adrenal', t:'ACTH is cortisol\'s regulator (the HPA axis)', basis:'review', ids:['rv-cort-reg','ad-acth-gs','ad-num-2'] },
+  { lec:'adrenal', t:'Cortisol raises glucose for stress', basis:'review', ids:['rv-cort-met','ad-cortisol-goal','ad-cortisol-muscle'] },
+  { lec:'adrenal', t:'Addison\'s vs Cushing\'s; cholesterol desmolase', basis:'hint', ids:['ad-addison-acth','ad-cushing-disease','ad-2s-3','ad-tf-4'] },
+  { lec:'steroids', t:'Corticosteroid side effects, masked infection first', basis:'hint', ids:['cs-infection','cs-num-1','cs-electrolytes'] },
+  { lec:'steroids', t:'Why the Dosepak tapers (adrenal suppression)', basis:'hint', ids:['cs-taper','cs-2s-2'] },
+  { lec:'steroids', t:'Ketoconazole, metyrapone, mifepristone; spironolactone\'s hyperkalemia', basis:'hint', ids:['cs-keto','cs-num-2','cs-hyperK','cs-spiro'] },
+  { lec:'thydrugs', t:'Pregnancy decides methimazole vs PTU', basis:'hint', ids:['td-ptu-preg','td-mmi-first','td-mmi-teratogen','td-num-1'] },
+  { lec:'thydrugs', t:'Levothyroxine: first thing in the morning, empty stomach', basis:'hint', ids:['td-levo-admin','td-binders','td-2s-1'] },
+  { lec:'thydrugs', t:'Read the TSH: does a treated patient need more drug or less?', basis:'hint', ids:['td-tsh-read','td-2s-3'] },
+  { lec:'thydrugs', t:'Amiodarone: the "iod" is iodine', basis:'hint', ids:['td-amio','td-2s-5'] },
+  { lec:'thydrugs', t:'What a dentist can see: goiter, macroglossia, tremor', basis:'hint', ids:['td-macroglossia','td-bb'] },
+  { lec:'histo2', t:'The medulla\'s dual blood supply (arterial + cortical venous)', basis:'hint', ids:['h2-dual','h2-dual-why'] },
+  { lec:'histo2', t:'Fasciculata cells are spongiocytes (lipid droplets)', basis:'hint', ids:['h2-spongio','h2-num-2'] },
+  { lec:'histo2', t:'All three zones answer to ACTH; the glomerulosa also to angiotensin II', basis:'hint', ids:['h2-acth-zones','h2-r-angio','h2-tf-3'] },
+  { lec:'histo2', t:'Islets: 1-2% of the volume; beta > alpha > delta', basis:'hint', ids:['h2-islet-share','h2-r-rank','h2-2s-3'] },
+  { lec:'calcium', t:'The chief cell paradox: calcium on the CaSR stops PTH', basis:'review + hint', ids:['rv-casr','ca-casr','ca-r-2s-1'] },
+  { lec:'calcium', t:'PTH turns on 1α-hydroxylase; calcitriol works in the gut', basis:'review', ids:['rv-vitd','ca-1alpha-on','ca-calcitriol-net','ca-2s-3'] },
+  { lec:'calcium', t:'PTH in the kidney: keep calcium, dump phosphate', basis:'hint', ids:['ca-pth-kidney','ca-why-split','ca-r-phos'] },
+  { lec:'calcium', t:'PTH acts on osteoblasts, which signal osteoclasts', basis:'hint', ids:['ca-ob-rec','ca-2s-2','ca-num-2'] },
+  { lec:'calcium', t:'Calcitonin on the osteoclast', basis:'hint', ids:['ca-oc-rec','ca-calcitonin'] },
+  { lec:'calcium', t:'Primary hyperparathyroidism: high PTH and calcium, low phosphate, stones', basis:'hint', ids:['ca-hpt','ca-r-stones'] }
+];
 
-/* ---------- MOCK: 55 questions in 90 minutes, as on Exam 1. No official counts per lecture, so the ten lectures share
-   them about evenly, a little more for the longer lectures. */
-var MOCK_BLUEPRINT = { histo1:5, hypopit:6, growth:6, thyroid:6, pancreas:7, adrenal:6, steroids:5, thydrugs:5, histo2:4, calcium:5 };
+/* ---------- source labels and the Daily drill's high-yield flag ---------- */
+var SRC_LABEL = { 'review':'In-class review', 'slides':'Slides', 'rec':'From the recording', 'class':'Asked in class', 'hub':'Hub case' };
+var DRILL_HY = { 'review':'from the 10/28 exam review', 'class':'one of the professors\' own in-class questions' };
+
+/* ---------- MOCK: 55 questions in 90 minutes, as on Exam 1, with the exam's own count per lecture (EXAM_COUNTS) and its
+   four Patient Box questions, all on L4 (MOCK_PBOX). Other lectures' Patient Box items stay in the bank, not the mock. */
+var MOCK_BLUEPRINT = EXAM_COUNTS;
+var MOCK_PBOX = { thyroid:4 };
 var MOCK_LIMIT = 90 * 60;
 
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
@@ -4251,6 +4419,34 @@ LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id
    every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), with your
    pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
 var QUESTION_WHY = {
+  "rv-sst":["Somatostatin inhibits glucagon; it never stimulates any hormone.", "Rising glucose does stimulate somatostatin, part of the brake on insulin.", "In the gut it does slow motility and nutrient absorption.", "It does suppress insulin: the paracrine brake, through a Gi receptor.", "Fuel from a meal (amino acids, fatty acids) does stimulate it."],
+  "rv-ins-muscle":["Insulin brings glucose into muscle through GLUT4 and stores it as glycogen.", "Lipolysis is a catabolic process; insulin blocks it in fat.", "Gluconeogenesis is a liver process driven by glucagon and cortisol; insulin suppresses it.", "Insulin builds muscle protein; breaking it down is cortisol's effect.", "Ketone bodies are made in the liver when insulin is missing and glucagon goes unopposed."],
+  "rv-aldo-high":["Aldosterone secretes potassium into the urine, so too much of it drops plasma potassium.", "Aldosterone keeps sodium; excess raises it, or holds it normal as water follows.", "Sodium and water retention raise blood pressure; low pressure is aldosterone deficiency.", "Immunosuppression is a cortisol effect.", "Gonadal problems come from sex steroids, not the mineralocorticoid."],
+  "rv-cort-reg":["ACTH, through its Gs receptor on the fasciculata, is cortisol's main control.", "Aldosterone is another adrenal product (glomerulosa), not a regulator of cortisol.", "Angiotensin II is the primary regulator of aldosterone, not cortisol.", "Androstenedione is a weak androgen from the zona reticularis.", "Renin starts the angiotensin cascade that leads to aldosterone."],
+  "rv-cort-met":["Cortisol raises hepatic gluconeogenesis to keep blood glucose up under stress.", "Cortisol lowers glucose use by muscle, sparing it for the brain.", "Cortisol promotes lipolysis in the extremities, freeing glycerol for gluconeogenesis.", "Cortisol breaks muscle protein down; it doesn't build it.", "Muscle breakdown raises plasma amino acids, which feed gluconeogenesis."],
+  "rv-gh-except":["Not true: removing somatostatin's brake isn't enough; GHRH from the hypothalamus has to drive GH.", "True: the largest, most predictable pulse comes soon after falling asleep.", "True: daily GH output and IGF-1 are highest during the pubertal growth spurt.", "True: GH is species-specific, so only human GH works in people.", "True: thyroid hormone is needed for growth and supports GH synthesis."],
+  "rv-vitd":["PTH turns on renal 1α-hydroxylase; the calcitriol it makes raises calcium absorption in the gut.", "PTH, not calcium directly, turns on 1α-hydroxylase, and calcitonin comes from C cells and lowers calcium.", "Low calcium is sensed by the parathyroid's CaSR; bone release is PTH's job.", "PTH activates vitamin D; it doesn't inhibit it.", "1α-hydroxylase is the kidney enzyme that activates vitamin D; calcitriol's main target is the gut."],
+  "rv-gh-linear":["GH makes the liver (and tissues) produce IGF-1, which drives chondrocyte proliferation at the plate.", "GH only makes plate precursors commit; the proliferation that lengthens bone is IGF-1's.", "Calcium absorption in the gut is calcitriol's job.", "Bones lengthen at the cartilage plate, through IGF-1, not by direct osteoblast action.", "Adrenal androgens aren't GH's route; sex steroids potentiate GH at puberty."],
+  "rv-laron":["The GH is there but its receptor can't respond, so the liver doesn't make IGF-1.", "GH excess would raise IGF-1 and cause gigantism, not short stature.", "A prolactinoma doesn't explain normal GH with low IGF-1.", "Excess thyroid hormone gives a growth spurt, and doesn't lower IGF-1.", "Adrenal insufficiency doesn't explain a GH-IGF-1 disconnect."],
+  "rv-gs":["Gs turns on adenylate cyclase, raising cAMP and activating PKA.", "Phospholipase C, IP3 and calcium release are the Gq pathway.", "Nuclear receptors are for steroid and thyroid hormones, not G-protein receptors.", "Secretory vesicles don't open sodium channels to release hormone.", "Gs receptors don't act through tyrosine kinases."],
+  "rv-casr":["Calcium on the CaSR activates Gq, and the rise in intracellular calcium blocks PTH secretion.", "Low calcium simply leaves the CaSR quiet; it is a Gq receptor, not Gs.", "High calcium turns PTH down, not up.", "The CaSR senses blood (extracellular) calcium, and its signal stops exocytosis.", "The CaSR controls PTH release; it doesn't make vitamin D."],
+  "rv-glucagon":["High insulin with normal sensitivity drops blood glucose, and falling glucose stimulates glucagon.", "Amino acids stimulate glucagon, so fewer of them would not.", "Somatostatin is a brake on glucagon.", "Rising glucose inhibits glucagon.", "With insulin resistance, glucose stays high, and high glucose holds glucagon down."],
+  "rv-th-anabolic":["It supports protein synthesis at normal levels, but excess drives breakdown and fast weight loss.", "Insulin is anabolic on muscle protein at any level.", "GH builds protein; its excess is diabetogenic, not catabolic on muscle.", "Testosterone is anabolic on muscle protein."],
+  "rv-gh-excess":["Open growth plates give gigantism, and GH's anti-insulin effects raise blood glucose.", "Gigantism is right, but GH excess is also diabetogenic.", "Acromegaly is GH excess after the growth plates close.", "Hyperglycemia is right, but prepubertal excess also causes gigantism.", "Acromegaly needs closed plates, so it is not the prepubertal picture."],
+  "rv-tpo":["Thyroperoxidase iodinates thyroglobulin's tyrosines (and oxidizes iodide and couples MIT and DIT).", "Thyroxine acts through nuclear receptors, not thyroperoxidase.", "Lysosomal enzymes digest thyroglobulin after endocytosis through megalin.", "Proteolysis in the lysosome frees T4 from thyroglobulin.", "5'-deiodinase converts T4 to active T3."],
+  "rv-steroid-except":["Not true: steroids are made on demand and released as they are made, not synthesized continuously.", "True: protein binding gives them a relatively long half-life.", "True: being lipid-soluble, most travel bound to plasma proteins.", "True: they cross the membrane and bind intracellular receptors.", "True: the receptor changes gene transcription, so mRNA synthesis comes first."],
+  "rv-acth-epi":["ACTH raises cortisol, which reaches the medulla and turns on PNMT to make epinephrine.", "CRH is a releasing hormone from the hypothalamus, not the anterior pituitary.", "GH has no route to the medulla's PNMT.", "GnRH is a hypothalamic releasing hormone for the gonadal axis."],
+  "rv-neuroendo":["Hypothalamic neurons make oxytocin and release it into the blood from the posterior pituitary.", "GH comes from somatotrophs, anterior pituitary gland cells, not neurons.", "Cortisol comes from adrenal cortex cells.", "Prolactin comes from lactotrophs, anterior pituitary gland cells.", "ACTH comes from corticotrophs, anterior pituitary gland cells."],
+  "rv-paracrine":["Delta-cell somatostatin acts on neighboring beta cells in the islet.", "Hypothalamic somatostatin reaches the pituitary through the portal blood: too far for paracrine.", "Norepinephrine on CRH neurons is neural signaling.", "CRH reaches the corticotrophs through the portal blood.", "Hypothalamic dopamine reaches the lactotrophs through the portal blood."],
+  "rv-graves":["High T3 and T4 feed back on the pituitary and drive TSH down.", "The stimulated gland makes more T3.", "The stimulated gland makes more T4.", "DIT is a building block made inside thyroglobulin; more synthesis doesn't lower it."],
+  "th-pb-graves":["Graves antibodies act like TSH, so T4 rises and feedback drives TSH low.", "A TSH-secreting adenoma would make TSH high, not low.", "Follicle destruction is Hashimoto's: T4 low and TSH high.", "Iodine deficiency lowers T4 and raises TSH."],
+  "th-pb-graves-eyes":["The autoantibodies cross-react with orbital muscles; the inflammation pushes the eyes forward.", "Myxedema is a hypothyroid sign, and it swells the skin.", "The goiter grows in the neck; it isn't what pushes the eyes.", "Her TSH is low, not high."],
+  "th-pb-hashi":["Autoimmune destruction of the gland, the most common cause of primary hypothyroidism.", "Graves raises T4 and lowers TSH.", "Pituitary failure would make TSH low, not high.", "A thyroid tumor is a cause of hyperthyroidism in the notes."],
+  "th-pb-hashi-chol":["Thyroid hormone maintains LDL receptors; with too little, LDL isn't cleared.", "TSH acts on the thyroid, not on the liver's LDL.", "She has too little thyroid hormone, not too much.", "Myxedema is proteins and hyaluronic acid holding water in the skin, not a cholesterol store."],
+  "th-pb-iodine":["TSH is a growth signal: high TSH makes the follicular cells bigger and more numerous.", "Stimulating antibodies are Graves, with high T4 and low TSH.", "He has too little iodide, not a build-up of it.", "The growth signal is TSH; low T4 acts by raising it."],
+  "th-pb-secondary":["Low TSH with low T4 points to the pituitary: secondary hypothyroidism.", "A failing gland would raise TSH, not lower it.", "TSH-receptor antibodies (Graves) would raise T4.", "Reverse T3 is made from T4 in the tissues; it doesn't lower TSH and T4 together."],
+  "th-pb-newborn":["T3 is needed for brain growth around birth, so replacement must start early to work.", "Thyroid hormone keeps ossification centers active; it doesn't close the plates in infancy.", "High TSH from a failing gland is not Graves, which is antibody-driven hyperthyroidism.", "Reverse T3 is inactive; it isn't why the baby needs T4."],
+  "th-pb-tpo":["Thyroperoxidase oxidizes iodide, iodinates thyroglobulin and couples MIT and DIT.", "Iodide uptake is high, so NIS trapping still works.", "Megalin endocytosis comes after the steps that fail; a megalin defect is a different cause.", "T4 to T3 is 5'-deiodinase in the tissues, not thyroperoxidase."],
   "gr-r-thymus":["GH stimulates the thymus and supports T and B lymphocyte development.","GH supports lymphocyte development; it doesn't suppress it.","PNMT is induced by cortisol flowing into the adrenal medulla.","GH helps maintain tissues and organs; it doesn't shrink lymphoid organs."],
   "gr-r-birthweight":["Insulin is the main growth hormone in utero, so a hyperinsulinemic mother's baby grows larger.","GH is not important for fetal growth.","IGF-1 matters for childhood and adolescent growth, not prenatal growth.","Estrogen closes growth plates at puberty; it isn't what enlarges babies."],
   "gr-r-ratio":["The 22-kDa, 191-amino-acid form is about nine times as common.","The two forms are not made equally.","It's the 22-kDa form that dominates; the 20-kDa form is the minor splice variant.","The ratio is about 9 to 1, not 3 to 1."],
@@ -4679,6 +4875,7 @@ var QUESTION_WHY = {
   "ca-num-2":["Osteoblasts hold the PTH, D3 and estrogen receptors; osteoclasts the calcitonin receptor.","Includes 3: in chief cells, rising intracellular calcium blocks PTH secretion.","Includes 4: the liver works at carbon 25; the kidney adds carbon 1.","Includes 3 and leaves out 1: PTH's receptor is on the osteoblast."]
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
+(function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t, i){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
 /* lecture label: L1-L10 */
 function lecLabel(l){ return l.label || ('L' + l.num); }
@@ -4782,6 +4979,8 @@ function renderHeaderStats(){
 /* ---------- question card renderer (shared by every mode) ---------- */
 var SEQ_STATE = {}, MATCH_STATE = {};
 var RENDER_SEQ = 0;
+/* the bank's tag for a predicted exam topic (LIKELY_TOPICS); not drawn in the mock, which stays exam-like */
+function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
 function qCardHTML(q, opts){
   opts = opts || {};
   var rid = 'r' + (++RENDER_SEQ);
@@ -4818,7 +5017,7 @@ function qCardHTML(q, opts){
   var seen = STATE.seen[q.id];
   var status = opts.retry ? '<span class="src-chip retry-chip">'+icon('cycle')+'Try it again: you missed this a few questions ago</span>' : seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
   return '<div class="qcard tag-'+tagOf(q.lec)+(opts.retry?' is-retry':'')+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
-    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
+    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+likelyChip(q)+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
@@ -5244,6 +5443,7 @@ function bankFiltered(search){
   return QUESTIONS.filter(function(q){
     if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
+    if(STATE.ui.qsort === 'likely-only' && !q.likely) return false;
     var fm = STATE.ui.qfmt || 'all';
     if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
     var seen = STATE.seen[q.id];
@@ -5259,7 +5459,8 @@ function renderBank(body){
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var soOpts = [['bank','Bank order'],['likely','High likelihood first'],['likely-only','High likelihood only']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qsort||'bank')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><select id="fSort" aria-label="Sort">'+soOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -5284,6 +5485,12 @@ function renderBank(body){
       var rank = function(q){ if(!q.pcase) return idx[q.id]||0; var set = caseSet(q.pcase); return Math.min.apply(null, set.map(function(id){ return idx[id]||0; })) + set.indexOf(q.id) / 100; };
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
+    /* predicted exam topics first, in topic order (each lecture's best-supported topics lead), the rest after */
+    if(STATE.ui.qsort === 'likely'){
+      var pos = {}; qs.forEach(function(q,i){ pos[q.id] = i; });
+      var lk = function(q){ return q.likely ? LIKELY_TOPICS.indexOf(q.likely) : 1e4; };
+      qs.sort(function(a,b){ return (lk(a)-lk(b)) || (pos[a.id]-pos[b.id]); });
+    }
     document.getElementById('qCount').textContent = qs.length + ' question' + (qs.length===1?'':'s') + (qs.length > bankShown ? ' · showing ' + bankShown : '');
     list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">No questions match these filters.</div>';
     document.getElementById('qMore').hidden = qs.length <= bankShown;
@@ -5292,6 +5499,7 @@ function renderBank(body){
   document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   document.getElementById('fFmt').onchange = function(e){ STATE.ui.qfmt = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
   document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  document.getElementById('fSort').onchange = function(e){ STATE.ui.qsort = e.target.value; bankShown = BANK_PAGE; saveState(); if(window.shTrack) window.shTrack('bank:sort=' + e.target.value); draw(); };
   var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; bankShown = BANK_PAGE; draw(); }, 180); };
   document.getElementById('fShuffle').onclick = function(){ order = shuffled(QUESTIONS.map(function(q){ return q.id; })); draw(); };
   document.getElementById('qMore').onclick = function(){ bankShown += BANK_PAGE; draw(); };
@@ -5300,6 +5508,7 @@ function renderBank(body){
 
 function renderHints(body){
   var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Exam 1: Friday, October 30, 8:00-9:30 am.</b> 55 multiple-choice questions on lectures 1-10, in person on Canvas with LockDown Browser. Hints come from the recordings of all ten lectures.</span></div>' +
+    likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   LECTURES.forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
@@ -5308,6 +5517,20 @@ function renderHints(body){
   });
   body.innerHTML = h;
   body.querySelectorAll('[data-lec]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); STATE.ui.lec = a.getAttribute('data-lec'); STATE.ui.sub = 'notes'; saveState(); renderCompendium(); }); });
+  body.querySelectorAll('[data-likely]').forEach(function(b){ b.addEventListener('click', function(){
+    STATE.ui.sub = 'bank'; STATE.ui.qlec = b.getAttribute('data-likely'); STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'all'; STATE.ui.qsort = 'likely-only'; bankShown = BANK_PAGE;
+    if(window.shTrack) window.shTrack('hints:likely-practice'); saveState(); renderCompendium(); window.scrollTo(0,0);
+  }); });
+}
+/* Most likely questions: each lecture's exam count with its predicted topics (LIKELY_TOPICS), folded by default */
+function likelyHTML(){
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> Each lecture\'s question count on Exam 1, with that many predicted topics, ranked by the exam hints and the 10/28 review.</span></summary>' +
+    '<div class="likely-grid">' + LECTURES.map(function(l){
+      var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }), n = EXAM_COUNTS[l.id] || ts.length, box = MOCK_PBOX[l.id];
+      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+n+' on the exam'+(box ? ' ('+box+' Patient Box)' : '')+'</small></h4><ol>' +
+        ts.map(function(t){ return '<li>'+escHtml(t.t)+' <span class="likely-basis">'+escHtml(t.basis)+'</span></li>'; }).join('') +
+        '</ol><button type="button" class="btn" data-likely="'+l.id+'">Practice these ('+ts.reduce(function(k,t){ return k + t.ids.length; }, 0)+')</button></div>';
+    }).join('') + '</div></details>';
 }
 
 function renderCram(body){
@@ -5424,9 +5647,14 @@ function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
     var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq'; });
-    var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
-    var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
-    fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
+    var pick = function(qs, n){
+      var fresh = shuffled(qs.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
+      var rest = shuffled(qs.filter(function(q){ return fresh.indexOf(q) === -1; }));
+      fresh.concat(rest).slice(0, n).forEach(function(q){ ids.push(q.id); });
+    };
+    var nBox = MOCK_PBOX[lec] || 0;
+    pick(pool.filter(function(q){ return !!q.pbox; }), nBox);
+    pick(pool.filter(function(q){ return !q.pbox; }), MOCK_BLUEPRINT[lec] - nBox);
   });
   var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QUESTIONS_BY_ID[id]); });
   STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
@@ -5446,7 +5674,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, as many as Exam 1 has, spread over all ten lectures (there are no official counts per lecture, so each gets 4 to 7). Two-statement, true/false, numbered-statement and Patient Box items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. Exam 1 gives you 90 minutes, so the clock counts against 90:00 and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, as many as Exam 1 has, with Exam 1\'s own count per lecture (L1-L3 6 each, L4 8, L5 6, L6 5, L7 3, L8 5, L9 4, L10 6). Like the exam, its four Patient Box questions are all on L4. Two-statement, true/false and numbered-statement items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. Exam 1 gives you 90 minutes, so the clock counts against 90:00 and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }

@@ -147,6 +147,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   hero banner, the Golden Gland stage (`smile.bg`) and the escape/Golden Gland lobby tiles are painted. About page,
   `sw.js` -> `sh-v43`. No schema change.
 
+- **2026-10-28 (Heme & Endo Exam 1: in-class review, official counts, High Likelihood tags, Claude Code)** — From the 10/28 review
+  PollEv doc (Drive: Heme/Endo Exam 1, "Endocrine Exam 1 PollEv"; its comments are classmates' notes on what the professors said):
+  20 items `rv-*`, new src `review` ("In-class review", Daily drill high-yield), stems and keys as given, typos fixed, explanations
+  from the class notes. `rv-sst`'s last choice now reads "stimulated by ... amino acids and fatty acids" (the doc's "inhibited by ...
+  ketoacids" would have made a second choice untrue). Sam gave the exam's count per lecture (6/6/6/8/6/5/3/5/4/6) and said the
+  four Patient Box questions are all on L4: `EXAM_COUNTS` = `MOCK_BLUEPRINT`, `MOCK_PBOX = { thyroid:4 }` (the mock takes Patient Box
+  items only there), `EXAM_INFO` line; 8 new L4 Patient Box cases (`th-pb-*`, two shared-patient pairs). Bank 582 -> 610.
+  **High Likelihood Exam Question** tag: `LIKELY_TOPICS` (as many topics per lecture as exam questions, ranked by review + hints,
+  each with 2-4 question ids, 171 tagged) sets `q.likely`; `likelyChip()` in the bank and drill (not the mock); bank sort menu
+  (`STATE.ui.qsort`: bank order / High likelihood first / High likelihood only); Exam Hints opens with a folded "Most likely
+  questions" list (`likelyHTML()`). About page. No notes text changed, so no narration regenerated. No schema change.
+
 - **2026-10-28 (arcade art, round 2: Showdown stages and painted lobby pictures, Claude Code)** — More of Sam's Argon art.
   **Showdown stage**: a skin's `board.bg` paints a stage behind the quiz board (`.sg-stage` in `widget/games.css`, dimmed so the
   tiles stay readable): Occlusion's Freeway Showdown stage, Perio's Pocket Showdown stage (`img/showdown-stage.webp`).
