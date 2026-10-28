@@ -839,6 +839,15 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 @media (max-width:760px){ .sh-ribbon-inbox{width:28px; height:26px;} .sh-ribbon-inbox svg{width:14px; height:14px;} }
 .sh-ribbon-tour{cursor:pointer;}
 @media (max-width:1000px){ .sh-ribbon-tour{display:none;} }   /* narrower screens: the top bar is full; "Take the tour" is in the menu / More sheet */
+/* Tablet widths (561-1000 px): the hubs' one-row top bar doesn't fit (tabs cut off, theme button off screen, the page
+   scrolling sideways), so the mode tabs take their own full-width row under the title, as they do on phones */
+@media (min-width:561px) and (max-width:1000px){
+  header.hub-header .hub-header-top{flex-wrap:wrap; row-gap:6px;}
+  header.hub-header .hub-title{flex:1 1 auto; min-width:0;}
+  header.hub-header #modeSwitch{order:3; flex:1 0 100%; margin:0; overflow:visible;}
+  header.hub-header #modeSwitch button{flex:1 1 0; min-width:0; justify-content:center;}
+  header.hub-header #modeSwitch .mode-label{display:inline;}
+}
 
 /* ================= motion (widget/fx.js) ================= */
 /* answer feedback: a check or an X that draws itself on the edge of the option */

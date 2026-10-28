@@ -124,6 +124,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (tablet-width top bar, Claude Code)** — Sam spotted the Heme & Endo top bar cut off on a tablet. Between about
+  561 and 1000 px every hub's one-row top bar overflowed (Heme & Endo, Occlusion, Perio and the archived three): the Arcade (and
+  sometimes Review) tab was cut off, the theme button sat off screen and the page scrolled sideways. One rule in `widget/v3.css`
+  (`@media (min-width:561px) and (max-width:1000px)`, scoped to `header.hub-header`) wraps the mode tabs onto their own
+  full-width row under the title, as phones already do (all labels shown). Checked at 561-1001 px in all six hubs: nothing past
+  the edge, no sideways scroll; at 1001 px and up the one-row bar is unchanged. `sw.js` -> `sh-v38`. No hub file changed.
+
 - **2026-10-28 (numbered-statement rule, Occlusion items, the boss moves to the top bar, Claude Code)** — Sam: add the "which
   statements are true" questions to Occlusion and keep it as a rule; move the bosses widget, which blocked questions. **Rule**
   (above, `CLAUDE.md` → "Numbered-statement questions"): `tools/ci/smoke.js` adds `numbered: 2` to `FORMAT_MIN` and checks each
