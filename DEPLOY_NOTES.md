@@ -83,6 +83,12 @@ It is also refreshed between archivings, by hand when Sam asks a Claude Code ses
 live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
 date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
 
+## Ship it now, never "after the exam" (standing rule, 2026-10-28)
+
+For every hub, every Project and session: **never hold a change until after an exam.** A hub is archived the night of its
+last exam, so anything held until then reaches no one; changes help most before the exam, including the night before.
+Ship as soon as it's ready and verified (`CLAUDE.md` → "Ship it now").
+
 ## Every hub opens on its own Home page (standing rule, 2026-10-27)
 
 Every hub (hub Projects included) has a **Home** mode, first and default: the exam countdown and facts, deadlines, quick start,
@@ -124,7 +130,7 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-10-28 (patient pictures in Heme & Endo, Special Patient Care arcade art, Claude Code)** — More of Sam's Argon art.
+- **2026-10-28 (patient pictures and arcade art in Heme & Endo, Special Patient Care arcade art, Claude Code)** — More of Sam's Argon art.
   **Heme & Endo patient pictures**: `CASE_IMG` + `caseImgHTML(q)` (the stub is now real, Occlusion's pattern with `<img>`): a
   question's `pimg:[keys]` draws painted illustrations inside its Patient Box, labeled as illustrations, not patient images.
   Three so far (`img/case-*.webp`): `ad-addison-gums` (pigmented attached gingiva), `gr-acro-dental` (face and hands),
@@ -135,8 +141,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   the curing light reveals, sink and mirror, door + keypad; the clock hand rides the painted clock); the hero banner, the Sparks
   Superstar stage (`smile.bg`) and the escape/Superstar lobby tiles (`thumbImg`) are painted too; the other four tiles keep their
   icon tiles. **Perio**: Mind the Pocket's lobby tile is painted (`img/thumb-gap.webp`), so every Perio tile is now art.
-  About page, `sw.js` -> `sh-v43`. No schema change. Heme & Endo's arcade art (hero, painted lab escape room, Golden Gland stage
-  and thumbnails) is held until after Exam 1 (Oct 30) so the arcade doesn't change under students two days out.
+  **Heme & Endo arcade**: Endo Lab Escape draws a painted lab (`img/lab-escape.webp`, hotspots measured onto the microscope with
+  its lamp off until solved, the analyzer, the lab report clipboard, the padlocked reagent cabinet, the starch paper on the
+  corkboard, the eyewash sink and mirror, the door keypad; the clock hand rides the painted clock), replacing the drawn room; the
+  hero banner, the Golden Gland stage (`smile.bg`) and the escape/Golden Gland lobby tiles are painted. About page,
+  `sw.js` -> `sh-v43`. No schema change.
 
 - **2026-10-28 (arcade art, round 2: Showdown stages and painted lobby pictures, Claude Code)** — More of Sam's Argon art.
   **Showdown stage**: a skin's `board.bg` paints a stage behind the quiz board (`.sg-stage` in `widget/games.css`, dimmed so the
