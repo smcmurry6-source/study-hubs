@@ -130,6 +130,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 afternoon (lessons audit + Timmy and device-link tracking, Claude Code)** — Two days before Heme/Endo Exam 1.
+  `hubs/heme-endo-exam1`, same ids and answer positions, explanations only: report #32 (`th-r-nis`: "an ATP dependent
+  symporter... wouldn't it directly use ATP?"): `th-nis` no longer calls NIS "ATP-dependent active transport", and both say NIS
+  doesn't split ATP, the Na+/K+-ATPase keeps the sodium gradient (the notes' "ultimately ATP-dependent" stays; narration unchanged);
+  `th-r-2s-1`, `pa-insulin-fat`, `gr-ghrelin`, `pa-liver-glut` and `h1-enzyme-linked` now answer their favorite wrong choice.
+  **Tracking** (no schema change, `feature_events`): `widget/pet.js` `pet:tap-hub|dashboard`, `pet:joke|checkup|tip` and a daily
+  `state:pet-hp=<band>`; `widget/ranks.js` (Stats → Link my devices) `link:code|linked|fail`; `widget/linkask.js` `link-ask:fail`;
+  `widget/clicks.js` exposes `shClicks.flush()`, called after `linked` in both flows (the event was lost to the reload, so the
+  prompt's outcome was invisible). `sw.js` -> `sh-v44`. `LESSONS.md` refreshed (names, device links and Timmy Tooth numbers).
+  **A feature that reloads or leaves the page: call `shClicks.flush()` after its last `shTrack`.**
 - **2026-10-28 (patient pictures and arcade art in Heme & Endo, Special Patient Care arcade art, Claude Code)** — More of Sam's Argon art.
   **Heme & Endo patient pictures**: `CASE_IMG` + `caseImgHTML(q)` (the stub is now real, Occlusion's pattern with `<img>`): a
   question's `pimg:[keys]` draws painted illustrations inside its Patient Box, labeled as illustrations, not patient images.

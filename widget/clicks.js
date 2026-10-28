@@ -97,6 +97,8 @@
         pending = {}; count = 0;
         try { o.sb.rpc("record_clicks", { p_hub: o.hub, p_visitor: o.visitor || null, p_items: items }).then(function(){}, function(){}); } catch (e) {}
       }
+      /* send now, before a reload would drop the batch (e.g. right after linking devices) */
+      window.shClicks.flush = flush;
       document.addEventListener("click", function(e){
         var el = e.target && e.target.closest && e.target.closest('button, a[href], [role="tab"], [role="button"], summary, label, [data-mode], [data-view]');
         if (!el) return;
