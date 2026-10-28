@@ -124,6 +124,12 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (admin Surveys tab: exam check-ins load the first time, Claude Code)** — Sam: the Surveys tab often said
+  "Couldn't load exam check-ins (migration_v23)" and worked after a refresh. `get_exam_debriefs` hit the API's 3 s anon
+  timeout on a cold load (~2.5 s warm): three subqueries per check-in, and `activity_pings` had no `(visitor_id, hub)` index.
+  `migration_v42.sql` (**applied via the connector**) adds `activity_pings_visitor_hub_idx` and counts each (hub, person)
+  pair once: ~100 ms, same rows and numbers (checked against the old query). `supabase/schema.sql` updated. No site change.
+
 - **2026-10-28 (tablet-width top bar, Claude Code)** — Sam spotted the Heme & Endo top bar cut off on a tablet. Between about
   561 and 1000 px every hub's one-row top bar overflowed (Heme & Endo, Occlusion, Perio and the archived three): the Arcade (and
   sometimes Review) tab was cut off, the theme button sat off screen and the page scrolled sideways. One rule in `widget/v3.css`
