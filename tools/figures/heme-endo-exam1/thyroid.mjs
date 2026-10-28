@@ -41,7 +41,13 @@ function thSvg(s, drug, t, D) {
   function lab(txt, x, y, px, py, a) { return '<g class="am-callout"><path class="th-lead" d="M' + f(a === "end" ? x + 3 : x - 3) + " " + f(y - 4) + "L" + f(px) + " " + f(py) + '"/><circle class="th-dot" cx="' + f(px) + '" cy="' + f(py) + '" r="1.8"/>' + tx(x, y, txt, "", a) + "</g>"; }
   function along(path, u) { var n = path.length - 1, i = Math.min(n - 1, Math.floor(u * n)), w = u * n - i; return [path[i][0] + (path[i + 1][0] - path[i][0]) * w, path[i][1] + (path[i + 1][1] - path[i][1]) * w]; }
   function ph(period, off) { return ((t / period + (off || 0)) % 1 + 1) % 1; }
-  function ion(x, y, cls, r) { return '<circle class="' + cls + '" cx="' + f(x) + '" cy="' + f(y) + '" r="' + (r || 3.4) + '"/>'; }
+  /* like along(), but by arc length, so an ion keeps one speed down a path with long and short legs */
+  function alongL(path, u) { var L = [0], i; for (i = 1; i < path.length; i++) L.push(L[i - 1] + Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]));
+    var d = u * L[L.length - 1]; for (i = 1; i < path.length - 1 && L[i] < d; i++); var w = (d - L[i - 1]) / ((L[i] - L[i - 1]) || 1);
+    return [path[i - 1][0] + (path[i][0] - path[i - 1][0]) * w, path[i - 1][1] + (path[i][1] - path[i - 1][1]) * w]; }
+  /* fade in and out at the capillary's cut ends, so blood ions arrive from off the page instead of popping in */
+  function edge(x) { return Math.max(0, Math.min(1, (x - 4) / 26, (636 - x) / 26)); }
+  function ion(x, y, cls, r, op) { return '<circle class="' + cls + '" cx="' + f(x) + '" cy="' + f(y) + '" r="' + (r || 3.4) + '"' + (op != null && op < 1 ? ' style="opacity:' + f(op) + '"' : "") + "/>"; }
   function cross(x, y) { return '<path class="th-block" d="M' + (x - 9) + " " + (y - 9) + "l18 18M" + (x + 9) + " " + (y - 9) + 'l-18 18"/>'; }
   /* colloid (the follicle lumen) */
   o += '<path class="th-colloid hot" data-info="Colloid: the gelatinous matrix in the follicle lumen, mostly thyroglobulin. T3 and T4 are made here, outside the cell." d="M4 4H636V' + (AP - 2) + 'H4Z"/>';
@@ -69,10 +75,17 @@ function thSvg(s, drug, t, D) {
   for (var g = 0; g < 4; g++) o += '<path class="th-golgi" d="M' + (362 + g * 2) + " " + (196 - g * 7) + "Q" + (382) + " " + (204 - g * 7) + " " + (402 - g * 2) + " " + (196 - g * 7) + '"/>';
   for (var er = 0; er < 3; er++) o += '<path class="th-er" d="M' + (270) + " " + (166 + er * 9) + "q12 -6 24 0t24 0t24 0" + '"/>';
   o += "</g>";
-  /* step 1: iodide from the blood through NIS into the cell */
-  if (S.iod) for (var i1 = 0; i1 < 4; i1++) { var q = along([[D.NIS[0], 392], [D.NIS[0], BL], [D.NIS[0] - 8, 268], [D.PEN[0] - 6, 176]], ph(S.low ? 1100 : 2400, i1 / 4)); o += ion(q[0], q[1], "th-i"); }
+  /* capillary, drawn under everything that moves: red cells, iodide and sodium drift through it left to right */
+  o += '<path class="th-cap hot" data-info="Capillary: iodide comes in from the blood, and T4 and T3 leave into it. In the blood, more than 99% is bound to thyroxine-binding globulin, transthyretin and albumin." d="M14 346H626Q636 346 636 356V408Q636 418 626 418H14Q4 418 4 408V356Q4 346 14 346Z"/>';
+  for (var r = 0; r < 5; r++) { var rx = 4 + ((r / 5 + ph(14000)) % 1) * 632; o += '<ellipse class="th-rbc" cx="' + f(rx) + '" cy="' + (r % 2 ? 398 : 370) + '" rx="13" ry="6" style="opacity:' + f(.75 * edge(rx)) + '"/>'; }
+  /* passing iodide (fewer when iodide is low) and sodium that the cell does not take up this pass */
+  var nI = S.low ? 2 : 6;
+  for (var b1 = 0; b1 < nI; b1++) { var bx = 4 + ((b1 / nI + .07 + ph(9000)) % 1) * 632; o += ion(bx, [360, 384, 404][b1 % 3], "th-i", 3.4, edge(bx)); }
+  for (var b2 = 0; b2 < 5; b2++) { var nx = 4 + ((b2 / 5 + .16 + ph(9000)) % 1) * 632; o += ion(nx, [376, 394, 364, 408, 386][b2], "th-na", 2.6, edge(nx)); }
+  /* step 1: iodide flows in along the capillary, then through NIS into the cell */
+  if (S.iod) for (var i1 = 0; i1 < 4; i1++) { var q = alongL([[4, 380], [D.NIS[0] - 26, 380], [D.NIS[0], 356], [D.NIS[0], BL], [D.NIS[0] - 8, 268], [D.PEN[0] - 6, 176]], ph(S.low ? 2200 : 4800, i1 / 4)); o += ion(q[0], q[1], "th-i", 3.4, q[1] > 346 ? edge(q[0]) : 1); }
   /* sodium rides in with each iodide (symport), then stays in the cytoplasm */
-  if (S.k === 1) for (var n1 = 0; n1 < 3; n1++) { var qn = along([[D.NIS[0] + 10, 392], [D.NIS[0] + 10, BL], [D.NIS[0] + 22, 288]], ph(S.low ? 1100 : 2400, n1 / 3 + .1)); o += ion(qn[0], qn[1], "th-na", 2.6); }
+  if (S.k === 1) for (var n1 = 0; n1 < 3; n1++) { var qn = alongL([[4, 392], [D.NIS[0] - 14, 392], [D.NIS[0] + 10, 360], [D.NIS[0] + 10, BL], [D.NIS[0] + 22, 288]], ph(S.low ? 2200 : 4800, n1 / 3 + .1)); o += ion(qn[0], qn[1], "th-na", 2.6, qn[1] > 346 ? edge(qn[0]) : 1); }
   /* step 2: a thyroglobulin vesicle from the Golgi to the apical membrane */
   if (S.k === 2) { var q2 = along([[382, 178], [388, 150], [D.TGX[0], AP + 6]], ph(1800)); o += '<circle class="th-ves" cx="' + f(q2[0]) + '" cy="' + f(q2[1]) + '" r="8"/>'; }
   /* step 3: iodide out through pendrin into the colloid, to thyroperoxidase */
@@ -88,7 +101,7 @@ function thSvg(s, drug, t, D) {
   o += '<circle class="th-lyso hot" data-info="Lysosome: its proteases digest thyroglobulin, freeing T4 and T3 (and leftover MIT and DIT)." cx="' + (D.LYS[0] + 18) + '" cy="' + (D.LYS[1] + 2) + '" r="8"/>';
   /* step 7: T4/T3 out to the blood; MIT/DIT iodine recycled */
   if (S.rel && S.hormone) {
-    for (var h = 0; h < 5; h++) { var q7 = along([[D.LYS[0], D.LYS[1] + 14], [D.LYS[0] + 18, BL - 10], [D.LYS[0] + 22, BL], [D.LYS[0] + 34, 392]], ph(2200, h / 5)); o += ion(q7[0], q7[1], h === 2 ? "th-t3" : "th-t4", 3.4); }
+    for (var h = 0; h < 5; h++) { var q7 = alongL([[D.LYS[0], D.LYS[1] + 14], [D.LYS[0] + 18, BL - 10], [D.LYS[0] + 22, BL], [D.LYS[0] + 40, 404], [636, 404]], ph(5200, h / 5)); o += ion(q7[0], q7[1], h === 2 ? "th-t3" : "th-t4", 3.4, edge(q7[0])); }
     o += '<path class="th-recyc" d="M' + (D.LYS[0] - 18) + " " + (D.LYS[1] - 6) + "Q300 214 " + (D.NIS[0] + 2) + ' 232"/><circle class="th-dot" cx="' + (D.NIS[0] + 2) + '" cy="232" r="1.8"/>';
     o += tx(300, 212, "I⁻ recycled", "th-key-i", "middle");
   }
@@ -102,9 +115,6 @@ function thSvg(s, drug, t, D) {
   o += '<g class="hot" data-info="TSH receptor (Gs): cAMP and protein kinase A turn up NIS, thyroglobulin, pendrin, thyroperoxidase and megalin, and drive glucose oxidation and NADPH, which make the H2O2 thyroperoxidase needs. Its growth signal (hypertrophy, hyperplasia) is why a goiter forms. In Graves disease, antibodies switch it on."><path class="th-prot th-tshr" d="M' + (D.TSHR - 8) + " " + (BL + 10) + "V" + (BL - 8) + "Q" + D.TSHR + " " + (BL - 20) + " " + (D.TSHR + 8) + " " + (BL - 8) + "V" + (BL + 10) + 'Z"/></g>';
   if (S.pen) o += '<path class="th-recyc" d="M' + D.TSHR + " " + (BL - 22) + "Q" + (D.TSHR + 36) + " 210 " + (D.TPO[0] - 4) + " " + (AP + 14) + '"/>' + tx(D.X0 - 8, 214, "NADPH → H₂O₂", "th-key", "end");
   if (S.rel && S.hormone) o += tx(330, 388, "in the tissues: T4 → T3 (5′-deiodinase) or rT3 (5-deiodinase)", "th-key-h", "middle");
-  /* capillary */
-  o += '<path class="th-cap hot" data-info="Capillary: iodide comes in from the blood, and T4 and T3 leave into it. In the blood, more than 99% is bound to thyroxine-binding globulin, transthyretin and albumin." d="M14 346H626Q636 346 636 356V408Q636 418 626 418H14Q4 418 4 408V356Q4 346 14 346Z"/>';
-  for (var r = 0; r < 5; r++) o += '<ellipse class="th-rbc" cx="' + (60 + r * 128) + '" cy="' + (r % 2 ? 396 : 372) + '" rx="13" ry="6"/>';
   /* labels */
   o += lab("NIS", 150, 372 + 10, N[0] - 10, N[1] + 6, "end");
   o += lab("pendrin", 196, 100, Pn[0] - 6, Pn[1] - 10, "end");
