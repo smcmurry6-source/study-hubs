@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-28** (steps 1-3 only, before building the Special Patient Care hub; the last full audit was
-2026-10-27, 9:30 pm Central, and the morning run before building the Heme/Endo Exam 1 hub was steps 1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
+**Last refreshed: 2026-10-28** (full audit, 4:45 pm Central; the morning run before building Special Patient Care was steps
+1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,12 +79,43 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-10-28 (steps 1-3, before building Special Patient Care):** a quiet day since last night's audit. No new reports,
-suggestions, check-ins or zero-result searches; one survey answer. Heme/Endo Exam 1 since 10-27: 42 people, 42 h (bank 21 h,
-22 people; notes 18 h, 27 people; Home 2 h, all 42; drill 3 people); no mocks yet; the only item under 50% with 15+ tries is
-`h1-tf-5` (8/20), already judged fair last night. Occlusion and perio: a few minutes each. Nothing new to act on, so the lessons
-below stand; the new hub follows them (Home first, why for every choice, two-statement, true/false and numbered items per lecture,
-correct answer not the longest choice, explanations that answer the likely wrong pick).
+**2026-10-28, 4:45 pm (full audit, two days before Heme/Endo Exam 1).** Since last night: **Heme/Endo** 53 people today, 42 h
+(bank 19 h / 33 people, notes 19 h / 33, Home 31 people, drill 4, cram 5, hints 5, Review 25 min, one mock started, none submitted);
+4,802 answers from 33 people at 81%. **Report #32** (`th-r-nis`): "It's an ATP dependent symporter? Wouldn't it then directly use
+ATP?" Fair: `th-nis`'s explanation said "(ATP-dependent active transport)" and the As-taught notes say "ultimately ATP-dependent",
+while `th-r-nis` keys secondary active transport. Both explanations now say NIS does not split ATP; the Na+/K+-ATPase spends it to
+keep the sodium gradient. Suggestion #13 (exam counts per lecture and predicted questions) is already answered and built (High
+Likelihood tags). One new Occlusion check-in (n = 14 now: "About right", went better, diagrams 4, Patient Box pictures 4). One survey
+answer asks for Quizlet-style flashcards and a game whose questions differ from the bank ("learning, not memorizing answer
+choices"), the same ask as round 2.
+
+**Did last night's fixes work?** `h1-downreg` 9/16 since (56%, 50% before; sequestration still 7 of 16: the trap holds, keep the
+explanation), `gr-muscle` 3/4 since (was 6/12). `h1-mag` gone, no new report on it. Perio `q4-06` / `q3-04`: no tries since. **Try
+it again** today: 424 retries shown to 26 people, 331 of 353 answered right (94%).
+
+**Hardest Heme/Endo items now (12+ tries), explanations fixed today** (same ids and positions): `th-r-2s-1` 5/16 ("Both true" 7:
+thyroglobulin is made in the cell, T3/T4 aren't until the colloid), `pa-insulin-fat` 7/18 (lipoprotein lipase 6), `gr-ghrelin` 6/14
+("inhibits via somatostatin" 6), `pa-liver-glut` 7/13 (cardiac muscle 6), `h1-enzyme-linked` 22/37 (G-protein-linked 10). Fair and
+already explained: `h1-tf-5` 15/33 (follicle size, one number ten times too big), `gr-direct` 8/15 (JAK-STAT is the indirect route),
+`th-r-tf-4` 8/15 (TRH's receptor is the Gq one). By lecture: Growth 77% and Thyroid 78% are the weakest with real tries; L6-L10 still
+have 2-4 tries per question. The 20 in-class review items (`rv-*`, added today) have no tries yet.
+
+**Names, device links and Timmy Tooth (Sam asked, 10-28).** *Names:* 17 ids carry a name of their own, 14 different names; one was
+set since 10-22. Three ids are "Dr Winters" / "Dr. Winters" and two "LeSunshine", none linked; "Floss Boss" is two ids too, and they
+are different people (one from 9-26, one from 10-27). *The "Is this your other device?" prompt (10-21):* shown 6 times to 4 people;
+"Yes" 2 (LeSunshine 10-22, Dr Winters today), a code made once, "Not now" 4, "No, that's someone else" 1 (the "Dr. Winters" id). **No link came from it**: no `visitor_links` row for any of those ids. The one link since (10-27, the new Floss
+Boss) was made 49 s after they saved the name and saw the prompt (they pressed "Not now"); which flow they used wasn't recorded. The
+prompt may have reminded them, but the people it was built for (the Winters and LeSunshine ids) are still split. Two
+gaps hid this: the "linked" event fired just before the page reloads and the batch was never sent, and Stats → Link my devices
+tracked nothing. **Fixed today** (below). *Timmy Tooth:* **49 adopted** (20 the first week, then 1, 13, 10 and 6 this week); 40 of
+them studied in the last 7 days (of 88 people who studied); 23 have reached 100 HP and 4 revived him from 0. Settings across devices
+in the last 7 days: on 103, dashboard only 3, off 5. His introduction was opened by 12 people since 10-20 (10 adopted with the
+button). Taps, jokes, checkups and tips were never tracked, so how much people *play* with him was unknown until today.
+
+**New tracking from today** (`feature_events`, no schema change): `pet:tap-hub` / `pet:tap-dashboard` (taps on an adopted Timmy),
+`pet:joke` / `pet:checkup` / `pet:tip` (his house's buttons), a daily `state:pet-hp=80-100|50-79|25-49|1-24|0` per device; `link:code`
+/ `link:linked` / `link:fail` from Stats → Link my devices and `link-ask:fail` from the prompt; both flush the event batch before
+reloading (`shClicks.flush`), so `linked` now arrives.
 
 Refreshed 2026-10-27, 9:30 pm Central (full audit); "since" = the 10-21 afternoon audit, the last one that shipped fixes. Live
 hubs: **Heme/Endo Exam 1** (Fri Oct 30; live since this morning), **Occlusion** (final Nov 19) and **perio** (final Nov 19). Nothing
@@ -134,7 +165,7 @@ L6; now a standing rule). Taking a mock went with "About right" (n = 13: suggest
 hardest perio items are still the midterm ones (`q3-M01` UniFe 28%, Phase I instrument items 35-54%); S4 instruments weren't on
 the midterm, so the final will be their first real test.
 
-**Next audit: Heme/Endo exam eve (Thu 10-29)**: its hardest items with 20+ tries, Endocrine Pancreas and the late lectures (L9,
+**Next audit: Heme/Endo exam eve (Thu 10-29)**: the `rv-*` review items, whether the new Timmy and link events arrive, its hardest items with 20+ tries, Endocrine Pancreas and the late lectures (L9,
 L10), mocks, the Home page buttons; then its check-ins from Fri 10 am. Occlusion and perio when L7 / S7 land.
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
@@ -270,6 +301,12 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   (95% right) and Weak Spots in the same sitting show the explanation was read, not that it stuck. The next-day re-ask is what
   catches the rest: in exam week, put yesterday's misses first in the Daily Drill and on Home, and say so ("you missed these
   yesterday"), rather than adding more same-session retries.
+- **Track the last step of a flow, and send it before the page moves on.** The "Is this your other device?" prompt (10-21) logged
+  its shown / yes / code clicks but its `linked` event fired just before a reload, so it never arrived, and Stats → Link my devices
+  logged nothing: a week later we could not tell whether any link came from it (none did, by `visitor_links`). Any feature that
+  ends in a reload or a page change calls `shClicks.flush()` after its last `shTrack`, and every path to the same outcome tracks it.
+  A prompt that needs two devices and a code completes rarely (0 of 2 "Yes" in a week); if it matters, make the second device's
+  step shorter rather than asking more often.
 - **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.

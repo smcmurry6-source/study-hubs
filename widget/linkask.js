@@ -115,9 +115,10 @@
         if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
         msg.textContent = "Linking…";
         rpc("redeem_link_code", { p_code: code, p_visitor: visitor() }).then(function(id){
-          if (!id) { msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+          if (!id) { track("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
           if (id === visitor()) { msg.textContent = "This device already uses that code’s account."; return; }
           track("linked");
+          try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
           /* same as Stats → Link my devices (widget/ranks.js) */
           ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
           rpc("get_display_name", { p_visitor: id }).then(function(n){

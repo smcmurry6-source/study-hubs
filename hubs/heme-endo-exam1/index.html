@@ -1977,7 +1977,7 @@ mcq("h1-slow", "histo1", "rec", "Compared with a hormone acting on a cell-surfac
   "Intracellular (steroid) receptors move to the nucleus and start the DNA-to-RNA-to-protein sequence: hours to days. Surface receptors change existing proteins: fast.");
 mcq("h1-enzyme-linked", "histo1", "slides", "Tyrosine kinase receptors belong to which class of cell-surface receptor?",
   ["Enzyme-linked","Ion-channel-linked","G-protein-linked","Intracellular (nuclear)"],
-  "The three classes of cell-surface receptors are ion-channel-linked, G-protein-linked and enzyme-linked. In enzyme-linked receptors, binding brings catalytic domains together and activates them: tyrosine kinases work this way.");
+  "The three classes of cell-surface receptors are ion-channel-linked, G-protein-linked and enzyme-linked. In enzyme-linked receptors, binding brings catalytic domains together and activates them: tyrosine kinases work this way. No G protein is involved: the receptor is the enzyme itself, while G-protein-linked receptors act through cAMP or IP3.");
 mcq("h1-gq", "histo1", "rec", "A hormone binds a Gq-coupled receptor. What happens next?",
   ["Phospholipase C is activated; IP3 releases calcium from the ER","Adenylate cyclase is activated and cAMP rises inside the cell","Adenylate cyclase is inhibited and cAMP falls","The receptor moves to the nucleus and binds DNA"],
   "Gq activates phospholipase C, which splits PIP2 into IP3 and DAG. IP3, the second messenger, opens calcium channels in the endoplasmic reticulum. Dr. Herr: \"kind of commit this table to memory.\"");
@@ -2358,7 +2358,7 @@ mcq("gr-ss-gi", "growth", "slides", "How does somatostatin stop GH secretion?",
   "Somatostatin binds a Gi-coupled receptor: no rise in cAMP, potassium channels activated, hyperpolarization, no GH secretion. GHRH and somatostatin are the \"yin-yang\" of GH control.");
 mcq("gr-ghrelin", "growth", "slides", "Ghrelin affects GH by:",
   ["Stimulating GH release from the pituitary","Inhibiting GH release by raising somatostatin output","Blocking IGF-1 receptors","Converting GH to IGF-1"],
-  "Ghrelin increases appetite and stimulates GH release; GH then breaks down fat and builds muscle.");
+  "Ghrelin increases appetite and stimulates GH release; GH then breaks down fat and builds muscle. Somatostatin is the brake on GH, raised by high glucose and free fatty acids, not by ghrelin.");
 mcq("gr-ss-glucose", "growth", "slides", "High blood glucose and high free fatty acids lower GH secretion because they:",
   ["Stimulate somatostatin release","Stimulate GHRH release","Activate the GH receptor","Increase ghrelin"],
   "On the axis diagram, high glucose and FFA stimulate somatostatin, a negative regulator of GH. (GH itself raises glucose and free fatty acids, so this is feedback.)");
@@ -2525,7 +2525,7 @@ mcq("th-rt3", "thyroid", "slides", "Which enzyme converts T4 to the inactive rev
   "5'-deiodinase (outer ring) makes active T3; 5-deiodinase (inner ring) makes inactive reverse T3. \"Key to whether T3 or reverse T3 is formed.\"");
 mcq("th-nis", "thyroid", "slides", "Step 1 of thyroid hormone synthesis, iodide trapping, is carried out by:",
   ["The sodium-iodide symporter (NIS) on the basolateral membrane","Pendrin, which pumps iodide from the blood across the apical membrane","Thyroperoxidase in the colloid","Megalin on the apical membrane"],
-  "NIS, on the basolateral membrane, uses the sodium gradient (ATP-dependent active transport) to concentrate iodide 20-50 times above plasma.");
+  "NIS, on the basolateral membrane, uses the sodium gradient to concentrate iodide 20-50 times above plasma. That is secondary active transport: NIS itself does not split ATP; the Na+/K+-ATPase spends the ATP that keeps sodium low inside the cell, which is why the notes call it ultimately ATP-dependent.");
 mcq("th-pendrin", "thyroid", "slides", "Iodide crosses the apical membrane of the follicular cell into the colloid through:",
   ["Pendrin","The sodium-iodide symporter","Megalin","Thyroglobulin"],
   "Pendrin moves iodide across the apical membrane; NIS brings it in across the basolateral side.");
@@ -2684,7 +2684,7 @@ mcq("th-r-t3", "thyroid", "rec", "Why does the thyroid release so little T3?",
   "About 90% of what the gland makes is T4. The T3 it makes has a very short half-life and is readily used by the gland, so little gets out; most T3 comes from T4 in the tissues (5'-deiodinase).");
 mcq("th-r-nis", "thyroid", "rec", "How does the sodium-iodide symporter move iodide against its concentration gradient?",
   ["Sodium running down its gradient drags iodide in with it","Iodide is pumped directly by ATP hydrolysis at the apical membrane","Pendrin pushes iodide in from the colloid","Thyroperoxidase pulls iodide in by oxidizing it"],
-  "Extracellular sodium is high and intracellular sodium is low, so sodium moving in carries iodide along against its own gradient: secondary active transport. Follicular cells pile iodide up far above blood levels.");
+  "Extracellular sodium is high and intracellular sodium is low, so sodium moving in carries iodide along against its own gradient: secondary active transport. Follicular cells pile iodide up far above blood levels. NIS does not use ATP directly: the Na+/K+-ATPase spends the ATP that keeps the sodium gradient, so the symporter is only ultimately ATP-dependent.");
 mcq("th-r-myosin", "thyroid", "rec", "Besides adding beta-1 receptors, how does thyroid hormone raise cardiac output?",
   ["It switches cardiac myosin to the alpha heavy chain","It switches cardiac myosin to the beta heavy chain","It lowers Na+/K+-ATPase in the heart","It slows the sinoatrial node so the ventricles fill longer"],
   "Normally the heart uses the beta myosin heavy chain; thyroid hormone shifts it to the alpha heavy chain, which contracts more strongly.");
@@ -2713,7 +2713,7 @@ mcq("th-r-kids", "thyroid", "rec", "Why are newborns and developing children che
   ["Caught early, treatment can reverse the growth and brain effects","Thyroid hormone isn't needed until puberty, so a low level is an early warning","Graves disease is most common in newborns","Hypothyroidism in children causes tall stature"],
   "T3 is required for perinatal brain development and for the growth plates. A hypothyroid newborn treated within weeks can catch up; \"you've got to catch it in time.\"");
 two("th-r-2s-1", "thyroid", "rec", "Thyroid hormone is the only endocrine hormone synthesized extracellularly.", "T3 and T4 are found inside the follicular cell mainly while thyroglobulin is being made.", true, false,
-  "Synthesis happens in the colloid; T3 and T4 appear inside the cell only at the last stage, as lysosomes cut them off thyroglobulin.",
+  "Synthesis happens in the colloid; T3 and T4 appear inside the cell only at the last stage, as lysosomes cut them off thyroglobulin. Statement 2 is the trap: thyroglobulin itself is made inside the cell, but it carries no T3 or T4 until it is iodinated and coupled out in the colloid.",
   "iodination and coupling happen out in the colloid.", "they are inside the cell only at the end, when they are cut off endocytosed thyroglobulin.");
 two("th-r-2s-2", "thyroid", "rec", "Before antithyroid drugs, a large iodide dose was a way to treat hyperthyroidism.", "Thyroid hormone increases beta-adrenergic receptor density throughout the body.", true, true,
   "The Wolff-Chaikoff block was used as treatment (and still diagnostically); more beta receptors everywhere is, to Dr. Galin, thyroid hormone's most important action.",
@@ -2779,7 +2779,7 @@ mcq("pa-glut4", "pancreas", "rec", "Within seconds of insulin binding its recept
   "The fast effect: vesicles of GLUT4 translocate to the membrane so the cell takes up glucose. Slower effects (hours) involve gene expression.");
 mcq("pa-liver-glut", "pancreas", "rec", "Which tissue does NOT rely on GLUT4 for insulin-stimulated glucose handling?",
   ["Liver","Skeletal muscle","Adipose tissue","Cardiac muscle"],
-  "Muscle and fat depend on insulin-recruited GLUT4. The liver doesn't rely on GLUT4; insulin controls its glucose handling through enzymes (glucokinase, glycogen synthase, etc.).", {"fmt":"except"});
+  "Muscle and fat depend on insulin-recruited GLUT4. The liver doesn't rely on GLUT4; insulin controls its glucose handling through enzymes (glucokinase, glycogen synthase, etc.). Cardiac muscle is muscle: it recruits GLUT4 just as skeletal muscle does.", {"fmt":"except"});
 mcq("pa-anabolic", "pancreas", "rec", "Insulin is described as an anabolic hormone because it:",
   ["Promotes storage: glycogen, triglycerides and protein","Breaks down glycogen and fat for energy","Raises blood glucose between meals","Stimulates ketone production"],
   "Insulin builds larger things from smaller ones: glycogenesis, lipogenesis and protein synthesis. Glucagon is the catabolic counterpart.");
@@ -2788,7 +2788,7 @@ mcq("pa-insulin-liver", "pancreas", "rec", "In the liver, insulin:",
   "Insulin activates glucokinase, glycogen synthase, PFK, pyruvate kinase and acetyl-CoA carboxylase, and inactivates glycogen phosphorylase, glucose-6-phosphatase, FBPase and PEP carboxykinase.");
 mcq("pa-insulin-fat", "pancreas", "rec", "In adipose tissue, insulin inhibits lipolysis by inhibiting:",
   ["Hormone-sensitive lipase","Lipoprotein lipase","Acetyl-CoA carboxylase","Glycogen synthase"],
-  "Insulin inhibits hormone-sensitive lipase (which hydrolyzes stored triglycerides) while promoting glucose uptake (GLUT4), fatty acid uptake and esterification (lipoprotein lipase helps bring fatty acids in).");
+  "Insulin inhibits hormone-sensitive lipase (which hydrolyzes stored triglycerides) while promoting glucose uptake (GLUT4), fatty acid uptake and esterification (lipoprotein lipase helps bring fatty acids in). Lipoprotein lipase is the trap: it helps fat come in for storage and insulin promotes it; hormone-sensitive lipase breaks down fat already stored, and that is the one insulin shuts off.");
 mcq("pa-insulin-muscle", "pancreas", "rec", "Which effect of insulin did Dr. Madison single out as especially important in skeletal muscle?",
   ["Increased protein synthesis with less protein breakdown","Increased gluconeogenesis from muscle amino acids","Increased ketone production","Decreased amino acid uptake"],
   "Insulin builds muscle tissue: more protein synthesis and amino acid uptake, less protein breakdown, alongside GLUT4 uptake, glycogen storage and glycolysis. Muscle does little or no gluconeogenesis.");

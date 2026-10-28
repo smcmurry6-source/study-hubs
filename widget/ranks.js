@@ -465,6 +465,7 @@
     try { if (window.shTrack) window.shTrack("flair:open"); } catch (e) {}
   }
   function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
   /* shRanks.flair(str, opt) -> mastery medals; empty string when there's nothing to show.
      Default (board rows): one tappable medal, this page's hub first (else the best), then "+N"; fixed small width.
      opt.list: every medal with its hub's name (the rank cards); opt.big: larger medals there.
@@ -896,6 +897,7 @@
         var out = sec.querySelector(".sh-link-code"); out.textContent = "…";
         rpc("create_link_code", { p_visitor: H.visitor }).then(function(c){
           out.innerHTML = c ? '<span class="sh-link-big">' + esc(c.slice(0, 3) + " " + c.slice(3)) + '</span><small>Enter it on your other device in the next 10 minutes.</small>' : "Couldn’t make a code. Are you online?";
+          if (c) linkTrack("code");
         });
         return;
       }
@@ -905,8 +907,10 @@
         if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
         msg.textContent = "Linking…";
         rpc("redeem_link_code", { p_code: code, p_visitor: H.visitor }).then(function(id){
-          if (!id) { msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+          if (!id) { linkTrack("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
           if (id === H.visitor) { msg.textContent = "This device already uses that code’s account."; return; }
+          linkTrack("linked");
+          try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
           ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
           rpc("get_display_name", { p_visitor: id }).then(function(n){
             if (n) ls("sh_display_name", n);

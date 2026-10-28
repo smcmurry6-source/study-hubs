@@ -1588,6 +1588,9 @@
     var hp = M.st.hp;
     /* trophies, recorded once */
     if (hp >= 100 && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
+    /* health band once a day (after the server rows load), for how adopted Timmys are doing across the class */
+    var day = new Date().toISOString().slice(0, 10);
+    if (quiet && M.rows && ls("sh_pet_hp_sent") !== day) { ls("sh_pet_hp_sent", day); track("state:pet-hp=" + (hp >= 80 ? "80-100" : hp >= 50 ? "50-79" : hp >= 25 ? "25-49" : hp > 0 ? "1-24" : "0")); }
     if (M.st.revived && !ls("sh_pet_revived")) { ls("sh_pet_revived", "1"); award("pet-revive"); talk("From 0 to 100. You brought me back. I'll never forget it.", "do-cheer"); }
     if (!quiet && prev != null) {
       var a = conditions(prev), b = conditions(hp);
@@ -1628,6 +1631,8 @@
     else setTimeout(hello, 900);
   }
   function homeClick(e){
+    var b = e.target.closest("[data-joke], [data-check], [data-tip]");
+    if (b) track("pet:" + (b.hasAttribute("data-joke") ? "joke" : b.hasAttribute("data-check") ? "checkup" : "tip"));
     if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(joke(), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
     else if (e.target.closest("[data-check]")) { hush(); checkup(); }
     else if (e.target.closest("[data-tip]")) tellTip();
@@ -1766,6 +1771,7 @@
   }
   function onTap(){
     if (!adopted()) { intro(); return; }
+    track("pet:tap-" + M.where);
     var now = Date.now();
     M.taps = now - M.tapT < 1200 ? M.taps + 1 : 1; M.tapT = now;
     if (M.sleeping) { M.sleeping = false; M.lastInput = now; draw(); talk(deal("wake", WAKE), "do-hop"); return; }
