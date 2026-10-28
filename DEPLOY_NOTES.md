@@ -130,6 +130,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 evening (device-link prompt streamlined, Claude Code)** — The "Is this your other device?" prompt linked nobody in its
+  first week (2 "Yes", 0 links). `widget/linkask.js`: "Yes, link them" now makes the code at once (no make-or-enter choice) and offers
+  **Send the link** (share sheet) / **Copy the link**: `<site>/?link=CODE` opens a "Link this device?" card on the other device and
+  links in one tap (the `link` param is removed from the address first). Typing a code links at the sixth character; the Link button
+  stays. Tracked as `link-ask:share`, `link-ask:url-open`, plus the existing `code` / `linked` / `fail`. About page, `sw.js` -> `sh-v45`.
+  Report #32 resolved with its reply. No schema change.
+
 - **2026-10-28 afternoon (lessons audit + Timmy and device-link tracking, Claude Code)** — Two days before Heme/Endo Exam 1.
   `hubs/heme-endo-exam1`, same ids and answer positions, explanations only: report #32 (`th-r-nis`: "an ATP dependent
   symporter... wouldn't it directly use ATP?"): `th-nis` no longer calls NIS "ATP-dependent active transport", and both say NIS
