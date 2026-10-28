@@ -33,11 +33,13 @@ const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
    Sam's standing rule, 2026-10-20). Hubs archived before the rule are exempt: their exams are over. */
 const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 /* every taught lecture's questions include two-statement and true/false items (Sam's standing rule, 2026-10-22; CLAUDE.md
-   "Two-statement and true/false questions"). Archived hubs are exempt, and so are the perio sessions taught before the
-   rule (its engine has no true/false yet): a lecture taught after it, in any live or new hub, needs both formats. */
+   "Two-statement and true/false questions") and numbered-statement items (2026-10-28; CLAUDE.md "Numbered-statement
+   questions"). Archived hubs are exempt, and so are the perio sessions taught before the rules (its engine has neither
+   true/false nor numbered items yet): a lecture taught after them, in any live or new hub, needs all three formats. */
 const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
-const FORMAT_MIN = { '2stmt': 3, tf: 5 };
+const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
+const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement' };
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
@@ -67,6 +69,17 @@ function lint(hub, A){
       if (!/\n1\. [^]*\n2\. /.test(q.stem || '')) problems.push(`${hub}: ${q.id} two-statement stem needs its statements on lines starting "1. " and "2. "`);
     }
     if (q.fmt === 'tf' && (q.choices || []).join('|') !== 'True|False') problems.push(`${hub}: ${q.id} true/false choices must be exactly True / False`);
+    if (q.fmt === 'numbered') {
+      /* "Which ... are true?" with numbered statements; choices are combinations ("1 and 3 only", "1, 2 and 4") in a
+         fixed canonical order, sorted by their numbers (choiceOrder never shuffles them) */
+      const n = ((q.stem || '').match(/\n\d+\. /g) || []).length, ch = (q.choices || []).map(String);
+      const sets = ch.map(c => (c.match(/\d+/g) || []).map(Number));
+      const cmp = (a, b) => { for (let i = 0; i < Math.min(a.length, b.length); i++) if (a[i] !== b[i]) return a[i] - b[i]; return a.length - b.length; };
+      if (n < 3) problems.push(`${hub}: ${q.id} numbered-statement stem needs 3 or more statements on lines starting "1. ", "2. ", "3. "`);
+      if (!ch.every(c => /^\d+( only| and \d+ only|(, \d+)+ and \d+)$/.test(c))) problems.push(`${hub}: ${q.id} numbered-statement choices must read like "2 only", "1 and 3 only" or "1, 2 and 4"`);
+      if (sets.some(st => st.some(k => k < 1 || k > n))) problems.push(`${hub}: ${q.id} a numbered-statement choice names a statement the stem doesn't have`);
+      if (sets.some((st, i) => i && cmp(sets[i - 1], st) >= 0)) problems.push(`${hub}: ${q.id} numbered-statement choices must be in canonical order (sorted by their numbers)`);
+    }
     if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
     if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
@@ -76,7 +89,7 @@ function lint(hub, A){
       const lq = Q.filter(q => q.lec === l.id);
       if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
-        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${f === 'tf' ? 'true/false' : 'two-statement'} questions (needs at least ${FORMAT_MIN[f]}; CLAUDE.md "Two-statement and true/false questions")`); });
+        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; CLAUDE.md "${f === 'numbered' ? 'Numbered-statement questions' : 'Two-statement and true/false questions'}")`); });
     });
     const tfq = Q.filter(q => q.fmt === 'tf');
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);

@@ -97,6 +97,14 @@ and 8 per lecture, at least 3 and 5 for any taught lecture, or CI fails. Fixed c
 choice, false statements that change one taught detail. How to build them: `CLAUDE.md` → "Two-statement and true/false
 questions" (copy `two()`/`tf()` from `occlusion`). **Perio Project: add true/false (`tf()`) before Session 6 goes to taught.**
 
+## Every lecture gets numbered-statement questions too (standing rule, 2026-10-28)
+
+Besides two-statement and true/false items, every session that writes questions for a lecture (hub Projects included) adds
+**numbered-statement** items: "Which ... are true?" over 4-5 numbered statements, answered with a combination ("1 and 3 only",
+"1, 2 and 4"), as Dr. Givan's Occlusion midterm asked. About 3-5 per lecture, at least 2 for any taught lecture, or CI fails.
+Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
+"Numbered-statement questions" (copy `nums()` from `occlusion`). **Perio Project: add `nums()` before Session 6 goes to taught.**
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
@@ -115,6 +123,20 @@ Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` �
 Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-28 (numbered-statement rule, Occlusion items, the boss moves to the top bar, Claude Code)** — Sam: add the "which
+  statements are true" questions to Occlusion and keep it as a rule; move the bosses widget, which blocked questions. **Rule**
+  (above, `CLAUDE.md` → "Numbered-statement questions"): `tools/ci/smoke.js` adds `numbered: 2` to `FORMAT_MIN` and checks each
+  numbered item's stem lines, choice wording and canonical order. **Occlusion**: new helper `nums()` (with `numList()`,
+  `numLabel()`) builds the stem, sorted combinations, key and "why each choice" lines from one reason per statement;
+  `choiceOrder()` keeps them in order, `arcadeQ` skips them, the bank's format filter gains "Numbered statements". 16 items
+  written from the notes (`rv-num-1..3`, `an-num-1..2`, `fn-num-1..2`, `cc-num-1..2`, `ap-num-1..2`, `in-num-1..5`; keys
+  spread 3/5/4/4 over the four positions); bank 510 -> 526. **Heme & Endo**: `th-num-2`, `h2-num-2`, `ca-num-2` (the three lectures that had one);
+  bank 579 -> 582. **Plaque boss** (`widget/eggs.js` `bossDock()`, `widget/v3.css` `.sh-egg-boss.is-docked`): it now docks as a
+  slim strip at the bottom of the hub's sticky `header.hub-header` (icon, name, HP bar, HP, the line it says on desktop, ×)
+  instead of a card floating over the bottom of the screen, where it covered answer choices (53 of 89 Occlusion students who met
+  one hid it). A page without a sticky header still floats it. About page, `sw.js` -> `sh-v37`. No schema change.
+  **Perio Project: add `nums()` and numbered items before S6 goes taught.**
 
 - **2026-10-27 evening (lessons audit, Claude Code)** — Heme & Endo Exam 1's first day (39 people, 29 h). `hubs/heme-endo-exam1`:
   `h1-mag` ("Dr. Herr said he would NOT expect you to be able to:") removed after two reports on its first afternoon (#30, #31: "not
