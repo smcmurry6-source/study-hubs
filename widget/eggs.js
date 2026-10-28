@@ -554,6 +554,14 @@
     var pos = getComputedStyle(h).position;
     return pos === "sticky" || pos === "fixed" ? h : null;
   }
+  /* bleed the docked band to the top bar's edges and flush with its bottom border, whatever padding the hub gives it */
+  function fitDock(el){
+    var p = el && el.parentNode; if (!p || !el.classList.contains("is-docked")) return;
+    var cs = getComputedStyle(p);
+    el.style.marginLeft = "-" + cs.paddingLeft; el.style.marginRight = "-" + cs.paddingRight; el.style.marginBottom = "-" + cs.paddingBottom;
+    el.style.paddingLeft = cs.paddingLeft; el.style.paddingRight = cs.paddingRight;
+  }
+  window.addEventListener("resize", function(){ if (boss) fitDock(boss.el); });
   function spawnBoss(hp, test){
     var id = bossId();
     if (!test && boss && boss.id === id) return;
@@ -568,6 +576,7 @@
       '<span class="sh-egg-boss-bar"><i></i></span></span>' +
       '<button type="button" class="sh-egg-x" aria-label="Hide the boss">×</button>';
     (dock || document.body).appendChild(el);
+    if (dock) fitDock(el);
     el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); });
     boss = { id: id, k: k, max: k.hp, hp: Math.min(k.hp, hp || k.hp), el: el, test: !!test };
     drawBoss();

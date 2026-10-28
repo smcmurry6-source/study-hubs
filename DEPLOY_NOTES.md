@@ -133,8 +133,9 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   written from the notes (`rv-num-1..3`, `an-num-1..2`, `fn-num-1..2`, `cc-num-1..2`, `ap-num-1..2`, `in-num-1..5`; keys
   spread 3/5/4/4 over the four positions); bank 510 -> 526. **Heme & Endo**: `th-num-2`, `h2-num-2`, `ca-num-2` (the three lectures that had one);
   bank 579 -> 582. **Plaque boss** (`widget/eggs.js` `bossDock()`, `widget/v3.css` `.sh-egg-boss.is-docked`): it now docks as a
-  slim strip at the bottom of the hub's sticky `header.hub-header` (icon, name, HP bar, HP, the line it says on desktop, ×)
-  instead of a card floating over the bottom of the screen, where it covered answer choices (53 of 89 Occlusion students who met
+  solid band along the bottom edge of the hub's sticky `header.hub-header` (`fitDock()` bleeds it to the bar's edges and flush
+  with its bottom border, from the header's own padding, so nothing scrolls through behind it; icon, name, HP bar, HP, the line it
+  says on desktop, ×; hit numbers stay inside the band) instead of a card floating over the bottom of the screen, where it covered answer choices (53 of 89 Occlusion students who met
   one hid it). A page without a sticky header still floats it. About page, `sw.js` -> `sh-v37`. No schema change.
   **Perio Project: add `nums()` and numbered items before S6 goes taught.**
 
