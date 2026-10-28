@@ -119,6 +119,7 @@ create index if not exists personal_answers_visitor_hub_idx on public.personal_a
 create index if not exists activity_pings_visitor_idx on public.activity_pings (visitor_id, pinged_at);
 create index if not exists activity_pings_visit_idx on public.activity_pings (visit_id, pinged_at);
 create index if not exists activity_pings_hub_idx on public.activity_pings (hub, pinged_at);
+create index if not exists activity_pings_visitor_hub_idx on public.activity_pings (visitor_id, hub);
 
 -- ---------------------------------------------------------------- row level security
 -- Every table has RLS on. Tables with no policy are reachable only through the
@@ -1496,11 +1497,21 @@ language plpgsql stable security definer set search_path = public as $$
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
   return query
+  with d as (select * from exam_debriefs e order by e.created_at desc limit 2000),
+  who as (select distinct d.hub, d.visitor_id from d),
+  t as (select w.hub, w.visitor_id, count(p.id) * 25 / 60 as minutes
+        from who w left join activity_pings p on p.visitor_id = w.visitor_id and p.hub = w.hub
+        group by w.hub, w.visitor_id),
+  a as (select w.hub, w.visitor_id, count(pa.id) as answered,
+               round(avg(case when pa.id is null then null when pa.correct then 100 else 0 end), 0) as accuracy
+        from who w left join personal_answers pa on pa.visitor_id = w.visitor_id and pa.hub = w.hub
+        group by w.hub, w.visitor_id)
   select d.hub, d.exam, d.visitor_id, d.answers, d.created_at,
-    (select count(*) * 25 / 60 from activity_pings p where p.hub = d.hub and p.visitor_id = d.visitor_id)::bigint,
-    (select count(*) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id)::bigint,
-    (select round(avg(case when a.correct then 100 else 0 end), 0) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id)
-  from exam_debriefs d order by d.created_at desc limit 2000;
+    t.minutes::bigint, a.answered::bigint, a.accuracy
+  from d
+  join t on t.hub = d.hub and t.visitor_id = d.visitor_id
+  join a on a.hub = d.hub and a.visitor_id = d.visitor_id
+  order by d.created_at desc;
 end;
 $$;
 
