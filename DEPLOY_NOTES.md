@@ -124,6 +124,30 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (new hub: Special Patient Care, Claude Code)** — `hubs/special-patient-care/` for Dr. Mitchell's Special Patient
+  Care exam (Canvas, opens Fri Nov 6 12:00 am, due Fri Nov 13 11:59 pm; format not announced, so the bank is multiple choice,
+  true/false and matching, plus the two-statement and numbered-statement items the standing rules require). Sources (Drive:
+  Special Patient Care/hubs): the recorded lectures and handouts for the introduction, behavior guidance, Down syndrome, cerebral
+  palsy, syndromes and prevention; the autism module's pages (what is autism, characteristics, stimming, meltdowns, sensory
+  defensiveness, dental conditions, appointment prep, operatory, communication, the successful appointment, advanced treatment);
+  and the mental illness reading (SAID Module 9) with Dr. Mitchell's video introduction. No graded quiz or exam content used.
+  Eight units (`intro`, `behavior`, `down`, `cp`, `syndromes`, `autism`, `prevention`, `mental`), all `status:'taught'`. Built on
+  the Heme & Endo Exam 1 engine (Home first, why for every choice, retries, sync, drill) with a new palette ("Sparks": clinic teal
+  and coral; DM Serif Text / Source Sans 3 / JetBrains Mono). **No figures or animations** (Sam): `FIGS`/`ANIMA` are empty stubs,
+  no diagram review, and the arcade has no drawn art (lobby tiles are an icon and a word; the escape room uses the shared operatory
+  with this hub's labels and story). 452 questions (src `rec` / `module` / `reading`), each MCQ with a why for every choice written
+  inline (`mq(id, lec, src, stem, [[choice, why], ...], ex)`, so `QUESTION_WHY` is empty); per unit 5 two-statement, 8
+  true/false, 3 numbered-statement and 1-2 matching; correct answer longest in 34%; true/false 53% True; numbered keys 6/7/5/6.
+  Notes at two levels with Kokoro narration for all eight, 41 exam hints quoted from the recordings (plus the autism module's and
+  the reading's own notes), cram sheet, Review (each unit's note tables plus written ones, and a Side by side tab: Down syndrome vs
+  CP vs autism, look-alike pairs), a 50-question / 75-minute mock (`MOCK_BLUEPRINT`; no official counts), and the Sparks Arcade
+  (`SPC_SKIN`, `[data-sg-skin="spc"]`: Chairside Sort, Chart Showdown, Sparks After Hours, Say It Once, Sparks Superstar,
+  Cross-Check). Home counts down to the window opening, then to the due time (`EXAM_DATE`/`EXAM_END`); `SH_EXPORT.exams` and the
+  dashboard's `HUBS` use the due date, so the card archives itself at 10 pm on Nov 13. Dashboard `HUBS`/`CLASSES` (`spc`, on the
+  free `genetics` ring), `ARCADES`, `HUB_LABEL`/`HUB_RING`; `review/` and `tools/publish-recap.js` labels; `widget/ranks.js` name and
+  medal ribbons (the shared tooth emblem); `sw.js` -> `sh-v40`; About page (Home, arcade table). The build sources and script stay
+  in the session (the hub is a single file: edit it directly from here on). No schema change.
+
 - **2026-10-28 (admin Surveys tab: exam check-ins load the first time, Claude Code)** — Sam: the Surveys tab often said
   "Couldn't load exam check-ins (migration_v23)" and worked after a refresh. `get_exam_debriefs` hit the API's 3 s anon
   timeout on a cold load (~2.5 s warm): three subqueries per check-in, and `activity_pings` had no `(visitor_id, hub)` index.
