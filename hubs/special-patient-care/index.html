@@ -266,7 +266,8 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 #panel-arcade{background:var(--ar-bg);color:var(--ar-ink);margin:-16px -20px 0;padding:24px 20px 40px;min-height:70vh;border-radius:0 0 18px 18px;position:relative;overflow:hidden}
 #panel-arcade::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);background-size:22px 22px;pointer-events:none}
 .ar-wrap{position:relative;max-width:1060px;margin:0 auto}
-.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px;min-height:220px;padding:22px 24px;border-radius:18px;border:2px solid var(--ar-line);background:linear-gradient(90deg, var(--ar-bg) 0 26%, rgba(12,32,31,.5) 48%, transparent 66%), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)}
+@media (max-width: 760px){ .ar-hero{min-height:170px;padding:16px;background:linear-gradient(90deg, var(--ar-bg) 0 40%, rgba(12,32,31,.6) 70%, rgba(12,32,31,.3)), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)} }
 .ar-logo{font-family:var(--font-arcade);font-size:1.35rem;line-height:1.5;color:var(--ar-yellow);text-shadow:3px 3px 0 var(--ar-pink);margin:0}
 .ar-logo small{display:block;font-size:.55rem;color:var(--ar-dim);text-shadow:none;margin-top:6px;letter-spacing:.06em}
 .ar-stats{display:flex;gap:8px;flex-wrap:wrap}
@@ -4396,9 +4397,9 @@ var ARCADE = (function(){
   var GAMES = [
     { id:'sort',  name:'CHAIRSIDE SORT', color:'var(--ar-yellow)', desc:'Cards rain down. Fling each into the right bin before it hits the floor: active vs passive stabilization, Down syndrome vs CP, tantrum vs meltdown, tooth-safe drinks, and more.', thumb:function(){ return thumbTile('cards', 'SORT'); } },
     { id:'board', name:'CHART SHOWDOWN', color:'var(--ar-cyan)', desc:'A board of patient charts, one column per unit. Two Count to Ten wagers, then Final Consent. Answers count toward class stats.', thumb:function(){ return thumbTile('layers', '$500'); } },
-    { id:'escape', name:'SPARKS AFTER HOURS', color:'var(--ar-green)', desc:'Locked in the operatory after hours. Answer what locks the viewer, the consent form and the supply drawer, then find what the curing light shows. Six minutes.', thumb:function(){ return thumbTile('tooth', 'ESCAPE'); } },
+    { id:'escape', name:'SPARKS AFTER HOURS', color:'var(--ar-green)', desc:'Locked in the operatory after hours. Answer what locks the viewer, the consent form and the supply drawer, then find what the curing light shows. Six minutes.', thumb:function(){ return thumbImg('thumb-escape.webp'); } },
     { id:'cloze', name:'SAY IT ONCE', color:'var(--ar-pink)', desc:'Type the key term missing from a sentence in the notes, Anki cloze style, before the clock runs out.', thumb:function(){ return thumbTile('notes', 'CLOZE'); } },
-    { id:'smile', name:'SPARKS SUPERSTAR', color:'var(--ar-orange)', desc:'Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven. Answers count toward class stats.', thumb:function(){ return thumbTile('star', '$125K'); } },
+    { id:'smile', name:'SPARKS SUPERSTAR', color:'var(--ar-orange)', desc:'Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven. Answers count toward class stats.', thumb:function(){ return thumbImg('thumb-smile.webp'); } },
     { id:'cross', name:'CROSS-CHECK', color:'var(--ar-violet)', desc:'A fresh mini crossword every game, from the bank\'s one-word answers and the key terms in the notes.', thumb:function(){ return thumbTile('helix', 'ACROSS'); } }
   ];
 
@@ -4461,6 +4462,7 @@ var ARCADE = (function(){
   }
 
   /* ---------- lobby tiles: an icon and a word (no drawn art in this hub) ---------- */
+  function thumbImg(f){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="img/' + f + '" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
   function thumbTile(ic, word){ return '<span class="spc-thumb">' + icon(ic) + '<b>' + word + '</b></span>'; }
 
   /* ---------- fullscreen ---------- */
@@ -4597,7 +4599,7 @@ var ARCADE = (function(){
      tiles are restyled in CSS ([data-sg-skin="spc"]). Never copy another hub's skin. */
   var SPC_SKIN = {
     id:'spc',
-    smile:{ lips:'#ff8a6b', lipsDark:'#c4553c', gum:'#ffb59f', gold:'#ffd166', inside:'#0d2b29', winTitle:'Sparks Superstar!' },
+    smile:{ bg:'img/smile-stage.webp', lips:'#ff8a6b', lipsDark:'#c4553c', gum:'#ffb59f', gold:'#ffd166', inside:'#0d2b29', winTitle:'Sparks Superstar!' },
     board:{ dd:'Count to Ten', final:'Final Consent', start:'Open the chart',
       intro:'A quiz board: one column per unit, five charts each from <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Right adds the value, wrong takes it away. Two charts hide a <b>Count to Ten</b> where you set the wager, and <b>Final Consent</b> asks for one last bet on a hard one. Answers count toward class stats.' },
     cloze:{ start:'Say it once, then wait',
@@ -4616,6 +4618,20 @@ var ARCADE = (function(){
         poster:{ label:'Visual schedule', locked:'A visual schedule poster: brush, polish, count to ten, all done. A faint glossy streak runs across the bottom, like cured resin.' },
         sink:{ label:'Sink', text:'<p>The sink drips. A note taped to the mirror, in the hygienist\'s handwriting:</p><p class="sg-note">“Blue light finds resin. Check the schedule.”</p>' },
         door:{ label:'Operatory door', text:'A keypad with four colored slots. One digit for each color is hidden around the operatory.' }
+      },
+      /* the room is a painted backdrop (img/after-hours-escape.webp, 1280x714, drawn to 800x450); hotspots sit over the painted props */
+      scene:function(a){
+        var sv = a.solved, h = '<rect width="800" height="450" fill="#5f8f8a"/><image href="img/after-hours-escape.webp" x="0" y="0" width="800" height="450" preserveAspectRatio="none"/>';
+        h += a.spot('xray', 18, 96, 146, 104, sv.xray ? a.digit('xray', 156, 104, 14) :
+          '<rect x="33" y="105" width="120" height="83" rx="3" fill="#0b1b1a" opacity=".86"/><text x="93" y="144" text-anchor="middle" font-size="10" font-weight="800" fill="#8fb5b0" letter-spacing="1">PANORAMIC</text><text x="93" y="158" text-anchor="middle" font-size="10" font-weight="800" fill="#8fb5b0" letter-spacing="1">VIEWER OFF</text>');
+        h += '<g aria-hidden="true">' + a.hand(221, 85, 'x="219.5" y="62" width="3" height="25" rx="1.5" fill="#e8475f"') + '<circle cx="221" cy="85" r="3" fill="#e8475f"/></g>';
+        h += a.spot('poster', 434, 84, 148, 88, sv.poster ? '<rect x="441" y="91" width="134" height="74" rx="4" fill="#5aa9ff" opacity=".3"/><text x="508" y="164" text-anchor="middle" font-size="18" font-weight="900" fill="#2f6bff" stroke="#fff" stroke-width=".8">' + a.digitOf('poster') + '</text>' + a.digit('poster', 574, 92, 12) : '');
+        h += a.spot('door', 704, 82, 96, 312, '<rect class="sg-hit" x="668" y="218" width="36" height="48" rx="6"/>');
+        h += a.spot('sink', 584, 134, 82, 204, '');
+        h += a.spot('monitor', 108, 214, 94, 86, sv.monitor ? '<rect x="115" y="221" width="78" height="51" rx="2" fill="#0f3d2c" opacity=".92"/><text x="154" y="250" text-anchor="middle" font-size="10" font-weight="800" fill="#58f29a">CHART OPEN</text>' + a.digit('monitor', 192, 222, 12) : '');
+        h += a.spot('chart', 298, 186, 46, 66, sv.chart ? a.digit('chart', 340, 192, 12) : '');
+        h += a.spot('drawer', 396, 276, 190, 100, a.check('drawer', 540, 290));
+        return h;
       }
     }
   };

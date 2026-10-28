@@ -5609,21 +5609,14 @@ var ARCADE = (function(){
     return '<ol class="lb-list">' + top.map(row).join('') + (me ? '<li class="lb-gap">…</li>' + row(me) : '') + '</ol>';
   }
 
-  /* ---------- thumbnails: painted art in img/ (Mind the Pocket's is still drawn) ---------- */
+  /* ---------- thumbnails: painted art in img/ ---------- */
   function thumbImg(f){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="img/' + f + '" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
   function thumbCrusher(){ return thumbImg('thumb-crusher.webp'); }
   function thumbBoard(){ return thumbImg('thumb-board.webp'); }
   function thumbEscape(){ return thumbImg('thumb-escape.webp'); }
   function thumbSmile(){ return thumbImg('thumb-smile.webp'); }
   function thumbCross(){ return thumbImg('thumb-cross.webp'); }
-  function thumbGapP(P){
-    var marks = ''; for(var i=0;i<7;i++) marks += '<rect x="'+(126+i*17)+'" y="70" width="13" height="4" fill="#2b2140"/>' + (i<2 ? '<text x="'+(132+i*17)+'" y="66" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="#d61f69">'+'CE'[i]+'</text>' : '');
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/><rect x="18" y="20" width="284" height="80" rx="10" fill="#fffaf0"/>' +
-      '<rect x="32" y="40" width="200" height="6" rx="3" fill="#d8c9b4"/><rect x="32" y="62" width="86" height="6" rx="3" fill="#d8c9b4"/>'+marks+'<rect x="252" y="62" width="36" height="6" rx="3" fill="#d8c9b4"/><rect x="32" y="82" width="150" height="6" rx="3" fill="#d8c9b4"/>' +
-      '<g transform="translate(20 124)"><rect width="250" height="14" rx="3" fill="#c9d3dc"/><rect x="58" width="25" height="14" fill="#2b2140"/><rect x="140" width="25" height="14" fill="#2b2140"/><rect x="225" width="25" height="14" fill="#2b2140"/><path d="M250 7h34l8-4" stroke="#8b97a3" stroke-width="5" fill="none" stroke-linecap="round"/></g></svg>';
-  }
-  var THUMB_P = { bg:'#19344F', panel:'#122840', ink:'#F2F8FF', dim:'#9CB3C8', a1:'#FFD84D', a2:'#FF6FA3', a3:'#43E0AC', a4:'#254A68' };
-  function thumbGap(){ return thumbGapP(THUMB_P); }
+  function thumbGap(){ return thumbImg('thumb-gap.webp'); }
 
   /* ---------- fullscreen ---------- */
   function fsEl(){ return document.fullscreenElement || document.webkitFullscreenElement; }

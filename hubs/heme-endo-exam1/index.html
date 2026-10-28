@@ -279,7 +279,8 @@ mark{background:var(--caution-soft);color:inherit;border-radius:3px;padding:0 2p
 #panel-arcade{background:var(--ar-bg);color:var(--ar-ink);margin:-16px -20px 0;padding:24px 20px 40px;min-height:70vh;border-radius:0 0 18px 18px;position:relative;overflow:hidden}
 #panel-arcade::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);background-size:22px 22px;pointer-events:none}
 .ar-wrap{position:relative;max-width:1060px;margin:0 auto}
-.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ar-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px;min-height:220px;padding:22px 24px;border-radius:18px;border:2px solid var(--ar-line);background:linear-gradient(90deg, var(--ar-bg) 0 26%, transparent 66%), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)}
+@media (max-width: 760px){ .ar-hero{min-height:170px;padding:16px;background:linear-gradient(90deg, var(--ar-bg) 0 40%, transparent 85%), url(img/arcade-hero.webp) right center/auto 100% no-repeat, var(--ar-bg)} }
 .ar-logo{font-family:var(--font-arcade);font-size:1.35rem;line-height:1.5;color:var(--ar-yellow);text-shadow:3px 3px 0 var(--ar-pink);margin:0}
 .ar-logo small{display:block;font-size:.55rem;color:var(--ar-dim);text-shadow:none;margin-top:6px;letter-spacing:.06em}
 .ar-stats{display:flex;gap:8px;flex-wrap:wrap}
@@ -515,6 +516,11 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .pbox dl{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:4px 14px;margin:0;font-size:.9rem}
 .pbox dt{font-weight:700;color:var(--ink-soft)}
 .pbox dd{margin:0;color:var(--ink)}
+.pimg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:10px 0 4px}
+.pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
+.pimg figcaption{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;line-height:1.3}
+.pimg img{display:block;width:100%;height:auto;max-width:520px;margin:0 auto;border-radius:6px}
+.pimg-note{font-size:.72rem;color:var(--ink-soft);margin-top:2px}
 @media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
 .qcard-choice.is-selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .qcard-choice.is-missed-right{border-color:var(--good);border-style:dashed}
@@ -1904,7 +1910,22 @@ var ANIMA = (function(){
 var CUSP_GAME = { mount:function(){} };
 function cuspMapHTML(){ return ''; }
 function wireCuspMaps(){}
-function caseImgHTML(){ return ''; }
+/* Painted patient pictures for Patient Box cases (Sam's Argon art, 2026-10-28). A question lists keys in pimg:[...]; each
+   picture shows only findings its box already lists, so it never gives the answer away. */
+var CASE_IMG = {
+  addison: { f:'case-addison-gums.webp', kind:'Intraoral view', title:'Attached gingiva',
+    alt:'Lips held back with retractors: patchy brown-black pigmentation on the attached gingiva above and below the front teeth; the gum margins are not swollen.' },
+  acro: { f:'case-acromegaly.webp', kind:'Clinical photos', title:'Face and hands',
+    alt:'Left: a middle-aged man with a heavy brow ridge, coarse features, a large lower jaw and gaps between his front teeth. Right: his broad, thick hand with a tight ring, beside an average-sized hand.' },
+  cushing: { f:'case-cushingoid.webp', kind:'Clinical photos', title:'Face, trunk and forearm',
+    alt:'Left: a woman with a round, flushed face and central obesity. Right: her forearm, with thin, shiny skin and several purple bruises.' }
+};
+function caseImgHTML(q){
+  if(!q.pimg) return '';
+  return '<div class="pimg-grid">' + q.pimg.map(function(k){ var c = CASE_IMG[k]; if(!c) return '';
+    return '<figure class="pimg"><figcaption><b>' + escHtml(c.kind) + '</b> · ' + escHtml(c.title) + '</figcaption><img src="img/' + c.f + '" alt="' + escHtml(c.alt) + '" width="1000" height="746" loading="lazy"></figure>'; }).join('') +
+    '</div><div class="pimg-note">Illustration made for this hub to show the findings; not a patient image.</div>';
+}
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order, except two-statement, true/false and
@@ -2364,7 +2385,7 @@ mcq("gr-giant", "growth", "slides", "GH excess that begins before the epiphyses 
   "Gigantism = GH excess before epiphyseal closure (excessive linear growth). Acromegaly = after closure (bones thicken).");
 mcq("gr-acro-dental", "growth", "slides", "An adult dental patient's lower jaw, brow ridge and hands have enlarged over years; he sweats a lot and was recently diagnosed with diabetes. The most likely cause is:",
   ["A GH-secreting somatotroph adenoma (acromegaly)","A GH receptor defect that blocks IGF-1 production in the liver","Excess prolactin","Primary hypothyroidism"],
-  "Acromegaly: after the plates close, GH excess thickens bone (periosteal growth): brow ridge, lower jaw, hands and feet; soft tissue grows; sweating, carpal tunnel and insulin resistance. Usually a benign, slow-growing somatotroph adenoma.", {"pbox":[["Patient","46-year-old man"],["History","Rings and shoes no longer fit; new diagnosis of diabetes; heavy sweating"],["Exam","Prominent brow ridge, enlarged lower jaw with new spacing between teeth, large hands"]]});
+  "Acromegaly: after the plates close, GH excess thickens bone (periosteal growth): brow ridge, lower jaw, hands and feet; soft tissue grows; sweating, carpal tunnel and insulin resistance. Usually a benign, slow-growing somatotroph adenoma.", {"pimg":["acro"],"pbox":[["Patient","46-year-old man"],["History","Rings and shoes no longer fit; new diagnosis of diabetes; heavy sweating"],["Exam","Prominent brow ridge, enlarged lower jaw with new spacing between teeth, large hands"]]});
 mcq("gr-acro-test", "growth", "slides", "Which tests confirm acromegaly?",
   ["Serum IGF levels plus a glucose tolerance test","A single random serum GH level drawn in the afternoon","Serum cortisol at 8 am","Serum TSH and free T4"],
   "The slide: \"Way to test: serum IGF levels + glucose tolerance test.\" GH is pulsatile, so one random GH value is unreliable.");
@@ -2989,7 +3010,7 @@ mcq("ad-addison-acth", "adrenal", "rec", "In Addison's disease, what happens to 
   "Autoimmune destruction of the cortex removes cortisol; without negative feedback the pituitary drives ACTH high. \"Just one high. Thank you, brave soul. She's correct.\"");
 mcq("ad-addison-gums", "adrenal", "rec", "A dental patient has new dark patches on the gums, fatigue, low blood pressure and low blood glucose. Which is most likely?",
   ["Addison's disease","Cushing's syndrome","Primary aldosteronism","Graves disease"],
-  "Hyperpigmentation of skin and mucosa (often the gums) from high ACTH and MSH can precede other Addison's symptoms by months to years. Low cortisol → hypoglycemia; mineralocorticoid loss → low BP.", {"pbox":[["Patient","38-year-old woman"],["Chief complaint","\"I'm always tired, and I get dizzy when I stand\""],["Oral exam","New brown-black patches on the attached gingiva"],["Vitals and labs","BP 92/58; fasting glucose low"]]});
+  "Hyperpigmentation of skin and mucosa (often the gums) from high ACTH and MSH can precede other Addison's symptoms by months to years. Low cortisol → hypoglycemia; mineralocorticoid loss → low BP.", {"pimg":["addison"],"pbox":[["Patient","38-year-old woman"],["Chief complaint","\"I'm always tired, and I get dizzy when I stand\""],["Oral exam","New brown-black patches on the attached gingiva"],["Vitals and labs","BP 92/58; fasting glucose low"]]});
 mcq("ad-cushing-disease", "adrenal", "rec", "Cushing's DISEASE specifically means cortisol excess caused by:",
   ["A pituitary adenoma secreting ACTH","An adrenal cortical adenoma","Long-term glucocorticoid medication","An aldosterone-secreting tumor"],
   "Cushing's disease is the ACTH-dependent form from a pituitary tumor. Cushing syndrome is the broader picture of prolonged high cortisol from any cause (adrenal tumor, ectopic ACTH, exogenous steroids).");
@@ -3112,7 +3133,7 @@ mcq("cs-addison-fludro", "steroids", "class", "A woman with Addison's disease, s
   "She lacks mineralocorticoid: low sodium, high potassium, low BP. Add a steroid with potent mineralocorticoid and minimal glucocorticoid activity: fludrocortisone.", {"pbox":[["Patient","28-year-old woman with primary adrenal insufficiency"],["Current drug","Hydrocortisone, adequate dose"],["Symptoms","Postural dizziness, salt craving, low blood pressure"],["Labs","Na+ 128 mmol/L (low); K+ 5.8 mmol/L (high)"]]});
 mcq("cs-asthma-bone", "steroids", "class", "After 8 months of oral prednisone for severe asthma, a 52-year-old woman has central obesity, moon face, thin forearm skin and a vertebral compression fracture after minor trauma. Which adverse effect explains the fracture?",
   ["Osteoporosis from inhibited bone formation","Weight loss from catabolism","Hypoglycemia from impaired gluconeogenesis","Increased muscle mass from anabolism"],
-  "Long-term glucocorticoids cause osteoporosis (watch for it especially in older patients). The other choices run opposite to steroid effects: steroids cause weight gain, hyperglycemia and muscle loss.", {"pbox":[["Patient","52-year-old woman"],["History","Severe asthma; oral prednisone 20-40 mg daily for 8 months"],["Complaint","Chronic back pain; vertebral compression fracture after minor trauma"],["Exam","Central obesity, moon face, thin skin on the forearms"]]});
+  "Long-term glucocorticoids cause osteoporosis (watch for it especially in older patients). The other choices run opposite to steroid effects: steroids cause weight gain, hyperglycemia and muscle loss.", {"pimg":["cushing"],"pbox":[["Patient","52-year-old woman"],["History","Severe asthma; oral prednisone 20-40 mg daily for 8 months"],["Complaint","Chronic back pain; vertebral compression fracture after minor trauma"],["Exam","Central obesity, moon face, thin skin on the forearms"]]});
 mcq("cs-pred-potency", "steroids", "rec", "Compared with cortisol, prednisone has about how much anti-inflammatory activity?",
   ["About 4 times","About the same","About 30 times","About 250 times"],
   "Prednisone: about 4 times cortisol's anti-inflammatory activity with weak salt retention. Dexamethasone about 30 times. Fludrocortisone's salt-retaining activity is about 250 times.");
@@ -5836,14 +5857,8 @@ var ARCADE = (function(){
       '<path d="M262 132v-14l-10-10M262 118l10-10" stroke="' + HE.pink + '" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="246" y="132" width="32" height="20" rx="4" fill="' + HE.pink + '" opacity=".5"/>' +
       '<rect x="18" y="114" width="200" height="38" rx="9" fill="' + HE.bg + '" stroke="' + HE.pink + '" stroke-width="3"/><text x="32" y="139" font-family="monospace" font-size="15" fill="' + HE.ink + '">glut</text><rect x="72" y="124" width="3" height="20" fill="' + HE.pink + '"/>');
   }
-  function thumbEscape(){
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#ead9ee"/><rect y="138" width="320" height="32" fill="#8d7299"/>' +
-      '<rect x="20" y="96" width="76" height="42" fill="#b9a3c4" stroke="#4a2a63" stroke-width="2"/><path d="M40 96c0-28 8-40 26-46" stroke="#4a2a63" stroke-width="7" fill="none" stroke-linecap="round"/><rect x="50" y="34" width="12" height="26" rx="3" fill="#4a2a63" transform="rotate(-20 56 47)"/><rect x="36" y="86" width="50" height="8" rx="2" fill="#4a2a63"/>' +
-      '<circle cx="60" cy="28" r="20" fill="#f6d8e6" stroke="#4a2a63" stroke-width="2"/>' + blob(58, 26, .9, '#7a4fb0') + '<circle cx="66" cy="20" r="3" fill="#7a4fb0"/>' +
-      '<rect x="118" y="20" width="96" height="74" rx="4" fill="#c49a6c" stroke="#7c5a39" stroke-width="3"/><rect x="134" y="30" width="64" height="54" fill="#fbf7ee"/><text x="166" y="70" text-anchor="middle" font-family="sans-serif" font-size="30" font-weight="900" fill="' + HE.blue + '">4</text><circle cx="140" cy="32" r="3" fill="#e8475f"/>' +
-      '<rect x="244" y="20" width="62" height="118" fill="#6b4f86" stroke="#3a2650" stroke-width="3"/><circle cx="275" cy="54" r="14" fill="#c9e3ee" stroke="#3a2650" stroke-width="3"/><rect x="250" y="6" width="50" height="13" rx="3" fill="#163b2a"/><text x="275" y="16" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="900" fill="#58f29a">EXIT</text>' +
-      '<rect x="284" y="78" width="16" height="26" rx="3" fill="#2c1a42"/>' + ['#4FB6F0','#FF6FA3','#FFC93C','#3DD39B'].map(function(c, i){ return '<circle cx="' + (288 + (i % 2) * 8) + '" cy="' + (85 + Math.floor(i / 2) * 9) + '" r="3" fill="' + c + '"/>'; }).join('') + '</svg>';
-  }
+  function thumbImg(f){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="img/' + f + '" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
+  function thumbEscape(){ return thumbImg('thumb-escape.webp'); }
   /* the Golden Gland's marquee picture: a thyroid that turns gold from rung 6 (games.js draws it via skin.smile.art) */
   function glandSVG(gold){
     var f = gold ? HE.gold : '#e86a9e', s = gold ? '#a77a08' : '#9c2f63';
@@ -5854,11 +5869,7 @@ var ARCADE = (function(){
       [[70,60],[86,82],[64,88],[170,60],[154,82],[176,88]].map(function(p){ return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="none" stroke="' + s + '" stroke-width="2" opacity=".55"/>'; }).join('') +
       (gold ? '<path class="sg-spark" d="M196 14l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="' + HE.gold + '" stroke="#fff" stroke-width="1"/><circle class="sg-spark" cx="40" cy="22" r="3" fill="#fff"/>' : '') + '</svg>';
   }
-  function thumbSmile(){
-    var lad = ''; ['$125K','$64K','$32K','$16K','$8K'].forEach(function(t, k){ lad += (k === 2 ? '<rect x="226" y="' + (22 + k * 22) + '" width="80" height="18" fill="#ffa75a"/>' : '') + '<text x="300" y="' + (36 + k * 22) + '" text-anchor="end" font-family="monospace" font-size="12" font-weight="700" fill="' + (k === 2 ? HE.panel : k < 2 ? HE.gold : HE.dim) + '">' + t + '</text>'; });
-    var bulbs = ''; for(var i = 0; i < 13; i++) bulbs += '<circle cx="' + (22 + i * 15) + '" cy="16" r="3" fill="' + (i % 2 ? HE.gold : '#ffa75a') + '"/><circle cx="' + (22 + i * 15) + '" cy="154" r="3" fill="' + (i % 2 ? '#ffa75a' : HE.gold) + '"/>';
-    return svgWrap('<rect x="10" y="8" width="208" height="154" rx="6" fill="' + HE.panel + '" stroke="' + HE.gold + '" stroke-width="2"/>' + bulbs + '<g transform="translate(26 26) scale(.73)">' + glandSVG(true).replace('<svg class="ms-grin" viewBox="0 0 240 120" aria-hidden="true">', '').replace('</svg>', '') + '</g>' + lad);
-  }
+  function thumbSmile(){ return thumbImg('thumb-smile.webp'); }
   function thumbCross(){
     var h = '', cells = { '1,1':'I','2,1':'N','3,1':'S','4,1':'U','5,1':'L','6,1':'I','7,1':'N','3,0':'T','3,2':'H','7,2':'I','7,3':'S' };
     Object.keys(cells).forEach(function(k){ var c = k.split(','), x = 30 + (+c[0]) * 28, y = 18 + (+c[1]) * 28;
@@ -6000,7 +6011,7 @@ var ARCADE = (function(){
      slides stained purple or pink; a thyroid that turns gold on the quiz ladder. Never copy another hub's skin. */
   var ENDO_SKIN = {
     id:'endo',
-    smile:{ lips:'#ff6fae', lipsDark:'#c2407e', gum:'#ffa8cf', gold:'#ffd23f', inside:'#2a1036', art:glandSVG, winTitle:'The Golden Gland!' },
+    smile:{ bg:'img/smile-stage.webp', lips:'#ff6fae', lipsDark:'#c2407e', gum:'#ffa8cf', gold:'#ffd23f', inside:'#2a1036', art:glandSVG, winTitle:'The Golden Gland!' },
     board:{ dd:'Hormone Surge', final:'Final Feedback', start:'Load the slides',
       intro:'A quiz board: one column per lecture, five glass slides each from <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Right stains the slide purple and adds its value; wrong stains it pink and takes it away. Two slides hide a <b>Hormone Surge</b> where you set the wager, and <b>Final Feedback</b> lets you bet everything on one hard question.' },
     cloze:{ start:'Bind the first one',
@@ -6020,53 +6031,18 @@ var ARCADE = (function(){
         sink:{ label:'Eyewash sink', text:'<p>The eyewash sink drips. A sticky note on the mirror, in somebody\'s lab handwriting:</p><p class="sg-note">“Iodine finds starch. Check the corkboard.”</p>' },
         door:{ label:'Lab door', text:'A keypad with four colored slots. One digit for each color is hidden around the lab.' }
       },
+      /* the room is a painted backdrop (img/lab-escape.webp, 1280x714, drawn to 800x450); hotspots sit over the painted props */
       scene:function(a){
-        var sv = a.solved, h = '';
-        /* room: blush wall, tile line, floor */
-        h += '<rect width="800" height="450" fill="#efe3f1"/><rect y="0" width="800" height="16" fill="#dcc8e2"/><rect y="236" width="800" height="4" fill="#dcc8e2"/>' +
-          '<rect y="372" width="800" height="78" fill="#8d7299"/><path d="M0 372H800" stroke="#6b5278" stroke-width="4"/>' + [70, 190, 310, 430, 550, 670].map(function(x){ return '<path d="M' + x + ' 372L' + (x - 40) + ' 450" stroke="#7a6387" stroke-width="2"/>'; }).join('');
-        /* clock */
-        h += '<g aria-hidden="true"><circle cx="262" cy="62" r="27" fill="#fffaf6" stroke="#3a2650" stroke-width="5"/>' + [0, 1, 2, 3].map(function(i){ return '<rect x="260" y="38" width="4" height="7" fill="#3a2650" transform="rotate(' + (i * 90) + ' 262 62)"/>'; }).join('') +
-          a.hand(262, 62, 'x="260" y="42" width="4" height="22" rx="2" fill="#e8475f"') + '<circle cx="262" cy="62" r="4" fill="#3a2650"/></g>';
-        /* shelf of reagent bottles (decor) */
-        h += '<g aria-hidden="true"><rect x="488" y="116" width="128" height="8" rx="2" fill="#9b7a5a"/>' + [[498, '#7a4fb0'], [526, '#e86a9e'], [554, '#c49a2c'], [584, '#4a8fb0']].map(function(b){ return '<rect x="' + b[0] + '" y="86" width="20" height="30" rx="4" fill="' + b[1] + '" opacity=".85"/><rect x="' + (b[0] + 6) + '" y="78" width="8" height="9" fill="#3a2650"/>'; }).join('') + '</g>';
-        /* microscope on a cart (view box spot) */
-        h += '<g aria-hidden="true"><rect x="44" y="250" width="146" height="10" rx="3" fill="#6b5278"/><rect x="52" y="260" width="8" height="112" fill="#6b5278"/><rect x="174" y="260" width="8" height="112" fill="#6b5278"/><rect x="52" y="330" width="130" height="6" fill="#6b5278"/></g>';
-        h += a.spot('xray', 40, 30, 156, 222, '<rect x="70" y="232" width="92" height="18" rx="5" fill="#3a2650"/><path d="M96 232c-6-40 4-70 34-84" stroke="#3a2650" stroke-width="13" fill="none" stroke-linecap="round"/>' +
-          '<rect x="112" y="128" width="20" height="40" rx="4" fill="#3a2650" transform="rotate(-24 122 148)"/><rect x="128" y="168" width="14" height="22" rx="3" fill="#5b3d78"/><rect x="104" y="196" width="66" height="8" rx="2" fill="#3a2650"/><rect x="118" y="190" width="38" height="6" fill="#d7eef4" stroke="#3a2650" stroke-width="1.5"/>' +
-          (sv.xray ? '<circle cx="96" cy="78" r="44" fill="#f6d8e6" stroke="#3a2650" stroke-width="4"/><path d="M60 70c10-16 34-20 50-8s30 6 34 22-24 32-46 28-46-24-38-42z" fill="#f0b3cf"/>' +
-              [[78, 70], [92, 92], [108, 66], [116, 88], [74, 96], [100, 78]].map(function(p){ return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="5" fill="#6b3fa0"/>'; }).join('') + '<path d="M122 112l16 18" stroke="#3a2650" stroke-width="4"/>' + a.digit('xray', 134, 46, 15)
-            : '<rect x="74" y="238" width="54" height="8" rx="2" fill="#5b3d78"/><text x="101" y="245" text-anchor="middle" font-size="7" font-weight="800" fill="#d9c7e6">LAMP OFF</text>'));
-        /* corkboard with starch paper (the "poster" spot) */
-        h += a.spot('poster', 324, 30, 152, 140, '<rect x="330" y="36" width="140" height="128" rx="4" fill="#c49a6c" stroke="#7c5a39" stroke-width="4"/>' +
-          '<rect x="356" y="48" width="88" height="104" fill="#fbf7ee"/><circle cx="364" cy="54" r="4" fill="#e8475f"/><circle cx="436" cy="54" r="4" fill="#e8475f"/>' +
-          '<rect x="340" y="120" width="14" height="18" fill="#ffe680" transform="rotate(-8 347 129)"/>' +
-          (sv.poster ? '<rect x="356" y="48" width="88" height="104" fill="#1d2a6b" opacity=".12"/><path d="M372 70h56M372 132h56" stroke="#1d2a6b" stroke-width="3" opacity=".7"/>' + a.digit('poster', 400, 101, 22)
-            : '<path d="M372 70h56M372 132h56" stroke="#e8dfc8" stroke-width="3"/>'));
-        /* the lab door with a porthole and the keypad */
-        h += a.spot('door', 636, 36, 148, 340, '<rect x="676" y="42" width="72" height="24" rx="4" fill="#163b2a"/><text x="712" y="60" text-anchor="middle" font-size="15" font-weight="900" fill="#58f29a">EXIT</text>' +
-          '<rect x="650" y="74" width="122" height="298" fill="#6b4f86" stroke="#3a2650" stroke-width="5"/><circle cx="711" cy="134" r="30" fill="#c9e3ee" stroke="#3a2650" stroke-width="6"/><path d="M694 122l20-12M700 140l26-16" stroke="#fff" stroke-width="4" opacity=".6"/>' +
-          '<rect x="668" y="200" width="70" height="26" rx="3" fill="#fbf2fa"/><text x="703" y="217" text-anchor="middle" font-size="11" font-weight="900" fill="#3a2650">ENDO LAB</text>' +
-          '<rect x="728" y="240" width="34" height="50" rx="5" fill="#2c1a42"/>' + a.keypad(735, 252, 20, 18, 6) + '<circle cx="745" cy="306" r="7" fill="#e3c26a" stroke="#3a2650" stroke-width="2"/>');
-        /* the bench */
-        h += '<g aria-hidden="true"><rect x="204" y="262" width="420" height="110" fill="#d9cbe2" stroke="#6b5278" stroke-width="4"/><rect x="196" y="252" width="436" height="14" rx="3" fill="#4a3360"/>' +
-          '<rect x="214" y="330" width="96" height="36" fill="none" stroke="#a991b6" stroke-width="3"/><rect x="318" y="330" width="96" height="36" fill="none" stroke="#a991b6" stroke-width="3"/><rect x="256" y="346" width="12" height="4" rx="2" fill="#6b5278"/><rect x="360" y="346" width="12" height="4" rx="2" fill="#6b5278"/>' +
-          /* test tube rack */
-          '<rect x="464" y="232" width="62" height="20" rx="3" fill="#9b7a5a"/>' + [470, 484, 498, 512].map(function(x, i){ return '<rect x="' + x + '" y="200" width="9" height="38" rx="4" fill="' + ['#f0b3cf', '#b49ae0', '#f5d36b', '#9fd3e6'][i] + '" stroke="#6b5278" stroke-width="1.5"/>'; }).join('') + '</g>';
-        /* lab analyzer (the computer) */
-        h += a.spot('monitor', 210, 160, 140, 94, '<rect x="216" y="166" width="128" height="86" rx="6" fill="#3a2650"/><rect x="226" y="176" width="108" height="56" rx="3" fill="' + (sv.monitor ? '#0f3d2c' : '#120a1e') + '"/><rect x="236" y="238" width="34" height="8" rx="2" fill="#b49ae0"/><circle cx="318" cy="242" r="5" fill="#58f29a"/>' +
-          (sv.monitor ? '<text x="270" y="200" text-anchor="middle" font-size="11" font-weight="800" fill="#58f29a">ACCESS OK</text>' + a.digit('monitor', 312, 214, 13)
-            : '<text x="280" y="196" text-anchor="middle" font-size="10" font-weight="700" fill="#c9a8ff">LOCKED</text><rect x="244" y="206" width="72" height="14" rx="3" fill="#24163a" stroke="#c9a8ff" stroke-width="1.5"/><text x="250" y="217" font-size="10" fill="#c9a8ff">••••_</text>'));
-        /* lab report clipboard */
-        h += a.spot('chart', 364, 196, 82, 60, '<g transform="rotate(-6 404 226)"><rect x="372" y="202" width="62" height="50" rx="4" fill="#a87b4f"/><rect x="377" y="207" width="52" height="42" fill="#fff"/><rect x="394" y="198" width="18" height="8" rx="2" fill="#6b5278"/>' +
-          '<text x="382" y="219" font-size="7" font-weight="800" fill="#4a3360">TSH</text><text x="382" y="230" font-size="7" font-weight="800" fill="#4a3360">FT4</text><text x="382" y="241" font-size="7" font-weight="800" fill="#4a3360">CORT</text><rect x="404" y="214" width="20" height="3" fill="#c7b6d2"/><rect x="404" y="225" width="16" height="3" fill="#c7b6d2"/><rect x="404" y="236" width="22" height="3" fill="#c7b6d2"/></g>' +
-          (sv.chart ? a.digit('chart', 440, 204, 13) : '<rect x="418" y="232" width="20" height="16" fill="#ffe680" transform="rotate(8 428 240)"/>'));
-        /* eyewash sink */
-        h += a.spot('sink', 548, 196, 72, 60, '<path d="M558 252h52l-5-12h-42z" fill="#d7e2e8" stroke="#4a3360" stroke-width="3"/><path d="M584 240v-28h14v8" stroke="#6b5278" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="604" cy="222" r="5" fill="#3DD39B" stroke="#4a3360" stroke-width="2"/>' +
-          '<rect x="556" y="204" width="18" height="16" fill="#ffe680" transform="rotate(-10 565 212)"/>');
-        /* reagent drawer in the bench front */
-        h += a.spot('drawer', 420, 280, 196, 44, '<rect x="428" y="284" width="180" height="36" fill="' + (sv.drawer ? '#cbb8d8' : '#f3ecf6') + '" stroke="#a991b6" stroke-width="3"/><rect x="508" y="299" width="24" height="5" rx="2" fill="#6b5278"/>' +
-          '<text x="446" y="306" font-size="9" font-weight="800" fill="#6b5278">REAGENTS</text>' + (sv.drawer ? '' : a.padlock(584, 296)) + a.check('drawer', 600, 284));
+        var sv = a.solved, h = '<rect width="800" height="450" fill="#e8d8ec"/><image href="img/lab-escape.webp" x="0" y="0" width="800" height="450" preserveAspectRatio="none"/>';
+        h += a.spot('xray', 50, 160, 112, 124, sv.xray ? '<circle cx="104" cy="234" r="9" fill="#fff6b0" opacity=".9"/>' + a.digit('xray', 152, 168, 13) :
+          '<rect x="58" y="262" width="94" height="17" rx="4" fill="#221a2c" opacity=".86"/><text x="105" y="274" text-anchor="middle" font-size="9" font-weight="800" fill="#c9b8d8" letter-spacing="1">LAMP OFF</text>');
+        h += '<g aria-hidden="true">' + a.hand(129, 76, 'x="127.5" y="50" width="3" height="27" rx="1.5" fill="#e8475f"') + '<circle cx="129" cy="76" r="3" fill="#e8475f"/></g>';
+        h += a.spot('poster', 552, 48, 128, 102, sv.poster ? '<text x="592" y="110" text-anchor="middle" font-size="24" font-weight="900" fill="#1d1a4a" stroke="#fff" stroke-width=".6">' + a.digitOf('poster') + '</text>' + a.digit('poster', 670, 56, 12) : '');
+        h += a.spot('door', 734, 46, 66, 346, '<rect class="sg-hit" x="748" y="228" width="30" height="54" rx="6"/>');
+        h += a.spot('sink', 608, 156, 82, 178, '');
+        h += a.spot('monitor', 194, 176, 108, 98, sv.monitor ? '<rect x="210" y="182" width="62" height="51" rx="2" fill="#0f3d2c" opacity=".92"/><text x="241" y="211" text-anchor="middle" font-size="9" font-weight="800" fill="#58f29a">REPORT OPEN</text>' + a.digit('monitor', 292, 182, 12) : '');
+        h += a.spot('chart', 358, 186, 64, 82, sv.chart ? a.digit('chart', 416, 192, 12) : '');
+        h += a.spot('drawer', 428, 246, 176, 134, a.check('drawer', 590, 256));
         return h;
       }
     }
