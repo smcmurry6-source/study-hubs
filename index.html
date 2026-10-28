@@ -770,7 +770,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   };
   var HUBS = [
     { id:"special-patient-care", cls:"spc", title:"Special Patient Care Hub", code:"Special Patient Care",
-      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care" } ], updated:"2026-10-28",
+      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinHour:24, promptHour:24 } ], updated:"2026-10-28",
       desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Nov 6 to Nov 13. Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a mock exam, review tables and the Sparks Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
@@ -809,7 +809,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
-     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm); checkinClosed:true ends its check-in early (button and pop-up). Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up). Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [

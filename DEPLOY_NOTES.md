@@ -124,6 +124,10 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (Special Patient Care check-in waits for the exam to close, Claude Code)** — Sam: no check-in until the exam
+  closes. The exam is due Fri Nov 13 at 11:59 pm, so its `HUBS` entry sets `checkinHour:24, promptHour:24` (`setHours(24)` = midnight
+  starting Sat Nov 14): no "Check in" button at 8 am and no pop-up at 10 pm on the due date. No hub file changed. No schema change.
+
 - **2026-10-28 (new hub: Special Patient Care, Claude Code)** — `hubs/special-patient-care/` for Dr. Mitchell's Special Patient
   Care exam (Canvas, opens Fri Nov 6 12:00 am, due Fri Nov 13 11:59 pm; format not announced, so the bank is multiple choice,
   true/false and matching, plus the two-statement and numbered-statement items the standing rules require). Sources (Drive:
