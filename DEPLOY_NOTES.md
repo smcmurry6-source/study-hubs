@@ -130,6 +130,24 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 night (Timmy Time: Heme & Endo Exam 1 episode, and a /podcast skill, Claude Code)** — A 53-minute last-minute
+  review for Exam 1 (Fri Oct 30, 8:00 am), hosted by Timmy Tooth: `hubs/heme-endo-exam1/audio/timmy-time.mp3` (38 MB,
+  -16 LUFS), script `tools/podcast/heme-endo-exam1/script.md`, written from the hub's notes (As taught), exam hints, cram
+  sheet, `LIKELY_TOPICS` and the 10/28 review items, gland by gland (signals and feedback, pituitary, growth, thyroid in two
+  parts, thyroid drugs, pancreas, adrenal, corticosteroids, calcium), with time weighted by the official counts and a
+  34-question lightning round. No quiz content (Quizzes 1-2 are open until 10/29). Lore (Sam picked all four): his four
+  Halloween costumes, one per page load (as `widget/pet.js` does); a neighbor, number thirty-one, the hypochondriac second
+  molar; TIMMY as a fight-or-flight surge with no adrenal medulla; enamel isn't a calcium bank. `lexicon.json` gains 105
+  endocrine words (hormones, drugs, eponyms, `GLUT`, `JAK`, `D-H-E-A`, `zona`). Every segment was transcribed back with
+  faster-whisper and diffed against the script (it caught "It isn't" heard as "it is an" and a run-together
+  "beta-endorphin"). Hub: `window.SH_PODCAST` (id `exam1-review`), the episode card on **Home** under the quick-start row,
+  a Timmy Time link in Home's "Also here", `#timmy` opens Home; dashboard card gets `podcast` and "Timmy Time" in modes;
+  About page updated. **New for every episode:** `tools/podcast/LORE.md` (the canon: read it, add to it),
+  `tools/podcast/extract_hub.js` (a hub's notes, hints, cram and exam facts as text; works on every live hub, perio
+  included), `render_podcast.py --words` (hard words and heteronyms in context), and the **`/podcast` skill**
+  (`.claude/skills/podcast/SKILL.md`): ask Sam the length and lore, write, fix pronunciations, render, wire in, verify, PR.
+  **When the notes change, fix the script and rebuild the episode in the same PR.** No schema change.
+
 - **2026-10-28 evening (device-link prompt streamlined, Claude Code)** — The "Is this your other device?" prompt linked nobody in its
   first week (2 "Yes", 0 links). `widget/linkask.js`: "Yes, link them" now makes the code at once (no make-or-enter choice) and offers
   **Send the link** (share sheet) / **Copy the link**: `<site>/?link=CODE` opens a "Link this device?" card on the other device and

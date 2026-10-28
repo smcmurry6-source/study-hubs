@@ -7,16 +7,22 @@ In the site it's played by `widget/podcast.js` (a hub opts in with `window.SH_PO
 tools/podcast/
   render_podcast.py   script -> per-segment voice stems (kokoro-onnx), with lexicon.json for hard words
   produce.py          stems -> finished mp3: voice chain, music, ducking, stingers, loudness; writes <out>.json (chapters)
-  lexicon.json        exact Kokoro phonemes for drug/anatomy words espeak gets wrong
-  <hub>/script.md     one episode's script (msk-exam4, occlusion)
+  lexicon.json        exact Kokoro phonemes for drug/anatomy/hormone words espeak gets wrong
+  extract_hub.js      a hub's notes, exam facts, hints, cram sheet and likely topics as plain text, to write from
+  LORE.md             Timmy Tooth's canon: read it before writing, add to it after
+  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1)
 ```
+
+The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.claude/skills/podcast/SKILL.md`).
 
 ## Build an episode
 
 ```bash
 pip install kokoro-onnx soundfile scipy         # plus ffmpeg on PATH
 # Kokoro model in /tmp/kokoro (see CLAUDE.md, "Text and audio must never drift")
-python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # read the phonemes first
+node tools/podcast/extract_hub.js hubs/msk-exam4/index.html /tmp/src                   # the material to write from
+python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --words        # hard words + heteronyms
+python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # every paragraph's phonemes
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md /tmp/stems     # ~10 min on 4 CPUs
 python tools/podcast/produce.py /tmp/stems hubs/msk-exam4/audio/timmy-time.mp3 \
   --script tools/podcast/msk-exam4/script.md --title "Timmy Time: MSK Exam 4"
@@ -42,5 +48,8 @@ Stems are cached: after editing one segment, re-render it with `--only N --force
   A plain "A band" reads "uh band", and "ay" reads "eye".
 - Spell out numbers, units and symbols; avoid parentheses, slashes and abbreviations.
 - Watch heteronyms ("live" was read as the adjective).
-- New hard word: add it to `lexicon.json`, run `--check`, read its phonemes.
+- New hard word: add it to `lexicon.json`, run `--words`, read its phonemes. Hyphenated compounds hide their words
+  from the lexicon (`prolactin-releasing`): drop the hyphen or add the compound.
+- `--words` also prints every sentence with a heteronym in it: "close" (verb or adjective), "use" (verb or noun),
+  "live", "read". Reword when espeak picks the wrong one ("shut", "have closed", "bind").
 - Content follows the hub's own notes and exam hints. Graded-course-work rules in `CLAUDE.md` apply here too.

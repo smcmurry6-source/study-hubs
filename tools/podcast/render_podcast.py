@@ -4,6 +4,7 @@ Usage:
   python render_podcast.py script.md stems/ [--voice am_michael:0.6,am_onyx:0.4] [--speed 0.95]
   then: python produce.py stems/ out.mp3 --script script.md   (music, voice processing, loudness, chapters)
   python render_podcast.py script.md --check     # print the phonemes of every paragraph, no audio
+  python render_podcast.py script.md --words     # each hard word not in the lexicon once, plus heteronyms in context
   python render_podcast.py script.md stems/ --only 5 --force   # re-render just segment 5
 
 Needs: pip install kokoro-onnx soundfile ;
@@ -68,6 +69,31 @@ def to_phonemes(text, tok, lex, pat):
     return " ".join(p for p in out if p).replace(" ,", ",").replace(" .", ".").replace(" ?", "?")
 
 
+# words espeak can read two ways; --words prints each sentence they appear in, with its phonemes
+HETERONYMS = {"close", "closes", "live", "lives", "read", "lead", "leads", "wound", "bow", "tear", "tears", "minute",
+              "content", "object", "present", "record", "produce", "separate", "wind", "row", "does", "excuse", "use"}
+
+
+def word_audit(segments, tok, lex, pat):
+    """Print every word worth checking once (7+ letters, capitalized, or letters read as letters) that the lexicon
+    doesn't cover, with espeak's phonemes, then each sentence holding a heteronym. Common words print too: skim them."""
+    texts = [val for seg in segments for kind, val in seg if kind == "text"]
+    seen = {}
+    for t in texts:
+        for w in re.findall(r"[A-Za-z][A-Za-z'-]*[A-Za-z]", t):
+            if pat.fullmatch(w) or w.lower() in seen:
+                continue
+            if len(w) >= 7 or w[0].isupper() or re.search(r"[A-Z]-[A-Z]", w):
+                seen[w.lower()] = w
+    for w in sorted(seen.values(), key=str.lower):
+        print(f"{w:34s} {_ph(tok, w)}")
+    print("\n# heteronyms, in context")
+    for t in texts:
+        for sent in re.split(r"(?<=[.?!])\s+", t):
+            if HETERONYMS & {w.lower() for w in re.findall(r"[A-Za-z']+", sent)}:
+                print(f"{sent}\n    {to_phonemes(sent, tok, lex, pat)}")
+
+
 def voice_style(kokoro, spec):
     style = None
     for part in spec.split(","):
@@ -85,6 +111,7 @@ def main():
     ap.add_argument("--speed", type=float, default=0.95)
     ap.add_argument("--only", type=int, help="render only this segment (1-based)")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--words", action="store_true", help="audit hard words and heteronyms, no audio")
     ap.add_argument("--force", action="store_true", help="re-render segments that already exist")
     ap.add_argument("--lexicon", default=os.path.join(HERE, "lexicon.json"))
     a = ap.parse_args()
@@ -95,6 +122,10 @@ def main():
     segments = parse(open(a.script, encoding="utf-8").read())
     if a.only:
         segments = [segments[a.only - 1]]
+
+    if a.words:
+        word_audit(segments, tok, lex, pat)
+        return
 
     if a.check:
         for i, seg in enumerate(segments, 1):
