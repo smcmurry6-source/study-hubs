@@ -647,7 +647,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       <span class="aside" id="hubsAside"></span>
     </div>
     <div id="terms"></div>
-    <noscript><p><a href="hubs/heme-endo-exam1/">Heme &amp; Endo Exam 1 Hub</a> · <a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Final Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
+    <noscript><p><a href="hubs/special-patient-care/">Special Patient Care Hub</a> · <a href="hubs/heme-endo-exam1/">Heme &amp; Endo Exam 1 Hub</a> · <a href="hubs/msk-exam4/">Musculoskeletal Exam 4 Hub</a> · <a href="hubs/pcd-exam3/">PCD Fixed Pros Exam 3 Hub</a> · <a href="hubs/occlusion/">Occlusion Final Hub</a> · <a href="hubs/msk-exam3/">Musculoskeletal Exam 3 Hub</a> · <a href="hubs/perio/">Periodontology D2 Compendium</a></p></noscript>
   </section>
 
   <!-- ============ HUB RECAPS: archived hubs, as a slideshow ============ -->
@@ -749,6 +749,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      show a visitor's personal progress on the card.
      ==================================================================== */
   var CLASSES = {
+    spc:      { name:"Special Patient Care", ring:"genetics",
+                egg:"Hands on belly. Counting to ten.",
+                icon:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>' },
     hemeendo: { name:"Hematology & Endocrinology", ring:"endo",
                 egg:"Negative feedback: every question you answer lowers exam-day cortisol.",
                 icon:'<path d="M11 13.5C10.6 8.6 9.2 4.5 7.1 4.5 4.6 4.5 4 9 4.9 12.6c.9 3.4 3.4 5 5.6 3.8"/><path d="M13 13.5c.4-4.9 1.8-9 3.9-9 2.5 0 3.1 4.5 2.2 8.1-.9 3.4-3.4 5-5.6 3.8"/><path d="M10.3 12.6h3.4v3h-3.4z"/><path d="M12 2.5v2.2M12 17v4.5"/>' },
@@ -766,6 +769,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
                 icon:'<path d="M5.6 4.2c1.5-1.7 3.1-1.2 4.4-.4 1.3-.8 2.9-1.3 4.4.4 1.3 1.6.9 4-.1 6-.7 1.4-1 3.2-1.3 5.1-.2 1.2-1.6 1.4-2 .1l-.6-2.5c-.2-.8-1-.8-1.2 0l-.6 2.5c-.4 1.3-1.8 1.1-2-.1-.3-1.9-.6-3.7-1.3-5.1-1-2-1.4-4.4-.1-6z"/><path d="M8 5.4c.8.4 1.4.5 2 .1"/>' }
   };
   var HUBS = [
+    { id:"special-patient-care", cls:"spc", title:"Special Patient Care Hub", code:"Special Patient Care",
+      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care" } ], updated:"2026-10-28",
+      desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Nov 6 to Nov 13. Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a mock exam, review tables and the Sparks Arcade.",
+      modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
       exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:10 } ], updated:"2026-10-27",
       desc:"Lectures 1-10: endocrine histology, the hypothalamus and pituitary, growth, thyroid, the endocrine pancreas, the adrenal gland, corticosteroid and thyroid drugs, and calcium and phosphate. Its own home page with your countdown and progress by lecture, notes in two reading levels with narration, two-statement, true/false and numbered-statement questions, exam hints from the recordings, a 55-question mock and the Feedback Loop Arcade.",
@@ -821,11 +828,13 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (a && new Date() >= a){ ARCHIVED_HUBS.push(h); return false; }
     return true;
   });
-  var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3", "msk-exam4":"MSK Exam 4", occlusion:"Occlusion", "pcd-exam3":"PCD Exam 3", "heme-endo-exam1":"Heme & Endo 1" };
-  var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "msk-exam4":"gi", occlusion:"pros", "pcd-exam3":"pros", "fixed-pros":"pros", perio:"perio", "heme-endo-exam1":"endo" };
+  var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3", "msk-exam4":"MSK Exam 4", occlusion:"Occlusion", "pcd-exam3":"PCD Exam 3", "heme-endo-exam1":"Heme & Endo 1", "special-patient-care":"Special Patient Care" };
+  var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "msk-exam4":"gi", occlusion:"pros", "pcd-exam3":"pros", "fixed-pros":"pros", perio:"perio", "heme-endo-exam1":"endo", "special-patient-care":"genetics" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
   /* Arcade high-score panel: one entry per hub arcade (p_hub for get_arcade_leaderboard). */
   var ARCADES = [
+    { hub:"special-patient-care", title:"Sparks Arcade", from:"Special Patient Care hub", money:["smile"], games:[
+      ["board","Chart Showdown"],["escape","Sparks After Hours"],["cloze","Say It Once"],["smile","Sparks Superstar"],["cross","Cross-Check"],["sort","Chairside Sort"] ] },
     { hub:"heme-endo-exam1", title:"Feedback Loop Arcade", from:"Heme & Endo Exam 1 hub", money:["smile"], games:[
       ["board","Axis Showdown"],["escape","Endo Lab Escape"],["cloze","Fill the Receptor"],["smile","The Golden Gland"],["cross","Cross-Stain"],["sort","Feedback Sort"] ] },
     { hub:"pcd-exam3", title:"Bond Street Arcade", from:"PCD Fixed Pros Exam 3 hub", games:[

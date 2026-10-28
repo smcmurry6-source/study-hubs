@@ -345,7 +345,7 @@
      tapping it opens the full set. */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
     "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
-    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1" };
+    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "special-patient-care": "Special Patient Care" };
   function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -357,6 +357,7 @@
      "l" = a dark detail line on top). Hubs without an entry get the tooth. */
   var TOOTH = [["f", "M7.2 4.6c-1.8 0-3 1.4-3 3.4 0 2.2 1.2 3.2 1.6 5 .4 2.2.8 4.6 1.8 4.6s1.4-2.2 1.6-3.6c.2-.8.6-1.2 1.8-1.2s1.6.4 1.8 1.2c.2 1.4.6 3.6 1.6 3.6s1.4-2.4 1.8-4.6c.4-1.8 1.6-2.8 1.6-5 0-2-1.2-3.4-3-3.4-1.6 0-2.4.8-4.8.8s-3-.8-4.8-.8z"]];
   var HUB_MEDAL = {
+    "special-patient-care": { rib: ["#1D6B66", "#FF8A6B"], g: TOOTH },
     "heme-endo-exam1": { rib: ["#6B3FA0", "#E86A9E"], g: [["f", "M11.2 13.6C10.8 8.6 9.4 4.4 7.2 4.4 4.6 4.4 4 9 4.9 12.7c.9 3.5 3.6 5.2 5.9 3.9z"], ["f", "M12.8 13.6c.4-5 1.8-9.2 4-9.2 2.6 0 3.2 4.6 2.3 8.3-.9 3.5-3.6 5.2-5.9 3.9z"], ["f", "M10 12.4h4v3.4h-4z"]] },
     "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
     "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },

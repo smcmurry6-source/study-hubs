@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-27, evening** (sixteenth refresh, the full audit, 9:30 pm Central; the morning run before building the
-Heme/Endo Exam 1 hub was steps 1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
+**Last refreshed: 2026-10-28** (steps 1-3 only, before building the Special Patient Care hub; the last full audit was
+2026-10-27, 9:30 pm Central, and the morning run before building the Heme/Endo Exam 1 hub was steps 1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -78,6 +78,13 @@ What each signal tells an author, and what to do with it in the next hub (and in
   professor's emphasis for the next course they teach.
 
 ## Live signals (rewritten by each refresh)
+
+**2026-10-28 (steps 1-3, before building Special Patient Care):** a quiet day since last night's audit. No new reports,
+suggestions, check-ins or zero-result searches; one survey answer. Heme/Endo Exam 1 since 10-27: 42 people, 42 h (bank 21 h,
+22 people; notes 18 h, 27 people; Home 2 h, all 42; drill 3 people); no mocks yet; the only item under 50% with 15+ tries is
+`h1-tf-5` (8/20), already judged fair last night. Occlusion and perio: a few minutes each. Nothing new to act on, so the lessons
+below stand; the new hub follows them (Home first, why for every choice, two-statement, true/false and numbered items per lecture,
+correct answer not the longest choice, explanations that answer the likely wrong pick).
 
 Refreshed 2026-10-27, 9:30 pm Central (full audit); "since" = the 10-21 afternoon audit, the last one that shipped fixes. Live
 hubs: **Heme/Endo Exam 1** (Fri Oct 30; live since this morning), **Occlusion** (final Nov 19) and **perio** (final Nov 19). Nothing
