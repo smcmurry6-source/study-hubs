@@ -25,7 +25,7 @@
      lecName(lecId)             short label, e.g. "L2 · TMJ Anatomy" or "S3 · Risk Assessment"
      lecOrder                   lecture ids in course order
      skin                       the hub's own look and story for these games (smile:{ bg } swaps the drawn grin for a painted stage) (standing rule: every hub's arcade looks
-                                like that hub, never a copy of another hub's). { id, board:{ dd, final, intro },
+                                like that hub, never a copy of another hub's). { id, board:{ dd, final, intro, bg (a painted stage behind the board) },
                                 cloze:{ intro, placeholder }, smile:{ colors, art(goldOn), winTitle }, escape:{ intro, room, item:{ name, found, reveal },
                                 spots:{ <id>:{ label, flavor, locked, text } }, scene(api) or parts:{ <part>(api) } } }.
                                 Every game's root gets data-sg-skin="<id>", so the hub's own CSS can restyle it.
@@ -197,7 +197,8 @@
     function hud(){ C.setHud(root, { score:money(S.score), tiles:S.left }); }
     function boardView(){
       stopTimer(); S.view = "board";
-      var n = S.cols.length, h = '<div class="sg-board" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">';
+      var n = S.cols.length, h = (K.bg ? '<div class="sg-stage" style="background-image:url(&quot;' + esc(K.bg) + '&quot;)">' : "") +
+        '<div class="sg-board" style="grid-template-columns:repeat(' + n + ',minmax(0,1fr))">';
       S.cols.forEach(function(c){ h += '<div class="sg-cat">' + esc(c.name) + "</div>"; });
       for (var r = 0; r < 5; r++) for (var ci = 0; ci < n; ci++){
         var t = S.tiles[ci][r];
@@ -207,7 +208,7 @@
       h += "</div>";
       var cleared = S.cols.length * 5 - S.left, canFinal = cleared >= 10 || S.left === 0;
       h += '<div class="sg-board-foot"><span>' + (S.note ? esc(S.note) + " " : "") + "Pick a tile. Right adds its value, wrong takes it away. Two tiles hide a " + esc(DD) + ".</span>" +
-        '<button type="button" class="gm-btn alt" data-final' + (canFinal ? "" : " disabled") + ">" + (S.left === 0 ? esc(FINAL) : canFinal ? "Skip to " + esc(FINAL.toLowerCase()) : esc(FINAL) + " after 10 tiles") + "</button></div>";
+        '<button type="button" class="gm-btn alt" data-final' + (canFinal ? "" : " disabled") + ">" + (S.left === 0 ? esc(FINAL) : canFinal ? "Skip to " + esc(FINAL.toLowerCase()) : esc(FINAL) + " after 10 tiles") + "</button></div>" + (K.bg ? "</div>" : "");
       body.innerHTML = h; hud();
       if (S.left === 0) finalView();
     }

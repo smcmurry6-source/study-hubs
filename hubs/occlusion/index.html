@@ -7944,56 +7944,14 @@ var ARCADE = (function(){
     });
   }
 
-  /* ---------- thumbnails (inline SVG, decorative) ---------- */
-  function thumbSort(){
-    var drops = ''; for(var i=0;i<22;i++){ var x = (i*47)%300+8, y = (i*29)%120+6; drops += '<line x1="'+x+'" y1="'+y+'" x2="'+(x-4)+'" y2="'+(y+10)+'" stroke="#3fe0d0" stroke-opacity=".35" stroke-width="2"/>'; }
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+drops+
-      '<rect x="20" y="112" width="130" height="48" rx="10" fill="#ffd23f" fill-opacity=".15" stroke="#ffd23f" stroke-dasharray="6 4" stroke-width="3"/><rect x="170" y="112" width="130" height="48" rx="10" fill="#ff5c8a" fill-opacity=".15" stroke="#ff5c8a" stroke-dasharray="6 4" stroke-width="3"/>'+
-      '<text x="85" y="142" text-anchor="middle" fill="#f4f1ff" font-family="monospace" font-size="12" font-weight="700">WORKING</text><text x="235" y="142" text-anchor="middle" fill="#f4f1ff" font-family="monospace" font-size="12" font-weight="700">NON-WORKING</text>'+
-      '<g transform="rotate(-6 160 58)"><rect x="100" y="36" width="120" height="40" rx="9" fill="#ffd23f"/><rect x="100" y="70" width="120" height="6" rx="3" fill="#b8901c"/><text x="160" y="62" text-anchor="middle" fill="#1a1433" font-family="sans-serif" font-size="13" font-weight="800">Condyle orbits</text></g>'+
-      '<path d="M160 86 L230 104" stroke="#ff5c8a" stroke-width="3" stroke-dasharray="5 5" fill="none"/><path d="M226 96 L232 105 L221 106" fill="#ff5c8a"/></svg>';
-  }
-
-
-
-
-
-
-
-
-
-
-
-  /* thumbnails for the shared games (widget/games.js); P = this arcade's colors */
-  function thumbBoardP(P){
-    var h = '';
-    for(var c=0;c<5;c++){ h += '<rect x="'+(14+c*60)+'" y="12" width="54" height="24" rx="3" fill="'+P.panel+'" stroke="'+P.a3+'" stroke-width="2" stroke-dasharray="4 3"/>';
-      for(var r=0;r<4;r++){ var used = (c===1&&r===0)||(c===3&&r===1)||(c===0&&r===2);
-        h += '<rect x="'+(14+c*60)+'" y="'+(44+r*30)+'" width="54" height="24" rx="2" fill="'+(used?'#2b62f0':'#c8102e')+'" opacity="'+(used?.55:1)+'"/>' + (used ? '' : '<text x="'+(41+c*60)+'" y="'+(61+r*30)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="800" fill="#fff">$'+((r+1)*100)+'</text>'); } }
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/>'+h+'</svg>';
-  }
-
-  function thumbGapP(P){
-    var slots = ''; for(var i=0;i<7;i++) slots += '<rect x="'+(128+i*17)+'" y="70" width="13" height="3" fill="'+P.a1+'"/>' + (i<2 ? '<text x="'+(134+i*17)+'" y="66" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="'+P.a1+'">'+'CO'[i]+'</text>' : '');
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/><rect x="18" y="20" width="284" height="80" rx="10" fill="'+P.panel+'"/>' +
-      '<rect x="32" y="40" width="200" height="6" rx="3" fill="'+P.dim+'"/><rect x="32" y="62" width="88" height="6" rx="3" fill="'+P.dim+'"/>'+slots+'<rect x="252" y="62" width="36" height="6" rx="3" fill="'+P.dim+'"/><rect x="32" y="82" width="150" height="6" rx="3" fill="'+P.dim+'"/>' +
-      '<rect x="18" y="114" width="210" height="38" rx="9" fill="'+P.bg+'" stroke="'+P.a2+'" stroke-width="3"/><text x="32" y="139" font-family="monospace" font-size="15" fill="'+P.ink+'">co</text><rect x="54" y="124" width="3" height="20" fill="'+P.a2+'"/>' +
-      '<rect x="238" y="114" width="64" height="38" rx="9" fill="'+P.a2+'"/><text x="270" y="138" text-anchor="middle" font-family="monospace" font-size="12" font-weight="800" fill="'+P.bg+'">ENTER</text></svg>';
-  }
-  function thumbEscapeP(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-escape.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
-
-
-  var THUMB_P = { bg:'#282050', panel:'#1d1838', ink:'#f4f1ff', dim:'#a79fcf', a1:'#ffd23f', a2:'#ff5c8a', a3:'#3fe0d0', a4:'#3b3270' };
-  function thumbBoard(){ return thumbBoardP(THUMB_P); }
-  function thumbGap(){ return thumbGapP(THUMB_P); }
-  function thumbEscape(){ return thumbEscapeP(THUMB_P); }
-  function svgWrap(inner){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="170" fill="#282050"/>'+inner+'</svg>'; }
-  function thumbSmile(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-smile.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
-  function thumbCross(){
-    var h = '', cells = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[3,0],[3,2],[3,3],[3,4],[6,2],[6,3],[5,3],[7,3],[8,3]], letters = {'1,1':'G','2,1':'R','3,1':'A','4,1':'C','5,1':'E','6,1':'Y','3,0':'P','3,2':'P','3,3':'E','3,4':'R','6,2':'O','6,3':'U'};
-    cells.forEach(function(c){ var x = 50+c[0]*26, y = 20+c[1]*26; h += '<rect x="'+x+'" y="'+y+'" width="24" height="24" rx="3" fill="'+(c[1]===1?'#ffe9a8':'#f5f1e6')+'"/>'; var L = letters[c[0]+','+c[1]]; if(L) h += '<text x="'+(x+12)+'" y="'+(y+18)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="13" fill="#1a2533">'+L+'</text>'; });
-    return svgWrap(h + '<text x="20" y="160" font-family="monospace" font-size="10" fill="#9CB3C8">1 ACROSS · Area-specific curette family</text>');
-  }
+  /* ---------- thumbnails: painted art in img/ ---------- */
+  function thumbImg(f){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="img/' + f + '" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
+  function thumbSort(){ return thumbImg('thumb-sort.webp'); }
+  function thumbBoard(){ return thumbImg('thumb-board.webp'); }
+  function thumbEscape(){ return thumbImg('thumb-escape.webp'); }
+  function thumbGap(){ return thumbImg('thumb-gap.webp'); }
+  function thumbSmile(){ return thumbImg('thumb-smile.webp'); }
+  function thumbCross(){ return thumbImg('thumb-cross.webp'); }
 
   /* ---------- fullscreen ---------- */
   function fsSupported(){ return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen); }
@@ -8128,7 +8086,7 @@ var ARCADE = (function(){
   var OCCL_SKIN = {
     id:'occlusion',
     smile:{ bg:'img/smile-stage.webp', lips:'#ff5c8a', lipsDark:'#c23a66', gum:'#ff9ab6', gold:'#ffd23f', inside:'#26102e' },
-    board:{ dd:'Centric Double', final:'Final Contact', start:'Mount the board',
+    board:{ dd:'Centric Double', final:'Final Contact', start:'Mount the board', bg:'img/showdown-stage.webp',
       intro:'A quiz board: one column per lecture, five strips each from <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Right marks the strip blue and adds its value; wrong marks it red and takes it away. Two strips hide a <b>Centric Double</b> where you set the wager, and the <b>Final Contact</b> lets you bet everything on one hard question.' },
     cloze:{ start:'Close the gap',
       intro:'Freeway space, but for words: each card is a sentence from Dr. Givan\'s notes with a <b>key term</b> taken out. Type it before the clock runs down. The marks show how many letters it has; showing one costs points. Two misses, a give-up or the clock costs a life, and you have three.' },

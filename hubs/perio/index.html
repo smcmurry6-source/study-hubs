@@ -5609,47 +5609,21 @@ var ARCADE = (function(){
     return '<ol class="lb-list">' + top.map(row).join('') + (me ? '<li class="lb-gap">…</li>' + row(me) : '') + '</ol>';
   }
 
-  /* ---------- thumbnails (inline SVG, decorative) ---------- */
-  function svgWrap(inner){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="170" fill="#19344F"/>'+inner+'</svg>'; }
-  function toothPath(x, y, s, fill){ s = s || 1; return '<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M-14 -16c5 0 9 3 14 3s9-3 14-3c7 0 11 6 11 13 0 9-5 13-6 23-1 8-3 15-7 15-5 0-5-13-12-13s-7 13-12 13c-4 0-6-7-7-15-1-10-6-14-6-23 0-7 4-13 11-13z" fill="'+(fill||'#fffaf0')+'" stroke="#0B1A2A" stroke-width="3"/><circle cx="-5" cy="-3" r="2.6" fill="#0B1A2A"/><circle cx="6" cy="-3" r="2.6" fill="#0B1A2A"/><path d="M-4 5q5 4 10 0" stroke="#0B1A2A" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>'; }
-  function thumbCrusher(){
-    var h = '', cols = ['#e8dca9','#d8c78a','#e8dca9','#cbb877'];
-    for(var r=0;r<3;r++) for(var c=0;c<8;c++) h += '<rect x="'+(12+c*37)+'" y="'+(44+r*18)+'" width="33" height="14" rx="4" fill="'+cols[(r+c)%4]+'"/>';
-    ['#FFD84D','#FF6FA3','#43E0AC','#B69CFF'].forEach(function(col,i){ h += '<rect x="'+(18+i*74)+'" y="14" width="64" height="22" rx="6" fill="'+col+'"/><text x="'+(50+i*74)+'" y="31" text-anchor="middle" font-family="Bungee,Impact" font-size="14" fill="#0B1A2A">'+LETTERS[i]+'</text>'; });
-    return svgWrap(h + '<circle cx="176" cy="120" r="7" fill="#fff"/><path d="M176 120 L150 150" stroke="#fff" stroke-dasharray="3 5" stroke-width="2"/><rect x="118" y="150" width="84" height="10" rx="5" fill="#5CC8FF"/>');
-  }
-  /* thumbnails for the shared games (widget/games.js); P = this arcade's colors */
-  function thumbBoardP(P){
-    var h = '<rect x="10" y="8" width="300" height="154" rx="10" fill="#f7f1e6"/>';
-    for(var c=0;c<5;c++){ h += '<rect x="'+(18+c*58)+'" y="14" width="52" height="18" rx="4" fill="#fff"/><rect x="'+(18+c*58)+'" y="30" width="52" height="3" fill="'+['#FFD84D','#FF6FA3','#43E0AC','#5CC8FF','#B69CFF'][c]+'"/>';
-      for(var r=0;r<4;r++){ var x = 30+c*58, y = 42+r*30, bad = (c===1&&r===2)||(c===3&&r===0);
-        h += '<path transform="translate('+x+' '+y+') scale(.62)" d="M4 2c5-3 9 1 16 1s11-4 16-1c5 4 4 13 1 20-2 6-3 14-5 20-1 4-5 4-6 0l-2-8c-1-3-3-3-4 0l-2 8c-1 4-5 4-6 0-2-6-3-14-5-20C0 15-1 6 4 2z" fill="#fffaf0" stroke="#5b4a5e" stroke-width="3"/>' +
-          '<rect x="'+(x-4)+'" y="'+(y+22)+'" width="34" height="6" rx="3" fill="#ff8fb3"/>' + (bad ? '<circle cx="'+(x+13)+'" cy="'+(y+23)+'" r="4" fill="#e01e4f"/>' : ''); } }
-    return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/>'+h+'</svg>';
-  }
-
+  /* ---------- thumbnails: painted art in img/ (Mind the Pocket's is still drawn) ---------- */
+  function thumbImg(f){ return '<svg viewBox="0 0 320 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="img/' + f + '" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
+  function thumbCrusher(){ return thumbImg('thumb-crusher.webp'); }
+  function thumbBoard(){ return thumbImg('thumb-board.webp'); }
+  function thumbEscape(){ return thumbImg('thumb-escape.webp'); }
+  function thumbSmile(){ return thumbImg('thumb-smile.webp'); }
+  function thumbCross(){ return thumbImg('thumb-cross.webp'); }
   function thumbGapP(P){
     var marks = ''; for(var i=0;i<7;i++) marks += '<rect x="'+(126+i*17)+'" y="70" width="13" height="4" fill="#2b2140"/>' + (i<2 ? '<text x="'+(132+i*17)+'" y="66" text-anchor="middle" font-family="monospace" font-size="14" font-weight="800" fill="#d61f69">'+'CE'[i]+'</text>' : '');
     return '<svg viewBox="0 0 320 170" aria-hidden="true"><rect width="320" height="170" fill="'+P.bg+'"/><rect x="18" y="20" width="284" height="80" rx="10" fill="#fffaf0"/>' +
       '<rect x="32" y="40" width="200" height="6" rx="3" fill="#d8c9b4"/><rect x="32" y="62" width="86" height="6" rx="3" fill="#d8c9b4"/>'+marks+'<rect x="252" y="62" width="36" height="6" rx="3" fill="#d8c9b4"/><rect x="32" y="82" width="150" height="6" rx="3" fill="#d8c9b4"/>' +
       '<g transform="translate(20 124)"><rect width="250" height="14" rx="3" fill="#c9d3dc"/><rect x="58" width="25" height="14" fill="#2b2140"/><rect x="140" width="25" height="14" fill="#2b2140"/><rect x="225" width="25" height="14" fill="#2b2140"/><path d="M250 7h34l8-4" stroke="#8b97a3" stroke-width="5" fill="none" stroke-linecap="round"/></g></svg>';
   }
-
-  function thumbEscapeP(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-escape.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
-
-
   var THUMB_P = { bg:'#19344F', panel:'#122840', ink:'#F2F8FF', dim:'#9CB3C8', a1:'#FFD84D', a2:'#FF6FA3', a3:'#43E0AC', a4:'#254A68' };
-  function thumbBoard(){ return thumbBoardP(THUMB_P); }
   function thumbGap(){ return thumbGapP(THUMB_P); }
-  function thumbEscape(){ return thumbEscapeP(THUMB_P); }
-  function thumbSmile(){ return '<svg viewBox="0 0 320 170" aria-hidden="true"><image href="img/thumb-smile.webp" width="320" height="170" preserveAspectRatio="xMidYMid slice"/></svg>'; }
-
-
-  function thumbCross(){
-    var h = '', cells = [[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[3,0],[3,2],[3,3],[3,4],[6,2],[6,3],[5,3],[7,3],[8,3]], letters = {'1,1':'G','2,1':'R','3,1':'A','4,1':'C','5,1':'E','6,1':'Y','3,0':'P','3,2':'P','3,3':'E','3,4':'R','6,2':'O','6,3':'U'};
-    cells.forEach(function(c){ var x = 50+c[0]*26, y = 20+c[1]*26; h += '<rect x="'+x+'" y="'+y+'" width="24" height="24" rx="3" fill="'+(c[1]===1?'#ffe9a8':'#f5f1e6')+'"/>'; var L = letters[c[0]+','+c[1]]; if(L) h += '<text x="'+(x+12)+'" y="'+(y+18)+'" text-anchor="middle" font-family="Bungee,Impact" font-size="13" fill="#1a2533">'+L+'</text>'; });
-    return svgWrap(h + '<text x="20" y="160" font-family="monospace" font-size="10" fill="#9CB3C8">1 ACROSS · Area-specific curette family</text>');
-  }
 
   /* ---------- fullscreen ---------- */
   function fsEl(){ return document.fullscreenElement || document.webkitFullscreenElement; }
@@ -5736,7 +5710,7 @@ var ARCADE = (function(){
   var PERIO_SKIN = {
     id:'perio',
     smile:{ bg:'img/smile-stage.webp', lips:'#FF6FA3', lipsDark:'#d94c84', gum:'#ffb3cb', gold:'#FFD84D', inside:'#3d0f25' },
-    board:{ dd:'Deep Pocket', final:'Final Probe', start:'Open the chart',
+    board:{ dd:'Deep Pocket', final:'Final Probe', start:'Open the chart', bg:'img/showdown-stage.webp',
       intro:'The board is a perio chart: one column per session, five teeth each, <b>$100</b> (the one the class gets right most) to <b>$500</b> (the toughest). Probe a tooth to answer. Miss and it bleeds, and you lose its value. Two teeth hide a <b>Deep Pocket</b> where you set the wager, and the <b>Final Probe</b> lets you bet it all on one hard question.' },
     cloze:{ start:'Insert probe', placeholder:'Type the missing term',
       intro:'Each card is a sentence from the session notes with a <b>key term</b> missing. Type it before the probe runs out of millimeters. The marks show how many letters it has; showing a letter costs points. Two misses, a give-up or the clock and you lose a tooth (you have three).' },
