@@ -502,6 +502,11 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .pbox dl{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:4px 14px;margin:0;font-size:.9rem}
 .pbox dt{font-weight:700;color:var(--ink-soft)}
 .pbox dd{margin:0;color:var(--ink)}
+.pimg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:10px 0 4px}
+.pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
+.pimg figcaption{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;line-height:1.3}
+.pimg img{display:block;width:100%;height:auto;max-width:520px;margin:0 auto;border-radius:6px}
+.pimg-note{font-size:.72rem;color:var(--ink-soft);margin-top:2px}
 @media (max-width:560px){.pbox dl{grid-template-columns:1fr}.pbox dd{margin-bottom:6px}}
 .qcard-choice.is-selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .qcard-choice.is-missed-right{border-color:var(--good);border-style:dashed}
@@ -1890,7 +1895,22 @@ var ANIMA = (function(){
 var CUSP_GAME = { mount:function(){} };
 function cuspMapHTML(){ return ''; }
 function wireCuspMaps(){}
-function caseImgHTML(){ return ''; }
+/* Painted patient pictures for Patient Box cases (Sam's Argon art, 2026-10-28). A question lists keys in pimg:[...]; each
+   picture shows only findings its box already lists, so it never gives the answer away. */
+var CASE_IMG = {
+  addison: { f:'case-addison-gums.webp', kind:'Intraoral view', title:'Attached gingiva',
+    alt:'Lips held back with retractors: patchy brown-black pigmentation on the attached gingiva above and below the front teeth; the gum margins are not swollen.' },
+  acro: { f:'case-acromegaly.webp', kind:'Clinical photos', title:'Face and hands',
+    alt:'Left: a middle-aged man with a heavy brow ridge, coarse features, a large lower jaw and gaps between his front teeth. Right: his broad, thick hand with a tight ring, beside an average-sized hand.' },
+  cushing: { f:'case-cushingoid.webp', kind:'Clinical photos', title:'Face, trunk and forearm',
+    alt:'Left: a woman with a round, flushed face and central obesity. Right: her forearm, with thin, shiny skin and several purple bruises.' }
+};
+function caseImgHTML(q){
+  if(!q.pimg) return '';
+  return '<div class="pimg-grid">' + q.pimg.map(function(k){ var c = CASE_IMG[k]; if(!c) return '';
+    return '<figure class="pimg"><figcaption><b>' + escHtml(c.kind) + '</b> · ' + escHtml(c.title) + '</figcaption><img src="img/' + c.f + '" alt="' + escHtml(c.alt) + '" width="1000" height="746" loading="lazy"></figure>'; }).join('') +
+    '</div><div class="pimg-note">Illustration made for this hub to show the findings; not a patient image.</div>';
+}
 
 /* ---------- QUESTIONS ----------
    Correct choice is authored first (answer:0); qCardHTML shuffles display order, except two-statement, true/false and
@@ -2350,7 +2370,7 @@ mcq("gr-giant", "growth", "slides", "GH excess that begins before the epiphyses 
   "Gigantism = GH excess before epiphyseal closure (excessive linear growth). Acromegaly = after closure (bones thicken).");
 mcq("gr-acro-dental", "growth", "slides", "An adult dental patient's lower jaw, brow ridge and hands have enlarged over years; he sweats a lot and was recently diagnosed with diabetes. The most likely cause is:",
   ["A GH-secreting somatotroph adenoma (acromegaly)","A GH receptor defect that blocks IGF-1 production in the liver","Excess prolactin","Primary hypothyroidism"],
-  "Acromegaly: after the plates close, GH excess thickens bone (periosteal growth): brow ridge, lower jaw, hands and feet; soft tissue grows; sweating, carpal tunnel and insulin resistance. Usually a benign, slow-growing somatotroph adenoma.", {"pbox":[["Patient","46-year-old man"],["History","Rings and shoes no longer fit; new diagnosis of diabetes; heavy sweating"],["Exam","Prominent brow ridge, enlarged lower jaw with new spacing between teeth, large hands"]]});
+  "Acromegaly: after the plates close, GH excess thickens bone (periosteal growth): brow ridge, lower jaw, hands and feet; soft tissue grows; sweating, carpal tunnel and insulin resistance. Usually a benign, slow-growing somatotroph adenoma.", {"pimg":["acro"],"pbox":[["Patient","46-year-old man"],["History","Rings and shoes no longer fit; new diagnosis of diabetes; heavy sweating"],["Exam","Prominent brow ridge, enlarged lower jaw with new spacing between teeth, large hands"]]});
 mcq("gr-acro-test", "growth", "slides", "Which tests confirm acromegaly?",
   ["Serum IGF levels plus a glucose tolerance test","A single random serum GH level drawn in the afternoon","Serum cortisol at 8 am","Serum TSH and free T4"],
   "The slide: \"Way to test: serum IGF levels + glucose tolerance test.\" GH is pulsatile, so one random GH value is unreliable.");
@@ -2975,7 +2995,7 @@ mcq("ad-addison-acth", "adrenal", "rec", "In Addison's disease, what happens to 
   "Autoimmune destruction of the cortex removes cortisol; without negative feedback the pituitary drives ACTH high. \"Just one high. Thank you, brave soul. She's correct.\"");
 mcq("ad-addison-gums", "adrenal", "rec", "A dental patient has new dark patches on the gums, fatigue, low blood pressure and low blood glucose. Which is most likely?",
   ["Addison's disease","Cushing's syndrome","Primary aldosteronism","Graves disease"],
-  "Hyperpigmentation of skin and mucosa (often the gums) from high ACTH and MSH can precede other Addison's symptoms by months to years. Low cortisol → hypoglycemia; mineralocorticoid loss → low BP.", {"pbox":[["Patient","38-year-old woman"],["Chief complaint","\"I'm always tired, and I get dizzy when I stand\""],["Oral exam","New brown-black patches on the attached gingiva"],["Vitals and labs","BP 92/58; fasting glucose low"]]});
+  "Hyperpigmentation of skin and mucosa (often the gums) from high ACTH and MSH can precede other Addison's symptoms by months to years. Low cortisol → hypoglycemia; mineralocorticoid loss → low BP.", {"pimg":["addison"],"pbox":[["Patient","38-year-old woman"],["Chief complaint","\"I'm always tired, and I get dizzy when I stand\""],["Oral exam","New brown-black patches on the attached gingiva"],["Vitals and labs","BP 92/58; fasting glucose low"]]});
 mcq("ad-cushing-disease", "adrenal", "rec", "Cushing's DISEASE specifically means cortisol excess caused by:",
   ["A pituitary adenoma secreting ACTH","An adrenal cortical adenoma","Long-term glucocorticoid medication","An aldosterone-secreting tumor"],
   "Cushing's disease is the ACTH-dependent form from a pituitary tumor. Cushing syndrome is the broader picture of prolonged high cortisol from any cause (adrenal tumor, ectopic ACTH, exogenous steroids).");
@@ -3098,7 +3118,7 @@ mcq("cs-addison-fludro", "steroids", "class", "A woman with Addison's disease, s
   "She lacks mineralocorticoid: low sodium, high potassium, low BP. Add a steroid with potent mineralocorticoid and minimal glucocorticoid activity: fludrocortisone.", {"pbox":[["Patient","28-year-old woman with primary adrenal insufficiency"],["Current drug","Hydrocortisone, adequate dose"],["Symptoms","Postural dizziness, salt craving, low blood pressure"],["Labs","Na+ 128 mmol/L (low); K+ 5.8 mmol/L (high)"]]});
 mcq("cs-asthma-bone", "steroids", "class", "After 8 months of oral prednisone for severe asthma, a 52-year-old woman has central obesity, moon face, thin forearm skin and a vertebral compression fracture after minor trauma. Which adverse effect explains the fracture?",
   ["Osteoporosis from inhibited bone formation","Weight loss from catabolism","Hypoglycemia from impaired gluconeogenesis","Increased muscle mass from anabolism"],
-  "Long-term glucocorticoids cause osteoporosis (watch for it especially in older patients). The other choices run opposite to steroid effects: steroids cause weight gain, hyperglycemia and muscle loss.", {"pbox":[["Patient","52-year-old woman"],["History","Severe asthma; oral prednisone 20-40 mg daily for 8 months"],["Complaint","Chronic back pain; vertebral compression fracture after minor trauma"],["Exam","Central obesity, moon face, thin skin on the forearms"]]});
+  "Long-term glucocorticoids cause osteoporosis (watch for it especially in older patients). The other choices run opposite to steroid effects: steroids cause weight gain, hyperglycemia and muscle loss.", {"pimg":["cushing"],"pbox":[["Patient","52-year-old woman"],["History","Severe asthma; oral prednisone 20-40 mg daily for 8 months"],["Complaint","Chronic back pain; vertebral compression fracture after minor trauma"],["Exam","Central obesity, moon face, thin skin on the forearms"]]});
 mcq("cs-pred-potency", "steroids", "rec", "Compared with cortisol, prednisone has about how much anti-inflammatory activity?",
   ["About 4 times","About the same","About 30 times","About 250 times"],
   "Prednisone: about 4 times cortisol's anti-inflammatory activity with weak salt retention. Dexamethasone about 30 times. Fludrocortisone's salt-retaining activity is about 250 times.");

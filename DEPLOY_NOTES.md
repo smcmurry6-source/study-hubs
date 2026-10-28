@@ -124,6 +124,20 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-28 (patient pictures in Heme & Endo, Special Patient Care arcade art, Claude Code)** — More of Sam's Argon art.
+  **Heme & Endo patient pictures**: `CASE_IMG` + `caseImgHTML(q)` (the stub is now real, Occlusion's pattern with `<img>`): a
+  question's `pimg:[keys]` draws painted illustrations inside its Patient Box, labeled as illustrations, not patient images.
+  Three so far (`img/case-*.webp`): `ad-addison-gums` (pigmented attached gingiva), `gr-acro-dental` (face and hands),
+  `cs-asthma-bone` (moon face, central obesity, thin bruised forearm skin). Each shows only findings its box already lists; the
+  arcade already skips `pimg` questions. **Special Patient Care arcade**: Sparks After Hours now draws a painted operatory
+  (`img/after-hours-escape.webp`, 1280x714 drawn to 800x450) with every hotspot measured onto its props (`SPC_SKIN.escape.scene`:
+  panoramic viewer dark until solved, charting computer, consent form clipboard, padlocked supply drawer, visual-schedule poster
+  the curing light reveals, sink and mirror, door + keypad; the clock hand rides the painted clock); the hero banner, the Sparks
+  Superstar stage (`smile.bg`) and the escape/Superstar lobby tiles (`thumbImg`) are painted too; the other four tiles keep their
+  icon tiles. **Perio**: Mind the Pocket's lobby tile is painted (`img/thumb-gap.webp`), so every Perio tile is now art.
+  About page, `sw.js` -> `sh-v43`. No schema change. Heme & Endo's arcade art (hero, painted lab escape room, Golden Gland stage
+  and thumbnails) is held until after Exam 1 (Oct 30) so the arcade doesn't change under students two days out.
+
 - **2026-10-28 (arcade art, round 2: Showdown stages and painted lobby pictures, Claude Code)** — More of Sam's Argon art.
   **Showdown stage**: a skin's `board.bg` paints a stage behind the quiz board (`.sg-stage` in `widget/games.css`, dimmed so the
   tiles stay readable): Occlusion's Freeway Showdown stage, Perio's Pocket Showdown stage (`img/showdown-stage.webp`).
