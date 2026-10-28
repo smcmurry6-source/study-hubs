@@ -1941,7 +1941,7 @@ mcq("h1-gi", "histo1", "slides", "Which G protein inhibits adenylate cyclase and
   "Gs activates adenylate cyclase (cAMP up); Gi inhibits it (cAMP down); Gq activates phospholipase C (IP3 up).");
 mcq("h1-downreg", "histo1", "rec", "A cell takes a hormone-bound receptor into an endosome that fuses with a lysosome. This way of turning signaling off is called:",
   ["Receptor downregulation","Receptor sequestration and recycling","Second-messenger amplification","Positive feedback"],
-  "Of the five ways to turn signaling off, sending the receptor to a lysosome to be destroyed is downregulation. Sequestration puts it in an endosome and returns it to the membrane.");
+  "Of the five ways to turn signaling off, sending the receptor to a lysosome to be destroyed is downregulation. Both ways start with the receptor in an endosome; the lysosome is what decides it. In sequestration the endosome takes the receptor back to the membrane to be used again; when the endosome fuses with a lysosome, the receptor is destroyed and the cell has fewer receptors.");
 mcq("h1-master", "histo1", "slides", "The pituitary is called the \"master organ\" because it:",
   ["Its hormones regulate many other glands and tissues, including growth","It synthesizes nearly every hormone in the body, peptide and steroid alike","Is controlled by no other organ","Is the largest endocrine gland"],
   "The pituitary regulates many other glands and tissues, but its own release is regulated by neurohormones from the hypothalamus (the hypothalamo-hypophysial system).");
@@ -2020,9 +2020,6 @@ mcq("h1-pt-life", "histo1", "rec", "Why do surgeons transplant the parathyroid g
 mcq("h1-fat", "histo1", "slides", "In the parathyroid glands of older adults, connective tissue may contain many adipose cells occupying up to:",
   ["60% of the gland","5% of the gland","25% of the gland","95% of the gland"],
   "The stroma around the parenchyma holds fat cells and neurovasculature; in older adults adipose cells can occupy up to 60% of the gland.");
-mcq("h1-mag", "histo1", "rec", "Dr. Herr said he would NOT expect you to be able to:",
-  ["Tell the cell types of the pars distalis apart on these stains","Name the two hormones that the posterior pituitary releases into blood","Say which G protein raises IP3","Say which parathyroid cell secretes PTH"],
-  "On the pars distalis stains: \"I would not expect you to be able to recognize those. All of those stains look pretty similar to me.\" The rest are core facts.");
 two("h1-2s-1", "histo1", "slides", "The posterior pituitary develops from the ectoderm of the oropharynx.", "Herring bodies contain granules of ADH or oxytocin.", false, true,
   "The anterior lobe develops from oral (oropharyngeal) ectoderm; the posterior lobe is a down-growth of the hypothalamus. Herring bodies are axonal swellings holding ADH or oxytocin.",
   "the posterior pituitary is neural, a down-growth of the hypothalamus; the anterior lobe comes from oral ectoderm.",
@@ -2290,9 +2287,9 @@ mcq("gr-diabetogenic", "growth", "slides", "GH is called diabetogenic because it
 mcq("gr-lipolysis", "growth", "slides", "In adipose tissue, GH:",
   ["Increases lipolysis","Increases triglyceride storage","Increases glucose uptake","Has no effect"],
   "GH breaks down fat (lipolytic) while building muscle protein, the pair Dr. Galin said to remember for the pancreas lecture.");
-mcq("gr-muscle", "growth", "slides", "Which pairing of GH effects did Dr. Galin say to remember because it ties into the pancreas lecture?",
+mcq("gr-muscle", "growth", "slides", "Apart from its effects on growth, which pairing of GH effects is correct?",
   ["Lipolysis in fat with protein formation in muscle","Glycogen storage in liver with lipogenesis in fat","Protein breakdown in muscle with fat storage","Insulin secretion with glucagon suppression"],
-  "Outside of growth, GH increases lipolysis while stimulating protein formation in muscle.");
+  "Outside of growth, GH increases lipolysis while stimulating protein formation in muscle (the pair Dr. Galin flagged for the pancreas lecture). GH does not release insulin or suppress glucagon: most of its metabolic actions oppose insulin, which is why it is called diabetogenic.");
 mcq("gr-diff", "growth", "slides", "In the \"take home\" slide, the direct action of GH (as opposed to IGF-1) at the growth plate is:",
   ["Differentiation of precursor cells such as prechondrocytes","Clonal expansion of the chondrocytes that have already formed","Calcification of the cartilage matrix","Closure of the epiphyseal plate"],
   "Direct GH: increase IGF-1 and stimulate formation of precursors (differentiation). Indirect, through IGF-1: clonal expansion of those precursors.");
@@ -4269,7 +4266,7 @@ var QUESTION_WHY = {
   "h1-enzyme-linked":["Binding activates the receptor's own catalytic (kinase) domains.","Ion-channel receptors open a gate to let ions in.","G-protein receptors work through second messengers such as cAMP and IP3.","Nuclear receptors are intracellular, not cell-surface."],
   "h1-gq":["Gq → phospholipase C → IP3 (and DAG) → calcium from the ER.","That is Gs.","That is Gi.","That describes an intracellular steroid receptor, not a G protein."],
   "h1-gi":["\"I\" for inhibitory: adenylate cyclase off, cAMP down.","Gs is stimulatory: cAMP up.","Gq works through phospholipase C and IP3.","Gt (transducin) isn't in this lecture's table; it works in the retina."],
-  "h1-downreg":["The receptor is destroyed, so the cell has fewer receptors.","In sequestration the receptor is recycled back to the membrane, not destroyed.","Amplification turns signaling up, not off.","Positive feedback increases secretion; this lowers responsiveness."],
+  "h1-downreg":["The receptor is destroyed, so the cell has fewer receptors.","Sequestration starts in an endosome too, but the receptor goes back to the membrane; here the lysosome destroys it.","Amplification turns signaling up, not off.","Positive feedback increases secretion; this lowers responsiveness."],
   "h1-master":["Its hormones control many other glands and growth.","Many hormones come from other glands (insulin, PTH, cortisol).","The hypothalamus controls it.","It is about the size of a pea; the liver and thyroid are larger."],
   "h1-sella":["Sella turcica of the sphenoid, behind the optic chiasm.","The foramen magnum transmits the spinal cord.","The cribriform plate carries olfactory nerves.","It hangs below the hypothalamus, not inside a ventricle."],
   "h1-adeno-parts":["These three glandular parts form the anterior lobe.","These are the neurohypophysis.","The pars nervosa is posterior, so this mixes the two lobes.","The median eminence belongs to the hypothalamus and the pars nervosa is posterior."],
@@ -4296,7 +4293,6 @@ var QUESTION_WHY = {
   "h1-casr":["Low calcium → PTH.","High calcium inhibits PTH secretion.","PTH is not under pituitary control.","Glucose controls insulin and glucagon, not PTH."],
   "h1-pt-life":["Without PTH, calcium falls dangerously; transplanted glands keep working.","Thyroid hormone comes from follicular cells, not parathyroids.","Malignancy isn't the reason given.","Fat doesn't convert PTH; calcitonin comes from C cells."],
   "h1-fat":["Up to 60%.","Far more than 5%.","More than 25% is possible.","Not that much: chief cells still make up much of the gland."],
-  "h1-mag":["He waved off identifying those cells on stains.","ADH and oxytocin: core.","Gq → IP3: he said commit the table to memory.","Chief cells → PTH: core."],
   "h1-num-1":["Leaves out 4: portal blood does carry releasing hormones to the anterior lobe.","1, 2 and 4 are true; 3 belongs to the posterior lobe.","Includes 3, which is the posterior lobe.","Includes 3 and leaves out 1."],
   "h1-num-2":["Includes 1 and leaves out 4.","Includes 1, which is false.","Leaves out 4, which is true (absence is incompatible with life).","Only statement 1 is false: chief cells make PTH."],
   "hp-neuroendo":["Hypothalamic releasing hormones come from the CNS.","The pituitary is outside the CNS; its hormones are endocrine.","Adrenal cortex hormones come from a peripheral gland.","Islet signaling is paracrine."],
@@ -4346,7 +4342,7 @@ var QUESTION_WHY = {
   "gr-igf-names":["IGF-1 = somatomedin C.","Somatostatin is the GH-inhibiting hormone.","Somatotropin is growth hormone itself.","Somatocrinin is another name for GHRH."],
   "gr-diabetogenic":["Anti-insulin effects push glucose up.","GH doesn't destroy beta cells; that is type 1 diabetes.","Increasing GLUT4 would be insulin-like.","GH tends to raise glucose, not lower it."],
   "gr-lipolysis":["GH is lipolytic.","Fat storage is insulin's effect.","Increasing glucose uptake is insulin-like; GH opposes it.","GH clearly acts on fat."],
-  "gr-muscle":["Burn fat, build muscle protein.","Glycogen and fat storage are insulin's effects.","GH builds muscle protein and breaks down fat, the reverse of this.","That isn't the pairing on the slide."],
+  "gr-muscle":["Burn fat, build muscle protein.","Glycogen and fat storage are insulin's effects.","GH builds muscle protein and breaks down fat, the reverse of this.","GH doesn't act on the islets this way; its actions mostly oppose insulin (diabetogenic)."],
   "gr-diff":["GH → differentiation; IGF-1 → clonal expansion.","Clonal expansion is IGF-1's job.","Calcification ends growth; it isn't GH's direct action.","Estrogen closes the plates."],
   "gr-estrogen":["Estrogen closes the plates.","GH drives growth; it doesn't close the plates.","IGF-1 drives clonal expansion.","TSH acts on the thyroid."],
   "gr-radial":["Radial growth: resorb inside, deposit outside.","The plate has closed, so no more lengthening there.","Articular cartilage doesn't lengthen or widen the shaft.","Widening the cavity alone wouldn't add diameter."],

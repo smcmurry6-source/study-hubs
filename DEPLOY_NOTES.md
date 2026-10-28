@@ -116,6 +116,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-27 evening (lessons audit, Claude Code)** — Heme & Endo Exam 1's first day (39 people, 29 h). `hubs/heme-endo-exam1`:
+  `h1-mag` ("Dr. Herr said he would NOT expect you to be able to:") removed after two reports on its first afternoon (#30, #31: "not
+  an exam-style question"; the notes already say the pars distalis stains aren't tested; bank 580 -> 579); `h1-downreg`'s explanation
+  and why line say both routes start in an endosome and the lysosome decides it (sequestration picked 12 of 26); `gr-muscle`'s stem
+  no longer quotes the lecture ("Apart from its effects on growth, which pairing of GH effects is correct?", same choices) and its
+  explanation says GH opposes insulin. `hubs/perio`: `q4-06` had two right answers (the S204SD9 *is* the posterior sickle, per the
+  hub's notes), so "Sickle scaler" is now "H6/7 sickle scaler" (same position; older `question_choices` rows for that slot mean the old
+  text); `q3-04`'s explanation says why "likelihood of retaining the tooth" (Miller & McEntire) sounds like McGuire & Nunn's
+  maintainability. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed (new lessons: misses re-asked a day
+  later; questions about what the professor said; a choice that contains the key; the Plaque Boss gets hidden, never switched off).
+  **Perio Project: carry the `q4-06` and `q3-04` changes into the split sources.**
+
 - **2026-10-27 (every hub opens on a Home page, Claude Code)** — Sam: "build a home page into each hub as a rule going forward".
   New standing rule (above, and `CLAUDE.md`). **Occlusion** gets a Home mode (first tab, default, `home/dashboard`): the final's
   countdown (days; `FINAL_TIME`/`FINAL_CLOSES` are null until the time is announced, then it counts hours and minutes), chips,

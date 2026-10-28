@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-27** (fifteenth refresh, steps 1-3 only, before building the Heme/Endo Exam 1 hub; Exam 1 is Fri
-Oct 30). Sam runs
+**Last refreshed: 2026-10-27, evening** (sixteenth refresh, the full audit, 9:30 pm Central; the morning run before building the
+Heme/Endo Exam 1 hub was steps 1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,34 +79,56 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-Refreshed 2026-10-27 (steps 1-3 only, before a new hub); "since" = the 10-21 afternoon audit. Live hubs: **Occlusion** (final
-Nov 19) and **perio** (final Nov 19); new today: **Heme/Endo Exam 1** (Fri Oct 30). Nothing newly archived. Since 10-21: 3
-Occlusion reports/suggestions, all resolved (#28 cusp game verdict, #29 `fp-facet`, #10-#12), no zero-result searches, no
-unresolved reports anywhere.
+Refreshed 2026-10-27, 9:30 pm Central (full audit); "since" = the 10-21 afternoon audit, the last one that shipped fixes. Live
+hubs: **Heme/Endo Exam 1** (Fri Oct 30; live since this morning), **Occlusion** (final Nov 19) and **perio** (final Nov 19). Nothing
+newly archived. Since 10-21: 2 new reports, both on Heme/Endo `h1-mag` (fixed tonight, below); Occlusion #29 (`fp-facet`, "what is
+a facial incline of a palatal cusp") was resolved and its stem now defines the incline, but **no reply was written, so the sender
+never heard back**; one search all week (no zero-result ones); survey round 2 answers as read this morning.
 
-**Occlusion midterm (10-21), the full picture:** 91 people and 136 h on exam day, 57 people and 64 h on the eve; 20,435
-answers all time at 82%; 35 mocks from 29 people since 10-21 at 82%. Then use stopped dead: 7 people and 8 minutes the next
-day, almost nothing since (the final is Nov 19). "Try it again" retries (from 10-21): 16 people, 186 shown, 137 right (74%).
-Tours: 84 people asked, 76 declined, 8 started, 7 finished. Arcade: 4 people.
+**Did the 10-21 afternoon fixes work?** Only exam-day afternoon data (3 pm to the 6:30 pm midterm), so small numbers: the
+redrawn horizontal envelope (matching Dr. Givan's slide) `fig-hor-b` 9/11 (63% over 43 before), `fig-hor-d` 6/7 (75% over 44), no
+report since, and the check-ins rate the diagrams 4.7/5; `cs-pro-incline`'s new key 3/6 (40% before): too few to say. The earlier
+eve and morning fixes held that afternoon: `fp-post` 5/7 (43% before), `cc-parfitt` 6/7 (47%), `cs-record-best` 8/10 (56%),
+`an-compound` 9/13 (41%). **Try it again** (missed bank questions return 5 cards later; all hubs since 10-21): 573 retries shown
+(Heme/Endo 19 people, Occlusion 16, perio 4), **459 of 484 answered right (95%)**. That is short-term recall: see the new standing lesson on next-day misses.
 
-**Occlusion check-ins, n = 14: 7 "worse than I expected", 6 "Exam asked different things"**, 6 About right, 1 easier;
-readiness 3-5 (average 3.9); diagrams 4.7/5, Patient Box pictures 3.9/5. What they say the exam had that the hub didn't:
-**"True or false with 2 statements"**, **"tricky wording like Dr. Givan uses"** (twice), **"questions with multiple choices like
-1-7, pick numbers"** (numbered-statement combination items), "oddly specific questions", "more board-style/application, more
-statement questions". The two-statement and true/false rule (10-22) answers the first; the rest is new: **write a few
-numbered-statement items per lecture** ("Which of the following are true? 1... 4..." with choices "1 and 3 only", "1, 2
-and 4", ...), and phrase stems the way the professor does (negatives, "most likely", "best explains"), not only clean recall.
-Perio had 28 midterm check-ins already read; PCD 3 got 3 late ones (2 About right, 1 easier).
+**Heme/Endo Exam 1, day one (10-27, from 11 am; 3 days out):** 39 people, 29 h; 11 under 5 min, 13 over an hour. 1,931 answers
+from 20 people at 81%; no mocks yet; Daily Drill 3 people. Time: bank 880 min (21 people), notes 678 (24), Home 116 (all 39),
+drill 62, Review 7 min (8 people), cram sheet, hints and arcade almost none. **Home** is where everyone lands: its "Lecture notes"
+quick start was the most used button (16 people, all to L1), "Practice questions" 4, Daily drill 2; 12 people went to Compendium by
+the mode tab instead. Notes: L2 Hypothalamus-Pituitary and L3 Growth opened by 10 people each; Plain English 5, As taught 4; Listen
+3. Diagrams: the pituitary on screen for 14 people (4 used its picker), HPA 7, thyroid 6. Accuracy so far: L1 Histology 83% (14
+tries per question), L2 80% (7), the rest under 5 tries per question; Endocrine Pancreas lowest at 61% on ~28 tries. Hardest
+(12+ tries): `h1-tf-5` 6/15 (follicles are 0.2-1.0 mm; "True" picked 9 times for "2 to 10 mm": fair, one number ten times too
+big), `h1-downreg` 13/26 (sequestration 12: both routes start in an endosome), `gr-muscle` 6/12 ("insulin secretion with glucagon
+suppression" 4, drawn by the stem's "ties into the pancreas lecture"), `hp-peptide-store` 7/12. **Reports #30 and #31** (two
+people, same afternoon) on `h1-mag`, "Dr. Herr said he would NOT expect you to be able to:": "not an exam-style question", "I
+don't think this needs to be a practice question". Plaque boss: 30 people met one on day one, 10 hid it. Tour: 6 asked, 2 finished.
 
-**Perio** (final Nov 19): 21 people, 8 h since 10-21, almost all on 10-22 (16 people, 6.7 h).
+**Fixed tonight:** Heme/Endo `h1-mag` removed (bank 580 -> 579; the notes already say he won't test the pars distalis stains),
+`h1-downreg`'s explanation and why line say both routes start in an endosome and the lysosome decides it, `gr-muscle`'s stem no
+longer quotes the lecture ("Apart from its effects on growth, which pairing of GH effects is correct?") and its explanation says GH
+opposes insulin (diabetogenic) rather than releasing it. Perio `q4-06` had **two right answers**: it keyed the S204SD9 over "Sickle
+scaler", but the hub's own notes call the S204SD9 the posterior sickle (7 of 17 picked "Sickle scaler"); that choice is now "H6/7
+sickle scaler". Perio `q3-04` (McGuire & Nunn, 49/105; "likelihood of retaining the tooth" picked 42 times): the explanation now says
+why the two sound alike (maintainability is the effort to keep the tooth; Miller & McEntire scores the likelihood of keeping a
+molar). Same ids and answer positions; `question_choices` rows for `q4-06` slot 2 before tonight mean "Sickle scaler".
 
-**Survey round 2, 5 more answers:** Quizlet Learn picked by 4 of 5 (Quizlet flashcards 2, Anki 1, "good the way they are" 2);
-tutorial "No" 4. Asks: "HYSG in learning objective format" (a high-yield guide organized by learning objective), "a game
-where the questions are a tad different than the Q bank, so I learn the information and not memorize answer choices",
-features like the nuke as opt-in. Quizlet-style term cards keep coming up: give a new hub a flashcard/Learn-style drill of
-terms, not only the bank.
+**Occlusion** since the midterm: no answers at all (13 minutes from a handful of visitors in a week); L6, the final's first
+lecture, went in this morning. **Check-ins, n = 13** (this morning's 14 was off by one): readiness 3.8, diagrams 4.7/5, Patient Box
+pictures 3.8/5. Against each person's use to the night of the exam: **"About right" 6** (143-868 min, 72-605 answers, 82-93%; 5
+went better or as expected; **5 of 6 took a mock**); **"Exam asked different things" 6, all went worse** (four heavy users, 373-740
+min at 73-88%, and two light ones, 38 and 72 min; **1 of 6 took a mock**); "Hub was easier" 1 (452 min, 729 answers, worse, no
+mock). Heavy users again ask for other formats (standing lesson): two-statement true/false (rule since 10-22), numbered "pick the
+numbers" items, Dr. Givan's tricky wording, application. **L6 has two-statement, true/false and EXCEPT items but no
+numbered-statement items yet.** Taking a mock went with "About right" (n = 13: suggestive, not proof).
 
-**Next audit: Heme/Endo Exam 1's first data (it goes live 3 days before the exam), then its check-ins from Oct 30.**
+**Perio:** S6 Regeneration's first use was 10-22 (16 people, 6.7 h, mostly notes); 152 answers on S6 from 5 people at 70%. The
+hardest perio items are still the midterm ones (`q3-M01` UniFe 28%, Phase I instrument items 35-54%); S4 instruments weren't on
+the midterm, so the final will be their first real test.
+
+**Next audit: Heme/Endo exam eve (Thu 10-29)**: its hardest items with 20+ tries, Endocrine Pancreas and the late lectures (L9,
+L10), mocks, the Home page buttons; then its check-ins from Fri 10 am. Occlusion and perio when L7 / S7 land.
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
@@ -233,6 +255,12 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   things work) and the lecture's emphasis over its details (MSK 4: "more specific definitions, pathways", "the hub asked
   more low-yield questions"). Write fewer product-trivia items and more decision items (this patient, this restoration,
   which material or drug and why).
+- **A miss re-asked soon is almost always right; a day later, a fifth to a third are missed again.** Every answer after a miss,
+  by the gap (10-27): within 30 minutes 88-96% right (Heme/Endo 96% of 305, Occlusion 91% of 568, PCD 3 94%, MSK 4 88%), 30
+  minutes to 12 hours 79-85%, **12 hours or more 69-80%** (Occlusion 80% of 963, PCD 3 80% of 459, MSK 4 69% of 373). "Try it again"
+  (95% right) and Weak Spots in the same sitting show the explanation was read, not that it stuck. The next-day re-ask is what
+  catches the rest: in exam week, put yesterday's misses first in the Daily Drill and on Home, and say so ("you missed these
+  yesterday"), rather than adding more same-session retries.
 - **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
@@ -266,7 +294,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   stem words echoed only by the answer, throwaway distractors). Write distractors that are the same category,
   length and form as the answer, and keep qualifiers in the explanation, not the choices. It still happens in new
   hubs: PCD `on-crack-types` asked which crack type is non-treatable with a choice labeled "Cracked tooth (treatable)"
-  (report #18, 2026-10-13). Before shipping, grep the choices for parentheses.
+  (report #18, 2026-10-13). Before shipping, grep the choices for parentheses. The reverse also happens: **a choice that names the key's own category is a second right answer.**
+  Perio `q4-06` keyed the S204SD9 over "Sickle scaler", but the hub's notes call the S204SD9 the posterior sickle (7 of 17 picked
+  "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it?
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
@@ -283,7 +313,11 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   and mixed up two slide figures. When a question tests a figure, the explanation states it and names which figure
   it is, and separates it from look-alike numbers.
 - **Low-value questions get reported.** "Not a super helpful question" (`q4-49`, disclosing-plaque order). Trivial
-  procedural orderings aren't worth a slot; test the decision or the reason instead.
+  procedural orderings aren't worth a slot; test the decision or the reason instead. Questions about what the professor said rather than about the subject
+  get reported too: Heme/Endo `h1-mag` ("Dr. Herr said he would NOT expect you to be able to:") drew two reports on its first
+  afternoon ("not an exam-style question"). A lecturer's "you won't need this" belongs in the notes or Exam Hints, never in the
+  bank; and a stem that quotes the lecture ("the pairing he said ties into the pancreas lecture") can cue a wrong choice
+  (`gr-muscle`: 4 of 12 picked the insulin/glucagon distractor). Ask about the content; credit the professor in the explanation.
 - **Students asked for spaced, missed-question review.** The first survey's only written answer asked for a daily
   drill of missed and high-yield questions, which became the Daily Drill (2026-09-28). The same survey: Question
   bank most helpful (5 of 8 answers by 10-03; Lecture notes 2, Review tables 1), usefulness 4.9/5 average.
@@ -304,6 +338,11 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   them. Sam opened separate work for highlight colors, the tutorial, Patient Box questions, games and a place to ask
   questions (10-20). Done the same day: the Daily Drill takes 10, 20 or 30 questions; Review groups carry their lecture
   number and title; Occlusion's Review has a Side by side group of comparison charts. Cloze items: not now (Sam).
+- **Interruptions get dismissed, not switched off.** Of the people who met a Plaque Boss from 10-20 on, Occlusion 53 of 89 (and 61
+  people all time) and Heme/Endo 10 of 30 on its first day closed it with "Hide the boss"; every older hub had 28-41 people do the
+  same. Yet none of 67 people with a settings snapshot since 10-22 has turned bosses off in Settings -> Extras. A survey answer:
+  "a lot of features which are fun but sometimes distracting. Features like the tactical nuke should be an opt-in thing". When most
+  people close something, offer the switch right there, or keep it out of the way in exam week.
 - **What check-ins say the hub missed lines up with the weakest data.** MSK's check-ins asked for "location of bone
   formation and differentiation", the lowest lecture (Bone Development 71%, its orderings 18-48%); perio's asked for
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.
