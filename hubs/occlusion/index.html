@@ -3615,6 +3615,31 @@ function tf(id, lec, src, statement, isTrue, ex, whyTrue, whyFalse, extra){
   mcq(id, lec, src, 'True or false: ' + statement, ['True','False'], ex, extra);
   var q = QUESTIONS[QUESTIONS.length - 1]; q.fmt = 'tf'; q.answer = isTrue ? 0 : 1; q.why = [whyTrue, whyFalse];
 }
+/* Numbered-statement items (fmt 'numbered'; Sam's standing rule, 2026-10-28): "Which ... are true?" over 4-5 numbered
+   statements, answered with a combination ("1 and 3 only", "1, 2 and 4"). The choices keep a fixed canonical order
+   (choiceOrder; sorted by the numbers), so the key is not authored first. nums() takes the statements, which are true,
+   three wrong combinations and one reason per statement (written to read after "which is true:" / "which is false:")
+   and builds the stem, the choices, the key and every "why each choice" line. */
+function numList(set){ return set.length === 1 ? String(set[0]) : set.slice(0, -1).join(', ') + ' and ' + set[set.length - 1]; }
+function numLabel(set){ return set.length === 1 ? set[0] + ' only' : set.length === 2 ? set[0] + ' and ' + set[1] + ' only' : numList(set); }
+function nums(id, lec, src, lead, stmts, truth, wrong, ex, reasons, extra){
+  var right = [], falses = [];
+  truth.forEach(function(t, i){ (t ? right : falses).push(i + 1); });
+  var sets = [right].concat(wrong).sort(function(a, b){
+    for(var i = 0; i < Math.min(a.length, b.length); i++) if(a[i] !== b[i]) return a[i] - b[i];
+    return a.length - b.length;
+  });
+  var why = sets.map(function(set){
+    if(set === right) return (falses.length ? (right.length === 1 ? 'Only statement ' + right[0] + ' is true. ' : 'Statements ' + numList(right) + ' are true. ') +
+      falses.map(function(k){ return 'Statement ' + k + ' is false: ' + reasons[k - 1]; }).join(' ') : 'All ' + truth.length + ' statements are true.');
+    var out = [];
+    set.forEach(function(k){ if(!truth[k - 1]) out.push('It includes ' + k + ', which is false: ' + reasons[k - 1]); });
+    right.forEach(function(k){ if(set.indexOf(k) < 0) out.push('It leaves out ' + k + ', which is true: ' + reasons[k - 1]); });
+    return out.join(' ');
+  });
+  mcq(id, lec, src, lead + '\n' + stmts.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n'), sets.map(numLabel), ex, extra);
+  var q = QUESTIONS[QUESTIONS.length - 1]; q.fmt = 'numbered'; q.answer = sets.indexOf(right); q.why = why;
+}
 /* Patient cases: one Patient Box (and its drawn findings) shared by every question on that patient. pc(key) gives
    a question the box and its pcase, so the box says "Same patient · 2 of 3" and Shuffle keeps the set together. */
 var CASES = {
@@ -4201,6 +4226,32 @@ tf('rv-tf-pp','review','handout','The postural position and the clinical rest po
   'They are often confused, but postural is 2-4 mm below MICP and clinical rest about 8 mm down.',
   'Postural position is reflex-held 2-4 mm below MICP; clinical rest is least EMG activity, about 8 mm inferior.');
 
+nums('rv-num-1','review','handout','Which statements about MIP, centric occlusion and centric relation are true?',
+  ['MIP is set by the teeth and neuromuscular feedback, whatever the condylar position.', 'Centric occlusion is another name for MIP.', 'Centric relation is a joint position, independent of tooth contact.', 'About 90% of people slide from the CO contact into MIP, about 1.25 mm on average.'],
+  [true,false,true,true], [[1,2,3,4],[1,3],[3,4]],
+  'MIP is the complete intercuspation of the teeth, independent of condylar position. Centric occlusion is the tooth contact with the joints seated (in CR); on Dr. Givan\'s exams it never means MIP. CR is where the condyles are seated, whatever the teeth do. About 90% of people have a CO-to-MIP slide averaging 1.25 ± 1 mm.',
+  ['MIP is a tooth-to-tooth relationship, neuromuscularly determined and independent of condylar position.',
+  'CO is the tooth contact with the joints seated; using it to mean MIP is the mix-up Dr. Givan would erase.',
+  'CR is where the condyle is seated in the joint, whatever the teeth are doing.',
+  'about 90% have a CO-to-MIP slide, averaging 1.25 ± 1 mm.']);
+nums('rv-num-2','review','handout','Which statements about posterior tooth form and how the arches fit are true?',
+  ['The centric (supporting) cusps are the maxillary lingual and mandibular buccal cusps.', 'Centric cusps maintain the vertical dimension of occlusion.', 'Centric cusps are sharp, about 1/6 of the buccolingual width.', 'A posterior crossbite is a functional problem, so posterior implant crowns should never be built in crossbite.'],
+  [true,true,false,false], [[1,2,3],[1,2,4],[2,4]],
+  'The centric cusps (maxillary lingual, mandibular buccal) are broad and rounded, about 1/3 of the buccolingual width, and hold the vertical dimension. The sharp, 1/6-width cusps are the non-centric (shearing) ones. Crossbite is functionally no problem, and after bone loss most posterior implant crowns have to be built in crossbite; just keep them from trapping the cheek.',
+  ['the maxillary lingual and mandibular buccal cusps are the supporting, holding or stamp cusps.',
+  'they hold the vertical dimension of occlusion and make the final crushing contact.',
+  'centric cusps are broad and rounded, about 1/3 of the width; the sharp 1/6-width cusps are the non-centric ones.',
+  'crossbite is functionally no problem, and after bone loss most posterior implant crowns have to be built in crossbite.']);
+nums('rv-num-3','review','handout','Which of these allow taller posterior cusps?',
+  ['A steeper condylar guidance', 'More horizontal overlap of the anterior teeth', 'More vertical overlap of the anterior teeth', 'A more acute curve of Spee', 'A greater Bennett movement'],
+  [true,false,true,false,false], [[1,2,3],[1,3,5],[3,4,5]],
+  'From the determinants table: steeper condylar guidance and more vertical overlap allow taller posterior cusps. More horizontal overlap, a more acute curve of Spee, a plane of occlusion more parallel to the condylar guidance and a greater Bennett movement all call for shorter ones.',
+  ['in the determinants table, steeper condylar guidance allows taller posterior cusps.',
+  'more horizontal overlap calls for shorter posterior cusps.',
+  'more vertical overlap allows taller posterior cusps.',
+  'a more acute curve of Spee calls for shorter cusps, the most posterior ones above all.',
+  'a greater Bennett movement (or a greater immediate side shift) calls for shorter cusps.']);
+
 /* =================================================================== L2 FUNCTIONAL TMJ ANATOMY + MUSCLES */
 mcq('an-ginglymus','anatomy','handout','A ginglymus joint:',
   ['Moves in one plane like a hinge, e.g. the elbow, knee and finger joints','Glides freely between flat surfaces, e.g. the wrist, the ankle and the spine','Rotates around a single pivot, e.g. the atlantoaxial joint','Is a fibrous joint with no movement, e.g. a cranial suture'],
@@ -4419,6 +4470,24 @@ tf('an-tf-hyoid','anatomy','handout','To open, the suprahyoid muscles fix the hy
   'False, it is reversed. The infrahyoids first fix the hyoid "like a rock," then the suprahyoids (digastric, geniohyoid, mylohyoid, stylohyoid) pull the mandible down.',
   'The roles are swapped: infrahyoids stabilize, suprahyoids open.',
   'Infrahyoids fix the hyoid first; then the suprahyoids pull the mandible down.');
+
+nums('an-num-1','anatomy','handout','Which statements about the TMJ and its disc are true?',
+  ['Rotation happens in the lower compartment, between the disc and the condyle.', 'The intermediate zone is the thickest part of the disc.', 'The disc is slightly thicker medially than laterally.', 'The retrodiscal tissues have no vessels or nerves, so loading them is painless.'],
+  [true,false,true,false], [[1,3,4],[2,3],[3,4]],
+  'Rotation happens in the lower compartment (disc to condyle), translation in the upper (disc to temporal bone). The disc is biconcave: a thick anterior border, a thinner avascular intermediate zone where the condyle sits, and an even thicker posterior border; it is slightly thicker medially. The retrodiscal tissues are loaded with vessels and nerves, so functioning on them hurts.',
+  ['the lower compartment (disc to condyle) is where rotation happens; translation is in the upper.',
+  'the intermediate zone is the thin part where the condyle sits; the posterior border is the thickest.',
+  'it is slightly thicker medially, so a disc that slips tends to go forward or medially.',
+  'the retrodiscal tissues are loaded with vessels and nerves, and functioning on them causes substantial pain.']);
+nums('an-num-2','anatomy','handout','Which muscles move the mandible to the right, according to the exam slide?',
+  ['Right temporalis', 'Right lateral pterygoid', 'Left medial pterygoid', 'Right masseter', 'Left lateral pterygoid'],
+  [true,false,true,true,true], [[1,2,3,4],[1,2,4,5],[1,3,4]],
+  'Lateral to the right: the right temporalis and right masseter, with the left lateral pterygoid and left medial pterygoid. A lateral pterygoid swings the chin to the opposite side, so the left one moves the jaw to the right.',
+  ['the right temporalis is on the slide for lateral to the right.',
+  'the right lateral pterygoid swings the chin to the left; it\'s the left one that moves the jaw to the right.',
+  'the left medial pterygoid works with the left lateral pterygoid to move the jaw to the right.',
+  'the right masseter is on the slide for lateral to the right.',
+  'contracting the left lateral pterygoid swings the chin to the right.']);
 
 /* =================================================================== L3 MASTICATION, DEGLUTITION AND SPEECH */
 mcq('fn-primary','function','handout','Which are the three PRIMARY functions of the masticatory system?',
@@ -4648,6 +4717,23 @@ tf('fn-tf-fma','function','handout','A high FMA (divergent jaws, a long face) go
   'Long, divergent faces have lower forces; square, low-angle faces have high ones.',
   'High FMA goes with lower bite force.');
 
+nums('fn-num-1','function','handout','Which statements about the chewing cycle are true?',
+  ['Tall cusps and deep fossae promote a broad, mostly horizontal stroke.', 'Chewing opens only about 16-18 mm and moves about 5-6 mm laterally.', 'When the teeth touch during chewing, they come back to ICP.', 'Patients with TMJ pain chew with faster, more repeatable strokes.'],
+  [false,true,true,false], [[1,2,3],[1,3],[2,3,4]],
+  'Chewing opens only about 16-18 mm with about 5-6 mm of lateral movement, and whenever the teeth contact they return to ICP. Tall cusps and deep fossae give a mostly vertical stroke (flattened cusps a broader one), and TMJ pain makes the strokes slower, shorter and less repeatable.',
+  ['tall cusps and deep fossae promote a mostly vertical stroke; flattened cusps give the broader, horizontal one.',
+  'the chewing stroke opens about 16-18 mm and moves about 5-6 mm laterally.',
+  'contacts return to ICP every time: you always come back to home plate.',
+  'with TMJ pain the strokes are less repeatable, slower, shorter and more irregular.']);
+nums('fn-num-2','function','handout','Which statements about swallowing and speech are true?',
+  ['In an adult somatic swallow, the teeth come together in MIP to stabilize the mandible.', 'Swallowing contacts happen in a retruded position, behind ICP.', 'The teeth normally touch during speech, most often on "s".', 'We swallow about 590 times a day.'],
+  [true,false,false,true], [[1,2,4],[2,3],[3,4]],
+  'Adults swallow somatically: teeth together in MIP, the elevators holding the mandible so the hyoid can move. Swallowing contacts are heavy and long and happen in ICP, not a retruded position as once thought. The teeth don\'t normally touch in speech; on "s" they come closest, about 1-1.5 mm apart. We swallow about 590 times a day.',
+  ['the teeth meet in MIP and the elevators hold the mandible there so the hyoid can move.',
+  'swallowing contacts happen in ICP, not the retruded position once thought.',
+  'teeth don\'t normally touch in speech; on "s" they come closest, about 1-1.5 mm apart.',
+  'about 590 a day: 146 at meals, 394 between meals awake and 50 asleep.']);
+
 /* =================================================================== L4 OCCLUSAL CONCEPTS */
 mcq('cc-bonwill','concepts','handout','Who is called "the father of articulation," and what was his theory?',
   ['W.G.A. Bonwill: the 4-inch equilateral triangle','George Monson: the 4-inch sphere centered near the glabella','Carl Christensen: posterior separation in protrusion','Norman Bennett: lateral translation of the mandible'],
@@ -4869,6 +4955,23 @@ tf('cc-tf-lisp','concepts','handout','Too much closest speaking space causes a w
   'False. Too much space gives a lisp; too little and the teeth bump or whistle.',
   'Too much space is a lisp; a whistle comes from too little.',
   'A whistle (or bumping teeth) means too little space.');
+
+nums('cc-num-1','concepts','handout','Which pairings of a name and an idea are correct?',
+  ['Bennett: the occlusal curve in the sagittal plane', 'D\'Amico: cusp-fossa waxing', 'Bonwill: the 4-inch triangle from condyle to condyle to the symphysis', 'Christensen: posterior separation in protrusion and the protrusive record'],
+  [false,false,true,true], [[1,3,4],[2,3],[2,3,4]],
+  'Bonwill described the 4-inch (110 mm) equilateral triangle, and Christensen the posterior separation in protrusion and the protrusive record. The sagittal occlusal curve is von Spee\'s; Bennett described lateral translation of the mandible. Cusp-fossa waxing is Peter K. Thomas\'s; D\'Amico\'s idea was mutually protected occlusion.',
+  ['the sagittal occlusal curve is von Spee\'s (1890); Bennett described lateral translation of the mandible (1908).',
+  'cusp-fossa waxing is Peter K. Thomas\'s; D\'Amico gave us mutually protected occlusion (keyword force).',
+  'Bonwill\'s equilateral triangle is about 4 inches (110 mm) condyle to condyle to the symphysis.',
+  'Christensen (1901) described posterior separation in protrusion and the protrusive record.']);
+nums('cc-num-2','concepts','handout','Which statements about the four modern concepts are true?',
+  ['Tripodization suits every crown because it leaves horizontal freedom.', 'Posterior support is usually the first consideration in a restorative plan.', 'Restoring to the second premolar (the shortened dental arch) shows no difference in chewing ability or TMD.', 'Condylar guidance is the determinant the dentist controls most.'],
+  [false,true,true,false], [[1,2,3],[2,3,4],[3,4]],
+  'Support first, disclusion second: posterior support usually comes first, and the shortened dental arch (to the second premolar) shows no difference in chewing, TMD or comfort. Point-to-surface contacts give horizontal freedom; tripodization leaves no wiggle room and is suggested only when the opposing surfaces are controlled. Anterior guidance is the determinant you control most.',
+  ['tripodization leaves no wiggle room and is suggested only when the opposing surfaces are controlled; point to surface is what gives freedom.',
+  'support first, disclusion second: anterior guidance follows as the second consideration.',
+  'restoring to the second premolar showed no difference in chewing ability, TMD, migration, periodontal support or comfort.',
+  'anterior guidance, through the lingual contours of the maxillary anteriors, is the determinant you control most.']);
 
 /* =================================================================== L5 APPLYING OCCLUSION */
 mcq('ap-schemes','applying','handout','Which are the three accepted occlusal schemes listed in Lec3-2?',
@@ -5194,6 +5297,23 @@ tf('ap-tf-shim','applying','handout','On a firm clench, shimstock should pull th
   'On a clench it should hold on all of them; pulling through belongs to the light closure.',
   'A clench drops the teeth into their PDL, so shimstock holds on the implant too.');
 
+nums('ap-num-1','applying','handout','Which statements about conformative and reorganized treatment are true?',
+  ['Conformative treatment copies the existing guidance when there are no signs or symptoms.', 'Reorganized treatment starts with the joints seated and uses a CR record.', 'For a conformative crown, a full-arch MIP registration is best because it keeps the casts from rocking.', 'Multiple large restorations across posterior quadrants call for a reorganized approach.'],
+  [true,true,false,true], [[1,2],[1,2,3,4],[2,4]],
+  'With no signs or symptoms, copy the existing guidance (conformative, with an MIP record kept minimal). Reorganized treatment starts from ground zero with the joints seated and a CR record, for destruction, wear, fractures or large multi-quadrant work. A full-arch registration is a common error: it puts material between teeth that should touch, so hand-articulate when you can.',
+  ['with no signs or symptoms, copying the existing guidance is conformative dentistry.',
+  'it starts from ground zero with the joints seated, mounted from a CR record.',
+  'a full-arch registration is a common error: it puts material between teeth that should touch.',
+  'multiple large restorations in posterior quadrants are treated reorganized.']);
+nums('ap-num-2','applying','handout','Which statements about occlusion on implants are true?',
+  ['An implant moves far less than a tooth under load because it has no periodontal ligament.', 'An anterior implant crown should take immediate canine disclusion on its own.', 'A posterior implant crown should be left out of contact in maximum intercuspation.', 'On a light closure, shimstock holds on the natural neighbors and pulls through the implant with some resistance.'],
+  [true,false,false,true], [[1,2,4],[2,4],[3,4]],
+  'With no PDL, an implant moves about 2-3 µm apically vs about 28 µm for a tooth. Anterior implants avoid immediate canine disclusion and share excursive load with the natural teeth, which have proprioception. Posterior implants are very light in casual closure but equal in maximum intercuspation: no contact lets the opposing tooth supererupt. Shimstock pulls through the implant on a light closure and holds on everything on a clench.',
+  ['with no PDL, an implant moves about 2-3 µm apically vs about 28 µm for a tooth.',
+  'anterior implants avoid immediate canine disclusion and share the load with natural teeth, which have proprioception.',
+  'posterior implants are very light in casual closure but equal in maximum intercuspation; no contact lets the opposing tooth supererupt.',
+  'on a light closure the natural teeth hold it and it pulls through the implant; on a clench it holds on all of them.']);
+
 /* =================================================================== L6 OCCLUSAL INSTRUMENTATION (final) */
 mcq('in-cr-mount','instruments','handout','For diagnosis, why is a CR mounting more useful than an MIP mounting?',
   ['It can close into CO and still move into MIP, so every contact and slide can be seen','It is simpler to take, because MICP is usually more stable than CO, so the casts rarely rock','It records the patient\'s chewing paths along with the closed position','It needs no interocclusal record whenever the casts hand-articulate'],
@@ -5486,6 +5606,46 @@ seq('in-seq-prog','instruments','handout','Put the steps for setting a semi-adju
   ['Release the centric latch and loosen both SCI settings','Seat the record on the upper cast and the lower cast into it','See the gap: the condylar elements don\'t touch the fossae','Adjust each SCI until its element touches the superior fossa','Tighten both SCI settings'],
   'Loosen, seat the record, find the gap, close the fossa down onto the condylar element, tighten. A protrusive record does both sides at once; for a lateral record you would also set the contralateral medial wall, then repeat with the other side.');
 
+nums('in-num-1','instruments','handout','Which statements about the facebow transfer are true?',
+  ['It mounts the maxillary cast in relation to the patient\'s hinge axis.', 'It can mount the mandibular cast when no centric relation record is available.', 'Its two posterior reference points are usually the ear canals.', 'An arbitrary facebow puts the articulator\'s hinge axis within about 2-5 mm of the patient\'s.'],
+  [true,false,true,true], [[1,2,3,4],[1,3],[3,4]],
+  'The facebow mounts the maxillary cast, never the mandibular: the mandibular cast goes on with a CR or MIP record. The ear canals estimate the transverse horizontal hinge axis, and an arbitrary facebow lands within about 2-5 mm of it, close enough for almost every patient.',
+  ['the facebow relates the maxilla to the patient\'s hinge axis, for function and esthetics.',
+  'the facebow mounts the maxillary cast, never the mandibular; the mandibular cast goes on with a CR or MIP record.',
+  'the ear canals estimate the transverse horizontal hinge axis.',
+  'an arbitrary bow estimates a point near the axis, typically within 2-5 mm.']);
+nums('in-num-2','instruments','handout','Which statements about eccentric records are true?',
+  ['One protrusive record sets the sagittal condylar inclination on both sides.', 'A right lateral record sets the right side\'s Bennett angle.', 'The condylar inclination read from a lateral record is steeper than the one read from a protrusive record.', 'Eccentric records are taken with the mandible moved 7-10 mm, where the condyle\'s path is straightest.'],
+  [true,false,true,false], [[1,2,3],[1,3,4],[2,3]],
+  'A protrusive record sets both SCIs at once. Each lateral record sets the opposite side: a right lateral record programs the left SCI and the left medial wall (Bennett angle). The lateral reading runs down the medial wall, so it is steeper than the protrusive one, which is why protrusive records are preferred. Records are taken at 3-5 mm: farther out the condyle\'s path curves.',
+  ['one protrusive record sets the SCI on both sides.',
+  'each lateral record sets the opposite side, so a right lateral record sets the left side\'s SCI, Bennett angle and side shift.',
+  'the lateral record reads the path down the medial wall, which is steeper than down the articular eminence.',
+  'records are taken at 3-5 mm; beyond that the condyle\'s path is curving, and at 7-10 mm the Bennett angle reads smaller.']);
+nums('in-num-3','instruments','handout','Which statements about mounting casts are true?',
+  ['From a CR mounting you can always find MIP, but an MIP mounting can\'t get back to CO.', 'A non-adjustable articulator is accurate only in MICP.', 'When the casts hand-articulate firmly, send the lab an MIP record anyway, just in case.', 'MIP and CO coincide in about 90% of people.'],
+  [true,true,false,false], [[1,2,3],[1,2,4],[2,4]],
+  'A CR mounting allows the fullest range of movement: you can close into CO and still move into MIP, while an MIP mounting can\'t reposition the condyles. Every non-adjustable articulator is accurate only in MICP. If the casts hand-articulate, do it: a lab mounts with whatever record you send. MIP and CO differ in about 90% of people.',
+  ['a CR mounting can close into CO and still move into MIP; an MIP mounting can\'t reposition the condyles to CR.',
+  'however it looks, its opening, closing and eccentric paths don\'t reflect the patient; only MICP is accurate.',
+  'hand-articulate whenever you can; a lab mounts with any record you send, so don\'t send one just in case.',
+  'they differ in about 90% of people; only about 10% have CO and MIP coincident.']);
+nums('in-num-4','instruments','handout','Which statements about fully adjustable articulators are true?',
+  ['They are programmed with an arbitrary facebow placed in front of the ears.', 'A thicker CR record adds more error on them than on a semi-adjustable articulator.', 'A pantograph records the timing of mandibular movement while a central bearing device keeps the teeth apart.', 'They can be set to the patient\'s intercondylar distance.'],
+  [false,false,true,true], [[1,2,3,4],[1,3,4],[2,3,4]],
+  'A fully adjustable articulator needs the exact hinge axis, located with a kinematic facebow. Because that axis is exact, the arcs on the patient and the articulator match and the thickness of the CR record doesn\'t matter; on a semi-adjustable articulator a thicker record adds error. The pantograph captures the timing of movement with the teeth held apart, and the instrument can be set to the intercondylar distance.',
+  ['they need the exact hinge axis, located with a kinematic facebow; an arbitrary bow only estimates it.',
+  'with the exact axis captured, the arcs match and record thickness doesn\'t affect accuracy; it\'s the semi-adjustable where thickness adds error.',
+  'its styli and recording tables capture protrusive and lateral movement, and the central bearing device keeps the teeth from guiding it.',
+  'not everyone is 4 inches, and the distance changes the paths of opposing cusps.']);
+nums('in-num-5','instruments','handout','Which of these call for at least a semi-adjustable articulator rather than a non-adjustable one?',
+  ['A crown on #20 when the patient has strong canine guidance', 'A crown that is part of the anterior guidance', 'Restorations that cross the midline', 'A diagnostic CR mounting'],
+  [false,true,true,true], [[1,2,3,4],[1,2,4],[2,3]],
+  'With strong anterior guidance a posterior crown will disclude, so any of the three articulators can do it. A restoration that is part of the anterior guidance, crosses the midline or needs a diagnostic CR mounting calls for at least a semi-adjustable articulator (a fully adjustable one does them best).',
+  ['strong anterior guidance discludes the posterior teeth, so a restoration discluded that well can go on any of the three.',
+  'it is hard to justify a non-adjustable articulator for any tooth that is part of the anterior guidance.',
+  'the selection table puts restorations that cross the midline under at least a semi-adjustable articulator.',
+  'the selection table lists a diagnostic CR mounting under at least a semi-adjustable articulator.']);
 /* ---------- READINGS (lecture notes synthesized from the recordings, slides and Dr. Givan's handouts) ----------
    Each lecture opens with a short "what's tested" list (LESSONS.md: lead with it) and puts look-alikes in a table.
    Narration (audio/<id>-full.mp3, -plain.mp3) is generated from this text: edit a level, regenerate its mp3. */
@@ -6845,7 +7005,7 @@ function lecLabel(l){ return l.label || ('L' + l.num); }
 
 /* ---------- utils ---------- */
 function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-function choiceOrder(q){ var idx = q.choices.map(function(c,i){ return i; }); return q.fmt === '2stmt' || q.fmt === 'tf' ? idx : shuffled(idx); }
+function choiceOrder(q){ var idx = q.choices.map(function(c,i){ return i; }); return q.fmt === '2stmt' || q.fmt === 'tf' || q.fmt === 'numbered' ? idx : shuffled(idx); }
 function shuffled(arr){ var a = arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function tagOf(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? l.tag : 'blue'; }
 function lecChip(lecId){ var l = LECTURE_BY_ID[lecId]; if(!l) return ''; return '<span class="lec-chip tag-'+l.tag+'">'+lecLabel(l)+' · '+escHtml(l.title.split(':')[0].split(',')[0])+'</span>'; }
@@ -7436,7 +7596,7 @@ var bankSearch = '';
 function renderBank(body){
   var lecOpts = '<option value="final"'+(STATE.ui.qlec==='final'?' selected':'')+'>For the final (L6 on)</option><option value="midterm"'+(STATE.ui.qlec==='midterm'?' selected':'')+'>Midterm lectures (L1-L5)</option><option value="all"'+(STATE.ui.qlec==='all'?' selected':'')+'>All lectures</option>' + lecOrder().map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
-  var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
   body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
@@ -7924,7 +8084,7 @@ var ARCADE = (function(){
   }
 
   /* ---------- context for the shared games (widget/games.js) ---------- */
-  function arcadeQ(q){ return q.type === 'mcq' && !q.pbox && !q.img && !q.pimg && q.fmt !== '2stmt' && q.fmt !== 'tf'; }
+  function arcadeQ(q){ return q.type === 'mcq' && !q.pbox && !q.img && !q.pimg && q.fmt !== '2stmt' && q.fmt !== 'tf' && q.fmt !== 'numbered'; }
   function scopeIds(scope){ return LECTURE_BY_ID[scope] ? [scope] : LECTURES.map(function(l){ return l.id; }); }
   function bankPool(scope){
     if(scope === 'missed') return QUESTIONS.filter(function(q){ var s = STATE.seen[q.id]; return arcadeQ(q) && !!s && s.last === false; });

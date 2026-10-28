@@ -546,19 +546,37 @@
   var boss = null, bossHidden = false, lastHitSend = 0;
   function bossId(){ var c = centralParts(); return HUB + "|" + c.day + "|" + Math.floor(c.hour / 2); }
   function bossDown(id){ return ls("sh_egg_boss_down") === id; }
+  /* The boss docks as a slim strip at the bottom of the hub's sticky top bar, so it never sits over a question (Sam,
+     2026-10-28: the floating card at the bottom of the screen covered answer choices). A page without one floats it. */
+  function bossDock(){
+    var h = document.querySelector("header.hub-header") || document.querySelector("header");
+    if (!h) return null;
+    var pos = getComputedStyle(h).position;
+    return pos === "sticky" || pos === "fixed" ? h : null;
+  }
+  /* bleed the docked band to the top bar's edges and flush with its bottom border, whatever padding the hub gives it */
+  function fitDock(el){
+    var p = el && el.parentNode; if (!p || !el.classList.contains("is-docked")) return;
+    var cs = getComputedStyle(p);
+    el.style.marginLeft = "-" + cs.paddingLeft; el.style.marginRight = "-" + cs.paddingRight; el.style.marginBottom = "-" + cs.paddingBottom;
+    el.style.paddingLeft = cs.paddingLeft; el.style.paddingRight = cs.paddingRight;
+  }
+  window.addEventListener("resize", function(){ if (boss) fitDock(boss.el); });
   function spawnBoss(hp, test){
     var id = bossId();
     if (!test && boss && boss.id === id) return;
     if (!test && bossDown(id)) return;
     if (boss) boss.el.remove();
     var k = test ? test.k : bossKind(id);
-    var el = document.createElement("div");
-    el.className = "sh-egg sh-egg-boss sh-egg-boss-" + k.id;
+    var el = document.createElement("div"), dock = bossDock();
+    el.className = "sh-egg sh-egg-boss sh-egg-boss-" + k.id + (dock ? " is-docked" : "");
+    el.title = "Every correct answer from anyone in the hub hits it";
     el.innerHTML = '<span class="sh-egg-boss-face" style="color:' + k.color + '">' + bossIcon(k) + '</span>' +
-      '<span class="sh-egg-boss-body"><b>' + bossName(k) + '</b><small>Every correct answer from anyone in the hub hits it</small>' +
+      '<span class="sh-egg-boss-body"><b>' + bossName(k) + '</b><small><span class="sh-egg-boss-hp"></span><span class="sh-egg-boss-say"></span></small>' +
       '<span class="sh-egg-boss-bar"><i></i></span></span>' +
       '<button type="button" class="sh-egg-x" aria-label="Hide the boss">×</button>';
-    document.body.appendChild(el);
+    (dock || document.body).appendChild(el);
+    if (dock) fitDock(el);
     el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); });
     boss = { id: id, k: k, max: k.hp, hp: Math.min(k.hp, hp || k.hp), el: el, test: !!test };
     drawBoss();
@@ -569,7 +587,8 @@
     var f = boss.hp / boss.max, said = boss.k.said;
     boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
     var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
-    boss.el.querySelector("small").textContent = boss.hp + " / " + boss.max + " HP · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
+    boss.el.querySelector(".sh-egg-boss-hp").textContent = boss.hp + " / " + boss.max + " HP";
+    boss.el.querySelector(".sh-egg-boss-say").textContent = " · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
     boss.el.classList.toggle("is-low", f <= .25);
     boss.el.classList.toggle("is-shown", !bossHidden && feat("boss"));
   }

@@ -2623,6 +2623,9 @@ tf("th-tf-8", "thyroid", "slides", "Thyroid storm affects about 1 to 2% of patie
 mcq("th-num-1", "thyroid", "slides", "Which steps happen in the colloid rather than inside the follicular cell?\n1. Iodination of thyroglobulin\n2. Coupling of MIT and DIT\n3. Proteolysis of thyroglobulin\n4. Iodide trapping by NIS",
   ["1 and 2 only","1, 2 and 3","1, 2 and 4","3 and 4 only"],
   "Iodination and coupling happen in the colloid (thyroid hormone is made extracellularly). Proteolysis happens in lysosomes after endocytosis; trapping is at the basolateral membrane.", {"fmt":"numbered"});
+mcq("th-num-2", "thyroid", "slides", "Which statements about primary thyroid disease are true?\n1. In Graves disease, antibodies activate the TSH receptor, so TSH is low.\n2. In Hashimoto's disease, T4 is low and TSH is low.\n3. Hypothyroid patients tend to have high cholesterol, from too few LDL receptors.\n4. A goiter can come with too much or too little thyroid hormone.",
+  ["1, 2 and 3","1, 2, 3 and 4","1 and 3 only","1, 3 and 4"],
+  "Graves antibodies act like TSH, so feedback drives TSH low. Hashimoto's is primary hypothyroidism: the gland fails, so T4 is low and TSH is very high. Too few LDL receptors raise cholesterol in hypothyroidism. TSH (or the Graves antibodies) is a growth signal, so a goiter can form with too much or too little hormone.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 3;
 seq("th-seq", "thyroid", "slides", "Put these steps of thyroid hormone synthesis in order.",
   ["Iodide trapped by NIS","Iodide oxidized and attached to thyroglobulin by thyroperoxidase","MIT and DIT coupled into T3 and T4","Colloid endocytosed through megalin","Thyroglobulin digested in lysosomes, freeing T3 and T4"],
   "Trap → oxidize and organify → couple → endocytose → proteolysis and secretion (with iodine recycled).");
@@ -3529,6 +3532,9 @@ tf("h2-tf-7", "histo2", "slides", "In an islet immunostained for insulin, glucag
 mcq("h2-num-1", "histo2", "slides", "Which are true of the adrenal medulla?\n1. It is completely invested by the cortex.\n2. It is stimulated mainly by ACTH.\n3. Its cells are innervated by preganglionic sympathetic fibers.\n4. It receives venous blood from the cortex.",
   ["1, 2, 3 and 4","1 and 3 only","1, 3 and 4","2, 3 and 4"],
   "The medulla is driven by sympathetic nerves (ACh), not ACTH. The rest are true.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 2;
+mcq("h2-num-2", "histo2", "slides", "Which statements about the adrenal cortex and the islets are true?\n1. The zona fasciculata is the largest zone and makes glucocorticoids.\n2. The zona glomerulosa responds to angiotensin II as well as ACTH.\n3. Beta cells are the most abundant islet cell.\n4. The islets make up about 10-15% of the pancreas's volume.",
+  ["1, 2 and 3","1, 2, 3 and 4","1 and 3 only","2, 3 and 4"],
+  "The fasciculata is 65-80% of the cortex and makes cortisol; the glomerulosa answers to angiotensin II as well as ACTH; beta cells are 65-70% of an islet. The islets are only about 1-2% of the pancreas's volume.", {"fmt":"numbered"});
 
 /* From the 10/27 recording */
 mcq("h2-r-middle", "histo2", "rec", "The middle suprarenal arteries arise directly from the:",
@@ -3742,6 +3748,9 @@ tf("ca-tf-7", "calcium", "slides", "Calcitriol increases intestinal phosphate ab
 mcq("ca-num-1", "calcium", "slides", "Which turn on renal 1α-hydroxylase (the active 1,25-(OH)2-D3)?\n1. PTH\n2. Hypercalcemia\n3. Hypophosphatemia\n4. 1,25-(OH)2-D3 itself",
   ["1, 2 and 3","1 and 3 only","1, 3 and 4","2 and 4 only"],
   "Hypocalcemia, PTH and hypophosphatemia turn on 1α-hydroxylase; hypercalcemia, hyperphosphatemia and calcitriol itself turn on 24-hydroxylase, the inactive pathway.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 1;
+mcq("ca-num-2", "calcium", "slides", "Which statements about bone cells, PTH and vitamin D are true?\n1. Osteoblasts carry the receptors for PTH, vitamin D3 and estrogen.\n2. Osteoclasts carry the receptor for calcitonin.\n3. In chief cells, a rise in intracellular calcium triggers PTH secretion.\n4. The liver adds the hydroxyl at carbon 1 that activates vitamin D.",
+  ["1 and 2 only","1, 2 and 3","1, 2 and 4","2 and 3 only"],
+  "Osteoblasts carry the PTH, vitamin D3 and estrogen receptors, and osteoclasts the calcitonin receptor (Dr. Galin: put a star by it). The chief cell is the exception in endocrinology: a rise in intracellular calcium blocks PTH secretion. The liver hydroxylates carbon 25; the kidney's 1α-hydroxylase adds carbon 1 to make the active hormone.", {"fmt":"numbered"});
 /* From the 10/27 recording */
 mcq("ca-r-chvostek", "calcium", "rec", "Tapping over a patient's facial nerve makes the facial muscles spasm. This is:",
   ["Chvostek's sign of hypocalcemia","Trousseau's sign of hypocalcemia","A sign of hypercalcemia","A sign of primary hyperparathyroidism"],
@@ -4401,6 +4410,7 @@ var QUESTION_WHY = {
   "th-goiter":["High TSH is trophic for the gland.","Hormone is low in Hashimoto's.","Activating antibodies are Graves.","Iodine excess isn't the mechanism."],
   "th-congenital-tx":["Replace the missing hormone.","Thiouracil blocks synthesis (for hyperthyroidism).","Radioiodine destroys thyroid tissue.","Somatostatin analogs treat acromegaly."],
   "th-num-1":["Iodination and coupling are extracellular.","Proteolysis happens in lysosomes inside the cell.","Trapping happens at the basolateral membrane.","Proteolysis and trapping are both cellular."],
+  "th-num-2":["Includes 2: in Hashimoto's (primary) the TSH is high, not low; it also leaves out 4.","Includes 2: primary hypothyroidism has a high TSH.","Leaves out 4: high TSH or Graves antibodies make the gland grow either way.","Only 2 is false: in primary hypothyroidism TSH is high."],
   "pa-beta-share":["Beta cells, about 70%.","Alpha cells are second, about 20%.","Delta cells are under 10%.","Epsilon cells are under 1%."],
   "pa-amylin":["Amylin rides along with insulin.","Ghrelin comes from epsilon cells.","Pancreatic polypeptide comes from gamma (PP) cells.","Somatostatin comes from delta cells."],
   "pa-epsilon":["Ghrelin, the hunger signal.","Glucagon is from alpha cells.","PP is from gamma cells.","Amylin is from beta cells."],
@@ -4595,6 +4605,7 @@ var QUESTION_WHY = {
   "h2-ss-para":["Paracrine.","It acts on other cells.","Not neuroendocrine.","Not exocrine."],
   "h2-em":["Vesicles beside capillaries.","Lipid droplets are fasciculata.","Colloid is thyroid.","Axons ending on vessels are the posterior pituitary."],
   "h2-num-1":["ACTH drives the cortex, not the medulla.","Statement 4 is true too (the dual supply).","Only statement 2 is false: sympathetic nerves drive the medulla.","Statement 2 is false and 1 is true."],
+  "h2-num-2":["Only 4 is false: the islets are about 1-2% of the volume.","Includes 4: the islets are only about 1-2% of the pancreas.","Leaves out 2: angiotensin II drives the glomerulosa too.","Includes 4 and leaves out 1: the fasciculata (65-80%) makes cortisol."],
   "ca-hypo-excit":["More excitable.","That is hypercalcemia.","Not the effect described.","The opposite: firing comes more easily."],
   "ca-tetany":["Tetany.","Low calcium causes spasm, not flaccidity.","Stones come from high urinary calcium.","Not an acute effect."],
   "ca-trousseau":["The BP-cuff spasm of hypocalcemia.","Those are symptoms of high calcium, not a provoked spasm.","Not a sign of excitability.","A rickets deformity."],
@@ -4633,7 +4644,8 @@ var QUESTION_WHY = {
   "ca-rickets-signs":["From hypercalciuria, not rickets.","On the list.","On the list.","On the list."],
   "ca-hpt":["Inappropriately high PTH, high Ca, low P.","That is hypoparathyroidism.","High PTH with low calcium is the normal response to low calcium.","Not this disease."],
   "ca-hpt-case":["The classic picture.","A childhood disease of soft bone.","That lowers calcium.","That lowers PTH and calcium."],
-  "ca-num-1":["High calcium turns on 24-hydroxylase instead.","PTH and low phosphate turn on 1α-hydroxylase.","Calcitriol itself turns on 24-hydroxylase (feedback).","Both of those turn on 24-hydroxylase."]
+  "ca-num-1":["High calcium turns on 24-hydroxylase instead.","PTH and low phosphate turn on 1α-hydroxylase.","Calcitriol itself turns on 24-hydroxylase (feedback).","Both of those turn on 24-hydroxylase."],
+  "ca-num-2":["Osteoblasts hold the PTH, D3 and estrogen receptors; osteoclasts the calcitonin receptor.","Includes 3: in chief cells, rising intracellular calcium blocks PTH secretion.","Includes 4: the liver works at carbon 25; the kidney adds carbon 1.","Includes 3 and leaves out 1: PTH's receptor is on the osteoblast."]
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });

@@ -120,8 +120,8 @@ pictures 3.8/5. Against each person's use to the night of the exam: **"About rig
 went better or as expected; **5 of 6 took a mock**); **"Exam asked different things" 6, all went worse** (four heavy users, 373-740
 min at 73-88%, and two light ones, 38 and 72 min; **1 of 6 took a mock**); "Hub was easier" 1 (452 min, 729 answers, worse, no
 mock). Heavy users again ask for other formats (standing lesson): two-statement true/false (rule since 10-22), numbered "pick the
-numbers" items, Dr. Givan's tricky wording, application. **L6 has two-statement, true/false and EXCEPT items but no
-numbered-statement items yet.** Taking a mock went with "About right" (n = 13: suggestive, not proof).
+numbers" items, Dr. Givan's tricky wording, application. **Numbered-statement items added 2026-10-28** (16 across L1-L6, 5 on
+L6; now a standing rule). Taking a mock went with "About right" (n = 13: suggestive, not proof).
 
 **Perio:** S6 Regeneration's first use was 10-22 (16 people, 6.7 h, mostly notes); 152 answers on S6 from 5 people at 70%. The
 hardest perio items are still the midterm ones (`q3-M01` UniFe 28%, Phase I instrument items 35-54%); S4 instruments weren't on
@@ -220,7 +220,9 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   midterm check-ins (n = 14, 7 "worse than expected"): the exam had two-statement true/false, "pick the numbers" items (four to
   seven numbered statements, choices are combinations) and "tricky wording". Every hub from Heme/Endo Exam 1 on gets a few
   numbered-statement items per lecture besides the two-statement and true/false rule, and stems phrased the way that
-  professor asks (NOT/EXCEPT, "most likely", "best explains"), drawn from how they word their own slide questions.
+  professor asks (NOT/EXCEPT, "most likely", "best explains"), drawn from how they word their own slide questions. **A standing
+  rule since 2026-10-28** (`CLAUDE.md` → "Numbered-statement questions": at least 2 per taught lecture, CI-checked); Occlusion got
+  16 (`nums()`), and the final will show whether they close the "Exam asked different things" gap.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
@@ -342,7 +344,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   people all time) and Heme/Endo 10 of 30 on its first day closed it with "Hide the boss"; every older hub had 28-41 people do the
   same. Yet none of 67 people with a settings snapshot since 10-22 has turned bosses off in Settings -> Extras. A survey answer:
   "a lot of features which are fun but sometimes distracting. Features like the tactical nuke should be an opt-in thing". When most
-  people close something, offer the switch right there, or keep it out of the way in exam week.
+  people close something, offer the switch right there, or keep it out of the way in exam week. Sam (2026-10-28): it blocked
+  questions, so the boss now docks as a slim strip in the hub's sticky top bar; next audit, compare "Hide the boss" per person
+  who meets one (Occlusion 53 of 89, Heme/Endo 10 of 30 before the move).
 - **What check-ins say the hub missed lines up with the weakest data.** MSK's check-ins asked for "location of bone
   formation and differentiation", the lowest lecture (Bone Development 71%, its orderings 18-48%); perio's asked for
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.
