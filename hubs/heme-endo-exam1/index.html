@@ -5247,9 +5247,11 @@ function renderHome(){
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="notes:' + cont.id + '"><span class="qs-ic">' + icon('notes') + '</span><span><b>Lecture notes</b><small>' + lecLabel(cont) + ' ' + escHtml(cont.title.split(':')[0]) + '</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="mock"><span class="qs-ic">' + icon('clock') + '</span><span><b>Mock exam</b><small>55 questions, 90 minutes</small></span></button></div>';
+  /* the Timmy Time episode card (widget/podcast.js fills it in, and refills it whenever Home redraws) */
+  h += '<div data-sh-podcast></div>';
   h += examCardHTML();
   h += '<div class="home-grid"><div class="home-col">' + homeNextHTML(rows) + homeLecturesHTML(rows) + '</div><div class="home-col">' + homeTimelineHTML() + homeDaysHTML() +
-    '<div class="home-card"><h3>' + icon('review') + 'Also here</h3><ul class="home-links"><li><button type="button" class="linkbtn" data-home="hints">Exam hints</button>: what the professors said to know, in their words</li><li><button type="button" class="linkbtn" data-home="cram">Cram sheet</button>: every lecture on one page</li><li><button type="button" class="linkbtn" data-home="review">Review tables</button>: lab patterns, receptors, look-alikes</li><li><button type="button" class="linkbtn" data-home="arcade">Arcade</button>: six games on the same material</li></ul></div></div></div>';
+    '<div class="home-card"><h3>' + icon('review') + 'Also here</h3><ul class="home-links"><li><button type="button" class="linkbtn" data-home="hints">Exam hints</button>: what the professors said to know, in their words</li><li><button type="button" class="linkbtn" data-home="cram">Cram sheet</button>: every lecture on one page</li><li><button type="button" class="linkbtn" data-home="review">Review tables</button>: lab patterns, receptors, look-alikes</li><li><button type="button" class="linkbtn" data-home="arcade">Arcade</button>: six games on the same material</li><li><button type="button" class="linkbtn" data-sh-podcast-open>Timmy Time</button>: the last-minute audio review, all ten lectures</li></ul></div></div></div>';
   p.innerHTML = h;
   var ec = document.getElementById('examCard');
   if(ec) ec.addEventListener('toggle', function(){ STATE.ui.examCard = ec.open ? 'open' : 'closed'; saveState(); });
@@ -6181,6 +6183,7 @@ function boot(){
   document.querySelectorAll('#modeSwitch [data-mode]').forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
   renderHeaderStats();
   var m = STATE.ui.mode; if(['home','compendium','review','arcade'].indexOf(m) === -1) m = 'home';
+  if(location.hash === '#timmy') m = 'home'; /* the dashboard's Timmy Time link: the episode card is on Home */
   setMode(m);
 }
 /* Section label for the shared widget's per-section time tracking (adds the arcade game). */
@@ -6269,6 +6272,28 @@ window.SH_DRILL = {
 };
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
+/* Timmy Time (widget/podcast.js; built by tools/podcast/, script tools/podcast/heme-endo-exam1/script.md).
+   When the notes change, fix the script and rebuild the episode in the same PR. */
+window.SH_PODCAST = {
+  id:'exam1-review', show:'Timmy Time', title:'Heme & Endo Exam 1: the last-minute review', src:'audio/timmy-time.mp3', duration:3177.2,
+  blurb:'53 min with Timmy Tooth: all ten lectures gland by gland, what the professors said to know, the review\'s answers, and a lightning round to finish.',
+  chapters:[
+    { t:0.0, title:'Cold open' },
+    { t:148.92, title:'Signals, receptors and feedback' },
+    { t:427.61, title:'The pituitary' },
+    { t:651.55, title:'Growth' },
+    { t:899.85, title:'The thyroid: made outside the cell' },
+    { t:1155.83, title:'The thyroid axis, and what goes wrong' },
+    { t:1436.75, title:'Thyroid drugs' },
+    { t:1635.59, title:'The endocrine pancreas' },
+    { t:1916.7, title:'The adrenal gland' },
+    { t:2258.2, title:'Corticosteroids' },
+    { t:2428.08, title:'Calcium and phosphate' },
+    { t:2779.86, title:'Lightning round' },
+    { t:3104.23, title:'Sign-off' }
+  ]
+};
+
 window.SH_EXPORT = {
   lectures: LECTURES.map(function(l){ return { id:l.id, title:''+lecLabel(l)+' ' + l.title, who:l.who, status:l.status }; }),
   questions: QUESTIONS.map(function(q){
