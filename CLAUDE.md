@@ -144,6 +144,34 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
 - False statements follow the true/false rule: change one taught detail, never a trick of wording. Draw them from the hub's notes.
 - Perio: its engine has no numbered items yet; add `nums()` (from `occlusion`) before Session 6 or any later session is taught.
 
+## High Likelihood Exam Questions from transcript clues (standing rule)
+
+Sam's rule, 2026-10-29: **every new hub tags its "High Likelihood Exam Question" topics, built from the clues in the lecture
+transcripts**, as Heme & Endo Exam 1 does. It applies to every new hub, every lecture added to a hub, and every lecture that goes
+from slides-only to taught (its recording is the clue source, so redo that lecture's topics then).
+- **Mine every transcript for clues while you write the notes and Exam Hints.** Strong clues: "this will be on your exam", "know
+  this", "the thing to remember", "I'd ask you...", a point the professor repeats or comes back to, "if you remember one thing", a
+  question the professor asks the room, a professor spending far longer on something than the slides do. Also: the professor's
+  focus lists or hint emails, an in-class review's items, and the notes' "What's tested" box. A professor saying something is
+  **not** tested ("I won't ask you", "not on the exam") is a clue too: those topics are never tagged, and the hint says so.
+- **Build the data the way `heme-endo-exam1` does** (copy it): `EXAM_COUNTS` (questions per lecture: the official count when
+  announced, otherwise split the exam's total by teaching time and say so in the comment), `LIKELY_TOPICS` (one row per topic:
+  `{ lec, t, basis, ids }`), the loop after `QUESTIONS` that sets `q.likely`, `likelyChip()` on the bank and drill cards (never in
+  the mock: it stays exam-like), the bank's sort menu (`STATE.ui.qsort`: bank order / High likelihood first / High likelihood
+  only) and `likelyHTML()`, the folded "Most likely questions" list at the top of Exam Hints. Edit topics there, never on questions.
+- **As many topics per lecture as it has exam questions**, ranked by the strength of the evidence: something the professor said is
+  on the exam, then focus lists and review items, then things repeated or emphasized in the recording, then the "What's tested" box.
+  `basis` names the evidence (`hint`, `focus list`, `review`, `tested`, joined with " + " when several agree). Each topic points
+  at 2-4 or more of the hub's own questions (`ids`), in the formats the exam uses; write new ones when a topic has fewer than 2.
+- **Every clue behind a `hint` topic is quoted in Exam Hints** (the professor's own words, from the recording), so a student can
+  see why it was tagged. The list is an educated guess, and the hub says so; never say or imply anyone has seen the exam.
+- **Graded course work never feeds it**: no open quiz, and no previous year's quiz, take-home or exam, even as a clue (the rules
+  under "Content from lecture materials"). A topic counts only if this year's lectures, hints or review point at it.
+- When new clues arrive (a review session, a focus list, a recording), rerank the lecture's topics in the same PR and keep the counts
+  true. CI (`tools/ci/smoke.js`) fails a hub not in `LIKELY_EXEMPT` whose taught lecture has no topic, a topic id that isn't a
+  question, or a topic on a lecture the hub doesn't have. Hubs built before the rule (archived ones, `occlusion`, `perio`,
+  `special-patient-care`) are exempt until Sam asks for theirs; adding topics to one means taking it off `LIKELY_EXEMPT`.
+
 ## Every hub opens on its own Home page (standing rule)
 
 Sam's rule, 2026-10-27: every hub has a **Home** mode, first in the mode switch and the default (`data-default-mode="home"`,

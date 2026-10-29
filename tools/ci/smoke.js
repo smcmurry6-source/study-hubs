@@ -40,6 +40,10 @@ const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
 const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
 const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement' };
+/* every new hub tags its High Likelihood Exam Question topics from the transcripts' clues (LIKELY_TOPICS; Sam's standing rule,
+   2026-10-29; CLAUDE.md "High Likelihood Exam Questions from transcript clues"): each taught lecture needs a topic. Hubs built
+   before the rule are exempt until they get theirs; a hub that has LIKELY_TOPICS is always checked for bad ids. */
+const LIKELY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'occlusion', 'perio', 'special-patient-care']);
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
@@ -95,6 +99,17 @@ function lint(hub, A){
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);
       if (t < 35 || t > 65) problems.push(`${hub}: ${t}% of true/false answers are True (keep it between 35% and 65%)`); }
   }
+  const LT = A.LIKELY_TOPICS;
+  if (LT) LT.forEach(t => {
+    if (!lecIds.has(t.lec)) problems.push(`${hub}: likely topic "${t.t}" points at unknown lecture "${t.lec}"`);
+    if (!String(t.basis || '').trim()) problems.push(`${hub}: likely topic "${t.t}" has no basis (the evidence behind it)`);
+    (t.ids || []).forEach(id => { if (!ids.has(id)) problems.push(`${hub}: likely topic "${t.t}" points at unknown question ${id}`); });
+    if (!(t.ids || []).length) problems.push(`${hub}: likely topic "${t.t}" has no questions`);
+  });
+  if (!LIKELY_EXEMPT.has(hub)) L.forEach(l => {
+    if ((l.status && l.status !== 'taught') || !Q.some(q => q.lec === l.id)) return;
+    if (!(LT || []).some(t => t.lec === l.id)) problems.push(`${hub}: lecture ${l.id} has no High Likelihood topics (LIKELY_TOPICS; CLAUDE.md "High Likelihood Exam Questions from transcript clues")`);
+  });
   const mc = Q.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
   const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
   const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
@@ -125,7 +140,7 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{} };\n' + h.slice(i);
+        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:null };\n' + h.slice(i);
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
