@@ -135,10 +135,10 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   deficiency, changes in GH with aging. L4 (Thyroid): synthesis, storage and release, T4 to T3 conversion, regulation of the
   thyroid axis, major metabolic and cardiovascular effects, hyper- vs hypothyroidism including Graves; both: understand the major
   relationships and physiologic effects. The notes already covered every item, so **no notes text changed and no narration or
-  Timmy Time rebuild**. `hubs/heme-endo-exam1`: 25 new questions (`gr-f-*` 11, `th-f-*` 14, new src `focus`, "Professor's focus list"),
-  written as relationship questions (block somatostatin, give IGF-1, receptor defect vs GH deficiency, adult GH loss; where hormone
-  is stored and how it is released, where T3 comes from, TRH in Graves, why the heart races) with a why for every choice; per lecture
-  2 two-statement, 2-3 true/false, 2-3 numbered. Bank 610 -> 635. `LIKELY_TOPICS` for L3 and L4 rewritten around the focus lists (L3's 6
+  Timmy Time rebuild**. `hubs/heme-endo-exam1`: 21 new questions (`gr-f-*` 9, `th-f-*` 12, new src `focus`, "Professor's focus list"),
+  written as relationship questions (block somatostatin, give IGF-1; where hormone
+  is stored and how it is released, where T3 comes from, why the heart races) with a why for every choice; per lecture
+  2 two-statement, 2-3 true/false, 2-3 numbered. Bank 610 -> 631. Only what the slides and the recordings say: nothing beyond them was added (Sam). `LIKELY_TOPICS` for L3 and L4 rewritten around the focus lists (L3's 6
   = the five hints with feedback split out; L4's 4 Patient Box topics kept, so its other 4 = synthesis/storage/release, T4 to T3, the
   axis, metabolic and CV effects), a new hint entry at the top of each lecture in Exam Hints, an exam-card line, cram lines. No schema change.
 
