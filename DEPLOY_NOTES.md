@@ -111,6 +111,17 @@ Besides two-statement and true/false items, every session that writes questions 
 Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
 "Numbered-statement questions" (copy `nums()` from `occlusion`). **Perio Project: add `nums()` before Session 6 goes to taught.**
 
+## Every new hub gets High Likelihood Exam Questions from transcript clues (standing rule, 2026-10-29)
+
+Every session that builds a hub, adds a lecture or turns a slides-only lecture into a taught one (hub Projects included) mines
+the lecture transcripts for exam clues ("this will be on your exam", "know this", points the professor repeats, questions asked
+of the room, plus focus lists, hint emails and review sessions) and tags the predicted topics: `EXAM_COUNTS` + `LIKELY_TOPICS`
+(as many topics per lecture as exam questions, ranked by evidence, each with its `basis` and 2+ of the hub's own questions), the
+"High Likelihood Exam Question" tag, the bank's sort menu and Exam Hints' "Most likely questions" list. Copy it from
+`heme-endo-exam1`; every clue behind a topic is quoted in Exam Hints; "not on the exam" topics are never tagged; no graded quiz
+or past-year exam content, even as a clue. CI fails a new hub's taught lecture without a topic. Details: `CLAUDE.md` → "High
+Likelihood Exam Questions from transcript clues".
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
@@ -129,6 +140,12 @@ Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` �
 Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-29 (rule: High Likelihood Exam Questions in every new hub, Claude Code)** — Sam: make the Heme & Endo "High
+  likelihood questions" a rule for new hubs, built from the transcripts' clues. New standing rule (above, and `CLAUDE.md`).
+  `tools/ci/smoke.js` reads `LIKELY_TOPICS` and fails a hub not in `LIKELY_EXEMPT` (archived hubs, `occlusion`, `perio`,
+  `special-patient-care`) whose taught lecture has no topic, and any hub whose topic points at a missing question or lecture.
+  No site change.
 
 - **2026-10-29 afternoon (lessons audit, Heme & Endo exam eve, Claude Code)** — `hubs/heme-endo-exam1`, same ids and answer
   positions, explanations only plus one stem: `td-num-2`, `ca-2s-4`, `ad-11bhsd`, `td-inducers` and `ca-r-vdr` now answer their
