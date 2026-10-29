@@ -130,6 +130,18 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-29 (Heme & Endo Exam 1: professors' focus lists for L3 and L4, Claude Code)** — Sam passed on the professors' hints the
+  night before Exam 1. L3 (Growth): regulation of GH secretion, GH and IGF-1, major metabolic effects of GH, effects of GH excess or
+  deficiency, changes in GH with aging. L4 (Thyroid): synthesis, storage and release, T4 to T3 conversion, regulation of the
+  thyroid axis, major metabolic and cardiovascular effects, hyper- vs hypothyroidism including Graves; both: understand the major
+  relationships and physiologic effects. The notes already covered every item, so **no notes text changed and no narration or
+  Timmy Time rebuild**. `hubs/heme-endo-exam1`: 25 new questions (`gr-f-*` 11, `th-f-*` 14, new src `focus`, "Professor's focus list"),
+  written as relationship questions (block somatostatin, give IGF-1, receptor defect vs GH deficiency, adult GH loss; where hormone
+  is stored and how it is released, where T3 comes from, TRH in Graves, why the heart races) with a why for every choice; per lecture
+  2 two-statement, 2-3 true/false, 2-3 numbered. Bank 610 -> 635. `LIKELY_TOPICS` for L3 and L4 rewritten around the focus lists (L3's 6
+  = the five hints with feedback split out; L4's 4 Patient Box topics kept, so its other 4 = synthesis/storage/release, T4 to T3, the
+  axis, metabolic and CV effects), a new hint entry at the top of each lecture in Exam Hints, an exam-card line, cram lines. No schema change.
+
 - **2026-10-29 early morning (lessons audit, Heme & Endo exam eve, Claude Code)** — `hubs/heme-endo-exam1`, same ids and answer
   positions, explanations and memory cues only: "Remember it" cues on `pa-insulin-fat` (lipoprotein lipase still picked 7 of 19
   after yesterday's explanation fix), `gr-ghrelin` and `h1-enzyme-linked`; `pa-num-1`, `pa-tf-3` and `ad-angII-gq` now answer their
