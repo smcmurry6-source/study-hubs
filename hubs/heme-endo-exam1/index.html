@@ -3030,7 +3030,7 @@ mcq("ad-aldo-k", "adrenal", "rec", "Aldosterone's effect on potassium is to:",
   "More Na+/K+ pumps plus apical K+ channels move potassium into the tubular lumen: aldosterone secretes K+, which is how it fixes hyperkalemia.");
 mcq("ad-11bhsd", "adrenal", "rec", "Why doesn't cortisol, which binds the mineralocorticoid receptor about as well as aldosterone, normally drive renal sodium retention?",
   ["The kidney converts cortisol to inactive cortisone","Cortisol can't cross the membranes of renal tubule cells","Cortisol is bound to aldosterone","The kidney lacks mineralocorticoid receptors"],
-  "At aldosterone-sensitive sites, 11β-HSD converts cortisol to inactive cortisone, keeping cortisol from regulating blood pressure inappropriately.");
+  "At aldosterone-sensitive sites, 11β-HSD converts cortisol to inactive cortisone, keeping cortisol from regulating blood pressure inappropriately. The kidney has plenty of mineralocorticoid receptors (that is where aldosterone works); the enzyme, not a missing receptor, is what keeps cortisol off them.");
 mcq("ad-acth-gs", "adrenal", "rec", "ACTH increases cortisol synthesis by:",
   ["Gs/PKA activation of cholesterol desmolase and LDL receptors","Gq/PKC activation of aldosterone synthase in the glomerulosa","Binding a nuclear receptor","Activating PNMT directly"],
   "ACTH binds a Gs-coupled receptor: PKA activates cholesterol desmolase (the rate-limiting step) and moves more LDL receptors to the surface for more cholesterol.");
@@ -3211,9 +3211,9 @@ mcq("cs-pred-potency", "steroids", "rec", "Compared with cortisol, prednisone ha
 mcq("cs-dexa", "steroids", "rec", "Which corticosteroid is long-acting, has no salt-retaining activity and about 30 times cortisol's anti-inflammatory potency?",
   ["Dexamethasone","Hydrocortisone","Fludrocortisone","Prednisolone"],
   "Dexamethasone (with betamethasone) is long-acting, given once a day, with no mineralocorticoid activity; Dr. Fasinu highlighted it as the most potent anti-inflammatory.");
-mcq("cs-triam", "steroids", "rec", "Which corticosteroid did Dr. Fasinu name as the popular intermediate-acting one?",
+mcq("cs-triam", "steroids", "rec", "Which corticosteroid is the popular intermediate-acting one?",
   ["Triamcinolone","Methylprednisolone","Betamethasone","Hydrocortisone"],
-  "Triamcinolone is the popular intermediate-acting glucocorticoid. Methylprednisolone and hydrocortisone are short-to-medium; betamethasone is long.");
+  "Triamcinolone is the popular intermediate-acting glucocorticoid (Dr. Fasinu's grouping). Methylprednisolone, the Medrol Dosepak, sits with hydrocortisone and prednisone in his short-to-medium group; betamethasone is long.");
 mcq("cs-choose", "steroids", "rec", "For post-extraction inflammation, why choose prednisone over fludrocortisone?",
   ["Prednisone mainly fights inflammation, with weak salt retention","Fludrocortisone is longer acting","Prednisone has more mineralocorticoid activity than fludrocortisone","Fludrocortisone causes hyperkalemia"],
   "\"Are you trying to treat inflammation, or are you trying to cause salt retention?\" Prednisone is a good anti-inflammatory with little salt retention; fludrocortisone is mostly salt retention.");
@@ -3381,7 +3381,7 @@ mcq("td-binders", "thydrugs", "rec", "Which drug class reduces absorption of lev
   "Binders lower absorption: bile acid sequestrants (cholestyramine), polyvalent metals (calcium, aluminum, magnesium) and high protein-binding drugs.");
 mcq("td-inducers", "thydrugs", "rec", "Which drugs can increase metabolism of thyroid hormone by inducing liver enzymes?",
   ["Rifampin and carbamazepine","Warfarin and theophylline","Methimazole and propylthiouracil","Amiodarone and lithium"],
-  "Hepatic inducers (rifampin, carbamazepine, St. John's wort) can lower thyroid hormone levels. Warfarin and theophylline are drugs that thyroid hormone affects.");
+  "Hepatic inducers (rifampin, carbamazepine, St. John's wort) can lower thyroid hormone levels. Methimazole and propylthiouracil also lower thyroid hormone, but by blocking its synthesis in the thyroid, not by speeding its breakdown in the liver. Warfarin and theophylline are drugs that thyroid hormone affects.");
 mcq("td-warfarin", "thydrugs", "rec", "A patient on warfarin starts levothyroxine. What happens?",
   ["Warfarin's effect increases (higher INR)","Warfarin's effect decreases (lower INR, clot risk)","Levothyroxine stops working","Nothing"],
   "Thyroid hormone increases warfarin's effect (raised INR) and lowers theophylline levels; both are narrow therapeutic index drugs.");
@@ -3499,7 +3499,7 @@ mcq("td-num-1", "thydrugs", "rec", "A patient is pregnant (first trimester) and 
   "Methimazole is avoided in the first trimester (teratogenic), so PTU is used. The rest are true.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 3;
 mcq("td-num-2", "thydrugs", "slides", "Which can lower levothyroxine absorption or levels?\n1. Cholestyramine\n2. Calcium carbonate\n3. Rifampin\n4. Warfarin",
   ["1 and 2 only","1, 2 and 3","1, 2, 3 and 4","2, 3 and 4"],
-  "Warfarin is affected BY thyroid hormone (its effect rises); it doesn't lower levothyroxine.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 1;
+  "Cholestyramine and calcium carbonate bind levothyroxine in the gut and lower its absorption, and rifampin induces liver enzymes that clear it faster, so all three belong. Warfarin is the odd one: it is affected BY thyroid hormone (its effect rises); it doesn't lower levothyroxine.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 1;
 
 /* =================================================================== L9 ENDOCRINE HISTOLOGY 2 */
 mcq("h2-capsule", "histo2", "slides", "The adrenal cortex and medulla are:",
@@ -3830,7 +3830,7 @@ two("ca-2s-3", "calcium", "slides", "PTH stimulates renal 1α-hydroxylase.", "Hy
   "PTH turns on 1α-hydroxylase.",
   "low phosphate turns it on too.");
 two("ca-2s-4", "calcium", "slides", "Calcitonin is essential for calcium balance.", "Calcitonin secretion falls when plasma calcium rises.", false, false,
-  "Calcitonin isn't essential, and its secretion rises with plasma calcium.",
+  "Calcitonin isn't essential, and its secretion rises with plasma calcium. Statement 1 is tempting because calcitonin does lower calcium (it inhibits osteoclasts), but the lecture calls it not essential: PTH and vitamin D are the ones calcium balance depends on.",
   "it isn't essential.",
   "its secretion rises with calcium.");
 tf("ca-tf-1", "calcium", "slides", "The liver's 25-hydroxylation of vitamin D is a necessary step.", true,
@@ -3888,7 +3888,7 @@ mcq("ca-r-ckd", "calcium", "rec", "A patient with chronic kidney disease is most
   "The kidney's 1α-hydroxylase makes the active form. Dr. Galin: with liver or kidney damage, watch bone density, heart rhythm and tetany too.");
 mcq("ca-r-vdr", "calcium", "rec", "The vitamin D receptor in an intestinal epithelial cell is:",
   ["An intranuclear receptor that changes gene transcription","A Gq-coupled receptor on the apical membrane","A receptor tyrosine kinase on the basolateral membrane","A calcium channel that opens when vitamin D binds"],
-  "Vitamin D enters the cell and binds an intranuclear receptor; the genes it turns up give the apical calcium channels, calbindin and the basolateral transporters.");
+  "Vitamin D enters the cell and binds an intranuclear receptor; the genes it turns up give the apical calcium channels, calbindin and the basolateral transporters. It is a steroid-like hormone, so its receptor is not on the membrane: the Gq-coupled receptor in this unit is the calcium-sensing receptor on parathyroid chief cells.");
 mcq("ca-r-oc-lineage", "calcium", "rec", "Osteoclasts come from which cell lineage?",
   ["Hematopoietic, like monocytes and macrophages","Mesenchymal, like osteoblasts and chondrocytes","Neural crest, like chromaffin cells","Endodermal, like the islet cells"],
   "Osteoclasts share the hematopoietic lineage of monocytes, macrophages and granulocytes, the immune cells. That is why osteoblasts reach them with cytokines and growth factors.");

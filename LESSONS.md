@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-29** (full audit, 4 am Central, Heme/Endo Exam 1 eve; the exam is Fri Oct 30). Sam runs
+**Last refreshed: 2026-10-29** (second audit of the day, 4 pm Central, Heme/Endo Exam 1 eve; the exam is Fri Oct 30, 8 am). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -78,37 +78,37 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-10-29, 4 am Central (Heme/Endo Exam 1 eve; the exam is Fri 10-30, 8:00 am).** "Since" = the 10-28 4:45 pm audit. No new
+**2026-10-29, 4 pm Central (Heme/Endo Exam 1 eve; the exam is Fri 10-30, 8:00 am).** "Since" = this morning's 4 am audit. No new
 reports, suggestions, check-ins, survey answers or searches, and **no report is open**. Nothing newly archived. Live hubs:
 Heme/Endo Exam 1, Occlusion (final 11-19), perio (final 11-19), Special Patient Care (window 11-6 to 11-13; no use yet).
 
-**Heme/Endo, two days in:** 10-28 had 61 people and 98 h (10-27: 39 people, 37 h); bank 52 h / 50 people, notes 41 h / 41, Home 39
-people, hints 11, cram 8, Weak Spots 6, drill 4, Review 5, arcade 2, Timmy Time 2 people (30 min heard). 7,548 answers from 50 people
-at 81% (the same 81% as day one with 2.5 times the people). **Mocks: 4 from 3 people** (51, 45, 44 and 31 of 55). Home's "notes: L1"
-button is still the most used quick start (18 people); lectures opened: Thyroid 20, L2 17, Growth 15, Pancreas 14, the late ones 9-10.
-By lecture (tries per question): Growth 77% (17.5), Pancreas 78% (18.3), Adrenal 78% (13.8), Thyroid 81% (19.7), the rest 81-84%;
-**L6-L10 still have 6.5-8 tries per question** against 27-39 for L1-L2 (the standing lesson on late lectures, again). The 20
-in-class review items (`rv-*`) got 4-15 tries each at 63-100%; none is hard.
+**Heme/Endo, eve so far (to 4 pm):** 59 people and 70 h today (10-28: 61 people, 98 h for the whole day), 8 of them first-time
+visitors; bank 44 h / 48 people, notes 17 h / 34, Home 19, mock 5, drill 4, Weak Spots 4, cram 5, hints 4, Timmy Time 2. 4,946 answers
+from 46 people at 80%. 4 mocks from 3 people today at 85% (the four before: 31-51 of 55, 78%). Bank as a whole: 14,816 tries; by lecture
+78% (Pancreas, Adrenal, Growth) to 85% (Histology 2); **L6-L10 still at 11-13 tries per question against 37-48 for L1-L2**. "Try it
+again" showed 935 retries today, 80% right. The High-likelihood sort: 7 people sorted by it today, 6 used "only". The professors'
+focus-list items (`gr-f-*`, `th-f-*`, added 10-29) got 10-21 tries each at 65-100% (84% overall): none is hard. **First device links
+made**: `link:linked` 2 people today (15 links all time); the 10-28 streamlined prompt itself was shown to 1 person and got a "Yes".
+Plaque boss docked: 51 people met one today, 4 hid it (1 turned bosses off in Settings).
 
-**Did yesterday's fixes work?** (since 10-28 afternoon) `th-r-2s-1` 5/7 (31% before), `pa-liver-glut` 9/13 (54%), `gr-ghrelin` 10/18
-(43%; "inhibits via somatostatin" still 4 of 18), `h1-downreg` 13/20 (50-56%; sequestration 7 of 20), `pa-insulin-fat` **9/19 (39%;
-lipoprotein lipase still 7 of 19)**, `h1-enzyme-linked` 11/18 (59%: flat, G-protein-linked 4). From the 10-27 night: `gr-muscle` 14/17
-since (50% before). `th-nis` / `th-r-nis` (report #32): no new report. **Plaque boss in the top bar** (10-28): 4 of 55 people who met
-one hid it, against 10 of 30 the day before when it floated over the questions. **New events arrive**: `pet:tap-hub` 8 people
-(35 taps), `state:pet-hp` from 27 devices, `link-ask` shown/yes 1 (no link made, 0 `visitor_links` since 10-21).
+**Did this morning's fixes work?** (since 4 am, small n) `pa-insulin-fat` **11/17 (65%; 16/37 = 43% before)**, `gr-ghrelin` 10/13 (50%
+before), `h1-enzyme-linked` 10/13 (60%), `pa-num-1` 6/8 (52%): all up. Flat: `pa-tf-3` 8/14 (53% before; "True" still the pick) and
+`ad-angII-gq` 7/13 (54%). From 10-28: `gr-muscle` 11/13, `h1-downreg` 10/13. `th-r-nis` (report #32) 12/20 today against 15/19
+before; its explanation already answers the ATP choice (picked 6 of 39 all time), so left alone.
 
-**Fixed tonight** (explanations and memory cues only; same ids and positions): `pa-insulin-fat` gets a "Remember it" cue (insulin
-turns on the lipase that brings fat in, off the one that empties the store), as do `gr-ghrelin` and `h1-enzyme-linked`; `pa-num-1`
-(12/23; "2, 3 and 4" picked 9 times: norepinephrine) now says adrenergic input stimulates on beta receptors but brakes on alpha;
-`pa-tf-3` (10/19; "True" 9) says why the center-outward flow matters (insulin washes over the alpha and delta cells at the edge);
-`ad-angII-gq` (13/24; Gs 7) names ACTH as the Gs one. Fair and left alone: `h1-tf-5` 25/50 (one number ten times too big),
-`gr-r-shbg` 9/18 (8 picked "lowers SHBG"; the hub teaches "GH raises SHBG" from the recording, keep it), `gr-somatopause` 16/29,
-`h2-islet-origin` 8/15, `gr-r-plate` 7/20 (a five-step ordering, matches the notes' list).
+**Fixed this afternoon** (explanations and one stem; same ids and positions): `td-num-2` (5/12; "2, 3 and 4" picked 3) now says why
+cholestyramine and calcium belong and rifampin does too; `ca-2s-4` (7/17; "1 true, 2 false" 5) says calcitonin lowers calcium yet
+isn't essential; `ad-11bhsd` (20/38; "kidney lacks mineralocorticoid receptors" 11) says the kidney is full of them; `td-inducers`
+(11/22; methimazole/PTU 6) says those block synthesis, not breakdown; `ca-r-vdr` (6/13; Gq 5) says the Gq one is the CaSR; `cs-triam`'s
+stem no longer asks what Dr. Fasinu named (the standing lesson on professor-quoting stems; 10/18, methylprednisolone 5) and its
+explanation places the Medrol Dosepak in his short-to-medium group. Fair and left alone: `h1-tf-5` 29/57, `pa-2s-2` 14/27 (the same
+insulin-and-lipase mix-up as `pa-insulin-fat`, whose cue now covers it), `cs-2s-3` 6/12, `ca-r-tf-2` 7/13, `gr-r-plate` 14/31 (five
+steps, as the notes list them).
 
-**Occlusion and perio:** quiet (3 and 2 people since yesterday). One perio session of 10 answers at 30%.
+**Occlusion and perio:** quiet (1 and 3 people today).
 
 **Next audit: after the exam** (Fri 10-30 from 10 am): Heme/Endo check-ins against study time, then its **retrospective and recap**
-(the hub archives itself at 10 pm Fri). Read whether today's cues moved `pa-insulin-fat` and the four explanations.
+(the hub archives itself at 10 pm Fri). Check whether the numbered-statement and focus-list items match what the check-ins say.
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
