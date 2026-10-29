@@ -130,6 +130,12 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-29 afternoon (lessons audit, Heme & Endo exam eve, Claude Code)** — `hubs/heme-endo-exam1`, same ids and answer
+  positions, explanations only plus one stem: `td-num-2`, `ca-2s-4`, `ad-11bhsd`, `td-inducers` and `ca-r-vdr` now answer their
+  favorite wrong choice; `cs-triam`'s stem asks "Which corticosteroid is the popular intermediate-acting one?" instead of what
+  Dr. Fasinu named (same choices and key). No notes text changed, so no narration or Timmy Time rebuild. `LESSONS.md` refreshed
+  (this morning's cue on `pa-insulin-fat`: 43% -> 11 of 17). No schema change.
+
 - **2026-10-29 (Heme & Endo Exam 1: professors' focus lists for L3 and L4, Claude Code)** — Sam passed on the professors' hints the
   night before Exam 1. L3 (Growth): regulation of GH secretion, GH and IGF-1, major metabolic effects of GH, effects of GH excess or
   deficiency, changes in GH with aging. L4 (Thyroid): synthesis, storage and release, T4 to T3 conversion, regulation of the
