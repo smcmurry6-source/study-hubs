@@ -4,8 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-28** (full audit, 4:45 pm Central; the morning run before building Special Patient Care was steps
-1-3 only. Heme/Endo Exam 1 is Fri Oct 30). Sam runs
+**Last refreshed: 2026-10-29** (full audit, 4 am Central, Heme/Endo Exam 1 eve; the exam is Fri Oct 30). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -79,94 +78,37 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-10-28, 4:45 pm (full audit, two days before Heme/Endo Exam 1).** Since last night: **Heme/Endo** 53 people today, 42 h
-(bank 19 h / 33 people, notes 19 h / 33, Home 31 people, drill 4, cram 5, hints 5, Review 25 min, one mock started, none submitted);
-4,802 answers from 33 people at 81%. **Report #32** (`th-r-nis`): "It's an ATP dependent symporter? Wouldn't it then directly use
-ATP?" Fair: `th-nis`'s explanation said "(ATP-dependent active transport)" and the As-taught notes say "ultimately ATP-dependent",
-while `th-r-nis` keys secondary active transport. Both explanations now say NIS does not split ATP; the Na+/K+-ATPase spends it to
-keep the sodium gradient. Suggestion #13 (exam counts per lecture and predicted questions) is already answered and built (High
-Likelihood tags). One new Occlusion check-in (n = 14 now: "About right", went better, diagrams 4, Patient Box pictures 4). One survey
-answer asks for Quizlet-style flashcards and a game whose questions differ from the bank ("learning, not memorizing answer
-choices"), the same ask as round 2.
+**2026-10-29, 4 am Central (Heme/Endo Exam 1 eve; the exam is Fri 10-30, 8:00 am).** "Since" = the 10-28 4:45 pm audit. No new
+reports, suggestions, check-ins, survey answers or searches, and **no report is open**. Nothing newly archived. Live hubs:
+Heme/Endo Exam 1, Occlusion (final 11-19), perio (final 11-19), Special Patient Care (window 11-6 to 11-13; no use yet).
 
-**Did last night's fixes work?** `h1-downreg` 9/16 since (56%, 50% before; sequestration still 7 of 16: the trap holds, keep the
-explanation), `gr-muscle` 3/4 since (was 6/12). `h1-mag` gone, no new report on it. Perio `q4-06` / `q3-04`: no tries since. **Try
-it again** today: 424 retries shown to 26 people, 331 of 353 answered right (94%).
+**Heme/Endo, two days in:** 10-28 had 61 people and 98 h (10-27: 39 people, 37 h); bank 52 h / 50 people, notes 41 h / 41, Home 39
+people, hints 11, cram 8, Weak Spots 6, drill 4, Review 5, arcade 2, Timmy Time 2 people (30 min heard). 7,548 answers from 50 people
+at 81% (the same 81% as day one with 2.5 times the people). **Mocks: 4 from 3 people** (51, 45, 44 and 31 of 55). Home's "notes: L1"
+button is still the most used quick start (18 people); lectures opened: Thyroid 20, L2 17, Growth 15, Pancreas 14, the late ones 9-10.
+By lecture (tries per question): Growth 77% (17.5), Pancreas 78% (18.3), Adrenal 78% (13.8), Thyroid 81% (19.7), the rest 81-84%;
+**L6-L10 still have 6.5-8 tries per question** against 27-39 for L1-L2 (the standing lesson on late lectures, again). The 20
+in-class review items (`rv-*`) got 4-15 tries each at 63-100%; none is hard.
 
-**Hardest Heme/Endo items now (12+ tries), explanations fixed today** (same ids and positions): `th-r-2s-1` 5/16 ("Both true" 7:
-thyroglobulin is made in the cell, T3/T4 aren't until the colloid), `pa-insulin-fat` 7/18 (lipoprotein lipase 6), `gr-ghrelin` 6/14
-("inhibits via somatostatin" 6), `pa-liver-glut` 7/13 (cardiac muscle 6), `h1-enzyme-linked` 22/37 (G-protein-linked 10). Fair and
-already explained: `h1-tf-5` 15/33 (follicle size, one number ten times too big), `gr-direct` 8/15 (JAK-STAT is the indirect route),
-`th-r-tf-4` 8/15 (TRH's receptor is the Gq one). By lecture: Growth 77% and Thyroid 78% are the weakest with real tries; L6-L10 still
-have 2-4 tries per question. The 20 in-class review items (`rv-*`, added today) have no tries yet.
+**Did yesterday's fixes work?** (since 10-28 afternoon) `th-r-2s-1` 5/7 (31% before), `pa-liver-glut` 9/13 (54%), `gr-ghrelin` 10/18
+(43%; "inhibits via somatostatin" still 4 of 18), `h1-downreg` 13/20 (50-56%; sequestration 7 of 20), `pa-insulin-fat` **9/19 (39%;
+lipoprotein lipase still 7 of 19)**, `h1-enzyme-linked` 11/18 (59%: flat, G-protein-linked 4). From the 10-27 night: `gr-muscle` 14/17
+since (50% before). `th-nis` / `th-r-nis` (report #32): no new report. **Plaque boss in the top bar** (10-28): 4 of 55 people who met
+one hid it, against 10 of 30 the day before when it floated over the questions. **New events arrive**: `pet:tap-hub` 8 people
+(35 taps), `state:pet-hp` from 27 devices, `link-ask` shown/yes 1 (no link made, 0 `visitor_links` since 10-21).
 
-**Names, device links and Timmy Tooth (Sam asked, 10-28).** *Names:* 17 ids carry a name of their own, 14 different names; one was
-set since 10-22. Three ids are "Dr Winters" / "Dr. Winters" and two "LeSunshine", none linked; "Floss Boss" is two ids too, and they
-are different people (one from 9-26, one from 10-27). *The "Is this your other device?" prompt (10-21):* shown 6 times to 4 people;
-"Yes" 2 (LeSunshine 10-22, Dr Winters today), a code made once, "Not now" 4, "No, that's someone else" 1 (the "Dr. Winters" id). **No link came from it**: no `visitor_links` row for any of those ids. The one link since (10-27, the new Floss
-Boss) was made 49 s after they saved the name and saw the prompt (they pressed "Not now"); which flow they used wasn't recorded. The
-prompt may have reminded them, but the people it was built for (the Winters and LeSunshine ids) are still split. Two
-gaps hid this: the "linked" event fired just before the page reloads and the batch was never sent, and Stats → Link my devices
-tracked nothing. **Fixed today** (below). *Timmy Tooth:* **49 adopted** (20 the first week, then 1, 13, 10 and 6 this week); 40 of
-them studied in the last 7 days (of 88 people who studied); 23 have reached 100 HP and 4 revived him from 0. Settings across devices
-in the last 7 days: on 103, dashboard only 3, off 5. His introduction was opened by 12 people since 10-20 (10 adopted with the
-button). Taps, jokes, checkups and tips were never tracked, so how much people *play* with him was unknown until today.
+**Fixed tonight** (explanations and memory cues only; same ids and positions): `pa-insulin-fat` gets a "Remember it" cue (insulin
+turns on the lipase that brings fat in, off the one that empties the store), as do `gr-ghrelin` and `h1-enzyme-linked`; `pa-num-1`
+(12/23; "2, 3 and 4" picked 9 times: norepinephrine) now says adrenergic input stimulates on beta receptors but brakes on alpha;
+`pa-tf-3` (10/19; "True" 9) says why the center-outward flow matters (insulin washes over the alpha and delta cells at the edge);
+`ad-angII-gq` (13/24; Gs 7) names ACTH as the Gs one. Fair and left alone: `h1-tf-5` 25/50 (one number ten times too big),
+`gr-r-shbg` 9/18 (8 picked "lowers SHBG"; the hub teaches "GH raises SHBG" from the recording, keep it), `gr-somatopause` 16/29,
+`h2-islet-origin` 8/15, `gr-r-plate` 7/20 (a five-step ordering, matches the notes' list).
 
-**New tracking from today** (`feature_events`, no schema change): `pet:tap-hub` / `pet:tap-dashboard` (taps on an adopted Timmy),
-`pet:joke` / `pet:checkup` / `pet:tip` (his house's buttons), a daily `state:pet-hp=80-100|50-79|25-49|1-24|0` per device; `link:code`
-/ `link:linked` / `link:fail` from Stats → Link my devices and `link-ask:fail` from the prompt; both flush the event batch before
-reloading (`shClicks.flush`), so `linked` now arrives.
+**Occlusion and perio:** quiet (3 and 2 people since yesterday). One perio session of 10 answers at 30%.
 
-Refreshed 2026-10-27, 9:30 pm Central (full audit); "since" = the 10-21 afternoon audit, the last one that shipped fixes. Live
-hubs: **Heme/Endo Exam 1** (Fri Oct 30; live since this morning), **Occlusion** (final Nov 19) and **perio** (final Nov 19). Nothing
-newly archived. Since 10-21: 2 new reports, both on Heme/Endo `h1-mag` (fixed tonight, below); Occlusion #29 (`fp-facet`, "what is
-a facial incline of a palatal cusp") was resolved and its stem now defines the incline, but **no reply was written, so the sender
-never heard back**; one search all week (no zero-result ones); survey round 2 answers as read this morning.
-
-**Did the 10-21 afternoon fixes work?** Only exam-day afternoon data (3 pm to the 6:30 pm midterm), so small numbers: the
-redrawn horizontal envelope (matching Dr. Givan's slide) `fig-hor-b` 9/11 (63% over 43 before), `fig-hor-d` 6/7 (75% over 44), no
-report since, and the check-ins rate the diagrams 4.7/5; `cs-pro-incline`'s new key 3/6 (40% before): too few to say. The earlier
-eve and morning fixes held that afternoon: `fp-post` 5/7 (43% before), `cc-parfitt` 6/7 (47%), `cs-record-best` 8/10 (56%),
-`an-compound` 9/13 (41%). **Try it again** (missed bank questions return 5 cards later; all hubs since 10-21): 573 retries shown
-(Heme/Endo 19 people, Occlusion 16, perio 4), **459 of 484 answered right (95%)**. That is short-term recall: see the new standing lesson on next-day misses.
-
-**Heme/Endo Exam 1, day one (10-27, from 11 am; 3 days out):** 39 people, 29 h; 11 under 5 min, 13 over an hour. 1,931 answers
-from 20 people at 81%; no mocks yet; Daily Drill 3 people. Time: bank 880 min (21 people), notes 678 (24), Home 116 (all 39),
-drill 62, Review 7 min (8 people), cram sheet, hints and arcade almost none. **Home** is where everyone lands: its "Lecture notes"
-quick start was the most used button (16 people, all to L1), "Practice questions" 4, Daily drill 2; 12 people went to Compendium by
-the mode tab instead. Notes: L2 Hypothalamus-Pituitary and L3 Growth opened by 10 people each; Plain English 5, As taught 4; Listen
-3. Diagrams: the pituitary on screen for 14 people (4 used its picker), HPA 7, thyroid 6. Accuracy so far: L1 Histology 83% (14
-tries per question), L2 80% (7), the rest under 5 tries per question; Endocrine Pancreas lowest at 61% on ~28 tries. Hardest
-(12+ tries): `h1-tf-5` 6/15 (follicles are 0.2-1.0 mm; "True" picked 9 times for "2 to 10 mm": fair, one number ten times too
-big), `h1-downreg` 13/26 (sequestration 12: both routes start in an endosome), `gr-muscle` 6/12 ("insulin secretion with glucagon
-suppression" 4, drawn by the stem's "ties into the pancreas lecture"), `hp-peptide-store` 7/12. **Reports #30 and #31** (two
-people, same afternoon) on `h1-mag`, "Dr. Herr said he would NOT expect you to be able to:": "not an exam-style question", "I
-don't think this needs to be a practice question". Plaque boss: 30 people met one on day one, 10 hid it. Tour: 6 asked, 2 finished.
-
-**Fixed tonight:** Heme/Endo `h1-mag` removed (bank 580 -> 579; the notes already say he won't test the pars distalis stains),
-`h1-downreg`'s explanation and why line say both routes start in an endosome and the lysosome decides it, `gr-muscle`'s stem no
-longer quotes the lecture ("Apart from its effects on growth, which pairing of GH effects is correct?") and its explanation says GH
-opposes insulin (diabetogenic) rather than releasing it. Perio `q4-06` had **two right answers**: it keyed the S204SD9 over "Sickle
-scaler", but the hub's own notes call the S204SD9 the posterior sickle (7 of 17 picked "Sickle scaler"); that choice is now "H6/7
-sickle scaler". Perio `q3-04` (McGuire & Nunn, 49/105; "likelihood of retaining the tooth" picked 42 times): the explanation now says
-why the two sound alike (maintainability is the effort to keep the tooth; Miller & McEntire scores the likelihood of keeping a
-molar). Same ids and answer positions; `question_choices` rows for `q4-06` slot 2 before tonight mean "Sickle scaler".
-
-**Occlusion** since the midterm: no answers at all (13 minutes from a handful of visitors in a week); L6, the final's first
-lecture, went in this morning. **Check-ins, n = 13** (this morning's 14 was off by one): readiness 3.8, diagrams 4.7/5, Patient Box
-pictures 3.8/5. Against each person's use to the night of the exam: **"About right" 6** (143-868 min, 72-605 answers, 82-93%; 5
-went better or as expected; **5 of 6 took a mock**); **"Exam asked different things" 6, all went worse** (four heavy users, 373-740
-min at 73-88%, and two light ones, 38 and 72 min; **1 of 6 took a mock**); "Hub was easier" 1 (452 min, 729 answers, worse, no
-mock). Heavy users again ask for other formats (standing lesson): two-statement true/false (rule since 10-22), numbered "pick the
-numbers" items, Dr. Givan's tricky wording, application. **Numbered-statement items added 2026-10-28** (16 across L1-L6, 5 on
-L6; now a standing rule). Taking a mock went with "About right" (n = 13: suggestive, not proof).
-
-**Perio:** S6 Regeneration's first use was 10-22 (16 people, 6.7 h, mostly notes); 152 answers on S6 from 5 people at 70%. The
-hardest perio items are still the midterm ones (`q3-M01` UniFe 28%, Phase I instrument items 35-54%); S4 instruments weren't on
-the midterm, so the final will be their first real test.
-
-**Next audit: Heme/Endo exam eve (Thu 10-29)**: the `rv-*` review items, whether the new Timmy and link events arrive, its hardest items with 20+ tries, Endocrine Pancreas and the late lectures (L9,
-L10), mocks, the Home page buttons; then its check-ins from Fri 10 am. Occlusion and perio when L7 / S7 land.
+**Next audit: after the exam** (Fri 10-30 from 10 am): Heme/Endo check-ins against study time, then its **retrospective and recap**
+(the hub archives itself at 10 pm Fri). Read whether today's cues moved `pa-insulin-fat` and the four explanations.
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
@@ -389,8 +331,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   same. Yet none of 67 people with a settings snapshot since 10-22 has turned bosses off in Settings -> Extras. A survey answer:
   "a lot of features which are fun but sometimes distracting. Features like the tactical nuke should be an opt-in thing". When most
   people close something, offer the switch right there, or keep it out of the way in exam week. Sam (2026-10-28): it blocked
-  questions, so the boss now docks as a slim strip in the hub's sticky top bar; next audit, compare "Hide the boss" per person
-  who meets one (Occlusion 53 of 89, Heme/Endo 10 of 30 before the move).
+  questions, so the boss now docks as a slim strip in the hub's sticky top bar. **It worked**: on the first day docked, 4 of 55
+  Heme/Endo people who met one hid it (10 of 30 the day before). Move an interruption out of the way before adding an off switch.
 - **What check-ins say the hub missed lines up with the weakest data.** MSK's check-ins asked for "location of bone
   formation and differentiation", the lowest lecture (Bone Development 71%, its orderings 18-48%); perio's asked for
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.
