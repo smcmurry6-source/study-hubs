@@ -136,6 +136,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   favorite wrong choice. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed (the docked Plaque Boss is hidden
   by 4 of 55 people, against 10 of 30 when it floated). No schema change.
 
+- **2026-10-29 (arcade crossword layout fix, Claude Code, #194)** — A student said the crossword was unplayable ("the window is
+  compressed where you can't see anything"). Its three tool buttons set the grid column's width, so the grid's columns stretched and
+  the clue list was crushed to about 130 px (or cut off) at tablet and small-laptop widths. `widget/games.css`: fixed-size cells
+  (`--cx`, up to 34 px, scaled to the screen; the grid gets `--cols` from `games.js`), the clue panel (`.cx-right`) wraps under the
+  grid below 280 px, Across/Down stack when narrow, and the buttons fit inside the grid's width. All four live hubs (shared file).
+  `sw.js` -> `sh-v46`. No schema change.
+
 - **2026-10-28 night (Timmy Time: Heme & Endo Exam 1 episode, and a /podcast skill, Claude Code)** — A 53-minute last-minute
   review for Exam 1 (Fri Oct 30, 8:00 am), hosted by Timmy Tooth: `hubs/heme-endo-exam1/audio/timmy-time.mp3` (38 MB,
   -16 LUFS), script `tools/podcast/heme-endo-exam1/script.md`, written from the hub's notes (As taught), exam hints, cram
