@@ -1977,7 +1977,7 @@ mcq("h1-slow", "histo1", "rec", "Compared with a hormone acting on a cell-surfac
   "Intracellular (steroid) receptors move to the nucleus and start the DNA-to-RNA-to-protein sequence: hours to days. Surface receptors change existing proteins: fast.");
 mcq("h1-enzyme-linked", "histo1", "slides", "Tyrosine kinase receptors belong to which class of cell-surface receptor?",
   ["Enzyme-linked","Ion-channel-linked","G-protein-linked","Intracellular (nuclear)"],
-  "The three classes of cell-surface receptors are ion-channel-linked, G-protein-linked and enzyme-linked. In enzyme-linked receptors, binding brings catalytic domains together and activates them: tyrosine kinases work this way. No G protein is involved: the receptor is the enzyme itself, while G-protein-linked receptors act through cAMP or IP3.");
+  "The three classes of cell-surface receptors are ion-channel-linked, G-protein-linked and enzyme-linked. In enzyme-linked receptors, binding brings catalytic domains together and activates them: tyrosine kinases work this way. No G protein is involved: the receptor is the enzyme itself, while G-protein-linked receptors act through cAMP or IP3.", {cue:"Tyrosine kinase is an enzyme, and here it is part of the receptor: enzyme-linked."});
 mcq("h1-gq", "histo1", "rec", "A hormone binds a Gq-coupled receptor. What happens next?",
   ["Phospholipase C is activated; IP3 releases calcium from the ER","Adenylate cyclase is activated and cAMP rises inside the cell","Adenylate cyclase is inhibited and cAMP falls","The receptor moves to the nucleus and binds DNA"],
   "Gq activates phospholipase C, which splits PIP2 into IP3 and DAG. IP3, the second messenger, opens calcium channels in the endoplasmic reticulum. Dr. Herr: \"kind of commit this table to memory.\"");
@@ -2358,7 +2358,7 @@ mcq("gr-ss-gi", "growth", "slides", "How does somatostatin stop GH secretion?",
   "Somatostatin binds a Gi-coupled receptor: no rise in cAMP, potassium channels activated, hyperpolarization, no GH secretion. GHRH and somatostatin are the \"yin-yang\" of GH control.");
 mcq("gr-ghrelin", "growth", "slides", "Ghrelin affects GH by:",
   ["Stimulating GH release from the pituitary","Inhibiting GH release by raising somatostatin output","Blocking IGF-1 receptors","Converting GH to IGF-1"],
-  "Ghrelin increases appetite and stimulates GH release; GH then breaks down fat and builds muscle. Somatostatin is the brake on GH, raised by high glucose and free fatty acids, not by ghrelin.");
+  "Ghrelin increases appetite and stimulates GH release; GH then breaks down fat and builds muscle. Somatostatin is the brake on GH, raised by high glucose and free fatty acids, not by ghrelin.", {cue:"Ghrelin is a go signal: appetite up and GH up together. Somatostatin is the brake."});
 mcq("gr-ss-glucose", "growth", "slides", "High blood glucose and high free fatty acids lower GH secretion because they:",
   ["Stimulate somatostatin release","Stimulate GHRH release","Activate the GH receptor","Increase ghrelin"],
   "On the axis diagram, high glucose and FFA stimulate somatostatin, a negative regulator of GH. (GH itself raises glucose and free fatty acids, so this is feedback.)");
@@ -2788,7 +2788,7 @@ mcq("pa-insulin-liver", "pancreas", "rec", "In the liver, insulin:",
   "Insulin activates glucokinase, glycogen synthase, PFK, pyruvate kinase and acetyl-CoA carboxylase, and inactivates glycogen phosphorylase, glucose-6-phosphatase, FBPase and PEP carboxykinase.");
 mcq("pa-insulin-fat", "pancreas", "rec", "In adipose tissue, insulin inhibits lipolysis by inhibiting:",
   ["Hormone-sensitive lipase","Lipoprotein lipase","Acetyl-CoA carboxylase","Glycogen synthase"],
-  "Insulin inhibits hormone-sensitive lipase (which hydrolyzes stored triglycerides) while promoting glucose uptake (GLUT4), fatty acid uptake and esterification (lipoprotein lipase helps bring fatty acids in). Lipoprotein lipase is the trap: it helps fat come in for storage and insulin promotes it; hormone-sensitive lipase breaks down fat already stored, and that is the one insulin shuts off.");
+  "Insulin inhibits hormone-sensitive lipase (which hydrolyzes stored triglycerides) while promoting glucose uptake (GLUT4), fatty acid uptake and esterification (lipoprotein lipase helps bring fatty acids in). Lipoprotein lipase is the trap: it helps fat come in for storage and insulin promotes it; hormone-sensitive lipase breaks down fat already stored, and that is the one insulin shuts off.", {cue:"Insulin says store: it turns ON the lipase that brings fat in (lipoprotein lipase) and OFF the one that empties the store (hormone-sensitive lipase)."});
 mcq("pa-insulin-muscle", "pancreas", "rec", "Which effect of insulin did Dr. Madison single out as especially important in skeletal muscle?",
   ["Increased protein synthesis with less protein breakdown","Increased gluconeogenesis from muscle amino acids","Increased ketone production","Decreased amino acid uptake"],
   "Insulin builds muscle tissue: more protein synthesis and amino acid uptake, less protein breakdown, alongside GLUT4 uptake, glycogen storage and glycolysis. Muscle does little or no gluconeogenesis.");
@@ -2884,7 +2884,7 @@ tf("pa-tf-2", "pancreas", "rec", "About 60% of secreted insulin is removed on it
   "The liver takes up ~60% on first pass.",
   "The slide notes give ~60%.");
 tf("pa-tf-3", "pancreas", "rec", "Islet blood flows from the periphery of the islet toward its center.", false,
-  "Blood flows from the center outward; beta cells are more central, alpha and delta cells more peripheral.",
+  "Blood flows from the center outward; beta cells are more central, alpha and delta cells more peripheral. That order is why each cell's product washes over the next: insulin from the central beta cells reaches the alpha and delta cells at the edge.",
   "Blood flows center to periphery.",
   "It flows outward from the center.");
 tf("pa-tf-4", "pancreas", "rec", "Cholinergic (parasympathetic) stimulation increases insulin secretion.", true,
@@ -2909,7 +2909,7 @@ tf("pa-tf-8", "pancreas", "rec", "Up to 50% of men with long-standing diabetes m
   "It is listed at up to 50%.");
 mcq("pa-num-1", "pancreas", "rec", "Which of the following stimulate insulin secretion?\n1. Somatostatin\n2. GLP-1\n3. Norepinephrine acting on alpha receptors\n4. Amino acids",
   ["1, 2, 3 and 4","1, 2 and 4","2, 3 and 4","2 and 4 only"],
-  "GLP-1 (an incretin) and amino acids stimulate insulin. Somatostatin (paracrine, Gi) and norepinephrine from the adrenal medulla (alpha-adrenergic, Gi) inhibit it.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 3;
+  "GLP-1 (an incretin) and amino acids stimulate insulin. Somatostatin (paracrine, Gi) and norepinephrine from the adrenal medulla (alpha-adrenergic, Gi) inhibit it. Statement 3 is the trap: adrenergic input on beta receptors can stimulate insulin, but on alpha receptors it is the fight-or-flight brake.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 3;
 mcq("pa-num-2", "pancreas", "rec", "Which are effects of glucagon on the liver?\n1. Activates glycogen phosphorylase\n2. Activates acetyl-CoA carboxylase\n3. Activates PEP carboxykinase\n4. Inhibits pyruvate kinase",
   ["1, 2 and 3","1 and 3 only","1, 3 and 4","2, 3 and 4"],
   "Glucagon inhibits acetyl-CoA carboxylase (lowering malonyl-CoA, enabling ketogenesis). The other three push glycogenolysis and gluconeogenesis.", {"fmt":"numbered"}); QUESTIONS[QUESTIONS.length - 1].answer = 2;
@@ -2941,7 +2941,7 @@ mcq("ad-angII", "adrenal", "rec", "What is the primary regulator of aldosterone 
   "Angiotensin II is the primary regulator; serum potassium is the other major stimulus. ACTH has only a modest, transient effect (10-20%) and no effect on aldosterone synthase.");
 mcq("ad-angII-gq", "adrenal", "rec", "Angiotensin II stimulates the zona glomerulosa through:",
   ["A Gq-coupled receptor that raises calcium and activates PKC","A Gs-coupled receptor that raises cAMP and activates PKA","A nuclear receptor","A receptor tyrosine kinase"],
-  "The angiotensin II receptor is Gq-coupled: calcium spike, PKC activation, and PKC activates cholesterol desmolase and aldosterone synthase.");
+  "The angiotensin II receptor is Gq-coupled: calcium spike, PKC activation, and PKC activates cholesterol desmolase and aldosterone synthase. The Gs receptor that raises cAMP and activates PKA is ACTH's, on the zona fasciculata.");
 mcq("ad-potassium", "adrenal", "rec", "How does a high serum potassium increase aldosterone?",
   ["It depolarizes glomerulosa cells, opening calcium channels","It binds the ACTH receptor on glomerulosa cells and raises cAMP","It inhibits renin release","It is converted into angiotensin II"],
   "High K+ depolarizes glomerulosa cells, opening voltage-gated calcium channels and activating PKC, which turns on desmolase and aldosterone synthase. Aldosterone then secretes the excess K+.");

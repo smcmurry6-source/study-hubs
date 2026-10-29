@@ -130,6 +130,12 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-29 early morning (lessons audit, Heme & Endo exam eve, Claude Code)** — `hubs/heme-endo-exam1`, same ids and answer
+  positions, explanations and memory cues only: "Remember it" cues on `pa-insulin-fat` (lipoprotein lipase still picked 7 of 19
+  after yesterday's explanation fix), `gr-ghrelin` and `h1-enzyme-linked`; `pa-num-1`, `pa-tf-3` and `ad-angII-gq` now answer their
+  favorite wrong choice. No notes text changed, so no narration regenerated. `LESSONS.md` refreshed (the docked Plaque Boss is hidden
+  by 4 of 55 people, against 10 of 30 when it floated). No schema change.
+
 - **2026-10-28 night (Timmy Time: Heme & Endo Exam 1 episode, and a /podcast skill, Claude Code)** — A 53-minute last-minute
   review for Exam 1 (Fri Oct 30, 8:00 am), hosted by Timmy Tooth: `hubs/heme-endo-exam1/audio/timmy-time.mp3` (38 MB,
   -16 LUFS), script `tools/podcast/heme-endo-exam1/script.md`, written from the hub's notes (As taught), exam hints, cram
