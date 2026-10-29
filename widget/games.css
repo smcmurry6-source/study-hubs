@@ -126,17 +126,20 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .ms-ladder li.done{color:var(--sg-good)}
 
 /* ---------- Cross-Section ---------- */
-.cx-stage{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;padding:16px;align-items:start}
-.cx-grid{display:grid;gap:2px;background:var(--ar-bg);padding:3px;border-radius:10px;touch-action:manipulation}
-.cx-cell{position:relative;width:34px;height:34px;background:transparent;border-radius:4px}
+.cx-stage{display:flex;flex-wrap:wrap;gap:18px;padding:16px;align-items:flex-start}
+/* the grid sets its own width (fixed cells); the clues take the rest and drop below it when under 280px */
+.cx-left{--cx:min(34px, calc((100vw - 96px) / var(--cols, 13) - 2px));flex:0 0 auto;width:max-content;max-width:100%;margin:0 auto}
+.cx-right{flex:1 1 280px;min-width:min(100%, 280px)}
+.cx-grid{display:grid;grid-template-columns:repeat(var(--cols, 13), var(--cx));gap:2px;width:max-content;background:var(--ar-bg);padding:3px;border-radius:10px;touch-action:manipulation}
+.cx-cell{position:relative;width:var(--cx);height:var(--cx);background:transparent;border-radius:4px}
 .cx-cell.on{background:#f5f1e6;cursor:pointer}
 .cx-cell.on.word{background:#ffe9a8}
 .cx-cell.on.cur{background:var(--sg-gold)}
 .cx-cell.on.bad{background:#ffb0c6}
 .cx-cell.on.ok{background:#b8f0d9}
-.cx-cell span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--sg-display);font-size:1rem;color:#1a2533}
+.cx-cell span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--sg-display);font-size:calc(var(--cx) * .5);color:#1a2533}
 .cx-cell em{position:absolute;top:1px;left:3px;font-style:normal;font-family:var(--sg-mono);font-size:.56rem;color:#56606b}
-.cx-clues{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-width:0}
+.cx-clues{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;min-width:0}
 .cx-clues h4{font-family:var(--sg-display);font-weight:400;color:var(--c);margin:0 0 6px;font-size:.9rem}
 .cx-clues ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
 .cx-clue{appearance:none;display:block;width:100%;text-align:left;cursor:pointer;background:transparent;border:0;color:var(--ar-dim);padding:5px 8px;border-radius:8px;font:inherit;font-size:.87rem;line-height:1.35}
@@ -144,10 +147,12 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .cx-clue.cur{background:var(--ar-panel-2);color:var(--ar-ink)}
 .cx-clue.done{text-decoration:line-through;opacity:.55}
 .cx-hidden{position:absolute;opacity:0;width:1px;height:1px;left:0;top:0;pointer-events:none}
-.cx-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.cx-tools{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:6px;margin-top:10px;width:0;min-width:100%}
+.cx-tools .gm-btn{padding:9px 4px;font-size:.6rem;line-height:1.25;white-space:normal;min-width:0}
 .cx-cur{background:var(--ar-bg);border:2px solid var(--sg-gold);border-radius:10px;padding:8px 12px;font-weight:600;margin-bottom:12px;font-size:.92rem}
 
 @media (max-width: 760px){
+  .cx-stage{padding:12px}
   .sg-body{padding:12px;min-height:0}
   .sg-choices{grid-template-columns:minmax(0,1fr)}
   .sg-cat{font-size:.66rem;min-height:48px;padding:6px 3px}
@@ -158,13 +163,8 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
   .ms-stage{grid-template-columns:minmax(0,1fr)}
   .ms-ladder{display:grid;grid-template-columns:repeat(4,1fr);font-size:.7rem}
   .ms-opts{grid-template-columns:minmax(0,1fr)}
-  .cx-stage{grid-template-columns:minmax(0,1fr);justify-items:center}
-  .cx-clues{grid-template-columns:minmax(0,1fr);width:100%}
-  .cx-cell{width:26px;height:26px}
-  .cx-cell span{font-size:.8rem}
 }
 @media (max-width: 420px){
-  .cx-cell{width:22px;height:22px}
   .sg-tile{font-size:.68rem}
   .sg-cat{font-size:.58rem;padding:5px 2px}
   .sg-code{width:28px;height:34px}

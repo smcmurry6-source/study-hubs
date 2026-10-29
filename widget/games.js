@@ -743,9 +743,9 @@
         grid += '<div class="' + cls + '" data-cx="' + k + '">' + (P.nums[k] ? "<em>" + P.nums[k] + "</em>" : "") + "<span>" + (S.fill[k] || "") + "</span></div>";
       }
       function clueList(dir){ return P.entries.map(function(en, i){ if (en.dir !== dir) return ""; var done = cellsOf(en).every(function(k){ return S.fill[k] === P.sol[k]; }); return '<li><button type="button" class="cx-clue' + (i === S.cur ? " cur" : "") + (done ? " done" : "") + '" data-clue="' + i + '"><b>' + en.n + "</b>" + esc(en.t.c) + "</button></li>"; }).join(""); }
-      root.querySelector("[data-body]").innerHTML = '<div><div class="cx-grid" style="grid-template-columns:repeat(' + P.W + ',auto)">' + grid + "</div>" +
+      root.querySelector("[data-body]").innerHTML = '<div class="cx-left" style="--cols:' + P.W + '"><div class="cx-grid">' + grid + "</div>" +
         '<div class="cx-tools"><button type="button" class="gm-btn alt" data-cx-act="check">Check (−25)</button><button type="button" class="gm-btn alt" data-cx-act="letter">Reveal letter (−15)</button><button type="button" class="gm-btn alt" data-cx-act="word">Reveal word</button></div></div>' +
-        '<div style="min-width:0"><div class="cx-cur">' + e.n + (e.dir === "A" ? " Across" : " Down") + " · " + esc(e.t.c) + '</div><div class="cx-clues"><div><h4>Across</h4><ol>' + clueList("A") + "</ol></div><div><h4>Down</h4><ol>" + clueList("D") + "</ol></div></div></div>";
+        '<div class="cx-right"><div class="cx-cur">' + e.n + (e.dir === "A" ? " Across" : " Down") + " · " + esc(e.t.c) + '</div><div class="cx-clues"><div><h4>Across</h4><ol>' + clueList("A") + "</ol></div><div><h4>Down</h4><ol>" + clueList("D") + "</ol></div></div></div>";
     }
     function hud(){ C.setHud(root, { score:S.total, words:S.P ? S.P.entries.length : 0, time:S.start ? Math.floor((Date.now() - S.start) / 1000) + "s" : "0s" }); }
     function focusHidden(){ try { hidden.focus({ preventScroll:true }); } catch (e) { hidden.focus(); } }
