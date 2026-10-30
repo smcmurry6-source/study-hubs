@@ -2085,3 +2085,251 @@ returns boolean language sql stable security definer set search_path = public as
   end;
 $$;
 grant execute on function public.name_shared(text, text) to anon, authenticated;
+
+-- ============================================================================
+-- XP and activity summaries (migration_v44, migration_v45): replace the earlier
+-- sh_visitor_xp, get_rank_board, get_leaderboard, get_visitor_summary,
+-- get_visitor_by_hub and get_visitor_by_section above (later definitions win).
+-- ============================================================================
+
+create table if not exists public.xp_seen (
+  visitor_id text not null, hub text not null, qid text not null, correct boolean not null,
+  primary key (visitor_id, hub, qid, correct)
+);
+create table if not exists public.xp_days (
+  visitor_id text not null, d date not null,
+  n int not null default 0, c int not null default 0, raw int not null default 0,
+  primary key (visitor_id, d)
+);
+alter table public.xp_seen enable row level security;
+alter table public.xp_days enable row level security;
+revoke all on public.xp_seen, public.xp_days from anon, authenticated;
+
+create or replace function public.sh_xp_rebuild(p_ids text[])
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  delete from xp_seen where visitor_id = any(p_ids);
+  delete from xp_days where visitor_id = any(p_ids);
+  insert into xp_seen (visitor_id, hub, qid, correct)
+    select distinct visitor_id, hub, qid, correct from personal_answers where visitor_id = any(p_ids);
+  insert into xp_days (visitor_id, d, n, c, raw)
+    with pa as (
+      select a.visitor_id, a.correct, (a.answered_at at time zone 'America/Chicago')::date as d,
+        row_number() over (partition by a.visitor_id, a.hub, a.qid, a.correct order by a.answered_at) as rn
+      from personal_answers a where a.visitor_id = any(p_ids)
+    )
+    select visitor_id, d, count(*), count(*) filter (where correct),
+      sum(case when correct and rn = 1 then 10 when correct then 2 else 1 end)
+    from pa group by 1, 2;
+end; $$;
+revoke all on function public.sh_xp_rebuild(text[]) from public, anon, authenticated;
+
+create or replace function public.sh_xp_on_insert()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare k int;
+begin
+  if new.visitor_id is null or new.hub is null or new.qid is null or new.correct is null then return null; end if;
+  insert into xp_seen (visitor_id, hub, qid, correct) values (new.visitor_id, new.hub, new.qid, new.correct)
+    on conflict do nothing;
+  get diagnostics k = row_count;
+  insert into xp_days (visitor_id, d, n, c, raw)
+    values (new.visitor_id, (new.answered_at at time zone 'America/Chicago')::date, 1,
+      case when new.correct then 1 else 0 end,
+      case when new.correct and k = 1 then 10 when new.correct then 2 else 1 end)
+    on conflict (visitor_id, d) do update set n = xp_days.n + 1, c = xp_days.c + excluded.c, raw = xp_days.raw + excluded.raw;
+  return null;
+end; $$;
+
+create or replace function public.sh_xp_on_update()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  perform sh_xp_rebuild(array(select visitor_id from old_rows union select visitor_id from new_rows));
+  return null;
+end; $$;
+
+create or replace function public.sh_xp_on_delete()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  perform sh_xp_rebuild(array(select distinct visitor_id from old_rows));
+  return null;
+end; $$;
+
+drop trigger if exists personal_answers_xp_ins on public.personal_answers;
+drop trigger if exists personal_answers_xp_upd on public.personal_answers;
+drop trigger if exists personal_answers_xp_del on public.personal_answers;
+create trigger personal_answers_xp_ins after insert on public.personal_answers
+  for each row execute function public.sh_xp_on_insert();
+create trigger personal_answers_xp_upd after update on public.personal_answers
+  referencing old table as old_rows new table as new_rows
+  for each statement execute function public.sh_xp_on_update();
+create trigger personal_answers_xp_del after delete on public.personal_answers
+  referencing old table as old_rows
+  for each statement execute function public.sh_xp_on_delete();
+
+lock table public.personal_answers in share row exclusive mode;
+select public.sh_xp_rebuild(array(select distinct visitor_id from public.personal_answers));
+
+create or replace function public.sh_visitor_xp(p_visitor text default null)
+returns table(visitor_id text, xp integer, days integer, answers integer, correct integer)
+language sql stable security definer set search_path = public as $$
+  select x.visitor_id, sum(least(x.raw, 600) + 20)::int, count(*)::int, sum(x.n)::int, sum(x.c)::int
+  from xp_days x where p_visitor is null or x.visitor_id = p_visitor
+  group by 1;
+$$;
+revoke all on function public.sh_visitor_xp(text) from public, anon, authenticated;
+
+create or replace function public.get_rank_board(p_visitor text default null, p_limit integer default 10)
+returns table(rnk bigint, display_name text, xp integer, tier integer, level integer, is_me boolean, flair text)
+language sql stable security definer set search_path = public as $$
+  with r as (select v.visitor_id, v.xp, rank() over (order by v.xp desc) as rnk from sh_visitor_xp(null) v),
+  top as (select * from r where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor))
+  select t.rnk, coalesce(vn.display_name, anon_name(t.visitor_id)), t.xp, sh_tier(t.xp), sh_step(t.xp) - sh_tier(t.xp) * 3 + 1,
+    (p_visitor is not null and t.visitor_id = p_visitor), sh_mastery_flair(t.visitor_id)
+  from top t left join visitor_names vn on vn.visitor_id = t.visitor_id
+  order by t.rnk;
+$$;
+
+create or replace function public.get_leaderboard(p_limit integer default 10)
+returns table(display_name text, streak integer, total_answered integer, tier integer, level integer, flair text)
+language plpgsql security definer set search_path = public as $$
+begin
+  return query
+  with islands as (
+    select visitor_id, d, d - (row_number() over (partition by visitor_id order by d))::int as grp from xp_days
+  ), streaks as (
+    select visitor_id, count(*)::int as len, max(d) as last_day from islands group by visitor_id, grp
+  ), current_streaks as (
+    select visitor_id, max(len) as streak from streaks
+    where last_day >= (now() at time zone 'America/Chicago')::date - 1 group by visitor_id
+  ), x as (select * from sh_visitor_xp(null)
+  ), top as (
+    select cs.visitor_id, cs.streak, coalesce(x.answers, 0) as total_answered, coalesce(x.xp, 0) as xp
+    from current_streaks cs left join x on x.visitor_id = cs.visitor_id
+    where cs.streak >= 2
+    order by cs.streak desc, 3 desc
+    limit p_limit
+  )
+  select coalesce(vn.display_name, anon_name(t.visitor_id)), t.streak::int, t.total_answered::int,
+    sh_tier(t.xp), sh_step(t.xp) - sh_tier(t.xp) * 3 + 1, sh_mastery_flair(t.visitor_id)
+  from top t left join visitor_names vn on vn.visitor_id = t.visitor_id
+  order by t.streak desc, t.total_answered desc;
+end; $$;
+
+create table if not exists public.activity_hourly (
+  h timestamptz not null, hub text not null, section text not null, visitor_id text not null,
+  n int not null default 0,
+  primary key (h, hub, section, visitor_id)
+);
+create table if not exists public.activity_visits (
+  visit_id text not null, visitor_id text not null,
+  first_at timestamptz not null, last_at timestamptz not null,
+  primary key (visit_id, visitor_id)
+);
+create index if not exists activity_hourly_visitor_idx on public.activity_hourly (visitor_id);
+create index if not exists activity_visits_last_idx on public.activity_visits (last_at);
+create index if not exists activity_visits_visitor_idx on public.activity_visits (visitor_id);
+alter table public.activity_hourly enable row level security;
+alter table public.activity_visits enable row level security;
+revoke all on public.activity_hourly, public.activity_visits from anon, authenticated;
+
+create or replace function public.sh_activity_rebuild(p_ids text[])
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  delete from activity_hourly where visitor_id = any(p_ids);
+  delete from activity_visits where visitor_id = any(p_ids);
+  insert into activity_hourly (h, hub, section, visitor_id, n)
+    select date_trunc('hour', pinged_at), coalesce(hub, ''), coalesce(section, ''), visitor_id, count(*)
+    from activity_pings where visitor_id = any(p_ids) group by 1, 2, 3, 4;
+  insert into activity_visits (visit_id, visitor_id, first_at, last_at)
+    select visit_id, visitor_id, min(pinged_at), max(pinged_at)
+    from activity_pings where visitor_id = any(p_ids) group by 1, 2;
+end; $$;
+revoke all on function public.sh_activity_rebuild(text[]) from public, anon, authenticated;
+
+create or replace function public.sh_activity_on_insert()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into activity_hourly (h, hub, section, visitor_id, n)
+    values (date_trunc('hour', new.pinged_at), coalesce(new.hub, ''), coalesce(new.section, ''), new.visitor_id, 1)
+    on conflict (h, hub, section, visitor_id) do update set n = activity_hourly.n + 1;
+  insert into activity_visits (visit_id, visitor_id, first_at, last_at)
+    values (new.visit_id, new.visitor_id, new.pinged_at, new.pinged_at)
+    on conflict (visit_id, visitor_id) do update set
+      first_at = least(activity_visits.first_at, excluded.first_at),
+      last_at = greatest(activity_visits.last_at, excluded.last_at);
+  return null;
+end; $$;
+
+create or replace function public.sh_activity_on_update()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  perform sh_activity_rebuild(array(select visitor_id from old_rows union select visitor_id from new_rows));
+  return null;
+end; $$;
+
+create or replace function public.sh_activity_on_delete()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  perform sh_activity_rebuild(array(select distinct visitor_id from old_rows));
+  return null;
+end; $$;
+
+drop trigger if exists activity_pings_sum_ins on public.activity_pings;
+drop trigger if exists activity_pings_sum_upd on public.activity_pings;
+drop trigger if exists activity_pings_sum_del on public.activity_pings;
+create trigger activity_pings_sum_ins after insert on public.activity_pings
+  for each row execute function public.sh_activity_on_insert();
+create trigger activity_pings_sum_upd after update on public.activity_pings
+  referencing old table as old_rows new table as new_rows
+  for each statement execute function public.sh_activity_on_update();
+create trigger activity_pings_sum_del after delete on public.activity_pings
+  referencing old table as old_rows
+  for each statement execute function public.sh_activity_on_delete();
+
+lock table public.activity_pings in share row exclusive mode;
+truncate public.activity_hourly, public.activity_visits;
+insert into public.activity_hourly (h, hub, section, visitor_id, n)
+  select date_trunc('hour', pinged_at), coalesce(hub, ''), coalesce(section, ''), visitor_id, count(*)
+  from public.activity_pings group by 1, 2, 3, 4;
+insert into public.activity_visits (visit_id, visitor_id, first_at, last_at)
+  select visit_id, visitor_id, min(pinged_at), max(pinged_at) from public.activity_pings group by 1, 2;
+analyze public.activity_hourly;
+analyze public.activity_visits;
+
+create or replace function public.get_visitor_by_hub(p_secret text, p_days integer default 30)
+returns table(hub text, unique_visitors bigint, total_minutes numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+  select coalesce(nullif(a.hub, ''), '(unknown)'), count(distinct a.visitor_id)::bigint,
+    round((sum(a.n) * 25.0 / 60.0)::numeric, 1) as total_minutes
+  from activity_hourly a
+  where a.h >= date_trunc('hour', now() - (p_days || ' days')::interval)
+  group by 1 order by total_minutes desc;
+end; $$;
+
+create or replace function public.get_visitor_by_section(p_secret text, p_days integer default 30)
+returns table(hub text, section text, total_minutes numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+  select coalesce(nullif(a.hub, ''), '(unknown)') as hub, coalesce(nullif(a.section, ''), '(unspecified)'),
+    round((sum(a.n) * 25.0 / 60.0)::numeric, 1) as total_minutes
+  from activity_hourly a
+  where a.h >= date_trunc('hour', now() - (p_days || ' days')::interval)
+  group by 1, 2 order by hub, total_minutes desc;
+end; $$;
+
+create or replace function public.get_visitor_summary(p_secret text, p_days integer default 30)
+returns table(unique_visitors bigint, total_visits bigint, avg_visit_minutes numeric)
+language plpgsql security definer set search_path = public as $$
+declare since timestamptz := now() - (p_days || ' days')::interval;
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+  select count(distinct v.visitor_id)::bigint, count(*)::bigint,
+    round(avg(greatest(extract(epoch from (v.last_at - greatest(v.first_at, since))) / 60.0, 0.4))::numeric, 1)
+  from activity_visits v where v.last_at >= since;
+end; $$;

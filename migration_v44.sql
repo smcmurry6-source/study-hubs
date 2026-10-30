@@ -99,3 +99,43 @@ language sql stable security definer set search_path = public as $$
   group by 1;
 $$;
 revoke all on function public.sh_visitor_xp(text) from public, anon, authenticated;
+
+-- The two boards then spent their time naming everyone (anon_name, sh_mastery_flair) before
+-- keeping the top rows. Pick the rows first, then name them. get_leaderboard also reads study
+-- days and answer totals from xp_days instead of scanning personal_answers. Same output.
+create or replace function public.get_rank_board(p_visitor text default null, p_limit integer default 10)
+returns table(rnk bigint, display_name text, xp integer, tier integer, level integer, is_me boolean, flair text)
+language sql stable security definer set search_path = public as $$
+  with r as (select v.visitor_id, v.xp, rank() over (order by v.xp desc) as rnk from sh_visitor_xp(null) v),
+  top as (select * from r where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor))
+  select t.rnk, coalesce(vn.display_name, anon_name(t.visitor_id)), t.xp, sh_tier(t.xp), sh_step(t.xp) - sh_tier(t.xp) * 3 + 1,
+    (p_visitor is not null and t.visitor_id = p_visitor), sh_mastery_flair(t.visitor_id)
+  from top t left join visitor_names vn on vn.visitor_id = t.visitor_id
+  order by t.rnk;
+$$;
+
+create or replace function public.get_leaderboard(p_limit integer default 10)
+returns table(display_name text, streak integer, total_answered integer, tier integer, level integer, flair text)
+language plpgsql security definer set search_path = public as $$
+begin
+  return query
+  with islands as (
+    select visitor_id, d, d - (row_number() over (partition by visitor_id order by d))::int as grp from xp_days
+  ), streaks as (
+    select visitor_id, count(*)::int as len, max(d) as last_day from islands group by visitor_id, grp
+  ), current_streaks as (
+    select visitor_id, max(len) as streak from streaks
+    where last_day >= (now() at time zone 'America/Chicago')::date - 1 group by visitor_id
+  ), x as (select * from sh_visitor_xp(null)
+  ), top as (
+    select cs.visitor_id, cs.streak, coalesce(x.answers, 0) as total_answered, coalesce(x.xp, 0) as xp
+    from current_streaks cs left join x on x.visitor_id = cs.visitor_id
+    where cs.streak >= 2
+    order by cs.streak desc, 3 desc
+    limit p_limit
+  )
+  select coalesce(vn.display_name, anon_name(t.visitor_id)), t.streak::int, t.total_answered::int,
+    sh_tier(t.xp), sh_step(t.xp) - sh_tier(t.xp) * 3 + 1, sh_mastery_flair(t.visitor_id)
+  from top t left join visitor_names vn on vn.visitor_id = t.visitor_id
+  order by t.streak desc, t.total_answered desc;
+end; $$;

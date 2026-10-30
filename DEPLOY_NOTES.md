@@ -130,6 +130,24 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (database timeouts on exam day: XP and activity summaries, Claude Code)** — On Heme & Endo exam morning the
+  dashboard's handpiece rank board stopped loading and the admin page's Time by section kept failing, even after #200's index.
+  Cause: `sh_visitor_xp(null)` recomputed everyone's XP from all of `personal_answers` (~0.9 s, a window sort spilling to disk),
+  and `get_rank_profile` (every hub and dashboard load: 15k calls), `get_trophy_stats`, `get_rank_board`, `get_leaderboard` and
+  `get_correct_streak_stats` all call it, so the database was saturated and every RPC near the 3 s anon limit failed.
+  `migration_v44.sql` (**applied via the connector**): a trigger on `personal_answers` keeps `xp_seen` (first try per
+  visitor/hub/qid/correct, which decides 10 vs 2 XP) and `xp_days` (per visitor and Central-time day: answers, right, raw XP)
+  in step; updates/deletes (Link my devices) rebuild the affected visitors. `sh_visitor_xp` keeps its signature and rules and
+  reads `xp_days` (3 ms; all 151 visitors' XP, days, answers and right answers checked identical to the old formula);
+  `get_rank_profile` 1.1 s -> 8 ms. `get_rank_board` and `get_leaderboard` now name only the rows they return (leaderboard reads
+  days and totals from `xp_days`; same output). `migration_v45.sql` (**applied**): the admin page sends 16 RPCs at once and the
+  three time queries each counted ~190k raw pings (~1.1 s), so a trigger on `activity_pings` keeps `activity_hourly` (pings per
+  hour, hub, section, visitor; null section stored as '') and `activity_visits` (first/last ping per visit);
+  `get_visitor_by_hub`, `get_visitor_by_section` and `get_visitor_summary` read those (6-19 ms; 30-day sections and ping counts
+  checked identical) and now use `sh_admin_ok()`. The range now starts on a whole hour. Still slow: `anon_name()` (~65 ms per
+  call; it computes every streak holder's base name), which keeps the boards at ~0.5 s. **Anything new that totals answers or
+  pings per visitor: read `xp_days` / `activity_hourly` / `activity_visits`, not the raw tables.** No site change.
+
 - **2026-10-29 afternoon (lessons audit, Heme & Endo exam eve, Claude Code)** — `hubs/heme-endo-exam1`, same ids and answer
   positions, explanations only plus one stem: `td-num-2`, `ca-2s-4`, `ad-11bhsd`, `td-inducers` and `ca-r-vdr` now answer their
   favorite wrong choice; `cs-triam`'s stem asks "Which corticosteroid is the popular intermediate-acting one?" instead of what
