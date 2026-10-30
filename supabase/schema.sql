@@ -120,6 +120,7 @@ create index if not exists activity_pings_visitor_idx on public.activity_pings (
 create index if not exists activity_pings_visit_idx on public.activity_pings (visit_id, pinged_at);
 create index if not exists activity_pings_hub_idx on public.activity_pings (hub, pinged_at);
 create index if not exists activity_pings_visitor_hub_idx on public.activity_pings (visitor_id, hub);
+create index if not exists activity_pings_time_idx on public.activity_pings (pinged_at) include (hub, section, visitor_id);
 
 -- ---------------------------------------------------------------- row level security
 -- Every table has RLS on. Tables with no policy are reachable only through the
