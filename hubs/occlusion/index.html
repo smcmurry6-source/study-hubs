@@ -7772,7 +7772,9 @@ function renderBank(body){
   }; });
   document.getElementById('fPinned').onclick = function(){ STATE.ui.qstatus = STATE.ui.qstatus === 'pinned' ? 'all' : 'pinned'; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
-  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('fPinN'); if(n) n.textContent = 'Pinned (' + e.detail.count + ')'; }); }
+  /* pins that arrive from another device (detail.synced) redraw the Pinned view */
+  renderBank.__draw = draw;
+  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('fPinN'); if(!n) return; n.textContent = 'Pinned (' + e.detail.count + ')'; if(e.detail.synced && STATE.ui.qstatus === 'pinned') renderBank.__draw(); }); }
   document.getElementById('qMore').onclick = function(){ bankShown += BANK_PAGE; draw(); };
   draw();
 }

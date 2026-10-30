@@ -149,9 +149,9 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
 Sam's rule, 2026-10-30, for every live and future hub: the Question Bank's lecture filter is a **tick-box list** (`lecPickHTML()` /
 `wireLecPick()`, every lecture ticked by default, Select all / Clear), with an **In order / Random** toggle (`STATE.ui.qorder`; In order =
 by lecture, then bank order; Random shuffles once and keeps that order until Random is tapped again), and **pinned questions**: the hub
-sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card (`window.shPins`, saved per device in
-`sh_pins_<hub>`, `sh:pins` event), and the bank filters by it (a **Pinned (n)** button and "Pinned" in the status menu). `STATE.ui.qlec`
-may be `'all'`, one id or an array of ids. Copy it all from `special-patient-care` (or `occlusion`, which adds final/midterm presets).
+sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card (`window.shPins`, saved in `sh_pins_<hub>`
+and synced across devices by `set_pins` / `get_my_pins` (migration_v46), `sh:pins` event), and the bank filters by it (a **Pinned (n)** button and "Pinned" in the status menu). `STATE.ui.qlec`
+may be `'all'`, one id or an array of ids. The bank opens with the filters and order used last time (saved in `STATE.ui`; Perio `STATE.ui.qbank`). Copy it all from `special-patient-care` (or `occlusion`, which adds final/midterm presets).
 
 **High Likelihood Exam Questions** (Sam's rule, 2026-10-30, every live and future hub; first in `heme-endo-exam1`): `LIKELY_TOPICS`
 (`{lec, t, basis, ids}`) lists each lecture's predicted exam topics, strongest evidence first: what a professor flagged in a recording

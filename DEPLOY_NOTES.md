@@ -130,6 +130,15 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (pins sync across devices; the bank remembers its filters, Claude Code)** — Sam: pins should follow you, and hubs
+  should open the bank with the filter you used last. `migration_v46.sql`: `question_pins` (visitor, hub, qid, pinned, t = the
+  device's change time in ms; an unpin is kept so it beats an older pin), public `set_pins(p_visitor, p_hub, p_pins)` and
+  `get_my_pins(p_visitor, p_hub)`, and `redeem_link_code` moves a device's pins (newer change wins). `widget/v3.js`: each Pin tap
+  saves at once; `shPins.sync()` runs with the answer sync (hub load, and back after 3+ minutes), merges per question by time,
+  uploads anything newer and fires `sh:pins {synced:true}` so an open Pinned view redraws. Change times in `sh_pins_t_<hub>`.
+  Perio's bank now saves its sessions, type and status (`STATE.ui.qbank`) like Occlusion and Special Patient Care already did
+  (the search box still starts empty). About page. **Perio Project: carry `STATE.ui.qbank` into the split sources.**
+
 - **2026-10-30 (High Likelihood Exam Questions in every live hub, Claude Code)** — Sam: carry Heme & Endo's feature to all current and
   future hubs (now a standing rule in `CLAUDE.md`). `LIKELY_TOPICS` + `EXAM_COUNTS` (empty: no hub has announced counts per lecture),
   `likelyChip()`, `likelyHTML()` (top of Exam Hints, "Practice these" opens the bank on that lecture with status "High likelihood only"),

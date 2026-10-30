@@ -4967,7 +4967,8 @@ var COMPENDIUM_VIEWS = [
 ];
 var COMPENDIUM_VIEW = COMPENDIUM_VIEWS.some(function(v){ return v.id === STATE.ui.view; }) ? STATE.ui.view : 'lecture-notes';
 var COMPENDIUM_SELECTED_LEC = LECTURE_BY_ID[STATE.ui.lec] ? STATE.ui.lec : LECTURES[0].id;
-var QBANK_FILTER = { search:'', lec:'all', type:'all', status:'all' };
+/* the bank opens with the filters used last time (STATE.ui.qbank: sessions, type, status; the search box starts empty) */
+var QBANK_FILTER = (function(){ var f = STATE.ui.qbank || {}; return { search:'', lec:f.lec || 'all', type:f.type || 'all', status:f.status || 'all' }; })();
 
 function content(){ return document.getElementById('compendium-content'); }
 function setView(id){
@@ -5228,11 +5229,13 @@ function renderQuestionBank(){
     renderQuestionBankListOnly();
   });
   /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
-  if(!renderQuestionBank.__pinsWired){ renderQuestionBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('qbPinN'); if(n) n.textContent = 'Pinned (' + e.detail.count + ')'; }); }
+  if(!renderQuestionBank.__pinsWired){ renderQuestionBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('qbPinN'); if(!n) return; n.textContent = 'Pinned (' + e.detail.count + ')'; if(e.detail.synced && QBANK_FILTER.status === 'pinned') renderQuestionBankListOnly(); }); }
 }
 /* In order: by session, then bank order. Random: one shuffle (QBANK_ORDER), kept until Random is tapped again */
 var QBANK_ORDER = null, RETRY_GAP = 5;
 function renderQuestionBankListOnly(){
+  var keep = { lec:QBANK_FILTER.lec, type:QBANK_FILTER.type, status:QBANK_FILTER.status };
+  if(JSON.stringify(keep) !== JSON.stringify(STATE.ui.qbank || {})){ STATE.ui.qbank = keep; saveState(); }
   if(!QBANK_ORDER){
     var lecIdx = {}; LECTURES.forEach(function(l, i){ lecIdx[l.id] = i; });
     QBANK_ORDER = {};
