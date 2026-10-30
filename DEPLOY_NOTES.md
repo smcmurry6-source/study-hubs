@@ -138,6 +138,11 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (admin Surveys tab: exam check-ins time out again, Claude Code)** — "Couldn't load exam check-ins
+  (migration_v23)" was back: `get_exam_debriefs` still counted each person's raw `activity_pings` and hit the 3 s anon
+  timeout (3.8 s). `migration_v47.sql` (**applied via the connector**) reads `activity_hourly` instead (v45's per-hour
+  counts; minutes identical for all 80 hub/person pairs): ~0.5 s, all 83 check-ins. `supabase/schema.sql` updated. No site change.
+
 - **2026-10-30 (pins sync across devices; the bank remembers its filters, Claude Code)** — Sam: pins should follow you, and hubs
   should open the bank with the filter you used last. `migration_v46.sql`: `question_pins` (visitor, hub, qid, pinned, t = the
   device's change time in ms; an unpin is kept so it beats an older pin), public `set_pins(p_visitor, p_hub, p_pins)` and
