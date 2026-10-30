@@ -130,6 +130,10 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (Heme & Endo Exam 1 check-in live, Claude Code)** — Sam: open the check-in now. The exam ended at 9:30 am, so its
+  `HUBS` entry sets `checkinHour:9, promptHour:9`: the card's "Check in" button and the dashboard pop-up both go out on exam day
+  instead of the button at 10 am and the pop-up at 10 pm. No schema change.
+
 - **2026-10-30 (database timeouts on exam day: XP and activity summaries, Claude Code)** — On Heme & Endo exam morning the
   dashboard's handpiece rank board stopped loading and the admin page's Time by section kept failing, even after #200's index.
   Cause: `sh_visitor_xp(null)` recomputed everyone's XP from all of `personal_answers` (~0.9 s, a window sort spilling to disk),
