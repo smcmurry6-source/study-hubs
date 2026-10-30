@@ -111,6 +111,14 @@ Besides two-statement and true/false items, every session that writes questions 
 Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
 "Numbered-statement questions" (copy `nums()` from `occlusion`). **Perio Project: add `nums()` before Session 6 goes to taught.**
 
+## Every lecture gets High Likelihood topics (standing rule, 2026-10-30)
+
+Every hub (hub Projects included) predicts its exam's most likely topics per lecture (`LIKELY_TOPICS`, ranked by evidence:
+recording hints, in-class reviews and focus lists, the exam-review guide, check-ins, then the slides). **Building a hub, adding a
+lecture to one, or moving a lecture from slides-only to taught includes its topics**, and new hints or reviews mean re-ranking.
+CI fails a lecture with questions but no topics. How: `CLAUDE.md` → "Question Bank: lecture picker, order and pins".
+**Perio Project: carry `LIKELY_TOPICS` into the split sources and add topics for each session as it is taught.**
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every

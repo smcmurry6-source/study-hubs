@@ -160,7 +160,10 @@ slides / lecture / module / reading. When the exam's count per lecture is announ
 many topics. The listed questions get `q.likely`: `likelyChip()` tags them in the bank and the drill (not the mock); the bank has a
 **Likely first** order and a **High likelihood only** status; Exam Hints opens with `likelyHTML()` ("Most likely questions", a
 Practice these button per lecture). Never base a topic on a graded quiz or a previous year's exam (graded-coursework rule below).
-Building a hub or adding a lecture includes its topics; when new hints, reviews or focus lists arrive, re-rank them.
+**Adding a lecture to an existing hub (or taking one from slides-only to taught) always includes its `LIKELY_TOPICS`
+entries**, ranked with the rest; when new hints, reviews or focus lists arrive, re-rank them. CI fails a lecture with questions
+but no topics, or a topic listing a question from another lecture (`LIKELY_SKIP` in `tools/ci/smoke.js` is only for lectures
+whose exam is already over).
 
 ## Every hub opens on its own Home page (standing rule)
 
