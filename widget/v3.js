@@ -801,6 +801,35 @@
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
     b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid); });
+    if (window.SH_PINS) addPinButton(card, top, qid);
+    top.appendChild(b);
+  }
+  /* ---------- pinned questions: a Pin button beside Report, in hubs that define window.SH_PINS (their Question Bank
+     filters by it). Saved per device in sh_pins_<hub> (an array of qids, newest first); every card of the same
+     question updates together, and "sh:pins" {qid, pinned, count} tells the hub. ---------- */
+  var PIN_KEY = "sh_pins_" + HUB;
+  var PIN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
+  function readPins(){ try { var a = JSON.parse(localStorage.getItem(PIN_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function paintPin(b, on){ b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); b.innerHTML = PIN_ICON + (on ? "Pinned" : "Pin"); b.title = on ? "Unpin this question" : "Pin this question to your Pinned list"; }
+  window.shPins = {
+    list: readPins,
+    has: function(qid){ return readPins().indexOf(qid) !== -1; },
+    count: function(){ return readPins().length; },
+    toggle: function(qid){
+      var a = readPins(), i = a.indexOf(qid), on = i === -1;
+      if (on) a.unshift(qid); else a.splice(i, 1);
+      try { localStorage.setItem(PIN_KEY, JSON.stringify(a)); } catch (e) {}
+      document.querySelectorAll(".sh-qpin").forEach(function(b){ if (b.__qid === qid) paintPin(b, on); });
+      shTrackSafe(on ? "pin:add" : "pin:remove");
+      try { document.dispatchEvent(new CustomEvent("sh:pins", { detail: { qid: qid, pinned: on, count: a.length } })); } catch (e) {}
+      return on;
+    }
+  };
+  function addPinButton(card, top, qid){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "sh-qpin"; b.__qid = qid;
+    paintPin(b, window.shPins.has(qid));
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); window.shPins.toggle(qid); });
     top.appendChild(b);
   }
   window.shWireClassStats = function(cardSelector){

@@ -130,6 +130,17 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (Question Bank: pick your lectures, in order or random, pinned questions, Claude Code)** — Sam's request, for
+  Occlusion, Perio and Special Patient Care and every future hub (not Heme & Endo Exam 1: its exam has passed). The lecture
+  dropdown is now a tick-box list (`lecPickHTML()`/`wireLecPick()`, all ticked by default, Select all / Clear; Occlusion adds For the
+  final / Midterm lectures; `STATE.ui.qlec` takes an array; Perio keeps `QBANK_FILTER.lec` in memory as before). Shuffle became an
+  **In order / Random** toggle (`STATE.ui.qorder`; In order = by lecture then bank order, patient sets kept together). **Pins**:
+  `widget/v3.js` adds a Pin button beside Report on every card in hubs that set `window.SH_PINS = true` (`window.shPins`,
+  `sh_pins_<hub>`, `sh:pins`, tracked `pin:add`/`pin:remove`, `bank:order=`); the bank has a Pinned (n) button and a "Pinned" status.
+  Occlusion's default lecture pick is now all lectures, and everyone starts once with all ticked (`STATE.ui.qpickOn`). New standing
+  rule in `CLAUDE.md`. About page, `sw.js` -> `sh-v47`. Pins are per device (no sync yet). No schema change.
+  **Perio Project: carry the picker, order toggle and `SH_PINS` into the split sources.**
+
 - **2026-10-30 (Heme & Endo Exam 1 check-in live, Claude Code)** — Sam: open the check-in now. The exam ended at 9:30 am, so its
   `HUBS` entry sets `checkinHour:9, promptHour:9`: the card's "Check in" button and the dashboard pop-up both go out on exam day
   instead of the button at 10 am and the pop-up at 10 pm. No schema change.

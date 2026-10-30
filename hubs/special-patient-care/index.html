@@ -146,6 +146,30 @@ main{padding-top:20px}
 .qfilters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .qfilters select,.qfilters input{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);min-width:0}
 .qfilters input{flex:1 1 200px}
+/* lecture picker (tick the lectures to practice), order toggle and the Pinned button */
+.lp{position:relative}
+.lp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer;max-width:100%}
+.lp-btn svg{width:14px;height:14px;flex:none}
+.lp-btn[aria-expanded="true"]{border-color:var(--accent)}
+.lp-sum{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28ch}
+.lp-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(420px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:10px}
+.lp-quick{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.lp-quick button,.lp-done{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:.8rem;font-weight:600;color:var(--ink);cursor:pointer}
+.lp-list{max-height:min(52vh,380px);overflow:auto}
+.lp-row{display:flex;align-items:flex-start;gap:8px;padding:7px 6px;border-radius:8px;cursor:pointer;font-size:.88rem}
+.lp-row:hover{background:var(--surface-2)}
+.lp-row input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+.lp-t{flex:1;min-width:0}
+.lp-n{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-faint);flex:none;margin-top:2px}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);margin-top:6px;font-size:.8rem;color:var(--ink-faint)}
+.qorder{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;background:var(--surface)}
+.qorder button{border:0;background:none;padding:7px 11px;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.qorder button+button{border-left:1px solid var(--line-strong)}
+.qorder button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink)}
+.qpinned{display:inline-flex;align-items:center;gap:6px}
+.qpinned svg{width:14px;height:14px}
+.qpinned[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:560px){.lp,.lp-btn{width:100%}.lp-sum{max-width:none;flex:1;text-align:left}}
 .qcount{color:var(--ink-faint);font-size:.84rem;margin-bottom:10px}
 .rv-set{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;border:1px solid var(--accent);background:var(--accent-soft,var(--surface-2));border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
 .rv-set b{display:block}
@@ -4100,10 +4124,58 @@ function placeLectureFigs(prose, lecId, level, rest){
   ANIMA.mount(prose.parentNode);
 }
 
+/* ---------- Question Bank: which lectures (tick any; all by default), in order or random, pinned ----------
+   STATE.ui.qlec is 'all', a lecture id, an array of ids (the picker). Pins live in the shared
+   widget (sh_pins_<hub>, window.shPins): read the same key here so the filter works before the widget loads. */
+window.SH_PINS = true;
+function pinnedIds(){ try { var a = JSON.parse(localStorage.getItem('sh_pins_special-patient-care') || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+function bankLecIds(){
+  var v = STATE.ui.qlec, all = LECTURES.map(function(l){ return l.id; });
+  if(Array.isArray(v)) return v.filter(function(id){ return LECTURE_BY_ID[id]; });
+  return LECTURE_BY_ID[v] ? [v] : all;
+}
+var PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
+var LP_CARET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+function lecPickSummary(ids){
+  if(ids.length === LECTURES.length) return 'All lectures';
+  if(!ids.length) return 'No lectures picked';
+  if(ids.length === 1){ var l = LECTURE_BY_ID[ids[0]]; return lecLabel(l) + ' ' + l.title; }
+  return ids.length + ' of ' + LECTURES.length + ' lectures: ' + LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(lecLabel).join(', ');
+}
+function lecPickHTML(ids){
+  var n = {}; QUESTIONS.forEach(function(q){ n[q.lec] = (n[q.lec] || 0) + 1; });
+  return '<div class="lp" id="lecPick"><button type="button" class="lp-btn" aria-haspopup="true" aria-expanded="false" aria-label="Lectures to practice">'+icon('notes')+'<span class="lp-sum">'+escHtml(lecPickSummary(ids))+'</span>'+LP_CARET+'</button>' +
+    '<div class="lp-pop" hidden role="group" aria-label="Lectures to practice"><div class="lp-quick"><button type="button" data-lp="all">Select all</button><button type="button" data-lp="none">Clear</button></div>' +
+    '<div class="lp-list">' + LECTURES.map(function(l){ return '<label class="lp-row tag-'+l.tag+'"><input type="checkbox" value="'+l.id+'"'+(ids.indexOf(l.id) !== -1 ? ' checked' : '')+'><span class="lec-num">'+lecLabel(l)+'</span><span class="lp-t">'+escHtml(l.title)+'</span><span class="lp-n">'+(n[l.id] || 0)+'</span></label>'; }).join('') + '</div>' +
+    '<div class="lp-foot"><span>Questions from the ticked lectures</span><button type="button" class="lp-done">Done</button></div></div></div>';
+}
+/* onPick(ids) runs on every tick; the list redraws live and the picker stays open */
+function wireLecPick(root, onPick){
+  var box = root.querySelector('#lecPick'); if(!box) return;
+  var btn = box.querySelector('.lp-btn'), pop = box.querySelector('.lp-pop');
+  function open(on){ pop.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  function picked(){ return Array.prototype.filter.call(box.querySelectorAll('input[type=checkbox]'), function(c){ return c.checked; }).map(function(c){ return c.value; }); }
+  function changed(){ var ids = picked(); box.querySelector('.lp-sum').textContent = lecPickSummary(ids); onPick(ids); }
+  btn.addEventListener('click', function(){ open(pop.hidden); });
+  box.querySelector('.lp-done').addEventListener('click', function(){ open(false); btn.focus(); });
+  box.addEventListener('change', changed);
+  box.querySelectorAll('[data-lp]').forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.getAttribute('data-lp');
+    box.querySelectorAll('input[type=checkbox]').forEach(function(c){ c.checked = k === 'all'; });
+    changed();
+  }); });
+  function away(e){ if(!document.body.contains(box)){ document.removeEventListener('click', away, true); document.removeEventListener('keydown', esc); return; } if(!pop.hidden && !box.contains(e.target)) open(false); }
+  function esc(e){ if(e.key === 'Escape' && !pop.hidden){ open(false); btn.focus(); } }
+  document.addEventListener('click', away, true); document.addEventListener('keydown', esc);
+}
+
 function bankFiltered(search){
-  var s = (search||'').toLowerCase().trim();
+  var s = (search||'').toLowerCase().trim(), lecOn = {}, pins = {};
+  bankLecIds().forEach(function(id){ lecOn[id] = 1; });
+  pinnedIds().forEach(function(id){ pins[id] = 1; });
   return QUESTIONS.filter(function(q){
-    if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
+    if(!lecOn[q.lec]) return false;
+    if(STATE.ui.qstatus === 'pinned' && !pins[q.id]) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
     var fm = STATE.ui.qfmt || 'all';
     if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
@@ -4116,11 +4188,10 @@ function bankFiltered(search){
 }
 var bankSearch = '';
 function renderBank(body){
-  var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time'],['pinned','Pinned']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters">'+lecPickHTML(bankLecIds())+'<select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">Random</button></div><button type="button" class="btn qpinned" id="fPinned" aria-pressed="'+(STATE.ui.qstatus === 'pinned')+'">'+PIN_SVG+'<span id="fPinN">Pinned ('+pinnedIds().length+')</span></button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -4136,7 +4207,12 @@ function renderBank(body){
     list.insertBefore(box.firstChild, cards[i] || null);
     if(window.shTrack) window.shTrack('bank:retry-shown');
   };
-  var order = null;
+  /* In order: by lecture, then bank order. Random: one shuffle, kept through filter changes and "Show more" */
+  var lecIdx = {}; LECTURES.forEach(function(l, i){ lecIdx[l.id] = i; });
+  function baseOrder(){ return STATE.ui.qorder === 'random' ? shuffled(QUESTIONS.map(function(q){ return q.id; })) : QUESTIONS.map(function(q, i){ return [q, i]; }).sort(function(a, b){ return (lecIdx[a[0].lec] - lecIdx[b[0].lec]) || (a[1] - b[1]); }).map(function(x){ return x[0].id; }); }
+  /* a reshuffle happens only when Random is tapped, not when the bank redraws */
+  var order = (STATE.ui.qorder === 'random' && renderBank.__shuf) || baseOrder();
+  if(STATE.ui.qorder === 'random') renderBank.__shuf = order;
   function draw(){
     var qs = bankFiltered(bankSearch);
     if(order){
@@ -4146,15 +4222,22 @@ function renderBank(body){
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
     document.getElementById('qCount').textContent = qs.length + ' question' + (qs.length===1?'':'s') + (qs.length > bankShown ? ' · showing ' + bankShown : '');
-    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">No questions match these filters.</div>';
+    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">' + (!bankLecIds().length ? 'No lectures picked. Tick at least one in the lecture list.' : STATE.ui.qstatus === 'pinned' && !pinnedIds().length ? 'No pinned questions yet. Tap Pin on any question to save it here.' : 'No questions match these filters.') + '</div>';
     document.getElementById('qMore').hidden = qs.length <= bankShown;
   }
-  document.getElementById('fLec').onchange = function(e){ STATE.ui.qlec = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  wireLecPick(body, function(ids){ STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; bankShown = BANK_PAGE; saveState(); draw(); });
   document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   document.getElementById('fFmt').onchange = function(e){ STATE.ui.qfmt = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
-  document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; bankShown = BANK_PAGE; draw(); }, 180); };
-  document.getElementById('fShuffle').onclick = function(){ order = shuffled(QUESTIONS.map(function(q){ return q.id; })); draw(); };
+  body.querySelectorAll('[data-qorder]').forEach(function(b){ b.onclick = function(){
+    STATE.ui.qorder = b.getAttribute('data-qorder'); saveState(); order = baseOrder(); renderBank.__shuf = STATE.ui.qorder === 'random' ? order : null; bankShown = BANK_PAGE;
+    body.querySelectorAll('[data-qorder]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    if(window.shTrack) window.shTrack('bank:order=' + STATE.ui.qorder); draw();
+  }; });
+  document.getElementById('fPinned').onclick = function(){ STATE.ui.qstatus = STATE.ui.qstatus === 'pinned' ? 'all' : 'pinned'; bankShown = BANK_PAGE; saveState(); renderBank(body); };
+  /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
+  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('fPinN'); if(n) n.textContent = 'Pinned (' + e.detail.count + ')'; }); }
   document.getElementById('qMore').onclick = function(){ bankShown += BANK_PAGE; draw(); };
   draw();
 }

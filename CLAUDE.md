@@ -144,6 +144,15 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
 - False statements follow the true/false rule: change one taught detail, never a trick of wording. Draw them from the hub's notes.
 - Perio: its engine has no numbered items yet; add `nums()` (from `occlusion`) before Session 6 or any later session is taught.
 
+## Question Bank: lecture picker, order and pins (standing rule)
+
+Sam's rule, 2026-10-30, for every live and future hub: the Question Bank's lecture filter is a **tick-box list** (`lecPickHTML()` /
+`wireLecPick()`, every lecture ticked by default, Select all / Clear), with an **In order / Random** toggle (`STATE.ui.qorder`; In order =
+by lecture, then bank order; Random shuffles once and keeps that order until Random is tapped again), and **pinned questions**: the hub
+sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card (`window.shPins`, saved per device in
+`sh_pins_<hub>`, `sh:pins` event), and the bank filters by it (a **Pinned (n)** button and "Pinned" in the status menu). `STATE.ui.qlec`
+may be `'all'`, one id or an array of ids. Copy it all from `special-patient-care` (or `occlusion`, which adds final/midterm presets).
+
 ## Every hub opens on its own Home page (standing rule)
 
 Sam's rule, 2026-10-27: every hub has a **Home** mode, first in the mode switch and the default (`data-default-mode="home"`,
