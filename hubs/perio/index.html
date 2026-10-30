@@ -283,6 +283,40 @@ main{padding-top:20px}
 .qfilters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .qfilters select,.qfilters input{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:7px 13px;font:inherit;font-size:.86rem;color:var(--ink);min-width:0;max-width:100%}
 .qfilters input{flex:1 1 220px}
+.likely-box{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);padding:10px 14px;margin:0 0 16px}
+.likely-box > summary{display:flex;gap:8px;align-items:flex-start;cursor:pointer;list-style:none}
+.likely-box > summary .ic{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent-ink)}
+.likely-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.likely-lec{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.likely-lec h4{margin:0 0 6px;font-size:.95rem}
+.likely-lec h4 .lec-num,.likely-lec h4 .snum{margin-right:6px}
+.likely-lec h4 small{display:block;font-weight:600;color:var(--ink-soft);font-size:.78rem;margin-top:2px}
+.likely-lec ol{margin:0 0 10px;padding-left:20px;font-size:.88rem}
+.likely-lec li{margin:3px 0}
+.likely-basis{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-soft);background:var(--surface-2);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.likely-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+.likely-chip .ic,.likely-chip svg{width:12px;height:12px}
+/* session picker (tick the sessions to practice), order toggle and the Pinned button */
+.lp{position:relative}
+.lp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:7px 13px;font:inherit;font-size:.86rem;color:var(--ink);cursor:pointer;max-width:100%}
+.lp-btn svg{width:14px;height:14px;flex:none}
+.lp-btn[aria-expanded="true"]{border-color:var(--accent)}
+.lp-sum{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28ch}
+.lp-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(420px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:10px}
+.lp-quick{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.lp-quick button,.lp-done{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:.8rem;font-weight:600;color:var(--ink);cursor:pointer}
+.lp-list{max-height:min(52vh,380px);overflow:auto}
+.lp-row{display:flex;align-items:flex-start;gap:8px;padding:7px 6px;border-radius:8px;cursor:pointer;font-size:.88rem}
+.lp-row:hover{background:var(--surface-2)}
+.lp-row input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+.lp-t{flex:1;min-width:0}
+.lp-n{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-faint);flex:none;margin-top:2px}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);margin-top:6px;font-size:.8rem;color:var(--ink-faint)}
+.qfilters .seg{margin-top:0}
+.qfilters .seg button{padding:4px 12px}
+.qpinned svg{width:14px;height:14px}
+.qpinned[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:560px){.lp,.lp-btn{width:100%}.lp-sum{max-width:none;flex:1;text-align:left}}
 .qcount{color:var(--ink-faint);font-size:.82rem;font-family:var(--font-mono)}
 .qlist{display:flex;flex-direction:column;gap:14px}
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--t, var(--line))}
@@ -2332,6 +2366,82 @@ QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]
 var QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
+
+/* ---------- HIGH LIKELIHOOD EXAM QUESTIONS (standing rule, 2026-10-30; first in heme-endo-exam1): each lecture's
+   predicted exam topics, ranked by evidence (basis: hint = flagged in a recording, review = asked at an in-class review,
+   review guide = the class exam-review guide, midterm check-ins = what the class said the exam asked, slides / lecture /
+   module / reading = the core of that source). Built from the recordings, the midterm check-ins and the exam-review guide. The listed questions carry the
+   "High Likelihood Exam Question" tag (q.likely) in the bank and the drill, and the bank can show them first or only.
+   Edit the topics here, not on the questions; when an exam's count per lecture is announced, add EXAM_COUNTS. ---------- */
+var EXAM_COUNTS = {};
+var LIKELY_TOPICS = [
+  { lec:"diagnosis-tx-planning", t:"Stage from CAL and bone loss, never from probing depth alone", basis:"hint", ids:["q1-02", "q1-03", "q1-05", "q1-15", "q1-S03", "q1-31"] },
+  { lec:"diagnosis-tx-planning", t:"Grading: start at B; the bone-loss/age ratio, smoking and HbA1c", basis:"midterm check-ins", ids:["q1-16", "q1-17", "q1-20", "q1-M01", "q1-A08", "q1-S08", "q1-O01"] },
+  { lec:"diagnosis-tx-planning", t:"Stage 4 complexity factors (the 2018 AAP/EFP tables)", basis:"midterm check-ins", ids:["q1-A01", "q1-A02", "q1-S06", "q1-P06", "q1-E01"] },
+  { lec:"diagnosis-tx-planning", t:"Caries control is part of Phase I; the treatment sequence", basis:"hint", ids:["q1-26", "q1-25", "q1-M03", "q1-E04", "q1-27"] },
+  { lec:"diagnosis-tx-planning", t:"Maintenance works: the Becker tooth-loss figures", basis:"hint", ids:["q1-29", "q1-28", "q1-12", "q1-E05"] },
+  { lec:"diagnosis-tx-planning", t:"Patient Box cases: stage and grade from the box", basis:"midterm check-ins", ids:["q1-P01", "q1-P02", "q1-P03", "q1-P04"] },
+  { lec:"incisions-flaps-sutures", t:"Vertical incisions at the line angle, never through the papilla", basis:"hint", ids:["q2-19", "q2-16", "q2-M02"] },
+  { lec:"incisions-flaps-sutures", t:"A flap's base must be wider than its free edge", basis:"hint", ids:["q2-17", "q2-15", "q2-13"] },
+  { lec:"incisions-flaps-sutures", t:"The sub-marginal incision", basis:"hint", ids:["q2-24", "q2-25"] },
+  { lec:"incisions-flaps-sutures", t:"The suture chart: resorption, braided vs monofilament, tissue reaction", basis:"midterm check-ins", ids:["q2-01", "q2-02", "q2-03", "q2-04", "q2-05", "q2-M01", "q2-S01", "q2-E03"] },
+  { lec:"incisions-flaps-sutures", t:"Suture techniques from a picture", basis:"midterm check-ins", ids:["q2-D01", "q2-D02", "q2-D04", "q2-D06", "q2-D07", "q2-D11", "q2-10", "q2-11", "q2-12"] },
+  { lec:"incisions-flaps-sutures", t:"Full vs partial thickness by procedure", basis:"lecture", ids:["q2-26", "q2-27", "q2-14", "q2-M03"] },
+  { lec:"risk-assessment", t:"McGuire & Nunn order: good, fair, poor, questionable, hopeless", basis:"hint", ids:["q3-27", "q3-28"] },
+  { lec:"risk-assessment", t:"McGuire & Nunn rates retention (maintainability); about 80% / 50% accurate", basis:"hint", ids:["q3-26", "q3-29", "q3-30", "q3-04", "q3-S03"] },
+  { lec:"risk-assessment", t:"Diagnostic vs therapeutic: only McGuire & Nunn works diagnostically", basis:"hint", ids:["q3-32", "q3-33", "q3-06", "q3-07", "q3-01"] },
+  { lec:"risk-assessment", t:"Kwok & Caton (stability, whole dentition) and Miller & McEntire (molars)", basis:"hint", ids:["q3-02", "q3-03", "q3-05", "q3-08", "q3-34", "q3-36", "q3-O01", "q3-M02"] },
+  { lec:"risk-assessment", t:"Risk-stratified maintenance intervals", basis:"lecture", ids:["q3-17", "q3-18", "q3-21", "q3-25", "q3-P01"] },
+  { lec:"phase1-therapy", t:"CAL = PD + recession, with its sign: negative recession in Salud", basis:"hint", ids:["q4-L06", "q4-L07", "q4-L08", "q4-10", "q4-11", "q4-P01"] },
+  { lec:"phase1-therapy", t:"The host does 75% of the damage, bacteria 25%", basis:"hint", ids:["q4-L23", "q4-L24"] },
+  { lec:"phase1-therapy", t:"Glickman furcation classes; Class II is the most regenerable", basis:"hint", ids:["q4-L14", "q4-L15", "q4-L16", "q4-O01"] },
+  { lec:"phase1-therapy", t:"Debridement has one indication and is never combined with SRP", basis:"hint", ids:["q4-L12", "q4-L13", "q4-18"] },
+  { lec:"phase1-therapy", t:"What SRP aims for, and re-evaluation at 4-6 weeks", basis:"hint", ids:["q4-L25", "q4-L28", "q4-27", "q4-29", "q4-L33", "q4-L27"] },
+  { lec:"phase1-therapy", t:"Prophylaxis vs maintenance vs D4346", basis:"hint", ids:["q4-L30", "q4-L31", "q4-19", "q4-L32"] },
+  { lec:"phase1-therapy", t:"Fremitus is palpated; Miller mobility classes", basis:"hint", ids:["q4-L19", "q4-L20", "q4-15", "q4-16", "q4-O02"] },
+  { lec:"phase1-therapy", t:"Instrumentation: finger rests, scaling vs root planing, what the ultrasonic can't do", basis:"hint", ids:["q4-39", "q4-L34", "q4-L29", "q4-L35"] },
+  { lec:"resective-furcation", t:"Attachment loss into the furcation drops the prognosis", basis:"hint", ids:["q5-L02", "q5-L01"] },
+  { lec:"resective-furcation", t:"Bower's furcation entrance depths from the CEJ", basis:"hint", ids:["q5-L08", "q5-L09", "q5-02", "q5-04", "q5-L10"] },
+  { lec:"resective-furcation", t:"The maxillary buccal furcation is affected most", basis:"hint", ids:["q5-L15"] },
+  { lec:"resective-furcation", t:"Primary cause is plaque-driven attachment loss; cervical enamel projections and their grades", basis:"hint", ids:["q5-L16", "q5-L17", "q5-L18", "q5-L21", "q5-L22", "q5-L19"] },
+  { lec:"resective-furcation", t:"One deep site in a stable mouth: look for a local cause", basis:"hint", ids:["q5-L24", "q5-L25"] },
+  { lec:"resective-furcation", t:"Furcation arrows, and the clinical exam before the radiograph", basis:"hint", ids:["q5-L34", "q5-L35", "q5-L37", "q5-L36"] },
+  { lec:"resective-furcation", t:"Osseous surgery: bone follows the gingiva, spare the furcation, debride the roots", basis:"hint", ids:["q5-R01", "q5-R12", "q5-R17", "q5-R18", "q5-08", "q5-09", "q5-R09"] },
+  { lec:"resective-furcation", t:"Ineffective plaque control is the first contraindication; the 1981 root planing study", basis:"hint", ids:["q5-R19", "q5-RM1", "q5-R07", "q5-R04"] },
+  { lec:"periodontal-regeneration", t:"Best candidates: deep, narrow, 3-wall defects", basis:"review guide", ids:["q6-01", "q6-02", "q6-L09", "q6-L06", "q6-L38"] },
+  { lec:"periodontal-regeneration", t:"Biologics: EMD (amelogenins), rhPDGF-BB, β-TCP", basis:"review guide", ids:["q6-03", "q6-04", "q6-05", "q6-07", "q6-L24"] },
+  { lec:"periodontal-regeneration", t:"Regeneration vs repair; only histology proves it", basis:"slides", ids:["q6-L01", "q6-L02", "q6-L03", "q6-L20", "q6-L21"] },
+  { lec:"periodontal-regeneration", t:"Risk factors for a less predictable result", basis:"review guide", ids:["q6-06", "q6-L33", "q6-L34"] },
+  { lec:"periodontal-regeneration", t:"The AAP decision tree", basis:"slides", ids:["q6-L27", "q6-L28", "q6-L30", "q6-L31", "q6-P04"] },
+  { lec:"periodontal-regeneration", t:"Graft types and the GTR membrane", basis:"slides", ids:["q6-X01", "q6-L15", "q6-L16", "q6-L17"] },
+  { lec:"implants-perio", t:"Smoking and implants: pathogens, immune changes, nicotine", basis:"review guide", ids:["q7-02", "q7-03", "q7-04", "q7-07"] },
+  { lec:"implants-perio", t:"Diabetes and implants", basis:"review guide", ids:["q7-05", "q7-09"] },
+  { lec:"implants-perio", t:"IL-1 genotype, and with smoking", basis:"review guide", ids:["q7-06", "q7-08"] },
+  { lec:"implants-perio", t:"What makes an implant successful", basis:"review guide", ids:["q7-01"] },
+  { lec:"antibiotics-host-mod", t:"Which antibiotic for what: metronidazole, clindamycin, tetracycline", basis:"review guide", ids:["q8-02", "q8-05", "q8-06", "q8-07", "q8-10"] },
+  { lec:"antibiotics-host-mod", t:"Food and absorption", basis:"review guide", ids:["q8-03", "q8-04"] },
+  { lec:"antibiotics-host-mod", t:"Local delivery: Arestin and PerioChip", basis:"review guide", ids:["q8-11", "q8-12"] },
+  { lec:"antibiotics-host-mod", t:"Host modulation: Periostat, NSAIDs, bisphosphonates", basis:"review guide", ids:["q8-13", "q8-14", "q8-15"] },
+  { lec:"antibiotics-host-mod", t:"Antibiotics as an adjunct; Augmentin; pregnancy", basis:"review guide", ids:["q8-01", "q8-08", "q8-09"] },
+  { lec:"perio-plastic-esthetics", t:"Recession and grafts: CTG vs FGG, allograft, the palatal vault", basis:"review guide", ids:["q9-01", "q9-02", "q9-03", "q9-04"] },
+  { lec:"perio-plastic-esthetics", t:"Altered passive eruption: types and treatment", basis:"review guide", ids:["q9-07", "q9-08"] },
+  { lec:"perio-plastic-esthetics", t:"Excess gingival display: the lip and the lower facial third", basis:"review guide", ids:["q9-09", "q9-10", "q9-11"] },
+  { lec:"perio-plastic-esthetics", t:"Pseudopockets and drug-induced enlargement", basis:"review guide", ids:["q9-05", "q9-06"] }
+];
+(function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
+/* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
+function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
+/* Most likely questions: each lecture's predicted topics (LIKELY_TOPICS), folded by default, at the top of Exam Hints */
+function likelyHTML(){
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The final is cumulative (S1-S9) and its count per session hasn\'t been announced. Topics come from what instructors flagged in the recordings (<i>hint</i>), what the midterm check-ins said the exam asked (<i>midterm check-ins</i>), the class exam-review guide (<i>review guide</i>) and the slides, strongest first.</span></summary>' +
+    '<div class="likely-grid">' + LECTURES.map(function(l){
+      var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }); if(!ts.length) return '';
+      var n = EXAM_COUNTS[l.id];
+      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="snum">S'+l.num+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+(n ? n+' on the exam' : ts.length+' predicted topic'+(ts.length===1?'':'s'))+'</small></h4><ol>' +
+        ts.map(function(t){ return '<li>'+escHtml(t.t)+' <span class="likely-basis">'+escHtml(t.basis)+'</span></li>'; }).join('') +
+        '</ol><button type="button" class="btn" data-likely="'+l.id+'">Practice these ('+ts.reduce(function(k,t){ return k + t.ids.length; }, 0)+')</button></div>';
+    }).join('') + '</div></details>';
+}
 
 /* ---------- LECTURE READING PROSE ---------- */
 var READINGS = {};
@@ -4439,7 +4549,7 @@ function statusHTML(l){ var s = STATUS_LABEL[l.status]; return '<span class="sta
 var SEQ_STATE = {}, MATCH_STATE = {};
 function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
-  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.img && !q.imgAfter?'<span class="chip src">Diagram</span>':'')+'</div>';
+  return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.img && !q.imgAfter?'<span class="chip src">Diagram</span>':'')+likelyChip(q)+'</div>';
 }
 /* the "Why each choice" list: right answers first, then the rest; picks = the indexes the student chose (marked) */
 function whyHTML(q, picks){
@@ -4857,7 +4967,8 @@ var COMPENDIUM_VIEWS = [
 ];
 var COMPENDIUM_VIEW = COMPENDIUM_VIEWS.some(function(v){ return v.id === STATE.ui.view; }) ? STATE.ui.view : 'lecture-notes';
 var COMPENDIUM_SELECTED_LEC = LECTURE_BY_ID[STATE.ui.lec] ? STATE.ui.lec : LECTURES[0].id;
-var QBANK_FILTER = { search:'', lec:'all', type:'all', status:'all' };
+/* the bank opens with the filters used last time (STATE.ui.qbank: sessions, type, status; the search box starts empty) */
+var QBANK_FILTER = (function(){ var f = STATE.ui.qbank || {}; return { search:'', lec:f.lec || 'all', type:f.type || 'all', status:f.status || 'all' }; })();
 
 function content(){ return document.getElementById('compendium-content'); }
 function setView(id){
@@ -5003,10 +5114,58 @@ function renderLectureNotes(){
 }
 
 /* ---------- Question bank ---------- */
+/* Which sessions (tick any; all by default), in order or random, and pinned questions. QBANK_FILTER.lec is 'all', a session
+   id or an array of ids (the picker). Pins live in the shared widget (sh_pins_perio, window.shPins): read the same key here
+   so the filter works before the widget loads. */
+window.SH_PINS = true;
+function pinnedIds(){ try { var a = JSON.parse(localStorage.getItem('sh_pins_perio') || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+function bankLecIds(){
+  var v = QBANK_FILTER.lec, all = LECTURES.map(function(l){ return l.id; });
+  if(Array.isArray(v)) return v.filter(function(id){ return LECTURE_BY_ID[id]; });
+  return LECTURE_BY_ID[v] ? [v] : all;
+}
+var PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
+var LP_CARET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+function lecPickSummary(ids){
+  if(ids.length === LECTURES.length) return 'All sessions';
+  if(!ids.length) return 'No sessions picked';
+  if(ids.length === 1){ var l = LECTURE_BY_ID[ids[0]]; return 'S' + l.num + ' · ' + shortTitle(l); }
+  return ids.length + ' of ' + LECTURES.length + ' sessions: ' + LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(function(l){ return 'S' + l.num; }).join(', ');
+}
+function lecPickHTML(ids){
+  var n = {}; QUESTIONS.forEach(function(q){ n[q.lec] = (n[q.lec] || 0) + 1; });
+  return '<div class="lp" id="lecPick"><button type="button" class="lp-btn" aria-haspopup="true" aria-expanded="false" aria-label="Sessions to practice">'+icon('notes')+'<span class="lp-sum">'+escHtml(lecPickSummary(ids))+'</span>'+LP_CARET+'</button>' +
+    '<div class="lp-pop" hidden role="group" aria-label="Sessions to practice"><div class="lp-quick"><button type="button" data-lp="all">Select all</button><button type="button" data-lp="none">Clear</button></div>' +
+    '<div class="lp-list">' + LECTURES.map(function(l){ return '<label class="lp-row tag-'+l.tag+'"><input type="checkbox" value="'+l.id+'"'+(ids.indexOf(l.id) !== -1 ? ' checked' : '')+'><span class="snum">S'+l.num+'</span><span class="lp-t">'+escHtml(l.title)+'</span><span class="lp-n">'+(n[l.id] || 0)+'</span></label>'; }).join('') + '</div>' +
+    '<div class="lp-foot"><span>Questions from the ticked sessions</span><button type="button" class="lp-done">Done</button></div></div></div>';
+}
+/* onPick(ids) runs on every tick; the list redraws live and the picker stays open */
+function wireLecPick(root, onPick){
+  var box = root.querySelector('#lecPick'); if(!box) return;
+  var btn = box.querySelector('.lp-btn'), pop = box.querySelector('.lp-pop');
+  function open(on){ pop.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  function picked(){ return Array.prototype.filter.call(box.querySelectorAll('input[type=checkbox]'), function(c){ return c.checked; }).map(function(c){ return c.value; }); }
+  function changed(){ var ids = picked(); box.querySelector('.lp-sum').textContent = lecPickSummary(ids); onPick(ids); }
+  btn.addEventListener('click', function(){ open(pop.hidden); });
+  box.querySelector('.lp-done').addEventListener('click', function(){ open(false); btn.focus(); });
+  box.addEventListener('change', changed);
+  box.querySelectorAll('[data-lp]').forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.getAttribute('data-lp');
+    box.querySelectorAll('input[type=checkbox]').forEach(function(c){ c.checked = k === 'all'; });
+    changed();
+  }); });
+  function away(e){ if(!document.body.contains(box)){ document.removeEventListener('click', away, true); document.removeEventListener('keydown', esc); return; } if(!pop.hidden && !box.contains(e.target)) open(false); }
+  function esc(e){ if(e.key === 'Escape' && !pop.hidden){ open(false); btn.focus(); } }
+  document.addEventListener('click', away, true); document.addEventListener('keydown', esc);
+}
 function filteredQuestions(){
-  var s = QBANK_FILTER.search.trim().toLowerCase();
+  var s = QBANK_FILTER.search.trim().toLowerCase(), lecOn = {}, pins = {};
+  bankLecIds().forEach(function(id){ lecOn[id] = 1; });
+  pinnedIds().forEach(function(id){ pins[id] = 1; });
   return QUESTIONS.filter(function(q){
-    if(QBANK_FILTER.lec !== 'all' && q.lec !== QBANK_FILTER.lec) return false;
+    if(!lecOn[q.lec]) return false;
+    if(QBANK_FILTER.status === 'pinned' && !pins[q.id]) return false;
+    if(QBANK_FILTER.status === 'likely' && !q.likely) return false;
     if(QBANK_FILTER.type === 'pbox'){ if(!q.pbox) return false; }
     else if(QBANK_FILTER.type === 'img'){ if(!q.img) return false; }
     else if(QBANK_FILTER.type === '2stmt' || QBANK_FILTER.type === 'except'){ if(q.fmt !== QBANK_FILTER.type) return false; }
@@ -5025,10 +5184,11 @@ function filteredQuestions(){
 function renderQuestionBank(){
   var sel = function(v, cur){ return v === cur ? ' selected' : ''; };
   var h = '<div class="qfilters"><input type="search" id="qbSearch" placeholder="Search questions and answers…" value="'+escHtml(QBANK_FILTER.search)+'">' +
-    '<select id="qbLec" aria-label="Session"><option value="all">All sessions</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+sel(l.id,QBANK_FILTER.lec)+'>S'+l.num+' · '+escHtml(shortTitle(l))+'</option>'; }).join('') + '</select>' +
+    lecPickHTML(bankLecIds()) +
     '<select id="qbType" aria-label="Question type">' + [['all','All types'],['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient box cases'],['img','Suture diagrams'],['2stmt','Two-statement'],['except','EXCEPT / NOT'],['match','Matching'],['recall','Recall'],['sequence','Sequence']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.type)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
-    '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
-    '<button type="button" class="btn sm ghost" id="qbShuffle">'+icon('shuffle')+'Shuffle</button></div>' +
+    '<select id="qbStatus" aria-label="Status">' + [['all','Any status'],['new','Not tried yet'],['missed','Missed last time'],['mastered','Mastered'],['pinned','Pinned'],['likely','High likelihood only']].map(function(o){ return '<option value="'+o[0]+'"'+sel(o[0],QBANK_FILTER.status)+'>'+o[1]+'</option>'; }).join('') + '</select>' +
+    '<div class="seg" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">'+icon('shuffle')+'Random</button><button type="button" data-qorder="likely" aria-pressed="'+(STATE.ui.qorder === 'likely')+'" title="High likelihood exam questions first, strongest topics first">'+icon('target')+'Likely first</button></div>' +
+    '<button type="button" class="btn sm qpinned" id="qbPinned" aria-pressed="'+(QBANK_FILTER.status === 'pinned')+'">'+PIN_SVG+'<span id="qbPinN">Pinned ('+pinnedIds().length+')</span></button></div>' +
     '<div class="qcount" id="qbCount" style="margin-bottom:12px"></div><div class="qlist" id="qbankList"></div>';
   content().innerHTML = h;
   renderQuestionBankListOnly();
@@ -5056,14 +5216,37 @@ function renderQuestionBank(){
   });
   var c = content();
   document.getElementById('qbSearch').addEventListener('input', function(e){ QBANK_FILTER.search = e.target.value; renderQuestionBankListOnly(); });
-  ['qbLec','qbType','qbStatus'].forEach(function(id){ document.getElementById(id).addEventListener('change', function(e){ QBANK_FILTER[{qbLec:'lec',qbType:'type',qbStatus:'status'}[id]] = e.target.value; renderQuestionBankListOnly(); }); });
-  document.getElementById('qbShuffle').addEventListener('click', function(){ QBANK_SHUFFLE = !QBANK_SHUFFLE; renderQuestionBankListOnly(); });
+  wireLecPick(c, function(ids){ QBANK_FILTER.lec = ids.length === LECTURES.length ? 'all' : ids; renderQuestionBankListOnly(); });
+  ['qbType','qbStatus'].forEach(function(id){ document.getElementById(id).addEventListener('change', function(e){ QBANK_FILTER[{qbType:'type',qbStatus:'status'}[id]] = e.target.value; if(id === 'qbStatus') document.getElementById('qbPinned').setAttribute('aria-pressed', e.target.value === 'pinned' ? 'true' : 'false'); renderQuestionBankListOnly(); }); });
+  c.querySelectorAll('[data-qorder]').forEach(function(b){ b.addEventListener('click', function(){
+    STATE.ui.qorder = b.getAttribute('data-qorder'); saveState(); QBANK_ORDER = null;
+    c.querySelectorAll('[data-qorder]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    if(window.shTrack) window.shTrack('bank:order=' + STATE.ui.qorder); renderQuestionBankListOnly();
+  }); });
+  document.getElementById('qbPinned').addEventListener('click', function(){
+    QBANK_FILTER.status = QBANK_FILTER.status === 'pinned' ? 'all' : 'pinned';
+    document.getElementById('qbStatus').value = QBANK_FILTER.status; this.setAttribute('aria-pressed', QBANK_FILTER.status === 'pinned' ? 'true' : 'false');
+    renderQuestionBankListOnly();
+  });
+  /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
+  if(!renderQuestionBank.__pinsWired){ renderQuestionBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('qbPinN'); if(!n) return; n.textContent = 'Pinned (' + e.detail.count + ')'; if(e.detail.synced && QBANK_FILTER.status === 'pinned') renderQuestionBankListOnly(); }); }
 }
-var QBANK_SHUFFLE = false, RETRY_GAP = 5;
+/* In order: by session, then bank order. Random: one shuffle (QBANK_ORDER), kept until Random is tapped again */
+var QBANK_ORDER = null, RETRY_GAP = 5;
 function renderQuestionBankListOnly(){
-  var qs = filteredQuestions(); if(QBANK_SHUFFLE) qs = shuffled(qs);
-  var cnt = document.getElementById('qbCount'); if(cnt) cnt.textContent = qs.length + ' question' + (qs.length===1?'':'s') + (QBANK_SHUFFLE ? ' · shuffled' : '');
-  var list = document.getElementById('qbankList'); if(list) list.innerHTML = qs.length ? qs.map(qCardHTML).join('') : '<p class="empty">No questions match those filters.</p>';
+  var keep = { lec:QBANK_FILTER.lec, type:QBANK_FILTER.type, status:QBANK_FILTER.status };
+  if(JSON.stringify(keep) !== JSON.stringify(STATE.ui.qbank || {})){ STATE.ui.qbank = keep; saveState(); }
+  if(!QBANK_ORDER){
+    var lecIdx = {}; LECTURES.forEach(function(l, i){ lecIdx[l.id] = i; });
+    QBANK_ORDER = {};
+    (STATE.ui.qorder === 'random' ? shuffled(QUESTIONS) : QUESTIONS.map(function(q, i){ return [q, i]; }).sort(function(a, b){ return (lecIdx[a[0].lec] - lecIdx[b[0].lec]) || (a[1] - b[1]); }).map(function(x){ return x[0]; }))
+      .forEach(function(q, i){ QBANK_ORDER[q.id] = i; });
+  }
+  var qs = filteredQuestions().sort(function(a, b){ return QBANK_ORDER[a.id] - QBANK_ORDER[b.id]; });
+  /* Likely first: predicted exam topics in topic order (each session's best-supported topics lead), the rest after in session order */
+  if(STATE.ui.qorder === 'likely'){ var lk = function(q){ return q.likely ? LIKELY_TOPICS.indexOf(q.likely) : 1e4; }; qs.sort(function(a, b){ return (lk(a) - lk(b)) || (QBANK_ORDER[a.id] - QBANK_ORDER[b.id]); }); }
+  var cnt = document.getElementById('qbCount'); if(cnt) cnt.textContent = qs.length + ' question' + (qs.length===1?'':'s') + (STATE.ui.qorder === 'random' ? ' · random order' : STATE.ui.qorder === 'likely' ? ' · high likelihood first' : '');
+  var list = document.getElementById('qbankList'); if(list) list.innerHTML = qs.length ? qs.map(qCardHTML).join('') : '<p class="empty">' + (!bankLecIds().length ? 'No sessions picked. Tick at least one in the session list.' : QBANK_FILTER.status === 'pinned' && !pinnedIds().length ? 'No pinned questions yet. Tap Pin on any question to save it here.' : 'No questions match those filters.') + '</p>';
 }
 
 /* ---------- Mock exam ---------- */
@@ -5314,6 +5497,7 @@ function renderCramSheet(){
 /* ---------- Exam hints ---------- */
 function renderExamHints(){
   var h = '<div class="card section-block"><div class="eyebrow">'+icon('quote')+'Exam hints</div><p class="muted" style="margin:0;max-width:66ch">Verbatim moments where an instructor flagged something as testable, or waved it off, pulled from the recordings and in-class sessions. Slide-only emphasis is labeled as such. No official exam-format handout has been posted yet.</p></div>';
+  h += likelyHTML();
   var byLec = {}; EXAM_HINTS.forEach(function(x){ (byLec[x.lec] = byLec[x.lec] || []).push(x); });
   LECTURES.forEach(function(l){
     var hs = byLec[l.id]; if(!hs) return;
@@ -5321,6 +5505,10 @@ function renderExamHints(){
       hs.map(function(x){ return '<div class="hint tag-'+l.tag+'"><blockquote>&ldquo;'+escHtml(x.quote)+'&rdquo;</blockquote><p class="take"><span class="kind '+x.type+'">'+(x.type==='emphasize'?'Testable':'Lower priority')+'</span>'+(x.src==='slide'?'<span class="kind slide">Slide</span>':x.src==='email'?'<span class="kind slide">Instructor email</span>':'')+escHtml(x.takeaway)+'</p></div>'; }).join('') + '</div>';
   });
   content().innerHTML = h;
+  content().querySelectorAll('[data-likely]').forEach(function(b){ b.addEventListener('click', function(){
+    QBANK_FILTER = { search:'', lec:b.getAttribute('data-likely'), type:'all', status:'likely' };
+    if(window.shTrack) window.shTrack('hints:likely-practice'); setView('question-bank'); window.scrollTo(0,0);
+  }); });
 }
 
 /* ---------- shell ---------- */

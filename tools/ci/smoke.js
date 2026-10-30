@@ -39,6 +39,12 @@ const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
 const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
+/* High Likelihood Exam Questions (Sam's standing rule, 2026-10-30; CLAUDE.md "Question Bank: lecture picker, order and pins"):
+   every lecture with questions has at least one LIKELY_TOPICS entry, so a lecture added to a hub is ranked too, and every
+   topic's ids exist in that lecture. Archived hubs from before the rule are exempt, and so are lectures whose exam is over
+   while the hub stays up for a later one (Occlusion's midterm lectures; the final isn't cumulative). */
+const LIKELY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
+const LIKELY_SKIP = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying']);
 const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement' };
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 function lint(hub, A){
@@ -83,6 +89,18 @@ function lint(hub, A){
     if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
     if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
+  if (!LIKELY_EXEMPT.has(hub)) {
+    const T = A.LIKELY_TOPICS;
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from special-patient-care)`);
+    else {
+      const byId = new Map(Q.map(q => [q.id, q]));
+      T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
+        if (!q) problems.push(`${hub}: LIKELY_TOPICS "${t.t}" lists unknown question ${id}`);
+        else if (q.lec !== t.lec) problems.push(`${hub}: LIKELY_TOPICS "${t.t}" (${t.lec}) lists ${id}, which is in ${q.lec}`); }));
+      L.forEach(l => { if (LIKELY_SKIP.has(`${hub}:${l.id}`) || !Q.some(q => q.lec === l.id)) return;
+        if (!T.some(t => t.lec === l.id && (t.ids || []).length)) problems.push(`${hub}: lecture ${l.id} has no High Likelihood topics (add its LIKELY_TOPICS entries, ranked by hints and reviews)`); });
+    }
+  }
   if (longItems.length) notes.push(`${hub}: heads-up, long ordering/select-all items score very low (LESSONS.md): ${longItems.join(', ')}`);
   if (!FORMAT_EXEMPT.has(hub)) {
     L.forEach(l => {
@@ -125,7 +143,7 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{} };\n' + h.slice(i);
+        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:undefined };\n' + h.slice(i);
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);

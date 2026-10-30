@@ -111,6 +111,14 @@ Besides two-statement and true/false items, every session that writes questions 
 Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
 "Numbered-statement questions" (copy `nums()` from `occlusion`). **Perio Project: add `nums()` before Session 6 goes to taught.**
 
+## Every lecture gets High Likelihood topics (standing rule, 2026-10-30)
+
+Every hub (hub Projects included) predicts its exam's most likely topics per lecture (`LIKELY_TOPICS`, ranked by evidence:
+recording hints, in-class reviews and focus lists, the exam-review guide, check-ins, then the slides). **Building a hub, adding a
+lecture to one, or moving a lecture from slides-only to taught includes its topics**, and new hints or reviews mean re-ranking.
+CI fails a lecture with questions but no topics. How: `CLAUDE.md` → "Question Bank: lecture picker, order and pins".
+**Perio Project: carry `LIKELY_TOPICS` into the split sources and add topics for each session as it is taught.**
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
@@ -129,6 +137,36 @@ Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` �
 Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-10-30 (pins sync across devices; the bank remembers its filters, Claude Code)** — Sam: pins should follow you, and hubs
+  should open the bank with the filter you used last. `migration_v46.sql`: `question_pins` (visitor, hub, qid, pinned, t = the
+  device's change time in ms; an unpin is kept so it beats an older pin), public `set_pins(p_visitor, p_hub, p_pins)` and
+  `get_my_pins(p_visitor, p_hub)`, and `redeem_link_code` moves a device's pins (newer change wins). `widget/v3.js`: each Pin tap
+  saves at once; `shPins.sync()` runs with the answer sync (hub load, and back after 3+ minutes), merges per question by time,
+  uploads anything newer and fires `sh:pins {synced:true}` so an open Pinned view redraws. Change times in `sh_pins_t_<hub>`.
+  Perio's bank now saves its sessions, type and status (`STATE.ui.qbank`) like Occlusion and Special Patient Care already did
+  (the search box still starts empty). About page. **Perio Project: carry `STATE.ui.qbank` into the split sources.**
+
+- **2026-10-30 (High Likelihood Exam Questions in every live hub, Claude Code)** — Sam: carry Heme & Endo's feature to all current and
+  future hubs (now a standing rule in `CLAUDE.md`). `LIKELY_TOPICS` + `EXAM_COUNTS` (empty: no hub has announced counts per lecture),
+  `likelyChip()`, `likelyHTML()` (top of Exam Hints, "Practice these" opens the bank on that lecture with status "High likelihood only"),
+  a **Likely first** button in the bank's order toggle and a **High likelihood only** status. Topics, each with its evidence: **Occlusion**
+  11 for L6 (the final's only lecture so far; Dr. Givan's hints from the recording, 52 questions); **Special Patient Care** 50 over the 8
+  units (Dr. Mitchell's hints first, then module / reading / lecture; 174 questions); **Perio** 52 over S1-S9 (recording hints, the midterm
+  check-ins, the exam-review guide and the slides; 212 questions; S7-S9 from the guide until they are lectured). No graded quiz content
+  used. Tracked as `bank:order=likely`, `hints:likely-practice`. About page. No schema change.
+  **Perio Project: carry `LIKELY_TOPICS` and its code into the split sources. Re-rank a hub's topics when hints, reviews or counts arrive.**
+
+- **2026-10-30 (Question Bank: pick your lectures, in order or random, pinned questions, Claude Code)** — Sam's request, for
+  Occlusion, Perio and Special Patient Care and every future hub (not Heme & Endo Exam 1: its exam has passed). The lecture
+  dropdown is now a tick-box list (`lecPickHTML()`/`wireLecPick()`, all ticked by default, Select all / Clear; Occlusion adds For the
+  final / Midterm lectures; `STATE.ui.qlec` takes an array; Perio keeps `QBANK_FILTER.lec` in memory as before). Shuffle became an
+  **In order / Random** toggle (`STATE.ui.qorder`; In order = by lecture then bank order, patient sets kept together). **Pins**:
+  `widget/v3.js` adds a Pin button beside Report on every card in hubs that set `window.SH_PINS = true` (`window.shPins`,
+  `sh_pins_<hub>`, `sh:pins`, tracked `pin:add`/`pin:remove`, `bank:order=`); the bank has a Pinned (n) button and a "Pinned" status.
+  Occlusion's default lecture pick is now all lectures, and everyone starts once with all ticked (`STATE.ui.qpickOn`). New standing
+  rule in `CLAUDE.md`. About page, `sw.js` -> `sh-v47`. Pins are per device (no sync yet). No schema change.
+  **Perio Project: carry the picker, order toggle and `SH_PINS` into the split sources.**
 
 - **2026-10-30 (Heme & Endo Exam 1 check-in live, Claude Code)** — Sam: open the check-in now. The exam ended at 9:30 am, so its
   `HUBS` entry sets `checkinHour:9, promptHour:9`: the card's "Check in" button and the dashboard pop-up both go out on exam day

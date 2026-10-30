@@ -146,6 +146,43 @@ main{padding-top:20px}
 .qfilters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .qfilters select,.qfilters input{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);min-width:0}
 .qfilters input{flex:1 1 200px}
+.likely-box{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);padding:10px 14px;margin:0 0 16px}
+.likely-box > summary{display:flex;gap:8px;align-items:flex-start;cursor:pointer;list-style:none}
+.likely-box > summary .ic{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent-ink)}
+.likely-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.likely-lec{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.likely-lec h4{margin:0 0 6px;font-size:.95rem}
+.likely-lec h4 .lec-num,.likely-lec h4 .snum{margin-right:6px}
+.likely-lec h4 small{display:block;font-weight:600;color:var(--ink-soft);font-size:.78rem;margin-top:2px}
+.likely-lec ol{margin:0 0 10px;padding-left:20px;font-size:.88rem}
+.likely-lec li{margin:3px 0}
+.likely-basis{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-soft);background:var(--surface-2);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.likely-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+.likely-chip .ic,.likely-chip svg{width:12px;height:12px}
+/* lecture picker (tick the lectures to practice), order toggle and the Pinned button */
+.lp{position:relative}
+.lp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer;max-width:100%}
+.lp-btn svg{width:14px;height:14px;flex:none}
+.lp-btn[aria-expanded="true"]{border-color:var(--accent)}
+.lp-sum{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28ch}
+.lp-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(420px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:10px}
+.lp-quick{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.lp-quick button,.lp-done{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:.8rem;font-weight:600;color:var(--ink);cursor:pointer}
+.lp-list{max-height:min(52vh,380px);overflow:auto}
+.lp-row{display:flex;align-items:flex-start;gap:8px;padding:7px 6px;border-radius:8px;cursor:pointer;font-size:.88rem}
+.lp-row:hover{background:var(--surface-2)}
+.lp-row input{margin:3px 0 0;accent-color:var(--accent);flex:none}
+.lp-t{flex:1;min-width:0}
+.lp-n{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-faint);flex:none;margin-top:2px}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);margin-top:6px;font-size:.8rem;color:var(--ink-faint)}
+.qorder{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;background:var(--surface)}
+.qorder button{border:0;background:none;padding:7px 11px;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.qorder button+button{border-left:1px solid var(--line-strong)}
+.qorder button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink)}
+.qpinned{display:inline-flex;align-items:center;gap:6px}
+.qpinned svg{width:14px;height:14px}
+.qpinned[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:560px){.lp,.lp-btn{width:100%}.lp-sum{max-width:none;flex:1;text-align:left}}
 .qcount{color:var(--ink-faint);font-size:.84rem;margin-bottom:10px}
 .rv-set{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;border:1px solid var(--accent);background:var(--accent-soft,var(--surface-2));border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
 .rv-set b{display:block}
@@ -3645,6 +3682,80 @@ function renderHeaderStats(){
 /* ---------- question card renderer (shared by every mode) ---------- */
 var SEQ_STATE = {}, MATCH_STATE = {};
 var RENDER_SEQ = 0;
+/* ---------- HIGH LIKELIHOOD EXAM QUESTIONS (standing rule, 2026-10-30; first in heme-endo-exam1): each lecture's
+   predicted exam topics, ranked by evidence (basis: hint = flagged in a recording, review = asked at an in-class review,
+   review guide = the class exam-review guide, midterm check-ins = what the class said the exam asked, slides / lecture /
+   module / reading = the core of that source). Built from what Dr. Mitchell flagged in the recordings, the autism module and the reading. The listed questions carry the
+   "High Likelihood Exam Question" tag (q.likely) in the bank and the drill, and the bank can show them first or only.
+   Edit the topics here, not on the questions; when an exam's count per lecture is announced, add EXAM_COUNTS. ---------- */
+var EXAM_COUNTS = {};
+var LIKELY_TOPICS = [
+  { lec:"intro", t:"The definition of intellectual disability: intellect, adaptive behavior, onset in childhood", basis:"hint", ids:["in-def", "in-tbi"] },
+  { lec:"intro", t:"Person-first language: ID is a diagnosis, not a description", basis:"hint", ids:["in-person", "in-cycle", "in-rosa"] },
+  { lec:"intro", t:"The 2018 ADA Code of Ethics: refer, don't just decline; CODA 2019", basis:"hint", ids:["in-ada", "in-coda"] },
+  { lec:"intro", t:"How ID is assessed today vs the old IQ cutoffs", basis:"lecture", ids:["in-modern", "in-iq", "in-lang"] },
+  { lec:"intro", t:"Deinstitutionalization: where people with ID live now", basis:"lecture", ids:["in-deinst", "in-most", "in-inst", "in-group", "in-willow"] },
+  { lec:"intro", t:"Access to care: the Surgeon General's 2005 report, cost, Medicaid at 21", basis:"lecture", ids:["in-sg", "in-cost", "in-medicaid", "in-or"] },
+  { lec:"behavior", t:"Start talking at a normal level, then back down to the social age; tone carries", basis:"hint", ids:["bg-start", "bg-social", "bg-tone"] },
+  { lec:"behavior", t:"Non-contingent vs contingent escape: the break comes at the goal", basis:"hint", ids:["bg-nce", "bg-ce", "bg-interval", "bg-goal"] },
+  { lec:"behavior", t:"A staff member's hold is restraint too: active stabilization needs informed consent", basis:"hint", ids:["bg-active", "bg-legal", "bg-cms", "bg-aapd"] },
+  { lec:"behavior", t:"Implied vs express consent; a blanket consent is not informed consent", basis:"hint", ids:["bg-implied", "bg-blanket", "bg-justify"] },
+  { lec:"behavior", t:"Competence: a competent patient may decline; beneficence for one who isn't", basis:"lecture", ids:["bg-competent", "bg-benef"] },
+  { lec:"behavior", t:"Behavior support: least invasive first; care limited only by the patient's benefit", basis:"lecture", ids:["bg-least", "bg-limits", "bg-mal", "bg-benefit", "bg-tolerate"] },
+  { lec:"behavior", t:"Protective stabilization done well: when, how, head holds and mouth props", basis:"lecture", ids:["bg-never", "bg-ideal", "bg-papoose", "bg-headhands", "bg-molt", "bg-fingers"] },
+  { lec:"down", t:"Midface hypoplasia, the cardinal feature: mouth breathing, water and Class III", basis:"hint", ids:["ds-midface", "ds-mouthbr", "ds-class3"] },
+  { lec:"down", t:"Congenital heart disease (about half; AV canal) and antibiotic prophylaxis", basis:"hint", ids:["ds-heart50", "ds-avcanal", "ds-tof", "ds-prophy", "ds-match"] },
+  { lec:"down", t:"Periodontal disease is the most common dental condition: early, fast, probe from age 6", basis:"hint", ids:["ds-perio", "ds-perio6", "ds-doxy", "ds-extract"] },
+  { lec:"down", t:"Liquid antibiotic doses: 250 mg/5 mL, 10 mL = 500 mg", basis:"hint", ids:["ds-liquid", "ds-liquid400"] },
+  { lec:"down", t:"Atlantoaxial instability: don't hyperextend the neck", basis:"hint", ids:["ds-aai"] },
+  { lec:"down", t:"The genetics: nondisjunction trisomy 21, translocation, mosaicism", basis:"lecture", ids:["ds-nondis", "ds-pct", "ds-trans", "ds-mosaic", "ds-match2"] },
+  { lec:"down", t:"Oral findings: caries, NUG, crossbite, missing laterals", basis:"lecture", ids:["ds-caries", "ds-nug", "ds-xbite", "ds-lat"] },
+  { lec:"cp", t:"Most people with CP have normal intelligence: speak to them as peers; dysarthria isn't cognition", basis:"hint", ids:["cp-iq", "cp-dysarth", "cp-consent", "cp-normal"] },
+  { lec:"cp", t:"Causes: mostly prenatal, TORCH infections, hypoxia at delivery is rare", basis:"hint", ids:["cp-torch", "cp-prenatal", "cp-hypoxia"] },
+  { lec:"cp", t:"Drooling comes from dysphagia, not hypersalivation", basis:"hint", ids:["cp-drool", "cp-droolrx", "cp-dysph"] },
+  { lec:"cp", t:"GERD erosion: control the GERD before restoring", basis:"hint", ids:["cp-gerd", "cp-gerdrest"] },
+  { lec:"cp", t:"G-tube calculus: clean buccal and lingual, leave the occlusal table", basis:"hint", ids:["cp-gtube", "cp-calc"] },
+  { lec:"cp", t:"Types of CP and the brain area: spastic, dyskinetic, ataxic", basis:"lecture", ids:["cp-spastic", "cp-dysk", "cp-ataxic", "cp-match", "cp-loud"] },
+  { lec:"cp", t:"Seizures and their drugs: managing a seizure, Dilantin overgrowth, Depakote bleeding", basis:"lecture", ids:["cp-seizure", "cp-dilantin", "cp-depakote", "cp-match2", "cp-status"] },
+  { lec:"syndromes", t:"Lesch-Nyhan: extracting healthy teeth to stop self-injury", basis:"hint", ids:["sy-lnext", "sy-ln", "sy-lnsex"] },
+  { lec:"syndromes", t:"The -dactyly terms: fingers and toes", basis:"hint", ids:["sy-brachy", "sy-syndac", "sy-ectro", "sy-clino"] },
+  { lec:"syndromes", t:"Pierre Robin sequence: the airway is the big issue", basis:"hint", ids:["sy-pr", "sy-prcleft", "sy-gloss", "sy-prtrach"] },
+  { lec:"syndromes", t:"Midface-deficient patients (Apert) struggle with the airway", basis:"hint", ids:["sy-apertair", "sy-apert", "sy-apertc3", "sy-apertoral"] },
+  { lec:"syndromes", t:"Look it up: quick access to good resources", basis:"hint", ids:["sy-lookup"] },
+  { lec:"syndromes", t:"Prader-Willi and fragile X: causes and hallmarks", basis:"lecture", ids:["sy-pwhall", "sy-pwcause", "sy-fxgene", "sy-fxboys", "sy-match"] },
+  { lec:"autism", t:"A meltdown is not a temper tantrum", basis:"hint", ids:["au-melt", "au-meltprep"] },
+  { lec:"autism", t:"Twins and siblings: identical 77%, fraternal 31%", basis:"hint", ids:["au-ident", "au-frat"] },
+  { lec:"autism", t:"Never treat a patient you can't treat safely: refer", basis:"hint", ids:["au-refer"] },
+  { lec:"autism", t:"Communication (the Crest course page): literal words, say it once, calm tone", basis:"hint", ids:["au-literal", "au-once", "au-tone", "au-hands", "au-no", "au-match"] },
+  { lec:"autism", t:"Stimming: allow it unless it disrupts, then redirect", basis:"module", ids:["au-stim", "au-redirect"] },
+  { lec:"autism", t:"Sensory defensiveness: firm touch, the x-ray vest", basis:"module", ids:["au-sens", "au-vest", "au-touch", "au-fight"] },
+  { lec:"autism", t:"Preparing the visit: first appointment, the operatory, a practice kit", basis:"module", ids:["au-first", "au-op", "au-ready", "au-kit", "au-drybrush"] },
+  { lec:"prevention", t:"Diet: sugar-sweetened drinks, and \"what do you drink the most?\"", basis:"hint", ids:["pv-ssb", "pv-question", "pv-drinks", "pv-10cal"] },
+  { lec:"prevention", t:"Swollen gingiva: check under the margins for calculus", basis:"hint", ids:["pv-hidden"] },
+  { lec:"prevention", t:"No take-home fluoride rinses or gels under age 8", basis:"hint", ids:["pv-age8"] },
+  { lec:"prevention", t:"Varnish, sealants and SDF: the ADA guideline", basis:"lecture", ids:["pv-varnish", "pv-occl", "pv-sdf", "pv-67", "pv-root", "pv-prox"] },
+  { lec:"prevention", t:"Products and contact time: Prevident, GelKam, MI Paste Plus", basis:"lecture", ids:["pv-contact", "pv-prev", "pv-mi", "pv-gelkam", "pv-match"] },
+  { lec:"prevention", t:"Home brushing positions and aids", basis:"lecture", ids:["pv-stand", "pv-recliner", "pv-floor", "pv-match2", "pv-handle"] },
+  { lec:"mental", t:"Antidepressants: tricyclics, xerostomia and vasoconstrictors, MAO inhibitors", basis:"reading", ids:["mi-tca", "mi-maoi", "mi-xero", "mi-dep"] },
+  { lec:"mental", t:"Bipolar disorder and lithium", basis:"reading", ids:["mi-lith", "mi-lithside", "mi-mania"] },
+  { lec:"mental", t:"Antipsychotics: tardive dyskinesia, EPS, akathisia, sedatives", basis:"reading", ids:["mi-td", "mi-eps", "mi-akath", "mi-schsed"] },
+  { lec:"mental", t:"Substance use: alcohol and bleeding, cocaine and epinephrine, Antabuse", basis:"reading", ids:["mi-alcbleed", "mi-coke", "mi-antabuse", "mi-recov"] }
+];
+(function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
+/* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
+function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
+/* Most likely questions: each lecture's predicted topics (LIKELY_TOPICS), folded by default, at the top of Exam Hints */
+function likelyHTML(){
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The exam\'s count per unit hasn\'t been announced, so each unit lists the topics Dr. Mitchell flagged in the recordings first (<i>hint</i>), then what the module, the reading or the lecture built around (<i>module</i>, <i>reading</i>, <i>lecture</i>).</span></summary>' +
+    '<div class="likely-grid">' + LECTURES.map(function(l){
+      var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }); if(!ts.length) return '';
+      var n = EXAM_COUNTS[l.id];
+      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+(n ? n+' on the exam' : ts.length+' predicted topic'+(ts.length===1?'':'s'))+'</small></h4><ol>' +
+        ts.map(function(t){ return '<li>'+escHtml(t.t)+' <span class="likely-basis">'+escHtml(t.basis)+'</span></li>'; }).join('') +
+        '</ol><button type="button" class="btn" data-likely="'+l.id+'">Practice these ('+ts.reduce(function(k,t){ return k + t.ids.length; }, 0)+')</button></div>';
+    }).join('') + '</div></details>';
+}
+
 function qCardHTML(q, opts){
   opts = opts || {};
   var rid = 'r' + (++RENDER_SEQ);
@@ -3681,7 +3792,7 @@ function qCardHTML(q, opts){
   var seen = STATE.seen[q.id];
   var status = opts.retry ? '<span class="src-chip retry-chip">'+icon('cycle')+'Try it again: you missed this a few questions ago</span>' : seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
   return '<div class="qcard tag-'+tagOf(q.lec)+(opts.retry?' is-retry':'')+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
-    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
+    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+likelyChip(q)+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
@@ -4100,10 +4211,59 @@ function placeLectureFigs(prose, lecId, level, rest){
   ANIMA.mount(prose.parentNode);
 }
 
+/* ---------- Question Bank: which lectures (tick any; all by default), in order or random, pinned ----------
+   STATE.ui.qlec is 'all', a lecture id, an array of ids (the picker). Pins live in the shared
+   widget (sh_pins_<hub>, window.shPins): read the same key here so the filter works before the widget loads. */
+window.SH_PINS = true;
+function pinnedIds(){ try { var a = JSON.parse(localStorage.getItem('sh_pins_special-patient-care') || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+function bankLecIds(){
+  var v = STATE.ui.qlec, all = LECTURES.map(function(l){ return l.id; });
+  if(Array.isArray(v)) return v.filter(function(id){ return LECTURE_BY_ID[id]; });
+  return LECTURE_BY_ID[v] ? [v] : all;
+}
+var PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
+var LP_CARET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+function lecPickSummary(ids){
+  if(ids.length === LECTURES.length) return 'All lectures';
+  if(!ids.length) return 'No lectures picked';
+  if(ids.length === 1){ var l = LECTURE_BY_ID[ids[0]]; return lecLabel(l) + ' ' + l.title; }
+  return ids.length + ' of ' + LECTURES.length + ' lectures: ' + LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(lecLabel).join(', ');
+}
+function lecPickHTML(ids){
+  var n = {}; QUESTIONS.forEach(function(q){ n[q.lec] = (n[q.lec] || 0) + 1; });
+  return '<div class="lp" id="lecPick"><button type="button" class="lp-btn" aria-haspopup="true" aria-expanded="false" aria-label="Lectures to practice">'+icon('notes')+'<span class="lp-sum">'+escHtml(lecPickSummary(ids))+'</span>'+LP_CARET+'</button>' +
+    '<div class="lp-pop" hidden role="group" aria-label="Lectures to practice"><div class="lp-quick"><button type="button" data-lp="all">Select all</button><button type="button" data-lp="none">Clear</button></div>' +
+    '<div class="lp-list">' + LECTURES.map(function(l){ return '<label class="lp-row tag-'+l.tag+'"><input type="checkbox" value="'+l.id+'"'+(ids.indexOf(l.id) !== -1 ? ' checked' : '')+'><span class="lec-num">'+lecLabel(l)+'</span><span class="lp-t">'+escHtml(l.title)+'</span><span class="lp-n">'+(n[l.id] || 0)+'</span></label>'; }).join('') + '</div>' +
+    '<div class="lp-foot"><span>Questions from the ticked lectures</span><button type="button" class="lp-done">Done</button></div></div></div>';
+}
+/* onPick(ids) runs on every tick; the list redraws live and the picker stays open */
+function wireLecPick(root, onPick){
+  var box = root.querySelector('#lecPick'); if(!box) return;
+  var btn = box.querySelector('.lp-btn'), pop = box.querySelector('.lp-pop');
+  function open(on){ pop.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+  function picked(){ return Array.prototype.filter.call(box.querySelectorAll('input[type=checkbox]'), function(c){ return c.checked; }).map(function(c){ return c.value; }); }
+  function changed(){ var ids = picked(); box.querySelector('.lp-sum').textContent = lecPickSummary(ids); onPick(ids); }
+  btn.addEventListener('click', function(){ open(pop.hidden); });
+  box.querySelector('.lp-done').addEventListener('click', function(){ open(false); btn.focus(); });
+  box.addEventListener('change', changed);
+  box.querySelectorAll('[data-lp]').forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.getAttribute('data-lp');
+    box.querySelectorAll('input[type=checkbox]').forEach(function(c){ c.checked = k === 'all'; });
+    changed();
+  }); });
+  function away(e){ if(!document.body.contains(box)){ document.removeEventListener('click', away, true); document.removeEventListener('keydown', esc); return; } if(!pop.hidden && !box.contains(e.target)) open(false); }
+  function esc(e){ if(e.key === 'Escape' && !pop.hidden){ open(false); btn.focus(); } }
+  document.addEventListener('click', away, true); document.addEventListener('keydown', esc);
+}
+
 function bankFiltered(search){
-  var s = (search||'').toLowerCase().trim();
+  var s = (search||'').toLowerCase().trim(), lecOn = {}, pins = {};
+  bankLecIds().forEach(function(id){ lecOn[id] = 1; });
+  pinnedIds().forEach(function(id){ pins[id] = 1; });
   return QUESTIONS.filter(function(q){
-    if(STATE.ui.qlec !== 'all' && q.lec !== STATE.ui.qlec) return false;
+    if(!lecOn[q.lec]) return false;
+    if(STATE.ui.qstatus === 'pinned' && !pins[q.id]) return false;
+    if(STATE.ui.qstatus === 'likely' && !q.likely) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
     var fm = STATE.ui.qfmt || 'all';
     if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
@@ -4116,11 +4276,10 @@ function bankFiltered(search){
 }
 var bankSearch = '';
 function renderBank(body){
-  var lecOpts = '<option value="all">All lectures</option>' + LECTURES.map(function(l){ return '<option value="'+l.id+'"'+(STATE.ui.qlec===l.id?' selected':'')+'>'+lecLabel(l)+' '+escHtml(l.title)+'</option>'; }).join('');
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters"><select id="fLec" aria-label="Lecture">'+lecOpts+'</select><select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><button type="button" class="btn" id="fShuffle">Shuffle</button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time'],['pinned','Pinned'],['likely','High likelihood only']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters">'+lecPickHTML(bankLecIds())+'<select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">Random</button><button type="button" data-qorder="likely" aria-pressed="'+(STATE.ui.qorder === 'likely')+'" title="High likelihood exam questions first, strongest topics first">Likely first</button></div><button type="button" class="btn qpinned" id="fPinned" aria-pressed="'+(STATE.ui.qstatus === 'pinned')+'">'+PIN_SVG+'<span id="fPinN">Pinned ('+pinnedIds().length+')</span></button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -4136,7 +4295,12 @@ function renderBank(body){
     list.insertBefore(box.firstChild, cards[i] || null);
     if(window.shTrack) window.shTrack('bank:retry-shown');
   };
-  var order = null;
+  /* In order: by lecture, then bank order. Random: one shuffle, kept through filter changes and "Show more" */
+  var lecIdx = {}; LECTURES.forEach(function(l, i){ lecIdx[l.id] = i; });
+  function baseOrder(){ return STATE.ui.qorder === 'random' ? shuffled(QUESTIONS.map(function(q){ return q.id; })) : QUESTIONS.map(function(q, i){ return [q, i]; }).sort(function(a, b){ return (lecIdx[a[0].lec] - lecIdx[b[0].lec]) || (a[1] - b[1]); }).map(function(x){ return x[0].id; }); }
+  /* a reshuffle happens only when Random is tapped, not when the bank redraws */
+  var order = (STATE.ui.qorder === 'random' && renderBank.__shuf) || baseOrder();
+  if(STATE.ui.qorder === 'random') renderBank.__shuf = order;
   function draw(){
     var qs = bankFiltered(bankSearch);
     if(order){
@@ -4145,22 +4309,38 @@ function renderBank(body){
       var rank = function(q){ if(!q.pcase) return idx[q.id]||0; var set = caseSet(q.pcase); return Math.min.apply(null, set.map(function(id){ return idx[id]||0; })) + set.indexOf(q.id) / 100; };
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
+    /* Likely first: predicted exam topics in topic order (each lecture's best-supported topics lead), the rest after */
+    if(STATE.ui.qorder === 'likely'){
+      var pos = {}; qs.forEach(function(q,i){ pos[q.id] = i; });
+      var lk = function(q){ return q.likely ? LIKELY_TOPICS.indexOf(q.likely) : 1e4; };
+      qs.sort(function(a,b){ return (lk(a)-lk(b)) || (pos[a.id]-pos[b.id]); });
+    }
     document.getElementById('qCount').textContent = qs.length + ' question' + (qs.length===1?'':'s') + (qs.length > bankShown ? ' · showing ' + bankShown : '');
-    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">No questions match these filters.</div>';
+    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">' + (!bankLecIds().length ? 'No lectures picked. Tick at least one in the lecture list.' : STATE.ui.qstatus === 'pinned' && !pinnedIds().length ? 'No pinned questions yet. Tap Pin on any question to save it here.' : 'No questions match these filters.') + '</div>';
     document.getElementById('qMore').hidden = qs.length <= bankShown;
   }
-  document.getElementById('fLec').onchange = function(e){ STATE.ui.qlec = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  wireLecPick(body, function(ids){ STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; bankShown = BANK_PAGE; saveState(); draw(); });
   document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   document.getElementById('fFmt').onchange = function(e){ STATE.ui.qfmt = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
-  document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
+  document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
   var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; bankShown = BANK_PAGE; draw(); }, 180); };
-  document.getElementById('fShuffle').onclick = function(){ order = shuffled(QUESTIONS.map(function(q){ return q.id; })); draw(); };
+  body.querySelectorAll('[data-qorder]').forEach(function(b){ b.onclick = function(){
+    STATE.ui.qorder = b.getAttribute('data-qorder'); saveState(); order = baseOrder(); renderBank.__shuf = STATE.ui.qorder === 'random' ? order : null; bankShown = BANK_PAGE;
+    body.querySelectorAll('[data-qorder]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    if(window.shTrack) window.shTrack('bank:order=' + STATE.ui.qorder); draw();
+  }; });
+  document.getElementById('fPinned').onclick = function(){ STATE.ui.qstatus = STATE.ui.qstatus === 'pinned' ? 'all' : 'pinned'; bankShown = BANK_PAGE; saveState(); renderBank(body); };
+  /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
+  /* pins that arrive from another device (detail.synced) redraw the Pinned view */
+  renderBank.__draw = draw;
+  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('fPinN'); if(!n) return; n.textContent = 'Pinned (' + e.detail.count + ')'; if(e.detail.synced && STATE.ui.qstatus === 'pinned') renderBank.__draw(); }); }
   document.getElementById('qMore').onclick = function(){ bankShown += BANK_PAGE; draw(); };
   draw();
 }
 
 function renderHints(body){
   var h = '<div class="exam-banner">'+icon('clock')+'<span><b>The exam: on Canvas, Friday, November 6 to Friday, November 13 (11:59 pm).</b> All eight units. Hints are Dr. Mitchell\'s own words from the recorded lectures, plus the autism module\'s and the reading\'s notes.</span></div>' +
+    likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where Dr. Mitchell (or the module) flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   LECTURES.forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
@@ -4169,6 +4349,10 @@ function renderHints(body){
   });
   body.innerHTML = h;
   body.querySelectorAll('[data-lec]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); STATE.ui.lec = a.getAttribute('data-lec'); STATE.ui.sub = 'notes'; saveState(); renderCompendium(); }); });
+  body.querySelectorAll('[data-likely]').forEach(function(b){ b.addEventListener('click', function(){
+    STATE.ui.sub = 'bank'; STATE.ui.qlec = b.getAttribute('data-likely'); STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'likely'; bankShown = BANK_PAGE;
+    if(window.shTrack) window.shTrack('hints:likely-practice'); saveState(); renderCompendium(); window.scrollTo(0,0);
+  }); });
 }
 
 function renderCram(body){

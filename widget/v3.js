@@ -801,6 +801,68 @@
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
     b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid); });
+    if (window.SH_PINS) addPinButton(card, top, qid);
+    top.appendChild(b);
+  }
+  /* ---------- pinned questions: a Pin button beside Report, in hubs that define window.SH_PINS (their Question Bank
+     filters by it). Kept in sh_pins_<hub> (an array of qids, newest first, which the hubs read) and synced across devices
+     (migration_v46: set_pins / get_my_pins, moved by Link my devices). sh_pins_t_<hub> holds each question's latest
+     change {qid: [1|0, epoch ms]}, so an unpin on one device beats an older pin on another. Every card of the same
+     question updates together, and "sh:pins" {qid, pinned, count, synced} tells the hub. ---------- */
+  var PIN_KEY = "sh_pins_" + HUB, PIN_T_KEY = "sh_pins_t_" + HUB;
+  var PIN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
+  function readPins(){ try { var a = JSON.parse(localStorage.getItem(PIN_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function readPinTimes(){ try { var o = JSON.parse(localStorage.getItem(PIN_T_KEY) || "{}"); return o && typeof o === "object" && !Array.isArray(o) ? o : {}; } catch (e) { return {}; } }
+  function writePins(a, times){ try { localStorage.setItem(PIN_KEY, JSON.stringify(a)); localStorage.setItem(PIN_T_KEY, JSON.stringify(times)); } catch (e) {} }
+  function paintPin(b, on){ b.classList.toggle("is-on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); b.innerHTML = PIN_ICON + (on ? "Pinned" : "Pin"); b.title = on ? "Unpin this question" : "Pin this question to your Pinned list"; }
+  function repaintPins(){ var a = readPins(); document.querySelectorAll(".sh-qpin").forEach(function(b){ paintPin(b, a.indexOf(b.__qid) !== -1); }); }
+  function sendPins(rows){
+    if (!supabase || AUTOMATED || !rows.length) return;
+    try { supabase.rpc("set_pins", { p_visitor: VISITOR_ID, p_hub: HUB, p_pins: rows.slice(0, 500) }).then(function(){}, function(){}); } catch (e) {}
+  }
+  window.shPins = {
+    list: readPins,
+    has: function(qid){ return readPins().indexOf(qid) !== -1; },
+    count: function(){ return readPins().length; },
+    toggle: function(qid){
+      var a = readPins(), times = readPinTimes(), i = a.indexOf(qid), on = i === -1, t = Date.now();
+      if (on) a.unshift(qid); else a.splice(i, 1);
+      times[qid] = [on ? 1 : 0, t];
+      writePins(a, times); repaintPins(); sendPins([[qid, on ? 1 : 0, t]]);
+      shTrackSafe(on ? "pin:add" : "pin:remove");
+      try { document.dispatchEvent(new CustomEvent("sh:pins", { detail: { qid: qid, pinned: on, count: a.length } })); } catch (e) {}
+      return on;
+    },
+    /* merge with the server's copy: per question the newer change wins; pins made before sync existed count as new */
+    sync: function(){
+      if (!window.SH_PINS || !supabase || AUTOMATED) return;
+      try {
+        supabase.rpc("get_my_pins", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
+          if (!res || res.error || !Array.isArray(res.data)) return;
+          var a = readPins(), times = readPinTimes(), srv = {}, up = [], now = Date.now(), before = a.join("|");
+          a.forEach(function(q){ if (!times[q] || !times[q][0]) times[q] = [1, now]; });
+          res.data.forEach(function(r){ if (Array.isArray(r) && r[0]) srv[r[0]] = [r[1] ? 1 : 0, +r[2] || 0]; });
+          Object.keys(times).forEach(function(q){ var m = times[q], x = srv[q]; if (!x || m[1] > x[1]) up.push([q, m[0], m[1]]); });
+          Object.keys(srv).forEach(function(q){ var x = srv[q], m = times[q]; if (!m || x[1] > m[1]) times[q] = x; });
+          var on = Object.keys(times).filter(function(q){ return times[q][0]; });
+          /* keep this device's order, newer pins from elsewhere in front */
+          var kept = a.filter(function(q){ return times[q] && times[q][0]; });
+          var added = on.filter(function(q){ return kept.indexOf(q) === -1; }).sort(function(x, y){ return times[y][1] - times[x][1]; });
+          a = added.concat(kept);
+          writePins(a, times); sendPins(up);
+          if (a.join("|") !== before) {
+            repaintPins();
+            try { document.dispatchEvent(new CustomEvent("sh:pins", { detail: { qid: null, pinned: null, count: a.length, synced: true } })); } catch (e) {}
+          }
+        }, function(){});
+      } catch (e) {}
+    }
+  };
+  function addPinButton(card, top, qid){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "sh-qpin"; b.__qid = qid;
+    paintPin(b, window.shPins.has(qid));
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); window.shPins.toggle(qid); });
     top.appendChild(b);
   }
   window.shWireClassStats = function(cardSelector){
@@ -1382,6 +1444,7 @@
   }
   function syncProgress(){
     if (!supabase || syncBusy || EXPORT_ONLY) return;
+    window.shPins.sync();
     syncBusy = true; syncAnsweredNow = {}; lastSync = Date.now();
     try {
       supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){

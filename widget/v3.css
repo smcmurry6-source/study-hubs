@@ -136,6 +136,13 @@
 .sh-qflag{appearance:none; background:none; border:0; padding:4px 6px; margin-left:auto; color:var(--ink-faint, #888); font:600 11.5px/1 var(--font-body, sans-serif); display:inline-flex; align-items:center; gap:4px; cursor:pointer; border-radius:6px;}
 .sh-qflag:hover{color:var(--ink, #222); background:var(--surface-2, #eee);}
 .sh-qflag svg{width:13px; height:13px;}
+/* Pin sits just before Report (hubs that define window.SH_PINS) */
+.sh-qpin{appearance:none; background:none; border:0; padding:4px 6px; margin-left:auto; color:var(--ink-faint, #888); font:600 11.5px/1 var(--font-body, sans-serif); display:inline-flex; align-items:center; gap:4px; cursor:pointer; border-radius:6px;}
+.sh-qpin:hover{color:var(--ink, #222); background:var(--surface-2, #eee);}
+.sh-qpin svg{width:13px; height:13px;}
+.sh-qpin.is-on{color:var(--accent-ink, #1f3b8c); background:var(--accent-soft, #dfe5f7);}
+.sh-qpin.is-on svg{fill:currentColor;}
+.sh-qpin + .sh-qflag{margin-left:0;}
 
 /* ---------- persistent screen-name badge (fallback when a hub has no ribbon slot) ---------- */
 #shname-badge{display:inline-flex; align-items:center; gap:6px; background:var(--shw-bg); color:var(--shw-ink); border:1px solid var(--shw-line); border-radius:999px; padding:7px 13px; font-family:var(--shw-font); font-size:12.5px; font-weight:600; cursor:pointer; box-shadow:var(--shw-shadow); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
