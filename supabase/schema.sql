@@ -1506,8 +1506,8 @@ begin
   return query
   with d as (select * from exam_debriefs e order by e.created_at desc limit 2000),
   who as (select distinct d.hub, d.visitor_id from d),
-  t as (select w.hub, w.visitor_id, count(p.id) * 25 / 60 as minutes
-        from who w left join activity_pings p on p.visitor_id = w.visitor_id and p.hub = w.hub
+  t as (select w.hub, w.visitor_id, coalesce(sum(h.n), 0) * 25 / 60 as minutes
+        from who w left join activity_hourly h on h.visitor_id = w.visitor_id and h.hub = w.hub
         group by w.hub, w.visitor_id),
   a as (select w.hub, w.visitor_id, count(pa.id) as answered,
                round(avg(case when pa.id is null then null when pa.correct then 100 else 0 end), 0) as accuracy
