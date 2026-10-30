@@ -153,6 +153,15 @@ sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Re
 `sh_pins_<hub>`, `sh:pins` event), and the bank filters by it (a **Pinned (n)** button and "Pinned" in the status menu). `STATE.ui.qlec`
 may be `'all'`, one id or an array of ids. Copy it all from `special-patient-care` (or `occlusion`, which adds final/midterm presets).
 
+**High Likelihood Exam Questions** (Sam's rule, 2026-10-30, every live and future hub; first in `heme-endo-exam1`): `LIKELY_TOPICS`
+(`{lec, t, basis, ids}`) lists each lecture's predicted exam topics, strongest evidence first: what a professor flagged in a recording
+(`hint`), an in-class review or focus list, the class exam-review guide, what check-ins said the exam asked, then the core of the
+slides / lecture / module / reading. When the exam's count per lecture is announced, put it in `EXAM_COUNTS` and give each lecture that
+many topics. The listed questions get `q.likely`: `likelyChip()` tags them in the bank and the drill (not the mock); the bank has a
+**Likely first** order and a **High likelihood only** status; Exam Hints opens with `likelyHTML()` ("Most likely questions", a
+Practice these button per lecture). Never base a topic on a graded quiz or a previous year's exam (graded-coursework rule below).
+Building a hub or adding a lecture includes its topics; when new hints, reviews or focus lists arrive, re-rank them.
+
 ## Every hub opens on its own Home page (standing rule)
 
 Sam's rule, 2026-10-27: every hub has a **Home** mode, first in the mode switch and the default (`data-default-mode="home"`,

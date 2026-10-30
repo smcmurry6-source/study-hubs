@@ -130,6 +130,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-10-30 (High Likelihood Exam Questions in every live hub, Claude Code)** — Sam: carry Heme & Endo's feature to all current and
+  future hubs (now a standing rule in `CLAUDE.md`). `LIKELY_TOPICS` + `EXAM_COUNTS` (empty: no hub has announced counts per lecture),
+  `likelyChip()`, `likelyHTML()` (top of Exam Hints, "Practice these" opens the bank on that lecture with status "High likelihood only"),
+  a **Likely first** button in the bank's order toggle and a **High likelihood only** status. Topics, each with its evidence: **Occlusion**
+  11 for L6 (the final's only lecture so far; Dr. Givan's hints from the recording, 52 questions); **Special Patient Care** 50 over the 8
+  units (Dr. Mitchell's hints first, then module / reading / lecture; 174 questions); **Perio** 52 over S1-S9 (recording hints, the midterm
+  check-ins, the exam-review guide and the slides; 212 questions; S7-S9 from the guide until they are lectured). No graded quiz content
+  used. Tracked as `bank:order=likely`, `hints:likely-practice`. About page. No schema change.
+  **Perio Project: carry `LIKELY_TOPICS` and its code into the split sources. Re-rank a hub's topics when hints, reviews or counts arrive.**
+
 - **2026-10-30 (Question Bank: pick your lectures, in order or random, pinned questions, Claude Code)** — Sam's request, for
   Occlusion, Perio and Special Patient Care and every future hub (not Heme & Endo Exam 1: its exam has passed). The lecture
   dropdown is now a tick-box list (`lecPickHTML()`/`wireLecPick()`, all ticked by default, Select all / Clear; Occlusion adds For the

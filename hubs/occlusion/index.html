@@ -144,6 +144,19 @@ main{padding-top:20px}
 .qfilters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
 .qfilters select,.qfilters input{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);min-width:0}
 .qfilters input{flex:1 1 200px}
+.likely-box{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);padding:10px 14px;margin:0 0 16px}
+.likely-box > summary{display:flex;gap:8px;align-items:flex-start;cursor:pointer;list-style:none}
+.likely-box > summary .ic{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent-ink)}
+.likely-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin-top:12px}
+.likely-lec{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.likely-lec h4{margin:0 0 6px;font-size:.95rem}
+.likely-lec h4 .lec-num,.likely-lec h4 .snum{margin-right:6px}
+.likely-lec h4 small{display:block;font-weight:600;color:var(--ink-soft);font-size:.78rem;margin-top:2px}
+.likely-lec ol{margin:0 0 10px;padding-left:20px;font-size:.88rem}
+.likely-lec li{margin:3px 0}
+.likely-basis{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-soft);background:var(--surface-2);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.likely-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+.likely-chip .ic,.likely-chip svg{width:12px;height:12px}
 /* lecture picker (tick the lectures to practice), order toggle and the Pinned button */
 .lp{position:relative}
 .lp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer;max-width:100%}
@@ -7135,6 +7148,41 @@ function renderHeaderStats(){
 /* ---------- question card renderer (shared by every mode) ---------- */
 var SEQ_STATE = {}, MATCH_STATE = {};
 var RENDER_SEQ = 0;
+/* ---------- HIGH LIKELIHOOD EXAM QUESTIONS (standing rule, 2026-10-30; first in heme-endo-exam1): each lecture's
+   predicted exam topics, ranked by evidence (basis: hint = flagged in a recording, review = asked at an in-class review,
+   review guide = the class exam-review guide, midterm check-ins = what the class said the exam asked, slides / lecture /
+   module / reading = the core of that source). Built from what Dr. Givan flagged in the recordings and the slides. The listed questions carry the
+   "High Likelihood Exam Question" tag (q.likely) in the bank and the drill, and the bank can show them first or only.
+   Edit the topics here, not on the questions; when an exam's count per lecture is announced, add EXAM_COUNTS. ---------- */
+var EXAM_COUNTS = {};
+var LIKELY_TOPICS = [
+  { lec:"instruments", t:"Articulator size: best value when it is similar in size to the patient; a small hinge costs chair time", basis:"hint", ids:["in-tf-9", "in-zirconia", "in-110", "in-4inch", "cs-in-crown-lab"] },
+  { lec:"instruments", t:"Non-adjustable articulators: accurate only in MICP, an advantage to the lab, not to you", basis:"hint", ids:["in-nonadj-acc", "in-nonadj-who", "in-nonadj-record", "in-2s-1"] },
+  { lec:"instruments", t:"Choosing the articulator: anterior teeth need at least a semi-adjustable; the job dictates the tool", basis:"hint", ids:["in-ag-nonadj", "in-sel-strong", "in-sel-poor", "in-job", "in-tf-10", "in-num-5", "cs-in-crown-art"] },
+  { lec:"instruments", t:"The facebow mounts the maxillary cast only, on a three-point reference plane", basis:"hint", ids:["in-fb-cast", "in-2s-2", "in-num-1", "in-fb-points", "in-frankfort"] },
+  { lec:"instruments", t:"An arbitrary facebow is close enough (2-5 mm); skipping it risks a cant and mounting errors", basis:"hint", ids:["in-arb-mm", "in-nofb", "cs-in-rehab-fb", "in-mt-post", "in-tf-7"] },
+  { lec:"instruments", t:"The MIP record: most common, most misused; hand articulate whenever you can", basis:"hint", ids:["in-mip-misused", "in-lab-errors", "in-hand-artic", "in-tf-3", "cs-in-high", "cs-in-high-fix"] },
+  { lec:"instruments", t:"VPS MIP records go over the prep only, trimmed off cusp tips and soft tissue", basis:"hint", ids:["in-vps-where", "in-vps-fit", "in-2s-7"] },
+  { lec:"instruments", t:"Protrusive records are preferred for the SCI: a lateral record reads steeper", basis:"hint", ids:["in-why-prot", "in-prot-rec", "in-lat-sets", "in-2s-3", "in-tf-5", "cs-in-rehab-sci", "in-num-2"] },
+  { lec:"instruments", t:"Eccentric records at 3-5 mm: farther out, the Bennett angle reads smaller", basis:"hint", ids:["in-3to5", "in-tf-4"] },
+  { lec:"instruments", t:"The Bennett angle is the setting he would leave off first; the SCI matters more", basis:"hint", ids:["in-bennett-off", "in-bennett", "in-sci-controls"] },
+  { lec:"instruments", t:"CR vs MIP mountings: a CR mounting finds MIP, an MIP mounting can't find CR", basis:"slides", ids:["in-cr-mount", "in-mip-limit", "in-tf-2", "in-num-3", "in-cr-contact"] }
+];
+(function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
+/* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
+function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
+/* Most likely questions: each lecture's predicted topics (LIKELY_TOPICS), folded by default, at the top of Exam Hints */
+function likelyHTML(){
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The final\'s count per lecture hasn\'t been announced, so these are the topics Dr. Givan flagged in the L6 recording (plus the slides\' core idea), ranked by how hard he leaned on them.</span></summary>' +
+    '<div class="likely-grid">' + LECTURES.map(function(l){
+      var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }); if(!ts.length) return '';
+      var n = EXAM_COUNTS[l.id];
+      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+(n ? n+' on the exam' : ts.length+' predicted topic'+(ts.length===1?'':'s'))+'</small></h4><ol>' +
+        ts.map(function(t){ return '<li>'+escHtml(t.t)+' <span class="likely-basis">'+escHtml(t.basis)+'</span></li>'; }).join('') +
+        '</ol><button type="button" class="btn" data-likely="'+l.id+'">Practice these ('+ts.reduce(function(k,t){ return k + t.ids.length; }, 0)+')</button></div>';
+    }).join('') + '</div></details>';
+}
+
 function qCardHTML(q, opts){
   opts = opts || {};
   var rid = 'r' + (++RENDER_SEQ);
@@ -7171,7 +7219,7 @@ function qCardHTML(q, opts){
   var seen = STATE.seen[q.id];
   var status = opts.retry ? '<span class="src-chip retry-chip">'+icon('cycle')+'Try it again: you missed this a few questions ago</span>' : seen ? (seen.last ? '<span class="src-chip" style="color:var(--good)">last: right</span>' : '<span class="src-chip" style="color:var(--bad)">last: missed</span>') : '';
   return '<div class="qcard tag-'+tagOf(q.lec)+(opts.retry?' is-retry':'')+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
-    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+status+'</div>' +
+    '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+likelyChip(q)+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
     '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
@@ -7656,6 +7704,7 @@ function bankFiltered(search){
   return QUESTIONS.filter(function(q){
     if(!lecOn[q.lec]) return false;
     if(STATE.ui.qstatus === 'pinned' && !pins[q.id]) return false;
+    if(STATE.ui.qstatus === 'likely' && !q.likely) return false;
     if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
     var fm = STATE.ui.qfmt || 'all';
     if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
@@ -7670,8 +7719,8 @@ var bankSearch = '';
 function renderBank(body){
   var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
   var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time'],['pinned','Pinned']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters">'+lecPickHTML(bankLecIds())+'<select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">Random</button></div><button type="button" class="btn qpinned" id="fPinned" aria-pressed="'+(STATE.ui.qstatus === 'pinned')+'">'+PIN_SVG+'<span id="fPinN">Pinned ('+pinnedIds().length+')</span></button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time'],['pinned','Pinned'],['likely','High likelihood only']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters">'+lecPickHTML(bankLecIds())+'<select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">Random</button><button type="button" data-qorder="likely" aria-pressed="'+(STATE.ui.qorder === 'likely')+'" title="High likelihood exam questions first, strongest topics first">Likely first</button></div><button type="button" class="btn qpinned" id="fPinned" aria-pressed="'+(STATE.ui.qstatus === 'pinned')+'">'+PIN_SVG+'<span id="fPinN">Pinned ('+pinnedIds().length+')</span></button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -7701,6 +7750,12 @@ function renderBank(body){
       var rank = function(q){ if(!q.pcase) return idx[q.id]||0; var set = caseSet(q.pcase); return Math.min.apply(null, set.map(function(id){ return idx[id]||0; })) + set.indexOf(q.id) / 100; };
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
+    /* Likely first: predicted exam topics in topic order (each lecture's best-supported topics lead), the rest after */
+    if(STATE.ui.qorder === 'likely'){
+      var pos = {}; qs.forEach(function(q,i){ pos[q.id] = i; });
+      var lk = function(q){ return q.likely ? LIKELY_TOPICS.indexOf(q.likely) : 1e4; };
+      qs.sort(function(a,b){ return (lk(a)-lk(b)) || (pos[a.id]-pos[b.id]); });
+    }
     document.getElementById('qCount').textContent = qs.length + ' question' + (qs.length===1?'':'s') + (qs.length > bankShown ? ' · showing ' + bankShown : '');
     list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">' + (!bankLecIds().length ? 'No lectures picked. Tick at least one in the lecture list.' : STATE.ui.qstatus === 'pinned' && !pinnedIds().length ? 'No pinned questions yet. Tap Pin on any question to save it here.' : 'No questions match these filters.') + '</div>';
     document.getElementById('qMore').hidden = qs.length <= bankShown;
@@ -7724,6 +7779,7 @@ function renderBank(body){
 
 function renderHints(body){
   var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Thursday, November 19.</b> Not comprehensive: Dr. Givan\'s lectures from 10/22 on (L6 so far), building on the midterm material. The time and format haven\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
+    likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   lecOrder().forEach(function(l){
     var items = HINTS.filter(function(x){ return x.lec === l.id; }); if(!items.length) return;
@@ -7732,6 +7788,10 @@ function renderHints(body){
   });
   body.innerHTML = h;
   body.querySelectorAll('[data-lec]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); STATE.ui.lec = a.getAttribute('data-lec'); STATE.ui.sub = 'notes'; saveState(); renderCompendium(); }); });
+  body.querySelectorAll('[data-likely]').forEach(function(b){ b.addEventListener('click', function(){
+    STATE.ui.sub = 'bank'; STATE.ui.qlec = b.getAttribute('data-likely'); STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'likely'; bankShown = BANK_PAGE;
+    if(window.shTrack) window.shTrack('hints:likely-practice'); saveState(); renderCompendium(); window.scrollTo(0,0);
+  }); });
 }
 
 function renderCram(body){
