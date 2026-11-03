@@ -6381,6 +6381,7 @@ window.SH_PODCAST = {
 };
 
 window.SH_EXPORT = {
+  archiveOn: { date:'2026-11-03', hour:22 },
   lectures: LECTURES.map(function(l){ return { id:l.id, title:''+lecLabel(l)+' ' + l.title, who:l.who, status:l.status }; }),
   questions: QUESTIONS.map(function(q){
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'multi' ? q.correct.map(function(k){ return q.choices[k]; }).join('; ') : q.type === 'sequence' ? q.steps.join(' → ') : q.pairs.map(function(p){ return p.join(': '); }).join('; ');
