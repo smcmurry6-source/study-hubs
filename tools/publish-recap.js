@@ -26,8 +26,10 @@ function norm(q) {
 function lastExam(h) {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), i = html.indexOf('id:"' + h + '"');
   if (i < 0) return null;
-  const next = html.indexOf('{ id:"', i + 5), entry = html.slice(i, next > -1 ? next : i + 4000);
-  const dates = (entry.match(/date:"(\d{4}-\d{2}-\d{2})"/g) || []).map(d => d.slice(6, 16)).sort();
+  // the next hub entry: a line indented 4 spaces then { id:"..." (extraQs entries inside exams also carry id:)
+  const m = /\n {4}\{ id:"/.exec(html.slice(i + 5)), entry = html.slice(i, m ? i + 5 + m.index : i + 4000);
+  // exam dates only: archiveOn:{ date } (a reopened hub's new archive day) is not an exam
+  const dates = (entry.replace(/archiveOn:\s*\{[^}]*\}/g, '').match(/date:"(\d{4}-\d{2}-\d{2})"/g) || []).map(d => d.slice(6, 16)).sort();
   return dates.length ? dates[dates.length - 1] : null;
 }
 async function rpc(name, body) {

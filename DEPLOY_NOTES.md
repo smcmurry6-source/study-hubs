@@ -146,6 +146,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-03 midday (lessons audit + Heme & Endo Exam 1 retrospective, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and key
+  positions: report #34 (`cb-pe`: each wrong choice named only one of the two variables, so the key was the only complete answer) now has
+  all four atomic-number / photon-energy combinations, each with its why; `cb-atten-z` had the same giveaway and gets the same treatment.
+  No notes text changed, so no narration rebuilt; `question_choices` rows before today for both ids refer to the old choices.
+  `tools/publish-recap.js`: the exam date it reads from `index.html` skipped exams after an `extraQs` list (Occlusion's final would have
+  been recapped as of the midterm) and took a reopened hub's `archiveOn` date as an exam (Heme & Endo as of 11-03); both fixed. The Heme &
+  Endo recap published 10-30 is unchanged (Sam reopened the hub for a late exam). `LESSONS.md`: Heme & Endo Exam 1 retrospective (the best
+  check-ins yet: 8 of 10 "About right", none "Exam asked different things"), the last refresh checked (MCQ fixes worked, two-statement
+  and true/false ones didn't), new Live signals. **Reports #35/#36 (Sam: remove those and ones like them)**: removed from PCD Implants
+  the brand and admin details with no exam signal (no hint, focus list, "on my exam" or example question): `tm-conelog` (CONELOG's taper),
+  `tm-rc-grooves` (Straumann RC's grooves, plus its card in the engaging sort), `tm-code-6010` and `tm-code-6058` (CDT codes) and
+  `gs-credit` (clinic crown credits); bank 548 -> 543. Kept, because the hint list or the professor flags them: each system's surface,
+  alloy and torques, conical vs non-conical, and `pf-systems` (Dr. Chavali's own example question). **Heme & Endo** (Sam reopened it for a
+  late exam): it still archives tonight at 10 pm (`archiveOn`), but its card stays on the dashboard with the Check in button until
+  **Fri 11-06 10 pm** (new `hideCardOn:{date,hour}` and per-exam `checkinUntil:{date,hour}` in `index.html`). No schema change.
+
 - **2026-11-03 (perio S7 and S8 taught, true/false and numbered items, six diagrams, Claude Code)** — Sam: update perio with
   the new files in Drive (Periodontology/hubs, added Nov 2): `perio oct 29.txt` (the Oct 29 class capture of S7) and
   `D2 Implants in periodontally compromised patients 2026 updated.pdf` (**S7 is Dr. Kaur's**, not Dr. Carr's), plus Dr. Litz's
