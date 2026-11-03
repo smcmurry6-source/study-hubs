@@ -14,7 +14,8 @@ does it differently.
 
 - `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`
   arrays near the top of the script; add or archive a hub there, not in markup.
-- `hubs/<hub-id>/index.html` — one single-file hub each. `hubs/<hub-id>/audio/` holds
+- `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
+  Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
 - `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
@@ -123,8 +124,8 @@ true/false per lecture (Occlusion has 27 and 42 over its five lectures). CI fail
   false through a trick of wording. Write each statement so it stands alone.
 - Every choice still gets its why: `two()` builds the four lines from one reason per statement (write each reason so it
   reads after "Statement 1 is true:"), `tf()` takes one line for True and one for False. Draw them from the hub's notes.
-- The graded-coursework rules below apply as to any question. Perio: its engine has two-statement items but no true/false
-  yet, so add `tf()` (from `occlusion`) before Session 6 or any later session is marked taught.
+- The graded-coursework rules below apply as to any question. Perio has `two()`, `tf()` and `nums()` (since 2026-11-03), so
+  Session 6 and any later session marked taught needs all three formats.
 
 ## Numbered-statement questions (standing rule)
 
@@ -142,7 +143,6 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
 - Make each wrong combination differ from the key by one or two statements, so every statement has to be judged. Spread the
   key over all four positions (the sort decides the position: pick the wrong combinations to move it).
 - False statements follow the true/false rule: change one taught detail, never a trick of wording. Draw them from the hub's notes.
-- Perio: its engine has no numbered items yet; add `nums()` (from `occlusion`) before Session 6 or any later session is taught.
 
 ## Question Bank: lecture picker, order and pins (standing rule)
 
