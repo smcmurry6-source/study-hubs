@@ -5,8 +5,9 @@ description: Run the study-hubs lessons audit (a.k.a. lessons refresh) on demand
 
 # Lessons audit
 
-The procedure is `tools/lessons-refresh.md`; this skill is the fast, repeatable way to run it end to end. Read
-`CLAUDE.md`, `LESSONS.md` (all of it: the standing lessons are the yardstick) and `tools/lessons-refresh.md` first.
+The procedure is `tools/lessons-refresh.md`; this skill is the fast, repeatable way to run it end to end. The rules
+come in with `CLAUDE.md`; read `LESSONS.md` (all of it: the standing lessons are the yardstick), `tools/lessons-refresh.md`
+and the note of each live hub (`vault/hubs/`) first.
 
 Needs the **Supabase connector** (`execute_sql`, project `thytmzsgymydbzcqdnix`, read-only). If it isn't available,
 stop and say so; never guess numbers. Everything students wrote (reports, suggestions, survey text, check-ins,
@@ -119,12 +120,15 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 - `LESSONS.md`: "Last refreshed" = today (Central); rewrite **Live signals** (replace, don't append): last refresh's
   results, then per live hub the numbers that matter and what to do; fold anything durable into **Standing lessons**
   or the reports section, with the evidence. Use they/them for students and for Sam.
-- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed, with
-  "**<Hub> Project: carry these into the split sources**" for perio/MSK.
+- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed.
+- The vault ([repo-is-the-vault](../../../vault/rules/repo-is-the-vault.md)): a call Sam made goes in
+  `vault/decisions.md`; a proposal Sam approves becomes a task note in `vault/tasks/`; a hub archived and retrospected
+  moves to Archived in `vault/home.md`, and its hub note links its retrospective; a quirk the next agent needs goes in
+  the hub note.
 
 ## 6. Ship
 
-- `node tools/ci/syntax.js` and `node tools/ci/smoke.js` (with `NODE_PATH=/opt/node22/lib/node_modules
+- `node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js` (with `NODE_PATH=/opt/node22/lib/node_modules
   PLAYWRIGHT_PATH=/opt/node22/lib/node_modules/playwright`), then push and open a **draft** PR
   `Lessons refresh YYYY-MM-DD`: what changes for students; did the last refresh work; LESSONS.md highlights; report
   verdicts; "For Sam".

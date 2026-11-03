@@ -45,6 +45,7 @@ Hub building
 ## How-tos
 
 - [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md)
+- [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
 - [Read usage data and run surveys](how-to/read-usage-data.md)
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)

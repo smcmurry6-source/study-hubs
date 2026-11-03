@@ -36,18 +36,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   like an Obsidian vault that any AI agent can be pointed at to do tasks (`vault/rules/repo-is-the-vault.md`). New
   `AGENTS.md` at the root is the entry point for every agent (Claude Code loads it through `CLAUDE.md`). New `vault/`:
   `home.md` (the map), `rules/` (every standing rule as its own note: the `CLAUDE.md` sections and this file's rule
-  sections, moved word for word, plus new `repo-is-the-vault` and `american-english`), `how-to/`, `reference/`, a note per
-  hub (`hubs/`: sources, build steps, quirks, diagram calls, pending work; `boards` for the hub on its own branch),
-  `decisions.md` (Sam's calls, started from this log), `tasks/` (one note per task with a status, an inbox, `done/`; six open or waiting tasks written from this log:
+  sections, moved word for word, plus new `repo-is-the-vault` and `american-english`), `how-to/` (new: `build-a-hub`,
+  the checklist and every file a new hub or lecture touches), `reference/`, a note per hub (`hubs/`: sources, build
+  steps, quirks, diagram calls, pending work; `boards` for the hub on its own branch), `decisions.md` (Sam's calls,
+  started from this log), `tasks/` (one note per task with a status, an inbox, `done/`; six open or waiting tasks:
   Occlusion L7 diagrams and final time/format, perio S6, S8 host modulation, S9, and merging `main` into
-  `claude/boards-hub`, whose own older `AGENTS.md` will conflict with the new one) and `templates/`. `CLAUDE.md` is now short
-  and `@`-imports `AGENTS.md`, this file and every rule, how-to and reference note, so Claude Code sessions load the same
-  rules as before. This file's opening sections became the redirect table above. Notes link with relative markdown links
-  (GitHub, Obsidian and agents all follow them); `.obsidian/app.json` sets that up for opening the repo root in Obsidian.
-  **New CI check** `node tools/ci/vault.js` (in `check.yml`): every relative link in the vault, `AGENTS.md`, `CLAUDE.md` and
-  `README.md` resolves, no `[[wikilinks]]`, every vault note has frontmatter, task notes have a valid status (done ones
-  in `done/`), and every rule note is listed in `vault/home.md` and imported by `CLAUDE.md`. References to `CLAUDE.md`
-  sections in the skills, `tools/`, `LESSONS.md` and the CI messages now point at the notes. No site change.
+  `claude/boards-hub`, whose own older `AGENTS.md` will conflict with the new one) and `templates/`. `CLAUDE.md` is now
+  short and `@`-imports `AGENTS.md` and every rule, how-to and reference note, so Claude Code sessions load the same
+  rules as before. **It no longer loads this file** (over 200 KB, about 50k of the 65k tokens a session started with):
+  read its first entries and grep it before you change a hub. When a skill, Project doc or memory disagrees with the
+  vault, the vault wins. This file's opening sections became the redirect table above. Notes link with relative
+  markdown links (GitHub, Obsidian and agents all follow them); `.obsidian/app.json` sets that up for opening the repo
+  root in Obsidian. **New CI check** `node tools/ci/vault.js` (last step of `check.yml`): every relative link in the
+  vault, `AGENTS.md`, `CLAUDE.md` and `README.md` resolves, no `[[wikilinks]]`, every vault note has frontmatter, task
+  notes have a valid status (done ones in `done/`), every rule note is listed in `vault/home.md` and imported by
+  `CLAUDE.md`, and every hub folder has its note on the map. References to `CLAUDE.md` sections in the skills, `tools/`,
+  `LESSONS.md` and the CI messages now point at the notes; `/lessons-audit` drops the retired "carry into the split
+  sources" step. No site change.
   **Every agent: write back what you learn to the vault in the same PR** (task outcome, decisions, hub note, new rules).
 
 - **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list

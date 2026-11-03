@@ -102,6 +102,8 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 - **About page** (`about/index.html`, the Timmy Time entry): where the card sits and the episode list with lengths.
 - **`tools/podcast/LORE.md`**: the new tidbits and a row in "Episodes so far". **`DEPLOY_NOTES.md`**: a "Recent major
   changes" line (what, length, sources, lexicon words added, where the card is).
+- **The hub's note** (`vault/hubs/<hub-id>.md`): that it has an episode, where its script is
+  (`tools/podcast/<hub-id>/script.md`), and that a notes change means fixing the script and rebuilding the episode.
 - If the hub has narration, nothing else changes; the podcast is separate from Listen.
 
 ## 6. Verify

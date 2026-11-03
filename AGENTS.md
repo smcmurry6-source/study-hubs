@@ -17,7 +17,7 @@ Why and how: [vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md
    automatically through `CLAUDE.md`; every other agent reads them.)
 4. Your task note, if you were given one (`vault/tasks/...`), and every note it links.
 5. The note for each hub you'll touch: `vault/hubs/<hub-id>.md`.
-6. Before building a hub or adding a lecture: `LESSONS.md`.
+6. Before building a hub or adding a lecture: `LESSONS.md` and [vault/how-to/build-a-hub.md](vault/how-to/build-a-hub.md).
 
 Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-file app: grep for what you need.
 `DEPLOY_NOTES.md` is the change log: read its top entries and grep it for your hub or feature.

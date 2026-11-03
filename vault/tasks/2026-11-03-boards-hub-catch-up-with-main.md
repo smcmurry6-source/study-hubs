@@ -36,15 +36,12 @@ merge gets bigger.
 
 - **`AGENTS.md`:** keep main's. The boards version's rules are in the [boards hub note](../hubs/boards.md) and
   `vault/rules/`; diff the two once, and put anything still missing in the hub note, not in `AGENTS.md`.
-- **`CLAUDE.md`:** keep main's. The boards side changed one sentence: entries about two weeks old move from
-  `DEPLOY_NOTES.md` to `DEPLOY_HISTORY.md`. Put that in step 7 of [ship-a-change](../how-to/ship-a-change.md) and
-  add `DEPLOY_HISTORY.md` to the [repo map](../reference/repo-map.md).
-- **`DEPLOY_NOTES.md`:** start from main's (the vault redirect table on top, every entry main has). The boards side
-  moved the 32 entries from 2026-09-26 and earlier into `DEPLOY_HISTORY.md` and put a paragraph saying so after the
-  list: keep that split (every Claude Code session loads this file, so shorter is better). Cut those 32 entries from
-  main's file and put the paragraph where they were. In the 2026-11-03 trial, 31 were already word for word in
-  `DEPLOY_HISTORY.md`; main had since edited one ("perio revamp + Pocket Arcade", 2026-09-24), so copy main's wording
-  of it into `DEPLOY_HISTORY.md`. The boards side had no entries of its own.
+- **`CLAUDE.md`:** keep main's. The boards side's one change (a sentence about moving old change-log entries to
+  `DEPLOY_HISTORY.md`) is moot: main's `CLAUDE.md` no longer loads the change log at all.
+- **`DEPLOY_NOTES.md`:** keep main's, and delete `DEPLOY_HISTORY.md`. The boards side split the log in two (2026-10-11)
+  because every Claude Code session loaded it; main stopped loading it (2026-11-03), so one file to grep is simpler. In
+  the 2026-11-03 trial, all 32 entries in `DEPLOY_HISTORY.md` were also in main's file (one, "perio revamp + Pocket
+  Arcade", in newer wording on main), and the boards side had no entries of its own; check that's still true.
 - **`.gitignore`:** keep both blocks (boards: `.cache/`; main: anima examples, figure previews, `.obsidian/`).
 - **`tools/ci/smoke.js`:** one line, where each side added keys to `window.__CI`: keep every key (`CASES` and
   `READINGS_DEEP` from boards, `LIKELY_TOPICS` from main). The rest of the boards checks (`lintBoards`) merge cleanly.

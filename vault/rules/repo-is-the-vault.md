@@ -12,6 +12,10 @@ Codex, ChatGPT, Gemini, Cursor, Copilot) with a task and it can do the task from
 needs may live only in a chat, a Claude Project's own files, a Drive doc or one agent's memory: if it isn't in the vault,
 the next agent doesn't know it.
 
+**The vault wins.** Skills (Sam's claude.ai `study-hub-*` skills and the repo's own), Project docs, chats and memory
+point at notes instead of restating them. When one of them disagrees with the vault, follow the vault, and fix the other
+copy (or tell Sam to, for a claude.ai skill or a Project doc).
+
 ## Where things go
 
 | What | Where |

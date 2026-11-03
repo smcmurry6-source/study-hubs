@@ -5,6 +5,7 @@
 //  - task notes have a valid status; vault/tasks/done/ holds only done or dropped tasks, and done ones live there
 //  - every rule note is listed in vault/home.md and imported (@vault/rules/<file>) by CLAUDE.md
 //  - every @import in CLAUDE.md exists
+//  - every hub folder (hubs/<id>/index.html) has vault/hubs/<id>.md, and every hub note is listed in vault/home.md
 const fs = require('fs'), path = require('path');
 const root = path.resolve(__dirname, '../..');
 const problems = [];
@@ -72,6 +73,18 @@ if (fs.existsSync(rulesDir)) {
   for (const f of fs.readdirSync(rulesDir).filter(f => f.endsWith('.md'))) {
     if (!homeText.includes(`(rules/${f})`)) problems.push(`vault/rules/${f}: not listed in vault/home.md`);
     if (!new RegExp(`^@vault/rules/${f.replace(/\./g, '\\.')}\\s*$`, 'm').test(claudeText)) problems.push(`vault/rules/${f}: not imported by CLAUDE.md (add a line "@vault/rules/${f}")`);
+  }
+}
+// every hub folder has its note, and every hub note is on the map
+const hubsDir = path.join(root, 'hubs'), hubNotes = path.join(vaultDir, 'hubs');
+if (fs.existsSync(hubsDir)) {
+  for (const id of fs.readdirSync(hubsDir).filter(d => fs.existsSync(path.join(hubsDir, d, 'index.html')))) {
+    if (!fs.existsSync(path.join(hubNotes, id + '.md'))) problems.push(`hubs/${id}/ has no note: add vault/hubs/${id}.md (copy vault/templates/hub.md; see vault/how-to/build-a-hub.md)`);
+  }
+}
+if (fs.existsSync(hubNotes)) {
+  for (const f of fs.readdirSync(hubNotes).filter(f => f.endsWith('.md'))) {
+    if (!homeText.includes(`(hubs/${f})`)) problems.push(`vault/hubs/${f}: not listed in vault/home.md`);
   }
 }
 for (const m of prose(claudeText).matchAll(/^@(\S+)\s*$/gm)) {
