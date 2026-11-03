@@ -781,10 +781,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Nov 6 to Nov 13. Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a mock exam, review tables and the Sparks Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
-      exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:9, promptHour:9 } ], updated:"2026-10-27",
+      exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:9, promptHour:9, checkinUntil:{ date:"2026-11-06", hour:22 } } ], updated:"2026-10-27",
       desc:"Lectures 1-10: endocrine histology, the hypothalamus and pituitary, growth, thyroid, the endocrine pancreas, the adrenal gland, corticosteroid and thyroid drugs, and calcium and phosphate. Its own home page with your countdown and progress by lecture, notes in two reading levels with narration, two-statement, true/false and numbered-statement questions, exam hints from the recordings, a 55-question mock and the Feedback Loop Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"endo1-state-v1",
-      archiveOn:{ date:"2026-11-03", hour:22 },
+      archiveOn:{ date:"2026-11-03", hour:22 }, hideCardOn:{ date:"2026-11-06", hour:22 },
       podcast:{ name:"Timmy Time", sub:"The last-minute review, 53 min" } },
     { id:"msk-exam4", cls:"gi", title:"Musculoskeletal Exam 4 Hub", code:"GI & MSK · Exam 4",
       exams:[ { name:"Musculoskeletal Exam 4", label:"Exam", date:"2026-10-16", checkinClosed:true } ], updated:"2026-10-08", hideCardOn:"2026-10-21",
@@ -815,12 +815,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   ];
   /* Archiving is automatic: a hub in HUBS turns into an archived card (no Open button) at ARCHIVE_HOUR on the day
      of its last exam (that exam's archiveHour overrides it; 24 = midnight after, for an exam due at 11:59 pm; give the hub's
-     SH_EXPORT.exams entry the same archiveHour so its "archived" notice agrees), and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
+     SH_EXPORT.exams entry the same archiveHour so its "archived" notice agrees), and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day; hideCardOn:{date,hour} also sets the hour).
      A hub-level archiveOn:{date,hour} overrides that cutoff without moving exam or check-in dates; mirror it in SH_EXPORT.archiveOn.
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
-     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up). Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up); checkinUntil:{date,hour} ends it at that time. Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [
@@ -834,6 +834,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var x = lastExam(hub); return x ? examAt(x, x.archiveHour != null ? x.archiveHour : ARCHIVE_HOUR) : null;
   }
   function cardGoneAt(hub){
+    if (hub.hideCardOn && typeof hub.hideCardOn === "object"){ var h = parseYmd(hub.hideCardOn.date); h.setHours(hub.hideCardOn.hour != null ? hub.hideCardOn.hour : 0, 0, 0, 0); return h; }
     if (hub.hideCardOn) return parseYmd(hub.hideCardOn);
     var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;
   }
@@ -1500,6 +1501,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var now = new Date();
     return (hub.exams || []).filter(function(x){
       var hour = forPopup ? (x.promptHour != null ? x.promptHour : ARCHIVE_HOUR) : (x.checkinHour != null ? x.checkinHour : CHECKIN_HOUR);
+      if (x.checkinUntil && now >= examAt({ date:x.checkinUntil.date }, x.checkinUntil.hour != null ? x.checkinUntil.hour : ARCHIVE_HOUR)) return false;
       return x.date && !x.checkinClosed && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS;
     })
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });

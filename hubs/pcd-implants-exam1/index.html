@@ -2936,12 +2936,6 @@ mq("tm-morse", "terms", "slides", "A Morse taper is:",
    ["A type of surface treatment","It's a connection geometry."],
    ["A cement used for implant crowns","It's mechanical, not cement."]],
   "Examples on the slide: Straumann synOcta platform; Dentsply Sirona Ankylos at 5.7 degrees.");
-mq("tm-conelog", "terms", "slides", "Nobel's internal connection is a shallow cone. What is CONELOG's taper?",
-  [["7.5 degrees, deep conical","vs Nobel's 45-degree shallow conical."],
-   ["45 degrees, a shallow internal cone","That's Nobel's internal."],
-   ["5.7 degrees","That's Ankylos."],
-   ["90 degrees","That's a flat connection."]],
-  "Shallow 45-degree vs deep 7.5-degree conical connections.");
 mq("tm-cover", "terms", "slides", "A cover screw is used:",
   [["At the first stage of a two-stage surgery, hidden under the soft tissue","Short and submerged."],
    ["At one-stage surgery, sticking through the tissue","That's the healing abutment."],
@@ -2996,12 +2990,6 @@ mq("tm-engaging", "terms", "slides", "An engaging abutment:",
    ["Is always cement-retained","Engagement and retention are separate choices."],
    ["Is used only for bridges","Single crowns must be engaging."]],
   "Straumann RC engages by 4 grooves; BioHorizons by a hex.");
-mq("tm-rc-grooves", "terms", "slides", "How does a Straumann RC abutment engage the implant?",
-  [["By 4 grooves","The slide's example."],
-   ["By an external hex","School implants are internal."],
-   ["By a tri-lobe","That's a Nobel line."],
-   ["It doesn't: RC abutments are non-engaging","RC abutments can be engaging."]],
-  "Engaging part = anti-rotation feature between abutment and implant once fully attached.");
 mq("tm-closed", "terms", "slides", "When is an open-tray impression preferred over closed-tray?",
   [["For multiple units, because it's more accurate","The coping comes out in the impression; no reinsertion."],
    ["Always: the student clinic uses open tray 99% of the time","The clinic uses closed tray 99% of the time."],
@@ -3194,18 +3182,6 @@ mq("tm-anodize", "terms", "slides", "Anodizing a titanium abutment changes its c
    ["Plating it with gold","No plating involved."],
    ["Heating it in a porcelain oven","It's electrolytic."]],
   "The layer is under a micron, so it doesn't affect fit; grinding removes the color.");
-mq("tm-code-6010", "terms", "slides", "Which code is surgical placement of an endosteal implant body?",
-  [["D6010","$1,295 in the clinic fee list."],
-   ["D6057","Custom abutment."],
-   ["D6065","Implant-supported porcelain/ceramic crown (screw-retained)."],
-   ["D0367","Cone beam CT, both jaws."]],
-  "Know the codes for planning, surgery, provisional and final restorations.");
-mq("tm-code-6058", "terms", "slides", "A single cement-retained ceramic crown on a custom abutment is billed as:",
-  [["D6057 (custom abutment) + D6058 (abutment-supported porcelain/ceramic crown)","The cement-retained single crown."],
-   ["D6065 alone","That's the screw-retained implant-supported crown."],
-   ["D6245 + D6075","Those are for a screw-retained FPD."],
-   ["D6190 + D6010","Index and surgery codes."]],
-  "Screw-retained single: D6065. FPD cement: D6057 x2 + D6068 x2 + D6245. FPD screw: D6075 x2 + D6245.");
 tf("tm-tf-1", "terms", "slides", "The school's implants all have an internal connection.", true,
   "\"The implants we used at school are all with internal connection.\"",
   "They're all internal.", "It is true.");
@@ -4676,12 +4652,6 @@ mq("gs-uab", "guided", "slides", "Which method does the UAB student clinic use m
    ["Dynamic guided surgery","Not the usual."],
    ["Freehand surgery without a CBCT or a guide","A CBCT is still needed."]],
   "\"This is what we do most of the time in UAB student clinic.\"");
-mq("gs-credit", "guided", "slides", "How does the student clinic encourage guided surgery?",
-  [["Extra crown credits, up to two","A clinic incentive."],
-   ["Waiving the CBCT and planning fees","Not what the slide says."],
-   ["Free implants","Not what the slide says."],
-   ["Extra exam points","Not what the slide says."]],
-  "D6190 $50; D6190GS $225.");
 mq("gs-6190gs", "guided", "slides", "What is the student clinic fee for D6190GS (guided surgery implant index)?",
   [["$225","D6190 is $50."],
    ["$50","That's D6190."],
@@ -5099,7 +5069,7 @@ var SORT_SETS = [
   { id:'class', lec:'intro', title:'Endosteal, or on/through the bone?', bins:['Endosteal (in the bone)','Eposteal or transosteal'], items:[['Root form',0],['Blade',0],['Ramus frame',0],['One cortical plate',0],['Subperiosteal framework',1],['Lies under the periosteum',1],['Transmandibular implant',1],['Both cortical plates',1]] },
   { id:'force', lec:'biomech', title:'Lowers or raises the force on an implant?', bins:['Lowers it','Raises it'], items:[['Splinting',0],['More implants',0],['Smaller occlusal table',0],['Night guard',0],['Opposing denture',0],['Cantilever',1],['Long span',1],['Bruxism',1],['Joining to a tooth',1],['Tall crown',1]] },
   { id:'screwcem', lec:'terms', title:'Screw-retained or cement-retained?', bins:['Screw-retained','Cement-retained'], items:[['Retrievable',0],['No residual cement',0],['Needed at 5 mm or less of space',0],['TiBase FPD',0],['More passive fit',1],['No access hole',1],['Facially placed implant',1],['Higher peri-implantitis risk',1]] },
-  { id:'eng', lec:'terms', title:'Engaging or non-engaging?', bins:['Engaging','Non-engaging'], items:[['Single crown',0],['Cement-retained FPD',0],['Custom abutment',0],['Straumann RC grooves',0],['Screw-retained FPD',1],['Verification jig',1],['Spins when seated',1],['Provisional bridge abutment',1]] },
+  { id:'eng', lec:'terms', title:'Engaging or non-engaging?', bins:['Engaging','Non-engaging'], items:[['Single crown',0],['Cement-retained FPD',0],['Custom abutment',0],['Screw-retained FPD',1],['Verification jig',1],['Spins when seated',1],['Provisional bridge abutment',1]] },
   { id:'stock', lec:'prefab', title:'Prefabricated or custom?', bins:['Prefabricated','Custom'], items:[['Off the shelf',0],['About $50 or free',0],['Must be prepared',0],['Deep margin traps cement',0],['UCLA abutment',1],['CAD/CAM milled',1],['Margin where you want it',1],['Excellent emergence profile',1]] },
   { id:'pa', lec:'imaging', title:'Periapical or panoramic?', bins:['Periapical','Panoramic'], items:[['Very high resolution',0],['Follow crestal bone',0],['Baseline at delivery',0],['Excellent screening',1],['Up to 30% height error',1],['Ball bearings for magnification',1],['Superimposition',1]] },
   { id:'ct', lec:'imaging', title:'Medical CT or cone beam CT?', bins:['Medical CT','Cone beam CT'], items:[['Fan beam',0],['Rotates very rapidly',0],['Helical data',0],['Patient supine',0],['Cone beam to a flat panel',1],['Sitting up',1],['5-10x lower dose',1],['More Compton scatter',1]] },

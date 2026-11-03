@@ -146,7 +146,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   been recapped as of the midterm) and took a reopened hub's `archiveOn` date as an exam (Heme & Endo as of 11-03); both fixed. The Heme &
   Endo recap published 10-30 is unchanged (Sam reopened the hub for a late exam). `LESSONS.md`: Heme & Endo Exam 1 retrospective (the best
   check-ins yet: 8 of 10 "About right", none "Exam asked different things"), the last refresh checked (MCQ fixes worked, two-statement
-  and true/false ones didn't), new Live signals. No schema change.
+  and true/false ones didn't), new Live signals. **Reports #35/#36 (Sam: remove those and ones like them)**: removed from PCD Implants
+  the brand and admin details with no exam signal (no hint, focus list, "on my exam" or example question): `tm-conelog` (CONELOG's taper),
+  `tm-rc-grooves` (Straumann RC's grooves, plus its card in the engaging sort), `tm-code-6010` and `tm-code-6058` (CDT codes) and
+  `gs-credit` (clinic crown credits); bank 548 -> 543. Kept, because the hint list or the professor flags them: each system's surface,
+  alloy and torques, conical vs non-conical, and `pf-systems` (Dr. Chavali's own example question). **Heme & Endo** (Sam reopened it for a
+  late exam): it still archives tonight at 10 pm (`archiveOn`), but its card stays on the dashboard with the Check in button until
+  **Fri 11-06 10 pm** (new `hideCardOn:{date,hour}` and per-exam `checkinUntil:{date,hour}` in `index.html`). No schema change.
 
 - **2026-11-03 (perio S7 and S8 taught, true/false and numbered items, six diagrams, Claude Code)** — Sam: update perio with
   the new files in Drive (Periodontology/hubs, added Nov 2): `perio oct 29.txt` (the Oct 29 class capture of S7) and

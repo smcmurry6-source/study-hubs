@@ -95,8 +95,8 @@ whole bank went 81% -> 80% -> 83% over the same windows, so +2 is noise.)
 **Student voice since 10-29:** 3 open reports, all PCD Implants, all from its first day: #34 `cb-pe` (each wrong choice named only one
 of the two variables, so the key was the only complete answer: **fixed today**, every choice now states both, and the same giveaway in
 `cb-atten-z` too); #35 `tm-conelog` and #36 `tm-rc-grooves`, "I don't think we need to know this much detail" (brand-level facts:
-Nobel CONELOG's 7.5-degree taper, Straumann RC's 4 grooves; neither is in `LIKELY_TOPICS` or the hint list): **for Sam** (remove, or
-keep). Heme & Endo check-ins: see its retrospective. One late Occlusion midterm check-in (n = 15 in all): about right, diagrams 5,
+Nobel CONELOG's 7.5-degree taper, Straumann RC's 4 grooves; neither is in `LIKELY_TOPICS` or the hint list): **removed** (Sam), with the
+other details that had no exam signal (the CDT-code and clinic-credit items); brand facts the hint list or a professor flags stayed. Heme & Endo check-ins: see its retrospective. One late Occlusion midterm check-in (n = 15 in all): about right, diagrams 5,
 pictured Patient Boxes 5. No zero-result searches.
 
 **Per hub:**
@@ -308,6 +308,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 - **Explanations must agree with the key and show the number.** Perio `q3-47`'s explanation didn't match its answer
   and mixed up two slide figures. When a question tests a figure, the explanation states it and names which figure
   it is, and separates it from look-alike numbers.
+- **Brand and admin details with no exam signal get reported as "too much detail".** PCD Implants #35/#36 on its first day (CONELOG's
+  taper, Straumann RC's grooves). Before shipping a bank, check every brand-specific number or part and every billing or clinic-policy
+  item for a hint, focus list or "this will be on the exam"; without one, leave it in the notes, not the bank.
 - **Low-value questions get reported.** "Not a super helpful question" (`q4-49`, disclosing-plaque order). Trivial
   procedural orderings aren't worth a slot; test the decision or the reason instead. Questions about what the professor said rather than about the subject
   get reported too: Heme/Endo `h1-mag` ("Dr. Herr said he would NOT expect you to be able to:") drew two reports on its first
