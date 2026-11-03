@@ -70,6 +70,13 @@ need an entry; a new hub mode, tab, game or question type does.
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.
 
+## Perio: the single file is the source (2026-11-03)
+
+`hubs/perio/index.html` is the perio hub's source: edit it directly (figures in `tools/figures/perio/`, then run its
+`build.mjs`). Sam confirmed on 2026-11-03 that the old Perio Claude Project's split sources are no longer used, so the many
+"**Perio Project: carry ... into the split sources**" lines in the entries below are obsolete: ignore them. (The MSK hubs that
+had a split-source Project are archived.)
+
 ## Archiving a hub = retrospective (standing rule)
 
 Every time a hub is archived, all the data gathered on it (time by section, clicks, engagement, questions, exam
@@ -93,15 +100,15 @@ Ship as soon as it's ready and verified (`CLAUDE.md` → "Ship it now").
 
 Every hub (hub Projects included) has a **Home** mode, first and default: the exam countdown and facts, deadlines, quick start,
 readiness, Where to next, progress by lecture, the course timeline and the last 14 days. Copy it from `heme-endo-exam1` or
-`occlusion`; the full list is in `CLAUDE.md` → "Every hub opens on its own Home page". **Perio Project: carry the Home mode into the
-split sources** (Course Home is no longer a Compendium tab).
+`occlusion`; the full list is in `CLAUDE.md` → "Every hub opens on its own Home page".
 
 ## Every lecture gets two-statement and true/false questions (standing rule, 2026-10-22)
 
 Every session that writes questions for a lecture (hub Projects included) adds two-statement and true/false items: about 5
 and 8 per lecture, at least 3 and 5 for any taught lecture, or CI fails. Fixed choice order, balanced keys, a why for every
 choice, false statements that change one taught detail. How to build them: `CLAUDE.md` → "Two-statement and true/false
-questions" (copy `two()`/`tf()` from `occlusion`). **Perio Project: add true/false (`tf()`) before Session 6 goes to taught.**
+questions" (copy `two()`/`tf()` from `occlusion`).
+Perio has `tf()` too (since 2026-11-03).
 
 ## Every lecture gets numbered-statement questions too (standing rule, 2026-10-28)
 
@@ -109,7 +116,8 @@ Besides two-statement and true/false items, every session that writes questions 
 **numbered-statement** items: "Which ... are true?" over 4-5 numbered statements, answered with a combination ("1 and 3 only",
 "1, 2 and 4"), as Dr. Givan's Occlusion midterm asked. About 3-5 per lecture, at least 2 for any taught lecture, or CI fails.
 Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
-"Numbered-statement questions" (copy `nums()` from `occlusion`). **Perio Project: add `nums()` before Session 6 goes to taught.**
+"Numbered-statement questions" (copy `nums()` from `occlusion`).
+Perio has `nums()` too (since 2026-11-03).
 
 ## Every lecture gets High Likelihood topics (standing rule, 2026-10-30)
 
@@ -117,7 +125,7 @@ Every hub (hub Projects included) predicts its exam's most likely topics per lec
 recording hints, in-class reviews and focus lists, the exam-review guide, check-ins, then the slides). **Building a hub, adding a
 lecture to one, or moving a lecture from slides-only to taught includes its topics**, and new hints or reviews mean re-ranking.
 CI fails a lecture with questions but no topics. How: `CLAUDE.md` → "Question Bank: lecture picker, order and pins".
-**Perio Project: carry `LIKELY_TOPICS` into the split sources and add topics for each session as it is taught.**
+Perio: add topics for each session as it is taught.
 
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
@@ -175,7 +183,6 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   hub's `anima:js`/`anima:css` markers, `--check`, `--preview`): peri-implant states, Meffert, BOP over 4 visits, the radiograph
   schedule (S7), why a biofilm beats antibiotics, where each antibiotic acts (S8); under the notes (`FIG_BY_LEC`/`figsHTML`,
   outside `.reading-prose`, `data-sh-noread`) and in Review. About page. No schema change.
-  **Perio Project: carry all of this into the split sources (the engine helpers, S7/S8 content, the figures and markers).**
 
 - **2026-11-03 (Occlusion L7: Malocclusion and Dysfunction, Claude Code)** — From the Drive Occlusion/Final folder (Occ Lec6 malocc slides + handout, `Occ oct29.txt`, the 10/29 lecture capture). New lecture `malocclusion` (L7, `exam:'final'`, tag `rose`, taught): notes at both levels and both mp3s (`audio/malocclusion-full.mp3`, `-plain.mp3`): the functional disturbance model, TMD (Bell's classification; muscles ~50%, joints ~35%; not orofacial pain), the five etiologies, orthopedic vs occlusal stability and its risk factors, interferences and the high crown, occlusal therapy (reversible vs irreversible, splints, the rule of thirds), trauma, mobility, wear and erosion patterns, NCCLs, stress, deep pain and bruxism. 145 questions (`mo-*`, `cs-mo-*` on 4 new Patient Box cases `mohigh`/`mobrux`/`moeros`/`momob`; 8 two-statement, 12 true/false (6 True), 6 numbered (keys 2/1/1/2 over the four positions), 5 EXCEPT, 2 select-all, 1 ordering, 1 matching; each with its why; correct answer longest in 33% of L7's MCQs), 17 exam hints quoted from the capture (one de-emphasized: the TMD classification list is the third-year course), 12 `LIKELY_TOPICS`, a Review tab, cram lines, 2 sort sets and a process. Where slides and recording differ (whether erosion facets match; how long a splint stops bruxism) the notes give both and no question turns on it. `MOCK_BLUEPRINT` = `{ instruments:20, malocclusion:20 }`; `EXAM_INFO`, `COURSE_DATES`, the hints banner, the mock intro and the dashboard card updated. Bank 526 -> 671. Diagram review: Sam approved all five candidates (the tolerance model, orthopedic vs occlusal stability, splint designs, the rule of thirds, an erosion pattern map); they ship in a follow-up PR. No schema change.
 
@@ -1809,8 +1816,8 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
   `p_hub='perio'`; `migration_v11.sql` (whitelists those ids) **was applied 2026-09-24 via the
   connector**. Bank-based games call `recordAnswer`, so they fire `perio:answered`. The state key and
   `answered/totalSeen/activeDates` shape are unchanged (dashboard `readProgress` still works); new
-  `STATE.ui`/`STATE.arcade` sub-objects. The hub is now built from split sources in the Perio Project
-  session; the deployed `index.html` is the single-file build. Lecture Notes now have an **As taught / Plain English** toggle (`READINGS_PLAIN`, `STATE.ui.level`); each level has
+  `STATE.ui`/`STATE.arcade` sub-objects. The hub was then built from split sources in the Perio Project
+  session (no longer: since 2026-11-03 the single file is the source; see "Perio: the single file is the source" above). Lecture Notes now have an **As taught / Plain English** toggle (`READINGS_PLAIN`, `STATE.ui.level`); each level has
   its own narration file, `audio/<id>-full.mp3` and `audio/<id>-plain.mp3` (all 9 plain files new; full regenerated for
   `phase1-therapy` and `risk-assessment`) — **edit either level's text and you must regenerate that file**. The Listen
   button is re-skinned with hub tokens in `hubs/perio` (the widget's `var(--card,#fff)` fallback made it white-on-white
