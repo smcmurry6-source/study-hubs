@@ -127,6 +127,14 @@ lecture to one, or moving a lecture from slides-only to taught includes its topi
 CI fails a lecture with questions but no topics. How: `CLAUDE.md` → "Question Bank: lecture picker, order and pins".
 Perio: add topics for each session as it is taught.
 
+## The Question Bank's filters are one labeled panel (standing rule, 2026-11-03)
+
+Every live and future hub (hub Projects included; not Heme & Endo Exam 1, which Sam said to leave as it is): Lectures (a tick
+list with "Only" on every row) and search; Show chips with counts (All, High likelihood, Not answered yet, Missed last time,
+Pinned); Order (In order / Random only, no "Likely first"); More filters (type, source); and under it a "Showing n of N" line
+with a removable tag per filter and Clear all. Copy it from `special-patient-care`. Details: `CLAUDE.md` → "Question Bank: the
+filter panel, lecture picker, order and pins".
+
 ## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
 
 Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
@@ -145,6 +153,23 @@ Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` �
 Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-11-03 (Question Bank filters redone in Occlusion, Perio, Special Patient Care and PCD Implants, Claude Code)** — Sam: "it
+  doesn't seem like people know how to use it". The data: in Occlusion 66 people opened the bank and 2 ever opened the lecture
+  picker; in PCD Implants 5 of the 8 who used it tapped Clear first just to get one lecture; select changes weren't tracked at all;
+  and since 10-30 the bank reopens with the last filters with nothing on screen saying so. Each bank now opens with one labeled
+  panel (`.qbar`): **Lectures** (Perio: Sessions; the tick list, every row with **Only**, All lectures / Untick all, Occlusion's
+  final/midterm presets) beside the search box; **Show** chips with live counts (`BANK_SHOW`: All, High likelihood, Not answered
+  yet, Missed last time, Pinned; replaces the status dropdown and the separate Pinned button); **Order** In order / Random; **More
+  filters** (folded, "n on" badge): question type (only the formats that bank has, with counts; new: Matching, Put in order,
+  Diagram questions in the three shared-engine hubs) and where it's from (new in Perio). Under it, "Showing n of N questions" with a
+  tag per filter (tap to remove) and Clear all; an empty result names the filter in the way and offers "Show all N questions".
+  **"Likely first" is gone** at Sam's request (High likelihood is a filter: those questions or the whole bank); a saved
+  `qorder:'likely'` falls back to In order. Perio's rarely reachable "Mastered" status is gone (a saved one falls back to All).
+  Fixed on the way: "In order" stayed highlighted beside "Likely first" after a reload. New tracking (`feature_events`):
+  `bank:show=`, `bank:lec-only`, `bank:lec-all|none|final|midterm`, `bank:type=`, `bank:src=`, `bank:more`, `bank:search`,
+  `bank:tag-off=`, `bank:clear`, `bank:empty-clear`. Heme & Endo Exam 1 unchanged (Sam). New standing rule (above and `CLAUDE.md`).
+  About page. No schema change.
 
 - **2026-11-03 midday (lessons audit + Heme & Endo Exam 1 retrospective, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and key
   positions: report #34 (`cb-pe`: each wrong choice named only one of the two variables, so the key was the only complete answer) now has

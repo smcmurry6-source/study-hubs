@@ -159,30 +159,84 @@ main{padding-top:20px}
 .likely-basis{font-family:var(--font-mono);font-size:.66rem;color:var(--ink-soft);background:var(--surface-2);border-radius:4px;padding:1px 5px;white-space:nowrap}
 .likely-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
 .likely-chip .ic,.likely-chip svg{width:12px;height:12px}
-/* lecture picker (tick the lectures to practice), order toggle and the Pinned button */
-.lp{position:relative}
-.lp-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);cursor:pointer;max-width:100%}
+/* Question Bank filter panel (2026-11-03): Lectures + search, Show chips, Order + More filters, then the "Showing ..." line
+   with a removable tag per filter. The lecture picker is the tick list, each row with "Only". */
+.qbar{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px}
+.qf-line{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+.qf-lab{flex:none;width:64px;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+.qf-search{flex:1 1 220px;display:flex;align-items:center;gap:7px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);padding:0 10px;min-width:0;cursor:text}
+.qf-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.qf-search svg{width:15px;height:15px;color:var(--ink-faint);flex:none}
+.qf-search input{border:0;background:none;outline:0;padding:8px 0;font:inherit;font-size:.9rem;color:var(--ink);flex:1;min-width:0}
+.qf-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+.qf-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 12px;font:inherit;font-size:.85rem;font-weight:600;color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.qf-chip svg{width:13px;height:13px;flex:none}
+.qf-chip:hover{border-color:var(--ink-soft);color:var(--ink)}
+.qf-chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.qf-n{font-family:var(--font-mono);font-size:.74rem;font-weight:600;color:var(--ink-faint)}
+.qf-chip[aria-pressed="true"] .qf-n{color:inherit}
+.qf-more{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 11px;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.qf-more svg{width:15px;height:15px;flex:none}
+.qf-more > svg:last-child{width:13px;height:13px;transition:transform .15s}
+.qf-more[aria-expanded="true"]{border-color:var(--accent);color:var(--accent-ink)}
+.qf-more[aria-expanded="true"] > svg:last-child{transform:rotate(180deg)}
+.qf-badge{background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:1px 7px;font-size:.72rem;font-weight:700}
+.qf-badge[hidden]{display:none}
+.qf-extra{display:flex;flex-wrap:wrap;gap:10px 18px;padding-top:10px;border-top:1px dashed var(--line)}
+.qf-extra[hidden]{display:none}
+.qf-field{display:flex;align-items:center;gap:8px 10px;min-width:0}
+.qf-field .qf-lab{width:auto}
+.qf-field select{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;color:var(--ink);min-width:0;max-width:100%}
+.qsum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;color:var(--ink-soft);font-size:.86rem;margin:0 0 12px}
+.qsum b{color:var(--ink)}
+.qsum-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+.qsum-tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:3px 7px 3px 10px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;max-width:100%;text-align:left}
+.qsum-tag svg{width:12px;height:12px;flex:none;opacity:.8}
+.qsum-tag:hover svg{opacity:1}
+.qsum-clear{border:0;background:none;color:var(--accent-ink);font:inherit;font-size:.82rem;font-weight:700;text-decoration:underline;text-underline-offset:2px;cursor:pointer;padding:3px 2px}
+.qf-empty p{margin:0 auto 12px;max-width:52ch}
+.lp{position:relative;flex:0 1 auto;min-width:0}
+.lp-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 10px;font:inherit;font-size:.88rem;font-weight:600;color:var(--ink);cursor:pointer;max-width:100%}
 .lp-btn svg{width:14px;height:14px;flex:none}
-.lp-btn[aria-expanded="true"]{border-color:var(--accent)}
-.lp-sum{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28ch}
-.lp-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(420px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:10px}
+.lp-btn:hover,.lp-btn[aria-expanded="true"]{border-color:var(--accent)}
+.lp-btn.is-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.lp-sum{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34ch}
+.lp-pop{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(440px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:10px}
+.lp-help{margin:0 2px 8px;font-size:.82rem;color:var(--ink-soft)}
 .lp-quick{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .lp-quick button,.lp-done{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:999px;padding:4px 11px;font:inherit;font-size:.8rem;font-weight:600;color:var(--ink);cursor:pointer}
+.lp-done{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .lp-list{max-height:min(52vh,380px);overflow:auto}
-.lp-row{display:flex;align-items:flex-start;gap:8px;padding:7px 6px;border-radius:8px;cursor:pointer;font-size:.88rem}
+.lp-row{display:flex;align-items:center;gap:6px;padding:2px 4px 2px 6px;border-radius:8px;font-size:.88rem}
 .lp-row:hover{background:var(--surface-2)}
+.lp-row label{display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;padding:6px 0;cursor:pointer}
 .lp-row input{margin:3px 0 0;accent-color:var(--accent);flex:none}
 .lp-t{flex:1;min-width:0}
 .lp-n{font-family:var(--font-mono);font-size:.75rem;color:var(--ink-faint);flex:none;margin-top:2px}
+.lp-only{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:3px 9px;font:inherit;font-size:.75rem;font-weight:700;color:var(--ink-soft);cursor:pointer;flex:none}
+.lp-only:hover,.lp-only:focus-visible{border-color:var(--accent);color:var(--accent-ink)}
 .lp-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);margin-top:6px;font-size:.8rem;color:var(--ink-faint)}
 .qorder{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;background:var(--surface)}
 .qorder button{border:0;background:none;padding:7px 11px;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
 .qorder button+button{border-left:1px solid var(--line-strong)}
 .qorder button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink)}
-.qpinned{display:inline-flex;align-items:center;gap:6px}
-.qpinned svg{width:14px;height:14px}
-.qpinned[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
-@media (max-width:560px){.lp,.lp-btn{width:100%}.lp-sum{max-width:none;flex:1;text-align:left}}
+@media (max-width:560px){
+  .qbar{padding:10px 12px;gap:9px}
+  .qf-lab{width:100%}
+  .qf-top .qf-lab{width:auto}
+  .lp{flex:1 1 0}
+  .lp-btn{width:100%}
+  .lp-pop{left:auto;right:-13px;width:calc(100vw - 32px)}
+  .lp-list{max-height:min(36vh,380px)}
+  .lp-sum{max-width:none;flex:1;text-align:left}
+  .qf-top .qf-search{flex-basis:100%}
+  .qf-chip{padding:5px 10px;font-size:.82rem}
+  .qorder button{padding:7px 9px;font-size:.82rem}
+  .qf-more{padding:7px 9px}
+  .qf-ord .qf-lab{display:none}
+  .qf-field{flex:1 1 100%;flex-wrap:wrap}
+  .qf-field select{flex:1 1 100%}
+}
 .qcount{color:var(--ink-faint);font-size:.84rem;margin-bottom:10px}
 .rv-set{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;border:1px solid var(--accent);background:var(--accent-soft,var(--surface-2));border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.9rem}
 .rv-set b{display:block}
@@ -4223,63 +4277,110 @@ function bankLecIds(){
 }
 var PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3z"/><path d="M12 15v6"/></svg>';
 var LP_CARET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+var QF_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>';
+var QF_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>';
+var QF_SLIDERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+/* ---------- Question Bank filters (Sam, 2026-11-03: "people don't know how to use it") ----------
+   One labeled panel instead of a row of unlabeled dropdowns. Before it, 2 of 66 Occlusion bank users ever opened the lecture
+   picker, and in PCD Implants 5 of 8 tapped Clear first just to pick one lecture; saved filters (kept since 10-30) gave no sign
+   they were still on. Now:
+   - Lectures: the tick list, every row with "Only" (one tap for one lecture).
+   - Show: chips for STATE.ui.qstatus (all | likely | unseen | missed | pinned), each with how many questions it would give.
+   - Search, and Order (In order | Random). There is no "Likely first" order (Sam, 2026-11-03): the High likelihood chip
+     shows only those questions, All shows the whole bank.
+   - More filters (folded): question type (STATE.ui.qfmt, only the formats this bank has) and where it's from (STATE.ui.qsrc).
+   Under the panel a line says what is showing, with a tag for every filter that's on (tap to remove it) and Clear all; when
+   nothing matches, it says which filter is in the way and offers the fix. STATE.ui.qlec is 'all', one id or an array of ids. */
+var BANK_SHOW = [['all','All'],['likely','High likelihood'],['unseen','Not answered yet'],['missed','Missed last time'],['pinned','Pinned']];
+var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
+function bankIsFmt(q, fm){ return fm === 'pbox' ? !!q.pbox : fm === 'img' ? !!q.img : (fm === 'multi' || fm === 'match' || fm === 'sequence') ? q.type === fm : q.fmt === fm; }
+function bankLabelOf(list, k){ for(var i = 0; i < list.length; i++) if(list[i][0] === k) return list[i][1]; return k; }
 function lecPickSummary(ids){
-  if(ids.length === LECTURES.length) return 'All lectures';
+  if(ids.length === LECTURES.length) return 'All ' + LECTURES.length + ' lectures';
   if(!ids.length) return 'No lectures picked';
-  if(ids.length === 1){ var l = LECTURE_BY_ID[ids[0]]; return lecLabel(l) + ' ' + l.title; }
-  return ids.length + ' of ' + LECTURES.length + ' lectures: ' + LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(lecLabel).join(', ');
+  if(ids.length === 1){ var l = LECTURE_BY_ID[ids[0]]; return lecLabel(l) + ' · ' + l.title; }
+  return ids.length + ' lectures: ' + LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(lecLabel).join(', ');
 }
 function lecPickHTML(ids){
   var n = {}; QUESTIONS.forEach(function(q){ n[q.lec] = (n[q.lec] || 0) + 1; });
-  return '<div class="lp" id="lecPick"><button type="button" class="lp-btn" aria-haspopup="true" aria-expanded="false" aria-label="Lectures to practice">'+icon('notes')+'<span class="lp-sum">'+escHtml(lecPickSummary(ids))+'</span>'+LP_CARET+'</button>' +
-    '<div class="lp-pop" hidden role="group" aria-label="Lectures to practice"><div class="lp-quick"><button type="button" data-lp="all">Select all</button><button type="button" data-lp="none">Clear</button></div>' +
-    '<div class="lp-list">' + LECTURES.map(function(l){ return '<label class="lp-row tag-'+l.tag+'"><input type="checkbox" value="'+l.id+'"'+(ids.indexOf(l.id) !== -1 ? ' checked' : '')+'><span class="lec-num">'+lecLabel(l)+'</span><span class="lp-t">'+escHtml(l.title)+'</span><span class="lp-n">'+(n[l.id] || 0)+'</span></label>'; }).join('') + '</div>' +
-    '<div class="lp-foot"><span>Questions from the ticked lectures</span><button type="button" class="lp-done">Done</button></div></div></div>';
+  return '<div class="lp" id="lecPick"><button type="button" class="lp-btn" aria-haspopup="true" aria-expanded="false" aria-label="Lectures to practice: '+escHtml(lecPickSummary(ids))+'"><span class="lp-sum">'+escHtml(lecPickSummary(ids))+'</span>'+LP_CARET+'</button>' +
+    '<div class="lp-pop" hidden role="group" aria-label="Lectures to practice"><p class="lp-help">Tick the lectures you want, or tap <b>Only</b> for just one.</p>' +
+    '<div class="lp-quick"><button type="button" data-lp="all">All lectures</button><button type="button" data-lp="none">Untick all</button></div>' +
+    '<div class="lp-list">' + LECTURES.map(function(l){ return '<div class="lp-row tag-'+l.tag+'"><label><input type="checkbox" value="'+l.id+'"'+(ids.indexOf(l.id) !== -1 ? ' checked' : '')+'><span class="lec-num">'+lecLabel(l)+'</span><span class="lp-t">'+escHtml(l.title)+'</span><span class="lp-n">'+(n[l.id] || 0)+'</span></label><button type="button" class="lp-only" data-only="'+l.id+'" aria-label="Only '+escHtml(lecLabel(l)+' '+l.title)+'">Only</button></div>'; }).join('') + '</div>' +
+    '<div class="lp-foot"><span class="lp-picked"></span><button type="button" class="lp-done">Done</button></div></div></div>';
 }
-/* onPick(ids) runs on every tick; the list redraws live and the picker stays open */
+/* onPick(ids, how) runs on every tick; the list redraws live and the picker stays open ("Only" closes it) */
 function wireLecPick(root, onPick){
   var box = root.querySelector('#lecPick'); if(!box) return;
   var btn = box.querySelector('.lp-btn'), pop = box.querySelector('.lp-pop');
   function open(on){ pop.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); }
   function picked(){ return Array.prototype.filter.call(box.querySelectorAll('input[type=checkbox]'), function(c){ return c.checked; }).map(function(c){ return c.value; }); }
-  function changed(){ var ids = picked(); box.querySelector('.lp-sum').textContent = lecPickSummary(ids); onPick(ids); }
+  function sum(ids){ var t = lecPickSummary(ids); box.querySelector('.lp-sum').textContent = t; btn.setAttribute('aria-label', 'Lectures to practice: ' + t); box.querySelector('.lp-picked').textContent = ids.length + ' of ' + LECTURES.length + ' ticked'; btn.classList.toggle('is-on', ids.length !== LECTURES.length); }
+  function changed(how){ var ids = picked(); sum(ids); onPick(ids, how); }
+  sum(picked());
   btn.addEventListener('click', function(){ open(pop.hidden); });
   box.querySelector('.lp-done').addEventListener('click', function(){ open(false); btn.focus(); });
-  box.addEventListener('change', changed);
+  box.addEventListener('change', function(){ changed('tick'); });
   box.querySelectorAll('[data-lp]').forEach(function(b){ b.addEventListener('click', function(){
     var k = b.getAttribute('data-lp');
     box.querySelectorAll('input[type=checkbox]').forEach(function(c){ c.checked = k === 'all'; });
-    changed();
+    changed(k);
+  }); });
+  box.querySelectorAll('[data-only]').forEach(function(b){ b.addEventListener('click', function(){
+    var id = b.getAttribute('data-only');
+    box.querySelectorAll('input[type=checkbox]').forEach(function(c){ c.checked = c.value === id; });
+    changed('only'); open(false); btn.focus();
   }); });
   function away(e){ if(!document.body.contains(box)){ document.removeEventListener('click', away, true); document.removeEventListener('keydown', esc); return; } if(!pop.hidden && !box.contains(e.target)) open(false); }
   function esc(e){ if(e.key === 'Escape' && !pop.hidden){ open(false); btn.focus(); } }
   document.addEventListener('click', away, true); document.addEventListener('keydown', esc);
 }
 
-function bankFiltered(search){
+/* o overrides one filter ({st}, {fm} or {src}), so each chip and menu entry can say how many it would give */
+function bankFiltered(search, o){
+  o = o || {};
   var s = (search||'').toLowerCase().trim(), lecOn = {}, pins = {};
+  var st = o.st || STATE.ui.qstatus || 'all', fm = o.fm || STATE.ui.qfmt || 'all', src = o.src || STATE.ui.qsrc || 'all';
   bankLecIds().forEach(function(id){ lecOn[id] = 1; });
-  pinnedIds().forEach(function(id){ pins[id] = 1; });
+  if(st === 'pinned') pinnedIds().forEach(function(id){ pins[id] = 1; });
   return QUESTIONS.filter(function(q){
     if(!lecOn[q.lec]) return false;
-    if(STATE.ui.qstatus === 'pinned' && !pins[q.id]) return false;
-    if(STATE.ui.qstatus === 'likely' && !q.likely) return false;
-    if(STATE.ui.qsrc !== 'all' && q.src !== STATE.ui.qsrc) return false;
-    var fm = STATE.ui.qfmt || 'all';
-    if(fm !== 'all' && !(fm === 'pbox' ? !!q.pbox : fm === 'multi' ? q.type === 'multi' : q.fmt === fm)) return false;
+    if(st === 'pinned' && !pins[q.id]) return false;
+    if(st === 'likely' && !q.likely) return false;
+    if(src !== 'all' && q.src !== src) return false;
+    if(fm !== 'all' && !bankIsFmt(q, fm)) return false;
     var seen = STATE.seen[q.id];
-    if(STATE.ui.qstatus === 'unseen' && seen) return false;
-    if(STATE.ui.qstatus === 'missed' && !(seen && seen.last === false)) return false;
+    if(st === 'unseen' && seen) return false;
+    if(st === 'missed' && !(seen && seen.last === false)) return false;
     if(s){ var hay = (q.stem + ' ' + (q.choices||q.steps||[]).join(' ') + ' ' + (q.pairs ? q.pairs.map(function(p){return p.join(' ');}).join(' ') : '') + ' ' + q.ex + ' ' + (q.pbox ? q.pbox.map(function(r){ return r.join(' '); }).join(' ') : '')).toLowerCase(); if(hay.indexOf(s) === -1) return false; }
     return true;
   });
 }
-var bankSearch = '';
+var bankSearch = '', bankMoreOpen = null;
+function bankResetFilters(){ STATE.ui.qlec = 'all'; STATE.ui.qstatus = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qsrc = 'all'; bankSearch = ''; bankShown = BANK_PAGE; saveState(); }
 function renderBank(body){
-  var srcOpts = '<option value="all">All sources</option>' + Object.keys(SRC_LABEL).map(function(k){ return '<option value="'+k+'"'+(STATE.ui.qsrc===k?' selected':'')+'>'+SRC_LABEL[k]+'</option>'; }).join('');
-  var fmOpts = [['all','Any format'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box'],['multi','Select all']].map(function(o){ return '<option value="'+o[0]+'"'+((STATE.ui.qfmt||'all')===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  var stOpts = [['all','Any status'],['unseen','Not yet answered'],['missed','Missed last time'],['pinned','Pinned'],['likely','High likelihood only']].map(function(o){ return '<option value="'+o[0]+'"'+(STATE.ui.qstatus===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('');
-  body.innerHTML = '<div class="cg-host" id="cgHost"></div><div class="qfilters">'+lecPickHTML(bankLecIds())+'<select id="fSrc" aria-label="Source">'+srcOpts+'</select><select id="fFmt" aria-label="Question format">'+fmOpts+'</select><select id="fSt" aria-label="Status">'+stOpts+'</select><input id="fSearch" type="search" placeholder="Search questions…" value="'+escHtml(bankSearch)+'"><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(STATE.ui.qorder !== 'random')+'">In order</button><button type="button" data-qorder="random" aria-pressed="'+(STATE.ui.qorder === 'random')+'" title="Random order (tap again to reshuffle)">Random</button><button type="button" data-qorder="likely" aria-pressed="'+(STATE.ui.qorder === 'likely')+'" title="High likelihood exam questions first, strongest topics first">Likely first</button></div><button type="button" class="btn qpinned" id="fPinned" aria-pressed="'+(STATE.ui.qstatus === 'pinned')+'">'+PIN_SVG+'<span id="fPinN">Pinned ('+pinnedIds().length+')</span></button></div><div class="qcount" id="qCount"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
+  var st = STATE.ui.qstatus || 'all', fm = STATE.ui.qfmt || 'all', src = STATE.ui.qsrc || 'all';
+  if(!BANK_SHOW.some(function(o){ return o[0] === st; })) st = STATE.ui.qstatus = 'all';
+  var fmts = BANK_FMTS.filter(function(o){ return QUESTIONS.some(function(q){ return bankIsFmt(q, o[0]); }); });
+  if(fm !== 'all' && !fmts.some(function(o){ return o[0] === fm; })) fm = STATE.ui.qfmt = 'all';
+  var srcs = Object.keys(SRC_LABEL).filter(function(k){ return QUESTIONS.some(function(q){ return q.src === k; }); });
+  if(src !== 'all' && srcs.indexOf(src) === -1) src = STATE.ui.qsrc = 'all';
+  if(bankMoreOpen === null) bankMoreOpen = fm !== 'all' || src !== 'all';
+  if(STATE.ui.qorder === 'likely') STATE.ui.qorder = 'linear';
+  var ord = STATE.ui.qorder === 'random' ? 'random' : 'linear';
+  var fmOpts = '<option value="all">Any type</option>' + fmts.map(function(o){ return '<option value="'+o[0]+'"'+(fm===o[0]?' selected':'')+' data-label="'+escHtml(o[1])+'">'+o[1]+'</option>'; }).join('');
+  var srcOpts = '<option value="all">Anywhere</option>' + srcs.map(function(k){ return '<option value="'+k+'"'+(src===k?' selected':'')+' data-label="'+escHtml(SRC_LABEL[k])+'">'+SRC_LABEL[k]+'</option>'; }).join('');
+  var chips = BANK_SHOW.map(function(o){ return '<button type="button" class="qf-chip" data-qshow="'+o[0]+'" aria-pressed="'+(st===o[0])+'">'+(o[0]==='pinned'?PIN_SVG:o[0]==='likely'?icon('target'):'')+o[1]+' <span class="qf-n" data-qshow-n="'+o[0]+'"></span></button>'; }).join('');
+  body.innerHTML = '<div class="cg-host" id="cgHost"></div>' +
+    '<section class="qbar" aria-label="Choose which questions to practice">' +
+      '<div class="qf-line qf-top"><span class="qf-lab" id="qfLecLab">Lectures</span>'+lecPickHTML(bankLecIds())+'<label class="qf-search">'+QF_SEARCH+'<input id="fSearch" type="search" placeholder="Search questions and answers" aria-label="Search questions and answers" value="'+escHtml(bankSearch)+'"></label></div>' +
+      '<div class="qf-line"><span class="qf-lab">Show</span><div class="qf-chips" role="group" aria-label="Show">'+chips+'</div></div>' +
+      '<div class="qf-line qf-ord"><span class="qf-lab">Order</span><div class="qorder" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(ord==='linear')+'" title="By lecture, in the bank\'s order">In order</button><button type="button" data-qorder="random" aria-pressed="'+(ord==='random')+'" title="Shuffled (tap again to reshuffle)">Random</button></div>' +
+        '<button type="button" class="qf-more" id="qfMore" aria-expanded="'+(!!bankMoreOpen)+'" aria-controls="qfExtra">'+QF_SLIDERS+'More<span class="qf-more-x"> filters</span><span class="qf-badge" id="qfBadge" hidden></span>'+LP_CARET+'</button></div>' +
+      '<div class="qf-extra" id="qfExtra"'+(bankMoreOpen ? '' : ' hidden')+'><label class="qf-field"><span class="qf-lab">Question type</span><select id="fFmt">'+fmOpts+'</select></label>' +
+        (srcs.length > 1 ? '<label class="qf-field"><span class="qf-lab">Where it\'s from</span><select id="fSrc">'+srcOpts+'</select></label>' : '') + '</div>' +
+    '</section>' +
+    '<div class="qsum" id="qCount" aria-live="polite"></div><div class="qlist" id="qList"></div><div style="text-align:center;margin-top:16px"><button type="button" class="btn" id="qMore" hidden>Show more</button></div>';
   CUSP_GAME.mount(document.getElementById('cgHost'));
   var list = document.getElementById('qList'); wireQuestionContainer(list);
   /* a missed question comes back as a fresh card RETRY_GAP cards further down, so the second try comes while it's fresh
@@ -4301,6 +4402,33 @@ function renderBank(body){
   /* a reshuffle happens only when Random is tapped, not when the bank redraws */
   var order = (STATE.ui.qorder === 'random' && renderBank.__shuf) || baseOrder();
   if(STATE.ui.qorder === 'random') renderBank.__shuf = order;
+  function track(k){ if(window.shTrack) window.shTrack('bank:' + k); }
+  /* the filters that are on, as [key, label]: the tags under the panel and the empty-state message read these */
+  function onNow(){
+    var p = [], ids = bankLecIds(), s = bankSearch.trim();
+    if(ids.length !== LECTURES.length) p.push(['lec', !ids.length ? 'No lectures' : ids.length === 1 ? lecPickSummary(ids) : ids.length <= 4 ? LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(lecLabel).join(', ') : ids.length + ' lectures']);
+    if(STATE.ui.qstatus && STATE.ui.qstatus !== 'all') p.push(['st', bankLabelOf(BANK_SHOW, STATE.ui.qstatus)]);
+    if(STATE.ui.qfmt && STATE.ui.qfmt !== 'all') p.push(['fm', bankLabelOf(BANK_FMTS, STATE.ui.qfmt)]);
+    if(STATE.ui.qsrc && STATE.ui.qsrc !== 'all') p.push(['src', SRC_LABEL[STATE.ui.qsrc] || STATE.ui.qsrc]);
+    if(s) p.push(['q', '“' + s + '”']);
+    return p;
+  }
+  function counts(){
+    body.querySelectorAll('[data-qshow-n]').forEach(function(el){ el.textContent = bankFiltered(bankSearch, { st:el.getAttribute('data-qshow-n') }).length; });
+    var f = document.getElementById('fFmt'); if(f) Array.prototype.forEach.call(f.options, function(op){ if(op.value !== 'all') op.textContent = op.getAttribute('data-label') + ' (' + bankFiltered(bankSearch, { fm:op.value }).length + ')'; });
+    var r = document.getElementById('fSrc'); if(r) Array.prototype.forEach.call(r.options, function(op){ if(op.value !== 'all') op.textContent = op.getAttribute('data-label') + ' (' + bankFiltered(bankSearch, { src:op.value }).length + ')'; });
+    var hidden = (STATE.ui.qfmt && STATE.ui.qfmt !== 'all' ? 1 : 0) + (STATE.ui.qsrc && STATE.ui.qsrc !== 'all' ? 1 : 0), bd = document.getElementById('qfBadge');
+    bd.hidden = !hidden; bd.textContent = hidden + ' on';
+  }
+  function emptyHTML(on){
+    var st = STATE.ui.qstatus, msg, only = !on.some(function(p){ return p[0] !== 'st' && p[0] !== 'lec'; });
+    if(!bankLecIds().length) msg = 'No lectures are ticked, so there is nothing to show.';
+    else if(st === 'pinned' && !pinnedIds().length) msg = 'No pinned questions yet. Tap <b>Pin</b> on any question to save it here.';
+    else if(st === 'missed' && only) msg = 'Nothing missed in these lectures. Questions you get wrong come back here.';
+    else if(st === 'unseen' && only) msg = 'You have answered every question here. Try <b>Missed last time</b>, or another lecture.';
+    else msg = 'No questions match all of these: ' + on.map(function(p){ return '<b>' + escHtml(p[1]) + '</b>'; }).join(', ') + '.';
+    return '<div class="rv-empty qf-empty"><p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all ' + QUESTIONS.length + ' questions</button></div>';
+  }
   function draw(){
     var qs = bankFiltered(bankSearch);
     if(order){
@@ -4309,31 +4437,46 @@ function renderBank(body){
       var rank = function(q){ if(!q.pcase) return idx[q.id]||0; var set = caseSet(q.pcase); return Math.min.apply(null, set.map(function(id){ return idx[id]||0; })) + set.indexOf(q.id) / 100; };
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
-    /* Likely first: predicted exam topics in topic order (each lecture's best-supported topics lead), the rest after */
-    if(STATE.ui.qorder === 'likely'){
-      var pos = {}; qs.forEach(function(q,i){ pos[q.id] = i; });
-      var lk = function(q){ return q.likely ? LIKELY_TOPICS.indexOf(q.likely) : 1e4; };
-      qs.sort(function(a,b){ return (lk(a)-lk(b)) || (pos[a.id]-pos[b.id]); });
-    }
-    document.getElementById('qCount').textContent = qs.length + ' question' + (qs.length===1?'':'s') + (qs.length > bankShown ? ' · showing ' + bankShown : '');
-    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || '<div class="rv-empty">' + (!bankLecIds().length ? 'No lectures picked. Tick at least one in the lecture list.' : STATE.ui.qstatus === 'pinned' && !pinnedIds().length ? 'No pinned questions yet. Tap Pin on any question to save it here.' : 'No questions match these filters.') + '</div>';
+    var on = onNow(), ordTxt = STATE.ui.qorder === 'random' ? 'random order' : 'lecture order';
+    document.getElementById('qCount').innerHTML = '<span class="qsum-n">' + (on.length ? 'Showing <b>' + qs.length + '</b> of ' + QUESTIONS.length + ' questions' : 'Showing <b>all ' + QUESTIONS.length + '</b> questions') + (qs.length ? ', ' + ordTxt : '') + (qs.length > bankShown ? ' (' + bankShown + ' at a time)' : '') + '</span>' +
+      (on.length ? '<span class="qsum-tags">' + on.map(function(p){ return '<button type="button" class="qsum-tag" data-qoff="'+p[0]+'" aria-label="Remove filter: '+escHtml(p[1])+'">'+escHtml(p[1])+QF_X+'</button>'; }).join('') + '<button type="button" class="qsum-clear" data-qclear>Clear all</button></span>' : '');
+    list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || emptyHTML(on);
     document.getElementById('qMore').hidden = qs.length <= bankShown;
+    counts();
   }
-  wireLecPick(body, function(ids){ STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; bankShown = BANK_PAGE; saveState(); draw(); });
-  document.getElementById('fSrc').onchange = function(e){ STATE.ui.qsrc = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
-  document.getElementById('fFmt').onchange = function(e){ STATE.ui.qfmt = e.target.value; bankShown = BANK_PAGE; saveState(); draw(); };
-  document.getElementById('fSt').onchange = function(e){ STATE.ui.qstatus = e.target.value; bankShown = BANK_PAGE; saveState(); renderBank(body); };
-  var t; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; bankShown = BANK_PAGE; draw(); }, 180); };
+  function redraw(){ bankShown = BANK_PAGE; saveState(); draw(); }
+  wireLecPick(body, function(ids, how){ STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; if(how !== 'tick') track('lec-' + how); redraw(); });
+  body.querySelectorAll('[data-qshow]').forEach(function(b){ b.onclick = function(){
+    STATE.ui.qstatus = b.getAttribute('data-qshow');
+    body.querySelectorAll('[data-qshow]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    track('show=' + STATE.ui.qstatus); redraw();
+  }; });
+  var fF = document.getElementById('fFmt'), fS = document.getElementById('fSrc');
+  fF.onchange = function(e){ STATE.ui.qfmt = e.target.value; track('type=' + e.target.value); redraw(); };
+  if(fS) fS.onchange = function(e){ STATE.ui.qsrc = e.target.value; track('src=' + e.target.value); redraw(); };
+  document.getElementById('qfMore').onclick = function(){ bankMoreOpen = !bankMoreOpen; this.setAttribute('aria-expanded', bankMoreOpen ? 'true' : 'false'); document.getElementById('qfExtra').hidden = !bankMoreOpen; if(bankMoreOpen) track('more'); };
+  var t, searched; document.getElementById('fSearch').oninput = function(e){ bankSearch = e.target.value; clearTimeout(t); t = setTimeout(function(){ if(!document.body.contains(list)) return; if(!searched && bankSearch.trim()){ searched = 1; track('search'); } bankShown = BANK_PAGE; draw(); }, 180); };
   body.querySelectorAll('[data-qorder]').forEach(function(b){ b.onclick = function(){
     STATE.ui.qorder = b.getAttribute('data-qorder'); saveState(); order = baseOrder(); renderBank.__shuf = STATE.ui.qorder === 'random' ? order : null; bankShown = BANK_PAGE;
     body.querySelectorAll('[data-qorder]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    if(window.shTrack) window.shTrack('bank:order=' + STATE.ui.qorder); draw();
+    track('order=' + STATE.ui.qorder); draw();
   }; });
-  document.getElementById('fPinned').onclick = function(){ STATE.ui.qstatus = STATE.ui.qstatus === 'pinned' ? 'all' : 'pinned'; bankShown = BANK_PAGE; saveState(); renderBank(body); };
-  /* the count follows pins at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away mid-read */
-  /* pins that arrive from another device (detail.synced) redraw the Pinned view */
-  renderBank.__draw = draw;
-  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ var n = document.getElementById('fPinN'); if(!n) return; n.textContent = 'Pinned (' + e.detail.count + ')'; if(e.detail.synced && STATE.ui.qstatus === 'pinned') renderBank.__draw(); }); }
+  /* a tag under the panel takes its filter off; Clear all (and the empty state's button) take them all off. Both rebuild the
+     panel so its controls match. One listener per container (renderBank reuses it), so it only acts on the bank's own tags. */
+  if(!body.__qfWired){ body.__qfWired = 1; body.addEventListener('click', function(e){
+    var off = e.target.closest && e.target.closest('[data-qoff]'), clr = e.target.closest && e.target.closest('[data-qclear]');
+    if(!off && !clr) return;
+    var tk = function(k){ if(window.shTrack) window.shTrack('bank:' + k); };
+    if(clr){ tk(clr.classList.contains('qsum-clear') ? 'clear' : 'empty-clear'); bankResetFilters(); }
+    else { var k = off.getAttribute('data-qoff'); tk('tag-off=' + k);
+      if(k === 'lec') STATE.ui.qlec = 'all'; else if(k === 'st') STATE.ui.qstatus = 'all'; else if(k === 'fm') STATE.ui.qfmt = 'all'; else if(k === 'src') STATE.ui.qsrc = 'all'; else bankSearch = '';
+      bankShown = BANK_PAGE; saveState(); }
+    renderBank(body);
+  }); }
+  /* pins: the chip counts follow at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away
+     mid-read. Pins that arrive from another device (detail.synced) redraw the Pinned view. */
+  renderBank.__draw = draw; renderBank.__counts = counts;
+  if(!renderBank.__pinsWired){ renderBank.__pinsWired = 1; document.addEventListener('sh:pins', function(e){ if(!document.getElementById('qfBadge')) return; renderBank.__counts(); if(e.detail.synced && STATE.ui.qstatus === 'pinned') renderBank.__draw(); }); }
   document.getElementById('qMore').onclick = function(){ bankShown += BANK_PAGE; draw(); };
   draw();
 }
