@@ -138,6 +138,16 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-03 midday (lessons audit + Heme & Endo Exam 1 retrospective, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and key
+  positions: report #34 (`cb-pe`: each wrong choice named only one of the two variables, so the key was the only complete answer) now has
+  all four atomic-number / photon-energy combinations, each with its why; `cb-atten-z` had the same giveaway and gets the same treatment.
+  No notes text changed, so no narration rebuilt; `question_choices` rows before today for both ids refer to the old choices.
+  `tools/publish-recap.js`: the exam date it reads from `index.html` skipped exams after an `extraQs` list (Occlusion's final would have
+  been recapped as of the midterm) and took a reopened hub's `archiveOn` date as an exam (Heme & Endo as of 11-03); both fixed. The Heme &
+  Endo recap published 10-30 is unchanged (Sam reopened the hub for a late exam). `LESSONS.md`: Heme & Endo Exam 1 retrospective (the best
+  check-ins yet: 8 of 10 "About right", none "Exam asked different things"), the last refresh checked (MCQ fixes worked, two-statement
+  and true/false ones didn't), new Live signals. No schema change.
+
 - **2026-11-03 (perio S7 and S8 taught, true/false and numbered items, six diagrams, Claude Code)** — Sam: update perio with
   the new files in Drive (Periodontology/hubs, added Nov 2): `perio oct 29.txt` (the Oct 29 class capture of S7) and
   `D2 Implants in periodontally compromised patients 2026 updated.pdf` (**S7 is Dr. Kaur's**, not Dr. Carr's), plus Dr. Litz's
