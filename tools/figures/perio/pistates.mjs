@@ -41,23 +41,24 @@ function piDyn(v, t, D) {
   o += '<g class="hot" data-info="Alveolar bone. After loading, the crest remodels about 2 mm and levels off within about the first year: physiologic. Any loss beyond that line is pathologic, and that is what makes it peri-implantitis.">' + bone(-1) + bone(1) + "</g>";
   /* mucosa: margin rises and bulges with swelling */
   var marg = 118 - v.swell * 9, bulge = 22 + v.swell * 14;
-  var base = marg + v.pd * MM;
+  var base = marg + v.pd * MM, AB = 10; /* the abutment is AB px narrower than the implant on each side */
   function gum(side) {
-    var s = side < 0, xi = s ? X0 - 1 : X1 + 1, xo = s ? 48 : D.W - 48, d = s ? -1 : 1, top = s ? (X0 - 18) : xi;
-    var head = s ? "M" + top + " " + f(marg) : "M" + xi + " " + f(marg);
-    var tail = s ? "L" + xi + " " + f(base) + "Z" : "Z";
-    return '<path class="pi-gum" style="fill:color-mix(in srgb, var(--pd-red) ' + Math.round(v.red * 80) + '%, var(--pd-gum))" d="' + head + "C" + (top + d * bulge) + " " + f(marg - 4) + " " + (top + d * (bulge + 26)) + " " + f(marg + 14) + " " + (xi + d * 92) + " " + f(marg + 20) + "L" + xo + " " + f(marg + 26) + "V" + f(far + 2) + "C" + (s ? X0 - 70 : X1 + 70) + " " + f(far + 2) + " " + (s ? X0 - 26 : X1 + 26) + " " + f(crest + 2) + " " + xi + " " + f(crest + 2) + tail + '"/>';
+    var s = side < 0, xo = s ? 48 : D.W - 48, d = s ? -1 : 1, xi = s ? X0 - 1 : X1 + 1, xa = s ? X0 + AB - 1 : X1 - AB + 1;
+    var top = s ? X0 + AB - 18 : xa, inner;
+    if (s) inner = base < D.PLAT ? "L" + xi + " " + D.PLAT + "L" + xa + " " + D.PLAT + "L" + xa + " " + f(base) + "Z" : "L" + xi + " " + f(base) + "Z";
+    else inner = "L" + xi + " " + D.PLAT + "L" + xa + " " + D.PLAT + "Z";
+    return '<path class="pi-gum" style="fill:color-mix(in srgb, var(--pd-red) ' + Math.round(v.red * 80) + '%, var(--pd-gum))" d="M' + top + " " + f(marg) + "C" + (top + d * bulge) + " " + f(marg - 4) + " " + (xi + d * (bulge + 26)) + " " + f(marg + 14) + " " + (xi + d * 92) + " " + f(marg + 20) + "L" + xo + " " + f(marg + 26) + "V" + f(far + 2) + "C" + (s ? X0 - 70 : X1 + 70) + " " + f(far + 2) + " " + (s ? X0 - 26 : X1 + 26) + " " + f(crest + 2) + " " + xi + " " + f(crest + 2) + inner + '"/>';
   }
   o += '<g class="hot" data-info="Peri-implant mucosa. Health: no change in color, no edema, no redness. Inflamed (mucositis, peri-implantitis): red and swollen, and the extra volume alone makes the pocket probe deeper.">' + gum(-1) + gum(1) + "</g>";
   /* probe in the sulcus on the left side, tip at the base of the sulcus */
-  var tip = base, px = X0 - 4, sx = X0 - 58, sy = 8;
+  var tip = base, px = base < D.PLAT ? X0 + AB - 3 : X0 - 4, sx = X0 - 50, sy = 8;
   o += '<g class="hot" data-info="Plastic implant probe, light force (about 0.25 N). Compare each reading with this implant\'s baseline: a depth only grows from measurement error, swelling, or true bone loss."><path class="pi-probe" d="M' + sx + " " + sy + "L" + px + " " + f(tip) + '"/>';
   for (var k = 1; k <= 12; k++) { var yy = tip - k * MM; if (yy < 20) break; var xx = px - (tip - yy) * (px - sx) / (tip - sy); if (k % 3 === 0) o += '<path class="pi-mark" d="M' + f(xx - 4) + " " + f(yy) + "H" + f(xx + 4) + '"/>'; }
   o += "</g>";
   o += '<path class="pi-lead" d="M' + (px - 3) + " " + f(tip) + "L" + (px - 96) + " " + f(tip + 40) + '"/><circle class="pi-dot" cx="' + px + '" cy="' + f(tip) + '" r="2"/><text class="pi-t pi-cl" x="' + (px - 100) + '" y="' + f(tip + 44) + '" text-anchor="end">PD ' + (Math.round(v.pd * 2) / 2) + " mm</text>";
   /* bleeding and suppuration at the margin */
-  if (v.bleed > .02) for (var b = 0; b < 4; b++) { var u = ((t / 1400 + b / 4) % 1), x = X0 - 12 - b * 8, y = marg - 3 + u * 26; o += '<path class="pi-blood" opacity="' + f(v.bleed * Math.min(1, (1 - u) * 3)) + '" d="M' + f(x) + " " + f(y - 5) + "Q" + f(x + 3.5) + " " + f(y) + " " + f(x) + " " + f(y + 3) + "Q" + f(x - 3.5) + " " + f(y) + " " + f(x) + " " + f(y - 5) + 'Z"/>'; }
-  if (v.pus > .02) o += '<g class="hot" data-info="Suppuration (pus): a sign of active disease. Whatever the long-term plan, it needs a response now: debride, and at a deep site perhaps a local antibiotic."><ellipse class="pi-pus" cx="' + (X1 + 14) + '" cy="' + f(marg - 2) + '" rx="' + f(6 * v.pus) + '" ry="' + f(4.5 * v.pus) + '"/></g>';
+  if (v.bleed > .02) for (var b = 0; b < 4; b++) { var u = ((t / 1400 + b / 4) % 1), x = X0 + 2 - b * 8, y = marg - 3 + u * 26; o += '<path class="pi-blood" opacity="' + f(v.bleed * Math.min(1, (1 - u) * 3)) + '" d="M' + f(x) + " " + f(y - 5) + "Q" + f(x + 3.5) + " " + f(y) + " " + f(x) + " " + f(y + 3) + "Q" + f(x - 3.5) + " " + f(y) + " " + f(x) + " " + f(y - 5) + 'Z"/>'; }
+  if (v.pus > .02) o += '<g class="hot" data-info="Suppuration (pus): a sign of active disease. Whatever the long-term plan, it needs a response now: debride, and at a deep site perhaps a local antibiotic."><ellipse class="pi-pus" cx="' + (X1 - 4) + '" cy="' + f(marg - 2) + '" rx="' + f(6 * v.pus) + '" ry="' + f(4.5 * v.pus) + '"/></g>';
   /* the line of initial remodeling, drawn over the tissue */
   o += '<path class="pi-remod" d="M48 ' + (D.PLAT + 2 * MM) + "H" + (D.W - 48) + '"/><text class="pi-t pi-small pi-halo" x="' + (D.W - 50) + '" y="' + (D.PLAT + 2 * MM - 5) + '" text-anchor="end">initial remodeling (~2 mm)</text>';
   /* bone loss bracket */
