@@ -3,5 +3,6 @@
     "allow": [
       "mcp__Supabase__apply_migration"
     ]
-  }
+  },
+  "autoCompactWindow": 500000
 }
