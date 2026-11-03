@@ -144,21 +144,34 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
   key over all four positions (the sort decides the position: pick the wrong combinations to move it).
 - False statements follow the true/false rule: change one taught detail, never a trick of wording. Draw them from the hub's notes.
 
-## Question Bank: lecture picker, order and pins (standing rule)
+## Question Bank: the filter panel, lecture picker, order and pins (standing rule)
 
-Sam's rule, 2026-10-30, for every live and future hub: the Question Bank's lecture filter is a **tick-box list** (`lecPickHTML()` /
-`wireLecPick()`, every lecture ticked by default, Select all / Clear), with an **In order / Random** toggle (`STATE.ui.qorder`; In order =
-by lecture, then bank order; Random shuffles once and keeps that order until Random is tapped again), and **pinned questions**: the hub
-sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card (`window.shPins`, saved in `sh_pins_<hub>`
-and synced across devices by `set_pins` / `get_my_pins` (migration_v46), `sh:pins` event), and the bank filters by it (a **Pinned (n)** button and "Pinned" in the status menu). `STATE.ui.qlec`
-may be `'all'`, one id or an array of ids. The bank opens with the filters and order used last time (saved in `STATE.ui`; Perio `STATE.ui.qbank`). Copy it all from `special-patient-care` (or `occlusion`, which adds final/midterm presets).
+Sam's rules, 2026-10-30 and 2026-11-03 ("refine the filtering ... people don't know how to use it"), for every live and future hub
+(not `heme-endo-exam1`: Sam said leave it as it is). The bank's filters are **one labeled panel** (`.qbar`), never a row of unlabeled
+dropdowns. Copy it from `special-patient-care` (or `occlusion`, which adds final/midterm presets; Perio has its own engine's copy):
+- **Lectures** (Perio: Sessions): a **tick-box list** (`lecPickHTML()` / `wireLecPick()`, every lecture ticked by default, All lectures /
+  Untick all) where **every row has an "Only" button** (one tap for one lecture; it closes the list). Beside it, the search box.
+- **Show**: chips for `STATE.ui.qstatus` (`BANK_SHOW`: All, **High likelihood**, Not answered yet, Missed last time, Pinned), each with
+  the number of questions it would give under the other filters (`bankFiltered(search, {st})`).
+- **Order**: **In order / Random** only (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
+  order until Random is tapped again). **No "Likely first"** (Sam, 2026-11-03): High likelihood is a filter, either those questions or the whole bank.
+- **More filters** (folded, with a "n on" badge): question type (`STATE.ui.qfmt`, only the formats the bank has, each with its count) and
+  where it's from (`STATE.ui.qsrc`).
+- Under the panel, `.qsum` says "Showing n of N questions" with a **removable tag for every filter that's on** and **Clear all**; when
+  nothing matches it names the filter in the way and offers "Show all N questions". The bank opens with the filters and order used last
+  time (saved in `STATE.ui`; Perio `STATE.ui.qbank`), which is why the tags matter: a saved filter is never hidden.
+- Filter changes are tracked (`bank:show=`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:tag-off=`, `bank:clear`, `bank:more`,
+  `bank:search`, `bank:order=`), since `widget/clicks.js` doesn't see `<select>` changes.
+- **Pinned questions**: the hub sets `window.SH_PINS = true`, the shared widget then adds a Pin button beside Report on every card
+  (`window.shPins`, saved in `sh_pins_<hub>` and synced across devices by `set_pins` / `get_my_pins` (migration_v46), `sh:pins` event,
+  which refreshes the chip counts). `STATE.ui.qlec` may be `'all'`, one id or an array of ids.
 
 **High Likelihood Exam Questions** (Sam's rule, 2026-10-30, every live and future hub; first in `heme-endo-exam1`): `LIKELY_TOPICS`
 (`{lec, t, basis, ids}`) lists each lecture's predicted exam topics, strongest evidence first: what a professor flagged in a recording
 (`hint`), an in-class review or focus list, the class exam-review guide, what check-ins said the exam asked, then the core of the
 slides / lecture / module / reading. When the exam's count per lecture is announced, put it in `EXAM_COUNTS` and give each lecture that
-many topics. The listed questions get `q.likely`: `likelyChip()` tags them in the bank and the drill (not the mock); the bank has a
-**Likely first** order and a **High likelihood only** status; Exam Hints opens with `likelyHTML()` ("Most likely questions", a
+many topics. The listed questions get `q.likely`: `likelyChip()` tags them in the bank and the drill (not the mock); the bank's
+**High likelihood** chip shows only those (no "Likely first" order since 2026-11-03); Exam Hints opens with `likelyHTML()` ("Most likely questions", a
 Practice these button per lecture). Never base a topic on a graded quiz or a previous year's exam (graded-coursework rule below).
 **Adding a lecture to an existing hub (or taking one from slides-only to taught) always includes its `LIKELY_TOPICS`
 entries**, ranked with the rest; when new hints, reviews or focus lists arrive, re-rank them. CI fails a lecture with questions
