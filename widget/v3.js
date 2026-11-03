@@ -2477,7 +2477,7 @@
     document.head.appendChild(drillScript);
   }
   /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
-     archiveHour overrides it, e.g. 24 for one due at 11:59 pm);
+     archiveHour overrides it, e.g. 24 for one due at 11:59 pm; SH_EXPORT.archiveOn can override the date for a temporary reopen);
      a hub page still reachable after that says so once per visit, with a way back to the dashboard. */
   (function(){
     if (EXPORT_ONLY) return;
@@ -2487,6 +2487,14 @@
       var d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22);
       if (!last || d > last.at) last = { at: d, x: x };
     });
+    var archiveOn = window.SH_EXPORT && window.SH_EXPORT.archiveOn;
+    if (archiveOn && archiveOn.date){
+      var p = String(archiveOn.date).split("-").map(Number);
+      if (p.length === 3 && p[0]){
+        var d = new Date(p[0], p[1] - 1, p[2], archiveOn.hour != null ? archiveOn.hour : 22);
+        if (!last || d > last.at) last = { at: d, x: last && last.x ? last.x : { label:"exam" } };
+      }
+    }
     if (!last || new Date() < last.at) return;
     try { if (sessionStorage.getItem("sh_archived_seen_" + HUB)) return; sessionStorage.setItem("sh_archived_seen_" + HUB, "1"); } catch (e) {}
     function show(){

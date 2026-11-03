@@ -777,6 +777,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:9, promptHour:9 } ], updated:"2026-10-27",
       desc:"Lectures 1-10: endocrine histology, the hypothalamus and pituitary, growth, thyroid, the endocrine pancreas, the adrenal gland, corticosteroid and thyroid drugs, and calcium and phosphate. Its own home page with your countdown and progress by lecture, notes in two reading levels with narration, two-statement, true/false and numbered-statement questions, exam hints from the recordings, a 55-question mock and the Feedback Loop Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"endo1-state-v1",
+      archiveOn:{ date:"2026-11-03", hour:22 },
       podcast:{ name:"Timmy Time", sub:"The last-minute review, 53 min" } },
     { id:"msk-exam4", cls:"gi", title:"Musculoskeletal Exam 4 Hub", code:"GI & MSK · Exam 4",
       exams:[ { name:"Musculoskeletal Exam 4", label:"Exam", date:"2026-10-16", checkinClosed:true } ], updated:"2026-10-08", hideCardOn:"2026-10-21",
@@ -808,6 +809,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   /* Archiving is automatic: a hub in HUBS turns into an archived card (no Open button) at ARCHIVE_HOUR on the day
      of its last exam (that exam's archiveHour overrides it; 24 = midnight after, for an exam due at 11:59 pm; give the hub's
      SH_EXPORT.exams entry the same archiveHour so its "archived" notice agrees), and that card is removed CARD_DAYS later (hideCardOn:'YYYY-MM-DD' overrides the removal day).
+     A hub-level archiveOn:{date,hour} overrides that cutoff without moving exam or check-in dates; mirror it in SH_EXPORT.archiveOn.
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
@@ -820,7 +822,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   ];
   function examAt(x, hour){ var d = parseYmd(x.date); d.setHours(hour, 0, 0, 0); return d; }
   function lastExam(hub){ return (hub.exams || []).filter(function(x){ return x.date; }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null; }
-  function archiveAt(hub){ var x = lastExam(hub); return x ? examAt(x, x.archiveHour != null ? x.archiveHour : ARCHIVE_HOUR) : null; }
+  function archiveAt(hub){
+    if (hub.archiveOn && hub.archiveOn.date){ var d = parseYmd(hub.archiveOn.date); d.setHours(hub.archiveOn.hour != null ? hub.archiveOn.hour : ARCHIVE_HOUR, 0, 0, 0); return d; }
+    var x = lastExam(hub); return x ? examAt(x, x.archiveHour != null ? x.archiveHour : ARCHIVE_HOUR) : null;
+  }
   function cardGoneAt(hub){
     if (hub.hideCardOn) return parseYmd(hub.hideCardOn);
     var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;
