@@ -792,7 +792,7 @@
   /* a small Report button on every question card; it opens the flag panel already
      tagged with that question's id, so reports arrive with context */
   var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
-  var pendingFlagQid = null;
+  var pendingFlagQid = null, pendingFlagLec = null;
   function addFlagButton(card){
     if (card.__shFlagBtn) return; card.__shFlagBtn = true;
     var qid = card.getAttribute("data-qid"); if (!qid) return;
@@ -2144,10 +2144,13 @@
     updateSheetState();
   });
 
+  /* qid is a question id, or { lec, label } for a lecture's notes (the Report button under each lecture's notes) */
   function setFlagContext(qid){
-    pendingFlagQid = qid || null;
+    pendingFlagLec = qid && typeof qid === "object" ? qid : null;
+    pendingFlagQid = pendingFlagLec ? null : (qid || null);
     var ctx = document.getElementById("shstat-flag-ctx");
     if (!ctx) return;
+    if (pendingFlagLec) { ctx.textContent = "About the notes for " + (pendingFlagLec.label || pendingFlagLec.lec); return; }
     if (!qid) { ctx.textContent = ""; return; }
     var meta = findQuestionMeta(qid), t = meta.text || "";
     ctx.textContent = "About question " + qid + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
@@ -2182,6 +2185,7 @@
     /* where the student was, so the report can be found: [question id] and the current section */
     var where = [];
     if (pendingFlagQid) where.push("question " + pendingFlagQid);
+    if (pendingFlagLec) where.push("lecture notes " + (pendingFlagLec.label ? pendingFlagLec.label + " (" + pendingFlagLec.lec + ")" : pendingFlagLec.lec));
     var sec = currentSection(); if (sec) where.push(sec);
     var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);
     supabase.from("question_flags").insert({ hub: HUB, note: note, visitor_id: VISITOR_ID }).then(function(res){
@@ -2509,6 +2513,121 @@
       document.body.appendChild(box);
     }
     if (document.body) show(); else document.addEventListener("DOMContentLoaded", show);
+  })();
+  /* ---------- lecture notes: a lecture list that scrolls on its own, Previous / Next and Report under each lecture's notes,
+     and drawn figures that fit on screen with their controls (Sam, 2026-11-03). Works on any hub whose notes are a
+     .notes-layout with a .lec-nav of buttons (the active one .is-active or aria-current="true") and an article.reading.
+     The hub's own nav buttons do the switching: Previous / Next just click them.
+     --sh-head-h (the sticky top bar) and --sh-vh (the screen height in the page's zoomed px; the text-size setting zooms
+     <html>, where 100vh overshoots) let v3.css size the list and the figures. ---------- */
+  if (!EXPORT_ONLY) (function(){
+    var root = document.documentElement;
+    function zoom(){ try { return parseFloat(getComputedStyle(root).zoom) || parseFloat(root.style.zoom) || 1; } catch (e) { return 1; } }
+    function headH(){ var h = document.querySelector("header.hub-header, .hub-header"); return h ? h.offsetHeight : 0; }
+    function fit(){
+      root.style.setProperty("--sh-vh", (window.innerHeight / zoom()) + "px");
+      root.style.setProperty("--sh-head-h", headH() + "px");
+      fitFigs();
+    }
+    function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+    function navBtns(nav){ return Array.prototype.slice.call(nav.querySelectorAll("button")).filter(function(b){ return !b.closest(".sh-lec-pager"); }); }
+    function isCur(b){ return b.classList.contains("is-active") || b.getAttribute("aria-current") === "true"; }
+    function lecId(b){ return b.getAttribute("data-lec") || b.getAttribute("data-goto-lecture") || b.getAttribute("data-id") || ""; }
+    function info(b){
+      var num = b.querySelector(".lec-num, .snum"), t = b.querySelector(".t");
+      var n = num ? num.textContent.trim() : "", title = t ? t.textContent.trim() : b.textContent.trim();
+      return { id: lecId(b), num: n, title: title, label: (n ? n + " · " : "") + title };
+    }
+    var FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>';
+    function side(dir, x){
+      return '<button type="button" class="sh-lec-pg sh-lec-pg-' + dir + '" data-sh-pager="' + dir + '">' +
+        '<span class="sh-lec-pg-k">' + (dir === "prev" ? "&larr; Previous" : "Next &rarr;") + '</span>' +
+        '<span class="sh-lec-pg-t">' + esc(x.label) + '</span></button>';
+    }
+    function go(lay, i){
+      var b = navBtns(lay.querySelector(".lec-nav"))[i]; if (!b) return;
+      b.click();
+      setTimeout(function(){
+        var nl = document.querySelector(".notes-layout"); if (!nl) return;
+        var top = nl.getBoundingClientRect().top + window.pageYOffset - headH() - 10;
+        window.scrollTo(0, Math.max(0, top));
+      }, 40);
+    }
+    function decorate(lay){
+      var nav = lay.querySelector(":scope > .lec-nav"), art = lay.querySelector("article.reading");
+      if (!nav || !art) return;
+      var btns = navBtns(nav), cur = -1;
+      btns.forEach(function(b, i){ if (cur < 0 && isCur(b)) cur = i; });
+      if (cur < 0) return;
+      /* keep the open lecture in view in the list (down the side on wide screens, across the top on phones) */
+      if (!nav.__shSeen) {
+        nav.__shSeen = 1;
+        var b = btns[cur], nr = nav.getBoundingClientRect(), br = b.getBoundingClientRect();
+        if (nav.scrollHeight > nav.clientHeight + 2 && (br.bottom > nr.bottom || br.top < nr.top)) nav.scrollTop += br.top - nr.top - nav.clientHeight / 2 + br.height / 2;
+        if (nav.scrollWidth > nav.clientWidth + 2 && (br.right > nr.right || br.left < nr.left)) nav.scrollLeft += br.left - nr.left - 12;
+      }
+      if (art.querySelector(":scope > .sh-lec-pager")) return;
+      var me = info(btns[cur]), prev = btns[cur - 1], next = btns[cur + 1];
+      var bar = document.createElement("nav");
+      bar.className = "sh-lec-pager"; bar.setAttribute("aria-label", "Other lectures"); bar.setAttribute("data-sh-noread", "");
+      bar.innerHTML = (prev ? side("prev", info(prev)) : '<span class="sh-lec-pg-gap"></span>') +
+        '<button type="button" class="sh-lec-flag" data-sh-lecflag="1" title="Something wrong or confusing in these notes? Tell us.">' + FLAG + '<span>Report a problem with these notes</span></button>' +
+        (next ? side("next", info(next)) : '<span class="sh-lec-pg-gap"></span>');
+      bar.addEventListener("click", function(e){
+        var t = e.target.closest("button"); if (!t) return;
+        if (t.hasAttribute("data-sh-lecflag")) {
+          if (window.shTrack) window.shTrack("notes:report");
+          if (window.shOpenFlag) window.shOpenFlag({ lec: me.id, label: me.label });
+          return;
+        }
+        var dir = t.getAttribute("data-sh-pager");
+        if (window.shTrack) window.shTrack("notes:" + dir);
+        go(lay, dir === "prev" ? cur - 1 : cur + 1);
+      });
+      art.appendChild(bar);
+    }
+    /* A drawn figure with controls (.anima: figure.iso-figure, then .am-controls and readouts) stays pinned under the top bar
+       while its controls and explanation scroll up beside it, so the picture and what you change are on screen together.
+       Only on wide screens, only when the picture fits in about 70% of the screen (v3.css caps the drawing's height). */
+    function fitFigs(){
+      var wide = window.matchMedia("(min-width: 861px)").matches;
+      var room = window.innerHeight / zoom() - headH();
+      document.querySelectorAll(".anima").forEach(function(a){
+        var figs = a.querySelectorAll(":scope > figure.iso-figure"), ctl = a.querySelector(":scope > .am-controls");
+        var f = figs.length === 1 && ctl ? figs[0] : null;
+        a.querySelectorAll(":scope > figure.sh-fig-pin").forEach(function(x){ if (x !== f) x.classList.remove("sh-fig-pin"); });
+        if (!f) return;
+        f.classList.remove("sh-fig-pin");
+        var ok = wide && f.offsetHeight > 0 && f.offsetHeight <= room * 0.7 && a.offsetHeight > f.offsetHeight + 60;
+        f.classList.toggle("sh-fig-pin", ok);
+      });
+    }
+    var queued = false, lastFigs = [];
+    function scan(){
+      queued = false;
+      document.querySelectorAll(".notes-layout").forEach(decorate);
+      /* re-measure figures only when the set on the page changed (the page changes a lot: clocks, timers, animations) */
+      var figs = Array.prototype.slice.call(document.querySelectorAll(".anima"));
+      if (figs.length !== lastFigs.length || figs.some(function(f, i){ return f !== lastFigs[i]; })) { lastFigs = figs; fitFigs(); }
+    }
+    function queue(){ if (!queued) { queued = true; requestAnimationFrame(scan); } }
+    function start(){
+      fit(); scan();
+      new MutationObserver(function(muts){
+        for (var i = 0; i < muts.length; i++) {
+          var t = muts[i].target;
+          if (t.nodeType === 1 && t.closest && t.closest(".sh-lec-pager")) continue;
+          queue(); return;
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+      window.addEventListener("resize", fit);
+      /* a tab or mode switch can show figures that were already on the page, hidden */
+      document.addEventListener("click", function(){ setTimeout(fitFigs, 80); }, true);
+      var h = document.querySelector("header.hub-header, .hub-header");
+      if (h && window.ResizeObserver) new ResizeObserver(fit).observe(h);
+      document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
+    }
+    if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
   if (!EXPORT_ONLY && supabase) {
