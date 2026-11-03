@@ -5,7 +5,7 @@ description: Make a Timmy Time episode for a study hub, end to end. Timmy Tooth 
 
 # Timmy Time: make an episode
 
-Read first: `CLAUDE.md` (the graded-coursework rules apply to scripts too), `tools/podcast/README.md` (how the tooling
+Read first: `vault/rules/graded-coursework.md` (it applies to scripts too), the hub's note in `vault/hubs/`, `tools/podcast/README.md` (how the tooling
 works and how to write for Kokoro), `tools/podcast/LORE.md` (the canon), and the most recent `tools/podcast/*/script.md`
 as the model for voice and pacing. The argument, if any, names the hub (`/podcast heme-endo-exam1`); otherwise take the
 live hub with the next exam from `HUBS` in `index.html`, and say which.
@@ -20,7 +20,7 @@ live hub with the next exam from `HUBS` in `index.html`, and say which.
   - **Lore** (multiSelect): offer 3-4 short tidbits that tie Timmy to this hub's material (a disease his neighbor thinks
     he has, a fact about teeth that fits a lecture, the current holiday) and continue `LORE.md`. Never contradict it,
     and never contradict what `widget/pet.js` shows (outfits, the house, the scared face after TIMMY).
-- Start the Kokoro setup in the background now (`CLAUDE.md`, "Text and audio must never drift": pip install, then
+- Start the Kokoro setup in the background now (`vault/how-to/narrate-with-kokoro.md`: pip install, then
   `gh release download` or the curl fallback into `/tmp/kokoro`); ffmpeg is preinstalled.
 
 ## 1. Gather the material

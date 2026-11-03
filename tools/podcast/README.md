@@ -19,7 +19,7 @@ The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.clau
 
 ```bash
 pip install kokoro-onnx soundfile scipy         # plus ffmpeg on PATH
-# Kokoro model in /tmp/kokoro (see CLAUDE.md, "Text and audio must never drift")
+# Kokoro model in /tmp/kokoro (see vault/how-to/narrate-with-kokoro.md)
 node tools/podcast/extract_hub.js hubs/msk-exam4/index.html /tmp/src                   # the material to write from
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --words        # hard words + heteronyms
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # every paragraph's phonemes
@@ -52,4 +52,4 @@ Stems are cached: after editing one segment, re-render it with `--only N --force
   from the lexicon (`prolactin-releasing`): drop the hyphen or add the compound.
 - `--words` also prints every sentence with a heteronym in it: "close" (verb or adjective), "use" (verb or noun),
   "live", "read". Reword when espeak picks the wrong one ("shut", "have closed", "bind").
-- Content follows the hub's own notes and exam hints. Graded-course-work rules in `CLAUDE.md` apply here too.
+- Content follows the hub's own notes and exam hints. The graded-coursework rules (`vault/rules/graded-coursework.md`) apply here too.

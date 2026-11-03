@@ -89,7 +89,7 @@ so say in the retro how many there were and that later ones go into the next aud
    question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
 4. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
-   work itself (see `CLAUDE.md`); list them for Sam if they aren't done.
+   work itself (see `vault/reference/repo-map.md` and `vault/rules/archiving-is-a-retrospective.md`); list them for Sam if they aren't done.
 
 ## 3. Read every hard question yourself
 
@@ -105,7 +105,7 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 ## 4. Edit safely
 
 - Explanations and grading only, unless a report or the data clearly calls for more. **Never** change reading text
-  without regenerating its narration in the same PR (`CLAUDE.md`, "Text and audio must never drift").
+  without regenerating its narration in the same PR (`vault/rules/text-and-audio-never-drift.md`).
 - Check the string's quote style before adding text: MSK `mcq(...)` explanations are **single-quoted** (no
   apostrophes: write "cannot", not "can't"); perio question objects use double quotes for `ex`.
 - Keep ids and answer positions. `node tools/ci/syntax.js` after each batch.
