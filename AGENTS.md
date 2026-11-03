@@ -37,7 +37,7 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
   push here too: fetch and rebase before you push), open a pull request into `main` (a draft is fine), and Sam merges.
   Claude Code cloud sessions push their own `claude/...` branch.
 - **Boards hub work** (INBDE + ADEX) is the exception: it lives on the `claude/boards-hub` branch with its own briefs
-  under `docs/boards/` there. Branch from it and open the PR into it.
+  under `docs/boards/` there. Branch from it and open the PR into it. Its rules: [vault/hubs/boards.md](vault/hubs/boards.md).
 - **Before the PR:** `node tools/ci/syntax.js` and `node tools/ci/vault.js`; `node tools/ci/smoke.js` too if you have
   Playwright (CI runs all three on every PR). Details: [vault/how-to/verify-before-pushing.md](vault/how-to/verify-before-pushing.md).
 - **The PR description** says what changed in plain, student-facing words, what you ran and what passed, and anything

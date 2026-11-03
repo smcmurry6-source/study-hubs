@@ -72,6 +72,9 @@ Archived (page still up)
   [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) · [MSK Exam 3](hubs/msk-exam3.md)
 - Removed earlier (no folder, labels only): GI Exam 1 (`gi-exam1`), GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 
+Being built on its own branch
+- [Boards (INBDE + ADEX)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.
+
 Which hubs are live, and every exam date, comes from `HUBS` in `index.html`: if this list disagrees, the code is right
 and this list needs fixing. A new hub gets a note from [the hub template](templates/hub.md).
 

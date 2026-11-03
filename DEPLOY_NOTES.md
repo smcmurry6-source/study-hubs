@@ -37,9 +37,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `AGENTS.md` at the root is the entry point for every agent (Claude Code loads it through `CLAUDE.md`). New `vault/`:
   `home.md` (the map), `rules/` (every standing rule as its own note: the `CLAUDE.md` sections and this file's rule
   sections, moved word for word, plus new `repo-is-the-vault` and `american-english`), `how-to/`, `reference/`, a note per
-  hub folder (`hubs/`: sources, build steps, quirks, diagram calls, pending work), `decisions.md` (Sam's calls, started from
-  this log), `tasks/` (one note per task with a status, an inbox, `done/`; five open or waiting tasks written from this log:
-  Occlusion L7 diagrams and final time/format, perio S6, S8 host modulation, S9) and `templates/`. `CLAUDE.md` is now short
+  hub (`hubs/`: sources, build steps, quirks, diagram calls, pending work; `boards` for the hub on its own branch),
+  `decisions.md` (Sam's calls, started from this log), `tasks/` (one note per task with a status, an inbox, `done/`; six open or waiting tasks written from this log:
+  Occlusion L7 diagrams and final time/format, perio S6, S8 host modulation, S9, and merging `main` into
+  `claude/boards-hub`, whose own older `AGENTS.md` will conflict with the new one) and `templates/`. `CLAUDE.md` is now short
   and `@`-imports `AGENTS.md`, this file and every rule, how-to and reference note, so Claude Code sessions load the same
   rules as before. This file's opening sections became the redirect table above. Notes link with relative markdown links
   (GitHub, Obsidian and agents all follow them); `.obsidian/app.json` sets that up for opening the repo root in Obsidian.
