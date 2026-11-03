@@ -6755,7 +6755,7 @@ function renderLectureNotes(){
     '<div class="reading-prose">' + ((level === 'plain' ? READINGS_PLAIN[l.id] : READINGS[l.id]) || '<p>Notes coming soon.</p>') + '</div>' + figsHTML(l.id) +
     '<div class="reading-foot"><button type="button" class="btn primary" data-practice="'+l.id+'">'+icon('bank')+'Practice S'+l.num+' questions ('+p.total+')</button>' +
     '<button type="button" class="btn" data-drill="'+l.id+'">'+icon('target')+'Drill what you haven\'t mastered</button>' +
-    (next ? '<button type="button" class="btn ghost" data-goto-lecture="'+next.id+'" style="margin-left:auto">Next: S'+next.num+' '+escHtml(shortTitle(next))+icon('arrowR')+'</button>' : '') + '</div></article>';
+    '</div></article>'; /* Previous / Next and Report come from the shared widget (v3.js, .sh-lec-pager) */
   var mm = MINDMAPS[l.id] ? '<div class="card mm-card"><div class="mm-card-head"><div><h4>'+icon('tree')+' Mind map</h4><p class="faint" style="margin:0;font-size:.86rem">How this session\'s ideas connect, at a glance.</p></div><button type="button" class="btn sm" id="sh-mmap-toggle" data-mmap-open="0">Show mind map</button></div><div id="sh-mmap-container" style="display:none;margin-top:14px"></div></div>' : '';
   content().innerHTML = '<div class="notes-layout">' + nav + '<div style="min-width:0">' + reading + mm + '</div></div>';
   ANIMA.mount(content());

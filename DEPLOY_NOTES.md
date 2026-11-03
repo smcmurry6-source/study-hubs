@@ -154,6 +154,22 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list
+  scrolled with the notes (Occlusion's list is 790 px tall, so on a 768 px laptop L7 was only reachable at the bottom of the notes),
+  there was no way to the next lecture from the end of the notes, interactive figures didn't fit on screen with their controls, and
+  each lecture needs a flag button. All in the shared widget, so every hub gets it: a "lecture notes" block in `widget/v3.js` sets
+  `--sh-head-h` (the sticky top bar's height) and `--sh-vh` (screen height divided by the text-size zoom) on `<html>`, and watches
+  for a `.notes-layout` with a `.lec-nav` and an `article.reading`. `widget/v3.css` (wide screens, 861 px+): the list sticks under
+  the top bar and scrolls on its own (`max-height` from those vars; the open lecture is scrolled into view, also across the top on
+  phones). Under each lecture's notes, `.sh-lec-pager`: Previous / Next (they click the hub's own nav buttons, then scroll to the
+  top of the notes) and **Report a problem with these notes**, which opens the Report panel with `shOpenFlag({lec, label})`; the
+  report lands in `question_flags` with "lecture notes L2 · Title (id)" in its note, so Inbox replies work as for questions. Perio's
+  own "Next:" button is gone (the pager replaces it). **Figures**: an anima drawing's height is capped to about 62% of the screen
+  (the SVG letterboxes), and a figure with one drawing and controls (`.anima > figure.iso-figure` + `.am-controls`) gets
+  `sh-fig-pin` (sticky under the top bar) when it fits in 70% of the screen, so the drawing stays put while its options and
+  explanation scroll under it. Tracked `notes:prev`, `notes:next`, `notes:report`. About page, `sw.js` -> `sh-v49`. No schema change.
+  **A new hub gets all of this by keeping that notes markup.**
+
 - **2026-11-03 (Question Bank filters redone in Occlusion, Perio, Special Patient Care and PCD Implants, Claude Code)** — Sam: "it
   doesn't seem like people know how to use it". The data: in Occlusion 66 people opened the bank and 2 ever opened the lecture
   picker; in PCD Implants 5 of the 8 who used it tapped Clear first just to get one lecture; select changes weren't tracked at all;
