@@ -138,6 +138,29 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-03 (perio S7 and S8 taught, true/false and numbered items, six diagrams, Claude Code)** — Sam: update perio with
+  the new files in Drive (Periodontology/hubs, added Nov 2): `perio oct 29.txt` (the Oct 29 class capture of S7) and
+  `D2 Implants in periodontally compromised patients 2026 updated.pdf` (**S7 is Dr. Kaur's**, not Dr. Carr's), plus Dr. Litz's
+  `Antibiotics in Periodontics recording_Dr. Litz_03252024.mp3` (a 2024 recording he gives every year; `litz antibiotics.txt` is its
+  transcript) and `Antibiotics and Host Modulation in Periodontics_Dr. Litz.pdf`. Both sessions go from `upcoming` to `taught`
+  (S8 carries a `note`: host modulation comes from the slides until its class part is posted). Both reading levels rewritten for
+  both, and all four mp3s regenerated. **Engine**: perio gets Occlusion's `two()`, `tf()` and `nums()` (plus `mq()`/`mm()`,
+  which build an item from [choice, why] pairs); `choiceOrder()` keeps tf/numbered in order, `arcadeQ` skips them, and the bank's
+  type filter gains "True or false" and "Numbered statements". **Questions**: 68 S7 (`q7-L*`, `-M*`, `-E01`, `-P01..04` on the
+  #31 case and others, 5 two-statement `q7-S*`, 8 true/false `q7-T*`, 4 numbered `q7-N*`) and 73 S8 (`q8-L*`, `-M*`, `-E*`,
+  `-P01..04`, `q8-S*`, `q8-T*`, `q8-N*`), each choice with its why; bank 509 -> 650. **Fix**: the hub said ciprofloxacin is
+  absorbed better with food; the slides and recording say most rapidly 1 hour before or 2 hours after meals (`q8-04` reworded,
+  same id and key position; its `question_choices` rows before today mean the old wording; the antibiotics table and cram line
+  corrected). 25 exam hints quoted from the capture and the recording; `LIKELY_TOPICS` re-ranked for S7 (10) and S8 (10) from
+  those hints (Dr. Kaur's own end-of-class list: smoking, mucositis vs peri-implantitis, bone loss as the difference,
+  physiologic vs pathologic bone loss, risk assessment at every stage); Review (diagnoses, Meffert, risk factors, BOP and
+  radiographs; prescribing, the full antibiotics table with doses, local delivery, host modulation); cram, mind maps, 5 arcade
+  words. **Diagrams** (Sam approved all six): new `tools/figures/perio/` (copied from heme-endo's build: `build.mjs` fills the
+  hub's `anima:js`/`anima:css` markers, `--check`, `--preview`): peri-implant states, Meffert, BOP over 4 visits, the radiograph
+  schedule (S7), why a biofilm beats antibiotics, where each antibiotic acts (S8); under the notes (`FIG_BY_LEC`/`figsHTML`,
+  outside `.reading-prose`, `data-sh-noread`) and in Review. About page. No schema change.
+  **Perio Project: carry all of this into the split sources (the engine helpers, S7/S8 content, the figures and markers).**
+
 - **2026-11-03 (Occlusion L7: Malocclusion and Dysfunction, Claude Code)** — From the Drive Occlusion/Final folder (Occ Lec6 malocc slides + handout, `Occ oct29.txt`, the 10/29 lecture capture). New lecture `malocclusion` (L7, `exam:'final'`, tag `rose`, taught): notes at both levels and both mp3s (`audio/malocclusion-full.mp3`, `-plain.mp3`): the functional disturbance model, TMD (Bell's classification; muscles ~50%, joints ~35%; not orofacial pain), the five etiologies, orthopedic vs occlusal stability and its risk factors, interferences and the high crown, occlusal therapy (reversible vs irreversible, splints, the rule of thirds), trauma, mobility, wear and erosion patterns, NCCLs, stress, deep pain and bruxism. 145 questions (`mo-*`, `cs-mo-*` on 4 new Patient Box cases `mohigh`/`mobrux`/`moeros`/`momob`; 8 two-statement, 12 true/false (6 True), 6 numbered (keys 2/1/1/2 over the four positions), 5 EXCEPT, 2 select-all, 1 ordering, 1 matching; each with its why; correct answer longest in 33% of L7's MCQs), 17 exam hints quoted from the capture (one de-emphasized: the TMD classification list is the third-year course), 12 `LIKELY_TOPICS`, a Review tab, cram lines, 2 sort sets and a process. Where slides and recording differ (whether erosion facets match; how long a splint stops bruxism) the notes give both and no question turns on it. `MOCK_BLUEPRINT` = `{ instruments:20, malocclusion:20 }`; `EXAM_INFO`, `COURSE_DATES`, the hints banner, the mock intro and the dashboard card updated. Bank 526 -> 671. Diagram review: Sam approved all five candidates (the tolerance model, orthopedic vs occlusal stability, splint designs, the rule of thirds, an erosion pattern map); they ship in a follow-up PR. No schema change.
 
 - **2026-11-03 (new hub: PCD Implants Exam 1, with 11 interactive diagrams, Claude Code)** — `hubs/pcd-implants-exam1/` for
