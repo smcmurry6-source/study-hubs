@@ -7,7 +7,8 @@ description: Make a Timmy Time episode for a study hub, end to end. Timmy Tooth 
 
 Read first: `vault/rules/graded-coursework.md` (it applies to scripts too), the hub's note in `vault/hubs/`, `tools/podcast/README.md` (how the tooling
 works and how to write for Kokoro), `tools/podcast/LORE.md` (the canon), and the most recent `tools/podcast/*/script.md`
-as the model for voice and pacing. The argument, if any, names the hub (`/podcast heme-endo-exam1`); otherwise take the
+as the model for voice and pacing. Every rule in `vault/rules/` applies (`CLAUDE.md` loads them); where this skill and
+the vault disagree, the vault wins: follow it and fix this file. The argument, if any, names the hub (`/podcast heme-endo-exam1`); otherwise take the
 live hub with the next exam from `HUBS` in `index.html`, and say which.
 
 ## 0. Set up and ask
@@ -86,7 +87,9 @@ python tools/podcast/produce.py <scratch>/stems hubs/<hub>/audio/timmy-time.mp3 
 ```
 
 Run the render with `run_in_background` and keep working (wiring, About page); it reads the script once at the start,
-so after any later edit re-render just that segment with `--only N --force`, then run `produce.py` again. Check the
+so after any later edit re-render just that segment with `--only N --force`, then run `produce.py` again. Don't end your
+turn and leave it running unattended: an idle cloud machine is reclaimed and the job dies with it
+(`vault/how-to/narrate-with-kokoro.md`). Check the
 result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in order. Don't commit the json.
 
 ## 5. Wire it in
@@ -108,8 +111,8 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 
 ## 6. Verify
 
-- `node tools/ci/syntax.js` and the smoke test (`node tools/ci/smoke.js`, Playwright preinstalled: set
-  `PLAYWRIGHT_PATH` to the global module) both pass.
+- `node tools/ci/syntax.js`, `node tools/ci/vault.js` and the smoke test (`node tools/ci/smoke.js`, Playwright
+  preinstalled: set `PLAYWRIGHT_PATH` to the global module) all pass.
 - In Playwright on `file://.../hubs/<hub>/index.html#timmy`: the hub opens on the slot's mode, the episode card shows
   the title, length and chapters, the "Timmy Time" link scrolls to it, and pressing play loads the mp3 (check
   `audio.duration`). Screenshot it at 390 px and desktop for the PR.
@@ -118,6 +121,6 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 ## 7. Ship
 
 Commit the script, lexicon, mp3 (tens of MB is fine; never commit stems or the json), hub, dashboard, About page,
-LORE.md and DEPLOY_NOTES.md. Push, open a draft PR (student-facing summary, the length, the chapters, the lore added,
+LORE.md, the hub's vault note and DEPLOY_NOTES.md. Push, open a draft PR (student-facing summary, the length, the chapters, the lore added,
 the pronunciation fixes), subscribe to it, and fix CI until green. Merge only if Sam said to; otherwise Sam merges.
 After merge, log it to the site changelog if `ADMIN_SECRET` is set (`log_changelog`), or tell Sam.

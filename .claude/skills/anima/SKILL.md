@@ -5,6 +5,12 @@ description: Create crafted, accurate visualizations of anatomy, neurobiology, p
 
 # Anima
 
+> **In study-hubs, the house rules come first** (`vault/rules/diagram-review.md`, `vault/rules/diagrams-anima.md`).
+> They override this skill where the two differ: **never build a figure Sam hasn't approved**, one candidate at a time
+> (so ignore "build it without asking" below); draw from the hub's own lecture notes; build it in
+> `tools/figures/<hub-id>/` and paste it into the hub (nothing loads from `.claude/` at runtime); give Sam screenshots at
+> 390 px and in both themes in the PR. This box is a local addition (see `UPSTREAM.md`): keep it when updating.
+
 This skill makes visual explanations of biological structure and function. Show the real structure accurately and make its mechanism visible. Use literal anatomy for structures such as neurons, hearts, cells and organs; use a clearly identified mechanical metaphor for processes when it improves understanding (for example, a receptor and ligand as lock and key, or an ion channel as a gated valve). Never let a metaphor imply that it is the literal biology.
 
 Six biology examples ship with the skill. Open the closest one before you start. Every example is built with `node examples/<name>/build.mjs`, which writes a standalone HTML page next to the script; add `--light` for the light theme.

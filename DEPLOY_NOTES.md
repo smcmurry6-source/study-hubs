@@ -51,8 +51,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   vault, `AGENTS.md`, `CLAUDE.md` and `README.md` resolves, no `[[wikilinks]]`, every vault note has frontmatter, task
   notes have a valid status (done ones in `done/`), every rule note is listed in `vault/home.md` and imported by
   `CLAUDE.md`, and every hub folder has its note on the map. References to `CLAUDE.md` sections in the skills, `tools/`,
-  `LESSONS.md` and the CI messages now point at the notes; `/lessons-audit` drops the retired "carry into the split
-  sources" step. No site change.
+  `LESSONS.md` and the CI messages now point at the notes. The repo's skills, checked against the vault:
+  `/lessons-audit` drops the retired "carry into the split sources" step, keeps each edited question's why lines in
+  step and checks `vault/decisions.md` before proposing; `/podcast` and `/lessons-audit` run `vault.js` and write back
+  to the vault; the anima skill opens with a box saying the house rules override it (no figure without Sam's approval).
+  No site change.
   **Every agent: write back what you learn to the vault in the same PR** (task outcome, decisions, hub note, new rules).
 
 - **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list

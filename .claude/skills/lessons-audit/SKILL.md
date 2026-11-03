@@ -45,7 +45,7 @@ select json_build_object(
 ```
 
 Then: `python3 tools/lessons-join.py <scratch>/banks <saved stats file> [hub ...]` for accuracy by lecture, type and
-source, and the hardest questions with their favourite wrong answer.
+source, and the hardest questions with their favorite wrong answer.
 
 **Check-ins against study time** (who felt ready, and did the hub match the exam, next to how much each person used it):
 
@@ -97,7 +97,7 @@ so say in the retro how many there were and that later ones go into the next aud
 For each item under ~45% with 12+ tries, read the stem, choices, key and explanation from the dumped bank.
 
 - Rule out a bug first: wrong key, two defensible answers, duplicate answers in a matching item, grading by index.
-- If the favourite wrong answer isn't addressed in the explanation, that is the fix (it took `q2-03` from 30% to 61%).
+- If the favorite wrong answer isn't addressed in the explanation, that is the fix (it took `q2-03` from 30% to 61%).
 - Before writing a sentence, grep the hub's notes and review tables so the explanation agrees with what the hub
   teaches (numbers, ages, sites). Don't add facts the hub doesn't already state.
 - Long ordering (6+ steps) and many-option select-all items score low by design: say so, propose a split for Sam,
@@ -110,10 +110,12 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 - Check the string's quote style before adding text: MSK `mcq(...)` explanations are **single-quoted** (no
   apostrophes: write "cannot", not "can't"); perio question objects use double quotes for `ex`.
 - Keep ids and answer positions. `node tools/ci/syntax.js` after each batch.
+- A changed explanation, stem or choice also updates that question's "why each choice" lines, so they still agree
+  (`vault/rules/every-choice-gets-a-why.md`; in hubs with `QUESTION_WHY` it's that row, in `mq()` hubs the pairs).
 - The CI lint fails on a matching item that repeats an answer (unless that hub grades by text and the id is in
   `SAME_ANSWER_OK` in `tools/ci/smoke.js`) and lists 6+ step orderings and 7+ option select-alls as a heads-up; read
   that list each audit.
-- Test any behaviour change in a browser (Playwright, `tools/ci/smoke.js` style): answer it right and wrong.
+- Test any behavior change in a browser (Playwright, `tools/ci/smoke.js` style): answer it right and wrong.
 
 ## 5. Write it down
 
@@ -131,7 +133,8 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 - `node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js` (with `NODE_PATH=/opt/node22/lib/node_modules
   PLAYWRIGHT_PATH=/opt/node22/lib/node_modules/playwright`), then push and open a **draft** PR
   `Lessons refresh YYYY-MM-DD`: what changes for students; did the last refresh work; LESSONS.md highlights; report
-  verdicts; "For Sam".
+  verdicts; "For Sam". Before proposing anything, check `vault/decisions.md` and the hub's note: don't re-propose
+  what Sam already skipped or settled.
 - **Reports and suggestions**: give each open one a verdict and a draft reply in plain, kind words (never make the
   student feel silly). Don't resolve them yourself: resolving sends the reply, so Sam picks the wording.
 - Watch the PR until CI is green. Merge only when Sam says so. After merge, log a student-facing line per changed
