@@ -138,6 +138,36 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-03 (new hub: PCD Implants Exam 1, with 11 interactive diagrams, Claude Code)** — `hubs/pcd-implants-exam1/` for
+  PCD Implants Exam 1 (Fri Nov 6, Canvas 7:00 am-8:00 pm, 40 questions in one hour: 3 multiple-answer, 3 matching, the rest
+  MCQ). Nine lectures, all `status:'taught'`: L1 Evolution of Dental Implants (Dr. Mueninghoff), L2 Introduction and the
+  Implant-Tissue Interface, L3 Biomechanics, L5 Prefabricated Abutments (Dr. Chavali; L2's recording is an earlier year's run),
+  L4 Implant Terminology and L9 Guided vs Freehand (Dr. Chen), L6 Imaging for Implant Diagnosis and L7 CBCT 101 (Dr. Givan's
+  study guide and handouts), L8 Introduction to Implant Surgery (Dr. Geisinger). Sources (Drive, PCD Implants): the recordings
+  (transcribed in-session), slides and handouts, the course's hint list; a prior class's answers to the hint list and a
+  diagram-aids doc were used only as a checklist against the lectures. No graded quiz or previous years' exam content used.
+  Built on the Special Patient Care engine (Home first, why for every choice, lecture picker, pins, retries, sync, drill) with a new
+  palette ("Anodized": titanium blue-gray; Sora / Manrope / Red Hat Mono). 548 questions (src `rec` / `slides` / `hub`): 373 MCQ,
+  11 multiple-answer (`mm()`, a new helper: one `[choice, isCorrect, why]` per option), 11 matching, 46 two-statement, 77 true/false
+  (38 True), 30 numbered-statement; correct answer longest in 37% of MCQs; 5 picture questions name an old implant type from a
+  drawn radiograph (`FIGS` `ty-*`). Notes at two levels with Kokoro narration for all nine, 68 exam hints (the hint list plus
+  recording quotes), 53 `LIKELY_TOPICS` (263 questions tagged), cram sheet, Review (each lecture's note tables, a Side by side tab:
+  the space numbers that sound alike (Chavali's 5 mm on the casts vs the 7 mm from bone vs Geisinger's 7-8 / 7.5 mm), torque and
+  stability numbers, osseointegration definitions, health vs mucositis vs peri-implantitis), a 40-question / 60-minute mock (MCQ
+  only, `MOCK_BLUEPRINT` 3/6/5/9/3/4/3/5/2; no official counts per lecture). **11 anima figures** (Sam: "Yes to all animations and
+  figures"; `tools/figures/pcd-implants-exam1/`, one generic live controller `amLive` in `shared.mjs`, `build.mjs --check`,
+  `--preview`): tooth vs implant attachment, one- vs two-stage, Misch D1-D4, cantilever (25 lb -> 75/50 lb), ideal position
+  (papilla and black triangle under 3 mm), connections / platform switching / microgap, the stability dip, the E/B/C zones,
+  screw vs cement (the 5 mm rule), CBCT beam and detector, freehand vs pilot vs fully guided vs dynamic; placed in the notes
+  (`FIG_PLACE`, both levels) and Review (`figs` sections). Arcade: the **Osseo Arcade** (`IMPL_SKIN`, `[data-sg-skin="impl"]`, drawn
+  implant lab: CBCT unit, light box, planning computer, order form, kit drawer; the scan template's gutta-percha markers show the
+  last digit): Osseo Sort, Platform Showdown (Torque Check, Final Torque), Implant Lab Escape, Mind the Microgap, The Golden Fixture,
+  Cross-Slice. Dashboard `HUBS` (`checkinHour:20, promptHour:20`: the window closes at 8 pm), new class `implants` on the `pros`
+  ring, `ARCADES`, `HUB_LABEL`/`HUB_RING`; `review/` and `tools/publish-recap.js` labels; `widget/ranks.js` name and medal (an
+  implant emblem); `sw.js` -> `sh-v48`; About page (Home, pick/pins lists, Diagrams, arcade table). `LESSONS.md` refreshed first
+  (steps 1-3). The build sources stay in the session (the hub is a single file: edit it directly, but edit the figures in
+  `tools/figures/pcd-implants-exam1/` and rerun its `build.mjs`). No schema change.
+
 - **2026-10-30 (pins sync across devices; the bank remembers its filters, Claude Code)** — Sam: pins should follow you, and hubs
   should open the bank with the filter you used last. `migration_v46.sql`: `question_pins` (visitor, hub, qid, pinned, t = the
   device's change time in ms; an unpin is kept so it beats an older pin), public `set_pins(p_visitor, p_hub, p_pins)` and

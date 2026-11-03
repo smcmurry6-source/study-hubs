@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-10-29** (second audit of the day, 4 pm Central, Heme/Endo Exam 1 eve; the exam is Fri Oct 30, 8 am). Sam runs
+**Last refreshed: 2026-11-03** (steps 1-3 only, before building the PCD Implants Exam 1 hub; Heme/Endo Exam 1 was Fri Oct 30, its full retrospective is still to do). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -78,37 +78,21 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-10-29, 4 pm Central (Heme/Endo Exam 1 eve; the exam is Fri 10-30, 8:00 am).** "Since" = this morning's 4 am audit. No new
-reports, suggestions, check-ins, survey answers or searches, and **no report is open**. Nothing newly archived. Live hubs:
-Heme/Endo Exam 1, Occlusion (final 11-19), perio (final 11-19), Special Patient Care (window 11-6 to 11-13; no use yet).
+**2026-11-03 morning (before building the PCD Implants Exam 1 hub; steps 1-3 only).** "Since" = 10-29 4 pm. Live hubs: Occlusion
+(final 11-19), perio (final 11-19), Special Patient Care (window 11-6 to 11-13), and Heme/Endo Exam 1, which passed on 10-30 and was
+temporarily reopened (85c1e1c). **Its retrospective and recap are still to do** (next full `/lessons-audit`).
 
-**Heme/Endo, eve so far (to 4 pm):** 59 people and 70 h today (10-28: 61 people, 98 h for the whole day), 8 of them first-time
-visitors; bank 44 h / 48 people, notes 17 h / 34, Home 19, mock 5, drill 4, Weak Spots 4, cram 5, hints 4, Timmy Time 2. 4,946 answers
-from 46 people at 80%. 4 mocks from 3 people today at 85% (the four before: 31-51 of 55, 78%). Bank as a whole: 14,816 tries; by lecture
-78% (Pancreas, Adrenal, Growth) to 85% (Histology 2); **L6-L10 still at 11-13 tries per question against 37-48 for L1-L2**. "Try it
-again" showed 935 retries today, 80% right. The High-likelihood sort: 7 people sorted by it today, 6 used "only". The professors'
-focus-list items (`gr-f-*`, `th-f-*`, added 10-29) got 10-21 tries each at 65-100% (84% overall): none is hard. **First device links
-made**: `link:linked` 2 people today (15 links all time); the 10-28 streamlined prompt itself was shown to 1 person and got a "Yes".
-Plaque boss docked: 51 people met one today, 4 hid it (1 turned bosses off in Settings).
+**Student voice:** one report (#33, `h2-r-origin`, already resolved: choices now read as full sentences, #202); no suggestions; **no
+open reports**. 9 Heme/Endo check-ins: went better than expected 6, about as expected 2, worse 1; hub vs exam "About right" 7 of 8, "Hub
+was harder" 1; readiness 3-5 (median 3.5). The one written answer asks to **pull out only the high-likelihood questions and fully shuffle
+them** (today they come first in the order, "only" is a status filter): a new hub should make "High likelihood only" + Random obvious
+together. 1 late Occlusion midterm check-in (diagrams 5, pictured Patient Boxes 5).
 
-**Did this morning's fixes work?** (since 4 am, small n) `pa-insulin-fat` **11/17 (65%; 16/37 = 43% before)**, `gr-ghrelin` 10/13 (50%
-before), `h1-enzyme-linked` 10/13 (60%), `pa-num-1` 6/8 (52%): all up. Flat: `pa-tf-3` 8/14 (53% before; "True" still the pick) and
-`ad-angII-gq` 7/13 (54%). From 10-28: `gr-muscle` 11/13, `h1-downreg` 10/13. `th-r-nis` (report #32) 12/20 today against 15/19
-before; its explanation already answers the ATP choice (picked 6 of 39 all time), so left alone.
-
-**Fixed this afternoon** (explanations and one stem; same ids and positions): `td-num-2` (5/12; "2, 3 and 4" picked 3) now says why
-cholestyramine and calcium belong and rifampin does too; `ca-2s-4` (7/17; "1 true, 2 false" 5) says calcitonin lowers calcium yet
-isn't essential; `ad-11bhsd` (20/38; "kidney lacks mineralocorticoid receptors" 11) says the kidney is full of them; `td-inducers`
-(11/22; methimazole/PTU 6) says those block synthesis, not breakdown; `ca-r-vdr` (6/13; Gq 5) says the Gq one is the CaSR; `cs-triam`'s
-stem no longer asks what Dr. Fasinu named (the standing lesson on professor-quoting stems; 10/18, methylprednisolone 5) and its
-explanation places the Medrol Dosepak in his short-to-medium group. Fair and left alone: `h1-tf-5` 29/57, `pa-2s-2` 14/27 (the same
-insulin-and-lipase mix-up as `pa-insulin-fat`, whose cue now covers it), `cs-2s-3` 6/12, `ca-r-tf-2` 7/13, `gr-r-plate` 14/31 (five
-steps, as the notes list them).
-
-**Occlusion and perio:** quiet (1 and 3 people today).
-
-**Next audit: after the exam** (Fri 10-30 from 10 am): Heme/Endo check-ins against study time, then its **retrospective and recap**
-(the hub archives itself at 10 pm Fri). Check whether the numbered-statement and focus-list items match what the check-ins say.
+**Use since 10-29:** Heme/Endo 88 people, 247 h, 18 mocks at 74% average (the four before the eve: 78%). Over 10-20 to now its time went
+bank 190 h (66 people), notes 109 h (65), mock 9 h (16), Home 5 h (91 people: everyone lands there, few stay), hints 4 h (28), drill 3 h
+(10), cram 3 h (31), Review 9 h in all (histology the most, 23 people), Weak Spots 2 h (17), Timmy Time 2 h (8), arcade under 1 h.
+**Same shape as every hub: bank + notes are 90%+ of the time.** Special Patient Care 10 people, 4 h (its window opens 11-6); Occlusion 5
+people, perio 8, both quiet until their finals. No zero-result searches.
 
 **Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
 - **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
