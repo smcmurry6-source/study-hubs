@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on: Sam's approval of the proposal and the first six cases (and which Drive file is the "newly uploaded" source)
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/238
 ---
 
 # Perio: the Patient Box as a visual diagnostic-case engine
