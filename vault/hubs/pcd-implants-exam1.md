@@ -27,6 +27,14 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   down (coronally)"; `position` measures every distance at the crest, to scale. A figure that wants to react when a
   slider or button sets a key names a helper in `D.ONSET` (`position` switches views that way). anima's line check has
   nothing to test here (these figures draw no `.iso-line`), so review them by eye in both themes and at 390 px.
+- **The seven implant types** (L1, `FIGS` `ty-*`, drawings A-G in the lecture's order) are built from
+  `tools/figures/pcd-implants-exam1/types.mjs` by the same `build.mjs` (it rewrites the hub's `var FIGS = {...};` line;
+  never edit that line by hand). Each is a main view (`.ty-main`: panoramic or periapical radiograph, or the denture's
+  tissue side) and a section (`.ty-sec`) showing where it sits; above a question the section is hidden by CSS until the
+  question is answered, and the numbered parts are explained by the figure's `key`. Redrawn 2026-11-04 (Sam: "could be
+  better and more accurate"), checked against Linkow's texts, Bosker's TMI patent and the intramucosal insert patents
+  (sources in the file's header), with keys that name only what L1 teaches
+  ([figures-teach-the-lecture](../rules/figures-teach-the-lecture.md)). Every type has a picture question (`ev-pic-*`).
 - **Arcade:** the Osseo Arcade, skin `IMPL_SKIN`.
 - **Timmy Time:** an episode (`hubs/pcd-implants-exam1/audio/timmy-time.mp3`, script `tools/podcast/pcd-implants-exam1/script.md`),
   card on Home under the quick-start row, `#timmy` opens Home. `SH_PODCAST.fans` holds its three lore comments

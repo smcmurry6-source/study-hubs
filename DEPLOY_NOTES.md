@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (PCD Implants: the seven implant types redrawn, the intramucosal insert added, Claude Code)** — Sam: "there
+  are only 6 drawn and i feel like they could be better and more accurate." The L1 drawings (`FIGS` `ty-*`) were hand-pasted
+  boxes: teeth as teardrops, a subperiosteal frame sunk into the bone, transosteal posts that missed the bar, a blade's bar
+  floating in the air, and no intramucosal insert. They are now built from `tools/figures/pcd-implants-exam1/types.mjs` (by
+  `build.mjs`, which also rewrites the `var FIGS` line; `--check` covers it), in the lecture's order A-G: subperiosteal,
+  endodontic stabilizer, transosseous (Bosker's TMI: base plate, four posts, cortical screws, bar), intramucosal insert
+  (buttons on a palateless upper denture), blade, ramus frame, root form. Each is drawn the way it turns up (a panoramic or
+  periapical radiograph, or the denture's tissue side) with numbered parts and a key, plus a section through the jaw
+  showing where it sits. Above a question the section is hidden (`.qcard-figure:not(.qcard-figure-after) .ty-sec`) until
+  it's answered, so it can't give the answer away. Checked against Linkow (1970, 1977), Bosker's patent 4,516,937, the
+  intramucosal insert patents and the ICOI glossary for accuracy, but under Sam's new rule
+  ([figures-teach-the-lecture](vault/rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for
+  what's shown and named) the keys name only what L1 teaches (no strut types, cortical screws or blade depths). Same rule
+  applied to `attach` (tooth vs implant): still drawn to Gargiulo's and Cochran's layers, but its labels now give only the
+  lecture's 2.04 and 3.08 mm, not each layer's thickness. Two new picture questions, `ev-pic-mucosal` and `ev-pic-root`,
+  added to the types' High Likelihood topic. About page updated. No notes text, narration or schema change.
 - **2026-11-04 (Perio: all figures audited and fixed, Claude Code)** — Sam: "vet, audit, and improve all perio
   figures." Six anima figures (`tools/figures/perio/`, rebuilt into the hub) and the suture diagrams (`SUTURE_DIAGRAMS`):
   - **Peri-implant health, mucositis, peri-implantitis** (S7): redrawn from scratch to scale (15 px/mm) as a section

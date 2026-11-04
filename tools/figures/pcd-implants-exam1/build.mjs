@@ -2,11 +2,13 @@
 //   node tools/figures/pcd-implants-exam1/build.mjs            rebuild the hub's anima blocks from the files here
 //   node tools/figures/pcd-implants-exam1/build.mjs --check    exit 1 if the hub's blocks are out of date
 //   node tools/figures/pcd-implants-exam1/build.mjs --preview  also write standalone pages to dist/ for anima's checks
+// It also writes the hub's FIGS line: the seven implant-type drawings (L1 Evolution) from types.mjs.
 // Each figure is one module here (static SVG + a live function sharing one model); edit them, never the generated
 // blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { baseCss } from "./shared.mjs";
 import { FIGURES } from "./index.mjs";
+import { types } from "./types.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,12 +53,16 @@ function between(src, b, e, body){
 const hub = readFileSync(HUB, "utf8");
 let out = between(hub, AJB, AJE, animaJs());
 out = between(out, ACB, ACE, animaCss());
+/* the static implant-type drawings: one line, var FIGS = {...}; */
+const FL = out.match(/^var FIGS = \{.*\};$/m);
+if (!FL) throw new Error("var FIGS line not found");
+out = out.replace(FL[0], () => "var FIGS = " + JSON.stringify(types()) + ";");
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/pcd-implants-exam1/index.html: the anima blocks are stale; run node tools/figures/pcd-implants-exam1/build.mjs"); process.exit(1); }
-  console.log("pcd-implants-exam1 anima blocks are up to date");
+  if (out !== hub) { console.error("hubs/pcd-implants-exam1/index.html: the anima blocks or FIGS are stale; run node tools/figures/pcd-implants-exam1/build.mjs"); process.exit(1); }
+  console.log("pcd-implants-exam1 anima blocks and FIGS are up to date");
 } else {
   writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + "; FIGS: " + Object.keys(types()).join(", ") + ")");
 }
 if (process.argv.includes("--preview")) {
   // standalone pages with the hub's tokens, for anima's capture and line checks

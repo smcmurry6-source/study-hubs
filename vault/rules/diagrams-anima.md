@@ -42,6 +42,8 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   after answering (`figAfterHTML` in `msk-exam4`/`pcd-exam3`, `figAfter` in `perio`). Also check that a diagram shown
   first doesn't draw or label the answer.
 - Draw from the hub's own lecture notes: labels and numbers match what was taught, and the caption names the lecture.
-  Anything beyond the lecture needs an authoritative source (anima's sourcing rule).
+  Outside sources may make a figure more accurate, but what it shows and names stays with what the lecture teaches
+  ([figures-teach-the-lecture](figures-teach-the-lecture.md)); anything drawn from beyond the lecture needs an
+  authoritative source (anima's sourcing rule).
 - Run anima's own checks, look at it at 390 px wide and in both themes, and give Sam the screenshots in the PR:
   drawn figures get Sam's look before merge, as the suture diagrams did. A new kind of figure goes on the About page.
