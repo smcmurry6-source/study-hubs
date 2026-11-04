@@ -42,6 +42,7 @@ Hub building
 - [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser.
 - [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time.
 - [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures.
+- [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named.
 - [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)
 
 ## How-tos

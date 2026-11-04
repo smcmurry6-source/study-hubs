@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | PCD Implants: redraw all seven implant-type drawings to be more accurate and add the missing intramucosal insert; outside sources are fine for accuracy (now a rule: [figures-teach-the-lecture](rules/figures-teach-the-lecture.md)) | `pcd-implants-exam1` | chat |
 | 2026-11-04 | After answering, every choice shows the % of the class that picked it (shared widget, `question_choices`) | every hub | chat, change log |
 | 2026-11-04 | `/reddit-scout`'s first run: build "Find this in the notes" (shipped in the widget) and the Supabase fix; skip a CI check for narration drift, don't re-propose it | widget, `/reddit-scout` | chat, `tools/reddit-scout/log.md` |
 | 2026-11-04 | Timmy Time comments open folded: only the first comment shows, with a button to show the rest | every episode | chat, [rule](rules/podcast-reactions.md) |

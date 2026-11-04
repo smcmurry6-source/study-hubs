@@ -67,7 +67,7 @@ function atRender(st, D) {
   o += '<path class="fib" d="' + gf + '"' + op("fibers") + "/>";
   /* junctional epithelium: a wedge on the enamel from the bottom of the sulcus down to the CEJ */
   function je(sg) { return "M" + f1(tx + sg * hw(jeT)) + " " + f1(jeT) + "L" + f1(tx + sg * (hw(jeT) + 7)) + " " + f1(jeT) + "L" + f1(tx + sg * (hw(cej) + 1.5)) + " " + f1(cej) + "L" + f1(tx + sg * hw(cej)) + " " + f1(cej) + "Z"; }
-  o += HOT("Junctional epithelium: about 1 mm (0.97 mm on average), attached to the enamel by hemidesmosomes along its whole length; it comes from the reduced enamel epithelium. Its lower end is at the CEJ.", '<path class="epi" d="' + je(-1) + je(1) + '"' + op("epi") + "/>");
+  o += HOT("Junctional epithelium: attached to the enamel by hemidesmosomes along its whole length; it comes from the reduced enamel epithelium. Its lower end is at the CEJ.", '<path class="epi" d="' + je(-1) + je(1) + '"' + op("epi") + "/>");
   /* ---- the implant ---- */
   var abB = 38, abT = 46, cm = gmI - 6;
   o += HOT("Implant body: titanium, threaded, in direct contact with bone. No PDL and no cementum, so no fibers can insert.", SCREW(ix, B, 88, 396 - B, 8));
@@ -90,7 +90,7 @@ function atRender(st, D) {
   o += HOT("Connective tissue zone, about 1 mm: fibers run parallel to the abutment and circular around it (here cut across, so they show as dots). None insert into the titanium, so the seal is weaker than a tooth's. More collagen, fewer fibroblasts.", '<g' + op("fibers") + '><path class="fib" d="' + pf + '"/><g fill="var(--im-fiber)">' + cf + "</g></g>");
   /* barrier (junctional) epithelium on the titanium, from the sulcus down to the connective tissue zone */
   function be(sg) { return "M" + f1(ix + sg * abX(jeI)) + " " + f1(jeI) + "L" + f1(ix + sg * (abX(jeI) + 7)) + " " + f1(jeI) + "L" + f1(ix + sg * (abX(ctI) + 1.5)) + " " + f1(ctI) + "L" + f1(ix + sg * abX(ctI)) + " " + f1(ctI) + "Z"; }
-  o += HOT("Barrier epithelium, like the junctional epithelium of gingiva but longer: about 1.88 mm, attached to the titanium by hemidesmosomes only in its apical third, and coming from the adjacent oral epithelium. The L8 notes give 1.5-2 mm. A long epithelium breaks down more easily over time.", '<path class="epi" d="' + be(-1) + be(1) + '"' + op("epi") + "/>");
+  o += HOT("Barrier epithelium, like the junctional epithelium of gingiva but longer, attached to the titanium by hemidesmosomes only in its apical third, and coming from the adjacent oral epithelium. The L8 notes give 1.5-2 mm. A long epithelium breaks down more easily over time.", '<path class="epi" d="' + be(-1) + be(1) + '"' + op("epi") + "/>");
   /* ---- labels ---- */
   o += T(tx, 28, "Tooth", "b", "middle") + T(ix, 28, "Implant", "b", "middle");
   o += L(228, 62, "fibers insert into cementum", tx + hw(cej + 8) + 22, cej + 4, "start");
@@ -100,8 +100,8 @@ function atRender(st, D) {
   if (st.bw) {
     /* each side's layers, to scale */
     function stack(x, sg, ys, labs) { var s = "", k; for (k = 0; k < ys.length - 1; k++) { s += '<path class="dim" d="M' + f1(x) + " " + f1(ys[k] + 1) + "L" + f1(x) + " " + f1(ys[k + 1] - 1) + "M" + f1(x - 3) + " " + f1(ys[k] + 1) + "h6M" + f1(x - 3) + " " + f1(ys[k + 1] - 1) + 'h6"/>'; if (labs[k]) s += T(x + sg * 6, (ys[k] + ys[k + 1]) / 2 + 4 + (labs[k][1] || 0), labs[k][0], "hot-t s", sg > 0 ? "start" : "end"); } return s; }
-    o += stack(98, -1, [gmT, jeT, cej, B], [["sulcus 0.69", -9], ["JE 0.97"], ["CT 1.07", 2]]);
-    o += stack(538, 1, [gmI, jeI, ctI, B], [["sulcus 0.16", -9], ["JE 1.88"], ["CT 1.05", 2]]);
+    o += stack(98, -1, [gmT, jeT, cej, B], [["sulcus", -9], ["JE"], ["CT", 2]]);
+    o += stack(538, 1, [gmI, jeI, ctI, B], [["sulcus", -9], ["JE"], ["CT", 2]]);
     o += DIM(288, jeT, 288, B, "2.04", 282, B - 26, "end") + T(282, B - 12, "mm", "hot-t s", "end");
     o += DIM(352, gmI, 352, B, "3.08", 358, B - 40, "start") + T(358, B - 26, "mm", "hot-t s", "start");
   }

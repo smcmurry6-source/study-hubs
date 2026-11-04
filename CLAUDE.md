@@ -76,6 +76,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/diagrams-anima.md
 
+@vault/rules/figures-teach-the-lecture.md
+
 @vault/rules/archiving-is-a-retrospective.md
 
 @vault/rules/secrets.md
