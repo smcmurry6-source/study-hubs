@@ -32,6 +32,32 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Occlusion: every figure vetted, audited and fixed, Claude Code, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232))** —
+  Sam: "vet, audit, and improve all occlusion figures." Every drawn figure in the hub (the kit drawings, contact map and cusp
+  game, the 19 anima figures and the case pictures) was checked against the hub's notes and questions, at 390 px and in both
+  themes, and fixed in its source in `tools/figures/occlusion/` (no new figures, no notes or audio changed).
+  - **Kit and game (L1):** #30's anatomy (MB widest, D smallest), the inclines figure, the sagittal envelope's E, the contact
+    map's straight contact lines and variable band, the cusp game's reveal. Class III #4 stays on #30's mesial fossa (the
+    help sheet's picture). The pathway questions `fig-pmax-*`/`fig-pmand-*` no longer give the arrow's direction in the stem.
+  - **L1 anima:** `crslide` (Fig 7) worked out at true scale on the shared skull rig (second-molar contact, a 1.25 mm slide,
+    the condyle 0.39 mm off its seat); `envelope` (Fig 6) step text describes the border just traced, and the frontal letters
+    follow Dr. Givan's handout (C = right lateral opening, D = right lateral superior; `fig-front-d` now asks about C, same
+    border and answer); `interferences`, `guidance`, `cuspmotion` and `cuspheight` redrawn so inclines sit on their cusps,
+    Class I positions are right and the cusp stays on the jaw.
+  - **L2, L3, L5:** the TMJ (Fig 1) gets a real ramus and coronoid under the arch and a lateral pterygoid that runs below the
+    eminence; muscles (Fig 4), swallowing (Fig 9, a full midline section) and the implant figure (Fig 10, the wrong "x500"
+    readout fixed) corrected.
+  - **L6:** `hingearc` (Fig 12) drawn on the rig with the magnified molar miss; `scirec` (Fig 13) shows real molars whose
+    cusps grow with the setting; `bennett` (Fig 14) the lower left molar the right way round, with the non-working cusp
+    leaving the central fossa distobuccally.
+  - **L7:** `l7rig.mjs` now draws a whole skull and a real mandible with the disc's true profile (Figs 7, 12, 15-17 use it;
+    cropped edges fade); labels moved off the teeth; thirds numbered from the central fossa; erosion stacks on a phone.
+  - **Case pictures:** radiographs rebuilt on one tooth model in mm (PDL, lamina dura, osseointegrated implants), the TMJ film,
+    the Div 2 and right buccal views, articulating-paper marks and wider perio charts.
+  - **Labels and hover text name only what the lecture teaches** ([figures-teach-the-lecture](vault/rules/figures-teach-the-lecture.md)):
+    "ear canal" for EAM; no orbit, mastoid, sigmoid notch or postglenoid process.
+  - Open questions for Sam are in the PR and [vault/hubs/occlusion.md](vault/hubs/occlusion.md) → Pending.
+
 - **2026-11-04 (PCD Implants: the seven implant types redrawn, the intramucosal insert added, Claude Code)** — Sam: "there
   are only 6 drawn and i feel like they could be better and more accurate." The L1 drawings (`FIGS` `ty-*`) were hand-pasted
   boxes: teeth as teardrops, a subperiosteal frame sunk into the bone, transosteal posts that missed the bar, a blade's bar

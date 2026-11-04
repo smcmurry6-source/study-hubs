@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | Occlusion: vet, audit and improve every figure (fix in place, no new figures; open content questions go to Sam in the PR and the hub note), merged when ready | `occlusion` | chat, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232) |
 | 2026-11-04 | PCD Implants: redraw all seven implant-type drawings to be more accurate and add the missing intramucosal insert; outside sources are fine for accuracy (now a rule: [figures-teach-the-lecture](rules/figures-teach-the-lecture.md)) | `pcd-implants-exam1` | chat |
 | 2026-11-04 | After answering, every choice shows the % of the class that picked it (shared widget, `question_choices`) | every hub | chat, change log |
 | 2026-11-04 | `/reddit-scout`'s first run: build "Find this in the notes" (shipped in the widget) and the Supabase fix; skip a CI check for narration drift, don't re-propose it | widget, `/reddit-scout` | chat, `tools/reddit-scout/log.md` |

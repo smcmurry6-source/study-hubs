@@ -20,29 +20,34 @@ var CUSP_GAME = (function(){
     return { mode:'contacts', cls:cls, side:side, c:c, done:false };
   }
   function contactSVG(rd, reveal){
-    var q = OD.quad(rd.cls, rd.side, { x0:40, k:8.2, yMax:72, yMand:214, W:480 }), c = rd.c, from = c[0], to = from === 'mand' ? 'max' : 'mand';
-    var src = q[from].teeth[c[1]].pt[c[2]], s = '';
-    /* before answering the rows are lined up at the canines (no hint); the reveal slides the lower row to its class position */
-    var dx = q.dx, shiftAll = rd.side === 'R' ? Math.max(0, -(40 + dx - 6)) : -Math.max(0, dx - 34);
-    /* reveal: drawn at the canine-aligned start, then slid into place (CUSP_GAME.draw sets the target transform) */
-    s += '<g class="cg-all" data-to="' + OD.f1(reveal ? shiftAll : 0) + '" style="transform:translateX(0px)">' + q.max.svg + OD.numLabels(q.max, 0, false);
-    s += '<g class="cg-low" data-to="' + OD.f1(reveal ? dx : 0) + '" style="transform:translateX(0px)">' + q.mand.svg + OD.numLabels(q.mand, 0, true);
-    var mandTargets = '', maxTargets = '';
+    var o = { x0:40, k:8.2, yMax:72, yMand:214, W:480 }, q = OD.quad(rd.cls, rd.side, o), c = rd.c, from = c[0], to = from === 'mand' ? 'max' : 'mand';
+    /* Before answering, both rows sit side by side, lined up at the canines (no hint). The reveal draws every tooth at that
+       start and slides it to where the contact map puts it for this class (OD.fit; CUSP_GAME.draw sets the target
+       transforms), then fades in the contact lines at the end positions. */
+    var qf = reveal ? OD.quad(rd.cls, rd.side, { x0:o.x0, k:o.k, yMax:o.yMax, yMand:o.yMand, W:o.W, fit:true }) : null, lo = 1e9, hi = -1e9;
+    if(qf) ['max', 'mand'].forEach(function(a){ OD.ORDER.forEach(function(t){ var tt = qf[a].teeth[t]; lo = Math.min(lo, tt.x); hi = Math.max(hi, tt.x + tt.w); }); });
+    var shiftAll = qf ? (lo < 40 ? 40 - lo : hi > 474 ? 474 - hi : 0) : 0;
+    function mv(a, t){ return qf ? OD.f1(qf[a].teeth[t].x - q[a].teeth[t].x) : '0'; }
+    function grp(a, t, inner){ return '<g class="cg-t" data-to="' + mv(a, t) + '" style="transform:translateX(0px)">' + inner + '</g>'; }
+    var teeth = '', hots = { max:'', mand:'' }, s = '';
     ['max', 'mand'].forEach(function(a){
-      OD.ORDER.forEach(function(t){ if(t === 'C') return; var tt = q[a].teeth[t];
+      var r = q[a], below = a === 'mand', yy = null;
+      OD.ORDER.forEach(function(t){ var tt = r.teeth[t], v = below ? tt.y + tt.h + 15 : tt.y - 6; yy = yy == null ? v : below ? Math.max(yy, v) : Math.min(yy, v); });
+      OD.ORDER.forEach(function(t){
+        var tt = r.teeth[t], h = '';
+        teeth += grp(a, t, tt.svg + OD.txt(tt.cx, yy, '#' + tt.num, 'fg-t sm od-num', 'middle'));
+        if(t === 'C' || a !== to) return;
         Object.keys(OD.SPEC[(a === 'max' ? 'max' : 'man') + t].fossae).forEach(function(f){
-          var p = tt.pt[f], ok = to === a && t === c[3] && (f === c[4] || f === c[5]), chosen = rd.tap && rd.tap.t === t && rd.tap.f === f && rd.tap.a === a;
-          var cls = 'cg-hot' + (rd.done ? (ok ? ' ok' : chosen ? ' bad' : '') : '') + (to !== a ? ' off' : '');
-          var g = '<circle class="' + cls + '" data-cg-hot="' + a + ':' + t + ':' + f + '" cx="' + OD.f1(p[0]) + '" cy="' + OD.f1(p[1]) + '" r="12.5" tabindex="' + (to === a && !rd.done ? 0 : -1) + '" role="button" aria-label="' + escHtml(fname(a, t, f, rd.side)) + '"/>';
-          if(a === 'mand') mandTargets += g; else maxTargets += g;
+          var p = tt.pt[f], ok = t === c[3] && (f === c[4] || f === c[5]), chosen = rd.tap && rd.tap.t === t && rd.tap.f === f && rd.tap.a === a;
+          h += '<circle class="cg-hot' + (rd.done ? (ok ? ' ok' : chosen ? ' bad' : '') : '') + '" data-cg-hot="' + a + ':' + t + ':' + f + '" cx="' + OD.f1(p[0]) + '" cy="' + OD.f1(p[1]) + '" r="11" tabindex="' + (rd.done ? -1 : 0) + '" role="button" aria-label="' + escHtml(fname(a, t, f, rd.side)) + '"/>';
         });
+        hots[a] += grp(a, t, h);
       });
     });
-    s += mandTargets;
-    var sp = src, srcMark = '<circle class="cg-src" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="9"/><circle class="cg-src-ring" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="15"/>';
-    if(from === 'mand') s += srcMark;
-    s += '</g>' + maxTargets + (from === 'max' ? srcMark : '');
-    if(reveal){ var hl = OD.CONTACTS[rd.cls].indexOf(c); s += '<g class="cg-lines">' + OD.contactLines(q, rd.cls, { hl:hl }) + '</g>'; }
+    var sp = q[from].teeth[c[1]].pt[c[2]];
+    var srcMark = grp(from, c[1], '<circle class="cg-src" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="9"/><circle class="cg-src-ring" cx="' + OD.f1(sp[0]) + '" cy="' + OD.f1(sp[1]) + '" r="15"/>');
+    s += '<g class="cg-all" data-to="' + OD.f1(shiftAll) + '" style="transform:translateX(0px)">' + teeth + hots.mand + hots.max + srcMark;
+    if(qf){ var hl = OD.CONTACTS[rd.cls].indexOf(c); s += '<g class="cg-lines">' + OD.contactLines(qf, rd.cls, { hl:hl }) + '</g>'; }
     s += '</g>';
     s += OD.txt(6, 76, 'Upper', 'fg-t sm') + OD.txt(6, 218, 'Lower', 'fg-t sm');
     return '<svg class="cg-svg" viewBox="0 0 480 280" role="img" aria-label="Upper and lower posterior teeth, occlusal views">' + s + '</svg>';
@@ -75,7 +80,7 @@ var CUSP_GAME = (function(){
     var t = OD.tooth(key, { x:110, y:60, k:16, flip:arch === 'mand', mirror:mirror }), b = t.pt[rd.c[4]];
     var v = moveVec(arch, rd.mv), mx = mirror ? 1 : -1, by = arch === 'max' ? -1 : 1, L = 96;
     var e = [b[0] + v[0] * mx * L, b[1] + v[1] * by * L];
-    var s = t.svg + '<circle class="od-ghost" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="11"/>' + OD.arrow(b[0], b[1], e[0], e[1], 'fg-acc', 12) + '<circle class="fg-dot" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="5"/>';
+    var s = t.svg + '<circle class="od-ghost" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="11"/>' + OD.arrowC(b[0], b[1], e[0], e[1], 'fg-acc', 12) + '<circle class="fg-dot od-mip" cx="' + OD.f1(b[0]) + '" cy="' + OD.f1(b[1]) + '" r="5"/>';
     var top = arch === 'max' ? 'BUCCAL' : 'LINGUAL', bot = arch === 'max' ? 'PALATAL' : 'BUCCAL';
     s += OD.txt(t.cx, 34, top, 'fg-t', 'middle') + OD.txt(t.cx, 60 + t.h + 26, bot, 'fg-t', 'middle');
     s += OD.txt(mirror ? t.x + t.w + 14 : 8, t.cy + 4, 'MESIAL', 'fg-t sm') + OD.txt(mirror ? 8 : t.x + t.w + 14, t.cy + 4, 'DISTAL', 'fg-t sm');
@@ -115,8 +120,8 @@ var CUSP_GAME = (function(){
       var c = rd.c;
       h += '<p class="cg-q"><span class="cg-tag">Class ' + OD.ROMAN[rd.cls] + ' · cusp-fossa</span> Where does the <b>' + escHtml(cname(c[0], c[1], c[2], rd.side)) + '</b> land? <span class="cg-sub">Tap the fossa on the ' + (c[0] === 'mand' ? 'upper' : 'lower') + ' teeth.</span></p>';
       h += '<div class="cg-stage">' + contactSVG(rd, rd.done) + '</div>';
-      if(!rd.done) h += '<div class="cg-btns"><button type="button" class="btn" data-cg="hint" aria-expanded="' + (!!rd.hint) + '">' + (rd.hint ? 'Hide' : 'Show') + ' the Class ' + OD.ROMAN[rd.cls] + ' fence post</button></div>' + (rd.hint ? '<div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40, x0:60 }) + '</div>' : '');
-      else h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + (rd.ok ? 'Right.' : 'Not quite.') + '</b> ' + contactExplain(rd) + '</div><div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40, x0:60, hl:{ mand:c[0] === 'mand' ? fpUnit(c[1], c[2]) : null }, hlMax:c[0] === 'max' ? [fpUnit(c[1], c[2])] : [] }) + '</div>';
+      if(!rd.done) h += '<div class="cg-btns"><button type="button" class="btn" data-cg="hint" aria-expanded="' + (!!rd.hint) + '">' + (rd.hint ? 'Hide' : 'Show') + ' the Class ' + OD.ROMAN[rd.cls] + ' fence post</button></div>' + (rd.hint ? '<div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40 }) + '</div>' : '');
+      else h += '<div class="cg-fb ' + (rd.ok ? 'ok' : 'bad') + '"><b>' + (rd.ok ? 'Right.' : 'Not quite.') + '</b> ' + contactExplain(rd) + '</div><div class="cg-fp">' + OD.fencePostSVG(rd.cls, { u:40, hl:{ mand:c[0] === 'mand' ? fpUnit(c[1], c[2]) : null }, hlMax:c[0] === 'max' ? [fpUnit(c[1], c[2])] : [] }) + '</div>';
     } else {
       h += '<p class="cg-q"><span class="cg-tag">' + (rd.step === 1 ? 'Step 1 of 2' : 'Step 2 of 2') + '</span> ' + (rd.step === 1 ? 'Which movement does this arrow show?' : 'Which cusp makes this path?') + ' <span class="cg-sub">Class I. The MIP contact is at the base of the arrow.</span></p>';
       h += '<div class="cg-stage">' + moveSVG(rd) + '</div><div class="cg-opts">';

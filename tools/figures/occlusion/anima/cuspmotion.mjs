@@ -3,8 +3,9 @@
 // and arrows as the static pathMax / pathMand figures (tools/figures/occlusion/od.js). Pick a movement and the opposing cusp
 // leaves its MIP contact and draws its path on both teeth at once: the mandible moves by d against the maxilla, so on #3
 // the lower cusp travels +d and on #30 the upper cusp travels -d, which is why every path reverses on a lower tooth.
-// Panel 2: the mandible from above (anterior at the top, patient's right on the right) rotating about the working
-// condyle. The path a right-side cusp takes in a right move (rotation about the right condyle) and in a left move (about
+// Panel 2: the mandible and its teeth from above (anterior at the top, patient's right on the right) rotating about the
+// working condyle; the arch is rebuilt through the watched cusp (the DB cusp of #30) for each slider setting. The path
+// a right-side cusp takes in a right move (rotation about the right condyle) and in a left move (about
 // the left condyle) spread apart more the farther the cusp is from the rotating condyle and from the midline and the more
 // side shift there is, and less the wider the intercondylar distance (the hub's L1 notes on horizontal determinants).
 // Panel 2 is a geometric model: distances are schematic, so its angle shows the trend, not a patient's value.
@@ -57,11 +58,16 @@ function toothPanel(arch) {
 const P3 = toothPanel("max"), P30 = toothPanel("mand");
 
 /* ---------- panel 2: the jaw from above ---------- */
+/* mm, x toward the patient's right, y anterior, the condylar axis at y = 0. The sliders set where the watched cusp (the
+   distobuccal cusp of #30) sits; the arch is rebuilt through it each time (the incisors at the midline, the teeth at
+   their usual widths along the arch), so the cusp always sits on its tooth and the tooth on the jaw. */
 const D = {
   teeth: { max: { base: P3.base, end: P3.end }, mand: { base: P30.base, end: P30.end } },
   letters: { pro: "A", work: "B", nonwork: "C", retro: "D" },
-  S: 2.6, OX: 190, OY: 290, AMAX: 0.26, SHIFT: 3.5,
-  dist: [30, 46, 66], mid: [18, 25, 32], icd: [84, 100, 118],
+  S: 2.6, OX: 190, OY: 290, AMAX: 0.16, SHIFT: 2.5,
+  dist: [38, 50, 62], mid: [20, 25, 30], icd: [84, 100, 118],
+  /* mandibular teeth from the midline: [mesiodistal, buccolingual] mm (central, lateral, canine, PM1, PM2, M1, M2) */
+  TW: [[5.4, 6.0], [5.9, 6.3], [6.9, 7.6], [7.0, 7.6], [7.1, 8.0], [11.2, 10.4], [10.6, 10.0]],
 };
 /* the jaw at a moment of a lateral move: side 1 = right move (rotates about the right condyle), -1 = left move;
    u = 0..1 of the move; returns where a point of the mandible (mm, x right, y anterior) ends up */
@@ -77,69 +83,124 @@ function jawAngles(o, D) {
   var cos = (a[0] * b[0] + a[1] * b[1]) / Math.sqrt((a[0] * a[0] + a[1] * a[1]) * (b[0] * b[0] + b[1] * b[1]));
   return { P: P, L: L, M: M, deg: Math.acos(Math.max(-1, Math.min(1, cos))) * 180 / Math.PI };
 }
+/* the mandible and its teeth for one slider setting, in screen units (cached: the shape only changes with the sliders) */
+function jawShape(o, D) {
+  var key = o.dist + "," + o.mid + "," + o.icd;
+  if (D._sk === key) return D._sh;
+  function f(v) { return Math.round(v * 10) / 10; }
+  function X(p) { return [f(D.OX + p[0] * D.S), f(D.OY - p[1] * D.S)]; }
+  function sm(pts) { var n = pts.length, d = "M" + X(pts[0]).join(" "); for (var i = 0; i < n; i++) { var p0 = X(pts[(i - 1 + n) % n]), p1 = X(pts[i]), p2 = X(pts[(i + 1) % n]), p3 = X(pts[(i + 2) % n]);
+    d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + p2[0] + " " + p2[1]; } return d + "Z"; }
+  var h = o.icd / 2, Q = [o.mid - 2.3, o.dist + 1.5], TW = D.TW, i, k;
+  /* the arch (the line of the tooth centers), midline to the first molar's center: a cubic with a flat tangent at the
+     incisors; its depth is solved so the teeth in front of the molar fit at their widths */
+  var toM1 = 0; for (i = 0; i < 5; i++) toM1 += TW[i][0]; toM1 += TW[5][0] / 2;
+  function bez(yI) { var dy = yI - Q[1]; return [[0, yI], [0.55 * Q[0], yI], [Q[0] - 0.12 * dy, Q[1] + 0.42 * dy], Q]; }
+  function pt(B, t) { var s = 1 - t; return [s * s * s * B[0][0] + 3 * s * s * t * B[1][0] + 3 * s * t * t * B[2][0] + t * t * t * B[3][0], s * s * s * B[0][1] + 3 * s * s * t * B[1][1] + 3 * s * t * t * B[2][1] + t * t * t * B[3][1]]; }
+  function table(B) { var T = [{ s: 0, p: pt(B, 0) }]; for (var j = 1; j <= 60; j++) { var p = pt(B, j / 60), q = T[j - 1].p; T.push({ s: T[j - 1].s + Math.sqrt((p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1])), p: p }); } return T; }
+  var lo = Q[1] + 4, hi = Q[1] + 70, B, T;
+  for (k = 0; k < 40; k++) { var ym = (lo + hi) / 2; T = table(bez(ym)); if (T[60].s < toM1) lo = ym; else hi = ym; }
+  B = bez((lo + hi) / 2); T = table(B);
+  var end = T[60], back = [Q[0] - T[57].p[0], Q[1] - T[57].p[1]], bl = Math.sqrt(back[0] * back[0] + back[1] * back[1]); back = [back[0] / bl, back[1] / bl];
+  /* a point and its unit tangent at arc length s (past the first molar, straight on along the arch) */
+  function at(s) {
+    if (s >= end.s) return { p: [Q[0] + back[0] * (s - end.s), Q[1] + back[1] * (s - end.s)], t: back };
+    for (var j = 1; j < T.length; j++) if (T[j].s >= s) { var a = T[j - 1], b = T[j], r = (s - a.s) / (b.s - a.s || 1), dx = b.p[0] - a.p[0], dy = b.p[1] - a.p[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
+      return { p: [a.p[0] + dx * r, a.p[1] + dy * r], t: [dx / L, dy / L] }; }
+    return { p: end.p, t: back };
+  }
+  /* the teeth: rounded outlines along the arch, both sides (squarer for molars, rounder for premolars, a blunt
+     diamond for the canine) */
+  var EX = [0.8, 0.8, 1.35, 0.9, 0.9, 0.55, 0.55], teeth = "", m1 = "", s0 = 0;
+  for (i = 0; i < TW.length; i++) {
+    var w = TW[i][0], bw = TW[i][1], A = at(s0 + w / 2), tt = A.t, nn = [-tt[1], tt[0]], pts = [], ex = EX[i];
+    for (k = 0; k < 16; k++) { var th = k / 16 * Math.PI * 2, cu = Math.cos(th), su = Math.sin(th);
+      var lu = 0.46 * w * (cu < 0 ? -1 : 1) * Math.pow(Math.abs(cu), ex), lv = 0.5 * bw * (su < 0 ? -1 : 1) * Math.pow(Math.abs(su), ex);
+      pts.push([A.p[0] + tt[0] * lu + nn[0] * lv, A.p[1] + tt[1] * lu + nn[1] * lv]); }
+    var dR = sm(pts), dL = sm(pts.map(function (p) { return [-p[0], p[1]]; }).reverse());
+    if (i === 5) m1 = dR; else teeth += dR;
+    teeth += dL; s0 += w;
+  }
+  /* the mandible: the body offset outward and inward from the arch (inner points that would cross the midline are
+     dropped, so a narrow arch still closes smoothly), then the rami curving back to the condylar necks */
+  var sEnd = s0 + 2.5, outR = [], inR = [];
+  for (k = 0; k <= 14; k++) { var s = sEnd * k / 14, Pq = at(s), n = [-Pq.t[1], Pq.t[0]], fr = Math.min(1, s / toM1);
+    var wo = 4.4 + 3.6 * fr, wi = 7.4 - 1.0 * fr, ip = [Pq.p[0] - n[0] * wi, Pq.p[1] - n[1] * wi];
+    outR.push([Pq.p[0] + n[0] * wo, Pq.p[1] + n[1] * wo]);
+    if (k === 0) ip[0] = 0; else if (ip[0] < 2.5) continue;
+    inR.push(ip); }
+  outR[0][0] = 0;
+  function ramus(a, e, L) { var c = [a[0] + back[0] * L, a[1] + back[1] * L], r = [];
+    for (var j = 1; j <= 6; j++) { var t = j / 6, q = 1 - t; r.push([q * q * a[0] + 2 * q * t * c[0] + t * t * e[0], q * q * a[1] + 2 * q * t * c[1] + t * t * e[1]]); } return r; }
+  var oe = outR[outR.length - 1], ie = inR[inR.length - 1];
+  outR = outR.concat(ramus(oe, [h + 3, 2.5], oe[1] * 0.45));
+  inR = inR.concat(ramus(ie, [h - 5, 2.5], ie[1] * 0.45));
+  function mir(a) { return a.map(function (p) { return [-p[0], p[1]]; }); }
+  /* clockwise: right outer front to back, right inner back to front, left inner front to back, left outer back to front */
+  var ring = outR.slice(0).concat(inR.slice(0).reverse(), mir(inR).slice(1), mir(outR).reverse().slice(0, -1));
+  var cR = X([h, 0]), cL = X([-h, 0]), nq = [-back[1], back[0]], lab = X([Q[0] - nq[0] * 11.5 + back[0] * 2.5, Q[1] - nq[1] * 11.5 + back[1] * 2.5 - 1.2]);
+  var sh = { jaw: sm(ring), teeth: teeth, m1: m1, cR: cR, cL: cL, lab: lab };
+  D._sk = key; D._sh = sh; return sh;
+}
 /* everything panel 2 draws, for one setting and one moment (side 0 = at rest) */
 function jawFrame(o, side, u, D) {
   function f(v) { return Math.round(v * 10) / 10; }
   function X(p) { return [f(D.OX + p[0] * D.S), f(D.OY - p[1] * D.S)]; }
   function poly(pts) { return "M" + pts.map(function (p) { var q = X(p); return q[0] + " " + q[1]; }).join("L"); }
-  var h = o.icd / 2;
-  /* outline of the mandible from above: condyles, rami and the body curving to the chin */
-  /* right half, buccal border from the condyle forward to the chin and lingual border back; the rami flare out behind
-     the body, which carries the teeth (schematic) */
-  var outR = [[h + 4, -2], [h + 1, 10], [(h + 34) / 2 + 1, 28], [34, 46], [31, 64], [23, 83], [12, 93], [0, 96]];
-  var inR = [[0, 85], [8, 82], [14, 72], [17, 58], [19, 44], [(h + 19) / 2, 24], [h - 8, 8], [h - 8, -2]];
-  function mir(a) { return a.map(function (p) { return [-p[0], p[1]]; }); }
-  var out = mir(outR).concat(outR.slice().reverse().slice(1)), inn = inR.slice().reverse().concat(mir(inR).slice(1));
-  function sm(pts) { var n = pts.length, d = "M" + X(pts[0]).join(" "); for (var i = 0; i < n - 1; i++) { var p0 = X(pts[Math.max(0, i - 1)]), p1 = X(pts[i]), p2 = X(pts[i + 1]), p3 = X(pts[Math.min(n - 1, i + 2)]);
-    d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + p2[0] + " " + p2[1]; } return d; }
-  var ang = jawAngles(o, D), P = ang.P;
-  function mv(p) { return side ? jawMove(p, o, side, u, D) : p; }
-  var A = {};
-  var oi = inn.map(mv), ip = X(oi[0]);
-  A[".cj-jaw"] = { d: sm(out.map(mv)) + "L" + ip[0] + " " + ip[1] + sm(oi).replace(/^M[^C]*/, "") + "Z" };
-  var cl = X(mv([-h, 0])), cr = X(mv([h, 0])), cp = X(mv(P));
-  A[".cj-cond.l"] = { cx: cl[0], cy: cl[1] }; A[".cj-cond.r"] = { cx: cr[0], cy: cr[1] };
+  var h = o.icd / 2, ang = jawAngles(o, D), P = ang.P, SH = jawShape(o, D), A = {};
+  /* the mandible moves as one rigid body: a turn about the working condyle, plus the side shift */
+  var rc = side ? X([side * h, 0]) : [0, 0], deg = side ? f(side * D.AMAX * u * 1800 / Math.PI) / 10 : 0;
+  var shp = side && o.shift ? side * D.SHIFT * Math.min(1, u * 3) * D.S : 0;
+  A[".cj-body"] = { transform: side ? "translate(" + f(shp) + " 0) rotate(" + deg + " " + rc[0] + " " + rc[1] + ")" : "translate(0 0)" };
+  A[".cj-jaw"] = { d: SH.jaw }; A[".cj-teeth"] = { d: SH.teeth }; A[".cj-m1"] = { d: SH.m1 }; A[".cj-lab"] = { x: SH.lab[0], y: SH.lab[1], opacity: side ? 0 : 1 };
+  A[".cj-cond.l"] = { cx: SH.cL[0], cy: SH.cL[1], transform: "rotate(15 " + SH.cL[0] + " " + SH.cL[1] + ")" };
+  A[".cj-cond.r"] = { cx: SH.cR[0], cy: SH.cR[1], transform: "rotate(-15 " + SH.cR[0] + " " + SH.cR[1] + ")" };
+  /* the cusp is drawn above the paths, so it sits outside the moving group and follows the same move */
+  var rp = X(P), cp = side ? X(jawMove(P, o, side, u, D)) : rp;
   A[".cj-cusp"] = { cx: cp[0], cy: cp[1] };
-  A[".cj-tooth"] = { transform: "translate(" + cp[0] + " " + cp[1] + ") rotate(" + f(side ? D.AMAX * u * side * 180 / Math.PI : 0) + ")" };
   /* fixed reference marks where the condyles and the cusp sit at rest */
-  var rl = X([-h, 0]), rr = X([h, 0]), rp = X(P);
-  A[".cj-rest.l"] = { cx: rl[0], cy: rl[1] }; A[".cj-rest.r"] = { cx: rr[0], cy: rr[1] }; A[".cj-rest.p"] = { cx: rp[0], cy: rp[1] };
+  A[".cj-rest.l"] = { cx: SH.cL[0], cy: SH.cL[1] }; A[".cj-rest.r"] = { cx: SH.cR[0], cy: SH.cR[1] }; A[".cj-rest.p"] = { cx: rp[0], cy: rp[1] };
   /* each path as an arc of the move, plus its chord arrowhead; the angle between them at the cusp */
   function arc(sd) { var pts = []; for (var i = 0; i <= 16; i++) pts.push(jawMove(P, o, sd, i / 16, D)); return poly(pts); }
   function head(sd) { var e = X(jawMove(P, o, sd, 1, D)), q = X(jawMove(P, o, sd, .82, D)), dx = e[0] - q[0], dy = e[1] - q[1], L = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / L, uy = dy / L;
     return "M" + e[0] + " " + e[1] + "L" + f(e[0] - ux * 9 - uy * 5) + " " + f(e[1] - uy * 9 + ux * 5) + "L" + f(e[0] - ux * 9 + uy * 5) + " " + f(e[1] - uy * 9 - ux * 5) + "Z"; }
   A[".cj-path.lat"] = { d: arc(1) }; A[".cj-head.lat"] = { d: head(1) };
   A[".cj-path.med"] = { d: arc(-1) }; A[".cj-head.med"] = { d: head(-1) };
-  var a1 = Math.atan2(-(ang.L[1] - P[1]), ang.L[0] - P[0]), a2 = Math.atan2(-(ang.M[1] - P[1]), ang.M[0] - P[0]), R = 17;
+  var a1 = Math.atan2(-(ang.L[1] - P[1]), ang.L[0] - P[0]), a2 = Math.atan2(-(ang.M[1] - P[1]), ang.M[0] - P[0]);
+  /* the angle's arc sits inside the shorter path, clear of its arrowhead */
+  var c1 = X(ang.L), c2 = X(ang.M), R = Math.round(Math.max(9, Math.min(17, 0.55 * Math.min(Math.sqrt((c1[0] - rp[0]) * (c1[0] - rp[0]) + (c1[1] - rp[1]) * (c1[1] - rp[1])), Math.sqrt((c2[0] - rp[0]) * (c2[0] - rp[0]) + (c2[1] - rp[1]) * (c2[1] - rp[1]))))));
   var p1 = [rp[0] + R * Math.cos(a1), rp[1] + R * Math.sin(a1)], p2 = [rp[0] + R * Math.cos(a2), rp[1] + R * Math.sin(a2)];
   var da = a2 - a1; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
   A[".cj-angle"] = { d: "M" + f(p1[0]) + " " + f(p1[1]) + "A" + R + " " + R + " 0 0 " + (da > 0 ? 1 : 0) + " " + f(p2[0]) + " " + f(p2[1]) };
   var am = a1 + da / 2;
-  A[".cj-deg"] = { x: f(rp[0] + (R + 15) * Math.cos(am)), y: f(rp[1] + (R + 15) * Math.sin(am) + 4) };
-  var spin = side === 1 ? cr : side === -1 ? cl : null;
+  A[".cj-deg"] = { x: f(rp[0] + (R + 16) * Math.cos(am)), y: f(rp[1] + (R + 16) * Math.sin(am) + 4) };
+  var spin = side ? X(jawMove([side * h, 0], o, side, u, D)) : null;
   A[".cj-spin"] = spin ? { cx: spin[0], cy: spin[1], opacity: 1 } : { opacity: 0 };
   return { attrs: A, deg: ang.deg };
 }
 const O0 = { dist: D.dist[1], mid: D.mid[1], icd: D.icd[1], shift: false };
 const J0 = jawFrame(O0, 0, 0, D);
+delete D._sk; delete D._sh; /* the shape cache is rebuilt in the page, not shipped */
 const at = (sel) => Object.entries(J0.attrs[sel] || {}).map(([k, v]) => ` ${k}="${v}"`).join("");
 const jawBody = [
   `<path class="cj-mid" d="M${D.OX} 18V${D.OY + 22}"/>`,
   `<text class="fg-t sm" x="${D.OX}" y="14" text-anchor="middle">ANTERIOR</text>`,
   `<text class="fg-t sm" x="8" y="${D.OY + 30}">Patient's LEFT</text><text class="fg-t sm" x="372" y="${D.OY + 30}" text-anchor="end">Patient's RIGHT</text>`,
   `<circle class="cj-rest l"${at(".cj-rest.l")} r="3"/><circle class="cj-rest r"${at(".cj-rest.r")} r="3"/><circle class="cj-rest p"${at(".cj-rest.p")} r="3"/>`,
-  `<g class="hot" tabindex="0" data-info="The mandible seen from above. In a lateral move it swings around the condyle on the side it moves toward (the working condyle), while the other condyle orbits forward and medially."><path class="cj-jaw"${at(".cj-jaw")}/></g>`,
-  `<circle class="cj-spin"${at(".cj-spin")} r="13"/>`,
-  `<g class="hot" tabindex="0" data-info="Left condyle. In a LEFT move it is the working condyle and mostly rotates; in a right move it is the non-working condyle and orbits forward, down and medially."><ellipse class="cj-cond l"${at(".cj-cond.l")} rx="10" ry="6"/></g>`,
-  `<g class="hot" tabindex="0" data-info="Right condyle. In a RIGHT move it is the working condyle and mostly rotates; in a left move it is the non-working condyle and orbits forward, down and medially."><ellipse class="cj-cond r"${at(".cj-cond.r")} rx="10" ry="6"/></g>`,
-  `<g class="cj-tooth"${at(".cj-tooth")}><rect x="-12" y="-11" width="24" height="22" rx="7" class="cj-molar"/></g>`,
+  `<g class="cj-body"${at(".cj-body")}>`,
+  `<g class="hot" tabindex="0" data-info="The mandible and its teeth seen from above. In a lateral move it swings around the condyle on the side it moves toward (the working condyle), while the other condyle orbits forward and medially."><path class="cj-jaw"${at(".cj-jaw")}/><path class="cj-teeth"${at(".cj-teeth")}/></g>`,
+  `<g class="hot" tabindex="0" data-info="Mandibular right first molar #30. The dark dot is its distobuccal cusp, the cusp whose two paths are drawn: the same cusp the dot on #3 stands for above."><path class="cj-m1"${at(".cj-m1")}/><text class="cj-lab"${at(".cj-lab")} text-anchor="middle">#30</text></g>`,
+  `<g class="hot" tabindex="0" data-info="Left condyle. In a LEFT move it is the working condyle and mostly rotates; in a right move it is the non-working condyle and orbits forward, down and medially."><ellipse class="cj-cond l"${at(".cj-cond.l")} rx="24" ry="11"/></g>`,
+  `<g class="hot" tabindex="0" data-info="Right condyle. In a RIGHT move it is the working condyle and mostly rotates; in a left move it is the non-working condyle and orbits forward, down and medially."><ellipse class="cj-cond r"${at(".cj-cond.r")} rx="24" ry="11"/></g>`,
+  `</g>`,
+  `<circle class="cj-spin"${at(".cj-spin")} r="30"/>`,
   `<g class="hot" tabindex="0" data-info="Path of the cusp in a RIGHT move (laterotrusive, working): the jaw rotates about the right condyle, so the cusp swings toward the cheek and a little forward."><path class="cj-path lat"${at(".cj-path.lat")}/><path class="cj-head lat"${at(".cj-head.lat")}/></g>`,
   `<g class="hot" tabindex="0" data-info="Path of the cusp in a LEFT move (mediotrusive, non-working): the jaw rotates about the left condyle, so the cusp swings toward the tongue and forward."><path class="cj-path med"${at(".cj-path.med")}/><path class="cj-head med"${at(".cj-head.med")}/></g>`,
   `<circle class="cj-cusp"${at(".cj-cusp")} r="4.5"/>`,
   `<path class="cj-angle"${at(".cj-angle")}/><text class="cj-deg"${at(".cj-deg")} text-anchor="middle">${Math.round(J0.deg)}°</text>`,
 ].join("");
 const jawSvg = figureSvg({ width: 380, height: D.OY + 40, className: "cm-jaw",
-  label: "The mandible seen from above, anterior at the top, with both condyles and a right mandibular molar cusp. Two arrows show the cusp's path in a right move and in a left move, with the angle between them. Sliders move the cusp farther from the condyles or the midline, widen or narrow the intercondylar distance, or add a side shift.",
+  label: "The mandible and its teeth seen from above, anterior at the top, with both condyles and the distobuccal cusp of the right first molar #30 marked. Two arrows show the cusp's path in a right move and in a left move, with the angle between them. Sliders move the cusp farther from the condyles or the midline, widen or narrow the intercondylar distance, or add a side shift.",
   body: jawBody });
 
 const plate1 = plateHtml({ fig: "Fig 2", title: "Cusp pathways in motion", hint: "pick a movement", readout: "MIP",
@@ -156,10 +217,10 @@ const controls2 = `<div class="am-controls cm-jawctl">${slider("dist", "closer",
 <div class="am-controls"><button type="button" class="am-btn" data-swing="1">Right move</button><button type="button" class="am-btn" data-swing="-1">Left move</button><button type="button" class="am-btn cm-shift" aria-pressed="false">Add side shift (Bennett)</button></div>
 <div class="am-stats" aria-live="polite"><span><b>Angle between the paths</b> <em data-r="deg">${Math.round(J0.deg)}°</em></span><span><b>Compared with the start</b> <em data-r="cmp">the starting setting</em></span><span class="cm-legend"><i class="sw lat"></i><b>Right move</b> <em>working</em> <i class="sw med"></i><b>Left move</b> <em>non-working</em></span></div>
 <p class="am-summary cm-sum2" aria-live="polite"></p>
-<p class="am-info">Tap or hover the condyles and the paths for what they are.</p>`;
+<p class="am-info">Tap or hover the condyles, #30 and the paths for what they are.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>Drawn from the hub's L1 notes and Dr. Givan's "What cusp hits where?" help sheet: on a maxillary tooth you watch a mandibular cusp (protrusive mesial, working buccal, non-working mesiopalatal); on a mandibular tooth you watch a maxillary cusp, and everything reverses (protrusive distal, working lingual, non-working distobuccal). The MIP contact is at the base of each arrow. The teeth and arrows are the same as in the Cusp pathways figures above, including the help sheet's slight mesial lean of the working path on the upper tooth; retrusion is only about a millimeter, so its arrow is short.</li>
-<li>Fig 2b follows the notes on horizontal determinants: a greater distance from the rotating condyle, a greater distance from the midsagittal plane and a greater Bennett movement all increase the angle between a cusp's laterotrusive and mediotrusive paths; a greater intercondylar distance decreases it. It is a geometric model (the jaw rotating about one condyle, plus an optional side shift), with schematic distances, so the angle shows the trend, not a patient's value, and it won't match the help sheet's drawing exactly.</li>
+<li>Fig 2b follows the notes on horizontal determinants: a greater distance from the rotating condyle, a greater distance from the midsagittal plane and a greater Bennett movement all increase the angle between a cusp's laterotrusive and mediotrusive paths; a greater intercondylar distance decreases it. It is a geometric model (the jaw rotating about one condyle, plus an optional side shift), with schematic distances: the lower teeth are redrawn at typical widths along an arch through the watched cusp for each setting, so the cusp stays on #30. Because of that, the angle shows the trend, not a patient's value, and it won't match the help sheet's drawing exactly.</li>
 <li>Paths are drawn in the horizontal plane only; in the mouth the cusps also separate vertically as the condyle moves down the eminence.</li></ul></details>`;
 
 function cmLive(root, D) {
@@ -216,13 +277,13 @@ function cmLive(root, D) {
   function val(k, v) { var r = D[k]; return v <= 50 ? r[0] + (r[1] - r[0]) * v / 50 : r[1] + (r[2] - r[1]) * (v - 50) / 50; }
   function drawJaw() {
     var F = D.jawFrame(o, side, u, D);
-    Object.keys(F.attrs).forEach(function (sel) { var el = els[sel] || (els[sel] = jaw.querySelector(sel)); if (!el) return; var a = F.attrs[sel]; for (var k in a) el.setAttribute(k, a[k]); });
+    Object.keys(F.attrs).forEach(function (sel) { var el = els[sel] || (els[sel] = jaw.querySelector(sel)); if (!el) return; var a = F.attrs[sel], was = el.__cj || (el.__cj = {}); for (var k in a) if (was[k] !== a[k]) { el.setAttribute(k, a[k]); was[k] = a[k]; } });
     var deg = Math.round(F.deg); jaw.querySelector(".cj-deg").textContent = deg + "°";
     rs.deg.textContent = deg + "°"; if (readout2) readout2.textContent = deg + "° between the paths";
     var dd = deg - Math.round(base);
     rs.cmp.textContent = dd > 0 ? dd + "° wider" : dd < 0 ? (-dd) + "° narrower" : "the starting setting";
     jaw.setAttribute("data-side", side > 0 ? "r" : side < 0 ? "l" : "");
-    var s2 = "The two arrows are the paths a right mandibular molar cusp takes across the upper tooth: in a right move the jaw swings around the right (working) condyle; in a left move, around the left one. ";
+    var s2 = "The two arrows are the paths the distobuccal cusp of #30 takes across the upper teeth: in a right move the jaw swings around the right (working) condyle; in a left move, around the left one. ";
     s2 += "Farther from the rotating condyle, farther from the midline or with more side shift, the paths spread wider; a wider intercondylar distance brings them closer. That is why an articulator much smaller than the patient makes crowns you have to adjust.";
     if (sum2.textContent !== s2) sum2.textContent = s2;
   }
@@ -270,13 +331,15 @@ const CSS = `
 .anima .cm-moves .am-btn{white-space:nowrap}
 .anima .cm-jawbox{max-width:460px;margin:0 auto}
 .anima .cm-jaw .fg-t{fill:var(--anatomy-text);font:10px var(--anatomy-mono)}
-.anima .cj-mid{fill:none;stroke:var(--anatomy-faint);stroke-width:1;stroke-dasharray:4 4}
+.anima .cj-mid{fill:none;stroke:var(--anatomy-faint);stroke-width:1;stroke-dasharray:4 4;vector-effect:none}
 .anima .cj-jaw{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.4;stroke-linejoin:round;fill-rule:evenodd}
 .anima .cj-cond{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.4}
-.anima .cj-rest{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:2 2}
-.anima .cj-spin{fill:none;stroke:var(--anatomy-lit);stroke-width:2;stroke-dasharray:3 3;transition:opacity .2s}
-.anima .cj-molar{fill:#e9dcbf;stroke:#8b7653;stroke-width:1.2}
-.anima .cj-cusp{fill:var(--anatomy-strong)}
+.anima .cj-rest{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:2 2;vector-effect:none}
+.anima .cj-spin{fill:none;stroke:var(--anatomy-lit);stroke-width:2;stroke-dasharray:3 3;vector-effect:none;transition:opacity .2s}
+.anima .cj-teeth{fill:#e9dcbf;stroke:#8b7653;stroke-width:1}
+.anima .cj-m1{fill:#f7efdc;stroke:#5c4524;stroke-width:1.9}
+.anima .cj-lab{fill:var(--anatomy-text);font:600 10px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round;transition:opacity .2s}
+.anima .cj-cusp{fill:#1f3b8c;stroke:#fdf8ec;stroke-width:1.5}
 .anima .cj-path{fill:none;stroke-width:3.4;stroke-linecap:round}
 .anima .cj-path.lat{stroke:var(--anatomy-lit)}.anima .cj-head.lat{fill:var(--anatomy-lit)}
 .anima .cj-path.med{stroke:var(--tag-red)}.anima .cj-head.med{fill:var(--tag-red)}
@@ -286,7 +349,7 @@ const CSS = `
 .anima .cm-legend .sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin:0 5px 2px 0;vertical-align:middle}.anima .cm-legend .sw.lat{background:var(--anatomy-lit)}.anima .cm-legend .sw.med{background:var(--tag-red);margin-left:10px}
 .anima .cm-slab{font:.78rem var(--font-body);color:var(--ink-soft)}
 @media (max-width:560px){.anima .cm-jawctl{grid-template-columns:1fr}.anima .cm-slab{margin:-4px 0 6px}}
-@media (prefers-reduced-motion:reduce){.anima .cm-ghost,.anima .cj-spin{transition:none}}
+@media (prefers-reduced-motion:reduce){.anima .cm-ghost,.anima .cj-spin,.anima .cj-lab{transition:none}}
 `;
 
 export function cuspmotion() {
@@ -297,7 +360,7 @@ export function cuspmotion() {
     html: `<div class="anima" data-anima="cuspmotion">${plate1}${controls1}${plate2}${controls2}${SOURCES}</div>`,
     css: CSS,
     live: cmLive.toString(),
-    helpers: [jawMove, jawAngles, jawFrame],
+    helpers: [jawMove, jawAngles, jawShape, jawFrame],
     data: D,
   };
 }
