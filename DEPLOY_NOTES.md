@@ -52,6 +52,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   laterotrusion matched the slide for back/forward errors but not cleanly for high/low on the non-working side, so the figure
   states the slide's rule for it instead of showing a side view that can't. Checked with anima's line check (both themes),
   at 390 px and in dark mode, in the hub's notes; caption and About page updated. No question, notes text or audio change.
+- **2026-11-04 (site down: repo made private, Claude Code)** — The repo was made private for a while; on GitHub's free
+  plan that unpublishes Pages, so the whole site returned "Site not found" from about 16:24 to the next publish. Making it
+  public again didn't turn Pages back on: Sam re-enabled it in Settings → Pages (`main`, `/ (root)`). That publish timed
+  out during GitHub's Actions/Pages incident, and its re-run failed with "Deployment cancelled" (same commit, same
+  deployment ID), so this notes-only PR is the new commit that publishes the site again. What to do next time:
+  `vault/reference/shared-infrastructure.md` (GitHub Pages deploy).
 - **2026-11-04 (class picks on each choice, Sam's ask, Claude Code)** — `widget/v3.js` + `widget/v3.css`, every hub, no hub
   changes: once a question card is answered, each choice shows the share of the class that picked it (a % at the right, a fill
   behind the choice as wide as its share, the top pick in bold) and a line under "% of the class got this right" says how many
