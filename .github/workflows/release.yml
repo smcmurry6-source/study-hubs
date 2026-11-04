@@ -107,6 +107,24 @@ jobs:
       - name: Build the preview (no Timmy Time episodes, over Cloudflare's 25 MB a file; they play the live site's copy)
         if: steps.host.outputs.ready == 'yes'
         run: node tools/preview/build.js --out _preview --no-podcast --label "${{ github.event.pull_request.number && format('PR {0}', github.event.pull_request.number) || github.ref_name }}"
+      # Says which part of the setup is wrong without printing the token: not a working API token at all (a Global API
+      # Key gets the same "Authentication error" from wrangler), or a token that can't reach this account's Pages.
+      - name: Check the Cloudflare token
+        if: steps.host.outputs.ready == 'yes'
+        run: |
+          api() { curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/$1"; }
+          if [ "$(api user/tokens/verify)" = 200 ] || [ "$(api "accounts/$CLOUDFLARE_ACCOUNT_ID/tokens/verify")" = 200 ]; then
+            echo "The token is a working API token."
+          else
+            echo "::error::CLOUDFLARE_API_TOKEN isn't a working API token. A Global API Key doesn't work here: create a token (My Profile, API Tokens, Create Token, Create Custom Token) with Account, Cloudflare Pages, Edit, and replace the secret."
+            exit 1
+          fi
+          code=$(api "accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects")
+          if [ "$code" != 200 ]; then
+            echo "::error::The token works but can't open Cloudflare Pages on account $CLOUDFLARE_ACCOUNT_ID (HTTP $code). Give it Account, Cloudflare Pages, Edit on that account, and check that CLOUDFLARE_ACCOUNT_ID is that account's id."
+            exit 1
+          fi
+          echo "It can open Cloudflare Pages on account $CLOUDFLARE_ACCOUNT_ID."
       - name: Deploy it to Cloudflare Pages
         id: deploy
         if: steps.host.outputs.ready == 'yes'
