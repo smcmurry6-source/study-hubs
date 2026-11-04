@@ -115,7 +115,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 /* the bar wraps by its content, not by a screen width: when the buttons don't fit beside the wordmark and the live count
    (a narrow phone, a large text size), they move together onto a row of their own, right-aligned */
 .topbar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:20px 0 0;}
-.tb-actions{display:flex; align-items:center; gap:inherit; margin-left:auto; flex:none;}
+.tb-actions{display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:inherit; margin-left:auto; flex:0 1 auto; min-width:0;}   /* and wrap among themselves at the largest text on the narrowest phones */
 .wordmark{display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; letter-spacing:-.01em; margin-right:auto;}
 .wordmark .rings{display:flex; gap:3px;}
 .wordmark .rings i{width:5px; height:18px; border-radius:3px; display:block;}

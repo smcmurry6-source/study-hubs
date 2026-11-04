@@ -902,6 +902,7 @@ header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; wh
 @media (pointer:coarse){
   header.hub-header[data-sh-head^="stack"] #modeSwitch button{min-height:40px;}
   header.hub-header .hub-meta > :is(.theme-btn, .sh-ribbon-inbox), header.hub-header .hub-back-btn{min-width:32px; min-height:32px;}
+  header.hub-header #sh-ribbon-name{min-height:32px;}
 }
 
 /* ================= motion (widget/fx.js) ================= */
@@ -1169,3 +1170,8 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
 .sh-cp-top .sh-cp-pct{font-weight:800; color:var(--ink, #15202A);}
 .sh-cp-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
 .sh-cp-note{margin-top:4px; font-size:.74rem; line-height:1.4; color:var(--ink-faint, #7a8090);}
+
+/* Home's "Where to next" list (copied into every hub from heme-endo-exam1): at the largest text sizes on a phone its rows
+   were wider than the screen, so the page scrolled sideways. The column may shrink, and a row's button drops below its text. */
+.home-next{grid-template-columns:minmax(0, 1fr);}
+.home-next > li{flex-wrap:wrap;}

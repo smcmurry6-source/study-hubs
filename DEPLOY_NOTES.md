@@ -51,7 +51,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   group of `aria-pressed` buttons, not a tablist without arrow keys). **Perio:** the arcade leaderboard tabs wrap. CI:
   `tools/ci/smoke.js` checks the dashboard and every hub at 320 px, 1001 px and 390 px with the largest text: no sideways scroll,
   every top-bar control and tab fully on screen and not clipped, every mode tab labeled. About page: "A top bar that fits your
-  screen"; Hub modes now says four modes. Bug log BUG-010-012; report `vault/release/reports/2026-11-04-responsive-top-bars.md`.
+  screen"; Hub modes now says four modes. The largest text also showed Home's "Where to next" rows wider than a phone in
+  five hubs (a shared guard in `widget/v3.css`: the column may shrink, the button drops below) and Perio's course-map titles
+  (`overflow-wrap`). Bug log BUG-010-013; report `vault/release/reports/2026-11-04-responsive-top-bars.md`.
   `sw.js` -> `sh-v53`.
 
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
