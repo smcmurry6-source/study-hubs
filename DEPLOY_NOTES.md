@@ -32,6 +32,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Occlusion L6: the mounting-error figure redrawn and made accurate, Claude Code)** — Sam: "the articulator
+  anima is not accurate." `mounterr` (L6 notes at "The facebow transfer" and Review) is rebuilt in
+  `tools/figures/occlusion/anima/mounterr.mjs`. What was wrong: the casts didn't meet (a gap between the arches), only the
+  maxillary cast moved (the mandibular cast is mounted to it with the CR record, so both carry the error), the condylar
+  element hung outside its housing, there was no incisal guide table, the lit teeth were drawn to the rule rather than
+  worked out, and "Move to the side" showed the same side view as protrusion. Now: a semi-adjustable arcon articulator to
+  scale (condylar elements on the lower member, housings with a 35° condylar guidance on the upper, the incisal pin on the
+  upper member lifting off a flat incisal guide table as the casts' own front teeth guide, mounting plates and stone),
+  both casts in Class I occlusion moving together, a slider for the size of the error (1-15 mm) and a chart of how many
+  microns more or less each lower posterior tooth drops on the articulator than in the mouth after 1 mm of protrusion.
+  One closed-form model (`meModel`: condyle down 35°, lower incisal edge down the upper central's 50° lingual surface, 3 mm
+  overbite, incisal edge 82 mm in front of and 43 mm below the axis) drives both panels. It reproduces the slide's rule
+  for all four errors: too far back or too high puts the teeth closer to the axis, the back teeth separate less there
+  (−19 / −13 µm at the second molar for 10 mm), so work built there leans on the anterior teeth; too far forward or too low,
+  they separate more (+16 / +11 µm), cusps are built too tall and the most posterior teeth hit. An arbitrary facebow's 2-5 mm
+  gives 2-9 µm, in line with the notes' "clinically insignificant". The direction reverses if the anterior guidance is
+  flatter than the condylar guidance (said in the figure's sources). Laterotrusion is no longer drawn: a 3-D check of right
+  laterotrusion matched the slide for back/forward errors but not cleanly for high/low on the non-working side, so the figure
+  states the slide's rule for it instead of showing a side view that can't. Checked with anima's line check (both themes),
+  at 390 px and in dark mode, in the hub's notes; caption and About page updated. No question, notes text or audio change.
 - **2026-11-04 (site down: repo made private, Claude Code)** — The repo was made private for a while; on GitHub's free
   plan that unpublishes Pages, so the whole site returned "Site not found" from about 16:24 to the next publish. Making it
   public again didn't turn Pages back on: Sam re-enabled it in Settings → Pages (`main`, `/ (root)`). That publish timed
