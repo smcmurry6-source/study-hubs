@@ -5539,7 +5539,19 @@ function homeNextHTML(rows){
   if(started.length && started[0].pct < 80){ var w = started[0];
     out.push('<li class="tag-' + w.l.tag + '"><span class="lec-num">' + lecLabel(w.l) + '</span><span><b>Your weakest lecture: ' + escHtml(w.l.title.split(':')[0]) + '</b><small>' + w.pct + '% right over ' + w.a + ' answers</small></span><button type="button" class="btn primary" data-home="weak:' + w.l.id + '">Drill it</button></li>'); }
   if(missed) out.push('<li><span class="hn-ic">' + icon('cycle') + '</span><span><b>' + missed + ' question' + (missed === 1 ? '' : 's') + ' you missed last time</b><small>Try them again while they\'re fresh</small></span><button type="button" class="btn" data-home="missed">Retry</button></li>');
-  if(fresh.length){ var f = fresh[0];
+  /* the lectures you've practiced least (Sam, 2026-11-04, from the lessons audit: two days out, practice fell off lecture by
+     lecture in bank order and the last four were barely touched): up to four lectures with under half their questions tried,
+     least first; Practice opens the bank on them with only the questions you haven't answered. Replaces "Not started" once
+     you've answered anything. */
+  var behind = rows.filter(function(r){ return r.total && r.tried / r.total < 0.5; })
+    .sort(function(a, b){ return a.tried / a.total - b.tried / b.total || a.l.num - b.l.num; }).slice(0, 4);
+  if(STATE.totalAnswered && behind.length){
+    out.push('<li class="tag-' + behind[0].l.tag + '"><span class="lec-num">' + lecLabel(behind[0].l) + '</span><span><b>Practiced least: ' + (behind.length === 1 ? escHtml(behind[0].l.title.split(':')[0]) : behind.length + ' lectures') + '</b><small>' +
+      (behind.length === 1 ? behind[0].tried + ' of ' + behind[0].total + ' questions tried' :
+        behind.map(function(r){ return lecLabel(r.l) + ' ' + escHtml(r.l.title.split(':')[0]) + ' (' + r.tried + ' of ' + r.total + ' tried)'; }).join(' · ')) +
+      '. Practice opens the questions you haven\'t tried in ' + (behind.length === 1 ? 'it' : 'them') + '.</small></span><button type="button" class="btn" data-home="least:' + behind.map(function(r){ return r.l.id; }).join(',') + '">Practice</button></li>');
+  }
+  else if(fresh.length){ var f = fresh[0];
     out.push('<li class="tag-' + f.l.tag + '"><span class="lec-num">' + lecLabel(f.l) + '</span><span><b>Not started: ' + escHtml(f.l.title.split(':')[0]) + '</b><small>' + (fresh.length > 1 ? fresh.length - 1 + ' more lecture' + (fresh.length > 2 ? 's' : '') + ' not started yet' : 'The last lecture you haven\'t tried') + '</small></span><button type="button" class="btn" data-home="notes:' + f.l.id + '">Read the notes</button></li>'); }
   if(!out.length) out.push('<li><span class="hn-ic">' + icon('medal') + '</span><span><b>Every lecture started and no misses waiting.</b><small>Take a full mock to check your timing</small></span><button type="button" class="btn primary" data-home="mock">Mock exam</button></li>');
   return '<div class="home-card"><h3>' + icon('target') + 'Where to next</h3><ul class="home-next">' + out.join('') + '</ul></div>';
@@ -5614,6 +5626,8 @@ function homeGo(what){
   else if(a === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = lec; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'all'; bankShown = BANK_PAGE; }
   else if(a === 'new'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
   else if(a === 'missed'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'missed'; bankShown = BANK_PAGE; }
+  else if(a === 'least'){ var ids = String(lec || '').split(',').filter(function(id){ return LECTURE_BY_ID[id]; });
+    STATE.ui.sub = 'bank'; STATE.ui.qlec = ids.length === 1 ? ids[0] : ids.length ? ids : 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
   else if(a === 'weak'){ STATE.ui.sub = 'weak'; WEAK_DRILL = lec; }
   else if(a === 'mock' || a === 'hints' || a === 'cram') STATE.ui.sub = a;
   saveState(); setMode('compendium');

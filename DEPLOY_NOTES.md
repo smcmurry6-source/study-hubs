@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (PCD Implants: "Practiced least" on Home, Claude Code)** — Sam approved the lessons audit's proposal. Two days out,
+  practice in `pcd-implants-exam1` fell off in bank order (the last four lectures had 6-7 answerers each vs 23 on L1-L2), so Home's
+  "Where to next" now lists up to four lectures with under half their questions tried, fewest first, and its Practice button opens
+  the Question Bank on them with "Not answered yet" (`homeGo('least:<ids>')`, `STATE.ui.qlec` as an array). It replaces the "Not
+  started" row once you've answered anything; a brand-new visitor still sees "Not started". About page (PCD Implants' Home line),
+  `vault/decisions.md`, hub note. No question, notes, audio or schema change.
+
 - **2026-11-04 morning (lessons audit, PCD Implants two days out, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and answer
   positions: report #37 (`bm-goodacre` printed each complication's percentage in its choice, so the biggest number was the key): the
   choices are now plain names and the numbers are in the why lines. Explanations name the favorite wrong answer on `ev-misch` (Ford
