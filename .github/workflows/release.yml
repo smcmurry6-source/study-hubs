@@ -33,9 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      SH_RELEASE_OUT: ${{ runner.temp }}/release
       SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
     steps:
+      # The runner context isn't available in a job's env, so the results folder is set here for every later step.
+      - name: Results folder outside the checkout
+        run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
