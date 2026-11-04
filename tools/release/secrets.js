@@ -18,6 +18,7 @@ const PATTERNS = [
   ['a Google API key', /\bAIza[0-9A-Za-z_-]{35}\b/],
   ['an AWS access key', /\bAKIA[0-9A-Z]{16}\b/],
   ['a Slack token', /\bxox[abprs]-[A-Za-z0-9-]{10,}/],
+  ['a Cloudflare API key or token', /\bcf[a-z]{1,3}_[A-Za-z0-9]{30,}\b|\b(CLOUDFLARE_API_(TOKEN|KEY)|CF_API_(TOKEN|KEY))\s*[:=]\s*["']?(?!\$)[A-Za-z0-9_-]{30,}/],
   ['a Cloudflare or other bearer token in a header', /Authorization:\s*Bearer\s+(?!["'+]|\$|SB_KEY|key\b)[A-Za-z0-9._-]{30,}/],
   ['a database URL with a password', /postgres(ql)?:\/\/[^:\s/]+:[^@\s<]{4,}@(?!localhost|127\.0\.0\.1)/],
   ['the admin secret written out', /\b(ADMIN_SECRET|p_secret)\s*[:=]\s*["'](?!<|\$|preview-admin|rls-test-secret|not-the-secret)[^"'\s]{8,}["']/]

@@ -52,15 +52,21 @@ not a screenshot. The tools are `tools/preview/`:
   700 MB). `--check <folder>` verifies a build.
 - In CI, the **Release tests** workflow builds it on every site-changing PR and attaches it as the `preview-site`
   artifact (kept 14 days): download, unzip, `node tools/preview/serve.js --dir preview-site`.
+- **A link per PR on Cloudflare Pages** (Sam's choice, 2026-11-04): the same workflow's `preview` job builds the
+  preview without Timmy Time episodes (`--no-podcast`: they're over Cloudflare's 25 MB a file and play the live site's
+  copy, so a new or changed episode doesn't play there), deploys it to `https://pr-<n>.<project>.pages.dev` and puts
+  that link on the PR in one comment it keeps up to date. It needs the repo secret `CLOUDFLARE_API_TOKEN` (a token with
+  only "Cloudflare Pages: Edit", never the Global API Key) and the repo variable `CLOUDFLARE_ACCOUNT_ID`; without them
+  it says so on the run's page.
 - In a Claude Code cloud session, the agent runs `serve.js` in the background and calls `report_preview_port`, so Sam
   can open the preview from the Claude app where it shows a preview panel, while the session is up. It has no address
-  outside the session, so screenshots come first when showing Sam ([section 10](#10-approval)).
+  outside the session; the PR's link is what Sam opens ([section 10](#10-approval)).
 
 **Where previews may be hosted.** Never on the live site's origin (`smcmurry6-source.github.io`), which rules out a
 second GitHub Pages repo too: pages on one origin share localStorage and the service worker's scope, so a preview there
 would read and overwrite real progress and could be served from the live site's cache. A hosted preview gets its own
 domain, and access control when classmates aren't meant to find it. The options are in [section 13](#13-hosting-and-staging); Sam
-chose none for now.
+chose Cloudflare Pages.
 
 **Noindex.** Every preview page carries `<meta name="robots" content="noindex, nofollow, noarchive, nosnippet,
 noimageindex">`, every response from `serve.js` an `X-Robots-Tag` header with the same, a build adds `_headers` (Cloudflare
@@ -196,11 +202,10 @@ Sam is the product owner, and nothing substantial reaches the class without Sam'
 Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agent **shows Sam the change**
 ([preview-a-change](vault/how-to/preview-a-change.md)):
 
-- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat every
-  time: they are what Sam sees;
-- a short recording when it moves or takes several steps;
-- the live preview from its cloud session (`report_preview_port`), where the Claude app shows it. It has no address
-  outside the session, so there's no link Sam can tap; that needs a hosted preview ([section 13](#13-hosting-and-staging)).
+- **the preview link on its own line, first**: `Preview: https://pr-<n>.<project>.pages.dev` from the PR's preview
+  comment ([section 3](#3-interactive-previews)), then the page and test account to open;
+- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat;
+- a short recording when it moves or takes several steps.
 
 Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
 has a checkbox, "Sam approved this release", that **only Sam ticks** (or Sam writes "approved for release" in a PR
@@ -231,20 +236,20 @@ problem (Sam's call), and the bug log.
 
 ## 13. Hosting and staging
 
-**Sam's call, 2026-11-04: neither, for now.** Sam sees a change in the agent's screenshots and its cloud session's live
-preview ([section 10](#10-approval)), and tests run on fixtures; everything above works that way. The options stay here
-in case that changes ([task, dropped](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)); a preview link Sam
-can tap on a phone needs one of the hosted options (A is the pick). Prices are from each
+**Sam's call, 2026-11-04: A, Cloudflare Pages, for a preview link on every PR** (the `preview` job,
+[section 3](#3-interactive-previews)), and **1, fixtures only, for staging** for now. Cloudflare Access isn't set up:
+previews show only made-up data and the site is public anyway, but anyone with a link can open one; adding Access later
+costs $0. Connecting it: [task](vault/tasks/2026-11-04-preview-hosting-and-staging.md). Prices are from each
 vendor's published plans as of November 2026; confirm on their pricing pages before signing up.
 
 **Hosted preview link per PR** (so a preview opens on a phone from the PR, with no computer):
 
 | Option | Cost | What Sam would do | Notes |
 |---|---|---|---|
-| A. Cloudflare Pages, deployed from the Release tests workflow (the pick if one is wanted) | $0 (Free: unlimited bandwidth, 500 builds a month); Cloudflare Access to keep previews private: $0 up to 50 users | Create a Cloudflare account and a Pages project (e.g. `study-hubs-preview`); create an API token with "Cloudflare Pages: Edit"; add it as the repo secret `CLOUDFLARE_API_TOKEN` and the account id as the variable `CLOUDFLARE_ACCOUNT_ID`; optionally an Access policy on `*.study-hubs-preview.pages.dev` (email one-time code) | Its own origin; reads `_headers` (X-Robots-Tag); per-PR URL `pr-<n>.<project>.pages.dev`. An agent then adds one deploy step. |
+| A. Cloudflare Pages, deployed from the Release tests workflow (**chosen 2026-11-04**) | $0 (Free: unlimited bandwidth, 500 builds a month); Cloudflare Access to keep previews private: $0 up to 50 users | Create a Cloudflare account and a Pages project (e.g. `study-hubs-preview`); create an API token with "Cloudflare Pages: Edit"; add it as the repo secret `CLOUDFLARE_API_TOKEN` and the account id as the variable `CLOUDFLARE_ACCOUNT_ID`; optionally an Access policy on `*.study-hubs-preview.pages.dev` (email one-time code) | Its own origin; reads `_headers` (X-Robots-Tag); per-PR URL `pr-<n>.<project>.pages.dev`. The `preview` job does the rest. |
 | B. Netlify deploy previews | Free plan (credit-based for new accounts; check how many deploys it covers) | Create an account; connect the repo or add a token secret | Reads `_headers`; previews public unless password protection (a paid feature) |
 | C. Vercel preview deployments | $0 on Hobby (non-commercial use only) | Create an account; connect the repo | Adds noindex to previews by itself; Vercel Authentication can keep them private |
-| D. Keep the current ways only (**chosen 2026-11-04**) | $0 | Nothing | Local or cloud-session preview, or the CI artifact (needs a computer) |
+| D. Keep the current ways only | $0 | Nothing | Local or cloud-session preview, or the CI artifact (needs a computer) |
 | Not an option | | | A second GitHub Pages repo: same origin as the live site (shared storage and service worker) |
 
 **Staging database** (for migrations and server logic):

@@ -9,6 +9,8 @@
 
 ## Preview
 
+Preview: <!-- the link from this PR's preview comment, on its own line -->
+
 <!-- What Sam was shown (screenshots, a recording, the cloud session's live preview) and how to open the preview (a
      cloud session, or the "Release tests" run's preview-site artifact). The Preview button's status at the end:
      "No request has reached production". -->

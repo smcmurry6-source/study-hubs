@@ -16,7 +16,9 @@ Why and the safety layers: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) (s
   same Wi-Fi.
 - **In a Claude Code cloud session:** run `node tools/preview/serve.js --port 4173` in the background, then call
   `report_preview_port` with 4173. Sam opens it from the Claude app, on a phone too, while the session is up.
-- **From a PR:** the "Release tests" run attaches `preview-site`. Download it, unzip, and
+- **From a PR, on a phone:** the link in the PR's preview comment, `https://pr-<n>.<project>.pages.dev` (Cloudflare
+  Pages, deployed by the "Release tests" run; no Timmy Time episodes, which play the live site's copy).
+- **From a PR, on a computer:** the "Release tests" run also attaches `preview-site`. Download it, unzip, and
   `node tools/preview/serve.js --dir preview-site`.
 - **A static copy** for a host: `node tools/preview/build.js --out _preview` (`_preview/` is gitignored), checked with
   `node tools/preview/build.js --check _preview`.
@@ -46,15 +48,13 @@ If the button turns red, something tried to reach production: that's an S1 bug, 
 Sam looks at a substantial change before approving it and doesn't test it
 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one easy look:
 
-- **Screenshots, first and every time,** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when
-  colors changed, at `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what each one
-  shows. They are what Sam sees: a cloud session's preview has no address outside the session, so there is no link Sam
-  can tap (2026-11-04: Sam asked for one; that needs a hosted preview, [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)
-  section 13). Never send the session's own link as if it opened the preview.
+- **The preview link on its own line, first, every time** (Sam, 2026-11-04): `Preview: https://pr-<n>.<project>.pages.dev`,
+  copied from the PR's preview comment (or the "Release tests" run's page), then the page and test account to open
+  (`hubs/occlusion/?persona=missed`). Never send a session's own link instead: a cloud session's preview has no address
+  outside it. If the PR has no link yet (the run hasn't finished, or the host isn't connected), say so.
+- **Screenshots** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when colors changed, at
+  `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what each one shows.
 - **A short recording** when it moves or takes several steps (Playwright's `recordVideo`), cut to the part that matters.
-- **The live preview, as a bonus:** keep `serve.js` running in the cloud session and call `report_preview_port`; where
-  the Claude app shows a preview panel, Sam can tap through it there. Say which page and test account to open (`?persona=missed`), and keep the session up
-  until Sam has looked.
 
 Sam says yes, or what to change; a new round gets new screenshots.
 
@@ -62,7 +62,7 @@ Sam says yes, or what to change; a new round gets new screenshots.
 
 Realtime (who's online, nukes, bosses: it shows 1 online); real class numbers (they're made up per question); the
 server's own rules for XP, streaks and leaderboards (approximated). Those need a staging database, not set up for
-now (Sam, 2026-11-04; [task](../tasks/done/2026-11-04-preview-hosting-and-staging.md)). Real Safari needs a real
+now (Sam, 2026-11-04; [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 13). Real Safari needs a real
 iPhone, iPad or Mac.
 
 ## Before the PR

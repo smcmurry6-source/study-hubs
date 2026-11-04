@@ -70,9 +70,9 @@ slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets)
 
 ## Not covered, or blocked
 
-- **A hosted preview link per PR:** not wanted for now (Sam, 2026-11-04): Sam looks at the agent's screenshots and its
-  cloud session's live preview ([task, dropped](../../tasks/done/2026-11-04-preview-hosting-and-staging.md)).
-- **Staging database:** not set up (same call). Server-side logic (XP, streaks, boards) is approximated in fixtures;
+- **A hosted preview link per PR:** built (Cloudflare Pages, Sam's choice), but not exercised yet: it needs the token
+  and account id in GitHub ([task](../../tasks/2026-11-04-preview-hosting-and-staging.md)).
+- **Staging database:** not set up (Sam, 2026-11-04: fixtures for now). Server-side logic (XP, streaks, boards) is approximated in fixtures;
   permissions are covered by `rls.js`.
 - **WebKit and Firefox:** not installed in this session; the "Release tests" workflow installs them, so its first run is
   their first run. Real Safari on an iPhone isn't covered by an agent.

@@ -3,6 +3,8 @@
 //   node tools/preview/build.js --out _preview                    fixture data, narration changed on this branch only
 //   node tools/preview/build.js --out _preview --audio all        every mp3 (about 700 MB)
 //   node tools/preview/build.js --out _preview --audio none       no hub narration copied; it streams from the live site
+//   node tools/preview/build.js --out _preview --no-podcast       leave out Timmy Time episodes (over Cloudflare Pages'
+//                                                                 25 MB a file); they play the live site's copy
 //   node tools/preview/build.js --check _preview                  verify a built preview (CI runs this)
 // Narration left out of the build is played from the live site's static copy (a plain GET of a public mp3; no data
 // is sent). Writes _headers (X-Robots-Tag for Cloudflare Pages / Netlify), robots.txt and preview-manifest.json.
@@ -12,6 +14,7 @@ const T = require('./transform');
 
 function arg(name, def){ const i = process.argv.indexOf('--' + name); return i > 0 ? process.argv[i + 1] : def; }
 const isHubAudio = rel => /^hubs\/[^/]+\/audio\/.+\.(mp3|mp4|webm)$/i.test(rel);
+const isPodcast = rel => /^hubs\/[^/]+\/audio\/timmy-time\.mp3$/i.test(rel);
 
 function walk(dir, base){
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(d => {
@@ -33,13 +36,14 @@ function build(out, opts){
   const audioMode = opts.audio || 'changed';
   const changed = audioMode === 'changed' ? changedFiles(opts.base || 'origin/main') : new Set();
   const files = T.SITE_ENTRIES.flatMap(e => { const p = path.join(T.ROOT, e); return !fs.existsSync(p) ? [] : fs.statSync(p).isDirectory() ? walk(p, T.ROOT) : [e]; });
-  const included = [], skipped = [];
+  const included = [], skipped = [], podcasts = [];
   files.forEach(rel => {
     if (isHubAudio(rel) && (audioMode === 'none' || (audioMode === 'changed' && !changed.has(rel)))) { skipped.push(rel); return; }
+    if (opts.noPodcast && isPodcast(rel)) { skipped.push(rel); podcasts.push(rel); return; }
     if (isHubAudio(rel)) included.push(rel);
   });
   const o = T.options({ data: opts.data || 'fixture', stagingUrl: process.env.SH_STAGING_URL, stagingKey: process.env.SH_STAGING_KEY, label: opts.label,
-    audio: audioMode === 'all' ? { mode: 'local', included: [] } : { mode: 'remote', included } });
+    audio: audioMode === 'all' && !podcasts.length ? { mode: 'local', included: [] } : { mode: 'remote', included } });
   let bytes = 0, count = 0;
   const skip = new Set(skipped);
   files.forEach(rel => {
@@ -55,8 +59,8 @@ function build(out, opts){
   fs.writeFileSync(path.join(out, '_headers'), T.headersFile());
   fs.writeFileSync(path.join(out, 'robots.txt'), T.robotsTxt());
   fs.writeFileSync(path.join(out, 'preview-manifest.json'), JSON.stringify({ label: o.label, ref: o.ref, sha: o.sha, builtAt: o.builtAt, data: o.data,
-    audio: audioMode, narrationIncluded: included.length, narrationFromLiveSite: skipped.length, files: count }, null, 1));
-  return { out, count, bytes, included: included.length, skipped: skipped.length, options: o };
+    audio: audioMode, narrationIncluded: included.length, narrationFromLiveSite: skipped.length, podcastsLeftOut: podcasts, files: count }, null, 1));
+  return { out, count, bytes, included: included.length, skipped: skipped.length, podcasts, options: o };
 }
 
 /* every check a preview host relies on; returns a list of problems */
@@ -97,8 +101,9 @@ if (require.main === module) {
       if (p.length) { console.error('✗ preview check failed:\n' + p.map(x => '  - ' + x).join('\n')); process.exit(1); }
       console.log(`✓ ${dir}: noindex everywhere, no production host or key, the runtime loads first on every page`);
     } else {
-      const r = build(arg('out', '_preview'), { audio: arg('audio', 'changed'), data: arg('data', 'fixture'), label: arg('label', null), base: arg('base', 'origin/main') });
+      const r = build(arg('out', '_preview'), { audio: arg('audio', 'changed'), data: arg('data', 'fixture'), label: arg('label', null), base: arg('base', 'origin/main'), noPodcast: process.argv.includes('--no-podcast') });
       console.log(`✓ preview of ${r.options.label} @ ${(r.options.sha || '').slice(0, 7)} in ${r.out}: ${r.count} files, ${(r.bytes / 1048576).toFixed(1)} MB; narration: ${r.included} included, ${r.skipped} from the live site`);
+      if (r.podcasts.length) console.log(`  Timmy Time left out (the preview plays the live site's copy): ${r.podcasts.join(', ')}`);
       const p = check(r.out);
       if (p.length) { console.error('✗ but the check failed:\n' + p.map(x => '  - ' + x).join('\n')); process.exit(1); }
     }
