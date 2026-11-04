@@ -1,10 +1,10 @@
 ---
 type: task
-status: blocked
+status: open
 hub: boards
 created: 2026-11-03
 requested-by: Sam
-waiting-on: PR 215 (the vault) merged into main
+waiting-on: 
 agent: 
 pr: 
 ---
@@ -75,6 +75,7 @@ merge gets bigger.
 ## Log
 
 - 2026-11-03: written with the vault PR, after a trial merge. Waiting on that PR.
+- 2026-11-04: the vault PR merged (Sam: "merge when ready"); ready for an agent.
 
 ## Outcome
 
