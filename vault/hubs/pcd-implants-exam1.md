@@ -21,7 +21,12 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   checklist against the lectures. No graded quiz or previous years' exam content.
 - **Mock:** 40 questions / 60 minutes, MCQ only; `MOCK_BLUEPRINT` is the hub's own (no official counts per lecture).
 - **Figures:** eleven anima figures from `tools/figures/pcd-implants-exam1/` (one generic live controller, `amLive`, in
-  `shared.mjs`); edit them there and rerun `build.mjs` (`--check`, `--preview`).
+  `shared.mjs`); edit them there and rerun `build.mjs` (`--check`, `--preview`). All eleven were checked against the notes
+  and fixed on 2026-11-04 (change log): `attach` draws its soft tissue layers to scale from Gargiulo 1961 and Cochran
+  1997 (the averages behind 2.04 and 3.08 mm); `zones` is an upper incisor, so coronal is down as in the notes' "creep
+  down (coronally)"; `position` measures every distance at the crest, to scale. A figure that wants to react when a
+  slider or button sets a key names a helper in `D.ONSET` (`position` switches views that way). anima's line check has
+  nothing to test here (these figures draw no `.iso-line`), so review them by eye in both themes and at 390 px.
 - **Arcade:** the Osseo Arcade, skin `IMPL_SKIN`.
 - **Timmy Time:** an episode (`hubs/pcd-implants-exam1/audio/timmy-time.mp3`, script `tools/podcast/pcd-implants-exam1/script.md`),
   card on Home under the quick-start row, `#timmy` opens Home. `SH_PODCAST.fans` holds its three lore comments

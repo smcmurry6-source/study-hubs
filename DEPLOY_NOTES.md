@@ -53,6 +53,34 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
     labeled apical and coronal, with the flap margin; the horizontal mattress strand now ends at a cut, not running off
     the picture; braided thread as herringbone. Figure-eight caption and q2-D03 explanation keep only what the notes
     say (flaps that won't meet closely, as with apically positioned flaps).
+- **2026-11-04 (PCD Implants: all eleven figures checked against the notes and fixed, Claude Code)** — Sam: "vet, audit, and
+  improve all implants figures." Each figure in `tools/figures/pcd-implants-exam1/` was rendered in every state, both themes and
+  at 390 px, and read against its lecture's notes. **Content fixes:** `attach` (tooth vs implant) drew the tooth's junctional
+  epithelium about 2.4 mm long, starting above the CEJ, and the implant's layers didn't add up to its 3.08 mm mark; now the
+  sulcus, JE and connective tissue are to scale on both (tooth 0.69 / 0.97 / 1.07 mm, Gargiulo 1961; implant 0.16 / 1.88 /
+  1.05 mm, Cochran 1997, the averages behind the lecture's 2.04 and 3.08), with enamel, dentin, pulp, PDL and lamina dura,
+  and the implant's circular fibers shown cut across. `zones` drew the B zone convex (the notes: concave) and said the margin
+  "creeps down (coronally)" while it moved up; it is now an upper incisor in section (coronal down), B zone concave, the facial
+  E zone on the slider, the palatal side following the natural tooth, with the straight-E-zone margin marked. `retention`
+  (screw or cement?) had the crown floating on the gum with nothing reaching the implant, and its facial tilt showed nothing;
+  now a lower molar in section in occlusion: one-piece screw-retained crown on a titanium base with the abutment screw and
+  access channel, the channel coming out through the buccal when the implant is tilted, and an angled abutment with a
+  cemented crown when that forces cement. `position`'s section labeled "2 mm+" on a gap drawn at 6.6 mm (it claimed 16 px
+  per mm); every distance is now measured at the crest and to scale (3 / 1 mm anterior, 1.5 / 1.5 mm posterior), the
+  proximal values sit in a row with what the rule needs, the tooth-implant papilla is drawn, and touching a slider switches
+  to the proximal view. **Drawing fixes:** `connection` (the external hex was hidden behind the abutment; every connection now
+  shows the abutment screw), `stages` (white gaps around the final abutment, the crown sitting on the gum, floating sutures,
+  and surgery 2 now closed around the healing abutment), `guided` (freehand drew a 28-degree tilt poking out of the bone;
+  fully guided and dynamic now land 1.1 mm / 1.3 mm off, the L8 averages, freehand and pilot marked as illustrations; the
+  pilot template comes off after the pilot drill; the screen no longer covers a tooth), `misch` (the marrow spaces formed a
+  diagonal stripe; now both arches in occlusal view and a trabecular pattern whose marrow spaces grow from D1 to D4),
+  `stability` (a kink in the total curve; the inset labels old bone, the resorbed gap and new bone), `cantilever` (the bridge
+  is drawn unit by unit, a clipped label, the 0 lb wording), `cbct` (two clipped labels), and leader lines that crossed their
+  own labels. `shared.mjs`: `amLive` calls `D[D.ONSET]` after a button or slider sets a key. Checked: `build.mjs --check`,
+  every figure mounted in the hub's notes (light 1200 px, dark 390 px), anima's line check (0 of 0: these figures use no
+  `.iso-line`), `syntax.js`, `vault.js`, `smoke.js`. About page (the Diagrams entry). No question, notes text, audio or
+  schema change. Phone labels are still small (inbox).
+
 - **2026-11-04 (Occlusion L6: the mounting-error figure redrawn and made accurate, Claude Code)** — Sam: "the articulator
   anima is not accurate." `mounterr` (L6 notes at "The facebow transfer" and Review) is rebuilt in
   `tools/figures/occlusion/anima/mounterr.mjs`. What was wrong: the casts didn't meet (a gap between the arches), only the

@@ -12,20 +12,29 @@ function coRender(st, D) {
   var bd = "M10 " + B + "L" + f1(cx - iw / 2 - 50) + " " + B + "Q" + f1(cx - iw / 2 - 12) + " " + f1(B + dip * 0.4) + " " + f1(cx - iw / 2) + " " + f1(B + dip) + "L" + f1(cx + iw / 2) + " " + f1(B + dip) + "Q" + f1(cx + iw / 2 + 12) + " " + f1(B + dip * 0.4) + " " + f1(cx + iw / 2 + 50) + " " + B + "L630 " + B + "V380H10Z";
   o += HOT("Crestal bone. Micromovement and bacteria at the implant-abutment junction (the microgap) cost crestal bone; moving the gap away from the bone preserves bone height.", '<path class="cort" d="' + bd + '"/>');
   o += '<path class="gum" d="M10 ' + (B - 70) + "H" + f1(cx - aw / 2 - 2) + "V" + f1(P) + "H" + f1(cx + aw / 2 + 2) + "V" + (B - 70) + "H630V" + B + "L" + f1(cx + iw / 2 + 50) + " " + B + "Q" + f1(cx + iw / 2 + 12) + " " + f1(B + dip * 0.4) + " " + f1(cx + iw / 2) + " " + f1(B + dip) + "V" + f1(P) + "H" + f1(cx - iw / 2) + "V" + f1(B + dip) + "Q" + f1(cx - iw / 2 - 12) + " " + f1(B + dip * 0.4) + " " + f1(cx - iw / 2 - 50) + " " + B + 'H10Z"/>';
-  o += HOT(tl ? "Tissue-level implant: a smooth, polished collar sits above the bone, in the soft tissue; the rough surface below is covered by bone." : "Bone-level implant: the platform sits at the bone, which leaves more room to contour the emergence profile.", SCREW(cx, P, iw, 380 - P, 14) + (tl ? '<path class="ti-hi" d="M' + f1(cx - iw / 2) + " " + f1(P) + "H" + f1(cx + iw / 2) + "V" + B + "H" + f1(cx - iw / 2) + 'Z"/>' : ""));
-  /* the connection */
-  if (k === "ext") o += HOT("External connection: the implant has a hex sticking up and the female part is in the abutment. More force on the abutment and screw, so screws loosen more; more tolerant of divergent implants when splinted.", '<path class="ti" d="M' + (cx - 30) + " " + f1(P) + "V" + f1(P - 14) + "H" + (cx + 30) + "V" + f1(P) + 'Z"/>');
-  else if (k === "int") o += HOT("Internal connection: the female part is in the implant. More force on the implant itself, less microgap under force. Every implant used at the school is internal.", '<path d="M' + (cx - 30) + " " + f1(P) + "V" + f1(P + 34) + "H" + (cx + 30) + "V" + f1(P) + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)"/>');
-  else o += HOT("Conical connection: a kind of internal connection where the abutment's tapered surface meets the implant's, slope against slope (Morse taper). Less microgap, so less marginal bone loss and fewer prosthetic complications; survival about the same as internal non-conical.", '<path d="M' + (cx - 36) + " " + f1(P) + "L" + (cx - 16) + " " + f1(P + 50) + "H" + (cx + 16) + "L" + (cx + 36) + " " + f1(P) + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)"/>');
-  /* abutment */
-  var ab = "M" + f1(cx - aw / 2) + " " + f1(P) + "L" + f1(cx - aw / 2 - 6) + " " + (B - 120) + "L" + f1(cx + aw / 2 + 6) + " " + (B - 120) + "L" + f1(cx + aw / 2) + " " + f1(P) + "Z";
+  o += HOT(tl ? "Tissue-level implant: a smooth, polished collar sits above the bone, in the soft tissue; the rough surface below is covered by bone." : "Bone-level implant: the platform sits at the bone, which leaves more room to contour the emergence profile.", SCREW(cx, P, iw, 380 - P, 14) + (tl ? '<path class="ti-hi" d="M' + f1(cx - iw / 2) + " " + B + "L" + f1(cx - iw / 2 - 6) + " " + f1(P) + "H" + f1(cx + iw / 2 + 6) + "L" + f1(cx + iw / 2) + " " + B + 'Z"/>' : ""));
+  /* the implant's internal thread bore, which the abutment screw goes into */
+  var bore = k === "ext" ? P : k === "int" ? P + 34 : P + 50;
+  o += '<path d="M' + (cx - 7) + " " + f1(bore) + "V" + f1(P + 96) + "H" + (cx + 7) + "V" + f1(bore) + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)" stroke-width=".8"/>';
+  /* the connection: where the female part is */
+  if (k === "int") o += HOT("Internal connection: the female part is in the implant. More force on the implant itself, less microgap under force. Every implant used at the school is internal.", '<path d="M' + (cx - 30) + " " + f1(P) + "V" + f1(P + 34) + "H" + (cx + 30) + "V" + f1(P) + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)"/>');
+  else if (k === "con") o += HOT("Conical connection: a kind of internal connection where the abutment's tapered surface meets the implant's, slope against slope (Morse taper). Less microgap, so less marginal bone loss and fewer prosthetic complications; survival about the same as internal non-conical.", '<path d="M' + (cx - 36) + " " + f1(P) + "L" + (cx - 16) + " " + f1(P + 50) + "H" + (cx + 16) + "L" + (cx + 36) + " " + f1(P) + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)"/>');
+  /* abutment, with its male part for internal and conical */
+  var top = B - 120, ab = "M" + f1(cx - aw / 2) + " " + f1(P) + "L" + f1(cx - aw / 2 - 6) + " " + top + "L" + f1(cx + aw / 2 + 6) + " " + top + "L" + f1(cx + aw / 2) + " " + f1(P) + "Z";
   if (k === "int") ab += "M" + (cx - 28) + " " + f1(P) + "V" + f1(P + 32) + "H" + (cx + 28) + "V" + f1(P) + "Z";
   if (k === "con") ab += "M" + (cx - 34) + " " + f1(P) + "L" + (cx - 15) + " " + f1(P + 48) + "H" + (cx + 15) + "L" + (cx + 34) + " " + f1(P) + "Z";
   o += HOT(ps ? "Platform switching: the abutment is narrower than the implant, so the junction moves inward and the soft tissue gains volume." : "Abutment as wide as the implant: the junction sits at the outer edge of the platform.", '<path class="ti-hi" d="' + ab + '"/>');
+  /* external: the implant's hex stands up into a recess in the abutment */
+  if (k === "ext") o += HOT("External connection: the implant has a hex sticking up and the female part is in the abutment. More force on the abutment and screw, so screws loosen more; more tolerant of divergent implants when splinted.", '<path class="ti" d="M' + (cx - 30) + " " + f1(P + 1) + "V" + f1(P - 14) + "H" + (cx + 30) + "V" + f1(P + 1) + 'Z"/>') + L(470, P - 24, "the implant's hex", cx + 28, P - 8, "start");
+  /* the abutment screw: head on the abutment's inner seat, shank down into the implant's threads */
+  var seat = k === "ext" ? P - 40 : P - 30, th = "";
+  for (var ty = P + 56; ty < P + 92; ty += 6) th += "M" + (cx - 7) + " " + ty + "l14 3";
+  o += '<path d="M' + (cx - 11) + " " + top + "V" + f1(seat - 12) + "H" + (cx + 11) + "V" + top + 'Z" fill="var(--anatomy-shade-0)" stroke="var(--im-ti-line)" stroke-width=".8"/>';
+  o += HOT("Abutment screw: it runs down through the abutment and threads into the implant, clamping the two together. In an external connection more of the force falls on it, so it loosens more.", '<path class="ti" d="M' + (cx - 10) + " " + f1(seat - 12) + "H" + (cx + 10) + "V" + f1(seat) + "H" + (cx + 5) + "V" + f1(P + 92) + "H" + (cx - 5) + "V" + f1(seat) + "H" + (cx - 10) + 'Z"/><path d="' + th + '" stroke="var(--im-ti-line)" stroke-width="1"/>') + L(470, top + 30, "abutment screw", cx + 10, seat - 8, "start");
   /* microgap markers */
   [-1, 1].forEach(function (s) { o += '<circle cx="' + f1(cx + s * gapX) + '" cy="' + f1(P) + '" r="' + (k === "con" ? 4 : 6) + '" fill="none" stroke="var(--im-bad)" stroke-width="2"/>'; });
-  o += L(560, P - 34, "microgap", cx + gapX + 4, P - 4, "end", "bad");
-  o += L(70, B + 46, "crestal bone", cx - iw / 2 - 30, B + dip * 0.3 + 4, "start");
+  o += L(500, P + 40, "microgap", cx + gapX + 4, P + 2, "start", "bad");
+  o += L(150, B + 46, "crestal bone", cx - iw / 2 - 30, B + dip * 0.3 + 4, "end");
   return o;
 }
 function coSay(st) {

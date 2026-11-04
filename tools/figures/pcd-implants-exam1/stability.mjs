@@ -4,8 +4,9 @@
 // weeks) and no numbers, so the y axis has none. A thread inset shows the bone-implant interface at the same moment.
 import { makeFig, f1, T, L, HOT } from "./shared.mjs";
 
-function stPrim(w) { return w <= 1 ? 1 : Math.exp(-(w - 1) / 2.2); }
-function stSec(w) { return 1 / (1 + Math.exp(-(w - 4.6) / 1.05)) - 1 / (1 + Math.exp(4.6 / 1.05)); }
+/* smooth schematic curves: primary falls from the first week, secondary rises; their sum dips around weeks 2-4 */
+function stPrim(w) { return (1 / (1 + Math.exp((w - 2.6) / 0.9))) / (1 / (1 + Math.exp(-2.6 / 0.9))); }
+function stSec(w) { return 1.05 * (1 / (1 + Math.exp(-(w - 4.2) / 1.0)) - 1 / (1 + Math.exp(4.2 / 1.0))); }
 function stRender(st, D) {
   var o = "", X0 = 60, X1 = 420, Y0 = 300, Y1 = 60, wmax = 12;
   function X(w) { return X0 + (X1 - X0) * w / wmax; } function Y(v) { return Y0 - (Y0 - Y1) * v / 1.25; }
@@ -16,22 +17,21 @@ function stRender(st, D) {
   o += HOT("Primary stability: the mechanical lock of an implant slightly wider than the last drill, measured as insertion torque (Ncm). It falls as the bone at the osteotomy edges is resorbed.", '<path d="' + path(D.stPrim) + '" fill="none" stroke="var(--im-ti-line)" stroke-width="2.2" stroke-dasharray="6 4"/>');
   o += HOT("Secondary stability: new (woven, then lamellar) bone laid down on the implant. This is osseointegration proper.", '<path d="' + path(D.stSec) + '" fill="none" stroke="var(--im-ok)" stroke-width="2.2"/>');
   o += HOT("Total stability = primary + secondary. The dip comes weeks after placement; exactly when depends on the brand and its surface treatment.", '<path d="' + path(function (x) { return D.stPrim(x) + D.stSec(x); }) + '" fill="none" stroke="var(--im-hot)" stroke-width="3"/>');
-  o += T(X(0.3), Y(1.06) - 6, "total", "hot-t s") + T(X(9.3), Y(D.stSec(9.3)) + 16, "secondary", "ok s") + T(X(5.4), Y(D.stPrim(5.4)) + 14, "primary", "s");
+  o += T(X(0.3), Y(1.06) - 6, "total", "hot-t s") + T(X(9.3), Y(D.stSec(9.3)) + 16, "secondary", "ok s") + T(X(2.9) + 8, Y(D.stPrim(2.9)) - 2, "primary", "s");
   var wk = st.wk, p = D.stPrim(wk), s = D.stSec(wk);
   o += '<path class="lead" d="M' + f1(X(wk)) + " " + Y1 + "V" + Y0 + '"/><circle cx="' + f1(X(wk)) + '" cy="' + f1(Y(p + s)) + '" r="5" fill="var(--im-hot)"/><circle cx="' + f1(X(wk)) + '" cy="' + f1(Y(p)) + '" r="4" fill="var(--im-ti-line)"/><circle cx="' + f1(X(wk)) + '" cy="' + f1(Y(s)) + '" r="4" fill="var(--im-ok)"/>';
-  /* inset: one thread against the bone */
-  var ix = 450, iy = 70, iw = 170, ih = 200, gap = (1 - p) * (1 - Math.min(1, s * 1.2)) * 18, wov = Math.min(1, s * 1.1);
+  /* inset: threads against the bone. The bone the threads pressed into is resorbed (as primary stability falls) while
+     new bone is laid down on the titanium (as secondary rises); what's left between them is the gap at the dip */
+  var ix = 450, iy = 70, iw = 170, ih = 200, tx = ix + 50, res = 18 * (1 - p), nb = 18 * Math.min(1, s / 1.0), gp = Math.max(0, res - nb);
+  function prof(off) { var d = "", k2; for (k2 = 0; k2 < 5; k2++) { var y = iy + 8 + k2 * 38; d += "L" + f1(ix + off) + " " + y + "L" + f1(tx + off) + " " + (y + 10) + "L" + f1(tx + off) + " " + (y + 18) + "L" + f1(ix + off) + " " + (y + 28); } return d; }
   o += '<rect x="' + ix + '" y="' + iy + '" width="' + iw + '" height="' + ih + '" rx="10" fill="var(--anatomy-shade-3)" stroke="var(--line)"/>';
   o += T(ix + iw / 2, iy - 8, "the interface, magnified", "s mut", "middle");
-  var tx = ix + 58, d = "M" + ix + " " + iy;
-  for (var k = 0; k < 5; k++) { var y = iy + 10 + k * 38; d += "L" + (ix) + " " + y + "L" + tx + " " + (y + 8) + "L" + tx + " " + (y + 22) + "L" + ix + " " + (y + 30); }
-  d += "L" + ix + " " + (iy + ih) + "Z";
-  o += HOT("Titanium threads (schematic). The implant is slightly wider than the last drill, so at placement the threads press into the bone.", '<path class="ti" d="' + d + '"/>');
-  var bd = "M" + (ix + iw) + " " + iy + "L" + f1(ix + gap) + " " + iy;
-  for (var k2 = 0; k2 < 5; k2++) { var y2 = iy + 10 + k2 * 38; bd += "L" + f1(ix + gap) + " " + y2 + "L" + f1(tx + gap) + " " + (y2 + 8) + "L" + f1(tx + gap) + " " + (y2 + 22) + "L" + f1(ix + gap) + " " + (y2 + 30); }
-  bd += "L" + f1(ix + gap) + " " + (iy + ih) + "L" + (ix + iw) + " " + (iy + ih) + "Z";
-  o += HOT("Bone at the osteotomy. From about day 7 osteoclasts resorb its edges (primary stability drops) while woven bone forms on the implant (secondary rises).", '<path class="trab" d="' + bd + '"/>');
-  if (wov > 0.05) { for (var k3 = 0; k3 < 5; k3++) { var y3 = iy + 14 + k3 * 38; o += '<path d="M' + f1(tx + 3) + " " + (y3 + 4) + "L" + f1(tx + 3 + gap * wov) + " " + (y3 + 4) + "L" + f1(tx + 3 + gap * wov) + " " + (y3 + 22) + "L" + f1(tx + 3) + " " + (y3 + 22) + 'Z" fill="var(--im-ok)" opacity="' + f1(0.25 + 0.5 * wov) + '"/>'; } }
+  o += HOT("Bone at the osteotomy. From about day 7 osteoclasts resorb the bone the threads were pressed into, so primary stability drops.", '<path class="trab" d="M' + (ix + iw) + " " + iy + "L" + f1(ix + res) + " " + iy + prof(res) + "L" + f1(ix + res) + " " + (iy + ih) + "L" + (ix + iw) + " " + (iy + ih) + 'Z"/>');
+  if (nb > 0.6) o += HOT("New bone (woven, then lamellar) laid down on the titanium: secondary stability, osseointegration proper.", '<path d="M' + ix + " " + iy + "L" + f1(ix + nb) + " " + iy + prof(nb) + "L" + f1(ix + nb) + " " + (iy + ih) + "L" + ix + " " + (iy + ih) + 'Z" fill="var(--im-ok)" opacity=".45"/>');
+  o += HOT("Titanium threads (schematic). The implant is slightly wider than the last drill, so at placement the threads press into the bone.", '<path class="ti" d="M' + ix + " " + iy + prof(0) + "L" + ix + " " + (iy + ih) + 'Z"/>');
+  o += T(ix + iw - 8, iy + 22, "old bone", "s", "end");
+  if (nb > 6) o += T(ix + iw - 8, iy + ih - 12, "new bone", "ok s", "end");
+  if (gp > 3) o += T(ix + iw - 8, iy + ih / 2 + 4, "resorbed: gap", "hot-t s", "end");
   return o;
 }
 function stSay(st) {

@@ -14,9 +14,13 @@ function caRender(st, D) {
   o += HOT("The far implant: it is pulled the other way (tension), a load bone and the screw tolerate poorly.", SCREW(xb, B, 50, 100, 6));
   o += HOT("The implant next to the pontic is the fulcrum: it carries the bite plus the leverage.", SCREW(xa, B, 50, 100, 6));
   if (fixd) o += HOT("The fix: another implant under the pontic (three implants for five units), or two separate bridges.", SCREW(xp, B, 50, 100, 6));
-  /* the bridge */
-  o += HOT("The bridge: crowns on the two implants and a cantilevered pontic beyond the last one.", '<path class="crown" d="M' + (xb - 44) + " " + (B - 74) + "Q" + (xb - 44) + " " + (B - 92) + " " + (xb - 20) + " " + (B - 92) + "L" + f1(xp + 26) + " " + (B - 92) + "Q" + f1(xp + 46) + " " + (B - 92) + " " + f1(xp + 46) + " " + (B - 74) + "L" + f1(xp + 40) + " " + (B - 26) + "L" + (xb - 40) + " " + (B - 26) + 'Z"/>');
-  [xb, xa].forEach(function (x) { o += '<path class="ti-hi" d="M' + (x - 14) + " " + B + "L" + (x + 14) + " " + B + "L" + (x + 18) + " " + (B - 26) + "L" + (x - 18) + " " + (B - 26) + 'Z"/>'; });
+  /* the bridge, unit by unit: crowns over the implants, pontics between and beyond, joined at the connectors */
+  var n = Math.max(3, Math.round((xp - xb) / 70) + 1), uw = (xp - xb) / (n - 1), top = B - 92, bot = B - 26, i, d1 = "M" + f1(xb - uw / 2 + 4) + " " + (bot - 8);
+  for (i = 0; i < n; i++) { var l = xb + (i - 0.5) * uw, rr = xb + (i + 0.5) * uw, c0 = xb + i * uw; d1 += (i ? "Q" + f1(l) + " " + (top + 16) + " " + f1(l + 6) + " " + (top + 8) : "L" + f1(l) + " " + (top + 14) + "Q" + f1(l) + " " + top + " " + f1(l + 12) + " " + top) + "Q" + f1(c0 - uw * 0.2) + " " + (top - 6) + " " + f1(c0) + " " + (top + 4) + "Q" + f1(c0 + uw * 0.2) + " " + (top - 6) + " " + f1(rr - (i === n - 1 ? 12 : 6)) + " " + (top + (i === n - 1 ? 0 : 8)); }
+  d1 += "Q" + f1(xp + uw / 2) + " " + top + " " + f1(xp + uw / 2) + " " + (top + 14) + "L" + f1(xp + uw / 2 - 4) + " " + (bot - 8);
+  for (i = n - 1; i >= 0; i--) { var l2 = xb + (i - 0.5) * uw, c2 = xb + i * uw; d1 += "Q" + f1(c2 + uw * 0.3) + " " + (bot + 2) + " " + f1(c2) + " " + bot + "Q" + f1(c2 - uw * 0.3) + " " + (bot + 2) + " " + f1(i ? l2 : l2 + 4) + " " + (i ? bot - 22 : bot - 8); }
+  o += HOT("The bridge: crowns on the two implants, a pontic between them and cantilevered pontics beyond the last one.", '<path class="crown" d="' + d1 + 'Z"/>');
+  [xb, xa].concat(fixd ? [xp] : []).forEach(function (x) { o += '<path class="ti-hi" d="M' + (x - 14) + " " + B + "L" + (x + 14) + " " + B + "L" + (x + 18) + " " + (B - 26) + "L" + (x - 18) + " " + (B - 26) + 'Z"/>'; });
   /* the bite */
   o += caArrow(xp, B - 170, B - 96, "--im-hot", 4) + T(xp, B - 176, "bite " + F + " lb", "hot-t", "middle");
   if (!fixd) {
@@ -25,12 +29,13 @@ function caRender(st, D) {
     if (fb > 0) o += caArrow(xb - 46, B + 14 + lb, B + 14, "--im-ti-line", 2 + fb / 14) + T(xb - 58, B + 30, f1(fb) + " lb", "b", "end") + T(xb - 58, B + 46, "pulled out", "s mut", "end");
     o += '<path class="dim" d="M' + xb + " " + (B - 120) + "H" + xa + '"/>' + T((xa + xb) / 2, B - 126, "d", "hot-t s", "middle");
     if (r > 0) o += '<path class="dim" d="M' + xa + " " + (B - 120) + "H" + f1(xp) + '"/>' + T((xa + xp) / 2, B - 126, "c = " + r + " d", "hot-t s", "middle");
-  } else o += T(xp, B + 128, "the load goes straight down this implant", "ok s", "middle");
+  } else o += T(xp - 40, B + 120, "no lever: the bite goes straight down", "ok s", "end");
   return o;
 }
 function caSay(st) {
   if (st.fix) return ["With an implant under the pontic there's no cantilever: the bite goes down the implant under it and there's no lever. Always avoid cantilevering an implant prosthesis (the one exception Dr. Chavali allowed: an opposing denture).", "no cantilever"];
   var F = 25, fa = F * (1 + st.r), fb = F * st.r;
+  if (st.r === 0) return ["With the bite right over the last implant there's no cantilever: that implant carries the " + F + " lb and the other one nothing. Slide the pontic out and the load on both grows: moment of force = force x distance.", F + " lb, no lever"];
   return ["Moment of force = force x distance. With the pontic " + st.r + " times the implant spacing beyond the last implant, a " + F + " lb bite puts " + fa + " lb on the fulcrum implant and " + fb + " lb on the other one, pulling it the other way." + (st.r === 2 ? " That's the lecture's example: 25 lb becomes 75 lb and 50 lb." : ""), f1(fa) + " lb on the fulcrum"];
 }
 export function cantilever() {
