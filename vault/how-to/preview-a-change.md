@@ -46,6 +46,11 @@ If the button turns red, something tried to reach production: that's an S1 bug, 
 Sam looks at a substantial change before approving it and doesn't test it
 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one easy look:
 
+- **A direct link on its own line, every time** (Sam, 2026-11-04), first in the message and in the PR's Preview section:
+  `Preview: https://claude.ai/code/<session id>`, then the page and account to open (`hubs/occlusion/?persona=missed`).
+  A cloud session's preview has no public address: it opens from that session's preview panel in the Claude app, so
+  the link is the session's (`get_session`, or the `Claude-Session` line). Say it lasts only while the session is up.
+  A local session gives `http://127.0.0.1:4173/<page>`.
 - **Screenshots** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when colors changed, at
   `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what each one shows.
 - **A short recording** when it moves or takes several steps (Playwright's `recordVideo`), cut to the part that matters.

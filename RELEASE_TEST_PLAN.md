@@ -199,7 +199,8 @@ Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agen
 - screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat;
 - a short recording when it moves or takes several steps;
 - the live preview from its cloud session (`report_preview_port`), which Sam can tap through in the Claude app, on a
-  phone too, while the session is up.
+  phone too, while the session is up, with **a direct link to it on its own line** (the session's link and the page to
+  open).
 
 Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
 has a checkbox, "Sam approved this release", that **only Sam ticks** (or Sam writes "approved for release" in a PR

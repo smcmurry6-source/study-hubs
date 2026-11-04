@@ -14,7 +14,8 @@ after. The whole process, with the tiers that say what counts as substantial, is
 - **The agent tests:** it uses the change in an interactive preview (`node tools/preview/serve.js`) as the test accounts,
   on an emulated phone and a laptop, and does the UAT itself ([preview-a-change](../how-to/preview-a-change.md)).
 - **Sam looks, doesn't test** (Sam, 2026-11-04): the agent shows Sam the change (screenshots, a short recording if it
-  moves, and its cloud session's live preview through `report_preview_port`); Sam says yes or what to change.
+  moves, and its cloud session's live preview through `report_preview_port`, with a direct link to it on its own line);
+  Sam says yes or what to change.
 - **No production data, ever:** previews and tests run on fixtures (or a staging project), never write to the class's
   data and never count in the analytics. Never type the real admin secret into a preview; never copy production rows
   into fixtures, staging or a report.
