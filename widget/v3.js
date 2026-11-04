@@ -1918,6 +1918,143 @@
     } catch (e) { return { text: null, lec: null }; }
   }
 
+  /* ---------- "Find this in the notes" after a missed question (2026-11-04, from /reddit-scout's first run) ----------
+     When the student misses a question they just answered on a card, a button under the explanation opens the notes
+     paragraph that best matches it, right there in the card, with a jump into the notes through the hub's own
+     window.SH_GOTO (the jump the widget's search uses). The match is BM25 over that lecture's note paragraphs in
+     SH_EXPORT.sections, with the right answer counting most, then the explanation, then the stem (SH_EXPORT.questions'
+     hint is "answer — explanation"). Weak matches get no button: a wrong passage is worse than none. Only a card the
+     student just tapped gets one, so the mock exam's submit and the arcade never do. Tracked: notes-jump:shown, :none,
+     :show, :open. */
+  var NJ_MIN_SCORE = 14, NJ_MIN_CHARS = 50;
+  var NJ_STOP = {};
+  ("a about above after again against all also an and any are as at be because been before being below between both but by can " +
+   "could did do does doing down during each either few for from further had has have having here how if in into is it its itself " +
+   "just more most much must no nor not now of off on once only or other our out over own same should so some such than that the " +
+   "their them then there these they this those through to too under until up very was we were what when where which while who whom " +
+   "why will with within without would you your one two three four five first second third true false statement statements read " +
+   "following choice choices answer answers correct incorrect best least likely except none neither option options question " +
+   "describes described describe given called known used uses using may might often usually typically commonly etc").split(" ")
+    .forEach(function(w){ NJ_STOP[w] = 1; });
+  function njStem(w){
+    if (w.length > 4 && /ies$/.test(w)) return w.slice(0, -3) + "y";
+    if (w.length > 5 && /(sses|xes|zes|ches|shes)$/.test(w)) return w.slice(0, -2);
+    if (w.length > 3 && /[^s]s$/.test(w)) return w.slice(0, -1);
+    if (w.length > 5 && /ing$/.test(w)) return w.slice(0, -3);
+    if (w.length > 4 && /ed$/.test(w)) return w.slice(0, -2);
+    if (w.length > 4 && /ly$/.test(w)) return w.slice(0, -2);
+    return w;
+  }
+  function njTokens(t){
+    var out = [];
+    (String(t || "").toLowerCase().match(/[a-z0-9]+/g) || []).forEach(function(w){
+      if (NJ_STOP[w] || (w.length < 3 && !/\d/.test(w))) return;
+      out.push(njStem(w));
+    });
+    return out;
+  }
+  var njIndexes = {}, njQuestions = null;
+  function njIndex(lec){
+    if (njIndexes[lec]) return njIndexes[lec];
+    var docs = getExport().sections.filter(function(s){
+      return s && s.kind === "Notes" && s.lec === lec && s.go && s.go.v === "notes" && String(s.text || "").length >= NJ_MIN_CHARS;
+    }).map(function(s){
+      var tf = {}, n = 0;
+      njTokens(s.text).forEach(function(t){ tf[t] = (tf[t] || 0) + 1; n++; });
+      return { s: s, tf: tf, n: n };
+    });
+    var df = {}, total = 0;
+    docs.forEach(function(d){ total += d.n; Object.keys(d.tf).forEach(function(t){ df[t] = (df[t] || 0) + 1; }); });
+    return (njIndexes[lec] = { docs: docs, df: df, avg: docs.length ? total / docs.length : 1 });
+  }
+  function njQuestion(qid){
+    if (!njQuestions) { njQuestions = {}; getExport().questions.forEach(function(q){ if (q && q.id) njQuestions[q.id] = q; }); }
+    return njQuestions[qid] || null;
+  }
+  function njBest(q){
+    if (!q || !q.lec) return null;
+    var ix = njIndex(q.lec); if (!ix.docs.length) return null;
+    var hint = String(q.hint || ""), cut = hint.indexOf(" — ");
+    var parts = cut > -1 ? [[hint.slice(0, cut), 2], [hint.slice(cut + 3), 1.5]] : [[hint, 1.5]];
+    parts.push([q.text, 1]);
+    var qw = {};
+    parts.forEach(function(p){ njTokens(p[0]).forEach(function(t){ var w = /^\d+$/.test(t) ? p[1] / 3 : p[1]; qw[t] = Math.max(qw[t] || 0, w); }); });
+    var N = ix.docs.length, k1 = 1.2, b = 0.75, top = null;
+    ix.docs.forEach(function(d){
+      var sc = 0, hits = [];
+      Object.keys(qw).forEach(function(t){
+        var f = d.tf[t]; if (!f) return;
+        var idf = Math.log(1 + (N - ix.df[t] + 0.5) / (ix.df[t] + 0.5));
+        var part = qw[t] * idf * (f * (k1 + 1)) / (f + k1 * (1 - b + b * d.n / ix.avg));
+        sc += part;
+        hits.push([t, part]);
+      });
+      if (!top || sc > top.score) top = { score: sc, hits: hits, s: d.s };
+    });
+    if (!top) return null;
+    /* the words that carry the match, most telling first; only these few get marked in the excerpt */
+    var words = top.hits.filter(function(h){ return !/^\d+$/.test(h[0]); })
+      .sort(function(x, y){ return y[1] - x[1]; }).map(function(h){ return h[0]; });
+    return words.length >= 2 && top.score >= NJ_MIN_SCORE ? { s: top.s, hits: words.slice(0, 6) } : null;
+  }
+  /* the paragraph, escaped, with the first place each of the telling words appears marked */
+  function njMarked(text, hits){
+    var on = {}; hits.forEach(function(t){ on[t] = 1; });
+    return String(text || "").split(/([A-Za-z0-9]+)/).map(function(part, i){
+      if (i % 2 === 0) return esc(part);
+      var w = part.toLowerCase(), t = njStem(w);
+      if (w.length < 3 || NJ_STOP[w] || on[t] !== 1) return esc(part);
+      on[t] = 2;
+      return "<mark>" + esc(part) + "</mark>";
+    }).join("");
+  }
+  var NJ_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>';
+  function njAttach(card, qid){
+    var ex = card.querySelector(".qcard-explain");
+    if (!ex || ex.querySelector(".sh-nj")) return;
+    var q = njQuestion(qid), m = null;
+    try { m = njBest(q); } catch (e) { m = null; }
+    if (!m) { shTrackSafe("notes-jump:none"); return; }
+    var where = lectureTitle(q.lec) || "";
+    var wrap = document.createElement("div");
+    wrap.className = "sh-nj";
+    wrap.setAttribute("data-sh-noread", "");
+    wrap.innerHTML = '<button type="button" class="sh-nj-btn" data-sh-notejump="show" aria-expanded="false">' + NJ_ICON + '<span>Find this in the notes</span></button>' +
+      '<div class="sh-nj-box" hidden><div class="sh-nj-where">' + esc(where) + (where ? " · " : "") + 'Notes</div>' +
+      '<p class="sh-nj-text">' + njMarked(m.s.text, m.hits) + '</p>' +
+      '<button type="button" class="sh-nj-open" data-sh-notejump="open">Open this in the notes</button></div>';
+    var btn = wrap.querySelector(".sh-nj-btn"), box = wrap.querySelector(".sh-nj-box");
+    btn.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      var open = box.hidden;
+      box.hidden = !open;
+      btn.setAttribute("aria-expanded", String(open));
+      if (open) shTrackSafe("notes-jump:show");
+    });
+    wrap.querySelector(".sh-nj-open").addEventListener("click", function(ev){
+      ev.stopPropagation();
+      shTrackSafe("notes-jump:open");
+      try { if (window.shDrill && window.shDrill.isOpen && window.shDrill.isOpen()) window.shDrill.close(); } catch (e) {}
+      try { if (window.shCloseWidgetPanels) window.shCloseWidgetPanels(); } catch (e) {}
+      try { window.SH_GOTO(m.s.go); } catch (e) {}
+    });
+    var row = ex.querySelector(".qcard-classdata-row");
+    if (row && row.parentNode === ex) ex.insertBefore(wrap, row); else ex.appendChild(wrap);
+    shTrackSafe("notes-jump:shown");
+  }
+  /* the card the student last tapped or typed in; answering a card fires the hub's answered event inside that tap */
+  var njCard = null;
+  function njNote(e){ var c = e.target && e.target.closest ? e.target.closest(".qcard[data-qid]") : null; njCard = c; }
+  document.addEventListener("click", njNote, true);
+  document.addEventListener("keydown", njNote, true);
+  document.addEventListener(ANSWERED_EVENT, function(e){
+    var d = (e && e.detail) || {};
+    if (d.correct || d.ctx === "mock" || d.ctx === "arcade" || typeof window.SH_GOTO !== "function") return;
+    var qid = String(d.qid || ""), card = njCard;
+    if (!qid || !card || card.getAttribute("data-qid") !== qid) return;
+    setTimeout(function(){ if (card.isConnected) njAttach(card, qid); }, 0);
+  });
+
   function loadStats(){
     var toughEl = document.getElementById("shstat-tough");
     var modesEl = document.getElementById("shstat-modes");

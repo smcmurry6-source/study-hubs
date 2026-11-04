@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 ("Find this in the notes" after a missed question, Claude Code)** — From `/reddit-scout`'s first run, Sam's
+  go. `widget/v3.js` (`njAttach` and helpers, after `findQuestionMeta`) + `widget/v3.css` (`.sh-nj*`), so every hub gets it:
+  when the student misses a question they just tapped, a **Find this in the notes** button appears under the explanation
+  (inside `.qcard-explain`, before the class-accuracy row). It opens the best-matching notes paragraph in the card, its six
+  most telling words marked, and **Open this in the notes** jumps there through the hub's `window.SH_GOTO` (the search's jump:
+  opens the lecture at As taught and flashes the paragraph), closing the Daily drill first if it's open. The match is BM25
+  over that lecture's `Notes` entries in `SH_EXPORT.sections` (50+ characters), weighting the right answer 2, the
+  explanation 1.5 and the stem 1 (numbers a third), from `SH_EXPORT.questions[].hint`; below a score of 14 or with fewer
+  than two shared words there is no button (`NJ_MIN_SCORE`). On the current banks 90-97% of questions get one (Occlusion
+  649/671, Perio 633/650, PCD Implants 486/543). Only the card the student just tapped (capture-phase click/keydown), so the
+  mock's submit and the arcade never get one; also skipped for `ctx` `mock` / `arcade`. Tracked `notes-jump:shown`, `:none`,
+  `:show`, `:open`. Checked in Playwright on Occlusion, Perio, PCD Implants and Special Patient Care, desktop and phone,
+  plus the drill and dark mode. About page ("In every hub"); `sw.js` -> `sh-v52`. No hub, notes, audio or schema change.
+
 - **2026-11-04 (reddit scout, Claude Code)** — New `/reddit-scout` skill (`.claude/skills/reddit-scout/`, model
   invocation off, so it runs only when Sam calls it): reads r/ClaudeAI, r/ClaudeCode, r/Anthropic and r/claude through
   `tools/reddit-scout/scout.py` (Atom feeds, since Reddit's JSON API answers 403 to cloud sessions; standard library

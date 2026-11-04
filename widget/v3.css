@@ -142,6 +142,19 @@
 .sh-qpin svg{width:13px; height:13px;}
 .sh-qpin.is-on{color:var(--accent-ink, #1f3b8c); background:var(--accent-soft, #dfe5f7);}
 .sh-qpin.is-on svg{fill:currentColor;}
+/* "Find this in the notes" under a missed question's explanation (v3.js, njAttach) */
+.sh-nj{margin-top:12px;}
+.sh-nj-btn{appearance:none; display:inline-flex; align-items:center; gap:7px; min-height:36px; padding:7px 13px; border:1px solid var(--line, rgba(0,0,0,.15)); border-radius:999px; background:var(--surface, transparent); color:var(--accent-ink, #1f3b8c); font:600 13px/1.2 var(--font-body, sans-serif); cursor:pointer;}
+.sh-nj-btn:hover{background:var(--accent-soft, #dfe5f7);}
+.sh-nj-btn[aria-expanded="true"]{background:var(--accent-soft, #dfe5f7); border-color:transparent;}
+.sh-nj-btn svg{width:15px; height:15px; flex:none;}
+.sh-nj-box{margin-top:8px; padding:10px 12px 8px; border-left:3px solid var(--accent, #2f6fd6); border-radius:0 10px 10px 0; background:var(--surface-2, rgba(0,0,0,.04));}
+.sh-nj-box[hidden]{display:none;}
+.sh-nj-where{margin-bottom:4px; color:var(--ink-faint, #888); font:600 11.5px/1.3 var(--font-body, sans-serif);}
+.sh-nj-text{margin:0; color:var(--ink, #222); font-size:14px; line-height:1.55; white-space:normal;}
+.sh-nj-text mark{padding:0; border-radius:2px; background:var(--accent-soft, rgba(47,111,214,.18)); color:inherit; box-shadow:0 0 0 1px var(--accent-soft, rgba(47,111,214,.18));}
+.sh-nj-open{appearance:none; margin-top:6px; padding:6px 0; border:0; background:none; color:var(--accent-ink, #1f3b8c); font:600 13px/1.2 var(--font-body, sans-serif); text-decoration:underline; text-underline-offset:2px; cursor:pointer;}
+.sh-nj-open::after{content:" \2192";}
 .sh-qpin + .sh-qflag{margin-left:0;}
 
 /* ---------- persistent screen-name badge (fallback when a hub has no ribbon slot) ---------- */
