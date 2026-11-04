@@ -32,6 +32,32 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
+  ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
+  [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,
+  bug log, Sam's approval, release, monitoring, rollback). **Previews:** `tools/preview/serve.js` (this checkout, on the fly)
+  and `build.js` (a static copy; the "Release tests" workflow attaches it to every site-changing PR as `preview-site`). A
+  preview runs on fixture data in the browser and can't reach the class's data: production Supabase URLs and keys are
+  rewritten to `fixtures.preview.invalid`, a connect/img/media CSP leaves production out, and `runtime/preview.js` (loaded
+  first, previews only) answers PostgREST-style from synthetic data, blocks and counts anything aimed at Supabase, and logs
+  every write; pages are noindex (meta, X-Robots-Tag, `_headers`, robots.txt) and titled "Preview ·". Its Preview button
+  has six synthetic test accounts (`fixtures/personas.json`: new, returning, high-XP, missed-question, archived-hub, admin
+  with the secret `preview-admin`), time travel, a class-data switch (normal, slow, unreachable) and the write log.
+  **CI ("Check hubs")** adds `tools/release/secrets.js` (keys, course material, data files), `tools/release/rls.js`
+  (RLS, grants and secret-gated functions as anon on a throwaway PostgreSQL built from `supabase/schema.sql`, against
+  `rls-expectations.json`) and `tools/ci/preview.js` (every page as every account, real write paths into fixtures, and
+  production attempted five ways without one request leaving the browser). **"Release tests"** (new workflow) runs
+  `tools/release/run.js`: those plus `a11y.js` (axe WCAG 2.2 AA, keyboard focus, reduced motion, against
+  `baselines/a11y.json`), `perf.js` (slow-4G phone budgets, `budgets.json`) and `matrix.js` (7 device sizes in Chromium,
+  WebKit and Firefox; refresh, history, offline, class data down, slow 3G). After a merge: `postcheck.js` (live files
+  identical to `main`, live pages load, every Supabase request blocked) and `monitor.sql` (read-only counts). Also
+  `rls-audit.sql` for the live database (run read-only today: no findings, 38 tables and 98 functions, matching the
+  snapshot). **Fixed:** `supabase/schema.sql`'s migration_v31 section had `$` for `$$` and couldn't rebuild the database.
+  Vault: rule, `vault/how-to/preview-a-change.md`, `roll-back-a-release.md`, `vault/release/` (UAT checklist, bug log with
+  the known accessibility and slow-3G issues, the dry-run report), a report template, a PR template, and a blocked task for
+  Sam's choice of a preview host and a staging database. No site change: nothing students see changed.
+
+
 - **2026-11-04 (PCD Implants: the seven implant types redrawn, the intramucosal insert added, Claude Code)** — Sam: "there
   are only 6 drawn and i feel like they could be better and more accurate." The L1 drawings (`FIGS` `ty-*`) were hand-pasted
   boxes: teeth as teardrops, a subperiosteal frame sunk into the bone, transosteal posts that missed the bar, a blade's bar

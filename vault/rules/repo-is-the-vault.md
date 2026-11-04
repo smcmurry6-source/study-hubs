@@ -30,6 +30,8 @@ copy (or tell Sam to, for a claude.ai skill or a Project doc).
 | Something to do | one note in `vault/tasks/` ([how tasks work](../tasks/README.md)) |
 | A quick idea, not yet a task | a line in [vault/tasks/inbox.md](../tasks/inbox.md) |
 | What shipped | "Recent major changes" in `DEPLOY_NOTES.md` (the change log) |
+| A bug found in testing or after a release (never an unfixed security hole) | a row in [the bug log](../release/bug-log.md) |
+| A release test report too long for its PR | `vault/release/reports/<yyyy-mm-dd>-<what>.md` ([template](../templates/release-test-report.md)) |
 | What the data taught | `LESSONS.md` (its own refresh process: `tools/lessons-refresh.md`) |
 
 ## How notes are written
@@ -38,7 +40,8 @@ copy (or tell Sam to, for a claude.ai skill or a Project doc).
 - **Link with relative markdown links**, `[ship-it-now](ship-it-now.md)`, never `[[wikilinks]]`: they work on GitHub,
   in Obsidian (the repo's `.obsidian/app.json` sets it) and for an agent reading raw files. Link to a file, not to a
   heading (GitHub and Obsidian spell heading anchors differently).
-- **Frontmatter** on every vault note: `type` (rule, how-to, reference, hub, task, decisions, map, template) and `tags`;
+- **Frontmatter** on every vault note: `type` (rule, how-to, reference, hub, task, decisions, map, template, checklist,
+  bug-log, test-report) and `tags`;
   rules carry `since`, tasks carry the fields in [tasks/README](../tasks/README.md).
 - **Link, don't copy.** Each fact has one home; everywhere else links to it. Code is the home of anything code says
   (exam dates live in `HUBS` in `index.html`, not in a note): a note says where to look.

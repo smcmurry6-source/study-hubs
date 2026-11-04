@@ -10,7 +10,11 @@ tags: [shipping]
 2. Make the change on your branch. Cloud sessions can only push their own
    `claude/...` branch; that's fine — open a PR and Sam merges it to publish.
    In a local session, still prefer a branch + PR over pushing `main` directly.
-3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)).
+3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)). **A substantial change** (tier 2 or 3 in
+   [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets a preview ([preview-a-change](preview-a-change.md)),
+   the release suites, UAT, its bug-log rows and a test report in the PR, and waits for Sam to tick "Sam approved this
+   release" ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge:
+   `node tools/release/postcheck.js` and the monitoring in the plan.
 4. In the PR description, write what changed in plain, student-facing language, in
    [American English](../rules/american-english.md).
 5. **Any student-visible feature, easter egg, trophy, holiday or setting goes on the About page in the same PR**
@@ -23,6 +27,7 @@ tags: [shipping]
 Never force-push `main`. If a PR conflicts, rebase and resolve deliberately —
 don't take one side wholesale; the other side is usually another session's work.
 
-Related: [github-is-the-source-of-truth](../rules/github-is-the-source-of-truth.md) ·
+Related: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) · [roll-back-a-release](roll-back-a-release.md) ·
+[github-is-the-source-of-truth](../rules/github-is-the-source-of-truth.md) ·
 [ship-it-now](../rules/ship-it-now.md) · [verify-before-pushing](verify-before-pushing.md) ·
 [tasks](../tasks/README.md)

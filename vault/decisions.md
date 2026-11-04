@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | Every substantial change gets an interactive preview on made-up data, the release tests and Sam's explicit approval before release, then post-release checks; previews never write to the class's data or analytics. Hosting a preview link per PR and a staging database wait for Sam's choice | every change, every agent | chat, [rule](rules/preview-and-release-test.md), [task](tasks/2026-11-04-preview-hosting-and-staging.md) |
 | 2026-11-04 | PCD Implants: redraw all seven implant-type drawings to be more accurate and add the missing intramucosal insert; outside sources are fine for accuracy (now a rule: [figures-teach-the-lecture](rules/figures-teach-the-lecture.md)) | `pcd-implants-exam1` | chat |
 | 2026-11-04 | After answering, every choice shows the % of the class that picked it (shared widget, `question_choices`) | every hub | chat, change log |
 | 2026-11-04 | `/reddit-scout`'s first run: build "Find this in the notes" (shipped in the widget) and the Supabase fix; skip a CI check for narration drift, don't re-propose it | widget, `/reddit-scout` | chat, `tools/reddit-scout/log.md` |

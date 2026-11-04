@@ -1,0 +1,16 @@
+{
+  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR.",
+  "anonSelect": [
+    "changelog",
+    "mode_stats",
+    "presence_hourly",
+    "question_choices",
+    "question_stats"
+  ],
+  "anonInsert": [
+    "hub_suggestions",
+    "question_flags"
+  ],
+  "anonUpdate": [],
+  "anonDelete": []
+}

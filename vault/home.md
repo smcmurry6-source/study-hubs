@@ -26,6 +26,8 @@ Shipping and the vault
 - [Secrets](rules/secrets.md): public repo; keys only from the environment.
 - [Content from lecture materials and graded coursework](rules/graded-coursework.md): no course files in the repo;
   graded work never copied, closed quizzes only as context, previous years' never.
+- [Preview and release-test every substantial change](rules/preview-and-release-test.md): a preview on made-up data, the
+  release tests, Sam's explicit approval, then checks after the release ([the plan](../RELEASE_TEST_PLAN.md)).
 
 Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md)
@@ -48,6 +50,8 @@ Hub building
 ## How-tos
 
 - [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md)
+- [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
+  travel · [Roll back a release](how-to/roll-back-a-release.md)
 - [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
 - [Read usage data and run surveys](how-to/read-usage-data.md)
@@ -55,6 +59,14 @@ Hub building
 - Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:
   `tools/podcast/README.md` (Claude Code: `/podcast`). Ideas from the Claude subreddits, checked against the repo:
   `.claude/skills/reddit-scout/SKILL.md` (Claude Code: `/reddit-scout`; past runs in `tools/reddit-scout/log.md`).
+
+## Release testing
+
+- [RELEASE_TEST_PLAN.md](../RELEASE_TEST_PLAN.md): the whole process, from tiers to rollback, and what waits on Sam.
+- [UAT checklist](release/uat-checklist.md) · [Bug log](release/bug-log.md) ·
+  [Release test report template](templates/release-test-report.md) · past reports in `vault/release/reports/`
+  ([the first one](release/reports/2026-11-04-release-process-dry-run.md)).
+- Tools: `tools/preview/` (previews) and `tools/release/` (the suites; `node tools/release/run.js` runs them all).
 
 ## Reference
 
@@ -85,4 +97,5 @@ and this list needs fixing. A new hub gets a note from [the hub template](templa
 
 ## Templates
 
-[Task](templates/task.md) · [Hub](templates/hub.md) · [Rule](templates/rule.md)
+[Task](templates/task.md) · [Hub](templates/hub.md) · [Rule](templates/rule.md) ·
+[Release test report](templates/release-test-report.md)

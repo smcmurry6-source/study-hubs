@@ -84,6 +84,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/graded-coursework.md
 
+@vault/rules/preview-and-release-test.md
+
 ## How-tos and reference
 
 @vault/how-to/narrate-with-kokoro.md

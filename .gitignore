@@ -21,3 +21,9 @@ tools/figures/*/dist/
 # copy duration and chapters into the hub's SH_PODCAST instead
 hubs/*/audio/*.mp3.json
 hubs/*/audio/*.mix.wav
+
+# Built previews (node tools/preview/build.js): never committed
+_preview/
+
+# npm i --no-save playwright axe-core (CI and the release tests): never committed
+node_modules/

@@ -8,6 +8,12 @@ tags: [map]
 - `AGENTS.md` — the entry point for every AI agent; `CLAUDE.md` loads it for Claude Code sessions.
 - `vault/` — the notes: rules, how-tos, reference, one note per hub, Sam's decisions and the task list. Start at
   [home](../home.md). Open the repo root in Obsidian to browse it as a vault ([repo-is-the-vault](../rules/repo-is-the-vault.md)).
+- `RELEASE_TEST_PLAN.md` — how a substantial change is previewed, tested, approved by Sam, released, watched and
+  rolled back ([preview-and-release-test](../rules/preview-and-release-test.md)). Its tools: `tools/preview/` (`serve.js`
+  and `build.js` make a production-safe preview on fixture data; `runtime/preview.js` is injected into previews only;
+  `fixtures/personas.json` holds the six test accounts) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
+  `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
+  `matrix.js`, `postcheck.js`, `monitor.sql`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
 - `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
   hub or feature; don't read it whole.
 - `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`

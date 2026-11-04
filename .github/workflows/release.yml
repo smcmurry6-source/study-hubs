@@ -1,0 +1,71 @@
+# The full automated release test (RELEASE_TEST_PLAN.md, "Automated gates") and an interactive preview to download.
+# Runs on every pull request that changes the site, and by hand (Actions -> Release tests -> Run workflow).
+# It never deploys anything and never talks to the live database: every page runs on fixture data.
+name: Release tests
+on:
+  workflow_dispatch:
+    inputs:
+      engines:
+        description: Browser engines for the device matrix
+        default: chromium,webkit,firefox
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'about/**'
+      - 'review/**'
+      - 'hubs/**'
+      - 'widget/**'
+      - 'assets/**'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'supabase/**'
+      - 'migration_v*.sql'
+      - 'tools/preview/**'
+      - 'tools/release/**'
+      - 'tools/ci/**'
+concurrency:
+  group: release-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      SH_RELEASE_OUT: ${{ runner.temp }}/release
+      SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright browsers, axe-core and PostgreSQL
+        run: |
+          npm i --no-save playwright@1.56.1 axe-core@4.14.0
+          npx playwright install --with-deps chromium webkit firefox
+          ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
+      - name: Run every release suite
+        run: node tools/release/run.js
+      - name: Write the summary on this run's page
+        if: ${{ !cancelled() }}
+        run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Build the preview (fixture data, noindex, narration from the live site unless changed here)
+        if: ${{ !cancelled() }}
+        run: node tools/preview/build.js --out _preview --label "${{ github.event.pull_request.number && format('PR {0}', github.event.pull_request.number) || github.ref_name }}"
+      - name: Upload the preview (download, unzip, then node tools/preview/serve.js --dir <folder>)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-site
+          path: _preview
+          retention-days: 14
+      - name: Upload the test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-test-results
+          path: ${{ runner.temp }}/release
+          retention-days: 30
