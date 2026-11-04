@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Occlusion L7: five interactive diagrams, Claude Code)** — The five figures Sam approved on 2026-11-03,
+  built with anima in `tools/figures/occlusion/anima/` and placed in the L7 notes at both levels (`FIG_PLACE.malocclusion`
+  and `FIG_BY_LEC.malocclusion` in `od.js`, in `data-sh-noread` wrappers; READINGS and the mp3s unchanged) and in L7's
+  Review tab (`figs` sections next to the matching tables): `tolerance` (normal function + events against a movable
+  tolerance line; above it the slides' signs a-g light on a side view with the masseter and temporalis; "Monday, then
+  Tuesday"; two SVGs that stack on a phone), `stability` (seat the joints and close to the first contact, bite into MIP
+  and the condyle comes off its seat, 1-2 mm / > 3 mm / the 10% with MIP = CR, bruxer loading, a flat plane splint),
+  `splints` (maxillary or mandibular, full or partial, stabilizing or repositioning, protrude on the ramp, months of
+  partial-coverage wear), `thirds` (slide the lower molar: first third grinding, middle third minor ortho and fixed pros,
+  beyond that major ortho, surgery, pros) and `erosion` (both arches, GERD with the side slept on, bulimia, soda swished or
+  pooled, citrus sucked or chewed, NCCLs, plus an attrition vs erosion close-up that doesn't say whether erosion facets
+  match). `stability` and `splints` share a side-view rig, `anima/l7rig.mjs` (skull, mandible, disc, teeth, a contact
+  solver; poses solved in Node). About page "Diagrams" entry updated. No question, notes or audio change; no schema change.
+
 - **2026-11-04 (taste skill, Claude Code)** — `.claude/skills/taste-skill/` (install name `design-taste-frontend`),
   vendored from Leonxlnx/taste-skill (MIT; commit and what was left out in its `UPSTREAM.md`): art direction for web
   pages and app screens, with a library of directions, a source linter and a real-browser inspector. Sam's call: when
