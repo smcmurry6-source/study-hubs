@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (taste skill, Claude Code)** — `.claude/skills/taste-skill/` (install name `design-taste-frontend`),
+  vendored from Leonxlnx/taste-skill (MIT; commit and what was left out in its `UPSTREAM.md`): art direction for web
+  pages and app screens, with a library of directions, a source linter and a real-browser inspector. Sam's call: when
+  Sam asks for a redesign, the skill is used in full, its house rules included (no monospace, eyebrows, gradients, index
+  numbers), even where they differ from a hub's current look; the vault's content and feature rules still hold, and
+  nobody restyles a live page unasked (the local box at the top of its `SKILL.md`, `vault/decisions.md`). New
+  `tools/chrome-no-sandbox.sh`: set it as `CHROME_PATH` so Chrome-driven scripts run as root in cloud sessions.
+  Listed in `CLAUDE.md` → Claude Code specifics; `.taste-skill/` (its working files) is gitignored. Cowork/Claude
+  Projects don't load repo skills. No site change.
+
 - **2026-11-04 (Thanksgiving all November, then Christmas to Dec 26, Claude Code)** — Sam: Thanksgiving was only Nov 20-27, after most hubs archive. `widget/eggs.js` (`tgSeason`, `xmasSeason`) and `widget/pet.js` (`holidayId`, kept in step): Thanksgiving now runs Nov 1 to the day after Thanksgiving, and the `winter` holiday (renamed "Christmas"; id unchanged, so costumes, outfits and lines carry over) from then to Dec 26 (was Dec 10-30). Dec 27-30 has no holiday; New Year unchanged. About page dates, `sw.js` -> `sh-v50`. No schema change.
 
 - **2026-11-03 (the repo is a vault: AGENTS.md, vault/ notes, tasks, Claude Code)** — Sam's new standing rule: use the repo

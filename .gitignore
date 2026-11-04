@@ -13,3 +13,6 @@ tools/figures/*/dist/
 !.obsidian/templates.json
 !.obsidian/core-plugins.json
 .trash/
+
+# Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
+.taste-skill/
