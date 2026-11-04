@@ -2,6 +2,9 @@
 -- Replace every :hub with the hub id in quotes, e.g. 'msk-exam3', and :exam with its exam date, e.g. '2026-10-02'.
 -- Then write what you learned into LESSONS.md (see the steps at the top of that file).
 -- Time: each activity ping = 25 s of active time. Pings before 2026-09-25 had no idle rule (see DEPLOY_NOTES).
+-- 0. The hub's line next to every other hub (reach, bounce, return, cramming, first try, retries; migration_v49):
+--    select x from jsonb_array_elements(sh_insights(jsonb_build_object(:hub, :exam))->'hubs') x where x->>'hub' = :hub;
+--    Only totals over 5+ people go into LESSONS.md (vault/rules/learner-data-privacy.md).
 
 -- 1. Reach and depth: people, study days per person, median minutes, how many bounced (< 5 min)
 with v as (
