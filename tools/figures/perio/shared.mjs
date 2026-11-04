@@ -50,7 +50,7 @@ const HUB = `
 .anima .iso-plate{border-radius:var(--radius);box-shadow:0 0 0 1px var(--line);padding:40px 12px 40px;background:var(--surface)}
 .anima .iso-plate-corners{inset:14px 16px}
 .anima .iso-plate-corner{font-size:10.5px}
-@media (max-width:560px){.anima .iso-plate{padding:36px 6px 54px}.anima .iso-plate-corner[data-corner="hint"]{bottom:16px}.anima .iso-plate-corner[data-corner="readout"]{white-space:normal;text-align:right;max-width:58%}}
+@media (max-width:560px){.anima .iso-plate-corner[data-corner="title"]{display:none}.anima .iso-plate{padding:36px 6px 54px}.anima .iso-plate-corner[data-corner="hint"]{bottom:16px}.anima .iso-plate-corner[data-corner="readout"]{white-space:normal;text-align:right;max-width:58%}}
 .anima .am-svg svg{display:block;width:100%;height:auto;overflow:hidden}
 .anima .am-label{fill:var(--anatomy-text);font:11.5px var(--anatomy-mono)}
 .anima .am-label.strong{fill:var(--anatomy-strong);font-weight:600}

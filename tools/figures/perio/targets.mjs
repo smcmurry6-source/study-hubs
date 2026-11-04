@@ -26,21 +26,24 @@ function tgDraw(D, k) {
   o += '<text class="tg-t tg-lab" x="385" y="215" text-anchor="middle">DNA</text>';
   o += '<g class="hot' + on("gyr") + '" data-info="DNA gyrase, the enzyme that unwinds DNA for copying: ciprofloxacin inhibits it."><rect class="tg-gyr" x="420" y="128" width="36" height="22" rx="6"/><text class="tg-t tg-in" x="438" y="143" text-anchor="middle">gyrase</text></g>';
   /* ribosome: 50S large, 30S small, with mRNA */
-  o += '<path class="tg-mrna" d="M110 176Q170 168 230 176"/>';
   o += '<g class="hot' + on("s50") + '" data-info="50S ribosomal subunit: clindamycin and the macrolides bind it and stop protein synthesis."><ellipse class="tg-s50" cx="170" cy="134" rx="54" ry="38"/><text class="tg-t tg-in" x="170" y="139" text-anchor="middle">50S</text></g>';
-  o += '<g class="hot' + on("s30") + '" data-info="30S ribosomal subunit: the tetracyclines bind it and stop protein synthesis."><ellipse class="tg-s30" cx="170" cy="190" rx="40" ry="18"/><text class="tg-t tg-in" x="170" y="195" text-anchor="middle">30S</text></g>';
+  o += '<g class="hot' + on("s30") + '" data-info="30S ribosomal subunit: the tetracyclines bind it and stop protein synthesis."><ellipse class="tg-s30" cx="170" cy="190" rx="40" ry="18"/><text class="tg-t tg-in" x="170" y="190" text-anchor="middle">30S</text></g>';
+  o += '<path class="tg-mrna" d="M104 200Q170 194 236 200"/><text class="tg-t tg-lab" x="100" y="203" text-anchor="end">mRNA</text>';
   o += '<text class="tg-t tg-lab" x="170" y="226" text-anchor="middle">ribosome</text>';
+  /* the drug (small dots) bound to its target */
+  var SITES = { wall: [[120, 47], [270, 41], [420, 47], [120, 253], [270, 259], [420, 253]], s50: [[150, 118], [192, 122]], s30: [[146, 184], [196, 186]], dna: [[332, 132], [352, 192], [404, 108]], gyr: [[428, 126], [450, 126]] };
+  if (d) SITES[tg].forEach(function (p) { o += '<circle class="tg-drug" cx="' + p[0] + '" cy="' + p[1] + '" r="4.2"/>'; });
   if (d) o += '<rect class="tg-chip ' + (d.kill.indexOf("static") > -1 ? "is-static" : "is-cidal") + '" x="190" y="268" width="160" height="24" rx="12"/><text class="tg-t tg-ct" x="270" y="284" text-anchor="middle">' + d.kill + "</text>";
   return o;
 }
-const svg = figureSvg({ width: W, height: H, className: "tg-svg", label: "A bacterial cell with its cell wall, a ribosome with 50S and 30S subunits, its DNA and DNA gyrase; the chosen antibiotic's target is highlighted.", body: '<g class="tg-dyn">' + tgDraw(D, "amox") + "</g>" });
+const svg = figureSvg({ width: W, height: H, className: "tg-svg", label: "A bacterial cell with its cell wall, a ribosome with 50S and 30S subunits and mRNA through the small subunit, its DNA and DNA gyrase; the chosen antibiotic's target is highlighted with the drug bound to it.", body: '<g class="tg-dyn">' + tgDraw(D, "amox") + "</g>" });
 const plate = plateHtml({ fig: "S8 · Fig 2", title: "Where each antibiotic acts", hint: "pick a drug · tap a part", readout: "cell wall", body: `<div class="am-svg tg-box">${svg}</div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Antibiotic">${D.DR.map((d, i) => `<button type="button" class="am-btn" data-tgk="${d.k}" aria-pressed="${i === 0}">${d.n}</button>`).join("")}</div>
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Tap the cell wall, a ribosome subunit, the DNA or gyrase.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>Mechanisms and kill types from Dr. Litz's slides and recording. Two bactericidal drugs (or two bacteriostatic ones) can be given together; one of each can't.</li>
-<li>Schematic cell, not to scale: a real bacterium has thousands of ribosomes and a circular chromosome. Educational, not medical advice.</li></ul></details>`;
+<li>Schematic cell, not to scale: a real bacterium has thousands of ribosomes, and its circular chromosome is packed into a nucleoid. Most periodontal pathogens are gram-negative, with an outer membrane outside a thin peptidoglycan wall; it is drawn here as one wall over the cell membrane. The blue dots mark where the drug binds. Educational, not medical advice.</li></ul></details>`;
 function tgLive(root, D) {
   var svg = root.querySelector(".tg-svg"), dyn = svg.querySelector(".tg-dyn"), sum = root.querySelector(".am-summary"), infoEl = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
   var NAME = { wall: "cell wall", s50: "50S subunit", s30: "30S subunit", dna: "DNA", gyr: "DNA gyrase" };
@@ -62,7 +65,8 @@ const CSS = `
 .anima .tg-svg .tg-dna2{fill:none;stroke:var(--pd-drug);stroke-width:1.2;stroke-dasharray:3 3;opacity:.7}
 .anima .tg-svg .tg-gyr{fill:var(--anatomy-shade-1);stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .tg-svg .tg-gyr + .tg-in{font-size:9.5px}
-.anima .tg-svg .tg-mrna{fill:none;stroke:var(--anatomy-mid);stroke-width:1.6;stroke-dasharray:2 3}
+.anima .tg-svg .tg-mrna{fill:none;stroke:var(--anatomy-strong);stroke-width:1.6;stroke-dasharray:2 3}
+.anima .tg-svg .tg-drug{fill:var(--pd-drug);stroke:var(--surface);stroke-width:1.4}
 .anima .tg-svg .tg-s50{fill:var(--anatomy-shade-1);stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .tg-svg .tg-s30{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .tg-svg .is-on .tg-wall{stroke:var(--pd-red)}

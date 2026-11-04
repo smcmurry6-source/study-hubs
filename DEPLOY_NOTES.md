@@ -32,6 +32,27 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Perio: all figures audited and fixed, Claude Code)** — Sam: "vet, audit, and improve all perio
+  figures." Six anima figures (`tools/figures/perio/`, rebuilt into the hub) and the suture diagrams (`SUTURE_DIAGRAMS`):
+  - **Peri-implant health, mucositis, peri-implantitis** (S7): redrawn from scratch to scale (15 px/mm) as a section
+    through the ridge. Threaded implant, abutment and crown with emergence profiles; a buccal and lingual plate that
+    remodels about 2 mm and then craters in peri-implantitis; mucosa that reddens and swells; a probe that bows around
+    the crown and reads 4, 5.5 and 8 mm against the baseline; bleeding and pus; brackets for the remodeling line and
+    the bone lost beyond it; a 5 mm scale bar.
+  - **Ailing, failing, failed** (S7): redrawn as three radiographs with the neighbor teeth. Each film's crest is
+    compared with a dashed line for the crest on the previous film. The failed implant wobbles, with a radiolucent band.
+    A key says a film shows bone, not inflammation or mobility. On a phone it shows one film at a time.
+  - **BOP over four visits** (S7): the axis says "losing 2 mm or more of attachment"; tooth sites, Lang 1986 (cited).
+    Fixed the bars' grow animation (negative heights in the console).
+  - **When to take implant radiographs** (S7): a brace shows the extra film can come at any maintenance visit. Phone
+    layout as a vertical list.
+  - **Biofilm** (S8): the barrier step works again after β-lactamase (the test never reached exactly 0).
+  - **Antibiotic targets** (S8): mRNA drawn on the 30S, drug dots on the lit target, simplification note.
+  - All: the title corner hides on phones so it no longer runs into the readout.
+  - **Suture diagrams** (S2): one proximal tooth behind the interdental section, not two crowns; periosteal anchorage
+    labeled apical and coronal, with the flap margin; the horizontal mattress strand now ends at a cut, not running off
+    the picture; braided thread as herringbone. Figure-eight caption and q2-D03 explanation keep only what the notes
+    say (flaps that won't meet closely, as with apically positioned flaps).
 - **2026-11-04 (PCD Implants: all eleven figures checked against the notes and fixed, Claude Code)** — Sam: "vet, audit, and
   improve all implants figures." Each figure in `tools/figures/pcd-implants-exam1/` was rendered in every state, both themes and
   at 390 px, and read against its lecture's notes. **Content fixes:** `attach` (tooth vs implant) drew the tooth's junctional
