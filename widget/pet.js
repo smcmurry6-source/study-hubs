@@ -51,8 +51,9 @@
     var today = new Date(y, m - 1, d).getTime();
     function near(at, b, a){ var t = at.getTime(); return today >= t - b * 864e5 && today <= t + a * 864e5; }
     if (x >= 1001 && x <= 1031) return "halloween";
-    if (near(nthThu(y), 6, 1)) return "thanksgiving";
-    if (x >= 1210 && x <= 1230) return "winter";
+    var tgEnd = nthThu(y).getTime() + 864e5;   // Thanksgiving: Nov 1 to the day after; Christmas: then to Dec 26
+    if (m === 11 && today <= tgEnd) return "thanksgiving";
+    if (today > tgEnd && x <= 1226 && x >= 1101) return "winter";
     if (x === 1231 || x <= 102) return "newyear";
     if (x >= 210 && x <= 214) return "valentine";
     if (x === 306) return "dentist";
@@ -935,7 +936,7 @@
      Each tip is [plain text, the bit to bold]. They come in order (sh_pet_tip), so you hear all of them. */
   var HOLIDAY_WORD = { halloween: "fangs", thanksgiving: "gobble", winter: "jingle", newyear: "cheers", valentine: "smile",
     dentist: "dentist", stpatrick: "lucky", easter: "hop" };
-  var HOLIDAY_NAME = { halloween: "Halloween", thanksgiving: "Thanksgiving", winter: "winter break", newyear: "New Year's",
+  var HOLIDAY_NAME = { halloween: "Halloween", thanksgiving: "Thanksgiving", winter: "Christmas season", newyear: "New Year's",
     valentine: "Valentine's", dentist: "National Dentist's Day", stpatrick: "St. Patrick's", easter: "Easter" };
   var TIPS = [
     ["Type {floss} anywhere in a hub. On a phone, type it into the Search box.", "floss"],

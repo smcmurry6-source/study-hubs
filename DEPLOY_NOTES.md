@@ -32,6 +32,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Thanksgiving all November, then Christmas to Dec 26, Claude Code)** — Sam: Thanksgiving was only Nov 20-27, after most hubs archive. `widget/eggs.js` (`tgSeason`, `xmasSeason`) and `widget/pet.js` (`holidayId`, kept in step): Thanksgiving now runs Nov 1 to the day after Thanksgiving, and the `winter` holiday (renamed "Christmas"; id unchanged, so costumes, outfits and lines carry over) from then to Dec 26 (was Dec 10-30). Dec 27-30 has no holiday; New Year unchanged. About page dates, `sw.js` -> `sh-v50`. No schema change.
+
 - **2026-11-03 (the repo is a vault: AGENTS.md, vault/ notes, tasks, Claude Code)** — Sam's new standing rule: use the repo
   like an Obsidian vault that any AI agent can be pointed at to do tasks (`vault/rules/repo-is-the-vault.md`). New
   `AGENTS.md` at the root is the entry point for every agent (Claude Code loads it through `CLAUDE.md`). New `vault/`:

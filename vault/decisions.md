@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | Holiday themes: Thanksgiving runs Nov 1 to the day after Thanksgiving, then Christmas (id `winter`) to Dec 26 | every hub, dashboard (`widget/eggs.js`, `widget/pet.js`) | chat, PR #216 |
 | 2026-11-03 | The repo is used like an Obsidian vault that any agent can be pointed at; agents write back what they learn | every agent | [rule](rules/repo-is-the-vault.md) |
 | 2026-11-03 | Occlusion L7: all five diagram candidates approved (tolerance model, orthopedic vs occlusal stability, splint designs, rule of thirds, erosion pattern map) | occlusion | [task](tasks/2026-11-03-occlusion-l7-diagrams.md) |
 | 2026-11-03 | Perio S7/S8: all six diagram candidates approved (built) | perio | change log |
