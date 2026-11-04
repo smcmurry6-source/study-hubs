@@ -32,14 +32,14 @@ const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
 /* every multiple-choice and select-all question explains each of its choices (q.why, one line per choice, same order;
    Sam's standing rule, 2026-10-20). Hubs archived before the rule are exempt: their exams are over. */
 const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
-/* every taught lecture's questions include two-statement and true/false items (Sam's standing rule, 2026-10-22; CLAUDE.md
-   "Two-statement and true/false questions") and numbered-statement items (2026-10-28; CLAUDE.md "Numbered-statement
-   questions"). Archived hubs are exempt, and so are the perio sessions taught before the rules (its engine has neither
+/* every taught lecture's questions include two-statement and true/false items (Sam's standing rule, 2026-10-22;
+   vault/rules/two-statement-and-true-false.md) and numbered-statement items (2026-10-28;
+   vault/rules/numbered-statements.md). Archived hubs are exempt, and so are the perio sessions taught before the rules (its engine has neither
    true/false nor numbered items yet): a lecture taught after them, in any live or new hub, needs all three formats. */
 const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
 const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
-/* High Likelihood Exam Questions (Sam's standing rule, 2026-10-30; CLAUDE.md "Question Bank: lecture picker, order and pins"):
+/* High Likelihood Exam Questions (Sam's standing rule, 2026-10-30; vault/rules/high-likelihood-topics.md):
    every lecture with questions has at least one LIKELY_TOPICS entry, so a lecture added to a hub is ranked too, and every
    topic's ids exist in that lecture. Archived hubs from before the rule are exempt, and so are lectures whose exam is over
    while the hub stays up for a later one (Occlusion's midterm lectures; the final isn't cumulative). */
@@ -107,7 +107,7 @@ function lint(hub, A){
       const lq = Q.filter(q => q.lec === l.id);
       if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
-        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; CLAUDE.md "${f === 'numbered' ? 'Numbered-statement questions' : 'Two-statement and true/false questions'}")`); });
+        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; see vault/rules/${f === 'numbered' ? 'numbered-statements' : 'two-statement-and-true-false'}.md)`); });
     });
     const tfq = Q.filter(q => q.fmt === 'tf');
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);
