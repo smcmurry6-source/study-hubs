@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (class picks on each choice, Sam's ask, Claude Code)** — `widget/v3.js` + `widget/v3.css`, every hub, no hub
+  changes: once a question card is answered, each choice shows the share of the class that picked it (a % at the right, a fill
+  behind the choice as wide as its share, the top pick in bold) and a line under "% of the class got this right" says how many
+  answers it's from. Reads `question_choices` (by authored index) through `shGetClassStats(qids, cb, true)`, which now also returns
+  `byQid[qid].choices`; choice buttons are found by `data-idx`, `data-multi-idx`, `data-mock-pick`, `data-mock-multi` or
+  `data-exam-choice` (`CP_ATTRS`), so a new hub that keeps those attributes gets it for free. A card drawn unanswered fetches the
+  counts as it renders and adds your own pick from the answered event (no race with `record_choice`); a card drawn already answered
+  (mock results) waits 1.2 s and uses the server's numbers. Multiple choice: picks / all picks; select-all: ticks /
+  `question_stats.attempts`. Shown from 2 answers. Nothing shows during a mock exam. About page: "Class accuracy on every question".
+
 - **2026-11-04 (Supabase: `admin_reset_changelog` refuses a missing secret, Claude Code)** — Found by `/reddit-scout`'s
   first run, Sam's go. The function checked `p_secret <> '...'`; with `p_secret = null` that comparison is NULL, so the
   check was skipped and any visitor with the publishable key could have emptied the site changelog and written their own
@@ -52,10 +62,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   mock's submit and the arcade never get one; also skipped for `ctx` `mock` / `arcade`. Tracked `notes-jump:shown`, `:none`,
   `:show`, `:open`. Checked in Playwright on Occlusion, Perio, PCD Implants and Special Patient Care, desktop and phone,
   plus the drill and dark mode. About page ("In every hub"); `sw.js` -> `sh-v52`. No hub, notes, audio or schema change.
+
 - **2026-11-04 (Timmy Time comments open folded, Claude Code)** — Sam: under every episode the comment thread now shows
   only its first comment (the first lore comment when there are any), with "Show n more comments" / "Show fewer
   comments" (`aria-expanded`; `pod:<id>:comments-all` still tracks opening it). Posting a comment opens the thread so
   the new one shows. `widget/podcast.js` only (`SHOW_FOLDED`); rule note and About page updated.
+
 - **2026-11-04 (PCD Implants: "Practiced least" on Home, Claude Code)** — Sam approved the lessons audit's proposal. Two days out,
   practice in `pcd-implants-exam1` fell off in bank order (the last four lectures had 6-7 answerers each vs 23 on L1-L2), so Home's
   "Where to next" now lists up to four lectures with under half their questions tried, fewest first, and its Practice button opens
