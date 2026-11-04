@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 morning (lessons audit, PCD Implants two days out, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and answer
+  positions: report #37 (`bm-goodacre` printed each complication's percentage in its choice, so the biggest number was the key): the
+  choices are now plain names and the numbers are in the why lines. Explanations name the favorite wrong answer on `ev-misch` (Ford
+  Turner), `bm-moment` (force / area is stress) and `ev-blade` (screws through both plates are transosteal), and the select-alls `tm-mm-1`,
+  `tm-mm-2`, `tm-mm-3` explain every option (explanation and why lines). **Select-all ticks are recorded** in `pcd-implants-exam1`,
+  `occlusion` and `special-patient-care`: their `recordAnswer` passes the ticked options as `picks` in the answered event, so
+  `widget/v3.js` sends `record_choices` (until now only perio did; `question_choices` has no select-all rows for these hubs before
+  today). `LESSONS.md` refreshed (Live signals; standing lessons on bank order, select-all tracking, numbers as giveaways, and the
+  Occlusion-then-Heme & Endo check-ins; Heme & Endo retrospective now n = 13). No reading text, audio or schema change.
+
 - **2026-11-04 (Timmy Time: PCD Implants Exam 1 episode, and likes, dislikes and comments on every episode, Claude Code)** —
   A 48-minute last-minute review for PCD Implants Exam 1 (Fri Nov 6): `hubs/pcd-implants-exam1/audio/timmy-time.mp3`
   (35 MB, -16 LUFS), script `tools/podcast/pcd-implants-exam1/script.md`, from the hub's notes (As taught), Exam Hints
@@ -70,6 +80,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Dashboard: new per-exam `checkinFrom:{date,hour}` (holds the Check in button and pop-up), set to Nov 19 for this exam; the
   card stays live through Saturday (hub-level `archiveOn` Nov 14 hour 24, mirrored in `SH_EXPORT.archiveOn`); the card text
   gives the format. About page (check-in line), hub note, decisions; `sw.js` -> `sh-v51`. No schema change.
+
 - **2026-11-04 (Occlusion L7: five interactive diagrams, Claude Code)** — The five figures Sam approved on 2026-11-03,
   built with anima in `tools/figures/occlusion/anima/` and placed in the L7 notes at both levels (`FIG_PLACE.malocclusion`
   and `FIG_BY_LEC.malocclusion` in `od.js`, in `data-sh-noread` wrappers; READINGS and the mp3s unchanged) and in L7's

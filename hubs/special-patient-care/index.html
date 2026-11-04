@@ -3913,7 +3913,7 @@ function checkAchievements(){
 }
 
 /* ---------- the one answer choke point ---------- */
-function recordAnswer(qid, lecId, correct, ctx, choice){
+function recordAnswer(qid, lecId, correct, ctx, choice, picks){
   var s = STATE.seen[qid] || { n:0, c:0, last:null };
   s.n++; if(correct) s.c++; s.last = !!correct; STATE.seen[qid] = s;
   STATE.totalAnswered++;
@@ -3923,7 +3923,8 @@ function recordAnswer(qid, lecId, correct, ctx, choice){
   checkAchievements();
   saveState();
   renderHeaderStats();
-  document.dispatchEvent(new CustomEvent('spc:answered', { detail:{ qid:qid, lec:lecId, correct:!!correct, ctx:ctx||'bank', choice:(typeof choice === 'number' ? choice : null) } }));
+  /* picks: a select-all's ticked options (authored indexes), so the class's wrong ticks reach question_choices */
+  document.dispatchEvent(new CustomEvent('spc:answered', { detail:{ qid:qid, lec:lecId, correct:!!correct, ctx:ctx||'bank', choice:(typeof choice === 'number' ? choice : null), picks:(Array.isArray(picks) && picks.length ? picks.slice() : null) } }));
 }
 
 /* ---------- header ---------- */
@@ -4117,8 +4118,8 @@ function finishCard(card, correct){
   card.classList.add('is-answered'); if(!correct) card.classList.add('is-missed');
   var v = card.querySelector('.qcard-verdict'); if(v){ v.textContent = correct ? 'Correct.' : 'Not quite.'; v.className = 'qcard-verdict ' + (correct ? 'ok' : 'bad'); }
   var q = QUESTIONS_BY_ID[card.getAttribute('data-qid')];
-  var pk = card.getAttribute('data-pick');
-  if(q) recordAnswer(q.id, q.lec, correct, card.getAttribute('data-ctx') || 'bank', pk === null ? null : +pk);
+  var pk = card.getAttribute('data-pick'), pks = card.getAttribute('data-picks');
+  if(q) recordAnswer(q.id, q.lec, correct, card.getAttribute('data-ctx') || 'bank', pk === null ? null : +pk, pks ? pks.split(',').map(Number) : null);
   if(card.classList.contains('is-retry') && window.shTrack) window.shTrack('bank:retry-' + (correct ? 'right' : 'missed'));
   var host = card.parentNode; if(q && !correct && host && host.__retry) host.__retry(card, q);
 }
@@ -4151,6 +4152,7 @@ function wireQuestionContainer(container){
         if(isC && was) b.classList.add('is-correct'); else if(isC) b.classList.add('is-missed-right'); else if(was) b.classList.add('is-wrong');
       });
       var wrapC = card.querySelector('[data-role="multi-check"]'); if(wrapC) wrapC.innerHTML = '<span class="multi-score">Partial credit: '+Math.round(sc*100)+'%. Dashed = a right answer you missed.</span>';
+      card.setAttribute('data-picks', mc.picks.join(','));
       finishCard(card, sc === 1);
     } else if(act === 'seq-undo' || act === 'seq-clear'){
       var us = SEQ_STATE[rid]; if(!us) return;
