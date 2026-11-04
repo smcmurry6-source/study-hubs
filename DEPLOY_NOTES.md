@@ -58,7 +58,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   and doesn't test it: every site-changing PR gets a Cloudflare Pages link in a PR comment (once the token is in GitHub;
   no Timmy Time episodes in that copy), plus screenshots; no staging database for now (Sam, 2026-11-04). No site change: nothing students see changed.
 
-
 - **2026-11-04 (PCD Implants: the seven implant types redrawn, the intramucosal insert added, Claude Code)** — Sam: "there
   are only 6 drawn and i feel like they could be better and more accurate." The L1 drawings (`FIGS` `ty-*`) were hand-pasted
   boxes: teeth as teardrops, a subperiosteal frame sunk into the bone, transosteal posts that missed the bar, a blade's bar
