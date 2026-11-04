@@ -16,6 +16,8 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
 | 2026-11-04 | `/reddit-scout`'s first run: build "Find this in the notes" (shipped in the widget) and the Supabase fix; skip a CI check for narration drift, don't re-propose it | widget, `/reddit-scout` | chat, `tools/reddit-scout/log.md` |
+| 2026-11-04 | Timmy Time comments open folded: only the first comment shows, with a button to show the rest | every episode | chat, [rule](rules/podcast-reactions.md) |
+| 2026-11-04 | PCD Implants: Home's "Where to next" points to the lectures you've practiced least (under half tried, up to four, fewest first) and opens the bank on their unanswered questions; approved from the lessons audit | pcd-implants-exam1 | chat, PR #222 |
 | 2026-11-04 | Timmy Time: likes, dislikes and comments under every episode, with 1-3 lore comments (a random count) per episode; class comments show at once, reportable, Sam can hide any | every episode | chat, [rule](rules/podcast-reactions.md) |
 | 2026-11-04 | Timmy Time's cold open leaves out per-lecture question counts, the exact exam time and LockDown Browser | every episode | chat, [rule](rules/podcast-intro.md) |
 | 2026-11-04 | Implants episode: about 45 minutes; lore: Timmy's ligament, number thirty-one thinks he's failing, Brånemark's rabbit, the Thanksgiving costumes. Gemini TTS was asked about; the episode stays on Kokoro until a `GEMINI_API_KEY` is set in the environment | `pcd-implants-exam1` | chat |
