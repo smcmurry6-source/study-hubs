@@ -70,8 +70,9 @@ slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets)
 
 ## Not covered, or blocked
 
-- **A hosted preview link per PR:** built (Cloudflare Pages, Sam's choice), but not exercised yet: it needs the token
-  and account id in GitHub ([task](../../tasks/2026-11-04-preview-hosting-and-staging.md)).
+- **A hosted preview link per PR:** connected (Cloudflare Pages, Sam's choice) and exercised once: the dashboard and
+  Occlusion loaded on an emulated iPhone 13, noindex and robots.txt served, no request reached Supabase
+  ([task](../../tasks/done/2026-11-04-preview-hosting-and-staging.md)).
 - **Staging database:** not set up (Sam, 2026-11-04: fixtures for now). Server-side logic (XP, streaks, boards) is approximated in fixtures;
   permissions are covered by `rls.js`.
 - **WebKit and Firefox:** not installed in this session; the "Release tests" workflow installs them, so its first run is

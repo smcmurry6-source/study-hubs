@@ -239,7 +239,7 @@ problem (Sam's call), and the bug log.
 **Sam's call, 2026-11-04: A, Cloudflare Pages, for a preview link on every PR** (the `preview` job,
 [section 3](#3-interactive-previews)), and **1, fixtures only, for staging** for now. Cloudflare Access isn't set up:
 previews show only made-up data and the site is public anyway, but anyone with a link can open one; adding Access later
-costs $0. Connecting it: [task](vault/tasks/2026-11-04-preview-hosting-and-staging.md). Prices are from each
+costs $0. Connected 2026-11-04 ([task](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)). Prices are from each
 vendor's published plans as of November 2026; confirm on their pricing pages before signing up.
 
 **Hosted preview link per PR** (so a preview opens on a phone from the PR, with no computer):

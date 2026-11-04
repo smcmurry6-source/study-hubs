@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: done
 hub: site
 created: 2026-11-04
 requested-by: Sam
 due:
-waiting-on: Sam adds a Cloudflare Pages token (secret CLOUDFLARE_API_TOKEN) and the account id (variable CLOUDFLARE_ACCOUNT_ID) in GitHub
+waiting-on:
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/233
 ---
@@ -15,7 +15,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/233
 ## Goal
 
 Give every PR a preview link that opens on a phone, without touching the class's data
-([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), sections 3 and 13).
+([RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md), sections 3 and 13).
 
 ## Context
 
@@ -44,7 +44,7 @@ Give every PR a preview link that opens on a phone, without touching the class's
 - [x] Sam picked a host (Cloudflare Pages) and a staging option (fixtures for now).
 - [x] The Release tests workflow deploys each site-changing PR to `pr-<n>` with only the repo's secrets and puts the link
       on the PR.
-- [ ] The secret and variable are in GitHub, and a run on a PR posts a working link (the dashboard and one hub load,
+- [x] The secret and variable are in GitHub, and a run posts a working link (the dashboard and one hub load,
       the Preview button says no request reached production).
 - [x] `RELEASE_TEST_PLAN.md` section 13 says what was chosen; `vault/decisions.md` has the line.
 - [ ] CI passes.
@@ -54,5 +54,13 @@ Give every PR a preview link that opens on a phone, without touching the class's
 - 2026-11-04: written by the session that built the release process; waiting on Sam.
 - 2026-11-04: Sam first chose neither, then Cloudflare Pages the same day ("lets try the cloudflare thing"); the
   `preview` job was added in PR #233. Waiting for the token and account id in GitHub.
+- 2026-11-04: Sam added them. The first two tries failed: the token had no Cloudflare Pages access (403); the new
+  "Check the Cloudflare token" step said so. After Sam fixed the token's permission, the deploy went through.
 
 ## Outcome
+
+Connected, 2026-11-04 (PR #233). The first deploy (21:01 UTC, 104 files) was opened on an emulated iPhone 13: the
+dashboard as the high-XP account and Occlusion as the missed-question account loaded (200, no page errors),
+`X-Robots-Tag: noindex…` and `robots.txt` `Disallow: /` were served, the Preview panel said "No request has reached
+production", and no request left the browser for Supabase. A new project's address took about 30 seconds to get its
+certificate. Staging stays fixtures-only (Sam); Cloudflare Access isn't set up.
