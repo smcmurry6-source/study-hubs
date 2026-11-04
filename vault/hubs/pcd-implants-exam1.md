@@ -31,6 +31,9 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
 - **Brand and admin details** (Sam, 2026-11-03, reports #35/#36): keep a system's details only with an exam signal
   (a hint, a focus list, "on my exam", an example question). Kept: each system's surface, alloy and torques, conical vs
   non-conical, `pf-systems`.
+- **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `impl:answered`, set in `recordAnswer`); older
+  `mm()` items have no per-option rows. Choices must not carry their own numbers when the stem asks which is most common (report #37).
+- **Practice follows bank order** (lessons audit, 11-04): two days out the last four lectures had 6-7 answerers each vs 23 on L1-L2.
 
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 

@@ -33,6 +33,8 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
   - L7's side-view figures (`stability`, `splints`) share `anima/l7rig.mjs`: the skull, mandible, disc and teeth in mm
     (y up, the seated condyle at the origin) and a contact solver run in Node at build time. Reuse it for any new side view
     of the jaws rather than drawing another skull.
+- **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `occl:answered`, set in `recordAnswer`). Hubs
+  copied from this engine need the same lines.
 - **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all seven lectures.
 - **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
