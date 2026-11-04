@@ -884,21 +884,30 @@ function pixelHeart(){
 }
 
 /* ---------- LECTURES ---------- */
-/* The exam is on Canvas, open from Friday, November 6 at 12:00 am until Friday, November 13 at 11:59 pm. Its format
-   has not been announced: this hub writes multiple-choice (including two-statement and numbered-statement items),
-   true/false and matching questions. */
-var EXAM_DATE = '2026-11-06', EXAM_END = '2026-11-13';
+/* The exam is on Canvas, open from Friday, November 6 at 12:00 am, due Friday, November 13 at 11:59 pm; Canvas keeps
+   it open through Saturday, November 14 at 11:59 pm. Dr. Mitchell's email (2026-11-04): 45 questions, 135 minutes,
+   open notes and lecture materials, a mix of multiple choice, multiple answer, ordering, matching, Hot Spot,
+   fill-in-the-blank and true/false. The email's own dates (Fri Nov 17, Sat Nov 18) are from an earlier year's calendar:
+   Sam confirmed these dates. This hub practices multiple choice (with two-statement and numbered-statement items),
+   multiple answer, true/false and matching (Sam: no ordering, fill-in-the-blank or Hot Spot practice). */
+var EXAM_DATE = '2026-11-06', EXAM_END = '2026-11-13', EXAM_LAST = '2026-11-14';
 var EXAM_TIME = '00:00', EXAM_CLOSES = '23:59';
+/* "not allowed to discuss the exam in any form with anyone until AFTER November 18th": the first day it may be discussed.
+   The dashboard's check-in (index.html, checkinFrom) waits for the same day. */
+var TALK_FROM = '2026-11-19';
 var EXAM_INFO = [
-  ['What', 'The Special Patient Care exam on all eight units in this hub. The format hasn\'t been announced, so the bank has multiple-choice, true/false and matching questions.'],
-  ['When', 'On Canvas: opens Friday, November 6, at 12:00 am and is due Friday, November 13, at 11:59 pm.'],
+  ['What', '45 questions on all eight units, 135 minutes once you start. A mix of multiple choice, multiple answer, ordering, matching, Hot Spot (click a place in an image), fill-in-the-blank, true/false and more.'],
+  ['When', 'On Canvas: opens Friday, November 6, at 12:00 am and is due Friday, November 13, at 11:59 pm. Canvas keeps it open through Saturday, November 14, at 11:59 pm, but it is due Friday night.'],
+  ['Rules', 'Open notes: you may use your notes and the lecture materials, but no other people (faculty, residents, classmates or anyone else). Don\'t discuss the exam with anyone, in any form, until after November 18, and that includes this hub\'s Report and Suggest boxes. Anything with this exam\'s content from earlier years is off limits. Dr. Mitchell: breaking these is a severe violation of the SOD Code of Ethics.'],
   ['Units', 'Introduction, behavior guidance, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading.'],
-  ['Tip', 'Dr. Mitchell\'s numbers come up again and again (1 in 700, 30% epilepsy, 45% NUG, 1 in 36): the cram sheet and the review tables collect them.']
+  ['Practice', 'The bank has multiple-choice, multiple-answer (select all), true/false, two-statement, numbered-statement and matching questions. The mock is the exam\'s size: 45 questions in 135 minutes.'],
+  ['Tip', 'Dr. Mitchell: be very familiar with all the course material before you begin. 135 minutes for 45 questions is 3 minutes a question. His numbers come up again and again (1 in 700, 30% epilepsy, 45% NUG, 1 in 36): the cram sheet and the review tables collect them.']
 ];
 /* the course, for Home's timeline (only dates that were announced) */
 var COURSE_DATES = [
   { date:'2026-11-06', label:'Exam opens on Canvas, 12:00 am', kind:'exam' },
-  { date:'2026-11-13', label:'Exam due, 11:59 pm', kind:'due' }
+  { date:'2026-11-13', label:'Exam due, 11:59 pm', kind:'due' },
+  { date:'2026-11-14', label:'Canvas closes, 11:59 pm (the exam is due the night before)' }
 ];
 var LECTURES = [
   { id:'intro',      num:1, title:'Introduction to Special Patient Care',             who:'Dr. Mitchell', tag:'teal',   source:'Recorded lecture', status:'taught' },
@@ -976,6 +985,9 @@ function nums(id, lec, src, lead, stmts, truth, wrong, ex, reasons, extra){
 /* Patient cases: one Patient Box (and its drawn findings) shared by every question on that patient. pc(key) gives
 /* mq(): a multiple-choice question whose choices carry their own "why" line: [[choice, why], ...], key first */
 function mq(id, lec, src, stem, pairs, ex, extra){ mcq(id, lec, src, stem, pairs.map(function(p){ return p[0]; }), ex, extra); QUESTIONS[QUESTIONS.length - 1].why = pairs.map(function(p){ return p[1]; }); }
+/* multiple answer (select all): mm(id, lec, src, stem, [[choice, isRight, why], ...], ex), copied from pcd-implants-exam1;
+   the whys go inline like mq()'s, so QUESTION_WHY stays empty */
+function mm(id, lec, src, stem, rows, ex, extra){ var c = []; rows.forEach(function(r, i){ if(r[1]) c.push(i); }); multi(id, lec, src, stem, rows.map(function(r){ return r[0]; }), c, ex, extra); QUESTIONS[QUESTIONS.length - 1].why = rows.map(function(r){ return r[2]; }); }
 
 /* =================================================================== L1 INTRODUCTION */
 mq("in-def", "intro", "rec", "Which definition of intellectual disability matches the one in Dr. Mitchell's lecture?",
@@ -1241,6 +1253,30 @@ nums("in-num-3", "intro", "rec", "Which are general characteristics Dr. Mitchell
 match("in-match", "intro", "rec", "Match each year with what happened.",
   [["1978","Laws require public schools to offer special education"],["2010","Rosa's Law"],["2013","DSM-5 adopts intellectual disability"],["2018","ADA Code of Ethics adds disability"],["2019","CODA adds \"and managing\""]],
   "1978 special education; 2010 Rosa's Law; 2013 DSM-5; 2018 ADA Code; 2019 CODA.");
+
+/* multiple answer (select all), added 2026-11-04: the exam has multiple-answer items (Dr. Mitchell's email) */
+mm("in-mm-1", "intro", "rec", "Select all that apply: which must be present for a DSM-5 diagnosis of intellectual disability?",
+  [["Deficits in intellectual functioning",true,"One of the DSM-5's three parts, and all three must be present."],
+   ["Deficits in adaptive functioning",true,"The ability to adapt to a setting and new sensory input: the part that matters most in autism."],
+   ["Onset during the developmental period",true,"Why a normally developing young adult with a brain injury is special needs but doesn't technically have ID."],
+   ["An IQ score under 70",false,"The older, test-based cutoff; today's assessment is a comprehensive clinical one, not one test."],
+   ["An identified genetic cause",false,"No cause is found in 30-40% of cases, and ID can be biological, psychosocial or both."]],
+  "DSM-5: deficits in intellectual and adaptive functioning, beginning in the developmental period.");
+mm("in-mm-2", "intro", "rec", "Select all that apply: which are physical, prenatal causes of intellectual disability in the lecture?",
+  [["Maternal malnutrition",true,"Listed under physical, prenatal causes."],
+   ["Acute or chronic maternal infection",true,"Listed under physical, prenatal causes."],
+   ["Fetal alcohol syndrome",true,"Prenatal: about 2% of ID."],
+   ["A hypoxic event at birth",false,"Neonatal, with prematurity and birth injury."],
+   ["Lack of stimulation early in life",false,"Environmental and psychosocial, not physical."],
+   ["Fragile X",false,"A single-gene error: a genetic cause."]],
+  "Prenatal: maternal malnutrition, infection, fetal alcohol syndrome. Neonatal: prematurity, hypoxia, birth injury. Postnatal: injury, tumors, infections, toxins.");
+mm("in-mm-3", "intro", "rec", "Select all that apply: which match what Dr. Mitchell said about dental coverage for people with intellectual disability in Alabama?",
+  [["Medicaid covers most of them until their 21st birthday, including OR care at Children's",true,"And it covers them well."],
+   ["After 21, people with severe ID usually keep Medicaid medical coverage but lose the dental benefit",true,"The dental benefit ends at 21."],
+   ["The Affordable Care Act may keep someone on a parent's private insurance to about 26",true,"After that, most pay out of pocket, often from a Social Security check."],
+   ["Medicaid's dental benefit continues for life when the disability is severe",false,"It ends at 21, whatever the severity."],
+   ["Most private dental plans make operating-room care easy to get",false,"Most make it nearly impossible; Blue Cross Blue Shield and ALL Kids were the exceptions he named."]],
+  "Medicaid until 21 (dental ends then), maybe a parent's plan to about 26, then mostly out of pocket.");
 
 /* =================================================================== L2 BEHAVIOR GUIDANCE */
 mq("bg-mal", "behavior", "rec", "What does \"maladaptive behavior\" mean in this course?",
@@ -1572,6 +1608,31 @@ nums("bg-num-3", "behavior", "rec", "Which are reasons Dr. Mitchell gives for us
 match("bg-match", "behavior", "rec", "Match each term to its meaning.",
   [["Maladaptive behavior","Can't adapt to the dental setting"],["Non-contingent escape","The break comes when the goal is met, not when the patient resists"],["Express consent","Given in words or writing"],["Implied consent","Shown by the person's conduct"],["Beneficence","Acting to maximize the patient's well-being"]],
   "These are the five terms the lecture asked you to define (with protective stabilization).");
+/* multiple answer (select all), added 2026-11-04 */
+mm("bg-mm-1", "behavior", "rec", "Select all that apply: which are passive stabilization?",
+  [["A Molt mouth prop",true,"A device holds the mouth open: passive."],
+   ["A papoose board or Rainbow Wrap",true,"A device holds the body: passive."],
+   ["An Open-Wide mouth prop",true,"A device: passive."],
+   ["A staff member cradling the head with spread fingers",false,"A person holds the patient: active stabilization."],
+   ["Hand guarding",false,"A person's hands over the patient's: listed with the active techniques."],
+   ["Crossing and holding the ankles",false,"A therapeutic hold by a person: active."]],
+  "Active = a person holds the patient still; passive = a device does. Both need informed consent.");
+mm("bg-mm-2", "behavior", "rec", "Select all that apply: which describe good protective stabilization?",
+  [["The lowest potential to cause injury",true,"One of its characteristics."],
+   ["The least restrictive alternative",true,"If only the head needs holding, hold only the head."],
+   ["Used only with informed consent",true,"Active and passive both need it."],
+   ["Short, used only for the time needed",true,"Its use should be short and let staff finish the needed treatment."],
+   ["Used as a consequence when a patient won't cooperate",false,"Never as punishment."],
+   ["Used for every child to keep the schedule moving",false,"Never as a convenience: clinics that did this caused real problems for the profession."]],
+  "Least injury, least restrictive, consent, short. Never punishment, never a substitute for guiding behavior, never convenience.");
+mm("bg-mm-3", "behavior", "rec", "Select all that apply: which are elements of informed consent?",
+  [["Mental capacity to make reasonable decisions",true,"Of whoever gives the consent."],
+   ["Enough information to make an educated decision",true,"Being informed of the needs and options."],
+   ["Given voluntarily",true,"If there is hesitation, it's best not to proceed."],
+   ["A blanket consent signed at registration",false,"Meaningless: the patient hasn't been told their needs or options."],
+   ["The caregiver's signature in every case",false,"A competent patient consents, and can refuse, for themselves."]],
+  "Capacity, information, voluntariness; then document it, specific and witnessed.");
+
 /* =================================================================== L3 DOWN SYNDROME */
 mq("ds-1866", "down", "rec", "When was Down syndrome first recognized as a chromosomal anomaly?",
   [["1956","Almost 100 years after it was described."],
@@ -1887,6 +1948,32 @@ match("ds-match", "down", "rec", "Match each heart defect with its share of card
 match("ds-match2", "down", "rec", "Match each type of Down syndrome to its share of cases.",
   [["Trisomy 21","94%"],["Translocation","5%"],["Mosaicism","1%"]],
   "Trisomy 21 94%, translocation 5%, mosaicism 1%.");
+
+/* multiple answer (select all), added 2026-11-04 */
+mm("ds-mm-1", "down", "rec", "Select all that apply: which oral findings are more common in Down syndrome?",
+  [["Class III malocclusion",true,"30-70%, from the underdeveloped maxilla."],
+   ["Posterior crossbite",true,"71%."],
+   ["Missing lateral incisors",true,"35-43%, against 2% generally."],
+   ["Taurodontism",true,"Bifurcation and pulp chamber floor displaced apically: large pulp chambers."],
+   ["Severe crowding",false,"Spacing is typical; crowding is rare in Down syndrome."],
+   ["A large mandible",false,"The Class III comes from midface hypoplasia, not a big mandible."]],
+  "Class III (small maxilla), crossbite 71%, missing laterals, microdontia, taurodontism, spacing, macroglossia.");
+mm("ds-mm-2", "down", "rec", "Select all that apply: under the current guideline, which patients need antibiotic prophylaxis?",
+  [["Cyanotic congenital heart disease not fully repaired, including shunts and conduits",true,"The first of the three highest-risk groups."],
+   ["A defect completely repaired with prosthetic material or a device, in the first six months",true,"Only for those first six months."],
+   ["Repaired congenital heart disease with a residual defect at or next to a prosthetic patch",true,"The third highest-risk group."],
+   ["A VSD repaired in infancy and healed with no residual defect",false,"Usually no antibiotics once healed."],
+   ["Mitral valve prolapse found on an EKG",false,"Common in Down syndrome (57% on EKG) but not on the highest-risk list."],
+   ["Any patient with Down syndrome",false,"It depends on the heart history, not the syndrome: consult the cardiologist."]],
+  "Prophylaxis is now only for the highest risk of endocarditis: unrepaired cyanotic disease, the first six months after a prosthetic repair, residual defects at a patch or device.");
+mm("ds-mm-3", "down", "rec", "Select all that apply: which describe periodontal disease in Down syndrome?",
+  [["It's the most common dental condition in Down syndrome",true,"Higher than in the general population and in other disabilities."],
+   ["Early onset in 60-95%, detectable as young as 6",true,"Probe from about age 6."],
+   ["It progresses faster than usual",true,"Some lose teeth to bone loss in their early teens."],
+   ["It's treated with scaling and root planing, like early-onset periodontitis",true,"SRP as for anyone, started early."],
+   ["Poor brushing alone explains it",false,"It's higher than in other disabilities, so brushing alone doesn't explain it."],
+   ["Probing can wait until the teen years",false,"Start at about 6 and look for bone loss on every film."]],
+  "Perio is the big risk: early, fast, more than other disabilities. Prevention, early SRP, long-term chlorhexidine.");
 
 /* =================================================================== L4 CEREBRAL PALSY */
 mq("cp-def", "cp", "rec", "Which best describes cerebral palsy?",
@@ -2215,6 +2302,32 @@ match("cp-match", "cp", "rec", "Match each type of CP to the brain area involved
 match("cp-match2", "cp", "rec", "Match each medication to its dental concern.",
   [["Dilantin","Gingival hyperplasia"],["Depakote","Thrombocytopenia and bleeding"],["Bisphosphonates","Osteonecrosis after extraction"],["Glycopyrrolate","Dry mouth and caries"]],
   "Dilantin: hyperplasia. Depakote: bleeding. Bisphosphonates: osteonecrosis. Anticholinergics for drooling: dry mouth and rampant caries.");
+/* multiple answer (select all), added 2026-11-04 */
+mm("cp-mm-1", "cp", "rec", "Select all that apply: a patient with CP has a seizure in the chair. Which are right?",
+  [["Stop the procedure and remove everything from the mouth",true,"Stop, then Remove."],
+   ["Turn the patient on the side",true,"So vomit isn't aspirated."],
+   ["Let the seizure run its course",true,"Allow: it should end in under five minutes."],
+   ["Call EMS if a single seizure lasts more than five minutes",true,"That's status epilepticus: activate EMS, monitor the airway, BLS if needed."],
+   ["Place something between the teeth to protect the tongue",false,"Remove everything from the mouth instead."],
+   ["Finish the planned treatment once the patient is calm",false,"Complete only urgent treatment, then release them home."]],
+  "Stop, Remove, Side, Safe, Allow, Release. Over five minutes, or two without recovering between: status epilepticus, call EMS.");
+mm("cp-mm-2", "cp", "rec", "Select all that apply: which causes of cerebral palsy are prenatal?",
+  [["TORCH infections",true,"Toxoplasmosis, rubella, cytomegalovirus, herpes: about 5% of CP."],
+   ["Prematurity",true,"Listed under prenatal causes (70-80% of CP)."],
+   ["Multiple embryos (twins, triplets)",true,"A prenatal cause."],
+   ["Intracranial hemorrhage",true,"A prenatal cause."],
+   ["Shaken baby syndrome",false,"Postnatal: trauma in the first years."],
+   ["Mechanical ventilation of a premature baby",false,"Neonatal, with hypoxia and blood pressure regulation."]],
+  "Prenatal 70-80%, neonatal 10-28%, postnatal 5-18% (closer to 5%).");
+mm("cp-mm-3", "cp", "rec", "Select all that apply: which are usually normal in cerebral palsy?",
+  [["The number of teeth",true,"No more missing or extra teeth."],
+   ["Eruption timing",true,"Normal in CP, unlike Down syndrome."],
+   ["Tongue size",true,"Normal: macroglossia is Down syndrome."],
+   ["Occlusion",false,"Open bite, kept open by tongue thrust, with Class II and more overjet."],
+   ["Incisor position",false,"Flared, procumbent incisors with more overjet."],
+   ["Tooth wear",false,"Bruxism in 58%: flat wear."]],
+  "Normal in CP: number of teeth, eruption times, tongue size.");
+
 /* =================================================================== L5 SYNDROMES */
 mq("sy-brachy", "syndromes", "rec", "What is brachydactyly?",
   [["Short fingers","Brachy = short."],
@@ -2512,6 +2625,32 @@ match("sy-match", "syndromes", "rec", "Match each syndrome to its cause.",
 match("sy-match2", "syndromes", "rec", "Match each term to its meaning.",
   [["Polydactyly","Extra fingers or toes"],["Ectrodactyly","Missing fingers or toes"],["Clinodactyly","A permanently bent finger"],["Brachydactyly","Short fingers"]],
   "Poly = extra, ectro = absent, clino = bent, brachy = short.");
+
+/* multiple answer (select all), added 2026-11-04 */
+mm("sy-mm-1", "syndromes", "rec", "Select all that apply: which are dental concerns in Prader-Willi syndrome?",
+  [["Decreased, viscous saliva with heavy calculus",true,"Thick saliva: calculus, caries and gingivitis."],
+   ["More caries",true,"The saliva, and overeating adds to it."],
+   ["A high-arched palate",true,"On the list of dental concerns."],
+   ["Sedation risk from obesity",true,"General anesthesia may be safer than deep sedation; watch the airway."],
+   ["Self-biting of the lips that may need full-mouth extractions",false,"That's Lesch-Nyhan syndrome."],
+   ["Gingival fibromas from benign tumors",false,"That's tuberous sclerosis."]],
+  "Prader-Willi: obesity (sedation), outbursts, insensitive to pain, thick saliva (calculus, caries, gingivitis), high palate.");
+mm("sy-mm-2", "syndromes", "rec", "Select all that apply: which are features of Apert syndrome?",
+  [["Craniosynostosis",true,"The skull and facial bones fuse too early."],
+   ["Syndactyly",true,"Webbed or mitten-like hands and feet."],
+   ["Midface hypoplasia with Class III malocclusion",true,"A deficient maxilla, not a big mandible."],
+   ["Usually inherited from a parent",false,"Almost always a new mutation."],
+   ["A U-shaped cleft palate from glossoptosis",false,"That's the Pierre Robin sequence."],
+   ["Brachycephaly",false,"Apert gives dolichocephaly; brachycephaly is less common in syndromes."]],
+  "Apert: craniosynostosis, dolichocephaly, hypertelorism, midface deficiency, syndactyly, sleep apnea; crowding, high palate, open bite, Class III, delayed eruption.");
+mm("sy-mm-3", "syndromes", "rec", "Select all that apply: which terms are matched with the right meaning?",
+  [["Ectrodactyly: one or more fingers or toes congenitally absent",true,"The bones are actually missing."],
+   ["Hypertelorism: an abnormal distance between paired organs, usually wide-set eyes",true,"Facial development stopped before the eyes moved to the midline."],
+   ["Glossoptosis: an enlarged tongue",false,"An enlarged tongue is macroglossia; glossoptosis is a tongue displaced downward and retracted."],
+   ["Kyphosis: the spine curves sideways",false,"Sideways is scoliosis; kyphosis curves with convexity backward."],
+   ["Miosis: a dilated pupil",false,"Miosis is constricted; mydriasis is dilated."],
+   ["Syndactyly: more than five digits",false,"Syndactyly is fused digits; more than five is polydactyly."]],
+  "Know the -dactylies, the eye terms, glossoptosis, scoliosis vs kyphosis, and dolichocephaly vs brachycephaly.");
 
 /* =================================================================== L6 AUTISM */
 mq("au-cdc", "autism", "module", "How does the CDC define autism spectrum disorders?",
@@ -2864,6 +3003,32 @@ match("au-match", "autism", "module", "Match each communication rule to its reas
 match("au-match2", "autism", "module", "Match each place to what it offers patients with complex behavior.",
   [["Oral surgeons","Extractions only, in the OR or with IV sedation"],["The Foundry Dental Clinic","An anesthesiologist comes to the clinic"],["Sparks Dental Clinic","Children's OR under 21; stabilization for adults"],["Pediatric dentists","OR or in-office sedation for children"]],
   "Advanced treatment options in Alabama.");
+/* multiple answer (select all), added 2026-11-04 */
+mm("au-mm-1", "autism", "module", "Select all that apply: which describe a meltdown rather than a tantrum?",
+  [["The person doesn't look or care whether anyone reacts",true,"A meltdown isn't aimed at an audience."],
+   ["The person doesn't consider their own safety",true,"A tantrum avoids getting hurt; a meltdown doesn't."],
+   ["It tapers off slowly, and nothing satisfies until it's over",true,"It runs on its own power."],
+   ["It stops as soon as the goal is reached",false,"That's a tantrum."],
+   ["The child checks whether anyone is reacting",false,"That's a tantrum: it seeks attention."],
+   ["It's an attempt to manipulate the situation",false,"That's a tantrum; in a meltdown the person is struggling to cope."]],
+  "Meltdown: struggling to cope, no audience, no regard for safety, tapers slowly, no one feels in control.");
+mm("au-mm-2", "autism", "module", "Select all that apply: which dental conditions are more common in people with autism?",
+  [["Caries",true,"Fixed diets and cleaning that isn't tolerated."],
+   ["Attrition",true,"Grinding for anxiety relief or as stimming."],
+   ["Erosion",true,"From more GERD."],
+   ["Trauma",true,"A reduced sense of danger, habits, and more abuse."],
+   ["Missing or extra teeth",false,"No difference, unlike Down syndrome."],
+   ["Malocclusion",false,"No difference, unlike Down syndrome or CP."]],
+  "Higher: caries, attrition, erosion, trauma; slightly higher: periodontitis; no difference in tooth number or malocclusion.");
+mm("au-mm-3", "autism", "module", "Select all that apply: which follow the module's communication advice for a patient with autism?",
+  [["Saying \"hands on belly\" instead of \"stop\"",true,"Friendlier, and it works wonders."],
+   ["Giving the instruction once and waiting",true,"Each repetition has to be processed again."],
+   ["A direct, even, neutral tone",true,"A sing-song voice may not register as an instruction."],
+   ["\"Open like an alligator,\" to make it fun",false,"Language is taken literally: say \"open your mouth.\""],
+   ["Clapping and cheering after each step",false,"Excitement can be scary: praise freely, but calmly."],
+   ["Asking \"Can I polish your teeth now?\"",false,"Don't offer a no when no isn't an option: \"It is time to polish your teeth.\""]],
+  "Short, concrete, consistent words; one instruction and wait; even tone; calm praise; visual supports.");
+
 /* =================================================================== L7 PREVENTION */
 mq("pv-varnish", "prevention", "rec", "Why does Sparks use fluoride varnish instead of foam or gel in trays?",
   [["Patients can't tolerate a tray for 4 minutes, and varnish gags less","It's also stronger and stays on."],
@@ -3168,6 +3333,30 @@ match("pv-match2", "prevention", "rec", "Match each brushing position to its mai
   [["Standing in front","Lowest gag risk"],["Recliner","Trains for the dental chair"],["Sitting, caregiver behind","Good for tall patients"],["Floor, two caregivers","Most control of uncooperative patients"]],
   "Positions taught to caregivers.");
 
+/* multiple answer (select all), added 2026-11-04 */
+mm("pv-mm-1", "prevention", "rec", "Select all that apply: why does Sparks use fluoride varnish instead of gels or foams in trays?",
+  [["Fewer gag reflex problems",true,"No tray to hold in the mouth."],
+   ["It's applied in seconds with a brush",true,"Saliva helps it set."],
+   ["The patient can eat and drink right away",true,"No waiting, unlike gels and foams."],
+   ["It stays on as a reservoir of fluoride",true,"A stronger fluoride, right where you want it."],
+   ["It works with a four-minute tray application",false,"The four-minute tray is what gels and foams need, and most patients can't tolerate it."],
+   ["Patients avoid eating for 20-30 minutes after it",false,"That's gels and foams."]],
+  "Varnish: less gagging, fast, stays on, no waiting. Sparks uses it exclusively.");
+mm("pv-mm-2", "prevention", "rec", "Select all that apply: by the 10-calorie rule, which drinks are not a caries risk?",
+  [["Coke Zero",true,"0 calories."],
+   ["Dr Pepper Ten",true,"10 calories: at the limit."],
+   ["Crystal Light",true,"Artificially sweetened: the treat without the caries."],
+   ["Coke",false,"110 calories of sugar-sweetened beverage."],
+   ["100% apple juice",false,"High in natural sugar: like eating five to ten apples."]],
+  "Read the label: 10 calories or fewer per serving is not a caries risk. Limit them to 2-3 a day.");
+mm("pv-mm-3", "prevention", "rec", "Select all that apply: which match Dr. Mitchell's advice on home fluoride products?",
+  [["No fluoride rinses or gels before about age 8",true,"They'd likely swallow it while the teeth are still developing: fluorosis."],
+   ["Prevident 5000: brush on at night, spit or wipe out the excess, no rinse",true,"Used instead of the regular toothpaste."],
+   ["Plain MI Paste for its fluoride",false,"Plain MI Paste has no fluoride: use MI Paste Plus."],
+   ["Custom fluoride trays as the usual way to apply it",false,"Trays are rarely tolerated: products are usually brushed on."],
+   ["A product that needs 60 seconds for a patient who tolerates 10",false,"Contact time: it does nothing if it can't stay on long enough."]],
+  "Age 8 or older, brushed on, enough contact time; Prevident 5000 at night without rinsing.");
+
 /* =================================================================== L8 MENTAL ILLNESS (reading) */
 mq("mi-def", "mental", "reading", "How does the reading distinguish mental illness from intellectual disability (\"mental retardation\" in the reading)?",
   [["Mental illness is psychiatric or emotional; ID is a cognitive deficit","They can coexist."],
@@ -3387,6 +3576,30 @@ match("mi-match", "mental", "reading", "Match each patient's medication or histo
 match("mi-match2", "mental", "reading", "Match each disorder with a typical dental finding.",
   [["Bipolar mania","Cervical abrasion from over-brushing"],["Dementia","Maxillofacial injuries from falls"],["Schizophrenia on antipsychotics","Tardive dyskinesia"],["Alcoholism","Bleeding tendency"]],
   "Dental implications by disorder.");
+
+/* multiple answer (select all), added 2026-11-04 */
+mm("mi-mm-1", "mental", "reading", "Select all that apply: which does the reading call contraindicated?",
+  [["Levonordefrin (Neo-Cobefrin) with a tricyclic antidepressant",true,"Levonordefrin and norepinephrine are contraindicated with tricyclics."],
+   ["Meperidine (Demerol) with an MAO inhibitor",true,"Absolutely contraindicated."],
+   ["Epinephrine within 48 hours of cocaine use",true,"Cocaine causes cardiac irritability."],
+   ["Alcohol-based mouthwash for a patient on disulfiram (Antabuse)",true,"They must avoid alcohol-containing products."],
+   ["Epinephrine for a normotensive patient on antipsychotics",false,"Local anesthetic with epinephrine is fine if they are normotensive."],
+   ["Epinephrine, used with prudence, with a tricyclic",false,"Epinephrine may be used with prudence; it's levonordefrin and norepinephrine that are out."]],
+  "Tricyclics: no levonordefrin or norepinephrine. MAOIs: no meperidine (and epinephrine, per the reading). Cocaine: no epinephrine for 48 hours. Antabuse: no alcohol.");
+mm("mi-mm-2", "mental", "reading", "Select all that apply: which are effects of antipsychotic (neuroleptic) drugs in the reading?",
+  [["Tardive dyskinesia: tongue protrusion, constant lip and jaw movements",true,"The long-term effect."],
+   ["Extrapyramidal symptoms such as neck spasms (torticollis)",true,"Short-term; treated with IM Benadryl."],
+   ["Akathisia: restlessness, wanting to get up during the appointment",true,"Can't sit still."],
+   ["Gingival hyperplasia",false,"That's Dilantin (phenytoin), from the CP lecture."],
+   ["Cervical abrasion from over-vigorous brushing",false,"That's the manic phase of bipolar disorder."]],
+  "Antipsychotics: extrapyramidal symptoms, tardive dyskinesia, akathisia, xerostomia; sedatives can deepen respiratory depression.");
+mm("mi-mm-3", "mental", "reading", "Select all that apply: which fit the reading's advice for a patient with progressive dementia?",
+  [["Complete dental treatment as early as possible",true,"Cooperation declines as the disease progresses."],
+   ["Take full-mouth radiographs early",true,"For future reference."],
+   ["Use nouns instead of pronouns, with short words and sentences",true,"The same communication techniques used for ID."],
+   ["Prescribe the usual adult dose",false,"In the elderly a single dose gives about twice the peak level and twice the half-life: prescribe cautiously."],
+   ["Rely on 30-second chlorhexidine rinses",false,"Many can't rinse for 30 seconds and swallow everything."]],
+  "Treat early, radiograph early, consult the team, prescribe cautiously, communicate simply.");
 
 /* ---------- READINGS (lecture notes from the recordings, handouts, the autism module and the reading) ----------
    Each lecture opens with a short "what's tested" list. Narration (audio/<id>-full.mp3, -plain.mp3) is generated from
@@ -3619,10 +3832,13 @@ var SORT_SETS = [
 var SRC_LABEL = { 'rec':'From the recording', 'module':'Autism module', 'reading':'Assigned reading', 'hub':'Hub case' };
 var DRILL_HY = {};
 
-/* ---------- MOCK: the exam's length hasn't been announced, so the mock is 50 questions spread over the eight units,
-   a little more for the longer lectures, against a 75-minute clock. */
-var MOCK_BLUEPRINT = { intro:6, behavior:7, down:7, cp:7, syndromes:6, autism:7, prevention:6, mental:4 };
-var MOCK_LIMIT = 75 * 60;
+/* ---------- MOCK: the exam's size (Dr. Mitchell's email, 2026-11-04): 45 questions in 135 minutes, spread over the eight
+   units, a little more for the longer lectures (no count per unit was announced). MOCK_MULTI of each unit's questions are
+   multiple-answer (select all), since the exam has them; the rest are multiple choice, true/false, two-statement and
+   numbered-statement items. */
+var MOCK_BLUEPRINT = { intro:5, behavior:6, down:6, cp:6, syndromes:6, autism:6, prevention:6, mental:4 };
+var MOCK_MULTI = 1;
+var MOCK_LIMIT = 135 * 60;
 
 
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
@@ -3729,7 +3945,7 @@ function renderHeaderStats(){
   if(cd){
     var now = new Date();
     var done = now >= examEnd(), open = now >= examStart(), days = calDays(now, EXAM_DATE), left = calDays(now, EXAM_END);
-    cd.textContent = done ? 'Exam done' : open ? (left > 1 ? 'Exam open · due in ' + left + ' days' : left === 1 ? 'Exam due tomorrow' : 'Exam due tonight') : days > 1 ? (days + ' days to the exam') : 'Exam opens tonight';
+    cd.textContent = done ? (now < examClosed() ? 'Past due · Canvas closes tonight' : 'Exam done') : open ? (left > 1 ? 'Exam open · due in ' + left + ' days' : left === 1 ? 'Exam due tomorrow' : 'Exam due tonight') : days > 1 ? (days + ' days to the exam') : 'Exam opens tonight';
   }
 }
 
@@ -3994,6 +4210,7 @@ function setMode(mode){
 var homeTimer = null;
 function examStart(){ return new Date(EXAM_DATE + 'T' + EXAM_TIME + ':00'); }
 function examEnd(){ return new Date(EXAM_END + 'T' + EXAM_CLOSES + ':00'); }
+function examClosed(){ return new Date(EXAM_LAST + 'T' + EXAM_CLOSES + ':00'); }
 function lecProgress(l){
   var qs = QUESTIONS_BY_LECTURE[l.id] || [], tried = 0, right = 0, missed = 0;
   qs.forEach(function(q){ var s = STATE.seen[q.id]; if(s){ tried++; if(s.last) right++; else missed++; } });
@@ -4002,7 +4219,12 @@ function lecProgress(l){
 }
 function countdownHTML(){
   var now = new Date(), s = examStart(), e = examEnd();
-  if(now >= e) return '<div class="home-count is-done"><b>The exam is done.</b><span>Tell the class how it went with Check in on the dashboard.</span></div>';
+  if(now >= e){
+    /* past due but Canvas still open (Saturday), then the no-discussion period from Dr. Mitchell's email: check-in waits for TALK_FROM */
+    if(now < examClosed()) return '<div class="home-count is-done"><b>The exam was due Friday at 11:59 pm.</b><span>Canvas closes Saturday at 11:59 pm. Please don\'t discuss the exam with anyone until after November 18.</span></div>';
+    if(now < new Date(TALK_FROM + 'T00:00:00')) return '<div class="home-count is-done"><b>The exam is done.</b><span>Please don\'t discuss it with anyone until after November 18. Check in on the dashboard opens on November 19.</span></div>';
+    return '<div class="home-count is-done"><b>The exam is done.</b><span>Tell the class how it went with Check in on the dashboard.</span></div>';
+  }
   var to = now >= s ? e : s, ms = to - now, d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
   function u(n, w){ return '<span class="hc-unit"><b>' + n + '</b><small>' + w + (n === 1 ? '' : 's') + '</small></span>'; }
   return (now >= s ? '<p class="hh-when"><b>The exam is open on Canvas.</b> Time left before it\'s due:</p>' : '') +
@@ -4063,7 +4285,7 @@ function renderHome(){
     '<div class="hh-main"><p class="hh-kicker">Special Patient Care · Dr. Mitchell</p><h2>The exam</h2>' +
       '<p class="hh-when">' + icon('calendar') + 'On Canvas · opens Fri, Nov 6, 12:00 am · due Fri, Nov 13, 11:59 pm</p>' +
       '<div id="homeCount">' + countdownHTML() + '</div>' +
-      '<div class="hh-chips"><span>All eight units</span><span>Format not announced</span><span>Canvas</span></div></div>' +
+      '<div class="hh-chips"><span>All eight units</span><span>45 questions, 135 minutes</span><span>Open notes</span><span>Canvas</span></div></div>' +
     '<div class="hh-ready">' + ringSVG(Math.round(right / total * 100)) + '<div class="hh-ready-txt"><b>' + right + ' of ' + total + '</b><span>questions right on your latest try</span>' +
       (acc !== null ? '<span>' + acc + '% of all your answers right</span>' : '<span>Answer a few to see your accuracy</span>') + '</div></div>' +
   '</section>';
@@ -4073,7 +4295,7 @@ function renderHome(){
     '<button type="button" class="qs-btn primary" data-home="new"><span class="qs-ic">' + icon('bank') + '</span><span><b>Practice questions</b><small>' + left + ' you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="notes:' + cont.id + '"><span class="qs-ic">' + icon('notes') + '</span><span><b>Lecture notes</b><small>' + lecLabel(cont) + ' ' + escHtml(cont.title.split(':')[0]) + '</small></span></button>' +
-    '<button type="button" class="qs-btn" data-home="mock"><span class="qs-ic">' + icon('clock') + '</span><span><b>Mock exam</b><small>50 questions, 75 minutes</small></span></button></div>';
+    '<button type="button" class="qs-btn" data-home="mock"><span class="qs-ic">' + icon('clock') + '</span><span><b>Mock exam</b><small>45 questions, 135 minutes</small></span></button></div>';
   h += examCardHTML();
   h += '<div class="home-grid"><div class="home-col">' + homeNextHTML(rows) + homeLecturesHTML(rows) + '</div><div class="home-col">' + homeTimelineHTML() + homeDaysHTML() +
     '<div class="home-card"><h3>' + icon('review') + 'Also here</h3><ul class="home-links"><li><button type="button" class="linkbtn" data-home="hints">Exam hints</button>: what the professors said to know, in their words</li><li><button type="button" class="linkbtn" data-home="cram">Cram sheet</button>: every lecture on one page</li><li><button type="button" class="linkbtn" data-home="review">Review tables</button>: the numbers, Down vs CP vs autism, look-alikes</li><li><button type="button" class="linkbtn" data-home="arcade">Arcade</button>: six games on the same material</li></ul></div></div></div>';
@@ -4099,7 +4321,7 @@ function homeGo(what){
 /* ===================================================================
    COMPENDIUM
    =================================================================== */
-var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (50)'] ];
+var SUBTABS = [ ['notes','Lecture Notes'], ['bank','Question Bank'], ['weak','Weak Spots'], ['hints','Exam Hints'], ['cram','Cram Sheet'], ['mock','Mock Exam (45)'] ];
 function examInfoHTML(){ return '<dl class="exam-info">' + EXAM_INFO.map(function(r){ return '<dt>'+r[0]+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>'; }
 /* the exam's format and logistics on Home, open until the student closes it (STATE.ui.examCard), gone once the exam ends */
 function examCardHTML(){
@@ -4107,8 +4329,8 @@ function examCardHTML(){
   if(now >= examEnd()) return '';
   var open = now >= examStart(), d = calDays(now, EXAM_DATE), left = calDays(now, EXAM_END);
   var when = open ? (left === 0 ? 'The exam is due tonight, 11:59 pm' : 'The exam is open: due Fri, Nov 13, 11:59 pm') : d === 1 ? 'The exam opens tonight at midnight' : 'The exam: Canvas, Nov 6-13';
-  return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · all eight units · format not announced</span></summary>' +
-    examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-home="mock">Take the 50-question mock</button></div></details>';
+  return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · 45 questions · 135 minutes · open notes</span></summary>' +
+    examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-home="mock">Take the 45-question mock</button></div></details>';
 }
 var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
@@ -4606,17 +4828,21 @@ function renderReview(){
 }
 
 /* ===================================================================
-   MOCK EXAM: 50 questions in 75 minutes (blueprint and limit are in the data above)
+   MOCK EXAM: 45 questions in 135 minutes, like the real one (blueprint and limit are in the data above)
    =================================================================== */
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
-    var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq'; });
-    var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
-    var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
-    fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
+    var qs = QUESTIONS_BY_LECTURE[lec]||[];
+    var take = function(pool, n){
+      var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
+      var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
+      return fresh.concat(rest).slice(0, n);
+    };
+    var multis = take(qs.filter(function(q){ return q.type === 'multi'; }), Math.min(MOCK_MULTI, MOCK_BLUEPRINT[lec]));
+    multis.concat(take(qs.filter(function(q){ return q.type === 'mcq'; }), MOCK_BLUEPRINT[lec] - multis.length)).forEach(function(q){ ids.push(q.id); });
   });
-  var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QUESTIONS_BY_ID[id]); });
+  var order = {}; ids.forEach(function(id){ var q = QUESTIONS_BY_ID[id]; order[id] = q.type === 'multi' ? shuffled(q.choices.map(function(c,k){ return k; })) : choiceOrder(q); });
   STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
   saveState();
 }
@@ -4634,7 +4860,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions spread over all eight units, a few more for the longer lectures. The exam\'s length and format haven\'t been announced, so treat this as practice at pace. Two-statement, true/false, numbered-statement and matching items are included. Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like a real exam: choose an answer for each question with no feedback, then submit. The clock counts against 75:00 (about 90 seconds a question) and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions spread over all eight units, a few more for the longer lectures. The exam is 45 questions in 135 minutes, so this mock is the same size. Multiple-answer (select all), two-statement, true/false and numbered-statement items are included; the exam\'s ordering, matching, Hot Spot and fill-in-the-blank items aren\'t (practice matching in the Question Bank). Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like a real exam: choose an answer for each question with no feedback, then submit. The clock counts against 135:00 (3 minutes a question, like the real exam) and turns red past it. A multiple-answer question counts as right only when you pick every right answer and nothing else. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
@@ -4656,20 +4882,28 @@ function renderMock(body){
   h += '<div class="qlist" id="mockList">' + m.ids.map(function(id, i){
     var q = QUESTIONS_BY_ID[id]; if(!q) return '';
     if(m.submitted && m.onlyMissed && m.res[id]) return '';
-    var pick = (id in m.picks) ? m.picks[id] : null;
+    var pick = (id in m.picks) ? m.picks[id] : null, isMulti = q.type === 'multi';
     var order = (m.order && m.order[id]) || q.choices.map(function(c,k){ return k; });
+    /* multiple answer: picks are a list of choice indexes, drawn as tick boxes; scored after Submit with the bank's partial credit */
+    var picks = isMulti ? (pick || []) : (pick === null ? [] : [pick]);
     var choices = order.map(function(k){
-      var cls = 'qcard-choice';
+      var cls = 'qcard-choice', on = picks.indexOf(k) > -1;
+      if(isMulti){
+        if(m.submitted){ var right = q.correct.indexOf(k) > -1; if(right && on) cls += ' is-correct'; else if(right) cls += ' is-missed-right'; else if(on) cls += ' is-wrong'; }
+        else if(on) cls += ' is-selected';
+        return '<button type="button" class="'+cls+'" data-act="multi" data-mock-multi="'+k+'" data-qid="'+id+'"'+(m.submitted?' disabled':'')+' aria-pressed="'+on+'">'+escHtml(q.choices[k])+'</button>';
+      }
       if(m.submitted){ if(k === q.answer) cls += ' is-correct'; else if(k === pick) cls += ' is-wrong'; }
       else if(k === pick) cls += ' is-picked';
       return '<button type="button" class="'+cls+'" data-mock-pick="'+k+'" data-qid="'+id+'"'+(m.submitted?' disabled':'')+' aria-pressed="'+(k === pick)+'">'+escHtml(q.choices[k])+'</button>';
     }).join('');
-    var verdict = !m.submitted ? '' : pick === null ? '<span class="qcard-verdict bad">Not answered.</span>' : m.res[id] ? '<span class="qcard-verdict ok">Correct.</span>' : '<span class="qcard-verdict bad">Missed.</span>';
+    var verdict = !m.submitted ? '' : pick === null ? '<span class="qcard-verdict bad">Not answered.</span>' : m.res[id] ? '<span class="qcard-verdict ok">Correct.</span>' :
+      '<span class="qcard-verdict bad">Missed.</span>' + (isMulti ? ' <span class="multi-score">Partial credit: '+Math.round(multiScore(q, picks)*100)+'%. Dashed = a right answer you missed.</span>' : '');
     return '<div><div class="qcount" style="margin:0 0 4px">Question '+(i+1)+'</div>' +
-      '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
+      '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="'+q.type+'">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
-      figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+(m.submitted ? figAfterHTML(q) : '')+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, pick === null ? [] : [pick]) : '')+cueHTML(q)+
+      figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + (isMulti && !m.submitted ? '<div class="qcard-hint">Select every correct answer.</div>' : '') + '<div class="qcard-choices">'+choices+'</div>' +
+      '<div class="qcard-explain" data-role="explain">'+verdict+(m.submitted ? figAfterHTML(q) : '')+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, picks) : '')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';
@@ -4679,10 +4913,20 @@ function renderMock(body){
   var list = document.getElementById('mockList');
   if(!m.submitted){
     list.addEventListener('click', function(e){
-      var b = e.target.closest('[data-mock-pick]'); if(!b) return;
-      var id = b.getAttribute('data-qid');
-      m.picks[id] = +b.getAttribute('data-mock-pick'); saveState();
-      b.parentNode.querySelectorAll('[data-mock-pick]').forEach(function(x){ x.classList.toggle('is-picked', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+      var mb = e.target.closest('[data-mock-multi]');
+      if(mb){ /* tick or untick one answer; an empty list counts as unanswered */
+        var mid = mb.getAttribute('data-qid'), k = +mb.getAttribute('data-mock-multi'), cur = (m.picks[mid] || []).slice(), at = cur.indexOf(k);
+        if(at > -1) cur.splice(at, 1); else cur.push(k);
+        if(cur.length) m.picks[mid] = cur; else delete m.picks[mid];
+        saveState();
+        mb.classList.toggle('is-selected', at === -1); mb.setAttribute('aria-pressed', String(at === -1));
+      }
+      var b = mb ? null : e.target.closest('[data-mock-pick]'); if(!b && !mb) return;
+      if(b){
+        var id = b.getAttribute('data-qid');
+        m.picks[id] = +b.getAttribute('data-mock-pick'); saveState();
+        b.parentNode.querySelectorAll('[data-mock-pick]').forEach(function(x){ x.classList.toggle('is-picked', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+      }
       body.querySelectorAll('#mockProg, [data-mock-prog]').forEach(function(pr){ pr.textContent = Object.keys(m.picks).length + ' / ' + m.ids.length + ' answered'; });
       body.querySelectorAll('[data-mock-submit][data-confirm]').forEach(function(sb){ sb.removeAttribute('data-confirm'); sb.textContent = 'Submit exam'; });
     });
@@ -4692,9 +4936,10 @@ function renderMock(body){
       m.submitted = true; m.tEnd = Date.now(); m.res = {};
       m.ids.forEach(function(id){
         var q = QUESTIONS_BY_ID[id]; if(!q) return;
-        var ok = (id in m.picks) && m.picks[id] === q.answer;
+        var multiQ = q.type === 'multi';
+        var ok = (id in m.picks) && (multiQ ? multiScore(q, m.picks[id]) === 1 : m.picks[id] === q.answer);
         m.res[id] = ok;
-        if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock', m.picks[id]);
+        if(id in m.picks) recordAnswer(q.id, q.lec, ok, 'mock', multiQ ? null : m.picks[id]);
       });
       /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) and its results card (widget/fx.js) */
       var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
@@ -4711,7 +4956,7 @@ function renderMock(body){
   }
   document.getElementById('mockNew').onclick = function(){ STATE.mock = null; saveState(); renderMock(body); };
   var clock = document.getElementById('mockClock');
-  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + ' / 90:00'; clock.classList.toggle('is-over', sec > MOCK_LIMIT); }
+  function tick(){ if(!document.body.contains(clock)){ clearInterval(mockTimer); return; } var end = m.tEnd || Date.now(); var sec = Math.floor((end - m.t0)/1000); clock.innerHTML = icon('clock') + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') + ' / ' + Math.round(MOCK_LIMIT/60) + ':00'; clock.classList.toggle('is-over', sec > MOCK_LIMIT); }
   tick(); if(!m.submitted) mockTimer = setInterval(tick, 1000);
 }
 
@@ -5193,7 +5438,9 @@ window.SH_EXPORT = {
   }),
   sections: shSearchSections(),
   hints: HINTS.map(function(x){ return { lec:x.lec, quote:x.quote }; }),
-  exams: [ { label:'Special Patient Care exam', date:EXAM_END, archiveHour:24 } ]
+  exams: [ { label:'Special Patient Care exam', date:EXAM_END, archiveHour:24 } ],
+  /* Canvas keeps the exam open through Saturday at 11:59 pm (open notes), so the hub isn't marked archived until then */
+  archiveOn: { date:EXAM_LAST, hour:24 }
 };
 
 })();

@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Special Patient Care: the exam's format, 45-question mock, multiple-answer questions, Claude Code)** — Dr.
+  Mitchell's exam email: 45 questions, 135 minutes, open notes and lecture materials, no other people, a mix of multiple
+  choice, multiple answer, ordering, matching, Hot Spot, fill-in-the-blank and true/false, and no discussing the exam until
+  after November 18. Its dates (Fri Nov 17, Sat Nov 18) are an earlier year's calendar; Sam kept opens Fri Nov 6, due Fri
+  Nov 13 11:59 pm, and Canvas closes Sat Nov 14 11:59 pm. The hub: `EXAM_INFO` (new Rules and Practice rows), the exam card's
+  summary, a Canvas-closes line in `COURSE_DATES`, `EXAM_LAST` / `TALK_FROM`, the header pill ("Past due · Canvas closes
+  tonight") and Home's done message (no discussing until after Nov 18; check-in opens Nov 19). The mock is now 45 questions
+  in 135 minutes (`MOCK_BLUEPRINT` 5/6/6/6/6/6/6/4, `MOCK_LIMIT`), with one multiple-answer item per unit (`MOCK_MULTI`):
+  tick boxes, all-or-nothing for the score, the bank's partial credit and the why list in review; its clock label read
+  "/ 90:00" against a 75-minute limit and now reads the limit. 24 new multiple-answer questions, three per unit (`mm()`,
+  copied from PCD Implants, inline whys); bank 452 -> 476. Sam chose no ordering, fill-in-the-blank or Hot Spot practice.
+  Dashboard: new per-exam `checkinFrom:{date,hour}` (holds the Check in button and pop-up), set to Nov 19 for this exam; the
+  card stays live through Saturday (hub-level `archiveOn` Nov 14 hour 24, mirrored in `SH_EXPORT.archiveOn`); the card text
+  gives the format. About page (check-in line), hub note, decisions; `sw.js` -> `sh-v51`. No schema change.
+
 - **2026-11-04 (Occlusion L7: five interactive diagrams, Claude Code)** — The five figures Sam approved on 2026-11-03,
   built with anima in `tools/figures/occlusion/anima/` and placed in the L7 notes at both levels (`FIG_PLACE.malocclusion`
   and `FIG_BY_LEC.malocclusion` in `od.js`, in `data-sh-noread` wrappers; READINGS and the mp3s unchanged) and in L7's

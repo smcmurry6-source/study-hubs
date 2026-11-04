@@ -15,6 +15,8 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | Special Patient Care: the exam email's dates (Fri Nov 17, Sat Nov 18) are left over from an earlier year; the hub keeps opens Fri Nov 6, due Fri Nov 13 11:59 pm, Canvas closes Sat Nov 14 11:59 pm | special-patient-care | chat, [hub note](hubs/special-patient-care.md) |
+| 2026-11-04 | Special Patient Care: add multiple-answer (select all) practice only; no ordering, fill-in-the-blank or Hot Spot practice, though the exam has them | special-patient-care | chat, [hub note](hubs/special-patient-care.md) |
 | 2026-11-04 | The taste skill (`.claude/skills/taste-skill/`) is used in full, its house rules and gates included, when Sam asks to redesign a hub or page; the vault's content and feature rules still hold, and nobody restyles a live page unasked | every hub, dashboard, About | chat, PR #217 |
 | 2026-11-04 | Holiday themes: Thanksgiving runs Nov 1 to the day after Thanksgiving, then Christmas (id `winter`) to Dec 26 | every hub, dashboard (`widget/eggs.js`, `widget/pet.js`) | chat, PR #216 |
 | 2026-11-03 | The repo is used like an Obsidian vault that any agent can be pointed at; agents write back what they learn | every agent | [rule](rules/repo-is-the-vault.md) |
@@ -27,7 +29,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 | 2026-11-03 | PCD Implants: remove brand and admin details with no exam signal (reports #35/#36) | pcd-implants-exam1 | [hub note](hubs/pcd-implants-exam1.md) |
 | 2026-11-03 | PCD Implants: "Yes to all animations and figures" (eleven built) | pcd-implants-exam1 | change log |
 | 2026-10-28 | Special Patient Care: no figures or animations, no diagram review | special-patient-care | [hub note](hubs/special-patient-care.md) |
-| 2026-10-28 | Special Patient Care: no check-in and no archiving until the exam closes (Nov 13, 11:59 pm) | special-patient-care | change log |
+| 2026-10-28 | Special Patient Care: no check-in and no archiving until the exam closes (Nov 13, 11:59 pm; since 2026-11-04 the card stays live through Sat Nov 14 and check-in waits for Nov 19, see the hub note) | special-patient-care | change log |
 | 2026-10-27 | Occlusion L6: four diagram candidates approved (built); Heme & Endo: "Yes to all animations" (six built) | occlusion, heme-endo-exam1 | change log |
 | 2026-10-20 | Occlusion: ten anima candidates approved for L1-L5 (all built) | occlusion | change log |
 | 2026-10-20 | The archived hub folders stay up; Timmy Tooth keeps asking unadopted visitors to tap him; no cloze question items for now | site | change log |
