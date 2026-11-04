@@ -108,8 +108,8 @@ items). No surveys, no searches.
   and Special Patient Care, so the exam eve will show which options people miss. Used: Random order 15 people, High likelihood 13, Not
   answered yet 9, Pins 7 (31 pins), "Try it again" 31 (552 shown, 96% right), the interactive figures 19, the six implant drawings 35.
   Next: read the select-all ticks and the last four lectures on the eve.
-- **Special Patient Care**: 12 people, 265 min, 39 answers; quiet until the window opens Fri. PR #221 (the exam's format, a 45-question
-  mock, multiple-answer items) is open.
+- **Special Patient Care**: 12 people, 265 min, 39 answers; quiet until the window opens Fri. PR #221 merged this morning (the exam's
+  format, a 45-question mock, multiple-answer items: 476 questions); its select-alls record their ticks from the start.
 - **Occlusion**: 1 person since (120 answers, 42 min of Daily Drill). L7's five figures went live this morning.
 - **Perio**: 3 people, 13 min. Nothing to act on.
 
