@@ -18,7 +18,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 | 2026-11-04 | The taste skill (`.claude/skills/taste-skill/`) is used in full, its house rules and gates included, when Sam asks to redesign a hub or page; the vault's content and feature rules still hold, and nobody restyles a live page unasked | every hub, dashboard, About | chat, PR #217 |
 | 2026-11-04 | Holiday themes: Thanksgiving runs Nov 1 to the day after Thanksgiving, then Christmas (id `winter`) to Dec 26 | every hub, dashboard (`widget/eggs.js`, `widget/pet.js`) | chat, PR #216 |
 | 2026-11-03 | The repo is used like an Obsidian vault that any agent can be pointed at; agents write back what they learn | every agent | [rule](rules/repo-is-the-vault.md) |
-| 2026-11-03 | Occlusion L7: all five diagram candidates approved (tolerance model, orthopedic vs occlusal stability, splint designs, rule of thirds, erosion pattern map) | occlusion | [task](tasks/2026-11-03-occlusion-l7-diagrams.md) |
+| 2026-11-03 | Occlusion L7: all five diagram candidates approved (tolerance model, orthopedic vs occlusal stability, splint designs, rule of thirds, erosion pattern map) | occlusion | [task](tasks/done/2026-11-03-occlusion-l7-diagrams.md) |
 | 2026-11-03 | Perio S7/S8: all six diagram candidates approved (built) | perio | change log |
 | 2026-11-03 | Perio's single file is the source; the split-source Perio Project is retired | perio | [hub note](hubs/perio.md) |
 | 2026-11-03 | No "Likely first" order in the Question Bank: High likelihood is a filter | every live hub | [rule](rules/question-bank-filter-panel.md) |
