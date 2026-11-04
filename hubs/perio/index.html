@@ -624,8 +624,7 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
 .ar-boards{margin-top:34px;background:var(--ar-panel);border:3px solid var(--ar-line);border-radius:20px;padding:18px 20px}
 .ar-sub{font-family:var(--font-arcade);font-weight:400;font-size:1.25rem;color:var(--ar-lemon);display:flex;align-items:center;gap:10px;margin:0 0 12px}
 .ar-sub .ic{width:24px;height:24px}
-.ar-board-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px}
-.ar-board-tabs::-webkit-scrollbar{display:none}
+.ar-board-tabs{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:4px;margin-bottom:12px}   /* all six games in view: the tabs wrap instead of hiding past the edge */
 .ar-board-tab{appearance:none;flex:none;cursor:pointer;border:2px solid var(--ar-line);background:var(--ar-bg);color:var(--ar-dim);border-radius:10px;padding:6px 11px;font-family:var(--font-arcade);font-size:.68rem}
 .ar-board-tab[aria-selected="true"]{border-color:var(--c);color:var(--ar-bg);background:var(--c)}
 .ar-board-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
