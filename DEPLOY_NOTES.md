@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Perio: Patient Box cases drawn from their numbers, Claude Code)** — Sam: upgrade the Perio Patient Box into a
+  visual diagnostic-case engine (the midterm check-ins asked for "cases with pictures, charts and radiographs" and more
+  staging/grading cases). A **shared kit**, `tools/figures/shared/dental-cases.js` + `.css` (the Occlusion case-picture
+  tooth model generalized; pasted into the hub between the `pcase` markers by `tools/figures/perio/build.mjs`), draws a
+  **periodontal chart** (an SVG strip per surface like a probing chart, blue margin line, red pocket line, bleeding dots,
+  furcation triangles, mobility, implants, missing teeth, with the numbers as a table), a **periapical radiograph**
+  (per-side bone levels as % of root length, angular defects, furcation radiolucency, calculus, crowns, root fillings,
+  amalgams, implants against a baseline) and a **drawn buccal view** (recession, swollen or fibrotic gingiva, bleeding,
+  suppuration, plaque, calculus), all from one case model, and `derive()` works the 2018 stage, grade and extent,
+  recession types and peri-implant states out of the same numbers; `tools/figures/perio/cases-check.mjs` fails the build
+  when a case's `expect` disagrees. **Six cases, 16 questions** (`PCASES`, `pc-*`: staging and grading, gingivitis vs
+  periodontitis with D4346, RT1-3, a Class II furcation with the stage trigger and the smoking modifier, a deep narrow
+  defect for regeneration, peri-implantitis and Meffert), each with a why per choice, memory cue, and **"In the notes"**
+  buttons (`q.ref`, through `SH_GOTO`; tracked `case:ref`). A question's `pfig` hides the row that would give its answer
+  away (CAL, furcation). `LIKELY_TOPICS` updated (two new topics); About page. No notes text, narration or schema change.
+  Tier 2: a draft PR for Sam's look; the expansion waits for approval ([task](vault/tasks/2026-11-04-perio-visual-case-engine.md)).
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
   ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
   [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,
