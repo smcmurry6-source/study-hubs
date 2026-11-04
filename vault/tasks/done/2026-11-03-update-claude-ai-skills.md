@@ -1,6 +1,6 @@
 ---
 type: task
-status: open
+status: done
 hub: vault
 created: 2026-11-03
 requested-by: Sam
@@ -21,11 +21,11 @@ repo, and delete the third, so no agent is told something the vault forbids.
 Checked on 2026-11-03 (the vault PR):
 - **`study-hub-builder`** (the most urgent): tells an agent in a Claude Project to "extract literally every question" from
   the course's quizzes, practice packets, crosswords and Slido sets into the hub, which breaks
-  [graded-coursework](../rules/graded-coursework.md); still builds the retired Atlas and illustrated-scene game modes
-  (removed 2026-09-24/25, replaced by the shared arcade, [arcade-skins](../rules/arcade-skins.md)); keeps a per-Project
+  [graded-coursework](../../rules/graded-coursework.md); still builds the retired Atlas and illustrated-scene game modes
+  (removed 2026-09-24/25, replaced by the shared arcade, [arcade-skins](../../rules/arcade-skins.md)); keeps a per-Project
   manifest doc instead of the hub note; and has none of the rules added since October (Home page, whys, question
   formats, High Likelihood, filter panel, diagram review). The new version points at `AGENTS.md` and
-  [build-a-hub](../how-to/build-a-hub.md), which now hold all of that.
+  [build-a-hub](../../how-to/build-a-hub.md), which now hold all of that.
 - **`study-hub-deploy`** (Cowork): pushes straight to `main` (the vault: every agent ships a branch and a PR, so CI runs
   before classmates see it), reads `DEPLOY_NOTES.md` for the rules, and says `CLAUDE.md` imports it. The new version
   keeps the Cowork mechanics (PAT, device bridge, Git Data API, Kokoro, long jobs) and ships a `cowork/...` branch and a
@@ -39,14 +39,21 @@ its setting.
 
 ## Done when
 
-- [ ] `study-hub-builder` replaced (claude.ai: Settings → Capabilities → Skills, upload the new zip)
-- [ ] `study-hub-deploy` replaced
-- [ ] `study-hub-git-workflow` deleted
-- [ ] This note moved to `done/` with the date
+- [x] `study-hub-builder` replaced (claude.ai: Settings → Capabilities → Skills, upload the new zip)
+- [x] `study-hub-deploy` replaced
+- [x] `study-hub-git-workflow` deleted
+- [x] This note moved to `done/` with the date
 
 ## Log
 
 - 2026-11-03: the three skills read against the vault; replacements written and validated.
+- 2026-11-04: Sam replaced both skills and deleted `study-hub-git-workflow`; checked in a Claude Code session.
 
 ## Outcome
+
+Done 2026-11-04. Sam uploaded the new `study-hub-builder` and `study-hub-deploy` (claude.ai shows both updated
+2026-11-04 01:51 UTC) and deleted `study-hub-git-workflow`; a Claude Code session's synced copies match the
+replacements word for word. Both now say the vault wins and point at `AGENTS.md`, `vault/how-to/build-a-hub.md` and the
+rules instead of restating them, so they should rarely need editing: when a rule changes, change its note. Cowork now
+ships a `cowork/...` branch and a draft PR rather than pushing `main` ([decisions](../../decisions.md)).
 
