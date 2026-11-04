@@ -1,7 +1,9 @@
 # Timmy Time: podcast episodes for the hubs
 
 A hub's audio review episode, hosted by Timmy Tooth: a script, a Kokoro voice, synthesized music and mastering.
-In the site it's played by `widget/podcast.js` (a hub opts in with `window.SH_PODCAST` and a `<div data-sh-podcast>` slot).
+In the site it's played by `widget/podcast.js` (a hub opts in with `window.SH_PODCAST` and a `<div data-sh-podcast>` slot),
+which also draws the episode's likes, dislikes and comments, its 1-3 lore comments first (`SH_PODCAST.fans`;
+`vault/rules/podcast-reactions.md`). The cold open skips the minutiae (`vault/rules/podcast-intro.md`).
 
 ```
 tools/podcast/
@@ -10,7 +12,7 @@ tools/podcast/
   lexicon.json        exact Kokoro phonemes for drug/anatomy/hormone words espeak gets wrong
   extract_hub.js      a hub's notes, exam facts, hints, cram sheet and likely topics as plain text, to write from
   LORE.md             Timmy Tooth's canon: read it before writing, add to it after
-  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1)
+  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1, pcd-implants-exam1)
 ```
 
 The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.claude/skills/podcast/SKILL.md`).

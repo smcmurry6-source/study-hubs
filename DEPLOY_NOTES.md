@@ -32,6 +32,30 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Timmy Time: PCD Implants Exam 1 episode, and likes, dislikes and comments on every episode, Claude Code)** —
+  A 48-minute last-minute review for PCD Implants Exam 1 (Fri Nov 6): `hubs/pcd-implants-exam1/audio/timmy-time.mp3`
+  (35 MB, -16 LUFS), script `tools/podcast/pcd-implants-exam1/script.md`, from the hub's notes (As taught), Exam Hints
+  (the course's hint list, every professor quote, Dr. Givan's study guide), cram sheet and `LIKELY_TOPICS`, 14 chapters
+  (L1-L9, with Dr. Chen's terms split in two) and a 25-question lightning round. No graded quiz content; no CDT codes,
+  clinic credits or brand details without an exam signal (reports #35/#36). Where lectures give different numbers (the 5 mm
+  rule vs the 7 mm count from bone vs Dr. Geisinger's table) it says whose is whose. **New rule
+  ([podcast-intro](vault/rules/podcast-intro.md)):** the cold open skips the minutiae (no question counts, exam time or
+  LockDown Browser); the `/podcast` skill now says so. Lore (Sam picked all four): three Thanksgiving costumes, one per page
+  load; Timmy is proud of his ligament (never splint him to an implant); thirty-one thinks he's a failing implant;
+  Brånemark's rabbit. `lexicon.json` gains 34 entries (Brånemark, Geisinger, Chavali, Mueninghoff, Straumann, DICOM, ALARA,
+  Bremsstrahlung, endosteal/eposteal/endosseous/subperiosteal, periapical, trabeculae, and `S-L-A`, `U-C-L-A`, `U-A-B`,
+  whose final A read "uh"). Hub: `SH_PODCAST` (id `exam1-review`), card on Home under the quick-start row, "Also here"
+  link, `#timmy` opens Home; dashboard card gets `podcast` and "Timmy Time" in modes. **New rule
+  ([podcast-reactions](vault/rules/podcast-reactions.md)), for every episode:** `widget/podcast.js` + `widget/v3.css` add a
+  like and a dislike (one per visitor, tap again to undo), the episode's 1-3 lore comments (`SH_PODCAST.fans`, a random
+  count; this one has three: number thirty-one, the rabbit down the hill, the toothbrush by the door, all in `LORE.md`) and
+  the class's comments (post at once under the leaderboard name, 280 characters, 5 per episode a day, delete your own,
+  report anyone's, three reports hide one). `migration_v47.sql` (applied through the connector): `podcast_reactions`,
+  `podcast_comments`, `podcast_comment_reports`, `pod_feed`, `pod_react`, `pod_comment`, `pod_delete_comment`,
+  `pod_report_comment`, `admin_pod_comments`, `admin_hide_pod_comment`. Admin page: Inbox → "Podcast comments", hide or
+  restore any. Tracked as `pod:<id>:like|dislike|unvote|comment|report|comments-all`. About page updated. Older episodes
+  get the buttons and the class's comments too, but no lore comments (their hubs are archived). Sam asked about Gemini
+  TTS: no `GEMINI_API_KEY` in the environment, so this episode is Kokoro.
 - **2026-11-04 (Special Patient Care: the exam's format, 45-question mock, multiple-answer questions, Claude Code)** — Dr.
   Mitchell's exam email: 45 questions, 135 minutes, open notes and lecture materials, no other people, a mix of multiple
   choice, multiple answer, ordering, matching, Hot Spot, fill-in-the-blank and true/false, and no discussing the exam until
@@ -46,7 +70,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Dashboard: new per-exam `checkinFrom:{date,hour}` (holds the Check in button and pop-up), set to Nov 19 for this exam; the
   card stays live through Saturday (hub-level `archiveOn` Nov 14 hour 24, mirrored in `SH_EXPORT.archiveOn`); the card text
   gives the format. About page (check-in line), hub note, decisions; `sw.js` -> `sh-v51`. No schema change.
-
 - **2026-11-04 (Occlusion L7: five interactive diagrams, Claude Code)** — The five figures Sam approved on 2026-11-03,
   built with anima in `tools/figures/occlusion/anima/` and placed in the L7 notes at both levels (`FIG_PLACE.malocclusion`
   and `FIG_BY_LEC.malocclusion` in `od.js`, in `data-sh-noread` wrappers; READINGS and the mp3s unchanged) and in L7's
@@ -60,7 +83,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   pooled, citrus sucked or chewed, NCCLs, plus an attrition vs erosion close-up that doesn't say whether erosion facets
   match). `stability` and `splints` share a side-view rig, `anima/l7rig.mjs` (skull, mandible, disc, teeth, a contact
   solver; poses solved in Node). About page "Diagrams" entry updated. No question, notes or audio change; no schema change.
-
 - **2026-11-04 (taste skill, Claude Code)** — `.claude/skills/taste-skill/` (install name `design-taste-frontend`),
   vendored from Leonxlnx/taste-skill (MIT; commit and what was left out in its `UPSTREAM.md`): art direction for web
   pages and app screens, with a library of directions, a source linter and a real-browser inspector. Sam's call: when

@@ -15,6 +15,9 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | Timmy Time: likes, dislikes and comments under every episode, with 1-3 lore comments (a random count) per episode; class comments show at once, reportable, Sam can hide any | every episode | chat, [rule](rules/podcast-reactions.md) |
+| 2026-11-04 | Timmy Time's cold open leaves out per-lecture question counts, the exact exam time and LockDown Browser | every episode | chat, [rule](rules/podcast-intro.md) |
+| 2026-11-04 | Implants episode: about 45 minutes; lore: Timmy's ligament, number thirty-one thinks he's failing, Brånemark's rabbit, the Thanksgiving costumes. Gemini TTS was asked about; the episode stays on Kokoro until a `GEMINI_API_KEY` is set in the environment | `pcd-implants-exam1` | chat |
 | 2026-11-04 | Special Patient Care: the exam email's dates (Fri Nov 17, Sat Nov 18) are left over from an earlier year; the hub keeps opens Fri Nov 6, due Fri Nov 13 11:59 pm, Canvas closes Sat Nov 14 11:59 pm | special-patient-care | chat, [hub note](hubs/special-patient-care.md) |
 | 2026-11-04 | Special Patient Care: add multiple-answer (select all) practice only; no ordering, fill-in-the-blank or Hot Spot practice, though the exam has them | special-patient-care | chat, [hub note](hubs/special-patient-care.md) |
 | 2026-11-04 | The taste skill (`.claude/skills/taste-skill/`) is used in full, its house rules and gates included, when Sam asks to redesign a hub or page; the vault's content and feature rules still hold, and nobody restyles a live page unasked | every hub, dashboard, About | chat, PR #217 |

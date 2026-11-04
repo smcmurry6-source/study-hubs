@@ -38,6 +38,8 @@ Hub building
 - [Every hub opens on its own Home page](rules/hub-home-page.md)
 - [Every hub's arcade looks like that hub](rules/arcade-skins.md)
 - [Text and audio must never drift](rules/text-and-audio-never-drift.md)
+- [Every Timmy Time episode has likes, dislikes and comments](rules/podcast-reactions.md), with 1-3 lore comments.
+- [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser.
 - [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time.
 - [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures.
 - [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)

@@ -67,6 +67,10 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/text-and-audio-never-drift.md
 
+@vault/rules/podcast-reactions.md
+
+@vault/rules/podcast-intro.md
+
 @vault/rules/diagram-review.md
 
 @vault/rules/diagrams-anima.md

@@ -41,16 +41,16 @@ Never use graded quiz, take-home or exam content, or anything still open (Canvas
 
 Copy the header comment from the last script and update it (sources, the exam, the lore added). Structure:
 
-1. **Cold open** (~2-3 min): the greeting, a lore beat, then the exam facts from `EXAM_INFO` (day, time, format, count per
-   lecture, where Patient Box items come from), logistics (LockDown Browser, open quizzes due) and how the episode is
-   ordered.
+1. **Cold open** (~1-2 min): the greeting, a lore beat, the exam and the day, the lectures and professors it covers, and
+   how the episode is ordered. **No minutiae** (`vault/rules/podcast-intro.md`): no question counts per lecture, no exact
+   exam time or window, no LockDown Browser or other logistics.
 2. **One segment per lecture or per gland/topic** (`## N. Title`, these become the chapters), 3-6 minutes each, with
    time roughly in proportion to the exam counts. Each one: what the professor said to know (quote `hints.txt` word for
    word and say it's a quote), the facts behind every `likely.txt` topic, the review items' answers explained, the
    look-alikes the class mixes up, and what was de-emphasized ("you don't need..."). Hooks and mnemonics from the notes.
 3. **Lightning round**: 25-35 one-line questions, `Question? [pause 2.5] Answer.` on one paragraph each (the inline pause
    cues the bell). Cover every lecture.
-4. **Sign-off**: the plan for the night before and the morning of, a lore callback, the exam time again, and
+4. **Sign-off**: the plan for the night before and the morning of, a lore callback, the exam day (not the time), and
    "This has been Timmy Time. I'm Timmy. Brush, floss, and ..." with a new ending.
 
 Writing for Kokoro (more in the README): letters read as letters are hyphenated capitals (`T-S-H`, `A-C-T-H`, `G-S`,
@@ -94,9 +94,11 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 
 ## 5. Wire it in
 
-- **Hub**: `window.SH_PODCAST = { id, show:'Timmy Time', title, src:'audio/timmy-time.mp3', duration, blurb, chapters }`
+- **Hub**: `window.SH_PODCAST = { id, show:'Timmy Time', title, src:'audio/timmy-time.mp3', duration, blurb, chapters, fans }`
   right before `window.SH_EXPORT = {` (copy `duration` and `chapters` from the json; chapter titles are the `##` titles
-  without numbers). A `<div data-sh-podcast></div>` slot where students will see it: on **Home** in hubs that have it
+  without numbers). `fans` is the episode's lore comments (`vault/rules/podcast-reactions.md`): roll 1-3 at random, write
+  each in character about this episode, from `LORE.md`'s characters (or a new one added there). The widget draws them
+  above the class's comments, with the like and dislike buttons. A `<div data-sh-podcast></div>` slot where students will see it: on **Home** in hubs that have it
   (under the quick-start row), else at the top of Compendium. `#timmy` must open that mode (boot: `if(location.hash ===
   '#timmy') m = '<mode>'`). In Home's "Also here" list, a `data-sh-podcast-open` link. `widget/podcast.js` does the
   rest (player, dock, menu item, resume, tracking).
