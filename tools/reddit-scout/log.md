@@ -23,15 +23,21 @@ Passed
 The first run, over the past month of r/ClaudeAI, r/ClaudeCode, r/Anthropic and r/claude.
 
 Suggested
-- A security finding in a Supabase admin function, reported to Sam in chat
-  (<https://www.reddit.com/r/ClaudeAI/comments/1x95eyf/fixed_a_clients_lovable_app_so_many_security/>; the Supabase
-  security advisor and read-only SQL confirmed it). Sam: pending
+- Supabase: `admin_reset_changelog` let a NULL secret through. It checked `p_secret <> '...'`, and a comparison with
+  NULL is NULL, so the check was skipped and anyone with the publishable key could empty the site changelog and write
+  their own entries (<https://www.reddit.com/r/ClaudeAI/comments/1x95eyf/fixed_a_clients_lovable_app_so_many_security/>,
+  on RLS and admin checks in vibe-coded Supabase apps; the Supabase security advisor and read-only SQL confirmed it).
+  Sam (2026-11-04): fix it now. Fixed the same day: `migration_v48.sql` checks it with `sh_admin_ok()`, like every other
+  admin function, applied to the live database and checked (a NULL secret fails); shipped in
+  [#227](https://github.com/smcmurry6-source/study-hubs/pull/227). No other admin function had the pattern.
 - "Find this in the notes" after a missed question: the widget jumps to the notes paragraph that best matches the
   question, through the `SH_EXPORT` sections and `SH_GOTO` every hub already has
-  (<https://www.reddit.com/r/ClaudeCode/comments/1wzy1a6/i_built_a_jarvisstyle_study_console_for_my_notes/>). Sam: pending
+  (<https://www.reddit.com/r/ClaudeCode/comments/1wzy1a6/i_built_a_jarvisstyle_study_console_for_my_notes/>). Sam
+  (2026-11-04): build it now. Shipped as a widget feature (see `DEPLOY_NOTES.md`, 2026-11-04)
 - A CI check that narration matches the notes (a text hash per lecture and level beside the mp3s, checked by
   `tools/ci/smoke.js`), so "text and audio never drift" is enforced rather than remembered
-  (<https://www.reddit.com/r/ClaudeAI/comments/1xlujwl/claude_codes_docs_say_claudemd_is_context_not/>). Sam: pending
+  (<https://www.reddit.com/r/ClaudeAI/comments/1xlujwl/claude_codes_docs_say_claudemd_is_context_not/>). Sam
+  (2026-11-04): skip; don't suggest it again
 
 Worth knowing
 - `disable-model-invocation: true` in a skill's frontmatter keeps it to `/name` only (checked in the Claude Code skills

@@ -407,11 +407,12 @@ begin
 end;
 $$;
 
+-- migration_v48: checks the secret with sh_admin_ok(); the old `p_secret <> ...` check let a NULL secret through.
 create or replace function public.admin_reset_changelog(p_secret text, p_entries jsonb)
 returns void language plpgsql security definer set search_path = public as $$
 declare entry jsonb;
 begin
-  if p_secret <> '<ADMIN_SECRET>' then raise exception 'invalid secret'; end if;
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
   delete from changelog;
   for entry in select * from jsonb_array_elements(p_entries) loop
     insert into changelog (hub, message, created_at)
