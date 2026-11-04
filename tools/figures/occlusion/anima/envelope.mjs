@@ -6,7 +6,10 @@
 // opening border), then the superior contact border set by the teeth: back past the incisal edges to edge to edge, up
 // the anterior guidance into MICP, and the slide back to CO/CR. A linked joint view shows the condyle at each step:
 // the first two steps use the TMJ figure's own model (tmjModel, tmj.mjs); the protruded steps keep the condyle forward
-// on the eminence and only change its rotation. Joint angles and positions are schematic.
+// on the eminence and only change its rotation. The disc is the TMJ figure's (its thickness profile, turned back on the
+// condyle as the condyle translates) and so is the mandible's outline, so the condyle never floats off the eminence.
+// The step text, read-outs and joint label describe the border just traced (at a step boundary, the one that ended).
+// Joint angles and positions are schematic.
 import { figureSvg, plateHtml } from "./shared.mjs";
 import { tmjModel, TMJ_D } from "./tmj.mjs";
 
@@ -36,38 +39,82 @@ const VIEWS = {
       ["L180 50", "D · right lateral", "And back to CR along the right lateral border (D). Most chewing happens well inside these borders."],
     ] },
   fro: { w: 360, h: 330, start: [180, 40],
-    shape: '<circle class="en-dot0" cx="180" cy="40" r="5"/><text class="en-t" x="192" y="34">ICP</text><circle class="en-dot0" cx="180" cy="56" r="4"/><text class="en-t" x="190" y="66">PP</text><text class="en-t en-mut" x="150" y="318">max opening</text>',
-    pins: [[238, 58, "A"], [268, 206, "B"], [122, 58, "C"], [92, 206, "D"]],
+    shape: '<circle class="en-dot0" cx="180" cy="40" r="5"/><text class="en-t" x="192" y="34">ICP</text><circle class="en-dot0" cx="180" cy="56" r="4"/><text class="en-t" x="180" y="76" text-anchor="middle">PP</text><text class="en-t en-mut" x="150" y="318">max opening</text>',
+    pins: [[238, 58, "A"], [268, 206, "B"], [92, 206, "C"], [122, 58, "D"]],
     extra: '<text class="en-t" x="8" y="150">Patient&#8217;s</text><text class="en-t" x="8" y="166">RIGHT</text><text class="en-t" x="288" y="150">Patient&#8217;s</text><text class="en-t" x="288" y="166">LEFT</text>',
     steps: [
       ["L270 98", "A · left lateral superior", "From the front (so the patient's left is on YOUR right), from the intercuspal position the incisor point slides out to the left along the left lateral superior border (A)."],
       ["C268 180 230 250 180 296", "B · left lateral opening", "From the far left it opens down the left lateral opening border (B) to maximum opening."],
-      ["C130 250 92 180 90 98", "D · right lateral opening", "Closing up the right lateral opening border (D) to the far right."],
-      ["L180 40", "C · right lateral superior", "And back along the right lateral superior border (C) to the intercuspal position. PP, the postural position, sits about 2-4 mm below it, held by a myotactic reflex."],
+      ["C130 250 92 180 90 98", "C · right lateral opening", "Closing up the right lateral opening border (C) to the far right."],
+      ["L180 40", "D · right lateral superior", "And back along the right lateral superior border (D) to the intercuspal position. PP, the postural position, sits about 2-4 mm below it, held by a myotactic reflex."],
     ] },
 };
 
+/* the TMJ figure's mandible outline in its own frame (tmj.mjs mandOut: neck, ramus, sigmoid notch, coronoid), sampled
+   as a polygon so the live code can rotate it and clip it to the joint window */
+const MAND = [[-21, 6], [-20, 34], [-24, 90], [-30, 170], [-34, 280], [160, 280], [158, 120], [150, 58], [138, 26], [128, 44], [104, 82], [74, 98], [44, 86], [24, 52], [13, 36], [18, 18], [21, 4]];
+function sampleOpen(pts, n) {
+  const out = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    for (let k = 0; k < n; k++) { const t = k / n, t2 = t * t, t3 = t2 * t, g = (a, b, c, d) => 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+      out.push([Math.round(g(p0[0], p1[0], p2[0], p3[0]) * 10) / 10, Math.round(g(p0[1], p1[1], p2[1], p3[1]) * 10) / 10]); }
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+
 const D = {
   VIEWS: Object.fromEntries(Object.entries(VIEWS).map(([k, v]) => [k, { n: v.steps.length, steps: v.steps.map((s) => ({ label: s[1], text: s[2], j: s[3] || null })) }])),
-  /* the TMJ figure's model */
-  C0: TMJ_D.C0, CC: TMJ_D.CC, C1: TMJ_D.C1, TH1: TMJ_D.TH1, TH2: TMJ_D.TH2, PSI: TMJ_D.PSI, R: TMJ_D.R,
+  /* the TMJ figure's model and disc */
+  C0: TMJ_D.C0, CC: TMJ_D.CC, C1: TMJ_D.C1, TH1: TMJ_D.TH1, TH2: TMJ_D.TH2, PSI: TMJ_D.PSI, R: TMJ_D.R, RI: TMJ_D.RI, DT: TMJ_D.DT,
+  MAND: sampleOpen(MAND, 4),
+  /* the joint window, in the TMJ figure's coordinates: x0, y0, x1, y1 */
+  WIN: [226, 104, 486, 290],
+  /* what the condyle does during each sagittal step: [read-out, short label in the joint view] */
+  JS: [["rotating only, still seated", "rotating"], ["rotating and sliding down the eminences", "rotating + sliding"], ["forward on the eminences, rotating back", "forward, closing"], ["sliding back up the eminences", "sliding back"], ["almost back on their seats (MICP)", "almost seated"], ["back on their seats (CR)", "seated"]],
 };
 
 /* the condyle at step position u (0..n) on the sagittal tab: centre and rotation */
 function enJoint(u, D) {
   var st = D.VIEWS.sag.steps, i = Math.min(st.length - 1, Math.floor(u)), f = u - i;
   function at(k) {
-    if (k < 0) return { C: D.C0, th: 0 };
+    if (k < 0) return { C: D.C0, th: 0, t: 0 };
     var j = st[k].j;
-    if (j.mm != null) { var m = tmjModel(j.mm, D); return { C: m.C, th: m.th }; }
+    if (j.mm != null) { var m = tmjModel(j.mm, D); return { C: m.C, th: m.th, t: m.t }; }
     var t = j.t, s = 1 - t, a = D.C0, b = D.CC, c = D.C1;
-    return { C: [s * s * a[0] + 2 * s * t * b[0] + t * t * c[0], s * s * a[1] + 2 * s * t * b[1] + t * t * c[1]], th: j.th };
+    return { C: [s * s * a[0] + 2 * s * t * b[0] + t * t * c[0], s * s * a[1] + 2 * s * t * b[1] + t * t * c[1]], th: j.th, t: t };
   }
   /* inside a step the opening steps follow tmjModel continuously; the others blend their end states */
   var j = st[i].j;
-  if (j.mm != null) { var mm0 = i ? st[i - 1].j.mm || 0 : 0, m = tmjModel(mm0 + (j.mm - mm0) * f, D); return { C: m.C, th: m.th }; }
+  if (j.mm != null) { var mm0 = i ? st[i - 1].j.mm || 0 : 0, m = tmjModel(mm0 + (j.mm - mm0) * f, D); return { C: m.C, th: m.th, t: m.t }; }
   var p = at(i - 1), q = at(i);
-  return { C: [p.C[0] + (q.C[0] - p.C[0]) * f, p.C[1] + (q.C[1] - p.C[1]) * f], th: p.th + (q.th - p.th) * f };
+  return { C: [p.C[0] + (q.C[0] - p.C[0]) * f, p.C[1] + (q.C[1] - p.C[1]) * f], th: p.th + (q.th - p.th) * f, t: p.t + (q.t - p.t) * f };
+}
+
+/* the disc's thickness by angle (degrees from the top of the condyle, + = anterior): the TMJ figure's profile */
+function enDiscT(a, D) {
+  var k = D.DT, i;
+  if (a <= k[0][0]) return k[0][1];
+  for (i = 1; i < k.length; i++) if (a <= k[i][0]) { var u = (a - k[i - 1][0]) / (k[i][0] - k[i - 1][0]); u = (1 - Math.cos(u * Math.PI)) / 2; return k[i - 1][1] + (k[i][1] - k[i - 1][1]) * u; }
+  return k[k.length - 1][1];
+}
+/* the moving parts of the joint view for a condyle state J {C, th, t}, in the TMJ figure's coordinates: the disc (turned
+   back on the condyle by PSI * t, as in the TMJ figure, so its thin middle stays between condyle and eminence) and the
+   mandible (rotated th about the condyle), clipped to the window */
+function enJointParts(J, D) {
+  function f(v) { return Math.round(v * 10) / 10; }
+  function rot(p, deg) { var r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return [J.C[0] + p[0] * c - p[1] * s, J.C[1] + p[0] * s + p[1] * c]; }
+  function polar(a, r) { var q = a * Math.PI / 180; return [r * Math.sin(q), -r * Math.cos(q)]; }
+  function P(pts) { return "M" + pts.map(function (p) { return f(p[0]) + " " + f(p[1]); }).join("L") + "Z"; }
+  var psi = -D.PSI * (J.t || 0), out = [], inn = [];
+  for (var a = -64; a <= 102; a += 6) { out.push(rot(polar(a, D.RI + enDiscT(a, D)), psi)); inn.unshift(rot(polar(a, D.RI), psi)); }
+  var B = D.WIN, m = D.MAND.map(function (p) { return rot(p, J.th); });
+  function side(arr, inside, cut) { var o = []; for (var i = 0; i < arr.length; i++) { var p = arr[i], q = arr[(i + 1) % arr.length], ip = inside(p), iq = inside(q); if (ip) o.push(p); if (ip !== iq) o.push(cut(p, q)); } return o; }
+  function cx(x) { return function (p, q) { return [x, p[1] + (q[1] - p[1]) * (x - p[0]) / (q[0] - p[0])]; }; }
+  function cy(y) { return function (p, q) { return [p[0] + (q[0] - p[0]) * (y - p[1]) / (q[1] - p[1]), y]; }; }
+  m = side(m, function (p) { return p[0] >= B[0]; }, cx(B[0])); m = side(m, function (p) { return p[0] <= B[2]; }, cx(B[2])); m = side(m, function (p) { return p[1] <= B[3]; }, cy(B[3]));
+  return { disc: P(out.concat(inn)), mand: m.length > 2 ? P(m) : "" };
 }
 
 function pin(x, y, l) { return `<g class="en-pin"><circle cx="${x}" cy="${y}" r="9"/><text x="${x}" y="${y + 4}" text-anchor="middle">${l}</text></g>`; }
@@ -83,12 +130,17 @@ function viewSvg(key) {
       `<g class="en-pen"><circle r="9" class="en-pen-halo"/><circle r="4.5" class="en-pen-dot"/></g>` });
 }
 
-/* the joint inset: the TMJ figure's fossa and eminence with the condyle and a stub of the ramus */
-const F = TMJ_D.FOSSA;
-const jointBone = "M226 104L226 " + F[0][1] + "L" + F.map((p) => p[0] + " " + p[1]).join("L") + `L${TMJ_D.TUB[0]} ${TMJ_D.TUB[1]}L486 172L486 104Z`;
-const jointSvg = figureSvg({ width: 260, height: 210, className: "en-joint", label: "The right temporomandibular joint from the side, with the condyle's position at each step",
-  body: `<g transform="translate(-226 -104)"><path class="en-jbone" d="${jointBone}"/><g class="en-cond" transform="translate(${TMJ_D.C0[0]} ${TMJ_D.C0[1]})"><path class="en-ramus" d="M-21 6L-24 96L22 96L21 6Z"/><circle class="en-chead" r="${TMJ_D.R}"/><path class="en-tick" d="M0 0V-17"/></g></g>` +
-    `<text class="en-t en-jlab" x="10" y="200">seated</text><text class="en-t en-mut" x="250" y="200" text-anchor="end">right TMJ</text>` });
+/* the joint inset: the TMJ figure's fossa and eminence, cut to a window, with the disc, the condyle and the mandible */
+const F = TMJ_D.FOSSA, WB = D.WIN;
+const jointBone = `M${WB[0]} ${WB[1]}L${WB[0]} ` + F[0][1] + "L" + F.map((p) => p[0] + " " + p[1]).join("L") + `L${TMJ_D.TUB[0]} ${TMJ_D.TUB[1]}L${WB[2]} 172L${WB[2]} ${WB[1]}Z`;
+const J0 = enJointParts({ C: TMJ_D.C0, th: 0, t: 0 }, D);
+const jointSvg = figureSvg({ width: 260, height: 210, className: "en-joint", label: "The right temporomandibular joint from the side, patient facing right, with the condyle and disc at each step",
+  body: `<g transform="translate(-226 -104)"><rect class="en-win" x="${WB[0]}" y="${WB[1]}" width="${WB[2] - WB[0]}" height="${WB[3] - WB[1]}"/><path class="en-jbone" d="${jointBone}"/>` +
+    `<path class="en-mand" d="${J0.mand}"/><path class="en-disc" d="${J0.disc}"/>` +
+    `<g class="en-cond" transform="translate(${TMJ_D.C0[0]} ${TMJ_D.C0[1]})"><circle class="en-chead" r="${TMJ_D.R}"/><path class="en-tick" d="M0 0V-17"/></g>` +
+    `<rect class="en-win-edge" x="${WB[0]}" y="${WB[1]}" width="${WB[2] - WB[0]}" height="${WB[3] - WB[1]}"/>` +
+    `<text class="en-t en-mut en-jt" x="404" y="132" text-anchor="middle">articular eminence</text><text class="en-t en-mut en-jt" x="300" y="122" text-anchor="middle">fossa</text></g>` +
+    `<text class="en-t en-jlab" x="6" y="204">seated</text><text class="en-t en-mut" x="254" y="204" text-anchor="end">right TMJ</text>` });
 
 const TABS = [["sag", "Sagittal"], ["hor", "Horizontal"], ["fro", "Frontal"]];
 const plate = plateHtml({ fig: "Fig 6", title: "Envelope tracer", hint: "step through the borders", readout: "",
@@ -100,7 +152,7 @@ const controls = `<div class="am-controls en-tabs" role="group" aria-label="View
 <p class="am-summary" aria-live="polite"></p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>The outlines and the lettered points are the same as the static envelope figures above (the notes' Posselt envelope), traced in the order the L1 notes describe. The pen is the lower central incisor.</li>
-<li>The joint view uses the TMJ figure's model (L2) for the opening steps: rotation only to about 20-25 mm, then translation down the eminence to maximum opening. For the protruded steps the condyle is drawn forward on the eminence; its exact position and angle are schematic. The disc is left out.</li>
+<li>The joint view uses the TMJ figure's model (L2) for the opening steps: rotation only to about 20-25 mm, then translation down the eminence to maximum opening, the disc turning back on the condyle so its thin middle stays against the eminence. For the protruded steps the condyle is drawn forward on the eminence; its exact position and angle are schematic. The retrodiscal tissue and the muscles are left out (they are in the TMJ figure).</li>
 <li>The borders are limits: the opening borders are set by ligaments and joint anatomy, the superior border by the teeth. We rarely function at a border except the superior one; chewing happens in the small teardrop below MICP.</li></ul></details>`;
 
 function enLive(root, D) {
@@ -109,6 +161,7 @@ function enLive(root, D) {
   var slider = root.querySelector('input[type="range"]'), sum = root.querySelector(".am-summary"), readout = root.querySelector("[data-readout]");
   var rs = {}; Array.prototype.forEach.call(root.querySelectorAll("[data-r]"), function (e) { rs[e.getAttribute("data-r")] = e; });
   var jbox = root.querySelector("[data-enjoint]"), jrow = root.querySelector("[data-enjrow]"), cond = root.querySelector(".en-cond"), jlab = root.querySelector(".en-jlab"), play = root.querySelector("[data-enplay]");
+  var mandEl = root.querySelector(".en-mand"), discEl = root.querySelector(".en-disc");
   var cache = {};
   function segs(k) {
     if (cache[k]) return cache[k];
@@ -117,22 +170,24 @@ function enLive(root, D) {
   }
   function n() { return D.VIEWS[view].n; }
   function draw() {
-    var S = segs(view), N = n(), i = Math.min(N - 1, Math.floor(u)), f = u - i;
+    /* the border being traced, or at a step boundary the one just finished, so the text matches what was drawn */
+    var S = segs(view), N = n(), i = u <= 0 ? 0 : Math.min(N - 1, Math.ceil(u - 1e-6) - 1), f = Math.max(0, Math.min(1, u - i));
     S.list.forEach(function (s, k) { var part = k < i ? 1 : k > i ? 0 : f; s.el.style.strokeDashoffset = String(s.L * (1 - part)); s.el.classList.toggle("is-now", k === i && u > 0 && u < N); });
     var seg = S.list[i], pt = seg.el.getPointAtLength(seg.L * f);
     S.pen.setAttribute("transform", "translate(" + pt.x.toFixed(1) + " " + pt.y.toFixed(1) + ")");
     var step = D.VIEWS[view].steps[i];
-    rs.step.textContent = u <= 0 ? "not started" : u >= N ? "done: the whole envelope" : step.label;
+    /* at the end, the last border's label and text stay up (B → A's slide, D's chewing, C's PP), then the closing line */
+    rs.step.textContent = u <= 0 ? "not started" : u >= N ? step.label + " (envelope closed)" : step.label;
     if (readout) readout.textContent = u <= 0 ? "" : u >= N ? "envelope closed" : step.label.split(" · ")[0];
-    var t = u <= 0 ? ({ sag: "Press Next step (or drag) and the pen on the lower incisor traces the sagittal envelope from centric relation, one border at a time.", hor: "From above, patient facing the bottom of the page: the pen starts at CR, the top (back) apex.", fro: "From the front: the pen starts at the intercuspal position at the top." })[view] : u >= N ? "That closes the envelope. Everything the jaw can do lies inside it; function happens in a small teardrop below MICP." : step.text;
+    var t = u <= 0 ? ({ sag: "Press Next step (or drag) and the pen on the lower incisor traces the sagittal envelope from centric relation, one border at a time.", hor: "From above, patient facing the bottom of the page: the pen starts at CR, the top (back) apex.", fro: "From the front: the pen starts at the intercuspal position at the top." })[view] : u >= N ? step.text + " That closes the envelope. Everything the jaw can do lies inside it; function happens in a small teardrop below MICP." : step.text;
     if (sum.textContent !== t) sum.textContent = t;
     jbox.hidden = view !== "sag"; jrow.hidden = view !== "sag";
     if (view === "sag") {
       var J = D.enJoint(Math.min(u, N - 0.0001), D);
       cond.setAttribute("transform", "translate(" + J.C[0].toFixed(1) + " " + J.C[1].toFixed(1) + ") rotate(" + J.th.toFixed(2) + ")");
-      var moved = Math.hypot(J.C[0] - D.C0[0], J.C[1] - D.C0[1]) > 1.5, turned = J.th > 0.8;
-      var js = !moved && !turned ? "seated in CR" : !moved ? "rotating in the fossa" : u > 1 && u < 2 ? "rotating and sliding down the eminence" : "forward on the eminence";
-      rs.joint.textContent = js; jlab.textContent = { "seated in CR": "seated", "rotating in the fossa": "rotating", "rotating and sliding down the eminence": "rotating + sliding", "forward on the eminence": "forward" }[js];
+      var parts = D.enJointParts(J, D); mandEl.setAttribute("d", parts.mand); discEl.setAttribute("d", parts.disc);
+      var js = u <= 0 || u >= N ? ["seated in CR", "seated"] : D.JS[i];
+      rs.joint.textContent = js[0]; jlab.textContent = js[1];
     }
   }
   function stop() { playing = false; cancelAnimationFrame(frame); play.setAttribute("aria-pressed", "false"); }
@@ -163,7 +218,7 @@ const CSS = `
 .anima .en-svg .en-t,.anima .en-joint .en-t{fill:var(--anatomy-text);font:13px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
 .anima .en-t.en-mut{fill:var(--anatomy-muted)}
 .anima .en-svg .en-soft{fill:var(--accent-soft);stroke:none}
-.anima .en-svg .en-track{fill:none;stroke:var(--anatomy-lo);stroke-width:1.6;stroke-dasharray:3 4}
+.anima .en-svg .en-track{fill:none;stroke:var(--anatomy-lo);stroke-width:1.6;stroke-dasharray:3 4;vector-effect:none}
 .anima .en-svg .en-seg{vector-effect:none;fill:none;stroke:var(--anatomy-strong);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .anima .en-svg .en-seg.is-now{stroke:var(--anatomy-lit)}
 .anima .en-svg .en-dot0{fill:var(--anatomy-strong)}
@@ -172,7 +227,11 @@ const CSS = `
 .anima .en-svg .en-pen-halo{fill:var(--anatomy-lit);opacity:.22}
 .anima .en-svg .en-pen-dot{fill:var(--anatomy-lit)}
 .anima .en-joint .en-jbone{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
-.anima .en-joint .en-ramus{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.2}
+.anima .en-joint .en-win{fill:var(--anatomy-shade-2)}
+.anima .en-joint .en-win-edge{fill:none;stroke:var(--anatomy-lo);stroke-width:1}
+.anima .en-joint .en-mand{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
+.anima .en-joint .en-disc{fill:var(--tm-disc);stroke:var(--anatomy-mid);stroke-width:.9;stroke-linejoin:round}
+.anima .en-joint .en-jt{font-size:12px;stroke:var(--tm-bone)}
 .anima .en-joint .en-chead{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.4}
 .anima .en-joint .en-tick{stroke:var(--anatomy-lit);stroke-width:2.4;stroke-linecap:round}
 .anima .en-joint .en-jlab{fill:var(--anatomy-strong);font-weight:600}
@@ -187,7 +246,7 @@ export function envelope() {
     html: `<div class="anima" data-anima="envelope">${plate}${controls}${SOURCES}</div>`,
     css: CSS,
     live: enLive.toString(),
-    helpers: [tmjModel, enJoint],
+    helpers: [tmjModel, enJoint, enDiscT, enJointParts],
     data: D,
   };
 }

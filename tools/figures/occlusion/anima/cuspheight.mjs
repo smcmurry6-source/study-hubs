@@ -14,7 +14,7 @@
 // CG, more VO -> taller; more HO, PO more parallel to CG, a more acute Spee -> shorter (the most posterior cusps).
 import { figureSvg, plateHtml } from "./shared.mjs";
 
-const W = 470, H = 300;
+const W = 470, H = 314; // tall enough that the jaw clears the bottom labels at the most extreme settings
 
 const D = {
   W, H, k: 5, P: 28, xb: 150, xk: 330, yk: 176, C0: [56, 96], r: 12, Tx: 356, margin: 3,
@@ -63,60 +63,81 @@ function chSvg(st, D) {
   var s = "";
   /* reference horizontal: both guidance angles and the plane are measured from it */
   s += '<path class="ch-ref" d="M6 30H' + (D.W - 6) + '"/>' + tx(D.W - 8, 24, "reference horizontal", "ch-mut", "end");
-  /* temporal bone: the fossa over the condyle and the posterior slope of the eminence at angle CG */
+  /* the condyle, the eminence at angle CG, and where the slope starts */
   var c0 = D.C0, r = D.r, cg = st.cg * rad, dir = [Math.cos(cg), Math.sin(cg)], nrm = [Math.sin(cg), -Math.cos(cg)], tb = [];
   var aEnd = Math.atan2(nrm[1], nrm[0]) + 2 * Math.PI;
   for (var a = Math.PI * 0.95; a <= aEnd + 0.001; a += (aEnd - Math.PI * 0.95) / 8) tb.push([c0[0] + (r + 1.5) * Math.cos(a), c0[1] + (r + 1.5) * Math.sin(a)]);
   var tp0 = [c0[0] + (r + 1.5) * nrm[0], c0[1] + (r + 1.5) * nrm[1]], e1 = [tp0[0] + 50 * dir[0], tp0[1] + 50 * dir[1]];
-  tb.push([tp0[0] + 25 * dir[0], tp0[1] + 25 * dir[1]], e1, [e1[0] + 9, e1[1] + 3], [e1[0] + 18, e1[1] - 3], [e1[0] + 26, e1[1] - 14], [e1[0] + 36, 48], [e1[0] + 10, 42], [60, 42], [14, 48], [10, c0[1] - 6], [c0[0] - r - 12, c0[1] + 8]);
-  s += '<path class="ch-bone hot" data-info="The articular eminence. In protrusion the condyle slides down its posterior slope: that slope is the condylar guidance (CG). Steeper = the back of the jaw drops more = taller cusps allowed." d="' + P(tb) + '"/>';
-  /* CG angle mark */
-  var arcR = 24, ap = [tp0[0] + arcR, tp0[1]], aq = [tp0[0] + arcR * dir[0], tp0[1] + arcR * dir[1]];
-  s += '<path class="ch-guide" d="M' + f(tp0[0]) + " " + f(tp0[1]) + "H" + f(tp0[0] + 32) + '"/><path class="ch-arc" d="M' + f(ap[0]) + " " + f(ap[1]) + "A" + arcR + " " + arcR + " 0 0 1 " + f(aq[0]) + " " + f(aq[1]) + '"/>';
-  s += tx(tp0[0] + 2, tp0[1] - 12, "CG " + Math.round(st.cg) + "°", "ch-key");
-  /* maxilla and the upper teeth (fixed) */
-  var T = m.T, E = [T[0] + st.ho * D.k, T[1] + st.vo * D.k], mx = [];
-  for (var q = 128; q <= 330; q += 14) mx.push([q, cy(q) - CH + 2]);
-  mx.push([E[0] - 10, E[1] - 50], [E[0] - 2, E[1] - 74]);
-  for (q = 330; q >= 128; q -= 14) mx.push([q, cy(q) - CH - 30]);
-  s += '<path class="ch-bone" d="' + P(mx) + '"/>';
-  function crown(t, up) {
+  var T = m.T, E = [T[0] + st.ho * D.k, T[1] + st.vo * D.k], AY = 62, q;
+  var rd = m.rho / rad, mvT = 'transform="translate(' + f(m.xc + m.ppx) + " " + f(m.yc + m.dc) + ") rotate(" + Math.round(rd * 1000) / 1000 + ") translate(" + (-m.xc) + " " + (-m.yc) + ')"';
+  /* a crown: the occlusal outline is the model's zigzag (exact), the sides bulge to the height of contour and narrow to
+     the cementoenamel junction; molars get their buccal groove ending in a pit */
+  function crownD(t, up, cusp) {
     var pts = [];
-    xs.forEach(function (x) { if (x >= t[0] - 0.1 && x <= t[1] + 0.1) pts.push([x, zy(x, act(x))]); });
-    var d = up ? -CH : CH, w = t[1] - t[0];
-    pts.push([t[1] - 1, cy(t[1]) + d * .55], [t[1] - w * .12, cy(t[1]) + d], [t[0] + w * .12, cy(t[0]) + d], [t[0] + 1, cy(t[0]) + d * .55]);
-    return pts;
+    xs.forEach(function (x) { if (x >= t[0] - 0.1 && x <= t[1] + 0.1) pts.push([x, zy(x, cusp(x))]); });
+    var d = up ? -CH : CH, w = t[1] - t[0], a0 = pts[0], a1 = pts[pts.length - 1], y0 = cy(t[0]), y1 = cy(t[1]);
+    return "M" + pts.map(function (p) { return f(p[0]) + " " + f(p[1]); }).join("L") +
+      "C" + f(t[1] + 2.2) + " " + f(y1 + d * .25) + " " + f(t[1] + 1) + " " + f(y1 + d * .72) + " " + f(t[1] - w * .1) + " " + f(y1 + d) +
+      "L" + f(t[0] + w * .1) + " " + f(y0 + d) +
+      "C" + f(t[0] - 1) + " " + f(y0 + d * .72) + " " + f(t[0] - 2.2) + " " + f(y0 + d * .25) + " " + f(a0[0]) + " " + f(a0[1]) + "Z";
   }
-  D.lower.forEach(function (t) {
-    s += '<path class="ch-tooth hot" data-info="An upper posterior tooth (today\'s cusps). Its distal inclines meet the lower teeth\'s mesial inclines when the jaw comes forward." d="' + P(crown([t[0] - hp, t[1] - hp], true)) + '"/>';
-  });
-  /* upper canine and central incisor; the incisor's lingual slope is the anterior guidance (VO over HO) */
-  s += '<path class="ch-tooth ch-ant" d="' + S([[305, cy(305) - 14], [318, cy(318) + 12], [331, cy(331) - 12], [329, cy(331) - CH - 2], [307, cy(305) - CH - 2]]) + '"/>';
-  var dl = Math.hypot(st.ho, st.vo), u = [st.ho / dl, st.vo / dl];
-  s += '<path class="ch-tooth ch-ant hot" data-info="Upper central incisor. The lower incisor slides down its lingual surface in protrusion: the anterior guidance. More vertical overlap (VO) makes it steeper, more horizontal overlap (HO) flatter." d="' +
-    P([[E[0] + 1.5, E[1] - 1], [E[0] + 3, E[1] - 26], [E[0] - 6, E[1] - 54], [Math.min(T[0] - 16, E[0] - 34), Math.min(E[1] - 50, T[1] - 26)], [T[0] - 13, T[1] - 12], [T[0] - 6 * u[0], T[1] - 6 * u[1]], [E[0] - 2, E[1] + 0.5]]) + '"/>';
-  /* the lower jaw, moved by the protrusion */
-  var g = "";
-  var md = [[c0[0] - 8, c0[1] + 6], [44, 140], [46, 214], [62, 240], [130, 252], [260, 258], [T[0] - 10, T[1] + 82], [T[0] + 10, T[1] + 66], [T[0] + 3, T[1] + 40],
+  function groove(t, up, cusp) {
+    if (t[1] - t[0] < D.P * 1.5) return "";
+    var x = t[0] + D.P, y = zy(x, cusp(x)), e = cy(x) + (up ? -CH : CH) * .5;
+    return '<path class="ch-groove" d="M' + f(x) + " " + f(y) + "L" + f(x) + " " + f(e) + '"/><circle class="ch-pit" cx="' + f(x) + '" cy="' + f(e) + '" r="1.3"/>';
+  }
+  /* the maxilla's posterior wall: from under the zygomatic arch down and back to the tuberosity behind the upper second
+     molar, bulging slightly backward; behind it, under the arch, the deep space where the coronoid process sits (shaded,
+     so it reads as a recess and not a hole in the skull) */
+  var wA = [178, AY + 2], wB = [127, cy(127) - CH - 2], wC = [(wA[0] + wB[0]) / 2 - 5, (wA[1] + wB[1]) / 2 - 5], wall = [];
+  for (q = 1; q <= 6; q++) { var tq = q / 6, uq = 1 - tq; wall.push([uq * uq * wA[0] + 2 * tq * uq * wC[0] + tq * tq * wB[0], uq * uq * wA[1] + 2 * tq * uq * wC[1] + tq * tq * wB[1]]); }
+  s += '<path class="ch-deep" d="' + P([[124, AY + 4], [wA[0] + 4, AY], wA].concat(wall, [[124, wB[1]]])) + '"/>';
+  /* 1. the mandible (moved by the protrusion): condylar neck, ramus, angle, body, chin, and the coronoid process, which
+     rises under the zygomatic arch (the skull is drawn over it) */
+  var md = [[c0[0] - 9, c0[1] + 7], [44, 130], [42, 180], [46, 216], [58, 238], [78, 250], [140, 256], [250, 262], [T[0] - 10, T[1] + 82], [T[0] + 10, T[1] + 66], [T[0] + 3, T[1] + 40],
     [T[0] - 18, T[1] + 36], [340, cy(340) + CH - 2]];
   for (q = 318; q >= xb; q -= 28) md.push([q, cy(q) + CH - 2]);
-  md.push([132, cy(132) + 18], [118, Math.min(116, cy(132) - 12)], [104, 122], [92, 126], [c0[0] + 9, c0[1] + 8]);
-  g += '<path class="ch-bone ch-mand" d="' + S(md) + '"/>';
-  g += '<circle class="ch-bone hot" data-info="The condyle. It comes down the eminence as the jaw protrudes (drawn without the disc)." cx="' + c0[0] + '" cy="' + c0[1] + '" r="' + r + '"/>';
-  var hits = [];
+  md.push([142, cy(142) + CH - 8], [134, cy(134) + 6], [130, 100], [134, 74], [126, 71], [114, 90], [94, 103], [76, 102], [c0[0] + 10, c0[1] + 8]);
+  s += '<g class="ch-low" ' + mvT + '><path class="ch-bone ch-mand hot" data-info="The mandible. In protrusion it comes forward and down: at the back the condyle follows the eminence, at the front the lower incisor follows the upper incisor\'s lingual surface." d="' + S(md) + '"/>' +
+    '<circle class="ch-bone hot" data-info="The condyle. It comes down the eminence as the jaw protrudes (drawn without the disc)." cx="' + c0[0] + '" cy="' + c0[1] + '" r="' + r + '"/></g>';
+  /* 2. the skull, one piece: the fossa and the eminence at angle CG, the articular tubercle, the zygomatic arch, the
+     maxilla's posterior wall down to the tuberosity, its alveolar process (following the plane and the curve of Spee) to
+     the incisors, and the face above */
+  var sk = tb.slice();
+  sk.push([tp0[0] + 25 * dir[0], tp0[1] + 25 * dir[1]], e1, [e1[0] + 9, e1[1] + 3], [e1[0] + 18, e1[1] - 3], [e1[0] + 26, e1[1] - 12], [Math.max(e1[0] + 32, 128), AY + 8], [150, AY], [wA[0] - 8, AY - 0.5], wA);
+  sk.push.apply(sk, wall);
+  for (q = 128; q <= 330; q += 14) sk.push([q, cy(q) - CH + 2]);
+  sk.push([E[0] - 10, E[1] - 50], [E[0] - 2, E[1] - 74], [E[0] + 1, E[1] - 90], [340, 80], [290, 66], [240, 56], [190, 48], [120, 44], [60, 40], [14, 48], [10, c0[1] - 6], [c0[0] - r - 12, c0[1] + 8]);
+  s += '<path class="ch-bone hot" data-info="The skull: the fossa and the articular eminence of the temporal bone, the zygomatic arch, and the maxilla holding the upper teeth. In protrusion the condyle slides down the eminence\'s posterior slope: that slope is the condylar guidance (CG). Steeper = the back of the jaw drops more = taller cusps allowed." d="' + P(sk) + '"/>';
+  /* CG angle mark */
+  var arcR = 24, ap = [tp0[0] + arcR, tp0[1]], aq = [tp0[0] + arcR * dir[0], tp0[1] + arcR * dir[1]];
+  s += '<path class="ch-guide" d="M' + f(tp0[0]) + " " + f(tp0[1]) + "H" + f(ap[0]) + '"/><path class="ch-arc" d="M' + f(ap[0]) + " " + f(ap[1]) + "A" + arcR + " " + arcR + " 0 0 1 " + f(aq[0]) + " " + f(aq[1]) + '"/>';
+  s += tx(tp0[0] + 2, tp0[1] - 12, "CG " + Math.round(st.cg) + "°", "ch-key");
+  /* 3. the upper posterior teeth (fixed) */
   D.lower.forEach(function (t) {
-    g += '<path class="ch-tooth hot" data-info="Lower ' + t[2] + ' (today\'s cusps, solid). The dashed outline is the tallest cusp that would still clear with the settings below." d="' + P(crown(t, false)) + '"/>';
+    var u = [t[0] - hp, t[1] - hp];
+    s += '<path class="ch-tooth hot" data-info="An upper posterior tooth (today\'s cusps). Its distal inclines meet the lower teeth\'s mesial inclines when the jaw comes forward." d="' + crownD(u, true, act) + '"/>' + groove(u, true, act);
+  });
+  /* 4. the lower teeth (moved): today's crowns, the too-tall cusps, the dashed limit, the lower canine and incisor */
+  var g = "", hits = [];
+  D.lower.forEach(function (t) {
+    g += '<path class="ch-tooth hot" data-info="Lower ' + t[2] + ' (today\'s cusps, solid). The dashed outline is the tallest cusp that would still clear with the settings below." d="' + crownD(t, false, act) + '"/>' + groove(t, false, act);
     g += tx((t[0] + t[1]) / 2, cy((t[0] + t[1]) / 2) + CH + 14, t[2], "ch-mut ch-sm", "middle");
     for (var c = t[0] + hp; c < t[1]; c += D.P) if (act(c) > m.allow(c) + 0.2) hits.push(c);
   });
   hits.forEach(function (c) { g += '<path class="ch-hit" d="' + P([[c - hp, zy(c - hp, act(c - hp))], [c, zy(c, act(c))], [c + hp, zy(c + hp, act(c + hp))]]) + '"/>'; });
-  /* the cusp that would just clear: the same tips and valleys with the allowed incline */
   var lx = xs.filter(function (x) { return x >= xb - 0.1; });
-  g += '<path class="ch-allow" d="' + L(lx.map(function (x) { return [x, zy(x, m.allow(x))]; })) + '"/>';
-  g += '<path class="ch-tooth ch-ant" d="' + S([[318, cy(318) + 12], [330, cy(330) - 12], [340, cy(340) + 6], [338, cy(340) + CH], [320, cy(318) + CH]]) + '"/>';
-  g += '<path class="ch-tooth ch-ant" d="' + P([[T[0], T[1]], [T[0] + 2.5, T[1] + 20], [T[0] - 1, T[1] + 42], [T[0] - 15, T[1] + 40], [T[0] - 12, T[1] + 12], [T[0] - 3, T[1] + 1]]) + '"/>';
-  var rd = m.rho / rad;
-  s += '<g class="ch-low" transform="translate(' + f(m.xc + m.ppx) + " " + f(m.yc + m.dc) + ") rotate(" + Math.round(rd * 1000) / 1000 + ") translate(" + (-m.xc) + " " + (-m.yc) + ')">' + g + "</g>";
+  /* drawn no taller than 60 degrees, so with extreme settings the outline stays inside the crowns */
+  g += '<path class="ch-allow" d="' + L(lx.map(function (x) { return [x, zy(x, Math.min(60, m.allow(x)))]; })) + '"/>';
+  g += '<path class="ch-tooth ch-ant" d="' + S([[320, cy(320) + CH], [318.5, cy(318) + 14], [320.5, cy(321) + 3], [330, cy(330) - 12], [338.5, cy(339) + 2], [341, cy(340) + 14], [338, cy(340) + CH]]) + '"/>';
+  g += '<path class="ch-tooth ch-ant" d="' + S([[T[0] - 3, T[1] + 0.5], [T[0] + 1, T[1] + 2], [T[0] + 2.6, T[1] + 20], [T[0] - 1, T[1] + 42], [T[0] - 14, T[1] + 41], [T[0] - 13, T[1] + 16]]) + '"/>';
+  s += '<g class="ch-low" ' + mvT + ">" + g + "</g>";
+  /* 5. the upper canine and central incisor (fixed), labial to the lower ones, so drawn over them; the incisor's lingual
+     slope is the anterior guidance (VO over HO) */
+  s += '<path class="ch-tooth ch-ant" d="' + S([[307, cy(307) - CH - 1], [305.5, cy(306) - 14], [307.5, cy(307) - 3], [318, cy(318) + 12], [328.5, cy(328) - 2], [331, cy(331) - 13], [329, cy(330) - CH - 1]]) + '"/>';
+  var dl = Math.hypot(st.ho, st.vo), u = [st.ho / dl, st.vo / dl];
+  s += '<path class="ch-tooth ch-ant hot" data-info="Upper central incisor. The lower incisor slides down its lingual surface in protrusion: the anterior guidance. More vertical overlap (VO) makes it steeper, more horizontal overlap (HO) flatter." d="' +
+    P([[E[0] + 1.5, E[1] - 1], [E[0] + 3, E[1] - 26], [E[0] - 6, E[1] - 54], [Math.min(T[0] - 16, E[0] - 34), Math.min(E[1] - 50, T[1] - 26)], [T[0] - 13, T[1] - 12], [T[0] - 6 * u[0], T[1] - 6 * u[1]], [E[0] - 2, E[1] + 0.5]]) + '"/>';
   /* Christensen's phenomenon: the space opening between the back teeth */
   if (st.p > 0.02) {
     /* per column: the upper teeth's surface and the moved lower teeth's surface; between them is the gap, and where the
@@ -129,15 +150,19 @@ function chSvg(st, D) {
       gapT.push([c, yu]); gapB.push([c, Math.max(yu, yl)]); hitT.push([c, Math.min(yu, yl)]); hitB.push([c, yu]); }
     if (gapT.length > 1) s += '<path class="ch-gap" d="' + P(gapT.concat(gapB.reverse())) + '"/><path class="ch-over" d="' + P(hitT.concat(hitB.reverse())) + '"/>';
   }
-  /* plane of occlusion through the canine, on top so it reads across the teeth */
-  var po = st.po * rad, pa = [112, D.yk + Math.tan(po) * (112 - D.xk)], pb = [T[0] + 6, D.yk + Math.tan(po) * (T[0] + 6 - D.xk)];
+  /* plane of occlusion from behind the upper second molar through the canine, on top so it reads across the teeth (it
+     starts short of the ramus, where the condyle's label goes) */
+  var po = st.po * rad, pa = [130, D.yk + Math.tan(po) * (130 - D.xk)], pb = [T[0] + 6, D.yk + Math.tan(po) * (T[0] + 6 - D.xk)];
   s += '<path class="ch-plane" d="M' + f(pa[0]) + " " + f(pa[1]) + "L" + f(pb[0]) + " " + f(pb[1]) + '"/>';
   /* VO / HO at the incisors */
-  var lab = E[0] + 12;
-  s += '<path class="ch-guide" d="M' + f(T[0] + 2) + " " + f(T[1]) + "H" + f(lab - 2) + '"/>';
-  s += '<path class="ch-dim" d="M' + f(lab - 4) + " " + f(T[1] + 1) + "V" + f(E[1] - 1) + '"/>' + tx(lab, (T[1] + E[1]) / 2 + 4, "VO " + st.vo, "ch-key");
-  s += '<path class="ch-dim" d="M' + f(T[0] + 3) + " " + f(E[1] + 7) + "H" + f(E[0]) + '"/>' + tx(lab, E[1] + 20, "HO " + st.ho, "ch-key");
-  s += tx(c0[0], c0[1] + 34, "condyle", "ch-mut", "middle");
+  /* VO (lower incisal edge to upper incisal edge, vertically) and HO (the lower incisor's labial face to the upper incisal
+     edge, horizontally), each with extension lines to both edges; measured in MIP, so they stay put during protrusion */
+  var lab = E[0] + 12, lab0 = T[0] + 2.6, yh = E[1] + 9;
+  s += '<path class="ch-guide" d="M' + f(T[0]) + " " + f(T[1]) + "H" + f(lab - 4) + "M" + f(E[0] - 0.8) + " " + f(E[1]) + "H" + f(lab - 4) + "M" + f(E[0]) + " " + f(E[1] - 0.3) + "V" + f(yh) + "M" + f(lab0) + " " + f(T[1] + 20) + "V" + f(yh) + '"/>';
+  s += '<path class="ch-dim" d="M' + f(lab - 4) + " " + f(T[1]) + "V" + f(E[1]) + '"/>' + tx(lab, (T[1] + E[1]) / 2 + 4, "VO " + st.vo, "ch-key");
+  s += '<path class="ch-dim" d="M' + f(lab0) + " " + f(yh) + "H" + f(E[0]) + '"/>' + tx(lab, yh + 12, "HO " + st.ho, "ch-key");
+  /* the condyle's label goes with the condyle, in the ramus under it */
+  s += tx(m.xc + m.ppx - 6, m.yc + m.dc + 36, "condyle", "ch-mut");
   s += tx(8, D.H - 8, "patient facing right →", "ch-mut ch-sm") + tx(D.W - 8, D.H - 8, "plane " + Math.round(st.po) + "° · Spee " + st.spee + " mm", "ch-mut ch-sm", "end");
   return s;
 }
@@ -146,7 +171,8 @@ function chSvg(st, D) {
 function chRead(st, D) {
   var m = chModel(st, D), m0 = chModel(D.start, D), x = D.lower[1][0] + D.P / 2, hits = [];
   D.lower.forEach(function (t) { for (var c = t[0] + D.P / 2; c < t[1]; c += D.P) if (Math.max(0, m0.allow(c) - D.margin) > m.allow(c) + 0.2 && hits.indexOf(t[2]) < 0) hits.push(t[2]); });
-  return { allow: Math.round(m.allow(x)), today: Math.round(Math.max(0, m0.allow(x) - D.margin)), drop: Math.round((m.dc + m.rho * (x - m.xc)) / D.k * 10) / 10, hits: hits };
+  /* past 60 degrees the read-out says "over 60" (the model's straight-line blend gives silly numbers at the extremes) */
+  return { allow: Math.round(Math.min(60, m.allow(x))), over: m.allow(x) > 60, today: Math.round(Math.max(0, m0.allow(x) - D.margin)), drop: Math.round((m.dc + m.rho * (x - m.xc)) / D.k * 10) / 10, hits: hits };
 }
 
 const svg = figureSvg({ width: W, height: H, className: "ch-svg", label: "Side view, patient facing right: the condyle on the articular eminence, the upper and lower posterior teeth, the canines and the central incisors, with the plane of occlusion and the guidance angles marked.", body: chSvg(D.start, D) });
@@ -161,7 +187,7 @@ const controls = LEGEND + `<div class="am-controls"><label class="am-slider"><sp
 <p class="am-info">Tap or hover the eminence, the incisors or a tooth for what it does.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>The trends are the notes' table: steeper condylar guidance and more vertical overlap allow taller posterior cusps; more horizontal overlap, a plane of occlusion more parallel to the condylar guidance and a more acute curve of Spee (the most posterior cusps) make them shorter. Thielmann's formula ties the factors together.</li>
-<li>Every number on it is schematic: the angles, millimeters and degrees are drawing units for comparing settings, not norms to memorize. The jaw's path at each tooth blends the condylar path and the incisor path by the tooth's distance from the condyle; a cusp just clears when its incline, measured from the local occlusal surface, is no steeper than that path.</li>
+<li>Every number on it is schematic: the angles, millimeters and degrees are drawing units for comparing settings, not norms to memorize. The jaw's path at each tooth blends the condylar path and the incisor path by the tooth's distance from the condyle; a cusp just clears when its incline, measured from the local occlusal surface, is no steeper than that path. At extreme settings that blend gives angles no real cusp has, so the dashed outline and the read-out stop at 60°.</li>
 <li>The Bennett movement (a lateral side shift) is a horizontal factor and can't be drawn in a side view: a greater, more superior or more immediate side shift also means shorter cusps. The horizontal factors that set ridge and groove direction are in Fig 2.</li>
 <li>Teeth are drawn from the cheek side in Class I, one cusp pitch for every tooth, and the disc is left out of the joint.</li></ul></details>`;
 
@@ -176,10 +202,10 @@ function chLive(root, D) {
   function draw() {
     svg.innerHTML = D.chSvg(st, D);
     var r = D.chRead(st, D);
-    rs.allow.textContent = "can be up to " + r.allow + "° (today " + r.today + "°)";
+    rs.allow.textContent = (r.over ? "can be over " : "can be up to ") + r.allow + "° (today " + r.today + "°)";
     rs.drop.textContent = st.p > 0.01 ? r.drop + " mm at " + Math.round(st.p * 100) + "% of the way to edge to edge" : "0 mm (in MIP)";
     rs.hits.textContent = r.hits.length ? r.hits.join(", ") + ": too tall for these settings" : "nothing";
-    if (readout) readout.textContent = "M1 cusp ≤ " + r.allow + "°";
+    if (readout) readout.textContent = "M1 cusp " + (r.over ? "> " : "≤ ") + r.allow + "°";
     var t = intro();
     if (last && last !== "p") { var up = st[last] > D.start[last], same = st[last] === D.start[last]; t = same ? "Back at the starting value." : D.MSG[last][up ? 0 : 1]; }
     else if (last === "p" && st.p > 0.02) t = "Protruding: the condyle comes down the eminence and the lower incisor slides down the upper incisor's lingual surface, so the lower jaw drops as it comes forward and a space opens between the back teeth (Christensen's phenomenon)." + (r.hits.length ? " The red cusps are taller than the dashed limit: as the jaw starts forward their mesial inclines would strike the upper teeth's distal inclines (a protrusive interference)." : " Every cusp clears.");
@@ -210,18 +236,21 @@ const CSS = `
 .anima .ch-svg .ch-t.ch-mut{fill:var(--anatomy-muted)}
 .anima .ch-svg .ch-t.ch-sm{font-size:13px}
 .anima .ch-svg .ch-t.ch-key{fill:var(--anatomy-strong);font-weight:600}
-.anima .ch-svg .ch-ref{stroke:var(--anatomy-lo);stroke-width:1;stroke-dasharray:2 4}
+.anima .ch-svg .ch-ref{stroke:var(--anatomy-lo);stroke-width:1;stroke-dasharray:2 4;vector-effect:none}
 .anima .ch-svg .ch-bone{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.1;stroke-linejoin:round}
 .anima .ch-svg .ch-mand{fill:var(--tm-bone-in)}
+.anima .ch-svg .ch-deep{fill:var(--tm-trab);stroke:none}
 .anima .ch-svg .ch-tooth{fill:#f6efe0;stroke:#8b7653;stroke-width:1;stroke-linejoin:round}
+.anima .ch-svg .ch-groove{fill:none;stroke:#8b7653;stroke-width:.9;stroke-linecap:round}
+.anima .ch-svg .ch-pit{fill:#8b7653}
 .anima .ch-svg .ch-ant{fill:#efe6d2}
-.anima .ch-svg .ch-allow{fill:none;stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:4 3;stroke-linejoin:round}
+.anima .ch-svg .ch-allow{fill:none;stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:4 3;stroke-linejoin:round;vector-effect:none}
 .anima .ch-svg .ch-hit{fill:#e05a4e;fill-opacity:.35;stroke:#c0392b;stroke-width:1.4}
 .anima .ch-svg .ch-over{fill:#c0392b;stroke:none}
 .anima .ch-svg .ch-gap{fill:var(--anatomy-lit);fill-opacity:.2;stroke:none}
 .anima .ch-svg .ch-gap-key{stroke:var(--anatomy-lit);stroke-width:.6}
-.anima .ch-svg .ch-plane{stroke:var(--anatomy-mid);stroke-width:1.1;stroke-dasharray:6 4}
-.anima .ch-svg .ch-guide{stroke:var(--anatomy-mid);stroke-width:.9;stroke-dasharray:2 3}
+.anima .ch-svg .ch-plane{stroke:var(--anatomy-mid);stroke-width:1.1;stroke-dasharray:6 4;vector-effect:none}
+.anima .ch-svg .ch-guide{stroke:var(--anatomy-mid);stroke-width:.9;stroke-dasharray:2 3;vector-effect:none}
 .anima .ch-svg .ch-arc,.anima .ch-svg .ch-dim{fill:none;stroke:var(--anatomy-lit);stroke-width:1.6}
 .anima .ch-svg .ch-lead{stroke:var(--anatomy-mid);stroke-width:.8}
 .anima .ch-svg .ch-dot{fill:var(--anatomy-dot)}

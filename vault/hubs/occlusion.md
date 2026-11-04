@@ -34,9 +34,22 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
     casts offset on the articulator (both casts move together), and the chart's microns come from it. Its geometry and
     assumptions are in the file's header and the figure's "What's simplified"; if the notes' guidance angles or the slide's
     rule change, re-check that the four errors still come out the slide's way.
-  - L7's side-view figures (`stability`, `splints`) share `anima/l7rig.mjs`: the skull, mandible, disc and teeth in mm
-    (y up, the seated condyle at the origin) and a contact solver run in Node at build time. Reuse it for any new side view
-    of the jaws rather than drawing another skull.
+  - The side-view figures share `anima/l7rig.mjs`: a whole skull (`BACK` behind the mandible, `FRONT` over it, with
+    `EDGES`, `SHADE`, `ORBIT`, `NASAL`, `EAM`), a real mandible, the disc in its true profile and the teeth, in mm (y up,
+    the seated condyle at the origin, facing left), plus a contact solver run in Node at build time. `crslide` (Fig 7,
+    mirrored), `hingearc` (Fig 12), `tolerance`, `stability` and `splints` (Figs 15-17) draw it. Reuse it for any new side
+    view of the jaws rather than drawing another skull. Where a frame crops the skull, fade it (`rgScene`'s `fog`, or
+    `rgFog`) instead of leaving a hard cut, and put labels on a soft card (`rgCard`), never across bone lines.
+  - The anima figures are numbered Fig 1-19 (plus Fig 2b) in lecture order; a new one takes the next free number.
+  - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
+    the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
+    **mesial** fossa of #30, as the sheet draws it, though real crown widths would put it nearer the central fossa) and
+    Dr. Givan's handout for the envelope's letters (both views run A-D round the shape as he numbers them 1-4; frontal:
+    C = right lateral opening, D = right lateral superior). Labels and hover text name only what the lecture teaches
+    ([figures-teach-the-lecture](../rules/figures-teach-the-lecture.md)): say "ear canal" (the facebow lecture's words),
+    not EAM; no orbit, mastoid, sigmoid notch or postglenoid process.
+  - Picture questions on the arrow figures (`fig-pmax-*`, `fig-pmand-*`) ask "which movement does arrow A show?": the
+    arrows carry letters only, so the stem doesn't name the direction.
 - **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `occl:answered`, set in `recordAnswer`). Hubs
   copied from this engine need the same lines.
 - **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all seven lectures.
@@ -54,6 +67,11 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
 ## Pending
 
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
+- Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
+  the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
+  exaggerated (about 9°); group function's lower partners (#26-28) are inferred; the thirds (Fig 18) are counted from the
+  central fossa (Okeson), and the notes don't say from which end; the contact map's distal band (c..d) against the sheet's
+  "oblique ridge to distal fossa"; case `sda` says "flared and worn ... see the chart", which a perio chart can't show.
 
 History: grep `Occlusion` in "Recent major changes" (`DEPLOY_NOTES.md`). Data: `LESSONS.md` → Live signals.
 

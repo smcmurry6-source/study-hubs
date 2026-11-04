@@ -1,4 +1,4 @@
-// Fig: erosion pattern map (Occlusion L7, "Dental wear": erosion patterns). Both arches in occlusal view, second molar
+// Fig 19: erosion pattern map (Occlusion L7, "Dental wear": erosion patterns). Both arches in occlusal view, second molar
 // to second molar (the maxillary seen from below, incisors up; the mandibular from above, incisors down; the patient's
 // right on the viewer's left, as in a chart), each tooth split into its facial, occlusal (incisal) and lingual surfaces.
 // Pick a cause and the surfaces it erodes shade by how much, as the notes give them: GERD (the lingual of every
@@ -6,12 +6,13 @@
 // (maxillary anteriors, sometimes to the first premolar; mandibular anteriors spared), carbonated drinks swished (all
 // teeth, satin, islands of dentin) or pooled at the back (very severe, back and front, high caries), citrus sucked
 // through the front teeth (screwdriver) or chewed on the molars (more posterior wear), and, for contrast, NCCLs (facial
-// of maxillary premolars, multifactorial). Beside it, a worn molar with attrition vs erosion. Severity is drawn in three
+// of maxillary premolars, multifactorial). Beside it (under it on a phone: the two drawings are separate SVGs), the
+// pattern's name and key, and a worn molar with attrition vs erosion, each an enamel cap over dentin with its roots fading out. Severity is drawn in three
 // steps to show the pattern, not measured; tooth sizes are typical, the arch form schematic. Static geometry is built
 // here; the browser only switches classes, so the shading crossfades.
 import { figureSvg, plateHtml } from "./shared.mjs";
 
-const W = 540, H = 400;
+const W = 300, H = 400; /* the arches */
 const r1 = (v) => Math.round(v * 10) / 10;
 /* [name, mesiodistal width, buccolingual depth] mm, central incisor to second molar */
 const MAXT = [["central incisor", 8.5, 7], ["lateral incisor", 6.5, 6], ["canine", 7.5, 8], ["first premolar", 7, 9], ["second premolar", 6.5, 9], ["first molar", 10, 11], ["second molar", 9, 11]];
@@ -90,25 +91,42 @@ const TEXT = {
   citrus1: "Citrus, type 1: bite the fruit and suck the juice through the teeth. The front teeth erode to a \"screwdriver\" appearance.",
   citrus2: "Citrus, type 2: bite and chew on the molars. It looks like a patient who pools drinks on the back teeth: more posterior wear than anterior.",
   nccl: "For contrast, noncarious cervical lesions (not one erosion pattern): notches at the CEJ found throughout the mouth, most often on the facial of the maxillary premolars; lingual ones occur but are rarely severe. Their cause is multifactorial: horizontal toothbrushing, acidic food and drink, reflux, with occlusal factors associated but not enough alone.",
-  more: " Less common causes: drug abuse (aspirin, meth), swimming in chlorinated water and occupational exposure (battery and galvanizing workers).",
+  more: " Less common causes: drug abuse (aspirin, meth), swimming in chlorinated water (on the side they breathe on) and occupational exposure (battery and galvanizing workers).",
 };
 const NAME = { gerd: "GERD", bulimia: "bulimia nervosa", soda1: "soda, swished", soda2: "soda, pooled at the back", citrus1: "citrus, sucked", citrus2: "citrus, chewed on the molars", nccl: "cervical notches (NCCLs)" };
 
-/* the worn molar close-up: attrition vs erosion, mesiodistal sections (local units, occlusal up) */
+/* the worn molar close-up: attrition vs erosion, mesiodistal sections (local units, about 9 to a millimeter, y down,
+   occlusal surface near y 30): an enamel cap over dentin, the CEJ at y 71, two roots fading out below. The attrition
+   molar meets its opposing molar (the same shape upside down) on matching flat facets */
+const MOL_SIDES = { r: [[94, 40], [95.5, 50], [93.5, 61], [87, 71], [86.5, 80], [84.5, 90], [82, 99], [66, 99], [63, 88], [57, 80], [50, 77], [43, 80], [37, 88], [34, 99], [18, 99], [15.5, 90], [13.5, 80], [13, 71], [6.5, 61], [4.5, 50], [6, 40]] };
+/* the dentin: inside the crown, then the roots themselves below the CEJ */
+const MOL_DENT = [[87, 40], [88.6, 50], [86.4, 61], [87, 71], [86.5, 80], [84.5, 90], [82, 99], [66, 99], [63, 88], [57, 80], [50, 77], [43, 80], [37, 88], [34, 99], [18, 99], [15.5, 90], [13.5, 80], [13, 71], [13.6, 61], [11.4, 50], [13, 40]];
 function erClose(x0, y0, k) {
-  const P = (pts) => "M" + pts.map((p) => r1(x0 + p[0] * k) + " " + r1(y0 + p[1] * k)).join("L") + "Z";
-  const att = [[8, 80], [6.5, 46], [7.6, 30], [92.4, 30], [93.5, 46], [92, 80]];
-  const attD = [[16, 80], [15, 44], [18.4, 30.2], [36, 30.2], [44, 35], [56, 35], [64, 30.2], [81.6, 30.2], [85, 44], [84, 80]];
-  const opp = [[10, 2], [90, 2], [91.6, 29.6], [8.4, 29.6]];
-  const ero = [[8, 80], [6.5, 44], [9, 31], [12.6, 25.6], [16.6, 26.4], [22, 31.6], [30, 33.2], [37, 30], [41.4, 27], [44, 27], [44, 19], [58, 19], [58, 27], [60.6, 27], [65, 30], [72, 33.2], [79, 31.4], [84, 26.4], [87.6, 25.6], [91, 31], [93.5, 44], [92, 80]];
-  const eroD = [[16, 80], [15, 44], [16, 27.2], [17.4, 27.4], [22.2, 32], [30, 33.6], [37.2, 30.4], [41.4, 27.6], [44, 28], [58, 28], [60.6, 27.6], [65, 30.4], [72, 33.6], [78.6, 31.8], [83, 27.4], [84, 27.2], [85, 44], [84, 80]];
-  return { att: P(att), attD: P(attD), opp: P(opp), shine: `M${r1(x0 + 12 * k)} ${r1(y0 + 31.6 * k)}L${r1(x0 + 52 * k)} ${r1(y0 + 31.6 * k)}`, ero: P(ero), eroD: P(eroD), resto: P([[44, 19], [58, 19], [58, 30], [44, 30]]) };
+  const P = (pts, flip) => "M" + pts.map((p) => r1(x0 + p[0] * k) + " " + r1(y0 + (flip ? 60 - p[1] : p[1]) * k)).join("L") + "Z";
+  const attTop = [[9, 30.4], [91, 30.4]], attDTop = [[17, 30.6], [83, 30.6]];
+  const eroTop = [[91.4, 31], [87.6, 25.6], [84, 26.4], [79, 31.4], [72, 33.2], [65, 30], [60.6, 27], [58, 27], [58, 19], [44, 19], [44, 27], [41.4, 27], [37, 30], [30, 33.2], [22, 31.6], [16.6, 26.4], [12.4, 25.6], [8.6, 31]];
+  const eroDTop = [[84.4, 27.4], [83, 27.8], [78.6, 32], [72, 33.8], [65, 30.6], [60.6, 27.8], [58, 28], [44, 28], [41.4, 27.8], [37.2, 30.6], [30, 33.8], [22.2, 32.2], [17.6, 27.8], [16, 27.4]];
+  /* the outlines run clockwise from the occlusal surface's distal end: the top (left to right), then the sides and roots */
+  const att = attTop.concat(MOL_SIDES.r), attD = attDTop.concat(MOL_DENT);
+  const ero = eroTop.slice().reverse().concat(MOL_SIDES.r), eroD = eroDTop.slice().reverse().concat(MOL_DENT);
+  return { att: P(att), attD: P(attD), opp: P(att, true), oppD: P(attD, true), shine: `M${r1(x0 + 12 * k)} ${r1(y0 + 31.8 * k)}L${r1(x0 + 52 * k)} ${r1(y0 + 31.8 * k)}`, ero: P(ero), eroD: P(eroD), resto: P([[44, 19], [58, 19], [58, 30], [44, 30]]) };
 }
-const CL = { a: erClose(302, 184, 1.0), e: erClose(424, 184, 1.0) };
+const SW = 250, SH = 356; /* the side panel */
+const CL = { x: [4, 136], y: 184, k: 1, a: erClose(4, 184, 1.0), e: erClose(136, 184, 1.0) };
 
-function erStatic() {
-  const f = r1; let o = "";
-  const tx = (x, y, t, cls, a) => `<text class="er-t${cls ? " " + cls : ""}" x="${f(x)}" y="${f(y)}"${a ? ` text-anchor="${a}"` : ""}>${t}</text>`;
+/* a fade: side-by-side page-colored bands from the clear edge c to the opaque edge o (local y), then solid page color
+   to yEnd (each pixel painted once, so the color can't drift in the dark theme) */
+function erFog(x0, x1, c, o, yEnd) {
+  let s = ""; const n = 12, Yl = (m) => CL.y + m * CL.k;
+  for (let k = 0; k <= n; k++) { const m0 = c + (o - c) * k / n, m1 = k === n ? yEnd : c + (o - c) * (k + 1) / n, op = k === n ? 1 : Math.round(1000 * (k + 0.5) / n) / 1000;
+    const ya = r1(Math.min(Yl(m0), Yl(m1))), yb = r1(Math.max(Yl(m0), Yl(m1))); /* edges rounded first: no seams */
+    s += `<rect class="er-fog" x="${r1(x0)}" y="${ya}" width="${r1(x1 - x0)}" height="${r1(yb - ya)}" style="fill-opacity:${op}"/>`; }
+  return s;
+}
+const tx = (x, y, t, cls, a) => `<text class="er-t${cls ? " " + cls : ""}" x="${r1(x)}" y="${r1(y)}"${a ? ` text-anchor="${a}"` : ""}>${t}</text>`;
+/* the arches */
+function erArch() {
+  let o = "";
   o += tx(150, 128, "maxillary", "er-cap", "middle") + tx(150, 141, "seen from below", "er-cap", "middle");
   o += tx(150, 288, "mandibular", "er-cap", "middle") + tx(150, 301, "seen from above", "er-cap", "middle");
   o += tx(6, 214, "patient's right", "er-cap", "start") + tx(294, 214, "patient's left", "er-cap", "end");
@@ -117,33 +135,42 @@ function erStatic() {
   G.teeth.forEach((t) => { o += `<path class="er-edge" d="${t.d}"/>`; });
   G.spots.dentin.forEach((p) => { o += `<ellipse class="er-dent" cx="${p[0]}" cy="${p[1]}" rx="2.2" ry="1.5"/>`; });
   G.spots.caries.forEach((p) => { o += `<circle class="er-car" cx="${p[0]}" cy="${p[1]}" r="1.9"/>`; });
-  /* the right panel: the pattern's name, the legend, the close-up */
-  o += `<text class="er-t er-head er-name" x="302" y="26">GERD</text>`;
-  o += tx(302, 42, "pick a cause below", "er-cap er-sub", "start");
-  [["none", 0], ["mild", 1], ["marked", 2], ["severe", 3]].forEach(([n, s], k) => { o += `<rect class="er-sw er-s${s}" x="${302 + k * 58}" y="58" width="14" height="10" rx="2"/>` + tx(320 + k * 58, 67, n, "er-cap", "start"); });
-  o += `<g class="er-dkey"><ellipse class="er-dent" cx="306" cy="98" rx="2.2" ry="1.5"/>${tx(314, 101, "islands of exposed dentin", "er-cap", "start")}</g>`;
-  o += `<g class="er-ckey"><circle class="er-car" cx="306" cy="98" r="1.9"/>${tx(314, 101, "caries", "er-cap", "start")}</g>`;
-  o += tx(302, 140, "a worn molar, close up", "er-head", "start");
-  o += `<path class="er-opp" d="${CL.a.opp}"/><path class="er-enamel hot" data-info="Attrition: tooth-to-tooth grinding. The facets match the opposing tooth and are only at the occlusal contacts; shiny, with sharp edges; enamel and dentin in the facet at the same height." d="${CL.a.att}"/><path class="er-dentin" d="${CL.a.attD}"/><path class="er-shine" d="${CL.a.shine}"/>`;
-  o += `<path class="er-enamel hot" data-info="Erosion: chemically assisted wear. It extends beyond the occlusal contacts; the facets are dull; the dentin cups out (it wears faster than enamel); restorations stand proud of the dissolved tooth." d="${CL.e.ero}"/><path class="er-dentin" d="${CL.e.eroD}"/><path class="er-resto hot" data-info="A proud restoration: the acid dissolves the tooth around it, not the restoration." d="${CL.e.resto}"/>`;
-  o += tx(352, 282, "attrition", "er-head", "middle") + ["shiny facets,", "sharp edges,", "enamel = dentin", "matches opposing"].map((t, k) => tx(352, 296 + k * 12.5, t, "er-cap er-sm", "middle")).join("");
-  o += tx(474, 282, "erosion", "er-head", "middle") + ["dull facets,", "cupped dentin,", "proud restoration,", "beyond contacts"].map((t, k) => tx(474, 296 + k * 12.5, t, "er-cap er-sm", "middle")).join("");
-  o += `<g class="am-callout"><path class="am-leader" d="M${r1(424 + 51 * 1)} ${r1(184 - 18)}L${r1(424 + 51)} ${r1(184 + 19)}"/><circle class="am-dot" cx="${r1(424 + 51)}" cy="${r1(184 + 19)}" r="1.8"/>${tx(424 + 51, 184 - 22, "restoration", "", "middle")}</g>`;
   return o;
 }
-const STATIC = erStatic();
-
-function erApply(svg, key, D) {
-  var s = D.PAT[key], g = key.slice(0, 4) === "gerd" ? "gerd" : key;
-  Array.prototype.forEach.call(svg.querySelectorAll("[data-zi]"), function (el) { el.setAttribute("class", "er-z er-s" + s[+el.getAttribute("data-zi")]); });
-  svg.setAttribute("data-er", key);
-  var n = svg.querySelector(".er-name"); if (n) n.textContent = D.NAME[g];
-  var sub = svg.querySelector(".er-sub"); if (sub) sub.textContent = key === "gerdR" ? "sleeps on the right side" : key === "gerdL" ? "sleeps on the left side" : key === "gerdB" ? "sleeps on the back" : key === "bulimia" ? "mandibular anteriors spared" : key === "citrus1" ? "screwdriver incisors" : key === "soda2" ? "very severe, high caries" : key === "nccl" ? "not one erosion pattern" : "generalized, satin";
-  if (key === "citrus2") sub.textContent = "more posterior than anterior";
+/* the side panel: the pattern's name, the legend, the close-up */
+function erSide() {
+  let o = "";
+  const xa = CL.x[0], xe = CL.x[1], ca = xa + 50 * CL.k, ce = xe + 50 * CL.k;
+  /* the teeth first, their root ends faded, then every word over them */
+  o += `<path class="er-enamel er-oppt hot" data-info="The opposing molar. With attrition the facets match: tooth grinding on tooth wears both flat at the contact." d="${CL.a.opp}"/><path class="er-dentin er-oppt" d="${CL.a.oppD}"/>`;
+  o += `<path class="er-enamel hot" data-info="Attrition: tooth-to-tooth grinding. The facets match the opposing tooth and are only at the occlusal contacts; shiny, with sharp edges; enamel and dentin in the facet at the same height." d="${CL.a.att}"/><path class="er-dentin" d="${CL.a.attD}"/><path class="er-shine" d="${CL.a.shine}"/>`;
+  o += `<path class="er-enamel hot" data-info="Erosion: chemically assisted wear. It extends beyond the occlusal contacts; the facets are dull; the dentin cups out (it wears faster than enamel); restorations stand proud of the dissolved tooth." d="${CL.e.ero}"/><path class="er-dentin" d="${CL.e.eroD}"/><path class="er-resto hot" data-info="A proud restoration: the acid dissolves the tooth around it, not the restoration." d="${CL.e.resto}"/>`;
+  o += erFog(xa - 2, xa + 100 * CL.k, -16, -32, -42) + erFog(0, SW, 84, 98, 101);
+  o += `<text class="er-t er-head er-name" x="0" y="26">GERD</text>`;
+  o += tx(0, 42, "pick a cause below", "er-cap er-sub", "start");
+  [["none", 0, 0], ["mild", 1, 58], ["marked", 2, 114], ["severe", 3, 184]].forEach(([n, s, x]) => { o += `<rect class="er-sw er-s${s}" x="${x}" y="58" width="14" height="10" rx="2"/>` + tx(x + 18, 67, n, "er-cap", "start"); });
+  o += tx(0, 86, "each tooth: facial band outside,", "er-cap er-sm", "start") + tx(0, 98, "occlusal in the middle, lingual inside", "er-cap er-sm", "start");
+  o += `<g class="er-dkey"><ellipse class="er-dent" cx="4" cy="114" rx="2.2" ry="1.5"/>${tx(12, 117, "islands of exposed dentin", "er-cap", "start")}</g>`;
+  o += `<g class="er-ckey"><circle class="er-car" cx="4" cy="114" r="1.9"/>${tx(12, 117, "caries", "er-cap", "start")}</g>`;
+  o += tx(0, 140, "a worn molar, close up", "er-head", "start");
+  o += `<g class="er-call"><path class="am-leader" d="M${r1(ce + 1)} ${r1(CL.y - 18)}L${r1(ce + 1)} ${r1(CL.y + 19 * CL.k)}"/><circle class="am-dot" cx="${r1(ce + 1)}" cy="${r1(CL.y + 19 * CL.k)}" r="1.8"/>${tx(ce + 1, CL.y - 22, "restoration", "", "middle")}</g>`;
+  o += tx(ca, 296, "attrition", "er-head", "middle") + ["shiny facets,", "sharp edges,", "enamel = dentin", "matches opposing"].map((t, k) => tx(ca, 310 + k * 12.5, t, "er-cap er-sm", "middle")).join("");
+  o += tx(ce, 296, "erosion", "er-head", "middle") + ["dull facets,", "cupped dentin,", "proud restoration,", "beyond contacts"].map((t, k) => tx(ce, 310 + k * 12.5, t, "er-cap er-sm", "middle")).join("");
+  return o;
 }
 
-const svg = figureSvg({ width: W, height: H, className: "er-svg", label: "Occlusal views of both arches with each tooth's facial, occlusal and lingual surfaces shaded by how much a chosen cause erodes them, and a worn molar with attrition beside erosion.", body: STATIC });
-const plate = plateHtml({ fig: "Fig", title: "Erosion patterns", hint: "pick a cause", readout: "", body: `<div class="am-svg er-box">${svg}</div>` });
+/* the pattern on the teeth, its name and the keys; box holds both drawings */
+function erApply(box, key, D) {
+  var s = D.PAT[key], g = key.slice(0, 4) === "gerd" ? "gerd" : key;
+  Array.prototype.forEach.call(box.querySelectorAll("[data-zi]"), function (el) { el.setAttribute("class", "er-z er-s" + s[+el.getAttribute("data-zi")]); });
+  box.setAttribute("data-er", key);
+  var n = box.querySelector(".er-name"); if (n) n.textContent = D.NAME[g];
+  var sub = box.querySelector(".er-sub"); if (sub) sub.textContent = { gerdR: "sleeps on the right side", gerdL: "sleeps on the left side", gerdB: "sleeps on the back", bulimia: "mandibular anteriors spared", soda1: "generalized, satin", soda2: "very severe, high caries", citrus1: "screwdriver incisors", citrus2: "more posterior than anterior", nccl: "not one erosion pattern" }[key];
+}
+
+const svgArch = figureSvg({ width: W, height: H, className: "er-svg er-arch", label: "Occlusal views of both arches with each tooth's facial, occlusal and lingual surfaces shaded by how much a chosen cause erodes them.", body: erArch() });
+const svgSide = figureSvg({ width: SW, height: SH, className: "er-svg er-side", label: "The chosen cause, the severity key, and a worn molar with attrition beside one with erosion.", body: erSide() });
+const plate = plateHtml({ fig: "Fig 19", title: "Erosion patterns", hint: "pick a cause", readout: "", body: `<div class="am-svg er-box">${svgArch}${svgSide}</div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Cause"><button type="button" class="am-btn" data-erk="gerd" aria-pressed="true">GERD</button><button type="button" class="am-btn" data-erk="bulimia" aria-pressed="false">Bulimia</button><button type="button" class="am-btn" data-erk="soda1" aria-pressed="false">Soda: swish</button><button type="button" class="am-btn" data-erk="soda2" aria-pressed="false">Soda: pool</button><button type="button" class="am-btn" data-erk="citrus1" aria-pressed="false">Citrus: suck</button><button type="button" class="am-btn" data-erk="citrus2" aria-pressed="false">Citrus: chew</button><button type="button" class="am-btn" data-erk="nccl" aria-pressed="false">NCCLs</button></div>
 <div class="am-controls er-sleep" role="group" aria-label="GERD: the side the patient sleeps on"><button type="button" class="am-btn" data-ers="R" aria-pressed="true">Sleeps on the right</button><button type="button" class="am-btn" data-ers="L" aria-pressed="false">On the left</button><button type="button" class="am-btn" data-ers="B" aria-pressed="false">On the back</button></div>
 <p class="am-summary" aria-live="polite"></p>
@@ -154,24 +181,28 @@ const SOURCES = `<details class="am-sources"><summary>What this shows, and what'
 <li>Schematic: severity is drawn in three steps to show where each pattern goes, not measured; surfaces the notes don't name are left unshaded (the bulimia lingual-and-incisal split follows the hub's case); tooth sizes are typical values and the arch form is drawn, not traced. Educational, not clinical guidance.</li></ul></details>`;
 
 function erLive(root, D) {
-  var svg = root.querySelector(".er-svg"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), sleepRow = root.querySelector(".er-sleep");
+  var box = root.querySelector(".er-box"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), sleepRow = root.querySelector(".er-sleep");
   var st = { k: "gerd", side: "R" };
   function key() { return st.k === "gerd" ? "gerd" + st.side : st.k; }
   function apply() {
-    D.erApply(svg, key(), D);
+    D.erApply(box, key(), D);
     sleepRow.hidden = st.k !== "gerd";
     sum.textContent = D.TEXT[st.k] + (st.k === "nccl" ? "" : D.TEXT.more);
     if (readout) readout.textContent = { gerd: "lingual maxillary, mandibular molars", bulimia: "maxillary anteriors", soda1: "all teeth", soda2: "back and front, severe", citrus1: "front teeth", citrus2: "back teeth", nccl: "facial, maxillary premolars" }[st.k];
   }
   root.querySelectorAll("[data-erk]").forEach(function (b) { b.addEventListener("click", function () { st.k = b.getAttribute("data-erk"); root.querySelectorAll("[data-erk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); apply(); }); });
   root.querySelectorAll("[data-ers]").forEach(function (b) { b.addEventListener("click", function () { st.side = b.getAttribute("data-ers"); root.querySelectorAll("[data-ers]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); apply(); }); });
-  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && svg.contains(el)) info.textContent = el.getAttribute("data-info"); }
-  svg.addEventListener("pointerover", hot); svg.addEventListener("click", hot);
+  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && box.contains(el)) info.textContent = el.getAttribute("data-info"); }
+  box.addEventListener("pointerover", hot); box.addEventListener("click", hot);
   apply();
 }
 
 const CSS = `
-.anima .er-box{max-width:580px;margin:0 auto}
+.anima .er-box{max-width:600px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 18px}
+.anima .am-svg.er-box svg.er-arch{flex:300 1 280px;width:auto;max-width:380px}
+.anima .am-svg.er-box svg.er-side{flex:250 1 230px;width:auto;max-width:300px}
+.anima .er-svg .er-fog{fill:var(--surface);stroke:none;pointer-events:none;shape-rendering:crispEdges}
+.anima .er-svg .er-oppt{fill-opacity:.7;stroke-opacity:.8}
 .anima .am-controls.er-sleep[hidden]{display:none}
 .anima .er-svg .er-t{fill:var(--anatomy-text);font:11.5px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
 .anima .er-svg .er-head{fill:var(--anatomy-strong);font-weight:700;stroke:none}
@@ -186,11 +217,10 @@ const CSS = `
 .anima .er-svg .er-dent,.anima .er-svg .er-car,.anima .er-svg .er-dkey,.anima .er-svg .er-ckey{opacity:0;transition:opacity .45s ease}
 .anima .er-svg .er-dent{fill:#d6b25e;stroke:var(--anatomy-hi);stroke-width:.5}
 .anima .er-svg .er-car{fill:#5b3a22;stroke:none}
-.anima .er-svg[data-er="soda1"] .er-dent,.anima .er-svg[data-er="soda1"] .er-dkey,.anima .er-svg[data-er="soda2"] .er-car,.anima .er-svg[data-er="soda2"] .er-ckey{opacity:1}
+.anima .er-box[data-er="soda1"] .er-dent,.anima .er-box[data-er="soda1"] .er-dkey,.anima .er-box[data-er="soda2"] .er-car,.anima .er-box[data-er="soda2"] .er-ckey{opacity:1}
 .anima .er-svg .er-dkey .er-dent,.anima .er-svg .er-ckey .er-car{opacity:1}
 .anima .er-svg .er-enamel{fill:var(--tm-disc-mid);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
 .anima .er-svg .er-dentin{fill:#e3c98a;stroke:var(--anatomy-lo);stroke-width:.8;stroke-linejoin:round;pointer-events:none}
-.anima .er-svg .er-opp{fill:var(--anatomy-shade-1);stroke:var(--anatomy-mid);stroke-width:1;stroke-linejoin:round}
 .anima .er-svg .er-shine{stroke:#fff;stroke-width:2;stroke-linecap:round;opacity:.9}
 .anima .er-svg .er-resto{fill:var(--anatomy-mid);stroke:var(--anatomy-hi);stroke-width:1}
 @media (prefers-reduced-motion: reduce){.anima .er-svg .er-z,.anima .er-svg .er-dent,.anima .er-svg .er-car{transition:none}}
