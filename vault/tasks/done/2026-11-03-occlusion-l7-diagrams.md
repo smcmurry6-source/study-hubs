@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/220
 ---
 
 # Build the five approved Occlusion L7 diagrams
@@ -50,7 +50,7 @@ were left for a follow-up PR. Build them before the final (Thu Nov 19), and the 
 ## Log
 
 - 2026-11-03: written from the L7 change-log entry (Sam approved all five that day).
-- 2026-11-04: built, placed and checked by a Claude Code session; PR opened for Sam's look.
+- 2026-11-04: built, placed and checked by a Claude Code session; [PR #220](https://github.com/smcmurry6-source/study-hubs/pull/220) opened for Sam's look.
 
 ## Outcome
 
