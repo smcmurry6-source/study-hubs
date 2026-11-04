@@ -30,6 +30,11 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
   - Controls of a figure inside the notes must not use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
     `data-lec` or `data-group` (the notes and the widget read those).
   - The anima kit sets `vector-effect:non-scaling-stroke`; a path drawn with `stroke-dasharray` needs `vector-effect:none`.
+  - L7's side-view figures (`stability`, `splints`) share `anima/l7rig.mjs`: the skull, mandible, disc and teeth in mm
+    (y up, the seated condyle at the origin) and a contact solver run in Node at build time. Reuse it for any new side view
+    of the jaws rather than drawing another skull.
+- **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `occl:answered`, set in `recordAnswer`). Hubs
+  copied from this engine need the same lines.
 - **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all seven lectures.
 - **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
@@ -39,11 +44,11 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
 
 - 2026-10-14 (first review): all four candidates of that review skipped.
 - 2026-10-20: Sam approved ten anima figures for L1-L5 (all built). 2026-10-27: four for L6 (built).
-- 2026-11-03: five for L7, approved, not built yet ([task](../tasks/2026-11-03-occlusion-l7-diagrams.md)).
+- 2026-11-03: five for L7 (built 2026-11-04: `tolerance`, `stability`, `splints`, `thirds`, `erosion`;
+  [task](../tasks/done/2026-11-03-occlusion-l7-diagrams.md)). Every lecture's diagram review is done; don't propose these again.
 
 ## Pending
 
-- [Build the five L7 diagrams](../tasks/2026-11-03-occlusion-l7-diagrams.md)
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
 
 History: grep `Occlusion` in "Recent major changes" (`DEPLOY_NOTES.md`). Data: `LESSONS.md` → Live signals.

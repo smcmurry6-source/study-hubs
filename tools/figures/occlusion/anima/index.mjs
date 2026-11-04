@@ -14,4 +14,10 @@ import { mounterr } from "./mounterr.mjs";
 import { hingearc } from "./hingearc.mjs";
 import { scirec } from "./scirec.mjs";
 import { bennett } from "./bennett.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett()];
+// L7 (final), approved by Sam 2026-11-03
+import { tolerance } from "./tolerance.mjs";
+import { stability } from "./stability.mjs";
+import { splints } from "./splints.mjs";
+import { thirds } from "./thirds.mjs";
+import { erosion } from "./erosion.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett(), tolerance(), stability(), splints(), thirds(), erosion()];

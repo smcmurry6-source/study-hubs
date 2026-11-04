@@ -16,3 +16,8 @@ tools/figures/*/dist/
 
 # Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
 .taste-skill/
+
+# Timmy Time build byproducts (tools/podcast/produce.py): chapters json and the temporary mix, never committed;
+# copy duration and chapters into the hub's SH_PODCAST instead
+hubs/*/audio/*.mp3.json
+hubs/*/audio/*.mix.wav

@@ -9,7 +9,12 @@
    through the Media Session API. Position is saved per device (sh_pod_pos:<hub>:<id>) and the speed in sh_pod_rate.
    The audio is fetched only when someone presses play (preload none): episodes are tens of MB.
    hubs/<id>/#timmy scrolls to the card (the dashboard links there). The widget menu gets a "Timmy Time" item.
-   Built by tools/podcast/ (script, Kokoro voice, music and mastering). */
+   Built by tools/podcast/ (script, Kokoro voice, music and mastering).
+
+   Under the player: likes, dislikes and comments (Sam's rule, vault/rules/podcast-reactions.md; migration_v47).
+   SH_PODCAST.fans = [{ who, tag, text }] holds the episode's 1-3 lore comments (characters from tools/podcast/LORE.md),
+   shown first with a "Timmy's world" tag; they aren't stored or counted. The class's own come from pod_feed: posted
+   under the visitor's leaderboard name, deleted by their author, reported by anyone (three reports hide one). */
 (function(){
   "use strict";
   var HUB = "", P = null, audio = null, dock = null, io = null, cardsSeen = 0, mounted = false, started = false, saveTimer = 0;
@@ -25,6 +30,9 @@
   var I_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
   var I_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/><text x="12" y="15.5" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">15</text></svg>';
   var I_FWD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/><text x="12" y="15.5" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">30</text></svg>';
+
+  var I_UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v11H4V10z"/><path d="M7 10l4-7c1.7 0 2.8 1.3 2.4 3L12.8 9H19a2 2 0 0 1 2 2.3l-1.2 7.6A2.5 2.5 0 0 1 17.3 21H7"/></svg>';
+  var I_DOWN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 14V3h3v11z"/><path d="M17 14l-4 7c-1.7 0-2.8-1.3-2.4-3l.6-3H5a2 2 0 0 1-2-2.3l1.2-7.6A2.5 2.5 0 0 1 6.7 3H17"/></svg>';
 
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
@@ -125,7 +133,156 @@
         '<div class="sh-pod-progress"><input type="range" class="sh-pod-seek" min="0" max="1000" value="0" step="1" aria-label="Position in the episode"><span class="sh-pod-time"></span></div>' +
         '<div class="sh-pod-note" hidden></div>' +
         (chapters ? '<ol class="sh-pod-chapters" hidden>' + chapters + '</ol>' : '') +
-      '</div></div>';
+      '</div>' + socialHTML() + '</div>';
+  }
+
+  /* ---------- likes, dislikes and comments ---------- */
+  var SOC = { loaded: false, failed: false, likes: 0, dislikes: 0, mine: 0, comments: [], showAll: false, draft: "", note: "", busy: false };
+  var SHOW_LATEST = 3, MAX_LEN = 280;
+  function sb(){ return window.shSupabase || null; }
+  function visitor(){ return ls("sh_visitor_id") || ""; }
+  function fans(){ return (Array.isArray(P.fans) ? P.fans : []).filter(function(f){ return f && f.who && f.text; }).slice(0, 3); }
+  function ago(iso){
+    var t = Date.parse(iso); if (!isFinite(t)) return "";
+    var s = Math.max(0, (Date.now() - t) / 1000);
+    if (s < 60) return "just now";
+    if (s < 3600) return Math.floor(s / 60) + " min ago";
+    if (s < 86400) { var h = Math.floor(s / 3600); return h + (h === 1 ? " hour ago" : " hours ago"); }
+    var d = Math.floor(s / 86400); return d === 1 ? "yesterday" : d < 30 ? d + " days ago" : new Date(t).toLocaleDateString();
+  }
+  function initial(name){ var m = String(name || "?").trim().replace(/^the\s+/i, "").match(/[A-Za-z0-9]/); return m ? m[0].toUpperCase() : "?"; }
+  function socialHTML(){
+    return '<div class="sh-pod-social" data-pod-social>' +
+      '<div class="sh-pod-react">' +
+        '<button type="button" class="sh-pod-vote" data-pod-vote="1" aria-pressed="false" aria-label="Like this episode">' + I_UP + '<span class="sh-pod-n" data-pod-n="likes"></span></button>' +
+        '<button type="button" class="sh-pod-vote" data-pod-vote="-1" aria-pressed="false" aria-label="Dislike this episode">' + I_DOWN + '<span class="sh-pod-n" data-pod-n="dislikes"></span></button>' +
+        '<span class="sh-pod-ccount"></span>' +
+      '</div>' +
+      '<ul class="sh-pod-comments"></ul>' +
+      '<button type="button" class="sh-pod-more" data-pod="more" hidden></button>' +
+      '<form class="sh-pod-form" novalidate>' +
+        '<textarea class="sh-pod-input" rows="2" maxlength="' + MAX_LEN + '" placeholder="What did you think of the episode?" aria-label="Add a comment about this episode"></textarea>' +
+        '<div class="sh-pod-form-row"><span class="sh-pod-as"></span><span class="sh-pod-left" aria-live="polite"></span>' +
+          '<button type="submit" class="sh-pod-post">Post</button></div>' +
+        '<div class="sh-pod-formnote" role="status" hidden></div>' +
+      '</form></div>';
+  }
+  function commentHTML(c){
+    var lore = !!c.lore;
+    var acts = lore ? "" : c.mine
+      ? '<button type="button" class="sh-pod-cact" data-pod-del="' + esc(c.id) + '">Delete</button>'
+      : '<button type="button" class="sh-pod-cact" data-pod-report="' + esc(c.id) + '"' + (c.reported ? ' disabled' : '') + '>' + (c.reported ? 'Reported' : 'Report') + '</button>';
+    return '<li class="sh-pod-c' + (lore ? ' is-lore' : '') + (c.mine ? ' is-mine' : '') + '">' +
+      '<span class="sh-pod-av" aria-hidden="true">' + esc(initial(c.name)) + '</span>' +
+      '<div class="sh-pod-cbody"><div class="sh-pod-chead"><b>' + esc(c.name) + '</b>' +
+        (lore ? '<span class="sh-pod-tag">' + esc(c.tag || "Timmy's world") + '</span>' : '<span class="sh-pod-when">' + esc(ago(c.at)) + (c.mine ? ' · you' : '') + '</span>') +
+      '</div><p>' + esc(c.body) + '</p>' + (acts ? '<div class="sh-pod-cacts">' + acts + '</div>' : '') + '</div></li>';
+  }
+  function paintSocial(){
+    var F = fans().map(function(f){ return { lore: true, name: f.who, tag: f.tag, body: f.text }; });
+    var mine = SOC.comments, shown = SOC.showAll ? mine : mine.slice(-SHOW_LATEST);
+    var total = F.length + mine.length, hiddenN = mine.length - shown.length;
+    var online = !!sb(), name = (window.shNameNow && window.shNameNow()) || "";
+    document.querySelectorAll("[data-pod-social]").forEach(function(el){
+      el.querySelectorAll("[data-pod-vote]").forEach(function(b){
+        var v = +b.getAttribute("data-pod-vote");
+        b.setAttribute("aria-pressed", SOC.mine === v ? "true" : "false");
+        b.disabled = !online;
+      });
+      el.querySelector('[data-pod-n="likes"]').textContent = SOC.loaded ? String(SOC.likes) : "";
+      el.querySelector('[data-pod-n="dislikes"]').textContent = SOC.loaded ? String(SOC.dislikes) : "";
+      el.querySelector(".sh-pod-ccount").textContent = total === 1 ? "1 comment" : total + " comments";
+      el.querySelector(".sh-pod-comments").innerHTML = F.concat(shown).map(commentHTML).join("");
+      var more = el.querySelector(".sh-pod-more");
+      more.hidden = !(hiddenN > 0 || (SOC.showAll && mine.length > SHOW_LATEST));
+      more.textContent = SOC.showAll ? "Show only the latest" : "Show all " + mine.length + " comments from the class";
+      var ta = el.querySelector(".sh-pod-input");
+      if (document.activeElement !== ta && ta.value !== SOC.draft) ta.value = SOC.draft;
+      ta.disabled = !online || SOC.busy;
+      el.querySelector(".sh-pod-post").disabled = !online || SOC.busy;
+      el.querySelector(".sh-pod-as").innerHTML = !online ? "Comments need a connection." :
+        name ? "Posting as <b>" + esc(name) + "</b>" + (window.shEditName ? ' · <button type="button" class="sh-pod-cact" data-pod="rename">change</button>' : "") : "";
+      var left = MAX_LEN - SOC.draft.length;
+      el.querySelector(".sh-pod-left").textContent = SOC.draft.length ? String(left) : "";
+      var note = el.querySelector(".sh-pod-formnote"); note.textContent = SOC.note; note.hidden = !SOC.note;
+    });
+  }
+  function loadFeed(){
+    var s = sb(); if (!s) { paintSocial(); return; }
+    try {
+      s.rpc("pod_feed", { p_hub: HUB, p_ep: P.id, p_visitor: visitor() }).then(function(res){
+        var d = res && !res.error && res.data;
+        if (d && !Array.isArray(d) && typeof d === "object") {
+          SOC.likes = +d.likes || 0; SOC.dislikes = +d.dislikes || 0; SOC.mine = +d.mine || 0;
+          SOC.comments = Array.isArray(d.comments) ? d.comments : []; SOC.loaded = true;
+        } else SOC.failed = true;
+        paintSocial();
+      }, function(){ SOC.failed = true; paintSocial(); });
+    } catch (e) { paintSocial(); }
+  }
+  function vote(v){
+    var s = sb(); if (!s) return;
+    var was = SOC.mine, now = was === v ? 0 : v;
+    if (was === 1) SOC.likes = Math.max(0, SOC.likes - 1); if (was === -1) SOC.dislikes = Math.max(0, SOC.dislikes - 1);
+    if (now === 1) SOC.likes++; if (now === -1) SOC.dislikes++;
+    SOC.mine = now; SOC.loaded = true; paintSocial();
+    track(now === 1 ? "like" : now === -1 ? "dislike" : "unvote");
+    try {
+      s.rpc("pod_react", { p_hub: HUB, p_ep: P.id, p_visitor: visitor(), p_val: now }).then(function(res){
+        var d = res && !res.error && res.data;
+        if (d && typeof d === "object" && !Array.isArray(d)) { SOC.likes = +d.likes || 0; SOC.dislikes = +d.dislikes || 0; paintSocial(); }
+      }, function(){});
+    } catch (e) {}
+  }
+  var POST_ERR = { empty: "Write something first.", long: "That's over " + MAX_LEN + " characters.",
+    slow: "One comment every 20 seconds. Try again in a moment.", limit: "That's five comments on this episode today. Come back tomorrow." };
+  function post(){
+    var s = sb(), text = SOC.draft.replace(/\s+/g, " ").trim();
+    if (!s || SOC.busy) return;
+    if (!text) { SOC.note = POST_ERR.empty; paintSocial(); return; }
+    if (text.length > MAX_LEN) { SOC.note = POST_ERR.long; paintSocial(); return; }
+    SOC.busy = true; SOC.note = ""; paintSocial();
+    var done = function(msg){ SOC.busy = false; SOC.note = msg || ""; paintSocial(); };
+    try {
+      s.rpc("pod_comment", { p_hub: HUB, p_ep: P.id, p_visitor: visitor(), p_body: text }).then(function(res){
+        var d = res && !res.error && res.data;
+        if (d && d.ok) {
+          SOC.comments = SOC.comments.concat([{ id: d.id, name: d.name, body: text, at: d.at, mine: true }]);
+          SOC.draft = ""; document.querySelectorAll(".sh-pod-input").forEach(function(t){ t.value = ""; });
+          track("comment"); done("");
+        } else done(POST_ERR[d && d.error] || "Couldn't post just now. Try again.");
+      }, function(){ done("Couldn't post just now. Try again."); });
+    } catch (e) { done("Couldn't post just now. Try again."); }
+  }
+  function removeComment(id){
+    var s = sb(); if (!s || !window.confirm("Delete your comment?")) return;
+    try {
+      s.rpc("pod_delete_comment", { p_visitor: visitor(), p_id: +id }).then(function(res){
+        if (res && !res.error && res.data) { SOC.comments = SOC.comments.filter(function(c){ return String(c.id) !== String(id); }); paintSocial(); }
+      }, function(){});
+    } catch (e) {}
+  }
+  function reportComment(id){
+    var s = sb(); if (!s || !window.confirm("Report this comment? A comment with three reports is hidden until it's checked.")) return;
+    SOC.comments.forEach(function(c){ if (String(c.id) === String(id)) c.reported = true; }); paintSocial();
+    track("report");
+    try { s.rpc("pod_report_comment", { p_visitor: visitor(), p_id: +id }).then(function(){}, function(){}); } catch (e) {}
+  }
+  function wireSocial(card){
+    var el = card.querySelector("[data-pod-social]"); if (!el) return;
+    el.addEventListener("click", function(e){
+      var b = e.target.closest("[data-pod-vote], [data-pod-del], [data-pod-report], [data-pod]"); if (!b) return;
+      e.stopPropagation();
+      if (b.hasAttribute("data-pod-vote")) vote(+b.getAttribute("data-pod-vote"));
+      else if (b.hasAttribute("data-pod-del")) removeComment(b.getAttribute("data-pod-del"));
+      else if (b.hasAttribute("data-pod-report")) reportComment(b.getAttribute("data-pod-report"));
+      else if (b.getAttribute("data-pod") === "more") { SOC.showAll = !SOC.showAll; paintSocial(); if (SOC.showAll) track("comments-all"); }
+      else if (b.getAttribute("data-pod") === "rename" && window.shEditName) window.shEditName();
+    });
+    var ta = el.querySelector(".sh-pod-input");
+    ta.addEventListener("input", function(){ SOC.draft = ta.value.slice(0, MAX_LEN); if (SOC.note) SOC.note = ""; paintSocial(); });
+    ta.addEventListener("keydown", function(e){ if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); post(); } });
+    el.querySelector(".sh-pod-form").addEventListener("submit", function(e){ e.preventDefault(); post(); });
   }
 
   function wireCard(slot){
@@ -143,8 +300,10 @@
       else if (what === "chapters") { var ol = card.querySelector(".sh-pod-chapters"); ol.hidden = !ol.hidden; b.setAttribute("aria-expanded", ol.hidden ? "false" : "true"); }
     });
     wireSeek(card.querySelector(".sh-pod-seek"));
+    wireSocial(card);
     if (io) io.observe(card);
     refresh();
+    paintSocial();
   }
 
   function wireSeek(input){
@@ -300,6 +459,8 @@
     window.addEventListener("pagehide", function(){ if (started) tick(true); });
     if (location.hash === "#timmy") setTimeout(goToCard, 350);
     refresh();
+    loadFeed();
+    document.addEventListener("sh:name", paintSocial);
   }
 
   window.shPodcast = {

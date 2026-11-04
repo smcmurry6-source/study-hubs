@@ -305,9 +305,16 @@ var FIG_PLACE = {
     { full:'The facebow transfer', plain:'The facebow', figs:['mounterr'] },
     { full:'Eccentric records and programming the articulator', plain:'Forward and side records', figs:['scirec', 'bennett'] },
     { full:'Fully adjustable articulators', plain:'Fully adjustable', figs:['hingearc'] }
+  ],
+  malocclusion: [
+    { full:'How a functional disturbance develops', plain:'How a problem starts', figs:['tolerance'] },
+    { full:'Orthopedic instability:', plain:'The catch:', figs:['stability'] },
+    { full:'Full coverage covers all the teeth', plain:'An upper splint has a flat back surface', figs:['splints'] },
+    { full:'The rule of thirds simplifies', plain:'Most irreversible dental work', figs:['thirds'] },
+    { full:'Noncarious cervical lesions', plain:'Notches at the gumline', figs:['erosion'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

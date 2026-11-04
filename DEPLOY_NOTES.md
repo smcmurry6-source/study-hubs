@@ -40,6 +40,68 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   tells the next run what was already judged. Unfixed security findings go to Sam in chat, never into the public repo.
   First run (past month, 728 posts) logged there. Listed in `CLAUDE.md`, `vault/home.md` and the repo map. No site change.
 
+- **2026-11-04 morning (lessons audit, PCD Implants two days out, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and answer
+  positions: report #37 (`bm-goodacre` printed each complication's percentage in its choice, so the biggest number was the key): the
+  choices are now plain names and the numbers are in the why lines. Explanations name the favorite wrong answer on `ev-misch` (Ford
+  Turner), `bm-moment` (force / area is stress) and `ev-blade` (screws through both plates are transosteal), and the select-alls `tm-mm-1`,
+  `tm-mm-2`, `tm-mm-3` explain every option (explanation and why lines). **Select-all ticks are recorded** in `pcd-implants-exam1`,
+  `occlusion` and `special-patient-care`: their `recordAnswer` passes the ticked options as `picks` in the answered event, so
+  `widget/v3.js` sends `record_choices` (until now only perio did; `question_choices` has no select-all rows for these hubs before
+  today). `LESSONS.md` refreshed (Live signals; standing lessons on bank order, select-all tracking, numbers as giveaways, and the
+  Occlusion-then-Heme & Endo check-ins; Heme & Endo retrospective now n = 13). No reading text, audio or schema change.
+
+- **2026-11-04 (Timmy Time: PCD Implants Exam 1 episode, and likes, dislikes and comments on every episode, Claude Code)** —
+  A 48-minute last-minute review for PCD Implants Exam 1 (Fri Nov 6): `hubs/pcd-implants-exam1/audio/timmy-time.mp3`
+  (35 MB, -16 LUFS), script `tools/podcast/pcd-implants-exam1/script.md`, from the hub's notes (As taught), Exam Hints
+  (the course's hint list, every professor quote, Dr. Givan's study guide), cram sheet and `LIKELY_TOPICS`, 14 chapters
+  (L1-L9, with Dr. Chen's terms split in two) and a 25-question lightning round. No graded quiz content; no CDT codes,
+  clinic credits or brand details without an exam signal (reports #35/#36). Where lectures give different numbers (the 5 mm
+  rule vs the 7 mm count from bone vs Dr. Geisinger's table) it says whose is whose. **New rule
+  ([podcast-intro](vault/rules/podcast-intro.md)):** the cold open skips the minutiae (no question counts, exam time or
+  LockDown Browser); the `/podcast` skill now says so. Lore (Sam picked all four): three Thanksgiving costumes, one per page
+  load; Timmy is proud of his ligament (never splint him to an implant); thirty-one thinks he's a failing implant;
+  Brånemark's rabbit. `lexicon.json` gains 34 entries (Brånemark, Geisinger, Chavali, Mueninghoff, Straumann, DICOM, ALARA,
+  Bremsstrahlung, endosteal/eposteal/endosseous/subperiosteal, periapical, trabeculae, and `S-L-A`, `U-C-L-A`, `U-A-B`,
+  whose final A read "uh"). Hub: `SH_PODCAST` (id `exam1-review`), card on Home under the quick-start row, "Also here"
+  link, `#timmy` opens Home; dashboard card gets `podcast` and "Timmy Time" in modes. **New rule
+  ([podcast-reactions](vault/rules/podcast-reactions.md)), for every episode:** `widget/podcast.js` + `widget/v3.css` add a
+  like and a dislike (one per visitor, tap again to undo), the episode's 1-3 lore comments (`SH_PODCAST.fans`, a random
+  count; this one has three: number thirty-one, the rabbit down the hill, the toothbrush by the door, all in `LORE.md`) and
+  the class's comments (post at once under the leaderboard name, 280 characters, 5 per episode a day, delete your own,
+  report anyone's, three reports hide one). `migration_v47.sql` (applied through the connector): `podcast_reactions`,
+  `podcast_comments`, `podcast_comment_reports`, `pod_feed`, `pod_react`, `pod_comment`, `pod_delete_comment`,
+  `pod_report_comment`, `admin_pod_comments`, `admin_hide_pod_comment`. Admin page: Inbox → "Podcast comments", hide or
+  restore any. Tracked as `pod:<id>:like|dislike|unvote|comment|report|comments-all`. About page updated. Older episodes
+  get the buttons and the class's comments too, but no lore comments (their hubs are archived). Sam asked about Gemini
+  TTS: no `GEMINI_API_KEY` in the environment, so this episode is Kokoro.
+- **2026-11-04 (Special Patient Care: the exam's format, 45-question mock, multiple-answer questions, Claude Code)** — Dr.
+  Mitchell's exam email: 45 questions, 135 minutes, open notes and lecture materials, no other people, a mix of multiple
+  choice, multiple answer, ordering, matching, Hot Spot, fill-in-the-blank and true/false, and no discussing the exam until
+  after November 18. Its dates (Fri Nov 17, Sat Nov 18) are an earlier year's calendar; Sam kept opens Fri Nov 6, due Fri
+  Nov 13 11:59 pm, and Canvas closes Sat Nov 14 11:59 pm. The hub: `EXAM_INFO` (new Rules and Practice rows), the exam card's
+  summary, a Canvas-closes line in `COURSE_DATES`, `EXAM_LAST` / `TALK_FROM`, the header pill ("Past due · Canvas closes
+  tonight") and Home's done message (no discussing until after Nov 18; check-in opens Nov 19). The mock is now 45 questions
+  in 135 minutes (`MOCK_BLUEPRINT` 5/6/6/6/6/6/6/4, `MOCK_LIMIT`), with one multiple-answer item per unit (`MOCK_MULTI`):
+  tick boxes, all-or-nothing for the score, the bank's partial credit and the why list in review; its clock label read
+  "/ 90:00" against a 75-minute limit and now reads the limit. 24 new multiple-answer questions, three per unit (`mm()`,
+  copied from PCD Implants, inline whys); bank 452 -> 476. Sam chose no ordering, fill-in-the-blank or Hot Spot practice.
+  Dashboard: new per-exam `checkinFrom:{date,hour}` (holds the Check in button and pop-up), set to Nov 19 for this exam; the
+  card stays live through Saturday (hub-level `archiveOn` Nov 14 hour 24, mirrored in `SH_EXPORT.archiveOn`); the card text
+  gives the format. About page (check-in line), hub note, decisions; `sw.js` -> `sh-v51`. No schema change.
+
+- **2026-11-04 (Occlusion L7: five interactive diagrams, Claude Code)** — The five figures Sam approved on 2026-11-03,
+  built with anima in `tools/figures/occlusion/anima/` and placed in the L7 notes at both levels (`FIG_PLACE.malocclusion`
+  and `FIG_BY_LEC.malocclusion` in `od.js`, in `data-sh-noread` wrappers; READINGS and the mp3s unchanged) and in L7's
+  Review tab (`figs` sections next to the matching tables): `tolerance` (normal function + events against a movable
+  tolerance line; above it the slides' signs a-g light on a side view with the masseter and temporalis; "Monday, then
+  Tuesday"; two SVGs that stack on a phone), `stability` (seat the joints and close to the first contact, bite into MIP
+  and the condyle comes off its seat, 1-2 mm / > 3 mm / the 10% with MIP = CR, bruxer loading, a flat plane splint),
+  `splints` (maxillary or mandibular, full or partial, stabilizing or repositioning, protrude on the ramp, months of
+  partial-coverage wear), `thirds` (slide the lower molar: first third grinding, middle third minor ortho and fixed pros,
+  beyond that major ortho, surgery, pros) and `erosion` (both arches, GERD with the side slept on, bulimia, soda swished or
+  pooled, citrus sucked or chewed, NCCLs, plus an attrition vs erosion close-up that doesn't say whether erosion facets
+  match). `stability` and `splints` share a side-view rig, `anima/l7rig.mjs` (skull, mandible, disc, teeth, a contact
+  solver; poses solved in Node). About page "Diagrams" entry updated. No question, notes or audio change; no schema change.
 - **2026-11-04 (taste skill, Claude Code)** — `.claude/skills/taste-skill/` (install name `design-taste-frontend`),
   vendored from Leonxlnx/taste-skill (MIT; commit and what was left out in its `UPSTREAM.md`): art direction for web
   pages and app screens, with a library of directions, a source linter and a real-browser inspector. Sam's call: when

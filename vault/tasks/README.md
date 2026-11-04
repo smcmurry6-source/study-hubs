@@ -13,7 +13,7 @@ Finished tasks move to [done/](done/README.md). Quick ideas that aren't tasks ye
 Point the agent at the repo and the note, in any words. For example:
 
 > Work in the GitHub repo smcmurry6-source/study-hubs. Read `AGENTS.md` first, then do the task in
-> `vault/tasks/2026-11-03-occlusion-l7-diagrams.md`.
+> `vault/tasks/2026-11-03-occlusion-final-time-and-format.md`.
 
 Or "go through `vault/tasks/inbox.md`", or "do the open tasks for perio". An agent that can't read the repo directly
 can be given the raw file URL: `https://raw.githubusercontent.com/smcmurry6-source/study-hubs/main/AGENTS.md`.
