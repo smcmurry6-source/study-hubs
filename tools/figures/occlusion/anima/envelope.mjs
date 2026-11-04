@@ -40,13 +40,13 @@ const VIEWS = {
     ] },
   fro: { w: 360, h: 330, start: [180, 40],
     shape: '<circle class="en-dot0" cx="180" cy="40" r="5"/><text class="en-t" x="192" y="34">ICP</text><circle class="en-dot0" cx="180" cy="56" r="4"/><text class="en-t" x="180" y="76" text-anchor="middle">PP</text><text class="en-t en-mut" x="150" y="318">max opening</text>',
-    pins: [[238, 58, "A"], [268, 206, "B"], [122, 58, "C"], [92, 206, "D"]],
+    pins: [[238, 58, "A"], [268, 206, "B"], [92, 206, "C"], [122, 58, "D"]],
     extra: '<text class="en-t" x="8" y="150">Patient&#8217;s</text><text class="en-t" x="8" y="166">RIGHT</text><text class="en-t" x="288" y="150">Patient&#8217;s</text><text class="en-t" x="288" y="166">LEFT</text>',
     steps: [
       ["L270 98", "A · left lateral superior", "From the front (so the patient's left is on YOUR right), from the intercuspal position the incisor point slides out to the left along the left lateral superior border (A)."],
       ["C268 180 230 250 180 296", "B · left lateral opening", "From the far left it opens down the left lateral opening border (B) to maximum opening."],
-      ["C130 250 92 180 90 98", "D · right lateral opening", "Closing up the right lateral opening border (D) to the far right."],
-      ["L180 40", "C · right lateral superior", "And back along the right lateral superior border (C) to the intercuspal position. PP, the postural position, sits about 2-4 mm below it, held by a myotactic reflex."],
+      ["C130 250 92 180 90 98", "C · right lateral opening", "Closing up the right lateral opening border (C) to the far right."],
+      ["L180 40", "D · right lateral superior", "And back along the right lateral superior border (D) to the intercuspal position. PP, the postural position, sits about 2-4 mm below it, held by a myotactic reflex."],
     ] },
 };
 

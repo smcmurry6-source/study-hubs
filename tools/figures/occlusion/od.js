@@ -365,13 +365,13 @@ var FIGS = (function(){
       '<text class="fg-t" x="290" y="150">Patient&#8217;s</text><text class="fg-t" x="290" y="166">LEFT</text>' +
       OD.pin(242,64,'A') + OD.pin(248,188,'B') + OD.pin(112,188,'C') + OD.pin(118,64,'D') + '</svg>' , key:[['A','Left lateral'],['B','Left lateral with protrusion'],['C','Right lateral with protrusion'],['D','Right lateral']] };
   F.envFront = { title:'Envelope of motion, frontal view',
-    caption:'Seen from the front, so the patient\'s left is on YOUR right. The top point is the intercuspal position; PP, the postural position, sits about 2-4 mm below it.',
+    caption:'Seen from the front, so the patient\'s left is on YOUR right; A to D run round the shape as Dr. Givan numbers them 1 to 4. The top point is the intercuspal position; PP, the postural position, sits about 2-4 mm below it.',
     svg: '<svg viewBox="0 0 360 330" role="img" aria-label="Frontal envelope of motion with borders A to D and PP">' +
       '<path class="fg-line" d="M180 40 L270 98 C268 180 230 250 180 296 C130 250 92 180 90 98 Z"/>' +
       '<circle class="fg-dot" cx="180" cy="40" r="5"/><text class="fg-t" x="192" y="34">ICP</text>' +
       '<circle class="fg-dot" cx="180" cy="56" r="4"/><text class="fg-t" x="180" y="82" text-anchor="middle">PP</text><text class="fg-t sm fg-hint" x="150" y="318">max opening</text>' +
       '<text class="fg-t" x="8" y="150">Patient&#8217;s</text><text class="fg-t" x="8" y="166">RIGHT</text><text class="fg-t" x="288" y="150">Patient&#8217;s</text><text class="fg-t" x="288" y="166">LEFT</text>' +
-      OD.pin(238,58,'A') + OD.pin(268,206,'B') + OD.pin(122,58,'C') + OD.pin(92,206,'D') + '</svg>' , key:[['A','Left lateral superior'],['B','Left lateral opening'],['C','Right lateral superior'],['D','Right lateral opening'],['PP','Postural position, about 2-4 mm below MICP (not the clinical rest position, about 8 mm down)']] };
+      OD.pin(238,58,'A') + OD.pin(268,206,'B') + OD.pin(92,206,'C') + OD.pin(122,58,'D') + '</svg>' , key:[['A','Left lateral superior'],['B','Left lateral opening'],['C','Right lateral opening'],['D','Right lateral superior'],['PP','Postural position, about 2-4 mm below MICP (not the clinical rest position, about 8 mm down)']] };
   F.fence = { title:'The fence post, Class I',
     caption:'Drawn the way the help sheet draws it, anterior at the left. Upper cusps are the V\'s, lower cusps the peaks; the posts mark where one tooth ends and the next begins. In Class I each lower cusp sits a half step in front (mesial) of its upper partner. It shows which cusp comes CLOSEST, not the anatomy: the questions are cusp-fossa.',
     svg: OD.fencePostSVG(1, { x0:29 }), key:[['Read it','Lower P2 points at the post between upper P1 and P2: by the premolar rule it lands in the MESIAL fossa of the upper second premolar (#29 on #4)'],['Class II','Lower row one post back'],['Class III','Lower row one post forward']] };
