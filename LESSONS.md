@@ -273,6 +273,17 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
 - **Exclude automated visitors before counting people.** Browser sessions that test or screenshot the live site make a new
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
+- **Check-ins and surveys speak for the heavy users.** Every check-in group so far studied several times its hub's median
+  (GI 2: respondents' median 177 minutes against 29 for everyone), and 169 of 190 people shown a survey said "No thanks"
+  (to 11-04). Read "About right" next to the use data, never as the class's verdict; the people who bounced aren't in it.
+- **People decline a tour offered on arrival, but finish one they choose.** Dashboard tour: 12 of 97 shown the prompt
+  started it, 8 finished; hub tours 11 of 118, 9 finished (10-21 to 11-04). Teach a feature where it's used (a one-line
+  tip), and keep the full tour in the menu.
+- **Cross-hub numbers go through the governance notes.** Sections are named differently per hub (`sh_surface()`), a
+  "person" is a browser, `question_stats` counts retries, and coverage starts on different dates:
+  [analytics-data-quality](vault/reference/analytics-data-quality.md). The admin page's Insights tab puts every hub side by
+  side ([insights-dashboard](vault/reference/insights-dashboard.md), first reading 2026-11-04: cramming rose to 83-90% of
+  pre-exam time in the last 3 days for MSK 4, Occlusion and Heme & Endo, from 65-76% before).
 
 ## What student reports and surveys have taught (keep adding)
 

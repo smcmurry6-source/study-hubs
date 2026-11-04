@@ -5,6 +5,12 @@ tags: [data]
 
 # Read usage data and run surveys
 
+Start with the admin page's **Insights** tab, or the same on the connector: `select sh_data_quality();` (is the data
+sound?), `select sh_insights('{"<hub>":"<last exam date>"}');` and `select sh_insight_retries();` (every hub side by side,
+with the decision each number drives: [insights-dashboard](../reference/insights-dashboard.md)). What every table and event
+means: [event-taxonomy](../reference/event-taxonomy.md); what to correct for: [analytics-data-quality](../reference/analytics-data-quality.md);
+what may be written down: [learner-data-privacy](../rules/learner-data-privacy.md) (totals over 5+ people, no visitor ids).
+
 To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
 `activity_pings` (time per `<mode>/<sub-view>`, 25 s per ping), `ui_clicks` + `ui_click_reach` (clicks per
 button/tab and distinct people, per day), `question_stats` / `question_choices` (accuracy, popular wrong answers),

@@ -176,6 +176,17 @@ table.data tr.group:hover td{background:none;}
 .qtext{font-weight:500;white-space:normal;margin-top:3px;max-width:62ch;line-height:1.4}
 .qkey{font-size:12.5px;color:var(--good,#1F8A5B);margin-top:3px;white-space:normal}
 .qwrong{font-size:12.5px;color:var(--bad,#B3261E);margin-top:2px;white-space:normal}
+
+/* ---------- insights (decision cards) ---------- */
+table.data td.warn{color:var(--warn); font-weight:700;}
+table.data td .sub2{display:block; font-size:12px; font-weight:400; color:var(--ink-3); margin-top:1px;}
+table.data.matrix td.n, table.data.matrix th.n{min-width:62px;}
+[data-panel="insights"] table.data td.lbl{min-width:150px;}
+.decisions{margin:14px 0 0; padding:12px 14px 12px 30px; border-radius:var(--r-m); background:var(--warn-soft); font-size:13.5px; color:var(--ink);}
+.decisions li{margin:5px 0;}
+.decisions.ok{background:var(--ok-soft); list-style:none; padding-left:14px;}
+.pill.ok{background:var(--ok-soft); color:var(--ok);}
+.pill.info{background:var(--accent-soft); color:var(--accent-ink);}
 </style>
 </head>
 <body>
@@ -205,6 +216,7 @@ table.data tr.group:hover td{background:none;}
       </div>
       <nav class="tabs" role="tablist" aria-label="Sections">
         <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+        <button role="tab" data-tab="insights" aria-selected="false">Insights</button>
         <button role="tab" data-tab="time" aria-selected="false">Time by section</button>
         <button role="tab" data-tab="questions" aria-selected="false">Questions</button>
         <button role="tab" data-tab="clicks" aria-selected="false">Clicks</button>
@@ -218,6 +230,7 @@ table.data tr.group:hover td{background:none;}
 
   <main>
     <section class="panel" data-panel="overview"></section>
+    <section class="panel" data-panel="insights" hidden></section>
     <section class="panel" data-panel="time" hidden></section>
     <section class="panel" data-panel="questions" hidden></section>
     <section class="panel" data-panel="clicks" hidden></section>
@@ -265,8 +278,41 @@ table.data tr.group:hover td{background:none;}
   function $(s, r){ return (r || document).querySelector(s); }
   function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
-  function hubLabel(h){ return HUB_LABEL[h] || h || "(unknown hub)"; }
-  function isArchived(h){ return !!ARCHIVED[h]; }
+  function hubLabel(h){ return HUB_LABEL[h] || (HUBINFO && HUBINFO[h] && HUBINFO[h].label) || h || "(unknown hub)"; }
+  /* archived: removed hubs (ARCHIVED) and every hub past its archive time in the dashboard's own HUBS list */
+  function isArchived(h){ return !!ARCHIVED[h] || !!(HUBINFO && HUBINFO[h] && !HUBINFO[h].live); }
+
+  /* Hub status and exam dates live in one place, HUBS / ARCHIVED_HUBS in the dashboard (../index.html, same origin):
+     read them from there instead of keeping a second list here. Archive time follows the dashboard's rule (10 pm on
+     the last exam's day, its archiveHour, or the hub's archiveOn). If the file can't be read, the static lists above apply. */
+  var HUBINFO = null, hubInfoReady = null;
+  function loadHubInfo(){
+    if (hubInfoReady) return hubInfoReady;
+    hubInfoReady = fetch("../index.html", { cache: "no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){
+      function arr(name){
+        var m = new RegExp("var " + name + " = (\\[[\\s\\S]*?\\n  \\]);").exec(t);
+        if (!m) return [];
+        try { return Function('"use strict"; return (' + m[1] + ');')() || []; } catch (e) { return []; }
+      }
+      function day(s){ var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+      function at(s, hour){ var d = day(s); d.setHours(hour == null ? 22 : hour, 0, 0, 0); return d; }
+      var now = new Date(), info = {};
+      function add(h, archived){
+        var ex = (h.exams || []).filter(function(x){ return x && /^\d{4}-\d{2}-\d{2}$/.test(x.date || ""); })
+          .sort(function(a, b){ return a.date < b.date ? -1 : 1; });
+        var last = ex[ex.length - 1];
+        var end = h.archiveOn && h.archiveOn.date ? at(h.archiveOn.date, h.archiveOn.hour) : last ? at(last.date, last.archiveHour) : null;
+        var past = ex.filter(function(x){ return day(x.date) <= now; });
+        info[h.id] = { label: h.code || h.title || h.id, live: !archived && !(end && now >= end),
+          exam: past.length ? past[past.length - 1].date : (ex[0] ? ex[0].date : null), exams: ex.map(function(x){ return x.date; }) };
+      }
+      arr("HUBS").forEach(function(h){ if (h && h.id) add(h, false); });
+      arr("ARCHIVED_HUBS").forEach(function(h){ if (h && h.id) add(h, true); });
+      HUBINFO = Object.keys(info).length ? info : null;
+      return HUBINFO;
+    }).catch(function(){ return null; });
+    return hubInfoReady;
+  }
   function keepHub(h){ return state.archived || !isArchived(h); }
   function hubCell(h){ return esc(hubLabel(h)) + (isArchived(h) ? ' <span class="pill arch">archived</span>' : ''); }
   function prettyPart(id){
@@ -308,9 +354,9 @@ table.data tr.group:hover td{background:none;}
     return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
   }
   function loadAll(){
-    $$(".panel:not([data-panel=recap])").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
+    $$(".panel:not([data-panel=recap]):not([data-panel=insights])").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
     var d = state.days;
-    return Promise.all([
+    return loadHubInfo().then(function(){ return Promise.all([
       rpc("get_visitor_summary", { p_secret: secret, p_days: d }),
       rpc("get_visitor_by_hub", { p_secret: secret, p_days: d }),
       rpc("get_visitor_by_section", { p_secret: secret, p_days: d }),
@@ -329,7 +375,7 @@ table.data tr.group:hover td{background:none;}
       rpc("get_nuke_unlocks", { p_secret: secret, p_days: d }),
       rpc("get_feature_events", { p_secret: secret, p_days: d }),
       rpc("admin_pod_comments", { p_secret: secret, p_days: 60 })
-    ]).then(function(r){
+    ]); }).then(function(r){
       data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15], features: r[16], podComments: r[17] };
       renderAll();
     });
@@ -961,8 +1007,286 @@ table.data tr.group:hover td{background:none;}
     }, function(){ btn.disabled = false; prev.innerHTML = '<div class="empty">Couldn\'t reach the server. Try again.</div>'; });
   }
 
+  /* ---------- Insights (migration_v49): every card pairs a number with the decision it drives ----------
+     All time, per hub. Each threshold below is explained in vault/reference/insights-dashboard.md: change both together.
+     Data: get_insights (scorecard, surfaces, features, voice), get_insight_retries (spacing), get_data_quality. */
+  var INSIGHT_RULES = {
+    activation: 60,    /* % of a hub's people who answered at least one question: under this, flag */
+    bounce: 30,        /* % who spent under 5 minutes in the hub: over this, flag */
+    returning: 30,     /* % who studied on 3 or more days (once the exam has passed): under this, flag */
+    cram: 75,          /* % of time up to the exam spent on exam day and the 2 days before: over this, flag */
+    depth: 25,         /* median answers per person: under this, flag */
+    reach: 15,         /* % of a hub's people who used a surface: under this in every hub that has it (3+ hubs), flag */
+    tourStart: 20,     /* % of people shown a tour prompt who start the tour: under this, flag */
+    podEnd: 40,        /* % of people who press play and hear 95% of an episode: under this, flag */
+    spacingGap: 10,    /* points between a miss re-asked within 10 minutes and one re-asked a day or more later: over this, flag */
+    knownRetries: 50,  /* % of re-answers spent on questions the person already had right: over this, flag */
+    checkinCover: 20,  /* % of a hub's people who checked in after its exam: under this, flag */
+    checkinBias: 2,    /* respondents' median minutes / the hub's median minutes: over this, flag */
+    dbMb: 350,         /* database size in MB (Supabase's free plan stops at 500 MB): over this, flag */
+    dbWeeks: 12,       /* weeks until 500 MB at the last 7 days' growth: under this, flag */
+    minPeople: 5,      /* a hub or page with fewer people is left out of the tables: its percentages are noise (and the privacy rule's floor) */
+    minRetries: 20     /* a hub's retry share is flagged only with at least this many retries */
+  };
+  var SURFACES = ["notes", "bank", "review", "mock", "drill", "hints", "cram", "weak-spots", "home", "podcast", "arcade", "recall", "other", "unknown", "retired"];
+  var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
+    "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
+  var insights = null;
+  function examMap(){
+    var m = {};
+    if (HUBINFO) Object.keys(HUBINFO).forEach(function(h){ if (HUBINFO[h].exam) m[h] = HUBINFO[h].exam; });
+    return m;
+  }
+  function loadInsights(){
+    var el = $('[data-panel="insights"]');
+    el.innerHTML = '<div class="empty">Loading… (three queries over every hub’s data, a few seconds)</div>';
+    insights = { pending: true };
+    /* each takes ~1-1.5 s warm; the first call after a quiet spell can pass anon's 3 s limit while the tables load
+       into memory, and then the same call succeeds, so a failed one is tried once more */
+    function twice(fn, args){ return rpc(fn, args).then(function(r){ return r.error ? rpc(fn, args) : r; }); }
+    return loadHubInfo().then(function(){
+      return Promise.all([
+        twice("get_insights", { p_secret: secret, p_exams: examMap() }),
+        twice("get_insight_retries", { p_secret: secret }),
+        twice("get_data_quality", { p_secret: secret })
+      ]);
+    }).then(function(r){ insights = { main: r[0], retries: r[1], quality: r[2] }; renderInsights(); });
+  }
+  function isHubId(h){ return !!h && !/^zz-/.test(h) && h !== "dashboard" && h !== "about" && !!(HUB_LABEL[h] || (HUBINFO && HUBINFO[h])); }
+  /* hubs with fewer than minPeople people: left out of every insight table, named once under the scorecard */
+  function smallHub(h){
+    var m = insights && insights.main, x = m && m.data && (m.data.hubs || []).filter(function(y){ return y.hub === h; })[0];
+    return !x || (x.people || 0) < INSIGHT_RULES.minPeople;
+  }
+  function showHub(h){ return isHubId(h) && keepHub(h) && !smallHub(h); }
+  function pctOf(a, b){ return b ? Math.round(100 * (Number(a) || 0) / b) : null; }
+  function nCell(v, warn, sub){ return '<td class="n' + (warn ? ' warn' : '') + '">' + (v == null ? '<span class="muted">—</span>' : v) + (sub ? '<span class="sub2">' + sub + '</span>' : '') + '</td>'; }
+  function decisions(list){
+    return list.length ? '<ul class="decisions">' + list.join("") + '</ul>' : '<ul class="decisions ok"><li>Nothing past its threshold.</li></ul>';
+  }
+  function flagLine(names, rule, action){ return '<li><b>' + rule + '</b>: ' + names.join(", ") + '. ' + action + '</li>'; }
+  function hubOrder(a, b){
+    var x = isArchived(a.hub) ? 1 : 0, y = isArchived(b.hub) ? 1 : 0;
+    if (x !== y) return x - y;
+    var ea = (HUBINFO && HUBINFO[a.hub] && HUBINFO[a.hub].exam) || a.exam || "", eb = (HUBINFO && HUBINFO[b.hub] && HUBINFO[b.hub].exam) || b.exam || "";
+    return ea < eb ? 1 : ea > eb ? -1 : 0;
+  }
+  function hubName(h){ return esc(hubLabel(h)) + (isArchived(h) ? ' <span class="pill arch">archived</span>' : ' <span class="pill ok">live</span>'); }
+
+  function insightScorecard(){
+    var m = insights.main, R = INSIGHT_RULES;
+    if (!m || m.error || !m.data) return card("Hub scorecard", "", '<div class="err">Couldn’t load insights (get_insights, migration_v49).</div>');
+    var first = {};
+    var rr = insights.retries;
+    if (rr && rr.data && rr.data.by_hub) rr.data.by_hub.forEach(function(h){ first[h.hub] = pctOf(h.first_ok, h.first_tries); });
+    var rows = (m.data.hubs || []).filter(function(h){ return showHub(h.hub); }).sort(hubOrder);
+    var small = (m.data.hubs || []).filter(function(h){ return isHubId(h.hub) && keepHub(h.hub) && smallHub(h.hub); }).map(function(h){ return esc(hubLabel(h.hub)); });
+    var F = { activation: [], bounce: [], returning: [], cram: [], depth: [] };
+    var body = rows.map(function(h){
+      var p = h.people || 0, done = h.last3_pct != null || isArchived(h.hub);
+      var act = pctOf(h.answerers, p), bounce = pctOf(h.under_5, p), ret = pctOf(h.three_days, p), mock = pctOf(h.mock_people, h.answerers);
+      var fa = act != null && act < R.activation, fb = bounce != null && bounce > R.bounce, fr = done && ret != null && ret < R.returning;
+      var fc = h.last3_pct != null && h.last3_pct > R.cram, fd = done && h.median_answers != null && h.median_answers < R.depth;
+      var name = esc(hubLabel(h.hub));
+      if (fa) F.activation.push(name + " " + act + "%"); if (fb) F.bounce.push(name + " " + bounce + "%"); if (fr) F.returning.push(name + " " + ret + "%");
+      if (fc) F.cram.push(name + " " + h.last3_pct + "%"); if (fd) F.depth.push(name + " " + h.median_answers);
+      var ex = h.exam ? "exam " + esc(h.exam) : "";
+      return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + ex + (h.first_day ? " · " + esc(h.first_day) + " to " + esc(h.last_day) : "") + '</span></td>' +
+        nCell(fmtNum(p)) + nCell(act == null ? null : act + "%", fa, fmtNum(h.answerers)) + nCell(bounce == null ? null : bounce + "%", fb) +
+        nCell(ret == null ? null : ret + "%", fr) + nCell(fmtMin(h.median_mins), false, "p90 " + fmtMin(h.p90_mins)) +
+        nCell(h.median_answers == null ? null : fmtNum(h.median_answers), fd) + nCell(h.last3_pct == null ? null : h.last3_pct + "%", fc) +
+        nCell(first[h.hub] == null ? null : first[h.hub] + "%") + nCell(mock == null ? null : mock + "%", false, h.mock_avg_pct != null ? "avg " + h.mock_avg_pct + "%" : "") + '</tr>';
+    }).join("");
+    var D = [];
+    if (F.activation.length) D.push(flagLine(F.activation, "Answered a question under " + R.activation + "%", "Put a question one tap from where people land (Home's quick-start row), and check the hub opens on Home."));
+    if (F.bounce.length) D.push(flagLine(F.bounce, "Left within 5 minutes over " + R.bounce + "%", "The landing view should get someone to a question or the notes in one tap; exam-morning visitors bounce most."));
+    if (F.returning.length) D.push(flagLine(F.returning, "Studied on 3+ days under " + R.returning + "%", "Have every lecture in the hub about 4 days before the exam, then bring people back: Daily Drill, Home's “Where to next”."));
+    if (F.cram.length) D.push(flagLine(F.cram, "Time in the last 3 days over " + R.cram + "%", "The night-before tools carry these hubs: check the cram sheet, exam hints, mock and Timmy Time first, and ship content early."));
+    if (F.depth.length) D.push(flagLine(F.depth, "Median answers under " + R.depth, "Most people read without practicing: put practice inside the notes (a question under each lecture) and on Home."));
+    var head = '<tr><th>Hub</th><th class="n">People</th><th class="n">Answered</th><th class="n">Under 5 min</th><th class="n">3+ days</th><th class="n">Median time</th><th class="n">Median answers</th><th class="n">Last 3 days</th><th class="n">First try</th><th class="n">Took a mock</th></tr>';
+    return card("Hub scorecard", "Reach, activation, depth and return per hub, all time. People are devices (a person on a phone and a laptop counts twice unless they linked them).",
+      rows.length ? '<div class="tbl-wrap"><table class="data wide">' + '<thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+        (small.length ? '<p class="note">Left out of every card (fewer than ' + R.minPeople + ' people): ' + small.join(", ") + '.</p>' : '') + decisions(D) : '<div class="empty">No hubs yet.</div>');
+  }
+
+  function insightSurfaces(){
+    var m = insights.main, R = INSIGHT_RULES;
+    if (!m || m.error || !m.data) return "";
+    var people = {}, byHub = {};
+    (m.data.hubs || []).forEach(function(h){ people[h.hub] = h.people || 0; });
+    (m.data.surfaces || []).forEach(function(s){
+      if (!showHub(s.hub)) return;
+      var h = byHub[s.hub] || (byHub[s.hub] = { hub: s.hub, mins: 0, s: {} });
+      h.mins += Number(s.mins) || 0; h.s[s.surface] = s;
+    });
+    var hubs = Object.keys(byHub).map(function(k){ return byHub[k]; }).sort(hubOrder);
+    var used = SURFACES.filter(function(sf){ return hubs.some(function(h){ return h.s[sf] && h.s[sf].mins > 0; }); });
+    var low = {};
+    used.forEach(function(sf){
+      var have = hubs.filter(function(h){ return h.s[sf]; });
+      if (have.length >= 3 && sf !== "other" && sf !== "unknown" && sf !== "retired" && have.every(function(h){ return pctOf(h.s[sf].people, people[h.hub]) < R.reach; })) low[sf] = have.length;
+    });
+    var body = hubs.map(function(h){
+      return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + fmtMin(h.mins) + '</span></td>' + used.map(function(sf){
+        var s = h.s[sf]; if (!s) return nCell(null);
+        var reach = pctOf(s.people, people[h.hub]);
+        return nCell(pctOf(s.mins, h.mins) + "%", !!low[sf], reach + "% used");
+      }).join("") + '</tr>';
+    }).join("");
+    var D = Object.keys(low).map(function(sf){
+      return '<li><b>' + esc(SURFACE_LABEL[sf] || sf) + '</b>: under ' + R.reach + '% of people used it in every one of ' + low[sf] + ' hubs. Before building more of it, make it easier to find or fold it into notes and bank; check <code>vault/decisions.md</code> first (some low-use features stay by Sam’s call).</li>';
+    });
+    return card("Where time goes", "Share of each hub’s active time by surface (big number) and the share of its people who used that surface (small). Sections are mapped by <code>sh_surface()</code>.",
+      hubs.length ? '<div class="tbl-wrap"><table class="data matrix"><thead><tr><th>Hub</th>' + used.map(function(sf){ return '<th class="n">' + esc(SURFACE_LABEL[sf] || sf) + '</th>'; }).join("") + '</tr></thead><tbody>' + body + '</tbody></table></div>' + decisions(D) : '<div class="empty">No time recorded.</div>');
+  }
+
+  function insightSpacing(){
+    var r = insights.retries, R = INSIGHT_RULES;
+    if (!r || r.error || !r.data) return card("Spacing: what a retry shows", "", '<div class="err">Couldn’t load retries (get_insight_retries, migration_v49).</div>');
+    var g = r.data.by_gap || [];
+    function cell(gap, after){ var x = g.filter(function(y){ return y.gap === gap && y.after === after; })[0]; return x ? { pct: pctOf(x.ok, x.n), n: x.n } : null; }
+    var gaps = ["under 10 min", "10 min to 1 day", "1 to 3 days", "3+ days"];
+    var rows = gaps.map(function(gap){
+      var a = cell(gap, "missed"), b = cell(gap, "right");
+      return '<tr><td class="lbl">' + esc(gap) + '</td>' + nCell(a ? a.pct + "%" : null, false, a ? fmtNum(a.n) + " tries" : "") + '<td class="barcell">' + (a ? bar(a.pct, 100, a.pct < 75, a.pct + "%") : "") + '</td>' +
+        nCell(b ? b.pct + "%" : null, false, b ? fmtNum(b.n) + " tries" : "") + '</tr>';
+    }).join("");
+    var quick = cell("under 10 min", "missed");
+    var lateN = 0, lateOk = 0;
+    g.forEach(function(x){ if (x.after === "missed" && (x.gap === "1 to 3 days" || x.gap === "3+ days")) { lateN += x.n; lateOk += x.ok; } });
+    var late = pctOf(lateOk, lateN);
+    var hubs = (r.data.by_hub || []).filter(function(h){ return showHub(h.hub); }).sort(hubOrder);
+    var allRetries = 0, allKnown = 0;
+    var hubRows = hubs.map(function(h){
+      allRetries += h.retries || 0; allKnown += h.retries_of_right || 0;
+      var known = pctOf(h.retries_of_right, h.retries);
+      return '<tr><td class="lbl">' + hubName(h.hub) + '</td>' + nCell(pctOf(h.first_ok, h.first_tries) + "%", false, fmtNum(h.first_tries) + " first tries") +
+        nCell(pctOf(h.quick_retries_of_missed_ok, h.quick_retries_of_missed) == null ? null : pctOf(h.quick_retries_of_missed_ok, h.quick_retries_of_missed) + "%", false, fmtNum(h.quick_retries_of_missed)) +
+        nCell(pctOf(h.late_retries_of_missed_ok, h.late_retries_of_missed) == null ? null : pctOf(h.late_retries_of_missed_ok, h.late_retries_of_missed) + "%", false, fmtNum(h.late_retries_of_missed)) +
+        nCell(known == null ? null : known + "%", known != null && known > R.knownRetries && h.retries >= R.minRetries, fmtNum(h.retries) + " retries") + '</tr>';
+    }).join("");
+    var D = [], known = pctOf(allKnown, allRetries);
+    if (quick && late != null && quick.pct - late > R.spacingGap) D.push('<li><b>A quick retry overstates learning</b>: a miss re-asked within 10 minutes is right ' + quick.pct + '% of the time, a day or more later ' + late + '%. Count a miss as fixed (readiness, Weak Spots, mastery) only when it is right on a later day, and put yesterday’s misses first in the Daily Drill and on Home.</li>');
+    if (known != null && known > R.knownRetries) D.push('<li><b>Most re-answers go to questions already right</b>: ' + known + '% of all retries. Point the bank’s default view and the drill at questions not yet answered or missed, and say so on Home.</li>');
+    return card("Spacing: what a retry shows", "Every answer to a question the same person had answered before, by the time since their previous try at it.",
+      '<div class="tbl-wrap"><table class="data"><thead><tr><th>Since the previous try</th><th class="n">After a miss</th><th></th><th class="n">After a right answer</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="tbl-wrap" style="margin-top:14px"><table class="data"><thead><tr><th>Hub</th><th class="n">First try</th><th class="n">Miss, retried &lt;10 min</th><th class="n">Miss, retried 1+ day later</th><th class="n">Retries of right answers</th></tr></thead><tbody>' + hubRows + '</tbody></table></div>' + decisions(D));
+  }
+
+  function insightFeatures(){
+    var m = insights.main, R = INSIGHT_RULES;
+    if (!m || m.error || !m.data) return "";
+    var rows = (m.data.features || []).filter(function(f){ return (showHub(f.hub) || f.hub === "dashboard") && (f.viewers || 0) >= R.minPeople; });
+    rows.sort(function(a, b){ return a.hub === "dashboard" ? -1 : b.hub === "dashboard" ? 1 : hubOrder(a, b); });
+    var T = { p: 0, s: 0 }, P = { p: 0, e: 0 };
+    var body = rows.map(function(f){
+      var v = f.viewers || 0;
+      T.p += f.tour_prompted || 0; T.s += f.tour_started || 0; P.p += f.pod_play || 0; P.e += f.pod_end || 0;
+      var ts = pctOf(f.tour_started, f.tour_prompted), pe = pctOf(f.pod_end, f.pod_play);
+      function reach(n){ return n ? fmtNum(n) + '<span class="sub2">' + pctOf(n, v) + '%</span>' : null; }
+      return '<tr><td class="lbl">' + (f.hub === "dashboard" ? "Dashboard" : hubName(f.hub)) + '<span class="sub2">since ' + esc(f.since) + '</span></td>' + nCell(fmtNum(v)) +
+        nCell(f.tour_prompted ? ts + "%" : null, f.tour_prompted >= 10 && ts < R.tourStart, f.tour_prompted ? fmtNum(f.tour_started) + " of " + fmtNum(f.tour_prompted) + ", " + fmtNum(f.tour_done) + " done" : "") +
+        nCell(f.pod_play ? pe + "%" : null, f.pod_play >= 5 && pe < R.podEnd, f.pod_play ? fmtNum(f.pod_end) + " of " + fmtNum(f.pod_play) + " played" : "") +
+        nCell(f.listen_people ? fmtNum(f.listen_people) : null, false, f.listen_people ? fmtMin(f.listen_mins) : "") +
+        nCell(f.fig_seen ? pctOf(f.fig_used, f.fig_seen) + "%" : null, false, f.fig_seen ? fmtNum(f.fig_used) + " of " + fmtNum(f.fig_seen) + " who saw one" : "") +
+        nCell(reach(f.highlighters)) + nCell(reach(f.pinners)) + nCell(reach(f.find_in_notes)) + nCell(reach(f.mind_maps)) +
+        nCell(f.settings_people ? pctOf(f.pet_off, f.settings_people) + "%" : null, false, f.settings_people ? "effects off " + pctOf(f.fx_off, f.settings_people) + "%" : "") + '</tr>';
+    }).join("");
+    var D = [];
+    var ts = pctOf(T.s, T.p), pe = pctOf(P.e, P.p);
+    if (T.p >= 10 && ts < R.tourStart) D.push('<li><b>Few take the tour</b>: ' + ts + '% of tour prompts led to a start (' + fmtNum(T.s) + ' of ' + fmtNum(T.p) + ', each person counted once per page, so someone asked on two pages counts twice; most who start, finish). Stop asking on arrival: offer it from the menu and teach with one-line tips where a feature is used.</li>');
+    if (P.p >= 5 && pe < R.podEnd) D.push('<li><b>Most stop the episode early</b>: ' + pe + '% of listeners heard 95% of an episode. Add chapters by lecture so people can jump to what they need, and put the highest-yield lectures first.</li>');
+    return card("Features: who finds them", "From feature events (widget/clicks.js), 2026-10-20 on. Small numbers are the share of that page’s people (devices that loaded it).",
+      rows.length ? '<div class="tbl-wrap"><table class="data matrix"><thead><tr><th>Page</th><th class="n">People</th><th class="n">Tour started</th><th class="n">Podcast to the end</th><th class="n">Listen</th><th class="n">Figures used</th><th class="n">Highlighter</th><th class="n">Pins</th><th class="n">Find in notes</th><th class="n">Mind maps</th><th class="n">Timmy off</th></tr></thead><tbody>' + body + '</tbody></table></div>' + decisions(D) : '<div class="empty">No feature events yet.</div>');
+  }
+
+  function insightVoice(){
+    var m = insights.main, R = INSIGHT_RULES;
+    if (!m || m.error || !m.data) return "";
+    var D = [], open = [];
+    var rep = (m.data.voice || []).filter(function(v){ return showHub(v.hub) || !v.hub; });
+    var repBody = rep.map(function(v){
+      if (v.open) open.push(esc(v.hub ? hubLabel(v.hub) : "site") + " " + v.open);
+      return '<tr><td class="lbl">' + (v.hub ? hubName(v.hub) : "Site-wide") + '</td>' + nCell(fmtNum(v.reports)) + nCell(fmtNum(v.open), v.open > 0) +
+        nCell(pctOf(v.replied, v.reports) + "%") + nCell(v.median_hours_to_resolve == null ? null : v.median_hours_to_resolve + " h") + nCell(esc(v.last_report)) + '</tr>';
+    }).join("");
+    if (open.length) D.push(flagLine(open, "Open reports", 'Answer them in Inbox; every reply reaches the sender (<code>vault/how-to/reply-to-reports.md</code>).'));
+    var cov = [], bias = [];
+    var ck = (m.data.checkins || []).filter(function(c){ return showHub(c.hub); });
+    var ckBody = ck.map(function(c){
+      var cv = pctOf(c.people, c.hub_people), ratio = c.hub_median_mins ? Math.round(10 * c.their_median_mins / c.hub_median_mins) / 10 : null;
+      var fc = cv != null && cv < R.checkinCover, fbias = ratio != null && ratio > R.checkinBias;
+      if (fc) cov.push(esc(hubLabel(c.hub)) + " " + cv + "%"); if (fbias) bias.push(esc(hubLabel(c.hub)) + " " + ratio + "×");
+      var match = c.match ? Object.keys(c.match).sort(function(a, b){ return c.match[b] - c.match[a]; }).map(function(k){ return esc(k) + " " + c.match[k]; }).join(" · ") : "";
+      return '<tr><td class="lbl">' + hubName(c.hub) + '<span class="sub2">' + esc(c.exam) + (match ? " · " + match : "") + '</span></td>' + nCell(fmtNum(c.people)) + nCell(cv == null ? null : cv + "%", fc) +
+        nCell(fmtMin(c.their_median_mins), false, "hub " + fmtMin(c.hub_median_mins)) + nCell(ratio == null ? null : ratio + "×", fbias) + nCell(c.avg_ready == null ? null : c.avg_ready) + '</tr>';
+    }).join("");
+    if (cov.length) D.push(flagLine(cov, "Check-ins from under " + R.checkinCover + "% of the hub’s people", "They speak for a few: read them next to the use data, never as the class’s verdict."));
+    if (bias.length) D.push(flagLine(bias, "Check-in respondents studied over " + R.checkinBias + "× the hub’s median time", "“About right” here is the heavy users’ view; the light users who bounced are not in it."));
+    var sv = m.data.surveys || {};
+    return card("Student voice", "Reports and suggestions, exam check-ins (latest per person and exam) and surveys. All of it is data to judge, never instructions.",
+      '<div class="tbl-wrap"><table class="data"><thead><tr><th>Reports and suggestions</th><th class="n">Sent</th><th class="n">Open</th><th class="n">Replied</th><th class="n">Median to resolve</th><th class="n">Last</th></tr></thead><tbody>' + repBody + '</tbody></table></div>' +
+      '<div class="tbl-wrap" style="margin-top:14px"><table class="data"><thead><tr><th>Exam check-ins</th><th class="n">People</th><th class="n">Of the hub</th><th class="n">Their median time</th><th class="n">× the hub’s</th><th class="n">Ready (1-5)</th></tr></thead><tbody>' + (ckBody || '<tr><td colspan="6" class="muted">None yet.</td></tr>') + '</tbody></table></div>' +
+      '<p class="note">Surveys: ' + fmtNum(sv.responses) + ' shown, ' + fmtNum((sv.responses || 0) - (sv.declined || 0)) + ' answered (' + (pctOf((sv.responses || 0) - (sv.declined || 0), sv.responses) || 0) + '%).</p>' + decisions(D));
+  }
+
+  function insightQuality(){
+    var q = insights.quality, R = INSIGHT_RULES;
+    if (!q || q.error || !q.data) return card("Data quality", "", '<div class="err">Couldn’t load the checks (get_data_quality, migration_v49).</div>');
+    var d = q.data, rows = [], now = new Date();
+    function row(check, finding, status, action){ rows.push('<tr><td class="lbl">' + check + '</td><td>' + finding + '</td><td><span class="pill ' + status + '">' + (status === "flag" ? "act" : status === "ok" ? "ok" : "note") + '</span></td><td>' + action + '</td></tr>'); }
+    function daysAgo(t){ if (!t) return null; var x = new Date(String(t).length === 10 ? t + "T12:00:00" : t); return Math.floor((now - x) / 86400000); }
+    var lw = d.last_write || {}, pingAge = daysAgo(lw.activity_pings);
+    ["personal_answers", "ui_clicks", "feature_events"].forEach(function(src){
+      var a = daysAgo(lw[src]);
+      var broken = pingAge != null && pingAge <= 1 && (a == null || a >= 2);
+      row("Tracking alive: <code>" + src + "</code>", "last write " + (a == null ? "never" : a === 0 ? "today" : a + " days ago") + " (pings: " + (pingAge === 0 ? "today" : pingAge + " days ago") + ")",
+        broken ? "flag" : "ok", broken ? "People are studying but this stopped: check the widget code that writes it and the RPC’s grants." : "");
+    });
+    var sa = daysAgo(lw.search_terms);
+    row("Searches", "last search logged " + (sa == null ? "never" : sa + " days ago"), "info", "Few people use Search (kept by Sam’s call, 2026-09-29); “Find this in the notes” is tracked as an event instead.");
+    var tr = d.test_rows || {}, tsum = Object.keys(tr).reduce(function(s, k){ return s + (Number(tr[k]) || 0); }, 0);
+    row("Test data", tsum ? Object.keys(tr).filter(function(k){ return tr[k]; }).map(function(k){ return fmtNum(tr[k]) + " rows in " + k; }).join(", ") : "none", tsum ? "flag" : "ok",
+      tsum ? "Left out of every insight already; delete them (retention task note)." : "");
+    var us = d.unmapped_sections || [], recent = us.filter(function(s){ var a = daysAgo(s.last_day); return a != null && a <= 30; });
+    row("Sections <code>sh_surface()</code> can’t place", us.length ? us.map(function(s){ return esc(hubLabel(s.hub)) + " “" + esc(s.section || "(none)") + "” " + fmtMin(s.pings * 25 / 60) + " (last " + esc(s.last_day) + ")"; }).join("; ") : "none",
+      recent.length ? "flag" : us.length ? "info" : "ok", recent.length ? "A new mode or sub-view: add it to <code>sh_surface()</code> in a migration so cross-hub numbers count it." : us.length ? "Historical only (older hubs sent no section)." : "");
+    var fam = d.event_families || [], fresh = fam.filter(function(f){ return daysAgo(f.first_day) <= 14; }), quiet = fam.filter(function(f){ return daysAgo(f.last_day) > 14; });
+    row("New event families (14 days)", fresh.length ? fresh.map(function(f){ return "<code>" + esc(f.family) + "</code> " + fmtNum(f.people) + " people"; }).join(", ") : "none", fresh.length ? "flag" : "ok",
+      fresh.length ? "Give each a row in <code>vault/reference/event-taxonomy.md</code> (meaning, unit, emitter)." : "");
+    row("Event families gone quiet (14+ days)", quiet.length ? quiet.map(function(f){ return "<code>" + esc(f.family) + "</code> last " + esc(f.last_day); }).join(", ") : "none", quiet.length ? "info" : "ok",
+      quiet.length ? "Retired feature, or tracking that broke? Check the feature is still on a live page." : "");
+    var oc = d.overcount || {};
+    row("Time counted twice", fmtNum(oc.visitor_hours) + " visitor-hours over 60 min of pings; " + fmtMin(oc.excess_minutes) + " extra", (oc.excess_minutes || 0) > 600 ? "flag" : "info", "Two hubs visible side by side both count. Small; subtract it if a hub’s total looks inflated.");
+    var al = d.alias_writes || {}, id = d.identity || {};
+    row("Devices and people", fmtNum(id.visitor_ids) + " device ids, " + fmtNum(id.linked_aliases) + " linked to another; " + fmtNum((al.activity_pings || 0) + (al.personal_answers || 0)) + " writes from a linked id after linking", "info", "“People” everywhere counts devices; real people are fewer.");
+    var cm = (d.choices_missing || []).filter(function(c){ return isHubId(c.hub); }), cmLive = cm.filter(function(c){ return !isArchived(c.hub) && c.no_choices > 0; });
+    row("Answers with no recorded pick", cm.length ? cm.map(function(c){ return esc(hubLabel(c.hub)) + " " + c.no_choices + " of " + c.answered_20; }).join(", ") : "none", cmLive.length ? "flag" : cm.length ? "info" : "ok",
+      cmLive.length ? "On a live hub: check the question type sends <code>choice</code> or <code>picks</code> with its answered event (LESSONS: select-alls sent none until 11-04)." : "Older hubs predate choice tracking.");
+    var sd = d.stats_drift || [];
+    row("Class counters vs personal rows", sd.length ? sd.map(function(s){ return esc(hubLabel(s.hub)) + " " + fmtNum(s.question_stats) + " vs " + fmtNum(s.personal_answers); }).join(", ") : "agree", sd.length ? "flag" : "ok", sd.length ? "One of the two answer RPCs is failing for some calls." : "");
+    var st = d.storage || {}, tables = st.tables || [];
+    function per(name, field){ var t = tables.filter(function(x){ return x.table === name; })[0]; return t && t.rows ? t.mb / t.rows : 0; }
+    var weekly = (st.pings_last_7_days || 0) * per("activity_pings") + (st.answers_last_7_days || 0) * (per("personal_answers") + per("xp_seen"));
+    var weeks = weekly > 0 ? Math.floor((500 - (st.database_mb || 0)) / weekly) : null;
+    var fs = (st.database_mb || 0) > R.dbMb || (weeks != null && weeks < R.dbWeeks);
+    row("Storage", fmtNum(st.database_mb) + " MB of 500; about " + (Math.round(weekly * 10) / 10) + " MB a week lately" + (weeks != null ? " (~" + weeks + " weeks to 500)" : "") +
+      '<span class="sub2">' + tables.slice(0, 4).map(function(t){ return esc(t.table) + " " + t.mb + " MB"; }).join(" · ") + '</span>', fs ? "flag" : "ok",
+      "Retention schedule: <code>vault/reference/analytics-retention.md</code>.");
+    return card("Data quality", "Checks that keep the numbers above honest. What each means: <code>vault/reference/analytics-data-quality.md</code>.",
+      '<div class="tbl-wrap"><table class="data"><thead><tr><th>Check</th><th>Finding</th><th>Status</th><th>What to do</th></tr></thead><tbody>' + rows.join("") + '</tbody></table></div>');
+  }
+
+  function renderInsights(){
+    var el = $('[data-panel="insights"]');
+    if (!insights || insights.pending) return;
+    el.innerHTML = '<p class="note" style="margin:0">Each card pairs a number with the decision it drives: a number past its threshold turns orange and its decision is listed under the card. All time, per hub; “Include archived hubs” adds the archived ones. Thresholds and reasons: <code>vault/reference/insights-dashboard.md</code>.</p>' +
+      insightScorecard() + insightSurfaces() + insightSpacing() + insightFeatures() + insightVoice() + insightQuality();
+  }
+
   function renderAll(){
     renderOverview(); renderTime(); renderQuestions(); renderClicks(); renderEngagement(); renderSurveys(); renderInbox(); updateInboxCount(); renderRecapPanel();
+    renderInsights();
   }
 
   /* ---------- tabs & controls ---------- */
@@ -971,6 +1295,7 @@ table.data tr.group:hover td{background:none;}
     $$(".tabs [role=tab]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.tab === t)); });
     $$(".panel").forEach(function(p){ p.hidden = p.dataset.panel !== t; });
     window.scrollTo(0, 0);
+    if (t === "insights" && secret && !insights) loadInsights();
   }
   $(".tabs").addEventListener("click", function(e){
     var b = e.target.closest("[data-tab]"); if (b) showTab(b.dataset.tab);
@@ -988,7 +1313,7 @@ table.data tr.group:hover td{background:none;}
   $("#showArchived").addEventListener("change", function(e){
     state.archived = e.target.checked; savePrefs(); renderAll();
   });
-  $("#refreshBtn").addEventListener("click", function(){ loadAll(); });
+  $("#refreshBtn").addEventListener("click", function(){ loadAll(); if (state.tab === "insights") loadInsights(); else insights = null; });
   function syncControls(){
     $$("#rangeSeg [data-days]").forEach(function(b){ b.setAttribute("aria-pressed", String(Number(b.dataset.days) === state.days)); });
     $("#showArchived").checked = state.archived;

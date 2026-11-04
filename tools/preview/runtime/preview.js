@@ -277,7 +277,7 @@
     return rows;
   }
 
-  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_hub_recap$)/;
+  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
   function synthAdmin(fn){
     var d = 864e5, t = now();
@@ -290,8 +290,42 @@
           .concat([{ kind: "flag", id: 8801, hub: "occlusion", note: "Fixture report: choice B and C read the same.", resolved: false, created_at: iso(t - d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null },
                    { kind: "suggestion", id: 8802, hub: "dashboard", note: "Fixture suggestion: a dark mode for the arcade.", resolved: false, created_at: iso(t - 2 * d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null }]);
       case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", at: iso(t - d), hidden: false, reports: 1 }];
+      case "get_insights": case "get_insight_retries": case "get_data_quality": return synthInsights(fn, t, d);
       default: return [];
     }
+  }
+  /* the admin page's Insights tab (migration_v49): every number made up, shaped like the real responses; a few cross
+     their thresholds on purpose so the flags and decision lists show, and one hub has too few people to be listed */
+  function synthInsights(fn, t, d){
+    var H = [["special-patient-care", 14, 5, 9], ["pcd-implants-exam1", 58, 2, 3], ["occlusion", 96, -14, 28], ["perio", 88, -34, 52], ["heme-endo-exam1", 72, -5, 20], ["genetics", 3, -60, 70]];
+    function ex(o){ return day(t + o * d); }
+    if (fn === "get_insight_retries") return {
+      by_gap: [["under 10 min", "missed", 900, 790], ["under 10 min", "right", 160, 151], ["10 min to 1 day", "missed", 700, 570], ["10 min to 1 day", "right", 1400, 1316],
+               ["1 to 3 days", "missed", 260, 190], ["1 to 3 days", "right", 900, 830], ["3+ days", "missed", 80, 55], ["3+ days", "right", 300, 272]].map(function(r){ return { gap: r[0], after: r[1], n: r[2], ok: r[3] }; }),
+      by_hub: H.map(function(h, i){ var n = h[1] * 60; return { hub: h[0], first_tries: n, first_ok: Math.round(n * (0.86 - i * 0.02)), retries: h[1] * 25, retries_of_right: Math.round(h[1] * 25 * (0.35 + i * 0.06)),
+        quick_retries_of_missed: h[1] * 3, quick_retries_of_missed_ok: Math.round(h[1] * 2.6), late_retries_of_missed: h[1], late_retries_of_missed_ok: Math.round(h[1] * 0.72) }; }) };
+    if (fn === "get_data_quality") return {
+      generated_at: iso(t), last_write: { activity_pings: iso(t - 3e5), personal_answers: iso(t - 6e5), ui_clicks: iso(t - 4e5), feature_events: iso(t - 9e5), search_terms: iso(t - 9 * d), exam_debriefs: iso(t - 5 * d), mock_scores: iso(t - d), question_flags: iso(t - 2 * d), survey_responses: iso(t - 20 * d) },
+      test_rows: { activity_hourly: 12, feature_events: 0, personal_answers: 4, ui_clicks: 0 },
+      unmapped_sections: [{ hub: "occlusion", section: "compendium/new-view", pings: 40, last_day: ex(-2) }],
+      event_families: [{ family: "pod", kinds: 6, people: 30, first_day: ex(-15), last_day: ex(0) }, { family: "sample-new", kinds: 2, people: 8, first_day: ex(-3), last_day: ex(0) }, { family: "old-thing", kinds: 1, people: 6, first_day: ex(-40), last_day: ex(-20) }],
+      overcount: { visitor_hours: 14, excess_minutes: 95 }, alias_writes: { activity_pings: 120, personal_answers: 40 }, identity: { visitor_ids: 410, linked_aliases: 22 },
+      choices_missing: [{ hub: "heme-endo-exam1", no_choices: 3, answered_20: 140 }], stats_drift: [],
+      storage: { database_mb: 210, pings_last_7_days: 52000, answers_last_7_days: 21000, tables: [{ table: "activity_pings", mb: 120, rows: 300000 }, { table: "personal_answers", mb: 30, rows: 130000 }, { table: "xp_seen", mb: 18, rows: 120000 }, { table: "ui_click_reach", mb: 9, rows: 40000 }] } };
+    var hubs = H.map(function(h, i){ var p = h[1]; return { hub: h[0], exam: ex(h[2]), first_day: ex(Math.min(h[2], 0) - h[3]), last_day: ex(Math.min(0, h[2])), people: p, answerers: Math.round(p * (i ? 0.66 + i * 0.03 : 0.4)),
+      answered_50: Math.round(p * 0.4), one_day: Math.round(p * 0.35), three_days: Math.round(p * (0.22 + i * 0.05)), under_5: Math.round(p * (i ? 0.18 + (i % 2) * 0.16 : 0.45)), median_mins: 25 + i * 15, p90_mins: 180 + i * 60, total_mins: p * (40 + i * 15),
+      median_answers: 18 + i * 12, questions_seen: 300, attempts: p * 60, correct: p * 48, last3_pct: h[2] <= 0 ? 60 + i * 5 : null, mocks: Math.round(p * 0.3), mock_people: Math.round(p * 0.2), mock_avg_pct: 70 + i }; });
+    var SF = [["notes", 0.38, 0.9], ["bank", 0.3, 0.75], ["home", 0.08, 0.95], ["mock", 0.06, 0.3], ["hints", 0.05, 0.35], ["cram", 0.05, 0.3], ["drill", 0.03, 0.12], ["podcast", 0.02, 0.1], ["arcade", 0.03, 0.12]], surfaces = [];
+    hubs.forEach(function(h){ SF.forEach(function(f){ surfaces.push({ hub: h.hub, surface: f[0], mins: Math.round(h.total_mins * f[1]), people: Math.round(h.people * f[2]) }); }); });
+    return { generated_at: iso(t), hubs: hubs, surfaces: surfaces,
+      features: [{ hub: "dashboard", since: ex(-15), viewers: 120 }].concat(hubs.slice(0, 5)).map(function(h, i){ var v = h.viewers || h.people; return { hub: h.hub, since: ex(-15), viewers: v,
+        tour_prompted: Math.round(v * 0.8), tour_started: Math.round(v * 0.1), tour_done: Math.round(v * 0.07), tour_declined: Math.round(v * 0.5), pod_play: i === 2 ? 20 : 0, pod_half: i === 2 ? 11 : 0, pod_end: i === 2 ? 6 : 0,
+        listen_people: i ? 4 : 0, listen_mins: i ? 30 : 0, fig_seen: i ? Math.round(v * 0.6) : 0, fig_used: i ? Math.round(v * 0.4) : 0, highlighters: i ? Math.round(v * 0.1) : 0, pinners: i ? Math.round(v * 0.08) : 0,
+        find_in_notes: i ? Math.round(v * 0.15) : 0, mind_maps: i ? 3 : 0, settings_people: Math.round(v * 0.9), pet_off: Math.round(v * 0.1), fx_off: Math.round(v * 0.02), eggs_off: 0 }; }),
+      voice: [{ hub: "occlusion", reports: 30, open: 2, replied: 26, median_hours_to_resolve: 9, last_report: ex(-1) }, { hub: "perio", reports: 18, open: 0, replied: 18, median_hours_to_resolve: 14, last_report: ex(-6) }, { hub: null, reports: 7, open: 1, replied: 5, median_hours_to_resolve: 30, last_report: ex(-3) }],
+      checkins: [{ hub: "occlusion", exam: ex(-14), people: 12, hub_people: 96, their_median_mins: 190, hub_median_mins: 55, avg_ready: 3.6, match: { "About right": 8, "Easier": 3, "Harder": 1 } },
+                 { hub: "perio", exam: ex(-34), people: 22, hub_people: 88, their_median_mins: 120, hub_median_mins: 70, avg_ready: 3.9, match: { "About right": 15, "Harder": 7 } }],
+      surveys: { responses: 60, declined: 25 } };
   }
   function rpc(fn, a){
     a = a || {};
