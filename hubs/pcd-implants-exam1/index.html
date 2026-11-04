@@ -5593,9 +5593,11 @@ function renderHome(){
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="notes:' + cont.id + '"><span class="qs-ic">' + icon('notes') + '</span><span><b>Lecture notes</b><small>' + lecLabel(cont) + ' ' + escHtml(cont.title.split(':')[0]) + '</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="mock"><span class="qs-ic">' + icon('clock') + '</span><span><b>Mock exam</b><small>40 questions, 60 minutes</small></span></button></div>';
+  /* the Timmy Time episode card (widget/podcast.js fills it in, and refills it whenever Home redraws) */
+  h += '<div data-sh-podcast></div>';
   h += examCardHTML();
   h += '<div class="home-grid"><div class="home-col">' + homeNextHTML(rows) + homeLecturesHTML(rows) + '</div><div class="home-col">' + homeTimelineHTML() + homeDaysHTML() +
-    '<div class="home-card"><h3>' + icon('review') + 'Also here</h3><ul class="home-links"><li><button type="button" class="linkbtn" data-home="hints">Exam hints</button>: the course\'s hint list, answered, and what the professors said to know</li><li><button type="button" class="linkbtn" data-home="cram">Cram sheet</button>: every lecture on one page</li><li><button type="button" class="linkbtn" data-home="review">Review tables</button>: the numbers, tooth vs implant, look-alikes, and the figures</li><li><button type="button" class="linkbtn" data-home="arcade">Arcade</button>: six games on the same material</li></ul></div></div></div>';
+    '<div class="home-card"><h3>' + icon('review') + 'Also here</h3><ul class="home-links"><li><button type="button" class="linkbtn" data-home="hints">Exam hints</button>: the course\'s hint list, answered, and what the professors said to know</li><li><button type="button" class="linkbtn" data-home="cram">Cram sheet</button>: every lecture on one page</li><li><button type="button" class="linkbtn" data-home="review">Review tables</button>: the numbers, tooth vs implant, look-alikes, and the figures</li><li><button type="button" class="linkbtn" data-home="arcade">Arcade</button>: six games on the same material</li><li><button type="button" class="linkbtn" data-sh-podcast-open>Timmy Time</button>: the last-minute audio review, all nine lectures</li></ul></div></div></div>';
   p.innerHTML = h;
   var ec = document.getElementById('examCard');
   if(ec) ec.addEventListener('toggle', function(){ STATE.ui.examCard = ec.open ? 'open' : 'closed'; saveState(); });
@@ -6653,6 +6655,7 @@ function boot(){
   document.querySelectorAll('#modeSwitch [data-mode]').forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
   renderHeaderStats();
   var m = STATE.ui.mode; if(['home','compendium','review','arcade'].indexOf(m) === -1) m = 'home';
+  if(location.hash === '#timmy') m = 'home'; /* the dashboard's Timmy Time link: the episode card is on Home */
   setMode(m);
 }
 /* Section label for the shared widget's per-section time tracking (adds the arcade game). */
@@ -6738,6 +6741,34 @@ window.SH_DRILL = {
     return QUESTIONS.map(function(q){ var s = STATE.seen[q.id]; return { id:q.id, lec:q.lec, last: s ? !!s.last : null, hy: DRILL_HY[q.src] || '' }; });
   },
   render: function(el, qid){ var q = QUESTIONS_BY_ID[qid]; if(!q) return false; el.innerHTML = qCardHTML(q, { ctx:'drill' }); wireQuestionContainer(el); return true; }
+};
+
+/* Timmy Time (widget/podcast.js): the episode, its chapters and its lore comments (vault/rules/podcast-reactions.md).
+   Script and build: tools/podcast/pcd-implants-exam1/script.md. A notes change means fixing the script and rebuilding the mp3. */
+window.SH_PODCAST = {
+  id:'exam1-review', show:'Timmy Time', title:'PCD Implants Exam 1: the last-minute review', src:'audio/timmy-time.mp3', duration:2884,
+  blurb:'48 min with Timmy Tooth: all nine lectures, every item on the hint list, what the professors said to know, and a lightning round to finish.',
+  chapters:[
+    { t:0, title:'Cold open' },
+    { t:91.86, title:'The seven types of implants' },
+    { t:285.39, title:'Osseointegration and titanium' },
+    { t:564.18, title:'An implant is not a tooth' },
+    { t:769.57, title:'Biomechanics' },
+    { t:1038.6, title:'The vocabulary of implants' },
+    { t:1270.84, title:'Where it goes, and what goes on it' },
+    { t:1542.23, title:'Prefabricated abutments' },
+    { t:1726.15, title:'Imaging for implants' },
+    { t:1935.05, title:'Cone beam basic science' },
+    { t:2190.95, title:'Implant surgery' },
+    { t:2421.69, title:'Guided surgery' },
+    { t:2563.83, title:'Lightning round' },
+    { t:2808.23, title:'Sign-off' }
+  ],
+  fans:[
+    { who:'Number thirty-one', tag:'Timmy\'s neighbor', text:'Listened through the wall again. For the record, I am not failing. I tapped myself with a spoon twelve times: zero percussion pain. Also, the turkey costume is still a cry for help.' },
+    { who:'The rabbit down the hill', tag:'Timmy\'s world', text:'"Showy"? My teeth keep growing because I chew hay all day, not to impress anybody. And osseointegration was found in rabbit bone, so, implants: you\'re welcome.' },
+    { who:'The toothbrush by the door', tag:'Timmy\'s world', text:'A whole episode on implants and not one mention of me. Implants get peri-implant disease too if nobody cleans them. Just saying.' }
+  ]
 };
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */

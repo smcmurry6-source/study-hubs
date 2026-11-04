@@ -21,7 +21,15 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 - **Number thirty-one**, the second molar who lives right behind him, is his neighbor (Heme & Endo Exam 1). A hypochondriac
   who listens to the lectures through the wall and believes he has every disease in them: asked whether his jaw looks
   heavy after hearing about acromegaly ("You don't have a jaw. You live in one."), wore a tiny scarf for cold intolerance,
-  and decided he only has the diseases on Exam Two.
+  and decided he only has the diseases on Exam Two. After the implant lectures (PCD Implants Exam 1) he decided he was a
+  failing implant: tapped himself with a spoon for percussion pain, asked whether he looked radiolucent ("You were never
+  osseointegrated. You have a ligament."), then took a periapical of himself: "Very nice crest." He thinks the turkey
+  costume is a cry for help.
+- **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
+  teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
+  osseointegration was found in rabbit bone (Brånemark, 1952).
+- **The toothbrush by the front door** (canon since Occlusion) talks now, in the comments: feels left out of every episode,
+  and reminds everyone that implants need cleaning too.
 
 ## Costumes
 
@@ -30,6 +38,8 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   **He can't pick one, so he wears the next one each time a page loads** (true in the widget). He never reveals a single
   costume as "the one", because students see different ones.
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
+- Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
+  feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
 
 ## TIMMY, the other one
 
@@ -43,12 +53,21 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 
 - Enamel has no cells, so PTH can't take calcium from him: "The bank is bone. Nobody's home to make a withdrawal." And
   nobody can rebuild it, "That's why I floss." (Heme & Endo Exam 1). Keep self-facts true: check them like any content.
+- **He is proud of his periodontal ligament** (PCD Implants Exam 1): a tooth gives twenty-five to a hundred microns when you
+  bite, an implant three to five, and the ligament is how he feels a twenty-five micron hair. "An implant is a very
+  impressive piece of titanium, and it feels nothing. So please, don't tie me to one."
+- Rabbits are "a little showy" for teeth that never stop growing: "Some of us got one set of roots and made it work."
+
+## Who comments
+
+Every episode's card carries 1-3 comments from these characters (`SH_PODCAST.fans`, [rule](../../vault/rules/podcast-reactions.md)):
+number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a new one here before using them.
 
 ## How he talks
 
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
-  negative").
+  negative"; PCD Implants: "torque responsibly").
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -61,3 +80,4 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 | `msk-exam4` | `msk-exam4/script.md` | 42 min | Small tooth, big voice; "I have one job"; they grind |
 | `occlusion` | `occlusion/script.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week |
 | `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
+| `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |

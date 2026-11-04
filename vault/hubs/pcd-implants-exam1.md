@@ -23,6 +23,11 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
 - **Figures:** eleven anima figures from `tools/figures/pcd-implants-exam1/` (one generic live controller, `amLive`, in
   `shared.mjs`); edit them there and rerun `build.mjs` (`--check`, `--preview`).
 - **Arcade:** the Osseo Arcade, skin `IMPL_SKIN`.
+- **Timmy Time:** an episode (`hubs/pcd-implants-exam1/audio/timmy-time.mp3`, script `tools/podcast/pcd-implants-exam1/script.md`),
+  card on Home under the quick-start row, `#timmy` opens Home. `SH_PODCAST.fans` holds its three lore comments
+  ([podcast-reactions](../rules/podcast-reactions.md)). **A notes change means fixing the script and rebuilding the episode**
+  ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). The script keeps CDT codes, clinic credits and
+  brand details with no exam signal out, like the bank.
 - **Brand and admin details** (Sam, 2026-11-03, reports #35/#36): keep a system's details only with an exam signal
   (a hint, a focus list, "on my exam", an example question). Kept: each system's surface, alloy and torques, conical vs
   non-conical, `pf-systems`.

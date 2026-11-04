@@ -327,9 +327,10 @@ table.data tr.group:hover td{background:none;}
       rpc("get_exam_debriefs", { p_secret: secret }),
       rpc("get_search_terms", { p_secret: secret, p_days: d }),
       rpc("get_nuke_unlocks", { p_secret: secret, p_days: d }),
-      rpc("get_feature_events", { p_secret: secret, p_days: d })
+      rpc("get_feature_events", { p_secret: secret, p_days: d }),
+      rpc("admin_pod_comments", { p_secret: secret, p_days: 60 })
     ]).then(function(r){
-      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15], features: r[16] };
+      data = { summary: r[0], byHub: r[1], bySection: r[2], qstats: r[3], modes: r[4], streaks: r[5], nukeSum: r[6], nukeHub: r[7], nukeRecent: r[8], reports: r[9], choices: r[10], clicks: r[11], surveys: r[12], debriefs: r[13], searches: r[14], nukeUnlocks: r[15], features: r[16], podComments: r[17] };
       renderAll();
     });
   }
@@ -826,7 +827,24 @@ table.data tr.group:hover td{background:none;}
     }).join("") : '<div class="empty">' + (showResolvedReports ? 'Nothing here yet.' : 'All clear — nothing open.') + '</div>';
     var open = all.filter(function(r){ return !r.resolved; }).length;
     el.innerHTML = card("Flags & suggestions", open + " open · " + all.length + " total", list,
-      '<label class="switch"><input type="checkbox" id="showResolved"' + (showResolvedReports ? ' checked' : '') + '> Show resolved</label>');
+      '<label class="switch"><input type="checkbox" id="showResolved"' + (showResolvedReports ? ' checked' : '') + '> Show resolved</label>') + podCommentsCard();
+  }
+  /* Timmy Time comments (widget/podcast.js, migration_v47): they post at once; three reports hide one; hide or restore any here */
+  function podCommentsCard(){
+    var pc = data.podComments || {};
+    if (pc.error) return card("Podcast comments", "", '<div class="err">Couldn’t load podcast comments (is migration_v47 applied?).</div>');
+    var rows = pc.data || [];
+    var body = rows.length ? rows.map(function(c){
+      var state = c.hidden ? (c.hidden_by === "self" ? "Deleted by its author" : c.hidden_by === "reports" ? "Hidden by reports" : "Hidden by you") : "Showing";
+      return '<div class="report' + (c.hidden ? ' is-resolved' : '') + '" data-pod-id="' + esc(c.id) + '">' +
+        '<div class="report-main"><div class="report-top"><span class="pill">' + esc(hubLabel(c.hub)) + '</span><span class="pill">' + esc(c.name) + '</span>' +
+        (Number(c.reports) ? '<span class="pill flag">' + esc(c.reports) + (Number(c.reports) === 1 ? ' report' : ' reports') + '</span>' : '') +
+        '<span class="report-date">' + fmtDate(c.created_at) + '</span></div>' +
+        '<div class="report-note">' + esc(c.body) + '</div><div class="report-sent">' + esc(state) + '</div></div>' +
+        (c.hidden_by === "self" ? '' : '<button class="resolve-btn pod-hide-btn' + (c.hidden ? ' is-done' : '') + '" type="button" data-hidden="' + (c.hidden ? '1' : '0') + '">' + (c.hidden ? 'Hidden · restore' : 'Hide') + '</button>') +
+      '</div>';
+    }).join("") : '<div class="empty">No comments on any episode yet.</div>';
+    return card("Podcast comments", rows.filter(function(c){ return !c.hidden; }).length + " showing · " + rows.length + " in the last 60 days", body);
   }
   function updateInboxCount(){
     var n = data.reports && !data.reports.error ? openReports().length : 0;
@@ -992,6 +1010,18 @@ table.data tr.group:hover td{background:none;}
     }
   });
   $('[data-panel="inbox"]').addEventListener("click", function(e){
+    var pb = e.target.closest(".pod-hide-btn");
+    if (pb) {
+      var pid = Number(pb.closest("[data-pod-id]").getAttribute("data-pod-id")), hide = pb.getAttribute("data-hidden") !== "1";
+      pb.disabled = true;
+      supabase.rpc("admin_hide_pod_comment", { p_secret: secret, p_id: pid, p_hidden: hide }).then(function(res){
+        if (res && !res.error) {
+          (data.podComments.data || []).forEach(function(c){ if (c.id === pid) { c.hidden = hide; c.hidden_by = hide ? "admin" : null; } });
+          renderInbox();
+        } else pb.disabled = false;
+      }, function(){ pb.disabled = false; });
+      return;
+    }
     var btn = e.target.closest(".resolve-btn"); if (!btn) return;
     var cardEl = btn.closest(".report");
     var kind = cardEl.getAttribute("data-kind");
