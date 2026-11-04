@@ -755,8 +755,9 @@
      fills it in -- there was no code anywhere that fetched it). Two-part
      API so each hub keeps its own card markup/classnames:
 
-     - window.shGetClassStats(qids, cb) -- low-level: cb receives a
-       {qid: {total, correct}} map. Calls made within a short window all
+     - window.shGetClassStats(qids, cb, withChoices) -- low-level: cb receives a
+       {qid: {total, correct}} map (plus choices: {authored index: picks}
+       with withChoices). Calls made within a short window all
        get coalesced into one get_question_class_stats RPC instead of one
        round trip per question.
      - window.shWireClassStats(cardSelector) -- high-level: pass the CSS
@@ -767,28 +768,128 @@
        bank, search results, wherever) -- and fills each in. ---------- */
   var classStatsPending = [];
   var classStatsCallbacks = [];
+  var classChoicesPending = [];
   var classStatsTimer = null;
+  function uniq(a){ return a.filter(function(v, i){ return a.indexOf(v) === i; }); }
+  /* a Supabase query as a promise that never rejects (null on failure) */
+  function settle(q){ return new Promise(function(res){ try { q.then(res, function(){ res(null); }); } catch (e) { res(null); } }); }
   function flushClassStats(){
-    var qids = classStatsPending, cbs = classStatsCallbacks;
-    classStatsPending = []; classStatsCallbacks = [];
-    var unique = qids.filter(function(v, i, a){ return a.indexOf(v) === i; });
+    var qids = classStatsPending, cbs = classStatsCallbacks, want = uniq(classChoicesPending);
+    classStatsPending = []; classStatsCallbacks = []; classChoicesPending = [];
+    var unique = uniq(qids);
     if (!supabase || !unique.length) { cbs.forEach(function(cb){ cb({}); }); return; }
     /* question_stats(hub,qid,attempts,correct) already exists and is already
        read anonymously elsewhere (the "Toughest questions" panel above) --
        reuse it rather than adding a new table/RPC for the same data. */
-    supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).in("qid", unique).then(function(res){
-      var byQid = {};
-      ((res && res.data) || []).forEach(function(r){ byQid[r.qid] = { total: r.attempts, correct: r.correct }; });
-      cbs.forEach(function(cb){ cb(byQid); });
-    }, function(){ cbs.forEach(function(cb){ cb({}); }); });
+    var jobs = [settle(supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).in("qid", unique))];
+    /* per-choice picks (question_choices, by authored index) only for the cards that show them; 100 questions per
+       request keeps each answer under the API's 1000-row cap */
+    for (var i = 0; i < want.length; i += 100) jobs.push(settle(supabase.from("question_choices").select("qid,choice,picks").eq("hub", HUB).in("qid", want.slice(i, i + 100))));
+    Promise.all(jobs).then(function(all){
+      var byQid = {}, res = all[0];
+      if (res && !res.error) (res.data || []).forEach(function(r){ byQid[r.qid] = { total: r.attempts, correct: r.correct }; });
+      var choicesOk = all.slice(1).every(function(r){ return r && !r.error; });
+      if (choicesOk) want.forEach(function(q){ (byQid[q] = byQid[q] || { total: 0, correct: 0 }).choices = {}; });
+      all.slice(1).forEach(function(r){
+        ((r && r.data) || []).forEach(function(c){ var b = byQid[c.qid]; if (b && b.choices) b.choices[c.choice] = c.picks; });
+      });
+      cbs.forEach(function(cb){ try { cb(byQid); } catch (e) {} });
+    });
   }
-  window.shGetClassStats = function(qids, cb){
+  /* withChoices: also fetch how often each choice was picked, as byQid[qid].choices = {authored index: picks} */
+  window.shGetClassStats = function(qids, cb, withChoices){
     if (!qids || !qids.length || typeof cb !== "function") return;
     classStatsPending = classStatsPending.concat(qids);
+    if (withChoices) classChoicesPending = classChoicesPending.concat(qids);
     classStatsCallbacks.push(cb);
     clearTimeout(classStatsTimer);
     classStatsTimer = setTimeout(flushClassStats, 150);
   };
+  /* ---------- class picks on each choice (Sam, 2026-11-04): once a question card is answered, every choice shows the
+     share of the class that picked it, as a percentage and a light fill behind the choice, so the most common picks
+     (and the most common wrong answer) stand out. Reads question_choices (record_choice / record_choices, by authored
+     index) through shGetClassStats(..., true), so hubs need no changes: their choice buttons already carry the
+     authored index in one of CP_ATTRS.
+     - A card drawn unanswered fetches the counts as it renders; when it's answered (the hub's answered event, sent
+       with the pick) your own pick is added locally, so the numbers include you without racing record_choice.
+     - A card drawn already answered (mock exam results) waits a moment so the picks just sent are counted, then uses
+       the server's numbers as they are.
+     - Multiple choice: picks of a choice / all picks. Select-all: how often a choice was ticked / answers to the
+       question (question_stats.attempts, never below the most-ticked choice).
+     - Shown from 2 answers (you and one other); the note under the explanation gives the count. ---------- */
+  var CP_ATTRS = ["data-idx", "data-multi-idx", "data-mock-pick", "data-mock-multi", "data-exam-choice"];
+  var CP_MIN = 2;
+  function cpIdx(b){
+    for (var i = 0; i < CP_ATTRS.length; i++) { var v = b.getAttribute(CP_ATTRS[i]); if (v !== null && v !== "" && !isNaN(+v)) return +v; }
+    return null;
+  }
+  function cpButtons(card){ return Array.prototype.filter.call(card.querySelectorAll(".qcard-choice"), function(b){ return cpIdx(b) !== null; }); }
+  function cpIsMulti(card, btns){
+    if (card.getAttribute("data-qtype") === "multi") return true;
+    return btns.some(function(b){ return b.hasAttribute("data-multi-idx") || b.hasAttribute("data-mock-multi"); });
+  }
+  /* the card shows its answer: the hub has marked a choice right or wrong (perio marks data-state) */
+  function cpRevealed(card){
+    return card.classList.contains("is-answered") ||
+      !!card.querySelector(".qcard-choice.is-correct, .qcard-choice.is-wrong, .qcard-choice.is-missed-right, .qcard-choice[data-state]");
+  }
+  function cpPaint(card){
+    var s = card.__shCp;
+    if (!s || s.done || !s.r || !card.isConnected) return;
+    var btns = cpButtons(card);
+    if (!btns.length || !s.r.choices) return;
+    s.done = true;
+    var multi = cpIsMulti(card, btns), own = s.late ? [] : (s.own || []), counts = {}, sum = 0, max = 0;
+    btns.forEach(function(b){ var i = cpIdx(b); counts[i] = +s.r.choices[i] || 0; });
+    own.forEach(function(i){ if (i in counts) counts[i]++; });
+    Object.keys(counts).forEach(function(k){ sum += counts[k]; if (counts[k] > max) max = counts[k]; });
+    var total = multi ? Math.max((+s.r.total || 0) + (own.length ? 1 : 0), max) : sum;
+    if (total < CP_MIN) return;
+    var still = (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || extraPref("sh_pref_fx") === "off";
+    btns.forEach(function(b){
+      var c = counts[cpIdx(b)], p = Math.round(100 * c / total);
+      b.classList.add("sh-cp");
+      if (c === max && c > 0) b.classList.add("sh-cp-top");
+      /* inline, so it layers over whatever background the hub gives a right / wrong / selected choice */
+      b.style.backgroundImage = "linear-gradient(var(--sh-cp-fill), var(--sh-cp-fill))";
+      b.style.backgroundRepeat = "no-repeat";
+      b.style.backgroundPosition = "0 0";
+      b.style.backgroundSize = (still ? p : 0) + "% 100%";
+      var lab = document.createElement("span");
+      lab.className = "sh-cp-pct";
+      lab.innerHTML = '<span class="sh-cp-sr">, picked by </span>' + p + '%<span class="sh-cp-sr"> of the class</span>';
+      b.appendChild(lab);
+      if (!still) requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        b.style.transition = "background-size .7s cubic-bezier(.22,.8,.3,1)";
+        b.style.backgroundSize = p + "% 100%";
+      }); });
+    });
+    var row = card.querySelector(".qcard-classdata-row") || card.querySelector('[data-role="explain"]');
+    if (row && !row.querySelector(".sh-cp-note")) {
+      var note = document.createElement("div");
+      note.className = "sh-cp-note";
+      note.textContent = "The % on each choice is how often the class " + (multi ? "ticked" : "picked") + " it (" + total + " answer" + (total === 1 ? "" : "s") + (own.length ? ", yours included" : "") + ").";
+      row.appendChild(note);
+    }
+  }
+  function extraPref(k){ try { return localStorage.getItem(k) || "on"; } catch (e) { return "on"; } }
+  /* the hub's answered event carries the pick: find the card it came from (answered, not painted yet) and paint it */
+  document.addEventListener(ANSWERED_EVENT, function(e){
+    var d = (e && e.detail) || {}, qid = String(d.qid || "");
+    if (!qid) return;
+    var own = typeof d.choice === "number" ? [d.choice] : Array.isArray(d.picks) ? d.picks.filter(function(x){ return typeof x === "number"; }) : [];
+    setTimeout(function(){
+      var sel = '.qcard[data-qid="' + (window.CSS && CSS.escape ? CSS.escape(qid) : qid.replace(/"/g, '\\"')) + '"]';
+      try {
+        document.querySelectorAll(sel).forEach(function(card){
+          var s = card.__shCp;
+          if (!s || s.late || s.own || !cpRevealed(card)) return;
+          s.own = own;
+          cpPaint(card);
+        });
+      } catch (err) {}
+    }, 0);
+  });
   /* a small Report button on every question card; it opens the flag panel already
      tagged with that question's id, so reports arrive with context */
   var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
@@ -877,18 +978,30 @@
     function handleCard(card){
       addFlagButton(card);
       var qid = card.getAttribute("data-qid");
+      if (!qid) return;
       var el = card.querySelector('[data-role="classdata-result"]');
-      if (!qid || !el || el.__shClassDataWired) return;
-      el.__shClassDataWired = true;
-      window.shGetClassStats([qid], function(byQid){
-        var r = byQid[qid];
-        if (!r || !r.total) { el.textContent = "Not enough class data yet"; return; }
-        var pct = Math.round((r.correct / r.total) * 100);
-        el.textContent = pct + "% of the class got this right (n=" + r.total + ")";
-        el.classList.remove("is-ok", "is-bad");
-        if (pct >= 70) el.classList.add("is-ok");
-        else if (pct < 50) el.classList.add("is-bad");
-      });
+      var wantText = !!(el && !el.__shClassDataWired);
+      /* class picks on each choice (above): cards with choice buttons, once per card element */
+      var wantPicks = !card.__shCp && cpButtons(card).length > 0;
+      if (!wantText && !wantPicks) return;
+      if (wantText) el.__shClassDataWired = true;
+      var late = wantPicks && cpRevealed(card);
+      if (wantPicks) card.__shCp = { late: late, r: null, own: null, done: false };
+      function load(){
+        window.shGetClassStats([qid], function(byQid){
+          var r = byQid[qid];
+          if (wantPicks) { card.__shCp.r = r || { total: 0, correct: 0 }; if (late || card.__shCp.own) cpPaint(card); }
+          if (!wantText) return;
+          if (!r || !r.total) { el.textContent = "Not enough class data yet"; return; }
+          var pct = Math.round((r.correct / r.total) * 100);
+          el.textContent = pct + "% of the class got this right (n=" + r.total + ")";
+          el.classList.remove("is-ok", "is-bad");
+          if (pct >= 70) el.classList.add("is-ok");
+          else if (pct < 50) el.classList.add("is-bad");
+        }, wantPicks);
+      }
+      /* drawn already answered (mock results right after Submit): give the picks just sent a moment to land */
+      if (late) setTimeout(load, 1200); else load();
     }
     try {
       document.querySelectorAll(cardSelector).forEach(handleCard);

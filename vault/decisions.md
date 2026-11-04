@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-04 | After answering, every choice shows the % of the class that picked it (shared widget, `question_choices`) | every hub | chat, change log |
 | 2026-11-04 | `/reddit-scout`'s first run: build "Find this in the notes" (shipped in the widget) and the Supabase fix; skip a CI check for narration drift, don't re-propose it | widget, `/reddit-scout` | chat, `tools/reddit-scout/log.md` |
 | 2026-11-04 | Timmy Time comments open folded: only the first comment shows, with a button to show the rest | every episode | chat, [rule](rules/podcast-reactions.md) |
 | 2026-11-04 | PCD Implants: Home's "Where to next" points to the lectures you've practiced least (under half tried, up to four, fewest first) and opens the bank on their unanswered questions; approved from the lessons audit | pcd-implants-exam1 | chat, PR #222 |
