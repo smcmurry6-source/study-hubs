@@ -15,14 +15,16 @@ description: >-
 
 # tasteskill v2
 
-> **In study-hubs, the house rules come first** (`AGENTS.md`, every note in `vault/rules/`, `vault/decisions.md`). They
-> override this skill where the two differ. The hubs use monospace accents, gradients, L1/L2 lecture labels and more than
-> two typefaces on purpose, so **never restyle a live hub, the dashboard or the About page to this skill's house rules
-> without Sam's say-so**: use it as advice for new pages, or to review a page when Sam asks. Hubs are single files: copy
-> what you need into the page (nothing loads from `.claude/` at runtime), add no build step or dependency, and put a
-> student-visible change on the About page. Run the scripts from a scratch folder, not the repo root, or keep
-> `.taste-skill/` out of commits (it's gitignored). A found picture still has to fit the public repo (credited, never
-> course material). This box is a local addition (see `UPSTREAM.md`): keep it when updating.
+> **In study-hubs** (Sam's call, 2026-11-04, `vault/decisions.md`): **when Sam asks to redesign, restyle or review a hub,
+> the dashboard or any page, use this skill in full**: the whole run, its house rules and its gates. Where its rules differ
+> from a hub's current look (monospace accents, gradients, the label style), the skill wins. Without that ask, don't
+> restyle a live page on your own. A redesign changes how things look, not what's there: the vault's rules on content and
+> features still hold (`AGENTS.md`, `vault/rules/`): every mode and required feature (Home, the Question Bank panel, the
+> arcade's own skin), the About page entry, narration that matches the notes. Hubs are single files: copy what you need
+> from `assets/` into the page (nothing loads from `.claude/` at runtime). Run the scripts from the repo root (their
+> `.taste-skill/` folder is gitignored); in a cloud session, which runs as root, start `inspect.mjs` and `scenes.mjs` as
+> `CHROME_PATH=tools/chrome-no-sandbox.sh node .claude/skills/taste-skill/scripts/inspect.mjs ...`. This box is a local
+> addition (see `UPSTREAM.md`): keep it when updating.
 
 A page built by a model usually looks like the average of every page the model has seen: a centred
 headline over three lines, a little label above it, a row of icon cards, a soft gradient, a few thin

@@ -8,8 +8,8 @@ Kept: everything in upstream's `skills/taste-skill/` (`SKILL.md`, `README.md`, `
 `assets/`, `evals/`), plus the repo's `LICENSE` and `CHANGELOG.md`. Left out: the repo's own README, wordmarks,
 sponsor logos and example screenshots (`assets/`, `examples/`), the plugin manifests (`.claude-plugin/`,
 `.codex-plugin/`, `.agents/`), `install.sh` (it symlinks into `~/.claude/skills`), CI and `tests/`.
-One local edit: the box at the top of `SKILL.md` saying the repo's house rules (`vault/rules/`) come first, as
-`anima`'s has. Keep it when updating.
+One local edit: the box at the top of `SKILL.md` (Sam's call, 2026-11-04): when Sam asks for a redesign, the skill is
+used in full, its house rules included; the vault's content and feature rules still hold. Keep it when updating.
 
 Upstream's `SKILL.md` mentions `library/scenes.json` and `assets/scenes/demo/`, which aren't in this commit;
 `draw.mjs` checks for the file and deals no scroll scenes without it.
@@ -21,11 +21,12 @@ Running it here:
 - `assets.mjs` searches Openverse, Wikimedia Commons, the Art Institute of Chicago, the Met, the Internet Archive and
   NASA; the environment's network policy has to allow those hosts.
 - `inspect.mjs` / `scenes.mjs` launch Chrome (`CHROME_PATH`, else the usual install paths). As root, Chromium needs
-  `--no-sandbox`: point `CHROME_PATH` at a wrapper around `/opt/pw-browsers/chromium`, as for anima.
+  `--no-sandbox`, which they can't pass themselves: run them with `CHROME_PATH=tools/chrome-no-sandbox.sh` (a wrapper
+  around `/opt/pw-browsers/chromium`; `CHROME_BIN` overrides it).
 
 Its house rules (no monospace outside code, no eyebrow labels, no gradients, no index numbering, no thin rules, two
-typefaces at most) are upstream's taste, not this repo's: the hubs use monospace accents, L1/L2 lecture labels and
-gradients today. Treat them as advice for new pages, not as a reason to restyle a live hub without Sam's say-so.
+typefaces at most) differ from the hubs' current look (monospace accents, L1/L2 lecture labels, gradients). In a
+redesign Sam asks for, the skill's rules win; without one, sessions don't restyle a live page on their own.
 
 To update: `git clone https://github.com/Leonxlnx/taste-skill`, read the new `SKILL.md` and diff the scripts, then copy
 `skills/taste-skill/*`, `LICENSE` and `CHANGELOG.md` over these, put the local box back at the top of `SKILL.md`, and
