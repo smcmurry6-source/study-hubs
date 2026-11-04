@@ -22,13 +22,14 @@ function bopDraw(D, sel, g) {
     o += '<text class="bp-t" x="' + (x + bw / 2) + '" y="' + (base + 18) + '" text-anchor="middle">' + b.v + "</text></g>";
   });
   o += '<path class="bp-axis" d="M' + x0 + " " + base + "H520" + '"/><text class="bp-t bp-ax" x="295" y="' + (base + 40) + '" text-anchor="middle">visits with bleeding on probing (of 4)</text>';
-  o += '<text class="bp-t bp-ax" x="' + x0 + '" y="22">chance of attachment loss</text>';
+  o += '<text class="bp-t bp-ax" x="' + x0 + '" y="22">chance of losing 2 mm or more of attachment</text>';
   return o;
 }
-const svg = figureSvg({ width: W, height: H, className: "bp-svg", label: "Bar chart: chance of attachment loss by visits with bleeding on probing, 30% at 4 of 4, 14% at 3, 6% at 2, 3% at 1, 1.5% at none.", body: '<g class="bp-dyn">' + bopDraw(D, 0, 1) + "</g>" });
+const svg = figureSvg({ width: W, height: H, className: "bp-svg", label: "Bar chart: chance of losing 2 mm or more of attachment by visits with bleeding on probing, 30% at 4 of 4, 14% at 3, 6% at 2, 3% at 1, 1.5% at none.", body: '<g class="bp-dyn">' + bopDraw(D, 0, 1) + "</g>" });
 const plate = plateHtml({ fig: "S7 · Fig 3", title: "Bleeding on probing over four visits", hint: "tap a bar", readout: "4 of 4 · 30%", body: `<div class="am-svg bp-box">${svg}</div>` });
 const controls = `<p class="am-summary" aria-live="polite"></p>`;
-const SOURCES = `<details class="am-sources"><summary>Where the numbers come from</summary><ul><li>Dr. Kaur's slide on the significance of bleeding on probing (sites followed over 4 maintenance visits); bars drawn to scale. Educational, not medical advice.</li></ul></details>`;
+const SOURCES = `<details class="am-sources"><summary>Where the numbers come from</summary><ul><li>Dr. Kaur's slide on the significance of bleeding on probing; bars drawn to scale.</li>
+<li>The numbers match Lang et al. 1986 (J Clin Periodontol 13:590-596): tooth sites in 55 patients treated for advanced periodontitis and followed in maintenance for at least 4 years, with attachment loss counted at 2 mm or more. Dr. Kaur showed it for implant maintenance; the lesson she drew carries over (track bleeding over visits; its absence predicts stability). Educational, not medical advice.</li></ul></details>`;
 function bopLive(root, D) {
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   var svg = root.querySelector(".bp-svg"), dyn = svg.querySelector(".bp-dyn"), sum = root.querySelector(".am-summary"), readout = root.querySelector("[data-readout]"), sel = 0, grown = reduce.matches;
@@ -37,7 +38,7 @@ function bopLive(root, D) {
   svg.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-bp]"); if (b) set(+b.getAttribute("data-bp")); });
   svg.addEventListener("pointerover", function (e) { var b = e.target.closest && e.target.closest("[data-bp]"); if (b && +b.getAttribute("data-bp") !== sel) set(+b.getAttribute("data-bp")); });
   sum.textContent = D.B[0].t;
-  if (!grown && window.IntersectionObserver) { draw(0); new IntersectionObserver(function (es, ob) { if (!es[0].isIntersecting) return; ob.disconnect(); var t0 = performance.now(); (function grow(now) { var g = Math.min(1, (now - t0) / 700); draw(1 - Math.pow(1 - g, 3)); if (g < 1) requestAnimationFrame(grow); })(t0); }).observe(svg); } else draw(1);
+  if (!grown && window.IntersectionObserver) { draw(0); new IntersectionObserver(function (es, ob) { if (!es[0].isIntersecting) return; ob.disconnect(); var t0 = performance.now(); (function grow(now) { var g = Math.max(0, Math.min(1, (now - t0) / 700)); draw(1 - Math.pow(1 - g, 3)); if (g < 1) requestAnimationFrame(grow); })(t0); }).observe(svg); } else draw(1);
 }
 const CSS = `
 .anima .bp-box{max-width:580px;margin:0 auto}
@@ -53,6 +54,6 @@ const CSS = `
 `;
 export function bop() {
   return { id: "bop", lec: "implants-perio", title: "Bleeding on probing over four visits",
-    caption: "The chance of attachment loss for a site by how many of four maintenance visits it bled at: follow the pattern, not one reading.",
+    caption: "The chance of attachment loss at a site by how many of four maintenance visits it bled at (tooth sites, Lang 1986): follow the pattern, not one reading.",
     html: `<div class="anima" data-anima="bop">${plate}${controls}${SOURCES}</div>`, css: CSS, live: bopLive.toString(), helpers: [bopDraw], data: D };
 }

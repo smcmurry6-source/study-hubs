@@ -39,6 +39,16 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
 - 2026-10-14: all four candidates of the first review skipped; S5's Glickman grades, entrance map and CEP grades skipped.
   Don't re-propose these.
 - 2026-11-03: six S7/S8 figures approved and built.
+- 2026-11-04: all perio figures audited against the S2, S7 and S8 notes and fixed ("vet, audit, and improve all perio
+  figures"). Peri-implant states: drawn to scale (15 px/mm) in a buccolingual section, with crater bone, a probe that
+  bows around the crown and measured PD. Meffert: each film read against a dashed previous crest. BOP: tooth sites, Lang
+  1986. Meffert and the radiograph timeline switch to a phone layout below 470 px (ResizeObserver in `live`). Strokes
+  inside a `scale()` group need `vector-effect:none`, because the kit CSS makes every path non-scaling. Suture diagrams
+  (`SUTURE_DIAGRAMS`): one proximal tooth behind the interdental section, periosteal anchorage labeled apical/coronal
+  with the flap margin, and the horizontal mattress strand ending at a cut, not running off. The braided-thread pattern
+  is now herringbone. The figure-eight "nonscalloped incisions" clause was removed because it couldn't be confirmed;
+  the figure now says only "flaps will not meet closely (apically positioned flaps)". Kept after checking: sling,
+  criss-cross, vertical mattress, continuous, continuous locking, and the materials chart.
 
 ## Pending
 

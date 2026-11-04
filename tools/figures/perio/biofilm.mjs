@@ -48,7 +48,7 @@ function bfDraw(v, t, D) {
   for (var m = 0; m < 14; m++) {
     var u = ((t / 3400) + m / 14) % 1, y0 = 40 + (m * 97) % 240, x = 470 - u * 360, alive = 1, cls = "bf-drug";
     var edge = 262 - 30 * Math.abs((y0 - 160) / 140);
-    if (v.film > .5 && !v.enz && x < edge) { if (m % 4) { x = edge + (edge - x) * .4; alive = Math.max(0, 1 - (edge - (470 - u * 360)) / 50); } }
+    if (v.film > .5 && v.enz <= .5 && x < edge) { if (m % 4) { x = edge + (edge - x) * .4; alive = Math.max(0, 1 - (edge - (470 - u * 360)) / 50); } }
     if (v.enz > .5 && x < edge) { if (m % 4) { x = edge + (edge - x) * .4; alive = Math.max(0, 1 - (edge - (470 - u * 360)) / 50); } else { cls = "bf-drug is-dead"; } }
     if (x < 100) alive = 0;
     if (alive > .02) o += '<circle class="' + cls + '" cx="' + f(x) + '" cy="' + f(y0 + Math.sin(u * 9 + m) * 6) + '" r="3.4" opacity="' + f(alive * Math.min(1, (1 - u) * 6, u * 10)) + '"/>';
