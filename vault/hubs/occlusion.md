@@ -30,6 +30,10 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
   - Controls of a figure inside the notes must not use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
     `data-lec` or `data-group` (the notes and the widget read those).
   - The anima kit sets `vector-effect:non-scaling-stroke`; a path drawn with `stroke-dasharray` needs `vector-effect:none`.
+  - `mounterr` (L6) is computed, not drawn to the rule: `meModel` solves protrusion in closed form for the patient and for
+    casts offset on the articulator (both casts move together), and the chart's microns come from it. Its geometry and
+    assumptions are in the file's header and the figure's "What's simplified"; if the notes' guidance angles or the slide's
+    rule change, re-check that the four errors still come out the slide's way.
   - L7's side-view figures (`stability`, `splints`) share `anima/l7rig.mjs`: the skull, mandible, disc and teeth in mm
     (y up, the seated condyle at the origin) and a contact solver run in Node at build time. Reuse it for any new side view
     of the jaws rather than drawing another skull.
