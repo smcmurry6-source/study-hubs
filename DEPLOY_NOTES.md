@@ -154,6 +154,13 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (taste skill, Claude Code)** — `.claude/skills/taste-skill/` (install name `design-taste-frontend`),
+  vendored from Leonxlnx/taste-skill (MIT; commit and what was left out in its `UPSTREAM.md`): art direction for web
+  pages and app screens, with a library of directions, a source linter and a real-browser inspector. Its house rules
+  (no monospace, eyebrows, gradients, index numbers) are upstream's, not this repo's; the hubs use several of them, so
+  don't restyle a live hub to its rules without Sam's say-so. `.taste-skill/` (its working files) is gitignored.
+  Cowork/Claude Projects don't load repo skills. No site change.
+
 - **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list
   scrolled with the notes (Occlusion's list is 790 px tall, so on a 768 px laptop L7 was only reachable at the bottom of the notes),
   there was no way to the next lecture from the end of the notes, interactive figures didn't fit on screen with their controls, and

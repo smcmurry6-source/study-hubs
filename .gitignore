@@ -5,3 +5,6 @@ question-banks/
 
 # Built preview pages of the hub figures (node tools/figures/<hub>/build.mjs --preview)
 tools/figures/*/dist/
+
+# Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
+.taste-skill/
