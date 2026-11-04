@@ -15,6 +15,8 @@ Part of [analytics governance](analytics-governance.md).
 - **Exam dates and live/archived status** come from `HUBS` / `ARCHIVED_HUBS` in `index.html`, read by the admin page at
   load (the one place they live); `p_exams` is each hub's most recent exam.
 - **Thresholds** are `INSIGHT_RULES` in `review/index.html`. The table below explains them: change both together.
+- **In a preview** ([preview-a-change](../how-to/preview-a-change.md)) the tab shows made-up numbers from `synthInsights()` in
+  `tools/preview/runtime/preview.js`, shaped like the real responses; when the functions' output changes, change it too.
 - **Small hubs are left out**: a hub or page with fewer than 5 people (`minPeople`) is dropped from every card and named
   once under the scorecard (Genetics and GI Exam 1 were removed early with 1-2 people each); their percentages are
   noise, and 5 is the [privacy](../rules/learner-data-privacy.md) floor. A hub's share of retries of right answers is
