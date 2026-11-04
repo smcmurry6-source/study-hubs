@@ -290,17 +290,17 @@ function rgScene(P, V, D, o) {
   o = o || {}; var mv = o.mv || { ua: 0, up: 0, la: 0, lp: 0 }, s = "";
   function shift(pts, dy) { return dy ? pts.map(function (p) { return [p[0], p[1] + dy]; }) : pts; }
   function ell(e, cls, info) { return '<ellipse class="' + cls + '"' + (info ? ' data-info="' + info + '"' : "") + ' cx="' + Math.round((V.OX + e.c[0] * V.S) * 10) / 10 + '" cy="' + Math.round((V.OY - e.c[1] * V.S) * 10) / 10 + '" rx="' + Math.round(e.rx * V.S * 10) / 10 + '" ry="' + Math.round(e.ry * V.S * 10) / 10 + '"/>'; }
-  var skullInfo = "The skull: the cranium, the orbit, the maxilla holding the upper teeth, the zygoma and zygomatic arch, and the temporal bone with the glenoid fossa, the articular eminence, the ear canal and the mastoid process.";
+  var skullInfo = "The skull: the maxilla holding the upper teeth, the cheekbone (malar process) and the zygomatic arch, and the temporal bone with the glenoid fossa and the articular eminence.";
   /* the skull behind the mandible, its openings, the deep space and the styloid process */
   s += '<path class="rg-bone hot" data-info="' + skullInfo + '" d="' + rgD(rgSamp(D.BACK, 4), V, true) + '"/>';
   if (o.temp) s += '<path class="rg-line" d="' + rgD(rgSamp(D.TEMPLINE, 4, true), V) + '"/>';
   s += '<path class="rg-void" d="' + rgD(rgSamp(D.ORBIT, 4), V, true) + '"/><path class="rg-void rg-nose" d="' + rgD(rgSamp(D.NASAL, 3), V, true) + '"/>';
-  s += ell(D.EAM, "rg-void hot", "The external ear canal (external acoustic meatus), just behind the joint.");
+  s += ell(D.EAM, "rg-void hot", "The ear canal, close to the jaw's hinge (a facebow's earpieces go in the ear canals).");
   s += '<path class="rg-deep" d="' + rgD(rgSamp(D.DEEP, 3), V, true) + '"/>' + (o.styloid === false ? "" : '<path class="rg-bone" d="' + rgD(rgSamp(D.STYLOID, 2), V, true) + '"/>');
   /* lower teeth, then the mandible over their roots */
   D.LO.forEach(function (t) { s += '<path class="rg-tooth' + (t.n === "I2" ? " rg-behind" : "") + '" d="' + rgD(rgSamp(shift(t.pts, t.g === "ant" ? mv.la : mv.lp), 3).map(function (p) { return rgT(p, P); }), V, true) + '"/>'; });
   var jaw = rgSamp(D.JAW, 4).map(function (p) { return rgT([p[0] + P.Cm[0], p[1] + P.Cm[1]], P); }), mf = rgT([D.MF[0] + P.Cm[0], D.MF[1] + P.Cm[1]], P);
-  s += '<g class="hot" data-info="The mandible: condyle, neck, sigmoid notch, coronoid process (under the zygomatic arch), ramus, angle, body and chin. It hinges about the condyles and, when they come off their seats, slides with them."><path class="rg-jaw" d="' + rgD(jaw, V, true) + '"/>' + ell({ c: mf, rx: 0.9, ry: 0.7 }, "rg-void") + "</g>";
+  s += '<g class="hot" data-info="The mandible: condyle, condylar neck, coronoid process (under the zygomatic arch), ramus, angle, body and chin. It hinges about the condyles and, when they come off their seats, slides with them."><path class="rg-jaw" d="' + rgD(jaw, V, true) + '"/>' + ell({ c: mf, rx: 0.9, ry: 0.7 }, "rg-void") + "</g>";
   if (o.mid) s += o.mid;
   /* upper teeth, then the arch, zygoma and maxilla over their roots */
   D.UP.forEach(function (t) { s += '<path class="rg-tooth' + (t.n === "I2" ? " rg-behind" : "") + '" d="' + rgD(rgSamp(shift(t.pts, t.g === "ant" ? mv.ua : mv.up), 3), V, true) + '"/>'; });

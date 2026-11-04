@@ -150,7 +150,7 @@ function swSvg(s, visceral, D) {
   if (S.bolus) o += '<circle class="sw-bolus" cx="' + f(S.bolus[0]) + '" cy="' + f(S.bolus[1]) + '" r="6"/>';
   /* labels */
   var vm = [(S.velum[3][0] + S.velum[6][0]) / 2, (S.velum[3][1] + S.velum[6][1]) / 2];
-  o += lab("nasal cavity", 316, 32, 316, 80, "middle", "sw-mut");
+  o += lab("nasal passage", 316, 32, 316, 80, "middle", "sw-mut");
   o += tx(300, 141, "hard palate", "sw-in", "middle");
   o += lab("Eustachian", 98, 106, 202, 126, "end", S.open ? "sw-key" : "") + tx(98, 121, S.open ? "tube opens" : "tube", S.open ? "sw-key" : "", "end");
   o += lab("soft palate", 98, 168, vm[0], vm[1], "end");
@@ -164,7 +164,7 @@ function swSvg(s, visceral, D) {
   return o;
 }
 
-const svg = figureSvg({ width: W, height: H, className: "sw-svg", label: "Midsagittal section of the head and neck, patient facing right: nasal cavity, hard and soft palate, tongue, incisors and lips, pharynx in front of the cervical spine, epiglottis, hyoid, larynx, trachea in front and esophagus behind, with a bolus on the tongue.", body: swSvg(0, false, D) });
+const svg = figureSvg({ width: W, height: H, className: "sw-svg", label: "Midsagittal section of the head and neck, patient facing right: nasal passage, hard and soft palate, tongue, incisors and lips, pharynx in front of the cervical spine, epiglottis, hyoid, larynx, trachea in front and esophagus behind, with a bolus on the tongue.", body: swSvg(0, false, D) });
 const plate = plateHtml({ fig: "Fig 9", title: "Swallowing", hint: "step through the stages", readout: "ready", body: `<div class="am-svg sw-box">${svg}</div>` });
 const controls = `<div class="am-controls"><label class="am-slider"><span>ready</span><input type="range" min="0" max="300" step="1" value="0" aria-label="Swallowing stage, from ready to the end of stage 3"><span>stage 3</span></label></div>
 <div class="am-controls"><button type="button" class="am-btn" data-swstep="-1">Back</button><button type="button" class="am-btn" data-swstep="1">Next stage</button><button type="button" class="am-btn" data-swplay aria-pressed="false">Swallow</button></div>

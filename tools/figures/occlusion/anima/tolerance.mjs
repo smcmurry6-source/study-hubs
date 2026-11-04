@@ -88,7 +88,7 @@ function toHead(over, D) {
   o += D.rgScene({ C: [0, 0], Cm: [0, 0], th: 0 }, V, D, { mid: temp, styloid: false });
   /* masseter, over the ramus */
   var M = D.MASS, mOut = D.rgSamp(M.top.concat(M.back.slice(1), M.bot.slice(0, -1).reverse(), M.front.slice(1, -1)), 3);
-  o += '<g class="hot" data-info="Masseter: an elevator, from the zygoma and the zygomatic arch down and back to the angle and the lower ramus of the mandible."><path class="to-musc to-mass" d="' + D.rgD(mOut, V, true) + '"/>' + fibers(M.top, M.bot, 10, "to-fib") + "</g>";
+  o += '<g class="hot" data-info="Masseter: an elevator, from the cheekbone (malar process) and the zygomatic arch down and back to the angle and the lower ramus of the mandible."><path class="to-musc to-mass" d="' + D.rgD(mOut, V, true) + '"/>' + fibers(M.top, M.bot, 10, "to-fib") + "</g>";
   /* the signs: a dot where each shows, a leader to its label */
   D.SIGNS.forEach(function (s) {
     var px = X(s.p), py = Y(s.p), w = Math.max.apply(null, s.t.map(function (t) { return t.length; })) * 6.3, n = s.t.length;

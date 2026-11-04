@@ -200,9 +200,9 @@ const F0 = tmjFrame(0, D);
 const at = (sel) => Object.entries(F0.attrs[sel]).map(([k, v]) => ` ${k}="${v}"`).join("");
 
 const INFO = {
-  bone: "Temporal bone: the glenoid (mandibular) fossa, and in front of it the articular eminence, whose posterior slope the condyle and disc slide down when the jaw translates. Behind the fossa: the postglenoid process and the external auditory meatus. In front, the zygomatic arch, the tunnel that protects the temporalis insertion on the coronoid process.",
+  bone: "Temporal bone: the glenoid (mandibular) fossa, and in front of it the articular eminence, whose posterior slope the condyle and disc slide down when the jaw translates. Behind the fossa: the ear canal. In front, the zygomatic arch, the tunnel that protects the temporalis insertion on the coronoid process.",
   condyle: "Condyle: in the first 20-25 mm it only rotates, about the transverse horizontal axis, in the lower joint space. Centric relation is this seated, anterosuperior position against the eminence slope, on the thinnest avascular part of the disc.",
-  coronoid: "Coronoid process: the temporalis inserts here. It sits under the zygomatic arch (drawn faded where it passes behind the arch), separated from the condyle by the sigmoid notch, and swings down and forward out from under the arch as the mouth opens.",
+  coronoid: "Coronoid process: the temporalis inserts here. It sits under the zygomatic arch (drawn faded where it passes behind the arch), and swings down and forward out from under the arch as the mouth opens.",
   disc: "Articular disc: dense fibrous connective tissue that functions like a third bone, which makes the TMJ a compound joint. Biconcave: a thick anterior border, a thin intermediate zone (avascular, no nerves) where the condyle sits, and an even thicker posterior border. Thicker medially, so a displaced disc tends to go forward or medially. Not a meniscus.",
   upper: "Upper (superior) joint space, disc to temporal bone: translation happens here.",
   lower: "Lower (inferior) joint space, disc to condyle: rotation happens here.",
@@ -245,7 +245,7 @@ const body = [
   `<circle class="tm-lig-dot" cx="${D.TMO[0]}" cy="${D.TMO[1]}" r="2.6"/><circle class="tm-lig-dot" cx="${D.TMI[0]}" cy="${D.TMI[1]}" r="2.6"/>`,
   `<text class="am-label tm-inlab" x="516" y="170" text-anchor="middle">zygomatic arch</text>`,
   rideLab("cond", ["condyle"]), rideLab("cor", ["coronoid", "process"]),
-  callout([178, 160], "EAM", [140, 128], "end"),
+  callout([178, 160], "ear canal", [140, 128], "end"),
   callout([D.C0[0] - 6, D.C0[1] - 48], "glenoid fossa", [232, 64], "end"),
   callout([crest[0] + 11, crest[1] - 6], "articular eminence", [crest[0] + 30, 108], "start"),
   callout([622, 198], "LP, superior head", [624, 230], "end"),
@@ -254,11 +254,11 @@ const body = [
 ].join("");
 
 const svg = figureSvg({ width: W, height: H, className: "tm-fig",
-  label: "Schematic sagittal section of the right temporomandibular joint, patient facing right: temporal bone with the glenoid fossa, articular eminence, zygomatic arch and external auditory meatus; the mandibular condyle with its neck, the sigmoid notch, the coronoid process tucked under the zygomatic arch, and the ramus; the biconcave articular disc with its thick posterior band, thin intermediate zone and anterior band; the retrodiscal tissue with its superior and inferior laminae; the superior and inferior heads of the lateral pterygoid; and the outer oblique and inner horizontal portions of the TM ligament. A slider opens the mouth from 0 to 50 millimeters: the condyle first rotates in the lower joint space, then the condyle and disc translate down the eminence in the upper joint space.",
+  label: "Schematic sagittal section of the right temporomandibular joint, patient facing right: temporal bone with the glenoid fossa, articular eminence, zygomatic arch and the ear canal; the mandibular condyle with its neck, the coronoid process tucked under the zygomatic arch, and the ramus; the biconcave articular disc with its thick posterior band, thin intermediate zone and anterior border; the retrodiscal tissue with its superior and inferior laminae; the superior and inferior heads of the lateral pterygoid; and the outer oblique and inner horizontal portions of the TM ligament. A slider opens the mouth from 0 to 50 millimeters: the condyle first rotates in the lower joint space, then the condyle and disc translate down the eminence in the upper joint space.",
   body });
 const plate = plateHtml({ fig: "Fig 1", title: "TMJ opening: rotation, then translation", hint: "drag the slider", readout: "closed", body: `<div class="am-svg">${svg}</div>` });
 
-const LEGEND = `<div class="am-stats tm-legend"><span><i class="sw" style="background:var(--tm-disc)"></i><b>Disc</b> <em>thick posterior band, thin intermediate zone, anterior band</em></span><span><i class="sw" style="background:var(--tm-retro)"></i><b>Retrodiscal tissue</b></span><span><i class="sw" style="background:var(--tm-muscle)"></i><b>Lateral pterygoid</b> <em>superior and inferior heads</em></span><span><i class="sw" style="background:var(--tm-lig)"></i><b>TM ligament</b> <em>outer oblique, inner horizontal</em></span></div>`;
+const LEGEND = `<div class="am-stats tm-legend"><span><i class="sw" style="background:var(--tm-disc)"></i><b>Disc</b> <em>thick posterior band, thin intermediate zone, anterior border</em></span><span><i class="sw" style="background:var(--tm-retro)"></i><b>Retrodiscal tissue</b></span><span><i class="sw" style="background:var(--tm-muscle)"></i><b>Lateral pterygoid</b> <em>superior and inferior heads</em></span><span><i class="sw" style="background:var(--tm-lig)"></i><b>TM ligament</b> <em>outer oblique, inner horizontal</em></span></div>`;
 const controls = `<div class="am-controls"><label class="am-slider"><span>Closed</span><input type="range" min="0" max="50" step="0.5" value="0" aria-label="Incisal opening in millimeters, 0 to 50"><span>50 mm</span></label><button type="button" class="am-btn tm-play" aria-pressed="false">Play</button></div>
 <div class="am-stats" aria-live="polite"><span><b>Opening</b> <em data-r="mm"></em></span><span><b>Movement</b> <em data-r="phase"></em></span><span><b>Working space</b> <em data-r="space"></em></span><span><b>Outer TM ligament</b> <em data-r="lig"></em></span><span><b>Lateral pterygoid</b> <em data-r="lp"></em></span></div>
 ${LEGEND}
@@ -267,7 +267,7 @@ ${LEGEND}
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>Drawn from the hub's L2 notes (Functional TMJ Anatomy, Dr. Givan): the biconcave disc and its zones, upper and lower joint spaces, the retrodiscal laminae, both heads of the lateral pterygoid and what each portion of the TM ligament limits; and the L1 handout's numbers: pure rotation to about 20-25 mm at the incisors, maximum opening about 40-60 mm.</li>
 <li>Schematic, not to scale: the angles of rotation, how far the disc turns on the condyle, the path down the eminence and the ligament's tension are drawn to show the relationships, not measured. The mandible is drawn to the joint's scale (the coronoid process about 3 cm in front of the condyle, under the zygomatic arch), but the masseter and the soft tissue around the joint are left out.</li>
-<li>Not all in one plane: the zygomatic arch and the TM ligament lie lateral to the joint and the lateral pterygoid medial to the ramus, so the ligament is drawn over the joint, the arch over the coronoid tip, and the muscle behind the ramus, where it shows through the sigmoid notch.</li>
+<li>Not all in one plane: the zygomatic arch and the TM ligament lie lateral to the joint and the lateral pterygoid medial to the ramus, so the ligament is drawn over the joint, the arch over the coronoid tip, and the muscle behind the ramus, where it shows through the notch between the condyle and the coronoid process.</li>
 <li>Muscle activity follows the slider: moving it toward open lights the inferior head (opening), toward closed the superior head (closing).</li></ul></details>`;
 
 function tmjLive(root, D) {

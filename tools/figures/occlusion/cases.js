@@ -307,7 +307,7 @@ var CASE_IMG = (function(){
     s += path('xr-head', dense([[-4, 1.7], [-4.4, 0], [-3.5, -2.3], [-1.2, -3.5], [1.5, -3.4], [3.7, -2.2], [4.4, .1], [3.6, 2.2]], false, 6).map(function(p){ return P(rot(p)); }), true);
     function lab(p, t, anchor){ var q = P(p); return T(q[0], q[1], t, 'xr-lab', anchor); }
     function lead(a, b){ var p = P(a), q = P(b); return '<path class="xr-lead" d="M' + f1(p[0]) + ' ' + f1(p[1]) + 'L' + f1(q[0]) + ' ' + f1(q[1]) + '"/><circle class="xr-lead-dot" cx="' + f1(q[0]) + '" cy="' + f1(q[1]) + '" r="2"/>'; }
-    s += lab([-13.4, 4.9], 'EAM', 'middle') + lab([-.4, 4.4], 'glenoid fossa', 'middle');
+    s += lab([-13.4, 4.9], 'ear canal', 'middle') + lab([-.4, 4.4], 'glenoid fossa', 'middle');
     s += lead([8.4, 9.7], [11, 7.75]) + lab([8.6, 11], 'articular eminence', 'end');
     s += lead([20.6, 15.4], [19.5, 12.4]) + lab([20, 17], 'condyle');
     return '<svg class="xr" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Lateral TMJ view: the condyle sits in front of the articular eminence and the glenoid fossa is empty">' + s + '</svg>';

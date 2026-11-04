@@ -82,7 +82,7 @@ const INFO = {
   lpS: "Lateral pterygoid, superior head: from the greater wing of the sphenoid and infratemporal crest to the capsule and disc. Relaxed when opening, active when closing, holding the disc in place. Not one of the slide's movers.",
   lpI: "Lateral pterygoid, inferior head: from the lateral pterygoid plate to the pterygoid fovea on the condylar neck. Pulls the condyle forward, down and medially: both sides = protrusion and opening; one side alone swings the chin to the OTHER side.",
   mp: "Medial pterygoid: from the medial surface of the lateral pterygoid plate down and back to the inside of the angle. An elevator; with the masseter outside it forms the pterygomasseteric sling. In a lateral move the opposite side's medial pterygoid helps.",
-  dig: "Digastric (a suprahyoid): posterior belly from the mastoid notch, intermediate tendon on the hyoid, anterior belly to the chin. With the hyoid held still it pulls the mandible down: a key opener.",
+  dig: "Digastric (a suprahyoid): anterior and posterior bellies joined by an intermediate tendon on the hyoid, the anterior belly running to the chin. With the hyoid held still it pulls the mandible down: a key opener.",
   infra: "Infrahyoid muscles (sternohyoid, omohyoid, sternothyroid, thyrohyoid): they fix the hyoid \"like a rock\" so the suprahyoids can open the jaw.",
   hyoid: "Hyoid bone: floats, articulating with no other bone; every horn and fossa is a muscle attachment.",
 };
