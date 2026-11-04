@@ -72,6 +72,8 @@ Hub building
 
 - [Repo map](reference/repo-map.md): what every file and folder is.
 - [Shared infrastructure](reference/shared-infrastructure.md): the widget, Supabase, Pages, the Kokoro model.
+- [Admin operations](reference/admin-operations.md): the admin page's Live tab (who's studying now), hub archive
+  overrides (what wins over the dates, the audit log) and newest-first check-ins.
 - `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
 - `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
 - `supabase/schema.sql` and `migration_v*.sql`: the database.

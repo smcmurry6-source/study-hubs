@@ -17,6 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="../widget/vendor/supabase-2.117.2.js"></script>
 <script src="../widget/recap.js"></script>
+<script src="../widget/archive.js"></script>
 <script src="../widget/timmy.js" defer></script>
 <style>
 :root{
@@ -176,6 +177,61 @@ table.data tr.group:hover td{background:none;}
 .qtext{font-weight:500;white-space:normal;margin-top:3px;max-width:62ch;line-height:1.4}
 .qkey{font-size:12.5px;color:var(--good,#1F8A5B);margin-top:3px;white-space:normal}
 .qwrong{font-size:12.5px;color:var(--bad,#B3261E);margin-top:2px;white-space:normal}
+/* ---------- keyboard focus (every control on this page) ---------- */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+
+/* ---------- live ---------- */
+.live-total{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:2px 0 4px;}
+.live-total .value{font-size:44px; font-weight:700; line-height:1; letter-spacing:-.02em;}
+.live-total .unit{font-size:15px; color:var(--ink-2); font-weight:600;}
+.live-hub{border-top:1px solid var(--line); padding:12px 0;}
+.live-hub:first-child{border-top:none; padding-top:2px;}
+.live-hub-head{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap; font-weight:600;}
+.names{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 0; padding:0; list-style:none;}
+.names li{font-size:13.5px; padding:4px 11px; border-radius:var(--r-pill); background:var(--paper-2); color:var(--ink); overflow-wrap:anywhere; max-width:100%;}
+.msg-ok{color:var(--ok);} .msg-err{color:var(--warn);}
+
+/* ---------- hubs: archive overrides ---------- */
+.hub-group + .hub-group{margin-top:18px;}
+.hub-group h3{font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); margin:0 0 8px;}
+.hub-row{border:1px solid var(--line); border-radius:var(--r-m); padding:12px 14px;}
+.hub-row + .hub-row{margin-top:10px;}
+.hub-row-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.hub-row-head h4{font-size:15px; margin:0; flex:1 1 220px; min-width:0; overflow-wrap:anywhere;}
+.state{display:inline-block; font-size:12px; font-weight:700; padding:2px 9px; border-radius:var(--r-pill); white-space:nowrap;}
+.state.s-live{background:var(--ok-soft); color:var(--ok);}
+.state.s-archived{background:var(--paper-2); color:var(--ink-2); border:1px solid var(--line-strong);}
+.state.s-hidden{background:var(--warn-soft); color:var(--warn);}
+.hub-meta{font-size:13.5px; color:var(--ink-2); margin:6px 0 0; overflow-wrap:anywhere;}
+.hub-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+.btn{min-height:40px; padding:8px 16px; border-radius:var(--r-pill); border:1px solid var(--line-strong); background:var(--card); color:var(--ink); font-size:14px; font-weight:600;}
+.btn.primary{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.btn:disabled{opacity:.5; cursor:default;}
+.arch-form{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line);}
+.arch-form fieldset{border:none; margin:0; padding:0; display:grid; gap:6px; min-width:0;}
+.arch-form legend{font-size:13px; font-weight:600; color:var(--ink-2); margin-bottom:6px; padding:0;}
+.arch-opt{display:flex; gap:10px; align-items:flex-start; padding:9px 12px; border:1px solid var(--line); border-radius:10px; cursor:pointer; min-height:44px;}
+.arch-opt input{margin:3px 0 0; accent-color:var(--accent); width:18px; height:18px; flex:none;}
+.arch-opt b{font-size:14px;}
+.arch-opt small{display:block; color:var(--ink-3); font-size:12.5px; line-height:1.4;}
+.arch-opt:has(input:checked){border-color:var(--accent); background:var(--accent-soft);}
+.arch-opt:has(input:disabled){opacity:.55; cursor:not-allowed;}
+.arch-fields{display:grid; gap:10px; grid-template-columns:repeat(2, minmax(0,1fr)); margin-top:12px;}
+@media (max-width:560px){ .arch-fields{grid-template-columns:1fr;} }
+.arch-fields label{display:grid; gap:4px; font-size:13px; font-weight:600; color:var(--ink-2); min-width:0;}
+.arch-fields small{font-weight:400; color:var(--ink-3); font-size:12px;}
+.arch-fields input{font:inherit; font-size:15px; font-weight:400; padding:8px 10px; min-height:42px; width:100%; border:1px solid var(--line-strong); border-radius:8px; background:var(--card); color:var(--ink);}
+.arch-fields input:disabled{opacity:.55;}
+.arch-confirm{margin-top:12px; padding:12px 14px; border-radius:10px; border:1px solid var(--warn); background:var(--warn-soft); color:var(--ink);}
+.arch-confirm p{margin:0;}
+.arch-msg{font-size:13.5px; margin:10px 0 0;}
+.arch-msg:empty{display:none;}
+.log-list{list-style:none; margin:0; padding:0;}
+.log-list li{padding:10px 0; border-top:1px solid var(--line); font-size:14px; overflow-wrap:anywhere;}
+.log-list li:first-child{border-top:none; padding-top:0;}
+.log-list .when{display:block; font-size:12.5px; color:var(--ink-3);}
+.rules{margin:0; padding-left:20px; font-size:14px;}
+.rules li + li{margin-top:6px;}
 </style>
 </head>
 <body>
@@ -205,12 +261,14 @@ table.data tr.group:hover td{background:none;}
       </div>
       <nav class="tabs" role="tablist" aria-label="Sections">
         <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+        <button role="tab" data-tab="live" aria-selected="false">Live<span class="count zero" id="liveCount" hidden>0</span></button>
         <button role="tab" data-tab="time" aria-selected="false">Time by section</button>
         <button role="tab" data-tab="questions" aria-selected="false">Questions</button>
         <button role="tab" data-tab="clicks" aria-selected="false">Clicks</button>
         <button role="tab" data-tab="engagement" aria-selected="false">Engagement</button>
         <button role="tab" data-tab="surveys" aria-selected="false">Surveys</button>
         <button role="tab" data-tab="recap" aria-selected="false">Recap</button>
+        <button role="tab" data-tab="hubs" aria-selected="false">Hubs</button>
         <button role="tab" data-tab="inbox" aria-selected="false">Inbox<span class="count zero" id="inboxCount">0</span></button>
       </nav>
     </div>
@@ -218,6 +276,7 @@ table.data tr.group:hover td{background:none;}
 
   <main>
     <section class="panel" data-panel="overview"></section>
+    <section class="panel" data-panel="live" hidden></section>
     <section class="panel" data-panel="time" hidden></section>
     <section class="panel" data-panel="questions" hidden></section>
     <section class="panel" data-panel="clicks" hidden></section>
@@ -225,6 +284,7 @@ table.data tr.group:hover td{background:none;}
     <section class="panel" data-panel="surveys" hidden></section>
     <section class="panel" data-panel="inbox" hidden></section>
     <section class="panel" data-panel="recap" hidden></section>
+    <section class="panel" data-panel="hubs" hidden></section>
   </main>
 </div>
 
@@ -288,6 +348,10 @@ table.data tr.group:hover td{background:none;}
       return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + ", " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
     } catch (e) { return iso; }
   }
+  function tsOf(r){ var t = Date.parse(r && r.created_at); return isNaN(t) ? 0 : t; }
+  /* newest first by the real created_at time (parsed, not compared as text); equal times keep the server's order */
+  function sortNewest(rows){ return rows.map(function(r, i){ return [r, i]; }).sort(function(a, b){ return tsOf(b[0]) - tsOf(a[0]) || a[1] - b[1]; }).map(function(x){ return x[0]; }); }
+  function newestAt(rows){ return rows.reduce(function(m, r){ return Math.max(m, tsOf(r)); }, 0); }
   function bar(v, max, low, title){
     var pct = max > 0 ? Math.max(1.5, (v / max) * 100) : 0;
     return '<div class="bar' + (low ? ' low' : '') + '" title="' + esc(title || "") + '"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
@@ -308,7 +372,7 @@ table.data tr.group:hover td{background:none;}
     return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
   }
   function loadAll(){
-    $$(".panel:not([data-panel=recap])").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
+    $$(".panel:not([data-panel=recap]):not([data-panel=live]):not([data-panel=hubs])").forEach(function(p){ p.innerHTML = '<div class="empty">Loading…</div>'; });
     var d = state.days;
     return Promise.all([
       rpc("get_visitor_summary", { p_secret: secret, p_days: d }),
@@ -554,9 +618,11 @@ table.data tr.group:hover td{background:none;}
   function renderDebriefs(){
     var d = data.debriefs;
     if (!d || d.error) return card("Exam check-ins", "", '<div class="err">Couldn’t load exam check-ins (migration_v23).</div>');
+    /* newest first everywhere: the rows inside a group by created_at, and the groups by their newest check-in
+       (never by hub name or exam label: those sort as text) */
     var groups = {};
-    (d.data || []).forEach(function(r){ var k = r.hub + "\u0001" + r.exam; (groups[k] = groups[k] || []).push(r); });
-    var keys = Object.keys(groups).sort().reverse();
+    sortNewest(d.data || []).forEach(function(r){ var k = r.hub + "\u0001" + r.exam; (groups[k] = groups[k] || []).push(r); });
+    var keys = Object.keys(groups).sort(function(a, b){ return newestAt(groups[b]) - newestAt(groups[a]) || (a < b ? -1 : a > b ? 1 : 0); });
     if (!keys.length) return card("Exam check-ins", "Pop-up on each person's first dashboard visit after an exam, plus a Check in button on the hub's card (live or archived) for 60 days.", '<div class="empty">None yet. The first ones come in the day after the next exam.</div>');
     return keys.map(function(k){
       var rows = groups[k], ans = rows.filter(function(r){ return r.answers; }), p = k.split("\u0001");
@@ -578,7 +644,7 @@ table.data tr.group:hover td{background:none;}
       var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "—") + '</td><td>' + esc(r.answers.went || "—") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "—" : r.accuracy + "%") + '</td></tr>'; }).join("");
       body += '<h4 style="margin:14px 0 6px">Each answer next to that person’s use of the hub</h4><div class="tbl-wrap"><table class="data"><thead><tr><th class="n">Ready</th><th>How it went</th><th class="n">Time in hub</th><th class="n">Answers</th><th class="n">Accuracy</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
       var who = {}; ans.forEach(function(r){ who[r.visitor_id] = 1; });
-      return card("Exam check-in · " + hubCell(p[0]) + " · " + esc(p[1]), fmtNum(ans.length) + " check-ins from " + fmtNum(Object.keys(who).length) + " people (someone can send more than one)", body);
+      return '<div data-checkin-group="' + esc(p[0]) + '" data-newest="' + newestAt(rows) + '">' + card("Exam check-in · " + hubCell(p[0]) + " · " + esc(p[1]), fmtNum(ans.length) + " check-ins from " + fmtNum(Object.keys(who).length) + " people (someone can send more than one) · newest " + esc(fmtDate(new Date(newestAt(rows)).toISOString())), body) + '</div>';
     }).join("");
   }
   function renderSearches(){
@@ -596,7 +662,7 @@ table.data tr.group:hover td{background:none;}
   /* ---------- surveys: results, on/off, and a form to publish one ---------- */
   function renderSurveys(){
     var el = $('[data-panel="surveys"]');
-    var list = (data.surveys && data.surveys.data) || [];
+    var list = sortNewest((data.surveys && data.surveys.data) || []);   /* newest survey first (the server sends them so too) */
     var out = "";
     if (data.surveys && data.surveys.error) out += card("Surveys", "", '<div class="err">Couldn’t load surveys (migration_v14).</div>');
     list.forEach(function(sv){
@@ -961,6 +1027,311 @@ table.data tr.group:hover td{background:none;}
     }, function(){ btn.disabled = false; prev.innerHTML = '<div class="empty">Couldn\'t reach the server. Try again.</div>'; });
   }
 
+  /* ---------- Live: who is studying right now (admin_live_presence, migration_v49) ----------
+     Live = at least one study ping in the last LIVE_MINUTES. widget/v3.js sends one for every 25 s a hub tab is
+     visible and in use, and stops when the tab is hidden or after 15 minutes with no input. Names are the ones the
+     class already sees on the leaderboards (a chosen name, else the random class name); the server never sends a
+     visitor id, an email or a section. Polls every 30 s, only while this tab is open and the page is visible; after an
+     error it waits 1, 2, 4, then 5 minutes. Reference: vault/reference/admin-operations.md. */
+  var LIVE_MINUTES = 3, LIVE_EVERY = 30000;
+  var live = { data: null, err: null, at: 0, tried: 0, fails: 0, timer: null, busy: false, wait: 0, built: false };
+  function liveOn(){ return !!secret && state.tab === "live" && document.visibilityState !== "hidden"; }
+  function liveStop(){ clearTimeout(live.timer); live.timer = null; }
+  function liveNext(){
+    liveStop();
+    if (!liveOn()) return;
+    live.wait = live.fails ? Math.min(5 * 60000, 60000 * Math.pow(2, live.fails - 1)) : LIVE_EVERY;
+    live.timer = setTimeout(function(){ pollLive(true); }, Math.max(1000, live.wait - (Date.now() - live.tried)));
+  }
+  function pollLive(force){
+    liveStop();
+    if (!liveOn() || live.busy) return;
+    if (!force && live.tried && Date.now() - live.tried < LIVE_EVERY - 1000) { renderLive(); liveNext(); return; }
+    live.busy = true; live.tried = Date.now(); renderLive();
+    rpc("admin_live_presence", { p_secret: secret, p_minutes: LIVE_MINUTES }).then(function(res){
+      live.busy = false;
+      var d = res && res.data;
+      if (res.error || !d || Array.isArray(d) || typeof d.total !== "number") { live.fails++; live.err = res.error || { message: "no data" }; }
+      else { live.fails = 0; live.err = null; live.data = d; live.at = Date.now(); }
+      liveNext(); renderLive();
+    });
+  }
+  function clock(ms){ return new Date(ms).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" }); }
+  function renderLive(){
+    var el = $('[data-panel="live"]'); if (!el) return;
+    if (!live.built) {
+      live.built = true;
+      el.innerHTML = card("Studying now", "People with a hub open and in use in the last " + LIVE_MINUTES + " minutes",
+          '<div class="live-total"><span class="value n" id="liveTotal">–</span><span class="unit" id="liveUnit">people</span></div>' +
+          '<p class="note" id="liveStatus" role="status" aria-live="polite"></p>',
+          '<button class="icon-btn" type="button" id="liveRefresh">Refresh now</button>') +
+        '<div class="card"><div class="card-head"><div><h2>By hub</h2><p class="sub">Names A to Z. Someone with two hubs open shows in both and counts once in the total.</p></div></div><div id="liveHubs"></div></div>' +
+        card("What this counts", "",
+          '<ul class="rules"><li><b>Live</b> means a study ping in the last ' + LIVE_MINUTES + ' minutes. A hub sends one for every 25 seconds it is on screen and in use; it stops when the tab is hidden, or after 15 minutes with no taps, clicks, keys or scrolling. The dashboard sends none, so this counts people in a hub.</li>' +
+          '<li><b>Names</b> are the ones classmates already see on the leaderboards: a name the student chose, otherwise their random class name. The page never gets a visitor id, an email or which section someone is on. Two devices linked to one person count once.</li>' +
+          '<li>The green "studying now" pill in the hubs counts open hub tabs, idle ones too, so it can read higher.</li>' +
+          '<li>This tab checks every 30 seconds while it is open and on screen, and not at all otherwise.</li></ul>');
+    }
+    var d = live.data, total = $("#liveTotal"), badge = $("#liveCount");
+    if (d) {
+      var t = fmtNum(d.total);
+      if (total.textContent !== t) total.textContent = t;
+      $("#liveUnit").textContent = d.total === 1 ? "person" : "people";
+      badge.hidden = false; badge.textContent = t; badge.classList.toggle("zero", !d.total);
+      var hubs = Array.isArray(d.hubs) ? d.hubs : [];
+      $("#liveHubs").innerHTML = hubs.length ? hubs.map(function(h){
+        var names = Array.isArray(h.names) ? h.names : [];
+        return '<div class="live-hub"><div class="live-hub-head"><span>' + hubCell(h.hub) + '</span><span class="n">' + fmtNum(h.people) + (h.people === 1 ? ' person' : ' people') + '</span></div>' +
+          (names.length ? '<ul class="names" aria-label="' + esc("Studying in " + hubLabel(h.hub)) + '">' + names.map(function(n){ return '<li>' + esc(n) + '</li>'; }).join("") + '</ul>' : '') + '</div>';
+      }).join("") : '<div class="empty">Nobody is studying in a hub right now.</div>';
+    } else if (!live.err) $("#liveHubs").innerHTML = '<div class="empty">Loading…</div>';
+    var st = $("#liveStatus"), msg;
+    if (live.err) msg = '<span class="msg-err">Couldn’t load who’s studying' + (/function|does not exist|PGRST202|404/i.test(String(live.err.message || live.err.code || "")) ? ' (needs migration_v49)' : '') + '.' +
+        (d ? ' Showing ' + esc(clock(live.at)) + '.' : '') + ' Trying again in ' + Math.round(live.wait / 60000) + ' min.</span>';
+    else if (live.busy && !d) msg = "Loading…";
+    else msg = d ? "Updated " + esc(clock(live.at)) + ". Checks again every 30 seconds while this tab is open." : "";
+    if (st.innerHTML !== msg) st.innerHTML = msg;
+    if (!d && live.err) $("#liveHubs").innerHTML = '<div class="empty">Nothing to show yet.</div>';
+  }
+  document.addEventListener("click", function(e){ if (e.target.closest("#liveRefresh")) pollLive(true); });
+
+  /* ---------- Hubs: the dashboard state of every hub, and a manual override (migration_v49) ----------
+     State (widget/archive.js): an override set here wins until it is set back to Automatic or its end time passes;
+     otherwise the dates in index.html (HUBS) decide. The schedule is read from the dashboard's own source, so it is
+     always the one students get. Every change goes through a confirmation step, carries the version the page showed
+     (a change from another tab is refused, not overwritten) and lands in the audit log. */
+  var STATE_WORD = { live: "Live", archived: "Archived", hidden: "Hidden", auto: "Automatic" };
+  var STATE_WHAT = {
+    live: "a card with an Open button, even after its exam",
+    archived: "a greyed card with no Open button (its check-in buttons still follow the exam dates)",
+    hidden: "no card on the dashboard (the page still opens from a direct link)"
+  };
+  var hubAdm = { dash: null, dashErr: null, rows: null, log: null, err: null, pages: {}, open: null, msg: null, msgHub: null, busy: false, loading: false };
+  function when(d){
+    if (!d) return "";
+    d = d instanceof Date ? d : new Date(d);
+    return d.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+  function loadHubAdmin(){
+    if (hubAdm.loading || !secret) return Promise.resolve();
+    hubAdm.loading = true;
+    if (!hubAdm.dash) renderHubAdmin();
+    var dashP = hubAdm.dash ? Promise.resolve(hubAdm.dash) : fetch("../index.html", { cache: "no-store" })
+      .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function(html){ return window.shArchive.fromDashboardHtml(html); });
+    return Promise.all([
+      dashP.then(function(x){ return x; }, function(e){ return { error: e }; }),
+      rpc("admin_hub_overrides", { p_secret: secret }),
+      rpc("admin_hub_archive_log", { p_secret: secret, p_limit: 50 })
+    ]).then(function(r){
+      hubAdm.loading = false;
+      if (r[0] && r[0].error) hubAdm.dashErr = r[0].error; else { hubAdm.dash = r[0]; hubAdm.dashErr = null; checkPages(); }
+      hubAdm.err = r[1].error || r[2].error || null;
+      hubAdm.rows = r[1].error ? null : r[1].data;
+      hubAdm.log = r[2].error ? null : r[2].data;
+      renderHubAdmin();
+    });
+  }
+  /* a hub whose page was removed can't be set to Live (its Open button would lead nowhere) */
+  function checkPages(){
+    allAdmHubs().forEach(function(x){
+      if (hubAdm.pages[x.h.id] !== undefined) return;
+      hubAdm.pages[x.h.id] = null;
+      fetch("../hubs/" + encodeURIComponent(x.h.id) + "/", { method: "HEAD", cache: "no-store" })
+        .then(function(r){ hubAdm.pages[x.h.id] = r.status !== 404; }, function(){ hubAdm.pages[x.h.id] = true; })   /* only a 404 means gone */
+        .then(function(){ if (state.tab === "hubs" && !hubAdm.open) renderHubAdmin(); });
+    });
+  }
+  function allAdmHubs(){
+    if (!hubAdm.dash) return [];
+    return hubAdm.dash.hubs.map(function(h){ return { h: h, listed: false }; }).concat(hubAdm.dash.archived.map(function(h){ return { h: h, listed: true }; }));
+  }
+  function overrideRow(id){ return (hubAdm.rows || []).filter(function(r){ return r.hub === id; })[0] || null; }
+  function admState(x){
+    var row = overrideRow(x.h.id), now = new Date();
+    var r = window.shArchive.resolve(x.h, row && row.active ? row : null, now, hubAdm.dash.options, x.listed);
+    r.row = row; r.version = row && row.active ? row.version : "auto";
+    return r;
+  }
+  function scheduleText(x, r){
+    if (x.listed) return r.cardGoneAt ? "Automatic: archived in the code (ARCHIVED_HUBS); card " + (new Date() < r.cardGoneAt ? "until " + when(r.cardGoneAt) : "gone since " + when(r.cardGoneAt)) + "." : "Automatic: archived in the code, no card.";
+    if (!r.archiveAt) return "Automatic: live (no exam date yet).";
+    var now = new Date();
+    if (now < r.archiveAt) return "Automatic: live until " + when(r.archiveAt) + ", then archived" + (r.cardGoneAt ? " until " + when(r.cardGoneAt) + ", then hidden." : ".");
+    if (r.cardGoneAt && now < r.cardGoneAt) return "Automatic: archived since " + when(r.archiveAt) + "; card until " + when(r.cardGoneAt) + ".";
+    return "Automatic: hidden since " + when(r.cardGoneAt || r.archiveAt) + ".";
+  }
+  function stateBadge(st){ return '<span class="state s-' + st + '">' + STATE_WORD[st] + '</span>'; }
+  function hubRowHTML(x){
+    var h = x.h, r = admState(x), row = r.row, id = h.id, open = hubAdm.open && hubAdm.open.hub === id, page = hubAdm.pages[id];
+    var out = '<div class="hub-row" data-arch-hub="' + esc(id) + '"><div class="hub-row-head"><h4>' + esc(h.title || hubLabel(id)) + '</h4>' + stateBadge(r.state) +
+      (r.source === "manual" ? '<span class="pill flag">Set by hand</span>' : '<span class="pill">Automatic</span>') + '</div>';
+    out += '<p class="hub-meta">' + esc(scheduleText(x, r)) + '</p>';
+    if (row && row.active) out += '<p class="hub-meta"><b>Set by hand: ' + STATE_WORD[row.state] + '</b> ' + (row.until ? "until " + esc(when(row.until)) + ", then the dates decide again" : "until you change it") +
+      '. Set ' + esc(when(row.set_at)) + '.' + (row.note ? ' Note: “' + esc(row.note) + '”' : '') + '</p>';
+    else if (row && !row.active) out += '<p class="hub-meta muted">An earlier override (' + STATE_WORD[row.state] + ') ended ' + esc(when(row.until)) + '; the dates decide again.</p>';
+    if (page === false) out += '<p class="hub-meta muted">Its page has been removed, so it can’t be set to Live.</p>';
+    if (hubAdm.msg && hubAdm.msgHub === id && !open) out += '<p class="arch-msg ' + (hubAdm.msg.ok ? 'msg-ok' : 'msg-err') + '" role="status">' + esc(hubAdm.msg.text) + '</p>';
+    out += '<div class="hub-actions"><button type="button" class="btn" data-arch-edit="' + esc(id) + '" aria-expanded="' + open + '" aria-controls="arch-form-' + esc(id) + '">Change…</button>' +
+      (row && row.active && !open ? '<button type="button" class="btn" data-arch-auto="' + esc(id) + '">Back to automatic</button>' : '') + '</div>';
+    if (open) out += formHTML(x, r);
+    return out + '</div>';
+  }
+  function formHTML(x, r){
+    var id = x.h.id, o = hubAdm.open, cur = r.source === "manual" ? r.state : "auto", pick = o.pick || cur, page = hubAdm.pages[id];
+    var opts = [["auto", "Automatic", "The dates decide: " + STATE_WORD[r.auto].toLowerCase() + " right now."],
+      ["live", "Live", STATE_WHAT.live[0].toUpperCase() + STATE_WHAT.live.slice(1) + "."],
+      ["archived", "Archived", STATE_WHAT.archived[0].toUpperCase() + STATE_WHAT.archived.slice(1) + "."],
+      ["hidden", "Hidden", STATE_WHAT.hidden[0].toUpperCase() + STATE_WHAT.hidden.slice(1) + "."]];
+    var nm = "arch-st-" + id;
+    var untilVal = o.until != null ? o.until : (r.row && r.row.active && r.row.until ? localInput(new Date(r.row.until)) : "");
+    var out = '<form class="arch-form" id="arch-form-' + esc(id) + '" data-arch-form="' + esc(id) + '" novalidate>' +
+      '<fieldset><legend>Show ' + esc(x.h.title || hubLabel(id)) + ' on the dashboard as</legend>' +
+      opts.map(function(op){
+        var dis = op[0] === "live" && page === false;
+        return '<label class="arch-opt"><input type="radio" name="' + esc(nm) + '" value="' + op[0] + '"' + (pick === op[0] ? ' checked' : '') + (dis ? ' disabled' : '') + '>' +
+          '<span><b>' + op[1] + (op[0] === cur ? ' (now)' : '') + '</b><small>' + esc(op[2]) + '</small></span></label>';
+      }).join("") + '</fieldset>' +
+      '<div class="arch-fields"><label>End time (optional)<input type="datetime-local" name="until" step="60" value="' + esc(untilVal) + '"' + (pick === "auto" ? ' disabled' : '') + '><small>Blank: until you change it. After it, the dates decide again.</small></label>' +
+      '<label>Note for the log (optional)<input type="text" name="note" maxlength="300" autocomplete="off" value="' + esc(o.note != null ? o.note : "") + '" placeholder="Why, e.g. exam moved to Nov 21"><small>Only you see it, here and in the log.</small></label></div>' +
+      (o.review ? '' : '<div class="hub-actions"><button type="submit" class="btn primary">Review change</button><button type="button" class="btn" data-arch-cancel="' + esc(id) + '">Cancel</button></div>');
+    if (o.review) out += '<div class="arch-confirm" tabindex="-1" role="group" aria-label="Confirm the change"><p>' + esc(o.review.text) + '</p>' +
+      '<div class="hub-actions"><button type="button" class="btn primary" data-arch-confirm="' + esc(id) + '"' + (hubAdm.busy ? ' disabled' : '') + '>' + (hubAdm.busy ? 'Saving…' : 'Confirm') + '</button>' +
+      '<button type="button" class="btn" data-arch-back="' + esc(id) + '"' + (hubAdm.busy ? ' disabled' : '') + '>Go back</button></div></div>';
+    if (hubAdm.msg && hubAdm.msgHub === id) out += '<p class="arch-msg ' + (hubAdm.msg.ok ? 'msg-ok' : 'msg-err') + '" role="status">' + esc(hubAdm.msg.text) + '</p>';
+    return out + '</form>';
+  }
+  function localInput(d){ var p = function(n){ return String(n).padStart(2, "0"); }; return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()); }
+  function changeText(x, r, pick, until){
+    var name = x.h.title || hubLabel(x.h.id);
+    var keep = " Its page and link, its questions, the analytics and everyone’s progress stay as they are.";
+    if (pick === "auto") {
+      var after = window.shArchive.resolve(x.h, null, new Date(), hubAdm.dash.options, x.listed);
+      return name + " goes back to Automatic: the dates decide, so it shows as " + STATE_WORD[after.state] + " now (" + STATE_WHAT[after.state] + ")." + keep;
+    }
+    return name + " will show as " + STATE_WORD[pick] + " on the dashboard from now " + (until ? "until " + when(until) + ", then the dates decide again" : "until you change it") +
+      ": " + STATE_WHAT[pick] + "." + keep + " Students see it the next time they open the dashboard; an open dashboard checks again within 5 minutes.";
+  }
+  function renderHubAdmin(){
+    var el = $('[data-panel="hubs"]'); if (!el) return;
+    if (!window.shArchive) { el.innerHTML = card("Hubs", "", '<div class="err">widget/archive.js didn’t load. Reload the page.</div>'); return; }
+    var head = card("How a hub’s dashboard state is decided", "",
+      '<ol class="rules"><li><b>A state you set here wins</b> (Live, Archived or Hidden) until you set the hub back to Automatic, or until its end time if you give one.</li>' +
+      '<li><b>Otherwise the dates in the dashboard’s code decide:</b> a hub archives at 10 pm on its last exam day (or its <code>archiveOn</code>) and its card goes 10 days later (or on its <code>hideCardOn</code>).</li>' +
+      '<li><b>Nothing is deleted or moved.</b> The hub’s page and direct link, its questions, the analytics and everyone’s progress stay. Check-ins still follow the exam dates. Every change is in the log below.</li></ol>');
+    if (!hubAdm.dash) { el.innerHTML = head + card("Hubs", "", hubAdm.dashErr ? '<div class="err">Couldn’t read the dashboard’s hub list (' + esc(hubAdm.dashErr.message || hubAdm.dashErr) + ').</div>' : '<div class="empty">Loading…</div>'); return; }
+    var groups = { live: [], archived: [], hidden: [] };
+    allAdmHubs().forEach(function(x){ groups[admState(x).state].push(x); });
+    var body = (hubAdm.err ? '<div class="err">Couldn’t load the overrides' + (/function|does not exist|PGRST202|404/i.test(String(hubAdm.err.message || hubAdm.err.code || "")) ? ' (needs migration_v49)' : '') + '. Showing the dates only; changes can’t be saved.</div>' : '') +
+      ["live", "archived", "hidden"].map(function(st){
+        if (!groups[st].length) return "";
+        return '<div class="hub-group"><h3>' + STATE_WORD[st] + ' · ' + groups[st].length + '</h3>' + groups[st].map(hubRowHTML).join("") + '</div>';
+      }).join("");
+    var log = hubAdm.log;
+    var logBody = log == null ? '<div class="empty">' + (hubAdm.err ? 'The log needs migration_v49.' : 'Loading…') + '</div>'
+      : !log.length ? '<div class="empty">No changes yet. Every override set here is listed, newest first.</div>'
+      : '<ol class="log-list">' + log.slice().sort(function(a, b){ return (Date.parse(b.at) - Date.parse(a.at)) || (b.id - a.id); }).map(function(l){
+          return '<li><span class="when">' + esc(when(l.at)) + '</span><b>' + esc(hubLabel(l.hub)) + ':</b> ' + STATE_WORD[l.old_state] + (l.old_until ? ' (until ' + esc(when(l.old_until)) + ')' : '') +
+            ' → ' + STATE_WORD[l.new_state] + (l.new_until ? ' (until ' + esc(when(l.new_until)) + ')' : '') + (l.note ? ' · “' + esc(l.note) + '”' : '') + '</li>';
+        }).join("") + '</ol>';
+    el.innerHTML = head + card("Hubs on the dashboard", "What students see now, and why", body, '<button class="icon-btn" type="button" id="hubsRefresh">Refresh</button>') +
+      card("Change log", "Newest first. One passphrase is shared, so a note is the way to say who and why.", logBody);
+    if (hubAdm.focus) { var f = el.querySelector(hubAdm.focus); hubAdm.focus = null; if (f) f.focus(); }
+  }
+  function admHub(id){ return allAdmHubs().filter(function(x){ return x.h.id === id; })[0] || null; }
+  function readForm(id){
+    var f = document.querySelector('[data-arch-form="' + id + '"]'); if (!f) return null;
+    var c = f.querySelector('input[type=radio]:checked');
+    return { pick: c ? c.value : "auto", until: f.querySelector('[name=until]').value, note: f.querySelector('[name=note]').value };
+  }
+  var hubsPanel = $('[data-panel="hubs"]');
+  hubsPanel.addEventListener("change", function(e){
+    var f = e.target.closest("[data-arch-form]"); if (!f || !hubAdm.open) return;
+    var v = readForm(f.dataset.archForm);
+    hubAdm.open.pick = v.pick; hubAdm.open.until = v.until; hubAdm.open.note = v.note;
+    if (e.target.type === "radio") {
+      var reviewing = !!hubAdm.open.review;
+      hubAdm.open.review = null; hubAdm.msg = null; f.querySelector('[name=until]').disabled = v.pick === "auto";
+      /* a different choice while the confirmation is up: back to the form, focus kept on the choice */
+      if (reviewing) { hubAdm.focus = '[data-arch-form="' + f.dataset.archForm + '"] input[value="' + v.pick + '"]'; renderHubAdmin(); }
+    }
+  });
+  hubsPanel.addEventListener("input", function(e){
+    var f = e.target.closest("[data-arch-form]"); if (!f || !hubAdm.open) return;
+    var v = readForm(f.dataset.archForm); hubAdm.open.until = v.until; hubAdm.open.note = v.note;
+  });
+  hubsPanel.addEventListener("submit", function(e){
+    var f = e.target.closest("[data-arch-form]"); if (!f) return;
+    e.preventDefault();
+    var id = f.dataset.archForm, x = admHub(id); if (!x || !hubAdm.open) return;
+    var v = readForm(id), r = admState(x), until = null;
+    hubAdm.open.pick = v.pick; hubAdm.open.until = v.until; hubAdm.open.note = v.note; hubAdm.msgHub = id;
+    if (hubAdm.err) { hubAdm.msg = { ok: false, text: "The overrides didn’t load, so nothing can be saved. Refresh and try again." }; renderHubAdmin(); return; }
+    if (v.pick !== "auto" && v.until) {
+      until = new Date(v.until);
+      if (isNaN(until) || until.getTime() < Date.now() + 60000) { hubAdm.msg = { ok: false, text: "The end time has to be in the future. Leave it blank to keep the state until you change it." }; hubAdm.focus = '[data-arch-form="' + id + '"] [name=until]'; renderHubAdmin(); return; }
+      if (until.getTime() > Date.now() + 400 * 864e5) { hubAdm.msg = { ok: false, text: "The end time can be at most 400 days away." }; hubAdm.focus = '[data-arch-form="' + id + '"] [name=until]'; renderHubAdmin(); return; }
+    }
+    var curUntil = r.source === "manual" && r.until ? r.until.getTime() : null, cur = r.source === "manual" ? r.state : "auto";
+    if (v.pick === cur && (v.pick === "auto" || (until ? until.getTime() : null) === curUntil)) { hubAdm.msg = { ok: false, text: "That is how it is set now: nothing to change." }; renderHubAdmin(); return; }
+    hubAdm.msg = null;
+    hubAdm.open.review = { pick: v.pick, until: until, text: changeText(x, r, v.pick, until), version: r.version };
+    hubAdm.focus = '[data-arch-form="' + id + '"] .arch-confirm';
+    renderHubAdmin();
+  });
+  hubsPanel.addEventListener("click", function(e){
+    var b;
+    if (e.target.closest("#hubsRefresh")) { hubAdm.dash = null; hubAdm.pages = {}; loadHubAdmin(); return; }
+    if ((b = e.target.closest("[data-arch-edit]"))) {
+      var id = b.dataset.archEdit;
+      if (hubAdm.open && hubAdm.open.hub === id) { hubAdm.open = null; hubAdm.focus = '[data-arch-edit="' + id + '"]'; }
+      else { hubAdm.open = { hub: id }; hubAdm.msg = null; hubAdm.focus = '[data-arch-form="' + id + '"] input[type=radio]:checked'; }
+      renderHubAdmin(); return;
+    }
+    if ((b = e.target.closest("[data-arch-auto]"))) {
+      var ida = b.dataset.archAuto, xa = admHub(ida); if (!xa) return;
+      var ra = admState(xa);
+      hubAdm.open = { hub: ida, pick: "auto", review: { pick: "auto", until: null, text: changeText(xa, ra, "auto", null), version: ra.version } };
+      hubAdm.msg = null; hubAdm.focus = '[data-arch-form="' + ida + '"] .arch-confirm'; renderHubAdmin(); return;
+    }
+    if ((b = e.target.closest("[data-arch-cancel]"))) { var idc = b.dataset.archCancel; hubAdm.open = null; hubAdm.msg = null; hubAdm.focus = '[data-arch-edit="' + idc + '"]'; renderHubAdmin(); return; }
+    if ((b = e.target.closest("[data-arch-back]"))) { var idb = b.dataset.archBack; hubAdm.open.review = null; hubAdm.focus = '[data-arch-form="' + idb + '"] [type=submit]'; renderHubAdmin(); return; }
+    if ((b = e.target.closest("[data-arch-confirm]"))) {
+      var idk = b.dataset.archConfirm, o = hubAdm.open; if (!o || !o.review || hubAdm.busy) return;
+      hubAdm.busy = true; renderHubAdmin();
+      var note = (o.note || "").trim();
+      supabase.rpc("admin_set_hub_archive", { p_secret: secret, p_hub: idk, p_state: o.review.pick, p_until: o.review.until ? o.review.until.toISOString() : null,
+        p_note: note || null, p_expect: o.review.version }).then(function(res){
+        hubAdm.busy = false;
+        var err = res && res.error;
+        if (err) {
+          var conflict = err.code === "40001" || /conflict/i.test(err.message || "");
+          hubAdm.msgHub = idk;
+          hubAdm.msg = { ok: false, text: conflict ? "This hub was changed in another tab or on another device since the page loaded. It has been reloaded: check it and try again." : "Couldn’t save: " + (err.message || "the server said no") + "." };
+          if (conflict) { hubAdm.open = null; hubAdm.focus = '[data-arch-edit="' + idk + '"]'; return loadHubAdmin(); }
+          renderHubAdmin(); return;
+        }
+        var saved = (res && res.data) || {};
+        hubAdm.open = null; hubAdm.msgHub = idk;
+        hubAdm.msg = { ok: true, text: saved.changed === false ? "Nothing changed: it was already set that way." : "Saved: " + STATE_WORD[o.review.pick] + (o.review.until ? " until " + when(o.review.until) : "") + ". It’s in the log below." };
+        hubAdm.focus = '[data-arch-edit="' + idk + '"]';
+        return loadHubAdmin();
+      }, function(){ hubAdm.busy = false; hubAdm.msgHub = idk; hubAdm.msg = { ok: false, text: "Couldn’t reach the server. Nothing was changed; try again." }; renderHubAdmin(); });
+    }
+  });
+  hubsPanel.addEventListener("keydown", function(e){
+    if (e.key !== "Escape" || !hubAdm.open) return;
+    var id = hubAdm.open.hub; hubAdm.open = null; hubAdm.msg = null; hubAdm.focus = '[data-arch-edit="' + id + '"]'; renderHubAdmin();
+  });
+
+  function onTab(t){
+    if (t === "live") pollLive(false); else liveStop();
+    if (t === "hubs" && !hubAdm.loading && (!hubAdm.dash || !hubAdm.rows)) loadHubAdmin();
+  }
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "hidden") liveStop(); else if (state.tab === "live") pollLive(false);
+  });
+
   function renderAll(){
     renderOverview(); renderTime(); renderQuestions(); renderClicks(); renderEngagement(); renderSurveys(); renderInbox(); updateInboxCount(); renderRecapPanel();
   }
@@ -971,6 +1342,7 @@ table.data tr.group:hover td{background:none;}
     $$(".tabs [role=tab]").forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.tab === t)); });
     $$(".panel").forEach(function(p){ p.hidden = p.dataset.panel !== t; });
     window.scrollTo(0, 0);
+    onTab(t);
   }
   $(".tabs").addEventListener("click", function(e){
     var b = e.target.closest("[data-tab]"); if (b) showTab(b.dataset.tab);
@@ -988,7 +1360,11 @@ table.data tr.group:hover td{background:none;}
   $("#showArchived").addEventListener("change", function(e){
     state.archived = e.target.checked; savePrefs(); renderAll();
   });
-  $("#refreshBtn").addEventListener("click", function(){ loadAll(); });
+  $("#refreshBtn").addEventListener("click", function(){
+    loadAll();
+    if (state.tab === "live") pollLive(true);
+    if (state.tab === "hubs") { hubAdm.dash = null; hubAdm.pages = {}; loadHubAdmin(); }
+  });
   function syncControls(){
     $$("#rangeSeg [data-days]").forEach(function(b){ b.setAttribute("aria-pressed", String(Number(b.dataset.days) === state.days)); });
     $("#showArchived").checked = state.archived;

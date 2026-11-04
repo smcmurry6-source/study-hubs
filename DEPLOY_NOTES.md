@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (admin page: who's studying now, hub archive overrides, newest-first check-ins, Claude Code)** — Sam's ask:
+  safer admin operations. **Live tab** (`review/`): how many people used a hub in the last 3 minutes and, hub by hub, their
+  leaderboard names (Sam's call), never an id, email or section; it asks every 30 s only while the tab is open and visible.
+  **Hubs tab:** set any hub Live, Archived or Hidden on the dashboard by hand, until set back to Automatic or until an
+  optional end time (Sam's call), with a confirmation, a note, an audit log and a stale-tab check; nothing is deleted.
+  The rules live once in `widget/archive.js` (loaded by `index.html` and `review/`; `widget/v3.js`'s archived notice
+  follows them). **Surveys tab:** check-in groups sort by their newest check-in (they sorted by hub name), rows and
+  survey answers newest first with an id tie-break. `migration_v49.sql` (**not applied**: tier 3, waits for Sam's written
+  approval): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
+  `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
+  in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on
+  10-30 (PR #205, never merged). `sw.js` sh-v53. About page: hub cards and Studying now. Tests: `tools/release/admin-ops.js`
+  and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js` (`run.js`, as `adminui`). How it works:
+  [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
+
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
   ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
   [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,
