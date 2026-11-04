@@ -73,6 +73,10 @@ const H = Math.ceil(V.OY - Math.min(...jawOpen.map((p) => p[1])) * V.S + 8);
 const D = {
   W, H, OPEN: r4(OPEN), V,
   SKULL: mxs(R.SKULL), JAW: mxs(R.JAW), DISC: mxs(DISC), CR: R.CR,
+  /* the rest of the rig's skull (the cranium behind the jaw, its openings, the edges drawn over the face), mirrored; the
+     view crops it at the top and the back, where it fades out (FOG, mm above / behind the seated condyle) */
+  BACK: mxs(R.BACK), EDGES: R.EDGES.map(mxs), SHADE: mxs(R.SHADE), ORBIT: mxs(R.ORBIT), NASAL: mxs(R.NASAL), DEEP: mxs(R.DEEP),
+  EAM: { c: mx(R.EAM.c), rx: R.EAM.rx, ry: R.EAM.ry }, IOF: mx(R.IOF), FOG: { top: [9.5, 20], back: [9, 21] },
   UP: R.UP.map((t) => ({ n: t.n, g: t.g, pts: mxs(t.pts) })), LO: R.LO.map((t) => ({ n: t.n, g: t.g, pts: mxs(t.pts) })),
   CUSP_LO: mxs(R.CUSP_LO), INC: mx(R.INC),
   SL: { Cm: mx(S0.Cm), co: r4(-S0.th), tab: TAB },
@@ -113,13 +117,17 @@ function crSvg(v, same, D) {
      onto a letter) and ends on a dot at the point */
   function lab(t, x, y, p, a, cls, dx) { var e = [X(p), Y(p)], lx = (a === "end" ? x - 4 : a === "middle" ? x : x + 4) + (dx || 0), ly = y < e[1] ? y + 1 : y - 8.5; return '<g class="cr-lab' + (cls ? " " + cls : "") + '"><path class="cr-lead" d="M' + f(lx) + " " + f(ly) + "L" + f(e[0]) + " " + f(e[1]) + '"/><circle class="cr-ldot" cx="' + f(e[0]) + '" cy="' + f(e[1]) + '" r="1.8"/>' + tx(x, y, t, "cr-t", a) + "</g>"; }
   var pose = { C: P.C, Cm: P.Cm, th: P.th };
+  function ell(e, cls) { return '<ellipse class="' + cls + '" cx="' + f(X(e.c)) + '" cy="' + f(Y(e.c)) + '" rx="' + f(e.rx * V.S) + '" ry="' + f(e.ry * V.S) + '"/>'; }
+  /* the skull behind the mandible: the cranium, the orbit and nasal opening, the ear canal and the deep space */
+  s += '<path class="rg-bone" d="' + D.rgD(D.rgSamp(D.BACK, 4), V, true) + '"/><path class="rg-void" d="' + D.rgD(D.rgSamp(D.ORBIT, 4), V, true) + '"/><path class="rg-void rg-nose" d="' + D.rgD(D.rgSamp(D.NASAL, 3), V, true) + '"/>' + ell(D.EAM, "rg-void") + '<path class="rg-deep" d="' + D.rgD(D.rgSamp(D.DEEP, 3), V, true) + '"/>';
   /* lower teeth, then the mandible over their roots */
   D.LO.forEach(function (t) { s += '<path class="rg-tooth' + (t.n === "M2" ? " hot" : "") + '"' + (t.n === "M2" ? ' data-info="The lower second molar. Nearest the hinge, so when the jaw closes in CR it meets the upper second molar first."' : "") + ' d="' + D.rgD(D.rgSamp(t.pts, 6).map(function (p) { return D.rgT(p, pose); }), V, true) + '"/>'; });
   var jaw = D.rgSamp(D.JAW, 5).map(function (p) { return D.rgT([p[0] + pose.Cm[0], p[1] + pose.Cm[1]], pose); });
   s += '<path class="rg-jaw hot" data-info="The mandible. Closing in CR it only rotates about the seated condyles (the transverse horizontal axis); in the slide it moves up and forward as the condyles come slightly off their seats." d="' + D.rgD(jaw, V, true) + '"/>';
   /* upper teeth, then the skull over their roots */
   D.UP.forEach(function (t) { s += '<path class="rg-tooth' + (t.n === "M2" ? " hot" : "") + '"' + (t.n === "M2" ? ' data-info="The upper second molar. The lower second molar touches its mesial incline first, then slides up it into MIP."' : "") + ' d="' + D.rgD(D.rgSamp(t.pts, 6), V, true) + '"/>'; });
-  s += '<path class="rg-bone hot" data-info="The skull: the glenoid fossa and the articular eminence of the temporal bone, the zygomatic arch (the coronoid process passes under it) and the maxilla. In centric relation the condyle sits up and forward against the eminence\'s posterior slope, with the disc between." d="' + D.rgD(D.rgSamp(D.SKULL, 5), V, true) + '"/>';
+  s += '<g class="hot" data-info="The skull: the glenoid fossa and the articular eminence of the temporal bone, the zygomatic arch (the coronoid process passes under it) and the maxilla. In centric relation the condyle sits up and forward against the eminence\'s posterior slope, with the disc between."><path class="rg-bone-f" d="' + D.rgD(D.rgSamp(D.SKULL, 5), V, true) + '"/><path class="rg-shade" d="' + D.rgD(D.rgSamp(D.SHADE, 4), V, true) + '"/>' +
+    D.EDGES.map(function (e) { return '<path class="rg-edge" d="' + D.rgD(D.rgSamp(e, 4, true), V) + '"/>'; }).join("") + ell({ c: D.IOF, rx: 1, ry: 0.8 }, "rg-void") + '</g>';
   /* the disc and condyle, then the seat (CR), dashed on top, once the condyle has left it */
   var c = P.C, off = Math.hypot(c[0], c[1]) > 0.005;
   s += '<g class="hot" data-info="The condyle on its disc. In centric relation it is seated: anterior-superior against the slope of the eminence, on the thin middle of the disc (the thick posterior band sits over the top of the condyle). The dashed circle marks that seat once the condyle leaves it."><path class="rg-disc" d="' + D.rgD(D.DISC.map(function (p) { return [p[0] + c[0], p[1] + c[1]]; }), V, true) + '"/><path class="rg-condyle" d="' + D.rgD(D.rgCirc(c, D.CR, 48), V, true) + '"/></g>';
@@ -129,9 +137,13 @@ function crSvg(v, same, D) {
     var h = [X(P.hit), Y(P.hit)];
     s += '<circle class="cr-halo" cx="' + f(h[0]) + '" cy="' + f(h[1]) + '" r="6"/><circle class="cr-hit hot" data-info="The CO contact: the first tooth contact with the condyles seated. Only the second molars touch; every other tooth is still apart." cx="' + f(h[0]) + '" cy="' + f(h[1]) + '" r="2.4"/>';
   } else if (P.phase === "mip") D.CUSP_LO.forEach(function (q) { var r = D.rgT(q, pose); s += '<circle class="cr-ok" cx="' + f(X(r)) + '" cy="' + f(Y(r)) + '" r="2.2"/>'; });
+  /* the view crops the skull at the top and the back: fade it out there (bands of the page color, opaque at the edge) */
+  s += D.rgFog(V, D.W, D.H, "top", D.FOG.top[0], D.FOG.top[1], 24);
+  for (var k = 0, nb = 24, fb = D.FOG.back; k <= nb; k++) { var m0 = fb[0] + (fb[1] - fb[0]) * k / nb, m1 = k === nb ? 1e4 : fb[0] + (fb[1] - fb[0]) * (k + 1) / nb, x1 = f(V.OX - m0 * V.S), x0 = f(Math.max(-2, V.OX - m1 * V.S));
+    if (x1 > 0) s += '<rect class="rg-fog" x="' + x0 + '" y="-2" width="' + f(x1 - x0) + '" height="' + (D.H + 4) + '" style="fill-opacity:' + (k === nb ? 1 : Math.round(1000 * (k + 0.5) / nb) / 1000) + '"/>'; }
   /* labels on the main view (hidden in the x4 panels): above the skull, and on the body of the mandible */
   s += lab("condyle on its disc", 124, 30, [c[0], c[1] + D.CR + 1.4], "start");
-  s += tx(D.W - 8, 52, "patient facing right →", "cr-t cr-mut", "end");
+  s += tx(D.W - 8, 12, "patient facing right →", "cr-t cr-mut", "end");
   if (P.phase === "co" || P.phase === "slide") s += lab(P.phase === "co" ? "first contact (CO)" : "sliding into MIP", 182, 268, P.hit, "middle", "", P.phase === "co" ? 0 : 4);
   if (P.phase === "co") s += lab("front teeth apart", 364, 268, D.rgT(D.INC, pose), "middle");
   if (P.phase === "mip") s += lab(same ? "CO = MIP: every cusp at once" : "MIP: the cusps meet evenly", 250, 268, D.rgT(D.CUSP_LO[3], pose), "middle");
