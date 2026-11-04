@@ -29,6 +29,11 @@ tags: [widget, supabase]
   script run), never written into a committed file. **Claude Code sessions
   (cloud or local) don't use the API path or a PAT:** they push a branch and
   open a PR, and merging the PR is the deploy — see [ship-a-change](../how-to/ship-a-change.md).
+  **Keep the repo public.** On GitHub's free plan, making it private takes the whole site down ("Site not found"),
+  and making it public again doesn't turn Pages back on: Settings → Pages → Build and deployment → Deploy from a
+  branch, `main`, `/ (root)`, Save, and check it's `main`, not another branch (2026-11-04). If a publish ("pages build
+  and deployment" in Actions) times out, re-running it fails at once with "Deployment cancelled", because a re-run
+  for the same commit reuses the cancelled deployment; a new commit to `main` (any merged PR) publishes again.
 - **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.
