@@ -8,7 +8,8 @@ tags: [testing, release]
 Manual user-acceptance testing for a substantial change ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), sections
 7 and 8), in a preview ([preview-a-change](../how-to/preview-a-change.md)). Copy the core pass and the sections that fit
 the change into the PR's test report, tick what you did, and write what you saw. Every problem goes in the
-[bug log](bug-log.md). Use a real phone for at least one pass.
+[bug log](bug-log.md). The agent runs it with the scripted browser on emulated devices; Sam doesn't (Sam only looks,
+[RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) section 10). Say under Not covered what needs a real device.
 
 ## Core pass (every substantial change)
 
@@ -24,6 +25,8 @@ the change into the PR's test report, tick what you did, and write what you saw.
       see where focus is.
 - [ ] Dark mode, and reduce motion on (the phone's setting or the browser's): still readable, nothing flashes or spins.
 - [ ] Wording is American English, plain, and right; the About page lists any new feature ([about-page](../rules/about-page.md)).
+- [ ] Sam was shown the change before approval: screenshots (phone and laptop), a recording if it moves, the session's
+      live preview.
 
 ## Questions, notes and lectures
 
@@ -80,6 +83,5 @@ the change into the PR's test report, tick what you did, and write what you saw.
 ## A redesign or a new screen
 
 - [ ] Phone (small and large), tablet both ways, laptop, wide screen; both themes; the largest text size.
-- [ ] Sam has seen screenshots or the preview itself before approval.
 
 Related: [bug-log](bug-log.md) · [release test report template](../templates/release-test-report.md)

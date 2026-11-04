@@ -54,8 +54,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `rls-audit.sql` for the live database (run read-only today: no findings, 38 tables and 98 functions, matching the
   snapshot). **Fixed:** `supabase/schema.sql`'s migration_v31 section had `$` for `$$` and couldn't rebuild the database.
   Vault: rule, `vault/how-to/preview-a-change.md`, `roll-back-a-release.md`, `vault/release/` (UAT checklist, bug log with
-  the known accessibility and slow-3G issues, the dry-run report), a report template, a PR template, and a blocked task for
-  Sam's choice of a preview host and a staging database. No site change: nothing students see changed.
+  the known accessibility and slow-3G issues, the dry-run report), a report template and a PR template. Sam looks at a change
+  (screenshots, a recording, the cloud session's live preview) and doesn't test it; no hosted preview or staging
+  database for now (Sam, 2026-11-04). No site change: nothing students see changed.
 
 
 - **2026-11-04 (PCD Implants: the seven implant types redrawn, the intramucosal insert added, Claude Code)** — Sam: "there

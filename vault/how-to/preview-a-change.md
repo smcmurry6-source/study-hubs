@@ -41,11 +41,26 @@ The **Preview** button, bottom left, opens the controls:
 
 If the button turns red, something tried to reach production: that's an S1 bug, report it (the write log says what).
 
+## Show Sam
+
+Sam looks at a substantial change before approving it and doesn't test it
+([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one easy look:
+
+- **Screenshots** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when colors changed, at
+  `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what each one shows.
+- **A short recording** when it moves or takes several steps (Playwright's `recordVideo`), cut to the part that matters.
+- **The live preview:** keep `serve.js` running in the cloud session and call `report_preview_port`, so Sam can tap
+  through it in the Claude app. Say which page and test account to open (`?persona=missed`), and keep the session up
+  until Sam has looked.
+
+Sam says yes, or what to change; a new round gets new screenshots.
+
 ## What a preview can't show
 
 Realtime (who's online, nukes, bosses: it shows 1 online); real class numbers (they're made up per question); the
-server's own rules for XP, streaks and leaderboards (approximated). Those need a staging database
-([task](../tasks/2026-11-04-preview-hosting-and-staging.md)). Real Safari needs a real iPhone, iPad or Mac.
+server's own rules for XP, streaks and leaderboards (approximated). Those need a staging database, not set up for
+now (Sam, 2026-11-04; [task](../tasks/done/2026-11-04-preview-hosting-and-staging.md)). Real Safari needs a real
+iPhone, iPad or Mac.
 
 ## Before the PR
 

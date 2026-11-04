@@ -1,13 +1,13 @@
 ---
 type: task
-status: blocked
+status: dropped
 hub: site
 created: 2026-11-04
 requested-by: Sam
 due:
-waiting-on: Sam's choice of a preview host and a staging database (accounts, tokens and costs are Sam's call)
+waiting-on:
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/233
 ---
 
 # Choose and connect a preview host and a staging database
@@ -16,11 +16,11 @@ pr:
 
 Give every PR a preview link that opens on a phone, and give migrations and server-side logic a database to be tested
 on, without touching the class's data. The rest of the release process is already in place
-([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)); these two need an account, so they wait for Sam.
+([RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md)); these two need an account, so they wait for Sam.
 
 ## Context
 
-- The options, costs and exactly what Sam would do for each: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 13.
+- The options, costs and exactly what Sam would do for each: [RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md), section 13.
 - Recommended: Cloudflare Pages deployed from the Release tests workflow, with Cloudflare Access ($0), and a second free
   Supabase project for staging ($0; the account has one active project, the Free plan allows two).
 - Not an option: a second GitHub Pages repo (same origin as the live site: shared storage and service worker).
@@ -41,5 +41,12 @@ on, without touching the class's data. The rest of the release process is alread
 ## Log
 
 - 2026-11-04: written by the session that built the release process; waiting on Sam.
+- 2026-11-04: Sam chose neither (same session, before merge).
 
 ## Outcome
+
+Dropped, 2026-11-04 (PR #233). Sam: "i dont need to do extensive testing, just see if i like something before it
+ships." No hosted preview (no Cloudflare or other host) and no staging database for now. The agent tests in its own
+scripted browser and shows Sam the change: screenshots, a short recording and its cloud session's live preview
+([RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md), sections 10 and 13). Reopen it if Sam wants a preview link that
+outlives the session, or server-side logic tested on a real database.

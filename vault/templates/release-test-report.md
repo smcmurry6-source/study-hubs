@@ -11,7 +11,8 @@ tags: [testing, release]
 
 - **Change:** what students will see, in a sentence. PR:
 - **Tier:** 2 or 3, and why.
-- **Preview:** how to open it (the `preview-site` artifact of run …, a cloud session, a hosted URL), branch and commit.
+- **Preview:** how to open it (a cloud session's live preview, the `preview-site` artifact of run …), branch and commit;
+  what Sam was shown (screenshots, a recording).
 - **Data:** fixtures / staging. No request reached production (the Preview button's status at the end):
 
 ## Automated

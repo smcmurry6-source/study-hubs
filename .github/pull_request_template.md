@@ -9,8 +9,9 @@
 
 ## Preview
 
-<!-- How to open it: the "Release tests" run's preview-site artifact, a cloud session, a hosted link. Fixture or staging
-     data. The Preview button's status at the end: "No request has reached production". -->
+<!-- What Sam was shown (screenshots, a recording, the cloud session's live preview) and how to open the preview (a
+     cloud session, or the "Release tests" run's preview-site artifact). The Preview button's status at the end:
+     "No request has reached production". -->
 
 ## Checks run
 

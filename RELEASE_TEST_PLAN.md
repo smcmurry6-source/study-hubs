@@ -9,7 +9,7 @@ Contents: [1. Which changes](#1-which-changes) · [2. The flow](#2-the-flow) · 
 [4. Data isolation](#4-data-isolation) · [5. Test accounts](#5-test-accounts) · [6. Automated gates](#6-automated-gates) ·
 [7. Manual UAT](#7-manual-uat) · [8. Browsers and devices](#8-browsers-and-devices) · [9. Bug log](#9-bug-log) ·
 [10. Approval](#10-approval) · [11. Release, monitoring, verification](#11-release-monitoring-and-post-release-verification) ·
-[12. Rollback](#12-rollback) · [13. Waiting on Sam](#13-decisions-waiting-on-sam)
+[12. Rollback](#12-rollback) · [13. Hosting and staging](#13-hosting-and-staging)
 
 ## 1. Which changes
 
@@ -30,11 +30,13 @@ When unsure, use the higher tier.
 1. Branch from a fresh `origin/main`; make the change ([ship-a-change](vault/how-to/ship-a-change.md)).
 2. Open a **preview** and use it like a student ([preview-a-change](vault/how-to/preview-a-change.md)).
 3. The **automated gates** run on the PR; run `node tools/release/run.js` locally first if you can.
-4. **UAT** with [the checklist](vault/release/uat-checklist.md) for the change's type, on a phone and a computer.
+4. **UAT** by the agent, with [the checklist](vault/release/uat-checklist.md) for the change's type, on an emulated
+   phone and a computer.
 5. Every problem found goes in the **[bug log](vault/release/bug-log.md)**, is fixed and retested, or accepted by Sam.
 6. Write the PR's **test report** ([template](vault/templates/release-test-report.md)): what was exercised, results,
    what's left. A long one goes in `vault/release/reports/`.
-7. **Sam approves** the release in the PR, then merges ([approval](#10-approval)).
+7. The agent **shows Sam the change** (screenshots, a recording, the live preview); **Sam approves** it in the PR, then
+   merges ([approval](#10-approval)).
 8. **After the merge:** the post-release check, monitoring, the changelogs; roll back if needed.
 
 ## 3. Interactive previews
@@ -51,12 +53,14 @@ not a screenshot. The tools are `tools/preview/`:
 - In CI, the **Release tests** workflow builds it on every site-changing PR and attaches it as the `preview-site`
   artifact (kept 14 days): download, unzip, `node tools/preview/serve.js --dir preview-site`.
 - In a Claude Code cloud session, the agent runs `serve.js` in the background and calls `report_preview_port`, so Sam
-  can open the preview from the Claude app, on a phone too, while the session is up.
+  can open the preview from the Claude app, on a phone too, while the session is up. This is how Sam sees a change
+  before approving it ([section 10](#10-approval)).
 
 **Where previews may be hosted.** Never on the live site's origin (`smcmurry6-source.github.io`), which rules out a
 second GitHub Pages repo too: pages on one origin share localStorage and the service worker's scope, so a preview there
 would read and overwrite real progress and could be served from the live site's cache. A hosted preview gets its own
-domain, and access control when classmates aren't meant to find it. The options are in [section 13](#13-decisions-waiting-on-sam).
+domain, and access control when classmates aren't meant to find it. The options are in [section 13](#13-hosting-and-staging); Sam
+chose none for now.
 
 **Noindex.** Every preview page carries `<meta name="robots" content="noindex, nofollow, noarchive, nosnippet,
 noimageindex">`, every response from `serve.js` an `X-Robots-Tag` header with the same, a build adds `_headers` (Cloudflare
@@ -103,8 +107,8 @@ frame that skips the runtime) and fails if a single request leaves the browser f
 
 **Staging** (`serve.js --data staging` with `SH_STAGING_URL` and `SH_STAGING_KEY`, a staging project's URL and publishable
 key) is for what fixtures can't show: a migration, server-side logic (XP, streaks, leaderboards), RLS against real
-requests. It needs a separate Supabase project with its own admin secret, never production's. It isn't set up yet
-([section 13](#13-decisions-waiting-on-sam)); `tools/release/rls.js` covers permissions until then.
+requests. It needs a separate Supabase project with its own admin secret, never production's. It isn't set up
+(Sam, 2026-11-04: not for now; [section 13](#13-hosting-and-staging)); `tools/release/rls.js` covers permissions.
 
 Never copy production rows into fixtures, staging or a test report: the repo is public, and the fixtures are made up
 on purpose.
@@ -150,16 +154,17 @@ that needs it, saying why; never to make a check pass.
 
 ## 7. Manual UAT
 
-A person uses the change in the preview, on a real phone and a computer, as the test accounts it affects, with
-[the UAT checklist](vault/release/uat-checklist.md): a core pass for every substantial change plus a section per kind
-of change (questions and notes, a new hub or lecture, the widget, saving and sync, ranks and trophies, admin, a
-migration, the service worker, a redesign). Sam is the product owner and the final tester; an agent does the first pass
-and writes what it saw. Classmates can be UAT testers only on a preview that runs on fixtures and that Sam chose to
+The agent does the UAT itself: it uses the change in the preview with a scripted browser (Playwright) on an emulated
+phone, tablet and laptop, as the test accounts the change affects, with [the UAT checklist](vault/release/uat-checklist.md):
+a core pass for every substantial change plus a section per kind of change (questions and notes, a new hub or lecture,
+the widget, saving and sync, ranks and trophies, admin, a migration, the service worker, a redesign). It looks at its
+own screenshots and writes what it saw in the test report. **Sam doesn't test** (Sam, 2026-11-04): Sam looks at the
+change and decides whether to ship it ([section 10](#10-approval)). Classmates can be UAT testers only on a preview that runs on fixtures and that Sam chose to
 share.
 
 ## 8. Browsers and devices
 
-| | Automated (`matrix.js`) | By hand (UAT) |
+| | Automated (`matrix.js`) | On real devices, when one is at hand |
 |---|---|---|
 | Phones | iPhone SE, iPhone 13, Pixel 7 sizes, touch | A real iPhone in Safari (most of the class) and an Android phone in Chrome; once a term, the home-screen app |
 | Tablets | iPad Mini, portrait and landscape | An iPad in Safari for anything with a layout change |
@@ -188,8 +193,17 @@ release, with its severity, owner, fix (PR) and retest status. Severity:
 ## 10. Approval
 
 Sam is the product owner, and nothing substantial reaches the class without Sam's explicit approval of that release.
-For tier 2 and 3, the PR description has a checkbox, "Sam approved this release", that **only Sam ticks**, after looking
-at the preview and the test report (or Sam writes "approved for release" in a PR comment). Agents never tick it, never
+Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agent **shows Sam the change**
+([preview-a-change](vault/how-to/preview-a-change.md)):
+
+- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat;
+- a short recording when it moves or takes several steps;
+- the live preview from its cloud session (`report_preview_port`), which Sam can tap through in the Claude app, on a
+  phone too, while the session is up.
+
+Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
+has a checkbox, "Sam approved this release", that **only Sam ticks** (or Sam writes "approved for release" in a PR
+comment). Agents never tick it, never
 merge, and never treat a merge request from anyone else as approval. Tier 0 and 1: Sam's merge is the approval, as
 before. Sam can make "Check hubs" and "Release tests" required checks in the repo's branch protection settings.
 
@@ -214,29 +228,29 @@ Revert button), which Sam merges like any other; never force-push `main`. A migr
 never by restoring the database without Sam. Then the post-release check again, a note to the class if they saw the
 problem (Sam's call), and the bug log.
 
-## 13. Decisions waiting on Sam
+## 13. Hosting and staging
 
-Everything above works today with local previews, cloud-session previews and the CI artifact. Two things need an account
-or a service, so they wait for Sam
-([task note](vault/tasks/2026-11-04-preview-hosting-and-staging.md)). Prices are from each vendor's published plans as
-of November 2026; confirm on their pricing pages before signing up.
+**Sam's call, 2026-11-04: neither, for now.** Sam sees a change in the agent's screenshots and its cloud session's live
+preview ([section 10](#10-approval)), and tests run on fixtures; everything above works that way. The options stay here
+in case that changes ([task, dropped](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)). Prices are from each
+vendor's published plans as of November 2026; confirm on their pricing pages before signing up.
 
 **Hosted preview link per PR** (so a preview opens on a phone from the PR, with no computer):
 
 | Option | Cost | What Sam would do | Notes |
 |---|---|---|---|
-| A. Cloudflare Pages, deployed from the Release tests workflow (recommended) | $0 (Free: unlimited bandwidth, 500 builds a month); Cloudflare Access to keep previews private: $0 up to 50 users | Create a Cloudflare account and a Pages project (e.g. `study-hubs-preview`); create an API token with "Cloudflare Pages: Edit"; add it as the repo secret `CLOUDFLARE_API_TOKEN` and the account id as the variable `CLOUDFLARE_ACCOUNT_ID`; optionally an Access policy on `*.study-hubs-preview.pages.dev` (email one-time code) | Its own origin; reads `_headers` (X-Robots-Tag); per-PR URL `pr-<n>.<project>.pages.dev`. An agent then adds one deploy step. |
+| A. Cloudflare Pages, deployed from the Release tests workflow (the pick if one is wanted) | $0 (Free: unlimited bandwidth, 500 builds a month); Cloudflare Access to keep previews private: $0 up to 50 users | Create a Cloudflare account and a Pages project (e.g. `study-hubs-preview`); create an API token with "Cloudflare Pages: Edit"; add it as the repo secret `CLOUDFLARE_API_TOKEN` and the account id as the variable `CLOUDFLARE_ACCOUNT_ID`; optionally an Access policy on `*.study-hubs-preview.pages.dev` (email one-time code) | Its own origin; reads `_headers` (X-Robots-Tag); per-PR URL `pr-<n>.<project>.pages.dev`. An agent then adds one deploy step. |
 | B. Netlify deploy previews | Free plan (credit-based for new accounts; check how many deploys it covers) | Create an account; connect the repo or add a token secret | Reads `_headers`; previews public unless password protection (a paid feature) |
 | C. Vercel preview deployments | $0 on Hobby (non-commercial use only) | Create an account; connect the repo | Adds noindex to previews by itself; Vercel Authentication can keep them private |
-| D. Keep the current ways only | $0 | Nothing | Local or cloud-session preview, or the CI artifact (needs a computer) |
+| D. Keep the current ways only (**chosen 2026-11-04**) | $0 | Nothing | Local or cloud-session preview, or the CI artifact (needs a computer) |
 | Not an option | | | A second GitHub Pages repo: same origin as the live site (shared storage and service worker) |
 
 **Staging database** (for migrations and server logic):
 
 | Option | Cost | What Sam would do | Notes |
 |---|---|---|---|
-| 1. Fixtures only (now) | $0 | Nothing | UI and every write path; no real server logic. `rls.js` covers permissions. |
-| 2. A second free Supabase project (recommended) | $0 (the Free plan allows two active projects; the account has one active now) | Create `study-hubs-staging`, load `supabase/schema.sql` with a staging-only admin secret, add its URL and publishable key as repo variables `SH_STAGING_URL`, `SH_STAGING_KEY`; keep its admin secret in Sam's local ops scripts | Pauses after a week idle (restore from the dashboard). Seed it with `personas.json`-style made-up data, never production rows. |
+| 1. Fixtures only (**chosen 2026-11-04**) | $0 | Nothing | UI and every write path; no real server logic. `rls.js` covers permissions. |
+| 2. A second free Supabase project (the pick if one is wanted) | $0 (the Free plan allows two active projects; the account has one active now) | Create `study-hubs-staging`, load `supabase/schema.sql` with a staging-only admin secret, add its URL and publishable key as repo variables `SH_STAGING_URL`, `SH_STAGING_KEY`; keep its admin secret in Sam's local ops scripts | Pauses after a week idle (restore from the dashboard). Seed it with `personas.json`-style made-up data, never production rows. |
 | 3. Supabase branching (a database per PR) | Pro plan $25 a month, plus compute for each branch while it runs | Upgrade, connect the GitHub integration; the migrations move into `supabase/migrations/` | Most automatic; real money and a restructure |
 
 Also Sam's call: whether to make "Check hubs" and "Release tests" required checks, and whether classmates may be UAT
