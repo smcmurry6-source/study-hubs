@@ -12,7 +12,7 @@
    - type "mirror": the hub flips left-to-right, the way the mouth looks in a dental mirror
    - Full Arch: every right answer grows a tooth in a little arch, every miss knocks one out; fill all 32
    - Cavity Search: each week a tiny cavity hides in one paragraph of each hub's Lecture Notes; the first five to tap it fill it
-   - Holidays (Halloween, Thanksgiving, winter break, New Year, Valentine's, Dentist's Day, St Patrick's, Easter): themed
+   - Holidays (Halloween, Thanksgiving, Christmas, New Year, Valentine's, Dentist's Day, St Patrick's, Easter): themed
      confetti and Plaque Boss, plus a magic word per holiday
    Magic words also work typed into the hub's Search box, which is how they work on a phone.
    Everything announces itself as a "sh:egg-local" event so the tooth buddy (widget/pet.js) can react. */
@@ -137,14 +137,18 @@
     mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return new Date(y, mo - 1, da); }
   function around(at, before, after){ return function(d){ var t = d.getTime(), a = at(d.getFullYear()).getTime(); return t >= a - before * 864e5 && t <= a + after * 864e5; }; }
   function md(m1, d1, m2, d2){ return function(d){ var x = (d.getMonth() + 1) * 100 + d.getDate(), a = m1 * 100 + d1, b = m2 * 100 + d2; return a <= b ? x >= a && x <= b : x >= a || x <= b; }; }
+  /* Thanksgiving runs from Nov 1 to the day after Thanksgiving; Christmas from then to the day after Christmas (Dec 26). */
+  function tgEnd(y){ return nthWeekday(y, 10, 4, 4).getTime() + 864e5; }
+  function tgSeason(d){ return d.getMonth() === 10 && d.getTime() <= tgEnd(d.getFullYear()); }
+  function xmasSeason(d){ var t = d.getTime(), y = d.getFullYear(); return t > tgEnd(y) && t <= new Date(y, 11, 26).getTime(); }
   var HOLIDAYS = [
     { id: "halloween", name: "Halloween", on: md(10, 1, 10, 31), word: "fangs", shape: "bat", boss: "Count Plaqula",
       colors: ["#F59A1E", "#7A3CC2", "#2B1B3D", "#9BE15D", "#F5D21E"], confetti: "candy",
       line: "A bat colony just flew through your notes. Happy Halloween!" },
-    { id: "thanksgiving", name: "Thanksgiving", on: around(function(y){ return nthWeekday(y, 10, 4, 4); }, 6, 1), word: "gobble", shape: "leaf", boss: "Pilgrim Plaque",
+    { id: "thanksgiving", name: "Thanksgiving", on: tgSeason, word: "gobble", shape: "leaf", boss: "Pilgrim Plaque",
       colors: ["#C2410C", "#E58E26", "#B45309", "#8C2F0B", "#D9A441"], confetti: "leaf",
       line: "Grateful for you. Also for gravy. Happy Thanksgiving!" },
-    { id: "winter", name: "Winter break", on: md(12, 10, 12, 30), word: "jingle", shape: "snow", boss: "Plaque Claus",
+    { id: "winter", name: "Christmas", on: xmasSeason, word: "jingle", shape: "snow", boss: "Plaque Claus",
       colors: ["#FFFFFF", "#BFE6FF", "#D6363C", "#2F8F4E", "#E6F5FF"], confetti: "snow",
       line: "Let it snow. Happy holidays, and good luck with finals!" },
     { id: "newyear", name: "New Year", on: md(12, 31, 1, 2), word: "cheers", shape: "star", boss: "Party Plaque",

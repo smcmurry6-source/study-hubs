@@ -154,6 +154,8 @@ Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Thanksgiving all November, then Christmas to Dec 26, Claude Code)** — Sam: Thanksgiving was only Nov 20-27, after most hubs archive. `widget/eggs.js` (`tgSeason`, `xmasSeason`) and `widget/pet.js` (`holidayId`, kept in step): Thanksgiving now runs Nov 1 to the day after Thanksgiving, and the `winter` holiday (renamed "Christmas"; id unchanged, so costumes, outfits and lines carry over) from then to Dec 26 (was Dec 10-30). Dec 27-30 has no holiday; New Year unchanged. About page dates, `sw.js` -> `sh-v50`. No schema change.
+
 - **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list
   scrolled with the notes (Occlusion's list is 790 px tall, so on a 768 px laptop L7 was only reachable at the bottom of the notes),
   there was no way to the next lecture from the end of the notes, interactive figures didn't fit on screen with their controls, and
