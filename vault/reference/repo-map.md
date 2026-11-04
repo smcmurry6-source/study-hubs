@@ -28,6 +28,8 @@ tags: [map]
   Kokoro voice with a pronunciation lexicon, synthesized music and mastering (its `README.md`). The mp3 goes in
   `hubs/<hub-id>/audio/timmy-time.mp3`; the hub defines `window.SH_PODCAST` and a `<div data-sh-podcast>` slot.
   Like narration, the episode must not drift from the notes: fix both in the same PR.
+- `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
+  (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
   hub, if its "Last refreshed" date isn't today, run steps 1-3 of `tools/lessons-refresh.md` first**. Sam runs the whole
   runbook by hand whenever Sam asks for a lessons refresh, usually as `/lessons-audit` (the skill in
