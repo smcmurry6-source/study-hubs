@@ -31,10 +31,11 @@ for (const [key, name, file] of SUITES) {
   const out = (r.stdout || '') + (r.stderr || '');
   process.stdout.write(out);
   const secs = Math.round((Date.now() - t0) / 1000);
-  const blocked = /Cannot find module '(playwright|axe-core[^']*)'|no PostgreSQL server binaries|Executable doesn't exist/.test(out);
+  const blocked = out.match(/Cannot find module '(playwright|axe-core[^']*)'|no PostgreSQL server binaries|Executable doesn't exist/);
   const verdict = r.status === 0 ? 'pass' : blocked ? 'blocked' : 'FAIL';
   if (verdict === 'FAIL') failed++;
-  const last = out.trim().split('\n').filter(l => /^[✓✗]|problem/.test(l.trim())).slice(-1)[0] || out.trim().split('\n').slice(-1)[0] || '';
+  const last = verdict === 'blocked' ? `needs ${blocked[1] ? blocked[1].split('/')[0] : blocked[0]}`
+    : out.trim().split('\n').filter(l => /^[✓✗]|problem/.test(l.trim())).slice(-1)[0] || out.trim().split('\n').slice(-1)[0] || '';
   rows.push({ key, name, file, verdict, secs, last: last.trim().slice(0, 160), out });
 }
 const now = new Date().toISOString().replace('T', ' ').slice(0, 16);

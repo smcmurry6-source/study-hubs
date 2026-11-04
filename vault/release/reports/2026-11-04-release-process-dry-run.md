@@ -33,6 +33,9 @@ data was written: the live database was only read, through its system catalogs (
 
 Not run here: WebKit and Firefox (not installed in this session; CI's Release tests installs them).
 
+Re-run at 20:17 UTC after rebasing onto `d670d8d` (`main` with PCD Implants' eleven figures redrawn): every suite passed
+again, accessibility still at its 157 known nodes, the performance budgets held.
+
 ## Exercised by hand (scripted browser, screenshots looked at)
 
 - The Preview panel on a laptop (light) and a 390 px phone (dark): frame, button above the phone's bottom bar, account
