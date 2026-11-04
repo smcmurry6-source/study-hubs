@@ -1,0 +1,77 @@
+{
+ "about": "Per-page budgets for tools/release/perf.js, measured as a mid-range phone on slow 4G (see the script). kb = bytes over the wire without narration or video; fcp, lcp, tbt in ms. Raise one only with a reason in the PR that Sam approves; lower them when a page gets lighter.",
+ "updated": "2026-11-04",
+ "profile": "slow 4G, CPU 4x, 412x823 phone",
+ "pages": {
+  "index.html": {
+   "kb": 290,
+   "requests": 16,
+   "fcp": 1500,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "about/": {
+   "kb": 60,
+   "requests": 9,
+   "fcp": 1500,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "hubs/heme-endo-exam1/": {
+   "kb": 1050,
+   "requests": 33,
+   "fcp": 2000,
+   "lcp": 2500,
+   "tbt": 1000
+  },
+  "hubs/msk-exam3/": {
+   "kb": 850,
+   "requests": 30,
+   "fcp": 1500,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "hubs/msk-exam4/": {
+   "kb": 900,
+   "requests": 31,
+   "fcp": 2000,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "hubs/occlusion/": {
+   "kb": 1320,
+   "requests": 33,
+   "fcp": 2000,
+   "lcp": 2500,
+   "tbt": 1000
+  },
+  "hubs/pcd-exam3/": {
+   "kb": 850,
+   "requests": 30,
+   "fcp": 1500,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "hubs/pcd-implants-exam1/": {
+   "kb": 1000,
+   "requests": 33,
+   "fcp": 2000,
+   "lcp": 2500,
+   "tbt": 500
+  },
+  "hubs/perio/": {
+   "kb": 1180,
+   "requests": 32,
+   "fcp": 1500,
+   "lcp": 4500,
+   "tbt": 1000
+  },
+  "hubs/special-patient-care/": {
+   "kb": 940,
+   "requests": 32,
+   "fcp": 1500,
+   "lcp": 2500,
+   "tbt": 500
+  }
+ }
+}

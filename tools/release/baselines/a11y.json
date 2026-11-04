@@ -1,0 +1,451 @@
+{
+ "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
+ "updated": "2026-11-04",
+ "pages": {
+  "dashboard": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tl-hub"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "about": {
+   "axe": {
+    "color-contrast": {
+     "n": 9,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".lede > .live.tag"
+    },
+    "scrollable-region-focusable": {
+     "n": 2,
+     "impact": "serious",
+     "help": "Scrollable region must have keyboard access",
+     "sample": "#seasons > .tablebox:nth-child(2)"
+    }
+   },
+   "focus": {
+    "invisible": 18,
+    "stuck": 0,
+    "where": [
+     "a",
+     "a",
+     "a"
+    ]
+   },
+   "motion": 0
+  },
+  "review (sign-in)": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".kicker"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "occlusion · home": {
+   "axe": {
+    "color-contrast": {
+     "n": 8,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tag-amber > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "occlusion · compendium": {
+   "axe": {
+    "color-contrast": {
+     "n": 3,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-lec=\"applying\"] > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": ".sh-pod-rate"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion · review": {
+   "axe": {
+    "color-contrast": {
+     "n": 7,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tag-teal.gc-lec"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion · arcade": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-mode=\"arcade\"] > .mode-label"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "pcd-implants-exam1 · home": {
+   "axe": {
+    "color-contrast": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tag-amber > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": ".sh-pod-rate"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "pcd-implants-exam1 · compendium": {
+   "axe": {
+    "color-contrast": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-lec=\"evolution\"] > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    },
+    "svg-img-alt": {
+     "n": 6,
+     "impact": "serious",
+     "help": "<svg> elements with an img or image role must have alternative text",
+     "sample": "figure:nth-child(1) > svg[viewBox=\"0 0 400 230\"][role=\"img\"]"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "pcd-implants-exam1 · review": {
+   "axe": {
+    "color-contrast": {
+     "n": 5,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tag-teal.gc-lec"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    },
+    "svg-img-alt": {
+     "n": 6,
+     "impact": "serious",
+     "help": "<svg> elements with an img or image role must have alternative text",
+     "sample": ".rv-section:nth-child(4) > .fig-grid > figure:nth-child(1) > svg[viewBox=\"0 0 400 230\"][role=\"img\"]"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "pcd-implants-exam1 · arcade": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-mode=\"arcade\"] > .mode-label"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "perio · home": {
+   "axe": {
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "perio · compendium": {
+   "axe": {
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "perio · review": {
+   "axe": {
+    "aria-allowed-attr": {
+     "n": 10,
+     "impact": "critical",
+     "help": "Elements must only use supported ARIA attributes",
+     "sample": "button[data-rv-lec=\"all\"]"
+    },
+    "color-contrast": {
+     "n": 18,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "#ref-staging > .eyebrow > .tag-teal.chip"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    },
+    "svg-img-alt": {
+     "n": 10,
+     "impact": "serious",
+     "help": "<svg> elements with an img or image role must have alternative text",
+     "sample": ".sut-fig:nth-child(1) > svg[viewBox=\"0 0 320 210\"][role=\"img\"]"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "perio · arcade": {
+   "axe": {
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "special-patient-care · home": {
+   "axe": {
+    "color-contrast": {
+     "n": 3,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".home-next > .tag-sage > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "special-patient-care · compendium": {
+   "axe": {
+    "color-contrast": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-lec=\"syndromes\"] > .lec-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "special-patient-care · review": {
+   "axe": {
+    "color-contrast": {
+     "n": 8,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".tag-green.gc-lec"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "special-patient-care · arcade": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": "button[data-mode=\"arcade\"] > .mode-label"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "dashboard (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion (dark)": {
+   "axe": {
+    "color-contrast": {
+     "n": 9,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".primary.btn[data-home=\"mock\"]"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "pcd-implants-exam1 (dark)": {
+   "axe": {
+    "color-contrast": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".primary.btn[data-home=\"mock\"]"
+    },
+    "label-content-name-mismatch": {
+     "n": 4,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": ".sh-pod-rate"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "perio (dark)": {
+   "axe": {
+    "color-contrast": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".hn-num"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  },
+  "special-patient-care (dark)": {
+   "axe": {
+    "color-contrast": {
+     "n": 2,
+     "impact": "serious",
+     "help": "Elements must meet minimum color contrast ratio thresholds",
+     "sample": ".primary.btn[data-home=\"mock\"]"
+    },
+    "label-content-name-mismatch": {
+     "n": 1,
+     "impact": "serious",
+     "help": "Elements must have their visible text as part of their accessible name",
+     "sample": "#shstat-launch"
+    }
+   },
+   "focus": null,
+   "motion": 0
+  }
+ }
+}

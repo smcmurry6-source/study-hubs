@@ -1,0 +1,80 @@
+{
+  "about": "Synthetic test accounts for previews (RELEASE_TEST_PLAN.md, 'Test accounts'). Every id, name and number here is made up: none is copied or derived from a real student, visitor id, answer, report or comment. Never paste production rows into this file (the repo is public). Answers are generated in the browser from each hub's own question ids, with a fixed seed, so every tester sees the same history.",
+  "adminSecret": "preview-admin",
+  "personas": [
+    {
+      "id": "new",
+      "name": "New learner",
+      "summary": "First visit: no saved progress, no name yet, the guided tour shows, every count starts at zero.",
+      "visitor": "00000000-0000-4000-8000-preview00001",
+      "displayName": null,
+      "xp": 0,
+      "skipTour": false,
+      "answers": {},
+      "inbox": []
+    },
+    {
+      "id": "returning",
+      "name": "Returning learner",
+      "summary": "Studied the live hubs on and off for a week: about 45% of questions tried, 72% right, a few pins, a reply waiting in the Inbox, a survey to answer.",
+      "visitor": "00000000-0000-4000-8000-preview00002",
+      "displayName": "Preview Premolar",
+      "xp": 2400,
+      "skipTour": true,
+      "survey": true,
+      "answers": { "live": { "share": 0.45, "accuracy": 0.72, "days": 7 } },
+      "pins": 6,
+      "inbox": [
+        { "kind": "flag", "note": "The second choice on this question looks the same as the third. (fixture report)", "message": "Thanks! The two choices now differ, and the explanation says why. (fixture reply)", "daysAgo": 1 }
+      ]
+    },
+    {
+      "id": "high-xp",
+      "name": "High-XP learner",
+      "summary": "Top of the rank board: Dark Matter, a long daily streak, most questions answered, trophies and mastery badges.",
+      "visitor": "00000000-0000-4000-8000-preview00003",
+      "displayName": "Preview Cuspid Champion",
+      "xp": 61000,
+      "skipTour": true,
+      "answers": { "live": { "share": 0.92, "accuracy": 0.88, "days": 30 }, "archived": { "share": 0.8, "accuracy": 0.85, "days": 30 } },
+      "badges": ["mastery-gold:occlusion", "mastery-crown:perio", "mastery-silver:pcd-implants-exam1", "fairy", "golden", "run-25"],
+      "pins": 3,
+      "inbox": []
+    },
+    {
+      "id": "missed",
+      "name": "Missed-question learner",
+      "summary": "Lots of misses: about half the questions tried and 38% right, so Weak Spots, the Daily Drill, Questions I missed and Find this in the notes all have plenty to show.",
+      "visitor": "00000000-0000-4000-8000-preview00004",
+      "displayName": "Preview Molar in Progress",
+      "xp": 900,
+      "skipTour": true,
+      "answers": { "live": { "share": 0.5, "accuracy": 0.38, "days": 5 } },
+      "inbox": []
+    },
+    {
+      "id": "archived",
+      "name": "Archived-hub learner",
+      "summary": "Studied only hubs whose exams are over (Heme & Endo, MSK 3 and 4, PCD Exam 3). Pair it with Time travel to the night after an exam to see archiving, the archived notice and the check-in pop-up.",
+      "visitor": "00000000-0000-4000-8000-preview00005",
+      "displayName": "Preview Retired Root",
+      "xp": 5200,
+      "skipTour": true,
+      "answers": { "archived": { "share": 0.7, "accuracy": 0.76, "days": 14 } },
+      "suggestNow": "2026-11-03T22:30",
+      "inbox": []
+    },
+    {
+      "id": "admin",
+      "name": "Admin",
+      "summary": "Sam's role: a returning learner whose admin page (review/) opens with the preview's admin secret, with fixture reports, suggestions, surveys and podcast comments to resolve, hide and answer. The real admin secret is never typed into a preview.",
+      "visitor": "00000000-0000-4000-8000-preview00006",
+      "displayName": "Preview Admin",
+      "xp": 3100,
+      "skipTour": true,
+      "admin": true,
+      "answers": { "live": { "share": 0.3, "accuracy": 0.7, "days": 4 } },
+      "inbox": []
+    }
+  ]
+}
