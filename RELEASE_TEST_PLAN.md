@@ -53,8 +53,8 @@ not a screenshot. The tools are `tools/preview/`:
 - In CI, the **Release tests** workflow builds it on every site-changing PR and attaches it as the `preview-site`
   artifact (kept 14 days): download, unzip, `node tools/preview/serve.js --dir preview-site`.
 - In a Claude Code cloud session, the agent runs `serve.js` in the background and calls `report_preview_port`, so Sam
-  can open the preview from the Claude app, on a phone too, while the session is up. This is how Sam sees a change
-  before approving it ([section 10](#10-approval)).
+  can open the preview from the Claude app where it shows a preview panel, while the session is up. It has no address
+  outside the session, so screenshots come first when showing Sam ([section 10](#10-approval)).
 
 **Where previews may be hosted.** Never on the live site's origin (`smcmurry6-source.github.io`), which rules out a
 second GitHub Pages repo too: pages on one origin share localStorage and the service worker's scope, so a preview there
@@ -196,11 +196,11 @@ Sam is the product owner, and nothing substantial reaches the class without Sam'
 Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agent **shows Sam the change**
 ([preview-a-change](vault/how-to/preview-a-change.md)):
 
-- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat;
+- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat every
+  time: they are what Sam sees;
 - a short recording when it moves or takes several steps;
-- the live preview from its cloud session (`report_preview_port`), which Sam can tap through in the Claude app, on a
-  phone too, while the session is up, with **a direct link to it on its own line** (the session's link and the page to
-  open).
+- the live preview from its cloud session (`report_preview_port`), where the Claude app shows it. It has no address
+  outside the session, so there's no link Sam can tap; that needs a hosted preview ([section 13](#13-hosting-and-staging)).
 
 Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
 has a checkbox, "Sam approved this release", that **only Sam ticks** (or Sam writes "approved for release" in a PR
@@ -233,7 +233,8 @@ problem (Sam's call), and the bug log.
 
 **Sam's call, 2026-11-04: neither, for now.** Sam sees a change in the agent's screenshots and its cloud session's live
 preview ([section 10](#10-approval)), and tests run on fixtures; everything above works that way. The options stay here
-in case that changes ([task, dropped](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)). Prices are from each
+in case that changes ([task, dropped](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)); a preview link Sam
+can tap on a phone needs one of the hosted options (A is the pick). Prices are from each
 vendor's published plans as of November 2026; confirm on their pricing pages before signing up.
 
 **Hosted preview link per PR** (so a preview opens on a phone from the PR, with no computer):

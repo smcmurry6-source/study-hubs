@@ -26,7 +26,7 @@ the change into the PR's test report, tick what you did, and write what you saw.
 - [ ] Dark mode, and reduce motion on (the phone's setting or the browser's): still readable, nothing flashes or spins.
 - [ ] Wording is American English, plain, and right; the About page lists any new feature ([about-page](../rules/about-page.md)).
 - [ ] Sam was shown the change before approval: screenshots (phone and laptop), a recording if it moves, the session's
-      live preview with a direct link on its own line.
+      live preview where the app shows it.
 
 ## Questions, notes and lectures
 
