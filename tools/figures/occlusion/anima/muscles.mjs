@@ -15,18 +15,20 @@ const lerp = (a, b, u) => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
 
 /* ---------- bones (patient facing right) ---------- */
 const CRAN = [[44,214],[30,170],[36,120],[62,78],[110,42],[170,24],[230,26],[278,46],[310,78],[324,108],[322,128],[334,150],[332,162],[324,172],
-  [330,190],[342,204],[336,214],[338,236],[320,241],[280,241],[244,241],[234,232],[220,222],[196,216],[176,214],[150,216],[136,236],[110,236],[80,228]];
+  [332,188],[334,194],[328,200],[328,209],[341,213],[333,218],[336,236],[320,241],[280,241],[244,241],[234,232],[220,222],[196,216],[176,214],[150,216],[136,236],[110,236],[80,228]];
 const ORBIT = smooth([[268,140],[280,126],[298,124],[310,138],[308,158],[294,168],[276,166],[266,154]], true);
 /* zygomatic bone and arch: drawn over the temporalis, which passes under it to the coronoid */
-const ARCH = [[172,193],[200,189],[240,187],[262,180],[280,170],[300,172],[308,186],[296,202],[266,206],[232,205],[200,205],[174,207]];
-const MAND = [[150,212],[152,203],[161,197],[171,201],[172,211],[169,222],[180,232],[194,229],[205,212],[211,196],[217,200],[221,222],[226,246],[236,261],
-  [250,266],[290,266],[326,265],[334,282],[334,304],[326,324],[312,334],[264,336],[214,332],[190,326],[172,322],[162,310],[158,286],[158,252],[158,230],[154,220]];
+const ARCH = [[150,188],[172,190],[200,189],[240,187],[262,180],[280,170],[300,172],[308,186],[296,202],[266,206],[232,205],[200,205],
+  [183,208],[173,201],[160,196],[149,196],[145,192]];
+const MAND = [[150,212],[152,203],[161,197],[171,201],[172,211],[169,221],[176,227],[187,228],[198,220],[206,207],[211,196],[216,199],[219,212],
+  [222,230],[227,246],[236,259],[248,266],[290,267],[322,266],[327,276],[332,293],[330,309],[320,320],[298,320],[268,316],[242,311],[224,306],
+  [208,306],[192,303],[180,297],[172,287],[166,268],[161,246],[158,232],[155,222]];
 const CONDYLE = [[150,212],[152,203],[161,197],[171,201],[172,211],[169,222],[156,222]];
 const MASTOID = [[120,228],[136,226],[140,248],[132,262],[124,248]];
 const UTEETH = [], LTEETH = [];
 { const TW = [13, 13, 10, 10, 9, 8, 8]; let x = 245;
   TW.forEach((w, i) => { UTEETH.push(`<rect class="mu-tooth" x="${x + (i > 4 ? 2 : 0)}" y="240" width="${w}" height="${i > 3 ? 14 : 12}" rx="3"/>`); LTEETH.push(`<rect class="mu-tooth" x="${x}" y="253" width="${w}" height="${i > 3 ? 13 : 12}" rx="3"/>`); x += w + 1; }); }
-const HYOID = smooth([[204,368],[216,363],[230,365],[232,372],[222,377],[206,376]], true);
+const HYOID = smooth([[204,349],[216,344],[230,346],[232,353],[222,358],[206,357]], true);
 
 /* ---------- muscles ---------- */
 /* temporalis: a fan from the temporal line (stopping behind the orbit) down under the arch to the coronoid process */
@@ -50,26 +52,26 @@ function quad(o0, o1, i1, i0, n) {
 }
 /* masseter: superficial from the zygomatic process and the front of the arch down and back to the angle; deep from
    the back of the arch nearly straight down onto the upper ramus */
-const M_S = quad([258,205], [210,205], [174,320], [238,331], 6);
-const M_D = quad([212,204], [176,206], [178,262], [210,270], 4);
+const M_S = quad([258,205], [210,205], [181,290], [233,305], 6);
+const M_D = quad([212,204], [178,206], [188,258], [217,262], 4);
 /* digastric: posterior belly from the mastoid notch to the intermediate tendon at the hyoid, anterior belly to the chin */
 /* the posterior belly bows back behind the angle of the mandible (it runs medial to it) */
-const DIG_P = { d: smooth([[131,246],[138,302],[166,348],[204,374],[208,366],[174,338],[150,296],[142,242]], true),
-  fib: `M136 254Q146 318 204 370M139 250Q152 314 206 368` };
-const DIG_A = quad([230,366], [230,374], [312,338], [310,330], 3);
-const INFRA = quad([206,378], [230,378], [232,418], [204,418], 3);
+const DIG_P = { d: smooth([[131,246],[138,298],[164,336],[203,357],[208,349],[173,327],[150,292],[142,242]], true),
+  fib: `M136 254Q144 312 203 354M139 250Q152 308 206 351` };
+const DIG_A = quad([230,347], [230,355], [316,324], [314,316], 3);
+const INFRA = quad([206,359], [230,359], [232,418], [204,418], 3);
 /* deep panel: pterygoids from the lateral pterygoid plate (behind the maxillary tuberosity) back to the joint and ramus */
 const PLATE = smooth([[226,206],[236,204],[244,232],[244,262],[236,266],[230,240]], true);
-const LP_S = quad([232,199], [230,209], [173,209], [171,201], 3);
+const LP_S = quad([238,189], [235,199], [173,209], [171,201], 3);
 const LP_I = quad([234,212], [240,238], [172,226], [170,215], 4);
-const MP = quad([238,240], [244,262], [186,326], [164,312], 5);
+const MP = quad([238,240], [244,262], [193,300], [173,276], 5);
 
 /* line of pull: from the insertion toward the origin (a muscle only pulls) */
 const PULL = {
-  tA: [[220,180],[248,124]], tM: [[208,178],[196,86]], tP: [[198,180],[116,130]],
-  mS: [[200,308],[238,222]], mD: [[192,258],[194,218]],
-  lpS: [[182,205],[224,204]], lpI: [[182,222],[228,228]], mp: [[182,312],[234,258]],
-  dig: [[298,342],[244,364]], infra: [[218,382],[218,412]],
+  tA: [[220,180],[248,124]], tM: [[208,178],[196,86]], tP: [[200,184],[112,158]],
+  mS: [[198,292],[238,220]], mD: [[202,254],[193,216]],
+  lpS: [[182,204],[226,196]], lpI: [[182,222],[228,228]], mp: [[184,290],[234,256]],
+  dig: [[300,327],[246,348]], infra: [[218,364],[218,404]],
 };
 const INFO = {
   tA: "Temporalis, anterior fibers: nearly vertical, so they elevate (close) the jaw. The temporalis inserts on the thin coronoid process: a fast positioner, not a power closer.",
@@ -91,7 +93,8 @@ const pullG = (k) => { const [a, b] = PULL[k], dx = b[0] - a[0], dy = b[1] - a[1
 
 function bones(deep) {
   const mand = `<path class="mu-bone mu-mand${deep ? " mu-see" : ""}" d="${smooth(MAND, true)}"/>`;
-  return `<path class="mu-bone" d="${smooth(CRAN, true)}"/><path class="mu-orbit" d="${ORBIT}"/>` +
+  /* the infratemporal fossa, seen through the sigmoid notch when the masseter is dimmed */
+  return (deep ? "" : `<path class="mu-fossa" d="M165 208L218 208L218 238L165 238Z"/>`) + `<path class="mu-bone" d="${smooth(CRAN, true)}"/><path class="mu-orbit" d="${ORBIT}"/>` +
     `<ellipse class="mu-eam" cx="139" cy="207" rx="6" ry="7"/><path class="mu-bone" d="${smooth(MASTOID, true)}"/>` +
     UTEETH.join("") + (deep ? `<path class="mu-plate" d="${PLATE}"/>` : "") + mand + LTEETH.join("");
 }
@@ -102,7 +105,7 @@ function panel(deep) {
     s += `<path class="mu-bone" d="${smooth(ARCH, true)}"/>`;
     s += fibG("mD", M_D) + fibG("mS", M_S);
     s += `<g class="hot mu-m" tabindex="0" data-mus="hyoid" data-info="${esc(INFO.hyoid)}"><path class="mu-bone" d="${HYOID}"/></g>`;
-    s += `<g class="hot mu-m" tabindex="0" data-mus="dig" data-info="${esc(INFO.dig)}"><path class="mu-body" d="${DIG_P.d}"/><path class="mu-fib" d="${DIG_P.fib}"/><path class="mu-body" d="${DIG_A.d}"/><path class="mu-fib" d="${DIG_A.fib}"/><path class="mu-tendon" d="M202 370Q218 376 234 370"/></g>`;
+    s += `<g class="hot mu-m" tabindex="0" data-mus="dig" data-info="${esc(INFO.dig)}"><path class="mu-body" d="${DIG_P.d}"/><path class="mu-fib" d="${DIG_P.fib}"/><path class="mu-body" d="${DIG_A.d}"/><path class="mu-fib" d="${DIG_A.fib}"/><path class="mu-tendon" d="M202 351Q218 357 234 351"/></g>`;
     s += fibG("infra", INFRA);
     s += ["tA", "tM", "tP", "mS", "mD", "dig", "infra"].map(pullG).join("");
   } else {
@@ -120,13 +123,13 @@ const LAB = {
   sup: [["tP", "posterior", 136, 118, "middle"], ["tM", "middle", 192, 100, "middle"], ["tA", "anterior", 236, 112, "middle"],
     ["tM", "TEMPORALIS", 176, 42, "middle"],
     ["mS", "Masseter,", 218, 272, "middle"], ["mS", "superficial", 218, 285, "middle"],
-    ["mD", "Masseter, deep", 14, 300, "start", [186, 236]],
-    ["dig", "Digastric", 14, 352, "start", [150, 316]],
-    ["hyoid", "Hyoid", 262, 392, "start", [228, 372]],
-    ["infra", "Infrahyoids", 252, 410, "start", [230, 404]]],
-  deep: [["lpS", "Lateral pterygoid:", 120, 130, "start"], ["lpS", "superior head", 120, 150, "start", [212, 203]],
+    ["mD", "Masseter, deep", 14, 300, "start", [188, 236]],
+    ["dig", "Digastric", 14, 352, "start", [155, 312]],
+    ["hyoid", "Hyoid", 262, 376, "start", [229, 353]],
+    ["infra", "Infrahyoids", 252, 400, "start", [229, 394]]],
+  deep: [["lpS", "Lateral pterygoid:", 120, 130, "start"], ["lpS", "superior head", 120, 150, "start", [222, 196.5]],
     ["lpI", "inferior head", 120, 168, "start", [200, 222]],
-    ["mp", "Medial pterygoid", 232, 384, "start", [206, 294]],
+    ["mp", "Medial pterygoid", 232, 384, "start", [212, 274]],
     ["none", "Arch removed (dashed),", 14, 384, "start"], ["none", "ramus see-through", 14, 397, "start"]],
 };
 function labels(which, mirror) {
@@ -244,8 +247,9 @@ const CSS = `
 .anima .mu-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 14px}
 .anima .mu-pair[hidden]{display:none}
 .anima .mu-svg .mu-bone{fill:var(--tm-bone);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
-.anima .mu-svg .mu-see{fill-opacity:.35;stroke-dasharray:4 3}
+.anima .mu-svg .mu-see{fill-opacity:.35;stroke-dasharray:4 3;vector-effect:none}
 .anima .mu-svg .mu-orbit{fill:var(--anatomy-shade-0);stroke:var(--anatomy-hi);stroke-width:1}
+.anima .mu-svg .mu-fossa{fill:var(--anatomy-shade-0);stroke:none}
 .anima .mu-svg .mu-eam{fill:var(--tm-air);stroke:var(--anatomy-hi);stroke-width:1}
 .anima .mu-svg .mu-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:.8;transition:opacity .2s}
 .anima .mu-svg .mu-ldot{fill:var(--anatomy-dot);transition:opacity .2s}
@@ -254,15 +258,15 @@ const CSS = `
 .anima .mu-svg .mu-plate{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1}
 .anima .mu-svg .mu-disc{fill:none;stroke:var(--tm-disc);stroke-width:4;stroke-linecap:round}
 .anima .mu-svg .mu-band{fill:var(--surface)}
-.anima .mu-svg .mu-cutline{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4}
-.anima .mu-svg .mu-ghost{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:3 3}
+.anima .mu-svg .mu-cutline{stroke:var(--line);stroke-width:1;stroke-dasharray:2 4;vector-effect:none}
+.anima .mu-svg .mu-ghost{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:3 3;vector-effect:none}
 .anima .mu-svg .mu-body{fill:var(--tm-muscle);stroke:var(--tm-muscle-fib);stroke-width:1;fill-opacity:.92;transition:fill .2s,opacity .2s}
 .anima .mu-svg .mu-fib{fill:none;stroke:var(--tm-muscle-fib);stroke-width:.8;opacity:.75;stroke-linecap:round}
 .anima .mu-svg .mu-tendon{fill:none;stroke:var(--anatomy-text);stroke-width:2.4;stroke-linecap:round}
 .anima .mu-svg .mu-m{transition:opacity .2s}
 .anima .mu-svg .mu-m.is-dim{opacity:.32}
 .anima .mu-svg .mu-m.is-on .mu-body{fill:#e05a4e;stroke:var(--anatomy-lit);stroke-width:2}
-.anima .mu-svg .mu-m.is-aux .mu-body{stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:4 3}
+.anima .mu-svg .mu-m.is-aux .mu-body{stroke:var(--anatomy-lit);stroke-width:1.6;stroke-dasharray:4 3;vector-effect:none}
 .anima .mu-svg .mu-pull{opacity:0;transition:opacity .2s;pointer-events:none}
 .anima .mu-svg .mu-pull.is-on{opacity:1}
 .anima .mu-svg .mu-pull path{fill:none;stroke:var(--anatomy-lit);stroke-width:2.6;stroke-linecap:round}

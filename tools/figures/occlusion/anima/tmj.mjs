@@ -5,6 +5,10 @@
 // Numbers from the hub's L1/L2 notes (Dr. Givan's handouts): pure rotation to about 20-25 mm, maximum opening 40-60 mm.
 // At about 5 px per mm the condyle travels roughly 19 mm forward and 10 mm down, about an eminence's height.
 // Rotation angles, the disc's turn and the path are schematic, chosen so the parts keep their relationships.
+// The mandible is drawn to the same scale (about 5 px per mm): a condylar head about 9 mm front to back, the sigmoid
+// notch about 15 mm deep, the coronoid tip about 30 mm in front of the condyle, under the zygomatic arch (which the
+// notes call the temporalis's protective tunnel), and a ramus about 32 mm wide. The joint model (C0, CC, C1, TH1, TH2,
+// PSI, R, FOSSA, TUB) is shared with the envelope tracer (envelope.mjs): don't change those values here.
 import { figureSvg, plateHtml, f1, esc, smooth, callout } from "./shared.mjs";
 
 const W = 640, H = 420;
@@ -14,8 +18,14 @@ const D = {
   /* disc thickness by angle (degrees from the top of the condyle, clockwise = anterior): thick posterior band,
      thin intermediate zone, anterior band (about 3 : 1 : 2, as the notes describe: biconcave) */
   DT: [[-64, 3], [-46, 11], [-26, 15], [-6, 11], [14, 6], [30, 5], [46, 6], [62, 9], [74, 10], [90, 7], [102, 3]],
-  FOVEA: [14, 34], NECK_P: [-19, 30], TML_NECK: [-12, 46], POLE: [9, -4],
-  SL: [252, 178], LPS0: [[640, 182], [640, 202]], LPI0: [[640, 246], [640, 284]],
+  /* in the mandible's own frame (origin = condyle center, x forward, y down): the pterygoid fovea on the front of the
+     neck, where the inferior retrodiscal lamina meets the back of the neck, the outer TM ligament's attachment low on
+     the outer surface of the neck, the lateral pole */
+  FOVEA: [13.5, 31], NECK_P: [-18, 26], TML_NECK: [-15, 58], POLE: [9, -4],
+  /* the TM ligament's origins on the outer surface of the articular eminence at the tubercle (absolute): the outer
+     oblique portion fans down and back to the neck, the inner horizontal portion runs straight back to the pole */
+  TMO: [408, 180], TMI: [400, 170],
+  SL: [252, 178], LPS0: [[640, 186], [640, 208]], LPI0: [[640, 262], [640, 300]], CLR: 6,
   wide: `0 0 ${W} ${H}`, narrow: "150 40 420 330",
 };
 function discT(a, D) {
@@ -37,11 +47,17 @@ function tmjFrame(mm, D) {
   function polar(a, r) { var q = a * Math.PI / 180; return [r * Math.sin(q), -r * Math.cos(q)]; }
   function f(v) { return Math.round(v * 10) / 10; }
   function P(pts) { return "M" + pts.map(function (p) { return f(p[0]) + " " + f(p[1]); }).join("L"); }
+  function lerp(a, b, u) { return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]; }
+  /* smooth open curve through points (Catmull-Rom as cubic Bezier), without the leading M */
+  function curve(pts) { var d = ""; for (var i = 0; i < pts.length - 1; i++) { var p0 = pts[i ? i - 1 : 0], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+    d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + f(p2[0]) + " " + f(p2[1]); } return d; }
+  /* the underside of the temporal bone (fossa roof forward), for keeping the superior head below the eminence */
+  function surfY(x) { var s = D.SURFT, i; if (x <= s[0][0]) return s[0][1]; for (i = 1; i < s.length; i++) if (x <= s[i][0]) return s[i - 1][1] + (s[i][1] - s[i - 1][1]) * (x - s[i - 1][0]) / (s[i][0] - s[i - 1][0]); return s[s.length - 1][1]; }
   var dPostO = rot(polar(-64, D.RI + discT(-64, D) + .5), m.psi), dPostI = rot(polar(-64, D.RI - .5), m.psi);
   var dAntO = rot(polar(102, D.RI + discT(102, D)), m.psi), dAntI = rot(polar(102, D.RI), m.psi);
-  var neckP = rot(D.NECK_P, m.th), fovea = rot(D.FOVEA, m.th), fovea2 = rot([D.FOVEA[0] + 2, D.FOVEA[1] + 14], m.th);
+  var neckP = rot(D.NECK_P, m.th), fovea = rot(D.FOVEA, m.th), fovea2 = rot([D.FOVEA[0] + 1.5, D.FOVEA[1] + 11], m.th);
   var tmlNeck = rot(D.TML_NECK, m.th), pole = rot(D.POLE, m.th);
-  var sl = D.SL, mid = [(dPostO[0] + sl[0]) / 2 - 4, (dPostO[1] + sl[1]) / 2 - 6];
+  var sl = D.SL;
   /* superior lamina is elastic: drawn wavy, its waves smoothing out as it stretches */
   var n = 7, wav = [], dx = sl[0] - dPostO[0], dy = sl[1] - dPostO[1], len = Math.sqrt(dx * dx + dy * dy), amp = Math.max(0.6, 4.2 - len / 30);
   for (var i = 0; i <= n * 2; i++) { var u = i / (n * 2), w = (i % 2 ? 1 : -1) * amp * Math.sin(u * Math.PI); wav.push([dPostO[0] + dx * u - dy / len * w, dPostO[1] + dy * u + dx / len * w]); }
@@ -53,23 +69,47 @@ function tmjFrame(mm, D) {
   for (var ra = -50; ra < aTop; ra += 8) rim.push(discOut(ra));
   var top = discOut(aTop);
   var behind = D.FOSSA.filter(function (p) { return p[0] < top[0]; }).reverse();
-  var retro = [top].concat(behind, [sl, lowPost, neckP, dPostI, dPostO], rim);
+  /* the inferior lamina runs from the posterior band down the back of the condyle to the neck, bowed away from it */
+  var lamMid = lerp(dPostI, neckP, .5), lamDir = rot([-1, 0], m.th); lamDir = [lamDir[0] - C[0], lamDir[1] - C[1]];
+  var lam = [dPostI, [lamMid[0] + lamDir[0] * 6, lamMid[1] + lamDir[1] * 6], neckP];
+  var retro = [top].concat(behind, [sl, lowPost, neckP, lam[1], dPostI, dPostO], rim);
+  /* vessels sit inside the retrodiscal tissue, between the postglenoid process and the back of the condyle */
+  var v1 = lerp(lerp(sl, dPostI, .5), lowPost, .25), v2 = lerp(lowPost, neckP, .5), v3 = lerp(lerp(sl, dPostI, .5), neckP, .55);
+  v2 = [v2[0], v2[1] - 5];
+  /* superior head: from the disc's anterior band forward to the infratemporal surface; where a straight band would cut
+     through the eminence it runs just below the bone, as it does in a sagittal section */
+  var N = 14, st = [], sb = [];
+  for (var j = 0; j <= N; j++) {
+    var uu = j / N, pt = lerp(dAntO, D.LPS0[0], uu), pb = lerp(dAntI, D.LPS0[1], uu);
+    var push = Math.max(0, surfY(pt[0]) + D.CLR - pt[1]) * Math.min(1, j / 3);
+    st.push([pt[0], pt[1] + push]); sb.push([pb[0], pb[1] + push]);
+  }
+  var lps = "M" + f(st[0][0]) + " " + f(st[0][1]) + curve(st) + "L" + f(sb[N][0]) + " " + f(sb[N][1]) + curve(sb.slice().reverse()) + "Z";
+  var lpsF = ""; [.25, .5, .75].forEach(function (q) { var fl = st.map(function (p, k) { return lerp(p, sb[k], q); }); fl = fl.slice(1); lpsF += "M" + f(fl[0][0]) + " " + f(fl[0][1]) + curve(fl); });
   function band(a0, a1, b0, b1) { return P([a0, b0, b1, a1]) + "Z"; }
-  var lps = band(dAntO, dAntI, D.LPS0[0], D.LPS0[1]);
   var lpi = band(fovea, fovea2, D.LPI0[0], D.LPI0[1]);
   function fibers(a0, a1, b0, b1, k) { var out = ""; for (var j = 1; j < k; j++) { var u = j / k, p = [a0[0] + (a1[0] - a0[0]) * u, a0[1] + (a1[1] - a0[1]) * u], q = [b0[0] + (b1[0] - b0[0]) * u, b0[1] + (b1[1] - b0[1]) * u]; out += "M" + f(p[0]) + " " + f(p[1]) + "L" + f(q[0]) + " " + f(q[1]); } return out; }
-  var A = {};
-  A[".tm-mand"] = { transform: "translate(" + f(C[0]) + " " + f(C[1]) + ") rotate(" + f(m.th) + ")" };
+  var A = {}, T = "translate(" + f(C[0]) + " " + f(C[1]) + ") rotate(" + f(m.th) + ")";
+  A[".tm-mand"] = { transform: T }; A[".tm-mand2"] = { transform: T };
   A[".tm-disc"] = { transform: "translate(" + f(C[0]) + " " + f(C[1]) + ") rotate(" + f(m.psi) + ")" };
   A[".tm-retro"] = { d: (function () { var s = "M" + f(retro[0][0]) + " " + f(retro[0][1]); for (var k = 1; k < retro.length; k++) s += "L" + f(retro[k][0]) + " " + f(retro[k][1]); return s + "Z"; })() };
+  A[".tm-v1"] = { cx: f(v1[0]), cy: f(v1[1]) }; A[".tm-v2"] = { cx: f(v2[0]), cy: f(v2[1]) }; A[".tm-v3"] = { cx: f(v3[0]), cy: f(v3[1]) };
   A[".tm-suplam"] = { d: P(wav) };
-  A[".tm-inflam"] = { d: P([dPostI, [(dPostI[0] + neckP[0]) / 2 - 3, (dPostI[1] + neckP[1]) / 2 + 2], neckP]) };
-  A[".tm-lps"] = { d: lps }; A[".tm-lps-f"] = { d: fibers(dAntO, dAntI, D.LPS0[0], D.LPS0[1], 4) };
+  A[".tm-inflam"] = { d: "M" + f(lam[0][0]) + " " + f(lam[0][1]) + curve(lam) };
+  A[".tm-lps"] = { d: lps }; A[".tm-lps-f"] = { d: lpsF };
   A[".tm-lpi"] = { d: lpi }; A[".tm-lpi-f"] = { d: fibers(fovea, fovea2, D.LPI0[0], D.LPI0[1], 5) };
-  A[".tm-tmlo"] = { d: P([D.TUB, tmlNeck]) };
-  A[".tm-tmli"] = { d: P([[D.TUB[0] - 2, D.TUB[1] - 4], pole]) };
+  A[".tm-tmlo"] = { d: P([D.TMO, tmlNeck]) };
+  A[".tm-tmli"] = { d: P([D.TMI, pole]) };
   A[".tm-tmlo-dot"] = { cx: f(tmlNeck[0]), cy: f(tmlNeck[1]) };
   A[".tm-tmli-dot"] = { cx: f(pole[0]), cy: f(pole[1]) };
+  /* labels that ride on the mandible: upright text, leader to a dot on the part */
+  [["cond", D.LAB_COND], ["cor", D.LAB_COR]].forEach(function (L) {
+    var k = L[0], o = L[1], tp = rot(o.t, m.th), lp = rot(o.l, m.th), dp = rot(o.p, m.th);
+    A[".tm-lab-" + k] = { x: f(tp[0]), y: f(tp[1]) };
+    if (o.t2) { var tp2 = rot(o.t2, m.th); A[".tm-lab-" + k + "2"] = { x: f(tp2[0]), y: f(tp2[1]) }; }
+    A[".tm-lead-" + k] = { d: "M" + f(lp[0]) + " " + f(lp[1]) + "L" + f(dp[0]) + " " + f(dp[1]) };
+    A[".tm-ldot-" + k] = { cx: f(dp[0]), cy: f(dp[1]) };
+  });
   var gy = D.GAUGE[1] + (D.GAUGE[2] - D.GAUGE[1]) * mm / 50;
   A[".tm-gauge-mark"] = { d: "M" + (D.GAUGE[0] - 7) + " " + f(gy) + "H" + (D.GAUGE[0] + 7) };
   A[".tm-gauge-fill"] = { y: D.GAUGE[1], height: f(Math.max(0, gy - D.GAUGE[1])) };
@@ -85,11 +125,13 @@ const surf = [[0, 214], [110, 216], [170, 208], [222, 212], [238, 205], [250, 18
 for (let a = -60; a <= 48; a += 6) surf.push(rotP(D.C0, polar(a, D.RI + discT(a, D) + D.GAP), 0));
 for (let i = 2; i <= 10; i++) { const mm = 25 + 2.5 * i, m = tmjModel(mm, D); surf.push(rotP(m.C, polar(30, D.RI + discT(30, D) + 2.4), m.psi)); }
 const fossaEnd = surf.length;
-{ const L = surf[surf.length - 1]; surf.push([L[0] + 16, L[1] + 3], [L[0] + 40, L[1] - 3], [L[0] + 72, L[1] - 20], [L[0] + 120, L[1] - 38], [640, L[1] - 44]); }
+// past the crest (the articular tubercle) the bone's lower border runs forward nearly level: the zygomatic arch
+{ const L = surf[surf.length - 1]; surf.push([L[0] + 16, L[1] + 3], [L[0] + 40, L[1] - 1], [L[0] + 80, L[1] - 2], [L[0] + 150, L[1] - 3], [640, L[1] - 2]); }
 const crestIdx = surf.reduce((bi, p, i) => (i > 20 && p[1] > surf[bi][1] ? i : bi), 21);
 /* the fossa contour from the postglenoid process forward along the eminence slope: the retrodiscal tissue fills it behind the disc */
 D.FOSSA = surf.slice(5, fossaEnd).map((p) => [f1(p[0]), f1(p[1])]);
 D.TUB = [f1(surf[crestIdx][0] + 26), f1(surf[crestIdx][1] - 2)];
+D.SURFT = surf.filter((p, i) => i > 12 && p[0] >= 296).map((p) => [f1(p[0]), f1(p[1])]);
 D.GAUGE = [52, 270, 380];
 /* the joint model, shared with the envelope tracer (envelope.mjs) */
 export { D as TMJ_D };
@@ -97,18 +139,55 @@ const surfD = smooth(surf, false);
 const boneD = surfD + `L640 0L0 0Z`;
 // cartilage lining on the articular surface (fossa to just past the eminence crest), as a stroke under the outline
 const cart = smooth(surf.slice(6, crestIdx + 3), false);
+/* the same curve as surfD from point i0 to the end (the zygomatic arch's lower border), segment for segment */
+function curveFrom(pts, i0) {
+  let d = `M${f1(pts[i0][0])} ${f1(pts[i0][1])}`; const n = pts.length;
+  for (let i = i0; i < n - 1; i++) { const p0 = pts[i ? i - 1 : 0], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2 < n ? i + 2 : i + 1];
+    d += ` C${f1(p1[0] + (p2[0] - p0[0]) / 6)} ${f1(p1[1] + (p2[1] - p0[1]) / 6)} ${f1(p2[0] - (p3[0] - p1[0]) / 6)} ${f1(p2[1] - (p3[1] - p1[1]) / 6)} ${f1(p2[0])} ${f1(p2[1])}`; }
+  return d;
+}
+const archI = crestIdx + 1, archLow = curveFrom(surf, archI), aP = surf[archI];
+/* the arch is lateral to the coronoid process: drawn over it, nearly opaque, so the tip shows faintly behind it */
+const archTop = [[640, 147], [560, 148], [492, 151], [458, 160]];
+const archD = archLow + `L${archTop.map((p) => p.join(" ")).join("L")}Z`;
+const archTopD = `M${f1(aP[0])} ${f1(aP[1])}` + smooth([aP, [446, 170], ...archTop.slice().reverse()], false).replace(/^M[^C]*/, "");
 
 function rnd(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
 const R1 = rnd(7);
 let trab = "";
 for (let i = 0; i < 70; i++) { const x = 8 + R1() * 624, y = 8 + R1() * 120; if (y > 150) continue; trab += `<ellipse class="tm-trab" cx="${f1(x)}" cy="${f1(y)}" rx="${f1(3 + R1() * 6)}" ry="${f1(1.6 + R1() * 2.4)}" transform="rotate(${Math.round(R1() * 180)} ${f1(x)} ${f1(y)})"/>`; }
 
-// mandible in its own frame (origin = condyle center): head, neck, pterygoid fovea, ramus, sigmoid notch, coronoid
-const mandOut = [[-21, 6], [-20, 34], [-24, 90], [-30, 170], [-34, 280], [160, 280], [158, 120], [150, 58], [138, 26], [128, 44], [104, 82], [74, 98], [44, 86], [24, 52], [13, 36], [18, 18], [21, 4]];
-const mandD = smooth(mandOut, false) + `A22 21 0 1 0 -21 6Z`;
-const headCap = `M-20.5 -2A22 21 0 0 1 21 -1`;
+// mandible in its own frame (origin = condyle center, 5 px per mm): condylar head (an ellipse 22 x 21), neck with the
+// pterygoid fovea in front, the posterior border of the ramus, the anterior border rising to the coronoid process, the
+// sigmoid notch between coronoid and condyle
+const head = []; for (let a = 100; a >= -100; a -= 10) head.push([22 * Math.sin(a * Math.PI / 180), -21 * Math.cos(a * Math.PI / 180)]);
+const MAND = [
+  ...head,
+  [-19.5, 18], [-17.5, 32], [-19, 58], [-21, 100], [-20, 150], [-16, 210], [-10, 270], [-6, 330], [100, 345], [214, 330],
+  [196, 290], [176, 250], [158, 205], [148, 160], [146, 120], [150, 80], [155, 45], [158, 20], [155, 7], [149, 1.5], [143, 6],
+  [130, 19], [114, 34], [96, 46], [76, 52], [56, 50], [38, 46], [25, 41], [16.5, 36], [13.5, 30], [15, 22], [18.5, 13],
+];
+const mandD = smooth(MAND, true);
+/* the coronoid process (for its own hover target and the dashed outline of the part hidden behind the arch) */
+const COR = [[76, 52], [96, 46], [114, 34], [130, 19], [143, 6], [149, 1.5], [155, 7], [158, 20], [155, 45], [150, 80], [110, 66]];
+const corHit = smooth(COR, true);
+const corGhost = smooth([[120, 30], [130, 19], [143, 6], [149, 1.5], [155, 7], [158, 20], [157.5, 30]], false);
+/* articular fibrocartilage on the anterosuperior surface of the head, just inside the cortex */
+const capPts = []; for (let a = -50; a <= 96; a += 6) capPts.push([20.2 * Math.sin(a * Math.PI / 180), -19.2 * Math.cos(a * Math.PI / 180)]);
+const headCap = smooth(capPts, false);
+function inPoly(p, poly) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
 const R2 = rnd(11);
-let mtrab = ""; for (let i = 0; i < 26; i++) { const x = -16 + R2() * 36, y = -10 + R2() * 120; mtrab += `<ellipse class="tm-trab" cx="${f1(x + y * .02)}" cy="${f1(y)}" rx="${f1(2 + R2() * 4)}" ry="${f1(1.2 + R2() * 1.8)}"/>`; }
+let mtrab = "";
+for (let i = 0, k = 0; i < 400 && k < 46; i++) {
+  const inHead = k < 16, x = inHead ? -18 + R2() * 36 : -16 + R2() * 170, y = inHead ? -16 + R2() * 44 : 30 + R2() * 240;
+  const rx = 2 + R2() * (inHead ? 3 : 4.5), ry = 1.2 + R2() * 1.8;
+  if (!inPoly([x, y], MAND) || !inPoly([x + rx + 3, y], MAND) || !inPoly([x - rx - 3, y], MAND) || !inPoly([x, y + 5], MAND) || !inPoly([x, y - 5], MAND)) continue;
+  if (inHead && x * x / 324 + y * y / 289 > 1) continue;
+  mtrab += `<ellipse class="tm-trab" cx="${f1(x)}" cy="${f1(y)}" rx="${f1(rx)}" ry="${f1(ry)}" transform="rotate(${Math.round(70 + R2() * 40)} ${f1(x)} ${f1(y)})"/>`; k++;
+}
+/* labels that ride on the mandible (frame coordinates: text, leader start, dot on the part) */
+D.LAB_COND = { t: [24, 96], l: [21, 84], p: [1, 2] };
+D.LAB_COR = { t: [100, 98], t2: [100, 111], l: [108, 86], p: [141, 30] };
 
 // the disc in its own frame
 const discO = [], discI = [];
@@ -121,16 +200,17 @@ const F0 = tmjFrame(0, D);
 const at = (sel) => Object.entries(F0.attrs[sel]).map(([k, v]) => ` ${k}="${v}"`).join("");
 
 const INFO = {
-  bone: "Temporal bone: the glenoid (mandibular) fossa, and in front of it the articular eminence, whose posterior slope the condyle and disc slide down when the jaw translates. Behind the fossa: the postglenoid process and the external auditory meatus.",
+  bone: "Temporal bone: the glenoid (mandibular) fossa, and in front of it the articular eminence, whose posterior slope the condyle and disc slide down when the jaw translates. Behind the fossa: the postglenoid process and the external auditory meatus. In front, the zygomatic arch, the tunnel that protects the temporalis insertion on the coronoid process.",
   condyle: "Condyle: in the first 20-25 mm it only rotates, about the transverse horizontal axis, in the lower joint space. Centric relation is this seated, anterosuperior position against the eminence slope, on the thinnest avascular part of the disc.",
+  coronoid: "Coronoid process: the temporalis inserts here. It sits under the zygomatic arch (drawn faded where it passes behind the arch), separated from the condyle by the sigmoid notch, and swings down and forward out from under the arch as the mouth opens.",
   disc: "Articular disc: dense fibrous connective tissue that functions like a third bone, which makes the TMJ a compound joint. Biconcave: a thick anterior border, a thin intermediate zone (avascular, no nerves) where the condyle sits, and an even thicker posterior border. Thicker medially, so a displaced disc tends to go forward or medially. Not a meniscus.",
   upper: "Upper (superior) joint space, disc to temporal bone: translation happens here.",
   lower: "Lower (inferior) joint space, disc to condyle: rotation happens here.",
   retro: "Retrodiscal tissues: loaded with vessels and nerves, so functioning on them hurts. The superior retrodiscal lamina is elastic (it stretches here as the disc goes forward); the inferior lamina is collagenous and ties the disc to the back of the condyle.",
   lps: "Superior head of the lateral pterygoid: from the greater wing of the sphenoid (infratemporal crest) to the capsule and disc. Active in CLOSING, steadying the disc against the pull of the retrodiscal tissue.",
   lpi: "Inferior head of the lateral pterygoid: from the lateral surface of the lateral pterygoid plate to the pterygoid fovea of the condylar neck. Active in OPENING and protrusion: it pulls the condyle forward down the eminence.",
-  tmlo: "TM ligament, outer oblique portion: a sling from the articular eminence to the back of the condylar neck. It limits rotational opening: once it is taut (about 20-25 mm), the jaw can only open further if the condyle translates forward.",
-  tmli: "TM ligament, inner horizontal portion: from the eminence back to the lateral pole of the condyle and the disc. It limits posterior movement of the condyle and disc, protecting the retrodiscal tissue from a blow to the chin.",
+  tmlo: "TM ligament, outer oblique portion: a sling from the outer surface of the articular eminence down and back to the outer surface of the condylar neck. It limits rotational opening: once it is taut (about 20-25 mm), the jaw can only open further if the condyle translates forward.",
+  tmli: "TM ligament, inner horizontal portion: from the eminence straight back to the lateral pole of the condyle and the disc. It limits posterior movement of the condyle and disc, protecting the retrodiscal tissue from a blow to the chin.",
 };
 const hot = (k, inner) => `<g class="hot" tabindex="0" data-part="${k}" data-info="${esc(INFO[k])}">${inner}</g>`;
 
@@ -144,30 +224,37 @@ const gauge = (() => {
   s += `<text class="am-label tm-gauge-note" x="${gx + 34}" y="${yy(22.5)}">end of rotation</text>`;
   return s;
 })();
+const rideLab = (k, lines) => `<g class="tm-ride"><path class="am-leader tm-lead-${k}"${at(".tm-lead-" + k)}/><circle class="am-dot tm-ldot-${k}" r="2"${at(".tm-ldot-" + k)}/>` +
+  lines.map((t, i) => `<text class="am-label tm-rlab tm-lab-${k}${i ? "2" : ""}" text-anchor="middle"${at(".tm-lab-" + k + (i ? "2" : ""))}>${t}</text>`).join("") + `</g>`;
 
 const crest = surf[crestIdx];
 const body = [
-  `<rect class="tm-air" x="0" y="0" width="${W}" height="${H}"/>`,
+  `<rect class="tm-soft" x="0" y="0" width="${W}" height="${H}"/>`,
   hot("bone", `<path class="tm-bone" d="${boneD}"/>${trab}<path class="tm-cart" d="${cart}"/><path class="tm-cortex" d="${surfD}"/><ellipse class="tm-eam" cx="192" cy="168" rx="20" ry="17"/>`),
-  hot("retro", `<path class="tm-retro"${at(".tm-retro")}/><circle class="tm-vessel" cx="244" cy="196" r="2.4"/><circle class="tm-vessel" cx="236" cy="203" r="1.8"/><path class="tm-inflam"${at(".tm-inflam")}/><path class="tm-suplam"${at(".tm-suplam")}/>`),
+  hot("retro", `<path class="tm-retro"${at(".tm-retro")}/><circle class="tm-vessel tm-v1" r="2.4"${at(".tm-v1")}/><circle class="tm-vessel tm-v2" r="1.9"${at(".tm-v2")}/><circle class="tm-vessel tm-v3" r="1.6"${at(".tm-v3")}/><path class="tm-inflam"${at(".tm-inflam")}/><path class="tm-suplam"${at(".tm-suplam")}/>`),
+  /* the lateral pterygoid lies medial to the ramus and coronoid: drawn behind them, seen through the sigmoid notch */
   hot("lpi", `<path class="tm-muscle tm-lpi"${at(".tm-lpi")}/><path class="tm-fib tm-lpi-f"${at(".tm-lpi-f")}/>`),
-  hot("condyle", `<g class="tm-mand"${at(".tm-mand")}><path class="tm-mandible" d="${mandD}"/>${mtrab}<path class="tm-headcap" d="${headCap}"/><path class="tm-fovea" d="M13 32 Q9 38 16 44"/></g>`),
+  hot("lps", `<path class="tm-muscle tm-lps"${at(".tm-lps")}/><path class="tm-fib tm-lps-f"${at(".tm-lps-f")}/>`),
+  hot("condyle", `<g class="tm-mand"${at(".tm-mand")}><path class="tm-mandible" d="${mandD}"/>${mtrab}<path class="tm-headcap" d="${headCap}"/><path class="tm-fovea" d="M15.5 25Q12 31 15 38"/></g>`),
+  hot("bone", `<path class="tm-arch" d="${archD}"/><path class="tm-cortex" d="${archLow}"/><path class="tm-arch-top" d="${archTopD}"/>`),
+  hot("coronoid", `<g class="tm-mand2"${at(".tm-mand2")}><path class="tm-hit" d="${corHit}"/><path class="tm-ghost" d="${corGhost}"/></g>`),
   hot("disc", `<g class="tm-disc"${at(".tm-disc")}><path class="tm-disc-body" d="${discD}"/><path class="tm-disc-iz" d="${zone(18, 44)}"/>` +
     `<path class="tm-space up" d="${arc(-56, 96, (a) => D.RI + discT(a, D) + 1.6)}"/><path class="tm-space lo" d="${arc(-58, 98, () => D.RI - 1.2)}"/></g>`),
-  hot("lps", `<path class="tm-muscle tm-lps"${at(".tm-lps")}/><path class="tm-fib tm-lps-f"${at(".tm-lps-f")}/>`),
-  hot("tmlo", `<path class="tm-lig tm-tmlo"${at(".tm-tmlo")}/><circle class="tm-lig-dot tm-tmlo-dot" r="2.6"${at(".tm-tmlo-dot")}/>`),
   hot("tmli", `<path class="tm-lig tm-tmli"${at(".tm-tmli")}/><circle class="tm-lig-dot tm-tmli-dot" r="2.2"${at(".tm-tmli-dot")}/>`),
-  `<circle class="tm-lig-dot" cx="${D.TUB[0]}" cy="${D.TUB[1]}" r="2.8"/>`,
+  hot("tmlo", `<path class="tm-lig tm-tmlo"${at(".tm-tmlo")}/><circle class="tm-lig-dot tm-tmlo-dot" r="2.4"${at(".tm-tmlo-dot")}/>`),
+  `<circle class="tm-lig-dot" cx="${D.TMO[0]}" cy="${D.TMO[1]}" r="2.6"/><circle class="tm-lig-dot" cx="${D.TMI[0]}" cy="${D.TMI[1]}" r="2.6"/>`,
+  `<text class="am-label tm-inlab" x="516" y="170" text-anchor="middle">zygomatic arch</text>`,
+  rideLab("cond", ["condyle"]), rideLab("cor", ["coronoid", "process"]),
   callout([178, 160], "EAM", [140, 128], "end"),
   callout([D.C0[0] - 6, D.C0[1] - 48], "glenoid fossa", [232, 64], "end"),
-  callout([crest[0] - 2, crest[1] - 8], "articular eminence", [crest[0] + 30, 112], "start"),
-  callout([612, 189], "LP, superior head", [628, 124], "end"),
-  callout([600, 266], "LP, inferior head", [600, 306], "end").replace('class="am-callout"', 'class="am-callout on-dark"'),
+  callout([crest[0] + 11, crest[1] - 6], "articular eminence", [crest[0] + 30, 108], "start"),
+  callout([622, 198], "LP, superior head", [624, 230], "end"),
+  callout([622, 280], "LP, inferior head", [624, 344], "end"),
   `<g class="tm-gauge">${gauge}</g>`,
 ].join("");
 
 const svg = figureSvg({ width: W, height: H, className: "tm-fig",
-  label: "Schematic sagittal section of the right temporomandibular joint, patient facing right: temporal bone with the glenoid fossa, articular eminence and external auditory meatus; the mandibular condyle with its neck and ramus; the biconcave articular disc with its thick posterior band, thin intermediate zone and anterior band; the retrodiscal tissue with its superior and inferior laminae; the superior and inferior heads of the lateral pterygoid; and the outer oblique and inner horizontal portions of the TM ligament. A slider opens the mouth from 0 to 50 millimeters: the condyle first rotates in the lower joint space, then the condyle and disc translate down the eminence in the upper joint space.",
+  label: "Schematic sagittal section of the right temporomandibular joint, patient facing right: temporal bone with the glenoid fossa, articular eminence, zygomatic arch and external auditory meatus; the mandibular condyle with its neck, the sigmoid notch, the coronoid process tucked under the zygomatic arch, and the ramus; the biconcave articular disc with its thick posterior band, thin intermediate zone and anterior band; the retrodiscal tissue with its superior and inferior laminae; the superior and inferior heads of the lateral pterygoid; and the outer oblique and inner horizontal portions of the TM ligament. A slider opens the mouth from 0 to 50 millimeters: the condyle first rotates in the lower joint space, then the condyle and disc translate down the eminence in the upper joint space.",
   body });
 const plate = plateHtml({ fig: "Fig 1", title: "TMJ opening: rotation, then translation", hint: "drag the slider", readout: "closed", body: `<div class="am-svg">${svg}</div>` });
 
@@ -179,7 +266,8 @@ ${LEGEND}
 <p class="am-info">Tap or hover any part for what it is.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>Drawn from the hub's L2 notes (Functional TMJ Anatomy, Dr. Givan): the biconcave disc and its zones, upper and lower joint spaces, the retrodiscal laminae, both heads of the lateral pterygoid and what each portion of the TM ligament limits; and the L1 handout's numbers: pure rotation to about 20-25 mm at the incisors, maximum opening about 40-60 mm.</li>
-<li>Schematic, not to scale: the angles of rotation, how far the disc turns on the condyle, the path down the eminence and the ligament's tension are drawn to show the relationships, not measured. The ligaments and lateral pterygoid sit lateral and medial to this plane in a real joint; they are drawn over it.</li>
+<li>Schematic, not to scale: the angles of rotation, how far the disc turns on the condyle, the path down the eminence and the ligament's tension are drawn to show the relationships, not measured. The mandible is drawn to the joint's scale (the coronoid process about 3 cm in front of the condyle, under the zygomatic arch), but the masseter and the soft tissue around the joint are left out.</li>
+<li>Not all in one plane: the zygomatic arch and the TM ligament lie lateral to the joint and the lateral pterygoid medial to the ramus, so the ligament is drawn over the joint, the arch over the coronoid tip, and the muscle behind the ramus, where it shows through the sigmoid notch.</li>
 <li>Muscle activity follows the slider: moving it toward open lights the inferior head (opening), toward closed the superior head (closing).</li></ul></details>`;
 
 function tmjLive(root, D) {
@@ -246,15 +334,22 @@ function tmjLive(root, D) {
 }
 
 const CSS = `
-.anima .tm-air{fill:var(--tm-air)}
+.anima .tm-fig{--tm-soft:#f1e8df}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima .tm-fig{--tm-soft:#2b2a31} }
+:root[data-theme="dark"] .anima .tm-fig{--tm-soft:#2b2a31}
+.anima .tm-soft{fill:var(--tm-soft)}
 .anima .tm-bone{fill:var(--tm-bone)}
 .anima .tm-trab{fill:var(--tm-trab);opacity:.7}
 .anima .tm-cortex{fill:none;stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linejoin:round}
 .anima .tm-cart{fill:none;stroke:var(--tm-cart);stroke-width:5;stroke-linecap:round}
 .anima .tm-eam{fill:var(--tm-air);stroke:var(--anatomy-hi);stroke-width:1.4}
+.anima .tm-arch{fill:var(--tm-bone);fill-opacity:.8;stroke:none}
+.anima .tm-arch-top{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-linecap:round}
 .anima .tm-mandible{fill:var(--tm-bone-in);stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linejoin:round}
-.anima .tm-headcap{fill:none;stroke:var(--tm-cart);stroke-width:4;stroke-linecap:round}
+.anima .tm-headcap{fill:none;stroke:var(--tm-cart);stroke-width:3;stroke-linecap:round}
 .anima .tm-fovea{fill:none;stroke:var(--anatomy-mid);stroke-width:1.2;stroke-linecap:round}
+.anima .tm-hit{fill:transparent;stroke:none}
+.anima .tm-ghost{fill:none;stroke:var(--anatomy-hi);stroke-width:1.1;stroke-dasharray:3 2.5;vector-effect:none;opacity:.75}
 .anima .tm-disc-body{fill:var(--tm-disc);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
 .anima .tm-disc-iz{fill:var(--tm-disc-mid);stroke:none}
 .anima .tm-space{fill:none;stroke:var(--anatomy-lit);stroke-width:3;stroke-linecap:round;opacity:0;transition:opacity .3s}
@@ -264,25 +359,23 @@ const CSS = `
 .anima .tm-vessel{fill:var(--tm-vessel)}
 .anima .tm-suplam{fill:none;stroke:var(--anatomy-hi);stroke-width:1.4;stroke-linejoin:round}
 .anima .tm-inflam{fill:none;stroke:var(--anatomy-hi);stroke-width:1.6;stroke-linecap:round}
-.anima .tm-muscle{fill:var(--tm-muscle);stroke:var(--anatomy-hi);stroke-width:1;stroke-linejoin:round;opacity:.85;transition:filter .2s,opacity .2s}
+.anima .tm-muscle{fill:var(--tm-muscle);stroke:var(--tm-muscle-fib);stroke-width:1;stroke-linejoin:round;opacity:.9;transition:filter .2s,opacity .2s}
 .anima .tm-fib{fill:none;stroke:var(--tm-muscle-fib);stroke-width:.9;opacity:.8}
 .anima .tm-fig[data-dir="open"] .tm-lpi,.anima .tm-fig[data-dir="close"] .tm-lps{opacity:1;stroke:var(--anatomy-lit);stroke-width:2.2}
-.anima .tm-lig{fill:none;stroke:var(--tm-lig);stroke-width:5;stroke-linecap:round;opacity:.75;stroke-dasharray:3 4;transition:opacity .2s}
-.anima .tm-fig[data-lig="taut"] .tm-tmlo{stroke-dasharray:none;opacity:1;stroke-width:6}
+.anima .tm-lig{fill:none;stroke:var(--tm-lig);stroke-width:4;stroke-linecap:round;opacity:.8;stroke-dasharray:4 4;vector-effect:none;transition:opacity .2s}
+.anima .tm-fig[data-lig="taut"] .tm-tmlo{stroke-dasharray:none;opacity:1;stroke-width:5}
 .anima .tm-lig-dot{fill:var(--anatomy-hi)}
-.anima .tm-gauge-bg{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:.8}
+.anima .tm-gauge-bg{fill:var(--anatomy-shade-3);stroke:var(--anatomy-mid);stroke-width:.8}
 .anima .tm-gauge-rot{fill:var(--anatomy-faint)}
 .anima .tm-gauge-fill{fill:var(--anatomy-lit);opacity:.55}
 .anima .tm-gauge-tick{fill:none;stroke:var(--anatomy-mid);stroke-width:1}
 .anima .tm-gauge-mark{fill:none;stroke:var(--anatomy-lit);stroke-width:3;stroke-linecap:round}
-.anima .tm-gauge .am-label{fill:#eceef4}
 .anima .tm-gauge-note{font-size:10px}
-.anima .tm-fig .am-callout .am-label{fill:var(--anatomy-hi)}
-.anima .tm-fig .am-callout.on-dark .am-label{fill:#eceef4}
+.anima .tm-fig .am-label{fill:var(--anatomy-hi);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.anima .tm-fig .tm-inlab{fill:var(--anatomy-text);stroke:var(--tm-bone);font-style:italic}
+.anima .tm-fig .tm-rlab{stroke:var(--tm-bone-in)}
 .anima .tm-fig .am-leader{stroke:var(--anatomy-mid)}
-.anima .tm-fig .am-callout.on-dark .am-leader{stroke:#9aa0b3}
 .anima .tm-fig .am-dot{fill:var(--anatomy-hi)}
-.anima .tm-fig .am-callout.on-dark .am-dot{fill:#eceef4}
 .anima .tm-legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid var(--line-strong)}
 @media (max-width:560px){.anima .tm-gauge{display:none}}
 @media (prefers-reduced-motion:reduce){.anima .tm-space,.anima .tm-muscle,.anima .tm-lig{transition:none}}
