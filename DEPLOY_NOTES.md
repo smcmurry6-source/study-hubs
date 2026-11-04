@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (reddit scout, Claude Code)** — New `/reddit-scout` skill (`.claude/skills/reddit-scout/`, model
+  invocation off, so it runs only when Sam calls it): reads r/ClaudeAI, r/ClaudeCode, r/Anthropic and r/claude through
+  `tools/reddit-scout/scout.py` (Atom feeds, since Reddit's JSON API answers 403 to cloud sessions; standard library
+  only, paced for Reddit's 429s), checks each idea against the repo, Sam's decisions and the docs, and reports only what
+  clears the bar; no suggestions is a normal result. Every run is logged in `tools/reddit-scout/log.md`, which also
+  tells the next run what was already judged. Unfixed security findings go to Sam in chat, never into the public repo.
+  First run (past month, 728 posts) logged there. Listed in `CLAUDE.md`, `vault/home.md` and the repo map. No site change.
+
 - **2026-11-04 morning (lessons audit, PCD Implants two days out, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and answer
   positions: report #37 (`bm-goodacre` printed each complication's percentage in its choice, so the biggest number was the key): the
   choices are now plain names and the numbers are in the why lines. Explanations name the favorite wrong answer on `ev-misch` (Ford

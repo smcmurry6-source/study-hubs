@@ -26,7 +26,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 - Connectors: Supabase (project `thytmzsgymydbzcqdnix`; read-only SQL for data, `apply_migration` pre-approved in
   `.claude/settings.json`) and, when connected, Google Drive for lecture sources (read them, never commit them).
 - Skills in `.claude/skills/`: `/lessons-audit` (the lessons refresh), `/podcast` (a Timmy Time episode), `anima` (diagrams),
-  `taste-skill` (art direction for pages and app screens, vendored from Leonxlnx/taste-skill: used in full when Sam asks for a redesign).
+  `taste-skill` (art direction for pages and app screens, vendored from Leonxlnx/taste-skill: used in full when Sam asks for a redesign),
+  `/reddit-scout` (ideas from the Claude subreddits, checked against the repo; runs only when Sam calls it; log in `tools/reddit-scout/log.md`).
   Sam's claude.ai skills (`study-hub-builder`, `study-hub-deploy`) only point here: where one disagrees with the vault,
   follow the vault and tell Sam.
 - "Do the task in `vault/tasks/...`", "go through the inbox": `vault/tasks/README.md`.

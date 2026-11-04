@@ -52,7 +52,8 @@ Hub building
 - [Read usage data and run surveys](how-to/read-usage-data.md)
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)
 - Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:
-  `tools/podcast/README.md` (Claude Code: `/podcast`).
+  `tools/podcast/README.md` (Claude Code: `/podcast`). Ideas from the Claude subreddits, checked against the repo:
+  `.claude/skills/reddit-scout/SKILL.md` (Claude Code: `/reddit-scout`; past runs in `tools/reddit-scout/log.md`).
 
 ## Reference
 
