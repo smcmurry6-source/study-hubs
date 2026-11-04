@@ -5,8 +5,8 @@ out to the live hubs. It runs:
 
 - **When Sam asks** ("run the lessons refresh", "lessons audit", or `/lessons-audit`) in a Claude Code session with
   the Supabase connector. The `lessons-audit` skill (`.claude/skills/lessons-audit/SKILL.md`) is the step-by-step way
-  to run it, with `tools/dump-banks.js` and `tools/lessons-join.py`. There is no scheduled routine (Sam cancelled it
-  2026-09-29 in favour of running it by hand).
+  to run it, with `tools/dump-banks.js` and `tools/lessons-join.py`. There is no scheduled routine (Sam canceled it
+  2026-09-29 in favor of running it by hand).
 - **Before building a new hub**: whatever session builds it (Claude Code, Cowork, a hub's Claude Project) runs
   steps 1-3 itself first if `LESSONS.md`'s "Last refreshed" date is not today, so the new hub starts from the latest
   data. Steps 4-5 can wait for the next full run.
@@ -48,14 +48,13 @@ A change goes out in this run only if it is **small, clearly right, and backed b
 - a clear bug in a widget feature or the dashboard.
 
 Rules:
-- Follow `CLAUDE.md`: verify (`node tools/ci/syntax.js`, `node tools/ci/smoke.js`), branch + draft PR, never push `main`.
+- Follow `AGENTS.md` and the rules in `vault/rules/` (Claude Code loads them through `CLAUDE.md`): verify (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), branch + draft PR, never push `main`.
 - **Text and audio must never drift**: don't edit a lecture's reading text (either level) unless you also
   regenerate that level's mp3 in the same PR. If you can't, list the change for Sam instead.
 - Keep question ids and answer positions; say in the PR if a change makes old `question_choices` rows stale.
 - Anything larger (new features, restructuring, new questions in bulk, removing a mode, schema changes) is a
-  **proposal for Sam** in the PR description, not a change.
-- Hubs built from split sources in a Claude Project (perio, MSK): add the line "**<Hub> Project: carry these into the
-  split sources**" to `DEPLOY_NOTES.md`, as other changes do.
+  **proposal for Sam** in the PR description, not a change. Once Sam approves one, it becomes a task note in
+  `vault/tasks/` so any agent can pick it up.
 - Don't mark reports resolved in Supabase; list which ones the PR fixes so Sam can resolve them after merge.
 
 ## 5. Open the PR

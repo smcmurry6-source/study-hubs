@@ -1,0 +1,19 @@
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative",
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "vault/tasks",
+  "showUnsupportedFiles": false,
+  "userIgnoreFilters": [
+    "hubs/",
+    "widget/",
+    "assets/",
+    "about/",
+    "review/",
+    "supabase/",
+    "tools/figures/",
+    ".claude/skills/anima/",
+    "migration_v"
+  ]
+}

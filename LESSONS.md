@@ -203,7 +203,7 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   seven numbered statements, choices are combinations) and "tricky wording". Every hub from Heme/Endo Exam 1 on gets a few
   numbered-statement items per lecture besides the two-statement and true/false rule, and stems phrased the way that
   professor asks (NOT/EXCEPT, "most likely", "best explains"), drawn from how they word their own slide questions. **A standing
-  rule since 2026-10-28** (`CLAUDE.md` → "Numbered-statement questions": at least 2 per taught lecture, CI-checked); Occlusion got
+  rule since 2026-10-28** (`vault/rules/numbered-statements.md`: at least 2 per taught lecture, CI-checked); Occlusion got
   16 (`nums()`), and the final will show whether they close the "Exam asked different things" gap. **First read, Heme & Endo Exam 1**
   (the first hub built with numbered items, the professors' focus lists and an in-class review set from the start): of 10 people who
   checked in, 8 said "About right", 1 "Hub was harder", **none "Exam asked different things"**. Statement formats are the hardest in its

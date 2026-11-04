@@ -1,158 +1,62 @@
-# Deploy Notes — read this before touching the repo
+# Deploy Notes — the change log
 
 This repo is edited from several different Claude Projects (one per hub, plus a
-"hub index" / overarching project for cross-hub UI and shared functionality).
-Those Projects don't share context with each other or with plain Claude Code
-sessions — a session in one Project has no idea what a session in another
-Project just changed. **This file is the one place every session, regardless
-of which Project spawned it, can check.** Update it whenever you make a
-non-trivial change, and read it before you deploy.
+"hub index" / overarching project for cross-hub UI and shared functionality),
+from Claude Code sessions and from other agents (Codex and others).
+They don't share context with each other — a session in one Project has no idea
+what a session in another Project just changed. **This file is the one place every
+session can check for what shipped.** Add an entry whenever you make a non-trivial
+change, and read the recent entries before you deploy.
 
-## The core rule: GitHub is the source of truth
+## Start at AGENTS.md: the rules are notes in vault/ (2026-11-03)
 
-Never trust a locally-cached or previously-read copy of a hub file across
-sessions. Before editing or publishing anything in `hubs/*/index.html` or
-`widget/`:
+Since 2026-11-03 the repo is a vault ([vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md)): start at
+[`AGENTS.md`](AGENTS.md), then [vault/home.md](vault/home.md). The rules that used to open this file, and the sections of
+`CLAUDE.md`, are notes now, one per rule, with the same titles. **Hub Projects and Cowork sessions: fetch and read them
+the way you read this file; they are the rules.** Where they went:
 
-1. Fetch the file fresh from `main` (raw GitHub content, not a cached Read/Artifact
-   snapshot from an earlier turn) and diff it against whatever you were about to
-   publish over it.
-2. If it changed since your working copy's common ancestor, don't blind-overwrite.
-   Do a real three-way merge (`git merge-file -p <mine> <ancestor> <theirs>`),
-   then check the result for conflict markers with a line-anchored pattern
-   (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) — this file's own CSS uses long `====`
-   dividers as comments, which false-positive on a naive substring search.
-3. After merging, verify before publishing: `node --check` on the extracted
-   `<script>` block, structural counts (question/lecture/drug counts match what
-   you expect), a duplicate-id check, a check that the feature you were adding
-   is actually present, and ideally a live smoke test (Playwright or the browser
-   pane) before it goes out.
-4. Check the entries below **and** the site's own changelog (Supabase
-   `changelog` table, shown on the dashboard) for anything recent before you
-   deploy — if someone else's change isn't reflected in your working copy yet,
-   that's your signal to go back to step 1.
+| Was | Now |
+|---|---|
+| The core rule: GitHub is the source of truth | [vault/rules/github-is-the-source-of-truth.md](vault/rules/github-is-the-source-of-truth.md) |
+| The About page lists everything | [vault/rules/about-page.md](vault/rules/about-page.md) |
+| Shared infrastructure | [vault/reference/shared-infrastructure.md](vault/reference/shared-infrastructure.md) |
+| Perio: the single file is the source | [vault/hubs/perio.md](vault/hubs/perio.md) |
+| Archiving a hub = retrospective | [vault/rules/archiving-is-a-retrospective.md](vault/rules/archiving-is-a-retrospective.md) |
+| Building a hub = diagram review | [vault/rules/diagram-review.md](vault/rules/diagram-review.md) |
+| Ship it now; Home page; two-statement and true/false; numbered statements; High Likelihood; the Question Bank panel | their notes in `vault/rules/` (listed in [vault/home.md](vault/home.md)) |
+| `CLAUDE.md` → "<section>" (in older entries below) | the note with that title in `vault/rules/`, `vault/how-to/` or `vault/reference/` |
 
-## The About page lists everything (standing rule)
+Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vault/hubs/<hub-id>.md`; Sam's calls are in
+[vault/decisions.md](vault/decisions.md); open work is in `vault/tasks/`. This file keeps the change log below.
 
-`about/index.html` (the dashboard's "About" button) is the students' guide to every feature, easter egg, trophy,
-holiday and setting. **Every Project and session that ships something students can see adds it to that page in the
-same change** (or updates/removes the entry when a feature changes or goes away). Secrets go inside a `spoil` element
-so they stay hidden until someone ticks "Show spoilers". Hub-only content (new questions, notes, review tables) doesn't
-need an entry; a new hub mode, tab, game or question type does.
-
-## Shared infrastructure (touch once, not per-hub)
-
-- **`widget/v3.js` + `widget/v3.css`** (+ `widget/eggs.js`, `widget/clicks.js`, `widget/replies.js`, `widget/ranks.js`, `widget/drill.js` and `widget/fx.js`, which v3.js loads itself; `widget/rankup.js` is
-  fetched by ranks.js only when a celebration card is needed) — loaded by every hub (`fixed-pros`,
-  `genetics`, `gi-exam1`, `hepatobiliary`, `perio`) via
-  `<script src="../../widget/v3.js" data-hub="<hub-id>" data-answered-event="<hub>:answered" data-default-mode="...">`.
-  Cross-hub functionality (search, class-wide correctness, streaks, activity
-  pulse, leaderboard, analytics) belongs here — never hand-patched into one
-  hub's own `index.html`. Each hub publishes `window.SH_EXPORT =
-  {lectures, questions}` after its own IIFE closes, which is what the widget
-  reads for search and "toughest questions" — if you add a hub or change its
-  question shape, make sure `SH_EXPORT` still reflects it.
-- **Supabase project `thytmzsgymydbzcqdnix`** backs the widget: changelog,
-  leaderboard, study streaks, activity pulse, and visitor analytics (see
-  `migration_v4.sql`/`v5.sql`/`v6.sql` at repo root for schema history — run
-  new migrations once each, by hand, in the Supabase SQL editor). The API key
-  and the `log_changelog`/admin RPC secret live only in local ops scripts on
-  Sam's machine (`deploy_rollout.ps1`, `check_leaderboard.ps1`) — **never**
-  commit them here or hardcode them into a hub's client-side JS.
-- **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch
-  `main`, served at `smcmurry6-source.github.io/study-hubs/`. Deploy via the
-  GitHub Git Data API (blob → tree → commit → ref update); a GitHub PAT is
-  needed for this and should only ever be used transiently (env var for one
-  script run), never written into a committed file. **Claude Code sessions
-  (cloud or local) don't use the API path or a PAT:** they push a branch and
-  open a PR, and merging the PR is the deploy — see `CLAUDE.md`.
-- **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
-  (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
-  only download release files from repos attached to the session.
-
-## Perio: the single file is the source (2026-11-03)
-
-`hubs/perio/index.html` is the perio hub's source: edit it directly (figures in `tools/figures/perio/`, then run its
-`build.mjs`). Sam confirmed on 2026-11-03 that the old Perio Claude Project's split sources are no longer used, so the many
-"**Perio Project: carry ... into the split sources**" lines in the entries below are obsolete: ignore them. (The MSK hubs that
-had a split-source Project are archived.)
-
-## Archiving a hub = retrospective (standing rule)
-
-Every time a hub is archived, all the data gathered on it (time by section, clicks, engagement, questions, exam
-check-ins, search terms, reports, surveys) is used to improve the next hubs: run `tools/retro.sql`, then record the
-findings and resulting changes in `LESSONS.md`. **Any session building or restructuring a hub reads `LESSONS.md`
-first** (hub Projects included: it holds what the class actually used and where they struggled).
-
-It is also refreshed between archivings, by hand when Sam asks a Claude Code session to "run the lessons refresh"
-(`tools/lessons-refresh.md`; no scheduled routine): it reads all tracked data, student reports and suggestions since the last run
-(`tools/lessons-daily.sql`), rewrites the "Live signals" section, and opens a PR with small, data-backed fixes to the
-live hubs. **Before building a new hub** (any session, hub Projects included), if `LESSONS.md`'s "Last refreshed"
-date isn't today, do steps 1-3 of that runbook first so the new hub is built from current data.
-
-## Ship it now, never "after the exam" (standing rule, 2026-10-28)
-
-For every hub, every Project and session: **never hold a change until after an exam.** A hub is archived the night of its
-last exam, so anything held until then reaches no one; changes help most before the exam, including the night before.
-Ship as soon as it's ready and verified (`CLAUDE.md` → "Ship it now").
-
-## Every hub opens on its own Home page (standing rule, 2026-10-27)
-
-Every hub (hub Projects included) has a **Home** mode, first and default: the exam countdown and facts, deadlines, quick start,
-readiness, Where to next, progress by lecture, the course timeline and the last 14 days. Copy it from `heme-endo-exam1` or
-`occlusion`; the full list is in `CLAUDE.md` → "Every hub opens on its own Home page".
-
-## Every lecture gets two-statement and true/false questions (standing rule, 2026-10-22)
-
-Every session that writes questions for a lecture (hub Projects included) adds two-statement and true/false items: about 5
-and 8 per lecture, at least 3 and 5 for any taught lecture, or CI fails. Fixed choice order, balanced keys, a why for every
-choice, false statements that change one taught detail. How to build them: `CLAUDE.md` → "Two-statement and true/false
-questions" (copy `two()`/`tf()` from `occlusion`).
-Perio has `tf()` too (since 2026-11-03).
-
-## Every lecture gets numbered-statement questions too (standing rule, 2026-10-28)
-
-Besides two-statement and true/false items, every session that writes questions for a lecture (hub Projects included) adds
-**numbered-statement** items: "Which ... are true?" over 4-5 numbered statements, answered with a combination ("1 and 3 only",
-"1, 2 and 4"), as Dr. Givan's Occlusion midterm asked. About 3-5 per lecture, at least 2 for any taught lecture, or CI fails.
-Choices in canonical order, keys spread over all four positions, a why for every combination. How to build them: `CLAUDE.md` →
-"Numbered-statement questions" (copy `nums()` from `occlusion`).
-Perio has `nums()` too (since 2026-11-03).
-
-## Every lecture gets High Likelihood topics (standing rule, 2026-10-30)
-
-Every hub (hub Projects included) predicts its exam's most likely topics per lecture (`LIKELY_TOPICS`, ranked by evidence:
-recording hints, in-class reviews and focus lists, the exam-review guide, check-ins, then the slides). **Building a hub, adding a
-lecture to one, or moving a lecture from slides-only to taught includes its topics**, and new hints or reviews mean re-ranking.
-CI fails a lecture with questions but no topics. How: `CLAUDE.md` → "Question Bank: lecture picker, order and pins".
-Perio: add topics for each session as it is taught.
-
-## The Question Bank's filters are one labeled panel (standing rule, 2026-11-03)
-
-Every live and future hub (hub Projects included; not Heme & Endo Exam 1, which Sam said to leave as it is): Lectures (a tick
-list with "Only" on every row) and search; Show chips with counts (All, High likelihood, Not answered yet, Missed last time,
-Pinned); Order (In order / Random only, no "Likely first"); More filters (type, source); and under it a "Showing n of N" line
-with a removable tag per filter and Clear all. Copy it from `special-patient-care`. Details: `CLAUDE.md` → "Question Bank: the
-filter panel, lecture picker, order and pins".
-
-## Building a hub = diagram review, approved by Sam one by one (standing rule, 2026-10-13)
-
-Every time a hub is built, or gains new lectures, the session building it (hub Projects included) goes through every
-lecture for places where a drawn diagram would teach better than text: a structure, a mechanism, where a drug acts,
-a sequence that happens in space, two structures side by side. Draw these from the hub's own notes and check them
-against the questions it tests. **Then ask Sam to approve each candidate separately before drawing any of them.**
-For each candidate, give:
-
-- what it shows, and any interaction (a toggle, a slider, stepping through a sequence, hover labels);
-- why it helps, with the question ids it supports;
-- where it goes: under a lecture's notes, in Review, or as a diagram question;
-- its size and rough build time.
-
-Only approved figures are built; note the skipped ones in the PR so the next session doesn't propose them again.
-Claude Code sessions build approved figures with the anima skill (`CLAUDE.md` → "Diagrams (the anima skill)").
-Accuracy is the bar: perio's Atlas diagrams were removed for being inaccurate (2026-09-25).
 
 ## Recent major changes (newest first — add a line when you ship something)
+
+- **2026-11-03 (the repo is a vault: AGENTS.md, vault/ notes, tasks, Claude Code)** — Sam's new standing rule: use the repo
+  like an Obsidian vault that any AI agent can be pointed at to do tasks (`vault/rules/repo-is-the-vault.md`). New
+  `AGENTS.md` at the root is the entry point for every agent (Claude Code loads it through `CLAUDE.md`). New `vault/`:
+  `home.md` (the map), `rules/` (every standing rule as its own note: the `CLAUDE.md` sections and this file's rule
+  sections, moved word for word, plus new `repo-is-the-vault` and `american-english`), `how-to/` (new: `build-a-hub`,
+  the checklist and every file a new hub or lecture touches), `reference/`, a note per hub (`hubs/`: sources, build
+  steps, quirks, diagram calls, pending work; `boards` for the hub on its own branch), `decisions.md` (Sam's calls,
+  started from this log), `tasks/` (one note per task with a status, an inbox, `done/`; six open or waiting tasks:
+  Occlusion L7 diagrams and final time/format, perio S6, S8 host modulation, S9, and merging `main` into
+  `claude/boards-hub`, whose own older `AGENTS.md` will conflict with the new one) and `templates/`. `CLAUDE.md` is now
+  short and `@`-imports `AGENTS.md` and every rule, how-to and reference note, so Claude Code sessions load the same
+  rules as before. **It no longer loads this file** (over 200 KB, about 50k of the 65k tokens a session started with):
+  read its first entries and grep it before you change a hub. When a skill, Project doc or memory disagrees with the
+  vault, the vault wins. This file's opening sections became the redirect table above. Notes link with relative
+  markdown links (GitHub, Obsidian and agents all follow them); `.obsidian/app.json` sets that up for opening the repo
+  root in Obsidian. **New CI check** `node tools/ci/vault.js` (last step of `check.yml`): every relative link in the
+  vault, `AGENTS.md`, `CLAUDE.md` and `README.md` resolves, no `[[wikilinks]]`, every vault note has frontmatter, task
+  notes have a valid status (done ones in `done/`), every rule note is listed in `vault/home.md` and imported by
+  `CLAUDE.md`, and every hub folder has its note on the map. References to `CLAUDE.md` sections in the skills, `tools/`,
+  `LESSONS.md` and the CI messages now point at the notes. The repo's skills, checked against the vault:
+  `/lessons-audit` drops the retired "carry into the split sources" step, keeps each edited question's why lines in
+  step and checks `vault/decisions.md` before proposing; `/podcast` and `/lessons-audit` run `vault.js` and write back
+  to the vault; the anima skill opens with a box saying the house rules override it (no figure without Sam's approval).
+  No site change.
+  **Every agent: write back what you learn to the vault in the same PR** (task outcome, decisions, hub note, new rules).
 
 - **2026-11-03 (lecture notes: scrolling list, Previous / Next, Report, figures that fit, Claude Code)** — Sam: the lecture list
   scrolled with the notes (Occlusion's list is 790 px tall, so on a 768 px laptop L7 was only reachable at the bottom of the notes),
@@ -2049,3 +1953,6 @@ ran. There's no mechanism to make Claude Projects "talk to each other" — the
 fix is procedural: treat this repo as the single source of truth, always
 re-pull before you push, and put anything cross-hub here or in `widget/`
 instead of copy-pasted into individual hubs.
+
+Since 2026-11-03 the same fix covers knowledge, not just code: rules, decisions, hub notes and tasks live in
+`vault/` as linked notes any agent can read and write back to (`vault/rules/repo-is-the-vault.md`).

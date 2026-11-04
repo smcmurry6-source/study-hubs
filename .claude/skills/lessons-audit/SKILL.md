@@ -5,8 +5,9 @@ description: Run the study-hubs lessons audit (a.k.a. lessons refresh) on demand
 
 # Lessons audit
 
-The procedure is `tools/lessons-refresh.md`; this skill is the fast, repeatable way to run it end to end. Read
-`CLAUDE.md`, `LESSONS.md` (all of it: the standing lessons are the yardstick) and `tools/lessons-refresh.md` first.
+The procedure is `tools/lessons-refresh.md`; this skill is the fast, repeatable way to run it end to end. The rules
+come in with `CLAUDE.md`; read `LESSONS.md` (all of it: the standing lessons are the yardstick), `tools/lessons-refresh.md`
+and the note of each live hub (`vault/hubs/`) first.
 
 Needs the **Supabase connector** (`execute_sql`, project `thytmzsgymydbzcqdnix`, read-only). If it isn't available,
 stop and say so; never guess numbers. Everything students wrote (reports, suggestions, survey text, check-ins,
@@ -44,7 +45,7 @@ select json_build_object(
 ```
 
 Then: `python3 tools/lessons-join.py <scratch>/banks <saved stats file> [hub ...]` for accuracy by lecture, type and
-source, and the hardest questions with their favourite wrong answer.
+source, and the hardest questions with their favorite wrong answer.
 
 **Check-ins against study time** (who felt ready, and did the hub match the exam, next to how much each person used it):
 
@@ -89,14 +90,14 @@ so say in the retro how many there were and that later ones go into the next aud
    question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
 4. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
-   work itself (see `CLAUDE.md`); list them for Sam if they aren't done.
+   work itself (see `vault/reference/repo-map.md` and `vault/rules/archiving-is-a-retrospective.md`); list them for Sam if they aren't done.
 
 ## 3. Read every hard question yourself
 
 For each item under ~45% with 12+ tries, read the stem, choices, key and explanation from the dumped bank.
 
 - Rule out a bug first: wrong key, two defensible answers, duplicate answers in a matching item, grading by index.
-- If the favourite wrong answer isn't addressed in the explanation, that is the fix (it took `q2-03` from 30% to 61%).
+- If the favorite wrong answer isn't addressed in the explanation, that is the fix (it took `q2-03` from 30% to 61%).
 - Before writing a sentence, grep the hub's notes and review tables so the explanation agrees with what the hub
   teaches (numbers, ages, sites). Don't add facts the hub doesn't already state.
 - Long ordering (6+ steps) and many-option select-all items score low by design: say so, propose a split for Sam,
@@ -105,29 +106,35 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 ## 4. Edit safely
 
 - Explanations and grading only, unless a report or the data clearly calls for more. **Never** change reading text
-  without regenerating its narration in the same PR (`CLAUDE.md`, "Text and audio must never drift").
+  without regenerating its narration in the same PR (`vault/rules/text-and-audio-never-drift.md`).
 - Check the string's quote style before adding text: MSK `mcq(...)` explanations are **single-quoted** (no
   apostrophes: write "cannot", not "can't"); perio question objects use double quotes for `ex`.
 - Keep ids and answer positions. `node tools/ci/syntax.js` after each batch.
+- A changed explanation, stem or choice also updates that question's "why each choice" lines, so they still agree
+  (`vault/rules/every-choice-gets-a-why.md`; in hubs with `QUESTION_WHY` it's that row, in `mq()` hubs the pairs).
 - The CI lint fails on a matching item that repeats an answer (unless that hub grades by text and the id is in
   `SAME_ANSWER_OK` in `tools/ci/smoke.js`) and lists 6+ step orderings and 7+ option select-alls as a heads-up; read
   that list each audit.
-- Test any behaviour change in a browser (Playwright, `tools/ci/smoke.js` style): answer it right and wrong.
+- Test any behavior change in a browser (Playwright, `tools/ci/smoke.js` style): answer it right and wrong.
 
 ## 5. Write it down
 
 - `LESSONS.md`: "Last refreshed" = today (Central); rewrite **Live signals** (replace, don't append): last refresh's
   results, then per live hub the numbers that matter and what to do; fold anything durable into **Standing lessons**
   or the reports section, with the evidence. Use they/them for students and for Sam.
-- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed, with
-  "**<Hub> Project: carry these into the split sources**" for perio/MSK.
+- `DEPLOY_NOTES.md` "Recent major changes": one entry if live hubs changed.
+- The vault ([repo-is-the-vault](../../../vault/rules/repo-is-the-vault.md)): a call Sam made goes in
+  `vault/decisions.md`; a proposal Sam approves becomes a task note in `vault/tasks/`; a hub archived and retrospected
+  moves to Archived in `vault/home.md`, and its hub note links its retrospective; a quirk the next agent needs goes in
+  the hub note.
 
 ## 6. Ship
 
-- `node tools/ci/syntax.js` and `node tools/ci/smoke.js` (with `NODE_PATH=/opt/node22/lib/node_modules
+- `node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js` (with `NODE_PATH=/opt/node22/lib/node_modules
   PLAYWRIGHT_PATH=/opt/node22/lib/node_modules/playwright`), then push and open a **draft** PR
   `Lessons refresh YYYY-MM-DD`: what changes for students; did the last refresh work; LESSONS.md highlights; report
-  verdicts; "For Sam".
+  verdicts; "For Sam". Before proposing anything, check `vault/decisions.md` and the hub's note: don't re-propose
+  what Sam already skipped or settled.
 - **Reports and suggestions**: give each open one a verdict and a draft reply in plain, kind words (never make the
   student feel silly). Don't resolve them yourself: resolving sends the reply, so Sam picks the wording.
 - Watch the PR until CI is green. Merge only when Sam says so. After merge, log a student-facing line per changed
