@@ -103,7 +103,7 @@ export function SCREW(x, y0, w, h, taper) { var o = "", n = Math.max(4, Math.rou
   o += '<path class="ti" d="' + d + '"/>'; return o; }
 
 /* one live controller for every figure: buttons [data-amk][data-amv] set a state key, [data-amt] toggles one,
-   range inputs [data-amk] set a number, [data-amstep] steps D.STEPKEY, [data-amplay] plays it; D[D.RENDER](st, D)
+   range inputs [data-amk] set a number (either one then calls D[D.ONSET](st, key, D) if the figure names a helper there), [data-amstep] steps D.STEPKEY, [data-amplay] plays it; D[D.RENDER](st, D)
    redraws the SVG and D[D.SAY](st, D) returns [summary, readout]. Hover or tap a .hot part to read its data-info. */
 export function amLive(root, D) {
   var st = JSON.parse(JSON.stringify(D.INIT)), svg = root.querySelector(".am-svg svg"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), ro = root.querySelector("[data-readout]"), timer = 0;
@@ -118,13 +118,13 @@ export function amLive(root, D) {
   function stepTo(v) { st[D.STEPKEY] = Math.max(0, Math.min(D.STEPMAX, v)); update(); }
   root.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest("button"); if (!b || !root.contains(b)) return;
-    if (b.hasAttribute("data-amk")) { var v = b.getAttribute("data-amv"); st[b.getAttribute("data-amk")] = isNaN(+v) ? v : +v; if (D.onSet) D.onSet(st, b.getAttribute("data-amk"), D); stop(); update(); }
+    if (b.hasAttribute("data-amk")) { var v = b.getAttribute("data-amv"); st[b.getAttribute("data-amk")] = isNaN(+v) ? v : +v; if (D.ONSET) D[D.ONSET](st, b.getAttribute("data-amk"), D); stop(); update(); }
     else if (b.hasAttribute("data-amt")) { var k = b.getAttribute("data-amt"); st[k] = !st[k]; update(); }
     else if (b.hasAttribute("data-amstep")) { stop(); stepTo(st[D.STEPKEY] + +b.getAttribute("data-amstep")); }
     else if (b.hasAttribute("data-amplay")) { if (timer) { stop(); return; } b.setAttribute("aria-pressed", "true"); b.textContent = "Pause"; if (st[D.STEPKEY] >= D.STEPMAX) stepTo(0);
       timer = setInterval(function () { if (st[D.STEPKEY] >= D.STEPMAX) { stop(); return; } stepTo(st[D.STEPKEY] + (D.PLAYSTEP || 1)); }, D.PLAYMS || 2400); }
   });
-  Array.prototype.forEach.call(root.querySelectorAll('input[type="range"][data-amk]'), function (inp) { inp.addEventListener("input", function () { stop(); st[inp.getAttribute("data-amk")] = +inp.value; update(); }); });
+  Array.prototype.forEach.call(root.querySelectorAll('input[type="range"][data-amk]'), function (inp) { inp.addEventListener("input", function () { stop(); st[inp.getAttribute("data-amk")] = +inp.value; if (D.ONSET) D[D.ONSET](st, inp.getAttribute("data-amk"), D); update(); }); });
   function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && svg.contains(el)) info.textContent = el.getAttribute("data-info"); }
   svg.addEventListener("pointerover", hot); svg.addEventListener("click", hot);
   if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) kick(); }, { rootMargin: "80px" }).observe(svg);

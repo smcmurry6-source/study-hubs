@@ -24,8 +24,8 @@ function cbRender(st, D) {
     if (!ct) { for (var k = 0; k < 12; k++) o += '<rect x="' + (470 + k * 4) + '" y="' + (110 + k * 6) + '" width="70" height="56" rx="3" fill="var(--anatomy-shade-1)" stroke="var(--anatomy-mid)" opacity="' + (k <= n ? 1 : 0.15) + '"/>';
       o += T(510, 98, "planar images", "s", "middle") + T(510, 222, "→ combined into a volume", "s", "middle"); }
   } else {
-    var X0 = 120, layers = [["scintillator", 120, "Outer layer, the scintillator: a material such as thallium-doped cesium iodide converts each x-ray photon into visible light, in proportion to its intensity.", "--im-light"], ["photodiodes (thin-film transistor layer)", 190, "Middle layer, the thin-film transistor layer: an array of photodiodes, each a pixel, that generate an electric signal in proportion to the light reaching them.", "--im-sig"], ["signal out", 260, "The signal is read out and digitized: each photodiode becomes one pixel of the planar image.", "--anatomy-mid"]];
-    layers.forEach(function (Ly, i) { o += HOT(Ly[2], '<rect x="' + X0 + '" y="' + Ly[1] + '" width="400" height="48" rx="6" fill="var(--anatomy-shade-' + (i + 1) + ')" stroke="var(' + Ly[3] + ')" stroke-width="2"/>' + T(X0 + 410, Ly[1] + 30, Ly[0], "s", "start")); });
+    var X0 = 210, layers = [["scintillator|(CsI:Tl)", 120, "Outer layer, the scintillator: a material such as thallium-doped cesium iodide converts each x-ray photon into visible light, in proportion to its intensity.", "--im-light"], ["photodiodes|(TFT layer)", 190, "Middle layer, the thin-film transistor layer: an array of photodiodes, each a pixel, that generate an electric signal in proportion to the light reaching them.", "--im-sig"], ["signal out|(one pixel each)", 260, "The signal is read out and digitized: each photodiode becomes one pixel of the planar image.", "--anatomy-mid"]];
+    layers.forEach(function (Ly, i) { var nm = Ly[0].split("|"); o += HOT(Ly[2], '<rect x="' + X0 + '" y="' + Ly[1] + '" width="400" height="48" rx="6" fill="var(--anatomy-shade-' + (i + 1) + ')" stroke="var(' + Ly[3] + ')" stroke-width="2"/>' + T(X0 - 12, Ly[1] + 22, nm[0], "b", "end") + T(X0 - 12, Ly[1] + 38, nm[1], "s mut", "end")); });
     for (var p = 0; p < 6; p++) o += '<rect x="' + (X0 + 10 + p * 65) + '" y="196" width="56" height="36" rx="3" fill="none" stroke="var(--im-sig)" opacity=".7"/>';
     for (var q = 0; q < 4; q++) {
       var u = ((t / 2600 + q / 4) % 1), x = X0 + 60 + q * 95, y;
@@ -34,7 +34,7 @@ function cbRender(st, D) {
       else { y = 214 + (u - 0.65) / 0.35 * 70; o += '<path d="M' + x + " " + f1(y) + "h12" + '" stroke="var(--im-sig)" stroke-width="3"/><circle cx="' + (x + 14) + '" cy="' + f1(y) + '" r="3" fill="var(--im-sig)"/>'; }
     }
     o += T(X0 + 200, 30, "x-ray photons from the patient", "s mut", "middle");
-    o += T(X0 + 200, 340, "indirect detection: x-rays → visible light → electric signal", "b", "middle");
+    o += T(320, 340, "indirect detection: x-rays → visible light → electric signal", "b", "middle");
   }
   return o;
 }
