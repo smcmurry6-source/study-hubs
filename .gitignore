@@ -6,5 +6,13 @@ question-banks/
 # Built preview pages of the hub figures (node tools/figures/<hub>/build.mjs --preview)
 tools/figures/*/dist/
 
+# Obsidian: open the repo root as a vault (vault/rules/repo-is-the-vault.md). Share the link and template settings;
+# keep each device's layout, plugins and trash out of the public repo.
+.obsidian/*
+!.obsidian/app.json
+!.obsidian/templates.json
+!.obsidian/core-plugins.json
+.trash/
+
 # Working files the taste skill's scripts write (draw sheets, inspector screenshots, downloaded pictures)
 .taste-skill/

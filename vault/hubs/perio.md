@@ -1,0 +1,51 @@
+---
+type: hub
+tags: [hub, live]
+hub: perio
+status: live
+---
+
+# Periodontology (perio)
+
+The D2 Periodontology course (DENT 2145), nine sessions with different professors. Midterm Oct 1 (S1-S4, done, check-in
+closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `MIDTERM_DATE` / `FINAL_DATE` in the hub).
+
+## Before you work on it
+
+- **Source:** `hubs/perio/index.html` is the source; edit it directly. The old Perio Claude Project's split sources are
+  retired (Sam, 2026-11-03), so every "Perio Project: carry ... into the split sources" line in the change log is obsolete.
+- **Its own engine**, not the shared Occlusion one: the bank keeps its filters in `STATE.ui.qbank`, matching grades by
+  answer text, picture questions use `figAfter`, `recordAnswer` passes select-all picks. Since 2026-11-03 it has `two()`,
+  `tf()`, `nums()`, `mq()` and `mm()`.
+- **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
+  (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation from the
+  slides until the class part is posted, as its `note` says), S9 `upcoming` (exam-review guide only). Any session going
+  to taught needs the full set: [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
+  [numbered-statements](../rules/numbered-statements.md), [high-likelihood-topics](../rules/high-likelihood-topics.md).
+- **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
+  connector can't download over 10 MB, so a big PDF may be text only.
+- **Quiz card:** `NEXT_QUIZ` shows on Home until its date passes; set the next one there.
+- **Figures:** `tools/figures/perio/` (`build.mjs` fills the `anima:js`/`anima:css` markers; `--check`, `--preview`),
+  placed with `FIG_BY_LEC` / `figsHTML`. The suture diagrams are hand-drawn SVG in the hub (`SUTURE_DIAGRAMS`).
+- **Narration:** both levels for every session; **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
+  (`img/clinic-escape.webp`).
+- **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
+  whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
+  furcation entrance wider, Hamp as under 3 / over 3 mm / through (in class it was called "three millimeter increments").
+
+## Diagram decisions
+
+- 2026-09-25: the Atlas mode's diagrams were removed for being inaccurate. Accuracy is the bar.
+- 2026-10-14: all four candidates of the first review skipped; S5's Glickman grades, entrance map and CEP grades skipped.
+  Don't re-propose these.
+- 2026-11-03: six S7/S8 figures approved and built.
+
+## Pending
+
+- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) ·
+  [S8 host modulation](../tasks/2026-11-03-perio-s8-host-modulation-class.md) ·
+  [S9](../tasks/2026-11-03-perio-s9-plastic-esthetics.md)
+
+History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
+
+Related: [home](../home.md) · [occlusion](occlusion.md) (same final day)

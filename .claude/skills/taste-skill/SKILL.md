@@ -15,6 +15,15 @@ description: >-
 
 # tasteskill v2
 
+> **In study-hubs, the house rules come first** (`AGENTS.md`, every note in `vault/rules/`, `vault/decisions.md`). They
+> override this skill where the two differ. The hubs use monospace accents, gradients, L1/L2 lecture labels and more than
+> two typefaces on purpose, so **never restyle a live hub, the dashboard or the About page to this skill's house rules
+> without Sam's say-so**: use it as advice for new pages, or to review a page when Sam asks. Hubs are single files: copy
+> what you need into the page (nothing loads from `.claude/` at runtime), add no build step or dependency, and put a
+> student-visible change on the About page. Run the scripts from a scratch folder, not the repo root, or keep
+> `.taste-skill/` out of commits (it's gitignored). A found picture still has to fit the public repo (credited, never
+> course material). This box is a local addition (see `UPSTREAM.md`): keep it when updating.
+
 A page built by a model usually looks like the average of every page the model has seen: a centred
 headline over three lines, a little label above it, a row of icon cards, a soft gradient, a few thin
 rules and a monospace caption. Nothing in it is wrong and nothing in it was decided.

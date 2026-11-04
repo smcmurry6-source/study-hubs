@@ -8,7 +8,8 @@ Kept: everything in upstream's `skills/taste-skill/` (`SKILL.md`, `README.md`, `
 `assets/`, `evals/`), plus the repo's `LICENSE` and `CHANGELOG.md`. Left out: the repo's own README, wordmarks,
 sponsor logos and example screenshots (`assets/`, `examples/`), the plugin manifests (`.claude-plugin/`,
 `.codex-plugin/`, `.agents/`), `install.sh` (it symlinks into `~/.claude/skills`), CI and `tests/`.
-Nothing was edited.
+One local edit: the box at the top of `SKILL.md` saying the repo's house rules (`vault/rules/`) come first, as
+`anima`'s has. Keep it when updating.
 
 Upstream's `SKILL.md` mentions `library/scenes.json` and `assets/scenes/demo/`, which aren't in this commit;
 `draw.mjs` checks for the file and deals no scroll scenes without it.
@@ -27,4 +28,5 @@ typefaces at most) are upstream's taste, not this repo's: the hubs use monospace
 gradients today. Treat them as advice for new pages, not as a reason to restyle a live hub without Sam's say-so.
 
 To update: `git clone https://github.com/Leonxlnx/taste-skill`, read the new `SKILL.md` and diff the scripts, then copy
-`skills/taste-skill/*`, `LICENSE` and `CHANGELOG.md` over these and bump the commit above.
+`skills/taste-skill/*`, `LICENSE` and `CHANGELOG.md` over these, put the local box back at the top of `SKILL.md`, and
+bump the commit above.
