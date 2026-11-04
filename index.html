@@ -777,8 +777,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       desc:"All nine lectures: the evolution of implants, the implant-tissue interface, biomechanics, implant terminology, prefabricated abutments, Dr. Givan's imaging and CBCT study guide, implant surgery, and guided vs freehand surgery. The exam is on Canvas Fri Nov 6, 7 am-8 pm (40 questions, one hour). Its own home page with your countdown and progress, notes in two reading levels with narration, 11 interactive diagrams, multiple-choice, multiple-answer, matching, true/false, two-statement and numbered-statement questions, exam hints, a mock exam and the Osseo Arcade.",
       modes:["Home","Compendium","Plain-English notes","Diagrams","Review tables","Mock exam","Arcade","Listen"], stateKey:"pcdimpl-state-v1" },
     { id:"special-patient-care", cls:"spc", title:"Special Patient Care Hub", code:"Special Patient Care",
-      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinHour:24, promptHour:24, archiveHour:24 } ], updated:"2026-10-28",
-      desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Nov 6 to Nov 13. Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a mock exam, review tables and the Sparks Arcade.",
+      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinFrom:{ date:"2026-11-19", hour:0 } } ], updated:"2026-11-04",
+      archiveOn:{ date:"2026-11-14", hour:24 },
+      desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Fri Nov 6, due Fri Nov 13 at 11:59 pm (45 questions, 135 minutes, open notes). Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, multiple-answer, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a 45-question mock exam, review tables and the Sparks Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam1", cls:"hemeendo", title:"Heme & Endo Exam 1 Hub", code:"Heme & Endo · Exam 1",
       exams:[ { name:"Hematology & Endocrinology Exam 1", label:"Exam", date:"2026-10-30", code:"Heme & Endo · Exam 1", checkinHour:9, promptHour:9, checkinUntil:{ date:"2026-11-06", hour:22 } } ], updated:"2026-10-27",
@@ -820,7 +821,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
-     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up); checkinUntil:{date,hour} ends it at that time. Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up); checkinUntil:{date,hour} ends it at that time; checkinFrom:{date,hour} holds both back until then (Special Patient Care: no discussing the exam until after Nov 18). Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [
@@ -1496,12 +1497,14 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   ];
   var debriefSb = null;
   /* exams whose check-in is open, newest first: the card button from the exam's checkinHour (default CHECKIN_HOUR) on exam day, the pop-up from the
-     exam's promptHour (default ARCHIVE_HOUR); both until DEBRIEF_DAYS after it */
+     exam's promptHour (default ARCHIVE_HOUR), neither before checkinFrom ({date, hour}) if it is set; both until DEBRIEF_DAYS after it */
   function pastExams(hub, forPopup){
     var now = new Date();
     return (hub.exams || []).filter(function(x){
       var hour = forPopup ? (x.promptHour != null ? x.promptHour : ARCHIVE_HOUR) : (x.checkinHour != null ? x.checkinHour : CHECKIN_HOUR);
       if (x.checkinUntil && now >= examAt({ date:x.checkinUntil.date }, x.checkinUntil.hour != null ? x.checkinUntil.hour : ARCHIVE_HOUR)) return false;
+      /* checkinFrom holds the button and the pop-up until a later day, e.g. when the course bans discussing the exam until a date */
+      if (x.checkinFrom && now < examAt({ date:x.checkinFrom.date }, x.checkinFrom.hour != null ? x.checkinFrom.hour : 0)) return false;
       return x.date && !x.checkinClosed && now >= examAt(x, hour) && -daysUntil(x.date) <= DEBRIEF_DAYS;
     })
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
