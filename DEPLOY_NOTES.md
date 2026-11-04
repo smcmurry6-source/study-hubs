@@ -32,13 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Timmy Time comments open folded, Claude Code)** — Sam: under every episode the comment thread now shows
+  only its first comment (the first lore comment when there are any), with "Show n more comments" / "Show fewer
+  comments" (`aria-expanded`; `pod:<id>:comments-all` still tracks opening it). Posting a comment opens the thread so
+  the new one shows. `widget/podcast.js` only (`SHOW_FOLDED`); rule note and About page updated.
 - **2026-11-04 (PCD Implants: "Practiced least" on Home, Claude Code)** — Sam approved the lessons audit's proposal. Two days out,
   practice in `pcd-implants-exam1` fell off in bank order (the last four lectures had 6-7 answerers each vs 23 on L1-L2), so Home's
   "Where to next" now lists up to four lectures with under half their questions tried, fewest first, and its Practice button opens
   the Question Bank on them with "Not answered yet" (`homeGo('least:<ids>')`, `STATE.ui.qlec` as an array). It replaces the "Not
   started" row once you've answered anything; a brand-new visitor still sees "Not started". About page (PCD Implants' Home line),
   `vault/decisions.md`, hub note. No question, notes, audio or schema change.
-
 - **2026-11-04 (reddit scout, Claude Code)** — New `/reddit-scout` skill (`.claude/skills/reddit-scout/`, model
   invocation off, so it runs only when Sam calls it): reads r/ClaudeAI, r/ClaudeCode, r/Anthropic and r/claude through
   `tools/reddit-scout/scout.py` (Atom feeds, since Reddit's JSON API answers 403 to cloud sessions; standard library
@@ -46,7 +49,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   clears the bar; no suggestions is a normal result. Every run is logged in `tools/reddit-scout/log.md`, which also
   tells the next run what was already judged. Unfixed security findings go to Sam in chat, never into the public repo.
   First run (past month, 728 posts) logged there. Listed in `CLAUDE.md`, `vault/home.md` and the repo map. No site change.
-
 - **2026-11-04 morning (lessons audit, PCD Implants two days out, Claude Code)** — `hubs/pcd-implants-exam1`, same ids and answer
   positions: report #37 (`bm-goodacre` printed each complication's percentage in its choice, so the biggest number was the key): the
   choices are now plain names and the numbers are in the why lines. Explanations name the favorite wrong answer on `ev-misch` (Ford

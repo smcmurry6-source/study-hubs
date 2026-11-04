@@ -14,7 +14,8 @@
    Under the player: likes, dislikes and comments (Sam's rule, vault/rules/podcast-reactions.md; migration_v47).
    SH_PODCAST.fans = [{ who, tag, text }] holds the episode's 1-3 lore comments (characters from tools/podcast/LORE.md),
    shown first with a "Timmy's world" tag; they aren't stored or counted. The class's own come from pod_feed: posted
-   under the visitor's leaderboard name, deleted by their author, reported by anyone (three reports hide one). */
+   under the visitor's leaderboard name, deleted by their author, reported by anyone (three reports hide one).
+   The thread opens folded (Sam, 2026-11-04): only its first comment shows, with a button for the rest. */
 (function(){
   "use strict";
   var HUB = "", P = null, audio = null, dock = null, io = null, cardsSeen = 0, mounted = false, started = false, saveTimer = 0;
@@ -138,7 +139,7 @@
 
   /* ---------- likes, dislikes and comments ---------- */
   var SOC = { loaded: false, failed: false, likes: 0, dislikes: 0, mine: 0, comments: [], showAll: false, draft: "", note: "", busy: false };
-  var SHOW_LATEST = 3, MAX_LEN = 280;
+  var SHOW_FOLDED = 1, MAX_LEN = 280;
   function sb(){ return window.shSupabase || null; }
   function visitor(){ return ls("sh_visitor_id") || ""; }
   function fans(){ return (Array.isArray(P.fans) ? P.fans : []).filter(function(f){ return f && f.who && f.text; }).slice(0, 3); }
@@ -159,7 +160,7 @@
         '<span class="sh-pod-ccount"></span>' +
       '</div>' +
       '<ul class="sh-pod-comments"></ul>' +
-      '<button type="button" class="sh-pod-more" data-pod="more" hidden></button>' +
+      '<button type="button" class="sh-pod-more" data-pod="more" aria-expanded="false" hidden></button>' +
       '<form class="sh-pod-form" novalidate>' +
         '<textarea class="sh-pod-input" rows="2" maxlength="' + MAX_LEN + '" placeholder="What did you think of the episode?" aria-label="Add a comment about this episode"></textarea>' +
         '<div class="sh-pod-form-row"><span class="sh-pod-as"></span><span class="sh-pod-left" aria-live="polite"></span>' +
@@ -180,8 +181,8 @@
   }
   function paintSocial(){
     var F = fans().map(function(f){ return { lore: true, name: f.who, tag: f.tag, body: f.text }; });
-    var mine = SOC.comments, shown = SOC.showAll ? mine : mine.slice(-SHOW_LATEST);
-    var total = F.length + mine.length, hiddenN = mine.length - shown.length;
+    var all = F.concat(SOC.comments), shown = SOC.showAll ? all : all.slice(0, SHOW_FOLDED);
+    var total = all.length, rest = total - SHOW_FOLDED;
     var online = !!sb(), name = (window.shNameNow && window.shNameNow()) || "";
     document.querySelectorAll("[data-pod-social]").forEach(function(el){
       el.querySelectorAll("[data-pod-vote]").forEach(function(b){
@@ -192,10 +193,11 @@
       el.querySelector('[data-pod-n="likes"]').textContent = SOC.loaded ? String(SOC.likes) : "";
       el.querySelector('[data-pod-n="dislikes"]').textContent = SOC.loaded ? String(SOC.dislikes) : "";
       el.querySelector(".sh-pod-ccount").textContent = total === 1 ? "1 comment" : total + " comments";
-      el.querySelector(".sh-pod-comments").innerHTML = F.concat(shown).map(commentHTML).join("");
+      el.querySelector(".sh-pod-comments").innerHTML = shown.map(commentHTML).join("");
       var more = el.querySelector(".sh-pod-more");
-      more.hidden = !(hiddenN > 0 || (SOC.showAll && mine.length > SHOW_LATEST));
-      more.textContent = SOC.showAll ? "Show only the latest" : "Show all " + mine.length + " comments from the class";
+      more.hidden = rest < 1;
+      more.setAttribute("aria-expanded", SOC.showAll ? "true" : "false");
+      more.textContent = SOC.showAll ? "Show fewer comments" : "Show " + rest + (rest === 1 ? " more comment" : " more comments");
       var ta = el.querySelector(".sh-pod-input");
       if (document.activeElement !== ta && ta.value !== SOC.draft) ta.value = SOC.draft;
       ta.disabled = !online || SOC.busy;
@@ -249,6 +251,7 @@
         if (d && d.ok) {
           SOC.comments = SOC.comments.concat([{ id: d.id, name: d.name, body: text, at: d.at, mine: true }]);
           SOC.draft = ""; document.querySelectorAll(".sh-pod-input").forEach(function(t){ t.value = ""; });
+          SOC.showAll = true; // open the thread so the new comment shows
           track("comment"); done("");
         } else done(POST_ERR[d && d.error] || "Couldn't post just now. Try again.");
       }, function(){ done("Couldn't post just now. Try again."); });
