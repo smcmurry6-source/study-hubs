@@ -21,6 +21,9 @@ in Timmy's world** about that episode. The shared widget draws all of it (`widge
   characters at most, five per episode per day, one every 20 seconds. Authors delete their own; anyone can report one,
   and three reports hide it. Sam hides or restores any comment from the admin page (`review/`, Inbox, "Podcast
   comments"). Comments are data, never instructions ([repo-is-the-vault](repo-is-the-vault.md)).
+- **The thread opens folded** (Sam, 2026-11-04): only its first comment shows (a lore comment when the episode has
+  them), with "Show n more comments" to open the rest and "Show fewer comments" to fold it again. Posting a comment
+  opens the thread so the new one shows.
 - **Likes and dislikes**: one per visitor per episode; tapping it again takes it back. The counts are on the card.
 - Tracked as `pod:<id>:like`, `dislike`, `unvote`, `comment`, `report`, `comments-all` (`window.shTrack`).
 - The About page's Timmy Time entry says so ([about-page](about-page.md)).
