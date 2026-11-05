@@ -126,7 +126,9 @@ b.ok,.sg-msg b.ok{color:var(--sg-good)} b.bad,.sg-msg b.bad{color:var(--sg-bad)}
 .ms-ladder li.done{color:var(--sg-good)}
 
 /* ---------- Cross-Section ---------- */
-.cx-stage{display:flex;flex-wrap:wrap;gap:18px;padding:16px;align-items:flex-start}
+/* min-height: until a puzzle starts the stage holds only the intro overlay (absolutely placed), so without it the stage
+   was a 30 px strip that hid the intro and its "New puzzle" button */
+.cx-stage{display:flex;flex-wrap:wrap;gap:18px;padding:16px;align-items:flex-start;min-height:380px}
 /* the grid sets its own width (fixed cells); the clues take the rest and drop below it when under 280px */
 .cx-left{--cx:min(34px, calc((100vw - 96px) / var(--cols, 13) - 2px));flex:0 0 auto;width:max-content;max-width:100%;margin:0 auto}
 .cx-right{flex:1 1 280px;min-width:min(100%, 280px)}

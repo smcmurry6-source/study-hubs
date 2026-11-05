@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (arcade crossword can be started again, Claude Code, BUG-024)** — Sam: "the arcade crossword is broken." Opening
+  the crossword (Cross-Section; Crossing Over, Cross-Slice and the other skins) showed an empty 30 px strip on every hub, laptop
+  and phone: before a puzzle starts the stage holds only the intro overlay, which is absolutely placed, so the stage had no
+  height and the intro and its "New puzzle" button were clipped. The clicks show students opening it, trying Full screen and
+  leaving; `arcade_scores` had no crossword score in 30 days. `widget/games.css`: `.cx-stage{min-height:380px}` (a started
+  puzzle is taller than that, so its layout is unchanged). Checked in the preview on all five live hubs: every arcade game's
+  start button takes a real tap, and every crossword types through to "Solved!". No `sw.js` bump (styles are network-first).
+  Noticed, not changed: two clues can come from the same note sentence with different blanks, so each gives the other's
+  answer away, and a clue can start with a stray ")".
+
 - **2026-11-05 (the 11-04 lessons refresh is live, Claude Code)** — #245 merged at 15:03 UTC, but its GitHub Pages deploy timed out ("Deploy to GitHub Pages" failed after 10 minutes), so #248 (vault only: Sam's calls in `vault/decisions.md`) gave `main` the new commit that publishes; the hubs were live at 15:30. At 15:31 `tools/data-fixes/2026-11-04-statement-keys.sql` ran (Sam's OK) with a guard that rolled everything back unless each reordered item's new key held exactly its correct count: it passed, nothing was left mid-move, and the rewritten items start fresh. `postcheck.js` passed (both hubs identical to main, 0 errors), a changelog line for each hub, and suggestion #14 got Sam's reply. BUG-022 retested; BUG-023 done for these items (version-aware picks still in the inbox).
 - **2026-11-04 evening (lessons audit: statement keys no longer a pattern, Claude Code)** — Suggestion #14 (PCD Implants, two days
   out): "a lot of the statement questions seem to all have the same answer... select all being options 1,2,4 a lot." True:
