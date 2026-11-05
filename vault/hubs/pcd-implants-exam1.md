@@ -50,6 +50,12 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   So Home's "Where to next" has a **Practiced least** row (`homeNextHTML`, `homeGo('least:<ids>')`; Sam, 2026-11-04): it
   replaces "Not started" once you've answered anything. Its clicks log as `home=least:<ids>`.
 
+- **Drawn Patient Box cases** (2026-11-05): the four L8 Patient Box items (`su-pb-1` to `su-pb-4`) name a case in
+  `PCASES` (mucositis at #19, peri-implantitis under a cement-retained crown at #30, a new patient with no baseline, an
+  early failure at #14 under a cover screw) and show its chart, film and drawn view from `widget/cases.js`, with "In the
+  notes" buttons (`REF_SURG_*`, `REF_REV_*`). Write any new Patient Box item the same way:
+  [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md); CI checks the numbers (`node tools/ci/cases.js`).
+
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
 Related: [home](../home.md) · [special-patient-care](special-patient-care.md) (its engine)

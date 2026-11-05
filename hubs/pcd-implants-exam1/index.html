@@ -23,6 +23,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Press+Start+2P&family=Red+Hat+Mono:wght@400;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../widget/v3.css">
+<link rel="stylesheet" href="../../widget/cases.css">
+<script src="../../widget/cases.js"></script>
 <style>
 /* ===================================================================
    PCD IMPLANTS EXAM 1 HUB — tokens
@@ -4705,34 +4707,75 @@ match("su-match", "surgery", "slides", "Match each prosthesis to its minimal ver
 mm("su-mm-1", "surgery", "slides", "Select all that apply: which are prosthetic-related risk factors for peri-implant disease?",
   [["Residual cement",true,"Prosthetic."],["Occlusal overload",true,"Prosthetic."],["Prosthetic contours",true,"Prosthetic."],["Tobacco use",false,"Patient-related."],["Implant malpositioning",false,"Surgical-related."]],
   "Patient, implant, site, prosthetic and surgical groups.");
+/* ---------- Patient Box cases drawn from their numbers (widget/cases.js; how: vault/how-to/draw-a-patient-box-case.md) ----------
+   A question that names a case in pcase shows the case's chart, radiograph and drawn view, produced from `spec`, so every
+   picture agrees with every number; `expect` is checked against the kit's derive() by CI (node tools/ci/cases.js),
+   which also checks every number is realistic. Facts as L8 teaches them (the 2018 peri-implant case definitions,
+   with and without baseline records; early vs late failure); the people are made up. */
+/* pcases begin */
+var PCASES = {
+  'impl-19-mucositis': {
+    title:'An implant at #19, two years on', box:[],
+    spec:{ teeth:['18','19','20'], age:58, lingual:false, gingiva:{ look:'inflamed', edema:.8 },
+      t:{ '19':{ implant:{ w:4.3, len:10, baseline:{ m:1.5, d:1.5 } }, bone:{ m:1.5, d:1.5 }, pd:{ f:[5,4,5] }, rec:{ f:[-2,-2,-2] }, bop:{ f:[1,1,1] }, plaque:{ f:[1,1,1] } } } },
+    figs:[{ kind:'chart', title:'#18-#20, facial' }, { kind:'film', title:'#18-#20, today', note:'On the film taken 1 year after the crown was delivered, the bone met the implant at this same thread.' }, { kind:'view', title:'#18-#20, facial' }],
+    expect:{ impl:{ '19':{ dx:'peri-implant mucositis', meffert:'healthy' } } }
+  },
+  'impl-30-periimplantitis': {
+    title:'A cement-retained crown on #30, four years on', box:[],
+    spec:{ teeth:['29','30','31'], age:63, lingual:false, gingiva:{ look:'inflamed', edema:.9 },
+      t:{ '30':{ implant:{ w:4.5, len:11, baseline:{ m:1.5, d:1.5 }, cement:true }, bone:{ m:4.5, d:4.5 }, pd:{ f:[7,6,7] }, rec:{ f:[-2,-2,-2] }, bop:{ f:[1,1,1] }, pus:{ f:[1,0,0] } } } },
+    figs:[{ kind:'chart', title:'#29-#31, facial' }, { kind:'film', title:'#29-#31, today', note:'On the film taken 1 year after delivery, the bone met the implant at its first thread, 1.5 mm below the platform.' }, { kind:'view', title:'#29-#31, facial' }],
+    expect:{ impl:{ '30':{ dx:'peri-implantitis', meffert:'failing' } } }
+  },
+  'impl-19-no-baseline': {
+    title:'A new patient with an implant at #19 and no records', box:[],
+    spec:{ teeth:['18','19','20'], age:66, lingual:false, gingiva:{ look:'inflamed', edema:.7 },
+      t:{ '19':{ implant:{ w:4.1, len:10 }, bone:{ m:4, d:4 }, pd:{ f:[6,5,6] }, rec:{ f:[-2,-2,-2] }, bop:{ f:[1,1,1] } } } },
+    figs:[{ kind:'chart', title:'#18-#20, facial' }, { kind:'film', title:'#18-#20', note:'No earlier film to compare with. Read the bone level from the most coronal part of the implant.' }],
+    expect:{ impl:{ '19':{ dx:'peri-implantitis' } } }
+  },
+  'impl-14-early': {
+    title:'An implant at #14, five weeks after placement', box:[],
+    spec:{ teeth:['13','14','15'], age:47, lingual:false, gingiva:{ look:'inflamed', edema:.5 },
+      t:{ '14':{ implant:{ w:4.1, len:10, cover:true }, halo:true, mob:1, bone:{ m:1, d:1 } } } },
+    figs:[{ kind:'film', title:'#13-#15, today', note:'The implant is still submerged under a cover screw. Look at the bone right against the threads.' }, { kind:'view', title:'#13-#15, facial' }],
+    expect:{ impl:{ '14':{ dx:'failed implant', meffert:'failed' } } }
+  }
+};
+/* pcases end */
+var REF_SURG_PI = { label:'L8 notes: Peri-implant health, mucositis and peri-implantitis', go:{ v:'notes', lec:'surgery', k:30 } };
+var REF_SURG_EARLY = { label:'L8 notes: Early and late failures', go:{ v:'notes', lec:'surgery', k:19 } };
+var REF_REV_PI = { label:'Review: peri-implant case definitions', go:{ v:'review', q:'Peri-implant' } };
+var REF_REV_EARLY = { label:'Review: Early or late failure?', go:{ v:'review', q:'Early' } };
 mq("su-pb-1", "surgery", "hub", "Read the Patient Box. Which condition best fits?",
   [["Peri-implant mucositis","Bleeding and deeper pockets without bone loss beyond initial remodeling."],
    ["Peri-implantitis","No progressive bone loss compared with the 1-year film."],
    ["Peri-implant health","Profuse bleeding and increased depths aren't health."],
    ["Failed osseointegration","The implant isn't mobile and has no radiolucency."]],
   "Inflammation without bone loss beyond initial remodeling: mucositis. It's reversible with biofilm control, though it may take longer than gingivitis.",
-  { pbox:[["Site","#19 implant crown, delivered 2 years ago"],["Probing","5 mm with profuse bleeding (3 mm at the 1-year visit)"],["Tissue","Red, swollen mucosa"],["Radiograph","Bone level unchanged from the 1-year film"],["Mobility","None"]] });
+  { pbox:[["Site","#19 implant crown, delivered 2 years ago"],["Probing","5 mm with profuse bleeding (3 mm at the 1-year visit)"],["Tissue","Red, swollen mucosa"],["Radiograph","Bone level unchanged from the 1-year film"],["Mobility","None"],["Findings","See the chart, the radiograph and the drawn view of #18-#20"]], pcase:'impl-19-mucositis', ref:[REF_SURG_PI, REF_REV_PI] });
 mq("su-pb-2", "surgery", "hub", "Read the Patient Box. Which condition best fits?",
   [["Peri-implantitis","Bleeding plus progressive bone loss compared with the 1-year film."],
    ["Peri-implant mucositis","Mucositis has no bone loss beyond initial remodeling."],
    ["Peri-implant health","Bone loss and suppuration aren't health."],
    ["A stability dip","That happens weeks after placement, not years."]],
   "Progressive bone loss vs the radiograph at 1 year after delivery, with bleeding/suppuration and deeper pockets: peri-implantitis.",
-  { pbox:[["Site","#30 implant crown, cement-retained, delivered 4 years ago"],["Probing","7 mm with bleeding and suppuration (4 mm at 1 year)"],["Radiograph","3 mm more bone loss than the 1-year film"],["Mobility","None"],["History","Excess cement was found at a recall"]] });
+  { pbox:[["Site","#30 implant crown, cement-retained, delivered 4 years ago"],["Probing","7 mm with bleeding and suppuration (4 mm at 1 year)"],["Radiograph","3 mm more bone loss than the 1-year film"],["Mobility","None"],["History","Excess cement was found at a recall"],["Findings","See the chart, the radiograph and the drawn view of #29-#31"]], pcase:'impl-30-periimplantitis', ref:[REF_SURG_PI, REF_REV_PI] });
 mq("su-pb-3", "surgery", "hub", "Read the Patient Box. Using the definition for patients with no baseline records, which condition best fits?",
   [["Peri-implantitis","Bone ≥3 mm from the implant's top and/or PD ≥6 mm, plus profuse bleeding."],
    ["Peri-implant mucositis","The bone level rules it out."],
    ["Peri-implant health","Not with these findings."],
    ["It can't be judged without baseline records","The 2018 definitions cover this case."]],
   "If there are no initial radiographs and probing depths: radiographic bone level ≥3 mm from the most coronal part of the implant and/or PD ≥6 mm plus profuse bleeding.",
-  { pbox:[["Patient","New to the clinic; implant placed elsewhere years ago"],["Records","No earlier radiographs or probings"],["Probing","6 mm with profuse bleeding"],["Radiograph","Bone 4 mm below the implant's most coronal part"]] });
+  { pbox:[["Patient","New to the clinic; implant placed elsewhere years ago"],["Records","No earlier radiographs or probings"],["Probing","6 mm with profuse bleeding"],["Radiograph","Bone 4 mm below the implant's most coronal part"],["Findings","See the chart and the radiograph of #18-#20"]], pcase:'impl-19-no-baseline', ref:[REF_SURG_PI, REF_REV_PI] });
 mq("su-pb-4", "surgery", "hub", "Read the Patient Box. What is the most likely cause of this failure?",
   [["Overheating the bone during the osteotomy","An early, surgical failure."],
    ["Peri-implantitis from residual cement","There's no crown yet; this is early."],
    ["Occlusal overload from the final crown at delivery","The implant was never restored."],
    ["Late prosthetic complications","Too early for prosthetic failure."]],
   "Early failures are generally surgical (heat, force, contamination), early overload, impaired healing or poor bone turnover. Here the surgical note points to heat.",
-  { pbox:[["Timeline","Implant #14 placed 5 weeks ago, cover screw, no provisional"],["Surgical note","Osteotomy drilled quickly with little irrigation in dense bone"],["Today","Pain, implant mobile, radiolucency around it"],["Health","Non-smoker, no medical history"]] });
+  { pbox:[["Timeline","Implant #14 placed 5 weeks ago, cover screw, no provisional"],["Surgical note","Osteotomy drilled quickly with little irrigation in dense bone"],["Today","Pain, implant mobile, radiolucency around it"],["Health","Non-smoker, no medical history"],["Findings","See the radiograph and the drawn view of #13-#15"]], pcase:'impl-14-early', ref:[REF_SURG_EARLY, REF_REV_EARLY] });
 
 /* =================================================================== L9 GUIDED SURGERY VS FREEHAND */
 mq("gs-two-q", "guided", "slides", "Which pair names the two ways of deciding where an implant should go?",
@@ -5565,7 +5608,7 @@ function qCardHTML(q, opts){
   return '<div class="qcard tag-'+tagOf(q.lec)+(opts.retry?' is-retry':'')+'" data-qid="'+q.id+'" data-rid="'+rid+'" data-qtype="'+q.type+'"'+(opts.ctx?' data-ctx="'+opts.ctx+'"':'')+'>' +
     '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span>'+likelyChip(q)+status+'</div>' +
     figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p>' + body +
-    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+cueHTML(q)+
+    '<div class="qcard-explain" data-role="explain"><span class="qcard-verdict"></span>'+figAfterHTML(q)+(q.type==='sequence' ? '<b>Order:</b> '+q.steps.map(function(s,i){ return (i+1)+'. '+escHtml(s); }).join(' → ')+'<br>' : '')+escHtml(q.ex)+whyHTML(q)+refHTML(q)+cueHTML(q)+
       '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
   '</div>';
 }
@@ -5585,8 +5628,9 @@ function caseSet(key){
 function pboxHTML(q){
   if(!q.pbox) return '';
   var set = q.pcase ? caseSet(q.pcase) : [], tag = set.length > 1 ? '<span class="pbox-set">Same patient · '+(set.indexOf(q.id)+1)+' of '+set.length+'</span>' : '';
-  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box'+tag+'</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + caseImgHTML(q) + '</div>';
+  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box'+tag+'</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + caseImgHTML(q) + (window.shCases ? window.shCases.pboxFigures(q, PCASES) : '') + '</div>';
 }
+function refHTML(q){ return window.shCases ? window.shCases.refHTML(q) : ''; }
 /* select-all partial credit (Canvas-style): +1/n per right pick, -1/n per wrong pick, floor 0; full credit counts as correct */
 var MULTI_STATE = {};
 function multiScore(q, picks){ var hit = picks.filter(function(i){ return q.correct.indexOf(i) > -1; }).length; return Math.max(0, (hit - (picks.length - hit)) / q.correct.length); }
@@ -6403,7 +6447,7 @@ function renderMock(body){
       '<div class="qcard tag-'+tagOf(q.lec)+(m.submitted?' is-answered':'')+(m.submitted && !m.res[id]?' is-missed':'')+'" data-qid="'+q.id+'" data-qtype="mcq">' +
       '<div class="qcard-top">'+lecChip(q.lec)+'<span class="src-chip">'+escHtml(SRC_LABEL[q.src]||q.src)+'</span></div>' +
       figHTML(q) + pboxHTML(q) + '<p class="qcard-stem">'+escHtml(q.stem)+'</p><div class="qcard-choices">'+choices+'</div>' +
-      '<div class="qcard-explain" data-role="explain">'+verdict+(m.submitted ? figAfterHTML(q) : '')+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, pick === null ? [] : [pick]) : '')+cueHTML(q)+
+      '<div class="qcard-explain" data-role="explain">'+verdict+(m.submitted ? figAfterHTML(q) : '')+escHtml(q.ex||'')+(m.submitted ? whyHTML(q, pick === null ? [] : [pick])+refHTML(q) : '')+cueHTML(q)+
         '<div class="qcard-classdata-row"><span class="qcard-classdata-result" data-role="classdata-result">Loading class data…</span></div></div>' +
       '</div></div>';
   }).join('') + '</div>';

@@ -64,6 +64,13 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
 - 2026-11-03: five for L7 (built 2026-11-04: `tolerance`, `stability`, `splints`, `thirds`, `erosion`;
   [task](../tasks/done/2026-11-03-occlusion-l7-diagrams.md)). Every lecture's diagram review is done; don't propose these again.
 
+## Drawn Patient Box cases
+
+The hub loads the shared case kit (`widget/cases.js`, 2026-11-05) and has an empty `PCASES` between its `pcases`
+markers, so a Patient Box question can name a case (`pcase`) and get a chart, film and drawn view from its numbers
+([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)). Its own case pictures (`CASE_IMG`, `pimg`: casts,
+marks, the TMJ view) stay as they are; use the kit for any new perio chart or radiograph.
+
 ## Pending
 
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
