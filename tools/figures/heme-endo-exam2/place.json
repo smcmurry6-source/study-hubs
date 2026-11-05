@@ -1,0 +1,39 @@
+{
+ "about": "Where each figure goes: under a notes heading (place: full and plain heading text, matched at the start) and in that lecture's Review (byLec). Read by the hub's build; the hub keeps its own copy in FIG_PLACE / FIG_BY_LEC.",
+ "place": {
+  "dmpharm": [
+   {"full": "Treating type 1 diabetes: insulin", "plain": "Insulins: fast for meals, slow for all day", "figs": ["insulins"]},
+   {"full": "The non-insulin drugs", "plain": "The drugs, one line each", "figs": ["drugsites"]}
+  ],
+  "path1": [
+   {"full": "Primary versus secondary: reading the labs", "plain": "The one rule to learn first", "figs": ["axislab"]}
+  ],
+  "path2": [
+   {"full": "Adrenal androgens and congenital adrenal hyperplasia", "plain": "Congenital adrenal hyperplasia", "figs": ["cah"]},
+   {"full": "The pattern to carry into the exam", "plain": "The one idea", "figs": ["axislab"]}
+  ],
+  "mhisto": [
+   {"full": "Spermatogenesis: the terms", "plain": "From stem cell to sperm", "figs": ["tubule"]},
+   {"full": "The duct system, in order", "plain": "The ducts", "figs": ["ducts"]}
+  ],
+  "fhisto": [
+   {"full": "Telling the stages apart", "plain": "The five follicle stages", "figs": ["follicle"]},
+   {"full": "How the ovarian and uterine cycles line up", "plain": "The cycle, side by side", "figs": ["cycle"]}
+  ],
+  "mphys": [
+   {"full": "Hormonal control: the hypothalamic-pituitary-testicular axis", "plain": "The control loop", "figs": ["hpg"]}
+  ],
+  "fphys": [
+   {"full": "The menstrual cycle: three phases", "plain": "The cycle in four beats", "figs": ["cycle"]}
+  ]
+ },
+ "byLec": {
+  "dmpharm": ["insulins", "drugsites"],
+  "path1": ["axislab"],
+  "path2": ["cah", "axislab"],
+  "mhisto": ["tubule", "ducts"],
+  "fhisto": ["follicle", "cycle"],
+  "mphys": ["hpg"],
+  "fphys": ["cycle"]
+ }
+}
