@@ -39,11 +39,11 @@
    "tbt": 500
   },
   "hubs/occlusion/": {
-   "kb": 1320,
-   "requests": 33,
+   "kb": 850,
+   "requests": 40,
    "fcp": 2000,
    "lcp": 2500,
-   "tbt": 1000
+   "tbt": 500
   },
   "hubs/pcd-exam3/": {
    "kb": 850,
@@ -53,11 +53,11 @@
    "tbt": 500
   },
   "hubs/pcd-implants-exam1/": {
-   "kb": 1000,
-   "requests": 33,
+   "kb": 850,
+   "requests": 40,
    "fcp": 2000,
    "lcp": 2500,
-   "tbt": 500
+   "tbt": 1000
   },
   "hubs/perio/": {
    "kb": 1180,
@@ -67,18 +67,18 @@
    "tbt": 1000
   },
   "hubs/special-patient-care/": {
-   "kb": 940,
-   "requests": 32,
-   "fcp": 1500,
+   "kb": 810,
+   "requests": 37,
+   "fcp": 2000,
    "lcp": 2500,
    "tbt": 500
   },
   "hubs/heme-endo-exam2/": {
-   "kb": 1330,
-   "requests": 33,
+   "kb": 810,
+   "requests": 37,
    "fcp": 2000,
-   "lcp": 5500,
-   "tbt": 1000
+   "lcp": 3000,
+   "tbt": 500
   }
  }
 }

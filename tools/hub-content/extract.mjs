@@ -381,7 +381,7 @@ function rendered(value, name) {
 }
 
 function sameFile(file, text) {
-  try { return statSync(file).isFile() && readFileSync(file, "utf8") === text; }
+  try { return statSync(file).isFile() && readFileSync(file, "utf8").replace(/\r\n/g, "\n") === text.replace(/\r\n/g, "\n"); }
   catch { return false; }
 }
 

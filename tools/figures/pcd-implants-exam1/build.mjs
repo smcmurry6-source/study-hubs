@@ -54,12 +54,14 @@ ${figs}
 const animaCss = () => baseCss() + FIGURES.map((f) => f.css).join("") + "\n";
 
 function between(src, b, e, body){
-  const i = src.indexOf(b), j = src.indexOf(e);
+  const begin = src.includes(b) ? b : b.replace(/\n/g, "\r\n");
+  const end = src.includes(e) ? e : e.replace(/\n/g, "\r\n");
+  const i = src.indexOf(begin), j = src.indexOf(end);
   if (i < 0 || j < i) throw new Error("markers not found: " + b.trim());
-  return src.slice(0, i) + b + body + src.slice(j);
+  return src.slice(0, i) + begin + body + src.slice(j);
 }
 function same(file, text){
-  try { return readFileSync(file, "utf8") === text; }
+  try { return readFileSync(file, "utf8").replace(/\r\n/g, "\n") === text.replace(/\r\n/g, "\n"); }
   catch { return false; }
 }
 function writeIfChanged(file, text){ if (!same(file, text)) writeFileSync(file, text); }
@@ -74,7 +76,7 @@ const figuresFallback = figureFallback(figures);
 let out = between(hub, AJB, AJE, JS_PLACEHOLDER);
 out = between(out, ACB, ACE, CSS_PLACEHOLDER);
 if (process.argv.includes("--check")) {
-  if (out !== hub || !same(JS_OUT, js) || !same(CSS_OUT, css) || !same(FIGURES_JSON, figuresJson) || !same(FIGURES_FALLBACK, figuresFallback)) {
+  if (!same(HUB, out) || !same(JS_OUT, js) || !same(CSS_OUT, css) || !same(FIGURES_JSON, figuresJson) || !same(FIGURES_FALLBACK, figuresFallback)) {
     console.error("hubs/pcd-implants-exam1: the lazy anima assets, static figures, or hub placeholders are stale; run node tools/figures/pcd-implants-exam1/build.mjs");
     process.exit(1);
   }

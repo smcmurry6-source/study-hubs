@@ -66,7 +66,7 @@ function between(src, b, e, body){
   return src.slice(0, i) + begin + body + src.slice(j);
 }
 function same(file, text){
-  try { return readFileSync(file, "utf8") === text; }
+  try { return readFileSync(file, "utf8").replace(/\r\n/g, "\n") === text.replace(/\r\n/g, "\n"); }
   catch { return false; }
 }
 function writeIfChanged(file, text){ if (!same(file, text)) writeFileSync(file, text); }
@@ -105,7 +105,7 @@ out = between(out, CB, CE, OD_CSS_PLACEHOLDER);
 out = between(out, AJB, AJE, ANIMA_JS_PLACEHOLDER);
 out = between(out, ACB, ACE, ANIMA_CSS_PLACEHOLDER);
 if (process.argv.includes("--check")) {
-  if (out !== hub || !same(OD_JS_OUT, odJs) || !same(OD_CSS_OUT, odCss) || !same(ANIMA_JS_OUT, animaJsOut) || !same(ANIMA_CSS_OUT, animaCssOut) || !same(FIGURES_JSON, figuresJson) || !same(FIGURES_FALLBACK, figuresFallback)) {
+  if (!same(HUB, out) || !same(OD_JS_OUT, odJs) || !same(OD_CSS_OUT, odCss) || !same(ANIMA_JS_OUT, animaJsOut) || !same(ANIMA_CSS_OUT, animaCssOut) || !same(FIGURES_JSON, figuresJson) || !same(FIGURES_FALLBACK, figuresFallback)) {
     console.error("hubs/occlusion: the lazy figure assets, static figures, or hub placeholders are stale; run node tools/figures/occlusion/build.mjs");
     process.exit(1);
   }
