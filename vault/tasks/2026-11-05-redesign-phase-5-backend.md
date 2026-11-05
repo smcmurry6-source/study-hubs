@@ -25,6 +25,10 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 - The audit's backend numbers: the audit note, sections 1 and 3. Schema in `supabase/schema.sql`; a new `migration_v53.sql` (and up), applied through the connector, `supabase/schema.sql` refreshed ([repo map](../reference/repo-map.md)).
 - Tests: `node tools/release/rls.js`, `admin-ops.js`, `retention.js` on a throwaway copy; `tools/release/perf.js` budgets lowered to the new sizes.
 
+- **Suited to a parallel agent (Codex 5.6 Terra, Sam, 2026-11-05)**: this phase does not depend on the design work. The
+  numbers to beat and the RPC inventory are in the audit note (sections 1 and 3) and in the session's architecture
+  report summarized there; every change is verifiable with the release suites on a throwaway database.
+
 ## Done when
 
 - [ ] Hub load: one bootstrap round trip (plus presence); dashboard the same

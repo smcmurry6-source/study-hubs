@@ -27,6 +27,10 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - Keep: `window.SH_EXPORT = {` last, the question-id registry, the lint's question shape and format minimums, the smoke test's selectors (update `tools/ci/smoke.js` with the engine), the `od:kit`/`anima:js` marker blocks (or their new per-figure files), narrate.py's READINGS format (or its new JSON reader), the preview transform's literal strings.
 - Settings cut: font choice, background music, accent metal (text size and theme stay). Tour prompt cut; one-line first-use tips.
 
+- **A parallel agent (Codex) can take the engine extraction and the content split** (`widget/hub.js`, the JSON files, CI,
+  narrate.py and the preview transform) while the design session does the layout, the card and the art on top of it: agree
+  the engine's module boundaries first (one PR for the extraction with no visual change, then the redesign PR on it).
+
 ## Done when
 
 - [ ] `widget/hub.js` + `hub.css`; `hubs/occlusion/` is configuration, data (JSON), tint, emblem, masthead and arcade skin
