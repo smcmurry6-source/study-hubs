@@ -18,6 +18,7 @@
 <script src="../widget/vendor/supabase-2.117.2.js"></script>
 <script src="../widget/recap.js"></script>
 <script src="../widget/archive.js"></script>
+<script src="../widget/qhealth.js"></script>
 <script src="../widget/timmy.js" defer></script>
 <style>
 /* The admin page (Sam only). Style: taste-skill's "framed sheet" app style (seed 373358903), kept to the dashboard's
@@ -299,6 +300,47 @@ table.data.matrix td.n, table.data.matrix th.n{min-width:64px;}
 .pill.info{background:var(--accent-soft); color:var(--accent-ink);}
 code{font-size:13px;}
 
+/* ---------- question health (widget/qhealth.js; vault/reference/question-health.md) ---------- */
+.qh-intro{color:var(--muted); max-width:78ch; margin-bottom:16px;}
+.qh-list{display:grid; gap:12px;}
+.qh-item{border:1px solid var(--border); border-radius:var(--r-card); padding:16px; display:grid; gap:10px; min-width:0;}
+.qh-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.qh-id{font-size:var(--fs-small); font-weight:600; background:var(--raised); border-radius:var(--r-control); padding:2px 7px; overflow-wrap:anywhere;}
+.qh-lec{font-size:13px; margin-right:4px;}
+.pill.qh-new{background:var(--pill-warn-bg); color:var(--pill-warn-ink);}
+.pill.qh-changed{background:var(--accent-soft); color:var(--accent-ink);}
+.pill.qh-todo{background:var(--pill-neg-bg); color:var(--pill-neg-ink);}
+.pill.qh-reviewed{background:var(--pill-pos-bg); color:var(--pill-pos-ink);}
+.qh-stem{font-size:15px; font-weight:500; line-height:22px; white-space:pre-wrap; overflow-wrap:anywhere; max-width:80ch;}
+.qh-chs{list-style:none; margin:0; padding:0; display:grid; gap:4px; max-width:80ch;}
+.qh-ch{position:relative; display:flex; justify-content:space-between; gap:12px; padding:6px 10px; border-radius:var(--r-control); background:var(--raised); overflow:hidden;}
+.qh-ch-t, .qh-ch-n{position:relative; z-index:1;}
+.qh-ch-t{overflow-wrap:anywhere; min-width:0;}
+.qh-ch-n{flex:none; font-size:var(--fs-small); font-weight:600;}
+.qh-ch-bar{position:absolute; left:0; top:0; bottom:0; background:color-mix(in srgb, var(--accent) 18%, transparent);}
+.qh-ch.is-key{background:var(--pill-pos-bg); color:var(--pill-pos-ink);}
+.qh-ch.is-flag{outline:2px solid var(--warn); outline-offset:-2px;}
+.qh-small{font-size:var(--fs-small); line-height:16px; color:var(--muted);}
+.qh-flags{list-style:none; margin:0; padding:0; display:grid; gap:6px;}
+.qh-f{display:flex; gap:8px; align-items:flex-start;}
+.qh-dot{flex:none; width:8px; height:8px; border-radius:50%; margin-top:6px; background:var(--faint);}
+.qh-f.sev-high .qh-dot{background:var(--negative);}
+.qh-f.sev-medium .qh-dot{background:var(--warn);}
+.qh-src{font-size:var(--fs-small); color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:0 6px; white-space:nowrap;}
+.qh-stats{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:13px; color:var(--muted);}
+.qh-stats b{color:var(--text); font-weight:600;}
+.qh-reps summary{cursor:pointer; font-size:13px; font-weight:500; color:var(--muted);}
+.qh-rep{margin-top:8px; padding-left:10px; border-left:3px solid var(--warn); display:grid; gap:6px;}
+.qh-rep.is-resolved{border-left-color:var(--control);}
+.qh-rep.is-resolved .report-note{color:var(--muted);}
+.qh-act{display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding-top:12px; border-top:1px solid var(--rule);}
+.qh-act .input{flex:1 1 260px; width:auto; min-width:0;}
+.qh-btns{display:flex; gap:6px; flex-wrap:wrap;}
+.qh-btns .btn:disabled{opacity:.5; cursor:default;}
+.qh-btns .qh-clear{border-style:dashed; color:var(--muted);}
+.qh-filter .qh-copy{margin-left:auto;}
+.qh-more{text-align:center; margin-top:12px;}
+
 /* ---------- tablet and phone: the frame folds into a 48px bar; the menu opens as a full-screen sheet ---------- */
 @media (max-width:1100px){ .s8, .s7, .s5, .s4{grid-column:span 12;} }
 @media (max-width:860px){
@@ -359,6 +401,7 @@ code{font-size:13px;}
       <a class="nav-item" href="#insights" data-tab="insights">Insights</a>
       <a class="nav-item" href="#time" data-tab="time">Time by section</a>
       <a class="nav-item" href="#questions" data-tab="questions">Questions</a>
+      <a class="nav-item" href="#health" data-tab="health">Question health<span class="count" id="healthCount" hidden>0</span></a>
       <a class="nav-item" href="#clicks" data-tab="clicks">Clicks and features</a>
       <a class="nav-item" href="#searches" data-tab="searches">Searches</a>
       <a class="nav-item" href="#engagement" data-tab="engagement">Engagement</a>
@@ -398,6 +441,7 @@ code{font-size:13px;}
     <section class="view" data-panel="insights" hidden></section>
     <section class="view" data-panel="time" hidden></section>
     <section class="view" data-panel="questions" hidden></section>
+    <section class="view" data-panel="health" hidden></section>
     <section class="view" data-panel="clicks" hidden></section>
     <section class="view" data-panel="searches" hidden></section>
     <section class="view" data-panel="engagement" hidden></section>
@@ -452,6 +496,7 @@ code{font-size:13px;}
     insights:   { t: "Insights", past: 1 },
     time:       { t: "Time by section", range: 1, past: 1, needs: ["byHub", "bySection"] },
     questions:  { t: "Questions", past: 1, needs: ["qstats", "choices"] },
+    health:     { t: "Question health" },
     clicks:     { t: "Clicks and features", range: 1, past: 1, needs: ["features", "clicks"] },
     searches:   { t: "Searches", range: 1, past: 1, needs: ["searches"] },
     engagement: { t: "Engagement", range: 1, past: 1, needs: ["streaks", "nukeSum", "nukeHub", "nukeRecent", "nukeUnlocks", "modes"] },
@@ -1858,9 +1903,232 @@ code{font-size:13px;}
   window.addEventListener("resize", queueScrollers);
   document.addEventListener("toggle", queueScrollers, true);   /* a <details> opening shows its table */
 
+  /* ---------- Question health (migration_v51; vault/reference/question-health.md) ----------
+     One hub at a time: get_question_health(secret, hub, 120 days, current), where current = {qid: fingerprint of the live
+     version} worked out here from the hub's own SH_EXPORT (shQH.fp, widget/qhealth.js), so the numbers are for the question
+     as it reads now and ids with data that the hub no longer has show up. Flags are leads, not verdicts: Sam marks each
+     Looks fine / Needs a fix / Fixed (admin_review_question), which only stores the call. Nothing here changes a question. */
+  var QH = { hub: null, rows: null, ex: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
+  var QH_FILTERS = [["review", "To review"], ["todo", "Needs a fix"], ["reviewed", "Reviewed"], ["all", "All with data"]];
+  var QH_STATE = { "new": "To review", changed: "Changed since “Needs a fix”: check it", todo: "Needs a fix", reviewed: "Reviewed", clear: "No flags" };
+  var QH_SRC = { version: "this version", all: "all answers ever", feedback: "students", ids: "ids" };
+  var QH_KIND = { mcq: "Multiple choice", "mcq:tf": "True/false", "mcq:2stmt": "Two statements", "mcq:num": "Numbered statements", multi: "Select all", match: "Matching", sequence: "Ordering", recall: "Recall" };
+  var QH_REASON = { "wrong-key": "answer looks wrong", confusing: "confusing wording", "not-in-notes": "not in the notes", explanation: "explanation didn’t help", giveaway: "gives the answer away" };
+  /* the hubs live on the dashboard now (dash.live, from index.html): an archived hub's page may be gone, and its questions no
+     longer change */
+  function qhHubs(){
+    var seen = {}, out = [];
+    Object.keys(HUB_LABEL).concat(Object.keys(dash.titles)).forEach(function(h){ if (!seen[h] && isHubId(h) && !isArchived(h)) { seen[h] = 1; out.push(h); } });
+    return out;
+  }
+  /* the view's title row belongs to whichever view is open; a load that lands later only redraws this panel */
+  function qhHead(s, at){ if (state.tab === "health") setHead(s, at); }
+  function qhCount(){
+    var hc = $("#healthCount"); if (!hc) return;
+    var k = QH.rows ? QH.rows.filter(function(r){ return qhIn(r, "review"); }).length : 0;
+    hc.textContent = k; hc.hidden = !k;
+  }
+  /* the hub's exported questions, read from a hidden same-site frame (?sh_export=1 logs nothing); fingerprints are taken
+     from the frame's own objects, the copy kept here is plain JSON */
+  function qhExport(hub){
+    if (QH.ex[hub] !== undefined) return Promise.resolve(QH.ex[hub]);
+    return new Promise(function(res){
+      var f = document.createElement("iframe"), done = false;
+      function fin(ex){ if (done) return; done = true; try { f.remove(); } catch (e) {} QH.ex[hub] = ex; res(ex); }
+      f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
+      f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
+      f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
+      f.onload = function(){
+        var ex = null;
+        try {
+          var x = f.contentWindow.SH_EXPORT;
+          if (x && Array.isArray(x.questions) && window.shQH) {
+            var fps = {}; x.questions.forEach(function(q){ if (q && q.id) fps[q.id] = window.shQH.fp(q); });
+            var qs = JSON.parse(JSON.stringify(x.questions)), byId = {};
+            qs.forEach(function(q){ q.fp = fps[q.id]; byId[q.id] = q; });
+            var lec = {}; JSON.parse(JSON.stringify(x.lectures || [])).forEach(function(l){ lec[l.id] = l.title; });
+            ex = { questions: qs, byId: byId, lec: lec };
+          }
+        } catch (e) {}
+        fin(ex);
+      };
+      setTimeout(function(){ fin(null); }, 25000);
+      document.body.appendChild(f);
+    });
+  }
+  function qhLoad(hub){
+    QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth();
+    qhExport(hub).then(function(ex){
+      var cur = null;
+      /* the live version's fingerprint, key, choice count and kind: the miskey and chance checks work before any version row exists */
+      if (ex) { cur = {}; ex.questions.forEach(function(q){ cur[q.id] = { v: q.fp, key: typeof q.answer === "number" ? q.answer : null,
+        nch: Array.isArray(q.choices) ? q.choices.length : null, qt: window.shQH ? window.shQH.kindOf(q, "") : "" }; }); }
+      return rpc("get_question_health", { p_secret: secret, p_hub: hub, p_days: 120, p_current: cur });
+    }).then(function(res){
+      if (QH.hub !== hub) return;
+      QH.loading = false;
+      if (res.error) QH.err = res.error.message || "error"; else { QH.rows = Array.isArray(res.data) ? res.data : []; QH.at = Date.now(); }
+      renderHealth();
+    });
+  }
+  function qhCodes(r){ return (r.flags || []).map(function(f){ return f.code; }); }
+  function qhIn(r, f){
+    if (f === "review") return r.state === "new" || r.state === "changed";
+    if (f === "todo") return r.state === "todo";
+    if (f === "reviewed") return r.state === "reviewed" || (!!r.review_status && r.state === "clear");
+    return true;
+  }
+  function qhPct(c, n){ return n ? Math.round(100 * c / n) + "%" : "—"; }
+  function qhSec(ms){ return ms == null ? "—" : Math.round(ms / 1000) + " s"; }
+  function qhChoices(r, q){
+    if (!q || !Array.isArray(q.choices)) return "";
+    var useV = r.choices && Object.keys(r.choices).length, src = useV ? r.choices : (r.a_choices || {}), tot = 0;
+    Object.keys(src).forEach(function(k){ tot += +src[k] || 0; });
+    var keys = Array.isArray(q.correct) ? q.correct : q.answer != null ? [q.answer] : r.key != null ? [r.key] : [];
+    var mk = (r.flags || []).filter(function(f){ return f.code === "miskey"; })[0];
+    var rows = q.choices.map(function(c, i){
+      var n = +src[i] || 0, isKey = keys.indexOf(i) > -1, p = tot ? Math.round(100 * n / tot) : 0;
+      return '<li class="qh-ch' + (isKey ? ' is-key' : '') + (mk && mk.choice === i ? ' is-flag' : '') + '"><span class="qh-ch-t">' + (isKey ? '<b aria-label="key">✓</b> ' : '') + esc(c) + '</span>' +
+        (tot ? '<span class="qh-ch-n n">' + p + '% <span class="muted">(' + n + ')</span></span><span class="qh-ch-bar" style="width:' + p + '%"></span>' : '') + '</li>';
+    }).join("");
+    var lab = !tot ? "No picks recorded yet" : useV ? "First tries on this version (" + tot + ")" : "Every pick, all versions and tries (" + tot + ")";
+    return '<ol class="qh-chs">' + rows + '</ol><div class="qh-small muted">' + lab + '</div>';
+  }
+  function qhStats(r){
+    var s = [];
+    if (r.n1) s.push("First try (this version): <b>" + qhPct(r.c1, r.n1) + "</b> of " + r.n1);
+    if (r.a_n1) s.push("First try (all ever): <b>" + qhPct(r.a_c1, r.a_n1) + "</b> of " + r.a_n1);
+    if (r.a_attempts) s.push("Every answer: " + qhPct(r.a_correct, r.a_attempts) + " of " + fmtNum(r.a_attempts));
+    if (r.nrm) s.push("Right after a miss: " + r.crm + " of " + r.nrm);
+    else if (r.a_nrm) s.push("Right after a miss (all ever): " + r.a_crm + " of " + r.a_nrm);
+    if (r.du != null && r.dl != null && r.du + r.dl) s.push("Top / bottom half: " + qhPct(r.pu * 100, 100) + " / " + qhPct(r.pl * 100, 100));
+    else if (r.a_du != null && r.a_dl != null && r.a_du + r.a_dl) s.push("Top / bottom half (all ever): " + qhPct(r.a_pu * 100, 100) + " / " + qhPct(r.a_pl * 100, 100));
+    if (r.nt) s.push("Median time: " + qhSec(r.med_ms) + (r.hub_med_ms ? " (hub " + qhSec(r.hub_med_ms) + ")" : ""));
+    if (r.engaged) s.push("Left unanswered: " + (r.abandoned || 0) + " of " + r.engaged);
+    if (r.miss_n) s.push("Explanation after a miss: " + qhSec(r.expl_med_ms) + " median, " + r.miss_quick + " of " + r.miss_n + " under 3 s");
+    if (r.up || r.down) {
+      var rs = Object.keys(r.reasons || {}).map(function(k){ return (QH_REASON[k] || k) + " " + r.reasons[k]; }).join(", ");
+      s.push("Votes: " + r.up + " up, " + r.down + " down" + (rs ? " (" + rs + ")" : ""));
+    }
+    return s.length ? '<div class="qh-stats">' + s.map(function(x){ return "<span>" + x + "</span>"; }).join("") + '</div>' : "";
+  }
+  function qhItem(r, ex){
+    var q = ex && ex.byId[r.qid], kind = QH_KIND[r.qt] || r.qt || "";
+    var pills = '<span class="pill qh-state qh-' + esc(r.state) + '">' + esc(r.state === "reviewed" && r.review_status === "fixed" ? "Reviewed: fixed" : r.state === "reviewed" ? "Reviewed: looks fine" : QH_STATE[r.state] || r.state) + '</span>' +
+      (kind ? '<span class="pill">' + esc(kind) + '</span>' : '') +
+      (r.versions > 1 ? '<span class="pill" title="Each edit of the stem, choices, key or explanation starts a new version">' + r.versions + ' versions</span>' : '') +
+      (q && !r.v_since && r.versions > 0 ? '<span class="pill" title="The live wording has no answers yet: numbers below are older">live version: no answers yet</span>' : '') +
+      (r.in_hub === false ? '<span class="pill flag">not in the hub</span>' : '');
+    var flags = (r.flags || []).map(function(f){
+      return '<li class="qh-f sev-' + esc(f.sev) + '"><span class="qh-dot" aria-hidden="true"></span><span>' + esc(f.why) + ' <span class="qh-src">' + esc(QH_SRC[f.src] || f.src) + '</span></span></li>';
+    }).join("");
+    var reps = (r.reports || []).map(function(p){
+      return '<div class="qh-rep' + (p.resolved ? ' is-resolved' : '') + '"><span class="qh-small">' + esc(fmtDate(p.at)) + (p.resolved ? " · resolved" : " · open") + '</span><div class="report-note">' + esc(p.note) + '</div>' +
+        (p.reply ? '<div class="report-reply">' + esc(p.reply) + '</div>' : '') + '</div>';
+    }).join("");
+    var lec = q && ex.lec[q.lec] ? esc(ex.lec[q.lec]) : "";
+    var rev = r.review_status ? '<div class="qh-small">Your call: <b>' + esc({ ok: "Looks fine", fix: "Needs a fix", fixed: "Fixed" }[r.review_status]) + '</b>' +
+      (r.review_at ? ' on ' + esc(fmtDate(r.review_at)) : '') + (r.review_v && r.review_v !== r.v ? ' (an earlier version)' : '') + '</div>' : '';
+    var busy = !!QH.saving[r.qid];
+    return '<article class="qh-item" data-qh-qid="' + esc(r.qid) + '">' +
+      '<div class="qh-top"><code class="qh-id">' + esc(r.qid) + '</code>' + (lec ? '<span class="muted qh-lec">' + lec + '</span>' : '') + pills + '</div>' +
+      (q ? '<div class="qh-stem">' + esc(q.text) + '</div>' + qhChoices(r, q) : '<div class="qh-stem muted">This id isn’t in the hub’s current bank.</div>') +
+      (flags ? '<ul class="qh-flags">' + flags + '</ul>' : '') + qhStats(r) +
+      (reps ? '<details class="qh-reps"><summary>' + (r.reports || []).length + ' report' + ((r.reports || []).length === 1 ? '' : 's') + ' from students</summary>' + reps + '</details>' : '') +
+      rev +
+      '<div class="qh-act"><input type="text" class="input qh-note" maxlength="1000" aria-label="Note on ' + esc(r.qid) + '" placeholder="Note: what you checked, what to change (optional)" value="' + esc(r.review_note || "") + '">' +
+        '<div class="qh-btns"><button type="button" class="btn" data-qh-set="ok"' + (busy ? ' disabled' : '') + '>Looks fine</button><button type="button" class="btn" data-qh-set="fix"' + (busy ? ' disabled' : '') + '>Needs a fix</button><button type="button" class="btn" data-qh-set="fixed"' + (busy ? ' disabled' : '') + '>Fixed</button>' +
+        (r.review_status ? '<button type="button" class="btn qh-clear" data-qh-set=""' + (busy ? ' disabled' : '') + '>Clear my call</button>' : '') + '</div></div>' +
+    '</article>';
+  }
+  function renderHealth(){
+    var el = $('[data-panel="health"]'); if (!el) return;
+    var hubs = qhHubs();
+    if (!QH.hub || hubs.indexOf(QH.hub) < 0) QH.hub = hubs[0] || null;
+    var intro = '<p class="qh-intro">Questions that may have a problem: a key that might be wrong, wording that trips up stronger students, a question people give up on, an explanation nobody reads, and what students say. ' +
+      '<b>These are leads, not verdicts.</b> Check each against the hub’s notes. Nothing here changes or hides a question: your call is only saved, and any fix goes through the hub’s source.</p>';
+    if (!QH.hub) { qhHead("No live hubs", 0); el.innerHTML = '<div class="stack">' + card("Question health", "", intro + empty("No live hubs.")) + '</div>'; qhCount(); return; }
+    if (QH.rows === null && !QH.loading && !QH.err) { qhLoad(QH.hub); return; }
+    var body = '<div class="chips" role="group" aria-label="Hub">' + hubs.map(function(h){ return '<button type="button" data-qh-hub="' + esc(h) + '" aria-pressed="' + (QH.hub === h) + '">' + dot(h) + esc(hubLabel(h)) + '</button>'; }).join("") + '</div>';
+    if (QH.loading) { qhHead("Loading…", 0); body += empty("Reading " + esc(hubLabel(QH.hub)) + "’s questions and class data…"); }
+    else if (QH.err) { qhHead("", 0); body += errBox("Couldn’t load question health: " + esc(QH.err)); }
+    else {
+      var ex = QH.ex[QH.hub], rows = QH.rows || [], n = {};
+      QH_FILTERS.forEach(function(f){ n[f[0]] = rows.filter(function(r){ return qhIn(r, f[0]); }).length; });
+      var gone = rows.filter(function(r){ return r.in_hub === false; }).length;
+      qhHead(n.review ? plural(n.review, "question") + " to review in " + hubLabel(QH.hub) : "Nothing to review in " + hubLabel(QH.hub), QH.at);
+      body += kpis([
+        { label: "To review", value: fmtNum(n.review), hint: "flagged, no call yet", lead: true },
+        { label: "Needs a fix", value: fmtNum(n.todo), hint: "you marked these" },
+        { label: "Reviewed", value: fmtNum(n.reviewed), hint: "looks fine or fixed" },
+        { label: "Questions in the hub", value: ex ? fmtNum(ex.questions.length) : "?", hint: ex ? fmtNum(rows.filter(function(r){ return r.in_hub !== false; }).length) + " with class data" : "couldn’t read the hub" },
+        { label: "Ids not in the hub", value: fmtNum(gone), hint: gone ? "class data under an old id" : "every id still there" }
+      ]);
+      body += '<div class="chips qh-filter" role="group" aria-label="Show">' + QH_FILTERS.map(function(f){ return '<button type="button" data-qh-filter="' + f[0] + '" aria-pressed="' + (QH.filter === f[0]) + '">' + f[1] + ' <span class="num">' + n[f[0]] + '</span></button>'; }).join("") +
+        '<button type="button" class="btn qh-copy" id="qhCopy" title="Copy this list as plain text, for a task note or a chat">Copy list</button></div>';
+      var list = rows.filter(function(r){ return qhIn(r, QH.filter); });
+      body += list.length ? '<div class="qh-list">' + list.slice(0, QH.shown).map(function(r){ return qhItem(r, ex); }).join("") + '</div>' +
+        (list.length > QH.shown ? '<div class="qh-more"><button type="button" class="btn" id="qhMore">Show more (' + (list.length - QH.shown) + ')</button></div>' : '')
+        : empty(QH.filter === "review" ? "Nothing to review in this hub right now." : "Nothing here.");
+    }
+    el.innerHTML = '<div class="stack">' + card("Question health", "last 120 days · " + esc(hubLabel(QH.hub)), intro + body) + '</div>' +
+      '<p class="note">Accuracy, the miskey check, retries and the stronger-vs-weaker check use this version’s first tries once 10 people have answered it; before that they use every answer ever (all versions), until you’ve made a call. ' +
+      'Time, giving up, the explanation and the thumbs are recorded from Nov 4, 2026, for the live version only. Thresholds and how to act on a flag: <code>vault/reference/question-health.md</code>.</p>';
+    el.dataset.ready = "1";
+    qhCount();
+  }
+  /* Copy list is for task notes and chats: a group under 5 people is "a few" there (vault/rules/learner-data-privacy.md);
+     report text never goes in it */
+  function qhFew(t){
+    return String(t).replace(/(^|[^\d.%])([1-4]) (people|person)\b/g, function(m, pre, n, w, i){ return pre + (i === 0 || /[.:]\s*$/.test(pre) ? "A few people" : "a few people"); })
+      .replace(/^1 open report\b/, "An open report").replace(/^[2-4] open reports\b/, "A few open reports")
+      .replace(/\bonly ([1-4]) got\b/g, "only a few got").replace(/\b([1-4]) of (\d+)\b/g, "a few of $2").replace(/^a few/, "A few");
+  }
+  function qhCopy(){
+    var ex = QH.ex[QH.hub], list = (QH.rows || []).filter(function(r){ return qhIn(r, QH.filter); });
+    var lab = (QH_FILTERS.filter(function(f){ return f[0] === QH.filter; })[0] || [])[1];
+    var out = "Question health · " + hubLabel(QH.hub) + " · " + new Date().toISOString().slice(0, 10) + " · " + lab + " (" + list.length + ")\n" +
+      "Leads to check against the notes, not verdicts. Groups under 5 people say \u201ca few\u201d; the numbers are on the admin page.\n\n" +
+      list.map(function(r){
+        var q = ex && ex.byId[r.qid];
+        return "- " + r.qid + (q ? ": " + String(q.text).replace(/\s+/g, " ").slice(0, 160) : "") + "\n" +
+          (r.flags || []).map(function(f){ return "    · " + qhFew(f.why) + " [" + (QH_SRC[f.src] || f.src) + "]"; }).join("\n") +
+          (r.review_note ? "\n    · Note: " + r.review_note : "");
+      }).join("\n");
+    var b = $("#qhCopy");
+    function done(ok){ if (b) { b.textContent = ok ? "Copied" : "Couldn’t copy"; setTimeout(function(){ if (b.isConnected) b.textContent = "Copy list"; }, 1600); } }
+    try { navigator.clipboard.writeText(out).then(function(){ done(true); }, function(){ done(false); }); } catch (e) { done(false); }
+  }
+  function qhSet(qid, status, note){
+    var r = (QH.rows || []).filter(function(x){ return x.qid === qid; })[0]; if (!r) return;
+    QH.saving[qid] = 1; renderHealth();
+    supabase.rpc("admin_review_question", { p_secret: secret, p_hub: QH.hub, p_qid: qid, p_v: r.v || "", p_status: status || null, p_flags: qhCodes(r), p_note: note || null })
+      .then(function(res){
+        delete QH.saving[qid];
+        if (res && res.error) { alert("Couldn’t save: " + res.error.message); renderHealth(); return; }
+        r.review_status = status || null; r.review_v = status ? r.v : null; r.review_flags = status ? qhCodes(r) : null;
+        r.review_note = status ? (note || null) : null; r.review_at = status ? new Date().toISOString() : null;
+        r.state = status === "fix" ? "todo" : status ? ((r.flags || []).length ? "reviewed" : "clear") : ((r.flags || []).length ? "new" : "clear");
+        renderHealth();
+      }, function(){ delete QH.saving[qid]; alert("Couldn’t reach the server."); renderHealth(); });
+  }
+  $('[data-panel="health"]').addEventListener("click", function(e){
+    var h = e.target.closest("[data-qh-hub]");
+    if (h) { if (h.dataset.qhHub === QH.hub && (QH.loading || QH.rows)) return;
+      /* a load still running for the last hub is dropped when it lands (qhLoad checks QH.hub), so start this one now */
+      QH.hub = h.dataset.qhHub; QH.rows = null; QH.err = null; QH.loading = false; renderHealth(); return; }
+    var f = e.target.closest("[data-qh-filter]");
+    if (f) { QH.filter = f.dataset.qhFilter; QH.shown = 40; renderHealth(); return; }
+    if (e.target.closest("#qhMore")) { QH.shown += 40; renderHealth(); return; }
+    if (e.target.closest("#qhCopy")) { qhCopy(); return; }
+    var s = e.target.closest("[data-qh-set]");
+    if (s) { var it = s.closest("[data-qh-qid]"); qhSet(it.dataset.qhQid, s.dataset.qhSet, ($(".qh-note", it) || {}).value); }
+  });
+
+
   /* ---------- views and routing (#overview, #inbox, ...: the back button and links work) ---------- */
   var RENDER = { overview: renderOverview, inbox: renderInbox, time: renderTime, questions: renderQuestions, clicks: renderClicks, searches: renderSearches,
-    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights };
+    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights, health: renderHealth };
   function renderView(t){
     var v = VIEWS[t], el = $('[data-panel="' + t + '"]');
     $("#viewTitle").textContent = v.t;
@@ -1869,6 +2137,8 @@ code{font-size:13px;}
     if (t === "hubs") { renderHubAdmin(); if (!hubAdm.loading && (!dash.src || !hubAdm.rows)) loadHubAdmin(); return; }
     if (t === "recap") { renderRecapPanel(); return; }
     if (t === "insights") { if (!insights) { setHead("Loading…", 0); loadInsights(); } else renderInsights(); return; }
+    /* Question health loads one hub at a time (qhLoad); it needs the dashboard's list first, to know which hubs are live */
+    if (t === "health") { if (!dash.src && !dash.err) { loadingView(el); setHead("Loading…", 0); loadDash().then(function(){ if (state.tab === "health") renderHealth(); }); } else renderHealth(); return; }
     var keys = v.needs || [];
     var ready = keys.every(fresh) && (!v.past || dash.src || dash.err);
     if (ready) { RENDER[t](); return; }
@@ -1909,6 +2179,7 @@ code{font-size:13px;}
     if (t === "hubs") { hubAdm.pages = {}; loadHubAdmin(true); return; }
     if (t === "recap") { loadPublished(); return; }
     if (t === "insights") { insights = null; setHead("Updating…", 0); loadInsights(); return; }
+    if (t === "health") { QH.ex = {}; if (QH.hub) { setHead("Updating…", 0); qhLoad(QH.hub); } else renderHealth(); return; }
     var keys = VIEWS[t].needs || [];
     $("#viewStamp").textContent = "Updating…";
     need(keys, true).then(function(){ if (state.tab === t) RENDER[t](); });

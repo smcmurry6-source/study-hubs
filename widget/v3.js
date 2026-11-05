@@ -1516,6 +1516,9 @@
        2. replays the history into spaced review (sh_srs_<hub>), so the Daily Drill sees misses from every device.
      byQid = { qid: { n: tries, c: right, last: latest try right?, t: latest try (ms) } }; days = local dates. */
   var syncAnsweredNow = {}, lastSync = 0, syncBusy = false;
+  /* the server history as of the last sync, for question health (widget/qhealth.js): {qid: {n, c, last, t}}; null until a
+     sync has come back, so a try is never called a first try just because the history hadn't arrived */
+  var qhHist = null;
   document.addEventListener(ANSWERED_EVENT, function(e){ var q = e && e.detail && e.detail.qid; if (q && syncBusy) syncAnsweredNow[String(q)] = 1; });
   function localDay(ms){ var d = new Date(ms); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
   function addDays(day, n){ var p = day.split("-").map(Number), d = new Date(p[0], p[1] - 1, p[2] + n); return localDay(d.getTime()); }
@@ -1530,6 +1533,7 @@
       (hist[q] || (hist[q] = [])).push([localDay(ms), ok]);
       daySet[localDay(ms)] = 1;
     });
+    qhHist = {}; Object.keys(byQid).forEach(function(q){ qhHist[q] = byQid[q]; });
     /* spaced review: same rules as srsRecord, replayed over the full history */
     try {
       var all = srsLoad(), eve = srsExamEve(), changed = false, known = null;
@@ -1562,7 +1566,7 @@
     try {
       supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
         syncBusy = false;
-        if (res && !res.error && Array.isArray(res.data) && res.data.length) applySync(res.data);
+        if (res && !res.error && Array.isArray(res.data)) { if (res.data.length) applySync(res.data); else if (!qhHist) qhHist = {}; }
       }, function(){ syncBusy = false; });
     } catch (e) { syncBusy = false; }
   }
@@ -2758,6 +2762,17 @@
     podScript.src = new URL("podcast.js", thisScript.src).href; podScript.async = true;
     podScript.onload = function(){ if (window.shPodcast) window.shPodcast.mount(HUB); };
     document.head.appendChild(podScript);
+  }
+  /* question health (widget/qhealth.js): time on each question, abandonment, the explanation, tries and the "Good question?"
+     thumbs, sent to record_qh / qh_vote for the admin page's Question health tab (migration_v51). Flags are for review only. */
+  if (!EXPORT_ONLY) {
+    var qhScript = document.createElement("script");
+    qhScript.src = new URL("qhealth.js", thisScript.src).href; qhScript.async = true;
+    qhScript.onload = function(){
+      if (window.shQH) window.shQH.mount({ hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, visit: VISIT_ID, supabase: supabase,
+        sbUrl: supabase ? SB_URL : "", sbKey: SB_KEY, automated: AUTOMATED, hist: function(){ return qhHist; } });
+    };
+    document.head.appendChild(qhScript);
   }
   /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time */
   if (!EXPORT_ONLY) {

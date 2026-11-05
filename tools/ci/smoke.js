@@ -47,8 +47,33 @@ const LIKELY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const LIKELY_SKIP = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying']);
 const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement' };
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
+/* Question ids are permanent (vault/rules/question-ids-are-permanent.md): class data, reports, pins and question health
+   are keyed on them. tools/question-ids/<hub>.txt lists every id the hub has ever shipped, "<id> retired" for one deleted
+   on purpose. A registered id missing from the hub (renamed or deleted) fails, and so does a retired id coming back.
+   A new id is added to the file by a local run; CI (which can't commit) fails until it's there. */
+const IDS_DIR = path.join(root, 'tools', 'question-ids');
+function checkIds(hub, qids){
+  const file = path.join(IDS_DIR, `${hub}.txt`), rel = `tools/question-ids/${hub}.txt`, ci = !!process.env.CI;
+  const live = new Set(), retired = new Set(), have = new Set(qids);
+  const text = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
+  if (text !== null) text.split('\n').forEach(line => {
+    const t = line.replace(/#.*/, '').trim(); if (!t) return;
+    const [id, flag] = t.split(/\s+/); (flag === 'retired' ? retired : live).add(id);
+  });
+  live.forEach(id => { if (!have.has(id) && !retired.has(id)) problems.push(`${hub}: question id ${id} is gone from the hub. Ids are permanent: give it back its id (edit the question in place), or, if it was deleted on purpose, change its line in ${rel} to "${id} retired"`); });
+  qids.forEach(id => { if (retired.has(id)) problems.push(`${hub}: question id ${id} was retired; a new question needs a new id (${rel})`); });
+  const fresh = qids.filter(id => !live.has(id) && !retired.has(id));
+  if (!fresh.length) return;
+  if (ci) { problems.push(`${hub}: ${fresh.length} question id(s) not in ${rel} yet: run node tools/ci/smoke.js locally (it adds them), or add these ids, one per line: ${fresh.join(", ")}`); return; }
+  fs.mkdirSync(IDS_DIR, { recursive: true });
+  const head = text === null ? `# Question ids for hubs/${hub}: every id this hub has ever shipped, one per line, never reused.\n` +
+    `# "<id> retired" marks a question deleted on purpose. Rules: vault/rules/question-ids-are-permanent.md\n` : (text.endsWith('\n') ? '' : '\n');
+  fs.appendFileSync(file, head + fresh.join('\n') + '\n');
+  notes.push(`${hub}: added ${fresh.length} new question id(s) to ${rel} (commit it)`);
+}
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
+  checkIds(hub, Q.map(q => String(q.id)));
   Q.forEach(q => {
     if (ids.has(q.id)) problems.push(`${hub}: duplicate question id ${q.id}`); ids.add(q.id);
     if (!lecIds.has(q.lec)) problems.push(`${hub}: ${q.id} points at unknown lecture "${q.lec}"`);

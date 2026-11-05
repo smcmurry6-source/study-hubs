@@ -15,7 +15,9 @@ To decide what to improve or cut, read the data before guessing (Supabase connec
 `activity_pings` (time per `<mode>/<sub-view>`, 25 s per ping), `ui_clicks` + `ui_click_reach` (clicks per
 button/tab and distinct people, per day), `question_stats` / `question_choices` (accuracy, popular wrong answers),
 `mode_stats`, `exam_debriefs` (post-exam check-ins), `search_terms` (what people searched for, with result
-counts), `podcast_reactions` / `podcast_comments` (Timmy Time likes, dislikes and comments, migration_v47) and `feature_events` (from 2026-10-20: page loads, a daily settings snapshot, easter eggs, Timmy Tooth's intro,
+counts), `podcast_reactions` / `podcast_comments` (Timmy Time likes, dislikes and comments, migration_v47), question health (migration_v51:
+`question_events`, `question_feedback`, `question_versions`, `question_reviews`; read it through `qh_report('<hub>')`,
+[question-health](../reference/question-health.md)) and `feature_events` (from 2026-10-20: page loads, a daily settings snapshot, easter eggs, Timmy Tooth's intro,
 podcast and Listen minutes and progress, diagrams; per day, page, kind and person). When you ship something a click
 can't measure, add a `window.shTrack("<area>:<what>")` call for it. The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
 Surveys: one live at a time on the dashboard, shown once per visitor. Publish from `review/` → Surveys, or

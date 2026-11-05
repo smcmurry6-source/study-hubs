@@ -60,6 +60,10 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/question-bank-filter-panel.md
 
+@vault/rules/question-ids-are-permanent.md
+
+@vault/rules/question-health-flags-are-leads.md
+
 @vault/rules/high-likelihood-topics.md
 
 @vault/rules/hub-home-page.md

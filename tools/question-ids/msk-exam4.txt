@@ -1,0 +1,270 @@
+# Question ids for hubs/msk-exam4: every id this hub has ever shipped, one per line, never reused.
+# "<id> retired" marks a question deleted on purpose. Rules: vault/rules/question-ids-are-permanent.md
+sk-kc95
+sk-mc13
+sk-corneum-out
+sk-corneum-dead
+sk-layers
+sk-lucidum
+sk-thinnest
+sk-thin-clue
+sk-granulosum
+sk-spinosum
+sk-hemides
+sk-col17
+sk-lamellar
+sk-barrier-site
+sk-keratinization
+sk-desquam
+sk-callus
+sk-tyrosinase
+sk-melanin-seq
+sk-cap
+sk-pigment-why
+sk-melanin-unit
+sk-neural-crest
+sk-langerhans
+sk-merkel
+sk-pacinian
+sk-meissner
+sk-papillary
+sk-langer
+sk-fibroblast
+sk-hypodermis
+sk-avascular
+sk-thermo
+sk-eccrine
+sk-apocrine-stim
+sk-apocrine-mero
+sk-sebaceous
+sk-arrector
+sk-nail
+sk-vitd
+sk-cells-match
+sk-ex-thick
+sk-ex-apocrine
+sk-ex-func
+sk-ridges
+dp-conc
+dp-occlusion
+dp-lice
+dp-toenail
+dp-tretinoin
+dp-isotret
+dp-brimonidine
+dp-impetigo
+dp-topical-vs-trans
+dp-reservoir
+dp-regional
+dp-face-steroid
+dp-ointment
+dp-vehicles
+dp-suspension
+dp-irritation
+dp-local-not-systemic
+dp-contact-urticaria
+dp-imiquimod
+dp-tacro
+dp-calcineurin
+dp-calcineurin-enzyme
+dp-acne-causes
+dp-isotret-moa
+dp-ipledge
+dp-adapalene
+dp-azelaic
+dp-metronidazole
+dp-clinda
+dp-abx-moa
+dp-mrsa
+dp-azoles
+dp-terb-pk
+dp-acyclovir
+dp-scabies
+dp-ecto-malathion
+dp-ecto-spinosad
+dp-ecto-ivermectin
+dp-ex-ecto
+dp-ex-protein
+dp-ex-factors
+pa-macule
+pa-plaque
+pa-bulla
+pa-lichenif
+pa-gross-match
+pa-acanthosis
+pa-spongiosis
+pa-parakerat
+pa-vitiligo-def
+pa-vitiligo-case
+pa-freckle
+pa-lentigo
+pa-nevus
+pa-oral-pigment
+pa-abcd
+pa-melanoma-depth
+pa-mimicker
+pa-pagetoid
+pa-sk-case
+pa-leser
+pa-skin-tag
+pa-wart-hpv
+pa-wart-plana
+pa-wart-plantar
+pa-wart-condyloma
+pa-koilocyte
+pa-papilloma
+pa-ak
+pa-scc-common
+pa-scc-ear
+pa-oral-scc
+pa-bcc
+pa-bcc-histo
+pa-urticaria
+pa-eczema
+pa-em
+pa-psoriasis-case
+pa-auspitz
+pa-psoriasis-histo
+pa-geographic
+pa-lp
+pa-lp-dysplasia
+pa-pemphigus
+pa-pemphigoid
+pa-blister-match
+pa-dh
+pa-scleroderma
+pa-ex-sun
+pa-ex-acute
+mu-sarcomere
+mu-zline
+mu-aband
+mu-contract-bands
+mu-tnc
+mu-troponin
+mu-myosin-head
+mu-filament-size
+mu-triad
+mu-dhpr
+mu-ecc
+mu-serca
+mu-rigor
+mu-rigor-term
+mu-syncytium
+mu-functional-syncytium
+mu-satellite
+mu-endomysium
+mu-fascicle
+mu-hierarchy
+mu-myoglobin
+mu-type1
+mu-speed
+mu-fibers-match
+mu-endurance
+mu-hypertrophy
+mu-sarcopenia
+mu-glut4
+mu-phosphocreatine
+mu-il6
+mu-spindle
+mu-ap-short
+mu-ex-thin
+mu-g6p
+mu-glucose-share
+mu-weak-bridge
+mu-cycle-seq
+mu-actin-moves
+mu-overlap
+mu-twitch-tetany
+mu-type-marathon
+mu-type-snatch
+mu-satellite-age
+mu-myokines
+nm-hyperK
+nm-reversal-moa
+nm-spasticity
+nm-sux-class
+nm-sux-intub
+nm-sux-seq
+nm-pseudo
+nm-sux-ach
+nm-myalgia
+nm-mh
+nm-dantrolene
+nm-sux-cv
+nm-ndb
+nm-fade
+nm-neostigmine
+nm-atropine
+nm-mg
+nm-ache
+nm-ache-i
+nm-sugammadex
+nm-sugammadex-ddi
+nm-baclofen
+nm-baclofen-case
+nm-tizanidine
+nm-botox
+nm-botox-deck
+nm-acute-spasm
+nm-uses
+nm-drugs-match
+nm-ex-sux
+nm-pseudo-homo
+nm-sux-brady
+nm-glyco-gi
+nm-sugammadex-which
+nm-tof-wake
+nm-botox-migraine
+nm-botulism
+nm-botox-except
+nm-tiz-first
+nm-fig-ache
+nm-fig-rec
+nm-fig-ves
+nm-fig-na
+mu-fig-h
+mu-fig-a
+rv-corneum
+rv-gland
+rv-fibroblast
+rv-sux-intubate
+rv-spasm
+rv-apocrine
+rv-vitiligo
+rv-scc-sun
+rv-urticaria
+rv-psoriasis
+rv-mline
+rv-sugammadex
+# Retired before 2026-11-04: class data under these ids, no longer in the hub (renamed or removed earlier)
+ca-accessory retired
+ca-acne-dental retired
+ca-addison retired
+ca-bcc-lip retired
+ca-derm-meds retired
+ca-eczema retired
+ca-ex-mronj retired
+ca-ex-osteomyel retired
+ca-lat-pteryg retired
+ca-lupus retired
+ca-mronj-bp retired
+ca-mronj-risk retired
+ca-oa-ra retired
+ca-oral-vs-skin retired
+ca-osteomalacia retired
+ca-osteomyelitis retired
+ca-osteoporosis retired
+ca-paget retired
+ca-pemph-oral retired
+ca-pemphigoid-oral retired
+ca-pharm retired
+ca-pre-bp retired
+ca-psoriasis-oral retired
+ca-scleroderma retired
+ca-tmd-class retired
+ca-tmd-tx retired
+ca-tmj retired
+ca-tmj-xray retired
+ca-vitiligo-oral retired
+dp-ecto retired
+pa-warts-match retired
