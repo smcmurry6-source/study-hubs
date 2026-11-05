@@ -60,7 +60,7 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(!first.some(n => /get_click_summary|get_search_terms|get_survey_results|get_feature_events|get_nuke_/.test(n)), `the Overview loads only its own data (it asked for ${[...new Set(first)].join(', ')})`);
     ok(first.filter(n => n === 'get_reports').length === 1, 'the sign-in check\'s reports are reused, not fetched twice');
     /* every view opens with its own title and no error */
-    for (const v of ['insights', 'time', 'questions', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
+    for (const v of ['insights', 'time', 'questions', 'health', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
       await go(page, v);
       await page.waitForFunction(v => { const el = document.querySelector(`[data-panel=${v}]`); return el && !el.querySelector('[aria-busy=true]') && el.children.length; }, v, { timeout: 15000 });
       const nav = (await page.textContent(`.nav [data-tab=${v}]`)).replace(/\d+$/, '').trim(), h1 = (await page.textContent('#viewTitle')).trim();
@@ -200,12 +200,13 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(await m.evaluate(() => !document.querySelector('#sidebar').classList.contains('open') && document.activeElement && document.activeElement.id === 'menuBtn'), 'Escape closes the menu and returns focus to Menu');
     const barTaps = await m.$$eval('.mbar .btn', els => els.map(e => Math.round(e.getBoundingClientRect().height)));
     ok(barTaps.every(h => h >= 44), `the top bar's buttons are at least 44 px tall (${barTaps})`);
-    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs']) {
+    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health']) {
       await go(m, tab);
       if (tab === 'live') await m.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5');
       if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="occlusion"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="occlusion"]'); await m.tap('[data-arch-form="occlusion"] input[value=hidden]'); await m.tap('[data-arch-form="occlusion"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
       if (tab === 'checkins') await m.waitForSelector('[data-checkin-group]');
       if (tab === 'overview') await m.waitForSelector('[data-panel=overview] .card');
+      if (tab === 'health') await m.waitForSelector('[data-panel=health] .qh-item', { timeout: 30000 });   /* Question health: the fixture flags on a live hub */
       await m.waitForTimeout(300);
       const over = await wide();
       ok(over <= 0, `${tab} scrolls sideways on a 390 px phone by ${over} px`);

@@ -59,6 +59,10 @@ privacy rule). Written by = the RPC and the client file that calls it.
 | `correct_streaks` | visitor, current and best run | yes | `record_correct_streak` | early | The streak flame and record |
 | `mock_scores` | one finished mock: visitor, hub, correct, total | yes | `record_mock_score`, `widget/ranks.js` | 2026-09-28 | One a minute at most |
 | `question_pins` | visitor × hub × qid, pinned, device time | yes | `set_pins`, `widget/v3.js` | 2026-11-02 (v46) | Sync, not analytics; `pin:add` events count use |
+| `question_events` | one answer or one unanswered read: visitor, visit, hub, qid, version, context, which try, previous result and gap, choice, active ms before answering and on the explanation, taps in it | yes | `record_qh`, `widget/qhealth.js` (batched) | 2026-11-04 (v50) | Question health ([question-health](question-health.md)). A `view` row is a card read 3 s or more and left unanswered. Mock answers carry no timing |
+| `question_feedback` | visitor × hub × qid: thumbs up/down and a fixed reason | yes | `qh_vote`, "Good question?" under the explanation | 2026-11-04 (v50) | One vote per person per question; reasons are a fixed list, never free text |
+| `question_versions` | hub × qid × version fingerprint, type, choice count, key | no | `record_qh` | 2026-11-04 (v50) | An edited question gets a new version, so its numbers start fresh |
+| `question_reviews` | hub × qid: Sam's call (ok, fix, fixed), the flags it covered, a note | no | `admin_review_question`, admin page | 2026-11-04 (v50) | Metadata only; never changes a question |
 
 ### Student voice
 
@@ -120,6 +124,7 @@ new one can't go undocumented.
 | `hints` | `hints:likely-practice` | "Practice these" on Exam Hints | hubs | 10-29 |
 | `drill` | `drill:size=20`, `drill:more=10` | Daily Drill size chosen, "more" | `widget/drill.js` | 10-20 |
 | `pin` | `pin:add`, `pin:remove` | pinned questions | `widget/v3.js` | 11-02 |
+| `qrate` | `qrate:up`, `qrate:down`, `qrate:undo`, `qrate:why=<reason>` (`wrong-key`, `confusing`, `not-in-notes`, `explanation`, `giveaway`, `other`, `none`) | "Good question?" taps | `widget/qhealth.js` | 11-04 |
 | `hl` | `hl:y`, `hl:g` | highlights made, by color | `widget/highlight.js` | 10-20 |
 | `mmap` | `mmap:open` | mind map opened | `widget/v3.js` | 10-20 |
 | `notes-jump` | `:shown`, `:show`, `:none` | "Find this in the notes" offered / tapped / no match | `widget/v3.js` | 11-04 |

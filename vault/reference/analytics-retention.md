@@ -36,9 +36,11 @@ Where the space goes (2026-11-04): `activity_pings` 145 MB (40 MB of rows, **105
 | `exam_debriefs` | the visitor id 1 year after the exam | keep the answers, id set to null | Check-ins are read against the person's use only in that hub's retrospective |
 | `survey_responses` | "No thanks" rows until the survey closes; answers keep, id null 90 days after it closes | | The rows only stop a survey being asked twice |
 | `podcast_reactions`, `podcast_comments`, `podcast_comment_reports` | until the hub's page comes down | delete with the hub | The episode leaves the site with its hub |
+| `question_events` | the school year | collapse to hub × qid × version totals (tries, right, choices, medians), no ids | Question health reads 120 days per person (tries and retries need the person); a hub's exams fit in a school year |
+| `question_feedback` | until the hub's page comes down | delete with the hub, or keep counts per question with no ids | One thumb per person per question, read only while the hub is live |
 | `link_attempts` | 7 days | delete | Only the last hour is read (rate limit) |
 | `zz-test` and blank-hub rows | none | delete | Test data |
-| `question_stats`, `question_choices`, `ui_clicks`, `search_terms`, `mode_stats`, `presence_hourly`, `hub_recaps`, `changelog` | keep | | No visitor ids; small |
+| `question_stats`, `question_choices`, `question_versions`, `question_reviews`, `ui_clicks`, `search_terms`, `mode_stats`, `presence_hourly`, `hub_recaps`, `changelog` | keep | | No visitor ids; small |
 | Trophies and games: `achievements`, `arcade_scores`, `egg_events`, `nuke_*`, `exam_luck`, `correct_streaks`, `visitor_names`, `visitor_links`, `question_pins` | keep | | They are the students' own records and settings |
 
 A student who asks for their data to be deleted: there is no self-serve way yet, and a student can't see their own id

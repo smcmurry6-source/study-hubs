@@ -1175,3 +1175,29 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
    were wider than the screen, so the page scrolled sideways. The column may shrink, and a row's button drops below its text. */
 .home-next{grid-template-columns:minmax(0, 1fr);}
 .home-next > li{flex-wrap:wrap;}
+
+/* ================= "Good question?" under the explanation (widget/qhealth.js) =================
+   A small row after the explanation: thumbs up / down (tap again to take it back). A thumbs down opens the reasons;
+   "Something else" opens the Report panel. Muted, so it never competes with the explanation itself. */
+.sh-qrate{display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; margin-top:10px; padding-top:8px;
+  border-top:1px dashed color-mix(in srgb, var(--ink, #3a4050) 16%, transparent); font-size:.76rem; line-height:1.3; color:var(--ink-faint, #7a8090);}
+.sh-qrate-q{font-weight:600; margin-right:2px;}
+.sh-qrate-b{appearance:none; background:none; border:1px solid transparent; border-radius:8px; width:30px; height:28px; padding:0;
+  display:inline-flex; align-items:center; justify-content:center; color:var(--ink-faint, #7a8090); cursor:pointer;}
+.sh-qrate-b svg{width:16px; height:16px;}
+.sh-qrate-down svg{transform:rotate(180deg);}
+.sh-qrate-b:hover{color:var(--ink, #222); background:var(--surface, #fff);}
+.sh-qrate-b:focus-visible, .sh-qrate-r:focus-visible{outline:2px solid var(--accent, #3b5bdb); outline-offset:1px;}
+.sh-qrate-b[aria-pressed="true"]{color:var(--accent-ink, #1f3b8c); background:var(--accent-soft, #dfe5f7); border-color:color-mix(in srgb, var(--accent-ink, #1f3b8c) 25%, transparent);}
+.sh-qrate-b[aria-pressed="true"] svg{fill:currentColor; fill-opacity:.18;}
+.sh-qrate-msg{margin-left:4px; font-weight:600; color:var(--ink-soft, #5b6270);}
+.sh-qrate-msg:empty{display:none;}
+.sh-qrate-why{flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:4px;}
+.sh-qrate-why[hidden]{display:none;}
+.sh-qrate-whyq{font-weight:600; margin-right:2px;}
+.sh-qrate-r{appearance:none; font:inherit; font-weight:600; border:1px solid color-mix(in srgb, var(--ink, #3a4050) 18%, transparent); background:var(--surface, #fff);
+  color:var(--ink-soft, #5b6270); border-radius:999px; padding:5px 10px; min-height:30px; cursor:pointer;}
+.sh-qrate-r:hover{color:var(--ink, #222); border-color:color-mix(in srgb, var(--ink, #3a4050) 34%, transparent);}
+.sh-qrate-r[aria-pressed="true"]{color:var(--accent-ink, #1f3b8c); background:var(--accent-soft, #dfe5f7); border-color:color-mix(in srgb, var(--accent-ink, #1f3b8c) 30%, transparent);}
+.sh-qrate-other{border-style:dashed;}
+@media (max-width:480px){ .sh-qrate-r{padding:6px 10px;} }

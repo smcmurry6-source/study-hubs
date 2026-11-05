@@ -21,7 +21,7 @@ tags: [map]
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md); `widget/archive.js`, which hubs
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/qhealth.js`, question health: per-question timing, retries and the "Good question?" thumbs, [question-health](question-health.md); `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md); `widget/archive.js`, which hubs
   are live, archived or hidden: the dates and Sam's overrides, loaded by `index.html` and `review/`) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
@@ -35,6 +35,8 @@ tags: [map]
   the hub page comes down, while `tools/dump-banks.js` can still read its bank.
   **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
   2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
+- `tools/question-ids/<hub>.txt` — every question id each hub has ever shipped (`<id> retired` for deleted ones), checked by
+  `tools/ci/smoke.js` ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
 - `tools/podcast/` — Timmy Time, a hub's audio review episode hosted by Timmy Tooth: the script (`<hub>/script.md`),
   Kokoro voice with a pronunciation lexicon, synthesized music and mastering (its `README.md`). The mp3 goes in
   `hubs/<hub-id>/audio/timmy-time.mp3`; the hub defines `window.SH_PODCAST` and a `<div data-sh-podcast>` slot.

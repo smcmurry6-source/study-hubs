@@ -37,6 +37,8 @@ Questions
 - [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture)
 - [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture.
 - [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins.
+- [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).
+- [Question-health flags are leads](rules/question-health-flags-are-leads.md): nothing changes a question automatically; Sam decides.
 
 Hub building
 - [Every hub opens on its own Home page](rules/hub-home-page.md)
@@ -81,6 +83,7 @@ Hub building
 - [Analytics governance](reference/analytics-governance.md): how usage data is collected, checked, kept and used. Its
   notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
   [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
+- [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
 - `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
 - `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
 - `supabase/schema.sql` and `migration_v*.sql`: the database.
