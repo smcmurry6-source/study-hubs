@@ -112,7 +112,10 @@ button{font:inherit; color:inherit; cursor:pointer;}
 #wrap{max-width:1040px; margin:0 auto; padding:0 24px 80px;}
 
 /* ================= TOP BAR ================= */
-.topbar{display:flex; align-items:center; gap:14px; padding:20px 0 0;}
+/* the bar wraps by its content, not by a screen width: when the buttons don't fit beside the wordmark and the live count
+   (a narrow phone, a large text size), they move together onto a row of their own, right-aligned */
+.topbar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:20px 0 0;}
+.tb-actions{display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:inherit; margin-left:auto; flex:0 1 auto; min-width:0;}   /* and wrap among themselves at the largest text on the narrowest phones */
 .wordmark{display:flex; align-items:center; gap:10px; font-weight:600; font-size:15px; letter-spacing:-.01em; margin-right:auto;}
 .wordmark .rings{display:flex; gap:3px;}
 .wordmark .rings i{width:5px; height:18px; border-radius:3px; display:block;}
@@ -528,7 +531,7 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .stat .n{font-family:var(--serif); font-size:44px; line-height:1;}
 .stat .l{font-size:13px; color:var(--ink-2); margin-top:6px;}
 .stat .who{font-size:13.5px; color:var(--ink); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.game-tabs{display:flex; gap:6px; overflow-x:auto; margin:14px -4px 0; padding:2px 4px 6px; scrollbar-width:thin;}
+.game-tabs{display:flex; flex-wrap:wrap; gap:6px; margin:14px -4px 0; padding:2px 4px 6px;}   /* every arcade and game in view: the buttons wrap instead of scrolling past the edge */
 .game-tabs button{flex:none; font-size:13px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink-2); white-space:nowrap;}
 .game-tabs button[aria-selected="true"], .game-tabs button[aria-pressed="true"]{background:var(--ink); color:var(--on-ink); border-color:var(--ink);}
 .muted{font-size:14px; color:var(--ink-3); margin-top:14px;}
@@ -614,11 +617,13 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   <div class="topbar">
     <div class="wordmark"><span class="rings" aria-hidden="true"><i style="background:var(--c-gi)"></i><i style="background:var(--c-perio)"></i><i style="background:var(--c-genetics)"></i><i style="background:var(--c-pros)"></i></span><span class="wm-text">Study Hubs</span></div>
     <span class="live-pill" title="People with a hub open right now"><span class="live-dot"></span><span><b id="liveCount">–</b> <span class="lp-long">studying </span>now</span></span>
+    <div class="tb-actions">
     <a class="icon-btn about-btn" id="aboutBtn" href="about/" title="About the hubs: every feature, easter egg and trophy" aria-label="About the hubs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M12 7.5v.01M12 10.5v4"/></svg><span class="about-lbl">About</span></a>
     <button class="icon-btn about-btn tour-btn" id="tourBtn" type="button" title="Take the guided tour of the hubs" aria-label="Take the tour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg><span class="about-lbl">Tour</span></button>
     <button class="icon-btn" id="inboxBtn" type="button" aria-label="Inbox" title="Inbox" data-sh-inbox><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5 6 5.5A2 2 0 0 1 7.9 4h8.2A2 2 0 0 1 18 5.5l2.5 8"/><path d="M3.5 13.5V18a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-4.5H15a3 3 0 0 1-6 0z"/></svg><span class="inbox-badge sh-inbox-badge" hidden></span></button>
     <button class="icon-btn" id="setBtn" type="button" aria-label="Settings" title="Settings"></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme"></button>
+    </div>
   </div>
 
   <p class="greeting" id="greeting">Welcome back.</p>
@@ -703,8 +708,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       <div class="panel p-arcade">
         <h3 id="arcadeTitle">Arcade high scores</h3>
         <p class="panel-sub" id="arcadeSub">From the hub arcades</p>
-        <div class="game-tabs" id="arcadeHubs" aria-label="Arcade" style="margin-bottom:6px"></div>
-        <div class="game-tabs" role="tablist" id="gameTabs" aria-label="Arcade game"></div>
+        <div class="game-tabs" role="group" id="arcadeHubs" aria-label="Arcade" style="margin-bottom:6px"></div>
+        <div class="game-tabs" role="group" id="gameTabs" aria-label="Arcade game"></div>
         <div id="arcadeBoard"><p class="muted">Loading…</p></div>
       </div>
     </div>
@@ -1993,7 +1998,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       function drawTabs(){
         var a = arc(), sel = ls(key + ":" + a.hub) || a.games[0][0];
         if (!a.games.some(function(g){ return g[0] === sel; })) sel = a.games[0][0];
-        tabs.innerHTML = a.games.map(function(g){ return '<button type="button" role="tab" data-game="' + g[0] + '" aria-selected="' + (g[0] === sel) + '">' + esc(g[1]) + '</button>'; }).join("");
+        tabs.innerHTML = a.games.map(function(g){ return '<button type="button" data-game="' + g[0] + '" aria-pressed="' + (g[0] === sel) + '">' + esc(g[1]) + '</button>'; }).join("");
         load(sel);
       }
       function load(game){
@@ -2014,7 +2019,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       });
       tabs.addEventListener("click", function(e){
         var b = e.target.closest("[data-game]"); if (!b) return;
-        tabs.querySelectorAll("[data-game]").forEach(function(x){ x.setAttribute("aria-selected", x === b ? "true" : "false"); });
+        tabs.querySelectorAll("[data-game]").forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
         lsSet(key + ":" + hubSel, b.getAttribute("data-game")); load(b.getAttribute("data-game"));
       });
       drawHubs(); drawTabs();

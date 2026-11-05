@@ -44,14 +44,38 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   dashboard by hand, until set back to Automatic or until an optional end time (Sam's call), with a confirmation, a note,
   an audit log and a stale-tab check; nothing is deleted. The rules live once in `widget/archive.js` (loaded by
   `index.html` and `review/`; `widget/v3.js`'s archived notice follows them). **Exam check-ins:** groups sort by their
-  newest check-in (they sorted by hub name, BUG-010), rows and survey answers newest first with an id tie-break.
+  newest check-in (they sorted by hub name, BUG-015), rows and survey answers newest first with an id tie-break.
   `migration_v50.sql` (numbered v49 until #237 took that number; tier 3, **applied 2026-11-05** after Sam's written
   approval, "Merge when ready"; the live permission audit found nothing after it): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
   `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
   in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on 10-30
-  (PR #205, never merged). `sw.js` sh-v53. No About page entry (Sam: admin information stays off it). Preview fixtures
+  (PR #205, never merged). `sw.js` sh-v54. No About page entry (Sam: admin information stays off it). Preview fixtures
   for every admin view. Tests: `tools/release/admin-ops.js` and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js`
   (`run.js`, as `adminui`). How it works: [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
+
+- **2026-11-04 (top bars fit their content: no more clipped Arcade tab, Claude Code)** — Sam: the dashboard top bar is cramped and
+  the Arcade tab gets cut off. **Root cause:** every hub picked its top-bar layout from a stack of screen-width breakpoints
+  (380/520/560/760/860 in each hub, plus the 561-1000 px patch of 2026-10-28 in `widget/v3.css`), but whether the bar fits
+  depends on what's in it: the hub's name, your name and rank, the countdown's wording, the streak and tour buttons, the font,
+  and the text-size setting, which zooms `<html>` where media queries can't see it. When a guess was wrong, `#modeSwitch`
+  (`min-width:0; overflow-x:auto` with a hidden scrollbar) shrank and **clipped Arcade** with nothing to show it was there (1001-1280
+  px in six hubs), or the tabs ran past the edge (320 px, four hubs, the page scrolled sideways); under 760 px some tab labels were
+  `display:none`, leaving tabs with no spoken name. **Fix (shared):** `widget/v3.js` measures the bar (ResizeObserver, a
+  MutationObserver for names and pills filling in, font loading) and keeps the first layout that fits: `data-sh-head` = `row` (one
+  line, every tab at full size), `stack` (title and pills on top, full-width tabs below) or `stack3` (phones and large text: title
+  and the round buttons on top, your name and the pills next, then the tabs; your name shortens with an ellipsis before the
+  countdown wraps); `data-sh-tabs` = `inline`, `tall` (icon over label) or `grid` (two columns). `widget/v3.css` draws them, scoped
+  to `header.hub-header[data-sh-head]` so they outrank each hub's own breakpoints; labels always show, the hub's name shows on
+  phones (with an ellipsis), touch screens get 40 px tabs and 32 px round buttons. It also keeps `--sh-head-h` current. **Dashboard**
+  (`index.html`): the top bar's buttons are one group (`.tb-actions`) that wraps onto its own row when it doesn't fit beside the
+  wordmark and live count; the Arcade high scores' hub and game rows wrap instead of scrolling past the edge (the game row is now a
+  group of `aria-pressed` buttons, not a tablist without arrow keys). **Perio:** the arcade leaderboard tabs wrap. CI:
+  `tools/ci/smoke.js` checks the dashboard and every hub at 320 px, 1001 px and 390 px with the largest text: no sideways scroll,
+  every top-bar control and tab fully on screen and not clipped, every mode tab labeled. About page: "A top bar that fits your
+  screen"; Hub modes now says four modes. The largest text also showed Home's "Where to next" rows wider than a phone in
+  five hubs (a shared guard in `widget/v3.css`: the column may shrink, the button drops below) and Perio's course-map titles
+  (`overflow-wrap`). Bug log BUG-010-013; report `vault/release/reports/2026-11-04-responsive-top-bars.md`.
+  `sw.js` -> `sh-v53`.
 
 - **2026-11-04 (analytics governance and learner insights, Claude Code)** — Sam asked for an analytics governance and
   learner-insights layer over every live and archived hub. **Admin page**: a new **Insights** tab (`review/`) puts every hub

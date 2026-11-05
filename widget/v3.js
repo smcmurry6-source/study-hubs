@@ -1898,6 +1898,53 @@
     tour.innerHTML = ICON_COMPASS;
     btn.parentNode.insertBefore(tour, btn);
   })();
+  /* ---------- the hub top bar fits its content, measured, not guessed from the screen width (2026-11-04).
+     Whether the bar fits depends on what's in it (the hub's name, your name and rank, the countdown's wording, the
+     streak and tour buttons, the font, the text-size setting, which zooms <html> where media queries can't see it), so
+     the old width breakpoints left the mode tabs clipped behind an invisible scrollbar or past the screen's edge. The
+     widget tries each layout in order and keeps the first that fits (v3.css draws them):
+       data-sh-head  row    : title, tabs and the rest on one line, every tab at full size
+                     stack  : title and the rest on top, the tabs on their own full-width row
+                     stack3 : the title (and the small buttons) on top, your name and the pills on a row of their own, then the tabs
+       data-sh-tabs  inline : icon beside label   tall : icon over label   grid : two columns
+     No tab ever hides its label, shrinks out of sight or scrolls. ---------- */
+  if (!EXPORT_ONLY) (function(){
+    var head = document.querySelector("header.hub-header");
+    var top = head && head.querySelector(".hub-header-top");
+    var tabs = head && head.querySelector("#modeSwitch");
+    if (!top || !tabs) return;
+    var title = top.querySelector(".hub-title"), meta = top.querySelector(".hub-meta");
+    var docEl = document.documentElement, lastW = -1, queued = false;
+    function over(el){ return !!el && el.scrollWidth > el.clientWidth + 1; }
+    function tabsOver(){
+      if (over(tabs)) return true;
+      var bs = tabs.querySelectorAll("button");
+      for (var i = 0; i < bs.length; i++) if (bs[i].offsetParent && over(bs[i])) return true;
+      return false;
+    }
+    function set(h, t){ head.setAttribute("data-sh-head", h); head.setAttribute("data-sh-tabs", t); }
+    function wrapped(a, b){ return !!(a && b) && b.offsetParent !== null && b.offsetTop > a.offsetTop + a.offsetHeight / 2; }
+    function fit(){
+      queued = false;
+      lastW = top.clientWidth;
+      set("row", "inline");
+      if (!over(top) && !over(meta) && !tabsOver()) return done();
+      set("stack", "inline");
+      if (wrapped(title, meta) || over(meta)) set("stack3", "inline");
+      var h = head.getAttribute("data-sh-head");
+      if (tabsOver()) { set(h, "tall"); if (tabsOver()) set(h, "grid"); }
+      done();
+    }
+    function done(){ docEl.style.setProperty("--sh-head-h", head.offsetHeight + "px"); }
+    function queue(){ if (!queued) { queued = true; requestAnimationFrame(fit); } }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(function(){ if (top.clientWidth !== lastW) queue(); }).observe(top);
+    window.addEventListener("resize", queue);
+    /* names, ranks, the countdown and the streak fill in after load; a hidden pill can appear */
+    new MutationObserver(queue).observe(top, { childList: true, subtree: true, characterData: true, attributeFilter: ["hidden"] });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+    window.addEventListener("load", queue);
+  })();
   var ICON_FLAG = shIcon('<path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/>');
   var ICON_GEAR = shIcon('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>');
   var ICON_MORE = shIcon('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>');

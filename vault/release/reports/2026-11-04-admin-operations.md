@@ -52,8 +52,10 @@ shadow), which only previews have.
 
 **CI's "Release tests" on this PR** fails on two things that aren't this PR's: the same failures are on #237's run (now in
 `main`) and on the other open PRs: Perio's Review table (`#ref-antibiotics > .table-wrap`) has no keyboard access (axe,
-`hubs/perio/`), and in WebKit and Firefox the dashboard and some hubs scroll sideways on a small phone and an iPad Mini
-(Chromium passes). Neither file is touched here. Explained on the PR; they need their own fix.
+`hubs/perio/`); in WebKit and Firefox the dashboard and some hubs scroll sideways on a small phone and an iPad Mini; and
+in all three engines on the iPhone SE size, the Arcade can't be opened in Occlusion, PCD Implants and Special Patient
+Care. None of those files is touched here. Explained on the PR; they need their own fix (#235's top-bar work, merged
+into `main` on 2026-11-05, may cover some of them).
 
 ## Exercised in the preview (scripted browser, screenshots looked at)
 
@@ -93,7 +95,7 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
 
 ## Bugs
 
-- BUG-010 (S3): the check-in groups sorted by hub name in reverse. Fixed here, retested in the preview and on a throwaway
+- BUG-015 (S3): the check-in groups sorted by hub name in reverse. Fixed here, retested in the preview and on a throwaway
   database; retest on the live page after the release.
 - Found and fixed while building (not shipped, so not logged): a lone Cancel above the confirmation box; the stale-tab
   test opening without the admin secret; the three axe findings above; a menu Close button showing on a laptop; two
@@ -116,7 +118,7 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
 - [x] Sam approved this release: in the session, 2026-11-05, "Merge when ready" (the PR's box is Sam's to tick).
 - [x] `migration_v50.sql` applied (connector `apply_migration`, 2026-11-05; live audit clean), then merged.
 - [ ] `node tools/release/postcheck.js` passed:
-- [ ] The live admin page: every view loads, Live and Hubs work, check-ins newest first (BUG-010 retested):
+- [ ] The live admin page: every view loads, Live and Hubs work, check-ins newest first (BUG-015 retested):
 - [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.
 
