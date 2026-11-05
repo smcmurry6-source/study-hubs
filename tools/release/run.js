@@ -20,6 +20,7 @@ const SUITES = [
   ['rls', 'Database permissions (RLS, grants, secrets)', 'tools/release/rls.js'],
   ['adminui', 'Admin page in a preview (Live, Hubs, newest first, phone layout)', 'tools/release/admin-ui.js'],
   ['admin', 'Admin operations on fixtures (live presence privacy, archive overrides, order)', 'tools/release/admin-ops.js'],
+  ['retention', 'Analytics retention on fixtures (deletes, kept hours, device linking, recap)', 'tools/release/retention.js'],
   ['a11y', 'Accessibility (axe, keyboard, reduced motion)', 'tools/release/a11y.js'],
   ['perf', 'Performance budgets (slow 4G phone)', 'tools/release/perf.js'],
   ['matrix', 'Devices and resilience (refresh, history, offline, slow)', 'tools/release/matrix.js']

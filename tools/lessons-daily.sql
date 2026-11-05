@@ -20,10 +20,11 @@ select hub, term, sum(searches) searches from search_terms
 where day >= :since::date and hits = 0 group by 1, 2 order by 3 desc limit 60;
 
 -- 3. Use per hub since the last refresh: people, minutes, top sections
-select hub, count(distinct visitor_id) people, count(*) * 25 / 60 mins from activity_pings
-where pinged_at >= :since::date group by 1 order by 3 desc;
-select hub, coalesce(section, '(none)') section, count(*) * 25 / 60 mins, count(distinct visitor_id) people
-from activity_pings where pinged_at >= :since::date group by 1, 2 order by 1, 3 desc;
+--    (activity_hourly: n pings of 25 s per hour, hub, section and person; raw pings are kept 30 days only, migration_v52)
+select hub, count(distinct visitor_id) people, sum(n) * 25 / 60 mins from activity_hourly
+where h >= :since::date group by 1 order by 3 desc;
+select hub, coalesce(nullif(section, ''), '(none)') section, sum(n) * 25 / 60 mins, count(distinct visitor_id) people
+from activity_hourly where h >= :since::date group by 1, 2 order by 1, 3 desc;
 -- features found by fewer than 3 people in the last 7 days
 select hub, target, count(distinct visitor_id) people from ui_click_reach
 where day >= current_date - 7 group by 1, 2 having count(distinct visitor_id) < 3 order by 1, 2 limit 80;
@@ -43,5 +44,5 @@ where s.attempts >= 20 and c.picks::float / s.attempts >= 0.4 order by c.hub, pc
 -- 5. Mock exams and drill since the last refresh
 select hub, count(*) mocks, count(distinct visitor_id) people, round(avg(100.0 * correct / total)) avg_pct
 from mock_scores where created_at >= :since::date group by 1;
-select hub, count(*) * 25 / 60 drill_mins, count(distinct visitor_id) people from activity_pings
-where pinged_at >= :since::date and section like 'drill/%' group by 1;
+select hub, sum(n) * 25 / 60 drill_mins, count(distinct visitor_id) people from activity_hourly
+where h >= :since::date and section like 'drill/%' group by 1;

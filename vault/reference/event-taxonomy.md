@@ -39,14 +39,15 @@ privacy rule). Written by = the RPC and the client file that calls it.
 
 | Table | Grain | Visitor | Written by | Since | Notes |
 |---|---|---|---|---|---|
-| `activity_pings` | one 25 s ping: visitor, visit, hub, section | yes | `record_activity_ping`, `widget/v3.js` | 2026-09-12 | Raw. 145 MB, the largest table. `section` is `<mode>/<sub-view>` (below); `hepatobiliary` and `gi-exam1` sent none |
-| `activity_hourly` | visitor × hub × section × hour, `n` pings | yes | trigger on `activity_pings` (v45) | rebuilt from all pings | What the admin RPCs and `sh_insights()` read. Deleting pings rebuilds it from what's left (see retention) |
+| `activity_pings` | one 25 s ping: visitor, visit, hub, section | yes | `record_activity_ping`, `widget/v3.js` | 2026-09-12 | Raw, **kept 30 days** ([analytics-retention](analytics-retention.md)); read only for the last few minutes (Live) and the data-quality checks. `section` is `<mode>/<sub-view>` (below); `hepatobiliary` and `gi-exam1` sent none |
+| `activity_hourly` | visitor × hub × section × hour, `n` pings | yes | trigger on `activity_pings` (v45) | 2026-09-12 (rebuilt from all pings in v45) | What the admin RPCs and `sh_insights()` read. The source of time for everything else since migration_v52 (recap, retro, lessons audit); a retention delete keeps it, an ordinary ping delete rebuilds it |
 | `activity_visits` | one visit: first and last ping | yes | same trigger | same | Visit length for `get_visitor_summary` |
 | `presence_hourly` | hub × hour of day, ping count | no | `record_presence_ping` | early | "Who's studying now" on the dashboard |
 | `mode_stats` | hub × mode, opens | no | `record_mode_open` | early | All-time counter, no date: can't be split by period |
 | `ui_clicks` | day × hub × section × target, `clicks` | no | `record_clicks`, `widget/clicks.js` | 2026-09-25 | Batched once a minute; max 80 targets a batch |
-| `ui_click_reach` | day × hub × target × visitor | yes | same | 2026-09-25 | Distinct people per button per day |
-| `feature_events` | day × hub × kind × visitor, `n` summed | yes | `record_events`, `window.shTrack` in `widget/clicks.js` | 2026-10-20 | `hub` is a page: a hub id, `dashboard` or `about`. Kinds below |
+| `ui_click_reach` | day × hub × target × visitor | yes | same | 2026-09-25 | Distinct people per button per day; kept 90 days |
+| `feature_events` | day × hub × kind × visitor, `n` summed | yes | `record_events`, `window.shTrack` in `widget/clicks.js` | 2026-10-20 | Kept 180 days, then collapsed into `feature_daily`. `hub` is a page: a hub id, `dashboard` or `about`. Kinds below |
+| `feature_daily` | day × hub × kind: `people`, `n` | no | `sh_retention_run` (v52) | rows older than 180 days | `feature_events` after 180 days; `people` is the distinct ids that day |
 | `search_terms` | day × hub × term, searches, last hit count | no | `record_search`, `widget/v3.js` | 2026-09-29 | The widget's Search only; terms trimmed to 3-60 characters, no visitor |
 
 ### Questions
@@ -68,17 +69,18 @@ privacy rule). Written by = the RPC and the client file that calls it.
 
 | Table | Grain | Visitor | Written by | Notes |
 |---|---|---|---|---|
-| `question_flags` | one report, free text | yes (from v25) | Report button (widget) | Reply goes back to the sender ([reply-to-reports](../how-to/reply-to-reports.md)) |
-| `hub_suggestions` | one suggestion, free text | yes (from v25) | Suggest (widget) | Same |
-| `exam_debriefs` | one check-in: hub, exam ('YYYY-MM-DD label'), answers json | yes | `submit_exam_debrief`, `index.html` | `answers`: `ready` 1-5, `went`, `match` (choices) and `missed` (free text), plus an exam's `extraQs`. Up to 10 per person per exam, 90 days |
-| `surveys` / `survey_responses` | survey; one response (null answers = "No thanks") | yes | `submit_survey`, `index.html`, `widget/replies.js` | 169 of 190 responses by 11-04 were "No thanks" |
+| `question_flags` | one report, free text | yes (from v25; removed 120 days after the reply) | Report button (widget) | Reply goes back to the sender ([reply-to-reports](../how-to/reply-to-reports.md)) |
+| `hub_suggestions` | one suggestion, free text | yes (from v25; removed 120 days after the reply) | Suggest (widget) | Same |
+| `exam_debriefs` | one check-in: hub, exam ('YYYY-MM-DD label'), answers json | yes (`anon-<row id>` after a year) | `submit_exam_debrief`, `index.html` | `answers`: `ready` 1-5, `went`, `match` (choices) and `missed` (free text), plus an exam's `extraQs`. Up to 10 per person per exam, 90 days |
+| `surveys` / `survey_responses` | survey; one response (null answers = "No thanks") | yes (answers lose it 90 days after the survey closes; "No thanks" rows go when it closes) | `submit_survey`, `index.html`, `widget/replies.js` | 169 of 190 responses by 11-04 were "No thanks" |
 | `podcast_reactions` / `podcast_comments` / `podcast_comment_reports` | one like or dislike; one comment; one report | yes | `pod_react` / `pod_comment` / `pod_report_comment`, `widget/podcast.js` | Comments are public to the class under the poster's leaderboard name |
 
 ### Game layer and identity (not analytics, but they hold visitor ids)
 
 `achievements`, `arcade_scores`, `egg_events`, `nuke_launches`, `nuke_unlocks`, `exam_luck`, `xp_seen`, `xp_days`,
 `visitor_names`, `visitor_links`, `link_codes`, `link_attempts`. Read them for feature use (who plays, who earns what),
-never for anything about a person. Content and ops: `changelog`, `site_notices`, `hub_recaps` (no visitor ids).
+never for anything about a person. `link_attempts` are kept 7 days. Content and ops: `changelog`, `site_notices`, `hub_recaps`,
+`retention_runs` (what each weekly retention run removed and the database size then, v52) (no visitor ids).
 
 ## Naming conventions
 
