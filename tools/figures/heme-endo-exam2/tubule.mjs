@@ -77,6 +77,7 @@ function tbCell(k, x, y, rot, s, m, hl, wig) {
     /* the Golgi moves to the top (the outward pole) of the nucleus and becomes the acrosome */
     if (mm < 0.4) { var ga = lerp(0, Math.PI / 2, mm / 0.4), gx = Math.cos(ga) * 7.4 * s, gy = Math.sin(ga) * 7.4 * s; o += '<path class="tb-golgi" opacity="' + f1(1 - mm / 0.4) + '" d="M' + f1(gx - 2.6 * s) + " " + f1(gy) + "q" + f1(2.6 * s) + " " + f1(2.2 * s) + " " + f1(5.2 * s) + " 0M" + f1(gx - 2 * s) + " " + f1(gy - 1.8 * s) + "q" + f1(2 * s) + " " + f1(1.8 * s) + " " + f1(4 * s) + ' 0"/>'; }
     o += E(0, nY, nRx, nRy, mm > 0.6 ? "tb-nu tb-dense" : "tb-nu");
+    if (hl && free) o += E(0, nY + 1.5, nRx + 4.5, nRy + 5.5, "tb-ring");
     if (mm > 0.15) { var ao = Math.min(1, (mm - 0.15) * 3); o += '<path class="tb-acro" opacity="' + f1(ao) + '" d="M' + f1(-nRx - 0.6) + " " + f1(nY + nRy * 0.15) + "Q" + f1(-nRx) + " " + f1(nY + nRy + 2.6 * s) + " 0 " + f1(nY + nRy + 2.4 * s) + "Q" + f1(nRx) + " " + f1(nY + nRy + 2.6 * s) + " " + f1(nRx + 0.6) + " " + f1(nY + nRy * 0.15) + "Q0 " + f1(nY + nRy * 0.9) + " " + f1(-nRx - 0.6) + " " + f1(nY + nRy * 0.15) + 'Z"/>'; }
   } else if (k === "rb") {
     o += '<path class="tb-cy" d="M' + f1(-4.6 * s) + " 0C" + f1(-4.6 * s) + " " + f1(-4 * s) + " " + f1(3.4 * s) + " " + f1(-5 * s) + " " + f1(4.6 * s) + " " + f1(-0.6 * s) + "C" + f1(5.4 * s) + " " + f1(3.4 * s) + " " + f1(-4.6 * s) + " " + f1(4.4 * s) + " " + f1(-4.6 * s) + ' 0Z"/>';
@@ -374,6 +375,7 @@ export default function tubule() {
 .anima .tubule-svg .tb-cy{fill:color-mix(in srgb,var(--bx-cyto) 70%,var(--surface));stroke:var(--bx-cyto-line);stroke-width:1}
 .anima .tubule-svg .tb-cy.is-trk{stroke:var(--anatomy-lit);stroke-width:2.2}
 .anima .tubule-svg .tb-halo{fill:var(--anatomy-lit);opacity:.14}
+.anima .tubule-svg .tb-ring{fill:none;stroke:var(--anatomy-lit);stroke-width:1.8}
 .anima .tubule-svg .tb-nu{fill:var(--bx-nuc);stroke:var(--bx-nuc-line);stroke-width:.8}
 .anima .tubule-svg .tb-nu.tb-pale{fill:color-mix(in srgb,var(--bx-nuc) 45%,var(--surface))}
 .anima .tubule-svg .tb-nu.tb-dense{fill:var(--bx-nuc-line)}

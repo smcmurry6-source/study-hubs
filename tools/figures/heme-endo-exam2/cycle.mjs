@@ -183,7 +183,7 @@ function cyRender(st, D) {
   var ax2 = '<path class="cy-axis" d="M' + XL + " 537H" + XR;
   for (i = 1; i <= 28; i++) ax2 += "M" + cyX(i) + " 537V" + (i === 1 || i === 5 || i === 14 || i === 28 ? 543 : 540);
   o += ax2 + '"/>';
-  [1, 5, 14, 28].forEach(function (k) { o += T(cyX(k), 556, String(k), "cy-dn" + (k === d ? " b" : ""), "middle"); });
+  [1, 5, 14, 28].forEach(function (k) { if (k === d || Math.abs(k - d) > 1) o += T(cyX(k), 556, String(k), "cy-dn" + (k === d ? " b" : ""), "middle"); });
   if ([1, 5, 14, 28].indexOf(d) < 0) o += T(cyX(d), 556, String(d), "cy-dn b", "middle");
   return o;
 }
