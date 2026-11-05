@@ -77,7 +77,7 @@ function cyRender(st, D) {
   /* ---- pituitary: FSH and LH ---- */
   o += T(XL, 44, "PITUITARY · FSH AND LH", "cy-h", "start") + T(XR, 44, "relative levels", "cy-h cy-hr", "end");
   o += '<path class="cy-axis" d="M' + XL + " " + P0 + "H" + XR + '"/>';
-  function curve(P, cls, y1, hh, info) { return HOT(info, '<path class="cy-fut ' + cls + '" d="' + cyPath(P, 0.5, 28.5, y1, hh) + '"/><path class="cy-now ' + cls + '" d="' + cyPath(P, 0.5, d, y1, hh) + '"/>') + '<circle class="cy-dot ' + cls + '" cx="' + f1(cyX(d)) + '" cy="' + f1(y1 - cyMono(P, d) * hh) + '" r="4"/>'; }
+  function curve(P, cls, y1, hh, info) { var full = cyPath(P, 0.5, 28.5, y1, hh); return HOT(info, '<path class="cy-hit" d="' + full + '"/><path class="cy-fut ' + cls + '" d="' + full + '"/><path class="cy-now ' + cls + '" d="' + cyPath(P, 0.5, d, y1, hh) + '"/>') + '<circle class="cy-dot ' + cls + '" cx="' + f1(cyX(d)) + '" cy="' + f1(y1 - cyMono(P, d) * hh) + '" r="4"/>'; }
   o += curve(C.FSH, "cy-fsh", P0, PH, "FSH: stimulates granulosa cell development and their estrogen synthesis (aromatase). Estradiol's negative feedback holds it down in the follicular phase, inhibin suppresses it at midcycle, and progesterone holds it down in the luteal phase.");
   o += curve(C.LH, "cy-lh", P0, PH, "LH: fairly steady across the cycle, then a dramatic surge just before ovulation, set off by estradiol's positive feedback. The surge restarts meiosis and causes follicular rupture 24 to 36 hours later. LH also drives the theca cells' testosterone.");
   o += T(cyX(2.6), P0 - cyMono(C.FSH, 2.6) * PH - 7, "FSH", "cy-lab cy-fsh-t", "middle");
@@ -123,7 +123,7 @@ function cyRender(st, D) {
   /* ---- ovarian hormones ---- */
   o += T(XL, 272, "OVARIAN HORMONES · ESTRADIOL, PROGESTERONE", "cy-h", "start");
   o += '<path class="cy-axis" d="M' + XL + " " + H1 + "H" + XR + '"/>';
-  o += HOT("The critical level from Dr. Madison's midcycle slide: plasma estradiol above 200 pg/mL switches its feedback from negative to positive.", '<path class="cy-thr" d="M' + XL + " " + f1(H1 - D.THR * HH) + "H" + XR + '"/>' + T(XL + 2, H1 - D.THR * HH - 4, "200 pg/mL", "cy-thrt", "start"));
+  o += HOT("The critical level from Dr. Madison's midcycle slide: plasma estradiol above 200 pg/mL switches its feedback from negative to positive.", '<path class="cy-hit" d="M' + XL + " " + f1(H1 - D.THR * HH) + "H" + XR + '"/><path class="cy-thr" d="M' + XL + " " + f1(H1 - D.THR * HH) + "H" + XR + '"/>' + T(XL + 2, H1 - D.THR * HH - 4, "200 pg/mL", "cy-thrt", "start"));
   o += curve(C.E2, "cy-e2", H1, HH, "Estradiol (17β-estradiol, the main estrogen from the ovary): rises markedly through the follicular phase as the follicle grows, crosses 200 pg/mL just before the LH surge, and falls abruptly with progesterone at the end of the luteal phase. The corpus luteum's granulosa-lutein cells also make estrogen.");
   o += curve(C.P4, "cy-p4", H1, HH, "Progesterone: low in the follicular phase; it increases markedly in the luteal phase, made by the corpus luteum, and falls abruptly as the corpus luteum regresses: that abrupt loss prompts menses.");
   o += T(cyX(8.6), H1 - cyMono(C.E2, 8.6) * HH - 9, "estradiol", "cy-lab cy-e2-t", "end");
@@ -230,6 +230,7 @@ export default function cycle() {
 .anima .cycle-svg .cy-bt.b{fill:var(--accent-ink)}
 .anima .cycle-svg .cy-star{font:10px var(--anatomy-mono);fill:var(--accent)}
 .anima .cycle-svg .cy-axis{fill:none;stroke:var(--anatomy-mid);stroke-width:1}
+.anima .cycle-svg .cy-hit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke}
 .anima .cycle-svg .cy-fut{fill:none;stroke-width:1.6;opacity:.32}
 .anima .cycle-svg .cy-now{fill:none;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
 .anima .cycle-svg .cy-dot{stroke:var(--surface);stroke-width:1.6}
@@ -276,7 +277,7 @@ export default function cycle() {
 .anima .cycle-svg .cy-gw{fill:none;stroke:var(--bx-violet);stroke-linecap:round;stroke-linejoin:round;opacity:.85}
 .anima .cycle-svg .cy-gl{fill:none;stroke:var(--bx-lumen);stroke-linecap:round;stroke-linejoin:round}
 .anima .cycle-svg .cy-sec{fill:var(--bx-eosin)}
-.anima .cycle-svg .cy-art{fill:none;stroke:var(--bx-blood);stroke-width:1.5;stroke-linecap:round}
+.anima .cycle-svg .cy-art{fill:none;stroke:var(--bx-blood);stroke-width:1.5;stroke-linecap:round;pointer-events:stroke}
 .anima .cycle-svg .cy-art.cy-con{stroke-width:.8}
 .anima .cycle-svg .cy-blood{fill:var(--bx-blood)}
 .anima .cycle-svg .cy-frag{fill:var(--bx-matrix);stroke:var(--bx-blood);stroke-width:1}

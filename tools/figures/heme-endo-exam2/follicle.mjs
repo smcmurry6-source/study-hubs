@@ -185,7 +185,7 @@ function foRender(st, D) {
     var zf = ""; for (i = 0; i < 9; i++) { var za = i / 9 * 6.283; var zp = foPt(cx, cy, r1 + 2, za), zq = foPt(cx, cy, r1 + 2, za + 0.5); zf += '<path class="fo-zp" stroke-width="3" d="M' + f1(zp[0]) + " " + f1(zp[1]) + "A" + (r1 + 2) + " " + (r1 + 2) + " 0 0 1 " + f1(zq[0]) + " " + f1(zq[1]) + '"/>'; }
     body += HOT("Zona pellucida, beginning to form: rich in glycosaminoglycans and glycoproteins.", zf);
     body += HOT("Granulosa cells: the follicular cells have become cuboidal, and from this stage on they are called granulosa cells. One layer, so the follicle is unilaminar. Extensive gap junctions join them, but no tight junctions: there is no blood-follicle barrier (unlike the blood-testis barrier).", foRing(cx, cy, r1 + 4, r1 + 21, 24, 0.1, "fo-gc", "fo-gn", "round"));
-    body += HOT("Basal lamina under the granulosa cells.", foCirc(cx, cy, r1 + 22, "fo-bl"));
+    body += HOT("Basal lamina under the granulosa cells.", foCirc(cx, cy, r1 + 22, "fo-hit") + foCirc(cx, cy, r1 + 22, "fo-bl"));
     labs += foLab(LX, 92, ["primary oocyte", "100-150 µm"], cx + 52, cy - 50);
     labs += foLab(LX, 170, ["zona pellucida", "begins to form"], foPt(cx, cy, r1 + 2, -0.55)[0], foPt(cx, cy, r1 + 2, -0.55)[1]);
     labs += foLab(LX, 258, ["granulosa cells:", "cuboidal, one layer;", "gap junctions,", "no tight junctions"], foPt(cx, cy, r1 + 13, 0.25)[0], foPt(cx, cy, r1 + 13, 0.25)[1]);
@@ -193,7 +193,7 @@ function foRender(st, D) {
     var r2 = 64, zo = r2 + 8, gR = zo + 52, ti = gR + 16, te = ti + 16;
     hole = [[cx, cy, te + 2]];
     body += HOT("Theca externa: mostly fibrous connective tissue and smooth muscle cells. Theca interna: richly vascularized connective tissue whose cells have LH receptors and, in response to LH, make androgens that are precursors to estrogen. Stromal cells organize into this theca folliculi outside the basal lamina of the granulosa cells.", foTheca(cx, cy, gR + 1, ti, te, 11, false));
-    body += HOT("Basal lamina of the granulosa cells: the theca folliculi forms outside it.", foCirc(cx, cy, gR + 1, "fo-bl"));
+    body += HOT("Basal lamina of the granulosa cells: the theca folliculi forms outside it.", foCirc(cx, cy, gR + 1, "fo-hit") + foCirc(cx, cy, gR + 1, "fo-bl"));
     var lay = ""; for (i = 0; i < 4; i++) { var ra = zo + i * 13, rb = ra + 13; lay += foRing(cx, cy, ra, rb, Math.round(2 * Math.PI * (ra + 6.5) / 12), i * 0.09, "fo-gc", "fo-gn", "round"); }
     body += HOT("Granulosa cells proliferate into several layers: the follicle is now multilaminar.", lay);
     var mv = ""; for (i = 0; i < 44; i++) { var ma = i / 44 * 6.283, m0 = foPt(cx, cy, r2 + 0.5, ma), m1 = foPt(cx, cy, zo - 0.5, ma + 0.03); mv += "M" + f1(m0[0]) + " " + f1(m0[1]) + "L" + f1(m1[0]) + " " + f1(m1[1]); }
@@ -349,6 +349,7 @@ export default function follicle() {
 .anima .follicle-svg .fo-gn{fill:var(--bx-nuc)}
 .anima .follicle-svg .fo-desmo{fill:var(--anatomy-hi)}
 .anima .follicle-svg .fo-bl{fill:none;stroke:var(--bx-memb);stroke-width:1.3}
+.anima .follicle-svg .fo-hit{fill:none;stroke:transparent;stroke-width:9;pointer-events:stroke}
 .anima .follicle-svg .fo-ti{fill:var(--bx-cyto)}
 .anima .follicle-svg .fo-ti.fo-swell{fill:var(--bx-blood-soft)}
 .anima .follicle-svg .fo-te{fill:var(--bx-eosin)}
