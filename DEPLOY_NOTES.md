@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
+  run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways on small screens. Students on a
+  320 px phone (the first iPhone SE) saw **Occlusion's, PCD Implants' and Special Patient Care's** mode row run past the
+  screen's edge, with the Arcade tab cut off: the tabs can now shrink, and at 380 px and below they drop their icons, as
+  Perio's already did. The **dashboard's** top bar fits a 320 px phone (smaller buttons and gaps at 360 px and below).
+  **Perio's arcade** no longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding).
+  **Perio Review's** tables that scroll sideways can be reached by keyboard and are named for screen readers. The device
+  matrix (`tools/release/matrix.js`) now measures against the layout width, so Chromium's phone emulation can't hide
+  overflow, and names the element that sticks out. BUG-010 to BUG-015 in `vault/release/bug-log.md`; the iPad landscape
+  header (BUG-014) is still open.
 - **2026-11-04 (analytics governance and learner insights, Claude Code)** — Sam asked for an analytics governance and
   learner-insights layer over every live and archived hub. **Admin page**: a new **Insights** tab (`review/`) puts every hub
   side by side (scorecard, where time goes by canonical surface, spacing of retries, feature reach, student voice, data

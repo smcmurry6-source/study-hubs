@@ -36,6 +36,15 @@ Not run here: WebKit and Firefox (not installed in this session; CI's Release te
 Re-run at 20:17 UTC after rebasing onto `d670d8d` (`main` with PCD Implants' eleven figures redrawn): every suite passed
 again, accessibility still at its 157 known nodes, the performance budgets held.
 
+**First full run on GitHub** (2026-11-04, 21:07-21:22 UTC, "Release tests" on this PR's last head, finished after the
+merge): the public-repo check, database permissions, preview safety, the smoke test and **performance** passed on CI's
+machines with the budgets set here. Two suites failed, and both were real: **WebKit and Firefox**, on their first run,
+found sideways scrolling on the smallest phones, on a tablet in landscape and in Perio's arcade. Chromium had missed it
+because the check compared the page with `innerWidth`, which a phone browser grows when it zooms out to fit a page that's
+too wide. And **accessibility** found one of Perio Review's tables unreachable by keyboard with CI's wider fonts.
+BUG-010 to BUG-015; the follow-up PR fixes the check and all but the tablet one (BUG-014, named by the fixed check on its
+next run).
+
 ## Exercised by hand (scripted browser, screenshots looked at)
 
 - The Preview panel on a laptop (light) and a 390 px phone (dark): frame, button above the phone's bottom bar, account
@@ -64,7 +73,7 @@ tests. Functions anon can run that the site doesn't call are pure helpers or sec
 
 ## Bugs
 
-Logged in the [bug log](../bug-log.md): BUG-001 (S2, fixed and retested here: `supabase/schema.sql` couldn't rebuild the
+Logged in the [bug log](../bug-log.md): BUG-010 to BUG-015 from the first full run on GitHub (above); BUG-001 (S2, fixed and retested here: `supabase/schema.sql` couldn't rebuild the
 database), BUG-002 to BUG-007 (S3, known accessibility issues, now held at their counts by the baseline), BUG-008 (S3,
 slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets). No S1.
 
@@ -75,8 +84,8 @@ slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets)
   ([task](../../tasks/done/2026-11-04-preview-hosting-and-staging.md)).
 - **Staging database:** not set up (Sam, 2026-11-04: fixtures for now). Server-side logic (XP, streaks, boards) is approximated in fixtures;
   permissions are covered by `rls.js`.
-- **WebKit and Firefox:** not installed in this session; the "Release tests" workflow installs them, so its first run is
-  their first run. Real Safari on an iPhone isn't covered by an agent.
+- **WebKit and Firefox:** not installed in this session; the "Release tests" workflow installs them. Their first run
+  (above) found BUG-011 to BUG-014. Real Safari on an iPhone isn't covered by an agent.
 - **The workflows themselves** ("Check hubs" with the new steps, "Release tests") run for the first time on this PR.
   Performance timings were calibrated here and may need `perf.js --update` from CI's numbers if CI machines are slower.
 - **Realtime** (who's online, nukes, bosses) isn't simulated in previews.

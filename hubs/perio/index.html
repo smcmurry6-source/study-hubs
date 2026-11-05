@@ -740,7 +740,9 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
   .gm-legend{grid-template-columns:minmax(0,1fr)}
   .gm-title{font-size:1rem;width:100%;order:-1}
 }
-@media (max-width: 420px){
+/* phones: #app's side padding drops to 14px at 520px, so the arcade's full-bleed margin follows it */
+@media (max-width: 520px){
+  #panel-arcade{margin:-20px -14px 0}
 }
 
 
@@ -6654,7 +6656,9 @@ var REF_SECTIONS = [
 var REVIEW = { lec:'all', q:'', hide:false };
 function refCardHTML(s){
   var l = LECTURE_BY_ID[s.lec];
-  return '<section class="ref-card tag-'+l.tag+'" id="ref-'+s.id+'" data-ref="'+s.id+'"><div class="eyebrow">'+sessChip(l)+escHtml(l.title)+'</div><h3>'+escHtml(s.title)+'</h3>'+s.body()+'</section>';
+  /* a table that scrolls sideways gets a keyboard stop and a name (WCAG 2.1.1; axe scrollable-region-focusable) */
+  var body = s.body().replace(/<div class="table-wrap">/g, '<div class="table-wrap" tabindex="0" role="region" aria-label="'+escHtml(s.title)+' (table)">');
+  return '<section class="ref-card tag-'+l.tag+'" id="ref-'+s.id+'" data-ref="'+s.id+'"><div class="eyebrow">'+sessChip(l)+escHtml(l.title)+'</div><h3>'+escHtml(s.title)+'</h3>'+body+'</section>';
 }
 function applyHide(root){
   root.querySelectorAll('table.chart-table tbody tr').forEach(function(row){
