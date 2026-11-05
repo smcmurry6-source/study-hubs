@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Retention test (migration_v50, vault/reference/analytics-retention.md): builds a throwaway PostgreSQL database from
+// Retention test (migration_v51, vault/reference/analytics-retention.md): builds a throwaway PostgreSQL database from
 // supabase/schema.sql, seeds made-up rows of every age, and checks that sh_retention_run():
 //   - with p_apply false only counts, and changes nothing;
 //   - deletes exactly the approved rows (raw pings > 30 days, click reach > 90 days, feature events > 180 days, test

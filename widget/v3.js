@@ -2779,7 +2779,10 @@
   }
   /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
      archiveHour overrides it, e.g. 24 for one due at 11:59 pm; SH_EXPORT.archiveOn can override the date for a temporary reopen);
-     a hub page still reachable after that says so once per visit, with a way back to the dashboard. */
+     a hub page still reachable after that says so once per visit, with a way back to the dashboard.
+     An override set on the admin page (review/, Hubs tab; get_hub_overrides, migration_v50) wins over the dates while it is
+     in force, the same rule as widget/archive.js: archived or hidden shows the notice, live doesn't. If the network is slow
+     (3 s) the dashboard's last copy of the overrides decides, else the dates. */
   (function(){
     if (EXPORT_ONLY) return;
     var last = null;
@@ -2796,20 +2799,46 @@
         if (!last || d > last.at) last = { at: d, x: last && last.x ? last.x : { label:"exam" } };
       }
     }
-    if (!last || new Date() < last.at) return;
-    try { if (sessionStorage.getItem("sh_archived_seen_" + HUB)) return; sessionStorage.setItem("sh_archived_seen_" + HUB, "1"); } catch (e) {}
-    function show(){
+    var byDates = !!(last && new Date() >= last.at);
+    try { if (sessionStorage.getItem("sh_archived_seen_" + HUB)) return; } catch (e) {}
+    var OV_KEY = "sh_hub_overrides";
+    function overrideIn(rows){
+      var o = null; (rows || []).forEach(function(r){ if (r && r.hub === HUB) o = r; });
+      if (!o || ["live", "archived", "hidden"].indexOf(o.state) < 0) return null;
+      if (o.until && new Date() >= new Date(o.until)) return null;
+      return o;
+    }
+    function cached(){ try { var c = JSON.parse(localStorage.getItem(OV_KEY) || "null"); return c && Array.isArray(c.rows) && Date.now() - c.t < 7 * 864e5 ? c.rows : null; } catch (e) { return null; } }
+    var decided = false;
+    function decide(rows){
+      if (decided) return; decided = true;
+      var o = overrideIn(rows);
+      if (!(o ? o.state !== "live" : byDates)) return;
+      try { sessionStorage.setItem("sh_archived_seen_" + HUB, "1"); } catch (e) {}
+      var early = !byDates;   /* archived by hand before its last exam passed */
+      if (document.body) show(early); else document.addEventListener("DOMContentLoaded", function(){ show(early); });
+    }
+    if (supabase) {
+      var wait = setTimeout(function(){ decide(cached()); }, 3000);
+      supabase.rpc("get_hub_overrides").then(function(r){
+        clearTimeout(wait);
+        if (r && !r.error && Array.isArray(r.data)) { try { localStorage.setItem(OV_KEY, JSON.stringify({ t: Date.now(), rows: r.data })); } catch (e) {} decide(r.data); }
+        else decide(cached());   /* before migration_v50, or an error: the last copy, else the dates */
+      }, function(){ clearTimeout(wait); decide(cached()); });
+    } else decide(cached());
+    function show(early){
       var box = document.createElement("div");
       box.className = "sh-archived"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "This hub is archived");
       box.innerHTML = '<div class="sh-archived-card"><b>This hub is archived</b>' +
-        '<p>It closed after ' + esc(/^exam\b/i.test(last.x.label || "") ? last.x.label : "the " + (last.x.label || "exam")) + ' on ' + esc(last.at.toLocaleDateString(undefined, { month: "long", day: "numeric" })) +
-        '. Everything still works if you want to look back, but it is no longer updated. Tell us how the exam went from the dashboard.</p>' +
+        (early || !last
+          ? '<p>Everything still works if you want to look back, but it isn\u2019t being updated right now.</p>'
+          : '<p>It closed after ' + esc(/^exam\b/i.test(last.x.label || "") ? last.x.label : "the " + (last.x.label || "exam")) + ' on ' + esc(last.at.toLocaleDateString(undefined, { month: "long", day: "numeric" })) +
+            '. Everything still works if you want to look back, but it is no longer updated. Tell us how the exam went from the dashboard.</p>') +
         '<div class="sh-archived-foot"><button type="button" class="sh-archived-stay">Keep browsing</button>' +
         '<a class="sh-archived-go" href="' + new URL("../", thisScript.src).href + '">Go to the dashboard</a></div></div>';
       box.addEventListener("click", function(e){ if (e.target === box || e.target.closest(".sh-archived-stay")) box.remove(); });
       document.body.appendChild(box);
     }
-    if (document.body) show(); else document.addEventListener("DOMContentLoaded", show);
   })();
   /* ---------- lecture notes: a lecture list that scrolls on its own, Previous / Next and Report under each lecture's notes,
      and drawn figures that fit on screen with their controls (Sam, 2026-11-03). Works on any hub whose notes are a

@@ -13,10 +13,13 @@ const ONLY = arg('only'), SKIP = arg('skip') || [];
 const SUITES = [
   ['syntax', 'Syntax and merge markers', 'tools/ci/syntax.js'],
   ['vault', 'Vault notes, links and tasks', 'tools/ci/vault.js'],
+  ['archive', 'Hub archive state (dates and admin overrides)', 'tools/ci/archive.js'],
   ['secrets', 'Public-repo check (secrets, course material)', 'tools/release/secrets.js'],
   ['smoke', 'Smoke test and question-bank lint', 'tools/ci/smoke.js'],
   ['preview', 'Preview safety (no production requests, noindex, fixtures)', 'tools/ci/preview.js'],
   ['rls', 'Database permissions (RLS, grants, secrets)', 'tools/release/rls.js'],
+  ['adminui', 'Admin page in a preview (Live, Hubs, newest first, phone layout)', 'tools/release/admin-ui.js'],
+  ['admin', 'Admin operations on fixtures (live presence privacy, archive overrides, order)', 'tools/release/admin-ops.js'],
   ['a11y', 'Accessibility (axe, keyboard, reduced motion)', 'tools/release/a11y.js'],
   ['perf', 'Performance budgets (slow 4G phone)', 'tools/release/perf.js'],
   ['matrix', 'Devices and resilience (refresh, history, offline, slow)', 'tools/release/matrix.js']

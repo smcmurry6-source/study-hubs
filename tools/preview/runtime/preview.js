@@ -16,7 +16,8 @@
   if (window.__shPreview) return;
   var C = window.SH_PREVIEW_CONFIG || {};
   var PERSONAS = C.personas || [];
-  var K = { db: "sh_preview_db_v1", log: "sh_preview_log_v1", persona: "sh_preview_persona", now: "sh_preview_now", ui: "sh_preview_ui", blocked: "sh_preview_blocked" };
+  var K = { db: "sh_preview_db_v1", log: "sh_preview_log_v1", persona: "sh_preview_persona", now: "sh_preview_now", ui: "sh_preview_ui", blocked: "sh_preview_blocked",
+    ovr: "sh_preview_overrides_v1" };   /* hub archive overrides: site-wide, kept when the test account changes */
   function lsGet(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function jget(k, d){ try { var v = JSON.parse(lsGet(k)); return v == null ? d : v; } catch (e) { return d; } }
@@ -64,7 +65,7 @@
   function applyPersona(id){
     var p = persona(id) || persona("returning") || PERSONAS[0];
     if (!p) return;
-    var keep = {}; [K.now, K.ui, K.log, K.blocked].forEach(function(k){ keep[k] = lsGet(k); });
+    var keep = {}; [K.now, K.ui, K.log, K.blocked, K.ovr].forEach(function(k){ keep[k] = lsGet(k); });
     try { localStorage.clear(); } catch (e) {}
     try { sessionStorage.clear(); } catch (e) {}
     Object.keys(keep).forEach(function(k){ lsSet(k, keep[k]); });
@@ -289,11 +290,112 @@
           .concat(db.suggestions.map(function(s){ return { kind: "suggestion", id: s.id, hub: s.hub, note: s.note, resolved: !!s.resolved, created_at: s.at, reply: s.reply || null, resolved_at: null, can_notify: true, reply_seen_at: null }; }))
           .concat([{ kind: "flag", id: 8801, hub: "occlusion", note: "Fixture report: choice B and C read the same.", resolved: false, created_at: iso(t - d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null },
                    { kind: "suggestion", id: 8802, hub: "dashboard", note: "Fixture suggestion: a dark mode for the arcade.", resolved: false, created_at: iso(t - 2 * d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null }]);
-      case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", at: iso(t - d), hidden: false, reports: 1 }];
+      case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", created_at: iso(t - d), hidden: !!(db.podHidden || {})[7701], hidden_by: (db.podHidden || {})[7701] ? "admin" : null, reports: 1 },
+        { id: 7702, hub: "occlusion", ep: "timmy-time", name: "Test Tubercle", body: "Fixture comment: the Bennett part finally clicked.", created_at: iso(t - 3 * d), hidden: false, hidden_by: null, reports: 0 }];
+      /* the admin page's other views, so each one has something to show in a preview (made-up numbers) */
+      case "get_visitor_by_section": {
+        var secs = { occlusion: ["home/dashboard", "bank/practice", "compendium/l3", "mock/exam", "arcade/showdown", "notes/l1"],
+                     perio: ["home/dashboard", "bank/practice", "notes/s6", "review/staging", "mock/exam"],
+                     "pcd-implants-exam1": ["home/dashboard", "notes/l1", "bank/practice", "listen/timmy-time"],
+                     "special-patient-care": ["bank/practice", "notes/l2", "home/dashboard"] }, out = [];
+        Object.keys(secs).forEach(function(h, hi){ secs[h].forEach(function(sec, i){ out.push({ hub: h, section: sec, unique_visitors: 30 - hi * 4 - i * 3, total_minutes: Math.round((620 - hi * 90) / (i + 1.4)) }); }); });
+        return out;
+      }
+      case "get_click_summary": {
+        var tg = ["mode=bank", "mode=mock", "#bankShow-likely", "mode=notes", "widget:#shSearch", ".qcard-next", "mode=arcade", "#homeDrill"], outc = [];
+        ["occlusion", "perio", "dashboard"].forEach(function(h, hi){ tg.forEach(function(x, i){ if (h === "dashboard" && i > 3) return; outc.push({ hub: h, target: h === "dashboard" ? ["open:occlusion", "open:perio", "about", "inbox"][i] : x, section: i % 2 ? "bank/practice" : "home/dashboard", clicks: Math.round((480 - hi * 120) / (i + 1)), people: Math.max(2, 34 - hi * 6 - i * 3) }); }); });
+        return outc;
+      }
+      case "get_feature_events": return [
+        { hub: "occlusion", kind: "view", people: 41, total: 690 }, { hub: "perio", kind: "view", people: 35, total: 510 },
+        { hub: "occlusion", kind: "tts:start-full", people: 14, total: 52 }, { hub: "occlusion", kind: "tts:secs", people: 14, total: 9200 },
+        { hub: "pcd-implants-exam1", kind: "pod:timmy-time:play", people: 11, total: 19 }, { hub: "pcd-implants-exam1", kind: "pod:timmy-time:q4", people: 6, total: 6 },
+        { hub: "dashboard", kind: "egg:timmy-start", people: 4, total: 5 }, { hub: "occlusion", kind: "fig-seen:angle-classes", people: 22, total: 61 },
+        { hub: "dashboard", kind: "name:set", people: 9, total: 9 }];
+      case "get_search_terms": return [
+        { hub: "occlusion", term: "bennett angle", searches: 14, hits: 6 }, { hub: "perio", term: "staging", searches: 11, hits: 9 },
+        { hub: "occlusion", term: "curve of spee", searches: 8, hits: 3 }, { hub: "perio", term: "furcation grade", searches: 6, hits: 0 },
+        { hub: "pcd-implants-exam1", term: "abutment", searches: 5, hits: 4 }, { hub: "occlusion", term: "fixture search with no result", searches: 3, hits: 0 }];
+      case "get_nuke_summary": return [{ total_launches: 12, unique_launchers: 7 }];
+      case "get_nuke_by_hub": return [{ hub: "occlusion", launches: 8 }, { hub: "perio", launches: 4 }];
+      case "get_nuke_unlocks": return [{ hub: "occlusion", unlocks: 15, unused: 6 }, { hub: "perio", unlocks: 7, unused: 3 }];
+      case "get_nuke_recent": return FAKE_NAMES.slice(0, 4).map(function(n, i){ return { display_name: n, hub: i % 2 ? "perio" : "occlusion", launched_at: iso(t - (i + 1) * 5 * 36e5) }; });
       case "get_insights": case "get_insight_retries": case "get_data_quality": return synthInsights(fn, t, d);
       default: return [];
     }
   }
+  /* ---------- admin operations (migration_v50): live presence, hub archive overrides, newest-first check-ins ----------
+     Overrides live in their own key (K.ovr), shared by every test account, so an admin can archive a hub on review/
+     and a student account sees it on the dashboard. Check-ins and surveys arrive deliberately out of order (and with the
+     newest group first by time but not by name), so the admin page's own sorting is what gets tested. */
+  function ovrStore(){ var o = jget(K.ovr, null); if (!o || !Array.isArray(o.rows) || !Array.isArray(o.log)) o = { rows: [], log: [], seq: 0 }; return o; }
+  function ovrActive(r, t){ return !r.until || new RealDate(r.until).getTime() > t; }
+  function ovrVersion(r){ return String(Math.floor(new RealDate(r.set_at).getTime() * 1000)); }
+  var ARCH_STATES = ["live", "archived", "hidden"];
+  function adminOps(fn, a){
+    var t = now(), o, i, cur, row;
+    switch (fn) {
+      case "admin_live_presence": {
+        var min = Math.max(1, Math.min(15, Number(a.p_minutes) || 3));
+        var hubs = [
+          { hub: "occlusion", people: 3, names: ["Fixture Fluoride", "Mock Mandible", "Sample Sealant"] },
+          { hub: "perio", people: 2, names: ["Dummy Dentin", "Sample Sealant"] },
+          { hub: "pcd-implants-exam1", people: 1, names: [db.name || "Preview Admin"] }
+        ];
+        return { data: { minutes: min, as_of: iso(t), total: 5, hubs: hubs } };
+      }
+      case "admin_hub_overrides":
+        o = ovrStore();
+        return { data: o.rows.map(function(r){ var act = ovrActive(r, t); return { hub: r.hub, state: r.state, until: r.until, note: r.note, set_at: r.set_at, active: act, version: act ? ovrVersion(r) : "auto" }; }) };
+      case "admin_hub_archive_log":
+        o = ovrStore();
+        return { data: o.log.slice().sort(function(x, y){ return (y.at < x.at ? -1 : y.at > x.at ? 1 : 0) || y.id - x.id; }).slice(0, Math.max(1, Math.min(200, Number(a.p_limit) || 50))) };
+      case "admin_set_hub_archive": {
+        var bad = function(msg, code){ return { error: { status: 400, code: code || "22023", message: msg } }; };
+        if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(String(a.p_hub || ""))) return bad("bad hub id");
+        if (a.p_state !== "auto" && ARCH_STATES.indexOf(a.p_state) < 0) return bad("bad state");
+        var until = a.p_state === "auto" || !a.p_until ? null : new RealDate(a.p_until).toISOString();
+        if (until && (new RealDate(until).getTime() <= t || new RealDate(until).getTime() > t + 400 * 864e5)) return bad("end time must be in the future, within 400 days");
+        var note = String(a.p_note || "").trim() || null;
+        if (note && note.length > 300) return bad("note is over 300 characters");
+        o = ovrStore();
+        for (i = 0; i < o.rows.length; i++) if (o.rows[i].hub === a.p_hub) cur = o.rows[i];
+        var inForce = cur && ovrActive(cur, t), oldState = inForce ? cur.state : "auto", oldUntil = inForce ? cur.until : null, version = inForce ? ovrVersion(cur) : "auto";
+        if (a.p_expect != null && a.p_expect !== version) return { error: { status: 409, code: "40001", message: "conflict: this hub was changed since the page loaded" } };
+        if (a.p_state === oldState && (until || null) === (oldUntil || null)) return { data: { hub: a.p_hub, state: oldState, until: oldUntil, changed: false, version: version } };
+        o.rows = o.rows.filter(function(r){ return r.hub !== a.p_hub; });
+        if (a.p_state !== "auto") { row = { hub: a.p_hub, state: a.p_state, until: until, note: note, set_at: iso(t) }; o.rows.push(row); }
+        o.seq = (o.seq || 0) + 1;
+        o.log.push({ id: o.seq, hub: a.p_hub, old_state: oldState, old_until: oldUntil, new_state: a.p_state, new_until: until, note: note, at: iso(t) });
+        jset(K.ovr, o);
+        return { write: true, data: { hub: a.p_hub, state: a.p_state, until: until, changed: true, version: row ? ovrVersion(row) : "auto" } };
+      }
+      case "get_exam_debriefs": {
+        var h = 36e5, mk = function(hub, exam, who, ago, ready, went, match, missed){ return { hub: hub, exam: exam, visitor_id: "fixture-" + who, created_at: iso(t - ago),
+          answers: { ready: ready, went: went, match: match, missed: missed }, minutes: 40 + (hash(who) % 300), answered: 30 + (hash(who + hub) % 400), accuracy: 55 + (hash(hub + who) % 40) }; };
+        /* by time the groups go Heme & Endo (1 h ago), PCD Implants (5 h), Occlusion (2 days), Perio (20 days); by name they
+           would go the other way round, and the rows inside each group arrive oldest first */
+        return { data: [
+          mk("perio", "2026-10-01 Midterm", "p1", 20 * 24 * h, 3, "About as expected", "About right", "Fixture: more staging pictures."),
+          mk("occlusion", "2026-10-21 Midterm", "o2", 9 * 24 * h, 4, "Better than expected", "About right", "Fixture: more casts with contacts."),
+          mk("occlusion", "2026-10-21 Midterm", "o1", 2 * 24 * h, 2, "Worse than expected", "Exam asked different things", "Fixture: the articulator settings."),
+          mk("pcd-implants-exam1", "2026-11-06 Exam", "i1", 5 * h, 4, "About as expected", "About right", "Fixture: more abutment pictures."),
+          mk("heme-endo-exam1", "2026-10-30 Exam", "e2", 3 * 24 * h, 3, "About as expected", "About right", "Fixture: the calcium drugs table."),
+          mk("heme-endo-exam1", "2026-10-30 Exam", "e1", 1 * h, 5, "Better than expected", "About right", "Fixture: nothing, it was great.")
+        ] };
+      }
+      case "get_survey_results":
+        return { data: [
+          { survey_id: 41, slug: "fixture-round-1", title: "Fixture survey, round 1 (older)", active: false, created_at: iso(t - 30 * 864e5), responses: 2, skipped: 1,
+            questions: [{ id: "q1", kind: "choice", prompt: "Where do you study most?", options: ["Phone", "Laptop", "Tablet"] }], answers: [{ q1: "Laptop" }, { q1: "Phone" }] },
+          { survey_id: 42, slug: "fixture-round-2", title: "Fixture survey, round 2 (newer)", active: true, created_at: iso(t - 2 * 864e5), responses: 3, skipped: 0,
+            questions: [{ id: "q1", kind: "scale", prompt: "How useful was the Daily Drill?" }, { id: "q2", kind: "text", prompt: "Anything to add?" }],
+            answers: [{ q1: 5, q2: "Fixture: newest answer." }, { q1: 4, q2: "Fixture: middle answer." }, { q1: 3, q2: "Fixture: oldest answer." }] }
+        ] };
+    }
+    return null;
+  }
+
   /* the admin page's Insights tab (migration_v49): every number made up, shaped like the real responses; a few cross
      their thresholds on purpose so the flags and decision lists show, and one hub has too few people to be listed */
   function synthInsights(fn, t, d){
@@ -331,8 +433,11 @@
     a = a || {};
     if (ADMIN_FNS.test(fn)) {
       if (a.p_secret !== C.adminSecret) return unauthorized();
-      if (/^(admin_|set_report_resolved)/.test(fn)) {
+      var ops = adminOps(fn, a);
+      if (ops) return ops;
+      if (/^(admin_|set_report_resolved)/.test(fn) && fn !== "admin_pod_comments") {
         if (fn === "set_report_resolved") db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
+        if (fn === "admin_hide_pod_comment") { db.podHidden = db.podHidden || {}; db.podHidden[a.p_id] = !!a.p_hidden; }
         if (fn === "admin_post_notice") db.notices.push({ title: a.p_title, message: a.p_message, at: iso(now()) });
         save(); return { write: true, data: null };
       }
@@ -340,6 +445,7 @@
     }
     var v = a.p_visitor, hub = a.p_hub, t = now();
     switch (fn) {
+      case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
       case "get_display_name": return { data: v === db.visitor ? db.name : null };
       case "set_display_name": if (v === db.visitor) { db.name = a.p_name; save(); } return { write: true, data: null };
       case "clear_display_name": if (v === db.visitor) { db.name = null; save(); } return { write: true, data: null };
@@ -440,10 +546,16 @@
     var hub = f.hub && /^eq\./.test(f.hub) ? f.hub.slice(3) : null;
     var ids = f.qid && /^in\.\(/.test(f.qid) ? parseList(f.qid.slice(4, -1)) : null, t = now();
     function qids(){ if (ids) return ids; var E = hub && hubExport(hub); return E ? E.questions.map(function(q){ return q.id; }) : []; }
+    /* the admin page reads these tables whole (no hub): a few real question ids from three live hubs, made-up numbers */
+    var ADMIN_Q = { occlusion: ["rv-occl-artic", "rv-slide-pct", "rv-christensen", "rv-posselt", "fp-pm1b", "rv-2s-angle", "an-compound"],
+                    perio: ["q1-01", "q1-30", "q2-24", "q3-19", "q3-46", "q4-23"], "special-patient-care": ["in-def", "in-medicaid", "bg-never", "bg-benef", "ds-age"] };
+    function wholeTable(fn){ var out = []; Object.keys(ADMIN_Q).forEach(function(h){ ADMIN_Q[h].forEach(function(q){ out = out.concat(fn(h, q)); }); }); return out; }
     switch (name) {
-      case "question_stats": return qids().map(function(q){ var s = classStat(hub, q); s.hub = hub; return s; });
-      case "question_choices": var rows = []; qids().forEach(function(q){ rows = rows.concat(choiceRows(hub, q)); }); return rows;
-      case "mode_stats": return ["home", "compendium", "bank", "mock", "arcade", "listen"].map(function(m, i){ return { mode: m, opens: 300 - i * 45 }; });
+      case "question_stats": if (!hub && !ids) return wholeTable(function(h, q){ var s = classStat(h, q); s.hub = h; return [s]; });
+        return qids().map(function(q){ var s = classStat(hub, q); s.hub = hub; return s; });
+      case "question_choices": if (!hub && !ids) return wholeTable(function(h, q){ return choiceRows(h, q).map(function(r){ r.hub = h; return r; }); });
+        var rows = []; qids().forEach(function(q){ rows = rows.concat(choiceRows(hub, q)); }); return rows;
+      case "mode_stats": return (hub ? [hub] : ["occlusion", "perio"]).reduce(function(o, h, hi){ return o.concat(["home", "compendium", "bank", "mock", "arcade", "listen"].map(function(m, i){ return { hub: h, mode: m, opens: 300 - i * 45 - hi * 60 }; })); }, []);
       case "presence_hourly": var hrs = []; for (var h = 0; h < 24; h++) hrs.push({ hour_of_day: h, ping_count: Math.round(40 + 160 * Math.max(0, Math.sin((h - 6) / 24 * 2 * Math.PI))) }); return hrs;
       case "changelog":
         var built = C.builtAt || iso(t);

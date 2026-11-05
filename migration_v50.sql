@@ -1,364 +1,233 @@
--- v50 (2026-11-05): the analytics retention schedule in force (Sam approved it on 2026-11-04;
--- vault/reference/analytics-retention.md, vault/rules/learner-data-privacy.md).
--- What it does, in order:
---   1. Drops activity_pings_visit_idx (27 MB; nothing has read it since the rollups of v45).
---   2. Deleting or moving raw pings no longer rebuilds activity_hourly / activity_visits from what is left when the
---      transaction sets sh.keep_rollups = 'on' (the retention job and device linking do), so trimming old pings keeps
---      their hours.
---   3. redeem_link_code ("Link my devices") moves the linked id's activity_hourly and activity_visits rows itself,
---      instead of rebuilding both ids from raw pings (which would drop every hour older than the raw pings kept).
---   4. get_hub_recap reads activity_hourly (same minutes, days, sections and hours of day; the pre-2026-09-25 cap of
---      3 hours per visit no longer applies, which changes only a few hours of Perio's and MSK 3's first days).
---   5. feature_daily (feature events collapsed to day x page x kind with people counts, no ids) and retention_runs
---      (what each run removed, and the database size).
---   6. sh_retention_run(p_apply): the approved deletes. With p_apply false (the default) it only counts what is due.
---        raw activity_pings          older than 30 days         deleted (activity_hourly / activity_visits keep them)
---        ui_click_reach              older than 90 days         deleted (ui_clicks keeps the counts, no ids)
---        feature_events              older than 180 days        collapsed into feature_daily, then deleted
---        question_flags, hub_suggestions   120 days after resolving   visitor id removed (text and reply kept)
---        exam_debriefs               a year after the check-in  visitor id replaced by 'anon-<row id>'
---        survey_responses            "No thanks" rows of a closed survey deleted; answers 90 days after it closed
---                                    get 'anon-<row id>' instead of the visitor id
---        link_attempts               older than 7 days          deleted
---        test hubs ('zz-...') and blank-hub rows                deleted
---      Not here: personal_answers / xp (ranks are built from them), the trophies and games tables, and Timmy Time
---      reactions and comments (removed by hand with the hub's page, vault/reference/analytics-retention.md).
---   7. sh_retention_status(): the last runs and the schedule; get_data_quality adds it for the admin page. What a
---      run would remove now: select sh_retention_run(); (counts only).
---   8. A weekly pg_cron job runs sh_retention_run(true) on Sundays at 09:23 UTC (3:23 am Central).
--- Every function here is closed to visitors (anon, authenticated); agents call them on the Supabase connector.
+-- migration_v50: admin live presence, hub archive overrides with an audit trail, newest-first check-ins and surveys.
+-- Admin page (review/): a Live tab, a Hubs tab, and the Surveys tab's check-ins in order. Sam's calls (2026-11-04,
+-- vault/decisions.md): live names are the leaderboard name; a manual archive state lasts until it is cleared, or until
+-- an optional end time. How it all works: vault/reference/admin-operations.md.
+--
+-- Applied to the live project on 2026-11-05 (connector apply_migration), after Sam approved the release in writing
+-- ("Merge when ready"; tier 3, RELEASE_TEST_PLAN.md). Tested first on a throwaway database built from
+-- supabase/schema.sql (tools/release/rls.js and tools/release/admin-ops.js), never against the class's data; the live
+-- permission audit (tools/release/rls-audit.sql) returned no findings after it.
+-- Numbered v49 while it was being written; main's migration_v49.sql (analytics insights, #237) took that number.
+--
+-- 1. Live presence. "Live" = at least one study ping in the last 3 minutes (p_minutes, 1-15). widget/v3.js sends a ping
+--    for every 25 s a hub tab is visible and in use (record_activity_ping); it stops when the tab is hidden and after 15
+--    minutes with no input, so an open but forgotten tab drops off within 3 minutes. Three minutes leaves room for
+--    someone moving between sections (each section banks its own 25 s) and a ping lost on a bad connection. The dashboard
+--    sends no pings, so this counts people in a hub. It reads only activity_pings_time_idx (pinged_at, include hub,
+--    visitor_id), a few minutes of rows. Devices linked to one person count once (visitor_links). Each person is shown by
+--    their leaderboard name (their own name if they chose one, otherwise their random class name: get_display_name).
+--    Never a visitor id, an email, a section or a timestamp per person.
+--
+-- 2. Archive overrides. The dashboard archives a hub by its dates in index.html (HUBS: ARCHIVE_HOUR on its last exam
+--    day, archiveOn, hideCardOn). An override sets a hub's public state by hand: live (card open, even after its exam),
+--    archived (greyed card, no Open button) or hidden (no card). Precedence (widget/archive.js does the same in the
+--    browser): an override that is in force wins; it is in force until Sam sets the hub back to automatic, or until its
+--    end time (until) if it has one; then the dates decide again. It never deletes or moves anything: the hub's page,
+--    its direct link, questions, analytics and everyone's progress stay as they are, and check-ins still follow the
+--    exam dates. Every change is written to hub_archive_log in the same transaction (old and new state, end time, note,
+--    when). One passphrase is shared, so the log can't say who; the note can.
+--
+-- 3. Order. get_exam_debriefs (from migration_v47's activity_hourly version, applied 2026-10-30) and
+--    get_survey_results return newest first by created_at with id as the tie-breaker, so equal times can't swap
+--    between loads. The admin page also sorts the check-in groups by their newest check-in, not by hub name.
 
--- ---------- 1. the unused index ----------
-drop index if exists public.activity_pings_visit_idx;
-
--- ---------- 2. rollups survive a retention delete or a device link ----------
-create or replace function public.sh_activity_on_delete()
-returns trigger language plpgsql security definer set search_path = public as $$
-begin
-  -- the retention job and device linking keep activity_hourly / activity_visits themselves
-  if current_setting('sh.keep_rollups', true) = 'on' then return null; end if;
-  perform sh_activity_rebuild(array(select distinct visitor_id from old_rows));
-  return null;
-end; $$;
-
-create or replace function public.sh_activity_on_update()
-returns trigger language plpgsql security definer set search_path = public as $$
-begin
-  if current_setting('sh.keep_rollups', true) = 'on' then return null; end if;
-  perform sh_activity_rebuild(array(select visitor_id from old_rows union select visitor_id from new_rows));
-  return null;
-end; $$;
-
--- ---------- 3. Link my devices moves the rollups instead of rebuilding them ----------
-create or replace function public.redeem_link_code(p_code text, p_visitor text)
-returns text language plpgsql security definer set search_path = public as $$
-declare p text; c text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9]', '', 'g'));
-begin
-  if p_visitor is null or length(p_visitor) not between 1 and 80 then return null; end if;
-  if (select count(*) from link_attempts where visitor_id = p_visitor and tried_at > now() - interval '1 hour') >= 10 then return null; end if;
-  insert into link_attempts (visitor_id) values (p_visitor);
-  select visitor_id into p from link_codes where code = c and created_at > now() - interval '10 minutes';
-  if p is null then return null; end if;
-  delete from link_codes where code = c;
-  if p = p_visitor then return p; end if;
-  -- follow an existing chain so everything ends on one id
-  p := coalesce((select primary_id from visitor_links where alias_id = p), p);
-
-  update personal_answers set visitor_id = p where visitor_id = p_visitor;
-  update arcade_scores set visitor_id = p where visitor_id = p_visitor;
-  update egg_events set visitor_id = p where visitor_id = p_visitor;
-  -- time (v50): move the hour and visit rollups, then the raw pings with the rebuild trigger off, so hours whose raw
-  -- pings the retention job already removed are kept
-  insert into activity_hourly (h, hub, section, visitor_id, n)
-    select h, hub, section, p, n from activity_hourly where visitor_id = p_visitor
-    on conflict (h, hub, section, visitor_id) do update set n = activity_hourly.n + excluded.n;
-  delete from activity_hourly where visitor_id = p_visitor;
-  insert into activity_visits (visit_id, visitor_id, first_at, last_at)
-    select visit_id, p, first_at, last_at from activity_visits where visitor_id = p_visitor
-    on conflict (visit_id, visitor_id) do update set first_at = least(activity_visits.first_at, excluded.first_at),
-      last_at = greatest(activity_visits.last_at, excluded.last_at);
-  delete from activity_visits where visitor_id = p_visitor;
-  perform set_config('sh.keep_rollups', 'on', true);
-  update activity_pings set visitor_id = p where visitor_id = p_visitor;
-  perform set_config('sh.keep_rollups', 'off', true);
-  update nuke_launches set visitor_id = p where visitor_id = p_visitor;
-  insert into achievements (visitor_id, kind, hub, created_at) select p, kind, hub, created_at from achievements where visitor_id = p_visitor on conflict do nothing;
-  delete from achievements where visitor_id = p_visitor;
-  insert into survey_responses (survey_id, visitor_id, answers, created_at) select survey_id, p, answers, created_at from survey_responses where visitor_id = p_visitor on conflict do nothing;
-  delete from survey_responses where visitor_id = p_visitor;
-  insert into ui_click_reach (day, hub, target, visitor_id) select day, hub, target, p from ui_click_reach where visitor_id = p_visitor on conflict do nothing;
-  delete from ui_click_reach where visitor_id = p_visitor;
-  insert into correct_streaks (visitor_id, current_streak, best_streak, updated_at)
-    select p, current_streak, best_streak, updated_at from correct_streaks where visitor_id = p_visitor
-    on conflict (visitor_id) do update set best_streak = greatest(correct_streaks.best_streak, excluded.best_streak),
-      current_streak = case when excluded.updated_at > correct_streaks.updated_at then excluded.current_streak else correct_streaks.current_streak end,
-      updated_at = greatest(correct_streaks.updated_at, excluded.updated_at);
-  delete from correct_streaks where visitor_id = p_visitor;
-  -- pinned questions (v46): per question, the newer change wins
-  insert into question_pins (visitor_id, hub, qid, pinned, t)
-    select p, hub, qid, pinned, t from question_pins where visitor_id = p_visitor
-    on conflict (visitor_id, hub, qid) do update set pinned = case when excluded.t > question_pins.t then excluded.pinned else question_pins.pinned end,
-      t = greatest(question_pins.t, excluded.t);
-  delete from question_pins where visitor_id = p_visitor;
-  -- keep a chosen name if the first device had none
-  insert into visitor_names (visitor_id, display_name, updated_at) select p, display_name, updated_at from visitor_names where visitor_id = p_visitor
-    on conflict (visitor_id) do nothing;
-  delete from visitor_names where visitor_id = p_visitor;
-  update visitor_links set primary_id = p where primary_id = p_visitor;
-  insert into visitor_links (alias_id, primary_id) values (p_visitor, p) on conflict (alias_id) do update set primary_id = excluded.primary_id, linked_at = now();
-  return p;
-end;
-$$;
-
--- ---------- 4. the end-of-hub recap reads the hourly rollup ----------
-create or replace function public.get_hub_recap(p_secret text, p_hub text, p_exam date default null)
-returns jsonb language plpgsql stable security definer set search_path = public as $$
-declare
-  tz text := 'America/Chicago';
-  r jsonb;
-begin
-  if not sh_admin_ok(p_secret) then raise exception 'not allowed'; end if;
-
-  -- v50: from activity_hourly (n pings of 25 s per visitor, hour, hub and section), so it survives the 30-day trim
-  -- of raw pings; Central time is a whole number of hours from UTC, so hours and days come out exactly as before
-  with p as (
-    select a.visitor_id, nullif(a.section, '') as section, a.h at time zone tz as t, a.n
-    from activity_hourly a where a.hub = p_hub
-  ),
-  ans as (select pa.visitor_id, pa.qid, pa.correct, pa.answered_at at time zone tz as t from personal_answers pa where pa.hub = p_hub),
-  people as (select visitor_id from p union select visitor_id from ans),
-  days as (
-    select d, sum(m) as minutes, sum(a) as answers, count(distinct v) as people from (
-      select t::date as d, n * 25 / 60.0 as m, 0 as a, visitor_id as v from p
-      union all select t::date, 0, 1, visitor_id from ans) u group by d),
-  exam as (select coalesce(p_exam, (select max(d) from days where minutes >= 30)) as d),
-  per_ans as (select visitor_id, count(*) as answers, count(*) filter (where correct) as correct from ans group by 1),
-  per_days as (select visitor_id, count(distinct t::date) as days from (select visitor_id, t from p union all select visitor_id, t from ans) z group by 1),
-  -- names only for the 3 shown (anon_name is slow: ~15 ms a person)
-  per_person as (
-    select v.visitor_id, coalesce(pa.answers, 0) as answers, coalesce(pa.correct, 0) as correct, coalesce(pd.days, 0) as days
-    from people v left join per_ans pa on pa.visitor_id = v.visitor_id left join per_days pd on pd.visitor_id = v.visitor_id
-  ),
-  runs as (
-    select visitor_id, count(*) as len from (
-      select visitor_id, correct,
-        row_number() over (partition by visitor_id order by t) - row_number() over (partition by visitor_id, correct order by t) as grp
-      from ans) s where correct group by visitor_id, grp
-  ),
-  best_run as (
-    select r.len, coalesce(vn.display_name, anon_name(r.visitor_id)) as name
-    from (select * from runs order by len desc limit 1) r left join visitor_names vn on vn.visitor_id = r.visitor_id
-  ),
-  secs as (select split_part(coalesce(section, ''), '/', 1) as mode, section, sum(n) * 25 / 60.0 as minutes from p group by 1, 2),
-  nm as (select visitor_id, display_name from visitor_names),
-  notes_top as (
-    select p.visitor_id, sum(p.n) * 25 / 60.0 as minutes from p
-    where p.section ~ '(^|/)(notes|lecture-notes|lectures|reading)$' group by 1 order by 2 desc limit 1),
-  arcade_top as (
-    select p.visitor_id, sum(p.n) * 25 / 60.0 as minutes from p
-    where p.section like 'arcade%' group by 1 order by 2 desc limit 1),
-  mock_top as (
-    select m.visitor_id, m.correct, m.total from mock_scores m
-    where m.hub = p_hub and m.total >= 20 and (p_exam is null or (m.created_at at time zone tz)::date <= p_exam)
-    order by m.correct::numeric / m.total desc, m.total desc, m.created_at limit 1)
-  select jsonb_build_object(
-    'hub', p_hub,
-    'first_day', (select min(d) from days),
-    'last_day', (select max(d) from days),
-    'exam_day', (select d from exam),
-    'minutes', (select round(coalesce(sum(minutes), 0)) from days),
-    'people', (select count(*) from people),
-    'answers', (select coalesce(sum(attempts), 0) from question_stats where hub = p_hub),
-    'correct', (select coalesce(sum(correct), 0) from question_stats where hub = p_hub),
-    'questions_seen', (select count(*) from question_stats where hub = p_hub and attempts > 0),
-    'by_day', (select coalesce(jsonb_agg(jsonb_build_object('d', d, 'minutes', round(minutes), 'answers', answers, 'people', people) order by d), '[]') from days),
-    'by_hour', (select jsonb_agg(coalesce(c, 0) * 25 / 60 order by h) from generate_series(0, 23) h
-                left join (select extract(hour from t)::int as hr, sum(n) as c from p group by 1) x on x.hr = h),
-    'after_midnight', (select count(distinct visitor_id) from p where extract(hour from t) < 4),
-    'night_before', (select round(coalesce(sum(minutes), 0)) from days, exam where days.d = exam.d - 1),
-    'night_before_people', (select coalesce(max(people), 0) from days, exam where days.d = exam.d - 1),
-    'sections', (select coalesce(jsonb_agg(jsonb_build_object('section', section, 'minutes', round(minutes)) order by minutes desc), '[]')
-                 from (select * from secs where section <> '' order by minutes desc limit 8) s),
-    'modes', (select coalesce(jsonb_agg(jsonb_build_object('mode', mode, 'minutes', round(m)) order by m desc), '[]')
-              from (select mode, sum(minutes) as m from secs where mode <> '' group by mode order by 2 desc limit 6) s),
-    'mode_opens', (select coalesce(jsonb_agg(jsonb_build_object('mode', mode, 'opens', opens) order by opens desc), '[]') from mode_stats where hub = p_hub and opens > 0),
-    'toughest', (select coalesce(jsonb_agg(jsonb_build_object('qid', qid, 'attempts', attempts, 'correct', correct) order by pct, attempts desc), '[]')
-                 from (select qid, attempts, correct, correct::numeric / attempts as pct from question_stats
-                       where hub = p_hub and attempts >= greatest(5, (select count(*) from people) / 6) order by pct, attempts desc limit 25) s),
-    'choices', (select coalesce(jsonb_agg(jsonb_build_object('qid', qid, 'choice', choice, 'picks', picks)), '[]') from question_choices where hub = p_hub),
-    'top_answers', (select coalesce(jsonb_agg(jsonb_build_object('name', name, 'answers', answers, 'correct', correct) order by answers desc), '[]')
-                    from (select coalesce(vn.display_name, anon_name(t.visitor_id)) as name, t.answers, t.correct
-                          from (select * from per_person where answers > 0 order by answers desc limit 3) t
-                          left join visitor_names vn on vn.visitor_id = t.visitor_id) s),
-    'best_run', (select jsonb_build_object('name', name, 'len', len) from best_run),
-    'regulars', (select count(*) from per_person where days >= 3),
-    'median_answers', (select coalesce(percentile_cont(0.5) within group (order by answers), 0) from per_person where answers > 0),
-    'arcade_plays', (select count(*) from arcade_scores where hub = p_hub),
-    'nukes', (select count(*) from nuke_launches where hub = p_hub),
-    'goldens', (select count(*) from egg_events where hub = p_hub and kind = 'golden'),
-    'fairies', (select count(*) from egg_events where hub = p_hub and kind = 'fairy'),
-    'awards', jsonb_build_object(
-      'notes', (select jsonb_build_object('name', coalesce(nm.display_name, anon_name(t.visitor_id)), 'minutes', round(t.minutes)) from notes_top t left join nm on nm.visitor_id = t.visitor_id),
-      'arcade', (select jsonb_build_object('name', coalesce(nm.display_name, anon_name(t.visitor_id)), 'minutes', round(t.minutes)) from arcade_top t left join nm on nm.visitor_id = t.visitor_id),
-      'mock', (select jsonb_build_object('name', coalesce(nm.display_name, anon_name(t.visitor_id)), 'correct', t.correct, 'total', t.total) from mock_top t left join nm on nm.visitor_id = t.visitor_id)),
-    'mocks_taken', (select count(*) from mock_scores where hub = p_hub)
-  ) into r;
-  return r;
-end;
-$$;
-
--- ---------- 5. collapsed feature events and the run log ----------
-create table if not exists public.feature_daily (
-  day date not null,
+-- ---------------------------------------------------------------- archive overrides
+create table if not exists public.hub_archive_overrides (
+  hub text primary key check (hub ~ '^[a-z0-9][a-z0-9-]{0,39}$'),
+  state text not null check (state in ('live', 'archived', 'hidden')),
+  until timestamptz,                                  -- null: until Sam sets the hub back to automatic
+  note text check (note is null or length(note) <= 300),
+  set_at timestamptz not null default now()
+);
+create table if not exists public.hub_archive_log (
+  id bigint generated always as identity primary key,
   hub text not null,
-  kind text not null,
-  people integer not null,   -- distinct visitor ids that day (no ids kept)
-  n bigint not null,          -- the events' summed counts
-  primary key (day, hub, kind)
+  old_state text not null check (old_state in ('auto', 'live', 'archived', 'hidden')),
+  old_until timestamptz,
+  new_state text not null check (new_state in ('auto', 'live', 'archived', 'hidden')),
+  new_until timestamptz,
+  note text,
+  at timestamptz not null default now()
 );
-alter table public.feature_daily enable row level security;
+create index if not exists hub_archive_log_at_idx on public.hub_archive_log (at desc, id desc);
+alter table public.hub_archive_overrides enable row level security;   -- no policies: only the functions below touch them
+alter table public.hub_archive_log enable row level security;
+revoke all on public.hub_archive_overrides, public.hub_archive_log from anon, authenticated;
 
-create table if not exists public.retention_runs (
-  id bigserial primary key,
-  ran_at timestamptz not null default now(),
-  database_mb numeric,
-  counts jsonb not null
-);
-alter table public.retention_runs enable row level security;
-
--- ---------- 6. the approved deletes ----------
-create or replace function public.sh_retention_run(p_apply boolean default false)
-returns jsonb language plpgsql set search_path = public as $$
-declare
-  c jsonb := '{}'::jsonb;
-  k bigint;
-  cut_pings timestamptz := now() - interval '30 days';
-  cut_reach date := current_date - 90;
-  cut_events date := current_date - 180;
-begin
-  -- raw pings older than 30 days, and test or blank-hub pings; their hours stay in activity_hourly / activity_visits
-  if p_apply then
-    perform set_config('sh.keep_rollups', 'on', true);
-    delete from activity_pings where pinged_at < cut_pings or hub = '' or hub ~ '^zz-';
-    get diagnostics k = row_count;
-    perform set_config('sh.keep_rollups', 'off', true);
-  else
-    select count(*) into k from activity_pings where pinged_at < cut_pings or hub = '' or hub ~ '^zz-';
-  end if;
-  c := c || jsonb_build_object('activity_pings', k);
-
-  -- who tapped what, older than 90 days (ui_clicks keeps the counts, with no ids)
-  if p_apply then delete from ui_click_reach where day < cut_reach or hub = '' or hub ~ '^zz-'; get diagnostics k = row_count;
-  else select count(*) into k from ui_click_reach where day < cut_reach or hub = '' or hub ~ '^zz-'; end if;
-  c := c || jsonb_build_object('ui_click_reach', k);
-
-  -- feature events older than 180 days: day x page x kind with people counts, then the per-person rows go
-  if p_apply then
-    insert into feature_daily (day, hub, kind, people, n)
-      select day, hub, kind, count(distinct visitor_id), sum(n) from feature_events
-      where day < cut_events and hub <> '' and hub !~ '^zz-' group by 1, 2, 3
-      on conflict (day, hub, kind) do update set people = feature_daily.people + excluded.people, n = feature_daily.n + excluded.n;
-    delete from feature_events where day < cut_events or hub = '' or hub ~ '^zz-'; get diagnostics k = row_count;
-  else select count(*) into k from feature_events where day < cut_events or hub = '' or hub ~ '^zz-'; end if;
-  c := c || jsonb_build_object('feature_events', k);
-
-  -- the other rollups and counters: test hubs and blank hubs only
-  if p_apply then
-    delete from activity_hourly where hub = '' or hub ~ '^zz-'; get diagnostics k = row_count; c := c || jsonb_build_object('activity_hourly_test', k);
-    delete from ui_clicks where hub = '' or hub ~ '^zz-'; get diagnostics k = row_count; c := c || jsonb_build_object('ui_clicks_test', k);
-  else
-    c := c || jsonb_build_object('activity_hourly_test', (select count(*) from activity_hourly where hub = '' or hub ~ '^zz-'),
-                                 'ui_clicks_test', (select count(*) from ui_clicks where hub = '' or hub ~ '^zz-'));
-  end if;
-
-  -- reports and suggestions: the sender's id goes 120 days after the reply (the reply has reached their Inbox by then)
-  if p_apply then
-    update question_flags set visitor_id = null where visitor_id is not null and resolved and resolved_at < now() - interval '120 days';
-    get diagnostics k = row_count; c := c || jsonb_build_object('question_flags_ids', k);
-    update hub_suggestions set visitor_id = null where visitor_id is not null and resolved and resolved_at < now() - interval '120 days';
-    get diagnostics k = row_count; c := c || jsonb_build_object('hub_suggestions_ids', k);
-  else
-    c := c || jsonb_build_object(
-      'question_flags_ids', (select count(*) from question_flags where visitor_id is not null and resolved and resolved_at < now() - interval '120 days'),
-      'hub_suggestions_ids', (select count(*) from hub_suggestions where visitor_id is not null and resolved and resolved_at < now() - interval '120 days'));
-  end if;
-
-  -- exam check-ins: compared with the person's own use only in that hub's retrospective; the id goes after a year
-  if p_apply then
-    update exam_debriefs set visitor_id = 'anon-' || id where visitor_id !~ '^anon-' and created_at < now() - interval '1 year';
-    get diagnostics k = row_count;
-  else select count(*) into k from exam_debriefs where visitor_id !~ '^anon-' and created_at < now() - interval '1 year'; end if;
-  c := c || jsonb_build_object('exam_debriefs_ids', k);
-
-  -- surveys: "No thanks" rows only stop a live survey asking twice; answers lose their id 90 days after it closed
-  -- (closed = not active, or past ends_at; when it closed = ends_at, else its last response)
-  if p_apply then
-    delete from survey_responses r using surveys s where s.id = r.survey_id and r.answers is null
-      and (not s.active or s.ends_at < now());
-    get diagnostics k = row_count; c := c || jsonb_build_object('survey_declines', k);
-    update survey_responses r set visitor_id = 'anon-' || r.id from surveys s
-      where s.id = r.survey_id and r.answers is not null and r.visitor_id !~ '^anon-' and (not s.active or s.ends_at < now())
-        and coalesce(s.ends_at, (select max(x.created_at) from survey_responses x where x.survey_id = s.id)) < now() - interval '90 days';
-    get diagnostics k = row_count; c := c || jsonb_build_object('survey_answer_ids', k);
-  else
-    c := c || jsonb_build_object(
-      'survey_declines', (select count(*) from survey_responses r join surveys s on s.id = r.survey_id
-                          where r.answers is null and (not s.active or s.ends_at < now())),
-      'survey_answer_ids', (select count(*) from survey_responses r join surveys s on s.id = r.survey_id
-                            where r.answers is not null and r.visitor_id !~ '^anon-' and (not s.active or s.ends_at < now())
-                              and coalesce(s.ends_at, (select max(x.created_at) from survey_responses x where x.survey_id = s.id)) < now() - interval '90 days'));
-  end if;
-
-  -- device-link attempts: only the last hour is read (the rate limit)
-  if p_apply then delete from link_attempts where tried_at < now() - interval '7 days'; get diagnostics k = row_count;
-  else select count(*) into k from link_attempts where tried_at < now() - interval '7 days'; end if;
-  c := c || jsonb_build_object('link_attempts', k);
-
-  if p_apply then
-    analyze activity_pings;
-    insert into retention_runs (database_mb, counts) values (round(pg_database_size(current_database()) / 1048576.0, 1), c);
-  end if;
-  return jsonb_build_object('applied', p_apply, 'counts', c,
-    'cutoffs', jsonb_build_object('activity_pings', cut_pings, 'ui_click_reach', cut_reach, 'feature_events', cut_events));
-end;
+-- the version token the admin page sends back, so a change made in another tab isn't overwritten blind
+create or replace function public.sh_archive_version(p_set_at timestamptz)
+returns text language sql stable set search_path = public as $$
+  select case when p_set_at is null then 'auto' else (floor(extract(epoch from p_set_at) * 1000000))::bigint::text end;
 $$;
-revoke all on function public.sh_retention_run(boolean) from public, anon, authenticated;
 
--- ---------- 7. status for agents and the admin page ----------
-create or replace function public.sh_retention_status()
-returns jsonb language plpgsql set search_path = public as $$
-declare sched text;
-begin
-  if to_regclass('cron.job') is not null then
-    execute $q$select schedule from cron.job where jobname = 'sh-retention-weekly' limit 1$q$ into sched;
-  end if;
-  return jsonb_build_object(
-    'schedule', sched,
-    'runs', coalesce((select jsonb_agg(jsonb_build_object('ran_at', x.ran_at, 'database_mb', x.database_mb, 'counts', x.counts) order by x.ran_at desc)
-                      from (select * from retention_runs order by ran_at desc limit 8) x), '[]'::jsonb));
-end;
+-- public: the overrides in force now (the dashboard and widget/v3.js read this; no notes)
+create or replace function public.get_hub_overrides()
+returns table(hub text, state text, until timestamptz)
+language sql stable security definer set search_path = public as $$
+  select o.hub, o.state, o.until from hub_archive_overrides o
+  where o.until is null or o.until > now()
+  order by o.hub;
 $$;
-revoke all on function public.sh_retention_status() from public, anon, authenticated;
 
-create or replace function public.get_data_quality(p_secret text)
-returns jsonb language plpgsql stable security definer set search_path = public as $$
+-- admin: every override row, with its note, whether it is still in force, and its version token
+create or replace function public.admin_hub_overrides(p_secret text)
+returns table(hub text, state text, until timestamptz, note text, set_at timestamptz, active boolean, version text)
+language plpgsql stable security definer set search_path = public as $$
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
-  return sh_data_quality() || jsonb_build_object('retention', sh_retention_status());
+  return query
+    select o.hub, o.state, o.until, o.note, o.set_at, (o.until is null or o.until > now()),
+           case when o.until is null or o.until > now() then sh_archive_version(o.set_at) else 'auto' end
+    from hub_archive_overrides o order by o.hub;
 end;
 $$;
 
--- ---------- 8. the weekly job (pg_cron, where the database has it) ----------
-do $do$
+-- admin: set a hub to 'auto' (no override: the dates decide), 'live', 'archived' or 'hidden'.
+-- p_until: optional end time (future, within 400 days); p_note: optional, 300 characters; p_expect: the version token
+-- the page showed ('auto' when no override was in force), or null to skip the check. A different token raises 40001.
+create or replace function public.admin_set_hub_archive(p_secret text, p_hub text, p_state text,
+  p_until timestamptz default null, p_note text default null, p_expect text default null)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  cur hub_archive_overrides%rowtype;
+  in_force boolean;
+  v_old_state text; v_old_until timestamptz; v_version text;
+  v_note text := nullif(btrim(coalesce(p_note, '')), '');
+  v_until timestamptz := case when p_state = 'auto' then null else p_until end;
+  r hub_archive_overrides%rowtype;
 begin
-  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
-    begin
-      create extension if not exists pg_cron;
-      perform cron.unschedule(jobid) from cron.job where jobname = 'sh-retention-weekly';
-      perform cron.schedule('sh-retention-weekly', '23 9 * * 0', 'select public.sh_retention_run(true)');
-    exception when others then
-      raise notice 'pg_cron not set up (%): run select sh_retention_run(true); by hand', sqlerrm;
-    end;
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  if p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$' then raise exception 'bad hub id' using errcode = '22023'; end if;
+  if p_state is null or p_state not in ('auto', 'live', 'archived', 'hidden') then raise exception 'bad state' using errcode = '22023'; end if;
+  if v_until is not null and (v_until <= now() or v_until > now() + interval '400 days') then
+    raise exception 'end time must be in the future, within 400 days' using errcode = '22023'; end if;
+  if v_note is not null and length(v_note) > 300 then raise exception 'note is over 300 characters' using errcode = '22023'; end if;
+
+  perform pg_advisory_xact_lock(hashtext('hub_archive:' || p_hub));
+  select * into cur from hub_archive_overrides o where o.hub = p_hub;
+  in_force := found and (cur.until is null or cur.until > now());
+  v_old_state := case when in_force then cur.state else 'auto' end;
+  v_old_until := case when in_force then cur.until end;
+  v_version := case when in_force then sh_archive_version(cur.set_at) else 'auto' end;
+  if p_expect is not null and p_expect <> v_version then
+    raise exception 'conflict: this hub was changed since the page loaded' using errcode = '40001'; end if;
+
+  if p_state = v_old_state and v_until is not distinct from v_old_until then
+    return jsonb_build_object('hub', p_hub, 'state', v_old_state, 'until', v_old_until, 'changed', false, 'version', v_version);
   end if;
-end
-$do$;
+
+  if p_state = 'auto' then
+    delete from hub_archive_overrides o where o.hub = p_hub;
+  else
+    insert into hub_archive_overrides as o (hub, state, until, note, set_at)
+    values (p_hub, p_state, v_until, v_note, clock_timestamp())
+    on conflict (hub) do update set state = excluded.state, until = excluded.until, note = excluded.note, set_at = excluded.set_at
+    returning * into r;
+  end if;
+  insert into hub_archive_log (hub, old_state, old_until, new_state, new_until, note)
+  values (p_hub, v_old_state, v_old_until, p_state, v_until, v_note);
+  return jsonb_build_object('hub', p_hub, 'state', p_state, 'until', v_until, 'changed', true,
+    'version', case when p_state = 'auto' then 'auto' else sh_archive_version(r.set_at) end);
+end;
+$$;
+
+-- admin: the audit trail, newest first
+create or replace function public.admin_hub_archive_log(p_secret text, p_limit integer default 50)
+returns table(id bigint, hub text, old_state text, old_until timestamptz, new_state text, new_until timestamptz, note text, at timestamptz)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+    select l.id, l.hub, l.old_state, l.old_until, l.new_state, l.new_until, l.note, l.at
+    from hub_archive_log l order by l.at desc, l.id desc
+    limit greatest(1, least(coalesce(p_limit, 50), 200));
+end;
+$$;
+
+-- ---------------------------------------------------------------- live presence
+-- { minutes, as_of, total, hubs: [{ hub, people, names: [..] }] }: busiest hub first, names A-Z. total counts a person
+-- once even with two hubs open.
+create or replace function public.admin_live_presence(p_secret text, p_minutes integer default 3)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare v_min integer := greatest(1, least(coalesce(p_minutes, 3), 15));
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return (
+    with recent as (
+      select distinct p.hub, coalesce(l.primary_id, p.visitor_id) as who
+      from activity_pings p
+      left join visitor_links l on l.alias_id = p.visitor_id
+      where p.pinged_at > now() - make_interval(mins => v_min) and coalesce(p.hub, '') <> ''
+    ),
+    people as (
+      select w.who, coalesce(vn.display_name, anon_name(w.who)) as name
+      from (select distinct r.who from recent r) w
+      left join visitor_names vn on vn.visitor_id = w.who
+    ),
+    per_hub as (
+      select r.hub, count(*)::int as n, jsonb_agg(pp.name order by lower(pp.name), pp.name) as names
+      from recent r join people pp on pp.who = r.who
+      group by r.hub
+    )
+    select jsonb_build_object(
+      'minutes', v_min,
+      'as_of', now(),
+      'total', (select count(*) from people)::int,
+      'hubs', coalesce((select jsonb_agg(jsonb_build_object('hub', h.hub, 'people', h.n, 'names', h.names) order by h.n desc, h.hub) from per_hub h), '[]'::jsonb))
+  );
+end;
+$$;
+
+-- ---------------------------------------------------------------- newest first, with a tie-breaker
+create or replace function public.get_exam_debriefs(p_secret text)
+returns table(hub text, exam text, visitor_id text, answers jsonb, created_at timestamptz,
+              minutes bigint, answered bigint, accuracy numeric)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+  with d as (select * from exam_debriefs e order by e.created_at desc, e.id desc limit 2000),
+  who as (select distinct d.hub, d.visitor_id from d),
+  t as (select w.hub, w.visitor_id, coalesce(sum(h.n), 0) * 25 / 60 as minutes
+        from who w left join activity_hourly h on h.visitor_id = w.visitor_id and h.hub = w.hub
+        group by w.hub, w.visitor_id),
+  a as (select w.hub, w.visitor_id, count(pa.id) as answered,
+               round(avg(case when pa.id is null then null when pa.correct then 100 else 0 end), 0) as accuracy
+        from who w left join personal_answers pa on pa.visitor_id = w.visitor_id and pa.hub = w.hub
+        group by w.hub, w.visitor_id)
+  select d.hub, d.exam, d.visitor_id, d.answers, d.created_at,
+    t.minutes::bigint, a.answered::bigint, a.accuracy
+  from d
+  join t on t.hub = d.hub and t.visitor_id = d.visitor_id
+  join a on a.hub = d.hub and a.visitor_id = d.visitor_id
+  order by d.created_at desc, d.id desc;
+end;
+$$;
+
+create or replace function public.get_survey_results(p_secret text)
+returns table(survey_id bigint, slug text, title text, questions jsonb, active boolean, created_at timestamptz,
+              responses bigint, skipped bigint, answers jsonb)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  return query
+  select s.id, s.slug, s.title, s.questions, s.active, s.created_at,
+    count(r.id) filter (where r.answers is not null), count(r.id) filter (where r.answers is null),
+    coalesce(jsonb_agg(r.answers order by r.created_at desc, r.id desc) filter (where r.answers is not null), '[]'::jsonb)
+  from surveys s left join survey_responses r on r.survey_id = s.id
+  group by s.id order by s.created_at desc, s.id desc;
+end;
+$$;
+
+-- ---------------------------------------------------------------- grants
+revoke all on function public.sh_archive_version(timestamptz) from public, anon, authenticated;
+revoke all on function public.get_hub_overrides() from public;
+revoke all on function public.admin_hub_overrides(text) from public;
+revoke all on function public.admin_set_hub_archive(text, text, text, timestamptz, text, text) from public;
+revoke all on function public.admin_hub_archive_log(text, integer) from public;
+revoke all on function public.admin_live_presence(text, integer) from public;
+grant execute on function public.get_hub_overrides() to anon, authenticated;
+grant execute on function public.admin_hub_overrides(text) to anon, authenticated;
+grant execute on function public.admin_set_hub_archive(text, text, text, timestamptz, text, text) to anon, authenticated;
+grant execute on function public.admin_hub_archive_log(text, integer) to anon, authenticated;
+grant execute on function public.admin_live_presence(text, integer) to anon, authenticated;

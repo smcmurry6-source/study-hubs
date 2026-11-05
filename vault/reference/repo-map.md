@@ -21,12 +21,15 @@ tags: [map]
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md)) — shared cross-hub layer (search, class stats,
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md); `widget/archive.js`, which hubs
+  are live, archived or hidden: the dates and Sam's overrides, loaded by `index.html` and `review/`) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its **Insights** tab puts every hub (live and archived) side by side and pairs each
   number with the decision it drives ([insights-dashboard](insights-dashboard.md), data from `migration_v49.sql`;
-  [analytics governance](analytics-governance.md)). Its **Recap** tab makes the shareable end-of-hub image (drawn by
+  [analytics governance](analytics-governance.md)). Its **Live** view shows who is studying now and its **Hubs** view sets a
+  hub live, archived or hidden by hand, with an audit log ([admin-operations](admin-operations.md), `migration_v50.sql`;
+  `widget/archive.js` holds the archive rules the dashboard, hubs and admin page share). Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
   recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
   the hub page comes down, while `tools/dump-banks.js` can still read its bank.
@@ -46,7 +49,8 @@ tags: [map]
   always includes a retrospective** (Sam's standing rule): run `tools/retro.sql` for that hub (time by section,
   clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
   resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. The dashboard archives a hub **by itself** at 10 pm on the day of
-  its last exam (`ARCHIVE_HOUR`): its card turns into an archived card with no Open button, which disappears 10 days
+  its last exam (`ARCHIVE_HOUR`), unless Sam set it by hand on the admin page's Hubs tab (that wins until it's cleared or ends:
+  [admin-operations](admin-operations.md)): its card turns into an archived card with no Open button, which disappears 10 days
   later (`CARD_DAYS`; `hideCardOn` overrides). "Check in" buttons show from 8 am on exam day; the pop-up only goes out
   from 10 pm and still reaches first visits up to 60 days after (`DEBRIEF_DAYS`). The hub's page itself stays up until
   someone removes it, so the retrospective and cleanup are still manual; moving the entry into `ARCHIVED_HUBS` then is optional. Read the check-ins as late as you can.
