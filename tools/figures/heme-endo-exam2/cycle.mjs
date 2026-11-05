@@ -230,7 +230,7 @@ export default function cycle() {
 .anima .cycle-svg .cy-bt.b{fill:var(--accent-ink)}
 .anima .cycle-svg .cy-star{font:10px var(--anatomy-mono);fill:var(--accent)}
 .anima .cycle-svg .cy-axis{fill:none;stroke:var(--anatomy-mid);stroke-width:1}
-.anima .cycle-svg .cy-hit{fill:none;stroke:transparent;stroke-width:12;pointer-events:stroke}
+.anima .cycle-svg .cy-hit{fill:none;stroke:transparent;stroke-width:9;pointer-events:stroke}
 .anima .cycle-svg .cy-fut{fill:none;stroke-width:1.6;opacity:.32}
 .anima .cycle-svg .cy-now{fill:none;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
 .anima .cycle-svg .cy-dot{stroke:var(--surface);stroke-width:1.6}

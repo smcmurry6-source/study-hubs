@@ -52,7 +52,7 @@ function alRender(st, D) {
   o += HOT(G.horInfo, alArrow(276, Y, 379, Y, "al-arr") + alDots([278, Y, 374, Y], horLv, t, "al-hp", false)) + T(327, Y - 12, G.hor, "s b", "middle");
   /* the ectopic ACTH source */
   if (Lz.ect) {
-    o += HOT("An ectopic tumor, here a lung cancer, making ACTH as a paraneoplastic effect: it ignores cortisol's feedback and drives both adrenals.", '<circle class="al-node al-on" cx="120" cy="222" r="22"/>' + alIcon("lung", 120, 222)) + alArrow(138, 208, 212, 144, "al-arr") + alDots([140, 206, 208, 148], 1, t, "al-sp", false) + T(150, 186, "ACTH", "s b", "end") + T(92, 226, "lung tumor", "s b", "end");
+    o += HOT("An ectopic tumor, here a lung cancer, making ACTH as a paraneoplastic effect: it ignores cortisol's feedback and drives both adrenals.", '<circle class="al-node al-on" cx="128" cy="216" r="21"/>' + alIcon("lung", 128, 216)) + alArrow(143, 201, 207, 133, "al-arr") + alDots([145, 199, 204, 137], 1, t, "al-sp", false) + T(150, 174, "ACTH", "s b", "end") + T(100, 220, "lung tumor", "s b", "end");
   }
   /* the three nodes */
   var keys = ["drv", "gl", "tg"];
@@ -65,8 +65,8 @@ function alRender(st, D) {
   });
   /* the culprit, hidden in a mystery case until the call is made */
   if (Lz.cul && !hide) {
-    var ci = { drv: 0, gl: 1, tg: 2, ect: -1 }[Lz.cul], cx = ci < 0 ? 138 : NX[ci] + 25, cy = ci < 0 ? 203 : Y - 25;
-    o += '<circle class="al-culr" cx="' + cx + '" cy="' + cy + '" r="' + f1(10 + pulse * 5) + '" opacity="' + f1(0.7 - pulse * 0.5) + '"/><circle class="al-cul" cx="' + cx + '" cy="' + cy + '" r="9"/>' + T(cx, cy + 4, "!", "al-cult", "middle");
+    var ci = { drv: 0, gl: 1, tg: 2, ect: -1 }[Lz.cul], cx = ci < 0 ? 147 : NX[ci] + 25, cy = ci < 0 ? 232 : Y - 25;
+    o += '<circle class="al-culr" cx="' + cx + '" cy="' + cy + '" r="' + f1(10 + pulse * 5) + '" opacity="' + f1(0.7 - pulse * 0.5) + '"/><circle class="al-cul" cx="' + cx + '" cy="' + cy + '" r="9"/><path class="al-bang" d="M' + cx + " " + (cy - 5) + "V" + (cy + 1.5) + '"/><circle class="al-bangd" cx="' + cx + '" cy="' + (cy + 5) + '" r="1.4"/>';
     if (ci >= 0 && Lz.cn) o += T(NX[ci], Y + R + (G.sub[ci] ? 46 : 32), Lz.cn, "s b bad", "middle");
     if (Lz.cul === "tg") o += '<path class="al-x" d="M370 108l14 20M384 108l-14 20"/>';
   }
@@ -79,9 +79,11 @@ function alRender(st, D) {
     var x = 28 + i * 122, y = SY + 40, v = b[1], word = b[2] || (v > 0 ? "high" : v < 0 ? "low" : "normal");
     o += HOT(b[0] + ": " + word + ". " + (i === 0 ? "The gland's hormone." : "Its driver, read with it."), '<rect class="al-tile" x="' + x + '" y="' + y + '" width="112" height="76" rx="6"/>' + T(x + 56, y + 19, b[0], "s b", "middle") + '<text class="t al-big ' + (v > 0 ? "al-upc" : v < 0 ? "al-dnc" : "al-eqc") + '" x="' + (x + 56) + '" y="' + (y + 50) + '" text-anchor="middle">' + (v > 0 ? "▲" : v < 0 ? "▼" : "=") + "</text>" + T(x + 56, y + 68, word, "s", "middle"));
   });
-  if (Lz.extra) Lz.extra.forEach(function (e, i) {
-    var x = 28 + i * 108, y = SY + 126, v = e[1];
-    o += HOT(e[0] + ": " + (v > 0 ? "high" : v < 0 ? "low" : "normal") + ".", '<rect class="al-chip" x="' + x + '" y="' + y + '" width="100" height="24" rx="12"/>' + T(x + 10, y + 16, e[0], "s b", "start") + '<text class="t s b ' + (v > 0 ? "al-upc" : v < 0 ? "al-dnc" : "al-eqc") + '" x="' + (x + 90) + '" y="' + (y + 16.5) + '" text-anchor="end">' + (v > 0 ? "▲" : v < 0 ? "▼" : "=") + "</text>");
+  var chx = 28;
+  if (Lz.extra) Lz.extra.forEach(function (e) {
+    var y = SY + 126, v = e[1], w = Math.round(e[0].length * 7.3 + 34);
+    o += HOT(e[0] + ": " + (v > 0 ? "high" : v < 0 ? "low" : "normal") + ".", '<rect class="al-chip" x="' + chx + '" y="' + y + '" width="' + w + '" height="24" rx="12"/><text class="t s b" x="' + (chx + 11) + '" y="' + (y + 16) + '">' + e[0] + ' <tspan class="' + (v > 0 ? "al-upc" : v < 0 ? "al-dnc" : "al-eqc") + '">' + (v > 0 ? "▲" : v < 0 ? "▼" : "=") + "</tspan></text>");
+    chx += w + 8;
   });
   if (G.shared) o += T(28, SY + 142, G.shared, "s mut", "start");
   /* the verdict stamp */
@@ -217,7 +219,8 @@ const CSS = `
 .anima .axislab-svg .t.al-fbt{fill:var(--bx-inhib)}
 .anima .axislab-svg .al-cul{fill:var(--bx-inhib)}
 .anima .axislab-svg .al-culr{fill:none;stroke:var(--bx-inhib);stroke-width:2}
-.anima .axislab-svg .t.al-cult{fill:var(--surface);font-weight:800;font-size:13px}
+.anima .axislab-svg .al-bang{stroke:var(--surface);stroke-width:2.4;stroke-linecap:round}
+.anima .axislab-svg .al-bangd{fill:var(--surface)}
 .anima .axislab-svg .al-x{stroke:var(--bx-inhib);stroke-width:3;stroke-linecap:round}
 .anima .axislab-svg .al-slip{fill:var(--anatomy-shade-3);stroke:var(--line-strong);stroke-width:1}
 .anima .axislab-svg .al-rule{stroke:var(--line);stroke-width:1}
