@@ -26,7 +26,22 @@ signatures, no student rows). [How it works](../../reference/admin-operations.md
 
 Run locally after merging `main` (`node tools/release/run.js`, Chromium; CI's "Release tests" adds WebKit and Firefox):
 
-RESULTS
+| Suite | Result | Time | Summary |
+|---|---|---|---|
+| Syntax and merge markers (`tools/ci/syntax.js`) | pass | 1 s | ✓ 11 pages and the widget scripts parse |
+| Vault notes, links and tasks (`tools/ci/vault.js`) | pass | 0 s | ✓ vault: 71 notes, links resolve, tasks and rules in order |
+| Hub archive state (dates and admin overrides) (`tools/ci/archive.js`) | pass | 0 s | ✓ archive state: 26186 checks (9 dashboard hubs, every hour Sep-Dec 2026, overrides, end times, reversal) |
+| Public-repo check (secrets, course material) (`tools/release/secrets.js`) | pass | 0 s | ✓ public-repo check: 573 tracked files, 374 scanned; no secrets, course material or data files |
+| Smoke test and question-bank lint (`tools/ci/smoke.js`) | pass | 181 s | ✓ smoke test and question lint passed |
+| Preview safety (no production requests, noindex, fixtures) (`tools/ci/preview.js`) | pass | 43 s | ✓ preview safety check passed |
+| Database permissions (RLS, grants, secrets) (`tools/release/rls.js`) | pass | 2 s | ✓ database permissions (RLS, grants, secret-gated functions) passed |
+| Admin page in a preview (Live, Hubs, newest first, phone layout) (`tools/release/admin-ui.js`) | pass | 120 s | ✓ admin page (Live, Hubs, order) in a preview passed |
+| Admin operations on fixtures (live presence privacy, archive overrides, order) (`tools/release/admin-ops.js`) | pass | 1 s | ✓ admin operations (live presence, archive overrides, order): 62 checks passed |
+| Accessibility (axe, keyboard, reduced motion) (`tools/release/a11y.js`) | pass | 40 s | ✓ accessibility passed |
+| Performance budgets (slow 4G phone) (`tools/release/perf.js`) | pass | 77 s | ✓ performance budgets passed |
+| Devices and resilience (refresh, history, offline, slow) (`tools/release/matrix.js`) | pass | 215 s | ✓ devices and resilience passed |
+
+Every suite passed.
 
 Also run by hand on the redesigned page: **axe (WCAG 2.0-2.2 A and AA) on every signed-in admin view**, light and dark,
 1280 and 390 px wide (`a11y.js` only covers the sign-in screen): no violations, after fixing three it found (a hub row's
