@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 evening (lessons audit: statement keys no longer a pattern, Claude Code)** — Suggestion #14 (PCD Implants, two days
+  out): "a lot of the statement questions seem to all have the same answer... select all being options 1,2,4 a lot." True:
+  `hubs/pcd-implants-exam1` keyed 36 of 46 two-statement items "Statement 1 is true; statement 2 is false", had statement 1 true in
+  all 30 numbered items and keyed the second choice in 23; `hubs/special-patient-care` had statement 1 true in all 24 numbered items.
+  Same ids. **Two-statement:** 7 PCD items swap their two statements, 8 have the false statement made true and 10 the true one made
+  false by one taught detail (facts from each item's explanation and the hub's notes), now 12 / 11 / 11 / 12 over the four choices;
+  SPC 4 swaps and 2 made "both false" (12 / 6 / 10 / 12). **Numbered:** statements reordered so the false one sits at every number
+  and the key at every position (PCD 7 / 8 / 8 / 7, SPC 6 / 6 / 6 / 6), the key's size shared by another choice, and in PCD three
+  items keyed "all four" and two "two true" (`ev-num-1`, `pf-num-1`, `cb-num-1`; `su-num-4`, `bm-num-1`). Every why line is rebuilt by
+  `two()` / `nums()`. The class's picks on each choice (`question_choices`, by position) would show beside the wrong choices: the PR
+  carries SQL, tested on a throwaway Postgres, that moves the picks of 43 reordered items with their choices and clears the 25
+  rewritten ones (`question_stats` too), to run at merge with Sam's OK; question health starts the new versions by itself. Also `im-template-vdo`'s explanation and whys now say why "room for the drill and the guide
+  sleeves" (6 of 15) is wrong. **CI:** `tools/ci/smoke.js` fails a hub whose statement keys form a pattern (a two-statement choice
+  keyed in over 40% or under 10% of items, a numbered key position over 45%, a statement number true in over 90%); rule notes
+  [two-statement-and-true-false](vault/rules/two-statement-and-true-false.md) and [numbered-statements](vault/rules/numbered-statements.md)
+  say so. `LESSONS.md` refreshed (Live signals; lessons on the key's position and on steering through what people tap). No reading
+  text, audio or schema change.
 - **2026-11-05 (Settings rows and Timmy's bubble fit a phone at the largest text: BUG-013, Claude Code)** — the follow-up to the top-bar PR (#235). **Settings sheet** (dashboard `index.html` `.set-x .set-seg`, hubs `widget/v3.css` `.shset-x .shset-seg`): a row of buttons beside its label was `flex:none`, so Timmy Tooth's Everywhere / Dashboard only / Off ran past the sheet at XX-Large on a phone; rows now shrink to their line and wrap (unchanged at normal text). **Timmy's speech bubble** (`widget/pet.js`, the dashboard perch): `place()` flipped it to his left whenever the right had under 200 px without checking the left, so at 320 px with the largest text it started 95 px off screen. It now measures both sides (rects against the page's own rect, turned into CSS px by the perch's offsetWidth), takes the roomier one, caps its width to that room (`--pet-room`), and goes above him, kept on screen, when neither side has 120 px. Its `100vw` caps use `--pet-vw` (the screen in zoomed px, set when he talks), the house bubble is capped to its scene (260% of his spot). **CI:** `tools/ci/smoke.js` opens the Settings sheet on the dashboard and every hub at 390 px with the largest text and fails a button past the sheet's edge (fails on `main`, passes here). The other two follow-ups from #235 (Perio's arcade 6 px, the Review table's keyboard stop) were already fixed by PR 239. `sw.js` sh-v56.
 - **2026-11-05 (no post-release monitoring, Claude Code)** — Sam: "take out all of the monitoring instructions now and
   for the future". The 1, 24 and 48 hour checks after a release are gone from `RELEASE_TEST_PLAN.md` (section 11 is now

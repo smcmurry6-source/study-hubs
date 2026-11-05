@@ -109,7 +109,11 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
   without regenerating its narration in the same PR (`vault/rules/text-and-audio-never-drift.md`).
 - Check the string's quote style before adding text: MSK `mcq(...)` explanations are **single-quoted** (no
   apostrophes: write "cannot", not "can't"); perio question objects use double quotes for `ex`.
-- Keep ids and answer positions. `node tools/ci/syntax.js` after each batch.
+- Keep ids and answer positions. `node tools/ci/syntax.js` after each batch. Since 2026-11-04 every answered card shows the
+  class's picks per choice, read from `question_choices` by position and not by version: a change that moves or rewrites
+  choices shows old percentages beside the wrong choice. When one must (a key pattern, a giveaway), write the SQL that moves
+  the moved rows and clears the rewritten ones, test it on a throwaway Postgres, put it in the PR, and run it only with
+  Sam's OK, right after the merge (the 2026-11-04 evening audit's PR is the example).
 - A changed explanation, stem or choice also updates that question's "why each choice" lines, so they still agree
   (`vault/rules/every-choice-gets-a-why.md`; in hubs with `QUESTION_WHY` it's that row, in `mq()` hubs the pairs).
 - The CI lint fails on a matching item that repeats an answer (unless that hub grades by text and the id is in

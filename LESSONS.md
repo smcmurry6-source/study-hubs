@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-04** (full audit, morning; PCD Implants two days out). Sam runs
+**Last refreshed: 2026-11-04** (full audit, evening; PCD Implants' exam is Friday). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -78,40 +78,51 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-04 morning (full audit, 8:30 am Central).** "Since" = 11-03 midday. Live hubs: **PCD Implants Exam 1** (Fri 11-6 on Canvas,
-7 am-8 pm: two days out), Special Patient Care (Canvas window 11-6 to 11-13), Occlusion and perio (finals 11-19). Heme & Endo Exam 1
-archived itself 11-03 at 10 pm after the late exam; three more check-ins are folded into its retrospective below. Nothing newly archived.
+**2026-11-04 evening (full audit, 9:45 pm Central).** "Since" = this morning's audit, whose fixes went live at 9 am. Live hubs: **PCD
+Implants Exam 1** (Fri 11-6 on Canvas, 7 am-8 pm: tomorrow is the eve), Special Patient Care (Canvas window 11-6 to 11-13), Occlusion
+and perio (finals 11-19). Nothing newly archived.
 
-**Did the last refresh work?** Too early to say: its fixes went to PCD Implants on its first afternoon. `cb-pe` 6/9 and `cb-atten-z` 7/8 in
-all (most tries came after the 11-03 rewrite). The brand and billing items cut after #35/#36 drew no more "too much detail" reports; the one
-new report is a different problem (#37 below). Occlusion's and perio's named lows haven't moved because nobody is studying them yet:
-`q3-04` 46% (49/106), `q3-M01` 28% (20/72), `cs-pro-incline` 41%, `an-compound` 45%, `fp-post` 45%.
+**Student voice since this morning:** suggestion #14 (PCD Implants, 8:40 pm), "a lot of the statement questions seem to all have the
+same answer... the select all being options 1,2,4 a lot." **Right**: 36 of 46 two-statement keys were "Statement 1 is true; statement 2
+is false", statement 1 was true in all 30 numbered items (28 included statement 2: "1, 2 and 4" 17 times, "1, 2 and 3" 11), and the
+second choice was the key in 23 of 30. Special Patient Care, on the same engine, had statement 1 true in all 24 of its numbered items.
+Accuracy didn't show anyone using the pattern yet (items keyed "1 true, 2 false" 81%, the others 86-92%), but the practice was teaching
+a habit the exam won't reward. **Fixed in both hubs** (below), and CI now fails a hub whose statement keys form a pattern. One more
+Occlusion midterm check-in (n = 17: About right 8, Exam asked different things 7, Hub was easier 2). Four survey skips, no answers.
+**Search** (`search_terms`): 2 searches in the widget since 10-16 and one person searching inside a bank. Not broken (`record_search`
+is granted and called), just unused.
 
-**Student voice since 11-03:** one report, #37 `bm-goodacre` (PCD Implants, 8 am today), "the percentages in the answers give the answer
-away": right, each choice printed its own share of the slide's failure data, so the biggest number was the key (8 of 8 picked it). **Fixed**:
-the numbers moved into the why lines. Check-ins: Heme & Endo 3 more (n = 13 people: About right 2, Hub was harder 1, at 93% and 295 min);
-the Occlusion midterm 1 more, "Exam asked different things" (131 min, 79%; n = 16: About right 8, different 7, easier 1). **The same people,
-two exams:** of the 7 who said the Occlusion midterm asked different things, 5 also checked in after Heme & Endo, the first hub built with
-numbered items and the professors' focus lists from the start: 4 said About right, 1 Hub was harder (see the standing lesson on numbered
-items). No surveys, no searches.
+**Did the last refresh work?** ("since" = answers after 9 am)
+- `bm-goodacre` (#37, the percentages taken out of its choices): 9/9 before, 9/14 since. The giveaway was real.
+- Explanations that now name the favorite wrong answer: `ev-misch` 12/24 then 12/19 since, `bm-moment` 10/18 then 10/16, `ev-blade`
+  14/23 then 11/18. Flat to slightly up, on small numbers.
+- **Select-all ticks arrive now** (`question_choices` rows for `tm-mm-*`, `gs-mm-1` and the rest). `tm-mm-2` (platform switching, 4 of
+  5 options right) is missed by leaving out the definition itself ("Abutment narrower than the implant", the least-ticked right
+  option); `tm-mm-1` (screw-retained advantages, 2 of 5) by adding a cement-retained advantage. Since 9 am: `tm-mm-1` 8/12, `tm-mm-2`
+  6/12, `tm-mm-3` 6/12.
+- **"Practiced least" on Home** (10:15 am): practice did move to the last four lectures (Imaging, CBCT, Surgery, Guided: 18% of all
+  answers before, 31% after; 10-15 answerers each instead of 7-9; L1-L2 from 43% to 24%), **but not through the new row: nobody
+  tapped it.** "Where to next" got 2 taps in two days (Weak, Missed). People got there through the bank in order, the lecture picker (up
+  to 9 people per lecture) and "Not answered yet" (12). On Home, the quick-start row is what gets tapped ("Practice questions" 7
+  people today, the notes button 8).
 
 **Per hub:**
-- **PCD Implants** (day two of four): 51 people, 65 h (all 51 on 11-03; 10 so far today), 7 under 5 min. 4,621 answers from 31 people
-  (median 79, most 451), 87%. Notes 2,022 min (41 people), bank 1,537 (34), Daily Drill 67 (5), hints 55 (10), cram sheet 7 (5), Review
-  ~150 (1-6 people per group), **no mock yet**. **Practice follows bank order**: 23 answerers reached L1-L2, 18 Terminology, 11-12
-  Biomechanics and Prefab, **6-7 each of the last four** (Imaging, CBCT, Surgery, Guided: 1.5-5 tries per question vs 18 on L1-L2), though
-  more people opened those notes (Surgery 11, Guided 9). By format: MCQ 88%, matching 84%, **select-all 69%** (11 items). Hardest:
-  `tm-mm-1` 39% (screw-retained advantages), `tm-match-2` 46% (ITI timing, 4 pairs), `tm-mm-2` 47% (platform switching),
-  `ev-misch` 50% ("Ford Turner" x10 of 24), `bm-moment` 56% ("Force / area" x7 of 18), `ev-2s-5` 57%, `ev-blade` 61%. **Fixed today**:
-  `ev-misch`, `bm-moment` and `ev-blade` now say why their favorite wrong answer is wrong, and the three select-alls name every option.
-  **Select-all ticks weren't being recorded** (the Occlusion engine and its copies sent only MCQ picks): fixed in PCD Implants, Occlusion
-  and Special Patient Care, so the exam eve will show which options people miss. Used: Random order 15 people, High likelihood 13, Not
-  answered yet 9, Pins 7 (31 pins), "Try it again" 31 (552 shown, 96% right), the interactive figures 19, the six implant drawings 35.
-  Next: read the select-all ticks and the last four lectures on the eve.
-- **Special Patient Care**: 12 people, 265 min, 39 answers; quiet until the window opens Fri. PR #221 merged this morning (the exam's
-  format, a 45-question mock, multiple-answer items: 476 questions); its select-alls record their ticks from the start.
-- **Occlusion**: 1 person since (120 answers, 42 min of Daily Drill). L7's five figures went live this morning.
-- **Perio**: 3 people, 13 min. Nothing to act on.
+- **PCD Implants** (the eve is tomorrow): 66 people, 133 h (11-03: 51 people, 60 h; 11-04: 58 people, 72 h, 15 of them new); 43 came on
+  2+ days, 6 stayed under 5 min. 9,185 answers from 45 people (median 125), 88%. Since 9 am: notes 2,107 min (43 people), bank 1,657
+  (38), Home 65 (26), Timmy Time 55 and the mock 49 (a few people each), Daily Drill 22. By format: true/false 91%, MCQ 89%, numbered
+  87%, matching 86%, two-statement 83%, select-all 70% (11 items). By lecture 84-92%, Evolution lowest (84%) with the most practice.
+  Hardest (12+ tries): `tm-mm-2` 48%, `tm-mm-1` 50%, `ev-misch` 55%, `tm-mm-3` 56%, `bm-moment` 59%, `im-template-vdo` 60% (6 of 15 picked
+  "to make room for the drill and the guide sleeves": **fixed**, the explanation says the template is worn for the scan and sleeves
+  belong to the surgical guide). Question health: five "stronger students miss it more" flags (`in-num-3`, `bm-order`, `bm-occ-goals`,
+  `ev-frialit`, `tm-depth`; 8-13 people per half). Each key checked against the notes and right: for Sam's list, not a change.
+  **Statement keys, fixed tonight:** two-statement keys are now 12 / 11 / 11 / 12 over the four choices (7 items swapped their two
+  statements; 8 had the false statement made true and 10 the true one made false by one taught detail, every fact from the item's
+  own explanation and the notes). Numbered keys are 7 / 8 / 8 / 7 by position, the false statement sits at every number (statement 1
+  true in 22 of 30), three are keyed "1, 2, 3 and 4" and two have two true. Next: on the eve, two-statement accuracy should dip now
+  that the pattern is gone; that is the point, not a regression.
+- **Special Patient Care** (window opens Fri): 12 people, 6 h all time, 2 today. Numbered statements reordered (the false one at every
+  number), four two-statement items swapped and two made "both false" (keys 12 / 6 / 10 / 12).
+- **Occlusion**: 4 people today, 16 min. **Perio**: 11 people today, 328 min, its most since the midterm (final 11-19).
 
 **Feature use, Heme & Endo (10-27 to 10-30):** "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); **High
 likelihood** order 23 people and "High likelihood only" 21, and the likely-tagged questions took 40% of all its tries (10,133 of 25,399) at the
@@ -182,6 +193,9 @@ diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read 
   PCD Implants had all nine lectures from its first day, and two days out practice still fell lecture by lecture (23 of 31 answerers on
   L1-L2, 6-7 on each of the last four, 1.5-5 tries per question vs 18), because the bank opens "In order" and people start at lecture 1.
   Point Home's "Where to next", the drill and the mock at the lectures with the fewest answers, whenever they were added.
+  **But steer through what people already tap:** Home's "Practiced least" row (11-04) got no taps on its first day while practice
+  moved to the late lectures anyway (bank order, the lecture picker, "Not answered yet"); "Where to next" got 2 taps in two days. The
+  quick-start row and the bank's own filters are where a nudge lands.
 - **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
   attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them. The same goes for the
   professors' own hints: PCD 3's `hint` items (from the course's exam-hint email) got 49 tries per question vs 35-40, and
@@ -315,9 +329,15 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   length and form as the answer, and keep qualifiers in the explanation, not the choices. It still happens in new
   hubs: PCD `on-crack-types` asked which crack type is non-treatable with a choice labeled "Cracked tooth (treatable)"
   (report #18, 2026-10-13). Before shipping, grep the choices for parentheses. Numbers do it too: PCD Implants `bm-goodacre` asked which
-  complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
+  complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04: 9/9 right before the fix, 9/14 after); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
   Perio `q4-06` keyed the S204SD9 over "Sickle scaler", but the hub's notes call the S204SD9 the posterior sickle (7 of 17 picked
   "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it?
+- **The key's position can give the answer away too.** PCD Implants suggestion #14 (2026-11-04, two days out): 36 of 46 two-statement
+  keys were "1 true, 2 false" and statement 1 was true in all 30 numbered items, because the author wrote the true statements first;
+  Special Patient Care, on the same engine, had the same numbered habit. In fixed-order formats, decide where the key goes after
+  writing the statements, and check the spread before shipping: CI fails it since 2026-11-04 (each two-statement choice keyed in
+  10-40% of items, no numbered key position over 45%, no statement number true in over 90%). Give the key a size another choice shares
+  ("1, 3 and 4" next to "2, 3 and 4", not next to two pairs and "1, 2, 3 and 4"), and key some items "all four" or "two".
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way

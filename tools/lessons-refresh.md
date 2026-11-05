@@ -58,7 +58,8 @@ Rules:
 - Follow `AGENTS.md` and the rules in `vault/rules/` (Claude Code loads them through `CLAUDE.md`): verify (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), branch + draft PR, never push `main`.
 - **Text and audio must never drift**: don't edit a lecture's reading text (either level) unless you also
   regenerate that level's mp3 in the same PR. If you can't, list the change for Sam instead.
-- Keep question ids and answer positions; say in the PR if a change makes old `question_choices` rows stale.
+- Keep question ids and answer positions; say in the PR if a change makes old `question_choices` rows stale. They are shown
+  to students now (the class's picks on each choice), so give Sam the SQL that moves or clears them, to run at merge.
 - Anything larger (new features, restructuring, new questions in bulk, removing a mode, schema changes) is a
   **proposal for Sam** in the PR description, not a change. Once Sam approves one, it becomes a task note in
   `vault/tasks/` so any agent can pick it up.

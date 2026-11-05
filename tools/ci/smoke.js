@@ -137,6 +137,19 @@ function lint(hub, A){
     const tfq = Q.filter(q => q.fmt === 'tf');
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);
       if (t < 35 || t > 65) problems.push(`${hub}: ${t}% of true/false answers are True (keep it between 35% and 65%)`); }
+    /* statement keys must not form a pattern (PCD Implants suggestion #14, 2026-11-04: 36 of 46 two-statement keys were
+       "1 true, 2 false", and statement 1 was true in all 30 numbered items): spread two-statement keys over all four
+       choices, numbered keys over every position, and the false statements over every number */
+    const two = Q.filter(q => q.fmt === '2stmt');
+    if (two.length >= 12) TWO_CHOICES.forEach((c, i) => { const t = Math.round(100 * two.filter(q => q.answer === i).length / two.length);
+      if (t < 10 || t > 40) problems.push(`${hub}: "${c}" is the key of ${t}% of two-statement questions (keep each choice between 10% and 40%; swap statements or change which is false)`); });
+    const numq = Q.filter(q => q.fmt === 'numbered');
+    if (numq.length >= 8) {
+      const most = Math.max(...[0, 1, 2, 3].map(i => numq.filter(q => q.answer === i).length));
+      if (most / numq.length > 0.45) problems.push(`${hub}: ${Math.round(100 * most / numq.length)}% of numbered-statement keys are in the same position (keep it at 45% or less; pick the wrong combinations to move the key)`);
+      [1, 2, 3, 4].forEach(k => { const t = numq.filter(q => (String(q.choices[q.answer]).match(/\d+/g) || []).map(Number).includes(k)).length;
+        if (t / numq.length > 0.9) problems.push(`${hub}: statement ${k} is true in ${t} of ${numq.length} numbered-statement questions (put the false statements at different numbers)`); });
+    }
   }
   const mc = Q.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
   const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;

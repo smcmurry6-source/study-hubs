@@ -17,7 +17,9 @@ and the check-ins asked for. Aim for about 3-5 per lecture; CI fails a taught le
 - `choiceOrder()` never shuffles them, the arcade skips them (`arcadeQ`), and the Question Bank's format filter has "Numbered
   statements". CI checks the stem's "1. "/"2. "/"3. " lines, the choice wording and the canonical order.
 - Make each wrong combination differ from the key by one or two statements, so every statement has to be judged. Spread the
-  key over all four positions (the sort decides the position: pick the wrong combinations to move it).
+  key over all four positions (the sort decides the position: pick the wrong combinations to move it), put the false
+  statements at different numbers (not always last), and give the key a size another choice shares. CI, since
+  2026-11-04: no key position over 45% of a hub's items, no statement number true in over 90%.
 - False statements follow the true/false rule: change one taught detail, never a trick of wording. Draw them from the hub's notes.
 
 Related: [two-statement-and-true-false](two-statement-and-true-false.md) · [every-choice-gets-a-why](every-choice-gets-a-why.md)

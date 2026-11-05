@@ -10,7 +10,8 @@ GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/sy
 rule notes in order; see [repo-is-the-vault](../rules/repo-is-the-vault.md)) and `node tools/ci/smoke.js` (headless click-through
 of the dashboard and every hub on desktop and phone, plus a question-bank lint: duplicate ids, answer
 ranges, missing explanations, a missing "why" for any choice, missing narration files, the correct answer being the longest choice
-in more than 40% of MCQs, and question ids against `tools/question-ids/<hub>.txt`: a renamed or deleted id fails,
+in more than 40% of MCQs, statement keys that form a pattern (a two-statement choice keyed in over 40% or under 10% of a hub's items, a
+numbered key in one position over 45%, a statement number true in over 90%), and question ids against `tools/question-ids/<hub>.txt`: a renamed or deleted id fails,
 and a local run adds new ids to the file, so commit it; see [question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
 Since 2026-11-04 it also runs `node tools/release/secrets.js` (no keys, course material or
 data files), `node tools/release/rls.js` (database permissions on a throwaway copy of `supabase/schema.sql`; needs
