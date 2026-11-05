@@ -201,7 +201,7 @@ function dsPanel(st, D) {
   }
   if (k === "gut") {
     var agi = d === "agi";
-    o += '<path class="lumen" d="M1 16H459V104H1Z"/>' + T(12, 40, "starch, disaccharides", "s b", "start") + T(448, 40, agi ? "→ colon: gas" : "→ on down the gut", "s b", "end");
+    o += '<path class="lumen" d="M1 16H459V104H1Z"/>' + T(12, 34, "starch, disaccharides", "s b", "start") + T(448, 34, agi ? "→ colon: gas" : "→ on down the gut", "s b", "end");
     var cl = "", mv2 = "", e;
     for (e = 0; e < 4; e++) { var ex0 = 14 + e * 108; cl += '<rect class="cyto" x="' + ex0 + '" y="110" width="104" height="84" rx="6"/><ellipse class="nuc" cx="' + (ex0 + 52) + '" cy="170" rx="12" ry="15"/>'; for (var mm = 6; mm < 100; mm += 5) mv2 += "M" + (ex0 + mm) + " 110V102"; }
     o += HOT("Small intestine lining (enterocytes) with its brush border of microvilli, where alpha-glucosidase breaks starch, dextrin and disaccharides into glucose that can be absorbed.", cl + '<path class="ds-mv" d="' + mv2 + '"/>');
@@ -209,7 +209,7 @@ function dsPanel(st, D) {
     o += cap(204) + rbcs(204, 9000) + T(12, 222, "blood", "s b ds-onv", "start");
     /* starch chains drift along; split into glucose that is absorbed unless the enzyme is blocked */
     for (var ch = 0; ch < 4; ch++) {
-      var u2 = ((t / 9000 + ch / 4) % 1), bx = -60 + u2 * 560, by = (agi ? 58 : 54) + (ch % 2) * (agi ? 22 : 12), split = !agi && bx > 120;
+      var u2 = ((t / 9000 + ch / 4) % 1), bx = -60 + u2 * 560, by = (agi ? 56 : 48) + (ch % 2) * (agi ? 24 : 10), split = !agi && bx > 120;
       for (var j = 0; j < 5; j++) {
         var hx0 = split ? bx + j * 15 : bx + j * 11, edge = Math.max(0, Math.min(1, (hx0 - 6) / 20, (452 - hx0) / 20));
         if (edge <= 0) continue;
@@ -218,7 +218,7 @@ function dsPanel(st, D) {
       }
     }
     o += T(130, 132, "brush border:", "s", "middle") + T(130, 146, "alpha-glucosidase", "s b", "middle") + T(130, 160, agi ? "blocked" : "working", "s" + (agi ? " bad" : " mut"), "middle");
-    if (!agi) o += '<g class="ds-q"><circle cx="40" cy="80" r="9"/><text x="40" y="84" text-anchor="middle">?</text></g>' + T(270, 80, "colesevelam may decrease glucose absorption;", "s b", "middle") + T(270, 93, "the mechanism is not established", "s mut", "middle");
+    if (!agi) o += '<rect class="ds-notebg" x="20" y="64" width="420" height="25" rx="5"/><g class="ds-q"><circle cx="40" cy="76" r="9"/><text x="40" y="80" text-anchor="middle">?</text></g>' + T(250, 73, "colesevelam may decrease glucose absorption;", "s b", "middle") + T(250, 85, "the mechanism is not established", "s mut", "middle");
   }
   if (k === "liv") {
     o += '<path class="vessel" d="M378 1H446V245H378Z"/>' + T(412, 22, "blood", "s b ds-onv", "middle");
@@ -409,6 +409,7 @@ const CSS = `
 .anima .drugsites-svg .ds-chain{fill:none;stroke:var(--bx-glu);stroke-width:4;stroke-linecap:round;stroke-dasharray:3.5 2}
 .anima .drugsites-svg .ds-stop circle{fill:var(--surface);stroke:var(--bx-inhib);stroke-width:1.6}
 .anima .drugsites-svg .ds-stop path{stroke:var(--bx-inhib);stroke-width:2;stroke-linecap:round}
+.anima .drugsites-svg .ds-notebg{fill:var(--surface);opacity:.88}
 .anima .drugsites-svg .ds-q circle{fill:var(--surface);stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .drugsites-svg .ds-q text{fill:var(--anatomy-strong);font:700 11px var(--anatomy-mono)}
 .anima .drugsites-svg .ds-syr .ds-barrel{fill:var(--anatomy-face);stroke:var(--anatomy-mid);stroke-width:1.2}

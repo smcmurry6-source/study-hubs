@@ -154,10 +154,10 @@ function foAlbicans(cx, cy, s) {
   return o;
 }
 /* a label with extra lines under it */
-function foLab(x, y, lines, px, py, a) { var o = L(x, y, lines[0], px, py, a || "start"), i; for (i = 1; i < lines.length; i++) o += T(x, y + i * 15, lines[i], "s mut", a || "start"); return o; }
+function foLab(x, y, lines, px, py, a) { var o = L(x, y, lines[0], px, py, a || "start"), i; for (i = 1; i < lines.length; i++) o += T(x, y + i * 16, lines[i], "s mut", a || "start"); return o; }
 
 function foRender(st, D) {
-  var o = "", drift = "", s = Math.max(0, Math.min(7, st.s)), fert = st.fert === "yes", cx = 196, cy = 250, LX = 398, FX0 = 8, FX1 = 386, FY0 = 58, FY1 = 424, i;
+  var o = "", over = "", s = Math.max(0, Math.min(7, st.s)), fert = st.fert === "yes", cx = 196, cy = 250, LX = 398, FX0 = 8, FX1 = 386, FY0 = 58, FY1 = 424, i;
   st.s = s;
   var field = HOT("Ovarian cortex stroma: densely packed spindle-shaped stromal cells. The cortex holds the developing follicles; the medulla, deeper, is loose connective tissue rich in vessels and nerves.", '<rect class="fo-field" x="' + FX0 + '" y="' + FY0 + '" width="' + (FX1 - FX0) + '" height="' + (FY1 - FY0) + '" rx="10"/>');
   var labs = "", hole = [], sf = null;
@@ -174,7 +174,7 @@ function foRender(st, D) {
     body += HOT("Primary oocyte, arrested in prophase of meiosis I: a spherical cell about 25 µm in diameter, with an asymmetric nucleus, vesicular-looking chromatin and prominent organelles.", foOocyte(cx, cy, r0, { nr: 19, nx: 22, ny: -15 }));
     labs += foLab(LX, 96, ["primary oocyte", "about 25 µm"], cx + 40, cy - 40);
     labs += foLab(LX, 176, ["asymmetric nucleus", "vesicular chromatin"], cx + 34, cy - 22);
-    labs += foLab(LX, 262, ["squamous follicular", "cells, one layer"], cx + r0 + 4, cy + 10);
+    labs += foLab(LX, 262, ["follicular cells:", "squamous, one layer"], cx + r0 + 4, cy + 10);
     labs += foLab(LX, 330, ["desmosomes"], foPt(cx, cy, r0 + 3.5, 0.2 + 2 * 2 * Math.PI / 13)[0], foPt(cx, cy, r0 + 3.5, 0.2 + 2 * 2 * Math.PI / 13)[1]);
   } else if (s === 1) {
     var r1 = 84;
@@ -186,7 +186,7 @@ function foRender(st, D) {
     body += HOT("Basal lamina under the granulosa cells.", foCirc(cx, cy, r1 + 22, "fo-bl"));
     labs += foLab(LX, 92, ["primary oocyte", "100-150 µm"], cx + 52, cy - 50);
     labs += foLab(LX, 170, ["zona pellucida", "begins to form"], foPt(cx, cy, r1 + 2, -0.55)[0], foPt(cx, cy, r1 + 2, -0.55)[1]);
-    labs += foLab(LX, 258, ["cuboidal granulosa", "cells, one layer:", "gap junctions,", "no tight junctions"], foPt(cx, cy, r1 + 13, 0.25)[0], foPt(cx, cy, r1 + 13, 0.25)[1]);
+    labs += foLab(LX, 258, ["granulosa cells:", "cuboidal, one layer;", "gap junctions,", "no tight junctions"], foPt(cx, cy, r1 + 13, 0.25)[0], foPt(cx, cy, r1 + 13, 0.25)[1]);
   } else if (s === 2) {
     var r2 = 64, zo = r2 + 8, gR = zo + 52, ti = gR + 16, te = ti + 16;
     hole = [[cx, cy, te + 2]];
@@ -197,9 +197,9 @@ function foRender(st, D) {
     var mv = ""; for (i = 0; i < 44; i++) { var ma = i / 44 * 6.283, m0 = foPt(cx, cy, r2 + 0.5, ma), m1 = foPt(cx, cy, zo - 0.5, ma + 0.03); mv += "M" + f1(m0[0]) + " " + f1(m0[1]) + "L" + f1(m1[0]) + " " + f1(m1[1]); }
     body += HOT("Zona pellucida, now surrounding the oocyte: produced by the follicular cells, its major components are the glycoproteins ZP1, ZP2 and ZP3. Microvilli from the oocyte and filopodia from the granulosa cells penetrate it and make contact with each other.", '<circle class="fo-zp" cx="' + cx + '" cy="' + cy + '" r="' + (r2 + 4) + '" stroke-width="8"/><path class="fo-mv" d="' + mv + '"/>');
     body += HOT("Primary oocyte, still arrested in prophase I.", foOocyte(cx, cy, r2, { nr: 21, nx: 5, ny: -3 }));
-    labs += foLab(LX, 84, ["theca externa", "fibrous CT, smooth muscle"], foPt(cx, cy, te - 6, -1.2)[0], foPt(cx, cy, te - 6, -1.2)[1]);
-    labs += foLab(LX, 136, ["theca interna", "vascular; LH receptors:", "makes androgens"], foPt(cx, cy, (gR + ti) / 2, -0.75)[0], foPt(cx, cy, (gR + ti) / 2, -0.75)[1]);
-    labs += foLab(LX, 204, ["basal lamina"], foPt(cx, cy, gR + 1, -0.3)[0], foPt(cx, cy, gR + 1, -0.3)[1]);
+    labs += foLab(LX, 84, ["theca externa", "fibrous CT and", "smooth muscle"], foPt(cx, cy, te - 6, -1.2)[0], foPt(cx, cy, te - 6, -1.2)[1]);
+    labs += foLab(LX, 140, ["theca interna", "vascular; LH", "receptors: androgens"], foPt(cx, cy, (gR + ti) / 2, -0.75)[0], foPt(cx, cy, (gR + ti) / 2, -0.75)[1]);
+    labs += foLab(LX, 208, ["basal lamina"], foPt(cx, cy, gR + 1, -0.3)[0], foPt(cx, cy, gR + 1, -0.3)[1]);
     labs += foLab(LX, 254, ["granulosa cells", "several layers"], foPt(cx, cy, zo + 30, 0.12)[0], foPt(cx, cy, zo + 30, 0.12)[1]);
     labs += foLab(LX, 316, ["zona pellucida", "ZP1, ZP2, ZP3"], foPt(cx, cy, r2 + 4, 0.75)[0], foPt(cx, cy, r2 + 4, 0.75)[1]);
   } else if (s === 3 || s === 4) {
@@ -241,18 +241,18 @@ function foRender(st, D) {
     var ra5 = function (a) { return (g5 - 16) * (1 + 0.07 * Math.sin(6 * a) + 0.05 * Math.sin(11 * a + 1)); };
     hole = [[ox, oy, t5e + 2]];
     body += HOT("The emptied follicle collapses and becomes folded; LH then converts it into the corpus luteum.", foTheca(ox, oy, g5 + 1, t5i, t5e, 31, true) + foCirc(ox, oy, g5 + 1, "fo-bl") + foGran(ox, oy, g5, ra5, null, 8) + '<path class="fo-liq" d="' + foPolar(ox, oy, ra5, 120) + '"/>');
-    /* the tear through follicle wall and tunica, fluid escaping */
-    body += HOT("The swollen follicle pushed against the tunica albuginea until the walls of both the ovary and the follicle ruptured.", '<path class="fo-liq fo-plume" d="M' + f1(ox - 18) + " " + f1(oy - g5 + 6) + "C" + f1(ox - 22) + " " + f1(oy - g5 - 30) + " " + f1(ox + 10) + " 92 " + f1(ox + 46) + " 82C" + f1(ox + 30) + " 104 " + f1(ox + 20) + " " + f1(oy - g5 - 20) + " " + f1(ox + 18) + " " + f1(oy - g5 + 6) + 'Z"/>');
-    var fx = 288;
-    body += HOT("Infundibulum: the funnel-shaped end of the oviduct, covered by fimbriae. The secondary oocyte is released into the peritoneum near its opening and enters the duct.", (function () { var p = "M" + FX1 + " " + FY0 + "H" + (fx + 26) + "Q" + fx + " " + (FY0 + 16) + " " + (fx - 4) + " " + (FY0 + 30), k; for (k = 0; k < 6; k++) { var x0 = fx - 4 + k * 15, x1 = x0 + 15; p += "Q" + f1(x0 + 2) + " " + (FY0 + 52 + (k % 2) * 8) + " " + f1(x0 + 7.5) + " " + (FY0 + 50 + (k % 2) * 8) + "Q" + f1(x1 - 2) + " " + (FY0 + 48 + (k % 2) * 8) + " " + f1(x1) + " " + (FY0 + 30 + (k === 5 ? 6 : 0)); } return '<path class="fo-tube" d="' + p + "L" + FX1 + " " + (FY0 + 38) + 'Z"/>'; })());
-    var dr = '<g class="fo-drift">' + foRing(ox + 52, 116, 21, 30, 16, 0.3, "fo-gc", "fo-gn", "radial") + '<circle class="fo-zp" cx="' + f1(ox + 52) + '" cy="116" r="18.5" stroke-width="4.5"/>' + foOocyte(ox + 52, 116, 16, { meta: true }) + foCirc(ox + 44, 126, 3.4, "fo-pb") + "</g>";
-    body += "@@DRIFT@@";
-    labs += foLab(LX, 136, ["secondary oocyte", "+ corona radiata,", "toward the", "infundibulum"], ox + 70, 112);
-    labs += foLab(LX, 214, ["first polar body"], ox + 42, 128);
-    labs += foLab(LX, 262, ["ruptured tunica", "albuginea"], ox + 52, sf(ox + 52) + 9);
+    /* the tear: open from the antrum through the follicle wall, the theca and the tunica albuginea */
+    body += HOT("The swollen follicle pushed against the tunica albuginea until the walls of both the ovary and the follicle ruptured.", '<path class="fo-tear" d="M' + f1(ox - 12) + " " + f1(oy - g5 + 18) + "C" + f1(ox - 16) + " " + f1(oy - g5 - 6) + " " + f1(ox - 26) + " 132 " + f1(ox - 24) + " 108L" + f1(ox + 24) + " 108C" + f1(ox + 24) + " 132 " + f1(ox + 14) + " " + f1(oy - g5 - 6) + " " + f1(ox + 12) + " " + f1(oy - g5 + 18) + 'Z"/>');
+    var fx = 290, fing = "M" + FX1 + " " + FY0 + "H" + (fx + 26) + "Q" + fx + " " + (FY0 + 14) + " " + (fx - 4) + " " + (FY0 + 28), k;
+    for (k = 0; k < 6; k++) { var x0 = fx - 4 + k * 15, x1 = x0 + 15, dy = (k % 2) * 7; fing += "Q" + f1(x0 + 1) + " " + (FY0 + 46 + dy) + " " + f1(x0 + 7.5) + " " + (FY0 + 46 + dy) + "Q" + f1(x1 - 1) + " " + (FY0 + 46 + dy) + " " + f1(x1) + " " + (FY0 + 28 + (k === 5 ? 4 : 0)); }
+    over += HOT("Infundibulum: the funnel-shaped end of the oviduct, covered by fimbriae. The secondary oocyte is released into the peritoneum near its opening and enters the duct.", '<path class="fo-tube" d="' + fing + "L" + FX1 + " " + (FY0 + 34) + 'Z"/>');
+    over += '<ellipse class="fo-liq" cx="' + f1(ox + 6) + '" cy="100" rx="4" ry="2.6"/><ellipse class="fo-liq" cx="' + f1(ox + 20) + '" cy="93" rx="3" ry="2"/>';
+    over += HOT("The secondary oocyte, arrested at metaphase II, with its first polar body under the zona pellucida and the cells of the corona radiata, released into the peritoneum near the infundibulum.", '<g class="fo-drift">' + foRing(ox + 56, 86, 16, 24, 15, 0.3, "fo-gc", "fo-gn", "radial") + '<circle class="fo-zp" cx="' + f1(ox + 56) + '" cy="86" r="14.5" stroke-width="3.5"/>' + foOocyte(ox + 56, 86, 12.5, { meta: true }) + foCirc(ox + 49, 94, 2.8, "fo-pb") + "</g>");
+    labs += foLab(LX, 104, ["secondary oocyte", "+ corona radiata,", "toward the", "infundibulum"], ox + 78, 82);
+    labs += foLab(LX, 184, ["first polar body"], ox + 50, 95);
+    labs += foLab(LX, 236, ["ruptured tunica", "albuginea"], ox + 30, sf(ox + 30) + 9);
     labs += foLab(LX, 330, ["collapsing,", "folding follicle"], foPt(ox, oy, g5 - 6, 0.35)[0], foPt(ox, oy, g5 - 6, 0.35)[1]);
-    labs += T(fx + 46, FY0 + 22, "fimbriae", "s mut", "middle");
-    drift = dr;
+    labs += T(fx + 44, FY0 + 18, "fimbriae", "s mut", "middle");
   } else if (s === 6 || (s === 7 && fert)) {
     var sc = s === 7 ? 1.08 : 1, lx = cx, ly = cy + 4;
     hole = [[lx, ly, 150 * sc]];
@@ -270,16 +270,16 @@ function foRender(st, D) {
     labs += foLab(LX, 220, ["fibroblasts", "secrete it"], foPt(ax, ay, 46, 0.55)[0], foPt(ax, ay, 46, 0.55)[1]);
     labs += foLab(LX, 300, ["a pale scar: the", "corpus albicans"], ax + 82, ay + 26);
   }
-  o += field + foStroma(FX0, FY0, FX1, FY1, hole, sf, 7 + s * 13, 300) + body.replace("@@DRIFT@@", "");
+  o += field + foStroma(FX0, FY0, FX1, FY1, hole, sf, 7 + s * 13, 300) + body;
   if (s === 4) o += HOT("The ovary's surface: an epithelium continuous with the mesothelium (the so-called germinal epithelium) over the tunica albuginea, its capsule. The Graafian follicle makes a bulge here and has to break through it at ovulation.", foSurface(FX0, FX1, 128, 30, cx, 130, null, FY0));
-  if (s === 5) o += HOT("The ovary's surface and tunica albuginea, torn where the follicle ruptured.", foSurface(FX0, FX1, 134, 22, cx - 10, 120, [cx - 34, cx + 14], FY0)) + drift;
+  if (s === 5) o += HOT("The ovary's surface and tunica albuginea, torn where the follicle ruptured.", foSurface(FX0, FX1, 134, 22, cx - 10, 120, [cx - 34, cx + 14], FY0)) + over;
   o += '<rect class="fo-frame" x="' + FX0 + '" y="' + FY0 + '" width="' + (FX1 - FX0) + '" height="' + (FY1 - FY0) + '" rx="10"/>';
   /* title and the meiosis badge */
   o += '<circle class="fo-num" cx="22" cy="28" r="13"/>' + T(22, 33, String(s + 1), "fo-numt", "middle");
   o += T(43, 34, s === 7 && fert ? "Corpus luteum, kept" : D.STAGES[s], "b fo-title", "start");
-  var mb = s <= 3 ? ["primary oocyte", "arrested: prophase I"] : s === 4 ? ["primary oocyte", "prophase I → LH surge"] : s === 5 ? ["secondary oocyte", "arrested: metaphase II"] : fert ? ["fertilized in the tube", "meiosis II completes"] : ["oocyte has left", "metaphase II, ~24 h"];
+  var mb = s <= 3 ? ["PRIMARY OOCYTE", "prophase I, arrested"] : s === 4 ? ["PRIMARY OOCYTE", "prophase I → LH surge"] : s === 5 ? ["SECONDARY OOCYTE", "metaphase II, arrested"] : fert ? ["FERTILIZED", "meiosis II completes"] : ["OOCYTE HAS LEFT", "metaphase II, ~24 h"];
   o += HOT(s <= 3 ? "Every follicle holds a primary oocyte arrested in prophase of meiosis I, from before birth until the LH surge." : s === 4 ? "Still prophase I. The LH surge causes release of meiosis-inducing factor, and the primary oocyte completes meiosis I shortly before ovulation." : s === 5 ? "Meiosis I ended with unequal cytokinesis: a secondary oocyte and the first polar body. The secondary oocyte entered meiosis II and is arrested at metaphase II until fertilization." : fert ? "Only upon fertilization (usually in the ampulla) does the oocyte complete meiosis II, forming the ovum and a second polar body." : "The ovulated secondary oocyte stays at metaphase II; unfertilized, it remains viable only about 24 hours.",
-    '<rect class="fo-badge" x="384" y="8" width="188" height="42" rx="9"/>' + T(396, 25, "MEIOSIS · " + mb[0], "fo-bk", "start") + T(396, 43, mb[1], "b fo-bv", "start"));
+    '<rect class="fo-badge" x="364" y="7" width="212" height="44" rx="9"/>' + T(376, 24, "MEIOSIS · " + mb[0], "fo-bk", "start") + T(376, 43, mb[1], "b fo-bv", "start"));
   o += labs;
   o += T(LX, FY1 - 18, "not to scale:", "s mut", "start") + T(LX, FY1 - 3, s <= 0 ? "oocyte ≈ 25 µm" : s <= 3 ? "oocyte 100-150 µm" : s <= 5 ? "Graafian ≈ 20 mm" : "drawn to fill", "s mut", "start");
   return o;
