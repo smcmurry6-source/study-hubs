@@ -654,7 +654,7 @@
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var CSS = [
     ".shpv-frame{position:fixed;inset:0;border:3px dashed #c2410c;pointer-events:none;z-index:2147483646}",
-    ".shpv-pill{position:fixed;left:12px;bottom:12px;z-index:2147483647;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:22px;border:2px solid #7c2d12;background:#c2410c;color:#fff;font:600 14px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3)}",
+    ".shpv-pill{position:fixed;left:12px;bottom:12px;z-index:2147483647;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:22px;background:#c2410c;color:#fff;font:600 14px/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;cursor:pointer}",
     ".shpv-pill:focus-visible,.shpv-panel button:focus-visible,.shpv-panel select:focus-visible,.shpv-panel input:focus-visible,.shpv-panel summary:focus-visible{outline:3px solid #2563eb;outline-offset:2px}",
     ".shpv-pill.is-alert{background:#b91c1c;border-color:#450a0a}",
     ".shpv-pill.is-min{padding:0;width:44px;justify-content:center}",
@@ -678,7 +678,7 @@
     var st = jget(K.ui, {});
     document.body.appendChild(el("div", { "class": "shpv-frame", "aria-hidden": "true" }));
     var pill = el("button", { id: "shpv-pill", type: "button", "class": "shpv-pill" + (st.min ? " is-min" : ""), "aria-expanded": "false", "aria-controls": "shpv-panel" });
-    pill.innerHTML = '<span aria-hidden="true">&#9888;</span><span class="shpv-pill-text">Preview · ' + esc(P.name) + '</span>';
+    pill.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M8 2.2 14.3 13.3H1.7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 6.4v3.4M8 11.6v.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="shpv-pill-text">Preview · ' + esc(P.name) + '</span>';
     pill.setAttribute("aria-label", "Preview, not the live site. Test account: " + P.name + ". Open preview controls.");
     document.body.appendChild(pill);
     var panel = el("div", { id: "shpv-panel", "class": "shpv-panel", role: "dialog", "aria-modal": "false", "aria-labelledby": "shpv-title", hidden: "" });

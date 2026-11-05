@@ -115,7 +115,7 @@
     '.sh-ru-unl{list-style:none; margin:16px auto 0; padding:0; display:grid; gap:8px; text-align:left; max-width:380px;}' +
     '.sh-ru-unl li{display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:14px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12);' +
     '  font-size:13.5px; line-height:1.35; color:rgba(255,255,255,.86); opacity:0; animation:sh-ru-left .5s both; animation-delay:calc(.85s + var(--i) * .13s);}' +
-    '.sh-ru-unl b{display:block; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--ru-n2);}' +
+    '.sh-ru-unl b{display:block; font-size:13px; letter-spacing:0; text-transform:none; color:var(--ru-n2);}' +
     '.sh-ru-ic{flex:none; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(255,255,255,.08) center/cover;' +
     '  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);} .sh-ru-ic svg{width:30px; height:30px; display:block;}' +
     '.sh-ru-go{margin-top:20px; font:inherit; font-size:15px; font-weight:800; letter-spacing:.02em; padding:12px 36px; border-radius:99px; border:0; cursor:pointer; color:#17110A;' +
@@ -143,7 +143,7 @@
     '.sh-ru-lv-coin{width:100%; height:100%; transform-style:preserve-3d;} .sh-ru-lv-coin svg{display:block; width:100%; height:100%; filter:drop-shadow(0 6px 12px rgba(0,0,0,.5));}' +
     '.sh-ru-lv-ring{position:absolute; inset:0; border-radius:50%; border:3px solid var(--ru-c); opacity:0; pointer-events:none; box-shadow:0 0 16px var(--ru-g80);}' +
     '.sh-ru-lv-body{flex:1; min-width:0;}' +
-    '.sh-ru-lv-eye{font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ru-n2);}' +
+    '.sh-ru-lv-eye{font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:var(--ru-n2);}' +
     '.sh-ru-lv-name{display:flex; align-items:baseline; gap:.28em; margin-top:2px; font:400 27px/1.15 var(--font-display, Georgia, "Times New Roman", serif);}' +
     '.sh-ru-roll{position:relative; display:inline-block; overflow:hidden; line-height:1.15;}' +
     '.sh-ru-roll i{visibility:hidden; font-style:normal;}' +
@@ -178,7 +178,7 @@
     '  background:linear-gradient(170deg, #211D29, #120F18); border:1px solid rgba(255,255,255,.12); box-shadow:0 30px 80px -20px rgba(0,0,0,.7), 0 0 60px -20px var(--mk-c);' +
     '  transform:translateY(18px) scale(.96); transition:transform .5s cubic-bezier(.2,1.2,.4,1);}' +
     '.sh-mk.is-on .sh-mk-card{transform:none;}' +
-    '.sh-mk-eye{font-size:11.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.62);}' +
+    '.sh-mk-eye{font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:rgba(255,255,255,.62);}' +
     '.sh-mk-ring{position:relative; width:168px; height:168px; margin:14px auto 4px;}' +
     '.sh-mk-ring svg{display:block; width:100%; height:100%; transform:rotate(-90deg); overflow:visible;}' +
     '.sh-mk-ring circle{fill:none; stroke-width:9; stroke-linecap:round;} .sh-mk-ring .bg{stroke:rgba(255,255,255,.1);}' +

@@ -1473,7 +1473,7 @@
       "  font-size:12.5px; line-height:1.35; text-align:left; opacity:0; transform:translateY(6px) scale(.96); transform-origin:0 100%; pointer-events:none; transition:opacity .25s, transform .25s cubic-bezier(.2,.8,.3,1);}",
       ".shpet-say.is-on{opacity:1; transform:none; pointer-events:auto;}",
       ".shpet-say b{font-weight:700;}",
-      ".shpet-say small{font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; opacity:.65;}",
+      ".shpet-say small{font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; opacity:.75;}",
       ".shpet-say .shpet-more{display:inline-block; margin-top:6px; padding:0; border:0; background:none; color:var(--pet-accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}",
       /* where it lives */
       ".shpet-home{position:fixed; z-index:9989; left:14px; bottom:12px; width:64px; transition:opacity .3s, transform .3s;}",

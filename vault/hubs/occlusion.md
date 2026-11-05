@@ -21,6 +21,16 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
 - **Built on** the MSK Exam 4 engine; palette "articulating paper" (Bricolage Grotesque / Public Sans / JetBrains Mono).
   It is the model other hubs copy for `two()`, `tf()`, `nums()`, `choiceOrder()`, `whyHTML`, shared patients (`CASES`,
   `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).
+- **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+  bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
+  `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
+  if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in
+  `house.css`, under that hub's comment. Design notes and critiques:
+  [2026-11-05-redesign-design-notes](../release/reports/2026-11-05-redesign-design-notes.md).
+- **Home** is drawn by `widget/blueprint.js` (`window.shHome`: the sheet with the band, countdown and quick start; the
+  ledger; the moments row; `window.shBlueprint`: the exam-by-lecture bars) from the hub's own data in `renderHome`. In
+  Compendium the subtabs come first and the Timmy Time slot (`data-sh-podcast`) sits under them; on a phone the card
+  starts folded (`widget/podcast.js`).
 - **Sources** (Drive, Occlusion): the help sheet (`Occ Lec0 help`, Hubs folder), the Midterm and Final folders (slides,
   handouts, lecture captures). Board-exam items in last year's class deck were deliberately not reproduced.
 - **Figures and the cusp game** come from `tools/figures/occlusion/`: `od.js` (the kit, the contact map, `CASE_IMG`

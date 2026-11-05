@@ -63,7 +63,7 @@
     ".sh-la-big{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:26px;font-weight:700;letter-spacing:.12em;}" +
     ".sh-la-enter{display:flex;gap:8px;}" +
     ".sh-la-enter input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--la-line);border-radius:10px;font:inherit;font-size:16px;" +
-    "text-transform:uppercase;letter-spacing:.08em;background:var(--la-bg);color:var(--la-ink);}" +
+    "text-transform:none;letter-spacing:0;background:var(--la-bg);color:var(--la-ink);}" +
     ".sh-la-msg{min-height:1.4em;margin-top:6px;font-size:13.5px;color:var(--la-ink2);}" +
     ".sh-la-codebox{margin:4px 0 12px;padding:12px 14px;border-radius:12px;background:var(--la-bg2);text-align:center;}" +
     ".sh-la-codebox small{display:block;color:var(--la-ink2);font-size:12.5px;margin-top:4px;}";

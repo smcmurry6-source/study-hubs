@@ -41,4 +41,12 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
 
 History: grep `Special Patient Care` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
+- **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+  bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
+  `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
+  if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in
+  `house.css`, under that hub's comment. Design notes and critiques:
+  [2026-11-05-redesign-design-notes](../release/reports/2026-11-05-redesign-design-notes.md).
+- **Home** is drawn by `widget/blueprint.js` (`window.shHome`, `window.shBlueprint`) from the hub's data in `renderHome`.
+
 Related: [home](../home.md) · [pcd-implants-exam1](pcd-implants-exam1.md) (built on this engine)

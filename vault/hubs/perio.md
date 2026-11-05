@@ -44,6 +44,17 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
   furcation entrance wider, Hamp as under 3 / over 3 mm / through (in class it was called "three millimeter increments").
 
+- **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+  bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
+  `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
+  if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in
+  `house.css`, under that hub's comment. Design notes and critiques:
+  [2026-11-05-redesign-design-notes](../release/reports/2026-11-05-redesign-design-notes.md).
+- **Home keeps Perio's own engine** (the hero card, stat boxes, Where to next, Course map), restyled by the house block:
+  the card labels are `h3.eyebrow` headings now (the old `div.eyebrow`), the label-above-title pairs are title first with
+  a `p.eyebrow` under it, and "D2" sits upright. Moving Home onto `widget/blueprint.js` like the other three hubs is
+  phase 2 of [the redesign task](../tasks/2026-11-05-site-redesign-taste.md).
+
 ## Diagram decisions
 
 - 2026-09-25: the Atlas mode's diagrams were removed for being inaccurate. Accuracy is the bar.

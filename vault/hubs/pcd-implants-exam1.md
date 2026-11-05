@@ -58,4 +58,13 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
 
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
+- **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+  bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
+  `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
+  if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in
+  `house.css`, under that hub's comment. Design notes and critiques:
+  [2026-11-05-redesign-design-notes](../release/reports/2026-11-05-redesign-design-notes.md).
+- **Home** is drawn by `widget/blueprint.js` (`window.shHome`, `window.shBlueprint`) from the hub's data in `renderHome`;
+  its Timmy Time slot stays on Home, between the alerts and the ledger.
+
 Related: [home](../home.md) · [special-patient-care](special-patient-care.md) (its engine)

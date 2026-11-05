@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Study Hubs">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#EEF2F4">
+<meta name="theme-color" content="#F1F0EC">
 <meta name="robots" content="noindex,nofollow">
 <title>Admin · Study Hubs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,15 +28,15 @@
    Grid: 12 columns, 16px gap; at 1440 the sheet is 1440 - 228 - 8 = 1204 wide, 1156 inside its 24px padding:
    12 x 83 + 11 x 16 = 1172 ... columns are fr units, so the cards always land on the sheet's padding edges. */
 :root{
-  --frame:#EEF2F4; --sheet:#FFFFFF; --raised:#F4F6F8; --active:#E1E7EB;
-  --border:#E2E7EA; --rule:#EDF0F2; --control:#C5CED5;
-  --text:#15202A; --muted:#4A5864; --faint:#5A6874;
-  --accent:#2F6FD6; --accent-soft:#E7EFFB; --accent-ink:#1D4E9E; --primary:#15202A; --primary-ink:#FFFFFF;
+  --frame:#F1F0EC; --sheet:#FFFFFF; --raised:#F6F5F2; --active:#E7E5DF;
+  --border:#E3E1DB; --rule:#ECEAE5; --control:#C9C5BC;
+  --text:#1F201D; --muted:#484945; --faint:#5E5F5B;
+  --accent:#1B6E66; --accent-soft:#DDEBE8; --accent-ink:#144F49; --primary:#1F201D; --primary-ink:#FFFFFF;
   --positive:#1F7A50; --negative:#B42318; --warn:#B4530A; --warn-soft:#FFF4E5;
   --pill-pos-bg:#DCF5E6; --pill-pos-ink:#0B3D23; --pill-neg-bg:#FDE8E4; --pill-neg-ink:#7E1D14;
   --pill-warn-bg:#FFF6DB; --pill-warn-ink:#7A4A06; --pill-bg:#EDF0F2; --pill-ink:#33404B;
   --font:'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --fs-title:24px; --fs-section:16px; --fs-body:14px; --fs-small:12px; --fs-kpi:24px; --fs-lead:32px;
+  --fs-title:24px; --fs-section:16px; --fs-body:15px; --fs-small:13px; --fs-kpi:24px; --fs-lead:32px;
   --sidebar:228px; --inset:8px; --pad:24px; --gap:16px; --card-pad:20px;
   --r-sheet:16px; --r-card:8px; --r-control:6px; --ctl:32px;
   --ease:cubic-bezier(.22,1,.36,1);
@@ -46,7 +46,7 @@
     --frame:#000000; --sheet:#111111; --raised:#1B1B1B; --active:#262626;
     --border:#2A2A2A; --rule:#1F1F1F; --control:#4A4A4A;
     --text:#F3F3F3; --muted:#B4B4B4; --faint:#9A9A9A;
-    --accent:#7AA7F2; --accent-soft:#16233A; --accent-ink:#A9C7F7; --primary:#F3F3F3; --primary-ink:#000000;
+    --accent:#6FC2B8; --accent-soft:#132C29; --accent-ink:#8ED3CA; --primary:#F3F3F3; --primary-ink:#000000;
     --positive:#4CC88A; --negative:#F07A6A; --warn:#F2A255; --warn-soft:#2B1E10;
     --pill-pos-bg:#14291D; --pill-pos-ink:#6BD9A0; --pill-neg-bg:#2E1814; --pill-neg-ink:#F59A8C;
     --pill-warn-bg:#2B2310; --pill-warn-ink:#E9B949; --pill-bg:#222222; --pill-ink:#E2E2E2;
@@ -316,6 +316,8 @@ code{font-size:13px;}
 .qh-ch{position:relative; display:flex; justify-content:space-between; gap:12px; padding:6px 10px; border-radius:var(--r-control); background:var(--raised); overflow:hidden;}
 .qh-ch-t, .qh-ch-n{position:relative; z-index:1;}
 .qh-ch-t{overflow-wrap:anywhere; min-width:0;}
+.qh-key{display:inline-block; width:14px; height:14px; vertical-align:-2px; color:var(--positive);}
+.qh-key svg{width:100%; height:100%; display:block;}
 .qh-ch-n{flex:none; font-size:var(--fs-small); font-weight:600;}
 .qh-ch-bar{position:absolute; left:0; top:0; bottom:0; background:color-mix(in srgb, var(--accent) 18%, transparent);}
 .qh-ch.is-key{background:var(--pill-pos-bg); color:var(--pill-pos-ink);}
@@ -1988,7 +1990,7 @@ code{font-size:13px;}
     var mk = (r.flags || []).filter(function(f){ return f.code === "miskey"; })[0];
     var rows = q.choices.map(function(c, i){
       var n = +src[i] || 0, isKey = keys.indexOf(i) > -1, p = tot ? Math.round(100 * n / tot) : 0;
-      return '<li class="qh-ch' + (isKey ? ' is-key' : '') + (mk && mk.choice === i ? ' is-flag' : '') + '"><span class="qh-ch-t">' + (isKey ? '<b aria-label="key">✓</b> ' : '') + esc(c) + '</span>' +
+      return '<li class="qh-ch' + (isKey ? ' is-key' : '') + (mk && mk.choice === i ? ' is-flag' : '') + '"><span class="qh-ch-t">' + (isKey ? '<span class="qh-key" role="img" aria-label="key"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> ' : '') + esc(c) + '</span>' +
         (tot ? '<span class="qh-ch-n n">' + p + '% <span class="muted">(' + n + ')</span></span><span class="qh-ch-bar" style="width:' + p + '%"></span>' : '') + '</li>';
     }).join("");
     var lab = !tot ? "No picks recorded yet" : useV ? "First tries on this version (" + tot + ")" : "Every pick, all versions and tries (" + tot + ")";

@@ -49,7 +49,7 @@
     ".sh-tour.is-center{left:50% !important; top:50% !important; transform:translate(-50%,-50%); width:min(440px, calc(100vw - 32px));}",
     ".sh-tour-x{position:absolute; top:10px; right:10px; width:32px; height:32px; border:0; border-radius:50%; background:transparent; color:var(--sht-ink3); font-size:22px; line-height:1; cursor:pointer; padding:0;}",
     ".sh-tour-x:hover{background:var(--sht-bg2); color:var(--sht-ink);}",
-    ".sh-tour-eyebrow{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--sht-ink3);}",
+    ".sh-tour-eyebrow{font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; color:var(--sht-ink3);}",
     ".sh-tour h3{font-family:var(--sht-display); font-weight:400; font-size:25px; line-height:1.15; margin:4px 32px 8px 0; color:var(--sht-ink); letter-spacing:0; text-transform:none;}",
     ".sh-tour-body{font-size:14.5px; line-height:1.5; color:var(--sht-ink2);}",
     ".sh-tour-body p{margin:0 0 8px;} .sh-tour-body b{color:var(--sht-ink);}",

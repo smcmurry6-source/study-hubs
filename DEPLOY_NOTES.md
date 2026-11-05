@@ -32,6 +32,35 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (Site redesign, phase 1: the house style, with the Taste skill, Claude Code)** — Sam: "Perform a full-site
+  visual, usability, performance, accessibility, and learning-experience redesign using the Taste skill in full." Led by the
+  class's own numbers ([evidence brief](vault/release/reports/2026-11-05-redesign-evidence-brief.md): the bank and the
+  notes are 70-96% of time, phones are most visits, Home is the first screen) and the dealt directions ([design
+  notes](vault/release/reports/2026-11-05-redesign-design-notes.md): "page-is-the-object" for a hub, "editorial-greeting"
+  for the dashboard). **Hubs** (the four live ones): a shared house style, `tools/house/house.css`, pasted into each hub by
+  `node tools/house/build.mjs` (one serif, 16 px floor, bone paper, one ink per hub from `tools/house/hubs.json`, no
+  shadows, hairlines, eyebrows or mono labels); Home redrawn by `widget/blueprint.js` as the exam sheet (the band, a
+  countdown in days or hours, quick start, the exam-by-lecture blueprint bars, the ledger, the moments row); the bank
+  card, filter panel, notes and Review on the same type; Perio keeps its own Home engine, restyled (its card labels are
+  headings, "D2" upright); Review's lecture chips wrap; on a phone only the mode row stays stuck (`--sh-head-top`) and the
+  Timmy Time card starts folded (`widget/podcast.js`: More/Less, opens on Play; new `pod:<id>:open`/`:fold` events); in
+  Occlusion the subtabs come before the episode card. **Widget** (`widget/v3.css`): 13 px floor, no shadows at rest, no
+  gradient tiers, phone sheets hidden until open; the Hub/Class toggle fills when pressed; the Stats launcher and the
+  podcast speed button say their visible text (BUG-003); the reply pop-up's shadow and the preview badge's emoji quieted.
+  **Dashboard** (`index.html`): white page, bone panels, the greeting as the h1 ("Morning, Ava.") with the next exam under
+  it, four count tiles (days, questions tried, streak, days studied), a 9/3 row for the exam and the last two weeks, hub
+  cards tinted by class, 15 px body, no shadows or icon chips. **About**: same type system, eyebrows and hairlines gone,
+  tables stack on a phone (and have keyboard stops: BUG-006), visible focus everywhere (BUG-007), entries "A new look",
+  "Next exam", "Greeting and name", the folded phone card under Timmy Time. **Admin** (`review/`): tokens aligned
+  (bone frame, teal accent, 15/13 px), the key glyph is an SVG. **Accessibility**: Perio's suture figures named
+  (BUG-005), its Review chips use `aria-pressed` (BUG-004), risk-table ticks read "Yes". Perio's dashed grade rows,
+  Occlusion's sideways scroll at 320 px (the timeline's bleed) and About's scroll entrance (it hid cards in a full-page
+  render) were found and fixed in the preview (bug log BUG-021 to BUG-024). Tier 2: previewed, release suites run, UAT
+  as the test accounts; waits for Sam's written approval ([test report](vault/release/reports/2026-11-05-site-redesign.md),
+  [task](vault/tasks/2026-11-05-site-redesign-taste.md)). Sam's three direction calls (type, color, pictures) are in the
+  task note. `sw.js` is `sh-v57` (precaches `widget/blueprint.js`). Phase 2 (archived hubs, the arcade lobby chrome,
+  Perio's Home on the shared sheet) is listed in the task note.
+
 - **2026-11-05 (Settings rows and Timmy's bubble fit a phone at the largest text: BUG-013, Claude Code)** — the follow-up to the top-bar PR (#235). **Settings sheet** (dashboard `index.html` `.set-x .set-seg`, hubs `widget/v3.css` `.shset-x .shset-seg`): a row of buttons beside its label was `flex:none`, so Timmy Tooth's Everywhere / Dashboard only / Off ran past the sheet at XX-Large on a phone; rows now shrink to their line and wrap (unchanged at normal text). **Timmy's speech bubble** (`widget/pet.js`, the dashboard perch): `place()` flipped it to his left whenever the right had under 200 px without checking the left, so at 320 px with the largest text it started 95 px off screen. It now measures both sides (rects against the page's own rect, turned into CSS px by the perch's offsetWidth), takes the roomier one, caps its width to that room (`--pet-room`), and goes above him, kept on screen, when neither side has 120 px. Its `100vw` caps use `--pet-vw` (the screen in zoomed px, set when he talks), the house bubble is capped to its scene (260% of his spot). **CI:** `tools/ci/smoke.js` opens the Settings sheet on the dashboard and every hub at 390 px with the largest text and fails a button past the sheet's edge (fails on `main`, passes here). The other two follow-ups from #235 (Perio's arcade 6 px, the Review table's keyboard stop) were already fixed by PR 239. `sw.js` sh-v56.
 - **2026-11-05 (no post-release monitoring, Claude Code)** — Sam: "take out all of the monitoring instructions now and
   for the future". The 1, 24 and 48 hour checks after a release are gone from `RELEASE_TEST_PLAN.md` (section 11 is now

@@ -1939,7 +1939,8 @@
       if (tabsOver()) { set(h, "tall"); if (tabsOver()) set(h, "grid"); }
       done();
     }
-    function done(){ docEl.style.setProperty("--sh-head-h", head.offsetHeight + "px"); }
+    /* --sh-head-top lets a phone's top bar scroll its title row away and keep only the mode row stuck (house.css) */
+    function done(){ docEl.style.setProperty("--sh-head-h", head.offsetHeight + "px"); var ms = head.querySelector("#modeSwitch"); docEl.style.setProperty("--sh-head-top", ms && ms.offsetTop > 8 ? (6 - ms.offsetTop) + "px" : "0px"); }
     function queue(){ if (!queued) { queued = true; requestAnimationFrame(fit); } }
     fit();
     if (window.ResizeObserver) new ResizeObserver(function(){ if (top.clientWidth !== lastW) queue(); }).observe(top);
@@ -2044,7 +2045,7 @@
     /* desktop: today's drill sits beside the launcher until it's done (widget/drill.js fills it in) */
     '<div class="shstat-launchrow">' +
       '<button class="sh-drill-chip" id="sh-drill-chip" type="button" data-sh-drill hidden>' + ICON_BOLT + '<span>Daily drill</span><span class="shd-chip-sub"></span></button>' +
-      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools: search, daily drill, class stats, inbox, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
+      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools, 1 studying now: search, daily drill, class stats, inbox, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
     '</div>';
   document.body.appendChild(root);
 
@@ -2052,7 +2053,7 @@
     var n = document.getElementById("shstat-online-n");
     if (n) n.textContent = onlineCount;
     var n2 = document.getElementById("shstat-launch-n");
-    if (n2) n2.textContent = onlineCount;
+    if (n2){ n2.textContent = onlineCount; var lb = n2.closest("button"); if (lb) lb.setAttribute("aria-label", "Study tools, " + onlineCount + " studying now: search, daily drill, class stats, inbox, settings"); }
   }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }

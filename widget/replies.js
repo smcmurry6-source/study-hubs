@@ -26,7 +26,7 @@
     ".sh-reply{position:fixed;right:16px;bottom:calc(var(--sh-tabbar-h,0px) + 16px + env(safe-area-inset-bottom,0px));z-index:10001;" +
     "width:min(400px,calc(var(--r-vw,100vw) - 32px));max-height:calc(var(--r-vh,100vh) - var(--sh-tabbar-h,0px) - 48px);overflow:hidden;display:flex;flex-direction:column;box-sizing:border-box;padding:16px 18px 14px;border-radius:16px;" +
     "background:var(--r-bg);border:1px solid var(--r-line);" +
-    "box-shadow:0 2px 6px rgba(20,16,12,.08),0 18px 44px -14px rgba(20,16,12,.4);animation:shReplyIn .28s ease-out;}" +
+    "box-shadow:0 2px 8px rgba(20,16,12,.08);animation:shReplyIn .28s ease-out;}" +
     "@media (max-width:560px){.sh-reply{right:12px;left:12px;width:auto;}}" +
     "@keyframes shReplyIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}" +
     ".sh-reply-top{display:flex;align-items:center;gap:8px;margin:0 28px 8px 0;font-weight:700;font-size:15.5px;}" +
@@ -34,14 +34,14 @@
     ".sh-reply-x{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;" +
     "color:var(--r-ink2);font-size:22px;line-height:1;cursor:pointer;}" +
     ".sh-reply-x:hover{background:var(--r-bg2);}" +
-    ".sh-reply-meta{font-size:12.5px;color:var(--r-ink2);margin-bottom:8px;}" +
+    ".sh-reply-meta{font-size:13px;color:var(--r-ink2);margin-bottom:8px;}" +
     ".sh-reply-you{font-size:13px;color:var(--r-ink2);border-left:3px solid var(--r-line);padding:2px 0 2px 10px;margin:0 0 10px;" +
     "white-space:pre-wrap;overflow-wrap:anywhere;}" +
     ".sh-reply-msg{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 12px;}" +
     /* in the pop-up only the message scrolls, so the buttons stay on screen at any text size */
     ".sh-reply > *{flex:none;}.sh-reply > .sh-reply-msg{flex:0 1 auto;min-height:3em;overflow:auto;}" +
     ".sh-reply-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;}" +
-    ".sh-reply-count{margin-right:auto;font-size:12.5px;color:var(--r-ink2);}" +
+    ".sh-reply-count{margin-right:auto;font-size:13px;color:var(--r-ink2);}" +
     ".sh-reply-ok{border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;" +
     "background:var(--r-ink);color:var(--r-bg);}" +
     /* inbox: centered sheet on desktop, bottom sheet on phones */
@@ -58,7 +58,7 @@
     ".sh-inbox-item:last-child{border-bottom:0;}" +
     ".sh-inbox-item .sh-reply-top{margin:0 0 4px;font-size:14.5px;}" +
     ".sh-inbox-item .sh-reply-top svg{width:18px;height:18px;}" +
-    ".sh-inbox-new{flex:none;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent-contrast,#fff);" +
+    ".sh-inbox-new{flex:none;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent-contrast,#fff);" +
     "background:var(--r-accent);border-radius:999px;padding:2px 7px;}" +
     ".sh-inbox-item .sh-reply-msg{margin:0;}" +
     ".sh-inbox-empty{padding:28px 4px;color:var(--r-ink2);text-align:center;}" +

@@ -1,0 +1,47 @@
+{
+  "about": "Each hub printed in its own single ink on the shared bone paper (vault/release/reports/2026-11-05-redesign-design-notes.md). ink: light-mode text and accent; deep: dark-mode ground. Keep every ink at 9:1 or more on #ecebe7. 'later' holds the archived hubs' inks for the phase 2 token pass (vault/tasks/2026-11-05-site-redesign-taste.md); the build only touches 'hubs'.",
+  "hubs": {
+    "occlusion": {
+      "name": "navy, articulating-paper blue",
+      "ink": "#1b2a5c",
+      "deep": "#10172f"
+    },
+    "perio": {
+      "name": "wine",
+      "ink": "#4a1b2e",
+      "deep": "#24101a"
+    },
+    "pcd-implants-exam1": {
+      "name": "steel, titanium",
+      "ink": "#233a4b",
+      "deep": "#121d27"
+    },
+    "special-patient-care": {
+      "name": "deep teal",
+      "ink": "#143f3c",
+      "deep": "#0c2422"
+    }
+  },
+  "later": {
+    "heme-endo-exam1": {
+      "name": "oxblood",
+      "ink": "#4b1f23",
+      "deep": "#251013"
+    },
+    "msk-exam4": {
+      "name": "umber",
+      "ink": "#463311",
+      "deep": "#241a09"
+    },
+    "pcd-exam3": {
+      "name": "rust",
+      "ink": "#4a2a1a",
+      "deep": "#26150d"
+    },
+    "msk-exam3": {
+      "name": "olive",
+      "ink": "#38450f",
+      "deep": "#1c2308"
+    }
+  }
+}
