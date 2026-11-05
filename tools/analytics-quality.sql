@@ -11,7 +11,7 @@ select sh_data_quality();
 --    (the "last 3 days" share needs it). Example from 2026-11-04:
 select sh_insights('{"hepatobiliary":"2026-09-18","perio":"2026-10-01","msk-exam3":"2026-10-02","pcd-exam3":"2026-10-15",
   "msk-exam4":"2026-10-16","occlusion":"2026-10-21","heme-endo-exam1":"2026-10-30","pcd-implants-exam1":"2026-11-06",
-  "special-patient-care":"2026-11-13"}');
+  "special-patient-care":"2026-11-13","heme-endo-exam2":"2026-11-13"}');
 -- one compact row per hub from it:
 with i as (select sh_insights('{}') j)
 select x->>'hub' hub, (x->>'people')::int people,

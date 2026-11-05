@@ -27,3 +27,4 @@ _preview/
 
 # npm i --no-save playwright axe-core (CI and the release tests): never committed
 node_modules/
+__pycache__/
