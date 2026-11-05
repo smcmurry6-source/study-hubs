@@ -921,6 +921,23 @@
     if (!supabase || AUTOMATED || !rows.length) return;
     try { supabase.rpc("set_pins", { p_visitor: VISITOR_ID, p_hub: HUB, p_pins: rows.slice(0, 500) }).then(function(){}, function(){}); } catch (e) {}
   }
+  function mergePins(rows){
+    var a = readPins(), times = readPinTimes(), srv = {}, up = [], now = Date.now(), before = a.join("|");
+    a.forEach(function(q){ if (!times[q] || !times[q][0]) times[q] = [1, now]; });
+    rows.forEach(function(r){ if (Array.isArray(r) && r[0]) srv[r[0]] = [r[1] ? 1 : 0, +r[2] || 0]; });
+    Object.keys(times).forEach(function(q){ var m = times[q], x = srv[q]; if (!x || m[1] > x[1]) up.push([q, m[0], m[1]]); });
+    Object.keys(srv).forEach(function(q){ var x = srv[q], m = times[q]; if (!m || x[1] > m[1]) times[q] = x; });
+    var on = Object.keys(times).filter(function(q){ return times[q][0]; });
+    /* keep this device's order, newer pins from elsewhere in front */
+    var kept = a.filter(function(q){ return times[q] && times[q][0]; });
+    var added = on.filter(function(q){ return kept.indexOf(q) === -1; }).sort(function(x, y){ return times[y][1] - times[x][1]; });
+    a = added.concat(kept);
+    writePins(a, times); sendPins(up);
+    if (a.join("|") !== before) {
+      repaintPins();
+      try { document.dispatchEvent(new CustomEvent("sh:pins", { detail: { qid: null, pinned: null, count: a.length, synced: true } })); } catch (e) {}
+    }
+  }
   window.shPins = {
     list: readPins,
     has: function(qid){ return readPins().indexOf(qid) !== -1; },
@@ -935,26 +952,14 @@
       return on;
     },
     /* merge with the server's copy: per question the newer change wins; pins made before sync existed count as new */
-    sync: function(){
-      if (!window.SH_PINS || !supabase || AUTOMATED) return;
+    sync: function(rows){
+      if (!window.SH_PINS) return;
+      if (Array.isArray(rows)) { mergePins(rows); return; }
+      if (!supabase || AUTOMATED) return;
       try {
         supabase.rpc("get_my_pins", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
           if (!res || res.error || !Array.isArray(res.data)) return;
-          var a = readPins(), times = readPinTimes(), srv = {}, up = [], now = Date.now(), before = a.join("|");
-          a.forEach(function(q){ if (!times[q] || !times[q][0]) times[q] = [1, now]; });
-          res.data.forEach(function(r){ if (Array.isArray(r) && r[0]) srv[r[0]] = [r[1] ? 1 : 0, +r[2] || 0]; });
-          Object.keys(times).forEach(function(q){ var m = times[q], x = srv[q]; if (!x || m[1] > x[1]) up.push([q, m[0], m[1]]); });
-          Object.keys(srv).forEach(function(q){ var x = srv[q], m = times[q]; if (!m || x[1] > m[1]) times[q] = x; });
-          var on = Object.keys(times).filter(function(q){ return times[q][0]; });
-          /* keep this device's order, newer pins from elsewhere in front */
-          var kept = a.filter(function(q){ return times[q] && times[q][0]; });
-          var added = on.filter(function(q){ return kept.indexOf(q) === -1; }).sort(function(x, y){ return times[y][1] - times[x][1]; });
-          a = added.concat(kept);
-          writePins(a, times); sendPins(up);
-          if (a.join("|") !== before) {
-            repaintPins();
-            try { document.dispatchEvent(new CustomEvent("sh:pins", { detail: { qid: null, pinned: null, count: a.length, synced: true } })); } catch (e) {}
-          }
+          mergePins(res.data);
         }, function(){});
       } catch (e) {}
     }
@@ -987,7 +992,11 @@
       if (wantText) el.__shClassDataWired = true;
       var late = wantPicks && cpRevealed(card);
       if (wantPicks) card.__shCp = { late: late, r: null, own: null, done: false };
+      var loaded = false, revealObserver = null;
       function load(){
+        if (loaded) return;
+        loaded = true;
+        if (revealObserver) revealObserver.disconnect();
         window.shGetClassStats([qid], function(byQid){
           var r = byQid[qid];
           if (wantPicks) { card.__shCp.r = r || { total: 0, correct: 0 }; if (late || card.__shCp.own) cpPaint(card); }
@@ -1001,7 +1010,14 @@
         }, wantPicks);
       }
       /* drawn already answered (mock results right after Submit): give the picks just sent a moment to land */
-      if (late) setTimeout(load, 1200); else load();
+      if (late) setTimeout(load, 1200);
+      else {
+        /* The class percentage lives inside the explanation. Do not fetch it
+           for every unopened question at page load; begin when it is revealed. */
+        revealObserver = new MutationObserver(function(){ if (cpRevealed(card)) load(); });
+        revealObserver.observe(card, { attributes:true, subtree:true, attributeFilter:["class", "data-state"] });
+        if (cpRevealed(card)) load();
+      }
     }
     try {
       document.querySelectorAll(cardSelector).forEach(handleCard);
@@ -1258,6 +1274,84 @@
     } catch (e) { return "anon-" + Math.random().toString(16).slice(2); }
   }
   var VISITOR_ID = getVisitorId();
+  function cavityWeek(){
+    try {
+      var parts = {}, f = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" });
+      f.formatToParts(new Date()).forEach(function(x){ parts[x.type] = x.value; });
+      var d = new Date(Date.UTC(+parts.year, +parts.month - 1, +parts.day)), day = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - day);
+      var y0 = new Date(Date.UTC(d.getUTCFullYear(), 0, 1)), week = Math.ceil(((d - y0) / 864e5 + 1) / 7);
+      return d.getUTCFullYear() + "-W" + (week < 10 ? "0" : "") + week;
+    } catch (e) { return null; }
+  }
+  /* Eggs only ask about this week's cavity when this hub has a taught Notes
+     section that could contain one and this device has not already found it.
+     Preserve that guard when including its read in the page bootstrap. */
+  function cavityWeekForBootstrap(){
+    var week = cavityWeek();
+    if (!week) return null;
+    try { if (localStorage.getItem("sh_egg_cavity_" + HUB) === week) return null; } catch (e) {}
+    var ex = window.SH_EXPORT || {}, taught = {};
+    (ex.lectures || []).forEach(function(l){ if (!l.status || l.status === "taught") taught[l.id] = 1; });
+    return (ex.sections || []).some(function(s){ return /^notes$/i.test(s.kind || "") && taught[s.lec] && String(s.text || "").replace(/\s+/g, " ").trim().length >= 140; }) ? week : null;
+  }
+
+  /* ---------- page bootstrap ----------
+     The widget's quiet, per-visitor reads used to fan out into separate requests
+     as each optional module arrived. Keep their existing response shapes, but get
+     them in one safe RPC at page start. Expensive rank, mastery, trophy and board
+     data intentionally do not belong here: those still wait for the Stats panel.
+     `ready` resolves to null only while an older database migration is being
+     rolled out or the network is unavailable; individual modules retain their
+     one-shot fallback so an offline hub never breaks. */
+  var bootstrap = { data: null, ready: Promise.resolve(null), linkName: currentName() };
+  if (supabase && !EXPORT_ONLY) {
+    try {
+      bootstrap.ready = supabase.rpc("get_widget_bootstrap", {
+        p_visitor: VISITOR_ID,
+        p_hub: HUB,
+        p_cavity_week: cavityWeekForBootstrap(),
+        p_episode: window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_PODCAST.id : null,
+        p_include_pins: !!window.SH_PINS,
+        p_link_name: bootstrap.linkName || null
+      }).then(function(res){
+        if (!res || res.error || !res.data || typeof res.data !== "object") return null;
+        bootstrap.data = res.data;
+        return bootstrap.data;
+      }, function(){ return null; });
+    } catch (e) { bootstrap.ready = Promise.resolve(null); }
+  }
+  window.shBootstrap = bootstrap;
+
+  /* ---------- shared analytics flush ----------
+     Click and question-health batches register with this one clock instead of
+     each creating a page-level interval. The activity ticker below measures
+     foreground time; it is not a network flush timer. */
+  (function(){
+    var jobs = {}, timer = null;
+    function now(){ return Date.now(); }
+    function run(force){
+      var t = now();
+      Object.keys(jobs).forEach(function(k){
+        var j = jobs[k];
+        if (!j || (!force && t < j.next)) return;
+        j.next = t + j.every;
+        try { j.flush(); } catch (e) {}
+      });
+    }
+    function arm(){ if (!timer) timer = setInterval(function(){ run(false); }, 15000); }
+    window.shAnalytics = {
+      register: function(key, flush, every){
+        if (!key || typeof flush !== "function") return function(){};
+        jobs[String(key)] = { flush: flush, every: Math.max(1000, Number(every) || 30000), next: now() + Math.max(1000, Number(every) || 30000) };
+        arm();
+        return function(){ delete jobs[String(key)]; };
+      },
+      flush: function(){ run(true); }
+    };
+    document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") run(true); });
+    window.addEventListener("pagehide", function(){ run(true); });
+  })();
 
   /* ---------- resolved display name: the same deterministic dentistry-
      themed name (e.g. "Gleaming Molar") the leaderboard/nuke-analytics/
@@ -1266,11 +1360,14 @@
      instead of the generic word "Someone". Always resolves well before
      NUKE_STREAK_THRESHOLD correct answers could realistically happen. ---------- */
   var resolvedAnonName = "";
-  if (supabase) try {
-    supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
+  bootstrap.ready.then(function(data){
+    if (data && data.display_name) { resolvedAnonName = data.display_name; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} return; }
+    /* Compatibility while the migration is being deployed; current schemas use
+       the bootstrap field above and make no second eager read. */
+    if (supabase) try { supabase.rpc("get_display_name", { p_visitor: VISITOR_ID }).then(function(res){
       if (res && !res.error && res.data) { resolvedAnonName = res.data; renderNameBadge(); syncNameInputs(); try { document.dispatchEvent(new CustomEvent("sh:name", { detail: {} })); } catch (e) {} }
-    }, function(){});
-  } catch (e) {}
+    }, function(){}); } catch (e) {}
+  });
   function displayName(){ return currentName() || resolvedAnonName || "Someone"; }
 
   /* ---------- online-now presence ---------- */
@@ -1509,13 +1606,13 @@
   });
   /* ---------- progress sync across devices (migration_v34) ----------
      Every answer is saved per person in personal_answers (above), and "Link my devices" moves a device's rows
-     onto the linked id, so the server holds the whole history. When a hub opens (and when it comes back after
-     a few minutes in the background) this reads it back with get_my_answers and
+     onto the linked id, so the server holds the whole history. The page bootstrap carries the first
+     history read; later returns from the background use get_my_answers and
        1. hands each question's totals to the hub's window.SH_SYNC.merge(byQid, days) to fold into its own
           saved progress (the hub keeps whichever copy has more tries, so nothing local is lost), and
        2. replays the history into spaced review (sh_srs_<hub>), so the Daily Drill sees misses from every device.
      byQid = { qid: { n: tries, c: right, last: latest try right?, t: latest try (ms) } }; days = local dates. */
-  var syncAnsweredNow = {}, lastSync = 0, syncBusy = false;
+  var syncAnsweredNow = {}, lastSync = 0, syncBusy = false, bootstrapSyncPending = true;
   /* the server history as of the last sync, for question health (widget/qhealth.js): {qid: {n, c, last, t}}; null until a
      sync has come back, so a try is never called a first try just because the history hadn't arrived */
   var qhHist = null;
@@ -1559,16 +1656,32 @@
       try { sync.merge(byQid, Object.keys(daySet).sort()); } catch (e) { if (window.console) console.warn("SH_SYNC.merge failed", e); }
     }
   }
-  function syncProgress(){
-    if (!supabase || syncBusy || EXPORT_ONLY) return;
+  function finishProgressSync(rows){
+    syncBusy = false;
+    if (Array.isArray(rows)) { if (rows.length) applySync(rows); else if (!qhHist) qhHist = {}; }
+  }
+  function syncProgressRemote(){
     window.shPins.sync();
-    syncBusy = true; syncAnsweredNow = {}; lastSync = Date.now();
     try {
       supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
-        syncBusy = false;
-        if (res && !res.error && Array.isArray(res.data)) { if (res.data.length) applySync(res.data); else if (!qhHist) qhHist = {}; }
-      }, function(){ syncBusy = false; });
-    } catch (e) { syncBusy = false; }
+        finishProgressSync(res && !res.error ? res.data : null);
+      }, function(){ finishProgressSync(null); });
+    } catch (e) { finishProgressSync(null); }
+  }
+  function syncProgress(){
+    if (!supabase || syncBusy || EXPORT_ONLY) return;
+    syncBusy = true; syncAnsweredNow = {}; lastSync = Date.now();
+    if (bootstrapSyncPending) {
+      bootstrapSyncPending = false;
+      bootstrap.ready.then(function(data){
+        if (data && Array.isArray(data.answers)) {
+          if (Array.isArray(data.pins)) window.shPins.sync(data.pins); else window.shPins.sync();
+          finishProgressSync(data.answers);
+        } else syncProgressRemote();
+      }, syncProgressRemote);
+      return;
+    }
+    syncProgressRemote();
   }
   window.shSyncProgress = syncProgress;
   setTimeout(syncProgress, 300);
@@ -2713,7 +2826,7 @@
   }
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
   window.shEggHooks = {
-    hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase,
+    hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
     send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
     name: displayName, section: currentSection, online: function(){ return onlineCount; },
     toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,
@@ -2736,7 +2849,7 @@
   if (!EXPORT_ONLY) {
     var petScript = document.createElement("script");
     petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks }); };
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); };
     document.head.appendChild(petScript);
   }
   /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
@@ -2838,11 +2951,19 @@
     }
     if (supabase) {
       var wait = setTimeout(function(){ decide(cached()); }, 3000);
-      supabase.rpc("get_hub_overrides").then(function(r){
+      function useRows(rows){
         clearTimeout(wait);
-        if (r && !r.error && Array.isArray(r.data)) { try { localStorage.setItem(OV_KEY, JSON.stringify({ t: Date.now(), rows: r.data })); } catch (e) {} decide(r.data); }
-        else decide(cached());   /* before migration_v50, or an error: the last copy, else the dates */
-      }, function(){ clearTimeout(wait); decide(cached()); });
+        if (Array.isArray(rows)) { try { localStorage.setItem(OV_KEY, JSON.stringify({ t: Date.now(), rows: rows })); } catch (e) {} decide(rows); }
+        else decide(cached());
+      }
+      function fallback(){
+        /* Compatibility only while a database migration is rolling out. On a
+           current schema the initial overrides come from get_widget_bootstrap. */
+        try { supabase.rpc("get_hub_overrides").then(function(r){ useRows(r && !r.error ? r.data : null); }, function(){ useRows(null); }); } catch (e) { useRows(null); }
+      }
+      bootstrap.ready.then(function(data){
+        if (data && Array.isArray(data.overrides)) useRows(data.overrides); else fallback();
+      }, fallback);
     } else decide(cached());
     function show(early){
       var box = document.createElement("div");
@@ -2984,14 +3105,14 @@
   if (!EXPORT_ONLY && supabase) {
     var replyScript = document.createElement("script");
     replyScript.src = new URL("replies.js", thisScript.src).href; replyScript.async = true;
-    replyScript.onload = function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB }); };
+    replyScript.onload = function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); };
     document.head.appendChild(replyScript);
   }
   /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */
   if (!EXPORT_ONLY && supabase) {
     var linkAskScript = document.createElement("script");
     linkAskScript.src = new URL("linkask.js", thisScript.src).href; linkAskScript.async = true;
-    linkAskScript.onload = function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection }); };
+    linkAskScript.onload = function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); };
     document.head.appendChild(linkAskScript);
   }
 })();

@@ -1642,11 +1642,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var hub = debriefHub(b.getAttribute("data-checkin")), x = hub && (hub.exams || []).filter(function(z){ return z.date === b.getAttribute("data-exam"); })[0];
     if (hub && x) openDebrief(hub, x);
   });
-  function startSurvey(sb){
+  function startSurvey(sb, bootstrap){
     var me = surveyVisitor();
     if (!me) return;
-    sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){
-      var sv = res && res.data && res.data[0];
+    function show(rows){
+      var sv = rows && rows[0];
       if (!sv || ls("sh_survey_done_" + sv.id)) return;
       var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
       if (!qs.length) return;
@@ -1724,7 +1724,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
         else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
       });
-    }, function(){});
+    }
+    function remote(){ sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){ show(res && !res.error ? res.data : null); }, function(){}); }
+    if (bootstrap && typeof bootstrap.then === "function") {
+      bootstrap.then(function(data){ if (data && Array.isArray(data.survey_popup)) show(data.survey_popup); else remote(); }, remote);
+    } else remote();
   }
 
   /* ====================================================================
@@ -1737,9 +1741,9 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var s = document.createElement("script"); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
     });
   }
-  function loadRecaps(sb){
-    sb.rpc("get_published_recaps").then(function(res){
-      var rows = (res && res.data) || [];
+  function loadRecaps(sb, bootstrap){
+    function show(rows){
+      rows = Array.isArray(rows) ? rows : [];
       if (!rows.length) return;
       if (!document.getElementById("recapFonts")) {
         var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet";
@@ -1750,7 +1754,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })),
         new Promise(function(r){ setTimeout(r, 2500); })]).catch(function(){}) : Promise.resolve(); };
       loadScriptOnce("widget/recap.js").then(fonts).then(function(){ startRecapShow(rows); }, function(){});
-    }, function(){});
+    }
+    function remote(){ sb.rpc("get_published_recaps").then(function(res){ show(res && !res.error ? res.data : null); }, function(){}); }
+    if (bootstrap && typeof bootstrap.then === "function") {
+      bootstrap.then(function(data){ if (data && Array.isArray(data.recaps)) show(data.recaps); else remote(); }, remote);
+    } else remote();
   }
   function startRecapShow(rows){
     var R = window.shRecap; if (!R) return;
@@ -1867,34 +1875,99 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     return f ? '<span class="nm-t">' + esc(r.display_name) + (extra || "") + '</span>' + f : esc(r.display_name) + (extra || "");
   }
   function nmClass(r, base){ return base + (r.flair && window.shRanks && window.shRanks.flair ? " has-flair" : ""); }
+  function dashboardBootstrap(sb){
+    var boot = { data:null, ready:Promise.resolve(null), linkName:localName || "" };
+    if (!sb || !VISITOR) { window.shBootstrap = boot; return boot; }
+    try {
+      boot.ready = sb.rpc("get_widget_bootstrap", {
+        p_visitor:VISITOR, p_hub:null, p_cavity_week:null, p_episode:null,
+        p_include_pins:false, p_dashboard:true,
+        p_luck_hub:luckFor ? luckFor.hub : null, p_luck_date:luckFor ? luckFor.date : null,
+        p_link_name:boot.linkName || null
+      }).then(function(r){
+        if (!r || r.error || !r.data || typeof r.data !== "object") return null;
+        boot.data = r.data; return boot.data;
+      }, function(){ return null; });
+    } catch (e) {}
+    window.shBootstrap = boot;
+    return boot;
+  }
+  /* The class boards are demand-loaded. A direct link or a large viewport still
+     counts as opening the panel; an ordinary first paint does not fetch them. */
+  function whenPanelOpens(selector, work){
+    var panel = typeof selector === "string" ? document.querySelector(selector) : selector;
+    if (!panel || typeof work !== "function") return;
+    var done = false, observer = null;
+    function cleanup(){
+      if (observer) observer.disconnect();
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+      panel.removeEventListener("focusin", open);
+      panel.removeEventListener("pointerdown", open);
+    }
+    function open(){ if (!done) { done = true; cleanup(); work(); } }
+    function check(){
+      var r = panel.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < (window.innerHeight || document.documentElement.clientHeight)) open();
+    }
+    if (window.IntersectionObserver) {
+      observer = new IntersectionObserver(function(entries){
+        if (entries.some(function(entry){ return entry.isIntersecting; })) open();
+      }, { rootMargin:"80px 0px" });
+      observer.observe(panel);
+    } else {
+      window.addEventListener("scroll", check, { passive:true });
+      window.addEventListener("resize", check);
+    }
+    panel.addEventListener("focusin", open);
+    panel.addEventListener("pointerdown", open);
+    requestAnimationFrame(check);
+  }
   function startClassData(){
   var sb = null;
   try{ if (window.supabase && window.supabase.createClient) sb = window.supabase.createClient(SB_URL, SB_KEY); }catch(e){}
+  /* Establish the anonymous visitor before the one load-time request, so a first
+     dashboard visit gets the same bootstrap payload as a returning one. */
+  VISITOR = surveyVisitor();
+  var bootstrap = dashboardBootstrap(sb);
   /* the tooth buddy (widget/pet.js) perches on your name in the greeting */
   if (window.shPet) window.shPet.mount({ where:"dashboard", sb:sb, visitor:VISITOR,
     name:function(){ return localName || randomName; },
     perch:function(){ return document.querySelector("#greeting b") || document.getElementById("greeting"); },
-    home:function(){ return document.getElementById("petHome"); } });
+    home:function(){ return document.getElementById("petHome"); }, bootstrap:bootstrap.ready });
   if (!sb){
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
     nameSb = sb;
-    loadOverrides(sb);
-    luckSb = sb; loadLuck();
-    loadMyRank(sb);
-    loadRecaps(sb);
+    loadOverrides(sb, bootstrap.ready);
+    luckSb = sb;
+    loadRecaps(sb, bootstrap.ready);
+    bootstrap.ready.then(function(data){
+      if (data && Object.prototype.hasOwnProperty.call(data, "exam_luck")) {
+        if (data.exam_luck && luckKey()) luckData[luckKey()] = data.exam_luck;
+        drawLuck();
+      } else loadLuck();       /* compatibility while the migration rolls out */
+    }, loadLuck);
     if (!localName && VISITOR){
-      sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } });
+      bootstrap.ready.then(function(data){
+        if (data && data.display_name) { randomName = data.display_name; greet(); return; }
+        sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } });
+      }, function(){ sb.rpc("get_display_name", { p_visitor:VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; greet(); } }); });
     }
 
-    /* your two weeks, from the server, across every live hub */
+    /* Your two weeks, across every hub, rides in the dashboard bootstrap.
+       The old per-hub reads remain only as a rollout/offline fallback. */
     if (VISITOR){
-      Promise.all(HUBS.map(function(h){ return sb.rpc("get_personal_stats", { p_visitor:VISITOR, p_hub:h.id }).then(function(r){ return (r && r.data) || []; }, function(){ return []; }); }))
-        .then(function(lists){
-          var by = {}, any = false;
-          lists.forEach(function(rows){ rows.forEach(function(r){ any = true; var k = String(r.answer_date).slice(0,10); by[k] = by[k] || { a:0, c:0 }; by[k].a += +r.attempts || 0; by[k].c += +r.correct || 0; }); });
-          if (any) renderWeek(by, "server");
-        });
+      function applyWeek(rows){
+        var by = {}, any = false;
+        (rows || []).forEach(function(r){ any = true; var k = String(r.answer_date).slice(0,10); by[k] = by[k] || { a:0, c:0 }; by[k].a += +r.attempts || 0; by[k].c += +r.correct || 0; });
+        if (any) renderWeek(by, "server");
+      }
+      function remoteWeek(){
+        Promise.all(HUBS.map(function(h){ return sb.rpc("get_personal_stats", { p_visitor:VISITOR, p_hub:h.id }).then(function(r){ return (r && r.data) || []; }, function(){ return []; }); }))
+          .then(function(lists){ applyWeek([].concat.apply([], lists)); });
+      }
+      bootstrap.ready.then(function(data){ if (data && Array.isArray(data.dashboard_week)) applyWeek(data.dashboard_week); else remoteWeek(); }, remoteWeek);
     }
 
     /* live count across every hub (listen only, never counted ourselves) */
@@ -1915,19 +1988,19 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     /* what gets clicked (widget/clicks.js), so we know what to improve or retire */
     if (window.shClicks) window.shClicks.start({ sb:sb, hub:"dashboard", visitor:surveyVisitor(), section:function(){ return "dashboard"; } });
     /* "your report was addressed" and notices to everyone (widget/replies.js) */
-    if (window.shReplies) window.shReplies.start({ sb:sb, visitor:VISITOR || null, hub:"dashboard" });
+    if (window.shReplies) window.shReplies.start({ sb:sb, visitor:VISITOR || null, hub:"dashboard", bootstrap:bootstrap.ready });
     /* "Is this your other device?" when your name is also used by another, unlinked device (widget/linkask.js) */
-    if (window.shLinkAsk) window.shLinkAsk.start({ sb:sb, hub:"dashboard" });
+    if (window.shLinkAsk) window.shLinkAsk.start({ sb:sb, hub:"dashboard", bootstrap:bootstrap.ready, bootstrapName:bootstrap.linkName });
 
     /* an occasional survey: offered once per visitor, remembered whether answered or skipped */
     /* after an exam, an exam check-in takes the survey's place for that visit */
     debriefSb = sb;
     /* both wait while the first-visit tour question or the tour itself is on screen (widget/tour.js) */
-    setTimeout(function(){ tourIdle(function(){ if (!autoDebrief()) startSurvey(sb); }); }, 4000);
+    setTimeout(function(){ tourIdle(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); }); }, 4000);
 
     /* Golden Probe (an easter egg in the hubs): who found today's, per hub */
-    sb.rpc("get_golden_today").then(function(res){
-      var rows = (res && res.data) || [];
+    function showGolden(rows){
+      rows = Array.isArray(rows) ? rows : [];
       if (!rows.length) return;
       var parts = HUBS.map(function(h){
         var r = rows.filter(function(x){ return x.hub === h.id; })[0];
@@ -1936,10 +2009,12 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       var el = $("goldenLine");
       el.innerHTML = '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gpDash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".35" stop-color="#F5C842"/><stop offset=".7" stop-color="#C08A12"/><stop offset="1" stop-color="#8A5E06"/></linearGradient></defs><g transform="rotate(-42 24 24)"><rect x="1" y="20.6" width="23" height="6.8" rx="3.4" fill="url(#gpDash)" stroke="#7A5205" stroke-width=".8"/><path d="M5 21.2v5.6M8 21v6M11 21v6M14 21v6M17 21v6M20 21.2v5.6" stroke="#8A5E06" stroke-width=".9" opacity=".55"/><rect x="23.4" y="21.8" width="3.6" height="4.4" rx="1" fill="url(#gpDash)" stroke="#7A5205" stroke-width=".7"/><path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="#7A5205" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M27 24H36.5Q40 24 41.6 27.2L44.6 33.4" fill="none" stroke="url(#gpDash)" stroke-width="1.5" stroke-linecap="round"/><path d="M42.3 28.7l.7 1.4M43.2 30.5l.5 1M44 32.1l.5 1" stroke="#3A2A05" stroke-width="1.7"/></g><path d="M37 3.8Q37 8 41.2 8Q37 8 37 12.2Q37 8 32.8 8Q37 8 37 3.8Z" fill="#FFE36B"/></svg><span><b>Today\'s Golden Probe</b> · ' + parts.join(" · ") + '</span>';
       el.hidden = false;
-    }, function(){});
+    }
+    function remoteGolden(){ sb.rpc("get_golden_today").then(function(res){ showGolden(res && !res.error ? res.data : null); }, function(){}); }
+    bootstrap.ready.then(function(data){ if (data && Array.isArray(data.golden)) showGolden(data.golden); else remoteGolden(); }, remoteGolden);
 
     /* busiest hours */
-    sb.from("presence_hourly").select("hour_of_day,ping_count").then(function(res){
+    whenPanelOpens(".p-hours", function(){ sb.from("presence_hourly").select("hour_of_day,ping_count").then(function(res){
       var rows = (res && res.data) || [];
       if (!rows.length){ unavailable("pulseHist", "Not enough activity yet. Check back after a few study sessions."); return; }
       var by = {}, max = 0, peak = 0, nowH = new Date().getHours();
@@ -1954,9 +2029,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       $("pulseHist").innerHTML = '<div class="hist" aria-hidden="true">' + bars + '</div>' +
         '<div class="hist-labels"><span>12 am</span><span>6 am</span><span>12 pm</span><span>6 pm</span><span>11 pm</span></div>' +
         '<p class="hist-note">Busiest around <b>' + hourLabel(peak) + '</b>. Right now (green) is running at ' + nowShare + '% of the peak.</p>';
-    }, function(){ unavailable("pulseHist"); });
+    }, function(){ unavailable("pulseHist"); }); });
 
     /* handpiece ranks: the top ten by XP, plus you */
+    whenPanelOpens(".p-ranks", function(){
+    loadMyRank(sb);
     sb.rpc("get_rank_board", { p_visitor:VISITOR || null, p_limit:10 }).then(function(res){
       var rows = (res && res.data) || [], R = window.shRanks;
       if (!rows.length || !R){ unavailable("rankBoard", "No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
@@ -1971,27 +2048,28 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
           (i ? Number(t.at).toLocaleString() + " XP" : "Start") + '</span>' + (me && me.tier === i ? '<span class="you">You</span>' : '') + '</div>';
       }).join("");
     }, function(){ unavailable("rankBoard"); });
+    });
 
     /* day streaks */
-    sb.rpc("get_leaderboard", { p_limit:6 }).then(function(res){
+    whenPanelOpens(".p-streaks", function(){ sb.rpc("get_leaderboard", { p_limit:6 }).then(function(res){
       var rows = (res && res.data) || [];
       if (!rows.length){ unavailable("pulseLeaderboard", "No streaks yet. Answer questions two days in a row to start one."); return; }
       $("pulseLeaderboard").innerHTML = '<ol class="board">' + rows.map(function(r, i){
         return '<li><span class="rk">' + (i + 1) + '</span><span class="' + nmClass(r, "nm") + '">' + rankMini(r.tier, r.level) + nameFlair(r) + '</span><span class="val">' + r.streak + '<small>' + (r.streak === 1 ? "day" : "days") + '</small></span></li>';
       }).join("") + '</ol>';
-    }, function(){ unavailable("pulseLeaderboard"); });
+    }, function(){ unavailable("pulseLeaderboard"); }); });
 
     /* correct-answer streaks */
-    sb.rpc("get_correct_streak_stats").then(function(res){
+    whenPanelOpens(".p-correct", function(){ sb.rpc("get_correct_streak_stats").then(function(res){
       var rows = (res && res.data) || [];
       var act = rows.filter(function(r){ return r.kind === "active"; })[0], rec = rows.filter(function(r){ return r.kind === "record"; })[0];
       if (!act && !rec){ unavailable("pulseCorrect", "No runs yet. Get a few right in a row to set the first record."); return; }
       function stat(r, label){ return r ? '<div class="stat"><div class="n">' + r.streak + '</div><div class="l">' + label + '</div><div class="' + nmClass(r, "who") + '">' + rankMini(r.tier, r.level) + nameFlair(r) + '</div></div>' : ""; }
       $("pulseCorrect").innerHTML = '<div class="stat-pair">' + stat(act, "Longest run still going") + stat(rec, "All-time record") + '</div>';
-    }, function(){ unavailable("pulseCorrect"); });
+    }, function(){ unavailable("pulseCorrect"); }); });
 
     /* arcade high scores (one tab row per hub arcade; see ARCADES) */
-    (function(){
+    whenPanelOpens(".p-arcade", function(){ (function(){
       var hubsEl = $("arcadeHubs"), tabs = $("gameTabs"), hk = "sh_dash_arcade_hub", key = "sh_dash_arcade_game";
       var hubSel = ls(hk) || ARCADES[0].hub;
       if (!ARCADES.some(function(a){ return a.hub === hubSel; })) hubSel = ARCADES[0].hub;
@@ -2029,7 +2107,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         lsSet(key + ":" + hubSel, b.getAttribute("data-game")); load(b.getAttribute("data-game"));
       });
       drawHubs(); drawTabs();
-    })();
+    })(); });
   }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startClassData); else startClassData();
@@ -2041,15 +2119,19 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (sig === hubSig) return;
     hubSig = sig; renderHero(); renderHubs(); animateMeters();
   }
-  function loadOverrides(sb){
+  function loadOverrides(sb, bootstrap){
     if (!sb || !window.shArchive) return;
     ovSb = sb; ovAt = Date.now();
-    sb.rpc("get_hub_overrides").then(function(r){
-      if (!r || r.error || !Array.isArray(r.data)) return;   /* not there yet (before migration_v50) or offline: keep what we have */
-      window.shArchive.writeCache(r.data);
-      OVERRIDES = window.shArchive.index(r.data);
+    function apply(rows){
+      if (!Array.isArray(rows)) return;   /* before a migration or offline: keep what we have */
+      window.shArchive.writeCache(rows);
+      OVERRIDES = window.shArchive.index(rows);
       applyHubStates();
-    }, function(){});
+    }
+    function remote(){ sb.rpc("get_hub_overrides").then(function(r){ apply(r && !r.error ? r.data : null); }, function(){}); }
+    if (bootstrap && typeof bootstrap.then === "function") {
+      bootstrap.then(function(data){ if (data && Array.isArray(data.overrides)) apply(data.overrides); else remote(); }, remote);
+    } else remote();
   }
   /* back on the tab after a while: check again (one small request, at most every 5 minutes) */
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });

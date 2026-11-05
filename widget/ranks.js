@@ -870,16 +870,24 @@
         if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
       });
     }
-    load();
+    /* Rank, mastery and trophy data are deliberately lazy.  Opening Stats is the
+       first time this panel is useful, and keeping these aggregate RPCs out of a
+       hub's initial bootstrap keeps ordinary page loads light. */
+    function panelOpen(){ return !!(panel && panel.classList.contains("is-open")); }
     var sinceLoad = 0;
-    document.addEventListener(H.answeredEvent, function(){ if (++sinceLoad >= 10) { sinceLoad = 0; setTimeout(load, 1500); } });
+    document.addEventListener(H.answeredEvent, function(){
+      if (++sinceLoad >= 10) {
+        sinceLoad = 0;
+        if (panelOpen()) setTimeout(load, 1500);
+      }
+    });
     document.addEventListener("click", function(e){
-      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(load, 50);
+      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
     });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
       if (d.total > 0 && !window.shAutomated) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
-      if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(load, 800); });
+      if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ if (panelOpen()) setTimeout(load, 800); });
       if (d.total >= 20 && d.correct === d.total) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock-perfect", p_hub: H.hub });
     });
 

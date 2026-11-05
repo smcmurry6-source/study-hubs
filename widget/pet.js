@@ -1554,13 +1554,13 @@
       where: where, H: H, sb: opt.sb || (H && H.supabase) || null, visitor: opt.visitor || (H && H.visitor) || ls("sh_visitor_id"),
       name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), perch: opt.perch || null, home: opt.home || null,
       el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
-      sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0
+      sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
+      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
     };
     load();
     render();
     if (where === "hub") wireHub(); else wireDashboard();
     setInterval(idleLife, 4200);
-    setInterval(load, 5 * 60 * 1000);
     window.addEventListener("resize", place);
     document.addEventListener("sh:pref", function(e){ if (e.detail && /^sh_pref_(pet|eggs)$/.test(e.detail.key)) refresh(); });
     document.addEventListener("sh:egg-local", function(e){
@@ -1578,6 +1578,19 @@
     return true;      // dashboard: before adoption it waits on your name to be noticed
   }
   function load(){
+    if (!M || M.loaded) return;
+    M.loaded = true;
+    var boot = M.bootstrap; M.bootstrap = null;
+    if (boot && typeof boot.then === "function") {
+      boot.then(function(data){
+        if (data && Array.isArray(data.pet_days)) { M.rows = data.pet_days; update(true); return; }
+        loadRemote();
+      }, loadRemote);
+      return;
+    }
+    loadRemote();
+  }
+  function loadRemote(){
     if (!M || !M.sb || !M.visitor) return;
     M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(function(r){
       if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
