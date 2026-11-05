@@ -41,5 +41,4 @@ What wasn't tested, and why (no staging, no real iPhone, realtime not simulatedâ
 
 - [ ] Sam approved this release (Sam ticks it).
 - [ ] Merged; `node tools/release/postcheck.js` passed:
-- [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.

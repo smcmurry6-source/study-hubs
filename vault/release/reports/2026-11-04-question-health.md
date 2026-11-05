@@ -100,7 +100,6 @@ and the row shows on mock results.
 
 - [ ] Sam approved this release: in chat, 2026-11-05, "Merge when ready" (recorded in [decisions](../../decisions.md)).
 - [ ] Merged; `node tools/release/postcheck.js` passed:
-- [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.
 
 Related: [question-health](../../reference/question-health.md) · [bug log](../bug-log.md) ·

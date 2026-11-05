@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (no post-release monitoring, Claude Code)** — Sam: "take out all of the monitoring instructions now and
+  for the future". The 1, 24 and 48 hour checks after a release are gone from `RELEASE_TEST_PLAN.md` (section 11 is now
+  "Release and post-release verification"), the [preview-and-release-test](vault/rules/preview-and-release-test.md) rule,
+  [ship-a-change](vault/how-to/ship-a-change.md), the PR template, the test-report template and the repo map;
+  `tools/release/monitor.sql` is deleted, and the open "Monitored" boxes came off the current reports. The pending
+  1-hour check for the admin page release was cancelled before it ran. `postcheck.js`, the changelogs and rollback stay.
+
 - **2026-11-04 (Question health for every hub, Claude Code)** — Sam: "Build a question-health system for all hubs. Create
   stable question IDs, track accuracy, retries, time/abandonment, explanation engagement, and feedback; flag likely-quality
   problems for admin review without automatically deleting or changing educational content." How it works and every
