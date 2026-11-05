@@ -81,7 +81,7 @@ function cyRender(st, D) {
   o += curve(C.LH, "cy-lh", P0, PH, "LH: fairly steady across the cycle, then a dramatic surge just before ovulation, set off by estradiol's positive feedback. The surge restarts meiosis and causes follicular rupture 24 to 36 hours later. LH also drives the theca cells' testosterone.");
   o += T(cyX(2.6), P0 - cyMono(C.FSH, 2.6) * PH - 7, "FSH", "cy-lab cy-fsh-t", "middle");
   o += T(cyX(7), P0 - cyMono(C.LH, 7) * PH + 15, "LH", "cy-lab cy-lh-t", "middle");
-  o += T(cyX(13.2) + 9, P0 - PH + 11, "LH surge", "cy-lab cy-lh-t", "start");
+  o += T(cyX(13.2) + 15, P0 - PH + 12, "LH surge", "cy-lab cy-lh-t", "start");
   var inh = d >= 11 && d <= 14;
   o += HOT("Inhibin, made by the granulosa cells, suppresses FSH (not LH). Dr. Madison's midcycle slide: FSH is suppressed by production of inhibin while LH surges, which is why the granulosa cells add LH receptors at midcycle.", T(cyX(13.4), P0 - 4, "inhibin ⊣ FSH", "cy-note" + (inh ? " is-on" : ""), "end"));
   if (ph.fb === "pos") o += T(cyX(12.5) - 6, P0 - PH + 12, "positive feedback", "cy-note is-on", "end") + T(cyX(12.5) - 6, P0 - PH + 26, "estradiol > 200 pg/mL", "cy-note is-on", "end");
@@ -112,7 +112,7 @@ function cyRender(st, D) {
     if (i === 0) g = cyFol(sx - 13, 214, 8, 0.4) + cyFol(sx + 1, 204, 10, 0.45) + cyFol(sx + 14, 220, 7, 0.35);
     else if (i === 1) g = '<g opacity=".55">' + cyFol(sx - 18, 224, 6, 0) + "</g>" + cyFol(sx + 3, 210, 17, 0.62);
     else if (i === 2) g = cyFol(sx, sT(sx) + 28, 25, 0.76);
-    else if (i === 3) g = cyFol(rx, 212, 21, 0.7) + '<path class="cy-tear" d="M' + f1(rx - 6) + " 194L" + f1(rx - 9) + " 182H" + f1(rx + 9) + "L" + f1(rx + 6) + ' 194Z"/><circle class="cy-zp" cx="' + f1(rx + 9) + '" cy="168" r="5.2"/><circle class="cy-oo" cx="' + f1(rx + 9) + '" cy="168" r="4"/>';
+    else if (i === 3) g = cyFol(rx, 212, 21, 0.7) + '<path class="cy-tear" d="M' + f1(rx - 6) + " 194L" + f1(rx - 9) + " 182H" + f1(rx + 9) + "L" + f1(rx + 6) + ' 194Z"/><circle class="cy-cor" cx="' + f1(rx + 12) + '" cy="170" r="7.4"/><circle class="cy-zp" cx="' + f1(rx + 12) + '" cy="170" r="5"/><circle class="cy-oo" cx="' + f1(rx + 12) + '" cy="170" r="3.8"/>';
     else if (i === 4) g = cyCL(sx, 210, 18);
     else if (i === 5) g = cyCL(sx, 210, 24);
     else g = preg ? cyCL(sx, 210, 25) : '<g opacity=".7">' + cyCA(sx, 212, 13) + "</g>";
@@ -254,6 +254,7 @@ export default function cycle() {
 .anima .cycle-svg .cy-zp{fill:var(--bx-eosin)}
 .anima .cycle-svg .cy-oo{fill:var(--bx-cyto);stroke:var(--bx-nuc);stroke-width:.7}
 .anima .cycle-svg .cy-tear{fill:var(--bx-lumen)}
+.anima .cycle-svg .cy-cor{fill:var(--bx-violet-soft);stroke:var(--bx-violet);stroke-width:.8;stroke-dasharray:1.6 1.2}
 .anima .cycle-svg .cy-cl{fill:var(--bx-gold-soft);stroke:var(--bx-gold);stroke-width:2.2}
 .anima .cycle-svg .cy-clin{fill:var(--bx-lumen);stroke:var(--bx-gold);stroke-width:.8}
 .anima .cycle-svg .cy-ca{fill:var(--bx-fat);stroke:var(--bx-fat-line);stroke-width:1}
