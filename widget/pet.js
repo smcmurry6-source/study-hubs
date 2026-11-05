@@ -1468,7 +1468,7 @@
       ".shpet-hp{display:block; height:5px; margin:3px auto 0; width:70%; border-radius:99px; background:color-mix(in srgb, var(--pet-ink) 12%, transparent); overflow:hidden;}",
       ".shpet-hp i{display:block; height:100%; border-radius:99px; transition:width .6s cubic-bezier(.2,.8,.3,1), background .6s;}",
       /* speech bubble */
-      ".shpet-say{position:absolute; z-index:3; left:calc(100% + 8px); bottom:38%; width:max-content; max-width:min(196px, calc(100vw - 110px)); padding:7px 10px;",
+      ".shpet-say{position:absolute; z-index:3; left:calc(100% + 8px); bottom:38%; width:max-content; max-width:min(196px, calc(var(--pet-vw, 100vw) - 110px)); padding:7px 10px;",
       "  border-radius:13px 13px 13px 4px; background:var(--pet-bg); color:var(--pet-ink); border:1px solid var(--pet-line); box-shadow:var(--pet-shadow);",
       "  font-size:12.5px; line-height:1.35; text-align:left; opacity:0; transform:translateY(6px) scale(.96); transform-origin:0 100%; pointer-events:none; transition:opacity .25s, transform .25s cubic-bezier(.2,.8,.3,1);}",
       ".shpet-say.is-on{opacity:1; transform:none; pointer-events:auto;}",
@@ -1478,14 +1478,15 @@
       /* where it lives */
       ".shpet-home{position:fixed; z-index:9989; left:14px; bottom:12px; width:64px; transition:opacity .3s, transform .3s;}",
       ".shpet-home.is-away{opacity:0; transform:translateY(30px); pointer-events:none;}",
-      "@media (max-width:760px){ .shpet-home{left:8px; width:50px; bottom:calc(var(--sh-tabbar-h, 60px) + 8px + env(safe-area-inset-bottom,0px));} .shpet-say{font-size:12px; max-width:min(180px, calc(100vw - 80px));} }",
+      "@media (max-width:760px){ .shpet-home{left:8px; width:50px; bottom:calc(var(--sh-tabbar-h, 60px) + 8px + env(safe-area-inset-bottom,0px));} .shpet-say{font-size:12px; max-width:min(180px, calc(var(--pet-vw, 100vw) - 80px));} }",
       /* Timmy's house: a card on the dashboard */
       ".shpet-house{display:grid; grid-template-columns:minmax(0,250px) minmax(0,1fr); gap:20px; align-items:center; margin:0 0 18px; padding:12px 18px 12px 12px;",
       "  border-radius:16px; background:var(--pet-bg); border:1px solid var(--pet-line); box-shadow:var(--shadow, 0 1px 2px rgba(0,0,0,.05));}",
       ".shpet-scene{position:relative;} .shpet-housesvg{display:block; width:100%; height:auto; border-radius:16px;}",
       ".shpet-spot{position:absolute; left:56%; bottom:4%; width:28%;}",
       ".shpet-house .shpet-hp{width:100%; height:8px; margin:8px 0;}",
-      ".shpet-house .shpet-say{left:auto; right:30%; bottom:calc(100% - 8px); transform-origin:100% 100%; border-radius:13px 13px 4px 13px; max-width:min(190px, 70vw);}",
+      /* the house bubble hangs left from 70% across Timmy's spot (28% of the scene, starting at 56%): 260% of the spot keeps it inside the scene */
+      ".shpet-house .shpet-say{left:auto; right:30%; bottom:calc(100% - 8px); transform-origin:100% 100%; border-radius:13px 13px 4px 13px; max-width:min(190px, 260%, calc(var(--pet-vw, 100vw) * .7));}",
       ".shpet-title{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}",
       ".shpet-title b{font-family:var(--serif, var(--font-display, Georgia, serif)); font-weight:400; font-size:24px; line-height:1.1;}",
       ".shpet-hpnum{font-size:13.5px; font-weight:700; color:var(--pet-ink2); font-variant-numeric:tabular-nums;}",
@@ -1506,7 +1507,8 @@
       "@keyframes shpet-drift{from{transform:translateX(0);} to{transform:translateX(-26px);}}",
       "@media (max-width:600px){ .shpet-house{grid-template-columns:1fr; gap:12px; padding:10px;} .shpet-housesvg{max-height:190px;} }",
       ".shpet-perch{position:absolute; z-index:5; width:66px; transition:opacity .3s;}",
-      ".shpet-perch .shpet-say{bottom:46%;}",
+      ".shpet-perch .shpet-say{bottom:46%; max-width:min(196px, var(--pet-room, 196px));}",
+      "@media (max-width:760px){ .shpet-perch .shpet-say{max-width:min(180px, var(--pet-room, 180px));} }",
       "@media (max-width:600px){ .shpet-perch{width:56px;} }",
       /* dialogs */
       ".shpet-dlg{position:fixed; inset:0; z-index:10060; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,8,14,.5); animation:shpet-fade .25s ease;}",
@@ -1684,10 +1686,26 @@
     var x = r.left + r.width / 2 - w / 2 + window.scrollX, y = r.top + window.scrollY - (M.el.offsetHeight || 92) - 12;
     x = Math.max(8, Math.min(x, document.documentElement.clientWidth - w - 8));
     M.el.style.left = x + "px"; M.el.style.top = y + "px";
-    /* keep the bubble on screen: flip it to the left when there's no room on the right */
-    var room = document.documentElement.clientWidth - (x - window.scrollX + w);
-    M.say.style.left = room < 200 ? "auto" : ""; M.say.style.right = room < 200 ? "calc(100% + 10px)" : "";
-    M.say.style.borderRadius = room < 200 ? "16px 16px 4px 16px" : "";
+    /* keep the bubble on screen: it goes right unless that side is tight and the left has more room, and it is never
+       wider than the room on its side (the text-size zoom shrinks both sides: BUG-013). Measured with rects against the
+       page's own rect, then turned into CSS px by the perch's offsetWidth, so it holds whichever space a browser's
+       zoomed rects come in. */
+    var pr = M.el.getBoundingClientRect(), vr = document.documentElement.getBoundingClientRect();
+    var k = pr.width ? (M.el.offsetWidth || w) / pr.width : 1, gap = 18 / k;
+    var roomR = (vr.right - pr.right - gap) * k, roomL = (pr.left - vr.left - gap) * k;
+    var flip = roomR < 200 && roomL > roomR, ss = M.say.style;
+    ss.bottom = ""; ss.right = "";
+    if (Math.max(roomL, roomR) < 120) {
+      /* no room either side (a narrow phone at the largest text): above him, as wide as the screen allows, kept on it */
+      var vwCss = vr.width * k, leftCss = (pr.left - vr.left) * k, bw = Math.min(180, vwCss - 16);
+      var off = Math.max(8 - leftCss, Math.min(M.el.offsetWidth / 2 - bw / 2, vwCss - 8 - bw - leftCss));
+      ss.left = Math.round(off) + "px"; ss.bottom = "calc(100% + 4px)"; ss.borderRadius = "16px";
+      ss.setProperty("--pet-room", Math.floor(bw) + "px");
+      return;
+    }
+    ss.left = flip ? "auto" : ""; ss.right = flip ? "calc(100% + 10px)" : "";
+    ss.borderRadius = flip ? "16px 16px 4px 16px" : "";
+    ss.setProperty("--pet-room", Math.max(96, Math.floor(flip ? roomL : roomR)) + "px");
   }
 
   /* ---------- talking ---------- */
@@ -1695,6 +1713,9 @@
     if (!M || !M.say || !visible()) return;
     clearTimeout(M.sayT);
     M.say.innerHTML = raw ? html : esc(html);
+    /* the text-size setting zooms <html>, where 100vw overshoots the screen: give the bubble the real width in zoomed px */
+    var z = 1; try { z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1; } catch (e) {}
+    M.say.style.setProperty("--pet-vw", (window.innerWidth / z) + "px");
     M.say.classList.add("is-on");
     M.lastTalk = Date.now();
     if (move) act(move);

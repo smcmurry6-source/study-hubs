@@ -179,7 +179,7 @@ button{font:inherit; color:inherit; cursor:pointer;}
 .set-xtxt{min-width:0; flex:1 1 170px;}
 .set-xtxt b{display:block; font-size:13.5px; color:var(--ink);}
 .set-xtxt small{display:block; font-size:12px; color:var(--ink-3); line-height:1.4; margin-top:2px;}
-.set-x .set-seg{flex:none; gap:4px;}
+.set-x .set-seg{flex:0 1 auto; max-width:100%; gap:4px;}  /* wraps under its label when the row is too narrow (largest text on a phone) */
 .set-x .set-seg button{padding:5px 10px; font-size:12.5px;}
 .set-row input[type=range]{width:100%; margin-top:10px; accent-color:var(--ink);}
 

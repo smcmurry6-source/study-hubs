@@ -225,9 +225,26 @@ function lint(hub, A){
         return out;
       });
       bad.forEach(b => problems.push(`${url} (${label}): ${b}`));
+      // the Settings sheet at the largest text (BUG-013): every row of buttons stays inside the sheet and the screen
+      if (tb.size) {
+        const off = await page.evaluate(() => {
+          const btn = document.getElementById('setBtn'); if (btn) btn.click();
+          const sp = document.getElementById('shstat-settingspanel'); if (sp) sp.classList.add('is-open');
+          const out = [], vw = document.documentElement.getBoundingClientRect();
+          document.querySelectorAll('.set-seg button, .shset-seg button').forEach(b => {
+            const r = b.getBoundingClientRect(); if (!r.width) return;
+            const box = (b.closest('#shstat-settingspanel') || document.documentElement).getBoundingClientRect();
+            if (r.right > Math.min(vw.right, box.right) + 1 || r.left < Math.max(vw.left, box.left) - 1) {
+              const seg = b.parentElement; out.push(`Settings: "${b.textContent.trim()}" (${seg.dataset.set || seg.dataset.key || seg.dataset.pref || 'a row'}) runs past the sheet's edge`);
+            }
+          });
+          return out;
+        });
+        off.forEach(b => problems.push(`${url} (${label}): ${b}`));
+      }
       await page.close();
     }
-    notes.push(`top bars and tab rows checked at ${label}`);
+    notes.push(`top bars and tab rows checked at ${label}${tb.size ? ', with the Settings sheet' : ''}`);
     await context.close();
   }
   await browser.close(); server.close();
