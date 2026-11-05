@@ -48,7 +48,7 @@ function cahRender(st, D) {
     if (blk) { var mx = (x1 + x2) / 2, my = (y1 + y2) / 2; o += '<path class="ch-blk" d="M' + (mx - 7) + " " + (my - 7) + "l14 14M" + (mx + 7) + " " + (my - 7) + 'l-14 14"/>'; }
   });
   /* enzyme labels where they act */
-  D.ENZ.forEach(function (z) { var on = s >= 1 && z[3] === def; o += T(z[0], z[1], z[2] + (on ? " missing" : ""), "s b ch-enzt" + z[3] + (on ? " ch-enzbad" : ""), z[4]); });
+  D.ENZ.forEach(function (z) { var on = s >= 1 && z[3] === def; o += T(z[0], z[1], z[2], "s b ch-enzt" + z[3] + (on ? " ch-enzbad" : ""), z[4]); });
   /* nodes: unlabeled intermediates, labeled products */
   Object.keys(N).forEach(function (id) {
     var n = N[id], inn = F.inflow[id] || 0, outs = D.OUT[id] || [], piled = s >= 1 && outs.some(function (e) { return F.blk[e]; }), dead = inn <= 0.001;
