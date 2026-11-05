@@ -413,9 +413,15 @@ var FIG_PLACE = {
     { full:'Full coverage covers all the teeth', plain:'An upper splint has a flat back surface', figs:['splints'] },
     { full:'The rule of thirds simplifies', plain:'Most irreversible dental work', figs:['thirds'] },
     { full:'Noncarious cervical lesions', plain:'Notches at the gumline', figs:['erosion'] }
+  ],
+  dentures: [
+    { full:'Denture teeth are generally set near where the ridge is', plain:'How the bone shrinks.', figs:['resorb'] },
+    { full:'Support, stability and retention', plain:'Support, stability and retention', figs:['ssr'] },
+    { full:'Both balanced and non-balanced work well', plain:'The three setups', figs:['schemes'] },
+    { full:'Tooth forms compared', plain:'Tooth shapes.', figs:['toothforms'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
