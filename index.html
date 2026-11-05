@@ -739,6 +739,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 <script src="widget/pet.js" defer></script>
 <script src="widget/timmy.js" defer></script>
 <script src="widget/tour.js" defer></script>
+<script src="widget/archive.js"></script>
 <script>
 (function(){
   "use strict";
@@ -845,11 +846,29 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (hub.hideCardOn) return parseYmd(hub.hideCardOn);
     var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;
   }
-  HUBS = HUBS.filter(function(h){
-    var a = archiveAt(h);
-    if (a && new Date() >= a){ ARCHIVED_HUBS.push(h); return false; }
-    return true;
-  });
+  /* Live, archived or hidden: widget/archive.js decides from the dates above plus any override set on the admin page
+     (review/, Hubs tab; get_hub_overrides, migration_v50). An override in force wins until it is cleared or its end
+     time passes; then the dates decide again. The last copy of the overrides is kept (shArchive.readCache), so a
+     returning visitor's first paint already has them; startClassData() fetches them fresh. Without widget/archive.js
+     (an old offline copy) the dates alone decide, as before. HUBS ends up holding the live hubs, ARCHIVED_HUBS the rest
+     (hidden ones too: their check-in pop-ups still follow the exam dates). */
+  var HUBS_SRC = HUBS.slice(), ARCHIVED_SRC = ARCHIVED_HUBS.slice(), HUB_STATE = {}, OVERRIDES = {};
+  try { if (window.shArchive) OVERRIDES = window.shArchive.index(window.shArchive.readCache()); } catch (e) {}
+  function stateOf(h, listed){
+    if (window.shArchive) return window.shArchive.resolve(h, OVERRIDES[h.id], new Date(), { archiveHour:ARCHIVE_HOUR, cardDays:CARD_DAYS }, listed);
+    var a = archiveAt(h), g = cardGoneAt(h), now = new Date();
+    var st = !listed && (!a || now < a) ? "live" : (g && now < g ? "archived" : "hidden");
+    return { state:st, source:"auto", auto:st };
+  }
+  function partitionHubs(){
+    var live = [], rest = [], sig = [];
+    [[HUBS_SRC, false], [ARCHIVED_SRC, true]].forEach(function(src){
+      src[0].forEach(function(h){ var r = stateOf(h, src[1]); HUB_STATE[h.id] = r; (r.state === "live" ? live : rest).push(h); sig.push(h.id + ":" + r.state); });
+    });
+    HUBS = live; ARCHIVED_HUBS = rest;
+    return sig.join(",");
+  }
+  var hubSig = partitionHubs();
   var HUB_LABEL = { genetics:"Genetics", hepatobiliary:"Hepatobiliary", "fixed-pros":"Fixed Pros", "gi-exam1":"GI Exam 1", perio:"Perio", "msk-exam3":"MSK Exam 3", "msk-exam4":"MSK Exam 4", occlusion:"Occlusion", "pcd-exam3":"PCD Exam 3", "heme-endo-exam1":"Heme & Endo 1", "special-patient-care":"Special Patient Care", "pcd-implants-exam1":"PCD Implants 1" };
   var HUB_RING  = { genetics:"genetics", hepatobiliary:"gi", "gi-exam1":"gi", "msk-exam3":"gi", "msk-exam4":"gi", occlusion:"pros", "pcd-exam3":"pros", "fixed-pros":"pros", perio:"perio", "heme-endo-exam1":"endo", "special-patient-care":"genetics", "pcd-implants-exam1":"pros" };
   var ALL_HUBS  = Object.keys(HUB_LABEL);
@@ -1306,14 +1325,16 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       '<a class="btn btn-primary" href="hubs/' + hub.id + '/" data-hub="' + hub.id + '">Open' + ICON.arrow + '</a></div>' +
     '</article>';
   }
-  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ var g = cardGoneAt(h); return g && new Date() < g; }); }
+  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
   function archivedCardHTML(hub){
     var cls = CLASSES[hub.cls], p = readProgress(hub), last = lastExam(hub);
     return '<article class="hub-card is-archived" style="' + ringVars(cls.ring) + '">' +
       '<div class="hub-top"><span class="chip">' + esc(hub.code) + '</span><span class="due arch-tag">Archived</span></div>' +
       '<h4>' + esc(hub.title) + '</h4>' +
-      '<p class="hub-desc">This hub closed after the exam on ' + esc(parseYmd(last.date).toLocaleDateString(undefined, { month:"long", day:"numeric" })) +
-        '. Tell us how the exam went: it shapes the next hubs.</p>' +
+      (last && daysUntil(last.date) < 0
+        ? '<p class="hub-desc">This hub closed after the exam on ' + esc(parseYmd(last.date).toLocaleDateString(undefined, { month:"long", day:"numeric" })) +
+          '. Tell us how the exam went: it shapes the next hubs.</p>'
+        : '<p class="hub-desc">This hub is archived for now. Your progress on it is kept.</p>') +
       (p ? '<div class="mine">You tried <b>' + p.seen + '</b> ' + (p.seen === 1 ? "question" : "questions") + ' here.</div>' : '') +
       checkinButtonsHTML(hub) +
     '</article>';
@@ -1852,6 +1873,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     ["pulseHist","pulseLeaderboard","pulseCorrect","arcadeBoard","rankBoard"].forEach(function(id){ unavailable(id); });
   } else {
     nameSb = sb;
+    loadOverrides(sb);
     luckSb = sb; loadLuck();
     loadMyRank(sb);
     loadRecaps(sb);
@@ -2006,6 +2028,26 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startClassData); else startClassData();
 
+  /* ---------- archive overrides from the admin page (widget/archive.js, migration_v50) ---------- */
+  var ovSb, ovAt;   /* no initializer: startClassData() may already have set them */
+  function applyHubStates(){
+    var sig = partitionHubs();
+    if (sig === hubSig) return;
+    hubSig = sig; renderHero(); renderHubs(); animateMeters();
+  }
+  function loadOverrides(sb){
+    if (!sb || !window.shArchive) return;
+    ovSb = sb; ovAt = Date.now();
+    sb.rpc("get_hub_overrides").then(function(r){
+      if (!r || r.error || !Array.isArray(r.data)) return;   /* not there yet (before migration_v50) or offline: keep what we have */
+      window.shArchive.writeCache(r.data);
+      OVERRIDES = window.shArchive.index(r.data);
+      applyHubStates();
+    }, function(){});
+  }
+  /* back on the tab after a while: check again (one small request, at most every 5 minutes) */
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
+
   /* ---------- What's new + "updated" labels, from the changelog every deploy logs to ---------- */
   rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
     if (!rows || !rows.length) return;
@@ -2074,7 +2116,11 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 
   /* refresh countdowns if the tab stays open past midnight */
   var dayKey = ymd(new Date());
-  setInterval(function(){ if (ymd(new Date()) !== dayKey){ dayKey = ymd(new Date()); renderHero(); renderHubs(); animateMeters(); } }, 60 * 1000);
+  /* ...and apply an archive time or an override's end time that passes while the page is open */
+  setInterval(function(){
+    if (ymd(new Date()) !== dayKey){ dayKey = ymd(new Date()); hubSig = partitionHubs(); renderHero(); renderHubs(); animateMeters(); }
+    else applyHubStates();
+  }, 60 * 1000);
 })();
 </script>
 </body>

@@ -5,7 +5,7 @@ tags: [analytics, dashboard, admin]
 
 # Insights dashboard: aggregate behavior turned into decisions
 
-The **Insights** tab of the admin page (`review/`, behind the admin secret) puts every hub, live and archived, side by side
+The **Insights** view of the admin page (`review/`, in the sidebar under Study data, behind the admin secret) puts every hub, live and archived, side by side
 and pairs each number with the decision it drives. A number past its threshold turns orange and the card lists what to do.
 Part of [analytics governance](analytics-governance.md).
 
@@ -13,7 +13,9 @@ Part of [analytics governance](analytics-governance.md).
   (`migration_v49.sql`). Agents on the Supabase connector call the same logic without the secret:
   `select sh_insights('{"<hub>":"YYYY-MM-DD", ...}')`, `select sh_insight_retries()`, `select sh_data_quality()`.
 - **Exam dates and live/archived status** come from `HUBS` / `ARCHIVED_HUBS` in `index.html`, read by the admin page at
-  load (the one place they live); `p_exams` is each hub's most recent exam.
+  load (the one place they live), through `widget/archive.js`, so a hub set by hand on the Hubs view counts as what the
+  dashboard shows ([admin-operations](admin-operations.md)); `p_exams` is each hub's most recent exam. The **Past hubs**
+  switch in the view's header adds the archived ones.
 - **Thresholds** are `INSIGHT_RULES` in `review/index.html`. The table below explains them: change both together.
 - **In a preview** ([preview-a-change](../how-to/preview-a-change.md)) the tab shows made-up numbers from `synthInsights()` in
   `tools/preview/runtime/preview.js`, shaped like the real responses; when the functions' output changes, change it too.

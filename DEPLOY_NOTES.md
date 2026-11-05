@@ -32,6 +32,27 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (admin page redesign; who's studying now, hub archive overrides, newest-first check-ins, Claude Code)** — Sam's
+  asks: safer admin operations, then "a full optimization of the admin page. Its clunky and not user friendly". **The page**
+  (`review/`) is rebuilt with the taste-skill's app-screen run: a sidebar of views (Overview, Live, Inbox; Insights, Time by
+  section, Questions, Clicks and features, Searches, Engagement; Exam check-ins, Surveys; Hubs on the dashboard, Recap),
+  each with its own address, title, a one-line finding and only the controls that apply; data loads per view instead of
+  18 queries at once; Overview says what is waiting on Sam; check-ins and searches have their own views; on a phone the
+  sidebar is a Menu sheet. #237's Insights tab moved in as a view, unchanged in what it computes. **Live view**: how many
+  people used a hub in the last 3 minutes and, hub by hub, their leaderboard names (Sam's call), never an id, email or
+  section; it asks every 30 s only while open and visible. **Hubs view:** set any hub Live, Archived or Hidden on the
+  dashboard by hand, until set back to Automatic or until an optional end time (Sam's call), with a confirmation, a note,
+  an audit log and a stale-tab check; nothing is deleted. The rules live once in `widget/archive.js` (loaded by
+  `index.html` and `review/`; `widget/v3.js`'s archived notice follows them). **Exam check-ins:** groups sort by their
+  newest check-in (they sorted by hub name, BUG-019), rows and survey answers newest first with an id tie-break.
+  `migration_v50.sql` (numbered v49 until #237 took that number; tier 3, **applied 2026-11-05** after Sam's written
+  approval, "Merge when ready"; the live permission audit found nothing after it): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
+  `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
+  in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on 10-30
+  (PR #205, never merged). `sw.js` sh-v54. No About page entry (Sam: admin information stays off it). Preview fixtures
+  for every admin view. Tests: `tools/release/admin-ops.js` and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js`
+  (`run.js`, as `adminui`). How it works: [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
+
 - **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
   run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways. Most were the top bars, which
   the measured top bar (PR 235, its entry below) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no

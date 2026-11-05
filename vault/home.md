@@ -76,6 +76,8 @@ Hub building
 
 - [Repo map](reference/repo-map.md): what every file and folder is.
 - [Shared infrastructure](reference/shared-infrastructure.md): the widget, Supabase, Pages, the Kokoro model.
+- [Admin operations](reference/admin-operations.md): the admin page's Live tab (who's studying now), hub archive
+  overrides (what wins over the dates, the audit log) and newest-first check-ins.
 - [Analytics governance](reference/analytics-governance.md): how usage data is collected, checked, kept and used. Its
   notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
   [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
