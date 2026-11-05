@@ -23,6 +23,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Bungee&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../widget/v3.css">
+<link rel="stylesheet" href="../../widget/cases.css">
+<script src="../../widget/cases.js"></script>
 <style>
 /* ===================================================================
    PERIODONTOLOGY D2 — tokens
@@ -416,6 +418,7 @@ main{padding-top:20px}
 .qx-cue .icon,.qx-cue svg{width:15px;height:15px;vertical-align:-3px;margin-right:4px;color:var(--accent-ink)}
 .qx-cue b{color:var(--accent-ink)}
 .qcard-explain.missed .qx-cue{display:block}
+.pbox-case .pimg-grid{margin-top:12px}
 .qcard-reveal-btn,.qcard-grade-btns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 .qcard-grade-btns button{appearance:none;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:600;font-size:.84rem}
 .qcard-grade-btns button.good{border-color:var(--good);color:var(--good)}
@@ -2007,6 +2010,101 @@ var ESTHETIC_TX = [
   { problem:'Short upper lip', tx:'No reliably good treatment option' }
 ];
 
+
+/* ---------- PATIENT BOX CASES, drawn from their numbers (2026-11-04) ----------
+   Each case is one model (see the dental case kit above): the Patient Box rows students read, the chart, radiograph
+   and drawn view are all produced from `spec`, so every picture agrees with every number. `figs` lists the default
+   pictures; a question can show its own list (q.pfig) and hide a row that would give its answer away (hide.cal,
+   hide.furc, hide.mob). `expect` is checked against derive() by tools/figures/perio/cases-check.mjs, so a key can't
+   drift from the case. All facts come from this hub's own notes (S1 staging and grading, S4 care types, S5 furcations,
+   S6 regeneration, S7 peri-implant states); the people are made up. Asked for by the midterm check-ins ("cases with
+   pictures, charts and radiographs", "more staging and grading diagnostic question/patient box"). */
+/* pcases begin */
+var PCASES = {
+  'first-visit': {
+    title:'Lower right, first visit',
+    box:[['Patient','44-year-old man'],['Medical history','Healthy; no diabetes'],['Social history','Never smoked'],['Chief complaint','"My lower right gum bleeds when I floss"'],
+      ['Rest of the mouth','28 teeth (third molars removed years ago for crowding). Bone loss like #30\'s at the mesial of #3 and #14; every other tooth probes 1-3 mm with the crest 1-2 mm from the CEJ'],
+      ['Findings','See the chart, the radiograph and the drawn view of #28-#31']],
+    spec:{ teeth:['28','29','30','31'], age:44, smoke:0, mouth:{ teeth:28, involved:4, lost:0 }, gingiva:{ look:'inflamed', edema:.5 },
+      t:{ '28':{ pd:{ f:[2,2,2], l:[2,2,2] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } },
+          '29':{ pd:{ f:[3,2,3], l:[3,2,3] }, rec:{ f:[-3,-2,-3], l:[-3,-2,-3] }, bop:{ f:[0,0,1] } },
+          '30':{ pd:{ f:[6,3,3], l:[5,3,3] }, rec:{ f:[1,0,-1], l:[1,0,-1] }, bop:{ f:[1,0,0], l:[1,0,0] }, furc:{ f:1 }, bone:{ m:40, d:15 }, furcX:1, calc:true, amalgam:true },
+          '31':{ pd:{ f:[3,2,4], l:[3,2,4] }, rec:{ f:[-2,-2,0], l:[-2,-2,0] }, bop:{ f:[0,0,1] }, bone:{ m:10, d:22 } } } },
+    figs:[{ kind:'chart', hide:{ cal:true } }, { kind:'film', title:'#28-#31' }, { kind:'view', title:'#28-#31, facial' }],
+    expect:{ kind:'periodontitis', stage:3, grade:'B', extent:'localized', maxInterdental:7, maxRBL:40 }
+  },
+  'bleeding-gums': {
+    title:'Bleeding gums at 23',
+    box:[['Patient','23-year-old woman'],['Medical history','Healthy; no medications'],['Social history','Never smoked'],['Chief complaint','"My gums bleed every time I brush, and they look puffy"'],['Dental history','Last cleaning 3 years ago'],
+      ['Whole mouth','Bleeding on probing at 46% of sites; probing depths 3-5 mm throughout; at every site the CEJ is felt 3-5 mm below the gingival margin. Full-mouth radiographs: the crest sits 1-2 mm from the CEJ everywhere'],
+      ['Findings','See the chart, the radiograph and the drawn view of #6-#11']],
+    spec:{ teeth:['6','7','8','9','10','11'], age:23, lingual:false, mouth:{ teeth:28, involved:0, lost:0 }, gingiva:{ look:'inflamed', edema:1 },
+      t:{ '6':{ pd:{ f:[4,3,4] }, rec:{ f:[-4,-3,-4] }, bop:{ f:[1,0,1] }, plaque:{ f:[1,1,1] } },
+          '7':{ pd:{ f:[5,4,4] }, rec:{ f:[-5,-4,-4] }, bop:{ f:[1,1,1] }, plaque:{ f:[1,1,1] } },
+          '8':{ pd:{ f:[5,4,5] }, rec:{ f:[-5,-4,-5] }, bop:{ f:[1,1,1] }, plaque:{ f:[1,1,1] } },
+          '9':{ pd:{ f:[5,4,5] }, rec:{ f:[-5,-4,-5] }, bop:{ f:[1,1,1] }, plaque:{ f:[1,1,1] } },
+          '10':{ pd:{ f:[4,4,5] }, rec:{ f:[-4,-4,-5] }, bop:{ f:[1,1,1] }, plaque:{ f:[1,1,1] } },
+          '11':{ pd:{ f:[4,3,4] }, rec:{ f:[-4,-3,-4] }, bop:{ f:[1,0,1] }, plaque:{ f:[1,1,1] } } } },
+    figs:[{ kind:'chart', title:'#6-#11, facial' }, { kind:'film', title:'#6-#11' }, { kind:'view', title:'#6-#11, facial' }],
+    expect:{ kind:'gingivitis', stage:0, maxInterdental:0, maxRBL:0 }
+  },
+  'long-teeth': {
+    title:'Recession on the lower front teeth',
+    box:[['Patient','35-year-old woman'],['Chief complaint','"My lower front teeth look longer, and they hurt with cold"'],['Habits','Brushes hard, twice a day, with a medium brush'],
+      ['Periodontal findings','No bleeding on probing anywhere; probing depths 1-3 mm. Thin tissue with a narrow band of keratinized gingiva'],
+      ['Radiographs','The crest sits 1-2 mm from the CEJ everywhere except at #23, where the interproximal crest is about 3 mm lower'],
+      ['Findings','See the chart and the drawn view of #23-#26']],
+    spec:{ teeth:['23','24','25','26'], age:35, lingual:false, gingiva:{ look:'healthy', kt:2 },
+      t:{ '23':{ pd:{ f:[3,1,3] }, rec:{ f:[2,2,2] }, bone:{ m:30, d:30 } },
+          '24':{ pd:{ f:[2,2,2] }, rec:{ f:[0,4,0] } },
+          '25':{ pd:{ f:[2,1,2] }, rec:{ f:[-2,3,-2] } },
+          '26':{ pd:{ f:[2,1,2] }, rec:{ f:[-2,1,-2] } } } },
+    figs:[{ kind:'chart', title:'#23-#26, facial' }, { kind:'view', title:'#23-#26, facial' }],
+    expect:{ rt:{ '23':'RT3', '24':'RT2', '25':'RT1', '26':'RT1' } }
+  },
+  'furcation-19': {
+    title:'A furcation on #19',
+    box:[['Patient','50-year-old woman'],['Medical history','Healthy'],['Social history','Smokes 15 cigarettes a day, for 20 years'],['Chief complaint','"Food packs around my lower left molar"'],
+      ['Nabers probe, #19','From the buccal the probe enters the furcation about 4 mm horizontally and stops against bone; from the lingual it does not enter'],
+      ['Rest of the mouth','28 teeth, none lost to gum disease. Bone loss like this at #18, #19, #3, #14 and #30; the other teeth probe 1-3 mm with the crest 1-2 mm from the CEJ'],
+      ['Findings','See the chart, the radiograph and the drawn view of #18-#21']],
+    spec:{ teeth:['18','19','20','21'], age:50, smoke:15, mouth:{ teeth:28, involved:5, lost:0 }, gingiva:{ look:'fibrotic' },
+      t:{ '18':{ pd:{ f:[4,2,4], l:[4,2,3] }, rec:{ f:[-1,-2,-1], l:[-1,-2,-1] }, bone:{ m:25, d:20 }, bop:{ f:[1,0,0] } },
+          '19':{ pd:{ f:[5,3,4], l:[4,3,4] }, rec:{ f:[-1,0,0], l:[-1,-1,-1] }, bop:{ f:[1,1,0], l:[1,0,0] }, furc:{ f:2 }, bone:{ m:30, d:28 }, furcX:2, calc:true },
+          '20':{ pd:{ f:[3,2,3], l:[3,2,3] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } },
+          '21':{ pd:{ f:[2,2,2], l:[2,2,2] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } } } },
+    figs:[{ kind:'chart', hide:{ furc:true } }, { kind:'film', title:'#18-#21' }, { kind:'view', title:'#18-#21, facial' }],
+    expect:{ kind:'periodontitis', stage:3, grade:'C', extent:'localized', maxInterdental:4, maxRBL:30, triggers:['Class II or III furcation involvement'] }
+  },
+  'deep-pocket-19': {
+    title:'One deep pocket after Phase I',
+    box:[['Patient','48-year-old man'],['Medical history','Healthy'],['Social history','Never smoked'],['Hygiene','Full-mouth plaque score 12%; keeps every maintenance visit'],
+      ['History','Scaling and root planing of all quadrants 6 weeks ago for localized Stage 3 periodontitis (#3, #19 and #30); the other sites now probe 3 mm or less without bleeding'],
+      ['Today, Phase I re-evaluation','See the chart and the radiograph of #18-#21']],
+    spec:{ teeth:['18','19','20','21'], age:48, mouth:{ teeth:28, involved:3, lost:0 }, gingiva:{ look:'healthy' },
+      t:{ '18':{ pd:{ f:[3,2,3], l:[3,2,3] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } },
+          '19':{ pd:{ f:[8,3,3], l:[7,3,3] }, rec:{ f:[0,-1,-1], l:[0,-1,-1] }, bop:{ f:[1,0,0], l:[1,0,0] }, bone:{ m:20, d:10 }, vdef:{ m:5 } },
+          '20':{ pd:{ f:[3,2,3], l:[3,2,3] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } },
+          '21':{ pd:{ f:[2,2,2], l:[2,2,2] }, rec:{ f:[-2,-2,-2], l:[-2,-2,-2] } } } },
+    figs:[{ kind:'chart' }, { kind:'film', title:'#18-#21', note:'Compare the crest beside #19\'s mesial root with the crest at #20.' }],
+    expect:{ kind:'periodontitis', stage:3, maxInterdental:8, triggers:['probing depth of 6 mm or more', 'vertical bone loss of 3 mm or more'] }
+  },
+  'implant-30': {
+    title:'An implant at #30, three years on',
+    box:[['Patient','60-year-old man'],['Medical history','Type 2 diabetes, HbA1c 6.4%'],['Social history','Never smoked'],
+      ['History','Implant placed at #30 three years ago; the crown was seated 2.5 years ago. At the crown seating (the baseline): probing 3 mm all around, no bleeding, and the film showed the bone at the first thread, 1.5 mm below the platform'],
+      ['Last maintenance visit','14 months ago'],['Today','The crown is firm (no mobility). See the chart, the radiograph and the drawn view of #29-#31']],
+    spec:{ teeth:['29','30','31'], age:60, hba1c:6.4, lingual:false, gingiva:{ look:'inflamed', edema:.7 },
+      t:{ '29':{ pd:{ f:[3,2,3] }, rec:{ f:[-3,-2,-3] } },
+          '30':{ implant:{ w:4.5, len:11, baseline:{ m:1.5, d:1.5 } }, pd:{ f:[7,5,6] }, rec:{ f:[-1,-1,-1] }, bop:{ f:[1,1,1] }, pus:{ f:[1,0,0] }, bone:{ m:5, d:4 } },
+          '31':{ pd:{ f:[3,2,3] }, rec:{ f:[-3,-2,-3] }, crown:true, endo:true } } },
+    figs:[{ kind:'chart', title:'#29-#31, facial' }, { kind:'film', title:'#29-#31, today', note:'At the baseline film the bone met the implant at its first thread.' }, { kind:'view', title:'#29-#31, facial' }],
+    expect:{ impl:{ '30':{ dx:'peri-implantitis', meffert:'failing' } } }
+  }
+};
+/* pcases end */
+
 /* ---------- WORKED CASES (Lecture 1) — also power Game-mode cutscenes ---------- */
 var CASES = [
   {
@@ -3426,6 +3524,138 @@ nums('q8-N04', L, 'slides', "Which statements about local delivery agents are tr
 /* why each choice is right or wrong (2026-10-20, Sam): one line per choice, in the same order as q.choices, for
    every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), with your
    pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
+/* ===== Patient Box cases drawn from their numbers (PCASES, 2026-11-04): the case's rows, chart, radiograph and view
+   sit in the Patient Box; `pfig` picks the pictures and hides any row that would give the answer away; `ref` points at
+   the notes and Review tables the question comes from. Every fact is in this hub's notes. ===== */
+var S1 = 'diagnosis-tx-planning', S4 = 'phase1-therapy', S5 = 'resective-furcation', S6 = 'periodontal-regeneration', S7 = 'implants-perio';
+var REF_S1_CAL = { label:'S1 notes: PD, recession and CAL', go:{ v:'notes', lec:S1, k:0 } }, REF_S1_STAGE = { label:'S1 notes: Staging and grading', go:{ v:'notes', lec:S1, k:5 } },
+    REF_S1_GRADE = { label:'S1 notes: Grading', go:{ v:'notes', lec:S1, k:6 } }, REF_STAGING = { label:'Review: Staging', go:{ v:'review', id:'staging' } },
+    REF_GRADING = { label:'Review: Grading', go:{ v:'review', id:'grading' } }, REF_AAP = { label:'Review: the full 2018 tables', go:{ v:'review', id:'aap-full' } },
+    REF_S1_HEALTH = { label:'S1 notes: Health, gingivitis, or periodontitis', go:{ v:'notes', lec:S1, k:2 } }, REF_S1_RT = { label:'S1 notes: Recession is a sign', go:{ v:'notes', lec:S1, k:4 } },
+    REF_RT = { label:'Review: Recession types', go:{ v:'review', id:'recession-types' } }, REF_S1_WALLS = { label:'S1 notes: Reading a bone defect', go:{ v:'notes', lec:S1, k:7 } },
+    REF_S1_PLAN = { label:'S1 notes: From diagnosis to treatment plan', go:{ v:'notes', lec:S1, k:8 } }, REF_CARE = { label:'Review: Prophy, D4346, SRP, maintenance, debridement', go:{ v:'review', id:'p1-care-types' } },
+    REF_CALCASES = { label:'Review: Recession, CAL and the Salud trap', go:{ v:'review', id:'p1-cal-cases' } }, REF_FURC_CLASSES = { label:'Review: Furcation classifications', go:{ v:'review', id:'furc-classes' } },
+    REF_FURC_TX = { label:'Review: Furcation treatment options', go:{ v:'review', id:'furc-approaches' } }, REF_REGEN = { label:'Review: Regeneration, definition and case selection', go:{ v:'review', id:'regen' } },
+    REF_WALLS = { label:'Review: Intrabony defect walls', go:{ v:'review', id:'defect-walls' } }, REF_IMPL = { label:'Review: Implant success and the peri-implant diagnoses', go:{ v:'review', id:'implants' } },
+    REF_S7_PI = { label:'S7 notes: Peri-implantitis', go:{ v:'notes', lec:S7, k:8 } }, REF_S7_MEFFERT = { label:'S7 notes: Ailing, failing, failed', go:{ v:'notes', lec:S7, k:11 } };
+
+/* Case: Lower right, first visit (Stage 3 Grade B, localized) */
+mq('pc-a1', S1, 'lecture', "Read the chart. What is the clinical attachment level at the mesiofacial site of #30?", [
+  ["7 mm", "The probing depth there is 6 mm and the recession is 1 mm (the margin sits 1 mm apical to the CEJ), so CAL = 6 + 1 = 7 mm."],
+  ["6 mm", "That is the probing depth alone, measured from the margin; attachment level is measured from the CEJ, so the recession has to be added."],
+  ["5 mm", "Subtracting the recession is the Salud trap backwards: with the margin apical to the CEJ the recession is positive and is added, not subtracted."],
+  ["1 mm", "That is the recession alone, the CEJ to the margin; the pocket below the margin still has to be counted."]
+], "CAL = probing depth + recession, with its sign. At #30 mesiofacial the chart shows PD 6 mm and 1 mm of recession, so the attachment loss is 7 mm. Where the margin sits coronal to the CEJ (the negative numbers on #28 and #29), the same sum makes the CAL smaller than the pocket.",
+  { pcase:'first-visit', pfig:[{ kind:'chart', hide:{ cal:true } }], ref:[REF_S1_CAL, REF_CALCASES], cue:"CAL = PD + recession, sign and all: 6 + 1 = 7." });
+mq('pc-a2', S1, 'lecture', "What is his periodontal diagnosis?", [
+  ["Localized Stage 3 Grade B periodontitis", "Worst interdental CAL 7 mm and bone loss into the middle third of #30's mesial root make it Stage 3 by severity (a 6 mm pocket is a complexity factor pointing the same way); no tooth lost and no need for complex rehabilitation, so not Stage 4. Grade: 40% ÷ 44 years ≈ 0.9, between 0.25 and 1.0, with no smoking or HbA1c to push it up, so B. Four of 28 teeth are involved (14%), so localized."],
+  ["Localized Stage 2 Grade B periodontitis", "Stage 2 stops at interdental CAL 3-4 mm with bone loss in the coronal third; #30's mesial has 7 mm of CAL and bone loss at 40% of the root, which is the middle third."],
+  ["Generalized Stage 3 Grade B periodontitis", "Generalized needs 30% or more of the teeth involved; here it is #30, #31, #3 and #14, 4 of 28 teeth."],
+  ["Localized Stage 3 Grade C periodontitis", "Grade C needs a bone-loss/age ratio over 1.0 or a modifier (10 or more cigarettes a day, HbA1c of 7% or more); his ratio is about 0.9 and he has neither modifier."]
+], "Stage from the worst site: interdental CAL 7 mm and radiographic bone loss at 40% of the root (middle third) at #30 mesial, so Stage 3; nothing lost to periodontitis and no complex rehabilitation, so not Stage 4. Grade: 40 ÷ 44 ≈ 0.9 is between 0.25 and 1.0, with no modifier, so Grade B. Extent: 4 of 28 teeth, under 30%, so localized.",
+  { pcase:'first-visit', ref:[REF_S1_STAGE, REF_STAGING, REF_GRADING], cue:"Stage from the single worst site; grade from the ratio (40 ÷ 44) plus modifiers; extent from how many teeth." });
+mq('pc-a3', S1, 'lecture', "Which one change would move him to Grade C?", [
+  ["Smoking 15 cigarettes a day", "Ten or more cigarettes a day is a grade modifier that pushes a case to Grade C whatever the bone-loss/age ratio says."],
+  ["A Class II furcation on #30", "A Class II furcation is a complexity factor for staging (it would keep him in Stage 3); it does not change the grade."],
+  ["Bleeding on probing at 40% of sites", "Bleeding measures inflammation and helps separate health from gingivitis; it is not part of grading."],
+  ["Being 60 instead of 44", "Older makes the ratio smaller (40 ÷ 60 ≈ 0.7), still Grade B; it is a younger patient with the same bone loss who moves toward C."]
+], "Grade starts at B and moves only with evidence: direct progression over time, the bone-loss/age ratio, or the two modifiers, heavy smoking (10 or more a day) and HbA1c of 7% or more, which only ever push the grade up. Furcations and pockets stage a case; bleeding scores it for gingivitis.",
+  { pcase:'first-visit', pfig:[{ kind:'chart', hide:{ cal:true } }, { kind:'film', title:'#28-#31' }], ref:[REF_S1_GRADE, REF_AAP], cue:"Modifiers only push up: 10+ cigarettes or HbA1c 7+ = C." });
+
+/* Case: Bleeding gums at 23 (gingivitis on an intact periodontium) */
+mq('pc-b1', S1, 'lecture', "What is her periodontal diagnosis?", [
+  ["Gingivitis on an intact periodontium", "Pockets of 4-5 mm with bleeding at 46% of sites, but the CEJ sits 3-5 mm below the margin, so the CAL is 0 at every site, and the crest is where it belongs on the films. The depth is swollen gingiva, not lost attachment: pseudopockets."],
+  ["Generalized Stage 1 Grade A periodontitis", "Any stage needs attachment loss or bone loss; her chart shows neither, so there is nothing to stage."],
+  ["Generalized Stage 2 Grade B periodontitis", "Stage 2 would need interdental CAL of 3-4 mm and bone loss in the coronal third; Dr. Abou-Arraj's warning is exactly this case: staging from a mouthful of 4s and 5s over-diagnoses a patient who has no periodontitis."],
+  ["Clinical health on an intact periodontium", "Health allows no bleeding and no depth over 3 mm; she bleeds at 46% of sites, far over the 10% threshold for calling gingivitis."]
+], "Attachment loss and bone loss are both absent: the margin has swelled coronally over the enamel (recession is negative), so CAL = PD + recession comes out at 0, and the films show the crest 1-2 mm from the CEJ. Bleeding at 46% is well over the 10% threshold, so this is plaque-induced gingivitis, which is fully reversible. \"Do not look at your periodontal chart and see where you have 4s and 5s and assign the stage based on your probing depth.\"",
+  { pcase:'bleeding-gums', ref:[REF_S1_HEALTH, REF_S1_CAL], cue:"4s and 5s with no CAL and no bone loss = pseudopockets = gingivitis." });
+mq('pc-b2', S4, 'lecture', "Which kind of care does she need?", [
+  ["Scaling in the presence of gingival inflammation (D4346)", "She has never been diagnosed with periodontitis and has no bone loss, but heavy generalized inflammation from local factors: the code between a prophy and SRP, done with perio faculty and followed by a Phase I evaluation."],
+  ["Scaling and root planing", "SRP is therapeutic treatment for periodontitis: root planing of roots exposed by attachment loss. She has no attachment loss and no exposed roots."],
+  ["Adult prophylaxis", "A prophy is preventive, not therapeutic; it fits gingival health or mild gingivitis, not generalized inflammation with bleeding at nearly half the sites."],
+  ["Full-mouth debridement (D4355)", "Debridement has one indication: calculus so heavy that the gingival margin can't be found and nothing can be charted. She was charted."]
+], "The care types line up with the diagnosis: a prophy for health, D4346 for heavy generalized gingival inflammation with no periodontitis, SRP for periodontitis, maintenance after periodontitis, and debridement only when calculus hides the margin. Hers is gingivitis with generalized inflammation, so D4346.",
+  { pcase:'bleeding-gums', pfig:[{ kind:'chart', title:'#6-#11, facial' }, { kind:'view', title:'#6-#11, facial' }], ref:[REF_CARE, REF_S1_HEALTH], cue:"No perio ever + heavy inflammation = D4346." });
+
+/* Case: Recession on the lower front teeth (RT1, RT2, RT3) */
+mq('pc-c1', S1, 'lecture', "Which recession type is #24?", [
+  ["RT2", "#24 has interproximal attachment loss (CAL 2 mm at the mesial and distal: 2 mm pockets with the margin at the CEJ), and it is less than the buccal CAL of 6 mm (2 mm pocket on 4 mm of recession). Interproximal loss that does not exceed the buccal loss is RT2."],
+  ["RT1", "RT1 means no interproximal attachment loss at all; #24's mesial and distal sites each show 2 mm of CAL. #25 and #26 are the RT1 teeth here."],
+  ["RT3", "RT3 means the interproximal attachment loss is greater than the buccal loss; at #24 the interproximal CAL (2 mm) is far less than the buccal (6 mm). #23 is the RT3 tooth."],
+  ["It can't be classified without a radiograph", "Recession types are read from the chart: the interproximal CAL against the buccal CAL. The radiograph confirms, it isn't needed to classify."]
+], "RT1: no interproximal attachment loss. RT2: interproximal loss that is less than or equal to the buccal loss. RT3: interproximal loss greater than the buccal loss. On #24 the facial site is 6 mm of attachment loss (PD 2 + recession 4) and the interproximal sites 2 mm, so RT2.",
+  { pcase:'long-teeth', ref:[REF_S1_RT, REF_RT], cue:"Compare interproximal CAL with buccal CAL: none = RT1, less = RT2, more = RT3." });
+mq('pc-c2', S1, 'lecture', "On which of these teeth is complete root coverage predictable?", [
+  ["#25", "#25 has 3 mm of facial recession and no interproximal attachment loss (its mesial and distal CAL are 0): RT1, where full root coverage is predictable."],
+  ["#24", "#24 is RT2: its 2 mm of interproximal attachment loss caps how far the tissue can be brought back, so partial coverage is expected."],
+  ["#23", "#23 is RT3: 5 mm of interproximal attachment loss against 3 mm of facial loss. Root coverage is not attempted because it will not succeed."],
+  ["None, because her tissue is thin", "The recession type, not the tissue thickness, predicts coverage in this lecture: an RT1 site predicts full coverage."]
+], "The interproximal attachment decides it: full coverage is predictable only where none has been lost (RT1). #25 (and #26) are RT1, #24 is RT2 (partial coverage), #23 is RT3 (not attempted).",
+  { pcase:'long-teeth', pfig:[{ kind:'chart', title:'#23-#26, facial' }], ref:[REF_RT, REF_S1_RT], cue:"RT1 = full coverage; RT2 = partial; RT3 = don't try." });
+
+/* Case: A furcation on #19 (Class II; Stage 3 by the trigger; Grade C from smoking) */
+mq('pc-d1', S5, 'lecture', "What is the Glickman class of the buccal furcation on #19?", [
+  ["Class II", "The Nabers probe enters the furcation horizontally (about 4 mm) but stops against bone and does not pass through to the lingual: a cul-de-sac with a bony wall remaining, Glickman Class II."],
+  ["Class I", "Class I is incipient: the probe only feels a catch or enters the flute, and the interradicular bone is intact. Here the probe goes 4 mm in."],
+  ["Class III", "Class III is through-and-through: the probe passes between the roots to the other side. From the lingual it does not enter at all."],
+  ["Class IV", "Class IV is a through-and-through furcation you can see because the soft tissue has receded; she has neither the through-and-through defect nor the recession."]
+], "Glickman: Class I, a catch at the entrance with the bone intact; Class II, definite horizontal invasion but a bony wall remains on the other side; Class III, through-and-through; Class IV, through-and-through and visible. A probe that enters 4 mm and stops is Class II (Hamp degree 2, over 3 mm but not through).",
+  { pcase:'furcation-19', pfig:[{ kind:'chart', hide:{ furc:true } }, { kind:'film', title:'#18-#21' }], ref:[REF_FURC_CLASSES], cue:"Enters and stops = II; passes through = III; through and visible = IV." });
+mq('pc-d2', S1, 'lecture', "What is her periodontal diagnosis?", [
+  ["Localized Stage 3 Grade C periodontitis", "By severity alone (worst interdental CAL 4 mm, bone loss 30%) she would be Stage 2, but a Class II furcation is one of the three findings that put a case straight into Stage 3 or 4; with no tooth lost and no complex rehabilitation, Stage 3. Her ratio (30 ÷ 50 = 0.6) says B, but 15 cigarettes a day pushes the grade to C. Five of 28 teeth: localized."],
+  ["Localized Stage 2 Grade B periodontitis", "The CAL and bone loss fit Stage 2, but the Class II furcation forces Stage 3, and smoking 15 a day forces Grade C."],
+  ["Localized Stage 2 Grade C periodontitis", "The grade is right (smoking), but a Class II or III furcation is an automatic Stage 3 or 4 trigger, whatever the CAL says."],
+  ["Localized Stage 3 Grade B periodontitis", "The stage is right, but the ratio is not the end of grading: 10 or more cigarettes a day moves the grade to C regardless of the ratio."]
+], "Three findings force Stage 3 or 4 on their own: vertical bone loss of 3 mm or more, a Class II or III furcation, and tooth loss from periodontitis. Her Class II furcation does it here. Grading: 30% ÷ 50 years = 0.6 would be B, but heavy smoking (10 or more a day) is a modifier that pushes it to C.",
+  { pcase:'furcation-19', ref:[REF_S1_STAGE, REF_AAP, REF_GRADING], cue:"Furcation II/III = at least Stage 3; 10+ cigarettes = Grade C." });
+mq('pc-d3', S5, 'lecture', "Of the treatments listed for a Class II furcation, which is least suited to her?", [
+  ["Regeneration with a barrier membrane", "A buccal mandibular Class II is the best furcation for regeneration, but the patient rules it out: regeneration is not done in smokers, nor with uncontrolled diabetes, immunocompromise, poor compliance or poor hygiene."],
+  ["Furcation plasty", "Reshaping the tooth and bone to make the entrance shallower and cleanable is a Class II option, and smoking does not take it off the list."],
+  ["Root resection or hemisection", "Resective options are listed for Class II (and III) furcations; they commit the tooth to endodontics and a restoration but are not ruled out by smoking."],
+  ["Extraction, with an implant later", "Extraction is the option when too much is against the tooth; it is not the least suited choice, though her smoking would also count against an implant."]
+], "Class II options: furcation plasty, regeneration, root resection, extraction. Regeneration needs the right site (hers is: mandibular, buccal, degree II) and the right patient; smoking, uncontrolled diabetes, immunocompromise, poor compliance and poor hygiene each rule it out.",
+  { pcase:'furcation-19', pfig:[{ kind:'film', title:'#18-#21' }], ref:[REF_FURC_TX, REF_FURC_CLASSES], cue:"Right site, wrong patient: no regeneration in a smoker." });
+
+/* Case: One deep pocket after Phase I (a deep, narrow intrabony defect) */
+mq('pc-e1', S6, 'slides', "How many bony walls does the #19 mesial defect have?", [
+  ["Not known yet: walls are counted at surgery", "The number of walls is read with the flap raised and the defect debrided, standing in the defect and counting the walls around you. A radiograph is two-dimensional and can hide a wall behind thick cortical bone."],
+  ["Three, because the radiolucency is narrow", "A narrow, deep radiolucency is a good sign for regeneration, but it doesn't count walls: the buccal and lingual walls are not shown on a film."],
+  ["One, because the crest beside the root is gone", "The film shows the bone beside the mesial root is lower than the crest at #20, which is the depth of the defect, not its wall count."],
+  ["Two, because it is a crater between #19 and #20", "A crater is bone lost from both neighboring proximal surfaces with only the buccal and lingual walls left; here the crest at #20 is intact, and craters aren't read from a film either."]
+], "Intrabony defects are classified by walls, width and depth, and the walls are confirmed at surgery after the flap is raised; the radiograph shows the defect's depth and angle. That depth (over 3 mm) and a narrow angle are what make this defect a good regeneration candidate.",
+  { pcase:'deep-pocket-19', ref:[REF_S1_WALLS, REF_WALLS, REF_REGEN], cue:"Depth and angle from the film; walls at surgery." });
+mq('pc-e2', S6, 'slides', "Which feature of this defect most favors regeneration?", [
+  ["It is deep (over 3 mm) and narrow", "Depth over 3 mm with a radiographic defect angle of 25° or less is the most amenable to conventional GTR; deeper, narrower defects gain more attachment and bone at 12 months (Nibali, 2021), and depth had the strongest evidence."],
+  ["It is on the mesial of a mandibular molar", "The tooth and surface decide the surgical access, not the predictability; the defect's own shape (depth, angle, walls) is what the evidence ranks."],
+  ["It still bleeds on probing", "Bleeding tells you the site is still inflamed after Phase I, which is why it is being treated; it is not a predictor of regenerative gain."],
+  ["The pocket is 8 mm", "The pocket depth includes the soft tissue over the defect; what predicts the gain is the defect's own depth and angle on the film, and its walls at surgery."]
+], "The regeneration lecture's case selection: a defect over 3 mm deep with an angle of 25° or less is most amenable; deeper and narrower defects with more walls gain more. Wide, shallow, predominantly 1-wall defects are the risk factors for failure.",
+  { pcase:'deep-pocket-19', pfig:[{ kind:'film', title:'#18-#21' }], ref:[REF_REGEN], cue:"Deep + narrow + many walls = regenerate." });
+mq('pc-e3', S1, 'lecture', "What comes next for the #19 mesial site?", [
+  ["Regenerative surgery, then maintenance", "Phase I is done and the re-evaluation shows one residual 8 mm pocket over a deep, narrow defect in a compliant nonsmoker with 12% plaque: a Phase II site, and the defect's shape makes rebuilding it (a graft, a membrane, or both) the right kind of surgery."],
+  ["Resective osseous surgery to flatten the defect", "Resective surgery recontours bone into a cleansable shape at the cost of bone; it suits horizontal loss and craters, not a deep, narrow defect that can be regenerated."],
+  ["Repeat scaling and root planing, re-evaluate in 6 weeks", "The re-evaluation appointment is where the surgical call is made; a residual 8 mm pocket on a 5 mm intrabony defect is beyond what another round of instrumentation can clean."],
+  ["Extract #19 and plan an implant", "Extraction is for a tooth with too much against it; this is one defect on a well-maintained, nonsmoking patient, with the best prognosis a defect can have."]
+], "Every plan starts with Phase I and ends in maintenance; the Phase I re-evaluation, not the first exam, is where Phase II is decided. A Stage 3 site that didn't resolve gets surgery: resective to recontour bone into a cleansable shape, or regenerative to rebuild a favorable defect. A deep, narrow intrabony defect in a compliant nonsmoker is the regenerative case.",
+  { pcase:'deep-pocket-19', ref:[REF_S1_PLAN, REF_REGEN], cue:"Phase I, re-evaluate, then Phase II: regenerate the favorable defect." });
+
+/* Case: An implant at #30, three years on (peri-implantitis; Meffert failing) */
+mq('pc-f1', S7, 'lecture', "What is the peri-implant diagnosis at #30?", [
+  ["Peri-implantitis", "Bleeding and suppuration on probing, probing depths up from 3 mm at the baseline to 5-7 mm, and bone loss well beyond the initial remodeling: the bone met the first thread (1.5 mm) at baseline and is now 4-5 mm below the platform."],
+  ["Peri-implant mucositis", "Mucositis has the inflammation (bleeding, suppuration, deeper probing from swelling) but no bone loss beyond the initial remodeling; this implant has lost about 3 mm more bone than the baseline."],
+  ["Peri-implant health", "Health means no bleeding or suppuration on gentle probing and no increase in probing depth against the previous exams; he has all three."],
+  ["Normal crestal remodeling", "Crestal remodeling is about 2 mm, in the first year, and then plateaus; this bone loss is beyond that, two and a half years after the crown, and it comes with bleeding and pus."]
+], "The 2017 diagnoses are read against the baseline: health (no inflammation, no change), mucositis (inflammation, no bone loss beyond the initial remodeling), peri-implantitis (inflammation plus bone loss beyond it). Here the bone has gone from the first thread to 4-5 mm below the platform with bleeding and suppuration.",
+  { pcase:'implant-30', ref:[REF_S7_PI, REF_IMPL], cue:"Inflamed + bone loss beyond the ~2 mm remodeling = peri-implantitis." });
+mq('pc-f2', S7, 'slides', "In Meffert's terms, this implant is", [
+  ["Failing", "Progressive bone loss with signs of inflammation and no mobility is a failing implant: treated case by case, or kept in function."],
+  ["Ailing", "Ailing is static radiographic bone loss with no inflammation and no mobility; this bone loss is new since the baseline and the site bleeds and suppurates."],
+  ["Failed", "Failed means progressive bone loss with clinical mobility and loss of function; the crown is firm, and mobility would have to be of the implant body, not the crown or abutment."],
+  ["Surviving, so successful", "Survival only means it is still in the mouth; success (Albrektsson) needs no radiolucency, no infection and bone loss under 1.5 mm in the first year and 0.2 mm a year after. \"Be cautious of the terms used, success versus survival.\""]
+], "Meffert: ailing, static bone loss without inflammation or mobility (monitor); failing, progressive bone loss with inflammation but no mobility (treat, or keep in function); failed, progressive loss with mobility and loss of function (remove). Progressive loss plus pus and bleeding on a firm implant is failing.",
+  { pcase:'implant-30', pfig:[{ kind:'chart', title:'#29-#31, facial' }, { kind:'film', title:'#29-#31, today', note:'At the baseline film the bone met the implant at its first thread.' }], ref:[REF_S7_MEFFERT, REF_IMPL], cue:"Progressing + inflamed + firm = failing; mobile = failed." });
+
 var QUESTION_WHY = {
   "q1-01":["Probing depth is measured from the gingival margin to the base of the pocket, exactly what this reading describes.", "CAL is measured from the CEJ, not the gingival margin: it is probing depth plus recession.", "Recession runs from the CEJ to the gingival margin; it says nothing about how deep the pocket is.", "Radiographic bone loss is read on a film, not measured with a probe in the pocket."],
   "q1-02":["With the CEJ 4 mm below the margin, GR is -4, so CAL = 7 + (-4) = 3 mm.", "7 mm is the probing depth; it ignores the 4 mm of pocket that sits above the CEJ on enamel.", "11 mm adds the 4 mm instead of subtracting it; a subgingival CEJ makes GR negative.", "4 mm is the CEJ-to-margin distance (the negative recession), not the attachment loss."],
@@ -3900,6 +4130,8 @@ var QUESTION_WHY = {
   "q4-E06":["This is the false statement: bacteria bring endotoxin, not osteoclasts; the osteoclasts are the host's own.", "True: the host response causes about 75% of the damage.", "True: plaque bacteria initiate the disease.", "True: bacteria bring endotoxin (lipopolysaccharide), part of their roughly 25% share of the damage."]
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
+/* a case question's Patient Box is the case's rows (then its own), so the bank filter, search, drill and mock see them */
+window.shCases.foldBox(QUESTIONS, PCASES);
 var QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ QUESTIONS_BY_LECTURE[l.id] = []; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
@@ -3917,7 +4149,8 @@ var LIKELY_TOPICS = [
   { lec:"diagnosis-tx-planning", t:"Stage 4 complexity factors (the 2018 AAP/EFP tables)", basis:"midterm check-ins", ids:["q1-A01", "q1-A02", "q1-S06", "q1-P06", "q1-E01"] },
   { lec:"diagnosis-tx-planning", t:"Caries control is part of Phase I; the treatment sequence", basis:"hint", ids:["q1-26", "q1-25", "q1-M03", "q1-E04", "q1-27"] },
   { lec:"diagnosis-tx-planning", t:"Maintenance works: the Becker tooth-loss figures", basis:"hint", ids:["q1-29", "q1-28", "q1-12", "q1-E05"] },
-  { lec:"diagnosis-tx-planning", t:"Patient Box cases: stage and grade from the box", basis:"midterm check-ins", ids:["q1-P01", "q1-P02", "q1-P03", "q1-P04"] },
+  { lec:"diagnosis-tx-planning", t:"Patient Box cases: stage and grade from the box", basis:"midterm check-ins", ids:["q1-P01", "q1-P02", "q1-P03", "q1-P04", "pc-a1", "pc-a2", "pc-a3", "pc-b1", "pc-d2", "pc-e3"] },
+  { lec:"diagnosis-tx-planning", t:"Recession types from the chart: RT1, RT2, RT3 and root coverage", basis:"midterm check-ins", ids:["pc-c1", "pc-c2", "q1-06", "q1-07", "q1-08"] },
   { lec:"incisions-flaps-sutures", t:"Vertical incisions at the line angle, never through the papilla", basis:"hint", ids:["q2-19", "q2-16", "q2-M02"] },
   { lec:"incisions-flaps-sutures", t:"A flap's base must be wider than its free edge", basis:"hint", ids:["q2-17", "q2-15", "q2-13"] },
   { lec:"incisions-flaps-sutures", t:"The sub-marginal incision", basis:"hint", ids:["q2-24", "q2-25"] },
@@ -3934,7 +4167,7 @@ var LIKELY_TOPICS = [
   { lec:"phase1-therapy", t:"Glickman furcation classes; Class II is the most regenerable", basis:"hint", ids:["q4-L14", "q4-L15", "q4-L16", "q4-O01"] },
   { lec:"phase1-therapy", t:"Debridement has one indication and is never combined with SRP", basis:"hint", ids:["q4-L12", "q4-L13", "q4-18"] },
   { lec:"phase1-therapy", t:"What SRP aims for, and re-evaluation at 4-6 weeks", basis:"hint", ids:["q4-L25", "q4-L28", "q4-27", "q4-29", "q4-L33", "q4-L27"] },
-  { lec:"phase1-therapy", t:"Prophylaxis vs maintenance vs D4346", basis:"hint", ids:["q4-L30", "q4-L31", "q4-19", "q4-L32"] },
+  { lec:"phase1-therapy", t:"Prophylaxis vs maintenance vs D4346", basis:"hint", ids:["q4-L30", "q4-L31", "q4-19", "q4-L32", "pc-b2"] },
   { lec:"phase1-therapy", t:"Fremitus is palpated; Miller mobility classes", basis:"hint", ids:["q4-L19", "q4-L20", "q4-15", "q4-16", "q4-O02"] },
   { lec:"phase1-therapy", t:"Instrumentation: finger rests, scaling vs root planing, what the ultrasonic can't do", basis:"hint", ids:["q4-39", "q4-L34", "q4-L29", "q4-L35"] },
   { lec:"resective-furcation", t:"Attachment loss into the furcation drops the prognosis", basis:"hint", ids:["q5-L02", "q5-L01"] },
@@ -3945,18 +4178,19 @@ var LIKELY_TOPICS = [
   { lec:"resective-furcation", t:"Furcation arrows, and the clinical exam before the radiograph", basis:"hint", ids:["q5-L34", "q5-L35", "q5-L37", "q5-L36"] },
   { lec:"resective-furcation", t:"Osseous surgery: bone follows the gingiva, spare the furcation, debride the roots", basis:"hint", ids:["q5-R01", "q5-R12", "q5-R17", "q5-R18", "q5-08", "q5-09", "q5-R09"] },
   { lec:"resective-furcation", t:"Ineffective plaque control is the first contraindication; the 1981 root planing study", basis:"hint", ids:["q5-R19", "q5-RM1", "q5-R07", "q5-R04"] },
-  { lec:"periodontal-regeneration", t:"Best candidates: deep, narrow, 3-wall defects", basis:"review guide", ids:["q6-01", "q6-02", "q6-L09", "q6-L06", "q6-L38"] },
+  { lec:"resective-furcation", t:"Furcation class from the Nabers probe, and the treatment by class", basis:"midterm check-ins", ids:["pc-d1", "pc-d3", "q5-P01"] },
+  { lec:"periodontal-regeneration", t:"Best candidates: deep, narrow, 3-wall defects", basis:"review guide", ids:["q6-01", "q6-02", "q6-L09", "q6-L06", "q6-L38", "pc-e1", "pc-e2"] },
   { lec:"periodontal-regeneration", t:"Biologics: EMD (amelogenins), rhPDGF-BB, β-TCP", basis:"review guide", ids:["q6-03", "q6-04", "q6-05", "q6-07", "q6-L24"] },
   { lec:"periodontal-regeneration", t:"Regeneration vs repair; only histology proves it", basis:"slides", ids:["q6-L01", "q6-L02", "q6-L03", "q6-L20", "q6-L21"] },
   { lec:"periodontal-regeneration", t:"Risk factors for a less predictable result", basis:"review guide", ids:["q6-06", "q6-L33", "q6-L34"] },
   { lec:"periodontal-regeneration", t:"The AAP decision tree", basis:"slides", ids:["q6-L27", "q6-L28", "q6-L30", "q6-L31", "q6-P04"] },
   { lec:"periodontal-regeneration", t:"Graft types and the GTR membrane", basis:"slides", ids:["q6-X01", "q6-L15", "q6-L16", "q6-L17"] },
-  { lec:"implants-perio", t:"Mucositis vs peri-implantitis: bone loss beyond remodeling is the difference", basis:"hint", ids:["q7-L06", "q7-L07", "q7-L09", "q7-L10", "q7-T02", "q7-N01", "q7-S02"] },
+  { lec:"implants-perio", t:"Mucositis vs peri-implantitis: bone loss beyond remodeling is the difference", basis:"hint", ids:["q7-L06", "q7-L07", "q7-L09", "q7-L10", "q7-T02", "q7-N01", "q7-S02", "pc-f1"] },
   { lec:"implants-perio", t:"Physiologic (~2 mm, first year) vs pathologic bone loss; compare with baseline", basis:"hint", ids:["q7-L05", "q7-L04", "q7-T05", "q7-M01", "q7-L43"] },
   { lec:"implants-perio", t:"Smoking and implants: pathogens, immunity, nicotine, the studies", basis:"hint", ids:["q7-02", "q7-03", "q7-04", "q7-07", "q7-L27", "q7-L28", "q7-L29", "q7-N03"] },
   { lec:"implants-perio", t:"Risk assessment at every stage; treat periodontitis before implants", basis:"hint", ids:["q7-L38", "q7-L23", "q7-L22", "q7-T03", "q7-P02", "q7-P04"] },
   { lec:"implants-perio", t:"Success vs survival; Albrektsson's criteria", basis:"lecture", ids:["q7-01", "q7-L01", "q7-L02", "q7-S01", "q7-N02"] },
-  { lec:"implants-perio", t:"Ailing, failing, failed; a mobile implant comes out", basis:"slides", ids:["q7-L13", "q7-L14", "q7-L15", "q7-L16", "q7-S03", "q7-T04"] },
+  { lec:"implants-perio", t:"Ailing, failing, failed; a mobile implant comes out", basis:"slides", ids:["q7-L13", "q7-L14", "q7-L15", "q7-L16", "q7-S03", "q7-T04", "pc-f2"] },
   { lec:"implants-perio", t:"Plaque biofilm, microbiology and the risk factor lists", basis:"slides", ids:["q7-L18", "q7-L19", "q7-L20", "q7-M02", "q7-L25", "q7-T01"] },
   { lec:"implants-perio", t:"Bleeding on probing and the radiograph schedule", basis:"slides", ids:["q7-L40", "q7-L41", "q7-L42", "q7-L44", "q7-N04", "q7-S05"] },
   { lec:"implants-perio", t:"Diabetes: control (HbA1c), not duration", basis:"lecture", ids:["q7-05", "q7-09", "q7-L31", "q7-S04"] },
@@ -6368,7 +6602,7 @@ function qCardHTML(q){
     choiceOrder(q).forEach(function(i){
       body += '<button type="button" class="qcard-choice" data-qid="'+q.id+'" data-idx="'+i+'">'+escHtml(q.choices[i])+'</button>';
     });
-    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
+    body += '</div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+refHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
   } else if(q.type === 'multi'){
     delete MULTI_STATE[q.id];
     body += '<div class="qcard-choices" data-qtype="multi" data-qid="'+q.id+'">';
@@ -6376,7 +6610,7 @@ function qCardHTML(q){
       body += '<button type="button" class="qcard-choice multi" data-qid="'+q.id+'" data-multi-idx="'+i+'" aria-pressed="false">'+escHtml(q.choices[i])+'</button>';
     });
     body += '</div><div class="qcard-reveal-btn" data-role="check-wrap"><button type="button" class="btn sm" data-action="multi-check" data-qid="'+q.id+'">Check answer</button></div>' +
-      '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
+      '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+refHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
   } else if(q.type === 'recall'){
     body += '<div class="qcard-reveal-btn" data-role="reveal-wrap"><button type="button" class="btn sm" data-action="reveal" data-qid="'+q.id+'">'+icon('eye')+'Show answer</button></div>' +
       '<div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+escHtml(q.answer)+(q.ex?('<br><br>'+escHtml(q.ex)):'')+'</div>'+cueHTML(q)+CLASS_ROW+'</div>' +
@@ -6391,14 +6625,14 @@ function qCardHTML(q){
       body += '<button type="button" class="qcard-choice" data-step-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.steps[i])+'</button>';
     });
     /* undo / start over for a wrong tap (student suggestion, 2026-10-02); the last step is forced, so grading on it stays */
-    body += '</div><div class="qcard-seq-tools" data-qid="'+q.id+'" hidden><button type="button" data-seq-tool="undo">Undo last step</button><button type="button" data-seq-tool="clear">Start over</button></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
+    body += '</div><div class="qcard-seq-tools" data-qid="'+q.id+'" hidden><button type="button" data-seq-tool="undo">Undo last step</button><button type="button" data-seq-tool="clear">Start over</button></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+refHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
   } else if(q.type === 'match'){
     delete MATCH_STATE[q.id];
     body += '<div class="qcard-match-cols" data-qtype="match" data-qid="'+q.id+'"><div class="qcard-match-col" data-side="left">';
     shuffled(q.pairs.map(function(p,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-match-item" data-side="left" data-pair-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.pairs[i][0])+'</button>'; });
     body += '</div><div class="qcard-match-col" data-side="right">';
     shuffled(q.pairs.map(function(p,i){ return i; })).forEach(function(i){ body += '<button type="button" class="qcard-match-item" data-side="right" data-pair-idx="'+i+'" data-qid="'+q.id+'">'+escHtml(q.pairs[i][1])+'</button>'; });
-    body += '</div></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
+    body += '</div></div><div class="qcard-explain" data-role="explain" id="explain-'+q.id+'"><div class="qx-body">'+(q.ex?escHtml(q.ex):'')+'</div>'+whyHTML(q)+refHTML(q)+cueHTML(q)+CLASS_ROW+'</div>';
   }
   var hint = q.type === 'sequence' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap the steps in order.</div>' : q.type === 'match' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Tap a left item, then its partner.</div>' : q.type === 'multi' ? '<div class="faint" style="font-size:.8rem;margin:-6px 0 8px">Select every correct answer, then check. Partial credit.</div>' : '';
   return figAfter(q, '<div class="qcard tag-'+lec.tag+'" data-qid="'+q.id+'" data-qtype="'+q.type+'">' + qMeta(q) +
@@ -6416,8 +6650,13 @@ function figAfter(q, html){
 }
 function pboxHTML(q){
   if(!q.pbox) return '';
-  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl></div>';
+  /* a PCASES case draws its chart, radiograph and view from the same numbers (the dental case kit); q.pfig picks the
+     pictures for this question and hides any row that would give its answer away */
+  var c = q.pcase && PCASES[q.pcase], figs = window.shCases.pboxFigures(q, PCASES);
+  return '<div class="pbox'+(c ? ' pbox-case' : '')+'"><div class="pbox-head">'+icon('notes')+'Patient box</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + figs + '</div>';
 }
+/* "In the notes": where a case question's facts live (q.ref = [{label, go}]), opened through SH_GOTO like the search */
+function refHTML(q){ return window.shCases.refHTML(q); }
 /* Multiple-answer partial credit (Canvas-style): each correct pick earns 1/n, each wrong pick costs 1/n, floor 0.
    The course's exact partial-credit rule isn't published; this is the common convention. */
 var MULTI_STATE = {};

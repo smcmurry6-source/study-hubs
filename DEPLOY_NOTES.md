@@ -34,12 +34,45 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
   run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways. Most were the top bars, which
-  the measured top bar above (PR 235) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no
+  the measured top bar (PR 235, its entry below) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no
   longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding at 520 px and below), and
   **Perio Review's** tables that scroll sideways take keyboard focus and are named for screen readers ("Antibiotics
   (table)"). The device matrix (`tools/release/matrix.js`) now measures against the layout width, because a phone browser
   zooms out to fit a page that's too wide, which hid the overflow from Chromium's phone emulation; it also names the
   element that sticks out. Bug log BUG-015 to BUG-018.
+- **2026-11-05 (The drawn Patient Box case system for every hub; anatomy and realism, Claude Code)** — Sam: "I also want
+  this system to be called for patient box questions in other hubs", "All teeth need to be anatomically correct. All
+  variables need to be realistic", "Merge when ready". The case kit moved out of the Perio hub into **`widget/cases.js` +
+  `widget/cases.css`** (`window.shCases`; a hub loads both and calls `shCases.pboxFigures(q, PCASES)` from its
+  `pboxHTML`, `shCases.refHTML(q)` for the "In the notes" buttons). **Every tooth type is redrawn from Wheeler's anatomy**:
+  crown shapes with the right cusps (two buccal cusps on upper molars, three on the lower first molar, two on the second),
+  contact heights and incisal angles, the canine's long root, the upper first premolar's two roots, the upper molars'
+  palatal root behind the buccal pair, the lower molars' broad mesial and narrower distal roots curving distally, root
+  trunks above the furcations, the cervical line dipping at mid-facial. **`shCases.validate()`** rejects unrealistic or
+  inconsistent numbers (ranges for probing depths, recession, CAL, bone loss, mobility, furcations, implants, age,
+  cigarettes, HbA1c; the pocket base and the bone crest must agree unless a vertical defect is declared; a furcation
+  needs a molar and bone loss to the trunk; a Class III is through and through), and **`node tools/ci/cases.js`** (new
+  CI step) runs it on every hub's `PCASES` and checks each case's `expect` against `derive()`. **PCD Implants** (exam Nov
+  6): its four L8 Patient Box items now draw their cases (mucositis, peri-implantitis under a cement-retained crown with
+  the cement fleck on the film, a new patient with no baseline, an early failure under a cover screw with the radiolucent
+  line) with "In the notes" buttons. **Occlusion** has the hook and an empty `PCASES`. How-to:
+  `vault/how-to/draw-a-patient-box-case.md`. Sam approved the release in chat.
+- **2026-11-04 (Perio: Patient Box cases drawn from their numbers, Claude Code)** — Sam: upgrade the Perio Patient Box into a
+  visual diagnostic-case engine (the midterm check-ins asked for "cases with pictures, charts and radiographs" and more
+  staging/grading cases). A **shared kit**, `tools/figures/shared/dental-cases.js` + `.css` (the Occlusion case-picture
+  tooth model generalized; pasted into the hub between the `pcase` markers by `tools/figures/perio/build.mjs`), draws a
+  **periodontal chart** (an SVG strip per surface like a probing chart, blue margin line, red pocket line, bleeding dots,
+  furcation triangles, mobility, implants, missing teeth, with the numbers as a table), a **periapical radiograph**
+  (per-side bone levels as % of root length, angular defects, furcation radiolucency, calculus, crowns, root fillings,
+  amalgams, implants against a baseline) and a **drawn buccal view** (recession, swollen or fibrotic gingiva, bleeding,
+  suppuration, plaque, calculus), all from one case model, and `derive()` works the 2018 stage, grade and extent,
+  recession types and peri-implant states out of the same numbers; `tools/figures/perio/cases-check.mjs` fails the build
+  when a case's `expect` disagrees. **Six cases, 16 questions** (`PCASES`, `pc-*`: staging and grading, gingivitis vs
+  periodontitis with D4346, RT1-3, a Class II furcation with the stage trigger and the smoking modifier, a deep narrow
+  defect for regeneration, peri-implantitis and Meffert), each with a why per choice, memory cue, and **"In the notes"**
+  buttons (`q.ref`, through `SH_GOTO`; tracked `case:ref`). A question's `pfig` hides the row that would give its answer
+  away (CAL, furcation). `LIKELY_TOPICS` updated (two new topics); About page. No notes text, narration or schema change.
+  Tier 2: a draft PR for Sam's look; the expansion waits for approval ([task](vault/tasks/done/2026-11-04-perio-visual-case-engine.md)).
 - **2026-11-04 (top bars fit their content: no more clipped Arcade tab, Claude Code)** — Sam: the dashboard top bar is cramped and
   the Arcade tab gets cut off. **Root cause:** every hub picked its top-bar layout from a stack of screen-width breakpoints
   (380/520/560/760/860 in each hub, plus the 561-1000 px patch of 2026-10-28 in `widget/v3.css`), but whether the bar fits

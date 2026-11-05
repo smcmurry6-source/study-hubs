@@ -32,3 +32,5 @@ jobs:
       - name: Vault notes, links and tasks
         if: ${{ !cancelled() }}
         run: node tools/ci/vault.js
+      - name: Drawn Patient Box cases (realistic numbers, keys agree)
+        run: node tools/ci/cases.js
