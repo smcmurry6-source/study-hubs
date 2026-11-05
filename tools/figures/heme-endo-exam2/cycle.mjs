@@ -185,7 +185,6 @@ function cyRender(st, D) {
   o += ax2 + '"/>';
   [1, 5, 14, 28].forEach(function (k) { o += T(cyX(k), 556, String(k), "cy-dn" + (k === d ? " b" : ""), "middle"); });
   if ([1, 5, 14, 28].indexOf(d) < 0) o += T(cyX(d), 556, String(d), "cy-dn b", "middle");
-  o += T(XR, 556, "day", "cy-dn", "end");
   return o;
 }
 function cySay(st, D) {
