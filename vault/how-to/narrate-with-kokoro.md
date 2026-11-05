@@ -29,8 +29,10 @@ lectures, shard the job and skip files that already exist. Keep the job in the
 foreground/polled; an idle cloud VM is reclaimed and background work is lost.
 
 **`tools/narrate.py`** does the whole job for a hub whose notes sit in one-line `var READINGS = {...};` and
-`var READINGS_PLAIN = {...};` objects (heme-endo-exam2 and hubs built after it): it turns each lecture's notes into
-spoken text (the "What's tested" box, headings with a pause, tables read row by row, symbols and units spelled out),
+`var READINGS_PLAIN = {...};` objects (heme-endo-exam2 and hubs built after it), or in perio's one template literal per
+lecture (`READINGS['<id>'] = ` then the notes in backticks, since 2026-11-05): it turns each lecture's notes into
+spoken text (the "What's tested" box, headings with a pause, tables read row by row, symbols, units and prescription
+shorthand spelled out: mg, po, qd/bid/tid/qid, q6h),
 uses Timmy Time's pronunciation lexicon (`tools/podcast/lexicon.json`) and writes both mp3s.
 
 ```bash

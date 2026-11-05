@@ -9,7 +9,8 @@ files in /tmp/kokoro, or $KOKORO_DIR). Hard words use tools/podcast/lexicon.json
   python3 tools/narrate.py hubs/<hub>/index.html --text --lec dmpharm  print the spoken text, no audio
   python3 tools/narrate.py hubs/<hub>/index.html --jobs 4              lectures in parallel processes
 
-It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), turns the HTML
+It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), or perio's
+READINGS['<id>'] = `...`; template-literal blocks, turns the HTML
 into spoken text (the "What's tested" box, headings with a pause, paragraphs, list items, and each table row read as
 "first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration.
 """
@@ -34,6 +35,10 @@ SAY = [
     (r"\bGLUT2\b", "glute two"), (r"\bGLUT4\b", "glute four"), (r"\bIGF-1\b", "I G F one"), (r"\bMEN ?1\b", "men one"), (r"\bMEN ?2A?\b", "men two"),
     (r"\b5-alpha\b", "five alpha"), (r"\b5α\b", "five alpha"), (r"α", "alpha "), (r"β", "beta "), (r"γ", "gamma "), (r"δ", "delta "),
     (r"&", " and "), (r"\s/\s", " or "), (r"\+/-", " plus or minus "),
+    # prescription shorthand (espeak reads "qid" as "kid", "IL-1" as "ill one")
+    (r"\b1\s*mg\b", "1 milligram"), (r"(?<=\d)\s*mg\b", " milligrams"), (r"\bq(\d+)h\b", r"every \1 hours"),
+    (r"\bpo\b", "P O"), (r"\bqd\b", "Q D"), (r"\bbid\b", "B I D"), (r"\btid\b", "T I D"), (r"\bqid\b", "Q I D"),
+    (r"\bIL-1\b", "I L one"),
 ]
 
 
@@ -114,8 +119,14 @@ def spoken(html_text):
 def readings(hub_html):
     def grab(name):
         m = re.search(r"^var " + name + r" = (\{.*\});$", hub_html, re.M)
-        if not m: sys.exit("no `var " + name + " = {...};` line in the hub")
-        return json.loads(m.group(1))
+        if m and json.loads(m.group(1)): return json.loads(m.group(1))
+        # perio's layout: `var NAME = {};`, then one template literal per lecture, NAME['<id>'] = `...`; closed by a `; line
+        out = {}
+        for lec, body in re.findall(r"^" + name + r"\['([^']+)'\] = `\n?(.*?)\n?`;$", hub_html, re.M | re.S):
+            if "${" in body or "\\" in body: sys.exit(name + "['" + lec + "'] uses ${...} or a backslash escape: not supported")
+            out[lec] = body
+        if not out: sys.exit("no `var " + name + " = {...};` line and no " + name + "['<id>'] = `...`; blocks in the hub")
+        return out
     return {"full": grab("READINGS"), "plain": grab("READINGS_PLAIN")}
 
 
