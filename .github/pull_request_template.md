@@ -33,5 +33,5 @@ Preview: <!-- the link from this PR's preview comment, on its own line -->
 ## Release
 
 - [ ] Sam approved this release <!-- tiers 2 and 3: only Sam ticks this -->
-- [ ] After merge: `node tools/release/postcheck.js` passed, and monitoring per RELEASE_TEST_PLAN.md section 11
+- [ ] After merge: `node tools/release/postcheck.js` passed
 - [ ] Vault written back (task note, decisions, hub note), `DEPLOY_NOTES.md`, About page if students can see it

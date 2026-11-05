@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-05 | No post-release monitoring, now or for future releases: the 1, 24 and 48 hour checks (`tools/release/monitor.sql`, removed) and scheduled check-ins for them are dropped. The post-release check (`postcheck.js`), the changelogs and rollback stay | every release | chat, [preview-and-release-test](rules/preview-and-release-test.md) |
 | 2026-11-05 | Question health: "Merge when ready": Sam's approval of the release, so the agent merges once "Check hubs" and "Release tests" pass | every hub, `review/` | chat, [test report](release/reports/2026-11-04-question-health.md) |
 | 2026-11-05 | The admin page redesign and admin operations (PR #236) approved for release: "Merge when ready". Sam asked the session to merge it, so the agent applied `migration_v50.sql` and merged once its checks passed (the release plan's "agents never merge" otherwise stands) | admin page, dashboard | chat, [PR #236](https://github.com/smcmurry6-source/study-hubs/pull/236) |
 | 2026-11-04 | The drawn Patient Box case system (`widget/cases.js`) is for every hub's Patient Box questions, not only Perio; every tooth anatomically correct, every variable realistic (CI validates); Sam approved the first PR in chat ("Merge when ready") | every hub | [how-to](how-to/draw-a-patient-box-case.md), [task](tasks/done/2026-11-04-perio-visual-case-engine.md) |

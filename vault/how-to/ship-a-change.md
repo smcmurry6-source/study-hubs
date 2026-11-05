@@ -14,7 +14,7 @@ tags: [shipping]
    [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets a preview ([preview-a-change](preview-a-change.md)),
    the release suites, UAT, its bug-log rows and a test report in the PR, and waits for Sam to tick "Sam approved this
    release" ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge:
-   `node tools/release/postcheck.js` and the monitoring in the plan.
+   `node tools/release/postcheck.js`.
 4. In the PR description, write what changed in plain, student-facing language, in
    [American English](../rules/american-english.md).
 5. **Any student-visible feature, easter egg, trophy, holiday or setting goes on the About page in the same PR**
