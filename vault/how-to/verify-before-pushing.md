@@ -14,13 +14,15 @@ in more than 40% of MCQs). Since 2026-11-04 it also runs `node tools/release/sec
 data files), `node tools/release/rls.js` (database permissions on a throwaway copy of `supabase/schema.sql`; needs
 PostgreSQL's server binaries), `node tools/release/admin-ops.js` (the admin page's database functions on the same kind of
 throwaway copy: who's studying now, archive overrides, newest-first check-ins), `node tools/ci/archive.js` (the hub archive
-rules against the old date logic) and `node tools/ci/preview.js` (the preview never reaches production; needs Playwright), and
+rules against the old date logic), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright) and
+`node tools/ci/cases.js` (every drawn Patient Box case has realistic numbers that agree with its key,
+[how-to](draw-a-patient-box-case.md)), and
 a second workflow, "Release tests", runs accessibility, performance and the device matrix on site changes
 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything). Run them locally before pushing; the smoke test needs Playwright
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
 
-- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/rankup.js` / `widget/drill.js` / `widget/fx.js` / `widget/podcast.js` / `widget/archive.js`.
+- `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/rankup.js` / `widget/drill.js` / `widget/fx.js` / `widget/podcast.js` / `widget/archive.js` / `widget/cases.js`.
 - Question / lecture counts match what you expect; no duplicate ids.
 - Grep that the feature you added (and anything from a merged-in branch) is present.
 - Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —

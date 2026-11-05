@@ -2,6 +2,8 @@
 //   node tools/figures/perio/build.mjs            rebuild the hub's anima blocks from the files here
 //   node tools/figures/perio/build.mjs --check    exit 1 if the hub's blocks are out of date
 //   node tools/figures/perio/build.mjs --preview  also write standalone pages to dist/ for anima's checks
+// --check also runs node tools/ci/cases.js, so every drawn Patient Box case (PCASES; the kit is widget/cases.js)
+// stays realistic and agrees with its own numbers.
 // Each figure is one module here (static SVG + a live function sharing one model); edit them, never the generated
 // blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -54,9 +56,13 @@ out = between(out, ACB, ACE, animaCss());
 if (process.argv.includes("--check")) {
   if (out !== hub) { console.error("hubs/perio/index.html: the anima blocks are stale; run node tools/figures/perio/build.mjs"); process.exit(1); }
   console.log("perio anima blocks are up to date");
+  const { spawnSync } = await import("node:child_process");
+  if (spawnSync(process.execPath, [join(HERE, "../../ci/cases.js")], { stdio: "inherit" }).status) process.exit(1);
 } else {
   writeFileSync(HUB, out);
   console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  const { spawnSync } = await import("node:child_process");
+  spawnSync(process.execPath, [join(HERE, "../../ci/cases.js")], { stdio: "inherit" });
 }
 if (process.argv.includes("--preview")) {
   // standalone pages with the hub's tokens, for anima's capture and line checks
