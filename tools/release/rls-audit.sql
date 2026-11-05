@@ -34,7 +34,7 @@ union all
 -- 5. helpers the schema revokes that anon can run anyway
 select 'internal helper open to anon', p.proname
 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-where n.nspname = 'public' and p.proname in ('sh_admin_ok', 'sh_visitor_xp', 'sh_xp_rebuild', 'sh_insights', 'sh_insight_retries', 'sh_data_quality', 'sh_archive_version')
+where n.nspname = 'public' and p.proname in ('sh_admin_ok', 'sh_visitor_xp', 'sh_xp_rebuild', 'sh_insights', 'sh_insight_retries', 'sh_data_quality', 'sh_archive_version', 'sh_retention_run', 'sh_retention_status')
   and has_function_privilege('anon', p.oid, 'execute')
 order by 1, 2;
 

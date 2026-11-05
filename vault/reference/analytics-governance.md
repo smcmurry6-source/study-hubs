@@ -39,7 +39,7 @@ people get stuck, which questions mislead, whether a change worked. **Never** to
 |---|---|
 | [event-taxonomy](event-taxonomy.md) | every table and event family, its grain, emitter and start date; naming rules for sections, click targets and event kinds; how to add tracking |
 | [analytics-data-quality](analytics-data-quality.md) | the automatic checks, the standing caveats (people are browsers, coverage dates, retries in accuracy, check-in bias), what's been fixed |
-| [analytics-retention](analytics-retention.md) | what's kept and for how long (a proposal until Sam decides), storage against the free plan, the traps before any delete |
+| [analytics-retention](analytics-retention.md) | what's kept and for how long (in force since 2026-11-05: a weekly job), how to check it, storage against the free plan |
 | [learner-data-privacy](../rules/learner-data-privacy.md) | the rule: per-person data stays in the database, groups of 5+, no new identifiers, read-only by default |
 | [insights-dashboard](insights-dashboard.md) | the Insights tab's cards, thresholds and decisions, and the first cross-hub reading |
 | [read-usage-data](../how-to/read-usage-data.md) | how to query it (tables, admin page, surveys) |

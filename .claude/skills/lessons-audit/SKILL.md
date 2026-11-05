@@ -51,7 +51,7 @@ source, and the hardest questions with their favorite wrong answer.
 
 ```sql
 select d.hub, d.exam, d.answers->>'ready' ready, d.answers->>'went' went, d.answers->>'match' match, d.answers->>'missed' missed,
-  (select count(*) * 25 / 60 from activity_pings p where p.hub = d.hub and p.visitor_id = d.visitor_id) mins,
+  (select sum(p.n) * 25 / 60 from activity_hourly p where p.hub = d.hub and p.visitor_id = d.visitor_id) mins,
   (select count(*) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id) answers,
   (select round(100.0 * avg(a.correct::int)) from personal_answers a where a.hub = d.hub and a.visitor_id = d.visitor_id) pct
 from exam_debriefs d order by d.hub, d.created_at;
@@ -67,7 +67,8 @@ a `missed` answer only as a topic, a format or a feature request. If one quotes 
 
 Also pull, for the live hubs: people/minutes/bounce (< 5 min) all-time and since, per day; time by section; click
 targets and reach for anything the last refresh changed (e.g. `practice=midterm`, `sh-drill=quick`); mocks
-(`mock_scores`) and drill (`drill/%` pings) per day.
+(`mock_scores`) and drill (`drill/%` sections) per day. Time comes from `activity_hourly` (`sum(n) * 25 / 60` minutes):
+raw `activity_pings` are kept 30 days only (`vault/reference/analytics-retention.md`).
 
 ## 2. Check the last refresh first
 
