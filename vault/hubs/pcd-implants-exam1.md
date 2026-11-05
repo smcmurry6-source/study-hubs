@@ -48,7 +48,13 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   `mm()` items have no per-option rows. Choices must not carry their own numbers when the stem asks which is most common (report #37).
 - **Practice follows bank order** (lessons audit, 11-04): two days out the last four lectures had 6-7 answerers each vs 23 on L1-L2.
   So Home's "Where to next" has a **Practiced least** row (`homeNextHTML`, `homeGo('least:<ids>')`; Sam, 2026-11-04): it
-  replaces "Not started" once you've answered anything. Its clicks log as `home=least:<ids>`.
+  replaces "Not started" once you've answered anything. Its clicks log as `home=least:<ids>`. Nobody tapped that row, while the
+  quick-start row gets the taps, so since 2026-11-05 (Sam: "fix both of the optional suggestions") the quick-start **Practice
+  questions** button goes to the same lectures (`lecsBehind(rows)` feeds both; it lists them by number, "Practiced least: L1, L2,
+  L5, L6 · 129 to try"), and to every unanswered question when none is behind. Its clicks log as `qs=practice-least` and
+  `qs=practice` (`data-qs`), apart from the row's `home=least:<ids>`.
+- **`tm-mm-2`** (platform switching) is 3 right of 5 since 2026-11-05: "Decreases soft tissue volume" replaced "Increases soft
+  tissue volume" (the notes: it increases), same id. Its old class picks and accuracy were cleared once it went live (Sam's OK, 2026-11-05), so its numbers start at 0.
 - **Statement keys were a pattern until 2026-11-04** (suggestion #14): 36 of 46 two-statement keys were "1 true, 2 false",
   statement 1 was true in all 30 numbered items and the second choice was the key in 23. The evening audit swapped,
   reordered and rewrote them (12 / 11 / 11 / 12 over the four two-statement choices; numbered keys 7 / 8 / 8 / 7 by

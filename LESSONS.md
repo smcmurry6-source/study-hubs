@@ -157,7 +157,10 @@ the statement keys before shipping (below); and expect the lectures finished las
   position and 90% for one statement number.
 - PCD Implants `in-num-3` (for Sam): the 5 misses all call statement 1 ("junctional epithelium attached to titanium") false; the
   notes call that tissue "junctional epithelium" in the comparison table and "barrier epithelium" in the figure. Make one name win.
-- PCD Implants `tm-mm-2` (for Sam): 4 of 5 options right, 7% on a first try; consider 3 right of 5 under the same id.
+- ~~PCD Implants `tm-mm-2` (for Sam): 4 of 5 options right, 7% on a first try; consider 3 right of 5 under the same id.~~ Done
+  2026-11-05: 3 right of 5 ("Decreases soft tissue volume" is the new wrong option). Its numbers start over.
+- ~~PCD Implants: point the quick-start "Practice questions" button at the least-practiced lectures.~~ Done 2026-11-05
+  (`qs=practice-least`); next refresh, compare its taps with the row's.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order

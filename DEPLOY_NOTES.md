@@ -32,6 +32,28 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (Special Patient Care archives when the exam opens, no check-in, Claude Code)** — Sam: archive the hub when the
+  exam opens and skip check-ins for this hub only; take the card off when it's archived. `index.html` `HUBS`: `archiveOn` and
+  `hideCardOn` both `{date:"2026-11-06", hour:0}` (so it goes straight from live to no card), the exam's `checkinFrom`
+  replaced by `checkinClosed:true`. The hub's `SH_EXPORT.exams` / `archiveOn` now use `EXAM_DATE` hour 0 so its own
+  "archived" notice agrees; Home's done message no longer mentions a check-in. About page's check-in entry updated.
+- **2026-11-05 (PCD Implants: Practice questions goes to the lectures practiced least; `tm-mm-2` is 3 of 5, Claude Code)** — The two optional items left open by #245 (Sam: "fix both of the optional suggestions"). `hubs/pcd-implants-exam1`: Home's quick-start **Practice questions** button, the part of Home people tap, now does what the untapped "Practiced least" row does: while some lectures have under half their questions tried, it names them ("Practiced least: L1, L2, L5, L6 · 129 to try", by lecture number) and opens the Question Bank on them with "Not answered yet"; otherwise it opens every unanswered question as before. Both use the new `lecsBehind(rows)`. Clicks log as `qs=practice-least` / `qs=practice`. The subtitle wraps only on that button (`.qs-wrap`, the count kept whole by `.qs-nw`), since the laptop's four-across row cut it off. **`tm-mm-2`** (platform switching, 7% on a first try with 4 of 5 options right): "Increases soft tissue volume" (right) became "Decreases soft tissue volume" (wrong), so it is 3 of 5; explanation and every why updated, same id, no notes text changed (no narration). Its class picks and accuracy went stale (option 4 changed meaning). **Live:** #252 merged at 19:35 UTC (rebased twice onto #251 and #250, CI green each time), live at 19:39; then (Sam: "yes, run the SQL") `tm-mm-2`'s 5 `question_choices` rows (68 ticks) and its `question_stats` row (34 attempts) were deleted, `postcheck.js --from c8a49d1 --to f5aaf51` passed, and the changelog line was logged. About page, hub note, `vault/decisions.md` and `LESSONS.md` updated.
+- **2026-11-05 (Occlusion final moves to Mon Nov 16, 6:30-7:45 pm, Claude Code)** — Sam: the final moves up from Thu Nov 19,
+  same time window as the midterm. `hubs/occlusion`: `FINAL_DATE` `2026-11-16`, `FINAL_TIME` / `FINAL_CLOSES` `'18:30'` / `'19:45'`
+  (Home now counts down days, hours and minutes, then "on now" until 7:45, then done), `EXAM_INFO`, the Home hero, exam card, hints
+  banner, timeline, header title and header pill ("Final tonight", "Exams done" after 7:45). Dashboard `HUBS`: the final's date,
+  `checkinHour:20, promptHour:20` (check-in after the window closes, not from 8 am before an evening exam) and the card text. No
+  notes text changed, so no narration. Still waiting on the format: [task](vault/tasks/2026-11-03-occlusion-final-time-and-format.md).
+- **2026-11-05 (arcade crossword can be started again, Claude Code, BUG-024)** — Sam: "the arcade crossword is broken." Opening
+  the crossword (Cross-Section; Crossing Over, Cross-Slice and the other skins) showed an empty 30 px strip on every hub, laptop
+  and phone: before a puzzle starts the stage holds only the intro overlay, which is absolutely placed, so the stage had no
+  height and the intro and its "New puzzle" button were clipped. The clicks show students opening it, trying Full screen and
+  leaving; `arcade_scores` had no crossword score in 30 days. `widget/games.css`: `.cx-stage{min-height:380px}` (a started
+  puzzle is taller than that, so its layout is unchanged). Checked in the preview on all five live hubs: every arcade game's
+  start button takes a real tap, and every crossword types through to "Solved!". No `sw.js` bump (styles are network-first).
+  Noticed, not changed: two clues can come from the same note sentence with different blanks, so each gives the other's
+  answer away, and a clue can start with a stray ")".
+
 - **2026-11-05 (the 11-04 lessons refresh is live, Claude Code)** — #245 merged at 15:03 UTC, but its GitHub Pages deploy timed out ("Deploy to GitHub Pages" failed after 10 minutes), so #248 (vault only: Sam's calls in `vault/decisions.md`) gave `main` the new commit that publishes; the hubs were live at 15:30. At 15:31 `tools/data-fixes/2026-11-04-statement-keys.sql` ran (Sam's OK) with a guard that rolled everything back unless each reordered item's new key held exactly its correct count: it passed, nothing was left mid-move, and the rewritten items start fresh. `postcheck.js` passed (both hubs identical to main, 0 errors), a changelog line for each hub, and suggestion #14 got Sam's reply. BUG-022 retested; BUG-023 done for these items (version-aware picks still in the inbox).
 - **2026-11-04 evening (lessons audit: statement keys no longer a pattern, Claude Code)** — Suggestion #14 (PCD Implants, two days
   out): "a lot of the statement questions seem to all have the same answer... select all being options 1,2,4 a lot." True:

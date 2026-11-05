@@ -784,8 +784,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       modes:["Home","Compendium","Plain-English notes","Diagrams","Review tables","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"pcdimpl-state-v1",
       podcast:{ name:"Timmy Time", sub:"The last-minute review, 48 min" } },
     { id:"special-patient-care", cls:"spc", title:"Special Patient Care Hub", code:"Special Patient Care",
-      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinFrom:{ date:"2026-11-19", hour:0 } } ], updated:"2026-11-04",
-      archiveOn:{ date:"2026-11-14", hour:24 },
+      exams:[ { name:"Special Patient Care exam", label:"Due", date:"2026-11-13", code:"Special Patient Care", checkinClosed:true } ], updated:"2026-11-04",
+      archiveOn:{ date:"2026-11-06", hour:0 }, hideCardOn:{ date:"2026-11-06", hour:0 },   /* Sam, 2026-11-05: archive and take the card off when the exam opens; no check-in */
       desc:"All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Fri Nov 6, due Fri Nov 13 at 11:59 pm (45 questions, 135 minutes, open notes). Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, multiple-answer, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a 45-question mock exam, review tables and the Sparks Arcade.",
       modes:["Home","Compendium","Plain-English notes","Review tables","Mock exam","Arcade","Listen"], stateKey:"spc-state-v1" },
     { id:"heme-endo-exam2", cls:"hemeendo", title:"Heme & Endo Exam 2 Hub", code:"Heme & Endo · Exam 2",
@@ -811,8 +811,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       exams:[ { name:"Occlusion midterm", label:"Midterm", date:"2026-10-21", code:"Occlusion · Midterm", checkinHour:19, promptHour:19,
                 extraQs:[ { id:"diagrams", kind:"scale", prompt:"How helpful were the hub's diagrams?", ends:["Not helpful","Very helpful"] },
                           { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box questions with pictures (charts, films, casts)?", ends:["Not helpful","Very helpful"] } ] },
-              { name:"Occlusion final", label:"Final", date:"2026-11-19", code:"Occlusion · Final" } ], updated:"2026-10-27",
-      desc:"Now for the final (Thu Nov 19, not comprehensive): L6 Occlusal Instrumentation (articulators, the facebow and the CR, MIP and eccentric records) and L7 Malocclusion and Dysfunction (TMD, splints, mobility, wear and bruxism). New lectures are added as they are taught. The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
+              { name:"Occlusion final", label:"Final", date:"2026-11-16", code:"Occlusion · Final", checkinHour:20, promptHour:20 } ], updated:"2026-11-05",
+      desc:"Now for the final (Mon Nov 16, 6:30-7:45 pm, not comprehensive): L6 Occlusal Instrumentation (articulators, the facebow and the CR, MIP and eccentric records) and L7 Malocclusion and Dysfunction (TMD, splints, mobility, wear and bruxism). New lectures are added as they are taught. The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
       modes:["Compendium","Plain-English notes","Diagrams","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"occl-state-v1",
       podcast:{ name:"Timmy Time", sub:"The midterm review, 45 min" } },
     { id:"msk-exam3", cls:"gi", title:"Musculoskeletal Exam 3 Hub", code:"GI & MSK · Exam 3",
@@ -832,7 +832,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
      Each exam's "Check in" button shows on the card from CHECKIN_HOUR on exam day; the check-in pop-up only goes out
      from ARCHIVE_HOUR on exam day, and still reaches people whose first visit comes after the card is gone, up to
      DEBRIEF_DAYS after the exam. An exam's promptHour sends its pop-up earlier (e.g. a midterm, whose hub stays live
-     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up); checkinUntil:{date,hour} ends it at that time; checkinFrom:{date,hour} holds both back until then (Special Patient Care: no discussing the exam until after Nov 18). Moving an entry here by hand (keep exams and stateKey) works the same way. */
+     until the final); its checkinHour holds the button back (e.g. a Canvas exam open until 8 pm; 24 = midnight after the exam day, for one due at 11:59 pm); checkinClosed:true ends its check-in early (button and pop-up); checkinUntil:{date,hour} ends it at that time; checkinFrom:{date,hour} holds both back until then. Moving an entry here by hand (keep exams and stateKey) works the same way. */
   var CHECKIN_HOUR = 8, ARCHIVE_HOUR = 22, CARD_DAYS = 10;
   var DEBRIEF_DAYS = 60;   /* how long after an exam its check-in pop-up stays offered */
   var ARCHIVED_HUBS = [

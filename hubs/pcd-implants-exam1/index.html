@@ -618,6 +618,8 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .qs-btn .qs-ic .ic{width:20px;height:20px}
 .qs-btn b{display:block;font-size:1rem}
 .qs-btn small{display:block;font-size:.8rem;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qs-btn small.qs-wrap{white-space:normal}
+.qs-btn small .qs-nw{white-space:nowrap}
 .qs-btn span{min-width:0}
 @media (max-width:720px){.quick-start{grid-template-columns:minmax(0,1fr);gap:8px}.qs-btn{padding:11px 14px}}
 .tested{border:1px solid color-mix(in srgb, var(--t, var(--accent)) 40%, var(--line));background:color-mix(in srgb, var(--ts, var(--accent-soft)) 60%, var(--surface));border-radius:10px;padding:10px 14px;margin:0 0 18px;font-size:.92rem}
@@ -3516,8 +3518,8 @@ mm("tm-mm-1", "terms", "slides", "Select all that apply: which are advantages of
   [["Retrievable through the screw channel",true,"You can take it out without cutting it."],["No residual cement issue",true,"No cement in the tissue."],["No screw channel showing",false,"A cement-retained advantage: no channel on the crown, so it looks better."],["Higher crown strength",false,"The channel weakens the crown; that's a cement-retained plus."],["More passive fit for an FPD",false,"Cement-retained gives the more passive connection."]],
   "Screw-retained has two advantages: it is retrievable (crown and abutment come out through the screw channel) and there is no residual cement. The other three are the cement-retained column of the same table: no screw channel showing, a stronger crown and a more passive fit, especially for an FPD.");
 mm("tm-mm-2", "terms", "slides", "Select all that apply: which describe platform switching?",
-  [["Abutment narrower than the implant",true,"The definition: the abutment diameter is smaller than the implant diameter."],["Microgap moved away from crestal bone",true,"The reason it works: the junction moves inward."],["Preserves bone height",true,"The main benefit, because the microgap is away from the crest."],["Increases soft tissue volume",true,"Also a benefit: the step inward leaves room for more soft tissue."],["Requires an external connection",false,"Connection type isn't part of it: the school's implants are internal and platform-switched."]],
-  "Platform switching means an abutment narrower than the implant. That moves the microgap inward, away from the crestal bone, which preserves bone height and increases the soft tissue volume: four right answers. It doesn't need an external connection.");
+  [["Abutment narrower than the implant",true,"The definition: the abutment diameter is smaller than the implant diameter."],["Microgap moved away from crestal bone",true,"The reason it works: the junction moves inward."],["Preserves bone height",true,"The main benefit, because the microgap is away from the crest."],["Decreases soft tissue volume",false,"It's the other way: the step inward leaves room for more soft tissue, so the soft tissue volume increases."],["Requires an external connection",false,"Connection type isn't part of it: the school's implants are internal and platform-switched."]],
+  "Platform switching means an abutment narrower than the implant. That moves the microgap inward, away from the crestal bone, which preserves bone height: three right answers. It increases the soft tissue volume (it doesn't decrease it), and it doesn't need an external connection.");
 mm("tm-mm-3", "terms", "slides", "Select all that apply: which make a cement-retained molar crown need about 7 mm of interocclusal space?",
   [["About 3 mm biologic width",true,"The 3 in the sum: bone to the tissue margin."],["Margin no more than 1 mm subgingival",true,"Part of the sum: the margin sits up to 1 mm below the tissue, so subtract 1."],["3-4 mm abutment for retention",true,"The 4 in the sum: resistance and retention form."],["1 mm zirconia",true,"The last 1 in the sum: the crown's thickness."],["4 mm for the screw head above the platform",false,"That's the castable screw-retained calculation, not the cement-retained one."]],
   "For a cement-retained molar: 3 (biologic width) - 1 (subgingival margin) + 4 (abutment) + 1 (zirconia) = 7 mm, from the bone to the opposing tooth. All four are part of it; the 4 mm for the screw head belongs to the castable screw-retained crown.");
@@ -5774,19 +5776,25 @@ function ringSVG(pct){
   var r = 34, c = 2 * Math.PI * r, off = c * (1 - pct / 100);
   return '<svg class="hh-ring" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="' + r + '" class="hh-ring-bg"/><circle cx="42" cy="42" r="' + r + '" class="hh-ring-fg" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/><text x="42" y="47" text-anchor="middle">' + pct + '%</text></svg>';
 }
+/* the lectures you've practiced least (Sam, 2026-11-04, from the lessons audit: two days out, practice fell off lecture by
+   lecture in bank order and the last four were barely touched): up to four lectures with under half their questions tried,
+   least first, once you've answered anything. Where to next's "Practiced least" row and the quick-start "Practice questions"
+   button (Sam, 2026-11-05: nobody tapped the row, the button gets tapped) both open the bank on them. */
+function lecsBehind(rows){
+  if(!STATE.totalAnswered) return [];
+  return rows.filter(function(r){ return r.total && r.tried / r.total < 0.5; })
+    .sort(function(a, b){ return a.tried / a.total - b.tried / b.total || a.l.num - b.l.num; }).slice(0, 4);
+}
 function homeNextHTML(rows){
   var out = [], started = rows.filter(function(r){ return r.a >= 5; }).sort(function(a, b){ return a.pct - b.pct; });
   var fresh = rows.filter(function(r){ return !r.tried; }), missed = rows.reduce(function(n, r){ return n + r.missed; }, 0);
   if(started.length && started[0].pct < 80){ var w = started[0];
     out.push('<li class="tag-' + w.l.tag + '"><span class="lec-num">' + lecLabel(w.l) + '</span><span><b>Your weakest lecture: ' + escHtml(w.l.title.split(':')[0]) + '</b><small>' + w.pct + '% right over ' + w.a + ' answers</small></span><button type="button" class="btn primary" data-home="weak:' + w.l.id + '">Drill it</button></li>'); }
   if(missed) out.push('<li><span class="hn-ic">' + icon('cycle') + '</span><span><b>' + missed + ' question' + (missed === 1 ? '' : 's') + ' you missed last time</b><small>Try them again while they\'re fresh</small></span><button type="button" class="btn" data-home="missed">Retry</button></li>');
-  /* the lectures you've practiced least (Sam, 2026-11-04, from the lessons audit: two days out, practice fell off lecture by
-     lecture in bank order and the last four were barely touched): up to four lectures with under half their questions tried,
-     least first; Practice opens the bank on them with only the questions you haven't answered. Replaces "Not started" once
-     you've answered anything. */
-  var behind = rows.filter(function(r){ return r.total && r.tried / r.total < 0.5; })
-    .sort(function(a, b){ return a.tried / a.total - b.tried / b.total || a.l.num - b.l.num; }).slice(0, 4);
-  if(STATE.totalAnswered && behind.length){
+  /* the lectures you've practiced least (lecsBehind): Practice opens the bank on them with only the questions you haven't
+     answered. Replaces "Not started" once you've answered anything. */
+  var behind = lecsBehind(rows);
+  if(behind.length){
     out.push('<li class="tag-' + behind[0].l.tag + '"><span class="lec-num">' + lecLabel(behind[0].l) + '</span><span><b>Practiced least: ' + (behind.length === 1 ? escHtml(behind[0].l.title.split(':')[0]) : behind.length + ' lectures') + '</b><small>' +
       (behind.length === 1 ? behind[0].tried + ' of ' + behind[0].total + ' questions tried' :
         behind.map(function(r){ return lecLabel(r.l) + ' ' + escHtml(r.l.title.split(':')[0]) + ' (' + r.tried + ' of ' + r.total + ' tried)'; }).join(' · ')) +
@@ -5843,8 +5851,16 @@ function renderHome(){
   '</section>';
   var pending = LECTURES.filter(function(l){ return l.status !== 'taught'; });
   if(pending.length) h += '<div class="home-alert">' + icon('notes') + '<span><b>From the slides so far:</b> ' + pending.map(function(l){ return lecLabel(l) + ' ' + escHtml(l.title.split(':')[0]); }).join(', ') + '. These notes will be updated once their recordings are posted.</span></div>';
+  /* Practice questions: the questions you haven't tried, from the lectures you've practiced least when some are behind
+     (lecsBehind), else from the whole bank. data-qs keeps its click name apart from the Where to next row's. */
+  var behind = lecsBehind(rows), qsGo = 'new', qsSub = left + ' you haven\'t tried';
+  if(behind.length){
+    var bLeft = behind.reduce(function(n, r){ return n + r.total - r.tried; }, 0);
+    qsGo = 'least:' + behind.map(function(r){ return r.l.id; }).join(',');
+    qsSub = 'Practiced least: ' + behind.slice().sort(function(a, b){ return a.l.num - b.l.num; }).map(function(r){ return lecLabel(r.l); }).join(', ') + ' · <span class="qs-nw">' + bLeft + ' to try</span>';
+  }
   h += '<div class="quick-start home-qs" aria-label="Start studying">' +
-    '<button type="button" class="qs-btn primary" data-home="new"><span class="qs-ic">' + icon('bank') + '</span><span><b>Practice questions</b><small>' + left + ' you haven\'t tried</small></span></button>' +
+    '<button type="button" class="qs-btn primary" data-qs="practice' + (behind.length ? '-least' : '') + '" data-home="' + qsGo + '"><span class="qs-ic">' + icon('bank') + '</span><span><b>Practice questions</b><small' + (behind.length ? ' class="qs-wrap"' : '') + '>' + qsSub + '</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="notes:' + cont.id + '"><span class="qs-ic">' + icon('notes') + '</span><span><b>Lecture notes</b><small>' + lecLabel(cont) + ' ' + escHtml(cont.title.split(':')[0]) + '</small></span></button>' +
     '<button type="button" class="qs-btn" data-home="mock"><span class="qs-ic">' + icon('clock') + '</span><span><b>Mock exam</b><small>40 questions, 60 minutes</small></span></button></div>';
