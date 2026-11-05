@@ -96,6 +96,13 @@ const INFO = {
   rb: "Excess cytoplasm left behind at spermiation: the Sertoli cell phagocytoses it.",
 };
 
+/* the germ cells that aren't followed (kind, angle, radius): left gap and the two edge gaps */
+const LATE = [[-13.6, 318], [-11.9, 312], [-10.3, 320], [-1.6, 316], [0.1, 310], [1.7, 318], [-16.6, 322], [12, 312], [13.6, 319], [16.4, 324]];
+const BG = [["B", -9.4, 547], ["dA", -6, 545], ["pA", -2.7, 546], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -8.9, 432], ["ss", -3.4, 428], ["ss", -6.3, 402],
+  ["sd", -8.5, 374], ["sd", -5.3, 368], ["sd", -2.6, 378], ["sd", -7.2, 349], ["sd", -3.9, 346],
+  ["pA", -15.7, 546], ["ps", -15.75, 470], ["ss", -15.3, 420], ["sd", -15.5, 364], ["sd", -15.1, 386],
+  ["B", 15.6, 546], ["ps", 15.4, 470], ["ss", 15.3, 420], ["sd", 15.4, 366], ["sd", 15.1, 388]];
+
 /* ---------- the drawing's fixed parts, built once here and stored as SVG strings ---------- */
 const G = { CX: 300, CY: -190, TH: 18, RL: 292, RJ: 522, RB: 560, RW: 582, RO: 700, RC: 661, SERT: [-12, 0, 12] };
 function dg(px, R) { return px / R * 180 / Math.PI; }
@@ -164,16 +171,13 @@ function staticParts() {
   });
   o.TJ = HOT("Occluding (tight) junctions between neighboring Sertoli cells, near their bases: the blood-testis barrier. They divide the epithelium into the basal compartment (the spermatogonia) and the adluminal compartment (spermatocytes and spermatids), protecting the developing gametes from the immune system.", tj);
   /* the germ cells that aren't followed: left gap, the two edge gaps; late spermatids at the Sertoli apices; sperm in the lumen */
-  var bg = [["B", -9.4, 547], ["dA", -6, 545], ["pA", -2.7, 546], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -8.9, 432], ["ss", -3.4, 428], ["ss", -6.3, 402],
-    ["sd", -8.5, 374], ["sd", -5.3, 368], ["sd", -2.6, 378], ["sd", -7.2, 349], ["sd", -3.9, 346],
-    ["pA", -15.7, 546], ["ps", -15.75, 470], ["ss", -15.3, 420], ["sd", -15.5, 364], ["sd", -15.1, 386],
-    ["B", 15.6, 546], ["ps", 15.4, 470], ["ss", 15.3, 420], ["sd", 15.4, 366], ["sd", 15.1, 388]];
+  var bg = BG;
   var cells = "";
   bg.forEach(function (c) { var p = tbP(c[1], c[2], G), flat = c[0] === "dA" || c[0] === "pA"; cells += HOT(INFO[c[0]], tbCell(c[0], p[0], p[1], -c[1], 1, 0, 0, 0)); });
   o.CELLS = cells;
   /* late spermatids: heads held in the Sertoli apices, tails into the lumen */
   var ld = "";
-  [[-13.6, 318], [-11.9, 312], [-10.3, 320], [-1.6, 316], [0.1, 310], [1.7, 318], [-16.6, 322], [12, 312], [13.6, 319], [16.4, 324]].forEach(function (c) { var p = tbP(c[0], c[1], G); ld += tbCell("sd", p[0], p[1], -c[0], 1, 1, 0, c[0]); });
+  LATE.forEach(function (c) { var p = tbP(c[0], c[1], G); ld += tbCell("sd", p[0], p[1], -c[0], 1, 1, 0, c[0]); });
   o.LATE = HOT(INFO.ld, ld);
   o.LUMSP = [[-7.4, 270, 0.3], [-3.2, 258, 1.2], [-14.4, 262, 2.4], [14.6, 250, 3.1]];
   /* the right gap when it isn't following a clone (hormone views): the same kinds of cells as the left gap */
@@ -287,7 +291,7 @@ function tbRender(st, D) {
   o += D.L(104, 374, "basement", 141, 347, "end", "s") + T(104, 388, "membrane", "s", "end");
   o += D.L(96, 414, "myoid cell", 148, 361, "end", "s");
   o += '<path class="lead" d="M254 424L218 421M346 424L372 416"/><circle class="dot" cx="218" cy="421" r="1.8"/><circle class="dot" cx="372" cy="416" r="1.8"/>' + T(300, 428, "Leydig cells", "s", "middle");
-  o += T(300, 475, "capillary", "s tb-onv", "middle");
+  o += T(300, 498, "capillary", "s", "middle");
   o += D.L(452, 38, "lumen", 352, 40, "start", "s");
   o += D.L(152, 240, "Sertoli cell", 197, 244, "end", "s b");
   o += D.L(128, 312, "tight junction", 245, 329, "end", "s");
@@ -296,7 +300,7 @@ function tbRender(st, D) {
     o += D.L(168, 206, "secondary", 176, 211, "end", "s") + T(168, 220, "spermatocyte", "s", "end");
     o += D.L(148, 262, "primary", 156, 258, "end", "s") + T(148, 276, "spermatocyte", "s", "end");
     o += D.L(118, 346, "spermatogonia", 136, 333, "end", "s");
-    o += D.L(408, 106, "late", 366, 113, "start", "s") + T(408, 120, "spermatids", "s", "start");
+    o += D.L(432, 150, "late", 376, 121, "start", "s") + T(432, 164, "spermatids", "s", "start");
   }
   if (st.comp || (cells && st.step === 2)) o += D.L(430, 186, "adluminal", 404, 242, "start", "s tb-adt") + T(430, 200, "compartment", "s tb-adt", "start") + D.L(472, 322, "basal", 458, 333, "start", "s tb-bat");
   /* ---------- the clone's chromosome count ---------- */
@@ -421,8 +425,18 @@ export default function tubule() {
   });
 }
 
-/* for the bio audit (node): the Sertoli outlines and the germ cells as closed boundaries */
+/* for anima's bio audit (node): every Sertoli outline and every germ cell, in each clone step, as closed boundaries */
 export function auditInput() {
+  const R = { dA: 16.5, pA: 16, B: 12.5, ps: 17, ss: 13.5, sd: 9, sz: 3, rb: 4.6 };
+  const circ = (id, a, Rr, r) => { const c = tbP(a, Rr, G), pts = []; for (let k = 0; k < 24; k++) pts.push([c[0] + r * Math.cos(k * Math.PI / 12), c[1] + r * Math.sin(k * Math.PI / 12)]); return { id, points: pts }; };
+  const germ = BG.map((c, j) => circ("bg" + j + "-" + c[0], c[1], c[2], R[c[0]]));
   const flaps = [[-G.TH, -6], [-6, 6], [6, G.TH]];
-  return { flaps, G, CL };
+  const sert = G.SERT.map((ac, j) => {
+    const d = sertoliOutline(ac, flaps[j][0] + (j ? 0.15 : 0), flaps[j][1] - (j < 2 ? 0.15 : 0));
+    const nums = d.match(/-?\d+(\.\d+)?/g).map(Number), pts = [];
+    for (let k = 0; k + 1 < nums.length; k += 2) pts.push([nums[k], nums[k + 1]]);
+    return { id: "sertoli" + j, points: pts.filter((q, k) => k % 3 === 0) };
+  });
+  const steps = CL.map((cells) => cells.map((c, j) => circ("clone-" + c.k + j, c.a, c.R, R[c.k] * (c.k === "sd" && c.m ? 0.65 : 1))));
+  return { germ, sert, steps };
 }
