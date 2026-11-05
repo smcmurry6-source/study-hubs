@@ -127,5 +127,26 @@ Options with a recommendation; the preview shows the recommended one.
   blueprint rows' spoken name, the dark "Send luck" button) and both are fixed. The test report:
   [2026-11-05-site-redesign](../release/reports/2026-11-05-site-redesign.md).
 
+- 2026-11-05, Sam's review of the first pass: "This design is boring. Functionality and user friendliness are the primary
+  goal, but I want the site to be engaging and satisfying to use. Make things more attractive and visually appealing.
+  Every pop-up and achievement should have unique, hand-drawn art; nothing stock, but one uniform style." Three sample
+  sheets (ink plate, marker sketchbook, chalkboard; same cast: Timmy, number thirty-one, the rabbit down the hill, the
+  toothbrush by the door, the tools, a trophy, the streak, the handpiece, each hub's object). Sam's calls, in
+  [decisions](../decisions.md): the ink plate; the kit matches Timmy as he is; ink plus two companion colors per hub on
+  warmer paper; everything drawn in code. The second pass (art kit, color, feedback) is built on this branch and PR.
+
+- 2026-11-05, Sam's second set of calls (asked with four questions, answered in chat): the rank medallions, trophy icons,
+  hub achievement badges and the animated celebration cards stay in their existing style (the medallions and trophy icons may
+  be touched up within it); the ink-plate hand goes on the pop-ups and toasts, the empty states and hub Home friezes, the
+  dashboard class cards and About parts, and the answer feedback; the whole cast appears; the new drawings get light,
+  gated motion. Recorded in [decisions](../decisions.md). The kit: `widget/art.js`, its rules `tools/art/README.md`, its
+  contact sheets `node tools/art/sheet.mjs`.
+
+- 2026-11-05, the second pass built: the art kit (`widget/art.js`, 49 drawings in the ink plate, `tools/art/README.md`), wired
+  into the toasts, pop-ups, empty states, Home friezes, dashboard classes, About parts and the answer feedback; the companion
+  colors and warmer paper. Sam, on the first contact sheet: do not change Timmy (a redrawn Timmy is fine as decoration; the pet
+  widget is untouched), the lines did not always connect (the wobble filter is gone), the handpiece looked bad (redrawn).
+  Design notes section 9 has the round-4 critique.
+
 ## Outcome
 

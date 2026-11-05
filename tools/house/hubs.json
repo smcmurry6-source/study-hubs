@@ -1,25 +1,33 @@
 {
-  "about": "Each hub printed in its own single ink on the shared bone paper (vault/release/reports/2026-11-05-redesign-design-notes.md). ink: light-mode text and accent; deep: dark-mode ground. Keep every ink at 9:1 or more on #ecebe7. 'later' holds the archived hubs' inks for the phase 2 token pass (vault/tasks/2026-11-05-site-redesign-taste.md); the build only touches 'hubs'.",
+  "about": "Each hub printed in its own ink on the shared bone paper, with two companion colors (Sam, 2026-11-05: richer than one ink): ink: light-mode text and accent; deep: dark-mode ground; warm: the highlight (a right answer's bar, today's ring, the drawings' spot color); cool: the quiet fill (missed-last-time bars, a drawing's shadow side). Keep every ink at 9:1 or more on the paper; warm and cool are fills, never text. 'later' holds the archived hubs' inks for the phase 2 token pass (vault/tasks/2026-11-05-site-redesign-taste.md); the build only touches 'hubs'.",
   "hubs": {
     "occlusion": {
-      "name": "navy, articulating-paper blue",
+      "name": "navy, articulating-paper blue \u00b7 articulating-paper red; paper blue",
       "ink": "#1b2a5c",
-      "deep": "#10172f"
+      "deep": "#10172f",
+      "warm": "#D4572F",
+      "cool": "#8FA6CC"
     },
     "perio": {
-      "name": "wine",
+      "name": "wine \u00b7 disclosing pink; mint",
       "ink": "#4a1b2e",
-      "deep": "#24101a"
+      "deep": "#24101a",
+      "warm": "#D9527A",
+      "cool": "#8FB3A8"
     },
     "pcd-implants-exam1": {
-      "name": "steel, titanium",
+      "name": "steel, titanium \u00b7 amber; titanium",
       "ink": "#233a4b",
-      "deep": "#121d27"
+      "deep": "#121d27",
+      "warm": "#D98A3A",
+      "cool": "#8DA6B8"
     },
     "special-patient-care": {
-      "name": "deep teal",
+      "name": "deep teal \u00b7 sun; sea glass",
       "ink": "#143f3c",
-      "deep": "#0c2422"
+      "deep": "#0c2422",
+      "warm": "#E0A33A",
+      "cool": "#7FB0A9"
     }
   },
   "later": {

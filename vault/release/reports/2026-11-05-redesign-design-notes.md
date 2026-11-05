@@ -214,3 +214,66 @@ Top three problems left (for phase 2 and Sam):
 Where the scores come from: the dashboard clears every app-screen check and reads as one page; the hubs' type,
 spacing and contrast are now the house's, but a page with no photograph cannot score above 6.5 on design under the
 skill's rule, and the preview badge keeps one FAIL on the sheet that production never has.
+
+## 9. The second pass: the ink plate (Sam's review of the first pass)
+
+Sam's review of phase 1, in one line: "This design is boring." Function and ease stay first, but the site has to be
+engaging and satisfying to use, attractive to look at, and every pop-up and achievement needs unique, hand-drawn art
+in one uniform style, nothing stock. Three sample sheets went to Sam, each with the same cast (Timmy, number thirty-one,
+the rabbit down the hill, the toothbrush by the door) and the same objects (the tools, a trophy, the streak, the
+handpiece, each hub's thing): **A, the ink plate** (a fine ink line, cross-hatching, one spot color on bone paper),
+B, a marker sketchbook (a thick marker line, flat marker fills), and C, a chalkboard (chalk on slate). Sam chose A, with
+the kit matched to Timmy as he is, ink plus two companion colors per hub on warmer paper, and everything drawn in
+code ([decisions](../../decisions.md), 2026-11-05).
+
+The second set of calls (asked as four questions): the rank medallions, the 30 trophy icons, each hub's achievement
+badges and the animated rank-up, level-up and trophy cards stay in their own style; the hand goes on the pop-ups and
+toasts, the empty states and hub Home friezes, the dashboard class cards and About parts, and the answer feedback; the
+whole cast appears; the new drawings get light, gated motion. Then, on the first contact sheet: "do not change Timmy"
+(his sprite, the pet in the bottom-left corner, is untouched; a redrawn Timmy is fine as decoration in the drawings),
+"the lines in your drawings do not always connect right" (the displacement filter that gave the pen its wobble was
+pulling the joints apart: removed; the hand is now in the paths alone, and every joint is checked on the big sheet),
+and "the handpiece looks very bad" (redrawn from the side: a slim tube, the neck bending to a round head, the bur out
+of the head, the coupling at the back).
+
+What was built (`tools/art/README.md` is the rule sheet; `widget/art.js` the kit; `node tools/art/sheet.mjs` the
+contact sheets):
+
+- **The kit**: 49 drawings in one hand: the cast (8), the shared objects (6), the pop-ups and toasts (8), the empty
+  states (5), the dashboard classes (7), the About parts (9), the hub friezes (4, wide) and the feedback marks (2). Each
+  is a 100 x 100 drawing (the friezes 300 x 60) of `s` lines, `b` body, `sp` spot, `sp2` cool fill, `hatch` shade,
+  `eye` and `shine`; the kit injects its own styles, so the dashboard and About (no `v3.css`) draw too. A drawing with
+  `ink: true` draws itself on when a pop-up opens (the lines first, then the fills), `wiggle: true` gives a toast its
+  nod; both are dropped under reduced motion and when Answer animations is off.
+- **Where it went**: the hubs' achievement toasts (Timmy with a rosette beside the hub's own badge), the reply, notice
+  and survey cards (`widget/replies.js`), the tour prompt (`widget/tour.js`), the Daily Drill card, its finish screen
+  and its "come back tomorrow" (`widget/drill.js`), the mock results card's corner (`widget/rankup.js`; its ring and
+  animation stay), the bank's empty states and Weak Spots' (the four live hubs), each hub's Home frieze
+  (`shHome.band()` in `widget/blueprint.js`, `band-<hub>`), the dashboard's class cards (`class-<key>`, the tap egg
+  stays), the About parts, the right-answer spark, the streak flame and the stamp on a lecture bar that fills
+  (`widget/fx.js`).
+- **Color**: each live hub gained a warm and a cool companion in `tools/house/hubs.json` (Occlusion: articulating-paper
+  red and paper blue; Perio: disclosing pink and mint; PCD Implants: amber and titanium; Special Patient Care: sun and
+  sea glass). They are fills, never text: the blueprint's "right" bars and today's ring take the warm one (deepened
+  with the ink at 72% so a bar reads at 3:1 on paper, pure in dark mode), "missed last time" the cool one, the
+  drawings' spot and cool fill both. The paper warmed (`#efe9dd`; every ink stays above 9:1, every text token above
+  4.5:1), and the dashboard's page, panels and class tints warmed and deepened with it.
+
+Critique, round 4 (after the art, the preview's screenshots):
+
+```
+ROUND 4
+Seen in one second: hub Home: a bench of the course's things in ink over "The Occlusion final"; the blueprint bars in
+  articulating-paper red and blue. Dashboard: Timmy on your name, each class with its own small drawing. About: each
+  part opens with its drawing. A pop-up: the rabbit with your answered report; the tour prompt: Timmy with a compass.
+Idea (one sentence): the exam sheet is still the page, and now it is illustrated in one hand, the ink plate, so that
+  every moment that used to be a stock icon is a small drawing about that moment.
+Live thing: unchanged (the countdown and the blueprint bars), plus the drawings that ink themselves on.
+Top three problems left:
+1. The inspector's "few pictures" is answered by drawings, not photographs; whether the skill's photograph rule
+   should count a drawn frieze is Sam's call to make by looking, not the meter's.
+2. The hub ACHIEVEMENTS badges keep their old icons beside the new toast drawing (Sam's call: keep them); a per-
+   achievement drawing is a later pass if Sam wants it.
+3. Perio's Home carries the frieze above its own hero card (its engine is still not the shared sheet, phase 2).
+```
+

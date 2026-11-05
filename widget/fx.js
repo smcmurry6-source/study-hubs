@@ -127,6 +127,8 @@
     anim(el, [{ transform: "none" }, { transform: "translateX(-7px)" }, { transform: "translateX(6px)" }, { transform: "translateX(-4px)" }, { transform: "translateX(2px)" }, { transform: "none" }],
       { duration: 420, delay: delay, easing: "ease-out" });
   }
+  /* a drawing from the art kit (widget/art.js) when it's there */
+  function art(name, o){ return window.shArt && window.shArt.has(name) ? window.shArt.svg(name, o) : ""; }
   function mark(el, k, delay){
     if (el.querySelector(".sh-fx-mark")) return;
     var m = document.createElement("span");
@@ -136,6 +138,27 @@
     m.innerHTML = k === "ok" ? SVG_OK : SVG_BAD;
     el.classList.add("sh-fx-host");
     el.appendChild(m);
+    /* a right answer also gets the kit's ink spark, bursting from the mark and gone in under a second (never under
+       reduced motion or with Answer animations off: the check mark alone says it) */
+    if (k === "ok" && !still()) {
+      var sp = art("spark", { size: 44 });
+      if (sp) {
+        var b = document.createElement("span");
+        b.className = "sh-fx-spark"; b.setAttribute("aria-hidden", "true"); b.style.setProperty("--d", (delay || 0) + "ms");
+        b.innerHTML = sp; el.appendChild(b);
+        setTimeout(function(){ b.remove(); }, 1200 + (delay || 0));
+      }
+    }
+  }
+  /* the kit's stamp lands on a lecture bar that just filled all the way (a real change in this session, not the first paint) */
+  function stamp(bar){
+    var sv = art("stamp", { size: 46 }); if (!sv) return;
+    var r = bar.getBoundingClientRect(); if (!r.width) return;
+    var st = document.createElement("span");
+    st.className = "sh-fx-stamp"; st.setAttribute("aria-hidden", "true");
+    st.style.left = Math.round(r.right - 26) + "px"; st.style.top = Math.round(r.top + r.height / 2 - 23) + "px";
+    st.innerHTML = sv; document.body.appendChild(st);
+    setTimeout(function(){ st.remove(); }, 1500);
   }
   /* the explanation grows open from nothing instead of appearing all at once */
   function openExplain(ex, delay){
@@ -164,6 +187,7 @@
       var key = barKey(bar), from = Object.prototype.hasOwnProperty.call(barMem, key) ? barMem[key] : "0%";
       barMem[key] = to;
       if (from !== to) anim(bar, [{ width: from }, { width: to }], { duration: 900, delay: Math.min(i, 8) * 45, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+      if (from !== to && to === "100%" && from !== "0%" && !still()) (function(b){ setTimeout(function(){ stamp(b); }, 900); })(bar);
     }
   }
 
@@ -231,7 +255,7 @@
     flame = document.createElement("div");
     flame.id = "sh-flame"; flame.className = "sh-flame"; flame.setAttribute("aria-hidden", "true");
     flame.innerHTML = '<span class="sh-flame-ic"><svg class="sh-flame-ring" viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="19.5"/><circle class="fg" cx="22" cy="22" r="19.5" pathLength="100"/></svg>' +
-      '<svg class="sh-flame-fire" viewBox="0 0 24 24"><path class="o" d="' + FIRE_O + '"/><path class="i" d="' + FIRE_I + '"/></svg>' +
+      (art("flame", { size: 24, bare: true, cls: "sh-flame-fire" }) || '<svg class="sh-flame-fire" viewBox="0 0 24 24"><path class="o" d="' + FIRE_O + '"/><path class="i" d="' + FIRE_I + '"/></svg>') +
       '<i class="sh-flame-smoke"></i><i class="sh-flame-smoke"></i><i class="sh-flame-smoke"></i></span>' +
       '<span class="sh-flame-txt"><b class="sh-flame-n">0</b><small>in a row</small></span>';
     document.body.appendChild(flame);

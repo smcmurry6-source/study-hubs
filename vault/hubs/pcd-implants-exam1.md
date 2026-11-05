@@ -59,6 +59,7 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
 - **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+- **The art kit (2026-11-05):** its Home opens with a frieze drawn for this course (`band-pcd-implants-exam1` in `widget/art.js`: an implant in bone, a surgical guide, a torque wrench, a CBCT slice, an abutment and crown, Timmy at the end); its toasts, empty states and pop-ups use the kit too (`tools/art/README.md`). Its two companion colors (warm, cool) live beside its ink in `tools/house/hubs.json`; the blueprint bars and today's ring take the warm one, "missed" the cool one. Redraw the frieze with `node tools/art/sheet.mjs band-` and look at it on a 390 px phone.
   bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
   `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
   if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in

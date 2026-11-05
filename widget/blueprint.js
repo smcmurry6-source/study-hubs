@@ -57,7 +57,13 @@
 
   var Home = {
     /* the sheet's striped band: alternating bars of the hub's ink and paper, a flex row of filled blocks (no gradient) */
-    band: function(){ var s = ""; for (var i = 0; i < 48; i++) s += "<i></i>"; return '<div class="sheet-band" aria-hidden="true">' + s + "</div>"; },
+    band: function(){
+      /* the hub's frieze from the art kit (widget/art.js, band-<hub>: the course's things on a bench), else the stripes */
+      var sc = document.querySelector("script[data-hub]"), m = location.pathname.match(/\/hubs\/([^\/]+)/);
+      var hub = (sc && sc.getAttribute("data-hub")) || (m && m[1]);   /* a hub that draws Home before its v3 tag is parsed still gets its frieze */
+      if (hub && window.shArt && window.shArt.has("band-" + hub)) return '<div class="sheet-band is-art" aria-hidden="true">' + window.shArt.svg("band-" + hub, { size: 600 }) + "</div>";
+      var s = ""; for (var i = 0; i < 48; i++) s += "<i></i>"; return '<div class="sheet-band" aria-hidden="true">' + s + "</div>";
+    },
     /* Where you stand: figures set large, aligned on the figure, units in the captions; the last 14 days under them */
     ledger: function(o){
       var items = (o.items || []).map(function(it){ return "<li><b>" + esc(it.n) + "</b><span>" + esc(it.t) + "</span></li>"; }).join("");

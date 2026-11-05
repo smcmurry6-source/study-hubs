@@ -50,6 +50,8 @@
     ".sh-tour-x{position:absolute; top:10px; right:10px; width:32px; height:32px; border:0; border-radius:50%; background:transparent; color:var(--sht-ink3); font-size:22px; line-height:1; cursor:pointer; padding:0;}",
     ".sh-tour-x:hover{background:var(--sht-bg2); color:var(--sht-ink);}",
     ".sh-tour-eyebrow{font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; color:var(--sht-ink3);}",
+    ".sh-tour-art{float:right; margin:-6px -4px 4px 14px;}",     /* the art kit's drawing on the first prompt (widget/art.js) */
+    "@media (max-width:420px){ .sh-tour-art svg{width:68px; height:68px;} }",
     ".sh-tour h3{font-family:var(--sht-display); font-weight:400; font-size:25px; line-height:1.15; margin:4px 32px 8px 0; color:var(--sht-ink); letter-spacing:0; text-transform:none;}",
     ".sh-tour-body{font-size:14.5px; line-height:1.5; color:var(--sht-ink2);}",
     ".sh-tour-body p{margin:0 0 8px;} .sh-tour-body b{color:var(--sht-ink);}",
@@ -446,7 +448,8 @@
     var block = document.createElement("div"); block.className = "sh-tour-block is-dim";
     var card = document.createElement("section"); card.className = "sh-tour is-center";
     card.setAttribute("role", "dialog"); card.setAttribute("aria-modal", "true"); card.setAttribute("aria-labelledby", "shTourAskH");
-    card.innerHTML = '<div class="sh-tour-eyebrow">' + (hub ? "New: a tour of the hub" : returning ? "New: a quick tour" : "Welcome") + '</div>' +
+    card.innerHTML = (window.shArt && window.shArt.has("tour") ? '<div class="sh-tour-art" aria-hidden="true">' + window.shArt.svg("tour", { size: 92, ink: true }) + '</div>' : '') +
+      '<div class="sh-tour-eyebrow">' + (hub ? "New: a tour of the hub" : returning ? "New: a quick tour" : "Welcome") + '</div>' +
       '<h3 id="shTourAskH">' + (hub ? "Want a quick tour of this hub?" : "Want a quick tour?") + '</h3><div class="sh-tour-body">' +
       (hub ? "<p>Lecture Notes you can listen to and highlight, a question bank that explains every choice, mock exams, review tables, games, search, a daily drill and more. Most people miss half of it.</p>" +
              "<p>A two-minute tour puts a spotlight on each one. Every hub works the same way, so you only need it once. You can always take it later from " + (phone() ? "<b>Take the tour</b> under <b>More</b>" : "the <b>Tour</b> button") + ".</p>"

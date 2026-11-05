@@ -26,6 +26,7 @@
 <link href="https://api.fontshare.com/v2/css?f[]=erode@400,401,500,600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../widget/v3.css">
+<script src="../../widget/art.js"></script>
 <script src="../../widget/blueprint.js"></script>
 <style>
 /* ===================================================================
@@ -785,28 +786,30 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 
 
 /* sh-house:start (built from tools/house/house.css; edit there, then node tools/house/build.mjs) */
-:root{--sh-ink:#143f3c;--sh-ink-deep:#0c2422;}
+:root{--sh-ink:#143f3c;--sh-ink-deep:#0c2422;--sh-warm:#E0A33A;--sh-cool:#7FB0A9;}
 /* ===================================================================================================================
    THE HOUSE STYLE FOR EVERY HUB (2026-11-05 redesign, the Taste skill's "page is the object" direction)
-   The hub is the professor's exam sheet: bone paper, one ink per hub (--sh-ink, set above this block by
-   tools/house/build.mjs from tools/house/hubs.json), one serif (Erode) for display and text, five type steps,
+   The hub is the professor's exam sheet: warm bone paper, one ink per hub plus two companion colors (--sh-ink, --sh-warm,
+   --sh-cool, set above this block by tools/house/build.mjs from tools/house/hubs.json: the warm one marks what you got
+   right and today, the cool one fills what's quiet), one serif (Erode) for display and text, five type steps,
    one radius, no shadows at rest, no hairlines, no gradients, no monospace, no tracked capitals. Dark mode is the
    inverse print: bone on the hub's deep ink. Right/wrong feedback keeps its green and red (functional, with marks).
    Everything here overrides the hub's own rules above it; a hub's arcade keeps its own skin (vault/rules/arcade-skins.md).
    Notes: vault/release/reports/2026-11-05-redesign-design-notes.md
    =================================================================================================================== */
 :root{
-  --paper:#ecebe7;
+  --paper:#efe9dd;
   --step-small:1rem;                                          /* captions and labels: 16px, the floor for anything read */
   --step-body:clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);        /* 17-20px */
   --step-lead:clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
   --step-head:clamp(2rem, 1.3rem + 3.2vw, 3rem);
   --step-display:clamp(3.5rem, 2rem + 7vw, 6.5rem);
-  --bg:var(--paper); --surface:#e1dfd9; --surface-2:#d5d2ca; --surface-3:#c8c4ba;
+  --bg:var(--paper); --surface:#e5ddce; --surface-2:#d9cfbd; --surface-3:#ccc0ab;
   --ink:var(--sh-ink); --ink-soft:color-mix(in srgb, var(--sh-ink) 82%, var(--paper)); --ink-faint:color-mix(in srgb, var(--sh-ink) 80%, var(--paper));
   --lec-num-ink:var(--paper);
   --line:color-mix(in srgb, var(--sh-ink) 14%, var(--paper)); --line-strong:color-mix(in srgb, var(--sh-ink) 26%, var(--paper));
   --accent:var(--sh-ink); --accent-ink:var(--sh-ink); --accent-soft:color-mix(in srgb, var(--sh-ink) 11%, var(--paper));
+  --sh-warm-deep:color-mix(in srgb, var(--sh-warm) 72%, var(--sh-ink)); --sh-cool-deep:color-mix(in srgb, var(--sh-cool) 66%, var(--sh-ink)); /* the companions as bars on light paper: deepened to read at 3:1 */
   --good:#2b6a3d; --good-soft:#d4e4d4; --bad:#9a2e2a; --bad-soft:#ead3cf; --caution:#765512; --caution-soft:#e6dec6;
   --tag-amber:#7a5210; --tag-sage:#3f6338; --tag-blue:#2a4f8a; --tag-teal:#1a6660; --tag-violet:#4f3b85; --tag-red:#963029; --tag-green:#3f6420; --tag-rose:#983757;
   --tag-amber-soft:#e9dfc8; --tag-sage-soft:#d9e3d4; --tag-blue-soft:#d6dfec; --tag-teal-soft:#d0e4e1; --tag-violet-soft:#dfd9ea; --tag-red-soft:#ead5d2; --tag-green-soft:#dbe4cf; --tag-rose-soft:#ebd6dd;
@@ -822,6 +825,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     --lec-num-ink:var(--sh-ink-deep);
     --line:color-mix(in srgb, var(--paper) 16%, var(--sh-ink-deep)); --line-strong:color-mix(in srgb, var(--paper) 28%, var(--sh-ink-deep));
     --accent:var(--paper); --accent-ink:var(--paper); --accent-soft:color-mix(in srgb, var(--paper) 14%, var(--sh-ink-deep));
+    --sh-warm-deep:var(--sh-warm); --sh-cool-deep:var(--sh-cool);
     --good:#8fd0a0; --good-soft:#1f3a28; --bad:#f0a094; --bad-soft:#44231f; --caution:#e2c06a; --caution-soft:#3d3115;
     --shadow:none;
   }
@@ -832,6 +836,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
   --lec-num-ink:var(--sh-ink-deep);
   --line:color-mix(in srgb, var(--paper) 16%, var(--sh-ink-deep)); --line-strong:color-mix(in srgb, var(--paper) 28%, var(--sh-ink-deep));
   --accent:var(--paper); --accent-ink:var(--paper); --accent-soft:color-mix(in srgb, var(--paper) 14%, var(--sh-ink-deep));
+  --sh-warm-deep:var(--sh-warm); --sh-cool-deep:var(--sh-cool);
   --good:#8fd0a0; --good-soft:#1f3a28; --bad:#f0a094; --bad-soft:#44231f; --caution:#e2c06a; --caution-soft:#3d3115;
   --shadow:none;
 }
@@ -979,6 +984,11 @@ table.rv-table td:first-child{font-weight:500}
 .sheet-band{display:flex;height:40px;overflow:hidden;background:var(--bg)}
 .sheet-band i{flex:0 0 28px;background:var(--ink)}
 .sheet-band i:nth-child(even){background:transparent}
+.sheet-band.is-art{display:block;height:auto;background:transparent;padding:10px 14px 0}
+.sheet-band.is-art .sh-art{display:block;width:100%;height:auto}
+.qf-empty .sh-art,.rv-empty .sh-art{display:block;margin:0 auto 8px}
+.rv-empty.qf-empty p{margin:0 auto 12px;max-width:52ch}
+.toast .sh-art{margin:-8px 0}
 .sheet-body{padding:26px 28px 24px;display:grid;gap:12px}
 .sheet-title{margin:0;font-size:var(--step-head);line-height:1.02;font-weight:500;max-width:14ch}
 .sheet-when{margin:0;font-size:var(--step-body);line-height:1.45;color:var(--ink-soft);max-width:40ch}
@@ -1018,8 +1028,8 @@ table.rv-table td:first-child{font-weight:500}
 .shbp-n{grid-column:2;grid-row:1 / span 2;font-size:var(--step-small);color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums}
 .shbp-bar{grid-column:1;position:relative;height:14px;border-radius:3px;background:var(--surface-2);overflow:hidden;min-width:48px}
 .shbp-bar i{position:absolute;top:0;bottom:0;left:0;width:0}
-.shbp-miss{background:color-mix(in srgb, var(--ink) 38%, var(--surface-2))}
-.shbp-right{background:var(--ink)}
+.shbp-miss{background:var(--sh-cool-deep)}
+.shbp-right{background:var(--sh-warm-deep)}
 .shbp.is-live .shbp-bar i{transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
 .shbp-group{font-size:var(--step-small);color:var(--ink-soft);padding:10px 0 2px;font-weight:500}
 .shbp-group:first-child{padding-top:0}
@@ -1028,7 +1038,7 @@ table.rv-table td:first-child{font-weight:500}
 .shbp-key{display:flex;flex-wrap:wrap;gap:6px 16px;margin:12px 0 0;padding:0;list-style:none;font-size:var(--step-small);color:var(--ink-soft)}
 .shbp-key li{display:flex;align-items:center;gap:7px}
 .shbp-key i{width:14px;height:10px;border-radius:2px;background:var(--surface-2);flex:none}
-.shbp-key .k-right{background:var(--ink)} .shbp-key .k-miss{background:color-mix(in srgb, var(--ink) 38%, var(--surface-2))}
+.shbp-key .k-right{background:var(--sh-warm-deep)} .shbp-key .k-miss{background:var(--sh-cool-deep)}
 /* the rest of Home: the ledger, where to next, the lectures, the course, the back of the sheet */
 .home-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start}
 .home-col{gap:28px}
@@ -1046,6 +1056,9 @@ table.rv-table td:first-child{font-weight:500}
 .ledger .hd-row{grid-column:1 / -1}
 .ledger .home-days{max-width:340px;margin:6px 0 0}
 .home-days{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px}
+.home-days .hd-day.on{background:var(--sh-warm-deep)}
+.home-days .hd-day.today{box-shadow:inset 0 0 0 2px var(--sh-warm-deep)} /* taste-skill-ignore: the ring marks today; a state mark, not a shadow */
+.home-count.is-live{background:color-mix(in srgb, var(--sh-warm) 16%, var(--paper))}
 .hd-day{aspect-ratio:1;border-radius:3px;background:var(--surface-2)}
 .hd-day.on{background:var(--ink)}
 .hd-day.today{outline:2px solid var(--ink);outline-offset:1px}
@@ -1072,7 +1085,7 @@ table.rv-table td:first-child{font-weight:500}
 .moments-nav button:disabled{background:var(--surface-2);color:var(--ink-soft);cursor:default}
 .moments-nav button svg{width:18px;height:18px}
 .moments-track{position:relative;height:6px;border-radius:3px;background:var(--surface-2);margin:0 0 14px;overflow:hidden}
-.moments-track i{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--ink);border-radius:3px;transition:width .2s,left .2s}
+.moments-track i{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--sh-warm-deep);border-radius:3px;transition:width .2s,left .2s}
 .home-tl{list-style:none;margin:0;padding:0 0 8px;border-left:0;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
 .home-tl::-webkit-scrollbar{display:none}
 .home-tl li{position:relative;flex:0 0 240px;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px;padding:0;background:transparent}
@@ -1082,7 +1095,7 @@ table.rv-table td:first-child{font-weight:500}
 .home-tl .tl-day{order:-1;margin:0 0 8px}
 .home-tl .tl-day b{display:block;width:100%;aspect-ratio:4 / 3;border-radius:var(--radius);background:var(--surface);color:var(--ink);font-family:var(--font-display);font-weight:500;font-size:clamp(2.5rem, 2rem + 2vw, 3.5rem);line-height:1;display:grid;place-items:center;letter-spacing:-.02em}
 .home-tl .tl-exam .tl-day b{background:var(--ink);color:var(--bg)}
-.home-tl .tl-today .tl-day b{box-shadow:inset 0 0 0 3px var(--ink)} /* taste-skill-ignore: the ring marks today on the timeline; a state mark, not a shadow */
+.home-tl .tl-today .tl-day b{box-shadow:inset 0 0 0 3px var(--sh-warm-deep)} /* taste-skill-ignore: the ring marks today on the timeline; a state mark, not a shadow */
 .home-tl .tl-past{opacity:1}
 .home-tl .tl-past .tl-day b{background:var(--surface-2);color:var(--ink-soft)}
 .home-tl .tl-later{opacity:1}
@@ -1112,6 +1125,7 @@ table.rv-table td:first-child{font-weight:500}
 @media (max-width:560px){
   .quick-start:not(.sheet-acts){grid-template-columns:minmax(0,1fr)}
   .sheet-band{height:28px}
+  .sheet-band.is-art{height:auto;padding:8px 8px 0}
   .sheet-band i{flex-basis:20px}
   .sheet-body{padding:18px 16px 18px}
   .sheet-title{font-size:clamp(1.9rem, 8vw, 2.4rem)}
@@ -1135,6 +1149,7 @@ table.rv-table td:first-child{font-weight:500}
 /* the hero's course facts sit under the title, not above it; each stat shows its number first, its label after */
 .hh-main{display:flex;flex-direction:column}
 .hh-main > h2{order:-1}
+.hh-main > .sheet-band{order:-2;margin:-10px -12px 14px}
 .hh-main > .eyebrow{margin:-6px 0 10px} /* taste-skill-ignore: restyles Perio's old label class; it sits under the title now */
 .hh-stat{display:flex;flex-direction:column}
 .hh-stat .k{order:2;margin-top:4px}
@@ -4238,7 +4253,8 @@ function shuffled(arr){ var a = arr.slice(); for(var i=a.length-1;i>0;i--){ var 
 function tagOf(lecId){ var l = LECTURE_BY_ID[lecId]; return l ? l.tag : 'blue'; }
 function lecChip(lecId){ var l = LECTURE_BY_ID[lecId]; if(!l) return ''; return '<span class="lec-chip tag-'+l.tag+'">'+lecLabel(l)+' · '+escHtml(l.title.split(':')[0].split(',')[0])+'</span>'; }
 function todayStr(){ var d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function toast(msg, ic){ var host = document.getElementById('toastHost'); if(!host) return; var t = document.createElement('div'); t.className='toast'; t.innerHTML = (ic ? icon(ic) : '') + '<span>' + escHtml(msg) + '</span>'; host.appendChild(t); setTimeout(function(){ t.remove(); }, 2600); }
+function artSvg(name, size, o){ o = o || {}; o.size = size || 96; return window.shArt && window.shArt.has(name) ? window.shArt.svg(name, o) : ''; } /* a drawing from the art kit (widget/art.js), if it has one */
+function toast(msg, ic, art){ var host = document.getElementById('toastHost'); if(!host) return; var t = document.createElement('div'); t.className='toast'; t.innerHTML = (art ? artSvg(art, 36, { wiggle:true }) : '') + (ic ? icon(ic) : '') + '<span>' + escHtml(msg) + '</span>'; host.appendChild(t); setTimeout(function(){ t.remove(); }, 2600); }
 
 /* ---------- STATE ---------- */
 var STATE_KEY = 'spc-state-v1';
@@ -4286,7 +4302,7 @@ function checkAchievements(){
     else if(c.type === 'streak') ok = STATE.streak >= c.n;
     else if(c.type === 'lecPct'){ var st = STATE.lecStats[c.lec]; ok = !!(st && st.a >= c.min && (st.c / st.a) * 100 >= c.pct); }
     else if(c.type === 'allSeen') ok = QUESTIONS.every(function(q){ return STATE.seen[q.id]; });
-    if(ok){ STATE.ach[a.id] = todayStr(); toast('Achievement: ' + a.name, a.icon); }
+    if(ok){ STATE.ach[a.id] = todayStr(); toast('Achievement: ' + a.name, a.icon, 'toast-cheer'); }
   });
 }
 
@@ -4784,7 +4800,7 @@ function renderWeak(body){
     var list = shuffled(missed).concat(shuffled(fresh)).slice(0, 20);
     var l = LECTURE_BY_ID[WEAK_DRILL];
     body.innerHTML = '<div class="qfilters" style="padding:4px 0"><button type="button" class="btn" id="weakBack">'+icon('back')+'All lectures</button><span class="pill">'+(l ? ''+lecLabel(l)+' '+escHtml(l.title) : 'Everything you missed')+'</span><span class="pill">'+missed.length+' missed last time'+(fresh.length ? ' · '+fresh.length+' not tried' : '')+'</span></div>' +
-      (list.length ? '<div class="qlist" id="weakList">' + list.map(function(q){ return qCardHTML(q, { ctx:'weak' }); }).join('') + '</div>' : '<div class="rv-empty">Nothing to drill here: no misses and nothing untried. Nice.</div>');
+      (list.length ? '<div class="qlist" id="weakList">' + list.map(function(q){ return qCardHTML(q, { ctx:'weak' }); }).join('') + '</div>' : '<div class="rv-empty qf-empty">' + artSvg('empty-misses') + '<p>Nothing to drill here: no misses and nothing untried. Nice.</p></div>');
     var wl = document.getElementById('weakList'); if(wl) wireQuestionContainer(wl);
     document.getElementById('weakBack').onclick = function(){ WEAK_DRILL = null; renderWeak(body); window.scrollTo(0,0); };
     return;
@@ -4804,7 +4820,7 @@ function renderWeak(body){
   }
   body.innerHTML = '<div class="reading" style="max-width:860px"><h2>Weak spots</h2><p>Lectures ranked by your accuracy on this device (3+ answers needed). Drill a lecture to get the questions you missed last time, then the ones you haven\'t tried.</p>' +
     '<div class="reading-actions" style="margin:6px 0 14px"><button type="button" class="btn primary" data-sh-drill="weak">'+icon('bolt')+'Daily drill</button>' + (totalMissed ? '<button type="button" class="btn" data-drill="all">Drill everything I missed ('+totalMissed+')</button>' : '') + '</div>' +
-    (started.length ? '<div class="weak-list">' + started.map(row).join('') + '</div>' : '<p class="rv-empty">Answer a few questions in the bank or mock exam and your weak spots show up here.</p>') +
+    (started.length ? '<div class="weak-list">' + started.map(row).join('') + '</div>' : '<div class="rv-empty qf-empty">' + artSvg('empty-first') + '<p>Answer a few questions in the bank or mock exam and your weak spots show up here.</p></div>') +
     (notYet.length ? '<h3 style="margin-top:22px">Not started yet</h3><div class="weak-list">' + notYet.map(row).join('') + '</div>' : '') + '</div>';
   body.querySelectorAll('[data-drill]').forEach(function(b){ b.onclick = function(){ WEAK_DRILL = b.getAttribute('data-drill'); renderWeak(body); window.scrollTo(0,0); }; });
 }
@@ -5045,7 +5061,8 @@ function renderBank(body){
     else if(st === 'missed' && only) msg = 'Nothing missed in these lectures. Questions you get wrong come back here.';
     else if(st === 'unseen' && only) msg = 'You have answered every question here. Try <b>Missed last time</b>, or another lecture.';
     else msg = 'No questions match all of these: ' + on.map(function(p){ return '<b>' + escHtml(p[1]) + '</b>'; }).join(', ') + '.';
-    return '<div class="rv-empty qf-empty"><p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all ' + QUESTIONS.length + ' questions</button></div>';
+    var art = st === 'pinned' && !pinnedIds().length ? 'empty-pins' : st === 'missed' && only ? 'empty-misses' : 'empty-search';
+    return '<div class="rv-empty qf-empty">' + artSvg(art) + '<p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all ' + QUESTIONS.length + ' questions</button></div>';
   }
   function draw(){
     var qs = bankFiltered(bankSearch);

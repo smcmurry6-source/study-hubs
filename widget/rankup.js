@@ -179,6 +179,7 @@
     '  transform:translateY(18px) scale(.96); transition:transform .5s cubic-bezier(.2,1.2,.4,1);}' +
     '.sh-mk.is-on .sh-mk-card{transform:none;}' +
     '.sh-mk-eye{font-size:13px; font-weight:600; letter-spacing:0; text-transform:none; color:rgba(255,255,255,.62);}' +
+    '.sh-mk-art{position:absolute; left:14px; top:10px;} @media (max-width:420px){ .sh-mk-art svg{width:54px; height:54px;} }' +   /* the art kit's exam booklet (widget/art.js) */
     '.sh-mk-ring{position:relative; width:168px; height:168px; margin:14px auto 4px;}' +
     '.sh-mk-ring svg{display:block; width:100%; height:100%; transform:rotate(-90deg); overflow:visible;}' +
     '.sh-mk-ring circle{fill:none; stroke-width:9; stroke-linecap:round;} .sh-mk-ring .bg{stroke:rgba(255,255,255,.1);}' +
@@ -735,6 +736,7 @@
     el.style.setProperty("--mk-c", B[1]); el.style.setProperty("--mk-g", B[2]);
     el.innerHTML = '<div class="sh-mk-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-mk-stage"><div class="sh-mk-card">' +
+        (window.shArt && window.shArt.has("mock") ? '<div class="sh-mk-art" aria-hidden="true">' + window.shArt.svg("mock", { size: 72, ink: true }) + '</div>' : '') +
         '<div class="sh-mk-eye">Mock exam' + (m.hub ? ' · ' + esc(m.hub) : '') + '</div>' +
         '<h2 id="sh-mk-t" class="sh-ru-sr">Mock exam score: ' + pct + '%, ' + right + ' of ' + total + ' right. ' + esc(verdict(p)) + '</h2>' +
         '<div class="sh-mk-ring" aria-hidden="true"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52" pathLength="100"/></svg>' +

@@ -142,8 +142,10 @@
       else if (act === "size") resize(+b.getAttribute("data-n"));
     });
   }
+  /* a drawing from the art kit (widget/art.js) when it's there, else the plain icon */
+  function art(name, o, fallback){ return window.shArt && window.shArt.has(name) ? window.shArt.svg(name, o) : (fallback || ''); }
   function top(right){
-    return '<div class="shd-top"><span class="shd-kicker">' + IC_BOLT + 'Daily drill</span>' + (right || '') +
+    return '<div class="shd-top"><span class="shd-kicker">' + art("drill", { size: 30 }, IC_BOLT) + 'Daily drill</span>' + (right || '') +
       '<button type="button" class="shd-x" data-shd="close" aria-label="Close the daily drill">&times;</button></div>';
   }
   /* roll: the set that was just finished started today's streak day, so the number rolls up from yesterday's */
@@ -247,8 +249,10 @@
     var extra = (s.start || 0) > 0, fresh = s.cheer !== s.items.length && right + wrong > 0, roll = fresh && freshDay;
     freshDay = false;
     /* the check draws itself, the score counts up, the results tick in one by one (CSS in v3.css) */
+    var doneArt = art("drill-done", { size: 76, ink: true });
     body.innerHTML = top() + '<div class="shd-done' + (fresh ? ' is-fresh' : '') + '">' +
-      '<div class="shd-done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="m5 12.5 4.2 4.2L19 7"/></svg></div>' +
+      (doneArt ? '<div class="shd-done-mark is-art">' + doneArt + '</div>'
+               : '<div class="shd-done-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="m5 12.5 4.2 4.2L19 7"/></svg></div>') +
       '<h2 id="shd-title">' + (extra ? 'Extra set done' : 'Drill done for today') + '</h2>' +
       '<p class="shd-lead">' + (right + wrong ? '<b class="shd-cnt">' + right + '</b> of ' + (right + wrong) + ' right' : 'All skipped') + (skipped && right + wrong ? ' · ' + skipped + ' skipped' : '') + '</p>' +
       '<p class="shd-how">' + (wrong ? (wrong === 1 ? 'The one you missed comes back tomorrow. ' : 'The ' + wrong + ' you missed come back tomorrow. ') : '') +
@@ -284,7 +288,7 @@
       var add = pick(n, seen);
       if (!add.length) {
         btns.forEach(function(b){ b.hidden = true; });
-        var how = body.querySelector(".shd-how"); if (how) how.textContent = "That's every question in scope for today. Come back tomorrow for a fresh set.";
+        var how = body.querySelector(".shd-how"); if (how) how.innerHTML = art("empty-drill", { size: 84 }) + "That's every question in scope for today. Come back tomorrow for a fresh set.";
         return;
       }
       s.start = s.items.length; s.items = s.items.concat(add); saveSet(s);

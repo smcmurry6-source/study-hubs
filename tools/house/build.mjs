@@ -24,7 +24,7 @@ for (const [id, hub] of Object.entries(cfg.hubs)) {
   const file = join(ROOT, "hubs", id, "index.html");
   if (!existsSync(file)) continue;
   const src = readFileSync(file, "utf8");
-  const block = START + `:root{--sh-ink:${hub.ink};--sh-ink-deep:${hub.deep};}\n` + css + END;
+  const block = START + `:root{--sh-ink:${hub.ink};--sh-ink-deep:${hub.deep};--sh-warm:${hub.warm || hub.ink};--sh-cool:${hub.cool || hub.ink};}\n` + css + END;
   let out;
   const i = src.indexOf(START), j = src.indexOf(END);
   if (i >= 0 && j > i) out = src.slice(0, i) + block + src.slice(j + END.length);

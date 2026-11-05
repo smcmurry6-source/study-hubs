@@ -31,6 +31,11 @@
     "@keyframes shReplyIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}" +
     ".sh-reply-top{display:flex;align-items:center;gap:8px;margin:0 28px 8px 0;font-weight:700;font-size:15.5px;}" +
     ".sh-reply-top svg{flex:none;width:20px;height:20px;color:var(--r-good);}" +
+    /* the art kit's drawing (widget/art.js) in place of the icon: big on the pop-up, small and still in the inbox list */
+    ".sh-reply-top svg.sh-art{width:52px;height:52px;margin:-6px 0;}" +
+    ".sh-inbox-item .sh-reply-top svg.sh-art{width:32px;height:32px;margin:-2px 0;}" +
+    ".sh-inbox-item .sh-art.is-ink .s,.sh-inbox-item .sh-art.is-ink .g{animation:none;stroke-dasharray:none;stroke-dashoffset:0;}" +
+    ".sh-inbox-item .sh-art.is-ink .b,.sh-inbox-item .sh-art.is-ink .sp,.sh-inbox-item .sh-art.is-ink .sp2,.sh-inbox-item .sh-art.is-ink .hatch,.sh-inbox-item .sh-art.is-ink .eye,.sh-inbox-item .sh-art.is-ink .shine{animation:none;}" +
     ".sh-reply-x{position:absolute;top:8px;right:8px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;" +
     "color:var(--r-ink2);font-size:22px;line-height:1;cursor:pointer;}" +
     ".sh-reply-x:hover{background:var(--r-bg2);}" +
@@ -81,6 +86,8 @@
     "@media (max-width:560px){.sh-inbox textarea{font-size:16px;}}";
   var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>';
   var CLIPBOARD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 10h6M9 14h6M9 18h3"/></svg>';
+  /* a drawing from the art kit (widget/art.js) when it's there, else the plain icon */
+  function art(name, fallback){ return window.shArt && window.shArt.has(name) ? window.shArt.svg(name, { size: 52, ink: true }) : fallback; }
   var MEGAPHONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 
   /* the widget appends "  — question <id> · <section>" to a report; show the student only what they typed */
@@ -155,7 +162,7 @@
     /* ---------- the survey, answered in the Inbox (same question kinds as the dashboard pop-up) ---------- */
     function surveyItem(el, r){
       var qs = r.questions, answers = {};
-      var h = '<div class="sh-reply-top">' + CLIPBOARD + '<span>' + esc(r.title || "Quick survey") + '</span></div>' +
+      var h = '<div class="sh-reply-top">' + art("survey", CLIPBOARD) + '<span>' + esc(r.title || "Quick survey") + '</span></div>' +
         '<div class="sh-reply-meta">Quick survey · ' + (qs.length === 1 ? "1 question" : qs.length + " questions") + '</div>';
       qs.forEach(function(q, qi){
         var id = String(q.id || ("q" + (qi + 1))), kind = q.kind || "choice";
@@ -221,7 +228,7 @@
       var msg = (r.message || "").trim() || (flag
         ? "It's been looked at and fixed where needed. Thanks for flagging it."
         : "It's been looked at. Thanks for the idea.");
-      el.querySelector(".sh-reply-top").innerHTML = (notice ? MEGAPHONE : CHECK) + "<span></span>";
+      el.querySelector(".sh-reply-top").innerHTML = (notice ? art("notice", MEGAPHONE) : art("reply", CHECK)) + "<span></span>";
       el.querySelector(".sh-reply-top span").textContent = notice ? r.title : flag ? "Your report was addressed" : "Your suggestion was addressed";
       var meta = [HUB_NAME[r.hub] || r.hub || (notice ? "Everyone" : "")];
       if (qid) meta.push("question " + qid);

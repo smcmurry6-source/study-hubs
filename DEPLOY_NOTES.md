@@ -32,6 +32,27 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (Site redesign, second pass: the ink plate, Claude Code; same PR)** — Sam's review of the first pass ("boring";
+  function first, but engaging and satisfying, with unique hand-drawn art in one style, nothing stock) and the calls that
+  followed ([decisions](vault/decisions.md)). **The art kit**, `widget/art.js` (`window.shArt`; rules in
+  `tools/art/README.md`; contact sheets `node tools/art/sheet.mjs`): 49 drawings in one hand, a fine ink line with
+  cross-hatching, one warm spot color and one cool fill on bone paper, Timmy's cast (Timmy as decoration, number
+  thirty-one, the rabbit down the hill, the toothbrush by the door). Where they went: every hub's achievement toast
+  (`toast(msg, ic, art)`), the reply, notice and survey cards (`widget/replies.js`), the tour prompt (`widget/tour.js`),
+  the Daily Drill card, finish screen and "come back tomorrow" (`widget/drill.js`), the mock results card's corner
+  (`widget/rankup.js`), the bank's and Weak Spots' empty states (the four live hubs, `artSvg()`), each hub's Home frieze
+  (`shHome.band()` in `widget/blueprint.js` draws `band-<hub>`; Perio's hero card carries it too), the dashboard's class
+  cards (`class-<key>`, the tap egg stays), the About parts (`about-<id>`, inserted by the page's script), and the answer
+  feedback in `widget/fx.js`: an ink spark behind a right answer's check, the streak flame drawn in the hand (tier colors
+  still fill it), a stamp on a lecture bar that fills in this session. The drawings ink themselves on when a pop-up opens
+  and a toast nods; both off under reduced motion and Answer animations off (`shArt.still()`). The rank medallions,
+  trophy icons, hub achievement badges and the celebration cards stay as they were (Sam). The pet widget is untouched.
+  **Companion colors**: `tools/house/hubs.json` gives each live hub a `warm` and a `cool` beside its ink; `build.mjs`
+  emits `--sh-warm`/`--sh-cool`; `house.css` uses them (deepened on light paper as `--sh-warm-deep`/`--sh-cool-deep`) for
+  the blueprint's right/missed bars, today's ring, the studied days, the live countdown and the moments track; the paper
+  warmed to `#efe9dd` (inks 9.6:1 and up, text tokens 5:1 and up), the dashboard's page, panels and class tints warmed and
+  deepened. `sw.js` VERSION `sh-v58` (art.js precached); `tools/ci/syntax.js` checks art.js. About: "Hand-drawn art" and
+  "The drawings in a hub" entries, the drill, feedback, flame and settings lines.
 - **2026-11-05 (Site redesign, phase 1: the house style, with the Taste skill, Claude Code)** — Sam: "Perform a full-site
   visual, usability, performance, accessibility, and learning-experience redesign using the Taste skill in full." Led by the
   class's own numbers ([evidence brief](vault/release/reports/2026-11-05-redesign-evidence-brief.md): the bank and the

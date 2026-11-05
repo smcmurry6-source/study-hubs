@@ -747,6 +747,8 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .shd-top{display:flex; align-items:center; gap:12px; min-height:38px;}
 .shd-kicker{display:inline-flex; align-items:center; gap:7px; font:600 13.5px/1.2 var(--shw-font); letter-spacing:0; text-transform:none; color:var(--shw-ink2);}
 .shd-kicker svg{width:16px; height:16px; color:var(--shw-accent);}
+.shd-kicker svg.sh-art{width:30px; height:30px; margin:-7px 0;}   /* the art kit's stopwatch on the cards (widget/art.js) */
+.shd-how .sh-art{display:block; margin:0 auto 8px;}
 .shd-count{margin-left:auto; font:600 13px/1 var(--shw-mono); color:var(--shw-ink2); font-variant-numeric:tabular-nums;}
 .shd-x{margin-left:auto; width:38px; height:38px; border-radius:50%; border:0; background:transparent; color:var(--shw-ink2); font-size:26px; line-height:1; cursor:pointer; flex:none;}
 .shd-count + .shd-x{margin-left:0;}
@@ -793,6 +795,8 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
   background:linear-gradient(to bottom, transparent, var(--shw-page) 30%);} /* taste-skill-ignore: drawn art (an easter egg, a medal, a swatch or a scroll fade), not page chrome */
 .shd-done-mark{width:52px; height:52px; margin-top:12px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--shw-good); color:#fff;}
 .shd-done-mark svg{width:28px; height:28px; stroke-width:2.4;}
+.shd-done-mark.is-art{width:84px; height:84px; background:transparent; color:inherit; border-radius:0;}   /* Timmy and the finished stack (widget/art.js) */
+.shd-done-mark.is-art svg{width:76px; height:76px;}
 .shd-results{list-style:none; margin:18px 0 0; padding:0; border-top:1px solid var(--shw-line);}
 .shd-results li{display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid var(--shw-line); font-size:14px; line-height:1.45; color:var(--shw-ink2);}
 .shd-res-ic{flex:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-top:0;}
@@ -808,8 +812,8 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 .shd-roll .o{display:none;}
 @media (prefers-reduced-motion: no-preference){
   .shd-done .shd-done-mark{animation:shd-pop .55s cubic-bezier(.2,1.6,.4,1) both;}
-  .shd-done .shd-done-mark path{stroke-dasharray:1; animation:sh-fx-draw .45s .28s ease-out both;}
-  .shd-done.is-fresh .shd-done-mark::after{content:""; position:absolute; inset:0; border-radius:50%; border:2px solid var(--shw-good); animation:shd-ring 1s .25s ease-out both;}
+  .shd-done .shd-done-mark:not(.is-art) path{stroke-dasharray:1; animation:sh-fx-draw .45s .28s ease-out both;}
+  .shd-done.is-fresh .shd-done-mark:not(.is-art)::after{content:""; position:absolute; inset:0; border-radius:50%; border:2px solid var(--shw-good); animation:shd-ring 1s .25s ease-out both;}
   .shd-done .shd-results li{animation:shd-li-in .4s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(.35s + var(--i, 0) * 55ms);}
   .shd-done .shd-res-ic{animation:shd-pop .4s cubic-bezier(.2,1.6,.4,1) both; animation-delay:calc(.45s + var(--i, 0) * 55ms);}
   .shd-done.is-fresh .shd-streak svg{animation:shd-puff .8s 1.05s cubic-bezier(.2,1.6,.4,1) both;}
@@ -910,6 +914,13 @@ header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; wh
 .sh-fx-mark.is-ok{background:var(--good, #1F8A5B);}
 .sh-fx-mark.is-bad{background:var(--bad, #B3261E);}
 .sh-fx-mark svg{width:14px; height:14px; display:block; fill:none; stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
+/* the art kit's ink spark behind a right answer's mark, and its stamp on a lecture bar that just filled (widget/art.js) */
+.sh-fx-spark{position:absolute; right:-22px; top:50%; width:44px; height:44px; margin-top:-22px; pointer-events:none; animation:sh-fx-spark .9s var(--d, 0ms) ease-out both;}
+.sh-fx-spark svg{width:44px; height:44px; display:block;}
+@keyframes sh-fx-spark{0%{opacity:0; transform:scale(.3);} 25%{opacity:1; transform:scale(1.1);} 100%{opacity:0; transform:scale(1.3) translateY(-8px);}}
+.sh-fx-stamp{position:fixed; z-index:60; width:46px; height:46px; pointer-events:none; animation:sh-fx-stamp 1.4s cubic-bezier(.2,1.4,.4,1) both;}
+.sh-fx-stamp svg{width:46px; height:46px; display:block;}
+@keyframes sh-fx-stamp{0%{opacity:0; transform:scale(1.8) rotate(-14deg);} 30%{opacity:1; transform:scale(1) rotate(-8deg);} 80%{opacity:1; transform:scale(1) rotate(-8deg);} 100%{opacity:0; transform:scale(1) rotate(-8deg);}}
 .sh-fx-mark.is-anim{animation:sh-fx-badge .28s cubic-bezier(.22,1.15,.36,1) var(--d, 0ms) both;}
 .sh-fx-sweep{position:absolute; inset:0; border-radius:inherit; pointer-events:none; transform-origin:left center; transform:scaleX(0);}
 .sh-fx-mark.is-anim path{stroke-dasharray:1; animation:sh-fx-draw .24s ease-out both; animation-delay:calc(var(--d, 0ms) + 90ms + var(--d2, 0ms));}
@@ -937,6 +948,9 @@ header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; wh
 .sh-flame-fire{position:absolute; left:18%; top:14%; width:64%; height:64%; transform-origin:50% 90%; overflow:visible;}
 .sh-flame-fire .o{fill:var(--fo); transition:fill .4s;}
 .sh-flame-fire .i{fill:var(--fi); transition:fill .4s;}
+.sh-flame-fire .sp{fill:var(--fo); transition:fill .4s;}        /* the kit's flame (widget/art.js): the tier colors fill it */
+.sh-flame-fire .shine{fill:var(--fi); transition:fill .4s;}
+.sh-flame-fire .hatch{opacity:.35;}
 #sh-flame.t3 .sh-flame-fire, #sh-flame.t4 .sh-flame-fire, #sh-flame.t5 .sh-flame-fire, #sh-flame.t6 .sh-flame-fire{filter:drop-shadow(0 0 4px var(--fo));}
 .sh-flame-txt{display:flex; flex-direction:column; line-height:1.05;}
 .sh-flame-n{display:block; font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; transform-origin:left center;}
@@ -944,7 +958,7 @@ header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; wh
 .sh-flame-spark{position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px; border-radius:50%; background:var(--fo); box-shadow:0 0 6px var(--fo); pointer-events:none;}
 .sh-flame-smoke{position:absolute; left:50%; top:30%; width:9px; height:9px; margin-left:-4.5px; border-radius:50%; background:var(--ink-faint, #8A8F96); opacity:0;}
 #sh-flame.is-fizz .sh-flame-fire{transform:scale(.55); transition:transform .5s ease-in;}
-#sh-flame.is-fizz .sh-flame-fire .o, #sh-flame.is-fizz .sh-flame-fire .i{fill:var(--ink-faint, #8A8F96);}
+#sh-flame.is-fizz .sh-flame-fire .o, #sh-flame.is-fizz .sh-flame-fire .i, #sh-flame.is-fizz .sh-flame-fire .sp, #sh-flame.is-fizz .sh-flame-fire .shine{fill:var(--ink-faint, #8A8F96);}
 #sh-flame.is-fizz .sh-flame-ring .fg{stroke:var(--ink-faint, #8A8F96);}
 #sh-flame.is-fizz .sh-flame-n{color:var(--ink-faint, #8A8F96); text-decoration:line-through;}
 html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}

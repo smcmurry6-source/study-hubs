@@ -22,6 +22,7 @@ comprehensive: L6 on, building on the midterm)**. The hub now leans to the final
   It is the model other hubs copy for `two()`, `tf()`, `nums()`, `choiceOrder()`, `whyHTML`, shared patients (`CASES`,
   `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).
 - **The house style (2026-11-05):** `tools/house/house.css` is the shared look of every live hub (one serif, the type steps,
+- **The art kit (2026-11-05):** its Home opens with a frieze drawn for this course (`band-occlusion` in `widget/art.js`: an articulator, a facebow, articulating paper, a wax record, a mandible, Timmy at the end); its toasts, empty states and pop-ups use the kit too (`tools/art/README.md`). Its two companion colors (warm, cool) live beside its ink in `tools/house/hubs.json`; the blueprint bars and today's ring take the warm one, "missed" the cool one. Redraw the frieze with `node tools/art/sheet.mjs band-` and look at it on a 390 px phone.
   bone paper, one ink per hub, no shadows or hairlines at rest); `node tools/house/build.mjs` pastes it between the hub's
   `/* sh-house:start */` and `/* sh-house:end */` markers with the hub's ink from `tools/house/hubs.json`; `--check` fails
   if the block is stale. **Edit `house.css`, never the pasted block.** A rule that only one hub needs still goes in

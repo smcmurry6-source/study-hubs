@@ -29,31 +29,31 @@
 </script>
 <style>
 /* ================= TOKENS =================
-   The dashboard is the front desk of the hubs: a white page, panels in the same bone paper the hubs are
-   printed on, one deep teal for the live things, and each class told apart by a pale tint, the way
+   The dashboard is the front desk of the hubs: a warm white page, panels in the same bone paper the hubs are
+   printed on, one deep teal for the live things, and each class told apart by its tint, the way
    instruments are banded in clinic. Instrument Serif sets the greeting alone; Instrument Sans does
    everything else. Why: vault/release/reports/2026-11-05-redesign-design-notes.md. */
 :root{
-  --bg:#FFFFFF;
-  --surface:#F1F0EC;
-  --surface-2:#E7E5DF;
-  --tray:#DCD9D1;
+  --bg:#FDFBF7;
+  --surface:#F3EEE4;
+  --surface-2:#E9E2D5;
+  --tray:#DED5C5;
   --ink:#1F201D;
   --ink-2:#484945;
   --ink-3:#5E5F5B;
-  --line:#DCD9D1;
-  --line-2:#C9C5BC;
+  --line:#DED5C5;
+  --line-2:#CBC1AF;
   --on-ink:#FFFFFF;
   --accent:#1B6E66;
   --focus:#1B6E66;
   --good:#2E7D32;
   --live:#1B6E66;
 
-  --c-gi:#7A5417;       --c-gi-soft:#F3E9D6;
-  --c-perio:#8C2F4C;    --c-perio-soft:#F6E4EA;
-  --c-genetics:#1F5C56; --c-genetics-soft:#DDEBE8;
-  --c-pros:#8F3F28;     --c-pros-soft:#F4E2D9;
-  --c-endo:#6B3279;     --c-endo-soft:#EEE2F2;
+  --c-gi:#7A5417;       --c-gi-soft:#F1E3C6;
+  --c-perio:#8C2F4C;    --c-perio-soft:#F6DCE4;
+  --c-genetics:#1F5C56; --c-genetics-soft:#D5E8E2;
+  --c-pros:#8F3F28;     --c-pros-soft:#F4DACB;
+  --c-endo:#6B3279;     --c-endo-soft:#EBDBF0;
 
   --shadow:none;
   --shadow-lift:0 2px 8px rgba(31,32,29,.08);   /* overlays only: dialogs, the survey card, toasts; quiet, the fill does the work */
@@ -316,11 +316,12 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .class-group{padding-top:4px;}
 .class-head{display:flex; align-items:center; gap:12px; margin-bottom:12px;}
 .class-icon{
-  width:40px; height:40px; border-radius:var(--radius-c); flex:none; border:0;
-  background:transparent; color:var(--ring-ink); display:flex; align-items:center; justify-content:center; padding:0; margin-left:-8px;
+  width:48px; height:48px; border-radius:var(--radius-c); flex:none; border:0;
+  background:transparent; color:var(--ring-ink); display:flex; align-items:center; justify-content:center; padding:0; margin-left:-6px;
   transition:transform .2s cubic-bezier(.3,1.6,.4,1);
 }
 .class-icon svg{width:24px; height:24px; display:block;}
+.class-icon svg.sh-art{width:44px; height:44px;}   /* the class's own drawing from the art kit (widget/art.js) */
 .class-icon:hover{transform:rotate(-6deg) scale(1.06);}
 .class-icon:active{transform:scale(.92);}
 .class-icon.is-active svg{animation:egg .6s cubic-bezier(.3,1.7,.4,1);}
@@ -702,6 +703,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
 <script src="widget/pet.js" defer></script>
 <script src="widget/timmy.js" defer></script>
 <script src="widget/tour.js" defer></script>
+<script src="widget/art.js"></script>
 <script src="widget/archive.js"></script>
 <script>
 (function(){
@@ -1318,7 +1320,8 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (hubs.length) liveClasses[cid] = 1;
       html += '<div class="class-group" id="class-' + cid + '" data-class="' + cid + '" style="' + ringVars(c.ring) + '">' +
         '<div class="class-head">' +
-          '<button class="class-icon" type="button" data-egg="' + cid + '" aria-label="' + esc(c.name) + ' (tap for a surprise)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + c.icon + '</svg></button>' +
+          '<button class="class-icon" type="button" data-egg="' + cid + '" aria-label="' + esc(c.name) + ' (tap for a surprise)">' +
+            (window.shArt && window.shArt.has("class-" + cid) ? window.shArt.svg("class-" + cid, { size: 44 }) : '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + c.icon + '</svg>') + '</button>' +
           '<button class="class-title" type="button" data-toggle aria-expanded="true"><h3>' + esc(c.name) + '</h3><span>' + hubs.length + (hubs.length === 1 ? " hub" : " hubs") + (old.length ? " · " + old.length + " archived" : "") + '</span></button>' +
           '<button class="class-toggle" type="button" data-toggle aria-expanded="true" aria-label="Show or hide ' + esc(c.name) + '">' + ICON.chev + '</button>' +
         '</div><div class="hub-grid">' + hubs.map(hubCardHTML).join("") + old.map(archivedCardHTML).join("") + '</div></div>';

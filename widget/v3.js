@@ -2709,6 +2709,9 @@
       nameMsg.textContent = "Saved. Hi, " + name + "!";
     });
   }
+  /* the art kit (widget/art.js, window.shArt): every drawing the widget's files make. Loaded first and not async, so the
+     pop-ups that follow find it; each caller still guards on window.shArt (an old cached v3 without it). */
+  if (!window.shArt) { var artScript = document.createElement("script"); artScript.src = new URL("art.js", thisScript.src).href; document.head.appendChild(artScript); }
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase,

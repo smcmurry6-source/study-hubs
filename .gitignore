@@ -27,3 +27,6 @@ _preview/
 
 # npm i --no-save playwright axe-core (CI and the release tests): never committed
 node_modules/
+
+# the art kit's contact sheets are rendered on demand (node tools/art/sheet.mjs)
+tools/art/*.png
