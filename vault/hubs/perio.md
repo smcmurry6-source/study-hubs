@@ -44,6 +44,13 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
 - **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
   furcation entrance wider, Hamp as under 3 / over 3 mm / through (in class it was called "three millimeter increments").
+- **The prognosis systems: two sources that disagree** (found by question health, 2026-11-05). The exam-review guide
+  (`RISK_SYSTEMS`) gives McGuire & Nunn "individual teeth" and gives "likelihood of retaining the tooth" to Miller &
+  McEntire; the in-class session (the notes, `PROGNOSIS_COMPARE`) says McGuire & Nunn "can be given per tooth or for the
+  whole dentition" and is about whether a tooth can be maintained, "meaning kept in the mouth" ("tooth retention"). So
+  don't make "retention" or "per tooth" the line between them: Miller & McEntire is molars and a number, Kwok & Caton is
+  stability and the whole dentition, McGuire & Nunn is maintainability. `q3-04`, `q3-08` and `q3-S03` were rewritten that
+  way (same ids); `q3-01` and `q3-05` still call McGuire & Nunn the per-tooth system, which their stems allow.
 
 ## Diagram decisions
 
