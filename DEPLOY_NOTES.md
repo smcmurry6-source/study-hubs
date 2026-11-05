@@ -41,8 +41,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   SPC 4 swaps and 2 made "both false" (12 / 6 / 10 / 12). **Numbered:** statements reordered so the false one sits at every number
   and the key at every position (PCD 7 / 8 / 8 / 7, SPC 6 / 6 / 6 / 6), the key's size shared by another choice, and in PCD three
   items keyed "all four" and two "two true" (`ev-num-1`, `pf-num-1`, `cb-num-1`; `su-num-4`, `bm-num-1`). Every why line is rebuilt by
-  `two()` / `nums()`. The class's picks on each choice (`question_choices`, by position) would show beside the wrong choices: the PR
-  carries SQL, tested on a throwaway Postgres, that moves the picks of 43 reordered items with their choices and clears the 25
+  `two()` / `nums()`. The class's picks on each choice (`question_choices`, by position) would show beside the wrong choices: 
+  `tools/data-fixes/2026-11-04-statement-keys.sql`, tested on a throwaway Postgres, that moves the picks of 43 reordered items with their choices and clears the 25
   rewritten ones (`question_stats` too), to run at merge with Sam's OK; question health starts the new versions by itself. Also `im-template-vdo`'s explanation and whys now say why "room for the drill and the guide
   sleeves" (6 of 15) is wrong. **CI:** `tools/ci/smoke.js` fails a hub whose statement keys form a pattern (a two-statement choice
   keyed in over 40% or under 10% of items, a numbered key position over 45%, a statement number true in over 90%); rule notes
