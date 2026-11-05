@@ -77,7 +77,7 @@ function cyRender(st, D) {
   /* ---- pituitary: FSH and LH ---- */
   o += T(XL, 44, "PITUITARY · FSH AND LH", "cy-h", "start") + T(XR, 44, "relative levels", "cy-h cy-hr", "end");
   o += '<path class="cy-axis" d="M' + XL + " " + P0 + "H" + XR + '"/>';
-  function curve(P, cls, y1, hh, info) { var full = cyPath(P, 0.5, 28.5, y1, hh); return HOT(info, '<path class="cy-hit" d="' + full + '"/><path class="cy-fut ' + cls + '" d="' + full + '"/><path class="cy-now ' + cls + '" d="' + cyPath(P, 0.5, d, y1, hh) + '"/>') + '<circle class="cy-dot ' + cls + '" cx="' + f1(cyX(d)) + '" cy="' + f1(y1 - cyMono(P, d) * hh) + '" r="4"/>'; }
+  function curve(P, cls, y1, hh, info) { var full = cyPath(P, 0.5, 28.5, y1, hh); return HOT(info, '<path class="cy-hit" d="' + full + '"/><path class="cy-fut ' + cls + '" d="' + full + '"/><path class="cy-now ' + cls + '" d="' + cyPath(P, 0.5, d, y1, hh) + '"/><circle class="cy-dot ' + cls + '" cx="' + f1(cyX(d)) + '" cy="' + f1(y1 - cyMono(P, d) * hh) + '" r="4"/>'); }
   o += curve(C.FSH, "cy-fsh", P0, PH, "FSH: stimulates granulosa cell development and their estrogen synthesis (aromatase). Estradiol's negative feedback holds it down in the follicular phase, inhibin suppresses it at midcycle, and progesterone holds it down in the luteal phase.");
   o += curve(C.LH, "cy-lh", P0, PH, "LH: fairly steady across the cycle, then a dramatic surge just before ovulation, set off by estradiol's positive feedback. The surge restarts meiosis and causes follicular rupture 24 to 36 hours later. LH also drives the theca cells' testosterone.");
   o += T(cyX(2.6), P0 - cyMono(C.FSH, 2.6) * PH - 7, "FSH", "cy-lab cy-fsh-t", "middle");
