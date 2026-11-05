@@ -53,6 +53,8 @@ Hub building
 - [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
   travel · [Roll back a release](how-to/roll-back-a-release.md)
 - [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
+- [Draw a Patient Box case from its numbers](how-to/draw-a-patient-box-case.md): the shared case kit (chart, radiograph,
+  drawn view and the diagnosis from one set of numbers) every hub's Patient Box questions use.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
 - [Read usage data and run surveys](how-to/read-usage-data.md)
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)

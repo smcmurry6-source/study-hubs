@@ -23,6 +23,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../widget/v3.css">
+<link rel="stylesheet" href="../../widget/cases.css">
+<script src="../../widget/cases.js"></script>
 <style>
 /* ===================================================================
    OCCLUSION MIDTERM HUB — tokens
@@ -10165,6 +10167,12 @@ function figAfterHTML(q){ var f = q.img && FIGS[q.img]; return f && (q.imgAfter 
 function figCardHTML(key){ if(key === 'cuspMap') return cuspMapHTML(1); if(ANIMA.meta(key)) return '<div class="fig-anima">' + ANIMA.html(key) + '</div>'; var f = FIGS[key]; return f ? '<figure class="fig-card"><h4>'+escHtml(f.title)+'</h4>'+f.svg+'<p>'+escHtml(f.caption)+'</p>'+figKeyHTML(f)+'</figure>' : ''; }
 /* Patient Box rows render above the stem */
 var CASE_SETS = null;
+/* Patient Box cases drawn from their numbers (widget/cases.js; how: vault/how-to/draw-a-patient-box-case.md). A
+   question with pcase:'<id>' shows the case's chart, radiograph and drawn view; CI checks every case
+   (node tools/ci/cases.js). Occlusion's own case pictures stay in CASE_IMG / pimg. */
+/* pcases begin */
+var PCASES = {};
+/* pcases end */
 function caseSet(key){
   if(!CASE_SETS){ CASE_SETS = {}; QUESTIONS.forEach(function(q){ if(q.pcase) (CASE_SETS[q.pcase] = CASE_SETS[q.pcase] || []).push(q.id); }); }
   return CASE_SETS[key] || [];
@@ -10172,7 +10180,7 @@ function caseSet(key){
 function pboxHTML(q){
   if(!q.pbox) return '';
   var set = q.pcase ? caseSet(q.pcase) : [], tag = set.length > 1 ? '<span class="pbox-set">Same patient · '+(set.indexOf(q.id)+1)+' of '+set.length+'</span>' : '';
-  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box'+tag+'</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + caseImgHTML(q) + '</div>';
+  return '<div class="pbox"><div class="pbox-head">'+icon('notes')+'Patient box'+tag+'</div><dl>' + q.pbox.map(function(r){ return '<dt>'+escHtml(r[0])+'</dt><dd>'+escHtml(r[1])+'</dd>'; }).join('') + '</dl>' + caseImgHTML(q) + (window.shCases ? window.shCases.pboxFigures(q, PCASES) : '') + '</div>';
 }
 /* select-all partial credit (Canvas-style): +1/n per right pick, -1/n per wrong pick, floor 0; full credit counts as correct */
 var MULTI_STATE = {};

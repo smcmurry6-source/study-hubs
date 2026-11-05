@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (The drawn Patient Box case system for every hub; anatomy and realism, Claude Code)** — Sam: "I also want
+  this system to be called for patient box questions in other hubs", "All teeth need to be anatomically correct. All
+  variables need to be realistic", "Merge when ready". The case kit moved out of the Perio hub into **`widget/cases.js` +
+  `widget/cases.css`** (`window.shCases`; a hub loads both and calls `shCases.pboxFigures(q, PCASES)` from its
+  `pboxHTML`, `shCases.refHTML(q)` for the "In the notes" buttons). **Every tooth type is redrawn from Wheeler's anatomy**:
+  crown shapes with the right cusps (two buccal cusps on upper molars, three on the lower first molar, two on the second),
+  contact heights and incisal angles, the canine's long root, the upper first premolar's two roots, the upper molars'
+  palatal root behind the buccal pair, the lower molars' broad mesial and narrower distal roots curving distally, root
+  trunks above the furcations, the cervical line dipping at mid-facial. **`shCases.validate()`** rejects unrealistic or
+  inconsistent numbers (ranges for probing depths, recession, CAL, bone loss, mobility, furcations, implants, age,
+  cigarettes, HbA1c; the pocket base and the bone crest must agree unless a vertical defect is declared; a furcation
+  needs a molar and bone loss to the trunk; a Class III is through and through), and **`node tools/ci/cases.js`** (new
+  CI step) runs it on every hub's `PCASES` and checks each case's `expect` against `derive()`. **PCD Implants** (exam Nov
+  6): its four L8 Patient Box items now draw their cases (mucositis, peri-implantitis under a cement-retained crown with
+  the cement fleck on the film, a new patient with no baseline, an early failure under a cover screw with the radiolucent
+  line) with "In the notes" buttons. **Occlusion** has the hook and an empty `PCASES`. How-to:
+  `vault/how-to/draw-a-patient-box-case.md`. Sam approved the release in chat.
 - **2026-11-04 (Perio: Patient Box cases drawn from their numbers, Claude Code)** — Sam: upgrade the Perio Patient Box into a
   visual diagnostic-case engine (the midterm check-ins asked for "cases with pictures, charts and radiographs" and more
   staging/grading cases). A **shared kit**, `tools/figures/shared/dental-cases.js` + `.css` (the Occlusion case-picture
@@ -47,7 +64,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   defect for regeneration, peri-implantitis and Meffert), each with a why per choice, memory cue, and **"In the notes"**
   buttons (`q.ref`, through `SH_GOTO`; tracked `case:ref`). A question's `pfig` hides the row that would give its answer
   away (CAL, furcation). `LIKELY_TOPICS` updated (two new topics); About page. No notes text, narration or schema change.
-  Tier 2: a draft PR for Sam's look; the expansion waits for approval ([task](vault/tasks/2026-11-04-perio-visual-case-engine.md)).
+  Tier 2: a draft PR for Sam's look; the expansion waits for approval ([task](vault/tasks/done/2026-11-04-perio-visual-case-engine.md)).
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
   ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
   [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,

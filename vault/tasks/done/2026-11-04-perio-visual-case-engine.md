@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: done
 hub: perio
 created: 2026-11-04
 requested-by: Sam
 due: 2026-11-19
-waiting-on: Sam's approval of the proposal and the first six cases (and which Drive file is the "newly uploaded" source)
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/238
 ---
@@ -66,11 +66,11 @@ chart or radiograph finding, not only describe it."
 - [x] Shared kit, perio build step and the self-check; six cases and 16 questions with a why for every choice and
       notes references; `LIKELY_TOPICS` updated; About page entry
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
-- [ ] Sam approves the proposal and the case set (tier 2: "Sam approved this release" in the PR)
+- [x] Sam approves the proposal and the case set (in the session, 2026-11-04: "Merge when ready")
 - [ ] Then: the question expansion (every session's Patient Box items rebuilt as cases; S3 risk and S4 re-evaluation
       cases; two-statement and numbered items on cases), the phone layouts polished on a real device, visual QA of
       every case in both themes, the full UAT pass, a test report
-- [ ] Vault written back (hub note, decisions, this note's Outcome)
+- [x] Vault written back (hub notes, decisions, the how-to, this note's Outcome)
 
 ## Open questions for Sam
 
@@ -86,6 +86,16 @@ chart or radiograph finding, not only describe it."
 ## Log
 
 - 2026-11-04: written; kit, six cases and the PR built the same day; waiting for Sam's look.
+- 2026-11-04 (Sam, in the session): "I also want this system to be called for patient box questions in other hubs";
+  "Merge when ready"; "All teeth need to be anatomically correct. All variables need to be realistic."
+- 2026-11-05: the kit moved to `widget/cases.js` + `.css`; every tooth type redrawn from Wheeler's anatomy (checked on a
+  tooth sheet of all 16 types in both themes); `validate()` + `node tools/ci/cases.js` in CI; PCD Implants' four Patient
+  Box items drawn; Occlusion hooked; how-to note written; merged on Sam's approval.
 
 ## Outcome
 
+Shipped in [PR #238](https://github.com/smcmurry6-source/study-hubs/pull/238) (Sam: "Merge when ready"): the shared case
+kit in `widget/`, six Perio cases (16 questions) and four PCD Implants cases, the realism validator and its CI step, the
+how-to. Still open, as new tasks when Sam wants them: the Perio expansion (every session's text-only Patient Box items as
+drawn cases, S3 and S4 cases, two-statement and numbered items on cases); the drawn view stays unless Sam says otherwise;
+no "newly uploaded" Perio source was found in Drive (nothing after Nov 2), so the cases rest on the hub's own notes.

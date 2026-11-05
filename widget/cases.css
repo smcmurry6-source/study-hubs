@@ -1,20 +1,23 @@
-/* dental case kit (shared; built from tools/figures/shared/dental-cases.css, edit there) */
-.pimg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px;margin:10px 0 4px}
-.pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
-.pimg figcaption{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;line-height:1.3}
-.pimg svg{display:block;width:100%;height:auto;max-width:460px;margin:0 auto}
-.pimg-cap{font-size:.76rem;color:var(--ink-soft);margin-top:6px;line-height:1.35}
-.pimg-note{font-size:.72rem;color:var(--ink-faint);margin:2px 0 0}
-.pimg.wide{grid-column:1/-1}
-.pimg svg.xr,.pimg svg.io{border-radius:12px}
+/* study-hubs: styles for the dental case kit (widget/cases.js): the chart strip, the numbers table, the periapical
+   film and the drawn buccal view. Scoped to .dc-figs so a hub's own .pimg rules are left alone. Loaded by every hub
+   that draws Patient Box cases, after widget/v3.css. */
+.dc-figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:10px 0 4px}
+.dc-figs .pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
+.dc-figs figcaption{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px;line-height:1.3}
+.dc-figs svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.dc-figs .pimg-cap{font-size:.76rem;color:var(--ink-soft);margin-top:6px;line-height:1.35}
+.dc-note{font-size:.72rem;color:var(--ink-faint);margin:2px 0 0}
+.dc-figs .pimg.wide{grid-column:1/-1}
+.dc-figs svg.xr,.dc-figs svg.io{border-radius:12px}
 /* the chart strip */
-.pimg svg.dc-chart{max-width:620px}
+.dc-figs svg.dc-chart{max-width:620px}
 .dc-paper{fill:var(--surface-2)}
 .dc-grid{stroke:var(--line);stroke-width:.6}.dc-grid5{stroke:var(--line-strong);stroke-width:.8}.dc-cej{stroke:var(--ink-faint);stroke-width:1.1;stroke-dasharray:3 2}
 .dc-ax{fill:var(--ink-faint);font:600 8.5px var(--font-mono)}
 .dc-num{fill:var(--ink);font:700 10px var(--font-mono)}.dc-mob{fill:var(--ink-soft);font:600 9px var(--font-mono)}
-.dc-crown{fill:#f3ecdc;stroke:#9c8a62;stroke-width:1}.dc-crown.dc-restored{fill:#e9e9ec;stroke:#777b88}
-.dc-root{fill:#e2d6b6;stroke:#a8956c;stroke-width:.9}.dc-amalgam{fill:#8a8f99}
+.dc-crown{fill:#f3ecdc;stroke:#9c8a62;stroke-width:1;stroke-linejoin:round}.dc-crown.dc-restored{fill:#e9e9ec;stroke:#777b88}
+.dc-root{fill:#e2d6b6;stroke:#a8956c;stroke-width:.9;stroke-linejoin:round}.dc-root.dc-back{opacity:.55}.dc-root.dc-trunk{stroke:none}
+.dc-amalgam{fill:#8a8f99}
 .dc-implant{fill:#c7ccd4;stroke:#5d6b78;stroke-width:.9}
 .dc-x{stroke:var(--ink-faint);stroke-width:2.2;stroke-linecap:round;fill:none}
 .dc-pocket{fill:#d7303a;opacity:.14}
@@ -39,20 +42,25 @@
 .pchart-key{font-size:.72rem;color:var(--ink-faint);margin-top:4px;line-height:1.35}
 @media (max-width:520px){.pchart{font-size:.72rem}.pchart th,.pchart td{padding:3px 2px}.pchart .pc-sites span{min-width:1em;margin:0}}
 /* the film keeps its own dark colors in both themes */
-.xr-film{fill:#121212}.xr-soft{fill:#242424}.xr-bone{fill:#5e5e5e}.xr-tb{fill:#7a7a7a;opacity:.5}.xr-tb2{fill:#3c3c3c;opacity:.45}
-.xr-cortex{fill:none;stroke:#8c8c8c;stroke-width:1.6;stroke-linejoin:round}
-.xr-lam{fill:#cfcfcf}.xr-pdl{fill:#2a2a2a}.xr-dentin{fill:#b2b2b2}.xr-enamel{fill:#ececec}.xr-pulp{fill:#4f4f4f}
-.xr-metal{fill:#fbfbfb}.xr-crown{fill:#e4e4e4;stroke:#fff;stroke-width:1.2}.xr-access{fill:#8a8a8a}.xr-bore{fill:#3c3c3c}
-.xr-dark{fill:#1d1d1d}.xr-dot{fill:#f3f3f3}
+.dc-film .xr-film{fill:#121212}.dc-film .xr-soft{fill:#242424}.dc-film .xr-bone{fill:#5e5e5e}.dc-film .xr-tb{fill:#7a7a7a;opacity:.5}.dc-film .xr-tb2{fill:#3c3c3c;opacity:.45}
+.dc-film .xr-cortex{fill:none;stroke:#8c8c8c;stroke-width:1.6;stroke-linejoin:round}
+.dc-film .xr-lam{fill:#cfcfcf}.dc-film .xr-pdl{fill:#2a2a2a}.dc-film .xr-dentin{fill:#b2b2b2}.dc-film .xr-enamel{fill:#ececec}.dc-film .xr-pulp{fill:#4f4f4f}
+.dc-film .xr-metal{fill:#fbfbfb}.dc-film .xr-crown{fill:#e4e4e4;stroke:#fff;stroke-width:1.2}.dc-film .xr-bore{fill:#3c3c3c}
+.dc-film .xr-dot{fill:#f3f3f3}
 /* the drawn view */
-.io-bg{fill:#3a1f24}.io-gum{fill:#e3959b}.io-mucosa{fill:#c9636d}
+.dc-view .io-bg{fill:#3a1f24}.dc-view .io-gum{fill:#e3959b}.dc-view .io-mucosa{fill:#c9636d}
 .dc-attached{fill:#eba3a8}.dc-attached.dc-inflamed{fill:#d9646c}.dc-attached.dc-fibrotic{fill:#e8b4b4}
 .dc-free{fill:#e79096;stroke:#c66b73;stroke-width:1}.dc-free.dc-inflamed{fill:#d4414c;stroke:#9c1f2b;stroke-width:1.4}.dc-free.dc-fibrotic{fill:#e6b1b1;stroke:#b78a8a}
 .dc-mucosa.dc-inflamed{fill:#b94853}
 .dc-stipple{fill:#f6c9cc;opacity:.7}
-.io-tooth{fill:#efe6d2;stroke:#9a8562;stroke-width:1.4;stroke-linejoin:round}.io-tooth.low{fill:#e6dcc4}.io-tooth.pfm{fill:#f4f2ea}
-.io-root{fill:#dcc08a;stroke:#a88b55;stroke-width:1}
-.io-margin{fill:none;stroke:#5c5f66;stroke-width:3;stroke-linecap:round}
+.dc-view .io-tooth{fill:#efe6d2;stroke:#9a8562;stroke-width:1.4;stroke-linejoin:round}.dc-view .io-tooth.low{fill:#e6dcc4}.dc-view .io-tooth.pfm{fill:#f4f2ea}
+.dc-view .io-root{fill:#dcc08a;stroke:#a88b55;stroke-width:1;stroke-linejoin:round}
+.dc-view .io-margin{fill:none;stroke:#5c5f66;stroke-width:3;stroke-linecap:round}
 .dc-blood{fill:#b3121f}.dc-pusdrop{fill:#efcf5a;stroke:#9a7b12;stroke-width:.6}
 .dc-plaque{fill:#f3efd8;opacity:.9}.dc-calc{fill:#c9b06a;stroke:#8d7435;stroke-width:.6}
-.io-lab{fill:#fff;font:600 11px var(--font-body)}
+.dc-view .io-lab{fill:#fff;font:600 11px var(--font-body)}
+/* "In the notes" buttons under an explanation */
+.qx-ref{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.qx-ref-lab{font-size:.78rem;font-weight:700;color:var(--ink-soft)}
+.qx-ref-btn{border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);color:var(--ink);font:500 .78rem var(--font-body);padding:4px 10px;cursor:pointer;min-height:32px;text-align:left}
+.qx-ref-btn:hover{border-color:var(--accent)}.qx-ref-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
