@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
+  run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways. Most were the top bars, which
+  the measured top bar (PR 235, its entry below) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no
+  longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding at 520 px and below), and
+  **Perio Review's** tables that scroll sideways take keyboard focus and are named for screen readers ("Antibiotics
+  (table)"). The device matrix (`tools/release/matrix.js`) now measures against the layout width, because a phone browser
+  zooms out to fit a page that's too wide, which hid the overflow from Chromium's phone emulation; it also names the
+  element that sticks out. Bug log BUG-015 to BUG-018.
 - **2026-11-05 (The drawn Patient Box case system for every hub; anatomy and realism, Claude Code)** — Sam: "I also want
   this system to be called for patient box questions in other hubs", "All teeth need to be anatomically correct. All
   variables need to be realistic", "Merge when ready". The case kit moved out of the Perio hub into **`widget/cases.js` +
