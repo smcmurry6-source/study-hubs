@@ -25,9 +25,11 @@ tags: [map]
   are live, archived or hidden: the dates and Sam's overrides, loaded by `index.html` and `review/`) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
-- `review/` — admin analytics page. Its **Live** tab shows who is studying now and its **Hubs** tab sets a hub live,
-  archived or hidden by hand, with an audit log ([admin-operations](admin-operations.md); `widget/archive.js` holds
-  the archive rules the dashboard, hubs and admin page share). Its **Recap** tab makes the shareable end-of-hub image (drawn by
+- `review/` — admin analytics page. Its **Insights** tab puts every hub (live and archived) side by side and pairs each
+  number with the decision it drives ([insights-dashboard](insights-dashboard.md), data from `migration_v49.sql`;
+  [analytics governance](analytics-governance.md)). Its **Live** view shows who is studying now and its **Hubs** view sets a
+  hub live, archived or hidden by hand, with an audit log ([admin-operations](admin-operations.md), `migration_v50.sql`;
+  `widget/archive.js` holds the archive rules the dashboard, hubs and admin page share). Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
   recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
   the hub page comes down, while `tools/dump-banks.js` can still read its bank.

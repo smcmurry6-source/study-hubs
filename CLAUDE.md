@@ -86,6 +86,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/preview-and-release-test.md
 
+@vault/rules/learner-data-privacy.md
+
 ## How-tos and reference
 
 @vault/how-to/narrate-with-kokoro.md

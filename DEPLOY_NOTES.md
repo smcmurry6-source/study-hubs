@@ -32,21 +32,44 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-04 (admin page: who's studying now, hub archive overrides, newest-first check-ins, Claude Code)** — Sam's ask:
-  safer admin operations. **Live tab** (`review/`): how many people used a hub in the last 3 minutes and, hub by hub, their
-  leaderboard names (Sam's call), never an id, email or section; it asks every 30 s only while the tab is open and visible.
-  **Hubs tab:** set any hub Live, Archived or Hidden on the dashboard by hand, until set back to Automatic or until an
-  optional end time (Sam's call), with a confirmation, a note, an audit log and a stale-tab check; nothing is deleted.
-  The rules live once in `widget/archive.js` (loaded by `index.html` and `review/`; `widget/v3.js`'s archived notice
-  follows them). **Surveys tab:** check-in groups sort by their newest check-in (they sorted by hub name), rows and
-  survey answers newest first with an id tie-break. `migration_v50.sql` (**not applied**: tier 3, waits for Sam's written
+- **2026-11-04 (admin page redesign; who's studying now, hub archive overrides, newest-first check-ins, Claude Code)** — Sam's
+  asks: safer admin operations, then "a full optimization of the admin page. Its clunky and not user friendly". **The page**
+  (`review/`) is rebuilt with the taste-skill's app-screen run: a sidebar of views (Overview, Live, Inbox; Insights, Time by
+  section, Questions, Clicks and features, Searches, Engagement; Exam check-ins, Surveys; Hubs on the dashboard, Recap),
+  each with its own address, title, a one-line finding and only the controls that apply; data loads per view instead of
+  18 queries at once; Overview says what is waiting on Sam; check-ins and searches have their own views; on a phone the
+  sidebar is a Menu sheet. #237's Insights tab moved in as a view, unchanged in what it computes. **Live view**: how many
+  people used a hub in the last 3 minutes and, hub by hub, their leaderboard names (Sam's call), never an id, email or
+  section; it asks every 30 s only while open and visible. **Hubs view:** set any hub Live, Archived or Hidden on the
+  dashboard by hand, until set back to Automatic or until an optional end time (Sam's call), with a confirmation, a note,
+  an audit log and a stale-tab check; nothing is deleted. The rules live once in `widget/archive.js` (loaded by
+  `index.html` and `review/`; `widget/v3.js`'s archived notice follows them). **Exam check-ins:** groups sort by their
+  newest check-in (they sorted by hub name, BUG-010), rows and survey answers newest first with an id tie-break.
+  `migration_v50.sql` (numbered v49 until #237 took that number; **not applied**: tier 3, waits for Sam's written
   approval): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
   `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
-  in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on
-  10-30 (PR #205, never merged). `sw.js` sh-v53. No About page entry (Sam: admin information stays off it). Tests: `tools/release/admin-ops.js`
-  and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js` (`run.js`, as `adminui`). How it works:
-  [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
+  in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on 10-30
+  (PR #205, never merged). `sw.js` sh-v53. No About page entry (Sam: admin information stays off it). Preview fixtures
+  for every admin view. Tests: `tools/release/admin-ops.js` and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js`
+  (`run.js`, as `adminui`). How it works: [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
 
+- **2026-11-04 (analytics governance and learner insights, Claude Code)** — Sam asked for an analytics governance and
+  learner-insights layer over every live and archived hub. **Admin page**: a new **Insights** tab (`review/`) puts every hub
+  side by side (scorecard, where time goes by canonical surface, spacing of retries, feature reach, student voice, data
+  quality); each number past its threshold (`INSIGHT_RULES`) turns orange and the card lists the decision it drives. Hubs
+  with fewer than 5 people are left out. The admin page now reads hub names, exam dates and live/archived status from
+  `HUBS` / `ARCHIVED_HUBS` in `index.html` instead of its own lists. **Database**: `migration_v49.sql` (applied; read-only:
+  `sh_surface`, `sh_insights`, `sh_insight_retries`, `sh_data_quality`, and admin wrappers `get_insights`,
+  `get_insight_retries`, `get_data_quality`); `supabase/schema.sql` refreshed. **Vault**: [analytics-governance](vault/reference/analytics-governance.md)
+  (start there), [event-taxonomy](vault/reference/event-taxonomy.md), [analytics-data-quality](vault/reference/analytics-data-quality.md),
+  [analytics-retention](vault/reference/analytics-retention.md) (a proposed schedule, nothing deleted: the free plan's 500 MB
+  is about 7 weeks away at the current rate; task `vault/tasks/2026-11-04-analytics-retention.md` waits on Sam),
+  [insights-dashboard](vault/reference/insights-dashboard.md) (the cards, the first reading, proposals for Sam), and a new
+  rule, [learner-data-privacy](vault/rules/learner-data-privacy.md). **About page**: "What the hubs record". Also
+  `tools/analytics-quality.sql`, a format breakdown and stale-id list in `tools/lessons-join.py`, and three standing
+  lessons in `LESSONS.md`. The preview answers the three admin calls with made-up numbers (`synthInsights()` in
+  `tools/preview/runtime/preview.js`), and `tools/release/rls-audit.sql` checks the new internal functions stay closed
+  to visitors (the live audit returned no findings after the migration).
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
   ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
   [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,

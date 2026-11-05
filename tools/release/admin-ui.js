@@ -60,7 +60,7 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(!first.some(n => /get_click_summary|get_search_terms|get_survey_results|get_feature_events|get_nuke_/.test(n)), `the Overview loads only its own data (it asked for ${[...new Set(first)].join(', ')})`);
     ok(first.filter(n => n === 'get_reports').length === 1, 'the sign-in check\'s reports are reused, not fetched twice');
     /* every view opens with its own title and no error */
-    for (const v of ['time', 'questions', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
+    for (const v of ['insights', 'time', 'questions', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
       await go(page, v);
       await page.waitForFunction(v => { const el = document.querySelector(`[data-panel=${v}]`); return el && !el.querySelector('[aria-busy=true]') && el.children.length; }, v, { timeout: 15000 });
       const nav = (await page.textContent(`.nav [data-tab=${v}]`)).replace(/\d+$/, '').trim(), h1 = (await page.textContent('#viewTitle')).trim();
