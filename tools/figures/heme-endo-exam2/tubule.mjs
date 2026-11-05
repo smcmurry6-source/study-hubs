@@ -101,14 +101,18 @@ const G = { CX: 300, CY: -190, TH: 18, RL: 292, RJ: 522, RB: 560, RW: 582, RO: 7
 function dg(px, R) { return px / R * 180 / Math.PI; }
 
 function sertoliOutline(ac, aL, aR) {
-  /* half widths (px) up the column; the flaps at R 516-528 reach the neighbors over the spermatogonia */
-  var up = [[G.RB + 1, 12], [546, 10.5], [533, 9.5], ["flap"], [503, 13], [484, 11.5], [458, 12.5], [432, 10.5], [404, 11.5], [378, 9.5], [350, 10], [326, 8.5], [306, 6.5]];
-  var left = [], right = [];
-  up.forEach(function (q) {
-    if (q[0] === "flap") { left.push([aL, 529], [aL, 516]); right.push([aR, 529], [aR, 516]); return; }
-    left.push([ac - dg(q[1], q[0]), q[0]]); right.push([ac + dg(q[1], q[0]), q[0]]);
-  });
-  var pts = left.concat([[ac, G.RL - 1]]).concat(right.reverse());
+  /* half widths (px) up the column; thin flaps at R 515-530 reach the neighbors over the spermatogonia */
+  var low = [[G.RB + 1, 12], [547, 10.5], [536, 9.5]], high = [[506, 12.5], [486, 11.5], [460, 12.5], [434, 10.5], [406, 11.5], [380, 9.5], [352, 10], [328, 8.5], [307, 6.5]];
+  function side(sg, aF) {
+    var o = [], i, a0 = ac + sg * dg(10, 531), a1 = ac + sg * dg(12, 512);
+    low.forEach(function (q) { o.push([ac + sg * dg(q[1], q[0]), q[0]]); });
+    for (i = 1; i <= 4; i++) o.push([a0 + (aF - a0) * i / 4, 529.5]);
+    o.push([aF, 522.5]);
+    for (i = 4; i >= 1; i--) o.push([a1 + (aF - a1) * i / 4, 515.5]);
+    high.forEach(function (q) { o.push([ac + sg * dg(q[1], q[0]), q[0]]); });
+    return o;
+  }
+  var pts = side(-1, aL).concat([[ac, G.RL - 1]]).concat(side(1, aR).reverse());
   return tbSm(pts.map(function (q) { return tbP(q[0], q[1], G); }));
 }
 
@@ -160,8 +164,10 @@ function staticParts() {
   });
   o.TJ = HOT("Occluding (tight) junctions between neighboring Sertoli cells, near their bases: the blood-testis barrier. They divide the epithelium into the basal compartment (the spermatogonia) and the adluminal compartment (spermatocytes and spermatids), protecting the developing gametes from the immune system.", tj);
   /* the germ cells that aren't followed: left gap, the two edge gaps; late spermatids at the Sertoli apices; sperm in the lumen */
-  var bg = [["dA", -6, 545], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -6.2, 414], ["sd", -7.9, 368], ["sd", -4.3, 362],
-    ["pA", -15.7, 546], ["ss", -15.3, 420], ["sd", -15.5, 364], ["B", 15.6, 546], ["ps", 15.4, 470], ["sd", 15.4, 366]];
+  var bg = [["B", -9.4, 547], ["dA", -6, 545], ["pA", -2.7, 546], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -8.9, 432], ["ss", -3.4, 428], ["ss", -6.3, 402],
+    ["sd", -8.5, 374], ["sd", -5.3, 368], ["sd", -2.6, 378], ["sd", -7.2, 349], ["sd", -3.9, 346],
+    ["pA", -15.7, 546], ["ps", -15.75, 470], ["ss", -15.3, 420], ["sd", -15.5, 364], ["sd", -15.1, 386],
+    ["B", 15.6, 546], ["ps", 15.4, 470], ["ss", 15.3, 420], ["sd", 15.4, 366], ["sd", 15.1, 388]];
   var cells = "";
   bg.forEach(function (c) { var p = tbP(c[1], c[2], G), flat = c[0] === "dA" || c[0] === "pA"; cells += HOT(INFO[c[0]], tbCell(c[0], p[0], p[1], -c[1], 1, 0, 0, 0)); });
   o.CELLS = cells;
@@ -254,14 +260,14 @@ function tbRender(st, D) {
   if (!cells) {
     var lh = v === "lh" || v === "fb", fsh = v === "fsh" || v === "fb";
     var capIn = D.tbArc(-D.TH, D.TH, D.RC, D, 28);
-    if (lh) o += D.tbFlow(capIn, 9, 7000, t, "tb-lh", 3.2) + D.tbFlow(D.P_LH1, 2, 2600, t, "tb-lh", 3.2) + D.tbFlow(D.P_LH2, 2, 2600, t, "tb-lh", 3.2, 0.5);
-    if (fsh) { o += D.tbFlow(capIn, 9, 7000, t, "tb-fsh", 3.2, 0.06); D.P_FSH.forEach(function (p, j) { o += D.tbFlow(p, 2, 3000, t, "tb-fsh", 3.2, j / 3); }); }
-    if (lh) { D.P_TIN.forEach(function (p, j) { o += D.tbFlow(p, 3, 3400, t, "tb-t", 3, j / 2); }); o += D.tbFlow(D.P_TOUT, 3, 3000, t, "tb-t", 3) + D.tbFlow(D.tbArc(9, D.TH, D.RC, D, 8), 2, 2400, t, "tb-t", 3); }
+    if (lh) o += D.tbFlow(capIn, 9, 7000, t, "tb-lh", 3.6) + D.tbFlow(D.P_LH1, 2, 2200, t, "tb-lh", 3.6) + D.tbFlow(D.P_LH2, 2, 2200, t, "tb-lh", 3.6, 0.5);
+    if (fsh) { o += D.tbFlow(capIn, 9, 7000, t, "tb-fsh", 3.6, 0.06); D.P_FSH.forEach(function (p, j) { o += D.tbFlow(p, 3, 3600, t, "tb-fsh", 3.6, j / 3); }); }
+    if (lh) { D.P_TIN.forEach(function (p, j) { o += D.tbFlow(p, 4, 4200, t, "tb-t", 3.4, j / 2); }); o += D.tbFlow(D.P_TOUT, 2, 2000, t, "tb-t", 3.4) + D.tbFlow(D.tbArc(9, D.TH, D.RC, D, 8), 2, 2400, t, "tb-t", 3.4); }
     if (fsh) {
       /* ABP up the Sertoli cells into the adluminal compartment, carrying testosterone; inhibin out to the blood */
       D.P_ABP.forEach(function (p, j) { for (var q = 0; q < 3; q++) { var uu = (((t / 4200) + q / 3 + j / 5) % 1 + 1) % 1, pt = D.tbAt(p, uu), al = Math.min(1, uu * 6, (1 - uu) * 6); o += '<g opacity="' + f1(al) + '"><circle class="tb-abp" cx="' + f1(pt[0]) + '" cy="' + f1(pt[1]) + '" r="3.4"/>' + (uu > 0.35 ? '<circle class="tb-t" cx="' + f1(pt[0] + 4.6) + '" cy="' + f1(pt[1] - 1) + '" r="2.4"/>' : "") + "</g>"; } });
-      D.P_INH.forEach(function (p, j) { o += D.tbFlow(p, 2, 3200, t, "tb-inh", 3, j / 3 + 0.2); });
-      o += D.tbFlow(D.tbArc(0, D.TH, D.RC, D, 12), 3, 3600, t, "tb-inh", 3, 0.3);
+      D.P_INH.forEach(function (p, j) { o += D.tbFlow(p, 2, 3200, t, "tb-inh", 3.4, j / 3 + 0.2); });
+      o += D.tbFlow(D.tbArc(0, D.TH, D.RC, D, 12), 3, 3600, t, "tb-inh", 3.4, 0.3);
     }
     /* the loop to the anterior pituitary, under the wedge */
     o += '<path class="tb-loop" d="' + D.tbPath(D.LOOP_IN) + '"/><path class="tb-loop" d="' + D.tbPath(D.LOOP_OUT) + '"/>';
@@ -273,39 +279,37 @@ function tbRender(st, D) {
       o += D.HOT("Testosterone lowers LH secretion by negative feedback (and, in Dr. Madison's lecture, GnRH from the hypothalamus too).", '<g class="tb-minus"><circle cx="352" cy="566" r="7"/><path d="M348.5 566H355.5"/></g>' + T(364, 570, "testosterone ⊣ LH", "s bad", "start"));
       o += D.HOT("Inhibin, made by the Sertoli cells, blocks FSH release by the anterior pituitary.", '<g class="tb-minus"><circle cx="352" cy="588" r="7"/><path d="M348.5 588H355.5"/></g>' + T(364, 592, "inhibin ⊣ FSH", "s bad", "start"));
     }
-    /* names on the flows */
-    if (lh) o += T(122, 520, "LH", "s tb-lht", "start") + D.L(150, 498, "testosterone", 352, 520, "start", "s tb-tt");
-    if (fsh) o += T(122, (lh ? 536 : 520), "FSH", "s tb-fsht", "start") + (v === "fsh" ? D.L(392, 220, "ABP + testosterone", 314, 300, "start", "s tb-abpt") + T(392, 236, "in the tubule", "s mut", "start") : "") + D.L(150, (lh ? 482 : 498), "inhibin", 286, 590 - 0, "start", "s tb-inht");
+    /* a color key, above the loop */
+    var key = v === "lh" ? [["tb-lh", "LH"], ["tb-t", "testosterone"]] : v === "fsh" ? [["tb-fsh", "FSH"], ["tb-abp", "ABP"], ["tb-t", "testosterone"], ["tb-inh", "inhibin"]] : [["tb-lh", "LH"], ["tb-fsh", "FSH"], ["tb-t", "testosterone"], ["tb-inh", "inhibin"]];
+    key.forEach(function (k, j) { var x = 30 + (j % 2) * 64 + (j % 2 && key[j - 1][1].length > 6 ? 40 : 0), y = 520 + Math.floor(j / 2) * 16; o += '<circle class="' + k[0] + '" cx="' + x + '" cy="' + (y - 4) + '" r="4"/>' + T(x + 8, y, k[1], "tb-xs", "start"); });
   }
-  /* ---------- labels ---------- */
-  o += D.L(30, 380, "basement", 120, 372, "start", "s") + T(30, 394, "membrane", "s", "start");
-  o += D.L(30, 430, "myoid cell", 114, 420, "start", "s");
-  o += D.L(30, 470, "Leydig cells", 176, 452, "start", "s");
-  o += T(446, 448, "capillary", "s tb-onv", "end");
+  /* ---------- labels: left ones end on their part (leaders run right), right ones start on it ---------- */
+  o += D.L(104, 374, "basement", 141, 347, "end", "s") + T(104, 388, "membrane", "s", "end");
+  o += D.L(96, 414, "myoid cell", 148, 361, "end", "s");
+  o += '<path class="lead" d="M254 424L218 421M346 424L372 416"/><circle class="dot" cx="218" cy="421" r="1.8"/><circle class="dot" cx="372" cy="416" r="1.8"/>' + T(300, 428, "Leydig cells", "s", "middle");
+  o += T(300, 475, "capillary", "s tb-onv", "middle");
   o += D.L(452, 38, "lumen", 352, 40, "start", "s");
+  o += D.L(152, 240, "Sertoli cell", 197, 244, "end", "s b");
+  o += D.L(128, 312, "tight junction", 245, 329, "end", "s");
   if (cells) {
-    if (st.step < 5) o += D.L(8, 158, "early spermatids", 196, 175, "start", "s");
-    o += D.L(8, 206, "secondary", 222, 220, "start", "s") + T(8, 220, "spermatocyte", "s", "start");
-    o += D.L(8, 256, "primary", 216, 275, "start", "s") + T(8, 270, "spermatocyte", "s", "start");
-    o += D.L(8, 312, "tight junction", 239, 333, "start", "s");
-    o += D.L(8, 344, "spermatogonia", 250, 357, "start", "s");
-    o += D.L(408, 106, "late", 336, 114, "start", "s") + T(408, 120, "spermatids", "s", "start");
-  } else {
-    o += D.L(8, 240, "Sertoli cell", 244, 268, "start", "s b");
-    o += D.L(8, 312, "tight junction", 239, 333, "start", "s");
+    if (st.step < 5) o += D.L(178, 158, "early spermatids", 194, 158, "end", "s");
+    o += D.L(168, 206, "secondary", 176, 211, "end", "s") + T(168, 220, "spermatocyte", "s", "end");
+    o += D.L(148, 262, "primary", 156, 258, "end", "s") + T(148, 276, "spermatocyte", "s", "end");
+    o += D.L(118, 346, "spermatogonia", 136, 333, "end", "s");
+    o += D.L(408, 106, "late", 366, 113, "start", "s") + T(408, 120, "spermatids", "s", "start");
   }
-  if (st.comp || (cells && st.step === 2)) o += D.L(430, 186, "adluminal", 404, 242, "start", "s tb-adt") + T(430, 200, "compartment", "s tb-adt", "start") + D.L(470, 300, "basal", 452, 334, "start", "s tb-bat");
+  if (st.comp || (cells && st.step === 2)) o += D.L(430, 186, "adluminal", 404, 242, "start", "s tb-adt") + T(430, 200, "compartment", "s tb-adt", "start") + D.L(472, 322, "basal", 458, 333, "start", "s tb-bat");
   /* ---------- the clone's chromosome count ---------- */
   if (cells && trk.length) {
     var top = trk[0], cy = 0; trk.forEach(function (q) { cy += q[1]; if (q[0] + q[2] > top[0] + top[2]) top = q; }); cy /= trk.length;
     var edge = D.CX + (cy - D.CY) * Math.tan(D.TH * Math.PI / 180) + 8, n2 = st.step < 3 || (st.step === 3 && e < 0.5);
     o += '<path class="lead" d="M' + f1(edge) + " " + f1(cy) + "L" + f1(top[0] + top[2] + 2) + " " + f1(top[1]) + '"/><rect class="tb-badge" x="' + f1(edge) + '" y="' + f1(cy - 11) + '" width="30" height="22" rx="11"/>' + T(edge + 15, cy + 4.5, n2 ? "2n" : "1n", "b", "middle");
     /* the ladder */
-    var lad = ["mitosis", "meiosis I", "meiosis II", "spermiogenesis", "spermiation"], sub = ["2n stays 2n", "2n → 1n", "1n stays 1n", "1n, no division", "1n, released"], at = [1, 3, 4, 5, 6];
+    var lad = ["mitosis", "meiosis I", "meiosis II", "spermiogenesis", "spermiation"], sub = ["2n stays 2n", "2n → 1n", "1n stays 1n", "1n, remodeled", "1n, released"], at = [1, 3, 4, 5, 6];
     o += T(260, 538, "the outlined clone, and its chromosome count", "s mut", "middle");
     lad.forEach(function (nm, j) {
       var x = 6 + j * 102, cur = at[j] === st.step, done = at[j] < st.step;
-      o += '<rect class="tb-chip' + (cur ? " is-cur" : done ? " is-done" : "") + '" x="' + x + '" y="550" width="98" height="44" rx="8"/>' + T(x + 49, 568, nm, "s" + (cur ? " b" : done ? "" : " mut"), "middle") + T(x + 49, 584, sub[j], "s" + (cur ? " hot-t" : " mut"), "middle");
+      o += '<rect class="tb-chip' + (cur ? " is-cur" : done ? " is-done" : "") + '" x="' + x + '" y="550" width="98" height="44" rx="8"/>' + T(x + 49, 568, nm, "tb-xs" + (cur ? " b" : done ? "" : " mut"), "middle") + T(x + 49, 584, sub[j], "tb-xs" + (cur ? " hot-t" : " mut"), "middle");
     });
   }
   /* the spermiogenesis zoom (steps 5 and 6): a round spermatid, then the spermatozoon it becomes, color-keyed */
@@ -329,16 +333,16 @@ export default function tubule() {
     INFO, CL, STEPS, VIEWS, ANIM: true, PLAYMS: 2600,
     INIT: { view: "cells", step: 0, comp: false }, STEPKEY: "step", STEPMAX: 6,
     P_LH1: [P(-9.4, 655), P(-9.6, 646)], P_LH2: [P(8.6, 654), P(8.8, 645)],
-    P_FSH: [[P(-12, 654), P(-12, 590), P(-12, 556)], [P(0, 654), P(0, 590), P(0, 556)], [P(12, 654), P(12, 590), P(12, 556)]],
+    P_FSH: [[P(-14.6, 654), P(-14.6, 596), P(-12.2, 558)], [P(-1.6, 654), P(-1.4, 596), P(-0.2, 558)], [P(14.2, 654), P(14.2, 596), P(12.2, 558)]],
     P_TIN: [[P(-8.6, 604), P(-7, 582), P(-6.2, 556), P(-6, 500)], [P(7.6, 600), P(6.4, 580), P(6, 556), P(6.2, 504)]],
     P_TOUT: [P(9.6, 646), P(9.4, 655)],
     P_ABP: [[P(-12, 520), P(-12, 420), P(-12, 330), P(-12, 270)], [P(0, 520), P(0, 420), P(0, 330), P(0, 262)], [P(12, 520), P(12, 420), P(12, 330), P(12, 270)]],
-    P_INH: [[P(-12.6, 556), P(-13.2, 600), P(-13.6, 654)], [P(0.6, 556), P(0.9, 600), P(1.2, 654)], [P(12.6, 556), P(13.1, 600), P(13.6, 654)]],
+    P_INH: [[P(-11.4, 558), P(-13.6, 596), P(-13.6, 654)], [P(0.6, 558), P(1.6, 596), P(1.8, 654)], [P(12.8, 558), P(15.2, 596), P(15.4, 654)]],
     LOOP_IN: [[180, 576], [16, 576], [16, P(-G.TH, G.RC)[1]], P(-G.TH, G.RC)],
     LOOP_OUT: [P(G.TH, G.RC), [512, P(G.TH, G.RC)[1]], [512, 576], [340, 576]],
   });
   return makeFig({
-    id: "tubule", lec: "mhisto", fig: "Fig", short: "Seminiferous tubule", hint: "step a clone · switch views · hover a cell",
+    id: "tubule", lec: "mhisto", fig: "Fig 5", short: "Seminiferous tubule", hint: "step · hover",
     title: "Inside a seminiferous tubule",
     caption: "A wedge cut from a tubule in cross-section: the lumen (the tubule's center) at the top, the basement membrane and the interstitium at the bottom. Follow one clone from spermatogonium to sperm, or switch to the hormones that run the testis.",
     W: 520, H: 612, label: "A wedge of a seminiferous tubule in cross-section: Sertoli cells from the basement membrane to the lumen with tight junctions near their bases, germ cells from spermatogonia to spermatozoa, the wall with myoid cells, and Leydig cells and a capillary in the interstitium.",
