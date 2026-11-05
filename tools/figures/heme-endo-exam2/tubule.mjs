@@ -215,7 +215,7 @@ const STEPS = [
 const VIEWS = {
   lh: { say: "LH, from the anterior pituitary, binds receptors on the Leydig cells, outside the tubule, and starts their production of testosterone, which stimulates sperm development. Testosterone goes into the tubule and out into the blood.", ro: "LH → Leydig → testosterone" },
   fsh: { say: "FSH acts on the Sertoli cells, inside the tubule. They make androgen-binding protein (ABP), which binds testosterone and keeps it concentrated in the tubule, and inhibin. Spermatogenesis needs both FSH and that high testosterone.", ro: "FSH → Sertoli → ABP, inhibin" },
-  fb: { say: "The brakes, by negative feedback on the anterior pituitary: testosterone lowers LH secretion (Dr. Madison adds GnRH from the hypothalamus), and inhibin from the Sertoli cells blocks FSH release. Testosterone taken from outside switches LH down, and the Leydig cells lose their stimulus.", ro: "testosterone ⊣ LH · inhibin ⊣ FSH" },
+  fb: { say: "The brakes, by negative feedback on the anterior pituitary: testosterone lowers LH secretion (Dr. Madison adds GnRH from the hypothalamus), and inhibin from the Sertoli cells blocks FSH release. Testosterone taken from outside switches LH down, and the Leydig cells lose their stimulus.", ro: "T ⊣ LH · inhibin ⊣ FSH" },
 };
 
 /* ---------- live drawing ---------- */

@@ -177,7 +177,7 @@ function hgRender(st, D) {
   o += HOT("Aromatase (estrogen synthase) turns testosterone into estradiol. From puberty on it is in the Leydig cells, driven by LH; in the fetus and newborn it is in the Sertoli cells, driven by FSH.",
     '<path class="hg-e2l" d="M96 466L84 486"/><circle class="hg-e2" cx="88" cy="479" r="2"/>' + T(70, 500, "estradiol", "hg-xs hg-e2t", "start") + T(70, 513, "(aromatase)", "hg-xs mut", "start"));
   if (lv.itt) o += hgChip(154, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
-  o += hgChip(312, 320, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
+  o += hgChip(312, 325, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
   o += "</g>";
 
   /* ----- hormone dots ----- */
