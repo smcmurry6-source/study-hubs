@@ -18,8 +18,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   answer text, picture questions use `figAfter`, `recordAnswer` passes select-all picks. Since 2026-11-03 it has `two()`,
   `tf()`, `nums()`, `mq()` and `mm()`.
 - **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
-  (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation from the
-  slides until the class part is posted, as its `note` says), S9 `upcoming` (exam-review guide only). Any session going
+  (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
+  dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 `upcoming` (exam-review guide only). Any session going
   to taught needs the full set: [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
   [numbered-statements](../rules/numbered-statements.md), [high-likelihood-topics](../rules/high-likelihood-topics.md).
 - **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
@@ -38,7 +38,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   unrealistic or its `expect` disagrees with them. A question names its case in `pcase`, picks its pictures with
   `pfig` (and hides a row that would give its answer away: `hide.cal`, `hide.furc`, `hide.mob`) and lists its `ref`
   links ("In the notes"). Write every new Patient Box item this way: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
-- **Narration:** both levels for every session; **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
+- **Narration:** both levels for every session, made with `python3 tools/narrate.py hubs/perio/index.html --lec <id>
+  --force` (it reads perio's template-literal `READINGS['<id>']` blocks since 2026-11-05; `--text` shows what it will say); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
 - **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
@@ -66,8 +67,13 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) ·
-  [S8 host modulation](../tasks/2026-11-03-perio-s8-host-modulation-class.md) ·
   [S9](../tasks/2026-11-03-perio-s9-plastic-esthetics.md)
+- S8's dosing chart (the last table in Dr. Litz's slides, which he said to know for the exam) differs from his
+  drug-by-drug slides for clindamycin (qid × 10 days vs tid × 7), doxycycline (a double first-day dose) and Augmentin
+  (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Its meal-timing
+  column couldn't be read reliably from the PDF text, so it isn't in the hub.
+- Diagram candidate never put to Sam: the S8 host-response flowchart (microbial challenge → host response → cytokines and
+  PGE2 → breakdown, the vicious cycle) with where NSAIDs, Periostat and bisphosphonates act.
 
 History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
