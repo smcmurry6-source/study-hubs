@@ -1038,11 +1038,7 @@ tf("dm-tf-8", "dmpharm", "rec", "Once someone has prediabetes, progressing to ty
   "The professor said the opposite: it is not a given that prediabetes becomes diabetes.",
   "Prediabetes can be reversed: diet, lifestyle change and weight loss bring many people back to normal numbers.");
 
-nums("dm-num-5", "dmpharm", "rec", "Each result below comes from a different patient. Which results fall in the diabetic range?",
-  ["HbA1c 6.7%", "Fasting plasma glucose 118 mg/dL", "Glucose 215 mg/dL 2 hours into an oral glucose tolerance test", "HbA1c 5.9%"],
-  [true, false, true, false], [[1, 3, 4], [2, 3], [3]],
-  "Diabetic range: A1C 6.5 percent or higher, fasting glucose 126 mg/dL or higher, a 2-hour oral glucose tolerance value of 200 or higher, or a random glucose above 200. A fasting glucose of 100 to 125 and an A1C of 5.7 to 6.4 are prediabetes.",
-  ["an A1C of 6.7 percent is above the 6.5 percent cutoff.", "118 mg/dL is in the prediabetes window of 100 to 125; the diabetic cutoff is 126.", "a 2-hour value of 200 mg/dL or more is diabetic; a working pancreas brings it below 200.", "5.9 percent is prediabetes (5.7 to 6.4), not diabetes."]);
+nums("dm-num-5", "dmpharm", "rec", "Each result below comes from a different patient. Which results fall in the diabetic range?", ["Fasting plasma glucose 118 mg/dL","HbA1c 6.7%","Glucose 215 mg/dL 2 hours into an oral glucose tolerance test","HbA1c 5.9%"], [false,true,true,false], [[2,3,4],[1,3],[3]], "Diabetic range: A1C 6.5 percent or higher, fasting glucose 126 mg/dL or higher, a 2-hour oral glucose tolerance value of 200 or higher, or a random glucose above 200. A fasting glucose of 100 to 125 and an A1C of 5.7 to 6.4 are prediabetes.", ["118 mg/dL is in the prediabetes window of 100 to 125; the diabetic cutoff is 126.","an A1C of 6.7 percent is above the 6.5 percent cutoff.","a 2-hour value of 200 mg/dL or more is diabetic; a working pancreas brings it below 200.","5.9 percent is prediabetes (5.7 to 6.4), not diabetes."]);
 
 two("dm-2s-1", "dmpharm", "rec", "Type 1 diabetes usually results from autoimmune destruction of the beta cells.", "In type 2 diabetes the tissues respond normally to insulin, but too little is made.", true, false,
   "Type 1 is absolute insulin deficiency, so the treatment is insulin. Type 2 is peripheral insulin resistance plus an inadequate secretory response, and with time a person with type 2 can also stop making insulin.",
@@ -1439,11 +1435,7 @@ two("dm-2s-7", "dmpharm", "rec", "SGLT2 inhibitors induce glucosuria in a dose-d
   "the slide says SGLT2 inhibition induces glucosuria in a dose-dependent manner.",
   "the listed effect is hyperkalemia, a high potassium, because losing sodium through these transporters tends to preserve potassium.");
 
-nums("dm-num-3", "dmpharm", "slides", "Which statements about SGLT2 inhibitors are true?",
-  ["They lower blood pressure.", "Their effect depends on beta cells that can still make insulin.", "Rare euglycemic DKA is among their warnings.", "Empagliflozin and canagliflozin have shown positive cardiovascular outcomes."],
-  [true, false, true, true], [[1, 2, 3], [1, 2, 4], [1, 3]],
-  "SGLT2 inhibitors work in the kidney, independent of insulin, so they can be added to any other antidiabetic drug. They lower blood pressure through the osmotic diuresis, rarely cause hypoglycemia and, for empagliflozin and canagliflozin, improve cardiovascular outcomes; rare euglycemic DKA is among the warnings.",
-  ["their diuretic effect lowers blood pressure, a listed advantage.", "they block glucose reabsorption in the kidney, so they work without the beta cells and can be added to any other agent.", "euglycemic DKA is on the slide as a rare warning.", "positive cardiovascular outcomes with empagliflozin and canagliflozin are a listed advantage."]);
+nums("dm-num-3", "dmpharm", "slides", "Which statements about SGLT2 inhibitors are true?", ["Their effect depends on beta cells that can still make insulin.","They lower blood pressure.","Rare euglycemic DKA is among their warnings.","Empagliflozin and canagliflozin have shown positive cardiovascular outcomes."], [false,true,true,true], [[1,2,3],[1,2,4],[2,3]], "SGLT2 inhibitors work in the kidney, independent of insulin, so they can be added to any other antidiabetic drug. They lower blood pressure through the osmotic diuresis, rarely cause hypoglycemia and, for empagliflozin and canagliflozin, improve cardiovascular outcomes; rare euglycemic DKA is among the warnings.", ["they block glucose reabsorption in the kidney, so they work without the beta cells and can be added to any other agent.","their diuretic effect lowers blood pressure, a listed advantage.","euglycemic DKA is on the slide as a rare warning.","positive cardiovascular outcomes with empagliflozin and canagliflozin are a listed advantage."]);
 
 mq("dm-ex-sglt2", "dmpharm", "rec", "Which is NOT an expected effect of an SGLT2 inhibitor such as dapagliflozin?",
   [["Frequent hypoglycemia", "Hypoglycemia is rare with SGLT2 inhibitors; they lower glucose without touching insulin."],
@@ -1515,18 +1507,7 @@ tf("p1-tf-lobes", "path1", "slides",
   "Secretory epithelial cells make up the anterior lobe, the adenohypophysis, not the posterior lobe.",
   "The posterior lobe is unmyelinated nerve fibers with neurosecretory granules of stored hormones, plus pituicytes.");
 
-nums("p1-num-cells", "path1", "slides",
-  "Which statements about the anterior pituitary are true?",
-  ["It has 5 cell types that make 7 hormones.",
-   "Corticotrophs make both ACTH and MSH.",
-   "Thyrotrophs make both TSH and prolactin.",
-   "Gonadotrophs make both FSH and LH."],
-  [true, true, false, true], [[1, 2], [1, 2, 3, 4], [2, 4]],
-  "Five cell types make seven hormones because two of them make a pair: corticotrophs (ACTH and MSH) and gonadotrophs (FSH and LH). TRH releases both TSH and prolactin, but from two different cells: thyrotrophs and mammotrophs.",
-  ["somatotrophs, mammotrophs, corticotrophs, thyrotrophs and gonadotrophs make 7 hormones between them.",
-   "corticotrophs make ACTH and MSH.",
-   "thyrotrophs make only TSH; prolactin comes from mammotrophs, even though TRH releases both.",
-   "gonadotrophs make FSH and LH."]);
+nums("p1-num-cells", "path1", "slides", "Which statements about the anterior pituitary are true?", ["Thyrotrophs make both TSH and prolactin.","Corticotrophs make both ACTH and MSH.","It has 5 cell types that make 7 hormones.","Gonadotrophs make both FSH and LH."], [false,true,true,true], [[2,3],[1,2,3,4],[2,4]], "Five cell types make seven hormones because two of them make a pair: corticotrophs (ACTH and MSH) and gonadotrophs (FSH and LH). TRH releases both TSH and prolactin, but from two different cells: thyrotrophs and mammotrophs.", ["thyrotrophs make only TSH; prolactin comes from mammotrophs, even though TRH releases both.","corticotrophs make ACTH and MSH.","somatotrophs, mammotrophs, corticotrophs, thyrotrophs and gonadotrophs make 7 hormones between them.","gonadotrophs make FSH and LH."]);
 
 match("p1-match-hypoth", "path1", "slides",
   "Match each hypothalamic hormone to its effect on the anterior pituitary.",
@@ -2606,19 +2587,7 @@ tf("p2-tf-12", "path2", "slides", "About one third of patients with 21-hydroxyla
   "One third is the slide's figure for sodium wasting from aldosterone deficiency.",
   "This is the slide's own figure: a third have sodium wasting.");
 
-nums("p2-num-5", "path2", "rec",
-  "Which statements about congenital adrenal hyperplasia are true?",
-  ["It is a group of autosomal recessive disorders.",
-   "Each form is a defect in an enzyme involved in cortisol biosynthesis.",
-   "17-hydroxylase deficiency is the most common form.",
-   "Glucocorticoids treat it through negative feedback that lowers ACTH."],
-  [true, true, false, true],
-  [[1, 2, 3], [1, 4], [2, 4]],
-  "CAH is a group of autosomal recessive defects in an enzyme of cortisol biosynthesis. 21-hydroxylase deficiency is the most common form (androgen excess); 17-hydroxylase deficiency is less common (androgen deficiency, sodium retention, hypertension). All forms are treated with glucocorticoids.",
-  ["each form is inherited recessively, with a defective copy from each parent.",
-   "the defect is in an enzyme on the way to cortisol, which is why these patients are short of cortisol.",
-   "21-hydroxylase deficiency is the most common form; 17-hydroxylase deficiency is less common.",
-   "giving glucocorticoid lowers ACTH and quiets the androgen excess."]);
+nums("p2-num-5", "path2", "rec", "Which statements about congenital adrenal hyperplasia are true?", ["17-hydroxylase deficiency is the most common form.","Each form is a defect in an enzyme involved in cortisol biosynthesis.","It is a group of autosomal recessive disorders.","Glucocorticoids treat it through negative feedback that lowers ACTH."], [false,true,true,true], [[1,2,3],[3,4],[2,4]], "CAH is a group of autosomal recessive defects in an enzyme of cortisol biosynthesis. 21-hydroxylase deficiency is the most common form (androgen excess); 17-hydroxylase deficiency is less common (androgen deficiency, sodium retention, hypertension). All forms are treated with glucocorticoids.", ["21-hydroxylase deficiency is the most common form; 17-hydroxylase deficiency is less common.","the defect is in an enzyme on the way to cortisol, which is why these patients are short of cortisol.","each form is inherited recessively, with a defective copy from each parent.","giving glucocorticoid lowers ACTH and quiets the androgen excess."]);
 
 mq("p2-cah-newborn", "path2", "hub",
   "A 10-day-old girl had an enlarged clitoris at birth and is now vomiting and feeding poorly. Her sodium is 126 and potassium 6.6 mmol/L. Which best explains both findings?",
@@ -2858,11 +2827,7 @@ tf("dc-tf-hypo-epi", "dental", "slides", "The caution about increased sensitivit
   "It is hyperthyroidism, not hypothyroidism, that makes patients overly sensitive to epinephrine.",
   "The epinephrine caution belongs to hyperthyroidism; the statement swaps hyper for hypo.");
 
-nums("dc-thy-num", "dental", "slides", "Which pairings of thyroid condition and dental consideration are on Dr. Taylor's slides?",
-  ["Hyperthyroidism: accelerated tooth eruption in children", "Hyperthyroidism: delayed wound healing", "Hypothyroidism: delayed eruption", "Hypothyroidism: macroglossia"],
-  [true, false, true, true], [[1, 2, 3], [1, 3], [2, 3, 4]],
-  "Hyperthyroidism: increased sensitivity to epinephrine, avoid excessive vasoconstrictor when uncontrolled, accelerated eruption in children. Hypothyroidism: delayed eruption, macroglossia, delayed wound healing.",
-  ["accelerated eruption in children is on the hyperthyroidism slide.", "delayed wound healing is listed for hypothyroidism, not hyperthyroidism.", "delayed eruption is on the hypothyroidism slide.", "macroglossia is on the hypothyroidism slide."]);
+nums("dc-thy-num", "dental", "slides", "Which pairings of thyroid condition and dental consideration are on Dr. Taylor's slides?", ["Hyperthyroidism: delayed wound healing","Hyperthyroidism: accelerated tooth eruption in children","Hypothyroidism: delayed eruption","Hypothyroidism: macroglossia"], [false,true,true,true], [[1,2,3],[2,3],[1,3,4]], "Hyperthyroidism: increased sensitivity to epinephrine, avoid excessive vasoconstrictor when uncontrolled, accelerated eruption in children. Hypothyroidism: delayed eruption, macroglossia, delayed wound healing.", ["delayed wound healing is listed for hypothyroidism, not hyperthyroidism.","accelerated eruption in children is on the hyperthyroidism slide.","delayed eruption is on the hypothyroidism slide.","macroglossia is on the hypothyroidism slide."]);
 
 nums("dc-storm-num", "dental", "slides", "Which statements about thyroid storm are true?",
   ["It is also called thyroid crisis or thyrotoxic crisis.", "It occurs when the gland releases a large amount of hormone in a short time.", "The heart rate can exceed 140 beats per minute.", "A low body temperature is one of its signs."],
@@ -3158,11 +3123,7 @@ mq("dc-preg", "dental", "hub", "Which pair of diagnoses best fits her findings?"
   "Pregnancy brings pregnancy gingivitis and the pyogenic granuloma, the \"pregnancy tumor\". Puberty increases gingival inflammation; menopause brings xerostomia, altered taste and osteoporosis implications.",
   {pbox: [["Patient", "29-year-old woman, 24 weeks pregnant"], ["Medical history", "No other conditions"], ["Complaint", "Gums bleed when she brushes; a lump on her gum"], ["Exam", "Red, swollen gingiva; a raised gingival mass between two lower teeth"]]});
 
-nums("dc-repro-num", "dental", "slides", "Which pairings of life stage and oral effect are on Dr. Taylor's reproductive endocrinology slide?",
-  ["Puberty: increased gingival inflammation", "Menopause: pyogenic granuloma", "Menopause: xerostomia and altered taste", "Menopause: osteoporosis implications"],
-  [true, false, true, true], [[1, 2, 3], [1, 2, 3, 4], [1, 3]],
-  "Puberty: more gingival inflammation. Pregnancy: pregnancy gingivitis and pyogenic granuloma (the pregnancy tumor). Menopause: xerostomia, altered taste and osteoporosis implications.",
-  ["puberty brings increased gingival inflammation.", "the pyogenic granuloma, the pregnancy tumor, goes with pregnancy.", "xerostomia and altered taste are listed for menopause.", "osteoporosis implications are listed for menopause."]);
+nums("dc-repro-num", "dental", "slides", "Which pairings of life stage and oral effect are on Dr. Taylor's reproductive endocrinology slide?", ["Menopause: pyogenic granuloma","Puberty: increased gingival inflammation","Menopause: xerostomia and altered taste","Menopause: osteoporosis implications"], [false,true,true,true], [[1,2,3],[1,2,3,4],[2,3]], "Puberty: more gingival inflammation. Pregnancy: pregnancy gingivitis and pyogenic granuloma (the pregnancy tumor). Menopause: xerostomia, altered taste and osteoporosis implications.", ["the pyogenic granuloma, the pregnancy tumor, goes with pregnancy.","puberty brings increased gingival inflammation.","xerostomia and altered taste are listed for menopause.","osteoporosis implications are listed for menopause."]);
 
 tf("dc-tf-puberty", "dental", "slides", "Xerostomia and altered taste are the oral effects Dr. Taylor links to puberty.", false,
   "Xerostomia and altered taste are menopause effects (with osteoporosis implications). Puberty's oral effect is increased gingival inflammation.",
@@ -3290,19 +3251,7 @@ mq("mh-amh", "mhisto", "slides",
    ["The spermatogonia enter the cell cycle years early, long before puberty", "Spermatogonia start dividing at puberty under testosterone; AMH plays no part in that on his slides."]],
   "Sertoli cells make anti-Müllerian hormone, which prevents development of the Müllerian duct (the precursor of the female reproductive system). Without it, that duct is not suppressed.");
 
-nums("mh-num-sertoli", "mhisto", "slides",
-  "Which statements about Sertoli cells are true?",
-  ["They are columnar, reach from the basement membrane to the lumen, and have a generally ovoid nucleus.",
-   "Tight junctions between neighboring Sertoli cells divide the tubule into basal and adluminal compartments.",
-   "They respond to LH by making androgen-binding protein.",
-   "They make anti-Müllerian hormone, which prevents development of the Müllerian duct."],
-  [true, true, false, true],
-  [[1, 2], [1, 2, 3, 4], [2, 3, 4]],
-  "Sertoli cells: tall columnar with an ovoid nucleus, joined by tight junctions (the blood-testis barrier), respond to FSH (ABP), make AMH and inhibin, phagocytose shed cytoplasm, and stop dividing in the mature testis.",
-  ["that is his description of their shape and nucleus.",
-   "those occluding junctions form the blood-testis barrier.",
-   "Sertoli cells respond to FSH, which drives ABP; LH acts on the Leydig cells.",
-   "AMH from Sertoli cells blocks the Müllerian duct, the precursor of the female tract."]);
+nums("mh-num-sertoli", "mhisto", "slides", "Which statements about Sertoli cells are true?", ["They respond to LH by making androgen-binding protein.","Tight junctions between neighboring Sertoli cells divide the tubule into basal and adluminal compartments.","They are columnar, reach from the basement membrane to the lumen, and have a generally ovoid nucleus.","They make anti-Müllerian hormone, which prevents development of the Müllerian duct."], [false,true,true,true], [[2,3],[1,2,3,4],[1,2,4]], "Sertoli cells: tall columnar with an ovoid nucleus, joined by tight junctions (the blood-testis barrier), respond to FSH (ABP), make AMH and inhibin, phagocytose shed cytoplasm, and stop dividing in the mature testis.", ["Sertoli cells respond to FSH, which drives ABP; LH acts on the Leydig cells.","those occluding junctions form the blood-testis barrier.","that is his description of their shape and nucleus.","AMH from Sertoli cells blocks the Müllerian duct, the precursor of the female tract."]);
 
 tf("mh-tf-sertoli-divide", "mhisto", "slides",
   "Sertoli cells keep dividing throughout adult life to keep pace with the germ cells they support.",
@@ -3345,19 +3294,7 @@ mq("mh-stages", "mhisto", "slides",
    ["The second tubule lost its blood-testis barrier, so immune cells cleared its spermatids", "Nothing points to damage; a normal testis shows different stages from one tubule cut to the next."]],
   "All stages occur in the seminiferous tubules, but at any one spot the tubule is at one stage of a process that takes about 74 days on his slide. Cut across many tubules and you see many different mixes of cells.");
 
-nums("mh-num-spg", "mhisto", "slides",
-  "On Dr. Herr's slides, which statements about spermatogenesis are true?",
-  ["One complete round of spermatogenesis takes about 74 days.",
-   "Spermiogenesis is the division in which diploid primary spermatocytes become haploid spermatids.",
-   "Different tubule cross-sections show different mixes of cells because the stages vary along the tubule.",
-   "Sperm leaving the testis are fully mature and ready to fertilize an ovum."],
-  [true, false, true, false],
-  [[1, 2], [1, 2, 3], [3]],
-  "About 74 days per round, all stages in the tubules but at different stages along their length. The division that makes haploid spermatids is meiosis; spermiogenesis remodels them afterward. Sperm finish maturing in the epididymis and are capacitated in the female tract.",
-  ["his slide estimates 74 days for spermatogenesis to be completed (Dr. Madison's physiology lecture says about two months).",
-   "that division is meiosis; spermiogenesis is the later remodeling of spermatids into spermatozoa.",
-   "spermatogenesis runs at different stages along the tubule, so each cut shows a different mix.",
-   "maturation is completed in the epididymis, and capacitation happens later still, in the female tract."]);
+nums("mh-num-spg", "mhisto", "slides", "On Dr. Herr's slides, which statements about spermatogenesis are true?", ["Spermiogenesis is the division in which diploid primary spermatocytes become haploid spermatids.","One complete round of spermatogenesis takes about 74 days.","Different tubule cross-sections show different mixes of cells because the stages vary along the tubule.","Sperm leaving the testis are fully mature and ready to fertilize an ovum."], [false,true,true,false], [[1,2],[1,2,3],[3]], "About 74 days per round, all stages in the tubules but at different stages along their length. The division that makes haploid spermatids is meiosis; spermiogenesis remodels them afterward. Sperm finish maturing in the epididymis and are capacitated in the female tract.", ["that division is meiosis; spermiogenesis is the later remodeling of spermatids into spermatozoa.","his slide estimates 74 days for spermatogenesis to be completed (Dr. Madison's physiology lecture says about two months).","spermatogenesis runs at different stages along the tubule, so each cut shows a different mix.","maturation is completed in the epididymis, and capacitation happens later still, in the female tract."]);
 
 tf("mh-tf-puberty", "mhisto", "slides",
   "At puberty, spermatogonia enter the cell cycle under the influence of testosterone.",
@@ -3930,17 +3867,7 @@ two("fh-2s-3", "fhisto", "slides", "Granulosa cells secrete oocyte maturation in
   "OMI is secreted into the antrum by the granulosa cells.",
   "the oocyte adheres to the follicle wall through the cumulus oophorus, formed by granulosa cells.");
 
-nums("fh-num-follicles", "fhisto", "slides", "Which statements about follicle stages are true?",
-  ["A primordial follicle has one layer of squamous follicular cells.",
-   "An early primary follicle has one layer of cuboidal granulosa cells.",
-   "A late primary follicle already has a single fluid-filled antrum.",
-   "A secondary follicle has a corona radiata around its oocyte."],
-  [true, true, false, true], [[1, 2, 3, 4], [1, 4], [2, 3, 4]],
-  "Squamous cells (primordial) turn cuboidal (early primary), then multiply into many layers (late primary). Fluid, liquor folliculi, is what makes a follicle secondary, and by then a corona radiata wraps the oocyte.",
-  ["the primordial follicle's single layer of follicular cells is squamous.",
-   "the unilaminar primary follicle has one layer of cuboidal granulosa cells.",
-   "liquor folliculi and the antrum are what define the secondary follicle; the late primary follicle has none yet.",
-   "a single layer of granulosa cells, the corona radiata, surrounds the oocyte in the secondary follicle."]);
+nums("fh-num-follicles", "fhisto", "slides", "Which statements about follicle stages are true?", ["A late primary follicle already has a single fluid-filled antrum.","An early primary follicle has one layer of cuboidal granulosa cells.","A primordial follicle has one layer of squamous follicular cells.","A secondary follicle has a corona radiata around its oocyte."], [false,true,true,true], [[1,2,3,4],[3,4],[1,2,4]], "Squamous cells (primordial) turn cuboidal (early primary), then multiply into many layers (late primary). Fluid, liquor folliculi, is what makes a follicle secondary, and by then a corona radiata wraps the oocyte.", ["liquor folliculi and the antrum are what define the secondary follicle; the late primary follicle has none yet.","the unilaminar primary follicle has one layer of cuboidal granulosa cells.","the primordial follicle's single layer of follicular cells is squamous.","a single layer of granulosa cells, the corona radiata, surrounds the oocyte in the secondary follicle."]);
 
 seq("fh-seq-follicle", "fhisto", "slides", "Put these views of a growing follicle in the order they develop.",
   ["A primary oocyte wrapped by one layer of flat follicular cells",
@@ -4156,17 +4083,7 @@ mq("fh-id-vagina", "fhisto", "slides", "A biopsy shows stratified squamous epith
    ["The ampulla of the uterine tube", "The ampulla is lined by ciliated columnar cells and peg cells on mucosal folds."]],
   "The vaginal mucosa is stratified squamous epithelium over a highly vascular lamina propria with many lymphocytes and neutrophils; the wall has no glands, and the epithelial cells store glycogen that they release as they desquamate.");
 
-nums("fh-num-vagina", "fhisto", "slides", "Which statements about the vagina are true?",
-  ["Its wall is devoid of glands.",
-   "Its mucosa is simple columnar epithelium over a lamina propria.",
-   "Its lamina propria contains many lymphocytes and neutrophils.",
-   "Its muscular layer is mainly longitudinal bundles of smooth muscle."],
-  [true, false, true, true], [[1, 2, 3], [1, 3], [1, 2, 3, 4]],
-  "The vagina has three layers: a mucosa of stratified squamous epithelium over a vascular lamina propria rich in lymphocytes and neutrophils, a muscular layer of mainly longitudinal smooth muscle, and a dense connective tissue adventitia. There are no glands; the ovulation mucus is cervical.",
-  ["the vaginal wall has no glands; lubrication comes from local mucosal secretions, the vestibular glands and the cervix.",
-   "the vaginal mucosa is stratified squamous epithelium, not simple columnar.",
-   "the highly vascular lamina propria has high numbers of lymphocytes and neutrophils.",
-   "the muscular layer is mainly longitudinal smooth muscle bundles."]);
+nums("fh-num-vagina", "fhisto", "slides", "Which statements about the vagina are true?", ["Its mucosa is simple columnar epithelium over a lamina propria.","Its wall is devoid of glands.","Its lamina propria contains many lymphocytes and neutrophils.","Its muscular layer is mainly longitudinal bundles of smooth muscle."], [false,true,true,true], [[1,2,3],[2,3],[1,2,3,4]], "The vagina has three layers: a mucosa of stratified squamous epithelium over a vascular lamina propria rich in lymphocytes and neutrophils, a muscular layer of mainly longitudinal smooth muscle, and a dense connective tissue adventitia. There are no glands; the ovulation mucus is cervical.", ["the vaginal mucosa is stratified squamous epithelium, not simple columnar.","the vaginal wall has no glands; lubrication comes from local mucosal secretions, the vestibular glands and the cervix.","the highly vascular lamina propria has high numbers of lymphocytes and neutrophils.","the muscular layer is mainly longitudinal smooth muscle bundles."]);
 
 mq("fh-ovulation-mucus", "fhisto", "slides", "Where does the mucus associated with ovulation come from?",
   [["The glands of the cervix", "The mucus associated with ovulation comes from the cervical glands."],
@@ -4766,17 +4683,7 @@ nums("mp-num-1", "mphys", "slides", "Which statements about the hypothalamic-pit
    "testosterone is the negative feedback on both the hypothalamus and the pituitary.",
    "when testosterone falls, GnRH and LH rise, which brings testosterone back up."]);
 
-nums("mp-num-2", "mphys", "slides", "Which statements describe Sertoli cells?",
-  ["They join by tight junctions to form the blood-testis barrier.",
-   "They have LH receptors and make testosterone from cholesterol.",
-   "They secrete androgen-binding protein.",
-   "They release mature spermatids into the lumen and remove their excess cytoplasm."],
-  [true, false, true, true], [[1, 2, 3, 4], [1, 3], [2, 3, 4]],
-  "Sertoli cells (FSH) nourish sperm, form the blood-testis barrier, secrete fluid, ABP and inhibin, and carry out spermiation. LH receptors and testosterone synthesis belong to the Leydig cells.",
-  ["Sertoli tight junctions keep haploid cells out of reach of the immune system.",
-   "LH receptors and testosterone synthesis belong to the Leydig cells; Sertoli cells respond to FSH.",
-   "ABP keeps testosterone high inside the testis.",
-   "this is spermiation, a Sertoli job."]);
+nums("mp-num-2", "mphys", "slides", "Which statements describe Sertoli cells?", ["They have LH receptors and make testosterone from cholesterol.","They join by tight junctions to form the blood-testis barrier.","They secrete androgen-binding protein.","They release mature spermatids into the lumen and remove their excess cytoplasm."], [false,true,true,true], [[1,2,3,4],[2,3],[1,3,4]], "Sertoli cells (FSH) nourish sperm, form the blood-testis barrier, secrete fluid, ABP and inhibin, and carry out spermiation. LH receptors and testosterone synthesis belong to the Leydig cells.", ["LH receptors and testosterone synthesis belong to the Leydig cells; Sertoli cells respond to FSH.","Sertoli tight junctions keep haploid cells out of reach of the immune system.","ABP keeps testosterone high inside the testis.","this is spermiation, a Sertoli job."]);
 
 nums("mp-num-3", "mphys", "slides", "Which statements about spermatogenesis are true?",
   ["Spermatogonia sit in the outer 2-3 layers of the seminiferous tubule.",
@@ -4840,11 +4747,11 @@ mq("fp-default-path", "fphys", "slides", "In a fetus with no Y chromosome, which
 
 two("fp-2s-default", "fphys", "slides",
   "The female reproductive tract develops by a default pathway, with no Y chromosome driving it.",
-  "Lack of anti-Müllerian hormone causes the Wolffian ducts to regress.",
-  true, false,
-  "The slide pairs each missing male hormone with one duct: lack of AMH lets the Müllerian ducts form, and lack of testosterone lets the Wolffian ducts regress. The pairs are easy to swap.",
+  "Anti-Müllerian hormone is made by the fetal testes.",
+  true, true,
+  "No Y chromosome means no testes, and the testes are the source of both male signals: with no AMH the Müllerian ducts form, and with no testosterone the Wolffian ducts regress. Nothing from the ovary is needed.",
   "with no Y chromosome no testes form and nothing male drives development, so the female tract is the default.",
-  "lack of AMH lets the Müllerian ducts form; it is lack of testosterone that makes the Wolffian ducts regress.");
+  "the slide says a female makes no AMH because the testicles never form; the testes are its source.");
 
 tf("fp-tf-amh", "fphys", "slides", "In a female fetus, the Müllerian ducts form because no anti-Müllerian hormone is made.", true,
   "No testes means no AMH, and without AMH the Müllerian ducts form. The other half of the default pathway is the missing testosterone, which lets the Wolffian ducts regress.",
@@ -4897,7 +4804,7 @@ tf("fp-tf-prog-fb", "fphys", "slides", "Progesterone can exert both positive and
 mq("fp-x-feedback", "fphys", "slides", "In the lecture, each of the following holds GnRH, LH or FSH down EXCEPT:",
   [["Estradiol above about 200 pg/mL at midcycle", "Above that level estradiol switches to positive feedback and sets off the LH surge, so it is the exception."],
    ["Progesterone from the corpus luteum in the luteal phase", "Progesterone gives negative feedback on GnRH, LH and FSH through the luteal phase."],
-   ["Rising estradiol from growing follicles in the follicular phase", "For most of the follicular phase, estradiol gives negative feedback on GnRH, LH and FSH."],
+   ["Estradiol from growing follicles early in the follicular phase", "Below the critical level, for most of the follicular phase, estradiol gives negative feedback on GnRH, LH and FSH."],
    ["Inhibin from the follicle, acting on FSH", "Inhibin suppresses FSH, which is why FSH falls as the follicle nears ovulation."]],
   "Three brakes and one accelerator: progesterone, inhibin and estradiol at ordinary levels all suppress. Only estradiol above about 200 pg/mL turns into positive feedback and drives the LH surge.",
   {fmt: 'except'});
@@ -4962,32 +4869,32 @@ two("fp-2s-hormones", "fphys", "slides",
 // ===== Follicle development and the oocyte =====
 two("fp-2s-receptors", "fphys", "slides",
   "Granulosa cells begin to express FSH receptors as a primordial follicle becomes a primary follicle.",
-  "The theca interna develops FSH receptors in the secondary follicle.",
+  "The theca interna develops FSH receptors once a theca forms around the growing follicle.",
   true, false,
-  "Receptors arrive in order: FSH receptors on granulosa cells at the primary stage, then LH receptors on the theca interna at the secondary stage. Those two receptor sets let the follicle answer both gonadotropins.",
+  "Receptors arrive in order: FSH receptors on granulosa cells at the primary stage, then LH receptors on the theca interna once the follicle has several granulosa layers and a theca. Those two receptor sets let the follicle answer both gonadotropins.",
   "as the oocyte enlarges and the granulosa layer proliferates, the granulosa cells start to express FSH receptors.",
   "the theca interna develops LH receptors, not FSH receptors.");
 
-mq("fp-secondary", "fphys", "slides", "Which change marks the step from a primary follicle to a secondary follicle?",
-  [["Granulosa cells form several layers and a theca appears", "Multiple granulosa layers and the acquisition of a theca are the two major changes of secondary follicle development."],
-   ["A fluid-filled antrum forms among the granulosa cells", "The antrum defines the later antral, or Graafian, follicle."],
-   ["A single layer of cuboidal granulosa cells surrounds the oocyte", "That is the definition of the primary follicle, the stage before."],
-   ["The oocyte finishes its first meiotic division and is released", "The first meiotic division is completed only at ovulation, after the LH surge."]],
-  "Primary follicle: one layer of cuboidal granulosa cells, now with FSH receptors. Secondary: several granulosa layers plus a theca (the theca interna gains LH receptors). Graafian: an antrum full of follicular fluid.");
+mq("fp-secondary", "fphys", "slides", "A growing follicle has a single layer of cuboidal granulosa cells around its oocyte. In the lecture's sequence, which change comes next?",
+  [["Granulosa cells form several layers and a theca appears", "The two major changes after the single-layer stage are more granulosa layers and the acquisition of a theca."],
+   ["Fluid collects among the granulosa cells and forms an antrum", "The fluid-filled antrum comes later, after the layers and the theca are in place."],
+   ["The granulosa cells begin to express FSH receptors", "Granulosa cells gain FSH receptors as the single-layer follicle forms, so this has already happened."],
+   ["The oocyte finishes its first meiotic division", "The first meiotic division is finished only by ovulation, after the LH surge."]],
+  "Single cuboidal layer with FSH receptors, then several granulosa layers plus a theca (the theca interna gains LH receptors), then a fluid-filled antrum. Dr. Madison calls the layered stage the secondary follicle; the L14 histology lecture calls it the late primary follicle and keeps the name secondary for the antral follicle, so learn the order, not just the names.");
 
-mq("fp-oocyte-gf", "fphys", "slides", "According to the lecture, what mainly drives the growth of a primary follicle into a fully grown secondary follicle?",
+mq("fp-oocyte-gf", "fphys", "slides", "According to the lecture, what mainly drives a follicle's early growth, from a single granulosa layer to several layers with a theca?",
   [["Autocrine and paracrine growth factors made by the oocyte", "The slide credits an active autocrine and paracrine process driven by growth factors from the oocyte."],
    ["The LH surge acting on LH receptors of the theca interna", "The LH surge comes at midcycle and triggers ovulation, long after secondary follicle growth."],
    ["Progesterone secreted by the corpus luteum after it forms", "The corpus luteum forms after ovulation; it doesn't drive early follicle growth."],
    ["Positive feedback of estradiol once it rises above 200 pg/mL", "That threshold sets off the LH surge at midcycle; it isn't what grows a secondary follicle."]],
   "Early follicle growth is local: growth factors from the oocyte act on the surrounding cells (autocrine and paracrine). The receptors gained along the way, FSH on granulosa cells and LH on the theca, then let the follicle respond to the pituitary.");
 
-mq("fp-x-graafian", "fphys", "slides", "Each of the following is true of the Graafian (antral) follicle EXCEPT:",
+mq("fp-x-graafian", "fphys", "slides", "Each of the following is true of the Graafian follicle EXCEPT:",
   [["It is the stage at which granulosa cells first express FSH receptors", "Granulosa cells first express FSH receptors at the primary stage, so this is the exception."],
    ["It has an antrum filled with follicular fluid", "The fluid-filled antrum is what defines the antral, or Graafian, follicle."],
    ["Before ovulation it has a high expression of LH receptors", "Preovulatory Graafian follicles express LH receptors heavily, so the LH surge can act on them."],
-   ["One of a few Graafian follicles becomes the dominant follicle each cycle", "A few follicles enter this sequence each cycle, and a single Graafian follicle becomes dominant."]],
-  "Graafian follicle: an antrum of follicular fluid (a plasma exudate conditioned by the oocyte and granulosa cells), many LH receptors before ovulation, and one per cycle becomes dominant. FSH receptors appeared much earlier, at the primary stage.",
+   ["The dominant one ruptures about 24 to 36 hours after the LH surge", "The surge acts on the dominant Graafian follicle's LH receptors, and it ruptures typically 24 to 36 hours later."]],
+  "Graafian follicle: an antrum of follicular fluid (a plasma exudate conditioned by the oocyte and granulosa cells), many LH receptors before ovulation, and the dominant one ruptures 24 to 36 hours after the surge. FSH receptors appeared much earlier, at the single-layer primary stage.",
   {fmt: 'except'});
 
 tf("fp-tf-cohort", "fphys", "slides", "In each menstrual cycle, only a single follicle enters the growth sequence that forms an antrum.", false,
@@ -4997,25 +4904,25 @@ tf("fp-tf-cohort", "fphys", "slides", "In each menstrual cycle, only a single fo
 
 seq("fp-seq-follicle", "fphys", "slides", "Put the stages of a follicle's life in order, from earliest to latest.",
   ["Primordial follicle, arrested until puberty",
-   "Primary follicle: one layer of cuboidal granulosa cells with FSH receptors",
-   "Secondary follicle: several granulosa layers and a theca with LH receptors",
-   "Graafian follicle: a fluid-filled antrum",
+   "One layer of cuboidal granulosa cells, now with FSH receptors",
+   "Several granulosa layers, and a theca whose inner layer has LH receptors",
+   "A fluid-filled antrum; one such follicle becomes dominant",
    "Corpus luteum: the ruptured follicle's remains, secreting steroid hormones"],
-  "Primordial, primary, secondary, Graafian (one becomes dominant and ruptures at ovulation), then the corpus luteum, which becomes the corpus albicans if there is no fertilization.");
+  "Primordial, then one cuboidal layer (primary), then several layers with a theca, then an antrum (Dr. Madison calls these secondary and Graafian; L14 calls them late primary and secondary), then rupture and the corpus luteum, which becomes the corpus albicans if there is no fertilization.");
 
 mq("fp-meiosis", "fphys", "slides", "When does the oocyte complete its first meiotic division?",
-  [["At ovulation, when the LH surge lifts the block on meiosis", "The LH surge removes the factors inhibiting meiosis, and the first division is complete once the oocyte is ovulated."],
+  [["By ovulation, after the LH surge lifts the block on meiosis", "The LH surge removes the factors inhibiting meiosis, and the first division is complete by the time the oocyte is ovulated."],
    ["At puberty, when follicles first move past the primordial stage", "Puberty lets follicles grow, but the oocyte stays a primary oocyte until ovulation."],
    ["In the fallopian tube, after the oocyte leaves the follicle", "The tube is where the second meiotic division is completed, not the first."],
    ["As the primary follicle's granulosa cells gain FSH receptors", "Gaining FSH receptors marks the primary follicle; the oocyte's meiosis is still arrested then."]],
-  "The oocyte stays a primary oocyte through all of follicle growth. The LH surge triggers resumption of meiosis, the first division is complete at ovulation (a secondary oocyte), and the second is completed in the fallopian tube.");
+  "The oocyte stays a primary oocyte through all of follicle growth. The LH surge triggers resumption of meiosis, the first division is complete by ovulation (a secondary oocyte), and the second is completed in the fallopian tube; the L14 histology lecture adds that it finishes only if a sperm fertilizes it.");
 
 two("fp-2s-meiosis", "fphys", "slides",
   "The oocyte completes its second meiotic division before it leaves the follicle.",
   "No follicle moves beyond its first stage until puberty, so a follicle can stay arrested there for 13 to 50 years.",
   false, true,
   "The oocyte waits a long time at two points: as a primary oocyte in a follicle that can't start growing until puberty (13 to 50 years), and again until the second meiotic division is finished in the fallopian tube.",
-  "the second meiotic division is completed in the fallopian tube, after ovulation.",
+  "the oocyte leaves the follicle with only its first division done; the second is completed later, in the fallopian tube.",
   "no follicle progresses past the first stage before puberty, so the arrest can last 13 to 50 years.");
 
 // ===== Corpus luteum =====
@@ -5089,13 +4996,13 @@ tf("fp-tf-14days", "fphys", "slides", "Ovulation occurs about 14 days before the
   "It is true: ovulation comes 14 days before menses, which lands on day 14 only in a 28-day cycle.");
 
 nums("fp-num-follicular", "fphys", "slides", "Which statements about the follicular phase are true?",
-  ["It runs from about day 0 to day 14 of a typical 28-day cycle.",
+  ["It is also called the proliferative phase.",
    "It is dominated by progesterone.",
    "For most of it, estradiol gives negative feedback on GnRH, LH and FSH.",
    "It ends with the regression of the corpus luteum."],
   [true, false, true, false], [[1, 3, 4], [1, 4], [3, 4]],
-  "The follicular (proliferative) phase is days 0 to 14, precedes ovulation and is dominated by estrogen, whose feedback is negative until it passes about 200 pg/mL. It ends with ovulation; corpus luteum regression ends the luteal phase.",
-  ["the follicular phase is days 0 to 14 and precedes ovulation.",
+  "The follicular, or proliferative, phase precedes ovulation and is dominated by estrogen, whose feedback is negative until it passes about 200 pg/mL. It ends with ovulation; corpus luteum regression ends the luteal phase.",
+  ["the slide labels the follicular phase the proliferative phase, the one before ovulation.",
    "the follicular phase is dominated by estrogen; progesterone dominates the luteal phase.",
    "the follicular-phase slide shows estradiol's negative feedback on GnRH, LH and FSH.",
    "it ends with ovulation; regression of the corpus luteum ends the luteal phase."]);
@@ -5117,14 +5024,14 @@ two("fp-2s-mucus", "fphys", "slides",
   "estrogen starts watery cervical mucus in the follicular phase.",
   "in the luteal phase progesterone decreases watery mucus and the mucus becomes thick.");
 
-mq("fp-endo-luteal", "fphys", "slides", "Which endometrial change belongs to the luteal phase?",
-  [["Proliferation slows while secretions and vasculature increase", "Progesterone slows proliferation and raises secretions and blood supply, preparing to receive a fertilized ovum."],
+mq("fp-endo-luteal", "fphys", "slides", "Which change in the uterus or cervix belongs to the luteal phase?",
+  [["Endometrial proliferation slows; secretions and vessels rise", "Progesterone slows proliferation and raises secretions and blood supply, preparing to receive a fertilized ovum."],
    ["The lining begins to grow and the endometrial arteries lengthen", "Initial growth and artery lengthening are estrogen's work in the follicular phase."],
    ["The lining and blood are sloughed after an abrupt hormone loss", "That is menses on day 28, when the corpus luteum regresses."],
-   ["Production of watery cervical mucus begins as estrogen climbs", "That is a follicular-phase estrogen effect, and it is cervical, not endometrial."]],
+   ["Watery cervical mucus begins to be made as estrogen climbs", "That is a follicular-phase estrogen effect; in the luteal phase progesterone makes the mucus thick."]],
   "Estrogen builds the lining (follicular phase); progesterone slows proliferation and makes the lining secretory and well vascularized (luteal phase), ready to receive a fertilized ovum.");
 
-mq("fp-menses", "fphys", "slides", "Without fertilization, what prompts menses on about day 28?",
+mq("fp-menses", "fphys", "slides", "Without fertilization, what prompts menses at the end of the cycle?",
   [["Corpus luteum regression and an abrupt loss of estrogen and progesterone", "As the corpus luteum regresses, estrogen and progesterone drop abruptly and the lining and blood are sloughed."],
    ["A second LH surge from the pituitary that ruptures the endometrial arteries", "There is one LH surge, at midcycle; it triggers ovulation, not menses."],
    ["A rise in inhibin that suppresses FSH and shrinks the endometrial lining", "Inhibin suppresses FSH; the lecture doesn't link it to shedding the lining."],
@@ -5199,12 +5106,12 @@ mq("fp-prl-1", "fphys", "hub", "Which category from the lecture's reproductive-d
   {pbox: [["Patient", "34-year-old woman at a dental visit; no period for 5 months"], ["History", "Regular periods since age 12; not breastfeeding"], ["Pregnancy test (hCG)", "Negative"], ["Prolactin", "96 ng/mL (high)"], ["FSH", "5 mIU/mL (normal)"]], pcase: 'fphys-case3'});
 
 two("fp-prl-2", "fphys", "hub",
-  "Her amenorrhea is secondary, because her periods began and then stopped.",
-  "Her negative pregnancy test rules out one of the lecture's listed causes of secondary amenorrhea.",
-  true, true,
-  "The slide's causes of secondary amenorrhea are pregnancy, lactation, menopause and hyperprolactinemia. Her test rules out pregnancy, she isn't nursing, her FSH argues against menopause, and her prolactin is high.",
-  "secondary amenorrhea means menses that had been established have stopped, which is her history.",
-  "pregnancy is on the slide's list of causes of secondary amenorrhea, with lactation, menopause and hyperprolactinemia.",
+  "Her pregnancy test and her history rule out two of the lecture's listed causes of secondary amenorrhea.",
+  "Her normal FSH supports menopause as the cause of her missed periods.",
+  true, false,
+  "Work down the slide's list of causes of secondary amenorrhea: pregnancy (her test is negative), lactation (she isn't breastfeeding), menopause (it raises FSH, and hers is normal) and hyperprolactinemia (her prolactin is high). Only the last one fits.",
+  "her negative hCG rules out pregnancy, and she isn't breastfeeding, so lactation is out too.",
+  "menopause raises FSH, because the follicles' negative feedback is gone, so a normal FSH argues against it.",
   {pbox: [["Patient", "34-year-old woman at a dental visit; no period for 5 months"], ["History", "Regular periods since age 12; not breastfeeding"], ["Pregnancy test (hCG)", "Negative"], ["Prolactin", "96 ng/mL (high)"], ["FSH", "5 mIU/mL (normal)"]], pcase: 'fphys-case3'});
 
 mq("fp-x-amen", "fphys", "slides", "Which of the following is NOT listed in the lecture as a cause of secondary amenorrhea?",
