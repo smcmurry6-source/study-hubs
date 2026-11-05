@@ -72,7 +72,7 @@ function tbCell(k, x, y, rot, s, m, hl, wig) {
     if (tl > 1) { var w = (wig || 0), q1 = 3.2 * Math.sin(w), q2 = -3.2 * Math.sin(w + 1.6); o += '<path class="tb-tail" d="M0 ' + f1(base) + "Q" + f1(q1 * s) + " " + f1(base - tl * 0.35) + " 0 " + f1(base - tl * 0.55) + "T" + f1(q2 * 0.6 * s) + " " + f1(base - tl) + '"/>'; }
     if (!free) o += '<circle class="tb-cy' + c + '" cx="0" cy="' + f1(cyY) + '" r="' + f1(cyR) + '"/>';
     /* mitochondria: scattered in the round spermatid, gathered into the middle piece at the end */
-    if (mm < 0.55) { var gm = mm / 0.55; [[-5, -3], [4.6, -4], [-3.4, 4.4]].forEach(function (q) { o += E(lerp(q[0], 0, gm) * s, lerp(q[1], base - 3, gm) * s / (s || 1) * s, 1.7 * s, 1 * s, "tb-mito"); }); }
+    if (mm < 0.55) { var gm = mm / 0.55; [[-5, -3], [4.6, -4], [-3.4, 4.4]].forEach(function (q) { o += E(lerp(q[0] * s, 0, gm), lerp(q[1] * s, base - 3 * s, gm), 1.7 * s, 1 * s, "tb-mito"); }); }
     else o += '<path class="tb-mid" d="M0 ' + f1(base) + "V" + f1(base - 7.5 * s) + '"/>';
     /* the Golgi moves to the top (the outward pole) of the nucleus and becomes the acrosome */
     if (mm < 0.4) { var ga = lerp(0, Math.PI / 2, mm / 0.4), gx = Math.cos(ga) * 7.4 * s, gy = Math.sin(ga) * 7.4 * s; o += '<path class="tb-golgi" opacity="' + f1(1 - mm / 0.4) + '" d="M' + f1(gx - 2.6 * s) + " " + f1(gy) + "q" + f1(2.6 * s) + " " + f1(2.2 * s) + " " + f1(5.2 * s) + " 0M" + f1(gx - 2 * s) + " " + f1(gy - 1.8 * s) + "q" + f1(2 * s) + " " + f1(1.8 * s) + " " + f1(4 * s) + ' 0"/>'; }
@@ -142,7 +142,6 @@ function staticParts() {
   o.BM = HOT("Basement membrane: the spermatogonia sit on it, and the Sertoli cells reach from it to the lumen.", '<path class="tb-bm" d="' + tbPath(tbArc(-G.TH, G.TH, G.RB, G)) + '"/>');
   /* the epithelium's ground and the lumen */
   o.EPI = '<path class="tb-epi" d="' + tbSector(-G.TH, G.TH, G.RL, G.RB, G) + '"/>';
-  var lum = tbPath([tbP(-G.TH, G.RL, G)].concat([tbP(-G.TH, 150, G), [G.CX + 150 * Math.sin(G.TH * Math.PI / 180), G.CY + 150]]).concat(tbArc(G.TH, -G.TH, G.RL, G)), true);
   o.LUM = HOT("Lumen of the seminiferous tubule. Released sperm leave through it, toward the tubuli recti and the rete testis.", '<path class="tb-lum" d="' + tbPath([tbP(-G.TH, 196, G), tbP(G.TH, 196, G)].concat(tbArc(G.TH, -G.TH, G.RL, G)), true) + '"/>');
   /* Sertoli cells, their nuclei and the tight junctions between them */
   var flaps = [[-G.TH, -6], [-6, 6], [6, G.TH]], sert = "", sertO = "";
@@ -154,8 +153,7 @@ function staticParts() {
   });
   o.SERT = sert; o.SERTO = sertO;
   var tj = "";
-  [-6, 6, -G.TH + 0.2, G.TH - 0.2].forEach(function (a, j) {
-    if (j > 1) return;
+  [-6, 6].forEach(function (a) {
     var p1 = tbP(a, 530, G), p2 = tbP(a, 515, G), d = "M" + f1(p1[0]) + " " + f1(p1[1]) + "L" + f1(p2[0]) + " " + f1(p2[1]);
     tj += '<path class="tb-tj" d="' + d + '"/>';
     for (i = 0; i < 3; i++) { var q = tbP(a, 518.5 + i * 4.5, G); tj += '<circle class="tb-tjd" cx="' + f1(q[0]) + '" cy="' + f1(q[1]) + '" r="1.5"/>'; }
@@ -242,7 +240,7 @@ function tbRender(st, D) {
         if (c.k === "rb") { op = e; s = 0.4 + 0.6 * e; }
         else if (pc.k === c.k) m = (pc.m || 0) + ((c.m || 0) - (pc.m || 0)) * e;
         else if (kids[c.p] > 1 || c.k === "sz") s = (sz[pc.k] / sz[c.k]) + (1 - sz[pc.k] / sz[c.k]) * e;
-        else { if (e < 0.5) k = pc.k; s = 1; }
+        else { var rr = sz[c.k] / sz[pc.k]; if (e < 0.5) { k = pc.k; s = 1 + (rr - 1) * e; } else s = 1 / rr + (1 - 1 / rr) * e; }
         if (c.k === "sz" && pc.k === "sd") { s = 1; }
       }
       var p = D.tbP(a, R, D), g = D.tbCell(k, p[0], p[1], -a, s, m, c.tr, t / 260 + a);
@@ -286,7 +284,7 @@ function tbRender(st, D) {
   o += T(446, 448, "capillary", "s tb-onv", "end");
   o += D.L(452, 38, "lumen", 352, 40, "start", "s");
   if (cells) {
-    o += D.L(8, 158, "early spermatids", 196, 175, "start", "s");
+    if (st.step < 5) o += D.L(8, 158, "early spermatids", 196, 175, "start", "s");
     o += D.L(8, 206, "secondary", 222, 220, "start", "s") + T(8, 220, "spermatocyte", "s", "start");
     o += D.L(8, 256, "primary", 216, 275, "start", "s") + T(8, 270, "spermatocyte", "s", "start");
     o += D.L(8, 312, "tight junction", 239, 333, "start", "s");
@@ -310,11 +308,11 @@ function tbRender(st, D) {
       o += '<rect class="tb-chip' + (cur ? " is-cur" : done ? " is-done" : "") + '" x="' + x + '" y="550" width="98" height="44" rx="8"/>' + T(x + 49, 568, nm, "s" + (cur ? " b" : done ? "" : " mut"), "middle") + T(x + 49, 584, sub[j], "s" + (cur ? " hot-t" : " mut"), "middle");
     });
   }
-  /* the spermiogenesis zoom (steps 5 and 6) */
+  /* the spermiogenesis zoom (steps 5 and 6): a round spermatid, then the spermatozoon it becomes, color-keyed */
   if (cells && st.step >= 5) {
-    o += '<rect class="tb-zoom" x="6" y="6" width="182" height="120" rx="10"/>' + T(14, 22, "spermiogenesis", "s b", "start");
-    o += D.tbCell("sd", 40, 80, 180, 1.9, 0, 0, 0) + '<path class="lead" d="M66 80H86"/><path class="tb-arrow" d="M86 76L92 80L86 84Z"/>' + D.tbCell("sz", 112, 70, 180, 1.9, 1, 0, t / 300);
-    o += T(126, 50, "acrosome", "s", "start") + T(126, 64, "(Golgi)", "s mut", "start") + T(126, 84, "head", "s", "start") + T(126, 98, "(nucleus)", "s mut", "start") + T(126, 116, "mid piece", "s", "start") + T(14, 116, "flagellum", "s mut", "start");
+    o += '<rect class="tb-zoom" x="6" y="6" width="184" height="142" rx="10"/>' + T(16, 24, "spermiogenesis", "s b", "start");
+    o += D.tbCell("sd", 32, 64, 90, 1.5, 0, 0, 0) + '<path class="lead" d="M50 64H62"/><path class="tb-arrow" d="M62 60L68 64L62 68Z"/>' + D.tbCell("sz", 96, 64, 90, 1.5, 1, 0, t / 300);
+    [["tb-sw-acro", "acrosome ← Golgi"], ["tb-sw-nu", "head ← nucleus"], ["tb-sw-mid", "mid piece ← mitochondria"], ["tb-sw-tail", "flagellum, new"]].forEach(function (r, j) { var y = 96 + j * 14; o += '<rect class="' + r[0] + '" x="16" y="' + (y - 7) + '" width="9" height="6" rx="2"/>' + T(30, y, r[1], "tb-xs", "start"); });
   }
   return o;
 }
@@ -410,6 +408,11 @@ export default function tubule() {
 .anima .tubule-svg .tb-chip.is-cur{fill:var(--anatomy-face);stroke:var(--anatomy-lit);stroke-width:2}
 .anima .tubule-svg .tb-zoom{fill:var(--anatomy-face);stroke:var(--anatomy-lo);stroke-width:1}
 .anima .tubule-svg .tb-arrow{fill:var(--anatomy-mid)}
+.anima .tubule-svg .t.tb-xs{font-size:11px}
+.anima .tubule-svg .tb-sw-acro{fill:var(--bx-memb)}
+.anima .tubule-svg .tb-sw-nu{fill:var(--bx-nuc-line)}
+.anima .tubule-svg .tb-sw-mid{fill:var(--bx-gold)}
+.anima .tubule-svg .tb-sw-tail{fill:var(--bx-sperm)}
 `,
   });
 }

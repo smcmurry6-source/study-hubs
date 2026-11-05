@@ -176,7 +176,9 @@ the statement keys before shipping (below); and expect the lectures finished las
   review tables, mock exams and Atlas-style extras each get a few people. Build and polish notes + bank first. Final numbers: MSK bank 99 h + notes 62 h of
   204 h; perio bank 98 h + notes 51 h of 217 h; PCD 3 bank 106 h + notes 77 h of 212 h; MSK 4 bank 60 h + notes 45 h of 131 h.
   **The extras each reach a minority**: across all hubs to 10-19, Listen 23 people ever, mind maps 36, the highlighter 12,
-  MSK 4's interactive diagrams 18 of 71, the Timmy Time podcast 20 (a third of the MSK 4 eve crowd; 3 heard it all). **Both arcades together got 1.4-1.7% of hub time** (MSK 19 people, 3 h;
+  MSK 4's interactive diagrams 18 of 71, the Timmy Time podcast 20 (a third of the MSK 4 eve crowd; a few heard it all). The widget's
+  search panel is used least of all (8 searches from 10-01 to 11-04, across every hub), so don't wait on zero-result searches to find
+  missing content. **Both arcades together got 1.4-1.7% of hub time** (MSK 19 people, 3 h;
   perio 30 people, 4 h), and the people who played most were heavy studiers anyway (top 5 arcade players: 31-61 arcade
   minutes each inside 191-631 total). Of 18 arcade games, the most-played had 9 people and 50 runs (MSK Sort Storm);
   only 3 people saved a score in the same game on two different days.
@@ -202,6 +204,9 @@ the statement keys before shipping (below); and expect the lectures finished las
   PCD Implants had all nine lectures from its first day, and two days out practice still fell lecture by lecture (23 of 31 answerers on
   L1-L2, 6-7 on each of the last four, 1.5-5 tries per question vs 18), because the bank opens "In order" and people start at lecture 1.
   Point Home's "Where to next", the drill and the mock at the lectures with the fewest answers, whenever they were added.
+  **The lag closes by itself when there are days to spare**: PCD Implants' last four lectures went from 7-9 answerers each to 12-16 on
+  day two (18% -> 35% of answers), while Home's new "Practiced least" button got no taps in its first 12 hours. Have every lecture in
+  the bank from the start; the pointers matter most for a hub that opens 1-3 days out, or a lecture added last.
 - **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
   attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them. The same goes for the
   professors' own hints: PCD 3's `hint` items (from the course's exam-hint email) got 49 tries per question vs 35-40, and
@@ -238,8 +243,9 @@ the statement keys before shipping (below); and expect the lectures finished las
   16 (`nums()`), and the final will show whether they close the "Exam asked different things" gap. **First read, Heme & Endo Exam 1**
   (the first hub built with numbered items, the professors' focus lists and an in-class review set from the start): of 10 people who
   checked in, 8 said "About right", 1 "Hub was harder", **none "Exam asked different things"** (13 by 11-04: 10 About right, 2 harder). The
-  same people moved: of the 7 who said the Occlusion midterm "asked different things", 5 checked in after Heme & Endo too, and 4 said About
-  right, 1 Hub was harder (two courses and professors, so a pointer, not proof). Statement formats are the hardest in its
+  same people moved: of the 7 who said the Occlusion midterm "asked different things", 5 checked in after Heme & Endo too, and most of
+  them said About right (two courses and professors, so a pointer, not proof). Final Heme & Endo count, n = 13 people: About right 10,
+  Hub was harder a couple, none "different"; the Occlusion midterm ended at n = 17 (About right 8, different 7). Statement formats are the hardest in its
   bank (two-statement 73%, numbered 75%, true/false 84%, plain MCQ 83%): keep them, they are where the practice is.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
@@ -265,7 +271,9 @@ the statement keys before shipping (below); and expect the lectures finished las
   splitting them into MCQs, not by rewriting the explanation. **The same goes for two-statement and true/false items**: Heme & Endo's
   10-29 fixes lifted MCQs and numbered items 10-28 points (`pa-num-1` 52% -> 80%, `gr-ghrelin` 50% -> 71%, `td-num-2` 42% -> 62%) while
   `ca-2s-4` stayed at 41% and `pa-tf-3` at 53-55%. When a statement item stays low, make the false detail plainer (one taught number or
-  name) or add a plain MCQ on the same fact; don't expect the explanation to fix it.
+  name) or add a plain MCQ on the same fact; don't expect the explanation to fix it. Again on PCD Implants (11-04): two of three MCQs
+  rose 7-15 points after their explanations named the favorite wrong answer (`ev-misch` 50% -> 13 of 20), and of three select-alls whose
+  explanations now name every option, one rose (`tm-mm-1` 39% -> 8 of 12) and two stayed flat.
 
 - **A report that says the key contradicts the case moves accuracy more than an added sentence.** 10-13 evening: the two
   keys rewritten from reports went 47% -> 14/14 (`ce-isolation`) and 48% -> 70% (`ve-pbox-3`); of five explanations that
@@ -338,6 +346,15 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04: 9 of 9 right before the fix, 9 of 14 after); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
   Perio `q4-06` keyed the S204SD9 over "Sickle scaler", but the hub's notes call the S204SD9 the posterior sickle (7 of 17 picked
   "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it?
+- **Students notice when the key keeps landing on the same answer.** PCD Implants suggestion #14 (2026-11-04, day two): "the statement
+  questions all seem to have the same answer", and the numbered ones keep coming out "1, 2 and 4". True: 36 of 46 two-statement items
+  were keyed "1 true, 2 false", and statement 1 was true in all 30 numbered items (17 keyed "1, 2 and 4", the second choice in 23).
+  Special Patient Care had statement 1 true in 24 of 24 numbered items. Written one at a time, the first statement tends to come out
+  true. Heme & Endo Exam 1 and Occlusion spread theirs (two-statement keys 11-18 of 60 and 9-15 of 43 per choice), so it can be done.
+  CI checks only the true/false balance. Before shipping, count: no two-statement key over about a third, statement 1 false in at least
+  a quarter of the numbered items, and keys with two true statements as well as three. Also expect the "True" lean: false-keyed
+  true/false items score lower (Heme & Endo 80% vs 87%, PCD Implants 88% vs 93%), and so does "Both statements are false" (Heme &
+  Endo 68%, the lowest key). The false half is where the practice is; keep it honest (one taught detail changed).
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
