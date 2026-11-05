@@ -72,8 +72,8 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 - 2026-10-20: Sam approved ten anima figures for L1-L5 (all built). 2026-10-27: four for L6 (built).
 - 2026-11-03: five for L7 (built 2026-11-04: `tolerance`, `stability`, `splints`, `thirds`, `erosion`;
   [task](../tasks/done/2026-11-03-occlusion-l7-diagrams.md)). L1-L7's diagram reviews are done; don't propose these again.
-- 2026-11-05: four L8 candidates (the three schemes in motion, ridge resorption, support/stability/retention, posterior
-  tooth forms) went to Sam; none built yet ([task](../tasks/2026-11-05-occlusion-l8-follow-ups.md)).
+- 2026-11-05: Sam approved all four L8 candidates (the three schemes in motion, ridge resorption,
+  support/stability/retention, posterior tooth forms); not built yet ([task](../tasks/2026-11-05-occlusion-l8-follow-ups.md)).
 
 ## Drawn Patient Box cases
 

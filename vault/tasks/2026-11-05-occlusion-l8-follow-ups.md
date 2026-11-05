@@ -1,13 +1,13 @@
 ---
 type: task
-status: blocked
+status: in-progress
 hub: occlusion
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-16
-waiting-on: Sam (which L8 diagrams to build); L8's slides or handout in the Drive Final folder
+waiting-on: L8's slides or handout in the Drive Final folder (the slides check only)
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/259
+pr: 
 ---
 
 # Occlusion L8 (Denture Occlusion): diagram review and the slides check
@@ -31,7 +31,7 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 - Draw from L8's notes (`dentures` in the hub's READINGS) and check against the `dn-*` / `cs-dn-*` questions. Build like
   the L7 figures (`tools/figures/occlusion/anima/`, `FIG_PLACE.dentures` in `od.js`, a Review `figs` section).
 
-**Diagram candidates** (proposed 2026-11-05; none built):
+**Diagram candidates** (proposed 2026-11-05; **Sam approved all four the same day**, "Build" to each; none built yet):
 
 1. **The three schemes in motion**: a frontal view of a pair of complete dentures (posterior teeth both sides) stepping
    centric occlusion, right working, protrusion, with a toggle for balanced / non-balanced / lingualized; contacts light
@@ -54,7 +54,7 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 
 ## Done when
 
-- [ ] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
+- [x] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
 - [ ] The approved figures are built, checked at 390 px in both themes, and Sam has seen the screenshots
 - [ ] The L8 slides or handout are checked against the notes (names the recording spelled by ear: Gysi, Trubyte, Hanau,
       Thielmann, Berry; the resorption directions; the tooth-form angles), with both mp3s rebuilt if the notes change
@@ -63,6 +63,7 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 
 ## Log
 
-- 2026-11-05: written when L8 shipped from the 11/5 recording; the four candidates went to Sam in chat.
+- 2026-11-05: written when L8 shipped from the 11/5 recording ([PR #259](https://github.com/smcmurry6-source/study-hubs/pull/259)); the four candidates went to Sam in chat.
+- 2026-11-05: Sam approved all four (Build, Build, Build, Build). Building them is next.
 
 ## Outcome
