@@ -32,6 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (the 11-04 lessons refresh is live, Claude Code)** — #245 merged at 15:03 UTC, but its GitHub Pages deploy timed out ("Deploy to GitHub Pages" failed after 10 minutes), so #248 (vault only: Sam's calls in `vault/decisions.md`) gave `main` the new commit that publishes; the hubs were live at 15:30. At 15:31 `tools/data-fixes/2026-11-04-statement-keys.sql` ran (Sam's OK) with a guard that rolled everything back unless each reordered item's new key held exactly its correct count: it passed, nothing was left mid-move, and the rewritten items start fresh. `postcheck.js` passed (both hubs identical to main, 0 errors), a changelog line for each hub, and suggestion #14 got Sam's reply. BUG-022 retested; BUG-023 done for these items (version-aware picks still in the inbox).
 - **2026-11-04 evening (lessons audit: statement keys no longer a pattern, Claude Code)** — Suggestion #14 (PCD Implants, two days
   out): "a lot of the statement questions seem to all have the same answer... select all being options 1,2,4 a lot." True:
   `hubs/pcd-implants-exam1` keyed 36 of 46 two-statement items "Statement 1 is true; statement 2 is false", had statement 1 true in
