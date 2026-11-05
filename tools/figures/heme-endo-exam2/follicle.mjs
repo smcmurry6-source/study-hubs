@@ -171,9 +171,9 @@ function foRender(st, D) {
     body += HOT("Squamous follicular cells: a single layer of flat cells that completely surround the oocyte and are attached to each other by desmosomes.", foRing(cx, cy, r0, r0 + 7, 13, 0.2, "fo-fc", "fo-gn", "flat"));
     var dz = ""; for (i = 0; i < 13; i++) { var dp = foPt(cx, cy, r0 + 3.5, 0.2 + i * 2 * Math.PI / 13); dz += foCirc(dp[0], dp[1], 1.7, "fo-desmo"); }
     body += HOT("Desmosomes join the squamous follicular cells to each other.", dz);
-    body += HOT("Primary oocyte, arrested in prophase of meiosis I: a spherical cell about 25 µm in diameter, with an asymmetric nucleus, vesicular-looking chromatin and prominent organelles.", foOocyte(cx, cy, r0, { nr: 20, nx: 14, ny: -9 }));
+    body += HOT("Primary oocyte, arrested in prophase of meiosis I: a spherical cell about 25 µm in diameter, with an asymmetric nucleus, vesicular-looking chromatin and prominent organelles.", foOocyte(cx, cy, r0, { nr: 19, nx: 22, ny: -15 }));
     labs += foLab(LX, 96, ["primary oocyte", "about 25 µm"], cx + 40, cy - 40);
-    labs += foLab(LX, 176, ["asymmetric nucleus", "vesicular chromatin"], cx + 26, cy - 14);
+    labs += foLab(LX, 176, ["asymmetric nucleus", "vesicular chromatin"], cx + 34, cy - 22);
     labs += foLab(LX, 262, ["squamous follicular", "cells, one layer"], cx + r0 + 4, cy + 10);
     labs += foLab(LX, 330, ["desmosomes"], foPt(cx, cy, r0 + 3.5, 0.2 + 2 * 2 * Math.PI / 13)[0], foPt(cx, cy, r0 + 3.5, 0.2 + 2 * 2 * Math.PI / 13)[1]);
   } else if (s === 1) {
@@ -203,10 +203,10 @@ function foRender(st, D) {
     labs += foLab(LX, 254, ["granulosa cells", "several layers"], foPt(cx, cy, zo + 30, 0.12)[0], foPt(cx, cy, zo + 30, 0.12)[1]);
     labs += foLab(LX, 316, ["zona pellucida", "ZP1, ZP2, ZP3"], foPt(cx, cy, r2 + 4, 0.75)[0], foPt(cx, cy, r2 + 4, 0.75)[1]);
   } else if (s === 3 || s === 4) {
-    var G = s === 4, gR3 = G ? 126 : 104, ti3 = gR3 + (G ? 18 : 14), te3 = ti3 + (G ? 15 : 13), tc = G ? 2.35 : 2.25, wall = G ? 15 : 24;
-    var ccx = cx, ccy = G ? 268 : cy;
-    var ra3 = function (a) { var d = Math.atan2(Math.sin(a - tc), Math.cos(a - tc)); return (gR3 - wall) - (G ? 62 : 46) * Math.exp(-d * d / (G ? 0.16 : 0.2)) - (G ? 0 : 10 * Math.sin(3 * a + 1)); };
-    var oR = G ? 24 : 27, oc = foPt(ccx, ccy, G ? 50 : 40, tc), zr = oR + 5, cr = zr + 9;
+    var G = s === 4, gR3 = G ? 126 : 106, ti3 = gR3 + (G ? 18 : 14), te3 = ti3 + (G ? 15 : 13), tc = G ? 2.35 : 2.25, wall = G ? 15 : 22;
+    var ccx = cx, ccy = G ? 268 : cy, rc = G ? 82 : 60;
+    var ra3 = function (a) { var d = Math.atan2(Math.sin(a - tc), Math.cos(a - tc)); return G ? (gR3 - wall) - 42 * Math.exp(-d * d / 0.2) : (gR3 - wall) - 26 * Math.exp(-d * d / 0.4) - 10 * (1 + Math.cos(d)); };
+    var oR = G ? 20 : 21, oc = foPt(ccx, ccy, rc, tc), zr = oR + 4.5, cr = zr + 8.5;
     hole = [[ccx, ccy, te3 + 2]];
     if (G) sf = function (x) { return 128 - 30 * Math.exp(-Math.pow((x - ccx) / 130, 2)); };
     body += HOT(G ? "Theca layers, more prominent in the Graafian follicle: the theca interna (vascular, with LH receptors; makes androgens) inside the fibrous theca externa." : "Theca interna (vascular, LH receptors, makes androgens) and theca externa (fibrous connective tissue and smooth muscle).", foTheca(ccx, ccy, gR3 + 1, ti3, te3, 21, G));
@@ -216,7 +216,7 @@ function foRender(st, D) {
     body += HOT("Corona radiata: the single layer of granulosa cells that surrounds the oocyte.", foRing(oc[0], oc[1], zr, cr, 18, 0.2, "fo-gc", "fo-gn", "radial"));
     body += HOT("Zona pellucida (ZP1, ZP2, ZP3).", '<circle class="fo-zp" cx="' + f1(oc[0]) + '" cy="' + f1(oc[1]) + '" r="' + f1(oR + 2.5) + '" stroke-width="5"/>');
     body += HOT("Primary oocyte, still arrested in prophase I. Cortical granules are evident just under its plasma membrane.", foOocyte(oc[0], oc[1], oR, { nr: 8.5, nx: 3, ny: -2, cg: true }));
-    var cum = foPt(ccx, ccy, (G ? 50 : 40) + cr + 9, tc);
+    var cum = foPt(ccx, ccy, rc + cr + 6, tc + 0.12);
     if (G) {
       labs += foLab(LX, 80, ["bulges on the", "ovary's surface"], ccx + 46, 104);
       labs += foLab(LX, 132, ["tunica albuginea"], ccx + 96, 122);
@@ -270,7 +270,7 @@ function foRender(st, D) {
     labs += foLab(LX, 220, ["fibroblasts", "secrete it"], foPt(ax, ay, 46, 0.55)[0], foPt(ax, ay, 46, 0.55)[1]);
     labs += foLab(LX, 300, ["a pale scar: the", "corpus albicans"], ax + 82, ay + 26);
   }
-  o += field + foStroma(FX0, FY0, FX1, FY1, hole, sf, 7 + s * 13, 220) + body.replace("@@DRIFT@@", "");
+  o += field + foStroma(FX0, FY0, FX1, FY1, hole, sf, 7 + s * 13, 300) + body.replace("@@DRIFT@@", "");
   if (s === 4) o += HOT("The ovary's surface: an epithelium continuous with the mesothelium (the so-called germinal epithelium) over the tunica albuginea, its capsule. The Graafian follicle makes a bulge here and has to break through it at ovulation.", foSurface(FX0, FX1, 128, 30, cx, 130, null, FY0));
   if (s === 5) o += HOT("The ovary's surface and tunica albuginea, torn where the follicle ruptured.", foSurface(FX0, FX1, 134, 22, cx - 10, 120, [cx - 34, cx + 14], FY0)) + drift;
   o += '<rect class="fo-frame" x="' + FX0 + '" y="' + FY0 + '" width="' + (FX1 - FX0) + '" height="' + (FY1 - FY0) + '" rx="10"/>';
