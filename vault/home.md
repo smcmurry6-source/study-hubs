@@ -28,6 +28,8 @@ Shipping and the vault
   graded work never copied, closed quizzes only as context, previous years' never.
 - [Preview and release-test every substantial change](rules/preview-and-release-test.md): a preview on made-up data, the
   release tests, Sam's explicit approval, then checks after the release ([the plan](../RELEASE_TEST_PLAN.md)).
+- [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
+  groups of 5+, no new identifiers.
 
 Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md)
@@ -74,6 +76,9 @@ Hub building
 
 - [Repo map](reference/repo-map.md): what every file and folder is.
 - [Shared infrastructure](reference/shared-infrastructure.md): the widget, Supabase, Pages, the Kokoro model.
+- [Analytics governance](reference/analytics-governance.md): how usage data is collected, checked, kept and used. Its
+  notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
+  [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
 - `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
 - `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
 - `supabase/schema.sql` and `migration_v*.sql`: the database.

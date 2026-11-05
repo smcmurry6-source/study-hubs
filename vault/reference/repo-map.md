@@ -24,7 +24,9 @@ tags: [map]
 - `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md)) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
-- `review/` — admin analytics page. Its **Recap** tab makes the shareable end-of-hub image (drawn by
+- `review/` — admin analytics page. Its **Insights** tab puts every hub (live and archived) side by side and pairs each
+  number with the decision it drives ([insights-dashboard](insights-dashboard.md), data from `migration_v49.sql`;
+  [analytics governance](analytics-governance.md)). Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
   recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
   the hub page comes down, while `tools/dump-banks.js` can still read its bank.

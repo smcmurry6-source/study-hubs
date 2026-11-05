@@ -65,6 +65,47 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   buttons (`q.ref`, through `SH_GOTO`; tracked `case:ref`). A question's `pfig` hides the row that would give its answer
   away (CAL, furcation). `LIKELY_TOPICS` updated (two new topics); About page. No notes text, narration or schema change.
   Tier 2: a draft PR for Sam's look; the expansion waits for approval ([task](vault/tasks/done/2026-11-04-perio-visual-case-engine.md)).
+- **2026-11-04 (top bars fit their content: no more clipped Arcade tab, Claude Code)** — Sam: the dashboard top bar is cramped and
+  the Arcade tab gets cut off. **Root cause:** every hub picked its top-bar layout from a stack of screen-width breakpoints
+  (380/520/560/760/860 in each hub, plus the 561-1000 px patch of 2026-10-28 in `widget/v3.css`), but whether the bar fits
+  depends on what's in it: the hub's name, your name and rank, the countdown's wording, the streak and tour buttons, the font,
+  and the text-size setting, which zooms `<html>` where media queries can't see it. When a guess was wrong, `#modeSwitch`
+  (`min-width:0; overflow-x:auto` with a hidden scrollbar) shrank and **clipped Arcade** with nothing to show it was there (1001-1280
+  px in six hubs), or the tabs ran past the edge (320 px, four hubs, the page scrolled sideways); under 760 px some tab labels were
+  `display:none`, leaving tabs with no spoken name. **Fix (shared):** `widget/v3.js` measures the bar (ResizeObserver, a
+  MutationObserver for names and pills filling in, font loading) and keeps the first layout that fits: `data-sh-head` = `row` (one
+  line, every tab at full size), `stack` (title and pills on top, full-width tabs below) or `stack3` (phones and large text: title
+  and the round buttons on top, your name and the pills next, then the tabs; your name shortens with an ellipsis before the
+  countdown wraps); `data-sh-tabs` = `inline`, `tall` (icon over label) or `grid` (two columns). `widget/v3.css` draws them, scoped
+  to `header.hub-header[data-sh-head]` so they outrank each hub's own breakpoints; labels always show, the hub's name shows on
+  phones (with an ellipsis), touch screens get 40 px tabs and 32 px round buttons. It also keeps `--sh-head-h` current. **Dashboard**
+  (`index.html`): the top bar's buttons are one group (`.tb-actions`) that wraps onto its own row when it doesn't fit beside the
+  wordmark and live count; the Arcade high scores' hub and game rows wrap instead of scrolling past the edge (the game row is now a
+  group of `aria-pressed` buttons, not a tablist without arrow keys). **Perio:** the arcade leaderboard tabs wrap. CI:
+  `tools/ci/smoke.js` checks the dashboard and every hub at 320 px, 1001 px and 390 px with the largest text: no sideways scroll,
+  every top-bar control and tab fully on screen and not clipped, every mode tab labeled. About page: "A top bar that fits your
+  screen"; Hub modes now says four modes. The largest text also showed Home's "Where to next" rows wider than a phone in
+  five hubs (a shared guard in `widget/v3.css`: the column may shrink, the button drops below) and Perio's course-map titles
+  (`overflow-wrap`). Bug log BUG-010-013; report `vault/release/reports/2026-11-04-responsive-top-bars.md`.
+  `sw.js` -> `sh-v53`.
+
+- **2026-11-04 (analytics governance and learner insights, Claude Code)** — Sam asked for an analytics governance and
+  learner-insights layer over every live and archived hub. **Admin page**: a new **Insights** tab (`review/`) puts every hub
+  side by side (scorecard, where time goes by canonical surface, spacing of retries, feature reach, student voice, data
+  quality); each number past its threshold (`INSIGHT_RULES`) turns orange and the card lists the decision it drives. Hubs
+  with fewer than 5 people are left out. The admin page now reads hub names, exam dates and live/archived status from
+  `HUBS` / `ARCHIVED_HUBS` in `index.html` instead of its own lists. **Database**: `migration_v49.sql` (applied; read-only:
+  `sh_surface`, `sh_insights`, `sh_insight_retries`, `sh_data_quality`, and admin wrappers `get_insights`,
+  `get_insight_retries`, `get_data_quality`); `supabase/schema.sql` refreshed. **Vault**: [analytics-governance](vault/reference/analytics-governance.md)
+  (start there), [event-taxonomy](vault/reference/event-taxonomy.md), [analytics-data-quality](vault/reference/analytics-data-quality.md),
+  [analytics-retention](vault/reference/analytics-retention.md) (a proposed schedule, nothing deleted: the free plan's 500 MB
+  is about 7 weeks away at the current rate; task `vault/tasks/2026-11-04-analytics-retention.md` waits on Sam),
+  [insights-dashboard](vault/reference/insights-dashboard.md) (the cards, the first reading, proposals for Sam), and a new
+  rule, [learner-data-privacy](vault/rules/learner-data-privacy.md). **About page**: "What the hubs record". Also
+  `tools/analytics-quality.sql`, a format breakdown and stale-id list in `tools/lessons-join.py`, and three standing
+  lessons in `LESSONS.md`. The preview answers the three admin calls with made-up numbers (`synthInsights()` in
+  `tools/preview/runtime/preview.js`), and `tools/release/rls-audit.sql` checks the new internal functions stay closed
+  to visitors (the live audit returned no findings after the migration).
 - **2026-11-04 (a permanent preview and release-test process, Claude Code)** — Sam's ask, now a standing rule
   ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md)); the whole process is
   [`RELEASE_TEST_PLAN.md`](RELEASE_TEST_PLAN.md) (tiers, previews, data isolation, test accounts, gates, UAT, device matrix,
