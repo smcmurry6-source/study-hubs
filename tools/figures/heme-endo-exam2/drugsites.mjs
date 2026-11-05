@@ -92,7 +92,7 @@ function dsBodyFlow(st, lv, D) {
   function syringe(on) { if (on < 0.02) return ""; var g = '<g class="ds-syr" opacity="' + f1(on) + '"><path class="ds-needle" d="M200 250L214 244"/><path class="ds-barrel" d="M213 240.5L241 228.5L244.5 236.5L216.5 248.5Z"/><path class="ds-needle" d="M243 232L254 227M252 222L256 231"/></g>'; return HOT("Injected under the skin (subcutaneous), into the fat: insulin, the GLP-1 agonists (oral semaglutide is the exception) and pramlintide are the parenteral drugs on his route summary.", g); }
   if (d === "ins") { o += syringe(1) + dsFlow(F.FAT_LIV, 6, 2600, t, "ds-ins", 2.6) + dsFlow(F.FAT_MUS, 4, 1800, t, "ds-ins", 2.6) + inflow(172, 314, "ds-glu", 1600, 6, 26) + inflow(193, 252, "ds-glu", 1700, 5, 22); }
   if (d === "su" || d === "meg") { var on = d === "meg" ? (0.5 + 0.5 * Math.cos(t / 900)) : 1; o += dsFlow(F.PAN_LIV, 5, 2400, t, "ds-ins", 2.6, 0, on) + dsFlow(F.PAN_MUS, 6, 3000, t, "ds-ins", 2.6, 0, on) + dsFlow(F.PAN_FAT, 4, 2200, t, "ds-ins", 2.6, 0, on); }
-  if (d === "met") { o += dsFlow(F.LIV_OUT, 2, 3600, t, "ds-glu", 2.6, 0, 0.6) + '<g class="ds-stop"><circle cx="102" cy="132" r="7"/><path d="M98.5 132H105.5"/></g>' + inflow(172, 314, "ds-glu", 2400, 4, 24) + dsFlow(F.GUT_OUT, 2, 5200, t, "ds-glu", 2.4, 0, 0.7); }
+  if (d === "met") { o += dsFlow(F.LIV_OUT, 2, 3600, t, "ds-glu", 2.6, 0, 0.6) + '<g class="ds-stop"><circle cx="92" cy="138" r="7"/><path d="M88.5 138H95.5"/></g>' + inflow(172, 314, "ds-glu", 2400, 4, 24) + dsFlow(F.GUT_OUT, 2, 5200, t, "ds-glu", 2.4, 0, 0.7); }
   if (d === "tzd") { o += inflow(193, 252, "ds-fa", 1500, 7, 24) + inflow(172, 314, "ds-glu", 2400, 4, 24); }
   if (d === "agi" || d === "resin") {
     for (var c = 0; c < 3; c++) { var u = ((t / 7000 + c / 3) % 1), q = dsAt(D.BODY.GUT, u), q2 = dsAt(D.BODY.GUT, Math.max(0, u - 0.02)); o += '<path class="ds-chain" d="M' + f1(q2[0]) + " " + f1(q2[1]) + "L" + f1(q[0]) + " " + f1(q[1]) + '" opacity="' + f1(Math.min(1, u * 8, (1 - u) * 8)) + '"/>'; }
@@ -112,7 +112,7 @@ function dsBodyFlow(st, lv, D) {
 /* ---------------- the side column: route, hypoglycemia, weight, watch for ---------------- */
 function dsCol(st, D) {
   var g = D.DRUGS[st.d], o = "", x = 286, i;
-  o += T(x, 30, g.name, "b ds-big", "start");
+  o += T(x, 30, g.name, "b ds-big" + (g.name.length > 17 ? " ds-long" : ""), "start");
   g.ex.forEach(function (s, k) { o += T(x, 47 + k * 14, s, "s mut", "start"); });
   var y = 104;
   o += T(x, y, "ROUTE", "s ds-cap", "start") + T(x, y + 17, g.route, "ds-val", "start");
@@ -137,60 +137,55 @@ function dsPanel(st, D) {
   var g = D.DRUGS[st.d], k = g.zoom, t = st.t || 0, o = "", d = st.d;
   o += '<rect class="ds-pan" x="0" y="0" width="460" height="246" rx="10"/>';
   function cap(y) { return '<path class="vessel" d="M1 ' + y + 'H459V' + (y + 26) + 'H1Z"/>'; }
-  function rbcs(y, per) { var s = "", i; for (i = 0; i < 7; i++) { var x = ((t / per + i / 7) % 1) * 480 - 10; s += '<ellipse class="ds-rbc" cx="' + f1(x) + '" cy="' + (y + 13) + '" rx="6" ry="3.6"/>'; } return s; }
+  function rbcs(y, per) { var s = "", i; for (i = 0; i < 7; i++) { var x = ((t / per + i / 7) % 1) * 480 - 10; s += '<ellipse class="ds-rbc" cx="' + f1(x) + '" cy="' + (y + 13) + '" rx="6" ry="3.6" opacity="' + f1(Math.max(0, Math.min(1, (x - 8) / 24, (452 - x) / 24)) * 0.75) + '"/>'; } return s; }
   if (k === "beta") {
     /* a meal cycle: glucose high after a meal, low between meals (reduced motion: after a meal) */
-    var ph = ((t / 8000) % 1 + 1) % 1, meal = ph < 0.5, gl = d === "glp1" || d === "dpp4";
-    var bound = d === "su" || (d === "meg" && meal), dep = bound || (gl && meal);
+    var ph = ((t / 8000) % 1 + 1) % 1, meal = ph < 0.5, gl = d === "glp1" || d === "dpp4", i;
+    var bound = d === "su" || (d === "meg" && meal), dep = bound || (gl && meal), rel = dep ? 1 : 0.1;
     o += cap(214) + rbcs(214, 9000) + T(452, 232, "capillary", "s ds-onv", "end");
-    o += dsFlow([[-10, 222], [470, 222]], 8, 6000, t, "ds-glu", 2.4, 0, meal ? 1 : 0.18);
-    o += '<rect class="ds-chip' + (meal ? "" : " ds-chip-lo") + '" x="292" y="6" width="160" height="22" rx="11"/>' + T(372, 21, meal ? "after a meal: glucose ↑" : "between meals: glucose ↓", "s ds-onv b", "middle");
+    o += dsFlow([[-10, 221], [470, 221]], 8, 6000, t, "ds-glu", 2.4, 0, meal ? 1 : 0.18);
+    var note = d === "su" ? (meal ? "insulin released" : "release goes on: hypo risk") : d === "meg" ? (meal ? "dosed with the meal" : "off fast: release stops") : d === "dpp4" ? (meal ? "your GLP-1 survives DPP-4" : "glucose low: release stops") : (meal ? "glucose high: insulin out" : "glucose low: release stops");
+    o += '<rect class="ds-chip' + (meal ? "" : " ds-chip-lo") + '" x="258" y="2" width="198" height="38" rx="9"/>' + T(357, 17, meal ? "after a meal: glucose ↑" : "between meals: glucose ↓", "s ds-onv b", "middle") + T(357, 33, note, "s ds-onv " + (d === "su" && !meal ? "bad" : "ok"), "middle");
     /* alpha cell */
-    var gOut = gl ? 0.25 : 1;
-    o += HOT("Alpha cell: makes glucagon. GLP-1 (from a GLP-1 agonist, or your own when a DPP-4 inhibitor protects it) decreases glucagon release.", '<ellipse class="ds-alpha" cx="62" cy="80" rx="42" ry="38"/><ellipse class="nuc" cx="56" cy="76" rx="13" ry="11"/>' + [[34, 66], [44, 100], [78, 58], [86, 92], [70, 104], [36, 88], [84, 74]].map(function (p) { return '<circle class="ds-gcg" cx="' + p[0] + '" cy="' + p[1] + '" r="3.2"/>'; }).join(""));
-    o += dsFlow([[86, 108], [100, 150], [104, 214]], 3, 2600, t, "ds-gcg", 2.6, 0, gOut);
-    o += T(42, 140, "alpha cell", "s b", "middle") + T(42, 154, gl ? "glucagon ↓" : "glucagon", "s" + (gl ? " ok" : " mut"), "middle");
+    o += HOT("Alpha cell: makes glucagon. GLP-1 (from a GLP-1 agonist, or your own when a DPP-4 inhibitor protects it) decreases glucagon release.", '<ellipse class="ds-alpha" cx="62" cy="82" rx="40" ry="36"/><ellipse class="nuc" cx="56" cy="78" rx="13" ry="11"/>' + [[36, 68], [46, 102], [78, 60], [86, 92], [70, 106], [36, 90], [84, 76]].map(function (p) { return '<circle class="ds-gcg" cx="' + p[0] + '" cy="' + p[1] + '" r="3.2"/>'; }).join(""));
+    o += dsFlow([[84, 110], [100, 160], [108, 214]], 3, 2600, t, "ds-gcg", 2.6, 0, gl ? 0.25 : 1);
+    o += T(40, 140, "alpha cell", "s b", "middle") + T(40, 154, gl ? "glucagon ↓" : "glucagon", "s" + (gl ? " ok" : " mut"), "middle");
     /* beta cell */
-    o += HOT("Beta cell: makes insulin. Insulin secretagogues (sulfonylureas, meglitinides) squeeze it to release insulin it has already made, so it needs a working pancreas.", '<ellipse class="cyto" cx="236" cy="124" rx="118" ry="86"/><ellipse class="nuc" cx="214" cy="100" rx="25" ry="21"/><circle class="ds-nucleolus" cx="220" cy="96" r="5"/>');
-    o += '<ellipse class="ds-mem' + (dep ? " ds-dep" : "") + '" cx="236" cy="124" rx="118" ry="86"/>';
-    o += T(176, 66, "beta cell", "b", "middle");
-    /* insulin granules: they slide to the membrane and empty into the capillary when the cell is driven */
-    var rel = dep ? 1 : 0.12, i;
+    var bx0 = 250, by0 = 120, brx = 104, bry = 80;
+    o += HOT("Beta cell: makes insulin and releases it from granules. The insulin secretagogues (sulfonylureas, meglitinides) squeeze out insulin it has already made, so they need a working pancreas.", '<ellipse class="cyto" cx="' + bx0 + '" cy="' + by0 + '" rx="' + brx + '" ry="' + bry + '"/><ellipse class="nuc" cx="232" cy="98" rx="24" ry="20"/><circle class="ds-nucleolus" cx="238" cy="94" r="5"/>');
+    o += '<ellipse class="ds-mem' + (dep ? " ds-dep" : "") + '" cx="' + bx0 + '" cy="' + by0 + '" rx="' + brx + '" ry="' + bry + '"/>';
+    o += T(196, 68, "beta cell", "b", "middle") + T(200, 152, dep ? "depolarized" : "resting", "s" + (dep ? " hot-t" : " mut"), "middle");
+    /* insulin granules slide to the membrane and empty into the capillary while the cell is driven */
     for (i = 0; i < 9; i++) {
-      var gx = 262 + (i % 3) * 18 + (i > 5 ? 6 : 0), gy = 150 + Math.floor(i / 3) * 14, u = rel > 0.2 ? ((t / 2400 + i / 9) % 1) : 0, yy = gy + u * (198 - gy) * 0.9;
-      o += '<circle class="ds-gran" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="5.5" opacity="' + f1(1 - Math.max(0, u - 0.8) * 5) + '"/><circle class="ins" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="2.4" opacity="' + f1(1 - Math.max(0, u - 0.8) * 5) + '"/>';
+      var gx = 270 + (i % 3) * 16 + (i > 5 ? 6 : 0), gy = 154 + Math.floor(i / 3) * 12, u = rel > 0.2 ? ((t / 2400 + i / 9) % 1) : 0, yy = gy + u * (194 - gy), fo = 1 - Math.max(0, u - 0.8) * 5;
+      o += '<circle class="ds-gran" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="5.3" opacity="' + f1(fo) + '"/><circle class="ins" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="2.3" opacity="' + f1(fo) + '"/>';
     }
-    o += dsFlow([[292, 202], [296, 226], [330, 228], [470, 228]], 7, 3000, t, "ds-ins", 2.6, 0, rel);
-    o += T(282, 140, "insulin granules", "s", "middle");
+    o += dsFlow([[290, 198], [294, 226], [330, 227], [470, 227]], 7, 3000, t, "ds-ins", 2.6, 0, rel);
+    o += T(292, 140, "insulin granules", "s", "middle");
     /* K-ATP channel with its SUR, on the left membrane */
-    var kx = 118, ky = 124;
-    o += HOT("K-ATP channel with its sulfonylurea receptor (SUR). Open, potassium leaves and the cell stays polarized. Sulfonylureas and meglitinides bind the SUR and close it (meglitinides share 2 binding sites with the sulfonylureas and have 1 of their own).",
+    var kx = 146, ky = 120;
+    o += HOT("K-ATP channel with its sulfonylurea receptor (SUR). Open, potassium leaves and the cell stays polarized. Sulfonylureas and meglitinides bind the SUR and close it (meglitinides share 2 binding sites with the sulfonylureas and have 1 of their own). After a meal, glucose closes it too.",
       '<rect class="ds-chan" x="' + (kx - 6) + '" y="' + (ky - 15) + '" width="12" height="11" rx="2"/><rect class="ds-chan" x="' + (kx - 6) + '" y="' + (ky + 4) + '" width="12" height="11" rx="2"/>' +
       '<path class="ds-gate' + (dep ? " ds-shut" : "") + '" d="M' + (kx - 7) + " " + ky + "H" + (kx + 7) + '" opacity="' + (dep ? 1 : 0.15) + '"/><rect class="ds-sur" x="' + (kx - 26) + '" y="' + (ky - 9) + '" width="18" height="18" rx="6"/>' + T(kx - 17, ky + 4, "S", "s ds-onsur", "middle"));
     if (bound) o += dsDia(kx - 17, ky - 14, 4.5) + dsDia(kx - 25, ky + 13, 4.5, 0.85);
-    if (!dep) o += dsFlow([[kx + 18, ky], [kx - 6, ky], [kx - 40, ky + 26], [kx - 80, ky + 40]], 4, 1800, t, "ds-k", 3);
+    if (!dep) o += dsFlow([[kx + 16, ky], [kx - 6, ky], [kx - 34, ky + 30], [kx - 60, ky + 52]], 4, 1800, t, "ds-k", 3);
     else for (i = 0; i < 6; i++) o += '<circle class="ds-k" cx="' + f1(kx + 14 + (i % 3) * 9 + Math.sin(t / 300 + i) * 1.6) + '" cy="' + f1(ky - 10 + Math.floor(i / 3) * 18 + Math.cos(t / 260 + i) * 1.6) + '" r="3"/>';
-    o += L(8, 196, "K-ATP channel", kx - 2, ky + 16, "start") + T(8, 210, dep ? "closed: K⁺ trapped" : "open: K⁺ leaves", "s" + (dep ? " bad" : " mut"), "start");
-    o += T(188, 150, dep ? "depolarized" : "resting", "s" + (dep ? " hot-t" : " mut"), "middle");
+    o += L(8, 190, "K-ATP channel", kx - 6, ky + 16, "start") + T(8, 204, dep ? "closed: K⁺ trapped" : "open: K⁺ leaves", "s" + (dep ? " bad" : " mut"), "start");
     /* calcium channel on the right membrane */
-    var cx2 = 354, cy2 = 124;
+    var cx2 = 354, cy2 = 120;
     o += HOT("Calcium channel. Depolarization opens it; calcium flows in and drives exocytosis of the insulin granules.", '<rect class="ds-chan" x="' + (cx2 - 6) + '" y="' + (cy2 - 15) + '" width="12" height="11" rx="2"/><rect class="ds-chan" x="' + (cx2 - 6) + '" y="' + (cy2 + 4) + '" width="12" height="11" rx="2"/><path class="ds-gate" d="M' + (cx2 - 7) + " " + cy2 + "H" + (cx2 + 7) + '" opacity="' + (dep ? 0.15 : 1) + '"/>');
-    if (dep) o += dsFlow([[430, cy2 - 20], [cx2 + 10, cy2], [cx2 - 30, cy2 + 6]], 4, 1700, t, "ds-ca", 3);
+    if (dep) o += dsFlow([[440, cy2 - 26], [cx2 + 10, cy2], [cx2 - 30, cy2 + 6]], 4, 1700, t, "ds-ca", 3);
     o += T(364, 98, "Ca²⁺ channel", "s", "start") + T(364, 112, dep ? "open, Ca²⁺ in" : "closed", "s" + (dep ? " ok" : " mut"), "start");
-    /* GLP-1 receptor on the lower left membrane, facing the capillary */
-    var rx = 170, ry = 196;
-    o += HOT("GLP-1 receptor (also in the brain, heart, vessels, kidney, lung and gut). GLP-1 raises insulin secretion in proportion to the glucose there: glucose-dependent, so a low risk of hypoglycemia on its own.", '<path class="ds-gpcr" d="M' + (rx - 10) + " " + (ry - 8) + "l3 14l3 -14l3 14l3 -14l3 14l3 -14" + '"/>');
-    if (d === "glp1") o += dsFlow([[20, 222], [rx - 30, 222], [rx, ry + 8]], 3, 2600, t, "ds-drug-dot", 3.2) + dsDia(rx + 2, ry + 12, 4);
+    /* glucose enters from the capillary; the GLP-1 receptor sits on the membrane facing it */
+    o += dsFlow([[188, 226], [194, 190], [206, 162]], 4, 2200, t, "ds-glu", 2.6, 0, meal ? 1 : 0.15);
+    var rx = 228, ry = 198;
+    o += HOT("GLP-1 receptor (also in the brain, heart, vessels, kidney, lung and gut). GLP-1 raises insulin secretion in proportion to the glucose there: glucose-dependent, so a low risk of hypoglycemia on its own.", '<path class="ds-gpcr" d="M' + (rx - 10) + " " + (ry - 7) + "l3 14l3 -14l3 14l3 -14l3 14l3 -14" + '"/>');
+    o += T(rx, 184, "GLP-1R", "s" + (gl ? " b ds-glpt" : " mut"), "middle");
+    if (d === "glp1") o += dsFlow([[120, 224], [200, 224], [rx, ry + 8]], 3, 2600, t, "ds-drug-dot", 3.2) + dsDia(rx + 1, ry + 11, 4);
     if (d === "dpp4") {
-      o += dsFlow([[-10, 226], [rx - 40, 226], [rx, ry + 8]], 4, 2600, t, "ds-glp", 3.2) + dsFlow([[-10, 230], [470, 230]], 6, 5200, t, "ds-glp", 3, 0.3);
-      o += HOT("DPP-4 in the blood: it breaks down your own GLP-1 and GIP. The inhibitor sits in it, so the incretins survive.", '<path class="ds-dpp" d="M108 220A9 9 0 1 1 108 234L100 227Z"/>' + dsDia(101, 227, 4));
+      o += dsFlow([[-10, 230], [rx - 50, 230], [rx, ry + 8]], 4, 2600, t, "ds-glp", 3.2) + dsFlow([[-10, 234], [470, 234]], 6, 5200, t, "ds-glp", 3, 0.3);
+      o += HOT("DPP-4 in the blood: it breaks down your own GLP-1 and GIP. The inhibitor sits in it, so the incretins survive.", '<path class="ds-dpp" d="M84 220A9 9 0 1 1 84 234L76 227Z"/>' + dsDia(77, 227, 4)) + T(98, 232, "DPP-4 blocked", "s ds-onv b", "start");
     }
-    o += dsFlow([[200, 226], [212, 200], [222, 160]], 4, 2200, t, "ds-glu", 2.6, 0, meal ? 1 : 0.15);
-    var note = d === "su" ? (meal ? "" : "still releasing: hypoglycemia") : d === "meg" ? (meal ? "taken with the meal" : "off fast: release stops") : (meal ? "glucose high: release" : "glucose low: release stops");
-    if (note) o += T(300, 186, note, "s b " + (d === "su" ? "bad" : "ok"), "middle");
-    if (gl) o += T(rx + 4, ry - 12, d === "dpp4" ? "your own GLP-1" : "GLP-1 receptor", "s" + (d === "dpp4" ? " ds-glpt" : ""), "middle");
-    else o += T(rx + 4, ry - 12, "GLP-1 receptor", "s mut", "middle");
-    if (d === "dpp4") o += T(126, 210, "DPP-4", "s b", "start");
   }
   if (k === "tub") {
     o += '<path class="lumen" d="M1 22H459V80H1Z"/>' + T(12, 40, "filtrate", "s b", "start") + T(448, 40, "→ urine", "s b", "end");
@@ -206,7 +201,7 @@ function dsPanel(st, D) {
   }
   if (k === "gut") {
     var agi = d === "agi";
-    o += '<path class="lumen" d="M1 16H459V104H1Z"/>' + T(12, 32, "starch, disaccharides", "s b", "start") + T(448, 32, agi ? "→ colon: gas" : "→ on down the gut", "s b", "end");
+    o += '<path class="lumen" d="M1 16H459V104H1Z"/>' + T(12, 40, "starch, disaccharides", "s b", "start") + T(448, 40, agi ? "→ colon: gas" : "→ on down the gut", "s b", "end");
     var cl = "", mv2 = "", e;
     for (e = 0; e < 4; e++) { var ex0 = 14 + e * 108; cl += '<rect class="cyto" x="' + ex0 + '" y="110" width="104" height="84" rx="6"/><ellipse class="nuc" cx="' + (ex0 + 52) + '" cy="170" rx="12" ry="15"/>'; for (var mm = 6; mm < 100; mm += 5) mv2 += "M" + (ex0 + mm) + " 110V102"; }
     o += HOT("Small intestine lining (enterocytes) with its brush border of microvilli, where alpha-glucosidase breaks starch, dextrin and disaccharides into glucose that can be absorbed.", cl + '<path class="ds-mv" d="' + mv2 + '"/>');
@@ -214,19 +209,21 @@ function dsPanel(st, D) {
     o += cap(204) + rbcs(204, 9000) + T(12, 222, "blood", "s b ds-onv", "start");
     /* starch chains drift along; split into glucose that is absorbed unless the enzyme is blocked */
     for (var ch = 0; ch < 4; ch++) {
-      var u2 = ((t / 9000 + ch / 4) % 1), bx = -60 + u2 * 560, by = 50 + (ch % 2) * 22, split = !agi && bx > 120;
+      var u2 = ((t / 9000 + ch / 4) % 1), bx = -60 + u2 * 560, by = (agi ? 58 : 54) + (ch % 2) * (agi ? 22 : 12), split = !agi && bx > 120;
       for (var j = 0; j < 5; j++) {
-        if (!split) { o += (j ? '<path class="ds-link" d="M' + f1(bx + j * 11 - 7) + " " + by + "h4" + '"/>' : "") + dsHex(bx + j * 11, by, 4.6); }
-        else { var age = Math.min(1, (bx - 120) / 140), absorb = j % 2 === 0 && d === "resin" ? 0 : age; o += dsHex(bx + j * 15, by + absorb * (150 - by) + j * 2, 4.6, 1 - Math.max(0, absorb - 0.85) * 6); }
+        var hx0 = split ? bx + j * 15 : bx + j * 11, edge = Math.max(0, Math.min(1, (hx0 - 6) / 20, (452 - hx0) / 20));
+        if (edge <= 0) continue;
+        if (!split) { o += (j ? '<path class="ds-link" d="M' + f1(bx + j * 11 - 7) + " " + by + "h4" + '" opacity="' + f1(edge) + '"/>' : "") + dsHex(hx0, by, 4.6, edge); }
+        else { var age = Math.min(1, (bx - 120) / 140), absorb = j % 2 === 0 ? 0 : age; o += dsHex(hx0, by + absorb * (150 - by) + j * 2, 4.6, edge * (1 - Math.max(0, absorb - 0.85) * 6)); }
       }
     }
     o += T(130, 132, "brush border:", "s", "middle") + T(130, 146, "alpha-glucosidase", "s b", "middle") + T(130, 160, agi ? "blocked" : "working", "s" + (agi ? " bad" : " mut"), "middle");
-    if (!agi) o += '<g class="ds-q"><circle cx="352" cy="140" r="10"/><text x="352" y="145" text-anchor="middle">?</text></g>' + T(352, 168, "less absorbed?", "s", "middle") + T(352, 182, "mechanism unclear", "s mut", "middle");
+    if (!agi) o += '<g class="ds-q"><circle cx="40" cy="80" r="9"/><text x="40" y="84" text-anchor="middle">?</text></g>' + T(270, 80, "colesevelam may decrease glucose absorption;", "s b", "middle") + T(270, 93, "the mechanism is not established", "s mut", "middle");
   }
   if (k === "liv") {
     o += '<path class="vessel" d="M378 1H446V245H378Z"/>' + T(412, 22, "blood", "s b ds-onv", "middle");
     for (var r2 = 0; r2 < 6; r2++) { var ry2 = ((t / 7000 + r2 / 6) % 1) * 260 - 10; o += '<ellipse class="ds-rbc" cx="' + (r2 % 2 ? 404 : 420) + '" cy="' + f1(ry2) + '" rx="3.6" ry="6"/>'; }
-    var hep = dsSm([[30, 30], [180, 18], [350, 34], [362, 130], [350, 222], [190, 232], [34, 220], [22, 120]], true);
+    var hep = dsSm([[30, 40], [180, 30], [350, 42], [362, 134], [350, 224], [190, 234], [34, 226], [22, 130]], true);
     o += HOT("Liver cell (hepatocyte). Metformin's primary effect is here: it inhibits hepatic gluconeogenesis, so less new glucose goes out into the blood. How it does it isn't settled; the lecture pays attention to the effect.", '<path class="cyto" d="' + hep + '"/><ellipse class="nuc" cx="96" cy="72" rx="22" ry="18"/><circle class="ds-nucleolus" cx="100" cy="68" r="4.5"/>');
     var gly = ""; [[150, 64], [170, 80], [196, 58], [214, 86], [240, 66], [262, 92], [286, 70], [70, 140], [58, 182], [92, 196]].forEach(function (p) { gly += '<circle class="ds-glyc" cx="' + p[0] + '" cy="' + p[1] + '" r="2"/>'; });
     o += gly;
@@ -238,7 +235,7 @@ function dsPanel(st, D) {
     o += '<g class="ds-stop"><circle cx="222" cy="168" r="10"/><path d="M217 168H227"/></g>';
     o += dsDia(196, 136, 5) + dsDia(250, 144, 5) + dsDia(292, 128, 5);
     o += T(222, 200, "gluconeogenesis: new glucose", "s b", "middle") + T(222, 214, "inhibited by metformin", "s bad", "middle");
-    o += T(250, 118, "metformin", "s ds-drugt", "middle") + T(60, 216, "liver cell", "s mut", "middle");
+    o += T(250, 118, "metformin", "s ds-drugt", "middle") + T(70, 214, "liver cell", "s mut", "middle") + T(368, 236, "less glucose out", "s b", "end");
   }
   if (k === "fat") {
     o += '<path class="vessel" d="M384 1H446V245H384Z"/>' + T(415, 22, "blood", "s b ds-onv", "middle");
@@ -249,10 +246,10 @@ function dsPanel(st, D) {
     o += dsFlow([[446, 96], [384, 96], [300, 110], [250, 120]], 6, 2400, t, "ds-fa", 2.8) + dsFlow([[446, 168], [384, 168], [312, 160], [270, 156]], 4, 2600, t, "ds-glu", 2.8, 0.3);
     o += '<rect class="ds-sglt" x="305" y="150" width="16" height="16" rx="4"/>';
     o += T(214, 96, "fatty acids taken up", "s", "middle") + T(214, 120, "into more adipocytes", "s", "middle") + T(214, 158, "insulin sensitivity ↑", "s ok", "middle") + T(214, 172, "(muscle and liver too)", "s mut", "middle");
-    o += L(14, 26, "PPAR-gamma", 196, 36, "start") + T(14, 40, "nuclear receptor", "s mut", "start") + T(62, 236, "more adipocytes", "s", "middle");
+    o += L(14, 62, "PPAR-gamma", 170, 44, "start") + T(14, 76, "nuclear receptor", "s mut", "start") + T(62, 236, "more adipocytes", "s", "middle");
   }
   if (k === "musc") {
-    o += '<path class="ds-int" d="M1 1H459V62H1Z"/>' + T(12, 20, "blood", "s b", "start");
+    o += '<path class="ds-int" d="M1 1H459V62H1Z"/>' + T(452, 20, "blood", "s b", "end");
     var fib = "M14 74H446V206H14Z", bands = "";
     for (var bx2 = 20; bx2 < 446; bx2 += 14) bands += '<rect class="ds-aband" x="' + bx2 + '" y="76" width="6" height="128"/>';
     o += HOT("Skeletal muscle fiber (fat cells take up glucose the same way): the insulin-dependent glucose transporter, GLUT4, waits inside the cell until insulin acts.", '<path class="ds-mus" d="' + fib + '"/>' + bands + '<ellipse class="ds-mnuc" cx="70" cy="80" rx="18" ry="4.5"/><ellipse class="ds-mnuc" cx="300" cy="80" rx="18" ry="4.5"/><ellipse class="ds-mnuc" cx="190" cy="200" rx="18" ry="4.5"/><ellipse class="ds-mnuc" cx="400" cy="200" rx="18" ry="4.5"/>');
@@ -269,18 +266,18 @@ function dsPanel(st, D) {
     });
     o += dsFlow([[56, 26], [56, 74], [60, 116]], 3, 1600, t, "ds-k", 2.8);
     o += T(110, 116, "insulin receptor", "s b", "middle") + T(110, 130, "(tyrosine kinase)", "s", "middle") + T(330, 140, "GLUT4 moves to", "s b", "middle") + T(330, 154, "the membrane", "s b", "middle");
-    o += T(56, 168, "K⁺ in", "s", "middle") + T(400, 40, "glucose in", "s", "middle") + T(452, 20, "skeletal muscle (and fat)", "s mut", "end");
+    o += T(56, 168, "K⁺ in", "s", "middle") + T(400, 44, "glucose in", "s", "middle") + T(230, 228, "skeletal muscle fiber (fat takes up glucose the same way)", "s mut", "middle");
   }
   if (k === "brain") {
-    var cer = dsSm([[40, 112], [52, 62], [96, 30], [160, 22], [222, 36], [262, 74], [268, 116], [250, 146], [212, 154], [180, 148], [140, 158], [96, 158], [56, 146]], true);
-    var cbl = dsSm([[214, 156], [250, 150], [274, 168], [268, 194], [236, 202], [212, 188]], true), bst = "M176 150C190 152 200 154 206 158C206 176 204 200 198 238H184C182 204 180 176 176 150Z";
+    var cer = dsSm([[46, 120], [54, 78], [92, 44], [156, 32], [220, 40], [268, 68], [288, 108], [280, 138], [250, 150], [212, 156], [190, 170], [150, 176], [112, 168], [98, 152], [70, 148], [52, 140]], true);
+    var cbl = dsSm([[214, 162], [246, 154], [276, 158], [288, 176], [276, 198], [246, 206], [222, 198], [210, 182]], true), bst = "M186 152C206 152 212 160 210 176C208 190 202 198 200 212L198 240L186 240L184 212C182 198 176 188 176 172C176 160 178 152 186 152Z";
     var pul = 0.6 + 0.3 * Math.sin(t / 420);
-    o += HOT("The brain (side view, front to the left). GLP-1 receptors here lower food intake.", '<path class="ds-brain" d="' + cer + '"/><path class="ds-gyri" d="M70 90C90 70 104 100 124 74M120 120C140 96 160 128 182 100M182 60C200 80 220 54 240 86M84 132C104 118 116 140 138 126"/>');
-    o += HOT("Hindbrain (brainstem and cerebellum): amylin, and its analog pramlintide, binds receptors here.", '<path class="ds-hind" d="' + bst + '"/><path class="ds-hind" d="' + cbl + '"/><path class="ds-folia" d="M222 170C236 164 252 168 264 176M220 184C236 178 252 182 266 188"/><path class="ds-halo" d="' + cbl + bst + '" opacity="' + f1(pul) + '"/><path class="ds-lit" d="' + cbl + bst + '"/>');
-    o += dsFlow([[20, 240], [120, 236], [196, 196]], 5, 3200, t, "ds-drug-dot", 3);
-    var rows = [["glucagon release", "↓", 64], ["gastric emptying", "↓", 116], ["satiety", "↑", 168]];
-    rows.forEach(function (r, n) { o += '<path class="ds-out" d="M262 ' + (176 + n * 4) + "L" + 300 + " " + (r[2] - 4) + '"/><circle class="dot" cx="300" cy="' + (r[2] - 4) + '" r="2"/>' + T(310, r[2], r[0] + " " + r[1], "s b", "start"); });
-    o += T(228, 226, "hindbrain", "s b", "middle") + T(96, 226, "pramlintide", "s ds-drugt", "middle");
+    o += HOT("The brain (side view, front to the left). GLP-1 receptors here lower food intake.", '<path class="ds-brain" d="' + cer + '"/><path class="ds-gyri" d="M104 150C128 140 150 128 178 112M170 34C164 60 156 84 148 110M206 40C200 62 196 86 194 106M70 96C86 84 98 98 116 80M220 82C236 74 252 92 270 86M120 118C128 104 140 116 150 100"/>');
+    o += HOT("Hindbrain (brainstem and cerebellum): amylin, and its analog pramlintide, binds receptors here.", '<path class="ds-hind" d="' + bst + '"/><path class="ds-hind" d="' + cbl + '"/><path class="ds-folia" d="M218 172C236 164 258 166 280 172M216 184C236 178 260 180 284 186M222 196C240 192 258 194 276 198"/><path class="ds-halo" d="' + cbl + bst + '" opacity="' + f1(pul) + '"/><path class="ds-lit" d="' + cbl + bst + '"/>');
+    o += dsFlow([[20, 238], [120, 232], [190, 214]], 5, 3200, t, "ds-drug-dot", 3);
+    var rows = [["glucagon release", "↓", 76], ["gastric emptying", "↓", 126], ["satiety", "↑", 176]];
+    rows.forEach(function (r, n) { o += '<path class="ds-out" d="M288 ' + (180 + n * 2) + "L" + 316 + " " + (r[2] - 4) + '"/><circle class="dot" cx="316" cy="' + (r[2] - 4) + '" r="2"/>' + T(324, r[2], r[0] + " " + r[1], "s b", "start"); });
+    o += T(246, 228, "hindbrain", "s b", "middle") + T(96, 222, "pramlintide", "s ds-drugt", "middle") + T(110, 106, "cerebrum", "s mut", "middle");
   }
   return o;
 }
@@ -361,6 +358,7 @@ const CSS = `
 .anima .drugsites-svg .t{font-size:13px}
 .anima .drugsites-svg .t.s{font-size:12px}
 .anima .drugsites-svg .t.ds-big{font-size:15.5px}
+.anima .drugsites-svg .t.ds-big.ds-long{font-size:12.5px}
 .anima .drugsites-svg .t.ds-val{fill:var(--anatomy-strong);font-weight:600;font-size:12px}
 .anima .drugsites-svg .t.ds-cap{fill:var(--anatomy-muted);letter-spacing:.08em;font-size:10.5px}
 .anima .drugsites-svg .t.ds-on{stroke:none;fill:var(--anatomy-hi);font-weight:600}
