@@ -6,8 +6,8 @@ created: 2026-11-05
 requested-by: Sam
 due: 2026-11-16
 waiting-on: Sam (which L8 diagrams to build); L8's slides or handout in the Drive Final folder
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/259
 ---
 
 # Occlusion L8 (Denture Occlusion): diagram review and the slides check
