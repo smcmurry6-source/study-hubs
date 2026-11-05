@@ -4,7 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-04** (full audit, morning; PCD Implants two days out). Sam runs
+**Last refreshed: 2026-11-05** (pre-build refresh for Heme & Endo Exam 2: steps 1-3 only, data read 10 pm Central on 11-04; PCD
+Implants exam Friday; no hub changed). Sam runs
 the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
