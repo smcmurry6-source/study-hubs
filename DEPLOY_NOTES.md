@@ -33,15 +33,37 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
-  run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways on small screens. Students on a
-  320 px phone (the first iPhone SE) saw **Occlusion's, PCD Implants' and Special Patient Care's** mode row run past the
-  screen's edge, with the Arcade tab cut off: the tabs can now shrink, and at 380 px and below they drop their icons, as
-  Perio's already did. The **dashboard's** top bar fits a 320 px phone (smaller buttons and gaps at 360 px and below).
-  **Perio's arcade** no longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding).
-  **Perio Review's** tables that scroll sideways can be reached by keyboard and are named for screen readers. The device
-  matrix (`tools/release/matrix.js`) now measures against the layout width, so Chromium's phone emulation can't hide
-  overflow, and names the element that sticks out. BUG-010 to BUG-015 in `vault/release/bug-log.md`; the iPad landscape
-  header (BUG-014) is still open.
+  run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways. Most were the top bars, which
+  the measured top bar above (PR 235) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no
+  longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding at 520 px and below), and
+  **Perio Review's** tables that scroll sideways take keyboard focus and are named for screen readers ("Antibiotics
+  (table)"). The device matrix (`tools/release/matrix.js`) now measures against the layout width, because a phone browser
+  zooms out to fit a page that's too wide, which hid the overflow from Chromium's phone emulation; it also names the
+  element that sticks out. Bug log BUG-015 to BUG-018.
+- **2026-11-04 (top bars fit their content: no more clipped Arcade tab, Claude Code)** — Sam: the dashboard top bar is cramped and
+  the Arcade tab gets cut off. **Root cause:** every hub picked its top-bar layout from a stack of screen-width breakpoints
+  (380/520/560/760/860 in each hub, plus the 561-1000 px patch of 2026-10-28 in `widget/v3.css`), but whether the bar fits
+  depends on what's in it: the hub's name, your name and rank, the countdown's wording, the streak and tour buttons, the font,
+  and the text-size setting, which zooms `<html>` where media queries can't see it. When a guess was wrong, `#modeSwitch`
+  (`min-width:0; overflow-x:auto` with a hidden scrollbar) shrank and **clipped Arcade** with nothing to show it was there (1001-1280
+  px in six hubs), or the tabs ran past the edge (320 px, four hubs, the page scrolled sideways); under 760 px some tab labels were
+  `display:none`, leaving tabs with no spoken name. **Fix (shared):** `widget/v3.js` measures the bar (ResizeObserver, a
+  MutationObserver for names and pills filling in, font loading) and keeps the first layout that fits: `data-sh-head` = `row` (one
+  line, every tab at full size), `stack` (title and pills on top, full-width tabs below) or `stack3` (phones and large text: title
+  and the round buttons on top, your name and the pills next, then the tabs; your name shortens with an ellipsis before the
+  countdown wraps); `data-sh-tabs` = `inline`, `tall` (icon over label) or `grid` (two columns). `widget/v3.css` draws them, scoped
+  to `header.hub-header[data-sh-head]` so they outrank each hub's own breakpoints; labels always show, the hub's name shows on
+  phones (with an ellipsis), touch screens get 40 px tabs and 32 px round buttons. It also keeps `--sh-head-h` current. **Dashboard**
+  (`index.html`): the top bar's buttons are one group (`.tb-actions`) that wraps onto its own row when it doesn't fit beside the
+  wordmark and live count; the Arcade high scores' hub and game rows wrap instead of scrolling past the edge (the game row is now a
+  group of `aria-pressed` buttons, not a tablist without arrow keys). **Perio:** the arcade leaderboard tabs wrap. CI:
+  `tools/ci/smoke.js` checks the dashboard and every hub at 320 px, 1001 px and 390 px with the largest text: no sideways scroll,
+  every top-bar control and tab fully on screen and not clipped, every mode tab labeled. About page: "A top bar that fits your
+  screen"; Hub modes now says four modes. The largest text also showed Home's "Where to next" rows wider than a phone in
+  five hubs (a shared guard in `widget/v3.css`: the column may shrink, the button drops below) and Perio's course-map titles
+  (`overflow-wrap`). Bug log BUG-010-013; report `vault/release/reports/2026-11-04-responsive-top-bars.md`.
+  `sw.js` -> `sh-v53`.
+
 - **2026-11-04 (analytics governance and learner insights, Claude Code)** — Sam asked for an analytics governance and
   learner-insights layer over every live and archived hub. **Admin page**: a new **Insights** tab (`review/`) puts every hub
   side by side (scorecard, where time goes by canonical surface, spacing of retries, feature reach, student voice, data

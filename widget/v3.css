@@ -859,14 +859,50 @@ html.sh-drill-open .shstat-launchrow, html.sh-drill-open .shstat-pillrow{display
 @media (max-width:760px){ .sh-ribbon-inbox{width:28px; height:26px;} .sh-ribbon-inbox svg{width:14px; height:14px;} }
 .sh-ribbon-tour{cursor:pointer;}
 @media (max-width:1000px){ .sh-ribbon-tour{display:none;} }   /* narrower screens: the top bar is full; "Take the tour" is in the menu / More sheet */
-/* Tablet widths (561-1000 px): the hubs' one-row top bar doesn't fit (tabs cut off, theme button off screen, the page
-   scrolling sideways), so the mode tabs take their own full-width row under the title, as they do on phones */
-@media (min-width:561px) and (max-width:1000px){
-  header.hub-header .hub-header-top{flex-wrap:wrap; row-gap:6px;}
-  header.hub-header .hub-title{flex:1 1 auto; min-width:0;}
-  header.hub-header #modeSwitch{order:3; flex:1 0 100%; margin:0; overflow:visible;}
-  header.hub-header #modeSwitch button{flex:1 1 0; min-width:0; justify-content:center;}
-  header.hub-header #modeSwitch .mode-label{display:inline;}
+/* ---------- the hub top bar: three layouts the widget picks from by measuring (v3.js, "the hub top bar fits its content").
+   These rules apply only once the widget has measured (data-sh-head on the header), and they outrank each hub's own
+   width breakpoints. The mode tabs never clip, never scroll out of sight and always show their labels. ---------- */
+header.hub-header[data-sh-head] #modeSwitch{overflow:visible; min-width:0;}
+header.hub-header[data-sh-head] #modeSwitch .mode-label{display:inline;}
+header.hub-header[data-sh-head] #modeSwitch .mode-icon{display:inline-flex;}
+header.hub-header[data-sh-head] .hub-title h1{display:block; white-space:nowrap;}
+/* row: one line, everything at full size */
+header.hub-header[data-sh-head="row"] .hub-header-top{flex-wrap:nowrap;}
+header.hub-header[data-sh-head="row"] .hub-title{flex:none;}
+header.hub-header[data-sh-head="row"] #modeSwitch{flex:none; order:0; margin:0;}
+header.hub-header[data-sh-head="row"] #modeSwitch button{flex:none;}
+header.hub-header[data-sh-head="row"] .hub-meta{flex:none; flex-wrap:nowrap; margin-left:auto;}
+header.hub-header[data-sh-head="row"] #sh-ribbon-name{flex-shrink:0;}
+/* stack: the title and the rest on top, the tabs on a full-width row of their own */
+header.hub-header[data-sh-head^="stack"] .hub-header-top{flex-wrap:wrap; row-gap:6px;}
+header.hub-header[data-sh-head^="stack"] .hub-title{flex:1 1 auto; min-width:0; align-items:center; flex-wrap:nowrap;}
+header.hub-header[data-sh-head^="stack"] .hub-title h1{min-width:0; overflow:hidden; text-overflow:ellipsis;}
+header.hub-header[data-sh-head^="stack"] .hub-meta{flex:none; flex-wrap:nowrap; margin-left:auto;}
+header.hub-header[data-sh-head^="stack"] #modeSwitch{order:4; flex:1 0 100%; margin:0;}
+header.hub-header[data-sh-head^="stack"] #modeSwitch button{flex:1 0 auto; justify-content:center;}
+/* stack3 (phones, large text): the title and the small round buttons on top, your name and the pills on the next row */
+header.hub-header[data-sh-head="stack3"] .hub-header-top{row-gap:0; justify-content:flex-start;}
+header.hub-header[data-sh-head="stack3"] .hub-header-top::after{content:""; order:2; flex:1 0 100%; height:0;}
+header.hub-header[data-sh-head="stack3"] .hub-title{order:0; flex:1 1 0;}
+header.hub-header[data-sh-head="stack3"] .hub-meta{display:contents;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > *{order:3; margin-top:6px;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > :is(.sh-ribbon-inbox, .theme-btn){order:1; margin-top:0; flex:none;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-inbox{margin-left:auto;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-tour{display:none;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > .sh-ribbon-inbox:not(.sh-ribbon-tour) ~ .theme-btn{margin-left:6px;}
+/* your name gives way (it shortens, with an ellipsis) before the countdown is pushed onto another row */
+header.hub-header[data-sh-head="stack3"] #sh-ribbon-name{flex:1 1 0; min-width:min(6.5em, 100%); max-width:max-content; margin-right:6px;}
+header.hub-header[data-sh-head="stack3"] .hub-meta > .pill{margin-right:6px;}
+header.hub-header[data-sh-head="stack3"] #modeSwitch{margin-top:6px;}
+/* the tabs when labels beside icons don't fit: icon over label, then two columns */
+header.hub-header[data-sh-tabs="tall"] #modeSwitch button{flex-direction:column; gap:2px; padding:5px 2px; font-size:.76rem; line-height:1.15;}
+header.hub-header[data-sh-tabs="grid"] #modeSwitch{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); border-radius:14px;}
+header.hub-header[data-sh-tabs="grid"] #modeSwitch button{border-radius:11px; white-space:normal; text-align:center;}
+/* touch screens: the tabs and the small round buttons get room for a thumb */
+@media (pointer:coarse){
+  header.hub-header[data-sh-head^="stack"] #modeSwitch button{min-height:40px;}
+  header.hub-header .hub-meta > :is(.theme-btn, .sh-ribbon-inbox), header.hub-header .hub-back-btn{min-width:32px; min-height:32px;}
+  header.hub-header #sh-ribbon-name{min-height:32px;}
 }
 
 /* ================= motion (widget/fx.js) ================= */
@@ -1134,3 +1170,8 @@ mark.sh-hl.sh-hl-c-o{background:rgba(255,140,30,.38);} [data-theme="dark"] mark.
 .sh-cp-top .sh-cp-pct{font-weight:800; color:var(--ink, #15202A);}
 .sh-cp-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
 .sh-cp-note{margin-top:4px; font-size:.74rem; line-height:1.4; color:var(--ink-faint, #7a8090);}
+
+/* Home's "Where to next" list (copied into every hub from heme-endo-exam1): at the largest text sizes on a phone its rows
+   were wider than the screen, so the page scrolled sideways. The column may shrink, and a row's button drops below its text. */
+.home-next{grid-template-columns:minmax(0, 1fr);}
+.home-next > li{flex-wrap:wrap;}

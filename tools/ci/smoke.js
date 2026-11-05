@@ -170,6 +170,41 @@ function lint(hub, A){
     }
     await context.close();
   }
+  // top bars and tab rows (2026-11-04): at the widths and text sizes where they used to break, every control in the
+  // dashboard's and each hub's top bar, the mode tabs and the dashboard's arcade rows is fully on screen, not clipped
+  // by a hidden scrollbar, and every mode tab shows its label
+  for (const tb of [{ width: 320, height: 640 }, { width: 1001, height: 800 }, { width: 390, height: 844, size: 'xxlarge' }]) {
+    const context = await browser.newContext({ viewport: { width: tb.width, height: tb.height }, serviceWorkers: 'block' });
+    await stub(context);
+    await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
+    const label = `${tb.width}px${tb.size ? ', largest text' : ''}`;
+    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`)]) {
+      const page = await context.newPage();
+      await page.goto(BASE() + url); await page.waitForTimeout(700);
+      await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
+      await page.waitForTimeout(150);
+      const bad = await page.evaluate(() => {
+        const out = [], vw = document.documentElement.clientWidth;
+        if (document.documentElement.scrollWidth > vw + 1) out.push(`page scrolls sideways by ${document.documentElement.scrollWidth - vw}px`);
+        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button');
+        for (const el of els) {
+          const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
+          const r = el.getBoundingClientRect(); if (!r.width && !r.height) continue;
+          const name = (el.getAttribute('aria-label') || el.textContent || el.id || '').trim().replace(/\s+/g, ' ').slice(0, 30);
+          if (r.right > vw + 1 || r.left < -1) { out.push(`"${name}" is past the screen's edge`); continue; }
+          for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+            if (/(hidden|auto|scroll|clip)/.test(getComputedStyle(a).overflowX)) { const ar = a.getBoundingClientRect(); if (r.right > ar.right + 1 || r.left < ar.left - 1) out.push(`"${name}" is cut off inside ${a.id ? '#' + a.id : a.className}`); break; }
+          }
+        }
+        document.querySelectorAll('#modeSwitch [data-mode]').forEach(b => { const l = b.querySelector('.mode-label'); if (l && (getComputedStyle(l).display === 'none' || !l.textContent.trim())) out.push(`the ${b.getAttribute('data-mode')} tab hides its label`); });
+        return out;
+      });
+      bad.forEach(b => problems.push(`${url} (${label}): ${b}`));
+      await page.close();
+    }
+    notes.push(`top bars and tab rows checked at ${label}`);
+    await context.close();
+  }
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }

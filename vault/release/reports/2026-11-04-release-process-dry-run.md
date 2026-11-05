@@ -42,8 +42,8 @@ machines with the budgets set here. Two suites failed, and both were real: **Web
 found sideways scrolling on the smallest phones, on a tablet in landscape and in Perio's arcade. Chromium had missed it
 because the check compared the page with `innerWidth`, which a phone browser grows when it zooms out to fit a page that's
 too wide. And **accessibility** found one of Perio Review's tables unreachable by keyboard with CI's wider fonts.
-BUG-010 to BUG-015; the follow-up PR fixes the check and all but the tablet one (BUG-014, named by the fixed check on its
-next run).
+The top bars were fixed the shared way by PR 235 (measured layouts, BUG-010 and BUG-011); PR 239 fixes the check
+and the rest (BUG-015 to BUG-018).
 
 ## Exercised by hand (scripted browser, screenshots looked at)
 
@@ -73,7 +73,7 @@ tests. Functions anon can run that the site doesn't call are pure helpers or sec
 
 ## Bugs
 
-Logged in the [bug log](../bug-log.md): BUG-010 to BUG-015 from the first full run on GitHub (above); BUG-001 (S2, fixed and retested here: `supabase/schema.sql` couldn't rebuild the
+Logged in the [bug log](../bug-log.md): BUG-015 to BUG-018 from the first full run on GitHub (above); BUG-001 (S2, fixed and retested here: `supabase/schema.sql` couldn't rebuild the
 database), BUG-002 to BUG-007 (S3, known accessibility issues, now held at their counts by the baseline), BUG-008 (S3,
 slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets). No S1.
 
@@ -85,7 +85,7 @@ slow 3G: taps dead for about 15 s on Occlusion), BUG-009 (S4, small tap targets)
 - **Staging database:** not set up (Sam, 2026-11-04: fixtures for now). Server-side logic (XP, streaks, boards) is approximated in fixtures;
   permissions are covered by `rls.js`.
 - **WebKit and Firefox:** not installed in this session; the "Release tests" workflow installs them. Their first run
-  (above) found BUG-011 to BUG-014. Real Safari on an iPhone isn't covered by an agent.
+  (above) found the overflow behind BUG-010, BUG-011, BUG-016 and BUG-017. Real Safari on an iPhone isn't covered by an agent.
 - **The workflows themselves** ("Check hubs" with the new steps, "Release tests") run for the first time on this PR.
   Performance timings were calibrated here and may need `perf.js --update` from CI's numbers if CI machines are slower.
 - **Realtime** (who's online, nukes, bosses) isn't simulated in previews.
