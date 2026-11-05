@@ -39,8 +39,9 @@ surveys newest first.
   tab moved in as a view
 - [x] Sam approves the release in writing ("Merge when ready", 2026-11-05)
 - [x] `migration_v50.sql` applied to the live project (connector `apply_migration`), then the PR merged
-- [ ] After the release: `node tools/release/postcheck.js`, the Live and Hubs tabs load on the live admin page, BUG-019
-  retested, monitoring at 1, 24 and 48 hours; PR #205 closed (its function is in v50)
+- [x] After the release: `node tools/release/postcheck.js`, the Live and Hubs views load on the live admin page, BUG-019
+  retested (2026-11-05)
+- [ ] Monitoring at 1, 24 and 48 hours (`tools/release/monitor.sql`); PR #205 closed (its function is in v50)
 
 ## Log
 
@@ -52,10 +53,14 @@ surveys newest first.
   PR (the same failures on #237): explained on the PR.
 - 2026-11-05: Sam: "Merge when ready". Applied `migration_v50.sql` (the live audit found nothing), merged after CI's
   check passed. Post-release check and monitoring per the test report.
+- 2026-11-05: `main` moved three times while CI ran (#235 top bars, #238 Patient Box cases, #239 small-screen fixes);
+  each merged into the branch, both sides kept (the check-in bug renumbered BUG-019). "Release tests" went green once
+  #235 and #239 were in. Merged as `e6a8f02`; postcheck passed; the live functions checked read-only (the test report).
 
 ## Outcome
 
 Shipped in PR #236 (2026-11-05): the redesigned admin page, Live and Hubs views, newest-first check-ins, and
 `migration_v50.sql` on the live project. Verified on fixtures and throwaway databases before release (the test
 report), and on the live database with read-only checks after the migration (grants, RLS, a wrong passphrase refused,
-the permission audit). Left: monitoring at 24 and 48 hours, BUG-019 retested on the live page, PR #205 closed by Sam.
+the permission audit), and after the merge by `postcheck.js` and read-only calls to the live functions. Left:
+monitoring at 1, 24 and 48 hours, Sam's first look at the signed-in views on real data, PR #205 closed by Sam.
