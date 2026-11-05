@@ -18,8 +18,8 @@ that scrolled sideways on a phone, 18 queries fired at once on every load, check
 tab). Built with the taste-skill's app-screen run (its "framed sheet" style, kept to the dashboard's face: Instrument Sans,
 its ink and blue-grey, each hub's class color as a dot).
 
-- **Views, in a sidebar:** Overview, Live, Inbox; *Study data*: Insights, Time by section, Questions, Clicks and
-  features, Searches, Engagement; *Feedback*: Exam check-ins, Surveys; *Manage*: Hubs on the dashboard, Recap. Each is a
+- **Views, in a sidebar:** Overview, Live, Inbox; *Study data*: Insights, Time by section, Questions, Question health
+  ([question-health](question-health.md)), Clicks and features, Searches, Engagement; *Feedback*: Exam check-ins, Surveys; *Manage*: Hubs on the dashboard, Recap. Each is a
   link (`#overview`, `#inbox`...), so the back button and bookmarks work, and the last one opens next time.
 - **One header per view:** its title, one line that says what matters (for example "2 reports waiting for a reply · 5
   people studying now"), and only the controls that apply there: the 7 / 30 / 90 day range on views that use it, the
@@ -50,7 +50,7 @@ its ink and blue-grey, each hub's class color as a dot).
 - **Cost:** one query over a few minutes of `activity_pings` through `activity_pings_time_idx`. The page asks every 30 s
   only while the Live view is open and the browser tab is visible, stops when either changes, and backs off (1, 2, 4,
   5 minutes) after an error. The Overview's "Studying now" reuses that answer, or asks once if it is over 2 minutes old.
-  The sidebar shows no count for Live: counts there are kept for things waiting on Sam (the Inbox).
+  The sidebar shows no count for Live: counts there are kept for things waiting on Sam (the Inbox; Question health's "to review" for the hub last opened there).
 - The green "studying now" pill students see is a different thing (Supabase Realtime presence on random keys, no names):
   it counts open hub tabs, idle ones too, so it can read higher.
 
