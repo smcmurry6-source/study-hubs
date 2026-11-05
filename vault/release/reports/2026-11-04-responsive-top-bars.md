@@ -124,5 +124,4 @@ BUG-010 (S2), BUG-011 (S3), BUG-012 (S3): fixed here. BUG-013 (S4): found at the
 
 - [ ] Sam approved this release (Sam ticks it).
 - [ ] Merged; `node tools/release/postcheck.js` passed:
-- [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [x] `DEPLOY_NOTES.md` updated; site changelog after merge.

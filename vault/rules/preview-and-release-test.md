@@ -7,7 +7,7 @@ since: 2026-11-04
 # Preview and release-test every substantial change
 
 Sam's standing rule, 2026-11-04: **every substantial change is used in an interactive preview, passes the release tests
-and gets Sam's explicit approval before it reaches the class**, and is verified, watched and (if needed) rolled back
+and gets Sam's explicit approval before it reaches the class**, and is verified and (if needed) rolled back
 after. The whole process, with the tiers that say what counts as substantial, is
 [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md). In short:
 
@@ -22,8 +22,8 @@ after. The whole process, with the tiers that say what counts as substantial, is
   [UAT checklist](../release/uat-checklist.md); every problem in the [bug log](../release/bug-log.md).
 - **Approval:** for tier 2 and 3, only Sam ticks "Sam approved this release" in the PR (or comments "approved for
   release"). Agents never tick it and never merge.
-- **After:** `node tools/release/postcheck.js`, `tools/release/monitor.sql` at 1, 24 and 48 hours, the changelogs;
-  [roll back](../how-to/roll-back-a-release.md) an S1.
+- **After:** `node tools/release/postcheck.js` and the changelogs; [roll back](../how-to/roll-back-a-release.md) an S1.
+  No post-release monitoring (Sam, 2026-11-05): no timed checks after a release and no scheduled check-ins for one.
 
 It doesn't slow a fix down: tier 1 (a question, a typo, a date) needs only CI and a look in the preview, and
 [ship-it-now](ship-it-now.md) still holds: an exam is never a reason to wait.

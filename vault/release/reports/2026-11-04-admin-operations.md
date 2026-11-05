@@ -125,7 +125,6 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
   no override and an empty log (the hubs follow their dates); Live returns only hub, count and names (5 or more people
   at the time); 96 check-ins and the surveys come back newest first (BUG-019 retested); a wrong passphrase is refused
   (28000) and the new tables answer 401 to a visitor. The signed-in views on real data are Sam's first look.
-- [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [x] `DEPLOY_NOTES.md` updated. Site changelog skipped: nothing students see changes until Sam sets a hub by hand.
 
 Related: [admin-operations](../../reference/admin-operations.md) · [bug log](../bug-log.md) ·

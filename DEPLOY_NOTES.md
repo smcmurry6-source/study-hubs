@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (Settings rows and Timmy's bubble fit a phone at the largest text: BUG-013, Claude Code)** — the follow-up to the top-bar PR (#235). **Settings sheet** (dashboard `index.html` `.set-x .set-seg`, hubs `widget/v3.css` `.shset-x .shset-seg`): a row of buttons beside its label was `flex:none`, so Timmy Tooth's Everywhere / Dashboard only / Off ran past the sheet at XX-Large on a phone; rows now shrink to their line and wrap (unchanged at normal text). **Timmy's speech bubble** (`widget/pet.js`, the dashboard perch): `place()` flipped it to his left whenever the right had under 200 px without checking the left, so at 320 px with the largest text it started 95 px off screen. It now measures both sides (rects against the page's own rect, turned into CSS px by the perch's offsetWidth), takes the roomier one, caps its width to that room (`--pet-room`), and goes above him, kept on screen, when neither side has 120 px. Its `100vw` caps use `--pet-vw` (the screen in zoomed px, set when he talks), the house bubble is capped to its scene (260% of his spot). **CI:** `tools/ci/smoke.js` opens the Settings sheet on the dashboard and every hub at 390 px with the largest text and fails a button past the sheet's edge (fails on `main`, passes here). The other two follow-ups from #235 (Perio's arcade 6 px, the Review table's keyboard stop) were already fixed by PR 239. `sw.js` sh-v56.
+- **2026-11-05 (no post-release monitoring, Claude Code)** — Sam: "take out all of the monitoring instructions now and
+  for the future". The 1, 24 and 48 hour checks after a release are gone from `RELEASE_TEST_PLAN.md` (section 11 is now
+  "Release and post-release verification"), the [preview-and-release-test](vault/rules/preview-and-release-test.md) rule,
+  [ship-a-change](vault/how-to/ship-a-change.md), the PR template, the test-report template and the repo map;
+  `tools/release/monitor.sql` is deleted, and the open "Monitored" boxes came off the current reports. The pending
+  1-hour check for the admin page release was cancelled before it ran. `postcheck.js`, the changelogs and rollback stay.
+
 - **2026-11-04 (Question health for every hub, Claude Code)** — Sam: "Build a question-health system for all hubs. Create
   stable question IDs, track accuracy, retries, time/abandonment, explanation engagement, and feedback; flag likely-quality
   problems for admin review without automatically deleting or changing educational content." How it works and every

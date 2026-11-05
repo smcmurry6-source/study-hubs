@@ -1,14 +1,14 @@
 # Release test plan
 
 How every substantial change to the study hubs is previewed, tested and approved before it reaches the class, and how
-it is checked, watched and rolled back after. It is a standing rule
+it is checked and, if needed, rolled back after. It is a standing rule
 ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md), Sam, 2026-11-04) for every agent
 and session. Merging to `main` is the release: GitHub Pages publishes it to the class within a minute or two.
 
 Contents: [1. Which changes](#1-which-changes) · [2. The flow](#2-the-flow) · [3. Previews](#3-interactive-previews) ·
 [4. Data isolation](#4-data-isolation) · [5. Test accounts](#5-test-accounts) · [6. Automated gates](#6-automated-gates) ·
 [7. Manual UAT](#7-manual-uat) · [8. Browsers and devices](#8-browsers-and-devices) · [9. Bug log](#9-bug-log) ·
-[10. Approval](#10-approval) · [11. Release, monitoring, verification](#11-release-monitoring-and-post-release-verification) ·
+[10. Approval](#10-approval) · [11. Release and verification](#11-release-and-post-release-verification) ·
 [12. Rollback](#12-rollback) · [13. Hosting and staging](#13-hosting-and-staging)
 
 ## 1. Which changes
@@ -37,7 +37,7 @@ When unsure, use the higher tier.
    what's left. A long one goes in `vault/release/reports/`.
 7. The agent **shows Sam the change** (screenshots, a recording, the live preview); **Sam approves** it in the PR, then
    merges ([approval](#10-approval)).
-8. **After the merge:** the post-release check, monitoring, the changelogs; roll back if needed.
+8. **After the merge:** the post-release check and the changelogs; roll back if needed.
 
 ## 3. Interactive previews
 
@@ -213,7 +213,7 @@ comment). Agents never tick it, never
 merge, and never treat a merge request from anyone else as approval. Tier 0 and 1: Sam's merge is the approval, as
 before. Sam can make "Check hubs" and "Release tests" required checks in the repo's branch protection settings.
 
-## 11. Release, monitoring and post-release verification
+## 11. Release and post-release verification
 
 1. **Release:** Sam merges. GitHub Pages publishes ("pages build and deployment" in Actions; about a minute).
 2. **Verify** (within the hour; tier 3 at once): `node tools/release/postcheck.js` checks every changed file is live and
@@ -221,11 +221,7 @@ before. Sam can make "Check hubs" and "Release tests" required checks in the rep
    blocked (it writes nothing). Then open the changed feature on a phone, as a person.
 3. **Log it:** a "Recent major changes" line in `DEPLOY_NOTES.md`, and the site changelog when students would notice
    (`log_changelog`, [secrets](vault/rules/secrets.md)).
-4. **Monitor** 1, 24 and 48 hours after: `tools/release/monitor.sql` (read-only counts per hub since the release against
-   the same hours a week before: people, activity, answers saved, reports), the admin page's Inbox for new reports, and the
-   Supabase logs for API errors. A hub with activity but no saved answers, activity far below last week, or a cluster of
-   reports is a lead: open it, log it, and roll back if it's S1.
-5. Close the bug-log rows the release fixed (retested on the live site), and write the test report's outcome.
+4. Close the bug-log rows the release fixed (retested on the live site), and write the test report's outcome.
 
 ## 12. Rollback
 
