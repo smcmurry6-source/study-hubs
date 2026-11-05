@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (widget bootstrap and visitor XP cache, Codex; pending review)** — `migration_v53.sql` and the matching
+  `supabase/schema.sql` snapshot move each hub/dashboard's eager widget reads into `get_widget_bootstrap`, while rank,
+  leaderboard, mastery and trophy calls stay panel-open. A trigger-maintained `xp_visitors` summary now supplies rank and
+  trophy totals instead of re-aggregating the class's `personal_answers`; Timmy's days are a one-shot bootstrap read, and
+  clicks/question-health share one analytics flush timer. The migration also pins the six advisor-flagged helper functions'
+  `search_path`, gives `link_attempts` a primary key, and drops the two unused indexes. **Not applied live:** after the
+  draft PR is reviewed and merged, apply `migration_v53.sql` manually through the approved deployment process with Sam's
+  approval; this task made no production/database writes. Fixture-only preview covered the dashboard and a returning hub;
+  there are no intended visual changes. Local syntax/vault checks pass; browser and throwaway-Postgres release suites need
+  their absent dependencies, and the runner's public-repo failure is the pre-existing untracked `.cache/boards-sources`
+  PDFs (not staged or changed here).
 - **2026-11-06 (outside sources for every figure, and Perio S8 Fig 3, Claude Code)** — Sam's new standing rule
   ([outside-sources-for-figures](vault/rules/outside-sources-for-figures.md)): outside sources are encouraged on every
   figure, for accuracy and for how it works, and cited in the figure; what it names and tests still follows the lecture.

@@ -27,10 +27,10 @@ function prose(text){
              .replace(/`[^`\n]*`/g, m => ' '.repeat(m.length));
 }
 function frontmatter(text){
-  const m = /^---\n([\s\S]*?)\n---\n/.exec(text);
+  const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(text);
   if (!m) return null;
   const fm = {};
-  m[1].split('\n').forEach(line => { const kv = /^([A-Za-z][\w-]*):\s*(.*?)\s*(#.*)?$/.exec(line); if (kv) fm[kv[1]] = kv[2]; });
+  m[1].split(/\r?\n/).forEach(line => { const kv = /^([A-Za-z][\w-]*):\s*(.*?)\s*(#.*)?$/.exec(line); if (kv) fm[kv[1]] = kv[2]; });
   return fm;
 }
 

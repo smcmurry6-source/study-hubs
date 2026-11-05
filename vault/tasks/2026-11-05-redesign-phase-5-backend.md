@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: review
 hub: widget
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on:
-agent:
+waiting-on: Sam's look and approval; migration_v53.sql applied to the live project
+agent: Codex (part 1); Claude Code (rebase onto main and the release suites)
 pr:
 ---
 
@@ -41,5 +41,10 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-05: implementation started on `codex/redesign-phase-5-backend` from `origin/main`.
+- 2026-11-05: implemented the fixture-safe bootstrap, trigger-maintained `xp_visitors` cache and advisor cleanup in `migration_v53.sql`; refreshed the schema snapshot. Previewed the dashboard and a returning-learner hub through `node tools/preview/serve.js` using browser-held fixtures only; no class data or live migration was touched.
+- 2026-11-05: `node tools/ci/syntax.js` and `node tools/ci/vault.js` pass. `node tools/ci/smoke.js` is blocked because this checkout lacks `playwright`. `node tools/release/run.js` confirms those passes, reports its browser/database suites blocked by missing `playwright`, `axe-core` and PostgreSQL binaries, and reports the pre-existing untracked `.cache/boards-sources/*.pdf` files in its public-repo scan. They were preserved and are not part of this branch.
 
 ## Outcome
+
+(pending)
