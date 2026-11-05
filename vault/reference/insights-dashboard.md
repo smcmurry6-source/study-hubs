@@ -41,7 +41,7 @@ Part of [analytics governance](analytics-governance.md).
 | Spacing: retries of right answers | re-answers of questions the person already had right ÷ all re-answers | over 50% | Point the bank's default view and the drill at unanswered and missed questions |
 | Features | per page: tour started ÷ shown (the card's total counts a person once per page, so someone asked on two pages counts twice); podcast 95% heard ÷ played; Listen, figures, highlighter, pins, Find in notes, mind maps, Timmy Tooth off (2026-10-20 on) | tour under 20%; podcast under 40% | Tour: stop asking on arrival, offer it from the menu. Podcast: chapters by lecture, highest-yield first |
 | Student voice | reports open, replied, median hours to resolve; check-ins ÷ the hub's people; respondents' median minutes ÷ the hub's | any open; check-ins under 20% of people; respondents over 2× the median | Answer open reports; read check-ins as heavy users' view, next to the use data |
-| Data quality | the checks in [analytics-data-quality](analytics-data-quality.md), storage against the 500 MB free plan | database over 350 MB or under 12 weeks of growth left | Fix the tracking, or run the [retention](analytics-retention.md) schedule once Sam approves it |
+| Data quality | the checks in [analytics-data-quality](analytics-data-quality.md), storage against the 500 MB free plan, the weekly [retention](analytics-retention.md) job's last run | database over 350 MB or under 12 weeks of growth left; the retention job missing or a week late | Fix the tracking; for storage, ask Sam about the next retention step; run a missed retention week by hand |
 
 ## First reading: all hubs, 2026-11-04
 
@@ -98,7 +98,8 @@ None of these is shipped; each needs Sam's call, then becomes a task note.
 - **Chapters in Timmy Time**, one per lecture, so people can jump (insight 7).
 - **Practice the hard formats**: the Daily Drill and the mock take a fixed share of two-statement, select-all and
   ordering items when the exam uses them (insight 5).
-- **Retention schedule and the two quick wins** in [analytics-retention](analytics-retention.md) (insight 10).
+- **Retention schedule and the two quick wins** in [analytics-retention](analytics-retention.md) (insight 10): done,
+  in force since 2026-11-05 (200 MB after the first run).
 
 Related: [analytics-governance](analytics-governance.md) · [event-taxonomy](event-taxonomy.md) ·
 [read-usage-data](../how-to/read-usage-data.md) · `LESSONS.md`
