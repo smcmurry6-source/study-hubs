@@ -1,5 +1,5 @@
 {
- "about": "Where each figure goes: under a notes heading (place: full and plain heading text, matched at the start) and in that lecture's Review (byLec). Read by the hub's build; the hub keeps its own copy in FIG_PLACE / FIG_BY_LEC.",
+ "about": "Where each figure goes: under a notes heading (place: full and plain heading text, matched at the start) and in that lecture's Review (byLec). The hub holds the same lists as FIG_PLACE / FIG_BY_LEC; change both.",
  "place": {
   "dmpharm": [
    {"full": "Treating type 1 diabetes: insulin", "plain": "Insulins: fast for meals, slow for all day", "figs": ["insulins"]},

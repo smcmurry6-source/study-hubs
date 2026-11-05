@@ -50,5 +50,8 @@ re-rank High Likelihood from the review on Wed 11/11.
 
 - 2026-11-05: written when the hub shipped (L11 and L12 from their recordings; A and L13-L16 from slides and speaker
   notes; L17 and L18 had no slides yet).
+- 2026-11-05: the hub merged with smcmurry6-source/study-hubs#246: every question vetted, nine figures, both narration
+  levels. The places where a lecture contradicts a textbook or itself (kept as taught) are in the hub note: check each
+  against the recording when A and L13-L16 go to taught, and the figures against the slide images.
 
 ## Outcome

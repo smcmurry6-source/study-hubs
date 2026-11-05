@@ -31,8 +31,14 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   from D3s" (last year's Exam 2 study guide, Anki deck of practice questions, a female repro study doc), Quiz 3 (open
   until 11/12), Quiz 4, the take-home.
 - **Figures:** `tools/figures/heme-endo-exam2/` (`node tools/figures/heme-endo-exam2/build.mjs`; `--check` fails if
-  the hub's `anima:css`/`anima:js` blocks are stale; `place.json` puts each figure under its notes heading). Sam said yes to
-  every animation (2026-11-05).
+  the hub's `anima:css`/`anima:js` blocks are stale). Sam said yes to every animation (2026-11-05). Nine, each under a notes
+  heading and in its lecture's Review: `drugsites` and `insulins` (L11), `axislab` (L12a and L12b), `cah` (L12b), `tubule`
+  and `ducts` (L13), `follicle` (L14), `cycle` (L14 and L16), `hpg` (L15). Where each goes is in the hub's `FIG_PLACE` /
+  `FIG_BY_LEC` (matched by heading text, both levels; `place.json` keeps the same list): renaming a heading unplaces its
+  figure. The slide images were too large to read, so curve shapes, histology and the steroid chart follow the slide text
+  and standard textbook layout; each figure's "What this shows, and what's simplified" says what was assumed (detemir
+  drawn without a peak, no FSH peak at midcycle because L16 says inhibin suppresses it, hCG unnamed because the slides
+  don't name it). Check them against the slides when the recordings land.
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
