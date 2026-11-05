@@ -46,7 +46,28 @@ const QUICK = process.argv.includes('--quick');
       const page = await ctx.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
       await page.goto(srv.url + 'index.html?persona=returning'); await L.settle(page);
-      const sideways = async where => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${tag}: ${where} scrolls sideways by ${w}px`); };
+      /* Measured against the layout width (clientWidth), not innerWidth: a phone browser zooms out to fit a page that's
+         too wide, which grows innerWidth to match, so Chromium's phone emulation hid real overflow. Names the element
+         that sticks out furthest (fixed elements and anything inside a clipping box can't scroll the page). */
+      const sideways = async where => {
+        const r = await page.evaluate(() => {
+          const cw = document.documentElement.clientWidth, w = document.documentElement.scrollWidth - cw;
+          if (w <= 1) return null;
+          const clipped = e => { for (let p = e.parentElement; p && p !== document.body; p = p.parentElement) if (getComputedStyle(p).overflowX !== 'visible') return true; return false; };
+          let worst = null;
+          for (const e of document.querySelectorAll('body *')) {
+            const b = e.getBoundingClientRect();
+            if (!b.width || b.right + scrollX <= cw + 1 || (worst && b.right <= worst.right)) continue;
+            if (getComputedStyle(e).position === 'fixed' || clipped(e)) continue;
+            worst = { right: b.right, e };
+          }
+          if (!worst) return { w, who: 'no element named' };
+          const e = worst.e, cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+          const text = (e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+          return { w, who: e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + cls.map(c => '.' + c).join('') + (text ? ` "${text}"` : '') };
+        });
+        if (r) problems.push(`${tag}: ${where} scrolls sideways by ${r.w}px (furthest out: ${r.who})`);
+      };
       await sideways('dashboard');
       let screens = 1, tiny = 0;
       for (const hub of live) {

@@ -23,7 +23,7 @@ surveys newest first.
 - How it works: [admin-operations](../reference/admin-operations.md)
 - Sam's calls: [decisions](../decisions.md) (2026-11-04: leaderboard names; manual state until cleared or an end time)
 - Process: [preview-and-release-test](../rules/preview-and-release-test.md), tier 3 (a migration and the dashboard)
-- Bug fixed on the way: BUG-015 in the [bug log](../release/bug-log.md)
+- Bug fixed on the way: BUG-019 in the [bug log](../release/bug-log.md)
 - Test report: [2026-11-04-admin-operations](../release/reports/2026-11-04-admin-operations.md)
 
 ## Done when
@@ -39,7 +39,7 @@ surveys newest first.
   tab moved in as a view
 - [x] Sam approves the release in writing ("Merge when ready", 2026-11-05)
 - [x] `migration_v50.sql` applied to the live project (connector `apply_migration`), then the PR merged
-- [ ] After the release: `node tools/release/postcheck.js`, the Live and Hubs tabs load on the live admin page, BUG-015
+- [ ] After the release: `node tools/release/postcheck.js`, the Live and Hubs tabs load on the live admin page, BUG-019
   retested, monitoring at 1, 24 and 48 hours; PR #205 closed (its function is in v50)
 
 ## Log
@@ -58,4 +58,4 @@ surveys newest first.
 Shipped in PR #236 (2026-11-05): the redesigned admin page, Live and Hubs views, newest-first check-ins, and
 `migration_v50.sql` on the live project. Verified on fixtures and throwaway databases before release (the test
 report), and on the live database with read-only checks after the migration (grants, RLS, a wrong passphrase refused,
-the permission audit). Left: monitoring at 24 and 48 hours, BUG-015 retested on the live page, PR #205 closed by Sam.
+the permission audit). Left: monitoring at 24 and 48 hours, BUG-019 retested on the live page, PR #205 closed by Sam.

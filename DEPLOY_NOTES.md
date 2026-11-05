@@ -44,7 +44,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   dashboard by hand, until set back to Automatic or until an optional end time (Sam's call), with a confirmation, a note,
   an audit log and a stale-tab check; nothing is deleted. The rules live once in `widget/archive.js` (loaded by
   `index.html` and `review/`; `widget/v3.js`'s archived notice follows them). **Exam check-ins:** groups sort by their
-  newest check-in (they sorted by hub name, BUG-015), rows and survey answers newest first with an id tie-break.
+  newest check-in (they sorted by hub name, BUG-019), rows and survey answers newest first with an id tie-break.
   `migration_v50.sql` (numbered v49 until #237 took that number; tier 3, **applied 2026-11-05** after Sam's written
   approval, "Merge when ready"; the live permission audit found nothing after it): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
   `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
@@ -53,6 +53,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   for every admin view. Tests: `tools/release/admin-ops.js` and `tools/ci/archive.js` (in CI), `tools/release/admin-ui.js`
   (`run.js`, as `adminui`). How it works: [vault/reference/admin-operations.md](vault/reference/admin-operations.md).
 
+- **2026-11-05 (small-screen fixes from the first full release test, Claude Code)** — The first full "Release tests"
+  run on GitHub (WebKit and Firefox for the first time) found pages that scroll sideways. Most were the top bars, which
+  the measured top bar (PR 235, its entry below) fixes for every hub and the dashboard. The rest, fixed here: **Perio's arcade** no
+  longer wiggles 6 px sideways on phones (its full-bleed margin follows the page's 14 px padding at 520 px and below), and
+  **Perio Review's** tables that scroll sideways take keyboard focus and are named for screen readers ("Antibiotics
+  (table)"). The device matrix (`tools/release/matrix.js`) now measures against the layout width, because a phone browser
+  zooms out to fit a page that's too wide, which hid the overflow from Chromium's phone emulation; it also names the
+  element that sticks out. Bug log BUG-015 to BUG-018.
 - **2026-11-05 (The drawn Patient Box case system for every hub; anatomy and realism, Claude Code)** — Sam: "I also want
   this system to be called for patient box questions in other hubs", "All teeth need to be anatomically correct. All
   variables need to be realistic", "Merge when ready". The case kit moved out of the Perio hub into **`widget/cases.js` +
