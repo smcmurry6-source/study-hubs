@@ -47,7 +47,13 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
     mirrored), `hingearc` (Fig 12), `tolerance`, `stability` and `splints` (Figs 15-17) draw it. Reuse it for any new side
     view of the jaws rather than drawing another skull. Where a frame crops the skull, fade it (`rgScene`'s `fog`, or
     `rgFog`) instead of leaving a hard cut, and put labels on a soft card (`rgCard`), never across bone lines.
-  - The anima figures are numbered Fig 1-19 (plus Fig 2b) in lecture order; a new one takes the next free number.
+  - The L8 figures share `anima/l8den.mjs`: a frontal section through the first molars of a patient wearing complete
+    dentures (maxilla and palate, mandible, tongue, both bases, the molars), in mm with the occlusal plane at y = 0, a jaw
+    move `{dx, dy, rot}`, a lower-denture tip about its right ridge crest, separate denture offsets (`opt.up`, `ddx`/`ddy`)
+    and a contact finder; plus the four posterior tooth profiles (`PROF`: anatomic 30°, semi-anatomic 20°, flat 0°,
+    lingualized with a wide, shallow lower fossa). `schemes` (Fig 22) solves its poses in Node at build time, so a profile
+    change re-poses it: look at every scheme and move again after one. Reuse it for any new denture section.
+  - The anima figures are numbered Fig 1-23 (plus Fig 2b) in lecture order; a new one takes the next free number.
   - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
     the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
     **mesial** fossa of #30, as the sheet draws it, though real crown widths would put it nearer the central fossa) and
@@ -73,7 +79,9 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 - 2026-11-03: five for L7 (built 2026-11-04: `tolerance`, `stability`, `splints`, `thirds`, `erosion`;
   [task](../tasks/done/2026-11-03-occlusion-l7-diagrams.md)). L1-L7's diagram reviews are done; don't propose these again.
 - 2026-11-05: Sam approved all four L8 candidates (the three schemes in motion, ridge resorption,
-  support/stability/retention, posterior tooth forms); not built yet ([task](../tasks/2026-11-05-occlusion-l8-follow-ups.md)).
+  support/stability/retention, posterior tooth forms); built the same day as Figs 20-23 (`resorb`, `ssr`, `schemes`,
+  `toothforms`; [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260)). L8's diagram review is done; don't
+  propose these again.
 
 ## Drawn Patient Box cases
 

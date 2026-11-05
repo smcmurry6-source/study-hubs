@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (Occlusion L8: four drawn figures, Claude Code)** — Sam approved all four L8 diagram candidates ("Build" to
+  each). Built with the anima kit from the L8 notes and placed after the paragraph each explains, at both note levels, and
+  in L8's Review: **Fig 20 How the ridges resorb** (`resorb`: a side view at the midline and a section through the first
+  molars; a slider from natural teeth to long edentulous, Play, and "Set denture teeth" near the ridges: posterior
+  crossbite, pseudo-Class III), **Fig 21 Support, stability and retention** (`ssr`: the force each resists on a pair of
+  complete dentures, the dentures moving with it, and what resists it), **Fig 22 Balanced, non-balanced, lingualized**
+  (`schemes`: five setups, closed / right working / protrusion, contact lamps per side and the front teeth, and "contact on
+  one side only" tipping the lower denture off its ridge) and **Fig 23 Posterior tooth forms** (`toothforms`: anatomic,
+  semi-anatomic, flat and lingualized pairs; "Slide sideways" draws the contact force square to the surfaces in contact).
+  `tools/figures/occlusion/anima/l8den.mjs` is the frontal section Figs 21 and 22 share (and the tooth profiles Fig 20 and
+  23 use). Occlusion's performance budget 1320 -> 1350 KB (the figures add about 21 KB over the wire), pending Sam's
+  approval (BUG-030). About page: the Diagrams entry. No schema change, no text or audio change.
+
 - **2026-11-05 (question health: every flagged question reviewed, Claude Code)** — Sam: "review and fix all questions flagged
   for question health". `qh_report` listed 33 to review on the live hubs (PCD Implants 14, Perio 10, Occlusion 9; none on
   Special Patient Care or Heme & Endo Exam 2). Each was read against its hub's notes: **every key matches the notes**, and

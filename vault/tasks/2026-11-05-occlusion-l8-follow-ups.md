@@ -5,9 +5,9 @@ hub: occlusion
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-16
-waiting-on: L8's slides or handout in the Drive Final folder (the slides check only)
+waiting-on: Sam's look at the four figures (PR #260), then L8's slides or handout in the Drive Final folder
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/260
 ---
 
 # Occlusion L8 (Denture Occlusion): diagram review and the slides check
@@ -31,7 +31,7 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 - Draw from L8's notes (`dentures` in the hub's READINGS) and check against the `dn-*` / `cs-dn-*` questions. Build like
   the L7 figures (`tools/figures/occlusion/anima/`, `FIG_PLACE.dentures` in `od.js`, a Review `figs` section).
 
-**Diagram candidates** (proposed 2026-11-05; **Sam approved all four the same day**, "Build" to each; none built yet):
+**Diagram candidates** (proposed 2026-11-05; **Sam approved all four the same day**, "Build" to each; built the same day as Figs 20-23, [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260)):
 
 1. **The three schemes in motion**: a frontal view of a pair of complete dentures (posterior teeth both sides) stepping
    centric occlusion, right working, protrusion, with a toggle for balanced / non-balanced / lingualized; contacts light
@@ -55,15 +55,18 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 ## Done when
 
 - [x] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
-- [ ] The approved figures are built, checked at 390 px in both themes, and Sam has seen the screenshots
+- [x] The approved figures are built and checked at 390 px in both themes (Sam seeing the screenshots: PR #260)
 - [ ] The L8 slides or handout are checked against the notes (names the recording spelled by ear: Gysi, Trubyte, Hanau,
       Thielmann, Berry; the resorption directions; the tooth-form angles), with both mp3s rebuilt if the notes change
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [ ] Vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
 
 - 2026-11-05: written when L8 shipped from the 11/5 recording ([PR #259](https://github.com/smcmurry6-source/study-hubs/pull/259)); the four candidates went to Sam in chat.
 - 2026-11-05: Sam approved all four (Build, Build, Build, Build). Building them is next.
+- 2026-11-05: built: Fig 20 `resorb`, Fig 21 `ssr`, Fig 22 `schemes`, Fig 23 `toothforms` (numbered in the notes' order),
+  in both note levels and L8's Review; screenshots for Sam in [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260).
+  Occlusion's performance budget raised to 1350 KB there, pending Sam (BUG-030). Left: Sam's look, then the slides check.
 
 ## Outcome
