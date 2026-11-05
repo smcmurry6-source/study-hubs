@@ -50,7 +50,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (L12a and L12b), CAH on the steroid pathway, the seminiferous tubule, the duct system, follicle stages, the 28-day cycle
   (L14 and L16) and the male HPG axis. The Cycle Arcade (`HEE2_SKIN`), the dashboard card and arcade, its medal
   (`widget/ranks.js`), the admin and recap lists, `sw.js` sh-v57, the About page (Home, Arcade, Diagrams). Light-mode tag
-  colors darkened for contrast; its accessibility baseline (0 issues) and performance budget are new. Not yet in it: L17
+  colors darkened for contrast; its accessibility baseline (0 issues) and performance budget are new. For every hub, the
+  shared Stats launcher's spoken name now starts with the count it shows (`widget/v3.js`, BUG-003 in part), and the admin
+  page test names Heme & Endo Exam 1's card in full now that two Heme & Endo cards exist. Not yet in it: L17
   and L18 (no slides on 11/5) and the recordings of A and L13-L16:
   [the task](vault/tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
 
