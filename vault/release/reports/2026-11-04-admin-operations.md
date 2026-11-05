@@ -116,11 +116,17 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
 ## Release
 
 - [x] Sam approved this release: in the session, 2026-11-05, "Merge when ready" (the PR's box is Sam's to tick).
-- [x] `migration_v50.sql` applied (connector `apply_migration`, 2026-11-05; live audit clean), then merged.
-- [ ] `node tools/release/postcheck.js` passed:
-- [ ] The live admin page: every view loads, Live and Hubs work, check-ins newest first (BUG-019 retested):
+- [x] `migration_v50.sql` applied (connector `apply_migration`, 2026-11-05; live audit clean), then merged (`e6a8f02`,
+  after "Check hubs" and "Release tests" both passed on the merged head `39f4c91`).
+- [x] `node tools/release/postcheck.js` passed (2026-11-05): 5 of 5 changed site files live and identical to `main`;
+  the dashboard and the four live hubs open with no errors; 69 Supabase requests blocked, nothing written.
+- [x] The live admin page (2026-11-05): it loads at 1280 and 390 px with all 13 views and `widget/archive.js`, no
+  script error, no sideways scroll (Supabase blocked). The live functions, called read-only with only counts printed:
+  no override and an empty log (the hubs follow their dates); Live returns only hub, count and names (5 or more people
+  at the time); 96 check-ins and the surveys come back newest first (BUG-019 retested); a wrong passphrase is refused
+  (28000) and the new tables answer 401 to a visitor. The signed-in views on real data are Sam's first look.
 - [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
-- [ ] `DEPLOY_NOTES.md` and the site changelog updated.
+- [x] `DEPLOY_NOTES.md` updated. Site changelog skipped: nothing students see changes until Sam sets a hub by hand.
 
 Related: [admin-operations](../../reference/admin-operations.md) · [bug log](../bug-log.md) ·
 [RELEASE_TEST_PLAN.md](../../../RELEASE_TEST_PLAN.md)
