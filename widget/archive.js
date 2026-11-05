@@ -2,7 +2,7 @@
    Which public state a hub is in right now: "live" (a card with an Open button), "archived" (a greyed card, no Open
    button, check-in buttons by the exam dates) or "hidden" (no card). Two inputs, in this order of precedence:
 
-     1. A manual override from the admin page (review/, Hubs tab; table hub_archive_overrides, migration_v49):
+     1. A manual override from the admin page (review/, Hubs tab; table hub_archive_overrides, migration_v50):
         live, archived or hidden, in force until Sam sets the hub back to Automatic or until its end time (until).
      2. Automatic, from the dashboard's dates in index.html: a hub in HUBS archives at ARCHIVE_HOUR (10 pm) on the day
         of its last exam (an exam's archiveHour, or the hub's archiveOn {date, hour}, moves that), and its card is

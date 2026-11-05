@@ -23,7 +23,13 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
   const errs = [];
   async function open(ctx, url){ const p = await ctx.newPage(); p.on('pageerror', e => errs.push(url + ': ' + e.message)); await p.goto(base + url); return p; }
   async function admin(ctx, url){ const p = await open(ctx, url || 'review/'); await p.waitForSelector('#app:not([hidden])', { timeout: 15000 }); return p; }
-  async function hubsTab(p){ await p.click('[data-tab=hubs]'); await p.waitForSelector('[data-arch-hub="occlusion"] .state', { timeout: 15000 }); await p.waitForTimeout(400); }
+  /* the admin page's views are links in its sidebar; on a phone the sidebar is a menu opened from the top bar */
+  async function go(p, view){
+    if (await p.isVisible('#menuBtn')) { await p.click('#menuBtn'); await p.waitForSelector('#sidebar.open'); }
+    await p.click(`.nav [data-tab=${view}]`);
+    await p.waitForFunction(v => !document.querySelector(`[data-panel=${v}]`).hidden, view);
+  }
+  async function hubsTab(p){ await go(p, 'hubs'); await p.waitForSelector('[data-arch-hub="occlusion"] .state', { timeout: 15000 }); await p.waitForTimeout(400); }
   async function setState(p, hub, st, until, note){
     await p.click(`[data-arch-edit="${hub}"]`);
     await p.check(`[data-arch-form="${hub}"] input[value=${st}]`);
@@ -47,34 +53,56 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     const G = await L.guard(ctx);
     const page = await admin(ctx, `review/?persona=admin&now=${NOW}`);
 
-    await page.click('[data-tab=surveys]');
+    /* each view loads only its own data: the Overview doesn't ask for clicks, searches or surveys */
+    await page.waitForSelector('[data-panel=overview] .card');
+    const calls = () => page.evaluate(() => window.__shPreview.log().map(x => x.name));
+    const first = await calls();
+    ok(!first.some(n => /get_click_summary|get_search_terms|get_survey_results|get_feature_events|get_nuke_/.test(n)), `the Overview loads only its own data (it asked for ${[...new Set(first)].join(', ')})`);
+    ok(first.filter(n => n === 'get_reports').length === 1, 'the sign-in check\'s reports are reused, not fetched twice');
+    /* every view opens with its own title and no error */
+    for (const v of ['time', 'questions', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
+      await go(page, v);
+      await page.waitForFunction(v => { const el = document.querySelector(`[data-panel=${v}]`); return el && !el.querySelector('[aria-busy=true]') && el.children.length; }, v, { timeout: 15000 });
+      const nav = (await page.textContent(`.nav [data-tab=${v}]`)).replace(/\d+$/, '').trim(), h1 = (await page.textContent('#viewTitle')).trim();
+      ok(nav === h1, `${v}: the title says "${h1}", the menu "${nav}"`);
+      ok(!(await page.$(`[data-panel=${v}] .err`)), `${v} shows an error`);
+      ok(await page.evaluate(() => location.hash) === '#' + v, `${v}: the address ends in #${v}`);
+    }
+    ok((await calls()).includes('get_click_summary'), 'Clicks asks for its data when it opens');
+    await page.goBack(); await page.waitForTimeout(300);
+    ok(await page.evaluate(() => !document.querySelector('[data-panel=recap]').hidden && location.hash === '#recap'), 'the back button returns to the view before');
+    notes.push('every view: its own title, no error, its own address; data loaded per view, the back button works');
+
+    await go(page, 'checkins');
     await page.waitForSelector('[data-checkin-group]');
     const groups = await page.$$eval('[data-checkin-group]', els => els.map(e => e.getAttribute('data-checkin-group')));
     ok(groups.join() === 'heme-endo-exam1,pcd-implants-exam1,occlusion,perio', `check-in groups newest first, not by name (got ${groups})`);
     const heme = await page.$$eval('[data-checkin-group="heme-endo-exam1"] .sv-text', els => els.map(e => e.textContent));
     ok(/it was great/.test(heme[0] || ''), `inside a group the newest check-in comes first (got "${heme[0]}")`);
+    await go(page, 'surveys');
+    await page.waitForSelector('[data-panel=surveys] [data-sv-toggle]');
     const titles = await page.$$eval('[data-panel=surveys] .card h2', els => els.map(e => e.textContent));
     const iNew = titles.findIndex(t => /round 2/.test(t)), iOld = titles.findIndex(t => /round 1/.test(t));
     ok(iNew >= 0 && iOld > iNew, `surveys newest first (got ${titles.filter(t => /round/.test(t))})`);
-    notes.push('Surveys tab: check-in groups and surveys newest first');
+    notes.push('Exam check-ins: groups and rows newest first; Surveys: newest first');
 
     /* Live: count, names, no ids, polling only while open and visible */
     const liveCalls = () => page.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_live_presence').length);
-    await page.click('[data-tab=live]');
+    await go(page, 'live');
     await page.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5', null, { timeout: 10000 });
     const liveText = await page.textContent('[data-panel=live]');
     ok(/Mock Mandible/.test(liveText) && /Occlusion/.test(liveText), 'Live lists names under their hub');
     ok(!/fixture-|00000000-|preview0000|visitor/i.test(liveText.replace(/visitor id/gi, '')), 'Live shows no visitor id');
-    ok((await page.textContent('#liveCount')) === '5', 'the Live tab shows the count');
+    ok(/^5 people studying/.test(await page.textContent('#viewSub')), 'the Live view says how many are studying under its title');
     await page.screenshot({ path: path.join(shots, 'live-desktop-light.png'), fullPage: true });
     const c1 = await liveCalls();
     await page.waitForTimeout(31500);
     const c2 = await liveCalls();
     ok(c2 === c1 + 1, `Live checks again after 30 s while open (${c1} -> ${c2})`);
-    await page.click('[data-tab=overview]');
+    await go(page, 'overview');
     await page.waitForTimeout(31500);
     ok(await liveCalls() === c2, 'Live stops checking while another tab is open');
-    await page.click('[data-tab=live]');
+    await go(page, 'live');
     await page.waitForTimeout(800);
     const c3 = await liveCalls();
     ok(c3 === c2 + 1, `back on Live it checks at once (${c2} -> ${c3})`);
@@ -164,22 +192,30 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, colorScheme: 'dark' });
     const G2 = await L.guard(phone);
     const m = await admin(phone, `review/?persona=admin&now=${NOW}`);
-    const wide = () => m.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    for (const tab of ['live', 'hubs', 'surveys']) {
-      await m.click(`[data-tab=${tab}]`);
+    const wide = () => m.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - 390);
+    /* the menu: a full-screen sheet; Escape closes it and gives focus back to the Menu button */
+    await m.tap('#menuBtn'); await m.waitForSelector('#sidebar.open');
+    ok(await m.evaluate(() => document.activeElement && document.activeElement.closest('#sidebar') !== null), 'opening the menu moves focus into it');
+    await m.keyboard.press('Escape');
+    ok(await m.evaluate(() => !document.querySelector('#sidebar').classList.contains('open') && document.activeElement && document.activeElement.id === 'menuBtn'), 'Escape closes the menu and returns focus to Menu');
+    const barTaps = await m.$$eval('.mbar .btn', els => els.map(e => Math.round(e.getBoundingClientRect().height)));
+    ok(barTaps.every(h => h >= 44), `the top bar's buttons are at least 44 px tall (${barTaps})`);
+    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs']) {
+      await go(m, tab);
       if (tab === 'live') await m.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5');
       if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="occlusion"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="occlusion"]'); await m.tap('[data-arch-form="occlusion"] input[value=hidden]'); await m.tap('[data-arch-form="occlusion"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
-      if (tab === 'surveys') await m.waitForSelector('[data-checkin-group]');
+      if (tab === 'checkins') await m.waitForSelector('[data-checkin-group]');
+      if (tab === 'overview') await m.waitForSelector('[data-panel=overview] .card');
       await m.waitForTimeout(300);
       const over = await wide();
       ok(over <= 0, `${tab} scrolls sideways on a 390 px phone by ${over} px`);
-      await m.screenshot({ path: path.join(shots, `${tab}-phone-dark.png`), fullPage: tab !== 'surveys' });
+      await m.screenshot({ path: path.join(shots, `${tab}-phone-dark.png`), fullPage: tab !== 'checkins' });
     }
     const tap = await m.$$eval('[data-arch-form="occlusion"] .arch-opt, [data-arch-form="occlusion"] .btn', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
     ok(tap.every(h => h >= 40), `touch targets in the form are at least 40 px tall (${tap})`);
     ok(G2.leaks.length === 0, `phone: requests to Supabase: ${G2.leaks.join(', ')}`);
     await phone.close();
-    notes.push('phone (390 px, dark): Live, Hubs with the form open, Surveys fit with no sideways scroll');
+    notes.push('phone (390 px, dark): the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins and Inbox fit with no sideways scroll');
     ok(!errs.length, `page errors: ${errs.slice(0, 3).join(' | ')}`);
     notes.push(`screenshots in ${shots}`);
   } catch (e) {

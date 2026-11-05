@@ -14,8 +14,8 @@ function signatures, no student rows). [How it works](../../reference/admin-oper
 
 - **Change:** the admin page gets a Live tab (who's studying now, by leaderboard name) and a Hubs tab (set a hub live,
   archived or hidden by hand, with an audit log); check-ins and surveys read newest first. Students see a hub card or a
-  hub page follow Sam's choice, and two new lines on the About page.
-- **Tier:** 3: a migration (`migration_v49.sql`, new tables and functions) and a change to what the dashboard shows.
+  hub page follow Sam's choice (no About page entry: Sam keeps admin information off it).
+- **Tier:** 3: a migration (`migration_v50.sql`, new tables and functions) and a change to what the dashboard shows.
   Waits for Sam's written approval; the migration is applied only after it.
 - **Preview:** `node tools/preview/serve.js` on the branch (the PR's Cloudflare Pages link when its preview job runs).
   Sam was shown nine screenshots (laptop light, phone dark). Every run ended with no request reaching production.
@@ -71,7 +71,7 @@ keyboard, dark mode, reduced motion (no new animation), privacy.
 ## Release
 
 - [ ] Sam approved this release (Sam ticks it in the PR).
-- [ ] `migration_v49.sql` applied (connector `apply_migration`), then merged; `node tools/release/postcheck.js` passed:
+- [ ] `migration_v50.sql` applied (connector `apply_migration`), then merged; `node tools/release/postcheck.js` passed:
 - [ ] The live admin page: Live and Hubs tabs load, check-ins newest first (BUG-010 retested):
 - [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.

@@ -290,11 +290,40 @@
           .concat(db.suggestions.map(function(s){ return { kind: "suggestion", id: s.id, hub: s.hub, note: s.note, resolved: !!s.resolved, created_at: s.at, reply: s.reply || null, resolved_at: null, can_notify: true, reply_seen_at: null }; }))
           .concat([{ kind: "flag", id: 8801, hub: "occlusion", note: "Fixture report: choice B and C read the same.", resolved: false, created_at: iso(t - d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null },
                    { kind: "suggestion", id: 8802, hub: "dashboard", note: "Fixture suggestion: a dark mode for the arcade.", resolved: false, created_at: iso(t - 2 * d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null }]);
-      case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", at: iso(t - d), hidden: false, reports: 1 }];
+      case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", created_at: iso(t - d), hidden: !!(db.podHidden || {})[7701], hidden_by: (db.podHidden || {})[7701] ? "admin" : null, reports: 1 },
+        { id: 7702, hub: "occlusion", ep: "timmy-time", name: "Test Tubercle", body: "Fixture comment: the Bennett part finally clicked.", created_at: iso(t - 3 * d), hidden: false, hidden_by: null, reports: 0 }];
+      /* the admin page's other views, so each one has something to show in a preview (made-up numbers) */
+      case "get_visitor_by_section": {
+        var secs = { occlusion: ["home/dashboard", "bank/practice", "compendium/l3", "mock/exam", "arcade/showdown", "notes/l1"],
+                     perio: ["home/dashboard", "bank/practice", "notes/s6", "review/staging", "mock/exam"],
+                     "pcd-implants-exam1": ["home/dashboard", "notes/l1", "bank/practice", "listen/timmy-time"],
+                     "special-patient-care": ["bank/practice", "notes/l2", "home/dashboard"] }, out = [];
+        Object.keys(secs).forEach(function(h, hi){ secs[h].forEach(function(sec, i){ out.push({ hub: h, section: sec, unique_visitors: 30 - hi * 4 - i * 3, total_minutes: Math.round((620 - hi * 90) / (i + 1.4)) }); }); });
+        return out;
+      }
+      case "get_click_summary": {
+        var tg = ["mode=bank", "mode=mock", "#bankShow-likely", "mode=notes", "widget:#shSearch", ".qcard-next", "mode=arcade", "#homeDrill"], outc = [];
+        ["occlusion", "perio", "dashboard"].forEach(function(h, hi){ tg.forEach(function(x, i){ if (h === "dashboard" && i > 3) return; outc.push({ hub: h, target: h === "dashboard" ? ["open:occlusion", "open:perio", "about", "inbox"][i] : x, section: i % 2 ? "bank/practice" : "home/dashboard", clicks: Math.round((480 - hi * 120) / (i + 1)), people: Math.max(2, 34 - hi * 6 - i * 3) }); }); });
+        return outc;
+      }
+      case "get_feature_events": return [
+        { hub: "occlusion", kind: "view", people: 41, total: 690 }, { hub: "perio", kind: "view", people: 35, total: 510 },
+        { hub: "occlusion", kind: "tts:start-full", people: 14, total: 52 }, { hub: "occlusion", kind: "tts:secs", people: 14, total: 9200 },
+        { hub: "pcd-implants-exam1", kind: "pod:timmy-time:play", people: 11, total: 19 }, { hub: "pcd-implants-exam1", kind: "pod:timmy-time:q4", people: 6, total: 6 },
+        { hub: "dashboard", kind: "egg:timmy-start", people: 4, total: 5 }, { hub: "occlusion", kind: "fig-seen:angle-classes", people: 22, total: 61 },
+        { hub: "dashboard", kind: "name:set", people: 9, total: 9 }];
+      case "get_search_terms": return [
+        { hub: "occlusion", term: "bennett angle", searches: 14, hits: 6 }, { hub: "perio", term: "staging", searches: 11, hits: 9 },
+        { hub: "occlusion", term: "curve of spee", searches: 8, hits: 3 }, { hub: "perio", term: "furcation grade", searches: 6, hits: 0 },
+        { hub: "pcd-implants-exam1", term: "abutment", searches: 5, hits: 4 }, { hub: "occlusion", term: "fixture search with no result", searches: 3, hits: 0 }];
+      case "get_nuke_summary": return [{ total_launches: 12, unique_launchers: 7 }];
+      case "get_nuke_by_hub": return [{ hub: "occlusion", launches: 8 }, { hub: "perio", launches: 4 }];
+      case "get_nuke_unlocks": return [{ hub: "occlusion", unlocks: 15, unused: 6 }, { hub: "perio", unlocks: 7, unused: 3 }];
+      case "get_nuke_recent": return FAKE_NAMES.slice(0, 4).map(function(n, i){ return { display_name: n, hub: i % 2 ? "perio" : "occlusion", launched_at: iso(t - (i + 1) * 5 * 36e5) }; });
       default: return [];
     }
   }
-  /* ---------- admin operations (migration_v49): live presence, hub archive overrides, newest-first check-ins ----------
+  /* ---------- admin operations (migration_v50): live presence, hub archive overrides, newest-first check-ins ----------
      Overrides live in their own key (K.ovr), shared by every test account, so an admin can archive a hub on review/
      and a student account sees it on the dashboard. Check-ins and surveys arrive deliberately out of order (and with the
      newest group first by time but not by name), so the admin page's own sorting is what gets tested. */
@@ -372,8 +401,9 @@
       if (a.p_secret !== C.adminSecret) return unauthorized();
       var ops = adminOps(fn, a);
       if (ops) return ops;
-      if (/^(admin_|set_report_resolved)/.test(fn)) {
+      if (/^(admin_|set_report_resolved)/.test(fn) && fn !== "admin_pod_comments") {
         if (fn === "set_report_resolved") db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
+        if (fn === "admin_hide_pod_comment") { db.podHidden = db.podHidden || {}; db.podHidden[a.p_id] = !!a.p_hidden; }
         if (fn === "admin_post_notice") db.notices.push({ title: a.p_title, message: a.p_message, at: iso(now()) });
         save(); return { write: true, data: null };
       }
@@ -482,10 +512,16 @@
     var hub = f.hub && /^eq\./.test(f.hub) ? f.hub.slice(3) : null;
     var ids = f.qid && /^in\.\(/.test(f.qid) ? parseList(f.qid.slice(4, -1)) : null, t = now();
     function qids(){ if (ids) return ids; var E = hub && hubExport(hub); return E ? E.questions.map(function(q){ return q.id; }) : []; }
+    /* the admin page reads these tables whole (no hub): a few real question ids from three live hubs, made-up numbers */
+    var ADMIN_Q = { occlusion: ["rv-occl-artic", "rv-slide-pct", "rv-christensen", "rv-posselt", "fp-pm1b", "rv-2s-angle", "an-compound"],
+                    perio: ["q1-01", "q1-30", "q2-24", "q3-19", "q3-46", "q4-23"], "special-patient-care": ["in-def", "in-medicaid", "bg-never", "bg-benef", "ds-age"] };
+    function wholeTable(fn){ var out = []; Object.keys(ADMIN_Q).forEach(function(h){ ADMIN_Q[h].forEach(function(q){ out = out.concat(fn(h, q)); }); }); return out; }
     switch (name) {
-      case "question_stats": return qids().map(function(q){ var s = classStat(hub, q); s.hub = hub; return s; });
-      case "question_choices": var rows = []; qids().forEach(function(q){ rows = rows.concat(choiceRows(hub, q)); }); return rows;
-      case "mode_stats": return ["home", "compendium", "bank", "mock", "arcade", "listen"].map(function(m, i){ return { mode: m, opens: 300 - i * 45 }; });
+      case "question_stats": if (!hub && !ids) return wholeTable(function(h, q){ var s = classStat(h, q); s.hub = h; return [s]; });
+        return qids().map(function(q){ var s = classStat(hub, q); s.hub = hub; return s; });
+      case "question_choices": if (!hub && !ids) return wholeTable(function(h, q){ return choiceRows(h, q).map(function(r){ r.hub = h; return r; }); });
+        var rows = []; qids().forEach(function(q){ rows = rows.concat(choiceRows(hub, q)); }); return rows;
+      case "mode_stats": return (hub ? [hub] : ["occlusion", "perio"]).reduce(function(o, h, hi){ return o.concat(["home", "compendium", "bank", "mock", "arcade", "listen"].map(function(m, i){ return { hub: h, mode: m, opens: 300 - i * 45 - hi * 60 }; })); }, []);
       case "presence_hourly": var hrs = []; for (var h = 0; h < 24; h++) hrs.push({ hour_of_day: h, ping_count: Math.round(40 + 160 * Math.max(0, Math.sin((h - 6) / 24 * 2 * Math.PI))) }); return hrs;
       case "changelog":
         var built = C.builtAt || iso(t);

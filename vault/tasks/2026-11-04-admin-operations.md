@@ -5,9 +5,9 @@ hub: site
 created: 2026-11-04
 requested-by: Sam
 due: 
-waiting-on: Sam's look at the preview and written approval; then migration_v49 is applied and the PR merged
+waiting-on: Sam's look at the preview and written approval; then migration_v50 is applied and the PR merged
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/236
 ---
 
 # Admin operations: who's studying now, hub archive overrides, newest-first check-ins
@@ -32,12 +32,12 @@ surveys newest first.
 - [x] Check-ins and surveys newest first by `created_at`, groups by their newest check-in
 - [x] Archive overrides: Live / Archived / Hidden / Automatic, optional end time, confirmation, audit log, stale-tab check,
   one precedence rule shared by the dashboard, the hubs and the admin page; nothing deleted
-- [x] Migration, `supabase/schema.sql`, About page, vault notes, change log
+- [x] Migration, `supabase/schema.sql`, vault notes, change log (no About entry: Sam keeps admin information off it)
 - [x] CI and the release suites run on fixtures; screenshots shown to Sam
 - [ ] Sam approves the release in writing
-- [ ] `migration_v49.sql` applied to the live project (connector `apply_migration`), then the PR merged
+- [ ] `migration_v50.sql` applied to the live project (connector `apply_migration`), then the PR merged
 - [ ] After the release: `node tools/release/postcheck.js`, the Live and Hubs tabs load on the live admin page, BUG-010
-  retested, monitoring at 1, 24 and 48 hours; PR #205 closed (its function is in v49)
+  retested, monitoring at 1, 24 and 48 hours; PR #205 closed (its function is in v50)
 
 ## Log
 

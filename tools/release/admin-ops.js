@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Admin operations (migration_v49) on a throwaway PostgreSQL built from supabase/schema.sql, with made-up visitors
+// Admin operations (migration_v50) on a throwaway PostgreSQL built from supabase/schema.sql, with made-up visitors
 // only. Every call is made as the anonymous role, as the admin page's browser makes it. Checks that:
 //   - live presence needs the admin secret; counts people with a ping in the last 3 minutes (1-15), one per person
 //     across linked devices; shows leaderboard names only (a chosen name, else the random class name); and never

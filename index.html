@@ -842,7 +842,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     var a = archiveAt(hub); return a ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + CARD_DAYS, ARCHIVE_HOUR) : null;
   }
   /* Live, archived or hidden: widget/archive.js decides from the dates above plus any override set on the admin page
-     (review/, Hubs tab; get_hub_overrides, migration_v49). An override in force wins until it is cleared or its end
+     (review/, Hubs tab; get_hub_overrides, migration_v50). An override in force wins until it is cleared or its end
      time passes; then the dates decide again. The last copy of the overrides is kept (shArchive.readCache), so a
      returning visitor's first paint already has them; startClassData() fetches them fresh. Without widget/archive.js
      (an old offline copy) the dates alone decide, as before. HUBS ends up holding the live hubs, ARCHIVED_HUBS the rest
@@ -2023,7 +2023,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startClassData); else startClassData();
 
-  /* ---------- archive overrides from the admin page (widget/archive.js, migration_v49) ---------- */
+  /* ---------- archive overrides from the admin page (widget/archive.js, migration_v50) ---------- */
   var ovSb, ovAt;   /* no initializer: startClassData() may already have set them */
   function applyHubStates(){
     var sig = partitionHubs();
@@ -2034,7 +2034,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     if (!sb || !window.shArchive) return;
     ovSb = sb; ovAt = Date.now();
     sb.rpc("get_hub_overrides").then(function(r){
-      if (!r || r.error || !Array.isArray(r.data)) return;   /* not there yet (before migration_v49) or offline: keep what we have */
+      if (!r || r.error || !Array.isArray(r.data)) return;   /* not there yet (before migration_v50) or offline: keep what we have */
       window.shArchive.writeCache(r.data);
       OVERRIDES = window.shArchive.index(r.data);
       applyHubStates();

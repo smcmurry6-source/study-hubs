@@ -2733,7 +2733,7 @@
   /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
      archiveHour overrides it, e.g. 24 for one due at 11:59 pm; SH_EXPORT.archiveOn can override the date for a temporary reopen);
      a hub page still reachable after that says so once per visit, with a way back to the dashboard.
-     An override set on the admin page (review/, Hubs tab; get_hub_overrides, migration_v49) wins over the dates while it is
+     An override set on the admin page (review/, Hubs tab; get_hub_overrides, migration_v50) wins over the dates while it is
      in force, the same rule as widget/archive.js: archived or hidden shows the notice, live doesn't. If the network is slow
      (3 s) the dashboard's last copy of the overrides decides, else the dates. */
   (function(){
@@ -2776,7 +2776,7 @@
       supabase.rpc("get_hub_overrides").then(function(r){
         clearTimeout(wait);
         if (r && !r.error && Array.isArray(r.data)) { try { localStorage.setItem(OV_KEY, JSON.stringify({ t: Date.now(), rows: r.data })); } catch (e) {} decide(r.data); }
-        else decide(cached());   /* before migration_v49, or an error: the last copy, else the dates */
+        else decide(cached());   /* before migration_v50, or an error: the last copy, else the dates */
       }, function(){ clearTimeout(wait); decide(cached()); });
     } else decide(cached());
     function show(early){

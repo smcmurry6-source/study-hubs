@@ -1,4 +1,4 @@
--- migration_v49: admin live presence, hub archive overrides with an audit trail, newest-first check-ins and surveys.
+-- migration_v50: admin live presence, hub archive overrides with an audit trail, newest-first check-ins and surveys.
 -- Admin page (review/): a Live tab, a Hubs tab, and the Surveys tab's check-ins in order. Sam's calls (2026-11-04,
 -- vault/decisions.md): live names are the leaderboard name; a manual archive state lasts until it is cleared, or until
 -- an optional end time. How it all works: vault/reference/admin-operations.md.

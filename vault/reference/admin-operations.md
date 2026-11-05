@@ -5,7 +5,7 @@ tags: [admin, dashboard, supabase, privacy, archive]
 
 # Admin operations: who's studying now, hub archive overrides, newest-first check-ins
 
-Three parts of the admin page (`review/`, opened with the admin passphrase) added on 2026-11-04 by `migration_v49.sql`,
+Three parts of the admin page (`review/`, opened with the admin passphrase) added on 2026-11-04 by `migration_v50.sql`,
 with Sam's calls in [decisions](../decisions.md). The functions are in `supabase/schema.sql`; the code is
 `review/index.html` (Live and Hubs tabs), `widget/archive.js` (the archive rules, shared by the dashboard, the hubs and
 the admin page), `index.html` (the dashboard) and `widget/v3.js` (a hub's "This hub is archived" notice).
@@ -20,7 +20,8 @@ the admin page), `index.html` (the dashboard) and `widget/v3.js` (a hub's "This 
 - **Names are the leaderboard name** (Sam, 2026-11-04): the name a student picked, otherwise their random class name
   (`get_display_name`/`anon_name`). The function returns only `{minutes, as_of, total, hubs: [{hub, people, names}]}`:
   never a visitor id, an email, a section or a time per person. Two devices linked to one person (`visitor_links`) count
-  once; someone with two hubs open shows under both and once in the total. The About page says Sam can see this.
+  once; someone with two hubs open shows under both and once in the total. The About page doesn't mention the admin
+  page (Sam, 2026-11-04: [decisions](../decisions.md)).
 - **Cost:** one query over a few minutes of `activity_pings` through `activity_pings_time_idx`. The page asks every 30 s
   only while the Live tab is open and the browser tab is visible, stops when either changes, and backs off (1, 2, 4,
   5 minutes) after an error. The tab's count badge comes from the same call.
@@ -78,7 +79,7 @@ which never merged; `supabase/schema.sql` now matches the live function).
 
 The migration is tier 3 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)): it is applied to the live project only
 after Sam approves the release in writing. Either order is safe: before the migration, the dashboard and hubs keep using
-the dates, and the Live and Hubs tabs say they need migration_v49.
+the dates, and the Live and Hubs tabs say they need migration_v50.
 
 Related: [shared-infrastructure](shared-infrastructure.md) · [repo-map](repo-map.md) ·
 [read-usage-data](../how-to/read-usage-data.md) · [archiving-is-a-retrospective](../rules/archiving-is-a-retrospective.md) ·
