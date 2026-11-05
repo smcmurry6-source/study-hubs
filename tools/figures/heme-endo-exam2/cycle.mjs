@@ -126,7 +126,7 @@ function cyRender(st, D) {
   o += curve(C.E2, "cy-e2", H1, HH, "Estradiol (17β-estradiol, the main estrogen from the ovary): rises markedly through the follicular phase as the follicle grows, crosses 200 pg/mL just before the LH surge, and falls abruptly with progesterone at the end of the luteal phase. The corpus luteum's granulosa-lutein cells also make estrogen.");
   o += curve(C.P4, "cy-p4", H1, HH, "Progesterone: low in the follicular phase; it increases markedly in the luteal phase, made by the corpus luteum, and falls abruptly as the corpus luteum regresses: that abrupt loss prompts menses.");
   o += T(cyX(8.6), H1 - cyMono(C.E2, 8.6) * HH - 9, "estradiol", "cy-lab cy-e2-t", "end");
-  o += T(cyX(17.3) - 4, H1 - cyMono(C.P4, 17.3) * HH + 2, "progesterone", "cy-lab cy-p4-t", "end");
+  o += T(cyX(21.5), H1 - 0.88 * HH - 6, "progesterone", "cy-lab cy-p4-t", "middle");
   /* ---- endometrium ---- */
   o += T(XL, 374, "ENDOMETRIUM", "cy-h", "start");
   var TF = C.TF, top = function (xx) { return BA0 - cyMono(TF, xx); };
@@ -166,8 +166,8 @@ function cyRender(st, D) {
   if (!preg) o += HOT("Day 28, without fertilization: estrogen and progesterone fall abruptly, the ischemic functionalis separates from the basalis, and the lining and blood are sloughed off: menses.", '<path class="cy-sep" d="M' + f1(cyX(26.6)) + " " + (BA0 - 1) + "H" + f1(cyX(28.5)) + '"/>');
   o += T(cyX(11.6), top(11.6) - 7, "straight glands", "cy-sl", "middle");
   o += T(cyX(18.6), top(18.6) - 7, "coiled glands", "cy-sl", "middle");
-  o += T(cyX(3.4), top(3.4) - 40, "functionalis shed", "cy-sl", "middle");
-  o += L(cyX(8.3), top(7.5) - 18, "spiral artery", cyX(8.5) - 1, BA0 - 7, "end", "cy-sl");
+  o += T(cyX(3.0), 404, "functionalis shed", "cy-sl cy-lg", "start");
+  o += '<g class="cy-lg">' + L(cyX(8.3), top(7.5) - 18, "spiral artery", cyX(8.5) - 1, BA0 - 7, "end", "cy-sl") + "</g>";
   o += T(cyX(20.6), BA0 - 30, "stratum functionalis", "cy-in", "middle");
   o += T(cyX(20.8), BA0 + 10.5, "stratum basalis", "cy-in cy-in-s", "middle");
   o += T(cyX(20.8), MY1 - 4.5, "myometrium", "cy-in cy-in-s", "middle");
@@ -284,7 +284,7 @@ export default function cycle() {
 .anima .cycle-svg .cy-bt,.anima .cycle-svg .cy-fbt,.anima .cycle-svg .cy-h,.anima .cycle-svg .cy-dn,.anima .cycle-svg .cy-star{stroke:none}
 .anima .cycle-svg .cy-sh{display:none}
 @media (max-width:560px){.anima .cycle-svg .cy-lg{display:none}.anima .cycle-svg .cy-sh{display:inline}}
-@media (max-width:560px){.anima .cycle-svg .cy-h{font-size:12.5px}.anima .cycle-svg .cy-bt,.anima .cycle-svg .cy-sl,.anima .cycle-svg .cy-fbt,.anima .cycle-svg .cy-note,.anima .cycle-svg .cy-thrt,.anima .cycle-svg .cy-dn{font-size:12.5px}.anima .cycle-svg .cy-lab{font-size:14px}.anima .cycle-svg .cy-in{font-size:12.5px}.anima .cycle-svg .cy-in-s{font-size:11.5px}}
+@media (max-width:560px){.anima .cycle-svg .cy-h{font-size:12.5px}.anima .cycle-svg .cy-bt,.anima .cycle-svg .cy-sl,.anima .cycle-svg .cy-fbt,.anima .cycle-svg .cy-note,.anima .cycle-svg .cy-thrt,.anima .cycle-svg .cy-dn{font-size:12.5px}.anima .cycle-svg .cy-lab{font-size:14px}.anima .cycle-svg .cy-sl{font-size:11.5px}.anima .cycle-svg .cy-in{font-size:12.5px}.anima .cycle-svg .cy-in-s{font-size:11.5px}}
 `,
   });
 }
