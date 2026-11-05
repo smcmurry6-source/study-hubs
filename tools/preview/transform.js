@@ -27,8 +27,11 @@ const ROBOTS = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 
 /* What the live site serves (and so what a preview serves). Everything else in the repo (vault, tools, SQL, notes)
    isn't part of the site. */
+/* `hubs` is recursive: it deliberately includes every hub's adjacent `content/` JSON as well as its page, figures and
+   narration. A preview must exercise the same on-demand content fetches as the live site. */
 const SITE_ENTRIES = ['index.html', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];
 const TEXT_EXT = new Set(['.html', '.js', '.css', '.json', '.webmanifest', '.svg', '.txt', '.md']);
+const HUB_CONTENT_JSON = /^hubs\/[^/]+\/content\/.+\.json$/i;
 
 function gitInfo(){
   const run = args => { try { return require('child_process').execFileSync('git', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch (e) { return ''; } };
@@ -88,6 +91,15 @@ function transformSw(js, o){
   return rewriteText(js, o).replace(/var VERSION = '([^']+)';/, (m, v) => `var VERSION = '${v}-preview-${(o.sha || 'local').slice(0, 7)}';`);
 }
 
+function transformHubContent(rel, text, o){
+  /* Content is normally just passed through after preview-safe replacements. Parse it here so a preview/build catches a
+     broken lazy data file instead of silently serving a hub that fails only when a student opens that view. */
+  const out = rewriteText(text, o);
+  try { JSON.parse(out); }
+  catch (e) { throw new Error(`${rel}: invalid hub content JSON (${e.message})`); }
+  return out;
+}
+
 /* body for a site-relative file, or null to serve it untouched (binary) */
 function transformFile(rel, buf, o){
   const ext = path.extname(rel).toLowerCase();
@@ -95,6 +107,7 @@ function transformFile(rel, buf, o){
   const text = buf.toString('utf8');
   if (ext === '.html') return transformHtml(text, rel, o);
   if (rel === 'sw.js') return transformSw(text, o);
+  if (HUB_CONTENT_JSON.test(rel)) return transformHubContent(rel, text, o);
   return rewriteText(text, o);
 }
 
@@ -115,5 +128,5 @@ function headersFile(){
 }
 function robotsTxt(){ return 'User-agent: *\nDisallow: /\n'; }
 
-module.exports = { ROOT, PROD_HOST, PROD_URL, PROD_KEY, FIXTURE_HOST, FIXTURE_URL, FIXTURE_KEY, LIVE_SITE, PREVIEW_DIR, ROBOTS, SITE_ENTRIES,
+module.exports = { ROOT, PROD_HOST, PROD_URL, PROD_KEY, FIXTURE_HOST, FIXTURE_URL, FIXTURE_KEY, LIVE_SITE, PREVIEW_DIR, ROBOTS, SITE_ENTRIES, HUB_CONTENT_JSON,
   options, rewriteText, transformHtml, transformFile, runtime, headersFile, robotsTxt, csp };

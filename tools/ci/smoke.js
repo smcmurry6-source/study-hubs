@@ -14,6 +14,35 @@ const server = http.createServer((req, res) => {
 const BASE = () => `http://127.0.0.1:${server.address().port}/`;
 const hubs = fs.readdirSync(path.join(root, 'hubs')).filter(h => fs.existsSync(path.join(root, 'hubs', h, 'index.html')));
 const problems = [], notes = [];
+/* The engine keeps these legacy hooks during the extraction. The data-attribute alternatives make the smoke traversal
+   cover a hub rendered by widget/hub.js without weakening coverage for the untouched hubs. */
+const HUB_SELECTORS = {
+  modes: '#modeSwitch [data-mode], [data-sh-mode-switch] [data-mode]',
+  mode: m => `#modeSwitch [data-mode="${m}"], [data-sh-mode-switch] [data-mode="${m}"]`,
+  panel: m => `:is([data-mode-panel="${m}"], [data-sh-mode-panel="${m}"])`,
+  subtabs: m => `:is([data-mode-panel="${m}"], [data-sh-mode-panel="${m}"]) .subtabs button, :is([data-mode-panel="${m}"], [data-sh-mode-panel="${m}"]) #compendium-subnav button, [data-sh-mode-panel="${m}"] [data-sh-subtabs] button`,
+  games: '#panel-arcade .ar-grid [data-game], [data-sh-arcade] [data-game]',
+  game: g => `#panel-arcade .ar-grid [data-game="${g}"], [data-sh-arcade] [data-game="${g}"]`
+};
+
+/* The lint needs the complete content model. Legacy hubs expose it synchronously; the extracted hubs expose a core
+   promise and an on-demand loader. This hook remains immediately before SH_EXPORT, whose final-statement contract CI
+   relies on, but defers its snapshot until every linted data set is ready. */
+const CI_HOOK = [
+  'window.__CI = (function(){',
+  '  var ready = Promise.resolve(typeof window.SH_CONTENT_READY === "undefined" ? null : window.SH_CONTENT_READY).then(function(){',
+  '    var c = window.shHubContent;',
+  '    return c && typeof c.ensure === "function" ? Promise.all(["core","questions","whys","notes","study"].map(function(name){ return c.ensure(name); })) : null;',
+  '  });',
+  '  return { ready: ready, data: function(){ return {',
+  '    QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[],',
+  '    LECTURES: typeof LECTURES!=="undefined"?LECTURES:[],',
+  '    READINGS: typeof READINGS!=="undefined"?READINGS:{},',
+  '    READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{},',
+  '    LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:undefined',
+  '  }; } };',
+  '})();'
+].join('\n');
 
 async function stub(context){
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
@@ -181,23 +210,30 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:undefined };\n' + h.slice(i);
+        if (i > 0) h = h.slice(0, i) + CI_HOOK + '\n' + h.slice(i);
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
       // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would
       await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
-      if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
-      const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+      if (!vp.isMobile) {
+        const A = await page.evaluate(async () => {
+          if (!window.__CI) return null;
+          await window.__CI.ready;
+          return window.__CI.data();
+        }).catch(e => { problems.push(`${hub}: could not load its content for lint: ${e.message || e}`); return null; });
+        if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`);
+      }
+      const modes = await page.$$eval(HUB_SELECTORS.modes, bs => [...new Set(bs.map(b => b.getAttribute('data-mode')).filter(Boolean))]);
       let screens = 0;
       for (const m of modes) {
-        await page.click(`#modeSwitch [data-mode="${m}"]`); await page.waitForTimeout(250); screens++;
-        const subs = await page.$$eval(`[data-mode-panel="${m}"] .subtabs button, [data-mode-panel="${m}"] #compendium-subnav button`, bs => bs.map((b, i) => i));
-        for (const i of subs) { await page.click(`:is([data-mode-panel="${m}"] .subtabs button, [data-mode-panel="${m}"] #compendium-subnav button) >> nth=${i}`).catch(() => {}); await page.waitForTimeout(200); screens++;
+        await page.click(HUB_SELECTORS.mode(m)); await page.waitForTimeout(250); screens++;
+        const subs = await page.$$eval(HUB_SELECTORS.subtabs(m), bs => bs.map((b, i) => i));
+        for (const i of subs) { await page.click(`${HUB_SELECTORS.subtabs(m)} >> nth=${i}`).catch(() => {}); await page.waitForTimeout(200); screens++;
           const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${hub} (${label}): ${m} tab ${i + 1} scrolls sideways by ${w}px`); }
         if (m === 'arcade') {
-          const games = await page.$$eval('#panel-arcade .ar-grid [data-game]', bs => [...new Set(bs.map(b => b.getAttribute('data-game')))]);
-          for (const g of games) { await page.click(`#panel-arcade .ar-grid [data-game="${g}"]`).catch(() => {}); await page.waitForTimeout(250);
+          const games = await page.$$eval(HUB_SELECTORS.games, bs => [...new Set(bs.map(b => b.getAttribute('data-game')))]);
+          for (const g of games) { await page.click(HUB_SELECTORS.game(g)).catch(() => {}); await page.waitForTimeout(250);
             const s = await page.$('#panel-arcade [data-start]'); if (s) await s.click().catch(() => {}); await page.waitForTimeout(400);
             const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); await page.waitForTimeout(150); screens++; }
         }

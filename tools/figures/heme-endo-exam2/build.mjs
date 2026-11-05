@@ -1,6 +1,6 @@
-// Pastes the Heme & Endo Exam 2 hub's anima figures into hubs/heme-endo-exam2/index.html between its markers.
-//   node tools/figures/heme-endo-exam2/build.mjs            rebuild the hub's anima blocks from the files here
-//   node tools/figures/heme-endo-exam2/build.mjs --check    exit 1 if the hub's blocks are out of date
+// Builds the Heme & Endo Exam 2 hub's lazy anima assets from the files here.
+//   node tools/figures/heme-endo-exam2/build.mjs            rebuild the hub's figure assets and marker placeholders
+//   node tools/figures/heme-endo-exam2/build.mjs --check    exit 1 if the assets or placeholders are out of date
 //   node tools/figures/heme-endo-exam2/build.mjs --preview  also write standalone pages to dist/ for anima's checks
 // Each figure is one module here (static SVG + a live function sharing one model); edit them, never the generated
 // blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
@@ -12,9 +12,14 @@ import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const HUB = join(HERE, "../../../hubs/heme-endo-exam2/index.html");
+const FIGURES_DIR = join(HERE, "../../../hubs/heme-endo-exam2/figures");
+const JS_OUT = join(FIGURES_DIR, "anima.js");
+const CSS_OUT = join(FIGURES_DIR, "anima.css");
 const read = (f) => readFileSync(join(HERE, f), "utf8").trimEnd() + "\n";
 const AJB = "/* anima:js begin (built from tools/figures/heme-endo-exam2; edit there) */\n", AJE = "/* anima:js end */\n";
 const ACB = "/* anima:css begin */\n", ACE = "/* anima:css end */\n";
+const JS_PLACEHOLDER = "/* Loaded on demand from figures/anima.js by widget/hub.js. */\nvar ANIMA = { html:function(){ return ''; }, mount:function(){}, meta:function(){ return null; } };\n";
+const CSS_PLACEHOLDER = "/* Loaded on demand from figures/anima.css by widget/hub.js. */\n";
 
 /* the anima figures: static SVG + a live function per figure; helpers are declared inside the figure's data scope so
    the live code and the build share one model */
@@ -48,15 +53,26 @@ function between(src, b, e, body){
   if (i < 0 || j < i) throw new Error("markers not found: " + b.trim());
   return src.slice(0, i) + b + body + src.slice(j);
 }
+function same(file, text){
+  try { return readFileSync(file, "utf8") === text; }
+  catch { return false; }
+}
+function writeIfChanged(file, text){ if (!same(file, text)) writeFileSync(file, text); }
 const hub = readFileSync(HUB, "utf8");
-let out = between(hub, AJB, AJE, animaJs());
-out = between(out, ACB, ACE, animaCss());
+const js = AJB + animaJs().replace(/^var ANIMA = /, "window.ANIMA = ") + AJE;
+const css = ACB + animaCss() + ACE;
+let out = between(hub, AJB, AJE, JS_PLACEHOLDER);
+out = between(out, ACB, ACE, CSS_PLACEHOLDER);
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/heme-endo-exam2/index.html: the anima blocks are stale; run node tools/figures/heme-endo-exam2/build.mjs"); process.exit(1); }
-  console.log("heme-endo-exam2 anima blocks are up to date");
+  if (out !== hub || !same(JS_OUT, js) || !same(CSS_OUT, css)) {
+    console.error("hubs/heme-endo-exam2: the lazy anima assets or hub placeholders are stale; run node tools/figures/heme-endo-exam2/build.mjs");
+    process.exit(1);
+  }
+  console.log("heme-endo-exam2 lazy anima assets are up to date");
 } else {
-  writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  mkdirSync(FIGURES_DIR, { recursive: true });
+  writeIfChanged(HUB, out); writeIfChanged(JS_OUT, js); writeIfChanged(CSS_OUT, css);
+  console.log("wrote lazy anima assets for heme-endo-exam2 (" + FIGURES.map((f) => f.id).join(", ") + ")");
 }
 if (process.argv.includes("--preview")) {
   // standalone pages with the hub's tokens, for anima's capture and line checks

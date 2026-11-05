@@ -1,8 +1,8 @@
-// Pastes the PCD Implants Exam 1 hub's anima figures into hubs/pcd-implants-exam1/index.html between its markers.
-//   node tools/figures/pcd-implants-exam1/build.mjs            rebuild the hub's anima blocks from the files here
-//   node tools/figures/pcd-implants-exam1/build.mjs --check    exit 1 if the hub's blocks are out of date
+// Builds the PCD Implants Exam 1 hub's lazy anima assets from the files here.
+//   node tools/figures/pcd-implants-exam1/build.mjs            rebuild the hub's figure assets and marker placeholders
+//   node tools/figures/pcd-implants-exam1/build.mjs --check    exit 1 if the assets or placeholders are out of date
 //   node tools/figures/pcd-implants-exam1/build.mjs --preview  also write standalone pages to dist/ for anima's checks
-// It also writes the hub's FIGS line: the seven implant-type drawings (L1 Evolution) from types.mjs.
+// It also writes the static FIGS payload: the seven implant-type drawings (L1 Evolution) from types.mjs.
 // Each figure is one module here (static SVG + a live function sharing one model); edit them, never the generated
 // blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -14,9 +14,17 @@ import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const HUB = join(HERE, "../../../hubs/pcd-implants-exam1/index.html");
+const FIGURES_DIR = join(HERE, "../../../hubs/pcd-implants-exam1/figures");
+const CONTENT_DIR = join(HERE, "../../../hubs/pcd-implants-exam1/content");
+const JS_OUT = join(FIGURES_DIR, "anima.js");
+const CSS_OUT = join(FIGURES_DIR, "anima.css");
+const FIGURES_JSON = join(CONTENT_DIR, "figures.json");
+const FIGURES_FALLBACK = join(CONTENT_DIR, "figures.js");
 const read = (f) => readFileSync(join(HERE, f), "utf8").trimEnd() + "\n";
 const AJB = "/* anima:js begin (built from tools/figures/pcd-implants-exam1; edit there) */\n", AJE = "/* anima:js end */\n";
 const ACB = "/* anima:css begin */\n", ACE = "/* anima:css end */\n";
+const JS_PLACEHOLDER = "/* Loaded on demand from figures/anima.js by widget/hub.js. */\nvar ANIMA = { html:function(){ return ''; }, mount:function(){}, meta:function(){ return null; } };\n";
+const CSS_PLACEHOLDER = "/* Loaded on demand from figures/anima.css by widget/hub.js. */\n";
 
 /* the anima figures: static SVG + a live function per figure; helpers are declared inside the figure's data scope so
    the live code and the build share one model */
@@ -50,19 +58,32 @@ function between(src, b, e, body){
   if (i < 0 || j < i) throw new Error("markers not found: " + b.trim());
   return src.slice(0, i) + b + body + src.slice(j);
 }
+function same(file, text){
+  try { return readFileSync(file, "utf8") === text; }
+  catch { return false; }
+}
+function writeIfChanged(file, text){ if (!same(file, text)) writeFileSync(file, text); }
+function figurePayload(){ return { ...JSON.parse(readFileSync(FIGURES_JSON, "utf8")), FIGS: types() }; }
+function figureFallback(data){ return `window.shHubContent.receive("figures",${JSON.stringify(data)});\n`; }
 const hub = readFileSync(HUB, "utf8");
-let out = between(hub, AJB, AJE, animaJs());
-out = between(out, ACB, ACE, animaCss());
-/* the static implant-type drawings: one line, var FIGS = {...}; */
-const FL = out.match(/^var FIGS = \{.*\};$/m);
-if (!FL) throw new Error("var FIGS line not found");
-out = out.replace(FL[0], () => "var FIGS = " + JSON.stringify(types()) + ";");
+const js = AJB + animaJs().replace(/^var ANIMA = /, "window.ANIMA = ") + AJE;
+const css = ACB + animaCss() + ACE;
+const figures = figurePayload();
+const figuresJson = JSON.stringify(figures) + "\n";
+const figuresFallback = figureFallback(figures);
+let out = between(hub, AJB, AJE, JS_PLACEHOLDER);
+out = between(out, ACB, ACE, CSS_PLACEHOLDER);
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/pcd-implants-exam1/index.html: the anima blocks or FIGS are stale; run node tools/figures/pcd-implants-exam1/build.mjs"); process.exit(1); }
-  console.log("pcd-implants-exam1 anima blocks and FIGS are up to date");
+  if (out !== hub || !same(JS_OUT, js) || !same(CSS_OUT, css) || !same(FIGURES_JSON, figuresJson) || !same(FIGURES_FALLBACK, figuresFallback)) {
+    console.error("hubs/pcd-implants-exam1: the lazy anima assets, static figures, or hub placeholders are stale; run node tools/figures/pcd-implants-exam1/build.mjs");
+    process.exit(1);
+  }
+  console.log("pcd-implants-exam1 lazy anima assets and static figures are up to date");
 } else {
-  writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + "; FIGS: " + Object.keys(types()).join(", ") + ")");
+  mkdirSync(FIGURES_DIR, { recursive: true });
+  writeIfChanged(HUB, out); writeIfChanged(JS_OUT, js); writeIfChanged(CSS_OUT, css);
+  writeIfChanged(FIGURES_JSON, figuresJson); writeIfChanged(FIGURES_FALLBACK, figuresFallback);
+  console.log("wrote lazy anima assets and static figures for pcd-implants-exam1 (" + FIGURES.map((f) => f.id).join(", ") + "; FIGS: " + Object.keys(types()).join(", ") + ")");
 }
 if (process.argv.includes("--preview")) {
   // standalone pages with the hub's tokens, for anima's capture and line checks

@@ -9,10 +9,11 @@ files in /tmp/kokoro, or $KOKORO_DIR). Hard words use tools/podcast/lexicon.json
   python3 tools/narrate.py hubs/<hub>/index.html --text --lec dmpharm  print the spoken text, no audio
   python3 tools/narrate.py hubs/<hub>/index.html --jobs 4              lectures in parallel processes
 
-It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), or perio's
-READINGS['<id>'] = `...`; template-literal blocks, turns the HTML
-into spoken text (the "What's tested" box, headings with a pause, paragraphs, list items, and each table row read as
-"first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration.
+It reads a hub's `content/notes.json` when its content manifest is present, or legacy inline
+`var READINGS = {...};` / `var READINGS_PLAIN = {...};` lines and Perio's `READINGS['<id>'] = \`...\`;`
+template-literal blocks. It turns the HTML into spoken text (the "What's tested" box, headings with a pause,
+paragraphs, list items, and each table row read as "first cell: header, cell; ...") and writes a 24 kHz mono
+64 kbps mp3 like the hubs' existing narration.
 """
 import argparse, html, json, os, re, subprocess, sys, tempfile
 from html.parser import HTMLParser
@@ -116,7 +117,31 @@ def spoken(html_text):
     return out
 
 
-def readings(hub_html):
+def readings(hub):
+    """Read narrated notes from a content manifest, with the legacy inline form as a fallback."""
+    hub_path = os.fspath(hub) if isinstance(hub, (str, os.PathLike)) else None
+    if hub_path and os.path.isfile(hub_path):
+        with open(hub_path, encoding="utf-8") as f:
+            hub_html = f.read()
+        content_dir = os.path.join(os.path.dirname(os.path.abspath(hub_path)), "content")
+        manifest_path = os.path.join(content_dir, "manifest.json")
+        if os.path.isfile(manifest_path):
+            try:
+                with open(manifest_path, encoding="utf-8") as f:
+                    manifest = json.load(f)
+                if not isinstance(manifest, dict) or manifest.get("format") != 1:
+                    raise ValueError("expected a format 1 object")
+                with open(os.path.join(content_dir, "notes.json"), encoding="utf-8") as f:
+                    notes = json.load(f)
+                full, plain = notes.get("readings"), notes.get("readingsPlain")
+                if not isinstance(full, dict) or not isinstance(plain, dict):
+                    raise ValueError("notes.json needs object readings and readingsPlain fields")
+                return {"full": full, "plain": plain}
+            except (OSError, ValueError, json.JSONDecodeError) as e:
+                sys.exit("could not read hub content notes: " + str(e))
+    else:
+        hub_html = hub
+
     def grab(name):
         m = re.search(r"^var " + name + r" = (\{.*\});$", hub_html, re.M)
         if m and json.loads(m.group(1)): return json.loads(m.group(1))
@@ -179,7 +204,7 @@ def main():
     ap.add_argument("--text", action="store_true")
     ap.add_argument("--jobs", type=int, default=1)
     a = ap.parse_args()
-    R = readings(open(a.hub, encoding="utf-8").read())
+    R = readings(a.hub)
     audio_dir = os.path.join(os.path.dirname(os.path.abspath(a.hub)), "audio")
     os.makedirs(audio_dir, exist_ok=True)
     jobs = []
