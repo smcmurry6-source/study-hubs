@@ -54,7 +54,7 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   L5, L6 · 129 to try"), and to every unanswered question when none is behind. Its clicks log as `qs=practice-least` and
   `qs=practice` (`data-qs`), apart from the row's `home=least:<ids>`.
 - **`tm-mm-2`** (platform switching) is 3 right of 5 since 2026-11-05: "Decreases soft tissue volume" replaced "Increases soft
-  tissue volume" (the notes: it increases), same id. Its class picks and accuracy from before are stale (the option changed meaning).
+  tissue volume" (the notes: it increases), same id. Its old class picks and accuracy were cleared once it went live (Sam's OK, 2026-11-05), so its numbers start at 0.
 - **Statement keys were a pattern until 2026-11-04** (suggestion #14): 36 of 46 two-statement keys were "1 true, 2 false",
   statement 1 was true in all 30 numbered items and the second choice was the key in 23. The evening audit swapped,
   reordered and rewrote them (12 / 11 / 11 / 12 over the four two-statement choices; numbered keys 7 / 8 / 8 / 7 by
