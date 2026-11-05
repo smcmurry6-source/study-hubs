@@ -85,9 +85,10 @@ function hgDots(p, lv, t, cls, r, ph) {
   return o;
 }
 /* a tag on a flow: the hormone's name over its arrow; ring > 0 marks a value that just changed */
+function hgWord(v) { return { u: "↑ high", d: "↓ low", n: "= normal", ng: "? not given", ns: "? not on slides", mr: "= male range", pulse: "pulses", cont: "continuous" }[v] || v; }
+function hgCW(name, v) { return Math.round(Math.max(name.length, hgWord(v).length) * 6.6 + 16); }
 function hgChip(x, y, name, v, info, ring, ncls, end) {
-  var W = { u: "↑ high", d: "↓ low", n: "= normal", ng: "? not given", ns: "? not on slides", mr: "= male range", pulse: "pulses", cont: "continuous" };
-  var s = W[v] || v, w = Math.round(Math.max(name.length, s.length) * 6.7 + 16), x0 = end ? x - w : x;
+  var s = hgWord(v), w = hgCW(name, v), x0 = end ? x - w : x;
   var cls = v === "u" ? "hg-up" : v === "d" ? "hg-dn" : (v === "ng" || v === "ns") ? "hg-q" : "hg-eq";
   var o = (ring > 0 ? '<rect class="hg-ring" x="' + f1(x0 - 3) + '" y="' + f1(y - 3) + '" width="' + (w + 6) + '" height="38" rx="10" opacity="' + f1(ring) + '"/>' : "") +
     '<rect class="hg-chip ' + cls + '" x="' + f1(x0) + '" y="' + f1(y) + '" width="' + w + '" height="32" rx="8"/>' +
@@ -160,12 +161,12 @@ function hgRender(st, D) {
   o += HOT("Sperm released into the lumen." + (fl.sp === "d" ? " In this case the sperm count is very low." : ""), '<g class="' + (fl.sp === "ng" ? "hg-faint" : "") + '">' + D.SPERM.slice(0, nSp).join("") + "</g>");
   o += HOT("Sertoli cells, the FSH target: they nourish the germ cells, secrete androgen-binding protein (ABP) and inhibin, and form the blood-testis barrier." + (failTub ? " Damaged in this case: less inhibin." : ""),
     '<circle class="hg-hit" cx="274" cy="412" r="12"/>');
-  o += L(176, 364, "Sertoli cells", 214, 398, "start", "hg-xs b");
+  o += L(172, 368, "Sertoli cells", 212, 400, "start", "hg-xs b");
   o += HOT("Leydig cells, the LH target, in the connective tissue between the tubules: they make testosterone from cholesterol (and, in adults, aromatase here turns some into estradiol)." + (failT ? " Failing in this case: little testosterone." : ""),
     '<g class="' + (failT ? "hg-fail" : "") + '">' + D.LEY + "</g>");
   o += T(112, 406, "Leydig cells", "hg-xs b", "middle");
-  if (failT) o += '<rect class="hg-stamp" x="236" y="306" width="74" height="16" rx="4"/>' + T(273, 318, "failing", "hg-xs hg-stampt", "middle");
-  if (S.fail === "tub") o += '<rect class="hg-stamp" x="236" y="306" width="74" height="16" rx="4"/>' + T(273, 318, "damaged", "hg-xs hg-stampt", "middle");
+  if (failT) o += '<rect class="hg-stamp" x="194" y="306" width="74" height="16" rx="4"/>' + T(231, 318, "failing", "hg-xs hg-stampt", "middle");
+  if (S.fail === "tub") o += '<rect class="hg-stamp" x="194" y="306" width="74" height="16" rx="4"/>' + T(231, 318, "damaged", "hg-xs hg-stampt", "middle");
   /* flows inside: LH and FSH in, T to the tubule with ABP and to the blood, estradiol, inhibin out */
   o += HOT("LH reaches the Leydig cells.", '<path class="hg-fl hg-lhl' + (fl.lh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_LHIN) + '"/>');
   o += HOT("FSH reaches the Sertoli cells.", '<path class="hg-fl hg-fshl' + (fl.fsh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_FSHIN) + '"/>');
@@ -175,8 +176,8 @@ function hgRender(st, D) {
   o += HOT("Inhibin leaves the Sertoli cells for the blood.", '<path class="hg-fl hg-inhl' + (fl.inh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_INHOUT) + '"/>');
   o += HOT("Aromatase (estrogen synthase) turns testosterone into estradiol. From puberty on it is in the Leydig cells, driven by LH; in the fetus and newborn it is in the Sertoli cells, driven by FSH.",
     '<path class="hg-e2l" d="M96 466L84 486"/><circle class="hg-e2" cx="88" cy="479" r="2"/>' + T(70, 500, "estradiol", "hg-xs hg-e2t", "start") + T(70, 513, "(aromatase)", "hg-xs mut", "start"));
-  if (lv.itt) o += hgChip(148, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
-  o += hgChip(312, 324, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
+  if (lv.itt) o += hgChip(154, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
+  o += hgChip(312, 320, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
   o += "</g>";
 
   /* ----- hormone dots ----- */
@@ -199,8 +200,8 @@ function hgRender(st, D) {
 
   /* ----- tags on the flows ----- */
   o += "<g" + axis + ">";
-  o += hgChip(52, 250, "LH", lv.lh, D.INFO.lh, ring("lh"), "hg-lht", false);
-  o += hgChip(114, 250, "FSH", lv.fsh, D.INFO.fsh, ring("fsh"), "hg-fsht", false);
+  o += hgChip(48, 250, "LH", lv.lh, D.INFO.lh, ring("lh"), "hg-lht", false);
+  o += hgChip(52 + hgCW("LH", lv.lh), 250, "FSH", lv.fsh, D.INFO.fsh, ring("fsh"), "hg-fsht", false);
   o += hgChip(326, 258, "inhibin", lv.inh, D.INFO.inh, ring("inh"), "hg-inht", true);
   o += "</g>";
   o += hgChip(344, 122, "T (blood)", lv.t, D.INFO.t, ring("t"), "hg-tt", false);
@@ -250,41 +251,41 @@ const SC = {
   normal: { name: "Normal", lv: { gnrh: "pulse", lh: "n", fsh: "n", t: "n", inh: "n", sp: "n", dht: "n" }, f: { lh: "n", fsh: "n", abp: "n", tl: "n", tu: "n", inh: "n", sp: "n" },
     verdict: "Pulses in; testosterone and inhibin hold it steady",
     say: "Normal: the hypothalamus releases GnRH in pulses, and the anterior pituitary answers with LH and FSH. LH acts on the Leydig cells, which make testosterone; FSH acts on the Sertoli cells (spermatogenesis, ABP, inhibin). Testosterone inhibits GnRH and LH, and inhibin inhibits FSH, so serum testosterone stays in a narrow range.",
-    ro: "normal · all in range" },
+    ro: "normal · in range" },
   cont: { name: "Continuous GnRH", lv: { gnrh: "cont", lh: "d", fsh: "ns", t: "d", inh: "ng", sp: "ng" }, f: { lh: "d", fsh: "ng", abp: "d", tl: "d", tu: "d", inh: "ng", sp: "ng" },
     verdict: "GnRH nonstop: LH ↓, so testosterone ↓",
     say: "Continuous GnRH: GnRH, and so LH, must be released in pulses. Given continuously, GnRH does the opposite of what you might expect: it decreases LH secretion, and therefore testosterone. The slides don't say what happens to FSH.",
-    ro: "continuous · LH↓ T↓" },
+    ro: "nonstop · LH↓ T↓" },
   inj: { name: "Testosterone injections", inj: true, lv: { gnrh: "d", lh: "d", fsh: "d", t: "u", inh: "ng", sp: "d", itt: "d" }, f: { lh: "d", fsh: "d", abp: "d", tl: "d", tu: "u", inh: "ng", sp: "d" },
     verdict: "T ↑ with LH ↓ and FSH ↓: it comes from outside",
     say: "Testosterone injections (as in anabolic steroid use): blood testosterone is high, and it inhibits GnRH and LH; with less GnRH, FSH falls too. The testes are no longer stimulated, so the high testosterone inside the testis that spermatogenesis needs is lost, and the sperm count falls even though blood testosterone is high.",
-    ro: "injections · T↑ LH↓ FSH↓" },
+    ro: "shots · T↑ LH↓ FSH↓" },
   testes: { name: "Failing testes", fail: "testis", lv: { gnrh: "u", lh: "u", fsh: "u", t: "d", inh: "d", sp: "ng" }, f: { lh: "u", fsh: "u", abp: "d", tl: "d", tu: "d", inh: "d", sp: "ng" },
     verdict: "T ↓ with LH ↑ and FSH ↑: the testes are failing",
     say: "Failing testes: testosterone (and inhibin) are low, so the brake is off and GnRH, LH and FSH rise. Low testosterone with high LH and FSH puts the problem in the testes themselves.",
-    ro: "testes fail · T↓ LH↑ FSH↑" },
+    ro: "testes · T↓ LH↑ FSH↑" },
   pit: { name: "Failing pituitary", fail: "pit", lv: { gnrh: "ng", lh: "d", fsh: "d", t: "d", inh: "ng", sp: "ng" }, f: { lh: "d", fsh: "d", abp: "d", tl: "d", tu: "d", inh: "ng", sp: "ng" },
     verdict: "T ↓ with LH ↓ and FSH ↓: the problem is above the testis",
     say: "Failing pituitary: LH and FSH are low, so the testes aren't stimulated and testosterone is low too. Low testosterone with low LH and FSH points above the testis: the pituitary, or the GnRH above it.",
-    ro: "pituitary fails · T↓ LH↓ FSH↓" },
+    ro: "pituitary · T↓ LH↓ FSH↓" },
   tub: { name: "Damaged tubules, healthy Leydig cells", fail: "tub", lv: { gnrh: "ng", lh: "n", fsh: "u", t: "n", inh: "d", sp: "d" }, f: { lh: "n", fsh: "u", abp: "n", tl: "n", tu: "n", inh: "d", sp: "d" },
     verdict: "FSH ↑ alone, LH and T normal: less inhibin",
     say: "Damaged tubules, healthy Leydig cells: the Sertoli cells make less inhibin, so FSH rises on its own, while LH and testosterone stay normal. Each testis cell feeds back on its own gonadotropin: Leydig testosterone on GnRH and LH, Sertoli inhibin on FSH. The hub's case has a very low sperm count.",
-    ro: "tubules · FSH↑ LH= T=" },
+    ro: "tubules · FSH↑ only" },
   ard: { name: "5-alpha-reductase deficiency", dev: true, lv: { gnrh: "ng", lh: "ng", fsh: "ng", t: "mr", inh: "ng", sp: "ng", dht: "d" }, f: { lh: "ng", fsh: "ng", abp: "ng", tl: "n", tu: "n", inh: "ng", sp: "ng" },
     cards: [[["develop: testosterone", "acts"], "ok", "In 5-alpha-reductase deficiency testosterone is made and its receptor works, so the Wolffian ducts develop."],
       [["DHT low: genitalia", "female-appearing"], "bad", "Testosterone can't be converted to DHT, so the external genitalia are female; these children are often raised as girls."],
       [["may bring male changes", "as testosterone rises"], "ok", "At puberty testosterone rises, and because testosterone acts on its own, they may develop male secondary sex characteristics."]],
     verdict: "T works, DHT ↓: Wolffian ducts yes, male genitalia no",
     say: "5-alpha-reductase deficiency (XY, testes): testosterone is made, in the male range, and its receptor works, so the Wolffian ducts develop. But it can't be converted to DHT, so DHT is low and the external genitalia are female. AMH works, so there are no Müllerian ducts. At puberty testosterone rises, and they may develop male secondary sex characteristics. " + DEVNOTE,
-    ro: "5-ARD · T male range, DHT↓" },
+    ro: "5-ARD · DHT↓" },
   ais: { name: "Androgen insensitivity syndrome", dev: true, rx: true, lv: { gnrh: "ng", lh: "ng", fsh: "ng", t: "mr", inh: "ng", sp: "ng" }, f: { lh: "ng", fsh: "ng", abp: "ng", tl: "n", tu: "n", inh: "ng", sp: "ng" },
     cards: [[["regress: no working", "receptor"], "bad", "In androgen insensitivity testosterone has no working receptor, so the Wolffian ducts regress."],
       [["female: no working", "receptor"], "bad", "DHT has no working receptor either, so the external genitalia follow the default female pathway."],
       [["female secondary sex", "characteristics"], "bad", "At puberty the secondary sex characteristics are female as well."]],
     verdict: "T made, no working receptor: T and DHT can't act",
     say: "Androgen insensitivity syndrome (testicular feminization), an X-linked androgen receptor deficiency: the person is XY with testes, and testosterone is made (in the normal adult male range in the hub's case), but neither testosterone nor DHT has a working receptor. The Wolffian ducts regress, the external genitalia are female, and puberty is female. AMH needs no androgen receptor, so the Müllerian ducts regress too: no uterus. " + DEVNOTE,
-    ro: "AIS · T male range, no receptor" },
+    ro: "AIS · no receptor" },
 };
 const INFO = {
   gnrh: "GnRH, from the hypothalamus: it makes the anterior pituitary release LH and FSH, and it must come in pulses.",
@@ -309,8 +310,8 @@ export default function hpg() {
     P_LHIN: [[44, 432], [90, 432]],
     P_FSHIN: [[44, 384], [150, 384], [182, 402]],
     P_ABP: [[136, 446], [162, 450]],
-    P_TOUT: [[128, 468], [140, 484], [140, 586]],
-    P_TLOW: [[128, 468], [140, 484], [140, 586], [314, 586], [332, 568], [332, 489]],
+    P_TOUT: [[128, 468], [146, 484], [146, 586]],
+    P_TLOW: [[128, 468], [146, 484], [146, 586], [314, 586], [332, 568], [332, 489]],
     P_TUP: [[332, 489], [332, 168], [318, 150], [240, 148], [200, 152]],
     P_INJ: [[372, 489], [334, 489]],
     P_INHOUT: [[251, 512], [252, 586]],
@@ -325,7 +326,7 @@ export default function hpg() {
     caption: "The hypothalamus, the anterior pituitary and the testes on one loop of blood, with testosterone's brakes and its targets. Pick a case to see which part breaks and which way each hormone goes.",
     W: 520, H: 660,
     label: "The hypothalamic-pituitary-testicular axis: GnRH from the hypothalamus to the anterior pituitary, LH and FSH in the blood to the Leydig and Sertoli cells of the testis, testosterone and inhibin back to the hypothalamus and pituitary as negative feedback, and testosterone on to the Wolffian ducts, to the DHT tissues through 5-alpha-reductase and to puberty.",
-    D, render: hgRender, say: hgSay, helpers: [hgPath, hgDots, hgChip, hgTrace, hgMark, hgBrake],
+    D, render: hgRender, say: hgSay, helpers: [hgPath, hgDots, hgWord, hgCW, hgChip, hgTrace, hgMark, hgBrake],
     controls: `<div class="am-controls" role="group" aria-label="Case">` + Object.keys(SC).map((k) => `<button type="button" class="am-btn" data-amk="sc" data-amv="${k}">${{ normal: "Normal", cont: "Continuous GnRH", inj: "Testosterone injections", testes: "Failing testes", pit: "Failing pituitary", tub: "Damaged tubules", ard: "5-alpha-reductase deficiency", ais: "Androgen insensitivity" }[k]}</button>`).join("") + `</div>`,
     sources: [
       "From the L15 notes (Dr. Madison): GnRH from the hypothalamus releases LH and FSH; LH acts on the Leydig cells (testosterone), FSH on the Sertoli cells (spermatogenesis, ABP, inhibin); testosterone inhibits GnRH and LH and inhibin inhibits FSH; GnRH (and so LH) must be pulsatile, and continuous GnRH decreases LH and testosterone; ABP keeps testosterone higher in the testis than in the blood; 5-alpha-reductase makes DHT in peripheral tissues (penis, scrotum, prostate); aromatase in the Sertoli cells (FSH) in the fetus and newborn and in the Leydig cells (LH) from puberty on; the hormone-pattern table (failing testes, failing pituitary, testosterone injections, damaged tubules with low inhibin, continuous GnRH with FSH not on the slides); androgen insensitivity and 5-alpha-reductase deficiency.",
