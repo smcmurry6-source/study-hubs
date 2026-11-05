@@ -15,6 +15,11 @@ tags: [widget, supabase]
   {lectures, questions}` after its own IIFE closes, which is what the widget
   reads for search and "toughest questions" — if you add a hub or change its
   question shape, make sure `SH_EXPORT` still reflects it.
+- **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
+  hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
+  and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
+  realistic (`node tools/ci/cases.js` in CI). Loaded synchronously by the hubs that have cases (Perio, PCD Implants,
+  Occlusion). How to add a case or a hub: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
 - **Supabase project `thytmzsgymydbzcqdnix`** backs the widget: changelog,
   leaderboard, study streaks, activity pulse, and visitor analytics (see
   `migration_v4.sql`/`v5.sql`/`v6.sql` at repo root for schema history — run
