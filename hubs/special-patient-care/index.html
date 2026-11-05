@@ -893,7 +893,7 @@ function pixelHeart(){
 var EXAM_DATE = '2026-11-06', EXAM_END = '2026-11-13', EXAM_LAST = '2026-11-14';
 var EXAM_TIME = '00:00', EXAM_CLOSES = '23:59';
 /* "not allowed to discuss the exam in any form with anyone until AFTER November 18th": the first day it may be discussed.
-   The dashboard's check-in (index.html, checkinFrom) waits for the same day. */
+   This hub has no dashboard check-in (Sam, 2026-11-05). */
 var TALK_FROM = '2026-11-19';
 var EXAM_INFO = [
   ['What', '45 questions on all eight units, 135 minutes once you start. A mix of multiple choice, multiple answer, ordering, matching, Hot Spot (click a place in an image), fill-in-the-blank, true/false and more.'],
@@ -4222,10 +4222,10 @@ function lecProgress(l){
 function countdownHTML(){
   var now = new Date(), s = examStart(), e = examEnd();
   if(now >= e){
-    /* past due but Canvas still open (Saturday), then the no-discussion period from Dr. Mitchell's email: check-in waits for TALK_FROM */
+    /* past due but Canvas still open (Saturday), then the no-discussion period from Dr. Mitchell's email (no check-in for this hub) */
     if(now < examClosed()) return '<div class="home-count is-done"><b>The exam was due Friday at 11:59 pm.</b><span>Canvas closes Saturday at 11:59 pm. Please don\'t discuss the exam with anyone until after November 18.</span></div>';
-    if(now < new Date(TALK_FROM + 'T00:00:00')) return '<div class="home-count is-done"><b>The exam is done.</b><span>Please don\'t discuss it with anyone until after November 18. Check in on the dashboard opens on November 19.</span></div>';
-    return '<div class="home-count is-done"><b>The exam is done.</b><span>Tell the class how it went with Check in on the dashboard.</span></div>';
+    if(now < new Date(TALK_FROM + 'T00:00:00')) return '<div class="home-count is-done"><b>The exam is done.</b><span>Please don\'t discuss it with anyone until after November 18.</span></div>';
+    return '<div class="home-count is-done"><b>The exam is done.</b><span>Thanks for studying with the hub.</span></div>';
   }
   var to = now >= s ? e : s, ms = to - now, d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
   function u(n, w){ return '<span class="hc-unit"><b>' + n + '</b><small>' + w + (n === 1 ? '' : 's') + '</small></span>'; }
@@ -5440,9 +5440,9 @@ window.SH_EXPORT = {
   }),
   sections: shSearchSections(),
   hints: HINTS.map(function(x){ return { lec:x.lec, quote:x.quote }; }),
-  exams: [ { label:'Special Patient Care exam', date:EXAM_END, archiveHour:24 } ],
-  /* Canvas keeps the exam open through Saturday at 11:59 pm (open notes), so the hub isn't marked archived until then */
-  archiveOn: { date:EXAM_LAST, hour:24 }
+  exams: [ { label:'Special Patient Care exam', date:EXAM_DATE, archiveHour:0 } ],
+  /* Sam, 2026-11-05: the hub archives itself when the exam opens on Canvas (Fri Nov 6, 12:00 am), the dashboard's archiveOn */
+  archiveOn: { date:EXAM_DATE, hour:0 }
 };
 
 })();

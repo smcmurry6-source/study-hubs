@@ -25,10 +25,12 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
 - **The model to copy for the Question Bank's filter panel** ([question-bank-filter-panel](../rules/question-bank-filter-panel.md)).
 - **No figures or animations** (Sam): `FIGS`/`ANIMA` are empty stubs and there is no diagram review for this hub.
 - **Whys** are written inline with `mq(id, lec, src, stem, [[choice, why], ...], ex)`, so `QUESTION_WHY` is empty.
-- **Check-in and archiving wait for the exam to close** (Sam). The card stays live through Canvas's Saturday close
-  (hub-level `archiveOn:{date:"2026-11-14", hour:24}` in `HUBS`, mirrored in `SH_EXPORT.archiveOn`). Check-in (button
-  and pop-up) waits for Thu Nov 19 (`checkinFrom` in its `HUBS` exam entry, `TALK_FROM` in the hub), because the email
-  bans discussing the exam until after Nov 18; Home's done message says so until then. Read the check-ins from Nov 19.
+- **Archived when the exam opens, no check-in** (Sam, 2026-11-05; replaces "wait for the exam to close"). The hub
+  archives at Fri Nov 6, 12:00 am and its card leaves the dashboard at the same moment (`archiveOn` and `hideCardOn` in
+  its `HUBS` entry; `SH_EXPORT.exams` / `SH_EXPORT.archiveOn` in the hub use `EXAM_DATE`, hour 0, so the hub's own
+  "archived" notice agrees). The page and its direct link stay up. Its exam has `checkinClosed:true`: no check-in button
+  or pop-up, ever; Home's done message only asks students not to discuss the exam until after Nov 18 (`TALK_FROM`).
+  The retrospective has no check-ins to read.
 - **Question formats:** multiple choice (with two-statement, numbered-statement and EXCEPT items), true/false, matching
   and, since 2026-11-04, multiple answer (24, three per unit, `mm()` with an inline why per choice). Sam chose no ordering,
   fill-in-the-blank or Hot Spot practice. **Mock:** 45 questions in 135 minutes (`MOCK_BLUEPRINT`, `MOCK_LIMIT`), one
