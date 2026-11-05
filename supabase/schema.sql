@@ -2839,8 +2839,8 @@ grant execute on function public.get_data_quality(text) to anon, authenticated;
 -- ============================================================================
 -- Admin live presence, hub archive overrides, newest-first check-ins and surveys (migration_v50)
 -- ============================================================================
--- v50: the admin page's Live and Hubs tabs (vault/reference/admin-operations.md). Applied to the live project with the
--- release that ships them, after Sam's written approval (RELEASE_TEST_PLAN.md, tier 3). Its get_exam_debriefs replaces
+-- v50: the admin page's Live and Hubs views (vault/reference/admin-operations.md). Applied to the live project on
+-- 2026-11-05, after Sam's written approval (RELEASE_TEST_PLAN.md, tier 3). Its get_exam_debriefs replaces
 -- the one above (it reads activity_hourly, as migration_v47's fix applied on 2026-10-30 did) and adds a tie-breaker;
 -- get_survey_results too. Later definitions win.
 

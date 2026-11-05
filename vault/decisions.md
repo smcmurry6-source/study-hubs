@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-05 | The admin page redesign and admin operations (PR #236) approved for release: "Merge when ready". Sam asked the session to merge it, so the agent applied `migration_v50.sql` and merged once its checks passed (the release plan's "agents never merge" otherwise stands) | admin page, dashboard | chat, [PR #236](https://github.com/smcmurry6-source/study-hubs/pull/236) |
 | 2026-11-04 | A hub's manual archive state (Live, Archived or Hidden on the admin page's Hubs tab) lasts until Sam sets it back to Automatic, or until an optional end time; then the dates decide again. It never deletes a hub's page, link, questions, analytics or progress | dashboard, every hub, admin page | chat, [admin-operations](reference/admin-operations.md) |
 | 2026-11-04 | Admin information stays off the About page: it doesn't mention the admin page's Live tab or setting a hub's state by hand (Sam's later call the same day, replacing "the About page says Sam can see who is studying now") | About, admin page | chat |
 | 2026-11-04 | The admin page's Live tab names people by their leaderboard name (the name they chose, else their random class name), never an id or email | admin page | chat, [admin-operations](reference/admin-operations.md) |

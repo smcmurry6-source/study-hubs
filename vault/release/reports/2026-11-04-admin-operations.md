@@ -18,7 +18,7 @@ signatures, no student rows). [How it works](../../reference/admin-operations.md
   with an audit log); check-ins and surveys read newest first. Students see a hub card or a hub page follow Sam's choice
   (no About page entry: Sam keeps admin information off it).
 - **Tier:** 3: a migration (`migration_v50.sql`, new tables and functions) and a change to what the dashboard shows.
-  Waits for Sam's written approval; the migration is applied only after it.
+  Sam approved it in writing on 2026-11-05 ("Merge when ready"); the migration was applied first, then the PR merged.
 - **Preview:** the PR's Cloudflare Pages link (the bot's comment on the PR), or `node tools/preview/serve.js` on the
   branch. Sam was shown screenshots (laptop light, phone dark). Every run ended with no request reaching production.
 
@@ -86,9 +86,10 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
 
 ## Not covered
 
-- The live database with the migration applied: not until Sam approves. The functions were tested on throwaway copies
-  of the schema; the live project's catalog shows the new names are free, everything they depend on exists, and the
-  two replaced functions keep their exact signatures.
+- The functions' behavior on the live database is checked read-only only: after the migration, the tables have RLS on
+  and no visitor access, a wrong passphrase is refused, `get_hub_overrides()` returns nothing (no override set), and the
+  live permission audit has no findings. Before it, the catalog showed the new names were free, everything they depend
+  on existed, and the two replaced functions kept their exact signatures and return types.
 - Real devices, WebKit and Firefox: not installed in this session (CI's "Release tests" runs WebKit and Firefox).
 - Realtime presence (the students' green pill) is unchanged and not simulated.
 - Load: `admin_live_presence` reads a few minutes of pings through an index; not measured against the live table.
@@ -97,8 +98,9 @@ keyboard, dark mode, reduced motion (the only motion is the menu sliding in, off
 
 ## Release
 
-- [ ] Sam approved this release (Sam ticks it in the PR).
-- [ ] `migration_v50.sql` applied (connector `apply_migration`), then merged; `node tools/release/postcheck.js` passed:
+- [x] Sam approved this release: in the session, 2026-11-05, "Merge when ready" (the PR's box is Sam's to tick).
+- [x] `migration_v50.sql` applied (connector `apply_migration`, 2026-11-05; live audit clean), then merged.
+- [ ] `node tools/release/postcheck.js` passed:
 - [ ] The live admin page: every view loads, Live and Hubs work, check-ins newest first (BUG-010 retested):
 - [ ] Monitored at 1 h / 24 h / 48 h (`tools/release/monitor.sql`), Inbox and logs:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.

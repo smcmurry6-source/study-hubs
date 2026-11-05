@@ -3,9 +3,11 @@
 -- vault/decisions.md): live names are the leaderboard name; a manual archive state lasts until it is cleared, or until
 -- an optional end time. How it all works: vault/reference/admin-operations.md.
 --
--- NOT APPLIED. This is tier 3 (RELEASE_TEST_PLAN.md): it is applied to the live project only after Sam approves the
--- release in writing. Tested on a throwaway database built from supabase/schema.sql (tools/release/rls.js and
--- tools/release/admin-ops.js), never against the class's data.
+-- Applied to the live project on 2026-11-05 (connector apply_migration), after Sam approved the release in writing
+-- ("Merge when ready"; tier 3, RELEASE_TEST_PLAN.md). Tested first on a throwaway database built from
+-- supabase/schema.sql (tools/release/rls.js and tools/release/admin-ops.js), never against the class's data; the live
+-- permission audit (tools/release/rls-audit.sql) returned no findings after it.
+-- Numbered v49 while it was being written; main's migration_v49.sql (analytics insights, #237) took that number.
 --
 -- 1. Live presence. "Live" = at least one study ping in the last 3 minutes (p_minutes, 1-15). widget/v3.js sends a ping
 --    for every 25 s a hub tab is visible and in use (record_activity_ping); it stops when the tab is hidden and after 15

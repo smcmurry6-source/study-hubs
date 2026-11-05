@@ -105,8 +105,8 @@ which never merged; `supabase/schema.sql` now matches the live function).
 
 ## Deploying
 
-The migration is tier 3 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)): it is applied to the live project only
-after Sam approves the release in writing. Either order is safe: before the migration, the dashboard and hubs keep using
+The migration is tier 3 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)): applied to the live project on
+2026-11-05 after Sam approved the release in writing. Either order was safe: before the migration, the dashboard and hubs keep using
 the dates, and the Live and Hubs views say they need migration_v50. (It was numbered v49 until #237's analytics layer
 took that number on main.)
 

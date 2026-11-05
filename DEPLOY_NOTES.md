@@ -45,8 +45,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   an audit log and a stale-tab check; nothing is deleted. The rules live once in `widget/archive.js` (loaded by
   `index.html` and `review/`; `widget/v3.js`'s archived notice follows them). **Exam check-ins:** groups sort by their
   newest check-in (they sorted by hub name, BUG-010), rows and survey answers newest first with an id tie-break.
-  `migration_v50.sql` (numbered v49 until #237 took that number; **not applied**: tier 3, waits for Sam's written
-  approval): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
+  `migration_v50.sql` (numbered v49 until #237 took that number; tier 3, **applied 2026-11-05** after Sam's written
+  approval, "Merge when ready"; the live permission audit found nothing after it): `hub_archive_overrides`, `hub_archive_log`, `get_hub_overrides`, `admin_hub_overrides`,
   `admin_set_hub_archive`, `admin_hub_archive_log`, `admin_live_presence`, and `get_exam_debriefs` / `get_survey_results`
   in order; `supabase/schema.sql` now also records the `activity_hourly` version of `get_exam_debriefs` applied on 10-30
   (PR #205, never merged). `sw.js` sh-v53. No About page entry (Sam: admin information stays off it). Preview fixtures
