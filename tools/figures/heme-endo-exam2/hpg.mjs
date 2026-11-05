@@ -86,7 +86,7 @@ function hgDots(p, lv, t, cls, r, ph) {
 }
 /* a tag on a flow: the hormone's name over its arrow; ring > 0 marks a value that just changed */
 function hgChip(x, y, name, v, info, ring, ncls, end) {
-  var W = { u: "↑ high", d: "↓ low", n: "= normal", ng: "? not given", ns: "? not on the slides", mr: "= male range", pulse: "pulses", cont: "continuous" };
+  var W = { u: "↑ high", d: "↓ low", n: "= normal", ng: "? not given", ns: "? not on slides", mr: "= male range", pulse: "pulses", cont: "continuous" };
   var s = W[v] || v, w = Math.round(Math.max(name.length, s.length) * 6.7 + 16), x0 = end ? x - w : x;
   var cls = v === "u" ? "hg-up" : v === "d" ? "hg-dn" : (v === "ng" || v === "ns") ? "hg-q" : "hg-eq";
   var o = (ring > 0 ? '<rect class="hg-ring" x="' + f1(x0 - 3) + '" y="' + f1(y - 3) + '" width="' + (w + 6) + '" height="38" rx="10" opacity="' + f1(ring) + '"/>' : "") +
@@ -96,7 +96,7 @@ function hgChip(x, y, name, v, info, ring, ncls, end) {
 }
 /* the GnRH monitor's trace: pulses scroll left; continuous is a flat raised line */
 function hgTrace(m, t, x0, x1, b) {
-  var o = "", x, y, sc = t ? t * 0.03 : 0, P = 62, A = m === "u" ? 50 : m === "d" ? 13 : 32;
+  var o = "", x, y, sc = t ? t * 0.03 : 0, P = 62, A = m === "u" ? 44 : m === "d" ? 13 : 32;
   for (x = x0; x <= x1; x += 2) {
     if (m === "cont") y = b - 24 - Math.sin((x + sc) / 9) * 0.8;
     else if (m === "ng") y = b;
@@ -142,7 +142,7 @@ function hgRender(st, D) {
   o += HOT("A monitor of GnRH release over time. GnRH, and so LH, must come in pulses to keep testosterone production normal; continuous GnRH lowers LH instead.",
     '<rect class="hg-screen" x="262" y="12" width="246" height="102" rx="10"/><path class="hg-grid" d="M272 54H498M272 76H498"/>' +
     '<path class="hg-base" d="M272 100H498"/><path class="hg-trace' + (lv.gnrh === "ng" ? " is-q" : "") + '" d="' + hgTrace(lv.gnrh === "pulse" ? "n" : lv.gnrh, t, 272, 498, 100) + '"/>' +
-    T(272, 30, "GnRH over time", "hg-xs hg-gnrht", "start") + (lv.gnrh === "ng" ? T(385, 84, "not given for this case", "hg-xs mut", "middle") : ""));
+    T(272, 30, "GnRH over time", "hg-xs hg-gnrht", "start"));
   o += hgChip(502, 18, "GnRH", lv.gnrh === "pulse" ? "pulse" : lv.gnrh, D.INFO.gnrh, ring("gnrh"), "hg-gnrht", true);
   o += '<path class="hg-probe" d="M166 112L262 66"/>';
   o += "</g>";
@@ -160,7 +160,7 @@ function hgRender(st, D) {
   o += HOT("Sperm released into the lumen." + (fl.sp === "d" ? " In this case the sperm count is very low." : ""), '<g class="' + (fl.sp === "ng" ? "hg-faint" : "") + '">' + D.SPERM.slice(0, nSp).join("") + "</g>");
   o += HOT("Sertoli cells, the FSH target: they nourish the germ cells, secrete androgen-binding protein (ABP) and inhibin, and form the blood-testis barrier." + (failTub ? " Damaged in this case: less inhibin." : ""),
     '<circle class="hg-hit" cx="274" cy="412" r="12"/>');
-  o += L(300, 362, "Sertoli cells", 268, 410, "end", "hg-xs b");
+  o += L(176, 364, "Sertoli cells", 214, 398, "start", "hg-xs b");
   o += HOT("Leydig cells, the LH target, in the connective tissue between the tubules: they make testosterone from cholesterol (and, in adults, aromatase here turns some into estradiol)." + (failT ? " Failing in this case: little testosterone." : ""),
     '<g class="' + (failT ? "hg-fail" : "") + '">' + D.LEY + "</g>");
   o += T(112, 406, "Leydig cells", "hg-xs b", "middle");
@@ -170,12 +170,12 @@ function hgRender(st, D) {
   o += HOT("LH reaches the Leydig cells.", '<path class="hg-fl hg-lhl' + (fl.lh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_LHIN) + '"/>');
   o += HOT("FSH reaches the Sertoli cells.", '<path class="hg-fl hg-fshl' + (fl.fsh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_FSHIN) + '"/>');
   o += HOT("Testosterone into the tubule: Sertoli cells' androgen-binding protein (ABP) keeps it higher in the testis than in the blood, and spermatogenesis depends on that.", '<path class="hg-fl hg-abpl" d="' + hgPath(D.P_ABP) + '"/>');
-  o += T(136, 480, "ABP", "hg-xs hg-abpt", "middle");
+  o += T(151, 440, "ABP", "hg-xs hg-abpt", "middle");
   o += HOT("Testosterone leaves the Leydig cells for the blood.", '<path class="hg-fl hg-tl" d="' + hgPath(D.P_TOUT) + '"/>');
   o += HOT("Inhibin leaves the Sertoli cells for the blood.", '<path class="hg-fl hg-inhl' + (fl.inh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_INHOUT) + '"/>');
   o += HOT("Aromatase (estrogen synthase) turns testosterone into estradiol. From puberty on it is in the Leydig cells, driven by LH; in the fetus and newborn it is in the Sertoli cells, driven by FSH.",
     '<path class="hg-e2l" d="M96 466L84 486"/><circle class="hg-e2" cx="88" cy="479" r="2"/>' + T(70, 500, "estradiol", "hg-xs hg-e2t", "start") + T(70, 513, "(aromatase)", "hg-xs mut", "start"));
-  if (lv.itt) o += hgChip(118, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
+  if (lv.itt) o += hgChip(148, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
   o += hgChip(312, 324, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
   o += "</g>";
 
@@ -199,9 +199,9 @@ function hgRender(st, D) {
 
   /* ----- tags on the flows ----- */
   o += "<g" + axis + ">";
-  o += hgChip(56, 250, "LH", lv.lh, D.INFO.lh, ring("lh"), "hg-lht", false);
-  o += hgChip(126, 250, "FSH", lv.fsh, D.INFO.fsh, ring("fsh"), "hg-fsht", false);
-  o += hgChip(424, 122, "inhibin", lv.inh, D.INFO.inh, ring("inh"), "hg-inht", false);
+  o += hgChip(52, 250, "LH", lv.lh, D.INFO.lh, ring("lh"), "hg-lht", false);
+  o += hgChip(114, 250, "FSH", lv.fsh, D.INFO.fsh, ring("fsh"), "hg-fsht", false);
+  o += hgChip(326, 258, "inhibin", lv.inh, D.INFO.inh, ring("inh"), "hg-inht", true);
   o += "</g>";
   o += hgChip(344, 122, "T (blood)", lv.t, D.INFO.t, ring("t"), "hg-tt", false);
 
@@ -221,9 +221,9 @@ function hgRender(st, D) {
     if (j === 1 && st.sc === "ard") o2 += '<path class="hg-rx" d="M368 ' + (y + 26) + "L486 " + (y + 46) + '"/>';
     s[0].forEach(function (ln, i) { o2 += T(370, y0 + i * 13, ln, "hg-xs " + (ok ? "hg-okt" : "hg-badt"), "start"); });
     o2 += hgMark(500, y + 12, ok);
+    if (j === 1) o2 += hgChip(370, y + c.h - 38, "DHT", lv.dht || "ng", D.INFO.dht, ring("dht"), "hg-dhtt", false);
     o += HOT(c.info + (S.cards && S.cards[j] ? " " + S.cards[j][2] : ""), o2);
   });
-  if (lv.dht) o += hgChip(512, D.CARDY[1] + 4, "DHT", lv.dht, D.INFO.dht, ring("dht"), "hg-dhtt", true);
 
   /* ----- the verdict ----- */
   o += HOT("What the pattern says.", '<rect class="hg-ban' + (st.sc === "normal" ? "" : " is-on") + '" x="8" y="602" width="504" height="48" rx="10"/>' + T(20, 621, S.name.toUpperCase(), "hg-xs hg-bant", "start") + T(20, 640, S.verdict, "hg-v", "start"));
@@ -239,15 +239,15 @@ function hgSay(st, D) {
 const CARDS = [
   { name: "Wolffian ducts", sub: ["testosterone itself"], h: 70, st: [["build the internal", "male ducts (fetus)"], "ok"],
     info: "The Wolffian ducts are testosterone tissue: testosterone itself acts on them, in the fetus, to build the internal male structures." },
-  { name: "DHT tissues", sub: ["T → DHT by", "5-alpha-reductase"], subcls: "hg-dhtt", h: 96, st: [["penis, scrotum and", "prostate form"], "ok"],
+  { name: "DHT tissues", sub: ["T → DHT by", "5-alpha-reductase"], subcls: "hg-dhtt", h: 122, st: [["penis, scrotum and", "prostate form"], "ok"],
     info: "5-alpha-reductase converts testosterone to dihydrotestosterone, mainly in peripheral tissues; DHT forms the penis, scrotum and prostate." },
   { name: "puberty", sub: ["testosterone itself"], h: 70, st: [["male secondary sex", "characteristics"], "ok"],
     info: "At puberty testosterone rises and brings the male secondary sex characteristics." },
 ];
-const CARDY = [194, 290, 386];
+const CARDY = [194, 304, 422];
 const DEVNOTE = "These are development cases: the labs the lecture gives are testosterone (and DHT); the rest of the axis is dimmed.";
 const SC = {
-  normal: { name: "Normal", lv: { gnrh: "pulse", lh: "n", fsh: "n", t: "n", inh: "n", sp: "n" }, f: { lh: "n", fsh: "n", abp: "n", tl: "n", tu: "n", inh: "n", sp: "n" },
+  normal: { name: "Normal", lv: { gnrh: "pulse", lh: "n", fsh: "n", t: "n", inh: "n", sp: "n", dht: "n" }, f: { lh: "n", fsh: "n", abp: "n", tl: "n", tu: "n", inh: "n", sp: "n" },
     verdict: "Pulses in; testosterone and inhibin hold it steady",
     say: "Normal: the hypothalamus releases GnRH in pulses, and the anterior pituitary answers with LH and FSH. LH acts on the Leydig cells, which make testosterone; FSH acts on the Sertoli cells (spermatogenesis, ABP, inhibin). Testosterone inhibits GnRH and LH, and inhibin inhibits FSH, so serum testosterone stays in a narrow range.",
     ro: "normal · all in range" },
@@ -309,12 +309,12 @@ export default function hpg() {
     P_LHIN: [[44, 432], [90, 432]],
     P_FSHIN: [[44, 384], [150, 384], [182, 402]],
     P_ABP: [[136, 446], [162, 450]],
-    P_TOUT: [[114, 470], [114, 586]],
-    P_TLOW: [[114, 470], [114, 586], [314, 586], [332, 568], [332, 489]],
+    P_TOUT: [[128, 468], [140, 484], [140, 586]],
+    P_TLOW: [[128, 468], [140, 484], [140, 586], [314, 586], [332, 568], [332, 489]],
     P_TUP: [[332, 489], [332, 168], [318, 150], [240, 148], [200, 152]],
     P_INJ: [[372, 489], [334, 489]],
-    P_INHOUT: [[228, 518], [228, 586]],
-    P_INH: [[228, 518], [228, 586], [314, 586], [332, 568], [332, 168], [318, 150], [240, 148], [200, 152]],
+    P_INHOUT: [[251, 512], [252, 586]],
+    P_INH: [[251, 512], [252, 586], [314, 586], [332, 568], [332, 168], [318, 150], [240, 148], [200, 152]],
     B_TH: [[200, 152], [182, 138], [166, 124]],
     B_TP: [[200, 152], [184, 166]],
     B_IP: [[200, 152], [194, 174], [182, 182]],
