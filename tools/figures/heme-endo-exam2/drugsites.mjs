@@ -46,10 +46,8 @@ function dsBody(lv, st, D) {
   var o = "", t = st.t || 0, B = D.BODY, mir = function (p) { return p.map(function (q) { return [280 - q[0], q[1]]; }); };
   function glow(d, k) { return k > 0.02 ? '<path class="ds-halo" d="' + d + '" opacity="' + f1(k * (0.55 + 0.25 * Math.sin(t / 420))) + '"/><path class="ds-lit" d="' + d + '" opacity="' + f1(k) + '"/>' : ""; }
   /* arms behind the torso, then the torso; the legs run off the bottom */
-  var armR = dsSm(B.ARM, true), armL = dsSm(mir(B.ARM), true);
   var side = B.SIDE, sideL = mir(side).reverse();
   var torso = dsSm(side, false) + "L146 332L140 304L134 332L" + f1(sideL[0][0]) + " " + f1(sideL[0][1]) + dsSm(sideL, false).replace(/^M[^C]*/, "") + "Z";
-  o += '<path class="ds-skin" d="' + armR + '"/><path class="ds-skin" d="' + armL + '"/>';
   o += '<path class="ds-skin" d="' + torso + '"/><path class="ds-skin" d="M131 60L131 80L149 80L149 60Z"/><ellipse class="ds-skin" cx="140" cy="40" rx="23" ry="28"/>';
   /* brain, with the hindbrain (brainstem and cerebellum) at its base */
   var hind = "M136 47C135 56 137 64 139 70L143 70C145 62 146 55 145 47Z", cereb = "M144 46C150 44 157 46 158 50C157 54 151 55 146 53Z";
@@ -82,8 +80,8 @@ function dsBody(lv, st, D) {
   o += HOT(D.INFO.mus, '<path class="ds-mus" d="' + mus + '"/><path class="ds-stri" d="' + stri + '"/>' + glow(mus, lv.mus));
   /* organ names: on the organ where they fit, otherwise beside the body */
   o += T(112, 147, "liver", "s ds-on", "middle") + T(180, 152, "stomach", "s ds-on", "middle");
-  o += L(8, 100, "brain", 122, 38, "start") + L(8, 178, "pancreas", 112, 186, "start") + L(8, 228, "kidney", 86, 214, "start") + L(8, 254, "gut", 106, 246, "start");
-  o += L(272, 252, "fat", 203, 252, "end") + L(272, 302, "muscle", 196, 312, "end") + L(8, 292, "bladder", 128, 290, "start");
+  o += L(110, 24, "brain", 124, 30, "end") + L(72, 192, "pancreas", 113, 187, "end") + L(72, 218, "kidney", 84, 214, "end") + L(72, 250, "gut", 105, 247, "end");
+  o += L(214, 284, "fat", 199, 270, "start") + L(214, 320, "muscle", 196, 316, "start") + L(72, 296, "bladder", 128, 291, "end");
   return o;
 }
 
@@ -115,10 +113,10 @@ function dsBodyFlow(st, lv, D) {
 function dsCol(st, D) {
   var g = D.DRUGS[st.d], o = "", x = 286, i;
   o += T(x, 30, g.name, "b ds-big", "start");
-  g.ex.forEach(function (s, k) { o += T(x, 49 + k * 15, s, "s mut", "start"); });
-  var y = 96;
+  g.ex.forEach(function (s, k) { o += T(x, 47 + k * 14, s, "s mut", "start"); });
+  var y = 104;
   o += T(x, y, "ROUTE", "s ds-cap", "start") + T(x, y + 17, g.route, "ds-val", "start");
-  y = 142;
+  y = 148;
   o += T(x, y, "HYPOGLYCEMIA", "s ds-cap", "start");
   var lab = ["none", "low", "yes", "high"];
   for (i = 0; i < 4; i++) {
@@ -126,9 +124,9 @@ function dsCol(st, D) {
     o += '<rect class="ds-seg' + (on ? " ds-seg-" + g.hypo : "") + '" x="' + (x + i * 46) + '" y="' + (y + 8) + '" width="42" height="12" rx="3"/>' + T(x + i * 46 + 21, y + 33, lab[i], "s" + (cur ? " b" : " mut"), "middle");
   }
   o += T(x, y + 52, g.hypoTxt, "ds-val", "start");
-  y = 222;
+  y = 226;
   o += T(x, y, "WEIGHT", "s ds-cap", "start") + T(x, y + 17, g.weight, "ds-val" + (g.weight === "not covered" ? " mut" : ""), "start");
-  y = 264;
+  y = 266;
   o += T(x, y, "WATCH FOR", "s ds-cap", "start");
   g.watch.forEach(function (s, k) { o += T(x, y + 17 + k * 15, s, "s", "start"); });
   return o;
@@ -141,8 +139,12 @@ function dsPanel(st, D) {
   function cap(y) { return '<path class="vessel" d="M1 ' + y + 'H459V' + (y + 26) + 'H1Z"/>'; }
   function rbcs(y, per) { var s = "", i; for (i = 0; i < 7; i++) { var x = ((t / per + i / 7) % 1) * 480 - 10; s += '<ellipse class="ds-rbc" cx="' + f1(x) + '" cy="' + (y + 13) + '" rx="6" ry="3.6"/>'; } return s; }
   if (k === "beta") {
-    var dep = d === "su" || (d === "meg" && Math.cos(t / 900) > -0.2), bound = dep, gl = d === "glp1" || d === "dpp4";
+    /* a meal cycle: glucose high after a meal, low between meals (reduced motion: after a meal) */
+    var ph = ((t / 8000) % 1 + 1) % 1, meal = ph < 0.5, gl = d === "glp1" || d === "dpp4";
+    var bound = d === "su" || (d === "meg" && meal), dep = bound || (gl && meal);
     o += cap(214) + rbcs(214, 9000) + T(452, 232, "capillary", "s ds-onv", "end");
+    o += dsFlow([[-10, 222], [470, 222]], 8, 6000, t, "ds-glu", 2.4, 0, meal ? 1 : 0.18);
+    o += '<rect class="ds-chip' + (meal ? "" : " ds-chip-lo") + '" x="292" y="6" width="160" height="22" rx="11"/>' + T(372, 21, meal ? "after a meal: glucose ↑" : "between meals: glucose ↓", "s ds-onv b", "middle");
     /* alpha cell */
     var gOut = gl ? 0.25 : 1;
     o += HOT("Alpha cell: makes glucagon. GLP-1 (from a GLP-1 agonist, or your own when a DPP-4 inhibitor protects it) decreases glucagon release.", '<ellipse class="ds-alpha" cx="62" cy="80" rx="42" ry="38"/><ellipse class="nuc" cx="56" cy="76" rx="13" ry="11"/>' + [[34, 66], [44, 100], [78, 58], [86, 92], [70, 104], [36, 88], [84, 74]].map(function (p) { return '<circle class="ds-gcg" cx="' + p[0] + '" cy="' + p[1] + '" r="3.2"/>'; }).join(""));
@@ -153,7 +155,7 @@ function dsPanel(st, D) {
     o += '<ellipse class="ds-mem' + (dep ? " ds-dep" : "") + '" cx="236" cy="124" rx="118" ry="86"/>';
     o += T(176, 66, "beta cell", "b", "middle");
     /* insulin granules: they slide to the membrane and empty into the capillary when the cell is driven */
-    var rel = dep ? 1 : gl ? 0.85 : 0.15, i;
+    var rel = dep ? 1 : 0.12, i;
     for (i = 0; i < 9; i++) {
       var gx = 262 + (i % 3) * 18 + (i > 5 ? 6 : 0), gy = 150 + Math.floor(i / 3) * 14, u = rel > 0.2 ? ((t / 2400 + i / 9) % 1) : 0, yy = gy + u * (198 - gy) * 0.9;
       o += '<circle class="ds-gran" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="5.5" opacity="' + f1(1 - Math.max(0, u - 0.8) * 5) + '"/><circle class="ins" cx="' + f1(gx) + '" cy="' + f1(yy) + '" r="2.4" opacity="' + f1(1 - Math.max(0, u - 0.8) * 5) + '"/>';
@@ -169,12 +171,12 @@ function dsPanel(st, D) {
     if (!dep) o += dsFlow([[kx + 18, ky], [kx - 6, ky], [kx - 40, ky + 26], [kx - 80, ky + 40]], 4, 1800, t, "ds-k", 3);
     else for (i = 0; i < 6; i++) o += '<circle class="ds-k" cx="' + f1(kx + 14 + (i % 3) * 9 + Math.sin(t / 300 + i) * 1.6) + '" cy="' + f1(ky - 10 + Math.floor(i / 3) * 18 + Math.cos(t / 260 + i) * 1.6) + '" r="3"/>';
     o += L(8, 196, "K-ATP channel", kx - 2, ky + 16, "start") + T(8, 210, dep ? "closed: K⁺ trapped" : "open: K⁺ leaves", "s" + (dep ? " bad" : " mut"), "start");
-    o += T(150, 182, dep ? "depolarized" : "resting", "s" + (dep ? " hot-t" : " mut"), "middle");
+    o += T(188, 150, dep ? "depolarized" : "resting", "s" + (dep ? " hot-t" : " mut"), "middle");
     /* calcium channel on the right membrane */
     var cx2 = 354, cy2 = 124;
     o += HOT("Calcium channel. Depolarization opens it; calcium flows in and drives exocytosis of the insulin granules.", '<rect class="ds-chan" x="' + (cx2 - 6) + '" y="' + (cy2 - 15) + '" width="12" height="11" rx="2"/><rect class="ds-chan" x="' + (cx2 - 6) + '" y="' + (cy2 + 4) + '" width="12" height="11" rx="2"/><path class="ds-gate" d="M' + (cx2 - 7) + " " + cy2 + "H" + (cx2 + 7) + '" opacity="' + (dep ? 0.15 : 1) + '"/>');
     if (dep) o += dsFlow([[430, cy2 - 20], [cx2 + 10, cy2], [cx2 - 30, cy2 + 6]], 4, 1700, t, "ds-ca", 3);
-    o += T(368, 100, "Ca²⁺ channel", "s", "start") + T(368, 114, dep ? "open: Ca²⁺ in" : "closed", "s" + (dep ? " ok" : " mut"), "start");
+    o += T(364, 98, "Ca²⁺ channel", "s", "start") + T(364, 112, dep ? "open, Ca²⁺ in" : "closed", "s" + (dep ? " ok" : " mut"), "start");
     /* GLP-1 receptor on the lower left membrane, facing the capillary */
     var rx = 170, ry = 196;
     o += HOT("GLP-1 receptor (also in the brain, heart, vessels, kidney, lung and gut). GLP-1 raises insulin secretion in proportion to the glucose there: glucose-dependent, so a low risk of hypoglycemia on its own.", '<path class="ds-gpcr" d="M' + (rx - 10) + " " + (ry - 8) + "l3 14l3 -14l3 14l3 -14l3 14l3 -14" + '"/>');
@@ -183,7 +185,9 @@ function dsPanel(st, D) {
       o += dsFlow([[-10, 226], [rx - 40, 226], [rx, ry + 8]], 4, 2600, t, "ds-glp", 3.2) + dsFlow([[-10, 230], [470, 230]], 6, 5200, t, "ds-glp", 3, 0.3);
       o += HOT("DPP-4 in the blood: it breaks down your own GLP-1 and GIP. The inhibitor sits in it, so the incretins survive.", '<path class="ds-dpp" d="M108 220A9 9 0 1 1 108 234L100 227Z"/>' + dsDia(101, 227, 4));
     }
-    if (gl) o += dsFlow([[200, 226], [212, 200], [222, 160]], 4, 2200, t, "ds-glu", 2.6);
+    o += dsFlow([[200, 226], [212, 200], [222, 160]], 4, 2200, t, "ds-glu", 2.6, 0, meal ? 1 : 0.15);
+    var note = d === "su" ? (meal ? "" : "still releasing: hypoglycemia") : d === "meg" ? (meal ? "taken with the meal" : "off fast: release stops") : (meal ? "glucose high: release" : "glucose low: release stops");
+    if (note) o += T(300, 186, note, "s b " + (d === "su" ? "bad" : "ok"), "middle");
     if (gl) o += T(rx + 4, ry - 12, d === "dpp4" ? "your own GLP-1" : "GLP-1 receptor", "s" + (d === "dpp4" ? " ds-glpt" : ""), "middle");
     else o += T(rx + 4, ry - 12, "GLP-1 receptor", "s mut", "middle");
     if (d === "dpp4") o += T(126, 210, "DPP-4", "s b", "start");
@@ -198,7 +202,7 @@ function dsPanel(st, D) {
     o += T(66, 112, "SGLT2", "s b", "middle") + T(66, 126, "blocked", "s bad", "middle");
     o += dsFlow([[-10, 52], [470, 52]], 9, 5200, t, "ds-glu", 3.2) + dsFlow([[-10, 66], [470, 66]], 7, 4300, t, "ds-water", 2.6, 0.2);
     o += T(230, 240, "normally about 99% is taken back here", "s mut", "middle");
-    o += T(300, 112, "glucose stays in the", "s", "middle") + T(300, 126, "filtrate, water follows", "s", "middle");
+    o += T(282, 110, "glucose stays", "s", "middle") + T(282, 124, "in the filtrate", "s", "middle") + T(390, 110, "water follows:", "s", "middle") + T(390, 124, "polyuria", "s b", "middle");
   }
   if (k === "gut") {
     var agi = d === "agi";
@@ -217,7 +221,7 @@ function dsPanel(st, D) {
       }
     }
     o += T(130, 132, "brush border:", "s", "middle") + T(130, 146, "alpha-glucosidase", "s b", "middle") + T(130, 160, agi ? "blocked" : "working", "s" + (agi ? " bad" : " mut"), "middle");
-    if (!agi) o += '<g class="ds-q"><circle cx="352" cy="140" r="10"/><text x="352" y="145" text-anchor="middle">?</text></g>' + T(352, 168, "less absorbed?", "s", "middle") + T(352, 182, "mechanism not established", "s mut", "middle");
+    if (!agi) o += '<g class="ds-q"><circle cx="352" cy="140" r="10"/><text x="352" y="145" text-anchor="middle">?</text></g>' + T(352, 168, "less absorbed?", "s", "middle") + T(352, 182, "mechanism unclear", "s mut", "middle");
   }
   if (k === "liv") {
     o += '<path class="vessel" d="M378 1H446V245H378Z"/>' + T(412, 22, "blood", "s b ds-onv", "middle");
@@ -298,8 +302,7 @@ function dsSay(st, D) { var g = D.DRUGS[st.d]; return [g.sum, g.ro]; }
 const D = {
   ANIM: true, INIT: { d: "su" },
   BODY: {
-    SIDE: [[149, 76], [170, 82], [192, 88], [204, 98], [206, 114], [201, 145], [197, 180], [195, 212], [200, 245], [204, 272], [201, 300], [198, 332]],
-    ARM: [[204, 98], [218, 112], [225, 140], [229, 180], [232, 215], [233, 240], [236, 262], [234, 280], [226, 286], [220, 276], [221, 256], [218, 220], [214, 182], [209, 150], [206, 128]],
+    SIDE: [[149, 76], [172, 82], [192, 88], [204, 100], [208, 118], [204, 140], [198, 176], [195, 212], [200, 245], [204, 272], [201, 300], [198, 332]],
     LIV: [[82, 128], [102, 120], [130, 118], [160, 121], [172, 127], [160, 134], [134, 146], [106, 162], [88, 166], [78, 152]],
     STOM: [[158, 128], [170, 120], [186, 121], [198, 134], [198, 154], [190, 170], [172, 178], [156, 178], [150, 172], [158, 166], [174, 162], [178, 148], [172, 138], [162, 138]],
     PANC: [[114, 186], [112, 178], [124, 176], [146, 180], [174, 176], [196, 170], [206, 172], [203, 180], [176, 186], [148, 192], [126, 196], [116, 194]],
@@ -329,28 +332,28 @@ const D = {
     mus: "Skeletal muscle: insulin brings glucose in through GLUT4 (and potassium in); metformin and TZDs make it more sensitive to insulin.",
   },
   DRUGS: {
-    ins: { name: "Insulin", ex: ["rapid, short (regular), NPH,", "long, ultra-long: see Fig 2"], route: "injected; Afrezza inhaled", hypo: 3, hypoTxt: "the watchword", weight: "gain", watch: ["hypoglycemia, weight gain", "retinopathy worse at first", "lipoatrophy, lipohypertrophy"], zoom: "musc", lit: { liv: 0.6, mus: 1, fat: 1 },
-      sum: "Insulin: all type 1 patients, and type 2 when needed; injected under the skin (Afrezza is inhaled). It binds the insulin receptor, a tyrosine kinase, and GLUT4 moves to the membrane of muscle and fat cells, so glucose (and potassium) move in; in the liver, gluconeogenesis and glycogen breakdown fall. Adverse: hypoglycemia, weight gain, a transient worsening of retinopathy, lipoatrophy or lipohypertrophy at the injection site.", ro: "hypoglycemia: yes · weight gain" },
-    su: { name: "Sulfonylureas", ex: ["glipizide, glyburide,", "glimepiride"], route: "oral", hypo: 3, hypoTxt: "the most likely in type 2", weight: "gain", watch: ["low durability", "disulfiram-like reaction", "G6PD, liver, kidney (glyburide)"], zoom: "beta", lit: { panc: 1 },
-      sum: "Sulfonylureas (glipizide, glyburide, glimepiride), insulin secretagogues: they bind the sulfonylurea receptor (SUR) on the beta cell's K-ATP channel and close it. Potassium is trapped, the cell depolarizes, calcium channels open, and insulin the cell has already made is released, whatever the glucose. So they need a working pancreas. Adverse: hypoglycemia (the class most likely to cause it in type 2), weight gain, low durability; also agranulocytosis, jaundice, a disulfiram-like reaction with alcohol.", ro: "hypoglycemia: highest of the orals" },
-    meg: { name: "Meglitinides", ex: ["repaglinide (Prandin),", "nateglinide"], route: "oral, several times a day", hypo: 2, hypoTxt: "yes, less than sulfonylureas", weight: "gain", watch: ["frequent dosing", "low durability", "not if a sulfonylurea failed"], zoom: "beta", lit: { panc: 1 },
-      sum: "Meglitinides (repaglinide, nateglinide): the same K-ATP channel and the same quick squeeze on the pancreas (2 binding sites shared with the sulfonylureas, 1 of their own), but rapidly absorbed: peak 1 hour, half-life 1 hour, so they are dosed with meals for the after-meal (postprandial) glucose. Adverse: hypoglycemia (less than with sulfonylureas), weight gain, frequent dosing, low durability; don't use them if a sulfonylurea has failed.", ro: "hypoglycemia: yes, less than SU" },
-    met: { name: "Metformin", ex: ["a biguanide; first-line", "for type 2"], route: "oral", hypo: 0, hypoTxt: "no: no effect if glucose is normal", weight: "neutral or some loss", watch: ["GI upset (the common one)", "low B12, lactic acidosis", "avoid if eGFR is under 30"], zoom: "liv", lit: { liv: 1, mus: 0.45, gut: 0.45 },
+    ins: { name: "Insulin", ex: ["rapid, short, NPH,", "long, ultra-long (Fig 2)"], route: "injected; Afrezza inhaled", hypo: 3, hypoTxt: "the watchword", weight: "gain", watch: ["hypoglycemia, weight gain", "retinopathy briefly worse", "lipoatrophy/hypertrophy"], zoom: "musc", lit: { liv: 0.6, mus: 1, fat: 1 },
+      sum: "Insulin: all type 1 patients, and type 2 when needed; injected under the skin (Afrezza is inhaled). It binds the insulin receptor, a tyrosine kinase, and GLUT4 moves to the membrane of muscle and fat cells, so glucose (and potassium) move in; in the liver, gluconeogenesis and glycogen breakdown fall. Adverse: hypoglycemia, weight gain, a transient worsening of retinopathy, lipoatrophy or lipohypertrophy at the injection site.", ro: "hypoglycemia: yes" },
+    su: { name: "Sulfonylureas", ex: ["glipizide, glyburide,", "glimepiride"], route: "oral", hypo: 3, hypoTxt: "the most likely in type 2", weight: "gain", watch: ["low durability", "disulfiram-like reaction", "G6PD; liver, kidney"], zoom: "beta", lit: { panc: 1 },
+      sum: "Sulfonylureas (glipizide, glyburide, glimepiride), insulin secretagogues: they bind the sulfonylurea receptor (SUR) on the beta cell's K-ATP channel and close it. Potassium is trapped, the cell depolarizes, calcium channels open, and insulin the cell has already made is released, whatever the glucose. So they need a working pancreas. Adverse: hypoglycemia (the class most likely to cause it in type 2), weight gain, low durability; also agranulocytosis, jaundice, a disulfiram-like reaction with alcohol.", ro: "hypoglycemia: highest" },
+    meg: { name: "Meglitinides", ex: ["repaglinide (Prandin),", "nateglinide"], route: "oral, with meals", hypo: 2, hypoTxt: "less than sulfonylureas", weight: "gain", watch: ["frequent dosing", "low durability", "not after a failed SU"], zoom: "beta", lit: { panc: 1 },
+      sum: "Meglitinides (repaglinide, nateglinide): the same K-ATP channel and the same quick squeeze on the pancreas (2 binding sites shared with the sulfonylureas, 1 of their own), but rapidly absorbed: peak 1 hour, half-life 1 hour, so they are dosed with meals for the after-meal (postprandial) glucose. Adverse: hypoglycemia (less than with sulfonylureas), weight gain, frequent dosing, low durability; don't use them if a sulfonylurea has failed.", ro: "hypoglycemia: yes" },
+    met: { name: "Metformin", ex: ["a biguanide; first-line", "for type 2"], route: "oral", hypo: 0, hypoTxt: "none at normal glucose", weight: "neutral or some loss", watch: ["GI upset (the common one)", "low B12, lactic acidosis", "avoid if eGFR is under 30"], zoom: "liv", lit: { liv: 1, mus: 0.45, gut: 0.45 },
       sum: "Metformin, the first-line drug for type 2 diabetes. Its primary effect is to inhibit hepatic gluconeogenesis; it also increases peripheral insulin sensitivity (glucose use in skeletal muscle) and delays glucose absorption from the gut. It has no effect when glucose is normal, so no hypoglycemia, and it is weight neutral or causes some weight loss. Adverse: GI upset (nausea, bloating, cramps, diarrhea), decreased B12 absorption, lactic acidosis; contraindicated when eGFR is under 30.", ro: "hypoglycemia: no" },
-    tzd: { name: "TZDs", ex: ["thiazolidinediones:", "pioglitazone, rosiglitazone"], route: "oral", hypo: 1, hypoTxt: "low risk", weight: "gain", watch: ["edema → heart failure", "avoid NYHA class III-IV", "macular edema; liver"], zoom: "fat", lit: { fat: 1, mus: 0.45, liv: 0.45 },
-      sum: "Thiazolidinediones (pioglitazone, rosiglitazone) are ligands for PPAR-gamma, a nuclear hormone receptor expressed mainly in fat: more adipocytes, more fatty acid uptake into them, and better insulin sensitivity in muscle and liver. Low risk of hypoglycemia, and they preserve beta cell function. Adverse: dose-related edema with new or worse heart failure (avoid in NYHA class III or IV), weight gain, liver (avoid if ALT is over 2.5 times normal); they may raise the risk of macular edema.", ro: "hypoglycemia: low · edema" },
-    agi: { name: "α-glucosidase inhibitors", ex: ["acarbose, miglitol"], route: "oral", hypo: 0, hypoTxt: "no", weight: "no gain", watch: ["flatulence, bloating, diarrhea", "transaminases rise", "less digoxin absorbed (acarbose)"], zoom: "gut", lit: { gut: 1 },
-      sum: "Alpha-glucosidase inhibitors (acarbose, miglitol) block alpha-glucosidase on the brush border of the small intestine, so starch, dextrin and disaccharides aren't broken down or absorbed and the after-meal spike is blunted; they work best on a starchy, high-fiber diet. Acarbose is minimally absorbed. No hypoglycemia. Adverse: flatulence, bloating and diarrhea (more with more carbohydrate), some transaminase elevation, less absorption of other drugs; avoid with bowel disease.", ro: "hypoglycemia: no · GI effects" },
-    glp1: { name: "GLP-1 agonists", ex: ["exenatide, liraglutide,", "dulaglutide, semaglutide"], route: "injected (oral semaglutide)", hypo: 1, hypoTxt: "low as monotherapy", weight: "loss", watch: ["nausea, vomiting (wanes)", "pancreatitis (rare)", "boxed: thyroid C-cell tumors"], zoom: "beta", lit: { panc: 1, stom: 0.8, brain: 0.8, fat: 0.25 },
-      sum: "GLP-1 receptor agonists (exenatide, from the Gila monster's exendin-4, then liraglutide, dulaglutide, semaglutide, tirzepatide) act like the gut's incretin GLP-1 but resist DPP-4: insulin secretion rises in a glucose-dependent way, glucagon release falls, gastric emptying slows and food intake drops, so weight comes down. Low risk of hypoglycemia as monotherapy. Adverse: dose-dependent nausea and vomiting that wane, delayed absorption of other oral drugs, rare pancreatitis, acute renal failure; boxed warning: thyroid C-cell tumors in animal studies.", ro: "hypoglycemia: low (alone) · weight loss" },
-    dpp4: { name: "DPP-4 inhibitors", ex: ["sitagliptin, saxagliptin,", "linagliptin, alogliptin"], route: "oral, once a day", hypo: 0, hypoTxt: "no", weight: "neutral", watch: ["modest A1C lowering, costly", "low durability (2 years)", "avoid in HF (not sitagliptin)"], zoom: "beta", lit: { gut: 0.7, panc: 1 },
+    tzd: { name: "TZDs", ex: ["pioglitazone (Actos),", "rosiglitazone (Avandia)"], route: "oral", hypo: 1, hypoTxt: "low risk", weight: "gain", watch: ["edema → heart failure", "avoid NYHA class III-IV", "macular edema; liver"], zoom: "fat", lit: { fat: 1, mus: 0.45, liv: 0.45 },
+      sum: "Thiazolidinediones (pioglitazone, rosiglitazone) are ligands for PPAR-gamma, a nuclear hormone receptor expressed mainly in fat: more adipocytes, more fatty acid uptake into them, and better insulin sensitivity in muscle and liver. Low risk of hypoglycemia, and they preserve beta cell function. Adverse: dose-related edema with new or worse heart failure (avoid in NYHA class III or IV), weight gain, liver (avoid if ALT is over 2.5 times normal); they may raise the risk of macular edema.", ro: "hypoglycemia: low" },
+    agi: { name: "α-glucosidase inhibitors", ex: ["acarbose (Precose),", "miglitol (Glyset)"], route: "oral", hypo: 0, hypoTxt: "no", weight: "no gain", watch: ["gas, bloating, diarrhea", "transaminases rise", "less digoxin absorbed"], zoom: "gut", lit: { gut: 1 },
+      sum: "Alpha-glucosidase inhibitors (acarbose, miglitol) block alpha-glucosidase on the brush border of the small intestine, so starch, dextrin and disaccharides aren't broken down or absorbed and the after-meal spike is blunted; they work best on a starchy, high-fiber diet. Acarbose is minimally absorbed. No hypoglycemia. Adverse: flatulence, bloating and diarrhea (more with more carbohydrate), some transaminase elevation, less absorption of other drugs; avoid with bowel disease.", ro: "hypoglycemia: no" },
+    glp1: { name: "GLP-1 agonists", ex: ["exenatide, liraglutide,", "dulaglutide, semaglutide"], route: "injected; Rybelsus oral", hypo: 1, hypoTxt: "low as monotherapy", weight: "loss", watch: ["nausea, vomiting (wanes)", "pancreatitis (rare)", "boxed: C-cell tumors"], zoom: "beta", lit: { panc: 1, stom: 0.8, brain: 0.8, fat: 0.25 },
+      sum: "GLP-1 receptor agonists (exenatide, from the Gila monster's exendin-4, then liraglutide, dulaglutide, semaglutide, tirzepatide) act like the gut's incretin GLP-1 but resist DPP-4: insulin secretion rises in a glucose-dependent way, glucagon release falls, gastric emptying slows and food intake drops, so weight comes down. Low risk of hypoglycemia as monotherapy. Adverse: dose-dependent nausea and vomiting that wane, delayed absorption of other oral drugs, rare pancreatitis, acute renal failure; boxed warning: thyroid C-cell tumors in animal studies.", ro: "hypoglycemia: low" },
+    dpp4: { name: "DPP-4 inhibitors", ex: ["sitagliptin, saxagliptin,", "linagliptin, alogliptin"], route: "oral, once a day", hypo: 0, hypoTxt: "no", weight: "neutral", watch: ["modest A1C drop, costly", "low durability (2 years)", "no HF (sitagliptin is ok)"], zoom: "beta", lit: { gut: 0.7, panc: 1 },
       sum: "DPP-4 inhibitors (sitagliptin, saxagliptin, linagliptin, alogliptin): DPP-4 is the enzyme that naturally breaks down your own incretins, GLP-1 and GIP. Blocking it makes the incretins you release after a meal last longer, so it's like taking a GLP-1, made by you: insulin rises and glucagon falls with the meal. No hypoglycemia, weight neutral, well tolerated, usable in kidney or liver disease. Adverse: expensive, modest A1C lowering, low durability; avoid in heart failure (except sitagliptin).", ro: "hypoglycemia: no" },
     amy: { name: "Pramlintide", ex: ["an amylin analog (Symlin)"], route: "injected before meals", hypo: 2, hypoTxt: "with insulin", weight: "not covered", watch: ["nausea, vomiting", "hypoglycemia with insulin"], zoom: "brain", lit: { brain: 1, stom: 0.8, panc: 0.3, fat: 0.25 },
-      sum: "Pramlintide (Symlin), the synthetic form of amylin, which beta cells co-secrete with insulin (in type 2, amylin forms amyloid fibers). Injected before meals, half-life 50 minutes, usable in type 1 and type 2: it binds receptors in the hindbrain, decreasing glucagon release, slowing gastric emptying and increasing satiety. Adverse: nausea and vomiting; hypoglycemia when used with insulin.", ro: "hypoglycemia: with insulin" },
-    sglt2: { name: "SGLT2 inhibitors", ex: ["canagliflozin, dapagliflozin,", "empagliflozin, ertugliflozin"], route: "oral, in the morning", hypo: 1, hypoTxt: "rare", weight: "not covered", watch: ["genital yeast infections, UTI", "polyuria, low BP, dizziness", "boxed: amputations"], zoom: "tub", lit: { kid: 1, blad: 0.8 },
-      sum: "SGLT2 inhibitors (canagliflozin, dapagliflozin, empagliflozin, ertugliflozin: the -gliflozins, flushing out the sugar). About 99% of filtered glucose is normally taken back by the sodium-glucose transporter; these block it, so glucose leaves in the urine, dose-dependently, with water (osmotic diuresis). Hypoglycemia is rare; they lower blood pressure and help heart failure. Adverse: genital yeast infections, UTIs, polyuria, dizziness and hypotension, hyperkalemia, rare euglycemic DKA; boxed warning: amputations (canagliflozin, ertugliflozin).", ro: "hypoglycemia: rare · glucose in urine" },
-    resin: { name: "Bile acid resin", ex: ["colesevelam"], route: "oral (very little absorbed)", hypo: -1, hypoTxt: "not covered", weight: "not covered", watch: ["constipation", "binds other drugs (warfarin,", "thyroxine...); raises TG"], zoom: "gut", lit: { gut: 0.6 },
-      sum: "Colesevelam, a bile acid resin: bile acid metabolism is abnormal in type 2 and the resin may decrease glucose absorption, but the mechanism is not established, and these are not popular drugs for diabetes. Adverse: constipation and other GI effects; it decreases absorption of warfarin, phenytoin, verapamil, glyburide, thyroxine, ethinyl estradiol and fat-soluble vitamins, and can raise triglycerides.", ro: "mechanism not established" },
+      sum: "Pramlintide (Symlin), the synthetic form of amylin, which beta cells co-secrete with insulin (in type 2, amylin forms amyloid fibers). Injected before meals, half-life 50 minutes, usable in type 1 and type 2: it binds receptors in the hindbrain, decreasing glucagon release, slowing gastric emptying and increasing satiety. Adverse: nausea and vomiting; hypoglycemia when used with insulin.", ro: "hypo: with insulin" },
+    sglt2: { name: "SGLT2 inhibitors", ex: ["canagliflozin,", "dapagliflozin,", "empa-, ertugliflozin"], route: "oral, in the morning", hypo: 1, hypoTxt: "rare", weight: "not covered", watch: ["genital yeast, UTIs", "polyuria, low BP", "boxed: amputations"], zoom: "tub", lit: { kid: 1, blad: 0.8 },
+      sum: "SGLT2 inhibitors (canagliflozin, dapagliflozin, empagliflozin, ertugliflozin: the -gliflozins, flushing out the sugar). About 99% of filtered glucose is normally taken back by the sodium-glucose transporter; these block it, so glucose leaves in the urine, dose-dependently, with water (osmotic diuresis). Hypoglycemia is rare; they lower blood pressure and help heart failure. Adverse: genital yeast infections, UTIs, polyuria, dizziness and hypotension, hyperkalemia, rare euglycemic DKA; boxed warning: amputations (canagliflozin, ertugliflozin).", ro: "hypoglycemia: rare" },
+    resin: { name: "Bile acid resin", ex: ["colesevelam"], route: "oral, barely absorbed", hypo: -1, hypoTxt: "not covered", weight: "not covered", watch: ["constipation", "cuts others' absorption", "raises triglycerides"], zoom: "gut", lit: { gut: 0.6 },
+      sum: "Colesevelam, a bile acid resin: bile acid metabolism is abnormal in type 2 and the resin may decrease glucose absorption, but the mechanism is not established, and these are not popular drugs for diabetes. Adverse: constipation and other GI effects; it decreases absorption of warfarin, phenytoin, verapamil, glyburide, thyroxine, ethinyl estradiol and fat-soluble vitamins, and can raise triglycerides.", ro: "mechanism unclear" },
   },
 };
 
@@ -358,7 +361,7 @@ const CSS = `
 .anima .drugsites-svg .t{font-size:13px}
 .anima .drugsites-svg .t.s{font-size:12px}
 .anima .drugsites-svg .t.ds-big{font-size:15.5px}
-.anima .drugsites-svg .t.ds-val{fill:var(--anatomy-strong);font-weight:600}
+.anima .drugsites-svg .t.ds-val{fill:var(--anatomy-strong);font-weight:600;font-size:12px}
 .anima .drugsites-svg .t.ds-cap{fill:var(--anatomy-muted);letter-spacing:.08em;font-size:10.5px}
 .anima .drugsites-svg .t.ds-on{stroke:none;fill:var(--anatomy-hi);font-weight:600}
 .anima .drugsites-svg .t.ds-onv{stroke:none}
@@ -413,6 +416,8 @@ const CSS = `
 .anima .drugsites-svg .ds-syr .ds-barrel{fill:var(--anatomy-face);stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .drugsites-svg .ds-needle{fill:none;stroke:var(--anatomy-mid);stroke-width:1.4;stroke-linecap:round}
 .anima .drugsites-svg .ds-dpp{fill:var(--bx-blue-soft);stroke:var(--bx-blue);stroke-width:1.2}
+.anima .drugsites-svg .ds-chip{fill:var(--bx-glu-soft);stroke:var(--bx-glu);stroke-width:1}
+.anima .drugsites-svg .ds-chip-lo{fill:var(--surface);stroke:var(--anatomy-lo)}
 .anima .drugsites-svg .ds-pan{fill:var(--bx-matrix);stroke:var(--line-strong);stroke-width:1}
 .anima .drugsites-svg .ds-rbc{fill:var(--bx-blood);opacity:.75}
 .anima .drugsites-svg .ds-alpha{fill:var(--bx-gold-soft);stroke:var(--bx-gold);stroke-width:1.4}
@@ -449,7 +454,7 @@ const CSS = `
 `;
 
 export default function () {
-  return makeFig({ id: "drugsites", lec: "dmpharm", fig: "Fig 1", short: "Where each drug acts", hint: "pick a drug · hover a part",
+  return makeFig({ id: "drugsites", lec: "dmpharm", fig: "Fig 1", short: "Where each drug acts", hint: "pick a drug",
     title: "Where each diabetes drug acts",
     caption: "Pick a drug class: its sites light up on the body (front view: the patient's right is on your left), the zoom underneath animates the mechanism Dr. Fasinu teaches, and the side column gives the route, the hypoglycemia risk and the weight effect.",
     W: 480, H: 600, label: "A front view of the body with the brain, stomach, liver, pancreas, small intestine, kidneys, bladder, fat and thigh muscle, a column with the drug's route, hypoglycemia risk and weight effect, and a zoom panel showing its mechanism.",
