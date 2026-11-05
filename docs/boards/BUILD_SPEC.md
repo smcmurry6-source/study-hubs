@@ -124,7 +124,7 @@ counts toward the drill whether or not the sheet is open. Finishing Today's shif
 ### 1.6 The `question_stats` 1,000-row limit
 
 `drill.js:72` and `v3.js:1655` select all of a hub's `question_stats` rows; the API returns at most 1,000 rows per
-request, and an RPC that returns a set is capped the same way. Fix (v33 + widget PR):
+request, and an RPC that returns a set is capped the same way. Fix (v34 + widget PR):
 
 - `get_question_stats_lite(p_hub text) returns jsonb`: **one** row, `{"<qid>":[attempts, correct], ...}`, built with
   `jsonb_object_agg`, so no row cap applies.
@@ -134,7 +134,7 @@ request, and an RPC that returns a set is capped the same way. Fix (v33 + widget
 - `review/index.html` Questions tab: page its selects with `.range()` (R1b, before the boards bank passes 1,000
   answered items).
 
-### 1.7 Migration v33 (`migration_v33.sql`; applied through the Supabase connector; `supabase/schema.sql` refreshed)
+### 1.7 Migration v34 (`migration_v34.sql`; `supabase/schema.sql` refreshed)
 
 1. `submit_arcade_score`: copy v11 exactly (list, 10 s throttle, 1..200000), add
    `or (p_hub = 'boards' and p_game ~ '^[a-z][a-z0-9-]{1,23}$')`. (Unused in R1; ready for Board Day.)
@@ -155,13 +155,13 @@ request, and an RPC that returns a set is capped the same way. Fix (v33 + widget
 9. `redeem_link_code`: also move `game_saves` and `srs_state` rows (on conflict keep the newest `updated_at` / `t`).
 
 RLS on as for every table; all writes through the functions; no admin secret in the file (`sh_admin_ok()` pattern if any
-admin RPC is added). `apply_migration` is pre-approved; log "applied via the connector" in DEPLOY_NOTES.
+admin RPC is added). Do not apply this draft here; Claude reviews and applies it. After application, log "applied via the connector" in DEPLOY_NOTES.
 
 ### 1.8 Every edit outside the hub
 
 | File | Change | PR |
 |---|---|---|
-| `migration_v33.sql`, `supabase/schema.sql` | Section 1.7 | R1a-1 (first) |
+| `migration_v34.sql`, `supabase/schema.sql` | Section 1.7 | R1a-1 (first) |
 | `widget/v3.js` | `SH_SRS` (steps, examCap, fuzz, server sync), `shQuestionStats`, device field in pings, Sure-wrong callback | R1a-1 |
 | `widget/drill.js` | `SH_DRILL.size` and `.plan`, `shDrill.ensureSet/set`, count answers with the sheet closed, use `shQuestionStats` | R1a-1 |
 | `widget/pet.js` | hide Timmy while `<html data-sh-fullscreen>` is set (3 lines) | R1a-1 |
@@ -194,7 +194,7 @@ DEPLOY_NOTES (top of "Recent major changes", after merge):
 
 > **<date> (Boards hub R1a, Claude Code)**: new hub `hubs/boards/` (INBDE + ADEX, ~Aug 2028, `exams: []` so it never
 > auto-archives; "~Aug 2028" via `examNote`). **Generated file: edit `src/boards/`, run `node tools/build-boards.js`;
-> CI fails if the build is stale.** Units: medcx, pharm (perio in R1b). `migration_v33.sql` (applied via the connector):
+> CI fails if the build is stale.** Units: medcx, pharm (perio in R1b). `migration_v34.sql` (apply after Claude review):
 > `game_saves`, `srs_state`, `get_my_srs`/`upsert_srs`, `get_my_latest`, `get_question_stats_lite`, `get_today_reach`,
 > device in pings, boards patterns in `submit_arcade_score`/`record_achievement`, link-code moves. Widget: `SH_SRS`
 > opt-in (long gaps, server copy), `SH_DRILL.size/plan`, `shDrill.ensureSet/set`, `shQuestionStats`. Spec:
@@ -919,7 +919,7 @@ item; one item per line and `--unit` builds keep agent reads small; agents grep 
 
 | Drop | Contents | Est. tokens | Lands |
 |---|---|---|---|
-| **R1a** | migration v33, widget PR, build tool, hub app (cards, cases, bank, notes, home, readiness and daily plan, Exam blocks), outside edits, About; unit **medcx** (60 items, 30 in cases) | ~2.9M | week 1 (target Nov 2026) |
+| **R1a** | migration v34, widget PR, build tool, hub app (cards, cases, bank, notes, home, readiness and daily plan, Exam blocks), outside edits, About; unit **medcx** (60 items, 30 in cases) | ~2.9M | week 1 (target Nov 2026) |
 | **R1b** | units **pharm** and **perio** (60 each) | ~2.1M | week 2 |
 | **R1c** | Chairside slice (section 6.7), About entry, trophies | ~1.6M | week 3 (target Dec 2026 - Jan 2027) |
 
@@ -952,8 +952,8 @@ all-in. Each unit is sized for one agent; units without a dependency path betwee
 
 ```json
 [
-  {"id":"int-v33","kind":"integration","unit":null,"title":"Migration v33: game_saves, srs_state, stats/latest/reach RPCs, device in pings, boards patterns, link-code moves","outputs":["migration_v33.sql","supabase/schema.sql","applied via the Supabase connector"],"depends_on":[],"est_tokens":150000,"model_hint":"opus","effort_hint":"high"},
-  {"id":"int-widget","kind":"integration","unit":null,"title":"Widget PR: SH_SRS opt-in with server sync and fuzz, shQuestionStats, device field, drill size/plan/ensureSet/set, pet fullscreen, ranks and replies names, 2 trophies","outputs":["widget/v3.js","widget/drill.js","widget/pet.js","widget/ranks.js","widget/replies.js","about/index.html (trophy rows)"],"depends_on":["int-v33"],"est_tokens":220000,"model_hint":"opus","effort_hint":"high"},
+  {"id":"int-v34","kind":"integration","unit":null,"title":"Migration v34: game_saves, srs_state, stats/latest/reach RPCs, device in pings, boards patterns, link-code moves","outputs":["migration_v34.sql","supabase/schema.sql","apply after Claude review"],"depends_on":[],"est_tokens":150000,"model_hint":"opus","effort_hint":"high"},
+  {"id":"int-widget","kind":"integration","unit":null,"title":"Widget PR: SH_SRS opt-in with server sync and fuzz, shQuestionStats, device field, drill size/plan/ensureSet/set, pet fullscreen, ranks and replies names, 2 trophies","outputs":["widget/v3.js","widget/drill.js","widget/pet.js","widget/ranks.js","widget/replies.js","about/index.html (trophy rows)"],"depends_on":["int-v34"],"est_tokens":220000,"model_hint":"opus","effort_hint":"high"},
   {"id":"int-build","kind":"integration","unit":null,"title":"Build tool, src/boards skeleton, shell, CSS tokens, CI wiring (--check, syntax glob, boards lint in smoke.js, check.yml)","outputs":["tools/build-boards.js","src/boards/{config.js,shell.html,README.md,css/*}","tools/ci/syntax.js","tools/ci/smoke.js",".github/workflows/check.yml"],"depends_on":[],"est_tokens":220000,"model_hint":"sonnet","effort_hint":"high"},
   {"id":"int-cards","kind":"integration","unit":null,"title":"Hub app: state, item card (shuffle with authored-index mapping, why lines, cue, Report, class row, lockIn API), case renderer with Rounds, Questions mode","outputs":["src/boards/app/00-util.js","10-state.js","20-card.js","25-case.js","40-bank.js"],"depends_on":["int-build"],"est_tokens":260000,"model_hint":"sonnet","effort_hint":"high"},
   {"id":"int-plan","kind":"integration","unit":null,"title":"Readiness and dailyPlan (budget, governor, retirement, follow-up visits) with Node tests","outputs":["src/boards/app/45-readiness-plan.js","tools/ci/fixtures/boards/plan-*.json"],"depends_on":["int-build"],"est_tokens":160000,"model_hint":"opus","effort_hint":"high"},
@@ -1003,7 +1003,7 @@ all-in. Each unit is sized for one agent; units without a dependency path betwee
 ```
 
 Totals: R1a ~2.9M (int-* 1.51M + medcx 1.27M + qa 0.1M), R1b ~2.1M (pharm 0.97M + perio 1.08M + QA 0.09M), R1c ~1.5M (game, incl. integration).
-Merge order: `int-v33` -> `int-widget` (own PR, perio/MSK smoke-tested) -> R1a hub PR -> R1b PR -> R1c PR.
+Merge order: `int-v34` -> `int-widget` (own PR, perio/MSK smoke-tested) -> R1a hub PR -> R1b PR -> R1c PR.
 
 ---
 
