@@ -14,7 +14,9 @@ true/false per lecture (Occlusion has 27 and 42 over its five lectures). CI fail
   starting "1. " / "2. ", the four fixed choices and the key; `tf(id, lec, src, statement, isTrue, ex, whyTrue, whyFalse)`
   writes "True or false: …" with the choices True, False. Their choices never shuffle (bank, drill, Weak Spots, mock),
   `.qcard-stem` keeps line breaks, and the arcade skips both (`arcadeQ`).
-- Spread two-statement keys over all four choices and keep true/false keys near half True (CI: 35-65% per hub).
+- Spread two-statement keys over all four choices and keep true/false keys near half True (CI: each two-statement key
+  10-40% of a hub's items, since 2026-11-04; true/false 35-65% True). Don't write the true statement first by habit: PCD
+  Implants had 36 of 46 keyed "1 true, 2 false" until a student noticed (suggestion #14).
 - A false statement changes one detail that was taught (a number, a side, a swapped pair, who said it); never make it
   false through a trick of wording. Write each statement so it stands alone.
 - Every choice still gets its why: `two()` builds the four lines from one reason per statement (write each reason so it

@@ -49,6 +49,11 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
 - **Practice follows bank order** (lessons audit, 11-04): two days out the last four lectures had 6-7 answerers each vs 23 on L1-L2.
   So Home's "Where to next" has a **Practiced least** row (`homeNextHTML`, `homeGo('least:<ids>')`; Sam, 2026-11-04): it
   replaces "Not started" once you've answered anything. Its clicks log as `home=least:<ids>`.
+- **Statement keys were a pattern until 2026-11-04** (suggestion #14): 36 of 46 two-statement keys were "1 true, 2 false",
+  statement 1 was true in all 30 numbered items and the second choice was the key in 23. The evening audit swapped,
+  reordered and rewrote them (12 / 11 / 11 / 12 over the four two-statement choices; numbered keys 7 / 8 / 8 / 7 by
+  position, the false statement at every number, three "all four" and two "two true" keys); `tools/ci/smoke.js` now fails
+  a hub whose statement keys form a pattern. Put new items wherever keeps that spread: don't put the true ones first.
 
 - **Drawn Patient Box cases** (2026-11-05): the four L8 Patient Box items (`su-pb-1` to `su-pb-4`) name a case in
   `PCASES` (mucositis at #19, peri-implantitis under a cement-retained crown at #30, a new patient with no baseline, an

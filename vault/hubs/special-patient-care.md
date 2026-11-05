@@ -34,6 +34,9 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
   fill-in-the-blank or Hot Spot practice. **Mock:** 45 questions in 135 minutes (`MOCK_BLUEPRINT`, `MOCK_LIMIT`), one
   multiple-answer item per unit (`MOCK_MULTI`); a multiple-answer item counts as right only when every right answer and
   nothing else is picked, and its review shows the bank's partial credit.
+- **Statement keys** (2026-11-04, after PCD Implants suggestion #14 found the same habit there): statement 1 was true in
+  all 24 numbered items, so their statements were reordered (the false one now sits at every number) and four
+  two-statement items swapped statements; two more became "both false". CI checks the spread (`tools/ci/smoke.js`).
 - **Sources:** Drive, Special Patient Care/hubs (recorded lectures and handouts, the autism module's pages, the reading
   with Dr. Mitchell's video introduction). No graded quiz or exam content.
 - **Arcade:** the Sparks Arcade, skin `SPC_SKIN`; Sparks After Hours is a painted operatory (`img/after-hours-escape.webp`)
