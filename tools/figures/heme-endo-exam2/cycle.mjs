@@ -86,11 +86,11 @@ function cyRender(st, D) {
   o += HOT("Inhibin, made by the granulosa cells, suppresses FSH (not LH). Dr. Madison's midcycle slide: FSH is suppressed by production of inhibin while LH surges, which is why the granulosa cells add LH receptors at midcycle.", T(cyX(13.4), P0 - 4, "inhibin ⊣ FSH", "cy-note" + (inh ? " is-on" : ""), "end"));
   if (ph.fb === "pos") o += T(cyX(12.5) - 6, P0 - PH + 12, "positive feedback", "cy-note is-on", "end") + T(cyX(12.5) - 6, P0 - PH + 26, "estradiol > 200 pg/mL", "cy-note is-on", "end");
   /* ---- feedback strip ---- */
-  function seg(a, b, cls, txt, on, info) { return HOT(info, '<rect class="cy-fb ' + cls + (on ? " is-on" : "") + '" x="' + f1(cyX(a) + 1) + '" y="136" width="' + f1(cyX(b) - cyX(a) - 2) + '" height="18" rx="9"/>' + (txt ? T((cyX(a) + cyX(b)) / 2, 149, txt, "cy-fbt" + (on ? " b" : ""), "middle") : "")); }
-  o += seg(0.5, 11.5, "cy-neg", "− estradiol: negative feedback", ph.fb === "negE", "Negative feedback, most of the follicular phase: GnRH stimulates FSH and LH, they stimulate estradiol from the follicular cells, and estradiol feeds back negatively on GnRH, LH and FSH.");
+  function seg(a, b, cls, txt, on, info, sh) { var mx = (cyX(a) + cyX(b)) / 2, k = "cy-fbt" + (on ? " b" : ""); return HOT(info, '<rect class="cy-fb ' + cls + (on ? " is-on" : "") + '" x="' + f1(cyX(a) + 1) + '" y="136" width="' + f1(cyX(b) - cyX(a) - 2) + '" height="18" rx="9"/>' + (txt ? (sh ? T(mx, 149, txt, k + " cy-lg", "middle") + T(mx, 149, sh, k + " cy-sh", "middle") : T(mx, 149, txt, k, "middle")) : "")); }
+  o += seg(0.5, 11.5, "cy-neg", "− estradiol: negative feedback", ph.fb === "negE", "Negative feedback, most of the follicular phase: GnRH stimulates FSH and LH, they stimulate estradiol from the follicular cells, and estradiol feeds back negatively on GnRH, LH and FSH.", "− estradiol");
   o += seg(11.5, 13.5, "cy-pos", "+", ph.fb === "pos", "Positive feedback, midcycle: plasma estradiol reaches a critical level (above 200 pg/mL), which progressively sensitizes the pituitary to GnRH, so a surge of LH follows. Positive feedback is what makes the female axis cyclical; the male has none and is acyclical.");
   o += seg(13.5, 14.5, "cy-ovs", "", ph.fb === "ov", "Day 14: the dominant follicle ruptures and releases the oocyte.");
-  o += seg(14.5, preg ? 28.5 : 25.5, "cy-neg", "− progesterone: negative feedback", ph.fb === "negP", "Negative feedback, luteal phase: GnRH stimulates FSH and LH, they stimulate progesterone secretion, and progesterone feeds back negatively on GnRH, LH and FSH. Progesterone gives negative feedback only.");
+  o += seg(14.5, preg ? 28.5 : 25.5, "cy-neg", "− progesterone: negative feedback", ph.fb === "negP", "Negative feedback, luteal phase: GnRH stimulates FSH and LH, they stimulate progesterone secretion, and progesterone feeds back negatively on GnRH, LH and FSH. Progesterone gives negative feedback only.", "− progesterone");
   if (!preg) o += seg(25.5, 28.5, "cy-neg cy-fade", "falling", ph.fb === "fade", "The corpus luteum regresses, so progesterone and estrogen fall and their brake on the pituitary fades.");
   /* ---- ovary ---- */
   o += T(XL, 172, "OVARY", "cy-h", "start");
@@ -99,13 +99,13 @@ function cyRender(st, D) {
   for (x = XL; x <= XR; x += 4) ov += "L" + f1(x) + " " + f1(sT(x));
   o += HOT("The ovary's cortex, which holds the follicles, under its surface.", '<path class="cy-ovary" d="' + ov + "L" + XR + " 236Q" + XR + " 240 " + (XR - 4) + " 240H" + (XL + 4) + "Q" + XL + " 240 " + XL + ' 236Z"/>');
   var S = [
-    [cyX(2.6), "a few follicles", "Each cycle a few follicles enter the next stage: fluid and hormones collect in an antrum (stage 2). FSH drives their granulosa cells; about 12 start each month."],
+    [cyX(2.6), "a few follicles", "Each cycle a few follicles enter the next stage: fluid and hormones collect in an antrum (stage 2). FSH drives their granulosa cells; about 12 start each month.", "a few"],
     [cyX(6.6), "dominant", "One follicle becomes dominant; the rest become atretic. Its theca cells (LH) make testosterone and its granulosa cells (FSH, aromatase) turn it into estradiol."],
     [cyX(10.6), "Graafian", "The dominant Graafian follicle grows to bulge on the ovary's surface, makes estradiol above 200 pg/mL, and before ovulation has a high expression of LH receptors. Its granulosa cells add LH receptors at midcycle."],
     [cyX(14), "ovulation", "Day 14: collagenases weaken the follicle wall and prostaglandins raise blood flow; it ruptures 24 to 36 hours after the LH surge and releases the oocyte (meiosis I just completed) toward the fallopian tube."],
     [cyX(17.8), "", "The ruptured follicle becomes the corpus luteum: mostly granulosa cells (granulosa-lutein: progesterone and estrogen) with some theca cells (theca-lutein: progesterone)."],
     [cyX(22.2), "corpus luteum", "The corpus luteum secretes the steroid hormones needed for implantation and for maintaining a zygote, mainly progesterone."],
-    [cyX(26.6), preg ? "kept" : "corpus albicans", preg ? "Pregnancy: a hormone from the placenta helps maintain the corpus luteum (later the placenta takes over hormone production)." : "No fertilization: the corpus luteum regresses over 14 days into a scar, the corpus albicans (fibroblasts fill it with collagen)."],
+    [cyX(26.6), preg ? "kept" : "corpus albicans", preg ? "Pregnancy: a hormone from the placenta helps maintain the corpus luteum (later the placenta takes over hormone production)." : "No fertilization: the corpus luteum regresses over 14 days into a scar, the corpus albicans (fibroblasts fill it with collagen).", preg ? "kept" : "albicans"],
   ];
   for (i = 0; i < S.length; i++) {
     var sx = S[i][0], on = ph.st === i || (i === 4 && ph.st === 5) || (i === 5 && ph.st === 4), g = "";
@@ -117,7 +117,7 @@ function cyRender(st, D) {
     else if (i === 5) g = cyCL(sx, 210, 24);
     else g = preg ? cyCL(sx, 210, 25) : '<g opacity=".7">' + cyCA(sx, 212, 13) + "</g>";
     o += HOT(S[i][2], '<g class="cy-st' + (ph.st === i ? " is-on" : "") + '">' + g + "</g>");
-    if (S[i][1]) o += T(i === 4 ? sx : i === 5 ? (S[4][0] + sx) / 2 : sx, 254, S[i][1], "cy-sl" + (on ? " b" : ""), "middle");
+    if (S[i][1]) { var lx2 = i === 5 ? (S[4][0] + sx) / 2 : sx, sh2 = S[i][3] || S[i][1]; o += T(lx2, 254, S[i][1], "cy-sl" + (on ? " b" : "") + (sh2 !== S[i][1] ? " cy-lg" : ""), "middle") + (sh2 !== S[i][1] ? T(lx2, 254, sh2, "cy-sl cy-sh" + (on ? " b" : ""), "middle") : ""); }
   }
   /* ---- ovarian hormones ---- */
   o += T(XL, 272, "OVARIAN HORMONES · ESTRADIOL, PROGESTERONE", "cy-h", "start");
@@ -141,11 +141,11 @@ function cyRender(st, D) {
   /* glands: straight while the functionalis regrows, coiled and secreting in the secretory phase */
   var gl = ["", "", ""];
   for (i = 1; i <= 28; i++) {
-    var gx = cyX(i) + 4, yb = BA0 + 9, yt = top(i) + 3, sec = i >= 15, amp = sec ? Math.min(4.6, (i - 14) * 0.9) : 0.5, pth = "";
-    for (var yy = yb; yy >= yt - 1e-6; yy -= 1.5) pth += (pth ? "L" : "M") + f1(gx + amp * Math.sin((yb - yy) / 9 * 2 * Math.PI)) + " " + f1(yy);
-    var w = sec ? 6 : 4.2, gi = i <= 4 ? 0 : sec ? 2 : 1;
+    var gx = cyX(i) + 4, yb = BA0 + 9, yt = top(i) + (i <= 4 ? 7 : 3), sec = i >= 15, amp = sec ? Math.min(3.2, (i - 14) * 0.6) : 0.4, pth = "";
+    for (var yy = yb; yy >= yt - 1e-6; yy -= 1.5) pth += (pth ? "L" : "M") + f1(gx + amp * Math.sin((yb - yy) / 11 * 2 * Math.PI)) + " " + f1(yy);
+    var w = sec ? 5.6 : 4.2, gi = i <= 4 ? 0 : sec ? 2 : 1;
     gl[gi] += '<path class="cy-gw" stroke-width="' + w + '" d="' + pth + '"/><path class="cy-gl" stroke-width="' + f1(w - 2.6) + '" d="' + pth + '"/>';
-    if (i >= 17) for (yy = yb - 4; yy > yt + 3; yy -= 9) gl[gi] += '<circle class="cy-sec" cx="' + f1(gx + amp * Math.sin((yb - yy) / 9 * 2 * Math.PI)) + '" cy="' + f1(yy) + '" r="1.1"/>';
+    if (i >= 17) for (yy = yb - 4; yy > yt + 3; yy -= 9) gl[gi] += '<circle class="cy-sec" cx="' + f1(gx + amp * Math.sin((yb - yy) / 11 * 2 * Math.PI)) + '" cy="' + f1(yy) + '" r="1.1"/>';
   }
   o += HOT("Glands in the basalis: only the deep parts of the glands remain while the functionalis is shed (menstrual phase, days 1 to 5).", gl[0]);
   o += HOT("Proliferative phase (days 5 to 14): estrogen grows the endometrium; the basalis rebuilds the functionalis, its glands straight.", gl[1]);
@@ -164,15 +164,15 @@ function cyRender(st, D) {
   for (i = 0; i < 11; i++) { var bd = 0.8 + i * 0.36, by = top(bd) - 3 - (i % 3) * 5; bl += '<path class="cy-blood" d="M' + f1(cyX(bd)) + " " + f1(by - 3.5) + "Q" + f1(cyX(bd) + 2.6) + " " + f1(by + 0.5) + " " + f1(cyX(bd)) + " " + f1(by + 1.6) + "Q" + f1(cyX(bd) - 2.6) + " " + f1(by + 0.5) + " " + f1(cyX(bd)) + " " + f1(by - 3.5) + 'Z"/>'; }
   o += HOT("Menstrual phase, days 1 to 5: the functionalis is shed with blood; the basalis stays.", bl + '<path class="cy-frag" d="M' + f1(cyX(1.2)) + " " + f1(top(1.2) - 14) + "q6 -5 13 -1q4 4 -2 6q-7 2 -11 -5Z" + "M" + f1(cyX(2.3)) + " " + f1(top(2.3) - 12) + 'q5 -3 9 0q2 4 -3 4q-5 0 -6 -4Z"/>');
   if (!preg) o += HOT("Day 28, without fertilization: estrogen and progesterone fall abruptly, the ischemic functionalis separates from the basalis, and the lining and blood are sloughed off: menses.", '<path class="cy-sep" d="M' + f1(cyX(26.6)) + " " + (BA0 - 1) + "H" + f1(cyX(28.5)) + '"/>');
-  o += T(cyX(10.4), top(10.4) - 7, "straight glands", "cy-sl", "middle");
+  o += T(cyX(11.6), top(11.6) - 7, "straight glands", "cy-sl", "middle");
   o += T(cyX(18.6), top(18.6) - 7, "coiled glands", "cy-sl", "middle");
-  o += T(cyX(2.7), top(2.7) - 22, "functionalis shed", "cy-sl", "middle");
-  o += L(cyX(6.3) + 14, top(6.3) - 22, "spiral artery", cyX(5.5) - 1, BA0 - 6, "start", "cy-sl");
-  o += T(cyX(20.8), BA0 - 26, "stratum functionalis", "cy-in", "middle");
+  o += T(cyX(3.4), top(3.4) - 40, "functionalis shed", "cy-sl", "middle");
+  o += L(cyX(8.3), top(7.5) - 18, "spiral artery", cyX(8.5) - 1, BA0 - 7, "end", "cy-sl");
+  o += T(cyX(20.6), BA0 - 30, "stratum functionalis", "cy-in", "middle");
   o += T(cyX(20.8), BA0 + 10.5, "stratum basalis", "cy-in cy-in-s", "middle");
   o += T(cyX(20.8), MY1 - 4.5, "myometrium", "cy-in cy-in-s", "middle");
-  if (!preg) o += T(XR, top(27) - 8, "arteries constrict", "cy-sl" + (d >= 25 ? " b" : ""), "end");
-  else o += T(XR, top(27) - 8, "kept: no menses", "cy-sl" + (d >= 23 ? " b" : ""), "end");
+  if (!preg) o += T(XR, 367, "arteries constrict", "cy-sl" + (d >= 25 ? " b" : ""), "end");
+  else o += T(XR, 367, "kept: no menses", "cy-sl" + (d >= 23 ? " b" : ""), "end");
   /* ---- uterine phases (bottom) and the day axis ---- */
   o += band(0.5, 5, 488, 18, "menstrual", ph.ut.indexOf("menstrual") === 0, "Menstrual phase, days 1 to 5: the functionalis is shed; the basalis stays.");
   o += band(5, 14.5, 488, 18, "proliferative", ph.ut === "proliferative" || ph.ut === "menstrual→proliferative", "Proliferative (or follicular) phase, days 5 to 14: estrogen from the growing follicles; the basalis rebuilds the functionalis.");
@@ -281,6 +281,9 @@ export default function cycle() {
 .anima .cycle-svg .cy-in-s{font-size:10px;stroke:var(--bx-cyto)}
 .anima .cycle-svg .cy-dn{font:11px var(--anatomy-mono);fill:var(--anatomy-muted)}
 .anima .cycle-svg .cy-dn.b{fill:var(--accent-ink);font-weight:700}
+.anima .cycle-svg .cy-bt,.anima .cycle-svg .cy-fbt,.anima .cycle-svg .cy-h,.anima .cycle-svg .cy-dn,.anima .cycle-svg .cy-star{stroke:none}
+.anima .cycle-svg .cy-sh{display:none}
+@media (max-width:560px){.anima .cycle-svg .cy-lg{display:none}.anima .cycle-svg .cy-sh{display:inline}}
 @media (max-width:560px){.anima .cycle-svg .cy-h{font-size:12.5px}.anima .cycle-svg .cy-bt,.anima .cycle-svg .cy-sl,.anima .cycle-svg .cy-fbt,.anima .cycle-svg .cy-note,.anima .cycle-svg .cy-thrt,.anima .cycle-svg .cy-dn{font-size:12.5px}.anima .cycle-svg .cy-lab{font-size:14px}.anima .cycle-svg .cy-in{font-size:12.5px}.anima .cycle-svg .cy-in-s{font-size:11.5px}}
 `,
   });
