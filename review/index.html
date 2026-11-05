@@ -1542,7 +1542,7 @@ code{font-size:13px;}
     row("Searches", "last search logged " + (sa == null ? "never" : sa + " days ago"), "info", "Few people use Search (kept by Sam’s call, 2026-09-29); “Find this in the notes” is tracked as an event instead.");
     var tr = d.test_rows || {}, tsum = Object.keys(tr).reduce(function(s, k){ return s + (Number(tr[k]) || 0); }, 0);
     row("Test data", tsum ? Object.keys(tr).filter(function(k){ return tr[k]; }).map(function(k){ return fmtNum(tr[k]) + " rows in " + k; }).join(", ") : "none", tsum ? "flag" : "ok",
-      tsum ? "Left out of every insight already; delete them (retention task note)." : "");
+      tsum ? "Left out of every insight already; the weekly retention job deletes them." : "");
     var us = d.unmapped_sections || [], recent = us.filter(function(s){ var a = daysAgo(s.last_day); return a != null && a <= 30; });
     row("Sections <code>sh_surface()</code> can’t place", us.length ? us.map(function(s){ return esc(hubLabel(s.hub)) + " “" + esc(s.section || "(none)") + "” " + fmtMin(s.pings * 25 / 60) + " (last " + esc(s.last_day) + ")"; }).join("; ") : "none",
       recent.length ? "flag" : us.length ? "info" : "ok", recent.length ? "A new mode or sub-view: add it to <code>sh_surface()</code> in a migration so cross-hub numbers count it." : us.length ? "Historical only (older hubs sent no section)." : "");
@@ -1560,12 +1560,30 @@ code{font-size:13px;}
       cmLive.length ? "On a live hub: check the question type sends <code>choice</code> or <code>picks</code> with its answered event (LESSONS: select-alls sent none until 11-04)." : "Older hubs predate choice tracking.");
     var sd = d.stats_drift || [];
     row("Class counters vs personal rows", sd.length ? sd.map(function(s){ return esc(hubLabel(s.hub)) + " " + fmtNum(s.question_stats) + " vs " + fmtNum(s.personal_answers); }).join(", ") : "agree", sd.length ? "flag" : "ok", sd.length ? "One of the two answer RPCs is failing for some calls." : "");
+    // retention (migration_v52): the weekly job's last runs, from sh_retention_status()
+    var rt = d.retention || {}, runs = rt.runs || [], last = runs[0], lastAge = last ? daysAgo(last.ran_at) : null;
+    var RET_LABEL = { activity_pings: "raw activity rows", ui_click_reach: "who-tapped-what rows", feature_events: "feature events",
+      survey_declines: "survey “No thanks” rows", survey_answer_ids: "survey answer ids", exam_debriefs_ids: "check-in ids",
+      question_flags_ids: "report ids", hub_suggestions_ids: "suggestion ids", link_attempts: "link attempts",
+      activity_hourly_test: "test-hub hours", ui_clicks_test: "test-hub clicks" };
+    function retCounts(c){ var k = Object.keys(c || {}).filter(function(x){ return Number(c[x]) > 0; });
+      return k.length ? k.map(function(x){ return fmtNum(c[x]) + " " + (RET_LABEL[x] || esc(x)); }).join(", ") : "nothing due"; }
+    var sched = rt.schedule === "23 9 * * 0" ? "weekly, Sundays 3:23 am Central" : rt.schedule ? "<code>" + esc(rt.schedule) + "</code>" : "not scheduled";
+    var retLate = !rt.schedule || !last || lastAge > 8;
+    row("Retention", (last ? "last run " + (lastAge === 0 ? "today" : lastAge + " days ago") + ": " + retCounts(last.counts) + "; database " + fmtNum(last.database_mb) + " MB then" : "no run yet") +
+      '<span class="sub2">Schedule: ' + sched + (runs.length > 1 ? " · " + runs.length + " runs logged" : "") + '</span>', retLate ? "flag" : "ok",
+      retLate ? (!rt.schedule ? "The weekly job is missing: run the last step of <code>migration_v52.sql</code> again, or <code>select sh_retention_run(true);</code> by hand." :
+        "The weekly job hasn’t run for over a week: check <code>cron.job_run_details</code>, then <code>select sh_retention_run(true);</code> by hand.") : "What’s kept and for how long: <code>vault/reference/analytics-retention.md</code>.");
     var st = d.storage || {}, tables = st.tables || [];
     function per(name, field){ var t = tables.filter(function(x){ return x.table === name; })[0]; return t && t.rows ? t.mb / t.rows : 0; }
-    var weekly = (st.pings_last_7_days || 0) * per("activity_pings") + (st.answers_last_7_days || 0) * (per("personal_answers") + per("xp_seen"));
+    // growth: from the database size the last two retention runs logged when there are two, else from last week's writes
+    // (an upper bound now: raw activity over 30 days old is deleted every week, so pings no longer pile up)
+    var r2 = runs.length > 1 ? runs[1] : null, span = r2 ? (new Date(last.ran_at) - new Date(r2.ran_at)) / 604800000 : 0;
+    var measured = r2 && span >= 0.5, weekly = measured ? Math.max(0, (last.database_mb - r2.database_mb) / span)
+      : (st.pings_last_7_days || 0) * per("activity_pings") + (st.answers_last_7_days || 0) * (per("personal_answers") + per("xp_seen"));
     var weeks = weekly > 0 ? Math.floor((500 - (st.database_mb || 0)) / weekly) : null;
     var fs = (st.database_mb || 0) > R.dbMb || (weeks != null && weeks < R.dbWeeks);
-    row("Storage", fmtNum(st.database_mb) + " MB of 500; about " + (Math.round(weekly * 10) / 10) + " MB a week lately" + (weeks != null ? " (~" + weeks + " weeks to 500)" : "") +
+    row("Storage", fmtNum(st.database_mb) + " MB of 500; about " + (Math.round(weekly * 10) / 10) + " MB a week " + (measured ? "between the last two retention runs" : "at most, from last week’s writes") + (weeks != null ? " (~" + weeks + " weeks to 500)" : "") +
       '<span class="sub2">' + tables.slice(0, 4).map(function(t){ return esc(t.table) + " " + t.mb + " MB"; }).join(" · ") + '</span>', fs ? "flag" : "ok",
       "Retention schedule: <code>vault/reference/analytics-retention.md</code>.");
     return card("Data quality", "Checks that keep the numbers above honest. What each means: <code>vault/reference/analytics-data-quality.md</code>.",

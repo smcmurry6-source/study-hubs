@@ -39,3 +39,8 @@ from activity_hourly group by 1 order by 4 desc;
 select relname, indexrelname, idx_scan, pg_size_pretty(pg_relation_size(indexrelid)) size
 from pg_stat_user_indexes where relname in ('activity_pings', 'personal_answers', 'xp_seen', 'ui_click_reach', 'feature_events')
 order by pg_relation_size(indexrelid) desc;
+
+-- 7. Retention (migration_v52, vault/reference/analytics-retention.md): the weekly job's schedule and its last runs
+--    (what each removed, the database size then), and what a run would remove now (counts only, nothing is deleted).
+select sh_retention_status();
+select sh_retention_run();

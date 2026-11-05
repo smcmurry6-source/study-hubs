@@ -17,7 +17,7 @@ what you found.
 
 1. **Pull everything.** Run the queries in `tools/retro.sql` with the Supabase connector (read-only) for that hub
    and its exam date. Use all of it, not just question accuracy:
-   - **Time by section** (`activity_pings`, 25 s per ping): which modes and sub-views people actually studied in,
+   - **Time by section** (`activity_hourly`, n pings of 25 s per hour; raw pings are kept 30 days): which modes and sub-views people actually studied in,
      and how that shifted as the exam got closer.
    - **Clicks and reach** (`ui_clicks`, `ui_click_reach`): which buttons, tabs and widget tools people used and how
      many people found each one. Pair with time: lots of time + few clicks = being read; a feature with under 3
