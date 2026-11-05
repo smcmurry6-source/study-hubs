@@ -119,7 +119,7 @@ function foSurface(x0, x1, base, bump, bx, bw, gap, top) {
 /* the corpus luteum: a folded wall of pale granulosa-lutein cells, darker theca-lutein cells around it and down the
    folds, the collapsed center inside; s scales it, pale fades it (regressing) */
 function foLutein(cx, cy, s, pale) {
-  function rO(a) { return s * (138 + 5 * Math.sin(6 * a) + 3 * Math.sin(11 * a + 1)); }
+  function rO(a) { return s * rOut(a); }
   function rI(a) { return s * (66 + 18 * Math.sin(7 * a + 0.4) + 7 * Math.sin(3 * a)); }
   var o = '<g' + (pale ? ' opacity="' + pale + '"' : "") + ">", i, j;
   o += '<path class="fo-tl" d="' + foPolar(cx, cy, rO, 120) + '"/>';
@@ -145,6 +145,8 @@ function foLutein(cx, cy, s, pale) {
   for (i = 0; i < 6; i++) { var e = foR(i * 9 + 3) * 6.283, f = foPt(cx, cy, rI(e) * 0.85, e), g = foPt(cx, cy, rI(e + 2.2) * 0.8, e + 2.2); o += '<path class="fo-fibrin" d="M' + f1(f[0]) + " " + f1(f[1]) + "Q" + f1(cx + (foR(i) - 0.5) * 30 * s) + " " + f1(cy + (foR(i + 4) - 0.5) * 30 * s) + " " + f1(g[0]) + " " + f1(g[1]) + '"/>'; }
   return o + "</g>";
 }
+/* the corpus luteum's outer outline (unscaled), shared by the drawing and its label */
+function rOut(a) { return 138 + 5 * Math.sin(6 * a) + 3 * Math.sin(11 * a + 1); }
 /* the corpus albicans: a shrunken, wavy, pale scar of collagen with a few flattened fibroblasts */
 function foAlbicans(cx, cy, s) {
   function rr(a) { return s * (80 + 10 * Math.sin(5 * a) + 6 * Math.sin(9 * a + 2)); }
@@ -252,16 +254,15 @@ function foRender(st, D) {
     labs += foLab(LX, 184, ["first polar body"], ox + 50, 95);
     labs += foLab(LX, 236, ["ruptured tunica", "albuginea"], ox + 30, sf(ox + 30) + 9);
     labs += foLab(LX, 330, ["collapsing,", "folding follicle"], foPt(ox, oy, g5 - 6, 0.35)[0], foPt(ox, oy, g5 - 6, 0.35)[1]);
-    labs += T(fx + 44, FY0 + 18, "fimbriae", "s mut", "middle");
+    labs += T(fx + 50, FY0 + 21, "fimbriae", "s", "middle");
   } else if (s === 6 || (s === 7 && fert)) {
     var sc = s === 7 ? 1.08 : 1, lx = cx, ly = cy + 4;
     hole = [[lx, ly, 150 * sc]];
     body += HOT(s === 7 ? "Corpus luteum, kept: if pregnancy occurs, the placenta produces a hormone that helps maintain the corpus luteum, and with it the progesterone that keeps the endometrium in place." : "Corpus luteum: the collapsed, folded follicle, converted by LH. Granulosa-lutein cells (from the granulosa cells) make progesterone and estrogen; theca-lutein cells (from the enlarged theca interna cells) make progesterone.", foLutein(lx, ly, sc, 0));
-    var gp = foPt(lx, ly, 104 * sc, -0.35), tp = foPt(lx, ly, 136 * sc, 0.5), sp = foPt(lx, ly, 100 * sc, (Math.PI / 2 - 0.4 + 2 * Math.PI * 1) / 7);
-    labs += HOT("Granulosa-lutein cells: from the granulosa cells of the Graafian follicle; they make progesterone and estrogen.", foLab(LX, 96, ["granulosa-lutein", "cells: progesterone", "and estrogen"], gp[0], gp[1]));
-    labs += HOT("Theca-lutein cells: the enlarged cells of the theca interna; they make progesterone.", foLab(LX, 194, ["theca-lutein cells:", "progesterone"], tp[0], tp[1]));
-    labs += foLab(LX, 262, ["theca-lutein cells", "run into the folds"], sp[0], sp[1]);
-    labs += foLab(LX, 320, [s === 7 ? "kept by a hormone" : "folded wall", s === 7 ? "from the placenta" : "of the collapsed", s === 7 ? "" : "follicle"].filter(function (x) { return x; }), lx + 36, ly + 30);
+    var gp = foPt(lx, ly, 104 * sc, -0.35), tp = foPt(lx, ly, (rOut(0.25) - 5.5) * sc, 0.25), sa = (Math.PI / 2 - 0.4 + 2 * Math.PI * 1) / 7, sp = foPt(lx, ly, 104 * sc, sa), wa = 0.62, wp = foPt(lx, ly, (66 + 18 * Math.sin(7 * wa + 0.4) + 7 * Math.sin(3 * wa) + 16) * sc, wa);
+    labs += HOT("Granulosa-lutein cells: from the granulosa cells of the Graafian follicle; they make progesterone and estrogen. The corpus luteum is mostly these.", foLab(LX, 96, ["granulosa-lutein", "cells: progesterone", "and estrogen"], gp[0], gp[1]));
+    labs += HOT("Theca-lutein cells: the enlarged cells of the theca interna, smaller and darker, around the edge and down the folds; they make progesterone.", foLab(LX, 196, ["theca-lutein cells", "at the edge and in", "the folds:", "progesterone"], tp[0], tp[1]) + '<path class="lead" d="M' + (LX - 3) + " 192L" + f1(sp[0]) + " " + f1(sp[1]) + '"/>' + foCirc(sp[0], sp[1], 1.8, "dot"));
+    labs += foLab(LX, 300, [s === 7 ? "kept by a hormone" : "folded wall", s === 7 ? "from the placenta" : "of the collapsed", s === 7 ? "" : "follicle"].filter(function (x) { return x; }), wp[0], wp[1]);
   } else {
     var ax = cx, ay = cy + 6;
     hole = [[ax, ay, 100]];
@@ -308,7 +309,7 @@ export default function follicle() {
     caption: "Dr. Herr's five follicle stages in section, then ovulation, the corpus luteum and what becomes of it. Step through them, check the oocyte's meiotic arrest in the badge, and switch between no fertilization and fertilization.",
     W, H, label: "An ovarian follicle in histologic section at each stage from primordial follicle to corpus albicans, with its layers labeled and the oocyte's meiotic arrest in a badge.",
     D: { INIT: { s: 0, fert: "no" }, STEPKEY: "s", STEPMAX: 7, PLAYMS: 2800, STAGES, ONSET: "foOnset" }, render: foRender, say: foSay,
-    helpers: [foR, foPt, foSmooth, foPolar, foCirc, foRing, foStroma, foOocyte, foTheca, foGran, foSurface, foLutein, foAlbicans, foLab, foOnset],
+    helpers: [foR, foPt, foSmooth, foPolar, foCirc, foRing, foStroma, foOocyte, foTheca, foGran, foSurface, rOut, foLutein, foAlbicans, foLab, foOnset],
     controls: `<div class="am-controls fo-stages" role="group" aria-label="Stage">${stageBtns}</div>
 <div class="am-controls"><button type="button" class="am-btn" data-amstep="-1">Back</button><button type="button" class="am-btn" data-amstep="1">Next</button><button type="button" class="am-btn" data-amplay aria-pressed="false">Play</button><span class="fo-sep" aria-hidden="true"></span><span class="fo-lbl">After ovulation:</span><button type="button" class="am-btn" data-amk="fert" data-amv="no">No fertilization</button><button type="button" class="am-btn" data-amk="fert" data-amv="yes">Fertilization</button></div>`,
     sources: [
@@ -368,7 +369,9 @@ export default function follicle() {
 .anima .follicle-svg .fo-col{fill:none;stroke:var(--bx-fat-line);stroke-width:.9;opacity:.85}
 .anima .follicle-svg .fo-fbn{fill:var(--bx-nuc);opacity:.7}
 .anima .follicle-svg .fo-drift{animation:fo-drift 4.8s ease-in-out infinite alternate}
-@keyframes fo-drift{from{transform:translate(-16px,14px)}to{transform:translate(4px,-4px)}}
+@keyframes fo-drift{from{transform:translate(-30px,16px)}to{transform:translate(6px,-3px)}}
+.anima .follicle-svg .fo-tear{fill:var(--bx-lumen);stroke:var(--bx-cyto-line);stroke-width:.8}
+@media (max-width:560px){.anima .follicle-svg .t{font-size:15.5px}.anima .follicle-svg .t.s{font-size:13.5px}.anima .follicle-svg .fo-title{font-size:17px}.anima .follicle-svg .fo-bk{font-size:11.5px}.anima .follicle-svg .fo-bv{font-size:14.5px}}
 @media (prefers-reduced-motion: reduce){.anima .follicle-svg .fo-drift{animation:none}}
 .anima .fo-stages .am-btn{padding:4px 8px;font-size:.76rem}
 .anima .fo-sep{flex:0 0 6px}
