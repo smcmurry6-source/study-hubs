@@ -53,6 +53,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Perio `q3-M01` and `q2-P01` (their low numbers are the 7-option versions cut to 5 on 10-01), `q1-P05`, `q4-M05`,
   `q4-02`, `q4-L34` (kept as taught); Occlusion all nine (midterm lectures, all-time data, explanations already name the
   favorite wrong choice since the 10-20 and 10-27 audits). `LESSONS.md`: four question-writing lessons. Hub notes updated.
+  **Live**: merged on Sam's "Merge" at 23:52 UTC, live about two minutes later; `postcheck.js --from 46eafd8 --to d145a46`
+  passed (both files live and identical to `main`, no errors on the dashboard or either hub); site changelog lines logged for
+  both hubs (ids 288, 289). Marking each question Looks fine / Fixed on the admin page is Sam's.
 - **2026-11-05 (perio S8: host modulation from the Nov 5 class, and the dosing chart, Claude Code)** — Sam: "update the perio
   hub with the files I added": `litz nov5.txt` in Drive, Periodontology/hubs, Dr. Litz's Nov 5 class (a short antibiotics recap,
   then all of host modulation). `hubs/perio`, S8 only: the host modulation section rewritten at both levels from the class (what
