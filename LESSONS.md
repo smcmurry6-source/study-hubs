@@ -79,71 +79,90 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-04 morning (full audit, 8:30 am Central).** "Since" = 11-03 midday. Live hubs: **PCD Implants Exam 1** (Fri 11-6 on Canvas,
-7 am-8 pm: two days out), Special Patient Care (Canvas window 11-6 to 11-13), Occlusion and perio (finals 11-19). Heme & Endo Exam 1
-archived itself 11-03 at 10 pm after the late exam; three more check-ins are folded into its retrospective below. Nothing newly archived.
+**2026-11-05 (pre-build refresh for Heme & Endo Exam 2, steps 1-3; data read at 10 pm Central on 11-04).** "Since" = the 11-04
+morning audit (8:30 am Central). Live hubs: **PCD Implants Exam 1** (Fri 11-6 on Canvas, a day and a half out), Special Patient Care
+(Canvas window 11-6 to 11-13), Occlusion and perio (finals 11-19). Heme & Endo Exam 1 is archived; its card and check-in stay until
+11-06 10 pm. Data quality (`sh_data_quality()`): no test rows, no stats drift, 34 overcounted minutes; two new event families,
+`notes-jump` ("Find this in the notes", from 11-04) and `qrate` (the "Good question?" thumbs). **The widget's search panel is barely
+used**: 8 searches from 10-01 to 11-04, none since 10-21. Tracking works; people just don't open it, so zero-result searches are no
+longer a signal worth waiting for.
 
-**Did the last refresh work?** Too early to say: its fixes went to PCD Implants on its first afternoon. `cb-pe` 6/9 and `cb-atten-z` 7/8 in
-all (most tries came after the 11-03 rewrite). The brand and billing items cut after #35/#36 drew no more "too much detail" reports; the one
-new report is a different problem (#37 below). Occlusion's and perio's named lows haven't moved because nobody is studying them yet:
-`q3-04` 46% (49/106), `q3-M01` 28% (20/72), `cs-pro-incline` 41%, `an-compound` 45%, `fp-post` 45%.
+**Did the last refresh work?** (its fixes went live at 9 am Central 11-04; tries since then)
+- Explanations that name the favorite wrong answer: `ev-misch` 50% of 24 -> 13 of 20, `bm-moment` 56% of 18 -> 10 of 16, `ev-blade`
+  flat (61% -> 11 of 18).
+- Select-alls that name every option: `tm-mm-1` 39% of 18 -> 8 of 12; `tm-mm-2` and `tm-mm-3` flat or lower (6 of 12 each).
+  `tm-mm-2` has 4 of its 5 options right and is the hardest first try in the hub (7% of 15 people).
+- `bm-goodacre` (report #37, percentages moved out of the choices): 9 of 9 right before, 9 of 14 since. The giveaway is gone.
+- Select-all ticks now arrive (11 PCD Implants items, 109 tries since): misses split evenly between a right option left out (9% of
+  right-option slots) and a wrong one ticked (8%).
+- "Practiced least" on Home (live 10:15 am): **nobody tapped its button**, yet the last four lectures caught up. Imaging, CBCT,
+  Surgery and Guided went from 7-9 answerers each before it to 12-16 since, and from 18% to 35% of all answers (L1: 24 people
+  before, 21 since). On day two people moved on through the bank and the lecture picker by themselves.
 
-**Student voice since 11-03:** one report, #37 `bm-goodacre` (PCD Implants, 8 am today), "the percentages in the answers give the answer
-away": right, each choice printed its own share of the slide's failure data, so the biggest number was the key (8 of 8 picked it). **Fixed**:
-the numbers moved into the why lines. Check-ins: Heme & Endo 3 more (n = 13 people: About right 2, Hub was harder 1, at 93% and 295 min);
-the Occlusion midterm 1 more, "Exam asked different things" (131 min, 79%; n = 16: About right 8, different 7, easier 1). **The same people,
-two exams:** of the 7 who said the Occlusion midterm asked different things, 5 also checked in after Heme & Endo, the first hub built with
-numbered items and the professors' focus lists from the start: 4 said About right, 1 Hub was harder (see the standing lesson on numbered
-items). No surveys, no searches.
+**Student voice since 11-04 morning:** no question reports. One suggestion, #14 (PCD Implants, 8:40 pm): the statement questions
+seem to have the same answer a lot, and the numbered ones keep coming out "1, 2 and 4". **Right, checked against the bank:** 36 of 46
+two-statement items are keyed "Statement 1 is true; statement 2 is false" (always the third choice). In all 30 numbered items statement 1
+is true (statement 2 in 28), every key is a three-statement combination, 17 are "1, 2 and 4", and the key is the second choice in 23.
+True/false is balanced (38 True, 39 False). Special Patient Care has the numbered half of the problem (statement 1 true in 24 of 24;
+key positions spread). Heme & Endo Exam 1 and Occlusion spread both formats. No sign the class has used it yet ("1 true, 2 false"
+items score 82%, the other keys 87-92%). Not fixed in this run: see "To fix" below. Check-ins: one more for the Occlusion midterm, "Hub
+was easier" (n = 17: About right 8, Exam asked different things 7, Hub was easier a couple; diagrams 4.6/5, Patient Box pictures 3.9/5,
+readiness 3.8/5). Heme & Endo: none since 11-03 evening. The live survey ("help shape the hubs 2"): 6 more "No thanks", no answers
+(14 answers and 90 skips since it went live).
 
 **Per hub:**
-- **PCD Implants** (day two of four): 51 people, 65 h (all 51 on 11-03; 10 so far today), 7 under 5 min. 4,621 answers from 31 people
-  (median 79, most 451), 87%. Notes 2,022 min (41 people), bank 1,537 (34), Daily Drill 67 (5), hints 55 (10), cram sheet 7 (5), Review
-  ~150 (1-6 people per group), **no mock yet**. **Practice follows bank order**: 23 answerers reached L1-L2, 18 Terminology, 11-12
-  Biomechanics and Prefab, **6-7 each of the last four** (Imaging, CBCT, Surgery, Guided: 1.5-5 tries per question vs 18 on L1-L2), though
-  more people opened those notes (Surgery 11, Guided 9). By format: MCQ 88%, matching 84%, **select-all 69%** (11 items). Hardest:
-  `tm-mm-1` 39% (screw-retained advantages), `tm-match-2` 46% (ITI timing, 4 pairs), `tm-mm-2` 47% (platform switching),
-  `ev-misch` 50% ("Ford Turner" x10 of 24), `bm-moment` 56% ("Force / area" x7 of 18), `ev-2s-5` 57%, `ev-blade` 61%. **Fixed today**:
-  `ev-misch`, `bm-moment` and `ev-blade` now say why their favorite wrong answer is wrong, and the three select-alls name every option.
-  **Select-all ticks weren't being recorded** (the Occlusion engine and its copies sent only MCQ picks): fixed in PCD Implants, Occlusion
-  and Special Patient Care, so the exam eve will show which options people miss. Used: Random order 15 people, High likelihood 13, Not
-  answered yet 9, Pins 7 (31 pins), "Try it again" 31 (552 shown, 96% right), the interactive figures 19, the six implant drawings 35.
-  Next: read the select-all ticks and the last four lectures on the eve.
-- **Special Patient Care**: 12 people, 265 min, 39 answers; quiet until the window opens Fri. PR #221 merged this morning (the exam's
-  format, a 45-question mock, multiple-answer items: 476 questions); its select-alls record their ticks from the start.
-- **Occlusion**: 1 person since (120 answers, 42 min of Daily Drill). L7's five figures went live this morning.
-- **Perio**: 3 people, 13 min. Nothing to act on.
+- **PCD Implants** (a day and a half out): 66 people, 137 h all time (59 people and 77 h on 11-04), 44 on 2+ days, median 79 min, 6
+  under 5 min. 9,591 answers from 46 people (median 112), 88%. Since 11-04 morning: notes 2,268 min (43 people), bank 1,815 (39), Home
+  67 (27), mock 50 (5), Daily Drill 22 (5), Timmy Time 57 (a couple of people); a few mocks, 86% on average. By lecture 84-92% (Evolution
+  lowest at 84% and 28 tries per question; Guided 92% at 7). By format: select-all 70%, two-statement 83%, matching 85%, numbered 86%,
+  MCQ 89%, true/false 91%. Hardest (12+ tries): `tm-mm-2` 48%, `tm-mm-1` 50%, `su-match` 54%, `tm-mm-3` 56%, `ev-misch` 57% ("Ford
+  Turner" x14 of 44), `bm-moment` 59% ("Force / area" x12 of 34), `im-template-vdo` 59% ("to make room for the drill and the guide
+  sleeves" x7 of 17). Question health: four "stronger students miss it more" leads (`in-num-3`, `ev-frialit`, `bm-order`,
+  `bm-occ-goals`); all four keys agree with the notes, and each flag rests on 2-5 misses. "Find this in the notes" (new 11-04): its
+  button appeared after a miss for 33 people and a few opened it; 21 people met a miss it found no paragraph for. Bank filters since
+  11-04: High likelihood 14 people, Not answered yet 13, Random 9.
+- **Special Patient Care**: a few people since 11-03 midday, 68 tries in all; quiet until its Canvas window opens Fri.
+- **Occlusion**: a few people since (16 min). Lows unchanged: `an-compound` (25% right first try; 54% of 103 tries pick the
+  hinge-and-glide choice), `cc-parfitt` 31%, `cs-pro-incline` 37%, `fp-post` 38% (40% pick the second-molar cusp), and
+  `rv-ch-spee` (42% of 78 pick "Taller"; its explanation already names the condylar-guidance trap).
+- **Perio**: 11 people, 5.5 h since (bank 255 min from 8 people). `q3-M01` 28% of 72 (21% first try; few of the 14 who missed it got it
+  next time), `q4-M05` 33% first try, `q3-04` 25%: leads for the final.
 
-**Feature use, Heme & Endo (10-27 to 10-30):** "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); **High
-likelihood** order 23 people and "High likelihood only" 21, and the likely-tagged questions took 40% of all its tries (10,133 of 25,399) at the
-bank's average 82%. Pins: 1 person (Occlusion). Device links: 4 made from Stats (`link:linked`), 1 "Yes" from the prompt.
+**Heme & Endo Exam 1 (archived), for Exam 2.** Nothing new since its retrospective below: no reports after 10-30, no check-ins after
+11-03 evening (final n = 13 people: About right 10, Hub was harder a couple, none "Exam asked different things"). Its bank spread both
+statement formats well (two-statement keys 11-18 per choice; statement 1 true in 22 of 25 numbered items, which is the most to allow).
+False-keyed true/false items scored 80% against 87% for true-keyed (1,476 and 1,814 tries), and "Both statements are false" was the
+lowest two-statement key (68%): the class leans "True". Building Exam 2 (diabetes drugs, endocrine pathology, dental endocrinology,
+reproductive histology and physiology): use Exam 1's recipe (recordings, the professors' focus lists and in-class review, the official
+count per lecture as the mock blueprint and `LIKELY_TOPICS`); carry Exam 1's weakest lecture into the diabetes drugs (Endocrine
+Pancreas, 79%: the misses were hormone-sensitive vs lipoprotein lipase, 26 picks, and which way islet blood flows, 27 "True"); count
+the statement keys before shipping (below); and expect the lectures finished last to get the fewest tries.
 
-**Feature use, all hubs, to 10-19** (asked by Sam; from clicks, pings and achievements):
-- **Timmy Time podcast** (MSK 4, live from 4:30 pm on the eve): 21 people pressed play, 20 logged listening, 287 min in
-  all; 15 on the eve (of 58 MSK 4 visitors that day), 7 on exam morning. 10 listened under 5 min, 5 for 5-15, 2 for 15-30
-  and **3 for 40+ min** (the whole 42-minute episode). Speed button 16 people, chapters 13.
-- **Timmy Tooth**: **35 adopted** (15 on launch day, 10-01; 28 with the Adopt button, 7 by closing the introduction, which
-  also adopts). 33 of them studied in the last week, 25 tapped him since 10-13, 16 earned the perfect-health trophy, 3
-  brought him back from 0 HP. **Turned off after adopting: 2** used "Turn off Timmy"; 3 more pressed an "Off" in Settings,
-  which may have been his or another setting. **"No thanks" in his introduction: at most 1 person** (every other dashboard
-  "No thanks" matches a survey skip that day). So the ~50 dashboard users who haven't adopted him never opened his
-  introduction: he is still perched on their name on the dashboard (he only follows you into hubs once adopted). Sam (10-20): he stays there and keeps asking to be tapped.
-- **Listen**: 23 people have ever pressed it (MSK 3 11, perio 9, Occlusion 7, PCD 6, MSK 4 6); ~4 used the floating dock.
-  **Mind maps**: 36 people (MSK 3 23, PCD 14, perio 11, Occlusion 4, MSK 4 2). **Highlighter** (10-15): 12 people (Occlusion 5
-  with 133 highlights, MSK 4 6, PCD 1).
-- **Names**: 12 people have a name of their own (2 set today); 47 have opened the name editor.
-- **MSK 4 interactive diagrams**: 18 of 71 visitors used them (10 the junction's drug picker, 14 the sarcomere slider or
-  Play); its 8 picture questions got 19-45 tries each, 62-89% right.
-- **Typing TIMMY**: never recorded (the count lived only on each device), so unknown before 10-20.
+**To fix (listed, not done in this pre-build run):**
+- PCD Implants: rebalance the two-statement and numbered keys before Friday (same ids, new why lines, a note in the PR that their
+  old `question_choices` rows go stale), then answer suggestion #14.
+- Special Patient Care: make statement 1 false in some numbered items before its window opens.
+- CI (proposal for Sam): fail a hub whose two-statement keys put over 40% on one choice, or whose numbered items keep one statement
+  true in over 85% of them, next to the true/false 35-65% check in `tools/ci/smoke.js`.
+- PCD Implants `in-num-3` (for Sam): the 5 misses all call statement 1 ("junctional epithelium attached to titanium") false; the
+  notes call that tissue "junctional epithelium" in the comparison table and "barrier epithelium" in the figure. Make one name win.
+- PCD Implants `tm-mm-2` (for Sam): 4 of 5 options right, 7% on a first try; consider 3 right of 5 under the same id.
 
-**New tracking from 10-20** (`migration_v37`, table `feature_events`, `window.shTrack` in `widget/clicks.js`): page loads
-on every page (dashboard and About included), a once-a-day snapshot of each visitor's settings (Timmy Tooth on, dashboard
-only or off; adopted; surprises, theme, font, size, music, accent, own name), settings changes, every easter egg (TIMMY
-summons as `egg:timmy-start`), how Timmy Tooth's introduction ends (Adopt, closed, No thanks, at which step), podcast play,
-seconds heard and 25/50/75/95% of the episode heard, Listen starts by level and lecture, minutes heard and finishes,
-diagrams on screen, moved or tapped, mind maps opened, names set or reset. Read it in `review/` -> Clicks -> Features, or
-`select hub, kind, count(distinct visitor_id), sum(n) from feature_events group by 1, 2`. (Three test rows under hub
-`zz-test` can be deleted.)
+**Older feature readings (kept for reference; the standing lessons carry what they mean):**
+- Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
+  23 people and "High likelihood only" 21; the likely-tagged questions took 40% of all tries (10,133 of 25,399) at the bank's average 82%.
+- All hubs to 10-19: **Timmy Time** (MSK 4, from the eve): 21 people pressed play, 287 min in all, 15 on the eve (of 58 MSK 4 visitors
+  that day) and 7 on exam morning; 10 listened under 5 minutes and a few heard the whole 42 minutes; speed button 16 people, chapters 13.
+  **Timmy Tooth**: 35 adopted (15 on launch day, 10-01), 33 of them studied in the last week, 25 tapped him after 10-13, 16 earned the
+  perfect-health trophy; a few turned him off. Almost nobody said "No thanks" in his introduction, so the ~50 dashboard users who haven't
+  adopted him never opened it (Sam, 10-20: he stays on their name and keeps asking to be tapped). **Listen** 23 people ever (MSK 3 11,
+  perio 9, Occlusion 7, PCD 6, MSK 4 6), **mind maps** 36 (MSK 3 23, PCD 14, perio 11), **highlighter** 12 (most in Occlusion and
+  MSK 4), own names 12 (47 opened the name editor). MSK 4's interactive diagrams: 18 of 71 visitors; its 8 picture questions got 19-45
+  tries each, 62-89% right.
+- Tracking (`feature_events`, `window.shTrack` in `widget/clicks.js`, from 10-20): page loads, a daily settings snapshot, settings
+  changes, easter eggs, how Timmy Tooth's introduction ends, podcast and Listen minutes and progress, diagrams, mind maps and names;
+  `notes-jump:*` and `qrate:*` from 11-04. Read it in `review/` -> Clicks -> Features, or
+  `select hub, kind, count(distinct visitor_id), sum(n) from feature_events group by 1, 2`.
 
 ## Standing lessons (read before building a hub)
 
@@ -316,7 +335,7 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   length and form as the answer, and keep qualifiers in the explanation, not the choices. It still happens in new
   hubs: PCD `on-crack-types` asked which crack type is non-treatable with a choice labeled "Cracked tooth (treatable)"
   (report #18, 2026-10-13). Before shipping, grep the choices for parentheses. Numbers do it too: PCD Implants `bm-goodacre` asked which
-  complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
+  complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04: 9 of 9 right before the fix, 9 of 14 after); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
   Perio `q4-06` keyed the S204SD9 over "Sickle scaler", but the hub's notes call the S204SD9 the posterior sickle (7 of 17 picked
   "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it?
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
