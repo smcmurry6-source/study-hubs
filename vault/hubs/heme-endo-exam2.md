@@ -37,8 +37,32 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
-- **Content flags** from the build (as taught, worth checking against the recordings): see the PR that built it and the
-  2026-11-05 entry in `DEPLOY_NOTES.md`.
+- **Vetted:** every question was checked against its slides and recording by a second reviewer on 2026-11-05 (about
+  1 in 4 rewritten). Where the lecture disagrees with a textbook or with itself, the hub keeps what was taught; those
+  places are listed below so whoever takes a lecture to taught can check them against its recording.
+
+## Content flags (kept as taught; check when the recording or review lands)
+
+- **L11:** at about 1:29 the answer read aloud to slide practice question 4 (glucose-dependent insulin release) was
+  sulfonylureas; the summary slide says GLP-1 agonists / DPP-4 inhibitors, and the hub follows the slide (the notes
+  mention the mix-up). The fluoroquinolone slide has the K-ATP effect backwards (not tested). Dulaglutide half-life:
+  slide 5 days, said 7 (hub: 5).
+- **L12a:** Hashimoto's taught as TSH-receptor-blocking antibodies (slide and recording 23:42; textbooks say anti-TPO /
+  anti-thyroglobulin); no key depends on it. Calcitonin "might" cause hypercalcemia in medullary carcinoma (said 33:20,
+  against his own slide; not tested).
+- **L12b:** the pheochromocytoma rule of 10s is taught with his warning that the numbers are dated. CAH: the slide's
+  "1/3 of cases have sodium wasting" may be inverted (references say most classic cases); p2-tf-12 is keyed True to the
+  slide. Adrenal cortical carcinoma "> 2 cm" on the slide (likely meant larger).
+- **A (slides only):** slide 15 says PTH "inhibits osteoblasts"; the mechanism follows Exam 1 (PTH acts on osteoblasts,
+  which drive osteoclasts); no key depends on it. Slides 17 and 35 are images that weren't read.
+- **L13 / L15 (slides only):** testis temperature 35 °C (L13) vs 34 °C (L15); sperm maturation 74 days (L13) vs
+  2 months (L15); each question uses its own lecture's number. L15's speaker note that the right testis hangs lower was
+  left out (anatomy texts say the left). Speaker notes for L13 and L14 couldn't be read (file size).
+- **L14 / L16 (slides only):** follicle names (L16 calls any follicle with an antrum Graafian) and day counts (L16
+  ovarian 0-14 / 14-28, L14 uterine 1-5 / 5-14 / 15-28) differ; each lecture's questions use its own. L16: inhibin
+  suppresses FSH at midcycle (so the cycle figure draws no FSH peak), rising GnRH causes hot flashes (fp-meno-2 says
+  "according to the lecture"). L14: lactation "activated by estrogen and progesterone surges after birth" (check
+  against L17).
 
 ## Pending
 
