@@ -8,7 +8,7 @@
 // Curves are relative levels drawn to the slides' shapes, not data; the only number is the slides' 200 pg/mL.
 import { makeFig, f1, T, L, HOT } from "./shared.mjs";
 
-const W = 600, H = 534;
+const W = 600, H = 562;
 /* relative levels (0-1) at key days; a monotone curve through them, so nothing overshoots */
 const K = {
   FSH: [[0.5, .5], [2, .6], [4, .62], [6, .54], [8, .44], [10, .34], [12, .27], [13.5, .24], [15, .23], [18, .2], [22, .18], [25, .2], [27, .33], [28.5, .46]],
@@ -65,12 +65,13 @@ function cyRender(st, D) {
   st.d = d;
   var C = preg ? D.KP : D.K, P0 = 128, PH = 76, H1 = 354, HH = 72, BA0 = 452, MY0 = 466, MY1 = 482, OVS = 184, XL = cyX(0.5), XR = cyX(28.5);
   function band(a, b, y0, h, txt, on, info, key) { return HOT(info, '<rect class="cy-band' + (on ? " is-on" : "") + '" x="' + f1(cyX(a)) + '" y="' + y0 + '" width="' + f1(cyX(b) - cyX(a)) + '" height="' + h + '" rx="4"/>' + (txt ? T((cyX(a) + cyX(b)) / 2, y0 + h - 5, txt, "cy-bt" + (on ? " b" : ""), "middle") : "")); }
+  o += T(XL, 12, "OVARIAN PHASES · L16 COUNTS DAYS 0-14, 14-28", "cy-h", "start") + '<g transform="translate(0 14)">';
   /* ---- the day cursor, under everything ---- */
-  o += '<rect class="cy-cur" x="' + f1(cyX(d) - 10) + '" y="26" width="20" height="482"/>';
-  o += '<path class="cy-ovl" d="M' + cyX(14) + " 26V508" + '"/>';
+  o += '<rect class="cy-cur" x="' + f1(cyX(d) - 10) + '" y="26" width="20" height="496"/>';
+  o += '<path class="cy-ovl" d="M' + cyX(14) + " 26V522" + '"/>';
   /* ---- ovarian phases (top) ---- */
   o += band(0.5, 13.5, 6, 18, "follicular phase", ph.ov === "follicular", "Follicular phase, days 0 to 14 on Dr. Madison's slide (also called proliferative): it precedes ovulation, involves the development of the ovarian follicle, and is dominated by estrogen.");
-  o += band(13.5, 14.5, 6, 18, "", ph.ov === "ovulation", "Midcycle: about day 14, which is 14 days before menses. Ovulation, the release of the mature ovum, 24 to 36 hours after the LH surge.");
+  o += band(13.5, 14.5, 6, 18, "", ph.ov === "ovulation", "Midcycle: about day 14 of a 28-day cycle, which is 14 days before menses. Ovulation, the release of the mature ovum, 24 to 36 hours after the LH surge.");
   o += T(cyX(14), 20, "★", "cy-star", "middle");
   o += band(14.5, 28.5, 6, 18, "luteal phase", ph.ov === "luteal", "Luteal phase, days 14 to 28 (also called secretory): it follows ovulation, is driven by the corpus luteum, and is dominated by progesterone.");
   /* ---- pituitary: FSH and LH ---- */
@@ -89,7 +90,7 @@ function cyRender(st, D) {
   function seg(a, b, cls, txt, on, info, sh) { var mx = (cyX(a) + cyX(b)) / 2, k = "cy-fbt" + (on ? " b" : ""); return HOT(info, '<rect class="cy-fb ' + cls + (on ? " is-on" : "") + '" x="' + f1(cyX(a) + 1) + '" y="136" width="' + f1(cyX(b) - cyX(a) - 2) + '" height="18" rx="9"/>' + (txt ? (sh ? T(mx, 149, txt, k + " cy-lg", "middle") + T(mx, 149, sh, k + " cy-sh", "middle") : T(mx, 149, txt, k, "middle")) : "")); }
   o += seg(0.5, 11.5, "cy-neg", "− estradiol: negative feedback", ph.fb === "negE", "Negative feedback, most of the follicular phase: GnRH stimulates FSH and LH, they stimulate estradiol from the follicular cells, and estradiol feeds back negatively on GnRH, LH and FSH.", "− estradiol");
   o += seg(11.5, 13.5, "cy-pos", "+", ph.fb === "pos", "Positive feedback, midcycle: plasma estradiol reaches a critical level (above 200 pg/mL), which progressively sensitizes the pituitary to GnRH, so a surge of LH follows. Positive feedback is what makes the female axis cyclical; the male has none and is acyclical.");
-  o += seg(13.5, 14.5, "cy-ovs", "", ph.fb === "ov", "Day 14: the dominant follicle ruptures and releases the oocyte.");
+  o += seg(13.5, 14.5, "cy-ovs", "", ph.fb === "ov", "About day 14 of a 28-day cycle: the dominant follicle ruptures and releases the oocyte.");
   o += seg(14.5, preg ? 28.5 : 25.5, "cy-neg", "− progesterone: negative feedback", ph.fb === "negP", "Negative feedback, luteal phase: GnRH stimulates FSH and LH, they stimulate progesterone secretion, and progesterone feeds back negatively on GnRH, LH and FSH. Progesterone gives negative feedback only.", "− progesterone");
   if (!preg) o += seg(25.5, 28.5, "cy-neg cy-fade", "falling", ph.fb === "fade", "The corpus luteum regresses, so progesterone and estrogen fall and their brake on the pituitary fades.");
   /* ---- ovary ---- */
@@ -102,7 +103,7 @@ function cyRender(st, D) {
     [cyX(2.6), "a few follicles", "Each cycle a few follicles enter the next stage: fluid and hormones collect in an antrum (stage 2). FSH drives their granulosa cells; about 12 start each month.", "a few"],
     [cyX(6.6), "dominant", "One follicle becomes dominant; the rest become atretic. Its theca cells (LH) make testosterone and its granulosa cells (FSH, aromatase) turn it into estradiol."],
     [cyX(10.6), "Graafian", "The dominant Graafian follicle grows to bulge on the ovary's surface, makes estradiol above 200 pg/mL, and before ovulation has a high expression of LH receptors. Its granulosa cells add LH receptors at midcycle."],
-    [cyX(14), "ovulation", "Day 14: collagenases weaken the follicle wall and prostaglandins raise blood flow; it ruptures 24 to 36 hours after the LH surge and releases the oocyte (meiosis I just completed) toward the fallopian tube."],
+    [cyX(14), "ovulation", "About day 14 of a 28-day cycle: collagenases weaken the follicle wall and prostaglandins raise blood flow; it ruptures 24 to 36 hours after the LH surge and releases the oocyte (meiosis I just completed) toward the fallopian tube."],
     [cyX(17.8), "", "The ruptured follicle becomes the corpus luteum: mostly granulosa cells (granulosa-lutein: progesterone and estrogen) with some theca cells (theca-lutein: progesterone)."],
     [cyX(22.2), "corpus luteum", "The corpus luteum secretes the steroid hormones needed for implantation and for maintaining a zygote, mainly progesterone."],
     [cyX(26.6), preg ? "kept" : "corpus albicans", preg ? "Pregnancy: a hormone from the placenta helps maintain the corpus luteum (later the placenta takes over hormone production)." : "No fertilization: the corpus luteum regresses over 14 days into a scar, the corpus albicans (fibroblasts fill it with collagen).", preg ? "kept" : "albicans"],
@@ -173,15 +174,18 @@ function cyRender(st, D) {
   o += T(cyX(20.8), MY1 - 4.5, "myometrium", "cy-in cy-in-s", "middle");
   if (!preg) o += T(XR, 367, "arteries constrict", "cy-sl" + (d >= 25 ? " b" : ""), "end");
   else o += T(XR, 367, "kept: no menses", "cy-sl" + (d >= 23 ? " b" : ""), "end");
+  o += "</g>";
   /* ---- uterine phases (bottom) and the day axis ---- */
-  o += band(0.5, 5, 488, 18, "menstrual", ph.ut.indexOf("menstrual") === 0, "Menstrual phase, days 1 to 5: the functionalis is shed; the basalis stays.");
-  o += band(5, 14.5, 488, 18, "proliferative", ph.ut === "proliferative" || ph.ut === "menstrual→proliferative", "Proliferative (or follicular) phase, days 5 to 14: estrogen from the growing follicles; the basalis rebuilds the functionalis.");
-  o += band(14.5, 28.5, 488, 18, "secretory", ph.ut === "secretory", "Secretory (or luteal) phase, days 15 to 28: progesterone from the corpus luteum; a thick functionalis whose glands secrete.");
-  var ax2 = '<path class="cy-axis" d="M' + XL + " 509H" + XR;
-  for (i = 1; i <= 28; i++) ax2 += "M" + cyX(i) + " 509V" + (i === 1 || i === 5 || i === 14 || i === 28 ? 515 : 512);
+  o += T(XL, 510, "UTERINE PHASES · L14 COUNTS DAYS 1-5, 5-14, 15-28", "cy-h", "start");
+  o += band(0.5, 5, 516, 18, "menstrual", ph.ut.indexOf("menstrual") === 0, "Menstrual phase, days 1 to 5: the functionalis is shed; the basalis stays.");
+  o += band(5, 14.5, 516, 18, "proliferative", ph.ut === "proliferative" || ph.ut === "menstrual→proliferative", "Proliferative (or follicular) phase, days 5 to 14: estrogen from the growing follicles; the basalis rebuilds the functionalis.");
+  o += band(14.5, 28.5, 516, 18, "secretory", ph.ut === "secretory", "Secretory (or luteal) phase, days 15 to 28: progesterone from the corpus luteum; a thick functionalis whose glands secrete.");
+  var ax2 = '<path class="cy-axis" d="M' + XL + " 537H" + XR;
+  for (i = 1; i <= 28; i++) ax2 += "M" + cyX(i) + " 537V" + (i === 1 || i === 5 || i === 14 || i === 28 ? 543 : 540);
   o += ax2 + '"/>';
-  [1, 5, 14, 28].forEach(function (k) { o += T(cyX(k), 528, String(k), "cy-dn" + (k === d ? " b" : ""), "middle"); });
-  if ([1, 5, 14, 28].indexOf(d) < 0) o += T(cyX(d), 528, String(d), "cy-dn b", "middle");
+  [1, 5, 14, 28].forEach(function (k) { o += T(cyX(k), 556, String(k), "cy-dn" + (k === d ? " b" : ""), "middle"); });
+  if ([1, 5, 14, 28].indexOf(d) < 0) o += T(cyX(d), 556, String(d), "cy-dn b", "middle");
+  o += T(XR, 556, "day", "cy-dn", "end");
   return o;
 }
 function cySay(st, D) {
@@ -191,7 +195,7 @@ function cySay(st, D) {
   else if (d <= 10) s = "Follicular (proliferative) phase: one follicle becomes dominant and makes estradiol (theca cells, LH: testosterone; granulosa cells, FSH: aromatase). Estradiol grows the endometrium and lengthens its arteries, the glands are straight, cervical mucus turns watery, and its negative feedback holds FSH and LH down.";
   else if (d === 11) s = "Late follicular phase: the Graafian follicle's estradiol climbs toward the critical level of 200 pg/mL; until then its feedback is still negative.";
   else if (d <= 13) s = "Midcycle: estradiol is above 200 pg/mL, so its feedback turns positive: the pituitary, sensitized to GnRH, releases the LH surge. Inhibin holds FSH down, so the granulosa cells add LH receptors. The surge restarts meiosis and raises collagenases and prostaglandins in the follicle.";
-  else if (d === 14) s = "Day 14, 14 days before menses: the weakened dominant follicle ruptures, 24 to 36 hours after the LH surge, and releases the oocyte (meiosis I just completed) toward the fallopian tube.";
+  else if (d === 14) s = "About day 14 of a 28-day cycle, 14 days before menses: the weakened dominant follicle ruptures, 24 to 36 hours after the LH surge, and releases the oocyte (meiosis I just completed) toward the fallopian tube.";
   else if (d <= 19) s = "Luteal (secretory) phase: the ruptured follicle becomes the corpus luteum, mostly granulosa cells with some theca cells. Progesterone rises and gives negative feedback on GnRH, LH and FSH; the glands start to coil and secrete.";
   else if (d <= 22 || preg && d <= 24) s = "Mid-luteal phase, dominated by progesterone: proliferation slows, secretions and vasculature increase, cervical mucus is thick, and the functionalis is near its thickest, with coiled glands full of secretion.";
   else if (preg) s = "Pregnancy: a hormone from the placenta keeps the corpus luteum, so progesterone and estrogen stay up, FSH and LH stay down, and the secretory lining is kept. Day 28 brings no menses: pregnancy is a cause of secondary amenorrhea. The placenta later takes over hormone production.";

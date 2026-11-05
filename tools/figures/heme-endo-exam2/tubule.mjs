@@ -98,7 +98,7 @@ const INFO = {
 
 /* the germ cells that aren't followed (kind, angle, radius): left gap and the two edge gaps */
 const LATE = [[-13.6, 318], [-11.9, 312], [-10.3, 320], [-1.6, 316], [0.1, 310], [1.7, 318], [-16.6, 322], [12, 312], [13.6, 319], [16.4, 324]];
-const BG = [["B", -9.4, 547], ["dA", -6, 545], ["pA", -2.7, 546], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -8.9, 432], ["ss", -3.4, 428], ["ss", -6.3, 402],
+const BG = [["B", -9.45, 547], ["dA", -6.3, 545], ["pA", -2.75, 546], ["ps", -8.3, 472], ["ps", -3.8, 466], ["ss", -8.9, 432], ["ss", -3.4, 428], ["ss", -6.3, 402],
   ["sd", -8.5, 374], ["sd", -5.3, 368], ["sd", -2.6, 378], ["sd", -7.2, 349], ["sd", -3.9, 346],
   ["pA", -15.7, 546], ["ps", -15.75, 470], ["ss", -15.3, 420], ["sd", -15.5, 364], ["sd", -15.1, 386],
   ["B", 15.6, 546], ["ps", 15.4, 470], ["ss", 15.3, 420], ["sd", 15.4, 366], ["sd", 15.1, 388]];
@@ -435,7 +435,8 @@ export function auditInput() {
     const d = sertoliOutline(ac, flaps[j][0] + (j ? 0.15 : 0), flaps[j][1] - (j < 2 ? 0.15 : 0));
     const nums = d.match(/-?\d+(\.\d+)?/g).map(Number), pts = [];
     for (let k = 0; k + 1 < nums.length; k += 2) pts.push([nums[k], nums[k + 1]]);
-    return { id: "sertoli" + j, points: pts.filter((q, k) => k % 3 === 0) };
+    const ends = pts.filter((q, k) => k % 3 === 0); ends.pop();
+    return { id: "sertoli" + j, points: ends };
   });
   const steps = CL.map((cells) => cells.map((c, j) => circ("clone-" + c.k + j, c.a, c.R, R[c.k] * (c.k === "sd" && c.m ? 0.65 : 1))));
   return { germ, sert, steps };

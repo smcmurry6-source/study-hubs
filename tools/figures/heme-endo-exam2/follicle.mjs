@@ -278,6 +278,7 @@ function foRender(st, D) {
   /* title and the meiosis badge */
   o += '<circle class="fo-num" cx="22" cy="28" r="13"/>' + T(22, 33, String(s + 1), "fo-numt", "middle");
   o += T(43, 34, s === 7 && fert ? "Corpus luteum, kept" : D.STAGES[s], "b fo-title", "start");
+  if (s === 2 || s === 3) o += T(44, 51, s === 2 ? "L16 (Dr. Madison) calls this the secondary follicle" : "L16 calls a follicle with an antrum Graafian", "s mut fo-alt", "start");
   var mb = s <= 3 ? ["PRIMARY OOCYTE", "prophase I, arrested"] : s === 4 ? ["PRIMARY OOCYTE", "prophase I → LH surge"] : s === 5 ? ["SECONDARY OOCYTE", "metaphase II, arrested"] : fert ? ["FERTILIZED", "meiosis II completes"] : ["OOCYTE HAS LEFT", "metaphase II, ~24 h"];
   o += HOT(s <= 3 ? "Every follicle holds a primary oocyte arrested in prophase of meiosis I, from before birth until the LH surge." : s === 4 ? "Still prophase I. The LH surge causes release of meiosis-inducing factor, and the primary oocyte completes meiosis I shortly before ovulation." : s === 5 ? "Meiosis I ended with unequal cytokinesis: a secondary oocyte and the first polar body. The secondary oocyte entered meiosis II and is arrested at metaphase II until fertilization." : fert ? "Only upon fertilization (usually in the ampulla) does the oocyte complete meiosis II, forming the ovum and a second polar body." : "The ovulated secondary oocyte stays at metaphase II; unfertilized, it remains viable only about 24 hours.",
     '<rect class="fo-badge" x="364" y="7" width="212" height="44" rx="9"/>' + T(376, 24, "MEIOSIS · " + mb[0], "fo-bk", "start") + T(376, 43, mb[1], "b fo-bv", "start"));
@@ -290,8 +291,8 @@ function foSay(st, D) {
   var A = [
     "Primordial follicle, the most primitive stage: a primary oocyte, about 25 µm, with an asymmetric nucleus and vesicular chromatin, completely surrounded by a single layer of squamous follicular cells joined by desmosomes. Look for: flat cells, one layer, no zona pellucida.",
     "Early primary (unilaminar) follicle: the follicular cells have become cuboidal, and from now on they are granulosa cells, still one layer. The oocyte grows to 100-150 µm, and the zona pellucida begins to form. Gap junctions, no tight junctions: no blood-follicle barrier. Look for: cuboidal cells, one layer.",
-    "Late primary (multilaminar) follicle: the granulosa cells proliferate into several layers, the zona pellucida (ZP1, ZP2, ZP3) surrounds the oocyte, and stromal cells outside the basal lamina organize into the theca interna (vascular, LH receptors, androgens) and theca externa (fibrous). Look for: several layers, no fluid yet.",
-    "Secondary (antral) follicle: told apart by liquor folliculi, made by granulosa cells under FSH, pooling into one chamber, the antrum. A cumulus oophorus forms, the corona radiata is the single layer of granulosa cells around the oocyte, and cortical granules appear under its membrane. Look for: fluid.",
+    "Late primary (multilaminar) follicle: the granulosa cells proliferate into several layers, the zona pellucida (ZP1, ZP2, ZP3) surrounds the oocyte, and stromal cells outside the basal lamina organize into the theca interna (vascular, LH receptors, androgens) and theca externa (fibrous). Look for: several layers, no fluid yet. Dr. Madison's L16 calls this many-layered follicle with a theca the secondary follicle.",
+    "Secondary (antral) follicle: told apart by liquor folliculi, made by granulosa cells under FSH, pooling into one chamber, the antrum. A cumulus oophorus forms, the corona radiata is the single layer of granulosa cells around the oocyte, and cortical granules appear under its membrane. Look for: fluid. Dr. Madison's L16 calls any follicle with an antrum a Graafian follicle; the order of events is the same.",
     "Mature Graafian follicle: about 20 mm, it bulges on the surface of the ovary; the theca layers are more prominent, and the oocyte adheres to the wall through the cumulus oophorus. Primordial to here takes many months. Its estrogen triggers the LH surge, and meiosis I completes shortly before ovulation.",
     "Ovulation: LH raises blood flow and theca interna permeability (local edema) and releases meiosis-inducing factor. Hyaluronic acid swells the antrum until the follicle and the tunica albuginea rupture, and the secondary oocyte (with its first polar body, arrested at metaphase II) and the corona radiata are released near the infundibulum.",
     "Corpus luteum: the emptied follicle collapses and folds, and LH converts it. Granulosa-lutein cells, from the granulosa cells, make progesterone and estrogen; theca-lutein cells, from the enlarged theca interna cells, make progesterone.",
@@ -314,13 +315,14 @@ export default function follicle() {
 <div class="am-controls"><button type="button" class="am-btn" data-amstep="-1">Back</button><button type="button" class="am-btn" data-amstep="1">Next</button><button type="button" class="am-btn" data-amplay aria-pressed="false">Play</button><span class="fo-sep" aria-hidden="true"></span><span class="fo-lbl">After ovulation:</span><button type="button" class="am-btn" data-amk="fert" data-amv="no">No fertilization</button><button type="button" class="am-btn" data-amk="fert" data-amv="yes">Fertilization</button></div>`,
     sources: [
       "From the L14 notes and slides (Dr. Herr): the five stages and how to tell them apart (squamous or cuboidal cells, one layer or several, fluid, a bulge on the ovary); the oocyte's size (about 25 µm in the primordial follicle, 100-150 µm once growing) and the Graafian follicle's (about 20 mm); his starred slide on the arrests (prophase I in every follicle, meiosis I completed shortly before ovulation after the LH surge, metaphase II until fertilization); ovulation; the granulosa-lutein and theca-lutein cells; the corpus albicans; and the placenta's hormone that maintains the corpus luteum in pregnancy (the slide doesn't name it).",
-      "Dr. Madison's L16 says it a little differently: the oocyte becomes a secondary oocyte at ovulation, and the corpus luteum regresses over 14 days. The badge follows Dr. Herr, since this is his lecture.",
+      "The names are Dr. Herr's (L14). Dr. Madison's L16 names the same sequence differently: his secondary follicle is the many-layered follicle with a theca (L14's late primary), and his Graafian follicle is any follicle with an antrum (L14's secondary, then mature Graafian). L16 also puts the end of meiosis I at ovulation and has the corpus luteum regress over 14 days; the badge follows L14 (meiosis I finishes shortly before ovulation, meiosis II only at fertilization), since this is his lecture.",
       "Schematic sections, not to scale: each stage is drawn to fill the frame, so the oocyte looks the same size from stage to stage when it really grows from about 25 to 100-150 µm, and the follicle from a fraction of a millimeter to about 20 mm. Cell counts, the folds of the corpus luteum and the stroma's whorls are drawn for the look, from standard histology atlas views; only the parts the lecture names are labeled. Educational, not medical advice."],
     css: `
 .anima[data-anima="follicle"] .am-svg{max-width:600px}
 .anima .follicle-svg .t{font-size:13px}
 .anima .follicle-svg .t.s{font-size:12px}
 .anima .follicle-svg .fo-title{font-size:15px}
+.anima .follicle-svg .fo-alt{font-size:11px}
 .anima .follicle-svg .fo-num{fill:var(--accent)}
 .anima .follicle-svg .fo-numt{fill:var(--surface);stroke:none;font-weight:700;font-size:13px}
 .anima .follicle-svg .fo-badge{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
@@ -371,7 +373,7 @@ export default function follicle() {
 .anima .follicle-svg .fo-drift{animation:fo-drift 4.8s ease-in-out infinite alternate}
 @keyframes fo-drift{from{transform:translate(-30px,16px)}to{transform:translate(6px,-3px)}}
 .anima .follicle-svg .fo-tear{fill:var(--bx-lumen);stroke:var(--bx-cyto-line);stroke-width:.8}
-@media (max-width:560px){.anima .follicle-svg .t{font-size:15.5px}.anima .follicle-svg .t.s{font-size:13.5px}.anima .follicle-svg .fo-title{font-size:17px}.anima .follicle-svg .fo-bk{font-size:11.5px}.anima .follicle-svg .fo-bv{font-size:14.5px}}
+@media (max-width:560px){.anima .follicle-svg .t{font-size:15.5px}.anima .follicle-svg .t.s{font-size:13.5px}.anima .follicle-svg .fo-title{font-size:17px}.anima .follicle-svg .fo-bk{font-size:11.5px}.anima .follicle-svg .fo-bv{font-size:14.5px}.anima .follicle-svg .fo-alt{font-size:12px}}
 @media (prefers-reduced-motion: reduce){.anima .follicle-svg .fo-drift{animation:none}}
 .anima .fo-stages .am-btn{padding:4px 8px;font-size:.76rem}
 .anima .fo-sep{flex:0 0 6px}
