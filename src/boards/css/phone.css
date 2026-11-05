@@ -3,6 +3,11 @@
   .notes-layout{grid-template-columns:minmax(0,1fr)}
   .unit-nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
   .unit-nav button{flex:none}
+  .case-layout{grid-template-columns:minmax(0,1fr)}
+  .case-chart{position:static;scroll-margin-top:130px}
+  .case-chart summary{display:list-item;cursor:pointer;font-weight:700;color:var(--ink);padding:12px 15px}
+  .case-chart[open] summary{border-bottom:1px solid var(--line)}
+  .case-chart-body{padding:12px}
 }
 @media (max-width: 560px){
   #app{padding:0 16px calc(var(--sh-tabbar-h, 60px) + 40px)}
@@ -22,4 +27,14 @@
   .pbox dd{border-top:0;padding-top:0}
   .empty{padding:16px;gap:12px}
   .panel-head h2{font-size:1.3rem}
+  .case-title{align-items:flex-start}
+  .case-title .btn{flex:none;padding:7px 10px}
+  .case-list-card,.missed-case{align-items:flex-start;flex-direction:column;gap:10px;padding:14px}
+  .case-list-card>.btn,.missed-case>.btn{align-self:flex-start}
+  .case-list-actions{align-self:stretch;flex-wrap:wrap}
+  .case-list-actions .btn{align-self:flex-start}
+  .case-stage-head{align-items:flex-start;flex-direction:column}
+  .case-round-item .qcard{padding:12px}
+  .bank-filters{gap:9px}
+  .bank-filters .field{flex:1 1 145px;min-width:0}
 }
