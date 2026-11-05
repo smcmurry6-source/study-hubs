@@ -1,6 +1,6 @@
 // Fig 2: the insulin preparations' time-action curves and a basal-bolus day (L11 Pharmacology of Diabetes,
-// Dr. Fasinu, recording and slides). Five classes as on his slide: rapid (lispro, aspart, glulisine; Afrezza inhaled),
-// short (regular), intermediate (NPH), long (glargine, detemir), ultra-long (degludec; glargine U-300). Only his numbers
+// Dr. Fasinu, recording and slides). Five classes as on his slide: rapid (lispro, aspart, glulisine; Afrezza inhaled, very rapid),
+// short (regular), intermediate (NPH), long (glargine, detemir), ultra-long (degludec; glargine as Toujeo). Only his numbers
 // are labeled: rapid onset 5-15 minutes and about 4 hours in all; regular peaks around 3 hours and is gone by about 8;
 // NPH onset 2-4 hours; glargine lasts more than 24 hours; degludec more than 42. The rest of each curve (rapid's peak,
 // regular's onset, NPH's peak and end, the long-acting onsets, detemir's shape) is drawn as a typical shape only, with
@@ -99,7 +99,7 @@ function inRender(st, D) {
 function inSay(st, D) {
   if (st.mode === "day") return [st.nolunch ? "Skip lunch, skip the lunch shot: the bolus is as needed (PRN), only when you eat. The basal insulin from last night still covers the background all day, so you aren't left without insulin." : "Basal-bolus, as Dr. Fasinu teaches it: a long-acting basal insulin such as glargine once at night, whatever you eat, to mimic your own background insulin through the whole day (it lasts more than 24 hours); then a rapid-acting bolus before breakfast, lunch and dinner for each after-meal spike. Questions often ask which insulin to take before a big meal: the fast one.", st.nolunch ? "basal-bolus · no lunch" : "basal-bolus day"];
   var C = st.cl === "all" ? null : D.CL[st.cl];
-  return [C ? C.sum : "Five speeds of insulin, as on his slide: rapid-acting (lispro, aspart, glulisine; Afrezza is inhaled), short-acting (regular), intermediate (NPH), long-acting (glargine, detemir) and ultra-long (degludec; glargine U-300). Onset, peak and duration decide which one is the basal and which one is given as needed (PRN) for meals. Pick one to see the numbers he gave.", C ? C.ro : "all five"];
+  return [C ? C.sum : "Five speeds of insulin, as on his slide: rapid-acting (lispro, aspart, glulisine; Afrezza, inhaled, is the very rapid one), short-acting (regular), intermediate (NPH), long-acting (glargine, detemir) and ultra-long (degludec; glargine as Toujeo). Onset, peak and duration decide which one is the basal and which one is given as needed (PRN) for meals. Pick one to see the numbers he gave.", C ? C.ro : "all five"];
 }
 function inSet(st, k) { if (k === "cl") st.hr = { all: 24, r: 12, s: 12, n: 24, l: 48, u: 48 }[st.cl]; }
 
@@ -108,8 +108,8 @@ const D = {
   BASAL: 0.3, BOLUS: 0.55, OWN0: 0.3, OWNP: 0.42,
   CL: {
     r: { on: 0.15, pk: 1.25, end: 4, tp: 2, a: 1.85, H: 1, short: "rapid", lab: [1.4, 1.03, "start"],
-      info: "Rapid-acting: lispro (Humalog), aspart (Novolog), glulisine (Apidra), modified to be absorbed and act faster than regular insulin. Onset 5-15 minutes and about 4 hours in all: the shortest duration of any insulin. Inhaled Afrezza is on the same list; he called it the very rapid one.",
-      sum: "Rapid-acting insulin: lispro (Humalog), aspart (Novolog), glulisine (Apidra); inhaled Afrezza is on the same list, and he called it the very rapid one (its action sets in within minutes). Onset 5-15 minutes, about 4 hours in all: the shortest duration, so it's the one to inject just before a meal for the after-meal (postprandial) spike.", ro: "onset 5-15 min · ~4 h" },
+      info: "Rapid-acting: lispro (Humalog), aspart (Novolog), glulisine (Apidra), modified to be absorbed and act faster than regular insulin. Onset 5-15 minutes and about 4 hours in all: the shortest duration of any insulin. Inhaled Afrezza, the very rapid one, acts within 1 to 2 minutes (not drawn).",
+      sum: "Rapid-acting insulin: lispro (Humalog), aspart (Novolog), glulisine (Apidra); inhaled Afrezza, the very rapid one, acts within 1 to 2 minutes (its curve isn't drawn). Onset 5-15 minutes, about 4 hours in all: the shortest duration, so it's the one to inject just before a meal for the after-meal (postprandial) spike.", ro: "onset 5-15 min · ~4 h" },
     s: { on: 0.5, pk: 3, end: 8, tp: 3, a: 2.5, H: 0.8, short: "regular", lab: [3.3, 0.84, "start"],
       info: "Short-acting: regular insulin (Humulin R, Novolin R), human insulin, the oldest. It peaks around 3 hours and by 8 hours the effect is technically gone. Regular and NPH are sold without a prescription (from the pharmacist).",
       sum: "Short-acting: regular insulin (Humulin R, Novolin R), plain human insulin, the R on the box. It kind of peaks around 3 hours, and by 8 hours the effect is technically gone. Of the choices regular, NPH and glargine, regular is the one for a big meal. Regular and NPH can be bought without a prescription.", ro: "peak ~3 h · gone ~8 h" },
@@ -117,12 +117,12 @@ const D = {
       info: "Intermediate-acting: NPH (Humulin N, Novolin N), neutral protamine Hagedorn: protamine mixed with insulin slows its absorption from the injection site, which stretches its action. Onset 2-4 hours: far too slow to cover a meal.",
       sum: "Intermediate-acting: NPH (Humulin N, Novolin N), neutral protamine Hagedorn: a protein, protamine, mixed with the insulin slows its absorption and stretches its action. Its onset is 2-4 hours, so it can't cover a meal you're about to eat. Like regular, it's sold without a prescription.", ro: "onset 2-4 h" },
     l: { on: 1.5, rise: 3, flat: 1, end: 28, tp: 3.5, H: 0.36, short: "glargine", lab: [12, 0.42, "middle"],
-      alt: { on: 1.5, pk: 8, end: 22, tp: 4, a: 1.6, H: 0.3, short: "detemir", lab: [19, 0.17] },
+      alt: { on: 1.5, rise: 4, flat: 1, end: 22, tp: 6, H: 0.27, short: "detemir", lab: [18, 0.08] },
       info: "Long-acting: glargine (Lantus, Basaglar) and detemir (Levemir), released slowly with no real peak. Glargine lasts more than 24 hours: one shot a day, at night, as the basal insulin.",
-      sum: "Long-acting: glargine (Lantus, Basaglar) and detemir (Levemir). Released slowly, without a real peak, so the profile looks as if it goes on forever: glargine lasts more than 24 hours, one shot a day, at night. That's the basal insulin of a basal-bolus regimen. (Detemir's curve is drawn as a typical shape; he gave no number for it.)", ro: "glargine: > 24 h" },
+      sum: "Long-acting: glargine (Lantus, Basaglar) and detemir (Levemir). Released slowly, without a real peak, so the profile looks as if it goes on forever: glargine lasts more than 24 hours, one shot a day, at night. That's the basal insulin of a basal-bolus regimen. (Detemir is drawn shorter than glargine as a typical shape; he gave no number for it.)", ro: "glargine: > 24 h" },
     u: { on: 1, rise: 4, flat: 1, end: 46, tp: 4, H: 0.3, short: "degludec", lab: [33, 0.24, "middle"],
-      info: "Ultra-long-acting: degludec (Tresiba), and the concentrated glargine (Toujeo, Toujeo Max). Degludec may last more than 42 hours.",
-      sum: "Ultra-long-acting: degludec (Tresiba) and concentrated glargine (Toujeo, Toujeo Max). Degludec may last more than 42 hours, the longest of all. Compare rapid-acting insulin's 4 hours: those duration numbers are what decide which insulin is the basal and which is taken as needed.", ro: "degludec: > 42 h" },
+      info: "Ultra-long-acting: degludec (Tresiba), and glargine as Toujeo. Degludec may last more than 42 hours.",
+      sum: "Ultra-long-acting: degludec (Tresiba) and glargine as Toujeo. Degludec may last more than 42 hours, the longest of all. Compare rapid-acting insulin's 4 hours: those duration numbers are what decide which insulin is the basal and which is taken as needed.", ro: "degludec: > 42 h" },
   },
   /* [from h, to h, label row, anchor, text]: only the numbers he gave */
   NUMS: {

@@ -75,7 +75,7 @@ function routeOf() {
 }
 
 const STOPS = [
-  { name: "Seminiferous tubule", lin: "Seminiferous (germinal) epithelium: Sertoli cells and spermatogenic cells.", job: "Sperm are made (about 74 days) and released into the lumen (spermiation); they leave non-motile.",
+  { name: "Seminiferous tubule", lin: "Seminiferous (germinal) epithelium: Sertoli cells and spermatogenic cells.", job: "Sperm are made (about 74 days in all) and released into the lumen (spermiation); they leave non-motile.",
     say: "Seminiferous tubule: sperm are made in the germinal epithelium of Sertoli and spermatogenic cells (about 74 days) and released into the lumen. They leave the testis non-motile." },
   { name: "Tubuli recti", lin: "Not described in the lecture.", job: "The straight tubules: they lead out of the seminiferous tubules into the rete testis.",
     say: "Tubuli recti (straight tubules): the ducts that lead out of the seminiferous tubules. His overview slide calls these straight ducts the rete testis; his duct slide puts the tubuli recti first, then the rete testis." },
@@ -176,8 +176,10 @@ function staticArt() {
   var cordC = cr([[396, 356], [392, 300], [388, 250], [386, 214]], 6), art = [], pp1 = [], pp2 = [];
   cordC.forEach(function (q, j) { art.push([q[0] - 7 + Math.sin(j * 0.9) * 1.4, q[1]]); pp1.push([q[0] + 6.5 + Math.sin(j * 1.3) * 2.2, q[1]]); pp2.push([q[0] + 8 - Math.sin(j * 1.3) * 2.2, q[1]]); });
   o.CORD = HOT("Spermatic cord: on his slide it carries the vas deferens, the testicular artery and the pampiniform plexus. The vas is reached and cut here in a vasectomy.", '<path class="dc-cord" d="' + sm([[384, 210], [392, 208], [398, 230], [404, 300], [408, 352], [398, 362], [386, 356], [382, 300], [377, 236]]) + '"/>');
-  o.CORDV = HOT("Testicular artery, in the spermatic cord beside the vas deferens; a vasectomy leaves it intact.", '<path class="dc-art" d="' + pl(art) + pl(cr([[389, 356], [376, 360], [356, 348], [340, 338]], 5)).replace("M", "L") + '"/>') +
-    HOT("Pampiniform plexus, a plexus of veins in the spermatic cord beside the vas deferens; a vasectomy leaves it intact.", '<path class="dc-pp" d="' + pl(pp1) + pl(cr([[403, 356], [392, 364], [370, 352], [348, 340]], 5)).replace("M", "L") + '"/><path class="dc-pp" d="' + pl(pp2) + '"/>');
+  o.CORDV = HOT("Testicular artery, in the spermatic cord beside the vas deferens; a vasectomy leaves it intact.", '<path class="dc-art" d="' + pl(art) + '"/>') +
+    HOT("Pampiniform plexus, a plexus of veins in the spermatic cord beside the vas deferens; a vasectomy leaves it intact.", '<path class="dc-pp" d="' + pl(pp1) + '"/><path class="dc-pp" d="' + pl(pp2) + '"/>');
+  /* below the cord they run down to the back of the testis, under the epididymis */
+  o.CORDLOW = '<path class="dc-art" d="' + pl(cr([[art[0][0], art[0][1]], [376, 366], [356, 380], [336, 404]], 5)) + '"/><path class="dc-pp" d="' + pl(cr([[pp1[0][0], pp1[0][1]], [392, 372], [362, 388], [338, 410]], 5)) + '"/>';
   return o;
 }
 
@@ -198,7 +200,7 @@ function dcRender(st, D) {
   /* the testis */
   o += D.TESTIS + D.HOT("A seminiferous tubule: blind-ended and highly coiled. Sperm are made in its wall and released into its lumen.", duct(D.SEG.tub, "dc-tubr")) + D.MED;
   o += D.HOT("Tubuli recti (straight tubules): they lead out of the seminiferous tubules into the rete testis.", duct(D.SEG.recti, "dc-tubr")) + D.TUNICA;
-  o += D.EFF + D.HOT("The efferent ductule this sperm takes.", duct(D.SEG.eff, "dc-tubr")) + D.EPI;
+  o += D.CORDLOW + D.EFF + D.HOT("The efferent ductule this sperm takes.", duct(D.SEG.eff, "dc-tubr")) + D.EPI;
   o += D.HOT("Ductus (vas) deferens: a straight tube with a thick muscular wall, lined by pseudostratified columnar cells with stereocilia. It runs up the spermatic cord, over and down behind the bladder (its last part widens, unlabeled here) to join the seminal vesicle's duct.", duct(D.SEG.vas, "dc-vas"));
   o += D.CORD + D.CORDV + D.HOT("Vas deferens, in the spermatic cord.", duct(D.CORDVAS, "dc-vas"));
   /* the vasectomy: two tied ends with a gap */
@@ -238,27 +240,26 @@ function dcRender(st, D) {
   o += D.HOT("The spermatic cord in section: the vas deferens (a thick muscular wall around a small lumen), the testicular artery and the veins of the pampiniform plexus. In a vasectomy only the vas is cut.",
     '<circle class="dc-cord" cx="462" cy="84" r="40"/>' + '<circle class="dc-vasx' + (vas ? " is-cut" : "") + '" cx="450" cy="96" r="14"/><path class="dc-vasl" d="M447 93L453 95L449 99L452 101"/>' + '<circle class="dc-artx" cx="476" cy="66" r="6"/>' +
     [[478, 92], [488, 80], [464, 58], [444, 70], [486, 104], [470, 112], [494, 66]].map(function (q) { return '<circle class="dc-ppx" cx="' + q[0] + '" cy="' + q[1] + '" r="' + (q[0] % 3 ? 4 : 5) + '"/>'; }).join(""));
-  o += '<path class="dc-zoom" d="M432 112L398 214"/>';
-  [["dc-sw-vas", "vas deferens"], ["dc-sw-art", "testicular artery"], ["dc-sw-pp", "pampiniform plexus"]].forEach(function (r, j) { var y = 140 + j * 16; o += '<rect class="' + r[0] + '" x="414" y="' + (y - 8) + '" width="10" height="8" rx="2"/>' + T(428, y, r[1], "tb-xs", "start"); });
+  o += '<path class="dc-zoom" d="M430 108L400 214"/>';
+  [["dc-sw-vas", "vas deferens", ""], ["dc-sw-art", "testicular", "artery"], ["dc-sw-pp", "pampiniform", "plexus"]].forEach(function (r, j) { var y = [142, 158, 186][j]; o += '<rect class="' + r[0] + '" x="424" y="' + (y - 8) + '" width="10" height="8" rx="2"/>' + T(438, y, r[1], "tb-xs", "start") + (r[2] ? T(438, y + 13, r[2], "tb-xs", "start") : ""); });
   /* ---------- the panel (lower left): this segment's lining and job, or the vasectomy result ---------- */
   var S = D.STOPS[s], y = 352, x = 14;
-  o += '<rect class="dc-panel" x="6" y="338" width="148" height="' + (vas ? 262 : 230) + '" rx="10"/>';
+  o += '<rect class="dc-panel" x="6" y="338" width="148" height="262" rx="10"/>';
   D.dcWrap((s + 1) + ". " + S.name, 18).forEach(function (l) { o += T(x, y, l, "s b", "start"); y += 15; });
   y += 4; o += T(x, y, "LINING", "tb-xs dc-cap", "start"); y += 14;
   D.dcWrap(S.lin, 21).forEach(function (l) { o += T(x, y, l, "tb-xs", "start"); y += 13; });
   y += 5; o += T(x, y, "WHAT HAPPENS", "tb-xs dc-cap", "start"); y += 14;
   D.dcWrap(S.job, 21).forEach(function (l) { o += T(x, y, l, "tb-xs", "start"); y += 13; });
   if (vas) {
-    y = Math.max(y + 6, 520);
-    o += T(x, y, "AFTER A VASECTOMY", "tb-xs dc-cap bad", "start"); y += 14;
-    [["sperm", "none"], ["volume", "nearly all"], ["fructose", "present"]].forEach(function (r) { o += T(x, y, r[0], "tb-xs mut", "start") + T(146, y, r[1], "tb-xs b" + (r[1] === "none" ? " bad" : " ok"), "end"); y += 14; });
+    o += '<rect class="dc-panel dc-vbox" x="6" y="8" width="132" height="74" rx="10"/>' + T(14, 26, "AFTER A VASECTOMY", "tb-xs dc-cap bad", "start");
+    [["sperm", "none"], ["volume", "nearly all"], ["fructose", "present"]].forEach(function (r, j) { var yy = 44 + j * 14; o += T(14, yy, r[0], "tb-xs mut", "start") + T(130, yy, r[1], "tb-xs b" + (r[1] === "none" ? " bad" : " ok"), "end"); });
   }
   if (blocked && s >= 6) o += T(D.CUT[0] + 24, D.CUT[1] + 18, "sperm stop here", "tb-xs bad", "start");
   return o;
 }
 function dcSay(st, D) {
   var S = D.STOPS[st.stop], ro = (st.stop + 1) + "/10 · " + S.name.toLowerCase();
-  if (st.vas) return ["Vasectomy: the vas deferens is cut in the spermatic cord, apart from the testicular artery and pampiniform plexus. Sperm can't pass the cut, but the seminal vesicles (about 70% of the volume), the prostate and the bulbourethral glands all join beyond it, so semen keeps nearly all its volume and its fructose, with no sperm." + (st.stop > 6 ? " " + S.name + ": " + S.job : ""), "vasectomy · " + ro];
+  if (st.vas) return ["Vasectomy: the vas deferens is cut in the spermatic cord, apart from the testicular artery and pampiniform plexus. Sperm can't pass the cut, but the seminal vesicles (about 70% of the volume), the prostate and the bulbourethral glands all join beyond it, so semen keeps nearly all its volume and its fructose, with no sperm." + (st.stop > 6 ? " " + S.name + ": " + S.job : ""), "cut · " + ro];
   return [S.say, ro];
 }
 
@@ -275,7 +276,7 @@ export default function ducts() {
     ANIM: true, PLAYMS: 2600, INIT: { stop: 0, vas: false }, STEPKEY: "stop", STEPMAX: 9,
   });
   return makeFig({
-    id: "ducts", lec: "mhisto", fig: "Fig 6", short: "The sperm's route out", hint: "step · play · hover",
+    id: "ducts", lec: "mhisto", fig: "Fig 6", short: "The sperm's route out", hint: "step · hover",
     title: "The sperm's route out",
     caption: "A side view, front of the body to the left: from a seminiferous tubule through the ducts in his order, past the three glands, out through the penis. Step a sperm along it, and cut the vas to see what still reaches the ejaculate.",
     W: 520, H: 604, label: "The male reproductive tract from the side: the testis in section with seminiferous tubules, tubuli recti and the rete testis, the efferent ductules and epididymis, the vas deferens in the spermatic cord, the seminal vesicle, the ejaculatory duct in the prostate, the bulbourethral gland and the urethra in the penis.",
@@ -334,6 +335,7 @@ export default function ducts() {
 .anima .ducts-svg .dc-sw-art{fill:var(--bx-blood)}
 .anima .ducts-svg .dc-sw-pp{fill:var(--bx-blue)}
 .anima .ducts-svg .dc-panel{fill:var(--anatomy-face);stroke:var(--anatomy-lo);stroke-width:1}
+.anima .ducts-svg .dc-vbox{stroke:var(--bx-inhib);stroke-width:1.4}
 .anima .ducts-svg .t.tb-xs{font-size:11px}
 .anima .ducts-svg .t.dc-cap{fill:var(--anatomy-muted);letter-spacing:.06em;font-weight:600}
 `,

@@ -97,7 +97,7 @@ function alRender(st, D) {
 function alSay(st, D) {
   var Lz = D.LES[st.les], G = D.G[st.g], K = D.KIND[Lz.kind];
   if (st.mys && !st.guess) return ["Mystery case. The patient: " + Lz.clue + ". Read the lab slip together: is the problem in the gland itself (primary), or is something outside driving it (secondary)" + (st.g === "pth" ? ", or do the target organs ignore the hormone" : "") + "? Make your call with the buttons below.", "mystery: your call"];
-  if (st.mys) { var ok = st.guess === Lz.kind; return [(ok ? "Right: " : "Not quite: ") + Lz.title + ". " + Lz.sum + " " + G.ruleLong, (ok ? "right: " : "no: ") + K[0].toLowerCase()]; }
+  if (st.mys) { var ok = st.guess === Lz.kind; return [(ok ? "Right: " : "Not quite: ") + Lz.title + ". " + Lz.sum + " " + G.ruleLong, (ok ? "right: " : "answer: ") + K[0].toLowerCase()]; }
   return [(Lz.kind === "n" ? "" : Lz.title + ". ") + Lz.sum + (Lz.kind === "n" ? "" : " " + G.ruleLong), Lz.ro || K[0].toLowerCase()];
 }
 function alSet(st, k, D) {
