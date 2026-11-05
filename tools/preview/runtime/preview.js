@@ -278,7 +278,56 @@
     return rows;
   }
 
-  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$)/;
+  /* Question health (migration_v51, vault/reference/question-health.md): made-up flags on a few of the hub's real ids,
+     one of each kind, plus an id that isn't in the hub. The admin page sends every live question as p_current; Sam's
+     calls (admin_review_question) are kept in the fixtures, so the states move the way they do live. */
+  var QH_KINDS = [
+    { code: "miskey", sev: "high", mcq: true, why: "Possible miskey: choice %c (as written) was picked by 46%, the key by 19% (26 first tries).", also: { code: "below_chance", sev: "high", why: "Below chance: 19% right on the first try (26 people), less than guessing among 4 choices (25%). Check the key." } },
+    { code: "upside_down", sev: "high", why: "Stronger students miss it more: 41% of the top half of the class got it right on the first try, 72% of the bottom half (17 and 18 people). Often a miskey or a trick of wording." },
+    { code: "reported", sev: "high", why: "1 open report from students (Inbox).", report: "Fixture report: I think two of the choices say the same thing." },
+    { code: "very_hard", sev: "medium", why: "Very hard: only 33% right on the first try (21 people). Is the stem clear and the key right?", also: { code: "missed_again", sev: "medium", why: "Missed again after seeing the answer: of 9 people who missed it, only 3 got it right the next time. The key, the explanation or the stem may be unclear." } },
+    { code: "voted_confusing", sev: "medium", why: "3 people say the wording is confusing." },
+    { code: "slow", sev: "low", why: "Slow: the median first try takes 71 s, 2.6 times the hub's median for this kind of question (27 s). Long or confusing stem?" },
+    { code: "abandoned", sev: "low", why: "Often left unanswered: 6 of 14 people who read it for 8 s or more moved on without answering (hub: 9%)." },
+    { code: "expl_skipped", sev: "low", why: "Explanation skipped: 9 of 11 who missed it left the explanation within 3 s. Too long, or not helpful?" }];
+  function qhFixture(hub, cur){
+    var reviews = db.qhReviews || {}, t = now(), out = [];
+    var ids = Object.keys(cur && typeof cur === "object" ? cur : {}).sort(function(x, y){ return hash(hub + "|" + x) - hash(hub + "|" + y); });
+    function info(q){ var c = cur[q]; return c && typeof c === "object" ? c : { v: String(c || "") }; }
+    var mcq = ids.filter(function(q){ var c = info(q); return /^mcq/.test(c.qt || "") && typeof c.key === "number" && c.nch >= 3; });
+    var used = {};
+    QH_KINDS.forEach(function(k, i){
+      var pool = k.mcq ? mcq : ids, q = null;
+      for (var j = 0; j < pool.length; j++) if (!used[pool[j]]) { q = pool[j]; break; }
+      if (!q) return; used[q] = 1;
+      var c = info(q), h = hash("qh|" + hub + q), n1 = k.mcq ? 26 : k.code === "very_hard" ? 21 : 14 + h % 20, c1 = k.mcq ? 5 : Math.round(n1 * (k.code === "very_hard" ? 0.33 : 0.55));
+      var flags = [{ code: k.code, sev: k.sev, src: k.code === "reported" || /^voted/.test(k.code) ? "feedback" : "version", why: k.why.replace("%c", String(((c.key || 0) + 1) % (c.nch || 4) + 1)) }];
+      if (k.mcq) flags[0].choice = ((c.key || 0) + 1) % (c.nch || 4);
+      if (k.also) flags.push({ code: k.also.code, sev: k.also.sev, src: "version", why: k.also.why });
+      var choices = null;
+      if (typeof c.key === "number" && c.nch) { choices = {}; var rest = n1 - c1 - (k.mcq ? 12 : 0), others = [];
+        for (var x = 0; x < c.nch; x++) if (x !== c.key && !(k.mcq && x === flags[0].choice)) others.push(x);
+        others.forEach(function(o, oi){ choices[o] = oi === others.length - 1 ? rest : Math.floor(rest / others.length); rest -= oi === others.length - 1 ? 0 : choices[o]; });
+        choices[c.key] = c1; if (k.mcq) choices[flags[0].choice] = 12; }
+      out.push({ hub: hub, qid: q, in_hub: true, v: c.v || "", versions: 1 + (i === 3 ? 1 : 0), v_since: iso(t - (20 + i) * 864e5), qt: c.qt || "", nch: c.nch || null, key: typeof c.key === "number" ? c.key : null,
+        n1: n1, c1: c1, choices: choices, nr: n1 + 9, cr: c1 + 5, nrm: 9, crm: 3, nt: n1, med_ms: k.code === "slow" ? 71000 : 22000 + h % 12000, hub_med_ms: 27000, engaged: 14, abandoned: k.code === "abandoned" ? 6 : 1, hub_abandon: 0.09,
+        answers: n1 + 9, miss_n: n1 - c1, miss_quick: k.code === "expl_skipped" ? 9 : 2, expl_med_ms: 6400, expl_acts: 0.2, du: 17, pu: 0.41, dl: 18, pl: 0.72,
+        a_n1: null, a_c1: null, a_nrm: null, a_crm: null, a_du: null, a_pu: null, a_dl: null, a_pl: null, a_attempts: null, a_correct: null, a_choices: null,
+        up: 2, down: k.code === "voted_confusing" ? 3 : 0, reasons: k.code === "voted_confusing" ? { confusing: 3 } : {}, reports_open: k.report ? 1 : 0,
+        reports: k.report ? [{ id: 8900 + i, note: k.report, resolved: false, at: iso(t - 864e5), reply: null }] : null, flags: flags, score: flags.reduce(function(s, f){ return s + (f.sev === "high" ? 3 : f.sev === "medium" ? 2 : 1); }, 0) });
+    });
+    out.push({ hub: hub, qid: "fixture-renamed-id", in_hub: false, v: "old", versions: 1, v_since: iso(t - 40 * 864e5), qt: "mcq", nch: 4, key: 1, n1: 30, c1: 21, choices: null, up: 0, down: 0, reasons: {}, reports_open: 0, reports: null,
+      flags: [{ code: "gone", sev: "low", src: "ids", why: "This id has class data but isn't in the hub any more. Renamed or removed? Ids are permanent (tools/question-ids/)." }], score: 1 });
+    out.forEach(function(r){
+      var rv = reviews[hub + "|" + r.qid], codes = r.flags.map(function(f){ return f.code; });
+      r.review_status = rv ? rv.status : null; r.review_v = rv ? rv.v : null; r.review_flags = rv ? rv.flags : null; r.review_note = rv ? rv.note : null; r.review_at = rv ? rv.at : null;
+      r.state = rv && rv.status === "fix" ? (rv.v === r.v ? "todo" : "changed")
+        : rv && (rv.status === "ok" || rv.status === "fixed") && rv.v === r.v && codes.every(function(cd){ return (rv.flags || []).indexOf(cd) >= 0; }) ? "reviewed" : "new";
+    });
+    return out.sort(function(x, y){ return y.score - x.score; });
+  }
+
+  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
   function synthAdmin(fn){
     var d = 864e5, t = now();
@@ -439,9 +488,11 @@
         if (fn === "set_report_resolved") db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
         if (fn === "admin_hide_pod_comment") { db.podHidden = db.podHidden || {}; db.podHidden[a.p_id] = !!a.p_hidden; }
         if (fn === "admin_post_notice") db.notices.push({ title: a.p_title, message: a.p_message, at: iso(now()) });
+        if (fn === "admin_review_question") { db.qhReviews = db.qhReviews || {}; var rk0 = a.p_hub + "|" + a.p_qid;
+          if (!a.p_status) delete db.qhReviews[rk0]; else db.qhReviews[rk0] = { status: a.p_status, v: a.p_v, flags: a.p_flags || [], note: a.p_note || null, at: iso(now()) }; }
         save(); return { write: true, data: null };
       }
-      return { data: synthAdmin(fn) };
+      return { data: fn === "get_question_health" ? qhFixture(a.p_hub, a.p_current) : synthAdmin(fn) };
     }
     var v = a.p_visitor, hub = a.p_hub, t = now();
     switch (fn) {

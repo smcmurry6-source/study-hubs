@@ -32,6 +32,31 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-04 (Question health for every hub, Claude Code)** — Sam: "Build a question-health system for all hubs. Create
+  stable question IDs, track accuracy, retries, time/abandonment, explanation engagement, and feedback; flag likely-quality
+  problems for admin review without automatically deleting or changing educational content." How it works and every
+  threshold: [vault/reference/question-health.md](vault/reference/question-health.md). In short:
+  - **Stable ids**: `tools/question-ids/<hub>.txt` registers every id each hub has shipped (written from the live banks,
+    plus ids with class data that are no longer in a hub, marked retired); `tools/ci/smoke.js` fails a renamed or deleted
+    id and a retired id that comes back, and a local run adds new ids. New rule:
+    [question-ids-are-permanent](vault/rules/question-ids-are-permanent.md). Versions: a fingerprint of what SH_EXPORT
+    shows of a question, so an edited question starts fresh numbers.
+  - **Tracking**, `widget/qhealth.js` (loaded by v3.js, no hub code): per answer, which try it was for that person, the
+    previous result and gap, the choice, active time before answering and on the explanation after, and taps in the
+    explanation; a card read 3 s or more and left unanswered is a view (abandonment). Batched to `record_qh`
+    (`migration_v51.sql`, applied 2026-11-04: `question_versions`, `question_events`, `question_feedback`,
+    `question_reviews`). `sw.js` → `sh-v55`.
+  - **"Good question?"**: a thumbs up/down under every explanation, with a reason on a thumbs down (`qh_vote`); on the
+    About page.
+  - **Flags for review**: `qh_report(hub)` (SQL connector) and the admin page's new **Question health** tab (`review/`):
+    below chance, very hard, possible miskey, stronger students missing it more, missed again, open reports, thumbs
+    reasons, disliked, slow, often left unanswered, explanation skipped, ids not in the hub. Sam marks each Looks fine /
+    Needs a fix / Fixed with a note (`admin_review_question`, metadata only); a new flag or a new version brings it back.
+    New rule: [question-health-flags-are-leads](vault/rules/question-health-flags-are-leads.md): **nothing changes,
+    hides or deletes a question automatically.** The lessons refresh now reads the list (`tools/lessons-refresh.md`).
+  - Timing, abandonment, the explanation and thumbs count from today; accuracy, miskey, retries and top-vs-bottom fall
+    back to every answer ever (`personal_answers`, `question_choices`) until a version has 10 first tries. First run on
+    the live data: 10 Perio questions to review (one possible miskey, q4-06).
 - **2026-11-04 (admin page redesign; who's studying now, hub archive overrides, newest-first check-ins, Claude Code)** — Sam's
   asks: safer admin operations, then "a full optimization of the admin page. Its clunky and not user friendly". **The page**
   (`review/`) is rebuilt with the taste-skill's app-screen run: a sidebar of views (Overview, Live, Inbox; Insights, Time by
