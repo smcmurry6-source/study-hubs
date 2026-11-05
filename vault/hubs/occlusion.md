@@ -7,7 +7,7 @@ status: live
 
 # Occlusion
 
-Dr. Givan's D2 Occlusion course. Two exams: the midterm (Wed Oct 21, L1-L5, done) and the **final (Mon Nov 16 at 6:30 pm, moved up from Thu Nov 19;
+Dr. Givan's D2 Occlusion course. Two exams: the midterm (Wed Oct 21, L1-L5, done) and the **final (Mon Nov 16, 6:30-7:45 pm, the midterm's window, moved up from Thu Nov 19;
 not comprehensive: L6 on, building on the midterm)**. The hub now leans to the final. Dates and check-in hours: `HUBS` in
 `index.html`.
 
@@ -16,9 +16,9 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 - **Source:** `hubs/occlusion/index.html` (single file), except the generated blocks below.
 - **Lectures:** L1-L5 carry `exam:'midterm'`, L6 `instruments` and L7 `malocclusion` carry `exam:'final'`.
   **Each new final lecture:** add it with `exam:'final'`, add it to `MOCK_BLUEPRINT`, and update `EXAM_INFO`.
-- **The final's length and format** aren't announced: `FINAL_TIME` is `'18:30'`, `FINAL_CLOSES` is still null (Home then
-  says when the final started instead of "on now"), and the dashboard's check-in waits for 8 pm (`checkinHour:20`)
-  ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
+- **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
+  `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
+  window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
 - **Built on** the MSK Exam 4 engine; palette "articulating paper" (Bricolage Grotesque / Public Sans / JetBrains Mono).
   It is the model other hubs copy for `two()`, `tf()`, `nums()`, `choiceOrder()`, `whyHTML`, shared patients (`CASES`,
   `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).

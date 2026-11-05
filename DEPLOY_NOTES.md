@@ -32,13 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-05 (Occlusion final moves to Mon Nov 16 at 6:30 pm, Claude Code)** — Sam: the final moves up from Thu Nov 19.
-  `hubs/occlusion`: `FINAL_DATE` `2026-11-16`, `FINAL_TIME` `'18:30'` (Home now counts down days, hours and minutes), `EXAM_INFO`,
-  the Home hero, exam card, hints banner, timeline, header title and header pill ("Final tonight"). `FINAL_CLOSES` stays null
-  because the length isn't announced: `countdownHTML()` then says "The final started at 6:30 pm" instead of "on now" and calls it
-  done the next day. Dashboard `HUBS`: the final's date, `checkinHour:20` (the check-in button no longer shows from 8 am before an
-  evening exam; the pop-up keeps the 10 pm default, which is also when the hub archives) and the card text. No notes text changed,
-  so no narration. Still waiting on length and format: [task](vault/tasks/2026-11-03-occlusion-final-time-and-format.md).
+- **2026-11-05 (Occlusion final moves to Mon Nov 16, 6:30-7:45 pm, Claude Code)** — Sam: the final moves up from Thu Nov 19,
+  same time window as the midterm. `hubs/occlusion`: `FINAL_DATE` `2026-11-16`, `FINAL_TIME` / `FINAL_CLOSES` `'18:30'` / `'19:45'`
+  (Home now counts down days, hours and minutes, then "on now" until 7:45, then done), `EXAM_INFO`, the Home hero, exam card, hints
+  banner, timeline, header title and header pill ("Final tonight", "Exams done" after 7:45). Dashboard `HUBS`: the final's date,
+  `checkinHour:20, promptHour:20` (check-in after the window closes, not from 8 am before an evening exam) and the card text. No
+  notes text changed, so no narration. Still waiting on the format: [task](vault/tasks/2026-11-03-occlusion-final-time-and-format.md).
 - **2026-11-05 (arcade crossword can be started again, Claude Code, BUG-024)** — Sam: "the arcade crossword is broken." Opening
   the crossword (Cross-Section; Crossing Over, Cross-Slice and the other skins) showed an empty 30 px strip on every hub, laptop
   and phone: before a puzzle starts the stage holds only the intro overlay, which is absolutely placed, so the stage had no

@@ -1708,7 +1708,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
     <div class="hub-header-top">
       <div class="hub-title">
         <a id="sh-ribbon-back" class="hub-back-btn" href="../../index.html" aria-label="All hubs" title="All hubs"></a>
-        <h1 title="Dr. Givan's lectures · Final, Mon Nov 16 at 6:30 pm (not comprehensive: the lectures from 10/22 on) · Midterm done Oct 21">Occlusion Final</h1>
+        <h1 title="Dr. Givan's lectures · Final, Mon Nov 16, 6:30-7:45 pm (not comprehensive: the lectures from 10/22 on) · Midterm done Oct 21">Occlusion Final</h1>
       </div>
       <nav id="modeSwitch" role="tablist" aria-label="Study mode">
         <button role="tab" type="button" data-mode="home" aria-selected="true"><span class="mode-icon" data-ic="home"></span><span class="mode-label">Home</span></button>
@@ -1808,17 +1808,17 @@ var FINAL_DATE = '2026-11-16';
 /* Dr. Givan's midterm email (10/20): Canvas with LockDown Browser + Monitor, 6:30 pm, one hour, log in from 6:25,
    window closes 7:45. Shown on Compendium until the window closes (examCardHTML). */
 var EXAM_TIME = '18:30', EXAM_CLOSES = '19:45';
-/* The final (Mon Nov 16, 6:30 pm; moved up from Thu Nov 19, Sam 2026-11-05): not comprehensive, Dr. Givan's lectures
-   from 10/22 on, building on the midterm material. Length and format not announced yet; update EXAM_INFO and
-   FINAL_CLOSES when they are. */
+/* The final (Mon Nov 16; moved up from Thu Nov 19, Sam 2026-11-05): the midterm's time window, 6:30 pm, closing at
+   7:45. Not comprehensive, Dr. Givan's lectures from 10/22 on, building on the midterm material. Format not announced
+   yet; update EXAM_INFO and the mock when it is. */
 var EXAM_INFO = [
   ['What', 'Dr. Givan\'s lectures from 10/22 on: L6 and L7 so far, with more added here as they are taught. The final is not comprehensive, but it builds on the midterm material.'],
-  ['When', 'Monday, November 16, at 6:30 pm (moved up from Thursday, November 19). The length and format haven\'t been announced yet; this card will change when they are.'],
+  ['When', 'Monday, November 16, 6:30 pm, the same time window as the midterm: it closes at 7:45 pm. Moved up from Thursday, November 19. The format hasn\'t been announced yet; this card will change when it is.'],
   ['So far', 'L6, Occlusal Instrumentation (10/22): the three kinds of articulator, the facebow, CR, MIP and eccentric records, and how to choose an articulator. L7, Malocclusion and Dysfunction (10/29): functional disturbances and TMD, the five etiologies, splints and occlusal therapy, mobility, wear and bruxism.'],
   ['Midterm lectures', 'L1-L5 stay in the hub for review. The final builds on them, so the terms (CR, CO, MIP), guidance and the determinants still matter.']
 ];
-/* the final's start and end ('HH:MM'), for Home's countdown: FINAL_CLOSES stays null until the length is announced */
-var FINAL_TIME = '18:30', FINAL_CLOSES = null;
+/* the final's start and end ('HH:MM'), for Home's countdown and the header pill: the midterm's window */
+var FINAL_TIME = '18:30', FINAL_CLOSES = '19:45';
 /* the course so far and what's announced, for Home's timeline (add each new lecture and any quiz or review date) */
 var COURSE_DATES = [
   { date:'2026-09-17', label:'L1 Review of Basic Occlusion' },
@@ -10063,6 +10063,7 @@ function renderHeaderStats(){
     var finalNext = now >= new Date(EXAM_DATE + 'T' + EXAM_CLOSES + ':00');
     var what = finalNext ? 'final' : 'midterm';
     var days = calDays(now, finalNext ? FINAL_DATE : EXAM_DATE);
+    if(now >= new Date(FINAL_DATE + 'T' + FINAL_CLOSES + ':00')) days = -1;
     cd.textContent = days > 1 ? (days + ' days to ' + what) : days === 1 ? (finalNext ? 'Final tomorrow' : 'Midterm tomorrow') : days === 0 ? (finalNext ? 'Final tonight' : 'Midterm tonight') : 'Exams done';
   }
 }
@@ -10312,15 +10313,14 @@ function lecProgress(l){
   var st = STATE.lecStats[l.id] || { a:0, c:0 };
   return { l:l, total:qs.length, tried:tried, right:right, missed:missed, a:st.a, pct: st.a ? Math.round(st.c / st.a * 100) : null };
 }
-/* counts down to FINAL_TIME (whole days while it's null); without FINAL_CLOSES (the length isn't announced) it says when
-   the final started instead of claiming it's still on, and calls it done the next day */
+/* counts down to FINAL_TIME (whole days while it's null), "on now" until FINAL_CLOSES, then done */
 function countdownHTML(){
   var now = new Date();
   function u(n, w){ return '<span class="hc-unit"><b>' + n + '</b><small>' + w + (n === 1 ? '' : 's') + '</small></span>'; }
   if(FINAL_TIME){
-    var s = new Date(FINAL_DATE + 'T' + FINAL_TIME + ':00'), e = FINAL_CLOSES ? new Date(FINAL_DATE + 'T' + FINAL_CLOSES + ':00') : null;
-    if(e ? now >= e : calDays(now, FINAL_DATE) < 0) return '<div class="home-count is-done"><b>The final is done.</b><span>Tell the class how it went with Check in on the dashboard.</span></div>';
-    if(now >= s) return '<div class="home-count is-live"><b>' + (e ? 'The final is on now.' : 'The final started at 6:30 pm.') + '</b><span>Good luck!</span></div>';
+    var s = new Date(FINAL_DATE + 'T' + FINAL_TIME + ':00'), e = new Date(FINAL_DATE + 'T' + FINAL_CLOSES + ':00');
+    if(now >= e) return '<div class="home-count is-done"><b>The final is done.</b><span>Tell the class how it went with Check in on the dashboard.</span></div>';
+    if(now >= s) return '<div class="home-count is-live"><b>The final is on now.</b><span>Good luck! The window closes at 7:45 pm.</span></div>';
     var ms = s - now;
     return '<div class="home-count" role="timer" aria-label="Time until the final">' + u(Math.floor(ms / 864e5), 'day') + u(Math.floor(ms % 864e5 / 36e5), 'hour') + u(Math.floor(ms % 36e5 / 6e4), 'minute') + '</div>';
   }
@@ -10390,7 +10390,7 @@ function renderHome(){
   var finLecs = LECTURES.filter(function(l){ return l.exam === 'final'; });
   var h = '<section class="home-hero">' +
     '<div class="hh-main"><p class="hh-kicker">Occlusion · Dr. Givan</p><h2>The final</h2>' +
-      '<p class="hh-when">' + icon('calendar') + 'Monday, November 16 · 6:30 pm · format not announced yet</p>' +
+      '<p class="hh-when">' + icon('calendar') + 'Monday, November 16 · 6:30-7:45 pm · format not announced yet</p>' +
       '<div id="homeCount">' + countdownHTML() + '</div>' +
       '<div class="hh-chips"><span>Not comprehensive</span><span>The lectures from 10/22 on</span><span>' + finLecs.map(lecLabel).join(', ') + ' so far</span><span>Builds on the midterm</span></div></div>' +
     '<div class="hh-ready">' + ringSVG(total ? Math.round(right / total * 100) : 0) + '<div class="hh-ready-txt"><b>' + right + ' of ' + total + '</b><span>questions for the final right on your latest try</span>' +
@@ -10811,7 +10811,7 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Monday, November 16, at 6:30 pm</b> (moved up from Thursday, November 19). Not comprehensive: Dr. Givan\'s lectures from 10/22 on (L6 and L7 so far), building on the midterm material. Its length and format haven\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Monday, November 16, 6:30-7:45 pm</b> (the midterm\'s time window, moved up from Thursday, November 19). Not comprehensive: Dr. Givan\'s lectures from 10/22 on (L6 and L7 so far), building on the midterm material. Its format hasn\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
     likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   lecOrder().forEach(function(l){
