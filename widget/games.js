@@ -90,7 +90,21 @@
     if (t.indexOf(" ") < 0 && /(ed|ly)$/.test(low)) return false;     /* single emphasis words: "maintained", "anteriorly" */
     return true;
   }
-  function sentencesOf(text){ return (text.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g) || []).map(function(s){ return s.trim(); }); }
+  /* A sentence ends at . ! or ? (with any closing bracket or quote) before a space, unless the period ends an abbreviation or
+     what follows is a plain lower-case word or a comma (a term like "rhPDGF-BB" or "kVp" can still start one). The old split
+     cut at any period not followed by a space and dropped what came before it, so "U.S.", "et al.", "3.08 mm" and ".)" left
+     clues like ") The decision to swallow..." or ", 1969: an intimate bone-to-implant contact". */
+  var ABBR = /(?:^|[\s(])(?:e\.g|i\.e|vs|etc|al|approx|cf|Dr|Drs|Fig|Figs|Mr|Mrs|Ms|St|U\.S|U\.K)$/;
+  function sentencesOf(text){
+    var out = [], start = 0, re = /[.!?]+["'”’)\]]*(?=\s|$)/g, m, end, next;
+    while ((m = re.exec(text))){
+      end = m.index + m[0].length; next = text.slice(end).replace(/^\s+/, "");
+      if (next && (/^(?:[,;:]|[a-z][a-z'’]*(?:-[a-z]+)*(?![A-Za-z0-9]))/.test(next) || (m[0].charAt(0) === "." && ABBR.test(text.slice(start, m.index))))) continue;
+      out.push(text.slice(start, end).trim()); start = end;
+    }
+    if (text.slice(start).trim()) out.push(text.slice(start).trim());
+    return out;
+  }
   var clozeCache = {};
   function buildCloze(lec, html){
     var d = document.createElement("div"); d.innerHTML = html;
@@ -675,12 +689,20 @@
 
   /* =================================================================== CROSS-SECTION (mini crossword) */
   function normWord(s){ return String(s || "").toUpperCase().replace(/[^A-Z]/g, ""); }
+  /* does this clue show the word (or its plural)? */
+  function clueNames(clue, w){
+    return new RegExp("(^|[^a-z])" + String(w).toLowerCase().replace(/[^a-z0-9]/g, "\\$&") + "(s|es)?(?![a-z])", "i").test(String(clue || ""));
+  }
+  /* Two words never share a puzzle when either clue shows the other's answer: clues cut from one sentence of the notes with a
+     different word blanked ("The adrenal ___ ... the medulla" and "The adrenal cortex ... the ___"), or a question stem that
+     names another answer. Before this, about half the puzzles had such a pair. */
+  function cluesClash(a, b){ return clueNames(a.c, b.w) || clueNames(b.c, a.w); }
   function Cross(g, C){
     var root, stage, S, running = false, hidden, clockT = 0;
     function build(words){
       var best = null;
       for (var attempt = 0; attempt < 40; attempt++){
-        var list = shuffled(words).slice(0, 16), G = {}, placed = [];
+        var list = shuffled(words).slice(0, 24), G = {}, placed = [];
         var get = function(x, y){ return G[x + "," + y]; };
         var canPlace = function(w, x, y, dir){
           var dx = dir === "A" ? 1 : 0, dy = dir === "D" ? 1 : 0, cross = 0;
@@ -696,6 +718,7 @@
         put(list[0], 0, 0, "A");
         for (var k = 1; k < list.length && placed.length < 9; k++){
           var t = list[k], w = t.w, opts = [];
+          if (placed.some(function(p){ return cluesClash(p.t, t); })) continue;
           Object.keys(G).forEach(function(key){
             var p = key.split(","), gx = +p[0], gy = +p[1], ch = G[key];
             for (var i = 0; i < w.length; i++){ if (w[i] !== ch) continue;
