@@ -17,6 +17,7 @@ update it in the PR that fixes it.
 
 | ID | Found | Severity | Problem | Owner | Status | Fix | Retest |
 |---|---|---|---|---|---|---|---|
+| BUG-014 | 2026-11-04, CI `a11y.js` on PR 235 | S3 | Perio: the Review sidebar and the mock-exam bar were sticky at fixed offsets (70 px, 58 px) that assume a one-row top bar; with the bar stacked in two rows the sidebar's top slid under it (axe target-size on the "All sessions" chip) | Claude Code | fixed (awaiting retest) | the top bar PR: both follow `--sh-head-h` | |
 | BUG-013 | 2026-11-04, top-bar audit at the largest text size | S4 | At XX-Large text on a 390 px phone, the widget's Settings sheet button rows (`.shset-seg`) and Timmy's speech bubble on the dashboard (`.shpet-say`) are wider than the screen | unassigned | open | | |
 | BUG-012 | 2026-11-04, header audit | S3 | Perio's arcade leaderboard tabs (`.ar-board-tabs`) scrolled past the edge behind a hidden scrollbar; the later games' boards were out of sight | Claude Code | fixed (awaiting retest) | the top bar PR: the tabs wrap | |
 | BUG-011 | 2026-11-04, header audit | S3 | Dashboard: at 320 px the theme button sat past the screen's edge (the page scrolled sideways 30 px); the Arcade high scores' hub and game rows hid most of their buttons past the edge at every width | Claude Code | fixed (awaiting retest) | the top bar PR: the buttons wrap onto their own row; the arcade rows wrap | |

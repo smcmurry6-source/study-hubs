@@ -95,6 +95,15 @@ into view at every width.
 - **Largest text, page content:** the largest text exposed two more rows wider than a phone, fixed here: Home's "Where to
   next" (shared guard in `widget/v3.css`, 5 hubs) and Perio's course-map titles (`overflow-wrap`).
 
+## CI ("Release tests")
+
+- Accessibility: one new finding from this PR, fixed (BUG-014: Perio's Review sidebar was sticky at a fixed 70 px and slid under
+  the two-row bar). One finding that `main` already had (Perio Review, `#ref-antibiotics > .table-wrap` not keyboard-scrollable;
+  also on PR 237's run) is left for its own change.
+- Devices (`matrix.js`): `main` fails 51 problems in WebKit and Firefox (PR 237's run), mostly pages scrolling 11-67 px sideways
+  on phones and tablets. This PR clears all of them except one that `main` already had: Perio's Arcade scrolls 6 px sideways on
+  WebKit and Firefox phones (not Chromium, which this session has; not reproduced here).
+
 ## Bugs
 
 BUG-010 (S2), BUG-011 (S3), BUG-012 (S3): fixed here. BUG-013 (S4): found at the largest text, not fixed here
