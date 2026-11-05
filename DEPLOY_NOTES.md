@@ -32,6 +32,27 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-05 (question health: every flagged question reviewed, Claude Code)** — Sam: "review and fix all questions flagged
+  for question health". `qh_report` listed 33 to review on the live hubs (PCD Implants 14, Perio 10, Occlusion 9; none on
+  Special Patient Care or Heme & Endo Exam 2). Each was read against its hub's notes: **every key matches the notes**, and
+  no question was removed. Same ids throughout; no notes text changed, so no narration or podcast change.
+  **PCD Implants** (exam tomorrow): `in-bh` stem ("the three implant systems the school's clinic uses"), `bm-25lb`,
+  `bm-occ-two` and `im-process` explanations now say why the popular wrong answer is wrong (the lever's 25 + 50 = 75 lb;
+  pull-through is the single-implant check in MI; the radiographic guide is worn during the scan); why lines only for
+  `ev-blade`, `ev-hader`, `ev-frialit` (versions kept). The subperiosteal drawing `ty-sub` (`ev-pic-sub`) had its lattice
+  12 px below the crest, so it read as in the bone (half the recent tries picked "Blade"): it now rides the crest
+  (`tools/figures/pcd-implants-exam1/types.mjs`, rebuilt). **Perio**: `q3-04` and `q3-08` had a second defensible answer
+  because the exam-review guide and the class notes word the prognosis systems differently (the notes call McGuire &
+  Nunn "tooth retention" and say it can be given for the whole dentition): `q3-04`'s distractor is now Miller & McEntire's
+  own ("A numeric score of how likely a molar is to be retained", same slot), `q3-08` asks about prognosis systems and says
+  McGuire & Nunn is also given tooth by tooth, and `q3-S03` (not flagged, same problem) has a statement 1 that is false by
+  both sources; `q4-06`'s key reads "S204SD9 sickle scaler" (only the wrong H6/7 said "scaler"); `q4-15`'s explanation no
+  longer says "don't read the class off the millimeters". Every changed choice keeps its slot's meaning, so no
+  `question_choices` rows need clearing. **Looks fine, no change** (for Sam to mark on the admin page): PCD `bm-sizes`,
+  `bm-occ-goals`, `tm-2s-6`, `tm-mm-1`, `ev-misch` (keys confirmed; small recent groups), `tm-mm-2` (fixed in #252);
+  Perio `q3-M01` and `q2-P01` (their low numbers are the 7-option versions cut to 5 on 10-01), `q1-P05`, `q4-M05`,
+  `q4-02`, `q4-L34` (kept as taught); Occlusion all nine (midterm lectures, all-time data, explanations already name the
+  favorite wrong choice since the 10-20 and 10-27 audits). `LESSONS.md`: four question-writing lessons. Hub notes updated.
 - **2026-11-05 (perio S8: host modulation from the Nov 5 class, and the dosing chart, Claude Code)** — Sam: "update the perio
   hub with the files I added": `litz nov5.txt` in Drive, Periodontology/hubs, Dr. Litz's Nov 5 class (a short antibiotics recap,
   then all of host modulation). `hubs/perio`, S8 only: the host modulation section rewritten at both levels from the class (what

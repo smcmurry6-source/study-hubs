@@ -58,6 +58,18 @@ What each signal tells an author, and what to do with it in the next hub (and in
   that id). If it is fair, the concept is hard: add it to exam hints / the cram sheet and to the Daily Drill's
   high-yield pool, and cover it more clearly in the notes.
 - **By type**: matching and sequence items score far lower (see below); use them sparingly and grade per pair.
+- **Two sources, two wordings** (question health, 2026-11-05): when the exam-review guide and the class word a concept
+  differently, a distractor taken from one source's wording can be the other source's right answer. Perio's guide gives
+  "likelihood of retaining the tooth" to Miller & McEntire, but the class notes call McGuire & Nunn "tooth retention" and
+  say it can be given for the whole dentition, so `q3-04` (25% first try) and `q3-08` (stronger students missed it more)
+  had a second defensible answer. Tell things apart by what both sources agree on (Miller & McEntire: molars, a number).
+- **The stem's word in one choice only** pulls picks to it: perio `q4-06` asked "Which scaler..." and only the wrong
+  "H6/7 sickle scaler" said scaler, while the key was a bare "S204SD9". Name every choice the same way.
+- **A picture must sit where the thing sits**: PCD Implants' subperiosteal drawing had its lattice 12 px below the crest,
+  so it read as set into the bone, and half of the recent tries picked "Blade". Draw on-the-bone parts on the crest line.
+- **A flag on 8-10 recent first tries**: read it beside the all-time numbers before acting. The night before the PCD
+  Implants exam, most of its "possible miskey" flags were small recent groups on keys the notes confirm (`ev-pic-sub` 2 of
+  8 since 11-04, 21 of 32 ever).
 - **By source**: what the professor put in class quizzes and polls is what students practise most and what exams
   echo. Mine those first; tag `src`.
 - **Exam check-ins** ("Hub was harder/easier", "Exam asked different things", and what it missed): calibrate

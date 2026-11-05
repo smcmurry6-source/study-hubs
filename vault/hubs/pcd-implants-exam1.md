@@ -55,6 +55,14 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   `qs=practice` (`data-qs`), apart from the row's `home=least:<ids>`.
 - **`tm-mm-2`** (platform switching) is 3 right of 5 since 2026-11-05: "Decreases soft tissue volume" replaced "Increases soft
   tissue volume" (the notes: it increases), same id. Its old class picks and accuracy were cleared once it went live (Sam's OK, 2026-11-05), so its numbers start at 0.
+- **Question health, 2026-11-05** (Sam: "review and fix all questions flagged"): all 14 flagged items were checked
+  against the notes and every key matched; most flags came from the 8-10 people counted since 11-04, whose numbers
+  differ from the all-time ones. Rewritten (new versions): `in-bh` (stem: "the three implant systems the school's clinic
+  uses"), `bm-25lb` (the explanation does the lever: 25 lb bite + 50 lb on the other implant = 75 lb on the fulcrum),
+  `bm-occ-two` (pull-through is the single-implant check in MI; implant against implant drags in forceful biting) and
+  `im-process` (the guide comes first because it's worn during the scan). Why lines only (same versions): `ev-blade`,
+  `ev-hader`, `ev-frialit`. The subperiosteal drawing (`ty-sub`, `ev-pic-sub`) now has its lattice on the crest; it
+  sat 12 px into the bone and half the recent tries picked "Blade". `tm-mm-2` was already fixed (#252).
 - **Statement keys were a pattern until 2026-11-04** (suggestion #14): 36 of 46 two-statement keys were "1 true, 2 false",
   statement 1 was true in all 30 numbered items and the second choice was the key in 23. The evening audit swapped,
   reordered and rewrote them (12 / 11 / 11 / 12 over the four two-statement choices; numbered keys 7 / 8 / 8 / 7 by

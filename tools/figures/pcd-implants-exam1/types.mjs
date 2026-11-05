@@ -172,12 +172,15 @@ function film(crest, seed, x0 = 22, x1 = 308) {
 
 /* ================================================================== A. Subperiosteal */
 function sub() {
+  /* the lattice lies ON the ridge: its top rail rides the crest (T) and the lower rail (B) is the frame draped down over
+     the bone, so it can't be read as something set into the bone (ev-pic-sub, 2026-11-05: half picked "Blade") */
+  const T = -1, B = 12, M = (T + B) / 2;
   const posts = [120, 146, 184, 210], strut = (dy, a, b) => P(range(a, b, 30).map((x) => [x, crestY(x) + dy]));
-  let fr = `<path d="${strut(12, 113, 217)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/><path d="${strut(25, 116, 214)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/>`;
-  fr += `<path d="M113 ${f(crestY(113) + 12)}Q108 ${f(crestY(113) + 19)} 116 ${f(crestY(116) + 25)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/><path d="M217 ${f(crestY(217) + 12)}Q222 ${f(crestY(217) + 19)} 214 ${f(crestY(214) + 25)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/>`;
-  [132, 158, 172, 197].forEach((x) => { fr += `<path d="M${x} ${f(crestY(x) + 12)}L${x + 3} ${f(crestY(x) + 25)}" stroke="${C.metal}" stroke-width="2" fill="none"/>`; });
-  posts.forEach((x) => { const c = crestY(x); fr += `<path d="M${x} ${f(c + 25)}L${x} ${f(c - 1)}" stroke="${C.metal}" stroke-width="3" fill="none"/><rect x="${x - 3.2}" y="${f(c - 19)}" width="6.4" height="19" rx="1.5" fill="${C.metal}"/><circle cx="${x}" cy="${f(c - 21)}" r="4.8" fill="${C.metal}"/>`; });
-  const body = pano(7) + fr + mark(1, 165, 120, 147, crestY(146) - 24) + mark(2, 165, 258, 165, crestY(165) + 25.5);
+  let fr = `<path d="${strut(T, 113, 217)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/><path d="${strut(B, 116, 214)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/>`;
+  fr += `<path d="M113 ${f(crestY(113) + T)}Q108 ${f(crestY(113) + M)} 116 ${f(crestY(116) + B)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/><path d="M217 ${f(crestY(217) + T)}Q222 ${f(crestY(217) + M)} 214 ${f(crestY(214) + B)}" stroke="${C.metal}" stroke-width="2.6" fill="none"/>`;
+  [132, 158, 172, 197].forEach((x) => { fr += `<path d="M${x} ${f(crestY(x) + T)}L${x + 3} ${f(crestY(x) + B)}" stroke="${C.metal}" stroke-width="2" fill="none"/>`; });
+  posts.forEach((x) => { const c = crestY(x); fr += `<path d="M${x} ${f(c + B)}L${x} ${f(c - 1)}" stroke="${C.metal}" stroke-width="3" fill="none"/><rect x="${x - 3.2}" y="${f(c - 19)}" width="6.4" height="19" rx="1.5" fill="${C.metal}"/><circle cx="${x}" cy="${f(c - 21)}" r="4.8" fill="${C.metal}"/>`; });
+  const body = pano(7) + fr + mark(1, 165, 120, 147, crestY(146) - 24) + mark(2, 165, 258, 165, crestY(165) + B + 0.5);
   const S = section(104, 212);
   let sec = boneSec(S, 11) + softSec(S, 150);
   const onB = S.off(3, (p) => p[1] <= 168);
