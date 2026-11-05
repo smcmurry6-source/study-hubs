@@ -1,6 +1,6 @@
 {
  "about": "Per-page budgets for tools/release/perf.js, measured as a mid-range phone on slow 4G (see the script). kb = bytes over the wire without narration or video; fcp, lcp, tbt in ms. Raise one only with a reason in the PR that Sam approves; lower them when a page gets lighter.",
- "updated": "2026-11-04",
+ "updated": "2026-11-05",
  "profile": "slow 4G, CPU 4x, 412x823 phone",
  "pages": {
   "index.html": {
@@ -72,6 +72,13 @@
    "fcp": 1500,
    "lcp": 2500,
    "tbt": 500
+  },
+  "hubs/heme-endo-exam2/": {
+   "kb": 1330,
+   "requests": 33,
+   "fcp": 2000,
+   "lcp": 5500,
+   "tbt": 1000
   }
  }
 }

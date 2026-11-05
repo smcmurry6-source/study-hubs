@@ -167,9 +167,9 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="heme-endo-exam1"] .arch-confirm')), 'the confirmation names the end time');
     await confirm(page, 'heme-endo-exam1');
     cards = await dashboard(ctx);
-    ok((card(cards, 'Heme') || {}).open, 'reopened: the dashboard shows Heme & Endo open before its end time');
+    ok((card(cards, 'Heme & Endo Exam 1') || {}).open, 'reopened: the dashboard shows Heme & Endo open before its end time');
     cards = await dashboard(ctx, '&now=2026-11-10T19:00');
-    ok(!card(cards, 'Heme'), 'after its end time Heme & Endo goes back to its dates (no card)');
+    ok(!card(cards, 'Heme & Endo Exam 1'), 'after its end time Heme & Endo goes back to its dates (no card)');
     notes.push('end time: reopened until 6 pm, its dates again at 7 pm');
 
     /* a change from a stale page is refused, not overwritten */

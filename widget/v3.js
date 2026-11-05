@@ -2044,7 +2044,7 @@
     /* desktop: today's drill sits beside the launcher until it's done (widget/drill.js fills it in) */
     '<div class="shstat-launchrow">' +
       '<button class="sh-drill-chip" id="sh-drill-chip" type="button" data-sh-drill hidden>' + ICON_BOLT + '<span>Daily drill</span><span class="shd-chip-sub"></span></button>' +
-      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="Study tools: search, daily drill, class stats, inbox, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
+      '<button class="shstat-launch" id="shstat-launch" type="button" aria-expanded="false" aria-controls="shstat-menu" aria-label="1 studying now. Study tools: search, daily drill, class stats, inbox, settings">' + ICON_MARK + '<span class="shl-live"><span class="shstat-dot"></span><span id="shstat-launch-n">1</span></span><span class="sh-inbox-badge sh-inbox-dot" hidden></span></button>' +
     '</div>';
   document.body.appendChild(root);
 
@@ -2053,6 +2053,9 @@
     if (n) n.textContent = onlineCount;
     var n2 = document.getElementById("shstat-launch-n");
     if (n2) n2.textContent = onlineCount;
+    /* the button shows the count, so its spoken name starts with it (voice control: say what you see; BUG-003) */
+    var lb = document.getElementById("shstat-launch");
+    if (lb) lb.setAttribute("aria-label", onlineCount + " studying now. Study tools: search, daily drill, class stats, inbox, settings");
   }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }

@@ -94,6 +94,7 @@ Live
 - [Occlusion](hubs/occlusion.md)
 - [Periodontology](hubs/perio.md)
 - [PCD Implants Exam 1](hubs/pcd-implants-exam1.md)
+- [Heme & Endo Exam 2](hubs/heme-endo-exam2.md)
 - [Special Patient Care](hubs/special-patient-care.md)
 
 Archived (page still up)
