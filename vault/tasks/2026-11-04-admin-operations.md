@@ -5,7 +5,7 @@ hub: site
 created: 2026-11-04
 requested-by: Sam
 due: 
-waiting-on: post-release monitoring at 24 and 48 hours (tools/release/monitor.sql); Sam closes PR #205
+waiting-on: Sam's first look at the signed-in admin views on real data; Sam closes PR #205
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/236
 ---
@@ -41,7 +41,7 @@ surveys newest first.
 - [x] `migration_v50.sql` applied to the live project (connector `apply_migration`), then the PR merged
 - [x] After the release: `node tools/release/postcheck.js`, the Live and Hubs views load on the live admin page, BUG-019
   retested (2026-11-05)
-- [ ] Monitoring at 1, 24 and 48 hours (`tools/release/monitor.sql`); PR #205 closed (its function is in v50)
+- [ ] PR #205 closed (its function is in v50)
 
 ## Log
 
@@ -56,6 +56,8 @@ surveys newest first.
 - 2026-11-05: `main` moved three times while CI ran (#235 top bars, #238 Patient Box cases, #239 small-screen fixes);
   each merged into the branch, both sides kept (the check-in bug renumbered BUG-019). "Release tests" went green once
   #235 and #239 were in. Merged as `e6a8f02`; postcheck passed; the live functions checked read-only (the test report).
+- 2026-11-05: Sam dropped post-release monitoring for this release and every future one; the 1-hour check was cancelled
+  before it ran.
 
 ## Outcome
 
@@ -63,4 +65,4 @@ Shipped in PR #236 (2026-11-05): the redesigned admin page, Live and Hubs views,
 `migration_v50.sql` on the live project. Verified on fixtures and throwaway databases before release (the test
 report), and on the live database with read-only checks after the migration (grants, RLS, a wrong passphrase refused,
 the permission audit), and after the merge by `postcheck.js` and read-only calls to the live functions. Left:
-monitoring at 1, 24 and 48 hours, Sam's first look at the signed-in views on real data, PR #205 closed by Sam.
+Sam's first look at the signed-in views on real data, PR #205 closed by Sam.
