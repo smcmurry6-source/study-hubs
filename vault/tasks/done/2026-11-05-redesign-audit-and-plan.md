@@ -241,7 +241,7 @@ icon library, no stock photographs, no generated images.
 | Phase | Task note | What ships |
 |---|---|---|
 | 0 | [design system and art](2026-11-05-redesign-phase-0-design-system.md) | Tokens, the two typeface candidates, the icon set, Timmy's symbol sheet, emblems and mastheads, the question card, on a preview page for Sam's pick; nothing live |
-| 1 | [hub engine on a preview](../2026-11-05-redesign-phase-1-hub-engine.md) | `widget/hub.js`, content split, the new layout, the core loop with its rewards, built on a preview of Occlusion; Sam picks which hub goes live first when he sees it |
+| 1 | [hub engine on a preview](2026-11-05-redesign-phase-1-hub-engine.md) | `widget/hub.js`, content split, the new layout, the core loop with its rewards, built on a preview of Occlusion; Sam picks which hub goes live first when he sees it |
 | 2 | [the other live hubs](../2026-11-05-redesign-phase-2-live-hubs.md) | Every live hub on the engine, perio ported |
 | 3 | [dashboard and About](../2026-11-05-redesign-phase-3-dashboard.md) | The new dashboard ("you" card, hub tabs, class board) and the About page rewritten |
 | 4 | [the game layer](../2026-11-05-redesign-phase-4-game-layer.md) | Medals, trophies, celebration cards on the new type, the arcade lobby redrawn |
@@ -268,7 +268,7 @@ and bowling is an Easter egg, not part of the session recap.
 
 | Where | What it adds | Note |
 |---|---|---|
-| Phase 1 ([#275](https://github.com/smcmurry6-source/study-hubs/pull/275), in progress) | Nothing new: its answer event already carries the picked choice and the context, which the new XP rules need | |
+| Phase 1 ([#275](https://github.com/smcmurry6-source/study-hubs/pull/275), merged 2026-11-06) | Nothing new: its answer event already carries the picked choice and the context, which the new XP rules need | |
 | Phase 3, the dashboard | The idea board (posts show at once, names and both vote counts shown, agent-written starting ideas); Timmy's place on the "you" card | [idea board](../2026-11-06-idea-board.md) |
 | Phase 4, part A | Three journeys (Handpiece, ModuPro, Loupes, 125,000 XP each), the hand-off scene, the Dark Matter unlock, the double-XP boost on the rank pill | [journeys](../2026-11-06-redesign-progression-journeys.md) |
 | Phase 4, part B | Shiny Gold Crowns, the rotating shop (daily, weekly, seasonal), rarity tiers, outfits, snacks and floss, XP boosts, rare costumes | [shop](../2026-11-06-redesign-timmy-shop.md) |

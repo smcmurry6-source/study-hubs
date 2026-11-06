@@ -73,7 +73,7 @@ html.shx, html.shx *, html.shx *::before, html.shx *::after { box-sizing: border
 html.shx { -webkit-text-size-adjust: 100%; background: var(--ground); }
 html.shx body { margin: 0; background: var(--ground); color: var(--text); font-family: var(--font); font-size: var(--fs-body); line-height: 1.5;
   font-weight: var(--w-body); font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
-/* the reset weighs no more than one class (:where), so a component's own margin wins over it (BUG-044) */
+/* the reset weighs no more than one class (:where), so a component's own margin wins over it (BUG-047) */
 .hx :where(h1, h2, h3, h4, p, ul, ol, figure, dl, dd, blockquote) { margin: 0; }
 .hx :where(ul, ol) { padding: 0; list-style: none; }
 .hx button, .hx select, .hx input { font: inherit; color: inherit; }
@@ -906,6 +906,6 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
 }
 @media (prefers-reduced-motion: reduce) {
   /* transitions off, not 1 ms: an element with no transition of its own has transition-property "all", and a 1 ms
-     duration made even its focus ring grow in from 0 px (BUG-040). Nothing waits on transitionend. */
+     duration made even its focus ring grow in from 0 px (BUG-043). Nothing waits on transitionend. */
   html.shx *, html.shx *::before, html.shx *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; transition-delay: 0s !important; }
 }

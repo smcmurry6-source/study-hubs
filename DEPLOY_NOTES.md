@@ -32,6 +32,30 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
+  students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
+  Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays
+  bottom-left; drill, misses, weak spots and the mock as sets of the bank; the question card with its rewards, the daily
+  goal ring and streak, the session recap, Check yourself under each lecture's notes). `hubs/occlusion/next/` is the new
+  Occlusion: a page of settings (`window.SH_HUB`), its art (`widget/hub-art/occlusion.js`) and content JSON written from
+  the live hub by `tools/hub-next/build.mjs` (CI's "generated files are current" step runs its `--check`). Outside a
+  preview the page sends visitors to the live hub. Same hub id, state key, answered event and question ids, so progress
+  carries over at the release. First load 371 KB over the wire before the bank's data (the live hub: 1317 KB with it).
+  Shared-widget changes are gated to the new versions: `window.shPet.say`/`hp`, `sh:rank-profile`, `SH_TOUR.steps`/`prompt`,
+  `shDrill.set`, and in `v3.js` Timmy's script loads only once he's adopted and the tour's only when it's started, for
+  pages with `SH_HUB`. `tools/ci/smoke.js` clicks through every `hubs/*/next/` page; `tools/release/perf.js` measures it.
+  The new bank follows #273's rule (High likelihood is an Only toggle on top of any Show chip; a hub adds its own in
+  `SH_HUB.bank.only`). Sam's calls: the streak counts any study day (the goal ring is today's target), the session recap
+  shows only on leaving the questions, Cusp Sort leads the arcade, "Why each choice" opens on your pick. Sam's second look,
+  all built: Focus mode in Settings (every extra off, then back to what you had), every arcade game in the lobby with its
+  own drawn art (`tools/figures/site/arcade.mjs`), the answered card in one row (no "Notes for <lecture>"), no "Your last
+  two weeks", Today and Timmy Time decorated (`spots.mjs`), four soft colors, previous / next lecture and "Report a mistake
+  in these notes", More as colored tiles, and a live "studying now" count in the bar and on Home (`v3.js` sends
+  `sh:online` with its presence count; nothing else changes on the live hubs). Sam's third look: Today's goal is a ring of
+  20 teeth, Timmy Time is an animated card among Home's quick starts (on the first screen), and Home's spacing is fixed
+  (BUG-047: the reset now uses `:where()`). Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`. Timmy's secret-tip line now readable in light mode (BUG-048). Approved by Sam ("Looks good. Merge when ready") and merged;
+  the bugs found and fixed are BUG-040 to 048 in `vault/release/bug-log.md` (#281 took 037 to 039 while this was open).
+
 - **2026-11-06 (Pages didn't publish #285 and #281, Claude Code)** — Both publishes ("pages build and deployment")
   ended in "Deployment failed, try again later" after a few minutes queued, and a re-run of #281's failed the same way,
   so the live site stayed on #282 (`postcheck.js`: the four files #281 changed differed from `main`). This notes-only PR
@@ -111,28 +135,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   techniques side by side) and `cb-hu-ref` (the explanation now gives the values, air -1000 and water 0, instead of
   "know both definitions").
 
-- **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
-  students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
-  Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays
-  bottom-left; drill, misses, weak spots and the mock as sets of the bank; the question card with its rewards, the daily
-  goal ring and streak, the session recap, Check yourself under each lecture's notes). `hubs/occlusion/next/` is the new
-  Occlusion: a page of settings (`window.SH_HUB`), its art (`widget/hub-art/occlusion.js`) and content JSON written from
-  the live hub by `tools/hub-next/build.mjs` (CI's "generated files are current" step runs its `--check`). Outside a
-  preview the page sends visitors to the live hub. Same hub id, state key, answered event and question ids, so progress
-  carries over at the release. First load 371 KB over the wire before the bank's data (the live hub: 1317 KB with it).
-  Shared-widget changes are gated to the new versions: `window.shPet.say`/`hp`, `sh:rank-profile`, `SH_TOUR.steps`/`prompt`,
-  `shDrill.set`, and in `v3.js` Timmy's script loads only once he's adopted and the tour's only when it's started, for
-  pages with `SH_HUB`. `tools/ci/smoke.js` clicks through every `hubs/*/next/` page; `tools/release/perf.js` measures it.
-  The new bank follows #273's rule (High likelihood is an Only toggle on top of any Show chip; a hub adds its own in
-  `SH_HUB.bank.only`). Sam's calls: the streak counts any study day (the goal ring is today's target), the session recap
-  shows only on leaving the questions, Cusp Sort leads the arcade, "Why each choice" opens on your pick. Sam's second look,
-  all built: Focus mode in Settings (every extra off, then back to what you had), every arcade game in the lobby with its
-  own drawn art (`tools/figures/site/arcade.mjs`), the answered card in one row (no "Notes for <lecture>"), no "Your last
-  two weeks", Today and Timmy Time decorated (`spots.mjs`), four soft colors, previous / next lecture and "Report a mistake
-  in these notes", More as colored tiles, and a live "studying now" count in the bar and on Home (`v3.js` sends
-  `sh:online` with its presence count; nothing else changes on the live hubs). Sam's third look: Today's goal is a ring of
-  20 teeth, Timmy Time is an animated card among Home's quick starts (on the first screen), and Home's spacing is fixed
-  (BUG-044: the reset now uses `:where()`). Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`.
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
   Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered

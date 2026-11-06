@@ -20,7 +20,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 ## Context
 
-- How the new versions are built and kept in step with the live hubs: [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)
+- How the new versions are built and kept in step with the live hubs: [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md)
   (Context). The other phases: [2](2026-11-05-redesign-phase-2-live-hubs.md), [3](2026-11-05-redesign-phase-3-dashboard.md),
   [4](2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
 - The plan: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
@@ -55,7 +55,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 Each phase writes here the rule, About page and how-to changes it needs, so they all land together.
 
-### From phase 1 (the engine and the new Occlusion, [phase 1](2026-11-05-redesign-phase-1-hub-engine.md))
+### From phase 1 (the engine and the new Occlusion, [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md))
 
 Written for the engine as built in `widget/hub.js` / `hub.css` and `hubs/occlusion/next/`. Phase 2 adds what the other hubs
 need; at the release, check each draft against the engine as it is then.

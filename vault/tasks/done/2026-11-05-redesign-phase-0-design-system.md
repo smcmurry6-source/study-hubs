@@ -106,5 +106,5 @@ already fixed on `main` by #260; testing it also led to #268 (BUG-035), two more
 GitHub Pages will serve the page at `/tools/preview/design/` once merged (noindex, unlinked, made-up data). The Fraunces
 files stay in `assets/fonts/` while the page compares the faces; phase 1 can drop them.
 
-**For phase 1** ([task](../2026-11-05-redesign-phase-1-hub-engine.md)): take the tokens from `design.css`, the card markup,
+**For phase 1** ([task](2026-11-05-redesign-phase-1-hub-engine.md)): take the tokens from `design.css`, the card markup,
 answer states and reward logic from `design.js`, and add a symbol-sheet output to `build.mjs` for the widget.

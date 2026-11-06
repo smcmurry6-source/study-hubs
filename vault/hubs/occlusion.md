@@ -82,7 +82,7 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 
 ## The new version (the redesign, not live yet)
 
-`hubs/occlusion/next/` is the redesigned Occlusion, built beside this one ([phase 1](../tasks/2026-11-05-redesign-phase-1-hub-engine.md))
+`hubs/occlusion/next/` is the redesigned Occlusion, built beside this one ([phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md))
 and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until then **edit content in the live file only**:
 - `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/occlusion/index.html` (its `LECTURES`, `QUESTIONS`,
   `QUESTION_WHY`, `READINGS`, hints, cram, review tables, `PCASES`, the generated figure and arcade blocks). Run it after any

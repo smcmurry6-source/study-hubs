@@ -23,7 +23,7 @@ privacy controls. This note is the workshop and the proposed plan; nothing is bu
 ## Context
 
 - The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10 lists this note),
-  [phase 1](../2026-11-05-redesign-phase-1-hub-engine.md) (the content JSON and the Notes toolbar).
+  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md) (the content JSON and the Notes toolbar).
 - Rules that matter most here: [secrets](../../rules/secrets.md), [learner-data-privacy](../../rules/learner-data-privacy.md),
   [graded-coursework](../../rules/graded-coursework.md), [preview-and-release-test](../../rules/preview-and-release-test.md),
   [about-page](../../rules/about-page.md).
