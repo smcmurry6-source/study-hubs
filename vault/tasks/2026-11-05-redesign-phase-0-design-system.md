@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on:
 agent: Claude Code (branch claude/study-hubs-design-system-fx9zfs)
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/264
 ---
 
 # Redesign phase 0: the design system and the art, on a preview page
