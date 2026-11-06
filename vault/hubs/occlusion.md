@@ -26,10 +26,16 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
   `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).
 - **Sources** (Drive, Occlusion): the help sheet (`Occ Lec0 help`, Hubs folder), the Midterm and Final folders (slides,
   handouts, lecture captures). Board-exam items in last year's class deck were deliberately not reproduced.
-  **L8 (`dentures`) is built from the 11/5 recording alone** (`occ nov 5.txt` in Occlusion/Hubs/Final); no slides or
-  handout were there yet. Names the recording spells by ear (Gysi, Trubyte, Hanau, Thielmann, Berry) and the tooth-form
-  angles are checked against what's known; check them against the slides when they arrive
-  ([task](../tasks/2026-11-05-occlusion-l8-follow-ups.md)). Its cases are `dnflat`, `dnbal`, `dnret`.
+  **L8 (`dentures`)** is built from the 11/5 recording (`occ nov 5.txt` in Occlusion/Hubs/Final) and, since
+  2026-11-06, the slides and handout (`Occ Lec7 RDP Occlusion`, the course's Lecture 7, in Occlusion/Final;
+  [task](../tasks/done/2026-11-05-occlusion-l8-follow-ups.md)). Where class and slides differ the notes say both
+  (lingualized anterior contact: "never" in class, "difficult, can be compensated" on the slides). Hanau's term is the
+  **Realeff**. L8 spells **Thielemann** (the slides); the Review lecture, `rv-thielmann*` and the podcast keep the
+  spelling they were written with, "Thielmann" (changing them means rebuilding the Review narration and the episode). The history slides say
+  "No test questions": the history questions stay as practice but aren't High likelihood. Its cases are `dnflat`,
+  `dnbal`, `dnret`. Its notes are narrated with `tools/narrate.py`'s `spoken()`/`render()` on the extracted
+  `dentures` template literals (the hub's READINGS isn't one JSON line), substituting "one sixteenth" for 1/16 and
+  "divided by" in Thielemann's formula.
 - **Figures and the cusp game** come from `tools/figures/occlusion/`: `od.js` (the kit, the contact map, `CASE_IMG`
   and **`FIG_PLACE`**, which lives in the generated block: edit it in `od.js`, never in the hub), `game.js`, `cases.js`,
   and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` pastes them between the hub's
@@ -95,7 +101,6 @@ marks, the TMJ view) stay as they are; use the kit for any new perio chart or ra
 ## Pending
 
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
-- [L8: diagram review and the slides check](../tasks/2026-11-05-occlusion-l8-follow-ups.md)
 - Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
   the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
   exaggerated (about 9°); group function's lower partners (#26-28) are inferred; the thirds (Fig 18) are counted from the

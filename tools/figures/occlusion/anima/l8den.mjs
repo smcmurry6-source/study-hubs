@@ -6,7 +6,7 @@
 // right ridge crest (`tip`, degrees), which is how a denture with contact on one side only tips off the far side.
 // Every outline is schematic, drawn to typical edentulous proportions (ridges about 50 mm apart, crowns 10 mm wide
 // buccolingually and about 7 mm tall), not traced from a patient. The four posterior tooth forms are the L8 notes':
-// anatomic (30 degree cusps), semi-anatomic (20 degrees, in the notes' 12-20 range), flat (0 degrees) and lingualized
+// anatomic (30 degree cusps), semi-anatomic (20 degrees, in the slides' 12-22 range), flat (0 degrees) and lingualized
 // (a long upper lingual cusp against a lower tooth with a wide, shallow fossa: mortar and pestle).
 
 const r3 = (v) => Math.round(v * 1000) / 1000;

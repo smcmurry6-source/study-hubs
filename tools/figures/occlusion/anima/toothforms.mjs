@@ -1,6 +1,6 @@
 // Fig 23: posterior tooth forms (Occlusion L8, "Tooth forms compared"). Four upper and lower molar pairs seen from the
-// front, buccal at the left, set cusp to fossa in a denture base: anatomic (30 degree cusps; the notes: 30 or more),
-// semi-anatomic (drawn at 20 degrees; the notes: about 12-20 depending on the mold), non-anatomic or flat (0 degrees) and
+// front, buccal at the left, set cusp to fossa in a denture base: anatomic (30 degree cusps; the slides: 30-33),
+// semi-anatomic (drawn at 20 degrees; the slides: about 12-22, the 12 and 20 degree molds), non-anatomic or flat (0 degrees) and
 // lingualized (a long upper lingual cusp in a wide, shallow fossa: the notes' "flat plane or wide fossa", mortar and
 // pestle). "Slide sideways" moves each lower tooth 1.5 mm buccally while it stays in contact: cusped teeth ride over
 // each other and the contact force, square to the sloping surfaces in contact, pushes the denture sideways (more the
@@ -13,16 +13,16 @@ import { DEN } from "./l8den.mjs";
 const PW = 140, PH = 250, S = 8, X0 = 22, YO = 122, SLIDE = 1.5, STEPS = 20;
 const FORMS = ["anat", "semi", "flat", "ling"];
 const NAME = { anat: "Anatomic", semi: "Semi-anatomic", flat: "Flat", ling: "Lingualized" };
-const SUB = { anat: "30° or more", semi: "about 12-20°", flat: "0°", ling: "long lingual cusp" };
+const SUB = { anat: "30-33°", semi: "about 12-22°", flat: "0°", ling: "long lingual cusp" };
 const SCHEME = { anat: "balanced", semi: "balanced or not", flat: "non-balanced", ling: "balanced or not" };
 const HOT = {
-  anat: "Anatomic, 30° or more: sulci and ridges, they look like teeth. For balanced occlusion (the anterior teeth may touch in protrusion). For it: the best esthetics, may chew slightly better. Against it: a semi-adjustable articulator programmed with a facebow and a protrusive record, more skill, and harder with abnormal jaw relations.",
-  semi: "Semi-anatomic, lower cusps (about 12-20° depending on the mold). Balanced or not, with lower lateral forces: easier stability, and they can still be set in balance. Not quite as esthetic.",
+  anat: "Anatomic, 30-33°: sulci and ridges, they look like teeth. For balanced occlusion (the anterior teeth may touch in protrusion). For it: the best esthetics, may chew slightly better. Against it: a semi-adjustable articulator programmed with a facebow and a protrusive record, more skill, and harder with abnormal jaw relations.",
+  semi: "Semi-anatomic, lower cusps (about 12-22° depending on the mold: the 12° and 20° molds). Balanced or not, with lower lateral forces: easier stability, and they can still be set in balance. Not quite as esthetic.",
   flat: "Non-anatomic (flat), 0°. Non-balanced. The least lateral force, so stability is easiest; any jaw relation (Class I, II, III) and crossbite, simpler to adjust, good for poor neuromuscular control, fewer complications. Less esthetic, and they penetrate food less, but that's clinically acceptable.",
-  ling: "Lingualized: a semi-anatomic upper tooth with an elongated lingual cusp against a flat plane or a wide fossa on the lower tooth, a little like a mortar and pestle. Much easier to arrange, set balanced or non-balanced: most likely the scheme for many of your dentures.",
+  ling: "Lingualized: a semi-anatomic upper tooth with an elongated lingual cusp against a flat plane or a wide fossa on a 0-12° lower tooth, a little like a mortar and pestle. Much easier to arrange, set balanced or non-balanced: most likely the scheme for many of your dentures.",
 };
 const SUM = {
-  close: "Four posterior tooth forms: an upper and a lower molar seen from the front, buccal at the left, cusp in fossa. Anatomic teeth have cusps of 30° or more, semi-anatomic about 12-20° depending on the mold, and flat (non-anatomic) teeth 0°. Lingualized teeth are semi-anatomic with a long upper lingual cusp that sits on a flat plane or in a wide fossa of the lower tooth, a little like a mortar and pestle. Slide them sideways to compare.",
+  close: "Four posterior tooth forms: an upper and a lower molar seen from the front, buccal at the left, cusp in fossa. Anatomic teeth have cusps of 30-33°, semi-anatomic about 12-22° depending on the mold, and flat (non-anatomic) teeth 0°. Lingualized teeth are semi-anatomic with a long upper lingual cusp that sits on a flat plane or in a wide fossa of the lower tooth, a little like a mortar and pestle. Slide them sideways to compare.",
   slide: "Sliding sideways, cusps have to ride over cusps. The force between the teeth acts square to the sloping surfaces in contact, so part of it pushes the denture sideways, more the steeper the cusps. Flat teeth just glide and the force stays straight down: the least lateral force, so stability is easiest. Steeper cusps look best and may chew slightly better; flat teeth suit any jaw relation and are simpler to adjust.",
 };
 
@@ -95,8 +95,8 @@ const controls = `<div class="am-controls" role="group" aria-label="Movement"><b
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Hover or tap a tooth form.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>From the L8 notes (Dr. Givan, the 11/5 recording): anatomic teeth 30° or more, semi-anatomic about 12-20° depending on the mold (lingualized teeth belong here), non-anatomic (flat) 0°; the scheme each suits; flat teeth have the least lateral force, so stability is easiest; lingualized teeth have an elongated maxillary lingual cusp against a flat plane or a wide fossa, like a mortar and pestle.</li>
-<li>Outside source for the angles: complete denture texts list the common molds as about 33° (anatomic), 20° or less (semi-anatomic) and 0° (non-anatomic), in line with the notes' 30° or more, about 12-20° and 0°.</li>
+<li>From the L8 notes, slides and handout (Dr. Givan, 11/5): anatomic teeth 30-33° (the handout: 30° or more), semi-anatomic about 12-22° depending on the mold (the 12° and 20° molds; lingualized maxillary teeth belong here), non-anatomic (flat) 0°; the scheme each suits; flat teeth have the least lateral force, so stability is easiest; lingualized teeth have an elongated maxillary lingual cusp against a flat plane or a wide fossa, like a mortar and pestle.</li>
+<li>Outside source for the angles: complete denture texts list the common molds as about 33° (anatomic), 20° or less (semi-anatomic) and 0° (non-anatomic), in line with the slides' 30-33°, about 12-22° and 0°.</li>
 <li>The arrow is the contact force on the lower tooth, square to the surfaces in contact (plain mechanics, friction left out); the arrow under the base is its sideways part. Semi-anatomic teeth are drawn at 20°. The slide is 1.5 mm with the teeth kept in contact.</li>
 <li>Schematic outlines, not traced from a manufacturer's mold. Educational, not clinical guidance.</li></ul></details>`;
 
