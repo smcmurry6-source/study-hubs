@@ -117,6 +117,31 @@ call can't pay twice, and Link my devices (`sh_xp_rebuild`) rebuilds it all. The
   Timmy reacts on the bar. Reduced motion: one still card that fades in under a second, the starfield drawn still, no camera
   moves. Sound only when the student turned sounds on. The ModuPro's and the Loupes' Dark Matter get their own versions.
 
+## Where people end up by June 1 (projection, 2026-11-06)
+
+Sam asked where people would end up, with the winter break (about Dec 8 to Jan 2) and the term running to June 1. The
+assumptions: each group keeps the pace it has had since 2026-09-08 (60 days of term so far); 181 days of term to go (Nov 7
+to Dec 7, then Jan 3 to Jun 1, nothing over the break); the new rules from now on (each week before the release runs at the
+old rate, about half the leaders' new pace); past days as they were. Groups by XP today, averages over 5-11 people.
+
+| Group | XP today | Old rules, June 1 | New rules: answers and milestones | Plus medals and double XP (estimate) |
+|---|---|---|---|---|
+| The five most active | 14,500 | 58,000: Dark Matter I | 113,000: Dark Matter III | 138,000-153,000: ModuPro Stone III to Antique II |
+| The next 10% (11 people) | 10,900 | 44,000: Diamond III | 91,000: Dark Matter II | 109,000-121,000: Dark Matter III |
+| Around the 75th percentile (11 people) | 4,900 | 20,000: Gold II | 40,000: Diamond II | 44,000-47,000: Diamond III |
+| Around the median (11 people) | 1,300 | 5,100: Silver I | 8,200: Silver II | about 8,400: Silver II |
+
+- **How**: answer XP per day of term without the cap (about 500, 420, 190 and 36 for the four groups; with the cap it was 242,
+  182, 82 and 21), milestones from each group's own history (days with 20 answers and misses fixed on a later day: about 39,
+  24, 6 and 2 XP a day), medals at the rate each group has earned them (19, 14, 4 and 0.4 per person in 60 days, about 275 XP
+  each), and double XP as a range (one extra study day's XP for every one or two medals). Timmy Time, the arcade and fixed
+  reports add a little more (a whole episode is about 550 XP).
+- **What it means**: only the most active reach the ModuPro by June; the Loupes (250,000) are two years or more away for
+  anyone; the middle of the class spends the year in Silver and Gold, so that's where most rank-ups happen.
+- **With back pay** (past days recomputed without the cap) add about 15,600, 14,200, 6,200 and 900: the five most active
+  would reach ModuPro Antique II to Bronze II, the next 10% Dark Matter III to ModuPro Stone II, the 75th percentile Dark
+  Matter I, the median Silver II.
+
 ## Still open
 
 - **Back pay for the cap?** Recomputing past days without the cap would about double everyone's XP and lift the leaders into
@@ -139,6 +164,7 @@ call can't pay twice, and Link my devices (`sh_xp_rebuild`) rebuilds it all. The
 
 - 2026-11-06: workshop of Sam's idea with the XP data.
 - 2026-11-06: Sam's calls (above); the ladder keeps its length, the cap goes, more sources added. Ready for phases 4 and 5.
+- 2026-11-06: the June 1 projection added, at Sam's request.
 
 ## Outcome
 
