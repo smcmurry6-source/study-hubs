@@ -48,7 +48,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `su-mm-1` (each risk factor's group: malpositioning is surgical-related) and `su-match` (a matching card shows only its
   explanation after answering, so it now lists the four pairs). These seven start fresh numbers. **Looks fine**:
   `bm-moment`, `im-pa-follow`, `tm-2s-6`. All ten marked on the admin page (`admin_review_question`; the seven as Fixed
-  once the new versions were live).
+  once the new versions were live). Then three more flagged while #277 shipped ("stronger students miss it more"; keys
+  match): `ev-2s-5` (statement 2 uses the notes' white, yellow, red instead of "grippier colors"), and new explanations and
+  why lines for `in-num-3` (the JE does attach to titanium; the hemidesmosomes are the false part) and `su-voxel` (more
+  dose with smaller voxels; "choose the smallest voxel" is about detail). Marked Fixed once live.
 
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
