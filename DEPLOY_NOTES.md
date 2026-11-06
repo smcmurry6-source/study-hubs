@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (admin page: light only, Claude Code)** — Sam: "i dont want the admin page to be dark mode. its hard to
+  see". `review/index.html` drops its two `prefers-color-scheme: dark` blocks (the page's colors and the switch knob) and sets
+  `color-scheme: light` plus `<meta name="color-scheme" content="only light">`, so a laptop or phone in dark mode still gets
+  the light page, form controls and scrollbars included (and Chrome's auto-dark leaves it alone). `tools/release/admin-ui.js`
+  now fails if the page turns dark on a dark-mode phone. Admin only: students see no change. No schema change.
+
 - **2026-11-06 (question health: PCD Implants on exam day, Claude Code)** — Sam: "review implants question health, fix the
   issues, mark them in the admin page, and merge". The 10 questions flagged since #267 were checked against the notes; every
   key matches; same ids; no notes text changed, so no narration or podcast change. **New wording**: `ev-tmi-bone` (its key
