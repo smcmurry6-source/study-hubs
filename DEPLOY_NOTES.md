@@ -51,7 +51,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   once the new versions were live). Then three more flagged while #277 shipped ("stronger students miss it more"; keys
   match): `ev-2s-5` (statement 2 uses the notes' white, yellow, red instead of "grippier colors"), and new explanations and
   why lines for `in-num-3` (the JE does attach to titanium; the hemidesmosomes are the false part) and `su-voxel` (more
-  dose with smaller voxels; "choose the smallest voxel" is about detail). Marked Fixed once live.
+  dose with smaller voxels; "choose the smallest voxel" is about detail). Marked Fixed once live. Then two more:
+  `in-1stage` (the most-picked wrong choice, "Brånemark (1985); it avoids a cover screw", was half true, since one-stage
+  surgery skips the cover screw; it now reads "avoids a healing abutment", with an explanation that sets the two
+  techniques side by side) and `cb-hu-ref` (the explanation now gives the values, air -1000 and water 0, instead of
+  "know both definitions").
 
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
