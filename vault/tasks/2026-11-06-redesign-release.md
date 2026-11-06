@@ -146,6 +146,23 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
+### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
+
+Proposed until Sam confirms the calls in that note; check against the engine as built.
+
+**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add):
+- **Study as** at the top of the Questions view: **Questions · Learn · Flashcards** (`STATE.ui.qview`, saved like the panel). The
+  panel picks which questions and the toggle how; Lectures, Show, the High likelihood toggle, More filters, search, the tags
+  and Clear all work the same in all three. Order (In order / Random) shows only for Questions. Drill, Yesterday's misses and
+  Weak spots work in all three; the mock is always questions. Tracked as `bank:view=<view>`.
+
+**About page**, Questions (new entry, tagged new): **Study as**: Questions as now; **Learn** asks the questions you picked in
+rounds of 7 until you've got each right twice (the second time you think of the answer before the choices show); **Flashcards**
+show the question, you flip it and say how well you knew it (Again, Hard, Good, Easy), and it comes back when you're about to
+forget it, never later than the day before the exam. Learn's answers count like any answer; a flashcard counts toward your
+daily goal and streak and earns 2 XP when it's due. "What the hubs record": how you rated each flashcard, so your schedule
+follows you to your other devices.
+
 ### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
 
 `migration_v54.sql` is written and tested, not applied. At the release, in this order:
