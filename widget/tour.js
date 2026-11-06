@@ -184,6 +184,8 @@
     return t.replace(/\s*\bhub\b\s*$/i, "") || "this hub";
   }
   function hubSteps(){
+    /* the redesigned hubs (widget/hub.js, not live yet) give their own steps through window.SH_TOUR.steps() */
+    if (window.SH_TOUR && typeof window.SH_TOUR.steps === "function") { try { return window.SH_TOUR.steps({ phone: phone(), visible: visible }); } catch (e) {} }
     var S = [], name = hubTitle();
     S.push({ title: "Welcome to " + name,
       body: "<p>This tour shows you where everything in this hub is, with a spotlight on the real buttons. It takes about two minutes, and it'll switch tabs for you along the way, then bring you back.</p>" +
@@ -491,6 +493,7 @@
   function mount(opt){
     WHERE = opt.where || "hub"; HUB = opt.hub || null;
     if (WHERE !== "hub" || ls(key())) return;
+    if (window.SH_TOUR && window.SH_TOUR.prompt === false) return;          /* the redesign: no prompt on arrival; the tour is in More */
     if (location.hash && location.hash.length > 1) return;                 /* #drill, #timmy, a search jump: not now */
     var archived = ((window.SH_EXPORT && window.SH_EXPORT.exams) || []).every(function(x){
       var p = String((x && x.date) || "").split("-").map(Number);

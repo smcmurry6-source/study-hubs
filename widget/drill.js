@@ -375,6 +375,35 @@
   }
 
   window.shDrill = {
+    /* the redesigned hubs (widget/hub.js, not live yet) show the day's set as a preset of their question bank instead
+       of this dialog: set(cb) hands over today's set, picked and saved exactly as the dialog does it, and mark() records
+       an answer to one of its questions. The live hubs never call these. */
+    set: function(cb){
+      if (!H || !hook()) { cb(null); return; }
+      var s = loadSet(); if (s) { cb(s); return; }
+      loadStats(function(){
+        var s2 = loadSet();
+        if (!s2) { var items = pick(size(), {}); if (items.length) { s2 = { day: today(), items: items, res: {}, start: 0 }; saveSet(s2); } }
+        refreshEntry(); cb(s2 || null);
+      });
+    },
+    more: function(n, cb){
+      if (!H || !hook()) { cb(null); return; }
+      var s = loadSet(), skip = {}; if (!s) { this.set(cb); return; }
+      s.items.forEach(function(it){ skip[it.id] = 1; });
+      var items = pick(SIZES.indexOf(n) >= 0 ? n : size(), skip);
+      if (!items.length) { cb(s); return; }
+      s.start = s.items.length; s.items = s.items.concat(items); s.done = false; saveSet(s);
+      try { if (window.shTrack) window.shTrack("drill:more=" + n); } catch (e) {}
+      refreshEntry(); cb(s);
+    },
+    mark: function(qid, correct){
+      var s = loadSet(); if (!s || isOpen) return;
+      var it = round(s).filter(function(x){ return x.id === String(qid); })[0];
+      if (!it || s.res[it.id] === 1 || s.res[it.id] === 0) return;
+      s.res[it.id] = correct ? 1 : 0; finishCheck(s); saveSet(s); refreshEntry();
+    },
+    streak: function(){ return H ? streak() : 0; },
     mount: function(hooks){
       if (H || !hooks) return;
       H = hooks; HUB = hooks.hub; KEY = "sh_drill_" + HUB;
