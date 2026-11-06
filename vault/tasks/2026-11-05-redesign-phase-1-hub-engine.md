@@ -58,7 +58,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - [x] Every mode, every question format, the mock, the arcade, narration, the podcast card, pins, reports, the drill, the eggs and Timmy work on the preview (UAT checklist), phone and laptop, light and dark
 - [x] The inspector passes with 0 FAIL on Home, Notes, Questions and More
 - [x] The rule, About page and [build-a-hub](../how-to/build-a-hub.md) changes written into the [release note](2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`): all pass locally; "Release tests" on PR #275 after the BUG-040 fix to confirm
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`): locally, and "Check hubs" and "Release tests" green on PR #275 after the BUG-040 fix
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
