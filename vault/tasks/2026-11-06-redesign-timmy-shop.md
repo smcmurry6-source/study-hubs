@@ -46,7 +46,6 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 - **The name**: Shiny Gold Crowns in full, "gold crowns" for short, never just "crowns", because the top mastery medal is
   the Crown. The coin is drawn as a shiny gold dental crown (the restoration, with its occlusal anatomy and a glint), never a
   king's crown, so it never looks like the Crown medal. In code and the database: `gold_crowns`.
-
 - **Worked out by the server from XP**: 1 gold crown per 10 XP of base XP (the extra from a double-XP boost earns none, so
   boosts can't feed themselves), plus one-time grants: each trophy 25, each mastery medal 50, each rank-up 20. It follows
   XP, so it inherits XP's server checks and adds no new way to farm. Spending never lowers XP or rank.
