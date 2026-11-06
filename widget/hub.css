@@ -76,6 +76,9 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx button { cursor: pointer; }
 .hx a { color: inherit; }
 .hx :focus-visible { outline: 3px solid var(--hub-text); outline-offset: 2px; border-radius: 6px; }
+/* keyboard use, marked by hub.js (html.hx-kbd): every focused control gets the ring, even where a browser's
+   :focus-visible guess says no (the release tests' Chromium skipped it on some links after a Tab) */
+html.hx-kbd .hx :is(a, button, summary, select, textarea, [tabindex]:not([tabindex="-1"])):focus { outline: 3px solid var(--hub-text); outline-offset: 2px; }
 .hx .num { font-variant-numeric: tabular-nums; }
 .hx [hidden] { display: none !important; }
 .hx .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

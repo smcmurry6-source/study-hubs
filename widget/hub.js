@@ -26,6 +26,9 @@
   var docEl = document.documentElement;
   var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
   docEl.classList.add("shx");
+  /* keyboard or pointer: Tab marks keyboard use, a tap or click ends it (hub.css draws the focus ring from it) */
+  document.addEventListener("keydown", function(e){ if (e.key === "Tab") docEl.classList.add("hx-kbd"); }, true);
+  document.addEventListener("pointerdown", function(){ docEl.classList.remove("hx-kbd"); }, true);
 
   /* ---------- small helpers ---------- */
   function $(s, el){ return (el || document).querySelector(s); }
