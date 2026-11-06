@@ -101,7 +101,7 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 
 - [ ] The catalog drawn and approved by Sam (light and dark, phone and laptop): the outfits, the snacks, the boosts, the
       seasonal sets, the rare costumes, the rarity frames
-- [ ] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
+- [x] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
 - [ ] Client: the shop in More, the balance on the "you" panel, rare costumes, recorded on the preview (reduced motion too)
 - [ ] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
@@ -115,6 +115,13 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 - 2026-11-06: Sam's calls (above). Bowling moved to [its own note](2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
   house card's redesign to [Timmy's place](2026-11-06-redesign-timmys-place.md).
 - 2026-11-06: the currency renamed from Mints to Shiny Gold Crowns (Sam).
+- 2026-11-06 (Claude Code): the server is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
+  [game-server](../reference/game-server.md)): `sh_wallet`, `shop_items` with the price bands checked, the daily, weekly,
+  seasonal and always shelves (`sh_season` / `sh_is_fall` match `widget/pet.js` on every day of 2026-2028), `buy_item`,
+  `equip_item`, `pet_inventory`, `pet_purchases`, snack HP in `get_pet_days_v2`, shop boosts that extend, the costume log
+  (`record_costume_sighting`; a spotted costume joins that visitor's shop), Link my devices merging all of it. The 48-item
+  catalog is a draft for phase 4's art and Sam's look. The gold crowns' one-time grants (trophies, medals, rank-ups) count
+  from the release on; the XP from before counts (the note's "median about 120").
 
 ## Outcome
 

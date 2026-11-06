@@ -1,0 +1,9 @@
+# Migrations written and tested but not yet applied to the live project (thytmzsgymydbzcqdnix), one file name per line,
+# in the order they're applied. supabase/schema.sql is the live database; the database tests (tools/release/rls.js,
+# admin-ops.js, retention.js, xp.js) build their throwaway copy from it and then apply these, so a pending migration is
+# tested with everything else. When one is applied (through the connector or the SQL editor), append it to
+# supabase/schema.sql and take its line out of this file, in the same PR.
+#
+# migration_v54.sql: the game layer's server (XP without a daily cap, server-checked answers, the 63-step ladder, Shiny
+# Gold Crowns and Timmy's shop, the idea board). Applied at the redesign's release: vault/tasks/2026-11-06-redesign-release.md
+migration_v54.sql

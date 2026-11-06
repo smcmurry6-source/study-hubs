@@ -46,6 +46,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   kit, `tools/figures/site/place.mjs`, built into `tools/preview/design/place.js` by `build.mjs` (`--check` covers it).
   `widget/pet.js` is unchanged until Sam approves the art
   ([task](vault/tasks/2026-11-06-redesign-timmys-place.md)).
+- **2026-11-06 (redesign phase 5, part 3: the game layer's server, written and tested, not applied, Claude Code)** — Nothing
+  changes for students and nothing reaches the live database: `migration_v54.sql` waits in `supabase/pending-migrations.txt`
+  for the redesign's release ([vault/reference/game-server.md](vault/reference/game-server.md)). It adds, beside today's
+  functions: server-graded answers (`question_keys`, `record_answer_v2`), XP with no daily cap as award rows with
+  guardrails and every new source (the day's 20th answer, a fixed miss, mocks, mastery medals with 24 hours of double XP,
+  Timmy Time minutes, the arcade, fixed reports), the 63-step ladder (Handpiece, ModuPro, Loupes), Shiny Gold Crowns and
+  Timmy's shop (`buy_item`, `equip_item`, the rotation, snack HP), and the idea board. No XP back pay. Tests:
+  `tools/release/xp.js` (new, 243 checks: a replayed call, a double tap, a linked device, the rebuild against the live
+  calls), `rls.js` (now also calls every function a visitor can run and fails if another visitor's id comes back),
+  `admin-ops.js` and `retention.js`, all with the pending migration applied; CI runs `xp.js` too. `tools/xp/keys.js` builds a
+  hub's keys from its content JSON. Found **BUG-049, live since v53**: today's bootstrap sent Timmy's days as bare dates,
+  so his HP counted only the device's own log. Its fix, the migration's section 0, **was applied live on its own** (Sam's OK,
+  about 20:25 UTC) and appended to `supabase/schema.sql`; checked on five active visitors, `rls-audit.sql` clean, site
+  changelog posted. The rest of v54 is not applied.
 - **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
   students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
   Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays

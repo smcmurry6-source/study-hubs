@@ -134,6 +134,13 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
   check-ins become starter ideas with no names.
 - 2026-11-06: Sam: every idea picks its hub (one hub or all hubs) and a category; the six categories written from Sam's
   examples (gamification, fun, functionality, feature).
+- 2026-11-06 (Claude Code): the server side is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
+  [game-server](../reference/game-server.md)): `ideas`, `idea_votes`, `idea_reports`, `idea_notes`, `post_idea` (with
+  `source` for the board, Suggest and a check-in), `vote_idea`, `report_idea`, `delete_my_idea`, `get_ideas` (tabs, both
+  filters and their counts, no visitor ids), `admin_ideas`, `admin_set_idea`, `admin_post_starter_idea`, the Inbox notes
+  (`get_my_inbox_v2`). Still to build: `widget/ideas.js`, the admin page's "Idea board", the check-in's tick. Calls made
+  while building, for Sam: an idea's hub must be one whose keys are loaded (the release loads them for the live hubs), and
+  an author's delete keeps an empty row so it still counts toward the day's three.
 
 ## Outcome
 

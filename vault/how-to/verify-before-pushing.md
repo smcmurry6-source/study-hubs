@@ -20,7 +20,9 @@ Since 2026-11-04 it also runs `node tools/release/secrets.js` (no keys, course m
 data files), `node tools/release/rls.js` (database permissions on a throwaway copy of `supabase/schema.sql`; needs
 PostgreSQL's server binaries), `node tools/release/admin-ops.js` (the admin page's database functions on the same kind of
 throwaway copy: who's studying now, archive overrides, newest-first check-ins), `node tools/release/retention.js` (the
-weekly retention job's deletes on the same kind of copy: the hourly totals, device linking and the recap survive them), `node tools/ci/archive.js` (the hub archive
+weekly retention job's deletes on the same kind of copy: the hourly totals, device linking and the recap survive them), `node tools/release/xp.js`
+(the game layer's server, [game-server](../reference/game-server.md): XP, a replayed call, a double tap, a linked device, the
+shop and the idea board; all four database suites apply `supabase/pending-migrations.txt` on top of the schema), `node tools/ci/archive.js` (the hub archive
 rules against the old date logic), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright) and
 `node tools/ci/cases.js` (every drawn Patient Box case has realistic numbers that agree with its key,
 [how-to](draw-a-patient-box-case.md)), and
