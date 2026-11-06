@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (Pages didn't publish #285 and #281, Claude Code)** — Both publishes ("pages build and deployment")
+  ended in "Deployment failed, try again later" after a few minutes queued, and a re-run of #281's failed the same way,
+  so the live site stayed on #282 (`postcheck.js`: the four files #281 changed differed from `main`). This notes-only PR
+  is the new commit that publishes both. [shared-infrastructure](vault/reference/shared-infrastructure.md) now says so.
+
 - **2026-11-06 (PCD Implants check-in: how the class felt about the week's changes, Claude Code)** — Sam: "for the
   implants check in, develop some questions to see how the class feels about changes in this hub like the improved patient
   boxes". The PCD Implants Exam 1 check-in (button and pop-up from 8 pm tonight) now has eight steps: after readiness, how it
