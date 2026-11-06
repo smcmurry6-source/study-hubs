@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: open
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam's calls (the questions under "Decisions for Sam")
+waiting-on: 
 agent: 
 pr: 
 ---
@@ -20,6 +20,8 @@ periodontal measurements, recession, CAL, BOP, mobility, furcations, horizontal 
 keeps the narrative, odontogram, perio chart, clinical image, radiograph, key and explanation consistent. It refuses
 impossible combinations and any answer that depends on something the student isn't shown. First: permanent-dentition perio
 cases and bone-level and radiograph variations; then restorations, caries, endo, implants, prosthodontics and other hubs.
+The tooth library is shared with the figures, so drawn figures pull from the same catalogue. Its own track, not tied
+to the redesign's release.
 
 ## Context
 
@@ -53,7 +55,9 @@ ideas, this one has the strongest evidence ([the audit](done/2026-11-05-redesign
    furcation entrances (maxillary molars buccal, mesial and distal, the last two probed from the palatal; mandibular molars
    buccal and lingual; a two-rooted maxillary first premolar mesial and distal), root trunk, the six probing sites,
    landmarks (CEJ, contacts, the crest 1.5 mm below the CEJ in health, as the kit draws it) and the films that show it
-   (periapical; bitewing for premolars and molars).
+   (periapical; bitewing for premolars and molars). **Figures pull from it too** (Sam, 2026-11-06): the library is one file
+   that `widget/cases.js` reads in the browser and the figure builds (`tools/figures/*`, the anima kit) import in Node, so
+   a drawn figure of a tooth uses the same outline, roots, furcations and landmarks as the cases and the two can't disagree.
 2. **Modules**, a layer above the per-tooth numbers: `missing`, `restoration(surfaces, material)`, `caries(surface, depth)`,
    `endo(fill, lesion)`, and perio modules that write consistent numbers from a few choices (`bonePattern({ teeth, percent,
    horizontal or vertical, defect })` sets bone, probing depth, recession and CAL so the pocket and the crest agree;
@@ -82,21 +86,22 @@ ideas, this one has the strongest evidence ([the audit](done/2026-11-05-redesign
 
 ## Where it goes
 
-Recommended: not tied to the redesign's release. The kit is content the live hubs use, and [ship-it-now](../rules/ship-it-now.md)
-holds, so each step ships to the live hubs when it's ready, with `cases.css` styled for today's hubs and for the
-redesign's tokens. Each step is a substantial change (tier 2): preview, the release suites, screenshots on a phone and in
-both themes, Sam's look. A new module goes to Sam with its first case, the way a figure does ([diagram-review](../rules/diagram-review.md)).
+**Its own track** (Sam, 2026-11-06), not tied to the redesign's release. The kit is content the live hubs use, and
+[ship-it-now](../rules/ship-it-now.md) holds, so each step ships to the live hubs when it's ready, with `cases.css` styled for
+today's hubs and for the redesign's tokens. Each step is a substantial change (tier 2): preview, the release suites,
+screenshots on a phone and in both themes, Sam's look. A new module goes to Sam with its first case, the way a figure does
+([diagram-review](../rules/diagram-review.md)).
 
-## Decisions for Sam
+## Sam's calls (2026-11-06, [decisions](../decisions.md))
 
-1. Ship v2 on its own as each step is ready (recommended), or with the redesign?
-2. The first version's scope as listed under Order, step 1?
-3. Who approves a new module: Sam, with its first case (recommended), or the CI checks alone?
+Patient Box v2 is done by itself, on its own track. Figures pull from the tooth catalogue too. The first version's scope
+(Order, step 1) and Sam's approval of each new module with its first case stand as proposed.
 
 ## Done when
 
 - [ ] Sam's calls are in [decisions](../decisions.md) and this note
 - [ ] v2.0 built: the library, the modules, the new views, the new checks in `validate()` and `tools/ci/cases.js`
+- [ ] The figure builds read the same library (one existing tooth figure redrawn from it to prove the path); `--check` still passes
 - [ ] Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)
 - [ ] The how-to rewritten ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)); the About page if a new kind
       of picture shows ([about-page](../rules/about-page.md))
@@ -105,7 +110,8 @@ both themes, Sam's look. A new module goes to Sam with its first case, the way a
 
 ## Log
 
-- 2026-11-06: workshop of Sam's idea; waiting on Sam's calls.
+- 2026-11-06: workshop of Sam's idea.
+- 2026-11-06: Sam's calls (above): its own track; figures pull from the catalogue. Ready for an agent.
 
 ## Outcome
 

@@ -193,6 +193,10 @@ sheet in one ink style (a renderer over the existing model); drawn mastery medal
 the "???" grid (secret ones stay a silhouette with a one-line riddle); the gradient rank name becomes flat metal; the
 dashboard rank card and the hub stats panel become one "you" panel. Timmy's HP model is **kept as is** (Sam).
 
+**Changed 2026-11-06 (Sam, 4.10):** the XP rules (no daily cap, more sources), the ladder (three journeys), the house
+(Timmy's place) and HP (snacks and floss from the shop restore it) change, and the shop and the bowling egg are added. The
+rest of this section stands.
+
 ### 4.6 Cut, fold, keep (Sam's calls)
 
 | Thing | Call |
@@ -242,6 +246,7 @@ icon library, no stock photographs, no generated images.
 | 3 | [dashboard and About](../2026-11-05-redesign-phase-3-dashboard.md) | The new dashboard ("you" card, hub tabs, class board) and the About page rewritten |
 | 4 | [the game layer](../2026-11-05-redesign-phase-4-game-layer.md) | Medals, trophies, celebration cards on the new type, the arcade lobby redrawn |
 | 5 | [backend and loading](../2026-11-05-redesign-phase-5-backend.md) | Bootstrap RPC, XP cache, timers, advisor fixes, bundles, font, sw.js |
+| | | Since 2026-11-06, phase 4 has four parts (A-D) and phase 5 a part 3; Patient Box v2 runs on its own (4.10) |
 
 Each phase is a PR with a preview link first, screenshots on a phone and a laptop, the release suites, and Sam's look
 ([preview-and-release-test](../../rules/preview-and-release-test.md)). Ship-it-now holds: a phase that is ready lands before
@@ -253,18 +258,25 @@ landing page with the quick links on the first phone screen; the drill, weak spo
 student sees, and released all at once by one PR when Sam likes the whole thing; the rule edits land with that PR
 ([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)).
 
-### 4.10 Additions proposed 2026-11-06 (waiting on Sam's calls)
+### 4.10 Additions agreed 2026-11-06
 
-Sam brought five more ideas to workshop (2026-11-06, in chat), open to any of them changing or not working out. Each has
-its own note with the data, the proposal and the questions for Sam. None is agreed yet; Sam dropped "Ask the Hub" the same day.
+Sam brought more ideas to workshop on 2026-11-06 and decided them in chat the same day ([decisions](../../decisions.md)).
+Each has its own task note with the data, the design and Sam's calls. Everything but Patient Box v2 is built side by side
+and **ships with the redesign's release**. This changes parts of 4.4 and 4.5: XP has no daily cap and many more sources,
+the ladder becomes three journeys, the house becomes a scene you build, the shop sells snacks and floss that restore HP,
+and bowling is an Easter egg, not part of the session recap.
 
-| Idea | Note | Where it would go |
+| Where | What it adds | Note |
 |---|---|---|
-| Three equipment journeys (Handpiece, ModuPro, Loupes), server-checked XP and milestones, the Dark Matter unlock | [journeys](../2026-11-06-redesign-progression-journeys.md) | The ladder's empty top reshaped now, before anyone reaches Diamond; the rest in phase 4 and the release |
-| "Ask the Hub", an assistant grounded in the hub's notes | [ask the hub](2026-11-06-ask-the-hub-assistant.md) | **Dropped** (Sam, 2026-11-06) |
-| Timmy's shop, rare costumes and bowling | [shop and bowling](../2026-11-06-redesign-timmy-shop-and-bowling.md) | Phase 4 and the release |
-| Patient Box v2: cases built from a tooth library and modules | [patient box v2](../2026-11-06-patient-box-v2-modular-cases.md) | Its own track, shipping to the live hubs step by step |
-| An idea board: classmates post ideas and vote on them | [idea board](../2026-11-06-idea-board.md) | Now, on today's dashboard, seeded with these ideas; then phase 3 |
+| Phase 1 ([#275](https://github.com/smcmurry6-source/study-hubs/pull/275), in progress) | Nothing new: its answer event already carries the picked choice and the context, which the new XP rules need | |
+| Phase 3, the dashboard | The idea board (posts show at once, names and both vote counts shown, agent-written starting ideas); Timmy's place on the "you" card | [idea board](../2026-11-06-idea-board.md) |
+| Phase 4, part A | Three journeys (Handpiece, ModuPro, Loupes, 125,000 XP each), the hand-off scene, the Dark Matter unlock, the double-XP boost on the rank pill | [journeys](../2026-11-06-redesign-progression-journeys.md) |
+| Phase 4, part B | Mints, the rotating shop (daily, weekly, seasonal), rarity tiers, outfits, snacks and floss, XP boosts, rare costumes | [shop](../2026-11-06-redesign-timmy-shop.md) |
+| Phase 4, part C | Timmy's place: the house card redrawn as an isometric scene with homes (castle, giant mushroom, treehouse), scenes and yard items | [Timmy's place](../2026-11-06-redesign-timmys-place.md) |
+| Phase 4, part D | The bowling egg: eight bowling-alley clips with the Plaque crew as pins | [bowling egg](../2026-11-06-redesign-bowling-egg.md) |
+| Phase 5, part 3 | The server for all of it: no XP cap, server-checked answers, the guardrails, every new XP source and boost, the 63-step ladder, Mints and the shop, the idea board's tables. Built and tested now on a throwaway copy, applied at the release | the notes above |
+| Its own track | Patient Box v2: the tooth library (shared with the figure builds), modules, new views and checks; ships to the live hubs step by step | [patient box v2](../2026-11-06-patient-box-v2-modular-cases.md) |
+| Dropped | "Ask the Hub", an AI study assistant | [ask the hub](2026-11-06-ask-the-hub-assistant.md) |
 
 ## 5. Decisions (all answered 2026-11-05, logged in [decisions](../../decisions.md))
 
