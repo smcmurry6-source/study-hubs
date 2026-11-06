@@ -26,7 +26,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
 - Timmy's HP model stays as it is (Sam, 2026-11-05), except that the shop's snacks and floss now restore HP (Sam, 2026-11-06).
 - **Four more parts, agreed 2026-11-06 (Sam)**, each its own PR and art review, on top of the presentation work above:
   - **A**: [three journeys, more XP and the Dark Matter unlock](2026-11-06-redesign-progression-journeys.md) (the client side);
-  - **B**: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) (Mints, the rotating shop, rarity, snacks and floss, XP boosts,
+  - **B**: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) (Shiny Gold Crowns, the rotating shop, rarity, snacks and floss, XP boosts,
     rare costumes);
   - **C**: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card redrawn as a scene you build);
   - **D**: [the bowling egg](2026-11-06-redesign-bowling-egg.md).

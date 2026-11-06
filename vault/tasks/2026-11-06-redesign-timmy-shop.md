@@ -10,11 +10,11 @@ agent:
 pr: 
 ---
 
-# Timmy's shop: Mints, a rotating shop, rarity, seasonal outfits and rare costumes
+# Timmy's shop: Shiny Gold Crowns, a rotating shop, rarity, seasonal outfits and rare costumes
 
 ## Goal
 
-Sam's idea (2026-11-06, workshopped in chat and decided the same day): students earn **Mints** and spend them in a Timmy
+Sam's idea (2026-11-06, workshopped in chat and decided the same day): students earn **Shiny Gold Crowns** and spend them in a Timmy
 shop that rotates (some items every 24 hours, some every week), with limited-time seasonal outfits and rarity tiers whose
 prices reflect the rarity. It sells outfits, cosmetics for Timmy's house and yard, snacks and floss that restore his health,
 and XP boosts. Purchases and inventory are kept on the server across devices and are safe from refresh or replay. On days
@@ -37,16 +37,19 @@ with no holiday, Timmy now and then wears a rare costume, the same one all day. 
 
 ## Sam's calls (2026-11-06, [decisions](../decisions.md))
 
-Mints is the name. The shop rotates daily and weekly, has limited-time seasonal outfits and rarity tiers priced by rarity,
+Shiny Gold Crowns is the name (Sam changed it from Mints the same day). The shop rotates daily and weekly, has limited-time seasonal outfits and rarity tiers priced by rarity,
 sells house cosmetics, snacks and floss that boost health, and XP boosts. The house card gets a full redesign
 ([its note](2026-11-06-redesign-timmys-place.md)). Ships with the redesign.
 
-## Mints
+## Shiny Gold Crowns
 
-- **Worked out by the server from XP**: 1 Mint per 10 XP of base XP (the extra from a double-XP boost doesn't mint, so
+- **The name**: Shiny Gold Crowns in full, "gold crowns" for short, never just "crowns", because the top mastery medal is
+  the Crown. The coin is drawn as a shiny gold dental crown (the restoration, with its occlusal anatomy and a glint), never a
+  king's crown, so it never looks like the Crown medal. In code and the database: `gold_crowns`.
+- **Worked out by the server from XP**: 1 gold crown per 10 XP of base XP (the extra from a double-XP boost earns none, so
   boosts can't feed themselves), plus one-time grants: each trophy 25, each mastery medal 50, each rank-up 20. It follows
   XP, so it inherits XP's server checks and adds no new way to farm. Spending never lowers XP or rank.
-- **Back pay**: on release day everyone has the Mints their XP already earned (median about 120, the most active about
+- **Back pay**: on release day everyone has the gold crowns their XP already earned (median about 120, the most active about
   1,450), so the shop opens with something to spend.
 - The balance is earned minus spent, always computed on the server; the browser only shows it.
 
@@ -60,7 +63,7 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
   - **Seasonal**: limited-time outfits and house props for each holiday and the fall weeks, on sale only in their season
     (`holidayId()`, `isFall()`); owned for good once bought. They don't replace the free holiday outfits he already wears.
   - **Always on the shelf**: snacks, floss and XP boosts.
-- **Rarity tiers**, each with a price band and how often it comes up in the rotation: Common 100-200 Mints, Uncommon
+- **Rarity tiers**, each with a price band and how often it comes up in the rotation: Common 100-200 gold crowns, Uncommon
   250-500, Rare 600-1,200, Epic 1,500-3,000, Legendary 4,000-8,000 (the castle, the giant mushroom, the treehouse). The rarer
   the item, the less often it shows; the tier has its own frame color on the card.
 - **What it sells**:
@@ -98,10 +101,10 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 
 - [ ] The catalog drawn and approved by Sam (light and dark, phone and laptop): the outfits, the snacks, the boosts, the
       seasonal sets, the rare costumes, the rarity frames
-- [ ] Server: Mints, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
+- [ ] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
 - [ ] Client: the shop in More, the balance on the "you" panel, rare costumes, recorded on the preview (reduced motion too)
-- [ ] `LORE.md`, the About page (Mints, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
+- [ ] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
       and retention rows
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -111,6 +114,7 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 - 2026-11-06: workshop of Sam's idea.
 - 2026-11-06: Sam's calls (above). Bowling moved to [its own note](2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
   house card's redesign to [Timmy's place](2026-11-06-redesign-timmys-place.md).
+- 2026-11-06: the currency renamed from Mints to Shiny Gold Crowns (Sam).
 
 ## Outcome
 

@@ -31,7 +31,7 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 - **Part 3, added 2026-11-06 (Sam): the server for the game-layer additions**, built and tested now on a throwaway copy and
   applied at [the release](2026-11-06-redesign-release.md), because it changes how the class earns XP: no daily XP cap,
   `question_keys` and server-checked answers, the guardrails, every new XP source and boost, award rows, the 63-step ladder
-  ([journeys](2026-11-06-redesign-progression-journeys.md)); Mints, the shop catalog and rotation, `buy_item`, `equip_item`,
+  ([journeys](2026-11-06-redesign-progression-journeys.md)); Shiny Gold Crowns, the shop catalog and rotation, `buy_item`, `equip_item`,
   inventory, HP from snacks ([shop](2026-11-06-redesign-timmy-shop.md), [Timmy's place](2026-11-06-redesign-timmys-place.md));
   the idea board's tables and functions ([idea board](2026-11-06-idea-board.md)). The new functions sit beside today's, so the
   live hubs keep today's rules until the release switches them.
