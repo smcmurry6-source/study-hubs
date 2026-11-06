@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: Sam's look and approval; migration_v53.sql applied to the live project
 agent: Codex (part 1); Claude Code (rebase onto main and the release suites)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/262
+pr: https://github.com/smcmurry6-source/study-hubs/pull/266
 ---
 
 # Redesign phase 5: the backend and loading
@@ -31,7 +31,7 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 
 ## Done when
 
-Part 1 (the loading and the database) is [PR #262](https://github.com/smcmurry6-source/study-hubs/pull/262); part 2 (the bundles, the
+Part 1 (the loading and the database) is [PR #266](https://github.com/smcmurry6-source/study-hubs/pull/266); part 2 (the bundles, the
 stylesheet, the font, the client and sw.js precaching) is still to do.
 
 - [x] Hub load: one bootstrap round trip (plus presence); dashboard the same (part 1)
