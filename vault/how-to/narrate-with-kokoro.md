@@ -7,7 +7,12 @@ tags: [audio]
 
 Why this matters: [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md).
 
-Kokoro TTS setup (cloud sessions can only download GitHub release files from
+**Already installed on the `study-hubs` cloud environment** (since 2026-11-06): its setup script runs these steps
+when a session's container starts (model files in `/opt/kokoro`, linked at `/tmp/kokoro`). Check `ls /tmp/kokoro` and
+`python3 -c "import kokoro_onnx"` before installing. That environment has limited network and no `SB_KEY` /
+`ADMIN_SECRET`; the Default environment has those but no setup script.
+
+Kokoro TTS setup by hand (cloud sessions can only download GitHub release files from
 repos attached to the session, so the model is re-hosted on this repo):
 
 ```bash
