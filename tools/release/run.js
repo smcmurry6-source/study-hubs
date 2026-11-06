@@ -21,6 +21,7 @@ const SUITES = [
   ['adminui', 'Admin page in a preview (Live, Hubs, newest first, phone layout)', 'tools/release/admin-ui.js'],
   ['admin', 'Admin operations on fixtures (live presence privacy, archive overrides, order)', 'tools/release/admin-ops.js'],
   ['retention', 'Analytics retention on fixtures (deletes, kept hours, device linking, recap)', 'tools/release/retention.js'],
+  ['xp', 'XP and the game layer on fixtures (replayed calls, double taps, linked devices, the shop, the idea board)', 'tools/release/xp.js'],
   ['a11y', 'Accessibility (axe, keyboard, reduced motion)', 'tools/release/a11y.js'],
   ['perf', 'Performance budgets (slow 4G phone)', 'tools/release/perf.js'],
   ['matrix', 'Devices and resilience (refresh, history, offline, slow)', 'tools/release/matrix.js']

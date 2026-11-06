@@ -6,7 +6,7 @@ created: 2026-11-05
 requested-by: Sam
 due: 
 waiting-on: 
-agent: Codex (part 1); Claude Code (part 1: rebase onto main, the release suites, merge and migration); part 2 not taken
+agent: Codex (part 1); Claude Code (part 1: rebase onto main, the release suites, merge and migration); Claude Code (part 3); part 2 not taken
 pr: https://github.com/smcmurry6-source/study-hubs/pull/266
 ---
 
@@ -50,7 +50,7 @@ with `migration_v53.sql` applied. Part 2 (the bundles, the stylesheet, the font,
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (part 1)
 - [x] Preview link, phone and laptop screenshots, and Sam's look (part 1: approved in chat, "Go ahead"; the PR's box is Sam's to tick)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome) (part 1; no About-page change, no new feature)
-- [ ] Part 3: the server for the game-layer additions (above), each note's server items done, its migration ready to apply at the release
+- [x] Part 3: the server for the game-layer additions (above), each note's server items done, its migration ready to apply at the release (`migration_v54.sql`, tested on a throwaway copy; not applied: [the release](2026-11-06-redesign-release.md) applies it)
 - [ ] Part 2: two widget bundles, one shared stylesheet, one self-hosted font, a thinner Supabase client, sw.js precaching the engine and fonts and caching content JSON stale-while-revalidate
 
 ## Log
@@ -63,9 +63,24 @@ with `migration_v53.sql` applied. Part 2 (the bundles, the stylesheet, the font,
 - 2026-11-06 (Claude Code): the preview showed Codex's lazy ranks took away the badge by the name and every rank-up, level-up, trophy and mastery card until Stats was opened (17 of 108 people in a hub opened it in 14 days). Sam chose "own rank on load": the bootstrap carries the visitor's own rank profile and hub mastery, refreshed every 10 answers; the class-wide board, leaderboards and trophy rarity wait for Stats.
 - 2026-11-06 (Claude Code): UAT in the preview found BUG-034 (cards with no choices, such as Perio's "Show answer" recall cards, sat on "Loading class data…" once class data waited for an answer); the class line now also loads when it comes into view. Before anything is answered, Perio's bank makes 0 class-data reads (main: 8).
 - 2026-11-06 (Claude Code): the full `node tools/release/run.js` passed (13 of 13 suites), and so did CI ("Check hubs", "Release tests", preview). Sam: "Go ahead". Merged as 04c4b3a; `postcheck.js` passed (11 of 11 changed files live, the dashboard and 4 hubs with no errors). Sam: "apply it". `migration_v53.sql` applied through the connector at about 01:55 UTC, while students were answering. Afterward: all 158 cache rows match the per-day XP, the answer totals match, `get_rank_profile` takes about 2 ms, the bootstrap about 115 ms (hub) and 170 ms (dashboard), `rls-audit.sql` is clean and the advisors' `search_path`, primary-key and unused-index warnings are gone. Site changelog posted.
+- 2026-11-06 (Claude Code, part 3): `migration_v54.sql`, the game layer's server, built and tested only on throwaway copies of
+  `supabase/schema.sql`, never on the live project ([game-server](../reference/game-server.md) says how it works). New:
+  `supabase/pending-migrations.txt` (migrations written ahead of their release, applied by every database suite on top of the
+  schema), `tools/release/xp.js` (243 checks: today's rules unchanged after the migration, server-graded answers, the
+  guardrails, every source, a replayed call, a double tap, a linked device, the rebuild against the live calls, the shop, the
+  idea board) and `tools/xp/keys.js` (a hub's keys from its content JSON; Occlusion's 773 load). `rls.js` now seeds the new
+  tables and calls every function a visitor can run with one visitor's id, failing if another's comes back (checked by
+  planting a leaky function: caught). Found BUG-049, live since v53: today's bootstrap sends Timmy's days as bare dates, so HP
+  counts only this device's log; the fix is section 0 of the migration and can be applied alone on Sam's OK.
 
 ## Outcome
 
 **Part 1 is live (2026-11-06, [PR #266](https://github.com/smcmurry6-source/study-hubs/pull/266), `migration_v53.sql`).** A hub or the dashboard reads everything it needs on load in one `get_widget_bootstrap` call. In the fixture preview that's 12 reads down to 1 on a hub and 19 down to 1 on the dashboard, besides presence and the changelog. Each visitor's own rank and hub mastery come with it (Sam's call), and the class-wide board, leaderboards and trophy rarity wait for Stats or the dashboard panel. XP is cached per visitor in `xp_visitors`, kept by the answer trigger, so a rank lookup takes about 2 ms instead of about 0.9 s. The advisor fixes are in. Three bugs were found and fixed on the way (BUG-032, BUG-033, BUG-034 in the [bug log](../release/bug-log.md)). Codex's #261 is superseded by #266.
 
 **Still to do (part 2):** two widget bundles (core on load, the rest on idle or first use), one shared stylesheet, one self-hosted font, a thinner Supabase client with realtime presence kept, sw.js precaching the engine and fonts and caching content JSON stale-while-revalidate, then lower the `perf.js` budgets to the new sizes. The bootstrap is the slowest single request now: about 115 ms on a hub and 170 ms on the dashboard for the most active visitor. That's worth a look if part 2 measures load time.
+
+**Part 3 is written and tested, waiting for the release** (`migration_v54.sql`; [game-server](../reference/game-server.md)). The
+server for the journeys, Shiny Gold Crowns and Timmy's shop, Timmy's place and the idea board sits beside today's functions, so
+the live hubs keep today's rules (and the 600-a-day cap) until the release switches the pages to the new calls. No XP back pay.
+What the release does with it is in [the release note](2026-11-06-redesign-release.md) ("From phase 5, part 3"). The judgment
+calls made while building it, for Sam to confirm before the release, are listed in the reference note and the PR.

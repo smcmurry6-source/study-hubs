@@ -82,6 +82,29 @@ privacy rule). Written by = the RPC and the client file that calls it.
 never for anything about a person. `link_attempts` are kept 7 days. Content and ops: `changelog`, `site_notices`, `hub_recaps`,
 `retention_runs` (what each weekly retention run removed and the database size then, v52) (no visitor ids).
 
+### The game layer's server (migration_v54, from the redesign's release; [game-server](game-server.md))
+
+Not analytics either: the records that pay XP, keep what students own and run the idea board. Read them for totals over 5 or
+more people, never for anything about a person.
+
+| Table | Grain | Visitor | Written by | Notes |
+|---|---|---|---|---|
+| `question_keys` | hub × qid × version: kind, answer, counted, retired | no | `admin_load_question_keys` (`tools/xp/keys.js`) | The bank's keys, so the server grades answers |
+| `answer_xp` | one v2 answer: its request id, context, mock or game session, kind, the result sent back | via `personal_answers` | `record_answer_v2` | One row per `personal_answers` row the new pages write; deleted with it |
+| `xp_awards` | visitor × award key: source, hub, base and paid XP, time, Central day | yes | `record_answer_v2`, `xp_session_finish`, `pod_minute_v2`, `admin_resolve_report_v2` | The XP ledger. Sources: `answer`, `goal20`, `fix`, `mock`, `medal`, `pod-min`, `pod-done`, `arcade`, `report` |
+| `xp_boosts` | visitor × boost: source (`medal`, `shop`), 2x, start and end | yes | medals, `buy_item` | Double XP |
+| `xp_sessions` | one mock or arcade game: visitor, hub, game, start and finish | yes | `xp_session_start` / `xp_session_finish` | Lets a mock's answers arrive together, and times a game |
+| `game_baseline` | visitor: XP and badges at the switch | yes | the migration, once | Why no medal or trophy from before the switch pays twice |
+| `game_config` | one row: the switch time | no | the migration | |
+| `podcast_episodes` | hub × episode: length in seconds | no | `admin_set_podcast_episode` | How many minutes an episode pays |
+| `report_outcomes` | report or suggestion × outcome (`fixed`, `no-change`) | no (the report has it) | `admin_resolve_report_v2` | "Fixed" pays the sender +100 |
+| `shop_items` | one item: kind, rarity, price, season, slot, HP or boost | no | the migration, `admin_upsert_shop_item` | The catalog |
+| `pet_purchases` | one purchase: visitor, item, price, request id, Central day, HP | yes | `buy_item` | Spending, snacks' HP, boosts bought |
+| `pet_inventory` / `pet_equipped` | visitor × item; visitor × slot | yes | `buy_item`, `equip_item` | What Timmy has, wears and where his things stand |
+| `costume_log` | visitor × rare costume: first day seen | yes | `record_costume_sighting` | The "you" panel's costume log |
+| `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter` |
+| `idea_votes` / `idea_reports` / `idea_notes` | visitor × idea: up or down; a report; a status note for the Inbox | yes | `vote_idea`, `report_idea`, `admin_set_idea` | Three reports hide an idea |
+
 ## Naming conventions
 
 ### Sections (`activity_pings.section`, `ui_clicks.section`)

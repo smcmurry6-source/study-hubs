@@ -8,12 +8,15 @@
 //   - every security-definer function pins its search_path; the functions the schema revokes stay revoked;
 //   - every function that takes p_secret refuses a missing and a wrong secret (and writes nothing), and accepts
 //     the right one (so the test means something);
-//   - per-visitor reads (get_my_answers, get_personal_stats) return only that visitor's rows.
-// Nothing here touches the live database. Run it whenever a migration or supabase/schema.sql changes:
+//   - per-visitor reads (get_my_answers, get_personal_stats, the bootstrap, the shop, the rank) return only that
+//     visitor's rows, and no function a visitor can run hands back another visitor's id.
+// The migrations waiting for their release (supabase/pending-migrations.txt) are applied on top of the schema first, so
+// they're checked with everything else. Nothing here touches the live database. Run it whenever a migration or supabase/schema.sql changes:
 //   node tools/release/rls.js            (needs PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 // The live database is checked read-only with tools/release/rls-audit.sql instead.
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), { execFileSync, spawnSync } = require('child_process');
+const { pending } = require('./pending');
 const ROOT = path.resolve(__dirname, '../..');
 const EXPECT = JSON.parse(fs.readFileSync(path.join(__dirname, 'rls-expectations.json'), 'utf8'));
 const SECRET = 'rls-test-secret';
@@ -60,12 +63,19 @@ try {
        alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
        alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
        alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;`);
-  const schema = fs.readFileSync(path.join(ROOT, 'supabase', 'schema.sql'), 'utf8').split('<ADMIN_SECRET>').join(SECRET);
+  let schema = fs.readFileSync(path.join(ROOT, 'supabase', 'schema.sql'), 'utf8').split('<ADMIN_SECRET>').join(SECRET);
   try { sql('begin;\n' + schema + '\ncommit;'); }
   catch (e) { fail(`supabase/schema.sql doesn't load into a fresh database: ${e.message.split('\n')[0]}`); throw new Error('stop'); }
+  /* the migrations waiting for their release, in order; their grants and revokes count as the schema's last word */
+  const waiting = pending(SECRET);
+  for (const m of waiting) {
+    try { sql('begin;\n' + m.text + '\ncommit;'); }
+    catch (e) { fail(`${m.file} (pending) doesn't load on top of supabase/schema.sql: ${e.message.split('\n')[0]}`); throw new Error('stop'); }
+    schema += '\n' + m.text;
+  }
   const tables = sql(`select c.relname, c.relrowsecurity from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' order by 1`);
   const fnCount = sql(`select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'`)[0][0];
-  notes.push(`loaded supabase/schema.sql: ${tables.length} tables, ${fnCount} functions`);
+  notes.push(`loaded supabase/schema.sql${waiting.length ? ' and the pending ' + waiting.map(m => m.file).join(', ') : ''}: ${tables.length} tables, ${fnCount} functions`);
 
   /* made-up rows for two visitors, A and B */
   sql(`insert into personal_answers (visitor_id, hub, qid, correct) values ('rls-A','rls-hub','q1',true),('rls-A','rls-hub','q2',false),('rls-A','rls-hub','q3',true),('rls-B','rls-hub','q1',true),('rls-B','rls-hub','q9',false);
@@ -78,6 +88,25 @@ try {
        insert into changelog (hub, message) values ('rls-hub','made-up entry');`);
   const xpA = sql(`select xp, days, answers, correct from public.xp_visitors where visitor_id = 'rls-A'`)[0];
   if (!xpA || xpA.map(Number).join(',') !== '41,1,3,2') fail(`xp_visitors did not incrementally cache A's answers (got ${(xpA || []).join(',') || 'no row'})`);
+  /* the game layer's tables (migration_v54), when they're in: B owns things, has XP awards, a boost, an idea, votes and
+     an Inbox note, so a function that leaks them shows up below */
+  const has = t => sql(`select to_regclass(${q('public.' + t)}) is not null`)[0][0] === 't';
+  const game = has('xp_awards') && has('pet_inventory') && has('ideas');
+  if (game) {
+    sql(`insert into question_keys (hub, qid, kind, answer) values ('rls-hub','q1','one','{1}'),('rls-hub','q2','one','{0}'),('rls-hub','q3','one','{2}'),('rls-hub','q9','one','{3}');
+         insert into visitor_names (visitor_id, display_name) values ('rls-B','Made Up Incisor');
+         insert into xp_awards (visitor_id, key, src, hub, base, xp, at, d) values ('rls-B','rep:flag:1','report','rls-hub',100,100,now(),current_date);
+         insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('rls-B','shop:1','shop',2,now() - interval '1 minute',now() + interval '1 hour');
+         insert into pet_purchases (visitor_id, item_id, kind, price, request_id, day) values ('rls-B','bow-tie','outfit',150,'rls-b-buy-0001',current_date);
+         insert into pet_inventory (visitor_id, item_id) values ('rls-B','bow-tie');
+         insert into pet_equipped (visitor_id, slot, item_id) values ('rls-B','outfit','bow-tie');
+         insert into costume_log (visitor_id, costume, first_day) values ('rls-B','pirate',current_date);
+         insert into ideas (visitor_id, name, title, hub, category, source) values ('rls-B','Made Up Incisor','A made-up idea','rls-hub','feature','board');
+         insert into idea_votes (idea_id, visitor_id, val) select id, 'rls-A', 1 from ideas where visitor_id = 'rls-B';
+         insert into idea_reports (idea_id, visitor_id) select id, 'rls-C' from ideas where visitor_id = 'rls-B';
+         insert into idea_notes (visitor_id, idea_id, status, note) select 'rls-B', id, 'planned', 'made-up note' from ideas where visitor_id = 'rls-B';
+         insert into xp_sessions (visitor_id, hub, kind, started_at) values ('rls-B','rls-hub','mock',now());`);
+  }
 
   /* 1. row-level security on, and anon's direct access is exactly the expected list */
   tables.filter(t => t[1] !== 't').forEach(t => fail(`table ${t[0]} has row-level security off (anon can read and write it directly)`));
@@ -167,6 +196,49 @@ try {
   const emptyBootstrap = JSON.parse(sql(`begin; set local role anon; select public.get_widget_bootstrap(null, 'rls-hub', null, null)::text; rollback;`)[0][0]);
   if ((emptyBootstrap.answers || []).length || (emptyBootstrap.pins || []).length || (emptyBootstrap.inbox || []).length || emptyBootstrap.rank || (emptyBootstrap.mastery || []).length) fail('get_widget_bootstrap with no visitor returned visitor data');
   notes.push('get_my_answers, get_personal_stats and get_widget_bootstrap return only the asking visitor\'s rows');
+
+  /* 6. the game layer's per-visitor reads (migration_v54) */
+  if (game) {
+    const asAnon = t => JSON.parse(sql(`begin; set local role anon; select (${t})::text; rollback;`)[0][0]);
+    const shopA = asAnon(`public.get_my_shop('rls-A')`), shopN = asAnon(`public.get_my_shop(null)`);
+    if (shopA.inventory.length || Object.keys(shopA.equipped).length || shopA.costumes.length || shopA.boost || !shopA.wallet || shopA.wallet.spent !== 0)
+      fail(`get_my_shop for visitor A shows someone else's things: ${JSON.stringify({ inv: shopA.inventory, eq: shopA.equipped, boost: shopA.boost, wallet: shopA.wallet })}`);
+    if (shopN.wallet || shopN.inventory.length || shopN.boost) fail('get_my_shop with no visitor returned visitor data');
+    const rankA = asAnon(`public.get_rank_profile_v2('rls-A')`);
+    if (!rankA || Number(rankA.xp) !== 41 || rankA.boost) fail(`get_rank_profile_v2 for visitor A is ${JSON.stringify(rankA)}, expected A's 41 XP and no boost`);
+    const b2 = asAnon(`public.get_widget_bootstrap_v2('rls-A', 'rls-hub', null, 'ep')`), b2n = asAnon(`public.get_widget_bootstrap_v2(null, 'rls-hub', null, null)`);
+    if ((b2.answers || []).length !== 3 || !b2.rank || Number(b2.rank.xp) !== 41 || (b2.shop.inventory || []).length) fail(`get_widget_bootstrap_v2 for visitor A doesn't match A's rows (${(b2.answers || []).length} answers, rank ${JSON.stringify(b2.rank && b2.rank.xp)})`);
+    if ((b2n.answers || []).length || b2n.rank || (b2n.inbox || []).length || (b2n.shop && b2n.shop.wallet)) fail('get_widget_bootstrap_v2 with no visitor returned visitor data');
+    const inboxA = asAnon(`(select coalesce(json_agg(x), '[]') from public.get_my_inbox_v2('rls-A') x)`);
+    if (inboxA.some(r => r.kind === 'idea')) fail('get_my_inbox_v2 for visitor A shows B\'s idea notes');
+    const board = asAnon(`public.get_ideas('rls-A')`);
+    if (!board.ideas.length || board.ideas.some(i => i.own) || board.ideas[0].mine !== 1) fail(`get_ideas for visitor A: ${JSON.stringify(board.ideas)} (expected B's idea, not A's own, with A's up vote)`);
+    notes.push('get_my_shop, get_rank_profile_v2, get_widget_bootstrap_v2, get_my_inbox_v2 and get_ideas return only the asking visitor\'s rows');
+  }
+
+  /* 7. no function a visitor can run hands back another visitor's id: every one (but triggers) is called as anon with A's
+     id, the hub, no secret and its defaults, in a transaction that's rolled back, and B's id must never come back */
+  const callable = sql(`select p.proname, array_to_string(p.proargnames, ','), array_to_string(array(select format_type(t, null) from unnest(p.proargtypes) t), ','),
+                          coalesce(array_to_string(p.proargmodes, ','), ''), p.pronargs - p.pronargdefaults, p.proretset, format_type(p.prorettype, null)
+                        from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.prokind = 'f'
+                          and format_type(p.prorettype, null) not in ('trigger', 'event_trigger') and has_function_privilege('anon', p.oid, 'execute') order by 1`);
+  let scanned = 0, raised = 0;
+  for (const [name, argNames, argTypes, modes, required, retset, rettype] of callable) {
+    const names = argNames ? argNames.split(',') : [], types = argTypes ? argTypes.split(',') : [], m = modes ? modes.split(',') : [];
+    const ins = names.map((n, i) => ({ n, t: types[i], mode: m[i] || 'i' })).filter(a => a.mode === 'i' || a.mode === 'b').slice(0, Number(required));
+    for (const visitor of ["'rls-A'", 'null::text']) {
+      const args = ins.map(a => `${a.n} => ${a.n === 'p_secret' ? 'null::text' : /^p_(visitor|primary|alias|me)$/.test(a.n) ? visitor : a.n === 'p_hub' ? "'rls-hub'" : VAL[a.t] || `null::${a.t}`}`).join(', ');
+      const call = `public.${name}(${args})`;
+      const pick = rettype === 'void' ? `select ${call}, ''` : retset === 't' || rettype === 'record' ? `select 'R', coalesce(json_agg(x), '[]')::text from ${call} x` : `select 'R', (${call})::text`;
+      let out;
+      try { out = sql(`begin; set local role anon; ${pick}; rollback;`); scanned++; }
+      catch (e) { raised++; continue; }
+      const text = out.map(r => r.join(' ')).join(' ');
+      if (/rls-B|rls-C/.test(text)) fail(`${name}(${visitor === 'null::text' ? 'no visitor' : "visitor A"}) hands back another visitor's id: ${text.slice(0, 120)}`);
+      if (visitor === 'null::text' && /rls-A/.test(text)) fail(`${name}(no visitor) hands back visitor A's id: ${text.slice(0, 120)}`);
+    }
+  }
+  notes.push(`${callable.length} functions anon can run scanned for other visitors' ids (${scanned} calls answered, ${raised} refused their made-up arguments)`);
 } catch (e) {
   if (e.message !== 'stop') fail(`test run failed: ${e.message.split('\n')[0]}`);
 }

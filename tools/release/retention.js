@@ -13,6 +13,7 @@
 //   node tools/release/retention.js      (needs PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), { execFileSync, spawnSync } = require('child_process');
+const { pending } = require('./pending');
 const ROOT = path.resolve(__dirname, '../..');
 const SECRET = 'retention-test-secret';
 const problems = [], notes = [];
@@ -55,6 +56,11 @@ try {
   const schema = fs.readFileSync(path.join(ROOT, 'supabase', 'schema.sql'), 'utf8').split('<ADMIN_SECRET>').join(SECRET);
   try { sql('begin;\n' + schema + '\ncommit;'); }
   catch (e) { problems.push(`supabase/schema.sql doesn't load: ${e.message.split('\n')[0]}`); throw new Error('stop'); }
+  /* the migrations waiting for their release (supabase/pending-migrations.txt), so the job is tested with them in place */
+  for (const m of pending(SECRET)) {
+    try { sql('begin;\n' + m.text + '\ncommit;'); }
+    catch (e) { problems.push(`${m.file} (pending) doesn't load: ${e.message.split('\n')[0]}`); throw new Error('stop'); }
+  }
   for (const f of ['sh_retention_run', 'sh_retention_status', 'feature_daily', 'retention_runs'])
     if (one(`select coalesce(to_regproc('public.${f}')::text, to_regclass('public.${f}')::text, '')`) === '') problems.push(`${f} is missing from supabase/schema.sql`);
   if (problems.length) throw new Error('stop');
