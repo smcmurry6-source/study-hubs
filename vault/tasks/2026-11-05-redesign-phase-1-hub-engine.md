@@ -26,6 +26,10 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - Rules edited in this PR: [hub-home-page](../rules/hub-home-page.md) (Home stays, as a landing page with the quick links on the first phone screen; drill, weak spots and mock as bank presets), [arcade-skins](../rules/arcade-skins.md) (one game up front, the rest behind more games), [question-bank-filter-panel](../rules/question-bank-filter-panel.md) (the presets as chips).
 - Keep: `window.SH_EXPORT = {` last, the question-id registry, the lint's question shape and format minimums, the smoke test's selectors (update `tools/ci/smoke.js` with the engine), the `od:kit`/`anima:js` marker blocks (or their new per-figure files), narrate.py's READINGS format (or its new JSON reader), the preview transform's literal strings.
 - Settings cut: font choice, background music, accent metal (text size and theme stay). Tour prompt cut; one-line first-use tips.
+- **From phase 0** ([task](2026-11-05-redesign-phase-0-design-system.md)): the typeface is **Nunito Sans**
+  (`assets/fonts/nunito-sans-*.woff2`); the tokens, the question card and the reward logic are on the design page
+  (`tools/preview/design/design.css`, `design.js`); the approved art is in `tools/figures/site/` (`build.mjs` writes
+  `art.js` today; add the symbol sheets for the widget). Occlusion's emblem, masthead and medals are there already.
 
 - **A parallel agent (Codex) can take the engine extraction and the content split** (`widget/hub.js`, the JSON files, CI,
   narrate.py and the preview transform) while the design session does the layout, the card and the art on top of it: agree

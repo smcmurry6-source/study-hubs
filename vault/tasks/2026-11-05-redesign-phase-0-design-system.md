@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: review
 hub: site
 created: 2026-11-05
 requested-by: Sam
 due: 
 waiting-on:
-agent:
+agent: Claude Code (branch claude/study-hubs-design-system-fx9zfs)
 pr:
 ---
 
@@ -54,15 +54,53 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 
 ## Done when
 
-- [ ] A preview page (`tools/preview/design/`, served by `node tools/preview/serve.js`) that shows every token, the icon set, Timmy's sheet, the emblems and mastheads, the medals, and the question card in each format, in both typefaces, in light and dark
-- [ ] The taste inspector (`--app`) passes with 0 FAIL on the preview page at 1440, 768 and 390
-- [ ] Sam picked the typeface and approved the art (one AskUserQuestion per group)
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] A preview page (`tools/preview/design/`, served by `node tools/preview/serve.js`) that shows every token, the icon set, Timmy's sheet, the emblems and mastheads, the medals, and the question card in each format, in both typefaces, in light and dark
+- [x] The taste inspector (`--app`) passes with 0 FAIL on the preview page at 1440, 768 and 390
+- [x] Sam picked the typeface and approved the art (one AskUserQuestion per group)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`), except two Occlusion contrast checks that fail the same way on `main` (BUG-030)
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
-- [ ] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
+- [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-05/06: built by Claude Code: the art in `tools/figures/site/`, the page in `tools/preview/design/`, the inspector
+  to 0 FAIL, screenshots to Sam and eight AskUserQuestion answers (below). Waiting on Sam's look at the PR.
 
 ## Outcome
+
+**What's there.** `tools/preview/design/` (`index.html`, `design.css`, `design.js`, `art.js`) is the design system on one
+page, on made-up data: the tokens (one ground, Timmy's ink, reward gold, a tint per hub, the 16 / 14 / pill radii and the
+motion tokens), both typefaces (a switch sets the whole page in either; a section shows them side by side), a Hub picker
+for each live hub's tint, emblem, scene and its own sample question, the question card in all nine formats (single,
+EXCEPT, select-all, two-statement, true/false, numbered, picture, Patient Box, recall), each waiting and answered, every
+card working, and the rewards wired to the live card (the XP spark flies to the rank pill, Timmy cheers or flinches on
+the bar, the goal ring closes, the streak flame grows, the session recap opens at 25). Light and dark, phone and laptop.
+The preview server and build include it (`PREVIEW_PAGES` in `tools/preview/transform.js`).
+
+**The art**, all SVG drawn in Timmy's ink (`#3B2E3A`, flat fills, one shade, white highlights; no ids, gradients, text or
+emoji, which `build.mjs` checks), in `tools/figures/site/`: `style.mjs` (ink, fills, the hub tints), `icons.mjs` (49
+icons, 24 grid, 2 px stroke), `emblems.mjs` and `mastheads.mjs` (the five live hubs and a placeholder), `medals.mjs`
+(Bronze, Silver, Gold and Crown per hub; 26 trophies and their locked shapes), `rewards.mjs` (the flame in three sizes,
+the XP spark). Timmy, his house and the handpiece ranks are rendered by the live code (`widget/pet.js`,
+`widget/ranks.js`) in a sandbox, unchanged. `node tools/figures/site/build.mjs` writes `art.js`; `--check` fails if it's
+stale. The page shows static drawings as images (`data:` URIs), so their ids never collide.
+
+**Sam's answers (2026-11-06):** typeface Nunito Sans; icons, masthead scenes, trophies and rewards art approved; the emblems
+and medals approved with a new rule, every new hub gets its own emblem, scene, unique medals and other art
+([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md), also a step in
+[build-a-hub](../how-to/build-a-hub.md)); the five live hubs keep the shared medal design. All in
+[decisions](../decisions.md).
+
+**Verified:** the taste inspector `--app`: 0 FAIL at 1440, 768 and 390 in Nunito light, Fraunces and dark (two warnings
+kept on purpose: the waiting and answered cards of a pair can't end level, and it's a long reference sheet, not a working
+screen). axe on the page: nothing but the preview banner's own pill. Every hub's card answered in a scripted browser with no
+console errors. `syntax.js`, `vault.js`, `smoke.js`, `secrets.js` and the release suites pass, except `a11y.js` on
+Occlusion (two contrast checks, the same on `main`: BUG-030 in the [bug log](../release/bug-log.md)).
+
+**Not changed:** no hub, the dashboard or the widget, so no About page entry (nothing students see yet) and no hub notes.
+GitHub Pages will serve the page at `/tools/preview/design/` once merged (noindex, unlinked, made-up data). The Fraunces
+files stay in `assets/fonts/` while the page compares the faces; phase 1 can drop them.
+
+**For phase 1** ([task](2026-11-05-redesign-phase-1-hub-engine.md)): take the tokens from `design.css`, the card markup,
+answer states and reward logic from `design.js`, and add a symbol-sheet output to `build.mjs` for the widget.

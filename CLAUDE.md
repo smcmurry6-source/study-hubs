@@ -70,6 +70,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/arcade-skins.md
 
+@vault/rules/every-hub-gets-its-own-art.md
+
 @vault/rules/text-and-audio-never-drift.md
 
 @vault/rules/podcast-reactions.md

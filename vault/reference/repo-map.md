@@ -11,7 +11,8 @@ tags: [map]
 - `RELEASE_TEST_PLAN.md` — how a substantial change is previewed, tested, approved by Sam, released and
   rolled back ([preview-and-release-test](../rules/preview-and-release-test.md)). Its tools: `tools/preview/` (`serve.js`
   and `build.js` make a production-safe preview on fixture data; `runtime/preview.js` is injected into previews only;
-  `fixtures/personas.json` holds the six test accounts) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
+  `fixtures/personas.json` holds the six test accounts; `design/` is the redesign's design system page, which a preview
+  serves at `/tools/preview/design/`, its art built from `tools/figures/site/` by `build.mjs`) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
   `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
   `matrix.js`, `postcheck.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
 - `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
