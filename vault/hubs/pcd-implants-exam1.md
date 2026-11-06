@@ -71,7 +71,15 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   `in-collagen`, `im-num-2`, `im-medct`, `tm-2s-1`, `cb-num-2`. **`su-def-bran` follows the surgery lecture**, which gives
   "light microscopic" to Brånemark (1969) and "structural and functional connection" to Albrektsson and Sennerby (1991);
   many textbooks credit that second wording to Brånemark, which is why most recent tries picked it. Keep the lecture's
-  attribution unless Sam says otherwise. **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
+  attribution unless Sam says otherwise. **Exam day, 2026-11-06** (Sam: "review implants question health, fix the issues, mark
+  them in the admin page, and merge"): 10 more flagged, every key matched the notes. New wording: `ev-tmi-bone` (the key says
+  "behind the plate", the notes' words, not "distal to"), `bm-goodacre` (the stem names Goodacre's review; resin, not porcelain,
+  was the veneer that fractured often). New explanations and why lines: `im-crest`, `su-esth-span` (a wide single space is low
+  risk), `su-bar`, `su-mm-1` (malpositioning is surgical-related), `su-match` (a matching card shows only its explanation after
+  answering, not the pairs, so the explanation now lists them; do the same for any matching item). Looks fine: `bm-moment`
+  (the lecture leans on "stress is force per unit area", so force / area is a real mix-up), `im-pa-follow` (21 of 23 right; the
+  top-vs-bottom flag is noise on an easy item), `tm-2s-6` (picks spread over all four choices: guessing, not a pull to one
+  wrong answer). **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
   key plus the explanation), so an explanation edit starts fresh numbers and a why-line edit doesn't. Ids removed on Sam's
   11-03 call (`tm-code-6010`, `tm-code-6058`, `tm-conelog`, `tm-rc-grooves`, `gs-credit`) are retired in
   `tools/question-ids/pcd-implants-exam1.txt`; the admin page lists the ones with class data as "gone".
