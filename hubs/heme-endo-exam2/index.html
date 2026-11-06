@@ -753,7 +753,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .home-tl li::before{content:"";position:absolute;left:-21px;top:5px;width:12px;height:12px;border-radius:999px;background:var(--surface);border:2px solid var(--line-strong)}
 .home-tl .tl-date{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
 .home-tl .tl-what{font-size:.9rem}
-.home-tl .tl-past{opacity:.62}
+.home-tl .tl-past .tl-what{color:var(--ink-soft)}
 .home-tl .tl-past::before{background:var(--line-strong)}
 .home-tl .tl-today::before{background:var(--accent);border-color:var(--accent)}
 .home-tl .tl-due .tl-what{color:var(--caution);font-weight:700}
@@ -1562,8 +1562,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .anima .hpg-svg .t.hg-bant{fill:var(--anatomy-muted);letter-spacing:.06em}
 
 /* anima:css end */
-/* contrast (tools/release/a11y.js): past timeline dates, the primary button in dark mode, the selected Arcade tab */
-.home-tl .tl-past{opacity:.85}
+/* contrast (tools/release/a11y.js): the primary button in dark mode, the selected Arcade tab */
 :root[data-theme="dark"] .btn.primary{color:#1a1114}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn.primary{color:#1a1114} }
 #modeSwitch button[data-mode="arcade"][aria-selected="true"]{color:var(--accent-ink)}

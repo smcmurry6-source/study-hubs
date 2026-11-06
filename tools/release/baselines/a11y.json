@@ -114,13 +114,13 @@
   "pcd-implants-exam1 · home": {
    "axe": {
     "color-contrast": {
-     "n": 4,
+     "n": 2,
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".tag-amber > .lec-num"
     },
     "label-content-name-mismatch": {
-     "n": 4,
+     "n": 3,
      "impact": "serious",
      "help": "Elements must have their visible text as part of their accessible name",
      "sample": ".sh-pod-rate"
@@ -140,18 +140,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": "button[data-lec=\"evolution\"] > .lec-num"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    },
-    "svg-img-alt": {
-     "n": 6,
-     "impact": "serious",
-     "help": "<svg> elements with an img or image role must have alternative text",
-     "sample": "figure:nth-child(1) > svg[viewBox=\"0 0 400 230\"][role=\"img\"]"
     }
    },
    "focus": null,
@@ -164,18 +152,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".tag-teal.gc-lec"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    },
-    "svg-img-alt": {
-     "n": 6,
-     "impact": "serious",
-     "help": "<svg> elements with an img or image role must have alternative text",
-     "sample": ".rv-section:nth-child(4) > .fig-grid > figure:nth-child(1) > svg[viewBox=\"0 0 400 230\"][role=\"img\"]"
     }
    },
    "focus": null,
@@ -188,12 +164,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": "button[data-mode=\"arcade\"] > .mode-label"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     }
    },
    "focus": null,
@@ -358,13 +328,13 @@
   "pcd-implants-exam1 (dark)": {
    "axe": {
     "color-contrast": {
-     "n": 4,
+     "n": 2,
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".primary.btn[data-home=\"mock\"]"
     },
     "label-content-name-mismatch": {
-     "n": 4,
+     "n": 3,
      "impact": "serious",
      "help": "Elements must have their visible text as part of their accessible name",
      "sample": ".sh-pod-rate"

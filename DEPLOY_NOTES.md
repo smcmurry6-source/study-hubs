@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (Course timeline contrast in Heme & Endo 1 and 2, PCD Implants, Special Patient Care, Claude Code)** — Sam said yes to the
+  inbox item left from BUG-031. Home's course timeline faded past rows with `opacity:.62` (Heme & Endo 2: `.85`, from its own contrast
+  patch), which put their dates near 3:1 in light mode, and every day another row turns past, so the accessibility gate could fail
+  with no code change, as Occlusion's did. All four now use Occlusion's rule, `.home-tl .tl-past .tl-what{color:var(--ink-soft)}`
+  (past dates already use the soft ink): 7.5:1 or better in both themes. `tools/release/a11y.js` passes; PCD Implants' Home contrast
+  nodes went 4 to 2 (light and dark) and its baseline was updated (`--update --hub pcd-implants-exam1`). Special Patient Care and Heme
+  & Endo 1 aren't live in the a11y suite any more; their numbers are computed from their palettes. Bug log: BUG-031.
 - **2026-11-06 ("Why each choice" starts folded, every live hub, Claude Code)** — Sam: "after you answer a question,
   have the 'why each choice' be collapsed by default. it takes up a lot of screen space". `whyHTML` no longer opens its
   `<details class="qx-why">`, so after answering a student sees the explanation and one "Why each choice" bar, and taps it
