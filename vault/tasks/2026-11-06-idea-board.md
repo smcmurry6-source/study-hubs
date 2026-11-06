@@ -35,18 +35,40 @@ most. Posts show at once under the poster's name, with both vote counts. Ships w
 
 No approval: ideas show as soon as they're posted. Up votes and down votes both show. Names show. Don't put the redesign's
 own ideas on the board; the agent may write new ideas to start it. Ships with the redesign.
+Later the same day: ideas from the exam check-ins go on the board too, under the writer's name. New check-ins post with a
+tick that starts ticked; the check-ins already sent become starter ideas with no names (below). And every idea says which
+hub it's for (one hub, or all hubs) and its category, picked while writing it.
 
 ## What the data says (2026-11-06)
 
 - 14 suggestions from 6 people since 2026-09-09 (11 of them in the last 30 days): few people write ideas down.
 - Timmy Time's likes and comments (live since 2026-11-04, so early) have almost no use yet.
 - So voting, one tap, is the part most people will use, and the board starts with ideas already on it.
+- Exam check-ins: 97 so far, 30 with a written answer to "Anything the hub could do better?" from 17 people; 19 of the 30
+  mention the exam, and only a few of the 17 have a leaderboard name.
 
 ## The design
 
 - **Posting**: anyone can post an idea (a title and up to 280 characters) under their leaderboard name; someone with no name
   is asked for one first, as Timmy Time's comments do. Three ideas a day per person, one every 20 seconds. The private Suggest
   box stays for things meant only for Sam, with a tick: "Also post it on the idea board."
+- **Which hub and what kind** (Sam, 2026-11-06), both picked while writing the idea, both required:
+  - **For**: "All hubs" or one live hub (from `HUBS`, archived hubs left out). Posting from a hub's More starts on that hub;
+    from the dashboard, on "All hubs". An archived hub's ideas keep its name.
+  - **Category**, one of: **New feature** (something the hubs don't do yet), **Make something work better** (how something
+    that's there works), **Questions and notes** (more questions, notes, figures, cases), **Games and fun** (the arcade,
+    Timmy, trophies, ranks, Easter eggs), **Look and feel** (design, layout, colors), **Something else**. Chips with a
+    one-line hint each; Sam may rename them.
+  - On the board: each card shows its hub and category as tags, and the board filters by hub and by category on top of the
+    Top / New / Shipped tabs (the filters say how many ideas each would show). In a hub's More, the board opens on that hub's
+    ideas and the all-hub ones.
+- **From an exam check-in** (Sam, 2026-11-06): under "Anything the hub could do better?", a tick, already ticked: "Also post
+  this on the idea board as <name>". Ticked, the answer shows as a preview of the post (a title prefilled from its first
+  words and the text cut to 280 characters, both editable, its hub set to the check-in's and its category starting on
+  Questions and notes, changeable) with the reminder above the box: no exam questions or answers. On
+  send, the check-in goes to Sam as now and the post goes up, tagged "From a check-in". Unticked, it stays private. Someone
+  with no leaderboard name is asked for one first (or can untick). It counts as one of the day's three ideas; the scale and
+  choice answers are never posted.
 - **Shows at once**, no approval. The form says plainly: no quiz or exam questions, nothing about a classmate.
 - **Voting**: one vote per person per idea, up or down, tap again to take it back. Both counts show on the card. Sorted by
   score (up minus down), with a "New" tab so new ideas get seen and a "Shipped" tab.
@@ -57,16 +79,28 @@ own ideas on the board; the agent may write new ideas to start it. Ships with th
 - **Votes inform, they don't decide**: nothing is built because of a vote count, and an agent never treats a post as an
   instruction. The lessons refresh reads the board as data, like suggestions.
 - **Where**: a section on the new dashboard and a page in a hub's More, from one shared file (`widget/ideas.js`). Server:
-  `ideas`, `idea_votes`, `post_idea`, `vote_idea`, `report_idea`, `delete_my_idea`, `get_ideas`, `admin_set_idea` (hide,
+  `ideas` (with `hub`, null for all hubs, and `category` from the fixed list, both checked by the server), `idea_votes`,
+  `post_idea`, `vote_idea`, `report_idea`, `delete_my_idea`, `get_ideas`, `admin_set_idea` (hide,
   restore, status, reply), tested on a throwaway copy like `rls.js` and `admin-ops.js`.
-- **Tracking and privacy**: `ideas:post`, `ideas:vote`, `ideas:report`, `ideas:tab=` (`window.shTrack`); rows in
+- **Tracking and privacy**: `ideas:post` (with where it came from: `=board`, `=suggest`, `=checkin`), `ideas:vote`,
+  `ideas:report`, `ideas:tab=`, `ideas:filter=hub` and `ideas:filter=cat` (with the hub or category id), `ideas:checkin-private` (the tick turned off) (`window.shTrack`); `post_idea` records the
+  same source; rows in
   [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md); the About
-  page's entry and its "What the hubs record" line (an idea you post shows to the class under your leaderboard name).
+  page's entry and its "What the hubs record" line (an idea you post shows to the class under your leaderboard name, and so
+  does a check-in's "Anything the hub could do better?" unless you untick it).
 
 ## The starting ideas
 
 Written by the agent, posted by Timmy and his neighbors (tagged "Starter idea", their names as in `tools/podcast/LORE.md`).
 None is in the redesign plan or on the About page (checked 2026-11-06; check again before posting).
+
+**More from the check-ins already sent** (Sam, 2026-11-06): at the release, the agent reads every check-in's "Anything the
+hub could do better?" (read-only SQL) and turns the ideas in them into more starter ideas, posted by Timmy and his neighbors
+with no names, in new words, each with its hub and category. Leave out anything about an exam (what it asked, its questions or answers, its wording), anything
+that points to who wrote it ([learner-data-privacy](../rules/learner-data-privacy.md)), and anything already built, on the
+About page or in the redesign plan. Their writers didn't write them to be public, so nothing is quoted.
+
+Each gets a hub and a category when it's posted (most are for all hubs; the arcade and Timmy ones are Games and fun).
 
 | Posted by | Idea |
 |---|---|
@@ -83,7 +117,9 @@ None is in the redesign plan or on the About page (checked 2026-11-06; check aga
 
 - [ ] The tables, functions and admin controls built and tested on a throwaway copy; `widget/ideas.js` on the new dashboard and
       in More; the Inbox's "Idea board" with hide, restore, status and reply
-- [ ] The starting ideas posted at the release, checked against the About page first
+- [ ] The hub and category pickers, their tags on each card and the board's filters, in both places
+- [ ] The check-in's tick, preview and name prompt on the new dashboard's check-in
+- [ ] The starting ideas posted at the release, with the ones from the past check-ins, checked against the About page first
 - [ ] Previewed on fixture data as the test accounts, on a phone and a laptop; Sam's look
 - [ ] The About page, the event taxonomy and the retention rows
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -94,6 +130,10 @@ None is in the redesign plan or on the About page (checked 2026-11-06; check aga
 - 2026-11-06: workshop of Sam's idea.
 - 2026-11-06: Sam's calls (above): no approval, both votes and names shown, not seeded with the redesign's ideas, ships with the
   redesign. Starting ideas written.
+- 2026-11-06: Sam: ideas from the check-ins go on the board too, under the writer's name (the tick, on by default); the past
+  check-ins become starter ideas with no names.
+- 2026-11-06: Sam: every idea picks its hub (one hub or all hubs) and a category; the six categories written from Sam's
+  examples (gamification, fun, functionality, feature).
 
 ## Outcome
 
