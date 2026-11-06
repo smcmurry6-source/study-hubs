@@ -94,6 +94,14 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   early failure at #14 under a cover screw) and show its chart, film and drawn view from `widget/cases.js`, with "In the
   notes" buttons (`REF_SURG_*`, `REF_REV_*`). Write any new Patient Box item the same way:
   [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md); CI checks the numbers (`node tools/ci/cases.js`).
+- **Exam check-in** (Sam, 2026-11-06: "see how the class feels about changes in this hub like the improved patient
+  boxes"): the exam's `extraQs` in `HUBS` (`index.html`) ask four more questions, eight steps in all: `pbox_img` (the drawn
+  Patient Box cases, 1-5) and `diagrams` (the diagrams and the seven implant-type drawings, 1-5), the ids the Occlusion
+  midterm used (there: Patient Box 3.9, diagrams 4.6, n = 17), each with a "didn't use them" button saved as `"none"`; `helped` (tick any: how the
+  class answered each choice, Why each choice, Practice questions by least practiced, High likelihood, Pinned, Timmy Time, None
+  of these); `changes` (keep improving up to the exam / hardly noticed / rather it held still). About half the people who
+  answered anything reached a Patient Box case (34 of 65 on exam morning), which is why the "didn't use" button is there. The
+  admin page's Check-ins view tallies all four. Read them in the retrospective next to each person's use of that feature.
 
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 

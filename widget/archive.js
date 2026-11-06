@@ -80,7 +80,10 @@
     for (; i < html.length; i++) {
       var c = html[i];
       if (q) { if (c === "\\") { i++; continue; } if (c === q) q = null; continue; }
-      if (c === '"' || c === "'") { q = c; continue; }
+      /* skip comments, so an apostrophe in one ("the hub's week") doesn't open a string that never closes */
+      if (c === "/" && html[i + 1] === "*") { var e = html.indexOf("*/", i + 2); if (e < 0) return null; i = e + 1; continue; }
+      if (c === "/" && html[i + 1] === "/") { var nl = html.indexOf("\n", i + 2); if (nl < 0) return null; i = nl; continue; }
+      if (c === '"' || c === "'" || c === "`") { q = c; continue; }
       if (c === "[") depth++;
       else if (c === "]" && --depth === 0) return html.slice(html.indexOf("[", start), i + 1);
     }

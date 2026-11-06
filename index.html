@@ -416,6 +416,13 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .debrief .survey-scale{justify-content:space-between;}
 .debrief .survey-scale .survey-opt{flex:1; min-width:0; padding:10px 0;}
 .debrief textarea{min-height:96px;}
+.debrief .debrief-none{margin-top:12px;}
+.debrief .debrief-none .survey-opt{text-align:center; color:var(--ink-2);}
+.debrief .debrief-none .survey-opt[aria-pressed="true"]{color:var(--on-ink);}
+.debrief-multi .survey-opt{display:flex; align-items:center; gap:10px; line-height:1.3; min-height:44px;}
+.debrief-multi .survey-opt::before{content:""; flex:none; display:flex; align-items:center; justify-content:center; width:17px; height:17px;
+  border:1.5px solid var(--ink-3); border-radius:4px; box-sizing:border-box; font-size:12px; font-weight:800; line-height:1;}
+.debrief-multi .survey-opt[aria-pressed="true"]::before{content:"\2713"; border-color:var(--on-ink); background:var(--on-ink); color:var(--ink);}
 .debrief .survey-foot .btn-quiet{padding:9px 16px; font-size:14px;}
 .hero-drill svg{color:var(--ring-ink);}
 .hub-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:auto; padding-top:4px;}
@@ -779,7 +786,15 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   };
   var HUBS = [
     { id:"pcd-implants-exam1", cls:"implants", title:"PCD Implants Exam 1 Hub", code:"PCD Implants · Exam 1",
-      exams:[ { name:"PCD Implants Exam 1", label:"Exam", date:"2026-11-06", code:"PCD Implants · Exam 1", checkinHour:20, promptHour:20 } ], updated:"2026-11-03",
+      exams:[ { name:"PCD Implants Exam 1", label:"Exam", date:"2026-11-06", code:"PCD Implants · Exam 1", checkinHour:20, promptHour:20,
+                /* how the class felt about the changes made during the hub week (Sam, 2026-11-06). diagrams and pbox_img are the
+                   ids the Occlusion midterm used, so the two hubs read side by side; "none" is the did-not-use button, never averaged */
+                extraQs:[ { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box cases with a drawn chart, X-ray and view of the implant?", ends:["Not helpful","Very helpful"], none:"I didn't get to them" },
+                          { id:"diagrams", kind:"scale", prompt:"How helpful were the diagrams and the drawings of the seven implant types?", ends:["Not helpful","Very helpful"], none:"I didn't use them" },
+                          { id:"helped", kind:"multi", prompt:"Which of these helped you study? Tick any.", only:"None of these",
+                            options:["How the class answered each choice","Why each choice","Practice questions starting with the lectures I'd practiced least","High likelihood questions","Pinned questions","Timmy Time","None of these"] },
+                          { id:"changes", kind:"choice", prompt:"The hub kept changing up to exam day: new Patient Box drawings, redrawn implant pictures, reworded questions. How was that?",
+                            options:["Good: keep improving it right up to the exam","Fine, I hardly noticed","Too much: I'd rather it held still the last few days"] } ] } ], updated:"2026-11-03",
       desc:"All nine lectures: the evolution of implants, the implant-tissue interface, biomechanics, implant terminology, prefabricated abutments, Dr. Givan's imaging and CBCT study guide, implant surgery, and guided vs freehand surgery. The exam is on Canvas Fri Nov 6, 7 am-8 pm (40 questions, one hour). Its own home page with your countdown and progress, notes in two reading levels with narration, 11 interactive diagrams, multiple-choice, multiple-answer, matching, true/false, two-statement and numbered-statement questions, exam hints, a mock exam and the Osseo Arcade.",
       modes:["Home","Compendium","Plain-English notes","Diagrams","Review tables","Mock exam","Arcade","Listen","Timmy Time"], stateKey:"pcdimpl-state-v1",
       podcast:{ name:"Timmy Time", sub:"The last-minute review, 48 min" } },
@@ -1589,7 +1604,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
         h += '<div class="survey-opts survey-scale">';
         for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="' + (v === n) + '" data-sv="' + n + '">' + n + '</button>';
         h += '</div><div class="survey-scale-ends"><span>' + esc(q.ends[0]) + '</span><span>' + esc(q.ends[1]) + '</span></div>';
-      } else h += '<div class="survey-opts debrief-list">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="' + (v === o) + '" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+        /* none: a button under the scale for "I didn't use it", saved as "none" so it never counts in the average */
+        if (q.none) h += '<div class="survey-opts debrief-list debrief-none"><button type="button" class="survey-opt" aria-pressed="' + (v === "none") + '" data-sv="none">' + esc(q.none) + '</button></div>';
+      } else if (q.kind === "multi") h += '<div class="survey-opts debrief-list debrief-multi" role="group" aria-label="' + esc(q.prompt) + '">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="' + (!!v && v.indexOf(o) >= 0) + '" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+      else h += '<div class="survey-opts debrief-list">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="' + (v === o) + '" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
       h += '</div><div class="survey-foot"><button type="button" class="survey-skip" data-act="' + (step ? 'back' : 'close') + '">' + (step ? 'Back' : 'Not now') + '</button>';
       if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
@@ -1610,10 +1628,20 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     box.addEventListener("click", function(e){
       var opt = e.target.closest(".survey-opt");
       if (opt){
-        var q = QS[step], on = opt.getAttribute("aria-pressed") !== "true";
+        var q = QS[step], on = opt.getAttribute("aria-pressed") !== "true", sv = opt.getAttribute("data-sv");
+        /* tick any: toggles in place and waits for Next; the q.only choice ("None of these") clears the others and the others clear it */
+        if (q.kind === "multi"){
+          opt.setAttribute("aria-pressed", String(on));
+          if (on && q.only) box.querySelectorAll(".survey-opt").forEach(function(b){ if (b !== opt && (sv === q.only || b.getAttribute("data-sv") === q.only)) b.setAttribute("aria-pressed", "false"); });
+          var picked = Array.prototype.map.call(box.querySelectorAll('.survey-opt[aria-pressed="true"]'), function(b){ return b.getAttribute("data-sv"); });
+          if (picked.length) answers[q.id] = picked; else delete answers[q.id];
+          var nx = box.querySelector('[data-act="next"]');
+          if (nx){ nx.className = "btn " + (picked.length ? "btn-primary" : "btn-quiet"); nx.textContent = picked.length ? "Next" : "Skip"; }
+          return;
+        }
         box.querySelectorAll(".survey-opt").forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
         opt.setAttribute("aria-pressed", String(on));
-        if (on) answers[q.id] = q.kind === "scale" ? +opt.getAttribute("data-sv") : opt.getAttribute("data-sv");
+        if (on) answers[q.id] = q.kind === "scale" && sv !== "none" ? +sv : sv;
         else delete answers[q.id];
         clearTimeout(timer);
         if (on) timer = setTimeout(function(){ go(step + 1); }, 320); else render();
@@ -1650,6 +1678,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       if (!sv || ls("sh_survey_done_" + sv.id)) return;
       var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
       if (!qs.length) return;
+      if (document.querySelector(".survey")) return;   /* a check-in opened from a card is already up: the survey waits for the next visit */
       var answers = {};
       var box = document.createElement("section");
       box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Quick survey");

@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (PCD Implants check-in: how the class felt about the week's changes, Claude Code)** — Sam: "for the
+  implants check in, develop some questions to see how the class feels about changes in this hub like the improved patient
+  boxes". The PCD Implants Exam 1 check-in (button and pop-up from 8 pm tonight) now has eight steps: after readiness, how it
+  went and hub vs exam, it asks how helpful the **drawn Patient Box cases** were (1-5, `pbox_img`) and the **diagrams and the
+  seven implant-type drawings** (1-5, `diagrams`), the ids Occlusion's midterm used, so the two hubs compare; each has an
+  "I didn't get to them" / "I didn't use them" button, saved as `"none"` and kept out of the average (half the people who
+  answered anything never reached a case). Then **which study tools helped** (tick any, `helped`: how the class answered each
+  choice, Why each choice, Practice questions by least practiced, High likelihood, Pinned, Timmy Time, None of these) and **how
+  the changes up to exam day felt** (`changes`: keep improving / hardly noticed / rather it held still). The text box stays
+  last. `index.html`'s `openDebrief` learned a scale's `none` button and a `multi` (tick any) kind, with an `only` option that
+  clears the others; the admin page's Check-ins view tallies 1-5 ratings with "didn't use it" apart, choices and tick-any lists.
+  Found in testing and fixed: a comment with apostrophes inside `HUBS` broke `widget/archive.js`'s reading of the list (BUG-037,
+  never shipped; `literalAt()` now skips comments), and the Quick survey could open on top of a check-in started from a card in
+  the first 4 seconds (BUG-038; it now waits for the next visit). No schema change: `submit_exam_debrief` already takes any
+  answers. About page, event taxonomy, lessons-audit skill, hub note.
+
 - **2026-11-06 (question health: PCD Implants on exam day, Claude Code)** — Sam: "review implants question health, fix the
   issues, mark them in the admin page, and merge". The 10 questions flagged since #267 were checked against the notes; every
   key matches; same ids; no notes text changed, so no narration or podcast change. **New wording**: `ev-tmi-bone` (its key
