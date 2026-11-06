@@ -4,7 +4,7 @@
    outlines, depth from overlap. No ids, gradients, filters, <text>, <style> or images, so a page can draw it many times.
 
    It is a kit, not a picture: the scene is built from slots, so every combination looks right and nothing overlaps.
-     - a 16 x 16 plot in isometric projection (P(): x runs down to the right, y down to the left, z up);
+     - a 14 x 14 plot in isometric projection (P(): x runs down to the right, y down to the left, z up);
      - the home on the back of the plot (HOMES): its door always at x 5.5 on its front face, so one path serves them all;
      - five yard spots along the front edges (SLOTS), each 3.6 x 3.6; a long item (the bowling lane) takes "side" and
        "corner" together;
