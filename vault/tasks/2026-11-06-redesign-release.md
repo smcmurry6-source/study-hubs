@@ -65,11 +65,14 @@ need; at the release, check each draft against the engine as it is then.
   `#questions[/drill|misses|weak|mock]`, `#more[/<page>]`); Home is the default and logs as `home/dashboard` (`SH_SECTION`).
 - Home is a landing page drawn by the engine from the hub's `SH_HUB.home` and its content: the hub's masthead, the exam
   card (countdown and the announced facts; the format line says when it isn't announced), the quick links on the first
-  phone screen (practice questions, Daily drill, the notes you were on, the mock and the rest), **Where to next** (at most
-  three rows: yesterday's misses in exam week, the weakest lecture, a lecture not started), **Today** on a warm field of
-  its own (the goal ring, the streak, XP today, right today, Timmy's HP; **no "last 14 days"**, Sam, 2026-11-06), progress
-  by lecture (Notes / Questions per row), the course timeline (`COURSE_DATES`) and the **Timmy Time** card on the hub's
-  color with Timmy in headphones. Under the countdown, the live count: "n studying <hub> right now, you included".
+  phone screen (practice questions, Daily drill, the notes you were on, the mock and the rest), with **Timmy Time** among
+  them when the hub has an episode (Sam, 2026-11-06: "animated and visible without scrolling down"): the hub's color,
+  Timmy in headphones bobbing to the music, the notes drifting, a small equalizer, still when motion is off; the last
+  column of both rows on a laptop, beside Practice questions on a phone. Then **Where to next** (at most three rows:
+  yesterday's misses in exam week, the weakest lecture, a lecture not started), **Today** on a warm field of its own (the
+  goal as **a ring of 20 teeth** that fill in as you answer, the streak, XP today, right today, Timmy's HP; **no "last 14
+  days"**, Sam, 2026-11-06), progress by lecture (Notes / Questions per row) and the course timeline (`COURSE_DATES`).
+  Under the countdown, the live count: "n studying <hub> right now, you included".
 - The bar shows the live count on every page (a green dot and the number; "studying now" where there's room): the shared
   widget's presence count for this hub (`sh:online`, sent by `widget/v3.js`), a total with nothing about who.
 - Drill, Yesterday's misses, Weak spots and the mock are **sets of the Question Bank** (`#questions/<set>`), not modes.
@@ -149,5 +152,6 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - 2026-11-06: Sam's second look (focus mode, every game with its own art, the answered card's row, no two-weeks card,
   decorated Today and Timmy Time, more color, notes prev/next and report, the More tiles, the live count) added to the
   drafts above.
+- 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
 
 ## Outcome

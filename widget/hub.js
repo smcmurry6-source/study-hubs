@@ -304,6 +304,10 @@
     $$("[data-livem]").forEach(function(m){ m.innerHTML = '<span class="live-dot" aria-hidden="true"></span><span class="num" aria-hidden="true">' + fmt(n) + '<span class="fold-live"> studying now</span></span><span class="sr">' + fmt(n) + " studying " + name + " now</span>"; });
     $$("[data-liveline]").forEach(function(m){ m.innerHTML = '<span class="live-dot" aria-hidden="true"></span><span><b class="num">' + fmt(n) + "</b> " + (n === 1 ? "studying " + name + " right now: you" : "studying " + name + " right now, you included") + "</span>"; });
   }
+  /* the decorations' motion (Timmy Time bobbing, a tooth popping in) stops with reduced motion or Answer animations off
+     (Focus mode turns that off too) */
+  function paintStill(){ document.documentElement.classList.toggle("hx-still", reduced || ls("sh_pref_fx") === "off"); }
+  paintStill(); document.addEventListener("sh:pref", paintStill);
   document.addEventListener("sh:online", function(e){ var n = +(e && e.detail && e.detail.n) || 0; if (n > 0 && n !== LIVE) { LIVE = n; paintLive(); } });
 
   /* ---------- routing ---------- */
@@ -576,12 +580,29 @@
     (function step(t){ var k = Math.min(1, (t - t0) / 450), e = 1 - Math.pow(1 - k, 3); n.textContent = (plus ? "+" : "") + fmt(Math.round(from + (to - from) * e)); if (k < 1) requestAnimationFrame(step); })(t0);
   }
   function petHp(){ try { return window.shPet && window.shPet.hp ? window.shPet.hp() : null; } catch (e) { return null; } }
+  /* Today's goal as a ring of 20 teeth, a child's full set (Sam, 2026-11-06: "a more visually interesting progress
+     circle"). Each tooth is a twentieth of the goal (one question at the default 20) and fills in the hub's color as you
+     answer; a tooth partly done is tinted. A thin arc inside shows the exact share. The tooth that just filled pops in. */
+  var TOOTH = "M-5 -3C-5.5 -7-3.5-7.8-1.8-7C-.8-6.6.8-6.6 1.8-7C3.5-7.8 5.5-7 5-3C4.7-.5 4 1.5 3.2 5C2.8 7 1.4 7.4 1 5.4L.4 2.6C.2 2-.2 2-.4 2.6L-1 5.4C-1.4 7.4-2.8 7-3.2 5C-4 1.5-4.7-.5-5-3Z";
+  var teethShown = -1;
+  function teethRing(done, of){
+    var N = 20, f = of ? Math.min(1, done / of) * N : 0, on = Math.floor(f), r = 33, c = 2 * Math.PI * r, out = "";
+    for (var k = 0; k < N; k++){
+      var s = k < on ? "is-on" : k < f ? "is-part" : "";
+      if (k < on && teethShown >= 0 && k >= teethShown) s += " is-new";
+      out += '<g transform="rotate(' + (k * 360 / N) + ' 60 60) translate(60 13)"><g class="tooth' + (s ? " " + s : "") + '"><path d="' + TOOTH + '"/>' + (k < on ? '<path class="shine" d="M-3.1-4.4C-2.7-5.6-1.7-5.9-.9-5.6"/>' : "") + "</g></g>";
+    }
+    teethShown = on;
+    return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0 0 120 120" aria-hidden="true" focusable="false">' +
+      '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' +
+      out + "</svg>";
+  }
   function todayPanel(){
     var t = todayRec(), g = goal(), n = streakDays(), left = Math.max(0, g - t.n), hp = petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
     var cap = t.n >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions. One answer keeps your streak going." : pl(left, "more question") + " meets today's goal.";
     return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
         spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
-      '<div class="big-ring">' + ring(t.n, g) + '<div><p class="ring-num num">' + fmt(t.n) + " of " + g + '</p><p class="ring-cap">' + esc(cap) + "</p></div></div>" +
+      '<div class="big-ring"><div class="teeth-wrap">' + teethRing(t.n, g) + '<p class="ring-num"><b class="num">' + fmt(t.n) + '</b><span>of ' + g + '</span><span class="sr"> questions today</span></p></div><p class="ring-cap">' + esc(cap) + "</p></div>" +
       '<ul class="today-stats">' +
         '<li class="ts-flame">' + flame(n, "ts-art") + '<span><b class="num">' + (n ? pl(n, "day") : "Not yet") + "</b><small>Streak</small></span></li>" +
         '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
@@ -661,14 +682,14 @@
           '<p class="live-line" data-liveline></p>' +
           (X.chips ? '<p class="exam-facts">' + X.chips.map(esc).join(" · ") + "</p>" : "") +
         "</div>" +
-        '<nav class="quick" aria-label="Start studying">' +
+        '<nav class="quick' + (pod ? " has-pod" : "") + '" aria-label="Start studying">' +
           q("#questions", "questions", "Practice questions", pl(left, "question") + " for the exam you haven't tried", "is-primary") +
           q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
           q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
           q("#questions/mock", "mock", "Mock exam", pl(mockTotal(), "question") + ", timed") +
-          (pod ? q("#more/timmy", "podcast", "Timmy Time", Math.round((pod.duration || 0) / 60) + " min audio review") : "") +
           q("#more/hints", "hints", "Exam hints", "What " + (X.prof || "the professor") + " said to know") +
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
+          (pod ? podMiniHTML(pod) : "") +
         "</nav>" +
       "</div>" +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
@@ -678,7 +699,6 @@
         '<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2><p class="note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>" + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
         '<div class="home-side">' +
           '<section class="panel" aria-labelledby="htH"><h2 id="htH">Course timeline</h2>' + timelineHTML() + "</section>" +
-          (pod ? podCardHTML(pod) : "") +
         "</div>" +
       "</div></div>";
     el.innerHTML = html;
@@ -718,12 +738,16 @@
       return '<li class="tl-' + when + (e.kind ? " tl-" + e.kind : "") + '"><span class="tl-date num">' + esc(dateLabel(e.date)) + (when === "today" ? " · today" : "") + '</span><span class="tl-what">' + esc(e.label) + "</span></li>";
     }).join("") + "</ol>";
   }
-  /* Timmy Time on Home: a field of the hub's color, Timmy in headphones (spots.mjs) with the notes */
+  /* Timmy Time on Home, among the quick starts so it's on the first screen (Sam, 2026-11-06: "animated and visible
+     without scrolling down"): the hub's color, Timmy in headphones bobbing to the music (spots.mjs), the notes drifting up
+     and a little equalizer. Still when motion is off (reduced motion, Answer animations off, Focus mode). */
   var POD_COL = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
-  function podCardHTML(pod){
-    return '<section class="panel pod-card" aria-labelledby="hpH"><div class="pod-text"><h2 id="hpH">Timmy Time</h2><p class="pod-title">' + esc(pod.title) + '</p><p class="pod-blurb">' + esc(pod.blurb || "") + "</p>" +
-      '<a class="btn pod-btn" href="#more/timmy">' + icon("play", 18) + "Listen" + (pod.duration ? " · " + Math.round(pod.duration / 60) + " min" : "") + "</a></div>" +
-      '<div class="pod-art" aria-hidden="true">' + spot("notes", POD_COL, "pod-notes") + spot("timmyTime", POD_COL, "pod-timmy") + "</div></section>";
+  function podMiniHTML(pod){
+    var min = pod.duration ? Math.round(pod.duration / 60) : 0;
+    return '<a class="ql ql-pod" href="#more/timmy">' +
+      '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" +
+      '<span class="pm-play">' + icon("play", 16) + "Listen" + (min ? '<span class="pm-min"> · ' + min + " min</span>" : "") + "</span></span>" +
+      '<span class="pm-art" aria-hidden="true">' + spot("notes", POD_COL, "pm-notes") + spot("timmyTime", POD_COL, "pm-timmy") + "</span></a>";
   }
 
   /* ======================= Notes ======================= */

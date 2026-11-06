@@ -92,6 +92,12 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
   BUG-041 (v3's old Inbox and Tour buttons at the page's foot) and BUG-042 (pop-ups stacked in the phone's corner). The
   preview's returning test accounts now have Timmy adopted (`petDaysAgo` in `personas.json`). Then BUG-043 (the music
   notes over the Timmy Time text, the notes tip at the lecture's end) and the notes page's two columns centered at 1440.
+- 2026-11-06: Sam's third look ([decisions](../decisions.md)): BUG-044 (the notice and the tip flush against the quick
+  starts: the reset now uses `:where()`, so a component's own margin wins), Today's goal as a ring of 20 teeth
+  (`teethRing()`), and Timmy Time as an animated card among the quick starts (`podMiniHTML()`; `hx-still` on `<html>`
+  stops its motion with reduced motion or Answer animations off). Home's masthead and exam card now stay side by side
+  down to 861 px, and a phone shows the whole 3:1 masthead, so Practice questions and Timmy Time are on the first screen
+  from a 360 px phone to a 1920 laptop (not on an iPhone SE's 568 px).
 
 ## Outcome
 
