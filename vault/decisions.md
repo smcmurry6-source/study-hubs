@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-06 | "No back pay": removing the XP cap counts from the release on; past days keep what they paid. On the June 1 projection (the top five just reach the ModuPro, the median ends in Silver): "that projection looks good" | widget, Supabase | chat, [task](tasks/2026-11-06-redesign-progression-journeys.md) |
 | 2026-11-06 | "Merge 276": Sam's approval of [#276](https://github.com/smcmurry6-source/study-hubs/pull/276) (the redesign's agreed additions, vault notes only), merged by the agent once "Check hubs" passed | vault | chat |
 | 2026-11-06 | "Ship all of this with the redesign": the journeys and XP changes, the shop, Timmy's place, the bowling egg and the idea board are built side by side and released with the redesign; Patient Box v2 is the exception (its own track) | widget, dashboard, Supabase | chat, [plan 4.10](tasks/done/2026-11-05-redesign-audit-and-plan.md) |
 | 2026-11-06 | Idea board: "Dont put these ideas on the idea board, but you can autogenerate some new ones. i dont want to approve them, just allow them to be posted, show upvotes and downvotes. show names" | dashboard, every hub's More | chat, [task](tasks/2026-11-06-idea-board.md) |

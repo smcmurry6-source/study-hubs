@@ -64,7 +64,7 @@ version for reduced motion. Ships with the redesign.
 
 ## XP: no cap, checked by the server
 
-The 600-a-day cap is removed **from the release on**; past days keep what they paid (see the open question below). Without a
+The 600-a-day cap is removed **from the release on**; past days keep what they paid, with no back pay (Sam, 2026-11-06). Without a
 cap, these guardrails keep a script from flooding the leaderboards without slowing anyone who studies:
 
 - **The server knows the bank.** At the release the content JSON also loads a `question_keys` table (hub, qid, version, the
@@ -138,14 +138,9 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
   reports add a little more (a whole episode is about 550 XP).
 - **What it means**: only the most active reach the ModuPro by June; the Loupes (250,000) are two years or more away for
   anyone; the middle of the class spends the year in Silver and Gold, so that's where most rank-ups happen.
-- **With back pay** (past days recomputed without the cap) add about 15,600, 14,200, 6,200 and 900: the five most active
-  would reach ModuPro Antique II to Bronze II, the next 10% Dark Matter III to ModuPro Stone II, the 75th percentile Dark
+- **Back pay was considered and turned down** (Sam, 2026-11-06). It would have added about 15,600, 14,200, 6,200 and 900, and the five most active
+  would have reached ModuPro Antique II to Bronze II, the next 10% Dark Matter III to ModuPro Stone II, the 75th percentile Dark
   Matter I, the median Silver II.
-
-## Still open
-
-- **Back pay for the cap?** Recomputing past days without the cap would about double everyone's XP and lift the leaders into
-  Diamond on release day. The default is forward only; Sam may choose back pay instead.
 
 ## Done when
 
@@ -164,7 +159,7 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
 
 - 2026-11-06: workshop of Sam's idea with the XP data.
 - 2026-11-06: Sam's calls (above); the ladder keeps its length, the cap goes, more sources added. Ready for phases 4 and 5.
-- 2026-11-06: the June 1 projection added, at Sam's request.
+- 2026-11-06: the June 1 projection added, at Sam's request. Sam: no back pay; "that projection looks good".
 
 ## Outcome
 
