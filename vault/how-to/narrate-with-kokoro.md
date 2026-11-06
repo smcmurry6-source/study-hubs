@@ -7,11 +7,11 @@ tags: [audio]
 
 Why this matters: [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md).
 
-**Check first:** `python3 -c "import kokoro_onnx"` and `ls "${KOKORO_DIR:-/tmp/kokoro}"`. A cloud environment's setup
-script may already have installed it; then skip to the Python below. This is the setup script for the repo's own cloud
-environment (Sam, 2026-11-06): paste it under the environment's Setup script in Settings, with the variable
-`KOKORO_DIR=/opt/kokoro`. It runs once per new container (about 70 s; a second run skips what's there) and never stops a
-session from starting:
+**Check first:** `python3 -c "import kokoro_onnx"` and `ls "${KOKORO_DIR:-/tmp/kokoro}"`. Sam's Default cloud
+environment runs this setup script (since 2026-11-06, with the variable `KOKORO_DIR=/opt/kokoro`), so its sessions start
+with Kokoro installed; then skip to the Python below. It runs once per new container (about 70 s; a second run skips
+what's there) and never stops a session from starting. Another environment that needs Kokoro gets the same script
+(Settings, the environment's Setup script):
 
 ```bash
 # study-hubs: Kokoro TTS for lecture narration and Timmy Time (vault/how-to/narrate-with-kokoro.md)
