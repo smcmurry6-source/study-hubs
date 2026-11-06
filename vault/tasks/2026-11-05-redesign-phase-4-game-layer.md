@@ -24,6 +24,10 @@ Put the ranks, trophies and celebrations on the design system without changing t
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - `widget/ranks.js`, `widget/rankup.js`, `widget/games.js`/`games.css`, each hub's skin, `widget/eggs.js` (pop-ups stay as they are: Sam).
 - Timmy's HP model stays as it is (Sam, 2026-11-05).
+- **Released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): these widget files are shared with the
+  live hubs, so the new look goes in files or styles only the new versions load (see
+  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)), and the live hubs keep today's cards until
+  [the release](2026-11-06-redesign-release.md).
 
 ## Done when
 

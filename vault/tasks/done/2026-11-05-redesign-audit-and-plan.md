@@ -249,6 +249,10 @@ the next exam, never after. Rules that change with phase 1: [hub-home-page](../.
 landing page with the quick links on the first phone screen; the drill, weak spots and mock as bank presets) and
 [arcade-skins](../../rules/arcade-skins.md) (one game up front); they are edited in that PR.
 
+**Changed 2026-11-06 (Sam):** nothing goes live phase by phase. The redesign is built side by side on `main`, in files no
+student sees, and released all at once by one PR when Sam likes the whole thing; the rule edits land with that PR
+([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)).
+
 ## 5. Decisions (all answered 2026-11-05, logged in [decisions](../../decisions.md))
 
 Feel: playful throughout. Layout: Home · Notes · Questions · More, with a Home landing page. Drill, Weak Spots and Mock as
