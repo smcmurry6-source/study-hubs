@@ -22,8 +22,8 @@ another hub's art, a recolored copy of it or the generic placeholder.
 - **Where it goes:** `tools/figures/site/` (`emblems.mjs`, `mastheads.mjs`, `medals.mjs`, the tint in `style.mjs`), then
   `node tools/figures/site/build.mjs`. Until the redesign reaches the hubs, the art shows on the design preview page
   (`tools/preview/design/`, its Hub picker).
-- **Sam looks before it ships**, with the rest of the new hub in its preview
-  ([preview-and-release-test](preview-and-release-test.md)): screenshots of the emblem, scene and medals in light and dark.
+- **Sam looks before it ships** ([preview-and-release-test](preview-and-release-test.md)): screenshots of the emblem,
+  scene and medals in light and dark, and the new hub's preview if Sam asks for one.
 - **The live hubs' art stays as approved on 2026-11-06:** the five live hubs (Occlusion, Perio, PCD Implants, Heme &
   Endo 2, Special Patient Care) keep their emblems, scenes and the shared medal design. The generic "A new hub" set is a
   placeholder for the preview page only.

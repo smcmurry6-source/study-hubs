@@ -1,6 +1,6 @@
 # Release test plan
 
-How every substantial change to the study hubs is previewed, tested and approved before it reaches the class, and how
+How every substantial change to the study hubs is tested and approved (and previewed, when Sam asks) before it reaches the class, and how
 it is checked and, if needed, rolled back after. It is a standing rule
 ([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md), Sam, 2026-11-04) for every agent
 and session. Merging to `main` is the release: GitHub Pages publishes it to the class within a minute or two.
@@ -19,8 +19,8 @@ is never a reason to hold a change; on an exam day, a tier 3 change only needs S
 | Tier | What | What it needs |
 |---|---|---|
 | 0, notes | Only `vault/`, `DEPLOY_NOTES.md`, `LESSONS.md`, `tools/` docs | CI ("Check hubs") |
-| 1, small content | A question's wording, an explanation or "why" line, a typo, a date or label, a new question in an existing format | CI, and the author looks at it in a preview. Sam's merge is the approval. |
-| 2, substantial | Anything that changes how the site behaves or what it saves: a new feature, mode, tab, game, setting, easter egg or question type; anything in `widget/`, `sw.js`, the dashboard's or admin page's script; a new hub or lectures added to one; ranks, XP, trophies, names, device linking, reports, comments, surveys, admin; a change to more than one hub; a redesign | Everything below: a preview link, the release suites green (or each failure explained), UAT from the checklist on a real phone, the bug log, **Sam's explicit approval** |
+| 1, small content | A question's wording, an explanation or "why" line, a typo, a date or label, a new question in an existing format | CI, and the author looks at it (screenshots with the class's data stubbed; a preview only if Sam asks). Sam's merge is the approval. |
+| 2, substantial | Anything that changes how the site behaves or what it saves: a new feature, mode, tab, game, setting, easter egg or question type; anything in `widget/`, `sw.js`, the dashboard's or admin page's script; a new hub or lectures added to one; ranks, XP, trophies, names, device linking, reports, comments, surveys, admin; a change to more than one hub; a redesign | Everything below: the release suites green (or each failure explained), the bug log, **Sam's explicit approval**; the agent asks once whether Sam wants a preview, and with a yes, a preview link and UAT from the checklist on a real phone |
 | 3, high risk | A Supabase migration; anything in answer saving, sync or the service worker; deleting or moving student data; a change on a live hub's exam day | Tier 2, plus `tools/release/rls.js` and `rls-audit.sql`, a staging run when staging exists, a written rollback in the PR, and the post-release check within the hour |
 
 When unsure, use the higher tier.
@@ -28,14 +28,16 @@ When unsure, use the higher tier.
 ## 2. The flow
 
 1. Branch from a fresh `origin/main`; make the change ([ship-a-change](vault/how-to/ship-a-change.md)).
-2. Open a **preview** and use it like a student ([preview-a-change](vault/how-to/preview-a-change.md)).
+2. **A preview only on request** (Sam, 2026-11-06): for a tier 2 or 3 change, ask Sam once, in one line, whether to
+   make one; Sam can also ask any time. With a yes, open it and use it like a student
+   ([preview-a-change](vault/how-to/preview-a-change.md)).
 3. The **automated gates** run on the PR; run `node tools/release/run.js` locally first if you can.
-4. **UAT** by the agent, with [the checklist](vault/release/uat-checklist.md) for the change's type, on an emulated
-   phone and a computer.
+4. With a preview, **UAT** by the agent in it, with [the checklist](vault/release/uat-checklist.md) for the change's
+   type, on an emulated phone and a computer.
 5. Every problem found goes in the **[bug log](vault/release/bug-log.md)**, is fixed and retested, or accepted by Sam.
 6. Write the PR's **test report** ([template](vault/templates/release-test-report.md)): what was exercised, results,
    what's left. A long one goes in `vault/release/reports/`.
-7. The agent **shows Sam the change** (screenshots, a recording, the live preview); **Sam approves** it in the PR, then
+7. The agent **shows Sam the change** (screenshots, a recording, the preview link when there is one); **Sam approves** it in the PR, then
    merges ([approval](#10-approval)).
 8. **After the merge:** the post-release check and the changelogs; roll back if needed.
 
@@ -50,9 +52,11 @@ not a screenshot. The tools are `tools/preview/`:
 - `node tools/preview/build.js --out _preview`: a static copy for a preview host or a download (about 23 MB; narration
   is streamed from the live site's public mp3s unless the branch changed it; `--audio all` copies everything, about
   700 MB). `--check <folder>` verifies a build.
-- In CI, the **Release tests** workflow builds it on every site-changing PR and attaches it as the `preview-site`
-  artifact (kept 14 days): download, unzip, `node tools/preview/serve.js --dir preview-site`.
-- **A link per PR on Cloudflare Pages** (Sam's choice, 2026-11-04): the same workflow's `preview` job builds the
+- In CI, **on request only** (Sam, 2026-11-06): the **Preview** workflow (`.github/workflows/preview.yml`) runs for a
+  PR with the `preview` label (and on each push to it after that), or by hand on a branch (Actions, Preview, Run
+  workflow). It attaches the `preview-site` artifact (kept 14 days): download, unzip,
+  `node tools/preview/serve.js --dir preview-site`. "Release tests" no longer builds a preview.
+- **A link per PR on Cloudflare Pages** (Sam's choice, 2026-11-04): the same workflow builds the
   preview without Timmy Time episodes (`--no-podcast`: they're over Cloudflare's 25 MB a file and play the live site's
   copy, so a new or changed episode doesn't play there), deploys it to `https://pr-<n>.<project>.pages.dev` and puts
   that link on the PR in one comment it keeps up to date. It needs the repo secret `CLOUDFLARE_API_TOKEN` (a token with
@@ -160,7 +164,7 @@ that needs it, saying why; never to make a check pass.
 
 ## 7. Manual UAT
 
-The agent does the UAT itself: it uses the change in the preview with a scripted browser (Playwright) on an emulated
+When Sam asked for a preview, the agent does the UAT itself: it uses the change in the preview with a scripted browser (Playwright) on an emulated
 phone, tablet and laptop, as the test accounts the change affects, with [the UAT checklist](vault/release/uat-checklist.md):
 a core pass for every substantial change plus a section per kind of change (questions and notes, a new hub or lecture,
 the widget, saving and sync, ranks and trophies, admin, a migration, the service worker, a redesign). It looks at its
@@ -202,9 +206,10 @@ Sam is the product owner, and nothing substantial reaches the class without Sam'
 Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agent **shows Sam the change**
 ([preview-a-change](vault/how-to/preview-a-change.md)):
 
-- **the preview link on its own line, first**: `Preview: https://pr-<n>.<project>.pages.dev` from the PR's preview
-  comment ([section 3](#3-interactive-previews)), then the page and test account to open;
-- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat;
+- when Sam asked for a preview, **the preview link on its own line, first**: `Preview: https://pr-<n>.<project>.pages.dev`
+  from the PR's preview comment ([section 3](#3-interactive-previews)), then the page and test account to open;
+- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat; without a
+  preview, taken in a scripted browser with the class's data stubbed, as `tools/ci/smoke.js` does;
 - a short recording when it moves or takes several steps.
 
 Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
@@ -232,8 +237,8 @@ problem (Sam's call), and the bug log.
 
 ## 13. Hosting and staging
 
-**Sam's call, 2026-11-04: A, Cloudflare Pages, for a preview link on every PR** (the `preview` job,
-[section 3](#3-interactive-previews)), and **1, fixtures only, for staging** for now. Cloudflare Access isn't set up:
+**Sam's call, 2026-11-04: A, Cloudflare Pages, for a preview link per PR** (since 2026-11-06 only on request: the
+`preview` label or a run by hand of the Preview workflow, [section 3](#3-interactive-previews)), and **1, fixtures only, for staging** for now. Cloudflare Access isn't set up:
 previews show only made-up data and the site is public anyway, but anyone with a link can open one; adding Access later
 costs $0. Connected 2026-11-04 ([task](vault/tasks/done/2026-11-04-preview-hosting-and-staging.md)). Prices are from each
 vendor's published plans as of November 2026; confirm on their pricing pages before signing up.

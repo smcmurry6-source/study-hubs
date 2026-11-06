@@ -43,9 +43,9 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
   Playwright (CI runs them on every PR, with the secrets, database-permission and preview-safety checks). Details:
   [vault/how-to/verify-before-pushing.md](vault/how-to/verify-before-pushing.md).
 - **A substantial change** (a feature, anything in `widget/`, a new hub or lecture, a migration...) follows
-  [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): an interactive preview on made-up data (`node tools/preview/serve.js`), the
-  release suites (`node tools/release/run.js`), UAT, the bug log, a test report in the PR, and **Sam's explicit approval**
-  before it ships. Previews and tests never write to the class's data.
+  [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): the release suites (`node tools/release/run.js`), the bug log, a test
+  report in the PR, and **Sam's explicit approval** before it ships. A preview on made-up data, and UAT in it, only when
+  Sam asks for one or says yes when you ask (Sam, 2026-11-06). Previews and tests never write to the class's data.
 - **The PR description** says what changed in plain, student-facing words, what you ran and what passed, and anything
   you're unsure of. American English everywhere.
 - **Can't push?** (A chat agent with read-only access.) Give Sam the complete changed files or a patch, vault notes

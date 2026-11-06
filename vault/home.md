@@ -29,8 +29,9 @@ Shipping and the vault
 - [Secrets](rules/secrets.md): public repo; keys only from the environment.
 - [Content from lecture materials and graded coursework](rules/graded-coursework.md): no course files in the repo;
   graded work never copied, closed quizzes only as context, previous years' never.
-- [Preview and release-test every substantial change](rules/preview-and-release-test.md): a preview on made-up data, the
-  release tests, Sam's explicit approval, then checks after the release ([the plan](../RELEASE_TEST_PLAN.md)).
+- [Release-test every substantial change; preview it on request](rules/preview-and-release-test.md): the release tests,
+  Sam's explicit approval, checks after the release; a preview on made-up data only when Sam asks
+  ([the plan](../RELEASE_TEST_PLAN.md)).
 - [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
   groups of 5+, no new identifiers.
 
