@@ -32,6 +32,10 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 - **Its own identity:** a new palette and type trio (tokens in the light, OS-dark and `[data-theme="dark"]` blocks), a
   plain name ("<Subject> Hub"), a new state key (`<slug>-state-v1`) and answered event (`<slug>:answered`). The widget's
   script tag carries `data-hub="<hub-id>"`, `data-answered-event` and `data-default-mode="home"`.
+- **Its own drawn art** ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)): an emblem, a masthead
+  scene and a mastery medal set unique to the hub, plus its tint, drawn in SVG in Timmy's ink in `tools/figures/site/`
+  (then `node tools/figures/site/build.mjs`). Never another hub's art, a recolored copy or the generic placeholder; Sam
+  sees it in the hub's preview.
 - **Data:** `LECTURES` (`id`, `num`, `title`, `who`, `status` taught / slides / upcoming, `tag`), `QUESTIONS` (each with
   `src`), notes at two levels (`READINGS`, `READINGS_PLAIN`), exam hints quoted from the recordings, `LIKELY_TOPICS`,
   the cram sheet, Review tables, `MOCK_BLUEPRINT`, `EXAM_INFO`, `COURSE_DATES`, and `EXAM_COUNTS` if counts per lecture

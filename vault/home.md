@@ -43,6 +43,7 @@ Questions
 Hub building
 - [Every hub opens on its own Home page](rules/hub-home-page.md)
 - [Every hub's arcade looks like that hub](rules/arcade-skins.md)
+- [Every new hub gets its own drawn art](rules/every-hub-gets-its-own-art.md): its emblem, masthead scene and unique medals.
 - [Text and audio must never drift](rules/text-and-audio-never-drift.md)
 - [Every Timmy Time episode has likes, dislikes and comments](rules/podcast-reactions.md), with 1-3 lore comments.
 - [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser.

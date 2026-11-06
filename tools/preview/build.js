@@ -35,7 +35,7 @@ function build(out, opts){
   fs.rmSync(out, { recursive: true, force: true });
   const audioMode = opts.audio || 'changed';
   const changed = audioMode === 'changed' ? changedFiles(opts.base || 'origin/main') : new Set();
-  const files = T.SITE_ENTRIES.flatMap(e => { const p = path.join(T.ROOT, e); return !fs.existsSync(p) ? [] : fs.statSync(p).isDirectory() ? walk(p, T.ROOT) : [e]; });
+  const files = T.SITE_ENTRIES.concat(T.PREVIEW_PAGES).flatMap(e => { const p = path.join(T.ROOT, e); return !fs.existsSync(p) ? [] : fs.statSync(p).isDirectory() ? walk(p, T.ROOT) : [e]; });
   const included = [], skipped = [], podcasts = [];
   files.forEach(rel => {
     if (isHubAudio(rel) && (audioMode === 'none' || (audioMode === 'changed' && !changed.has(rel)))) { skipped.push(rel); return; }

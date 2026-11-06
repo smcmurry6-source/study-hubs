@@ -23,12 +23,15 @@ Move the other live hubs (Heme & Endo 2, Special Patient Care, PCD Implants if s
   preview link first, screenshots, the release suites, Sam's look), [about-page](../rules/about-page.md),
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - Hub notes: [perio](../hubs/perio.md) (its own engine, `two()`/`tf()`/`nums()`, the case kit), [heme-endo-exam2](../hubs/heme-endo-exam2.md), [special-patient-care](../hubs/special-patient-care.md), [pcd-implants-exam1](../hubs/pcd-implants-exam1.md).
-- Each hub is its own PR with a preview link; ship-it-now: a hub whose exam is close goes first.
+- Each hub is its own PR with a preview link. Each new version is built beside the live hub, the way
+  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md) builds Occlusion's, and goes live with the rest at
+  [the release](2026-11-06-redesign-release.md) (Sam, 2026-11-06). Start with the hubs whose exams fall after the
+  release: a hub whose exam passes first is never ported.
 
 ## Done when
 
-- [ ] Each live hub on the engine, one PR each, with its own emblem and masthead
-- [ ] Perio's engine removed; its questions, cases and figures unchanged (ids permanent)
+- [ ] A new version of each live hub on the engine, beside the live one, one PR each, with its own emblem and masthead
+- [ ] Perio's new version needs no engine of its own; its questions, cases and figures unchanged (ids permanent); the old engine goes at the release
 - [ ] The archived hubs untouched; the dashboard's archived cards restyled only
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)

@@ -236,7 +236,7 @@ icon library, no stock photographs, no generated images.
 
 | Phase | Task note | What ships |
 |---|---|---|
-| 0 | [design system and art](../2026-11-05-redesign-phase-0-design-system.md) | Tokens, the two typeface candidates, the icon set, Timmy's symbol sheet, emblems and mastheads, the question card, on a preview page for Sam's pick; nothing live |
+| 0 | [design system and art](2026-11-05-redesign-phase-0-design-system.md) | Tokens, the two typeface candidates, the icon set, Timmy's symbol sheet, emblems and mastheads, the question card, on a preview page for Sam's pick; nothing live |
 | 1 | [hub engine on a preview](../2026-11-05-redesign-phase-1-hub-engine.md) | `widget/hub.js`, content split, the new layout, the core loop with its rewards, built on a preview of Occlusion; Sam picks which hub goes live first when he sees it |
 | 2 | [the other live hubs](../2026-11-05-redesign-phase-2-live-hubs.md) | Every live hub on the engine, perio ported |
 | 3 | [dashboard and About](../2026-11-05-redesign-phase-3-dashboard.md) | The new dashboard ("you" card, hub tabs, class board) and the About page rewritten |
@@ -248,6 +248,10 @@ Each phase is a PR with a preview link first, screenshots on a phone and a lapto
 the next exam, never after. Rules that change with phase 1: [hub-home-page](../../rules/hub-home-page.md) (Home stays, as a
 landing page with the quick links on the first phone screen; the drill, weak spots and mock as bank presets) and
 [arcade-skins](../../rules/arcade-skins.md) (one game up front); they are edited in that PR.
+
+**Changed 2026-11-06 (Sam):** nothing goes live phase by phase. The redesign is built side by side on `main`, in files no
+student sees, and released all at once by one PR when Sam likes the whole thing; the rule edits land with that PR
+([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)).
 
 ## 5. Decisions (all answered 2026-11-05, logged in [decisions](../../decisions.md))
 

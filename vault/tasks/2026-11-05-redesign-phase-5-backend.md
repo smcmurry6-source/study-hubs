@@ -24,6 +24,9 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - The audit's backend numbers: the audit note, sections 1 and 3. Schema in `supabase/schema.sql`; a new `migration_v53.sql` (and up), applied through the connector, `supabase/schema.sql` refreshed ([repo map](../reference/repo-map.md)).
 - Tests: `node tools/release/rls.js`, `admin-ops.js`, `retention.js` on a throwaway copy; `tools/release/perf.js` budgets lowered to the new sizes.
+- **Still ships when ready** (Sam, 2026-11-06, [decisions](../decisions.md)): the rest of the redesign waits for one
+  release, but this phase's changes don't change what students see. Part 2's pieces that only serve the new engine
+  (precaching it, the one font) come with [the release](2026-11-06-redesign-release.md).
 
 - **Suited to a parallel agent (Codex 5.6 Terra, Sam, 2026-11-05)**: this phase does not depend on the design work. The
   numbers to beat and the RPC inventory are in the audit note (sections 1 and 3) and in the session's architecture

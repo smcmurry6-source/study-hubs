@@ -83,6 +83,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   23 use). Occlusion's performance budget 1320 -> 1350 KB (the figures add about 21 KB over the wire), approved
   by Sam on 2026-11-06 (BUG-030). About page: the Diagrams entry. No schema change, no text or audio change.
 
+- **2026-11-06 (redesign phase 0: the design system preview page, Claude Code)** — Nothing students see changes yet. The
+  redesign's design system is a preview page, `tools/preview/design/` (`node tools/preview/serve.js`, then
+  `/tools/preview/design/`; `PREVIEW_PAGES` in `tools/preview/transform.js` lets the preview server and build include it).
+  It shows the tokens, both candidate typefaces, 49 hand-drawn icons, an emblem and a masthead scene for each live hub and
+  a placeholder pair for a future one, the mastery medals (24) and trophies (26), Timmy and his house as drawn today
+  (rendered by `widget/pet.js` and `widget/ranks.js`), and the question card in all nine formats waiting and answered, with
+  the new rewards (the XP spark, Timmy's cheer and flinch, the streak flame, the daily-goal ring, the session recap), in
+  light and dark, on made-up data. Every drawing is SVG in Timmy's ink in `tools/figures/site/`; `build.mjs` writes
+  `tools/preview/design/art.js` (`--check` fails if it's stale; Timmy's holiday outfit is pinned so the build repeats).
+  **Sam's picks (2026-11-06):** Nunito Sans for the whole site (Fraunces has no tabular figures); the icons, emblems,
+  masthead scenes, trophies and rewards art approved; the five live hubs keep the shared medal design; and a new rule,
+  [every-hub-gets-its-own-art](vault/rules/every-hub-gets-its-own-art.md): every new hub gets its own emblem, scene and
+  unique medals. The taste inspector (`--app`) shows 0 FAIL at 1440, 768 and 390 in Nunito light, Fraunces and dark.
+  Next: phase 1, Occlusion on a preview
+  ([task](vault/tasks/done/2026-11-05-redesign-phase-0-design-system.md)).
 - **2026-11-05 (question health: every flagged question reviewed, Claude Code)** — Sam: "review and fix all questions flagged
   for question health". `qh_report` listed 33 to review on the live hubs (PCD Implants 14, Perio 10, Occlusion 9; none on
   Special Patient Care or Heme & Endo Exam 2). Each was read against its hub's notes: **every key matches the notes**, and
