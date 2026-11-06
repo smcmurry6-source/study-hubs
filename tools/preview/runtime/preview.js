@@ -490,15 +490,20 @@
         return { write: true, data: { hub: a.p_hub, state: a.p_state, until: until, changed: true, version: row ? ovrVersion(row) : "auto" } };
       }
       case "get_exam_debriefs": {
-        var h = 36e5, mk = function(hub, exam, who, ago, ready, went, match, missed){ return { hub: hub, exam: exam, visitor_id: "fixture-" + who, created_at: iso(t - ago),
-          answers: { ready: ready, went: went, match: match, missed: missed }, minutes: 40 + (hash(who) % 300), answered: 30 + (hash(who + hub) % 400), accuracy: 55 + (hash(hub + who) % 40) }; };
+        var h = 36e5, mk = function(hub, exam, who, ago, ready, went, match, missed, more){ var a = { ready: ready, went: went, match: match, missed: missed };
+          Object.keys(more || {}).forEach(function(k){ a[k] = more[k]; });
+          return { hub: hub, exam: exam, visitor_id: "fixture-" + who, created_at: iso(t - ago),
+          answers: a, minutes: 40 + (hash(who) % 300), answered: 30 + (hash(who + hub) % 400), accuracy: 55 + (hash(hub + who) % 40) }; };
         /* by time the groups go Heme & Endo (1 h ago), PCD Implants (5 h), Occlusion (2 days), Perio (20 days); by name they
            would go the other way round, and the rows inside each group arrive oldest first */
         return { data: [
           mk("perio", "2026-10-01 Midterm", "p1", 20 * 24 * h, 3, "About as expected", "About right", "Fixture: more staging pictures."),
           mk("occlusion", "2026-10-21 Midterm", "o2", 9 * 24 * h, 4, "Better than expected", "About right", "Fixture: more casts with contacts."),
           mk("occlusion", "2026-10-21 Midterm", "o1", 2 * 24 * h, 2, "Worse than expected", "Exam asked different things", "Fixture: the articulator settings."),
-          mk("pcd-implants-exam1", "2026-11-06 Exam", "i1", 5 * h, 4, "About as expected", "About right", "Fixture: more abutment pictures."),
+          mk("pcd-implants-exam1", "2026-11-06 Exam", "i2", 6 * h, 3, "Worse than expected", "Hub was easier", "Fixture: more CBCT questions.",
+            { pbox_better: "none", diagrams: 4, helped: ["Why each choice", "Timmy Time"], changes: "Fine, I hardly noticed" }),
+          mk("pcd-implants-exam1", "2026-11-06 Exam", "i1", 5 * h, 4, "About as expected", "About right", "Fixture: more abutment pictures.",
+            { pbox_better: 4, diagrams: 5, helped: ["How the class answered each choice", "Why each choice", "High likelihood questions"], changes: "Good: keep improving it right up to the exam" }),
           mk("heme-endo-exam1", "2026-10-30 Exam", "e2", 3 * 24 * h, 3, "About as expected", "About right", "Fixture: the calcium drugs table."),
           mk("heme-endo-exam1", "2026-10-30 Exam", "e1", 1 * h, 5, "Better than expected", "About right", "Fixture: nothing, it was great.")
         ] };
@@ -626,6 +631,8 @@
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
       case "get_active_survey": case "get_my_survey": return { data: bootstrapSurvey(t) };
       case "submit_survey": db.surveys.answered = a; save(); return { write: true, data: null };
+      /* the exam check-in shows "Thank you" only on true, as the live function returns */
+      case "submit_exam_debrief": (db.debriefs = db.debriefs || []).push(a); save(); return { write: true, data: true };
       case "pod_feed": {
         return { data: bootstrapPodcast(hub, a.p_ep, t) };
       }

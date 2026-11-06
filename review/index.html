@@ -882,7 +882,9 @@ code{font-size:13px;}
   }
 
   /* ---------- Exam check-ins (migration_v23): newest first, groups by their newest check-in ---------- */
-  var DEBRIEF_EXTRA = { diagrams: "Diagrams helpful", pbox_img: "Patient Box pictures helpful" };
+  var DEBRIEF_EXTRA = { diagrams: "Diagrams helpful", pbox_img: "Patient Box pictures helpful",
+    pbox_better: "New Patient Box cases vs the ones before (1 worse, 3 the same, 5 better)", helped: "What helped them study",
+    changes: "Changes up to exam day" };
   function renderCheckins(){
     var el = $('[data-panel="checkins"]'), d = D("debriefs");
     if (d.error) { el.innerHTML = errBox("Couldn’t load exam check-ins (migration_v23). Try Refresh."); setHead("", 0); return; }
@@ -904,11 +906,26 @@ code{font-size:13px;}
       var body = '<div class="tally"><div><div class="kpi-label">Ready, 1 to 5</div><p><b>' + avg + '</b> average · ' + tally("ready") + '</p></div>' +
         '<div><div class="kpi-label">How it went</div><p>' + tally("went") + '</p></div>' +
         '<div><div class="kpi-label">Hub against the exam</div><p>' + tally("match") + '</p></div></div>';
-      /* any other 1-5 rating an exam added (extraQs in index.html, e.g. Occlusion's diagrams / pbox_img) */
-      var extra = {}; ans.forEach(function(r){ Object.keys(r.answers).forEach(function(id){ if (id !== "ready" && typeof r.answers[id] === "number") extra[id] = 1; }); });
+      /* any other question an exam added (extraQs in index.html): a 1-5 rating (e.g. Occlusion's diagrams / pbox_img; "none" is
+         its "didn't use it" button, counted apart and never averaged), a choice (one answer) or a tick-any list (an array) */
+      var extra = {}, CORE = { ready:1, went:1, match:1, missed:1 };
+      ans.forEach(function(r){ Object.keys(r.answers).forEach(function(id){
+        if (CORE[id]) return;
+        var v = r.answers[id], k = Array.isArray(v) ? "multi" : (typeof v === "number" || v === "none") ? "scale" : "choice";
+        if (!extra[id] || k === "scale") extra[id] = k;
+      }); });
       Object.keys(extra).forEach(function(id){
-        var vs = ans.filter(function(r){ return typeof r.answers[id] === "number"; });
-        body += '<p class="note"><b>' + esc(DEBRIEF_EXTRA[id] || id) + ', 1 to 5:</b> average ' + (vs.reduce(function(s, r){ return s + r.answers[id]; }, 0) / vs.length).toFixed(1) + ' · ' + tally(id) + '</p>';
+        var label = esc(DEBRIEF_EXTRA[id] || id), kind = extra[id];
+        if (kind === "multi"){
+          var c = {}, n = 0;
+          ans.forEach(function(r){ var v = r.answers[id]; if (!Array.isArray(v)) return; n++; v.forEach(function(o){ c[o] = (c[o] || 0) + 1; }); });
+          body += '<p class="note"><b>' + label + ', tick any</b> (' + plural(n, "person", "people") + ' ticked something): ' +
+            Object.keys(c).sort(function(a, b){ return c[b] - c[a]; }).map(function(o){ return esc(o) + " <b>" + c[o] + "</b>"; }).join(" · ") + '</p>';
+        } else if (kind === "scale"){
+          var vs = ans.filter(function(r){ return typeof r.answers[id] === "number"; }), none = ans.filter(function(r){ return r.answers[id] === "none"; }).length;
+          body += '<p class="note"><b>' + label + ', 1 to 5:</b> ' + (vs.length ? 'average ' + (vs.reduce(function(s, r){ return s + r.answers[id]; }, 0) / vs.length).toFixed(1) + ' · ' : '') +
+            tally(id).replace(/(^|· )none (?=<b>)/, "$1didn’t use it ") + (none ? ' <span class="muted">(“didn’t use it” is left out of the average)</span>' : '') + '</p>';
+        } else body += '<p class="note"><b>' + label + ':</b> ' + tally(id) + '</p>';
       });
       var notes = ans.filter(function(r){ return r.answers.missed; });
       body += '<h3 class="sub-h">What the hub could do better</h3>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<p class="muted">No written answers.</p>');

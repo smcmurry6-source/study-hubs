@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (PCD Implants check-in: how the class felt about the week's changes, Claude Code)** — Sam: "for the
+  implants check in, develop some questions to see how the class feels about changes in this hub like the improved patient
+  boxes". The PCD Implants Exam 1 check-in (button and pop-up from 8 pm tonight) now has eight steps: after readiness, how it
+  went and hub vs exam, it asks whether the **new drawn Patient Box cases** were better than the Patient Box questions
+  students had before (Sam: "i want to know if they are better than the previous pt box questions"; 1 worse, 3 about the
+  same, 5 better; `pbox_better`) and how
+  helpful the **diagrams and the seven implant-type drawings** were (1-5, `diagrams`, the id Occlusion's midterm used); each has an
+  "I didn't get to them" / "I didn't use them" button, saved as `"none"` and kept out of the average (half the people who
+  answered anything never reached a case). Then **which study tools helped** (tick any, `helped`: how the class answered each
+  choice, Why each choice, Practice questions by least practiced, High likelihood, Pinned, Timmy Time, None of these) and **how
+  the changes up to exam day felt** (`changes`: keep improving / hardly noticed / rather it held still). The text box stays
+  last. `index.html`'s `openDebrief` learned a scale's `none` button, a third label under its middle (`ends:[low, middle,
+  high]`) and a `multi` (tick any) kind, with an `only` option that
+  clears the others; the admin page's Check-ins view tallies 1-5 ratings with "didn't use it" apart, choices and tick-any lists.
+  Found in testing and fixed: a comment with apostrophes inside `HUBS` broke `widget/archive.js`'s reading of the list (BUG-037,
+  never shipped; `literalAt()` now skips comments), and the Quick survey could open on top of a check-in started from a card in
+  the first 4 seconds (BUG-038; it now waits for the next visit). No schema change: `submit_exam_debrief` already takes any
+  answers. About page, event taxonomy, lessons-audit skill, hub note.
+
 - **2026-11-06 (Release tests trimmed, Claude Code)** — Sam asked whether the 18-minute Release tests were necessary, then
   chose "Trim it". `.github/workflows/release.yml`: a few-second `scope` job runs the suites only when a PR changes shared
   code or has the `full-tests` label (a tier 2 or 3 change inside hubs gets it); on a PR they skip syntax, vault, archive,
