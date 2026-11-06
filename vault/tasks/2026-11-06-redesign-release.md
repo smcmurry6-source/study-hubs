@@ -148,7 +148,7 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
 
-Proposed until Sam confirms the calls in that note; check against the engine as built.
+Sam confirmed the calls in that note (2026-11-06); check against the engine as built.
 
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add):
 - **Study as** at the top of the Questions view: **Questions · Learn · Flashcards** (`STATE.ui.qview`, saved like the panel). The

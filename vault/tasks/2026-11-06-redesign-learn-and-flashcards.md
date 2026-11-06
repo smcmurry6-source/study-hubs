@@ -157,9 +157,9 @@ by side in the engine and **ships with the redesign's release**.
 - About page, Questions: a new entry for **Study as** with Learn and Flashcards (what each does, the schedule ending on exam
   eve, what earns XP), tagged new.
 
-## Proposed, for Sam to confirm
+## Sam's calls (2026-11-06, [decisions](../decisions.md))
 
-These are the defaults above; each is one line to change.
+Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 are all good with me"):
 
 1. **Names**: "Learn" and "Flashcards" on the site, not "Quizlet Learn" or "Anki" (they're other companies' product names,
    and these work differently). The About page may say they're "like Quizlet's Learn or Anki".
@@ -172,7 +172,7 @@ These are the defaults above; each is one line to change.
 
 ## Done when
 
-- [ ] Sam has confirmed or changed the calls above
+- [x] Sam has confirmed or changed the calls above (all six confirmed, 2026-11-06)
 - [ ] The toggle, Learn and Flashcards built in `widget/hub.js` / `hub.css` (or a `widget/study-modes.js` loaded when first
       used, phase 5's bundles), in the new Occlusion first, then every hub on the engine
 - [ ] The two icons drawn in `tools/figures/site/icons.mjs` and built into `widget/hub-art.js`
@@ -188,6 +188,7 @@ These are the defaults above; each is one line to change.
 
 - 2026-11-06: written from Sam's request in chat, with the survey's answers, the retry data and the engine and server as
   they are; the calls above are proposals until Sam confirms them.
+- 2026-11-06: Sam confirmed all six calls; ready to build.
 
 ## Outcome
 
