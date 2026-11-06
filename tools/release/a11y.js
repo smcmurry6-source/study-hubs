@@ -29,7 +29,7 @@ async function audit(page){
 }
 async function keyboard(page){
   await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); window.scrollTo(0, 0); });
-  let invisible = 0, stuck = 0, last = null, same = 0; const where = [];
+  let invisible = 0, stuck = 0, last = null, same = 0; const where = [], whyNot = [];
   for (let i = 0; i < 30; i++) {
     await page.keyboard.press('Tab');
     const f = await page.evaluate(() => {
@@ -38,14 +38,16 @@ async function keyboard(page){
       if (e.closest('#shpv-pill, #shpv-panel')) return { skip: true };
       const s = getComputedStyle(e), ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || (s.boxShadow && s.boxShadow !== 'none');
       const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
-      return { id, ring, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
+      /* why a stop has no ring, for the report: is it :focus / :focus-visible, does the page have focus, what outline applies */
+      const why = ring ? '' : `focus=${e.matches(':focus')} focus-visible=${e.matches(':focus-visible')} page-focused=${document.hasFocus()} outline=${s.outlineStyle} ${s.outlineWidth}`;
+      return { id, ring, why, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
     });
     if (!f || f.skip) continue;
-    if (!f.ring) { invisible++; if (where.length < 3) where.push(f.id); }
+    if (!f.ring) { invisible++; if (where.length < 3) where.push(f.id); if (whyNot.length < 3) whyNot.push(`${f.id} (${f.why})`); }
     if (f.id + f.path === last) { if (++same >= 4) { stuck = 1; break; } } else same = 0;
     last = f.id + f.path;
   }
-  return { invisible, stuck, where };
+  return { invisible, stuck, where, why: whyNot };
 }
 async function motion(page){
   return page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && a.effect && a.effect.getComputedTiming().iterations === Infinity
@@ -133,7 +135,7 @@ async function motion(page){
     const better = Object.keys(b.axe).filter(id => !r.axe[id] || r.axe[id].n < b.axe[id].n);
     if (better.length) notes.push(`${key}: better than the baseline on ${better.join(', ')} (run with --update to lock it in)`);
     if (r.focus && b.focus) {
-      if (r.focus.invisible > b.focus.invisible) problems.push(`${key}: ${r.focus.invisible} keyboard stops with no visible focus (baseline ${b.focus.invisible}), e.g. ${r.focus.where.join(', ')}`);
+      if (r.focus.invisible > b.focus.invisible) problems.push(`${key}: ${r.focus.invisible} keyboard stops with no visible focus (baseline ${b.focus.invisible}), e.g. ${(r.focus.why && r.focus.why.length ? r.focus.why : r.focus.where).join(', ')}`);
       if (r.focus.stuck && !b.focus.stuck) problems.push(`${key}: the keyboard gets stuck (Tab stops moving)`);
     }
     if (r.motion > (b.motion || 0)) problems.push(`${key}: ${r.motion} endless animation(s) still run with reduced motion on (baseline ${b.motion || 0})`);
