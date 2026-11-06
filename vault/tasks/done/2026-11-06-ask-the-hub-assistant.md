@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: dropped
 hub: site
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam's calls (the questions under "Decisions for Sam"); an AI provider key that Sam saves in Supabase
+waiting-on: 
 agent: 
 pr: 
 ---
@@ -22,13 +22,13 @@ privacy controls. This note is the workshop and the proposed plan; nothing is bu
 
 ## Context
 
-- The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10 lists this note),
-  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md) (the content JSON and the Notes toolbar).
-- Rules that matter most here: [secrets](../rules/secrets.md), [learner-data-privacy](../rules/learner-data-privacy.md),
-  [graded-coursework](../rules/graded-coursework.md), [preview-and-release-test](../rules/preview-and-release-test.md),
-  [about-page](../rules/about-page.md).
+- The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10 lists this note),
+  [phase 1](../2026-11-05-redesign-phase-1-hub-engine.md) (the content JSON and the Notes toolbar).
+- Rules that matter most here: [secrets](../../rules/secrets.md), [learner-data-privacy](../../rules/learner-data-privacy.md),
+  [graded-coursework](../../rules/graded-coursework.md), [preview-and-release-test](../../rules/preview-and-release-test.md),
+  [about-page](../../rules/about-page.md).
 
-## What the data says (the [audit](done/2026-11-05-redesign-audit-and-plan.md), section 1)
+## What the data says (the [audit](2026-11-05-redesign-audit-and-plan.md), section 1)
 
 - Students ask for **content and formats, not features**: check-ins asked for pictures and cases (17) and exam wording (12);
   in survey 2 a guided tutorial got No 6, Yes 3. The look-it-up features get little use: bank search 2 people, "Find this
@@ -63,7 +63,7 @@ privacy controls. This note is the workshop and the proposed plan; nothing is bu
 - **Privacy**: the question goes to the AI provider to be answered, and the About page's "What the hubs record" says so in
   plain words. By default nothing typed is stored: only counts per hub and day, the "not covered" rate and the thumbs.
   Keeping the question text (trimmed, with no id, like `search_terms`) to learn what students ask is Sam's call; if yes,
-  it gets its rows in [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md).
+  it gets its rows in [event-taxonomy](../../reference/event-taxonomy.md) and [analytics-retention](../../reference/analytics-retention.md).
 - **Graded quizzes**: the syllabus allows no AI on an open quiz. Proposed: Ask the Hub switches itself off on a hub while
   one of its graded quizzes is open. That needs each quiz's open and close times in `COURSE_DATES` (today an entry has one
   date and no times). It's also off during the mock and once the hub is archived.
@@ -87,7 +87,7 @@ the release up. A pilot on one hub for one exam; then Sam decides from the numbe
 
 ## Done when
 
-- [ ] Sam's calls are in [decisions](../decisions.md) and this note
+- [ ] Sam's calls are in [decisions](../../decisions.md) and this note
 - [ ] The key saved by Sam in Supabase; the `ask-hub` function deployed with its limits and the spending limit set
 - [ ] The test set passes in the preview: every answer's quotes check out, "not covered" when it should be, no bank answers
 - [ ] The About page's entry and "What the hubs record" updated; event taxonomy and retention rows
@@ -97,8 +97,12 @@ the release up. A pilot on one hub for one exam; then Sam decides from the numbe
 ## Log
 
 - 2026-11-06: workshop of Sam's idea; waiting on Sam's calls.
+- 2026-11-06: Sam, in chat: "i think we ditch the ask the hub idea". Dropped.
 
 ## Outcome
 
-Related: [secrets](../rules/secrets.md) · [learner-data-privacy](../rules/learner-data-privacy.md) ·
-[graded-coursework](../rules/graded-coursework.md) · [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md)
+**Dropped** (Sam, 2026-11-06, [decisions](../../decisions.md)): not built, now or after the redesign. The design above
+stays here in case it comes back; don't propose it again unless Sam asks.
+
+Related: [secrets](../../rules/secrets.md) · [learner-data-privacy](../../rules/learner-data-privacy.md) ·
+[graded-coursework](../../rules/graded-coursework.md) · [the audit and plan](2026-11-05-redesign-audit-and-plan.md)

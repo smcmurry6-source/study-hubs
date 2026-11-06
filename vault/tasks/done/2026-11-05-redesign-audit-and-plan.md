@@ -255,15 +255,16 @@ student sees, and released all at once by one PR when Sam likes the whole thing;
 
 ### 4.10 Additions proposed 2026-11-06 (waiting on Sam's calls)
 
-Sam brought four more ideas to workshop (2026-11-06, in chat), open to any of them changing or not working out. Each has
-its own note with the data, the proposal and the questions for Sam; none is agreed yet.
+Sam brought five more ideas to workshop (2026-11-06, in chat), open to any of them changing or not working out. Each has
+its own note with the data, the proposal and the questions for Sam. None is agreed yet; Sam dropped "Ask the Hub" the same day.
 
 | Idea | Note | Where it would go |
 |---|---|---|
 | Three equipment journeys (Handpiece, ModuPro, Loupes), server-checked XP and milestones, the Dark Matter unlock | [journeys](../2026-11-06-redesign-progression-journeys.md) | The ladder's empty top reshaped now, before anyone reaches Diamond; the rest in phase 4 and the release |
-| "Ask the Hub", an assistant grounded in the hub's notes | [ask the hub](../2026-11-06-ask-the-hub-assistant.md) | Its own track after the release, a pilot on one hub |
+| "Ask the Hub", an assistant grounded in the hub's notes | [ask the hub](2026-11-06-ask-the-hub-assistant.md) | **Dropped** (Sam, 2026-11-06) |
 | Timmy's shop, rare costumes and bowling | [shop and bowling](../2026-11-06-redesign-timmy-shop-and-bowling.md) | Phase 4 and the release |
 | Patient Box v2: cases built from a tooth library and modules | [patient box v2](../2026-11-06-patient-box-v2-modular-cases.md) | Its own track, shipping to the live hubs step by step |
+| An idea board: classmates post ideas and vote on them | [idea board](../2026-11-06-idea-board.md) | Now, on today's dashboard, seeded with these ideas; then phase 3 |
 
 ## 5. Decisions (all answered 2026-11-05, logged in [decisions](../../decisions.md))
 
