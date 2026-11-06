@@ -33,7 +33,8 @@ its ink and blue-grey, each hub's class color as a dot).
   dashboard's own `HUBS`, overrides included). The page's own `ARCHIVED` list is only a fallback until that loads.
 - **Phone:** the sidebar folds into a Menu button that opens a full-screen list (Escape closes it and returns focus);
   the Inbox stays one tap away in the top bar; buttons are 44 px; wide tables scroll inside their card and get a
-  keyboard stop only when they do. Dark mode follows the device. No new animation.
+  keyboard stop only when they do. **Always light**, even on a device in dark mode (Sam, 2026-11-06: dark was hard
+  to read; `color-scheme: only light`, no dark styles). No new animation.
 
 ## Live: who's studying now
 
@@ -100,8 +101,8 @@ which never merged; `supabase/schema.sql` now matches the live function).
 - `node tools/release/admin-ui.js`: the whole page in the preview as the admin test account (fixtures for every view in
   `tools/preview/runtime/preview.js`): every view opens with its title, no error and its own address, the Overview loads
   only its own data, the back button, check-ins and surveys newest first, Live's polling, the Hubs flows with the
-  dashboard and a hub page checked after each change, and on a 390 px phone in dark mode the menu (focus, Escape, 44 px)
-  and no sideways scroll. `node tools/release/run.js` runs it as `adminui`.
+  dashboard and a hub page checked after each change, and on a 390 px phone in dark mode the page staying light, the menu
+  (focus, Escape, 44 px) and no sideways scroll. `node tools/release/run.js` runs it as `adminui`.
 
 ## Deploying
 

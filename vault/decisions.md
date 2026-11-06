@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-06 | "I dont want the admin page to be dark mode. its hard to see": the admin page is light only, even on a device in dark mode; then "merge when ready", Sam's approval, so the agent merges once "Check hubs" and "Release tests" pass | the admin page (`review/`) | chat, [admin-operations](reference/admin-operations.md) |
 | 2026-11-06 | "Ship all of this with the redesign": the journeys and XP changes, the shop, Timmy's place, the bowling egg and the idea board are built side by side and released with the redesign; Patient Box v2 is the exception (its own track) | widget, dashboard, Supabase | chat, [plan 4.10](tasks/done/2026-11-05-redesign-audit-and-plan.md) |
 | 2026-11-06 | Idea board: "Dont put these ideas on the idea board, but you can autogenerate some new ones. i dont want to approve them, just allow them to be posted, show upvotes and downvotes. show names" | dashboard, every hub's More | chat, [task](tasks/2026-11-06-idea-board.md) |
 | 2026-11-06 | Patient Box v2 is done "by itself" (its own track, shipping to the live hubs when ready), and "figures [can] pull from the catalogue too": one tooth library for the cases and the figure builds | every hub with cases or tooth figures | chat, [task](tasks/2026-11-06-patient-box-v2-modular-cases.md) |
