@@ -96,6 +96,7 @@ const controls = `<div class="am-controls" role="group" aria-label="Movement"><b
 <p class="am-info">Hover or tap a tooth form.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>From the L8 notes (Dr. Givan, the 11/5 recording): anatomic teeth 30° or more, semi-anatomic about 12-20° depending on the mold (lingualized teeth belong here), non-anatomic (flat) 0°; the scheme each suits; flat teeth have the least lateral force, so stability is easiest; lingualized teeth have an elongated maxillary lingual cusp against a flat plane or a wide fossa, like a mortar and pestle.</li>
+<li>Outside source for the angles: complete denture texts list the common molds as about 33° (anatomic), 20° or less (semi-anatomic) and 0° (non-anatomic), in line with the notes' 30° or more, about 12-20° and 0°.</li>
 <li>The arrow is the contact force on the lower tooth, square to the surfaces in contact (plain mechanics, friction left out); the arrow under the base is its sideways part. Semi-anatomic teeth are drawn at 20°. The slide is 1.5 mm with the teeth kept in contact.</li>
 <li>Schematic outlines, not traced from a manufacturer's mold. Educational, not clinical guidance.</li></ul></details>`;
 

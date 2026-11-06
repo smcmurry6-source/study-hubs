@@ -68,5 +68,8 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 - 2026-11-05: built: Fig 20 `resorb`, Fig 21 `ssr`, Fig 22 `schemes`, Fig 23 `toothforms` (numbered in the notes' order),
   in both note levels and L8's Review; screenshots for Sam in [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260).
   Occlusion's performance budget raised to 1350 KB there, pending Sam (BUG-030). Left: Sam's look, then the slides check.
+- 2026-11-06: Sam made outside sources a standing rule for figures ([outside-sources-for-figures](../rules/outside-sources-for-figures.md))
+  and said "Build all proposed figures". Fig 20 now resorbs the maxilla less, so the mandible loses about twice its height
+  (Tallgren; Cawood & Howell for the basal bone), and Figs 20-23 cite their outside sources. Same PR.
 
 ## Outcome

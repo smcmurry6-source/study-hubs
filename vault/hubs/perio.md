@@ -68,6 +68,11 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   is now herringbone. The figure-eight "nonscalloped incisions" clause was removed because it couldn't be confirmed;
   the figure now says only "flaps will not meet closely (apically positioned flaps)". Kept after checking: sling,
   criss-cross, vertical mattress, continuous, continuous locking, and the materials chart.
+- 2026-11-06: the S8 host-response flowchart, the one candidate never put to Sam, approved with "Build all proposed
+  figures" and built as S8 · Fig 3 (`tools/figures/perio/hostmod.mjs`, under the S8 notes and in Review's `abx-figs`):
+  Dr. Litz's flowchart as a cycle, with a no-bacteria view and where SRP, NSAIDs, bisphosphonates and Periostat act.
+  Outside sources (Page & Kornman 1997, Vane 1971, Golub 1998, Caton 2000, Russell 2011) are cited in its "What's
+  simplified" ([outside-sources-for-figures](../rules/outside-sources-for-figures.md)); what it names is the class's.
 
 ## Pending
 
@@ -79,8 +84,6 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   drug-by-drug slides for clindamycin (qid × 10 days vs tid × 7), doxycycline (a double first-day dose) and Augmentin
   (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Its meal-timing
   column couldn't be read reliably from the PDF text, so it isn't in the hub.
-- Diagram candidate never put to Sam: the S8 host-response flowchart (microbial challenge → host response → cytokines and
-  PGE2 → breakdown, the vicious cycle) with where NSAIDs, Periostat and bisphosphonates act.
 
 History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
 

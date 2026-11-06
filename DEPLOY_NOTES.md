@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (outside sources for every figure, and Perio S8 Fig 3, Claude Code)** — Sam's new standing rule
+  ([outside-sources-for-figures](vault/rules/outside-sources-for-figures.md)): outside sources are encouraged on every
+  figure, for accuracy and for how it works, and cited in the figure; what it names and tests still follows the lecture.
+  The same message ("Build all proposed figures") approved the one figure proposed but never put to Sam: **Perio S8 · Fig 3
+  The host response, and host modulation** (`tools/figures/perio/hostmod.mjs`, under the S8 notes and in Review):
+  Dr. Litz's flowchart as a cycle, with No bacteria, SRP, NSAIDs, bisphosphonates and Periostat. The L8 figures now cite
+  theirs: Fig 20's maxilla resorbs less, so the mandible loses about twice its height (Tallgren 1972 and 1980; Cawood &
+  Howell 1988 for the basal bone staying put), and Figs 21-23 cite the Glossary of Prosthodontic Terms and the usual mold
+  angles. About page: the Perio diagrams sentence. No schema change, no text or audio change.
+
 - **2026-11-05 (Occlusion L8: four drawn figures, Claude Code)** — Sam approved all four L8 diagram candidates ("Build" to
   each). Built with the anima kit from the L8 notes and placed after the paragraph each explains, at both note levels, and
   in L8's Review: **Fig 20 How the ridges resorb** (`resorb`: a side view at the midline and a section through the first

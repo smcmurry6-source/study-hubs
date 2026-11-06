@@ -4,9 +4,10 @@
 // to a long-edentulous patient: after the teeth are lost the maxilla resorbs up and in (anteriorly upward and inward,
 // posteriorly upward and toward the midline) and the mandible down and out (anteriorly downward and forward,
 // posteriorly downward and outward). Set denture teeth near the ridges, as the notes say they generally are, and the
-// posterior teeth end up in crossbite and the front reads pseudo-Class III. Content from the L8 notes only (the 11/5
-// recording). Schematic outlines drawn to typical proportions; how far each ridge moves is illustrative, with the
-// mandible losing more height than the maxilla.
+// posterior teeth end up in crossbite and the front reads pseudo-Class III. What it shows and names comes from the L8
+// notes (the 11/5 recording). Outside sources set the proportions (vault/rules/outside-sources-for-figures.md): the
+// mandible loses about twice the maxilla's ridge height (Tallgren 1972 and 1980), and the basal bone keeps its shape
+// while the alveolar bone resorbs (Cawood & Howell 1988). Outlines are schematic, drawn to typical proportions.
 import { figureSvg, plateHtml } from "./shared.mjs";
 import { DEN } from "./l8den.mjs";
 
@@ -17,7 +18,7 @@ const SAG = {
      and back along the nasal floor; points 1-9 are its oral surface, 5 the crest */
   MAX: [
     [[12.5, 22.4], [9.8, 20.6], [7.6, 16], [8.4, 11], [7.6, 9.6], [5.1, 9.2], [2.6, 9.8], [-1, 13], [-8, 16], [-26, 16.8], [-26, 21.6], [-6, 22.2]],
-    [[12.5, 22.4], [9.8, 20.6], [6.2, 18.6], [4.8, 16], [3.4, 14.6], [1.4, 14.2], [-0.8, 14.6], [-3.6, 16.2], [-9, 17.2], [-26, 17.6], [-26, 21.6], [-6, 22.2]],
+    [[12.5, 22.4], [9.8, 20.6], [6.2, 18.3], [4.8, 15.4], [3.4, 14], [1.4, 13.6], [-0.8, 14], [-3.6, 15.8], [-9, 17.1], [-26, 17.5], [-26, 21.6], [-6, 22.2]],
   ],
   /* the symphysis: the labial surface up from the chin, the crest (5), the lingual surface down; points 2-8 are oral */
   MAN: [
@@ -36,7 +37,7 @@ const COR = {
   /* the patient's right half (the left is its mirror): the maxilla from the cheek over the ridge (4) to the midline (9) */
   MAX: [
     [[-46, 28], [-38, 22], [-33, 14], [-31, 9.6], [-26, 8.3], [-21.5, 9.6], [-18, 14], [-12, 19.5], [-5, 22.5], [0, 23]],
-    [[-46, 28], [-36, 24], [-29.5, 19], [-26.5, 15.6], [-23, 14.6], [-19.6, 15.8], [-16.5, 18], [-11, 21], [-5, 23], [0, 23.3]],
+    [[-46, 28], [-36, 23.4], [-29.5, 17.5], [-26.5, 13.8], [-23, 12.7], [-19.6, 13.9], [-16.5, 16.8], [-11, 20.6], [-5, 22.9], [0, 23.2]],
   ],
   /* the mandible's body at the first molar: buccal surface up to the ridge (4), lingual surface down */
   MAN: [
@@ -177,7 +178,8 @@ const controls = `<div class="am-controls"><label class="am-slider rb-sl"><span>
 <p class="am-info">Hover or tap the bone, a tooth or a dashed line.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>From the L8 notes (Dr. Givan, the 11/5 recording): after the teeth are lost the maxillary anterior ridge resorbs upward and inward, the maxillary posterior upward and toward the midline, the mandibular anterior downward and forward, the mandibular posterior downward and outward; the maxilla's arch gets smaller and, at the level of the teeth, the edentulous mandible larger; denture teeth are generally set near the ridge, so posterior teeth are often set in crossbite (nothing wrong with that in a denture); a patient made skeletal Class III this way has a pseudo-Class III relationship.</li>
-<li>Schematic sections drawn to typical proportions, not traced from a patient. How far each ridge moves is illustrative (the mandible loses more height than the maxilla); the jaws are kept at the same vertical relation throughout, as if at the denture's vertical dimension. Denture molars are drawn flat for simplicity. Educational, not clinical guidance.</li></ul></details>`;
+<li>Outside sources for the proportions: Tallgren's 25-year study of complete denture wearers found the residual ridges keep shrinking for decades, the lower faster than the upper (J Prosthet Dent 1972;27:120-32), and her study of immediate dentures found the lower anterior ridge lost about twice the height of the upper; the figure's mandible loses about twice the maxilla's height. Cawood and Howell's classification of the edentulous jaws found that the alveolar bone resorbs while the basal bone keeps its shape (Int J Oral Maxillofac Surg 1988;17:232-6), so the drawing moves only the ridges and keeps the bone beneath them still.</li>
+<li>Schematic sections drawn to typical proportions, not traced from a patient; the amounts are typical, not one patient's. The jaws are kept at the same vertical relation throughout, as if at the denture's vertical dimension. Denture molars are drawn flat for simplicity. Educational, not clinical guidance.</li></ul></details>`;
 
 function rbLive(root, D) {
   var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };

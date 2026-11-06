@@ -5,4 +5,6 @@ import { bop } from "./bop.mjs";
 import { xrays } from "./xrays.mjs";
 import { biofilm } from "./biofilm.mjs";
 import { targets } from "./targets.mjs";
-export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets()];
+// S8 host modulation, approved by Sam 2026-11-06 ("Build all proposed figures")
+import { hostmod } from "./hostmod.mjs";
+export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets(), hostmod()];

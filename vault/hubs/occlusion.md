@@ -53,6 +53,8 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
     and a contact finder; plus the four posterior tooth profiles (`PROF`: anatomic 30°, semi-anatomic 20°, flat 0°,
     lingualized with a wide, shallow lower fossa). `schemes` (Fig 22) solves its poses in Node at build time, so a profile
     change re-poses it: look at every scheme and move again after one. Reuse it for any new denture section.
+    Fig 20's proportions come from outside sources (2026-11-06, [outside-sources-for-figures](../rules/outside-sources-for-figures.md)):
+    the mandible loses about twice the maxilla's ridge height (Tallgren), and the basal bone stays put (Cawood & Howell).
   - The anima figures are numbered Fig 1-23 (plus Fig 2b) in lecture order; a new one takes the next free number.
   - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
     the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
