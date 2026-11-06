@@ -47,6 +47,10 @@ does exactly the deletes marked "the weekly job" below and nothing else. A new k
 | `zz-test` and blank-hub rows | none | delete (pings, click reach, feature events, hourly rows, click counts) | the weekly job | Test data |
 | `question_stats`, `question_choices`, `question_versions`, `question_reviews`, `ui_clicks`, `search_terms`, `mode_stats`, `presence_hourly`, `hub_recaps`, `changelog`, `feature_daily`, `retention_runs`, `hub_archive_log` | keep | | | No visitor ids; small |
 | Trophies and games: `achievements`, `arcade_scores`, `egg_events`, `nuke_*`, `exam_luck`, `correct_streaks`, `visitor_names`, `visitor_links`, `question_pins` | keep | | | They are the students' own records and settings |
+| The game layer (migration_v54, from the release): `xp_awards`, `xp_boosts`, `answer_xp`, `game_baseline`, `pet_purchases`, `pet_inventory`, `pet_equipped`, `costume_log` | keep | revisit when the class graduates, with `personal_answers` | | XP, gold crowns and what students bought are built from them; deleting them lowers XP or takes things away. `answer_xp` goes with its answer |
+| `xp_sessions` | keep for now | **proposed, not approved**: delete sessions older than 30 days in the weekly job (only the last 6 hours are read); ask Sam | | A mock's or game's start and finish |
+| `ideas`, `idea_votes`, `idea_reports`, `idea_notes` | keep while the board is up | **to decide with Sam** before the release: how long an idea hidden by reports or by Sam, and its votes, stay (an author's own delete removes its words, name, votes, reports and notes at once; the empty row, which only keeps the day's limit, could go after a day) | | Public to the class under the poster's name; votes and notes are per person |
+| `question_keys`, `shop_items`, `podcast_episodes`, `report_outcomes`, `game_config` | keep | | | No visitor ids |
 
 A student who asks for their data to be deleted: there is no self-serve way yet, and a student can't see their own id.
 Until there is, Sam deletes by the id from the student's own browser, never by guessing from a name.

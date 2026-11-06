@@ -57,8 +57,8 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
       starting with the cottage redrawn, the castle, the giant mushroom, the treehouse, the pool and the garden
 - [ ] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
       preview with reduced motion too
-- [ ] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
-      every linked device
+- [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
+      every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4)
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -66,6 +66,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 ## Log
 
 - 2026-11-06: written from Sam's calls in chat.
+- 2026-11-06 (Claude Code): `equip_item` and `pet_equipped` keep the home, the scene, six yard spots and the home's upgrades
+  (windows, porch, chimney, flag, paint) on the server; a yard item moves between spots; on Link my devices the newer
+  choice per slot wins (`migration_v54.sql`, [game-server](../reference/game-server.md)). The slot names are a draft for
+  phase 4's renderer.
 
 ## Outcome
 

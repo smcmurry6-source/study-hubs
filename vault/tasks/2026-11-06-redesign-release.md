@@ -146,6 +146,32 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
+### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
+
+`migration_v54.sql` is written and tested, not applied. At the release, in this order:
+
+1. **Apply it** through the connector in the same few minutes the switch PR merges: it sets the switch time
+   (`game_config.v2_at`) and takes everyone's baseline when it runs, so XP without the cap starts then. Pages that still
+   call today's functions keep today's rules either way. (Its section 0, the BUG-049 fix, was applied on its own on
+   2026-11-06: it changes nothing the second time.)
+2. In the switch PR: append `migration_v54.sql` to `supabase/schema.sql` and take its line out of
+   `supabase/pending-migrations.txt`; then `node tools/release/rls.js` and `rls-audit.sql` on the live project.
+3. **Load the keys** of every hub that switches: `node tools/xp/keys.js <hub> --sql` (the admin secret typed in by hand,
+   never committed), through the connector, and check the count it returns. A hub that keeps its old page records answers
+   the old way and needs none, but an idea can only name a hub with keys: load them for each live hub, or its ideas use
+   "All hubs".
+4. **Set each episode's length** (`admin_set_podcast_episode`), so Timmy Time's minutes pay.
+5. **Post the starter ideas** (`admin_post_starter_idea`, the table in [the idea board](2026-11-06-idea-board.md)), checked
+   against the About page first.
+6. The new pages call the new functions: `record_answer_v2` in place of `record_answer`, `record_choice` /
+   `record_choices`, `record_personal_answer` and `record_correct_streak`; `xp_session_start` / `xp_session_finish` for a mock
+   and an arcade game; `pod_minute_v2`; `get_widget_bootstrap_v2`; the `_v2` boards; the shop, Timmy's place and the idea
+   board's functions; the admin page's `admin_resolve_report_v2` ("Fixed" / "No change needed") and `get_reports_v2`.
+7. Before it: Sam confirms the calls made while building it (listed in [game-server](../reference/game-server.md) and the
+   PR that added it), the draft catalog's prices, and how long hidden ideas are kept ([analytics-retention](../reference/analytics-retention.md)).
+8. About page: the XP sources and the guardrails, Shiny Gold Crowns, the shop, the idea board, and "What the hubs record"
+   (ideas show to the class under your name).
+
 ## Log
 
 - 2026-11-06: written after Sam chose to build the whole redesign side by side and release it at once.

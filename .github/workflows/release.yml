@@ -3,7 +3,7 @@
 # runs them only when it changes shared code (the dashboard, About, the admin page, widget/, assets, the service worker,
 # the database, the preview runtime, the suites or this file) or has the `full-tests` label, so question and notes
 # changes skip it; and it skips the suites Check hubs already ran on the same commit (syntax, vault, archive, secrets,
-# smoke, preview safety, database permissions, admin operations, retention). By hand (Actions -> Release tests -> Run
+# smoke, preview safety, database permissions, admin operations, retention, XP). By hand (Actions -> Release tests -> Run
 # workflow) it runs every suite. The hosted preview is its own workflow, preview.yml, on request only.
 # It never deploys anything and never talks to the live database: every page runs on fixture data.
 name: Release tests
@@ -74,7 +74,7 @@ jobs:
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
       # on a pull request, Check hubs already ran these on the same commit; a run by hand runs everything
       - name: Run the release suites
-        run: node tools/release/run.js ${{ github.event_name == 'pull_request' && '--skip syntax,vault,archive,secrets,smoke,preview,rls,admin,retention' || '' }}
+        run: node tools/release/run.js ${{ github.event_name == 'pull_request' && '--skip syntax,vault,archive,secrets,smoke,preview,rls,admin,retention,xp' || '' }}
       - name: Write the summary on this run's page
         if: ${{ !cancelled() }}
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
