@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -69,6 +69,17 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 
 - 2026-11-06: written from Sam's calls in chat ("maybe we can make it an easter egg").
 - 2026-11-06: the triggers moved from 10 and 30 in a row to 50 and 150 (Sam), with the data on how often each happens.
+- 2026-11-06 (Claude Code): the eight clips drawn and animated, on the design page only, for Sam's look from a recording
+  before any trigger goes into `widget/eggs.js`. One kit, `tools/figures/site/bowling.mjs`, built by `build.mjs` into
+  `tools/preview/design/bowling.js` (`window.SH_BOWL`; about 56 KB): a front view of a lane (the deck, the curtain, the
+  kickbacks the pins run behind, a masking panel with chasing bulbs), ten pins in the boss egg's colors with each crew
+  member's mark (Plaque Boss is the head pin), the mint, number thirty-one (a second molar with worried brows and a
+  thermometer), the toothbrush by the door, the handpiece and a turkey in Timmy's pilgrim hat. Each clip is one CSS
+  timeline of 4.4 to 5.2 seconds; its still is the same timeline frozen on the last frame (`.bw-still`), and the word is
+  page text over it, placed low over the lane (over the curtain for the neighbor). The build checks every clip, still
+  and playing, and that every class its CSS moves is in its drawing. The design page's "The bowling egg" section plays
+  them (tap to skip, play all, still), with the stills, the cast and how it's found. Left for after Sam's yes: the
+  triggers, the lane at Timmy's place, the egg log and trophy, `LORE.md`, the About page and the event taxonomy.
 
 ## Outcome
 
