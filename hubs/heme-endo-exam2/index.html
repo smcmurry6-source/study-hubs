@@ -1681,7 +1681,7 @@ var EXAM_INFO = [
   ['Where', 'In person, Volker Hall Lecture Room B, on Canvas with LockDown Browser, as for Exam 1.'],
   ['Lectures', 'L11 Diabetes pharmacology, L12 Endocrine pathology (both hours), A Dental endocrinology, L13-L14 Male and female reproductive histology, L15-L16 Male and female reproductive physiology, L17 Pregnancy and lactation, L18 Estrogens and androgens. L17 and L18 join this hub when their slides are posted.'],
   ['Review', 'Wednesday, November 11, 2:00-2:50 pm, with Dr. Madison.'],
-  ['Exam 1 material', 'Five questions come from Exam 1. The Exam 1 Refresher (R) holds the Exam 1 hub\'s High Likelihood questions (its predicted topics) and the questions the class found hardest; the mock\'s five Exam 1 questions come from the High Likelihood ones.'],
+  ['Exam 1 material', 'Five questions come from Exam 1. The Exam 1 Refresher (R) holds the Exam 1 hub\'s High Likelihood questions (its predicted topics) and the questions the class found hardest; the mock\'s five Exam 1 questions come from the High Likelihood ones. To practice those, open the Question Bank and tap "Exam 1 High likelihood" under Show.'],
   ['Before', 'Quiz 3 is due Thursday, November 12, at 11:59 pm. This hub uses nothing from the quizzes or the take-home.']
 ];
 /* the course, for Home's timeline (the syllabus schedule) */
@@ -8579,13 +8579,16 @@ var QF_SLIDERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
    picker, and in PCD Implants 5 of 8 tapped Clear first just to pick one lecture; saved filters (kept since 10-30) gave no sign
    they were still on. Now:
    - Lectures: the tick list, every row with "Only" (one tap for one lecture).
-   - Show: chips for STATE.ui.qstatus (all | likely | unseen | missed | pinned), each with how many questions it would give.
+   - Show: chips for STATE.ui.qstatus (all | likely | likely1 | unseen | missed | pinned), each with how many questions it would give.
+     likely1, "Exam 1 High likelihood" (Sam, 2026-11-06): only the Exam 1 Refresher's High Likelihood questions (Exam 1's
+     predicted topics); tapping it ticks R if it isn't ticked.
    - Search, and Order (In order | Random). There is no "Likely first" order (Sam, 2026-11-03): the High likelihood chip
      shows only those questions, All shows the whole bank.
    - More filters (folded): question type (STATE.ui.qfmt, only the formats this bank has) and where it's from (STATE.ui.qsrc).
    Under the panel a line says what is showing, with a tag for every filter that's on (tap to remove it) and Clear all; when
    nothing matches, it says which filter is in the way and offers the fix. STATE.ui.qlec is 'all', one id or an array of ids. */
-var BANK_SHOW = [['all','All'],['likely','High likelihood'],['unseen','Not answered yet'],['missed','Missed last time'],['pinned','Pinned']];
+var BANK_SHOW = [['all','All'],['likely','High likelihood'],['likely1','Exam 1 High likelihood'],['unseen','Not answered yet'],['missed','Missed last time'],['pinned','Pinned']];
+var BANK_E1_LEC = 'refresh';
 var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
 function bankIsFmt(q, fm){ return fm === 'pbox' ? !!q.pbox : fm === 'img' ? !!q.img : (fm === 'multi' || fm === 'match' || fm === 'sequence') ? q.type === fm : q.fmt === fm; }
 function bankLabelOf(list, k){ for(var i = 0; i < list.length; i++) if(list[i][0] === k) return list[i][1]; return k; }
@@ -8641,6 +8644,7 @@ function bankFiltered(search, o){
     if(!lecOn[q.lec]) return false;
     if(st === 'pinned' && !pins[q.id]) return false;
     if(st === 'likely' && !q.likely) return false;
+    if(st === 'likely1' && !(q.likely && q.lec === BANK_E1_LEC)) return false;
     if(src !== 'all' && q.src !== src) return false;
     if(fm !== 'all' && !bankIsFmt(q, fm)) return false;
     var seen = STATE.seen[q.id];
@@ -8664,7 +8668,7 @@ function renderBank(body){
   var ord = STATE.ui.qorder === 'random' ? 'random' : 'linear';
   var fmOpts = '<option value="all">Any type</option>' + fmts.map(function(o){ return '<option value="'+o[0]+'"'+(fm===o[0]?' selected':'')+' data-label="'+escHtml(o[1])+'">'+o[1]+'</option>'; }).join('');
   var srcOpts = '<option value="all">Anywhere</option>' + srcs.map(function(k){ return '<option value="'+k+'"'+(src===k?' selected':'')+' data-label="'+escHtml(SRC_LABEL[k])+'">'+SRC_LABEL[k]+'</option>'; }).join('');
-  var chips = BANK_SHOW.map(function(o){ return '<button type="button" class="qf-chip" data-qshow="'+o[0]+'" aria-pressed="'+(st===o[0])+'">'+(o[0]==='pinned'?PIN_SVG:o[0]==='likely'?icon('target'):'')+o[1]+' <span class="qf-n" data-qshow-n="'+o[0]+'"></span></button>'; }).join('');
+  var chips = BANK_SHOW.map(function(o){ return '<button type="button" class="qf-chip" data-qshow="'+o[0]+'" aria-pressed="'+(st===o[0])+'">'+(o[0]==='pinned'?PIN_SVG:(o[0]==='likely'||o[0]==='likely1')?icon('target'):'')+o[1]+' <span class="qf-n" data-qshow-n="'+o[0]+'"></span></button>'; }).join('');
   body.innerHTML = '<div class="cg-host" id="cgHost"></div>' +
     '<section class="qbar" aria-label="Choose which questions to practice">' +
       '<div class="qf-line qf-top"><span class="qf-lab" id="qfLecLab">Lectures</span>'+lecPickHTML(bankLecIds())+'<label class="qf-search">'+QF_SEARCH+'<input id="fSearch" type="search" placeholder="Search questions and answers" aria-label="Search questions and answers" value="'+escHtml(bankSearch)+'"></label></div>' +
@@ -8717,6 +8721,7 @@ function renderBank(body){
   function emptyHTML(on){
     var st = STATE.ui.qstatus, msg, only = !on.some(function(p){ return p[0] !== 'st' && p[0] !== 'lec'; });
     if(!bankLecIds().length) msg = 'No lectures are ticked, so there is nothing to show.';
+    else if(st === 'likely1' && bankLecIds().indexOf(BANK_E1_LEC) === -1) msg = 'Exam 1\'s High Likelihood questions are in <b>R · Exam 1 Refresher</b>, which isn\'t ticked under Lectures.';
     else if(st === 'pinned' && !pinnedIds().length) msg = 'No pinned questions yet. Tap <b>Pin</b> on any question to save it here.';
     else if(st === 'missed' && only) msg = 'Nothing missed in these lectures. Questions you get wrong come back here.';
     else if(st === 'unseen' && only) msg = 'You have answered every question here. Try <b>Missed last time</b>, or another lecture.';
@@ -8742,8 +8747,12 @@ function renderBank(body){
   wireLecPick(body, function(ids, how){ STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; if(how !== 'tick') track('lec-' + how); redraw(); });
   body.querySelectorAll('[data-qshow]').forEach(function(b){ b.onclick = function(){
     STATE.ui.qstatus = b.getAttribute('data-qshow');
+    track('show=' + STATE.ui.qstatus);
+    /* Exam 1 High likelihood needs R ticked: tick it and rebuild the panel so the lecture picker matches */
+    var ids = bankLecIds();
+    if(STATE.ui.qstatus === 'likely1' && ids.indexOf(BANK_E1_LEC) === -1){ ids = ids.concat([BANK_E1_LEC]); STATE.ui.qlec = ids.length === LECTURES.length ? 'all' : ids; bankShown = BANK_PAGE; saveState(); renderBank(body); return; }
     body.querySelectorAll('[data-qshow]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    track('show=' + STATE.ui.qstatus); redraw();
+    redraw();
   }; });
   var fF = document.getElementById('fFmt'), fS = document.getElementById('fSrc');
   fF.onchange = function(e){ STATE.ui.qfmt = e.target.value; track('type=' + e.target.value); redraw(); };

@@ -27,6 +27,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   on 2026-11-06), and **the mock's five Exam 1 questions come only from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
   `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
+  The Question Bank's Show row has an extra chip for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
+  High Likelihood questions; tapping it ticks R if it isn't ticked. "High likelihood" still shows every lecture's.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A and L13-L16 were
   written from slides (and Dr. Herr's speaker notes) before they were given, `status:'slides'`. L17 and L18 had no slides
   on 2026-11-05: [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
