@@ -767,9 +767,9 @@ table.chart-table tbody tr:hover{background:color-mix(in srgb, var(--surface-2) 
   #modeSwitch .mode-icon{display:none}
 }
 .mock-foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:10px; margin:22px 0 8px; padding:14px 0 0; border-top:1px solid var(--line);}
-.qx-why{margin-top:10px;padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface,transparent)}
-.qx-why summary{cursor:pointer;font-weight:700;font-size:.85rem;letter-spacing:.02em}
-.qx-why ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.qx-why{margin-top:10px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface,transparent)}
+.qx-why summary{cursor:pointer;font-weight:700;font-size:.85rem;letter-spacing:.02em;padding:10px 11px;border-radius:8px}
+.qx-why ul{list-style:none;margin:0;padding:0 11px 10px;display:grid;gap:8px}
 .qx-why li{display:flex;gap:8px;align-items:flex-start;font-size:.92em;line-height:1.45;padding:6px 8px;border-radius:6px}
 .qx-why li.is-picked{outline:2px solid currentColor;outline-offset:-1px}
 .qx-why li.is-right .qx-why-mark{color:var(--good)} .qx-why li.is-wrong .qx-why-mark{color:var(--bad)}
@@ -3734,8 +3734,8 @@ nums('q8-N06', L, 'lecture', "Which statements about host modulation drugs are t
   ["at 20 mg bid it has no antimicrobial effect; it inhibits host collagenase.", "the benefit came with daily dosing for up to 3 years.", "BRONJ risk has stunted their development as host modulators.", "it is an adjunct to SRP, never a replacement, even for hard-to-modify risks like smoking."]);
 })();
 /* why each choice is right or wrong (2026-10-20, Sam): one line per choice, in the same order as q.choices, for
-   every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), with your
-   pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
+   every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), folded until
+   tapped, with your pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
 /* ===== Patient Box cases drawn from their numbers (PCASES, 2026-11-04): the case's rows, chart, radiograph and view
    sit in the Patient Box; `pfig` picks the pictures and hides any row that would give the answer away; `ref` points at
    the notes and Review tables the question comes from. Every fact is in this hub's notes. ===== */
@@ -6845,12 +6845,13 @@ function qMeta(q){
   var lec = LECTURE_BY_ID[q.lec];
   return '<div class="qcard-top">'+sessChip(lec)+'<span class="chip src">'+(SRC_LABEL[q.src]||'Hub')+'</span>'+(q.img && !q.imgAfter?'<span class="chip src">Diagram</span>':'')+likelyChip(q)+'</div>';
 }
-/* the "Why each choice" list: right answers first, then the rest; picks = the indexes the student chose (marked) */
+/* the "Why each choice" list: right answers first, then the rest; picks = the indexes the student chose (marked).
+   It starts folded (Sam, 2026-11-06: it took up too much of the screen); tapping its bar opens it. */
 function whyHTML(q, picks){
   if(!q.why || !q.choices) return '';
   var ok = function(i){ return q.type === 'multi' ? q.correct.indexOf(i) > -1 : i === q.answer; };
   var idx = q.choices.map(function(c,i){ return i; }).sort(function(a,b){ return (ok(b)?1:0) - (ok(a)?1:0) || a - b; });
-  return '<details class="qx-why" open><summary>Why each choice</summary><ul>' + idx.map(function(i){
+  return '<details class="qx-why"><summary>Why each choice</summary><ul>' + idx.map(function(i){
     var p = picks && picks.indexOf(i) > -1;
     return '<li class="'+(ok(i)?'is-right':'is-wrong')+(p?' is-picked':'')+'" data-why-idx="'+i+'"><span class="qx-why-mark" aria-hidden="true">'+(ok(i)?'✓':'✗')+'</span><span><b>'+escHtml(q.choices[i])+'</b>'+(p?'<em class="qx-why-you"> your pick</em>':'')+'<br>'+escHtml(q.why[i])+'</span></li>';
   }).join('') + '</ul></details>';

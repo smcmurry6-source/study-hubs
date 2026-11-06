@@ -45,5 +45,8 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-06: Sam asked for "Why each choice" to start folded after answering (it took up too much of the screen), and
+  all six live hubs now do. The engine's question card keeps the whole list folded until tapped, not the plan's "your
+  pick's line opened" ([decisions](../decisions.md)).
 
 ## Outcome
