@@ -56,7 +56,7 @@ const SUM = {
 };
 const FRONT = { co: "apart: usually only the back teeth touch", work: "apart", "prot:bal": "touching: allowed with anatomic teeth", "prot:non": "apart: no anterior contact", "prot:lingB": "apart: never in lingualized", "prot:lingN": "apart: never in lingualized" };
 const TEETH = {
-  anat: "Anatomic denture teeth: 30-degree cusps (30 degrees or more), with sulci and ridges. They allow balance and look the most natural.",
+  anat: "Anatomic denture teeth: 30-degree cusps (the slides: 30 to 33 degrees), with sulci and ridges. They allow balance and look the most natural.",
   flat: "Flat (non-anatomic) teeth: 0-degree cusps. The least lateral force, so stability is easiest.",
   ling: "Lingualized: the upper tooth's lingual cusp is elongated (the pestle); the lower tooth is flat with a wide fossa (the mortar).",
 };

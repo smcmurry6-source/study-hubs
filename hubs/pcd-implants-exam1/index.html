@@ -757,13 +757,14 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .home-tl li::before{content:"";position:absolute;left:-21px;top:5px;width:12px;height:12px;border-radius:999px;background:var(--surface);border:2px solid var(--line-strong)}
 .home-tl .tl-date{font-family:var(--font-mono);font-size:.74rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
 .home-tl .tl-what{font-size:.9rem}
-.home-tl .tl-past{opacity:.62}
+/* past and far-off rows: dimmed with the soft ink, not opacity, so their text keeps 4.5:1 contrast (BUG-031) */
+.home-tl .tl-past .tl-what{color:var(--ink-soft)}
 .home-tl .tl-past::before{background:var(--line-strong)}
 .home-tl .tl-today::before{background:var(--accent);border-color:var(--accent)}
 .home-tl .tl-due .tl-what{color:var(--caution);font-weight:700}
 .home-tl .tl-exam .tl-what{color:var(--accent-ink);font-weight:700}
 .home-tl .tl-exam::before{border-color:var(--accent);background:var(--accent-soft)}
-.home-tl .tl-later{opacity:.75}
+.home-tl .tl-later .tl-what{color:var(--ink-soft)}
 .home-days{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin:0 0 10px}
 .hd-day{aspect-ratio:1;border-radius:4px;background:var(--surface-3)}
 .hd-day.on{background:var(--accent)}

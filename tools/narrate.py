@@ -35,6 +35,9 @@ SAY = [
     (r"\bGLUT2\b", "glute two"), (r"\bGLUT4\b", "glute four"), (r"\bIGF-1\b", "I G F one"), (r"\bMEN ?1\b", "men one"), (r"\bMEN ?2A?\b", "men two"),
     (r"\b5-alpha\b", "five alpha"), (r"\b5α\b", "five alpha"), (r"α", "alpha "), (r"β", "beta "), (r"γ", "gamma "), (r"δ", "delta "),
     (r"&", " and "), (r"\s/\s", " or "), (r"\+/-", " plus or minus "),
+    # rating marks in tables (+++ / ++ / + / −) when they stand alone, not "Ca2+" or a negative number
+    (r"(?<![\w+])\+\+\+(?![\w+])", " three plus "), (r"(?<![\w+])\+\+(?![\w+])", " two plus "),
+    (r"(?<![\w+])\+(?![\w+])", " plus "), (r"(?<![\w−])−(?![\w−])", " minus "),
     # prescription shorthand (espeak reads "qid" as "kid", "IL-1" as "ill one")
     (r"\b1\s*mg\b", "1 milligram"), (r"(?<=\d)\s*mg\b", " milligrams"), (r"\bq(\d+)h\b", r"every \1 hours"),
     (r"\bpo\b", "P O"), (r"\bqd\b", "Q D"), (r"\bbid\b", "B I D"), (r"\btid\b", "T I D"), (r"\bqid\b", "Q I D"),

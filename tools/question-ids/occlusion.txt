@@ -673,10 +673,10 @@ mo-seq-grind
 mo-match-wear
 dn-goal
 dn-balance
-dn-hist-role
-dn-bonwill
-dn-gysi
-dn-temperament
+dn-hist-role retired
+dn-bonwill retired
+dn-gysi retired
+dn-temperament retired
 dn-implant-why
 dn-one-tooth
 dn-proprio
@@ -741,10 +741,10 @@ dn-2s-3
 dn-2s-4
 dn-2s-5
 dn-2s-6
-dn-2s-7
+dn-2s-7 retired
 dn-2s-8
 dn-tf-1
-dn-tf-2
+dn-tf-2 retired
 dn-tf-3
 dn-tf-4
 dn-tf-5
@@ -753,7 +753,7 @@ dn-tf-7
 dn-tf-8
 dn-tf-9
 dn-tf-10
-dn-tf-11
+dn-tf-11 retired
 dn-num-1
 dn-num-2
 dn-num-3
@@ -763,3 +763,20 @@ dn-num-6
 dn-sel-nonbal
 dn-sel-ling
 dn-match-resorb
+dn-ret-fluid
+dn-support-occl
+dn-tip-except
+dn-hanau-m1
+dn-fixed-po
+dn-neutro-40
+dn-compare-adjust
+dn-compare-stab
+dn-md-length
+dn-reverse-curve
+dn-sel-lingadv
+dn-num-7
+dn-2s-9
+dn-2s-10
+dn-tf-12
+dn-tf-13
+dn-tf-14
