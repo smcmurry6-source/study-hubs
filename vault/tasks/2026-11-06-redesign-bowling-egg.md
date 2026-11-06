@@ -45,8 +45,12 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 
 ## How it's found
 
-- **In the bank**: ten first-try right answers in a row plays a strike clip, on the bar and only after the tenth answer's
-  verdict (never over a question); thirty in a row plays the turkey. Not in the mock.
+- **In the bank**: every 50 first-try right answers in a row plays a strike clip (at 50 and 100), on the bar and only after
+  that answer's verdict (never over a question); the third strike, 150 in a row, plays the turkey instead. Not in the mock.
+  (Sam, 2026-11-06: 10 and 30 "would happen way too often and be annoying".) Since 2026-09-08, counting every answer (retries
+  and the mock too, so more often than the real trigger): a run of 10 right came about 5,200 times, about 4.6 times a day for
+  each person studying; a run of 50 about 110 times, for 43 people, about once in ten study days; a run of 150 only a couple
+  of times. So the turkey is rare by design, and the bowling lane at Timmy's place still plays any clip.
 - **At Timmy's place**: the bowling lane yard item ([Timmy's place](2026-11-06-redesign-timmys-place.md)); tapping it plays a
   random clip.
 - **First sighting** of each clip goes in the egg log; seeing all eight is a secret trophy (keep the About page's trophy count true).
@@ -64,6 +68,7 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 ## Log
 
 - 2026-11-06: written from Sam's calls in chat ("maybe we can make it an easter egg").
+- 2026-11-06: the triggers moved from 10 and 30 in a row to 50 and 150 (Sam), with the data on how often each happens.
 
 ## Outcome
 
