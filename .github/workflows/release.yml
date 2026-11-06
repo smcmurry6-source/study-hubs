@@ -34,6 +34,8 @@ jobs:
     timeout-minutes: 40
     env:
       SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
+      # the smoke suite checks only the hubs a PR changes (HEAD^1 of the merge commit is its base); a run by hand checks every hub
+      SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
     steps:
       # The runner context isn't available in a job's env, so the results folder is set here for every later step.
       - name: Results folder outside the checkout

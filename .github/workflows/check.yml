@@ -9,6 +9,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1), so the smoke test sees which hubs changed
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -33,7 +35,9 @@ jobs:
         run: node tools/ci/archive.js
       - name: Install headless Chromium
         run: npm i --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
-      - name: Click through every hub and lint the question banks
+      - name: Click through the hubs this PR changes (every hub on main or when a shared file changes) and lint their question banks
+        env:
+          SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
         run: node tools/ci/smoke.js
       - name: Preview safety (no production requests, noindex, fixtures)
         if: ${{ !cancelled() }}
