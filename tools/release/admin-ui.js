@@ -6,8 +6,9 @@
 //   - archiving a hub skips the confirmation, doesn't reach the dashboard and the hub's notice, or can't be reversed;
 //   - an end time doesn't hand the hub back to its dates; a change from a stale page isn't refused; a bad end time saves;
 //   - Escape doesn't close the form and return focus; a removed page can be set to Live;
-//   - any admin screen scrolls sideways at 390 px, a page throws, or any request heads for Supabase.
-// Screenshots (desktop light, phone dark) go to $SH_RELEASE_OUT/admin-ui/.   node tools/release/admin-ui.js
+//   - any admin screen scrolls sideways at 390 px, a page throws, or any request heads for Supabase;
+//   - the page turns dark on a dark-mode device (it is light only, Sam 2026-11-06).
+// Screenshots (desktop light, phone on a dark-mode device) go to $SH_RELEASE_OUT/admin-ui/.   node tools/release/admin-ui.js
 'use strict';
 const path = require('path');
 const { start } = require('../preview/serve');
@@ -188,11 +189,14 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(await page.evaluate(() => window.__shPreview.blocked()) === 0, 'the preview blocked a request to production');
     await ctx.close();
 
-    /* ---------- 2. phone, dark: no sideways scrolling ---------- */
+    /* ---------- 2. phone in dark mode: the page stays light, no sideways scrolling ---------- */
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, colorScheme: 'dark' });
     const G2 = await L.guard(phone);
     const m = await admin(phone, `review/?persona=admin&now=${NOW}`);
     const wide = () => m.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - 390);
+    /* light only (Sam, 2026-11-06: dark was hard to read): a dark-mode phone still gets the light page */
+    const look = await m.evaluate(() => [getComputedStyle(document.body).backgroundColor, getComputedStyle(document.querySelector('.sheet')).backgroundColor, getComputedStyle(document.documentElement).colorScheme]);
+    ok(look[0] === 'rgb(238, 242, 244)' && look[1] === 'rgb(255, 255, 255)' && look[2] === 'light', `the admin page stays light on a dark-mode phone (body ${look[0]}, sheet ${look[1]}, color-scheme ${look[2]})`);
     /* the menu: a full-screen sheet; Escape closes it and gives focus back to the Menu button */
     await m.tap('#menuBtn'); await m.waitForSelector('#sidebar.open');
     ok(await m.evaluate(() => document.activeElement && document.activeElement.closest('#sidebar') !== null), 'opening the menu moves focus into it');
@@ -216,7 +220,7 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(tap.every(h => h >= 40), `touch targets in the form are at least 40 px tall (${tap})`);
     ok(G2.leaks.length === 0, `phone: requests to Supabase: ${G2.leaks.join(', ')}`);
     await phone.close();
-    notes.push('phone (390 px, dark): the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins and Inbox fit with no sideways scroll');
+    notes.push('phone (390 px, dark-mode device): the page stays light; the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins and Inbox fit with no sideways scroll');
     ok(!errs.length, `page errors: ${errs.slice(0, 3).join(' | ')}`);
     notes.push(`screenshots in ${shots}`);
   } catch (e) {
