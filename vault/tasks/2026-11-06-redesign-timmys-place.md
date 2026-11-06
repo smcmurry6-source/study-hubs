@@ -58,7 +58,8 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - [ ] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
       preview with reduced motion too
 - [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
-      every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4)
+      every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4); its five yard spots and
+      names follow the art (Sam, 2026-11-06)
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -87,6 +88,26 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
   (the lane takes two); the server sells a mailbox, the art keeps the mailbox as the Bronze rank's and has a mint fountain
   instead. The upgrades' names differ too (round windows and a brick chimney there; shutters, window boxes and a stone
   chimney here): whichever Sam picks, the other side follows.
+- 2026-11-06 (Claude Code): redrawn from Sam's feedback, with free rein. **No plot square**: each scene's ground fills the
+  picture (a hilltop, dunes into the sea, a pine clearing, a snowy ledge over the clouds, a little planet, a cloud bank),
+  and the homes sit in it with a soft shadow and the scene's own ground, path, tree and lamp. **Eight homes** (the cottage,
+  the castle, the giant mushroom, the treehouse, and new: a beach hut, a lighthouse, an igloo, an observatory), **six
+  scenes** (new: above the clouds), **twelve yard things** (new: a sandcastle, a beach umbrella, a campfire, a hot spring,
+  a telescope, the mailbox back in the shop) and **seven theme outfits** for Timmy, in six themes (hilltop, seaside,
+  woodland, snowy, starlight, clouds) plus the classics. **Earned things are part of the place**: the rank is a statue of
+  the handpiece by the door (the rank's material, one to three steps for the level), each mastered hub a pennant in the
+  bunting (gold with a crown mark for a Crown). **Rarity art**: each rarity has its own animated card frame, placing burst
+  and coin. **Timmy hops** on the ground between spots, round the house and the yard things (a route over a visibility
+  graph; he climbs the treehouse ladder and the beach hut's steps), never floats. **Eggs**: tapping the sun or moon, the
+  house, the yard things and each scene's critter plays a small animation with a line from Timmy. The design page has Play
+  and Customize, rarity cards with prices, and the galleries; the build checks 648 drawings and 1872 walks.
+- 2026-11-06 (Claude Code): Sam's calls on the redraw: five yard spots, the mint fountain stays, the server's names follow
+  the art. `migration_v54.sql` now has the five spots (`yard-left`, `yard-front`, `yard-corner`, `yard-side`,
+  `yard-right`), `wide` for the bowling lane (`equip_item` keeps it in the side yard and clears the front corner), the
+  upgrades renamed (`fancy-windows`, `chimney`, Timmy flag) and every new piece with the kit's id, rarity and price (68
+  rows); `tools/release/xp.js` tests the spots and the lane (247 checks pass). Still waiting for Sam's look at the art;
+  then the renderer goes into `widget/pet.js`, and `LORE.md` (the new critters: the rabbit, a crab, an owl, a yeti, a
+  friend in a crater, a whale, the dog) and the About page get their lines.
 
 ## Outcome
 
