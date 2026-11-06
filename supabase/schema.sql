@@ -4001,6 +4001,9 @@ begin
       insert into xp_days (visitor_id, d, n, c, raw)
         values (new.visitor_id, answer_day, 1, case when new.correct then 1 else 0 end, raw_delta);
       is_new_day := true;
+      -- select ... into left previous_raw null when the day had no row yet; a null here would make
+      -- least(previous_raw + raw_delta, 600) read 600 and drop this answer's XP from the cache.
+      previous_raw := 0;
       exit;
     exception when unique_violation then
       -- Another transaction made this visitor/day while this one was checking.  Lock and update it.
@@ -4168,8 +4171,10 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- ---------- 3. one safe eager-load payload for the shared widget ----------
--- Deliberately absent: get_rank_profile, rank/arcade/leaderboards, get_hub_mastery, and
--- get_trophy_stats.  Those stay panel-open work so a normal hub visit is not a class-wide read.
+-- The visitor's own rank profile and hub mastery are included (Sam, 2026-11-06): with xp_visitors they are cheap
+-- per-visitor reads, and they drive the badge by the name, the rank-up and trophy cards and the mastery medals.
+-- Deliberately absent: the rank board, arcade and leaderboards, and get_trophy_stats.  Those are class-wide and
+-- stay panel-open work.
 drop function if exists public.get_widget_bootstrap(text, text, text, text, boolean);
 drop function if exists public.get_widget_bootstrap(text, text, text, text);
 drop function if exists public.get_widget_bootstrap(text, text, text, text, boolean, boolean, text, date);
@@ -4194,7 +4199,7 @@ begin
       'inbox', '[]'::jsonb, 'survey', '[]'::jsonb, 'overrides', '[]'::jsonb,
       'pet_days', '[]'::jsonb, 'cavity', '[]'::jsonb, 'podcast', null,
       'dashboard_week', '[]'::jsonb, 'survey_popup', '[]'::jsonb, 'exam_luck', null,
-      'recaps', '[]'::jsonb, 'golden', '[]'::jsonb, 'name_shared', false);
+      'recaps', '[]'::jsonb, 'golden', '[]'::jsonb, 'name_shared', false, 'rank', null, 'mastery', '[]'::jsonb);
   end if;
 
   return jsonb_build_object(
@@ -4233,7 +4238,11 @@ begin
       select jsonb_agg(to_jsonb(g) order by g.claimed_at) from get_golden_today() g
     ), '[]'::jsonb) else '[]'::jsonb end,
     'name_shared', case when length(btrim(coalesce(p_link_name, ''))) between 1 and 24
-      then name_shared(p_visitor, p_link_name) else false end
+      then name_shared(p_visitor, p_link_name) else false end,
+    'rank', get_rank_profile(p_visitor),
+    'mastery', case when valid_hub then
+      coalesce((select jsonb_agg(to_jsonb(m) order by m.hub) from get_hub_mastery(p_visitor) m), '[]'::jsonb)
+      else '[]'::jsonb end
   );
 end;
 $$;

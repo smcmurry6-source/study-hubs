@@ -1856,17 +1856,20 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     el.hidden = false;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = el.querySelector(".me-rank-bar i"); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
   }
+  /* your own rank: the card, the accent, Timmy's flair and the rank-up celebration. It comes in the page bootstrap
+     (Sam, 2026-11-06: cheap since migration_v53's XP cache); get_rank_profile on its own only as the fallback. */
+  function applyMyRank(p){
+    myTier = p.tier || 0; renderMyRank(p); dashAccent();
+    /* a new rank or level since this device last looked plays its celebration here (widget/rankup.js) */
+    if (window.shRanks && window.shRanks.track) window.shRanks.track(p); else lsSet("sh_rank_tier", String(myTier));
+    /* rank and mastery decorate Timmy Tooth's house (widget/pet.js) */
+    if (window.shRanks && window.shRanks.flairFromBadges){ try{ localStorage.setItem("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }catch(e){} }
+    if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(p.badges);
+    try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){}
+  }
   function loadMyRank(sb){
     if (!VISITOR){ renderMyRank(null); return; }
-    sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){
-      if (r && r.data){ myTier = r.data.tier || 0; renderMyRank(r.data); dashAccent();
-        /* a new rank or level since this device last looked plays its celebration here (widget/rankup.js) */
-        if (window.shRanks && window.shRanks.track) window.shRanks.track(r.data); else lsSet("sh_rank_tier", String(myTier));
-        /* rank and mastery decorate Timmy Tooth's house (widget/pet.js) */
-        if (window.shRanks && window.shRanks.flairFromBadges){ try{ localStorage.setItem("sh_rank_flair", window.shRanks.flairFromBadges(r.data.badges)); }catch(e){} }
-        if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(r.data.badges);
-        try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){} }
-    }, function(){});
+    sb.rpc("get_rank_profile", { p_visitor:VISITOR }).then(function(r){ if (r && r.data) applyMyRank(r.data); }, function(){});
   }
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
   /* a board row's name with its mastery medals (migration_v31 `flair`); the caller adds the "has-flair" class via nmClass */
@@ -2032,8 +2035,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
     }, function(){ unavailable("pulseHist"); }); });
 
     /* handpiece ranks: the top ten by XP, plus you */
+    bootstrap.ready.then(function(data){
+      if (data && data.rank && typeof data.rank === "object") applyMyRank(data.rank); else loadMyRank(sb);
+    }, function(){ loadMyRank(sb); });
     whenPanelOpens(".p-ranks", function(){
-    loadMyRank(sb);
     sb.rpc("get_rank_board", { p_visitor:VISITOR || null, p_limit:10 }).then(function(res){
       var rows = (res && res.data) || [], R = window.shRanks;
       if (!rows.length || !R){ unavailable("rankBoard", "No ranks yet. Answer a question in any hub to get your first handpiece."); return; }

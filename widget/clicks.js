@@ -129,8 +129,7 @@
       track("view");
       snapshot(o.hub);
       try { watchFigures(); } catch (e) {}
-      if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("clicks", flush, 60000);
-      else setInterval(flush, 60000); /* standalone/dashboard fallback */
+      if (window.shAnalytics) shAnalytics.register("clicks", flush, 60000); else setInterval(flush, 60000);
       document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") flush(); });
       window.addEventListener("pagehide", flush);
     }

@@ -305,7 +305,7 @@
   function widgetBootstrap(a, t){
     var v = a.p_visitor, hub = a.p_hub, ep = a.p_episode || a.p_ep || a.p_podcast;
     var dashboard = !!a.p_dashboard;
-    if (v !== db.visitor) return { display_name: null, answers: [], pins: [], inbox: [], survey: [], overrides: [], pet_days: [], cavity: [], podcast: null, dashboard_week: [], survey_popup: [], exam_luck: null, recaps: [], golden: [], name_shared: false };
+    if (v !== db.visitor) return { display_name: null, answers: [], pins: [], inbox: [], survey: [], overrides: [], pet_days: [], cavity: [], podcast: null, dashboard_week: [], survey_popup: [], exam_luck: null, recaps: [], golden: [], name_shared: false, rank: null, mastery: [] };
     var answers = answersFor(hub);
     return {
       display_name: db.name,
@@ -322,7 +322,10 @@
       exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
       recaps: [],
       golden: [],
-      name_shared: false
+      name_shared: false,
+      /* your own rank and mastery ride in the bootstrap too (Sam, 2026-11-06); same fixtures as the single calls */
+      rank: rpc("get_rank_profile", { p_visitor: v }).data,
+      mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
     };
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */

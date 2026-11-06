@@ -161,8 +161,11 @@ try {
   if (none.length) fail('get_my_answers with no visitor returned rows');
   const bootstrap = JSON.parse(sql(`begin; set local role anon; select public.get_widget_bootstrap('rls-A', 'rls-hub', null, 'ep')::text; rollback;`)[0][0]);
   if (!Array.isArray(bootstrap.answers) || bootstrap.answers.length !== 3) fail(`get_widget_bootstrap for visitor A returned ${bootstrap.answers && bootstrap.answers.length} answers, expected A's 3`);
+  if (!bootstrap.rank || Number(bootstrap.rank.xp) !== 41 || Number(bootstrap.rank.answers) !== 3) fail(`get_widget_bootstrap's rank for visitor A is ${JSON.stringify(bootstrap.rank)}, expected A's 41 XP over 3 answers`);
+  const bm = (bootstrap.mastery || []).filter(r => r.hub === 'rls-hub')[0];
+  if (!bm || Number(bm.seen) !== 3 || Number(bm.latest_correct) !== 2) fail(`get_widget_bootstrap's mastery for visitor A is ${JSON.stringify(bootstrap.mastery)}, expected 2 of 3 in rls-hub`);
   const emptyBootstrap = JSON.parse(sql(`begin; set local role anon; select public.get_widget_bootstrap(null, 'rls-hub', null, null)::text; rollback;`)[0][0]);
-  if ((emptyBootstrap.answers || []).length || (emptyBootstrap.pins || []).length || (emptyBootstrap.inbox || []).length) fail('get_widget_bootstrap with no visitor returned visitor data');
+  if ((emptyBootstrap.answers || []).length || (emptyBootstrap.pins || []).length || (emptyBootstrap.inbox || []).length || emptyBootstrap.rank || (emptyBootstrap.mastery || []).length) fail('get_widget_bootstrap with no visitor returned visitor data');
   notes.push('get_my_answers, get_personal_stats and get_widget_bootstrap return only the asking visitor\'s rows');
 } catch (e) {
   if (e.message !== 'stop') fail(`test run failed: ${e.message.split('\n')[0]}`);

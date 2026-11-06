@@ -992,11 +992,12 @@
       if (wantText) el.__shClassDataWired = true;
       var late = wantPicks && cpRevealed(card);
       if (wantPicks) card.__shCp = { late: late, r: null, own: null, done: false };
-      var loaded = false, revealObserver = null;
+      var loaded = false, revealObserver = null, lineObserver = null;
       function load(){
         if (loaded) return;
         loaded = true;
         if (revealObserver) revealObserver.disconnect();
+        if (lineObserver) lineObserver.disconnect();
         window.shGetClassStats([qid], function(byQid){
           var r = byQid[qid];
           if (wantPicks) { card.__shCp.r = r || { total: 0, correct: 0 }; if (late || card.__shCp.own) cpPaint(card); }
@@ -1013,10 +1014,21 @@
       if (late) setTimeout(load, 1200);
       else {
         /* The class percentage lives inside the explanation. Do not fetch it
-           for every unopened question at page load; begin when it is revealed. */
-        revealObserver = new MutationObserver(function(){ if (cpRevealed(card)) load(); });
-        revealObserver.observe(card, { attributes:true, subtree:true, attributeFilter:["class", "data-state"] });
-        if (cpRevealed(card)) load();
+           for every unopened question at page load; begin when it is revealed:
+           a choice is marked (the picks), or the class line itself comes into
+           view (cards with no choices to mark, such as Perio's "Show answer"
+           recall cards, would otherwise sit on "Loading class data..."). */
+        if (wantPicks) {
+          revealObserver = new MutationObserver(function(){ if (cpRevealed(card)) load(); });
+          revealObserver.observe(card, { attributes:true, subtree:true, attributeFilter:["class", "data-state"] });
+        }
+        if (wantText) {
+          if (window.IntersectionObserver) {
+            lineObserver = new IntersectionObserver(function(entries){ if (entries.some(function(x){ return x.isIntersecting; })) load(); });
+            lineObserver.observe(el);
+          } else if (!wantPicks) load();
+        }
+        if (wantPicks && cpRevealed(card)) load();
       }
     }
     try {

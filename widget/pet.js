@@ -1696,8 +1696,11 @@
       var tn = target.firstChild;
       if (tn && tn.nodeType === 3 && tn.nodeValue.trim()) { try { var rg = document.createRange(); rg.selectNodeContents(tn); r = rg.getBoundingClientRect(); } catch (e) {} }
     }
-    var x = r.left + r.width / 2 - w / 2 + window.scrollX, y = r.top + window.scrollY - (M.el.offsetHeight || 92) - 12;
-    x = Math.max(8, Math.min(x, document.documentElement.clientWidth - w - 8));
+    /* rects come in screen px, but left/top are CSS px of the zoomed page (the text-size setting zooms <html>):
+       convert with his own rect, or at the largest text he lands 1.45x too far right and low, past the screen's edge */
+    var pr0 = M.el.getBoundingClientRect(), z = pr0.width ? (M.el.offsetWidth || w) / pr0.width : 1;
+    var x = (r.left + r.width / 2 + window.scrollX) * z - w / 2, y = (r.top + window.scrollY) * z - (M.el.offsetHeight || 92) - 12;
+    x = Math.max(8, Math.min(x, document.documentElement.clientWidth * z - w - 8));
     M.el.style.left = x + "px"; M.el.style.top = y + "px";
     /* keep the bubble on screen: it goes right unless that side is tight and the left has more room, and it is never
        wider than the room on its side (the text-size zoom shrinks both sides: BUG-013). Measured with rects against the
