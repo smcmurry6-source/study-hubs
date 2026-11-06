@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, in the mock and the bank, Claude Code)** — Sam:
+  "have the 5 exam 1 questions come from the high likelihood question bank". The mock's five Exam 1 questions now come only
+  from the Exam 1 Refresher's High Likelihood questions: one per topic, each from a different Exam 1 lecture, questions not seen or missed last time first
+  (`MOCK_LIKELY_ONLY`, `mockLikelyPick` in `hubs/heme-endo-exam2/index.html`). The Refresher's "Exam 1's hardest questions
+  for the class" entry came out of `LIKELY_TOPICS`: it was class data, not a predicted topic, so those 10 questions stay
+  in the Refresher without the High Likelihood tag. The mock's intro, the exam facts and the About page say so.
+  Then "also have the exam 1 high likelihood questions available in the exam 2 question bank filter": the Question Bank's
+  Show row gains **Exam 1 High likelihood** (`likely1` in `BANK_SHOW`), only the Refresher's High Likelihood questions;
+  tapping it ticks R if it isn't ticked, and with R unticked the empty list says so. Tracked as `bank:show=likely1`.
+  Then "yes all exam 1 high likelihood questions": the Refresher held 68 of them (Exam 1's top two topics per lecture);
+  the other 138 came in, so it has **all 206, over all 55 of Exam 1's predicted topics** (219 questions in R, 747 in the
+  hub), copied unchanged except id `r-<id>`, lecture R and "(Exam 1 · L#)" after the explanation, and its `LIKELY_TOPICS`
+  are Exam 1's. The Refresher's notes say so at both levels, so both narration mp3s were regenerated.
+  Then "do not count the exam 1 questions in the overall count. they are just available for review": R is review only.
+  The header's progress, Home's readiness ring and "you haven't tried", Where to next and the bank's "of N" count the
+  528 Exam 2 questions (the bank adds "+ n Exam 1 review"), and the mastery medal leaves R out too: a hub may now export
+  `SH_EXPORT.uncounted()` and `widget/ranks.js` takes those questions off both sides of the medal. R's answers still
+  earn XP and streaks.
+
 - **2026-11-06 (redesign phase 5, part 1: one request per page load and a cached XP total, Codex and Claude Code, #266)** — Codex's draft (#261) rebased onto `main` by Claude Code with its conflicts resolved, and finished. A hub now reads everything it needs on load in one `get_widget_bootstrap` call (besides realtime presence and the changelog): 12 reads become 1 on a hub and 19 become 1 on the dashboard (fixture preview). The class-wide rank board, leaderboards and trophy rarity load when Stats opens or the dashboard panel scrolls into view. **Each visitor's own rank and hub mastery ride in the bootstrap** (Sam, 2026-11-06) and refresh every 10 answers, so the badge by the name, the rank-up, level-up, trophy and mastery cards and the medals work as before (Codex's draft loaded them only with Stats, which 17 of 108 people in a hub opened in 14 days). `migration_v53.sql`: the `xp_visitors` cache, kept by the existing answer trigger, so ranks stop summing the whole class (BUG-032, the cache dropping each day's first answer, fixed before it was applied); the advisor fixes (six `search_path`s, a `link_attempts` primary key, two unused indexes); `get_pet_days` no longer polled; clicks and question health share one flush timer; a class percentage is fetched when its question is answered or its class line comes into view, not for every card on the page (BUG-034: in Codex's draft, Perio's "Show answer" cards stayed on "Loading class data…"). Every part falls back to its old call while the migration isn't applied, so merge order doesn't matter. Also: Timmy on the dashboard at the largest text no longer sits past the screen's edge (BUG-033), `perf.js` no longer counts the preview's own runtime against a page's budget, `sw.js` `sh-v58`. **Live 2026-11-06** with Sam's OK ("Go ahead", then "apply it"): merged as 04c4b3a, and `postcheck.js` passed (11 of 11 changed files live, the dashboard and 4 hubs with no errors). `migration_v53.sql` was applied at about 01:55 UTC while students were answering. Afterward the cache matched the per-day XP for all 158 visitors, and its answer total matched the answer table. `get_rank_profile` takes about 2 ms (it was about 0.9 s), the bootstrap about 115 ms on a hub and 170 ms on the dashboard for the most active visitor, and `get_trophy_stats` 5 ms. The live permissions audit (`rls-audit.sql`) is clean, and the advisors' `search_path`, primary-key and unused-index warnings are gone. Site changelog posted. Still open in phase 5: the two widget bundles, one stylesheet, one font, the thinner client and sw.js precaching ([task](vault/tasks/2026-11-05-redesign-phase-5-backend.md)).
 - **2026-11-06 (outside sources for every figure, and Perio S8 Fig 3, Claude Code)** — Sam's new standing rule
   ([outside-sources-for-figures](vault/rules/outside-sources-for-figures.md)): outside sources are encouraged on every
