@@ -50,6 +50,7 @@ Hub building
 - [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time.
 - [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures.
 - [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named.
+- [Outside sources are encouraged for every figure](rules/outside-sources-for-figures.md): for accuracy and for how it works, cited.
 - [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)
 
 ## How-tos

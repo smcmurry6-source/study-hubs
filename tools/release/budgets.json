@@ -39,7 +39,7 @@
    "tbt": 500
   },
   "hubs/occlusion/": {
-   "kb": 1320,
+   "kb": 1350,
    "requests": 33,
    "fcp": 2000,
    "lcp": 2500,

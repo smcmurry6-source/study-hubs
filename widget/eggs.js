@@ -34,6 +34,14 @@
     if (!SB) return Promise.resolve(null);
     return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; });
   }
+  function initialCavityRows(){
+    var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready);
+    if (!boot || typeof boot.then !== "function") return rpc("get_cavity_week", { p_hub: HUB, p_week: CAV_WEEK });
+    return boot.then(function(data){
+      if (data && Object.prototype.hasOwnProperty.call(data, "cavity")) return Array.isArray(data.cavity) ? data.cavity : [];
+      return rpc("get_cavity_week", { p_hub: HUB, p_week: CAV_WEEK });
+    }, function(){ return rpc("get_cavity_week", { p_hub: HUB, p_week: CAV_WEEK }); });
+  }
   function exp(){ return window.SH_EXPORT || {}; }
   /* the class is in Birmingham; days roll over on Central time, same as the server */
   function centralParts(){
@@ -1035,7 +1043,7 @@
   function startCavity(){
     if (cavObs || !document.body) return;
     if (ls(CAV_KEY) === CAV_WEEK || !cavityTarget()) return;
-    rpc("get_cavity_week", { p_hub: HUB, p_week: CAV_WEEK }).then(function(rows){ if (rows && rows.length >= 5) { cavFull = true; var b = document.querySelector(".sh-egg-cavity:not(.is-filled)"); if (b) b.remove(); } });
+    initialCavityRows().then(function(rows){ if (rows && rows.length >= 5) { cavFull = true; var b = document.querySelector(".sh-egg-cavity:not(.is-filled)"); if (b) b.remove(); } });
     var queued = false;
     cavObs = new MutationObserver(function(){ if (queued) return; queued = true; setTimeout(function(){ queued = false; placeCavity(); }, 250); });
     cavObs.observe(document.body, { childList: true, subtree: true });

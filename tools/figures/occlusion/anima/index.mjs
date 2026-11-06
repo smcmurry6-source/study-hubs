@@ -20,4 +20,9 @@ import { stability } from "./stability.mjs";
 import { splints } from "./splints.mjs";
 import { thirds } from "./thirds.mjs";
 import { erosion } from "./erosion.mjs";
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett(), tolerance(), stability(), splints(), thirds(), erosion()];
+// L8 (final), approved by Sam 2026-11-05
+import { resorb } from "./resorb.mjs";
+import { ssr } from "./ssr.mjs";
+import { schemes } from "./schemes.mjs";
+import { toothforms } from "./toothforms.mjs";
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett(), tolerance(), stability(), splints(), thirds(), erosion(), resorb(), ssr(), schemes(), toothforms()];

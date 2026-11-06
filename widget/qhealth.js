@@ -66,7 +66,7 @@
   var H = null, HUB = "", ON = false;
   var TICK = 1000, IDLE = 120000, VIEW_MIN = 3000, PRE_CAP = 600000, EXPL_CAP = 300000;
   var tracked = [], visible = new Set(), io = null, focus = null, lastTick = 0, lastInput = Date.now(), inputCard = null, inputAt = 0;
-  var queue = [], sess = {}, flushTimer = null;
+  var queue = [], sess = {};
   var RATE_KEY = "", rates = null;
 
   function now(){ return Date.now(); }
@@ -319,7 +319,8 @@
     window.addEventListener("scroll", input, { passive: true, capture: true });
     lastTick = now();
     setInterval(tick, TICK);
-    flushTimer = setInterval(function(){ flush(false); }, 30000);
+    if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("qhealth", function(){ flush(false); }, 30000);
+    else setInterval(function(){ flush(false); }, 30000); /* standalone fallback */
     document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") closeAll(); else lastTick = now(); });
     window.addEventListener("pagehide", closeAll);
   }

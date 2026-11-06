@@ -32,6 +32,30 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (redesign phase 5, part 1: one request per page load and a cached XP total, Codex and Claude Code; pending Sam's approval)** — Codex's draft (#261) rebased onto `main` by Claude Code with its conflicts resolved, and finished. A hub now reads everything it needs on load in one `get_widget_bootstrap` call (besides realtime presence and the changelog): 12 reads become 1 on a hub and 19 become 1 on the dashboard (fixture preview). The class-wide rank board, leaderboards and trophy rarity load when Stats opens or the dashboard panel scrolls into view. **Each visitor's own rank and hub mastery ride in the bootstrap** (Sam, 2026-11-06) and refresh every 10 answers, so the badge by the name, the rank-up, level-up, trophy and mastery cards and the medals work as before (Codex's draft loaded them only with Stats, which 17 of 108 people in a hub opened in 14 days). `migration_v53.sql`: the `xp_visitors` cache, kept by the existing answer trigger, so ranks stop summing the whole class (BUG-032, the cache dropping each day's first answer, fixed before it was applied); the advisor fixes (six `search_path`s, a `link_attempts` primary key, two unused indexes); `get_pet_days` no longer polled; clicks and question health share one flush timer; a class percentage is fetched when its question is answered or its class line comes into view, not for every card on the page (BUG-034: in Codex's draft, Perio's "Show answer" cards stayed on "Loading class data…"). Every part falls back to its old call while the migration isn't applied, so merge order doesn't matter. Also: Timmy on the dashboard at the largest text no longer sits past the screen's edge (BUG-033), `perf.js` no longer counts the preview's own runtime against a page's budget, `sw.js` `sh-v58`. **The migration is not applied yet**: apply it with Sam's OK. Still open in phase 5: the two widget bundles, one stylesheet, one font, the thinner client and sw.js precaching ([task](vault/tasks/2026-11-05-redesign-phase-5-backend.md)).
+- **2026-11-06 (outside sources for every figure, and Perio S8 Fig 3, Claude Code)** — Sam's new standing rule
+  ([outside-sources-for-figures](vault/rules/outside-sources-for-figures.md)): outside sources are encouraged on every
+  figure, for accuracy and for how it works, and cited in the figure; what it names and tests still follows the lecture.
+  The same message ("Build all proposed figures") approved the one figure proposed but never put to Sam: **Perio S8 · Fig 3
+  The host response, and host modulation** (`tools/figures/perio/hostmod.mjs`, under the S8 notes and in Review):
+  Dr. Litz's flowchart as a cycle, with No bacteria, SRP, NSAIDs, bisphosphonates and Periostat. The L8 figures now cite
+  theirs: Fig 20's maxilla resorbs less, so the mandible loses about twice its height (Tallgren 1972 and 1980; Cawood &
+  Howell 1988 for the basal bone staying put), and Figs 21-23 cite the Glossary of Prosthodontic Terms and the usual mold
+  angles. About page: the Perio diagrams sentence. No schema change, no text or audio change.
+
+- **2026-11-05 (Occlusion L8: four drawn figures, Claude Code)** — Sam approved all four L8 diagram candidates ("Build" to
+  each). Built with the anima kit from the L8 notes and placed after the paragraph each explains, at both note levels, and
+  in L8's Review: **Fig 20 How the ridges resorb** (`resorb`: a side view at the midline and a section through the first
+  molars; a slider from natural teeth to long edentulous, Play, and "Set denture teeth" near the ridges: posterior
+  crossbite, pseudo-Class III), **Fig 21 Support, stability and retention** (`ssr`: the force each resists on a pair of
+  complete dentures, the dentures moving with it, and what resists it), **Fig 22 Balanced, non-balanced, lingualized**
+  (`schemes`: five setups, closed / right working / protrusion, contact lamps per side and the front teeth, and "contact on
+  one side only" tipping the lower denture off its ridge) and **Fig 23 Posterior tooth forms** (`toothforms`: anatomic,
+  semi-anatomic, flat and lingualized pairs; "Slide sideways" draws the contact force square to the surfaces in contact).
+  `tools/figures/occlusion/anima/l8den.mjs` is the frontal section Figs 21 and 22 share (and the tooth profiles Fig 20 and
+  23 use). Occlusion's performance budget 1320 -> 1350 KB (the figures add about 21 KB over the wire), approved
+  by Sam on 2026-11-06 (BUG-030). About page: the Diagrams entry. No schema change, no text or audio change.
+
 - **2026-11-06 (redesign phase 0: the design system preview page, Claude Code)** — Nothing students see changes yet. The
   redesign's design system is a preview page, `tools/preview/design/` (`node tools/preview/serve.js`, then
   `/tools/preview/design/`; `PREVIEW_PAGES` in `tools/preview/transform.js` lets the preview server and build include it).

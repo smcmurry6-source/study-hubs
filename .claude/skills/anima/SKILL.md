@@ -7,7 +7,8 @@ description: Create crafted, accurate visualizations of anatomy, neurobiology, p
 
 > **In study-hubs, the house rules come first** (`vault/rules/diagram-review.md`, `vault/rules/diagrams-anima.md`).
 > They override this skill where the two differ: **never build a figure Sam hasn't approved**, one candidate at a time
-> (so ignore "build it without asking" below); draw from the hub's own lecture notes; build it in
+> (so ignore "build it without asking" below); draw from the hub's own lecture notes, with outside sources encouraged for
+> accuracy and for how it works (`vault/rules/outside-sources-for-figures.md`); build it in
 > `tools/figures/<hub-id>/` and paste it into the hub (nothing loads from `.claude/` at runtime); give Sam screenshots at
 > 390 px and in both themes in the PR. This box is a local addition (see `UPSTREAM.md`): keep it when updating.
 

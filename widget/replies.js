@@ -110,6 +110,7 @@
     api.started = true;
     var sb = o.sb, visitor = o.visitor || null;
     var items = [], loading = null;
+    var bootstrap = o.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null, bootstrapUsed = false;
 
     function seenList(key){ try { return JSON.parse(localStorage.getItem(key) || "[]") || []; } catch (e) { return []; } }
     function seenNotices(){ return seenList(SEEN_KEY); }
@@ -133,21 +134,37 @@
       });
       try { document.dispatchEvent(new CustomEvent("sh:inbox", { detail: { unread: n } })); } catch (e) {}
     }
-    function load(){
-      if (loading) return loading;
+    function setItems(inbox, surveys){
+      /* one inbox: the same list on every hub and the dashboard (a notice's hub is just its label); an unanswered survey first */
+      var sv = (surveys || []).filter(function(x){ return x && Array.isArray(x.questions) && x.questions.length; })[0];
+      items = (sv ? [{ kind: "survey", id: sv.id, title: sv.title, questions: sv.questions.slice(0, 5), at: sv.starts_at }] : []).concat(inbox || []);
+      updateBadges();
+      return items;
+    }
+    function loadRemote(){
       function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
       var none = Promise.resolve(null);
-      loading = Promise.all([
+      return Promise.all([
         sb.rpc("get_my_inbox", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
         visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
       ]).then(function(r){
         if (!r[0]) return items;
-        /* one inbox: the same list on every hub and the dashboard (a notice's hub is just its label); an unanswered survey first */
-        var sv = (r[1] || []).filter(function(x){ return x && Array.isArray(x.questions) && x.questions.length; })[0];
-        items = (sv ? [{ kind: "survey", id: sv.id, title: sv.title, questions: sv.questions.slice(0, 5), at: sv.starts_at }] : []).concat(r[0]);
-        updateBadges();
-        return items;
+        return setItems(r[0], r[1]);
       });
+    }
+    function load(){
+      if (loading) return loading;
+      if (!bootstrapUsed && bootstrap && typeof bootstrap.then === "function") {
+        bootstrapUsed = true;
+        loading = bootstrap.then(function(data){
+          if (data && Array.isArray(data.inbox)) {
+            var surveys = Array.isArray(data.survey) ? data.survey : data.survey ? [data.survey] : [];
+            return setItems(data.inbox, surveys);
+          }
+          loading = null;
+          return load();
+        }, function(){ loading = null; return load(); });
+      } else loading = loadRemote();
       return loading;
     }
     api.refresh = function(){ loading = null; return load(); };

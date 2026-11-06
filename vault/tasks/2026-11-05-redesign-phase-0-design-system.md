@@ -57,7 +57,7 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 - [x] A preview page (`tools/preview/design/`, served by `node tools/preview/serve.js`) that shows every token, the icon set, Timmy's sheet, the emblems and mastheads, the medals, and the question card in each format, in both typefaces, in light and dark
 - [x] The taste inspector (`--app`) passes with 0 FAIL on the preview page at 1440, 768 and 390
 - [x] Sam picked the typeface and approved the art (one AskUserQuestion per group)
-- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`), except two Occlusion contrast checks that fail the same way on `main` (BUG-030)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`); the first run's accessibility failure on Occlusion was BUG-031, fixed on `main` by #260
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
@@ -95,8 +95,9 @@ and medals approved with a new rule, every new hub gets its own emblem, scene, u
 **Verified:** the taste inspector `--app`: 0 FAIL at 1440, 768 and 390 in Nunito light, Fraunces and dark (two warnings
 kept on purpose: the waiting and answered cards of a pair can't end level, and it's a long reference sheet, not a working
 screen). axe on the page: nothing but the preview banner's own pill. Every hub's card answered in a scripted browser with no
-console errors. `syntax.js`, `vault.js`, `smoke.js`, `secrets.js` and the release suites pass, except `a11y.js` on
-Occlusion (two contrast checks, the same on `main`: BUG-030 in the [bug log](../release/bug-log.md)).
+console errors. `syntax.js`, `vault.js`, `smoke.js`, `secrets.js` and the release suites pass. The first run's `a11y.js`
+failure on Occlusion's Home was BUG-031 in the [bug log](../release/bug-log.md) (a timeline row turning past each day),
+already fixed on `main` by #260; testing it also led to #268 (BUG-035), two more Occlusion contrast fixes.
 
 **Not changed:** no hub, the dashboard or the widget, so no About page entry (nothing students see yet) and no hub notes.
 GitHub Pages will serve the page at `/tools/preview/design/` once merged (noindex, unlinked, made-up data). The Fraunces
