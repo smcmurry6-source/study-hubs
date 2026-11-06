@@ -32,4 +32,4 @@ another hub's art, a recolored copy of it or the generic placeholder.
 How: [build-a-hub](../how-to/build-a-hub.md) (its "Its own drawn art" step).
 
 Related: [arcade-skins](arcade-skins.md) · [build-a-hub](../how-to/build-a-hub.md) ·
-[the redesign phase 0 task](../tasks/2026-11-05-redesign-phase-0-design-system.md) · [decisions](../decisions.md)
+[the redesign phase 0 task](../tasks/done/2026-11-05-redesign-phase-0-design-system.md) · [decisions](../decisions.md)

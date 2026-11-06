@@ -89,7 +89,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   [every-hub-gets-its-own-art](vault/rules/every-hub-gets-its-own-art.md): every new hub gets its own emblem, scene and
   unique medals. The taste inspector (`--app`) shows 0 FAIL at 1440, 768 and 390 in Nunito light, Fraunces and dark.
   Next: phase 1, Occlusion on a preview
-  ([task](vault/tasks/2026-11-05-redesign-phase-0-design-system.md)).
+  ([task](vault/tasks/done/2026-11-05-redesign-phase-0-design-system.md)).
 - **2026-11-05 (question health: every flagged question reviewed, Claude Code)** — Sam: "review and fix all questions flagged
   for question health". `qh_report` listed 33 to review on the live hubs (PCD Implants 14, Perio 10, Occlusion 9; none on
   Special Patient Care or Heme & Endo Exam 2). Each was read against its hub's notes: **every key matches the notes**, and

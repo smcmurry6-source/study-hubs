@@ -1,6 +1,6 @@
 ---
 type: task
-status: review
+status: done
 hub: site
 created: 2026-11-05
 requested-by: Sam
@@ -18,10 +18,10 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 
 ## Context
 
-- The plan and Sam's decisions: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
-- Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (every phase is tier 2 or 3:
-  preview link first, screenshots, the release suites, Sam's look), [about-page](../rules/about-page.md),
-  [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
+- The plan and Sam's decisions: [the redesign audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4.
+- Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md) (every phase is tier 2 or 3:
+  preview link first, screenshots, the release suites, Sam's look), [about-page](../../rules/about-page.md),
+  [learner-data-privacy](../../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - Everything drawn by the agent in SVG (no generated images, no emoji, no icon library), in `tools/figures/site/` with a build that writes the symbol sheets into the widget.
 - The art today: Timmy in `widget/pet.js` (SVG strings, moods, conditions, outfits), the house (`houseSvg`), ranks in `widget/ranks.js`, cards in `widget/rankup.js`.
 - Hubs to draw an emblem and masthead for: Occlusion, perio, PCD Implants, Heme & Endo 2, Special Patient Care (and a generic one for a future hub).
@@ -58,7 +58,7 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 - [x] The taste inspector (`--app`) passes with 0 FAIL on the preview page at 1440, 768 and 390
 - [x] Sam picked the typeface and approved the art (one AskUserQuestion per group)
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`); the first run's accessibility failure on Occlusion was BUG-031, fixed on `main` by #260
-- [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
+- [x] Preview link, phone and laptop screenshots, and Sam's look (Sam: "okay merge", 2026-11-06)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
@@ -67,7 +67,8 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 - 2026-11-05/06: built by Claude Code: the art in `tools/figures/site/`, the page in `tools/preview/design/`, the inspector
   to 0 FAIL, screenshots to Sam and eight AskUserQuestion answers (below). Waiting on Sam's look at the PR.
 - 2026-11-06: Sam chose to build the whole redesign side by side on `main` and release it at once
-  ([decisions](../decisions.md), [the release note](2026-11-06-redesign-release.md)); the phase notes say how.
+  ([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)); the phase notes say how.
+- 2026-11-06: Sam: "okay merge". Merged once "Check hubs" and "Release tests" passed; nothing students see changed.
 
 ## Outcome
 
@@ -90,20 +91,20 @@ stale. The page shows static drawings as images (`data:` URIs), so their ids nev
 
 **Sam's answers (2026-11-06):** typeface Nunito Sans; icons, masthead scenes, trophies and rewards art approved; the emblems
 and medals approved with a new rule, every new hub gets its own emblem, scene, unique medals and other art
-([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md), also a step in
-[build-a-hub](../how-to/build-a-hub.md)); the five live hubs keep the shared medal design. All in
-[decisions](../decisions.md).
+([every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md), also a step in
+[build-a-hub](../../how-to/build-a-hub.md)); the five live hubs keep the shared medal design. All in
+[decisions](../../decisions.md).
 
 **Verified:** the taste inspector `--app`: 0 FAIL at 1440, 768 and 390 in Nunito light, Fraunces and dark (two warnings
 kept on purpose: the waiting and answered cards of a pair can't end level, and it's a long reference sheet, not a working
 screen). axe on the page: nothing but the preview banner's own pill. Every hub's card answered in a scripted browser with no
 console errors. `syntax.js`, `vault.js`, `smoke.js`, `secrets.js` and the release suites pass. The first run's `a11y.js`
-failure on Occlusion's Home was BUG-031 in the [bug log](../release/bug-log.md) (a timeline row turning past each day),
+failure on Occlusion's Home was BUG-031 in the [bug log](../../release/bug-log.md) (a timeline row turning past each day),
 already fixed on `main` by #260; testing it also led to #268 (BUG-035), two more Occlusion contrast fixes.
 
 **Not changed:** no hub, the dashboard or the widget, so no About page entry (nothing students see yet) and no hub notes.
 GitHub Pages will serve the page at `/tools/preview/design/` once merged (noindex, unlinked, made-up data). The Fraunces
 files stay in `assets/fonts/` while the page compares the faces; phase 1 can drop them.
 
-**For phase 1** ([task](2026-11-05-redesign-phase-1-hub-engine.md)): take the tokens from `design.css`, the card markup,
+**For phase 1** ([task](../2026-11-05-redesign-phase-1-hub-engine.md)): take the tokens from `design.css`, the card markup,
 answer states and reward logic from `design.js`, and add a symbol-sheet output to `build.mjs` for the widget.
