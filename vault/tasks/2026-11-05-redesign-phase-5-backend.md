@@ -34,7 +34,10 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
   ([journeys](2026-11-06-redesign-progression-journeys.md)); Shiny Gold Crowns, the shop catalog and rotation, `buy_item`, `equip_item`,
   inventory, HP from snacks ([shop](2026-11-06-redesign-timmy-shop.md), [Timmy's place](2026-11-06-redesign-timmys-place.md));
   the idea board's tables and functions ([idea board](2026-11-06-idea-board.md)). The new functions sit beside today's, so the
-  live hubs keep today's rules until the release switches them.
+  live hubs keep today's rules until the release switches them. **Still to add** (Sam, 2026-11-06, after part 3 merged):
+  the Learn and Flashcards toggle's server, `learn` in `record_answer_v2`'s `ctx` list, the `card_reviews` log,
+  `record_card_v2` and `get_my_cards` ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md)), in the pending
+  migration with its checks.
 - **Suited to a parallel agent (Codex 5.6 Terra, Sam, 2026-11-05)**: this phase does not depend on the design work. The
   numbers to beat and the RPC inventory are in the audit note (sections 1 and 3) and in the session's architecture
   report summarized there; every change is verifiable with the release suites on a throwaway database.

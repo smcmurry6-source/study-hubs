@@ -122,6 +122,10 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
   (`record_costume_sighting`; a spotted costume joins that visitor's shop), Link my devices merging all of it. The 48-item
   catalog is a draft for phase 4's art and Sam's look. The gold crowns' one-time grants (trophies, medals, rank-ups) count
   from the release on; the XP from before counts (the note's "median about 120").
+- 2026-11-06 (Claude Code): the catalog follows Timmy's place's art (Sam: "upgrade the names"): 68 rows, the homes,
+  scenes, yard things, paints, upgrades and the six theme outfits with the kit's ids, rarities and prices; five yard spots
+  and `wide` for the bowling lane ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289). The outfits not drawn
+  yet, the snacks, boosts and seasonal items are still drafts.
 
 ## Outcome
 

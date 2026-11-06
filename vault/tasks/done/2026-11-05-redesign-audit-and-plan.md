@@ -264,7 +264,8 @@ Sam brought more ideas to workshop on 2026-11-06 and decided them in chat the sa
 Each has its own task note with the data, the design and Sam's calls. Everything but Patient Box v2 is built side by side
 and **ships with the redesign's release**. This changes parts of 4.4 and 4.5: XP has no daily cap and many more sources,
 the ladder becomes three journeys, the house becomes a scene you build, the shop sells snacks and floss that restore HP,
-and bowling is an Easter egg, not part of the session recap.
+and bowling is an Easter egg, not part of the session recap. Later the same day Sam added a toggle to the Question Bank
+(4.4) that switches it to Learn or Flashcards.
 
 | Where | What it adds | Note |
 |---|---|---|
@@ -274,6 +275,7 @@ and bowling is an Easter egg, not part of the session recap.
 | Phase 4, part B | Shiny Gold Crowns, the rotating shop (daily, weekly, seasonal), rarity tiers, outfits, snacks and floss, XP boosts, rare costumes | [shop](../2026-11-06-redesign-timmy-shop.md) |
 | Phase 4, part C | Timmy's place: the house card redrawn as an isometric scene with homes (castle, giant mushroom, treehouse), scenes and yard items | [Timmy's place](../2026-11-06-redesign-timmys-place.md) |
 | Phase 4, part D | The bowling egg: eight bowling-alley clips with the Plaque crew as pins | [bowling egg](../2026-11-06-redesign-bowling-egg.md) |
+| The engine, every hub on it | **Study as: Questions · Learn · Flashcards**, a toggle at the top of the Question Bank (Sam, 2026-11-06): Learn asks the panel's questions in rounds until each is mastered (like Quizlet's Learn); Flashcards flip and rate them, scheduled to come back, never past exam eve (like Anki). The panel still picks which questions; the mock stays questions only. Its server part joins phase 5, part 3 | [Learn and Flashcards](../2026-11-06-redesign-learn-and-flashcards.md) |
 | Phase 5, part 3 | The server for all of it: no XP cap, server-checked answers, the guardrails, every new XP source and boost, the 63-step ladder, Shiny Gold Crowns and the shop, the idea board's tables. Built and tested now on a throwaway copy, applied at the release | the notes above |
 | Its own track | Patient Box v2: the tooth library (shared with the figure builds), modules, new views and checks; ships to the live hubs step by step | [patient box v2](../2026-11-06-patient-box-v2-modular-cases.md) |
 | Dropped | "Ask the Hub", an AI study assistant | [ask the hub](2026-11-06-ask-the-hub-assistant.md) |
