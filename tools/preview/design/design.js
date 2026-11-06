@@ -1017,6 +1017,78 @@
       '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
   }
 
+
+  /* ---------- the bowling egg (phase 4, part D): eight clips on the alley's screen ---------- */
+  var BW = window.SH_BOWL, BS = { k: null, all: false, still: false, n: 0, timer: 0, next: 0 };
+  function bwClip(k){ return BW.CLIPS.filter(function(c){ return c.k === k; })[0]; }
+  /* a clip as a picture, with its motion inside it; a new number each time, so it starts again from the top */
+  function bwImg(k, still){
+    var c = bwClip(k), svg = BW.render(k, { still: still }).replace(/^(<svg[^>]*)>/, function(m, a){ return a + ' data-n="' + (++BS.n) + '"><style>' + BW.css(k) + "</style>"; });
+    return img(svg, c.alt + (still ? " (the last frame)" : ""), "bw-img");
+  }
+  function bwScreen(k, still){
+    var c = bwClip(k);
+    return bwImg(k, still) + '<span class="bw-word' + (still ? " is-still" : "") + '" data-w="' + esc(c.word) + '" style="animation-delay:' + c.wordAt + "s;left:" + c.wordPos[0] + "%;top:" + c.wordPos[1] + '%" aria-hidden="true">' + esc(c.word) + "</span>";
+  }
+  function bwPlay(k, still){
+    clearTimeout(BS.timer); clearTimeout(BS.next);
+    var c = bwClip(k), scr = $("#bwScreen");
+    BS.k = k; still = !!(still || BS.still || reduced);
+    scr.innerHTML = bwScreen(k, still);
+    scr.classList.toggle("is-playing", !still);
+    scr.setAttribute("aria-label", still ? c.n + ": the last frame. Tap to play it." : "Playing " + c.n + ". Tap to skip to the end.");
+    $$("#bwChips .tp-chip").forEach(function(b){ var on = b.dataset.bw === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+    $("#bwNow").innerHTML = "<b>" + esc(c.n) + " <span class=\"bw-len\">" + c.D + " s</span></b><span>" + esc(c.note) + "</span>";
+    if (!still) BS.timer = setTimeout(function(){ scr.classList.remove("is-playing"); scr.setAttribute("aria-label", c.n + ": the last frame. Tap to play it again."); if (BS.all) bwNext(); }, c.D * 1000 + 700);
+    else if (BS.all) BS.next = setTimeout(bwNext, 1500);
+  }
+  function bwNext(){
+    var i = BW.CLIPS.map(function(c){ return c.k; }).indexOf(BS.k);
+    if (i < BW.CLIPS.length - 1) BS.next = setTimeout(function(){ bwPlay(BW.CLIPS[i + 1].k); }, 500);
+    else { BS.all = false; bwAllBtn(); }
+  }
+  function bwAllBtn(){ var b = $("#bwAll"); if (b) { b.textContent = BS.all ? "Stop" : "Play all eight"; b.setAttribute("aria-pressed", BS.all ? "true" : "false"); } }
+  function bowling(){
+    if (!BW) { $("#bowlGrid").innerHTML = '<p class="note">bowling.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    var chips = BW.CLIPS.map(function(c, i){ return '<button type="button" class="tp-chip" aria-pressed="false" data-bw="' + c.k + '"><i class="bw-num">' + (i + 1) + "</i>" + esc(c.n) + "</button>"; }).join("");
+    var cast = BW.CREW.map(function(c, i){ return '<figure class="bw-castfig">' + img(BW.part(c.k), "A bowling pin drawn as " + c.n, "bw-pin") + "<figcaption>" + esc(c.n) + (i === 0 ? "<span>the head pin</span>" : "") + "</figcaption></figure>"; }).join("") +
+      '<figure class="bw-castfig">' + img(BW.part("mint"), "A giant sugar-free mint, white with a pinwheel of mint green", "bw-pin bw-round") + "<figcaption>The ball<span>a sugar-free mint</span></figcaption></figure>";
+    var guests = [["thirtyOne", "Number thirty-one", "the neighbor, with his thermometer", "Number thirty-one, a nervous molar with a thermometer in his mouth"],
+      ["brush", "The toothbrush", "from Timmy's front door", "The toothbrush from Timmy's front door, bristles down to sweep"],
+      ["turkey", "The turkey", "in Timmy's pilgrim hat", "A turkey wearing Timmy's pilgrim hat"],
+      ["handpiece", "The handpiece", "the ball, in disguise", "A high-speed handpiece standing on its back end"]].map(function(g){
+        return '<figure class="bw-castfig">' + img(BW.part(g[0]), g[3], "bw-pin") + "<figcaption>" + esc(g[1]) + "<span>" + esc(g[2]) + "</span></figcaption></figure>"; }).join("");
+    $("#bowlGrid").innerHTML =
+      '<div class="panel s12"><h3>On the alley’s screen</h3><p>Pick a clip, or play all eight. Tap the screen to skip to the end, the way a student skips one on the bar. With reduced motion (or “Still”), each is its last frame and its word.</p>' +
+        '<div class="panel-body bw-play"><div class="bw-tv"><button type="button" class="bw-screen" id="bwScreen"></button></div>' +
+        '<div class="bw-side"><div class="tp-opts" id="bwChips" role="group" aria-label="The clips">' + chips + '</div><p class="bw-now" id="bwNow" aria-live="polite"></p>' +
+        '<div class="bw-btns"><button type="button" class="btn btn-primary" id="bwAgain">Play it again</button><button type="button" class="btn" id="bwAll" aria-pressed="false">Play all eight</button></div>' +
+        '<label class="tp-ctl tp-check"><input type="checkbox" id="bwStill"' + (reduced ? " checked disabled" : "") + "> <span>Still (as with reduced motion)" + (reduced ? ": your device asks for it" : "") + "</span></label></div></div></div>" +
+      '<div class="panel s12"><h3>The still versions</h3><p>What a student who asked for reduced motion sees instead: the last frame and the word, held until they tap it away.</p><div class="panel-body bw-gal">' +
+        BW.CLIPS.map(function(c){ return '<figure class="bw-fig"><div class="bw-mini">' + bwScreen(c.k, true) + "</div><figcaption>" + esc(c.n) + "<span>" + esc(c.note) + "</span></figcaption></figure>"; }).join("") + "</div></div>" +
+      '<div class="panel s12"><h3>The cast</h3><p>The pins are the Plaque crew from the boss egg, in their colors, never teeth. Each wears what sets it apart: Tartar’s cracks, Biofilm’s drips, the Mutans chain, Cavity Creep’s hole, the Goblin’s ears, the Haze, the Red Complex’s tails.</p>' +
+        '<div class="panel-body"><div class="bw-cast">' + cast + guests + "</div></div></div>" +
+      '<div class="panel s12"><h3>How it’s found</h3><p>From the task note; the triggers are built in phase 4, after these are approved.</p><div class="panel-body tp-how bw-how"><ul>' +
+        "<li><b>In the bank</b>: every 50 first-try right answers in a row plays a strike clip (at 50 and 100); the third, 150 in a row, plays the turkey. Not in the mock.</li>" +
+        "<li><b>On the bar, after the verdict</b>, never over a question waiting for an answer. A tap skips it; each lasts 3 to 5 seconds.</li>" +
+        "<li><b>At Timmy’s place</b>: tap the bowling lane in the yard for a random clip.</li>" +
+        "<li><b>The egg log</b> keeps the first sighting of each; seeing all eight is a secret trophy.</li>" +
+        "<li><b>Off</b> with the eggs switch in Settings, like every egg. Tracked as <code>egg:bowling=&lt;clip&gt;</code>.</li>" +
+        "<li><b>Light to load</b>: one kit draws all eight (about 56 KB before compression), fetched only when a clip is due.</li>" +
+        "</ul></div></div>";
+    $$("#bwChips .tp-chip").forEach(function(b){ b.addEventListener("click", function(){ BS.all = false; bwAllBtn(); bwPlay(b.dataset.bw); }); });
+    $("#bwScreen").addEventListener("click", function(){ bwPlay(BS.k, $("#bwScreen").classList.contains("is-playing")); });
+    $("#bwAgain").addEventListener("click", function(){ bwPlay(BS.k); });
+    $("#bwAll").addEventListener("click", function(){ BS.all = !BS.all; bwAllBtn(); if (BS.all) bwPlay(BW.CLIPS[0].k); else { clearTimeout(BS.next); } });
+    $("#bwStill").addEventListener("change", function(e){ BS.still = e.target.checked; bwPlay(BS.k); });
+    /* the screen starts on the first clip's last frame; it plays when it scrolls into view the first time */
+    bwPlay(BW.CLIPS[0].k, true);
+    if (!reduced && "IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function(es){ if (es[0].isIntersecting) { io.disconnect(); if (!BS.still) bwPlay(BS.k); } }, { threshold: .6 });
+      io.observe($("#bwScreen"));
+    }
+  }
+
   /* ---------- controls ---------- */
   function setFace(f){ root.dataset.face = f; $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === f ? "true" : "false"); }); save(); tokens(); }
   function setTheme(t){ root.dataset.theme = t; $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === t ? "true" : "false"); }); save(); tokens(); }
@@ -1032,8 +1104,9 @@
     $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === root.dataset.face ? "true" : "false"); b.addEventListener("click", function(){ setFace(b.dataset.face); }); });
     $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === root.dataset.theme ? "true" : "false"); b.addEventListener("click", function(){ setTheme(b.dataset.theme); }); });
     pick.addEventListener("change", function(){ setHub(pick.value); });
-    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place();
+    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place(); bowling();
   }
-  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(o){ buildPlace(o); }, drawGalleries: function(){ if (lazyGalleries.all) lazyGalleries.all(); }, placeStage: ST };
+  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(o){ buildPlace(o); }, drawGalleries: function(){ if (lazyGalleries.all) lazyGalleries.all(); }, placeStage: ST,
+    bowl: BS, playBowl: function(k, still){ bwPlay(k, still); } };
   init();
 })();

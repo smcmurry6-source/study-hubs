@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (redesign phase 4 part D: the bowling egg, the clips, Claude Code)** — Nothing students see changes.
+  Eight 4-5 second cartoons for the alley's screen (the panic, the conga, the floss lasso, the handpiece rocket, the clean
+  sweep, the neighbor, the turkey, the spare), drawn in SVG and animated in CSS, each with a still version for reduced
+  motion, on the design page only (`tools/preview/design/`, "The bowling egg"). The pins are the Plaque crew, the ball
+  a sugar-free mint. One kit, `tools/figures/site/bowling.mjs`, built into `tools/preview/design/bowling.js` by
+  `build.mjs` (`--check` covers it). `widget/eggs.js` is unchanged until Sam approves the clips
+  ([task](vault/tasks/2026-11-06-redesign-bowling-egg.md)).
 - **2026-11-06 (redesign phase 4 part C: Timmy's place, the art, Claude Code)** — Nothing students see changes. Timmy's
   house card redrawn as a little isometric world you build, on the design page only (`tools/preview/design/`, "Timmy's
   place"), then redrawn again from Sam's feedback: no plot square (each scene's ground fills the picture and the homes sit
