@@ -278,8 +278,8 @@
     $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row with the goal met" : "No streak yet") + "</span>"; });
     $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
     var x = rankXp(), rk = $("#hxRank");
-    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + "</span><b>" + esc(rankName()) + '</b><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + "</span>";
-    if (rk) rk.setAttribute("aria-label", "Your rank: " + rankName() + ", " + (x === null ? fmt(t.xp) + " XP today" : fmt(x) + " XP") + ". Open your stats");
+    /* its spoken name is its visible text with a few hidden words around it (axe: the label must contain what's shown) */
+    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + esc(rankName()) + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. Open your stats</span>';
     $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>'; });
     $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
   }
@@ -301,7 +301,7 @@
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
     if (gear) { if (setOn) gear.setAttribute("aria-current", "page"); else gear.removeAttribute("aria-current"); }
-    $$("#modeSwitch [data-mode]").forEach(function(a){ var on = a.getAttribute("data-mode") === v && !setOn; a.setAttribute("aria-selected", on ? "true" : "false"); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    $$("#modeSwitch [data-mode]").forEach(function(a){ var on = a.getAttribute("data-mode") === v && !setOn; a.classList.toggle("is-active", on); if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     $$(".hx-view").forEach(function(p){ p.hidden = p.getAttribute("data-view") !== v; });
     docEl.classList.toggle("sh-mock-on", false);
     var el = $('.hx-view[data-view="' + v + '"]');
@@ -878,7 +878,7 @@
     var picked = lecIds(), all = LECS.length, sum = picked.length === all ? "All lectures" : picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
     var showChip = function(k, lab){ var n = filtered({ st: k }).length; return '<button class="chip" type="button" data-show="' + k + '" aria-pressed="' + (!preset && (STATE.ui.qstatus || "all") === k) + '">' + esc(lab) + ' <span class="n num">' + n + "</span></button>"; };
     var setCount = { drill: "", misses: srsMisses().length, weak: weakList().length, mock: mockTotal() };
-    var setChip = function(k, lab){ return '<a class="chip" href="#questions/' + k + '" data-set="' + k + '" aria-pressed="' + (preset === k) + '"' + (preset === k ? ' aria-current="page"' : "") + ">" + icon(k === "misses" ? "misses" : k, 16) + esc(lab) + (setCount[k] !== "" ? ' <span class="n num">' + setCount[k] + "</span>" : "") + "</a>"; };
+    var setChip = function(k, lab){ return '<a class="chip" href="#questions/' + k + '" data-set="' + k + '"' + (preset === k ? ' aria-current="page"' : "") + ">" + icon(k === "misses" ? "misses" : k, 16) + esc(lab) + (setCount[k] !== "" ? ' <span class="n num">' + setCount[k] + "</span>" : "") + "</a>"; };
     var fmts = FMTS.filter(function(f){ return QS.some(function(q){ return isFmt(q, f[0]); }); });
     var srcs = Object.keys(CORE.srcLabel || {}).filter(function(k){ return QS.some(function(q){ return q.src === k; }); });
     var more = (STATE.ui.qfmt && STATE.ui.qfmt !== "all" ? 1 : 0) + (STATE.ui.qsrc && STATE.ui.qsrc !== "all" ? 1 : 0);

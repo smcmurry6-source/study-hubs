@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: review
 hub: occlusion
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-19
 waiting-on:
-agent:
+agent: Claude Code (cloud)
 pr:
 ---
 
@@ -53,14 +53,14 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 
 ## Done when
 
-- [ ] `widget/hub.js` + `hub.css`; the new Occlusion (beside the live one) is configuration, data (JSON), tint, emblem, masthead and arcade skin; the live Occlusion unchanged
-- [ ] First load of Occlusion well under the perf budget (target: under 400 KB over the wire before the bank's data)
-- [ ] Every mode, every question format, the mock, the arcade, narration, the podcast card, pins, reports, the drill, the eggs and Timmy work on the preview (UAT checklist), phone and laptop, light and dark
-- [ ] The inspector passes with 0 FAIL on Home, Notes, Questions and More
-- [ ] The rule, About page and [build-a-hub](../how-to/build-a-hub.md) changes written into the [release note](2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
+- [x] `widget/hub.js` + `hub.css`; the new Occlusion (beside the live one) is configuration, data (JSON), tint, emblem, masthead and arcade skin; the live Occlusion unchanged
+- [x] First load of Occlusion well under the perf budget (target: under 400 KB over the wire before the bank's data)
+- [x] Every mode, every question format, the mock, the arcade, narration, the podcast card, pins, reports, the drill, the eggs and Timmy work on the preview (UAT checklist), phone and laptop, light and dark
+- [x] The inspector passes with 0 FAIL on Home, Notes, Questions and More
+- [x] The rule, About page and [build-a-hub](../how-to/build-a-hub.md) changes written into the [release note](2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
-- [ ] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
+- [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
 
@@ -68,5 +68,29 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - 2026-11-06: Sam asked for "Why each choice" to start folded after answering (it took up too much of the screen), and
   all six live hubs now do ([decisions](../decisions.md)). The design page (`tools/preview/design/`) opens the why for
   your pick on an answered card: ask Sam whether the engine's card folds that line too before building it.
+- 2026-11-06: built (Claude Code). Sam's look mid-build: Timmy back in the bottom-left corner with a Settings button on the
+  bar, plain answer rows like the live hubs (no circles), more design on the Notes lecture list ([decisions](../decisions.md)).
+  The engine's "Why each choice" now folds under one bar like the live hubs; inside it the pick's reason is open (asked Sam).
 
 ## Outcome
+
+Built side by side, nothing students see changes ([PR](https://github.com/smcmurry6-source/study-hubs/pulls?q=head%3Aclaude%2Fsleepy-ramanujan-x1cctt)):
+- **The engine**: `widget/hub.js` + `widget/hub.css` (its header says how a hub plugs in). The art: `widget/hub-art.js` (the
+  shared icons, flame and medals) and `widget/hub-art/<hub>.js` (tint, emblem, masthead), built by `tools/figures/site/build.mjs`.
+- **The new Occlusion**: `hubs/occlusion/next/` (settings in `window.SH_HUB`; content in `content/`, written by
+  `tools/hub-next/build.mjs`; how it's kept in step: [the hub note](../hubs/occlusion.md)). The guard sends visitors to the
+  live hub outside a preview.
+- **Gated hooks in the shared widget** (the live hubs behave as before): `shPet.say`/`hp`, the `sh:rank-profile` event
+  (`ranks.js`), `SH_TOUR.steps`/`prompt` (`tour.js`), `shDrill.set` (`drill.js`), and in `v3.js` `shLoadPet` / `shLoadTour`:
+  on a page with `SH_HUB`, Timmy's script loads once he's adopted and the tour's when it's started.
+- **First load**: 371 KB over the wire before the bank's data (target 400), 536 KB with it; FCP 1.8 s, LCP 1.9 s, TBT 0.2 s
+  on the slow-4G phone (the live Occlusion: 1317 KB, LCP 1.2 s, TBT 0.8 s, load 8.4 s). Budget added in `budgets.json`.
+- **Inspector**: 0 FAIL on Home, Notes, Questions and More at 1440, 768 and 390 (WARNs left: ragged rows on Home and in
+  the bank's side column, below-the-fold notes, one empty panel inside an anima figure).
+- **CI**: `smoke.js` clicks through every `hubs/*/next/` page (four views, every More page and set, an answer, the arcade)
+  and checks its bar at 320 px and at the largest text; `check.yml` runs both builds' `--check`; `perf.js` measures the page;
+  `a11y.js` audits the four views (0 axe issues, light and dark; baseline added). Bugs found and fixed: BUG-037 to BUG-039
+  in the [bug log](../release/bug-log.md).
+- The rule, About page and build-a-hub changes are drafted in the [release note](2026-11-06-redesign-release.md).
+- **For phase 2**: `PCASES` and the case kit are wired (Perio, PCD Implants); the figure 11 px floor is in the content
+  build; anything a hub writes in its own code goes in its `SH_HUB`.

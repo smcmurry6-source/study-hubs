@@ -111,6 +111,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   techniques side by side) and `cb-hu-ref` (the explanation now gives the values, air -1000 and water 0, instead of
   "know both definitions").
 
+- **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
+  students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
+  Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays
+  bottom-left; drill, misses, weak spots and the mock as sets of the bank; the question card with its rewards, the daily
+  goal ring and streak, the session recap, Check yourself under each lecture's notes). `hubs/occlusion/next/` is the new
+  Occlusion: a page of settings (`window.SH_HUB`), its art (`widget/hub-art/occlusion.js`) and content JSON written from
+  the live hub by `tools/hub-next/build.mjs` (CI's "generated files are current" step runs its `--check`). Outside a
+  preview the page sends visitors to the live hub. Same hub id, state key, answered event and question ids, so progress
+  carries over at the release. First load 371 KB over the wire before the bank's data (the live hub: 1317 KB with it).
+  Shared-widget changes are gated to the new versions: `window.shPet.say`/`hp`, `sh:rank-profile`, `SH_TOUR.steps`/`prompt`,
+  `shDrill.set`, and in `v3.js` Timmy's script loads only once he's adopted and the tour's only when it's started, for
+  pages with `SH_HUB`. `tools/ci/smoke.js` clicks through every `hubs/*/next/` page; `tools/release/perf.js` measures it.
+  Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md` for the release.
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
   Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered
@@ -138,6 +151,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   PCD Implants, Special Patient Care and Occlusion dim past and far-off course-timeline rows with the soft ink color
   instead of opacity, so their text keeps 4.5:1 contrast as rows turn past each day.
   [Task](vault/tasks/done/2026-11-05-occlusion-l8-follow-ups.md).
+
 - **2026-11-06 ("Why each choice" starts folded, every live hub, Claude Code)** — Sam: "after you answer a question,
   have the 'why each choice' be collapsed by default. it takes up a lot of screen space". `whyHTML` no longer opens its
   `<details class="qx-why">`, so after answering a student sees the explanation and one "Why each choice" bar, and taps it

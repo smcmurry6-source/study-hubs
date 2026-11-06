@@ -80,6 +80,23 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
   hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.
 
+## The new version (the redesign, not live yet)
+
+`hubs/occlusion/next/` is the redesigned Occlusion, built beside this one ([phase 1](../tasks/2026-11-05-redesign-phase-1-hub-engine.md))
+and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until then **edit content in the live file only**:
+- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/occlusion/index.html` (its `LECTURES`, `QUESTIONS`,
+  `QUESTION_WHY`, `READINGS`, hints, cram, review tables, `PCASES`, the generated figure and arcade blocks). Run it after any
+  change to the live hub and commit the JSON; CI's "generated files are current" step fails when it's stale.
+- The page itself (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code
+  (the Home exam card, the hints banner, the mock's blurb, the arcade's games and which one is up front). When one of those
+  changes in the live hub (the final's format, a new lecture's dates), change it there too.
+- Its art (tint `#2747a3`, emblem, masthead, medals) is `widget/hub-art/occlusion.js`, built by
+  `node tools/figures/site/build.mjs` from `tools/figures/site/`.
+- The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
+- Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
+- Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
+  the page sends you to the live hub, and a plain static server would reach the class's data.
+
 ## Diagram decisions
 
 - 2026-10-14 (first review): all four candidates of that review skipped.

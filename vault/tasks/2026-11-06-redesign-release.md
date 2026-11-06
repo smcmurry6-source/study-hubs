@@ -53,6 +53,75 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 Each phase writes here the rule, About page and how-to changes it needs, so they all land together.
 
+### From phase 1 (the engine and the new Occlusion, [phase 1](2026-11-05-redesign-phase-1-hub-engine.md))
+
+Written for the engine as built in `widget/hub.js` / `hub.css` and `hubs/occlusion/next/`. Phase 2 adds what the other hubs
+need; at the release, check each draft against the engine as it is then.
+
+**[hub-home-page](../rules/hub-home-page.md)** (replace the body; keep the date of the original rule):
+- Every hub has four views, **Home, Notes, Questions and More**, as hash routes (`#home`, `#notes/<lecture>`,
+  `#questions[/drill|misses|weak|mock]`, `#more[/<page>]`); Home is the default and logs as `home/dashboard` (`SH_SECTION`).
+- Home is a landing page drawn by the engine from the hub's `SH_HUB.home` and its content: the hub's masthead, the exam
+  card (countdown and the announced facts; the format line says when it isn't announced), the quick links on the first
+  phone screen (practice questions, Daily drill, the notes you were on, the mock and the rest), **Where to next** (at most
+  three rows: yesterday's misses in exam week, the weakest lecture, a lecture not started), today (the goal ring, the
+  streak, the last 14 days), progress by lecture (Notes / Questions per row), the course timeline (`COURSE_DATES`) and
+  the podcast card.
+- Drill, Yesterday's misses, Weak spots and the mock are **sets of the Question Bank** (`#questions/<set>`), not modes.
+- The one-time flag rule stays: nothing that moves returning visitors goes in `defaultState()`.
+
+**[arcade-skins](../rules/arcade-skins.md)** (add): the arcade lives in More. It opens on **one game up front**
+(`SH_HUB.arcade.first`, Occlusion: Cusp Sort) with the hub's own blurb, and the rest behind **More games (n)**. The skin
+rules are unchanged: each hub's games, names, lobby text and look are its own (`arcade.js` / `arcade.css` beside the page).
+
+**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (edit):
+- A **Sets** row in the panel, under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set
+  replaces the list until it's closed; the filters stay as they were.
+- The panel keeps Lectures (tick boxes, Only), Show (All, High likelihood, Not answered yet, Missed last time, Pinned, each
+  with its count), Order (In order / Random), More filters (type, source), the `.qsum` line with removable tags and Clear
+  all, and the tracking names. On a laptop a Today column (the goal ring, streak, XP, this session) sits beside the questions.
+- Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status.
+
+**[every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)** (one line): in the new card, "Why each choice" is one folded
+bar under the explanation; opened, it lists every choice with your pick's reason open (ask Sam first, see the phase 1
+note's Outcome, whether the pick's reason should show without a tap).
+
+**[build-a-hub](../how-to/build-a-hub.md)** (rewrite "Build it" and "Wire it into the site"):
+- A new hub is a page like `hubs/occlusion/next/index.html`: the guard script, `window.SH_HUB` (hub id, name, state key,
+  answered event, exam, the Home/Notes/hints/mock/arcade wording), `widget/hub-art.js` + `widget/hub-art/<hub>.js`, `hub.css`
+  and `hub.js`. Nothing else goes in the page.
+- Its content is JSON beside the page (`content/core.json`, `questions.json`, `notes.json`, `study.json`) plus
+  `figures.js/css` and `arcade.js/css`. After the release the JSON is the source (edited by hand or by a build step), and
+  `narrate.py`, the lint, the figure builds and the question-id registry read it.
+- Its art (emblem, masthead, medals, tint) is drawn in `tools/figures/site/` and built into `widget/hub-art/<hub>.js`
+  ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)).
+- The engine owns the frame, the card, the bank, the rewards, the mock and the settings: a hub never copies or patches
+  them; a change for every hub goes in `widget/hub.js` / `hub.css`.
+- Figure text is 11 px at the smallest (the build raises 9-10.5 px to 11).
+- Drop from the old steps: copying a hub file, its palette and type trio (the tint is the hub's color now), `whyHTML`,
+  the `.qbar` copy, `renderHome()` and the tour steps.
+
+**About page** (`about/index.html`), Part 3 "Hub modes", rewritten:
+- "Each hub has four parts on its bar: **Home, Notes, Questions and More**. On a laptop the bar is at the top; on a phone it's
+  at the bottom, with a **Settings** button beside the four." (Replace "four modes in its top bar: Home, Compendium,
+  Review and Arcade" and the "top bar that fits your screen" entry.)
+- **Home**: what it shows (above), the daily goal and streak, Where to next.
+- **Notes**: the lecture list (lectures on the exam first, the others for review, each with a progress bar and how many
+  you've tried), both reading levels, Listen, the drawn diagrams beside their paragraph, and **Check yourself**: three
+  questions at the end of each lecture's notes.
+- **Questions**: the bank, its panel and the four sets (Daily drill, Yesterday's misses, Weak spots, Mock exam); answer
+  choices look as they do now (plain rows, a check or cross after you answer); Pin and Report on every card.
+- **Rewards on every answer** (new): XP counts up on the rank pill, the goal ring fills, the streak flame grows with the
+  streak, Timmy cheers or flinches, and after 25 answers (or when you leave with 5 or more) a **session recap** card says
+  how it went and offers the misses.
+- **Daily goal and streak** (new): 10 to 50 questions a day (default 20) in Settings; the streak counts the days you meet it.
+- **More**: Timmy Time, Exam hints, Cram sheet, Side by side (was Review), Arcade, Stats and trophies, Settings.
+- **Settings** (changed): theme, text size, the daily goal, your name, Timmy and the extras. The font choice, background
+  music and the accent metal are gone (remove their entries and any trophy text that names them; keep "All 24 trophies"
+  true).
+- **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
+- Timmy Tooth: he stays in the bottom-left corner, as now.
+
 ## Log
 
 - 2026-11-06: written after Sam chose to build the whole redesign side by side and release it at once.

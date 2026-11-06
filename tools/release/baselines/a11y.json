@@ -437,6 +437,35 @@
    "axe": {},
    "focus": null,
    "motion": 0
+  },
+  "occlusion/next · home": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": []
+   },
+   "motion": 0
+  },
+  "occlusion/next · notes": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · questions": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · more": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
   }
  }
 }

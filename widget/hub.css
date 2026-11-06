@@ -105,8 +105,8 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
   font-size: var(--fs-label); font-weight: var(--w-strong); white-space: nowrap; text-decoration: none; transition: background var(--t-hover); }
 .hx .chip:hover { background: var(--active); }
 .hx .chip .n { color: var(--muted); font-weight: var(--w-body); }
-.hx .chip[aria-pressed="true"] { background: var(--hub-soft); color: var(--hub-text); }
-.hx .chip[aria-pressed="true"] .n { color: inherit; }
+.hx .chip[aria-pressed="true"], .hx a.chip[aria-current="page"] { background: var(--hub-soft); color: var(--hub-text); }
+.hx .chip[aria-pressed="true"] .n, .hx a.chip[aria-current="page"] .n { color: inherit; }
 .hx .chipset { display: flex; flex-wrap: wrap; gap: 6px; }
 .hx .seg { display: inline-flex; flex-wrap: wrap; padding: 3px; gap: 2px; background: var(--panel); border-radius: var(--r-pill); }
 .hx .panel .seg, .hx .qbar .seg { background: var(--row); }
