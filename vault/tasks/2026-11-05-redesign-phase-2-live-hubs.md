@@ -14,7 +14,7 @@ pr:
 
 ## Goal
 
-Move the other live hubs (Heme & Endo 2, Special Patient Care, PCD Implants if still live, perio) onto `widget/hub.js` with their content as JSON, their tint, emblem, masthead and arcade skin. Perio's own engine retires. The four archived hubs stay as they are (Sam).
+Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with their content as JSON, their tint, emblem, masthead and arcade skin, ready for the one release with the rest (Sam, 2026-11-06). Perio's own engine retires at the release. **PCD Implants and Special Patient Care are not ported** (Sam, 2026-11-06, [decisions](../decisions.md)); they and the archived hubs stay as they are.
 
 ## Context
 
@@ -24,13 +24,16 @@ Move the other live hubs (Heme & Endo 2, Special Patient Care, PCD Implants if s
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - Hub notes: [perio](../hubs/perio.md) (its own engine, `two()`/`tf()`/`nums()`, the case kit), [heme-endo-exam2](../hubs/heme-endo-exam2.md), [special-patient-care](../hubs/special-patient-care.md), [pcd-implants-exam1](../hubs/pcd-implants-exam1.md).
 - Each hub is its own PR with a preview link. Each new version is built beside the live hub, the way
-  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md) builds Occlusion's, and goes live with the rest at
-  [the release](2026-11-06-redesign-release.md) (Sam, 2026-11-06). Start with the hubs whose exams fall after the
-  release: a hub whose exam passes first is never ported.
+  [phase 1](2026-11-05-redesign-phase-1-hub-engine.md) builds Occlusion's (`hubs/<id>/next/`, `tools/hub-next/build.mjs`
+  `--hub <id>`), and goes live with the rest at [the release](2026-11-06-redesign-release.md) (Sam, 2026-11-06).
+- The two hubs: **Heme & Endo Exam 2** (`hee2-state-v1`, `hee2:answered`; its Exam 1 Refresher's review-only questions
+  through `uncounted()`, its "Exam 1 High likelihood" toggle through `SH_HUB.bank.only`) and **Perio** (its own engine:
+  `perio-d2-compendium-state-v1`, `perio:answered`, sessions, notes as template literals, `QBANK_FILTER`, Patient Box
+  cases through the case kit, `PERIO_SKIN`). Progress must carry over: same hub id, state key, state shape and answered event.
 
 ## Done when
 
-- [ ] A new version of each live hub on the engine, beside the live one, one PR each, with its own emblem and masthead
+- [ ] New versions of Heme & Endo Exam 2 and Perio on the engine, beside the live ones, one PR each, with their own emblem and masthead
 - [ ] Perio's new version needs no engine of its own; its questions, cases and figures unchanged (ids permanent); the old engine goes at the release
 - [ ] The archived hubs untouched; the dashboard's archived cards restyled only
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -40,5 +43,6 @@ Move the other live hubs (Heme & Endo 2, Special Patient Care, PCD Implants if s
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-06: Sam narrowed it to Heme & Endo Exam 2 and Perio (no PCD Implants, no Special Patient Care), all released at once.
 
 ## Outcome

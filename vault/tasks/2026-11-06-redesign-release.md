@@ -28,7 +28,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
   suites, UAT, Sam ticks "Sam approved this release"), [about-page](../rules/about-page.md),
   [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md), [question-ids-are-permanent](../rules/question-ids-are-permanent.md),
   [roll-back-a-release](../how-to/roll-back-a-release.md).
-- Only the hubs that are still live get switched. A hub whose exam passed before the release keeps its old page, like the
+- The hubs that get new versions: **Occlusion, Heme & Endo Exam 2 and Perio** (Sam, 2026-11-06). PCD Implants and Special
+  Patient Care keep their pages. **When:** Sam plans the release for after the PCD Implants exam (Nov 6). The exams still
+  ahead: Heme & Endo Exam 2 Nov 13, Occlusion's final Nov 16, Perio's final Nov 19 (`HUBS` in `index.html`). Only the hubs that are still live get switched. A hub whose exam passed before the release keeps its old page, like the
   archived hubs.
 
 ## Done when
