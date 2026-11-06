@@ -20,11 +20,15 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), A Dental
   endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 81 questions copied
-  from `heme-endo-exam1` (its top two High Likelihood topics per lecture, its hardest questions, format top-ups) with ids
-  `r-<exam1 id>`, for the exam's five Exam 1 questions. Its notes are Exam 1's cram sheet. Only its copies of Exam 1's
-  predicted topics are High Likelihood (23 topics, 68 single-answer questions; the "hardest questions" set lost the tag
-  on 2026-11-06), and **the mock's five Exam 1 questions come only from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 219 questions copied
+  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
+  question** (206 over all 55 of its predicted topics, in Exam 1's topic order; Sam, 2026-11-06: the hub was built with the
+  top two topics per lecture, 68 questions, and the other 138 came in that day) plus 13 others (its hardest questions for
+  the class, format top-ups). A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
+  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. Only the predicted topics are High
+  Likelihood (the "hardest questions" set lost the tag on 2026-11-06), and **the mock's five Exam 1 questions come only
+  from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
   `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
   The Question Bank's Show row has an extra chip for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
