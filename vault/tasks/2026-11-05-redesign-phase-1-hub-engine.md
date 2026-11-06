@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on:
 agent: Claude Code (cloud)
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/275
 ---
 
 # Redesign phase 1: the shared hub engine, on a preview of Occlusion
@@ -74,7 +74,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 
 ## Outcome
 
-Built side by side, nothing students see changes ([PR](https://github.com/smcmurry6-source/study-hubs/pulls?q=head%3Aclaude%2Fsleepy-ramanujan-x1cctt)):
+Built side by side, nothing students see changes ([PR #275](https://github.com/smcmurry6-source/study-hubs/pull/275)):
 - **The engine**: `widget/hub.js` + `widget/hub.css` (its header says how a hub plugs in). The art: `widget/hub-art.js` (the
   shared icons, flame and medals) and `widget/hub-art/<hub>.js` (tint, emblem, masthead), built by `tools/figures/site/build.mjs`.
 - **The new Occlusion**: `hubs/occlusion/next/` (settings in `window.SH_HUB`; content in `content/`, written by
