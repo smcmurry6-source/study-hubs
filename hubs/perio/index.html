@@ -314,6 +314,12 @@ main{padding-top:20px}
 .qf-chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);box-shadow:inset 0 0 0 1px var(--accent)}
 .qf-n{font-family:var(--font-mono);font-size:.74rem;font-weight:600;color:var(--ink-faint)}
 .qf-chip[aria-pressed="true"] .qf-n{color:inherit}
+/* the Only line's toggle (High likelihood): a tick box, so it reads as on top of the Show chip */
+.qf-chip .qf-box{width:15px;height:15px}
+.qf-box rect{fill:none;stroke:currentColor;stroke-width:2}
+.qf-box path{fill:none;stroke:var(--surface);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.qf-tog[aria-pressed="true"] .qf-box rect{fill:currentColor}
+.qf-tog[aria-pressed="true"] .qf-box path{opacity:1}
 .qf-more{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:7px 11px;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer}
 .qf-more svg{width:15px;height:15px;flex:none}
 .qf-more > svg:last-child{width:13px;height:13px;transition:transform .15s}
@@ -363,6 +369,8 @@ main{padding-top:20px}
   .qbar{padding:10px 12px;gap:9px}
   .qf-lab{width:100%}
   .qf-top .qf-lab{width:auto}
+  .qf-lk{align-items:baseline}
+  .qf-lk .qf-lab{width:auto}
   .lp{flex:1 1 0}
   .lp-btn{width:100%}
   .lp-pop{left:auto;right:-13px;width:calc(100vw - 32px)}
@@ -7276,8 +7284,8 @@ var COMPENDIUM_VIEWS = [
 ];
 var COMPENDIUM_VIEW = COMPENDIUM_VIEWS.some(function(v){ return v.id === STATE.ui.view; }) ? STATE.ui.view : 'lecture-notes';
 var COMPENDIUM_SELECTED_LEC = LECTURE_BY_ID[STATE.ui.lec] ? STATE.ui.lec : LECTURES[0].id;
-/* the bank opens with the filters used last time (STATE.ui.qbank: sessions, type, status, source; the search box starts empty) */
-var QBANK_FILTER = (function(){ var f = STATE.ui.qbank || {}; return { search:'', lec:f.lec || 'all', type:f.type || 'all', status:f.status || 'all', src:f.src || 'all' }; })();
+/* the bank opens with the filters used last time (STATE.ui.qbank: sessions, type, status, High likelihood, source; the search box starts empty) */
+var QBANK_FILTER = (function(){ var f = STATE.ui.qbank || {}; return { search:'', lec:f.lec || 'all', type:f.type || 'all', status:f.status || 'all', likely:f.likely || '', src:f.src || 'all' }; })();
 
 function content(){ return document.getElementById('compendium-content'); }
 function setView(id){
@@ -7446,12 +7454,22 @@ var QF_SLIDERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 /* ---------- Question Bank filters (Sam, 2026-11-03: "people don't know how to use it"; same panel as Occlusion, Special
    Patient Care and PCD Implants) ----------
    One labeled panel instead of a row of unlabeled dropdowns: Sessions (the tick list, every row with "Only") and search; Show
-   chips for QBANK_FILTER.status (all | likely | new | missed | pinned), each with how many questions it would give; Order (In
-   order | Random; no "Likely first": the High likelihood chip shows only those questions); More filters (folded): question
+   chips for QBANK_FILTER.status (all | new | missed | pinned), each with how many questions it would give; Only: the High
+   likelihood toggle (QBANK_FILTER.likely: '' | likely) on top of any Show chip (Sam, 2026-11-06: "filter by both high likelihood
+   and not answered yet or missed last time or pinned"; a saved status 'likely', a Show chip before then, moves there); Order (In
+   order | Random; no "Likely first": the High likelihood toggle shows only those questions); More filters (folded): question
    type (QBANK_FILTER.type) and where it's from (QBANK_FILTER.src). Under the panel a line says what is showing, with a tag
    for every filter that's on (tap to remove it) and Clear all; the empty state says which filter is in the way. The old
    "Mastered" status is gone (it was never reachable from Home or Weak Spots). */
-var BANK_SHOW = [['all','All'],['likely','High likelihood'],['new','Not answered yet'],['missed','Missed last time'],['pinned','Pinned']];
+var BANK_SHOW = [['all','All'],['new','Not answered yet'],['missed','Missed last time'],['pinned','Pinned']];
+var BANK_LIKELY = [['likely','High likelihood']];
+var QF_BOX = '<svg class="qf-box" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m8 12.5 3 3 5-6.5"/></svg>';
+/* a saved status 'likely' (a Show chip before 2026-11-06) becomes the Only toggle; an unknown toggle turns off */
+function qbankNorm(){
+  var f = QBANK_FILTER, isLk = function(k){ return BANK_LIKELY.some(function(o){ return o[0] === k; }); };
+  if(isLk(f.status)){ f.likely = f.status; f.status = 'all'; }
+  if(!isLk(f.likely)) f.likely = '';
+}
 var BANK_TYPES = [['mcq','Multiple choice'],['multi','Multiple answer'],['pbox','Patient Box cases'],['img','Suture diagrams'],['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['match','Matching'],['recall','Recall'],['sequence','Put in order']];
 function bankIsType(q, t){ return t === 'pbox' ? !!q.pbox : t === 'img' ? !!q.img : (t === '2stmt' || t === 'except' || t === 'tf' || t === 'numbered') ? q.fmt === t : q.type === t; }
 function bankLabelOf(list, k){ for(var i = 0; i < list.length; i++) if(list[i][0] === k) return list[i][1]; return k; }
@@ -7495,17 +7513,17 @@ function wireLecPick(root, onPick){
   function esc(e){ if(e.key === 'Escape' && !pop.hidden){ open(false); btn.focus(); } }
   document.addEventListener('click', away, true); document.addEventListener('keydown', esc);
 }
-/* o overrides one filter ({status}, {type} or {src}), so each chip and menu entry can say how many it would give */
+/* o overrides one filter ({status}, {likely}, {type} or {src}), so each chip and menu entry can say how many it would give */
 function filteredQuestions(o){
-  o = o || {};
-  var st = o.status || QBANK_FILTER.status || 'all', ty = o.type || QBANK_FILTER.type || 'all', src = o.src || QBANK_FILTER.src || 'all';
+  o = o || {}; qbankNorm();
+  var st = o.status || QBANK_FILTER.status || 'all', lk = 'likely' in o ? o.likely : QBANK_FILTER.likely, ty = o.type || QBANK_FILTER.type || 'all', src = o.src || QBANK_FILTER.src || 'all';
   var s = (QBANK_FILTER.search || '').trim().toLowerCase(), lecOn = {}, pins = {};
   bankLecIds().forEach(function(id){ lecOn[id] = 1; });
   if(st === 'pinned') pinnedIds().forEach(function(id){ pins[id] = 1; });
   return QUESTIONS.filter(function(q){
     if(!lecOn[q.lec]) return false;
     if(st === 'pinned' && !pins[q.id]) return false;
-    if(st === 'likely' && !q.likely) return false;
+    if(lk && !q.likely) return false;
     if(ty !== 'all' && !bankIsType(q, ty)) return false;
     if(src !== 'all' && q.src !== src) return false;
     var a = STATE.answered[q.id];
@@ -7522,6 +7540,7 @@ var QBANK_MORE = null;
 function renderQuestionBank(){
   var f = QBANK_FILTER;
   if(!f.src) f.src = 'all';
+  qbankNorm();
   if(!BANK_SHOW.some(function(o){ return o[0] === f.status; })) f.status = 'all';
   var types = BANK_TYPES.filter(function(o){ return QUESTIONS.some(function(q){ return bankIsType(q, o[0]); }); });
   if(f.type !== 'all' && !types.some(function(o){ return o[0] === f.type; })) f.type = 'all';
@@ -7530,10 +7549,12 @@ function renderQuestionBank(){
   if(QBANK_MORE === null) QBANK_MORE = f.type !== 'all' || f.src !== 'all';
   if(STATE.ui.qorder === 'likely'){ STATE.ui.qorder = 'linear'; saveState(); }
   var ord = STATE.ui.qorder === 'random' ? 'random' : 'linear';
-  var chips = BANK_SHOW.map(function(o){ return '<button type="button" class="qf-chip" data-qshow="'+o[0]+'" aria-pressed="'+(f.status===o[0])+'">'+(o[0]==='pinned'?PIN_SVG:o[0]==='likely'?icon('target'):'')+o[1]+' <span class="qf-n" data-qshow-n="'+o[0]+'"></span></button>'; }).join('');
+  var chips = BANK_SHOW.map(function(o){ return '<button type="button" class="qf-chip" data-qshow="'+o[0]+'" aria-pressed="'+(f.status===o[0])+'">'+(o[0]==='pinned'?PIN_SVG:'')+o[1]+' <span class="qf-n" data-qshow-n="'+o[0]+'"></span></button>'; }).join('');
+  var lkChips = BANK_LIKELY.map(function(o){ return '<button type="button" class="qf-chip qf-tog" data-qlk="'+o[0]+'" aria-pressed="'+(f.likely===o[0])+'">'+QF_BOX+o[1]+' <span class="qf-n" data-qlk-n="'+o[0]+'"></span></button>'; }).join('');
   var h = '<section class="qbar" aria-label="Choose which questions to practice">' +
       '<div class="qf-line qf-top"><span class="qf-lab">Sessions</span>'+lecPickHTML(bankLecIds())+'<label class="qf-search">'+QF_SEARCH+'<input type="search" id="qbSearch" placeholder="Search questions and answers" aria-label="Search questions and answers" value="'+escHtml(f.search)+'"></label></div>' +
       '<div class="qf-line"><span class="qf-lab">Show</span><div class="qf-chips" role="group" aria-label="Show">'+chips+'</div></div>' +
+      '<div class="qf-line qf-lk"><span class="qf-lab">Only</span><div class="qf-chips" role="group" aria-label="Only">'+lkChips+'</div></div>' +
       '<div class="qf-line qf-ord"><span class="qf-lab">Order</span><div class="seg" role="group" aria-label="Question order"><button type="button" data-qorder="linear" aria-pressed="'+(ord==='linear')+'" title="By session, in the bank\'s order">In order</button><button type="button" data-qorder="random" aria-pressed="'+(ord==='random')+'" title="Shuffled (tap again to reshuffle)">'+icon('shuffle')+'Random</button></div>' +
         '<button type="button" class="qf-more" id="qfMore" aria-expanded="'+(!!QBANK_MORE)+'" aria-controls="qfExtra">'+QF_SLIDERS+'More filters<span class="qf-badge" id="qfBadge" hidden></span>'+LP_CARET+'</button></div>' +
       '<div class="qf-extra" id="qfExtra"'+(QBANK_MORE ? '' : ' hidden')+'><label class="qf-field"><span class="qf-lab">Question type</span><select id="qbType"><option value="all">Any type</option>' + types.map(function(o){ return '<option value="'+o[0]+'"'+(f.type===o[0]?' selected':'')+' data-label="'+escHtml(o[1])+'">'+o[1]+'</option>'; }).join('') + '</select></label>' +
@@ -7572,6 +7593,12 @@ function renderQuestionBank(){
     c.querySelectorAll('[data-qshow]').forEach(function(x){ x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
     track('show=' + (QBANK_FILTER.status === 'new' ? 'unseen' : QBANK_FILTER.status)); renderQuestionBankListOnly();
   }); });
+  /* Only: High likelihood on top of the Show chip; tapping it again turns it off */
+  c.querySelectorAll('[data-qlk]').forEach(function(b){ b.addEventListener('click', function(){
+    var k = b.getAttribute('data-qlk'); QBANK_FILTER.likely = QBANK_FILTER.likely === k ? '' : k;
+    c.querySelectorAll('[data-qlk]').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-qlk') === QBANK_FILTER.likely ? 'true' : 'false'); });
+    track('show=' + (QBANK_FILTER.likely || k + '-off')); renderQuestionBankListOnly();
+  }); });
   document.getElementById('qbType').addEventListener('change', function(e){ QBANK_FILTER.type = e.target.value; track('type=' + e.target.value); renderQuestionBankListOnly(); });
   var qs = document.getElementById('qbSrc'); if(qs) qs.addEventListener('change', function(e){ QBANK_FILTER.src = e.target.value; track('src=' + e.target.value); renderQuestionBankListOnly(); });
   document.getElementById('qfMore').addEventListener('click', function(){ QBANK_MORE = !QBANK_MORE; this.setAttribute('aria-expanded', QBANK_MORE ? 'true' : 'false'); document.getElementById('qfExtra').hidden = !QBANK_MORE; if(QBANK_MORE) track('more'); });
@@ -7585,9 +7612,9 @@ function renderQuestionBank(){
   if(!c.__qfWired){ c.__qfWired = 1; c.addEventListener('click', function(e){
     var off = e.target.closest && e.target.closest('[data-qoff]'), clr = e.target.closest && e.target.closest('[data-qclear]');
     if(!off && !clr) return;
-    if(clr){ track(clr.classList.contains('qsum-clear') ? 'clear' : 'empty-clear'); QBANK_FILTER = { search:'', lec:'all', type:'all', status:'all', src:'all' }; }
+    if(clr){ track(clr.classList.contains('qsum-clear') ? 'clear' : 'empty-clear'); QBANK_FILTER = { search:'', lec:'all', type:'all', status:'all', likely:'', src:'all' }; }
     else { var k = off.getAttribute('data-qoff'); track('tag-off=' + k);
-      if(k === 'lec') QBANK_FILTER.lec = 'all'; else if(k === 'st') QBANK_FILTER.status = 'all'; else if(k === 'ty') QBANK_FILTER.type = 'all'; else if(k === 'src') QBANK_FILTER.src = 'all'; else QBANK_FILTER.search = ''; }
+      if(k === 'lec') QBANK_FILTER.lec = 'all'; else if(k === 'lk') QBANK_FILTER.likely = ''; else if(k === 'st') QBANK_FILTER.status = 'all'; else if(k === 'ty') QBANK_FILTER.type = 'all'; else if(k === 'src') QBANK_FILTER.src = 'all'; else QBANK_FILTER.search = ''; }
     renderQuestionBank();
   }); }
   /* pins: the chip counts follow at once; an unpinned card stays on screen until the list redraws, so it doesn't jump away
@@ -7598,6 +7625,7 @@ function renderQuestionBank(){
 function qbankOnNow(){
   var p = [], ids = bankLecIds(), f = QBANK_FILTER, s = (f.search || '').trim();
   if(ids.length !== LECTURES.length) p.push(['lec', !ids.length ? 'No sessions' : ids.length === 1 ? lecPickSummary(ids) : ids.length <= 4 ? LECTURES.filter(function(l){ return ids.indexOf(l.id) !== -1; }).map(function(l){ return 'S' + l.num; }).join(', ') : ids.length + ' sessions']);
+  if(f.likely) p.push(['lk', bankLabelOf(BANK_LIKELY, f.likely)]);
   if(f.status && f.status !== 'all') p.push(['st', bankLabelOf(BANK_SHOW, f.status)]);
   if(f.type && f.type !== 'all') p.push(['ty', bankLabelOf(BANK_TYPES, f.type)]);
   if(f.src && f.src !== 'all') p.push(['src', SRC_LABEL[f.src] || f.src]);
@@ -7607,6 +7635,7 @@ function qbankOnNow(){
 function qbankCounts(){
   var c = content(); if(!c) return;
   c.querySelectorAll('[data-qshow-n]').forEach(function(el){ el.textContent = filteredQuestions({ status:el.getAttribute('data-qshow-n') }).length; });
+  c.querySelectorAll('[data-qlk-n]').forEach(function(el){ el.textContent = filteredQuestions({ likely:el.getAttribute('data-qlk-n') }).length; });
   var ty = document.getElementById('qbType'); if(ty) Array.prototype.forEach.call(ty.options, function(op){ if(op.value !== 'all') op.textContent = op.getAttribute('data-label') + ' (' + filteredQuestions({ type:op.value }).length + ')'; });
   var sr = document.getElementById('qbSrc'); if(sr) Array.prototype.forEach.call(sr.options, function(op){ if(op.value !== 'all') op.textContent = op.getAttribute('data-label') + ' (' + filteredQuestions({ src:op.value }).length + ')'; });
   var n = (QBANK_FILTER.type && QBANK_FILTER.type !== 'all' ? 1 : 0) + (QBANK_FILTER.src && QBANK_FILTER.src !== 'all' ? 1 : 0), bd = document.getElementById('qfBadge');
@@ -7615,7 +7644,7 @@ function qbankCounts(){
 /* In order: by session, then bank order. Random: one shuffle (QBANK_ORDER), kept until Random is tapped again */
 var QBANK_ORDER = null, RETRY_GAP = 5;
 function renderQuestionBankListOnly(){
-  var keep = { lec:QBANK_FILTER.lec, type:QBANK_FILTER.type, status:QBANK_FILTER.status, src:QBANK_FILTER.src || 'all' };
+  var keep = { lec:QBANK_FILTER.lec, type:QBANK_FILTER.type, status:QBANK_FILTER.status, likely:QBANK_FILTER.likely || '', src:QBANK_FILTER.src || 'all' };
   if(JSON.stringify(keep) !== JSON.stringify(STATE.ui.qbank || {})){ STATE.ui.qbank = keep; saveState(); }
   if(!QBANK_ORDER){
     var lecIdx = {}; LECTURES.forEach(function(l, i){ lecIdx[l.id] = i; });
@@ -7632,11 +7661,11 @@ function renderQuestionBankListOnly(){
   if(list){
     if(qs.length) list.innerHTML = qs.map(qCardHTML).join('');
     else {
-      var st = QBANK_FILTER.status, only = !on.some(function(p){ return p[0] !== 'st' && p[0] !== 'lec'; }), msg;
+      var st = QBANK_FILTER.status, lk = QBANK_FILTER.likely, hl = lk ? '<b>' + bankLabelOf(BANK_LIKELY, lk) + '</b> ' : '', only = !on.some(function(p){ return p[0] !== 'st' && p[0] !== 'lk' && p[0] !== 'lec'; }), msg;
       if(!bankLecIds().length) msg = 'No sessions are ticked, so there is nothing to show.';
       else if(st === 'pinned' && !pinnedIds().length) msg = 'No pinned questions yet. Tap <b>Pin</b> on any question to save it here.';
-      else if(st === 'missed' && only) msg = 'Nothing missed in these sessions. Questions you get wrong come back here.';
-      else if(st === 'new' && only) msg = 'You have answered every question here. Try <b>Missed last time</b>, or another session.';
+      else if(st === 'missed' && only) msg = lk ? 'You haven\'t missed any ' + hl + 'questions in these sessions. Questions you get wrong come back here.' : 'Nothing missed in these sessions. Questions you get wrong come back here.';
+      else if(st === 'new' && only) msg = 'You have answered every ' + hl + 'question here. Try <b>Missed last time</b>, or another session.';
       else msg = 'No questions match all of these: ' + on.map(function(p){ return '<b>' + escHtml(p[1]) + '</b>'; }).join(', ') + '.';
       list.innerHTML = '<div class="empty qf-empty"><p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all ' + QUESTIONS.length + ' questions</button></div>';
     }
@@ -7901,7 +7930,7 @@ function renderExamHints(){
   });
   content().innerHTML = h;
   content().querySelectorAll('[data-likely]').forEach(function(b){ b.addEventListener('click', function(){
-    QBANK_FILTER = { search:'', lec:b.getAttribute('data-likely'), type:'all', status:'likely' };
+    QBANK_FILTER = { search:'', lec:b.getAttribute('data-likely'), type:'all', status:'all', likely:'likely' };
     if(window.shTrack) window.shTrack('hints:likely-practice'); setView('question-bank'); window.scrollTo(0,0);
   }); });
 }

@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
+  bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
+  Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered
+  yet, Missed last time, Pinned) and becomes a tick-box toggle on its own **Only** line under Show (`STATE.ui.qlikely`,
+  `BANK_LIKELY`; Perio `QBANK_FILTER.likely`), which works on top of whichever Show chip is on. Its count follows the Show chip,
+  the chips' counts follow it, and the line under the panel gets a "High likelihood" tag. A saved Show "High likelihood" from
+  before becomes the toggle (`bankNormShow()`, Perio `qbankNorm()`); Exam Hints' "Practice these" turns it on, Home's buttons into
+  the bank turn it off. Heme & Endo Exam 2's **Exam 1 High likelihood** is a second toggle (one on at a time; it still ticks R).
+  The empty state says "You haven't missed any High likelihood questions in these lectures" and the like. Tracked as before
+  (`bank:show=likely`), plus `bank:show=likely-off` / `likely1-off` and `bank:tag-off=lk`. About page, both rules. No schema change.
+
 - **2026-11-06 (Occlusion L8 checked against the slides, and the Home timeline contrast in every hub, Claude Code)** —
   Sam: "Ive added the slides and lecture study guide. Fix the timeline contrast in the other hubs too." **Occlusion L8**
   (`dentures`), checked against `Occ Lec7 RDP Occlusion` (slides and handout, Drive Occlusion/Final): Hanau's term is

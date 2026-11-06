@@ -31,8 +31,9 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
   `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
-  The Question Bank's Show row has an extra chip for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
-  High Likelihood questions; tapping it ticks R if it isn't ticked. "High likelihood" still shows every lecture's.
+  The Question Bank's Only line has an extra toggle for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
+  High Likelihood questions; turning it on ticks R if it isn't ticked, and turns "High likelihood" (every lecture's) off. Either
+  one works on top of the Show chip (Missed last time, Not answered yet, Pinned).
   **R is review only and not in the hub's totals** (Sam, 2026-11-06: "they are just available for review since the exam 2
   will have 5 questions from that pool"): `COUNT_SKIP` / `COUNTED_QS` keep it out of the header's progress, Home's
   readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
