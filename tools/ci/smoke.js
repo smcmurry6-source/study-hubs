@@ -24,6 +24,7 @@ const HUB_SELECTORS = {
   games: '#panel-arcade .ar-grid [data-game], [data-sh-arcade] [data-game]',
   game: g => `#panel-arcade .ar-grid [data-game="${g}"], [data-sh-arcade] [data-game="${g}"]`
 };
+const EXTRACTED_HUBS = new Set(['occlusion', 'heme-endo-exam2', 'pcd-implants-exam1', 'special-patient-care']);
 
 /* The lint needs the complete content model. Legacy hubs expose it synchronously; the extracted hubs expose a core
    promise and an on-demand loader. This hook remains immediately before SH_EXPORT, whose final-statement contract CI
@@ -54,6 +55,100 @@ async function stub(context){
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   // the first-visit "Want a quick tour?" prompt dims the page and would block the clicks below; answer it up front
   await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); } catch (e) {} });
+}
+
+/* The normal desktop pass intentionally preloads data for the question-bank lint.
+   Exercise the extracted engine separately from a fresh Home page, before that
+   hook runs, so a missing on-demand dependency cannot be hidden by another tab. */
+async function freshLazyChecks(context, hub, label){
+  const cases = [
+    {
+      name: 'Bank',
+      open: async page => {
+        await page.click(HUB_SELECTORS.mode('compendium'));
+        await page.click('[data-sub="bank"]');
+      },
+      sets: ['questions', 'whys', 'cases', 'figures', 'review', 'study'],
+      verify: page => page.$eval('#compBody .qcard', el => !!el)
+    },
+    {
+      name: 'Mock',
+      open: async page => {
+        await page.click(HUB_SELECTORS.mode('compendium'));
+        await page.click('[data-sub="mock"]');
+      },
+      sets: ['questions', 'whys', 'cases', 'figures', 'review', 'study'],
+      verify: () => true
+    },
+    {
+      name: 'Weak Spots',
+      open: async page => {
+        await page.click(HUB_SELECTORS.mode('compendium'));
+        await page.click('[data-sub="weak"]');
+      },
+      sets: ['questions', 'whys', 'cases', 'figures', 'review', 'study'],
+      verify: () => true
+    },
+    {
+      name: 'Arcade',
+      open: page => page.click(HUB_SELECTORS.mode('arcade')),
+      sets: ['questions', 'whys', 'cases', 'figures', 'review', 'notes'],
+      verify: page => page.$eval(HUB_SELECTORS.games, el => !!el)
+    },
+    {
+      name: 'Daily Drill card',
+      open: page => page.evaluate(() => {
+        var pool = window.SH_DRILL && window.SH_DRILL.pool && window.SH_DRILL.pool();
+        if (!pool || !pool.length) throw new Error('Daily Drill did not receive Home question index');
+        var el = document.createElement('div'); el.id = 'ci-drill-card'; document.body.appendChild(el);
+        if (window.SH_DRILL.render(el, pool[0].id) === false) throw new Error('Daily Drill rejected a Home question id');
+      }),
+      sets: ['questions', 'whys', 'cases', 'figures', 'review', 'study'],
+      verify: page => page.$eval('#ci-drill-card .qcard', el => !!el)
+    },
+    {
+      name: 'Class stats',
+      open: page => page.evaluate(() => {
+        var button = document.getElementById('shstat-stats-pill');
+        if (!button) throw new Error('Class stats button is missing');
+        button.click();
+      }),
+      sets: ['questions'],
+      verify: () => true
+    }
+  ];
+  for (const check of cases) {
+    const page = await context.newPage(), errs = [];
+    page.on('pageerror', e => errs.push(e.message));
+    try {
+      await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
+      await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
+      await check.open(page);
+      await page.waitForFunction(sets => {
+        var content = window.shHubContent;
+        return content && sets.every(name => content.loaded(name));
+      }, check.sets, { timeout: 5000 });
+      if (!await check.verify(page)) problems.push(`${hub} (${label}): fresh ${check.name} did not render after its data loaded`);
+    } catch (e) {
+      problems.push(`${hub} (${label}): fresh ${check.name} lazy-load check failed: ${e.message || e}`);
+    }
+    errs.forEach(e => problems.push(`${hub} (${label}): fresh ${check.name} JavaScript error: ${e}`));
+    await page.close();
+  }
+  const frame = await context.newPage(), frameErrors = [];
+  frame.on('pageerror', e => frameErrors.push(e.message));
+  try {
+    await frame.goto(BASE() + `hubs/${hub}/index.html?sh_export=1`); await frame.waitForTimeout(800);
+    const question = await frame.evaluate(async () => {
+      if (window.SH_EXPORT_READY) await window.SH_EXPORT_READY;
+      return (window.SH_EXPORT && window.SH_EXPORT.questions || []).find(q => q && q.text && Array.isArray(q.choices) && q.choices.length) || null;
+    });
+    if (!question) problems.push(`${hub} (${label}): export-only frame did not publish a complete question`);
+  } catch (e) {
+    problems.push(`${hub} (${label}): export-only lazy-load check failed: ${e.message || e}`);
+  }
+  frameErrors.forEach(e => problems.push(`${hub} (${label}): export-only JavaScript error: ${e}`));
+  await frame.close();
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
@@ -206,6 +301,7 @@ function lint(hub, A){
       const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
       await page.close(); }
     for (const hub of hubs) {
+      if (!vp.isMobile && EXTRACTED_HUBS.has(hub)) await freshLazyChecks(context, hub, label);
       const page = await context.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {

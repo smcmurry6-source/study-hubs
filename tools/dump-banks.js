@@ -19,13 +19,12 @@ const hubs = fs.readdirSync(path.join(root, 'hubs')).filter(h => fs.existsSync(p
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   for (const hub of hubs) {
     const page = await ctx.newPage();
-    await page.route(`**/hubs/${hub}/index.html`, async route => {
-      const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-      if (i > 0) h = h.slice(0, i) + 'window.__DUMP = { Q: typeof QUESTIONS!=="undefined"?QUESTIONS:[], L: typeof LECTURES!=="undefined"?LECTURES:[] };\n' + h.slice(i);
-      route.fulfill({ response: r, body: h });
-    });
     await page.goto(`http://127.0.0.1:${server.address().port}/hubs/${hub}/index.html`); await page.waitForTimeout(800);
-    const A = await page.evaluate(() => window.__DUMP ? JSON.parse(JSON.stringify(window.__DUMP)) : null);
+    const A = await page.evaluate(async () => {
+      var content = window.shHubContent;
+      if (content && typeof content.ensure === 'function') await content.ensure('questions');
+      return { Q: typeof QUESTIONS !== 'undefined' ? QUESTIONS : [], L: typeof LECTURES !== 'undefined' ? LECTURES : [] };
+    }).then(A => JSON.parse(JSON.stringify(A)), () => null);
     if (A) { fs.writeFileSync(path.join(out, hub + '.json'), JSON.stringify(A)); console.log(`${hub}: ${A.Q.length} questions, ${A.L.length} lectures`); }
     else console.log(`${hub}: could not read its data (is window.SH_EXPORT still at the end of the script?)`);
     await page.close();

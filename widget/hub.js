@@ -144,13 +144,14 @@ window.shHubBind = function(scope){
     var ui = (get('STATE', {}) || {}).ui || {}, sub = ui.sub || 'notes';
     if(mode === 'compendium'){
       if(sub === 'notes') return ['notes','figures'];
-      if(sub === 'bank' || sub === 'mock') return ['questions','whys','cases','figures'];
-      if(sub === 'weak') return ['questions','whys','cases','figures'];
+      if(sub === 'bank') return ['questions','whys','cases','figures','review','study'];
+      if(sub === 'mock') return ['questions','whys','cases','figures','review','study'];
+      if(sub === 'weak') return ['questions','whys','cases','figures','review','study'];
       if(sub === 'hints' || sub === 'cram') return ['study'];
       return ['study'];
     }
     if(mode === 'review') return ['review','figures'];
-    if(mode === 'arcade') return ['questions','whys','review','cases','figures'];
+    if(mode === 'arcade') return ['questions','whys','review','cases','figures','notes'];
     return [];
   }
   function modeReady(mode){ return modeSets(mode).every(function(name){ return !!st.loaded[name]; }); }
@@ -179,6 +180,12 @@ window.shHubBind = function(scope){
     });
     st.ready = st.manifestPromise.then(function(){ return load('core'); });
     window.SH_CONTENT_READY = st.ready;
+    /* review/ loads ?sh_export=1 in a hidden frame. That frame has no user
+       view to keep lean, but its established export contract includes full
+       question text and choices, so make its readiness explicit. */
+    window.SH_EXPORT_READY = /(?:^|[?&])sh_export=1(?:[&#]|$)/.test(location.search)
+      ? st.ready.then(function(){ return api.ensure('questions'); })
+      : st.ready;
     return st.ready;
   }
   var api = window.shHubContent = {
@@ -194,9 +201,9 @@ window.shHubBind = function(scope){
   /* A drill card needs a complete question, not the compact Home index. Returning
    * true keeps the drill open while the real card replaces this short loader. */
   api.renderQuestion = function(el, draw){
-    if(api.loaded('questions') && api.loaded('whys')) return draw();
+    if(api.loaded('questions') && api.loaded('whys') && api.loaded('cases') && api.loaded('review') && api.loaded('study') && api.loaded('figures')) return draw();
     if(el) el.innerHTML = '<p class="rv-empty">Loading question…</p>';
-    api.ensure('questions', 'whys', 'notes', 'figures').then(function(){ if(el && el.isConnected) draw(); }, api.report);
+    api.ensure('questions', 'whys', 'cases', 'review', 'study', 'figures').then(function(){ if(el && el.isConnected) draw(); }, api.report);
     return true;
   };
   /* v3 registers its input handler later. Capture it here so a first search

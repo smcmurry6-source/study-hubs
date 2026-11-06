@@ -2223,6 +2223,14 @@
   });
 
   function loadStats(){
+    /* Extracted hubs initially publish only the compact Home question index.
+       Class stats labels must use the complete question stems, but should not
+       make Home fetch the bank until a student actually opens this panel. */
+    var content = window.shHubContent;
+    if (content && typeof content.ensure === "function" && typeof content.loaded === "function" && !content.loaded("questions")) {
+      content.ensure("questions").then(loadStats, content.report);
+      return;
+    }
     var toughEl = document.getElementById("shstat-tough");
     var modesEl = document.getElementById("shstat-modes");
     if (!supabase) { toughEl.innerHTML = modesEl.innerHTML = '<div class="shstat-empty">Class data isn&#39;t reachable right now.</div>'; return; }

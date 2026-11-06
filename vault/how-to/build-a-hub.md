@@ -88,6 +88,9 @@ extracted hub's content promise, then clicks through every hub on desktop and ph
 `tools/figures/<hub-id>/build.mjs --check` too. Its first local run writes the hub's question-id registry,
 `tools/question-ids/<hub-id>.txt`: commit it ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
 Then run the release suite for a shared-engine change and open a draft PR ([ship-a-change](ship-a-change.md)).
+For a shared-engine change, keep the fresh Home → Bank, Arcade, Daily Drill and Class stats smoke paths green: if a
+view or card reads another data group (for example `LIKELY_TOPICS`, `CASE_SETS` or note-derived game terms), add that
+group to its on-demand contract rather than relying on a previously visited tab to hydrate it.
 
 ## Adding a lecture
 

@@ -1017,6 +1017,15 @@ code{font-size:13px;}
   /* question text comes from each live hub's own SH_EXPORT, read from a hidden same-site
      frame (?sh_export=1 keeps that copy from logging any activity) */
   var QTEXT = {}, qtextLoaded = {};
+  function exportedHub(frame){
+    try {
+      var win = frame.contentWindow, ready = win.SH_EXPORT_READY;
+      if (ready && typeof ready.then === "function") return ready.then(function(){ return win.SH_EXPORT || {}; });
+      var content = win.shHubContent;
+      if (content && typeof content.ensure === "function") return content.ensure("questions").then(function(){ return win.SH_EXPORT || {}; });
+      return Promise.resolve(win.SH_EXPORT || {});
+    } catch (e) { return Promise.reject(e); }
+  }
   function loadQuestionText(hub){
     if (qtextLoaded[hub] || isArchived(hub)) return;
     qtextLoaded[hub] = true;
@@ -1025,12 +1034,15 @@ code{font-size:13px;}
     f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
     f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
     f.onload = function(){
-      try {
-        var ex = f.contentWindow.SH_EXPORT;
+      exportedHub(f).then(function(ex){
         (ex && ex.questions || []).forEach(function(q){ QTEXT[hub + "|" + q.id] = q; });
-      } catch (e) {}
-      f.remove();
-      if (state.tab === "overview" || state.tab === "questions") renderView(state.tab);
+      }, function(){}).then(function(){
+        f.remove();
+        if (state.tab === "overview" || state.tab === "questions") renderView(state.tab);
+      }, function(){
+        f.remove();
+        if (state.tab === "overview" || state.tab === "questions") renderView(state.tab);
+      });
     };
     document.body.appendChild(f);
   }
@@ -1202,7 +1214,7 @@ code{font-size:13px;}
       f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
       f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px"; f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
       var done = function(list){ f.remove(); resolve(list); };
-      f.onload = function(){ try { done(((f.contentWindow.SH_EXPORT || {}).questions || []).map(norm)); } catch (e) { done([]); } };
+      f.onload = function(){ exportedHub(f).then(function(ex){ done((ex.questions || []).map(norm)); }, function(){ done([]); }); };
       setTimeout(function(){ if (f.isConnected) done([]); }, 15000);
       document.body.appendChild(f);
     });
@@ -1958,8 +1970,7 @@ code{font-size:13px;}
       f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
       f.onload = function(){
         var ex = null;
-        try {
-          var x = f.contentWindow.SH_EXPORT;
+        exportedHub(f).then(function(x){
           if (x && Array.isArray(x.questions) && window.shQH) {
             var fps = {}; x.questions.forEach(function(q){ if (q && q.id) fps[q.id] = window.shQH.fp(q); });
             var qs = JSON.parse(JSON.stringify(x.questions)), byId = {};
@@ -1967,8 +1978,8 @@ code{font-size:13px;}
             var lec = {}; JSON.parse(JSON.stringify(x.lectures || [])).forEach(function(l){ lec[l.id] = l.title; });
             ex = { questions: qs, byId: byId, lec: lec };
           }
-        } catch (e) {}
-        fin(ex);
+          fin(ex);
+        }, function(){ fin(null); });
       };
       setTimeout(function(){ fin(null); }, 25000);
       document.body.appendChild(f);
