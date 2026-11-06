@@ -13,8 +13,9 @@ Why and how: [vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md
 
 1. This file.
 2. [vault/home.md](vault/home.md): the map of everything.
-3. **Every note in `vault/rules/`**: Sam's standing rules. They apply to every change you make. (Claude Code loads them
-   automatically through `CLAUDE.md`; every other agent reads them.)
+3. **The notes in `vault/rules/`**: Sam's standing rules. They apply to every change you make. Read every one,
+   except those marked `load: on-demand` (arcade, podcast, figures, a new hub's art): read those when your task
+   touches that feature (`CLAUDE.md`'s "Feature rules" says when). (Claude Code loads the rest through `CLAUDE.md`.)
 4. Your task note, if you were given one (`vault/tasks/...`), and every note it links.
 5. The note for each hub you'll touch: `vault/hubs/<hub-id>.md`.
 6. Before building a hub or adding a lecture: `LESSONS.md` and [vault/how-to/build-a-hub.md](vault/how-to/build-a-hub.md).
@@ -42,9 +43,9 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
   Playwright (CI runs them on every PR, with the secrets, database-permission and preview-safety checks). Details:
   [vault/how-to/verify-before-pushing.md](vault/how-to/verify-before-pushing.md).
 - **A substantial change** (a feature, anything in `widget/`, a new hub or lecture, a migration...) follows
-  [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): an interactive preview on made-up data (`node tools/preview/serve.js`), the
-  release suites (`node tools/release/run.js`), UAT, the bug log, a test report in the PR, and **Sam's explicit approval**
-  before it ships. Previews and tests never write to the class's data.
+  [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): the release suites (`node tools/release/run.js`), the bug log, a test
+  report in the PR, and **Sam's explicit approval** before it ships. A preview on made-up data, and UAT in it, only when
+  Sam asks for one or says yes when you ask (Sam, 2026-11-06). Previews and tests never write to the class's data.
 - **The PR description** says what changed in plain, student-facing words, what you ran and what passed, and anything
   you're unsure of. American English everywhere.
 - **Can't push?** (A chat agent with read-only access.) Give Sam the complete changed files or a patch, vault notes

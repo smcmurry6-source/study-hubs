@@ -1,4 +1,5 @@
-# The full automated release test (RELEASE_TEST_PLAN.md, "Automated gates") and an interactive preview to download.
+# The full automated release test (RELEASE_TEST_PLAN.md, "Automated gates"). The hosted preview is its own workflow,
+# preview.yml, on request only (Sam, 2026-11-06).
 # Runs on every pull request that changes the site, and by hand (Actions -> Release tests -> Run workflow).
 # It never deploys anything and never talks to the live database: every page runs on fixture data.
 name: Release tests
@@ -34,6 +35,8 @@ jobs:
     timeout-minutes: 40
     env:
       SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
+      # the smoke suite checks only the hubs a PR changes (HEAD^1 of the merge commit is its base); a run by hand checks every hub
+      SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
     steps:
       # The runner context isn't available in a job's env, so the results folder is set here for every later step.
       - name: Results folder outside the checkout
@@ -54,16 +57,6 @@ jobs:
       - name: Write the summary on this run's page
         if: ${{ !cancelled() }}
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
-      - name: Build the preview (fixture data, noindex, narration from the live site unless changed here)
-        if: ${{ !cancelled() }}
-        run: node tools/preview/build.js --out _preview --label "${{ github.event.pull_request.number && format('PR {0}', github.event.pull_request.number) || github.ref_name }}"
-      - name: Upload the preview (download, unzip, then node tools/preview/serve.js --dir <folder>)
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-site
-          path: _preview
-          retention-days: 14
       - name: Upload the test results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -71,90 +64,3 @@ jobs:
           name: release-test-results
           path: ${{ runner.temp }}/release
           retention-days: 30
-
-  # A preview link for every pull request that changes the site (RELEASE_TEST_PLAN.md, sections 3 and 13): this branch
-  # on made-up data at https://pr-<n>.<project>.pages.dev, put on the PR in one comment that's kept up to date. It needs
-  # the repo secret CLOUDFLARE_API_TOKEN (a token with only "Cloudflare Pages: Edit", never the Global API Key) and the
-  # repo variable CLOUDFLARE_ACCOUNT_ID; without them it says so on the run's page and stops.
-  preview:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      pull-requests: write
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      CF_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'study-hubs-preview' }}
-      WRANGLER_SEND_METRICS: 'false'
-    steps:
-      - name: Is the preview host connected?
-        id: host
-        run: |
-          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "ready=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "No preview link: the repo secret CLOUDFLARE_API_TOKEN or the variable CLOUDFLARE_ACCOUNT_ID isn't set. The preview-site artifact is still attached by the release job." >> "$GITHUB_STEP_SUMMARY"
-          fi
-      - uses: actions/checkout@v4
-        if: steps.host.outputs.ready == 'yes'
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        if: steps.host.outputs.ready == 'yes'
-        with:
-          node-version: 22
-      - name: Build the preview (no Timmy Time episodes, over Cloudflare's 25 MB a file; they play the live site's copy)
-        if: steps.host.outputs.ready == 'yes'
-        run: node tools/preview/build.js --out _preview --no-podcast --label "${{ github.event.pull_request.number && format('PR {0}', github.event.pull_request.number) || github.ref_name }}"
-      # Says which part of the setup is wrong without printing the token: not a working API token at all (a Global API
-      # Key gets the same "Authentication error" from wrangler), or a token that can't reach this account's Pages.
-      - name: Check the Cloudflare token
-        if: steps.host.outputs.ready == 'yes'
-        run: |
-          api() { curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/$1"; }
-          if [ "$(api user/tokens/verify)" = 200 ] || [ "$(api "accounts/$CLOUDFLARE_ACCOUNT_ID/tokens/verify")" = 200 ]; then
-            echo "The token is a working API token."
-          else
-            echo "::error::CLOUDFLARE_API_TOKEN isn't a working API token. A Global API Key doesn't work here: create a token (My Profile, API Tokens, Create Token, Create Custom Token) with Account, Cloudflare Pages, Edit, and replace the secret."
-            exit 1
-          fi
-          code=$(api "accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects")
-          if [ "$code" != 200 ]; then
-            echo "::error::The token works but can't open Cloudflare Pages on account $CLOUDFLARE_ACCOUNT_ID (HTTP $code). Give it Account, Cloudflare Pages, Edit on that account, and check that CLOUDFLARE_ACCOUNT_ID is that account's id."
-            exit 1
-          fi
-          echo "It can open Cloudflare Pages on account $CLOUDFLARE_ACCOUNT_ID."
-      - name: Deploy it to Cloudflare Pages
-        id: deploy
-        if: steps.host.outputs.ready == 'yes'
-        env:
-          BRANCH: ${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || github.ref_name }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -o pipefail
-          BRANCH=$(printf '%s' "$BRANCH" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9' '-' | cut -c1-28)
-          npx --yes wrangler@4 pages project create "$CF_PROJECT" --production-branch main > /dev/null 2>&1 || true
-          npx --yes wrangler@4 pages deploy _preview --project-name "$CF_PROJECT" --branch "$BRANCH" --commit-hash "$HEAD_SHA" --commit-dirty=true 2>&1 | tee "$RUNNER_TEMP/deploy.log"
-          URL=$(grep -oE "https://$BRANCH\.[a-z0-9-]+\.pages\.dev" "$RUNNER_TEMP/deploy.log" | tail -1)
-          [ -n "$URL" ] || URL=$(grep -oE 'https://[a-z0-9.-]+\.pages\.dev' "$RUNNER_TEMP/deploy.log" | tail -1)
-          [ -n "$URL" ] || { echo "::error::The deploy finished without printing a preview address"; exit 1; }
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "**Preview:** $URL (this branch on made-up data; noindex)" >> "$GITHUB_STEP_SUMMARY"
-      - name: Put the preview link on the pull request
-        if: steps.deploy.outputs.url && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        env:
-          URL: ${{ steps.deploy.outputs.url }}
-          SHA: ${{ github.event.pull_request.head.sha }}
-        with:
-          script: |
-            const marker = '<!-- sh-preview-link -->';
-            const body = [marker, `**Preview:** ${process.env.URL}`, '',
-              `This PR's site on made-up data, never the class's (updated for ${process.env.SHA.slice(0, 7)}). ` +
-              'Tap **Preview** at the bottom left for the test accounts and time travel.'].join('\n');
-            const { owner, repo } = context.repo, issue_number = context.issue.number;
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
-            const mine = comments.find(c => c.user && c.user.type === 'Bot' && (c.body || '').includes(marker));
-            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
-            else await github.rest.issues.createComment({ owner, repo, issue_number, body });

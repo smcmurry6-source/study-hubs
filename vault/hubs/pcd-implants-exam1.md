@@ -82,7 +82,11 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   wrong answer). Flagged while that shipped, all "stronger students miss it more", keys matching the notes: `ev-2s-5`
   (statement 2 now says the notes' white, yellow, red instead of "grippier colors"), `in-num-3` (the explanation says the
   JE does attach to titanium; statement 2's hemidesmosomes are the false part) and `su-voxel` (smaller voxels and closer
-  slices mean more dose; the CBCT lecture's "choose the smallest voxel" is about detail). **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
+  slices mean more dose; the CBCT lecture's "choose the smallest voxel" is about detail). Then two more: `in-1stage` (the
+  wrong choice "Brånemark (1985); it avoids a cover screw" was half true, since one-stage skips the cover screw; it now
+  says "avoids a healing abutment") and `cb-hu-ref` (the explanation gives air -1000, water 0; most misses shifted it by
+  1000). Flags keep arriving on exam day as the class answers: re-check `qh_report` rather than assume the list is done.
+  **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
   key plus the explanation), so an explanation edit starts fresh numbers and a why-line edit doesn't. Ids removed on Sam's
   11-03 call (`tm-code-6010`, `tm-code-6058`, `tm-conelog`, `tm-rc-grooves`, `gs-credit`) are retired in
   `tools/question-ids/pcd-implants-exam1.txt`; the admin page lists the ones with class data as "gone".

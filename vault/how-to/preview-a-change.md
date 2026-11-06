@@ -8,6 +8,12 @@ tags: [shipping, testing]
 A preview is the site from your branch, in a real browser, on made-up data: use it like a student before Sam does.
 Why and the safety layers: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) (sections 3-5).
 
+**Only on request** (Sam, 2026-11-06: "for the majority of cases i dont need it";
+[preview-and-release-test](../rules/preview-and-release-test.md)). For a tier 2 or 3 change, ask Sam once, in one line,
+when you hand it over: "Want a preview of this?" Make one only when Sam says yes, or asks. Tier 0 and 1: don't ask.
+Without a preview, take screenshots in a scripted browser with the class's data stubbed (as `tools/ci/smoke.js` does),
+never on the plain page as a test account: that saves to the class's real data.
+
 ## Open one
 
 - **On your computer:** `node tools/preview/serve.js`, then open `http://127.0.0.1:4173/`. It serves the checkout as it
@@ -16,9 +22,10 @@ Why and the safety layers: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) (s
   same Wi-Fi.
 - **In a Claude Code cloud session:** run `node tools/preview/serve.js --port 4173` in the background, then call
   `report_preview_port` with 4173. Sam opens it from the Claude app, on a phone too, while the session is up.
-- **From a PR, on a phone:** the link in the PR's preview comment, `https://pr-<n>.<project>.pages.dev` (Cloudflare
-  Pages, deployed by the "Release tests" run; no Timmy Time episodes, which play the live site's copy).
-- **From a PR, on a computer:** the "Release tests" run also attaches `preview-site`. Download it, unzip, and
+- **From a PR, on a phone:** add the `preview` label to the PR (or run Actions, Preview, Run workflow on its branch).
+  The Preview workflow deploys it to Cloudflare Pages and puts the link, `https://pr-<n>.<project>.pages.dev`, in a PR
+  comment, kept up to date on each push while the label stays (no Timmy Time episodes, which play the live site's copy).
+- **From a PR, on a computer:** the same Preview run attaches `preview-site`. Download it, unzip, and
   `node tools/preview/serve.js --dir preview-site`.
 - **A static copy** for a host: `node tools/preview/build.js --out _preview` (`_preview/` is gitignored), checked with
   `node tools/preview/build.js --check _preview`.
@@ -48,8 +55,8 @@ If the button turns red, something tried to reach production: that's an S1 bug, 
 Sam looks at a substantial change before approving it and doesn't test it
 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one easy look:
 
-- **The preview link on its own line, first, every time** (Sam, 2026-11-04): `Preview: https://pr-<n>.<project>.pages.dev`,
-  copied from the PR's preview comment (or the "Release tests" run's page), then the page and test account to open
+- **When Sam asked for a preview, its link on its own line, first** (Sam, 2026-11-04): `Preview: https://pr-<n>.<project>.pages.dev`,
+  copied from the PR's preview comment (or the Preview run's page), then the page and test account to open
   (`hubs/occlusion/?persona=missed`). Never send a session's own link instead: a cloud session's preview has no address
   outside it. If the PR has no link yet (the run hasn't finished, or the host isn't connected), say so.
 - **Screenshots** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when colors changed, at

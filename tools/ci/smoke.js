@@ -12,7 +12,35 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': TYPES[path.extname(f)] || 'application/octet-stream', 'Content-Length': st.size }); fs.createReadStream(f).pipe(res); });
 }).listen(0, '127.0.0.1');
 const BASE = () => `http://127.0.0.1:${server.address().port}/`;
-const hubs = fs.readdirSync(path.join(root, 'hubs')).filter(h => fs.existsSync(path.join(root, 'hubs', h, 'index.html')));
+const allHubs = fs.readdirSync(path.join(root, 'hubs')).filter(h => fs.existsSync(path.join(root, 'hubs', h, 'index.html')));
+/* Which hubs to click through and lint (2026-11-06): only the hubs a change touches, because one hub's files never
+   reach another hub's page (no hub loads another's files). Every hub when a shared file changes (widget/, the dashboard,
+   sw.js, assets, a workflow, this test), on main, with --all or SMOKE_ALL=1, or when git can't tell what changed. Files
+   that never reach a page (notes, tools, SQL, the vault, about/ and review/, which this test doesn't open) don't count.
+   The dashboard is always checked. SMOKE_CHANGED_FROM=<git ref> sets the base (CI: the PR's base, HEAD^1 of the merge
+   commit); locally it's where this branch left origin/main, and uncommitted and new files count too. */
+const NEVER_ON_A_PAGE = /^(vault\/|tools\/|supabase\/|\.claude\/|\.obsidian\/|about\/|review\/|migration_v[^/]*\.sql$|\.gitignore$)|(^|\/)[^/]+\.md$/;
+function pickHubs(){
+  if (process.argv.includes('--all') || process.env.SMOKE_ALL) return { hubs: allHubs, why: 'every hub (--all)' };
+  let base = process.env.SMOKE_CHANGED_FROM;
+  if (!base && process.env.CI) return { hubs: allHubs, why: 'every hub (a CI run that is not a pull request)' };
+  const git = (...a) => require('child_process').execFileSync('git', a, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  let changed;
+  try {
+    if (!base) base = git('merge-base', 'HEAD', 'origin/main').trim();
+    changed = (git('diff', '--name-only', '--no-renames', base) + '\n' + git('ls-files', '--others', '--exclude-standard')).split('\n').filter(Boolean);
+  } catch (e) { return { hubs: allHubs, why: `every hub (git couldn't tell what changed${base ? ' since ' + base : ''})` }; }
+  const touched = new Set();
+  for (const f of changed) {
+    const m = /^hubs\/([^/]+)\//.exec(f) || /^tools\/question-ids\/([^/]+)\.txt$/.exec(f);
+    if (m) { touched.add(m[1]); continue; }
+    if (f === 'tools/ci/smoke.js' || !NEVER_ON_A_PAGE.test(f)) return { hubs: allHubs, why: `every hub (${f} is shared)` };
+  }
+  const hubs = allHubs.filter(h => touched.has(h));
+  return { hubs, why: (hubs.length ? `the hub(s) this change touches: ${hubs.join(', ')}` : 'no hub changed, so the dashboard only') + ' (--all checks every hub)' };
+}
+const { hubs, why: hubsWhy } = pickHubs();
+console.log(`Smoke test: ${hubsWhy}`);
 const problems = [], notes = [];
 
 async function stub(context){
@@ -263,5 +291,5 @@ function lint(hub, A){
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-  console.log('\n✓ smoke test and question lint passed');
+  console.log(`\n✓ smoke test and question lint passed: ${hubsWhy}`);
 })().catch(e => { console.error(e); process.exit(1); });

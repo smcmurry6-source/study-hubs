@@ -9,11 +9,12 @@
 
 ## Preview
 
-Preview: <!-- the link from this PR's preview comment, on its own line -->
+Preview: <!-- only when Sam asked for one (the `preview` label): the link from this PR's preview comment, on its own
+     line. Otherwise write "none, not asked for" (vault/rules/preview-and-release-test.md). -->
 
-<!-- What Sam was shown (screenshots, a recording, the cloud session's live preview) and how to open the preview (a
-     cloud session, or the "Release tests" run's preview-site artifact). The Preview button's status at the end:
-     "No request has reached production". -->
+<!-- What Sam was shown (screenshots, a recording, the cloud session's live preview) and, with a preview, how to open it
+     (the PR's link, a cloud session, or the Preview run's preview-site artifact) and the Preview button's status at the
+     end: "No request has reached production". -->
 
 ## Checks run
 

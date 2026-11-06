@@ -69,7 +69,8 @@ Perio, PCD Implants and Occlusion have all of this (Occlusion's `PCASES` is empt
   and check the drawn view too (a furcation question can show the film's radiolucency but not the chart's triangle).
 - Numbering is universal; the kit puts teeth in viewer order (the patient's right on your left) and flips upper
   arches crowns-down on the chart and the film, as on a real chart and film.
-- Look at it in the preview on a phone and in dark mode before the PR ([preview-a-change](preview-a-change.md)).
+- Look at it on a phone and in dark mode before the PR: in a scripted browser with the class's data stubbed, or in the
+  preview when Sam asked for one ([preview-and-release-test](../rules/preview-and-release-test.md)).
 
 ## Where the anatomy comes from
 

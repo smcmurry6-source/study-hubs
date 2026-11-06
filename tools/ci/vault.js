@@ -3,8 +3,9 @@
 //  - no [[wikilinks]] (GitHub and agents can't follow them)
 //  - every vault note has frontmatter with a `type`
 //  - task notes have a valid status; vault/tasks/done/ holds only done or dropped tasks, and done ones live there
-//  - every rule note is listed in vault/home.md and imported (@vault/rules/<file>) by CLAUDE.md
-//  - every @import in CLAUDE.md exists
+//  - every rule note is listed in vault/home.md and imported (@vault/rules/<file>) by CLAUDE.md, except a rule for one
+//    feature (`load: on-demand`), which CLAUDE.md links under "Feature rules" instead of importing (2026-11-06)
+//  - every @import in CLAUDE.md, and in a folder's own CLAUDE.md (tools/figures/, tools/podcast/), exists
 //  - every hub folder (hubs/<id>/index.html) has vault/hubs/<id>.md, and every hub note is listed in vault/home.md
 const fs = require('fs'), path = require('path');
 const root = path.resolve(__dirname, '../..');
@@ -72,7 +73,13 @@ const claudeText = fs.existsSync(claude) ? fs.readFileSync(claude, 'utf8') : '';
 if (fs.existsSync(rulesDir)) {
   for (const f of fs.readdirSync(rulesDir).filter(f => f.endsWith('.md'))) {
     if (!homeText.includes(`(rules/${f})`)) problems.push(`vault/rules/${f}: not listed in vault/home.md`);
-    if (!new RegExp(`^@vault/rules/${f.replace(/\./g, '\\.')}\\s*$`, 'm').test(claudeText)) problems.push(`vault/rules/${f}: not imported by CLAUDE.md (add a line "@vault/rules/${f}")`);
+    const imported = new RegExp(`^@vault/rules/${f.replace(/\./g, '\\.')}\\s*$`, 'm').test(claudeText);
+    const load = (frontmatter(fs.readFileSync(path.join(rulesDir, f), 'utf8')) || {}).load;
+    if (load && load !== 'on-demand') problems.push(`vault/rules/${f}: load is "${load}"; it can only be on-demand (or left out)`);
+    else if (load === 'on-demand') {
+      if (imported) problems.push(`vault/rules/${f}: is load: on-demand, but CLAUDE.md imports it (link it under "Feature rules" instead, or drop load: on-demand)`);
+      if (!claudeText.includes(`(vault/rules/${f})`)) problems.push(`vault/rules/${f}: is load: on-demand; link it under "Feature rules" in CLAUDE.md, saying when to read it`);
+    } else if (!imported) problems.push(`vault/rules/${f}: not imported by CLAUDE.md (add a line "@vault/rules/${f}")`);
   }
 }
 // every hub folder has its note, and every hub note is on the map
@@ -89,6 +96,15 @@ if (fs.existsSync(hubNotes)) {
 }
 for (const m of prose(claudeText).matchAll(/^@(\S+)\s*$/gm)) {
   if (!fs.existsSync(path.join(root, m[1]))) problems.push(`CLAUDE.md imports @${m[1]}, which doesn't exist`);
+}
+// a folder's own CLAUDE.md (Claude Code loads it when a session opens a file there): its imports resolve from its folder
+for (const dir of ['tools', '.claude']) {
+  const found = [], look = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    if (e.isDirectory() && e.name !== 'node_modules') look(path.join(d, e.name)); else if (e.name === 'CLAUDE.md') found.push(path.join(d, e.name)); });
+  look(path.join(root, dir));
+  for (const f of found) for (const m of prose(fs.readFileSync(f, 'utf8')).matchAll(/^@(\S+)\s*$/gm)) {
+    if (!fs.existsSync(path.resolve(path.dirname(f), m[1]))) problems.push(`${rel(f)} imports @${m[1]}, which doesn't exist`);
+  }
 }
 
 if (problems.length) { problems.forEach(p => console.error('✗ ' + p)); console.error(`Vault check failed (${problems.length})`); process.exit(1); }

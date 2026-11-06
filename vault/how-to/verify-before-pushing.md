@@ -8,7 +8,10 @@ tags: [shipping, ci]
 GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/syntax.js`
 (every inline script parses, no conflict markers), `node tools/ci/vault.js` (vault links resolve, task notes and
 rule notes in order; see [repo-is-the-vault](../rules/repo-is-the-vault.md)) and `node tools/ci/smoke.js` (headless click-through
-of the dashboard and every hub on desktop and phone, plus a question-bank lint: duplicate ids, answer
+of the dashboard and, since 2026-11-06, only the hubs your change touches: every hub when a shared file changes
+(`widget/`, the dashboard, `sw.js`, assets, a workflow, the test itself), on `main`, or with `--all`; notes, tools, SQL
+and the vault don't count. It works this out from git (on a PR, against its base) and prints which hubs it checked.
+On desktop and phone, plus a question-bank lint of those hubs: duplicate ids, answer
 ranges, missing explanations, a missing "why" for any choice, missing narration files, the correct answer being the longest choice
 in more than 40% of MCQs, statement keys that form a pattern (a two-statement choice keyed in over 40% or under 10% of a hub's items, a
 numbered key in one position over 45%, a statement number true in over 90%), and question ids against `tools/question-ids/<hub>.txt`: a renamed or deleted id fails,

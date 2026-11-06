@@ -7,9 +7,11 @@ Pushing to `main` IS deploying — classmates see it within a minute or two.
 **This repo is a vault** (Sam's standing rule, 2026-11-03, `vault/rules/repo-is-the-vault.md`): the rules, how-tos, hub
 notes, decisions and tasks are linked notes under `vault/`, shared with every other agent, and `AGENTS.md` is the entry
 point for all of them. This file loads `AGENTS.md` and every note that used to be written out here, so a Claude Code
-session starts with all the rules; read hub notes (`vault/hubs/`), `vault/decisions.md`, task notes and how-tos such as
+session starts with every rule except the few for one feature ("Feature rules" below, read when a task touches
+that feature); read hub notes (`vault/hubs/`), `vault/decisions.md`, task notes and how-tos such as
 `vault/how-to/build-a-hub.md` on demand. **To change a rule, edit its note in `vault/rules/`**, not this file. A new rule gets its own note, a line in
-`vault/home.md` and an import line below; `node tools/ci/vault.js` fails without both.
+`vault/home.md` and an import line below (a rule for one feature: `load: on-demand` and a line under "Feature rules"
+instead); `node tools/ci/vault.js` fails without them.
 
 @AGENTS.md
 
@@ -68,23 +70,7 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/hub-home-page.md
 
-@vault/rules/arcade-skins.md
-
-@vault/rules/every-hub-gets-its-own-art.md
-
 @vault/rules/text-and-audio-never-drift.md
-
-@vault/rules/podcast-reactions.md
-
-@vault/rules/podcast-intro.md
-
-@vault/rules/diagram-review.md
-
-@vault/rules/diagrams-anima.md
-
-@vault/rules/figures-teach-the-lecture.md
-
-@vault/rules/outside-sources-for-figures.md
 
 @vault/rules/archiving-is-a-retrospective.md
 
@@ -95,6 +81,24 @@ applies here too, except where a note says how a Claude Code session does it dif
 @vault/rules/preview-and-release-test.md
 
 @vault/rules/learner-data-privacy.md
+
+## Feature rules: read them when your task touches the feature
+
+These standing rules apply to one feature each, so they aren't loaded into every session (Sam, 2026-11-06: tasks were
+slow to start). They bind just as much: **read the ones for a feature before you change it.** Claude Code also loads
+them by itself when it opens a file in `tools/figures/` or `tools/podcast/` (each has a `CLAUDE.md` that imports them),
+and the `/podcast` and `anima` skills point at them.
+
+- **An arcade game or a hub's arcade skin** (`widget/games.js`, a hub's `GAMES` list or skin, lobby thumbnails):
+  [arcade-skins](vault/rules/arcade-skins.md).
+- **A Timmy Time episode** (`tools/podcast/`, a hub's `SH_PODCAST`, `widget/podcast.js`):
+  [podcast-intro](vault/rules/podcast-intro.md), [podcast-reactions](vault/rules/podcast-reactions.md).
+- **Any figure** (anima figures, drawn `FIGS`, case images, diagram questions, a game that draws anatomy), and the
+  diagram review that **building a hub or adding lectures** always includes: [diagram-review](vault/rules/diagram-review.md),
+  [diagrams-anima](vault/rules/diagrams-anima.md), [figures-teach-the-lecture](vault/rules/figures-teach-the-lecture.md),
+  [outside-sources-for-figures](vault/rules/outside-sources-for-figures.md).
+- **A new hub's art** (emblem, masthead scene, medals, tint; `tools/figures/site/`):
+  [every-hub-gets-its-own-art](vault/rules/every-hub-gets-its-own-art.md).
 
 ## How-tos and reference
 
