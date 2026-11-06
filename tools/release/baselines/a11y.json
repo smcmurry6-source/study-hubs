@@ -1,6 +1,6 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-05",
+ "updated": "2026-11-06",
  "pages": {
   "dashboard": {
    "axe": {
@@ -61,20 +61,7 @@
    "motion": 0
   },
   "occlusion · home": {
-   "axe": {
-    "color-contrast": {
-     "n": 8,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".tag-amber > .lec-num"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
+   "axe": {},
    "focus": {
     "invisible": 0,
     "stuck": 0,
@@ -85,13 +72,13 @@
   "occlusion · compendium": {
    "axe": {
     "color-contrast": {
-     "n": 3,
+     "n": 2,
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": "button[data-lec=\"applying\"] > .lec-num"
+     "sample": ".status-badge"
     },
     "label-content-name-mismatch": {
-     "n": 4,
+     "n": 3,
      "impact": "serious",
      "help": "Elements must have their visible text as part of their accessible name",
      "sample": ".sh-pod-rate"
@@ -103,16 +90,10 @@
   "occlusion · review": {
    "axe": {
     "color-contrast": {
-     "n": 7,
+     "n": 6,
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".tag-teal.gc-lec"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     }
    },
    "focus": null,
@@ -125,12 +106,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": "button[data-mode=\"arcade\"] > .mode-label"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     }
    },
    "focus": null,
@@ -376,20 +351,7 @@
    "motion": 0
   },
   "occlusion (dark)": {
-   "axe": {
-    "color-contrast": {
-     "n": 9,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".primary.btn[data-home=\"mock\"]"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
+   "axe": {},
    "focus": null,
    "motion": 0
   },
