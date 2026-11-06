@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (question health: PCD Implants on exam day, Claude Code)** — Sam: "review implants question health, fix the
+  issues, mark them in the admin page, and merge". The 10 questions flagged since #267 were checked against the notes; every
+  key matches; same ids; no notes text changed, so no narration or podcast change. **New wording**: `ev-tmi-bone` (its key
+  said "distal to the plate"; the notes say the bone *behind* the plate grew thicker) and `bm-goodacre` (the stem names
+  Goodacre's review instead of "the slide", and the porcelain choice's why says the veneer that fractured often was resin).
+  **New explanations and why lines**: `im-crest` (the crest as the early warning sign; the stability dip isn't on a film),
+  `su-esth-span` (the table's span row: a wide single space is low risk), `su-bar` (her table by the space available),
+  `su-mm-1` (each risk factor's group: malpositioning is surgical-related) and `su-match` (a matching card shows only its
+  explanation after answering, so it now lists the four pairs). These seven start fresh numbers. **Looks fine**:
+  `bm-moment`, `im-pa-follow`, `tm-2s-6`. All ten marked on the admin page (`admin_review_question`; the seven as Fixed
+  once the new versions were live).
+
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
   Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered
