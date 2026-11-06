@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 ("Why each choice" starts folded, every live hub, Claude Code)** — Sam: "after you answer a question,
+  have the 'why each choice' be collapsed by default. it takes up a lot of screen space". `whyHTML` no longer opens its
+  `<details class="qx-why">`, so after answering a student sees the explanation and one "Why each choice" bar, and taps it
+  for the list (with their pick marked, as before). On a phone the folded bar is 43 px tall, against 430-590 px open. The
+  bar is now the whole tap target (padding moved from the box to the `summary`). In Occlusion, Perio, Special Patient Care,
+  Heme & Endo Exams 1 and 2 and PCD Implants: Question Bank, Daily Drill, Weak Spots and mock review. Opening it is
+  counted by `widget/clicks.js` as the "Why each choice" click (no new tracking). About page entry rewritten.
+
 - **2026-11-06 (question health: the newly flagged PCD Implants questions, Claude Code)** — Sam had the agent mark the 33
   questions reviewed in #258 on the admin page (12 Fixed, 21 Looks fine, through `admin_review_question` with the admin page's
   versions and flags; recorded in `vault/decisions.md`), then said yes to reviewing the PCD Implants questions flagged since

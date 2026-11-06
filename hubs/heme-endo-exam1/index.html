@@ -598,9 +598,9 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 .fig-key dt{font-weight:700;font-family:var(--font-mono)}
 .fig-key dd{margin:0;color:var(--ink-soft)}
 .mock-foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:10px; margin:22px 0 8px; padding:14px 0 0; border-top:1px solid var(--line);}
-.qx-why{margin-top:10px;padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface,transparent)}
-.qx-why summary{cursor:pointer;font-weight:700;font-size:.85rem;letter-spacing:.02em}
-.qx-why ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.qx-why{margin-top:10px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface,transparent)}
+.qx-why summary{cursor:pointer;font-weight:700;font-size:.85rem;letter-spacing:.02em;padding:10px 11px;border-radius:8px}
+.qx-why ul{list-style:none;margin:0;padding:0 11px 10px;display:grid;gap:8px}
 .qx-why li{display:flex;gap:8px;align-items:flex-start;font-size:.92em;line-height:1.45;padding:6px 8px;border-radius:6px}
 .qx-why li.is-picked{outline:2px solid currentColor;outline-offset:-1px}
 .qx-why li.is-right .qx-why-mark{color:var(--good)} .qx-why li.is-wrong .qx-why-mark{color:var(--bad)}
@@ -4489,8 +4489,8 @@ var MOCK_LIMIT = 90 * 60;
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
 /* why each choice is right or wrong (2026-10-20, Sam): one line per choice, in the same order as q.choices, for
-   every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), with your
-   pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
+   every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), folded until
+   tapped, with your pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
 var QUESTION_WHY = {
   "rv-sst":["Somatostatin inhibits glucagon; it never stimulates any hormone.", "Rising glucose does stimulate somatostatin, part of the brake on insulin.", "In the gut it does slow motility and nutrient absorption.", "It does suppress insulin: the paracrine brake, through a Gi receptor.", "Fuel from a meal (amino acids, fatty acids) does stimulate it."],
   "rv-ins-muscle":["Insulin brings glucose into muscle through GLUT4 and stores it as glycogen.", "Lipolysis is a catabolic process; insulin blocks it in fat.", "Gluconeogenesis is a liver process driven by glucagon and cortisol; insulin suppresses it.", "Insulin builds muscle protein; breaking it down is cortisol's effect.", "Ketone bodies are made in the liver when insulin is missing and glucagon goes unopposed."],
@@ -5131,12 +5131,13 @@ function pboxHTML(q){
 var MULTI_STATE = {};
 function multiScore(q, picks){ var hit = picks.filter(function(i){ return q.correct.indexOf(i) > -1; }).length; return Math.max(0, (hit - (picks.length - hit)) / q.correct.length); }
 /* memory cue (q.cue): a mnemonic or hook, shown only after a miss (student suggestion, 2026-10-02) */
-/* the "Why each choice" list: right answers first, then the rest; picks = the indexes the student chose (marked) */
+/* the "Why each choice" list: right answers first, then the rest; picks = the indexes the student chose (marked).
+   It starts folded (Sam, 2026-11-06: it took up too much of the screen); tapping its bar opens it. */
 function whyHTML(q, picks){
   if(!q.why || !q.choices) return '';
   var ok = function(i){ return q.type === 'multi' ? q.correct.indexOf(i) > -1 : i === q.answer; };
   var idx = q.choices.map(function(c,i){ return i; }).sort(function(a,b){ return (ok(b)?1:0) - (ok(a)?1:0) || a - b; });
-  return '<details class="qx-why" open><summary>Why each choice</summary><ul>' + idx.map(function(i){
+  return '<details class="qx-why"><summary>Why each choice</summary><ul>' + idx.map(function(i){
     var p = picks && picks.indexOf(i) > -1;
     return '<li class="'+(ok(i)?'is-right':'is-wrong')+(p?' is-picked':'')+'" data-why-idx="'+i+'"><span class="qx-why-mark" aria-hidden="true">'+(ok(i)?'✓':'✗')+'</span><span><b>'+escHtml(q.choices[i])+'</b>'+(p?'<em class="qx-why-you"> your pick</em>':'')+'<br>'+escHtml(q.why[i])+'</span></li>';
   }).join('') + '</ul></details>';

@@ -65,5 +65,8 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-06: Sam asked for "Why each choice" to start folded after answering (it took up too much of the screen), and
+  all six live hubs now do ([decisions](../decisions.md)). The design page (`tools/preview/design/`) opens the why for
+  your pick on an answered card: ask Sam whether the engine's card folds that line too before building it.
 
 ## Outcome
