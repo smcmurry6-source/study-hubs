@@ -24,7 +24,9 @@ weekly retention job's deletes on the same kind of copy: the hourly totals, devi
 rules against the old date logic), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright) and
 `node tools/ci/cases.js` (every drawn Patient Box case has realistic numbers that agree with its key,
 [how-to](draw-a-patient-box-case.md)), and
-a second workflow, "Release tests", runs accessibility, performance and the device matrix on site changes
+a second workflow, "Release tests", runs accessibility, performance and the device matrix when a PR changes shared code
+(the dashboard, `widget/`, the service worker, the admin page, the database...) or has the `full-tests` label (since
+2026-11-06: hub content and notes skip it; a tier 2 or 3 change inside hubs gets the label)
 ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything). Run them locally before pushing; the smoke test needs Playwright
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.

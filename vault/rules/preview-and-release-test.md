@@ -27,7 +27,8 @@ say what counts as substantial, is [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLA
 - **No production data, ever:** previews and tests run on fixtures (or a staging project), never write to the class's
   data and never count in the analytics. Never type the real admin secret into a preview; never copy production rows
   into fixtures, staging or a report.
-- **Gates:** "Check hubs" and "Release tests" green, or each failure explained in the PR; the UAT checklist when there
+- **Gates:** "Check hubs" green, and "Release tests" when it runs (shared code changed, or the `full-tests` label, which a
+  tier 2 or 3 change inside hubs gets; Sam, 2026-11-06), or each failure explained in the PR; the UAT checklist when there
   is a preview; every problem in the [bug log](../release/bug-log.md).
 - **Approval:** for tier 2 and 3, only Sam ticks "Sam approved this release" in the PR (or comments "approved for
   release"). Agents never tick it and never merge.

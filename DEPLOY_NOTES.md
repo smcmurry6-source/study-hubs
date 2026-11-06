@@ -51,6 +51,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the first 4 seconds (BUG-038; it now waits for the next visit). No schema change: `submit_exam_debrief` already takes any
   answers. About page, event taxonomy, lessons-audit skill, hub note.
 
+- **2026-11-06 (Release tests trimmed, Claude Code)** — Sam asked whether the 18-minute Release tests were necessary, then
+  chose "Trim it". `.github/workflows/release.yml`: a few-second `scope` job runs the suites only when a PR changes shared
+  code or has the `full-tests` label (a tier 2 or 3 change inside hubs gets it); on a PR they skip syntax, vault, archive,
+  secrets, smoke, preview safety, database permissions, admin operations and retention, which Check hubs already ran on
+  the same commit, leaving the admin page in a preview, accessibility, performance and the device matrix. By hand it
+  runs every suite. What the suites had caught: about 20 bugs, all S3/S4, most when the baselines were set on Nov 4; both
+  S2s automated tests found came from `rls.js` in Check hubs. Documented in `RELEASE_TEST_PLAN.md` section 6,
+  `verify-before-pushing` and `preview-and-release-test`.
 - **2026-11-06 (previews on request, Claude Code)** — Sam: "can i make the preview site an option that you ask to do
   instead of something you do by default. for the majority of cases i dont need it". `vault/rules/preview-and-release-test.md`
   (now "Release-test every substantial change; preview it on request"), `RELEASE_TEST_PLAN.md` (tiers, the flow, sections
