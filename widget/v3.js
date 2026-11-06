@@ -2181,6 +2181,8 @@
     /* the button shows the count, so its spoken name starts with it (voice control: say what you see; BUG-003) */
     var lb = document.getElementById("shstat-launch");
     if (lb) lb.setAttribute("aria-label", onlineCount + " studying now. Study tools: search, daily drill, class stats, inbox, settings");
+    /* the redesigned hubs (widget/hub.js) show the count in their own bar */
+    try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: onlineCount } })); } catch (e) {}
   }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }

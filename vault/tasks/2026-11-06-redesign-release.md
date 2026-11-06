@@ -66,15 +66,21 @@ need; at the release, check each draft against the engine as it is then.
 - Home is a landing page drawn by the engine from the hub's `SH_HUB.home` and its content: the hub's masthead, the exam
   card (countdown and the announced facts; the format line says when it isn't announced), the quick links on the first
   phone screen (practice questions, Daily drill, the notes you were on, the mock and the rest), **Where to next** (at most
-  three rows: yesterday's misses in exam week, the weakest lecture, a lecture not started), today (the goal ring, the
-  streak, the last 14 days), progress by lecture (Notes / Questions per row), the course timeline (`COURSE_DATES`) and
-  the podcast card.
+  three rows: yesterday's misses in exam week, the weakest lecture, a lecture not started), **Today** on a warm field of
+  its own (the goal ring, the streak, XP today, right today, Timmy's HP; **no "last 14 days"**, Sam, 2026-11-06), progress
+  by lecture (Notes / Questions per row), the course timeline (`COURSE_DATES`) and the **Timmy Time** card on the hub's
+  color with Timmy in headphones. Under the countdown, the live count: "n studying <hub> right now, you included".
+- The bar shows the live count on every page (a green dot and the number; "studying now" where there's room): the shared
+  widget's presence count for this hub (`sh:online`, sent by `widget/v3.js`), a total with nothing about who.
 - Drill, Yesterday's misses, Weak spots and the mock are **sets of the Question Bank** (`#questions/<set>`), not modes.
 - The one-time flag rule stays: nothing that moves returning visitors goes in `defaultState()`.
 
-**[arcade-skins](../rules/arcade-skins.md)** (add): the arcade lives in More. It opens on **one game up front**
-(`SH_HUB.arcade.first`, Occlusion: Cusp Sort) with the hub's own blurb, and the rest behind **More games (n)**. The skin
-rules are unchanged: each hub's games, names, lobby text and look are its own (`arcade.js` / `arcade.css` beside the page).
+**[arcade-skins](../rules/arcade-skins.md)** (add): the arcade lives in More. Its lobby shows **every game** (Sam,
+2026-11-06), the hub's pick first and full width (`SH_HUB.arcade.first`, Occlusion: Cusp Sort), each tile on its own field
+of color with **the game's own drawing** across its top: SVG in the house ink style, drawn from the hub's own world in
+`tools/figures/site/arcade.mjs` and built into `widget/hub-art/<hub>.js` (`games`); a hub without drawings yet shows each
+game's icon. The live lobby's painted thumbnails (`img/thumb-*.webp`) aren't used. The skin rules are unchanged: each hub's
+games, names, lobby text and look are its own (`arcade.js` / `arcade.css` beside the page).
 
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (edit):
 - A **Sets** row in the panel, under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set
@@ -84,6 +90,8 @@ rules are unchanged: each hub's games, names, lobby text and look are its own (`
   Order (In order / Random), More filters (type, source), the `.qsum` line with removable tags and Clear all, and the
   tracking names (`bank:show=likely`, `bank:show=likely-off`, `bank:tag-off=lk`). On a laptop a Today column (the goal ring, streak, XP, this session) sits beside the questions.
 - Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status.
+- After an answer, one row: **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss)
+  and **Good question?** at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job).
 
 **[every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)** (one line): in the new card, "Why each choice" is one folded
 bar under the explanation; opened, it lists every choice with your pick's reason open (Sam, 2026-11-06).
@@ -118,8 +126,18 @@ bar under the explanation; opened, it lists every choice with your pick's reason
   how it went and offers the misses (never mid-practice; Sam, 2026-11-06).
 - **Daily goal** (new): a ring in the bar fills toward 10 to 50 questions a day (default 20, in Settings). The **streak**
   still counts any day you answer a question, as now; missing the goal doesn't break it (Sam, 2026-11-06).
-- **More**: Timmy Time, Exam hints, Cram sheet, Side by side (was Review), Arcade, Stats and trophies, Settings.
-- **Settings** (changed): theme, text size, the daily goal, your name, Timmy and the extras. The font choice, background
+- **More**: a tile per part, each on its own color with a line of what's in it: Timmy Time (the big one, Timmy in
+  headphones), Exam hints, Cram sheet, Side by side (was Review), Arcade, Stats and trophies, Settings; then Talk to us
+  (Inbox, Suggest, Report, the tour, About, All hubs).
+- **Notes** (add): at the end of every lecture's notes, **Previous lecture / Next lecture** buttons, and **Report a mistake
+  in these notes** (also in the notes toolbar), which opens the report form with the lecture attached.
+- **Arcade** (changed): every game in the lobby, each with its own drawing; Cusp Sort first.
+- **Studying now** (new entry): the green dot in the bar counts everyone on this hub right now, you included, and Home says
+  it under the countdown. It's a live total: nothing about who.
+- **Focus mode** (new, in Settings): one switch at the top turns Timmy and every extra off, for just the notes and the
+  questions; turning it off brings back what you had, and turning any one extra back on ends it. It uses the extras' own
+  switches, so the dashboard and every hub follow it. (Phase 4: give the dashboard's Settings the same switch.)
+- **Settings** (changed): Focus mode, theme, text size, the daily goal, your name, Timmy and the extras. The font choice, background
   music and the accent metal are gone (remove their entries and any trophy text that names them; keep "All 24 trophies"
   true).
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
@@ -128,5 +146,8 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 ## Log
 
 - 2026-11-06: written after Sam chose to build the whole redesign side by side and release it at once.
+- 2026-11-06: Sam's second look (focus mode, every game with its own art, the answered card's row, no two-weeks card,
+  decorated Today and Timmy Time, more color, notes prev/next and report, the More tiles, the live count) added to the
+  drafts above.
 
 ## Outcome

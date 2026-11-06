@@ -56,6 +56,13 @@
     return '<svg class="ic' + (cls ? " " + cls : "") + '" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + b + "</svg>";
   }
   function artSvg(inner, vb, cls, label){ return '<svg class="' + (cls || "") + '" viewBox="' + vb + '" ' + (label ? 'role="img" aria-label="' + esc(label) + '"' : 'aria-hidden="true"') + ' focusable="false">' + inner + "</svg>"; }
+  /* Home's spot art (tools/figures/site/spots.mjs), as an image like every still drawing; its tint parts take the colors
+     given ({ tint, light, line }), since an image can't read the page's CSS */
+  function spot(k, col, cls){
+    var S = (A.spots || {})[k]; if (!S) return "";
+    var b = S.body.replace(/class="sp-tint"/g, 'fill="' + col.tint + '"').replace(/class="sp-tint-light"/g, 'fill="' + col.light + '"').replace(/class="sp-tint-line"/g, 'stroke="' + col.line + '"');
+    return img(b, "", cls, S.vb);
+  }
   /* a still drawing goes on the page as an image: its own document, so its ids never collide */
   function img(svg, alt, cls, vb){
     if (vb) svg = '<svg viewBox="' + vb + '">' + svg + "</svg>";
@@ -256,6 +263,7 @@
         '<nav class="hx-tabs" id="modeSwitch" aria-label="' + name + '">' + VIEWS.map(function(v){
           return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon(v[0], 22) + "<span>" + v[1] + "</span></a>"; }).join("") + "</nav>" +
         '<span class="hx-meters" aria-label="Today">' +
+          '<span class="hx-meter hx-live" data-livem title="Studying ' + name + ' right now, you included"></span>' +
           '<span class="hx-meter" data-streakm title="Your streak"></span>' +
           '<span class="hx-meter" data-goalm title="Today\'s goal"></span>' +
           '<a class="hx-rank" id="hxRank" href="#more/stats"></a>' +
@@ -263,7 +271,7 @@
         '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
         '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
       "</header>" +
-      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
       '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
       '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
     document.body.appendChild(shell);
@@ -284,7 +292,19 @@
     if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + esc(rankName()) + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. Open your stats</span>';
     $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>'; });
     $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+    paintLive();
   }
+  /* how many are studying this hub right now, you included (Sam, 2026-11-06: "a live study count everyone can see"):
+     the shared widget's presence channel, the same count the live hubs show on their widget button; a total, nothing
+     about who */
+  var LIVE = 0;
+  function liveNow(){ if (LIVE) return LIVE; try { return (window.shEggHooks && window.shEggHooks.online && window.shEggHooks.online()) || 1; } catch (e) { return 1; } }
+  function paintLive(){
+    var n = liveNow(), name = esc(C.name || HUB);
+    $$("[data-livem]").forEach(function(m){ m.innerHTML = '<span class="live-dot" aria-hidden="true"></span><span class="num" aria-hidden="true">' + fmt(n) + '<span class="fold-live"> studying now</span></span><span class="sr">' + fmt(n) + " studying " + name + " now</span>"; });
+    $$("[data-liveline]").forEach(function(m){ m.innerHTML = '<span class="live-dot" aria-hidden="true"></span><span><b class="num">' + fmt(n) + "</b> " + (n === 1 ? "studying " + name + " right now: you" : "studying " + name + " right now, you included") + "</span>"; });
+  }
+  document.addEventListener("sh:online", function(e){ var n = +(e && e.detail && e.detail.n) || 0; if (n > 0 && n !== LIVE) { LIVE = n; paintLive(); } });
 
   /* ---------- routing ---------- */
   function parse(){
@@ -482,9 +502,14 @@
       (q.cue && !right ? '<p class="qc-cue">' + icon("hints", 18) + "<span><b>Remember it:</b> " + esc(q.cue) + "</span></p>" : "") +
       whyHTML(q, q.type === "mcq" || q.type === "multi" ? picks : null) +
       '<p class="qc-class note" data-classnote hidden></p>' +
-      '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + "Try it again</button>" +
-      '<a class="btn btn-text" href="#notes/' + esc(q.lec) + '">' + icon("notes", 18) + "Notes for " + esc(lecLabel(LBY[q.lec])) + "</a></div>";
+      '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button></div>';
     res.hidden = false;
+    /* one row under the answer (Sam, 2026-11-06): Try it again, then the shared widget's "Find this in the notes" (on a
+       miss; it replaced the "Notes for <lecture>" link) and "Good question?", moved in beside it as they arrive */
+    var after = $(".qc-after", res);
+    var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
+    gather();
+    if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
     $("[data-again]", res).addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
     if (FIG && FIG.ANIMA) { try { FIG.ANIMA.mount(res); } catch (e) {} }
   }
@@ -552,13 +577,17 @@
   }
   function petHp(){ try { return window.shPet && window.shPet.hp ? window.shPet.hp() : null; } catch (e) { return null; } }
   function todayPanel(){
-    var t = todayRec(), g = goal(), n = streakDays(), left = Math.max(0, g - t.n), hp = petHp();
+    var t = todayRec(), g = goal(), n = streakDays(), left = Math.max(0, g - t.n), hp = petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
     var cap = t.n >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions. One answer keeps your streak going." : pl(left, "more question") + " meets today's goal.";
-    return '<div class="panel today" data-today><h2>Today</h2><div class="big-ring">' + ring(t.n, g) + '<div><p class="ring-num num">' + fmt(t.n) + " of " + g + '</p><p class="ring-cap">' + esc(cap) + "</p></div></div>" +
-      '<dl class="kv"><div><dt>' + icon("flame", 18) + 'Streak</dt><dd class="num">' + (n ? pl(n, "day") : "Not yet") + "</dd></div>" +
-      "<div><dt>" + icon("xp", 18) + 'XP today</dt><dd class="num">+' + fmt(t.xp) + " XP</dd></div>" +
-      "<div><dt>" + icon("questions", 18) + 'This session</dt><dd class="num">' + fmt(SESSION.n) + " answered · " + fmt(SESSION.r) + " right</dd></div>" +
-      (hp !== null ? "<div><dt>" + icon("tooth", 18) + 'Timmy</dt><dd class="num">' + hp + " HP</dd></div>" : "") + "</dl></div>";
+    return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
+        spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
+      '<div class="big-ring">' + ring(t.n, g) + '<div><p class="ring-num num">' + fmt(t.n) + " of " + g + '</p><p class="ring-cap">' + esc(cap) + "</p></div></div>" +
+      '<ul class="today-stats">' +
+        '<li class="ts-flame">' + flame(n, "ts-art") + '<span><b class="num">' + (n ? pl(n, "day") : "Not yet") + "</b><small>Streak</small></span></li>" +
+        '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
+        '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
+      "</ul>" +
+      (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
   }
   /* the session recap: when you leave the questions with 5 or more answered since the last one (Sam, 2026-11-06: never
      mid-practice) */
@@ -629,6 +658,7 @@
           '<p class="exam-when">' + esc(X.when || (EXAM ? dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) + (EXAM.time ? " · " + timeLabel(EXAM.time) + (EXAM.closes ? " to " + timeLabel(EXAM.closes) : "") : "") : "")) + "</p>" +
           "<h1>" + esc(X.title || C.name) + "</h1>" +
           '<div id="hxCount">' + countHTML() + "</div>" +
+          '<p class="live-line" data-liveline></p>' +
           (X.chips ? '<p class="exam-facts">' + X.chips.map(esc).join(" · ") + "</p>" : "") +
         "</div>" +
         '<nav class="quick" aria-label="Start studying">' +
@@ -648,13 +678,13 @@
         '<section class="panel lecs" aria-labelledby="hlH"><h2 id="hlH">Your progress by lecture</h2><p class="note">How much of each lecture\'s bank you\'ve tried; the solid part is right on your latest try. ' + right + " of " + total + " for the exam right so far.</p>" + lecsHTML(fin.concat(rows.filter(function(r){ return !isExamLec(r.l.id); }))) + "</section>" +
         '<div class="home-side">' +
           '<section class="panel" aria-labelledby="htH"><h2 id="htH">Course timeline</h2>' + timelineHTML() + "</section>" +
-          '<section class="panel" aria-labelledby="hdH"><h2 id="hdH">Your last two weeks</h2>' + daysHTML() + "</section>" +
-          (pod ? '<section class="panel pod-card" aria-labelledby="hpH"><h2 id="hpH">Timmy Time</h2><p>' + esc(pod.title) + '</p><p class="note">' + esc(pod.blurb || "") + '</p><a class="btn" href="#more/timmy">' + icon("podcast", 18) + "Listen</a></section>" : "") +
+          (pod ? podCardHTML(pod) : "") +
         "</div>" +
       "</div></div>";
     el.innerHTML = html;
     /* Home's way into the bank starts fresh: the exam's lectures, not answered yet, High likelihood off (the rule) */
     $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); bankReset(); STATE.ui.qlec = ex.length && ex.length < LECS.length ? ex : "all"; STATE.ui.qstatus = "unseen"; bankSearch = ""; saveState(); }); });
+    paintLive();
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
     tip(el, "home", "Your daily goal is the ring in the bar: " + goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
   }
@@ -688,12 +718,12 @@
       return '<li class="tl-' + when + (e.kind ? " tl-" + e.kind : "") + '"><span class="tl-date num">' + esc(dateLabel(e.date)) + (when === "today" ? " · today" : "") + '</span><span class="tl-what">' + esc(e.label) + "</span></li>";
     }).join("") + "</ol>";
   }
-  function daysHTML(){
-    var on = goalDays(), studied = {}, cells = "";
-    (STATE.days || []).forEach(function(k){ studied[k] = 1; });
-    for (var i = -13; i <= 0; i++) { var k = day(i), st = on[k] ? "met" : studied[k] ? "on" : ""; cells += '<span class="dd ' + st + (i === 0 ? " is-today" : "") + '" title="' + esc(dateLabel(k)) + (on[k] ? ": goal met" : studied[k] ? ": studied" : "") + '"></span>'; }
-    var n = streakDays();
-    return '<div class="days" role="img" aria-label="The last 14 days: filled where you met the goal, outlined where you studied">' + cells + '</div><p class="note">' + (n > 1 ? "<b>" + pl(n, "day") + " in a row.</b> " : "") + pl(STATE.totalAnswered, "answer") + " so far" + (STATE.bestStreak > 1 ? ", " + STATE.bestStreak + " right in a row at best" : "") + ".</p>";
+  /* Timmy Time on Home: a field of the hub's color, Timmy in headphones (spots.mjs) with the notes */
+  var POD_COL = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
+  function podCardHTML(pod){
+    return '<section class="panel pod-card" aria-labelledby="hpH"><div class="pod-text"><h2 id="hpH">Timmy Time</h2><p class="pod-title">' + esc(pod.title) + '</p><p class="pod-blurb">' + esc(pod.blurb || "") + "</p>" +
+      '<a class="btn pod-btn" href="#more/timmy">' + icon("play", 18) + "Listen" + (pod.duration ? " · " + Math.round(pod.duration / 60) + " min" : "") + "</a></div>" +
+      '<div class="pod-art" aria-hidden="true">' + spot("notes", POD_COL, "pod-notes") + spot("timmyTime", POD_COL, "pod-timmy") + "</div></section>";
   }
 
   /* ======================= Notes ======================= */
@@ -727,6 +757,7 @@
         (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : "") +
         (hasPlain ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button><button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button></span>' : "") +
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
+        '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
       "</div>" +
       '<div class="mmap" hidden></div>' +
@@ -736,6 +767,8 @@
       '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
       '<nav class="foot-acts" aria-label="Next"><a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
         '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
+      footNavHTML(lec) +
+      '<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in these notes</button></p>" +
       "</article>";
     el.innerHTML = '<div class="hx-page notes"><div class="notes-grid">' + list + art + "</div></div>";
     /* figures: in the notes next to the paragraph they explain, the rest under them (the live hub's FIG_PLACE) */
@@ -751,8 +784,21 @@
     });
     var tts = $("#sh-tts-btn", el);
     if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, ASSETS + "audio/" + lec.id + "-" + level + ".mp3"); });
+    /* a mistake in the notes goes to Sam's Inbox with the lecture attached (the shared widget's report form) */
+    $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
+      track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.");
+    }); });
+    $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.");
+  }
+  /* the previous and next lecture, at the end of every lecture's notes (Sam, 2026-11-06), in the order they were taught */
+  function footNavHTML(lec){
+    var i = LECS.indexOf(lec), prev = LECS[i - 1], next = LECS[i + 1];
+    var link = function(l, k){ return '<a class="btn fn-' + k + '" href="#notes/' + esc(l.id) + '" data-lecnav="' + k + '">' + (k === "prev" ? icon("chevron", 20, "flip") : "") +
+      "<span><small>" + (k === "prev" ? "Previous lecture" : "Next lecture") + "</small><b>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</b></span>" + (k === "next" ? icon("chevron", 20) : "") + "</a>"; };
+    if (!prev && !next) return "";
+    return '<nav class="foot-nav" aria-label="Other lectures">' + (prev ? link(prev, "prev") : "") + (next ? link(next, "next") : "") + "</nav>";
   }
   function lecBadge(l){ return '<span class="lb num' + (isExamLec(l.id) ? " is-on" : "") + '" aria-hidden="true">' + esc(lecLabel(l)) + "</span>"; }
   function lecItemHTML(l, cur){
@@ -1152,19 +1198,39 @@
     var body = $(".more-body", el);
     ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, stats: moreStats, settings: moreSettings })[s](body);
   }
+  /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
+     a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
+  var MORE_FIELD = { timmy: "hub", hints: "sun", cram: "mint", side: "lilac", arcade: "peach", stats: "sun", settings: "plain" };
+  function moreMeta(k){
+    var pod = CORE.podcast, X = C.arcade || {}, x = rankXp();
+    return ({
+      timmy: pod ? Math.round((pod.duration || 0) / 60) + " min" + (pod.chapters ? " · " + pl(pod.chapters.length, "chapter") : "") : "",
+      hints: pl((CORE.likelyTopics || []).length, "likely topic"),
+      cram: pl(LECS.length, "lecture"),
+      side: "Across every lecture",
+      arcade: pl((X.games || []).length, "game"),
+      stats: rankName() + (x === null ? "" : " · " + fmt(x) + " XP"),
+      settings: focusOn() ? "Focus mode is on" : "Daily goal: " + pl(goal(), "question")
+    })[k] || "";
+  }
   function drawMoreMenu(el){
     var pod = CORE.podcast;
-    el.innerHTML = '<div class="hx-page more"><h1>More</h1><div class="more-grid">' +
-      '<nav class="panel menu" aria-labelledby="mpH"><h2 id="mpH">Study and play</h2><ul class="rows">' + MORE.filter(function(m){ return m[0] !== "timmy" || pod; }).map(function(m){
-        return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") + "</ul></nav>" +
-      '<section class="panel menu" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
+    var tile = function(m){
+      var f = MORE_FIELD[m[0]] || "plain", big = m[0] === "timmy";
+      var art = big ? spot("notes", POD_COL, "mt-notes") + spot("timmyTime", POD_COL, "mt-timmy") : icon(m[1], 40);
+      return '<li class="mt f-' + f + (big ? " is-big" : "") + '"><a href="#more/' + m[0] + '"><span class="mt-art" aria-hidden="true">' + art + '</span><span class="mt-text"><b>' + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small>" +
+        '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
+    };
+    el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
+      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return m[0] !== "timmy" || pod; }).map(tile).join("") + "</ul></nav>" +
+      '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="suggest">' + icon("comment", 22) + "<span><b>Suggest something</b><small>An idea for this hub or the site</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="flag">' + icon("report", 22) + "<span><b>Report an issue</b><small>A typo, a wrong key, something broken</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-tour>' + icon("tour", 22) + "<span><b>Take the tour</b><small>Two minutes, on the real buttons</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><a href="' + esc(C.about || "../../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
         '<li><a href="' + esc(C.back || "../../../index.html") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
-      "</ul></section></div></div>";
+      "</ul></section></div>";
     $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; } var p = document.getElementById("shstat-" + k + "-pill"); if (p) p.click(); }); });
     var t = $("[data-tour]", el); t.addEventListener("click", function(){ track("more:tour"); startTour(); });
   }
@@ -1207,8 +1273,8 @@
       if ($("[data-figs]", body)) needFigures().then(function(){ $$("[data-figs]", body).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(body); FIG.ANIMA.mount(body); } catch (e) {} });
     });
   }
-  /* the arcade: one game up front, the rest behind More games (Sam, 2026-11-05); the games and their skin are the hub's
-     own (arcade.js, from the live hub), so only the lobby is drawn here */
+  /* the arcade: every game in the lobby (Sam, 2026-11-06; one game up front before), Sam's pick first; the games and
+     their skin are the hub's own (arcade.js, from the live hub), so only the lobby is drawn here */
   function needArcade(){
     loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
     return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
@@ -1221,13 +1287,15 @@
   function moreArcade(body){
     body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
     needArcade().then(function(){
-      var X = C.arcade || {}, first = X.first || "sort", games = X.games || [];
+      var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
       var by = {}; games.forEach(function(g){ by[g.id] = g; GAME_INFO[g.id] = g; });
       var best = STATE.arcade.best || {}, plays = STATE.arcade.plays || {};
-      var g0 = by[first] || games[0];
-      var tile = function(g, big){ return '<li class="game' + (big ? " is-first" : "") + '"><div><h2>' + esc(g.name) + "</h2><p>" + esc(g.desc) + '</p><p class="note num">Your best: ' + fmt(best[g.id] || 0) + " · played " + pl(plays[g.id] || 0, "time") + '</p></div><button class="btn' + (big ? " btn-primary" : "") + '" type="button" data-game="' + esc(g.id) + '">' + icon("play", 18) + "Play</button></li>"; };
-      body.innerHTML = '<div class="arcade-lobby"><ul class="ar-grid">' + tile(g0, true) + "</ul>" +
-        '<details class="more-games"><summary class="btn">' + icon("arcade", 18) + "More games (" + (games.length - 1) + ")</summary><ul class=\"ar-grid\">" + games.filter(function(g){ return g !== g0; }).map(function(g){ return tile(g, false); }).join("") + "</ul></details>" +
+      games.sort(function(a, b){ return (b.id === first) - (a.id === first); });
+      /* each game's own drawing (tools/figures/site/arcade.mjs), or its icon where a hub has none yet */
+      var GA = AH.games || {};
+      var art = function(g){ return GA[g.id] ? '<span class="game-pic">' + img(GA[g.id].body, "", "", AH.gamesViewBox) + "</span>" : '<span class="game-art" aria-hidden="true">' + icon(g.icon || "arcade", 30) + "</span>"; };
+      var tile = function(g, k){ return '<li class="game c' + (k % 4) + (g.id === first ? " is-first" : "") + (GA[g.id] ? " has-pic" : "") + '">' + art(g) + '<div><h2>' + esc(g.name) + "</h2><p>" + esc(g.desc) + '</p><p class="note num">Your best: ' + fmt(best[g.id] || 0) + " · played " + pl(plays[g.id] || 0, "time") + '</p></div><button class="btn' + (g.id === first ? " btn-primary" : "") + '" type="button" data-game="' + esc(g.id) + '">' + icon("play", 18) + "Play</button></li>"; };
+      body.innerHTML = '<div class="arcade-lobby"><ul class="ar-grid">' + games.map(tile).join("") + "</ul>" +
         '<p class="note">' + esc(X.how || "") + "</p></div>" +
         '<div id="panel-arcade" class="arcade-stage" hidden></div>';
       var stage = $("#panel-arcade", body), lobby = $(".arcade-lobby", body);
@@ -1271,25 +1339,60 @@
   var SIZES = [["small", "Small", .9], ["default", "Default", 1], ["large", "Large", 1.15], ["xlarge", "X-Large", 1.3], ["xxlarge", "XX-Large", 1.45]];
   function prefSet(k, v){ ls(k, v); try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: k, val: v } })); } catch (e) {} }
   function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
+  /* Focus mode (Sam, 2026-11-06): one switch that turns every extra off, and back to what you had when you turn it off.
+     It writes the same keys as each extra's own switch, so every hub and the dashboard follow it. */
+  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+  function focusOn(){ return ls("sh_pref_focus") === "on"; }
+  function setFocus(on){
+    if (on === focusOn()) return;
+    if (on) {
+      var prev = {}; FOCUS_KEYS.forEach(function(k){ prev[k] = ls(k) || "on"; });
+      ls("sh_pref_focus_prev", JSON.stringify(prev));
+      FOCUS_KEYS.forEach(function(k){ prefSet(k, "off"); });
+    } else {
+      var back = {}; try { back = JSON.parse(ls("sh_pref_focus_prev") || "{}") || {}; } catch (e) {}
+      FOCUS_KEYS.forEach(function(k){ prefSet(k, back[k] || "on"); });
+      ls("sh_pref_focus_prev", null);
+    }
+    prefSet("sh_pref_focus", on ? "on" : "off");
+  }
+  function focusRowHTML(){
+    var on = focusOn();
+    return '<div class="focus-row"><span class="focus-art" aria-hidden="true">' + icon("goal", 30) + '</span><div><b>Focus mode</b><small>' +
+      (on ? "On: Timmy and every extra are off. Turn it off to bring back what you had." : "Turns Timmy and every extra off in one tap: just the notes and the questions.") + "</small></div>" +
+      '<button class="btn' + (on ? " btn-primary" : "") + ' focus-btn" type="button" role="switch" aria-checked="' + on + '" data-focus>' + (on ? "On" : "Off") + "</button></div>";
+  }
   function moreSettings(body){
     var theme = ls("sh_theme") || "", size = ls("sh_pref_size") || "default";
+    var extrasHTML = function(){ return EXTRAS.map(function(x){ return '<div class="set-row"><div><b>' + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></div>" + seg(x[0], x[3] || [["on", "On"], ["off", "Off"]], ls(x[0]) || "on") + "</div>"; }).join(""); };
     body.innerHTML = '<div class="settings">' +
+      '<section class="panel focus-panel' + (focusOn() ? " is-on" : "") + '" aria-label="Focus mode">' + focusRowHTML() + "</section>" +
       '<section class="panel" aria-labelledby="stH"><h2 id="stH">Look</h2>' +
         '<div class="set-row"><div><b>Theme</b><small>Every hub and the dashboard follow it.</small></div>' + seg("theme", [["light", "Light"], ["dark", "Dark"], ["", "Match my device"]], theme) + "</div>" +
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
         '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(goal())) + "</div>" +
         (window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
-      '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p>' +
-        EXTRAS.map(function(x){ return '<div class="set-row"><div><b>' + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></div>" + seg(x[0], x[3] || [["on", "On"], ["off", "Off"]], ls(x[0]) || "on") + "</div>"; }).join("") + "</section></div>";
+      '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
+        extrasHTML() + "</div></section></div>";
+    function paintFocus(){ var fp = $(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
     body.addEventListener("click", function(e){
+      if (e.target.closest("[data-focus]")) {
+        var on = !focusOn(); setFocus(on); paintFocus(); $("[data-extras]", body).innerHTML = extrasHTML();
+        track("settings:focus=" + (on ? "on" : "off")); toast(on ? "Focus mode is on. Every extra is off." : "Focus mode is off. Your extras are back.");
+        $("[data-focus]", body).focus(); return;
+      }
       var b = e.target.closest(".seg [data-val]"); if (b) {
         var k = b.parentNode.getAttribute("data-key"), v = b.getAttribute("data-val");
         $$("[data-val]", b.parentNode).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
         if (k === "theme") { ls("sh_theme", v); applyTheme(v); }
         else if (k === "size") { prefSet("sh_pref_size", v); docEl.style.zoom = (SIZES.filter(function(s){ return s[0] === v; })[0] || [0, 0, 1])[2]; }
         else if (k === "goal") { STATE.nx.goal = +v; var t = todayRec(); if (!t.met && t.n >= +v) t.met = 1; saveNow(); paintMeters(); }
-        else prefSet(k, v);
+        else {
+          prefSet(k, v);
+          /* turning one extra back on ends focus mode; the others stay off */
+          if (v !== "off" && focusOn()) { prefSet("sh_pref_focus", "off"); ls("sh_pref_focus_prev", null); paintFocus(); }
+        }
         track("settings:" + k + "=" + v);
         return;
       }

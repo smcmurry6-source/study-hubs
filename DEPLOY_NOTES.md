@@ -125,7 +125,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   pages with `SH_HUB`. `tools/ci/smoke.js` clicks through every `hubs/*/next/` page; `tools/release/perf.js` measures it.
   The new bank follows #273's rule (High likelihood is an Only toggle on top of any Show chip; a hub adds its own in
   `SH_HUB.bank.only`). Sam's calls: the streak counts any study day (the goal ring is today's target), the session recap
-  shows only on leaving the questions, Cusp Sort leads the arcade, "Why each choice" opens on your pick. Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`.
+  shows only on leaving the questions, Cusp Sort leads the arcade, "Why each choice" opens on your pick. Sam's second look,
+  all built: Focus mode in Settings (every extra off, then back to what you had), every arcade game in the lobby with its
+  own drawn art (`tools/figures/site/arcade.mjs`), the answered card in one row (no "Notes for <lecture>"), no "Your last
+  two weeks", Today and Timmy Time decorated (`spots.mjs`), four soft colors, previous / next lecture and "Report a mistake
+  in these notes", More as colored tiles, and a live "studying now" count in the bar and on Home (`v3.js` sends
+  `sh:online` with its presence count; nothing else changes on the live hubs). Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`.
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
   Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered

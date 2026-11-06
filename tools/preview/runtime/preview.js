@@ -71,6 +71,9 @@
     Object.keys(keep).forEach(function(k){ lsSet(k, keep[k]); });
     lsSet("sh_visitor_id", p.visitor);
     if (p.skipTour) { lsSet("sh_tour", "no"); lsSet("sh_tour_hub", "no"); }
+    /* Timmy adopted that many days ago, so he shows on the hubs as for a student who adopted him (the new hubs load
+       him only once he's adopted) */
+    if (p.petDaysAgo != null) lsSet("sh_pet_born", new RealDate(realNow() + OFFSET - p.petDaysAgo * 864e5).toISOString().slice(0, 10));
     if (p.admin && C.adminSecret) { try { sessionStorage.setItem("sh_admin_secret", C.adminSecret); } catch (e) {} }
     lsSet(K.persona, p.id);
     jset(K.db, freshDb(p));
@@ -741,10 +744,25 @@
     ".shpv-log{margin:6px 0 0;padding-left:20px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-word}",
     ".shpv-log .k-blocked,.shpv-log .k-denied{color:#b91c1c}.shpv-log .k-write{color:#1d4ed8}",
     "@media (prefers-color-scheme:dark){.shpv-panel,.shpv-panel select,.shpv-panel input{background:#1f1f1f;color:#f3f3f3}.shpv-panel button{background:#3b1d0e;color:#fed7aa;border-color:#fb923c}.shpv-muted{color:#cbd5e1}.shpv-bad{color:#fca5a5}.shpv-ok{color:#86efac}.shpv-log .k-write{color:#93c5fd}.shpv-log .k-blocked,.shpv-log .k-denied{color:#fca5a5}}",
+    /* the new hubs: Timmy has the bottom-left corner and the reply pop-up the bottom-right, so on a laptop the pill sits
+       above Timmy; on a phone it's a round button on the right, clear of his speech bubble */
+    "html.shx .shpv-pill{bottom:110px}html.shx .shpv-panel{bottom:162px;max-height:calc(100vh - 180px)}",
+    "@media (max-width:700px){html.shx .shpv-pill{left:auto;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));padding:0;width:44px;justify-content:center}" +
+      "html.shx .shpv-pill .shpv-pill-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}" +
+      "html.shx .shpv-panel{left:auto;right:12px;bottom:calc(136px + env(safe-area-inset-bottom,0px));max-height:calc(100vh - 160px)}}",
     "@media print{.shpv-frame,.shpv-pill,.shpv-panel{display:none}}"
   ].join("\n");
+  /* who's studying now: realtime has no fixture, so the redesigned hubs' live count (the sh:online event widget/v3.js
+     sends) gets a made-up number that drifts a little, as a real class would; nothing on the live hubs listens for it */
+  function fakeOnline(){
+    var n = 9;
+    function send(){ try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {} }
+    setTimeout(send, 1200);
+    setInterval(function(){ n = Math.max(3, Math.min(16, n + [-1, 0, 1][Math.floor(Math.random() * 3)])); send(); }, 20000);
+  }
   function mount(){
     if (document.getElementById("shpv-pill")) return;
+    fakeOnline();
     document.head.appendChild(el("style", { id: "shpv-style" }, CSS));
     var st = jget(K.ui, {});
     document.body.appendChild(el("div", { "class": "shpv-frame", "aria-hidden": "true" }));

@@ -30,6 +30,11 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   through `uncounted()`, its "Exam 1 High likelihood" toggle through `SH_HUB.bank.only`) and **Perio** (its own engine:
   `perio-d2-compendium-state-v1`, `perio:answered`, sessions, notes as template literals, `QBANK_FILTER`, Patient Box
   cases through the case kit, `PERIO_SKIN`). Progress must carry over: same hub id, state key, state shape and answered event.
+- What the engine already gives each new version (Sam's second look, 2026-11-06): Focus mode, the live count, the notes'
+  previous / next and Report a mistake, the More tiles, the decorated Today and Timmy Time cards. What each hub still
+  draws: its emblem, masthead and medals, and **its six arcade lobby drawings** in `tools/figures/site/arcade.mjs`
+  (`arcadeArt(hub)` returns null for both today, so the lobby falls back to icons), from its own skin
+  ([arcade-skins](../rules/arcade-skins.md)).
 
 ## Done when
 

@@ -80,6 +80,17 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
   fold, and Cusp Sort up front; the streak counts any study day (built as goal days: changed, `studyDays()` reads the live
   hub's `STATE.days`, so nobody's streak changes at the release); the session recap only on leaving the questions with 5
   or more answered (the 25-answer card is gone).
+- 2026-11-06: Sam's second look, all built ([decisions](../decisions.md)): Focus mode in Settings (`setFocus()`: saves the
+  extras in `sh_pref_focus_prev`, sets each to off, puts them back); every arcade game in the lobby with its own drawing
+  (`tools/figures/site/arcade.mjs` → `widget/hub-art/occlusion.js` `games`); the More icon's dots straightened; the answered
+  card's one row (Try it again, the widget's Find this in the notes and Good question? moved in beside it, no "Notes for"
+  link) and tighter spacing; Home without "Your last two weeks", Today on a gold field with the calendar spot, flame and XP
+  spark, Timmy Time on the hub's color with Timmy in headphones (`tools/figures/site/spots.mjs`; the live Timmy drawing,
+  its gradient ids renamed); four soft fields (`--sun`, `--mint`, `--peach`, `--lilac` and their inks); prev / next lecture
+  and Report a mistake (`shOpenFlag({ lec, label })`) in the notes; More as colored tiles; the live count in the bar, the
+  strip and Home (`sh:online` from `widget/v3.js`'s presence count; the preview sends a made-up one). Fixed on the way:
+  BUG-041 (v3's old Inbox and Tour buttons at the page's foot) and BUG-042 (pop-ups stacked in the phone's corner). The
+  preview's returning test accounts now have Timmy adopted (`petDaysAgo` in `personas.json`).
 
 ## Outcome
 
@@ -103,4 +114,6 @@ Built side by side, nothing students see changes ([PR #275](https://github.com/s
 - The rule, About page and build-a-hub changes are drafted in the [release note](2026-11-06-redesign-release.md).
 - **For phase 2**: `PCASES` and the case kit are wired (Perio, PCD Implants); the figure 11 px floor is in the content
   build; anything a hub writes in its own code goes in its `SH_HUB`; a hub's own bank toggle goes in `SH_HUB.bank.only`
-  (`[[key, label]]`, the key a question property), as Heme & Endo Exam 2's Exam 1 High likelihood will.
+  (`[[key, label]]`, the key a question property), as Heme & Endo Exam 2's Exam 1 High likelihood will. Each hub's arcade
+  lobby art is drawn in `tools/figures/site/arcade.mjs` (`arcadeArt()` returns only Occlusion's set so far): Heme & Endo 2
+  and Perio need their six each, from their own skins.
