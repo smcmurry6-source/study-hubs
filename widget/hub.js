@@ -790,7 +790,8 @@
     }); });
     $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
-    tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.");
+    /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
+    tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
   }
   /* the previous and next lecture, at the end of every lecture's notes (Sam, 2026-11-06), in the order they were taught */
   function footNavHTML(lec){
@@ -1402,12 +1403,14 @@
   function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
 
   /* one-line tips, the first time a part is seen (the arrival tour is cut; the full tour is in More) */
-  function tip(el, k, text){
+  /* a first-visit tip, under the page's title, or after `after` when the title isn't the page's own child
+     (the notes: their one grid holds the title, so the tip goes under the toolbar, above the text it's about) */
+  function tip(el, k, text, after){
     if (STATE.nx.tips[k]) return;
     var t = h('<p class="tipline" role="note">' + icon("hints", 18) + "<span>" + esc(text) + '</span><button class="btn btn-text" type="button">Got it</button></p>');
     $("button", t).addEventListener("click", function(){ STATE.nx.tips[k] = 1; saveState(); t.remove(); });
     var page = $(".hx-page", el); if (!page) return;
-    var h1 = $("h1", page); (h1 && h1.parentNode === page ? h1 : page.firstElementChild).insertAdjacentElement("afterend", t);
+    var h1 = $("h1", page); (after || (h1 && h1.parentNode === page ? h1 : page.firstElementChild)).insertAdjacentElement("afterend", t);
   }
 
   /* ======================= the shared widget ======================= */

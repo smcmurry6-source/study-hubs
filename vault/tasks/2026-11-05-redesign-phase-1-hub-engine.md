@@ -90,7 +90,8 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
   and Report a mistake (`shOpenFlag({ lec, label })`) in the notes; More as colored tiles; the live count in the bar, the
   strip and Home (`sh:online` from `widget/v3.js`'s presence count; the preview sends a made-up one). Fixed on the way:
   BUG-041 (v3's old Inbox and Tour buttons at the page's foot) and BUG-042 (pop-ups stacked in the phone's corner). The
-  preview's returning test accounts now have Timmy adopted (`petDaysAgo` in `personas.json`).
+  preview's returning test accounts now have Timmy adopted (`petDaysAgo` in `personas.json`). Then BUG-043 (the music
+  notes over the Timmy Time text, the notes tip at the lecture's end) and the notes page's two columns centered at 1440.
 
 ## Outcome
 
