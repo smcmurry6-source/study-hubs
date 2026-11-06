@@ -6,7 +6,8 @@ tags: [testing, release]
 # UAT checklist
 
 Manual user-acceptance testing for a substantial change ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), sections
-7 and 8), in a preview ([preview-a-change](../how-to/preview-a-change.md)). Copy the core pass and the sections that fit
+7 and 8), in a preview ([preview-a-change](../how-to/preview-a-change.md)), so only when Sam asked for one
+([preview-and-release-test](../rules/preview-and-release-test.md)). Copy the core pass and the sections that fit
 the change into the PR's test report, tick what you did, and write what you saw. Every problem goes in the
 [bug log](bug-log.md). The agent runs it with the scripted browser on emulated devices; Sam doesn't (Sam only looks,
 [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) section 10). Say under Not covered what needs a real device.

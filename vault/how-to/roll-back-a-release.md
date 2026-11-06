@@ -12,7 +12,7 @@ first and debug after. A rollback is a release too: it goes through a PR, and Sa
 2. **Revert it with a new PR.** On the merged PR's page, **Revert** makes the PR. Or by hand:
    `git fetch origin main && git switch -c <your-branch> origin/main && git revert -m 1 <merge-sha>`, push, open a PR.
    Never force-push `main`, never reset it.
-3. **Check the revert** like any change: CI, a quick look in a preview (`node tools/preview/serve.js`), and that the
+3. **Check the revert** like any change: CI (a preview only if Sam asks for one), and that the
    reverted files don't also carry someone else's later fix (if a later PR built on the change, revert both or fix
    forward; say which in the PR).
 4. **Sam merges.** Pages republishes in a minute or two. Pages and scripts are network-first in the service worker, so

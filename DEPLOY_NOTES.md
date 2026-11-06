@@ -32,6 +32,28 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (previews on request, Claude Code)** — Sam: "can i make the preview site an option that you ask to do
+  instead of something you do by default. for the majority of cases i dont need it". `vault/rules/preview-and-release-test.md`
+  (now "Release-test every substantial change; preview it on request"), `RELEASE_TEST_PLAN.md` (tiers, the flow, sections
+  3, 7, 10, 13), `preview-a-change`, `ship-a-change`, `AGENTS.md`, the UAT checklist, the test-report and PR templates:
+  an agent asks once for a tier 2 or 3 change and makes a preview only with a yes. **CI**: the preview build, the
+  `preview-site` artifact and the Cloudflare link moved out of "Release tests" into `.github/workflows/preview.yml`, which
+  runs only for a PR with the `preview` label (and each push after) or by hand (it finds the branch's PR for the `pr-<n>`
+  link and comment). Release tests still run every suite. Without a preview, screenshots come from a stubbed browser;
+  never the plain page as a test account (it would save to the class's data). Nothing students see changed.
+- **2026-11-06 (faster sessions and CI, Claude Code)** — Sam asked why every task takes longer, then "do these".
+  **Feature rules load on demand**: `arcade-skins`, `podcast-intro`, `podcast-reactions`, `diagram-review`, `diagrams-anima`,
+  `figures-teach-the-lecture`, `outside-sources-for-figures` and `every-hub-gets-its-own-art` carry `load: on-demand`;
+  `CLAUDE.md` lists them under "Feature rules" (when to read each) instead of importing them, `tools/figures/CLAUDE.md`
+  and `tools/podcast/CLAUDE.md` import them so Claude Code loads them when it opens those folders, and the `/podcast` and
+  `anima` skills name them. `tools/ci/vault.js` enforces it (an on-demand rule must be linked there, not imported).
+  **Smoke test checks only the hubs a PR touches** (`tools/ci/smoke.js`, `pickHubs()`): every hub when a shared file
+  changes (`widget/`, the dashboard, `sw.js`, assets, a workflow, the test), on `main`, with `--all`/`SMOKE_ALL=1`, or when
+  git can't tell; Check hubs fetches the PR's base (`fetch-depth: 2`) and both workflows set `SMOKE_CHANGED_FROM=HEAD^1`
+  on pull requests. A one-hub change: 32 s locally instead of a full run. **Kokoro installs itself on first use**: `tools/narrate.py` and
+  `render_podcast.py` run the new `tools/kokoro-setup.sh` (via `tools/podcast/kokoro_ready.py`) when kokoro-onnx or the
+  model is missing; tested from a clean machine. No setup script on the cloud environment (one was tried and taken off:
+  most sessions never narrate and it made each one wait about 70 s). Nothing students see changed.
 - **2026-11-06 (admin page: light only, Claude Code)** — Sam: "i dont want the admin page to be dark mode. its hard to
   see". `review/index.html` drops its two `prefers-color-scheme: dark` blocks (the page's colors and the switch knob) and sets
   `color-scheme: light` plus `<meta name="color-scheme" content="only light">`, so a laptop or phone in dark mode still gets

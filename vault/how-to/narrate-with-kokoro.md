@@ -7,16 +7,12 @@ tags: [audio]
 
 Why this matters: [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md).
 
-Kokoro TTS setup (cloud sessions can only download GitHub release files from
-repos attached to the session, so the model is re-hosted on this repo):
-
-```bash
-pip install kokoro-onnx soundfile
-mkdir -p /tmp/kokoro && cd /tmp/kokoro
-gh release download kokoro-model-v1.0 -R smcmurry6-source/study-hubs \
-  || for f in kokoro-v1.0.onnx voices-v1.0.bin; do
-       curl -fL -o "$f" "https://github.com/smcmurry6-source/study-hubs/releases/download/kokoro-model-v1.0/$f"; done
-```
+**Kokoro installs itself.** `tools/narrate.py` and `tools/podcast/render_podcast.py` run `tools/kokoro-setup.sh`
+the first time they find it missing: `pip install kokoro-onnx soundfile`, then the model files into `/tmp/kokoro`
+(or `$KOKORO_DIR`), about a minute, once per machine. Sessions don't install it at start (Sam, 2026-11-06: most never
+narrate, and a setup script made every one of them wait for the download). To install it by hand, or before your own
+Python: `bash tools/kokoro-setup.sh`. The model is re-hosted on this repo's release `kokoro-model-v1.0`, because cloud
+sessions can only download GitHub release files from repos attached to the session.
 
 ```python
 from kokoro_onnx import Kokoro

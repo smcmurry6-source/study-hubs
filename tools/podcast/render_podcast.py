@@ -7,8 +7,8 @@ Usage:
   python render_podcast.py script.md --words     # each hard word not in the lexicon once, plus heteronyms in context
   python render_podcast.py script.md stems/ --only 5 --force   # re-render just segment 5
 
-Needs: pip install kokoro-onnx soundfile ;
-model files in $KOKORO_DIR (default /tmp/kokoro): kokoro-v1.0.onnx, voices-v1.0.bin.
+Needs kokoro-onnx, soundfile and the model files in $KOKORO_DIR (default /tmp/kokoro): kokoro-v1.0.onnx, voices-v1.0.bin.
+They install themselves the first time they're missing (tools/kokoro-setup.sh, via kokoro_ready.py).
 """
 import argparse, json, os, re, sys
 import numpy as np
@@ -116,6 +116,8 @@ def main():
     ap.add_argument("--lexicon", default=os.path.join(HERE, "lexicon.json"))
     a = ap.parse_args()
 
+    from kokoro_ready import ensure
+    kdir = ensure(model=not (a.check or a.words))   # installs Kokoro the first time; --check and --words need no model
     from kokoro_onnx.tokenizer import Tokenizer
     tok = Tokenizer()
     lex, pat = load_lexicon(a.lexicon)
@@ -136,7 +138,6 @@ def main():
 
     from kokoro_onnx import Kokoro
     import soundfile as sf
-    kdir = os.environ.get("KOKORO_DIR", "/tmp/kokoro")
     k = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
     style = voice_style(k, a.voice)
     stems = a.out or "stems"

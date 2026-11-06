@@ -11,8 +11,8 @@ tags: [shipping]
    `claude/...` branch; that's fine — open a PR and Sam merges it to publish.
    In a local session, still prefer a branch + PR over pushing `main` directly.
 3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)). **A substantial change** (tier 2 or 3 in
-   [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets a preview ([preview-a-change](preview-a-change.md)),
-   the release suites, UAT, its bug-log rows and a test report in the PR, and waits for Sam to tick "Sam approved this
+   [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets the release suites, its bug-log rows and a test
+   report in the PR (and a preview with UAT in it only if Sam says yes when you ask once: [preview-a-change](preview-a-change.md)), and waits for Sam to tick "Sam approved this
    release" ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge:
    `node tools/release/postcheck.js`.
 4. In the PR description, write what changed in plain, student-facing language, in
