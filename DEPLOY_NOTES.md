@@ -35,18 +35,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-06 (question health: the newly flagged PCD Implants questions, Claude Code)** — Sam had the agent mark the 33
   questions reviewed in #258 on the admin page (12 Fixed, 21 Looks fine, through `admin_review_question` with the admin page's
   versions and flags; recorded in `vault/decisions.md`), then said yes to reviewing the PCD Implants questions flagged since
-  (15, the night before the exam). Every key matches the notes; same ids; no notes text changed, so no narration or podcast
-  change. **New wording** (fresh numbers): `in-3weeks` ("after the healing abutment is placed" also fits a one-stage case, where
-  the bone needs months, so "3 months" was defensible: the stem now asks how long the soft tissue needs) and `tm-mm-3` (it asked
-  which "make" the crown need 7 mm, but the subgingival margin subtracts 1: it now asks which go into the 7 mm). **Explanations
-  and why lines only** (numbers kept, since PCD's versions come from stem, choices and key): `im-tf-3` (metal does scatter the
-  beam, but the starburst comes from sampling limits), `im-flapless` (CT shows the sinus but doesn't make bone; the old why was
-  "Not his point"), `bm-moment` (moment vs stress), `im-software` (DICOM is the file format the software reads), `su-edent`.
-  **Looks fine**: `in-collagen`, `im-num-2`, `tm-2s-1`, `cb-num-2`. **Removed on purpose** (Sam's 11-03 call on reports #35/#36):
-  `tm-code-6010`, `tm-code-6058`, `tm-conelog`, `tm-rc-grooves` show as "gone"; `tm-conelog`, `tm-rc-grooves` and `gs-credit`
-  added to `tools/question-ids/pcd-implants-exam1.txt` as retired so the ids are never reused. The 15 aren't marked on the admin
-  page (Sam's call).
-- **2026-11-06 (redesign phase 5, part 1: one request per page load and a cached XP total, Codex and Claude Code; pending Sam's approval)** — Codex's draft (#261) rebased onto `main` by Claude Code with its conflicts resolved, and finished. A hub now reads everything it needs on load in one `get_widget_bootstrap` call (besides realtime presence and the changelog): 12 reads become 1 on a hub and 19 become 1 on the dashboard (fixture preview). The class-wide rank board, leaderboards and trophy rarity load when Stats opens or the dashboard panel scrolls into view. **Each visitor's own rank and hub mastery ride in the bootstrap** (Sam, 2026-11-06) and refresh every 10 answers, so the badge by the name, the rank-up, level-up, trophy and mastery cards and the medals work as before (Codex's draft loaded them only with Stats, which 17 of 108 people in a hub opened in 14 days). `migration_v53.sql`: the `xp_visitors` cache, kept by the existing answer trigger, so ranks stop summing the whole class (BUG-032, the cache dropping each day's first answer, fixed before it was applied); the advisor fixes (six `search_path`s, a `link_attempts` primary key, two unused indexes); `get_pet_days` no longer polled; clicks and question health share one flush timer; a class percentage is fetched when its question is answered or its class line comes into view, not for every card on the page (BUG-034: in Codex's draft, Perio's "Show answer" cards stayed on "Loading class data…"). Every part falls back to its old call while the migration isn't applied, so merge order doesn't matter. Also: Timmy on the dashboard at the largest text no longer sits past the screen's edge (BUG-033), `perf.js` no longer counts the preview's own runtime against a page's budget, `sw.js` `sh-v58`. **The migration is not applied yet**: apply it with Sam's OK. Still open in phase 5: the two widget bundles, one stylesheet, one font, the thinner client and sw.js precaching ([task](vault/tasks/2026-11-05-redesign-phase-5-backend.md)).
+  (18 over the evening, the night before the exam). Every key matches the notes; same ids; no notes text changed, so no
+  narration or podcast change. **New wording**: `in-3weeks` ("after the healing abutment is placed" also fits a one-stage
+  case, where the bone needs months, so "3 months" was defensible: the stem now asks how long the soft tissue needs) and
+  `tm-mm-3` (it asked which "make" the crown need 7 mm, but the subgingival margin subtracts 1: it now asks which go into the
+  7 mm). **New explanations and why lines**: `im-tf-3` (metal does scatter the beam, but the starburst comes from sampling
+  limits), `im-flapless` (CT shows the sinus but doesn't make bone; the old why was "Not his point"), `im-software` (DICOM is
+  the file format the software reads), `cb-num-3` (beam hardening vs motion fixes), `su-def-bran` (the surgery lecture's two
+  definitions; many textbooks credit the "structural and functional" wording to Brånemark, the slides to Albrektsson and
+  Sennerby, and the question follows the slides). These seven start fresh numbers (PCD's versions include the explanation).
+  **Why lines only** (numbers kept): `bm-moment`, `su-edent`. **Looks fine**: `in-collagen`, `im-num-2`, `im-medct`,
+  `tm-2s-1`, `cb-num-2`. **Removed on purpose** (Sam's 11-03 call on reports #35/#36): `tm-code-6010`, `tm-code-6058`,
+  `tm-conelog`, `tm-rc-grooves` show as "gone"; `tm-conelog`, `tm-rc-grooves` and `gs-credit` are now retired in
+  `tools/question-ids/pcd-implants-exam1.txt`. Sam asked the agent to mark them all on the admin page after the merge.
 - **2026-11-06 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, in the mock and the bank, Claude Code)** — Sam:
   "have the 5 exam 1 questions come from the high likelihood question bank". The mock's five Exam 1 questions now come only
   from the Exam 1 Refresher's High Likelihood questions: one per topic, each from a different Exam 1 lecture, questions not seen or missed last time first
