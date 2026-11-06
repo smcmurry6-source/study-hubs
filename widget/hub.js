@@ -261,7 +261,7 @@
         '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
         '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
       "</header>" +
-      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="grow"></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
       '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
       '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
     document.body.appendChild(shell);
@@ -275,12 +275,12 @@
   function paintMeters(){
     if (!shell) return;
     var n = streakDays(), t = todayRec(), g = goal();
-    $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num">' + (n ? pl(n, "day") : "No streak") + '</span><span class="sr"> in a row with the goal met</span>'; });
-    $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num">' + Math.min(t.n, 999) + " of " + g + '</span><span class="sr"> questions today</span>'; });
+    $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row with the goal met" : "No streak yet") + "</span>"; });
+    $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
     var x = rankXp(), rk = $("#hxRank");
     if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + "</span><b>" + esc(rankName()) + '</b><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + "</span>";
     if (rk) rk.setAttribute("aria-label", "Your rank: " + rankName() + ", " + (x === null ? fmt(t.xp) + " XP today" : fmt(x) + " XP") + ". Open your stats");
-    $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP</span>"; });
+    $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>'; });
     $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
   }
 
@@ -461,12 +461,13 @@
     var idx = q.choices.map(function(c, i){ return i; }).sort(function(a, b){ return (ok(b) ? 1 : 0) - (ok(a) ? 1 : 0) || a - b; });
     var open = {}; (opened || picks || []).forEach(function(i){ open[i] = 1; });
     idx.forEach(function(i){ if (multi && ok(i) && (picks || []).indexOf(i) < 0) open[i] = 1; });
-    return '<div class="why"><h4>Why each choice</h4>' + idx.map(function(i){
+    /* folded until tapped, as on the live hubs (Sam, 2026-11-06: open, it took up too much of the screen); inside, your pick is open */
+    return '<details class="why"><summary class="why-bar"><span>Why each choice</span><span class="chev">' + icon("chevron", 16) + "</span></summary>" + idx.map(function(i){
       var pk = (picks || []).indexOf(i) > -1, st = ok(i) ? (pk || !multi ? "right" : "missed") : pk ? "wrong" : "";
       var tag = pk ? "Your pick" : multi && ok(i) ? "You missed this one" : "";
       return "<details" + (open[i] ? " open" : "") + '><summary><span class="tick ' + (st === "wrong" ? "no" : st ? "ok" : "") + '">' + (st ? icon(st === "wrong" ? "cross" : "check", 18) : "") + "</span><span>" + esc(q.choices[i]) +
         (tag ? ' <span class="tag">· ' + tag + "</span>" : "") + '</span><span class="chev">' + icon("chevron", 16) + "</span></summary><p>" + esc(q.why[i]) + "</p></details>";
-    }).join("") + "</div>";
+    }).join("") + "</details>";
   }
   function result(el, q, right, partial, xp, picks){
     var res = $(".qc-result", el);
