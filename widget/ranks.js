@@ -856,30 +856,51 @@
     });
 
     var loading = false;
-    function load(){
+    /* your own rank and mastery: the badge by your name, the rank-up, level-up, trophy and mastery cards, and the
+       medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
+       (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
+    function applyOwn(p, m){
+      profile = p; mastery = m || [];
+      if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
+      track(profile, { busy: mockBusy });
+      badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
+      /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
+      if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
+    }
+    function loadOwn(){
       if (loading) return; loading = true;
-      loadTrophyStats();
       Promise.all([rpc("get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
-        profile = r[0]; mastery = r[1] || [];
-        if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-        track(profile, { busy: mockBusy });
-        badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
-        /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
-        if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
+        applyOwn(r[0], r[1]);
       });
     }
-    load();
+    function load(){ loadTrophyStats(); loadOwn(); }
+    /* On load: your own rank and mastery from the page bootstrap (one request for the whole widget); the old
+       separate reads only while migration_v53 isn't applied or the bootstrap failed. The class-wide trophy rarity
+       (get_trophy_stats) stays lazy: it loads when Stats opens. */
+    function panelOpen(){ return !!(panel && panel.classList.contains("is-open")); }
+    var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
+    if (boot && typeof boot.then === "function") {
+      boot.then(function(data){
+        if (data && data.rank && typeof data.rank === "object") applyOwn(data.rank, Array.isArray(data.mastery) ? data.mastery : []);
+        else loadOwn();
+      }, loadOwn);
+    } else loadOwn();
     var sinceLoad = 0;
-    document.addEventListener(H.answeredEvent, function(){ if (++sinceLoad >= 10) { sinceLoad = 0; setTimeout(load, 1500); } });
+    document.addEventListener(H.answeredEvent, function(){
+      if (++sinceLoad >= 10) {
+        sinceLoad = 0;
+        setTimeout(panelOpen() ? load : loadOwn, 1500);
+      }
+    });
     document.addEventListener("click", function(e){
-      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(load, 50);
+      if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
     });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
       if (d.total > 0 && !window.shAutomated) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
-      if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(load, 800); });
+      if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(panelOpen() ? load : loadOwn, 800); });
       if (d.total >= 20 && d.correct === d.total) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock-perfect", p_hub: H.hub });
     });
 

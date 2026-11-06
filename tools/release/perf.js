@@ -31,10 +31,12 @@ async function measure(browser, url){
   await cdp.send('Network.enable');
   await cdp.send('Network.emulateNetworkConditions', NET);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  let bytes = 0, requests = 0, html = 0; const types = {};
-  cdp.on('Network.responseReceived', e => { types[e.requestId] = e.type; if (e.type === 'Document' && !html) html = -1; });
+  let bytes = 0, requests = 0, html = 0; const types = {}, previewOnly = {};
+  cdp.on('Network.responseReceived', e => { types[e.requestId] = e.type; if (/\/__preview\//.test(e.response.url)) previewOnly[e.requestId] = 1; if (e.type === 'Document' && !html) html = -1; });
   cdp.on('Network.loadingFinished', e => {
-    const t = types[e.requestId]; if (t === 'Media') return;
+    /* the preview's own runtime (/__preview/preview.js, fixtures included) is injected into previews only: students never
+       download it, so it doesn't count against a page's budget */
+    const t = types[e.requestId]; if (t === 'Media' || previewOnly[e.requestId]) return;
     requests++; bytes += e.encodedDataLength;
     if (t === 'Document' && html === -1) html = e.encodedDataLength;
   });

@@ -209,18 +209,29 @@
       var note = el.querySelector(".sh-pod-formnote"); note.textContent = SOC.note; note.hidden = !SOC.note;
     });
   }
-  function loadFeed(){
+  function setFeed(d){
+    if (d && !Array.isArray(d) && typeof d === "object") {
+      SOC.likes = +d.likes || 0; SOC.dislikes = +d.dislikes || 0; SOC.mine = +d.mine || 0;
+      SOC.comments = Array.isArray(d.comments) ? d.comments : []; SOC.loaded = true;
+    } else SOC.failed = true;
+    paintSocial();
+  }
+  function loadFeedRemote(){
     var s = sb(); if (!s) { paintSocial(); return; }
     try {
       s.rpc("pod_feed", { p_hub: HUB, p_ep: P.id, p_visitor: visitor() }).then(function(res){
         var d = res && !res.error && res.data;
-        if (d && !Array.isArray(d) && typeof d === "object") {
-          SOC.likes = +d.likes || 0; SOC.dislikes = +d.dislikes || 0; SOC.mine = +d.mine || 0;
-          SOC.comments = Array.isArray(d.comments) ? d.comments : []; SOC.loaded = true;
-        } else SOC.failed = true;
-        paintSocial();
-      }, function(){ SOC.failed = true; paintSocial(); });
+        setFeed(d);
+      }, function(){ setFeed(null); });
     } catch (e) { paintSocial(); }
+  }
+  function loadFeed(){
+    var boot = window.shBootstrap && window.shBootstrap.ready;
+    if (!boot || typeof boot.then !== "function") { loadFeedRemote(); return; }
+    boot.then(function(data){
+      if (data && Object.prototype.hasOwnProperty.call(data, "podcast")) { setFeed(data.podcast); return; }
+      loadFeedRemote();
+    }, loadFeedRemote);
   }
   function vote(v){
     var s = sb(); if (!s) return;

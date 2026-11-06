@@ -258,6 +258,76 @@
     return db.answers[hub] || [];
   }
   function allAnswers(){ var out = []; Object.keys(db.answers).forEach(function(h){ (db.answers[h] || []).forEach(function(a){ out.push([h, a[0], a[1], a[2], a[3]]); }); }); return out; }
+  /* Keep the bootstrap response assembled from the same fixture shapes as its
+     individual RPCs. This lets preview exercise the one-round-trip path without
+     giving it a second, subtly different model of learner data. */
+  function bootstrapPins(v, hub){
+    if (v !== db.visitor) return [];
+    answersFor(hub); var pm = db.pins[hub] || {};
+    return Object.keys(pm).map(function(q){ return [q, pm[q][0], pm[q][1]]; });
+  }
+  function bootstrapInbox(v){
+    return v === db.visitor ? db.inbox.concat(db.notices.map(function(n, i){
+      return { kind: "notice", id: 9500 + i, hub: null, title: n.title, note: null, message: n.message, at: n.at, seen: false, expires_at: null };
+    })) : [];
+  }
+  function bootstrapSurvey(t){
+    if (!P.survey || db.surveys.answered) return [];
+    return [{ id: 501, title: "Preview survey (fixture)", starts_at: iso(t - 864e5), questions: [
+      { id: "q1", kind: "scale", prompt: "How useful was the Daily Drill this week?", ends: ["Not useful", "Very useful"] },
+      { id: "q2", kind: "choice", prompt: "Where do you study most?", options: ["Phone", "Laptop", "Tablet"] },
+      { id: "q3", kind: "text", prompt: "Anything we should add before the next exam?" }] }];
+  }
+  function bootstrapPetDays(t){
+    var byd = {};
+    allAnswers().forEach(function(r){
+      if (t - r[2] * 1000 > 70 * 864e5) return;
+      var dd = day(r[2] * 1000), x = byd[dd] || (byd[dd] = { d: dd, attempts: 0, correct: 0 });
+      x.attempts++; x.correct += r[3];
+    });
+    return Object.keys(byd).sort().map(function(k){ return byd[k]; });
+  }
+  function bootstrapPodcast(hub, ep, t){
+    if (!ep) return null;
+    var pk = hub + "|" + ep, cm = db.comments[pk] || [], rx = db.reactions[pk] || { likes: 7, dislikes: 1, mine: null };
+    return { likes: rx.likes, dislikes: rx.dislikes, mine: rx.mine, comments: [
+      { id: 7001, name: "Sample Sealant", body: "Fixture comment: the part on osseointegration finally clicked.", at: iso(t - 2 * 864e5), mine: false, reported: false },
+      { id: 7002, name: "Mock Mandible", body: "Fixture comment: listened on the bus, twice.", at: iso(t - 864e5), mine: false, reported: false }].concat(cm) };
+  }
+  function bootstrapWeek(){
+    var by = {};
+    allAnswers().forEach(function(r){
+      var d = day(r[2] * 1000), x = by[d] || (by[d] = { answer_date: d, attempts: 0, correct: 0 });
+      x.attempts++; x.correct += r[3];
+    });
+    return Object.keys(by).sort().map(function(k){ return by[k]; });
+  }
+  function widgetBootstrap(a, t){
+    var v = a.p_visitor, hub = a.p_hub, ep = a.p_episode || a.p_ep || a.p_podcast;
+    var dashboard = !!a.p_dashboard;
+    if (v !== db.visitor) return { display_name: null, answers: [], pins: [], inbox: [], survey: [], overrides: [], pet_days: [], cavity: [], podcast: null, dashboard_week: [], survey_popup: [], exam_luck: null, recaps: [], golden: [], name_shared: false, rank: null, mastery: [] };
+    var answers = answersFor(hub);
+    return {
+      display_name: db.name,
+      answers: answers,
+      pins: a.p_include_pins ? bootstrapPins(v, hub) : [],
+      inbox: bootstrapInbox(v),
+      survey: bootstrapSurvey(t),
+      overrides: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }),
+      pet_days: bootstrapPetDays(t),
+      cavity: [],
+      podcast: bootstrapPodcast(hub, ep, t),
+      dashboard_week: dashboard ? bootstrapWeek() : [],
+      survey_popup: dashboard ? bootstrapSurvey(t) : [],
+      exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
+      recaps: [],
+      golden: [],
+      name_shared: false,
+      /* your own rank and mastery ride in the bootstrap too (Sam, 2026-11-06); same fixtures as the single calls */
+      rank: rpc("get_rank_profile", { p_visitor: v }).data,
+      mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
+    };
+  }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
   function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra; }
   function classStat(hub, qid){
@@ -501,6 +571,7 @@
     var v = a.p_visitor, hub = a.p_hub, t = now();
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
+      case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };
       case "get_display_name": return { data: v === db.visitor ? db.name : null };
       case "set_display_name": if (v === db.visitor) { db.name = a.p_name; save(); } return { write: true, data: null };
       case "clear_display_name": if (v === db.visitor) { db.name = null; save(); } return { write: true, data: null };
@@ -516,8 +587,7 @@
         return { data: Object.keys(by).sort().map(function(k){ return by[k]; }) };
       }
       case "get_pet_days": {
-        var byd = {}; allAnswers().forEach(function(r){ if (t - r[2] * 1000 > 70 * 864e5) return; var dd = day(r[2] * 1000), x = byd[dd] || (byd[dd] = { d: dd, attempts: 0, correct: 0 }); x.attempts++; x.correct += r[3]; });
-        return { data: Object.keys(byd).sort().map(function(k){ return byd[k]; }) };
+        return { data: bootstrapPetDays(t) };
       }
       case "get_hub_mastery": {
         var hubs = {}; Object.keys(db.answers).forEach(function(h){ var last = {}; db.answers[h].forEach(function(r){ last[r[0]] = r[2]; });
@@ -547,27 +617,17 @@
       }
       case "submit_arcade_score": (db.arcade[hub + "|" + a.p_game] = db.arcade[hub + "|" + a.p_game] || []).push(Number(a.p_score) || 0); save(); return { write: true, data: null };
       case "get_my_pins": {
-        if (v !== db.visitor) return { data: [] };
-        answersFor(hub); var pm = db.pins[hub] || {};
-        return { data: Object.keys(pm).map(function(q){ return [q, pm[q][0], pm[q][1]]; }) };
+        return { data: bootstrapPins(v, hub) };
       }
       case "set_pins":
         if (v === db.visitor) { var pins = db.pins[hub] || (db.pins[hub] = {}); (a.p_pins || []).forEach(function(r){ if (Array.isArray(r) && r[0]) pins[r[0]] = [r[1] ? 1 : 0, +r[2] || 0]; }); save(); }
         return { write: true, data: null };
-      case "get_my_inbox": return { data: v === db.visitor ? db.inbox.concat(db.notices.map(function(n, i){ return { kind: "notice", id: 9500 + i, hub: null, title: n.title, note: null, message: n.message, at: n.at, seen: false, expires_at: null }; })) : [] };
+      case "get_my_inbox": return { data: bootstrapInbox(v) };
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
-      case "get_active_survey": case "get_my_survey":
-        if (!P.survey || db.surveys.answered) return { data: [] };
-        return { data: [{ id: 501, title: "Preview survey (fixture)", starts_at: iso(t - 864e5), questions: [
-          { id: "q1", kind: "scale", prompt: "How useful was the Daily Drill this week?", ends: ["Not useful", "Very useful"] },
-          { id: "q2", kind: "choice", prompt: "Where do you study most?", options: ["Phone", "Laptop", "Tablet"] },
-          { id: "q3", kind: "text", prompt: "Anything we should add before the next exam?" }] }] };
+      case "get_active_survey": case "get_my_survey": return { data: bootstrapSurvey(t) };
       case "submit_survey": db.surveys.answered = a; save(); return { write: true, data: null };
       case "pod_feed": {
-        var pk = hub + "|" + a.p_ep, cm = db.comments[pk] || [], rx = db.reactions[pk] || { likes: 7, dislikes: 1, mine: null };
-        return { data: { likes: rx.likes, dislikes: rx.dislikes, mine: rx.mine, comments: [
-          { id: 7001, name: "Sample Sealant", body: "Fixture comment: the part on osseointegration finally clicked.", at: iso(t - 2 * 864e5), mine: false, reported: false },
-          { id: 7002, name: "Mock Mandible", body: "Fixture comment: listened on the bus, twice.", at: iso(t - 864e5), mine: false, reported: false }].concat(cm) } };
+        return { data: bootstrapPodcast(hub, a.p_ep, t) };
       }
       case "pod_react": {
         var rk = hub + "|" + a.p_ep, r0 = db.reactions[rk] || (db.reactions[rk] = { likes: 7, dislikes: 1, mine: null }), vote = a.p_vote || a.p_kind || null;

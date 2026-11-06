@@ -129,7 +129,7 @@
       track("view");
       snapshot(o.hub);
       try { watchFigures(); } catch (e) {}
-      setInterval(flush, 60000);
+      if (window.shAnalytics) shAnalytics.register("clicks", flush, 60000); else setInterval(flush, 60000);
       document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") flush(); });
       window.addEventListener("pagehide", flush);
     }

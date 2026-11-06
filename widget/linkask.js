@@ -15,7 +15,7 @@
   "use strict";
   if (window.shLinkAsk) return;
   var NO_KEY = "sh_link_ask_no", LATER_KEY = "sh_link_ask_later", DAY_KEY = "sh_link_ask_day";
-  var C = { sb: null, hub: "", section: function(){ return ""; } }, card = null;
+  var C = { sb: null, hub: "", section: function(){ return ""; }, bootstrap: null, bootstrapName: "" }, card = null;
   /* the site's root (the dashboard), from this script's own address: <root>widget/linkask.js */
   var ROOT = (function(){ try { return document.currentScript.src.replace(/widget\/linkask\.js.*$/, ""); } catch (e) { return location.origin + "/"; } })();
 
@@ -180,7 +180,7 @@
   }
 
   /* fromSave: the person just picked this name, so ask even inside the "Not now" wait */
-  function check(name, fromSave){
+  function check(name, fromSave, knownShared){
     name = String(name || "").trim();
     var v = visitor();
     if (!name || !v || !C.sb || card || blocked()) return;
@@ -193,6 +193,10 @@
     }
     /* a save reaches the server first; give it a moment so the check sees the new name */
     setTimeout(function(){
+      if (typeof knownShared === "boolean") {
+        if (knownShared && !blocked()) { if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ open(name); }); else open(name); }
+        return;
+      }
       rpc("name_shared", { p_visitor: v, p_name: name }).then(function(shared){
         if (!shared || blocked()) return;
         if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ open(name); }); else open(name);
@@ -203,12 +207,20 @@
   window.shLinkAsk = {
     start: function(opts){
       C.sb = opts.sb || null; C.hub = opts.hub || "";
+      C.bootstrap = opts.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
+      C.bootstrapName = String(opts.bootstrapName == null ? "" : opts.bootstrapName).trim();
       if (typeof opts.section === "function") C.section = opts.section;
       setTimeout(function(){ if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(fromUrl); else fromUrl(); }, 1500);
       if (ls(DAY_KEY) === today()) return;
       setTimeout(function(){
         var n = ls("sh_display_name");
-        if (n) check(n, false);
+        if (!n) return;
+        if (C.bootstrap && typeof C.bootstrap.then === "function") {
+          C.bootstrap.then(function(data){
+            if (data && Object.prototype.hasOwnProperty.call(data, "name_shared") && norm(n) === norm(C.bootstrapName)) check(n, false, !!data.name_shared);
+            else check(n, false);
+          }, function(){ check(n, false); });
+        } else check(n, false);
       }, 6000);
     },
     check: function(name){ check(name, true); },
