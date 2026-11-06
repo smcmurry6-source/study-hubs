@@ -20,8 +20,8 @@ The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.clau
 ## Build an episode
 
 ```bash
-pip install kokoro-onnx soundfile scipy         # plus ffmpeg on PATH
-# Kokoro model in /tmp/kokoro (see vault/how-to/narrate-with-kokoro.md)
+pip install scipy                               # plus ffmpeg on PATH; Kokoro and its model install themselves on the
+                                                # first render (tools/kokoro-setup.sh, vault/how-to/narrate-with-kokoro.md)
 node tools/podcast/extract_hub.js hubs/msk-exam4/index.html /tmp/src                   # the material to write from
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --words        # hard words + heteronyms
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # every paragraph's phonemes

@@ -41,9 +41,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   **Smoke test checks only the hubs a PR touches** (`tools/ci/smoke.js`, `pickHubs()`): every hub when a shared file
   changes (`widget/`, the dashboard, `sw.js`, assets, a workflow, the test), on `main`, with `--all`/`SMOKE_ALL=1`, or when
   git can't tell; Check hubs fetches the PR's base (`fetch-depth: 2`) and both workflows set `SMOKE_CHANGED_FROM=HEAD^1`
-  on pull requests. A one-hub change: 32 s locally instead of a full run. **Kokoro**: Sam's Default cloud environment now
-  runs a setup script that installs it (model in `/opt/kokoro`, `KOKORO_DIR`); the script is in
-  `vault/how-to/narrate-with-kokoro.md`, which now says to check before installing. Nothing students see changed.
+  on pull requests. A one-hub change: 32 s locally instead of a full run. **Kokoro installs itself on first use**: `tools/narrate.py` and
+  `render_podcast.py` run the new `tools/kokoro-setup.sh` (via `tools/podcast/kokoro_ready.py`) when kokoro-onnx or the
+  model is missing; tested from a clean machine. No setup script on the cloud environment (one was tried and taken off:
+  most sessions never narrate and it made each one wait about 70 s). Nothing students see changed.
 - **2026-11-06 (admin page: light only, Claude Code)** — Sam: "i dont want the admin page to be dark mode. its hard to
   see". `review/index.html` drops its two `prefers-color-scheme: dark` blocks (the page's colors and the switch knob) and sets
   `color-scheme: light` plus `<meta name="color-scheme" content="only light">`, so a laptop or phone in dark mode still gets

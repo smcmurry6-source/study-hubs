@@ -1,8 +1,8 @@
 """Narrate a hub's lecture notes with Kokoro: audio/<lecture>-full.mp3 (As taught) and audio/<lecture>-plain.mp3 (Plain English).
 
 The rule (vault/rules/text-and-audio-never-drift.md): change a lecture's notes at either level and regenerate that
-level's mp3 in the same PR. Setup: vault/how-to/narrate-with-kokoro.md (pip install kokoro-onnx soundfile; the model
-files in /tmp/kokoro, or $KOKORO_DIR). Hard words use tools/podcast/lexicon.json, the same lexicon as Timmy Time.
+level's mp3 in the same PR. Kokoro installs itself the first time it's missing (tools/kokoro-setup.sh: kokoro-onnx,
+soundfile and the model files in /tmp/kokoro, or $KOKORO_DIR; vault/how-to/narrate-with-kokoro.md). Hard words use tools/podcast/lexicon.json, the same lexicon as Timmy Time.
 
   python3 tools/narrate.py hubs/<hub>/index.html                      every lecture, both levels (skips existing files)
   python3 tools/narrate.py hubs/<hub>/index.html --lec dmpharm --level full --force
@@ -134,11 +134,12 @@ def readings(hub_html):
 
 
 def render(items, out_mp3, voice, speed):
+    from kokoro_ready import ensure
+    kdir = ensure()   # installs Kokoro the first time it's missing (tools/kokoro-setup.sh)
     import numpy as np, soundfile as sf
     from kokoro_onnx import Kokoro
     from kokoro_onnx.tokenizer import Tokenizer
     from render_podcast import load_lexicon, to_phonemes
-    kdir = os.environ.get("KOKORO_DIR", "/tmp/kokoro")
     k = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
     tok = Tokenizer(); lex, pat = load_lexicon(os.path.join(HERE, "podcast", "lexicon.json"))
     audio = []
@@ -194,7 +195,9 @@ def main():
                 print("=== %s %s" % (lec, level)); print("\n".join(v for k, v in spoken(R[level][lec]) if k == "text")); continue
             if os.path.exists(out) and not a.force: print("skip", out); continue
             jobs.append((lec, level, out))
-    if a.text: return
+    if a.text or not jobs: return
+    from kokoro_ready import ensure
+    ensure()   # once, before any parallel workers start, so they don't all install it at the same time
     if a.jobs > 1 and len(jobs) > 1:
         procs = []
         for i in range(a.jobs):

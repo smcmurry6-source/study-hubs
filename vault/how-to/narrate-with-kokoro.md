@@ -7,36 +7,12 @@ tags: [audio]
 
 Why this matters: [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md).
 
-**Check first:** `python3 -c "import kokoro_onnx"` and `ls "${KOKORO_DIR:-/tmp/kokoro}"`. Sam's Default cloud
-environment runs this setup script (since 2026-11-06, with the variable `KOKORO_DIR=/opt/kokoro`), so its sessions start
-with Kokoro installed; then skip to the Python below. It runs once per new container (about 70 s; a second run skips
-what's there) and never stops a session from starting. Another environment that needs Kokoro gets the same script
-(Settings, the environment's Setup script):
-
-```bash
-# study-hubs: Kokoro TTS for lecture narration and Timmy Time (vault/how-to/narrate-with-kokoro.md)
-python3 -m pip install -q kokoro-onnx soundfile || echo "setup: pip install of Kokoro failed"
-U=https://github.com/smcmurry6-source/study-hubs/releases/download/kokoro-model-v1.0
-mkdir -p /opt/kokoro
-for f in kokoro-v1.0.onnx voices-v1.0.bin; do
-  [ -s "/opt/kokoro/$f" ] && continue
-  if curl -fsSL --retry 3 -o "/opt/kokoro/$f.part" "$U/$f"; then mv "/opt/kokoro/$f.part" "/opt/kokoro/$f"
-  else echo "setup: download of $f failed"; fi
-done
-ln -sfn /opt/kokoro /tmp/kokoro
-exit 0
-```
-
-Kokoro TTS setup (cloud sessions can only download GitHub release files from
-repos attached to the session, so the model is re-hosted on this repo):
-
-```bash
-pip install kokoro-onnx soundfile
-mkdir -p /tmp/kokoro && cd /tmp/kokoro
-gh release download kokoro-model-v1.0 -R smcmurry6-source/study-hubs \
-  || for f in kokoro-v1.0.onnx voices-v1.0.bin; do
-       curl -fL -o "$f" "https://github.com/smcmurry6-source/study-hubs/releases/download/kokoro-model-v1.0/$f"; done
-```
+**Kokoro installs itself.** `tools/narrate.py` and `tools/podcast/render_podcast.py` run `tools/kokoro-setup.sh`
+the first time they find it missing: `pip install kokoro-onnx soundfile`, then the model files into `/tmp/kokoro`
+(or `$KOKORO_DIR`), about a minute, once per machine. Sessions don't install it at start (Sam, 2026-11-06: most never
+narrate, and a setup script made every one of them wait for the download). To install it by hand, or before your own
+Python: `bash tools/kokoro-setup.sh`. The model is re-hosted on this repo's release `kokoro-model-v1.0`, because cloud
+sessions can only download GitHub release files from repos attached to the session.
 
 ```python
 from kokoro_onnx import Kokoro
