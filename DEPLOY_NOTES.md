@@ -35,8 +35,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-06 (PCD Implants check-in: how the class felt about the week's changes, Claude Code)** — Sam: "for the
   implants check in, develop some questions to see how the class feels about changes in this hub like the improved patient
   boxes". The PCD Implants Exam 1 check-in (button and pop-up from 8 pm tonight) now has eight steps: after readiness, how it
-  went and hub vs exam, it asks whether the **drawn Patient Box cases** were more effective than text-only Patient Box
-  questions (Sam: "better/more effective on a scale"; 1 less effective, 3 about the same, 5 more; `pbox_better`) and how
+  went and hub vs exam, it asks whether the **new drawn Patient Box cases** were better than the Patient Box questions
+  students had before (Sam: "i want to know if they are better than the previous pt box questions"; 1 worse, 3 about the
+  same, 5 better; `pbox_better`) and how
   helpful the **diagrams and the seven implant-type drawings** were (1-5, `diagrams`, the id Occlusion's midterm used); each has an
   "I didn't get to them" / "I didn't use them" button, saved as `"none"` and kept out of the average (half the people who
   answered anything never reached a case). Then **which study tools helped** (tick any, `helped`: how the class answered each

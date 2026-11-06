@@ -99,8 +99,10 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md); CI checks the numbers (`node tools/ci/cases.js`).
 - **Exam check-in** (Sam, 2026-11-06: "see how the class feels about changes in this hub like the improved patient
   boxes"): the exam's `extraQs` in `HUBS` (`index.html`) ask four more questions, eight steps in all: `pbox_better` (were
-  the drawn Patient Box cases more effective than text-only ones: 1 less effective, 3 about the same, 5 more; Sam asked for
-  "better/more effective on a scale" rather than "how helpful", so it is not comparable with Occlusion's `pbox_img`) and
+  the new drawn Patient Box cases better than the Patient Box questions students had before: 1 worse, 3 about the same, 5
+  better; Sam asked for a scale against the previous Patient Box questions rather than "how helpful", so it is not comparable
+  with Occlusion's `pbox_img`; "before" means this hub's own text-only boxes until Nov 4-5, or other hubs' for anyone who
+  started later) and
   `diagrams` (how helpful the diagrams and the seven implant-type drawings were, 1-5, the id the Occlusion midterm used: 4.6
   there, n = 17), each with a "didn't use them" button saved as `"none"`; `helped` (tick any: how the
   class answered each choice, Why each choice, Practice questions by least practiced, High likelihood, Pinned, Timmy Time, None
