@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/289
 ---
 
 # Timmy's place: the house card, redrawn as a scene you build
