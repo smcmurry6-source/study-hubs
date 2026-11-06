@@ -6,7 +6,7 @@ created: 2026-11-05
 requested-by: Sam
 due: 2026-11-16
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/260
+pr: https://github.com/smcmurry6-source/study-hubs/pull/270
 ---
 
 # Occlusion L8 (Denture Occlusion): diagram review and the slides check
@@ -72,7 +72,7 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../../r
   (Tallgren; Cawood & Howell for the basal bone), and Figs 20-23 cite their outside sources. Same PR.
 - 2026-11-06: Sam approved PR #260 ("Merge when ready"), the budget raise included. Left: the slides check.
 - 2026-11-06: Sam added the slides and handout ("Occ Lec7 RDP Occlusion", the course's Lecture 7, in Occlusion/Final) and
-  asked for the check; done in the PR below, with the Home-timeline contrast fix for the other hubs (BUG-031).
+  asked for the check; done in [PR #270](https://github.com/smcmurry6-source/study-hubs/pull/270), with the Home-timeline contrast fix for the other hubs (BUG-031).
 
 ## Outcome
 
