@@ -22,7 +22,8 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   checks every total, profile, board and trophy rate before and after): `sh_xp_on_insert` (a v2 answer adds no capped answer
   XP; its award pays instead), `sh_xp_rebuild` (adds the award rows and replays the v2 answers) and `redeem_link_code` (also
   moves the new tables, then rebuilds).
-- Section 0 is a fix for today's bootstrap ([BUG-049](../release/bug-log.md)) and can be applied on its own.
+- Section 0 is a fix for today's bootstrap ([BUG-049](../release/bug-log.md)). It was applied to the live project on its own
+  on 2026-11-06 (Sam's OK) and is in `supabase/schema.sql`, so at the release it changes nothing.
 - **The switch** is `game_config.v2_at`, set when the migration runs. `game_baseline` keeps each visitor's XP and badges at
   that moment. **No XP back pay** (Sam, 2026-11-06): answers from before keep what they paid, and a medal reached before the
   switch earns no XP and no boost.

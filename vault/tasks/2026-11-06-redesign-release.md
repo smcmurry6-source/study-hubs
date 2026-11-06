@@ -152,8 +152,8 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 
 1. **Apply it** through the connector in the same few minutes the switch PR merges: it sets the switch time
    (`game_config.v2_at`) and takes everyone's baseline when it runs, so XP without the cap starts then. Pages that still
-   call today's functions keep today's rules either way. (Its section 0, the BUG-049 fix, may already have been applied:
-   it's a no-op the second time.)
+   call today's functions keep today's rules either way. (Its section 0, the BUG-049 fix, was applied on its own on
+   2026-11-06: it changes nothing the second time.)
 2. In the switch PR: append `migration_v54.sql` to `supabase/schema.sql` and take its line out of
    `supabase/pending-migrations.txt`; then `node tools/release/rls.js` and `rls-audit.sql` on the live project.
 3. **Load the keys** of every hub that switches: `node tools/xp/keys.js <hub> --sql` (the admin secret typed in by hand,

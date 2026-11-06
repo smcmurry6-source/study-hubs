@@ -72,6 +72,10 @@ with `migration_v53.sql` applied. Part 2 (the bundles, the stylesheet, the font,
   tables and calls every function a visitor can run with one visitor's id, failing if another's comes back (checked by
   planting a leaky function: caught). Found BUG-049, live since v53: today's bootstrap sends Timmy's days as bare dates, so HP
   counts only this device's log; the fix is section 0 of the migration and can be applied alone on Sam's OK.
+- 2026-11-06 (Claude Code, part 3): Sam: apply the BUG-049 fix now ("Yes"). Section 0 alone applied through the connector at
+  about 20:25 UTC, after checking the live function matched `supabase/schema.sql` byte for byte; afterward the live definition
+  matches the tested fix, the grants are unchanged, five active visitors' bootstraps send rows with each day's answers, and
+  `rls-audit.sql` is clean. Appended to `supabase/schema.sql`; site changelog posted. Sam: "Merge" for PR #290.
 
 ## Outcome
 

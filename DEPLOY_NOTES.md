@@ -42,8 +42,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `tools/release/xp.js` (new, 243 checks: a replayed call, a double tap, a linked device, the rebuild against the live
   calls), `rls.js` (now also calls every function a visitor can run and fails if another visitor's id comes back),
   `admin-ops.js` and `retention.js`, all with the pending migration applied; CI runs `xp.js` too. `tools/xp/keys.js` builds a
-  hub's keys from its content JSON. Found **BUG-049, live since v53**: today's bootstrap sends Timmy's days as bare dates,
-  so his HP counts only the device's own log; the fix is the migration's section 0, which can be applied alone.
+  hub's keys from its content JSON. Found **BUG-049, live since v53**: today's bootstrap sent Timmy's days as bare dates,
+  so his HP counted only the device's own log. Its fix, the migration's section 0, **was applied live on its own** (Sam's OK,
+  about 20:25 UTC) and appended to `supabase/schema.sql`; checked on five active visitors, `rls-audit.sql` clean, site
+  changelog posted. The rest of v54 is not applied.
 - **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
   students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
   Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays

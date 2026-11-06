@@ -64,7 +64,10 @@ try {
        insert into achievements (visitor_id, kind, hub, created_at) values ('xp-L1', 'mastery-bronze', 'xm', '2026-10-02 16:00:00+00'), ('xp-L1', 'owl', '', '2026-10-02 16:00:00+00');
        insert into visitor_names (visitor_id, display_name) values ('xp-L1', 'Made Up Molar');
        insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
-         select 'xp-U', 'xh', 'old' || g, true, '2026-10-05 15:00:00+00'::timestamptz + make_interval(secs => g * 30) from generate_series(1, 25) g;`);
+         select 'xp-U', 'xh', 'old' || g, true, '2026-10-05 15:00:00+00'::timestamptz + make_interval(secs => g * 30) from generate_series(1, 25) g;
+       insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+         select 'xp-PD', 'xh', 'old' || g, g < 3, ((date_trunc('day', now() at time zone 'America/Chicago') - interval '2 days' + interval '12 hours') at time zone 'America/Chicago')
+           + make_interval(secs => g * 30) from generate_series(1, 3) g;`);
   const before = {
     xp: rows(`select visitor_id, xp, days, answers, correct, best_days from xp_visitors order by 1`),
     profile: json(`get_rank_profile('xp-L1')`),
@@ -73,8 +76,9 @@ try {
   };
   eq(before.xp.find(r => r.visitor_id === 'xp-L1').xp, 600 + 20 + (3 * 2 + 3 * 1) + 20, 'today\'s rules: L1 has 600 capped + 20 on day one, three repeats right (2), three wrong (1) + 20 on day two');
   const v1keys = Object.keys(json(`get_widget_bootstrap('xp-L1', 'xm')`)).sort();
-  ok(Array.isArray(json(`get_widget_bootstrap('xp-L1', 'xm')->'pet_days'`)) && typeof json(`get_widget_bootstrap('xp-L1', 'xm')->'pet_days'`)[0] === 'string',
-    'BUG-049 is reproduced before the migration (pet_days as bare dates); if this fails, the bug was fixed elsewhere: update this check');
+  const pd0 = json(`get_widget_bootstrap('xp-PD', 'xh')->'pet_days'`);   // Timmy's days cover the last 70, so this history is recent
+  ok(Array.isArray(pd0) && pd0.length === 1 && typeof pd0[0] === 'object' && pd0[0].attempts === 3 && pd0[0].correct === 2,
+    `BUG-049 stays fixed in today's schema (v54 section 0, applied live 2026-11-06): Timmy's days are rows with their answers (${JSON.stringify(pd0).slice(0, 80)})`);
 
   /* ====================================================== the release: the pending migrations */
   const applied = db.applyPending();
@@ -88,8 +92,8 @@ try {
   sql(`select sh_xp_rebuild(array['xp-L1', 'xp-U'])`);
   eq(rows(`select visitor_id, xp, days, answers, correct, best_days from xp_visitors order by 1`), before.xp, 'the new rebuild gives today\'s totals for answers recorded the old way');
   eq(Object.keys(json(`get_widget_bootstrap('xp-L1', 'xm')`)).sort(), v1keys, 'today\'s bootstrap keeps its keys');
-  const pd1 = json(`get_widget_bootstrap('xp-L1', 'xm')->'pet_days'`);
-  ok(Array.isArray(pd1) && (pd1.length === 0 || (typeof pd1[0] === 'object' && 'attempts' in pd1[0])), `BUG-049: today's bootstrap sends Timmy's days as rows (${JSON.stringify(pd1).slice(0, 80)})`);
+  const pd1 = json(`get_widget_bootstrap('xp-PD', 'xh')->'pet_days'`);
+  eq(pd1, pd0, 'BUG-049: today\'s bootstrap sends the same rows of Timmy\'s days after the migration');
   // record_personal_answer after the switch: today's rules, the cap included
   anon(`select record_personal_answer('xp-L2', 'xh', 'leg' || g, true) from generate_series(1, 70) g`);
   eq(xpOf('xp-L2'), 620, 'record_personal_answer still caps answer XP at 600 a day after the migration (70 first-right answers: 600 + 20)');

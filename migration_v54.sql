@@ -2,7 +2,8 @@
 -- (tools/release/rls.js, tools/release/xp.js); applied to the live project at the redesign's release, not before
 -- (vault/tasks/2026-11-06-redesign-release.md). Until then it is listed in supabase/pending-migrations.txt.
 --
--- Section 0 fixes today's bootstrap (BUG-049, vault/release/bug-log.md); it can be applied alone before the release.
+-- Section 0 fixes today's bootstrap (BUG-049, vault/release/bug-log.md). It was applied to the live project on its own on
+-- 2026-11-06 (Sam's OK) and is in supabase/schema.sql; at the release it changes nothing.
 --
 -- What it adds (the notes: vault/tasks/2026-11-06-redesign-progression-journeys.md, -redesign-timmy-shop.md,
 -- -redesign-timmys-place.md, 2026-11-06-idea-board.md; how it works: vault/reference/game-server.md):
@@ -34,8 +35,8 @@
 -- ====================================================================== 0. a fix for today's bootstrap (BUG-049)
 -- migration_v53's get_widget_bootstrap sent Timmy's days as bare dates (["2026-11-06"]): to_jsonb(d) over a row aliased d
 -- that also has a column d turns the column into JSON, not the row. widget/pet.js then read 0 answers for every day and
--- worked out HP from this device's own tally only. Same function, same signature, the alias renamed. This statement
--- can be run on its own before the release (then it is a no-op here).
+-- worked out HP from this device's own tally only. Same function, same signature, the alias renamed. Applied on its own
+-- on 2026-11-06, so at the release this statement changes nothing.
 create or replace function public.get_widget_bootstrap(
   p_visitor text,
   p_hub text default null,
