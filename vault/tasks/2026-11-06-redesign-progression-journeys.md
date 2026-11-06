@@ -144,7 +144,7 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
 
 ## Done when
 
-- [ ] Server (phase 5, part 3, built on a throwaway copy, applied at the release): `question_keys`, the new
+- [x] Server (phase 5, part 3, built on a throwaway copy, applied at the release): `question_keys`, the new
       `record_personal_answer`, the guardrails, the 63-step ladder, every source in the table, the boosts, the award rows,
       `sh_xp_rebuild` updated; tests for each source, a replayed call, a double tap, a linked device (`node tools/release/rls.js`
       and a new XP suite)
@@ -160,6 +160,15 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
 - 2026-11-06: workshop of Sam's idea with the XP data.
 - 2026-11-06: Sam's calls (above); the ladder keeps its length, the cap goes, more sources added. Ready for phases 4 and 5.
 - 2026-11-06: the June 1 projection added, at Sam's request. Sam: no back pay; "that projection looks good".
+- 2026-11-06 (Claude Code): the server is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
+  [game-server](../reference/game-server.md)): `question_keys` and `record_answer_v2` (the server grades; today's
+  `record_personal_answer` keeps the cap for the old pages), the guardrails, every source in the table with its award rows,
+  the medal boost, `sh_rank` (the Handpiece identical to today's below 125,000), the `_v2` profile, boards and trophies, the
+  Dark Matter unlock mark, `sh_xp_rebuild` with a replay. The admin page's "Fixed" / "No change needed" is
+  `admin_resolve_report_v2` on the server; the control itself is still to build. The event taxonomy and retention rows for
+  the new tables are in. Calls made while building, for Sam: a question's wrong answers also pay only three a day; medal and
+  report awards aren't doubled by a boost; a rank-up is a tier; match questions are self-graded (a flat 2); a mock needs 10
+  answers for its +50; a podcast minute needs 25 seconds since the last; "finished" is 90% of its minutes.
 
 ## Outcome
 

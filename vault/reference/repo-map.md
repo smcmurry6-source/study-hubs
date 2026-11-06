@@ -14,7 +14,8 @@ tags: [map]
   `fixtures/personas.json` holds the six test accounts; `design/` is the redesign's design system page, which a preview
   serves at `/tools/preview/design/`, its art built from `tools/figures/site/` by `build.mjs`) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
   `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
-  `matrix.js`, `postcheck.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
+  `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
+  a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
 - `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
   hub or feature; don't read it whole.
 - `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`
@@ -60,6 +61,9 @@ tags: [map]
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
   Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
-  refresh `supabase/schema.sql` either way.
+  refresh `supabase/schema.sql` either way. A migration written ahead of its release (`migration_v54.sql`, the game layer's
+  server: [game-server](game-server.md)) is listed in `supabase/pending-migrations.txt` until it's applied; the database
+  suites apply the listed ones on top of `supabase/schema.sql`. At the release: apply it, append it to `supabase/schema.sql`
+  and take its line out of the list, in the same PR. `tools/xp/keys.js <hub>` builds a hub's `question_keys` from its content JSON.
 - `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code
   session doesn't need them: use git.

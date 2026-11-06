@@ -1,9 +1,11 @@
-// A throwaway PostgreSQL for the database tests (tools/release/admin-ops.js): initdb in a temp folder, Supabase's
-// roles and default grants, then supabase/schema.sql with a test admin secret. Never the live database.
-// (tools/release/rls.js has its own copy of the same setup.)
+// A throwaway PostgreSQL for the database tests (tools/release/admin-ops.js, xp.js): initdb in a temp folder, Supabase's
+// roles and default grants, then supabase/schema.sql with a test admin secret, then the migrations waiting for their
+// release (supabase/pending-migrations.txt; { pending: false } leaves them for applyPending()). Never the live database.
+// (tools/release/rls.js and retention.js have their own copy of the same setup.)
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), { execFileSync, spawnSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '../..');
+const { pending } = require('./pending');
 
 function pgBin(){
   if (process.env.PG_BIN) return process.env.PG_BIN;
@@ -13,7 +15,8 @@ function pgBin(){
   return null;
 }
 
-function throwaway(secret){
+function throwaway(secret, opts){
+  opts = opts || {};
   const BIN = pgBin();
   if (!BIN || !fs.existsSync(path.join(BIN, 'initdb'))) { console.error('✗ no PostgreSQL server binaries (set PG_BIN, or install postgresql)'); process.exit(2); }
   const asRoot = process.getuid && process.getuid() === 0;
@@ -45,7 +48,10 @@ function throwaway(secret){
        alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;`);
   const schema = fs.readFileSync(path.join(ROOT, 'supabase', 'schema.sql'), 'utf8').split('<ADMIN_SECRET>').join(secret);
   sql('begin;\n' + schema + '\ncommit;');
-  return { sql, stop, q: s => "'" + String(s).replace(/'/g, "''") + "'" };
+  const waiting = pending(secret);
+  function applyPending(){ waiting.forEach(m => { try { sql('begin;\n' + m.text + '\ncommit;'); } catch (e) { e.message = `${m.file}: ${e.message}`; throw e; } }); return waiting.map(m => m.file); }
+  if (opts.pending !== false) applyPending();
+  return { sql, stop, applyPending, pending: waiting.map(m => m.file), q: s => "'" + String(s).replace(/'/g, "''") + "'" };
 }
 
 module.exports = { throwaway, pgBin };

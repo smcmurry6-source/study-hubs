@@ -30,6 +30,9 @@ jobs:
       - name: Analytics retention on fixtures (the approved deletes, kept hourly totals, device linking, recap)
         if: ${{ !cancelled() }}
         run: node tools/release/retention.js
+      - name: XP and the game layer on fixtures (migration_v54 waiting for its release; a replayed call, a double tap, a linked device)
+        if: ${{ !cancelled() }}
+        run: node tools/release/xp.js
       - name: Hub archive state (the dashboard's dates and admin overrides)
         if: ${{ !cancelled() }}
         run: node tools/ci/archive.js
