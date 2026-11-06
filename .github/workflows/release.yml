@@ -1,6 +1,10 @@
-# The full automated release test (RELEASE_TEST_PLAN.md, "Automated gates"). The hosted preview is its own workflow,
-# preview.yml, on request only (Sam, 2026-11-06).
-# Runs on every pull request that changes the site, and by hand (Actions -> Release tests -> Run workflow).
+# The release suites that Check hubs doesn't run (RELEASE_TEST_PLAN.md, "Automated gates"): accessibility, performance,
+# the device matrix in three browsers and the admin page in a preview. Trimmed on Sam's call, 2026-11-06: a pull request
+# runs them only when it changes shared code (the dashboard, About, the admin page, widget/, assets, the service worker,
+# the database, the preview runtime, the suites or this file) or has the `full-tests` label, so question and notes
+# changes skip it; and it skips the suites Check hubs already ran on the same commit (syntax, vault, archive, secrets,
+# smoke, preview safety, database permissions, admin operations, retention). By hand (Actions -> Release tests -> Run
+# workflow) it runs every suite. The hosted preview is its own workflow, preview.yml, on request only.
 # It never deploys anything and never talks to the live database: every page runs on fixture data.
 name: Release tests
 on:
@@ -10,33 +14,49 @@ on:
         description: Browser engines for the device matrix
         default: chromium,webkit,firefox
   pull_request:
-    paths:
-      - 'index.html'
-      - 'about/**'
-      - 'review/**'
-      - 'hubs/**'
-      - 'widget/**'
-      - 'assets/**'
-      - 'sw.js'
-      - 'manifest.webmanifest'
-      - 'supabase/**'
-      - 'migration_v*.sql'
-      - 'tools/preview/**'
-      - 'tools/release/**'
-      - 'tools/ci/**'
-concurrency:
-  group: release-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    types: [opened, synchronize, reopened, labeled]
 permissions:
   contents: read
 jobs:
+  # A few seconds: does this pull request need the release suites? (Adding any other label does nothing.)
+  scope:
+    if: github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'full-tests')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1)
+      - name: Shared code changed, or the full-tests label?
+        id: decide
+        env:
+          LABELED: ${{ contains(github.event.pull_request.labels.*.name, 'full-tests') }}
+          SHARED: '^(index\.html|about/|review/|widget/|assets/|sw\.js|manifest\.webmanifest|supabase/|migration_v[^/]*\.sql|tools/preview/|tools/release/|\.github/workflows/release\.yml)'
+        run: |
+          shared=$(git diff --name-only HEAD^1 HEAD | grep -E "$SHARED" || true)
+          if [ "$LABELED" = true ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"; echo "The \`full-tests\` label is on: running the release suites." >> "$GITHUB_STEP_SUMMARY"
+          elif [ -n "$shared" ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+            { echo "Shared code changed, so the release suites run:"; echo '```'; echo "$shared"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "run=no" >> "$GITHUB_OUTPUT"
+            echo "No shared code changed (hub content, notes or tools only): the release suites are skipped. Add the \`full-tests\` label to run them anyway." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   release:
+    needs: scope
+    # a run by hand has no scope job (it's skipped), so it always runs
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.scope.outputs.run == 'yes') }}
+    concurrency:
+      group: release-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
       SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
-      # the smoke suite checks only the hubs a PR changes (HEAD^1 of the merge commit is its base); a run by hand checks every hub
-      SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
     steps:
       # The runner context isn't available in a job's env, so the results folder is set here for every later step.
       - name: Results folder outside the checkout
@@ -52,8 +72,9 @@ jobs:
           npm i --no-save playwright@1.56.1 axe-core@4.14.0
           npx playwright install --with-deps chromium webkit firefox
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
-      - name: Run every release suite
-        run: node tools/release/run.js
+      # on a pull request, Check hubs already ran these on the same commit; a run by hand runs everything
+      - name: Run the release suites
+        run: node tools/release/run.js ${{ github.event_name == 'pull_request' && '--skip syntax,vault,archive,secrets,smoke,preview,rls,admin,retention' || '' }}
       - name: Write the summary on this run's page
         if: ${{ !cancelled() }}
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true

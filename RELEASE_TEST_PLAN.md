@@ -154,8 +154,12 @@ clock; `?now=real` resets it.
 | All of the above | `node tools/release/run.js` | by hand, Release tests | Writes one summary to paste into the test report |
 | After the merge | `node tools/release/postcheck.js` | after each release | The live files differ from `main`; a live page throws |
 
-"Check hubs" (the first six) runs on every PR; "Release tests" runs on every PR that touches the site and can be run by
-hand (Actions, Release tests, Run workflow). Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
+"Check hubs" (the first six) runs on every PR. "Release tests" (trimmed on Sam's call, 2026-11-06) runs on a PR only when it
+changes shared code (the dashboard, About, the admin page, `widget/`, assets, the service worker, the database, the
+preview runtime, the suites or its own workflow) or has the **`full-tests` label**, and then skips the suites Check hubs
+already ran on that commit; question and notes changes skip it. **A tier 2 or 3 change that stays inside hubs** (a new
+hub, lectures added to one, a new mode or game in a hub) gets the `full-tests` label. Run by hand (Actions, Release
+tests, Run workflow), it runs every suite. Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
 the question lint, the baselines (accessibility, performance) and the preview's write-path checks; a bug that slipped
 through gets a check added in the PR that fixes it, where a script can see it.
 
