@@ -77,14 +77,14 @@ rules are unchanged: each hub's games, names, lobby text and look are its own (`
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (edit):
 - A **Sets** row in the panel, under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set
   replaces the list until it's closed; the filters stay as they were.
-- The panel keeps Lectures (tick boxes, Only), Show (All, High likelihood, Not answered yet, Missed last time, Pinned, each
-  with its count), Order (In order / Random), More filters (type, source), the `.qsum` line with removable tags and Clear
-  all, and the tracking names. On a laptop a Today column (the goal ring, streak, XP, this session) sits beside the questions.
+- The panel keeps Lectures (tick boxes, Only), Show (All, Not answered yet, Missed last time, Pinned, each with its count),
+  the **Only** line with the High likelihood toggle on top of any Show chip (and a hub's own toggles, `SH_HUB.bank.only`),
+  Order (In order / Random), More filters (type, source), the `.qsum` line with removable tags and Clear all, and the
+  tracking names (`bank:show=likely`, `bank:show=likely-off`, `bank:tag-off=lk`). On a laptop a Today column (the goal ring, streak, XP, this session) sits beside the questions.
 - Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status.
 
 **[every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)** (one line): in the new card, "Why each choice" is one folded
-bar under the explanation; opened, it lists every choice with your pick's reason open (ask Sam first, see the phase 1
-note's Outcome, whether the pick's reason should show without a tap).
+bar under the explanation; opened, it lists every choice with your pick's reason open (Sam, 2026-11-06).
 
 **[build-a-hub](../how-to/build-a-hub.md)** (rewrite "Build it" and "Wire it into the site"):
 - A new hub is a page like `hubs/occlusion/next/index.html`: the guard script, `window.SH_HUB` (hub id, name, state key,
@@ -109,12 +109,13 @@ note's Outcome, whether the pick's reason should show without a tap).
 - **Notes**: the lecture list (lectures on the exam first, the others for review, each with a progress bar and how many
   you've tried), both reading levels, Listen, the drawn diagrams beside their paragraph, and **Check yourself**: three
   questions at the end of each lecture's notes.
-- **Questions**: the bank, its panel and the four sets (Daily drill, Yesterday's misses, Weak spots, Mock exam); answer
+- **Questions**: the bank, its panel (the High likelihood toggle as now) and the four sets (Daily drill, Yesterday's misses, Weak spots, Mock exam); answer
   choices look as they do now (plain rows, a check or cross after you answer); Pin and Report on every card.
 - **Rewards on every answer** (new): XP counts up on the rank pill, the goal ring fills, the streak flame grows with the
-  streak, Timmy cheers or flinches, and after 25 answers (or when you leave with 5 or more) a **session recap** card says
-  how it went and offers the misses.
-- **Daily goal and streak** (new): 10 to 50 questions a day (default 20) in Settings; the streak counts the days you meet it.
+  streak, Timmy cheers or flinches, and when you leave the questions with 5 or more answered a **session recap** card says
+  how it went and offers the misses (never mid-practice; Sam, 2026-11-06).
+- **Daily goal** (new): a ring in the bar fills toward 10 to 50 questions a day (default 20, in Settings). The **streak**
+  still counts any day you answer a question, as now; missing the goal doesn't break it (Sam, 2026-11-06).
 - **More**: Timmy Time, Exam hints, Cram sheet, Side by side (was Review), Arcade, Stats and trophies, Settings.
 - **Settings** (changed): theme, text size, the daily goal, your name, Timmy and the extras. The font choice, background
   music and the accent metal are gone (remove their entries and any trophy text that names them; keep "All 24 trophies"

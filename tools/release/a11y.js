@@ -39,7 +39,12 @@ async function keyboard(page){
       const s = getComputedStyle(e), ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || (s.boxShadow && s.boxShadow !== 'none');
       const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
       /* why a stop has no ring, for the report: is it :focus / :focus-visible, does the page have focus, what outline applies */
-      const why = ring ? '' : `focus=${e.matches(':focus')} focus-visible=${e.matches(':focus-visible')} page-focused=${document.hasFocus()} outline=${s.outlineStyle} ${s.outlineWidth}`;
+      let why = '';
+      if (!ring) {
+        why = `focus=${e.matches(':focus')} focus-visible=${e.matches(':focus-visible')} page-focused=${document.hasFocus()} outline=${s.outlineStyle} ${s.outlineWidth}` +
+          ` html=${document.documentElement.className || '-'} in-hx=${!!e.closest('.hx')}`;
+        return new Promise(r => setTimeout(() => { const t = getComputedStyle(e); r({ id, ring, why: why + ` later: active=${document.activeElement === e} outline=${t.outlineStyle} ${t.outlineWidth}`, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) }); }, 200));
+      }
       return { id, ring, why, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
     });
     if (!f || f.skip) continue;

@@ -123,7 +123,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Shared-widget changes are gated to the new versions: `window.shPet.say`/`hp`, `sh:rank-profile`, `SH_TOUR.steps`/`prompt`,
   `shDrill.set`, and in `v3.js` Timmy's script loads only once he's adopted and the tour's only when it's started, for
   pages with `SH_HUB`. `tools/ci/smoke.js` clicks through every `hubs/*/next/` page; `tools/release/perf.js` measures it.
-  Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md` for the release.
+  The new bank follows #273's rule (High likelihood is an Only toggle on top of any Show chip; a hub adds its own in
+  `SH_HUB.bank.only`). Sam's calls: the streak counts any study day (the goal ring is today's target), the session recap
+  shows only on leaving the questions, Cusp Sort leads the arcade, "Why each choice" opens on your pick. Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`.
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,
   Perio, Special Patient Care, PCD Implants and Heme & Endo Exam 2, High likelihood leaves the Show chips (now All, Not answered

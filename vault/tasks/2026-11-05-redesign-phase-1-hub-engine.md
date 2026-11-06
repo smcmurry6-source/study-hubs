@@ -71,6 +71,15 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - 2026-11-06: built (Claude Code). Sam's look mid-build: Timmy back in the bottom-left corner with a Settings button on the
   bar, plain answer rows like the live hubs (no circles), more design on the Notes lecture list ([decisions](../decisions.md)).
   The engine's "Why each choice" now folds under one bar like the live hubs; inside it the pick's reason is open (asked Sam).
+- 2026-11-06: rebased onto [PR #273](https://github.com/smcmurry6-source/study-hubs/pull/273) (High likelihood works on top of
+  any Show chip). The engine's bank follows the new rule: Show is All, Not answered yet, Missed last time, Pinned, and an
+  **Only** line under it holds the High likelihood toggle (`STATE.ui.qlikely`), with its own tag, the live hubs' empty-state
+  words, a saved Show "likely" moved to the toggle, Exam hints' "Practice these" turning it on and Home's Practice questions
+  turning it off. A hub adds its own toggle in `SH_HUB.bank.only` (Heme & Endo Exam 2's Exam 1 High likelihood, phase 2).
+- 2026-11-06: Sam's answers ([decisions](../decisions.md)): keep "Why each choice" with the pick's reason open inside the
+  fold, and Cusp Sort up front; the streak counts any study day (built as goal days: changed, `studyDays()` reads the live
+  hub's `STATE.days`, so nobody's streak changes at the release); the session recap only on leaving the questions with 5
+  or more answered (the 25-answer card is gone).
 
 ## Outcome
 
@@ -93,4 +102,5 @@ Built side by side, nothing students see changes ([PR #275](https://github.com/s
   in the [bug log](../release/bug-log.md).
 - The rule, About page and build-a-hub changes are drafted in the [release note](2026-11-06-redesign-release.md).
 - **For phase 2**: `PCASES` and the case kit are wired (Perio, PCD Implants); the figure 11 px floor is in the content
-  build; anything a hub writes in its own code goes in its `SH_HUB`.
+  build; anything a hub writes in its own code goes in its `SH_HUB`; a hub's own bank toggle goes in `SH_HUB.bank.only`
+  (`[[key, label]]`, the key a question property), as Heme & Endo Exam 2's Exam 1 High likelihood will.

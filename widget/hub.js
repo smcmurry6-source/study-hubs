@@ -91,7 +91,7 @@
   var STATE_KEY = C.stateKey;
   function defaultState(){
     return { v: 1, seen: {}, streak: 0, bestStreak: 0, totalCorrect: 0, totalAnswered: 0, lecStats: {}, days: [], ach: {},
-      ui: { mode: "home", sub: "notes", lec: C.firstLec || "", level: "full", group: "", recall: false, qlec: "all", qsrc: "all", qstatus: "all" },
+      ui: { mode: "home", sub: "notes", lec: C.firstLec || "", level: "full", group: "", recall: false, qlec: "all", qsrc: "all", qstatus: "all", qlikely: "" },
       arcade: { best: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, plays: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, muted: false, scope: "all", sortSet: "mix", snakeLec: "all", stackSet: "mix", matchSet: "mix", hangLec: "all", blastLec: "all", searchLec: "all", whackSet: "mix" } };
   }
   function loadState(){
@@ -174,12 +174,14 @@
   function goal(){ return STATE.nx.goal || 20; }
   function goalDays(){
     var on = {}; Object.keys(STATE.nx.days).forEach(function(k){ if (STATE.nx.days[k].met) on[k] = 1; });
-    /* before this device used the new hub, a day you studied counts as a goal day, so nobody's streak resets at the release */
-    (STATE.days || []).forEach(function(k){ if (k < STATE.nx.since) on[k] = 1; });
     return on;
   }
+  /* the streak counts the days you studied (answered at least one question), as on the live hubs (Sam, 2026-11-06): the
+     goal ring is today's target, and missing it doesn't break the streak. STATE.days is the live hub's own list, so
+     nobody's streak changes at the release. Not studied yet today: it counts back from yesterday. */
+  function studyDays(){ var on = {}; (STATE.days || []).forEach(function(k){ on[k] = 1; }); return on; }
   function streakDays(){
-    var on = goalDays(), n = 0, off = on[day(0)] ? 0 : -1;
+    var on = studyDays(), n = 0, off = on[day(0)] ? 0 : -1;
     while (on[day(off)]) { n++; off--; }
     return n;
   }
@@ -278,7 +280,7 @@
   function paintMeters(){
     if (!shell) return;
     var n = streakDays(), t = todayRec(), g = goal();
-    $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row with the goal met" : "No streak yet") + "</span>"; });
+    $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
     $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
     var x = rankXp(), rk = $("#hxRank");
     /* its spoken name is its visible text with a few hidden words around it (axe: the label must contain what's shown) */
@@ -523,8 +525,8 @@
       if (rec.met) {
         var n = streakDays();
         $$("[data-streakm] .flame").forEach(function(f){ f.classList.add("grow-in"); });
-        say("Goal met! " + (n > 1 ? pl(n, "day") + " in a row." : "That's day one of your streak."), "do-hop");
-        toast("Today's goal is met: " + goal() + " questions. Your streak is " + pl(n, "day") + ".");
+        say("Goal met! " + goal() + " questions today.", "do-hop");
+        toast("Today's goal is met: " + goal() + " questions." + (n > 1 ? " Your streak is " + pl(n, "day") + "." : ""));
       }
     }, reduced ? 0 : 650);
   }
@@ -554,14 +556,15 @@
   function petHp(){ try { return window.shPet && window.shPet.hp ? window.shPet.hp() : null; } catch (e) { return null; } }
   function todayPanel(){
     var t = todayRec(), g = goal(), n = streakDays(), left = Math.max(0, g - t.n), hp = petHp();
-    var cap = t.n >= g ? "Goal met. " + (n > 1 ? "Your streak is " + pl(n, "day") + "." : "Your streak starts today.") : left === g ? "Answer " + g + " questions today to keep your streak going." : pl(left, "more question") + " meets today's goal.";
+    var cap = t.n >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions. One answer keeps your streak going." : pl(left, "more question") + " meets today's goal.";
     return '<div class="panel today" data-today><h2>Today</h2><div class="big-ring">' + ring(t.n, g) + '<div><p class="ring-num num">' + fmt(t.n) + " of " + g + '</p><p class="ring-cap">' + esc(cap) + "</p></div></div>" +
       '<dl class="kv"><div><dt>' + icon("flame", 18) + 'Streak</dt><dd class="num">' + (n ? pl(n, "day") : "Not yet") + "</dd></div>" +
       "<div><dt>" + icon("xp", 18) + 'XP today</dt><dd class="num">+' + fmt(t.xp) + " XP</dd></div>" +
       "<div><dt>" + icon("questions", 18) + 'This session</dt><dd class="num">' + fmt(SESSION.n) + " answered · " + fmt(SESSION.r) + " right</dd></div>" +
       (hp !== null ? "<div><dt>" + icon("tooth", 18) + 'Timmy</dt><dd class="num">' + hp + " HP</dd></div>" : "") + "</dl></div>";
   }
-  /* the session recap: after 25 answers, and when you leave the questions with 5 or more since the last one */
+  /* the session recap: when you leave the questions with 5 or more answered since the last one (Sam, 2026-11-06: never
+     mid-practice) */
   function recapDue(){ var n = SESSION.n - SESSION.since; return n >= 5 ? { n: n, r: SESSION.r - (SESSION.rAt || 0), xp: SESSION.xp - (SESSION.xpAt || 0), miss: Object.assign({}, SESSION.miss) } : null; }
   function markRecap(){ SESSION.since = SESSION.n; SESSION.rAt = SESSION.r; SESSION.xpAt = SESSION.xp; SESSION.miss = {}; }
   function recapHTML(d){
@@ -579,7 +582,7 @@
       (function step(t){ var k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3); n.textContent = (plus ? "+" : "") + Math.round(to * e); if (k < 1) requestAnimationFrame(step); })(t0); });
     node.addEventListener("click", function(e){
       var b = e.target.closest("[data-recap]"); if (!b) return;
-      if (b.getAttribute("data-recap") === "miss") { STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-lecs").split(","); STATE.ui.qstatus = "missed"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("recap:misses"); go("questions"); }
+      if (b.getAttribute("data-recap") === "miss") { STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-lecs").split(","); STATE.ui.qstatus = "missed"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("recap:misses"); go("questions"); }
       else { node.remove(); track("recap:keep"); }
     });
   }
@@ -621,7 +624,7 @@
     var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
     var mis = srsMisses().length, examWeek = d !== null && d >= 0 && d <= 7;
     var pod = CORE.podcast;
-    var q = function(href, ic, title, sub, cls){ return '<a class="ql' + (cls ? " " + cls : "") + '" href="' + href + '">' + icon(ic, 22) + "<span><b>" + esc(title) + "</b><small>" + esc(sub) + "</small></span></a>"; };
+    var q = function(href, ic, title, sub, cls){ return '<a class="ql' + (cls ? " " + cls : "") + '" href="' + href + '"' + (cls === "is-primary" ? " data-home-practice" : "") + ">" + icon(ic, 22) + "<span><b>" + esc(title) + "</b><small>" + esc(sub) + "</small></span></a>"; };
     var html = '<div class="hx-page home">' +
       '<div class="home-top">' +
         '<figure class="mast">' + img(M.body, M.label, "", "0 0 600 200") + "</figure>" +
@@ -653,8 +656,10 @@
         "</div>" +
       "</div></div>";
     el.innerHTML = html;
+    /* Home's way into the bank starts fresh: the exam's lectures, not answered yet, High likelihood off (the rule) */
+    $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); bankReset(); STATE.ui.qlec = ex.length && ex.length < LECS.length ? ex : "all"; STATE.ui.qstatus = "unseen"; bankSearch = ""; saveState(); }); });
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
-    tip(el, "home", "Your daily goal is the ring in the bar: " + goal() + " questions keeps your streak going. Change it in More, Settings.");
+    tip(el, "home", "Your daily goal is the ring in the bar: " + goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
   }
   function nextHTML(rows, mis, examWeek){
     var fin = rows.filter(function(r){ return isExamLec(r.l.id); }), out = [];
@@ -816,12 +821,21 @@
     (need ? needFigures() : Promise.resolve()).then(function(){ if (!host.isConnected) return; pick.forEach(function(q){ host.appendChild(card(q, { ctx: "check" })); }); });
   }
   function wireLecLinks(el){
-    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice"); }); });
+    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice"); }); });
     $$("[data-cram]", el).forEach(function(a){ a.addEventListener("click", function(){ setTimeout(function(){ var c = document.getElementById("cram-" + a.getAttribute("data-cram")); if (c) c.scrollIntoView({ block: "start" }); }, 80); }); });
   }
 
   /* ======================= Questions: the bank, its panel, its presets ======================= */
-  var SHOW = [["all", "All"], ["likely", "High likelihood"], ["unseen", "Not answered yet"], ["missed", "Missed last time"], ["pinned", "Pinned"]];
+  var SHOW = [["all", "All"], ["unseen", "Not answered yet"], ["missed", "Missed last time"], ["pinned", "Pinned"]];
+  /* Only: the High likelihood toggle, on top of any Show chip (Sam, 2026-11-06). A hub may add its own (SH_HUB.bank.only,
+     [[key, label]], the key a question property), one on at a time. A Show "likely" saved before then becomes the toggle. */
+  var LIKELY = [["likely", "High likelihood"]].concat((C.bank && C.bank.only) || []);
+  function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
+  function normShow(){
+    if (isLk(STATE.ui.qstatus)) { STATE.ui.qlikely = STATE.ui.qstatus; STATE.ui.qstatus = "all"; }
+    if (STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = "";
+  }
+  function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
   var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
   var FMTS = [["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
   var PAGE = 20, bankSearch = "";
@@ -839,13 +853,14 @@
   function filtered(o){
     o = o || {};
     var s = (o.search != null ? o.search : bankSearch).toLowerCase().trim(), on = {}, pin = {};
-    var st = o.st || STATE.ui.qstatus || "all", fm = o.fm || STATE.ui.qfmt || "all", src = o.src || STATE.ui.qsrc || "all";
+    normShow();
+    var st = o.st || STATE.ui.qstatus || "all", lk = "lk" in o ? o.lk : STATE.ui.qlikely || "", fm = o.fm || STATE.ui.qfmt || "all", src = o.src || STATE.ui.qsrc || "all";
     lecIds().forEach(function(id){ on[id] = 1; });
     if (st === "pinned") pins().forEach(function(id){ pin[id] = 1; });
     return QS.filter(function(q){
       if (!on[q.lec]) return false;
       if (st === "pinned" && !pin[q.id]) return false;
-      if (st === "likely" && !q.likely) return false;
+      if (lk && !q[lk]) return false;
       if (src !== "all" && q.src !== src) return false;
       if (fm !== "all" && !isFmt(q, fm)) return false;
       var seen = STATE.seen[q.id];
@@ -861,7 +876,7 @@
     return list.slice().sort(function(a, b){ return pos[a.lec] - pos[b.lec]; });
   }
   function renderQuestions(el, s){
-    if (s === "missed") { STATE.ui.qset = ""; STATE.ui.qstatus = "missed"; STATE.ui.qlec = "all"; saveState(); history.replaceState(null, "", "#questions"); s = ""; }
+    if (s === "missed") { STATE.ui.qset = ""; STATE.ui.qstatus = "missed"; STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; saveState(); history.replaceState(null, "", "#questions"); s = ""; }
     if (SESSION.hp0 === null) SESSION.hp0 = petHp();
     el.innerHTML = '<div class="hx-page bank"><p class="note loading">Loading the questions…</p></div>';
     needQuestions().then(function(){ if (view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
@@ -879,6 +894,8 @@
   }
   function panelHTML(preset){
     var picked = lecIds(), all = LECS.length, sum = picked.length === all ? "All lectures" : picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
+    normShow();
+    var lkChip = function(k, lab){ var on = !preset && STATE.ui.qlikely === k; return '<button class="chip chip-tog" type="button" data-lk="' + k + '" aria-pressed="' + on + '"><span class="box" aria-hidden="true">' + icon("check", 14) + "</span>" + esc(lab) + ' <span class="n num">' + filtered({ lk: k }).length + "</span></button>"; };
     var showChip = function(k, lab){ var n = filtered({ st: k }).length; return '<button class="chip" type="button" data-show="' + k + '" aria-pressed="' + (!preset && (STATE.ui.qstatus || "all") === k) + '">' + esc(lab) + ' <span class="n num">' + n + "</span></button>"; };
     var setCount = { drill: "", misses: srsMisses().length, weak: weakList().length, mock: mockTotal() };
     var setChip = function(k, lab){ return '<a class="chip" href="#questions/' + k + '" data-set="' + k + '"' + (preset === k ? ' aria-current="page"' : "") + ">" + icon(k === "misses" ? "misses" : k, 16) + esc(lab) + (setCount[k] !== "" ? ' <span class="n num">' + setCount[k] + "</span>" : "") + "</a>"; };
@@ -894,6 +911,7 @@
         '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
       "</div>" +
       '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
+      '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row"><span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
         '<details class="morefil"' + (STATE.ui.qmore ? " open" : "") + '><summary class="btn btn-text">' + icon("filter", 16) + "More filters" + (more ? ' <span class="badge num">' + more + " on</span>" : "") + "</summary>" +
@@ -911,6 +929,7 @@
     $("[data-lpall]", el).addEventListener("click", function(){ STATE.ui.qlec = "all"; redraw("lec-all"); });
     $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).forEach(function(c){ c.checked = false; }); STATE.ui.qlec = []; saveState(); $("#lpS", el).textContent = "No lectures"; });
     $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
+    $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); STATE.ui.qlikely = !preset && STATE.ui.qlikely === k ? "" : k; redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
     $$("[data-order]", el).forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-order"); if (o === "random") STATE.ui.qseed = Math.floor(Math.random() * 2e9) + 1; STATE.ui.qorder = o; redraw("order=" + o); }); });
     $$("[data-fmt]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qfmt = b.getAttribute("data-fmt"); STATE.ui.qmore = 1; redraw("type=" + STATE.ui.qfmt); }); });
     $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qsrc = b.getAttribute("data-src"); STATE.ui.qmore = 1; redraw("src=" + STATE.ui.qsrc); }); });
@@ -965,23 +984,34 @@
     var all = QS.length, list = ordered(filtered());
     LIST.items = list;
     sumEl.innerHTML = summaryHTML(list.length, all);
-    $$("[data-tagoff]", sumEl).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-tagoff"); if (k === "lec") STATE.ui.qlec = "all"; if (k === "show") STATE.ui.qstatus = "all"; if (k === "fmt") STATE.ui.qfmt = "all"; if (k === "src") STATE.ui.qsrc = "all"; if (k === "search") bankSearch = ""; saveState(); track("bank:tag-off=" + k); drawQuestions(el, ""); }); });
-    var ca = $("[data-clearall]", sumEl); if (ca) ca.addEventListener("click", function(){ STATE.ui.qlec = "all"; STATE.ui.qstatus = "all"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); });
-    if (!list.length) { host.innerHTML = emptyHTML("Nothing matches", "Those filters together leave no questions.", '<button class="btn btn-primary" type="button" data-clearall>Show all ' + all + " questions</button>"); $("[data-clearall]", host).addEventListener("click", function(){ STATE.ui.qlec = "all"; STATE.ui.qstatus = "all"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; bankSearch = ""; saveState(); drawQuestions(el, ""); }); return; }
+    $$("[data-tagoff]", sumEl).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-tagoff"); if (k === "lec") STATE.ui.qlec = "all"; if (k === "show") STATE.ui.qstatus = "all"; if (k === "lk") STATE.ui.qlikely = ""; if (k === "fmt") STATE.ui.qfmt = "all"; if (k === "src") STATE.ui.qsrc = "all"; if (k === "search") bankSearch = ""; saveState(); track("bank:tag-off=" + k); drawQuestions(el, ""); }); });
+    var ca = $("[data-clearall]", sumEl); if (ca) ca.addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); });
+    if (!list.length) { host.innerHTML = emptyHTML("Nothing matches", emptyWhy(), '<button class="btn btn-primary" type="button" data-clearall>Show all ' + all + " questions</button>"); $("[data-clearall]", host).addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); }); return; }
     page();
   }
   function summaryHTML(n, all){
     var tags = [], picked = lecIds();
     if (picked.length !== LECS.length) tags.push(["lec", picked.length === 1 ? lecName(picked[0]) : picked.length + " lectures"]);
     if (STATE.ui.qstatus && STATE.ui.qstatus !== "all") tags.push(["show", labelOf(SHOW, STATE.ui.qstatus)]);
+    if (STATE.ui.qlikely) tags.push(["lk", labelOf(LIKELY, STATE.ui.qlikely)]);
     if (STATE.ui.qfmt && STATE.ui.qfmt !== "all") tags.push(["fmt", labelOf(FMTS, STATE.ui.qfmt)]);
     if (STATE.ui.qsrc && STATE.ui.qsrc !== "all") tags.push(["src", (CORE.srcLabel || {})[STATE.ui.qsrc] || STATE.ui.qsrc]);
     if (bankSearch.trim()) tags.push(["search", "“" + bankSearch.trim() + "”"]);
     return '<p class="sumline">Showing <b class="num">' + n + "</b> of " + all + " questions" + (STATE.ui.qorder === "random" ? ", in random order" : "") + "</p>" +
       (tags.length ? '<span class="tags">' + tags.map(function(t){ return '<button class="tagx" type="button" data-tagoff="' + t[0] + '" aria-label="Remove the filter ' + esc(t[1]) + '">' + esc(t[1]) + icon("close", 14) + "</button>"; }).join("") + '<button class="btn btn-text" type="button" data-clearall>Clear all</button></span>' : "");
   }
+  /* what's in the way when the bank shows nothing, in the live hubs' words */
+  function emptyWhy(){
+    var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? labelOf(LIKELY, STATE.ui.qlikely) + " " : "";
+    var only = !(STATE.ui.qfmt && STATE.ui.qfmt !== "all") && !(STATE.ui.qsrc && STATE.ui.qsrc !== "all") && !bankSearch.trim();
+    if (!lecIds().length) return "No lectures are ticked, so there is nothing to show.";
+    if (st === "pinned" && !pins().length) return "No pinned questions yet. Tap Pin on any question to save it here.";
+    if (st === "missed" && only) return lk ? "You haven't missed any " + lk + "questions in these lectures. Questions you get wrong come back here." : "Nothing missed in these lectures. Questions you get wrong come back here.";
+    if (st === "unseen" && only) return "You have answered every " + lk + "question here. Try Missed last time, or another lecture.";
+    return "Those filters together leave no questions.";
+  }
   function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
-  function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlec = "all"; saveState(); }); }); }
+  function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; saveState(); }); }); }
   /* twenty cards, then the next twenty load by themselves as you reach the end */
   var io = null;
   function page(){
@@ -1009,10 +1039,6 @@
       after.parentNode.insertBefore(again, after.nextSibling);
     }
     if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
-    if (SESSION.n - SESSION.since >= 25) {
-      var d = recapDue(); markRecap();
-      var r = h(recapHTML(d)); cardEl.parentNode.insertBefore(r, cardEl.nextSibling); wireRecap(r); track("recap:25");
-    }
     if (L.ctx === "drill") {
       setTimeout(function(){
         var D = window.shDrill; if (!D || !D.set) return;
@@ -1158,7 +1184,7 @@
           return '<div class="hint-group"><h3>' + esc(lecName(l.id)) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
             return '<figure class="hint"><blockquote>“' + esc(x.quote) + '”</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
       body.innerHTML = html;
-      $$("[data-likely]", body).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-likely"); STATE.ui.qstatus = "likely"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("hints:likely-practice"); go("questions"); }); });
+      $$("[data-likely]", body).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-likely"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = "likely"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("hints:likely-practice"); go("questions"); }); });
     }); }).catch(function(){ body.innerHTML = "<p>Couldn't load the hints. Check your connection.</p>"; });
   }
   function likelyHTML(X){
@@ -1223,7 +1249,7 @@
         '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>" +
       '<section class="panel" aria-labelledby="ssH"><h2 id="ssH">Your answers</h2><dl class="kv">' +
         "<div><dt>Answered</dt><dd class=\"num\">" + fmt(STATE.totalAnswered) + "</dd></div><div><dt>Right</dt><dd class=\"num\">" + fmt(STATE.totalCorrect) + (acc !== null ? " · " + acc + "%" : "") + "</dd></div>" +
-        "<div><dt>Best run</dt><dd class=\"num\">" + pl(STATE.bestStreak, "right in a row", "right in a row") + "</dd></div><div><dt>Goal days</dt><dd class=\"num\">" + fmt(days) + "</dd></div>" +
+        "<div><dt>Best run</dt><dd class=\"num\">" + pl(STATE.bestStreak, "right in a row", "right in a row") + "</dd></div><div><dt>Days goal met</dt><dd class=\"num\">" + fmt(days) + "</dd></div>" +
         "<div><dt>Achievements</dt><dd class=\"num\">" + Object.keys(STATE.ach || {}).length + " of " + (CORE.achievements || []).length + "</dd></div></dl></section>" +
       '<section class="panel wide" aria-labelledby="slH"><h2 id="slH">By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Tried</th><th scope="col" class="r">Right now</th><th scope="col" class="r">Accuracy</th></tr></thead><tbody>' +
         rows.map(function(r){ return '<tr><th scope="row">' + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
@@ -1255,7 +1281,7 @@
         '<div class="set-row"><div><b>Theme</b><small>Every hub and the dashboard follow it.</small></div>' + seg("theme", [["light", "Light"], ["dark", "Dark"], ["", "Match my device"]], theme) + "</div>" +
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
-        '<div class="set-row"><div><b>Questions a day</b><small>Meet it to keep your streak. It counts every answer, right or wrong.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(goal())) + "</div>" +
+        '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(goal())) + "</div>" +
         (window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
       '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p>' +
         EXTRAS.map(function(x){ return '<div class="set-row"><div><b>' + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></div>" + seg(x[0], x[3] || [["on", "On"], ["off", "Off"]], ls(x[0]) || "on") + "</div>"; }).join("") + "</section></div>";
@@ -1313,7 +1339,7 @@
     else if (g.v === "cram") { go("more/cram"); setTimeout(function(){ var c = document.getElementById("cram-" + g.lec); if (c && window.shFlash) window.shFlash(c); }, 600); }
     else if (g.v === "hints") go("more/hints");
     else if (g.v === "review") go("more/side");
-    else if (g.v === "bank") { STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qstatus = "all"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; bankSearch = g.q || ""; saveState(); go("questions"); }
+    else if (g.v === "bank") { bankReset(); bankSearch = g.q || ""; saveState(); go("questions"); }
   };
   var LOADED = Date.now();
   window.SH_SYNC = {
@@ -1335,7 +1361,8 @@
       if (!changed) return;
       STATE.days.sort(); achievements(true); saveNow(); paintMeters();
       if (added) toast("Synced " + pl(added, "question") + " from your other devices");
-      if (Date.now() - LOADED < 8000 && view === "home") route();
+      /* Home, or a bank not yet answered in, redraws with the merged answers (its counts and Missed last time) */
+      if (Date.now() - LOADED < 8000 && (view === "home" || (view === "questions" && !SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))))) route();
     }
   };
   window.SH_DRILL = {
@@ -1356,7 +1383,7 @@
     return [
       { title: "Welcome to " + (C.name || "this hub"), body: "<p>A quick look at where everything is, on the real buttons. It switches pages for you and takes about a minute.</p>" },
       { el: "#modeSwitch", title: "Four pages", body: "<ul><li><b>Home</b>: the countdown, where to go next and your progress.</li><li><b>Notes</b>: every lecture, to read or listen to, with its charts and three questions to check yourself.</li><li><b>Questions</b>: the whole bank, plus the daily drill, yesterday's misses, weak spots and the mock.</li><li><b>More</b>: Timmy Time, hints, the cram sheet, the arcade, stats and settings.</li></ul>" },
-      { el: function(){ return [].slice.call(document.querySelectorAll("[data-goalm]")).filter(o.visible)[0]; }, title: "Your daily goal", body: "<p>" + goal() + " questions a day keeps your streak going; the flame counts the days. Change the goal in More, Settings.</p>" },
+      { el: function(){ return [].slice.call(document.querySelectorAll("[data-goalm]")).filter(o.visible)[0]; }, title: "Your daily goal", body: "<p>The ring fills toward " + goal() + " questions a day, and the flame counts the days in a row you study. Change the goal in More, Settings.</p>" },
       { el: function(){ return [document.getElementById("hxRank"), document.getElementById("hxXp")].filter(o.visible)[0]; }, title: "XP and your rank", body: "<p>Every answer earns XP, and it flies up here. Tap it for your stats and trophies.</p>" },
       { el: ".hx-set", title: "Settings", body: "<p>Theme, text size, your daily goal, Timmy and the extras.</p>" },
       { el: ".shpet-home", title: "Timmy", body: "<p>Timmy Tooth, in the corner, cheers when you get one right and when you meet your goal. Tap him for a joke.</p>" },

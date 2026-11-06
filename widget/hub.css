@@ -111,6 +111,11 @@ html.hx-kbd .hx :is(a, button, summary, select, textarea, [tabindex]:not([tabind
 .hx .chip[aria-pressed="true"], .hx a.chip[aria-current="page"] { background: var(--hub-soft); color: var(--hub-text); }
 .hx .chip[aria-pressed="true"] .n, .hx a.chip[aria-current="page"] .n { color: inherit; }
 .hx .chipset { display: flex; flex-wrap: wrap; gap: 6px; }
+/* a tick-box chip (the bank's Only toggles): an empty box, ticked when on */
+.hx .chip-tog .box { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--line-strong); }
+.hx .chip-tog .box svg { opacity: 0; }
+.hx .chip-tog[aria-pressed="true"] .box { border-color: var(--hub-text); background: var(--hub-text); color: var(--bg, #fff); }
+.hx .chip-tog[aria-pressed="true"] .box svg { opacity: 1; }
 .hx .seg { display: inline-flex; flex-wrap: wrap; padding: 3px; gap: 2px; background: var(--panel); border-radius: var(--r-pill); }
 .hx .panel .seg, .hx .qbar .seg { background: var(--row); }
 .hx .seg button { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: transparent;
@@ -724,6 +729,8 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .qc-match { grid-template-columns: 1fr; }
   .qbar .lab { min-width: 0; flex-basis: 100%; }
   .qbar-row.chips .lab { padding-top: 0; }
+  .qbar-row.only { flex-wrap: nowrap; }
+  .qbar-row.only .lab { flex-basis: auto; padding-top: 8px; }
   .lp { flex-wrap: wrap; width: 100%; gap: 6px; }
   .hx .lp-btn { max-width: none; width: 100%; justify-content: space-between; }
   .lp-pop { left: 0; }
