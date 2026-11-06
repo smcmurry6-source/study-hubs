@@ -15,6 +15,7 @@ changes" in `DEPLOY_NOTES.md` (grep it before re-proposing something).
 
 | Date | Decision | Applies to | Source |
 |---|---|---|---|
+| 2026-11-06 | "Release with the rest of the hub redesign when its ready": one release with everything, no target date and no rush before an exam. As the release note says, a hub whose exam passes first keeps its old page (Heme & Endo 2 Nov 13, the Occlusion final Nov 16, the Perio final Nov 19), so phase 2 ports only the hubs that will still be live when the release is in sight | redesign | chat, [release](tasks/2026-11-06-redesign-release.md), [phase 2](tasks/2026-11-05-redesign-phase-2-live-hubs.md) |
 | 2026-11-06 | The bowling egg's triggers: a strike every 50 first-try right answers in a row and the turkey at 150, not 10 and 30 ("that would happen way too often and be annoying") | widget (`eggs.js`) | chat, [task](tasks/2026-11-06-redesign-bowling-egg.md) |
 | 2026-11-06 | "No back pay": removing the XP cap counts from the release on; past days keep what they paid. On the June 1 projection (the top five just reach the ModuPro, the median ends in Silver): "that projection looks good" | widget, Supabase | chat, [task](tasks/2026-11-06-redesign-progression-journeys.md) |
 | 2026-11-06 | "Merge 276": Sam's approval of [#276](https://github.com/smcmurry6-source/study-hubs/pull/276) (the redesign's agreed additions, vault notes only), merged by the agent once "Check hubs" passed | vault | chat |
