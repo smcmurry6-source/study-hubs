@@ -41,7 +41,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Hanau's first-molar contacts and remounts, Thielemann's fixed and variable factors, materials, the posterior selection
   criteria, the tooth forms' names and pros and cons, the four-scheme comparison table and the Abduo 2013 review. Both
   note levels and both mp3s; 17 new questions (`handout` source), every why; LIKELY_TOPICS re-ranked (hint, then slides;
-  `dn-hist-role` out: the history slides say "No test questions", now a de-emphasize hint); Review, cram sheet and Figs
+  the history slides say "No test questions", so a de-emphasize hint, and on Sam's word the seven history questions
+  retired and the history rows out of L8's Review; the notes keep the history, as narrated); Review, cram sheet and Figs
   22-23 updated. `tools/narrate.py` reads rating marks (+++, ++, +, −) aloud; the podcast lexicon gained Thielemann,
   Duchâteau, Gysi, Trubyte, Fauchard, Boucher, Abduo and bizygomatic. **Home timeline (BUG-031):** Heme & Endo 1 and 2,
   PCD Implants, Special Patient Care and Occlusion dim past and far-off course-timeline rows with the soft ink color

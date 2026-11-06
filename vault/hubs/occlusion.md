@@ -31,8 +31,8 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
   [task](../tasks/done/2026-11-05-occlusion-l8-follow-ups.md)). Where class and slides differ the notes say both
   (lingualized anterior contact: "never" in class, "difficult, can be compensated" on the slides). Hanau's term is the
   **Realeff**. L8 spells **Thielemann** (the slides); the Review lecture, `rv-thielmann*` and the podcast keep the
-  spelling they were written with, "Thielmann" (changing them means rebuilding the Review narration and the episode). The history slides say
-  "No test questions": the history questions stay as practice but aren't High likelihood. Its cases are `dnflat`,
+  spelling they were written with, "Thielmann" (Sam, 2026-11-06: leave them; no narration redo). The history slides say "No test questions", so L8 has
+  no history questions (seven retired) and its Review no history rows; the notes keep the history, as narrated. Its cases are `dnflat`,
   `dnbal`, `dnret`. Its notes are narrated with `tools/narrate.py`'s `spoken()`/`render()` on the extracted
   `dentures` template literals (the hub's READINGS isn't one JSON line), substituting "one sixteenth" for 1/16 and
   "divided by" in Thielemann's formula.

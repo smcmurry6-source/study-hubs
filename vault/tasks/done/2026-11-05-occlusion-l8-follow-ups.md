@@ -90,7 +90,8 @@ two, and the slides add a good deal the lecture skipped over:
   tooth factors (40% narrower), lingualized's definition and seven advantages, Hanau's first-molar contacts and clinical
   remounts, Thielemann's fixed and variable factors, the balanced setup, the materials (a reverse curve in 5-7 years),
   the six posterior selection criteria, the tooth forms' other names and pros and cons, the slides' table comparing the
-  four schemes, and the Abduo 2013 review. Every history slide says "No test questions": a de-emphasize hint, and
-  `dn-hist-role` left High likelihood (the history questions stay as practice; removing them is Sam's call).
+  four schemes, and the Abduo 2013 review. Every history slide says "No test questions": a de-emphasize hint, and on
+  Sam's word ("if the slides say it isn't tested, then take it out") the seven history questions were retired and the
+  history rows left L8's Review; the notes keep the history so the narration stands ("don't redo the narration").
 - 17 new questions (`handout`), every L8 topic re-ranked (hint, then slides), Review and the cram sheet updated, Figs 22
   and 23 relabeled (12-22°, 30-33°), both mp3s rebuilt. `tools/narrate.py` now reads rating marks (+++, ++, +, −) aloud.
