@@ -1681,7 +1681,7 @@ var EXAM_INFO = [
   ['Where', 'In person, Volker Hall Lecture Room B, on Canvas with LockDown Browser, as for Exam 1.'],
   ['Lectures', 'L11 Diabetes pharmacology, L12 Endocrine pathology (both hours), A Dental endocrinology, L13-L14 Male and female reproductive histology, L15-L16 Male and female reproductive physiology, L17 Pregnancy and lactation, L18 Estrogens and androgens. L17 and L18 join this hub when their slides are posted.'],
   ['Review', 'Wednesday, November 11, 2:00-2:50 pm, with Dr. Madison.'],
-  ['Exam 1 material', 'Five questions come from Exam 1. The Exam 1 Refresher (R) holds the Exam 1 hub\'s high-likelihood and hardest questions.'],
+  ['Exam 1 material', 'Five questions come from Exam 1. The Exam 1 Refresher (R) holds the Exam 1 hub\'s High Likelihood questions (its predicted topics) and the questions the class found hardest; the mock\'s five Exam 1 questions come from the High Likelihood ones.'],
   ['Before', 'Quiz 3 is due Thursday, November 12, at 11:59 pm. This hub uses nothing from the quizzes or the take-home.']
 ];
 /* the course, for Home's timeline (the syllabus schedule) */
@@ -7703,7 +7703,8 @@ match("fp-match-roles", "fphys", "slides", "Match each structure to its role in 
 
 /* =================================================================== R EXAM 1 REFRESHER */
 /* Exam 1 Refresher: copies of the Exam 1 hub's strongest predicted-topic questions and its hardest items (by class data),
-   ids prefixed r-; the 5 "old" questions on Exam 2 come from Exam 1 material. */
+   ids prefixed r-; the 5 "old" questions on Exam 2 come from Exam 1 material. Only the predicted topics are High
+   Likelihood (LIKELY_TOPICS), and the mock's five Exam 1 questions come from them (MOCK_LIKELY_ONLY). */
 QUESTIONS.push({"id": "r-h1-gq", "lec": "refresh", "type": "mcq", "stem": "A hormone binds a Gq-coupled receptor. What happens next?", "choices": ["Phospholipase C is activated; IP3 releases calcium from the ER", "Adenylate cyclase is activated and cAMP rises inside the cell", "Adenylate cyclase is inhibited and cAMP falls", "The receptor moves to the nucleus and binds DNA"], "answer": 0, "ex": "Gq activates phospholipase C, which splits PIP2 into IP3 and DAG. IP3, the second messenger, opens calcium channels in the endoplasmic reticulum. Dr. Herr: \"kind of commit this table to memory.\" (Exam 1 · L1 Endocrine Histology 1)", "src": "rec", "why": ["Gq → phospholipase C → IP3 (and DAG) → calcium from the ER.", "That is Gs.", "That is Gi.", "That describes an intracellular steroid receptor, not a G protein."]});
 QUESTIONS.push({"id": "r-h1-gi", "lec": "refresh", "type": "mcq", "stem": "Which G protein inhibits adenylate cyclase and lowers cAMP?", "choices": ["Gi", "Gs", "Gq", "Gt"], "answer": 0, "ex": "Gs activates adenylate cyclase (cAMP up); Gi inhibits it (cAMP down); Gq activates phospholipase C (IP3 up). (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "why": ["\"I\" for inhibitory: adenylate cyclase off, cAMP down.", "Gs is stimulatory: cAMP up.", "Gq works through phospholipase C and IP3.", "Gt (transducin) isn't in this lecture's table; it works in the retina."]});
 QUESTIONS.push({"id": "r-h1-2s-4", "lec": "refresh", "type": "mcq", "stem": "Read the two statements.\n1. Gs activates adenylate cyclase and increases cAMP.\n2. Gq activates phospholipase C and increases IP3.", "choices": ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], "answer": 0, "ex": "Both are on the table Dr. Herr said to memorize: Gs → adenylate cyclase → cAMP up; Gi → adenylate cyclase down; Gq → phospholipase C → IP3 up. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "fmt": "2stmt", "why": ["Statement 1 is true: Gs stimulates adenylate cyclase, raising cAMP. Statement 2 is true: Gq activates phospholipase C, raising IP3 (and calcium release).", "Statement 1 is true, not false: Gs stimulates adenylate cyclase, raising cAMP. Statement 2 is true, not false: Gq activates phospholipase C, raising IP3 (and calcium release).", "Statement 2 is true, not false: Gq activates phospholipase C, raising IP3 (and calcium release).", "Statement 1 is true, not false: Gs stimulates adenylate cyclase, raising cAMP."]});
@@ -7843,9 +7844,12 @@ var SRC_LABEL = { 'rec':'From the recording', 'slides':'From the slides', 'hub':
 var DRILL_HY = {};
 
 /* ---------- MOCK: the exam's format, 50 questions in 90 minutes: 45 new, weighted by lecture time (no official counts per
-   lecture yet; L17 and L18 have no slides yet, so their share is spread over the rest), and 5 from Exam 1 (the Refresher). */
+   lecture yet; L17 and L18 have no slides yet, so their share is spread over the rest), and 5 from Exam 1: the Refresher's High Likelihood questions (MOCK_LIKELY_ONLY). */
 var MOCK_BLUEPRINT = {"dmpharm": 8, "path1": 6, "path2": 7, "dental": 5, "mhisto": 5, "fhisto": 5, "mphys": 5, "fphys": 4, "refresh": 5};
 var MOCK_LIMIT = 90 * 60;
+/* Sam, 2026-11-06: the mock's five Exam 1 questions come from the High Likelihood questions (the Refresher's copies of
+   Exam 1's predicted topics), one per topic, from different Exam 1 lectures (mockLikelyPick) */
+var MOCK_LIKELY_ONLY = { refresh: true };
 
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
 LECTURES.forEach(function(l){ LECTURE_BY_ID[l.id] = l; QUESTIONS_BY_LECTURE[l.id] = []; });
@@ -8045,7 +8049,6 @@ var LIKELY_TOPICS = [{"lec": "dmpharm", "t": "Choosing an insulin: rapid or regu
   {"lec": "fphys", "t": "The three estrogens and the corpus luteum", "basis": "slides", "ids": ["fp-match-steroids", "fp-num-cl", "fp-tf-cl-cells", "fp-anov-1", "fp-match-roles"]},
   {"lec": "fphys", "t": "Sexual differentiation: the default pathway and the two ducts", "basis": "objectives", "ids": ["fp-default-path", "fp-2s-default", "fp-tf-amh"]},
   {"lec": "fphys", "t": "Amenorrhea: primary vs secondary and its causes", "basis": "slides", "ids": ["fp-prl-1", "fp-prl-2", "fp-x-amen", "fp-tf-amen"]},
-  {"lec": "refresh", "t": "Exam 1's hardest questions for the class (calcitonin, growth plates, methimazole vs PTU, Gq receptors, lipoprotein lipase, neural crest)", "basis": "Exam 1 class data", "ids": ["r-ca-2s-4", "r-cs-2s-3", "r-gr-r-plate", "r-pa-2s-2", "r-td-inducers", "r-h2-r-2s-1", "r-ca-r-vdr", "r-pa-insulin-fat", "r-cs-mitotane", "r-h2-islet-origin", "r-h1-tf-5", "r-pa-tf-3"]},
   {"lec": "refresh", "t": "L1 Endocrine Histology 1: Gs, Gi and Gq: what each does to cAMP, IP3 and calcium", "basis": "Exam 1 hint", "ids": ["r-h1-gq", "r-h1-gi", "r-h1-2s-4"]},
   {"lec": "refresh", "t": "L1 Endocrine Histology 1: FLAT PiG: which pars distalis cells are acidophils and basophils", "basis": "Exam 1 hint", "ids": ["r-h1-acidophils", "r-h1-2s-2"]},
   {"lec": "refresh", "t": "L1 Endocrine Histology 1: The posterior pituitary: Herring bodies, pituicytes, ADH = vasopressin", "basis": "Exam 1 hint", "ids": ["r-h1-tf-3"]},
@@ -8899,11 +8902,33 @@ function renderReview(){
 /* ===================================================================
    MOCK EXAM: 50 questions in 75 minutes (blueprint and limit are in the data above)
    =================================================================== */
+function mockFresh(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }
+/* n High Likelihood questions from one lecture: one per predicted topic, a different Exam 1 lecture each where it can
+   (a topic's text starts with its lecture, "L4 Thyroid Physiology: ..."), topics with a question not seen or missed
+   last time first. [] when the lecture has no High Likelihood questions, so the mock falls back to the whole lecture. */
+function mockLikelyPick(lec, n){
+  var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq' && q.likely; });
+  if(!pool.length) return [];
+  var groups = shuffled(LIKELY_TOPICS.filter(function(t){ return t.lec === lec; })).map(function(t){
+    var qs = shuffled(pool.filter(function(q){ return q.likely === t; }));
+    var f = qs.filter(mockFresh);
+    return { src: t.t.split(':')[0], q: f[0] || qs[0], fresh: f.length > 0 };
+  }).filter(function(g){ return g.q; });
+  groups = groups.filter(function(g){ return g.fresh; }).concat(groups.filter(function(g){ return !g.fresh; }));
+  var out = [], used = {};
+  groups.forEach(function(g){ if(out.length < n && !used[g.src]){ used[g.src] = 1; out.push(g.q); } });
+  groups.forEach(function(g){ if(out.length < n && out.indexOf(g.q) === -1) out.push(g.q); });
+  var left = shuffled(pool.filter(function(q){ return out.indexOf(q) === -1; }));
+  left.filter(mockFresh).concat(left.filter(function(q){ return !mockFresh(q); })).forEach(function(q){ if(out.length < n) out.push(q); });
+  return out;
+}
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
+    var likely = MOCK_LIKELY_ONLY[lec] ? mockLikelyPick(lec, MOCK_BLUEPRINT[lec]) : [];
+    if(likely.length){ likely.forEach(function(q){ ids.push(q.id); }); return; }
     var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq'; });
-    var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
+    var fresh = shuffled(pool.filter(mockFresh));
     var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
     fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
   });
@@ -8925,7 +8950,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, like the real exam: 45 spread over the new lectures by their share of lecture time (the exam\'s count per lecture hasn\'t been announced) and 5 from the Exam 1 Refresher. The mock uses single-answer questions, including two-statement, true/false and numbered-statement items; practice the select-all, matching and ordering items in the bank (More filters, question type). Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real exam: choose an answer for each question with no feedback, then submit. The clock counts against 90:00, the exam\'s hour and a half (about 108 seconds a question), and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, like the real exam: 45 spread over the new lectures by their share of lecture time (the exam\'s count per lecture hasn\'t been announced) and 5 on Exam 1, drawn from the Exam 1 Refresher\'s High Likelihood questions (Exam 1\'s predicted topics), each from a different Exam 1 lecture. The mock uses single-answer questions, including two-statement, true/false and numbered-statement items; practice the select-all, matching and ordering items in the bank (More filters, question type). Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real exam: choose an answer for each question with no feedback, then submit. The clock counts against 90:00, the exam\'s hour and a half (about 108 seconds a question), and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }

@@ -22,7 +22,11 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
   female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 81 questions copied
   from `heme-endo-exam1` (its top two High Likelihood topics per lecture, its hardest questions, format top-ups) with ids
-  `r-<exam1 id>`, for the exam's five Exam 1 questions. Its notes are Exam 1's cram sheet.
+  `r-<exam1 id>`, for the exam's five Exam 1 questions. Its notes are Exam 1's cram sheet. Only its copies of Exam 1's
+  predicted topics are High Likelihood (23 topics, 68 single-answer questions; the "hardest questions" set lost the tag
+  on 2026-11-06), and **the mock's five Exam 1 questions come only from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
+  `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
+  Physiology: ..." prefix, so keep it), unseen or missed questions first.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A and L13-L16 were
   written from slides (and Dr. Herr's speaker notes) before they were given, `status:'slides'`. L17 and L18 had no slides
   on 2026-11-05: [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
