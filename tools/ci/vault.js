@@ -10,6 +10,7 @@ const fs = require('fs'), path = require('path');
 const root = path.resolve(__dirname, '../..');
 const problems = [];
 const rel = f => path.relative(root, f).split(path.sep).join('/');
+const read = file => fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
 
 function walk(dir){
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(d => {
@@ -35,7 +36,7 @@ function frontmatter(text){
 }
 
 for (const file of [...entry, ...notes]) {
-  const text = fs.readFileSync(file, 'utf8'), body = prose(text), name = rel(file);
+  const text = read(file), body = prose(text), name = rel(file);
   const lineOf = i => body.slice(0, i).split('\n').length;
   for (const m of body.matchAll(/\[\[[^\]\n]+\]\]/g)) problems.push(`${name}:${lineOf(m.index)} uses a [[wikilink]]; use a relative markdown link [text](path.md)`);
   for (const m of body.matchAll(/\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) {
@@ -53,7 +54,7 @@ for (const file of [...entry, ...notes]) {
 const STATUSES = ['open', 'in-progress', 'blocked', 'review', 'done', 'dropped'];
 const tasksDir = path.join(vaultDir, 'tasks'), doneDir = path.join(tasksDir, 'done');
 for (const file of notes) {
-  const name = rel(file), fm = frontmatter(fs.readFileSync(file, 'utf8'));
+  const name = rel(file), fm = frontmatter(read(file));
   if (!fm || !fm.type) { problems.push(`${name}: needs frontmatter with a type (see vault/rules/repo-is-the-vault.md)`); continue; }
   if (fm.type !== 'task' || name.startsWith('vault/templates/')) continue;
   const inDone = path.dirname(file) === doneDir;
@@ -67,8 +68,8 @@ for (const file of notes) {
 
 const rulesDir = path.join(vaultDir, 'rules');
 const home = path.join(vaultDir, 'home.md'), claude = path.join(root, 'CLAUDE.md');
-const homeText = fs.existsSync(home) ? fs.readFileSync(home, 'utf8') : '';
-const claudeText = fs.existsSync(claude) ? fs.readFileSync(claude, 'utf8') : '';
+const homeText = fs.existsSync(home) ? read(home) : '';
+const claudeText = fs.existsSync(claude) ? read(claude) : '';
 if (fs.existsSync(rulesDir)) {
   for (const f of fs.readdirSync(rulesDir).filter(f => f.endsWith('.md'))) {
     if (!homeText.includes(`(rules/${f})`)) problems.push(`vault/rules/${f}: not listed in vault/home.md`);

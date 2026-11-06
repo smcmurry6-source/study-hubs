@@ -22,8 +22,10 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Build it
 
-- **Start from the newest engine.** Copy `hubs/pcd-implants-exam1/index.html` (or `hubs/special-patient-care/index.html`,
-  the same engine without figures) to `hubs/<hub-id>/index.html` and replace its content. One file, no build step.
+- **Start from the shared engine.** Copy an extracted hub shell, not its old inline engine. Keep the hub's markup,
+  identity, configuration and small bridge in `hubs/<hub-id>/index.html`; load `../../widget/hub.css` after the
+  hub's token/preamble styles and before its local tail styles, and `../../widget/hub.js` before the strict hub IIFE.
+  Bind the hub's local configuration and data through `window.shHubBind`; do not fork the shared renderer or styles.
   It already has: Home first ([hub-home-page](../rules/hub-home-page.md)), the filter panel
   ([question-bank-filter-panel](../rules/question-bank-filter-panel.md)), the question helpers `mq()`, `mm()`, `two()`,
   `tf()`, `nums()` with a why for every choice ([every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)),
@@ -32,18 +34,24 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 - **Its own identity:** a new palette and type trio (tokens in the light, OS-dark and `[data-theme="dark"]` blocks), a
   plain name ("<Subject> Hub"), a new state key (`<slug>-state-v1`) and answered event (`<slug>:answered`). The widget's
   script tag carries `data-hub="<hub-id>"`, `data-answered-event` and `data-default-mode="home"`.
-- **Data:** `LECTURES` (`id`, `num`, `title`, `who`, `status` taught / slides / upcoming, `tag`), `QUESTIONS` (each with
-  `src`), notes at two levels (`READINGS`, `READINGS_PLAIN`), exam hints quoted from the recordings, `LIKELY_TOPICS`,
-  the cram sheet, Review tables, `MOCK_BLUEPRINT`, `EXAM_INFO`, `COURSE_DATES`, and `EXAM_COUNTS` if counts per lecture
-  were announced.
+- **Data:** use `hubs/<hub-id>/content/manifest.json` and its `core.json`, `questions.json`, `whys.json`,
+  `notes.json`, `review.json`, `study.json`, `cases.json` and `figures.json` files. `core.json` carries
+  `LECTURES` (`id`, `num`, `title`, `who`, `status` taught / slides / upcoming, `tag`), exam settings and the
+  compact question index that lets Home load quickly; the full bank stays in `questions.json` and loads when a bank,
+  mock, arcade or drill needs it. Keep every question id exactly as registered. Put notes at both levels
+  (`readings`, `readingsPlain`) in `notes.json`; put hints, `LIKELY_TOPICS` and cram in `study.json`; put Review
+  tables and sequences in `review.json`. Let `window.shHubContent` load a group on demand instead of adding an
+  inline copy of it.
 - **Questions per taught lecture:** about 5 two-statement, 8 true/false and 3-5 numbered-statement items
   ([two-statement-and-true-false](../rules/two-statement-and-true-false.md), [numbered-statements](../rules/numbered-statements.md));
   the correct answer is the longest choice in no more than 40% of MCQs.
-- **Narration:** a Kokoro mp3 for every lecture at both levels in `hubs/<hub-id>/audio/`
+- **Narration:** `tools/narrate.py` reads `content/notes.json`; keep a Kokoro mp3 for every lecture at both levels
+  in `hubs/<hub-id>/audio/` and regenerate it whenever either note level changes
   ([narrate-with-kokoro](narrate-with-kokoro.md)).
 - **Diagrams:** a diagram review, each candidate put to Sam separately before anything is drawn
-  ([diagram-review](../rules/diagram-review.md)); approved figures are built in `tools/figures/<hub-id>/`
-  ([diagrams-anima](../rules/diagrams-anima.md)).
+  ([diagram-review](../rules/diagram-review.md)); approved figures are built in `tools/figures/<hub-id>/` and their
+  generated marker blocks land in `hubs/<hub-id>/figures/`, listed as `figureAssets` in the content manifest so the
+  engine loads them with the figures, not with Home ([diagrams-anima](../rules/diagrams-anima.md)).
 - **Arcade:** load `widget/games.js` and build the context like Occlusion's (`CTX` in its ARCADE), with the hub's own
   skin, names and art ([arcade-skins](../rules/arcade-skins.md)).
 - **Keep the widget's hooks** and a new hub gets the shared features (answer animations, Daily Drill, sync, pins, tours,
@@ -74,11 +82,12 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Check
 
-`node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js`: the smoke test clicks through every
-hub on desktop and phone and fails on missing formats, whys, `LIKELY_TOPICS` or narration files. Its first local run
-writes the hub's question-id registry, `tools/question-ids/<hub-id>.txt`: commit it
-([question-ids-are-permanent](../rules/question-ids-are-permanent.md)). Then a draft PR
-([ship-a-change](ship-a-change.md)).
+`node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js`: the smoke test waits for an
+extracted hub's content promise, then clicks through every hub on desktop and phone and fails on missing formats, whys,
+`LIKELY_TOPICS` or narration files. Run `node tools/hub-content/extract.mjs --check` and the applicable
+`tools/figures/<hub-id>/build.mjs --check` too. Its first local run writes the hub's question-id registry,
+`tools/question-ids/<hub-id>.txt`: commit it ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
+Then run the release suite for a shared-engine change and open a draft PR ([ship-a-change](ship-a-change.md)).
 
 ## Adding a lecture
 

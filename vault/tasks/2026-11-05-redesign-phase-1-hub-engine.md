@@ -45,5 +45,6 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-05: extraction slice completed in draft [PR #262](https://github.com/smcmurry6-source/study-hubs/pull/262). The byte-identical engine now lives in `widget/hub.js` and `widget/hub.css` for Occlusion, Heme & Endo Exam 2, PCD Implants Exam 1 and Special Patient Care; each hub loads its compact core and question index first, then its bank, notes, review, study, cases and figures on demand. Question ids and the final `window.SH_EXPORT = {` contract are unchanged; smoke, narration, preview and figure builds follow the extracted paths. Slow-4G first load (main → branch; page document in parentheses): Occlusion 1,316 → 703 KB (690 → 51 KB); Heme & Endo Exam 2 1,111 → 673 KB (516 → 53 KB); PCD Implants Exam 1 929 → 703 KB (304 → 54 KB); Special Patient Care 800 → 670 KB (204 → 50 KB). This is the engine/content handoff only; the agreed layout, art and redesign remain for the redesign session.
 
 ## Outcome
