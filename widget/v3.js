@@ -2181,6 +2181,8 @@
     /* the button shows the count, so its spoken name starts with it (voice control: say what you see; BUG-003) */
     var lb = document.getElementById("shstat-launch");
     if (lb) lb.setAttribute("aria-label", onlineCount + " studying now. Study tools: search, daily drill, class stats, inbox, settings");
+    /* the redesigned hubs (widget/hub.js) show the count in their own bar */
+    try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: onlineCount } })); } catch (e) {}
   }
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
@@ -2857,13 +2859,22 @@
     rankScript.onload = function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); };
     document.head.appendChild(rankScript);
   }
-  /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard */
-  if (!EXPORT_ONLY) {
+  /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard.
+     The redesigned hubs (window.SH_HUB, widget/hub.js; not live yet) load him only once he's adopted: on this device, or
+     on another one, which hub.js hears from the rank profile and then calls shLoadPet. The live hubs load him as before. */
+  var petLoading = false;
+  function loadPet(then){
+    if (window.shPet) { if (then) then(); return; }
+    if (petLoading || EXPORT_ONLY) return;
+    petLoading = true;
     var petScript = document.createElement("script");
     petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); };
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); if (then) then(); };
     document.head.appendChild(petScript);
   }
+  window.shLoadPet = loadPet;
+  var petBorn = null; try { petBorn = localStorage.getItem("sh_pet_born"); } catch (e) {}
+  if (!EXPORT_ONLY && !(window.SH_HUB && !petBorn)) loadPet();
   /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
   if (!EXPORT_ONLY && !window.__timmyLoaded) {
     var timmyScript = document.createElement("script");
@@ -2902,16 +2913,24 @@
     };
     document.head.appendChild(qhScript);
   }
-  /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time */
-  if (!EXPORT_ONLY) {
+  /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time.
+     A hub that never asks on arrival (SH_TOUR.prompt === false: the redesigned hubs) loads it when the tour is started. */
+  var tourLoading = false;
+  function loadTour(then){
+    if (window.shTour) { if (then) then(); return; }
+    if (tourLoading || EXPORT_ONLY) return;
+    tourLoading = true;
     var tourScript = document.createElement("script");
     tourScript.src = new URL("tour.js", thisScript.src).href; tourScript.async = true;
-    tourScript.onload = function(){ if (window.shTour) window.shTour.mount({ where: "hub", hub: HUB, section: currentSection }); };
+    tourScript.onload = function(){ tourLoading = false; if (window.shTour) window.shTour.mount({ where: "hub", hub: HUB, section: currentSection }); if (then) then(); };
+    tourScript.onerror = function(){ tourLoading = false; };
     document.head.appendChild(tourScript);
   }
+  window.shLoadTour = loadTour;
+  if (!EXPORT_ONLY && !(window.SH_TOUR && window.SH_TOUR.prompt === false)) loadTour();
   document.addEventListener("click", function(e){
     var b = e.target.closest && e.target.closest("[data-sh-tour]");
-    if (b && window.shTour) setTimeout(function(){ window.shTour.start(); }, 0);    /* after the menu has closed */
+    if (b) setTimeout(function(){ loadTour(function(){ if (window.shTour) window.shTour.start(); }); }, 0);    /* after the menu has closed */
   });
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
   if (!EXPORT_ONLY) {

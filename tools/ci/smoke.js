@@ -41,6 +41,9 @@ function pickHubs(){
 }
 const { hubs, why: hubsWhy } = pickHubs();
 console.log(`Smoke test: ${hubsWhy}`);
+/* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
+   the hubs picked above (a change to hubs/<id>/next/ touches <id>; widget/hub.js is shared, so it picks every hub) */
+const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
 const problems = [], notes = [];
 
 async function stub(context){
@@ -234,6 +237,31 @@ function lint(hub, A){
       notes.push(`${hub} (${label}): clicked through ${screens} screens`);
       await page.close();
     }
+    // the redesigned hubs: the four views, then every page in More and every set of questions
+    for (const hub of nextHubs) {
+      const page = await context.newPage(); const errs = [], name = `${hub}/next`;
+      page.on('pageerror', e => errs.push(e.message));
+      await page.goto(BASE() + `hubs/${hub}/next/index.html`); await page.waitForTimeout(1500);
+      const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+      if (modes.join() !== 'home,notes,questions,more') problems.push(`${name} (${label}): the views are ${modes.join(', ') || 'missing'}, not Home, Notes, Questions and More`);
+      const n = await page.evaluate(() => window.SH_EXPORT && window.SH_EXPORT.questions ? window.SH_EXPORT.questions.length : 0);
+      if (!n) problems.push(`${name} (${label}): window.SH_EXPORT has no questions (the widget's search, stats and question health read it)`);
+      let screens = 0;
+      const routes = [...modes, 'questions/drill', 'questions/misses', 'questions/weak', 'questions/mock',
+        'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings'];
+      for (const r of routes) {
+        if (modes.includes(r)) await page.click(`#modeSwitch [data-mode="${r}"]`); else await page.evaluate(h => { location.hash = h; }, r);
+        await page.waitForTimeout(r === 'more/arcade' ? 1500 : 500); screens++;
+        const st = await page.evaluate(() => { const v = document.querySelector('.hx-view:not([hidden])'); return { h1: !!(v && v.querySelector('h1')), w: document.documentElement.scrollWidth - innerWidth }; });
+        if (!st.h1) problems.push(`${name} (${label}): ${r} has no page title`);
+        if (st.w > 1) problems.push(`${name} (${label}): ${r} scrolls sideways by ${st.w}px`);
+        if (r === 'questions') { const c = await page.$('#qlist .qcard .ch'); if (c) { await c.click(); await page.waitForTimeout(300); if (!(await page.$('#qlist .qcard.is-answered'))) problems.push(`${name} (${label}): answering a question didn't mark the card answered`); } }
+        if (r === 'more/arcade') { const g = await page.$('.ar-grid [data-game]'); if (g) { await g.click(); await page.waitForTimeout(400); const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); } }
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);
+      await page.close();
+    }
     await context.close();
   }
   // top bars and tab rows (2026-11-04): at the widths and text sizes where they used to break, every control in the
@@ -244,7 +272,7 @@ function lint(hub, A){
     await stub(context);
     await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
     const label = `${tb.width}px${tb.size ? ', largest text' : ''}`;
-    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`)]) {
+    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
       const page = await context.newPage();
       await page.goto(BASE() + url); await page.waitForTimeout(700);
       await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
@@ -252,7 +280,7 @@ function lint(hub, A){
       const bad = await page.evaluate(() => {
         const out = [], vw = document.documentElement.clientWidth;
         if (document.documentElement.scrollWidth > vw + 1) out.push(`page scrolls sideways by ${document.documentElement.scrollWidth - vw}px`);
-        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button');
+        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, .hx-bar a, .hx-bar button, .hx-strip button, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button');
         for (const el of els) {
           const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
           const r = el.getBoundingClientRect(); if (!r.width && !r.height) continue;

@@ -47,3 +47,6 @@ jobs:
         run: node tools/ci/vault.js
       - name: Drawn Patient Box cases (realistic numbers, keys agree)
         run: node tools/ci/cases.js
+      - name: The redesign's generated files are current (site art, the new hubs' content from the live hubs)
+        if: ${{ !cancelled() }}
+        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check

@@ -26,7 +26,7 @@ export const ICONS = {
     dot(12, 16.6, 1.35) },
 
   more: { label: "More", body:
-    dot(5.6, 12.2, 1.9) + dot(12, 11.8, 1.9) + dot(18.4, 12.2, 1.9) },
+    dot(5.5, 12, 1.9) + dot(12, 12, 1.9) + dot(18.5, 12, 1.9) },   /* one straight row (Sam, 2026-11-06) */
 
   drill: { label: "Daily drill", body:
     '<g transform="rotate(-38 12 12)">' +

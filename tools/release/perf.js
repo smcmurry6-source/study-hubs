@@ -58,7 +58,9 @@ async function measure(browser, url){
   const budgets = fs.existsSync(BUDGET_FILE) ? JSON.parse(fs.readFileSync(BUDGET_FILE, 'utf8')) : { pages: {} };
   const srv = await start({});
   const browser = await L.launch();
-  const pages = ['index.html', 'about/', ...L.hubs().map(h => `hubs/${h}/`)].filter(p => !ONLY || p === ONLY);
+  /* the redesign's new versions (hubs/<id>/next/) are measured too, before they replace the live hubs */
+  const next = L.hubs().filter(h => fs.existsSync(path.join(L.ROOT, 'hubs', h, 'next', 'index.html'))).map(h => `hubs/${h}/next/`);
+  const pages = ['index.html', 'about/', ...L.hubs().map(h => `hubs/${h}/`), ...next].filter(p => !ONLY || p === ONLY);
   const results = {}, problems = [], notes = [];
   for (const p of pages) {
     results[p] = await measure(browser, srv.url + p + (p.startsWith('hubs/') || p === 'index.html' ? '?persona=returning' : ''));

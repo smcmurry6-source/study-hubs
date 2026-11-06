@@ -865,6 +865,8 @@
        (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
     function applyOwn(p, m){
       profile = p; mastery = m || [];
+      /* the redesigned hubs' rank pill (widget/hub.js) listens; nothing on the live pages does */
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: p, mastery: masteryFor() } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(profile, { busy: mockBusy });
       badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));

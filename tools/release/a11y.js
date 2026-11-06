@@ -29,7 +29,7 @@ async function audit(page){
 }
 async function keyboard(page){
   await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); window.scrollTo(0, 0); });
-  let invisible = 0, stuck = 0, last = null, same = 0; const where = [];
+  let invisible = 0, stuck = 0, last = null, same = 0; const where = [], whyNot = [];
   for (let i = 0; i < 30; i++) {
     await page.keyboard.press('Tab');
     const f = await page.evaluate(() => {
@@ -38,14 +38,21 @@ async function keyboard(page){
       if (e.closest('#shpv-pill, #shpv-panel')) return { skip: true };
       const s = getComputedStyle(e), ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || (s.boxShadow && s.boxShadow !== 'none');
       const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
-      return { id, ring, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
+      /* why a stop has no ring, for the report: is it :focus / :focus-visible, does the page have focus, what outline applies */
+      let why = '';
+      if (!ring) {
+        why = `focus=${e.matches(':focus')} focus-visible=${e.matches(':focus-visible')} page-focused=${document.hasFocus()} outline=${s.outlineStyle} ${s.outlineWidth}` +
+          ` html=${document.documentElement.className || '-'} in-hx=${!!e.closest('.hx')}`;
+        return new Promise(r => setTimeout(() => { const t = getComputedStyle(e); r({ id, ring, why: why + ` later: active=${document.activeElement === e} outline=${t.outlineStyle} ${t.outlineWidth}`, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) }); }, 200));
+      }
+      return { id, ring, why, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
     });
     if (!f || f.skip) continue;
-    if (!f.ring) { invisible++; if (where.length < 3) where.push(f.id); }
+    if (!f.ring) { invisible++; if (where.length < 3) where.push(f.id); if (whyNot.length < 3) whyNot.push(`${f.id} (${f.why})`); }
     if (f.id + f.path === last) { if (++same >= 4) { stuck = 1; break; } } else same = 0;
     last = f.id + f.path;
   }
-  return { invisible, stuck, where };
+  return { invisible, stuck, where, why: whyNot };
 }
 async function motion(page){
   return page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running' && a.effect && a.effect.getComputedTiming().iterations === Infinity
@@ -88,13 +95,24 @@ async function motion(page){
       if (first) { results[`${hub} · ${m}`].focus = await keyboard(page); results[`${hub} · ${m}`].motion = await motion(page); first = false; }
     }
   }
+  /* the redesign's new versions (hubs/<id>/next/, widget/hub.js; not live until the release): the four views */
+  const next = live.filter(h => fs.existsSync(path.join(L.ROOT, 'hubs', h, 'next', 'index.html')));
+  for (const hub of next) {
+    await page.goto(srv.url + `hubs/${hub}/next/`); await L.settle(page);
+    let first = true;
+    for (const v of ['home', 'notes', 'questions', 'more']) {
+      await page.evaluate(h => { location.hash = h; }, v); await page.waitForTimeout(900);
+      await check(`${hub}/next · ${v}`, null);
+      if (first) { results[`${hub}/next · ${v}`].focus = await keyboard(page); results[`${hub}/next · ${v}`].motion = await motion(page); first = false; }
+    }
+  }
   await ctx.close();
   /* dark mode: the first screen of each live hub and the dashboard */
   const dark = await ctxFor('dark'); await L.guard(dark);
   const dp = await dark.newPage();
   await dp.goto(srv.url + 'index.html?persona=returning'); await L.settle(dp);
   await dp.evaluate(() => { try { localStorage.setItem('sh_theme', 'dark'); } catch (e) {} });
-  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...live.map(h => [`${h} (dark)`, `hubs/${h}/`])].filter(([k]) => !ONLY || k !== 'dashboard (dark)')) {
+  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...live.map(h => [`${h} (dark)`, `hubs/${h}/`]), ...next.map(h => [`${h}/next (dark)`, `hubs/${h}/next/`])].filter(([k]) => !ONLY || k !== 'dashboard (dark)')) {
     await dp.goto(srv.url + url); await L.settle(dp);
     await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await dp.addScriptTag({ content: AXE });
@@ -122,7 +140,7 @@ async function motion(page){
     const better = Object.keys(b.axe).filter(id => !r.axe[id] || r.axe[id].n < b.axe[id].n);
     if (better.length) notes.push(`${key}: better than the baseline on ${better.join(', ')} (run with --update to lock it in)`);
     if (r.focus && b.focus) {
-      if (r.focus.invisible > b.focus.invisible) problems.push(`${key}: ${r.focus.invisible} keyboard stops with no visible focus (baseline ${b.focus.invisible}), e.g. ${r.focus.where.join(', ')}`);
+      if (r.focus.invisible > b.focus.invisible) problems.push(`${key}: ${r.focus.invisible} keyboard stops with no visible focus (baseline ${b.focus.invisible}), e.g. ${(r.focus.why && r.focus.why.length ? r.focus.why : r.focus.where).join(', ')}`);
       if (r.focus.stuck && !b.focus.stuck) problems.push(`${key}: the keyboard gets stuck (Tab stops moving)`);
     }
     if (r.motion > (b.motion || 0)) problems.push(`${key}: ${r.motion} endless animation(s) still run with reduced motion on (baseline ${b.motion || 0})`);

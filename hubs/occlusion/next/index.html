@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Occlusion</title>
+<script>
+/* The redesigned Occlusion (phase 1 of the redesign, vault/tasks/2026-11-05-redesign-phase-1-hub-engine.md). Nothing
+   links here and it is only for the preview: anywhere but a preview (or a file/localhost copy) it sends the visitor to the
+   live hub, so the class keeps seeing the live Occlusion until the redesign is released. */
+(function(){
+  var local = location.protocol === "file:" || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  if (!window.SH_PREVIEW_CONFIG && !local) location.replace("../" + location.hash);
+})();
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="../../../assets/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="../../../assets/favicon-64.png?v=2">
+<meta name="theme-color" content="#2747a3">
+<link rel="preload" href="../../../assets/fonts/nunito-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="content/core.json" as="fetch" type="application/json" crossorigin>
+<link rel="stylesheet" href="../../../widget/hub.css">
+<script>
+/* This hub's settings for the engine (widget/hub.js). The content is in content/, written from the live hub by
+   tools/hub-next/build.mjs; the words below are the live hub's own (its Home, hints, mock and arcade). */
+window.SH_HUB = {
+  hub: "occlusion",
+  name: "Occlusion",
+  stateKey: "occl-state-v1",
+  answeredEvent: "occl:answered",
+  exam: "final",
+  content: "content/",
+  widget: "../../../widget/",
+  assets: "../",
+  back: "../../../index.html",
+  about: "../../../about/",
+  home: {
+    title: "The final",
+    when: "Monday, November 16 · 6:30-7:45 pm · format not announced yet",
+    chips: ["Not comprehensive", "The lectures from 10/22 on", "L6, L7, L8 so far", "Builds on the midterm"],
+    notice: ["More lectures are coming.", "Each one Dr. Givan teaches before the final is added here, with its notes, questions and a place in the mock."],
+    prof: "Dr. Givan",
+    onExam: "On the final",
+    offExam: "Midterm lectures: the final builds on them"
+  },
+  notes: { onExam: "On the final", offExam: "Midterm lectures", offNote: "The final builds on them" },
+  hints: {
+    prof: "Dr. Givan",
+    banner: "Occlusion final: Monday, November 16, 6:30-7:45 pm (the midterm's time window, moved up from Thursday, November 19). Not comprehensive: Dr. Givan's lectures from 10/22 on (L6, L7 and L8 so far), building on the midterm material. Its format hasn't been announced yet. The midterm lectures' hints stay below for review."
+  },
+  mock: {
+    blurb: "Multiple-choice questions from the final's lectures so far (L6 Occlusal Instrumentation, L7 Malocclusion and Dysfunction and L8 Denture Occlusion); it grows as Dr. Givan's next lectures are added. The final is not comprehensive, so the midterm lectures aren't in it. Patient Box items are included, and questions you haven't seen or missed last time are picked first.",
+    how: "It runs like the real thing: choose an answer for each question with no feedback, then submit. The final's format hasn't been announced, so the clock keeps the midterm's pace (about 80 seconds a question) and turns red past the hour. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats."
+  },
+  arcade: {
+    first: "sort",
+    how: "Every game is built on Occlusion's own material, and the answers in Freeway Showdown and Million-Dollar Smile count toward class stats.",
+    games: [
+      { id: "sort", icon: "shuffle", name: "Cusp Sort", desc: "Cards rain down. Fling each one into the right bin before it hits the floor: centric vs non-centric cusp, MIP vs centric occlusion, working vs non-working, and more." },
+      { id: "board", icon: "questions", name: "Freeway Showdown", desc: "A board of articulating-paper strips, one column per lecture. Two Centric Doubles to wager on, then the Final Contact. Answers count toward class stats." },
+      { id: "escape", icon: "tour", name: "Lab Escape", desc: "Locked in the occlusion lab. Answer what locks the view box, the chart and the drawer, then mark the casts to find the door code. Six minutes." },
+      { id: "cloze", icon: "highlight", name: "Mind the Gap", desc: "Type the key term missing from a sentence in Dr. Givan's notes, Anki cloze style, before the clock runs out." },
+      { id: "smile", icon: "trophy", name: "Million-Dollar Smile", desc: "Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven. Answers count toward class stats." },
+      { id: "cross", icon: "cram", name: "Cross-Section", desc: "A fresh mini crossword every game, from the bank's one-word answers and the key terms in the notes." }
+    ]
+  }
+};
+</script>
+<script src="../../../widget/hub-art.js"></script>
+<script src="../../../widget/hub-art/occlusion.js"></script>
+<script src="../../../widget/hub.js" defer></script>
+</head>
+<body>
+<noscript><p style="font:16px/1.5 system-ui;padding:24px">This hub needs JavaScript. <a href="../">Open the Occlusion hub</a>.</p></noscript>
+</body>
+</html>
