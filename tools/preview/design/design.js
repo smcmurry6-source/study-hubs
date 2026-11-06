@@ -595,6 +595,223 @@
       '<div class="panel s12"><h3>His house</h3><p>It grows with your rank: a fence, a mailbox, gold trim, a night sky, and a pennant for every hub you master.</p><div class="panel-body houses">' + houses + "</div></div>";
   }
 
+  /* ---------- Timmy's place (redesign phase 4, part C): place.js, built from tools/figures/site/place.mjs ----------
+     The builder draws the live kit (SH_PLACE.render) inline, so its motion runs; the galleries are still pictures,
+     drawn when they scroll near. Timmy is the live drawing (art.js), laid over the scene at a spot. */
+  var TP = window.SH_PLACE;
+  var TIER_NAMES = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"];
+  var TIER_DECO = ["Nothing yet", "A picket fence", "A mailbox", "A lamppost", "Gold trim and a gold door", "Diamond windows", "Dark Matter stars over his place"];
+  var HOLS = [["", "No holiday"], ["halloween", "Halloween"], ["thanksgiving", "Thanksgiving"], ["winter", "Christmas"], ["newyear", "New Year's"], ["valentine", "Valentine's Day"], ["dentist", "Dentist's Day"], ["stpatrick", "St. Patrick's Day"], ["easter", "Easter"]];
+  var SEASONS = [["", "Summer"], ["spring", "Spring"], ["fall", "Fall"]];
+  var FLAIRS = [[], [{ hub: "perio", lvl: 2 }], [{ hub: "occlusion", lvl: 3 }, { hub: "perio", lvl: 2 }, { hub: "heme-endo-exam2", lvl: 1 }], [{ hub: "occlusion", lvl: 4 }, { hub: "perio", lvl: 3 }, { hub: "heme-endo-exam2", lvl: 2 }, { hub: "pcd-implants-exam1", lvl: 1 }]];
+  var FLAIR_NAMES = ["No pennants", "One pennant (Silver)", "Three pennants", "Four, one crowned"];
+  var RARITY = { Common: "#8E98A3", Uncommon: "#3E8E45", Rare: "#2378B0", Epic: "#7A3CFF", Legendary: "#C9971C" };
+  var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "pool", side: "lane", right: "doghouse" }, up: {}, paint: "cream",
+    tier: 3, flair: 1, holiday: "", season: "", timmy: "happy", pick: "home", still: false };
+  function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
+  function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
+  function tpOpts(o){
+    return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
+      tier: PS.tier, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
+  }
+  function timmyArt(k){
+    var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
+    if (m) return m.svg;
+    var hp = (t.hp || []).filter(function(x){ return "hp" + x.hp === k; })[0];
+    return (hp || t.moods[0]).svg;
+  }
+  /* a still picture of a place, with Timmy at a spot (vb: the crop, from the kit's own viewBox) */
+  function placeFig(o, cap, sub, timmySpot, cls){
+    var vb = o.viewBox || TP.VIEWBOX, r = TP.render(o), t = "";
+    var sp = timmySpot && r.spots[timmySpot];
+    if (sp) t = '<span class="tp-timmy" style="left:' + ((sp[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%;top:" + ((sp[1] - vb[1]) / vb[3] * 100).toFixed(2) + "%;width:" + (36 / vb[2] * 100).toFixed(2) + '%">' + img(A.timmy.moods[0].svg, "") + "</span>";
+    var pic = img(r.svg, cap).replace("<img ", '<img width="' + vb[2] + '" height="' + vb[3] + '" ');
+    return '<figure class="tp-fig ' + (cls || "") + '"><div class="tp-pic' + (o.night ? " is-night" : "") + '">' + pic + t + "</div>" + (cap ? "<figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</figcaption>" : "") + "</figure>";
+  }
+  /* the builder's scene goes on the page as a picture too (it's an illustration, not a chart), with the kit's motion
+     inside it; still (reduced motion, or the preview's "still" box) leaves the motion out */
+  function sceneImg(svgStr, alt, still){
+    if (!still) svgStr = svgStr.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
+    return img(svgStr, alt, "tp-sceneimg");
+  }
+  function sceneAlt(){
+    var h = byK(TP.HOMES, PS.home), sc = byK(TP.SCENES, PS.scene), items = TP.SLOTS.map(function(s){ return PS.yard[s.k]; }).filter(Boolean).map(function(k){ return byK(TP.YARD, k).n.replace(/^A /, "a "); });
+    return "Timmy's place: " + h.n.replace(/^The /, "the ") + " on " + sc.n.replace(/^The /, "the ") + (items.length ? ", with " + (items.length > 1 ? items.slice(0, -1).join(", ") + " and " + items[items.length - 1] : items[0]) : "");
+  }
+  function crop(pts, pad){
+    var xs = [], ys = [];
+    pts.forEach(function(p){ var q = TP.project(p[0], p[1], p[2]); xs.push(q[0]); ys.push(q[1]); });
+    var x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad, x1 = Math.max.apply(null, xs) + pad, y1 = Math.max.apply(null, ys) + pad;
+    return [Math.round(x0), Math.round(y0), Math.round(x1 - x0), Math.round(y1 - y0)];
+  }
+  function cube(x0, y0, x1, y1, z){ return [[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y0, z], [x1, y0, z], [x1, y1, z], [x0, y1, z]]; }
+  var HOME_CROP = function(){ return crop(cube(1.6, 1.8, 9.6, 10.4, 9.6), 6); };
+  function slotCrop(k, wide){ var s = TP.SLOT_AT[k]; return crop(cube(s.x - .4, s.y - .4, s.x + TP.S + .4, s.y + (wide ? 7.5 : TP.S) + .4, 3), 8); }
+
+  function place(){
+    if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
+    $("#placeGrid").innerHTML =
+      '<div class="panel s12"><h3>Build it</h3><p>Tap a spot in the yard, or the house, to change it; tap the scene button for the world around it. Timmy walks between the spots; drag across it (or tilt your phone) and it leans a little. Reduced motion: all still.</p>' +
+        '<div class="panel-body tp-build"><div class="tp-stage-wrap"><div class="tp-stage" id="tpStage"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
+      '<div class="panel s6"><h3>On the “you” card</h3><p>The small size, on the dashboard and in a hub’s More. It shows what the builder shows, cropped to the plot.</p><div class="panel-body"><div class="tp-card" id="tpCard"></div></div></div>' +
+      '<div class="panel s6"><h3>How it’s built</h3><p>Slots, not free placement, so every combination looks right and nothing overlaps.</p><div class="panel-body tp-how">' +
+        "<ul>" +
+        "<li><b>The home</b> stands on the back of the plot, its door always where the path starts. The cottage is free and stays every Timmy's first home; the castle, the giant mushroom and the treehouse come from the shop.</li>" +
+        "<li><b>Five yard spots</b> along the front: by the path on each side, the front corner, the side yard and the back corner. The bowling lane is long, so it takes the side yard and the front corner together.</li>" +
+        "<li><b>Fixed spots</b> for what you earn and the seasons: the fence on the back edges, the mailbox and lamppost at the end of the path, the tree out front, the flagpole for your pennants, the toothbrush by the door, the snowman, the holiday props by the door.</li>" +
+        "<li><b>The scene</b> sets the sky, the ground and what holds the plot up: the hill (free), the beach, the forest, the snowy mountain or the night sky.</li>" +
+        "<li><b>Day and night</b> follow your clock (7 pm to 7 am is night); every home has its own night lights. Light and dark mode change the page around it, not the scene.</li>" +
+        "<li><b>Light to load</b>: one drawing kit draws every combination (about 90 KB before compression), and it loads only when his place is on screen.</li>" +
+        "</ul></div></div>" +
+      galleryPanel("tpHomes", "The homes", "The cottage redrawn, then the three shop homes. Each has its own spots for Timmy and its own night lights.") +
+      galleryPanel("tpNights", "At night", "Each home’s own lights: windows, a porch lamp, torches at the castle gate, fireflies round the mushroom, lanterns on the treehouse deck.") +
+      galleryPanel("tpScenes", "The scenes", "What the plot stands on: the hill (free, with number thirty-one’s place on the next hill and the rabbit down the hill), the beach, the forest, the snowy mountain and the night sky with the Dark Matter stars.") +
+      galleryPanel("tpYard", "The yard", "Six things for the yard spots, each drawn to fit a spot. The mailbox stays your Bronze rank’s, at the end of the path, so a mint fountain takes its place in the list.") +
+      galleryPanel("tpUps", "Upgrades of the home itself", "Each home with every upgrade it takes: windows, a porch, a chimney, a flag. Plain versions are under The homes.") +
+      galleryPanel("tpPaint", "Paint", "Six colors for the cottage’s walls; the same six set the mushroom’s cap, the castle’s roofs and banners and the treehouse cabin.") +
+      galleryPanel("tpRanks", "What you’ve earned still shows: your rank", "The handpiece journey’s decorations, one per rank, on any home and scene (the ModuPro on the porch and Timmy in loupes come with the journeys’ art).") +
+      galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.");
+    buildPlace();
+    lazyGalleries();
+  }
+  function galleryPanel(id, h, p){ return '<div class="panel s12"><h3>' + h + "</h3><p>" + p + '</p><div class="panel-body tp-gal" id="' + id + '" data-lazy="1"></div></div>'; }
+  var GALLERIES = {
+    tpHomes: function(){ return TP.HOMES.map(function(h){ return placeFig({ home: h.k, scene: "hill", tier: 1, yard: {} }, h.n, (h.rarity ? h.rarity + " · " : "") + h.note.replace(/^(Free|Legendary): /, ""), "door"); }).join(""); },
+    tpNights: function(){ return TP.HOMES.map(function(h){ return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: { porch: true }, yard: { front: "pool" } }, h.n + " at night", "", "door"); }).join(""); },
+    tpScenes: function(){ return TP.SCENES.map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: { left: "garden", corner: "hammock" } }, s.n, s.note, "door"); }).join(""); },
+    tpYard: function(){
+      var where = { garden: "left", pool: "front", hammock: "left", fountain: "front", doghouse: "right", lane: "side" };
+      return TP.YARD.map(function(y){ var k = where[y.k], yd = {}; yd[k] = y.k;
+        return placeFig({ home: "cottage", scene: "hill", tier: 0, bare: true, yard: yd, viewBox: slotCrop(k, y.wide) }, y.n, y.rarity + " · " + y.note, "", "tp-yardfig"); }).join("");
+    },
+    tpUps: function(){ return TP.HOMES.map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
+      return placeFig({ home: h.k, scene: "hill", tier: 0, up: up, yard: {}, viewBox: HOME_CROP() }, h.n, h.ups.filter(function(k){ return k !== "paint"; }).map(function(k){ return h.upn[k]; }).join(", ")); }).join(""); },
+    tpPaint: function(){ return TP.PAINTS.map(function(p){ return placeFig({ home: "cottage", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.n, ""); }).join("") +
+      TP.PAINTS.map(function(p){ return placeFig({ home: "mushroom", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.boldName + " cap", ""); }).join(""); },
+    tpRanks: function(){ return TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", tier: i, yard: { front: "pool" } }, n, TIER_DECO[i], "", "tp-small"); }).join("") +
+      placeFig({ home: "cottage", scene: "hill", tier: 2, flair: FLAIRS[3], yard: {} }, "Mastery pennants", "One per hub mastered, in its medal’s color; a Crown puts a crown on the roof", "", "tp-small"); },
+    tpSeasons: function(){
+      var list = [["", "fall", "Fall"], ["", "spring", "Spring"], ["winter", "", "Christmas"], ["halloween", "fall", "Halloween"], ["thanksgiving", "fall", "Thanksgiving"], ["newyear", "", "New Year's"], ["valentine", "", "Valentine's Day"], ["stpatrick", "spring", "St. Patrick's Day"], ["easter", "spring", "Easter"], ["dentist", "", "Dentist's Day"]];
+      return list.map(function(x, i){ return placeFig({ home: TP.HOMES[i % 4].k, scene: "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
+    }
+  };
+  function lazyGalleries(){
+    /* drawn up front (a few milliseconds each); the pictures themselves load as they scroll near */
+    $$(".tp-gal[data-lazy]").forEach(function(el){ delete el.dataset.lazy; el.innerHTML = GALLERIES[el.id]().replace(/<img /g, '<img loading="lazy" '); });
+  }
+
+  /* the builder: the scene inline, tap targets over the slots and the home, Timmy walking, the side panel */
+  var walkTimer = null, walkAt = 0;
+  function buildPlace(){
+    var o = tpOpts({ marks: true }), r = TP.render(o), vb = TP.VIEWBOX, stage = $("#tpStage");
+    var hits = Object.keys(r.slots).map(function(k){ var it = PS.yard[k], name = byK(TP.SLOTS, k).n;
+      return '<path class="tp-hitarea' + (PS.pick === k ? " on" : "") + '" data-pick="' + k + '" d="' + r.slots[k] + '" tabindex="0" role="button" aria-label="' + esc(name + ": " + (it ? byK(TP.YARD, it).n : "empty") + ". Change it") + '"/>'; }).join("") +
+      '<path class="tp-hitarea tp-hithome' + (PS.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(byK(TP.HOMES, PS.home).n + ". Change it") + '"/>';
+    stage.classList.toggle("is-night", !!o.night);
+    stage.classList.toggle("tp-still", PS.still || reduced);
+    stage.innerHTML = '<div class="tp-tilt">' + sceneImg(r.svg, sceneAlt(), PS.still || reduced) + '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' + hits + "</svg>" +
+      '<span class="tp-timmy tp-walker" id="tpTimmy" style="width:' + (36 / vb[2] * 100).toFixed(2) + '%">' + img(timmyArt(PS.timmy), "Timmy") + "</span></div>";
+    stage.dataset.spots = JSON.stringify(r.spots);
+    $$(".tp-hitarea", stage).forEach(function(p){
+      p.addEventListener("click", function(){ PS.pick = p.dataset.pick; buildPlace(); });
+      p.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); PS.pick = p.dataset.pick; buildPlace(); var n = $('.tp-hitarea[data-pick="' + PS.pick + '"]'); if (n) n.focus(); } });
+    });
+    walkTo(walkAt, true);
+    if (!walkTimer && !(PS.still || reduced)) walkTimer = setInterval(function(){ walkTo(walkAt + 1); }, 3600);
+    if ((PS.still || reduced) && walkTimer) { clearInterval(walkTimer); walkTimer = null; }
+    side();
+    placeCard(r);
+    tilt(stage);
+  }
+  function spotOrder(spots){
+    /* the door first, then the home's own spots and the lawn, then each yard spot that has something in it */
+    var keys = ["door"].concat(Object.keys(spots).filter(function(k){ return k !== "door" && k !== "lawn" && !TP.SLOTS.some(function(s){ return s.k === k; }); }), ["lawn"]);
+    TP.SLOTS.forEach(function(s){ if (spots[s.k]) keys.push(s.k); });
+    return keys;
+  }
+  function walkTo(i, jump){
+    var stage = $("#tpStage"), t = $("#tpTimmy"); if (!stage || !t) return;
+    var spots = JSON.parse(stage.dataset.spots || "{}"), keys = (PS.still || reduced) ? ["door"] : spotOrder(spots), vb = TP.VIEWBOX;
+    walkAt = ((i % keys.length) + keys.length) % keys.length;
+    var sp = spots[keys[walkAt]] || spots.door;
+    if (jump) t.classList.add("no-anim");
+    t.style.left = ((sp[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%"; t.style.top = ((sp[1] - vb[1]) / vb[3] * 100).toFixed(2) + "%";
+    if (jump) { void t.offsetWidth; t.classList.remove("no-anim"); return; }
+    t.classList.remove("walking"); void t.offsetWidth; t.classList.add("walking");
+  }
+  function tilt(stage){
+    var el = $(".tp-tilt", stage);
+    if (PS.still || reduced) { el.style.transform = ""; return; }
+    if (stage._tilt) return; stage._tilt = 1;
+    stage.addEventListener("pointermove", function(e){
+      if (PS.still || reduced) return;
+      var b = stage.getBoundingClientRect(), x = (e.clientX - b.left) / b.width - .5, y = (e.clientY - b.top) / b.height - .5;
+      $(".tp-tilt", stage).style.transform = "perspective(900px) rotateX(" + (-y * 5).toFixed(2) + "deg) rotateY(" + (x * 7).toFixed(2) + "deg)";
+    });
+    stage.addEventListener("pointerleave", function(){ var t = $(".tp-tilt", stage); if (t) t.style.transform = ""; });
+    var base = null;
+    window.addEventListener("deviceorientation", function(e){
+      if (PS.still || reduced || e.gamma == null) return;
+      if (!base) base = [e.beta, e.gamma];
+      var rx = Math.max(-5, Math.min(5, (e.beta - base[0]) * .25)), ry = Math.max(-7, Math.min(7, (e.gamma - base[1]) * .3)), t = $(".tp-tilt", stage);
+      if (t) t.style.transform = "perspective(900px) rotateX(" + (-rx).toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+    });
+    stage.addEventListener("click", function(){ if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission && !stage._asked){ stage._asked = 1; DeviceOrientationEvent.requestPermission().catch(function(){}); } }, { once: true });
+  }
+  function chip(label, on, data, extra){ return '<button type="button" class="tp-chip' + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + (extra || "") + esc(label) + "</button>"; }
+  function rarityTag(r){ return r ? '<i class="tp-rar" style="--rar:' + RARITY[r] + '">' + esc(r) + "</i>" : '<i class="tp-rar free">Free</i>'; }
+  function side(){
+    var el = $("#tpSide"), pick = PS.pick, h = byK(TP.HOMES, PS.home), body = "";
+    var tabs = [["home", "Home"], ["scene", "Scene"]].concat(TP.SLOTS.filter(function(s){ return !(s.k === "corner" && PS.yard.side === "lane"); }).map(function(s){ return [s.k, s.n]; }));
+    var head = '<div class="tp-tabs" role="group" aria-label="What to change">' + tabs.map(function(t){ return chip(t[1], pick === t[0], 'data-pick="' + t[0] + '"'); }).join("") + "</div>";
+    if (pick === "home") {
+      body = "<h4>" + esc(h.n) + "</h4>" + '<div class="tp-opts">' + TP.HOMES.map(function(x){ return chip(x.n, x.k === PS.home, 'data-home="' + x.k + '"', rarityTag(x.rarity)); }).join("") + "</div>" +
+        "<h4>Upgrades</h4>" + '<div class="tp-opts">' + h.ups.filter(function(k){ return k !== "paint"; }).map(function(k){ return chip(h.upn[k], !!PS.up[k], 'data-up="' + k + '"'); }).join("") + "</div>" +
+        "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var c = PS.home === "mushroom" || PS.home === "castle" ? p.bold : p.c;
+          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(PS.home === "mushroom" || PS.home === "castle" ? p.boldName : p.n) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>";
+    } else if (pick === "scene") {
+      body = "<h4>The scene</h4>" + '<div class="tp-opts">' + TP.SCENES.map(function(s){ return chip(s.n, s.k === PS.scene, 'data-scene="' + s.k + '"', rarityTag(s.k === "hill" ? "" : s.k === "space" ? "Legendary" : "Epic")); }).join("") + "</div>";
+    } else {
+      var sl = byK(TP.SLOTS, pick), cur = PS.yard[pick];
+      body = "<h4>" + esc(sl.n) + "</h4>" + '<div class="tp-opts">' + chip("Nothing here", !cur, 'data-item=""') +
+        TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; }).map(function(y){ return chip(y.n, cur === y.k, 'data-item="' + y.k + '"', rarityTag(y.rarity)); }).join("") + "</div>" +
+        (pick === "side" || pick === "corner" ? '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>' : "");
+    }
+    body += '<div class="tp-shop"><button type="button" class="btn" disabled>Get more in the shop</button><span class="tp-note">The shop is part B: here everything is yours to try.</span></div>';
+    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season, Timmy</summary>" +
+      '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
+      selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n + ": " + TIER_DECO[i]]; }), PS.tier) +
+      selRow("Pennants", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
+      selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
+      selRow("Timmy", "timmy", [["happy", "Happy"], ["ok", "Okay"], ["sad", "Sad"], ["sick", "Sick"], ["sleep", "Asleep"], ["scared", "Startled"]].concat((A.timmy.hp || []).map(function(x){ return ["hp" + x.hp, x.hp + " HP"]; })), PS.timmy) +
+      '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
+    el.innerHTML = head + '<div class="tp-pick">' + body + "</div>" + prev;
+    $("details", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.pick = b.dataset.pick; buildPlace(); }); });
+    $$("[data-home]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.home = b.dataset.home; buildPlace(); }); });
+    $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.up[b.dataset.up] = !PS.up[b.dataset.up]; buildPlace(); }); });
+    $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.paint = b.dataset.paint; buildPlace(); }); });
+    $$("[data-scene]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.scene = b.dataset.scene; buildPlace(); }); });
+    $$("[data-item]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = PS.pick, it = b.dataset.item;
+      if (it === "lane") { delete PS.yard.corner; PS.yard.side = "lane"; PS.pick = "side"; }
+      else if (it) PS.yard[k] = it; else delete PS.yard[k];
+      buildPlace(); }); });
+    $$("[data-time]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.time = b.dataset.time; buildPlace(); }); });
+    $$("select[data-k]", el).forEach(function(s){ s.addEventListener("change", function(){ var k = s.dataset.k; PS[k] = k === "tier" || k === "flair" ? +s.value : s.value; buildPlace(); }); });
+    $("[data-still]", el).addEventListener("change", function(e){ PS.still = e.target.checked; buildPlace(); });
+  }
+  function selRow(label, k, opts, cur){
+    return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
+  }
+  function placeCard(r){
+    var o = tpOpts({ viewBox: TP.CARD }), rr = TP.render(o), vb = TP.CARD, h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene), sp = rr.spots.door;
+    $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), PS.still || reduced) +
+      '<span class="tp-timmy" style="left:' + ((sp[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%;top:" + ((sp[1] - vb[1]) / vb[3] * 100).toFixed(2) + "%;width:" + (36 / vb[2] * 100).toFixed(2) + '%">' + img(timmyArt(PS.timmy), "Timmy") + "</span></div>" +
+      '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
+  }
+
   /* ---------- controls ---------- */
   function setFace(f){ root.dataset.face = f; $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === f ? "true" : "false"); }); save(); tokens(); }
   function setTheme(t){ root.dataset.theme = t; $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === t ? "true" : "false"); }); save(); tokens(); }
@@ -610,8 +827,8 @@
     $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === root.dataset.face ? "true" : "false"); b.addEventListener("click", function(){ setFace(b.dataset.face); }); });
     $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === root.dataset.theme ? "true" : "false"); b.addEventListener("click", function(){ setTheme(b.dataset.theme); }); });
     pick.addEventListener("change", function(){ setHub(pick.value); });
-    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys();
+    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place();
   }
-  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub };
+  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(){ buildPlace(); } };
   init();
 })();

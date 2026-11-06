@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -66,6 +66,18 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 ## Log
 
 - 2026-11-06: written from Sam's calls in chat.
+- 2026-11-06 (Claude Code): the art, drawn first on the design page, for Sam's look before anything goes into
+  `widget/pet.js`. One kit, `tools/figures/site/place.mjs`, built by `build.mjs` into `tools/preview/design/place.js`
+  (`window.SH_PLACE`): an isometric 14 x 14 plot with five yard slots (a wide one for the lane), drawn back to front.
+  Four homes (the cottage redrawn, the castle, the giant mushroom, the treehouse), each with its own Timmy spots, door,
+  toothbrush and night lights, and four to five upgrades (windows, a porch or landing, a chimney, a flag, a paint color);
+  five scenes (the hill, with thirty-one's house on the next hill and the rabbit by its burrow; a beach, a forest, a snowy
+  mountain, the night sky with the Dark Matter stars); six yard items (a garden, a pool, a hammock, a mint fountain, a
+  doghouse, a bowling lane). The rank layers, the pennants, the Crown, the seasons and the holiday props draw on every
+  home and scene. The design page's "Timmy's place" section has the full view (tap a spot, Timmy walks there, drag or
+  tilt) and the card, light and dark, at 390 px, reduced motion still. The build checks 188 combinations. Waiting for
+  Sam's look; then the renderer goes into `widget/pet.js`, and `LORE.md` and the About page get their lines when a
+  student's Timmy can really move.
 
 ## Outcome
 

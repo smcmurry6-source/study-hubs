@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (redesign phase 4 part C: Timmy's place, the art, Claude Code)** — Nothing students see changes. Timmy's
+  house card redrawn as a little isometric world you build, on the design page only (`tools/preview/design/`, "Timmy's
+  place"): four homes (the cottage, a castle, a giant mushroom, a treehouse) with their upgrades and paint, five scenes,
+  six yard items in five slots, and the rank, pennant, season and holiday layers on all of them, by day and night. One
+  kit, `tools/figures/site/place.mjs`, built into `tools/preview/design/place.js` by `build.mjs` (`--check` covers it).
+  `widget/pet.js` is unchanged until Sam approves the art
+  ([task](vault/tasks/2026-11-06-redesign-timmys-place.md)).
 - **2026-11-06 (redesign phase 1: the hub engine and the new Occlusion, beside the live one, Claude Code)** — Nothing
   students see changes. `widget/hub.js` + `widget/hub.css` are the one engine every redesigned hub will use (Home, Notes,
   Questions, More; the bar at the top on a laptop and at the bottom on a phone, with a Settings button; Timmy stays
