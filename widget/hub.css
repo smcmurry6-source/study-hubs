@@ -76,9 +76,6 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx button { cursor: pointer; }
 .hx a { color: inherit; }
 .hx :focus-visible { outline: 3px solid var(--hub-text); outline-offset: 2px; border-radius: 6px; }
-/* keyboard use, marked by hub.js (html.hx-kbd): every focused control gets the ring, even where a browser's
-   :focus-visible guess says no (the release tests' Chromium skipped it on some links after a Tab) */
-html.hx-kbd .hx :is(a, button, summary, select, textarea, [tabindex]:not([tabindex="-1"])):focus { outline: 3px solid var(--hub-text); outline-offset: 2px; }
 .hx .num { font-variant-numeric: tabular-nums; }
 .hx [hidden] { display: none !important; }
 .hx .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -747,5 +744,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .game .btn { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  html.shx *, html.shx *::before, html.shx *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+  /* transitions off, not 1 ms: an element with no transition of its own has transition-property "all", and a 1 ms
+     duration made even its focus ring grow in from 0 px (BUG-040). Nothing waits on transitionend. */
+  html.shx *, html.shx *::before, html.shx *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; transition-delay: 0s !important; }
 }
