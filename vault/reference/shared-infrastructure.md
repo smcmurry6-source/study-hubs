@@ -41,7 +41,11 @@ tags: [widget, supabase]
   and making it public again doesn't turn Pages back on: Settings → Pages → Build and deployment → Deploy from a
   branch, `main`, `/ (root)`, Save, and check it's `main`, not another branch (2026-11-04). If a publish ("pages build
   and deployment" in Actions) times out, re-running it fails at once with "Deployment cancelled", because a re-run
-  for the same commit reuses the cancelled deployment; a new commit to `main` (any merged PR) publishes again.
+  for the same commit reuses the cancelled deployment; a new commit to `main` (any merged PR) publishes again. The same
+  holds for "Deployment failed, try again later" after a few minutes of `deployment_queued` (2026-11-06: #285's and
+  #281's publishes both ended that way, GitHub's status page said Pages was fine, and re-running #281's failed again
+  in a minute): the live site stays on the last good publish until the next merge. `node tools/release/postcheck.js`
+  catches it ("the live copy differs from main").
 - **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.
