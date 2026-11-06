@@ -11,7 +11,8 @@ dropdowns. Copy it from `special-patient-care` (or `occlusion`, which adds final
 - **Lectures** (Perio: Sessions): a **tick-box list** (`lecPickHTML()` / `wireLecPick()`, every lecture ticked by default, All lectures /
   Untick all) where **every row has an "Only" button** (one tap for one lecture; it closes the list). Beside it, the search box.
 - **Show**: chips for `STATE.ui.qstatus` (`BANK_SHOW`: All, **High likelihood**, Not answered yet, Missed last time, Pinned), each with
-  the number of questions it would give under the other filters (`bankFiltered(search, {st})`).
+  the number of questions it would give under the other filters (`bankFiltered(search, {st})`). A hub may add one for its own case
+  (Heme & Endo Exam 2: **Exam 1 High likelihood**, the Exam 1 Refresher's predicted-topic questions; Sam, 2026-11-06).
 - **Order**: **In order / Random** only (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
   order until Random is tapped again). **No "Likely first"** (Sam, 2026-11-03): High likelihood is a filter, either those questions or the whole bank.
 - **More filters** (folded, with a "n on" badge): question type (`STATE.ui.qfmt`, only the formats the bank has, each with its count) and

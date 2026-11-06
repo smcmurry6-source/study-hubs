@@ -696,9 +696,13 @@
     }
 
     function masteryFor(){
-      var bank = ((window.SH_EXPORT || {}).questions || []).length;
+      var ex = window.SH_EXPORT || {}, bank = (ex.questions || []).length, off = 0;
+      /* a hub may keep review-only questions out of its mastery (Heme & Endo Exam 2's Exam 1 Refresher, Sam 2026-11-06):
+         SH_EXPORT.uncounted() returns { n: how many, right: how many of them you have right on your latest try }. The
+         server's count includes them, so they come off both sides. */
+      if (typeof ex.uncounted === "function") { try { var u = ex.uncounted() || {}; bank = Math.max(0, bank - (u.n | 0)); off = u.right | 0; } catch (e) {} }
       var row = (mastery || []).filter(function(r){ return r.hub === H.hub; })[0];
-      var got = row ? row.latest_correct : 0, pct = bank ? got / bank : 0, lvl = -1;
+      var got = row ? Math.max(0, Math.min(bank, row.latest_correct - off)) : 0, pct = bank ? got / bank : 0, lvl = -1;
       MASTERY.forEach(function(m, i){ if (bank && pct >= m.pct) lvl = i; });
       return { bank: bank, got: got, pct: pct, lvl: lvl };
     }
