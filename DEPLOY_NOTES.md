@@ -35,11 +35,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-06 (question health: the newly flagged PCD Implants questions, Claude Code)** — Sam had the agent mark the 33
   questions reviewed in #258 on the admin page (12 Fixed, 21 Looks fine, through `admin_review_question` with the admin page's
   versions and flags; recorded in `vault/decisions.md`), then said yes to reviewing the PCD Implants questions flagged since
-  (18 over the evening, the night before the exam). Every key matches the notes; same ids; no notes text changed, so no
+  (19 over the evening, the night before the exam). Every key matches the notes; same ids; no notes text changed, so no
   narration or podcast change. **New wording**: `in-3weeks` ("after the healing abutment is placed" also fits a one-stage
   case, where the bone needs months, so "3 months" was defensible: the stem now asks how long the soft tissue needs) and
   `tm-mm-3` (it asked which "make" the crown need 7 mm, but the subgingival margin subtracts 1: it now asks which go into the
-  7 mm). **New explanations and why lines**: `im-tf-3` (metal does scatter the beam, but the starburst comes from sampling
+  7 mm) and `tm-early-place` ("after an extraction": most misses picked immediate loading, which counts from placement). **New explanations and why lines**: `im-tf-3` (metal does scatter the beam, but the starburst comes from sampling
   limits), `im-flapless` (CT shows the sinus but doesn't make bone; the old why was "Not his point"), `im-software` (DICOM is
   the file format the software reads), `cb-num-3` (beam hardening vs motion fixes), `su-def-bran` (the surgery lecture's two
   definitions; many textbooks credit the "structural and functional" wording to Brånemark, the slides to Albrektsson and

@@ -63,9 +63,10 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   `im-process` (the guide comes first because it's worn during the scan). Why lines only (same versions): `ev-blade`,
   `ev-hader`, `ev-frialit`. The subperiosteal drawing (`ty-sub`, `ev-pic-sub`) now has its lattice on the crest; it
   sat 12 px into the bone and half the recent tries picked "Blade". `tm-mm-2` was already fixed (#252).
-- **Question health, 2026-11-06** (the 18 flagged after that review, the night before the exam): every key matched the notes.
+- **Question health, 2026-11-06** (the 19 flagged after that review, the night before the exam): every key matched the notes.
   New wording: `in-3weeks` (asks the soft tissue's wait, since "after the healing abutment" also fits a one-stage case where
-  the bone needs months) and `tm-mm-3` ("which go into the 7 mm": the subgingival margin subtracts). Explanations and why lines:
+  the bone needs months), `tm-mm-3` ("which go into the 7 mm": the subgingival margin subtracts) and `tm-early-place`
+  ("after an extraction": placement counts from the extraction, loading from placement). Explanations and why lines:
   `im-tf-3`, `im-flapless`, `im-software`, `cb-num-3`, `su-def-bran`; why lines only: `bm-moment`, `su-edent`. Looks fine:
   `in-collagen`, `im-num-2`, `im-medct`, `tm-2s-1`, `cb-num-2`. **`su-def-bran` follows the surgery lecture**, which gives
   "light microscopic" to Brånemark (1969) and "structural and functional connection" to Albrektsson and Sennerby (1991);
