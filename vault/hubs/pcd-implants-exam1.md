@@ -95,9 +95,11 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   notes" buttons (`REF_SURG_*`, `REF_REV_*`). Write any new Patient Box item the same way:
   [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md); CI checks the numbers (`node tools/ci/cases.js`).
 - **Exam check-in** (Sam, 2026-11-06: "see how the class feels about changes in this hub like the improved patient
-  boxes"): the exam's `extraQs` in `HUBS` (`index.html`) ask four more questions, eight steps in all: `pbox_img` (the drawn
-  Patient Box cases, 1-5) and `diagrams` (the diagrams and the seven implant-type drawings, 1-5), the ids the Occlusion
-  midterm used (there: Patient Box 3.9, diagrams 4.6, n = 17), each with a "didn't use them" button saved as `"none"`; `helped` (tick any: how the
+  boxes"): the exam's `extraQs` in `HUBS` (`index.html`) ask four more questions, eight steps in all: `pbox_better` (were
+  the drawn Patient Box cases more effective than text-only ones: 1 less effective, 3 about the same, 5 more; Sam asked for
+  "better/more effective on a scale" rather than "how helpful", so it is not comparable with Occlusion's `pbox_img`) and
+  `diagrams` (how helpful the diagrams and the seven implant-type drawings were, 1-5, the id the Occlusion midterm used: 4.6
+  there, n = 17), each with a "didn't use them" button saved as `"none"`; `helped` (tick any: how the
   class answered each choice, Why each choice, Practice questions by least practiced, High likelihood, Pinned, Timmy Time, None
   of these); `changes` (keep improving up to the exam / hardly noticed / rather it held still). About half the people who
   answered anything reached a Patient Box case (34 of 65 on exam morning), which is why the "didn't use" button is there. The

@@ -501,9 +501,9 @@
           mk("occlusion", "2026-10-21 Midterm", "o2", 9 * 24 * h, 4, "Better than expected", "About right", "Fixture: more casts with contacts."),
           mk("occlusion", "2026-10-21 Midterm", "o1", 2 * 24 * h, 2, "Worse than expected", "Exam asked different things", "Fixture: the articulator settings."),
           mk("pcd-implants-exam1", "2026-11-06 Exam", "i2", 6 * h, 3, "Worse than expected", "Hub was easier", "Fixture: more CBCT questions.",
-            { pbox_img: "none", diagrams: 4, helped: ["Why each choice", "Timmy Time"], changes: "Fine, I hardly noticed" }),
+            { pbox_better: "none", diagrams: 4, helped: ["Why each choice", "Timmy Time"], changes: "Fine, I hardly noticed" }),
           mk("pcd-implants-exam1", "2026-11-06 Exam", "i1", 5 * h, 4, "About as expected", "About right", "Fixture: more abutment pictures.",
-            { pbox_img: 5, diagrams: 5, helped: ["How the class answered each choice", "Why each choice", "High likelihood questions"], changes: "Good: keep improving it right up to the exam" }),
+            { pbox_better: 4, diagrams: 5, helped: ["How the class answered each choice", "Why each choice", "High likelihood questions"], changes: "Good: keep improving it right up to the exam" }),
           mk("heme-endo-exam1", "2026-10-30 Exam", "e2", 3 * 24 * h, 3, "About as expected", "About right", "Fixture: the calcium drugs table."),
           mk("heme-endo-exam1", "2026-10-30 Exam", "e1", 1 * h, 5, "Better than expected", "About right", "Fixture: nothing, it was great.")
         ] };

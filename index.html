@@ -416,6 +416,9 @@ html[data-sh-accent] .btn-primary{background-image:var(--sh-tex); background-siz
 .debrief .survey-scale{justify-content:space-between;}
 .debrief .survey-scale .survey-opt{flex:1; min-width:0; padding:10px 0;}
 .debrief textarea{min-height:96px;}
+.survey-scale-ends3{display:grid; grid-template-columns:1fr 1fr 1fr;}   /* ends:[low, middle, high]: the middle label sits under 3 */
+.survey-scale-ends3 span:nth-child(2){text-align:center;}
+.survey-scale-ends3 span:nth-child(3){text-align:right;}
 .debrief .debrief-none{margin-top:12px;}
 .debrief .debrief-none .survey-opt{text-align:center; color:var(--ink-2);}
 .debrief .debrief-none .survey-opt[aria-pressed="true"]{color:var(--on-ink);}
@@ -787,9 +790,10 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
   var HUBS = [
     { id:"pcd-implants-exam1", cls:"implants", title:"PCD Implants Exam 1 Hub", code:"PCD Implants · Exam 1",
       exams:[ { name:"PCD Implants Exam 1", label:"Exam", date:"2026-11-06", code:"PCD Implants · Exam 1", checkinHour:20, promptHour:20,
-                /* how the class felt about the changes made during the hub week (Sam, 2026-11-06). diagrams and pbox_img are the
-                   ids the Occlusion midterm used, so the two hubs read side by side; "none" is the did-not-use button, never averaged */
-                extraQs:[ { id:"pbox_img", kind:"scale", prompt:"How helpful were the Patient Box cases with a drawn chart, X-ray and view of the implant?", ends:["Not helpful","Very helpful"], none:"I didn't get to them" },
+                /* how the class felt about the changes made during the hub week (Sam, 2026-11-06). pbox_better compares the drawn
+                   cases with text-only ones (Sam: better or more effective, on a scale; 3 = about the same); diagrams is the id the
+                   Occlusion midterm used, so the two hubs read side by side; "none" is the did-not-use button, never averaged */
+                extraQs:[ { id:"pbox_better", kind:"scale", prompt:"Were the Patient Box cases with a drawn chart, X-ray and view of the implant more effective than text-only Patient Box questions?", ends:["Less effective","About the same","More effective"], none:"I didn't get to them" },
                           { id:"diagrams", kind:"scale", prompt:"How helpful were the diagrams and the drawings of the seven implant types?", ends:["Not helpful","Very helpful"], none:"I didn't use them" },
                           { id:"helped", kind:"multi", prompt:"Which of these helped you study? Tick any.", only:"None of these",
                             options:["How the class answered each choice","Why each choice","Practice questions starting with the lectures I'd practiced least","High likelihood questions","Pinned questions","Timmy Time","None of these"] },
@@ -1603,7 +1607,7 @@ footer a:hover{color:var(--ink); text-decoration:underline;}
       else if (q.kind === "scale") {
         h += '<div class="survey-opts survey-scale">';
         for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="' + (v === n) + '" data-sv="' + n + '">' + n + '</button>';
-        h += '</div><div class="survey-scale-ends"><span>' + esc(q.ends[0]) + '</span><span>' + esc(q.ends[1]) + '</span></div>';
+        h += '</div><div class="survey-scale-ends' + (q.ends.length > 2 ? ' survey-scale-ends3' : '') + '">' + q.ends.map(function(e){ return '<span>' + esc(e) + '</span>'; }).join("") + '</div>';
         /* none: a button under the scale for "I didn't use it", saved as "none" so it never counts in the average */
         if (q.none) h += '<div class="survey-opts debrief-list debrief-none"><button type="button" class="survey-opt" aria-pressed="' + (v === "none") + '" data-sv="none">' + esc(q.none) + '</button></div>';
       } else if (q.kind === "multi") h += '<div class="survey-opts debrief-list debrief-multi" role="group" aria-label="' + esc(q.prompt) + '">' + q.options.map(function(o){ return '<button type="button" class="survey-opt" aria-pressed="' + (!!v && v.indexOf(o) >= 0) + '" data-sv="' + esc(o) + '">' + esc(o) + '</button>'; }).join("") + '</div>';
