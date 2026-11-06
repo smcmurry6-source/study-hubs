@@ -33,6 +33,11 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
   The Question Bank's Show row has an extra chip for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
   High Likelihood questions; tapping it ticks R if it isn't ticked. "High likelihood" still shows every lecture's.
+  **R is review only and not in the hub's totals** (Sam, 2026-11-06: "they are just available for review since the exam 2
+  will have 5 questions from that pool"): `COUNT_SKIP` / `COUNTED_QS` keep it out of the header's progress, Home's
+  readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
+  adds "+ n Exam 1 review") and, through `SH_EXPORT.uncounted()`, the mastery medal in `widget/ranks.js`. Its answers
+  still count for XP, streaks and leaderboards, and the bank, mock, drill and search still use its questions.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A and L13-L16 were
   written from slides (and Dr. Herr's speaker notes) before they were given, `status:'slides'`. L17 and L18 had no slides
   on 2026-11-05: [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).

@@ -14,7 +14,10 @@ tags: [widget, supabase]
   hub's own `index.html`. Each hub publishes `window.SH_EXPORT =
   {lectures, questions}` after its own IIFE closes, which is what the widget
   reads for search and "toughest questions" — if you add a hub or change its
-  question shape, make sure `SH_EXPORT` still reflects it.
+  question shape, make sure `SH_EXPORT` still reflects it. A hub with review-only questions (questions it keeps for
+  review but leaves out of its totals) adds `uncounted()`, returning `{ n, right }` (how many, how many right on the
+  latest try), and `widget/ranks.js` takes them off both sides of the mastery medal (Heme & Endo Exam 2's Exam 1
+  Refresher, 2026-11-06).
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is

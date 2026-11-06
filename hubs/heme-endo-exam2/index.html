@@ -7998,6 +7998,13 @@ var QUESTION_WHY = {};  /* this hub writes each why inline with its question (mq
 
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
+/* Review-only questions (Sam, 2026-11-06): the Exam 1 Refresher is there to review, since Exam 2 takes 5 questions from that
+   pool, so its questions don't count in the hub's totals: the header's progress, Home's readiness and "you haven't tried",
+   Where to next, the bank's "of N" and the mastery medal (SH_EXPORT.uncounted, read by widget/ranks.js). They still count
+   for answers, streaks and XP, and the bank, mock, drill and search still use them. */
+var COUNT_SKIP = { refresh: true };
+var COUNTED_QS = QUESTIONS.filter(function(q){ return !COUNT_SKIP[q.lec]; });
+function countedLecIds(){ return LECTURES.filter(function(l){ return !COUNT_SKIP[l.id]; }).map(function(l){ return l.id; }); }
 /* lecture label: L1-L10 */
 function lecLabel(l){ return l.label || ('L' + l.num); }
 
@@ -8087,8 +8094,8 @@ function dayStreak(){
 /* whole calendar days from today to a 'YYYY-MM-DD' date (0 = today) */
 function calDays(now, ymd){ return Math.round((new Date(ymd + 'T00:00:00') - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5); }
 function renderHeaderStats(){
-  var seenCount = QUESTIONS.filter(function(q){ return STATE.seen[q.id]; }).length;
-  var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + '/' + QUESTIONS.length;
+  var seenCount = COUNTED_QS.filter(function(q){ return STATE.seen[q.id]; }).length;
+  var el = document.getElementById('progressSummary'); if(el) el.textContent = seenCount + '/' + COUNTED_QS.length;
   var sp = document.getElementById('streakPill'); if(sp){ var n = dayStreak(); sp.textContent = n + ' day streak'; sp.hidden = n < 2; }
   var cd = document.getElementById('countdownPill');
   if(cd){
@@ -8462,9 +8469,10 @@ function ringSVG(pct){
   var r = 34, c = 2 * Math.PI * r, off = c * (1 - pct / 100);
   return '<svg class="hh-ring" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="' + r + '" class="hh-ring-bg"/><circle cx="42" cy="42" r="' + r + '" class="hh-ring-fg" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/><text x="42" y="47" text-anchor="middle">' + pct + '%</text></svg>';
 }
-function homeNextHTML(rows){
+function homeNextHTML(allRows){
+  var rows = allRows.filter(function(r){ return !COUNT_SKIP[r.l.id]; });
   var out = [], started = rows.filter(function(r){ return r.a >= 5; }).sort(function(a, b){ return a.pct - b.pct; });
-  var fresh = rows.filter(function(r){ return !r.tried; }), missed = rows.reduce(function(n, r){ return n + r.missed; }, 0);
+  var fresh = rows.filter(function(r){ return !r.tried; }), missed = allRows.reduce(function(n, r){ return n + r.missed; }, 0);
   if(started.length && started[0].pct < 80){ var w = started[0];
     out.push('<li class="tag-' + w.l.tag + '"><span class="lec-num">' + lecLabel(w.l) + '</span><span><b>Your weakest lecture: ' + escHtml(w.l.title.split(':')[0]) + '</b><small>' + w.pct + '% right over ' + w.a + ' answers</small></span><button type="button" class="btn primary" data-home="weak:' + w.l.id + '">Drill it</button></li>'); }
   if(missed) out.push('<li><span class="hn-ic">' + icon('cycle') + '</span><span><b>' + missed + ' question' + (missed === 1 ? '' : 's') + ' you missed last time</b><small>Try them again while they\'re fresh</small></span><button type="button" class="btn" data-home="missed">Retry</button></li>');
@@ -8488,7 +8496,7 @@ function homeNextHTML(rows){
 function homeLecturesHTML(rows){
   return '<div class="home-card home-lecs"><h3>' + icon('layers') + 'Your progress by lecture</h3><p class="hc-note">Bars show how much of each lecture\'s bank you\'ve tried; the solid part is what you got right on your latest try.</p><ul class="hl-list">' + rows.map(function(r){
     var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0;
-    return '<li class="tag-' + r.l.tag + '"><span class="lec-num">' + lecLabel(r.l) + '</span><div class="hl-main"><div class="hl-top"><b>' + escHtml(r.l.title) + '</b><span class="hl-who">' + escHtml(r.l.who) + (r.l.status === 'taught' ? '' : ' · slides only') + '</span></div>' +
+    return '<li class="tag-' + r.l.tag + '"><span class="lec-num">' + lecLabel(r.l) + '</span><div class="hl-main"><div class="hl-top"><b>' + escHtml(r.l.title) + '</b><span class="hl-who">' + escHtml(r.l.who) + (COUNT_SKIP[r.l.id] ? ' · review only, not in your totals' : r.l.status === 'taught' ? '' : ' · slides only') + '</span></div>' +
       '<span class="hl-bar" role="img" aria-label="' + r.tried + ' of ' + r.total + ' tried, ' + r.right + ' right"><i class="hl-tried" style="width:' + tw + '%"></i><i class="hl-right" style="width:' + rw + '%"></i></span>' +
       '<span class="hl-meta">' + r.tried + ' of ' + r.total + ' tried' + (r.pct !== null ? ' · ' + r.pct + '% of answers right' : '') + '</span></div>' +
       '<span class="hl-acts"><button type="button" class="btn" data-home="notes:' + r.l.id + '" aria-label="Notes for ' + lecLabel(r.l) + '">Notes</button><button type="button" class="btn" data-home="bank:' + r.l.id + '" aria-label="Questions for ' + lecLabel(r.l) + '">Questions</button></span></li>';
@@ -8517,8 +8525,8 @@ function homeDaysHTML(){
 function renderHome(){
   clearInterval(homeTimer);
   var p = document.getElementById('panel-home'); if(!p) return;
-  var rows = LECTURES.map(lecProgress), total = QUESTIONS.length;
-  var right = rows.reduce(function(n, r){ return n + r.right; }, 0), left = QUESTIONS.filter(function(q){ return !STATE.seen[q.id]; }).length;
+  var rows = LECTURES.map(lecProgress), total = COUNTED_QS.length;
+  var right = rows.reduce(function(n, r){ return n + (COUNT_SKIP[r.l.id] ? 0 : r.right); }, 0), left = COUNTED_QS.filter(function(q){ return !STATE.seen[q.id]; }).length;
   var acc = STATE.totalAnswered ? Math.round(STATE.totalCorrect / STATE.totalAnswered * 100) : null;
   var cont = LECTURE_BY_ID[STATE.ui.lec] || LECTURES[0], now = new Date();
   var h = '<section class="home-hero">' +
@@ -8551,7 +8559,7 @@ function homeGo(what){
   if(a === 'arcade'){ setMode('arcade'); return; }
   if(a === 'notes'){ STATE.ui.lec = lec; STATE.ui.sub = 'notes'; }
   else if(a === 'bank'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = lec; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'all'; bankShown = BANK_PAGE; }
-  else if(a === 'new'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
+  else if(a === 'new'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = countedLecIds(); STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
   else if(a === 'missed'){ STATE.ui.sub = 'bank'; STATE.ui.qlec = 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'missed'; bankShown = BANK_PAGE; }
   else if(a === 'least'){ var ids = String(lec || '').split(',').filter(function(id){ return LECTURE_BY_ID[id]; });
     STATE.ui.sub = 'bank'; STATE.ui.qlec = ids.length === 1 ? ids[0] : ids.length ? ids : 'all'; STATE.ui.qsrc = 'all'; STATE.ui.qfmt = 'all'; STATE.ui.qstatus = 'unseen'; bankShown = BANK_PAGE; }
@@ -8896,7 +8904,7 @@ function renderBank(body){
     else if(st === 'missed' && only) msg = 'Nothing missed in these lectures. Questions you get wrong come back here.';
     else if(st === 'unseen' && only) msg = 'You have answered every question here. Try <b>Missed last time</b>, or another lecture.';
     else msg = 'No questions match all of these: ' + on.map(function(p){ return '<b>' + escHtml(p[1]) + '</b>'; }).join(', ') + '.';
-    return '<div class="rv-empty qf-empty"><p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all ' + QUESTIONS.length + ' questions</button></div>';
+    return '<div class="rv-empty qf-empty"><p>' + msg + '</p><button type="button" class="btn primary" data-qclear>Show all questions</button></div>';
   }
   function draw(){
     var qs = bankFiltered(bankSearch);
@@ -8907,7 +8915,11 @@ function renderBank(body){
       qs.sort(function(a,b){ return rank(a)-rank(b); });
     }
     var on = onNow(), ordTxt = STATE.ui.qorder === 'random' ? 'random order' : 'lecture order';
-    document.getElementById('qCount').innerHTML = '<span class="qsum-n">' + (on.length ? 'Showing <b>' + qs.length + '</b> of ' + QUESTIONS.length + ' questions' : 'Showing <b>all ' + QUESTIONS.length + '</b> questions') + (qs.length ? ', ' + ordTxt : '') + (qs.length > bankShown ? ' (' + bankShown + ' at a time)' : '') + '</span>' +
+    /* review-only questions are counted apart from the bank's total (COUNT_SKIP) */
+    var nRev = qs.filter(function(q){ return COUNT_SKIP[q.lec]; }).length, nMain = qs.length - nRev, NT = COUNTED_QS.length;
+    var sumTxt = !nMain && nRev ? 'Showing <b>' + nRev + '</b> Exam 1 review question' + (nRev === 1 ? '' : 's') :
+      (on.length || nMain < NT ? 'Showing <b>' + nMain + '</b> of ' + NT + ' questions' : 'Showing <b>all ' + NT + '</b> questions') + (nRev ? ' + <b>' + nRev + '</b> Exam 1 review' : '');
+    document.getElementById('qCount').innerHTML = '<span class="qsum-n">' + sumTxt + (qs.length ? ', ' + ordTxt : '') + (qs.length > bankShown ? ' (' + bankShown + ' at a time)' : '') + '</span>' +
       (on.length ? '<span class="qsum-tags">' + on.map(function(p){ return '<button type="button" class="qsum-tag" data-qoff="'+p[0]+'" aria-label="Remove filter: '+escHtml(p[1])+'">'+escHtml(p[1])+QF_X+'</button>'; }).join('') + '<button type="button" class="qsum-clear" data-qclear>Clear all</button></span>' : '');
     list.innerHTML = qs.slice(0, bankShown).map(function(q){ return qCardHTML(q); }).join('') || emptyHTML(on);
     document.getElementById('qMore').hidden = qs.length <= bankShown;
@@ -9723,6 +9735,8 @@ window.SH_DRILL = {
 
 /* Published for the shared widget (search + toughest-questions labels) — see widget/v3.js. */
 window.SH_EXPORT = {
+  /* review-only questions left out of the mastery medal (widget/ranks.js): how many, and how many you have right now */
+  uncounted: function(){ var n = 0, right = 0; QUESTIONS.forEach(function(q){ if(!COUNT_SKIP[q.lec]) return; n++; var s = STATE.seen[q.id]; if(s && s.last) right++; }); return { n: n, right: right }; },
   lectures: LECTURES.map(function(l){ return { id:l.id, title:''+lecLabel(l)+' ' + l.title, who:l.who, status:l.status }; }),
   questions: QUESTIONS.map(function(q){
     var hint = q.type === 'mcq' ? q.choices[q.answer] : q.type === 'multi' ? q.correct.map(function(k){ return q.choices[k]; }).join('; ') : q.type === 'sequence' ? q.steps.join(' → ') : q.pairs.map(function(p){ return p.join(': '); }).join('; ');
