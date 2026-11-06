@@ -548,3 +548,6 @@ gs-mm-1
 # Retired before 2026-11-04: class data under these ids, no longer in the hub (renamed or removed earlier)
 tm-code-6010 retired
 tm-code-6058 retired
+tm-conelog retired
+tm-rc-grooves retired
+gs-credit retired
