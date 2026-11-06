@@ -771,7 +771,7 @@
         "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var c = PS.home === "mushroom" || PS.home === "castle" ? p.bold : p.c;
           return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(PS.home === "mushroom" || PS.home === "castle" ? p.boldName : p.n) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>";
     } else if (pick === "scene") {
-      body = "<h4>The scene</h4>" + '<div class="tp-opts">' + TP.SCENES.map(function(s){ return chip(s.n, s.k === PS.scene, 'data-scene="' + s.k + '"', rarityTag(s.k === "hill" ? "" : s.k === "space" ? "Legendary" : "Epic")); }).join("") + "</div>";
+      body = "<h4>The scene</h4>" + '<div class="tp-opts">' + TP.SCENES.map(function(s){ return chip(s.n, s.k === PS.scene, 'data-scene="' + s.k + '"', rarityTag(s.rarity)); }).join("") + "</div>";
     } else {
       var sl = byK(TP.SLOTS, pick), cur = PS.yard[pick];
       body = "<h4>" + esc(sl.n) + "</h4>" + '<div class="tp-opts">' + chip("Nothing here", !cur, 'data-item=""') +

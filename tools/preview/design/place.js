@@ -224,7 +224,7 @@ window.SH_PLACE = (function placeKit(INK, C){
 
   var SCENES = {
     hill: {
-      n: "The hill", note: "Free: where every Timmy starts",
+      n: "The hill", note: "Free: where every Timmy starts", rarity: "",
       sky: function(o){ return o.night ? bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + moon(330, 44) + stars(rng(5), 30, 150, "tp-star")
         : bands(["#BFE5FA", "#CBEAF9", "#D8F0FB", "#E5F5FC"], 0, 300) + sun(78, 40) + cloud(306, 34) + cloud(156, 22, .7); },
       far: function(o){
@@ -261,7 +261,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       fg: function(o){ return ""; }
     },
     beach: {
-      n: "The beach", note: "Sand, sea and a palm",
+      n: "The beach", note: "Sand, sea and a palm", rarity: "Rare",
       sky: function(o){ return o.night ? bands(["#16204A", "#1E2C5C", "#283B70", "#33497F"], 0, 300) + moon(84, 40) + stars(rng(9), 28, 140, "tp-star")
         : bands(["#BDE6FA", "#CDEDFB", "#DDF3FC", "#ECF8FD"], 0, 300) + sun(318, 38) + cloud(118, 30) + G("tp-gull", L("M240 52 q4 -4 8 0 q4 -4 8 0 M268 70 q3 -3 6 0 q3 -3 6 0", 1.4)); },
       far: function(o){
@@ -296,7 +296,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       }
     },
     forest: {
-      n: "The forest", note: "Tall pines all around",
+      n: "The forest", note: "Tall pines all around", rarity: "Rare",
       sky: function(o){ return o.night ? bands(["#121C3E", "#18264E", "#20325E", "#283D6C"], 0, 300) + moon(86, 40) + stars(rng(13), 26, 120, "tp-star")
         : bands(["#CBE8E6", "#D6EEEA", "#E1F3EE", "#ECF8F2"], 0, 300) + sun(330, 40) + cloud(170, 30, .8); },
       far: function(o){
@@ -322,7 +322,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       }
     },
     mountain: {
-      n: "The snowy mountain", note: "Snow all year, up on a peak",
+      n: "The snowy mountain", note: "Snow all year, up on a peak", rarity: "Epic",
       sky: function(o){ return o.night ? bands(["#121A40", "#1A2552", "#233265", "#2D3F76"], 0, 300) + moon(328, 40) + stars(rng(17), 34, 150, "tp-star")
         : bands(["#C9E0F4", "#D6E8F7", "#E2EFF9", "#EEF5FB"], 0, 300) + sun(84, 40) + cloud(286, 30, .9); },
       far: function(o){
@@ -350,7 +350,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       fg: function(o){ return G("tp-snowfall", flakes(rng(31), 16)); }
     },
     space: {
-      n: "The night sky", note: "Dark Matter stars, always night", alwaysNight: true,
+      n: "The night sky", note: "Dark Matter stars, always night", rarity: "Epic", alwaysNight: true,
       sky: function(o){
         var R = rng(41), s = bands(["#0E0726", "#140B33", "#1D0F45", "#2A1458", "#341B66"], 0, 300);
         /* a nebula and the Dark Matter stars */
@@ -719,7 +719,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       }
     },
     pool: {
-      n: "A swimming pool", note: "With a ladder and a mint float", rarity: "Rare",
+      n: "A swimming pool", note: "With a ladder and a mint float", rarity: "Epic",
       spot: [3.45, 2.3],
       draw: function(o){
         var x0 = .2, y0 = .3, x1 = 3.4, y1 = 3.4, r = .32, s = "";
@@ -789,7 +789,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       }
     },
     doghouse: {
-      n: "A doghouse", note: "A bowl, a chew toy and a name plate", rarity: "Common",
+      n: "A doghouse", note: "A bowl, a chew toy and a name plate", rarity: "Uncommon",
       spot: [3.35, 3.35],
       draw: function(o){
         var s = "", x0 = .6, y0 = .7, w = 2.4, d = 2.2, h = 1.5;
@@ -813,7 +813,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       }
     },
     lane: {
-      n: "A bowling lane", note: "Takes the side yard and the front corner; tap it to bowl", rarity: "Epic", wide: true,
+      n: "A bowling lane", note: "Takes the side yard and the front corner; tap it to bowl", rarity: "Rare", wide: true,
       spot: [1.8, 6.9],
       draw: function(o){
         /* a backyard lane running from the front corner (bowler) back to the pins, gutters each side */
@@ -1083,7 +1083,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, project: P, N: N, S: S, FIX: FIX,
     SLOT_AT: SLOTS,
     HOMES: Object.keys(HOMES).map(function(k){ return { k: k, n: HOMES[k].n, note: HOMES[k].note, rarity: HOMES[k].rarity, ups: HOMES[k].ups, upn: HOMES[k].upn }; }),
-    SCENES: Object.keys(SCENES).map(function(k){ return { k: k, n: SCENES[k].n, note: SCENES[k].note, alwaysNight: !!SCENES[k].alwaysNight }; }),
+    SCENES: Object.keys(SCENES).map(function(k){ return { k: k, n: SCENES[k].n, note: SCENES[k].note, alwaysNight: !!SCENES[k].alwaysNight, rarity: SCENES[k].rarity }; }),
     YARD: Object.keys(YARD).map(function(k){ return { k: k, n: YARD[k].n, note: YARD[k].note, rarity: YARD[k].rarity, wide: !!YARD[k].wide }; }),
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n }; }),
