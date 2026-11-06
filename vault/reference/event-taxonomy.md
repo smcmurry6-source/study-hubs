@@ -122,7 +122,7 @@ new one can't go undocumented.
 | `pod` | `pod:<episode>:play`, `:q1`-`:q4` (25/50/75/95% heard), `:secs`, `:like`, `:dislike`, `:unvote`, `:comment`, `:report`, `:comments-all` | count; seconds for `:secs` | `widget/podcast.js` | 10-20 (reactions 11-04) |
 | `tts` | `tts:start-<plain\|full\|voice>`, `tts:lec=<lecture>-<level>`, `tts:secs`, `tts:end` | starts; seconds heard; finishes | Listen, `widget/v3.js` | 10-20 |
 | `tour` / `tour-hub` | `:prompt`, `:start`, `:done`, `:decline`, `:quit-<step>` | the dashboard's and a hub's guided tour | `widget/tour.js` | 10-21 |
-| `bank` | `bank:show=<chip>`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:order=`, `bank:search`, `bank:tag-off=`, `bank:clear`, `bank:more`, `bank:retry-shown`, `bank:retry`; `bank:sort=` (Heme & Endo only) | Question Bank filter panel use ([rule](../rules/question-bank-filter-panel.md)), "Try it again" | each hub's bank (`track()` adds `bank:`) | 10-21 |
+| `bank` | `bank:show=<chip>` (a Show chip, or a High likelihood toggle turned on: `likely`, Heme & Endo 2 `likely1`), `bank:show=<toggle>-off` (from 11-06), `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:order=`, `bank:search`, `bank:tag-off=`, `bank:clear`, `bank:more`, `bank:retry-shown`, `bank:retry`; `bank:sort=` (Heme & Endo only) | Question Bank filter panel use ([rule](../rules/question-bank-filter-panel.md)), "Try it again" | each hub's bank (`track()` adds `bank:`) | 10-21 |
 | `hints` | `hints:likely-practice` | "Practice these" on Exam Hints | hubs | 10-29 |
 | `drill` | `drill:size=20`, `drill:more=10` | Daily Drill size chosen, "more" | `widget/drill.js` | 10-20 |
 | `pin` | `pin:add`, `pin:remove` | pinned questions | `widget/v3.js` | 11-02 |
