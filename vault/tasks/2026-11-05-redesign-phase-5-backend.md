@@ -28,6 +28,13 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
   release, but this phase's changes don't change what students see. Part 2's pieces that only serve the new engine
   (precaching it, the one font) come with [the release](2026-11-06-redesign-release.md).
 
+- **Part 3, added 2026-11-06 (Sam): the server for the game-layer additions**, built and tested now on a throwaway copy and
+  applied at [the release](2026-11-06-redesign-release.md), because it changes how the class earns XP: no daily XP cap,
+  `question_keys` and server-checked answers, the guardrails, every new XP source and boost, award rows, the 63-step ladder
+  ([journeys](2026-11-06-redesign-progression-journeys.md)); Mints, the shop catalog and rotation, `buy_item`, `equip_item`,
+  inventory, HP from snacks ([shop](2026-11-06-redesign-timmy-shop.md), [Timmy's place](2026-11-06-redesign-timmys-place.md));
+  the idea board's tables and functions ([idea board](2026-11-06-idea-board.md)). The new functions sit beside today's, so the
+  live hubs keep today's rules until the release switches them.
 - **Suited to a parallel agent (Codex 5.6 Terra, Sam, 2026-11-05)**: this phase does not depend on the design work. The
   numbers to beat and the RPC inventory are in the audit note (sections 1 and 3) and in the session's architecture
   report summarized there; every change is verifiable with the release suites on a throwaway database.
@@ -43,6 +50,7 @@ with `migration_v53.sql` applied. Part 2 (the bundles, the stylesheet, the font,
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (part 1)
 - [x] Preview link, phone and laptop screenshots, and Sam's look (part 1: approved in chat, "Go ahead"; the PR's box is Sam's to tick)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome) (part 1; no About-page change, no new feature)
+- [ ] Part 3: the server for the game-layer additions (above), each note's server items done, its migration ready to apply at the release
 - [ ] Part 2: two widget bundles, one shared stylesheet, one self-hosted font, a thinner Supabase client, sw.js precaching the engine and fonts and caching content JSON stale-while-revalidate
 
 ## Log

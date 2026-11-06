@@ -23,7 +23,15 @@ Put the ranks, trophies and celebrations on the design system without changing t
   preview link first, screenshots, the release suites, Sam's look), [about-page](../rules/about-page.md),
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - `widget/ranks.js`, `widget/rankup.js`, `widget/games.js`/`games.css`, each hub's skin, `widget/eggs.js` (pop-ups stay as they are: Sam).
-- Timmy's HP model stays as it is (Sam, 2026-11-05).
+- Timmy's HP model stays as it is (Sam, 2026-11-05), except that the shop's snacks and floss now restore HP (Sam, 2026-11-06).
+- **Four more parts, agreed 2026-11-06 (Sam)**, each its own PR and art review, on top of the presentation work above:
+  - **A**: [three journeys, more XP and the Dark Matter unlock](2026-11-06-redesign-progression-journeys.md) (the client side);
+  - **B**: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) (Mints, the rotating shop, rarity, snacks and floss, XP boosts,
+    rare costumes);
+  - **C**: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card redrawn as a scene you build);
+  - **D**: [the bowling egg](2026-11-06-redesign-bowling-egg.md).
+  Their server side is [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3. This changes "without changing their
+  model" in the goal: XP rules, the ladder, the house and HP change as those notes say.
 - **Released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): these widget files are shared with the
   live hubs, so the new look goes in files or styles only the new versions load (see
   [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)), and the live hubs keep today's cards until
@@ -32,6 +40,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
 ## Done when
 
 - [ ] Every card and the cutscene reviewed in a recording on the preview, reduced motion too
+- [ ] Part A, B, C and D done as their notes say (each note's "Done when")
 - [ ] The arcade lobby of each live hub redrawn; game mechanics unchanged
 - [ ] The About page's trophy and rank entries updated
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -41,5 +50,6 @@ Put the ranks, trophies and celebrations on the design system without changing t
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-06: parts A-D added (Sam's calls on the journeys, the shop, Timmy's place and the bowling egg).
 
 ## Outcome
