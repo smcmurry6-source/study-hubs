@@ -38,7 +38,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   with no code change, as Occlusion's did. All four now use Occlusion's rule, `.home-tl .tl-past .tl-what{color:var(--ink-soft)}`
   (past dates already use the soft ink): 7.5:1 or better in both themes. `tools/release/a11y.js` passes; PCD Implants' Home contrast
   nodes went 4 to 2 (light and dark) and its baseline was updated (`--update --hub pcd-implants-exam1`). Special Patient Care and Heme
-  & Endo 1 aren't live in the a11y suite any more; their numbers are computed from their palettes. Bug log: BUG-031.
+  & Endo 1 aren't live in the a11y suite any more; their numbers are computed from their palettes. Bug log: BUG-031. PR 274.
 - **2026-11-06 ("Why each choice" starts folded, every live hub, Claude Code)** — Sam: "after you answer a question,
   have the 'why each choice' be collapsed by default. it takes up a lot of screen space". `whyHTML` no longer opens its
   `<details class="qx-why">`, so after answering a student sees the explanation and one "Why each choice" bar, and taps it
