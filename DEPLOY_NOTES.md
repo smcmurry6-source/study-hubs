@@ -52,8 +52,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   one side only" tipping the lower denture off its ridge) and **Fig 23 Posterior tooth forms** (`toothforms`: anatomic,
   semi-anatomic, flat and lingualized pairs; "Slide sideways" draws the contact force square to the surfaces in contact).
   `tools/figures/occlusion/anima/l8den.mjs` is the frontal section Figs 21 and 22 share (and the tooth profiles Fig 20 and
-  23 use). Occlusion's performance budget 1320 -> 1350 KB (the figures add about 21 KB over the wire), pending Sam's
-  approval (BUG-030). About page: the Diagrams entry. No schema change, no text or audio change.
+  23 use). Occlusion's performance budget 1320 -> 1350 KB (the figures add about 21 KB over the wire), approved
+  by Sam on 2026-11-06 (BUG-030). About page: the Diagrams entry. No schema change, no text or audio change.
 
 - **2026-11-05 (question health: every flagged question reviewed, Claude Code)** — Sam: "review and fix all questions flagged
   for question health". `qh_report` listed 33 to review on the live hubs (PCD Implants 14, Perio 10, Occlusion 9; none on

@@ -5,7 +5,7 @@ hub: occlusion
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-16
-waiting-on: Sam's look at the four figures (PR #260), then L8's slides or handout in the Drive Final folder
+waiting-on: L8's slides or handout in the Drive Final folder
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/260
 ---
@@ -71,5 +71,6 @@ left before the final (Mon Nov 16), the sooner the better ([ship-it-now](../rule
 - 2026-11-06: Sam made outside sources a standing rule for figures ([outside-sources-for-figures](../rules/outside-sources-for-figures.md))
   and said "Build all proposed figures". Fig 20 now resorbs the maxilla less, so the mandible loses about twice its height
   (Tallgren; Cawood & Howell for the basal bone), and Figs 20-23 cite their outside sources. Same PR.
+- 2026-11-06: Sam approved PR #260 ("Merge when ready"), the budget raise included. Left: the slides check.
 
 ## Outcome
