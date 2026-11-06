@@ -50,6 +50,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the first 4 seconds (BUG-038; it now waits for the next visit). No schema change: `submit_exam_debrief` already takes any
   answers. About page, event taxonomy, lessons-audit skill, hub note.
 
+- **2026-11-06 (admin page: light only, Claude Code)** — Sam: "i dont want the admin page to be dark mode. its hard to
+  see". `review/index.html` drops its two `prefers-color-scheme: dark` blocks (the page's colors and the switch knob) and sets
+  `color-scheme: light` plus `<meta name="color-scheme" content="only light">`, so a laptop or phone in dark mode still gets
+  the light page, form controls and scrollbars included (and Chrome's auto-dark leaves it alone). `tools/release/admin-ui.js`
+  now fails if the page turns dark on a dark-mode phone. Admin only: students see no change. No schema change.
+
 - **2026-11-06 (question health: PCD Implants on exam day, Claude Code)** — Sam: "review implants question health, fix the
   issues, mark them in the admin page, and merge". The 10 questions flagged since #267 were checked against the notes; every
   key matches; same ids; no notes text changed, so no narration or podcast change. **New wording**: `ev-tmi-bone` (its key
@@ -60,7 +66,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `su-mm-1` (each risk factor's group: malpositioning is surgical-related) and `su-match` (a matching card shows only its
   explanation after answering, so it now lists the four pairs). These seven start fresh numbers. **Looks fine**:
   `bm-moment`, `im-pa-follow`, `tm-2s-6`. All ten marked on the admin page (`admin_review_question`; the seven as Fixed
-  once the new versions were live).
+  once the new versions were live). Then three more flagged while #277 shipped ("stronger students miss it more"; keys
+  match): `ev-2s-5` (statement 2 uses the notes' white, yellow, red instead of "grippier colors"), and new explanations and
+  why lines for `in-num-3` (the JE does attach to titanium; the hemidesmosomes are the false part) and `su-voxel` (more
+  dose with smaller voxels; "choose the smallest voxel" is about detail). Marked Fixed once live.
 
 - **2026-11-06 (Question Bank: High likelihood on top of any Show chip, Claude Code)** — Sam: "when im filtering questions in the
   bank, i want to be able to filter by both high likelihood and not answered yet or missed last time or pinned". In Occlusion,

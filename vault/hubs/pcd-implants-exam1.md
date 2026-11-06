@@ -79,7 +79,10 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   answering, not the pairs, so the explanation now lists them; do the same for any matching item). Looks fine: `bm-moment`
   (the lecture leans on "stress is force per unit area", so force / area is a real mix-up), `im-pa-follow` (21 of 23 right; the
   top-vs-bottom flag is noise on an easy item), `tm-2s-6` (picks spread over all four choices: guessing, not a pull to one
-  wrong answer). **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
+  wrong answer). Flagged while that shipped, all "stronger students miss it more", keys matching the notes: `ev-2s-5`
+  (statement 2 now says the notes' white, yellow, red instead of "grippier colors"), `in-num-3` (the explanation says the
+  JE does attach to titanium; statement 2's hemidesmosomes are the false part) and `su-voxel` (smaller voxels and closer
+  slices mean more dose; the CBCT lecture's "choose the smallest voxel" is about detail). **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
   key plus the explanation), so an explanation edit starts fresh numbers and a why-line edit doesn't. Ids removed on Sam's
   11-03 call (`tm-code-6010`, `tm-code-6058`, `tm-conelog`, `tm-rc-grooves`, `gs-credit`) are retired in
   `tools/question-ids/pcd-implants-exam1.txt`; the admin page lists the ones with class data as "gone".

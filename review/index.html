@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#EEF2F4">
+<meta name="color-scheme" content="only light">
 <meta name="robots" content="noindex,nofollow">
 <title>Admin · Study Hubs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,17 +41,7 @@
   --sidebar:228px; --inset:8px; --pad:24px; --gap:16px; --card-pad:20px;
   --r-sheet:16px; --r-card:8px; --r-control:6px; --ctl:32px;
   --ease:cubic-bezier(.22,1,.36,1);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --frame:#000000; --sheet:#111111; --raised:#1B1B1B; --active:#262626;
-    --border:#2A2A2A; --rule:#1F1F1F; --control:#4A4A4A;
-    --text:#F3F3F3; --muted:#B4B4B4; --faint:#9A9A9A;
-    --accent:#7AA7F2; --accent-soft:#16233A; --accent-ink:#A9C7F7; --primary:#F3F3F3; --primary-ink:#000000;
-    --positive:#4CC88A; --negative:#F07A6A; --warn:#F2A255; --warn-soft:#2B1E10;
-    --pill-pos-bg:#14291D; --pill-pos-ink:#6BD9A0; --pill-neg-bg:#2E1814; --pill-neg-ink:#F59A8C;
-    --pill-warn-bg:#2B2310; --pill-warn-ink:#E9B949; --pill-bg:#222222; --pill-ink:#E2E2E2;
-  }
+  color-scheme:light; /* Sam, 2026-11-06: light only, even when the device is in dark mode (dark was hard to read) */
 }
 *,*::before,*::after{box-sizing:border-box;}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
@@ -105,7 +96,6 @@ a{color:inherit;}
 .switch{appearance:none; -webkit-appearance:none; width:32px; height:20px; margin:0; border-radius:999px; background:var(--control); position:relative; cursor:pointer; flex:none; transition:background-color .2s ease;}
 .switch::after{content:""; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform .2s var(--ease);}
 .switch:checked{background:var(--text);} .switch:checked::after{transform:translateX(12px);}
-@media (prefers-color-scheme: dark){ .switch::after{background:#111;} .switch:not(:checked)::after{background:#ddd;} }
 
 /* ---------- buttons and fields ---------- */
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:var(--ctl); padding:5px 12px; border-radius:var(--r-control); border:1px solid var(--control); background:var(--sheet); color:var(--text); font-weight:500; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background-color .15s ease, transform .12s var(--ease);}
