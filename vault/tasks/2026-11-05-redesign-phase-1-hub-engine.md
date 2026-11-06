@@ -58,7 +58,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - [x] Every mode, every question format, the mock, the arcade, narration, the podcast card, pins, reports, the drill, the eggs and Timmy work on the preview (UAT checklist), phone and laptop, light and dark
 - [x] The inspector passes with 0 FAIL on Home, Notes, Questions and More
 - [x] The rule, About page and [build-a-hub](../how-to/build-a-hub.md) changes written into the [release note](2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`): all pass locally; "Release tests" on PR #275 after the BUG-040 fix to confirm
 - [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
@@ -98,7 +98,7 @@ Built side by side, nothing students see changes ([PR #275](https://github.com/s
   the bank's side column, below-the-fold notes, one empty panel inside an anima figure).
 - **CI**: `smoke.js` clicks through every `hubs/*/next/` page (four views, every More page and set, an answer, the arcade)
   and checks its bar at 320 px and at the largest text; `check.yml` runs both builds' `--check`; `perf.js` measures the page;
-  `a11y.js` audits the four views (0 axe issues, light and dark; baseline added). Bugs found and fixed: BUG-037 to BUG-039
+  `a11y.js` audits the four views (0 axe issues, light and dark; baseline added). Bugs found and fixed: BUG-037 to BUG-040
   in the [bug log](../release/bug-log.md).
 - The rule, About page and build-a-hub changes are drafted in the [release note](2026-11-06-redesign-release.md).
 - **For phase 2**: `PCASES` and the case kit are wired (Perio, PCD Implants); the figure 11 px floor is in the content
