@@ -764,7 +764,7 @@ html.shx .sh-rank-card { background-image: none; }
 html.shx .sh-rank-name { background: none; -webkit-background-clip: border-box; background-clip: border-box; -webkit-text-fill-color: currentColor; color: var(--text); }
 /* Timmy stays in the bottom-left corner, as on the live hubs (Sam, 2026-11-06); only his bubble takes the new tokens */
 html.shx .shpet-say { box-shadow: var(--float-shadow); font-family: var(--font); font-size: var(--fs-meta); }
-html.shx .shpet-say small { font-size: 12px; letter-spacing: 0; text-transform: none; }
+html.shx .shpet-say small { font-size: 12px; letter-spacing: 0; text-transform: none; opacity: 1; color: var(--muted); }
 html.shx .sh-qflag, html.shx .sh-qpin { min-height: 32px; padding: 0 10px; border-radius: var(--r-pill); font: var(--w-strong) var(--fs-meta)/1 var(--font); color: var(--muted); }
 html.shx .sh-qflag svg, html.shx .sh-qpin svg { width: 16px; height: 16px; }
 html.shx .sh-qflag:hover, html.shx .sh-qpin:hover { background: var(--row); color: var(--text); }
