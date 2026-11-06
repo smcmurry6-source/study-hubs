@@ -63,6 +63,18 @@ window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
   `im-process` (the guide comes first because it's worn during the scan). Why lines only (same versions): `ev-blade`,
   `ev-hader`, `ev-frialit`. The subperiosteal drawing (`ty-sub`, `ev-pic-sub`) now has its lattice on the crest; it
   sat 12 px into the bone and half the recent tries picked "Blade". `tm-mm-2` was already fixed (#252).
+- **Question health, 2026-11-06** (the 19 flagged after that review, the night before the exam): every key matched the notes.
+  New wording: `in-3weeks` (asks the soft tissue's wait, since "after the healing abutment" also fits a one-stage case where
+  the bone needs months), `tm-mm-3` ("which go into the 7 mm": the subgingival margin subtracts) and `tm-early-place`
+  ("after an extraction": placement counts from the extraction, loading from placement). Explanations and why lines:
+  `im-tf-3`, `im-flapless`, `im-software`, `cb-num-3`, `su-def-bran`; why lines only: `bm-moment`, `su-edent`. Looks fine:
+  `in-collagen`, `im-num-2`, `im-medct`, `tm-2s-1`, `cb-num-2`. **`su-def-bran` follows the surgery lecture**, which gives
+  "light microscopic" to Brånemark (1969) and "structural and functional connection" to Albrektsson and Sennerby (1991);
+  many textbooks credit that second wording to Brånemark, which is why most recent tries picked it. Keep the lecture's
+  attribution unless Sam says otherwise. **A question's version here includes its explanation** (`SH_EXPORT`'s `hint` is the
+  key plus the explanation), so an explanation edit starts fresh numbers and a why-line edit doesn't. Ids removed on Sam's
+  11-03 call (`tm-code-6010`, `tm-code-6058`, `tm-conelog`, `tm-rc-grooves`, `gs-credit`) are retired in
+  `tools/question-ids/pcd-implants-exam1.txt`; the admin page lists the ones with class data as "gone".
 - **Statement keys were a pattern until 2026-11-04** (suggestion #14): 36 of 46 two-statement keys were "1 true, 2 false",
   statement 1 was true in all 30 numbered items and the second choice was the key in 23. The evening audit swapped,
   reordered and rewrote them (12 / 11 / 11 / 12 over the four two-statement choices; numbered keys 7 / 8 / 8 / 7 by

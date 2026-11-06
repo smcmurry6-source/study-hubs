@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (question health: the newly flagged PCD Implants questions, Claude Code)** — Sam had the agent mark the 33
+  questions reviewed in #258 on the admin page (12 Fixed, 21 Looks fine, through `admin_review_question` with the admin page's
+  versions and flags; recorded in `vault/decisions.md`), then said yes to reviewing the PCD Implants questions flagged since
+  (19 over the evening, the night before the exam). Every key matches the notes; same ids; no notes text changed, so no
+  narration or podcast change. **New wording**: `in-3weeks` ("after the healing abutment is placed" also fits a one-stage
+  case, where the bone needs months, so "3 months" was defensible: the stem now asks how long the soft tissue needs),
+  `tm-mm-3` (it asked which "make" the crown need 7 mm, but the subgingival margin subtracts 1: it now asks which go into the
+  7 mm) and `tm-early-place` ("after an extraction": most misses picked immediate loading, which counts from placement).
+  **New explanations and why lines**: `im-tf-3` (metal does scatter the beam, but the starburst comes from sampling
+  limits), `im-flapless` (CT shows the sinus but doesn't make bone; the old why was "Not his point"), `im-software` (DICOM is
+  the file format the software reads), `cb-num-3` (beam hardening vs motion fixes), `su-def-bran` (the surgery lecture's two
+  definitions; many textbooks credit the "structural and functional" wording to Brånemark, the slides to Albrektsson and
+  Sennerby, and the question follows the slides). These eight start fresh numbers (PCD's versions include the explanation).
+  **Why lines only** (numbers kept): `bm-moment`, `su-edent`. **Looks fine**: `in-collagen`, `im-num-2`, `im-medct`,
+  `tm-2s-1`, `cb-num-2`. **Removed on purpose** (Sam's 11-03 call on reports #35/#36): `tm-code-6010`, `tm-code-6058`,
+  `tm-conelog`, `tm-rc-grooves` show as "gone"; `tm-conelog`, `tm-rc-grooves` and `gs-credit` are now retired in
+  `tools/question-ids/pcd-implants-exam1.txt`. Sam asked the agent to mark them all on the admin page after the merge.
 - **2026-11-06 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, in the mock and the bank, Claude Code)** — Sam:
   "have the 5 exam 1 questions come from the high likelihood question bank". The mock's five Exam 1 questions now come only
   from the Exam 1 Refresher's High Likelihood questions: one per topic, each from a different Exam 1 lecture, questions not seen or missed last time first
