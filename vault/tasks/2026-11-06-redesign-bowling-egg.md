@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/291
 ---
 
 # The bowling egg: odd bowling-alley animations, Timmy style
