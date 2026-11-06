@@ -75,8 +75,9 @@ journey trophies and leaves the unlock marks out.
   +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
-  boost. The 48 rows are a **draft**: names, prices and the art come with phase 4 and Sam's look
-  (`admin_upsert_shop_item` edits them).
+  boost, and `wide` for a yard item that takes two spots (the bowling lane). The 68 rows follow Timmy's place's art
+  (`tools/figures/site/place.mjs` names each piece's id, rarity and price; Sam, 2026-11-06: the names follow the art); the
+  outfits that aren't drawn yet, the snacks, boosts and seasonal items are still drafts (`admin_upsert_shop_item` edits them).
 - **The rotation** (`sh_shop_day(date)`, Central time, the same for everyone): 4 daily items seeded by the date, 3 weekly ones
   seeded by Monday's date, the season's items (`sh_season` and `sh_is_fall`, in step with `holidayId()` and `isFall()` in
   `widget/pet.js`, checked over three years), and the always-shelf (snacks, floss, boosts). Rarer items come up less often
@@ -84,7 +85,9 @@ journey trophies and leaves the unlock marks out.
   visitor's shop as a fifth shelf until bought.
 - **`buy_item(visitor, item, request)`**: on sale today for this visitor, not owned already, one of each snack a day, and the
   balance; idempotent on the request id. **`equip_item(visitor, slot, item)`**: what Timmy wears and where his things stand
-  (the home, the scene, six yard spots, the home's upgrades). `get_my_shop` gives today's shop with the wallet, the
+  (the home, the scene, the five yard spots the art draws, `yard-left`, `yard-front`, `yard-corner`, `yard-side` and
+  `yard-right`, and the home's upgrades). The bowling lane always stands in `yard-side` and takes the front corner too;
+  something put in the front corner takes it away. `get_my_shop` gives today's shop with the wallet, the
   inventory, what's equipped, the costume log, today's snacks and the boost. Snack HP shows in `get_pet_days_v2`.
 
 ## The idea board
@@ -117,7 +120,7 @@ Each is one line in `migration_v54.sql` to change.
 - A rare costume Timmy was seen in stays on that visitor's shop until bought (one new sighting a day).
 - An idea's hub must have keys loaded; an author's delete removes the words, name and votes but keeps an empty row for the
   day's limit.
-- The 48-item catalog and its prices are drafts.
+- The catalog's undrawn outfits, snacks, boosts and seasonal items, and their prices, are drafts.
 - Today's `record_personal_answer` stays open after the release, with today's capped rules, for any page that still calls it;
   a later migration can close it once no page does.
 

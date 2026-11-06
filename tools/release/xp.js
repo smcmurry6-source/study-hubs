@@ -398,13 +398,20 @@ try {
   sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-B', 'mb:xh:1', 'medal', 2, now() - interval '1 minute', now() + interval '1 day')`);
   eq([num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and starts_at < now() and ends_at > now()`), num(`select sh_xp_mult('xp-B', now())`)], [2, 2], 'a shop boost and a medal boost together: still 2x');
   // equip
-  sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch') on conflict do nothing`);
+  sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch'), ('xp-B', 'bowling-lane'), ('xp-B', 'mailbox') on conflict do nothing`);
   eq(anonJson(`equip_item('xp-B', 'outfit', 'white-coat')`).error, 'not-owned', 'equipping something not owned');
   eq(anonJson(`equip_item('xp-B', 'home', 'garden')`).error, 'slot', 'a yard item can\'t be the home');
   ok(anonJson(`equip_item('xp-B', 'home', 'castle')`).equipped.home === 'castle', 'move into the castle');
-  anon(`select equip_item('xp-B', 'yard-1', 'garden')`);
-  const ey = anonJson(`equip_item('xp-B', 'yard-3', 'garden')`).equipped;
-  ok(ey['yard-3'] === 'garden' && !ey['yard-1'], 'a yard item moves from one spot to another');
+  anon(`select equip_item('xp-B', 'yard-left', 'garden')`);
+  const ey = anonJson(`equip_item('xp-B', 'yard-front', 'garden')`).equipped;
+  ok(ey['yard-front'] === 'garden' && !ey['yard-left'], 'a yard item moves from one spot to another');
+  eq(anonJson(`equip_item('xp-B', 'yard-6', 'mailbox')`).error, 'bad', 'only the five yard spots the art draws');
+  anon(`select equip_item('xp-B', 'yard-corner', 'mailbox')`);
+  eq(anonJson(`equip_item('xp-B', 'yard-left', 'bowling-lane')`).error, 'slot', 'the bowling lane only in the side yard');
+  const lane = anonJson(`equip_item('xp-B', 'yard-corner', 'bowling-lane')`).equipped;
+  ok(lane['yard-side'] === 'bowling-lane' && !lane['yard-corner'], `the bowling lane takes the side yard and the front corner (${JSON.stringify(lane)})`);
+  const unlane = anonJson(`equip_item('xp-B', 'yard-corner', 'mailbox')`).equipped;
+  ok(unlane['yard-corner'] === 'mailbox' && !unlane['yard-side'], 'something in the front corner takes the lane away');
   ok(anonJson(`equip_item('xp-B', 'porch', 'porch')`).equipped.porch === 'porch' && anonJson(`equip_item('xp-B', 'chimney', 'porch')`).error === 'slot', 'an upgrade only in its own slot');
   ok(!('home' in anonJson(`equip_item('xp-B', 'home', null)`).equipped), 'back to the cottage');
   // rare costumes
@@ -416,7 +423,7 @@ try {
   ok(buy('xp-B', 'pirate', 'buy-b-0000011').ok && !json(`get_my_shop('xp-B')`).items.some(i => i.shelf === 'spotted'), 'bought, it leaves the Spotted shelf');
   ok(buy('xp-B3', 'pirate', 'buy-b3-000001').error !== undefined && buy('xp-B3', 'pirate', 'buy-b3-000001').error === 'not-today', 'someone who hasn\'t spotted it can\'t buy it');
   const gs = json(`get_my_shop('xp-B')`), g0 = json(`get_my_shop(null)`);
-  ok(gs.wallet && gs.inventory.length >= 4 && gs.equipped['yard-3'] === 'garden' && gs.costumes.length === 1 && gs.snacks_today.length === 2 && gs.boost, 'get_my_shop has the wallet, things, what\'s equipped, costumes, today\'s snacks and the boost');
+  ok(gs.wallet && gs.inventory.length >= 4 && gs.equipped['yard-front'] === 'garden' && gs.costumes.length === 1 && gs.snacks_today.length === 2 && gs.boost, 'get_my_shop has the wallet, things, what\'s equipped, costumes, today\'s snacks and the boost');
   ok(g0.wallet === null && g0.items.length >= 13 && g0.inventory.length === 0, 'without a visitor, just today\'s shop');
   raises(() => anon(`select admin_upsert_shop_item('wrong', '{"id":"x"}'::jsonb)`), '28000', 'editing the catalog with a wrong secret');
   raises(() => anon(`select admin_upsert_shop_item(${S}, '{"id":"too-cheap","name":"X","kind":"outfit","rarity":"legendary","price":100}'::jsonb)`), '23514', 'a price outside its rarity\'s band');

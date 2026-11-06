@@ -595,6 +595,428 @@
       '<div class="panel s12"><h3>His house</h3><p>It grows with your rank: a fence, a mailbox, gold trim, a night sky, and a pennant for every hub you master.</p><div class="panel-body houses">' + houses + "</div></div>";
   }
 
+  /* ---------- Timmy's place (redesign phase 4, part C): place.js, built from tools/figures/site/place.mjs ----------
+     The stage draws the live kit (SH_PLACE.render) inline, in a shadow root so its CSS stays with it: Timmy hops between
+     spots on the ground (SH_PLACE.route), drawn in the scene's depth order, and tapping things plays their easter eggs.
+     The pickers are rarity cards; the galleries are still pictures, drawn as they scroll near. */
+  var TP = window.SH_PLACE;
+  var TIER_NAMES = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"];
+  var LEVELS = ["I", "II", "III"];
+  var HOLS = [["", "No holiday"], ["halloween", "Halloween"], ["thanksgiving", "Thanksgiving"], ["winter", "Christmas"], ["newyear", "New Year's"], ["valentine", "Valentine's Day"], ["dentist", "Dentist's Day"], ["stpatrick", "St. Patrick's Day"], ["easter", "Easter"]];
+  var SEASONS = [["", "Summer"], ["spring", "Spring"], ["fall", "Fall"]];
+  var FLAIR_HUBS = ["occlusion", "perio", "heme-endo-exam2", "pcd-implants-exam1", "special-patient-care", "generic"];
+  function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i], t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : "" }; }); }
+  var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1])];
+  var FLAIR_NAMES = ["No pennants yet", "One hub mastered (Silver)", "Three hubs", "Four, one crowned", "Six hubs"];
+  var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
+    tier: 3, level: 2, flair: 2, holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
+  function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
+  function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
+  function isStill(){ return PS.still || reduced; }
+  function tpOpts(o){
+    return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
+      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
+  }
+  function timmyArt(k){
+    var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
+    if (m) return m.svg;
+    var hp = (t.hp || []).filter(function(x){ return "hp" + x.hp === k; })[0];
+    return (hp || t.moods[0]).svg;
+  }
+  function timmySvg(mood, outfit){ var s = timmyArt(mood || "happy"); return outfit ? TP.dress(s, outfit) : s; }
+  /* Timmy inside a scene: his drawing at 36 wide, its feet (pet.js's shadow, y 226) on the spot */
+  function timmyG(svg){ return '<g class="tp-tface"><svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>"; }
+  function fmtPrice(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  var COIN = null;
+  function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Free</span>'; }
+  function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Free") + "</i>"; }
+  /* a piece's rarity and price for a caption: free things just say so */
+  function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + price(x.price || 0) : rarTag(""); }
+  function sentence(t){ t = String(t || "").replace(/^(Free|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
+  function placeFig(o, cap, sub, timmySpot, cls, outfit){
+    if (timmySpot) o = Object.assign({}, o, { timmy: { g: timmyG(timmySvg("happy", outfit)), at: timmySpot } });
+    var vb = o.viewBox || TP.VIEWBOX, r = TP.render(o);
+    var pic = img(r.svg, cap).replace("<img ", '<img width="' + vb[2] + '" height="' + vb[3] + '" ');
+    return '<figure class="tp-fig ' + (cls || "") + '"><div class="tp-pic' + (o.night ? " is-night" : "") + '">' + pic + "</div>" + (cap ? "<figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption>" : "") + "</figure>";
+  }
+  /* the card's scene goes on the page as a picture, with the kit's motion inside unless it's still */
+  function sceneImg(svgStr, alt, still){
+    if (!still) svgStr = svgStr.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
+    return img(svgStr, alt, "tp-sceneimg");
+  }
+  function sceneAlt(){
+    var h = byK(TP.HOMES, PS.home), sc = byK(TP.SCENES, PS.scene), items = TP.SLOTS.map(function(s){ return PS.yard[s.k]; }).filter(Boolean).map(function(k){ return byK(TP.YARD, k).n.replace(/^A /, "a "); });
+    return "Timmy's place: " + h.n.replace(/^The /, "the ") + " on " + sc.n.replace(/^The /, "the ") + (items.length ? ", with " + (items.length > 1 ? items.slice(0, -1).join(", ") + " and " + items[items.length - 1] : items[0]) : "");
+  }
+  function crop(pts, pad){
+    var xs = [], ys = [];
+    pts.forEach(function(p){ var q = TP.project(p[0], p[1], p[2]); xs.push(q[0]); ys.push(q[1]); });
+    var x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad, x1 = Math.max.apply(null, xs) + pad, y1 = Math.max.apply(null, ys) + pad;
+    return [Math.round(x0), Math.round(y0), Math.round(x1 - x0), Math.round(y1 - y0)];
+  }
+  function cube(x0, y0, x1, y1, z){ return [[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y0, z], [x1, y0, z], [x1, y1, z], [x0, y1, z]]; }
+  var HOME_CROP = function(){ return crop(cube(1.2, 1.6, 10, 10.6, 11.6), 6); };
+  function slotCrop(k, wide){ var s = TP.SLOT_AT[k]; return crop(cube(s.x - .6, s.y - .6, s.x + TP.S + .6, s.y + (wide ? 7.5 : TP.S) + .6, 3.4), 8); }
+  function statueCrop(){ return crop(cube(1.9, 8.1, 4.2, 10.5, 3.6), 10); }
+
+  /* each rarity's card art, from the kit (frame()), as a picture with its own motion inside */
+  var FRAME_IMG = {};
+  function frameImg(r){
+    var k = r || "Common", key = k + (isStill() ? "-still" : "");
+    if (!FRAME_IMG[key]) {
+      var css = TP.CSS.split("\n").filter(function(l){ return /tp-r-|@keyframes tp-spin|prefers-reduced/.test(l); }).join("\n");
+      var s = TP.frame(k); if (!isStill()) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + css + "</style>");
+      FRAME_IMG[key] = img(s, "", "tp-rframe");
+    }
+    return FRAME_IMG[key];
+  }
+  var THUMBS = {};
+  function thumbImg(kind, k, o){
+    var key = kind + ":" + k + ":" + JSON.stringify(o || {});
+    if (!THUMBS[key]) THUMBS[key] = kind === "outfit" ? img(timmySvg("happy", k), "") : img(TP.thumb(kind, k, o), "");
+    return THUMBS[key];
+  }
+  function cardName(n){ n = n.replace(/^(The|A|An) /, ""); return n.charAt(0).toUpperCase() + n.slice(1); }
+  /* a shop card: the rarity's art behind the thing itself, its name, rarity and price */
+  function rcard(x, thumb, on, data){
+    var r = x.rarity || "";
+    return '<button type="button" class="tp-rcard r-' + (r || "free") + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + frameImg(r || "Common") +
+      (r ? '<span class="tp-rprice">' + price(x.price || 0) + "</span>" : "") +
+      '<span class="tp-rthumb">' + thumb + '</span><span class="tp-rtext"><span class="tp-rname">' + esc(cardName(x.n)) + '</span><span class="tp-rmeta">' + rarTag(r) + "</span></span></button>";
+  }
+
+  function place(){
+    if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
+    $("#placeGrid").innerHTML =
+      '<div class="panel s12"><h3>Build it</h3><p>Play: tap things in the picture (the sun, the house, whatever’s in the yard) and Timmy hops over to see. Customize: tap a spot or the house to change it, or pick from the cards. Reduced motion: all still.</p>' +
+        '<div class="panel-body tp-build"><div class="tp-stage-wrap"><div class="tp-modebar"><div class="seg" role="group" aria-label="What tapping does">' +
+          '<button type="button" data-mode="play">Play</button><button type="button" data-mode="customize">Customize</button></div><span class="tp-found" id="tpFound" aria-live="polite"></span></div>' +
+          '<div class="tp-stage" id="tpStage"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
+      '<div class="panel s6"><h3>On the “you” card</h3><p>The small size, on the dashboard and in a hub’s More: what the builder shows, cropped close.</p><div class="panel-body"><div class="tp-card" id="tpCard"></div></div></div>' +
+      '<div class="panel s6 tp-short"><h3>How it’s built</h3><p>Slots, not free placement, so every combination looks right and nothing overlaps.</p><div class="panel-body tp-how"><ul>' +
+        "<li><b>No plot square:</b> each scene’s ground fills the picture, and the yard is its flat middle.</li>" +
+        "<li><b>Homes sit in their scene:</b> a soft shadow, the scene’s own ground round the walls, its path, tree and lamp.</li>" +
+        "<li><b>Five yard spots</b> along the front; the bowling lane takes two.</li>" +
+        "<li><b>What you’ve earned is part of it:</b> your rank is the statue by the door, each hub you master a pennant in the bunting.</li>" +
+        "<li><b>Timmy hops on the ground</b> round the house and the yard things, never over them.</li>" +
+        "<li><b>Day and night</b> follow your clock (7 pm to 7 am).</li>" +
+        "<li><b>Light to load:</b> one kit draws every combination (about " + Math.round(TP.CSS.length / 1024 + 180) + " KB before compression), loaded only when his place is on screen.</li>" +
+        "</ul></div></div>" +
+      galleryPanel("tpThemes", "Themes", "Six sets of things that belong together, a scene, its homes, yard things and an outfit for Timmy, and the classics, which go anywhere. Every piece is sold on its own; a theme is just what matches.") +
+      galleryPanel("tpHomes", "The homes", "The cottage is free and stays every Timmy’s first home. Seven more from the shop, each shown in its own theme’s scene.") +
+      galleryPanel("tpNights", "At night", "Each home’s own lights: windows, a porch lamp, torches at the castle gate, fireflies round the mushroom, the lighthouse’s turning beam, the igloo’s glow, the observatory’s open slit.") +
+      galleryPanel("tpScenes", "The scenes", "Each with its own ground, path, tree and lamp, and something to find: number thirty-one’s house on the next hill and the rabbit down it, a whale and a crab, an owl in the pines, a yeti behind a rock, a friend in a crater, a hot-air balloon.") +
+      galleryPanel("tpYard", "The yard", "Twelve things for the yard spots, each drawn to fit one. Tap one in the builder for its egg.") +
+      galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
+      galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
+      galleryPanel("tpRanks", "Your rank and your mastery", "The handpiece statue in each rank’s material, its steps for the level, and the bunting: one pennant per hub, Bronze, Silver or Gold, a Crown in gold with a crown on it.") +
+      galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
+      galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
+      galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.") +
+      '<div class="panel s12"><h3>Every easter egg</h3><p>What tapping each thing does, and what Timmy says. Spoilers, so it’s folded.</p><div class="panel-body"><details class="tp-eggs"><summary>Show all ' + Object.keys(TP.EGGS).length + "</summary><ul>" +
+        Object.keys(TP.EGGS).map(function(k){ var e = TP.EGGS[k]; return "<li><b>" + esc(e.n) + "</b> " + esc(e.does) + (e.say ? ": <q>" + esc(e.say) + "</q>" : "") + "</li>"; }).join("") + "</ul></details></div></div>";
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.addEventListener("click", function(){ PS.mode = b.dataset.mode; buildPlace(); }); });
+    buildPlace();
+    lazyGalleries();
+  }
+  function galleryPanel(id, h, p){ return '<div class="panel s12"><h3>' + h + "</h3><p>" + p + '</p><div class="panel-body tp-gal" id="' + id + '" data-lazy="1"></div></div>'; }
+  function listN(names){ return names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0] || ""; }
+  function themeFill(t){
+    var y = {}, order = ["left", "front", "right", "corner", "side"];
+    t.yard.forEach(function(k, i){ var it = byK(TP.YARD, k); if (it.wide) y.side = k; else y[order[i]] = k; });
+    return y;
+  }
+  var THEME_HOME = { hilltop: "cottage", seaside: "lighthouse", woodland: "treehouse", snowy: "igloo", starlight: "observatory", clouds: "castle" };
+  var GALLERIES = {
+    tpThemes: function(){
+      return TP.THEMES.map(function(t){
+        var home = THEME_HOME[t.k] || "cottage", scene = t.scene || "hill", out = t.outfits[0] || "";
+        var pieces = [].concat(t.scene ? [byK(TP.SCENES, t.scene)] : [], t.homes.map(function(k){ return byK(TP.HOMES, k); }), t.yard.map(function(k){ return byK(TP.YARD, k); }), t.outfits.map(function(k){ return byK(TP.OUTFITS, k); }));
+        var list = '<span class="tp-pieces">' + pieces.map(function(x){ return '<span class="tp-piece">' + esc(cardName(x.n)) + " " + tagLine(x) + "</span>"; }).join("") + "</span>";
+        var o = { home: home, scene: scene, tier: 3, level: 2, yard: themeFill(t), up: { chimney: true, flag: true }, flair: FLAIRS[2] };
+        return placeFig(o, t.n, esc(t.note) + list + '<button type="button" class="btn tp-try" data-theme-try="' + t.k + '">Try it in the builder</button>', "lawn", "tp-theme", out);
+      }).join("");
+    },
+    tpHomes: function(){ return TP.HOMES.map(function(h){ var t = byK(TP.THEMES, h.theme) || {}; return placeFig({ home: h.k, scene: (t.scene) || "hill", tier: 1, yard: {} }, h.n, tagLine(h) + " " + esc(sentence(h.note)), "door"); }).join(""); },
+    tpNights: function(){ return TP.HOMES.map(function(h){ var up = {}; h.ups.forEach(function(k){ up[k] = true; }); return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: up, yard: { front: "campfire" } }, h.n + " at night", "", "door"); }).join(""); },
+    tpScenes: function(){ return TP.SCENES.map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: {} }, s.n, tagLine(s) + " " + esc(sentence(s.note)), "door"); }).join(""); },
+    tpYard: function(){
+      return TP.YARD.map(function(y){ var t = byK(TP.THEMES, y.theme), sc = t && t.scene || "hill", k = y.wide ? "side" : "front", yd = {}; yd[k] = y.k;
+        return placeFig({ home: "cottage", scene: sc, tier: 0, bare: true, yard: yd, viewBox: slotCrop(k, y.wide) }, y.n, tagLine(y) + " " + esc(y.note), "", "tp-yardfig"); }).join("");
+    },
+    tpUps: function(){ return TP.HOMES.map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
+      return placeFig({ home: h.k, scene: "hill", tier: 0, up: up, yard: {}, viewBox: HOME_CROP() }, h.n, esc(h.ups.filter(function(k){ return k !== "paint"; }).map(function(k, i){ return i ? lowerFirst(h.upn[k]) : h.upn[k]; }).join(", "))); }).join("") +
+      '<div class="tp-upcards">' + TP.UPGRADES.map(function(u){ return '<span class="tp-piece">' + esc(cardName(u.n)) + " " + tagLine(u) + "</span>"; }).join("") + "</div>"; },
+    tpPaint: function(){ return TP.PAINTS.map(function(p){ return placeFig({ home: "cottage", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.n, tagLine(p), "", "tp-small"); }).join("") +
+      TP.PAINTS.map(function(p){ return placeFig({ home: "lighthouse", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.boldName + " stripes", "", "", "tp-small"); }).join(""); },
+    tpRanks: function(){
+      return TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", tier: i, level: 3, yard: {}, viewBox: statueCrop(), night: i === 6 }, n, i === 6 ? "It glows, and its stars come out" : "", "", "tp-small"); }).join("") +
+        LEVELS.map(function(l, i){ return placeFig({ home: "cottage", scene: "hill", tier: 4, level: i + 1, yard: {}, viewBox: statueCrop() }, "Gold " + l, (i + 1) + (i ? " steps" : " step"), "", "tp-small"); }).join("") +
+        FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: ["cottage", "mushroom", "castle", "lighthouse"][i], scene: "hill", tier: 2, flair: fl, yard: {}, viewBox: HOME_CROP() }, FLAIR_NAMES[i + 1], "", "", "tp-small"); }).join("");
+    },
+    tpFrames: function(){
+      var sample = { Common: ["yard", "mailbox"], Uncommon: ["yard", "campfire"], Rare: ["yard", "telescope"], Epic: ["home", "igloo"], Legendary: ["home", "lighthouse"] };
+      return TP.RARITIES.map(function(r){ var s = sample[r.k], x = s[0] === "home" ? byK(TP.HOMES, s[1]) : byK(TP.YARD, s[1]);
+        return '<div class="tp-framefig">' + rcard(x, thumbImg(s[0], s[1], {}), false, 'data-burst="' + r.k + '"') + "<p><b>" + esc(r.k) + "</b> " + fmtPrice(r.band[0]) + " to " + fmtPrice(r.band[1]) + "</p></div>"; }).join("");
+    },
+    tpOutfits: function(){
+      return TP.OUTFITS.map(function(o){ var t = byK(TP.THEMES, o.theme);
+        return '<figure class="tp-fig tp-outfig"><div class="tp-pic tp-outpic">' + thumbImg("outfit", o.k) + "</div><figcaption><b>" + esc(o.n) + "</b><span>" + tagLine(o) + " " + esc(t ? t.n : "") + "</span><span><q>" + esc(o.say[0]) + "</q></span></figcaption></figure>"; }).join("");
+    },
+    tpSeasons: function(){
+      var list = [["", "fall", "Fall"], ["", "spring", "Spring"], ["winter", "", "Christmas"], ["halloween", "fall", "Halloween"], ["thanksgiving", "fall", "Thanksgiving"], ["newyear", "", "New Year's"], ["valentine", "", "Valentine's Day"], ["stpatrick", "spring", "St. Patrick's Day"], ["easter", "spring", "Easter"], ["dentist", "", "Dentist's Day"]];
+      return list.map(function(x, i){ return placeFig({ home: TP.HOMES[i % TP.HOMES.length].k, scene: i === 2 ? "forest" : "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
+    }
+  };
+  function lazyGalleries(){
+    var draw = function(el){ if (!el.dataset.lazy) return; delete el.dataset.lazy; el.innerHTML = GALLERIES[el.id]().replace(/<img /g, '<img loading="lazy" '); wireGallery(el); };
+    var els = $$(".tp-gal[data-lazy]");
+    if (!("IntersectionObserver" in window)) { els.forEach(draw); return; }
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { io.unobserve(e.target); draw(e.target); } }); }, { rootMargin: "900px 0px" });
+    els.forEach(function(el){ io.observe(el); });
+    lazyGalleries.all = function(){ els.forEach(function(el){ io.unobserve(el); draw(el); }); };
+  }
+  function wireGallery(el){
+    $$("[data-theme-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var t = byK(TP.THEMES, b.dataset.themeTry);
+      PS.scene = t.scene || PS.scene; PS.home = THEME_HOME[t.k] || PS.home; PS.yard = themeFill(t); PS.outfit = t.outfits[0] || ""; PS.paint = "cream";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-burst]", el).forEach(function(b){ b.addEventListener("click", function(){
+      if (isStill()) return;
+      var old = $(".tp-cardburst", b); if (old) old.remove();
+      b.insertAdjacentHTML("beforeend", '<span class="tp-cardburst">' + TP.burst(b.dataset.burst) + "</span>");
+      setTimeout(function(){ var n = $(".tp-cardburst", b); if (n) n.remove(); }, 1600); }); });
+  }
+
+  /* ---------- the stage: the scene inline (a shadow root), Timmy hopping, eggs, the customize targets ---------- */
+  var STAGE_CSS = [
+    ":host{display:block}.tp-box{position:relative;line-height:0}.tp-box>svg.tp-scene{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}",
+    ".tp-egg{outline:none}.tp-egg:focus-visible{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)}.tp-timmy{cursor:pointer}",
+    ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
+    ".tp-hitarea:hover,.tp-hitarea:focus-visible{fill:rgba(255,255,255,.2);stroke:#fff;stroke-dasharray:4 4}.tp-hitarea.on{stroke:#fff;stroke-width:2.6;stroke-dasharray:5 4;fill:rgba(255,255,255,.16)}",
+    ".tp-hithome.on,.tp-hithome:hover,.tp-hithome:focus-visible{fill:rgba(255,255,255,.08)}",
+    ".tp-bubble{position:absolute;left:50%;top:10px;max-width:min(84%,420px);transform:translate(-50%,-6px);background:var(--surface,#fff);color:var(--text,#3B2E3A);border:2px solid #3B2E3A;border-radius:14px;",
+    "padding:7px 12px;font:inherit;font-size:14px;font-weight:650;line-height:1.35;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;text-align:center}",
+    ".tp-bubble.on{opacity:1;transform:translate(-50%,0)}.tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
+    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}}"
+  ].join("\n");
+  var ST = { at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, tg: null, tw: null, face: null, depth: null, sr: null, wander: 0, lastTap: 0, layout: null, visible: true };
+  function buildPlace(opt){
+    opt = opt || {};
+    var host = $("#tpStage"); if (!host.shadowRoot) host.attachShadow({ mode: "open" });
+    var sr = host.shadowRoot, still = isStill(), o = tpOpts({ marks: PS.mode === "customize" }), L = TP.layout(o), vb = TP.VIEWBOX;
+    cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null;
+    if (!L.spots[ST.at]) ST.at = "door";
+    o.timmy = { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: ST.at };
+    var r = TP.render(o);
+    var hits = PS.mode !== "customize" ? "" : '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' +
+      Object.keys(r.slots).map(function(k){ var it = PS.yard[k], name = byK(TP.SLOTS, k).n;
+        return '<path class="tp-hitarea' + (PS.pick === k ? " on" : "") + '" data-pick="' + k + '" d="' + r.slots[k] + '" tabindex="0" role="button" aria-label="' + esc(name + ": " + (it ? byK(TP.YARD, it).n : "empty") + ". Change it") + '"/>'; }).join("") +
+      '<path class="tp-hitarea tp-hithome' + (PS.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(byK(TP.HOMES, PS.home).n + ". Change it") + '"/></svg>';
+    host.classList.toggle("is-night", !!(o.night || byK(TP.SCENES, PS.scene).alwaysNight));
+    sr.innerHTML = "<style>" + TP.CSS + "\n" + STAGE_CSS + "</style>" + '<div class="tp-box' + (still ? " tp-still" : "") + '">' +
+      r.svg.replace(' aria-hidden="true" focusable="false"', ' role="group" aria-label="' + esc(sceneAlt()) + '"') + hits + '<div class="tp-bubble" role="status" aria-live="polite"></div></div>';
+    ST.sr = sr; ST.layout = L; ST.depth = $(".tp-depth", sr); ST.tg = $(".tp-timmy", sr); ST.tw = ST.tg && ST.tg.parentNode; ST.face = ST.tg && $(".tp-tface", ST.tg);
+    ST.pos = L.spots[ST.at].slice(); setTimmy(ST.pos, 0, 1, 1);
+    if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy");
+      ST.tg.addEventListener("click", function(e){ e.stopPropagation(); flip(); }); keyed(ST.tg, flip); }
+    $$(".tp-egg", sr).forEach(function(g){
+      var k = g.dataset.egg, e = TP.EGGS[k] || TP.EGGS.home;
+      g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-label", e.n + ": " + e.does);
+      g.addEventListener("click", function(ev){ ev.stopPropagation(); playEgg(g); });
+      keyed(g, function(){ playEgg(g); });
+    });
+    $$(".tp-hitarea", sr).forEach(function(p){
+      var go = function(){ PS.pick = p.dataset.pick; buildPlace(); var n = ST.sr && $('.tp-hitarea[data-pick="' + PS.pick + '"]', ST.sr); if (n) n.focus(); };
+      p.addEventListener("click", function(e){ e.stopPropagation(); go(); }); keyed(p, go);
+    });
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.mode === PS.mode ? "true" : "false"); });
+    found();
+    if (opt.burst && !still) burstAt(opt.burst);
+    if (opt.burst && opt.burst !== "home" && L.spots[opt.burst]) setTimeout(function(){ goTo(opt.burst); }, still ? 0 : 450);
+    if (opt.say) say(opt.say);
+    wanderOn();
+    side();
+    placeCard();
+  }
+  function keyed(el, fn){ el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); fn(); } }); }
+  function found(){
+    var eggs = ST.sr ? $$(".tp-egg", ST.sr).map(function(g){ return g.dataset.egg; }) : [], seen = {};
+    eggs.forEach(function(k){ seen[k] = 1; });
+    var n = Object.keys(seen).length, got = Object.keys(seen).filter(function(k){ return PS.found[k]; }).length;
+    $("#tpFound").textContent = PS.mode === "play" ? (got ? got + " of " + n + " surprises found here" : n + " things here do something when tapped") : "Tap a dashed spot or the house";
+  }
+  function say(text){
+    var b = ST.sr && $(".tp-bubble", ST.sr); if (!b || !text) return;
+    b.textContent = text; b.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(function(){ b.classList.remove("on"); }, 3200);
+  }
+  function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
+  function playEgg(g){
+    var k = g.dataset.egg, e = TP.EGGS[k] || {};
+    g.classList.remove("tp-on"); void g.getBoundingClientRect(); g.classList.add("tp-on");
+    clearTimeout(g._t); g._t = setTimeout(function(){ g.classList.remove("tp-on"); }, 2600);
+    PS.found[k] = 1; found();
+    say(k === "statue" ? rankLine() : e.say);
+    ST.lastTap = Date.now();
+    if (isStill()) return;
+    var target = spotFor(g);
+    if (target) goTo(target); else hopInPlace();
+  }
+  /* where Timmy goes to see a thing: its yard spot, the door for the home and what's by it, else the nearest spot when
+     it stands on the ground in the yard; things in the sky or far off, he hops where he is */
+  function spotFor(g){
+    var it = g.closest(".tp-item"), k = g.dataset.egg, sp = ST.layout.spots;
+    if (it && sp[it.dataset.slot]) return it.dataset.slot;
+    if (k === "home" || k === "statue" || k === "brush" || k === "bunting") return sp.deck && Math.random() < .4 ? "deck" : "door";
+    var b; try { b = g.getBBox(); } catch (x) { return null; }
+    var q = TP.unproject(b.x + b.width / 2, b.y + b.height);
+    if (!(q[0] > -2 && q[1] > -2 && q[0] < 16.5 && q[1] < 16.5)) return null;
+    var best = null, bd = 1e9; Object.keys(sp).forEach(function(s){ var p = sp[s], d = (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); if (d < bd) { bd = d; best = s; } });
+    return best;
+  }
+  function setTimmy(p, arc, kx, ky){
+    if (!ST.tg) return;
+    var q = TP.project(p[0], p[1], p[2] || 0);
+    ST.tg.setAttribute("transform", "translate(" + q[0].toFixed(1) + " " + (q[1] - arc).toFixed(1) + ")");
+    ST.face.setAttribute("transform", "scale(" + (ST.dir * kx).toFixed(3) + " " + ky.toFixed(3) + ")");
+    /* drawn in the scene's depth order: in front of what's behind him, behind what's in front */
+    var z = p[0] + p[1] + .3, c = ST.depth.firstChild;
+    while (c && (c === ST.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
+    if (c !== ST.tw.nextSibling) ST.depth.insertBefore(ST.tw, c);
+  }
+  function lerp(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t]; }
+  function goTo(spot){
+    if (!ST.layout || !ST.layout.spots[spot]) return;
+    if (isStill()) { ST.at = spot; ST.pos = ST.layout.spots[spot].slice(); setTimmy(ST.pos, 0, 1, 1); return; }
+    if (ST.busy) { ST.next = spot; return; }
+    if (spot === ST.at) { hopInPlace(); return; }
+    var path = TP.route(tpOpts(), ST.at, spot); ST.at = spot;
+    hops(path);
+  }
+  function hops(path){
+    var list = [];
+    for (var i = 1; i < path.length; i++){
+      var a = path[i - 1], b = path[i], dz = (b[2] || 0) - (a[2] || 0), d = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + dz * dz * 1.4);
+      var n = Math.max(1, Math.ceil(d / 1.15));
+      for (var j = 0; j < n; j++) list.push([lerp(a, b, j / n), lerp(a, b, (j + 1) / n), Math.abs(dz) > .3]);
+    }
+    if (!list.length) return;
+    ST.busy = true;
+    var hi = 0, t0 = performance.now(), AIR = 260, LAND = 90;
+    var start = function(h){ var p = TP.project(h[0][0], h[0][1], h[0][2]), q = TP.project(h[1][0], h[1][1], h[1][2]); if (Math.abs(q[0] - p[0]) > .5) ST.dir = q[0] < p[0] ? -1 : 1; };
+    start(list[0]);
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var h = list[hi], t = now - t0;
+      if (t < AIR) { var u = t / AIR, e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; setTimmy(lerp(h[0], h[1], e), Math.sin(Math.PI * u) * (h[2] ? 3 : 6), 1 - .04 * Math.sin(Math.PI * u), 1 + .07 * Math.sin(Math.PI * u)); }
+      else if (t < AIR + LAND) { var v = Math.sin(Math.PI * (t - AIR) / LAND); setTimmy(h[1], 0, 1 + .1 * v, 1 - .13 * v); }
+      else {
+        hi++; t0 = now;
+        if (hi >= list.length) { ST.busy = false; ST.pos = h[1]; setTimmy(h[1], 0, 1, 1); if (ST.next) { var n = ST.next; ST.next = null; goTo(n); } return; }
+        start(list[hi]);
+      }
+      ST.raf = requestAnimationFrame(frame);
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  function hopInPlace(){ if (isStill() || ST.busy || !ST.pos) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos]); }
+  function flip(quiet){
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(TP.EGGS.timmy.say); }
+    if (isStill() || ST.busy || !ST.pos) return;
+    ST.busy = true; var t0 = performance.now(), D = 620, p = ST.pos;
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var u = Math.min(1, (now - t0) / D);
+      setTimmy(p, Math.sin(Math.PI * u) * 16, Math.cos(u * Math.PI * 2), 1);
+      if (u < 1) ST.raf = requestAnimationFrame(frame); else { setTimmy(p, 0, 1, 1); ST.busy = false; }
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  /* while it's on screen and nobody's tapping, he wanders to a spot now and then */
+  function wanderOn(){
+    if (ST.wander) return;
+    var host = $("#tpStage");
+    if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ ST.visible = es[0].isIntersecting; }).observe(host);
+    ST.wander = setInterval(function(){
+      if (isStill() || PS.mode !== "play" || ST.busy || !ST.visible || document.hidden || Date.now() - ST.lastTap < 6000 || !ST.layout) return;
+      var keys = Object.keys(ST.layout.spots).filter(function(k){ return k !== ST.at; });
+      if (keys.length) goTo(keys[Math.floor(Math.random() * keys.length)]);
+    }, 5200);
+  }
+  function burstAt(where){
+    var it = where === "home" ? null : PS.yard[where], x = it ? byK(TP.YARD, it) : byK(TP.HOMES, PS.home), r = x && x.rarity || "Common", vb = TP.VIEWBOX, q;
+    if (where === "home") q = TP.project(5.5, 5.5, 4);
+    else { var s = TP.SLOT_AT[where]; q = TP.project(s.x + TP.S / 2, s.y + (x && x.wide ? 3.75 : TP.S / 2), 1); }
+    var box = ST.sr && $(".tp-box", ST.sr); if (!box) return;
+    box.insertAdjacentHTML("beforeend", '<div class="tp-burstpos" style="left:' + ((q[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%;top:" + ((q[1] - vb[1]) / vb[3] * 100).toFixed(2) + '%">' + TP.burst(r) + "</div>");
+    setTimeout(function(){ var b = ST.sr && $(".tp-burstpos", ST.sr); if (b) b.remove(); }, 1700);
+  }
+
+  /* ---------- the side panel: what to change, as rarity cards ---------- */
+  function chip(label, on, data, extra){ return '<button type="button" class="tp-chip' + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + (extra || "") + esc(label) + "</button>"; }
+  function side(){
+    var el = $("#tpSide"), pick = PS.pick, h = byK(TP.HOMES, PS.home), body = "", lane = PS.yard.side === "lane";
+    var tabs = [["home", "Home"], ["scene", "Scene"]].concat(TP.SLOTS.filter(function(s){ return !(s.k === "corner" && lane); }).map(function(s){ return [s.k, s.n]; }), [["timmy", "Timmy"]]);
+    if (pick === "corner" && lane) pick = PS.pick = "side";
+    var head = '<div class="tp-tabs" role="group" aria-label="What to change">' + tabs.map(function(t){ return chip(t[1], pick === t[0], 'data-pick="' + t[0] + '"'); }).join("") + "</div>";
+    var cards = function(list){ return '<div class="tp-rcards">' + list.join("") + "</div>"; };
+    if (pick === "home") {
+      body = "<h4>Home</h4>" + cards(TP.HOMES.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: PS.scene }), x.k === PS.home, 'data-home="' + x.k + '"'); })) +
+        "<h4>Upgrades for " + esc(h.n.replace(/^The /, "the ")) + "</h4>" + '<div class="tp-opts">' + TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0; }).map(function(u){
+          var on = !!PS.up[u.k], own = h.upn[u.k], same = cardName(own).toLowerCase() === cardName(u.n).toLowerCase();
+          return '<button type="button" class="tp-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-up="' + u.k + '">' + rarTag(u.rarity) +
+            '<span class="tp-upn"><b>' + esc(cardName(u.n)) + "</b><small>" + esc(same ? "" : own) + "</small></span>" + price(u.price) + "</button>"; }).join("") + "</div>" +
+        "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home), c = bold ? p.bold : p.c;
+          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>";
+    } else if (pick === "scene") {
+      body = "<h4>The scene</h4>" + cards(TP.SCENES.map(function(s){ return rcard(s, thumbImg("scene", s.k), s.k === PS.scene, 'data-scene="' + s.k + '"'); }));
+    } else if (pick === "timmy") {
+      body = "<h4>What Timmy wears</h4>" + cards([rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""')].concat(TP.OUTFITS.map(function(o){ return rcard(o, thumbImg("outfit", o.k), PS.outfit === o.k, 'data-outfit="' + o.k + '"'); })));
+    } else {
+      var sl = byK(TP.SLOTS, pick), cur = PS.yard[pick];
+      body = "<h4>" + esc(sl.n) + "</h4>" + cards([rcard({ n: "Nothing here", rarity: "", price: 0 }, "", !cur, 'data-item=""')].concat(TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; })
+        .map(function(y){ return rcard(y, thumbImg("yard", y.k, { scene: PS.scene }), cur === y.k, 'data-item="' + y.k + '"'); }))) +
+        (pick === "side" || pick === "corner" ? '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>' : "");
+    }
+    body += '<div class="tp-shop"><button type="button" class="btn" disabled>Get more in the shop</button><span class="tp-note">The shop is part B: here everything is yours to try. Prices are in Shiny Gold Crowns.</span></div>';
+    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season, Timmy</summary>" +
+      '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
+      selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
+      selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
+      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
+      selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
+      selRow("Timmy", "timmy", [["happy", "Happy"], ["ok", "Okay"], ["sad", "Sad"], ["sick", "Sick"], ["sleep", "Asleep"], ["scared", "Startled"]].concat((A.timmy.hp || []).map(function(x){ return ["hp" + x.hp, x.hp + " HP"]; })), PS.timmy) +
+      '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
+    el.innerHTML = head + '<div class="tp-pick">' + body + "</div>" + prev;
+    $("details", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.pick = b.dataset.pick; if (PS.mode === "play" && PS.pick !== "timmy" && PS.pick !== "scene") PS.mode = "customize"; buildPlace(); }); });
+    $$("[data-home]", el).forEach(function(b){ b.addEventListener("click", function(){ if (PS.home === b.dataset.home) return; PS.home = b.dataset.home; buildPlace({ burst: "home", say: byK(TP.HOMES, PS.home).n + ". Home sweet home." }); }); });
+    $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.up[b.dataset.up] = !PS.up[b.dataset.up]; buildPlace(PS.up[b.dataset.up] ? { burst: "home" } : {}); }); });
+    $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.paint = b.dataset.paint; buildPlace(); }); });
+    $$("[data-scene]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.scene = b.dataset.scene; buildPlace({ say: byK(TP.SCENES, PS.scene).n + ". Let's look around." }); }); });
+    $$("[data-outfit]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.outfit = b.dataset.outfit; var o = byK(TP.OUTFITS, PS.outfit); buildPlace({ say: o ? o.say[0] : "Back to just me." }); if (!isStill()) setTimeout(function(){ flip(true); }, 120); }); });
+    $$("[data-item]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = PS.pick, it = b.dataset.item;
+      if (it === "lane") { delete PS.yard.corner; PS.yard.side = "lane"; k = PS.pick = "side"; }
+      else if (it) { if (k === "side" && PS.yard.side === "lane" && it !== "lane") delete PS.yard.side; PS.yard[k] = it; }
+      else delete PS.yard[k];
+      buildPlace(it ? { burst: k, say: "New: " + byK(TP.YARD, it).n.replace(/^A /, "a ") + "." } : {}); }); });
+    $$("[data-time]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.time = b.dataset.time; buildPlace(); }); });
+    $$("select[data-k]", el).forEach(function(s){ s.addEventListener("change", function(){ var k = s.dataset.k; PS[k] = k === "tier" || k === "flair" || k === "level" ? +s.value : s.value; buildPlace(); }); });
+    $("[data-still]", el).addEventListener("change", function(e){ PS.still = e.target.checked; buildPlace(); });
+  }
+  function selRow(label, k, opts, cur){
+    return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
+  }
+  function placeCard(){
+    var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
+    $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), isStill()) + "</div>" +
+      '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
+  }
+
   /* ---------- controls ---------- */
   function setFace(f){ root.dataset.face = f; $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === f ? "true" : "false"); }); save(); tokens(); }
   function setTheme(t){ root.dataset.theme = t; $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === t ? "true" : "false"); }); save(); tokens(); }
@@ -610,8 +1032,8 @@
     $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === root.dataset.face ? "true" : "false"); b.addEventListener("click", function(){ setFace(b.dataset.face); }); });
     $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === root.dataset.theme ? "true" : "false"); b.addEventListener("click", function(){ setTheme(b.dataset.theme); }); });
     pick.addEventListener("change", function(){ setHub(pick.value); });
-    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys();
+    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place();
   }
-  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub };
+  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(o){ buildPlace(o); }, drawGalleries: function(){ if (lazyGalleries.all) lazyGalleries.all(); }, placeStage: ST };
   init();
 })();

@@ -943,8 +943,9 @@ $$;
 
 -- ====================================================================== 5. Shiny Gold Crowns and Timmy's shop
 -- The catalog. kind: outfit (Timmy wears one at a time), costume (a rare costume: on sale to someone who has spotted it),
--- home, scene, yard (one of six yard spots), upgrade (its own slot on the home), snack (HP at once), boost (double XP).
--- Prices follow the rarity's band. season: on sale only then (a holiday id from sh_season, or 'fall').
+-- home, scene, yard (one of the five yard spots), upgrade (its own slot on the home), snack (HP at once), boost (double XP).
+-- Prices follow the rarity's band. season: on sale only then (a holiday id from sh_season, or 'fall'). wide: a yard item
+-- that takes two spots (the bowling lane: the side yard and the front corner; tools/figures/site/place.mjs draws it).
 create table if not exists public.shop_items (
   id text primary key check (id ~ '^[a-z0-9][a-z0-9-]{0,39}$'),
   name text not null,
@@ -960,12 +961,14 @@ create table if not exists public.shop_items (
   rotates boolean not null default true,         -- can come up in the daily and weekly picks
   active boolean not null default true,
   sort integer not null default 0,
+  wide boolean not null default false,
   check ((rarity = 'common' and price between 100 and 200) or (rarity = 'uncommon' and price between 250 and 500)
       or (rarity = 'rare' and price between 600 and 1200) or (rarity = 'epic' and price between 1500 and 3000)
       or (rarity = 'legendary' and price between 4000 and 8000)),
   check ((kind = 'upgrade') = (slot is not null)),
   check ((kind = 'snack') = (hp is not null)),
-  check ((kind = 'boost') = (boost_minutes is not null and boost_mult is not null))
+  check ((kind = 'boost') = (boost_minutes is not null and boost_mult is not null)),
+  check (not wide or kind = 'yard')
 );
 
 -- Everything bought, once per tap (request_id). Spending is the sum of price; it never lowers XP or rank.
@@ -991,11 +994,13 @@ create table if not exists public.pet_inventory (
   primary key (visitor_id, item_id)
 );
 
--- what Timmy wears and where his things stand, the same on every linked device
+-- what Timmy wears and where his things stand, the same on every linked device. The five yard spots, as the art names
+-- them: yard-left and yard-front by the path, yard-corner (the front corner), yard-side (the side yard), yard-right (the
+-- back corner).
 create table if not exists public.pet_equipped (
   visitor_id text not null,
-  slot text not null check (slot in ('outfit', 'home', 'scene', 'yard-1', 'yard-2', 'yard-3', 'yard-4', 'yard-5', 'yard-6',
-    'windows', 'porch', 'chimney', 'flag', 'paint')),
+  slot text not null check (slot in ('outfit', 'home', 'scene', 'yard-left', 'yard-front', 'yard-corner', 'yard-side',
+    'yard-right', 'windows', 'porch', 'chimney', 'flag', 'paint')),
   item_id text not null references public.shop_items (id),
   set_at timestamptz not null default now(),
   primary key (visitor_id, slot)
@@ -1176,14 +1181,16 @@ begin
 end;
 $$;
 
--- wear an outfit, move into a home, pick a scene, put a yard item in one of six spots, or fit an upgrade; p_item null takes
--- the slot back to the free default (no outfit, the cottage, the hill, an empty spot). Only what you own.
+-- wear an outfit, move into a home, pick a scene, put a yard item in one of the five spots, or fit an upgrade; p_item null
+-- takes the slot back to the free default (no outfit, the cottage, the hill, an empty spot). Only what you own. A wide yard
+-- item (the bowling lane) always stands in the side yard and takes the front corner too: it clears that spot, and putting
+-- something in the front corner takes the lane away.
 create or replace function public.equip_item(p_visitor text, p_slot text, p_item text)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare it record;
+declare it record; v_slot text := p_slot;
 begin
   if p_visitor is null or length(p_visitor) not between 1 and 80 or p_slot is null or p_slot not in ('outfit', 'home', 'scene',
-     'yard-1', 'yard-2', 'yard-3', 'yard-4', 'yard-5', 'yard-6', 'windows', 'porch', 'chimney', 'flag', 'paint') then
+     'yard-left', 'yard-front', 'yard-corner', 'yard-side', 'yard-right', 'windows', 'porch', 'chimney', 'flag', 'paint') then
     return jsonb_build_object('ok', false, 'error', 'bad'); end if;
   if p_item is null then
     delete from pet_equipped where visitor_id = p_visitor and slot = p_slot;
@@ -1193,8 +1200,16 @@ begin
     if not ((p_slot = 'outfit' and it.kind in ('outfit', 'costume')) or (p_slot = it.kind and it.kind in ('home', 'scene'))
             or (p_slot like 'yard-%' and it.kind = 'yard') or (it.kind = 'upgrade' and p_slot = it.slot)) then
       return jsonb_build_object('ok', false, 'error', 'slot'); end if;
-    if it.kind = 'yard' then delete from pet_equipped where visitor_id = p_visitor and item_id = p_item and slot <> p_slot; end if;
-    insert into pet_equipped (visitor_id, slot, item_id, set_at) values (p_visitor, p_slot, p_item, clock_timestamp())
+    if it.kind = 'yard' and it.wide then
+      if p_slot not in ('yard-side', 'yard-corner') then return jsonb_build_object('ok', false, 'error', 'slot'); end if;
+      v_slot := 'yard-side';
+      delete from pet_equipped where visitor_id = p_visitor and slot = 'yard-corner';
+    elsif p_slot = 'yard-corner' then
+      delete from pet_equipped e using shop_items i
+      where e.visitor_id = p_visitor and e.slot = 'yard-side' and i.id = e.item_id and i.wide;
+    end if;
+    if it.kind = 'yard' then delete from pet_equipped where visitor_id = p_visitor and item_id = p_item and slot <> v_slot; end if;
+    insert into pet_equipped (visitor_id, slot, item_id, set_at) values (p_visitor, v_slot, p_item, clock_timestamp())
       on conflict (visitor_id, slot) do update set item_id = excluded.item_id, set_at = excluded.set_at;
   end if;
   return jsonb_build_object('ok', true, 'equipped',
@@ -1226,14 +1241,16 @@ returns boolean language plpgsql security definer set search_path = public as $$
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
   if jsonb_typeof(p_item) is distinct from 'object' or coalesce(p_item->>'id', '') = '' then raise exception 'p_item needs an id'; end if;
-  insert into shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, active, sort)
+  insert into shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, active, sort, wide)
   values (p_item->>'id', p_item->>'name', p_item->>'kind', p_item->>'rarity', (p_item->>'price')::integer, p_item->>'season',
     p_item->>'slot', (p_item->>'hp')::integer, (p_item->>'boost_minutes')::integer, (p_item->>'boost_mult')::smallint,
     coalesce((p_item->>'shelf')::boolean, false), coalesce((p_item->>'rotates')::boolean, true),
-    coalesce((p_item->>'active')::boolean, true), coalesce((p_item->>'sort')::integer, 0))
+    coalesce((p_item->>'active')::boolean, true), coalesce((p_item->>'sort')::integer, 0),
+    coalesce((p_item->>'wide')::boolean, false))
   on conflict (id) do update set name = excluded.name, kind = excluded.kind, rarity = excluded.rarity, price = excluded.price,
     season = excluded.season, slot = excluded.slot, hp = excluded.hp, boost_minutes = excluded.boost_minutes,
-    boost_mult = excluded.boost_mult, shelf = excluded.shelf, rotates = excluded.rotates, active = excluded.active, sort = excluded.sort;
+    boost_mult = excluded.boost_mult, shelf = excluded.shelf, rotates = excluded.rotates, active = excluded.active, sort = excluded.sort,
+    wide = excluded.wide;
   return true;
 end;
 $$;
@@ -1252,57 +1269,79 @@ language sql stable security definer set search_path = public as $$
   from a full join s on s.d = a.d order by 1;
 $$;
 
--- the starting catalog (a draft for the art review: ids stay, names and prices may change before the release)
+-- the starting catalog. Names, ids, rarities and prices follow the art (tools/figures/site/place.mjs: its HOMES, SCENES,
+-- YARD, OUTFITS, PAINTS and UPGRADES name each piece's id here; Sam, 2026-11-06: the server's names follow the art).
 insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, sort) values
-  ('scrub-cap', 'Scrub cap', 'outfit', 'common', 150, null, null, null, null, null, false, true, 10),
-  ('bow-tie', 'Bow tie', 'outfit', 'common', 120, null, null, null, null, null, false, true, 11),
-  ('beanie', 'Beanie', 'outfit', 'common', 180, null, null, null, null, null, false, true, 12),
-  ('safety-glasses', 'Safety glasses', 'outfit', 'uncommon', 300, null, null, null, null, null, false, true, 13),
-  ('white-coat', 'White coat', 'outfit', 'uncommon', 450, null, null, null, null, null, false, true, 14),
-  ('graduation-cap', 'Graduation cap', 'outfit', 'rare', 900, null, null, null, null, null, false, true, 15),
-  ('castle', 'Castle', 'home', 'legendary', 8000, null, null, null, null, null, false, true, 20),
-  ('giant-mushroom', 'Giant mushroom', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 21),
-  ('treehouse', 'Treehouse', 'home', 'legendary', 5000, null, null, null, null, null, false, true, 22),
-  ('beach', 'Beach', 'scene', 'rare', 1000, null, null, null, null, null, false, true, 30),
-  ('forest', 'Forest', 'scene', 'rare', 800, null, null, null, null, null, false, true, 31),
-  ('snowy-mountain', 'Snowy mountain', 'scene', 'epic', 1800, null, null, null, null, null, false, true, 32),
-  ('night-sky', 'Night sky', 'scene', 'epic', 2500, null, null, null, null, null, false, true, 33),
-  ('mailbox', 'Mailbox', 'yard', 'common', 100, null, null, null, null, null, false, true, 40),
-  ('garden', 'Garden', 'yard', 'uncommon', 300, null, null, null, null, null, false, true, 41),
-  ('hammock', 'Hammock', 'yard', 'uncommon', 350, null, null, null, null, null, false, true, 42),
-  ('doghouse', 'Doghouse', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 43),
-  ('bowling-lane', 'Bowling lane', 'yard', 'rare', 1200, null, null, null, null, null, false, true, 44),
-  ('swimming-pool', 'Swimming pool', 'yard', 'epic', 2000, null, null, null, null, null, false, true, 45),
-  ('round-windows', 'Round windows', 'upgrade', 'uncommon', 250, null, 'windows', null, null, null, false, true, 50),
-  ('porch', 'Porch', 'upgrade', 'rare', 700, null, 'porch', null, null, null, false, true, 51),
-  ('brick-chimney', 'Brick chimney', 'upgrade', 'uncommon', 300, null, 'chimney', null, null, null, false, true, 52),
-  ('flag', 'Flag', 'upgrade', 'common', 120, null, 'flag', null, null, null, false, true, 53),
-  ('paint-mint', 'Mint paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 54),
-  ('paint-lilac', 'Lilac paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 55),
-  ('apple', 'Apple', 'snack', 'common', 100, null, null, 10, null, null, true, false, 60),
-  ('cheese-cube', 'Cheese cube', 'snack', 'common', 150, null, null, 15, null, null, true, false, 61),
-  ('floss', 'Floss', 'snack', 'uncommon', 250, null, null, 25, null, null, true, false, 62),
-  ('fluoride-rinse', 'Fluoride rinse', 'snack', 'uncommon', 400, null, null, 40, null, null, true, false, 63),
-  ('boost-1h', 'Double XP for 1 hour', 'boost', 'rare', 600, null, null, null, 60, 2, true, false, 70),
-  ('boost-3h', 'Double XP for 3 hours', 'boost', 'epic', 1500, null, null, null, 180, 2, true, false, 71),
-  ('pumpkin-lantern', 'Pumpkin lantern', 'yard', 'uncommon', 300, 'halloween', null, null, null, null, false, false, 80),
-  ('vampire-cape', 'Vampire cape', 'outfit', 'rare', 800, 'halloween', null, null, null, null, false, false, 81),
-  ('pilgrim-hat', 'Pilgrim hat', 'outfit', 'rare', 700, 'thanksgiving', null, null, null, null, false, false, 82),
-  ('ugly-sweater', 'Holiday sweater', 'outfit', 'rare', 700, 'winter', null, null, null, null, false, false, 83),
-  ('snow-globe', 'Snow globe', 'yard', 'uncommon', 300, 'winter', null, null, null, null, false, false, 84),
-  ('party-hat', 'Party hat', 'outfit', 'uncommon', 300, 'newyear', null, null, null, null, false, false, 85),
-  ('heart-balloon', 'Heart balloon', 'yard', 'uncommon', 250, 'valentine', null, null, null, null, false, false, 86),
-  ('gold-mirror', 'Golden mouth mirror', 'outfit', 'rare', 900, 'dentist', null, null, null, null, false, false, 87),
-  ('clover-hat', 'Clover hat', 'outfit', 'uncommon', 300, 'stpatrick', null, null, null, null, false, false, 88),
-  ('bunny-ears', 'Bunny ears', 'outfit', 'uncommon', 300, 'easter', null, null, null, null, false, false, 89),
-  ('leaf-pile', 'Leaf pile', 'yard', 'common', 120, 'fall', null, null, null, null, false, false, 90),
-  ('scarf', 'Scarf', 'outfit', 'common', 150, 'fall', null, null, null, null, false, false, 91),
-  ('pirate', 'Pirate', 'costume', 'epic', 2000, null, null, null, null, null, false, false, 100),
-  ('astronaut', 'Astronaut', 'costume', 'epic', 2500, null, null, null, null, null, false, false, 101),
-  ('detective', 'Detective', 'costume', 'epic', 1800, null, null, null, null, null, false, false, 102),
-  ('chef', 'Chef', 'costume', 'epic', 1500, null, null, null, null, null, false, false, 103),
-  ('captain-enamel', 'Captain Enamel', 'costume', 'legendary', 4000, null, null, null, null, null, false, false, 104)
+  ('scrub-cap', 'Scrub cap', 'outfit', 'common', 150, null, null, null, null, null, false, true, 101),
+  ('bow-tie', 'Bow tie', 'outfit', 'common', 120, null, null, null, null, null, false, true, 102),
+  ('beanie', 'Beanie and scarf', 'outfit', 'common', 180, null, null, null, null, null, false, true, 103),
+  ('safety-glasses', 'Safety glasses', 'outfit', 'uncommon', 300, null, null, null, null, null, false, true, 104),
+  ('white-coat', 'White coat', 'outfit', 'uncommon', 450, null, null, null, null, null, false, true, 105),
+  ('graduation-cap', 'Graduation cap', 'outfit', 'rare', 900, null, null, null, null, null, false, true, 106),
+  ('sun-hat', 'Straw sun hat', 'outfit', 'common', 150, null, null, null, null, null, false, true, 107),
+  ('ranger-hat', 'Ranger hat', 'outfit', 'uncommon', 300, null, null, null, null, null, false, true, 108),
+  ('sunglasses-lei', 'Sunglasses and a lei', 'outfit', 'uncommon', 350, null, null, null, null, null, false, true, 109),
+  ('captain-hat', 'Captain''s hat', 'outfit', 'rare', 800, null, null, null, null, null, false, true, 110),
+  ('nightcap', 'Starry nightcap', 'outfit', 'rare', 900, null, null, null, null, null, false, true, 111),
+  ('aviator-cap', 'Aviator cap and goggles', 'outfit', 'rare', 1000, null, null, null, null, null, false, true, 112),
+  ('castle', 'Castle', 'home', 'legendary', 8000, null, null, null, null, null, false, true, 201),
+  ('giant-mushroom', 'Giant mushroom', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 202),
+  ('treehouse', 'Treehouse', 'home', 'legendary', 5000, null, null, null, null, null, false, true, 203),
+  ('lighthouse', 'Lighthouse', 'home', 'legendary', 7000, null, null, null, null, null, false, true, 204),
+  ('observatory', 'Observatory', 'home', 'legendary', 7500, null, null, null, null, null, false, true, 205),
+  ('beach-hut', 'Beach hut', 'home', 'epic', 2600, null, null, null, null, null, false, true, 206),
+  ('igloo', 'Igloo', 'home', 'epic', 2200, null, null, null, null, null, false, true, 207),
+  ('beach', 'Beach', 'scene', 'rare', 1000, null, null, null, null, null, false, true, 301),
+  ('forest', 'Forest', 'scene', 'rare', 800, null, null, null, null, null, false, true, 302),
+  ('snowy-mountain', 'Snowy mountain', 'scene', 'epic', 1800, null, null, null, null, null, false, true, 303),
+  ('night-sky', 'Night sky', 'scene', 'epic', 2500, null, null, null, null, null, false, true, 304),
+  ('clouds', 'Above the clouds', 'scene', 'epic', 2800, null, null, null, null, null, false, true, 305),
+  ('mailbox', 'Mailbox', 'yard', 'common', 100, null, null, null, null, null, false, true, 401),
+  ('garden', 'Garden', 'yard', 'uncommon', 300, null, null, null, null, null, false, true, 402),
+  ('hammock', 'Hammock', 'yard', 'uncommon', 350, null, null, null, null, null, false, true, 403),
+  ('doghouse', 'Doghouse', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 404),
+  ('bowling-lane', 'Bowling lane', 'yard', 'rare', 1200, null, null, null, null, null, false, true, 405),
+  ('swimming-pool', 'Swimming pool', 'yard', 'epic', 2000, null, null, null, null, null, false, true, 406),
+  ('mint-fountain', 'Mint fountain', 'yard', 'rare', 900, null, null, null, null, null, false, true, 407),
+  ('sandcastle', 'Sandcastle', 'yard', 'common', 150, null, null, null, null, null, false, true, 408),
+  ('beach-umbrella', 'Beach umbrella', 'yard', 'uncommon', 350, null, null, null, null, null, false, true, 409),
+  ('campfire', 'Campfire', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 410),
+  ('hot-spring', 'Hot spring', 'yard', 'epic', 2200, null, null, null, null, null, false, true, 411),
+  ('telescope', 'Telescope', 'yard', 'rare', 1000, null, null, null, null, null, false, true, 412),
+  ('fancy-windows', 'Fancy windows', 'upgrade', 'uncommon', 250, null, 'windows', null, null, null, false, true, 501),
+  ('porch', 'Porch', 'upgrade', 'rare', 700, null, 'porch', null, null, null, false, true, 502),
+  ('chimney', 'Chimney', 'upgrade', 'uncommon', 300, null, 'chimney', null, null, null, false, true, 503),
+  ('flag', 'Timmy flag', 'upgrade', 'common', 120, null, 'flag', null, null, null, false, true, 504),
+  ('paint-mint', 'Mint paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 505),
+  ('paint-lilac', 'Lilac paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 506),
+  ('paint-sky', 'Sky paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 507),
+  ('paint-butter', 'Butter paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 508),
+  ('paint-peach', 'Peach paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 509),
+  ('apple', 'Apple', 'snack', 'common', 100, null, null, 10, null, null, true, false, 601),
+  ('cheese-cube', 'Cheese cube', 'snack', 'common', 150, null, null, 15, null, null, true, false, 602),
+  ('floss', 'Floss', 'snack', 'uncommon', 250, null, null, 25, null, null, true, false, 603),
+  ('fluoride-rinse', 'Fluoride rinse', 'snack', 'uncommon', 400, null, null, 40, null, null, true, false, 604),
+  ('boost-1h', 'Double XP for 1 hour', 'boost', 'rare', 600, null, null, null, 60, 2, true, false, 701),
+  ('boost-3h', 'Double XP for 3 hours', 'boost', 'epic', 1500, null, null, null, 180, 2, true, false, 702),
+  ('pumpkin-lantern', 'Pumpkin lantern', 'yard', 'uncommon', 300, 'halloween', null, null, null, null, false, false, 801),
+  ('vampire-cape', 'Vampire cape', 'outfit', 'rare', 800, 'halloween', null, null, null, null, false, false, 802),
+  ('pilgrim-hat', 'Pilgrim hat', 'outfit', 'rare', 700, 'thanksgiving', null, null, null, null, false, false, 803),
+  ('ugly-sweater', 'Holiday sweater', 'outfit', 'rare', 700, 'winter', null, null, null, null, false, false, 804),
+  ('snow-globe', 'Snow globe', 'yard', 'uncommon', 300, 'winter', null, null, null, null, false, false, 805),
+  ('party-hat', 'Party hat', 'outfit', 'uncommon', 300, 'newyear', null, null, null, null, false, false, 806),
+  ('heart-balloon', 'Heart balloon', 'yard', 'uncommon', 250, 'valentine', null, null, null, null, false, false, 807),
+  ('gold-mirror', 'Golden mouth mirror', 'outfit', 'rare', 900, 'dentist', null, null, null, null, false, false, 808),
+  ('clover-hat', 'Clover hat', 'outfit', 'uncommon', 300, 'stpatrick', null, null, null, null, false, false, 809),
+  ('bunny-ears', 'Bunny ears', 'outfit', 'uncommon', 300, 'easter', null, null, null, null, false, false, 810),
+  ('leaf-pile', 'Leaf pile', 'yard', 'common', 120, 'fall', null, null, null, null, false, false, 811),
+  ('scarf', 'Scarf', 'outfit', 'common', 150, 'fall', null, null, null, null, false, false, 812),
+  ('pirate', 'Pirate', 'costume', 'epic', 2000, null, null, null, null, null, false, false, 901),
+  ('astronaut', 'Astronaut', 'costume', 'epic', 2500, null, null, null, null, null, false, false, 902),
+  ('detective', 'Detective', 'costume', 'epic', 1800, null, null, null, null, null, false, false, 903),
+  ('chef', 'Chef', 'costume', 'epic', 1500, null, null, null, null, null, false, false, 904),
+  ('captain-enamel', 'Captain Enamel', 'costume', 'legendary', 4000, null, null, null, null, null, false, false, 905)
 on conflict (id) do nothing;
+update public.shop_items set wide = true where id = 'bowling-lane' and not wide;
 
 -- ====================================================================== 6. the idea board
 -- Ideas show as soon as they're posted, under the poster's leaderboard name, with up and down votes. Each picks a hub (one

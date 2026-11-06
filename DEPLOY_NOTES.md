@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (redesign phase 4 part C: Timmy's place, the art, Claude Code)** — Nothing students see changes. Timmy's
+  house card redrawn as a little isometric world you build, on the design page only (`tools/preview/design/`, "Timmy's
+  place"), then redrawn again from Sam's feedback: no plot square (each scene's ground fills the picture and the homes sit
+  in it), eight homes (new: a beach hut, a lighthouse, an igloo, an observatory), six scenes (new: above the clouds),
+  twelve yard things in five spots, seven theme outfits in six themes, the rank as a handpiece statue by the door and
+  mastery as pennants in the bunting, animated art per rarity (card frames, a placing burst), Timmy hopping on the ground
+  round things instead of floating, and small eggs on what you tap. Play and Customize on the design page. One kit,
+  `tools/figures/site/place.mjs`, built into `tools/preview/design/place.js` by `build.mjs` (`--check` covers it; 648
+  drawings and 1872 walks checked). `migration_v54.sql` (still unapplied) follows Sam's calls: five yard spots, the
+  bowling lane `wide`, the art's names and ids in the catalog (68 rows); `tools/release/xp.js` 247 checks.
+  `widget/pet.js` is unchanged until Sam approves the art
+  ([task](vault/tasks/2026-11-06-redesign-timmys-place.md)).
 - **2026-11-06 (redesign phase 5, part 3: the game layer's server, written and tested, not applied, Claude Code)** — Nothing
   changes for students and nothing reaches the live database: `migration_v54.sql` waits in `supabase/pending-migrations.txt`
   for the redesign's release ([vault/reference/game-server.md](vault/reference/game-server.md)). It adds, beside today's
