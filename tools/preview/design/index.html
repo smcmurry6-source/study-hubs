@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-face="nunito" data-theme="light" data-hub="occlusion">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Design system · Study hubs</title>
+<meta name="description" content="Phase 0 of the study hubs redesign: the type, color, hand-drawn art and the question card every hub will be built from.">
+<link rel="preload" href="../../../assets/fonts/nunito-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="design.css">
+<script>
+  /* typeface, theme and hub before first paint: ?face=fraunces&theme=dark&hub=perio, else the last choice */
+  (function(){
+    var q = new URLSearchParams(location.search), s = {};
+    try { s = JSON.parse(localStorage.getItem("sh_design_prefs") || "{}") || {}; } catch (e) {}
+    var face = q.get("face") || s.face || "nunito", theme = q.get("theme") || s.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"), hub = q.get("hub") || s.hub || "occlusion";
+    var r = document.documentElement; r.dataset.face = face; r.dataset.theme = theme; r.dataset.hub = hub;
+  })();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="Study hubs design system, top of the page"><span class="brand-mark" id="brandMark"></span>Study hubs</a>
+  <span class="crumb"><span class="crumb-sep">/ </span>Design system</span>
+  <span class="spacer"></span>
+  <span class="status">Phase 0 preview · made-up data · nothing here is live</span>
+</header>
+
+<main class="page" id="top">
+  <section class="head">
+    <h1>Design system</h1>
+    <p class="sub">The type, color, drawings and question card every hub, the dashboard and the widget will be built from. Pick a typeface and look over each group of art; switch the hub to see its tint, emblem and scene.</p>
+    <div class="controls" role="group" aria-label="Preview settings">
+      <div class="control"><span id="lblFace">Typeface</span>
+        <div class="seg" role="group" aria-labelledby="lblFace">
+          <button type="button" data-face="nunito" aria-pressed="true">Nunito Sans</button>
+          <button type="button" data-face="fraunces" aria-pressed="false">Fraunces</button>
+        </div>
+      </div>
+      <div class="control"><span id="lblTheme">Theme</span>
+        <div class="seg" role="group" aria-labelledby="lblTheme">
+          <button type="button" data-theme="light" aria-pressed="true">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
+      <label class="control" for="hubPick">Hub
+        <span class="select-wrap"><select class="select" id="hubPick"></select><span id="hubChev"></span></span>
+      </label>
+    </div>
+    <div class="grid tiles" id="tiles"></div>
+  </section>
+
+  <section class="section" id="hub" aria-labelledby="h-hub">
+    <header>
+      <h2 id="h-hub">A hub: the bar, Home and a question</h2>
+      <p>Timmy, your streak, the day's goal and your rank sit on the bar (at the bottom on a phone). Answer the question to see the rewards: the XP spark flies to your rank, Timmy reacts, and this answer closes the day's goal.</p>
+    </header>
+    <div class="hub" id="hubDemo"></div>
+  </section>
+
+  <section class="section" id="formats" aria-labelledby="h-formats">
+    <header>
+      <h2 id="h-formats">The question card, in every format</h2>
+      <p>One card for every format. Each pair shows it waiting for an answer and answered: the verdict and explanation first, the class's picks beside each choice, and the why for your pick opened. Every card works: tap to answer.</p>
+    </header>
+    <div id="pairs"></div>
+  </section>
+
+  <section class="section" id="rewards" aria-labelledby="h-rewards">
+    <header>
+      <h2 id="h-rewards">Rewards</h2>
+      <p>What moves when you answer: the XP spark, Timmy, the streak flame and the daily goal, and the recap after 25 answers or when you leave the bank.</p>
+    </header>
+    <div class="grid" id="rewardGrid"></div>
+  </section>
+
+  <section class="section" id="type" aria-labelledby="h-type">
+    <header>
+      <h2 id="h-type">Typeface</h2>
+      <p>One face for the whole site, self-hosted. Here are both, side by side; the switch at the top sets the whole page in either one.</p>
+    </header>
+    <div class="grid" id="faces"></div>
+  </section>
+
+  <section class="section" id="tokens" aria-labelledby="h-tokens">
+    <header>
+      <h2 id="h-tokens">Tokens</h2>
+      <p>One ground, one ink (Timmy's outline), one accent (reward gold) and a tint for each hub. Flat surfaces a tone step apart, one radius pair and the motion every control shares.</p>
+    </header>
+    <div class="grid" id="tokenGrid"></div>
+  </section>
+
+  <section class="section" id="icons" aria-labelledby="h-icons">
+    <header>
+      <h2 id="h-icons">Icons</h2>
+      <p>Drawn by hand on a 24 grid with one 2 px stroke and round ends, in the color of the text around them. For the bars, the notes toolbar, the card and More.</p>
+    </header>
+    <div class="panel" id="iconPanel"></div>
+  </section>
+
+  <section class="section" id="hubart" aria-labelledby="h-hubart">
+    <header>
+      <h2 id="h-hubart">Hub emblems and masthead scenes</h2>
+      <p>Each hub's emblem (on its tab, the dashboard and its medals) and the scene at the top of its Home, drawn in Timmy's ink, plus a pair for a future hub.</p>
+    </header>
+    <div class="panel" id="emblemPanel"></div>
+    <div class="masts" id="masts"></div>
+  </section>
+
+  <section class="section" id="medals" aria-labelledby="h-medals">
+    <header>
+      <h2 id="h-medals">Mastery medals, trophies and ranks</h2>
+      <p>The medal metal is the mastery level; the ribbons and the middle are the hub's. Every trophy is its own drawn object; a secret one shows as a shape with its riddle until it's won. The handpiece ranks stay as they are.</p>
+    </header>
+    <div class="grid" id="medalGrid"></div>
+  </section>
+
+  <section class="section" id="timmy" aria-labelledby="h-timmy">
+    <header>
+      <h2 id="h-timmy">Timmy and his house, as drawn today</h2>
+      <p>Rendered by the live code (widget/pet.js), unchanged: his moods, what shows as his HP drops, a few holiday outfits and the house as it grows with your rank.</p>
+    </header>
+    <div class="grid" id="timmyGrid"></div>
+  </section>
+
+  <footer class="foot">
+    <span>Drawings: tools/figures/site · built into art.js by build.mjs</span>
+    <span>This page reads no class data and saves only your preview settings.</span>
+  </footer>
+</main>
+
+<script src="art.js"></script>
+<script src="design.js"></script>
+</body>
+</html>

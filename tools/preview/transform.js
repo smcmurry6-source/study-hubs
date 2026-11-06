@@ -28,6 +28,10 @@ const ROBOTS = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 /* What the live site serves (and so what a preview serves). Everything else in the repo (vault, tools, SQL, notes)
    isn't part of the site. */
 const SITE_ENTRIES = ['index.html', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];
+/* Pages that aren't part of the site but are shown in a preview for Sam to look at: the redesign's design system
+   (tools/preview/design, Phase 0). A preview serves and builds them like a site page; a release doesn't check them. */
+const PREVIEW_PAGES = ['tools/preview/design'];
+const inPreview = rel => SITE_ENTRIES.includes(rel.split('/')[0]) || PREVIEW_PAGES.some(e => rel === e || rel.startsWith(e + '/'));
 const TEXT_EXT = new Set(['.html', '.js', '.css', '.json', '.webmanifest', '.svg', '.txt', '.md']);
 
 function gitInfo(){
@@ -115,5 +119,5 @@ function headersFile(){
 }
 function robotsTxt(){ return 'User-agent: *\nDisallow: /\n'; }
 
-module.exports = { ROOT, PROD_HOST, PROD_URL, PROD_KEY, FIXTURE_HOST, FIXTURE_URL, FIXTURE_KEY, LIVE_SITE, PREVIEW_DIR, ROBOTS, SITE_ENTRIES,
+module.exports = { ROOT, PROD_HOST, PROD_URL, PROD_KEY, FIXTURE_HOST, FIXTURE_URL, FIXTURE_KEY, LIVE_SITE, PREVIEW_DIR, ROBOTS, SITE_ENTRIES, PREVIEW_PAGES, inPreview,
   options, rewriteText, transformHtml, transformFile, runtime, headersFile, robotsTxt, csp };

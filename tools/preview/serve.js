@@ -27,7 +27,6 @@ function start(opts){
   const built = !!opts.dir;
   const o = built ? null : T.options({ data: opts.data || 'fixture', stagingUrl: process.env.SH_STAGING_URL, stagingKey: process.env.SH_STAGING_KEY, label: opts.label });
   const runtime = built ? null : T.runtime(o);
-  const allowed = new Set(T.SITE_ENTRIES);
   const server = http.createServer((req, res) => {
     /* text is gzipped when the browser asks, as GitHub Pages does, so sizes and timings match the live site */
     const gz = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
@@ -44,7 +43,7 @@ function start(opts){
     if (u === `/${T.PREVIEW_DIR}/preview.js` && !built) return send(200, runtime, TYPES['.js']);
     if (u.endsWith('/')) u += 'index.html';
     const rel = u.replace(/^\/+/, '');
-    if (!built && !allowed.has(rel.split('/')[0])) return send(404, 'not part of the site');
+    if (!built && !T.inPreview(rel)) return send(404, 'not part of the site');
     const file = path.join(root, rel);
     if (!file.startsWith(root + path.sep)) return send(403, 'forbidden');
     fs.stat(file, (err, st) => {
@@ -88,6 +87,7 @@ if (require.main === module) {
     console.log(`Preview of ${o ? o.label + (o.sha ? ' @ ' + o.sha.slice(0, 7) : '') : DIR} at ${s.url}`);
     console.log(`  class data: ${o ? (o.data === 'staging' ? 'staging (' + process.env.SH_STAGING_URL + ')' : 'fixtures, kept in the browser') : 'as built'}; production is blocked; pages are noindex`);
     console.log(`  test accounts: ${s.url}?persona=new | returning | high-xp | missed | archived | admin   (admin page: ${s.url}review/)`);
+    console.log(`  the redesign's design system: ${s.url}tools/preview/design/`);
     console.log('  Ctrl+C to stop.');
   }).catch(e => { console.error(e.message); process.exit(1); });
 }
