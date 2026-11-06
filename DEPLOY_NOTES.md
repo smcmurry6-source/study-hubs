@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-06 (faster sessions and CI, Claude Code)** — Sam asked why every task takes longer, then "do these".
+  **Feature rules load on demand**: `arcade-skins`, `podcast-intro`, `podcast-reactions`, `diagram-review`, `diagrams-anima`,
+  `figures-teach-the-lecture`, `outside-sources-for-figures` and `every-hub-gets-its-own-art` carry `load: on-demand`;
+  `CLAUDE.md` lists them under "Feature rules" (when to read each) instead of importing them, `tools/figures/CLAUDE.md`
+  and `tools/podcast/CLAUDE.md` import them so Claude Code loads them when it opens those folders, and the `/podcast` and
+  `anima` skills name them. `tools/ci/vault.js` enforces it (an on-demand rule must be linked there, not imported).
+  **Smoke test checks only the hubs a PR touches** (`tools/ci/smoke.js`, `pickHubs()`): every hub when a shared file
+  changes (`widget/`, the dashboard, `sw.js`, assets, a workflow, the test), on `main`, with `--all`/`SMOKE_ALL=1`, or when
+  git can't tell; Check hubs fetches the PR's base (`fetch-depth: 2`) and both workflows set `SMOKE_CHANGED_FROM=HEAD^1`
+  on pull requests. A one-hub change: 32 s locally instead of a full run. **Kokoro**: the setup script for the repo's own
+  cloud environment is in `vault/how-to/narrate-with-kokoro.md` (model in `/opt/kokoro`, `KOKORO_DIR`), which now says to
+  check before installing. Nothing students see changed.
 - **2026-11-06 (admin page: light only, Claude Code)** — Sam: "i dont want the admin page to be dark mode. its hard to
   see". `review/index.html` drops its two `prefers-color-scheme: dark` blocks (the page's colors and the switch knob) and sets
   `color-scheme: light` plus `<meta name="color-scheme" content="only light">`, so a laptop or phone in dark mode still gets

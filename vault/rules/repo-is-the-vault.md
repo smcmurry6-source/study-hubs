@@ -47,7 +47,10 @@ copy (or tell Sam to, for a claude.ai skill or a Project doc).
   (exam dates live in `HUBS` in `index.html`, not in a note): a note says where to look.
 - **End with Related links** to the notes an agent would want next. Home links every rule, how-to, reference and hub note.
 - **A new rule** gets its own note in `vault/rules/`, a line in [home](../home.md) and an `@vault/rules/<name>.md` line
-  in `CLAUDE.md` (so Claude Code loads it). `node tools/ci/vault.js` fails if either is missing.
+  in `CLAUDE.md` (so Claude Code loads it). A rule for **one feature only** (an arcade, the podcast, figures) is **on
+  demand** instead, so it isn't loaded into every session (Sam, 2026-11-06): `load: on-demand` in its frontmatter, a
+  line under "Feature rules" in `CLAUDE.md` saying when to read it, and a link from where that work starts (its skill,
+  its how-to, or a `CLAUDE.md` in its tool folder that imports it). `node tools/ci/vault.js` checks all of it.
 - [American English](american-english.md), plain words, short.
 
 ## Every agent writes back

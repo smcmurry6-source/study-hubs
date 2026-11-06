@@ -5,9 +5,10 @@ description: Make a Timmy Time episode for a study hub, end to end. Timmy Tooth 
 
 # Timmy Time: make an episode
 
-Read first: `vault/rules/graded-coursework.md` (it applies to scripts too), the hub's note in `vault/hubs/`, `tools/podcast/README.md` (how the tooling
+Read first: `vault/rules/graded-coursework.md` (it applies to scripts too), `vault/rules/podcast-intro.md` and
+`vault/rules/podcast-reactions.md` (on demand: `CLAUDE.md` doesn't load them, `tools/podcast/CLAUDE.md` does), the hub's note in `vault/hubs/`, `tools/podcast/README.md` (how the tooling
 works and how to write for Kokoro), `tools/podcast/LORE.md` (the canon), and the most recent `tools/podcast/*/script.md`
-as the model for voice and pacing. Every rule in `vault/rules/` applies (`CLAUDE.md` loads them); where this skill and
+as the model for voice and pacing. Every rule in `vault/rules/` applies (`CLAUDE.md` loads the rest); where this skill and
 the vault disagree, the vault wins: follow it and fix this file. The argument, if any, names the hub (`/podcast heme-endo-exam1`); otherwise take the
 live hub with the next exam from `HUBS` in `index.html`, and say which.
 

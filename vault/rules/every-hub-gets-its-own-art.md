@@ -1,5 +1,6 @@
 ---
 type: rule
+load: on-demand
 tags: [art, hubs, redesign]
 since: 2026-11-06
 ---

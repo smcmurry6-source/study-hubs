@@ -5,7 +5,8 @@ description: Create crafted, accurate visualizations of anatomy, neurobiology, p
 
 # Anima
 
-> **In study-hubs, the house rules come first** (`vault/rules/diagram-review.md`, `vault/rules/diagrams-anima.md`).
+> **In study-hubs, the house rules come first** (`vault/rules/diagram-review.md`, `vault/rules/diagrams-anima.md`,
+> `vault/rules/figures-teach-the-lecture.md`; on demand, so read them now if `tools/figures/CLAUDE.md` hasn't loaded them).
 > They override this skill where the two differ: **never build a figure Sam hasn't approved**, one candidate at a time
 > (so ignore "build it without asking" below); draw from the hub's own lecture notes, with outside sources encouraged for
 > accuracy and for how it works (`vault/rules/outside-sources-for-figures.md`); build it in

@@ -142,7 +142,7 @@ clock; `?now=real` resets it.
 | Vault | `node tools/ci/vault.js` | every PR | A broken link, a rule not listed, a task out of order |
 | Public-repo check | `node tools/release/secrets.js` | every PR | Anything that looks like a key or token; course material or data files; media outside the narration folders |
 | Database permissions | `node tools/release/rls.js` | every PR | A table without RLS; anon access beyond `rls-expectations.json`; student data readable; a definer function without `search_path`; a secret-gated function that answers no or a wrong secret, or writes; per-visitor reads that leak |
-| Smoke and question lint | `node tools/ci/smoke.js` | every PR | A JavaScript error or sideways scroll on any hub screen; the question rules (formats, whys, likely topics, answer length) |
+| Smoke and question lint | `node tools/ci/smoke.js` | every PR | A JavaScript error or sideways scroll on any screen of the hubs a PR touches (every hub when a shared file changes); the question rules (formats, whys, likely topics, answer length) |
 | Preview safety | `node tools/ci/preview.js` | every PR | Any request reaching Supabase; a page without noindex or the runtime; a write path not reaching the fixtures; the admin page answering a wrong secret |
 | Accessibility | `node tools/release/a11y.js` | Release tests | A new or worse axe (WCAG 2.2 AA) issue than `tools/release/baselines/a11y.json`; focus you can't see; a keyboard trap; endless animation with reduced motion on |
 | Performance | `node tools/release/perf.js` | Release tests | Bytes or requests over `tools/release/budgets.json` on a slow-4G phone; FCP, LCP or blocking time past 1.5x budget |
@@ -151,7 +151,7 @@ clock; `?now=real` resets it.
 | After the merge | `node tools/release/postcheck.js` | after each release | The live files differ from `main`; a live page throws |
 
 "Check hubs" (the first six) runs on every PR; "Release tests" runs on every PR that touches the site and can be run by
-hand (Actions, Release tests, Run workflow). Regression coverage is the smoke test (every hub, every mode, two sizes),
+hand (Actions, Release tests, Run workflow). Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
 the question lint, the baselines (accessibility, performance) and the preview's write-path checks; a bug that slipped
 through gets a check added in the PR that fixes it, where a script can see it.
 

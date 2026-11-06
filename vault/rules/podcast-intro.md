@@ -1,5 +1,6 @@
 ---
 type: rule
+load: on-demand
 tags: [podcast]
 since: 2026-11-04
 ---

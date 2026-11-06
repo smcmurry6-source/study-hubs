@@ -78,8 +78,8 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Check
 
-`node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js`: the smoke test clicks through every
-hub on desktop and phone and fails on missing formats, whys, `LIKELY_TOPICS` or narration files. Its first local run
+`node tools/ci/syntax.js`, `node tools/ci/vault.js` and `node tools/ci/smoke.js`: the smoke test clicks through the
+hubs you changed (all of them when a shared file changed) on desktop and phone and fails on missing formats, whys, `LIKELY_TOPICS` or narration files. Its first local run
 writes the hub's question-id registry, `tools/question-ids/<hub-id>.txt`: commit it
 ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)). Then a draft PR
 ([ship-a-change](ship-a-change.md)).

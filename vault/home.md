@@ -17,6 +17,9 @@ Read `AGENTS.md` at the repo root first. How the vault works: [repo-is-the-vault
 
 ## Rules (every agent, every change)
 
+Those marked *(on demand)* apply to one feature: read them when your task touches it (`CLAUDE.md` lists them under
+"Feature rules" instead of loading them into every session).
+
 Shipping and the vault
 - [The repo is the vault](rules/repo-is-the-vault.md): read from it, write back to it, link don't copy, nothing private.
 - [GitHub is the source of truth](rules/github-is-the-source-of-truth.md): fetch fresh, merge, never overwrite blind.
@@ -42,15 +45,15 @@ Questions
 
 Hub building
 - [Every hub opens on its own Home page](rules/hub-home-page.md)
-- [Every hub's arcade looks like that hub](rules/arcade-skins.md)
-- [Every new hub gets its own drawn art](rules/every-hub-gets-its-own-art.md): its emblem, masthead scene and unique medals.
+- [Every hub's arcade looks like that hub](rules/arcade-skins.md) *(on demand)*
+- [Every new hub gets its own drawn art](rules/every-hub-gets-its-own-art.md): its emblem, masthead scene and unique medals *(on demand)*.
 - [Text and audio must never drift](rules/text-and-audio-never-drift.md)
-- [Every Timmy Time episode has likes, dislikes and comments](rules/podcast-reactions.md), with 1-3 lore comments.
-- [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser.
-- [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time.
-- [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures.
-- [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named.
-- [Outside sources are encouraged for every figure](rules/outside-sources-for-figures.md): for accuracy and for how it works, cited.
+- [Every Timmy Time episode has likes, dislikes and comments](rules/podcast-reactions.md), with 1-3 lore comments *(on demand)*.
+- [Timmy Time's cold open skips the minutiae](rules/podcast-intro.md): no question counts, exam times or LockDown Browser *(on demand)*.
+- [Building a hub = diagram review](rules/diagram-review.md), approved by Sam one candidate at a time *(on demand)*.
+- [Diagrams (the anima skill)](rules/diagrams-anima.md): house rules for drawn figures *(on demand)*.
+- [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named *(on demand)*.
+- [Outside sources are encouraged for every figure](rules/outside-sources-for-figures.md): for accuracy and for how it works, cited *(on demand)*.
 - [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)
 
 ## How-tos

@@ -1,5 +1,6 @@
 ---
 type: rule
+load: on-demand
 tags: [arcade]
 ---
 
