@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-08 (Heme & Endo Exam 2: Lecture A and L13-L15 taught from their recordings, Claude Code)** — Sam: "update the
+  heme and endo exam 2 hub with the transcripts i just added to the drive folder" (the four 11/6 recordings), then "merge
+  when ready". Dr. Taylor's A, Dr. Herr's L13 and L14 (his re-recording, posted that afternoon) and Dr. Madison's L15 go
+  from slides-only to taught: notes at both levels checked against what was said (what each professor stressed added,
+  what he said you don't need marked, slips and contradictions kept as taught and listed in the hub note's content
+  flags), 57 new questions (A 62 to 84, L13 68 to 80, L14 70 to 78, L15 64 to 79; same ids for every edited question;
+  `src` relabeled `rec` where the point was said aloud), 58 Exam Hints quoted from the recordings, High Likelihood
+  re-ranked from what each flagged (Dr. Herr: the labeled Sertoli cell drawing "is actually on your exam"), cram and
+  tables, and both mp3s for all four lectures. Dr. Madison's in-class correction (aromatase mostly in the Sertoli cells)
+  now drives the notes, `mp-2s-2` and the `hpg` figure (`tools/figures/heme-endo-exam2/hpg.mjs`: its hover text and the
+  estradiol mark moved to the tubule). The pronunciation lexicon reads "Class II/III" as two and three. Open: the `cycle`
+  figure's FSH at midcycle (L14 says it peaks with LH; L16's slide says inhibin holds it down), L16 on 11/10, L17, L18.
+
 - **2026-11-06 (redesign phase 5, part 3: the game layer's server, written and tested, not applied, Claude Code)** — Nothing
   changes for students and nothing reaches the live database: `migration_v54.sql` waits in `supabase/pending-migrations.txt`
   for the redesign's release ([vault/reference/game-server.md](vault/reference/game-server.md)). It adds, beside today's
