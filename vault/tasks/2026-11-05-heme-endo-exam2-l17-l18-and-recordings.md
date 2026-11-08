@@ -60,5 +60,8 @@ re-rank High Likelihood from the review on Wed 11/11.
   and the `hpg` figure moved to Dr. Madison's in-class aromatase correction. The contradictions found are in the hub
   note's content flags. Still to do here: L16 (recording Tue 11/10), L17 and L18, the 11/11 review, and the `cycle`
   figure's FSH at midcycle (L14 and L16 disagree).
+- 2026-11-08: Sam: "2 should come out along with any questions that professors say we dont need to know". `mh-2s-6`
+  retired; every recording and Exam 1's de-emphasis hints checked, nothing else tested a skipped point. Do the same
+  check for L16-L18 and the review.
 
 ## Outcome

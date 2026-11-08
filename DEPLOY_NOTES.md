@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-08 (Heme & Endo Exam 2: no questions on what a professor said you don't need, Claude Code)** — Sam: "2 should
+  come out along with any questions that professors say we dont need to know". `mh-2s-6` (the erectile blood-supply
+  figure Dr. Herr said you don't need) is removed and retired in `tools/question-ids/heme-endo-exam2.txt`. Every recording
+  (L11, L12a, L12b, A, L13-L15) was searched for what a professor said you don't need, and the Refresher was checked
+  against Exam 1's de-emphasis hints; no other question tests such a point. L13 has 79 questions, the hub 803.
+
 - **2026-11-08 (Heme & Endo Exam 2: Lecture A and L13-L15 taught from their recordings, Claude Code)** — Sam: "update the
   heme and endo exam 2 hub with the transcripts i just added to the drive folder" (the four 11/6 recordings), then "merge
   when ready". Dr. Taylor's A, Dr. Herr's L13 and L14 (his re-recording, posted that afternoon) and Dr. Madison's L15 go
