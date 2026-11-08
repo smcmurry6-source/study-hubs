@@ -66,6 +66,10 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
+- **What a professor says you don't need isn't asked** (Sam, 2026-11-08): no question tests it. On 2026-11-08 every
+  recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
+  tested such a point, and it was retired. Questions that only mention a skipped point in a wrong choice or an
+  explanation stay. When L16-L18 and the review come in, check their "you don't need" remarks the same way.
 - **Vetted:** every question was checked against its slides and recording by a second reviewer on 2026-11-05 (about
   1 in 4 rewritten). Where the lecture disagrees with a textbook or with itself, the hub keeps what was taught; those
   places are listed below so whoever takes a lecture to taught can check them against its recording.
@@ -99,7 +103,7 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   "ductus deferens" for the efferent ductules (1:45), "seminiferous tubules" for the seminal vesicles (33:35). His
   release order is bulbourethral, prostate, then seminal vesicles with the sperm (36:01; textbooks put most sperm in the
   prostatic fraction). He said the labeled Sertoli cell drawing "is actually on your exam" (5:19) and stained images won't
-  be tested (18:29). `mh-2s-6` tests the erectile blood-supply figure he said you don't need; kept until Sam says.
+  be tested (18:29). `mh-2s-6`, on the erectile blood-supply figure he said you don't need, was removed and retired on 2026-11-08 (Sam).
 - **L15 (taught, 11/6 recording):** 34 °C said three times (L13's slide: 35); each lecture's questions use its own.
   "Two months" for sperm maturation is only on his slide (L13 says 74 days aloud). At 26:42 he had the class cross out
   his slide's "aromatase in the Leydig cells from puberty on": the Sertoli cells carry most of it from fetal development

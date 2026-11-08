@@ -548,7 +548,7 @@ mh-case-psa-1
 mh-case-psa-2
 mh-case-stain
 mh-erection
-mh-2s-6
+mh-2s-6 retired
 mh-venous
 mh-tf-cavernosum
 fp-default-path
