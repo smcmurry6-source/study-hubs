@@ -66,7 +66,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
-- **What a professor says you don't need isn't asked** (Sam, 2026-11-08): no question tests it. On 2026-11-08 every
+- **What a professor says you don't need isn't asked** (Sam, 2026-11-08; now a standing rule for every hub,
+  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
   recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
   tested such a point, and it was retired. Questions that only mention a skipped point in a wrong choice or an
   explanation stay. When L16-L18 and the review come in, check their "you don't need" remarks the same way.
