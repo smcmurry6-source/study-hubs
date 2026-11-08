@@ -5,7 +5,7 @@ hub: heme-endo-exam2
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
-waiting-on: L17 and L18 slides; the recordings of Lecture A and L13-L16; the Exam 2 review (Wed 11/11)
+waiting-on: L17 and L18 slides; the L16 recording (Tue 11/10); the Exam 2 review (Wed 11/11)
 agent: 
 pr: 
 ---
@@ -41,7 +41,7 @@ re-rank High Likelihood from the review on Wed 11/11.
 - [ ] L17 and L18 are lectures with notes at both levels, narration, questions in every required format and their
       `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions
 - [ ] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
-      and Exam Hints quoted from what was said
+      and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 waits for its 11/10 recording)
 - [ ] High Likelihood re-ranked from the 11/11 review
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [ ] Vault written back (hub note, decisions, this note's Outcome)
@@ -53,5 +53,12 @@ re-rank High Likelihood from the review on Wed 11/11.
 - 2026-11-05: the hub merged with smcmurry6-source/study-hubs#246: every question vetted, nine figures, both narration
   levels. The places where a lecture contradicts a textbook or itself (kept as taught) are in the hub note: check each
   against the recording when A and L13-L16 go to taught, and the figures against the slide images.
+- 2026-11-08: Sam added the 11/6 recordings' transcripts to Drive ("update the heme and endo exam 2 hub with the
+  transcripts i just added to the drive folder"; then "merge when ready"). A, L13, L14 and L15 are taught: notes at both
+  levels checked against what was said, 57 new questions (sources relabeled `rec` where the point was said aloud), Exam
+  Hints quoted from each recording, High Likelihood re-ranked from what each professor flagged, both mp3s regenerated,
+  and the `hpg` figure moved to Dr. Madison's in-class aromatase correction. The contradictions found are in the hub
+  note's content flags. Still to do here: L16 (recording Tue 11/10), L17 and L18, the 11/11 review, and the `cycle`
+  figure's FSH at midcycle (L14 and L16 disagree).
 
 ## Outcome
