@@ -13,7 +13,8 @@ question health are all keyed on `(hub, id)`, so a renamed id orphans its data a
 - **Editing a question keeps its id.** Fix the stem, a choice, the key or the explanation in place; the system notices
   the new version by itself (its numbers start fresh, the old ones stay).
 - **A new question gets a new id**, never one the hub has used before. Follow the hub's own pattern (`q4-06`, `an-compound`).
-- **Deleting a question** is Sam's call ([graded-coursework](graded-coursework.md) says ask). Then change its line in
+- **Deleting a question** is Sam's call ([graded-coursework](graded-coursework.md) says ask), except a question on something a
+  professor said you don't need, which comes out by standing rule ([dont-ask-what-professors-skip](dont-ask-what-professors-skip.md)). Then change its line in
   `tools/question-ids/<hub>.txt` to `<id> retired`; the id stays out of use for good.
 - **The registry**: `tools/question-ids/<hub>.txt` lists every id the hub has ever shipped, one per line (`#` starts a
   comment). `node tools/ci/smoke.js` checks it: a registered id missing from the hub fails, a retired id coming back

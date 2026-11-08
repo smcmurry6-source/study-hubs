@@ -1,32 +1,32 @@
 # Question ids for hubs/heme-endo-exam2: every id this hub has ever shipped, one per line, never reused.
 # "<id> retired" marks a question deleted on purpose. Rules: vault/rules/question-ids-are-permanent.md
 dm-glut4
-dm-2s-5
+dm-2s-5 retired
 dm-a1c-why
 dm-tf-3
-dm-tf-8
+dm-tf-8 retired
 dm-num-5
-dm-2s-1
+dm-2s-1 retired
 dm-ex-micro
-dm-tf-1
-dm-secondary
-dm-match-druginduced
-dm-tf-7
-dm-pb-k
+dm-tf-1 retired
+dm-secondary retired
+dm-match-druginduced retired
+dm-tf-7 retired
+dm-pb-k retired
 dm-pb-dx-1
 dm-pb-dx-2
 dm-ins-meal
 dm-ins-shortest
 dm-ins-basal
-dm-ins-nph
+dm-ins-nph retired
 dm-tf-2
 dm-2s-6
-dm-ex-insae
+dm-ex-insae retired
 dm-tf-9
 dm-pb-chair-1
 dm-pb-chair-2
 dm-pb-chair-3
-dm-seq-su
+dm-seq-su retired
 dm-pb-cpep-1
 dm-pb-cpep-2
 dm-su-durability
@@ -38,17 +38,17 @@ dm-met-moa
 dm-met-hypo
 dm-2s-2
 dm-num-1
-dm-ex-met
+dm-ex-met retired
 dm-pb-renal-1
 dm-pb-renal-2
 dm-pb-hf-1
 dm-pb-hf-2
 dm-dpp4-hf
 dm-2s-3
-dm-tf-5
+dm-tf-5 retired
 dm-tzd-eye
-dm-mm-glp1
-dm-exendin
+dm-mm-glp1 retired
+dm-exendin retired
 dm-tf-6
 dm-num-4
 dm-pb-thyroid
@@ -56,109 +56,109 @@ dm-pb-wt-1
 dm-pb-wt-2
 dm-dpp4-moa
 dm-2s-4
-dm-ex-dpp4
-dm-agi
-dm-amylin
-dm-match-target
+dm-ex-dpp4 retired
+dm-agi retired
+dm-amylin retired
+dm-match-target retired
 dm-pb-sglt2
 dm-sglt2-bbw
 dm-2s-7
-dm-num-3
+dm-num-3 retired
 dm-ex-sglt2
 dm-tf-10
 dm-hypo-class
-dm-num-2
+dm-num-2 retired
 dm-mm-weight
-dm-mm-route
-p1-feedback
-p1-2s-hormone
-p1-tf-lobes
-p1-num-cells
-p1-match-hypoth
-p1-tf-pitnet
+dm-mm-route retired
+p1-feedback retired
+p1-2s-hormone retired
+p1-tf-lobes retired
+p1-num-cells retired
+p1-match-hypoth retired
+p1-tf-pitnet retired
 p1-macro-mass
 p1-hemianopsia
-p1-x-macro
-p1-tf-hyperpit
-p1-somato
+p1-x-macro retired
+p1-tf-hyperpit retired
+p1-somato retired
 p1-2s-gigant
-p1-gonado
+p1-gonado retired
 p1-prl-1
-p1-prl-2
+p1-prl-2 retired
 p1-corticotroph
 p1-tf-hypopit75
-p1-null-cell
-p1-mm-hypopit
+p1-null-cell retired
+p1-mm-hypopit retired
 p1-sheehan-1
 p1-sheehan-2
-p1-2s-pp
-p1-adh
+p1-2s-pp retired
+p1-adh retired
 p1-tf-di
 p1-tf-siadh
 p1-num-di
 p1-di-1
-p1-di-2
-p1-siadh
+p1-di-2 retired
+p1-siadh retired
 p1-lingual
-p1-ccell
-p1-goiter
+p1-ccell retired
+p1-goiter retired
 p1-num-labs
 p1-graves-1
 p1-graves-2
 p1-2s-graves
 p1-tsh-adenoma
-p1-x-hyper
-p1-hashi-1
-p1-hashi-2
+p1-x-hyper retired
+p1-hashi-1 retired
+p1-hashi-2 retired
 p1-hashi-3
 p1-2s-hashi
 p1-mm-myxedema
 p1-cretin
 p1-tf-adenoma
 p1-adenoma-vs-ca
-p1-num-fc
+p1-num-fc retired
 p1-fc-mets
-p1-mm-fc
+p1-mm-fc retired
 p1-2s-ptc
 p1-ptc-braf
 p1-pseudoincl
 p1-tf-psammoma
-p1-seq-psammoma
+p1-seq-psammoma retired
 p1-num-ptc
 p1-x-ptc
-p1-ptc-1
+p1-ptc-1 retired
 p1-ptc-2
 p1-mtc-1
-p1-mtc-2
+p1-mtc-2 retired
 p1-tf-mtc
 p1-x-mtc
 p1-ana-1
 p1-ana-2
-p1-tf-anaplastic
+p1-tf-anaplastic retired
 p1-match-ca
 p2-pth-kidney
-p2-pth-fragments
-p2-fat-age
-p2-phpt-def
+p2-pth-fragments retired
+p2-fat-age retired
+p2-phpt-def retired
 p2-phpt-cause
 p2-triad
-p2-num-1
+p2-num-1 retired
 p2-adhyp-dx
 p2-pca-features
 p2-2s-3
 p2-2s-1
 p2-tf-1
-p2-tf-2
-p2-tf-3
+p2-tf-2 retired
+p2-tf-3 retired
 p2-surg-classic
-p2-seq-mips
-p2-case1-a
-p2-case1-b
+p2-seq-mips retired
+p2-case1-a retired
+p2-case1-b retired
 p2-case1-c
 p2-shpt-dialysis
 p2-shpt-fix
 p2-2s-2
-p2-mm-hypo
+p2-mm-hypo retired
 p2-hypo-except
 p2-tf-4
 p2-num-2
@@ -166,641 +166,641 @@ p2-case2-a
 p2-case2-b
 p2-pseudo-mech
 p2-tf-5
-p2-case3-a
-p2-case3-b
-p2-match-labs
-p2-match-zones
+p2-case3-a retired
+p2-case3-b retired
+p2-match-labs retired
+p2-match-zones retired
 p2-zones-apply
 p2-tf-10
-p2-cortisol-except
-p2-mm-cushing
+p2-cortisol-except retired
+p2-mm-cushing retired
 p2-case4-a
 p2-case4-b
 p2-cush-ectopic
 p2-tf-7
 p2-2s-4
-p2-seq-raas
+p2-seq-raas retired
 p2-tf-6
 p2-case5-a
 p2-case5-b
-p2-mm-renin
-p2-hyperaldo-except
-p2-cah-21-why
+p2-mm-renin retired
+p2-hyperaldo-except retired
+p2-cah-21-why retired
 p2-cah-tx
-p2-2s-5
-p2-tf-12
+p2-2s-5 retired
+p2-tf-12 retired
 p2-num-5
 p2-cah-newborn
 p2-cah-17
 p2-case6-a
 p2-case6-b
-p2-addison-except
+p2-addison-except retired
 p2-num-3
 p2-tf-8
 p2-cortex-adenoma
-p2-2s-6
-p2-tf-9
+p2-2s-6 retired
+p2-tf-9 retired
 p2-pheo-cell
 p2-pheo-dental
-p2-num-4
+p2-num-4 retired
 p2-nb
-p2-2s-7
-p2-tf-11
-fh-organ-jobs
-fh-steroids
+p2-2s-7 retired
+p2-tf-11 retired
+fh-organ-jobs retired
+fh-steroids retired
 fh-arrest-1
 fh-arrest-2
 fh-lh-meiosis
-fh-polar
-fh-seq-meiosis
+fh-polar retired
+fh-seq-meiosis retired
 fh-match-counts
 fh-tf-12
-fh-tf-meiosis2
-fh-primordial-id
-fh-unilaminar-id
+fh-tf-meiosis2 retired
+fh-primordial-id retired
+fh-unilaminar-id retired
 fh-antral-id
-fh-graafian-id
-fh-corona
-fh-zp-contact
+fh-graafian-id retired
+fh-corona retired
+fh-zp-contact retired
 fh-gap-barrier
-fh-mm-liquor
+fh-mm-liquor retired
 fh-tf-months
-fh-2s-1
+fh-2s-1 retired
 fh-2s-2
-fh-2s-3
+fh-2s-3 retired
 fh-num-follicles
-fh-seq-follicle
-fh-ex-secondary
-fh-ovulation-trigger
-fh-mm-lh
-fh-rupture
-fh-where-released
+fh-seq-follicle retired
+fh-ex-secondary retired
+fh-ovulation-trigger retired
+fh-mm-lh retired
+fh-rupture retired
+fh-where-released retired
 fh-lutein-estrogen
-fh-tf-thecalutein
+fh-tf-thecalutein retired
 fh-2s-5
 fh-cl-fate
-fh-ex-postov
+fh-ex-postov retired
 fh-phase-days
-fh-day10
-fh-day22
+fh-day10 retired
+fh-day22 retired
 fh-num-cycle
 fh-menses-cause
-fh-tf-basalis
+fh-tf-basalis retired
 fh-tf-helical
 fh-ampulla
 fh-peg
 fh-tf-cilia
-fh-tf-24h
+fh-tf-24h retired
 fh-capacitation
-fh-id-tube
-fh-ex-tube
-fh-2s-4
-fh-ex-endometrium
-fh-tf-myoestrogen
+fh-id-tube retired
+fh-ex-tube retired
+fh-2s-4 retired
+fh-ex-endometrium retired
+fh-tf-myoestrogen retired
 fh-cervix-mucus
 fh-tz
-fh-id-vagina
+fh-id-vagina retired
 fh-num-vagina
-fh-ovulation-mucus
-fh-mammary-structure
-fh-tf-lactating
-fh-ex-milk
-fh-num-milk
-fh-2s-6
-fh-match-epith
-fh-mm-preg
+fh-ovulation-mucus retired
+fh-mammary-structure retired
+fh-tf-lactating retired
+fh-ex-milk retired
+fh-num-milk retired
+fh-2s-6 retired
+fh-match-epith retired
+fh-mm-preg retired
 fh-pb-colostrum
 fh-pb-letdown
 fh-pb-cl
-fh-pb-myo
-fh-pb-abx
-fh-pb-meno
-fh-num-ovary
-mp-4g-gonadal
+fh-pb-myo retired
+fh-pb-abx retired
+fh-pb-meno retired
+fh-num-ovary retired
+mp-4g-gonadal retired
 mp-amh
-mp-wolffian
+mp-wolffian retired
 mp-dht-targets
 mp-ais-cause
 mp-btb
 mp-abp
-mp-spermiation
-mp-cold
+mp-spermiation retired
+mp-cold retired
 mp-meiosis
-mp-epid-time
+mp-epid-time retired
 mp-acrosome
 mp-rate-limit
 mp-aromatase
-mp-lh-signal
-mp-gnrh-cont
-mp-pit-pattern
+mp-lh-signal retired
+mp-gnrh-cont retired
+mp-pit-pattern retired
 mp-sv-volume
-mp-psa
+mp-psa retired
 mp-ans
-mp-erect-nt
-mp-fetal-leydig
-mp-cs-steroid-1
+mp-erect-nt retired
+mp-fetal-leydig retired
+mp-cs-steroid-1 retired
 mp-cs-steroid-2
-mp-cs-ais-1
-mp-cs-ais-2
-mp-cs-5ard-1
-mp-cs-5ard-2
+mp-cs-ais-1 retired
+mp-cs-ais-2 retired
+mp-cs-5ard-1 retired
+mp-cs-5ard-2 retired
 mp-cs-inhibin
 mp-cs-primary
 mp-cs-pde5-1
 mp-cs-pde5-2
-mp-x-sertoli
-mp-x-sv
-mp-x-ais
-mp-x-tprod
-mp-mm-epid
-mp-mm-both
-mp-match-axis
-mp-match-glands
-mp-seq-erection
-mp-seq-route
+mp-x-sertoli retired
+mp-x-sv retired
+mp-x-ais retired
+mp-x-tprod retired
+mp-mm-epid retired
+mp-mm-both retired
+mp-match-axis retired
+mp-match-glands retired
+mp-seq-erection retired
+mp-seq-route retired
 mp-2s-1
 mp-2s-2
-mp-2s-3
+mp-2s-3 retired
 mp-2s-4
-mp-2s-5
-mp-2s-6
-mp-tf-1
+mp-2s-5 retired
+mp-2s-6 retired
+mp-tf-1 retired
 mp-tf-2
-mp-tf-3
+mp-tf-3 retired
 mp-tf-4
 mp-tf-5
-mp-tf-6
-mp-tf-7
-mp-tf-8
-mp-tf-9
-mp-tf-10
+mp-tf-6 retired
+mp-tf-7 retired
+mp-tf-8 retired
+mp-tf-9 retired
+mp-tf-10 retired
 mp-num-1
-mp-num-2
-mp-num-3
-mp-num-4
-mp-num-5
+mp-num-2 retired
+mp-num-3 retired
+mp-num-4 retired
+mp-num-5 retired
 mp-num-6
-r-h1-gq
-r-h1-gi
+r-h1-gq retired
+r-h1-gi retired
 r-h1-2s-4
 r-h1-acidophils
-r-h1-2s-2
+r-h1-2s-2 retired
 r-rv-paracrine
-r-rv-neuroendo
-r-hp-neuroendo
-r-rv-gs
-r-hp-gs-ca
+r-rv-neuroendo retired
+r-hp-neuroendo retired
+r-rv-gs retired
+r-hp-gs-ca retired
 r-hp-ins-vs-gh
-r-hp-2s-4
-r-rv-gh-except
+r-hp-2s-4 retired
+r-rv-gh-except retired
 r-gr-ss-gi
-r-gr-ghrh-gs
-r-gr-num-1
+r-gr-ghrh-gs retired
+r-gr-num-1 retired
 r-gr-r-ssfb
-r-gr-igf-fb
-r-gr-ss-glucose
-r-gr-f-igfinj
-r-rv-tpo
-r-th-tpo
-r-th-r-nis
-r-th-megalin
+r-gr-igf-fb retired
+r-gr-ss-glucose retired
+r-gr-f-igfinj retired
+r-rv-tpo retired
+r-th-tpo retired
+r-th-r-nis retired
+r-th-megalin retired
 r-th-rt3
-r-th-2s-1
-r-th-t3
-r-th-r-t3
-r-rv-sst
+r-th-2s-1 retired
+r-th-t3 retired
+r-th-r-t3 retired
+r-rv-sst retired
 r-pa-ss
-r-pa-ss-stim
+r-pa-ss-stim retired
 r-rv-glucagon
-r-pa-glucagon-stim
-r-pa-tf-5
-r-rv-aldo-high
+r-pa-glucagon-stim retired
+r-pa-tf-5 retired
+r-rv-aldo-high retired
 r-ad-aldo-excess
-r-ad-aldo-k
-r-ad-angII
-r-rv-acth-epi
+r-ad-aldo-k retired
+r-ad-angII retired
+r-rv-acth-epi retired
 r-ad-pnmt-reg
-r-ad-pnmt
-r-ad-2s-4
-r-cs-infection
+r-ad-pnmt retired
+r-ad-2s-4 retired
+r-cs-infection retired
 r-cs-num-1
-r-cs-electrolytes
+r-cs-electrolytes retired
 r-cs-taper
-r-cs-2s-2
-r-td-ptu-preg
-r-td-mmi-first
-r-td-mmi-teratogen
+r-cs-2s-2 retired
+r-td-ptu-preg retired
+r-td-mmi-first retired
+r-td-mmi-teratogen retired
 r-td-num-1
 r-td-levo-admin
-r-td-binders
-r-td-2s-1
+r-td-binders retired
+r-td-2s-1 retired
 r-h2-dual
-r-h2-dual-why
+r-h2-dual-why retired
 r-h2-spongio
-r-h2-num-2
+r-h2-num-2 retired
 r-rv-casr
-r-ca-casr
-r-ca-r-2s-1
+r-ca-casr retired
+r-ca-r-2s-1 retired
 r-rv-vitd
-r-ca-1alpha-on
-r-ca-calcitriol-net
-r-ca-2s-3
-r-ca-2s-4
-r-cs-2s-3
-r-gr-r-plate
-r-pa-2s-2
-r-td-inducers
-r-h2-r-2s-1
-r-ca-r-vdr
-r-pa-insulin-fat
-r-cs-mitotane
-r-h2-islet-origin
-r-h1-tf-5
+r-ca-1alpha-on retired
+r-ca-calcitriol-net retired
+r-ca-2s-3 retired
+r-ca-2s-4 retired
+r-cs-2s-3 retired
+r-gr-r-plate retired
+r-pa-2s-2 retired
+r-td-inducers retired
+r-h2-r-2s-1 retired
+r-ca-r-vdr retired
+r-pa-insulin-fat retired
+r-cs-mitotane retired
+r-h2-islet-origin retired
+r-h1-tf-5 retired
 r-pa-tf-3
-r-h1-tf-1
-r-h1-tf-2
+r-h1-tf-1 retired
+r-h1-tf-2 retired
 r-h1-tf-3
-r-h1-tf-4
+r-h1-tf-4 retired
 dc-classes
 dc-2s-class
 dc-tf-endo-nerv
-dc-pit-match
+dc-pit-match retired
 dc-adh
-dc-2s-pit
-dc-tsh
-dc-acro
-dc-macro
-dc-hyperthy-except
-dc-2s-thy
-dc-tf-hypo-epi
+dc-2s-pit retired
+dc-tsh retired
+dc-acro retired
+dc-macro retired
+dc-hyperthy-except retired
+dc-2s-thy retired
+dc-tf-hypo-epi retired
 dc-thy-num
-dc-storm-num
-dc-c1-lab
+dc-storm-num retired
+dc-c1-lab retired
 dc-c1-epi
-dc-c1-oral
-dc-c1-storm
-dc-storm-case
+dc-c1-oral retired
+dc-c1-storm retired
+dc-storm-case retired
 dc-storm-vs-hypo
-dc-hypo-child
-dc-ca-except
+dc-hypo-child retired
+dc-ca-except retired
 dc-2s-ca
-dc-tf-vitd
-dc-tf-calcitonin
-dc-ca-seq
-dc-hpt-except
-dc-c5-gland
+dc-tf-vitd retired
+dc-tf-calcitonin retired
+dc-ca-seq retired
+dc-hpt-except retired
+dc-c5-gland retired
 dc-c5-mech
-dc-tf-hypopara
-dc-hormone-match
-dc-tf-medulla
-dc-2s-adr
-dc-medulla-dental
+dc-tf-hypopara retired
+dc-hormone-match retired
+dc-tf-medulla retired
+dc-2s-adr retired
+dc-medulla-dental retired
 dc-c3-pig
-dc-c3-trigger
+dc-c3-trigger retired
 dc-c3-crisis
-dc-addison-seq
-dc-tf-addison-pig
-dc-cushing
-dc-glucagon
-dc-tf-insulin
-dc-dm-types
-dc-2s-dm
-dc-dm-oral-except
+dc-addison-seq retired
+dc-tf-addison-pig retired
+dc-cushing retired
+dc-glucagon retired
+dc-tf-insulin retired
+dc-dm-types retired
+dc-2s-dm retired
+dc-dm-oral-except retired
 dc-tf-perio
-dc-perio-mech
-dc-dm-mgmt-num
-dc-tf-morning
-dc-hypo-signs
-dc-2s-ff
-dc-c2-organ
-dc-c2-before
-dc-c2-heal
-dc-c4-what
+dc-perio-mech retired
+dc-dm-mgmt-num retired
+dc-tf-morning retired
+dc-hypo-signs retired
+dc-2s-ff retired
+dc-c2-organ retired
+dc-c2-before retired
+dc-c2-heal retired
+dc-c4-what retired
 dc-c4-do
-dc-c4-unc
+dc-c4-unc retired
 dc-c4-prevent
 dc-preg
-dc-repro-num
+dc-repro-num retired
 dc-tf-puberty
-dc-meno
-mh-lobules
-mh-wall
-mh-tf-temp
+dc-meno retired
+mh-lobules retired
+mh-wall retired
+mh-tf-temp retired
 mh-lh
 mh-abp
 mh-2s-1
-mh-mm-gonadotropin
-mh-sertoli-id
+mh-mm-gonadotropin retired
+mh-sertoli-id retired
 mh-btb
-mh-btb-why
+mh-btb-why retired
 mh-mm-adluminal
 mh-x-sertoli
-mh-amh
+mh-amh retired
 mh-num-sertoli
 mh-tf-sertoli-divide
-mh-tf-leydig
+mh-tf-leydig retired
 mh-terms
-mh-meiosis
-mh-stages
+mh-meiosis retired
+mh-stages retired
 mh-num-spg
 mh-tf-puberty
-mh-dark-a
+mh-dark-a retired
 mh-2s-3
-mh-seq-cells
+mh-seq-cells retired
 mh-organelles
 mh-tf-head
-mh-spermiation
-mh-seq-ducts
-mh-efferent
-mh-tf-efferent
+mh-spermiation retired
+mh-seq-ducts retired
+mh-efferent retired
+mh-tf-efferent retired
 mh-num-ducts
-mh-x-pseudo
-mh-2s-2
-mh-epid-id
+mh-x-pseudo retired
+mh-2s-2 retired
+mh-epid-id retired
 mh-cilia-stereo
-mh-2s-5
-mh-x-epid
+mh-2s-5 retired
+mh-x-epid retired
 mh-num-epid
 mh-gpc
-mh-motility
+mh-motility retired
 mh-tf-epid74
-mh-ejac-duct
-mh-case-vas-1
-mh-case-vas-2
-mh-case-vas-3
-mh-case-t-1
-mh-case-t-2
+mh-ejac-duct retired
+mh-case-vas-1 retired
+mh-case-vas-2 retired
+mh-case-vas-3 retired
+mh-case-t-1 retired
+mh-case-t-2 retired
 mh-case-temp
-mh-case-rad
-mh-match-numbers
+mh-case-rad retired
+mh-match-numbers retired
 mh-sv-fructose
-mh-sv-id
-mh-bu-id
-mh-bu-timing
+mh-sv-id retired
+mh-bu-id retired
+mh-bu-timing retired
 mh-2s-4
-mh-tf-prostate-first
-mh-tf-prostate-sets
-mh-x-prostate
-mh-num-glands
-mh-match-secretions
-mh-tf-pg
-mh-case-psa-1
-mh-case-psa-2
-mh-case-stain
+mh-tf-prostate-first retired
+mh-tf-prostate-sets retired
+mh-x-prostate retired
+mh-num-glands retired
+mh-match-secretions retired
+mh-tf-pg retired
+mh-case-psa-1 retired
+mh-case-psa-2 retired
+mh-case-stain retired
 mh-erection
 mh-2s-6 retired
-mh-venous
-mh-tf-cavernosum
+mh-venous retired
+mh-tf-cavernosum retired
 fp-default-path
-fp-2s-default
+fp-2s-default retired
 fp-tf-amh
-fp-tf-fimbriae
-fp-tf-cortex
-fp-kndy
+fp-tf-fimbriae retired
+fp-tf-cortex retired
+fp-kndy retired
 fp-cyclic
-fp-num-axis
+fp-num-axis retired
 fp-tf-prog-fb
-fp-x-feedback
+fp-x-feedback retired
 fp-scc
 fp-fsh-block
-fp-lh-block
-fp-lhr-granulosa
-fp-match-steroids
+fp-lh-block retired
+fp-lhr-granulosa retired
+fp-match-steroids retired
 fp-tf-estrone
 fp-2s-twocell
 fp-2s-hormones
 fp-2s-receptors
-fp-secondary
-fp-oocyte-gf
-fp-x-graafian
-fp-tf-cohort
-fp-seq-follicle
+fp-secondary retired
+fp-oocyte-gf retired
+fp-x-graafian retired
+fp-tf-cohort retired
+fp-seq-follicle retired
 fp-meiosis
-fp-2s-meiosis
+fp-2s-meiosis retired
 fp-num-cl
 fp-tf-cl-cells
 fp-day21
-fp-day10
+fp-day10 retired
 fp-tf-200
-fp-inhibin
+fp-inhibin retired
 fp-num-ovulation
-fp-seq-ovulation
-fp-tf-14days
+fp-seq-ovulation retired
+fp-tf-14days retired
 fp-num-follicular
 fp-2s-luteal
 fp-2s-mucus
-fp-endo-luteal
+fp-endo-luteal retired
 fp-menses
 fp-tf-myometrium
-fp-mm-estrogen
-fp-mm-progesterone
+fp-mm-estrogen retired
+fp-mm-progesterone retired
 fp-meno-1
 fp-meno-2
 fp-num-meno
-fp-x-meno
+fp-x-meno retired
 fp-prl-1
-fp-prl-2
-fp-x-amen
-fp-tf-amen
+fp-prl-2 retired
+fp-x-amen retired
+fp-tf-amen retired
 fp-anov-1
 fp-anov-2
 fp-ovtime-1
-fp-ovtime-2
-fp-preov-1
-fp-preov-2
-fp-match-roles
-r-h1-herring
-r-h1-pituicyte
-r-h1-nuclei
-r-h1-adeno-parts
-r-h1-portal
-r-h1-num-1
+fp-ovtime-2 retired
+fp-preov-1 retired
+fp-preov-2 retired
+fp-match-roles retired
+r-h1-herring retired
+r-h1-pituicyte retired
+r-h1-nuclei retired
+r-h1-adeno-parts retired
+r-h1-portal retired
+r-h1-num-1 retired
 r-h1-tf-8
 r-h1-chief
-r-h1-casr
-r-h1-2s-5
+r-h1-casr retired
+r-h1-2s-5 retired
 r-h1-ccell
-r-h1-2s-3
-r-h1-num-2
+r-h1-2s-3 retired
+r-h1-num-2 retired
 r-rv-steroid-except
-r-hp-steroid-store
-r-hp-peptide-store
-r-hp-num-1
+r-hp-steroid-store retired
+r-hp-peptide-store retired
+r-hp-num-1 retired
 r-hp-primary-cort
-r-hp-secondary-fail
-r-hp-num-2
-r-hp-2s-3
-r-hp-glucagon-fb
+r-hp-secondary-fail retired
+r-hp-num-2 retired
+r-hp-2s-3 retired
+r-hp-glucagon-fb retired
 r-hp-positive
 r-hp-pp-none
-r-hp-2s-2
-r-hp-tf-3
-r-gr-f-ssblock
-r-gr-r-daytime
-r-gr-f-tf-1
-r-gr-f-2s-2
+r-hp-2s-2 retired
+r-hp-tf-3 retired
+r-gr-f-ssblock retired
+r-gr-r-daytime retired
+r-gr-f-tf-1 retired
+r-gr-f-2s-2 retired
 r-rv-gh-linear
-r-gr-somatomedin
-r-gr-diff
-r-gr-r-2s-1
-r-rv-gh-excess
-r-gr-diabetogenic
-r-gr-r-glucose
-r-gr-lipolysis
-r-gr-muscle
-r-gr-f-metprofile
-r-gr-f-num-1
+r-gr-somatomedin retired
+r-gr-diff retired
+r-gr-r-2s-1 retired
+r-rv-gh-excess retired
+r-gr-diabetogenic retired
+r-gr-r-glucose retired
+r-gr-lipolysis retired
+r-gr-muscle retired
+r-gr-f-metprofile retired
+r-gr-f-num-1 retired
 r-gr-f-tf-2
-r-gr-giant
-r-gr-2s-3
-r-gr-num-2
-r-gr-acro-sx-ex
-r-rv-laron
-r-gr-laron
-r-gr-deficiency-sx
+r-gr-giant retired
+r-gr-2s-3 retired
+r-gr-num-2 retired
+r-gr-acro-sx-ex retired
+r-rv-laron retired
+r-gr-laron retired
+r-gr-deficiency-sx retired
 r-gr-f-2s-1
-r-gr-somatopause
-r-gr-somatopause-sx
+r-gr-somatopause retired
+r-gr-somatopause-sx retired
 r-gr-2s-4
-r-gr-r-tf-4
-r-gr-r-tf-3
-r-gr-f-num-2
-r-th-extracell
-r-th-r-2s-1
-r-th-num-1
-r-th-f-store
-r-th-f-release
+r-gr-r-tf-4 retired
+r-gr-r-tf-3 retired
+r-gr-f-num-2 retired
+r-th-extracell retired
+r-th-r-2s-1 retired
+r-th-num-1 retired
+r-th-f-store retired
+r-th-f-release retired
 r-th-f-tf-2
-r-th-f-conv
-r-th-f-2s-1
-r-th-f-tf-3
+r-th-f-conv retired
+r-th-f-2s-1 retired
+r-th-f-tf-3 retired
 r-th-trh-gq
-r-th-tsh-gs
-r-th-t3-inhib
-r-th-r-ss
-r-rv-th-anabolic
-r-th-bmr
-r-th-heart
-r-th-r-myosin
-r-th-f-cv
+r-th-tsh-gs retired
+r-th-t3-inhib retired
+r-th-r-ss retired
+r-rv-th-anabolic retired
+r-th-bmr retired
+r-th-heart retired
+r-th-r-myosin retired
+r-th-f-cv retired
 r-th-f-num-1
-r-th-f-num-3
-r-th-f-tf-1
-r-th-pb-graves
-r-th-pb-graves-eyes
-r-rv-graves
-r-th-graves-labs
+r-th-f-num-3 retired
+r-th-f-tf-1 retired
+r-th-pb-graves retired
+r-th-pb-graves-eyes retired
+r-rv-graves retired
+r-th-graves-labs retired
 r-th-f-compare
-r-th-pb-hashi
-r-th-pb-hashi-chol
+r-th-pb-hashi retired
+r-th-pb-hashi-chol retired
 r-th-r-ldl
-r-th-f-num-2
+r-th-f-num-2 retired
 r-th-pb-iodine
-r-th-pb-tpo
-r-th-goiter
+r-th-pb-tpo retired
+r-th-goiter retired
 r-th-pb-newborn
-r-th-pb-secondary
-r-th-congenital-tx
-r-th-child-growth
+r-th-pb-secondary retired
+r-th-congenital-tx retired
+r-th-child-growth retired
 r-rv-ins-muscle
-r-pa-glut4
-r-pa-insulin-muscle
-r-pa-ketogenesis
+r-pa-glut4 retired
+r-pa-insulin-muscle retired
+r-pa-ketogenesis retired
 r-pa-num-2
-r-pa-glucagon-muscle
+r-pa-glucagon-muscle retired
 r-pa-katp
-r-pa-sulfonyl
-r-pa-cpeptide
+r-pa-sulfonyl retired
+r-pa-cpeptide retired
 r-rv-cort-reg
-r-ad-acth-gs
-r-ad-num-2
+r-ad-acth-gs retired
+r-ad-num-2 retired
 r-rv-cort-met
-r-ad-cortisol-goal
-r-ad-cortisol-muscle
+r-ad-cortisol-goal retired
+r-ad-cortisol-muscle retired
 r-ad-addison-acth
-r-ad-cushing-disease
-r-ad-2s-3
-r-ad-tf-4
-r-cs-keto
-r-cs-num-2
+r-ad-cushing-disease retired
+r-ad-2s-3 retired
+r-ad-tf-4 retired
+r-cs-keto retired
+r-cs-num-2 retired
 r-cs-hyperK
-r-cs-spiro
+r-cs-spiro retired
 r-td-tsh-read
-r-td-2s-3
+r-td-2s-3 retired
 r-td-amio
-r-td-2s-5
+r-td-2s-5 retired
 r-td-macroglossia
-r-td-bb
-r-h2-acth-zones
+r-td-bb retired
+r-h2-acth-zones retired
 r-h2-r-angio
-r-h2-tf-3
-r-h2-islet-share
+r-h2-tf-3 retired
+r-h2-islet-share retired
 r-h2-r-rank
-r-h2-2s-3
+r-h2-2s-3 retired
 r-ca-pth-kidney
-r-ca-why-split
-r-ca-r-phos
-r-ca-ob-rec
+r-ca-why-split retired
+r-ca-r-phos retired
+r-ca-ob-rec retired
 r-ca-2s-2
-r-ca-num-2
-r-ca-oc-rec
+r-ca-num-2 retired
+r-ca-oc-rec retired
 r-ca-calcitonin
 r-ca-hpt
-r-ca-r-stones
-dc-growth-plates
+r-ca-r-stones retired
+dc-growth-plates retired
 dc-implant-growth
 dc-2s-acro
 dc-rln
 dc-tf-hypo-common
 dc-storm-911
-dc-lamina-dura
+dc-lamina-dura retired
 dc-2s-brown
 dc-tf-steroid
 dc-stress-dose
 dc-tf-t2
-dc-metformin-skip
+dc-metformin-skip retired
 dc-a1c-num
-dc-tf-glucose60
+dc-tf-glucose60 retired
 dc-tf-farxiga
 dc-salivary-sugar
 dc-cgm
-dc-glp1-slow
+dc-glp1-slow retired
 dc-glucose-sucrose
 dc-rescue-num
 dc-pack-years
-dc-2s-preg
-mh-tf-tunica
+dc-2s-preg retired
+mh-tf-tunica retired
 mh-fig-seq
 mh-fig-label
-mh-tf-efferens
+mh-tf-efferens retired
 mh-2s-7
 mh-tf-bu-somatic
-mh-seq-ejac
+mh-seq-ejac retired
 mh-prostate-urine
 mh-num-prostate
 mh-spongiosum
 mh-tf-point
 mh-2s-8
 fh-fsh-growth
-fh-seq-wall
+fh-seq-wall retired
 fh-2s-7
-fh-num-graph
+fh-num-graph retired
 fh-tf-fshpeak
 fh-2s-8
-fh-seq-menses
+fh-seq-menses retired
 fh-tf-straight
 mp-sl-pair
-mp-arom-adult
-mp-e2-role
-mp-t-life
+mp-arom-adult retired
+mp-e2-role retired
+mp-t-life retired
 mp-clot
 mp-cav-art
-mp-mm-wolff
+mp-mm-wolff retired
 mp-2s-7
-mp-2s-8
-mp-tf-11
+mp-2s-8 retired
+mp-tf-11 retired
 mp-tf-12
 mp-tf-13
 mp-tf-14
-mp-num-7
+mp-num-7 retired
 mp-num-8

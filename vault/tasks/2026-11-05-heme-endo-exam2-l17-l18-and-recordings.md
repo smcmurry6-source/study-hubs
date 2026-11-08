@@ -35,6 +35,8 @@ re-rank High Likelihood from the review on Wed 11/11.
 - Quiz 3 is open until Thu 11/12, 11:59 pm and the take-home until 11/15: never use either
   ([graded-coursework](../rules/graded-coursework.md)).
 - `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: update them if the course announces a count per lecture.
+- **The bank is kept high yield** (Sam, 2026-11-08: "803 is way too many questions"; it was cut to 339): L17 and L18 get
+  about 30-35 questions each, and L16 going taught swaps questions instead of adding; see the hub note.
 
 ## Done when
 
@@ -62,6 +64,9 @@ re-rank High Likelihood from the review on Wed 11/11.
   figure's FSH at midcycle (L14 and L16 disagree).
 - 2026-11-08: Sam: "2 should come out along with any questions that professors say we dont need to know". `mh-2s-6`
   retired; every recording and Exam 1's de-emphasis hints checked, nothing else tested a skipped point. Do the same
-  check for L16-L18 and the review.
+  check for L16-L18 and the review. Then "That should be a standing rule" (now
+  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)) and "803 is way too many questions. They need
+  to be higher yield": the bank was cut to 339 high-yield questions (464 ids retired), High Likelihood made selective
+  (about half of each lecture), the Refresher to one question per Exam 1 topic. New lectures stay at that size.
 
 ## Outcome

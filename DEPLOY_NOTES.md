@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
+  "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
+  rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't
+  need; check every recording, review and focus list; retire what tests it (Sam's standing OK). (2) The bank is cut from
+  803 to 339: L11 70 → 48, L12a 66 → 38, L12b 70 → 42, A 84 → 32, L13 79 → 32, L14 78 → 32, L15 79 → 32, L16 58 → 28 and
+  the Exam 1 Refresher 219 → 55 (one per Exam 1 predicted topic), about 6 per expected exam question (the median student
+  answered about 300 before Exam 1). Kept: what a professor stressed, the predicted topics and each lecture's core, one
+  question per fact. Cut: near-duplicates in other formats, minor details and slide numbers, long ordering, matching and
+  select-all items, stained-section identification, and points a professor played down (alpha-glucosidase inhibitors,
+  pramlintide, the SGLT2 inhibitors' rare trial findings, the pheochromocytoma rule of 10s, empty sella, spermiation).
+  464 ids retired in `tools/question-ids/heme-endo-exam2.txt`; no question was reworded. `LIKELY_TOPICS` keep every
+  topic, each with its 1-3 best questions (156 of 284 lecture questions High Likelihood, all 55 of R's). Format minimums
+  and key balance hold (two-statement keys 26/23/26/26%, true/false 49% True, numbered positions 10/6/8/7, longest choice
+  10%). Notes and narration unchanged. Hub note, task note, decisions and `LESSONS.md` updated.
 - **2026-11-08 (Heme & Endo Exam 2: no questions on what a professor said you don't need, Claude Code)** — Sam: "2 should
   come out along with any questions that professors say we dont need to know". `mh-2s-6` (the erectile blood-supply
   figure Dr. Herr said you don't need) is removed and retired in `tools/question-ids/heme-endo-exam2.txt`. Every recording

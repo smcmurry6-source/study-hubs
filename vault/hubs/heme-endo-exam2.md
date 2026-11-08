@@ -20,14 +20,13 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), A Dental
   endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 219 questions copied
-  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
-  question** (206 over all 55 of its predicted topics, in Exam 1's topic order; Sam, 2026-11-06: the hub was built with the
-  top two topics per lecture, 68 questions, and the other 138 came in that day) plus 13 others (its hardest questions for
-  the class, format top-ups). A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 55 questions copied
+  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **one for each of Exam 1's 55
+  predicted topics**, in Exam 1's topic order. (It held 219 from 2026-11-06, every Exam 1 High Likelihood question plus 13 of
+  its hardest, until the high-yield cut below.) A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
   before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. Only the predicted topics are High
-  Likelihood (the "hardest questions" set lost the tag on 2026-11-06), and **the mock's five Exam 1 questions come only
+  Likelihood (all 55, one per topic), and **the mock's five Exam 1 questions come only
   from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
   `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
@@ -66,7 +65,17 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
-- **What a professor says you don't need isn't asked** (Sam, 2026-11-08): no question tests it. On 2026-11-08 every
+- **The bank is high yield** (Sam, 2026-11-08: "803 is way too many questions. They need to be higher yield"): it was cut
+  from 803 to 339, about 6 questions for each question the lecture is expected to get on the exam (the median student
+  answered about 300 before Exam 1): L11 48, L12a 38, L12b 42, A 32, L13 32, L14 32, L15 32, L16 28, R 55. Kept: what a
+  professor stressed, the predicted topics and the core of each lecture, one question per fact; cut: near-duplicates in
+  other formats, minor details and slide numbers nobody stressed, long ordering, matching and select-all items, stained-
+  section identification (Dr. Herr: stained images aren't tested), and points a professor played down. The 464 removed ids
+  are retired. **Keep it that size:** a new lecture (L17, L18) gets about 30-35 questions, and a lecture going taught (L16)
+  swaps questions rather than adding. High Likelihood is selective too: each topic lists its 1-3 best questions, about
+  half of each lecture (156 of 284; R all 55).
+- **What a professor says you don't need isn't asked** (Sam, 2026-11-08; now a standing rule for every hub,
+  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
   recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
   tested such a point, and it was retired. Questions that only mention a skipped point in a wrong choice or an
   explanation stay. When L16-L18 and the review come in, check their "you don't need" remarks the same way.
@@ -96,8 +105,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   SGLT2); HbA1c above 5.3 a "prediabetes risk" and fasting glucose over 100 suggesting diabetes (25:56, 28:07; L11's
   cutoffs are used for diagnosis); fructose "toxic" and honey "all fructose" (34:28, 35:02); a "3.5-gland"
   parathyroidectomy "causing hyperparathyroidism" (13:02). He called metformin with a skipped breakfast a high
-  hypoglycemia risk (21:43-22:31), against L11; `dc-metformin-skip` asks it "in Dr. Taylor's example" and its
-  explanation gives L11's view.
+  hypoglycemia risk (21:43-22:31), against L11; `dc-metformin-skip` asked it "in Dr. Taylor's example" until the
+  high-yield cut retired it (2026-11-08), so no question turns on it now.
 - **L13 (taught, 11/6 recording):** he said "lower" for the testis temperature (3:58), so 35 °C stays from the slide;
   74 days said aloud (14:59). Slips the hub doesn't follow: "gap junctions" for the Sertoli occluding junctions (7:09),
   "ductus deferens" for the efferent ductules (1:45), "seminiferous tubules" for the seminal vesicles (33:35). His
