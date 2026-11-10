@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: Sam
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/299
 ---
 
 # Timmy's place, the shop and the rewards art: Sam's third round of feedback
