@@ -108,8 +108,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
   rows); `tools/release/xp.js` tests the spots and the lane (247 checks pass). Still waiting for Sam's look at the art;
   then the renderer goes into `widget/pet.js`, and `LORE.md` (the new critters: the rabbit, a crab, an owl, a yeti, a
   friend in a crater, a whale, the dog) and the About page get their lines.
+- 2026-11-10: Sam's third round of feedback (the art, the scenes, the yard, mastery, rank-up unlocks, seasonal sets, the
+  shop's shelves, visiting someone's Timmy) is its own task: [round 3](2026-11-10-redesign-timmys-place-round-3.md). PR #289 stays open for it.
 
 ## Outcome
 
-Related: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+Related: [round 3](2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
 [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../rules/diagrams-anima.md)

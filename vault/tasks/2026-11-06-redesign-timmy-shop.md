@@ -126,6 +126,8 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
   scenes, yard things, paints, upgrades and the six theme outfits with the kit's ids, rarities and prices; five yard spots
   and `wide` for the bowling lane ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289). The outfits not drawn
   yet, the snacks, boosts and seasonal items are still drafts.
+- 2026-11-10: Sam's new calls for the shop (daily and weekly items plus a seasonal section; a full seasonal set per season
+  with a Legendary house and scene; past seasons unlocked for everyone; rank-up unlocks) are in [round 3](2026-11-10-redesign-timmys-place-round-3.md).
 
 ## Outcome
 
