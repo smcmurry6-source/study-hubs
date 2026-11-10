@@ -22,7 +22,7 @@
 import vm from "node:vm";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../../..");
@@ -40,6 +40,15 @@ const { FLAME, XP } = await import("./rewards.mjs");
 const { arcadeArt, ARCADE_VIEWBOX } = await load("./arcade.mjs", { arcadeArt: () => null, ARCADE_VIEWBOX: [0, 0, 320, 170] });
 const { HEADPHONES, NOTES, NOTES_VIEWBOX, TODAY, TODAY_VIEWBOX } = await load("./spots.mjs", { HEADPHONES: "", NOTES: "", NOTES_VIEWBOX: [0, 0, 1, 1], TODAY: "", TODAY_VIEWBOX: [0, 0, 1, 1] });
 const { placeKit } = await load("./place.mjs", { placeKit: null });
+/* the sets of Timmy's place: sets.mjs lists every piece (the shop's catalog has the same rows), and each set's drawings
+   are one pack in packs/<set>.mjs (a function handed the kit's tools). A set with no pack yet isn't drawn; --strict fails on one. */
+const { SEASONS, RANKS } = await import("./sets.mjs");
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const PACKS = [], onlyPack = process.argv.includes("--pack") ? process.argv[process.argv.indexOf("--pack") + 1] : "";   // --pack <set> --dry: check one set while drawing it, write nothing
+for (const k of SEASONS.map((s) => s.k).concat(["ranks"]).filter((k) => !onlyPack || k === onlyPack)) {
+  const file = path.join(path.dirname(fileURLToPath(import.meta.url)), "packs", k + ".mjs");
+  if (fs.existsSync(file)) PACKS.push({ k, pack: (await import(pathToFileURL(file).href)).pack });
+}
 
 /* ---------- the live widget code, in a sandbox ---------- */
 function sandbox(){
@@ -119,18 +128,34 @@ add("spot headphones", HEADPHONES); add("spot notes", NOTES); add("spot today", 
    home and scene with the yard empty, full and with the lane, his way must go round everything and stay on the ground. */
 let placeCount = 0, routeCount = 0;
 if (placeKit) {
-  const K = placeKit(INK, C), items = K.YARD.filter((y) => !y.wide).map((y) => y.k), slots = K.SLOTS.map((x) => x.k);
+  const K = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), items = K.YARD.filter((y) => !y.wide && !y.set).map((y) => y.k), slots = K.SLOTS.map((x) => x.k);
+  /* every piece a set lists is drawn by its pack, as the kind the list says, and a pack draws nothing the list doesn't have */
+  const want = {}, kinds = { home: K.HOMES, scene: K.SCENES, yard: K.YARD, outfit: K.OUTFITS };
+  for (const se of SEASONS) for (const it of se.items) want[it.id] = { kind: it.kind, set: se.k };
+  for (const r of RANKS) { want[r.outfit[0]] = { kind: "outfit", set: "ranks" }; want[r.yard[0]] = { kind: "yard", set: "ranks" }; }
+  const drawnSets = new Set(PACKS.map((x) => x.k)), missing = [...new Set(Object.values(want).map((w) => w.set))].filter((k) => !drawnSets.has(k));
+  for (const [id, w] of Object.entries(want)) if (drawnSets.has(w.set) && !kinds[w.kind].some((x) => x.k === id)) bad.push("set " + w.set + ": " + w.kind + " " + id + " isn't drawn (packs/" + w.set + ".mjs)");
+  for (const [kind, list] of Object.entries(kinds)) for (const x of list) if (x.set && !(want[x.k] && want[x.k].kind === kind)) bad.push("pack piece " + x.k + " (" + kind + ") isn't in sets.mjs");
+  if (missing.length && process.argv.includes("--strict")) bad.push("sets not drawn yet: " + missing.join(", "));
+  if (missing.length && !onlyPack) console.log("sets not drawn yet: " + missing.join(", "));
+  const builtIn = (x) => !x.set;
   const fill = (shift) => { const y = {}; slots.forEach((k, i) => { y[k] = items[(i + shift) % items.length]; }); return y; };
   const ups = (h) => Object.fromEntries(h.ups.map((k) => [k, true]));
   const flair = [{ hub: "a", lvl: 4 }, { hub: "b", lvl: 3 }, { hub: "c", lvl: 2 }, { hub: "d", lvl: 1 }, { hub: "e", lvl: 3, tint: "#3FA7E0" }, { hub: "f", lvl: 2 }];
   const combos = [];
-  K.HOMES.forEach((h, hi) => K.SCENES.forEach((sc, si) => [false, true].forEach((night) => {
+  /* the built-in homes in every built-in scene; a set's home in the hill and in its own scene, a set's scene with the cottage and its own home */
+  const pairs = [];
+  K.HOMES.forEach((h, hi) => K.SCENES.forEach((sc, si) => { if ((builtIn(h) && builtIn(sc)) || (h.set && (sc.k === "hill" || sc.set === h.set)) || (sc.set && h.k === "cottage")) pairs.push([h, sc, hi, si]); }));
+  pairs.forEach(([h, sc, hi, si]) => [false, true].forEach((night) => {
     combos.push({ home: h.k, scene: sc.k, night, tier: 0 });
     combos.push({ home: h.k, scene: sc.k, night, tier: 6, level: 3, up: ups(h), paint: K.PAINTS[(hi + si) % K.PAINTS.length].k, yard: fill(hi + si), flair, marks: true });
-    combos.push({ home: h.k, scene: sc.k, night, tier: (hi + si) % 6, level: 1 + (hi % 3), yard: Object.assign(fill(hi), { side: "lane" }), flair: flair.slice(0, 2) });
-  })));
+    combos.push({ home: h.k, scene: sc.k, night, tier: (hi + si) % 6, level: 1 + (hi % 3), yard: Object.assign(fill(hi), { side: "lane" }), flair: flair.slice(0, 2), mastery: "plaque" });
+  }));
+  /* a set's yard pieces, in the yard of their own scene (or the hill), day and night */
+  K.YARD.filter((y) => y.set).forEach((y, i) => { const sc = K.SCENES.find((x) => x.set === y.set) || { k: "hill" }, hm = K.HOMES.find((x) => x.set === y.set) || { k: "cottage" };
+    [false, true].forEach((night) => combos.push({ home: hm.k, scene: sc.k, night, tier: 2, yard: { [slots[i % slots.length]]: y.k, [slots[(i + 2) % slots.length]]: y.k } })); });
   ["", "halloween", "thanksgiving", "winter", "newyear", "valentine", "dentist", "stpatrick", "easter"].forEach((hol) => ["", "fall", "spring"].forEach((season) =>
-    K.HOMES.forEach((h) => combos.push({ home: h.k, scene: "hill", holiday: hol, season, tier: 3, yard: fill(1) }))));
+    K.HOMES.filter(builtIn).forEach((h) => combos.push({ home: h.k, scene: "hill", holiday: hol, season, tier: 3, yard: fill(1) }))));
   for (const c of combos) {
     const r = K.render(c), body = r.svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
     if (/NaN|undefined|Infinity/.test(r.svg)) bad.push("place " + JSON.stringify(c) + ": NaN or undefined in the drawing");
@@ -138,8 +163,8 @@ if (placeKit) {
     placeCount++;
   }
   const art = [];
-  K.YARD.forEach((y) => K.SCENES.forEach((sc) => art.push(["thumb " + y.k + " " + sc.k, K.thumb("yard", y.k, { scene: sc.k })])));
-  K.HOMES.forEach((h) => K.SCENES.forEach((sc) => art.push(["thumb " + h.k + " " + sc.k, K.thumb("home", h.k, { scene: sc.k, up: ups(h) })])));
+  K.YARD.forEach((y) => K.SCENES.forEach((sc) => { if (builtIn(sc) || sc.set === y.set) art.push(["thumb " + y.k + " " + sc.k, K.thumb("yard", y.k, { scene: sc.k })]); }));
+  pairs.forEach(([h, sc]) => art.push(["thumb " + h.k + " " + sc.k, K.thumb("home", h.k, { scene: sc.k, up: ups(h) })]));
   K.SCENES.forEach((sc) => art.push(["thumb " + sc.k, K.thumb("scene", sc.k)]));
   K.RARITIES.forEach((r) => { art.push(["frame " + r.k, K.frame(r.k)]); art.push(["burst " + r.k, K.burst(r.k)]); });
   art.push(["coin", K.coin()]);
@@ -152,7 +177,7 @@ if (placeKit) {
   /* every outfit goes on the live Timmy: its layers land inside his drawing */
   for (const o of K.OUTFITS) { const t = pet({ hp: 85 }), d = K.dress(t, o.k); if (d === t || !/<\/g><\/svg>$/.test(d)) bad.push("outfit " + o.k + ": dress() didn't fit Timmy's drawing"); }
   /* Timmy's walks */
-  for (const h of K.HOMES) for (const sc of K.SCENES) for (const yard of [{}, fill(0), fill(3), Object.assign(fill(2), { side: "lane" })]) {
+  for (const [h, sc] of pairs) for (const yard of [{}, fill(0), fill(3), Object.assign(fill(2), { side: "lane" })]) {
     const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween" }, L = K.layout(o);
     const inR = (p, r, e) => p[0] > r[0] + (e || 0) && p[0] < r[2] - (e || 0) && p[1] > r[1] + (e || 0) && p[1] < r[3] - (e || 0);
     for (const k of Object.keys(L.spots)) for (const [a, b] of [["door", k], [k, "door"]]) {
@@ -196,13 +221,18 @@ const outs = [[OUT, text]];
 const engineHead = "/* Generated by tools/figures/site/build.mjs from the drawings in tools/figures/site/. Do not edit: change the drawing and run the build. */\n";
 outs.push([path.join(root, "widget/hub-art.js"), engineHead + "window.SH_HUB_ART = " + JSON.stringify({ ink: INK, icons: ICONS, flame: FLAME, xp: XP, spots: spots }) + ";\n"]);
 if (placeKit) outs.push([path.join(root, "tools/preview/design/place.js"), "/* Generated by tools/figures/site/build.mjs from tools/figures/site/place.mjs (Timmy's place: the kit itself, checked in the build).\n" +
-  "   Do not edit: change place.mjs and run the build. */\nwindow.SH_PLACE = (" + placeKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ");\n"]);
+  "   Do not edit: change place.mjs and run the build. */\nwindow.SH_PLACE = (" + placeKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ", [\n" +
+  PACKS.map((x) => "/* the " + x.k + " set: tools/figures/site/packs/" + x.k + ".mjs */\n" + x.pack.toString()).join(",\n") + "\n], " + JSON.stringify(SETS) + ");\n"]);
 for (const h of HUBS) {
   if (!EMBLEMS[h] || !MASTHEADS[h]) continue;
   outs.push([path.join(root, "widget/hub-art/" + h + ".js"), engineHead + "window.SH_HUB_ART_HUB = " +
     JSON.stringify(Object.assign({ hub: h, tint: TINTS[h], emblem: EMBLEMS[h], masthead: MASTHEADS[h] }, arcades[h] ? { games: arcades[h], gamesViewBox: ARCADE_VIEWBOX.join(" ") } : {})) + ";\n"]);
 }
-if (check) {
+if (process.argv.includes("--dry")) {
+  console.log("checked, nothing written: Timmy's place (" + placeCount + " drawings and " + routeCount + " walks)" + (onlyPack ? ", with only the " + onlyPack + " set" : ""));
+} else if (onlyPack) {
+  console.error("--pack is for checking one set: add --dry (a build with one set would drop the others from place.js)"); process.exit(1);
+} else if (check) {
   const stale = outs.filter(([f, t]) => !fs.existsSync(f) || fs.readFileSync(f, "utf8") !== t).map(([f]) => path.relative(root, f));
   if (stale.length) { console.error("stale: " + stale.join(", ") + "\nrun node tools/figures/site/build.mjs"); process.exit(1); }
   console.log("art.js, place.js, widget/hub-art.js and widget/hub-art/ are up to date");

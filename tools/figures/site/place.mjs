@@ -11,7 +11,7 @@
        grade over the whole picture;
      - six themes (a scene, its homes, yard things and outfits for Timmy that belong together) and the classics;
      - what students earn meshes with the place: the rank is a statue of the journey's object by the door, in the tier's
-       material, on one to three steps for the level; each hub's mastery medal is a pennant in the bunting on the home;
+       material, on one to three steps for the level; each hub's mastery medal shows in the display by the house (a trophy case or a gem plaque);
        Dark Matter brings its stars;
      - Timmy hops on the ground between spots (route()), drawn in the scene's depth order, never floating over things;
      - tapping things plays small easter eggs (EGGS), and each rarity has its own card art (frame()) and placing burst.
@@ -24,7 +24,7 @@
    The whole kit is one function, placeKit(INK, C): build.mjs writes its source into the files that draw it
    (tools/preview/design/place.js now; the widget's on-demand bundle when it is wired), so what a page runs is what the
    build checked.                                                                                                       */
-export function placeKit(INK, C){
+export function placeKit(INK, C, PACKS, SETS){
   "use strict";
 
   /* ------------------------------------------------------------------ geometry ------------------------------------- */
@@ -179,7 +179,6 @@ export function placeKit(INK, C){
     lilac:  { n: "Purple",      c: "#9B7BE0", s: "#6E50B8" },
     peach:  { n: "Orange",      c: "#F59A6E", s: "#C96A44" }
   };
-  var PEN = ["", "#C47A3E", "#C9D1D9", "#E8BE45", "#F2C230"];
   var NIGHT = "#141A40";
 
   /* ------------------------------------------------------------------ the yard and its fixed spots ----------------- */
@@ -192,7 +191,7 @@ export function placeKit(INK, C){
     right:  { n: "The back corner",    x: 10.2, y: .8 }
   };
   var SLOT_ORDER = ["right", "side", "left", "front", "corner"];
-  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3] };
+  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [9.95, 7.9] };
   /* where nothing else grows: the home, the path, the slots and the fixed pieces */
   function busy(x, y){
     if (x > 1.2 && x < 9.8 && y > 1.2 && y < 10.4) return true;
@@ -327,6 +326,31 @@ export function placeKit(INK, C){
     if (kind === "cloud") return circ(x, y - 1, 4.6 * k, "#FFFFFF", 0) + circ(x + 4 * k, y + .2, 3.6 * k, "#F1EEFA", 0) + L("M" + f(x - 4.4 * k) + " " + f(y + .6) + " q4.4 2.6 9 0", 1, "#C9C1E6");
     /* grass, with a flower now and then */
     return tuft(x, y + .6, o.night ? "#3D7449" : "#5DA45A", k) + tuft(x + 2.6, y + 1, o.night ? "#4A8457" : "#6CB060", k * .8) + (i % 4 === 2 ? flower(x + 1, y + .8, ["#FF8FB1", "#FFE27A", "#B08CFF"][i % 3], .8) : "");
+  }
+
+  /* a set's scene on the hill's own landform (so the yard, the path and Timmy's walks work as on the hill): the pack gives
+     its sky, its backdrop, the ground's four greens (or snows, or sands) and what grows and stands on it.
+     spec: { sky(o), far(o), ground(o) -> [top, light slope, far slope, line], flat(o, on), props(o, on) -> [{x, y, s}],
+     landExtra(o), fg(o), skirt, path, treeKind, lamp, grade, snowy, alwaysNight } */
+  function hillScene(spec){
+    return {
+      top: HILL_TOP, skirt: spec.skirt || "grass", path: spec.path || "stones", treeKind: spec.treeKind || "round", lamp: spec.lamp || "post", grade: spec.grade || ["#FFE7B0", .05],
+      snowy: !!spec.snowy, alwaysNight: !!spec.alwaysNight,
+      chip: function(o){ var g = spec.ground(o); return [g[0], g[3]]; },
+      sky: spec.sky, far: spec.far || function(){ return ""; },
+      land: function(o){
+        var g = spec.ground(o), s = F(landD(HILL_TOP), g[0]);
+        s += F("M30 " + f(HILL_TOP(30)) + " L30 300 L200 300 L200 266 C150 262 96 240 62 208 C48 194 38 178 30 " + f(HILL_TOP(30)) + " Z", g[1], .7);
+        s += F("M370 " + f(HILL_TOP(370)) + " L370 300 L200 300 L200 266 C256 262 318 236 346 204 C358 190 366 178 370 " + f(HILL_TOP(370)) + " Z", g[2]);
+        s += L(D2(trace(HILL_TOP, 30, 370), true), SW);
+        s += F("M30 266 Q112 246 200 262 Q290 276 370 252 V300 H30 Z", g[2]) + L("M30 266 Q112 246 200 262 Q290 276 370 252", 1.4, g[3]);
+        s += L("M70 226 Q100 216 128 222 M270 248 Q298 238 328 242 M52 200 Q66 194 80 196", 1.3, g[3], .7);
+        return s + (spec.landExtra ? spec.landExtra(o) : "");
+      },
+      flat: function(o){ return spec.flat ? spec.flat(o, function(sx, sy, x, y){ return sy > HILL_TOP(sx) + 5 && !busy(x, y); }) : ""; },
+      props: function(o){ return spec.props ? spec.props(o, function(sx, sy, x, y){ return sy > HILL_TOP(sx) + 8 && !inYard(x, y) && !busy(x, y); }) : []; },
+      fg: spec.fg || function(){ return ""; }
+    };
   }
 
   var SCENES = {
@@ -761,7 +785,7 @@ export function placeKit(INK, C){
   /* ------------------------------------------------------------------ the homes ------------------------------------ */
   /* Each home: n, note, rarity, theme, price, id (the shop's), ups (the upgrades it takes) and upn (what each is on it),
      door [x, y] (the path starts there), brush and statue (by the door), spots (Timmy's, [x, y, z]), climbs (a raised spot's
-     way up), eaves (where the bunting hangs), h (how tall), foot or round (its footprint: the shadow), base (the line where
+     way up), eaves (where the holiday lights hang), h (how tall), foot or round (its footprint: the shadow), base (the line where
      its walls meet the ground: the skirt), block (where Timmy can't go), draw(o) -> { body, lights } */
   function smoke(x, y){ return G("tp-smoke", circ(x, y, 3.4, "#FFFFFF", 0) + circ(x + 4, y - 7, 4.4, "#FFFFFF", 0) + circ(x + 10, y - 15, 5.4, "#FFFFFF", 0), ' opacity=".9"'); }
   function glowAt(x, y, r){ return circ(x, y, r, K.glow, 0).replace("/>", ' opacity=".28"/>') + circ(x, y, r * .6, K.glow, 0).replace("/>", ' opacity=".28"/>'); }
@@ -1647,23 +1671,68 @@ export function placeKit(INK, C){
     var glint = L("M" + f(t[0] + 3) + " " + f(t[1] - 7) + " l-5 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
     return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
-  /* mastery: one pennant per hub medal in the bunting along the home's eaves (Bronze, Silver, Gold; a Crown is gold with
-     a white crown mark), the hub's tint as a dot when the page gives it */
-  function bunting(h, flair, o){
-    var e = h.eaves; if (!e || !flair.length) return "";
-    var a = P.apply(null, e[0]), b = P.apply(null, e[1]), sag = (e[2] || 4) + 6, list = flair.slice().sort(function(p, q){ return q.lvl - p.lvl; }).slice(0, 6), n = list.length;
-    var pt = function(t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t + Math.sin(t * Math.PI) * sag]; };
-    var line = []; for (var i = 0; i <= 20; i++) line.push(pt(i / 20));
-    var s = L(D2(line, true), 1, "#5B4A57");
+  /* mastery: every hub medal shows by the house, in one of two displays (Sam picks; o.mastery "case" or "plaque"). Both grow
+     with the number of hubs, up to 20, best medals first; the metal says the level (Bronze, Silver, Gold; a Crown is gold
+     with a sparkle) and the color is the hub's own tint. */
+  var MEDAL = ["", ["#C47A3E", "#8F5220", "#E9B07C"], ["#C9D1D9", "#8E98A3", "#F4F7FA"], ["#E8BE45", "#B98A16", "#FFE9A3"], ["#F2C230", "#B98A16", "#FFF3C4"]];
+  function masteryList(flair){ return flair.slice().sort(function(p, q){ return q.lvl - p.lvl; }).slice(0, 20); }
+  function masteryGrid(n){ var cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : n <= 12 ? 4 : 5; return [cols, Math.ceil(n / cols)]; }
+  /* A: a trophy case, one cup per hub on its shelves (it faces you, like the plaque, so the cups show) */
+  function trophyCase(x, y, flair, o){
+    var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
+    var g = masteryGrid(n), cols = g[0], rows = g[1], cw = n <= 1 ? 10 : n <= 4 ? 8.4 : n <= 9 ? 7.2 : n <= 12 ? 6.4 : 5.8, rh = cw + 2.4, k = cw / 7.2;
+    var W = cols * cw + 6, H = rows * rh + 5.4, t = P(x, y, 0), bx = t[0], by = t[1] - 2.6, top = by - H, s = "", lights = "";
+    s += ell(bx + 2, t[1] + .6, W * .52, 3, "#1B2A3A", 0, .14);
+    s += FO("M" + f(bx - W / 2 + 1) + " " + f(t[1]) + " v-3 h2.4 v3 z M" + f(bx + W / 2 - 3.4) + " " + f(t[1]) + " v-3 h2.4 v3 z", K.woodShade, 1.1);
+    s += FO("M" + f(bx + W / 2) + " " + f(by) + " l2.6 -1.8 V" + f(top - 1.8) + " l-2.6 1.8 z", K.woodShade, 1.3);
+    s += FO("M" + f(bx - W / 2) + " " + f(by) + " V" + f(top) + " H" + f(bx + W / 2) + " V" + f(by) + " Z", K.wood, 1.5);
+    s += FO("M" + f(bx - W / 2 - 1.2) + " " + f(top) + " l2.6 -1.8 H" + f(bx + W / 2 + 3.8) + " l-2.6 1.8 z", K.woodLight, 1.3);
+    s += FO("M" + f(bx - 5.4) + " " + f(top - 1.8) + " q5.4 -6.4 10.8 0 z", K.woodLight, 1.3) + tinyTooth(bx, top - 3.4, .3, "#FFFFFF");
+    var gx0 = bx - W / 2 + 2.2, gw = W - 4.4, gy0 = top + 2.2, gh = H - 4.4;
+    s += FO("M" + f(gx0) + " " + f(gy0) + " h" + f(gw) + " v" + f(gh) + " h" + f(-gw) + " z", o.night ? "#FFE9A8" : "#E3F4FB", 1);
+    if (o.night) lights += glowAt(bx, top + H / 2, Math.max(10, W * .45));
+    for (var r = 0; r < rows; r++){
+      var sy = gy0 + gh - (rows - 1 - r) * rh - .2, inRow = Math.min(cols, n - r * cols);
+      if (r < rows - 1) s += L("M" + f(gx0) + " " + f(sy) + " h" + f(gw), 1.3, K.woodShade);
+      for (var c = 0; c < inRow; c++){
+        var fl = list[r * cols + c], lvl = Math.max(1, Math.min(4, fl.lvl | 0)), m = MEDAL[lvl], kk = k * [.8, .8, .9, 1, 1.04][lvl];
+        var cup = FO("M-2.5 0 h5 v-1.6 h-5 z", fl.tint || m[1], .7) + FO("M-.7 -1.6 v-1.2 h1.4 v1.2 z", m[1], .5) +
+          (lvl >= 3 ? L("M-2.5 -6 q-1.9 .2 -1.3 1.9 q.5 .9 1.6 .7 M2.5 -6 q1.9 .2 1.3 1.9 q-.5 .9 -1.6 .7", .8) : "") +
+          FO("M-2.7 -6.9 h5.4 q.1 4.2 -2.7 4.2 q-2.8 0 -2.7 -4.2 z", m[0], .8) + L("M-1.5 -6.1 q-.2 1.6 .5 2.4", .8, m[2], .95);
+        if (lvl >= 4) cup += dmStar(1.8, -8, 2.2, "#FFFFFF", "tp-twinkle", c * .3);
+        s += '<g transform="translate(' + f(bx + (c - (inRow - 1) / 2) * cw) + " " + f(sy - .5) + ") scale(" + f(kk) + ')">' + cup + "</g>";
+      }
+    }
+    s += L("M" + f(gx0 + 1.6) + " " + f(gy0 + 4.6) + " l2.6 -3", 1, "#FFFFFF", .85);
+    return { s: s, lights: lights };
+  }
+  /* B: a plaque on a post, one gem per hub set in its board */
+  function gemPlaque(x, y, flair, o){
+    var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
+    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10 : n <= 4 ? 8.2 : n <= 9 ? 7 : n <= 12 ? 6.2 : 5.6;
+    var W = cols * cell + 7, H = rows * cell + 7, t = P(x, y, 0), bx = t[0], by = t[1] - 9, top = by - H, s = "", lights = "";
+    s += ell(bx + 2, t[1] + 1, 7, 2.6, "#1B2A3A", 0, .14) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 5) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 2.8, K.wood);
+    var board = "M" + f(bx - W / 2) + " " + f(by) + " V" + f(top + 3) + " q0 -3 3 -3 H" + f(bx - 5) + " q5 -5.4 10 0 H" + f(bx + W / 2 - 3) + " q3 0 3 3 V" + f(by) + " q0 2.4 -2.4 2.4 H" + f(bx - W / 2 + 2.4) + " q-2.4 0 -2.4 -2.4 Z";
+    s += FO(board, K.woodLight, 1.5) + F("M" + f(bx + W / 2 - 3.2) + " " + f(top + .8) + " q2.6 .2 2.6 2.4 V" + f(by) + " q0 1.8 -1.8 1.8 h-.8 z", K.wood, .8);
+    s += FO("M" + f(bx - W / 2 + 2.4) + " " + f(top + 2.6) + " h" + f(W - 4.8) + " v" + f(H - 3.2) + " h" + f(-(W - 4.8)) + " z", o.night ? "#3A2F52" : "#4A3550", .9);
+    s += tinyTooth(bx, top - .6, .34, "#FFFFFF");
     list.forEach(function(fl, i){
-      var t = (i + 1) / (n + 1), p = pt(t - .04), q = pt(t + .04), m = pt(t), lvl = Math.max(1, Math.min(4, fl.lvl | 0));
-      var d = "M" + f(p[0]) + " " + f(p[1]) + " L" + f(q[0]) + " " + f(q[1]) + " L" + f(m[0]) + " " + f(m[1] + 10) + " Z";
-      var g = FO(d, PEN[lvl], 1);
-      if (lvl >= 4) g += '<path d="M' + f(m[0] - 2.6) + " " + f(m[1] + 4.4) + ' l.4 -2.4 1 1.1 .8 -1.8 .8 1.8 1 -1.1 .4 2.4 Z" fill="#fff"/>';
-      else if (fl.tint) g += circ(m[0], m[1] + 3.4, 1.4, fl.tint, .6);
-      s += '<g class="tp-pen" style="animation-delay:' + f(i * .25) + 's">' + g + "</g>";
+      var lvl = Math.max(1, Math.min(4, fl.lvl | 0)), m = MEDAL[lvl], c = i % cols, r = Math.floor(i / cols), inRow = Math.min(cols, n - r * cols);
+      var gx = bx + (c - (inRow - 1) / 2) * cell, gy = top + 2.6 + (H - 3.2) / 2 + (r - (rows - 1) / 2) * cell, R = cell * .34, col = fl.tint || m[0];
+      var gem = "M" + f(gx - R) + " " + f(gy - R * .25) + " L" + f(gx - R * .5) + " " + f(gy - R * .95) + " H" + f(gx + R * .5) + " L" + f(gx + R) + " " + f(gy - R * .25) + " L" + f(gx) + " " + f(gy + R) + " Z";
+      s += circ(gx, gy, R + 1.7, m[0], .8) + circ(gx, gy, R + .5, m[1], 0) + FO(gem, col, .7) +
+        F("M" + f(gx - R) + " " + f(gy - R * .25) + " L" + f(gx - R * .5) + " " + f(gy - R * .95) + " H" + f(gx + R * .5) + " L" + f(gx + R) + " " + f(gy - R * .25) + " Z", "#FFFFFF", .38) +
+        L("M" + f(gx - R * .5) + " " + f(gy - R * .25) + " L" + f(gx) + " " + f(gy + R) + " L" + f(gx + R * .5) + " " + f(gy - R * .25), .5, "#FFFFFF", .55);
+      if (lvl >= 4) s += dmStar(gx + R * .9, gy - R * .9, Math.max(1.8, R * .8), "#FFFFFF", "tp-twinkle", i * .3);
+      if (o.night) lights += circ(gx, gy, R + 3, col, 0).replace("/>", ' opacity=".28"/>');
     });
-    return egg("bunting", s);
+    return { s: s, lights: lights };
+  }
+  function mastery(h, flair, o, kind){
+    if (!flair || !flair.length) return { s: "", lights: "", z: 0 };
+    var at = h.mast || FIX.mast, m = kind === "plaque" ? gemPlaque(at[0], at[1], flair, o) : trophyCase(at[0], at[1], flair, o), t = P(at[0], at[1], 0);
+    var spark = dmStar(t[0] - 9, t[1] - 30, 3.4, "#FFFFFF", "") + dmStar(t[0] + 10, t[1] - 22, 2.8, "#FFE27A", "") + dmStar(t[0] + 2, t[1] - 42, 3, "#FFFFFF", "");
+    return { s: egg("mastery", m.s, spark), lights: m.lights, z: at[0] + at[1] + .2 };
   }
 
   /* ------------------------------------------------------------------ the fixed pieces ----------------------------- */
@@ -1779,7 +1848,7 @@ export function placeKit(INK, C){
 
   /* ------------------------------------------------------------------ the render ----------------------------------- */
   /* o = { home, scene, night, yard: { left: "garden", ... }, up: { windows, porch, chimney, flag: true }, paint,
-           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] (the bunting),
+           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] and mastery "case" | "plaque" (the mastery display),
            season "", "fall", "winter", "spring", holiday (holidayId()), marks (dash the empty spots: the full view),
            timmy: { g: markup, at: spot } (a still picture with Timmy in it), viewBox, bare (a yard item on its own) }
      returns { svg, spots (screen [x, y]), plot (yard [x, y, z]), slots { name: path d }, homeHit, eggs [keys] }        */
@@ -1805,12 +1874,13 @@ export function placeKit(INK, C){
     var items = [], lights = "";
     if (!o.bare){
       var drawn = home.draw({ night: night, up: up, paint: o.paint || "cream", fall: season === "fall", snow: snow });
-      var hb = drawn.body + (H === "winter" ? eaveLights(home.eaves) : "") + bunting(home, flair, so);
+      var hb = drawn.body + (H === "winter" ? eaveLights(home.eaves) : "");
       items.push({ z: 11, s: egg("home", hb, G("", dmStar.apply(null, P(5.5, 5.5, home.h - .6).concat([4, "#FFFFFF", ""])) + dmStar.apply(null, P(3.4, 6.6, home.h - 2).concat([3, "#FFE27A", ""])) + dmStar.apply(null, P(7.4, 4.4, home.h - 1.6).concat([3, "#FFFFFF", ""])))) });
       items.push({ z: 11.05, s: skirt(sc, home, so) });
       lights += drawn.lights;
       items.push({ z: FIX.tree[0] + FIX.tree[1], s: sceneTree(sc, so) });
       var st = home.statue || FIX.statue, stt = statue(st[0], st[1], st[2] || 0, tier, o.level || 1, so); items.push({ z: st[0] + st[1] + (st[2] ? 1.2 : .3), s: stt.s }); lights += stt.lights;
+      var ma = mastery(home, flair, so, o.mastery); if (ma.s) { items.push({ z: ma.z, s: ma.s }); lights += ma.lights; }
       var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
       var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
@@ -2034,7 +2104,7 @@ export function placeKit(INK, C){
     brush: { n: "The toothbrush", does: "wiggles", say: "My toothbrush says hi. It talks now, apparently." },
     statue: { n: "Your rank", does: "it gleams", say: "" },
     tree: { n: "The tree", does: "shakes", say: "Whoa, the tree is ticklish." },
-    bunting: { n: "The bunting", does: "flutters", say: "One pennant for every hub you've mastered." },
+    mastery: { n: "Your hub mastery", does: "it sparkles", say: "One for every hub you've mastered. The metal is the medal." },
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },
@@ -2050,8 +2120,39 @@ export function placeKit(INK, C){
     timmy: { n: "Timmy", does: "waves hello; tap him again and he flips", say: "Wheee!" }
   };
   var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
-    home: "tp-pop 1.8s", statue: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
+    home: "tp-pop 1.8s", statue: "tp-pop 2s", mastery: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
     mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s" };
+  /* ------------------------------------------------------------------ the sets (packs) ------------------------------
+     A seasonal set or the rank sets: one function per set in tools/figures/site/packs/, handed this toolkit, returning
+     { k, homes, scenes, yard, outfits }, each keyed by the piece's shop id. Its name, rarity and price come from SETS
+     (tools/figures/site/sets.mjs, the one list the catalog and the art share), so they can't drift. */
+  var TOOLS = { INK: INK, K: K, U: U, SW: SW, P: P, D: D, D2: D2, f: f, RX: RX, RY: RY, rng: rng, F: F, O: O, L: L, FO: FO, HI: HI, G: G, T: T, circ: circ, ell: ell, seg: seg, at: at,
+    box: box, cyl: cyl, cone: cone, dome: dome, lumps: lumps, canopy: canopy, onY: onY, onX: onX, rectUV: rectUV, archUV: archUV, arcPts: arcPts, bands: bands, sun: sun, moon: moon, cloud: cloud,
+    starField: starField, dmStar: dmStar, pine: pine, scatter: scatter, trace: trace, landD: landD, win: win, porthole: porthole, doorArch: doorArch, roundDoor: roundDoor, flagOn: flagOn,
+    tinyTooth: tinyTooth, glowAt: glowAt, smoke: smoke, tuft: tuft, flower: flower, stemLeaf: stemLeaf, daisyOn: daisyOn, tulip: tulip, sunflower: sunflower, mintBall: mintBall,
+    snowSlope: snowSlope, snowDome: snowDome, backSlope: backSlope, firefly: firefly, crystal: crystal, fern: fern, PAINTS: PAINTS, BOLD: BOLD, HILL_TOP: HILL_TOP, hillScene: hillScene,
+    busy: busy, inYard: inYard, p: p, O2: O2, O3: O3, O4: O4, star5: star5, FIX: FIX, S: S };
+  var SET_OF = {};
+  (function(){
+    var info = {}, cap = function(r){ return r.charAt(0).toUpperCase() + r.slice(1); };
+    if (SETS){
+      SETS.seasons.forEach(function(se){ se.items.forEach(function(it){ info[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: se.k }; }); });
+      SETS.ranks.forEach(function(r){ [r.outfit, r.yard].forEach(function(q){ info[q[0]] = { n: q[1], rarity: cap(q[2]), price: 0, set: "rank", rank: r.gtier, rankName: r.rank }; }); });
+    }
+    (PACKS || []).forEach(function(pack){
+      var got = pack(TOOLS);
+      [["homes", HOMES], ["scenes", SCENES], ["yard", YARD], ["outfits", OUTFITS]].forEach(function(pair){
+        var list = got[pair[0]] || {};
+        Object.keys(list).forEach(function(id){
+          var x = list[id], m = info[id] || {};
+          x.k = id; x.id = id; x.set = m.set || got.k; x.theme = ""; x.n = m.n || x.n || id; x.rarity = m.rarity || x.rarity || "Legendary"; x.price = m.price != null ? m.price : x.price || 0;
+          if (m.rank){ x.rank = m.rank; x.rankName = m.rankName; }
+          pair[1][id] = x; SET_OF[id] = x.set;
+          if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
+        });
+      });
+    });
+  })();
   var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "sun"];
 
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
@@ -2073,7 +2174,6 @@ export function placeKit(INK, C){
     "@keyframes tp-drift{0%,100%{transform:translateX(0)}50%{transform:translateX(8px)}}.tp-cloud{animation:tp-drift 9s ease-in-out infinite}",
     ".tp-foam{animation:tp-shim 3.4s ease-in-out infinite}.tp-wave{animation:tp-drift 4s ease-in-out infinite}",
     "@keyframes tp-spout{0%,100%{opacity:1}50%{opacity:.5}}.tp-spout{animation:tp-spout 1.4s ease-in-out infinite}",
-    "@keyframes tp-pen{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}.tp-pen{transform-box:fill-box;transform-origin:50% 0;animation:tp-pen 2.6s ease-in-out infinite}",
     "@keyframes tp-spin{to{transform:rotate(360deg)}}.tp-beam{animation:tp-spin 8s linear infinite}",
     "@keyframes tp-steam{0%{transform:translateY(4px);opacity:0}40%{opacity:.85}100%{transform:translateY(-12px);opacity:0}}.tp-steam path{animation:tp-steam 3s ease-out infinite}.tp-steam path:nth-child(2){animation-delay:1s}.tp-steam path:nth-child(3){animation-delay:2s}",
     /* the eggs */
@@ -2104,7 +2204,7 @@ export function placeKit(INK, C){
     "[data-egg='rabbit'].tp-on .tp-eo{transform-box:fill-box;transform-origin:50% 100%;animation:tp-burrow 1.8s ease}[data-egg='crab'].tp-on .tp-eo{animation:tp-scuttle 1.6s ease}",
     "[data-egg='owl'].tp-on .tp-owlhead{transform-box:fill-box;transform-origin:50% 100%;animation:tp-turn 1.6s ease}[data-egg='owl'].tp-on .tp-owlhead .tp-eb{animation:tp-blink 1.6s}[data-egg='balloon'].tp-on .tp-eo{animation:tp-rise2 3s ease-in-out}",
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
-    "[data-egg='mailbox'].tp-on .tp-mflag{transform-box:fill-box;transform-origin:0 100%;animation:tp-flip 2.2s ease}[data-egg='hammock'].tp-on .tp-cloth{animation:tp-swing 1.6s ease-in-out}[data-egg='bunting'].tp-on .tp-pen{animation:tp-flutter .3s ease-in-out 5}",
+    "[data-egg='mailbox'].tp-on .tp-mflag{transform-box:fill-box;transform-origin:0 100%;animation:tp-flip 2.2s ease}[data-egg='hammock'].tp-on .tp-cloth{animation:tp-swing 1.6s ease-in-out}",
     "[data-egg='fountain'].tp-on .tp-eb,[data-egg='geyser'] .tp-eb{transform-box:fill-box;transform-origin:50% 100%}[data-egg='pool'].tp-on .tp-eb{transform-box:fill-box;transform-origin:center}",
     /* the rarity frames and the placing burst */
     "@keyframes tp-r-shine{0%,58%{transform:translateX(0)}100%{transform:translateX(340px)}}.tp-r-shine{animation:tp-r-shine 3.8s ease-in-out infinite}",
@@ -2123,13 +2223,13 @@ export function placeKit(INK, C){
   return {
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
-    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs"]),
-    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight"]),
-    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide"]),
+    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),
+    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]),
+    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]),
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say"]), dress: dress,
+    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]), dress: dress, SETS: SETS || null,
     THEMES: THEMES, RARITIES: RARITIES, EGGS: EGGS, frame: frame, burst: burst, coin: coin, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; }
   };
