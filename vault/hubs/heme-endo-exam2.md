@@ -7,8 +7,10 @@ status: live
 
 # Heme & Endo Exam 2
 
-DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, 45 on L11-L18 and Dr. Taylor's Lecture A, 5 on Exam 1
-material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its `HUBS` entry in `index.html`.
+DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, 45 on L11-L18, 5 on Exam 1 material. **Dr. Taylor's Lecture A
+is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
+that for exam 3"): the hub's A came out whole that day, and everything it had (notes, narration, 58 questions, hints,
+tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its `HUBS` entry in `index.html`.
 
 ## Before you work on it
 
@@ -18,8 +20,7 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   without the Patient Box case kit (`PCASES` is empty; Patient Box questions are text boxes). Palette "Luteal" (aubergine
   ink, blush paper, a berry accent and corpus-luteum gold); Literata / Hanken Grotesk / Overpass Mono. State key
   `hee2-state-v1`, answered event `hee2:answered`.
-- **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), A Dental
-  endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
+- **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
   female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 207 questions copied
   from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
   question** (206, under Exam 1's 55 predicted topics, in Exam 1's topic order) plus `r-pa-2s-2`, untagged. **Never cut
@@ -42,8 +43,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
   adds "+ n Exam 1 review") and, through `SH_EXPORT.uncounted()`, the mastery medal in `widget/ranks.js`. Its answers
   still count for XP, streaks and leaderboards, and the bank, mock, drill and search still use its questions.
-- **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A, L13, L14 and L15
-  went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
+- **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A (since removed), L13,
+  L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
   Every Zoom caption is labeled "Michael Herr" because the room's account is his: A is Dr. Taylor and L15 Dr. Madison.
   Their questions' `src` is `rec` where the point was said aloud. L16 is still slides-only (taught Tue 11/10). L17 and L18
@@ -85,8 +86,11 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   each section) has a question, the untagged questions filling those gaps (about 5-10 more per lecture; stained-section
   identification, near-duplicates and slide trivia stay out). On the Exam 2 lectures, 133 cut questions came back as they were (ids
   un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
-  `fh-tf-atresia`). The Exam 2 lectures now hold 421: L11 63, L12a 52, L12b 55, A 54, L13 52, L14 58, L15 48, L16 39; 300
-  are High Likelihood. **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
+  `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures hold 393
+  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43; 258 are High Likelihood. The mock's 45 are L11 8, L12a 7,
+  L12b 7, L13-L15 6 each, L16 5 (A's 5 went one each to L12a and L13-L16). **The mock stays 50 questions** (Sam,
+  2026-11-10); when Dr. Herr gives the exam's breakdown per lecture, Sam will pass it on: put it in `EXAM_COUNTS` and
+  `MOCK_BLUEPRINT` (and give each lecture that many High Likelihood topics, [high-likelihood-topics](../rules/high-likelihood-topics.md)). **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
   topics covered, its notes' key terms covered once, nothing on skipped points.
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
   histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
@@ -120,18 +124,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
 - **L12b:** the pheochromocytoma rule of 10s is taught with his warning that the numbers are dated. CAH: the slide's
   "1/3 of cases have sodium wasting" may be inverted (references say most classic cases); p2-tf-12 is keyed True to the
   slide. Adrenal cortical carcinoma "> 2 cm" on the slide (likely meant larger).
-- **A (taught, 11/6 recording):** slide 15's PTH "inhibits osteoblasts" he also said aloud (13:21); the notes keep Exam
-  1's mechanism (PTH acts on osteoblasts, which drive osteoclasts); no key depends on it. Slide 17 is the lamina dura
-  radiographs and a brown tumor (14:52-15:58); slide 35 an image he didn't teach. Kept as taught, no key depends on them:
-  FSH named as the driver of testosterone (2:56; L13 and L15 teach LH, and the notes say use LH); hyperthyroidism
-  "generally an adenoma" (11:02; L12a: Graves is the most common cause); diabetes insipidus tied to sodium retention
-  (17:29); Addison patients "losing sodium and potassium" (17:46; losing aldosterone retains potassium); the pituitary
-  "stimulating" the adrenal medulla (19:36); Farxiga "stimulating" the sodium-glucose transporter (26:39; it inhibits
-  SGLT2); HbA1c above 5.3 a "prediabetes risk" and fasting glucose over 100 suggesting diabetes (25:56, 28:07; L11's
-  cutoffs are used for diagnosis); fructose "toxic" and honey "all fructose" (34:28, 35:02); a "3.5-gland"
-  parathyroidectomy "causing hyperparathyroidism" (13:02). He called metformin with a skipped breakfast a high
-  hypoglycemia risk (21:43-22:31), against L11; `dc-metformin-skip` asked it "in Dr. Taylor's example" until the
-  high-yield cut retired it (2026-11-08), so no question turns on it now.
+- **A:** no longer in this hub (2026-11-10); its content flags moved with it to
+  [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
 - **L13 (taught, 11/6 recording):** he said "lower" for the testis temperature (3:58), so 35 °C stays from the slide;
   74 days said aloud (14:59). Slips the hub doesn't follow: "gap junctions" for the Sertoli occluding junctions (7:09),
   "ductus deferens" for the efferent ductules (1:45), "seminiferous tubules" for the seminal vesicles (33:35). His
@@ -161,7 +155,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   so `mh-fig-seq` isn't given away). `build.mjs` writes the hub's `var FIGS = {...};` line along with the anima blocks; edit
   the module, never the line. It sits above `mh-fig-seq` and `mh-fig-label` and under L13's "Sertoli cells" heading.
 - **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
-  after `mq()`, followed by one block of two of each per lecture (ids `<prefix>-ws-*` and `<prefix>-wf-*`). L16 (`fphys`)
+  after `mq()`, followed by one block of two of each per lecture (ids `<prefix>-ws-*` and `<prefix>-wf-*`; A's four,
+  `dc-*`, left with it). L16 (`fphys`)
   has its four from the slides; when its recording lands, check them against what Dr. Madison said. Six older items are
   tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
   `r-ca-calcitonin`).

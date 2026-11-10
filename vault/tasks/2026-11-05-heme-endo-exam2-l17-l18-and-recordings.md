@@ -79,5 +79,8 @@ re-rank High Likelihood from the review on Wed 11/11.
   random from them, R out of the bank's default lectures; "fill in the gaps a little more" (a key-term pass: 68 back, 2
   new; Exam 2 lectures 421); L14 38-39 is the endometrium during menstruation, so the focus topics were re-ranked from the
   decks' real slide order. Still to do: the same as above.
+- 2026-11-10: Lecture A is not on Exam 2 (Sam asked Dr. Herr: he forgot about it, so it will likely be on the next exam;
+  "i guess save all that for exam 3"). It came out of the hub whole; the Exam 3 hub picks it up:
+  [the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
 
 ## Outcome
