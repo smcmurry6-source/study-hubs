@@ -20,17 +20,20 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), A Dental
   endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 80 questions copied
-  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **at least one for each of Exam 1's
-  55 predicted topics** plus one for each point an Exam 1 professor stressed that no other copy tested (25, back since
-  2026-11-10), in Exam 1's topic order. (It held 219 from 2026-11-06, every Exam 1 High Likelihood question plus 13 of
-  its hardest, then 55 after the high-yield cut below.) Keep it lean: Exam 2 asks only 5 questions on Exam 1. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 207 questions copied
+  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
+  question** (206, under Exam 1's 55 predicted topics, in Exam 1's topic order) plus `r-pa-2s-2`, untagged. **Never cut
+  them** (Sam, 2026-11-10: "include all of the exam 1 high likelihood questions. do not cut them"). (It held 219 from
+  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below,
+  until Sam's call.) A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
-  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. Every R question is High
-  Likelihood (filed under its predicted topic), and **the mock's five Exam 1 questions come only
-  from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
-  `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
-  Physiology: ..." prefix, so keep it), unseen or missed questions first.
+  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. **The mock's five Exam 1
+  questions come only from R's High Likelihood questions** (Sam, 2026-11-06), **drawn at random** (Sam, 2026-11-10: "pull
+  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`.
+  **The Question Bank leaves R out by default** (Sam, 2026-11-10: "do not include them in the default question bank filter
+  unless you click to include them"): `qlec: 'all'` means the Exam 2 lectures (`bankDefaultIds`); R joins when it is ticked
+  in the Lectures list, when Exam 1 High likelihood is turned on (which ticks R, and unticks it again when turned off:
+  `STATE.ui.qE1auto`), or when a search jump matches a Refresher question; a tag "Exam 2 lectures + R" shows it's in.
   The Question Bank's Only line has an extra toggle for them, **Exam 1 High likelihood** (`likely1`, Sam, 2026-11-06): only R's
   High Likelihood questions; turning it on ticks R if it isn't ticked, and turns "High likelihood" (every lecture's) off. Either
   one works on top of the Show chip (Missed last time, Not answered yet, Pinned).
@@ -73,25 +76,29 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   tested) and points a professor played down came out, and their ids are retired.
 - **Coverage, not a count, decides what's in it** (Sam, 2026-11-08: "be sure the emphasized points are covered,
   deemphasized points are left out ... other content is sufficiently covered without being overwhelming ... the rest of the
-  questions should be filling in the gaps ... be sure that the high likelihood questions are sufficient"). On 2026-11-10
-  every lecture was audited against that: each `emphasize` hint (and each of Dr. Herr's focus slides) has a question; no
-  question's key depends on a `deemphasize` hint; **each High Likelihood topic has one HL question for each point it names**
-  (no two on the same fact); and each notes section with testable content has at least one question, the untagged
-  questions filling those gaps. 90 cut questions came back as they were (ids un-retired) and 2 were written for points
-  nothing tested (`dm-met-lactic`, metformin's lactic acidosis; `mh-spermio-phases`). Now 431: L11 53, L12a 44, L12b 45,
-  A 43, L13 44, L14 45, L15 42, L16 35, R 80; 369 are High Likelihood (289 of the 351 on the Exam 2 lectures), because the
-  topics name most of what the recordings stressed. **Adding to it:** a new lecture (L17, L18) or one going taught gets
-  the same audit: its hints and topics covered, gaps filled once, nothing on skipped points.
+  questions should be filling in the gaps ... be sure that the high likelihood questions are sufficient"; 2026-11-10: "i
+  definitely want the stressed topics to be the core of the bank, but i do think its important to fill in the gaps a
+  little more"). Audited twice on 2026-11-10: each `emphasize` hint and each of Dr. Herr's focus slides has a question; no
+  question's key depends on a `deemphasize` hint ("the numbers may not be accurate" is not one: the rule of 10s,
+  `p2-num-4`, and Dr. Taylor's metformin example, `dc-metformin-skip`, are back); **each High Likelihood topic has one HL
+  question for each point it names** (no two on the same fact); and then **each testable key term in the notes** (not only
+  each section) has a question, the untagged questions filling those gaps (about 5-10 more per lecture; stained-section
+  identification, near-duplicates and slide trivia stay out). On the Exam 2 lectures, 133 cut questions came back as they were (ids
+  un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
+  `fh-tf-atresia`). The Exam 2 lectures now hold 421: L11 63, L12a 52, L12b 55, A 54, L13 52, L14 58, L15 48, L16 39; 300
+  are High Likelihood. **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
+  topics covered, its notes' key terms covered once, nothing on skipped points.
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
   histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
-  L13 and L14 (drawn as "focus list", no quotation marks, since it came from the class), and the topics on those slides
-  rank first, basis "focus list + recording" (L13: the Sertoli drawing, Sertoli cells, LH vs FSH, spermatogenesis,
-  spermiogenesis, inside or outside the tubule; L14: the follicle stages, menstruation, the uterine tube, FSH and LH on the
-  follicles, the linings, the cycle graph, granulosa vs theca). The slide decks were too large to open, so **which content
-  sits on those slide numbers was inferred** from the order of the notes (L13 8-10 Sertoli cells, 12 Leydig cells, 19-21
-  the spermatogonia, meiosis and spermiogenesis; L14 18-21 the secondary and Graafian follicles, 30-31 the uterine tube
-  and the uterus's regions, 33-34 the endometrium, 38-39 the cervix and vagina). If Sam or the slides say otherwise,
-  re-rank the topics.
+  L13 and L14 (drawn as "focus list", no quotation marks, since it came from the class) that says what is on those slides,
+  and the topics on them rank first, basis "focus list + recording". What is on the slides comes from the decks' own slide
+  order (Drive copies of 2026-11-04; L13 46 slides, L14 50; Sam confirmed L14 38-39): **L13** 8-10 the Sertoli cell (shape,
+  occluding junctions and the blood-testis barrier, FSH, its functions, on the labeled seminiferous-epithelium drawing), 12
+  the Leydig cells outside the tubules, 19 the three spermatogonia and the clonal path to sperm, 20 a vascular cast (image
+  only), 21 a labeled tubule; **L14** 18-21 the secondary (antral) and Graafian follicles, 30-31 the uterine tube's cells
+  (ciliated and peg cells), 33-34 the uterine wall's layers and the endometrium's structure, 38-39 the endometrium's layers
+  and menstruation. Not on them: spermiogenesis (L13 22), the uterus's regions (L14 32), the cycle graphs (23-25, 35), the
+  cervix and vagina (41-44). L14 has a topic for 33-34, "The uterine wall".
 - **What a professor says you don't need isn't asked** (Sam, 2026-11-08; now a standing rule for every hub,
   [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
   recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`

@@ -3572,6 +3572,23 @@ mq("dm-ex-micro", "dmpharm", "rec", "Each of the following is a microvascular co
    ["Nephropathy", "Nephropathy is microvascular; diabetes is the leading cause of end-stage renal disease."],
    ["Retinopathy", "Retinopathy is microvascular and is often how an optometrist first discovers that a patient has diabetes."]],
   "Microvascular means small vessels: neuropathy, nephropathy and retinopathy. Macrovascular means big vessels: coronary artery disease, peripheral vascular disease and stroke.", {fmt:'except'});
+tf("dm-tf-1", "dmpharm", "rec", "The non-ketotic hyperosmolar state carries a higher mortality than diabetic ketoacidosis.", true,
+  "Both are acute complications. DKA comes from cells starved of glucose burning fatty acids into ketone bodies; the non-ketotic hyperosmolar state comes from the sheer amount of glucose in the blood and can lead to stupor, coma and death.",
+  "The professor said the hyperosmolar state is actually more deadly than DKA.",
+  "It is the other way around: the non-ketotic hyperosmolar state has the higher mortality.");
+mq("dm-secondary", "dmpharm", "rec", "A patient with no history of diabetes develops hyperglycemia while being treated for Cushing syndrome. According to the lecture, treatment should focus on:",
+  [["The underlying Cushing syndrome that is causing the hyperglycemia", "Secondary diabetes has a primary cause, and the professor said you treat that cause rather than the diabetes."],
+   ["Lifelong insulin, because new hyperglycemia means type 1 diabetes", "Type 1 is autoimmune loss of beta cells; hyperglycemia caused by another disease is secondary, not type 1."],
+   ["Metformin, because it is first-line for any newly found hyperglycemia", "Metformin is first-line for type 2 diabetes in an otherwise healthy patient, not for hyperglycemia with a treatable cause."],
+   ["A sulfonylurea, to squeeze more insulin out of the pancreas", "Stimulating insulin release ignores the cause of the high glucose."]],
+  "Pregnancy (gestational diabetes), acromegaly, Cushing syndrome, thyrotoxicosis, chronic pancreatitis, cancer and several drugs can raise glucose. That is secondary diabetes: there is a primary cause, and treatment is aimed at it.");
+mq("dm-pb-k", "dmpharm", "hub", "A man without diabetes is treated for a dangerously high potassium (see the Patient Box). Why is dextrose given together with the insulin?",
+  [["To prevent hypoglycemia while insulin drives potassium into cells", "Insulin lowers potassium by stimulating Na/K-ATPase uptake into cells; the glucose gives insulin something to clear so blood sugar doesn't crash."],
+   ["Because dextrose itself is what pumps potassium into the cells", "The potassium-lowering effect is insulin's, through Na/K-ATPase; the dextrose is there to protect the blood glucose."],
+   ["To treat the undiagnosed diabetes that raised his potassium level", "He has no diabetes; here insulin is used only as a potassium-lowering drug."],
+   ["To replace glucose he is losing in the urine by osmotic diuresis", "Glucose lost in the urine is what SGLT2 inhibitors cause; it has nothing to do with this treatment."]],
+  "Insulin increases cellular potassium uptake through Na/K-ATPase, so it is a standard way to bring down a high potassium, even in people who don't have diabetes. It is given with glucose so the patient doesn't become hypoglycemic.",
+  {pbox:[["Patient", "67-year-old man in the emergency department with muscle weakness and an irregular heartbeat"], ["Potassium", "6.5 mEq/L (normal 3.5 to 5)"], ["Diabetes", "None"], ["Orders", "Regular insulin IV with dextrose"]]});
 
 /* ---- The dental patient: diagnosis and first-line drug (set) ---- */
 mq("dm-pb-dx-1", "dmpharm", "hub", "A dental patient with repeated periodontal abscesses is sent for blood work (see the Patient Box). Which conclusion do the results best support?",
@@ -3611,6 +3628,12 @@ mq("dm-ins-basal", "dmpharm", "rec", "In a basal-bolus regimen, which insulin is
    ["Regular insulin", "Regular insulin peaks around 3 hours and is gone by about 8; it is used before meals."],
    ["Inhaled insulin (Afrezza)", "Afrezza starts working within a minute or two, an ultra-fast mealtime insulin."]],
   "Basal insulin runs all day whether or not the patient eats; bolus insulin is taken as needed (PRN) before each meal and skipped if the meal is skipped.");
+mq("dm-ins-nph", "dmpharm", "rec", "What does the protamine in NPH insulin do?",
+  [["It slows absorption from the injection site, so insulin lasts longer", "Hagedorn added the protein protamine so injected insulin is released slowly, turning a short-acting insulin into an intermediate one."],
+   ["It speeds absorption so the insulin can be given right before meals", "Faster release is what the rapid analogs (lispro, aspart, glulisine) were modified for; protamine does the opposite."],
+   ["It protects insulin from DPP-4 so the insulin can be taken by mouth", "DPP-4 breaks down incretins, not insulin, and no insulin is swallowed; the one non-injected insulin is inhaled Afrezza."],
+   ["It acidifies the solution so the insulin can be mixed with any other", "The N stands for neutral: the preparation is neither acidic nor basic."]],
+  "NPH = neutral protamine Hagedorn: neutral pH, protamine to slow absorption, and Hagedorn, the researcher. It was the first change made to lengthen insulin's action, so patients needed fewer injections.");
 
 tf("dm-tf-2", "dmpharm", "rec", "Regular insulin and NPH can be bought at a pharmacy without a prescription.", true,
   "The professor stressed it: the two older human insulins, regular (Humulin R, Novolin R) and NPH (Humulin N, Novolin N), are sold without a prescription to patients who know how to use them. The analogs are not.",
@@ -3621,6 +3644,12 @@ two("dm-2s-6", "dmpharm", "rec", "Afrezza is an inhaled insulin that starts acti
   "Afrezza, inhaled, is the fastest insulin (a minute or two). The sharp peak around 3 hours belongs to regular insulin; glargine releases slowly and evenly with no real peak, which is what makes it a basal insulin.",
   "it is given by inhalation and its action sets in within one to two minutes.",
   "the peak around 3 hours (gone by about 8) is regular insulin; glargine has a slow, flat release lasting more than 24 hours.");
+mq("dm-ex-insae", "dmpharm", "slides", "Each of the following is an adverse effect of insulin EXCEPT:",
+  [["Weight loss", "Insulin is anabolic, so it causes weight gain, not weight loss."],
+   ["Hypoglycemia", "Hypoglycemia is insulin's main adverse effect, shared by every drug that raises insulin release."],
+   ["Lipohypertrophy at the injection site", "Fat can build up at a repeatedly used injection site; it is on the list."],
+   ["Lipoatrophy at the injection site", "Fat can also waste away at an injection site; it is on the list too."]],
+  "Insulin's adverse effects: hypoglycemia, weight gain, transient worsening of retinopathy, and lipoatrophy or lipohypertrophy at the injection site.", {fmt:'except'});
 
 tf("dm-tf-9", "dmpharm", "rec", "Starting insulin can cause a temporary worsening of diabetic retinopathy before it improves.", true,
   "Transient deterioration of retinopathy is a listed adverse effect: most people with diabetes already have some eye disease, and starting insulin may make it worse for a while before it gets better.",
@@ -3739,6 +3768,12 @@ nums("dm-num-1", "dmpharm", "rec", "Which statements about metformin are true?",
   [true, true, false, true], [[1, 3, 4], [2, 3, 4], [2, 4]],
   "Metformin lowers hepatic glucose output, lowers B12 absorption (some patients need B12 injections), is weight neutral or causes modest weight loss, and is absolutely contraindicated below an eGFR of 30.",
   ["inhibiting hepatic gluconeogenesis is its primary effect.", "decreased B12 absorption is a listed adverse effect; some patients need B12 injections.", "metformin is weight neutral or causes modest weight loss; weight gain belongs to insulin, the secretagogues and TZDs.", "an eGFR below 30 is an absolute contraindication."]);
+mq("dm-ex-met", "dmpharm", "slides", "Metformin should be avoided, or used with caution, in each of these patients EXCEPT one with:",
+  [["Obesity, with a BMI of 33", "Metformin is weight neutral or causes modest weight loss, so obesity is no reason to avoid it."],
+   ["Heavy daily alcohol intake", "The slide says to avoid metformin with excessive acute or chronic alcohol use."],
+   ["Acute, unstable heart failure", "Unstable or acute heart failure is a listed caution."],
+   ["Acute metabolic acidosis", "Acute or chronic metabolic acidosis is a contraindication; lactic acidosis is one of metformin's adverse effects."]],
+  "Metformin's contraindications: eGFR below 30 and acute or chronic metabolic acidosis. Cautions: excessive alcohol, unstable or acute heart failure, and hepatic impairment.", {fmt:'except'});
 
 mq("dm-pb-renal-1", "dmpharm", "hub", "An older patient's kidney function has fallen since his last visit (see the Patient Box). What should happen to his metformin?",
   [["Stop it: an eGFR below 30 is an absolute contraindication", "Metformin is well tolerated, but the professor said that when the GFR is below 30 it is not given."],
@@ -3784,6 +3819,10 @@ two("dm-2s-3", "dmpharm", "rec", "Thiazolidinediones act on a cell-surface tyros
   "TZDs are PPAR-gamma agonists: PPAR-gamma is a nuclear receptor, mostly in adipose tissue, that switches on genes of glucose and lipid metabolism. They add fat cells and fat mass and cause weight gain and edema, while improving insulin sensitivity.",
   "they bind PPAR-gamma, a nuclear receptor that regulates genes of glucose and lipid metabolism; the tyrosine kinase is the insulin receptor.",
   "they increase the number of fat cells and fat mass, and weight gain is a listed adverse effect.");
+tf("dm-tf-5", "dmpharm", "slides", "Pioglitazone should be avoided when ALT is more than 2.5 times the upper limit of normal.", true,
+  "TZD cautions: NYHA class III or IV heart failure, and hepatic disease (avoid if ALT is more than 2.5 times the upper limit of normal). Their advantages are a low risk of hypoglycemia, preserved beta-cell function, higher HDL and lower triglycerides and blood pressure.",
+  "The slide's hepatic caution for TZDs is exactly this: avoid if ALT is over 2.5 times the upper limit of normal.",
+  "It is a listed caution: TZDs are avoided when ALT is above 2.5 times the upper limit of normal.");
 
 mq("dm-tzd-eye", "dmpharm", "slides", "A patient with type 2 diabetes had a drug added six months ago. Her optometrist now finds macular edema and asks her physician to review the change. Which added drug is the most likely culprit?",
   [["Pioglitazone", "The fluid retention TZDs cause isn't only in the ankles: the lecture links them to macular edema, which is why retinal health is watched."],
@@ -3853,6 +3892,24 @@ two("dm-2s-4", "dmpharm", "rec", "DPP-4 inhibitors are given by subcutaneous inj
   "The gliptins (sitagliptin, saxagliptin, linagliptin, alogliptin) are oral, once daily, weight neutral and free of hypoglycemia. Weekly injections are the long-acting GLP-1 agonists.",
   "the gliptins are all taken by mouth once daily; weekly injections belong to GLP-1 agonists such as dulaglutide and semaglutide.",
   "no hypoglycemia and weight neutrality are their listed advantages.");
+mq("dm-ex-dpp4", "dmpharm", "slides", "Each of the following is a listed advantage of DPP-4 inhibitors EXCEPT:",
+  [["Strong, lasting A1C lowering", "The reverse is true: their A1C lowering is modest and their durability low (about 2 years)."],
+   ["No hypoglycemia when used alone", "No hypoglycemia is an advantage, as with the GLP-1 agonists."],
+   ["Weight neutral", "They are weight neutral (some people lose a little)."],
+   ["Usable in kidney and liver dysfunction", "The slide says they can be used in patients with renal and hepatic dysfunction."]],
+  "DPP-4 inhibitors: well tolerated, weight neutral, no hypoglycemia, usable in renal and hepatic dysfunction (no renal adjustment for linagliptin). Drawbacks: expensive, modest A1C lowering, low durability, avoid in heart failure except sitagliptin.", {fmt:'except'});
+mq("dm-agi", "dmpharm", "rec", "A patient starts acarbose. Which adverse effect best fits how it works?",
+  [["Flatulence and bloating from carbohydrate left undigested in the gut", "Acarbose blocks alpha-glucosidase at the brush border, so starch and disaccharides aren't broken down; the GI effects scale with the dose and the carbohydrate eaten."],
+   ["Genital yeast infections from glucose spilled into the urine", "Glucose in the urine and genital yeast infections come with SGLT2 inhibitors."],
+   ["Ankle edema and weight gain from fluid retained in the tissues", "Edema and weight gain come with the thiazolidinediones."],
+   ["Frequent hypoglycemia from extra insulin squeezed out of the pancreas", "Acarbose doesn't release insulin and causes no hypoglycemia on its own."]],
+  "Alpha-glucosidase inhibitors (acarbose, miglitol) work in the gut: complex carbohydrates aren't broken down, so less is absorbed and the post-meal spike is smaller. Malabsorption, flatulence, bloating and diarrhea follow. They are most effective on a starchy, high-fiber diet low in glucose and sucrose.");
+mq("dm-amylin", "dmpharm", "slides", "Which statement about pramlintide is correct?",
+  [["It is a synthetic amylin injected before meals, in type 1 or type 2 diabetes", "Pramlintide (Symlin) is synthetic amylin given subcutaneously before meals; it can be used in both types."],
+   ["It is an oral DPP-4 inhibitor that preserves the body's own GLP-1 and GIP", "Preserving GLP-1 and GIP is what the gliptins do; pramlintide is injected."],
+   ["It is an inhaled insulin that starts working within one to two minutes", "The inhaled insulin is Afrezza."],
+   ["It raises glucagon release, which protects against hypoglycemia with insulin", "Amylin lowers glucagon release, and pramlintide can cause hypoglycemia when used with insulin."]],
+  "Amylin is co-secreted with insulin by beta cells (islet amyloid polypeptide). It acts in the hindbrain to lower glucagon, slow gastric emptying and increase satiety, and it forms amyloid fibers in type 2. Pramlintide: half-life about 50 minutes, cleared by the kidney; nausea, and hypoglycemia with insulin.");
 
 /* ---- Alpha-glucosidase inhibitors, amylin, SGLT2 inhibitors, others ---- */
 
@@ -3931,6 +3988,18 @@ mq("p1-hemianopsia", "path1", "slides",
    ["Loss of both nasal fields, from pressure on the uncrossed lateral fibers", "The uncrossed lateral fibers are spared, and the fields lost are the temporal ones, not the nasal ones."],
    ["Loss of one whole eye's field, from pressure on a single optic nerve", "Pressing one optic nerve can affect that eye, but pressure on the chiasm itself hits the crossing fibers from both eyes."]],
   "The adenoma presses on the crossing central fibers of the optic chiasm and spares the uncrossed lateral fibers, so the outer (temporal) half of each eye's field is lost: bitemporal hemianopsia, beginning in the upper temporal quadrants.");
+tf("p1-tf-hyperpit", "path1", "slides",
+  "Excess hormone production by the anterior pituitary almost always means a pituitary adenoma.", true,
+  "Hyperpituitarism almost always implies an adenoma. The rare causes are carcinoma, nontumorous hyperplasia, hypothalamic lesions and visceral cancers.",
+  "The slide says hyperpituitarism almost always implies an adenoma.",
+  "Other causes exist (carcinoma, hyperplasia, hypothalamic lesions, visceral cancers), but they are rare; an adenoma is almost always the cause.");
+mq("p1-somato", "path1", "slides",
+  "A 50-year-old man's hat no longer fits. Imaging shows an enlarged skull and vertebrae and a 2.5 cm sellar mass, and he has new glucose intolerance and hypertension. Which cells make up the tumor?",
+  [["Somatotrophs, making growth hormone", "Growth hormone excess in an adult enlarges bones and organs (acromegaly) and brings glucose intolerance, osteoporosis and hypertension; somatotroph tumors are the largest adenomas."],
+   ["Corticotrophs, making ACTH and MSH", "ACTH excess (Cushing disease) also brings hypertension and diabetes, but with central obesity and a moon face, not an enlarging skull, and these tend to be microadenomas."],
+   ["Gonadotrophs, making FSH and LH", "Gonadotroph adenomas are large but cause no clinical syndrome; they don't enlarge bones."],
+   ["Thyrotrophs, making thyroid-stimulating hormone", "A TSH-secreting adenoma causes hyperthyroidism (weight loss, tremor, heat intolerance), not bone growth."]],
+  "Somatotroph tumors are the largest pituitary adenomas and often show mass effects. Growth hormone excess causes gigantism in a child and acromegaly in an adult, with glucose intolerance, osteoporosis and hypertension.");
 
 two("p1-2s-gigant", "path1", "rec",
   "Gigantism is the result of growth hormone excess in an adult.",
@@ -3967,6 +4036,13 @@ tf("p1-tf-hypopit75", "path1", "slides",
   "The gland has a large reserve: hypopituitarism appears only after about 75 percent of the anterior pituitary parenchyma is lost. Less often, a hypothalamic disorder (such as a hypothalamic tumor) blocks delivery of the releasing factors.",
   "The threshold is about 75 percent loss, not 25 percent.",
   "It takes loss of about 75 percent of the anterior pituitary parenchyma.");
+mq("p1-null-cell", "path1", "rec",
+  "Which best explains how a \"null cell\" adenoma leads to hypopituitarism?",
+  [["It makes no hormone itself, and as it grows it shuts down the normal pituitary", "A non-secretory adenoma is just a mass: none of its cells make hormone, and it shuts the normal gland down."],
+   ["It cuts the pituitary's blood supply after childbirth, causing ischemic necrosis", "That is Sheehan syndrome, postpartum ischemic necrosis, not an adenoma."],
+   ["It pushes the subarachnoid space into the sella through a defect in the diaphragm", "That describes empty sella syndrome, a chronic herniation through a defective diaphragma sellae."],
+   ["Its hormone excess feeds back on the hypothalamus and stops every releasing hormone", "A null cell adenoma has no hormone excess at all; that is what 'null cell' means."]],
+  "Non-secretory (null cell) adenomas head the slide's list of causes of hypopituitarism: the tumor makes no hormone, and as a mass-like lesion it shuts down the pituitary around it.");
 mm("p1-mm-hypopit", "path1", "slides",
   "Which of these are causes of hypopituitarism? Select all that apply.",
   [["Sheehan syndrome (postpartum ischemic necrosis)", true, "Ischemic necrosis of the anterior pituitary after delivery is a classic cause."],
@@ -3975,6 +4051,14 @@ mm("p1-mm-hypopit", "path1", "slides",
    ["A prolactin-secreting microadenoma (prolactinoma)", false, "A prolactinoma is the most common hyperfunctioning tumor, usually a microadenoma: hormone excess, not deficiency."],
    ["Ectopic ADH made by small cell carcinoma of the lung", false, "Ectopic ADH from a lung tumor is the most common cause of SIADH, a posterior pituitary syndrome, not hypopituitarism."]],
   "Hypopituitarism appears after about 75 percent of the anterior pituitary is lost. The lecture's causes: non-secretory (null cell) adenomas, ischemic necrosis (Sheehan syndrome), ablation, empty sella syndrome, inflammatory lesions, trauma and metastatic neoplasms.");
+mq("p1-x-macro", "path1", "slides",
+  "A woman whose anterior pituitary has been largely destroyed could have each of the following EXCEPT:",
+  [["Milky discharge from the nipples (galactorrhea)", "Galactorrhea is prolactin excess, the prolactinoma picture; hypopituitarism brings the opposite, an inability to produce milk."],
+   ["Sensitivity to cold, with fatigue", "Fatigue and sensitivity to cold are on the slide's list of hypopituitarism symptoms."],
+   ["Irregular or absent periods and loss of pubic hair", "Irregular or absent periods and loss of pubic hair are on the slide's list for women, since the pituitary hormones that run the cycle are missing."],
+   ["Facial puffiness and anemia", "Facial puffiness and anemia are both on the slide's list of hypopituitarism symptoms."]],
+  "Hypopituitarism's symptoms depend on which hormones are missing: fatigue, weight loss, decreased sex drive, sensitivity to cold, decreased appetite, facial puffiness, anemia and infertility, and in women hot flashes, irregular or absent periods, loss of pubic hair and an inability to produce milk. Galactorrhea is the hormone excess of a prolactinoma.",
+  {fmt: "except"});
 
 // Sheehan case
 mq("p1-sheehan-1", "path1", "hub",
@@ -4007,6 +4091,13 @@ two("p1-2s-pp", "path1", "slides",
   "Both hormones are made in the hypothalamus (supraoptic and paraventricular nuclei) and only stored in the posterior pituitary. Diabetes insipidus is a lack of ADH action; the slide says no clinical syndromes are associated with oxytocin, which potentiates uterine contractions and milk ejection.",
   "they are made in the hypothalamus and only stored in the posterior pituitary.",
   "diabetes insipidus is a lack of ADH action; no clinical syndromes are associated with oxytocin.");
+mq("p1-adh", "path1", "slides",
+  "Which pair of actions belongs to ADH?",
+  [["Water reabsorption in the renal tubules and vasoconstriction", "ADH maintains serum osmolality by having the tubules take back water, and it also constricts vessels."],
+   ["Potentiating uterine contractions and milk ejection", "Those are oxytocin's actions, the other posterior pituitary hormone."],
+   ["Milk production and control of the menstrual cycle", "Those belong to prolactin, from the anterior pituitary's mammotrophs."],
+   ["Helping bone take up calcium and inhibiting bone resorption", "That is calcitonin, from the thyroid's parafollicular C cells."]],
+  "ADH maintains serum osmolality: it acts on the renal tubules to reabsorb water and also causes vasoconstriction. Its name is the hint: it works against diuresis.");
 
 // ---------- Posterior pituitary ----------
 
@@ -4047,6 +4138,16 @@ mq("p1-di-1", "path1", "hub",
           ["Urine", "Very large volumes; specific gravity 1.002 (low)"],
           ["Serum sodium", "151 mEq/L (normal 135-145)"],
           ["Serum osmolality", "312 mOsm/kg (normal 275-295)"]], pcase: "path1-case3"});
+mq("p1-siadh", "path1", "hub",
+  "Which best explains his low sodium?",
+  [["The tumor makes ADH ectopically, and the retained water dilutes his sodium", "Small cell lung carcinoma is the most common source of ectopic ADH; retained water dilutes the blood (SIADH)."],
+   ["The tumor has spread to the posterior pituitary, so ADH is no longer released", "Losing ADH causes diabetes insipidus, which raises the sodium."],
+   ["His kidneys have stopped responding to ADH, so sodium is lost in the urine", "Kidneys that ignore ADH is nephrogenic diabetes insipidus, which loses water and raises the sodium."],
+   ["The tumor makes oxytocin ectopically, and oxytocin drives water retention", "Oxytocin acts on uterine contraction and milk ejection and has no clinical syndrome; ADH is the water hormone."]],
+  "SIADH is continued ADH release without regard to serum osmolality: water is retained, body fluids are diluted, and sodium falls. The most common cause is ectopic ADH from small cell carcinoma of the lung.",
+  {pbox: [["Patient", "67-year-old man who has smoked for 50 years, with a central lung mass and new confusion"],
+          ["Serum sodium", "121 mEq/L (normal 135-145)"],
+          ["Serum osmolality", "255 mOsm/kg (normal 275-295)"]]});
 
 // ---------- Thyroid: development, cells, goiter ----------
 mq("p1-lingual", "path1", "hub",
@@ -4190,6 +4291,18 @@ mq("p1-adenoma-vs-ca", "path1", "rec",
    ["Follicles that look like normal thyroid tissue", "Normal-appearing tissue in a capsule is the adenoma's description; it is invasion that marks the carcinoma."],
    ["Nuclear grooves and pseudoinclusions in the tumor cells", "Grooves and pseudoinclusions define papillary carcinoma, not follicular carcinoma."]],
   "Follicular adenoma and follicular carcinoma are both encapsulated follicular tumors. The adenoma's capsule is intact; the carcinoma invades through the capsule (a mushroom-like push) or into blood vessels. Invasion makes the diagnosis.");
+nums("p1-num-fc", "path1", "slides",
+  "Which statements about follicular thyroid carcinoma are true?",
+  ["It is more common in women.",
+   "The mean age at diagnosis is about 50 years.",
+   "A minimally invasive tumor shows capsular invasion only.",
+   "A widely invasive tumor has invaded one or two blood vessels."],
+  [true, true, true, false], [[1, 2], [1, 2, 3, 4], [2, 3, 4]],
+  "Follicular carcinoma is more common in women, mean age about 50. It is classified by invasion: minimally invasive (capsule only), encapsulated angioinvasive (vessels) and widely invasive (four or more vessels plus the adjacent thyroid tissue).",
+  ["the slide says it is more common in women.",
+   "the mean age at diagnosis is about 50.",
+   "minimally invasive means grossly encapsulated, with capsular invasion on histology.",
+   "widely invasive means four or more blood vessels plus the adjacent thyroid tissue."]);
 
 mq("p1-fc-mets", "path1", "slides",
   "A 55-year-old woman with widely invasive follicular carcinoma develops a metastasis. Which pairing of site and route fits this tumor?",
@@ -4273,6 +4386,13 @@ mq("p1-mtc-1", "path1", "rec",
    ["Papillary carcinoma, with psammoma bodies and pale, grooved nuclei", "Papillary carcinoma forms papillae with distinctive nuclei; the deposits here are amyloid, not psammoma bodies."],
    ["Follicular carcinoma, invading its capsule and nearby blood vessels", "Follicular carcinoma keeps a follicular pattern; these cells make no colloid and lay down amyloid."]],
   "Medullary carcinoma comes from the C cells, so it makes no thyroid hormone or colloid. It looks like a neuroendocrine tumor (nested, somewhat spindled cells), produces amyloid with apple-green birefringence, and stains for neuroendocrine markers (chromogranin, synaptophysin), calcitonin and CEA.");
+mq("p1-mtc-2", "path1", "slides",
+  "Compared with sporadic medullary thyroid carcinoma, the familial form is more likely to be which of the following?",
+  [["Multiple and bilateral with C-cell hyperplasia, at a mean age of 35", "The familial form strikes younger patients, is often multiple and bilateral, and arises with C-cell hyperplasia."],
+   ["A solitary lesion in an older patient, at a mean age of about 45 years", "That describes the sporadic form, about 80 percent of cases."],
+   ["Driven by a BRAF mutation and spread mainly through the lymphatics", "BRAF and lymphatic spread describe papillary carcinoma; familial medullary carcinoma carries a germline RET mutation."],
+   ["Arising from follicular cells in a region where goiter is endemic", "Areas of endemic goiter go with anaplastic carcinoma; medullary carcinoma comes from C cells."]],
+  "Medullary carcinoma is sporadic in about 80 percent: a solitary lesion, mean age 45. The familial form strikes younger patients (mean age 35), is often multiple and bilateral, arises with C-cell hyperplasia, and is part of MEN 2A and MEN 2B through RET.");
 
 tf("p1-tf-mtc", "path1", "slides",
   "Most medullary thyroid carcinomas are sporadic rather than familial.", true,
@@ -4333,6 +4453,20 @@ mq("p2-pth-fragments", "path2", "rec",
    ["N-terminal fragments are biologically inactive, last several hours and are cleared by glomerular filtration", "That describes the C-terminal fragments: inactive, long-lived and filtered by the kidney."],
    ["C-terminal fragments are biologically active, last several hours and are cleared by glomerular filtration", "C-terminal fragments do last hours and are filtered, but they are biologically inactive."]],
   "Intact PTH and its N-terminal fragments do the work and last only minutes; C-terminal fragments are inactive, last hours and are cleared by glomerular filtration. That short half-life is why PTH can be measured during surgery to confirm the gland is out.");
+mq("p2-fat-age", "path2", "rec",
+  "Dr. Dababneh's rule of thumb: subtract a person's age from 100 to get the expected percent of cells in a normal parathyroid, the rest being fat. A gland from a 65-year-old is about 80 percent cells with very little fat. How is it best read?",
+  [["Hypercellular for the patient's age, which fits a hyperfunctioning gland", "At 65 the gland should be about 35 percent cells; 80 percent is far too cellular, the picture of an adenoma or hyperplasia."],
+   ["Normal for the patient's age, because parathyroid fat shrinks as people age", "Parathyroid fat increases with age; an older gland should be mostly fat, not mostly cells."],
+   ["Hypocellular for the patient's age, which fits hypoparathyroidism", "Hypocellular would mean fewer cells than expected; 80 percent is many more, not fewer."],
+   ["Normal at any age, since the ratio of fat to cells stays the same", "The ratio changes with age: a young gland is mostly cells, a 70-year-old's is about 70 percent fat."]],
+  "A young adult's parathyroid is mostly cells; a 70-year-old's is about 70 percent fat and 30 percent cells. A middle-aged or older gland at 70 to 80 percent cells is hypercellular and may be hyperfunctioning.");
+mq("p2-phpt-def", "path2", "slides",
+  "Which best defines primary hyperparathyroidism?",
+  [["PTH secretion that is inappropriately high for the serum calcium, with no known stimulus driving it", "That is the slide's definition: the gland itself is overactive."],
+   ["PTH secretion raised in response to chronically low serum calcium, most often from renal failure", "That is secondary hyperparathyroidism: the glands are responding to a disease that lowers calcium."],
+   ["Normal or high PTH secretion with target organs that fail to respond, so serum calcium stays low", "That is pseudohypoparathyroidism, end-organ resistance to PTH."],
+   ["PTH secretion too low for the serum calcium, most often after the glands are removed with the thyroid", "That is hypoparathyroidism, which causes low calcium."]],
+  "Primary means the parathyroid itself is the problem (adenoma, hyperplasia or carcinoma), so PTH and calcium are both high. Secondary means something else, such as renal failure or a lack of calcium or vitamin D, is driving the glands.");
 
 // ---------- Primary hyperparathyroidism ----------
 
@@ -4351,6 +4485,21 @@ mq("p2-triad", "path2", "rec",
    ["Cataracts, dental root hypoplasia and laryngospasm", "These are findings of hypoparathyroidism and low calcium."],
    ["Short metacarpals and metatarsals, short stature and developmental anomalies", "These are the features of pseudohypoparathyroidism."]],
   "Too much PTH means too much calcium: it is pulled out of bone (osteitis fibrosa cystica), forms kidney stones and disturbs nerve and muscle function. Most patients today have none of these and are found on routine labs.");
+nums("p2-num-1", "path2", "slides",
+  "Which statements about parathyroid adenoma are true?",
+  ["It is a benign neoplasm of chief or oxyphil cells.",
+   "It is about three times more common in women than in men.",
+   "The upper parathyroid glands are involved more often than the lower ones.",
+   "It usually involves all four glands at once.",
+   "It usually weighs between 0.3 and 1.0 g."],
+  [true, true, false, false, true],
+  [[1, 2], [1, 2, 3, 5], [2, 4, 5]],
+  "Parathyroid adenoma: a solitary benign neoplasm of chief or oxyphil cells, 80 to 90 percent of primary hyperparathyroidism, three times more common in women, usually in the 4th to 5th decade, more often in a lower gland, 0.3 to 1.0 g.",
+  ["it is a benign neoplasm of either parathyroid cell type.",
+   "the slide gives three times more common in females, usually in the 4th to 5th decade.",
+   "the lower glands are the ones involved more often.",
+   "an adenoma is a solitary lesion; four enlarged glands points to hyperplasia.",
+   "the slide gives a weight range of 0.3 to 1.0 g."]);
 
 mq("p2-adhyp-dx", "path2", "rec",
   "A patient has high calcium and high PTH. How is a parathyroid adenoma told apart from primary chief cell hyperplasia?",
@@ -4388,6 +4537,14 @@ tf("p2-tf-1", "path2", "rec", "In a healthy 70-year-old, about 70 percent of the
   "Dr. Dababneh's rule of thumb: the expected percent of cells is about 100 minus the age, so at 70 the gland is about 30 percent cells and 70 percent fat. A gland far more cellular than that is hypercellular.",
   "At 70, about 70 percent fat and 30 percent cells is the expected normal gland.",
   "The statement is true: parathyroid fat rises with age, to about 70 percent at age 70.");
+tf("p2-tf-2", "path2", "slides", "Most patients with primary hyperparathyroidism today come to attention because of kidney stones or bone disease.", false,
+  "Stones, bones and groans is the classic picture, but most patients now have no symptoms: the high calcium turns up on a routine blood chemistry panel.",
+  "The classic triad is now the exception; most patients are found on routine labs.",
+  "Most patients are asymptomatic and found by a high calcium on routine chemistry.");
+tf("p2-tf-3", "path2", "slides", "In primary chief cell hyperplasia, the enlarged parathyroid glands contain more stromal fat than normal.", false,
+  "Hyperplasia means increased parenchymal cell mass with decreased stromal fat: sheets or nodules of chief cells, oncocytic cells or both, with little fat between them, in all four glands (1 to 3 g together).",
+  "The fat goes down, not up: the cells crowd out the stromal fat.",
+  "Hyperplastic glands have more cells and less stromal fat, not more fat.");
 
 // ---------- Surgery ----------
 mq("p2-surg-classic", "path2", "rec",
@@ -4537,6 +4694,14 @@ tf("p2-tf-10", "path2", "rec", "The zona glomerulosa is the innermost zone of th
   "From the outside in: glomerulosa (salt), fasciculata (sugar), reticularis (sex), then the medulla. The glomerulosa is the outermost zone of the cortex.",
   "The glomerulosa is the outermost zone; the reticularis is the innermost.",
   "Salt, sugar, sex runs from the outside in, so the glomerulosa is outermost.");
+mq("p2-cortisol-except", "path2", "slides",
+  "Each of the following is true of cortisol EXCEPT:",
+  [["It increases glucose uptake by cells", "Cortisol inhibits glucose uptake by cells, one reason it raises blood glucose."],
+   ["Its secretion is stimulated by ACTH", "ACTH from the pituitary drives the adrenal cortex to release cortisol."],
+   ["It increases gluconeogenesis in the liver", "Making new glucose in the liver is one of cortisol's listed actions."],
+   ["It promotes fat deposition", "Fat deposition is a listed action, behind the central obesity of Cushing syndrome."]],
+  "Cortisol, released under ACTH, inhibits glucose uptake by cells, promotes fat deposition and increases hepatic gluconeogenesis, which is why its excess brings hyperglycemia and central obesity.",
+  {fmt: "except"});
 
 // ---------- Cushing syndrome ----------
 
@@ -4623,6 +4788,21 @@ mq("p2-case5-b", "path2", "hub",
           ["Aldosterone", "38 ng/dL (4-31)"],
           ["Renin activity", "0.2 ng/mL/h (0.5-4.0)"],
           ["CT", "1.5 cm nodule in the left adrenal gland"]], pcase: "path2-case5"});
+mq("p2-hyperaldo-except", "path2", "slides",
+  "All of the following fit primary hyperaldosteronism EXCEPT:",
+  [["High serum potassium", "Aldosterone dumps potassium, so it runs low; high potassium fits aldosterone deficiency, as in Addison disease."],
+   ["Hypertension", "Retained sodium and water raise blood pressure, the main sign."],
+   ["Low plasma renin", "In primary disease, aldosterone from the adrenal shuts renin off."],
+   ["Fatigue", "Fatigue is on the lecture's list of clinical features."]],
+  "Hyperaldosteronism: hypertension, fatigue, high sodium and low potassium. Primary: aldosterone high, renin low.",
+  {fmt: "except"});
+mq("p2-cah-21-why", "path2", "rec",
+  "Why does 21-hydroxylase deficiency lead to androgen excess?",
+  [["Blocked paths to aldosterone and cortisol shunt the pathway into androgens", "With the routes to mineralocorticoids and glucocorticoids shut, the precursors go to sex steroids."],
+   ["21-hydroxylase normally breaks down testosterone in the peripheral tissues", "21-hydroxylase is an adrenal enzyme on the way to aldosterone and cortisol, not a breakdown enzyme."],
+   ["The block makes precursors with mineralocorticoid activity pile up instead", "Mineralocorticoid precursors piling up, with sodium retention and hypertension, is 17-hydroxylase deficiency."],
+   ["It triggers an androgen-secreting carcinoma of the adrenal cortex", "Virilizing adrenal tumors are mostly carcinomas, but CAH is an enzyme defect, not a tumor."]],
+  "In 21-hydroxylase deficiency the paths to aldosterone and cortisol are blocked, so the pathway shifts into androgens: androgen excess, and in about a third, sodium wasting from aldosterone deficiency.");
 
 // ---------- Androgens and congenital adrenal hyperplasia ----------
 
@@ -4710,6 +4890,10 @@ mq("p2-cortex-adenoma", "path2", "slides",
    ["Most secrete androgens, which makes them the usual virilizing adrenal tumor", "Most virilizing adrenal neoplasms are carcinomas, not adenomas."],
    ["About half are functional, and they are highly malignant", "Half functional and highly malignant describes adrenal cortical carcinoma."]],
   "Adrenal cortical adenoma: mostly nonsecreting; the commonest functional type secretes aldosterone (high sodium, low potassium, hypertension). Carcinoma: large, over 2 cm, half functional, highly malignant, and the usual virilizing tumor.");
+tf("p2-tf-9", "path2", "slides", "Most virilizing adrenal neoplasms are carcinomas.", true,
+  "The slide lists it under adrenal cortical carcinoma: most virilizing adrenal neoplasms are carcinomas, while adenomas are mostly nonsecreting or make aldosterone.",
+  "An adrenal tumor that makes a patient look more male is most often a carcinoma.",
+  "This is the slide's statement: virilization from an adrenal tumor points to carcinoma.");
 
 // ---------- Adrenal medulla ----------
 mq("p2-pheo-cell", "path2", "rec",
@@ -4814,6 +4998,16 @@ two("dc-2s-acro", "dental", "rec", "Growth hormone excess that starts before pub
   "Before puberty the long bones are open, so GH excess makes a very tall person; after puberty they are fused, and the excess shows as acromegaly, where the dentist sees the jaw grow, the bite shift toward Class III, diastemas open and the tongue enlarge.",
   "before puberty the long bones haven't fused, so GH excess makes a person very tall (he said 7 feet or more).",
   "he told the class to look for the jaw: the mandible grows, so the bite goes from Class I to edge-to-edge or even Class III.");
+mq("dc-hyperthy-except", "dental", "rec", "Each of the following is a systemic finding of hyperthyroidism EXCEPT:",
+  [["Bradycardia", "A slow heart rate is on the hypothyroidism slide; hyperthyroidism speeds the heart."],
+   ["Weight loss", "Weight loss is on the hyperthyroidism slide (hypothyroidism brings weight gain)."],
+   ["Tachycardia", "A fast heart rate is on the hyperthyroidism slide."],
+   ["Heat intolerance", "Heat intolerance is on the hyperthyroidism slide."]],
+  "Hyperthyroidism: weight loss, tachycardia, heat intolerance. Hypothyroidism is the mirror image: fatigue, weight gain, bradycardia.", {fmt: 'except'});
+tf("dc-tf-hypo-epi", "dental", "rec", "The caution about increased sensitivity to epinephrine applies to patients with uncontrolled hypothyroidism.", false,
+  "Increased sensitivity to epinephrine, and avoiding excessive vasoconstrictor in uncontrolled disease, are on the hyperthyroidism slide. Hypothyroidism's dental list is delayed eruption, macroglossia and delayed wound healing.",
+  "It is hyperthyroidism, not hypothyroidism, that makes patients overly sensitive to epinephrine.",
+  "The epinephrine caution belongs to hyperthyroidism; the statement swaps hyper for hypo.");
 
 // ---------- Thyroid ----------
 
@@ -4858,6 +5052,10 @@ two("dc-2s-ca", "dental", "rec", "Vitamin D is the fast-acting regulator of bloo
   "PTH is the fast-acting regulator; vitamin D, activated in the kidney, is the long-term regulator that helps the gut absorb calcium. High calcium brings out calcitonin from the thyroid.",
   "the roles are swapped: PTH is fast acting and vitamin D is the long-term regulator.",
   "increased blood calcium stimulates the thyroid to release calcitonin.");
+tf("dc-tf-vitd", "dental", "rec", "Vitamin D, the long-term regulator of blood calcium, is activated in the kidney.", true,
+  "Vitamin D is activated in the kidney (the kidneys release calcitriol) and helps the GI tract absorb calcium; PTH is the fast-acting regulator.",
+  "His slide says vitamin D is the long-term regulator and is activated in the kidney.",
+  "Both details are on the slide: long-term regulator, activated in the kidney.");
 
 mq("dc-c5-mech", "dental", "hub", "Which mechanism best explains why her teeth are loosening?",
   [["Excess PTH drives osteoclasts to resorb alveolar bone and release calcium", "Excess PTH resorbs bone; around the teeth that shows as lost lamina dura and mobility."],
@@ -4869,11 +5067,21 @@ tf("dc-tf-hypopara", "dental", "rec", "Hypoparathyroidism causes hypercalcemia, 
   "Too little PTH means too little calcium: hypoparathyroidism causes hypocalcemia, and low calcium brings neuromuscular irritability and tetany.",
   "Hypoparathyroidism lowers calcium (hypocalcemia); it doesn't raise it.",
   "The statement flips the calcium level: it is hypocalcemia, not hypercalcemia.");
+mq("dc-lamina-dura", "dental", "rec", "On a normal periapical radiograph, what is the lamina dura, the structure lost in hyperparathyroidism?",
+  [["The thin white line of dense socket bone that the PDL attaches to", "He described it as the white outline of harder, denser bone around the tooth, which the ligament attaches to."],
+   ["The thin dark line between the root and the socket, where the PDL sits", "That dark line is the PDL space; the lamina dura is the white line of dense bone outside it."],
+   ["The radiolucent area in the bone below a premolar on a panoramic film", "That was his picture of a brown tumor, another hyperparathyroid finding, not the lamina dura."],
+   ["The white layer of cementum that covers the outside of the root surface", "Cementum is part of the tooth; the lamina dura is the socket's dense bone, which the PDL attaches to."]],
+  "On a normal film a thin white line outlines the socket: the lamina dura, the denser bone the periodontal ligament attaches to; the dark line between it and the root is the PDL space. In hyperparathyroidism the lamina dura is lost, and the bone looks diffuse and gray right up to the tooth.");
 
 two("dc-2s-brown", "dental", "rec", "A brown tumor shows on a panoramic radiograph as a radiopaque (white) mass.", "In hyperparathyroidism, the lamina dura becomes a sharper, brighter white line around the roots.", false, false,
   "Both statements reverse his radiograph findings: a brown tumor is radiolucent (his example sat in the bone below a premolar), and in hyperparathyroidism the lamina dura is lost, leaving diffuse gray bone up to the tooth. If you find a brown tumor, ask about other symptoms and send the patient to their physician.",
   "his brown tumor was a radiolucent (dark) area in the bone below a premolar.",
   "the lamina dura is lost in hyperparathyroidism: the bone looks diffuse, with no definite white line.");
+tf("dc-tf-medulla", "dental", "rec", "Aldosterone is made by the adrenal medulla.", false,
+  "The adrenal cortex makes cortisol and aldosterone; the adrenal medulla makes epinephrine and norepinephrine.",
+  "Aldosterone is a cortex hormone; the medulla makes epinephrine and norepinephrine.",
+  "It names the wrong layer: aldosterone comes from the adrenal cortex.");
 mq("dc-medulla-dental", "dental", "rec", "Dr. Taylor ties the adrenal medulla's hormones to dentistry through which two points?",
   [["Vasoconstrictor use and stress management during treatment", "Epinephrine and norepinephrine are the medulla's hormones; his dental points are vasoconstrictors and managing stress in the chair."],
    ["Diffuse oral melanosis and the risk of adrenal crisis during surgery", "Those belong to the adrenal cortex (Addison disease), not the medulla."],
@@ -4902,6 +5110,10 @@ mq("dc-c3-crisis", "dental", "hub", "Forty minutes into a long surgical extracti
    ["Hypoglycemia", "Confusion can occur, but he has no diabetes, and hypoglycemia's list is sweating, tremors and tachycardia, not a pressure of 70 over 40."],
    ["Hypocalcemic tetany", "Tetany is the neuromuscular irritability of low calcium, not a collapse of blood pressure."]],
   "Adrenal crisis signs: severe hypotension, weakness, confusion, loss of consciousness and shock. A long, stressful surgery is one of the procedures that can set it off in a patient with Addison disease.", {pbox: DC_CASE3, pcase: 'dental-case3'});
+tf("dc-tf-addison-pig", "dental", "rec", "In Addison disease, the hormone primarily deficient is aldosterone.", false,
+  "His Addison case answers: the deficient hormone is cortisol, often accompanied by reduced aldosterone levels. The low cortisol is also what lets ACTH rise and darken the mouth.",
+  "Cortisol is the hormone primarily deficient; aldosterone is often reduced along with it.",
+  "The statement swaps the two: cortisol is primarily deficient, often with reduced aldosterone.");
 
 tf("dc-tf-steroid", "dental", "rec", "A patient on long-term corticosteroid therapy can show the same moon face, buffalo hump and hyperglycemia as Cushing syndrome.", true,
   "Cushing syndrome means the body makes too much corticosteroid, and Dr. Taylor said it gives the same picture as long-term corticosteroid supplementation: fat moved to the face and the back of the neck (moon face, buffalo hump) and hyperglycemia, with more infections and slower healing in the mouth.",
@@ -4920,6 +5132,12 @@ mq("dc-glucagon", "dental", "rec", "Which hormone, made where, breaks down glyco
    ["Glucagon from beta cells", "Glucagon is the right hormone, but it comes from alpha cells; beta cells make insulin."],
    ["Insulin from alpha cells", "Insulin comes from beta cells, and it stores glucose rather than releasing it."]],
   "Alpha cells make glucagon (glycogen breakdown, gluconeogenesis). Beta cells make insulin (moves glucose into cells, the storage hormone).");
+mq("dc-dm-types", "dental", "rec", "Which feature points to type 1 rather than type 2 diabetes?",
+  [["Autoimmune destruction of the beta cells", "Type 1 is autoimmune destruction of the beta cells, the insulin makers."],
+   ["Insulin resistance with high insulin levels (hyperinsulinemia)", "Insulin resistance and hyperinsulinemia define type 2."],
+   ["Hyperglycemia found on a fasting blood glucose", "High glucose is a diagnostic concept for diabetes in general, not a way to tell the types apart."],
+   ["An elevated HbA1c on the diabetes workup", "HbA1c is a diagnostic concept for both types."]],
+  "Type 1: autoimmune destruction of the beta cells; it usually starts young, and the patient needs insulin injections to survive. Type 2: insulin resistance with hyperinsulinemia, and insulin production may decline over time. Hyperglycemia and HbA1c are how both are diagnosed and followed.");
 
 // ---------- Pancreas and diabetes ----------
 
@@ -4939,6 +5157,10 @@ nums("dc-a1c-num", "dental", "rec", "Which statements match what Dr. Taylor said
   [true, false, true, true], [[1, 2, 4], [1, 3], [3, 4]],
   "Dr. Taylor's numbers: an HbA1c above 7 is poorly controlled, with a much higher risk of implant failure and of periodontal disease; below 7 is generally well controlled, below 6 better, and a person without diabetes runs about 5. (For diagnosis, use Lecture 11's cutoffs: 5.7 to 6.4 percent is prediabetes, 6.5 and above is diabetes.)",
   ["above 7 is his line for poor control.", "poor control raises the risk of periodontal disease; it doesn't lower it.", "he said a person without diabetes usually runs about 5.", "he said poorly controlled patients are at much higher risk of implant failure."]);
+tf("dc-tf-glucose60", "dental", "rec", "Dr. Taylor treats a chairside finger-stick glucose under 100 as hypoglycemia that needs sugar.", false,
+  "His number for giving sugar is under 60. A fasting glucose well over 100 is his sign that a patient may have diabetes, not low sugar.",
+  "His cutoff for hypoglycemia that needs sugar is under 60, not under 100.",
+  "The number is changed: he gives sugar under 60; 100 is his fasting line for suspecting diabetes.");
 
 tf("dc-tf-farxiga", "dental", "rec", "Patients taking an SGLT2 inhibitor such as dapagliflozin (Farxiga) have a higher risk of urinary tract infections, because the extra sugar is passed in the urine.", true,
   "Dapagliflozin acts on the sodium-glucose transporter in the kidney, so glucose is passed in the urine instead of reabsorbed, and sugar near the urinary tract feeds Candida and bacteria. (Lecture 11 gives the mechanism: the gliflozins inhibit SGLT2.)",
@@ -4967,6 +5189,10 @@ nums("dc-dm-mgmt-num", "dental", "rec", "Which steps are on Dr. Taylor's dental 
   [true, true, false, true], [[1, 2], [1, 2, 3, 4], [2, 3, 4]],
   "Before treatment: review glycemic control, assess HbA1c, confirm meals and medication compliance. During treatment: morning appointments are preferred, and monitor for hypoglycemia.",
   ["reviewing glycemic control and the HbA1c come first on his list.", "confirming meals and medication compliance is a before-treatment step.", "he prefers morning appointments, not late-afternoon ones.", "watching for hypoglycemia is the during-treatment step."]);
+tf("dc-tf-morning", "dental", "rec", "Delayed healing is a dental concern in hypothyroidism, Cushing syndrome and diabetes alike.", true,
+  "Delayed healing shows up on three of his slides: hypothyroidism (delayed wound healing), Cushing syndrome (with increased infection risk) and diabetes (decreased neutrophil function, poor blood supply, impaired collagen synthesis).",
+  "All three slides list delayed healing, so the statement is true.",
+  "Each of the three conditions lists delayed healing; none of them is the odd one out.");
 nums("dc-c2-heal", "dental", "hub", "Which statements explain why his extraction site may heal poorly?",
   ["Neutrophil function is decreased.", "Collagen synthesis is impaired.", "Blood supply to the site is increased.", "Hyperglycemia dampens inflammation in the tissues."],
   [true, true, false, false], [[1, 2, 3], [1, 2, 4], [2, 3]],
@@ -4999,6 +5225,12 @@ mq("dc-cgm", "dental", "rec", "A diabetic patient becomes sweaty and confused mi
    ["Give her usual insulin dose, since the reading shows the monitor is working", "Insulin lowers glucose further; she needs sugar."],
    ["Wait 15 minutes and check the CGM again before giving anything by mouth", "Hypoglycemia is treated when it is recognized; waiting on a monitor at its floor loses time."]],
   "Some CGMs only read down to a certain level. His patient's stopped at 53, and her finger-stick was in the 30s; it took 10 or 12 packets of glucose gel to bring her back. When the signs appear, check a finger-stick (with permission) and give glucose.");
+mq("dc-glp1-slow", "dental", "rec", "His hypoglycemic patient also took Mounjaro, and oral glucose raised her sugar slowly. Why?",
+  [["GLP-1 drugs slow the gut, so glucose by mouth reaches the blood late", "Most GLP-1 drugs slow digestion so the patient feels full longer, which also slows glucose given by mouth."],
+   ["It makes the kidneys pass glucose into the urine before it can act", "That is the SGLT2 inhibitor dapagliflozin (Farxiga), not a GLP-1 drug."],
+   ["It blocks the liver's gluconeogenesis, so no new glucose can be made at all", "That is metformin's action in his lecture."],
+   ["It makes the beta cells release insulin regardless of the glucose level", "That describes the sulfonylureas; the GLP-1 drug's effect here is the slowed gut."]],
+  "GLP-1 drugs slow the digestive system. Glucose given by mouth then moves through the gut slowly and raises blood sugar slowly, so expect a slower response and be ready for the next step: IV dextrose if available, otherwise glucagon IM or subcutaneously.");
 
 mq("dc-glucose-sucrose", "dental", "rec", "For a conscious hypoglycemic patient, why does Dr. Taylor prefer straight glucose to table sugar?",
   [["Sucrose is half fructose, which the liver must convert first", "Fructose can't be used directly; the liver converts it to glucose, so straight glucose raises the blood sugar faster."],
@@ -5901,6 +6133,12 @@ mq("mp-abp", "mphys", "rec", "Why do Sertoli cells secrete androgen-binding prot
    ["To convert testosterone into estradiol inside the seminiferous tubules", "Turning testosterone into estradiol is aromatase's job, not ABP's."],
    ["To feed testosterone back to the hypothalamus so that GnRH secretion falls", "Serum testosterone does inhibit GnRH, but that is feedback on the brain, not what ABP is for."]],
   "FSH turns on ABP in Sertoli cells, and ABP keeps intratesticular testosterone higher than in the blood. Testosterone is necessary for spermatogenesis, so this local supply matters. It also depends on LH driving the Leydig cells, which is why a man injecting testosterone (which shuts LH off) can have high blood levels and still make few sperm.");
+mq("mp-cold", "mphys", "rec", "A man wades into a cold lake. What happens to his testes and scrotum, and why?",
+  [["The testes rise and the scrotum tightens, conserving heat", "Testes rise to get warmer, and the contracted scrotum conserves heat, keeping the testes near 34 degrees Celsius."],
+   ["The testes descend and the scrotum relaxes, letting air circulate", "Descent and a smooth, relaxed scrotum are the cooling response to warmth, the opposite of what cold triggers."],
+   ["The testes descend, since spermatogenesis works best near core body temperature", "Spermatogenesis is optimal at about 34 degrees Celsius, a few degrees below core temperature, and cold makes the testes rise."],
+   ["Nothing changes, because the scrotum responds only to sexual stimulation", "The scrotum contracts with cold, exercise or sexual stimulation and relaxes when warm."]],
+  "Testes descend to get cooler and rise to get warmer, which keeps them near 34 degrees Celsius. In the lecture, the testes drop away from the body when it is warm (he tied this to the cremaster), and in the cold the dartos contracts, tightening the scrotum and pulling them closer. A contracted scrotum conserves heat; a relaxed, elongated one lets air circulate and cool it.");
 
 mq("mp-meiosis", "mphys", "rec", "One spermatocyte completes both meiotic divisions. What does it produce?",
   [["Four spermatids, each with 23 unpaired chromosomes", "Two meiotic divisions turn one spermatocyte into four spermatids, each with 22 autosomes plus an X or a Y."],
@@ -5943,12 +6181,24 @@ mq("mp-e2-role", "mphys", "rec", "In the testis, Sertoli cell aromatase turns so
    ["To the anterior pituitary, where it is the main brake on FSH secretion", "The brake on FSH is inhibin, another Sertoli product, acting at the pituitary."],
    ["To the fetal Müllerian ducts, which regress in response to it", "The Müllerian ducts regress in response to AMH, also from the Sertoli cells, not estradiol."]],
   "Men make estradiol at far lower levels than women, mostly through Sertoli cell aromatase. Some of it enters the blood and supports tissues outside the testes; some returns to the Leydig cells and promotes protein synthesis, the anabolic effect estradiol has in many target tissues.");
+mq("mp-gnrh-cont", "mphys", "slides", "A man is given GnRH continuously instead of in pulses. What happens?",
+  [["LH secretion falls, so testosterone falls", "GnRH must be pulsatile; continuous GnRH lowers LH secretion, and with less LH, testosterone production drops."],
+   ["LH secretion rises, so testosterone rises", "More GnRH does not mean more LH: the pituitary needs pulses, and continuous exposure lowers LH."],
+   ["LH secretion rises, but testosterone falls because Leydig cells stop responding", "The change is at the pituitary: LH itself falls with continuous GnRH."],
+   ["FSH falls because of inhibin, while LH and testosterone stay normal", "Inhibin acts on FSH only; continuous GnRH lowers LH and, through it, testosterone."]],
+  "GnRH and LH secretion must be pulsatile to maintain normal testosterone production. Continuous GnRH decreases LH secretion and therefore testosterone, the opposite of what more GnRH might suggest.");
 mq("mp-t-life", "mphys", "rec", "Which description of testosterone across a man's life matches the lecture?",
   [["High in the fetus and after birth, low in childhood, up at puberty, down in old age", "This is the curve he walked through: fetal, neonatal and pubertal rises, fairly steady adult levels and a late decline."],
    ["Low until puberty, then rising and falling in a monthly cycle through adulthood", "Testosterone is high in the fetus and just after birth, and adult levels are fairly steady, not cyclic like the female hormones."],
    ["High in the fetus, then low from birth until puberty, and steady for the rest of life", "This misses the peak soon after birth and the decline in old age."],
    ["Highest in the fetus, then falling steadily from birth through old age", "Levels go quiet in childhood but surge again at puberty and stay high through adulthood."]],
   "Testosterone is high in gestation (building the male structures), peaks again soon after birth, goes quiet through childhood, surges at puberty and stays fairly steady through adulthood, with peaks and valleys but no monthly cycle. It declines in old age (late-onset hypogonadism), for reasons that are multifactorial: Leydig cells that respond less to LH, or a change at the hypothalamus.");
+mq("mp-pit-pattern", "mphys", "hub", "A man's serum testosterone is low, and his LH and FSH are low as well. Where is the problem most likely?",
+  [["Above the testis, in the pituitary or hypothalamus", "Low LH and FSH with a low testosterone means the testes aren't being stimulated: without LH the Leydig cells make little testosterone."],
+   ["In the testes, whose failing Leydig cells send less testosterone back", "Failing testes lower testosterone, which takes the brake off GnRH and LH, so LH and FSH would be high, not low."],
+   ["In the tubules alone, whose damaged Sertoli cells make less inhibin", "Low inhibin raises FSH on its own; it would not lower LH, FSH and testosterone together."],
+   ["Outside the axis, from injected testosterone suppressing GnRH and LH", "Injected testosterone does lower LH and FSH, but his blood testosterone would then be high, not low."]],
+  "Read the pattern with the feedback rules: LH drives testosterone, and testosterone and inhibin hold LH and FSH down. When the pituitary (or the GnRH above it) fails, everything downstream falls; when the testis fails, LH and FSH rise because the brake is gone; injected testosterone gives low LH and FSH with a high testosterone.");
 
 // ---------- Accessory glands ----------
 mq("mp-sv-volume", "mphys", "rec", "Both of a man's seminal vesicles are removed. Which change in his ejaculate would you expect?",
@@ -5957,6 +6207,12 @@ mq("mp-sv-volume", "mphys", "rec", "Both of a man's seminal vesicles are removed
    ["It contains no sperm, because the seminal vesicles are where sperm are stored", "Sperm are stored in the epididymis and reach the urethra through the vas deferens, so they are still there."],
    ["It loses the early lubricating mucus that flushes the urethra before ejaculation", "That mucus comes from the bulbourethral (Cowper's) glands, which are untouched."]],
   "Semen is sperm plus seminal fluid, and most of the fluid, 60 to 70 percent in the lecture (50 to 80 on his slide, about 70 in Dr. Herr's histology lecture), comes from the seminal vesicles. Their fructose is the energy the sperm metabolize to swim. The prostate adds 20 to 30 percent, a thin, milky fluid with PSA, and the bulbourethral glands add lubricating mucus before ejaculation.");
+mq("mp-psa", "mphys", "rec", "What does prostate-specific antigen (PSA) do in semen?",
+  [["It is a serine protease that breaks down the semen clot so sperm can move on", "PSA, made by the prostate, is an enzyme that breaks down the clot fibrinogen forms after ejaculation, so the sperm can move toward the fallopian tubes."],
+   ["It supplies fructose, the energy source that keeps sperm alive until fertilization", "Fructose comes from the seminal vesicles, not from PSA."],
+   ["It lubricates and flushes the urethra early in sexual excitation", "That is the clear, thick mucus of the bulbourethral (Cowper's) glands."],
+   ["It stimulates contractions of the female tract that help move the sperm", "That is the job of the prostaglandins, which come from the seminal vesicles, not the prostate."]],
+  "PSA is a serine protease from the prostate. Fibrinogen and other clotting factors from the seminal vesicles make semen clot soon after ejaculation, which holds the sperm in the female tract; PSA breaks that clot down over time so the sperm can move on toward the fallopian tubes. The prostate's thin, milky fluid also neutralizes acidity, which supports sperm motility and survival.");
 
 mq("mp-clot", "mphys", "rec", "Soon after ejaculation, semen clots in the female tract. In the lecture, what forms the clot, what is it for, and what breaks it down?",
   [["Seminal vesicle fibrinogen; it holds sperm in the tract; prostate PSA breaks it down", "Clotting factors such as fibrinogen keep the sperm in the female tract; PSA, a prostate enzyme, then breaks the clot down so they can move on."],
@@ -5979,6 +6235,12 @@ mq("mp-cav-art", "mphys", "rec", "Which vessels did Dr. Madison single out as th
    ["The cavernosal arteries, which norepinephrine constricts", "Norepinephrine is sympathetic, the side that drives ejaculation; erection needs the arteries to dilate."],
    ["The testicular arteries, which cool as they pass the veins", "That heat exchange keeps the testes near 34 degrees Celsius; it has nothing to do with erection."]],
   "The penis is mostly cavernous tissue (the corpora cavernosa and the corpus spongiosum). During arousal, parasympathetic nerves release acetylcholine and nitric oxide; NO dilates the cavernosal arteries, the spongy tissue fills with blood, and the engorged tissue pinches off the veins so the blood can't drain.");
+mq("mp-fetal-leydig", "mphys", "rec", "In the male fetus, what stimulates the Leydig cells to make testosterone?",
+  [["hCG and LH", "hCG, which the placenta makes in large amounts in early gestation, and LH drive the fetal Leydig cells to make testosterone."],
+   ["FSH and inhibin", "FSH acts on Sertoli cells, and inhibin suppresses FSH; neither drives Leydig testosterone."],
+   ["Anti-Müllerian hormone", "AMH comes from the Sertoli cells and makes the Müllerian ducts regress."],
+   ["Dihydrotestosterone", "DHT is made from testosterone; it is a product of the pathway, not the signal that starts it."]],
+  "In the fetus, hCG and LH act on the Leydig cells, which make the testosterone that builds the Wolffian structures. LH keeps this role for life: it is the Leydig cell's signal in the adult as well.");
 
 // ---------- Patient Box cases ----------
 // Case 1: testosterone injections (anabolic steroid use)
@@ -6119,6 +6381,10 @@ tf("mp-tf-6", "mphys", "rec", "During erection, the engorged cavernous tissue co
   "Vasodilation fills the cavernous tissue with blood, and the engorged tissue compresses the venous vessels that drain it, so the blood stays in.",
   "Engorgement compresses the draining veins, which keeps blood in the erectile tissue.",
   "Compression of the draining veins by the engorged tissue is part of how an erection is kept.");
+tf("mp-tf-7", "mphys", "slides", "Where the testicular arteries and veins intertwine, heat passes from the veins to the arteries.", false,
+  "Heat passes from the arteries to the veins. Arterial blood is cooled before it reaches the testis, which helps keep it near 34 degrees Celsius.",
+  "Heat passes the other way, from the warm arteries to the veins, so blood is cooled before it reaches the testis.",
+  "The exchange runs from artery to vein, cooling the blood that flows into the testis.");
 tf("mp-tf-10", "mphys", "rec", "Leydig cells can convert adrenal androgens into testosterone.", true,
   "Leydig cells make testosterone from cholesterol in response to LH, and they also express enzymes that convert the adrenal androgens to testosterone.",
   "His testosterone synthesis slide says Leydig cells express enzymes that convert adrenal androgens to testosterone.",
@@ -6224,6 +6490,10 @@ tf("fp-tf-amh", "fphys", "slides", "In a female fetus, the Müllerian ducts form
   "No testes means no AMH, and without AMH the Müllerian ducts form. The other half of the default pathway is the missing testosterone, which lets the Wolffian ducts regress.",
   "With no testes there is no AMH, so nothing removes the Müllerian ducts and they form.",
   "It is true: the slide pairs lack of AMH with Müllerian duct formation; lack of testosterone is the Wolffian half.");
+tf("fp-tf-fimbriae", "fphys", "slides", "The ovaries sit in the peritoneal cavity, and the beating of the fimbriae moves the ovulated oocyte into the fallopian tube.", true,
+  "No duct joins the ovary to the tube. The ovary sits in the peritoneal cavity close to the tube's opening, the beating fimbriae carry the oocyte in, and fertilization then happens in the fallopian tube.",
+  "The ovary lies free near the tube's opening, and the beating fimbriae sweep the oocyte in.",
+  "It is true: no duct joins ovary and tube, so the beating fimbriae have to move the oocyte in.");
 tf("fp-tf-cortex", "fphys", "slides", "The follicles, the functional units of the ovary, sit in the ovarian medulla.", false,
   "The follicles are in the cortex. The medulla and the hilum hold the blood and lymphatic vessels.",
   "The follicles are in the cortex; the medulla and hilum carry the vessels.",
@@ -6299,6 +6569,16 @@ mq("fp-secondary", "fphys", "slides", "A growing follicle has a single layer of 
    ["The granulosa cells begin to express FSH receptors", "Granulosa cells gain FSH receptors as the single-layer follicle forms, so this has already happened."],
    ["The oocyte finishes its first meiotic division", "The first meiotic division is finished only by ovulation, after the LH surge."]],
   "Single cuboidal layer with FSH receptors, then several granulosa layers plus a theca (the theca interna gains LH receptors), then a fluid-filled antrum. Dr. Madison calls the layered stage the secondary follicle; the L14 histology lecture calls it the late primary follicle and keeps the name secondary for the antral follicle, so learn the order, not just the names.");
+mq("fp-oocyte-gf", "fphys", "slides", "According to the lecture, what mainly drives a follicle's early growth, from a single granulosa layer to several layers with a theca?",
+  [["Autocrine and paracrine growth factors made by the oocyte", "The slide credits an active autocrine and paracrine process driven by growth factors from the oocyte."],
+   ["The LH surge acting on LH receptors of the theca interna", "The LH surge comes at midcycle and triggers ovulation, long after this early growth."],
+   ["Progesterone secreted by the corpus luteum after it forms", "The corpus luteum forms after ovulation; it doesn't drive early follicle growth."],
+   ["Positive feedback of estradiol once it rises above 200 pg/mL", "That threshold sets off the LH surge at midcycle; it isn't what grows an early follicle."]],
+  "Early follicle growth is local: growth factors from the oocyte act on the surrounding cells (autocrine and paracrine). The receptors gained along the way, FSH on granulosa cells and LH on the theca, then let the follicle respond to the pituitary.");
+tf("fp-tf-cohort", "fphys", "slides", "In each menstrual cycle, only a single follicle enters the growth sequence that forms an antrum.", false,
+  "A few follicles enter the sequence that forms an antrum each cycle; only one of them goes on to become the dominant follicle that ovulates.",
+  "A few follicles start the sequence each cycle; only later is one selected as the dominant follicle.",
+  "It is false: a few follicles start growing each cycle, and only one of them becomes dominant.");
 
 mq("fp-meiosis", "fphys", "slides", "When does the oocyte complete its first meiotic division?",
   [["By ovulation, after the LH surge lifts the block on meiosis", "The LH surge removes the factors inhibiting meiosis, and the first division is complete by the time the oocyte is ovulated."],
@@ -6402,6 +6682,13 @@ tf("fp-tf-myometrium", "fphys", "slides", "Progesterone causes the myometrium to
   "On the myometrium the two hormones oppose each other: estrogen causes contraction, progesterone causes relaxation.",
   "Progesterone relaxes the myometrium; estrogen is the one that contracts it.",
   "It is false: progesterone relaxes the myometrium, and estrogen contracts it.");
+mm("fp-mm-progesterone", "fphys", "slides", "Which of these are actions of progesterone, according to the lecture? Select all that apply.",
+  [["Relaxing the myometrium", true, "Progesterone relaxes the myometrium, the opposite of estrogen."],
+   ["Thickening the cervical mucus", true, "Progesterone decreases watery mucus, so the mucus becomes thick."],
+   ["Increasing endometrial vasculature", true, "Progesterone enhances and sustains endometrial growth and increases its blood supply."],
+   ["Positive feedback that triggers the LH surge", false, "That is estradiol above about 200 pg/mL; progesterone's feedback is only negative."],
+   ["Starting endometrial growth after menses", false, "Estrogen starts the growth in the follicular phase; progesterone enhances and sustains it."]],
+  "Progesterone relaxes the myometrium, thickens cervical mucus and makes the endometrium secretory and well vascularized, and it gives only negative feedback. Starting the lining's growth and the LH surge are estrogen's jobs.");
 
 // ===== Menopause =====
 mq("fp-meno-1", "fphys", "hub", "Which best explains her FSH and LH results?",
@@ -6907,7 +7194,7 @@ var LIKELY_TOPICS = [{"lec": "dmpharm", "t": "Choosing an insulin: rapid or regu
   {"lec": "path1", "t": "Diabetes insipidus (central vs nephrogenic) vs SIADH (small cell lung carcinoma)", "basis": "recording", "ids": ["p1-di-1", "p1-tf-siadh", "p1-num-di"]},
   {"lec": "path1", "t": "Pituitary adenomas: micro vs macro, mass effect, bitemporal hemianopsia, the functioning types", "basis": "slides", "ids": ["p1-macro-mass", "p1-hemianopsia", "p1-prl-1", "p1-2s-gigant"]},
   {"lec": "path1", "t": "Medullary carcinoma: C cells, RET and MEN 2, amyloid, calcitonin/chromogranin/CEA, sporadic vs familial", "basis": "slides", "ids": ["p1-mtc-1", "p1-x-mtc", "p1-tf-mtc"]},
-  {"lec": "path1", "t": "Hypopituitarism: the 75 percent rule, Sheehan syndrome, null cell adenoma, empty sella, and its symptoms", "basis": "slides", "ids": ["p1-sheehan-1", "p1-tf-hypopit75", "p1-mm-hypopit"]},
+  {"lec": "path1", "t": "Hypopituitarism: the 75 percent rule, Sheehan syndrome, null cell adenoma, empty sella, and its symptoms", "basis": "slides", "ids": ["p1-sheehan-1", "p1-tf-hypopit75", "p1-mm-hypopit", "p1-null-cell", "p1-x-macro"]},
   {"lec": "path1", "t": "Hypothyroid and hyperthyroid features: myxedema and cretinism (enlarged tongue), causes of hyperthyroidism", "basis": "slides", "ids": ["p1-mm-myxedema", "p1-cretin", "p1-x-hyper"]},
   {"lec": "path1", "t": "Thyroid development, follicular adenoma and anaplastic carcinoma", "basis": "slides", "ids": ["p1-lingual", "p1-tf-adenoma", "p1-ana-1", "p1-ana-2"]},
   {"lec": "path2", "t": "Hypoparathyroidism: causes, low calcium with high phosphate, Chvostek and Trousseau, dental root hypoplasia", "basis": "recording", "ids": ["p2-case2-a", "p2-num-2", "p2-tf-4", "p2-mm-hypo"]},
@@ -6920,7 +7207,7 @@ var LIKELY_TOPICS = [{"lec": "dmpharm", "t": "Choosing an insulin: rapid or regu
   {"lec": "path2", "t": "Congenital adrenal hyperplasia: 21-hydroxylase versus 17-hydroxylase, treated with glucocorticoids", "basis": "recording", "ids": ["p2-cah-tx", "p2-cah-newborn", "p2-cah-17"]},
   {"lec": "path2", "t": "Addison disease: features, high ACTH, autoimmune cause", "basis": "recording", "ids": ["p2-case6-a", "p2-num-3", "p2-case6-b"]},
   {"lec": "path2", "t": "Pheochromocytoma (rule of 10s, Zellballen) and neuroblastoma", "basis": "recording", "ids": ["p2-pheo-dental", "p2-num-4", "p2-nb"]},
-  {"lec": "dental", "t": "Hypoglycemia in the chair: the signs, a finger-stick (some CGMs stop reading at a floor), straight glucose rather than table sugar, a slow response on a GLP-1 drug, glucagon IM or subcutaneously if oral glucose fails", "basis": "recording", "ids": ["dc-rescue-num", "dc-cgm", "dc-glucose-sucrose", "dc-c4-what"]},
+  {"lec": "dental", "t": "Hypoglycemia in the chair: the signs, a finger-stick (some CGMs stop reading at a floor), straight glucose rather than table sugar, a slow response on a GLP-1 drug, glucagon IM or subcutaneously if oral glucose fails", "basis": "recording", "ids": ["dc-rescue-num", "dc-cgm", "dc-glucose-sucrose", "dc-c4-what", "dc-glp1-slow"]},
   {"lec": "dental", "t": "Before treating a diabetic: HbA1c above 7 is poorly controlled (implant failure, periodontal disease), confirm the meal and medication, morning appointments; Dr. Taylor's metformin with a skipped breakfast; pack-years", "basis": "recording", "ids": ["dc-a1c-num", "dc-c4-prevent", "dc-pack-years", "dc-dm-mgmt-num", "dc-metformin-skip"]},
   {"lec": "dental", "t": "Hyperthyroidism and Graves disease (his first case): epinephrine caution, and thyroid storm (fever, pulse 140 or more; call 911)", "basis": "recording", "ids": ["dc-storm-911", "dc-c1-epi", "dc-storm-vs-hypo"]},
   {"lec": "dental", "t": "Addison disease (his third case): oral pigment from high ACTH, adrenal crisis triggers and signs, extra corticosteroid after a big procedure; Cushing syndrome and long-term steroids", "basis": "recording", "ids": ["dc-c3-pig", "dc-stress-dose", "dc-c3-crisis", "dc-c3-trigger", "dc-tf-steroid"]},

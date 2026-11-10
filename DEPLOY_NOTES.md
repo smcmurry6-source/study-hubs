@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, fuller gaps, focus slides from the decks,
+  Claude Code)** — Sam: "include all of the exam 1 high likelihood questions. do not cut them. pull randomly from them for
+  the mock. do not include them in the default question bank filter unless you click to include them"; "fill in the gaps
+  a little more"; "38-39 for l14 is the layers of the endometrium during menstruation". (1) The Refresher holds all 206
+  Exam 1 High Likelihood questions again (207 with `r-pa-2s-2`); the mock draws its five Exam 1 questions at random from
+  them (`mockLikelyPick`). (2) The Question Bank's default lectures are the 8 Exam 2 ones (`bankDefaultIds`): R joins only
+  when ticked, with Exam 1 High likelihood on (which unticks it again when turned off) or on a search jump that matches it.
+  (3) A key-term gap pass: 68 more cut questions back (the rule of 10s and Dr. Taylor's metformin example among them) and 2
+  new (`mh-sertoli-fridge`, `fh-tf-atresia`): the Exam 2 lectures hold 421, 300 High Likelihood. (4) L13 and L14 topics
+  re-ranked from the decks' real slide order, with a new L14 topic for the uterine wall (33-34); the focus hints say what
+  each slide range covers.
 - **2026-11-10 (Perio: Session 9 taught, from Dr. Abou-Arraj's recording, Claude Code, #298)** — Sam: "Update perio hub".
   Dr. Abou-Arraj's recorded first part of S9 (posted Nov 9) and his 2026 slides were in Drive, so S9 (Periodontal
   Plastic Therapy & Esthetics) went from `upcoming` straight to `taught`. Notes rewritten at both levels (40 aligned
