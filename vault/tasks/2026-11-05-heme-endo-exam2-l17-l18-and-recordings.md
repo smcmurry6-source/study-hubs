@@ -5,19 +5,21 @@ hub: heme-endo-exam2
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
-waiting-on: L17 and L18 slides; the L16 recording (Tue 11/10); the Exam 2 review (Wed 11/11)
+waiting-on: the L16 recording (Tue 11/10); the Exam 2 review (Wed 11/11)
 agent: 
 pr: 
 ---
 
-# Heme & Endo Exam 2: add L17 and L18, and make the slides-only lectures taught
+# Heme & Endo Exam 2: make the slides-only lectures taught (L17 and L18 left the exam)
 
 ## Goal
 
 The hub shipped on 2026-11-05, before half of its lectures were given. Bring it up to the whole exam before Fri 11/13:
 add L17 (Pregnancy and lactation, Dr. Madison, Tue 11/10) and L18 (Estrogens and androgens, Dr. Fasinu, Wed 11/11)
 when their slides are posted, take Lecture A and L13-L16 from slides-only to taught as their recordings land, and
-re-rank High Likelihood from the review on Wed 11/11.
+re-rank High Likelihood from the review on Wed 11/11. **Changed 2026-11-10:** L16 is the last lecture on Exam 2 (Sam, from
+Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam 3 hub
+([carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md)).
 
 ## Context
 
@@ -34,14 +36,15 @@ re-rank High Likelihood from the review on Wed 11/11.
   [diagram-review](../rules/diagram-review.md) (Sam said yes to all animations for this hub on 2026-11-05).
 - Quiz 3 is open until Thu 11/12, 11:59 pm and the take-home until 11/15: never use either
   ([graded-coursework](../rules/graded-coursework.md)).
-- `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: update them if the course announces a count per lecture.
+- `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: set from Dr. Herr's count per lecture on 2026-11-10 (see the hub note).
+  The counts never trim High Likelihood: a topic the review raises is added or ranked higher.
 - **The bank is kept high yield** (Sam, 2026-11-08: "803 is way too many questions"; it was cut to 339): L17 and L18 get
   about 30-35 questions each, and L16 going taught swaps questions instead of adding; see the hub note.
 
 ## Done when
 
-- [ ] L17 and L18 are lectures with notes at both levels, narration, questions in every required format and their
-      `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions
+- [x] ~~L17 and L18 are lectures with notes at both levels, narration, questions in every required format and their
+      `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions~~ Dropped 2026-11-10: not on Exam 2 (L16 is its last lecture)
 - [ ] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
       and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 waits for its 11/10 recording)
 - [ ] High Likelihood re-ranked from the 11/11 review
@@ -82,5 +85,9 @@ re-rank High Likelihood from the review on Wed 11/11.
 - 2026-11-10: Lecture A is not on Exam 2 (Sam asked Dr. Herr: he forgot about it, so it will likely be on the next exam;
   "i guess save all that for exam 3"). It came out of the hub whole; the Exam 3 hub picks it up:
   [the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
+- 2026-11-10: Sam, from Dr. Herr: "There are 5 review, 8 for l11, 9 for l12, and 7 for the rest of the lectures. L16 is the
+  last lecture on the test." `EXAM_COUNTS` and the mock follow it (High Likelihood keeps every topic: Sam, "Dont remove any
+  high likelihood questions"), and L17 and L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
+  L16's recording and the 11/11 review.
 
 ## Outcome
