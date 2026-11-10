@@ -173,7 +173,7 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     (`tools/figures/site/packs/`, [how-to](../how-to/draw-a-seasonal-set.md)).
   - **Server** (`migration_v54.sql`, still pending): the catalog (180 rows), seasonal windows, two throwback days a
     month, rank sets earned by rank, Halloween's set as a gift, the shop's shelves in `get_my_shop`, and visiting
-    (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js` has 344 checks.
+    (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js` has 348 checks.
   - **The design page**: galleries for the mastery options, the rank sets and the seasonal sets, and designs of the
     shop's shelves and of visiting from the boards.
 

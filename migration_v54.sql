@@ -1043,6 +1043,7 @@ create table if not exists public.shop_items (
   wide boolean not null default false,
   gift boolean not null default false,           -- everyone owns it (Halloween 2026's set)
   rank_tier smallint check (rank_tier between 1 and 20),   -- owned from this global tier on (a rank set)
+  added_on date not null default current_date,   -- the day it joined the catalog: a throwback needs its season to have run since
   check ((rank_tier is not null and price = 0) or (rank_tier is null and (
          (rarity = 'common' and price between 100 and 200) or (rarity = 'uncommon' and price between 250 and 500)
       or (rarity = 'rare' and price between 600 and 1200) or (rarity = 'epic' and price between 1500 and 3000)
@@ -1197,7 +1198,17 @@ returns table(item_id text, pos integer) language sql stable security definer se
   ) z order by z.k, z.id limit greatest(0, p_n);
 $$;
 
--- a throwback day's "Back for today" shelf: 3 seasonal items whose season is not on sale that day, at their usual price.
+-- has this season been on sale on some day from p_since up to the day before p_day? (Sam, 2026-11-10: holiday content
+-- is never in the shop before its own dates, so a throwback can only bring back a season that has already had a run
+-- since its items joined the catalog.) It looks back 400 days: more than the longest gap between two Easters' weeks.
+create or replace function public.sh_season_was_on(p_season text, p_since date, p_day date)
+returns boolean language sql stable set search_path = public as $$
+  select exists (select 1 from generate_series(greatest(p_since, p_day - 400), p_day - 1, interval '1 day') g
+                 where p_season = any(sh_shop_seasons(g::date)));
+$$;
+
+-- a throwback day's "Back for today" shelf: up to 3 seasonal items whose season is not on sale that day but has been
+-- since the items joined the catalog (so nothing is sold before its season's first run), at their usual price.
 -- The same weighted draw as the daily picks, seeded by the date; homes and scenes come up least (their weight is 0.4 of
 -- their rarity's). Never a gift (everyone has it) or a rank item. No rows on any other day.
 create or replace function public.sh_throwback_items(p_day date)
@@ -1209,6 +1220,8 @@ returns table(item_id text, pos integer) language sql stable security definer se
     from shop_items i
     where sh_is_throwback(p_day) and i.active and i.season is not null and not i.gift and i.rank_tier is null
       and i.kind not in ('snack', 'boost', 'costume') and not (i.season = any(sh_shop_seasons(p_day)))
+      and (i.season, i.added_on) in (select s.season, s.added_on from (select distinct season, added_on from shop_items where season is not null) s
+                                     where sh_season_was_on(s.season, s.added_on, p_day))
   ) z order by z.k, z.id limit 3;
 $$;
 
@@ -2105,6 +2118,7 @@ revoke all on function public.sh_shop_day(date) from public, anon, authenticated
 revoke all on function public.sh_shop_for(text, date) from public, anon, authenticated;
 revoke all on function public.sh_wallet(text) from public, anon, authenticated;
 revoke all on function public.sh_throwback_items(date) from public, anon, authenticated;
+revoke all on function public.sh_season_was_on(text, date, date) from public, anon, authenticated;
 revoke all on function public.sh_owned(text) from public, anon, authenticated;
 revoke all on function public.sh_owns(text, text) from public, anon, authenticated;
 revoke all on function public.sh_buy(date, text, text, text) from public, anon, authenticated;

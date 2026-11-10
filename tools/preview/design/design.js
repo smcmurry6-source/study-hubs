@@ -49,6 +49,22 @@
   }
   function timmy(k){ return uniq(A.timmy.bar[k] || A.timmy.bar.happy); }
 
+  /* Today's goal as a ring of 20 teeth, the way the hub engine draws it (widget/hub.js teethRing; Sam, 2026-11-06: "a more
+     visually interesting progress circle"): each tooth is a twentieth of the goal and fills in the hub's color, a thin
+     arc shows the exact share, the tooth that just filled pops in */
+  var TOOTH = "M-5 -3C-5.5 -7-3.5-7.8-1.8-7C-.8-6.6.8-6.6 1.8-7C3.5-7.8 5.5-7 5-3C4.7-.5 4 1.5 3.2 5C2.8 7 1.4 7.4 1 5.4L.4 2.6C.2 2-.2 2-.4 2.6L-1 5.4C-1.4 7.4-2.8 7-3.2 5C-4 1.5-4.7-.5-5-3Z";
+  var teethShown = -1;
+  function teethRing(done, of){
+    var N = 20, f = of ? Math.min(1, done / of) * N : 0, on = Math.floor(f), r = 33, c = 2 * Math.PI * r, out = "";
+    for (var k = 0; k < N; k++){
+      var st = k < on ? "is-on" : k < f ? "is-part" : "";
+      if (k < on && teethShown >= 0 && k >= teethShown) st += " is-new";
+      out += '<g transform="rotate(' + (k * 360 / N) + ' 60 60) translate(60 13)"><g class="tooth' + (st ? " " + st : "") + '"><path d="' + TOOTH + '"/>' + (k < on ? '<path class="shine" d="M-3.1-4.4C-2.7-5.6-1.7-5.9-.9-5.6"/>' : "") + "</g></g>";
+    }
+    teethShown = on;
+    return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0 0 120 120" role="img" aria-label="' + done + " of " + of + ' questions today">' +
+      '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' + out + "</svg>";
+  }
   /* the drawn answer marks: a hand-drawn ring or box that fills when picked, and a blob with a tick or a cross once
      answered (marks like articulating paper leaves on a cusp) */
   var RING = "M14 4.2C19.6 4 24 8.4 23.9 14c-.1 5.7-4.4 10-9.9 9.9C8.4 23.8 4.1 19.6 4.2 14 4.3 8.5 8.5 4.4 14 4.2Z";
@@ -302,6 +318,8 @@
       if (state.goal < state.of) {
         state.goal++;
         $$("[data-ring]").forEach(function(r){ r.outerHTML = ring(state.goal, state.of, r.getAttribute("class").replace("ring", "").trim()).replace("<svg ", '<svg data-ring="1" '); });
+        $$("[data-teeth]").forEach(function(w){ w.innerHTML = teethRing(state.goal, state.of); });
+        $$("[data-goalnum]").forEach(function(n){ n.textContent = state.goal; });
         $$("[data-goaltext]").forEach(function(n){ n.textContent = state.goal + " of " + state.of; });
         if (state.goal === state.of) {
           state.streak++;
@@ -400,8 +418,8 @@
             return '<button class="chip" type="button" aria-pressed="' + (c[2] ? "true" : "false") + '">' + c[0] + ' <span class="n num">' + c[1] + "</span></button>"; }).join("") + "</div>" +
         '<div class="livecard" id="liveCard"></div>' +
         '<aside class="today" aria-label="Today">' +
-          '<div class="panel"><h3>Today</h3><div class="panel-body big-ring">' + ring(state.goal, state.of, "").replace("<svg ", '<svg data-ring="1" ') +
-            '<div><p class="ring-num num" data-goaltext>' + state.goal + " of " + state.of + '</p><p class="ring-cap" data-goalcap>One more right or wrong answer meets today’s goal.</p></div></div>' +
+          '<div class="panel"><h3>Today</h3><div class="panel-body big-ring teeth-ring"><div class="teeth-wrap"><span data-teeth>' + teethRing(state.goal, state.of) + '</span><p class="teeth-num"><b class="num" data-goalnum>' + state.goal + '</b><span>of ' + state.of + '</span></p></div>' +
+            '<div><p class="ring-cap" data-goalcap>One more right or wrong answer meets today’s goal.</p></div></div>' +
             '<dl class="kv"><div><dt>' + icon("flame", 18) + 'Streak</dt><dd class="num" data-streak>' + state.streak + " days</dd></div>" +
             "<div><dt>" + icon("xp", 18) + 'XP today</dt><dd class="num" data-xptoday>+' + state.xpToday + " XP</dd></div>" +
             "<div><dt>" + icon("questions", 18) + 'This session</dt><dd class="num" data-session>' + state.session + " answered · " + state.right + " right</dd></div>" +

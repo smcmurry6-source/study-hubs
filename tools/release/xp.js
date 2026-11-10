@@ -594,7 +594,9 @@ try {
     'a holiday\'s set is on sale on every day Timmy dresses up for it, and the fall set exactly in the fall weeks (sh_season and sh_is_fall unchanged, as checked against widget/pet.js above)');
   eq(json(`to_jsonb(sh_shop_seasons(null))`), [], 'no day, no season');
 
-  // three years of the shared shop, day by day, for the checks below
+  // three years of the shared shop, day by day, for the checks below. The catalog's rows joined it "today" (added_on's
+  // default), so date them before the three years: a throwback only brings back a season that has run since then.
+  sql(`update shop_items set added_on = '2025-01-01'`);
   sql(`create table xp_test_shop as select d::date as d, s.item_id, s.shelf, s.pos
        from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d cross join lateral sh_shop_day(d::date) s`);
   eq(num(`select count(*) from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') g where
@@ -630,6 +632,22 @@ try {
   ok(tbMix.rare > tbMix.epic && tbMix.epic > tbMix.legendary && tbMix.legendary > tbMix.place && tbMix.place > 0,
     `on throwback days rarer items come back less often, and homes and scenes least (twenty years, 26 items of each: ${JSON.stringify(tbMix)})`);
   eq(rows(`select * from sh_throwback_items((select min(g)::date from generate_series('2027-06-01'::date, '2027-06-30'::date, interval '1 day') g where not sh_is_throwback(g::date)))`), [], 'no throwback shelf on any other day');
+  // nothing is sold before its season's first run (Sam, 2026-11-10): with a catalog that opened on 2026-11-15, a
+  // throwback can only bring back a season that has already been on sale since that day
+  sql(`update shop_items set added_on = '2026-11-15'`);
+  const early = rows(`select to_char(d, 'YYYY-MM-DD') as d, i.season from generate_series('2026-11-15'::date, '2027-11-14'::date, interval '1 day') d
+      cross join lateral sh_throwback_items(d::date) t join shop_items i on i.id = t.item_id order by 1`);
+  const firstRun = { thanksgiving: '2026-11-15', fall: '2026-11-15', winter: '2026-11-28', newyear: '2026-12-27', valentine: '2027-02-08', mardigras: '2027-02-03',
+    toothfairy: '2027-02-22', dentist: '2027-02-28', stpatrick: '2027-03-11', spring: '2027-03-20', easter: '2027-03-22', summer: '2027-06-01', july4: '2027-06-28' };
+  const tooSoon = early.filter(r => !firstRun[r.season] || r.d <= firstRun[r.season]);
+  ok(early.length > 30 && tooSoon.length === 0, `in the catalog's first year no throwback item comes before its season's first run (${early.length} items; ${tooSoon.length} too soon${tooSoon.length ? ': ' + JSON.stringify(tooSoon[0]) : ''})`);
+  const dec = [...new Set(early.filter(r => r.d >= '2026-12-01' && r.d <= '2026-12-14').map(r => r.season))].sort();
+  ok(dec.length > 0 && dec.every(s => s === 'thanksgiving' || s === 'fall'), `December's first throwback day brings back only Thanksgiving and fall pieces (${dec.join(', ')})`);
+  eq(num(`select count(*) from generate_series('2026-11-15'::date, '2027-03-21'::date, interval '1 day') d cross join lateral sh_shop_day(d::date) s
+          join shop_items i on i.id = s.item_id where i.season = 'easter'`), 0, 'no Easter piece is on any shelf before Easter week first comes');
+  ok(rows(`select sh_season_was_on('easter', '2026-11-15', '2028-04-01') as a, sh_season_was_on('easter', '2026-11-15', '2027-03-22') as b, sh_season_was_on('easter', '2027-03-30', '2028-04-09') as c`)
+    .every(r => r.a === true && r.b === false && r.c === false), 'a season counts as run from the day after its first day on sale, across a long gap between Easters, and not before the catalog had it');
+  sql(`update shop_items set added_on = '2025-01-01'`);
 
   // buying a seasonal item: in season, or on a throwback day when it's on that shelf
   const buyAt = (day, v, item, req) => json(`sh_buy(${q(day)}::date, ${q(v)}, ${q(item)}, ${q(req)})`);

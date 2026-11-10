@@ -312,6 +312,25 @@ img.emb-disc, .big, .small img { display: block; }
 .big-ring .ring circle { stroke-width: 3.6; }
 .ring-num { font-size: 26px; font-weight: var(--w-body); line-height: 1.1; }
 .ring-cap { font-size: var(--fs-label); color: var(--muted); }
+/* the goal as a ring of 20 teeth (the hub engine's teethRing): unearned teeth pale, earned ones in the hub's color */
+.big-ring.teeth-ring { grid-template-columns: 132px 1fr; }
+.teeth-wrap { position: relative; width: 132px; height: 132px; }
+.teeth { display: block; width: 100%; height: 100%; overflow: visible; }
+.teeth .tooth { transform-box: fill-box; transform-origin: center; }
+.teeth .tooth path { fill: var(--row); stroke: color-mix(in srgb, var(--text) 38%, transparent); stroke-width: 1.1; stroke-linejoin: round; transition: fill 200ms var(--ease-out); }
+.teeth .tooth .shine { fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: 1.1; stroke-linecap: round; }
+.teeth .tooth.is-part path { fill: var(--hub-mid); stroke: var(--text); }
+.teeth .tooth.is-on path:not(.shine) { fill: var(--hub); stroke: var(--text); }
+.teeth .tooth.is-new { animation: tooth-pop 560ms var(--ease-out) both; }
+@keyframes tooth-pop { 0% { transform: scale(.3); } 65% { transform: scale(1.28); } 100% { transform: scale(1); } }
+.teeth circle { fill: none; stroke-width: 3; }
+.teeth .t-track { stroke: var(--track); }
+.teeth .t-arc { stroke: var(--gold); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 700ms var(--ease-out); }
+.teeth.is-met .t-arc { stroke: var(--right); }
+.teeth-num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.teeth-num b { font-size: 32px; font-weight: var(--w-head); color: var(--text); }
+.teeth-num span { margin-top: 3px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--gold-ink); }
+@media (prefers-reduced-motion: reduce) { .teeth .tooth.is-new { animation: none; } .teeth .t-arc, .teeth .tooth path { transition: none; } }
 .kv { display: grid; gap: 0; margin-top: 12px; }
 .kv div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; font-size: var(--fs-label); }
 .kv div + div { border-top: 1px solid var(--rule); }

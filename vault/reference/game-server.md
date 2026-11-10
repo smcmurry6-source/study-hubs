@@ -111,6 +111,11 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   says whether a day is one. That day's "Back for today" shelf is 3 seasonal items whose season is not on sale, at their
   usual price: the same weighted draw, with homes and scenes at 0.4 of their rarity's weight so they come up least; never
   a gift or a rank item.
+- **Nothing is sold before its season's first run** (Sam, 2026-11-10: "holiday content is not available in the shop
+  until the holiday dates"): `shop_items.added_on` is the day a row joined the catalog (the day the migration is
+  applied), and a throwback only brings back a season that has been on sale since then (`sh_season_was_on`, looking back
+  400 days). So in the first months the "Back for today" shelf is short or empty (`throwback` can be true with no
+  throwback items: the client hides an empty shelf), and a season added later waits for its own first run.
 - **`buy_item(visitor, item, request)`**: not owned already, not a rank item, on sale today for this visitor (any shelf
   above), one of each snack a day, and the balance; idempotent on the request id. **`equip_item(visitor, slot, item)`**:
   what Timmy wears and where his things stand (the home, the scene, the five yard spots the art draws, `yard-left`,
@@ -197,7 +202,7 @@ Each is one line in `migration_v54.sql` to change.
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (344 checks: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (348 checks: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, and a place opened from a board row). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
