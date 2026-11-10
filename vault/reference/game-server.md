@@ -8,7 +8,7 @@ tags: [supabase, xp, ranks, shop, visiting, idea-board, redesign]
 How the redesign's game layer works on the database: XP without a daily cap, server-checked answers, the three journeys,
 Shiny Gold Crowns and Timmy's shop (the seasonal sets, the rank sets and throwback days included), visiting someone's place,
 and the idea board. Written and tested on a throwaway copy on 2026-11-06, changed in place on 2026-11-10 for
-[Sam's third round](../tasks/2026-11-10-redesign-timmys-place-round-3.md), and **applied
+[Sam's third round](../tasks/done/2026-11-10-redesign-timmys-place-round-3.md), and **applied
 at [the release](../tasks/2026-11-06-redesign-release.md), not before**; until then `migration_v54.sql` is listed in
 `supabase/pending-migrations.txt` and the live project runs today's rules. What each part should do and why:
 [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/2026-11-06-redesign-timmy-shop.md),

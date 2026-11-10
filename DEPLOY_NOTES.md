@@ -33,7 +33,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-10 (Timmy's place, round 3: on the design page and in the pending migration only, Claude Code)** — Sam's
-  third round of feedback ([task](vault/tasks/2026-11-10-redesign-timmys-place-round-3.md), PR #299, stacked on #289).
+  third round of feedback ([task](vault/tasks/done/2026-11-10-redesign-timmys-place-round-3.md), PR #299, stacked on #289).
   **Students see nothing yet**: nothing is wired into `widget/pet.js`, `widget/eggs.js`, `widget/hub.js` or
   `widget/ranks.js`, and `migration_v54.sql` is still unapplied. (1) Art fixes: "Why each choice" folded, a pop on the
   "Good question?" thumbs, shiny gold XP text, a five-level streak flame (blue at 10 days, Dark Matter at 30), the coin
@@ -62,7 +62,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   cut-offs of `conditions()` in `widget/pet.js`) sets his drawing, how he hops, how much he wanders, his wave, whether he
   flips and what he says; at 0 HP he stays on the doorstep. A visitor never sees it. (9) **Gentler ground**: every
   scene's contour is a wider, flatter bell (`arcTop(cx, top, edge)`; Sam: "too extreme and pointy"), and each scene
-  raises its backdrop to match (`farLift`). Open: Sam's look at the screenshots.
+  raises its backdrop to match (`farLift`). Sam: "Looks good", "its good to merge when youre ready" (#299, with #289's
+  commits). Next: the wiring into the live widgets.
 - **2026-11-10 (Occlusion L9: Noncarious Cervical Lesions, Dr. Lawson's prerecorded lecture, Claude Code)** — Sam added
   the transcript of Dr. Lawson's prerecorded lecture for the 11/12 session ("i dont have his slides yet or the other
   lecture from thursday"), so L9 `nccl` went live from the recording alone, the way L8 did. It has its own notes at both

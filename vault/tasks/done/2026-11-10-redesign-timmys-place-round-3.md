@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: done
 hub: widget
 created: 2026-11-10
 requested-by: Sam
 due: 
-waiting-on: Sam
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/299
 ---
@@ -14,8 +14,8 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/299
 
 ## Goal
 
-Sam looked at the design page after the second round ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289, and
-[the bowling egg](2026-11-06-redesign-bowling-egg.md), PR #291) and sent the list below. Fix the art, add what's missing
+Sam looked at the design page after the second round ([Timmy's place](../2026-11-06-redesign-timmys-place.md), PR #289, and
+[the bowling egg](../2026-11-06-redesign-bowling-egg.md), PR #291) and sent the list below. Fix the art, add what's missing
 and change how unlocks, seasons and the shop work, on the design page first, then show Sam before anything goes into
 `widget/pet.js`, `widget/eggs.js` or the live hubs.
 
@@ -32,10 +32,10 @@ and change how unlocks, seasons and the shop work, on the design page first, the
   built by `node tools/figures/site/build.mjs` into `tools/preview/design/place.js`; the page code is the place block in
   `tools/preview/design/design.js` and the `tp-*` rules in `design.css`. The rewards art (the streak flame, the XP spark)
   is `tools/figures/site/rewards.mjs`; the emblems are `emblems.mjs`; the bowling clips are `bowling.mjs`.
-- Rules that matter most: the house style in [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)
-  (drawn SVG in Timmy's ink style, no emoji, nothing generated), [preview-and-release-test](../rules/preview-and-release-test.md),
-  [learner-data-privacy](../rules/learner-data-privacy.md) (visiting someone's Timmy), [about-page](../rules/about-page.md),
-  and the lore rules in [podcast-reactions](../rules/podcast-reactions.md) (`tools/podcast/LORE.md`).
+- Rules that matter most: the house style in [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md)
+  (drawn SVG in Timmy's ink style, no emoji, nothing generated), [preview-and-release-test](../../rules/preview-and-release-test.md),
+  [learner-data-privacy](../../rules/learner-data-privacy.md) (visiting someone's Timmy), [about-page](../../rules/about-page.md),
+  and the lore rules in [podcast-reactions](../../rules/podcast-reactions.md) (`tools/podcast/LORE.md`).
 
 ## Sam's list (2026-11-10, in Sam's words where they're short)
 
@@ -105,9 +105,9 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 - **Visiting**: how a student finds someone (the leaderboard name, a link, friends?), whether it's opt-in, and what a
   visitor sees. Per-person rows never leave the database except the person's own, so the server needs a function that
   returns only what a place shows (the home, scene, yard, outfit, rank, mastery) for someone who chose to be visitable,
-  by their leaderboard name, and nothing that identifies them further ([learner-data-privacy](../rules/learner-data-privacy.md)).
+  by their leaderboard name, and nothing that identifies them further ([learner-data-privacy](../../rules/learner-data-privacy.md)).
 - **Rank-up unlocks**: which decoration, outfit and house each full rank gives (the ladder is in
-  [game-server](../reference/game-server.md) and [the journeys](2026-11-06-redesign-progression-journeys.md)); whether
+  [game-server](../../reference/game-server.md) and [the journeys](../2026-11-06-redesign-progression-journeys.md)); whether
   they're free unlocks or also in the shop.
 - **Seasonal returns**: how often "rare intervals" is (for example one seasonal item in the daily picks a few times a
   month), and whether a returning item keeps its price.
@@ -144,9 +144,9 @@ fall in the school year (with their dates), and ask Sam which to add before draw
       fountain's id, the visiting function, and their tests in `tools/release/xp.js` (and `rls.js` for visiting)
 - [x] `node tools/figures/site/build.mjs --check`, `node tools/ci/syntax.js`, `node tools/ci/vault.js`, the database
       suites, and the smoke test pass
-- [x] Vault written back: this note's Log and Outcome, [decisions](../decisions.md),
-      [Timmy's place](2026-11-06-redesign-timmys-place.md), [the shop](2026-11-06-redesign-timmy-shop.md),
-      [game-server](../reference/game-server.md), `DEPLOY_NOTES.md`
+- [x] Vault written back: this note's Log and Outcome, [decisions](../../decisions.md),
+      [Timmy's place](../2026-11-06-redesign-timmys-place.md), [the shop](../2026-11-06-redesign-timmy-shop.md),
+      [game-server](../../reference/game-server.md), `DEPLOY_NOTES.md`
 
 ## Log
 
@@ -170,7 +170,7 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     **trophy case** (a cup per hub) and a **gem plaque** (a gem per hub in the hub's color); the metal is the medal.
   - **Sets**: `tools/figures/site/sets.mjs` lists 14 seasonal sets of 8 pieces (Spring, Summer, Tooth Fairy week, Mardi
     Gras and the Fourth of July are new) and the Handpiece's six rank sets; each is drawn in its own pack
-    (`tools/figures/site/packs/`, [how-to](../how-to/draw-a-seasonal-set.md)).
+    (`tools/figures/site/packs/`, [how-to](../../how-to/draw-a-seasonal-set.md)).
   - **Server** (`migration_v54.sql`, still pending): the catalog (180 rows), seasonal windows, two throwback days a
     month, rank sets earned by rank, Halloween's set as a gift, the shop's shelves in `get_my_shop`, and visiting
     (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js` has 348 checks.
@@ -229,7 +229,7 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     and what he says. At 0 HP he stays on the doorstep, turns to look at what's tapped and says what he needs. The
     design page's Build it has a health slider with a chip per level (a preview: in the hubs his HP is the pet's), and a
     gallery of the eight levels. A visited Timmy is always drawn healthy: `get_place` returns no HP, and it must stay
-    that way ([learner-data-privacy](../rules/learner-data-privacy.md)).
+    that way ([learner-data-privacy](../../rules/learner-data-privacy.md)).
   - **Gentler ground** (Sam: "i want the contour of the hill and island and the other scenes to be more gradual. its
     a little too extreme and pointy"). `arcTop(cx, top, edge)` in `place.mjs` is a much wider bell now: the land
     drops about 50 units from the crest to the picture's edge where it dropped about 80, with a nearly flat crown,
@@ -245,8 +245,9 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 ## Outcome
 
 Sam looked at the last sheets (the gentler ground, health at his place) on 2026-11-10: "Looks good". The design
-work in this note is done; the PR waits for Sam to merge it (after #289, which it is stacked on). Left for the next
-session, which starts from this note:
+work in this note is done. Sam then said "its good to merge when youre ready": PR #299 goes into `main` once its
+checks are green, carrying #289's commits (it was stacked on it), so #289 is closed as shipped inside it.
+`migration_v54.sql` stays unapplied. Left for the next session, which starts from this note:
 
 - **Wiring** (not done, by instruction): the place, the sets, the wave and the bubble into `widget/pet.js`; the new
   seasons and holidays into `holidayId()` / `isFall()` (the server's `sh_shop_seasons` already has them); flame levels
@@ -264,6 +265,6 @@ session, which starts from this note:
 - A tall yard piece in the front spot (the wishing well, the swing) stands in front of the door, and one in the side
   yard or the front corner can cover part of the medal board: that is the player's choice of spot, not a drawing fault.
 
-Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
-[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [game-server](../reference/game-server.md)
+Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·
+[the bowling egg](../2026-11-06-redesign-bowling-egg.md) · [the journeys](../2026-11-06-redesign-progression-journeys.md) ·
+[phase 4](../2026-11-05-redesign-phase-4-game-layer.md) · [game-server](../../reference/game-server.md)
