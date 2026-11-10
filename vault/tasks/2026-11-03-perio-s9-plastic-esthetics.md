@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on: the live class's capture (gingival excess and abnormal color, the week of Nov 9), and Sam's answers on the diagram candidates
 agent: Claude Code (claude/bold-thompson-v88wcy)
-pr: the draft PR from claude/bold-thompson-v88wcy
+pr: https://github.com/smcmurry6-source/study-hubs/pull/298
 ---
 
 # Perio Session 9 (Periodontal Plastic Therapy & Esthetics)
@@ -64,7 +64,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 
 ## Outcome
 
-2026-11-10, PR from `claude/bold-thompson-v88wcy`:
+2026-11-10, [PR 298](https://github.com/smcmurry6-source/study-hubs/pull/298):
 - **Status taught**, with a lecture `note` saying it was lectured in two parts. The recording covers the phenotype,
   recession (factors, the two pathways, why treat, Cairo RT1-RT3), graft sources and the palate, the CTG + coronally
   advanced flap and ADM + tunnel cases, keratinized gingiva (is it needed, the 2 mm rule, an FGG left exposed) and the

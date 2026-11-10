@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-10 (Perio: Session 9 taught, from Dr. Abou-Arraj's recording, Claude Code)** — Sam: "Update perio hub".
+- **2026-11-10 (Perio: Session 9 taught, from Dr. Abou-Arraj's recording, Claude Code, #298)** — Sam: "Update perio hub".
   Dr. Abou-Arraj's recorded first part of S9 (posted Nov 9) and his 2026 slides were in Drive, so S9 (Periodontal
   Plastic Therapy & Esthetics) went from `upcoming` straight to `taught`. Notes rewritten at both levels (40 aligned
   paragraphs; the gingival excess, altered passive eruption, esthetics and tattoo sections are labeled "(slides; the
