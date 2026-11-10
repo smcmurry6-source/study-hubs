@@ -209,6 +209,11 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     the igloo's doorway (no snow on or in front of the tunnel, the statue and snow lanterns clear of the door), and the
     emerald hills' walls (one boundary wall with a gateway, pillars and a field gate; the loose wall pieces on the grass
     are mossy boulders).
+  - **Timmy's podcast studio** is a yard decoration (Sam: "i also want timmys podcast studio to be a decoration"): a
+    sound booth on a deck with a studio window, an on-air lamp, the show's poster, an antenna, his mic and a stool. Kit
+    key `studio`, shop id `podcast-studio`, one of the classics (goes in any scene), Epic, 2,400 crowns (the agent's
+    pick of rarity and price). Tapped, it goes on air (the lamp lights, the antenna sends rings) and Timmy says the
+    show's opening line. The catalog is 181 rows now (57 everyday).
   - The vendored `taste-skill` was not run in full: its house rules are for work screens and marketing pages (no
     decorative shapes), which fights a decorative game screen in Timmy's ink style. Its look-and-fix loop on
     screenshots is what the polish pass did.
@@ -221,7 +226,8 @@ Waiting for Sam's look at the second set of screenshots (PR above). Left for aft
   seasons and holidays into `holidayId()` / `isFall()` (the server's `sh_shop_seasons` already has them); flame levels
   4 and 5 into `widget/hub.js` (it picks levels 1-3 today); the shop (its window, the purchase animation and sounds),
   the customizer, the rank board's emblems and nameplate and visiting as real clients; then the About page (visiting,
-  the sets, the medal board, the sound switch) and `tools/podcast/LORE.md`.
+  the sets, the medal board, the sound switch, the podcast studio) and `tools/podcast/LORE.md` (the studio in the yard is
+  where Timmy Time is recorded: nothing in the lore says otherwise yet).
 - **For the wiring agent**: the design page's shop, customizer, rank board and cloud trip are mock-ups in
   `tools/preview/design/design.js` on made-up names and a made-up wallet; the sounds are Web Audio tones (`sfx()`), the
   setting is `sh_design_sound` in localStorage. The kit side (the medal board, `MEDALS`, `EGGS.mastery`) is real.

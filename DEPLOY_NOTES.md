@@ -46,8 +46,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (3) **Sets**: `tools/figures/site/sets.mjs`
   lists 14 seasonal sets of 8 pieces (new: Spring, Summer, Tooth Fairy week, Mardi Gras, the Fourth of July) and the
   Handpiece's six rank sets (an outfit and a yard piece per full rank-up, earned, never sold); each is one file in
-  `tools/figures/site/packs/` ([how-to](vault/how-to/draw-a-seasonal-set.md)); the build checks 1,430 drawings and 3,384
-  walks and `--strict` fails on a set with no pack. (4) Server, still pending: the catalog is 180 rows; seasonal windows
+  `tools/figures/site/packs/` ([how-to](vault/how-to/draw-a-seasonal-set.md)); the build checks 1,436 drawings and 3,384
+  walks and `--strict` fails on a set with no pack. (4) Server, still pending: the catalog is 181 rows; seasonal windows
   (`sh_shop_seasons`), two throwback days a month, rank sets by rank, Halloween's set as a gift, the shop's shelves in
   `get_my_shop`, and visiting (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js`
   348 checks; nothing seasonal is sold before its season's first run (`added_on`, `sh_season_was_on`); the Fourth of
@@ -56,7 +56,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   with synthesized sound cues), a **customizer** (a picture dock, shelves, a wardrobe rail, a camera that moves in), the
   **rank board** with each rank's handpiece emblem and your own name on a gold nameplate, and **visiting** (Visit, a
   random visit, next and back, a trip through soft clouds). (6) Polish: the statue's handpiece stands upright; the
-  igloo's doorway is clear; the emerald hills have one gated wall. Open: Sam's look at the second screenshots.
+  igloo's doorway is clear; the emerald hills have one gated wall. (7) **Timmy's podcast studio** is a yard piece (kit
+  key `studio`, shop id `podcast-studio`, Epic, 2,400): a sound booth with an on-air lamp, an antenna, the show's poster
+  and his mic; tapped, it goes on air. Open: Sam's look at the second screenshots.
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't

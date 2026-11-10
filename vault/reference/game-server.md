@@ -78,9 +78,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
-  from that rank on; its price is 0). 180 rows: 56 everyday ones (the rotation, the always-shelf and the rare costumes;
+  from that rank on; its price is 0). 181 rows: 57 everyday ones (the rotation, the always-shelf and the rare costumes;
   they follow Timmy's place's art, `tools/figures/site/place.mjs`; Sam, 2026-11-06: the names follow the art; the mint
-  fountain is now `mouthwash-fountain`), 112 seasonal and 12 rank. The seasonal and rank rows are **exactly** `allSetItems()` of
+  fountain is now `mouthwash-fountain`; Timmy's podcast studio, `podcast-studio`, an Epic yard piece, joined on 2026-11-10), 112 seasonal and 12 rank. The seasonal and rank rows are **exactly** `allSetItems()` of
   `tools/figures/site/sets.mjs` (generated from it; `xp.js` fails if they differ). The outfits that aren't drawn yet, the
   snacks and the boosts are still drafts (`admin_upsert_shop_item` edits them).
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and

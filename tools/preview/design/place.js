@@ -1590,6 +1590,71 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
         return s;
       },
       bits: function(){ var c = P(1.7, 1.7, 0); return dmStar(c[0] + 30, c[1] - 52, 6, "#FFE27A", "tp-twinkle") + dmStar(c[0] + 40, c[1] - 44, 3, "#FFFFFF", "tp-twinkle", .4); }
+    },
+    /* Timmy's podcast studio (Sam, 2026-11-10): the booth where Timmy Time is recorded. A sound-proofed cabin on a deck,
+       a studio window with the mic inside, an on-air lamp over it, the show's poster, an antenna on the roof, and his
+       microphone and a stool on the deck out front. Tapped, it goes on air: the lamp lights and the antenna sends rings. */
+    studio: {
+      n: "Timmy's podcast studio", note: "Where Timmy Time is recorded: a sound booth with an on-air lamp, an antenna and his microphone", rarity: "Epic", theme: "", price: 2400, id: "podcast-studio", spot: [3.45, 3.4],
+      geo: { x0: .3, y0: .2, w: 2.55, d: 1.5, h: 2.0, z0: .14 },
+      draw: function(o){
+        var g = YARD.studio.geo, x0 = g.x0, y0 = g.y0, w = g.w, d = g.d, h = g.h, z0 = g.z0, yf = y0 + d, xr = x0 + w, s = "";
+        var wall = o.night ? ["#6A59AE", "#4C3F86"] : ["#8A76D6", "#6452AE"], trim = o.night ? "#D9CFE6" : "#FFFDF6";
+        /* the deck */
+        s += box(x0 - .15, y0 - .15, 0, w + .3, d + 1.75, z0, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.4, si: .9 });
+        for (var i = 1; i < 6; i++) s += L(D([[x0 - .15 + i * .48, yf + .04, z0], [x0 - .15 + i * .48, yf + 1.58, z0]], true), .7, K.woodShade, .6);
+        /* the booth, padded: seams where the panels meet */
+        s += box(x0, y0, z0, w, d, h, { top: wall[0], left: wall[0], right: wall[1] });
+        s += L(D([[x0, yf, z0 + .36], [xr, yf, z0 + .36]], true) + D([[xr, y0, z0 + .36], [xr, yf, z0 + .36]], true), .8, INK, .28);
+        s += L(D([[xr, y0 + .3, z0 + .36], [xr, y0 + .3, z0 + h]], true) + D([[xr, y0 + 1.25, z0 + .36], [xr, y0 + 1.25, z0 + h]], true), .8, INK, .2);
+        /* the studio window: the dark of the booth, the mic on its arm and a strip of foam */
+        s += FO(D(onY(yf, rectUV(x0 + .2, x0 + 1.5, z0 + .56, z0 + 1.5))), trim, 1.4);
+        s += FO(D(onY(yf, rectUV(x0 + .29, x0 + 1.41, z0 + .65, z0 + 1.41))), o.night ? K.lit : "#2B2440", 1);
+        var m = P(x0 + .8, yf, z0 + 1.1), mc = o.night ? "#7A5A20" : "#C9D1D9";
+        s += L("M" + f(m[0] + 5) + " " + f(m[1] - 5.4) + " L" + f(m[0] + 1) + " " + f(m[1] - 1.4), 1.1, mc) + ell(m[0], m[1], 1.5, 2.3, mc, .7) + L("M" + f(m[0] - 1.2) + " " + f(m[1] - .5) + " h2.4 M" + f(m[0] - 1.2) + " " + f(m[1] + .6) + " h2.4", .5, INK, .6);
+        s += L(D([[x0 + .34, yf, z0 + .74], [x0 + .5, yf, z0 + .86], [x0 + .66, yf, z0 + .74], [x0 + .82, yf, z0 + .86], [x0 + .98, yf, z0 + .74], [x0 + 1.14, yf, z0 + .86], [x0 + 1.36, yf, z0 + .74]], true), .8, o.night ? "#B88A2A" : "#5B4A8A");
+        s += L(D([[x0 + .4, yf, z0 + 1.34], [x0 + .7, yf, z0 + 1.34]], true), .8, "#FFFFFF", o.night ? .7 : .35);
+        /* the on-air lamp over the window */
+        s += FO(D(onY(yf, rectUV(x0 + .43, x0 + 1.27, z0 + 1.58, z0 + 1.9))), o.night ? "#FF6B6B" : "#D8474D", 1.2) + L(D([[x0 + .53, yf, z0 + 1.79], [x0 + .89, yf, z0 + 1.79]], true), .8, "#FFFFFF", .7);
+        /* the door, on the side wall, a round window in it */
+        s += FO(D(onX(xr, rectUV(y0 + .5, y0 + 1.1, z0, z0 + 1.5))), trim, 1.4) + FO(D(onX(xr, rectUV(y0 + .57, y0 + 1.03, z0, z0 + 1.43))), o.night ? "#E0913F" : "#F29E4C", 1);
+        var dw = P(xr, y0 + .8, z0 + 1.06), kn = P(xr, y0 + .95, z0 + .66);
+        s += ell(dw[0], dw[1], 1.5, 1.9, o.night ? K.lit : "#BFE6F5", .9) + circ(kn[0], kn[1], .8, INK);
+        /* the show's poster beside the window: the tooth in headphones */
+        s += FO(D(onY(yf, rectUV(x0 + 1.68, x0 + 2.4, z0 + .66, z0 + 1.66))), "#FFD95A", 1.2);
+        var pc = P(x0 + 2.04, yf, z0 + 1.12);
+        s += tinyTooth(pc[0], pc[1] + .6, .58, "#FFFFFF") + L("M" + f(pc[0] - 3.1) + " " + f(pc[1] - .4) + " q.2 -4.4 3.1 -4.4 q2.9 0 3.1 4.4", 1.1) + circ(pc[0] - 3.1, pc[1] - .1, 1.15, K.red, .7) + circ(pc[0] + 3.1, pc[1] - .1, 1.15, K.red, .7);
+        /* the roof, and the antenna on it */
+        var rt = o.snow ? "#FFFFFF" : "#5A4A5E";
+        s += box(x0 - .18, y0 - .18, z0 + h, w + .36, d + .36, .2, { top: rt, left: "#6B5870", right: "#3B2E3A" }, { sw: 1.5, si: .9 });
+        var a0 = P(x0 + .62, y0 + .7, z0 + h + .2), a1 = [a0[0], a0[1] - 21];
+        s += ell(a0[0], a0[1], 2.6, 1.3, "#3B2E3A", 0) + L(seg(a0, a1), 2.8) + L(seg(a0, a1), 1.3, "#C9D1D9");
+        s += L("M" + f(a1[0] - 4) + " " + f(a1[1] + 6) + " h8 M" + f(a1[0] - 2.8) + " " + f(a1[1] + 10) + " h5.6", 1.3) + circ(a1[0], a1[1], 2, K.red, 1) + circ(a1[0] - .6, a1[1] - .6, .6, "#FFFFFF", 0);
+        /* out front: a stool, and the microphone on its stand with a pop filter */
+        var st = P(x0 + 2.08, yf + .62, z0), sz = 6.2;
+        s += L("M" + f(st[0] - 2.6) + " " + f(st[1]) + " l1 " + f(-sz) + " M" + f(st[0] + 2.6) + " " + f(st[1]) + " l-1 " + f(-sz) + " M" + f(st[0]) + " " + f(st[1] + 1.2) + " v" + f(-sz), 1.3) + L("M" + f(st[0] - 2) + " " + f(st[1] - 2.6) + " h4", .9);
+        s += ell(st[0], st[1] - sz + .6, 4, 2, K.redShade, 1.2) + ell(st[0], st[1] - sz - .4, 4, 2, K.red, 1.2);
+        var mb = P(x0 + 1.2, yf + 1.42, z0), mt = [mb[0], mb[1] - 9.6], mh = [mb[0] + 3.2, mb[1] - 12.2];
+        s += ell(mb[0], mb[1], 3.2, 1.6, "#3B2E3A", 0) + L(seg(mb, mt), 2.6) + L(seg(mb, mt), 1.2, "#8E98A3") + L(seg(mt, mh), 2.4) + L(seg(mt, mh), 1.1, "#8E98A3");
+        s += '<g transform="translate(' + f(mh[0]) + " " + f(mh[1]) + ') rotate(28)">' + FO("M-2.1 -3.4 a2.1 2.1 0 0 1 4.2 0 v4.6 a2.1 2.1 0 0 1 -4.2 0 z", "#E3E7EB", 1.1) + L("M-2 -2.2 h4 M-2 -.6 h4 M-2 1 h4", .6, INK, .55) + FO("M-1.3 3.2 h2.6 v1.6 h-2.6 z", "#3B2E3A", .6) + "</g>";
+        s += L("M" + f(mh[0] + 4.4) + " " + f(mh[1] - 4.1) + " a2.9 2.9 0 1 0 .01 0", 1);
+        return s;
+      },
+      /* at night the window, the door's porthole and the lamp are lit */
+      lights: function(){
+        var g = YARD.studio.geo, yf = g.y0 + g.d, wc = P(g.x0 + .85, yf, g.z0 + 1.03), lc = P(g.x0 + .85, yf, g.z0 + 1.73);
+        return glowAt(wc[0], wc[1], 11) + circ(lc[0], lc[1], 6, "#FF6B6B", 0).replace("/>", ' opacity=".3"/>');
+      },
+      /* on air: the lamp glows, the antenna sends rings, a couple of notes drift off */
+      bits: function(){
+        var g = YARD.studio.geo, yf = g.y0 + g.d, lc = P(g.x0 + .85, yf, g.z0 + 1.73), a = P(g.x0 + .62, g.y0 + .7, g.z0 + g.h + .2), t = [a[0], a[1] - 21], s = "";
+        s += circ(lc[0], lc[1], 8, "#FF6B6B", 0).replace("/>", ' opacity=".35"/>') + FO(D(onY(yf, rectUV(g.x0 + .43, g.x0 + 1.27, g.z0 + 1.58, g.z0 + 1.9))), "#FF5A5F", 1.2) + L(D([[g.x0 + .53, yf, g.z0 + 1.79], [g.x0 + 1.01, yf, g.z0 + 1.79]], true), 1, "#FFFFFF", .9);
+        var ring = "";
+        [5.5, 9.5, 13.5].forEach(function(r, i){ ring += L("M" + f(t[0] + r * .72) + " " + f(t[1] - r * .7) + " A" + f(r) + " " + f(r) + " 0 0 1 " + f(t[0] + r * .72) + " " + f(t[1] + r * .7) + " M" + f(t[0] - r * .72) + " " + f(t[1] - r * .7) + " A" + f(r) + " " + f(r) + " 0 0 0 " + f(t[0] - r * .72) + " " + f(t[1] + r * .7), 1.5 - i * .2, i ? "#FFD95A" : "#FFFFFF", 1 - i * .18); });
+        s += G("tp-twinkle", ring);
+        var note = function(x, y, c){ return L("M" + f(x + 1.5) + " " + f(y) + " v-7 l4 -1.4 v2.4 l-4 1.4", 1.3) + ell(x, y, 2.1, 1.6, c, 1); };
+        return s + G("tp-sparks", note(t[0] + 22, t[1] + 16, "#FFD95A") + note(t[0] - 20, t[1] + 12, "#8FE3D9"));
+      }
     }
   };
   Object.keys(YARD).forEach(function(k){ YARD[k].k = k; });
@@ -2044,7 +2109,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     { k: "snowy", n: "Snowy peak", note: "An igloo on a ledge above the clouds, a hot spring to warm up in", scene: "mountain", homes: ["igloo"], yard: ["hotspring"], outfits: ["beanie"], color: "#5FA3D9" },
     { k: "starlight", n: "Starlight", note: "A little planet under the Dark Matter stars", scene: "space", homes: ["observatory"], yard: ["telescope"], outfits: ["nightcap"], color: "#7A3CFF" },
     { k: "clouds", n: "Above the clouds", note: "A castle in the sky, a mouthwash fountain in its yard", scene: "clouds", homes: ["castle"], yard: ["fountain"], outfits: ["aviator"], color: "#E07090" },
-    { k: "classics", n: "The classics", note: "They go anywhere", scene: "", homes: [], yard: ["doghouse", "lane"], outfits: [], color: "#8E98A3" }
+    { k: "classics", n: "The classics", note: "They go anywhere", scene: "", homes: [], yard: ["doghouse", "lane", "studio"], outfits: [], color: "#8E98A3" }
   ];
   /* the upgrades and paints in the shop: one item each; every home draws it its own way (HOMES[k].upn) */
   var UPGRADES = [
@@ -2085,11 +2150,12 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     campfire: { n: "The campfire", does: "sparks fly up", say: "No marshmallows. Just stories." },
     hotspring: { n: "The hot spring", does: "bubbles", say: "Ahh. Warm water, sensitive teeth: careful." },
     telescope: { n: "The telescope", does: "finds a star", say: "Found one! Calling it Molar Major." },
+    studio: { n: "The podcast studio", does: "goes on air", say: "Hey. It's Timmy, and this is Timmy Time." },
     timmy: { n: "Timmy", does: "waves hello; tap him again and he flips", say: "Wheee!" }
   };
   var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
     home: "tp-pop 1.8s", statue: "tp-pop 2s", mastery: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
-    mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s" };
+    mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s", studio: "tp-pop 2.6s" };
   /* ------------------------------------------------------------------ the sets (packs) ------------------------------
      A seasonal set or the rank sets: one function per set in tools/figures/site/packs/, handed this toolkit, returning
      { k, homes, scenes, yard, outfits }, each keyed by the piece's shop id. Its name, rarity and price come from SETS
@@ -2121,7 +2187,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       });
     });
   })();
-  var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "sun"];
+  var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "studio", "sun"];
 
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
      and an egg shows its bits without moving. */

@@ -543,7 +543,7 @@ try {
   const gotSets = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier from shop_items where season is not null or gift or rank_tier is not null`));
   const setDiff = [...new Set([...Object.keys(wantSets), ...Object.keys(gotSets)])].filter(id => wantSets[id] !== gotSets[id]).sort();
   ok(setDiff.length === 0 && SETS.items.length === 124, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
-  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 56 + SETS.items.length, 'the catalog has 180 rows: 56 everyday ones (the rotation, the always-shelf, the rare costumes), 112 seasonal and 12 rank');
+  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 57 + SETS.items.length, 'the catalog has 181 rows: 57 everyday ones (the rotation, the always-shelf, the rare costumes), 112 seasonal and 12 rank');
   const perSeason = rows(`select season, count(*)::int as n, count(*) filter (where kind = 'home' and rarity = 'legendary')::int as h, count(*) filter (where kind = 'scene' and rarity = 'legendary')::int as s,
       string_agg(rarity, ',' order by price) filter (where kind = 'outfit') as o, string_agg(rarity, ',' order by price) filter (where kind = 'yard') as y, bool_or(rotates or shelf) as r, bool_and(gift) as g
     from shop_items where season is not null group by 1 order by 1`);
