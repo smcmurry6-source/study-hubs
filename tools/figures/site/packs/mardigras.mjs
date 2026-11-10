@@ -159,7 +159,7 @@ export function pack(T){
       sky: function(o){
         var st = curl(124, 4, MG[0]) + curl(148, 2, MG[1], true) + curl(252, 3, MG[2]) + curl(276, 5, MG[0], true) + curl(322, 3, MG[1]) + curl(346, 6, MG[2], true) + curl(54, 2, MG[2], true), cf = "", R = T.rng(41), i;
         for (i = 0; i < 26; i++){ var x = 48 + R() * 304, y = 8 + R() * 70; cf += F("M" + m(x, y) + " l2.4 .9 -.9 2.4 -2.4 -.9 z", [PUR[0], GLD[0], GRN[0], "#F58FB0"][i % 4], o.night ? .7 : .9); }
-        if (o.night) return T.bands(["#1D1444", "#291B5A", "#39256F", "#4C3284"], 0, 300) + T.starField(11, 24, 120) + T.moon(86, 36) + cf + st;
+        if (o.night) return T.bands(["#1D1444", "#291B5A", "#39256F", "#4C3284"], 0, 300) + T.starField(11, 24, 120) + T.moon(86, 23) + cf + st;
         return T.bands(["#BBD8F8", "#CCE2FA", "#E0EBFB", "#F4EEFB"], 0, 300) + T.sun(86, 32) + T.cloud(300, 44, .9) + T.cloud(196, 14, .6) + cf + st;
       },
       far: function(o){

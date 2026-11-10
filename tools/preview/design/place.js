@@ -257,12 +257,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* ------------------------------------------------------------------ the ground ----------------------------------- */
   /* Each scene's land fills the picture below its top edge, a function of x (a hill's crest, the dunes, a planet's
      rim), and above its bottom edge where it has one (a cliff, a cloud bank). */
-  /* a gradual hill (Sam, 2026-11-10: not a semicircle poking up from the ground): a bell, rounded on top and easing out
-     at its foot, wider than the picture so the land runs off both edges. top at cx; rx is where the old dome ended:
-     the bell is as high there as the yard needs, and reaches its foot (base) at 1.5 rx. */
-  function arcTop(cx, top, rx, base){
-    var w = rx * 1.52;
-    return function(x){ var d = Math.min(1, Math.abs(x - cx) / w); return top + (base - top) * (1 - Math.cos(Math.PI * d)) / 2; };
+  /* a gradual hill (Sam, 2026-11-10: not a semicircle poking up from the ground; then "more gradual. its a little too
+     extreme and pointy"): a wide bell, 380 across each way, so its crown is nearly flat and the land runs off both
+     edges of the picture while still rising. arcTop(cx, top, edge): top at cx, and edge is how high the land stands at
+     the picture's edge (156 from the middle). A backdrop drawn for the older, steeper hill is raised by the scene's
+     farLift so the land doesn't bury it. */
+  function arcTop(cx, top, edge){
+    var w = 380, k = (1 - Math.cos(Math.PI * 156 / w)) / 2, full = (edge - top) / k;
+    return function(x){ var d = Math.min(1, Math.abs(x - cx) / w); return top + full * (1 - Math.cos(Math.PI * d)) / 2; };
   }
   function trace(fn, x0, x1, step){ var pts = []; for (var x = x0; x < x1; x += step || 6) pts.push([x, fn(x)]); pts.push([x1, fn(x1)]); return pts; }
   function landD(top, bot){ var a = trace(top, 30, 370), b = bot ? trace(bot, 30, 370).reverse() : [[370, 300], [30, 300]]; return D2(a.concat(b)); }
@@ -278,17 +280,17 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     return out;
   }
 
-  var HILL_TOP = arcTop(200, 74, 142, 172);
-  var BEACH_TOP = arcTop(198, 80, 150, 170);
+  var HILL_TOP = arcTop(200, 78, 128);
+  var BEACH_TOP = arcTop(198, 82, 128);
   /* the beach is an island (Sam, 2026-11-10): the sea behind the dune, round both ends and across the front. shoreB(x)
      is the front shoreline; the dune's crest (BEACH_TOP) is its back. */
   function shoreB(x){ var d = (x - 176) / 190; return d * d >= 1 ? 0 : 170 + 96 * Math.sqrt(1 - d * d) + 3 * Math.sin(x / 13) + 1.6 * Math.sin(x / 5.3 + 1); }
   function onIsland(sx, sy, m){ return sy < shoreB(sx) - (m || 0); }
-  var FOREST_TOP = arcTop(200, 72, 168, 156);
-  var MTN_TOP = arcTop(200, 70, 172, 150);
+  var FOREST_TOP = arcTop(200, 74, 114);
+  var MTN_TOP = arcTop(200, 72, 110);
   function cliffY(x){ var d = (x - 200) / 160; return 256 - 24 * d * d + 3.5 * Math.sin(x / 7); }
-  var MOON_TOP = arcTop(200, 72, 176, 146);
-  var CLOUD_ARC = arcTop(200, 78, 166, 160);
+  var MOON_TOP = arcTop(200, 74, 108);
+  var CLOUD_ARC = arcTop(200, 80, 118);
   function cloudTop(x){ return CLOUD_ARC(x); }
   function cloudBot(x){ var d = (x - 200) / 160; return 262 - 26 * d * d + 6 * Math.abs(Math.sin(x / 11)); }
 
@@ -307,10 +309,12 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* a set's scene on the hill's own landform (so the yard, the path and Timmy's walks work as on the hill): the pack gives
      its sky, its backdrop, the ground's four greens (or snows, or sands) and what grows and stands on it.
      spec: { sky(o), far(o), ground(o) -> [top, light slope, far slope, line], flat(o, on), props(o, on) -> [{x, y, s}],
-     landExtra(o), fg(o), skirt, path, treeKind, lamp, grade, snowy, alwaysNight } */
+     landExtra(o), fg(o), skirt, path, treeKind, lamp, grade, snowy, alwaysNight, farLift }
+     farLift (22 unless given) raises the backdrop: draw far(o) as if the land's edge stood near y 150 at the picture's
+     sides, and keep the sun and the moon clear of whatever the backdrop lifts into the sky. */
   function hillScene(spec){
     return {
-      top: HILL_TOP, skirt: spec.skirt || "grass", path: spec.path || "stones", treeKind: spec.treeKind || "round", lamp: spec.lamp || "post", grade: spec.grade || ["#FFE7B0", .05],
+      top: HILL_TOP, farLift: spec.farLift == null ? 22 : spec.farLift, skirt: spec.skirt || "grass", path: spec.path || "stones", treeKind: spec.treeKind || "round", lamp: spec.lamp || "post", grade: spec.grade || ["#FFE7B0", .05],
       snowy: !!spec.snowy, alwaysNight: !!spec.alwaysNight,
       chip: function(o){ var g = spec.ground(o); return [g[0], g[3]]; },
       sky: spec.sky, far: spec.far || function(){ return ""; },
@@ -332,7 +336,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   var SCENES = {
     hill: {
       n: "The hill", note: "Default: the hilltop where every Timmy starts", rarity: "", theme: "hilltop", price: 0, id: "",
-      top: HILL_TOP, skirt: "grass", path: "stones", treeKind: "round", lamp: "post", grade: ["#FFE7B0", .05],
+      top: HILL_TOP, farLift: 22, skirt: "grass", path: "stones", treeKind: "round", lamp: "post", grade: ["#FFE7B0", .05],
       chip: function(o){ return o.night ? ["#5E9E6A", "#3F7550"] : [K.grass, K.grassShade]; },
       sky: function(o){ return o.night ? bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + moon(330, 44) + starField(5, 30, 150)
         : bands(["#BFE5FA", "#CBEAF9", "#D8F0FB", "#E5F5FC"], 0, 300) + sun(78, 40) + cloud(306, 34) + cloud(156, 22, .7); },
@@ -384,7 +388,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     },
     beach: {
       n: "The beach", note: "Dunes, a palm and the sea lapping in", rarity: "Rare", theme: "seaside", price: 1000, id: "beach",
-      top: BEACH_TOP, wet: true, skirt: "sand", path: "boards", treeKind: "palm", lamp: "tiki", grade: ["#FFD28A", .07],
+      top: BEACH_TOP, farLift: 14, wet: true, skirt: "sand", path: "boards", treeKind: "palm", lamp: "tiki", grade: ["#FFD28A", .07],
       chip: function(o){ return o.night ? ["#B9A67C", "#86774F"] : ["#F7E4B2", "#D6B676"]; },
       sky: function(o){ return o.night ? bands(["#16204A", "#1E2C5C", "#283B70", "#33497F"], 0, 300) + moon(84, 40) + starField(9, 28, 116)
         : bands(["#BDE6FA", "#CDEDFB", "#DDF3FC", "#ECF8FD"], 0, 300) + sun(318, 38) + cloud(118, 30) + G("tp-gull", L("M240 52 q4 -4 8 0 q4 -4 8 0 M268 70 q3 -3 6 0 q3 -3 6 0", 1.4)); },
@@ -487,7 +491,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     },
     mountain: {
       n: "The snowy mountain", note: "A ledge above the clouds, snow all year", rarity: "Epic", theme: "snowy", price: 1800, id: "snowy-mountain",
-      top: MTN_TOP, bot: cliffY, snowy: true, skirt: "snow", path: "snow", treeKind: "pine", lamp: "iron", grade: ["#9CC3E6", .07],
+      top: MTN_TOP, farLift: 16, bot: cliffY, snowy: true, skirt: "snow", path: "snow", treeKind: "pine", lamp: "iron", grade: ["#9CC3E6", .07],
       chip: function(o){ return o.night ? ["#C9D6EA", "#7F8A97"] : ["#F7FBFF", "#97A3B1"]; },
       sky: function(o){ return o.night ? bands(["#121A40", "#1A2552", "#233265", "#2D3F76"], 0, 300) + moon(328, 40) + starField(17, 34, 120)
         : bands(["#C9E0F4", "#D6E8F7", "#E2EFF9", "#EEF5FB"], 0, 300) + sun(84, 40) + cloud(286, 30, .9); },
@@ -591,7 +595,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       /* redrawn 2026-11-10 (Sam: "looks more like snow than a cloud"): big round billows along the top, puffs drawn
          across the surface, warm light and pink shade instead of snow's blue white, and two gaps the sky shows through */
       n: "Above the clouds", note: "A cloud bank in the sky, a rainbow behind", rarity: "Epic", theme: "clouds", price: 2800, id: "clouds",
-      top: cloudTop, bot: cloudBot, skirt: "cloud", path: "gold", treeKind: "cloud", lamp: "gold", grade: ["#FFC9D9", .05],
+      top: cloudTop, farLift: 14, bot: cloudBot, skirt: "cloud", path: "gold", treeKind: "cloud", lamp: "gold", grade: ["#FFC9D9", .05],
       chip: function(o){ return o.night ? ["#D9D4EF", "#A99FD0"] : ["#FFFDF8", "#E3D6EE"]; },
       sky: function(o){
         if (o.night) return bands(["#1A2558", "#22306A", "#2C3C7A", "#3A4888", "#4A5496"], 0, 300) + moon(320, 44) + starField(61, 34, 150);
@@ -1898,7 +1902,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     if (tier >= 6) s += G("", [[150, 30, 5], [196, 16, 7], [246, 30, 4.4], [118, 54, 3.4], [276, 54, 3.6]].map(function(p, i){ return dmStar(p[0], p[1], p[2], i % 2 ? K.dmTeal : K.dmLight, "tp-twinkle", i * .5); }).join("") +
       (night ? F("M70 84 Q140 40 200 58 Q262 76 330 40 L330 50 Q262 88 200 70 Q140 52 70 96 Z", K.dmLight, .22) + F("M70 98 Q140 58 200 74 Q262 90 330 58 L330 64 Q262 98 200 82 Q140 66 70 104 Z", K.dmTeal, .2) : ""));
     s += holidaySky(H === "winter" ? "" : H);
-    s += sc.far(so) + sc.land(so) + sc.flat(so);
+    /* the backdrops were drawn for a steeper hill: farLift raises one so the gentler land doesn't bury it */
+    s += (sc.farLift ? T(0, -sc.farLift, sc.far(so)) : sc.far(so)) + sc.land(so) + sc.flat(so);
     if (season === "fall" && !snow && (sc === SCENES.hill || sc === SCENES.forest)) s += scatter(66, 12, function(sx, sy, x, y){ return sceneOn(sc, sx, sy) && !busy(x, y); }, function(sx, sy, i){ return F("M" + f(sx) + " " + f(sy) + " q2.4 -2.4 4.8 0 q-2.4 2.4 -4.8 0z", ["#E8A33D", "#D9622B", "#C2410C", "#F2C230"][i % 4], .9); }).join("");
     if (!o.bare) s += shadowOf(home) + pathAll(sc, home, so);
     if (o.marks) SLOT_ORDER.forEach(function(k){ if (!yard[k] && !(k === "corner" && yard.side && YARD[yard.side].wide)) s += emptySlot(k); });
@@ -2949,14 +2954,14 @@ function pack(T){
     return s + G("tp-water", rays) + L(T.D2(lo, true), 1.6, "#E9FFF2", Math.round(.6 * k * 100) / 100);
   }
   var scenes = {
-    "aurora-lake": T.hillScene({
+    "aurora-lake": T.hillScene({ farLift: 20,
       note: "Snow, pines and a frozen lake, the northern lights rippling over the far peaks",
       path: "snow", treeKind: "pine", lamp: "iron", skirt: "snow", grade: ["#8FB6E8", .07], snowy: true,
       ground: function(o){ return o.night ? ["#C9D6EA", "#B4C3DC", "#9FB0CC", "#8394B4"] : ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#0A1136", "#101B48", "#17295A", "#1E376A"], 0, 300) + T.starField(23, 30, 120) + aurora(38, 6, 2.1, ["#A99BFF", "#6FD9E8", "#B48CFF"], .8) + aurora(76, 9, .4, ["#7CF5B0", "#4FE0C0", "#8C8CF5"], 1) + T.moon(332, 28);
+        if (o.night) return T.bands(["#0A1136", "#101B48", "#17295A", "#1E376A"], 0, 300) + T.starField(23, 30, 120) + aurora(38, 6, 2.1, ["#A99BFF", "#6FD9E8", "#B48CFF"], .8) + aurora(76, 9, .4, ["#7CF5B0", "#4FE0C0", "#8C8CF5"], 1) + T.moon(214, 22);
         /* the short polar day: a dusky sky, the lights already out, the sun low */
-        return T.bands(["#6272BC", "#8C8ECC", "#C6A6CE", "#F2C2B8"], 0, 300) + aurora(40, 6, 2.1, ["#C9B8FF", "#9FE6EE", "#C9A6FF"], .6) + aurora(76, 9, .4, ["#9BF7C4", "#7FE9D2", "#A9A9F7"], .8) + T.sun(84, 40);
+        return T.bands(["#6272BC", "#8C8ECC", "#C6A6CE", "#F2C2B8"], 0, 300) + aurora(40, 6, 2.1, ["#C9B8FF", "#9FE6EE", "#C9A6FF"], .6) + aurora(76, 9, .4, ["#9BF7C4", "#7FE9D2", "#A9A9F7"], .8) + T.sun(142, 28);
       },
       far: function(o){
         var m = o.night ? ["#33427A", "#283668", "#C9D6EA"] : ["#8F9CD2", "#7584C0", "#FFFFFF"], ice = o.night ? ["#2C5C86", "#3D749C", "#7FB0D0"] : ["#C6E6F6", "#E4F4FB", "#FFFFFF"], pn = o.night ? "#1F3F3A" : "#3E7A5C", s = "", x;
@@ -3228,7 +3233,7 @@ function pack(T){
     return s;
   }
   var scenes = {
-    "midnight-rooftops": T.hillScene({
+    "midnight-rooftops": T.hillScene({ farLift: 8,
       note: "Always midnight: the city's rooftops and lit windows behind the hill, fireworks overhead",
       alwaysNight: true, path: "stones", treeKind: "round", lamp: "iron", grade: ["#7A5CFF", .05],
       ground: function(o){ return o.snow ? ["#EEF4FB", "#DEE8F4", "#CCDAEA", "#B0C4DA"] : ["#63A08C", "#57927F", "#4A8271", "#3A6B5C"]; },
@@ -3593,7 +3598,7 @@ function pack(T){
       sky: function(o){
         var st = curl(124, 4, MG[0]) + curl(148, 2, MG[1], true) + curl(252, 3, MG[2]) + curl(276, 5, MG[0], true) + curl(322, 3, MG[1]) + curl(346, 6, MG[2], true) + curl(54, 2, MG[2], true), cf = "", R = T.rng(41), i;
         for (i = 0; i < 26; i++){ var x = 48 + R() * 304, y = 8 + R() * 70; cf += F("M" + m(x, y) + " l2.4 .9 -.9 2.4 -2.4 -.9 z", [PUR[0], GLD[0], GRN[0], "#F58FB0"][i % 4], o.night ? .7 : .9); }
-        if (o.night) return T.bands(["#1D1444", "#291B5A", "#39256F", "#4C3284"], 0, 300) + T.starField(11, 24, 120) + T.moon(86, 36) + cf + st;
+        if (o.night) return T.bands(["#1D1444", "#291B5A", "#39256F", "#4C3284"], 0, 300) + T.starField(11, 24, 120) + T.moon(86, 23) + cf + st;
         return T.bands(["#BBD8F8", "#CCE2FA", "#E0EBFB", "#F4EEFB"], 0, 300) + T.sun(86, 32) + T.cloud(300, 44, .9) + T.cloud(196, 14, .6) + cf + st;
       },
       far: function(o){
@@ -3902,7 +3907,7 @@ function pack(T){
       path: "stones", treeKind: "round", lamp: "iron", grade: ["#FFB3C7", .07],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5C9272", "#508466", "#44745A", "#38644C"] : ["#BCE5A2", "#ABDA93", "#95CC81", "#6FAE66"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#2A1B4A", "#3A2460", "#4D2F72", "#643C82"], 0, 300) + T.starField(14, 28, 140) + T.moon(322, 46) + heart(142, 40, 5, "#F7A3BA").replace("/>", ' opacity=".5"/>');
+        if (o.night) return T.bands(["#2A1B4A", "#3A2460", "#4D2F72", "#643C82"], 0, 300) + T.starField(14, 28, 140) + T.moon(296, 32) + heart(142, 40, 5, "#F7A3BA").replace("/>", ' opacity=".5"/>');
         var doves = ""; [[118, 70], [130, 63]].forEach(function(q){ doves += L("M" + f(q[0] - 4) + " " + f(q[1] - 1) + " q2.4 -2.6 4 0 q1.6 -2.6 4 0", 1.3, INK, .6); });
         return T.bands(["#FFC4D6", "#FFD2DF", "#FFDFE8", "#FFEDF1"], 0, 300) + T.sun(76, 50) + T.cloud(306, 34) + T.cloud(196, 22, .6) + FO(hd(142, 40, 9), "#FFFFFF", 1.4) + doves;
       },
@@ -4516,8 +4521,8 @@ function pack(T){
       path: "stones", treeKind: "round", lamp: "post", grade: ["#FFF1C4", .04],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E29A", "#A2D889", "#8CCB78", "#6DB062"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + T.moon(318, 40) + T.starField(11, 28, 140);
-        return T.bands(["#9FD8F7", "#B3E1F9", "#C7EAFB", "#DBF2FC"], 0, 300) + T.sun(84, 38) + T.cloud(318, 30, .6);
+        if (o.night) return T.bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + T.moon(322, 28) + T.starField(11, 28, 140);
+        return T.bands(["#9FD8F7", "#B3E1F9", "#C7EAFB", "#DBF2FC"], 0, 300) + T.sun(150, 28) + T.cloud(318, 30, .6);
       },
       far: function(o){
         var c = o.snow ? ["#EEF5FB", "#DCEAF6"] : o.night ? ["#3D6B5A", "#335C4C"] : ["#C9E9B6", "#B2DC9C"], s = "", n = o.night;
@@ -5199,7 +5204,7 @@ function pack(T){
       path: "stones", treeKind: "round", lamp: "lantern", grade: ["#FFE3EC", .06],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E28A", "#A3D878", "#8CC968", "#68AA52"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#1A2152", "#1F2759", "#252E63", "#2C366E", "#353F7A", "#404886", "#404886", "#404886"], 0, 300) + T.moon(326, 44) + T.starField(7, 28, 120);
+        if (o.night) return T.bands(["#1A2152", "#1F2759", "#252E63", "#2C366E", "#353F7A", "#404886", "#404886", "#404886"], 0, 300) + T.moon(262, 28) + T.starField(7, 28, 120);
         return T.bands(["#BDE3F8", "#CBE9F9", "#DAEFF8", "#EAF3F3", "#F8EEE6", "#FCE9DF", "#FCE9DF", "#FCE9DF"], 0, 300) + T.sun(82, 38) + T.cloud(296, 32) + T.cloud(190, 20, .6) +
           butterfly(146, 58, PAS[0]) + butterfly(252, 64, PAS[2]);
       },
@@ -5495,7 +5500,7 @@ function pack(T){
 
   /* ------------------------------------------------------------------ the scene: a cherry blossom grove ------------- */
   var scenes = {
-    "cherry-blossoms": T.hillScene({
+    "cherry-blossoms": T.hillScene({ farLift: 8,
       note: "Pink trees in bloom all round the hill, petals drifting down and lying on the grass",
       path: "stones", treeKind: "round", lamp: "lantern", grade: ["#FFC4D8", .07],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9372", "#528566", "#467658", "#355E45"] : ["#BDE5A6", "#AEDB97", "#9BCE86", "#6FB068"]; },
@@ -5864,7 +5869,7 @@ function pack(T){
 
   /* ------------------------------------------------------------------ the scene: the fairgrounds -------------------- */
   var scenes = {
-    fairgrounds: T.hillScene({
+    fairgrounds: T.hillScene({ farLift: 15,
       note: "Striped tents, strings of pennants and a Ferris wheel; fireworks at night",
       path: "dirt", treeKind: "round", lamp: "post", grade: ["#FFE7B0", .05],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5C8F5E", "#518154", "#467249", "#38603C"] : ["#B4DC84", "#A3D075", "#8FC265", "#6FA44C"]; },
@@ -6201,10 +6206,10 @@ function pack(T){
       path: "boards", treeKind: "round", lamp: "lantern", grade: ["#FFE9A8", .05],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E38C", "#A2D87A", "#8CCA68", "#69AB54"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#131C48", "#1A2858", "#22346A", "#2C427C"], 0, 300) + T.moon(318, 38) + T.starField(21, 30, 84);
+        if (o.night) return T.bands(["#131C48", "#1A2858", "#22346A", "#2C427C"], 0, 300) + T.moon(240, 20) + T.starField(21, 30, 84);
         var kite = G("tp-float", L("M262 31 Q296 58 332 82", .8, INK, .45) + FO("M262 18 l7.4 10 -7.4 13 -7.4 -13 z", K.red, 1.2) + F("M262 18 l7.4 10 h-7.4 z", "#F2C94C") + L("M254.6 28 h14.8 M262 18 v23", .8) +
           L("M262 41 q-4 5 0 9 q4 4 0 9", 1.1, INK, .7) + FO("M258 49 l4 1.6 -4 1.6 z M266 57 l-4 1.6 4 1.6 z", "#3FB8C8", .6));
-        return T.bands(["#86CDF6", "#9FD8F8", "#B9E3FA", "#D3EEFC"], 0, 300) + T.sun(84, 36) + T.cloud(306, 26) + T.cloud(186, 18, .62) + kite + L("M132 46 q4 -4 8 0 q4 -4 8 0 M150 34 q3 -3 6 0 q3 -3 6 0", 1.2, INK, .65);
+        return T.bands(["#86CDF6", "#9FD8F8", "#B9E3FA", "#D3EEFC"], 0, 300) + T.sun(84, 29) + T.cloud(306, 26) + T.cloud(186, 18, .62) + kite + L("M132 46 q4 -4 8 0 q4 -4 8 0 M150 34 q3 -3 6 0 q3 -3 6 0", 1.2, INK, .65);
       },
       far: function(o){
         var n = o.night, sn = o.snow, s = "";

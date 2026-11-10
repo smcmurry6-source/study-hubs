@@ -153,8 +153,8 @@ export function pack(T){
       path: "stones", treeKind: "round", lamp: "post", grade: ["#FFF1C4", .04],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E29A", "#A2D889", "#8CCB78", "#6DB062"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + T.moon(318, 40) + T.starField(11, 28, 140);
-        return T.bands(["#9FD8F7", "#B3E1F9", "#C7EAFB", "#DBF2FC"], 0, 300) + T.sun(84, 38) + T.cloud(318, 30, .6);
+        if (o.night) return T.bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + T.moon(322, 28) + T.starField(11, 28, 140);
+        return T.bands(["#9FD8F7", "#B3E1F9", "#C7EAFB", "#DBF2FC"], 0, 300) + T.sun(150, 28) + T.cloud(318, 30, .6);
       },
       far: function(o){
         var c = o.snow ? ["#EEF5FB", "#DCEAF6"] : o.night ? ["#3D6B5A", "#335C4C"] : ["#C9E9B6", "#B2DC9C"], s = "", n = o.night;

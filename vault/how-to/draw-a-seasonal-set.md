@@ -32,6 +32,10 @@ but `T`. Names, rarities and prices come from `sets.mjs`, never from the pack.
 statue spots and what Timmy walks round; a scene through `T.hillScene`; a yard piece's footprint, spot and easter egg;
 an outfit's `back`, `face` and `top` in Timmy's box).
 
+A scene's backdrop (`far`) is drawn behind a gentle hill (Sam, 2026-11-10: the hill's contour is gradual, not
+pointed) and `hillScene` raises it by `farLift` (22 unless the pack gives its own). Render the scene by day and by
+night and check that nothing in the backdrop is buried by the land or covers the sun or the moon.
+
 The house style holds ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)): drawn SVG in Timmy's ink
 style, flat fills and ink outlines, no ids, gradients, filters, text, images or emoji. **Never sugar**: Timmy is a tooth,
 so no candy, cake or soda as something good. Holidays are drawn by their secular trimmings.

@@ -98,7 +98,7 @@ export function pack(T){
     return s;
   }
   var scenes = {
-    "midnight-rooftops": T.hillScene({
+    "midnight-rooftops": T.hillScene({ farLift: 8,
       note: "Always midnight: the city's rooftops and lit windows behind the hill, fireworks overhead",
       alwaysNight: true, path: "stones", treeKind: "round", lamp: "iron", grade: ["#7A5CFF", .05],
       ground: function(o){ return o.snow ? ["#EEF4FB", "#DEE8F4", "#CCDAEA", "#B0C4DA"] : ["#63A08C", "#57927F", "#4A8271", "#3A6B5C"]; },

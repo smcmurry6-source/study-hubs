@@ -133,7 +133,7 @@ export function pack(T){
       path: "stones", treeKind: "round", lamp: "lantern", grade: ["#FFE3EC", .06],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E28A", "#A3D878", "#8CC968", "#68AA52"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#1A2152", "#1F2759", "#252E63", "#2C366E", "#353F7A", "#404886", "#404886", "#404886"], 0, 300) + T.moon(326, 44) + T.starField(7, 28, 120);
+        if (o.night) return T.bands(["#1A2152", "#1F2759", "#252E63", "#2C366E", "#353F7A", "#404886", "#404886", "#404886"], 0, 300) + T.moon(262, 28) + T.starField(7, 28, 120);
         return T.bands(["#BDE3F8", "#CBE9F9", "#DAEFF8", "#EAF3F3", "#F8EEE6", "#FCE9DF", "#FCE9DF", "#FCE9DF"], 0, 300) + T.sun(82, 38) + T.cloud(296, 32) + T.cloud(190, 20, .6) +
           butterfly(146, 58, PAS[0]) + butterfly(252, 64, PAS[2]);
       },

@@ -230,6 +230,14 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     design page's Build it has a health slider with a chip per level (a preview: in the hubs his HP is the pet's), and a
     gallery of the eight levels. A visited Timmy is always drawn healthy: `get_place` returns no HP, and it must stay
     that way ([learner-data-privacy](../rules/learner-data-privacy.md)).
+  - **Gentler ground** (Sam: "i want the contour of the hill and island and the other scenes to be more gradual. its
+    a little too extreme and pointy"). `arcTop(cx, top, edge)` in `place.mjs` is a much wider bell now: the land
+    drops about 50 units from the crest to the picture's edge where it dropped about 80, with a nearly flat crown,
+    in all six classic scenes and, through `hillScene`, the 14 seasonal ones. The backdrops were drawn for the
+    steeper hill, so each scene raises its own (`farLift`: 22 on the hill and by default in `hillScene`, less where
+    a pack says so), and a few suns and moons moved clear of what that lifted (winter, the dentist's street, summer,
+    Easter, Mardi Gras, Valentine's). Every scene was looked at by day and by night; the yard, the walks and the
+    homes did not change.
   - The vendored `taste-skill` was not run in full: its house rules are for work screens and marketing pages (no
     decorative shapes), which fights a decorative game screen in Timmy's ink style. Its look-and-fix loop on
     screenshots is what the polish pass did.

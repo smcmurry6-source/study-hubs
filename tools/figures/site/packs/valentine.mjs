@@ -139,7 +139,7 @@ export function pack(T){
       path: "stones", treeKind: "round", lamp: "iron", grade: ["#FFB3C7", .07],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5C9272", "#508466", "#44745A", "#38644C"] : ["#BCE5A2", "#ABDA93", "#95CC81", "#6FAE66"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#2A1B4A", "#3A2460", "#4D2F72", "#643C82"], 0, 300) + T.starField(14, 28, 140) + T.moon(322, 46) + heart(142, 40, 5, "#F7A3BA").replace("/>", ' opacity=".5"/>');
+        if (o.night) return T.bands(["#2A1B4A", "#3A2460", "#4D2F72", "#643C82"], 0, 300) + T.starField(14, 28, 140) + T.moon(296, 32) + heart(142, 40, 5, "#F7A3BA").replace("/>", ' opacity=".5"/>');
         var doves = ""; [[118, 70], [130, 63]].forEach(function(q){ doves += L("M" + f(q[0] - 4) + " " + f(q[1] - 1) + " q2.4 -2.6 4 0 q1.6 -2.6 4 0", 1.3, INK, .6); });
         return T.bands(["#FFC4D6", "#FFD2DF", "#FFDFE8", "#FFEDF1"], 0, 300) + T.sun(76, 50) + T.cloud(306, 34) + T.cloud(196, 22, .6) + FO(hd(142, 40, 9), "#FFFFFF", 1.4) + doves;
       },

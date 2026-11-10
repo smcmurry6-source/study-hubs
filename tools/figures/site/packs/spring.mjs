@@ -108,7 +108,7 @@ export function pack(T){
 
   /* ------------------------------------------------------------------ the scene: a cherry blossom grove ------------- */
   var scenes = {
-    "cherry-blossoms": T.hillScene({
+    "cherry-blossoms": T.hillScene({ farLift: 8,
       note: "Pink trees in bloom all round the hill, petals drifting down and lying on the grass",
       path: "stones", treeKind: "round", lamp: "lantern", grade: ["#FFC4D8", .07],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9372", "#528566", "#467658", "#355E45"] : ["#BDE5A6", "#AEDB97", "#9BCE86", "#6FB068"]; },

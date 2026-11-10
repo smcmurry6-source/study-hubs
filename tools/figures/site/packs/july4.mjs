@@ -148,7 +148,7 @@ export function pack(T){
 
   /* ------------------------------------------------------------------ the scene: the fairgrounds -------------------- */
   var scenes = {
-    fairgrounds: T.hillScene({
+    fairgrounds: T.hillScene({ farLift: 15,
       note: "Striped tents, strings of pennants and a Ferris wheel; fireworks at night",
       path: "dirt", treeKind: "round", lamp: "post", grade: ["#FFE7B0", .05],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5C8F5E", "#518154", "#467249", "#38603C"] : ["#B4DC84", "#A3D075", "#8FC265", "#6FA44C"]; },

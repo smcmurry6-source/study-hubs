@@ -112,14 +112,14 @@ export function pack(T){
     return s + G("tp-water", rays) + L(T.D2(lo, true), 1.6, "#E9FFF2", Math.round(.6 * k * 100) / 100);
   }
   var scenes = {
-    "aurora-lake": T.hillScene({
+    "aurora-lake": T.hillScene({ farLift: 20,
       note: "Snow, pines and a frozen lake, the northern lights rippling over the far peaks",
       path: "snow", treeKind: "pine", lamp: "iron", skirt: "snow", grade: ["#8FB6E8", .07], snowy: true,
       ground: function(o){ return o.night ? ["#C9D6EA", "#B4C3DC", "#9FB0CC", "#8394B4"] : ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#0A1136", "#101B48", "#17295A", "#1E376A"], 0, 300) + T.starField(23, 30, 120) + aurora(38, 6, 2.1, ["#A99BFF", "#6FD9E8", "#B48CFF"], .8) + aurora(76, 9, .4, ["#7CF5B0", "#4FE0C0", "#8C8CF5"], 1) + T.moon(332, 28);
+        if (o.night) return T.bands(["#0A1136", "#101B48", "#17295A", "#1E376A"], 0, 300) + T.starField(23, 30, 120) + aurora(38, 6, 2.1, ["#A99BFF", "#6FD9E8", "#B48CFF"], .8) + aurora(76, 9, .4, ["#7CF5B0", "#4FE0C0", "#8C8CF5"], 1) + T.moon(214, 22);
         /* the short polar day: a dusky sky, the lights already out, the sun low */
-        return T.bands(["#6272BC", "#8C8ECC", "#C6A6CE", "#F2C2B8"], 0, 300) + aurora(40, 6, 2.1, ["#C9B8FF", "#9FE6EE", "#C9A6FF"], .6) + aurora(76, 9, .4, ["#9BF7C4", "#7FE9D2", "#A9A9F7"], .8) + T.sun(84, 40);
+        return T.bands(["#6272BC", "#8C8ECC", "#C6A6CE", "#F2C2B8"], 0, 300) + aurora(40, 6, 2.1, ["#C9B8FF", "#9FE6EE", "#C9A6FF"], .6) + aurora(76, 9, .4, ["#9BF7C4", "#7FE9D2", "#A9A9F7"], .8) + T.sun(142, 28);
       },
       far: function(o){
         var m = o.night ? ["#33427A", "#283668", "#C9D6EA"] : ["#8F9CD2", "#7584C0", "#FFFFFF"], ice = o.night ? ["#2C5C86", "#3D749C", "#7FB0D0"] : ["#C6E6F6", "#E4F4FB", "#FFFFFF"], pn = o.night ? "#1F3F3A" : "#3E7A5C", s = "", x;

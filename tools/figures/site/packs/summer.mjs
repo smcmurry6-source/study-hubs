@@ -143,10 +143,10 @@ export function pack(T){
       path: "boards", treeKind: "round", lamp: "lantern", grade: ["#FFE9A8", .05],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9E6A", "#528F5E", "#467E52", "#3A6C46"] : ["#B4E38C", "#A2D87A", "#8CCA68", "#69AB54"]; },
       sky: function(o){
-        if (o.night) return T.bands(["#131C48", "#1A2858", "#22346A", "#2C427C"], 0, 300) + T.moon(318, 38) + T.starField(21, 30, 84);
+        if (o.night) return T.bands(["#131C48", "#1A2858", "#22346A", "#2C427C"], 0, 300) + T.moon(240, 20) + T.starField(21, 30, 84);
         var kite = G("tp-float", L("M262 31 Q296 58 332 82", .8, INK, .45) + FO("M262 18 l7.4 10 -7.4 13 -7.4 -13 z", K.red, 1.2) + F("M262 18 l7.4 10 h-7.4 z", "#F2C94C") + L("M254.6 28 h14.8 M262 18 v23", .8) +
           L("M262 41 q-4 5 0 9 q4 4 0 9", 1.1, INK, .7) + FO("M258 49 l4 1.6 -4 1.6 z M266 57 l-4 1.6 4 1.6 z", "#3FB8C8", .6));
-        return T.bands(["#86CDF6", "#9FD8F8", "#B9E3FA", "#D3EEFC"], 0, 300) + T.sun(84, 36) + T.cloud(306, 26) + T.cloud(186, 18, .62) + kite + L("M132 46 q4 -4 8 0 q4 -4 8 0 M150 34 q3 -3 6 0 q3 -3 6 0", 1.2, INK, .65);
+        return T.bands(["#86CDF6", "#9FD8F8", "#B9E3FA", "#D3EEFC"], 0, 300) + T.sun(84, 29) + T.cloud(306, 26) + T.cloud(186, 18, .62) + kite + L("M132 46 q4 -4 8 0 q4 -4 8 0 M150 34 q3 -3 6 0 q3 -3 6 0", 1.2, INK, .65);
       },
       far: function(o){
         var n = o.night, sn = o.snow, s = "";
