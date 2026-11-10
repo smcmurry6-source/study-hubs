@@ -195,7 +195,7 @@ Each is one line in `migration_v54.sql` to change.
   - `get_my_shop` also says which seasons are on sale and whether today is a throwback day; the season shelf lists the
     holidays' sets before the long seasons'.
   - A season's set is on sale on every day Timmy wears that holiday's outfit and, for the short holidays, the days before:
-    the Fourth of July's is June 28 to July 4 (7 days), where Sam's answer said July 1-4 for the holiday itself.
+    the Fourth of July's is June 28 to July 4 (7 days; Sam confirmed it, 2026-11-10).
 - Today's `record_personal_answer` stays open after the release, with today's capped rules, for any page that still calls it;
   a later migration can close it once no page does.
 

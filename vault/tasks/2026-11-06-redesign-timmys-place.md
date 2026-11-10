@@ -113,6 +113,9 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - 2026-11-10 (Claude Code): round 3 is built on the design page ([its note](2026-11-10-redesign-timmys-place-round-3.md)):
   the scenes, homes and yard redrawn, Timmy's wave and his bubble, two mastery displays for Sam to pick from, and the
   seasonal and rank sets as packs (`tools/figures/site/packs/`). Still nothing in `widget/pet.js`.
+- 2026-11-10 (Claude Code): Sam's second look: hub mastery is one **medal board** (each hub's own medal, a big view on
+  tap), the statue stands upright, and the design page has the shop's window, the customizer, the rank board and
+  visiting ([round 3's note](2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
 
 ## Outcome
 

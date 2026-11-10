@@ -40,16 +40,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   as a dental crown, Perio's emblem tooth, "Default" on the cottage; the hill and island rise gradually; the seaside,
   cloud and starlight scenes, the castle, treehouse, beach hut, observatory and igloo, and most of the yard redrawn (a
   **mouthwash fountain**, id `mouthwash-fountain`, a dog with the doghouse, a mint for the lane's ball). Timmy waves and
-  his speech bubble follows him. (2) Hub mastery: the pennants are gone; a **trophy case** and a **gem plaque**, each good
-  for 20 hubs, for Sam to pick from (`mastery: "case" | "plaque"` in the kit). (3) **Sets**: `tools/figures/site/sets.mjs`
+  his speech bubble follows him. (2) Hub mastery: the pennants are gone; a **medal board** beside the house hangs each
+  hub's own mastery medal in miniature (up to 20), and tapping it opens a big view of every medal (Sam picked the plaque,
+  then asked for the same medals on the board and in the pop-up; no trophy case, no gems, no `mastery` option).
+  (3) **Sets**: `tools/figures/site/sets.mjs`
   lists 14 seasonal sets of 8 pieces (new: Spring, Summer, Tooth Fairy week, Mardi Gras, the Fourth of July) and the
   Handpiece's six rank sets (an outfit and a yard piece per full rank-up, earned, never sold); each is one file in
   `tools/figures/site/packs/` ([how-to](vault/how-to/draw-a-seasonal-set.md)); the build checks 1,430 drawings and 3,384
   walks and `--strict` fails on a set with no pack. (4) Server, still pending: the catalog is 180 rows; seasonal windows
   (`sh_shop_seasons`), two throwback days a month, rank sets by rank, Halloween's set as a gift, the shop's shelves in
   `get_my_shop`, and visiting (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js`
-  344 checks. (5) The design page shows all of it, with designs of the shop's shelves and of visiting. Open: Sam's pick
-  of the mastery display; the Fourth of July window (Sam said July 1-4, the server has June 28 to July 4).
+  348 checks; nothing seasonal is sold before its season's first run (`added_on`, `sh_season_was_on`); the Fourth of
+  July's set is June 28 to July 4 (Sam confirmed). (5) The design page shows all of it as mock-ups on made-up names: a
+  **storefront shop** (any piece opens in its own window; "Back for today" is a corner stamp; buying plays out by rarity
+  with synthesized sound cues), a **customizer** (a picture dock, shelves, a wardrobe rail, a camera that moves in), the
+  **rank board** with each rank's handpiece emblem and your own name on a gold nameplate, and **visiting** (Visit, a
+  random visit, next and back, a trip through soft clouds). (6) Polish: the statue's handpiece stands upright; the
+  igloo's doorway is clear; the emerald hills have one gated wall. Open: Sam's look at the second screenshots.
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't

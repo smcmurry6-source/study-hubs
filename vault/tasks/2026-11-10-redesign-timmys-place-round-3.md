@@ -176,20 +176,59 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js` has 348 checks.
   - **The design page**: galleries for the mastery options, the rank sets and the seasonal sets, and designs of the
     shop's shelves and of visiting from the boards.
+- 2026-11-10 (Claude Code, the same session, after Sam looked at the first screenshots): Sam's second list, all on the
+  design page and in the kit; still nothing wired into the live widgets.
+  - **Mastery**: Sam picked the plaque, then asked for the board and the pop-up to show the same medals. The trophy
+    case and the gems are gone: the **medal board** beside the house hangs each hub's own mastery medal in miniature
+    (the hub's ribbons, Bronze, Silver or Gold, a crown on a Crown), up to 20, and tapping it opens the **big view**:
+    every hub's medal at full size with its name and level, and a count per level. The board is kept small and stands
+    low at the wall's front end so it covers little of the house.
+  - **The Fourth of July** set is on sale June 28 to July 4 (Sam: "Let's do June 28 through July 4").
+  - **Holiday content before its dates**: checked. A seasonal piece is refused outside its window (`not-today`), the
+    daily and weekly picks never include one, and the one gap (a throwback day bringing back a holiday that has not had
+    its first run yet) is closed: `shop_items.added_on` and `sh_season_was_on`, four more tests (348 checks).
+  - **The daily goal ring** was never lost: the ring of 20 teeth lives in `widget/hub.js`; the design page's mock Today
+    panel drew the older plain ring. It draws the ring of teeth now.
+  - **The rank board**: every name has its rank's handpiece emblem; your own row carries your board name (never "You")
+    on a gold nameplate with a sheen, Timmy peeking over it and a "That's you" flag.
+  - **Visiting**: a Visit button with a porthole of the person's home, **Visit someone random**, next and back arrows
+    while visiting ("Place n of N"), and a cloud trip: soft separate clouds drift in from every side, cover the screen,
+    the place changes behind them and they scatter (Sam: not two curtains; less harsh clouds). A plain swap under
+    reduced motion.
+  - **The shop** is a storefront (an awning, a hanging sign, Timmy as the keeper, wooden shelves). Any piece opens in
+    its own window: a display case with rays in the rarity's color, "The piece" / "At my place" views, the set it
+    belongs to, the price against your crowns, Buy and "Try it at my place". **Back for today** is a corner "Today
+    only" stamp and a tag in the window, not a banner across the card (it read as unavailable).
+  - **Buying** plays out by rarity (coins fly in, a flash, rings, confetti; a Legendary charges up first) with sound
+    cues synthesized in the page (no audio files), a sound switch in the shop, silent and still under reduced motion.
+  - **The customizer**: a dock of picture tiles (Home, Scene, Timmy and the five yard spots), a drawer with Classics,
+    Seasonal and Rank tabs on shelves (outfits on a wardrobe rail), a camera that moves in on what you're changing,
+    "Surprise me" and a close-up.
+  - **The statue**: the handpiece stands upright in a socket in the middle of its pedestal.
+  - **Polish pass**: every home rendered in its own scene with a full yard, day and night, and every thumbnail. Fixed:
+    the igloo's doorway (no snow on or in front of the tunnel, the statue and snow lanterns clear of the door), and the
+    emerald hills' walls (one boundary wall with a gateway, pillars and a field gate; the loose wall pieces on the grass
+    are mossy boulders).
+  - The vendored `taste-skill` was not run in full: its house rules are for work screens and marketing pages (no
+    decorative shapes), which fights a decorative game screen in Timmy's ink style. Its look-and-fix loop on
+    screenshots is what the polish pass did.
 
 ## Outcome
 
-Waiting for Sam's look at the screenshots (PR below). Left for after it:
+Waiting for Sam's look at the second set of screenshots (PR above). Left for after it:
 
-- **Sam picks** the trophy case or the gem plaque.
-- **The Fourth of July window**: Sam said July 1-4; the server and `sets.mjs` use June 28 to July 4, by the rule "a short
-  holiday's set is on sale for the seven days ending on its last day". Say which.
 - **Wiring** (not done, by instruction): the place, the sets, the wave and the bubble into `widget/pet.js`; the new
   seasons and holidays into `holidayId()` / `isFall()` (the server's `sh_shop_seasons` already has them); flame levels
-  4 and 5 into `widget/hub.js` (it picks levels 1-3 today); the shop and visiting clients; then the About page (visiting,
-  the sets, the mastery display) and `tools/podcast/LORE.md`.
+  4 and 5 into `widget/hub.js` (it picks levels 1-3 today); the shop (its window, the purchase animation and sounds),
+  the customizer, the rank board's emblems and nameplate and visiting as real clients; then the About page (visiting,
+  the sets, the medal board, the sound switch) and `tools/podcast/LORE.md`.
+- **For the wiring agent**: the design page's shop, customizer, rank board and cloud trip are mock-ups in
+  `tools/preview/design/design.js` on made-up names and a made-up wallet; the sounds are Web Audio tones (`sfx()`), the
+  setting is `sh_design_sound` in localStorage. The kit side (the medal board, `MEDALS`, `EGGS.mastery`) is real.
 - Only the Handpiece's six rank sets exist; the ModuPro's and the Loupes' are drawn before anyone reaches them.
-- A tall piece in the side yard or the front corner can cover part of the mastery display.
+- A tall yard piece in the front spot (the wishing well, the swing) stands in front of the door, and one in the side
+  yard or the front corner can cover part of the medal board: that is the player's choice of spot, not a drawing fault.
+- If Sam only meant "the board and its pop-up match" and wants the gems back, the gem version is commit `5fc40aa`.
 
 Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
 [the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
