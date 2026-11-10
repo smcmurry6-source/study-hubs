@@ -1630,14 +1630,17 @@ export function placeKit(INK, C, PACKS, SETS){
   ];
   /* a high-speed handpiece, held up like a trophy (redrawn 2026-11-10: Sam, "doesn't look like a handpiece"): the long
      handle with its coupling at the foot and the knurled grip, the contra-angle bend, the small head set across the end
-     and the bur coming out of it. It leans away from the door (head up and to the left), about 34 px tall. */
+     and the bur coming out of it. It stands nearly upright in a socket in the middle of the top step (Sam, 2026-11-10: "the
+     handpiece does not sit on the pedestal well": it used to lean 22 degrees from the step's edge), about 34 px tall. */
   function handpiece(m, o){
-    var s = "", A = [4.8, -2.2], B = [-3, -21.4], C = [-6.9, -25.4], Hd = [-8.9, -27.2];
+    var s = "", A = [1.3, -1.9], B = [-1.6, -21.3], C = [-5.2, -25.5], Hd = [-7.1, -27.4];
     function unit(a, b){ var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.sqrt(dx * dx + dy * dy); return [dx / l, dy / l]; }
     function quad(a, b, wa, wb){ var d = unit(a, b), n = [-d[1], d[0]]; return [[a[0] + n[0] * wa, a[1] + n[1] * wa], [b[0] + n[0] * wb, b[1] + n[1] * wb], [b[0] - n[0] * wb, b[1] - n[1] * wb], [a[0] - n[0] * wa, a[1] - n[1] * wa]]; }
     function along(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
     var d = unit(A, B), n = [-d[1], d[0]];                      // n points down and to the left: the lit side is -n
     if (m.k === "dark") s += circ(-1, -16, 17, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
+    /* the socket it stands in: a stone ring on the step and a collar in the statue's own material */
+    s += ell(.9, -.4, 4.3, 1.8, K.stoneShade, 1.2) + ell(.9, -.9, 3.3, 1.35, m.s, 1.1);
     /* the neck first (behind the grip), then the handle, lit along its upper edge and shaded along its lower */
     var nk = quad(B, C, 1.9, 1.7); s += FO(D2(nk), m.c, 1.4);
     var hq = quad(A, B, 2.6, 2.1); s += F(D2(hq), m.c) + F(D2([hq[0], hq[1], along(hq[1], hq[2], .42), along(hq[0], hq[3], .42)]), m.s) + O(D2(hq), 1.5);
@@ -1654,10 +1657,10 @@ export function placeKit(INK, C, PACKS, SETS){
     s += '<path d="' + D2(hp) + '" fill="' + m.c + '" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round"/>' + F(D2([hp[1], hp[2], along(hp[2], hp[3], .45), along(hp[1], hp[0], .45)]), m.s) +
       '<path d="' + D2(hp) + '" fill="none" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round"/>';
     s += L(seg([Hd[0] - v[0] * 2 + u[0] * 1.5, Hd[1] - v[1] * 2 + u[1] * 1.5], [Hd[0] + v[0] * 2 + u[0] * 1.5, Hd[1] + v[1] * 2 + u[1] * 1.5]), 1, m.h, .95);
-    if (m.k === "antique") s += circ(1.6, -9.6, .9, m.pat) + circ(-.4, -15.6, .7, m.pat);
-    if (m.k === "diamond") s += L("M3.4 -5.4 L-.6 -13.6 M1.4 -8.2 L-2.4 -19", .7, "#FFFFFF");
-    if (m.k === "dark") s += circ(2.2, -8, .5, "#FFFFFF") + circ(-.6, -15, .6, K.dmTeal) + circ(-2.4, -20, .4, "#FFFFFF");
-    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(6, -27, 2.6, "#FFFFFF", "tp-twinkle", .6);
+    if (m.k === "antique") s += circ(.2, -9.4, .9, m.pat) + circ(-.7, -15.4, .7, m.pat);
+    if (m.k === "diamond") s += L("M1.3 -5.4 L.1 -13.6 M-.3 -8.2 L-1.9 -19", .7, "#FFFFFF");
+    if (m.k === "dark") s += circ(.5, -8, .5, "#FFFFFF") + circ(-.7, -15, .6, K.dmTeal) + circ(-1.5, -20, .4, "#FFFFFF");
+    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(5, -26, 2.6, "#FFFFFF", "tp-twinkle", .6);
     return s;
   }
   function statue(x, y, z, tier, level, o){
@@ -1668,7 +1671,7 @@ export function placeKit(INK, C, PACKS, SETS){
     if (o.snow) s += F(D([[x - .3, y - .3, zt], [x + .3, y - .3, zt], [x + .3, y + .3, zt], [x - .3, y + .3, zt]]), "#FFFFFF");
     var t = P(x, y, zt);
     s += T(t[0], t[1] - 1, handpiece(m, o));
-    var glint = L("M" + f(t[0] + 3) + " " + f(t[1] - 7) + " l-5 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
+    var glint = L("M" + f(t[0] + .6) + " " + f(t[1] - 7) + " l-1.8 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
     return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
   /* mastery: every hub medal shows by the house on a board (Sam, 2026-11-10: picked the plaque over the trophy case, then
