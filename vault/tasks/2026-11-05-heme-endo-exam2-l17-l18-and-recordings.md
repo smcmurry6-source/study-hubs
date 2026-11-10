@@ -37,7 +37,7 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
 - Quiz 3 is open until Thu 11/12, 11:59 pm and the take-home until 11/15: never use either
   ([graded-coursework](../rules/graded-coursework.md)).
 - `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: set from Dr. Herr's count per lecture on 2026-11-10 (see the hub note).
-  Re-ranking keeps each lecture at its count: a topic the review raises replaces the lowest one.
+  The counts never trim High Likelihood: a topic the review raises is added or ranked higher.
 - **The bank is kept high yield** (Sam, 2026-11-08: "803 is way too many questions"; it was cut to 339): L17 and L18 get
   about 30-35 questions each, and L16 going taught swaps questions instead of adding; see the hub note.
 
@@ -86,8 +86,8 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
   "i guess save all that for exam 3"). It came out of the hub whole; the Exam 3 hub picks it up:
   [the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
 - 2026-11-10: Sam, from Dr. Herr: "There are 5 review, 8 for l11, 9 for l12, and 7 for the rest of the lectures. L16 is the
-  last lecture on the test." `EXAM_COUNTS` and the mock follow it, High Likelihood is trimmed to the counts, and L17 and
-  L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
+  last lecture on the test." `EXAM_COUNTS` and the mock follow it (High Likelihood keeps every topic: Sam, "Dont remove any
+  high likelihood questions"), and L17 and L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
   L16's recording and the 11/11 review.
 
 ## Outcome

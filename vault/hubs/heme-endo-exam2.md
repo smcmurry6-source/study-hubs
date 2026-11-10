@@ -94,11 +94,10 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   `EXAM_COUNTS = { dmpharm 8, L12 9, mhisto 7, fhisto 7, mphys 7, fphys 7, refresh 5 }`, and `MOCK_BLUEPRINT` is the same
   object, so the mock is the exam's 50. L12's two hours share their 9 (`EXAM_GROUPS`): the mock draws the 9 from L12a and
   L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
-  **High Likelihood follows the counts** ([high-likelihood-topics](../rules/high-likelihood-topics.md), as Exam 1 did): each
-  lecture keeps its first n topics in rank order (L11 8, L13-L16 7 each) and L12 keeps 9, 4 from L12a and 5 from L12b
-  (L12b's recording flagged more: 17 `emphasize` hints to 12). 29 lower-ranked topics came off; 163 Exam 2 questions
-  are High Likelihood (258 before). The Refresher keeps all 55 of Exam 1's topics (Sam's "do not cut them"). When the
-  11/11 review or L16's recording ranks a topic higher, swap it in for the lowest one, keeping each lecture at its count.
+  **The counts never trim High Likelihood** (Sam, 2026-11-10: "Dont remove any high likelihood questions. If they were
+  hinted to be exam questions, they need to be high likelihood"; now in [high-likelihood-topics](../rules/high-likelihood-topics.md)):
+  every lecture keeps all its topics (74 on the Exam 2 lectures, 258 questions; the Refresher's 55), and the box only
+  shows the count beside each lecture. When the 11/11 review or L16's recording flags a topic, add it or rank it higher.
   **Adding to it:** a lecture going taught (L16) gets the same audit: its hints and
   topics covered, its notes' key terms covered once, nothing on skipped points.
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro

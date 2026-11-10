@@ -35,8 +35,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-10 (Heme & Endo Exam 2: the exam's own count per lecture, Claude Code)** — Sam, from Dr. Herr: 5 on Exam 1, 8
   on L11, 9 on L12, 7 each on L13-L16, and L16 is the last lecture on the exam. `EXAM_COUNTS` (= `MOCK_BLUEPRINT`, with
   `EXAM_GROUPS` letting L12's two hours share their 9, drawn at random) drives the mock, the "Most likely questions" box,
-  Home's exam facts and the Exam Hints banner. High Likelihood is trimmed to each lecture's count, as the standing rule
-  says (29 lower-ranked topics off; 163 Exam 2 questions tagged, 258 before; the Refresher keeps all of Exam 1's). L17 and
+  Home's exam facts and the Exam Hints banner. High Likelihood keeps every topic (Sam: "Dont remove any high likelihood
+  questions"; the High Likelihood rule now says counts never trim topics, for every hub). L17 and
   L18 aren't added to this hub (they go to Exam 3 with Lecture A). Also fixes two places #304 missed that still said
   Lecture A was on the exam (BUG-054).
 - **2026-11-10 (Occlusion L9: Noncarious Cervical Lesions, Dr. Lawson's prerecorded lecture, Claude Code)** — Sam added
