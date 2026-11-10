@@ -75,5 +75,9 @@ re-rank High Likelihood from the review on Wed 11/11.
   lecture was audited for coverage (emphasized points, topic facets, gaps): 90 cut questions back, 2 new, 339 → 431,
   369 High Likelihood. Still to do: L16's recording (Tue 11/10), L17 and L18, the 11/11 review, each with the same
   coverage audit.
+- 2026-11-10: Sam: all of Exam 1's High Likelihood questions back in the Refresher (206), the mock's Exam 1 five drawn at
+  random from them, R out of the bank's default lectures; "fill in the gaps a little more" (a key-term pass: 68 back, 2
+  new; Exam 2 lectures 421); L14 38-39 is the endometrium during menstruation, so the focus topics were re-ranked from the
+  decks' real slide order. Still to do: the same as above.
 
 ## Outcome
