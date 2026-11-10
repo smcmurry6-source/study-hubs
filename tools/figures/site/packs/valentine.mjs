@@ -1,0 +1,314 @@
+/* The Valentine's Day set of Timmy's place (tools/figures/site/sets.mjs lists its eight pieces; the shop's catalog has
+   the same rows). One self-contained function: the build hands it the kit's tools (place.mjs, TOOLS) and pastes its
+   source into tools/preview/design/place.js, so it may use nothing from outside itself but T. What each kind of piece
+   needs is in packs/thanksgiving.mjs, the worked example.
+   Hearts, roses, letters and swans; never sugar (Timmy is a tooth): no chocolates or candy anywhere.
+   No ids, gradients, filters, text, images or emoji: flat fills and ink outlines. */
+export function pack(T){
+  var K = T.K, P = T.P, D = T.D, f = T.f, F = T.F, O = T.O, L = T.L, FO = T.FO, G = T.G, circ = T.circ, ell = T.ell, box = T.box, INK = T.INK;
+  var p = T.p, O2 = T.O2, O3 = T.O3;
+  var RED = "#E5484D", ROSE = "#F0627E", PINK = "#FF9DB8", BLUSH = "#FFD3DF", CREAM = "#FFFDF6", GOLD = "#F2C94C";
+  var sp = function(q){ var a = P(q[0], q[1], q[2]); return f(a[0]) + " " + f(a[1]); };
+  /* a heart in screen space: centered on (x, y), k is half its width (it is 1.95k tall) */
+  function hd(x, y, k){
+    var q = function(a, b){ return f(x + a * k) + " " + f(y + b * k); };
+    return "M" + q(0, .95) + " C" + q(-.35, .6) + " " + q(-1, .25) + " " + q(-1, -.35) + " C" + q(-1, -.8) + " " + q(-.68, -1) + " " + q(-.42, -1) + " C" + q(-.2, -1) + " " + q(-.05, -.86) + " " + q(0, -.62) +
+      " C" + q(.05, -.86) + " " + q(.2, -1) + " " + q(.42, -1) + " C" + q(.68, -1) + " " + q(1, -.8) + " " + q(1, -.35) + " C" + q(1, .25) + " " + q(.35, .6) + " " + q(0, .95) + " Z";
+  }
+  function heart(x, y, k, fill, sw){ return sw ? FO(hd(x, y, k), fill, sw) : F(hd(x, y, k), fill); }
+  /* a heart as flat points (u, v), w wide and h tall round (uc, vc): for a wall (T.onY) or the ground; floor cuts its tip off */
+  function heartUV(uc, vc, w, h, floor){
+    var out = [];
+    for (var i = 0; i < 32; i++){
+      var t = i / 32 * Math.PI * 2, a = Math.pow(Math.sin(t), 3), b = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16;
+      var v = vc + (b + .159) * h / 1.806; out.push([uc + a * w / 2, floor != null && v < floor ? floor : v]);
+    }
+    return out;
+  }
+  function rose(x, y, r, c){ return circ(x, y, r, c, .7) + L("M" + f(x - r * .5) + " " + f(y + r * .15) + " q" + f(r * .5) + " " + f(-r * .9) + " " + f(r) + " 0", .6, INK, .5); }
+  function greens(o){ return o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#3F7059", "#335E4A"] : ["#6DB56A", "#4F9A52"]; }
+  function reds(o){ return o.night ? ["#B8546A", "#C9788E", "#D9A3B4"] : [RED, ROSE, PINK]; }
+  /* a rose bush: a lumpy green ball with blooms on it */
+  function bush(x, y, r, seed, o){
+    var s = T.canopy(x, y, r, greens(o), seed), R = T.rng(seed + 5), c = reds(o);
+    for (var i = 0; i < 5; i++) s += rose(x + (R() - .5) * r * 1.35, y + (R() - .5) * r * 1.1, r * .16 + .9, c[i % 3]);
+    return s;
+  }
+
+  /* ------------------------------------------------------------------ the home: a heart cottage --------------------- */
+  var homes = {
+    "heart-cottage": {
+      note: "A blush cottage with a heart for a door, a heart window in the gable and a roof of heart shingles",
+      ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the ridge", paint: "Wall paint" },
+      door: [5.5, 8.6], brush: [7.9, 9.15], statue: [3.05, 9.5], spots: { door: [5.5, 10.6] }, h: 8.6,
+      eaves: [[2.5, 8.95, 2.9], [8.5, 8.95, 2.9]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.4, 2.7, 8.8, 9.0],
+      draw: function(o){
+        var u = o.up, wp = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#FFE9EE", s: "#F3BECB" }, s = "", lights = "", b;
+        var x0 = 2.6, x1 = 8.4, y0 = 3.0, y1 = 8.6, zw = 3.0, xm = 5.5, zr = 6.9, ov = .4, m = (zr - zw) / (x1 - xm), ze = zw - ov * m, xe = x1 + ov, ya = y0 - ov, yb = y1 + ov;
+        var roof = o.snow ? ["#FFFFFF", "#EEF5FB", "#D3E2F0"] : ["#F0627E", "#E04E70", "#C73B5E"];
+        /* the shaded side wall: a window with shutters and a box, and roses up a trellis */
+        s += FO(D([[x1, y0, 0], [x1, y1, 0], [x1, y1, zw], [x1, y0, zw]]), wp.s);
+        var w = T.win("x", x1, 3.95, 5.05, 1.1, 2.1, { night: o.night, shutters: "#E5637F", box: true }); s += w.s; lights += w.lights;
+        var tr = ""; [6.35, 6.85, 7.35].forEach(function(yy){ tr += D(T.onX(x1, [[yy, .15], [yy, 2.35]]), true); }); [.7, 1.3, 1.9].forEach(function(zz){ tr += D(T.onX(x1, [[6.2, zz], [7.5, zz]]), true); });
+        s += L(tr, 1.3, CREAM) + L(D(T.onX(x1, [[6.5, .1], [6.7, .8], [6.4, 1.4], [7.1, 1.9], [6.9, 2.4]]), true) + D(T.onX(x1, [[7.3, .1], [7.2, .9], [7.4, 1.5]]), true), 1.5, o.snow ? "#9DB8A6" : "#4F9A52");
+        [[6.7, .8], [6.4, 1.4], [7.1, 1.9], [6.9, 2.4], [7.2, .9], [7.4, 1.5], [6.75, 1.65]].forEach(function(q, i){ var a = P(x1, q[0], q[1]); s += rose(a[0], a[1], 2, reds(o)[i % 3]); });
+        /* the gable end, with the door */
+        var gable = [[x0, y1, 0], [x1, y1, 0], [x1, y1, zw], [xm, y1, zr], [x0, y1, zw]];
+        s += FO(D(gable), wp.c);
+        for (b = 1; b < 10; b++){ var z = b * .6, hw = z <= zw ? (x1 - x0) / 2 : (zr - z) / m; s += L(D([[xm - hw, y1, z], [xm + hw, y1, z]], true), .7, INK, .12); }
+        s += L(D([[x0, y1, .1], [x0, y1, zw]], true) + D([[x1, y1, .1], [x1, y1, zw]], true), 2, "#FFFFFF", .9);
+        /* the door is a heart: a cream frame, two red leaves, gold knobs */
+        s += FO(D(T.onY(y1, heartUV(xm, 1.3, 2.3, 2.85, 0))), CREAM, 1.6) + FO(D(T.onY(y1, heartUV(xm, 1.27, 1.82, 2.3, 0))), RED, 1.3);
+        s += L(D(T.onY(y1, [[xm, .05], [xm, 1.85]]), true), 1, INK, .5);
+        [-.2, .2].forEach(function(dx){ var k = P(xm + dx, y1, 1.05); s += circ(k[0], k[1], 1.2, GOLD, .6); });
+        var hl = P(xm - .62, y1, 1.9); s += L("M" + f(hl[0]) + " " + f(hl[1]) + " q1 -3.4 4.4 -4", 1.3, "#FFFFFF", .6);
+        /* a heart window up in the gable */
+        var pane = function(){ return FO(D(T.onY(y1, heartUV(xm, 4.28, 1.4, 1.34))), o.night ? K.lit : "#CFEFFC", 1.2) + L(D(T.onY(y1, [[xm, 3.66], [xm, 4.62]]), true) + D(T.onY(y1, [[xm - .62, 4.42], [xm + .62, 4.42]]), true), 1.1); };
+        s += FO(D(T.onY(y1, heartUV(xm, 4.3, 1.86, 1.8))), CREAM, 1.5) + pane();
+        var hc = P(xm, y1, 4.35);
+        if (o.night) lights += T.glowAt(hc[0], hc[1], 13) + pane();
+        else s += L("M" + f(hc[0] - 4.4) + " " + f(hc[1] - 1) + " l1.6 -2.4", 1.3, "#FFFFFF");
+        /* the roof's near side: rows of heart shingles, each row's points lapping the row below */
+        var pt = function(y, t){ return [xe - (xe - xm) * t, y, ze + (zr - ze) * t]; }, rows = 6, wide = (yb - ya) / 8;
+        var slope = D([pt(ya, 0), pt(yb, 0), pt(yb, 1), pt(ya, 1)]);
+        s += F(slope, roof[1]);
+        for (var r = 0; r < rows; r++){
+          var t0 = r / rows, dip = r ? .85 / rows : .05, cuts = [ya], c;
+          for (c = r % 2 ? .5 : 1; ya + c * wide < yb - .01; c++) cuts.push(ya + c * wide);
+          cuts.push(yb);
+          var edge = "M" + sp(pt(ya, t0));
+          for (c = 1; c < cuts.length; c++){ var a0 = cuts[c - 1], a1 = cuts[c], g = (a1 - a0) * .06; edge += " Q" + sp(pt(a0 + g, t0 - dip * .85)) + " " + sp(pt((a0 + a1) / 2, t0 - dip)) + " Q" + sp(pt(a1 - g, t0 - dip * .85)) + " " + sp(pt(a1, t0)); }
+          s += F(edge + " L" + sp(pt(yb, 1)) + " L" + sp(pt(ya, 1)) + " Z", roof[r % 2 ? 2 : 1]) + L(edge, .9, INK, .45);
+        }
+        s += O(slope, 1.6);
+        /* the chimney, with a heart or two drifting up instead of smoke */
+        var zs = function(x){ return zr - (x - xm) * m; }, cx0 = 6.45, cx1 = 7.25, cy0 = 3.7, cy1 = 4.5, ct = 7.15;
+        s += FO(D([[cx0, cy1, zs(cx0)], [cx1, cy1, zs(cx1)], [cx1, cy1, ct], [cx0, cy1, ct]]), "#FFF3E6", 1.4) + FO(D([[cx1, cy0, zs(cx1)], [cx1, cy1, zs(cx1)], [cx1, cy1, ct], [cx1, cy0, ct]]), "#E3CFC0", 1.4);
+        s += box(cx0 - .12, cy0 - .12, ct, cx1 - cx0 + .24, cy1 - cy0 + .24, .26, { top: o.snow ? "#FFFFFF" : roof[2], left: roof[0], right: roof[2] }, { sw: 1.4, si: .9 });
+        var ch = P((cx0 + cx1) / 2, (cy0 + cy1) / 2, ct + .26);
+        s += G("tp-float", heart(ch[0] + 2, ch[1] - 7, 2.6, PINK, .9) + heart(ch[0] + 8, ch[1] - 15, 3.6, BLUSH, .9) + heart(ch[0] + 4, ch[1] - 26, 4.6, PINK, .9));
+        /* the ridge, then the cream bargeboard over the gable, hearts along it, and a heart on the peak */
+        s += L(D([pt(ya, 1), pt(yb, 1)], true), 3.6) + L(D([pt(ya, 1), pt(yb, 1)], true), 1.8, roof[0]);
+        if (u.flag) s += T.flagOn(xm, 6.3, zr, 2.2);
+        s += FO(D([[x0 - ov, yb, ze], [xm, yb, zr], [xe, yb, ze], [xe, yb, ze - .46], [xm, yb, zr - .54], [x0 - ov, yb, ze - .46]]), CREAM, 1.5);
+        [.2, .42, .64].forEach(function(t){ [-1, 1].forEach(function(sd){ var q = P(xm + sd * (xe - xm) * (1 - t), yb, ze + (zr - ze) * t - .27); s += heart(q[0], q[1], 1.9, o.snow ? "#C4D6E6" : ROSE); }); });
+        var pk = P(xm, yb, zr);
+        s += L("M" + f(pk[0]) + " " + f(pk[1]) + " v-5", 1.8) + heart(pk[0], pk[1] - 10, 5.6, RED, 1.4) + L("M" + f(pk[0] - 3.4) + " " + f(pk[1] - 11.6) + " q.4 -2.4 2.4 -2.6", 1.1, "#FFFFFF", .8);
+        /* a stone step and a rose bush on each side of the door */
+        s += box(4.95, y1, 0, 1.1, .5, .14, { top: K.stone, left: K.stone, right: K.stoneShade }, { sw: 1.3, si: .9 });
+        var b1 = P(3.9, y1 + .42, 0), b2 = P(7.0, y1 + .36, 0);
+        s += bush(b1[0], b1[1] - 5, 6.4, 21, o) + bush(b2[0], b2[1] - 4.6, 5.6, 27, o);
+        if (o.night) lights += T.firefly(132, 152, .3) + T.firefly(282, 136, 1.4);
+        return { body: s, lights: lights };
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the scene: a rose garden ---------------------- */
+  /* things for the backdrop, in screen space: an arbor hung with roses, a clipped cypress, a gazebo */
+  function arbor(x, y, w, h, o){
+    var d = "M" + f(x - w / 2) + " " + f(y) + " v" + f(-(h - w / 2)) + " a" + f(w / 2) + " " + f(w / 2) + " 0 0 1 " + f(w) + " 0 v" + f(h - w / 2), s = L(d, 5) + L(d, 2.8, o.night ? "#B9B3C6" : CREAM), c = reds(o);
+    for (var i = 0; i <= 8; i++){ var a = Math.PI * i / 8, px = x - Math.cos(a) * w / 2, py = y - (h - w / 2) - Math.sin(a) * w / 2; s += circ(px + (i % 2 ? 1 : -1), py + 1.4, 2.4, greens(o)[0], .6) + rose(px, py - .6, 2.1, c[i % 3]); }
+    [.3, .62].forEach(function(t, i){ s += rose(x - w / 2, y - (h - w / 2) * t, 1.9, c[i]) + rose(x + w / 2, y - (h - w / 2) * (t + .1), 1.9, c[i + 1]); });
+    return s;
+  }
+  function cypress(x, y, h, o){ var g = greens(o); return FO("M" + f(x) + " " + f(y) + " q" + f(-h * .24) + " " + f(-h * .5) + " 0 " + f(-h) + " q" + f(h * .24) + " " + f(h * .5) + " 0 " + f(h) + " z", g[1], 1.3) + L("M" + f(x - 1) + " " + f(y - h * .3) + " q1 " + f(-h * .2) + " .6 " + f(-h * .4), 1, g[0], .8); }
+  function gazebo(x, y, o){
+    var wh = o.night ? "#B9B3C6" : CREAM, s = ell(x, y, 15, 4.4, wh, 1.2);
+    [-12, -4.4, 4.4, 12].forEach(function(dx){ s += L("M" + f(x + dx) + " " + f(y - .6) + " v-17", 4) + L("M" + f(x + dx) + " " + f(y - .6) + " v-17", 2, wh); });
+    s += L("M" + f(x - 12) + " " + f(y - 6) + " h24", 1.2, INK, .6);
+    s += FO("M" + f(x - 16) + " " + f(y - 17) + " q16 -22 32 0 q-16 4.4 -32 0 z", o.snow ? "#F7FBFF" : o.night ? "#A8556E" : ROSE, 1.4) + L("M" + f(x - 6) + " " + f(y - 15.6) + " q1 -8 6 -12.4 M" + f(x + 6) + " " + f(y - 15.6) + " q-1 -8 -6 -12.4", .9, INK, .4);
+    return s + heart(x, y - 31.6, 3.4, o.night ? "#C9788E" : RED, 1);
+  }
+  /* a clipped hedge along a curve (a quadratic from a to b round c), th tall, roses dotted on it */
+  function hedge(a, c, b, th, seed, o){
+    var g = greens(o), R = T.rng(seed), n = 12, top = [], bot = [], s, i;
+    for (i = 0; i <= n; i++){ var t = i / n, x = (1 - t) * (1 - t) * a[0] + 2 * t * (1 - t) * c[0] + t * t * b[0], y = (1 - t) * (1 - t) * a[1] + 2 * t * (1 - t) * c[1] + t * t * b[1]; bot.push([x, y]); top.push([x, y - th]); }
+    var d = "M" + f(bot[0][0]) + " " + f(bot[0][1]);
+    for (i = 1; i <= n; i++) d += " L" + f(bot[i][0]) + " " + f(bot[i][1]);
+    d += " L" + f(top[n][0]) + " " + f(top[n][1]);
+    for (i = n - 1; i >= 0; i--) d += " Q" + f((top[i][0] + top[i + 1][0]) / 2) + " " + f((top[i][1] + top[i + 1][1]) / 2 - 3) + " " + f(top[i][0]) + " " + f(top[i][1]);
+    s = FO(d + " Z", g[0], 1.4);
+    for (i = 0; i < n; i++) s += F("M" + f(bot[i][0]) + " " + f(bot[i][1]) + " L" + f(bot[i + 1][0]) + " " + f(bot[i + 1][1]) + " L" + f(bot[i + 1][0]) + " " + f(bot[i + 1][1] - th * .38) + " L" + f(bot[i][0]) + " " + f(bot[i][1] - th * .38) + " Z", g[1], .8);
+    for (i = 0; i < n * 2; i++){ var k = Math.floor(R() * n), q = bot[k]; s += rose(q[0] + R() * 6, q[1] - 1.6 - R() * (th - 1), 1.7, reds(o)[i % 3]); }
+    return s;
+  }
+  var scenes = {
+    "rose-garden": T.hillScene({
+      note: "Rose hedges, arbors and a gazebo under a soft pink sky, petals on the lawn",
+      path: "stones", treeKind: "round", lamp: "iron", grade: ["#FFB3C7", .07],
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5C9272", "#508466", "#44745A", "#38644C"] : ["#BCE5A2", "#ABDA93", "#95CC81", "#6FAE66"]; },
+      sky: function(o){
+        if (o.night) return T.bands(["#2A1B4A", "#3A2460", "#4D2F72", "#643C82"], 0, 300) + T.starField(14, 28, 140) + T.moon(322, 46) + heart(142, 40, 5, "#F7A3BA").replace("/>", ' opacity=".5"/>');
+        var doves = ""; [[118, 70], [130, 63]].forEach(function(q){ doves += L("M" + f(q[0] - 4) + " " + f(q[1] - 1) + " q2.4 -2.6 4 0 q1.6 -2.6 4 0", 1.3, INK, .6); });
+        return T.bands(["#FFC4D6", "#FFD2DF", "#FFDFE8", "#FFEDF1"], 0, 300) + T.sun(76, 50) + T.cloud(306, 34) + T.cloud(196, 22, .6) + FO(hd(142, 40, 9), "#FFFFFF", 1.4) + doves;
+      },
+      far: function(o){
+        var c = o.snow ? ["#EEF5FB", "#DCEAF6"] : o.night ? ["#4E7462", "#446856"] : ["#D6EDBE", "#C3E3A8"], s = "";
+        /* a far lawn with a gazebo and cypresses on its ridge */
+        s += F("M0 136 Q56 100 130 112 Q200 96 280 110 Q344 96 400 128 V300 H0 Z", c[0]) + L("M0 136 Q56 100 130 112 Q200 96 280 110 Q344 96 400 128", 1.4, INK, .5);
+        s += '<g opacity="' + (o.night ? ".85" : ".95") + '">' + cypress(52, 120, 26, o) + cypress(98, 110, 22, o) + cypress(304, 108, 24, o) + cypress(352, 112, 26, o) + gazebo(328, 108, o) + "</g>";
+        /* nearer: the rose hedges, with an arbor in each */
+        s += F("M0 158 Q50 126 120 132 L120 300 H0 Z M400 156 Q350 122 280 128 L280 300 H400 Z", c[1]);
+        s += hedge([40, 143], [66, 124], [112, 124], 10, 31, o) + arbor(74, 131, 17, 26, o);
+        s += hedge([288, 121], [334, 122], [362, 143], 10, 37, o) + arbor(297, 123, 15, 22, o);
+        return s;
+      },
+      flat: function(o, on){
+        var tc = o.snow ? "" : o.night ? "#3D7449" : "#6FAE66", pet = o.night ? ["#B8546A", "#C9788E", "#D9A3B4", "#E6D9E0"] : [RED, ROSE, PINK, "#FFFFFF"];
+        return (tc ? T.scatter(151, 26, on, function(sx, sy){ return T.tuft(sx, sy, tc, .8); }).join("") : "") +
+          T.scatter(152, 44, on, function(sx, sy, i){ return F("M" + f(sx) + " " + f(sy) + (i % 2 ? " q2.2 -2.6 4.6 -.4 q-2 2.4 -4.6 .4z" : " q1.6 -3 4 -1.6 q-1 3 -4 1.6z"), pet[i % 4], .95); }).join("");
+      },
+      props: function(o, on){
+        return T.scatter(153, 9, on, function(sx, sy, i, R, x, y){
+          /* rose bushes, and now and then a rose tree: a ball of blooms on a stem */
+          var s = i % 3 === 2 ? L("M" + f(sx) + " " + f(sy) + " v-13", 3.4) + L("M" + f(sx) + " " + f(sy) + " v-13", 1.6, o.night ? "#6E5A4A" : K.wood) + bush(sx, sy - 17, 7, 70 + i, o)
+            : bush(sx, sy - 6, 8 + R() * 2.4, 80 + i, o);
+          return { x: x, y: y, s: s };
+        });
+      }
+    })
+  };
+
+  /* ------------------------------------------------------------------ the yard -------------------------------------- */
+  var balloon = function(x, y, k, c){
+    return FO("M" + f(x - 1.8) + " " + f(y + k * .95 + 2.6) + " l1.8 -3.4 1.8 3.4 z", c, .9) + heart(x, y, k, c, 1.3) + L("M" + f(x - k * .62) + " " + f(y - k * .3) + " q.2 " + f(-k * .36) + " " + f(k * .34) + " " + f(-k * .42), 1.5, "#FFFFFF", .8);
+  };
+  /* a swan, facing right, its bill at x = 0 on the water line y = 0: the neck bows back and comes forward, so two of them
+     beak to beak leave a heart between their necks */
+  var swan = function(){
+    var neck = "M-1.8 -3 C-11 -6.4 -11.6 -19 -6.4 -19.6 C-4.6 -19.8 -3.6 -18.2 -3.8 -16.2";
+    return FO("M-18.4 -5.8 q2.4 .2 3.8 1.6 q3.2 -4.6 8.4 -3.4 q5.2 1.2 5.6 5.6 q.2 2.2 -1.6 2.2 h-11 q-4.4 -.2 -5.2 -6 z", "#FFFFFF", 1.2) + L("M-13.4 -3 q4.2 -2.8 8.2 .2 M-11 -.9 q3 -1.6 5.6 .2", .8, "#B9CCDD") +
+      '<path d="' + neck + '" fill="none" stroke="' + INK + '" stroke-width="5" stroke-linecap="round"/><path d="' + neck + '" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/>' +
+      circ(-4, -15.8, 2.5, "#FFFFFF", 1) + FO("M-2 -17 L.1 -13.9 L-2.6 -13.6 z", "#F28C28", .7) + circ(-2.3, -15.4, .9, INK) + circ(-4.8, -16.5, .55, INK);
+  };
+  var yard = {
+    "heart-balloon": {
+      note: "Three heart balloons tied to a pot of roses", spot: [3.3, 3.4],
+      egg: { n: "The heart balloons", does: "little hearts drift up", say: "Hearts and teeth: look after them and they last a lifetime." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var g0 = P(1.8, 1.9, 0), x = g0[0], y = g0[1], s = ell(x, y + 1, 17, 6, "#1B2A3A", 0, .1);
+        var bl = [[x - 12, y - 31, 8.4, ROSE], [x + 11, y - 33, 8, PINK], [x - 1, y - 43, 9.6, RED]], str = "", top = "";
+        bl.forEach(function(q){ str += "M" + f(x) + " " + f(y - 12) + " Q" + f((x + q[0]) / 2 - (q[0] - x) * .2) + " " + f((y - 12 + q[1] + q[2]) / 2) + " " + f(q[0]) + " " + f(q[1] + q[2] * .95 + 2.6); top += balloon(q[0], q[1], q[2], o.night && q[3] === PINK ? "#F08AA8" : q[3]); });
+        if (o.snow) top += ell(x - 1, y - 52.2, 4.4, 1.5, "#FFFFFF", 0);
+        /* the pot: terracotta, a bow on it, roses in it */
+        s += L(str, 1, INK, .8);
+        s += FO("M" + f(x - 6.4) + " " + f(y - 8) + " h12.8 l-1.6 8 q-4.8 1.8 -9.6 0 z", "#D98A5F", 1.3) + FO("M" + f(x - 7.4) + " " + f(y - 10.6) + " h14.8 v3 q-7.4 1.6 -14.8 0 z", "#E8A47A", 1.2);
+        s += F(T.lumps(x, y - 12.6, 6.4, 5, 8, .6), greens(o)[0]) + rose(x - 3.6, y - 13, 2.2, RED) + rose(x + 3.4, y - 12.6, 2.2, PINK) + rose(x, y - 14.6, 2.2, ROSE);
+        s += heart(x, y - 3.6, 2.2, "#FFFDF6", .7);
+        return s + G("tp-float", top);
+      },
+      bits: function(){ var g0 = P(1.8, 1.9, 0), s = ""; [[-20, -52, 3, PINK], [-6, -60, 2.4, RED], [10, -54, 3.2, ROSE], [21, -44, 2.4, PINK], [-24, -38, 2.2, RED], [2, -66, 2.8, PINK]].forEach(function(q){ s += heart(g0[0] + q[0], g0[1] + q[1], q[2], q[3], .7); }); return s; }
+    },
+    "swing-for-two": {
+      note: "A white garden swing, a bench for two under a frame hung with roses", spot: [3.35, 3.45],
+      egg: { n: "The swing for two", does: "two lovebirds land on the beam", say: "Room for two. Front teeth always sit side by side, too." }, anim: "tp-pop 2.2s",
+      draw: function(o){
+        var s = ell.apply(null, P(1.85, 1.9, 0).concat([31, 11, "#1B2A3A", 0, .1])), xa = .3, xb = 3.3, yc = 1.75, zt = 3.75, wh = "#FFFDF6", wd = { top: wh, left: "#F6ECE0", right: "#DCCEBE" };
+        var beam2 = function(a, b, wdt){ return L(T.seg(P.apply(null, a), P.apply(null, b)), wdt + 2) + L(T.seg(P.apply(null, a), P.apply(null, b)), wdt, wh); };
+        var aframe = function(x){ return beam2([x, yc - 1.25, 0], [x, yc, zt], 2.4) + beam2([x, yc + 1.25, 0], [x, yc, zt], 2.4) + beam2([x, yc - .62, 1.9], [x, yc + .62, 1.9], 1.8); };
+        var rope = function(x, y, z){ return L(T.seg(P(x, yc, zt), P(x, y, z)), 1.2, INK, .85); };
+        /* the far A-frame, the back ropes, the bench (its back topped with a heart), the near ropes, the beam, the near A-frame */
+        s += aframe(xa) + rope(.95, 1.4, 1.75) + rope(2.65, 1.4, 1.75);
+        var back = T.onY(1.4, T.rectUV(.85, 2.75, 1.05, 1.78));
+        s += FO(D(back), wh, 1.4);
+        for (var i = 1; i < 6; i++) s += L(D(T.onY(1.4, [[.85 + i * .317, 1.1], [.85 + i * .317, 1.74]]), true), .8, INK, .3);
+        s += FO(D(T.onY(1.4, heartUV(1.8, 1.92, .92, .86))), RED, 1.3);
+        s += box(.85, 1.4, .93, 1.9, .82, .13, wd, { sw: 1.4, si: .9 });
+        s += FO(D([[.97, 1.55, 1.07], [2.63, 1.55, 1.07], [2.63, 2.14, 1.07], [.97, 2.14, 1.07]]), o.snow ? "#FFFFFF" : ROSE, 1) + L(D([[1.8, 1.55, 1.07], [1.8, 2.14, 1.07]], true), .8, INK, .4);
+        [.85, 2.75].forEach(function(x){ s += beam2([x, 1.42, 1.5], [x, 2.2, 1.5], 1.5) + beam2([x, 2.16, 1.06], [x, 2.16, 1.5], 1.5); });
+        s += rope(.95, 2.18, 1.5) + rope(2.65, 2.18, 1.5);
+        s += beam2([xa - .15, yc, zt], [xb + .15, yc, zt], 3);
+        /* a garland along the beam: leaves, roses, a heart hung in the middle; fairy lights at night */
+        var A = P(xa, yc, zt), B = P(xb, yc, zt), gar = "", c = reds(o);
+        for (i = 0; i < 4; i++){ var q0 = [A[0] + (B[0] - A[0]) * i / 4, A[1] + (B[1] - A[1]) * i / 4], q1 = [A[0] + (B[0] - A[0]) * (i + 1) / 4, A[1] + (B[1] - A[1]) * (i + 1) / 4]; gar += "M" + f(q0[0]) + " " + f(q0[1] + 1) + " Q" + f((q0[0] + q1[0]) / 2) + " " + f((q0[1] + q1[1]) / 2 + 6) + " " + f(q1[0]) + " " + f(q1[1] + 1); }
+        s += L(gar, 2.6, o.snow ? "#9DB8A6" : "#4F9A52");
+        for (i = 0; i <= 4; i++){ var qx = A[0] + (B[0] - A[0]) * i / 4, qy = A[1] + (B[1] - A[1]) * i / 4; s += rose(qx, qy + 1.4, 2.6, c[i % 3]); }
+        var md = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+        s += L("M" + f(md[0] - 9.5) + " " + f(md[1] - 2) + " v9", .9) + heart(md[0] - 9.5, md[1] + 10, 3, RED, .9);
+        if (o.night) [1, 3, 5, 7].forEach(function(k){ s += circ(A[0] + (B[0] - A[0]) * k / 8, A[1] + (B[1] - A[1]) * k / 8 + 4.6, 1.5, K.litHot, .6); });
+        s += aframe(xb);
+        if (o.snow) s += ell((A[0] + B[0]) / 2 + 8, (A[1] + B[1]) / 2 - 1.6, 9, 1.6, "#FFFFFF", 0);
+        return s;
+      },
+      lights: function(){ var A = P(.3, 1.75, 3.75), B = P(3.3, 1.75, 3.75), s = ""; [1, 3, 5, 7].forEach(function(k){ s += T.glowAt(A[0] + (B[0] - A[0]) * k / 8, A[1] + (B[1] - A[1]) * k / 8 + 4.6, 6); }); return s; },
+      bits: function(){
+        var A = P(.3, 1.75, 3.75), B = P(3.3, 1.75, 3.75), bird = function(t, dir, col){ var x = A[0] + (B[0] - A[0]) * t, y = A[1] + (B[1] - A[1]) * t - 4.4;
+          return FO("M" + f(x - dir * 3.4) + " " + f(y + .6) + " l" + f(-dir * 4) + " 1.8 l" + f(dir * 2) + " -3 z", col, .8) + ell(x, y, 3.6, 3, col, .9) + circ(x + dir * 2.6, y - 2.6, 2.2, col, .9) + FO("M" + f(x + dir * 4.6) + " " + f(y - 3) + " l" + f(dir * 2.2) + " .7 l" + f(-dir * 2.2) + " .9 z", "#F2C230", .6) + circ(x + dir * 3, y - 3, .5, INK); };
+        var m = [(A[0] + B[0]) / 2 + 3, (A[1] + B[1]) / 2 - 15];
+        return bird(.52, 1, "#8FD08A") + bird(.7, -1, "#FFB35C") + heart(m[0] + 2, m[1], 2.6, RED, .7);
+      }
+    },
+    "swan-pond": {
+      note: "A heart-shaped pond, and two swans whose necks make a heart", spot: [3.5, 2.7],
+      egg: { n: "The swan pond", does: "a cygnet paddles out", say: "Swans have no teeth at all. I try not to stare." }, anim: "tp-peek 2.4s",
+      draw: function(o){
+        /* the pond is a heart lying on the lawn, its point toward the front corner: (u, v) across and up the heart */
+        var cx = 1.72, cy = 1.72, q = Math.SQRT1_2, grd = function(uv, z){ return [cx + (uv[0] - uv[1]) * q, cy - (uv[0] + uv[1]) * q, z || 0]; };
+        var hp = function(w, h, z){ return D(heartUV(0, .05, w, h).map(function(t){ return grd(t, z); })); };
+        var s = "", wa = o.snow ? "#DCEFFA" : o.night ? "#4C8FC4" : K.water, st = o.night ? ["#A9B3BE", "#8E98A3"] : [K.stone, K.stoneShade], C = P(cx, cy, 0);
+        /* reeds behind it, a stone rim, the water */
+        [[P(.15, 2.3, 0), -4, 15, -1.2], [P(.15, 2.3, 0), 0, 19, .4], [P(.15, 2.3, 0), 4, 13, 1.4], [P(2.95, .2, 0), -2, 14, -1], [P(2.95, .2, 0), 2.6, 18, .8]].forEach(function(r0){ var rd = r0[0], r = r0.slice(1); s += L("M" + f(rd[0] + r[0]) + " " + f(rd[1]) + " q" + f(r[2]) + " " + f(-r[1] / 2) + " " + f(r[2] * 1.4) + " " + f(-r[1]), 1.5, o.snow ? "#9DB8A6" : "#4F9A52") + ell(rd[0] + r[0] + r[2] * 1.4, rd[1] - r[1] - 2.4, 1.5, 3.2, "#8A5A3A", .8); });
+        s += FO(hp(4.5, 4.25, 0), st[1], 1.6) + FO(hp(4.5, 4.25, .12), st[0], 1.3);
+        for (var i = 0; i < 32; i += 2){ var a = heartUV(0, .05, 4.5, 4.25)[i], b = heartUV(0, .05, 3.75, 3.5)[i]; s += L(D([grd(a, .12), grd(b, .12)], true), .8, INK, .35); }
+        s += FO(hp(3.75, 3.5, .12), o.night ? "#3F79AC" : K.waterShade, 1.2) + F(hp(3.75, 3.5, .04), wa);
+        s += O(hp(3.75, 3.5, .12), 1.2);
+        if (!o.snow) s += G("tp-water", L("M" + f(C[0] - 17) + " " + f(C[1] - 6) + " h6 M" + f(C[0] + 10) + " " + f(C[1] - 7) + " h7 M" + f(C[0] - 6) + " " + f(C[1] + 5.4) + " h8", 1.2, "#FFFFFF", .8));
+        /* lily pads and a water lily */
+        var lp = P(cx - .95, cy + .1, 0), lq = P(cx + .2, cy - 1.15, 0);
+        s += ell(lp[0], lp[1], 3.6, 1.9, "#6DB56A", .8) + ell(lq[0], lq[1], 3.2, 1.7, "#6DB56A", .8) + FO("M" + f(lq[0] - 2.4) + " " + f(lq[1] - .4) + " q.4 -3 2.4 -3.4 q2 .4 2.4 3.4 q-2.4 1.4 -4.8 0 z", PINK, .7);
+        /* the swans, beak to beak, and the little heart they make */
+        var wy = C[1] - 4.2, sw = '<g transform="scale(1.12)">' + swan() + "</g>", pair = heart(C[0], wy - 13, 8.6, BLUSH).replace("/>", ' opacity=".75"/>') + T.T(C[0], wy, sw) + '<g transform="translate(' + f(C[0]) + " " + f(wy) + ') scale(-1 1)">' + sw + "</g>";
+        pair += L("M" + f(C[0] - 21) + " " + f(wy + .8) + " h18 M" + f(C[0] + 3) + " " + f(wy + .8) + " h18", 1, "#FFFFFF", .7);
+        s += G("tp-bob", pair) + heart(C[0], wy - 29, 2.8, RED, .8);
+        if (o.snow) s += ell.apply(null, P(cx - 1.5, cy - 1.5, .14).concat([7, 2.2, "#FFFFFF", 0]));
+        return s;
+      },
+      lights: function(){ var C = P(1.72, 1.72, 0); return T.glowAt(C[0], C[1] - 16, 13) + T.firefly(C[0] - 22, C[1] - 20, .2) + T.firefly(C[0] + 21, C[1] - 12, 1.1); },
+      bits: function(){ var m = P(2.45, 2.2, 0), x = m[0], y = m[1] - 1.4; return L("M" + f(x - 6) + " " + f(y + 1.6) + " h11", 1, "#FFFFFF", .8) + ell(x, y - 1, 4, 2.6, "#C9C1B4", .9) + circ(x - 3.4, y - 4.4, 2, "#C9C1B4", .9) + FO("M" + f(x - 5.2) + " " + f(y - 4.6) + " l-2.2 .8 2.2 .8 z", "#3B2E3A", .5) + circ(x - 3.8, y - 4.8, .5, INK); }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the outfits ----------------------------------- */
+  var ln = function(d, c, w){ return '<path d="' + d + '" fill="none" stroke="' + c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'; };
+  var eo = ' fill-rule="evenodd" stroke="' + INK + '" stroke-width="3" stroke-linejoin="round"';
+  var outfits = {
+    "mail-cap": {
+      note: "A mail carrier's cap with a heart badge, and a letter sealed with a heart",
+      face: '<g transform="translate(167 110) rotate(-12)">' + p("M-20 -14 h40 v28 h-40 z", CREAM, O3 + ' stroke-linejoin="round"') + ln("M-20 -14 L0 3 L20 -14 M-20 14 L-7 -1 M20 14 L7 -1", INK, 2) + p(hd(0, 3.6, 7), RED, O2) + "</g>",
+      top: p("M54 30 C46 8 68 -6 100 -6 C132 -6 154 8 146 30 Q100 42 54 30 Z", "#3F78C2") + ln("M68 6 Q84 -1 100 -1", "#FFFFFF", 3).replace("/>", ' opacity=".5"/>') +
+        p("M60 28 Q100 40 140 28 L140 46 Q100 58 60 46 Z", "#2C5494", O3) + ln("M60 31 Q100 43 140 31", GOLD, 2.4) +
+        p("M56 46 Q100 60 144 46 Q152 58 140 63 Q100 74 60 63 Q48 58 56 46 Z", "#22304F", O3) + ln("M66 60 Q100 69 134 60", "#5B6E96", 2) +
+        '<ellipse cx="100" cy="40" rx="12.4" ry="10" fill="' + GOLD + '" ' + O2 + "/>" + p(hd(100, 40.4, 6.2), RED, 'stroke="' + INK + '" stroke-width="1.6"'),
+      say: ["Special delivery! One love letter, sealed with a heart.", "Neither plaque nor tartar stops this mail carrier.", "You've got mail. It says: floss tonight."]
+    },
+    "knight-of-hearts": {
+      note: "A knight's helmet with a heart for a crest, a heart shield and a sword",
+      back: ln("M172 122 L188 58", INK, 9) + ln("M172 122 L188 58", "#DCE3EA", 5) + ln("M186.4 64 L188.6 55", "#FFFFFF", 2) + ln("M162 104 L186 111", INK, 8) + ln("M162 104 L186 111", GOLD, 4) + '<circle cx="170.4" cy="127" r="4.6" fill="' + GOLD + '" ' + O2 + "/>",
+      face: p(hd(39, 109, 21), "#C9D3DC", O3) + p(hd(39, 108.4, 15.4), RED, O2) + T.tinyTooth(39, 106.6, 1.7, "#FFFFFF") + ln("M24 100 q1 -6 7 -8", "#FFFFFF", 2.4).replace("/>", ' opacity=".7"/>'),
+      top: p(hd(100, -11, 16), RED) + ln("M90 -18 q1 -5 6 -6", "#FFFFFF", 3).replace("/>", ' opacity=".7"/>') +
+        p("M44 78 C34 30 62 4 100 4 C138 4 166 30 156 78 L152 110 Q146 120 139 112 L138 68 Q100 58 62 68 L61 112 Q54 120 48 110 Z", "#C9D3DC") +
+        '<path d="M112 6 C140 12 160 36 154 78 L152 110 Q146 120 139 112 L138 68 Q132 30 112 6 Z" fill="#AEBBC7" opacity=".8"/>' + ln("M100 6 V34", INK, 2.4) + ln("M62 26 Q72 12 88 8", "#FFFFFF", 3).replace("/>", ' opacity=".7"/>') +
+        p("M56 64 Q100 44 144 64 L141 44 Q100 26 59 44 Z", "#DCE3EA", O3) + ln("M76 50 l1 8 M88 46 l.6 8 M100 45 v8 M112 46 l-.6 8 M124 50 l-1 8", INK, 2.6) +
+        '<circle cx="57" cy="58" r="5" fill="' + GOLD + '" ' + O2 + '/><circle cx="143" cy="58" r="5" fill="' + GOLD + '" ' + O2 + "/>",
+      say: ["Sir Timmy, Knight of Hearts, at your service!", "My shield stops plaque. Mostly, it's the brushing.", "A brave knight never skips the back molars."]
+    },
+    "masquerade": {
+      note: "A jeweled mask with plumes, a high-collared cape with a heart clasp, and a rose",
+      back: p("M46 60 L14 22 Q22 58 13 96 Q5 126 3 152 L197 152 Q195 126 187 96 Q178 58 186 22 L154 60 Z", "#B5283F") + ln("M27 66 Q22 110 16 150 M173 66 Q178 110 184 150", "#8E1C30", 2.6) + ln("M15 24 L45 59 M185 24 L155 59", GOLD, 3),
+      face: ln("M54 118 Q100 136 146 118", INK, 6.4) + ln("M54 118 Q100 136 146 118", GOLD, 3) + p(hd(100, 127.4, 8.4), RED, O3) +
+        /* a rose in his hand */
+        ln("M44 126 Q38 114 27 104", INK, 5.4) + ln("M44 126 Q38 114 27 104", "#4F9A52", 2.6) + p("M38 117 q-3 -8 -10 -8 q2 8 10 8 z", "#6DB56A", O2) +
+        '<circle cx="23" cy="98" r="9.6" fill="' + RED + '" ' + O3 + "/>" + ln("M18 100 q1 -7 7 -6 q5 1 3 6 q-2 3 -5 1", "#8E1C30", 1.8) +
+        /* the plumes, then the mask: holes round his eyes, so they show */
+        p("M148 72 C146 46 156 26 178 16 C178 38 170 58 156 74 Z", PINK, O3) + p("M152 74 C158 54 170 44 190 42 C184 58 172 70 157 78 Z", "#B08CFF", O3) + ln("M152 70 C154 52 162 36 174 24 M157 75 C164 62 174 52 184 46", INK, 1.4).replace("/>", ' opacity=".5"/>') +
+        '<path d="M42 66 C54 65 66 67 78 70 C90 72 95 78 100 78 C105 78 110 72 122 70 C134 67 146 65 158 66 C158 84 150 99 130 100 C114 101 106 94 100 94 C94 94 86 101 70 100 C50 99 42 84 42 66 Z M71 84 a9 9.6 0 1 0 18 0 a9 9.6 0 1 0 -18 0 Z M111 84 a9 9.6 0 1 0 18 0 a9 9.6 0 1 0 -18 0 Z" fill="#5B3A8C"' + eo + "/>" +
+        '<ellipse cx="80" cy="84" rx="11.6" ry="12.2" fill="none" stroke="' + GOLD + '" stroke-width="1.8"/><ellipse cx="120" cy="84" rx="11.6" ry="12.2" fill="none" stroke="' + GOLD + '" stroke-width="1.8"/>' +
+        ln("M46 70 C56 69 66 70 77 73 M154 70 C144 69 134 70 123 73", GOLD, 1.8) + p(hd(100, 85.6, 3.6), RED, 'stroke="' + INK + '" stroke-width="1.2"') +
+        '<circle cx="54" cy="80" r="1.8" fill="' + GOLD + '"/><circle cx="146" cy="80" r="1.8" fill="' + GOLD + '"/><circle cx="60" cy="92" r="1.6" fill="' + GOLD + '"/><circle cx="140" cy="92" r="1.6" fill="' + GOLD + '"/>',
+      say: ["Who is this mysterious molar? It's me. It's Timmy.", "A mask for the ball, a cape for the drama.", "May I have this dance? I know the two-step: brush, then floss."]
+    }
+  };
+
+  return { k: "valentine", homes: homes, scenes: scenes, yard: yard, outfits: outfits };
+}
