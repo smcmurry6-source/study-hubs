@@ -202,16 +202,16 @@ p2-2s-6 retired
 p2-tf-9 retired
 p2-pheo-cell
 p2-pheo-dental
-p2-num-4 retired
+p2-num-4
 p2-nb
 p2-2s-7 retired
 p2-tf-11 retired
 fh-organ-jobs retired
-fh-steroids retired
+fh-steroids
 fh-arrest-1
 fh-arrest-2
 fh-lh-meiosis
-fh-polar retired
+fh-polar
 fh-seq-meiosis retired
 fh-match-counts
 fh-tf-12
@@ -220,23 +220,23 @@ fh-primordial-id retired
 fh-unilaminar-id retired
 fh-antral-id
 fh-graafian-id
-fh-corona retired
+fh-corona
 fh-zp-contact
 fh-gap-barrier
 fh-mm-liquor retired
 fh-tf-months
-fh-2s-1 retired
+fh-2s-1
 fh-2s-2
 fh-2s-3
 fh-num-follicles
 fh-seq-follicle retired
 fh-ex-secondary
-fh-ovulation-trigger retired
-fh-mm-lh retired
+fh-ovulation-trigger
+fh-mm-lh
 fh-rupture
 fh-where-released retired
 fh-lutein-estrogen
-fh-tf-thecalutein retired
+fh-tf-thecalutein
 fh-2s-5
 fh-cl-fate
 fh-ex-postov retired
@@ -254,7 +254,7 @@ fh-tf-24h
 fh-capacitation
 fh-id-tube retired
 fh-ex-tube
-fh-2s-4 retired
+fh-2s-4
 fh-ex-endometrium
 fh-tf-myoestrogen retired
 fh-cervix-mucus
@@ -262,7 +262,7 @@ fh-tz
 fh-id-vagina retired
 fh-num-vagina
 fh-ovulation-mucus retired
-fh-mammary-structure retired
+fh-mammary-structure
 fh-tf-lactating retired
 fh-ex-milk retired
 fh-num-milk
@@ -273,8 +273,8 @@ fh-pb-colostrum
 fh-pb-letdown
 fh-pb-cl
 fh-pb-myo
-fh-pb-abx retired
-fh-pb-meno retired
+fh-pb-abx
+fh-pb-meno
 fh-num-ovary
 mp-4g-gonadal
 mp-amh
@@ -344,67 +344,67 @@ r-h1-gq
 r-h1-gi
 r-h1-2s-4
 r-h1-acidophils
-r-h1-2s-2 retired
+r-h1-2s-2
 r-rv-paracrine
-r-rv-neuroendo retired
-r-hp-neuroendo retired
+r-rv-neuroendo
+r-hp-neuroendo
 r-rv-gs
-r-hp-gs-ca retired
+r-hp-gs-ca
 r-hp-ins-vs-gh
 r-hp-2s-4
 r-rv-gh-except
 r-gr-ss-gi
-r-gr-ghrh-gs retired
+r-gr-ghrh-gs
 r-gr-num-1
 r-gr-r-ssfb
-r-gr-igf-fb retired
-r-gr-ss-glucose retired
-r-gr-f-igfinj retired
-r-rv-tpo retired
-r-th-tpo retired
-r-th-r-nis retired
-r-th-megalin retired
+r-gr-igf-fb
+r-gr-ss-glucose
+r-gr-f-igfinj
+r-rv-tpo
+r-th-tpo
+r-th-r-nis
+r-th-megalin
 r-th-rt3
-r-th-2s-1 retired
-r-th-t3 retired
-r-th-r-t3 retired
-r-rv-sst retired
+r-th-2s-1
+r-th-t3
+r-th-r-t3
+r-rv-sst
 r-pa-ss
-r-pa-ss-stim retired
+r-pa-ss-stim
 r-rv-glucagon
-r-pa-glucagon-stim retired
-r-pa-tf-5 retired
-r-rv-aldo-high retired
+r-pa-glucagon-stim
+r-pa-tf-5
+r-rv-aldo-high
 r-ad-aldo-excess
-r-ad-aldo-k retired
-r-ad-angII retired
-r-rv-acth-epi retired
+r-ad-aldo-k
+r-ad-angII
+r-rv-acth-epi
 r-ad-pnmt-reg
-r-ad-pnmt retired
-r-ad-2s-4 retired
-r-cs-infection retired
+r-ad-pnmt
+r-ad-2s-4
+r-cs-infection
 r-cs-num-1
-r-cs-electrolytes retired
+r-cs-electrolytes
 r-cs-taper
-r-cs-2s-2 retired
-r-td-ptu-preg retired
+r-cs-2s-2
+r-td-ptu-preg
 r-td-mmi-first
-r-td-mmi-teratogen retired
+r-td-mmi-teratogen
 r-td-num-1
 r-td-levo-admin
-r-td-binders retired
-r-td-2s-1 retired
+r-td-binders
+r-td-2s-1
 r-h2-dual
-r-h2-dual-why retired
+r-h2-dual-why
 r-h2-spongio
-r-h2-num-2 retired
+r-h2-num-2
 r-rv-casr
-r-ca-casr retired
-r-ca-r-2s-1 retired
+r-ca-casr
+r-ca-r-2s-1
 r-rv-vitd
-r-ca-1alpha-on retired
-r-ca-calcitriol-net retired
-r-ca-2s-3 retired
+r-ca-1alpha-on
+r-ca-calcitriol-net
+r-ca-2s-3
 r-ca-2s-4 retired
 r-cs-2s-3 retired
 r-gr-r-plate retired
@@ -412,7 +412,7 @@ r-pa-2s-2
 r-td-inducers retired
 r-h2-r-2s-1 retired
 r-ca-r-vdr retired
-r-pa-insulin-fat retired
+r-pa-insulin-fat
 r-cs-mitotane retired
 r-h2-islet-origin retired
 r-h1-tf-5 retired
@@ -512,19 +512,19 @@ mh-tf-head
 mh-spermiation
 mh-seq-ducts retired
 mh-efferent retired
-mh-tf-efferent retired
+mh-tf-efferent
 mh-num-ducts
-mh-x-pseudo retired
+mh-x-pseudo
 mh-2s-2 retired
 mh-epid-id retired
 mh-cilia-stereo
-mh-2s-5 retired
+mh-2s-5
 mh-x-epid
 mh-num-epid
 mh-gpc
 mh-motility retired
 mh-tf-epid74
-mh-ejac-duct retired
+mh-ejac-duct
 mh-case-vas-1 retired
 mh-case-vas-2 retired
 mh-case-vas-3 retired
@@ -538,9 +538,9 @@ mh-sv-id retired
 mh-bu-id retired
 mh-bu-timing
 mh-2s-4
-mh-tf-prostate-first retired
-mh-tf-prostate-sets retired
-mh-x-prostate retired
+mh-tf-prostate-first
+mh-tf-prostate-sets
+mh-x-prostate
 mh-num-glands
 mh-match-secretions retired
 mh-tf-pg
@@ -609,144 +609,144 @@ fp-ovtime-2 retired
 fp-preov-1 retired
 fp-preov-2 retired
 fp-match-roles retired
-r-h1-herring retired
-r-h1-pituicyte retired
-r-h1-nuclei retired
-r-h1-adeno-parts retired
-r-h1-portal retired
+r-h1-herring
+r-h1-pituicyte
+r-h1-nuclei
+r-h1-adeno-parts
+r-h1-portal
 r-h1-num-1
 r-h1-tf-8
 r-h1-chief
-r-h1-casr retired
-r-h1-2s-5 retired
+r-h1-casr
+r-h1-2s-5
 r-h1-ccell
-r-h1-2s-3 retired
-r-h1-num-2 retired
+r-h1-2s-3
+r-h1-num-2
 r-rv-steroid-except
-r-hp-steroid-store retired
-r-hp-peptide-store retired
-r-hp-num-1 retired
+r-hp-steroid-store
+r-hp-peptide-store
+r-hp-num-1
 r-hp-primary-cort
-r-hp-secondary-fail retired
-r-hp-num-2 retired
-r-hp-2s-3 retired
+r-hp-secondary-fail
+r-hp-num-2
+r-hp-2s-3
 r-hp-glucagon-fb
 r-hp-positive
 r-hp-pp-none
-r-hp-2s-2 retired
+r-hp-2s-2
 r-hp-tf-3
-r-gr-f-ssblock retired
-r-gr-r-daytime retired
-r-gr-f-tf-1 retired
-r-gr-f-2s-2 retired
+r-gr-f-ssblock
+r-gr-r-daytime
+r-gr-f-tf-1
+r-gr-f-2s-2
 r-rv-gh-linear
-r-gr-somatomedin retired
-r-gr-diff retired
-r-gr-r-2s-1 retired
-r-rv-gh-excess retired
-r-gr-diabetogenic retired
-r-gr-r-glucose retired
-r-gr-lipolysis retired
+r-gr-somatomedin
+r-gr-diff
+r-gr-r-2s-1
+r-rv-gh-excess
+r-gr-diabetogenic
+r-gr-r-glucose
+r-gr-lipolysis
 r-gr-muscle
-r-gr-f-metprofile retired
-r-gr-f-num-1 retired
+r-gr-f-metprofile
+r-gr-f-num-1
 r-gr-f-tf-2
-r-gr-giant retired
-r-gr-2s-3 retired
-r-gr-num-2 retired
-r-gr-acro-sx-ex retired
-r-rv-laron retired
-r-gr-laron retired
-r-gr-deficiency-sx retired
+r-gr-giant
+r-gr-2s-3
+r-gr-num-2
+r-gr-acro-sx-ex
+r-rv-laron
+r-gr-laron
+r-gr-deficiency-sx
 r-gr-f-2s-1
-r-gr-somatopause retired
-r-gr-somatopause-sx retired
+r-gr-somatopause
+r-gr-somatopause-sx
 r-gr-2s-4
-r-gr-r-tf-4 retired
-r-gr-r-tf-3 retired
-r-gr-f-num-2 retired
-r-th-extracell retired
-r-th-r-2s-1 retired
+r-gr-r-tf-4
+r-gr-r-tf-3
+r-gr-f-num-2
+r-th-extracell
+r-th-r-2s-1
 r-th-num-1
-r-th-f-store retired
-r-th-f-release retired
+r-th-f-store
+r-th-f-release
 r-th-f-tf-2
-r-th-f-conv retired
-r-th-f-2s-1 retired
-r-th-f-tf-3 retired
+r-th-f-conv
+r-th-f-2s-1
+r-th-f-tf-3
 r-th-trh-gq
 r-th-tsh-gs
-r-th-t3-inhib retired
-r-th-r-ss retired
-r-rv-th-anabolic retired
+r-th-t3-inhib
+r-th-r-ss
+r-rv-th-anabolic
 r-th-bmr
-r-th-heart retired
-r-th-r-myosin retired
-r-th-f-cv retired
+r-th-heart
+r-th-r-myosin
+r-th-f-cv
 r-th-f-num-1
-r-th-f-num-3 retired
-r-th-f-tf-1 retired
-r-th-pb-graves retired
-r-th-pb-graves-eyes retired
+r-th-f-num-3
+r-th-f-tf-1
+r-th-pb-graves
+r-th-pb-graves-eyes
 r-rv-graves
-r-th-graves-labs retired
+r-th-graves-labs
 r-th-f-compare
 r-th-pb-hashi
-r-th-pb-hashi-chol retired
+r-th-pb-hashi-chol
 r-th-r-ldl
-r-th-f-num-2 retired
+r-th-f-num-2
 r-th-pb-iodine
-r-th-pb-tpo retired
-r-th-goiter retired
+r-th-pb-tpo
+r-th-goiter
 r-th-pb-newborn
 r-th-pb-secondary
-r-th-congenital-tx retired
+r-th-congenital-tx
 r-th-child-growth
 r-rv-ins-muscle
-r-pa-glut4 retired
+r-pa-glut4
 r-pa-insulin-muscle
-r-pa-ketogenesis retired
+r-pa-ketogenesis
 r-pa-num-2
-r-pa-glucagon-muscle retired
+r-pa-glucagon-muscle
 r-pa-katp
-r-pa-sulfonyl retired
-r-pa-cpeptide retired
+r-pa-sulfonyl
+r-pa-cpeptide
 r-rv-cort-reg
-r-ad-acth-gs retired
-r-ad-num-2 retired
+r-ad-acth-gs
+r-ad-num-2
 r-rv-cort-met
-r-ad-cortisol-goal retired
-r-ad-cortisol-muscle retired
+r-ad-cortisol-goal
+r-ad-cortisol-muscle
 r-ad-addison-acth
-r-ad-cushing-disease retired
-r-ad-2s-3 retired
+r-ad-cushing-disease
+r-ad-2s-3
 r-ad-tf-4
-r-cs-keto retired
+r-cs-keto
 r-cs-num-2
 r-cs-hyperK
-r-cs-spiro retired
+r-cs-spiro
 r-td-tsh-read
-r-td-2s-3 retired
+r-td-2s-3
 r-td-amio
-r-td-2s-5 retired
+r-td-2s-5
 r-td-macroglossia
-r-td-bb retired
+r-td-bb
 r-h2-acth-zones
 r-h2-r-angio
-r-h2-tf-3 retired
-r-h2-islet-share retired
+r-h2-tf-3
+r-h2-islet-share
 r-h2-r-rank
 r-h2-2s-3
 r-ca-pth-kidney
-r-ca-why-split retired
-r-ca-r-phos retired
+r-ca-why-split
+r-ca-r-phos
 r-ca-ob-rec
 r-ca-2s-2
-r-ca-num-2 retired
-r-ca-oc-rec retired
+r-ca-num-2
+r-ca-oc-rec
 r-ca-calcitonin
 r-ca-hpt
-r-ca-r-stones retired
+r-ca-r-stones
 dc-growth-plates
 dc-implant-growth
 dc-2s-acro
@@ -758,7 +758,7 @@ dc-2s-brown
 dc-tf-steroid
 dc-stress-dose
 dc-tf-t2
-dc-metformin-skip retired
+dc-metformin-skip
 dc-a1c-num
 dc-tf-glucose60 retired
 dc-tf-farxiga
@@ -787,7 +787,7 @@ fh-2s-7
 fh-num-graph
 fh-tf-fshpeak
 fh-2s-8
-fh-seq-menses retired
+fh-seq-menses
 fh-tf-straight
 mp-sl-pair
 mp-arom-adult retired
