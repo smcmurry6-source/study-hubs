@@ -2254,7 +2254,61 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   ].join("\n");
 
   function meta(list, keys){ return Object.keys(list).map(function(k){ var x = list[k], o = { k: k }; keys.forEach(function(q){ if (x[q] !== undefined) o[q] = x[q]; }); return o; }); }
+  /* ------------------------------------------------------------------ Timmy's health at his place ------------------
+     His HP (widget/pet.js: conditions() and moodFor()) shows in how he looks, moves and behaves at home (Sam,
+     2026-11-10: "timmys behavior, movement, and appearance at his house should also reflect his health level").
+     One row per level, best first, with the same cut-offs as pet.js's conditions:
+       min     HP at or above this
+       art     which of pet.js's drawings he is: a mood ("happy") or an HP level ("hp35": the plaque, stains, cavity...)
+       pace    how long each hop takes (x the usual), hop: how high (x), stride: how far (x)
+       roam    the share of his idle turns he wanders off on; near: he keeps to the door and the spots by it;
+               stay: he doesn't leave the doorstep at all
+       wave    [swings of his arm, how wide in degrees]; flip: a second tap flips him
+       idle    what he does standing still: "bounce", "", "droop" or "shiver"
+       does    one line for people (the design page's gallery, later the About page)
+       hello   what he says when tapped ({hp} is his HP); tired: what he says in place of a flip; rest: what he says
+               when something is tapped and he stays where he is
+     A visitor never sees someone else's health (learner-data-privacy): a visited Timmy is always drawn healthy. */
+  var HEALTH = [
+    { k: "sparkling", n: "Sparkling", min: 90, art: "hp100", pace: .82, hop: 1.45, stride: 1.15, roam: .8, wave: [8, 64], flip: true, idle: "bounce", cheer: true,
+      does: "Bounces on the spot, hops high and fast, wanders the most, cheers when he gets somewhere, flips twice",
+      hello: ["I'm at {hp} HP. I'm basically a toothpaste commercial.", "Look at me. Sparkling. That's all you.", "{hp} HP. I've never felt better."] },
+    { k: "healthy", n: "Healthy", min: 70, art: "happy", pace: 1, hop: 1, stride: 1, roam: .66, wave: [6, 58], flip: true, idle: "",
+      does: "His everyday self: hops over to what you tap, wanders, waves, flips on a second tap",
+      hello: ["Hi! Good to see you.", "Feeling good: {hp} HP. A few questions a day keeps the plaque away.", "Hello! Come on in.", "Oh, hi! I was just thinking about flossing."] },
+    { k: "plaque", n: "A little plaque", min: 55, art: "hp65", pace: 1.15, hop: .8, stride: .95, roam: .5, wave: [5, 50], flip: false, idle: "",
+      does: "A touch slower and lower, wanders less; a small hop where a flip would be",
+      hello: ["{hp} HP. A little plaque at my gumline. Some right answers would brush it off.", "Hi. I could use a brush."],
+      tired: "Not feeling flippy. There's a little plaque at my gumline." },
+    { k: "stains", n: "Stains and puffy gums", min: 40, art: "hp50", pace: 1.35, hop: .6, stride: .85, roam: .38, wave: [4, 42], flip: false, idle: "",
+      does: "Slow, low hops, a smaller wave, mostly stays where he is",
+      hello: ["{hp} HP. I've got stains and puffy gums. A study streak would fix me right up.", "Hey. My gums are a bit puffy today."],
+      tired: "No flips today. My gums are sore." },
+    { k: "cavity", n: "A cavity", min: 25, art: "hp35", pace: 1.3, hop: .3, stride: .8, roam: .2, near: true, wave: [3, 30], flip: false, idle: "droop",
+      does: "Shuffles in short steps, droops and sways, keeps near the door, a weak wave",
+      hello: ["{hp} HP. That's a cavity. Please. Questions. Now.", "Ow. Hi. It's the cavity."],
+      tired: "I can't flip with a cavity." },
+    { k: "perio", n: "Periodontitis", min: 12, art: "hp20", pace: 1.45, hop: .16, stride: .72, roam: .1, near: true, wave: [2, 24], flip: false, idle: "droop",
+      does: "Barely leaves the ground, wobbles as he stands, hardly wanders",
+      hello: ["{hp} HP. My gums are receding and there's calculus on my roots. Periodontitis is no joke.", "I feel a bit loose today."],
+      tired: "If I flipped, I might wobble right out." },
+    { k: "fracture", n: "A cracked cusp", min: 1, art: "hp8", pace: 1.55, hop: 0, stride: .68, roam: 0, near: true, wave: [2, 18], flip: false, idle: "shiver",
+      does: "Limps without a hop, shivers, never wanders by himself; still comes to see what you tap, slowly",
+      hello: ["{hp} HP. I cracked a cusp. I need a real treatment plan: questions, today and tomorrow."],
+      tired: "No flips. I cracked a cusp." },
+    { k: "zero", n: "Needs treatment", min: 0, art: "hp0", pace: 1.7, hop: 0, stride: .68, roam: 0, near: true, stay: true, wave: [1, 14], flip: false, idle: "shiver",
+      does: "Stays on the doorstep, shivering; he turns to look at what you tap and tells you what he needs",
+      hello: ["0 HP. I'm in rough shape. I won't die, but getting me back takes a few solid study days."],
+      tired: "I can't. Not at 0 HP.", rest: "I'll watch from here. A few right answers and I'll hop over." }
+  ];
+  function healthFor(hp){
+    hp = hp == null || isNaN(+hp) ? 80 : Math.max(0, Math.min(100, +hp));
+    for (var i = 0; i < HEALTH.length; i++) if (hp >= HEALTH[i].min) return HEALTH[i];
+    return HEALTH[HEALTH.length - 1];
+  }
+
   return {
+    HEALTH: HEALTH, healthFor: healthFor,
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
     HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),

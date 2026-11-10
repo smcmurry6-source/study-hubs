@@ -58,7 +58,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   random visit, next and back, a trip through soft clouds). (6) Polish: the statue's handpiece stands upright; the
   igloo's doorway is clear; the emerald hills have one gated wall. (7) **Timmy's podcast studio** is a yard piece (kit
   key `studio`, shop id `podcast-studio`, Epic, 2,400): a sound booth with an on-air lamp, an antenna, the show's poster
-  and his mic; tapped, it goes on air. Open: Sam's look at the second screenshots.
+  and his mic; tapped, it goes on air. (8) **Timmy's health at his place**: the kit's `HEALTH` table (eight levels, the
+  cut-offs of `conditions()` in `widget/pet.js`) sets his drawing, how he hops, how much he wanders, his wave, whether he
+  flips and what he says; at 0 HP he stays on the doorstep. A visitor never sees it. Open: Sam's look at the screenshots.
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't

@@ -645,7 +645,7 @@
   function hubLabel(h){ var t = A.tints && A.tints[h], m = /^hub-(\d+)$/.exec(h); return h === "generic" ? MORE_HUBS[15] : t && t.name ? t.name : m ? MORE_HUBS[(+m[1] - 7 + MORE_HUBS.length) % MORE_HUBS.length] : h; }
   var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank"; }, byRank = function(x){ return x.set === "rank"; };
   var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
-    tier: 3, level: 2, flair: 3, holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
+    tier: 3, level: 2, flair: 3, holiday: "", season: "", hp: 82, outfit: "", mode: "play", pick: "home", still: false, found: {} };
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
   function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
   function isStill(){ return PS.still || reduced; }
@@ -661,7 +661,15 @@
   }
   function timmySvg(mood, outfit){ var s = timmyArt(mood || "happy"); return outfit ? TP.dress(s, outfit) : s; }
   /* Timmy inside a scene: his drawing at 36 wide, its feet (pet.js's shadow, y 226) on the spot */
-  function timmyG(svg){ return '<g class="tp-tface"><svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>"; }
+  function timmyG(svg, hl){
+    var star = function(x, y, k, d){ return '<path class="tp-twinkle" style="animation-delay:' + d + 's" transform="translate(' + x + " " + y + ") scale(" + k + ')" d="M0 -3 L.8 -.8 L3 0 L.8 .8 L0 3 L-.8 .8 L-3 0 L-.8 -.8 Z" fill="#FFE27A" stroke="#3B2E3A" stroke-width=".35"/>'; };
+    return '<g class="tp-tface"><g class="tp-tmood">' + '<svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>" +
+      (hl && hl.k === "sparkling" ? star(-17, -38, 1, 0) + star(17, -28, .8, .7) + star(-19, -14, .7, 1.3) + star(15, -44, .6, 1.9) : "") + "</g>";
+  }
+  /* Timmy's health at his place: the kit's table (TP.HEALTH) says how he looks, moves and behaves at each level */
+  function HL(){ return TP.healthFor(PS.hp); }
+  function hpLine(t){ return String(t || "").replace("{hp}", PS.hp); }
+  function hpRange(h){ var i = TP.HEALTH.indexOf(h), top = i ? TP.HEALTH[i - 1].min - 1 : 100; return h.min === top ? h.min + " HP" : h.min + " to " + top + " HP"; }
   function fmtPrice(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
   var COIN = null;
   function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Default</span>'; }
@@ -673,8 +681,8 @@
   function sentence(t){ t = String(t || "").replace(/^(Free|Default|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
   function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
   /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
-  function placeFig(o, cap, sub, timmySpot, cls, outfit){
-    if (timmySpot) o = Object.assign({}, o, { timmy: { g: timmyG(timmySvg("happy", outfit)), at: timmySpot } });
+  function placeFig(o, cap, sub, timmySpot, cls, outfit, art){
+    if (timmySpot) o = Object.assign({}, o, { timmy: { g: timmyG(timmySvg(art && art.art || "happy", outfit), art), at: timmySpot } });
     var vb = o.viewBox || TP.VIEWBOX, r = TP.render(o);
     var pic = img(r.svg, cap).replace("<img ", '<img width="' + vb[2] + '" height="' + vb[3] + '" ');
     return '<figure class="tp-fig ' + (cls || "") + '"><div class="tp-pic' + (o.night ? " is-night" : "") + '">' + pic + "</div>" + (cap ? "<figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption>" : "") + "</figure>";
@@ -732,12 +740,12 @@
     if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
     if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
     $("#placeGrid").innerHTML =
-      '<div class="panel s12"><h3>Build it</h3><p>Play: tap things in the picture (the sun, the house, whatever’s in the yard) and Timmy hops over to see. Customize: the dock shows what’s in every spot now; tap one (or the spot in the picture) and the view moves in close on it while its drawer opens: homes and yard things on shelves, Timmy’s outfits on a wardrobe rail, each with Classics, Seasonal and Rank tabs. <b>Surprise me</b> redoes the whole place. Reduced motion: all still.</p>' +
+      '<div class="panel s12"><h3>Build it</h3><p>Play: tap things in the picture (the sun, the house, whatever’s in the yard) and Timmy hops over to see. Customize: the dock shows what’s in every spot now; tap one (or the spot in the picture) and the view moves in close on it while its drawer opens: homes and yard things on shelves, Timmy’s outfits on a wardrobe rail, each with Classics, Seasonal and Rank tabs. <b>Surprise me</b> redoes the whole place. <b>Timmy’s health</b> (under the picture) changes how he looks, moves and behaves: try the levels. Reduced motion: all still.</p>' +
         '<div class="panel-body tp-build"><div class="tp-stage-wrap"><div class="tp-modebar"><div class="seg" role="group" aria-label="What tapping does">' +
           '<button type="button" data-mode="play">Play</button><button type="button" data-mode="customize">Customize</button></div>' +
           '<button type="button" class="tp-vrand tp-shuffle" id="tpShuffle">' + VIC.dice + '<span>Surprise me</span></button><button type="button" class="tp-zoom" id="tpZoom" aria-pressed="true">Close-up</button>' +
           '<span class="tp-found" id="tpFound" aria-live="polite"></span></div>' +
-          '<div class="tp-stage" id="tpStage"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
+          '<div class="tp-stage" id="tpStage"></div><div class="tp-hp" id="tpHp"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
       '<div class="panel s6"><h3>On the “you” card</h3><p>The small size, on the dashboard and in a hub’s More: what the builder shows, cropped close.</p><div class="panel-body"><div class="tp-card" id="tpCard"></div></div></div>' +
       '<div class="panel s6 tp-short"><h3>How it’s built</h3><p>Slots, not free placement, so every combination looks right and nothing overlaps.</p><div class="panel-body tp-how"><ul>' +
         "<li><b>No plot square:</b> each scene’s ground fills the picture, and the yard is its flat middle.</li>" +
@@ -757,6 +765,7 @@
       galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
       galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material. Every rank has three levels, I, II and III, and the statue stands on one step for each: one at I, two at II, three at III. Dark Matter glows, and its stars come out.") +
       galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
+      galleryPanel("tpHealth", "Timmy’s health at home", "His HP shows at his place the way it does in the pet: the drawing (sparkles, then plaque, stains, a cavity, receding gums, a cracked cusp), how he moves (how high and fast he hops, how far he goes) and what he does (how much he wanders, how big his wave is, whether he’ll flip, what he says). At 0 HP he stays on the doorstep. Try it live in Build it, above. A visitor never sees it: a visited Timmy always looks well.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
       '<div class="panel s12"><h3>The shop</h3><p>A wooden shop: plank walls, a hanging sign, Timmy behind the counter and the pieces in wooden cabinets. Its shelves: daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price, each marked with a small “Today only” stamp. <b>Tap any piece</b> and its window opens: the piece in its rarity’s display case, your place with it in, its set, the price against your crowns, Buy and Try. <b>Buying</b> plays out by rarity, with sound: coins fly in, the piece pops, and the party grows from a Common’s little pop to a Legendary’s charge-up, gold flash, confetti and fanfare (the speaker button turns sound off; reduced motion skips the animation). A design: the crowns here are made up, so buy away, and the real shop is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
@@ -819,6 +828,10 @@
       return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
         placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the medals glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
         FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
+    },
+    tpHealth: function(){
+      var o = { home: "cottage", scene: "hill", yard: { corner: "mailbox" } }, d = TP.layout(o).spots.corner, q = TP.project(d[0], d[1], d[2] || 0);
+      return TP.HEALTH.map(function(h){ return placeFig(Object.assign({ viewBox: [q[0] - 36, q[1] - 60, 62, 74] }, o), h.n, hpRange(h) + ". " + h.does + ".", "corner", "tp-small", "", h); }).join("");
     },
     tpRankSets: function(){
       if (!TP.SETS) return "";
@@ -900,8 +913,14 @@
     ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}",
     ".tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
     /* Timmy waves with his right arm (the same move as the pet's do-wave) */
-    ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out 6 alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(-58deg)}}",
-    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}.tp-timmy.do-wave .shpet-arm-r{animation:none}}"
+    ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out var(--wn,6) alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(var(--wa,-58deg))}}",
+    /* how he stands follows his health: a bounce at his best, a droop and sway when he hurts, a shiver at his worst */
+    ".tp-tmood{transform-box:fill-box;transform-origin:50% 100%}",
+    ".tp-timmy.hl-bounce .tp-tmood{animation:tp-hl-bounce 1.1s ease-in-out infinite}@keyframes tp-hl-bounce{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-1.7px) scale(.985,1.025)}}",
+    ".tp-timmy.hl-droop .tp-tmood{animation:tp-hl-droop 3.6s ease-in-out infinite}@keyframes tp-hl-droop{0%,100%{transform:rotate(-2.4deg) scale(1,.962)}50%{transform:rotate(2.4deg) scale(1.012,.948)}}",
+    ".tp-timmy.hl-shiver .tp-tmood{animation:tp-hl-shiver 2.2s linear infinite}@keyframes tp-hl-shiver{0%,56%,100%{transform:translateX(0) scale(1.01,.935)}60%,68%,76%,84%,92%{transform:translateX(-.55px) scale(1.01,.935)}64%,72%,80%,88%,96%{transform:translateX(.55px) scale(1.01,.935)}}",
+    ".tp-still .tp-tmood{animation:none!important}.tp-still .tp-timmy.hl-droop .tp-tmood{transform:scale(1,.96)}.tp-still .tp-timmy.hl-shiver .tp-tmood{transform:scale(1.01,.935)}",
+    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}.tp-timmy.do-wave .shpet-arm-r,.tp-tmood{animation:none!important}}"
   ].join("\n");
   var ST = { at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, tg: null, tw: null, face: null, depth: null, sr: null, wander: 0, lastTap: 0, layout: null, visible: true };
   function buildPlace(opt){
@@ -910,7 +929,8 @@
     var sr = host.shadowRoot, still = isStill(), o = tpOpts({ marks: PS.mode === "customize" && PS.pick !== "timmy" }), L = TP.layout(o), vb = TP.VIEWBOX;
     cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null; ST.bub = null;
     if (!L.spots[ST.at]) ST.at = "door";
-    o.timmy = { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: ST.at };
+    var H = HL(); if (H.stay) ST.at = "door";
+    o.timmy = { g: timmyG(timmySvg(H.art, PS.outfit), H), at: ST.at };
     var r = TP.render(o);
     var hits = PS.mode !== "customize" ? "" : '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' +
       Object.keys(r.slots).map(function(k){ var it = PS.yard[k], name = byK(TP.SLOTS, k).n;
@@ -923,7 +943,8 @@
     ST.pos = L.spots[ST.at].slice(); setTimmy(ST.pos, 0, 1, 1);
     camTo($$("svg.tp-scene, svg.tp-hit", sr), camFor(), still);
     var zb = $("#tpZoom"); zb.hidden = PS.mode !== "customize"; zb.setAttribute("aria-pressed", PS.wide ? "false" : "true");
-    if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy");
+    if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy, " + H.n.toLowerCase() + ", " + PS.hp + " HP");
+      if (H.idle) ST.tg.classList.add("hl-" + H.idle);
       ST.tg.addEventListener("click", function(e){ e.stopPropagation(); tapTimmy(); }); keyed(ST.tg, tapTimmy); }
     $$(".tp-egg", sr).forEach(function(g){
       var k = g.dataset.egg, e = TP.EGGS[k] || TP.EGGS.home;
@@ -944,6 +965,28 @@
     wanderOn();
     side();
     placeCard();
+    hpUI();
+  }
+  /* the health control under the picture: a preview of what the hubs will feed in (his HP follows your studying) */
+  var HP_PRESET = { sparkling: 100, healthy: 82, plaque: 62, stains: 48, cavity: 32, perio: 18, fracture: 6, zero: 0 };
+  function hpUI(){
+    var el = $("#tpHp"); if (!el) return;
+    var H = HL();
+    if (!el.firstChild) {
+      el.innerHTML = '<div class="tp-hphead"><b>Timmy’s health</b><output id="tpHpOut" for="tpHpRange"></output></div>' +
+        '<input type="range" id="tpHpRange" min="0" max="100" step="1" aria-label="Timmy’s HP">' +
+        '<div class="tp-hpsteps" role="group" aria-label="Health levels">' + TP.HEALTH.map(function(h){ return '<button type="button" data-hp="' + h.k + '" title="' + esc(hpRange(h)) + '">' + esc(h.n) + "</button>"; }).join("") + "</div>" +
+        '<p class="tp-note" id="tpHpDoes"></p><p class="tp-note tp-hpnote">A preview: in the hubs his HP follows your studying. Visitors never see it.</p>';
+      var set = function(v, speak){ PS.hp = Math.max(0, Math.min(100, Math.round(v))); var h = HL(); buildPlace(speak ? { say: hpLine(h.hello[0]) } : {}); };
+      $("#tpHpRange", el).addEventListener("input", function(e){ PS.hp = +e.target.value; hpUI(); });
+      $("#tpHpRange", el).addEventListener("change", function(e){ set(+e.target.value, true); });
+      $$("[data-hp]", el).forEach(function(b){ b.addEventListener("click", function(){ set(HP_PRESET[b.dataset.hp], true); }); });
+    }
+    $("#tpHpRange", el).value = PS.hp; el.dataset.level = H.k;
+    $("#tpHpRange", el).style.setProperty("--fill", PS.hp + "%");
+    $("#tpHpOut", el).textContent = PS.hp + " HP · " + H.n;
+    $("#tpHpDoes", el).textContent = H.does + ".";
+    $$("[data-hp]", el).forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.hp === H.k ? "true" : "false"); });
   }
   /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
      the scene, for Play and when Close-up is off. One viewBox, eased, shared by the picture and its tap areas */
@@ -1040,12 +1083,21 @@
     g.classList.remove("tp-on"); void g.getBoundingClientRect(); g.classList.add("tp-on");
     clearTimeout(g._t); g._t = setTimeout(function(){ g.classList.remove("tp-on"); }, 2600);
     PS.found[k] = 1; found();
-    say(k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say);
+    var H = HL(), line = k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say;
+    if (H.stay && k !== "mastery" && k !== "statue") { ST.rested = !ST.rested; line = ST.rested ? H.rest : line; }
+    say(line);
     ST.lastTap = Date.now();
     if (k === "mastery") { clearTimeout(ST.mt); ST.mt = setTimeout(function(){ openMastery(FLAIRS[PS.flair]); }, isStill() ? 0 : 650); }
     if (isStill()) return;
     var target = spotFor(g);
+    if (H.stay) { lookAt(target); return; }
     if (target) goTo(target); else hopInPlace();
+  }
+  /* he turns to face a spot without leaving his own */
+  function lookAt(spot){
+    var sp = ST.layout && ST.layout.spots[spot]; if (!sp || !ST.pos || ST.busy) return;
+    var a = TP.project(ST.pos[0], ST.pos[1], 0), b = TP.project(sp[0], sp[1], 0);
+    if (Math.abs(b[0] - a[0]) > .5) { ST.dir = b[0] < a[0] ? -1 : 1; setTimmy(ST.pos, 0, 1, 1); }
   }
   /* where Timmy goes to see a thing: its yard spot, the door for the home and what's by it, else the nearest spot when
      it stands on the ground in the yard; things in the sky or far off, he hops where he is */
@@ -1073,70 +1125,91 @@
   function lerp(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t]; }
   function goTo(spot){
     if (!ST.layout || !ST.layout.spots[spot]) return;
+    if (HL().stay && spot !== "door") { lookAt(spot); return; }
     if (isStill()) { ST.at = spot; ST.pos = ST.layout.spots[spot].slice(); setTimmy(ST.pos, 0, 1, 1); return; }
     if (ST.busy) { ST.next = spot; return; }
     if (spot === ST.at) { hopInPlace(); return; }
     var path = TP.route(tpOpts(), ST.at, spot); ST.at = spot;
     hops(path);
   }
-  function hops(path){
-    var list = [];
+  function hops(path, plain){
+    var list = [], H = HL(), stride = 1.15 * H.stride, soft = Math.min(1, H.hop + .25);
     for (var i = 1; i < path.length; i++){
       var a = path[i - 1], b = path[i], dz = (b[2] || 0) - (a[2] || 0), d = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + dz * dz * 1.4);
-      var n = Math.max(1, Math.ceil(d / 1.15));
+      var n = Math.max(1, Math.ceil(d / stride));
       for (var j = 0; j < n; j++) list.push([lerp(a, b, j / n), lerp(a, b, (j + 1) / n), Math.abs(dz) > .3]);
     }
     if (!list.length) return;
     ST.busy = true;
-    var hi = 0, t0 = performance.now(), AIR = 260, LAND = 90;
+    var hi = 0, t0 = performance.now(), AIR = 260 * H.pace, LAND = 90 * Math.max(1, H.pace * .8) + (H.hop < .5 ? 40 : 0), cheer = H.cheer && !plain;
     var start = function(h){ var p = TP.project(h[0][0], h[0][1], h[0][2]), q = TP.project(h[1][0], h[1][1], h[1][2]); if (Math.abs(q[0] - p[0]) > .5) ST.dir = q[0] < p[0] ? -1 : 1; };
     start(list[0]);
     var frame = function(now){
       if (!ST.tg) { ST.busy = false; return; }
       var h = list[hi], t = now - t0;
-      if (t < AIR) { var u = t / AIR, e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; setTimmy(lerp(h[0], h[1], e), Math.sin(Math.PI * u) * (h[2] ? 3 : 6), 1 - .04 * Math.sin(Math.PI * u), 1 + .07 * Math.sin(Math.PI * u)); }
-      else if (t < AIR + LAND) { var v = Math.sin(Math.PI * (t - AIR) / LAND); setTimmy(h[1], 0, 1 + .1 * v, 1 - .13 * v); }
+      /* a hop; with no hop left in him (hop 0) it's a limp: he dips and leans into each short step */
+      if (t < AIR) { var u = t / AIR, e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, w = Math.sin(Math.PI * u);
+        if (H.hop > 0) setTimmy(lerp(h[0], h[1], e), w * (h[2] ? 3 : 6) * H.hop, 1 - .04 * w * soft, 1 + .07 * w * soft);
+        else setTimmy(lerp(h[0], h[1], e), 0, 1 + .05 * w, 1 - .07 * w); }
+      else if (t < AIR + LAND) { var v = Math.sin(Math.PI * (t - AIR) / LAND); setTimmy(h[1], 0, 1 + .1 * v * soft, 1 - .13 * v * soft); }
       else {
         hi++; t0 = now;
-        if (hi >= list.length) { ST.busy = false; ST.pos = h[1]; setTimmy(h[1], 0, 1, 1); if (ST.next) { var n = ST.next; ST.next = null; goTo(n); } return; }
+        if (hi >= list.length) { ST.busy = false; ST.pos = h[1]; setTimmy(h[1], 0, 1, 1); if (ST.next) { var n = ST.next; ST.next = null; goTo(n); } else if (cheer) hopInPlace(); return; }
         start(list[hi]);
       }
       ST.raf = requestAnimationFrame(frame);
     };
     ST.raf = requestAnimationFrame(frame);
   }
-  function hopInPlace(){ if (isStill() || ST.busy || !ST.pos) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos]); }
+  function hopInPlace(){ if (isStill() || ST.busy || !ST.pos || HL().hop <= 0) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos], true); }
   /* Timmy waves hello when he's tapped (and now and then by himself); tap him again while he's waving and he flips */
-  var HELLOS = ["Hi! Good to see you.", "Hello! Come on in.", "Hey there! Nice day for it.", "Oh, hi! I was just thinking about flossing."];
   function wave(quiet){
     if (!ST.tg) return;
-    if (quiet !== true) { PS.found.timmy = 1; found(); say(HELLOS[(wave.n = (wave.n || 0) + 1) % HELLOS.length]); }
+    var H = HL();
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(hpLine(H.hello[(wave.n = (wave.n || 0) + 1) % H.hello.length])); }
     if (isStill()) return;
-    ST.tg.classList.remove("do-wave"); void ST.tg.getBoundingClientRect(); ST.tg.classList.add("do-wave"); ST.waveAt = Date.now();
-    clearTimeout(wave.t); wave.t = setTimeout(function(){ if (ST.tg) ST.tg.classList.remove("do-wave"); }, 2400);
+    ST.tg.style.setProperty("--wn", H.wave[0]); ST.tg.style.setProperty("--wa", -H.wave[1] + "deg");
+    ST.tg.classList.remove("do-wave"); void ST.tg.getBoundingClientRect(); ST.tg.classList.add("do-wave"); ST.waveAt = Date.now(); ST.waveFor = H.wave[0] * 380 + 120;
+    clearTimeout(wave.t); wave.t = setTimeout(function(){ if (ST.tg) ST.tg.classList.remove("do-wave"); }, ST.waveFor);
   }
-  function tapTimmy(){ ST.lastTap = Date.now(); if (Date.now() - (ST.waveAt || 0) < 2400 && !isStill()) { ST.waveAt = 0; if (ST.tg) ST.tg.classList.remove("do-wave"); flip(); } else wave(); }
+  /* a second tap while he waves: a flip when he's well; when he isn't, he says why not (and manages a small hop if he can) */
+  function tapTimmy(){
+    ST.lastTap = Date.now();
+    var H = HL(), again = Date.now() - (ST.waveAt || 0) < Math.max(1400, ST.waveFor || 2400) && !isStill();
+    if (!again) { wave(); return; }
+    ST.waveAt = 0; if (ST.tg) ST.tg.classList.remove("do-wave");
+    if (H.flip) flip(); else { PS.found.timmy = 1; found(); say(hpLine(H.tired)); hopInPlace(); }
+  }
   function flip(quiet){
     if (quiet !== true) { PS.found.timmy = 1; found(); say(TP.EGGS.timmy.say); }
     if (isStill() || ST.busy || !ST.pos) return;
-    ST.busy = true; var t0 = performance.now(), D = 620, p = ST.pos;
+    var twice = HL().k === "sparkling";
+    ST.busy = true; var t0 = performance.now(), D = twice ? 860 : 620, p = ST.pos;
     var frame = function(now){
       if (!ST.tg) { ST.busy = false; return; }
       var u = Math.min(1, (now - t0) / D);
-      setTimmy(p, Math.sin(Math.PI * u) * 16, Math.cos(u * Math.PI * 2), 1);
+      setTimmy(p, Math.sin(Math.PI * u) * (twice ? 22 : 16), Math.cos(u * Math.PI * (twice ? 4 : 2)), 1);
       if (u < 1) ST.raf = requestAnimationFrame(frame); else { setTimmy(p, 0, 1, 1); ST.busy = false; }
     };
     ST.raf = requestAnimationFrame(frame);
   }
-  /* while it's on screen and nobody's tapping, he wanders to a spot now and then */
+  /* while it's on screen and nobody's tapping, he does something now and then: how often he wanders off, how far, and
+     what he does instead all follow his health */
   function wanderOn(){
     if (ST.wander) return;
     var host = $("#tpStage");
     if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ ST.visible = es[0].isIntersecting; }).observe(host);
     ST.wander = setInterval(function(){
       if (isStill() || PS.mode !== "play" || ST.busy || !ST.visible || document.hidden || Date.now() - ST.lastTap < 6000 || !ST.layout) return;
-      if (Math.random() < .34) { wave(true); return; }
-      var keys = Object.keys(ST.layout.spots).filter(function(k){ return k !== ST.at; });
+      var H = HL(), sp = ST.layout.spots;
+      if (H.stay) return;
+      if (Math.random() > H.roam) {
+        if (H.idle === "bounce") { if (Math.random() < .4) flip(true); else if (Math.random() < .5) hopInPlace(); else wave(true); }
+        else if (H.wave[0] >= 4 && Math.random() < .55) wave(true);
+        return;
+      }
+      var keys = Object.keys(sp).filter(function(k){ return k !== ST.at; });
+      if (H.near) { var d = sp.door; keys = keys.filter(function(k){ var q = sp[k]; return k === "door" || k === "deck" || Math.sqrt((q[0] - d[0]) * (q[0] - d[0]) + (q[1] - d[1]) * (q[1] - d[1])) < 4.2; }); }
       if (keys.length) goTo(keys[Math.floor(Math.random() * keys.length)]);
     }, 5200);
   }
@@ -1187,13 +1260,12 @@
           return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>") + "</div>";
     if (kind === "yard" && (pick === "side" || pick === "corner")) body += '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
     body += '<div class="tp-shop"><a class="btn" href="#tpShop">Get more in the shop</a><span class="tp-note">Here everything is yours to try. Prices are in Shiny Gold Crowns.</span></div>';
-    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season, Timmy</summary>" +
+    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season</summary>" +
       '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
       selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
       selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
       selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
       selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
-      selRow("Timmy", "timmy", [["happy", "Happy"], ["ok", "Okay"], ["sad", "Sad"], ["sick", "Sick"], ["sleep", "Asleep"], ["scared", "Startled"]].concat((A.timmy.hp || []).map(function(x){ return ["hp" + x.hp, x.hp + " HP"]; })), PS.timmy) +
       '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
     var keep = $(".tp-dcards", el), top = keep && side.kept === kind + src ? keep.scrollTop : 0; side.kept = kind + src;
     el.innerHTML = dock + '<div class="tp-drawer d-' + kind + '">' + body + "</div>" + prev;
@@ -1221,7 +1293,7 @@
     return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
   }
   function placeCard(){
-    var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
+    var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(HL().art, PS.outfit), HL()), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
     $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), isStill()) + "</div>" +
       '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
   }

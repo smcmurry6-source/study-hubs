@@ -220,6 +220,16 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     rank. The shop is wooden: plank walls in a timber frame, each shelf a cabinet with thick boards, Timmy behind a
     counter, the sign carved and hung on chains, the crowns and the sound switch on wooden plaques, and a timber frame
     round a piece's window. The same wood in light and dark (deeper in dark).
+  - **Timmy's health shows at his place** (Sam: "timmys behavior, movement, and appearance at his house should also
+    reflect his health level"). The kit has one table, `HEALTH` (`TP.healthFor(hp)`), eight levels with the same
+    cut-offs as `conditions()` in `widget/pet.js`: Sparkling (90+), Healthy (70+), a little plaque (55+), stains and
+    puffy gums (40+), a cavity (25+), periodontitis (12+), a cracked cusp (1+), needs treatment (0). Each row says which
+    of the pet's drawings he is, how long, high and far he hops, how much he wanders (and whether he keeps near the
+    door), how big his wave is, whether a second tap flips him, how he stands (a bounce, a droop and sway, a shiver)
+    and what he says. At 0 HP he stays on the doorstep, turns to look at what's tapped and says what he needs. The
+    design page's Build it has a health slider with a chip per level (a preview: in the hubs his HP is the pet's), and a
+    gallery of the eight levels. A visited Timmy is always drawn healthy: `get_place` returns no HP, and it must stay
+    that way ([learner-data-privacy](../rules/learner-data-privacy.md)).
   - The vendored `taste-skill` was not run in full: its house rules are for work screens and marketing pages (no
     decorative shapes), which fights a decorative game screen in Timmy's ink style. Its look-and-fix loop on
     screenshots is what the polish pass did.
@@ -234,6 +244,9 @@ Waiting for Sam's look at the second set of screenshots (PR above). Left for aft
   the customizer, the rank board's emblems and nameplate and visiting as real clients; then the About page (visiting,
   the sets, the medal board, the sound switch, the podcast studio) and `tools/podcast/LORE.md` (the studio in the yard is
   where Timmy Time is recorded: nothing in the lore says otherwise yet).
+- **Health, when wired**: `widget/pet.js` passes its own HP to the kit's `healthFor()` and uses the row for the art,
+  the hops and the idle loop; the design page's stage code (`hops()`, `wave()`, `tapTimmy()`, `wanderOn()` in
+  `tools/preview/design/design.js`) is the reference. The About page's Timmy entry gets a line on it.
 - **For the wiring agent**: the design page's shop, customizer, rank board and cloud trip are mock-ups in
   `tools/preview/design/design.js` on made-up names and a made-up wallet; the sounds are Web Audio tones (`sfx()`), the
   setting is `sh_design_sound` in localStorage. The kit side (the medal board, `MEDALS`, `EGGS.mastery`) is real.
