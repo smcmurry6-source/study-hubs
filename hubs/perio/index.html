@@ -38,9 +38,9 @@
   --accent:#A23F5E; --accent-ink:#86304C; --accent-soft:#F6E2E8;
   --probe:#2F5D7C; --probe-soft:#DDE8F1;
   --good:#2A7858; --good-soft:#DCEFE5; --bad:#B0393A; --bad-soft:#F7DEDC; --caution:#98640F; --caution-soft:#F6E8CB;
-  --tag-teal:#1C7A6D; --tag-teal-soft:#D9EEEA;
+  --tag-teal:#1B7468; --tag-teal-soft:#D9EEEA;
   --tag-rose:#B23A5C; --tag-rose-soft:#F6DFE6;
-  --tag-amber:#A2660E; --tag-amber-soft:#F6E7CA;
+  --tag-amber:#905B0C; --tag-amber-soft:#F6E7CA;
   --tag-blue:#2E62A0; --tag-blue-soft:#DDE7F4;
   --tag-violet:#6A4E9F; --tag-violet-soft:#E8E0F3;
   --tag-slate:#55626D; --tag-slate-soft:#E1E6EA;
@@ -1543,7 +1543,7 @@ var LECTURES = [
   { id:'periodontal-regeneration', num:6, title:'Periodontal Regeneration', who:'Dr. Geurs', tag:'slate', source:'Slide deck (Dr. Geurs) + exam-review guide; lectured in class', status:'preview' },
   { id:'implants-perio', num:7, title:'Implants for Periodontally Compromised Patients', who:'Dr. Kaur', tag:'teal', source:'Oct 29 class capture + slide deck (2026 updated)', status:'taught' },
   { id:'antibiotics-host-mod', num:8, title:'Pharmacotherapy: Antibiotics & Host Modulation', who:'Dr. Litz', tag:'rose', source:'Recorded lecture (antibiotics) + class (host modulation) + slide deck', status:'taught', note:'<b>Lectured in two parts.</b> Dr. Litz recorded the antibiotics half (the posted recording is from March 2024; he gives this lecture every year) and taught host modulation in class on Nov 5, after a short antibiotics recap. The antibiotics notes come from the recording, the slides and the recap (including the dosing chart he said to know for the exam); the host modulation section comes from the class.' },
-  { id:'perio-plastic-esthetics', num:9, title:'Periodontal Plastic Therapy & Esthetics', who:'Dr. Abou-Arraj', tag:'amber', source:'Exam-review guide only — session not yet taught', status:'upcoming' }
+  { id:'perio-plastic-esthetics', num:9, title:'Periodontal Plastic Therapy & Esthetics', who:'Dr. Abou-Arraj', tag:'amber', source:'Recorded lecture (posted Nov 9) + slide deck (2026) + exam-review guide', status:'taught', note:'<b>Lectured in two parts.</b> Dr. Abou-Arraj recorded the first part (the phenotype, recession and grafting, keratinized gingiva and the frenum) and covers the last two deformities, gingival excess and abnormal color, in the live class the week of Nov 9. Until that class is posted, the gingival excess, altered passive eruption, esthetics and tattoo sections come from his slides and the exam-review guide.' }
 ];
 var MIDTERM_AFTER = 4; // midterm covers sessions 1-4
 var LECTURE_BY_ID = {}, LECTURE_BY_NUM = {};
@@ -2080,44 +2080,80 @@ var RECESSION_TYPES = [
   { type:'RT2', def:'Loss of interproximal attachment, where interproximal CAL ≤ buccal CAL.', implication:'Partial root coverage is expected — interproximal loss caps how much can be covered.' },
   { type:'RT3', def:'Loss of interproximal attachment, where interproximal CAL > buccal CAL.', implication:'Root coverage is not attempted — it will not succeed.' }
 ];
+var RECESSION_FACTORS = [
+  { factor:'Periodontitis', note:'Attachment and bone loss expose the root (gingivitis rarely causes recession).' },
+  { factor:'Trauma', note:'Toothbrushing is the most common (hard bristles or an aggressive brusher); also flossing, self-inflicted habits, foreign objects (a fingernail, a pen), caustic medicaments.' },
+  { factor:'Anatomic variations', note:'Fenestration (a window in the bone), dehiscence (facial bone missing from the crest), a buccally positioned tooth. Moving that tooth back onto the arch can partly resolve recession.' },
+  { factor:'Thin phenotype; lack of keratinized gingiva', note:'Thin (1 mm or less, probe visible) is predisposed; under 2 mm of KG with suboptimal plaque control is at risk.' },
+  { factor:'Orthodontic treatment', note:'Teeth pushed out of the alveolar housing over thin tissue; controversial in the literature.' },
+  { factor:'Previous periodontal surgery', note:'Resective surgery exposes roots on purpose, to eliminate pockets.' },
+  { factor:'High muscle attachment, aberrant frenum', note:'Pulls on the margin with every movement and traps plaque.' },
+  { factor:'Iatrogenic restoration margins', note:'Intrasulcular or subgingival, ill-fitting or overcontoured margins on a thin phenotype.' },
+  { factor:'Smokeless tobacco', note:'Severe localized recession where it is held, often the lower premolar or molar area.' }
+];
+var RECESSION_WHY_TREAT = [
+  'Six risks of exposed roots: dentinal hypersensitivity, soft tissue discomfort, root surface caries, esthetic concerns, interference with plaque control, greater susceptibility to inflammatory insult.',
+  'Untreated recession continues to progress (Chambrone and Tatakis, systematic review, 2016).',
+  'Pathogenesis: brushing trauma (abrasion, inflammation, ulcer, recession) or plaque (the periodontitis process on a thin phenotype). The key word is inflammation; the factors only predispose.',
+  'Cairo RT1: about 100% coverage achievable. RT2: partial, about 50-60%, up to the interproximal attachment level. RT3: no coverage; don\'t graft for root coverage.'
+];
 var GRAFTS = [
-  { name:'Connective Tissue Graft (CTG)', origin:'Autograft (palate)', note:'No epithelium; the connective tissue induces epithelial differentiation and keratinization once covered by a flap.' },
-  { name:'Free Gingival Graft (FGG)', origin:'Autograft (palate)', note:'Includes both epithelium and connective tissue; left exposed at the recipient site rather than covered by a flap.' },
-  { name:'Acellular Dermal Matrix (ADM)', origin:'Allograft (donated human tissue)', note:'Contains collagen, elastin, and reticular fibers. The most common allograft; performs slightly less well than autografts but avoids a second surgical site.' }
+  { name:'Free Gingival Graft (FGG)', origin:'Autograft (palate or tuberosity)', note:'Epithelium plus lamina propria in one piece. Left exposed, with an apically positioned flap: it heals into a band of keratinized gingiva. The palate heals by secondary intention.' },
+  { name:'Connective Tissue Graft (CTG, SCTG)', origin:'Autograft (palate or tuberosity)', note:'Connective tissue only (trap door, or an FGG de-epithelialized). Always covered by the flap, a coronally advanced flap for root coverage; it also thickens a thin phenotype.' },
+  { name:'Acellular Dermal Matrix (ADM)', origin:'Allograft (donated human dermis)', note:'Epidermis and cells removed; collagen, elastic and reticular fibers. The most common allograft. No donor site, many teeth at once; must be fully covered (no cells, no blood supply), replaced by the patient\'s tissue over time; doesn\'t work as well as autografts in demanding sites.' }
 ];
 var GRAFT_PEARLS = [
-  'A high, deep palatal vault gives the greatest margin for error when harvesting donor tissue.',
-  'Clinicians sometimes intentionally harvest an FGG-thickness piece but deliver it as a CTG — it is easier to harvest a thicker piece and it heals using the covered CTG technique.'
+  'The rule: a graft covered by a flap is connective tissue only (epithelium against the flap\'s inner side won\'t heal); a graft left exposed is an FGG.',
+  '"We always do a coronally advanced flap if we\'re trying to cover the graft," tension free. A tunnel (pouch) flap reaches several teeth without raising the papillae.',
+  'Palate layers: epithelium 0.3-0.6 mm, lamina propria 1.25-3.0 mm, then submucosa (fat and glands, trimmed off so it doesn\'t slow healing). Grafts: thin 0.5-0.8 mm, average 0.9-1.4 mm, thick 1.5-2.0+ mm.',
+  'The greater palatine artery and nerve sit about 7 mm from the CEJ in a shallow palate, 12 mm in an average one and 17 mm in a high one: a high, deep vault gives the most room for error.',
+  'Sometimes an FGG is harvested but delivered as a CTG, because that is easier to harvest and heal (exam-review guide).'
+];
+var KG_POINTS = [
+  'Keratinized gingiva runs from the gingival margin to the MGJ. Find the MGJ by its color change or by rolling a probe: the mucosa rolls with it, and stops at the MGJ.',
+  'With plaque controlled and no traumatic factors, a zone of attached gingiva is not by itself essential (Kennedy 1985; Scheyer 2015).',
+  'With suboptimal plaque control, at least 2 mm of KG is needed to prevent attachment loss; under 2 mm is at risk of recession, but grafting is case by case.',
+  'To create KG: an FGG left exposed with an apically positioned flap. A CTG covered by alveolar mucosa gains no KG.',
+  'A high frenum pulls on the margin and traps plaque; a frenectomy excises it in a diamond shape, closed with sutures into the lip.'
 ];
 var GINGIVAL_EXCESS_TX = [
-  { cause:'Pseudopocket', tx:'Improve oral hygiene and professional scaling' },
-  { cause:'Gingival enlargement (e.g., drug-induced)', tx:'Gingivectomy, improve OH, consider changing the causative medication' },
+  { cause:'Pseudopocket (gingivitis)', tx:'Improved oral hygiene and scaling' },
+  { cause:'Gingival enlargement (phenytoin, calcium channel blockers, cyclosporine)', tx:'Gingivectomy, improved OH, possibly change the contributing medication' },
   { cause:'Inconsistent gingival margins', tx:'Gingivectomy or apically positioned flap' },
-  { cause:'Excessive gingival display', tx:'Gingivectomy or apically positioned flap' }
+  { cause:'Excessive gingival display', tx:'Gingivectomy or apically positioned flap, once the cause is known' }
 ];
 var APE_TABLE = [
-  { cls:'Type 1', def:'Wide band of keratinized/attached gingiva; the mucogingival junction (MGJ) is apical to the alveolar crest.' },
+  { cls:'Type 1', def:'Wider gingival dimension (free gingival margin to MGJ); the MGJ is apical to the alveolar crest.' },
   { cls:'Type 2', def:'Normal gingival dimension; the MGJ sits at the level of the CEJ.' },
-  { cls:'Subcategory A', def:'Osseous crest is more than 1 mm from the CEJ.' },
-  { cls:'Subcategory B', def:'Osseous crest sits in close proximity to the CEJ.' }
+  { cls:'Subcategory A', def:'More than 1 mm between the CEJ and the osseous crest.' },
+  { cls:'Subcategory B', def:'Osseous crest in close proximity to the CEJ.' }
 ];
 var APE_TX = [
   { cls:'Type 1A', tx:'Gingivectomy alone' },
-  { cls:'Type 2A', tx:'Apically positioned flap alone' },
-  { cls:'Type 1B and Type 2B', tx:'Apically positioned flap plus osseous surgery — the bone itself sits too close to the CEJ in both' }
+  { cls:'Type 2A', tx:'Apically positioned flap (a gingivectomy would cost the normal-width band of KG)' },
+  { cls:'Type 1B and Type 2B', tx:'Apically positioned flap plus osseous surgery: the bone itself sits too close to the CEJ in both' },
+  { cls:'Most common', tx:'Types 1A and 1B' }
 ];
 var ESTHETIC_NORMS = [
-  { param:'Facial symmetry', note:'An increased lower-facial-third proportion suggests vertical maxillary excess.' },
-  { param:'Upper lip length at rest', note:'≈20–22 mm in females, ≈22–24 mm in males.' },
-  { param:'Upper lip mobility on full smile', note:'≈6–8 mm.' },
-  { param:'Gingival margin lines', note:'Central incisor and canine margins are level; the lateral incisor margin sits ~1 mm coronal to that line.' },
-  { param:'Relative tooth widths', note:'Central incisor ≈ 1.6 units, lateral incisor ≈ 1 unit, half the canine ≈ 0.6 units.' }
+  { param:'Facial symmetry', note:'Equal facial thirds; facial midline vs dental midline. An increased lower facial third suggests vertical maxillary excess.' },
+  { param:'Smile line (lip line)', note:'High, medium or low.' },
+  { param:'Incisal line', note:'Consonant with the lower lip.' },
+  { param:'Upper lip length at rest', note:'20-22 mm in women, 22-24 mm in men. Under 20 mm = short upper lip.' },
+  { param:'Upper lip mobility on full smile', note:'6-8 mm. Over 8 mm = hypermobile upper lip.' },
+  { param:'Gingival line', note:'Central incisors and canines level; lateral incisors 1 mm coronal to them.' },
+  { param:'Tooth proportions', note:'Golden proportion: central 1.618 : lateral 1 : visible canine 0.618 (guide: 1.6, 1, 0.6).' }
 ];
 var ESTHETIC_TX = [
-  { problem:'Altered passive eruption', tx:'Crown lengthening plus restorative treatment' },
-  { problem:'Vertical maxillary excess', tx:'Orthodontics, orthognathic surgery, or periodontal surgery' },
-  { problem:'Hypermobile upper lip', tx:'Botox or lip-repositioning surgery' },
-  { problem:'Short upper lip', tx:'No reliably good treatment option' }
+  { problem:'Altered passive eruption (short clinical crowns)', tx:'Crown lengthening and restorative therapy' },
+  { problem:'Vertical maxillary excess', tx:'Orthodontics, orthognathic surgery; periodontics may be required' },
+  { problem:'Hypermobile upper lip', tx:'Lip repositioning surgery or Botox' },
+  { problem:'Short upper lip', tx:'No good options' },
+  { problem:'Several factors', tx:'A combination of therapies' }
+];
+var CL_EVAL = [
+  'Clinical crown (what shows) versus anatomical crown (the enamel to the CEJ).',
+  'Clinical parameters: probing depth, gingival health, width of keratinized gingiva.',
+  'Radiographic parameters: apical extent of fracture or caries, root length and form, level of the alveolar crest, pulpal involvement.'
 ];
 
 
@@ -2211,6 +2247,27 @@ var PCASES = {
           '31':{ pd:{ f:[3,2,3] }, rec:{ f:[-3,-2,-3] }, crown:true, endo:true } } },
     figs:[{ kind:'chart', title:'#29-#31, facial' }, { kind:'film', title:'#29-#31, today', note:'At the baseline film the bone met the implant at its first thread.' }, { kind:'view', title:'#29-#31, facial' }],
     expect:{ impl:{ '30':{ dx:'peri-implantitis', meffert:'failing' } } }
+  },
+  'no-kg-24': {
+    title:'A sensitive lower incisor with no keratinized gingiva',
+    box:[['Patient','31-year-old woman'],['Chief complaint','"This lower front tooth is sensitive, and it\'s hard to keep clean"'],['Habits','Brushes twice a day with a soft brush; plaque collects at the #24 margin'],['Dental history','Treated for periodontitis; stable on periodontal maintenance since'],
+      ['Periodontal findings','Probing depths 1-3 mm; no bleeding on probing. The #24 facial margin sits in alveolar mucosa: no keratinized gingiva on that tooth, a good band on its neighbors'],
+      ['Findings','See the chart and the drawn view of #23-#26']],
+    spec:{ teeth:['23','24','25','26'], age:31, lingual:false, gingiva:{ look:'healthy', kt:3 },
+      t:{ '24':{ pd:{ f:[3,1,3] }, rec:{ f:[0,3,0] }, plaque:{ f:[0,1,0] }, bone:{ m:25, d:25 } } } },
+    figs:[{ kind:'chart', title:'#23-#26, facial' }, { kind:'view', title:'#23-#26, facial' }],
+    expect:{ rt:{ '24':'RT2' } }
+  },
+  'recession-11': {
+    title:'A long-looking canine',
+    box:[['Patient','26-year-old man'],['Chief complaint','"My left canine looks long, and cold air makes it zing"'],['Habits','Scrubs with a hard-bristled brush'],
+      ['Periodontal findings','Probing depths 1-2 mm; no bleeding on probing. Facial recession on #10 and #11, with keratinized gingiva still apical to both'],
+      ['Findings','See the chart and the drawn view of #9-#12']],
+    spec:{ teeth:['9','10','11','12'], age:26, lingual:false, gingiva:{ look:'healthy', kt:5 },
+      t:{ '10':{ pd:{ f:[2,1,2] }, rec:{ f:[-2,2,-2] } },
+          '11':{ pd:{ f:[2,1,2] }, rec:{ f:[-2,3,-2] } } } },
+    figs:[{ kind:'chart', title:'#9-#12, facial' }, { kind:'view', title:'#9-#12, facial' }],
+    expect:{ rt:{ '10':'RT1', '11':'RT1' } }
   }
 };
 /* pcases end */
@@ -3744,6 +3801,345 @@ nums('q8-N06', L, 'lecture', "Which statements about host modulation drugs are t
 /* why each choice is right or wrong (2026-10-20, Sam): one line per choice, in the same order as q.choices, for
    every multiple-choice and select-all question. Shown under the explanation once you answer (whyHTML), folded until
    tapped, with your pick marked. A new mcq/multi question needs its row here too: the CI lint (tools/ci/smoke.js) fails without it. */
+/* ===== Session 9 from Dr. Abou-Arraj's recorded lecture (posted Nov 9) and his 2026 slides (2026-11-10). The gingival
+   excess, altered passive eruption, esthetics and tattoo items come from the slides and the exam-review guide until
+   the live class is posted. ===== */
+(function(){ var L = 'perio-plastic-esthetics';
+mq('q9-L01', L, 'lecture', "You slide a probe into the facial sulcus of #8 and can see its outline through the gingiva. What does that tell you?", [
+  ["A thin phenotype, 1 mm or less", "The validated test: a probe visible through the tissue means a thin phenotype, 1 mm or less of soft tissue."],
+  ["A thick phenotype, over 1 mm", "It's the reverse: a thick phenotype hides the probe. Seeing it means the tissue is thin."],
+  ["A thin phenotype, 2 mm or less", "The cutoff is 1 mm: thin is 1 mm or less, thick is more than 1 mm."],
+  ["Recession on #8's facial", "Recession is the margin apical to the CEJ, measured from the margin to the CEJ; a probe showing through measures thickness."]
+], "Phenotype thickness is judged with the probe in the sulcus: visible through the tissue = thin (1 mm or less); not visible = thick (more than 1 mm). It matters because a thin phenotype is predisposed to recession.");
+mq('q9-L02', L, 'lecture', "A young patient about to start orthodontics has no recession, but the tissue over his incisors is so thin the roots show through. Why did Dr. Abou-Arraj graft him first?", [
+  ["To thicken a thin phenotype before tooth movement", "Orthodontics, then years of brushing, would put thin tissue at risk of recession; a CTG under the flap thickened it first."],
+  ["To cover recession already present on the incisors", "He had no recession yet; the graft was to prevent it, not to cover a root."],
+  ["To deepen a shallow vestibule for the brackets", "The vestibule wasn't the problem in this case; the tissue's thickness was."],
+  ["To widen the band of attached gingiva to 5 mm", "No width target was set; the goal was changing the phenotype from thin to thick."]
+], "His thin phenotype put him at risk of recession once the teeth moved and brushing went on for years. A trapezoidal full-thickness flap, a connective tissue graft over the two central incisors and the flap back over the graft changed it to a thick phenotype, and he was cleared for orthodontics.");
+mq('q9-L03', L, 'lecture', "How is gingival recession measured?", [
+  ["From the gingival margin to the CEJ", "Recession is the margin's position apical to the CEJ, so it is measured margin to CEJ, at the same six sites as probing depth."],
+  ["From the CEJ to the base of the pocket", "That is the clinical attachment level, which adds the recession to the probing depth."],
+  ["From the gingival margin to the pocket base", "That is the probing depth."],
+  ["From the gingival margin to the MGJ", "That is the width of keratinized gingiva."]
+], "Recession = the marginal tissue apical to the CEJ (AAP Glossary 2001). Probe from the gingival margin to the CEJ at six sites and record it so it can be followed. Note interproximal recession too: it changes the prognosis.");
+mq('q9-L04', L, 'lecture', "Why is recession more common in older patients, according to Dr. Abou-Arraj?", [
+  ["They have built up more risk factors over the years", "Not age itself: older patients have been exposed to more predisposing factors for longer."],
+  ["The gingiva thins with age itself, whatever the risk factors", "He put it on the accumulation of risk factors, not on aging tissue."],
+  ["Older patients brush harder than younger ones", "Aggressive brushing is one factor at any age; it isn't his explanation for the age trend."],
+  ["Alveolar bone resorbs on its own after age 65", "He didn't attribute it to bone loss from age; it's the years of risk factors."]
+], "Prevalence and extent rise with age, \"not because older people have more recession just because of their age,\" but because of the accumulation of risk factors over the years.");
+mq('q9-L05', L, 'lecture', "Which traumatic factor is the most common cause of recession?", [
+  ["Toothbrushing", "\"Toothbrushing seems to be the most common one\": hard bristles, or an aggressive brusher with any brush."],
+  ["Flossing habits", "On the trauma list, but not the most common."],
+  ["Fingernail or pen habits", "Foreign objects are on the list, but toothbrushing is the most common."],
+  ["Caustic medicaments on the gingiva", "On the trauma list, but rare next to toothbrushing."]
+], "Trauma on the slide: toothbrushing, flossing, self-inflicted habits, foreign objects (fingernail, pen) and caustic medicaments. Toothbrushing is the most common.");
+mq('q9-L06', L, 'lecture', "Which combination did Dr. Abou-Arraj call \"the perfect storm\" for recession?", [
+  ["A dehiscence, a thin phenotype and aggressive brushing", "Missing facial bone, thin tissue over it and trauma on top: several predisposing factors at once."],
+  ["A fenestration, a thick phenotype and a soft brush", "A thick phenotype and gentle brushing protect the margin; only the fenestration predisposes."],
+  ["Gingivitis, a thick phenotype and a wide band of attached gingiva", "Gingivitis rarely causes recession, and thick tissue with wide KG resists it."],
+  ["A low frenum, a thick phenotype and flossing", "A low frenum doesn't pull on the margin, and thick tissue resists recession."]
+], "An anatomic variation (fenestration or dehiscence) plus a thin phenotype plus aggressive brushing is \"like the perfect storm\" for recession on one or more teeth.");
+mq('q9-L07', L, 'lecture', "A mandibular incisor sits buccal to the arch, with thin facial tissue and recession. What can moving it back onto the arch orthodontically do?", [
+  ["Resolve some of the recession, without a graft", "Back in its alveolar housing the tissue gets thicker, and some recession can resolve, at least partly."],
+  ["Nothing: only a graft changes a recession", "He said yes, in some cases repositioning alone gives partial resolution."],
+  ["Cover the exposed root completely in every case", "He described at least partial resolution in some cases, not complete coverage every time."],
+  ["Make the recession progress faster", "Pushing teeth out of the housing is the risk; moving a tooth back into it is what helps."]
+], "A buccally positioned tooth has thinner facial tissue and takes more of the toothbrush. Repositioned onto the arch, within its alveolar housing, the tissue thickens and recession can at least partly resolve without grafting.");
+mq('q9-L08', L, 'lecture', "After Phase I and resective Phase II surgery, a patient has recession on many teeth. Where did most of it come from?", [
+  ["The surgery, which removes pockets on purpose", "\"We caused most of this recession,\" to leave an environment without pockets that the patient can keep clean."],
+  ["Toothbrushing trauma after the surgery", "Brushing trauma causes recession too, but here the resection itself exposed the roots."],
+  ["The periodontitis itself, before any treatment began", "Periodontitis caused some, but he said the treatment caused most of it."],
+  ["A thin phenotype unmasked by the surgery", "The phenotype isn't the source here; resecting tissue to eliminate pockets is."]
+], "Previous periodontal surgery is a predisposing factor: resective therapy reduces pockets by removing tissue, which exposes root surfaces. It's done deliberately, for an environment the patient can maintain without pockets and inflammation.");
+mq('q9-L09', L, 'lecture', "What did Dr. Abou-Arraj call the key word in how recession develops?", [
+  ["Inflammation", "\"The key word here is inflammation\": it's what actually causes recession; the factors on the list predispose to it."],
+  ["Trauma", "Trauma starts one pathway, but it leads to recession through inflammation and ulceration."],
+  ["Thin phenotype", "A thin phenotype is a predisposing factor, not the cause."],
+  ["Plaque", "Plaque starts the other pathway, but again through inflammation."]
+], "Two pathways: brushing trauma (abrasion, inflammation, an ulcer, recession) and plaque (the periodontitis process on a thin phenotype). Both run through inflammation; everything on the factor list is predisposing.");
+mq('q9-L10', L, 'lecture', "A canine has 4 mm of facial recession, and the interproximal CEJ can't be found on either side. With a graft, how much root coverage can you expect?", [
+  ["About 100%", "No interproximal attachment loss is RT1: the best prognosis, and full root coverage is achievable."],
+  ["About 50 to 60%", "That is what he quoted for RT2, where interproximal attachment has been lost."],
+  ["None; don't attempt coverage", "That is RT3, where interproximal loss exceeds the buccal loss."],
+  ["About 25%", "No type in the Cairo system predicts a quarter; RT1 predicts full coverage."]
+], "An undetectable interproximal CEJ means no interproximal attachment loss: Cairo RT1, where about 100% root coverage is possible. RT2 gives partial coverage (about 50-60% in his cases); RT3 gives none.");
+mq('q9-L11', L, 'lecture', "A tooth's interproximal CAL is 6 mm and its buccal CAL is 4 mm. Which Cairo recession type is it?", [
+  ["RT3", "Interproximal attachment loss greater than the buccal loss is RT3: root coverage won't be achieved."],
+  ["RT2", "RT2 has interproximal loss less than or equal to the buccal loss; here it is greater."],
+  ["RT1", "RT1 has no interproximal attachment loss at all; here it is 6 mm."],
+  ["It can't be typed without a radiograph", "The Cairo types are read from the clinical attachment levels; no radiograph is needed."]
+], "Cairo: RT1 no interproximal attachment loss; RT2 interproximal CAL less than or equal to buccal CAL; RT3 interproximal CAL greater than buccal CAL. 6 mm against 4 mm is RT3.");
+mq('q9-L12', L, 'lecture', "Why can't a graft cover an RT2 recession all the way to the CEJ?", [
+  ["Nothing interproximal holds the tissue up there", "No framework and no blood supply interproximally, so coverage stops at about the interproximal attachment level."],
+  ["The CEJ can't be found clinically in RT2", "In RT2 you can see the CEJ interproximally; that is how the loss is detected."],
+  ["A coronally advanced flap can't be moved that far", "The limit is biological, the interproximal support, not how far a flap can be advanced."],
+  ["RT2 roots are too sensitive for grafting", "Sensitivity is a reason to treat, not a limit on coverage."]
+], "In RT2 the best you can hope for is coverage up to the level of the interproximal attachment, because without bone and attachment between the teeth there is no framework or blood supply to support the tissue higher. (\"If we know how to fix this, we could ... cure everybody from periodontitis.\")");
+mq('q9-L13', L, 'lecture', "#28 has a 2 mm RT1 recession that isn't sensitive or visible. What did the Chambrone and Tatakis review find about recession left untreated?", [
+  ["It tends to keep progressing", "Untreated recession defects continue, the margin moving further apical."],
+  ["It stays stable if it causes no symptoms", "That is the assumption the review contradicts: no symptoms doesn't mean it stays the same."],
+  ["It reverses once the patient brushes gently", "Gentler brushing removes a factor; the review found untreated defects progress."],
+  ["It progresses only in smokers", "The review's finding wasn't limited to smokers."]
+], "Chambrone and Tatakis (systematic review, 2016): untreated recession continues to progress, leading to esthetic disharmony, hypersensitivity and root caries. So \"let's just monitor it\" doesn't keep it the same; apart from RT3, consider treatment when indicated.");
+mq('q9-L14', L, 'lecture', "Why is the palate the usual donor site for gingival grafts?", [
+  ["Its tissue is keratinized and passes that on", "The palate is orthokeratinized, and its connective tissue induces keratinization at the recipient site."],
+  ["It has no major vessels or nerves to work around", "The greater palatine artery and nerve run through it; harvesting means staying away from them."],
+  ["Its wound always heals by primary intention", "An FGG donor site is left open and heals by secondary intention."],
+  ["Its tissue is thin and elastic, like mucosa", "Palatal tissue is thick, firm and keratinized, unlike the alveolar mucosa."]
+], "\"We go to the palate because it has orthokeratinized soft tissue\": the graft carries the information of keratinization to the recipient site. Palatal connective tissue induces epithelial differentiation and keratinization.");
+mq('q9-L15', L, 'slides', "Which layer of the palate is usually the thickest, and is what a connective tissue graft is made of?", [
+  ["The lamina propria", "The connective tissue layer, 1.25-3.0 mm on the slide; a CTG is this layer without the epithelium."],
+  ["The epithelium", "The surface layer is thin, 0.3-0.6 mm; an FGG includes it, a CTG doesn't."],
+  ["The submucosal fat layer", "The adipose and glandular layer under the lamina propria; it is usually trimmed off the graft."],
+  ["The periosteum", "The periosteum covers the bone under the submucosa; it isn't harvested as the graft."]
+], "From the surface in: epithelium (0.3-0.6 mm), lamina propria (connective tissue, 1.25-3.0 mm), submucosa (fat and glands), bone. An FGG is epithelium plus lamina propria; a CTG is the lamina propria alone.");
+mq('q9-L16', L, 'lecture', "The graft will be covered completely by a coronally advanced flap. Which graft do you use?", [
+  ["A CTG, since epithelium under a flap won't heal", "The flap's inner side is connective tissue; epithelium placed against it \"just would not heal properly.\""],
+  ["An FGG, since its epithelium protects the root", "An FGG's epithelium is for a graft left exposed; under a flap it would not heal."],
+  ["An FGG, since it carries more keratinization", "Both grafts carry the palate's keratinization; the deciding question is covered or exposed."],
+  ["Either one, since the flap's underside is epithelium", "The flap's inner side is connective tissue, which is why a covered graft must be connective tissue only."]
+], "The rule: a graft that will be covered by a flap must be connective tissue only (a CTG); a graft left exposed is an FGG, with its epithelium.");
+mq('q9-L17', L, 'lecture', "In his root-coverage case on #10 and #11, how was the flap closed over the connective tissue graft?", [
+  ["Advanced coronally, tension free, over the graft", "A coronally advanced flap covering the graft completely, tension free so it holds its coronal position."],
+  ["Positioned apically, the graft left exposed", "That is the FGG approach for gaining keratinized gingiva, not root coverage with a CTG."],
+  ["Put back at its old level, half the graft exposed", "A CTG is covered completely; an exposed CTG would heal poorly."],
+  ["Not closed: left to heal by secondary intention", "The palatal donor site of an FGG heals that way; the recipient flap here was sutured over the graft."]
+], "Trapezoidal partial-thickness flap, a CTG harvested and de-epithelialized, sutured over the roots, then the flap advanced coronally, tension free, covering the recessions and the graft. \"We always do a coronally advanced flap if we're trying to cover the graft.\"");
+mq('q9-L18', L, 'lecture', "What is an acellular dermal matrix allograft?", [
+  ["Human dermis with its epidermis and cells removed", "Processed skin from a tissue bank: a matrix of collagen, elastic and reticular fibers, with no cells."],
+  ["Bovine collagen pressed into a membrane", "Bovine and porcine products exist, but ADM is human dermis."],
+  ["The patient's own palatal tissue, de-epithelialized", "That is a connective tissue graft, an autograft."],
+  ["A synthetic polymer scaffold seeded with fibroblasts", "ADM is processed human tissue with the cells removed, not a seeded synthetic."]
+], "ADM (AlloDerm is one) is dermis donated to a tissue bank, usually from cadavers, processed to remove the epidermis, hair follicles and cells, leaving collagen, elastic and reticular fibers. It is the most common soft tissue allograft.");
+mq('q9-L19', L, 'lecture', "Which case best suits an acellular dermal matrix instead of a palatal graft?", [
+  ["Root coverage on six teeth in one surgery", "No donor site and \"unlimited\" quantity: multiple defects in one procedure, as in his canine-to-canine case."],
+  ["A band of KG on one tooth, the graft left exposed", "ADM must be covered; creating KG with an exposed graft is an FGG's job."],
+  ["Thickening the tissue on one central incisor", "One tooth needs only a small palatal harvest; he used a CTG for exactly this."],
+  ["A demanding site where every cell helps healing", "ADM has no cells to contribute; in a demanding site autogenous tissue does better."]
+], "ADM's advantages: no donor site, more patient acceptance, shorter surgery, many defects in one procedure, results comparable to autogenous tissue, ease of use. Its limits: it must be covered, and in demanding sites it can't match the patient's own tissue.");
+mq('q9-L20', L, 'lecture', "Why must an acellular dermal matrix be covered completely by the flap?", [
+  ["It has no cells or blood supply to heal on its own", "\"More or less a dead piece of skin,\" like a band-aid; covered, it is remodeled and replaced by the patient's tissue."],
+  ["Left exposed, the body rejects it as foreign tissue", "His reason was the lack of cells and blood supply, not rejection."],
+  ["Its epidermis can't heal against the flap", "ADM has no epidermis; it is removed in processing."],
+  ["Saliva dissolves the matrix within days", "His reason was that it can't heal by itself without a blood supply."]
+], "ADM has nothing to contribute to healing, so it is fully covered, usually with a coronally advanced flap. Over time it is remodeled and replaced by the patient's own tissue, as histology has shown.");
+mq('q9-L21', L, 'lecture', "What sets a tunnel (pouch) flap apart?", [
+  ["The papillae aren't raised; the sulci are joined underneath", "Like an envelope flap without elevating the papillae: in through each sulcus, connected into one plane."],
+  ["It has two vertical releasing incisions", "That is a trapezoidal flap, which he used for single sites."],
+  ["It is positioned apically to expose the graft", "That is the apically positioned flap of the FGG technique."],
+  ["It is raised full thickness all the way down to the bone crest", "What defines it is leaving the papillae attached, not the flap's thickness."]
+], "In his ADM case the tunnel ran canine to canine through each sulcus without raising the papillae; the ADM was snaked into it, held with sling sutures, and the flap advanced coronally to cover it.");
+mq('q9-L22', L, 'slides', "How is the width of keratinized gingiva measured?", [
+  ["From the gingival margin to the MGJ", "Keratinized gingiva runs from the gingival margin to the mucogingival junction."],
+  ["From the CEJ to the MGJ", "KG starts at the gingival margin, which may sit above or below the CEJ."],
+  ["From the gingival margin to the sulcus base", "That is the probing depth."],
+  ["From the MGJ to the depth of the vestibule", "That is alveolar mucosa, not keratinized gingiva."]
+], "KG = gingival margin to MGJ (attached plus free gingiva). Find the MGJ by its color change or the roll test, then measure from it to the margin.");
+mq('q9-L23', L, 'lecture', "You roll a probe, held horizontally, from the alveolar mucosa toward the margin. How do you know you've reached the MGJ?", [
+  ["The tissue stops rolling with the probe", "The loose mucosa rolls with the probe; at the MGJ the attached tissue stops rolling."],
+  ["The tissue turns white under the probe tip", "Blanching isn't the sign he described; the rolling stops."],
+  ["The probe slips into the sulcus", "The sulcus is at the gingival margin, coronal to the MGJ."],
+  ["The tissue starts to bleed", "Bleeding isn't how the MGJ is found."]
+], "The mucosa is mobile and rolls on the probe; once you reach the MGJ it \"just does not want to roll on the probe anymore,\" and you're on keratinized tissue. From there to the margin is the width of KG.");
+mq('q9-L24', L, 'slides', "With good plaque control and no traumatic factors, is a zone of attached gingiva needed to keep periodontal health and attachment?", [
+  ["No, not by itself", "By itself it isn't an essential prerequisite when plaque is controlled and other trauma is absent (Kennedy 1985; Scheyer 2015)."],
+  ["Yes, at least 2 mm", "2 mm is the figure for suboptimal plaque control, not for good plaque control."],
+  ["Yes, at least 1 mm", "No minimum is needed when plaque is controlled and there's no trauma."],
+  ["Only around mandibular incisors", "The finding isn't tooth-specific."]
+], "Slide: a zone of attached gingiva is not, of and by itself, essential when dental plaque is controlled and other traumatic factors are absent. If plaque control is suboptimal, at least 2 mm of KG is needed to prevent attachment loss.");
+mq('q9-L25', L, 'slides', "Plaque control is suboptimal. How much keratinized gingiva does the slide say is needed to prevent attachment loss?", [
+  ["At least 2 mm", "The slide's figure, and his point: teeth with less than 2 mm of KG are likely prone to recession."],
+  ["At least 1 mm", "1 mm is the phenotype cutoff (thin is 1 mm or less), not the KG figure."],
+  ["At least 4 mm", "The slide says 2 mm."],
+  ["None, if the phenotype is thick", "The 2 mm figure applies whenever plaque control is suboptimal."]
+], "Kennedy (1985) and Scheyer (2015): with suboptimal plaque control, at least 2 mm of KG is needed to prevent attachment loss. Less than 2 mm puts the tooth at risk, but grafting is still case by case.");
+mq('q9-L26', L, 'lecture', "Why wouldn't a CTG under a coronally advanced flap create keratinized gingiva at a site that has only alveolar mucosa?", [
+  ["The mucosa over the graft stays nonkeratinized", "Covering the graft with mucosa doesn't turn the mucosa into keratinized gingiva."],
+  ["A CTG has no connective tissue to induce keratinization", "A CTG is all connective tissue; the problem is what covers it."],
+  ["The flap would cut off the graft's blood supply", "A covered CTG gets its blood supply from the flap; that isn't the problem."],
+  ["CTGs only work on RT3 recessions", "RT3 is where root coverage fails; it isn't where CTGs work."]
+], "\"If I cover the connective tissue graft with the mucosa ... I would not gain any keratinized gingiva,\" because the mucosa doesn't become keratinized just by covering it. To create KG, use an FGG left exposed with an apically positioned flap.");
+mq('q9-L27', L, 'lecture', "After a free gingival graft held only by sutures, which instruction did he give the patient?", [
+  ["Don't pull the lip down to look at the graft", "The graft is held only by sutures; pulling the lip strains it."],
+  ["Brush the graft firmly to keep it clean", "No brushing in the area while it heals."],
+  ["Eat normally from the first day", "A soft diet protects the graft."],
+  ["Remove the palatal sutures at home after 2 days", "That isn't among his instructions; the instructions protect the graft."]
+], "To protect the graft while it heals: don't pull the lip down to look at it, keep a soft diet, no toothbrushing in the area, among other instructions. The palatal donor site heals by secondary intention.");
+mq('q9-L28', L, 'lecture', "How does a highly attached frenum add to recession?", [
+  ["It pulls the margin with every lip movement", "With the lip and all the muscle movements it pulls on the margin, facilitating plaque accumulation."],
+  ["It blocks the blood supply to the papilla", "That isn't the mechanism he described; it is the pull on the margin."],
+  ["It thins the bone over the root", "Thin bone is an anatomic variation; the frenum's problem is the pull."],
+  ["It keeps the patient from brushing that area", "He described the pull and the plaque it traps, not blocked brushing."]
+], "A high frenum pulls on the gingival margin, not only when someone pulls the lip but with all the muscle movements in the area, which facilitates plaque accumulation and adds to an existing recession. A frenectomy excises it in a diamond shape, closed with sutures into the lip.");
+mq('q9-L29', L, 'slides', "A woman's gummy smile: equal facial thirds, normally proportioned teeth, lip mobility 7 mm, and an upper lip 17 mm long at rest. What is the cause?", [
+  ["A short upper lip", "The slide's sign of a short lip is a length under 20 mm; women normally have 20-22 mm."],
+  ["A hypermobile upper lip", "Hypermobility is lip mobility over 8 mm; 7 mm is within the normal 6-8 mm."],
+  ["Vertical maxillary excess", "Its sign is an increased lower facial third; her thirds are equal."],
+  ["Altered passive eruption", "Its sign is short clinical crowns with abnormal proportions; her teeth are normally proportioned."]
+], "Match the finding to the cause: increased lower facial third = vertical maxillary excess; lip length under 20 mm = short upper lip; lip mobility over 8 mm = hypermobile upper lip; abnormal tooth proportions and gingival asymmetry = short clinical crowns. For a short upper lip the slide says there are no good options.");
+mq('q9-L30', L, 'slides', "A man's gummy smile: equal facial thirds, an upper lip 23 mm long, normally proportioned teeth, and the lip rises 11 mm into a full smile. What is the treatment?", [
+  ["Botox or lip repositioning surgery", "Lip mobility over 8 mm is a hypermobile upper lip, and these may reduce the display."],
+  ["Orthodontics and orthognathic surgery", "For vertical maxillary excess, which would show an increased lower facial third."],
+  ["Crown lengthening and restorations", "For altered passive eruption, which would show short, abnormally proportioned crowns."],
+  ["No good options exist", "That is the slide's verdict on a short upper lip; 23 mm is normal for a man."]
+], "Normal: lip length 22-24 mm in men (20-22 in women), mobility 6-8 mm. 11 mm of mobility is a hypermobile upper lip: lip repositioning surgery or Botox may reduce the gingival display.");
+mq('q9-L31', L, 'slides', "Short teeth: the band of gingiva is of normal width with the MGJ at the CEJ, and the osseous crest sits 2.5 mm from the CEJ. Which crown lengthening fits?", [
+  ["An apically positioned flap", "Normal band and MGJ at the CEJ is Type 2; crest more than 1 mm away is subcategory A: Type 2A."],
+  ["A gingivectomy alone", "Only Type 1A, with a wide band of gingiva, gets a gingivectomy alone."],
+  ["An apically positioned flap with osseous surgery", "Osseous surgery is for the B types, with the crest close to the CEJ; here it is 2.5 mm away."],
+  ["No surgery; restorations only", "Altered passive eruption is treated with crown lengthening first."]
+], "Coslet: Type 1 wide gingiva, MGJ apical to the crest; Type 2 normal dimension, MGJ at the CEJ; A crest more than 1 mm from the CEJ; B crest close to the CEJ. Gingivectomy only in 1A, apically positioned flap in 2A, flap plus osseous surgery in 1B and 2B.");
+mq('q9-L32', L, 'slides', "In altered passive eruption, how do the clinical and anatomical crowns compare?", [
+  ["The clinical crown is shorter than the anatomical one", "The gingiva never migrated apically, so it still covers part of the enamel: the teeth look short."],
+  ["The clinical crown is longer than the anatomical crown", "That describes recession, where the root is exposed."],
+  ["They match, but the roots are short", "Root length isn't what makes the teeth look short; the gingiva covering the crown is."],
+  ["The anatomical crown is shorter, from wear", "Wear shortens the anatomical crown; APE is gingiva covering a normal crown."]
+], "In passive eruption the gingival complex migrates apically and settles at the cervical level. When it doesn't, gingiva covers part of the anatomical crown, and the clinical crown, what shows, is short. Crown lengthening uncovers it.");
+mq('q9-L33', L, 'slides', "Where should a maxillary lateral incisor's gingival margin sit?", [
+  ["About 1 mm coronal to the centrals and canines", "The slide's gingival line: centrals and canines level, laterals 1 mm coronal."],
+  ["Level with the centrals and canines", "The centrals and canines are level; the laterals sit 1 mm coronal to them."],
+  ["About 1 mm apical to the centrals and canines", "It's the other way: the lateral sits coronal, toward the incisal edge."],
+  ["About 2 mm coronal to the centrals and canines", "The slide says 1 mm."]
+], "Gingival line: the central incisors and canines at the same level, the lateral incisors 1 mm coronal to them. Gingival line asymmetries are one sign of short clinical crowns.");
+mq('q9-L34', L, 'slides', "What does the slide give as the treatment for vertical maxillary excess?", [
+  ["Orthodontics and orthognathic surgery", "A skeletal cause: orthodontics and orthognathic surgery, and the slide adds that periodontics may be required to correct the display."],
+  ["Lip repositioning surgery or Botox injections", "These are for a hypermobile upper lip."],
+  ["Crown lengthening followed by restorative therapy", "These are for altered passive eruption."],
+  ["No good options exist", "That is the slide's verdict on a short upper lip."]
+], "Excessive gingival display by cause: altered passive eruption, crown lengthening and restorative therapy; vertical maxillary excess, orthodontics, orthognathic surgery, and periodontics may be required; hypermobile lip, lip repositioning or Botox; short upper lip, no good options.");
+mq('q9-L35', L, 'slides', "Patient 1, 28: equal facial thirds, normal upper lip length and mobility, a high lip line at full smile, flat and uneven gingival margins on the anterior teeth, and short, square centrals. What explains her gummy smile?", [
+  ["Short crowns and an uneven gingival line", "Facial thirds and lip are normal, so it's the teeth and gingiva: the plan was crown lengthening, then veneers."],
+  ["Vertical maxillary excess, a skeletal cause", "Its sign is an increased lower facial third; her thirds are equal."],
+  ["A hypermobile upper lip", "Her lip mobility is normal."],
+  ["A short upper lip", "Her lip length is normal."]
+], "Patient 1: equal thirds, normal lip length and mobility, high lip line, canted gingival and incisal lines, flat gingival contours on #8-10, #7 and #10 more apical, square #8, 9 and 10. Short clinical crowns with gingival asymmetry: crown lengthening, then veneers.");
+mq('q9-L36', L, 'lecture', "Why is the fat layer usually trimmed off a thick palatal graft?", [
+  ["So it doesn't slow the healing", "A thick graft brings much of the adipose layer with it, and it is removed so it doesn't slow healing."],
+  ["So the graft keeps its epithelium", "The epithelium is the outer layer; the fat is on the deep side."],
+  ["So the graft fits under a tunnel", "His reason was healing, not fit."],
+  ["So the greater palatine artery is spared", "Staying clear of the artery is about where and how deep you harvest, not trimming the graft."]
+], "Palate layers: epithelium, lamina propria, then the submucosa of adipose and glandular tissue. A thick graft can include much of the fat, which is removed so it does not slow the healing.");
+mq('q9-E01', L, 'slides', "Each is a radiographic parameter in the pretreatment evaluation for crown lengthening EXCEPT:", [
+  ["The width of keratinized gingiva", "A clinical parameter, with probing depth and gingival health; it can't be seen on a radiograph."],
+  ["The apical extent of a fracture or caries", "A radiographic parameter on the slide."],
+  ["Root length and form", "A radiographic parameter on the slide."],
+  ["The level of the alveolar crest", "A radiographic parameter on the slide."]
+], "Clinical parameters: probing depth, gingival health, width of keratinized gingiva. Radiographic: apical extent of fracture or caries, root length and form, level of the alveolar crest, pulpal involvement.");
+mq('q9-E02', L, 'slides', "Each is a reason on the slide to treat recession EXCEPT:", [
+  ["Increased tooth mobility", "Not on the list: recession exposes the root; it doesn't loosen the tooth."],
+  ["Dentinal hypersensitivity", "On the list: exposed dentin is sensitive to cold and air."],
+  ["Root surface caries", "On the list: exposed roots raise the caries risk."],
+  ["Harder mechanical plaque control", "On the list: interference with adequate plaque control."]
+], "Reasons to treat: hypersensitivity, soft tissue discomfort, root caries, esthetics, interference with plaque control, greater susceptibility to inflammatory insult. And untreated recession progresses (Chambrone and Tatakis 2016).");
+mm('q9-M01', L, 'slides', "Which medications does the slide list as causes of gingival enlargement? Select all that apply.", [
+  ["Phenytoin", "Belongs: a gingival disease modified by medication.", true],
+  ["Calcium channel blockers", "Belongs: on the slide (nifedipine-type drugs).", true],
+  ["Cyclosporine", "Belongs: on the slide.", true],
+  ["Metformin", "Doesn't belong: not on the slide's list."],
+  ["Amoxicillin", "Doesn't belong: not on the slide's list."]
+], "Gingival enlargement, gingival diseases modified by medications: phenytoin, calcium channel blockers, cyclosporine. Treatment: gingivectomy, improved oral hygiene and possibly changing the contributing medication.");
+mm('q9-M02', L, 'slides', "Which are advantages of an acellular dermal matrix over a palatal graft? Select all that apply.", [
+  ["No donor site", "Belongs: no surgery on the roof of the mouth.", true],
+  ["More patient acceptance", "Belongs: because there's no palatal wound.", true],
+  ["Many defects treated in one procedure", "Belongs: quantity isn't limited by the palate.", true],
+  ["It heals well when left exposed", "Doesn't belong: it has no cells or blood supply and must be fully covered."],
+  ["It brings its own keratinization", "Doesn't belong: that is palatal tissue's advantage, which is why an FGG creates KG."]
+], "ADM advantages: no donor site, more patient acceptance, less surgical time, multiple defects in one procedure, esthetics comparable to autogenous tissue, ease of use. It must be covered, and in demanding sites it can't match autogenous tissue.");
+two('q9-S01', L, 'lecture', "An FGG is the palate's connective tissue without its epithelium.", "A graft that will be covered completely by a coronally advanced flap should be an FGG.", false, false,
+  "An FGG is the epithelium with the lamina propria; a CTG is connective tissue only, and a covered graft must be a CTG.",
+  "the FGG is the epithelium with the lamina propria under it; connective tissue alone is the CTG.",
+  "a covered graft must be connective tissue only, because epithelium against the flap's inner side won't heal.");
+two('q9-S02', L, 'lecture', "In RT2 recession, the interproximal attachment loss is greater than the buccal attachment loss.", "In RT1 recession, about 50 to 60% root coverage is the best to expect.", false, false,
+  "RT2 is interproximal loss less than or equal to the buccal; greater is RT3. RT1 allows about 100% coverage; 50-60% is RT2.",
+  "RT2's interproximal loss is less than or equal to the buccal loss; greater than the buccal is RT3.",
+  "RT1 has the best prognosis, about 100% coverage; 50 to 60% is what he quoted for RT2.");
+two('q9-S03', L, 'slides', "With plaque controlled and no traumatic factors, a zone of attached gingiva is not by itself essential for periodontal health.", "With suboptimal plaque control, at least 2 mm of keratinized gingiva is needed to prevent attachment loss.", true, true,
+  "Both are the slide's findings (Kennedy 1985; Scheyer 2015). Less than 2 mm of KG puts a tooth at risk, but grafting is case by case.",
+  "that is the first half of the slide's finding (Kennedy 1985; Scheyer 2015).",
+  "that is the second half: with suboptimal plaque control, 2 mm of KG or more is needed.");
+two('q9-S04', L, 'lecture', "An acellular dermal matrix can be left exposed to heal, like an FGG.", "An acellular dermal matrix lets you treat many teeth in one procedure without a donor site.", false, true,
+  "ADM has no cells or blood supply, so it is always fully covered; its big advantage is many teeth with no palatal wound.",
+  "it is \"more or less a dead piece of skin\" with no cells or blood supply, so it is fully covered by the flap.",
+  "no donor site and \"unlimited\" quantity are its main advantages.");
+two('q9-S05', L, 'slides', "Type 2 altered passive eruption has a wide band of gingiva, with the MGJ apical to the alveolar crest.", "Types 1B and 2B both need an apically positioned flap plus osseous surgery.", false, true,
+  "Type 1 is the wide band with the MGJ apical to the crest; Type 2 is normal, with the MGJ at the CEJ. Both B types need the flap plus osseous surgery.",
+  "that describes Type 1; Type 2 has a normal dimension, with the MGJ at the level of the CEJ.",
+  "in both B types the crest is close to the CEJ, so the bone has to be recontoured with the flap.");
+tf('q9-T01', L, 'lecture', "A probe that shows through the gingiva means a thin phenotype, 1 mm or less.", true,
+  "Visible probe = thin, 1 mm or less; not visible = thick, more than 1 mm. Thin phenotypes are predisposed to recession.",
+  "That is the validated test he described: a visible probe means 1 mm or less.",
+  "It is true: a probe hidden by the tissue would mean a thick phenotype, more than 1 mm.");
+tf('q9-T02', L, 'slides', "In a shallow palate, the greater palatine neurovascular bundle runs about 17 mm from the CEJ.", false,
+  "On the slide: about 7 mm in a shallow palate, 12 mm in an average palate and 17 mm in a high one. A high vault gives the most room for error.",
+  "17 mm is the high palate; in a shallow palate the bundle is only about 7 mm from the CEJ.",
+  "It is false: about 7 mm in a shallow palate; 17 mm belongs to the high palate.");
+tf('q9-T03', L, 'lecture', "Recession defects left untreated tend to continue to progress.", true,
+  "Chambrone and Tatakis (2016): untreated recession continues, so a recession that doesn't hurt still deserves a treatment decision.",
+  "That is the systematic review's finding: they progress if left untreated.",
+  "It is true: the review found progression, so \"just monitor it\" doesn't keep it the same.");
+tf('q9-T04', L, 'lecture', "In toothbrushing-related recession, an ulcer forms first, and the epithelium is abraded later.", false,
+  "The order is abrasion of the epithelium, then inflammation in the connective tissue, then an ulcer, then recession with continued trauma.",
+  "It's the reverse: the epithelium is abraded first; the ulcer comes after the inflammation.",
+  "It is false: abrasion comes first, then inflammation, then the ulcer.");
+tf('q9-T05', L, 'lecture', "After a free gingival graft, the palatal donor site heals by secondary intention.", true,
+  "The palate is left as an open wound after the FGG is harvested, so it heals by secondary intention.",
+  "That's right: the harvest leaves an open wound on the palate.",
+  "It is true: nothing closes the palatal wound over, so it heals by secondary intention.");
+tf('q9-T06', L, 'slides', "A gingivectomy alone is the treatment for Type 2A altered passive eruption.", false,
+  "Gingivectomy only in Type 1A; an apically positioned flap in Type 2A; a flap plus osseous surgery in 1B and 2B.",
+  "Gingivectomy alone is only for Type 1A; Type 2A gets an apically positioned flap.",
+  "It is false: Type 2A's band is only of normal width, so it is moved with an apically positioned flap.");
+tf('q9-T07', L, 'slides', "Types 1A and 1B are the most frequently encountered forms of altered passive eruption.", true,
+  "The slide: Types 1A and 1B are the most frequently encountered.",
+  "That's what the slide says.",
+  "It is true: the slide names 1A and 1B as the most frequent.");
+tf('q9-T08', L, 'slides', "A normal upper lip rises about 10-12 mm in a full smile.", false,
+  "Normal lip mobility is 6-8 mm; more than 8 mm is a hypermobile upper lip.",
+  "10-12 mm would be hypermobile; normal is 6-8 mm.",
+  "It is false: normal mobility is 6-8 mm, and over 8 mm is hypermobile.");
+tf('q9-T09', L, 'slides', "A maxillary lateral incisor's gingival margin normally sits about 1 mm apical to the central incisor and canine margins.", false,
+  "The centrals and canines are level, and the laterals sit 1 mm coronal to them.",
+  "The lateral sits 1 mm coronal, toward the incisal edge, not apical.",
+  "It is false: the lateral's margin is 1 mm coronal to the central-canine line.");
+tf('q9-T10', L, 'lecture', "A tunnel flap reaches the roots of several teeth without raising the papillae.", true,
+  "The tunnel (pouch) goes through each sulcus and joins them under the tissue, leaving the papillae attached.",
+  "That's what makes it a tunnel: the papillae stay attached.",
+  "It is true: the papillae are never elevated; the sulci are connected underneath.");
+nums('q9-N01', L, 'slides', "Which are predisposing factors for gingival recession on Dr. Abou-Arraj's slide?", [
+  "A thin gingival phenotype",
+  "The use of smokeless tobacco",
+  "A wide band of keratinized gingiva",
+  "An aberrant frenum or high muscle attachment"
+], [true, true, false, true], [[1,3,4],[2,3,4],[2,4]],
+  "Predisposing factors include a thin phenotype, smokeless tobacco and an aberrant frenum. It is the lack of keratinized gingiva that predisposes; a wide band resists recession.",
+  ["thin tissue is predisposed to recession.", "smokeless tobacco can cause severe localized recession.", "it's the lack of keratinized gingiva that predisposes; a wide band resists recession.", "it pulls on the margin and traps plaque."]);
+nums('q9-N02', L, 'lecture', "Which statements about an acellular dermal matrix allograft are true?", [
+  "It comes from donated human dermis, processed to remove its cells",
+  "It brings living donor fibroblasts that help it heal",
+  "Over time it is replaced by the patient's own tissue",
+  "It should be covered completely by the flap"
+], [true, false, true, true], [[1,2,3],[2,3,4],[3,4]],
+  "ADM is processed human dermis with no cells, is remodeled and replaced by the patient's tissue, and must be fully covered because it has nothing to contribute to healing.",
+  ["it is donated dermis with the epidermis and cells removed.", "it is acellular: \"more or less a dead piece of skin\" with nothing to contribute.", "histology shows it remodeled and replaced by the patient's own tissue.", "it heals poorly without a blood supply, so it is fully covered."]);
+nums('q9-N03', L, 'slides', "Which statements about altered passive eruption are true?", [
+  "In Type 1, the MGJ sits at the level of the CEJ",
+  "In subcategory A, more than 1 mm separates the CEJ from the osseous crest",
+  "Type 1A is treated with a gingivectomy alone",
+  "Type 2B is treated with an apically positioned flap alone"
+], [false, true, true, false], [[2,3,4],[2,4],[3,4]],
+  "Type 1 is the wide band with the MGJ apical to the crest (Type 2 has it at the CEJ); A means more than 1 mm from CEJ to crest; 1A gets a gingivectomy alone; 2B needs the flap plus osseous surgery.",
+  ["Type 1 has the MGJ apical to the alveolar crest; the MGJ at the CEJ is Type 2.", "subcategory A has more than 1 mm between the CEJ and the crest.", "only Type 1A gets a gingivectomy alone.", "2B has the crest close to the CEJ, so it needs osseous surgery with the flap."]);
+nums('q9-N04', L, 'slides', "For a gummy smile, which pairs of finding and cause are correct?", [
+  "An increased lower facial third: vertical maxillary excess",
+  "A lip length under 20 mm: a short upper lip",
+  "Lip mobility over 8 mm: a hypermobile upper lip",
+  "Lip mobility of 6-8 mm: a hypermobile upper lip"
+], [true, true, true, false], [[1,2],[1,2,4],[2,3,4]],
+  "On the slides: increased lower facial third = vertical maxillary excess; lip under 20 mm = short upper lip; mobility over 8 mm = hypermobile lip. 6-8 mm is normal mobility.",
+  ["that is the slide's sign of vertical maxillary excess.", "under 20 mm is the slide's sign of a short upper lip.", "over 8 mm is the slide's sign of a hypermobile upper lip.", "6-8 mm is normal lip mobility; hypermobile is over 8 mm."]);
+})();
 /* ===== Patient Box cases drawn from their numbers (PCASES, 2026-11-04): the case's rows, chart, radiograph and view
    sit in the Patient Box; `pfig` picks the pictures and hides any row that would give the answer away; `ref` points at
    the notes and Review tables the question comes from. Every fact is in this hub's notes. ===== */
@@ -3875,6 +4271,40 @@ mq('pc-f2', S7, 'slides', "In Meffert's terms, this implant is", [
   ["Surviving, so successful", "Survival only means it is still in the mouth; success (Albrektsson) needs no radiolucency, no infection and bone loss under 1.5 mm in the first year and 0.2 mm a year after. \"Be cautious of the terms used, success versus survival.\""]
 ], "Meffert: ailing, static bone loss without inflammation or mobility (monitor); failing, progressive bone loss with inflammation but no mobility (treat, or keep in function); failed, progressive loss with mobility and loss of function (remove). Progressive loss plus pus and bleeding on a firm implant is failing.",
   { pcase:'implant-30', pfig:[{ kind:'chart', title:'#29-#31, facial' }, { kind:'film', title:'#29-#31, today', note:'At the baseline film the bone met the implant at its first thread.' }], ref:[REF_S7_MEFFERT, REF_IMPL], cue:"Progressing + inflamed + firm = failing; mobile = failed." });
+
+/* Session 9 cases (2026-11-10): keratinized gingiva on #24 (an FGG left exposed) and RT1 recession on #10-#11 (a CTG under a coronally advanced flap) */
+var S9 = 'perio-plastic-esthetics';
+var REF_S9_RT = { label:'S9 notes: The Cairo classification', go:{ v:'notes', lec:S9, k:14 } }, REF_S9_GRAFT = { label:'S9 notes: Which graft', go:{ v:'notes', lec:S9, k:21 } },
+    REF_S9_CAF = { label:'S9 notes: Root coverage with a CTG', go:{ v:'notes', lec:S9, k:22 } }, REF_S9_KG = { label:'S9 notes: Is keratinized gingiva needed?', go:{ v:'notes', lec:S9, k:28 } },
+    REF_S9_FGG = { label:'S9 notes: Gaining keratinized gingiva', go:{ v:'notes', lec:S9, k:29 } }, REF_S9_GRAFTS = { label:'Review: Grafts, and which one when', go:{ v:'review', id:'grafts' } };
+mq('q9-P01', S9, 'lecture', "What is the main goal of treating #24, and which procedure meets it?", [
+  ["A band of KG: an exposed FGG, flap positioned apically", "The site has no keratinized gingiva and traps plaque; an exposed FGG brings its own keratinization, as in Dr. Abou-Arraj's case."],
+  ["Full root coverage: a CTG under a coronally advanced flap", "#24 is RT2, so full coverage isn't possible, and covering a CTG with mucosa gains no keratinized gingiva."],
+  ["Coverage of several roots: an ADM under a tunnel flap", "Only #24 needs treatment, and an ADM, covered by mucosa, brings no keratinization of its own."],
+  ["Removing excess tissue: a gingivectomy", "There is no excess gingiva here; a gingivectomy would remove tissue the tooth lacks."]
+], "His case: an RT2 recession on a sensitive tooth with no KG, a plaque trap. The goal was a band of keratinized gingiva, with root coverage a bonus: a trapezoidal flap positioned apically and an FGG from the palate left exposed, so it heals into KG. At three months there was a band of KG, partial root coverage (RT2) and no more sensitivity.",
+  { pcase:'no-kg-24', ref:[REF_S9_FGG, REF_S9_KG, REF_S9_GRAFTS], cue:"Goal = KG → FGG left exposed. Goal = coverage → CTG under a CAF." });
+mq('q9-P02', S9, 'lecture', "Read the chart. Which Cairo type is #24's recession, and what coverage can a graft give?", [
+  ["RT2, so partial coverage", "Interproximal CAL 3 mm is less than the 4 mm buccal CAL: RT2, coverage up to about the interproximal attachment level."],
+  ["RT2, so complete coverage", "RT2 has interproximal attachment loss, which caps the coverage; complete coverage is RT1's."],
+  ["RT1, so complete coverage", "RT1 has no interproximal attachment loss; #24's mesial and distal sites have 3 mm of CAL."],
+  ["RT3, so no coverage", "RT3 needs interproximal loss greater than the buccal; here 3 mm is less than 4 mm."]
+], "#24: facial PD 1 mm + recession 3 mm = buccal CAL 4 mm; mesial and distal PD 3 mm with the margin at the CEJ = interproximal CAL 3 mm. Interproximal loss less than or equal to buccal = RT2: partial coverage (about 50-60% in his cases).",
+  { pcase:'no-kg-24', pfig:[{ kind:'chart', title:'#23-#26, facial' }], ref:[REF_S9_RT, REF_RT], cue:"Compare interproximal CAL with buccal CAL: none = RT1, less or equal = RT2, more = RT3." });
+mq('q9-P03', S9, 'lecture', "Which plan fits #10 and #11?", [
+  ["A CTG under a coronally advanced flap", "Root coverage is the goal, so the graft is covered: connective tissue only, with the flap advanced tension free over it."],
+  ["An FGG left exposed, with an apically positioned flap", "That is for creating keratinized gingiva; he still has KG, and his concern is the exposed roots."],
+  ["An ADM left exposed over both roots", "An acellular dermal matrix must be fully covered; it has no cells or blood supply of its own."],
+  ["Monitor it, since recession is stable without pain", "Untreated recession tends to progress (Chambrone and Tatakis), and he has sensitivity and an esthetic concern."]
+], "Esthetic concern and sensitivity on two RT1 recessions: treat for root coverage. A covered graft must be a CTG (epithelium under the flap won't heal), with a coronally advanced flap, as in Dr. Abou-Arraj's #10-#11 case. He should also stop scrubbing with a hard brush.",
+  { pcase:'recession-11', ref:[REF_S9_CAF, REF_S9_GRAFT, REF_S9_GRAFTS], cue:"Covered graft = CTG; we always use a coronally advanced flap to cover it." });
+mq('q9-P04', S9, 'lecture', "Read the chart. With a graft, how much root coverage can he expect on #11?", [
+  ["About 100%", "Mesial and distal CAL are 0: no interproximal attachment loss, RT1, where full coverage is achievable."],
+  ["About 50 to 60%", "That is RT2's expectation; #11 has no interproximal attachment loss."],
+  ["None, since the recession is 3 mm", "The amount of recession doesn't decide it; the interproximal attachment does."],
+  ["About 25%, since he brushes hard", "His brushing is a factor to correct, not what predicts coverage."]
+], "#11: 3 mm of facial recession (buccal CAL 4 mm) with the margin 2 mm coronal to the CEJ interproximally and 2 mm probing (CAL 0): RT1. RT1 has the best prognosis, about 100% root coverage.",
+  { pcase:'recession-11', pfig:[{ kind:'chart', title:'#9-#12, facial' }], ref:[REF_S9_RT, REF_RT], cue:"No interproximal attachment loss = RT1 = full coverage possible." });
 
 var QUESTION_WHY = {
   "q1-01":["Probing depth is measured from the gingival margin to the base of the pocket, exactly what this reading describes.", "CAL is measured from the CEJ, not the gingival margin: it is probing depth plus recession.", "Recession runs from the CEJ to the gingival margin; it says nothing about how deep the pocket is.", "Radiographic bone loss is read on a film, not measured with a probe in the pocket."],
@@ -4428,10 +4858,18 @@ var LIKELY_TOPICS = [
   { lec:"antibiotics-host-mod", t:"NSAIDs, bisphosphonates and BRONJ; why to step lightly", basis:"review guide", ids:["q8-13", "q8-15", "q8-L43", "q8-L44", "q8-L55", "q8-T10", "q8-T11", "q8-L54", "q8-N06"] },
   { lec:"antibiotics-host-mod", t:"Drug by drug: mechanism, ANUG, C. diff, tetracycline cautions, food", basis:"slides", ids:["q8-02", "q8-05", "q8-06", "q8-07", "q8-10", "q8-L22", "q8-L24", "q8-S02", "q8-03", "q8-04", "q8-S03"] },
   { lec:"antibiotics-host-mod", t:"Augmentin, erythromycin, macrolides, pregnancy", basis:"slides", ids:["q8-08", "q8-09", "q8-L17", "q8-L26", "q8-N03", "q8-T05"] },
-  { lec:"perio-plastic-esthetics", t:"Recession and grafts: CTG vs FGG, allograft, the palatal vault", basis:"review guide", ids:["q9-01", "q9-02", "q9-03", "q9-04"] },
-  { lec:"perio-plastic-esthetics", t:"Altered passive eruption: types and treatment", basis:"review guide", ids:["q9-07", "q9-08"] },
-  { lec:"perio-plastic-esthetics", t:"Excess gingival display: the lip and the lower facial third", basis:"review guide", ids:["q9-09", "q9-10", "q9-11"] },
-  { lec:"perio-plastic-esthetics", t:"Pseudopockets and drug-induced enlargement", basis:"review guide", ids:["q9-05", "q9-06"] }
+  { lec:"perio-plastic-esthetics", t:"Cairo RT1, RT2, RT3: how much root coverage to expect", basis:"hint", ids:["q9-L10", "q9-L11", "q9-L12", "q9-S02", "q9-P02", "q9-P04"] },
+  { lec:"perio-plastic-esthetics", t:"Which graft: a covered graft is a CTG, under a coronally advanced flap", basis:"hint", ids:["q9-02", "q9-L16", "q9-L17", "q9-S01", "q9-P03"] },
+  { lec:"perio-plastic-esthetics", t:"Inflammation causes recession; the factors only predispose", basis:"hint", ids:["q9-L09", "q9-L05", "q9-L06", "q9-N01", "q9-T04"] },
+  { lec:"perio-plastic-esthetics", t:"Keratinized gingiva: the 2 mm rule, and an FGG left exposed to create it", basis:"hint", ids:["q9-L24", "q9-L25", "q9-L26", "q9-S03", "q9-P01"] },
+  { lec:"perio-plastic-esthetics", t:"The acellular dermal matrix: what it is, when, and why it's covered", basis:"hint + review guide", ids:["q9-03", "q9-L18", "q9-L19", "q9-L20", "q9-N02", "q9-S04"] },
+  { lec:"perio-plastic-esthetics", t:"Untreated recession progresses; why treat it", basis:"hint", ids:["q9-L13", "q9-T03", "q9-E02"] },
+  { lec:"perio-plastic-esthetics", t:"Thin vs thick phenotype: the probe test and recession risk", basis:"hint", ids:["q9-L01", "q9-L02", "q9-T01"] },
+  { lec:"perio-plastic-esthetics", t:"Altered passive eruption: the types and their crown lengthening", basis:"review guide + slides", ids:["q9-07", "q9-08", "q9-L31", "q9-N03", "q9-S05", "q9-T06"] },
+  { lec:"perio-plastic-esthetics", t:"Excessive gingival display: the cause from the findings, and its treatment", basis:"review guide + slides", ids:["q9-09", "q9-10", "q9-11", "q9-L29", "q9-L30", "q9-L34", "q9-L35", "q9-N04"] },
+  { lec:"perio-plastic-esthetics", t:"Pseudopockets and drug-induced enlargement", basis:"review guide", ids:["q9-05", "q9-06", "q9-M01"] },
+  { lec:"perio-plastic-esthetics", t:"Esthetic norms: the lip, the gingival line, the golden proportion", basis:"review guide", ids:["q9-12", "q9-L33", "q9-T08", "q9-T09"] },
+  { lec:"perio-plastic-esthetics", t:"The palate: its layers, the greater palatine bundle, the high vault", basis:"review guide", ids:["q9-04", "q9-L15", "q9-T02"] }
 ];
 (function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
 /* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
@@ -4835,9 +5273,68 @@ READINGS['antibiotics-host-mod'] = `
 `;
 
 READINGS['perio-plastic-esthetics'] = `
-<p>This session has not been lectured yet — the notes below come only from the class exam-review guide.</p>
-<p>Recession increases with age and shows up most often on the buccal of maxillary molars and mandibular incisors — graded with the same RT1/RT2/RT3 system introduced in the first lecture, since that classification is what decides whether root coverage is worth attempting. Soft-tissue grafting splits into autografts, harvested from the patient's own palate — a connective tissue graft (CTG, no epithelium, covered by a flap) or a free gingival graft (FGG, epithelium and connective tissue, left exposed) — and allografts, most commonly an acellular dermal matrix, which perform slightly less well than autografts but spare the patient a second surgical site. A deep palatal vault gives the most room for harvesting error, and clinicians sometimes deliberately harvest FGG-thickness tissue while using it as a CTG, since a thicker piece is easier to harvest and heals with the covered technique.</p>
-<p>Gingival excess is matched to its cause: a pseudopocket needs only better hygiene and scaling; drug-induced enlargement needs gingivectomy, better hygiene, and a conversation about the causative medication; inconsistent margins or excessive gingival display call for gingivectomy or an apically positioned flap. Altered passive eruption is read on two axes — gingival dimension (Type 1: wide, MGJ apical to the crest; Type 2: normal, MGJ at the CEJ) and how close the osseous crest sits to the CEJ (Subcategory A: more than 1 mm away; Subcategory B: close). Only Type 1A responds to gingivectomy alone and only Type 2A to an apically positioned flap alone — both B subcategories need an apically positioned flap plus osseous surgery, because the bone itself is the limiting factor. On the esthetic side, an increased lower-facial-third proportion suggests vertical maxillary excess; upper lip length at rest runs about 20–22 mm in women and 22–24 mm in men, with roughly 6–8 mm of mobility on a full smile; the lateral incisor's gingival margin sits about 1 mm coronal to the central-incisor/canine line; and tooth width narrows from about 1.6 units at the central incisor to 1 unit at the lateral to 0.6 units for half the canine. Altered passive eruption is treated with crown lengthening and restorative work, vertical maxillary excess with orthodontics, orthognathic surgery, or perio surgery depending on severity, a hypermobile lip with Botox or lip-repositioning surgery — and a structurally short upper lip, honestly, has no reliably good fix.</p>
+<p>Dr. Abou-Arraj split this session in two. He recorded the first part (posted Nov 9): the periodontal phenotype, recession and how it is grafted, the lack of keratinized gingiva and the frenum. "The remaining two mucogingival deformities," <b>gingival excess</b> and <b>abnormal color</b>, he covers "when we meet live this week." Until a capture of that class is posted, those sections come from his 2026 slides and the class exam-review guide, and they say so.</p>
+<h5>The tissues: gingiva, alveolar mucosa and the MGJ</h5>
+<p>The <b>mucogingival junction (MGJ)</b> separates the <b>gingiva</b> from the <b>alveolar mucosa</b>. You can often see it, but it is found "most accurately" clinically, with a probe. All the gingiva coronal to the MGJ is <b>keratinized gingiva</b>. Part of it is <b>attached</b>, to the root surface and the bone; the rest is <b>free gingiva</b>, the part a probe slips under to measure the probing depth. The line between free and attached gingiva isn't visible clinically.</p>
+<h5>Mucogingival deformities</h5>
+<p>Periodontal plastic therapy treats <b>mucogingival deformities</b>: "any deviation from the norm" in the volume, dimension, contour or shape of the soft tissue around teeth. The 2017 World Workshop classification (Journal of Periodontology, 2018) lists seven, and the slides walk through them in order: (1) the <b>periodontal phenotype</b> (thin scalloped, thick scalloped, thick flat); (2) <b>gingival or soft tissue recession</b>, described by surface (facial or lingual, interproximal or papillary), severity (Cairo RT1, 2, 3), gingival thickness and width, any NCCL or cervical caries, the patient's esthetic concern and hypersensitivity; (3) <b>lack of keratinized gingiva</b>; (4) <b>decreased vestibular depth</b>; (5) <b>aberrant frenum or muscle position</b>; (6) <b>gingival excess</b> (pseudopocket, inconsistent gingival margin, excessive gingival display, gingival enlargement); and (7) <b>abnormal color</b> (a mucogingival tattoo).</p>
+<h5>The periodontal phenotype</h5>
+<p>The phenotype has two parts: the tissue's <b>thickness</b>, thin or thick, and the gingival line's <b>contour</b>, scalloped or flat. Thin tissue can be judged by eye (you can almost see the roots through it), but the validated way is the probe: slide it into the sulcus. If you <b>can see the probe through the tissue</b>, the phenotype is <b>thin</b>, <b>1 mm or less</b>. If you <b>can't see it</b>, the phenotype is <b>thick</b>, <b>more than 1 mm</b>.</p>
+<p>Why it matters: a <b>thin phenotype is predisposed to recession</b>, and recession that is already there tends to progress on it, while a thick phenotype resists it. His example: a young patient about to start orthodontics had a thin phenotype over his incisors, so thin you could see the roots. Orthodontic movement, then years of toothbrushing on top of it, would put him at risk of recession he didn't have yet. So before the orthodontics the phenotype was changed from thin to thick: a <b>trapezoidal, full-thickness flap</b>, a <b>connective tissue graft</b> from the palate sutured over the two central incisors (the teeth most at risk), and the flap put back over the graft to cover it completely. At two weeks the tissue was already thicker, and he was cleared for orthodontics with less risk of recession.</p>
+<h5>Recession: what it is and who gets it</h5>
+<p><b>Recession</b> is "the location of the marginal periodontal tissues apical to the cemento-enamel junction" (AAP Glossary, 2001): part of the root is exposed. Measure it with the probe from the <b>gingival margin to the CEJ</b>, at the same six sites as probing depth, so it can be recorded and followed over time. It isn't only on the straight facial or lingual: note any <b>interproximal</b> recession too, because it "could change totally the prognosis of the treatment."</p>
+<p>It is common. The slide (Albandar and Kingman, 1999): <b>88% of people 65 and older and 50% of people 18 to 64</b> have at least one site with recession, and prevalence and extent rise significantly with age. In the recording he put it another way: more than half of the US population 30 or older has at least 1 mm of recession, and almost a quarter has at least one tooth surface with 3 mm or more. Older people have more not because of their age but because they have <b>accumulated risk factors</b> over more years. Recession is more common in <b>men</b> than in women and in <b>African-Americans</b> than in other groups, and most common on the <b>buccal surfaces of maxillary molars (first molars in particular) and mandibular central incisors</b>; canines are also commonly affected.</p>
+<h5>Predisposing factors</h5>
+<p>The slide lists ten: periodontal disease (periodontitis); trauma (toothbrushing, flossing, self-inflicted, foreign objects); anatomic variations (fenestration, dehiscence and abnormal tooth position); lack of keratinized gingiva; a thin gingival phenotype; orthodontic treatment; previous periodontal surgery; a high muscle attachment and aberrant frenum; iatrogenic factors related to the location of restoration margins; and the use of smokeless tobacco. What he added in the recording:</p>
+<p><b>Periodontitis</b>, not gingivitis: attachment and bone loss expose the root. <b>Previous periodontal surgery</b>: after Phase I and resective Phase II therapy, "we caused most of this recession," on purpose, to leave an environment without pockets that the patient can keep clean. <b>Toothbrushing</b> is the most common traumatic factor: hard bristles, or an aggressive brusher whatever the bristle. The trauma list also takes in flossing habits, self-inflicted oral habits, foreign objects (a fingernail, a pen) and caustic medicaments applied directly to the gingiva.</p>
+<p><b>Anatomic variations.</b> A <b>fenestration</b> is a window in the bone over the root; a <b>dehiscence</b> is missing facial bone from the crest apically. A tooth positioned <b>buccally</b> on the arch has thinner facial tissue and takes more of the toothbrush. Moving it back onto the arch orthodontically, into its alveolar housing, can resolve some of the recession, at least partly, without a graft. Put a dehiscence or fenestration together with a thin phenotype and an aggressive brusher, and you have "the perfect storm."</p>
+<p><b>Orthodontic treatment</b>: pushing teeth buccally out of the alveolar housing (proclining incisors) over a thin phenotype can cause recession. Some studies find incisor proclination doesn't; he calls it controversial and advises caution about when to propose grafting. <b>Iatrogenic margins</b>: an intrasulcular or subgingival crown margin on a thin phenotype, an ill-fitting margin or an overcontoured restoration can lead to recession (which doesn't mean every crown needs a graft). A <b>high frenum or muscle attachment</b> pulls on the margin with every movement. <b>Smokeless tobacco</b>, held in one spot, usually the lower premolar or molar area, changes the tissue locally and can cause a severe localized recession. His worst case had no pockets and no interproximal bone loss, but recessions reaching the bottom of the vestibule, hard to treat even with several attempts.</p>
+<h5>How recession develops</h5>
+<p>Two mechanisms (from Zucchelli's textbook). <b>Toothbrushing trauma</b>, especially on thin tissue: the epithelium is abraded, the connective tissue under it responds with inflammation, an ulcer forms at the surface, and with continued trauma the margin recedes. <b>Plaque-related</b>: the same process as periodontitis (plaque in the sulcus with poor hygiene, apical and lateral migration of the junctional epithelium, loss of attachment), here on a local scale on a thin phenotype. "The key word here is <b>inflammation</b>": it is what actually causes recession, and the factors above are predisposing factors that make it happen.</p>
+<h5>The Cairo classification: how much root can you cover?</h5>
+<p>Before proposing a graft, assess how severe the recession is and what treatment can achieve. The <b>Cairo</b> classification (2011) has three types, read from the interproximal attachment:</p>
+<p><b>RT1</b>: recession with <b>no loss of interproximal attachment</b>; the interproximal CEJ can't be detected clinically on the mesial or the distal. The best prognosis: about <b>100% root coverage</b> is achievable.</p>
+<p><b>RT2</b>: recession with <b>loss of interproximal attachment</b>, where the <b>interproximal CAL</b> (from the interproximal CEJ to the depth of the interproximal sulcus or pocket) is <b>less than or equal to the buccal CAL</b> (from the buccal CEJ to the depth of the buccal sulcus or pocket). You can see the CEJ interproximally. Expect <b>partial root coverage</b>, about <b>50 to 60%</b> in cases like his: at best up to the level of the interproximal attachment on either side. The tissue can't be pulled any higher, because there is no framework and no blood supply interproximally to hold it there ("if we know how to fix this, we could ... cure everybody from periodontitis").</p>
+<p><b>RT3</b>: loss of interproximal attachment where the <b>interproximal CAL is greater than the buccal CAL</b>. A graft for root coverage "would not end up achieving that root coverage at all," so root coverage isn't encouraged. The classification is how you decide when to propose a soft tissue graft for root coverage, and when not to.</p>
+<h5>Why treat recession</h5>
+<p>Exposed roots and lost tissue raise the likelihood of (1) <b>dentinal hypersensitivity</b>, (2) <b>soft tissue discomfort</b> (thin tissue with little keratinized gingiva can hurt to brush), (3) <b>root surface caries</b>, (4) <b>esthetic concerns</b>, (5) interference with adequate <b>mechanical plaque control</b>, and (6) greater susceptibility to inflammatory insult. And recession doesn't sit still: a systematic review (<b>Chambrone and Tatakis, 2016</b>) found that <b>untreated recession defects continue to progress</b>, the margin moving further apical. So "let's just monitor it" because it doesn't hurt, isn't sensitive and isn't in the esthetic zone doesn't mean it will stay the same. Apart from RT3, recession should be considered for treatment when indicated. (Restorative ways to treat recession are for next year's course; this session is about soft tissue grafting.)</p>
+<h5>Soft tissue grafts: where they come from</h5>
+<p>The two main sources in the US are the <b>patient's own tissue, an autograft</b>, and <b>donor tissue from a tissue bank, an allograft</b>; there are others (bovine, porcine). The most common graft comes from the <b>palate</b> (or the tuberosity), because the palate is <b>orthokeratinized</b>: its tissue "carries that information of keratinization with it" to the recipient site. <b>Palatal connective tissue induces epithelial differentiation and keratinization.</b> From the palate you take either a <b>free gingival graft (FGG)</b>, the <b>epithelium together with the lamina propria</b> (the connective tissue) under it in one piece, or a <b>subepithelial connective tissue graft (SCTG, or CTG)</b>, the <b>connective tissue without the epithelium</b>.</p>
+<p><b>The palate's layers</b>, from the surface in: the <b>epithelium</b> (0.3-0.6 mm, thin), the <b>lamina propria</b> (connective tissue, 1.25-3.0 mm, usually the thickest), the <b>submucosa</b> (adipose and glandular tissue), then bone. An epithelialized graft is thin at 0.5-0.8 mm, average at 0.9-1.4 mm and thick at 1.5-2.0 mm or more. A thick graft brings much of the fat layer with it, and that is usually removed so it doesn't slow the healing.</p>
+<p><b>The anatomy to stay away from</b> is the <b>greater palatine artery and nerve</b>, the neurovascular bundle. On the slide it runs about <b>7 mm</b> from the CEJ in a <b>shallow</b> palate, <b>12 mm</b> in an <b>average</b> palate and <b>17 mm</b> in a <b>high</b> palate. So a high, deep palatal vault gives the most room for error when harvesting (the exam-review guide's point). There are guidelines for which area to harvest from (premolar, molar) and how far up the palate to go.</p>
+<p><b>Two ways to harvest a CTG</b>: a <b>trap door</b>, elevating the epithelium and connective tissue together and then taking the connective tissue from under the epithelium; or harvesting the whole rectangle with its epithelium, like an FGG, and <b>removing the epithelium afterwards</b>. The exam-review guide puts it this way: sometimes an FGG is harvested but delivered as a CTG, because that is easier to harvest and heal.</p>
+<p><b>The rule for which graft:</b> if the graft will be <b>covered by a flap</b>, it must be <b>connective tissue only</b>. The inner side of the flap is connective tissue, and epithelium placed against it "just would not heal properly." If the graft will be <b>left exposed</b>, not covered by the flap, use an <b>FGG</b>, with its epithelium.</p>
+<h5>Root coverage with a CTG and a coronally advanced flap</h5>
+<p>His case: recession on #10 and #11 (part of a composite filling was removed first). A <b>trapezoidal flap</b>, raised <b>partial thickness</b> to keep some of the periosteum, exposed the roots; the graft size was planned (a template helps) and a CTG harvested from the palate, its epithelium removed. The graft was placed and sutured, then the flap was <b>advanced coronally over it</b>, <b>tension free</b>, so it holds its coronal position covering the recessions and the graft completely. At about four weeks the coverage was good, and coverage that looks like this early usually holds. The profile view shows the other gain: much thicker tissue over the roots, a thick phenotype "that by definition would resist much better" further recession. "We always do a <b>coronally advanced flap</b> if we're trying to cover the graft."</p>
+<h5>Many teeth: the acellular dermal matrix allograft</h5>
+<p>Treating many teeth from the palate means a large, invasive harvest. When you can avoid that, use a <b>soft tissue allograft</b>: donated human <b>dermis</b>, usually from cadavers, processed to remove the epidermis, the hair follicles and the existing cells. What is left, the <b>acellular dermal matrix (ADM, or ADMA; AlloDerm is one)</b>, is a matrix of <b>collagen, elastic and reticular fibers</b> with no cells. It wasn't designed for dentistry: it has been used since 1995 for burns, head and neck reconstruction, urology (bladder slings, pelvic floor reconstruction), orthopedics (rotator cuff repair, periosteal replacement) and hernia repair, and in dentistry since 1997, now in dental sizes. It is the most common soft tissue allograft (exam-review guide).</p>
+<p><b>Advantages</b> (slide): it <b>eliminates the need for a donor site</b>; <b>increases patient acceptance</b> (no surgery on the roof of the mouth); <b>decreases surgical time</b>; treats <b>multiple defects in one procedure</b> ("quote-unquote unlimited quantities"); achieves esthetic results comparable or superior to autogenous tissue; and is easy to use. <b>Disadvantages</b> (recording): it is "more or less a dead piece of skin" with nothing to contribute to the healing, "like a band-aid." So it must be <b>fully covered</b> by the flap, because it heals poorly left exposed without a blood supply. Over time it is remodeled and <b>replaced by the patient's own tissue</b> (histology shows this). In a more demanding site it can't give the same benefit as autogenous tissue; the exam-review guide's summary is that allografts don't work as well as autografts but have many advantages.</p>
+<p>His case: canine to canine, five or six teeth, with a combination of RT2 and RT3 recessions. The flap was a <b>tunnel (pouch)</b>: like an envelope flap but <b>without raising the papillae</b>, going into the sulcus of each tooth and connecting sulcus to sulcus into one plane under the tissue. The ADM went through two water baths, the second with <b>tetracycline</b>, was snaked into the tunnel over the roots, held with <b>sling sutures</b>, and the flap was advanced coronally to cover it completely. At six months, given the RT2 and RT3 start, the result was considered quite successful.</p>
+<h5>Lack of keratinized gingiva</h5>
+<p><b>Keratinized gingiva (KG)</b> runs from the <b>gingival margin to the MGJ</b>, and it can be thin or thick. Besides the color change (pink gingiva, redder mucosa), find the MGJ by <b>rolling the probe</b>, held horizontally, from the mucosa toward the margin: the loose, mobile mucosa rolls with it, and at the MGJ the tissue stops rolling. From there to the gingival margin is the <b>width of keratinized gingiva</b>. It can be measured on edentulous ridges too.</p>
+<p>On average (Lindhe's figure), the maxillary facial KG is widest at the incisors, narrowest at the canine and first premolar, and wider again toward the molars, and the mandible follows a similar pattern; on the mandibular lingual it is narrowest at the incisors and widens toward the molars. Patients vary.</p>
+<p><b>Is keratinized gingiva needed?</b> A zone of attached gingiva is, of and by itself, <b>not essential</b> for keeping periodontal health and attachment, <b>when dental plaque is controlled and there are no other traumatic factors</b> (Kennedy and colleagues, 1985; Scheyer and colleagues, the AAP Regeneration Workshop, 2015). <b>If plaque control is suboptimal, at least 2 mm of KG is needed to prevent attachment loss.</b> Many patients don't have optimal plaque control, so a tooth with <b>less than 2 mm of KG</b> is likely prone to recession. That doesn't mean every such tooth needs a graft: it is case by case. Not every patient lacking KG has recession, but lacking it predisposes to it, while a thick phenotype with a wide band of KG resists it.</p>
+<h5>Gaining keratinized gingiva: an FGG left exposed</h5>
+<p>His patient had an RT2 recession on a sensitive tooth with no KG: the site was a plaque trap, chronically irritating the margin and leading to more recession. The goal was to <b>change the quality of the tissue, creating a band of KG</b>; root coverage would be a bonus. A CTG under a coronally advanced flap wouldn't do it: covering the graft with the only tissue there, alveolar mucosa, gains no keratinized gingiva, because mucosa doesn't become keratinized just because it covers a graft. So he used a <b>free gingival graft</b> with an <b>apically positioned flap</b>: a trapezoidal flap (a horizontal incision and two vertical ones) placed apically, and an FGG from the palate, with its epithelium, <b>left exposed</b> so it heals into a band of KG, bringing its own determination to keratinize. Covering it with the flap would deny it that. The palate heals by <b>secondary intention</b>. The graft is held only by sutures, so patients are told not to pull the lip down to look at it every day, to keep a soft diet and not to brush the area while it heals. At three months there was a good band of KG where there had been none, blending with the neighboring tissue (bigger on the apical side), and partial root coverage, as expected for RT2. Her sensitivity was gone, the site was easier to clean and less of a plaque trap, and the phenotype was thicker and more protective.</p>
+<h5>The frenum and the vestibule</h5>
+<p>A <b>highly attached frenum</b> can be a critical factor in the progression of recession: with the lip and every muscle movement in the area (not only when someone pulls the lip), it pulls on the gingival margin, which facilitates plaque accumulation and adds to the recession. In one patient, pulling the lip pulled all the way to the margin of a central incisor with no KG. In another, the frenum stood in the way of the esthetic result while her crowns were being redone (the provisionals had closed the black triangle), so a <b>frenectomy</b> was done before the final restorations. It is a quick, easy procedure: dissect around the frenum, excise the tissue that forms it in a <b>diamond shape</b>, and close the diamond with a few sutures that extend into the lip. The classification lists decreased vestibular depth beside it, and the slides show both together.</p>
+<h5>Gingival excess (slides; the live session)</h5>
+<p>The slides give four etiologies of gingival excess, each with its treatment. <b>1. Pseudopocket</b>: gingivitis, the gingiva swollen coronally so the probing depth grows without attachment loss. Treatment: <b>improved oral hygiene measures and scaling</b>. <b>2. Gingival enlargement</b>: gingival diseases modified by medications, <b>phenytoin</b>, <b>calcium channel blockers</b> and <b>cyclosporine</b>. Treatment: <b>gingivectomy, improved oral hygiene and possibly a change of the contributing medication</b>. <b>3. Inconsistent gingival margins</b>: discrepant gingival margins of contralateral teeth, a gingival line discrepancy. Treatment: <b>gingivectomy or an apically positioned flap</b>. <b>4. Excessive gingival display</b>, a "gummy smile." Treatment: <b>gingivectomy or an apically positioned flap</b>, but first find its cause, because it has several.</p>
+<h5>Excessive gingival display: find the cause</h5>
+<p>The possible etiologies, each with the finding that points to it on the slides: <b>short clinical crowns</b> (altered passive eruption), with <b>abnormal tooth dimensions and proportions</b> and gingival line asymmetries; <b>vertical maxillary excess</b>, with an <b>increased lower facial third</b>; a <b>short upper lip</b>, with a <b>lip length under 20 mm</b>; a <b>hypermobile upper lip</b>, with <b>lip mobility over 8 mm</b>; or a <b>combination</b> of these.</p>
+<h5>Passive eruption and altered passive eruption</h5>
+<p>In <b>passive eruption</b> the gingival complex migrates in the apical direction, gradually exposing the crown, until the dentogingival junction settles in a final stable position at the cervical level (Alpiste-Illueca). In <b>altered passive eruption</b> it doesn't, and the teeth look short: the clinical crown is shorter than the anatomical crown. Coslet's classification reads it on two axes. <b>Type 1</b>: a <b>wider gingival dimension</b> from the free gingival margin to the MGJ, with the MGJ <b>apical to the alveolar crest</b>. <b>Type 2</b>: a <b>normal</b> dimension, with the MGJ <b>at the level of the CEJ</b>. <b>Subcategory A</b>: <b>more than 1 mm</b> between the CEJ and the osseous crest. <b>Subcategory B</b>: the osseous crest <b>in close proximity to the CEJ</b>. Types <b>1A and 1B are the most frequently encountered</b>.</p>
+<p>The treatment is <b>crown lengthening</b>, matched to the type: a <b>gingivectomy only in Type 1A</b>; an <b>apically positioned flap in Type 2A</b>; an <b>apically positioned flap plus osseous surgery in Types 1B and 2B</b>. The logic behind the rule: in a B type the bone itself sits too close to the CEJ, so the bone has to be moved, whatever the gingiva; in Type 2 the band of gingiva is only of normal width, so cutting gingiva away would cost keratinized gingiva, and the flap moves the band apically instead. Only Type 1A has both extra gingiva and room above the bone.</p>
+<h5>Crown lengthening: the pretreatment evaluation</h5>
+<p>Crown lengthening works on the difference between the <b>clinical crown</b>, what shows above the gingiva, and the <b>anatomical crown</b>, the enamel down to the CEJ. Before it, check the <b>clinical parameters</b>, probing depth, gingival health and the width of keratinized gingiva, and the <b>radiographic parameters</b>: the apical extent of any fracture or caries, root length and form, the level of the alveolar crest, and pulpal involvement (Abou-Arraj and Souccar, 2013).</p>
+<h5>The esthetic evaluation</h5>
+<p>His checklist on the slides. <b>Facial symmetry</b>: the facial thirds, and the facial midline against the dental midline; an increased lower facial third suggests vertical maxillary excess. <b>Smile line (lip line)</b>: high, medium or low. <b>Incisal line</b>: it should be consonant with the lower lip. <b>Upper lip</b>, height and mobility: <b>20-22 mm for women, 22-24 mm for men</b>, and <b>normal lip mobility is 6-8 mm</b>, measured with a caliper at rest and in a full smile. <b>Gingival line</b>: the <b>central incisors and canines at the same level</b>, and the <b>lateral incisors 1 mm coronal</b> to them. <b>Tooth shape, dimensions and proportions</b>: the <b>golden proportion</b>, which the slides show in nature, art and architecture. Seen from the front, the central incisor is about <b>1.618</b> times as wide as the lateral, and the lateral 1.618 times the visible part of the canine, so centrals, laterals and canines show at about <b>1.618 : 1 : 0.618</b> (the exam-review guide rounds it to 1.6, 1 and 0.6 for half the canine). On the slide a 9 mm central goes with a 5.56 mm lateral and 3.44 mm of canine.</p>
+<h5>Treating excessive gingival display</h5>
+<p>The slide's table: <b>altered passive eruption</b>, <b>crown lengthening and restorative therapy</b>; <b>vertical maxillary excess</b>, <b>orthodontics and orthognathic surgery, and periodontics may be required</b> to correct the gingival display; a <b>hypermobile upper lip</b>, <b>lip repositioning surgery or Botox</b> may reduce the display; a <b>short upper lip</b>, <b>no good options</b>. When several factors are present, a combination of therapies may be considered.</p>
+<h5>Patient 1</h5>
+<p>A healthy 28-year-old woman: "I don't like the color of my front teeth" (generalized fluorosis). She declined orthodontics and wanted veneers. The esthetic evaluation: <b>equal facial thirds</b>; the dental midline slightly to the right; a <b>high lip line at full smile</b>; <b>normal upper lip length and mobility</b>; canted gingival and incisal lines, the incisal line not consonant with the lower lip; flat gingival heights of contour on #8, 9 and 10, with the margins of #7 and #10 more apical than those of #6, 8 and 9, a discrepancy across all the anterior teeth; and <b>square</b> teeth #8, 9 and 10 (the centrals 8 mm wide and 8.5-9 mm high, the laterals 6 mm wide and 7.5-8 mm high). With normal facial thirds and a normal lip, the gummy smile came from the teeth and gingiva, short clinical crowns and an uneven gingival line, so the plan was crown lengthening, then the veneers. The photos follow her from the planned gingival line on the cast, through the surgery, to the veneers, with healing at 1 week, 3 weeks, 6 months and 18 months.</p>
+<h5>Abnormal color: the mucogingival tattoo</h5>
+<p>The last deformity in the classification (slides; the live session): a gray discoloration of the gingiva or mucosa, a mucogingival tattoo. The slides show one case: the stained tissue over an anterior bridge was removed, a graft harvested from the palate was sutured in its place, and the area was recontoured with a gingivoplasty 3 months after the grafting.</p>
 `;
 
 /* ---------- EXAM HINTS (mined from Lecture 1 transcript — explicit emphasis / de-emphasis) ---------- */
@@ -5067,6 +5564,21 @@ EXAM_HINTS.push(
   { lec:'antibiotics-host-mod', type:'emphasize', quote:"We give it at 20 milligrams, so a fifth of the dose, 20 milligrams. We give it twice a day.", takeaway:"Periostat (sub-antimicrobial doxycycline): 20 mg bid vs the antibiotic's 100 mg once a day. No antimicrobial activity, so no resistance and long-term use; inhibits collagenase from PMNs; the first FDA-approved systemic host modulator, an adjunct to SRP." },
   { lec:'antibiotics-host-mod', type:'emphasize', quote:"What causes this? Trauma.", takeaway:"BRONJ: scraping the necrotic bone is trauma, the very cause, so lesions grow. Bisphosphonates stay in the system for years; most complications are with high-dose IV. No bisphosphonate is approved for periodontal disease." },
   { lec:'antibiotics-host-mod', type:'deemphasize', quote:"Don't know the specific numbers from this one particular study, just know basically what it's saying here.", takeaway:"Caton 2000: SRP + Periostat beat SRP + placebo at 3, 6 and 9 months, statistically significant but by fractions of a millimeter. Know the point (is it clinically significant?), not the numbers." }
+);
+/* ---------- Session 9 exam hints, from Dr. Abou-Arraj's recorded lecture (posted Nov 9); the live class's part is still to come ---------- */
+EXAM_HINTS.push(
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"The key word here is inflammation is what's causing recession to actually happen. And all the lists of factors that I shared with you are mainly predisposing factors that are there to make this happen.", takeaway:"Inflammation causes recession, by either pathway (brushing trauma or plaque). Thin phenotype, brushing, dehiscences, orthodontics, margins, the frenum and smokeless tobacco only predispose." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"That classification should help you identify those different defects and be able to identify when or not should you propose a soft tissue graft.", takeaway:"Cairo: RT1 (no interproximal loss) about 100% coverage; RT2 (interproximal CAL less than or equal to buccal) partial, about 50-60%, up to the interproximal level; RT3 (interproximal greater) none." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"If you do a graft to achieve root coverage for recession type 3, you would not end up achieving that root coverage at all.", takeaway:"RT3 is the one type not to graft for root coverage; the other types should be considered for treatment when indicated." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"They found that those recessions do progress over time if left untreated.", takeaway:"Chambrone and Tatakis (2016): untreated recession progresses, so a recession that doesn't hurt still needs a decision." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"If your goal is to cover your graft with a flap, we want it to be only connective tissue graft. We don't want to put epithelium underneath the inner layer of the flap.", takeaway:"Covered graft = CTG (connective tissue only). Exposed graft = FGG (epithelium plus lamina propria)." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"We always do a coronally advanced flap if we're trying to cover the graft.", takeaway:"Root coverage with a CTG or an ADM: the flap is advanced coronally, tension free, over the graft." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"It's more or less like a band-aid. Therefore whenever we use these products we do our best to fully cover those grafts.", takeaway:"An acellular dermal matrix has no cells or blood supply: always fully covered; remodeled and replaced by the patient's tissue; best for many teeth at once." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"Those patients who have less than two millimeters of keratinized gingiva are likely prone to developing recession... but it is a case by case.", takeaway:"With good plaque control KG isn't essential; with suboptimal plaque control at least 2 mm is needed to prevent attachment loss." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"If I covered it with the flap, then I would deny it the ability to go ahead and turn into keratinized tissue.", takeaway:"To create KG, use an FGG left exposed with an apically positioned flap. A CTG covered by mucosa gains no KG." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"With thinner phenotype we can expect to have a predisposition for having soft tissue recession as opposed to thicker phenotypes which tend to be more resistant.", takeaway:"Probe visible through the tissue = thin (1 mm or less), prone to recession; not visible = thick (more than 1 mm)." },
+  { lec:'perio-plastic-esthetics', type:'emphasize', quote:"Toothbrushing seems to be the most common one.", takeaway:"Of the traumatic factors (brushing, flossing, habits, foreign objects, caustic medicaments), toothbrushing is the most common." },
+  { lec:'perio-plastic-esthetics', type:'deemphasize', quote:"There are different ways to treat recessions that may be restorative, but we'll talk about that in next year's course.", takeaway:"Restorative treatment of recession is next year's course; this session tests soft tissue grafting." }
 );
 
 
@@ -5458,10 +5970,68 @@ READINGS_PLAIN['antibiotics-host-mod'] = `
 `;
 
 READINGS_PLAIN['perio-plastic-esthetics'] = `
-<p>This session hasn't been lectured yet. These notes come only from the class exam-review guide.</p>
-<p>Recession gets more common with age and shows up most on the cheek side of upper molars and lower front teeth. It's graded with the same RT1/RT2/RT3 system from Session 1, because that grade decides whether covering the root is worth trying. Gum grafts come from two places. <b>From the patient's own palate</b>: a connective tissue graft (<b>CTG</b>, no surface layer, tucked under a flap) or a free gingival graft (<b>FGG</b>, surface layer plus connective tissue, left uncovered). <b>From a donor</b>: most often acellular dermal matrix (<b>ADM</b>), which works a little less well than the patient's own tissue but spares them a second wound. A high, deep palate leaves the most room for error when harvesting, and clinicians sometimes take a thick, FGG-type piece on purpose and use it as a CTG, because a thicker piece is easier to cut and heals well tucked under a flap.</p>
-<p>Too much gum is treated according to its cause. A <b>pseudopocket</b> (deep only because the gum is swollen) needs better hygiene and a cleaning. <b>Drug-induced overgrowth</b> needs the extra gum cut away (gingivectomy), better hygiene, and a talk with the physician about the medication. <b>Uneven gum lines</b> or a <b>gummy smile</b> call for a gingivectomy or an apically positioned flap (moving the gum down to a lower position). <b>Altered passive eruption</b> (gum that never moved back down after the teeth came in) is read two ways: how much gum there is (Type 1: a wide band, with the gum-lining border below the bone crest; Type 2: normal width, border at the CEJ) and how close the bone sits to the CEJ (Subcategory A: more than 1 mm away; B: right up close). Only Type 1A gets a gingivectomy alone and only Type 2A an apically positioned flap alone. Both B types need the flap plus bone reshaping, because the bone itself is the problem.</p>
-<p>For looks: a longer-than-usual lower third of the face suggests the upper jaw grew too far down (vertical maxillary excess). The upper lip at rest is about 20-22 mm in women and 22-24 mm in men and lifts about 6-8 mm in a full smile. The lateral incisor's gum edge sits about 1 mm lower than a line through the central incisor and canine gum edges. Tooth widths step down from about 1.6 units (central) to 1 unit (lateral) to 0.6 units (the visible half of the canine). Treatments: altered passive eruption gets crown lengthening plus restorations; vertical maxillary excess gets braces, jaw surgery, or gum surgery depending on severity; an overly mobile lip gets Botox or lip-repositioning surgery; and a lip that is simply short has no reliably good fix.</p>
+<p>Dr. Abou-Arraj taught this in two parts. He recorded the first part (posted Nov 9): gum thickness, receding gums and how they're grafted, missing firm gum, and the frenum. The last two problems, <b>too much gum</b> and <b>gum discoloration</b>, he covers in a live class the week of Nov 9. Until that class is posted, those parts come from his slides and the class exam-review guide.</p>
+<h5>The tissues</h5>
+<p>The <b>mucogingival junction (MGJ)</b> is the line between the firm, pink <b>gum (gingiva)</b> and the loose, redder <b>lining of the mouth (alveolar mucosa)</b>. You can often see it, but a probe finds it best. All the gum above that line is <b>keratinized gingiva</b>, the tough kind. Part of it is <b>stuck down</b> to the tooth and bone (attached gingiva); the edge is <b>free</b> (free gingiva), and that's where the probe slips in to measure pocket depth.</p>
+<h5>Gum and lining problems</h5>
+<p>Periodontal plastic therapy fixes <b>mucogingival deformities</b>: anything abnormal about the amount, size, outline or shape of the soft tissue around teeth. The current classification (the 2017 World Workshop) lists seven: (1) <b>gum thickness and shape</b> (the phenotype); (2) <b>receding gums</b> (recession); (3) <b>not enough firm gum</b> (lack of keratinized gingiva); (4) <b>a shallow vestibule</b>; (5) <b>a frenum or muscle attached too high</b>; (6) <b>too much gum</b> (gingival excess); and (7) <b>discolored gum</b> (a tattoo).</p>
+<h5>Thin or thick gums</h5>
+<p>The phenotype is how <b>thick</b> the gum is (thin or thick) and how its edge is <b>shaped</b> (scalloped or flat). To test thickness, put the probe in the pocket. If you <b>can see the probe through the gum</b>, it's <b>thin, 1 mm or less</b>. If you <b>can't</b>, it's <b>thick, more than 1 mm</b>.</p>
+<p>It matters because <b>thin gum recedes more easily</b>, and recession on thin gum tends to get worse; thick gum resists it. His example: a young patient with gum so thin you could see the roots was about to get braces. Braces plus years of brushing could make his gums recede, so before the braces the gum was made thicker: a flap was lifted, a piece of <b>connective tissue from the palate</b> was stitched over the two front teeth most at risk, and the flap was laid back over it. Two weeks later the gum was already thicker, and he went ahead with braces.</p>
+<h5>Receding gums: what and who</h5>
+<p><b>Recession</b> means the gum edge has moved <b>below the CEJ</b> (where the enamel ends), so some root shows. Measure it from the <b>gum edge to the CEJ</b> at the same six spots as pocket depth. Check <b>between the teeth</b> too, because recession there changes what treatment can do.</p>
+<p>It's very common. The slide: <b>88% of people 65 and over and 50% of people 18 to 64</b> have at least one spot. In the recording: over half of Americans 30 and older have at least 1 mm, and almost a quarter have at least one spot of 3 mm or more. Older people have more because they've <b>piled up more risk factors over the years</b>, not because of age itself. It's more common in <b>men</b> and in <b>African-Americans</b>, and most common on the <b>cheek side of upper molars (especially first molars) and lower front teeth</b>; canines are common too.</p>
+<h5>What sets it up</h5>
+<p>The slide's list of ten: gum disease (periodontitis); injury (brushing, flossing, picking, objects); bone variations (a window or a gap in the bone over the root) and teeth out of line; not enough firm gum; thin gum; braces; past gum surgery; a frenum or muscle attached high; filling and crown edges; and chewing tobacco. What he added:</p>
+<p><b>Gum disease</b> means periodontitis, not gingivitis: losing bone and attachment uncovers the root. <b>Past gum surgery</b>: resective surgery causes most of its recession on purpose, to leave no pockets, so the patient can keep the area clean. <b>Brushing</b> is the most common injury: hard bristles, or simply brushing too hard. Flossing habits, picking, objects like a fingernail or pen, and harsh medicines put right on the gum count too.</p>
+<p><b>Bone variations.</b> A <b>fenestration</b> is a window in the bone over the root; a <b>dehiscence</b> is missing bone from the top edge down. A tooth that sits <b>out toward the cheek</b> has thinner gum and gets hit harder by the brush. Moving it back into line with braces can undo some recession without a graft. Thin gum plus missing bone plus hard brushing is "the perfect storm."</p>
+<p><b>Braces</b> that push teeth out of their bone over thin gum can cause recession, though some studies disagree; he calls it controversial. <b>Crown and filling edges</b> placed under the gum, poorly fitting, or too bulky on thin gum can cause it (not that every crown needs a graft). <b>A high frenum</b> tugs on the gum edge with every movement. <b>Chewing tobacco</b>, held in one spot, usually the lower back teeth, can cause severe recession right there; his worst case had recession down to the bottom of the vestibule, with no pockets.</p>
+<h5>How it happens</h5>
+<p>Two ways. <b>Brushing injury</b>, especially on thin gum: the surface is scraped, the tissue underneath gets inflamed, a small sore forms, and with more injury the gum edge pulls back. <b>Plaque</b>: the same process as periodontitis, plaque left in the pocket causing attachment loss, just in one small spot on thin gum. Either way, his key word is <b>inflammation</b>: it's what actually causes recession. Everything on the list just sets it up.</p>
+<h5>The Cairo grades: how much root can be covered?</h5>
+<p>Before suggesting a graft, grade the recession, because the grade predicts the result. The <b>Cairo</b> system has three:</p>
+<p><b>RT1</b>: <b>no attachment lost between the teeth</b>; you can't find the CEJ between the teeth. The best case: about <b>100% of the root can be covered</b>.</p>
+<p><b>RT2</b>: <b>some attachment lost between the teeth</b>, but <b>no more than on the front of the tooth</b> (the attachment loss between the teeth is less than or equal to the loss on the cheek side). You can see the CEJ between the teeth. Expect <b>partial coverage</b>, about <b>50 to 60%</b> in his examples: only up to the level of the attachment between the teeth, because there's nothing there to hold the gum higher and no blood supply for it.</p>
+<p><b>RT3</b>: <b>more attachment lost between the teeth than on the front</b>. A graft won't cover the root at all, so don't try for coverage.</p>
+<h5>Why treat it</h5>
+<p>Exposed roots and lost tissue make these more likely: (1) <b>sensitive teeth</b>, (2) <b>sore gums</b> (thin gum can hurt to brush), (3) <b>root cavities</b>, (4) <b>looks</b>, (5) <b>harder cleaning</b>, and (6) the gum <b>inflames more easily</b>. And it keeps going: a 2016 review (Chambrone and Tatakis) found <b>untreated recession keeps getting worse</b>. So "it doesn't hurt, let's just watch it" doesn't mean it will stay the same. Except for RT3, consider treating it when there's a reason to. (Fixing recession with fillings is next year's course.)</p>
+<h5>Gum grafts: where they come from</h5>
+<p>Two main sources: the <b>patient's own tissue (an autograft)</b> and <b>donor tissue from a tissue bank (an allograft)</b>. Animal sources exist too. The most common graft comes from the <b>palate</b>, because palate tissue is the tough, keratinized kind, and its connective tissue <b>teaches the new site to grow tough gum</b>. Two kinds come from the palate: a <b>free gingival graft (FGG)</b>, the <b>surface layer plus the connective tissue</b> in one piece; and a <b>connective tissue graft (CTG)</b>, <b>only the connective tissue</b>, no surface layer.</p>
+<p><b>The palate's layers</b>, from the surface down: a thin <b>surface layer</b> (0.3-0.6 mm), the thick <b>connective tissue</b> (1.25-3 mm), then <b>fat and glands</b>, then bone. A thick graft brings fat along, and that's trimmed off so it doesn't slow healing.</p>
+<p><b>Stay away from the big artery and nerve</b> of the palate (the greater palatine). On the slide it sits about <b>7 mm</b> from the CEJ in a <b>shallow palate</b>, <b>12 mm</b> in an <b>average</b> one and <b>17 mm</b> in a <b>high</b> one. So a <b>high, deep palate gives the most room for error</b>.</p>
+<p>A CTG can be taken two ways: open a <b>trap door</b> and take the connective tissue from underneath, or cut out the whole piece with its surface layer and <b>peel the surface layer off after</b>. The exam-review guide's version: sometimes an FGG is cut but used as a CTG, because that's easier.</p>
+<p><b>The rule:</b> if a flap will <b>cover the graft</b>, use <b>connective tissue only</b>, because surface layer pressed against the flap's underside won't heal. If the graft will be <b>left uncovered</b>, use an <b>FGG</b>.</p>
+<h5>Covering a root: CTG under a flap pulled up</h5>
+<p>His case: recession on #10 and #11. He lifted a flap, took a CTG from the palate, stitched it over the roots, and pulled the flap <b>up over it</b> (a <b>coronally advanced flap</b>), with no tension so it stays put. Four weeks later the roots were well covered, and the gum over them was much thicker, which resists more recession. His rule: <b>"We always do a coronally advanced flap if we're trying to cover the graft."</b></p>
+<h5>Many teeth: donor skin</h5>
+<p>Grafting many teeth from the palate means a big, painful harvest. Instead, use an <b>allograft</b>: donated human <b>skin (dermis)</b>, cleaned of its surface layer, hair follicles and cells, leaving a <b>framework of collagen, elastic and reticular fibers</b>. This is <b>acellular dermal matrix (ADM)</b>, the most common donor graft (AlloDerm is one). It was made for burns and reconstructions (since 1995) and used in dentistry since 1997.</p>
+<p><b>Pros</b>: <b>no second wound</b> on the palate, patients accept it more, <b>shorter surgery</b>, <b>many teeth at once</b>, good-looking results, easy to use. <b>Cons</b>: it's "more or less a dead piece of skin," like a band-aid, with nothing alive to help healing. So it must be <b>completely covered</b> by the flap; over time the body replaces it with its own tissue. In a tough site it can't match the patient's own tissue (the guide: it doesn't work as well as an autograft, but has many advantages).</p>
+<p>His case: five or six teeth, canine to canine, with RT2 and RT3 recession. He used a <b>tunnel flap</b>: like an envelope, but <b>without lifting the gum between the teeth</b>, joining the pockets of all the teeth into one tunnel under the gum. The ADM was soaked in two baths (the second with the antibiotic <b>tetracycline</b>), slid into the tunnel, held with sling stitches, and covered by pulling the flap up. Six months later it was a good result for that starting point.</p>
+<h5>Not enough firm gum</h5>
+<p><b>Keratinized gingiva (KG)</b> is measured from the <b>gum edge to the MGJ</b>. To find the MGJ, look for the color change, or <b>roll the probe</b> up from the loose lining: the lining rolls with it, and where it stops rolling is the MGJ.</p>
+<p>On average the upper front teeth have the most, the canine and first premolar the least, and the molars more again; the lower arch is similar, and on the tongue side of the lower jaw the front teeth have the least.</p>
+<p><b>Do you need it?</b> With <b>good plaque control and no other injury</b>, a band of attached gum <b>isn't essential</b> for healthy gums. But <b>if plaque control isn't great, at least 2 mm of KG is needed</b> to prevent attachment loss. Many patients don't clean perfectly, so a tooth with <b>under 2 mm</b> is likely to recede. Still, it's case by case: not every such tooth needs a graft.</p>
+<h5>Growing firm gum: an FGG left uncovered</h5>
+<p>His patient had RT2 recession, a sensitive tooth and no firm gum, so the spot trapped plaque and kept receding. The goal was <b>a band of firm gum</b>, with any root coverage a bonus. A CTG under a flap wouldn't help: the only tissue to cover it with was loose lining, and lining doesn't turn into firm gum by covering a graft. So he did an <b>FGG</b>: the flap was moved <b>down</b> (an <b>apically positioned flap</b>), and a graft with its surface layer was stitched on and <b>left uncovered</b>, so it heals into firm gum. The palate wound heals on its own (<b>secondary intention</b>). The graft is held only by stitches, so the patient shouldn't pull the lip to look at it, should eat soft food and shouldn't brush there while it heals. Three months later: a good band of firm gum, some root coverage (as expected for RT2), no more sensitivity, and a spot that's easier to clean.</p>
+<h5>The frenum</h5>
+<p>A <b>frenum attached too high</b> pulls on the gum edge every time the lip and face move, which traps plaque and makes recession worse. In one patient it was in the way of her new crowns looking good, so it was removed before the final crowns (a <b>frenectomy</b>): cut out the frenum in a <b>diamond shape</b> and close it with a few stitches into the lip.</p>
+<h5>Too much gum (slides; the live class)</h5>
+<p>Four causes, each with its fix. <b>1. Pseudopocket</b>: swollen gums from gingivitis make the pocket deeper without any attachment loss. Fix: <b>better home care and a cleaning</b>. <b>2. Overgrowth from a drug</b>: <b>phenytoin</b> (a seizure drug), <b>calcium channel blockers</b> (blood pressure drugs) and <b>cyclosporine</b>. Fix: <b>cut away the extra gum (gingivectomy)</b>, better home care, and maybe <b>change the drug</b>. <b>3. Uneven gum lines</b> between matching teeth. Fix: <b>gingivectomy or an apically positioned flap</b>. <b>4. A gummy smile</b>. Fix: <b>gingivectomy or an apically positioned flap</b>, once you know the cause.</p>
+<h5>Gummy smile: find the cause</h5>
+<p>Each cause has a sign on the slides: <b>short teeth</b> (altered passive eruption), with <b>odd tooth sizes and proportions</b> and uneven gum lines; <b>an upper jaw grown too far down</b> (vertical maxillary excess), with a <b>long lower third of the face</b>; <b>a short upper lip</b>, <b>under 20 mm</b>; <b>a lip that lifts too far</b>, <b>more than 8 mm</b>; or a mix.</p>
+<h5>Gum that never moved down</h5>
+<p>Normally, after a tooth comes in, the gum slowly <b>moves down</b> to uncover the crown and settles near the CEJ (<b>passive eruption</b>). In <b>altered passive eruption</b> it doesn't, so teeth look short. It's graded two ways. <b>Type 1</b>: a <b>wide band of gum</b>, with the MGJ <b>below the bone edge</b>. <b>Type 2</b>: a <b>normal band</b>, with the MGJ <b>at the CEJ</b>. <b>A</b>: the bone is <b>more than 1 mm</b> below the CEJ. <b>B</b>: the bone is <b>right up near the CEJ</b>. Types <b>1A and 1B</b> are the most common.</p>
+<p>The fix is <b>crown lengthening</b>: <b>1A, cut away gum (gingivectomy)</b>; <b>2A, move the gum down with a flap</b> (apically positioned flap); <b>1B and 2B, the flap plus bone reshaping</b>. Why: in a B type the bone is too close, so it has to be moved; in Type 2 the gum band is only normal width, so cutting it away would leave too little firm gum, and the flap moves it down instead. Only 1A has extra gum and room above the bone.</p>
+<h5>Before crown lengthening</h5>
+<p>The <b>clinical crown</b> is what shows above the gum; the <b>anatomical crown</b> is all the enamel, down to the CEJ. Check the <b>pocket depths, gum health and width of firm gum</b>, and on the radiograph <b>how deep any fracture or decay goes, the root's length and shape, where the bone is, and whether the nerve is involved</b>.</p>
+<h5>Checking the smile</h5>
+<p>His checklist: <b>face symmetry</b> (the face in thirds; the face's midline against the teeth's midline; a long lower third means the upper jaw grew too far down); <b>smile line</b> (high, medium or low); <b>edges of the front teeth</b> (they should follow the lower lip); <b>upper lip</b> (<b>20-22 mm in women, 22-24 mm in men</b>, and it normally lifts <b>6-8 mm</b> in a full smile); <b>gum line</b> (the <b>central incisors and canines level</b>, the <b>lateral incisors 1 mm lower</b>, toward the biting edge); and <b>tooth shape and proportions</b>: the <b>golden proportion</b>, so from the front the central, lateral and the visible part of the canine show at about <b>1.618 : 1 : 0.618</b> (the guide rounds it to 1.6, 1 and 0.6).</p>
+<h5>Treating a gummy smile</h5>
+<p>By cause: <b>short teeth</b> (altered passive eruption): <b>crown lengthening and restorations</b>; <b>upper jaw too long</b>: <b>braces and jaw surgery</b>, maybe with gum surgery too; <b>lip that lifts too far</b>: <b>lip repositioning surgery or Botox</b>; <b>short upper lip</b>: <b>no good options</b>. If there are several causes, combine treatments.</p>
+<h5>Patient 1</h5>
+<p>A healthy 28-year-old woman who didn't like the color of her front teeth (fluorosis), didn't want braces and wanted veneers. Her face thirds were equal and her lip was normal in length and movement, but she had a <b>high smile line</b>, an uneven, tilted gum line and <b>short, square front teeth</b>. So her gummy smile came from the teeth and gums, not the jaw or lip, and the plan was <b>crown lengthening, then veneers</b>. The photos follow her healing out to 18 months.</p>
+<h5>Discolored gum</h5>
+<p>The last problem on the list: a gray stain in the gum, a <b>tattoo</b>. The slides show one case where the stained tissue was cut out, replaced with a graft from the palate and reshaped 3 months later.</p>
 `;
 
 var MINDMAPS = {
@@ -6575,44 +7145,75 @@ var MINDMAPS = {
   "label": "Periodontal Plastic & Esthetics",
   "children": [
    {
-    "label": "Recession & RT grading",
+    "label": "Recession",
     "children": [
      {
-      "label": "Most common: buccal of max. molars, mand. incisors"
+      "label": "Thin phenotype (1 mm or less, probe shows) is predisposed"
      },
      {
-      "label": "Increases with age"
+      "label": "Factors: periodontitis, trauma (brushing most common), anatomy, ortho, frenum, margins, smokeless tobacco"
      },
      {
-      "label": "RT1/RT2/RT3 decides if coverage is worth attempting"
+      "label": "Two pathways, one key word: inflammation"
+     },
+     {
+      "label": "Untreated recession progresses (Chambrone and Tatakis 2016)"
      }
     ]
    },
    {
-    "label": "Soft-tissue grafting",
+    "label": "Cairo RT grading",
     "children": [
      {
-      "label": "CTG: connective tissue only, covered by flap"
+      "label": "RT1: no interproximal loss, ~100% coverage"
      },
      {
-      "label": "FGG: epithelium + CT, left exposed"
+      "label": "RT2: interproximal loss less than buccal, partial (~50-60%)"
      },
      {
-      "label": "Allograft (acellular dermal matrix): spares 2nd site"
-     },
-     {
-      "label": "Deep palatal vault = most harvest room"
+      "label": "RT3: interproximal loss more than buccal, no coverage"
      }
     ]
    },
    {
-    "label": "Gingival excess & treatment",
+    "label": "Grafts, and which one when",
+    "children": [
+     {
+      "label": "Covered by a flap: CTG, under a coronally advanced flap"
+     },
+     {
+      "label": "Left exposed: FGG, to create keratinized gingiva"
+     },
+     {
+      "label": "ADM: allograft, no donor site, must be fully covered"
+     },
+     {
+      "label": "Palate: greater palatine 7 / 12 / 17 mm; a high vault gives the most room"
+     }
+    ]
+   },
+   {
+    "label": "Keratinized gingiva and frenum",
+    "children": [
+     {
+      "label": "Not essential with good plaque control"
+     },
+     {
+      "label": "Under 2 mm with poor plaque control: at risk"
+     },
+     {
+      "label": "Frenectomy: diamond-shaped excision"
+     }
+    ]
+   },
+   {
+    "label": "Gingival excess (slides)",
     "children": [
      {
       "label": "Pseudopocket: hygiene + scaling"
      },
      {
-      "label": "Drug-induced: gingivectomy + hygiene + med discussion"
+      "label": "Drugs (phenytoin, CCBs, cyclosporine): gingivectomy, maybe change the drug"
      },
      {
       "label": "Excess display: gingivectomy or apically positioned flap"
@@ -6620,36 +7221,39 @@ var MINDMAPS = {
     ]
    },
    {
-    "label": "Altered passive eruption",
+    "label": "Altered passive eruption (slides)",
     "children": [
      {
-      "label": "Type 1 (wide, MGJ apical) vs. Type 2 (normal, MGJ at CEJ)"
+      "label": "Type 1 (wide, MGJ apical to crest) vs. Type 2 (normal, MGJ at CEJ)"
      },
      {
-      "label": "Subcat A (crest >1mm away) vs. B (crest close)"
+      "label": "Subcat A (crest more than 1 mm from CEJ) vs. B (crest close)"
      },
      {
-      "label": "1A: gingivectomy alone; 2A: apically positioned flap alone"
+      "label": "1A: gingivectomy; 2A: apically positioned flap"
      },
      {
-      "label": "Both B: need flap + osseous surgery (bone is limiting)"
+      "label": "Both B: flap + osseous surgery (bone is limiting)"
      }
     ]
    },
    {
-    "label": "Esthetic proportions",
+    "label": "Esthetic evaluation (slides)",
     "children": [
      {
-      "label": "Increased lower-face third → vertical maxillary excess"
+      "label": "Increased lower face third: vertical maxillary excess"
      },
      {
-      "label": "Upper lip at rest: ~20-22mm (F), ~22-24mm (M)"
+      "label": "Upper lip at rest 20-22 mm (F), 22-24 mm (M); mobility 6-8 mm"
      },
      {
-      "label": "Lateral incisor margin ~1mm coronal to central/canine line"
+      "label": "Lateral incisor margin 1 mm coronal to central and canine"
      },
      {
-      "label": "Width ratio: central 1.6 : lateral 1 : canine 0.6"
+      "label": "Golden proportion 1.618 : 1 : 0.618"
+     },
+     {
+      "label": "Hypermobile lip: lip repositioning or Botox"
      }
     ]
    }
@@ -7181,9 +7785,12 @@ var REF_SECTIONS = [
   { id:'abx-doses', lec:'antibiotics-host-mod', title:'His dosing chart ("I would know this for the exam")', body:function(){ return tableWrap(['Regimen','Usual adult dose','Length','Children'], rowsOf(DOSE_CHART,['name','dose','len','kids'])) + '<p class="note">Where the drug slides differ, know both: clindamycin 150-300 mg tid × 7 days, doxycycline 100 mg once a day, Augmentin written as 500 or 875 mg (clavulanate 125 mg).</p>'; } },
   { id:'abx-figs', lec:'antibiotics-host-mod', title:'Diagrams: biofilms, antibiotic targets and host modulation', body:function(){ return '<p class="note" style="margin-top:0">Why a biofilm beats antibiotics (barrier, β-lactamase, slowed growth, and after SRP), where each antibiotic acts on the bacterium, and where SRP, NSAIDs, bisphosphonates and Periostat break the host-response cycle.</p>' + ['biofilm','targets','hostmod'].map(function(k){ return '<div class="lec-fig-card">' + ANIMA.html(k) + '</div>'; }).join(''); } },
   { id:'local-host', lec:'antibiotics-host-mod', title:'Local delivery and host modulation', body:function(){ return tableWrap(['Local delivery agent','Contains','Notes'], rowsOf(LOCAL_DELIVERY,['name','content','note'])) + ulOf(LOCAL_INDIC) + tableWrap(['Host modulation','Notes'], rowsOf(HOST_MOD,['name','note'])); } },
-  { id:'grafts', lec:'perio-plastic-esthetics', title:'Grafts and gingival excess', body:function(){ return tableWrap(['Graft','Origin','Notes'], rowsOf(GRAFTS,['name','origin','note'])) + ulOf(GRAFT_PEARLS) + tableWrap(['Cause of excess','Treatment'], rowsOf(GINGIVAL_EXCESS_TX,['cause','tx'])); } },
-  { id:'ape', lec:'perio-plastic-esthetics', title:'Altered passive eruption', body:function(){ return tableWrap(['Class','Definition'], rowsOf(APE_TABLE,['cls','def'])) + tableWrap(['Presentation','Treatment'], rowsOf(APE_TX,['cls','tx'])); } },
-  { id:'esthetics', lec:'perio-plastic-esthetics', title:'Esthetic norms and treatments', body:function(){ return tableWrap(['Parameter','Norm'], rowsOf(ESTHETIC_NORMS,['param','note'])) + tableWrap(['Esthetic problem','Treatment'], rowsOf(ESTHETIC_TX,['problem','tx'])); } }
+  { id:'s9-recession', lec:'perio-plastic-esthetics', title:'Recession: what predisposes, how it develops, why treat', body:function(){ return tableWrap(['Predisposing factor','What he said'], rowsOf(RECESSION_FACTORS,['factor','note'])) + ulOf(RECESSION_WHY_TREAT); } },
+  { id:'grafts', lec:'perio-plastic-esthetics', title:'Grafts, and which one when', body:function(){ return tableWrap(['Graft','Origin','Notes'], rowsOf(GRAFTS,['name','origin','note'])) + ulOf(GRAFT_PEARLS); } },
+  { id:'s9-kg', lec:'perio-plastic-esthetics', title:'Keratinized gingiva and the frenum', body:function(){ return ulOf(KG_POINTS); } },
+  { id:'s9-excess', lec:'perio-plastic-esthetics', title:'Gingival excess (slides)', body:function(){ return tableWrap(['Cause of excess','Treatment'], rowsOf(GINGIVAL_EXCESS_TX,['cause','tx'])); } },
+  { id:'ape', lec:'perio-plastic-esthetics', title:'Altered passive eruption and crown lengthening (slides)', body:function(){ return tableWrap(['Class','Definition'], rowsOf(APE_TABLE,['cls','def'])) + tableWrap(['Presentation','Treatment'], rowsOf(APE_TX,['cls','tx'])) + ulOf(CL_EVAL); } },
+  { id:'esthetics', lec:'perio-plastic-esthetics', title:'Esthetic evaluation and excessive gingival display (slides)', body:function(){ return tableWrap(['Parameter','Norm'], rowsOf(ESTHETIC_NORMS,['param','note'])) + tableWrap(['Cause of the gummy smile','Treatment'], rowsOf(ESTHETIC_TX,['problem','tx'])); } }
 ];
 
 var REVIEW = { lec:'all', q:'', hide:false };
@@ -7270,7 +7877,7 @@ var CRAM_CONTENT = [
   { lec:'periodontal-regeneration', points:["Regeneration = new bone + new cementum + new PDL over a pathologically exposed root. Long junctional epithelium = repair", "Four factors: cells, scaffolds, growth factors, blood supply", "Best candidate: >3 mm deep, radiographic angle ≤25°, more walls (3-wall best). Deeper + narrower + more walls = more CAL and bone gain", "Non-supportive (1-wall) anatomy = failure risk. 1-wall + thin scalloped biotype = more midfacial recession", "Toolbox: bone grafts (DFDBA = allograft), GTR membrane, combination (graft holds the space), EMD, PDGF, MIST", "EMD = amelogenins, outcomes ~ GTR. rhPDGF-BB = chemotactic/mitogenic/angiogenic. β-TCP = osteoconductive scaffold", "Decision tree: fix the patient first (systemic, tobacco, hygiene). <3 mm defect: no regeneration. 3-wall/circumferential <2 mm wide: graft, membrane or biologic. Wide or 2-wall: reinforced membrane, graft + membrane or graft + biologic. 1-wall: combination. High esthetic risk: avoid the membrane", "Risk assessment: smoking ≤10/day medium, >10 high; FMPS ≤15% low, ≥25% high; contained = 1-2 sides of the root", "OFD baseline: PD ~7 → 4 mm, CAL gain ~1.5 mm, bone gain ~1 mm (rest is recession)", "Only histology proves regeneration; subtraction radiography shows change between two standardized films"] },
   { lec:'implants-perio', points:["Survival = present and loaded (complications allowed); success = no complications", "Albrektsson 1986: immobile, no radiolucency, no pain/infection/paresthesia, ≤1.5 mm bone loss at 1 year; then <0.2 mm a year", "Health: no BOP/suppuration on gentle probing, no PD increase vs previous exams (no 3 mm cutoff), no bone loss beyond remodeling", "~2 mm crestal remodeling in year 1 = physiologic; beyond it = pathologic", "Mucositis = gingivitis of implants: profuse bleeding/suppuration, deeper PD from swelling, no bone loss, reversible", "Peri-implantitis = plaque-associated inflammation + progressive bone loss beyond remodeling. No decontamination method is superior", "Meffert: ailing (static, monitor) / failing (progressive + inflamed, not mobile) / failed (mobile: remove; osseointegration can't be regained)", "Primary cause: plaque biofilm. Pre-implant flora decides peri-implant flora; pellicle in 30 min; pathogens persist a year after extractions", "Untreated periodontitis = contraindication; treated, arrested, compliant = OK. Treat perio first, no immediate implants during disease control", "Smoking: 11.3% vs 4.76% failure (Bain & Moy), dose-response (Alsaadi), peri-implantitis 23.5% vs 16.5% (Simonis). Diabetes: HbA1c, not duration", "Risk assessment: before placement, during osseointegration, in maintenance, after removal", "BOP at ~0.25 N: absence = stability; 4/4 visits 30% → 0/4 1.5%. Radiographs: baseline at the final restoration, 6-monthly in year 1, then yearly; confirmatory, not exploratory"] },
   { lec:'antibiotics-host-mod', points:["Bacteria and plaque cause it; antibiotics only for acute infection with systemic signs, aggressive and refractory periodontitis", "Never monotherapy: always an adjunct, given after SRP", "Biofilm: barrier, β-lactamase, slow growth; survives 500-1000× systemic levels; must be scrubbed off", "Bactericidal needs dividing cells: never pair static + cidal (amoxicillin + metronidazole = both cidal)", "Amoxicillin 500 mg po tid × 7 = 21 tabs; cell wall; β-lactamase-sensitive. Augmentin adds clavulanate (125 mg), more GI upset and cost", "True allergy = hives or trouble breathing. PCN-allergic and unsure about cephalosporins: no cephalosporin (10% cross). Next: clindamycin (not with colitis: C. diff)", "Tetracycline: 30S, static, A.a., no dairy/antacids, stains (<8 y, pregnancy), sun. Doxy 100 qd, mino 100 bid", "Macrolides: 50S, static; erythromycin not recommended; Z-Pak 500 then 250 × 4, away from food; clarithromycin pregnancy C; raise digoxin", "Metronidazole: obligate anaerobes, DNA, cidal; ANUG; orange-red urine, no alcohol; raises warfarin. Cipro: DNA gyrase, anaerobes resistant, 1 h before / 2 h after meals, with metronidazole", "Warfarin: prescribe, but tell the physician. All antibiotics: weaker oral contraceptives, C. diff, GI upset (yogurt, Diflucan)", "Local delivery after SRP, for one breaking-down site in a stable maintenance patient: PerioChip 2.5 mg CHX (peak 2 h), Atridox 10% doxy (7 days no brushing/flossing/eating), Arestin 1 mg mino (14 days; no brushing 12 h, no flossing 10 days)", "Know the dosing chart: Augmentin 250-500 tid × 10 d; amox 375 + metro 250 tid × 7 d (not under 16); clinda 150-300 qid × 10 d; doxy 100 bid day 1 then 100/day × 10-14 d; metro 250 tid-qid × 10 d; mino 200 bid day 1 then 100 bid × 10-14 d; tetracycline 250 qid × 14-21 d", "Bacteria = the key, host response = the engine: required, not sufficient; not autoimmune; vicious cycle", "Complement calls PMNs + histamine (edema); neutrophils 24-48 h, then macrophages; IL-1 = osteoclast activating factor → osteoclasts, collagenase, PGE2, MMPs", "NSAIDs block PGE2 (daily for years; GI, bleeding). Bisphosphonates: BRONJ (scraping = trauma = cause; high-dose IV), none approved. Periostat 20 mg bid (a fifth of 100 mg) inhibits collagenase, no resistance; small gains (Caton 2000). Step lightly"] },
-  { lec:'perio-plastic-esthetics', points:['Recession is most common on the buccal of maxillary molars and mandibular incisors','CTG = no epithelium, covered by a flap. FGG = epithelium + CT, left exposed. ADM = most common allograft','Type 1A → gingivectomy. Type 2A → APF. Both "B" subcategories → APF + osseous surgery','Tooth width ratio ≈ 1.6 : 1 : 0.6 (central : lateral : half-canine)'] }
+  { lec:'perio-plastic-esthetics', points:['Recession: a thin phenotype (1 mm or less, the probe shows through) is predisposed; the key word is inflammation, from brushing trauma or plaque','Cairo: RT1 (no interproximal loss) ~100% coverage; RT2 (interproximal loss less than buccal) partial; RT3 (more than buccal) don\'t graft for coverage','Covered by a flap = CTG only (no epithelium), under a coronally advanced flap. Left exposed = FGG, which creates keratinized gingiva','ADM = the most common allograft: no donor site, many teeth at once, must be fully covered; not as good as an autograft in demanding sites','Keratinized gingiva isn\'t essential with good plaque control; under 2 mm with poor plaque control is at risk. Untreated recession progresses','Palate: greater palatine artery ~7 / 12 / 17 mm from the CEJ in a shallow / average / high vault','APE: Type 1A = gingivectomy; Type 2A = apically positioned flap; both B = flap + osseous surgery','Upper lip 20-22 mm (F), 22-24 mm (M), mobility 6-8 mm; lateral margin 1 mm coronal; golden proportion 1.618 : 1 : 0.618'] }
 ];
 
 var COMPENDIUM_VIEWS = [
@@ -8111,7 +8718,11 @@ var PERIO_TERMS = [
   { w:'BOTOX', c:'One fix for a hypermobile upper lip', lec:'perio-plastic-esthetics' },
   { w:'ALLOGRAFT', c:'ADM is the most common one', lec:'perio-plastic-esthetics' },
   { w:'BIOTYPE', c:'A thin, scalloped one predicts a worse regenerative outcome', lec:'perio-plastic-esthetics' },
-  { w:'PAPILLA', c:'Interdental tissue a ___-sparing flap keeps intact', lec:'perio-plastic-esthetics' }
+  { w:'PAPILLA', c:'Interdental tissue a ___-sparing flap keeps intact', lec:'perio-plastic-esthetics' },
+  { w:'FRENECTOMY', c:'Excising a high frenum in a diamond shape', lec:'perio-plastic-esthetics' },
+  { w:'DEHISCENCE', c:'Facial bone missing from the crest, which predisposes to recession', lec:'perio-plastic-esthetics' },
+  { w:'PHENOTYPE', c:'Thin (1 mm or less) or thick; the thin one is predisposed to recession', lec:'perio-plastic-esthetics' },
+  { w:'PALATINE', c:'Greater ___ artery: 7, 12 or 17 mm from the CEJ', lec:'perio-plastic-esthetics' }
 ];
 
 /* ====================================================================
