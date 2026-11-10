@@ -810,17 +810,24 @@
     ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
     ".tp-hitarea:hover,.tp-hitarea:focus-visible{fill:rgba(255,255,255,.2);stroke:#fff;stroke-dasharray:4 4}.tp-hitarea.on{stroke:#fff;stroke-width:2.6;stroke-dasharray:5 4;fill:rgba(255,255,255,.16)}",
     ".tp-hithome.on,.tp-hithome:hover,.tp-hithome:focus-visible{fill:rgba(255,255,255,.08)}",
-    ".tp-bubble{position:absolute;left:50%;top:10px;max-width:min(84%,420px);transform:translate(-50%,-6px);background:var(--surface,#fff);color:var(--text,#3B2E3A);border:2px solid #3B2E3A;border-radius:14px;",
-    "padding:7px 12px;font:inherit;font-size:14px;font-weight:650;line-height:1.35;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;text-align:center}",
-    ".tp-bubble.on{opacity:1;transform:translate(-50%,0)}.tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
-    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}}"
+    /* the speech bubble comes from Timmy: it sits over his head, its tail points at him, and it follows him as he hops */
+    ".tp-bubble{position:absolute;left:0;top:0;width:max-content;max-width:min(72%,300px);transform:translateY(5px) scale(.96);transform-origin:var(--tail,50%) 100%;background:#fff;color:#3B2E3A;border:2px solid #3B2E3A;border-radius:14px;",
+    "padding:6px 11px;font:inherit;font-size:13.5px;font-weight:650;line-height:1.35;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;text-align:center;z-index:2}",
+    ".tp-bubble.on{opacity:1;transform:none}",
+    ".tp-bubble::before,.tp-bubble::after{content:'';position:absolute;left:var(--tail,50%);top:100%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #3B2E3A}",
+    ".tp-bubble::after{border-left-width:5px;border-right-width:5px;border-top:7px solid #fff;margin-top:-.5px}",
+    ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}",
+    ".tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
+    /* Timmy waves with his right arm (the same move as the pet's do-wave) */
+    ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out 6 alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(-58deg)}}",
+    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}.tp-timmy.do-wave .shpet-arm-r{animation:none}}"
   ].join("\n");
   var ST = { at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, tg: null, tw: null, face: null, depth: null, sr: null, wander: 0, lastTap: 0, layout: null, visible: true };
   function buildPlace(opt){
     opt = opt || {};
     var host = $("#tpStage"); if (!host.shadowRoot) host.attachShadow({ mode: "open" });
     var sr = host.shadowRoot, still = isStill(), o = tpOpts({ marks: PS.mode === "customize" }), L = TP.layout(o), vb = TP.VIEWBOX;
-    cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null;
+    cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null; ST.bub = null;
     if (!L.spots[ST.at]) ST.at = "door";
     o.timmy = { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: ST.at };
     var r = TP.render(o);
@@ -834,7 +841,7 @@
     ST.sr = sr; ST.layout = L; ST.depth = $(".tp-depth", sr); ST.tg = $(".tp-timmy", sr); ST.tw = ST.tg && ST.tg.parentNode; ST.face = ST.tg && $(".tp-tface", ST.tg);
     ST.pos = L.spots[ST.at].slice(); setTimmy(ST.pos, 0, 1, 1);
     if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy");
-      ST.tg.addEventListener("click", function(e){ e.stopPropagation(); flip(); }); keyed(ST.tg, flip); }
+      ST.tg.addEventListener("click", function(e){ e.stopPropagation(); tapTimmy(); }); keyed(ST.tg, tapTimmy); }
     $$(".tp-egg", sr).forEach(function(g){
       var k = g.dataset.egg, e = TP.EGGS[k] || TP.EGGS.home;
       g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-label", e.n + ": " + e.does);
@@ -863,7 +870,16 @@
   }
   function say(text){
     var b = ST.sr && $(".tp-bubble", ST.sr); if (!b || !text) return;
-    b.textContent = text; b.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(function(){ b.classList.remove("on"); }, 3200);
+    b.textContent = text; b.classList.toggle("small", b.parentNode.clientWidth < 440); ST.bub = { el: b, w: b.offsetWidth, h: b.offsetHeight }; bubbleAt();
+    b.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(function(){ b.classList.remove("on"); ST.bub = null; }, 3200);
+  }
+  /* put the bubble over Timmy's head (under him when there's no room above), kept inside the picture, its tail on him */
+  function bubbleAt(){
+    var u = ST.bub; if (!u || !ST.pos) return;
+    var box = u.el.parentNode, W = box.clientWidth, H = box.clientHeight, vb = TP.VIEWBOX, q = TP.project(ST.pos[0], ST.pos[1], ST.pos[2] || 0);
+    var x = (q[0] - vb[0]) / vb[2] * W, head = (q[1] - (PS.outfit ? 60 : 50) - vb[1]) / vb[3] * H, feet = (q[1] + 4 - vb[1]) / vb[3] * H;
+    var left = Math.max(6, Math.min(W - u.w - 6, x - u.w / 2)), below = head - u.h - 11 < 4, top = below ? feet + 11 : head - u.h - 11;
+    u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
   }
   function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
   function playEgg(g){
@@ -898,6 +914,7 @@
     var z = p[0] + p[1] + .3, c = ST.depth.firstChild;
     while (c && (c === ST.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
     if (c !== ST.tw.nextSibling) ST.depth.insertBefore(ST.tw, c);
+    if (ST.bub) { var keep = ST.pos; ST.pos = p; bubbleAt(); ST.pos = keep; }
   }
   function lerp(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t]; }
   function goTo(spot){
@@ -935,6 +952,16 @@
     ST.raf = requestAnimationFrame(frame);
   }
   function hopInPlace(){ if (isStill() || ST.busy || !ST.pos) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos]); }
+  /* Timmy waves hello when he's tapped (and now and then by himself); tap him again while he's waving and he flips */
+  var HELLOS = ["Hi! Good to see you.", "Hello! Come on in.", "Hey there! Nice day for it.", "Oh, hi! I was just thinking about flossing."];
+  function wave(quiet){
+    if (!ST.tg) return;
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(HELLOS[(wave.n = (wave.n || 0) + 1) % HELLOS.length]); }
+    if (isStill()) return;
+    ST.tg.classList.remove("do-wave"); void ST.tg.getBoundingClientRect(); ST.tg.classList.add("do-wave"); ST.waveAt = Date.now();
+    clearTimeout(wave.t); wave.t = setTimeout(function(){ if (ST.tg) ST.tg.classList.remove("do-wave"); }, 2400);
+  }
+  function tapTimmy(){ ST.lastTap = Date.now(); if (Date.now() - (ST.waveAt || 0) < 2400 && !isStill()) { ST.waveAt = 0; if (ST.tg) ST.tg.classList.remove("do-wave"); flip(); } else wave(); }
   function flip(quiet){
     if (quiet !== true) { PS.found.timmy = 1; found(); say(TP.EGGS.timmy.say); }
     if (isStill() || ST.busy || !ST.pos) return;
@@ -954,6 +981,7 @@
     if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ ST.visible = es[0].isIntersecting; }).observe(host);
     ST.wander = setInterval(function(){
       if (isStill() || PS.mode !== "play" || ST.busy || !ST.visible || document.hidden || Date.now() - ST.lastTap < 6000 || !ST.layout) return;
+      if (Math.random() < .34) { wave(true); return; }
       var keys = Object.keys(ST.layout.spots).filter(function(k){ return k !== ST.at; });
       if (keys.length) goTo(keys[Math.floor(Math.random() * keys.length)]);
     }, 5200);

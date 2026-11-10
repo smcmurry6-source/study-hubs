@@ -2047,7 +2047,7 @@ export function placeKit(INK, C){
     campfire: { n: "The campfire", does: "sparks fly up", say: "No marshmallows. Just stories." },
     hotspring: { n: "The hot spring", does: "bubbles", say: "Ahh. Warm water, sensitive teeth: careful." },
     telescope: { n: "The telescope", does: "finds a star", say: "Found one! Calling it Molar Major." },
-    timmy: { n: "Timmy", does: "a flip", say: "Wheee!" }
+    timmy: { n: "Timmy", does: "waves hello; tap him again and he flips", say: "Wheee!" }
   };
   var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
     home: "tp-pop 1.8s", statue: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
