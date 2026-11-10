@@ -421,68 +421,70 @@ r-h1-tf-1 retired
 r-h1-tf-2 retired
 r-h1-tf-3
 r-h1-tf-4 retired
-dc-classes
-dc-2s-class
-dc-tf-endo-nerv
+# dc-*: Dr. Taylor's Lecture A, taken out of Exam 2 on 2026-11-10 (Dr. Herr left it off; likely on Exam 3). The Exam 3 hub
+# carries it with its own registry: vault/tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md
+dc-classes retired
+dc-2s-class retired
+dc-tf-endo-nerv retired
 dc-pit-match retired
-dc-adh
+dc-adh retired
 dc-2s-pit retired
 dc-tsh retired
-dc-acro
+dc-acro retired
 dc-macro retired
-dc-hyperthy-except
+dc-hyperthy-except retired
 dc-2s-thy retired
-dc-tf-hypo-epi
-dc-thy-num
+dc-tf-hypo-epi retired
+dc-thy-num retired
 dc-storm-num retired
 dc-c1-lab retired
-dc-c1-epi
+dc-c1-epi retired
 dc-c1-oral retired
 dc-c1-storm retired
 dc-storm-case retired
-dc-storm-vs-hypo
+dc-storm-vs-hypo retired
 dc-hypo-child retired
 dc-ca-except retired
-dc-2s-ca
-dc-tf-vitd
+dc-2s-ca retired
+dc-tf-vitd retired
 dc-tf-calcitonin retired
 dc-ca-seq retired
 dc-hpt-except retired
 dc-c5-gland retired
-dc-c5-mech
-dc-tf-hypopara
+dc-c5-mech retired
+dc-tf-hypopara retired
 dc-hormone-match retired
-dc-tf-medulla
+dc-tf-medulla retired
 dc-2s-adr retired
-dc-medulla-dental
-dc-c3-pig
-dc-c3-trigger
-dc-c3-crisis
+dc-medulla-dental retired
+dc-c3-pig retired
+dc-c3-trigger retired
+dc-c3-crisis retired
 dc-addison-seq retired
-dc-tf-addison-pig
+dc-tf-addison-pig retired
 dc-cushing retired
-dc-glucagon
+dc-glucagon retired
 dc-tf-insulin retired
-dc-dm-types
+dc-dm-types retired
 dc-2s-dm retired
-dc-dm-oral-except
-dc-tf-perio
+dc-dm-oral-except retired
+dc-tf-perio retired
 dc-perio-mech retired
-dc-dm-mgmt-num
-dc-tf-morning
+dc-dm-mgmt-num retired
+dc-tf-morning retired
 dc-hypo-signs retired
 dc-2s-ff retired
 dc-c2-organ retired
 dc-c2-before retired
-dc-c2-heal
-dc-c4-what
-dc-c4-do
+dc-c2-heal retired
+dc-c4-what retired
+dc-c4-do retired
 dc-c4-unc retired
-dc-c4-prevent
-dc-preg
+dc-c4-prevent retired
+dc-preg retired
 dc-repro-num retired
-dc-tf-puberty
-dc-meno
+dc-tf-puberty retired
+dc-meno retired
 mh-lobules retired
 mh-wall
 mh-tf-temp retired
@@ -747,27 +749,27 @@ r-ca-oc-rec
 r-ca-calcitonin
 r-ca-hpt
 r-ca-r-stones
-dc-growth-plates
-dc-implant-growth
-dc-2s-acro
-dc-rln
-dc-tf-hypo-common
-dc-storm-911
-dc-lamina-dura
-dc-2s-brown
-dc-tf-steroid
-dc-stress-dose
-dc-tf-t2
-dc-metformin-skip
-dc-a1c-num
-dc-tf-glucose60
-dc-tf-farxiga
-dc-salivary-sugar
-dc-cgm
-dc-glp1-slow
-dc-glucose-sucrose
-dc-rescue-num
-dc-pack-years
+dc-growth-plates retired
+dc-implant-growth retired
+dc-2s-acro retired
+dc-rln retired
+dc-tf-hypo-common retired
+dc-storm-911 retired
+dc-lamina-dura retired
+dc-2s-brown retired
+dc-tf-steroid retired
+dc-stress-dose retired
+dc-tf-t2 retired
+dc-metformin-skip retired
+dc-a1c-num retired
+dc-tf-glucose60 retired
+dc-tf-farxiga retired
+dc-salivary-sugar retired
+dc-cgm retired
+dc-glp1-slow retired
+dc-glucose-sucrose retired
+dc-rescue-num retired
+dc-pack-years retired
 dc-2s-preg retired
 mh-tf-tunica
 mh-fig-seq
@@ -819,10 +821,10 @@ p1-wf-hypopit
 p2-ws-pheo
 p2-wf-nb
 p2-wf-aldo
-dc-ws-calcium
-dc-ws-thyroid
-dc-wf-addison
-dc-wf-dmmouth
+dc-ws-calcium retired
+dc-ws-thyroid retired
+dc-wf-addison retired
+dc-wf-dmmouth retired
 mh-ws-spg
 mh-wf-testis
 mh-wf-vas

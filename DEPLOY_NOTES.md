@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Heme & Endo Exam 2: Dr. Taylor's Lecture A out, saved for Exam 3, Claude Code)** — Sam asked Dr. Herr:
+  he forgot Lecture A when he wrote Exam 2, so it will likely be on the next exam ("i guess save all that for exam 3").
+  A came out of the hub whole: its notes at both levels and both mp3s, 58 questions (`dc-*`, retired in the hub's
+  registry), 15 Exam Hints, its Review group and three side-by-side tables, cram lines, 3 sequences, 1 sort set and 11
+  High Likelihood topics. The mock's 45 new questions now come from L11-L16 (A's 5 went one each to L12a and L13-L16).
+  The exam facts on Home say A isn't on Exam 2, and the timeline marks it for Exam 3. A mock started before the change
+  drops A's questions instead of counting them unanswered. Everything A had waits in
+  `vault/tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md` (from commit `43ece52`) for the Exam 3 hub.
 - **2026-11-10 (Heme & Endo Exam 2: the two-Sertoli-cell figure, Claude Code)** — Report #38 and Sam's "Draw the figure":
   the hub's own unlabeled version of Dr. Herr's L13 drawing he said is on the exam (`tools/figures/heme-endo-exam2/sertoli.mjs`),
   laid out like his slide (Sam's screenshot, matched and not committed): his ten labels numbered in scrambled order and the
