@@ -15,7 +15,10 @@
 --      Link my devices (sh_xp_rebuild) replays it all;
 --   4. the 63-step ladder (three journeys: Handpiece, ModuPro, Loupes), the rank profile, boards and leaderboards with it;
 --   5. Shiny Gold Crowns (worked out from XP), the shop catalog and its rotation, buy_item, equip_item, the inventory,
---      HP from snacks and floss, the rare-costume log;
+--      HP from snacks and floss, the rare-costume log; and since 2026-11-10 (Sam's third round,
+--      vault/tasks/2026-11-10-redesign-timmys-place-round-3.md): a full set for every season, on sale in its window
+--      (sh_shop_seasons), Halloween's set as everyone's gift, a set earned at every full rank-up, two throwback days a
+--      month, and visiting someone's place from the boards (get_place, set_visiting);
 --   6. the idea board (ideas, votes, reports, statuses with Inbox notes);
 --   7. the bootstrap with all of it.
 --
@@ -854,19 +857,50 @@ begin
 end;
 $$;
 
+-- Visiting (Sam, 2026-11-10: "Its on by default and you visit from the boards"). The boards never give out a visitor id,
+-- so every row of the four boards below carries a visit key instead (`visit`): an opaque digest of the person's id with a
+-- secret only the server holds. get_place(key) opens that person's place; someone who turned visiting off has no key
+-- (null), on every board. The secret is one random value made when this migration runs; nobody but the functions here
+-- can read it, so a key can't be worked out from an id, or an id from a key.
+create table if not exists public.visit_secret (
+  id boolean primary key default true check (id),
+  secret text not null
+);
+insert into public.visit_secret (id, secret)
+  values (true, replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '')) on conflict (id) do nothing;
+
+-- who turned visiting off (a row = off; no row = on, the default)
+create table if not exists public.pet_visit_off (
+  visitor_id text primary key,
+  set_at timestamptz not null default now()
+);
+
+-- a person's visit key: 24 hex characters, the same every time. Private: only the functions in this file call it.
+create or replace function public.sh_visit_key(p_visitor text)
+returns text language sql stable security definer set search_path = public as $$
+  select left(encode(sha256(convert_to(s.secret || ':' || p_visitor, 'UTF8')), 'hex'), 24) from visit_secret s where s.id;
+$$;
+
+-- what a board row carries: the key, or null for someone who turned visiting off
+create or replace function public.sh_visit_link(p_visitor text)
+returns text language sql stable security definer set search_path = public as $$
+  select case when p_visitor is null or exists (select 1 from pet_visit_off o where o.visitor_id = p_visitor) then null
+              else sh_visit_key(p_visitor) end;
+$$;
+
 create or replace function public.get_rank_board_v2(p_visitor text default null, p_limit integer default 10)
-returns table(rnk bigint, display_name text, xp integer, journey integer, tier integer, level integer, step integer, is_me boolean, flair text)
+returns table(rnk bigint, display_name text, xp integer, journey integer, tier integer, level integer, step integer, is_me boolean, flair text, visit text)
 language sql stable security definer set search_path = public as $$
   with r as (select v.visitor_id, v.xp, rank() over (order by v.xp desc) as rnk from xp_visitors v),
   top as (select * from r where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor))
   select t.rnk, coalesce(vn.display_name, anon_name(t.visitor_id)), t.xp, k.journey, k.tier, k.level, k.step,
-    (p_visitor is not null and t.visitor_id = p_visitor), sh_mastery_flair(t.visitor_id)
+    (p_visitor is not null and t.visitor_id = p_visitor), sh_mastery_flair(t.visitor_id), sh_visit_link(t.visitor_id)
   from top t left join visitor_names vn on vn.visitor_id = t.visitor_id cross join lateral sh_rank(t.xp) k
   order by t.rnk;
 $$;
 
 create or replace function public.get_leaderboard_v2(p_limit integer default 10)
-returns table(display_name text, streak integer, total_answered integer, journey integer, tier integer, level integer, step integer, flair text)
+returns table(display_name text, streak integer, total_answered integer, journey integer, tier integer, level integer, step integer, flair text, visit text)
 language plpgsql stable security definer set search_path = public as $$
 begin
   return query
@@ -885,14 +919,14 @@ begin
     limit greatest(1, least(coalesce(p_limit, 10), 50))
   )
   select coalesce(vn.display_name, anon_name(t.visitor_id)), t.streak::int, t.total_answered::int,
-    k.journey, k.tier, k.level, k.step, sh_mastery_flair(t.visitor_id)
+    k.journey, k.tier, k.level, k.step, sh_mastery_flair(t.visitor_id), sh_visit_link(t.visitor_id)
   from top t left join visitor_names vn on vn.visitor_id = t.visitor_id cross join lateral sh_rank(t.xp) k
   order by t.streak desc, t.total_answered desc;
 end;
 $$;
 
 create or replace function public.get_correct_streak_stats_v2()
-returns table(kind text, display_name text, streak integer, journey integer, tier integer, level integer, step integer, flair text)
+returns table(kind text, display_name text, streak integer, journey integer, tier integer, level integer, step integer, flair text, visit text)
 language plpgsql stable security definer set search_path = public as $$
 begin
   return query
@@ -903,7 +937,8 @@ begin
     (select 'record'::text, s.visitor_id, s.best_streak, 2
        from correct_streaks s where s.best_streak > 0 order by s.best_streak desc limit 1)
   )
-  select t.k, coalesce(vn.display_name, anon_name(t.visitor_id)), t.n, k.journey, k.tier, k.level, k.step, sh_mastery_flair(t.visitor_id)
+  select t.k, coalesce(vn.display_name, anon_name(t.visitor_id)), t.n, k.journey, k.tier, k.level, k.step, sh_mastery_flair(t.visitor_id),
+    sh_visit_link(t.visitor_id)
   from top t left join visitor_names vn on vn.visitor_id = t.visitor_id
   left join xp_visitors v on v.visitor_id = t.visitor_id cross join lateral sh_rank(coalesce(v.xp, 0)) k
   order by t.ord;
@@ -911,7 +946,7 @@ end;
 $$;
 
 create or replace function public.get_arcade_leaderboard_v2(p_hub text, p_game text, p_visitor text default null, p_limit integer default 10)
-returns table(rnk bigint, display_name text, best integer, plays bigint, is_me boolean, journey integer, tier integer, level integer, step integer, flair text)
+returns table(rnk bigint, display_name text, best integer, plays bigint, is_me boolean, journey integer, tier integer, level integer, step integer, flair text, visit text)
 language plpgsql stable security definer set search_path = public as $$
 begin
   return query
@@ -922,12 +957,50 @@ begin
     select b.visitor_id, b.best, b.plays, rank() over (order by b.best desc) as rnk from best b
   )
   select r.rnk, coalesce(vn.display_name, anon_name(r.visitor_id)), r.best, r.plays,
-    (p_visitor is not null and r.visitor_id = p_visitor), k.journey, k.tier, k.level, k.step, sh_mastery_flair(r.visitor_id)
+    (p_visitor is not null and r.visitor_id = p_visitor), k.journey, k.tier, k.level, k.step, sh_mastery_flair(r.visitor_id),
+    sh_visit_link(r.visitor_id)
   from ranked r
   left join visitor_names vn on vn.visitor_id = r.visitor_id
   left join xp_visitors v on v.visitor_id = r.visitor_id cross join lateral sh_rank(coalesce(v.xp, 0)) k
   where r.rnk <= greatest(1, least(coalesce(p_limit, 10), 50)) or (p_visitor is not null and r.visitor_id = p_visitor)
   order by r.rnk, r.best desc;
+end;
+$$;
+
+-- visiting on (the default) or off, the visitor's own choice. Off: no key on any board, and get_place gives nothing
+create or replace function public.set_visiting(p_visitor text, p_on boolean)
+returns jsonb language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_on is null then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+  if p_on then delete from pet_visit_off where visitor_id = p_visitor;
+  else insert into pet_visit_off (visitor_id) values (p_visitor) on conflict (visitor_id) do nothing;
+  end if;
+  return jsonb_build_object('ok', true, 'visiting', p_on);
+end;
+$$;
+
+-- someone's place, opened with the visit key from a board row. Only what a place shows: the leaderboard name exactly as
+-- the boards show it, what stands in each slot (the home, the scene, the five yard spots, the upgrades and paint, the
+-- outfit), the rank (journey, tier, level) and the mastery flair the boards already show. Never the visitor id, XP as a
+-- number, HP, snacks, the streak, answers, the wallet, the inventory, or any date or time. An unknown key, or someone
+-- who turned visiting off (an old key included), gives null. The search covers everyone a board can list.
+create or replace function public.get_place(p_key text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare v text; k record;
+begin
+  if p_key is null or p_key !~ '^[0-9a-f]{24}$' then return null; end if;
+  select z.visitor_id into v from (
+    select x.visitor_id from xp_visitors x
+    union select c.visitor_id from correct_streaks c
+    union select a.visitor_id from arcade_scores a
+  ) z where sh_visit_key(z.visitor_id) = p_key limit 1;
+  if v is null or exists (select 1 from pet_visit_off o where o.visitor_id = v) then return null; end if;
+  select * into k from sh_rank(coalesce((select x.xp from xp_visitors x where x.visitor_id = v), 0));
+  return jsonb_build_object(
+    'name', coalesce((select vn.display_name from visitor_names vn where vn.visitor_id = v), anon_name(v)),
+    'equipped', coalesce((select jsonb_object_agg(e.slot, e.item_id) from pet_equipped e where e.visitor_id = v), '{}'::jsonb),
+    'rank', jsonb_build_object('journey', k.journey, 'tier', k.tier, 'level', k.level),
+    'flair', sh_mastery_flair(v));
 end;
 $$;
 
@@ -944,15 +1017,21 @@ $$;
 -- ====================================================================== 5. Shiny Gold Crowns and Timmy's shop
 -- The catalog. kind: outfit (Timmy wears one at a time), costume (a rare costume: on sale to someone who has spotted it),
 -- home, scene, yard (one of the five yard spots), upgrade (its own slot on the home), snack (HP at once), boost (double XP).
--- Prices follow the rarity's band. season: on sale only then (a holiday id from sh_season, or 'fall'). wide: a yard item
--- that takes two spots (the bowling lane: the side yard and the front corner; tools/figures/site/place.mjs draws it).
+-- Prices follow the rarity's band. season: one of a season's set, on sale only in that season's window (sh_shop_seasons),
+-- and now and then on a throwback day. wide: a yard item that takes two spots (the bowling lane: the side yard and the
+-- front corner; tools/figures/site/place.mjs draws it).
+-- gift: everyone owns it from the start, with no row in pet_inventory (Sam, 2026-11-10: "only Halloween 2026's set is free
+-- for everyone"); it is never sold. rank_tier: one of a rank set (Sam: "timmy outfit and a decoration only. Do rank only"),
+-- owned by everyone whose rank has reached that tier (sh_rank's gtier: 1 Antique ... 6 Dark Matter of the Handpiece, 7-13
+-- the ModuPro, 14-20 the Loupes); earned, never sold, so its price is 0 and it is on no shelf.
 create table if not exists public.shop_items (
   id text primary key check (id ~ '^[a-z0-9][a-z0-9-]{0,39}$'),
   name text not null,
   kind text not null check (kind in ('outfit', 'costume', 'home', 'scene', 'yard', 'upgrade', 'snack', 'boost')),
   rarity text not null check (rarity in ('common', 'uncommon', 'rare', 'epic', 'legendary')),
   price integer not null,
-  season text check (season in ('halloween', 'thanksgiving', 'winter', 'newyear', 'valentine', 'dentist', 'stpatrick', 'easter', 'fall')),
+  season text check (season in ('halloween', 'thanksgiving', 'winter', 'newyear', 'mardigras', 'valentine', 'toothfairy', 'dentist',
+    'stpatrick', 'easter', 'spring', 'july4', 'summer', 'fall')),
   slot text check (slot in ('windows', 'porch', 'chimney', 'flag', 'paint')),
   hp integer check (hp between 1 and 50),
   boost_minutes integer check (boost_minutes between 15 and 720),
@@ -962,9 +1041,14 @@ create table if not exists public.shop_items (
   active boolean not null default true,
   sort integer not null default 0,
   wide boolean not null default false,
-  check ((rarity = 'common' and price between 100 and 200) or (rarity = 'uncommon' and price between 250 and 500)
+  gift boolean not null default false,           -- everyone owns it (Halloween 2026's set)
+  rank_tier smallint check (rank_tier between 1 and 20),   -- owned from this global tier on (a rank set)
+  check ((rank_tier is not null and price = 0) or (rank_tier is null and (
+         (rarity = 'common' and price between 100 and 200) or (rarity = 'uncommon' and price between 250 and 500)
       or (rarity = 'rare' and price between 600 and 1200) or (rarity = 'epic' and price between 1500 and 3000)
-      or (rarity = 'legendary' and price between 4000 and 8000)),
+      or (rarity = 'legendary' and price between 4000 and 8000)))),
+  check (rank_tier is null or (kind in ('outfit', 'yard') and season is null and not gift and not shelf and not rotates)),
+  check (not gift or kind not in ('snack', 'boost')),
   check ((kind = 'upgrade') = (slot is not null)),
   check ((kind = 'snack') = (hp is not null)),
   check ((kind = 'boost') = (boost_minutes is not null and boost_mult is not null)),
@@ -1014,11 +1098,23 @@ create table if not exists public.costume_log (
   primary key (visitor_id, costume)
 );
 
--- the holidays and the fall weeks by Central date, in step with holidayId() and isFall() in widget/pet.js
+-- Easter Sunday of a year (the Gregorian computus), for sh_season and sh_shop_seasons
+create or replace function public.sh_easter(p_year integer)
+returns date language plpgsql immutable set search_path = public as $$
+declare y int := p_year; a int; b int; c int; dd int; e int; ff int; g int; h int; i int; k int; l int; mm int;
+begin
+  a := y % 19; b := y / 100; c := y % 100; dd := b / 4; e := b % 4; ff := (b + 8) / 25; g := (b - ff + 1) / 3;
+  h := (19 * a + b - dd - g + 15) % 30; i := c / 4; k := c % 4; l := (32 + 2 * e + 2 * i - h - k) % 7; mm := (a + 11 * h + 22 * l) / 451;
+  return make_date(y, (h + l - 7 * mm + 114) / 31, ((h + l - 7 * mm + 114) % 31) + 1);
+end;
+$$;
+
+-- the holidays and the fall weeks by Central date, in step with holidayId() and isFall() in widget/pet.js: the days Timmy
+-- dresses up by himself. (When a season's set is on sale is sh_shop_seasons, below: longer for the short holidays.)
 create or replace function public.sh_season(p_day date)
 returns text language plpgsql immutable set search_path = public as $$
 declare y int := extract(year from p_day); m int := extract(month from p_day); x int := m * 100 + extract(day from p_day)::int;
-  f date; tg_end date; a int; b int; c int; dd int; e int; ff int; g int; h int; i int; k int; l int; mm int; easter date;
+  f date; tg_end date; easter date;
 begin
   if x between 1001 and 1031 then return 'halloween'; end if;
   f := make_date(y, 11, 1);
@@ -1029,9 +1125,7 @@ begin
   if x between 210 and 214 then return 'valentine'; end if;
   if x = 306 then return 'dentist'; end if;
   if x between 314 and 317 then return 'stpatrick'; end if;
-  a := y % 19; b := y / 100; c := y % 100; dd := b / 4; e := b % 4; ff := (b + 8) / 25; g := (b - ff + 1) / 3;
-  h := (19 * a + b - dd - g + 15) % 30; i := c / 4; k := c % 4; l := (32 + 2 * e + 2 * i - h - k) % 7; mm := (a + 11 * h + 22 * l) / 451;
-  easter := make_date(y, (h + l - 7 * mm + 114) / 31, ((h + l - 7 * mm + 114) % 31) + 1);
+  easter := sh_easter(y);
   if p_day between easter - 6 and easter + 1 then return 'easter'; end if;
   return null;
 end;
@@ -1041,32 +1135,114 @@ returns boolean language sql immutable set search_path = public as $$
   select (extract(month from p_day) * 100 + extract(day from p_day)) between 922 and 1130;
 $$;
 
+-- every season whose set is on sale on a Central date (Sam, 2026-11-10); several can be on at once, the holidays first.
+--   halloween Oct 1-31; thanksgiving Nov 1 to the day after the fourth Thursday; winter from the day after that to Dec 26
+--   (these three as sh_season has them);
+--   the short holidays for the 7 days ending on their last day: newyear Dec 27 - Jan 2, valentine Feb 8-14, toothfairy
+--   Feb 22-28, dentist the 7 days ending Mar 6, stpatrick Mar 11-17, july4 Jun 28 - Jul 4, mardigras the 7 days ending on
+--   Fat Tuesday (47 days before Easter);
+--   easter from 6 days before Easter to the day after (as sh_season);
+--   spring Mar 20 - May 31, summer Jun 1 - Sep 21, fall Sep 22 - Nov 30 (sh_is_fall).
+create or replace function public.sh_shop_seasons(p_day date)
+returns text[] language plpgsql immutable set search_path = public as $$
+declare y int := extract(year from p_day); x int := extract(month from p_day)::int * 100 + extract(day from p_day)::int;
+  f date := make_date(y, 11, 1); tg_end date; easter date := sh_easter(y); r text[] := '{}';
+begin
+  if p_day is null then return r; end if;
+  tg_end := f + ((4 - extract(dow from f)::int + 7) % 7) + 21 + 1;      -- the day after the fourth Thursday of November
+  if x between 1001 and 1031 then r := r || 'halloween'::text; end if;
+  if x >= 1101 and p_day <= tg_end then r := r || 'thanksgiving'::text; end if;
+  if p_day > tg_end and x <= 1226 then r := r || 'winter'::text; end if;
+  if x >= 1227 or x <= 102 then r := r || 'newyear'::text; end if;
+  if p_day between easter - 53 and easter - 47 then r := r || 'mardigras'::text; end if;
+  if x between 208 and 214 then r := r || 'valentine'::text; end if;
+  if x between 222 and 228 then r := r || 'toothfairy'::text; end if;
+  if p_day between make_date(y, 3, 6) - 6 and make_date(y, 3, 6) then r := r || 'dentist'::text; end if;
+  if x between 311 and 317 then r := r || 'stpatrick'::text; end if;
+  if p_day between easter - 6 and easter + 1 then r := r || 'easter'::text; end if;
+  if x between 628 and 704 then r := r || 'july4'::text; end if;
+  if x between 320 and 531 then r := r || 'spring'::text; end if;
+  if x between 601 and 921 then r := r || 'summer'::text; end if;
+  if x between 922 and 1130 then r := r || 'fall'::text; end if;
+  return r;
+end;
+$$;
+
+-- throwback days (Sam, 2026-11-10: "two throwback days a month, the same for everyone"): one day in the month's first
+-- half (the 1st to the 14th) and one in its second (the 15th to the 28th), worked out from the year and month alone.
+create or replace function public.sh_throwback_days(p_day date)
+returns integer[] language sql immutable set search_path = public as $$
+  select array[1 + (('x' || '00000000' || substr(h.m, 1, 8))::bit(64)::bigint % 14)::integer,
+               15 + (('x' || '00000000' || substr(h.m, 9, 8))::bit(64)::bigint % 14)::integer]
+  from (select md5('throwback:' || extract(year from p_day)::integer || '-' || lpad(extract(month from p_day)::integer::text, 2, '0')) as m) h;
+$$;
+create or replace function public.sh_is_throwback(p_day date)
+returns boolean language sql immutable set search_path = public as $$
+  select coalesce(extract(day from p_day)::integer = any(sh_throwback_days(p_day)), false);
+$$;
+
 -- the rotation, the same for everyone and worked out from the Central date: 3 weekly items (new every Monday), then 4 daily
--- ones (new at midnight, never one of the week's), each a weighted draw where rarer items come up less often; plus the
--- season's items and the shelf (snacks, floss, boosts). Deterministic: the same day gives the same shop.
+-- ones (new at midnight, never one of the week's), each a weighted draw where rarer items come up less often; plus the sets
+-- of the seasons on sale, a throwback day's three, and the shelf (snacks, floss, boosts). Deterministic: the same day gives
+-- the same shop. The daily and weekly draws never hold a seasonal item, a gift or a rank item.
 create or replace function public.sh_shop_pick(p_seed text, p_n integer, p_exclude text[])
 returns table(item_id text, pos integer) language sql stable security definer set search_path = public as $$
   select z.id, (row_number() over (order by z.k, z.id))::integer from (
     select i.id, -ln((('x' || '00000000' || substr(md5(p_seed || ':' || i.id), 1, 8))::bit(64)::bigint + 0.5) / 4294967296.0)
       / case i.rarity when 'common' then 10 when 'uncommon' then 6 when 'rare' then 3 when 'epic' then 1.5 else 0.6 end as k
     from shop_items i
-    where i.active and i.rotates and i.season is null and i.kind not in ('snack', 'boost', 'costume')
+    where i.active and i.rotates and i.season is null and not i.gift and i.rank_tier is null
+      and i.kind not in ('snack', 'boost', 'costume')
       and not (i.id = any(coalesce(p_exclude, '{}')))
   ) z order by z.k, z.id limit greatest(0, p_n);
 $$;
 
+-- a throwback day's "Back for today" shelf: 3 seasonal items whose season is not on sale that day, at their usual price.
+-- The same weighted draw as the daily picks, seeded by the date; homes and scenes come up least (their weight is 0.4 of
+-- their rarity's). Never a gift (everyone has it) or a rank item. No rows on any other day.
+create or replace function public.sh_throwback_items(p_day date)
+returns table(item_id text, pos integer) language sql stable security definer set search_path = public as $$
+  select z.id, (row_number() over (order by z.k, z.id))::integer from (
+    select i.id, -ln((('x' || '00000000' || substr(md5('throwback:' || p_day || ':' || i.id), 1, 8))::bit(64)::bigint + 0.5) / 4294967296.0)
+      / (case i.rarity when 'common' then 10 when 'uncommon' then 6 when 'rare' then 3 when 'epic' then 1.5 else 0.6 end
+         * case when i.kind in ('home', 'scene') then 0.4 else 1 end) as k
+    from shop_items i
+    where sh_is_throwback(p_day) and i.active and i.season is not null and not i.gift and i.rank_tier is null
+      and i.kind not in ('snack', 'boost', 'costume') and not (i.season = any(sh_shop_seasons(p_day)))
+  ) z order by z.k, z.id limit 3;
+$$;
+
 create or replace function public.sh_shop_day(p_day date)
 returns table(item_id text, shelf text, pos integer) language plpgsql stable security definer set search_path = public as $$
-declare wk text[]; ssn text := sh_season(p_day); fall boolean := sh_is_fall(p_day);
+declare wk text[]; ssn text[] := sh_shop_seasons(p_day);
 begin
   wk := array(select w.item_id from sh_shop_pick('week:' || date_trunc('week', p_day)::date, 3, null) w order by w.pos);
   return query
     select w.item_id, 'weekly'::text, w.pos::integer from unnest(wk) with ordinality w(item_id, pos)
     union all select d.item_id, 'daily', d.pos from sh_shop_pick('day:' || p_day, 4, wk) d
-    union all select i.id, 'season', (row_number() over (order by i.sort, i.id))::integer from shop_items i
-      where i.active and i.season is not null and (i.season = ssn or (i.season = 'fall' and fall))
+    union all select i.id, 'season', (row_number() over (order by array_position(ssn, i.season), i.sort, i.id))::integer from shop_items i
+      where i.active and i.season = any(ssn)
+    union all select t.item_id, 'throwback', t.pos from sh_throwback_items(p_day) t
     union all select i.id, 'always', (row_number() over (order by i.sort, i.id))::integer from shop_items i where i.active and i.shelf;
 end;
+$$;
+
+-- What someone owns, decided in this one place: what they bought (a row in pet_inventory), every gift (Halloween 2026's
+-- set, everyone's), and every rank item whose tier their rank has reached (so the sets of ranks already passed are theirs
+-- with no rows written). Gifts and rank items count while they are active in the catalog. `how` says which: 'bought',
+-- 'gift' or 'rank'; `at` is when it was bought (null for the other two).
+create or replace function public.sh_owned(p_visitor text)
+returns table(item_id text, how text, at timestamptz) language sql stable security definer set search_path = public as $$
+  with me as (select (select k.gtier from sh_rank(coalesce((select x.xp from xp_visitors x where x.visitor_id = p_visitor), 0)) k) as g)
+  select i.id, case when v.item_id is not null then 'bought' when i.gift then 'gift' else 'rank' end, v.bought_at
+  from shop_items i cross join me
+  left join pet_inventory v on v.visitor_id = p_visitor and v.item_id = i.id
+  where p_visitor is not null
+    and (v.item_id is not null or (i.active and (i.gift or (i.rank_tier is not null and i.rank_tier <= me.g))));
+$$;
+create or replace function public.sh_owns(p_visitor text, p_item text)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from sh_owned(p_visitor) o where o.item_id = p_item);
 $$;
 
 -- one visitor's shop today: the shared one, plus one rare costume they've spotted and don't own yet ('spotted')
@@ -1075,9 +1251,8 @@ returns table(item_id text, shelf text, pos integer) language sql stable securit
   select * from sh_shop_day(p_day)
   union all
   select c.costume, 'spotted', 1 from costume_log c join shop_items i on i.id = c.costume and i.active
-  where p_visitor is not null and c.visitor_id = p_visitor
-    and not exists (select 1 from pet_inventory v where v.visitor_id = p_visitor and v.item_id = c.costume)
-  order by 2, 3 limit 50;
+  where p_visitor is not null and c.visitor_id = p_visitor and not sh_owns(p_visitor, c.costume)
+  order by 2, 3 limit 100;
 $$;
 
 -- Shiny Gold Crowns, worked out by the server: 1 per 10 XP of base XP (a boost's extra earns none), plus 25 per trophy,
@@ -1108,36 +1283,55 @@ begin
 end;
 $$;
 
--- one visitor's shop, wallet, things and what's on today; with no visitor, just today's shop
-create or replace function public.get_my_shop(p_visitor text)
+-- one visitor's shop, wallet, things and what's on today; with no visitor, just today's shop. `seasons` are the sets on
+-- sale today and `throwback` says whether today is a throwback day. `inventory` is everything owned, each with how it is
+-- owned ('bought', 'gift' or 'rank'); `locked` lists the rank items not reached yet, with the tier that unlocks each
+-- ("Unlocks at Silver"); `visiting` says whether others can visit this place from the boards.
+-- sh_my_shop takes the Central date (the tests set it; null = today); get_my_shop is what a page calls.
+create or replace function public.sh_my_shop(p_day date, p_visitor text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
-declare dd date := (now() at time zone 'America/Chicago')::date; ok boolean := p_visitor is not null and length(p_visitor) between 1 and 80;
+declare dd date := coalesce(p_day, (now() at time zone 'America/Chicago')::date); ok boolean := p_visitor is not null and length(p_visitor) between 1 and 80;
+  v text := case when p_visitor is not null and length(p_visitor) between 1 and 80 then p_visitor end;
 begin
   return jsonb_build_object(
     'day', dd,
+    'seasons', to_jsonb(sh_shop_seasons(dd)),
+    'throwback', sh_is_throwback(dd),
     'wallet', case when ok then sh_wallet(p_visitor) end,
     'items', coalesce((select jsonb_agg(jsonb_build_object('id', i.id, 'name', i.name, 'kind', i.kind, 'rarity', i.rarity, 'price', i.price,
         'season', i.season, 'slot', i.slot, 'hp', i.hp, 'boost_minutes', i.boost_minutes, 'boost_mult', i.boost_mult, 'shelf', s.shelf,
-        'owned', ok and exists (select 1 from pet_inventory v where v.visitor_id = p_visitor and v.item_id = i.id))
+        'gift', i.gift, 'owned', o.item_id is not null)
         order by s.shelf, s.pos)
-      from sh_shop_for(case when ok then p_visitor end, dd) s join shop_items i on i.id = s.item_id), '[]'::jsonb),
-    'inventory', case when ok then coalesce((select jsonb_agg(jsonb_build_object('id', v.item_id, 'at', v.bought_at) order by v.bought_at)
-      from pet_inventory v where v.visitor_id = p_visitor), '[]'::jsonb) else '[]'::jsonb end,
+      from sh_shop_for(v, dd) s join shop_items i on i.id = s.item_id left join sh_owned(v) o on o.item_id = i.id), '[]'::jsonb),
+    'inventory', coalesce((select jsonb_agg(jsonb_build_object('id', o.item_id, 'at', o.at, 'how', o.how) order by o.at nulls last, o.item_id)
+      from sh_owned(v) o), '[]'::jsonb),
+    'locked', coalesce((select jsonb_agg(jsonb_build_object('id', i.id, 'name', i.name, 'kind', i.kind, 'rarity', i.rarity, 'rank_tier', i.rank_tier)
+        order by i.rank_tier, i.sort, i.id)
+      from shop_items i where i.active and i.rank_tier is not null
+        and not exists (select 1 from sh_owned(v) o where o.item_id = i.id)), '[]'::jsonb),
     'equipped', case when ok then coalesce((select jsonb_object_agg(e.slot, e.item_id) from pet_equipped e where e.visitor_id = p_visitor), '{}'::jsonb) else '{}'::jsonb end,
     'costumes', case when ok then coalesce((select jsonb_agg(jsonb_build_object('id', c.costume, 'day', c.first_day) order by c.first_day, c.costume)
       from costume_log c where c.visitor_id = p_visitor), '[]'::jsonb) else '[]'::jsonb end,
     'snacks_today', case when ok then coalesce((select jsonb_agg(distinct p.item_id) from pet_purchases p
       where p.visitor_id = p_visitor and p.day = dd and p.kind = 'snack'), '[]'::jsonb) else '[]'::jsonb end,
-    'boost', case when ok then sh_boost_json(p_visitor, clock_timestamp()) end);
+    'boost', case when ok then sh_boost_json(p_visitor, clock_timestamp()) end,
+    'visiting', case when ok then not exists (select 1 from pet_visit_off o where o.visitor_id = p_visitor) end);
 end;
 $$;
+create or replace function public.get_my_shop(p_visitor text)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select sh_my_shop(null, p_visitor);
+$$;
 
--- buy one thing: on sale today for this visitor, not owned already (outfits, costumes, the home's things), at most one of
--- each snack a day, enough gold crowns. Idempotent on p_request (a double tap or a replayed call buys once). A snack's HP
--- counts today (get_pet_days_v2); a boost starts now, or extends the one running instead of stacking.
-create or replace function public.buy_item(p_visitor text, p_item text, p_request text)
+-- buy one thing: not owned already (outfits, costumes, the home's things; a gift is everyone's, so it can never be
+-- bought), not a rank item (earned by rank, never sold), on sale today for this visitor (a shelf of sh_shop_for: daily,
+-- weekly, a season on sale, a throwback day's three, the always-shelf, a spotted costume), at most one of each snack a
+-- day, enough gold crowns. Idempotent on p_request (a double tap or a replayed call buys once). A snack's HP counts today
+-- (get_pet_days_v2); a boost starts now, or extends the one running instead of stacking.
+-- sh_buy takes the Central date (the tests set it; null = today); buy_item is what a page calls.
+create or replace function public.sh_buy(p_day date, p_visitor text, p_item text, p_request text)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare it record; prev record; dd date := (now() at time zone 'America/Chicago')::date; w jsonb; bal int; pid bigint;
+declare it record; prev record; dd date := coalesce(p_day, (now() at time zone 'America/Chicago')::date); w jsonb; bal int; pid bigint;
   v_resp jsonb; bst record; b_until timestamptz;
 begin
   if p_visitor is null or length(p_visitor) not between 1 and 80 or p_item is null or p_item !~ '^[a-z0-9][a-z0-9-]{0,39}$'
@@ -1150,9 +1344,9 @@ begin
   end if;
   select * into it from shop_items where id = p_item and active;
   if not found then return jsonb_build_object('ok', false, 'error', 'unknown'); end if;
+  if it.kind not in ('snack', 'boost') and sh_owns(p_visitor, p_item) then return jsonb_build_object('ok', false, 'error', 'owned'); end if;
+  if it.rank_tier is not null then return jsonb_build_object('ok', false, 'error', 'rank', 'rank_tier', it.rank_tier); end if;
   if not exists (select 1 from sh_shop_for(p_visitor, dd) s where s.item_id = p_item) then return jsonb_build_object('ok', false, 'error', 'not-today'); end if;
-  if it.kind not in ('snack', 'boost') and exists (select 1 from pet_inventory where visitor_id = p_visitor and item_id = p_item) then
-    return jsonb_build_object('ok', false, 'error', 'owned'); end if;
   if it.kind = 'snack' and exists (select 1 from pet_purchases where visitor_id = p_visitor and item_id = p_item and day = dd) then
     return jsonb_build_object('ok', false, 'error', 'today'); end if;
   w := sh_wallet(p_visitor); bal := (w->>'balance')::integer;
@@ -1181,10 +1375,17 @@ begin
 end;
 $$;
 
+create or replace function public.buy_item(p_visitor text, p_item text, p_request text)
+returns jsonb language sql volatile security definer set search_path = public as $$
+  select sh_buy(null, p_visitor, p_item, p_request);
+$$;
+
 -- wear an outfit, move into a home, pick a scene, put a yard item in one of the five spots, or fit an upgrade; p_item null
--- takes the slot back to the free default (no outfit, the cottage, the hill, an empty spot). Only what you own. A wide yard
--- item (the bowling lane) always stands in the side yard and takes the front corner too: it clears that spot, and putting
--- something in the front corner takes the lane away.
+-- takes the slot back to the free default (no outfit, the cottage, the hill, an empty spot). Only what you own (sh_owns:
+-- bought, a gift, or a rank item whose rank you've reached). A wide yard item (the bowling lane) always stands in the side
+-- yard and takes the front corner too: it clears that spot, and putting something in the front corner takes the lane away.
+-- If someone's XP ever drops below a rank (a rebuild after a correction), a rank item they already put on simply stays
+-- on: nothing takes it off, they just can't put it on again until the rank is back.
 create or replace function public.equip_item(p_visitor text, p_slot text, p_item text)
 returns jsonb language plpgsql security definer set search_path = public as $$
 declare it record; v_slot text := p_slot;
@@ -1195,7 +1396,7 @@ begin
   if p_item is null then
     delete from pet_equipped where visitor_id = p_visitor and slot = p_slot;
   else
-    select i.* into it from shop_items i join pet_inventory v on v.item_id = i.id and v.visitor_id = p_visitor where i.id = p_item;
+    select i.* into it from shop_items i where i.id = p_item and sh_owns(p_visitor, p_item);
     if not found then return jsonb_build_object('ok', false, 'error', 'not-owned'); end if;
     if not ((p_slot = 'outfit' and it.kind in ('outfit', 'costume')) or (p_slot = it.kind and it.kind in ('home', 'scene'))
             or (p_slot like 'yard-%' and it.kind = 'yard') or (it.kind = 'upgrade' and p_slot = it.slot)) then
@@ -1241,16 +1442,18 @@ returns boolean language plpgsql security definer set search_path = public as $$
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
   if jsonb_typeof(p_item) is distinct from 'object' or coalesce(p_item->>'id', '') = '' then raise exception 'p_item needs an id'; end if;
-  insert into shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, active, sort, wide)
+  insert into shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, active, sort, wide,
+    gift, rank_tier)
   values (p_item->>'id', p_item->>'name', p_item->>'kind', p_item->>'rarity', (p_item->>'price')::integer, p_item->>'season',
     p_item->>'slot', (p_item->>'hp')::integer, (p_item->>'boost_minutes')::integer, (p_item->>'boost_mult')::smallint,
-    coalesce((p_item->>'shelf')::boolean, false), coalesce((p_item->>'rotates')::boolean, true),
+    coalesce((p_item->>'shelf')::boolean, false),
+    coalesce((p_item->>'rotates')::boolean, p_item->>'season' is null and p_item->>'rank_tier' is null),
     coalesce((p_item->>'active')::boolean, true), coalesce((p_item->>'sort')::integer, 0),
-    coalesce((p_item->>'wide')::boolean, false))
+    coalesce((p_item->>'wide')::boolean, false), coalesce((p_item->>'gift')::boolean, false), (p_item->>'rank_tier')::smallint)
   on conflict (id) do update set name = excluded.name, kind = excluded.kind, rarity = excluded.rarity, price = excluded.price,
     season = excluded.season, slot = excluded.slot, hp = excluded.hp, boost_minutes = excluded.boost_minutes,
     boost_mult = excluded.boost_mult, shelf = excluded.shelf, rotates = excluded.rotates, active = excluded.active, sort = excluded.sort,
-    wide = excluded.wide;
+    wide = excluded.wide, gift = excluded.gift, rank_tier = excluded.rank_tier;
   return true;
 end;
 $$;
@@ -1271,6 +1474,7 @@ $$;
 
 -- the starting catalog. Names, ids, rarities and prices follow the art (tools/figures/site/place.mjs: its HOMES, SCENES,
 -- YARD, OUTFITS, PAINTS and UPGRADES name each piece's id here; Sam, 2026-11-06: the server's names follow the art).
+-- The seasonal sets and the rank sets are the second statement below.
 insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, sort) values
   ('scrub-cap', 'Scrub cap', 'outfit', 'common', 150, null, null, null, null, null, false, true, 101),
   ('bow-tie', 'Bow tie', 'outfit', 'common', 120, null, null, null, null, null, false, true, 102),
@@ -1302,7 +1506,7 @@ insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, 
   ('doghouse', 'Doghouse', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 404),
   ('bowling-lane', 'Bowling lane', 'yard', 'rare', 1200, null, null, null, null, null, false, true, 405),
   ('swimming-pool', 'Swimming pool', 'yard', 'epic', 2000, null, null, null, null, null, false, true, 406),
-  ('mint-fountain', 'Mint fountain', 'yard', 'rare', 900, null, null, null, null, null, false, true, 407),
+  ('mouthwash-fountain', 'Mouthwash fountain', 'yard', 'rare', 900, null, null, null, null, null, false, true, 407),
   ('sandcastle', 'Sandcastle', 'yard', 'common', 150, null, null, null, null, null, false, true, 408),
   ('beach-umbrella', 'Beach umbrella', 'yard', 'uncommon', 350, null, null, null, null, null, false, true, 409),
   ('campfire', 'Campfire', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 410),
@@ -1323,18 +1527,6 @@ insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, 
   ('fluoride-rinse', 'Fluoride rinse', 'snack', 'uncommon', 400, null, null, 40, null, null, true, false, 604),
   ('boost-1h', 'Double XP for 1 hour', 'boost', 'rare', 600, null, null, null, 60, 2, true, false, 701),
   ('boost-3h', 'Double XP for 3 hours', 'boost', 'epic', 1500, null, null, null, 180, 2, true, false, 702),
-  ('pumpkin-lantern', 'Pumpkin lantern', 'yard', 'uncommon', 300, 'halloween', null, null, null, null, false, false, 801),
-  ('vampire-cape', 'Vampire cape', 'outfit', 'rare', 800, 'halloween', null, null, null, null, false, false, 802),
-  ('pilgrim-hat', 'Pilgrim hat', 'outfit', 'rare', 700, 'thanksgiving', null, null, null, null, false, false, 803),
-  ('ugly-sweater', 'Holiday sweater', 'outfit', 'rare', 700, 'winter', null, null, null, null, false, false, 804),
-  ('snow-globe', 'Snow globe', 'yard', 'uncommon', 300, 'winter', null, null, null, null, false, false, 805),
-  ('party-hat', 'Party hat', 'outfit', 'uncommon', 300, 'newyear', null, null, null, null, false, false, 806),
-  ('heart-balloon', 'Heart balloon', 'yard', 'uncommon', 250, 'valentine', null, null, null, null, false, false, 807),
-  ('gold-mirror', 'Golden mouth mirror', 'outfit', 'rare', 900, 'dentist', null, null, null, null, false, false, 808),
-  ('clover-hat', 'Clover hat', 'outfit', 'uncommon', 300, 'stpatrick', null, null, null, null, false, false, 809),
-  ('bunny-ears', 'Bunny ears', 'outfit', 'uncommon', 300, 'easter', null, null, null, null, false, false, 810),
-  ('leaf-pile', 'Leaf pile', 'yard', 'common', 120, 'fall', null, null, null, null, false, false, 811),
-  ('scarf', 'Scarf', 'outfit', 'common', 150, 'fall', null, null, null, null, false, false, 812),
   ('pirate', 'Pirate', 'costume', 'epic', 2000, null, null, null, null, null, false, false, 901),
   ('astronaut', 'Astronaut', 'costume', 'epic', 2500, null, null, null, null, null, false, false, 902),
   ('detective', 'Detective', 'costume', 'epic', 1800, null, null, null, null, null, false, false, 903),
@@ -1342,6 +1534,137 @@ insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, 
   ('captain-enamel', 'Captain Enamel', 'costume', 'legendary', 4000, null, null, null, null, null, false, false, 905)
 on conflict (id) do nothing;
 update public.shop_items set wide = true where id = 'bowling-lane' and not wide;
+
+-- The seasonal sets and the rank sets (Sam, 2026-11-10): exactly the pieces of tools/figures/site/sets.mjs (allSetItems()),
+-- which the art draws by the same ids; tools/release/xp.js fails if the two differ. These rows are generated from that
+-- file: change it, then these. A season's set is 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary
+-- outfit and yard thing; Halloween's is everyone's gift. A rank set is an outfit and a yard thing for a full rank-up.
+insert into public.shop_items (id, name, kind, rarity, price, season, gift, rank_tier, rotates, sort) values
+  ('haunted-manor', 'Haunted manor', 'home', 'legendary', 6500, 'halloween', true, null, false, 1001),
+  ('pumpkin-patch', 'Pumpkin patch at dusk', 'scene', 'legendary', 5000, 'halloween', true, null, false, 1002),
+  ('floss-mummy', 'Floss mummy', 'outfit', 'rare', 800, 'halloween', true, null, false, 1003),
+  ('bedsheet-ghost', 'Bedsheet ghost', 'outfit', 'epic', 1800, 'halloween', true, null, false, 1004),
+  ('skeleton-suit', 'Skeleton suit', 'outfit', 'legendary', 4500, 'halloween', true, null, false, 1005),
+  ('pumpkin-lantern', 'Pumpkin lanterns', 'yard', 'rare', 700, 'halloween', true, null, false, 1006),
+  ('bubbling-cauldron', 'Bubbling cauldron', 'yard', 'epic', 1800, 'halloween', true, null, false, 1007),
+  ('haunted-tree', 'Haunted tree', 'yard', 'legendary', 4200, 'halloween', true, null, false, 1008),
+  ('harvest-barn', 'Harvest barn', 'home', 'legendary', 6000, 'thanksgiving', false, null, false, 1011),
+  ('harvest-fields', 'Harvest fields', 'scene', 'legendary', 5000, 'thanksgiving', false, null, false, 1012),
+  ('scarecrow-hat', 'Scarecrow hat', 'outfit', 'rare', 700, 'thanksgiving', false, null, false, 1013),
+  ('football-helmet', 'Football helmet', 'outfit', 'epic', 1800, 'thanksgiving', false, null, false, 1014),
+  ('parade-marshal', 'Parade grand marshal', 'outfit', 'legendary', 4500, 'thanksgiving', false, null, false, 1015),
+  ('hay-bales', 'Hay bales', 'yard', 'rare', 700, 'thanksgiving', false, null, false, 1016),
+  ('harvest-table', 'Harvest table', 'yard', 'epic', 2000, 'thanksgiving', false, null, false, 1017),
+  ('turkey-balloon', 'Turkey parade balloon', 'yard', 'legendary', 4500, 'thanksgiving', false, null, false, 1018),
+  ('log-cabin', 'Snowy log cabin', 'home', 'legendary', 6500, 'winter', false, null, false, 1021),
+  ('aurora-lake', 'Frozen lake under the northern lights', 'scene', 'legendary', 5500, 'winter', false, null, false, 1022),
+  ('ugly-sweater', 'Holiday sweater', 'outfit', 'rare', 700, 'winter', false, null, false, 1023),
+  ('elf-suit', 'Elf suit', 'outfit', 'epic', 1800, 'winter', false, null, false, 1024),
+  ('nutcracker', 'Nutcracker uniform', 'outfit', 'legendary', 4800, 'winter', false, null, false, 1025),
+  ('snow-globe', 'Snow globe', 'yard', 'rare', 800, 'winter', false, null, false, 1026),
+  ('ice-rink', 'Ice rink', 'yard', 'epic', 2200, 'winter', false, null, false, 1027),
+  ('holiday-tree', 'Decorated tree', 'yard', 'legendary', 4500, 'winter', false, null, false, 1028),
+  ('clock-tower', 'Clock tower', 'home', 'legendary', 7000, 'newyear', false, null, false, 1031),
+  ('midnight-rooftops', 'Midnight rooftops', 'scene', 'legendary', 5500, 'newyear', false, null, false, 1032),
+  ('sparkle-bow-tie', 'Sparkly bow tie', 'outfit', 'rare', 700, 'newyear', false, null, false, 1033),
+  ('tuxedo', 'Tuxedo', 'outfit', 'epic', 2000, 'newyear', false, null, false, 1034),
+  ('father-time', 'Father Time', 'outfit', 'legendary', 4500, 'newyear', false, null, false, 1035),
+  ('confetti-cannon', 'Confetti cannon', 'yard', 'rare', 800, 'newyear', false, null, false, 1036),
+  ('countdown-clock', 'Countdown clock', 'yard', 'epic', 2000, 'newyear', false, null, false, 1037),
+  ('ball-drop', 'Midnight ball drop', 'yard', 'legendary', 4500, 'newyear', false, null, false, 1038),
+  ('french-quarter', 'French Quarter townhouse', 'home', 'legendary', 7000, 'mardigras', false, null, false, 1041),
+  ('parade-street', 'Parade street', 'scene', 'legendary', 5000, 'mardigras', false, null, false, 1042),
+  ('bead-necklaces', 'Parade beads', 'outfit', 'rare', 700, 'mardigras', false, null, false, 1043),
+  ('jester', 'Jester', 'outfit', 'epic', 1800, 'mardigras', false, null, false, 1044),
+  ('carnival-king', 'Carnival king', 'outfit', 'legendary', 4500, 'mardigras', false, null, false, 1045),
+  ('bead-tree', 'Bead tree', 'yard', 'rare', 700, 'mardigras', false, null, false, 1046),
+  ('jazz-stand', 'Jazz stand', 'yard', 'epic', 1800, 'mardigras', false, null, false, 1047),
+  ('parade-float', 'Parade float', 'yard', 'legendary', 4500, 'mardigras', false, null, false, 1048),
+  ('heart-cottage', 'Heart cottage', 'home', 'legendary', 6000, 'valentine', false, null, false, 1051),
+  ('rose-garden', 'Rose garden', 'scene', 'legendary', 5000, 'valentine', false, null, false, 1052),
+  ('mail-cap', 'Love-letter mail cap', 'outfit', 'rare', 700, 'valentine', false, null, false, 1053),
+  ('knight-of-hearts', 'Knight of hearts', 'outfit', 'epic', 1800, 'valentine', false, null, false, 1054),
+  ('masquerade', 'Masquerade mask and cape', 'outfit', 'legendary', 4500, 'valentine', false, null, false, 1055),
+  ('heart-balloon', 'Heart balloons', 'yard', 'rare', 700, 'valentine', false, null, false, 1056),
+  ('swing-for-two', 'Swing for two', 'yard', 'epic', 1800, 'valentine', false, null, false, 1057),
+  ('swan-pond', 'Swan pond', 'yard', 'legendary', 4500, 'valentine', false, null, false, 1058),
+  ('pillow-palace', 'Pillow palace', 'home', 'legendary', 7000, 'toothfairy', false, null, false, 1061),
+  ('fairy-glen', 'Moonlit fairy glen', 'scene', 'legendary', 5500, 'toothfairy', false, null, false, 1062),
+  ('fairy-wand', 'Wand and tiara', 'outfit', 'rare', 800, 'toothfairy', false, null, false, 1063),
+  ('fairy-wings', 'Fairy wings', 'outfit', 'epic', 2000, 'toothfairy', false, null, false, 1064),
+  ('tooth-fairy', 'The Tooth Fairy', 'outfit', 'legendary', 5000, 'toothfairy', false, null, false, 1065),
+  ('coin-pile', 'Pile of shiny coins', 'yard', 'rare', 800, 'toothfairy', false, null, false, 1066),
+  ('tooth-pillow', 'Tooth pillow', 'yard', 'epic', 1800, 'toothfairy', false, null, false, 1067),
+  ('fairy-ring', 'Fairy ring', 'yard', 'legendary', 4500, 'toothfairy', false, null, false, 1068),
+  ('dental-office', 'Dental office', 'home', 'legendary', 7000, 'dentist', false, null, false, 1071),
+  ('main-street', 'Main Street', 'scene', 'legendary', 5000, 'dentist', false, null, false, 1072),
+  ('gold-mirror', 'Golden mouth mirror', 'outfit', 'rare', 900, 'dentist', false, null, false, 1073),
+  ('surgical-scrubs', 'Surgical scrubs and mask', 'outfit', 'epic', 1800, 'dentist', false, null, false, 1074),
+  ('dr-timmy', 'Dr. Timmy''s long white coat', 'outfit', 'legendary', 4500, 'dentist', false, null, false, 1075),
+  ('dental-chair', 'Dental chair', 'yard', 'rare', 900, 'dentist', false, null, false, 1076),
+  ('operatory-light', 'Operatory light and tray', 'yard', 'epic', 1800, 'dentist', false, null, false, 1077),
+  ('molar-monument', 'Molar monument', 'yard', 'legendary', 4500, 'dentist', false, null, false, 1078),
+  ('thatched-cottage', 'Thatched cottage', 'home', 'legendary', 6000, 'stpatrick', false, null, false, 1081),
+  ('emerald-hills', 'Emerald hills', 'scene', 'legendary', 5000, 'stpatrick', false, null, false, 1082),
+  ('flat-cap', 'Tweed flat cap', 'outfit', 'rare', 700, 'stpatrick', false, null, false, 1083),
+  ('bagpiper', 'Bagpiper', 'outfit', 'epic', 1800, 'stpatrick', false, null, false, 1084),
+  ('gold-buckle-suit', 'Gold-buckle suit', 'outfit', 'legendary', 4500, 'stpatrick', false, null, false, 1085),
+  ('clover-patch', 'Clover patch', 'yard', 'rare', 700, 'stpatrick', false, null, false, 1086),
+  ('wishing-well', 'Wishing well', 'yard', 'epic', 1800, 'stpatrick', false, null, false, 1087),
+  ('pot-of-gold', 'Pot of gold', 'yard', 'legendary', 4500, 'stpatrick', false, null, false, 1088),
+  ('egg-house', 'Painted egg house', 'home', 'legendary', 6000, 'easter', false, null, false, 1091),
+  ('tulip-meadow', 'Tulip meadow', 'scene', 'legendary', 5000, 'easter', false, null, false, 1092),
+  ('easter-bonnet', 'Easter bonnet', 'outfit', 'rare', 700, 'easter', false, null, false, 1093),
+  ('egg-painter', 'Egg painter''s smock', 'outfit', 'epic', 1800, 'easter', false, null, false, 1094),
+  ('bunny-suit', 'Bunny suit', 'outfit', 'legendary', 4500, 'easter', false, null, false, 1095),
+  ('egg-basket', 'Giant egg basket', 'yard', 'rare', 700, 'easter', false, null, false, 1096),
+  ('carrot-patch', 'Carrot patch', 'yard', 'epic', 1800, 'easter', false, null, false, 1097),
+  ('chick-coop', 'Chick coop', 'yard', 'legendary', 4200, 'easter', false, null, false, 1098),
+  ('flowerpot-house', 'Flowerpot house', 'home', 'legendary', 6000, 'spring', false, null, false, 1101),
+  ('cherry-blossoms', 'Cherry blossom grove', 'scene', 'legendary', 5000, 'spring', false, null, false, 1102),
+  ('rain-slicker', 'Raincoat and boots', 'outfit', 'rare', 700, 'spring', false, null, false, 1103),
+  ('beekeeper', 'Beekeeper', 'outfit', 'epic', 1800, 'spring', false, null, false, 1104),
+  ('butterfly-wings', 'Butterfly wings', 'outfit', 'legendary', 4500, 'spring', false, null, false, 1105),
+  ('birdbath', 'Birdbath', 'yard', 'rare', 700, 'spring', false, null, false, 1106),
+  ('beehives', 'Beehives', 'yard', 'epic', 1800, 'spring', false, null, false, 1107),
+  ('greenhouse', 'Glass greenhouse', 'yard', 'legendary', 4500, 'spring', false, null, false, 1108),
+  ('a-frame-cabin', 'A-frame cabin', 'home', 'legendary', 6000, 'july4', false, null, false, 1111),
+  ('fairgrounds', 'Fairgrounds', 'scene', 'legendary', 5000, 'july4', false, null, false, 1112),
+  ('stars-top-hat', 'Stars-and-stripes top hat', 'outfit', 'rare', 700, 'july4', false, null, false, 1113),
+  ('drum-major', 'Drum major', 'outfit', 'epic', 1800, 'july4', false, null, false, 1114),
+  ('lady-liberty', 'Lady Liberty', 'outfit', 'legendary', 4500, 'july4', false, null, false, 1115),
+  ('picnic-blanket', 'Picnic blanket', 'yard', 'rare', 700, 'july4', false, null, false, 1116),
+  ('fireworks-launcher', 'Fireworks launcher', 'yard', 'epic', 1800, 'july4', false, null, false, 1117),
+  ('ferris-wheel', 'Little Ferris wheel', 'yard', 'legendary', 4500, 'july4', false, null, false, 1118),
+  ('camper-van', 'Camper van', 'home', 'legendary', 6500, 'summer', false, null, false, 1121),
+  ('summer-lake', 'Summer lake', 'scene', 'legendary', 5000, 'summer', false, null, false, 1122),
+  ('snorkel', 'Snorkel and flippers', 'outfit', 'rare', 700, 'summer', false, null, false, 1123),
+  ('lifeguard', 'Lifeguard', 'outfit', 'epic', 1800, 'summer', false, null, false, 1124),
+  ('deep-sea-diver', 'Deep-sea diver', 'outfit', 'legendary', 4500, 'summer', false, null, false, 1125),
+  ('lawn-sprinkler', 'Lawn sprinkler', 'yard', 'rare', 700, 'summer', false, null, false, 1126),
+  ('barbecue-grill', 'Barbecue grill', 'yard', 'epic', 1800, 'summer', false, null, false, 1127),
+  ('water-slide', 'Water slide', 'yard', 'legendary', 4500, 'summer', false, null, false, 1128),
+  ('acorn-house', 'Acorn house', 'home', 'legendary', 6000, 'fall', false, null, false, 1131),
+  ('autumn-woods', 'Autumn woods', 'scene', 'legendary', 5000, 'fall', false, null, false, 1132),
+  ('flannel', 'Flannel and scarf', 'outfit', 'rare', 700, 'fall', false, null, false, 1133),
+  ('fox-hood', 'Fox hood', 'outfit', 'epic', 1800, 'fall', false, null, false, 1134),
+  ('tweed-professor', 'Tweed professor', 'outfit', 'legendary', 4500, 'fall', false, null, false, 1135),
+  ('leaf-pile', 'Leaf pile', 'yard', 'rare', 700, 'fall', false, null, false, 1136),
+  ('cider-stand', 'Apple cider stand', 'yard', 'epic', 1800, 'fall', false, null, false, 1137),
+  ('apple-tree', 'Apple tree with a swing', 'yard', 'legendary', 4200, 'fall', false, null, false, 1138),
+  ('rank-antique-outfit', 'Brass monocle and bowler', 'outfit', 'rare', 0, null, false, 1, false, 2001),
+  ('rank-antique-yard', 'Treadle dental engine', 'yard', 'rare', 0, null, false, 1, false, 2002),
+  ('rank-bronze-outfit', 'Bronze gladiator helmet', 'outfit', 'rare', 0, null, false, 2, false, 2003),
+  ('rank-bronze-yard', 'Bronze bell', 'yard', 'rare', 0, null, false, 2, false, 2004),
+  ('rank-silver-outfit', 'Silver knight''s helm', 'outfit', 'epic', 0, null, false, 3, false, 2005),
+  ('rank-silver-yard', 'Silver trophy cup', 'yard', 'epic', 0, null, false, 3, false, 2006),
+  ('rank-gold-outfit', 'Golden laurels and toga', 'outfit', 'epic', 0, null, false, 4, false, 2007),
+  ('rank-gold-yard', 'Golden tooth statue', 'yard', 'epic', 0, null, false, 4, false, 2008),
+  ('rank-diamond-outfit', 'Diamond shades and ice cape', 'outfit', 'legendary', 0, null, false, 5, false, 2009),
+  ('rank-diamond-yard', 'Diamond geode', 'yard', 'legendary', 0, null, false, 5, false, 2010),
+  ('rank-dark-outfit', 'Dark Matter cloak', 'outfit', 'legendary', 0, null, false, 6, false, 2011),
+  ('rank-dark-yard', 'Dark Matter orb', 'yard', 'legendary', 0, null, false, 6, false, 2012)
+on conflict (id) do nothing;
 
 -- ====================================================================== 6. the idea board
 -- Ideas show as soon as they're posted, under the poster's leaderboard name, with up and down votes. Each picks a hub (one
@@ -1594,7 +1917,8 @@ $$;
 -- Today's redeem_link_code (migration_v52), plus the new tables, moved before the answers so the answer trigger's rebuild
 -- sees them: awards and boosts (a key both devices earned pays once), sessions, the baseline (added together), purchases
 -- (spending adds up), the inventory (both devices' things), what's equipped (per slot, the newer choice wins), the costume
--- log, ideas, votes (the newer vote wins), reports and notes. Then one rebuild for both ids.
+-- log, ideas, votes (the newer vote wins), reports and notes, and the visiting switch (off on either device stays off).
+-- Then one rebuild for both ids.
 create or replace function public.redeem_link_code(p_code text, p_visitor text)
 returns text language plpgsql security definer set search_path = public as $$
 declare p text; c text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9]', '', 'g'));
@@ -1640,6 +1964,9 @@ begin
     select p, costume, first_day from costume_log where visitor_id = p_visitor
     on conflict (visitor_id, costume) do update set first_day = least(costume_log.first_day, excluded.first_day);
   delete from costume_log where visitor_id = p_visitor;
+  insert into pet_visit_off (visitor_id, set_at)
+    select p, set_at from pet_visit_off where visitor_id = p_visitor on conflict (visitor_id) do nothing;
+  delete from pet_visit_off where visitor_id = p_visitor;
   update ideas set visitor_id = p where visitor_id = p_visitor;
   insert into idea_votes (idea_id, visitor_id, val, at)
     select idea_id, p, val, at from idea_votes where visitor_id = p_visitor
@@ -1753,10 +2080,12 @@ alter table public.ideas enable row level security;
 alter table public.idea_votes enable row level security;
 alter table public.idea_reports enable row level security;
 alter table public.idea_notes enable row level security;
+alter table public.visit_secret enable row level security;
+alter table public.pet_visit_off enable row level security;
 revoke all on table public.game_config, public.game_baseline, public.question_keys, public.xp_awards, public.xp_boosts,
   public.xp_sessions, public.answer_xp, public.podcast_episodes, public.report_outcomes, public.shop_items, public.pet_purchases,
   public.pet_inventory, public.pet_equipped, public.costume_log, public.ideas, public.idea_votes, public.idea_reports,
-  public.idea_notes from public, anon, authenticated;
+  public.idea_notes, public.visit_secret, public.pet_visit_off from public, anon, authenticated;
 
 -- private helpers: only the functions above call them
 revoke all on function public.sh_v2_at() from public, anon, authenticated;
@@ -1775,8 +2104,17 @@ revoke all on function public.sh_shop_pick(text, integer, text[]) from public, a
 revoke all on function public.sh_shop_day(date) from public, anon, authenticated;
 revoke all on function public.sh_shop_for(text, date) from public, anon, authenticated;
 revoke all on function public.sh_wallet(text) from public, anon, authenticated;
+revoke all on function public.sh_throwback_items(date) from public, anon, authenticated;
+revoke all on function public.sh_owned(text) from public, anon, authenticated;
+revoke all on function public.sh_owns(text, text) from public, anon, authenticated;
+revoke all on function public.sh_buy(date, text, text, text) from public, anon, authenticated;
+revoke all on function public.sh_my_shop(date, text) from public, anon, authenticated;
+-- the visit key is made only inside the boards and get_place: nobody can ask for the key of an id
+revoke all on function public.sh_visit_key(text) from public, anon, authenticated;
+revoke all on function public.sh_visit_link(text) from public, anon, authenticated;
 
--- what pages call (sh_rank, sh_season and sh_is_fall are pure arithmetic on the ladder and the calendar)
+-- what pages call (sh_rank, sh_season, sh_is_fall, sh_easter, sh_shop_seasons, sh_throwback_days and sh_is_throwback are
+-- pure arithmetic on the ladder and the calendar)
 revoke all on function public.record_answer_v2(text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public;
 grant execute on function public.record_answer_v2(text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) to anon, authenticated;
 revoke all on function public.xp_session_start(text, text, text, text) from public;
@@ -1791,6 +2129,14 @@ revoke all on function public.sh_season(date) from public;
 grant execute on function public.sh_season(date) to anon, authenticated;
 revoke all on function public.sh_is_fall(date) from public;
 grant execute on function public.sh_is_fall(date) to anon, authenticated;
+revoke all on function public.sh_easter(integer) from public;
+grant execute on function public.sh_easter(integer) to anon, authenticated;
+revoke all on function public.sh_shop_seasons(date) from public;
+grant execute on function public.sh_shop_seasons(date) to anon, authenticated;
+revoke all on function public.sh_throwback_days(date) from public;
+grant execute on function public.sh_throwback_days(date) to anon, authenticated;
+revoke all on function public.sh_is_throwback(date) from public;
+grant execute on function public.sh_is_throwback(date) to anon, authenticated;
 revoke all on function public.get_rank_profile_v2(text) from public;
 grant execute on function public.get_rank_profile_v2(text) to anon, authenticated;
 revoke all on function public.mark_dark_unlock_seen(text, integer) from public;
@@ -1805,6 +2151,10 @@ revoke all on function public.get_arcade_leaderboard_v2(text, text, text, intege
 grant execute on function public.get_arcade_leaderboard_v2(text, text, text, integer) to anon, authenticated;
 revoke all on function public.get_trophy_stats_v2() from public;
 grant execute on function public.get_trophy_stats_v2() to anon, authenticated;
+revoke all on function public.set_visiting(text, boolean) from public;
+grant execute on function public.set_visiting(text, boolean) to anon, authenticated;
+revoke all on function public.get_place(text) from public;
+grant execute on function public.get_place(text) to anon, authenticated;
 revoke all on function public.get_my_shop(text) from public;
 grant execute on function public.get_my_shop(text) to anon, authenticated;
 revoke all on function public.buy_item(text, text, text) from public;
