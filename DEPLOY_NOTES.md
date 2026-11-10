@@ -63,6 +63,92 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   flips and what he says; at 0 HP he stays on the doorstep. A visitor never sees it. (9) **Gentler ground**: every
   scene's contour is a wider, flatter bell (`arcTop(cx, top, edge)`; Sam: "too extreme and pointy"), and each scene
   raises its backdrop to match (`farLift`). Open: Sam's look at the screenshots.
+- **2026-11-10 (Occlusion L9: Noncarious Cervical Lesions, Dr. Lawson's prerecorded lecture, Claude Code)** — Sam added
+  the transcript of Dr. Lawson's prerecorded lecture for the 11/12 session ("i dont have his slides yet or the other
+  lecture from thursday"), so L9 `nccl` went live from the recording alone, the way L8 did. It has its own notes at both
+  levels with both mp3s (`audio/nccl-full.mp3`, `-plain.mp3`), 57 questions (`nc-*`, `cs-nc-*`: 22 multiple-choice, 10
+  Patient Box case items on three pbox-only cases, 5 two-statement, 9 true/false, 4 numbered, 2 which-true, 2
+  which-false, 2 select-all, 1 match, every choice with its why), 16 emphasize and 2 de-emphasize Exam Hints, 10 High
+  Likelihood topics, a Review group and two side-by-side rows, cram lines and two sort sets. The bank grows from 785 to
+  842. The mock stays 45 questions in an hour, now 12 each from L6-L8 and 9 from L9. A ninth tag color, slate, was
+  added to the tag CSS (light and both dark blocks). The exam card, hints banner, mock intro, Home notice, page
+  description, footer and dashboard card list L9 and no longer say the final is only Dr. Givan's lectures; the
+  redesign (`next/`) copy matches and its content was rebuilt. Lexicon: NCCLs, Dzakovich, chelator, exostoses, tori,
+  subgingivally, CEJ. The notes give both views where L9 meets L7 (Lawson: abfraction is a cause, treat it with a night
+  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/2026-11-10-occlusion-l9-follow-ups.md):
+  Sam's answers on four diagram candidates, the check against Dr. Lawson's slides (names spelled by ear) and the other
+  11/12 lecture as L10. Occlusion's performance budget 1350 -> 1370 KB (L9 adds about 25 KB over the wire; BUG-053),
+  for Sam to approve with the PR. No schema change.
+- **2026-11-10 (Heme & Endo Exam 2: Dr. Taylor's Lecture A out, saved for Exam 3, Claude Code)** — Sam asked Dr. Herr:
+  he forgot Lecture A when he wrote Exam 2, so it will likely be on the next exam ("i guess save all that for exam 3").
+  A came out of the hub whole: its notes at both levels and both mp3s, 58 questions (`dc-*`, retired in the hub's
+  registry), 15 Exam Hints, its Review group and three side-by-side tables, cram lines, 3 sequences, 1 sort set and 11
+  High Likelihood topics. The mock's 45 new questions now come from L11-L16 (A's 5 went one each to L12a and L13-L16).
+  The exam facts on Home say A isn't on Exam 2, and the timeline marks it for Exam 3. A mock started before the change
+  drops A's questions instead of counting them unanswered. Everything A had waits in
+  `vault/tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md` (from commit `43ece52`) for the Exam 3 hub.
+- **2026-11-10 (Heme & Endo Exam 2: the two-Sertoli-cell figure, Claude Code)** — Report #38 and Sam's "Draw the figure":
+  the hub's own unlabeled version of Dr. Herr's L13 drawing he said is on the exam (`tools/figures/heme-endo-exam2/sertoli.mjs`),
+  laid out like his slide (Sam's screenshot, matched and not committed): his ten labels numbered in scrambled order and the
+  two compartments lettered, with the key after answering. It sits above
+  `mh-fig-seq` and `mh-fig-label` and under the notes' "Sertoli cells" heading; `build.mjs` now writes the hub's `FIGS` line.
+- **2026-11-10 (Perio S9: five drawn diagrams, Claude Code, #301)** — Sam: "Yes to all diagrams. Merge when ready". The five
+  S9 candidates, built with the anima kit in `tools/figures/perio/` (`cairo.mjs`, `palate.mjs`, `grafts.mjs`, `ape.mjs`,
+  `egd.mjs`; `build.mjs` pastes them into the hub): **Fig 1 The Cairo recession types** (one canine with 4 mm of
+  recession as RT1, RT2 and RT3, the buccal and interproximal CAL, and a toggle for what a graft can cover), **Fig 2 The
+  palate as a donor site** (a section through a premolar and the palate: epithelium, lamina propria, submucosa, and the
+  greater palatine bundle at about 7, 12 or 17 mm for a shallow, average or high vault, with FGG and CTG outlines),
+  **Fig 3 Covered or exposed: which graft** (a CTG under a coronally advanced flap and an FGG left exposed above an
+  apically positioned flap, four steps each, from his two recorded cases), **Fig 4 Altered passive eruption** (Coslet's
+  Types 1/2 and A/B, before and after their crown lengthening) and **Fig 5 A gummy smile: find the cause** (lip length
+  and mobility sliders, the lower facial third and short crowns, each pointing to its cause and treatment). Under the S9
+  notes and in the Review section each illustrates; Figs 4 and 5 follow the slides until the live class is posted. Each
+  cites its outside sources. About page: the Perio diagrams sentence. No notes, questions or audio changed.
+- **2026-11-10 ("Which statement" questions, Claude Code)** — Sam: "add which statement questions" and "also do the inverse".
+  Two new formats with their own Question Bank filter entries: **Which statement is true** (`which`, one true of four) and
+  **Which statement is false** (`whichf`, one false of four), built by `which()` / `whichf()` in Heme & Endo Exam 2 and Occlusion.
+  42 new items written from the hubs' notes (30 in Heme & Endo Exam 2, 12 in Occlusion), so each of Heme & Endo Exam 2's eight
+  lectures (not the Exam 1 Refresher) and Occlusion L6-L8 has at least two of each; nine older items tagged `which`. New standing rule `vault/rules/which-statement-questions.md`;
+  `tools/ci/smoke.js` checks the shape and needs one of each per lecture taught from now on (`WHICH_MIN`, with exempt hubs and
+  grandfathered lectures). About page: the Question types entry. Same PR as the lessons refresh (#297).
+- **2026-11-10 (Lessons refresh, Claude Code)** — `/lessons-audit`, data read 5:50 am Central. PCD Implants Exam 1 is archived: its
+  retrospective is in `LESSONS.md` (88 people, 339 h, median 199 min each; the notes carried the first two days; the lecture lag closed
+  by itself on the eve; 5 check-ins) and its recap was published to the dashboard. Four explanations fixed in live hubs: Heme & Endo
+  Exam 2 `p2-cah-17` and `p1-corticotroph` now name the class's favorite wrong answer (21-hydroxylase; ACTH low with cortisol high);
+  perio `q4-44` gives its number (4 µm, not 0.4 mm) and `q4-M02` lists the three goals of SRP. Same ids and choice order, so the
+  class picks stay put. `LESSONS.md` Live signals rewritten and the standing lessons updated; the data-quality note adds
+  early-ended mocks and cleared class counters; PCD Implants and Special Patient Care move to Archived in `vault/home.md`.
+- **2026-11-10 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, fuller gaps, focus slides from the decks,
+  Claude Code)** — Sam: "include all of the exam 1 high likelihood questions. do not cut them. pull randomly from them for
+  the mock. do not include them in the default question bank filter unless you click to include them"; "fill in the gaps
+  a little more"; "38-39 for l14 is the layers of the endometrium during menstruation". (1) The Refresher holds all 206
+  Exam 1 High Likelihood questions again (207 with `r-pa-2s-2`); the mock draws its five Exam 1 questions at random from
+  them (`mockLikelyPick`). (2) The Question Bank's default lectures are the 8 Exam 2 ones (`bankDefaultIds`): R joins only
+  when ticked, with Exam 1 High likelihood on (which unticks it again when turned off) or on a search jump that matches it.
+  (3) A key-term gap pass: 68 more cut questions back (the rule of 10s and Dr. Taylor's metformin example among them) and 2
+  new (`mh-sertoli-fridge`, `fh-tf-atresia`): the Exam 2 lectures hold 421, 300 High Likelihood. (4) L13 and L14 topics
+  re-ranked from the decks' real slide order, with a new L14 topic for the uterine wall (33-34); the focus hints say what
+  each slide range covers.
+- **2026-11-10 (Perio: Session 9 taught, from Dr. Abou-Arraj's recording, Claude Code, #298)** — Sam: "Update perio hub".
+  Dr. Abou-Arraj's recorded first part of S9 (posted Nov 9) and his 2026 slides were in Drive, so S9 (Periodontal
+  Plastic Therapy & Esthetics) went from `upcoming` straight to `taught`. Notes rewritten at both levels (40 aligned
+  paragraphs; the gingival excess, altered passive eruption, esthetics and tattoo sections are labeled "(slides; the
+  live session)" until the live class is posted) and both mp3s regenerated; 59 new questions (`q9-L01`-`L36`, `E`, `M`,
+  five two-statement, ten true/false, four numbered) plus four drawn Patient Box items on two new cases (`no-kg-24`,
+  `recession-11`); 12 Exam Hints and 12 ranked `LIKELY_TOPICS`; Review, cram, mind map and arcade words redone; ten
+  names in `tools/podcast/lexicon.json`. The teal and amber session chips are a shade darker in light mode, for AA
+  contrast (BUG-050, caught by `a11y.js`). Still to come: the live class's part, and the diagram candidates for Sam
+  ([task](vault/tasks/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
+- **2026-11-10 (Heme & Endo Exam 2: coverage over count, Dr. Herr's FSH and his focus slides, Claude Code)** — Sam: "be
+  sure the emphasized points are covered, deemphasized points are left out ... be sure that the high likelihood questions
+  are sufficient. I dont know what you took out from them. Go with dr herrs version", then Dr. Herr's in-class focus
+  slides for L13 and L14. (1) Midcycle FSH peaks with LH just before ovulation, as on Dr. Herr's L14 graph, everywhere:
+  L14 and L16 notes (both levels), cram, note tables, the ovulation sequence, the `cycle` figure (`cycle.mjs`) and
+  `fh-tf-fshpeak`; L16's slide is noted as differing; `fhisto-full`, `fphys-full` and `fphys-plain` regenerated.
+  (2) A `focus` Exam Hint kind ("focus list", no quotation marks) at the top of L13 and L14, and the topics on those
+  slides rank first ("focus list + recording"). (3) Every lecture audited for coverage: 90 cut questions back (ids
+  un-retired), 2 new (`dm-met-lactic`, `mh-spermio-phases`), five topic lines reworded; 339 → 431 (L11 53, L12a 44, L12b
+  45, A 43, L13 44, L14 45, L15 42, L16 35, R 80), 369 High Likelihood. Hub note: "Coverage, not a count".
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't

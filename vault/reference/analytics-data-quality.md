@@ -64,6 +64,13 @@ page's Insights tab (`review/`); the local checks are in `tools/analytics-qualit
 13. **`mode_stats` has no dates** (an all-time counter), and `search_terms.hits` keeps only the last result count.
 14. **Duplicate answer events are rare**: 11 pairs of the same answer within 2 seconds in 120k answers. Ignore.
 15. **Days are Central time** in `day` columns and in every query here; `*_at` columns are UTC.
+16. **A mock ended early counts as a full one.** `record_mock_score` stores the mock's full total, so finishing after a few
+    questions saves, say, 3 of 40. PCD Implants' four exam-day mocks of 1-5 out of 40 took its stored average from about 86% to 75%
+    (lessons audit, 2026-11-10). Drop the ones far below the person's other scores before quoting a mock average.
+17. **Cleared class counters make `question_stats` run behind `personal_answers`.** When Sam OKs clearing a changed question's
+    class numbers (a rewritten statement, a re-keyed select-all), its `question_stats` row restarts and the personal rows stay, so
+    the "class counters vs personal rows" check fires: PCD Implants was 480 behind on 2026-11-10, all on the items rewritten
+    11-04 and `tm-mm-2` (11-05). Check the per-question gap before calling it a tracking fault.
 
 ## Fixed or handled
 

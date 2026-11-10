@@ -8,16 +8,20 @@ status: live
 # Occlusion
 
 Dr. Givan's D2 Occlusion course. Two exams: the midterm (Wed Oct 21, L1-L5, done) and the **final (Mon Nov 16, 6:30-7:45 pm, the midterm's window, moved up from Thu Nov 19;
-not comprehensive: L6 on, building on the midterm)**. The hub now leans to the final. Dates and check-in hours: `HUBS` in
+not comprehensive: L6 on, building on the midterm)**. The hub now leans to the final. Its lectures are Dr. Givan's except
+**L9 `nccl`, Noncarious Cervical Lesions, Dr. Lawson's** (prerecorded for the 11/12 session; added 2026-11-10). Dates and check-in hours: `HUBS` in
 `index.html`.
 
 ## Before you work on it
 
 - **Source:** `hubs/occlusion/index.html` (single file), except the generated blocks below.
-- **Lectures:** L1-L5 carry `exam:'midterm'`, L6 `instruments`, L7 `malocclusion` and L8 `dentures` carry `exam:'final'`.
+- **Lectures:** L1-L5 carry `exam:'midterm'`, L6 `instruments`, L7 `malocclusion`, L8 `dentures` and L9 `nccl` carry `exam:'final'`.
   **Each new final lecture:** add it with `exam:'final'`, add it to `MOCK_BLUEPRINT`, and update `EXAM_INFO`, `COURSE_DATES`,
-  the hints banner, the mock intro and the dashboard card. The mock takes 15 from each final lecture (45 questions, 80 s
-  each, the midterm's pace) until the final's format is announced.
+  the hints banner, the mock intro, the Home notice ("New: ..."), the dashboard card and the same words in
+  `next/index.html`'s `SH_HUB`. All nine tag colors are in use (L9 is `slate`, added 2026-11-10): a tenth lecture needs a
+  new one in the tag CSS (light and both dark blocks). The mock stays at 45 questions, 80 s each (the midterm's pace),
+  split over the final's lectures until the format is announced: 12 each from L6-L8 and 9 from L9 (2026-11-10; it was
+  15 each before L9); with a fifth final lecture, 9 each.
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
   window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
@@ -36,6 +40,13 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
   `dnbal`, `dnret`. Its notes are narrated with `tools/narrate.py`'s `spoken()`/`render()` on the extracted
   `dentures` template literals (the hub's READINGS isn't one JSON line), substituting "one sixteenth" for 1/16 and
   "divided by" in Thielemann's formula.
+  **L9 (`nccl`, Dr. Lawson)** is built from his prerecorded lecture for the 11/12 session (`en-Dr. Lawson NCCLs.txt` in
+  Occlusion/Hubs/Final; no slides yet, so its badge says "Recording"; the transcript is not in the repo). Its questions
+  are `nc-*` and `cs-nc-*` on three text-only Patient Box cases (`ncbrush`, `ncgrind`, `ncacid`). Where it meets L7 the
+  notes say both: Dr. Lawson teaches abfraction as one of three causes, with a night guard for it; Dr. Givan's L7 slides
+  call it supported in vitro but unproven clinically. Restoring follows both (his "cleansable, doesn't hurt, doesn't look
+  bad, not deep" and L7's "when necessary"). Names spelled by ear, the judgment calls, the slides check and the other
+  11/12 lecture: [task](../tasks/2026-11-10-occlusion-l9-follow-ups.md).
 - **Figures and the cusp game** come from `tools/figures/occlusion/`: `od.js` (the kit, the contact map, `CASE_IMG`
   and **`FIG_PLACE`**, which lives in the generated block: edit it in `od.js`, never in the hub), `game.js`, `cases.js`,
   and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` pastes them between the hub's
@@ -73,9 +84,11 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
     arrows carry letters only, so the stem doesn't name the direction.
 - **Select-all ticks** reach `question_choices` only from 2026-11-04 (`picks` in `occl:answered`, set in `recordAnswer`). Hubs
   copied from this engine need the same lines.
-- **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all eight lectures. The notes are template literals,
+- **Narration:** `audio/<lecture>-full.mp3` and `-plain.mp3` for all nine lectures. The notes are template literals,
   not the one-line objects `tools/narrate.py` reads, so L8 was narrated through a small wrapper that evaluates READINGS
   and calls `narrate.spoken()` / `narrate.render()` (spoken "1/16" as "one sixteenth", "11/5" as "November fifth").
+  L9 the same way ("11/12" as "November twelfth", "lower-RDA" as "lower RDA"); the lexicon gained NCCLs, Dzakovich,
+  chelator, exostoses, tori, subgingivally and CEJ for it.
 - **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
   hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.
@@ -94,8 +107,14 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   `node tools/figures/site/build.mjs` from `tools/figures/site/`.
 - The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
 - Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
+- The "which statement" formats (2026-11-10) reach `next/content/` through the build, and their choices shuffle
+  there too, but the new engine's type filter (`FMTS` in `widget/hub.js`) doesn't list `which` / `whichf` yet: add
+  `["which", "Which statement is true"], ["whichf", "Which statement is false"]` before the release.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
   the page sends you to the live hub, and a plain static server would reach the class's data.
+- `SH_HUB.home.prof` and `SH_HUB.hints.prof` say "Dr. Givan", so the new Exam hints read "What Dr. Givan said to know"
+  and "In Dr. Givan's words" though L9's hints are Dr. Lawson's. `widget/hub.js` builds "In " + prof + "'s words", so
+  "the professors" would read wrong: word it per lecture (or plural) before the release.
 
 ## Diagram decisions
 
@@ -107,6 +126,8 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   support/stability/retention, posterior tooth forms); built the same day as Figs 20-23 (`resorb`, `ssr`, `schemes`,
   `toothforms`; [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260)). L8's diagram review is done; don't
   propose these again.
+- 2026-11-10: four L9 candidates went to Sam (abfraction's flex, the buffering-capacity titration, the cupped cusp tip,
+  and reusing Fig 19 under L9's erosion section), waiting on the answers ([task](../tasks/2026-11-10-occlusion-l9-follow-ups.md)).
 
 ## Drawn Patient Box cases
 
@@ -115,9 +136,15 @@ markers, so a Patient Box question can name a case (`pcase`) and get a chart, fi
 ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)). Its own case pictures (`CASE_IMG`, `pimg`: casts,
 marks, the TMJ view) stay as they are; use the kit for any new perio chart or radiograph.
 
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `nums()`, followed by two of each for L6-L8 (`in-`, `mo-`, `dn-` + `ws-`/`wf-`); L9's (`nc-ws-*`, `nc-wf-*`) sit
+  with its other questions. Each new final lecture needs at
+  least one of each (CI); the midterm lectures are grandfathered. `rv-mip-dynamic`, `rv-cf` and `ap-mip` are tagged `which`.
+
 ## Pending
 
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
+- [L9's diagrams, Dr. Lawson's slides and the other 11/12 lecture](../tasks/2026-11-10-occlusion-l9-follow-ups.md)
 - Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
   the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
   exaggerated (about 9°); group function's lower partners (#26-28) are inferred; the thirds (Fig 18) are counted from the

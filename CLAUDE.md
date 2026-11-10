@@ -60,6 +60,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/numbered-statements.md
 
+@vault/rules/which-statement-questions.md
+
 @vault/rules/question-bank-filter-panel.md
 
 @vault/rules/question-ids-are-permanent.md

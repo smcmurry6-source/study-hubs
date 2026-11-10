@@ -40,6 +40,8 @@ clock. When the announcement arrives (Sam passes it on), make the hub match it.
 - 2026-11-05: Sam: the final moves to Mon Nov 16, "the same time window, just on a different date" (the midterm's
   6:30 pm, closing 7:45). Date and window are in the hub and on the dashboard (check-in from 8 pm), PR #250; still
   waiting on the format.
+- 2026-11-10: L9 (Dr. Lawson's noncarious cervical lesions) added: the mock is still 45 questions in an hour, now 12 each
+  from L6-L8 and 9 from L9 (`MOCK_BLUEPRINT`); still waiting on the format.
 
 ## Outcome
 

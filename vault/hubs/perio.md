@@ -19,7 +19,9 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   `tf()`, `nums()`, `mq()` and `mm()`.
 - **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
   (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
-  dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 `upcoming` (exam-review guide only). Any session going
+  dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 taught (2026-11-10)
+  from Dr. Abou-Arraj's recorded first part (posted Nov 9) plus his slides: gingival excess, altered passive eruption,
+  esthetics and tattoos are from the slides and the guide until the live class is posted ([task](../tasks/2026-11-03-perio-s9-plastic-esthetics.md)). Any session going
   to taught needs the full set: [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
   [numbered-statements](../rules/numbered-statements.md), [high-likelihood-topics](../rules/high-likelihood-topics.md).
 - **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
@@ -74,12 +76,25 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   Outside sources (Page & Kornman 1997, Vane 1971, Golub 1998, Caton 2000, Russell 2011) are cited in its "What's
   simplified" ([outside-sources-for-figures](../rules/outside-sources-for-figures.md)); what it names is the class's.
 
+- 2026-11-10: all five S9 candidates approved ("Yes to all diagrams. Merge when ready") and built in
+  `tools/figures/perio/` (`cairo`, `palate`, `grafts`, `ape`, `egd`), under the S9 notes (`FIG_BY_LEC`) and in the Review
+  section each one illustrates: `cairo` in `s9-recession`, `palate` and `grafts` in `grafts`, `ape` in `ape`, `egd` in
+  `esthetics`. Figs 4 and 5 (altered passive eruption, the gummy smile) follow the slides and the review guide: check
+  them against the live class with the rest of that part of S9. Their positions in mm (where the margin, MGJ and crest
+  sit; how far a longer lower third moves the teeth) are illustrative, and their labels give only the notes' relations
+  and numbers. Each cites its outside sources in "What this shows, and what's simplified".
+
 ## Pending
 
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
-- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) ·
-  [S9](../tasks/2026-11-03-perio-s9-plastic-esthetics.md)
+- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-10) ·
+  [S9](../tasks/2026-11-03-perio-s9-plastic-esthetics.md): the live class's part (gingival excess, abnormal color),
+  and a check of Figs 4 and 5 against it.
+- S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
+  comparable or superior to autografts, the exam-review guide says it doesn't work as well): the notes give both and
+  no question turns on either. S9's drawn cases, modeled on two of his recorded cases, are `no-kg-24` and
+  `recession-11` in `PCASES`.
 - S8's dosing chart (the last table in Dr. Litz's slides, which he said to know for the exam) differs from his
   drug-by-drug slides for clindamycin (qid × 10 days vs tid × 7), doxycycline (a double first-day dose) and Augmentin
   (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Its meal-timing

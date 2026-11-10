@@ -1,15 +1,18 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived]
 hub: pcd-implants-exam1
-status: live
+status: archived
 ---
 
 # PCD Implants Exam 1
 
 Nine lectures (Dr. Mueninghoff, Dr. Chavali, Dr. Chen, Dr. Givan, Dr. Geisinger). The exam is on Canvas, Fri Nov 6,
 7:00 am-8:00 pm: 40 questions in one hour (3 multiple-answer, 3 matching, the rest MCQ). Dates and check-in hours (the
-window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`.
+window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`. Archived 2026-11-06 at 10 pm; its card leaves the dashboard
+11-16. Retrospective: `LESSONS.md` → Hub retrospectives (written 2026-11-10, with the first 5 check-ins; later ones go into the next
+audit). Its recap is on the dashboard since 2026-11-10 (`review/` → Recap → "Remove from dashboard" takes it down). Still to do by
+hand: remove `hubs/pcd-implants-exam1/` and optionally move its entry into `ARCHIVED_HUBS`.
 
 ## Before you work on it
 
