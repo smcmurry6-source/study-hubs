@@ -757,7 +757,7 @@
       galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
-      '<div class="panel s12"><h3>The shop’s shelves</h3><p>Daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price. A design of the shelves: the shop itself is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
+      '<div class="panel s12"><h3>The shop</h3><p>A storefront of shelves: daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price, each marked with a small “Today only” stamp. <b>Tap any piece</b> and its window opens: the piece in its rarity’s display case, your place with it in, its set, the price against your crowns, Buy and Try. A design: the crowns here are made up, and the real shop is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
       '<div class="panel s12"><h3>The rank board and visiting</h3><p>Every name has its rank’s handpiece beside it, and your own row carries your board name (never “You”) on a gold nameplate with your Timmy peeking over it. Visiting is on by default: tap <b>Visit</b> on a row, or <b>Visit someone random</b>, and clouds drift in from every side, cover the screen and scatter again over that person’s place. While you’re there, the arrows take you to the next or the last place, and <b>Back to mine</b> brings you home. One switch turns visits to your place off. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
       galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
       galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
@@ -1183,22 +1183,86 @@
       '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
   }
 
-  /* ---------- the shop's shelves (a design of what get_my_shop returns: today, this week, the season, a throwback) ---------- */
-  function anyCard(x, extra){ var kind = kindOf(x); return scard(x, thumbImg(kind, x.k, kind === "scene" || kind === "outfit" ? undefined : {}), extra); }
+  /* ---------- the shop: a storefront of shelves (what get_my_shop returns: today, this week, the season, a throwback),
+     and a window that opens on any piece. A mock: the wallet and what's owned live on this page only ---------- */
+  var SHOP = { wallet: 3450, owned: {} };
+  var KIND_N = { home: "Home", scene: "Scene", yard: "Yard piece", outfit: "Outfit for Timmy" };
+  var SIC = {
+    clock: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5.800V10l2.800 1.900" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    glass: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M5 2.500h10M5 17.500h10M6.200 2.500c0 4 3.800 5 3.800 7.500s-3.800 3.500-3.800 7.500M13.800 2.500c0 4-3.800 5-3.800 7.500s3.800 3.500 3.800 7.500" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.600 16.500c.6-1.900 4.200-1.900 4.800 0Z" fill="currentColor"/></svg>',
+    check: '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4.500 10.500l3.700 3.700L15.500 6.500" fill="none" stroke="currentColor" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  function allPieces(){ return TP.HOMES.concat(TP.SCENES, TP.OUTFITS, TP.YARD); }
+  function seasonOf(x){ return x.set && x.set !== "rank" && TP.SETS ? TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0] : null; }
+  function pieceId(x){ return kindOf(x) + ":" + x.k; }
+  function pieceBy(id){ var q = id.split(":"), list = q[0] === "home" ? TP.HOMES : q[0] === "scene" ? TP.SCENES : q[0] === "yard" ? TP.YARD : TP.OUTFITS; return byK(list, q[1]); }
+  /* a set piece is shown in its own set's scene, anything else in yours */
+  function sceneFor(x){ var sc = x.set ? TP.SCENES.filter(function(q){ return q.set === x.set; })[0] : null; return sc ? sc.k : PS.scene; }
+  function pieceThumb(x){ var kind = kindOf(x); return kind === "outfit" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: sceneFor(x) }); }
+  function slotFor(x){ if (x.wide) return "side"; var free = ["left", "front", "right", "corner"].filter(function(k){ return !PS.yard[k] && !(k === "corner" && PS.yard.side === "lane"); }); return free[0] || "left"; }
+  /* your place with the piece in it (the window's "At my place" view, and what "Try it" does to the builder) */
+  function withPiece(x, apply){
+    var kind = kindOf(x), t = apply ? PS : { home: PS.home, scene: PS.scene, outfit: PS.outfit, yard: Object.assign({}, PS.yard) };
+    if (kind === "home") t.home = x.k; else if (kind === "scene") t.scene = x.k; else if (kind === "outfit") t.outfit = x.k;
+    else { var sl = slotFor(x); if (x.wide) delete t.yard.corner; else if (sl === "side" && t.yard.side === "lane") delete t.yard.side; t.yard[sl] = x.k; if (apply) PS.pick = sl; }
+    if (apply) { if (kind !== "yard") PS.pick = kind === "outfit" ? "timmy" : kind; return null; }
+    return tpOpts({ home: t.home, scene: t.scene, yard: t.yard, timmy: { g: timmyG(timmySvg("happy", t.outfit)), at: "door" } });
+  }
+  function shopCard(x, shelf){
+    var own = SHOP.owned[pieceId(x)], extra = (shelf === "back" ? '<span class="tp-stamp">' + SIC.glass + "<b>Today only</b></span>" : "") + (own ? '<span class="tp-owned">' + SIC.check + "Yours</span>" : "");
+    return rcard(x, pieceThumb(x), false, 'data-shop="' + pieceId(x) + '" data-shelf="' + shelf + '" aria-label="' + esc(cardName(x.n) + ", " + (x.rarity || "") + ", " + (own ? "yours" : fmtPrice(x.price || 0) + " crowns") + (shelf === "back" ? ", back for today only" : "") + ". Open") + '"')
+      .replace(' aria-pressed="false"', "").replace(/<\/button>$/, extra + "</button>");
+  }
   function shopMock(){
     var el = $("#tpShop"); if (!el) return;
     var pick = function(list, ks){ return ks.map(function(k){ return byK(list, k); }).filter(Boolean); };
-    var shelf = function(title, when, note, cards, cls){ return '<section class="tp-shelf ' + (cls || "") + '"><header><h4>' + esc(title) + '</h4><span class="tp-when">' + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") + '</header><div class="tp-rcards">' + cards.join("") + "</div></section>"; };
+    var shelf = function(k, title, when, ic, note, items){ return '<section class="tp-shelf tp-shelf-' + k + '"><header><h4 class="tp-tagsign">' + esc(title) + '</h4><span class="tp-when">' + ic + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") +
+      '</header><div class="tp-rcards tp-plank">' + items.map(function(x){ return shopCard(x, k); }).join("") + "</div></section>"; };
     var season = TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === "thanksgiving"; })[0], of = function(list, k){ return list.filter(function(x){ return x.set === k; }); };
     var seasonal = season ? of(TP.HOMES, season.k).concat(of(TP.SCENES, season.k), of(TP.OUTFITS, season.k), of(TP.YARD, season.k)) : [];
     var back = [].concat(of(TP.YARD, "spring").slice(1, 2), of(TP.OUTFITS, "valentine").slice(0, 1), of(TP.HOMES, "summer").slice(0, 1));
-    var ribbon = '<span class="tp-ribbon">Back for today</span>';
-    el.innerHTML =
-      shelf("Today’s picks", "New picks in 6 h 12 min", "Four pieces, the same for everyone, new every day.", pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"])).map(function(x){ return anyCard(x); })) +
-      shelf("This week", "5 days left", "Three bigger pieces that stay all week.", pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"])).map(function(x){ return anyCard(x); })) +
-      (seasonal.length ? shelf(season.n, "On sale until November 27", "The season’s set, only while the season lasts. Two seasons at once (fall is on too) get a shelf each.", seasonal.map(function(x){ return anyCard(x); }), "tp-shelf-season") : "") +
-      (back.length ? shelf("Back for today", "A throwback day: two a month", "Three pieces from seasons that have passed, at their usual price, today only.", back.map(function(x){ return anyCard(x, ribbon); }), "tp-shelf-back") : "") +
-      '<p class="tp-note">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them.</p>';
+    var stripes = ""; for (var n = 0; n < 40; n++) stripes += "<i></i>";
+    el.innerHTML = '<div class="tp-store"><div class="tp-awning" aria-hidden="true">' + stripes + "</div>" +
+      '<div class="tp-storehead"><span class="tp-keeper" aria-hidden="true">' + img(timmySvg("happy", "sunhat"), "") + '</span><div class="tp-sign"><b>Timmy’s Shop</b><span>Tap anything for a closer look.</span></div>' +
+        '<span class="tp-wallet" title="Shiny Gold Crowns">' + img(TP.coin(), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(SHOP.wallet) + "</b><small>crowns</small></span></div>" +
+      shelf("today", "Today’s picks", "New picks in 6 h 12 min", SIC.clock, "Four pieces, the same for everyone, new every day.", pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"]))) +
+      shelf("week", "This week", "5 days left", SIC.clock, "Three bigger pieces that stay all week.", pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"]))) +
+      (seasonal.length ? shelf("season", season.n, "Until November 27", SIC.clock, "The season’s set, only while the season lasts. Nothing from a season or a holiday is ever sold before its dates. Two seasons at once (fall is on too) get a shelf each.", seasonal) : "") +
+      (back.length ? shelf("back", "Back for today", "Gone at midnight", SIC.glass, "A throwback day, two a month: three pieces from seasons that have passed, at their usual price. On other days this shelf isn’t here.", back) : "") +
+      '<p class="tp-note tp-storefoot">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them. The crowns and what you buy here are made up for this page.</p></div>';
+    $$("[data-shop]", el).forEach(function(b){ b.addEventListener("click", function(){ openItem(pieceBy(b.dataset.shop), b.dataset.shelf); }); });
+  }
+  /* the window on one piece: a display case in the rarity's color with turning rays, the piece itself or your place with
+     it in, what it is, its set, the price against your crowns, Buy and Try */
+  function rays(){ var s = ""; for (var a = 0; a < 12; a++) s += '<path d="M0 0L-13 -120L13 -120Z" transform="rotate(' + a * 30 + ')"/>'; return '<svg class="tp-irays" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="#fff">' + s + "</g></svg>"; }
+  function openItem(x, shelf, view, bought){
+    if (!x) return;
+    var kind = kindOf(x), id = pieceId(x), r = x.rarity || "Common", se = seasonOf(x), own = !!SHOP.owned[id], cost = x.price || 0, short = cost - SHOP.wallet; view = view || "piece";
+    var pic = view === "place" ? '<div class="tp-iplace">' + sceneImg(TP.render(withPiece(x)).svg, "Your place with " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); }), isStill()) + "</div>"
+      : '<div class="tp-ipiece k-' + kind + '">' + (kind === "outfit" ? '<span class="tp-ipod" aria-hidden="true"></span>' + img(timmySvg("happy", x.k), "Timmy in " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); })) : pieceThumb(x).replace('alt=""', 'alt="' + esc(cardName(x.n)) + '"')) + "</div>";
+    var others = se ? allPieces().filter(function(q){ return q.set === x.set && q !== x; }) : [];
+    var fits = kind === "yard" ? (x.wide ? "It’s long: it takes the side yard and the front corner together." : "Fits any spot in the yard.") : kind === "home" ? "Your yard, upgrades and paint move in with you." : kind === "scene" ? "Your home and yard move over as they are." : "Timmy wears it at his place, and on your card.";
+    var buy = own ? '<p class="tp-iown">' + SIC.check + (bought ? "It’s yours! " : "Yours. ") + "It’s in your inventory for good.</p>" + '<button type="button" class="tp-buy" data-item-try="1">Put it out at my place</button>'
+      : '<div class="tp-iprice"><span class="tp-ibig">' + img(TP.coin(), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(cost) + "</b></span><span class=\"tp-ihave\">" + (short > 0 ? "You have " + fmtPrice(SHOP.wallet) + ": " + fmtPrice(short) + " more to go" : "You have " + fmtPrice(SHOP.wallet) + ", so " + fmtPrice(-short) + " left after") + "</span>" +
+          (short > 0 ? '<span class="tp-ibar" aria-hidden="true"><i style="width:' + Math.round(SHOP.wallet / cost * 100) + '%"></i></span>' : "") + "</div>" +
+        '<div class="tp-iacts"><button type="button" class="tp-buy" data-item-buy="1"' + (short > 0 ? " disabled" : "") + ">" + (short > 0 ? "Not enough yet" : "Buy for " + fmtPrice(cost)) + '</button><button type="button" class="btn tp-itry" data-item-try="1">Try it at my place</button></div>';
+    var d = openDlg('<div class="tp-item r-' + r + (bought ? " is-new" : "") + '">' + DLG_X +
+      '<div class="tp-icase">' + rays() + '<span class="tp-icorner a" aria-hidden="true"></span><span class="tp-icorner b" aria-hidden="true"></span>' + pic + (bought && !isStill() ? '<div class="tp-iburst">' + TP.burst(r) + "</div>" : "") +
+        '<div class="seg tp-iview" role="group" aria-label="What the picture shows"><button type="button" data-iview="piece" aria-pressed="' + (view === "piece") + '">The piece</button><button type="button" data-iview="place" aria-pressed="' + (view === "place") + '">At my place</button></div></div>' +
+      '<div class="tp-iinfo"><p class="tp-ikind">' + esc(KIND_N[kind]) + (se ? " · " + esc(se.n) + " set" : "") + '</p><h3 id="tpDlgT">' + esc(cardName(x.n)) + "</h3>" +
+        '<p class="tp-itags">' + rarTag(r) + (shelf === "back" ? '<span class="tp-stamp is-inline">' + SIC.glass + "<b>Back for today only</b></span>" : "") + "</p>" +
+        '<p class="tp-idesc">' + esc(sentence(x.note)) + ". " + fits + "</p>" +
+        (kind === "outfit" && x.say ? '<p class="tp-isay"><span aria-hidden="true">' + img(timmySvg("happy", ""), "") + "</span><q>" + esc(x.say[(x.say.length > 1 ? 1 : 0)]) + "</q></p>" : "") +
+        (se ? '<div class="tp-iset"><b>' + esc(se.n) + " set</b><span>" + esc(shelf === "back" ? "Its season has passed: this piece is back today only, gone at midnight. The rest of the set comes back with its season." : "On sale: " + se.when + ".") + '</span><div class="tp-isetrow">' +
+          others.map(function(q){ return shelf === "back" ? '<span class="tp-imini is-off" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</span>" : '<button type="button" class="tp-imini" data-item-go="' + pieceId(q) + '" aria-label="' + esc(cardName(q.n)) + '" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</button>"; }).join("") + "</div></div>" : "") +
+        '<div class="tp-ibuy">' + buy + "</div></div></div>", "tp-idlg");
+    d.setAttribute("aria-labelledby", "tpDlgT");
+    $$("[data-iview]", d).forEach(function(b){ b.addEventListener("click", function(){ openItem(x, shelf, b.dataset.iview); var n = $('[data-iview="' + b.dataset.iview + '"]', $("#tpDlg")); if (n) n.focus(); }); });
+    $$("[data-item-go]", d).forEach(function(b){ b.addEventListener("click", function(){ openItem(pieceBy(b.dataset.itemGo), shelf); }); });
+    $$("[data-item-buy]", d).forEach(function(b){ b.addEventListener("click", function(){ if (SHOP.wallet < cost) return; SHOP.wallet -= cost; SHOP.owned[id] = 1; shopMock(); openItem(x, shelf, view, true); var n = $(".tp-buy", $("#tpDlg")); if (n) n.focus(); }); });
+    $$("[data-item-try]", d).forEach(function(b){ b.addEventListener("click", function(){
+      withPiece(x, true); PS.mode = "customize"; d.close(); buildPlace(kind === "yard" ? { burst: PS.pick } : kind === "home" ? { burst: "home" } : kind === "outfit" && x.say ? { say: x.say[0] } : {});
+      $("#tpStage").scrollIntoView({ block: "center", behavior: isStill() ? "auto" : "smooth" }); }); });
   }
 
   /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
