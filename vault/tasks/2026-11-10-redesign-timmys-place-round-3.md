@@ -244,7 +244,9 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 
 ## Outcome
 
-Waiting for Sam's look at the second set of screenshots (PR above). Left for after it:
+Sam looked at the last sheets (the gentler ground, health at his place) on 2026-11-10: "Looks good". The design
+work in this note is done; the PR waits for Sam to merge it (after #289, which it is stacked on). Left for the next
+session, which starts from this note:
 
 - **Wiring** (not done, by instruction): the place, the sets, the wave and the bubble into `widget/pet.js`; the new
   seasons and holidays into `holidayId()` / `isFall()` (the server's `sh_shop_seasons` already has them); flame levels
