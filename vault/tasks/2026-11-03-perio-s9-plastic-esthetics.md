@@ -87,7 +87,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
   vs the slide's 88% / 50%), and ADM ("comparable or superior" on a slide vs "doesn't work as well" in the guide).
 - **Left:** the live class's capture (see the checklist above). When it comes, check Figs 4 and 5 against it too.
 
-2026-11-10, the diagrams PR (Sam: "Yes to all diagrams. Merge when ready"):
+2026-11-10, [PR 301](https://github.com/smcmurry6-source/study-hubs/pull/301), the diagrams (Sam: "Yes to all diagrams. Merge when ready"):
 - **Five figures**, built with the anima kit in `tools/figures/perio/` and pasted in by `build.mjs`: S9 · Fig 1 `cairo`
   (the Cairo types on one canine, with what a graft can cover), Fig 2 `palate` (the palate's layers and the greater
   palatine bundle at 7, 12 or 17 mm for a shallow, average or high vault, with FGG and CTG outlines), Fig 3 `grafts`

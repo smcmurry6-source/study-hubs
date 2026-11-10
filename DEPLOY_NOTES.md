@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-10 (Perio S9: five drawn diagrams, Claude Code)** — Sam: "Yes to all diagrams. Merge when ready". The five
+- **2026-11-10 (Perio S9: five drawn diagrams, Claude Code, #301)** — Sam: "Yes to all diagrams. Merge when ready". The five
   S9 candidates, built with the anima kit in `tools/figures/perio/` (`cairo.mjs`, `palate.mjs`, `grafts.mjs`, `ape.mjs`,
   `egd.mjs`; `build.mjs` pastes them into the hub): **Fig 1 The Cairo recession types** (one canine with 4 mm of
   recession as RT1, RT2 and RT3, the buccal and interproximal CAL, and a toggle for what a graft can cover), **Fig 2 The
