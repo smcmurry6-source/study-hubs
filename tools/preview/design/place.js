@@ -803,8 +803,12 @@ window.SH_PLACE = (function placeKit(INK, C){
     var fl = "M" + f(t[0] + .8) + " " + f(t[1] + 1) + " Q" + f(t[0] + 9) + " " + f(t[1] - 2) + " " + f(t[0] + 17) + " " + f(t[1] + 2) + " L" + f(t[0] + 17) + " " + f(t[1] + 12) + " Q" + f(t[0] + 9) + " " + f(t[1] + 8) + " " + f(t[0] + .8) + " " + f(t[1] + 11) + " Z";
     return s + G("tp-flag", FO(fl, K.blue, 1.4) + tinyTooth(t[0] + 9, t[1] + 6.4, .55, "#FFFFFF"));
   }
+  /* a little molar for signs, flags and letters: every number scales with k, so it keeps its shape at any size */
   function tinyTooth(x, y, k, fill){
-    return '<path d="M' + f(x - 4 * k) + " " + f(y - 4 * k) + " c0 -3 " + f(3 * k) + " -3 " + f(4 * k) + " -1.6 c" + f(1 * k) + " -1.4 " + f(4 * k) + " -1.4 " + f(4 * k) + " 1.6 c0 3 " + f(-1 * k) + " 4 " + f(-1.4 * k) + " 7 c-.3 1.6 " + f(-1.6 * k) + " 1.6 " + f(-1.8 * k) + " 0 l-.4 -2.4 c-.2 -.6 -.8 -.6 -1 0 l-.4 2.4 c-.2 1.6 " + f(-1.5 * k) + " 1.6 " + f(-1.8 * k) + " 0 c" + f(-.4 * k) + " -3 " + f(-1.4 * k) + " -4 " + f(-1.4 * k) + ' -7 z" fill="' + fill + '" stroke="' + INK + '" stroke-width=".8"/>';
+    var q = function(a, b){ return f(x + a * k) + " " + f(y + b * k); };
+    return '<path d="M' + q(-4, -3.1) + " C" + q(-4, -5.7) + " " + q(-1.3, -6) + " " + q(0, -4.7) + " C" + q(1.3, -6) + " " + q(4, -5.7) + " " + q(4, -3.1) +
+      " C" + q(4, -.5) + " " + q(3, .7) + " " + q(2.75, 3.7) + " C" + q(2.6, 5.1) + " " + q(1.2, 5.1) + " " + q(1.05, 3.7) + " L" + q(.8, 2) + " C" + q(.6, 1.2) + " " + q(-.6, 1.2) + " " + q(-.8, 2) +
+      " L" + q(-1.05, 3.7) + " C" + q(-1.2, 5.1) + " " + q(-2.6, 5.1) + " " + q(-2.75, 3.7) + " C" + q(-3, .7) + " " + q(-4, -.5) + " " + q(-4, -3.1) + ' Z" fill="' + fill + '" stroke="' + INK + '" stroke-width="' + f(Math.max(.7, Math.min(1.1, k * 1.3))) + '"/>';
   }
   function firefly(x, y, d){ return '<g class="tp-firefly" style="animation-delay:' + d + 's">' + circ(x, y, 4, "#F6F2A0", 0).replace("/>", ' opacity=".35"/>') + circ(x, y, 1.4, "#FFFBD0", 0) + "</g>"; }
 
@@ -1227,56 +1231,101 @@ window.SH_PLACE = (function placeKit(INK, C){
   function pin(x, y){
     return FO("M" + f(x - 1.6) + " " + f(y) + " q-1.4 -3 -.6 -5.4 q.6 -1.4 .2 -2.6 q-.4 -1.6 1 -2.2 q1.4 .6 1 2.2 q-.4 1.2 .2 2.6 q.8 2.4 -.6 5.4 z", "#FFFFFF", 1.1) + L("M" + f(x - 1) + " " + f(y - 7.2) + " h2", .9, K.red);
   }
+  /* a sugar-free mint, the one the bowling egg rolls: white, with a pinwheel of mint-green wedges */
   function mintBall(x, y, r){
-    return circ(x, y, r, "#FFFFFF", 1.4) + L("M" + f(x - r * .9) + " " + f(y - r * .3) + " q" + f(r * .4) + " " + f(-r * .6) + " " + f(r * .9) + " " + f(-r * .7) +
-      " M" + f(x + r * .3) + " " + f(y - r * .9) + " q" + f(r * .6) + " " + f(r * .3) + " " + f(r * .6) + " " + f(r * .9) + " M" + f(x + r * .9) + " " + f(y + r * .3) + " q" + f(-r * .4) + " " + f(r * .6) + " " + f(-r * .9) + " " + f(r * .7) +
-      " M" + f(x - r * .3) + " " + f(y + r * .9) + " q" + f(-r * .6) + " " + f(-r * .3) + " " + f(-r * .6) + " " + f(-r * .9), 1.4, K.green);
+    var w = "", rr = r * .9;
+    for (var i = 0; i < 6; i++){
+      var a1 = i * Math.PI / 3, a2 = a1 + Math.PI / 6;
+      w += F("M0 0 Q" + f(Math.cos(a1 - .55) * r * .55) + " " + f(Math.sin(a1 - .55) * r * .55) + " " + f(Math.cos(a1) * rr) + " " + f(Math.sin(a1) * rr) +
+        " A" + f(rr) + " " + f(rr) + " 0 0 1 " + f(Math.cos(a2) * rr) + " " + f(Math.sin(a2) * rr) + " Q" + f(Math.cos(a2 - .55) * r * .55) + " " + f(Math.sin(a2 - .55) * r * .55) + " 0 0 Z", "#7FD6B5");
+    }
+    return T(x, y, circ(0, 0, r, "#FFFFFF") + w + circ(0, 0, r * .2, "#FFFFFF") +
+      L("M" + f(-r * .66) + " " + f(-r * .3) + " A" + f(r * .72) + " " + f(r * .72) + " 0 0 1 " + f(-r * .2) + " " + f(-r * .69), Math.max(.8, r * .2), "#FFFFFF", .95) + circ(0, 0, r, "none", Math.max(1.1, r * .26)));
   }
+  /* garden flowers on a stem with a leaf: p is the foot on screen, h the stem's height */
+  function stemLeaf(p, h, c){ return L("M" + f(p[0]) + " " + f(p[1]) + " v" + f(-h), 1.4, c || K.leafShade) + FO("M" + f(p[0]) + " " + f(p[1] - h * .35) + " q3.4 -.6 4 -3.6 q-3.4 .4 -4 3.6 z", "#6CB060", .7); }
+  function daisyOn(p, h, c){ var out = stemLeaf(p, h), cy = p[1] - h; for (var a = 0; a < 6; a++){ var t = a * Math.PI / 3; out += circ(p[0] + Math.cos(t) * 2.2, cy + Math.sin(t) * 2.2, 1.5, c, .7); } return out + circ(p[0], cy, 1.5, "#FFE27A", .7); }
+  function tulip(p, h, c){ var x = p[0], y = p[1] - h; return stemLeaf(p, h) + FO("M" + f(x - 2.6) + " " + f(y - 3.4) + " l1.4 1.8 1.2 -2.6 1.2 2.6 1.4 -1.8 q.8 5.6 -2.6 6 q-3.4 -.4 -2.6 -6 z", c, .9); }
+  function sunflower(p, h){ var x = p[0], y = p[1] - h, out = stemLeaf(p, h) + stemLeaf([p[0], p[1] - h * .3], h * .2); for (var a = 0; a < 9; a++){ var t = a * Math.PI * 2 / 9; out += circ(x + Math.cos(t) * 3.5, y + Math.sin(t) * 3.5, 1.8, "#FFD23F", .7); } return out + circ(x, y, 2.6, "#8A5A3A", .9) + circ(x - .6, y - .6, .7, "#B98559"); }
   var YARD = {
     garden: {
-      n: "A garden", note: "Raised beds of flowers and carrots", rarity: "Uncommon", theme: "hilltop", price: 300, id: "garden", spot: [1.8, 3.5],
+      n: "A garden", note: "Raised beds of flowers and vegetables, a bean trellis and a watering can", rarity: "Uncommon", theme: "hilltop", price: 300, id: "garden", spot: [1.8, 3.5],
       draw: function(o){
-        var s = "";
-        [[.3, .3], [.3, 2.0]].forEach(function(b, k){
-          s += box(b[0], b[1], 0, 3.0, 1.3, .55, { top: o.snow ? "#F7FBFF" : K.soil, left: K.wood, right: K.woodShade });
-          for (var i = 0; i < 5; i++){
-            var x = b[0] + .35 + i * .58, y = b[1] + .65, p = P(x, y, .55);
-            if (o.snow) { s += ell(p[0], p[1] - 1, 3, 1.4, "#FFFFFF", 0); continue; }
-            if (k === 0) s += L("M" + f(p[0]) + " " + f(p[1]) + " v-6", 1.3, "#4F9A52") + circ(p[0], p[1] - 7, 2.6, ["#FF8FB1", "#FFE27A", "#B08CFF", "#FF7A5C", "#8FD3F5"][i], 1) + circ(p[0], p[1] - 7, .9, "#FFE27A");
-            else s += L("M" + f(p[0]) + " " + f(p[1]) + " l-2 -5 M" + f(p[0]) + " " + f(p[1]) + " l0 -6 M" + f(p[0]) + " " + f(p[1]) + " l2 -5", 1.4, o.fall ? "#9FB54A" : "#4F9A52") + FO("M" + f(p[0] - 1.6) + " " + f(p[1]) + " h3.2 l-1.6 3 z", K.orange, .8);
-          }
+        var s = "", soil = o.snow ? "#F7FBFF" : K.soil, green = o.fall ? "#9FB54A" : "#4F9A52";
+        var bed = function(x, y, w, d){
+          var out = box(x, y, 0, w, d, .55, { top: soil, left: K.wood, right: K.woodShade });
+          out += L(D([[x, y + d, .28], [x + w, y + d, .28]], true) + D([[x + w, y, .28], [x + w, y + d, .28]], true), .8, K.woodShade, .8);
+          if (!o.snow) out += L(D([[x + .2, y + .2, .55], [x + w - .2, y + .2, .55]], true) + D([[x + .2, y + d * .5, .55], [x + w - .2, y + d * .5, .55]], true), .8, K.soilShade, .5);
+          [[x, y + d], [x + w, y + d], [x + w, y]].forEach(function(q){ out += box(q[0] - .1, q[1] - .1, 0, .2, .2, .7, { top: K.woodLight, left: K.woodLight, right: K.wood }, { sw: 1.1, si: .7 }); });
+          return out;
+        };
+        /* the back bed: a bean trellis and a row of flowers */
+        s += bed(.3, .3, 3.0, 1.25);
+        var ty = .5, z0 = .55, z1 = 2.4, post = function(x){ return L(D([[x, ty, z0], [x, ty, z1]], true), 2.8) + L(D([[x, ty, z0], [x, ty, z1]], true), 1.4, K.woodLight); };
+        s += post(.6) + post(3.0);
+        [1.0, 1.55, 2.1].forEach(function(z){ s += L(D([[.6, ty, z], [3.0, ty, z]], true), 1, K.wood); });
+        [1.2, 1.8, 2.4].forEach(function(x){ s += L(D([[x, ty, z0], [x, ty, z1 - .2]], true), 1, K.wood); });
+        if (o.snow) s += L(D([[.6, ty, z1], [3.0, ty, z1]], true), 2.2, "#FFFFFF");
+        else {
+          var vine = []; for (var i = 0; i <= 12; i++) vine.push([.66 + i * .19, ty + .03, .8 + i * .1 + Math.sin(i * 1.3) * .16]);
+          s += L(D(vine, true), 1.5, green);
+          vine.forEach(function(q, k){ var p = P(q[0], q[1], q[2]);
+            if (k % 2) s += FO("M" + f(p[0]) + " " + f(p[1]) + " q-3 -1 -3.4 -4.2 q3.2 .4 3.4 4.2 z", k % 4 === 1 ? "#6CB060" : green, .7);
+            if (k % 4 === 2) s += circ(p[0] + 1.6, p[1] + 2.2, 1.8, K.red, .8) + circ(p[0] + 1.1, p[1] + 1.7, .5, "#FFB3A0"); });
+        }
+        [[.7, "t", "#FF8FB1", 6], [1.3, "d", "#FFFFFF", 7.5], [1.9, "s", "", 12.5], [2.5, "d", "#B08CFF", 7], [3.0, "t", "#FF7A5C", 6]].forEach(function(q){
+          var p = P(q[0], 1.05, .55);
+          if (o.snow){ s += ell(p[0], p[1] - 1, 3, 1.4, "#FFFFFF", 0); return; }
+          s += q[1] === "t" ? tulip(p, q[3], q[2]) : q[1] === "d" ? daisyOn(p, q[3], q[2]) : sunflower(p, q[3]);
         });
-        var w = P(3.3, 3.5, 0);
-        s += FO("M" + f(w[0] - 4) + " " + f(w[1]) + " v-6 h8 v6 q-4 2 -8 0 z", K.blue, 1.3) + L("M" + f(w[0] + 4) + " " + f(w[1] - 3) + " l5 -5", 2.6) + L("M" + f(w[0] + 4) + " " + f(w[1] - 3) + " l5 -5", 1.2, K.blue) + L("M" + f(w[0] - 3) + " " + f(w[1] - 6) + " q3 -5 6 0", 1.2);
+        /* the front bed: carrots and lettuces */
+        s += bed(.3, 2.05, 3.0, 1.25);
+        [.7, 1.25, 1.8].forEach(function(x){ var p = P(x, 2.7, .55);
+          if (o.snow){ s += ell(p[0], p[1] - 1, 3, 1.4, "#FFFFFF", 0); return; }
+          s += L("M" + f(p[0]) + " " + f(p[1] - 1) + " l-2.6 -5.2 M" + f(p[0]) + " " + f(p[1] - 1) + " l0 -6.6 M" + f(p[0]) + " " + f(p[1] - 1) + " l2.6 -5.2", 1.5, green) +
+            FO("M" + f(p[0] - 2) + " " + f(p[1] + .8) + " q0 -2.6 2 -2.6 q2 0 2 2.6 z", K.orange, .8); });
+        [2.4, 2.95].forEach(function(x){ var p = P(x, 2.7, .55);
+          if (o.snow){ s += ell(p[0], p[1] - 1, 3, 1.4, "#FFFFFF", 0); return; }
+          s += circ(p[0], p[1] - 1.8, 3.5, "#8FD08A", .9) + L("M" + f(p[0] - 2.4) + " " + f(p[1] - 2) + " q2.4 -2.6 4.8 0 M" + f(p[0] - 1.2) + " " + f(p[1] - .6) + " q1.2 -1.2 2.4 0", .9, "#4F9A52"); });
+        /* a seed marker, a watering can and a butterfly */
+        var m = P(.5, 3.45, 0);
+        s += L("M" + f(m[0]) + " " + f(m[1]) + " v-6", 1.3) + FO("M" + f(m[0] - 3) + " " + f(m[1] - 10.4) + " h6 v4.6 h-6 z", "#FFFDF6", .9) + FO("M" + f(m[0] - 1.3) + " " + f(m[1] - 9.4) + " h2.6 l-1.3 2.8 z", K.orange, .5);
+        var w = P(3.3, 3.5, 0), wx = w[0], wy = w[1];
+        s += L("M" + f(wx - 4.4) + " " + f(wy - 5.2) + " q-4.2 .6 -3.6 4 q.4 1.6 3.2 1.4", 1.5) + L("M" + f(wx + 4) + " " + f(wy - 2.4) + " l5.6 -5", 3.2) + L("M" + f(wx + 4) + " " + f(wy - 2.4) + " l5.6 -5", 1.6, K.blue) +
+          FO("M" + f(wx - 4.2) + " " + f(wy) + " l-.5 -6.6 h9.4 l-.5 6.6 q-4.2 1.7 -8.4 0 z", K.blue, 1.3) + ell(wx, wy - 6.6, 4.7, 1.5, "#8FD3F5", 1.1) + ell(wx + 10.2, wy - 8, 1.5, 2.4, "#8FD3F5", 1) + L("M" + f(wx - 2.4) + " " + f(wy - 2.6) + " v-2", 1.2, "#FFFFFF", .7);
+        if (!o.snow && !o.night){ var b = P(1.9, 1.05, 2.3); s += G("tp-firefly", FO("M" + f(b[0]) + " " + f(b[1]) + " q-4 -4.4 -5 -.6 q.4 2.6 5 .6 q4.6 2 5 -.6 q-1 -3.8 -5 .6 z", "#FFB3D1", .8) + L("M" + f(b[0]) + " " + f(b[1] - 1.4) + " v3", 1)); }
         return s;
       },
-      bits: function(){ var p = P(1.5, 2.65, .55); return FO("M" + f(p[0] - 2.4) + " " + f(p[1] - 6) + " h4.8 l-2.4 10 z", K.orange, 1) + L("M" + f(p[0]) + " " + f(p[1] - 6) + " l-2 -5 M" + f(p[0]) + " " + f(p[1] - 6) + " l0 -6 M" + f(p[0]) + " " + f(p[1] - 6) + " l2 -5", 1.4, "#4F9A52"); }
+      bits: function(){ var p = P(1.25, 2.7, .55); return FO("M" + f(p[0] - 2.4) + " " + f(p[1] - 6) + " h4.8 l-2.4 10 z", K.orange, 1) + L("M" + f(p[0]) + " " + f(p[1] - 6) + " l-2 -5 M" + f(p[0]) + " " + f(p[1] - 6) + " l0 -6 M" + f(p[0]) + " " + f(p[1] - 6) + " l2 -5", 1.4, "#4F9A52"); }
     },
     pool: {
       n: "A swimming pool", note: "With a ladder and a mint float", rarity: "Epic", theme: "seaside", price: 2000, id: "swimming-pool", spot: [3.45, 2.3],
       draw: function(o){
-        var x0 = .2, y0 = .3, x1 = 3.4, y1 = 3.4, r = .32, s = "";
-        s += F(D([[x0, y0, .18], [x1, y0, .18], [x1, y1, .18], [x0, y1, .18]]), "#FFFFFF") + F(D([[x0, y1, .18], [x1, y1, .18], [x1, y1, 0], [x0, y1, 0]]), "#E3EEF5") + F(D([[x1, y0, .18], [x1, y1, .18], [x1, y1, 0], [x1, y0, 0]]), "#C9DCE8");
-        s += O(D([[x0, y0, .18], [x1, y0, .18], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y1, .18]]));
-        var a = x0 + r, b = y0 + r, c = x1 - r, d = y1 - r;
-        s += F(D([[a, b, .18], [c, b, .18], [c, b, -.5], [a, b, -.5]]), "#7FCDEB") + F(D([[a, b, .18], [a, d, .18], [a, d, -.5], [a, b, -.5]]), "#A9E1F7");
-        s += F(D([[a, b, -.12], [c, b, -.12], [c, d, -.12], [a, d, -.12]]), o.snow ? "#DCEFFA" : K.water) + F(D([[a + 1.4, b, -.12], [c, b, -.12], [c, d, -.12], [a + 2.4, d, -.12]]), o.snow ? "#C9E3F3" : K.waterShade, .5);
-        s += O(D([[a, b, .18], [c, b, .18], [c, d, .18], [a, d, .18]]), 1.6);
-        for (var i = 1; i < 5; i++){ s += L(D([[x0 + i * .64, y1, .18], [x0 + i * .64, d, .18]], true), .7, "#B9CFDC") + L(D([[x1, y0 + i * .62, .18], [c, y0 + i * .62, .18]], true), .7, "#B9CFDC"); }
+        /* the water sits dz below the deck, so the near rim hides a strip of it dz wide: only that much water, and that much
+           of the far walls, is drawn (nothing spills over the pool's side) */
+        var x0 = .2, y0 = .3, x1 = 3.4, y1 = 3.4, r = .34, zc = .18, dz = .36, zw = zc - dz, s = "";
+        s += F(D([[x0, y0, zc], [x1, y0, zc], [x1, y1, zc], [x0, y1, zc]]), "#FFFFFF") + F(D([[x0, y1, zc], [x1, y1, zc], [x1, y1, 0], [x0, y1, 0]]), "#E3EEF5") + F(D([[x1, y0, zc], [x1, y1, zc], [x1, y1, 0], [x1, y0, 0]]), "#C9DCE8");
+        s += O(D([[x0, y0, zc], [x1, y0, zc], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y1, zc]])) + L(D([[x0, y1, zc], [x1, y1, zc], [x1, y0, zc]], true) + D([[x1, y1, zc], [x1, y1, 0]], true), 1.2);
+        var a = x0 + r, b = y0 + r, c = x1 - r, d = y1 - r, wa = o.snow ? "#DCEFFA" : K.water, ws = o.snow ? "#C9E3F3" : K.waterShade;
+        for (var i = 1; i < 5; i++){ s += L(D([[x0 + i * .64, y1, zc], [x0 + i * .64, d, zc]], true) + D([[x1, y0 + i * .62, zc], [c, y0 + i * .62, zc]], true) + D([[x0 + i * .64, y0, zc], [x0 + i * .64, b, zc]], true) + D([[x0, y0 + i * .62, zc], [a, y0 + i * .62, zc]], true), .7, "#B9CFDC"); }
+        s += F(D([[a, b, zc], [c, b, zc], [c - dz, b, zw], [a, b, zw]]), "#7FCDEB") + F(D([[a, b, zc], [a, d, zc], [a, d - dz, zw], [a, b, zw]]), "#A9E1F7");
+        s += F(D([[a, b, zw], [c - dz, b, zw], [c - dz, d - dz, zw], [a, d - dz, zw]]), wa) + F(D([[a + 1.2, b, zw], [c - dz, b, zw], [c - dz, d - dz, zw], [a + 2.0, d - dz, zw]]), ws, .5);
+        s += L(D([[a, d - dz, zw], [a, b, zw], [c - dz, b, zw]], true), .9, "#FFFFFF", .8) + L(D([[a, b, zc], [a, b, zw]], true), .9, "#5FB6E0");
+        s += O(D([[a, b, zc], [c, b, zc], [c, d, zc], [a, d, zc]]), 1.6);
         if (!o.snow){
-          s += G("tp-water", L(D([[a + .4, b + .7, -.12], [a + 1.2, b + .7, -.12]], true) + D([[a + 1.5, b + 1.6, -.12], [a + 2.3, b + 1.6, -.12]], true) + D([[a + .6, b + 2.2, -.12], [a + 1.4, b + 2.2, -.12]], true), 1.4, "#FFFFFF", .8));
-          var m = P(a + 1.8, b + 1.0, -.08);
-          s += G("tp-bob", ell(m[0], m[1], 9, 5.2, "#FFFFFF", 1.6) + ell(m[0], m[1] - .6, 3.6, 2, K.water, 1.2) +
-            L("M" + f(m[0] - 8) + " " + f(m[1] - 2) + " q2 -2 5 -2.6 M" + f(m[0] + 3) + " " + f(m[1] - 4.6) + " q4 .4 5.6 2.4 M" + f(m[0] + 7.4) + " " + f(m[1] + 2.6) + " q-3 2 -6 2.2 M" + f(m[0] - 3) + " " + f(m[1] + 4.6) + " q-4 -.6 -5.6 -2.4", 1.8, K.green));
-        } else s += L(D([[a + .4, b + .6, -.12], [a + 2, b + 2.2, -.12]], true), 1, "#FFFFFF", .8);
-        var l1 = P(c - .1, d - .7, .18), l2 = P(c - .1, d - 1.5, .18);
-        s += L("M" + f(l1[0]) + " " + f(l1[1] + 6) + " v-9 q0 -3 -3 -3 M" + f(l2[0]) + " " + f(l2[1] + 6) + " v-9 q0 -3 -3 -3", 2.8) + L("M" + f(l1[0]) + " " + f(l1[1] + 6) + " v-9 q0 -3 -3 -3 M" + f(l2[0]) + " " + f(l2[1] + 6) + " v-9 q0 -3 -3 -3", 1.3, K.stone);
+          s += G("tp-water", L(D([[a + .3, b + .6, zw], [a + 1.0, b + .6, zw]], true) + D([[a + 1.3, b + 1.7, zw], [a + 2.0, b + 1.7, zw]], true) + D([[a + .3, b + 2.0, zw], [a + 1.0, b + 2.0, zw]], true), 1.4, "#FFFFFF", .8));
+          var m = P(a + 1.25, b + 1.05, zw + .04);
+          s += G("tp-bob", ell(m[0], m[1], 7.6, 4.4, "#FFFFFF", 1.5) + ell(m[0], m[1] - .5, 3, 1.7, wa, 1.1) +
+            L("M" + f(m[0] - 6.8) + " " + f(m[1] - 1.7) + " q1.7 -1.7 4.2 -2.2 M" + f(m[0] + 2.5) + " " + f(m[1] - 3.9) + " q3.4 .3 4.7 2 M" + f(m[0] + 6.2) + " " + f(m[1] + 2.2) + " q-2.5 1.7 -5 1.9 M" + f(m[0] - 2.5) + " " + f(m[1] + 3.9) + " q-3.4 -.5 -4.7 -2", 1.5, "#7FD6B5"));
+        } else s += L(D([[a + .4, b + .6, zw], [a + 1.8, b + 2.0, zw]], true), 1, "#FFFFFF", .8);
+        /* the ladder: two rails over the near edge */
+        [d - 1.25, d - .8].forEach(function(y){ var rl = D([[c + .24, y, zc], [c + .24, y, zc + .46], [c + .13, y, zc + .6], [c - .08, y, zc + .6], [c - .19, y, zc + .46], [c - .19, y, zc + .04]], true); s += L(rl, 2.5) + L(rl, 1.1, K.stone); });
         return s;
       },
-      bits: function(){ var m = P(2.32, 1.62, -.08); return G("tp-splash", ell(m[0], m[1], 14, 7, "none", 0).replace('fill="none"', 'fill="none" stroke="#FFFFFF" stroke-width="2"') + circ(m[0] - 10, m[1] - 8, 1.6, "#FFFFFF", .8) + circ(m[0] + 9, m[1] - 10, 1.8, "#FFFFFF", .8) + circ(m[0] + 2, m[1] - 13, 1.4, "#FFFFFF", .8)); }
+      bits: function(){ var m = P(1.79, 1.69, -.14); return G("tp-splash", ell(m[0], m[1], 14, 7, "none", 0).replace('fill="none"', 'fill="none" stroke="#FFFFFF" stroke-width="2"') + circ(m[0] - 10, m[1] - 8, 1.6, "#FFFFFF", .8) + circ(m[0] + 9, m[1] - 10, 1.8, "#FFFFFF", .8) + circ(m[0] + 2, m[1] - 13, 1.4, "#FFFFFF", .8)); }
     },
     hammock: {
-      n: "A hammock", note: "Striped, on a wooden frame", rarity: "Uncommon", theme: "woodland", price: 350, id: "hammock", spot: [2.9, 3.1],
+      n: "A hammock", note: "Striped, on a wooden frame, with a pillow", rarity: "Uncommon", theme: "woodland", price: 350, id: "hammock", spot: [2.9, 3.1],
       draw: function(o){
         var s = "", h = 2.1, A = [.55, 3.05], B = [3.05, .55], w = .3;
         var leg = function(c){ var a = [c[0] - .32, c[1] - .32, 0], b = [c[0] + .32, c[1] + .32, 0], t = [c[0], c[1], h]; return L(D([a, t, b], true), 3.6) + L(D([a, t, b], true), 1.8, K.wood); };
@@ -1285,54 +1334,84 @@ window.SH_PLACE = (function placeKit(INK, C){
         var sag = function(off, z0, dip){ var out = []; for (var i = 0; i <= 14; i++){ var t = i / 14, x = A[0] + (B[0] - A[0]) * (.1 + .8 * t), y = A[1] + (B[1] - A[1]) * (.1 + .8 * t); out.push([x + off, y + off, z0 - dip * Math.sin(t * Math.PI)]); } return out; };
         var e1 = sag(-w, h - .45, .95), e2 = sag(w, h - .45, .95), cloth = D(e1.concat(e2.slice().reverse()));
         s += L(D([[A[0], A[1], h - .05], e1[0]], true) + D([[A[0], A[1], h - .05], e2[0]], true) + D([[B[0], B[1], h - .05], e1[14]], true) + D([[B[0], B[1], h - .05], e2[14]], true), 1.1);
-        var cl = F(cloth, o.night ? "#E8D5E0" : "#FFFFFF") + L(D(sag(-w * .35, h - .45, .95), true), 2.6, K.red) + L(D(sag(w * .35, h - .45, .95), true), 2.6, K.blue) + F(D(e2.concat(sag(w * .7, h - .45, .95).reverse())), "#E9DFCC", .9) + O(cloth, 1.6);
-        var pw = P(A[0] + .55, A[1] - .55, h - .75);
-        s += G("tp-cloth", cl + FO("M" + f(pw[0] - 6) + " " + f(pw[1]) + " q5 -5 11 -2 q1 4 -2 6 q-6 1 -9 -4 z", K.yellow, 1.2));
+        /* the pillow lies in the cloth at the head end: it follows the sag, and the near edge of the hammock folds up over it */
+        var mid = sag(0, h - .45, .95), pa = P(mid[2][0], mid[2][1], mid[2][2]), pb = P(mid[5][0], mid[5][1], mid[5][2]), ang = Math.atan2(pb[1] - pa[1], pb[0] - pa[0]) * 180 / Math.PI;
+        var pil = '<g transform="translate(' + f((pa[0] + pb[0]) / 2) + " " + f((pa[1] + pb[1]) / 2 - .6) + ") rotate(" + f(ang * .8) + ') scale(.74)">' +
+          FO("M-7 -1.8 q-.4 -2.6 2 -2.6 q5 -.8 10 0 q2.4 0 2 2.6 q.4 2.2 0 3.6 q.2 2.2 -2 2.2 q-5 .8 -10 0 q-2.2 0 -2 -2.2 q-.4 -1.4 0 -3.6 z", o.night ? "#E9DDF1" : "#FFF3C4", 1.2) + L("M-4 -2.4 q4 -1 8 0", .9, "#E8BE45", .9) + "</g>";
+        var cl = F(cloth, o.night ? "#E8D5E0" : "#FFFFFF") + L(D(sag(-w * .35, h - .45, .95), true), 2.6, K.red) + L(D(sag(w * .35, h - .45, .95), true), 2.6, K.blue) + O(cloth, 1.6) + pil +
+          F(D(e2.concat(sag(w * .62, h - .45, .95).reverse())), "#E9DFCC") + L(D(sag(w * .62, h - .45, .95), true), .8, "#C9BBA3") + L(D(e2, true), 1.6);
+        s += G("tp-cloth", cl);
         return s + leg(B);
       }
     },
     fountain: {
-      n: "A mint fountain", note: "Mouthwash-green water, a tooth on top", rarity: "Rare", theme: "clouds", price: 900, id: "mint-fountain", spot: [3.3, 3.3],
+      n: "A mouthwash fountain", note: "Minty mouthwash bubbles out of the bottle and falls bowl to basin", rarity: "Rare", theme: "clouds", price: 900, id: "mouthwash-fountain", spot: [3.3, 3.3],
       draw: function(o){
-        var s = "", c = [1.8, 1.8];
+        var s = "", c = [1.8, 1.8], wash = o.snow ? "#DCEFFA" : K.mint, hi = "#E2FBF3";
         s += cyl(c[0], c[1], 0, 1.55, .7, 1.55, K.stone, K.stoneShade, K.stoneShade);
-        var t = P(c[0], c[1], .7);
-        s += ell(t[0], t[1], RX(1.25), RY(1.25), o.snow ? "#DCEFFA" : K.mint, 1.3);
-        if (!o.snow) s += G("tp-water", L("M" + f(t[0] - 10) + " " + f(t[1]) + " q4 -2 8 0 M" + f(t[0] + 2) + " " + f(t[1] + 3) + " q4 -2 8 0", 1.2, "#FFFFFF", .8));
-        s += cyl(c[0], c[1], .5, .3, 2.0, .3, K.stone, K.stoneShade, K.stone, { sw: 1.6, si: 1 });
-        s += cyl(c[0], c[1], 2.0, .8, 2.25, .8, K.stone, K.stoneShade, o.snow ? "#DCEFFA" : K.mint, { sw: 1.6, si: 1 });
-        var top = P(c[0], c[1], 2.25);
-        s += tinyTooth(top[0], top[1] - 6, 1, "#FFFDF6");
-        if (!o.snow) s += G("tp-spout", '<circle cx="' + f(top[0] - 8) + '" cy="' + f(top[1] - 2) + '" r="1.4" fill="' + K.mint + '"/><circle cx="' + f(top[0] + 8) + '" cy="' + f(top[1] - 2) + '" r="1.4" fill="' + K.mint + '"/>' +
-          L("M" + f(top[0] - 4) + " " + f(top[1] - 6) + " q-6 0 -8 12 M" + f(top[0] + 4) + " " + f(top[1] - 6) + " q6 0 8 12", 1.6, K.mint));
-        return s;
+        var t = P(c[0], c[1], .7), bx = RX(1.25), by = RY(1.25);
+        s += ell(t[0], t[1], bx, by, wash, 1.3);
+        if (!o.snow) s += G("tp-water", L("M" + f(t[0] - 12) + " " + f(t[1] - 1) + " q4 -2 8 0 M" + f(t[0] + 4) + " " + f(t[1] - 4) + " q4 -2 8 0", 1.2, "#FFFFFF", .8));
+        s += cyl(c[0], c[1], .55, .34, 1.85, .24, K.stone, K.stoneShade, K.stone, { sw: 1.6, si: 1 });
+        s += cyl(c[0], c[1], 1.85, .4, 2.2, .9, K.stone, K.stoneShade, wash, { sw: 1.6, si: 1 });
+        var top = P(c[0], c[1], 2.2), ax = RX(.9), ay = RY(.9);
+        if (!o.snow){
+          /* the mouthwash runs over the bowl's lip and falls all the way to the basin, where it lands in a ring */
+          var fall = function(k){ var x0 = top[0] + ax * k, y0 = top[1] + ay * Math.sqrt(1 - k * k) - .4, x1 = t[0] + bx * k * .62, y1 = t[1] + by * Math.sqrt(1 - k * k * .385) * .62;
+            var d = "M" + f(x0) + " " + f(y0) + " C" + f(x0 + k * 3.4) + " " + f(y0 + 2.4) + " " + f(x1) + " " + f(y0 + 8) + " " + f(x1) + " " + f(y1);
+            return L(d, 3.6, K.mintShade) + L(d, 2.4, K.mint) + L(d, .9, hi, .9) + ell(x1, y1 + .4, 4.6, 1.7, "none", 0).replace('fill="none"', 'fill="none" stroke="#FFFFFF" stroke-width="1.1"') + circ(x1 - 4.4, y1 - 2.2, .8, hi) + circ(x1 + 4.6, y1 - 1.6, .7, hi); };
+          s += G("tp-spout", fall(-.8) + fall(.8) + fall(0));
+        }
+        /* the bottle: mouthwash bubbles up out of its open neck and runs down into the bowl */
+        var bt = T(top[0], top[1] + 1.4,
+          FO("M-5.6 0 v-9.6 q0 -2.8 2.6 -3.6 l.3 -2.6 h5.4 l.3 2.6 q2.6 .8 2.6 3.6 v9.6 q-5.6 1.7 -11.2 0 z", o.snow ? "#BFE3EE" : "#43B894", 1.4) + F("M1.6 -13.6 q3.2 .8 3.2 3.8 v9.9 q-1.6 .5 -3.2 .7 z", "#000000", .12) +
+          FO("M-3.9 -9.2 h7.8 v6.2 h-7.8 z", "#FFFDF6", .9) + tinyTooth(0, -6, .42, "#FFFFFF") + L("M-4.2 -11.4 v-.6", 1.2, "#DFF8F0", .9) + FO("M-3 -15.8 h6 v-1.6 h-6 z", "#FFFFFF", 1));
+        if (!o.snow) bt += G("tp-spout", L("M" + f(top[0] - 2.2) + " " + f(top[1] - 16.2) + " q-5.6 -1.6 " + f(-ax * .46) + " 15.4 M" + f(top[0] + 2.2) + " " + f(top[1] - 16.2) + " q5.6 -1.6 " + f(ax * .46) + " 15.4", 1.5, K.mint) +
+          F(lumps(top[0], top[1] - 17.4, 3.4, 5, 7, .7), K.mint) + circ(top[0] - 1, top[1] - 18.2, .8, hi));
+        return s + bt;
       },
-      bits: function(){ var top = P(1.8, 1.8, 2.25); return G("tp-geyser", L("M" + f(top[0]) + " " + f(top[1] - 12) + " v-22", 3.2, K.mint) + circ(top[0], top[1] - 36, 2.6, K.mint, 0) + circ(top[0] - 5, top[1] - 30, 1.6, K.mint, 0) + circ(top[0] + 5, top[1] - 31, 1.6, K.mint, 0)); }
+      bits: function(){ var top = P(1.8, 1.8, 2.2); return G("tp-geyser", L("M" + f(top[0]) + " " + f(top[1] - 18) + " v-20", 3.2, K.mint) + circ(top[0], top[1] - 41, 2.6, K.mint, 0) + circ(top[0] - 5, top[1] - 35, 1.6, K.mint, 0) + circ(top[0] + 5, top[1] - 36, 1.6, K.mint, 0)); }
     },
     doghouse: {
-      n: "A doghouse", note: "A bowl, a chew toy and a name plate", rarity: "Uncommon", theme: "", price: 400, id: "doghouse", spot: [3.35, 3.35],
+      n: "A doghouse", note: "With its dog, a bowl, a chew bone and a name plate", rarity: "Uncommon", theme: "", price: 400, id: "doghouse", spot: [3.35, 3.4],
       draw: function(o){
-        var s = "", x0 = .6, y0 = .7, w = 2.4, d = 2.2, h = 1.5;
+        var s = "", x0 = .35, y0 = .3, w = 2.2, d = 2.0, h = 1.4;
         s += box(x0, y0, 0, w, d, h, { top: K.woodLight, left: K.woodLight, right: K.wood });
         for (var z = .35; z < h; z += .35) s += L(D([[x0, y0 + d, z], [x0 + w, y0 + d, z]], true) + D([[x0 + w, y0, z], [x0 + w, y0 + d, z]], true), .7, K.woodShade, .7);
-        s += FO(D(onY(y0 + d, archUV(x0 + .7, x0 + 1.7, 0, 1.2, 8))), "#3B2E3A", 1.4);
+        s += FO(D(onY(y0 + d, archUV(x0 + .6, x0 + 1.6, 0, 1.15, 8))), "#3B2E3A", 1.4);
         var ym0 = y0 - .25, ym1 = y0 + d + .25, xm = x0 + w / 2;
         var sl = [[x0 + w + .25, ym0, h - .1], [x0 + w + .25, ym1, h - .1], [xm, ym1, h + 1.2], [xm, ym0, h + 1.2]];
         s += FO(D([[x0, y0 + d, h], [x0 + w, y0 + d, h], [xm, y0 + d, h + 1.1]]), K.woodLight, 1.4);
         s += FO(D(sl), K.red) + F(D([[x0 + w + .25, ym0, h - .1], [x0 + w + .25, ym1, h - .1], [x0 + w + .25, ym1, h - .3], [x0 + w + .25, ym0, h - .3]]), K.redShade) +
           FO(D([[xm, ym1, h + 1.2], [x0 - .25, ym1, h - .1], [x0 - .25, ym1, h - .32], [xm, ym1, h + .95], [x0 + w + .25, ym1, h - .32], [x0 + w + .25, ym1, h - .1]]), K.redShade, 1.4);
         if (o.snow) s += FO(D([[xm, ym0, h + 1.25], [xm, ym1, h + 1.25], [x0 + w - .2, ym1, h + .3], [x0 + w - .2, ym0, h + .3]]), "#FFFFFF", 1.1);
-        s += FO(D(onY(y0 + d, rectUV(x0 + .75, x0 + 1.65, 1.35, 1.65))), "#FFFDF6", 1);
-        var b = P(x0 + .8, y0 + d + .45, 0);
-        s += ell(b[0], b[1], 5, 2.4, K.blue, 1.3) + ell(b[0], b[1] - 1, 3.6, 1.4, "#8A5A3A", 0);
-        var t = P(x0 + 2.1, y0 + d + .45, 0);
-        s += L("M" + f(t[0] - 5) + " " + f(t[1] + 1) + " l9 -3", 3.4) + L("M" + f(t[0] - 5) + " " + f(t[1] + 1) + " l9 -3", 1.8, "#FF8FB1") + FO("M" + f(t[0] + 3) + " " + f(t[1] - 4) + " h3.6 v2.4 h-3.6 z", "#FFFFFF", .9);
-        return s;
+        var np = P(x0 + 1.1, y0 + d, 1.42);
+        s += FO(D(onY(y0 + d, rectUV(x0 + .62, x0 + 1.58, 1.26, 1.58))), "#FFFDF6", 1) + FO("M" + f(np[0] - 3.4) + " " + f(np[1] - .9) + " a1 1 0 1 1 1.2 -.2 l3.6 .9 a1 1 0 1 1 .5 1.7 a1 1 0 1 1 -1.2 .2 l-3.6 -.9 a1 1 0 1 1 -.5 -1.7 z", K.woodLight, .6);
+        /* the bowl */
+        var b = P(x0 + .55, y0 + d + .75, 0);
+        s += ell(b[0], b[1], 5.6, 2.7, "#2378B0", 1.3) + ell(b[0], b[1] - 1.5, 5, 2.2, K.blue, 1.2) + ell(b[0], b[1] - 1.5, 3.4, 1.3, "#8A5A3A", 0);
+        /* the chew bone: knobs at both ends and ridges to clean the dog's teeth */
+        var t = P(x0 + 1.7, y0 + d + 1.15, 0);
+        s += '<g transform="translate(' + f(t[0]) + " " + f(t[1] - 2) + ') rotate(-16)">' +
+          FO("M-4.6 -1.3 a2 2 0 1 1 -1.4 -2.2 a2 2 0 1 1 3 1.2 l5.6 0 a2 2 0 1 1 3 -1.2 a2 2 0 1 1 -1.4 2.2 q.5 1.3 0 2.6 a2 2 0 1 1 1.4 2.2 a2 2 0 1 1 -3 -1.2 l-5.6 0 a2 2 0 1 1 -3 1.2 a2 2 0 1 1 1.4 -2.2 q-.5 -1.3 0 -2.6 z", "#FF8FB1", 1.1) +
+          L("M-1.8 -1 v2 M0 -1 v2 M1.8 -1 v2", .9, "#E0457B") + L("M-6 -2.6 q.6 -.8 1.4 -.6", .8, "#FFFFFF", .9) + "</g>";
+        /* the dog, sitting by the door */
+        var g = P(x0 + 2.75, y0 + d + .6, 0), x = g[0], y = g[1], fur = "#E2B887", dark = "#A8703C", pale = "#FFF3E0";
+        var dog = L("M" + f(x + 5) + " " + f(y - 2) + " q5.4 -1 4.4 -7", 3.6) + L("M" + f(x + 5) + " " + f(y - 2) + " q5.4 -1 4.4 -7", 1.9, fur);
+        dog += FO("M" + f(x - 5.4) + " " + f(y) + " q-1.4 -10 3.4 -12 q7.6 -1 8 8 q.4 3 -1 4.4 q-5.4 1.4 -10.4 -.4 z", fur, 1.3) + F("M" + f(x - 2.6) + " " + f(y - 9) + " q3 -.8 4.4 1.4 q.6 4.4 -.6 7.6 q-2.4 .4 -4.2 0 q-1 -5 .4 -9 z", pale);
+        dog += ell(x - 3.2, y + .2, 2.5, 1.5, pale, 1.1) + ell(x + 1.6, y + .5, 2.5, 1.5, pale, 1.1) + ell(x + 5.4, y - .6, 2.6, 1.5, fur, 1.1);
+        var hx = x - 1.2, hy = y - 15.4;
+        dog += FO("M" + f(hx - 5.4) + " " + f(hy - 2.2) + " q-3.6 1 -3.2 6.2 q1.6 1.6 3.4 -.4 z M" + f(hx + 5.2) + " " + f(hy - 2.6) + " q3.8 .6 3.6 5.8 q-1.6 1.8 -3.4 0 z", dark, 1.1);
+        dog += circ(hx, hy, 5.8, fur, 1.3) + F("M" + f(hx + 1) + " " + f(hy - 5.6) + " q5 .6 4.6 6 q-2.6 -.4 -4.6 -6 z", dark, .9) + ell(hx - .6, hy + 2.2, 3.4, 2.5, pale, 0);
+        dog += circ(hx - 2.6, hy - .9, .85, INK) + circ(hx + 1.7, hy - .9, .85, INK) + ell(hx - .6, hy + 1.1, 1.3, .9, INK, 0) + L("M" + f(hx - .6) + " " + f(hy + 2) + " v1 q-1.2 1 -2.2 .2 M" + f(hx - .6) + " " + f(hy + 3) + " q1.2 1 2.2 .2", .8);
+        dog += L("M" + f(x - 3.6) + " " + f(y - 10.4) + " q3 1.8 6.4 .2", 2.2, K.red) + circ(x - .6, y - 8.6, 1.2, K.yellow, .7);
+        return s + G("tp-dog", dog);
       },
-      bits: function(){ var c = P(1.8, 2.9, .55); return FO("M" + f(c[0] - 5) + " " + f(c[1] - 2) + " q-1 -6 2 -7 q1 3 1 6 z M" + f(c[0] + 5) + " " + f(c[1] - 2) + " q1 -6 -2 -7 q-1 3 -1 6 z", "#C4915F", 1.1) + circ(c[0] - 2, c[1] - 1, .9, "#FFFFFF") + circ(c[0] + 2, c[1] - 1, .9, "#FFFFFF") + circ(c[0], c[1] + 1.4, 1.3, INK); }
+      bits: function(){ var g = P(3.1, 2.9, 0), x = g[0] - 1.2, y = g[1] - 15.4; return L("M" + f(x - 9) + " " + f(y + 1) + " l-3.4 -1 M" + f(x - 9) + " " + f(y + 3.6) + " l-3.6 .6 M" + f(x - 8.4) + " " + f(y + 6) + " l-3 2", 1.4) +
+        FO("M" + f(x + 2) + " " + f(y - 12) + " q-3.4 -3.6 -5 -.6 q-.8 2.6 5 5.6 q5.8 -3 5 -5.6 q-1.6 -3 -5 .6 z", "#FF8FB1", 1); }
     },
     lane: {
-      n: "A bowling lane", note: "Takes the side yard and the front corner; tap it to bowl", rarity: "Rare", theme: "", price: 1200, id: "bowling-lane", wide: true, spot: [1.8, 6.9],
+      n: "A bowling lane", note: "Takes the side yard and the front corner; tap it to bowl the sugar-free mint", rarity: "Rare", theme: "", price: 1200, id: "bowling-lane", wide: true, spot: [1.8, 6.9],
       draw: function(o){
         var s = "", x0 = .5, x1 = 3.1, y0 = .3, y1 = 7.4;
         s += box(x0, y0, 0, x1 - x0, y1 - y0, .22, { top: "#8E98A3", left: "#C9D1D9", right: "#A9B3BE" });
@@ -1343,60 +1422,91 @@ window.SH_PLACE = (function placeKit(INK, C){
         [.25, .5, .75].forEach(function(t, k){ var x = lx0 + (lx1 - lx0) * t, y = y1 - 2.4 - (k === 1 ? .3 : 0); s += FO(D([[x, y - .35, .22], [x + .12, y, .22], [x - .12, y, .22]]), K.red, .8); });
         s += L(D([[lx0, y1 - .9, .22], [lx1, y1 - .9, .22]], true), 1.6, K.red);
         s += box(x0, y0 - .3, 0, x1 - x0, .3, 1.9, { top: "#6B5A68", left: "#3B2E3A", right: "#2B2230" });
-        s += FO(D(onY(y0, rectUV(x0 + .3, x1 - .3, 1.2, 1.8))), "#E0457B", 1.2) + tinyTooth.apply(null, P((x0 + x1) / 2, y0, 1.5).concat([.42, "#FFFFFF"]));
+        s += FO(D(onY(y0, rectUV(x0 + .3, x1 - .3, 1.05, 1.8))), "#E0457B", 1.2) + tinyTooth.apply(null, P((x0 + x1) / 2, y0, 1.42).concat([.5, "#FFFFFF"]));
         var cx = (lx0 + lx1) / 2, rows = [[0], [-.5, .5], [-1, 0, 1], [-1.5, -.5, .5, 1.5]], pins = [];
         rows.forEach(function(r, k){ r.forEach(function(px){ pins.push([cx + px * .36, y0 + 1.6 - k * .34]); }); });
         pins.sort(function(a, b){ return a[1] - b[1] || a[0] - b[0]; });
         s += G("tp-pins", pins.map(function(q){ var p = P(q[0], q[1], .22); return pin(p[0], p[1]); }).join(""));
         var bp = P(cx + .3, y1 - .5, .22);
-        s += G("tp-ball", mintBall(bp[0], bp[1] - 4.4, 4.6));
+        s += G("tp-ball", ell(bp[0] + 1, bp[1] + .4, 5, 1.8, "#000000", 0, .14) + mintBall(bp[0], bp[1] - 4.8, 5.2));
+        /* the ball return, with a spare mint on it */
         s += box(x1 + .05, y1 - 1.6, 0, .4, 1.2, .55, { top: "#6B5A68", left: "#8E98A3", right: "#6B5A68" }, { sw: 1.4, si: .9 });
         var rb = P(x1 + .25, y1 - 1.0, .55);
-        return s + circ(rb[0], rb[1] - 2.4, 2.8, K.blue, 1.2);
+        return s + mintBall(rb[0], rb[1] - 3, 3.4);
       }
     },
     mailbox: {
-      n: "A mailbox", note: "Its flag goes up when there's a letter", rarity: "Common", theme: "hilltop", price: 100, id: "mailbox", spot: [3.0, 3.3],
+      n: "A mailbox", note: "In a ring of flowers; its flag goes up when there's a letter", rarity: "Common", theme: "hilltop", price: 100, id: "mailbox", spot: [3.0, 3.3],
       draw: function(o){
         var b = P(1.7, 1.9, 0), x = b[0], y = b[1], s = "";
-        s += ell(x, y, 15, 6.4, o.snow ? "#FFFFFF" : K.soil, 1.3);
-        if (!o.snow) [[-9, -1, "#FF8FB1"], [-4, 3, "#FFE27A"], [6, 2.4, "#B08CFF"], [10, -1.6, "#FF8FB1"], [1, -3.6, "#FFE27A"]].forEach(function(q){ s += flower(x + q[0], y + q[1], q[2], 1); });
-        s += L("M" + f(x) + " " + f(y) + " v-22", 4.4) + L("M" + f(x) + " " + f(y) + " v-22", 2.4, K.wood);
-        var bx = "M" + f(x - 9) + " " + f(y - 20) + " v-7 a9 6.4 0 0 1 18 0 v7 z";
-        s += F(bx, K.blue) + F("M" + f(x + 3) + " " + f(y - 20) + " v-9.6 a9 6.4 0 0 1 6 3 v6.6 z", "#2378B0") + O(bx, 1.6);
-        if (o.snow) s += F("M" + f(x - 9) + " " + f(y - 27) + " a9 6.4 0 0 1 18 0 q-9 -2 -18 0 z", "#FFFFFF");
-        s += tinyTooth(x - 3, y - 24, .5, "#FFFFFF");
-        return s + G("tp-mflag", FO("M" + f(x + 9) + " " + f(y - 21) + " v-9 l6 2.4 -6 2.4", K.red, 1.1));
+        /* a round bed edged with stones; the flowers behind the post first, then the post, then the ones in front */
+        s += ell(x, y + 1.2, 19, 8.2, o.snow ? "#DCEAF6" : K.soilShade, 1.3) + ell(x, y, 17.4, 7, o.snow ? "#FFFFFF" : K.soil, 0);
+        var beds = [[-11, -2.6, "d", "#FFFFFF", 6.5], [-5.4, -4.4, "t", "#FF8FB1", 7.5], [5.6, -4.4, "t", "#FFD23F", 7.5], [11.4, -2.4, "d", "#B08CFF", 6.5], [-12.6, 1.6, "t", "#FF7A5C", 5.5], [-6.8, 3.6, "d", "#FFE27A", 5.5], [6.6, 3.8, "d", "#FF8FB1", 5.5], [12.6, 1.8, "t", "#B08CFF", 5.5]];
+        var plant = function(q){ var p = [x + q[0], y + q[1]]; return o.snow ? ell(p[0], p[1] - 1, 3.2, 1.6, "#FFFFFF", 0) : q[2] === "t" ? tulip(p, q[4], q[3]) : daisyOn(p, q[4], q[3]); };
+        beds.slice(0, 4).forEach(function(q){ s += plant(q); });
+        s += L("M" + f(x) + " " + f(y) + " v-22", 4.4) + L("M" + f(x) + " " + f(y) + " v-22", 2.4, K.wood) + L("M" + f(x - 3.6) + " " + f(y - 15) + " l3.6 -3.4", 3.6) + L("M" + f(x - 3.6) + " " + f(y - 15) + " l3.6 -3.4", 1.8, K.wood);
+        var bx = "M" + f(x - 9.4) + " " + f(y - 20) + " v-7.4 a9.4 6.8 0 0 1 18.8 0 v7.4 z";
+        s += F(bx, K.blue) + F("M" + f(x + 3.4) + " " + f(y - 20) + " v-10.4 a9.4 6.8 0 0 1 6 3 v7.4 z", "#2378B0") + O(bx, 1.6) + L("M" + f(x - 9.4) + " " + f(y - 22.6) + " h12.8", .9, "#2378B0");
+        if (o.snow) s += F("M" + f(x - 9.4) + " " + f(y - 27.4) + " a9.4 6.8 0 0 1 18.8 0 q-9.4 -2 -18.8 0 z", "#FFFFFF");
+        s += tinyTooth(x - 3, y - 27.6, .56, "#FFFFFF");
+        s += G("tp-mflag", L("M" + f(x + 9.4) + " " + f(y - 21) + " v-10", 1.4) + FO("M" + f(x + 9.4) + " " + f(y - 31) + " l6.4 2.4 -6.4 2.4 z", K.red, 1.1));
+        beds.slice(4).forEach(function(q){ s += plant(q); });
+        if (!o.snow) [[-17.6, 2.4], [-13, 6.6], [-5, 8.8], [4.6, 8.9], [12.8, 6.8], [17.6, 2.6]].forEach(function(q, i){ s += ell(x + q[0], y + q[1], 2.6, 1.7, i % 2 ? "#C9D1D9" : "#E3E8EC", .9); });
+        return s;
       },
-      bits: function(){ var b = P(1.7, 1.9, 0); return FO("M" + f(b[0] - 6) + " " + f(b[1] - 38) + " h12 v8 h-12 z", "#FFFFFF", 1.2) + L("M" + f(b[0] - 6) + " " + f(b[1] - 38) + " l6 4.4 6 -4.4", 1) + circ(b[0], b[1] - 33.6, 1.2, K.red); }
+      bits: function(){ var b = P(1.7, 1.9, 0); return FO("M" + f(b[0] - 6) + " " + f(b[1] - 44) + " h12 v8 h-12 z", "#FFFFFF", 1.2) + L("M" + f(b[0] - 6) + " " + f(b[1] - 44) + " l6 4.4 6 -4.4", 1) + circ(b[0], b[1] - 39.6, 1.2, K.red); }
     },
     sandcastle: {
-      n: "A sandcastle", note: "Four towers, a flag and a bucket", rarity: "Common", theme: "seaside", price: 150, id: "sandcastle", spot: [3.3, 3.2],
+      n: "A sandcastle", note: "Four bucket towers with battlements, a gate, a flag and a pail", rarity: "Common", theme: "seaside", price: 150, id: "sandcastle", spot: [3.3, 3.2],
       draw: function(o){
-        var sand = o.snow ? ["#FFFFFF", "#DCEAF6"] : o.night ? ["#B3A27A", "#958560"] : ["#F3D99C", "#D9B970"], s = "", c = P(1.8, 1.8, 0), st = { top: sand[0], left: sand[0], right: sand[1] };
+        var sand = o.snow ? ["#FFFFFF", "#DCEAF6", "#B9CCDD"] : o.night ? ["#B3A27A", "#958560", "#7A6C4A"] : ["#F3D99C", "#D9B970", "#B8964E"], s = "", c = P(1.8, 1.8, 0), st = { top: sand[0], left: sand[0], right: sand[1] };
         s += ell(c[0], c[1] + 2, 31, 13.4, sand[1], 1.6) + ell(c[0], c[1], 28, 11.4, sand[0], 0);
-        var tw = function(x, y, h){ var t = P(x, y, h), out = cyl(x, y, 0, .42, h, .4, sand[0], sand[1], sand[0], { sw: 1.4, si: 1 }); for (var k = 0; k < 3; k++){ var a = (20 + k * 50) * Math.PI / 180, q = P(x + Math.cos(a) * .36, y + Math.sin(a) * .36, h); out += FO("M" + f(q[0] - 1.4) + " " + f(q[1]) + " v-2.6 h2.8 v2.6 z", sand[0], .9); } return out; };
-        s += tw(.95, 1.0, 1.2) + tw(2.65, 1.0, 1.1);
-        s += box(1.0, 1.05, 0, 1.7, 1.6, .75, st, { sw: 1.4, si: .9 });
-        s += FO(D(onY(2.65, archUV(1.6, 2.1, 0, .55, 6))), o.night ? "#6B5A3A" : "#8A6A3A", 1);
-        s += tw(.95, 2.65, 1.0) + tw(2.65, 2.65, 1.45);
-        var fp = P(2.65, 2.65, 1.45); s += L("M" + f(fp[0]) + " " + f(fp[1] - 2) + " v-10", 1.2) + FO("M" + f(fp[0]) + " " + f(fp[1] - 12) + " l6 2 -6 2 z", K.red, .9);
-        var bk = P(3.15, 3.05, 0); s += FO("M" + f(bk[0] - 4) + " " + f(bk[1]) + " l-1 -6 h10 l-1 6 q-4 1.6 -8 0 z", K.blue, 1.2) + L("M" + f(bk[0] - 4.6) + " " + f(bk[1] - 6) + " q4.6 -5 9.4 0", 1) + L("M" + f(bk[0] + 6) + " " + f(bk[1] - 1) + " l5 -9", 2.4) + L("M" + f(bk[0] + 6) + " " + f(bk[1] - 1) + " l5 -9", 1.1, K.yellow);
+        /* a tower turned out of a pail: wider at the foot, a collar at the top and battlements all the way round it */
+        var tw = function(x, y, h){
+          var out = cyl(x, y, 0, .5, h, .38, sand[0], sand[1], sand[0], { sw: 1.4, si: 1, open: true }) + cyl(x, y, h, .46, h + .2, .46, sand[0], sand[1], sand[0], { sw: 1.3, si: 1 });
+          var tooth = function(a, c){ var q = P(x + Math.cos(a * Math.PI / 180) * .4, y + Math.sin(a * Math.PI / 180) * .4, h + .2); return FO("M" + f(q[0] - 1.5) + " " + f(q[1] + .5) + " v-3 h3 v3 z", c, .9); };
+          out += tooth(200, sand[1]) + tooth(280, sand[1]) + tooth(118, sand[0]) + tooth(45, sand[0]) + tooth(-28, sand[1]);
+          var wv = P(x + .22, y + .3, h * .62); out += FO("M" + f(wv[0] - 1) + " " + f(wv[1] + 1.8) + " v-2.8 q1 -1.4 2 0 v2.8 z", sand[2], .7);
+          var r1 = P(x, y, h * .3); return out + L("M" + f(r1[0] - RX(.46)) + " " + f(r1[1]) + " A" + f(RX(.46)) + " " + f(RY(.46)) + " 0 0 0 " + f(r1[0] + RX(.46)) + " " + f(r1[1]), .7, sand[2], .7);
+        };
+        s += tw(.85, .9, 1.25);
+        s += box(.95, 1.0, 0, 1.75, 1.7, .8, st, { sw: 1.4, si: .9 });
+        /* battlements along the two front walls */
+        [1.3, 1.8, 2.3].forEach(function(x){ var q = P(x, 2.7, .8); s += FO("M" + f(q[0] - 1.5) + " " + f(q[1] + .4) + " v-2.8 h3 v2.8 z", sand[0], .9); });
+        [1.35, 1.85, 2.35].forEach(function(y){ var q = P(2.7, y, .8); s += FO("M" + f(q[0] - 1.5) + " " + f(q[1] + .4) + " v-2.8 h3 v2.8 z", sand[1], .9); });
+        s += FO(D(onY(2.7, archUV(1.5, 2.1, 0, .6, 6))), sand[2], 1) + L(D(onY(2.7, [[1.8, .04], [1.8, .58]]), true), .7, INK, .5);
+        s += tw(2.75, .9, 1.15) + tw(.85, 2.7, 1.05) + tw(2.75, 2.7, 1.5);
+        var fp = P(2.75, 2.7, 1.9); s += L("M" + f(fp[0]) + " " + f(fp[1]) + " v-10", 1.3) + FO("M" + f(fp[0]) + " " + f(fp[1] - 10) + " l6.4 2 -6.4 2.2 z", K.red, .9);
+        /* a shell or two, and the pail and spade that built it */
+        var sh = P(1.2, 3.35, 0); s += FO("M" + f(sh[0] - 2.6) + " " + f(sh[1]) + " q2.6 -5 5.2 0 q-2.6 1.4 -5.2 0 z", "#FFD9C2", .8) + L("M" + f(sh[0]) + " " + f(sh[1] - 2.4) + " v2.6 M" + f(sh[0] - 1.4) + " " + f(sh[1] - 1.6) + " l.6 2 M" + f(sh[0] + 1.4) + " " + f(sh[1] - 1.6) + " l-.6 2", .6, "#E0A98A");
+        var bk = P(3.3, 3.2, 0);
+        s += L("M" + f(bk[0] + 6.4) + " " + f(bk[1] - .6) + " l4.6 -9", 2.6) + L("M" + f(bk[0] + 6.4) + " " + f(bk[1] - .6) + " l4.6 -9", 1.2, K.yellow) + FO("M" + f(bk[0] + 4.6) + " " + f(bk[1] + 1.6) + " q-.4 -3.4 2 -3.6 q2 .6 1.4 3.8 q-1.6 1.2 -3.4 -.2 z", K.red, .9);
+        s += L("M" + f(bk[0] - 4.8) + " " + f(bk[1] - 6.2) + " q4.8 -6 9.6 0", 1.1) + FO("M" + f(bk[0] - 3.8) + " " + f(bk[1]) + " l-1.2 -6.4 h10 l-1.2 6.4 q-3.8 1.6 -7.6 0 z", K.blue, 1.2) + ell(bk[0], bk[1] - 6.4, 5, 1.5, "#8FD3F5", 1) + L("M" + f(bk[0] - 4) + " " + f(bk[1] - 3.2) + " q4 1.4 8 0", .9, "#FFFFFF", .8);
         return s;
       },
       bits: function(){ var c = P(.6, 2.6, 0); return T(c[0], c[1], ell(0, 0, 4, 2.6, K.red, 1.1) + circ(-1.3, -2.4, .7, INK) + circ(1.3, -2.4, .7, INK) + L("M-4 0 l-2 1.6 M4 0 l2 1.6", 1)); }
     },
     umbrella: {
-      n: "A beach umbrella", note: "Striped, with two deck chairs and a towel", rarity: "Uncommon", theme: "seaside", price: 350, id: "beach-umbrella", spot: [3.3, 3.2],
+      n: "A beach umbrella", note: "Striped, with two sun loungers and a towel", rarity: "Uncommon", theme: "seaside", price: 350, id: "beach-umbrella", spot: [3.3, 3.5],
       draw: function(o){
-        var s = "", stripe = o.night ? "#B8323A" : K.red;
-        s += FO(D([[.4, 2.3, 0], [2.1, 2.3, 0], [2.1, 3.4, 0], [.4, 3.4, 0]]), K.yellow, 1.2) + L(D([[.8, 2.3, 0], [.8, 3.4, 0]], true) + D([[1.7, 2.3, 0], [1.7, 3.4, 0]], true), 1.4, "#FFFFFF");
-        var chair = function(x, y){ var seat = [[x, y, .3], [x + .85, y, .3], [x + .85, y - 1.1, 1.1], [x, y - 1.1, 1.1]];
-          return L(D([[x, y + .2, 0], [x, y, .3], [x, y - 1.1, 1.1], [x, y - 1.4, 0]], true), 2.4) + L(D([[x + .85, y + .2, 0], [x + .85, y, .3], [x + .85, y - 1.1, 1.1], [x + .85, y - 1.4, 0]], true), 2.4) +
-            F(D(seat), "#FFFFFF") + F(D([[x + .28, y, .3], [x + .56, y, .3], [x + .56, y - 1.1, 1.1], [x + .28, y - 1.1, 1.1]]), K.blue) + O(D(seat), 1.4); };
-        s += chair(2.4, 2.0) + chair(2.6, 3.3);
-        var cx = 1.5, cy = 1.4, z1 = 3.4, z0 = 2.7, r = 1.6, pb = P(cx, cy, 0), pt = P(cx, cy, z1);
-        s += L(seg(pb, pt), 3) + L(seg(pb, pt), 1.4, "#FFFFFF");
+        var s = "", stripe = o.night ? "#B8323A" : K.red, cx = .95, cy = .95, z1 = 3.5, z0 = 2.75, r = 1.55, pb = P(cx, cy, 0), pt = P(cx, cy, z1);
+        s += ell(pb[0] + 4, pb[1] + 3, 20, 8, "#000000", 0, .08) + L(seg(pb, pt), 3) + L(seg(pb, pt), 1.4, "#FFFFFF");
+        /* a towel on the sand */
+        s += FO(D([[.25, 2.2, 0], [1.05, 2.2, 0], [1.05, 3.5, 0], [.25, 3.5, 0]]), K.yellow, 1.2) + L(D([[.25, 2.45, 0], [1.05, 2.45, 0]], true) + D([[.25, 3.25, 0], [1.05, 3.25, 0]], true), 1.6, "#FFFFFF");
+        /* a sun lounger: a wooden frame low to the sand, a striped sling, the backrest propped up at the head end */
+        var lounger = function(x, y, col){
+          var w = .82, zs = .36, xb = x + .78, xe = x + 2.05, zb = 1.12, out = "";
+          var wood = function(a, b, k){ return L(D([a, b], true), k || 2.6) + L(D([a, b], true), (k || 2.6) - 1.4, K.woodLight); };
+          out += wood([x + .12, y, 0], [x, y, zb]) + wood([xb + .1, y, 0], [xb + .1, y, zs]) + wood([xe - .1, y, 0], [xe - .1, y, zs]);
+          var sling = [[x, y, zb], [xb, y, zs], [xe, y, zs], [xe, y + w, zs], [xb, y + w, zs], [x, y + w, zb]];
+          out += F(D(sling), "#FFFFFF");
+          [.2, .62].forEach(function(t){ out += F(D([[x, y + w * t, zb], [xb, y + w * t, zs], [xe, y + w * t, zs], [xe, y + w * (t + .2), zs], [xb, y + w * (t + .2), zs], [x, y + w * (t + .2), zb]]), col); });
+          out += F(D([[x, y, zb], [xb, y, zs], [xb, y + w, zs], [x, y + w, zb]]), "#000000", .07) + O(D(sling), 1.4) + L(D([[xb, y, zs], [xb, y + w, zs]], true), .9, INK, .5);
+          var pl = P(x + .16, y + w / 2, zb - .14); out += ell(pl[0] + 1.4, pl[1] + .6, 4.4, 2.5, "#FFFDF6", 1);
+          out += wood([x, y + w, zb], [xb, y + w, zs]) + wood([xb, y + w, zs], [xe, y + w, zs]) + wood([x + .12, y + w, 0], [x, y + w, zb]) + wood([x + .62, y + w, 0], [x + .3, y + w, .8], 2.2) + wood([xb + .1, y + w, 0], [xb + .1, y + w, zs]) + wood([xe - .1, y + w, 0], [xe - .1, y + w, zs]);
+          return out;
+        };
+        s += lounger(1.3, 1.35, K.blue) + lounger(1.3, 2.55, "#F2884B");
         s += cone(cx, cy, z0, r, z1, "#FFFFFF", "#E3E6EA");
         var tip = P(cx, cy, z1);
         for (var k = 0; k < 6; k++){ var a0 = (-45 + 30 * k) * Math.PI / 180, a1 = (-45 + 30 * k + 15) * Math.PI / 180, q0 = P(cx + Math.cos(a0) * r, cy + Math.sin(a0) * r, z0), q1 = P(cx + Math.cos(a1) * r, cy + Math.sin(a1) * r, z0); s += F("M" + f(tip[0]) + " " + f(tip[1]) + " L" + f(q0[0]) + " " + f(q0[1]) + " L" + f(q1[0]) + " " + f(q1[1]) + " Z", stripe); }
@@ -1871,7 +1981,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     { k: "woodland", n: "Woodland", note: "A clearing in the pines: up a tree or under a mushroom", scene: "forest", homes: ["treehouse", "mushroom"], yard: ["hammock", "campfire"], outfits: ["ranger"], color: "#4F9A52" },
     { k: "snowy", n: "Snowy peak", note: "An igloo on a ledge above the clouds, a hot spring to warm up in", scene: "mountain", homes: ["igloo"], yard: ["hotspring"], outfits: ["beanie"], color: "#5FA3D9" },
     { k: "starlight", n: "Starlight", note: "A little planet under the Dark Matter stars", scene: "space", homes: ["observatory"], yard: ["telescope"], outfits: ["nightcap"], color: "#7A3CFF" },
-    { k: "clouds", n: "Above the clouds", note: "A castle in the sky, a mint fountain in its yard", scene: "clouds", homes: ["castle"], yard: ["fountain"], outfits: ["aviator"], color: "#E07090" },
+    { k: "clouds", n: "Above the clouds", note: "A castle in the sky, a mouthwash fountain in its yard", scene: "clouds", homes: ["castle"], yard: ["fountain"], outfits: ["aviator"], color: "#E07090" },
     { k: "classics", n: "The classics", note: "They go anywhere", scene: "", homes: [], yard: ["doghouse", "lane"], outfits: [], color: "#8E98A3" }
   ];
   /* the upgrades and paints in the shop: one item each; every home draws it its own way (HOMES[k].upn) */
@@ -1904,8 +2014,8 @@ window.SH_PLACE = (function placeKit(INK, C){
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },
-    fountain: { n: "The mint fountain", does: "spouts high", say: "Minty fresh!" },
-    doghouse: { n: "The doghouse", does: "someone peeks out", say: "Who's a good dog? Not sure. It's shy." },
+    fountain: { n: "The mouthwash fountain", does: "spouts high", say: "Minty fresh! Swish, don't swallow." },
+    doghouse: { n: "The doghouse", does: "the dog barks hello", say: "Who's a good dog? He brushes twice a day, too." },
     lane: { n: "The bowling lane", does: "rolls a mint", say: "Strike! Well, close." },
     mailbox: { n: "The mailbox", does: "a letter", say: "A letter! It's from thirty-one. He's worried about a bump." },
     sandcastle: { n: "The sandcastle", does: "a crab peeks out", say: "Someone moved into my sandcastle." },
@@ -1916,7 +2026,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     timmy: { n: "Timmy", does: "a flip", say: "Wheee!" }
   };
   var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
-    home: "tp-pop 1.8s", statue: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-peek 2.4s",
+    home: "tp-pop 1.8s", statue: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-pop 2.2s",
     mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s" };
   var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "sun"];
 
