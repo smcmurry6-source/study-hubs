@@ -20,13 +20,14 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), A Dental
   endocrinology (`dental`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 55 questions copied
-  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **one for each of Exam 1's 55
-  predicted topics**, in Exam 1's topic order. (It held 219 from 2026-11-06, every Exam 1 High Likelihood question plus 13 of
-  its hardest, until the high-yield cut below.) A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 80 questions copied
+  from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **at least one for each of Exam 1's
+  55 predicted topics** plus one for each point an Exam 1 professor stressed that no other copy tested (25, back since
+  2026-11-10), in Exam 1's topic order. (It held 219 from 2026-11-06, every Exam 1 High Likelihood question plus 13 of
+  its hardest, then 55 after the high-yield cut below.) Keep it lean: Exam 2 asks only 5 questions on Exam 1. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
-  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. Only the predicted topics are High
-  Likelihood (all 55, one per topic), and **the mock's five Exam 1 questions come only
+  before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. Every R question is High
+  Likelihood (filed under its predicted topic), and **the mock's five Exam 1 questions come only
   from them** (Sam, 2026-11-06): `MOCK_LIKELY_ONLY` and
   `mockLikelyPick` take one per topic, each from a different Exam 1 lecture (read off the topic's "L4 Thyroid
   Physiology: ..." prefix, so keep it), unseen or missed questions first.
@@ -55,25 +56,42 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   `FIG_BY_LEC` (matched by heading text, both levels; `place.json` keeps the same list): renaming a heading unplaces its
   figure. The slide images were too large to read, so curve shapes, histology and the steroid chart follow the slide text
   and standard textbook layout; each figure's "What this shows, and what's simplified" says what was assumed (detemir
-  drawn without a peak, no FSH peak at midcycle because L16 says inhibin suppresses it, hCG unnamed because the slides
-  don't name it). Check them against the slides when the recordings land. `hpg` follows Dr. Madison's in-class
+  drawn without a peak, hCG unnamed because the slides don't name it). Check them against the slides when the recordings land. `hpg` follows Dr. Madison's in-class
   correction since 2026-11-08 (aromatase mostly in the Sertoli cells, some in the Leydig cells; its slide said Leydig from
-  puberty on). **Open:** `cycle` draws no FSH peak at midcycle (L16's slide: inhibin suppresses FSH), but in L14 Dr. Herr
-  walks his graph with FSH peaking alongside LH just before ovulation (10:52, 20:39); the L14 notes say so above the
-  figure. Settle it after L16's recording (Tue 11/10).
+  puberty on). **Midcycle FSH follows Dr. Herr** (Sam, 2026-11-08: "Go with dr herrs version"): in L14 he walks his
+  graph with FSH dipping, then peaking alongside LH just before ovulation, the smaller peak (10:52, 20:39), so `cycle`
+  (`cycle.mjs`) draws that peak, and the L14 and L16 notes, both levels, the cram sheet, the note tables, the ovulation
+  sequence and `fh-tf-fshpeak` say it. L16's slide says inhibin holds FSH down at midcycle; the notes say the slide differs.
+  No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
 - **The bank is high yield** (Sam, 2026-11-08: "803 is way too many questions. They need to be higher yield"): it was cut
-  from 803 to 339, about 6 questions for each question the lecture is expected to get on the exam (the median student
-  answered about 300 before Exam 1): L11 48, L12a 38, L12b 42, A 32, L13 32, L14 32, L15 32, L16 28, R 55. Kept: what a
-  professor stressed, the predicted topics and the core of each lecture, one question per fact; cut: near-duplicates in
-  other formats, minor details and slide numbers nobody stressed, long ordering, matching and select-all items, stained-
-  section identification (Dr. Herr: stained images aren't tested), and points a professor played down. The 464 removed ids
-  are retired. **Keep it that size:** a new lecture (L17, L18) gets about 30-35 questions, and a lecture going taught (L16)
-  swaps questions rather than adding. High Likelihood is selective too: each topic lists its 1-3 best questions, about
-  half of each lecture (156 of 284; R all 55).
+  from 803 to 339, one question per fact: near-duplicates in other formats, minor details and slide numbers nobody
+  stressed, long ordering, matching and select-all items, stained-section identification (Dr. Herr: stained images aren't
+  tested) and points a professor played down came out, and their ids are retired.
+- **Coverage, not a count, decides what's in it** (Sam, 2026-11-08: "be sure the emphasized points are covered,
+  deemphasized points are left out ... other content is sufficiently covered without being overwhelming ... the rest of the
+  questions should be filling in the gaps ... be sure that the high likelihood questions are sufficient"). On 2026-11-10
+  every lecture was audited against that: each `emphasize` hint (and each of Dr. Herr's focus slides) has a question; no
+  question's key depends on a `deemphasize` hint; **each High Likelihood topic has one HL question for each point it names**
+  (no two on the same fact); and each notes section with testable content has at least one question, the untagged
+  questions filling those gaps. 90 cut questions came back as they were (ids un-retired) and 2 were written for points
+  nothing tested (`dm-met-lactic`, metformin's lactic acidosis; `mh-spermio-phases`). Now 431: L11 53, L12a 44, L12b 45,
+  A 43, L13 44, L14 45, L15 42, L16 35, R 80; 369 are High Likelihood (289 of the 351 on the Exam 2 lectures), because the
+  topics name most of what the recordings stressed. **Adding to it:** a new lecture (L17, L18) or one going taught gets
+  the same audit: its hints and topics covered, gaps filled once, nothing on skipped points.
+- **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
+  histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
+  L13 and L14 (drawn as "focus list", no quotation marks, since it came from the class), and the topics on those slides
+  rank first, basis "focus list + recording" (L13: the Sertoli drawing, Sertoli cells, LH vs FSH, spermatogenesis,
+  spermiogenesis, inside or outside the tubule; L14: the follicle stages, menstruation, the uterine tube, FSH and LH on the
+  follicles, the linings, the cycle graph, granulosa vs theca). The slide decks were too large to open, so **which content
+  sits on those slide numbers was inferred** from the order of the notes (L13 8-10 Sertoli cells, 12 Leydig cells, 19-21
+  the spermatogonia, meiosis and spermiogenesis; L14 18-21 the secondary and Graafian follicles, 30-31 the uterine tube
+  and the uterus's regions, 33-34 the endometrium, 38-39 the cervix and vagina). If Sam or the slides say otherwise,
+  re-rank the topics.
 - **What a professor says you don't need isn't asked** (Sam, 2026-11-08; now a standing rule for every hub,
   [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
   recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
@@ -121,8 +139,8 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   order and say so. The speaker note that the right testis hangs lower stays out (anatomy texts say the left).
 - **L14 (taught, posted recording):** he read the LH-driven edema as "theca externa" (22:48) and the secondary oocyte
   as "entering prophase" (23:06); the hub keeps the slides' theca interna and metaphase II. Cycle length: slide 28-30
-  days, said 28-33 (no key depends on it). FSH peaks with LH before ovulation in his lecture (`fh-tf-fshpeak` says "In
-  Dr. Herr's lecture"); L16's slide says inhibin holds it down. Lactation "activated by estrogen and progesterone surges
+  days, said 28-33 (no key depends on it). FSH peaks with LH before ovulation in his lecture, which the whole hub
+  follows (above); L16's slide says inhibin holds it down. Lactation "activated by estrogen and progesterone surges
   during pregnancy and after childbirth" (35:48; check against L17). He calls the corpus luteum "more translucent" (not
   used). ZP1-3: "you don't need to know those".
 - **L14 / L16:** follicle names (L16 calls any follicle with an antrum Graafian) and day counts (L16 ovarian 0-14 /

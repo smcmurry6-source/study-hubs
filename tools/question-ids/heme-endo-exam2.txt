@@ -4,7 +4,7 @@ dm-glut4
 dm-2s-5 retired
 dm-a1c-why
 dm-tf-3
-dm-tf-8 retired
+dm-tf-8
 dm-num-5
 dm-2s-1 retired
 dm-ex-micro
@@ -26,7 +26,7 @@ dm-tf-9
 dm-pb-chair-1
 dm-pb-chair-2
 dm-pb-chair-3
-dm-seq-su retired
+dm-seq-su
 dm-pb-cpep-1
 dm-pb-cpep-2
 dm-su-durability
@@ -47,8 +47,8 @@ dm-dpp4-hf
 dm-2s-3
 dm-tf-5 retired
 dm-tzd-eye
-dm-mm-glp1 retired
-dm-exendin retired
+dm-mm-glp1
+dm-exendin
 dm-tf-6
 dm-num-4
 dm-pb-thyroid
@@ -72,8 +72,8 @@ dm-mm-weight
 dm-mm-route retired
 p1-feedback retired
 p1-2s-hormone retired
-p1-tf-lobes retired
-p1-num-cells retired
+p1-tf-lobes
+p1-num-cells
 p1-match-hypoth retired
 p1-tf-pitnet retired
 p1-macro-mass
@@ -88,10 +88,10 @@ p1-prl-2 retired
 p1-corticotroph
 p1-tf-hypopit75
 p1-null-cell retired
-p1-mm-hypopit retired
+p1-mm-hypopit
 p1-sheehan-1
 p1-sheehan-2
-p1-2s-pp retired
+p1-2s-pp
 p1-adh retired
 p1-tf-di
 p1-tf-siadh
@@ -101,13 +101,13 @@ p1-di-2 retired
 p1-siadh retired
 p1-lingual
 p1-ccell retired
-p1-goiter retired
+p1-goiter
 p1-num-labs
 p1-graves-1
 p1-graves-2
 p1-2s-graves
 p1-tsh-adenoma
-p1-x-hyper retired
+p1-x-hyper
 p1-hashi-1 retired
 p1-hashi-2 retired
 p1-hashi-3
@@ -137,7 +137,7 @@ p1-ana-2
 p1-tf-anaplastic retired
 p1-match-ca
 p2-pth-kidney
-p2-pth-fragments retired
+p2-pth-fragments
 p2-fat-age retired
 p2-phpt-def retired
 p2-phpt-cause
@@ -153,12 +153,12 @@ p2-tf-3 retired
 p2-surg-classic
 p2-seq-mips retired
 p2-case1-a retired
-p2-case1-b retired
+p2-case1-b
 p2-case1-c
 p2-shpt-dialysis
 p2-shpt-fix
 p2-2s-2
-p2-mm-hypo retired
+p2-mm-hypo
 p2-hypo-except
 p2-tf-4
 p2-num-2
@@ -219,21 +219,21 @@ fh-tf-meiosis2 retired
 fh-primordial-id retired
 fh-unilaminar-id retired
 fh-antral-id
-fh-graafian-id retired
+fh-graafian-id
 fh-corona retired
-fh-zp-contact retired
+fh-zp-contact
 fh-gap-barrier
 fh-mm-liquor retired
 fh-tf-months
 fh-2s-1 retired
 fh-2s-2
-fh-2s-3 retired
+fh-2s-3
 fh-num-follicles
 fh-seq-follicle retired
-fh-ex-secondary retired
+fh-ex-secondary
 fh-ovulation-trigger retired
 fh-mm-lh retired
-fh-rupture retired
+fh-rupture
 fh-where-released retired
 fh-lutein-estrogen
 fh-tf-thecalutein retired
@@ -250,12 +250,12 @@ fh-tf-helical
 fh-ampulla
 fh-peg
 fh-tf-cilia
-fh-tf-24h retired
+fh-tf-24h
 fh-capacitation
 fh-id-tube retired
-fh-ex-tube retired
+fh-ex-tube
 fh-2s-4 retired
-fh-ex-endometrium retired
+fh-ex-endometrium
 fh-tf-myoestrogen retired
 fh-cervix-mucus
 fh-tz
@@ -265,20 +265,20 @@ fh-ovulation-mucus retired
 fh-mammary-structure retired
 fh-tf-lactating retired
 fh-ex-milk retired
-fh-num-milk retired
-fh-2s-6 retired
+fh-num-milk
+fh-2s-6
 fh-match-epith retired
 fh-mm-preg retired
 fh-pb-colostrum
 fh-pb-letdown
 fh-pb-cl
-fh-pb-myo retired
+fh-pb-myo
 fh-pb-abx retired
 fh-pb-meno retired
-fh-num-ovary retired
-mp-4g-gonadal retired
+fh-num-ovary
+mp-4g-gonadal
 mp-amh
-mp-wolffian retired
+mp-wolffian
 mp-dht-targets
 mp-ais-cause
 mp-btb
@@ -329,33 +329,33 @@ mp-tf-2
 mp-tf-3 retired
 mp-tf-4
 mp-tf-5
-mp-tf-6 retired
+mp-tf-6
 mp-tf-7 retired
 mp-tf-8 retired
 mp-tf-9 retired
-mp-tf-10 retired
+mp-tf-10
 mp-num-1
 mp-num-2 retired
 mp-num-3 retired
-mp-num-4 retired
-mp-num-5 retired
+mp-num-4
+mp-num-5
 mp-num-6
-r-h1-gq retired
-r-h1-gi retired
+r-h1-gq
+r-h1-gi
 r-h1-2s-4
 r-h1-acidophils
 r-h1-2s-2 retired
 r-rv-paracrine
 r-rv-neuroendo retired
 r-hp-neuroendo retired
-r-rv-gs retired
+r-rv-gs
 r-hp-gs-ca retired
 r-hp-ins-vs-gh
-r-hp-2s-4 retired
-r-rv-gh-except retired
+r-hp-2s-4
+r-rv-gh-except
 r-gr-ss-gi
 r-gr-ghrh-gs retired
-r-gr-num-1 retired
+r-gr-num-1
 r-gr-r-ssfb
 r-gr-igf-fb retired
 r-gr-ss-glucose retired
@@ -388,7 +388,7 @@ r-cs-electrolytes retired
 r-cs-taper
 r-cs-2s-2 retired
 r-td-ptu-preg retired
-r-td-mmi-first retired
+r-td-mmi-first
 r-td-mmi-teratogen retired
 r-td-num-1
 r-td-levo-admin
@@ -408,7 +408,7 @@ r-ca-2s-3 retired
 r-ca-2s-4 retired
 r-cs-2s-3 retired
 r-gr-r-plate retired
-r-pa-2s-2 retired
+r-pa-2s-2
 r-td-inducers retired
 r-h2-r-2s-1 retired
 r-ca-r-vdr retired
@@ -428,7 +428,7 @@ dc-pit-match retired
 dc-adh
 dc-2s-pit retired
 dc-tsh retired
-dc-acro retired
+dc-acro
 dc-macro retired
 dc-hyperthy-except retired
 dc-2s-thy retired
@@ -450,41 +450,41 @@ dc-ca-seq retired
 dc-hpt-except retired
 dc-c5-gland retired
 dc-c5-mech
-dc-tf-hypopara retired
+dc-tf-hypopara
 dc-hormone-match retired
 dc-tf-medulla retired
 dc-2s-adr retired
-dc-medulla-dental retired
+dc-medulla-dental
 dc-c3-pig
-dc-c3-trigger retired
+dc-c3-trigger
 dc-c3-crisis
 dc-addison-seq retired
 dc-tf-addison-pig retired
 dc-cushing retired
-dc-glucagon retired
+dc-glucagon
 dc-tf-insulin retired
 dc-dm-types retired
 dc-2s-dm retired
-dc-dm-oral-except retired
+dc-dm-oral-except
 dc-tf-perio
 dc-perio-mech retired
-dc-dm-mgmt-num retired
+dc-dm-mgmt-num
 dc-tf-morning retired
 dc-hypo-signs retired
 dc-2s-ff retired
 dc-c2-organ retired
 dc-c2-before retired
-dc-c2-heal retired
-dc-c4-what retired
+dc-c2-heal
+dc-c4-what
 dc-c4-do
 dc-c4-unc retired
 dc-c4-prevent
 dc-preg
 dc-repro-num retired
 dc-tf-puberty
-dc-meno retired
+dc-meno
 mh-lobules retired
-mh-wall retired
+mh-wall
 mh-tf-temp retired
 mh-lh
 mh-abp
@@ -498,18 +498,18 @@ mh-x-sertoli
 mh-amh retired
 mh-num-sertoli
 mh-tf-sertoli-divide
-mh-tf-leydig retired
+mh-tf-leydig
 mh-terms
-mh-meiosis retired
+mh-meiosis
 mh-stages retired
 mh-num-spg
 mh-tf-puberty
-mh-dark-a retired
+mh-dark-a
 mh-2s-3
 mh-seq-cells retired
 mh-organelles
 mh-tf-head
-mh-spermiation retired
+mh-spermiation
 mh-seq-ducts retired
 mh-efferent retired
 mh-tf-efferent retired
@@ -519,7 +519,7 @@ mh-2s-2 retired
 mh-epid-id retired
 mh-cilia-stereo
 mh-2s-5 retired
-mh-x-epid retired
+mh-x-epid
 mh-num-epid
 mh-gpc
 mh-motility retired
@@ -531,19 +531,19 @@ mh-case-vas-3 retired
 mh-case-t-1 retired
 mh-case-t-2 retired
 mh-case-temp
-mh-case-rad retired
+mh-case-rad
 mh-match-numbers retired
 mh-sv-fructose
 mh-sv-id retired
 mh-bu-id retired
-mh-bu-timing retired
+mh-bu-timing
 mh-2s-4
 mh-tf-prostate-first retired
 mh-tf-prostate-sets retired
 mh-x-prostate retired
-mh-num-glands retired
+mh-num-glands
 mh-match-secretions retired
-mh-tf-pg retired
+mh-tf-pg
 mh-case-psa-1 retired
 mh-case-psa-2 retired
 mh-case-stain retired
@@ -555,8 +555,8 @@ fp-default-path
 fp-2s-default retired
 fp-tf-amh
 fp-tf-fimbriae retired
-fp-tf-cortex retired
-fp-kndy retired
+fp-tf-cortex
+fp-kndy
 fp-cyclic
 fp-num-axis retired
 fp-tf-prog-fb
@@ -570,7 +570,7 @@ fp-tf-estrone
 fp-2s-twocell
 fp-2s-hormones
 fp-2s-receptors
-fp-secondary retired
+fp-secondary
 fp-oocyte-gf retired
 fp-x-graafian retired
 fp-tf-cohort retired
@@ -580,7 +580,7 @@ fp-2s-meiosis retired
 fp-num-cl
 fp-tf-cl-cells
 fp-day21
-fp-day10 retired
+fp-day10
 fp-tf-200
 fp-inhibin retired
 fp-num-ovulation
@@ -589,7 +589,7 @@ fp-tf-14days retired
 fp-num-follicular
 fp-2s-luteal
 fp-2s-mucus
-fp-endo-luteal retired
+fp-endo-luteal
 fp-menses
 fp-tf-myometrium
 fp-mm-estrogen retired
@@ -597,10 +597,10 @@ fp-mm-progesterone retired
 fp-meno-1
 fp-meno-2
 fp-num-meno
-fp-x-meno retired
+fp-x-meno
 fp-prl-1
 fp-prl-2 retired
-fp-x-amen retired
+fp-x-amen
 fp-tf-amen retired
 fp-anov-1
 fp-anov-2
@@ -614,7 +614,7 @@ r-h1-pituicyte retired
 r-h1-nuclei retired
 r-h1-adeno-parts retired
 r-h1-portal retired
-r-h1-num-1 retired
+r-h1-num-1
 r-h1-tf-8
 r-h1-chief
 r-h1-casr retired
@@ -630,11 +630,11 @@ r-hp-primary-cort
 r-hp-secondary-fail retired
 r-hp-num-2 retired
 r-hp-2s-3 retired
-r-hp-glucagon-fb retired
+r-hp-glucagon-fb
 r-hp-positive
 r-hp-pp-none
 r-hp-2s-2 retired
-r-hp-tf-3 retired
+r-hp-tf-3
 r-gr-f-ssblock retired
 r-gr-r-daytime retired
 r-gr-f-tf-1 retired
@@ -647,7 +647,7 @@ r-rv-gh-excess retired
 r-gr-diabetogenic retired
 r-gr-r-glucose retired
 r-gr-lipolysis retired
-r-gr-muscle retired
+r-gr-muscle
 r-gr-f-metprofile retired
 r-gr-f-num-1 retired
 r-gr-f-tf-2
@@ -667,7 +667,7 @@ r-gr-r-tf-3 retired
 r-gr-f-num-2 retired
 r-th-extracell retired
 r-th-r-2s-1 retired
-r-th-num-1 retired
+r-th-num-1
 r-th-f-store retired
 r-th-f-release retired
 r-th-f-tf-2
@@ -675,11 +675,11 @@ r-th-f-conv retired
 r-th-f-2s-1 retired
 r-th-f-tf-3 retired
 r-th-trh-gq
-r-th-tsh-gs retired
+r-th-tsh-gs
 r-th-t3-inhib retired
 r-th-r-ss retired
 r-rv-th-anabolic retired
-r-th-bmr retired
+r-th-bmr
 r-th-heart retired
 r-th-r-myosin retired
 r-th-f-cv retired
@@ -688,10 +688,10 @@ r-th-f-num-3 retired
 r-th-f-tf-1 retired
 r-th-pb-graves retired
 r-th-pb-graves-eyes retired
-r-rv-graves retired
+r-rv-graves
 r-th-graves-labs retired
 r-th-f-compare
-r-th-pb-hashi retired
+r-th-pb-hashi
 r-th-pb-hashi-chol retired
 r-th-r-ldl
 r-th-f-num-2 retired
@@ -699,12 +699,12 @@ r-th-pb-iodine
 r-th-pb-tpo retired
 r-th-goiter retired
 r-th-pb-newborn
-r-th-pb-secondary retired
+r-th-pb-secondary
 r-th-congenital-tx retired
-r-th-child-growth retired
+r-th-child-growth
 r-rv-ins-muscle
 r-pa-glut4 retired
-r-pa-insulin-muscle retired
+r-pa-insulin-muscle
 r-pa-ketogenesis retired
 r-pa-num-2
 r-pa-glucagon-muscle retired
@@ -720,9 +720,9 @@ r-ad-cortisol-muscle retired
 r-ad-addison-acth
 r-ad-cushing-disease retired
 r-ad-2s-3 retired
-r-ad-tf-4 retired
+r-ad-tf-4
 r-cs-keto retired
-r-cs-num-2 retired
+r-cs-num-2
 r-cs-hyperK
 r-cs-spiro retired
 r-td-tsh-read
@@ -731,23 +731,23 @@ r-td-amio
 r-td-2s-5 retired
 r-td-macroglossia
 r-td-bb retired
-r-h2-acth-zones retired
+r-h2-acth-zones
 r-h2-r-angio
 r-h2-tf-3 retired
 r-h2-islet-share retired
 r-h2-r-rank
-r-h2-2s-3 retired
+r-h2-2s-3
 r-ca-pth-kidney
 r-ca-why-split retired
 r-ca-r-phos retired
-r-ca-ob-rec retired
+r-ca-ob-rec
 r-ca-2s-2
 r-ca-num-2 retired
 r-ca-oc-rec retired
 r-ca-calcitonin
 r-ca-hpt
 r-ca-r-stones retired
-dc-growth-plates retired
+dc-growth-plates
 dc-implant-growth
 dc-2s-acro
 dc-rln
@@ -769,7 +769,7 @@ dc-glucose-sucrose
 dc-rescue-num
 dc-pack-years
 dc-2s-preg retired
-mh-tf-tunica retired
+mh-tf-tunica
 mh-fig-seq
 mh-fig-label
 mh-tf-efferens retired
@@ -784,23 +784,25 @@ mh-2s-8
 fh-fsh-growth
 fh-seq-wall retired
 fh-2s-7
-fh-num-graph retired
+fh-num-graph
 fh-tf-fshpeak
 fh-2s-8
 fh-seq-menses retired
 fh-tf-straight
 mp-sl-pair
 mp-arom-adult retired
-mp-e2-role retired
-mp-t-life retired
+mp-e2-role
+mp-t-life
 mp-clot
 mp-cav-art
 mp-mm-wolff retired
 mp-2s-7
-mp-2s-8 retired
+mp-2s-8
 mp-tf-11 retired
 mp-tf-12
 mp-tf-13
 mp-tf-14
-mp-num-7 retired
+mp-num-7
 mp-num-8
+dm-met-lactic
+mh-spermio-phases
