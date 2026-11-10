@@ -501,7 +501,9 @@ official counts per lecture as the mock blueprint and `LIKELY_TOPICS` gave the b
 early for counts and focus lists; (2) High Likelihood got used (23 people ordered by it, 21 filtered to it, 40% of all tries): make
 "High likelihood only" + Random one obvious path in the bank; (3) statement formats are the hardest and the least helped by explanation
 fixes (standing lesson above); (4) "a lot of questions": 631 for 55 exam questions was more than people finished (median 302 answers);
-High Likelihood is the answer to that, not a smaller bank; (5) three days of hub was enough for 50 people to use it on 3+ days, but the
+High Likelihood is the answer to that, not a smaller bank (but Sam on Exam 2, 2026-11-08: "803 is way too many questions.
+They need to be higher yield": that bank was cut to 339, about 6 per expected exam question, and High Likelihood made
+selective; see `vault/decisions.md`); (5) three days of hub was enough for 50 people to use it on 3+ days, but the
 calcium and drug lectures, added or finished last, got the fewest tries again. Cleanup still to do by hand, after the late exam: remove
 `hubs/heme-endo-exam1/` and optionally move its entry into `ARCHIVED_HUBS`.
 

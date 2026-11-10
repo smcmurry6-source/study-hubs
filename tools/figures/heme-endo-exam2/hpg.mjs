@@ -159,10 +159,10 @@ function hgRender(st, D) {
     '<g class="' + (failTub ? "hg-fail" : "") + '">' + D.TUB + (failTub ? "" : D.GERM) + "</g>");
   var nSp = fl.sp === "d" ? 1 : 6;
   o += HOT("Sperm released into the lumen." + (fl.sp === "d" ? " In this case the sperm count is very low." : ""), '<g class="' + (fl.sp === "ng" ? "hg-faint" : "") + '">' + D.SPERM.slice(0, nSp).join("") + "</g>");
-  o += HOT("Sertoli cells, the FSH target: they nourish the germ cells, secrete androgen-binding protein (ABP) and inhibin, and form the blood-testis barrier." + (failTub ? " Damaged in this case: less inhibin." : ""),
+  o += HOT("Sertoli cells, the FSH target: they nourish the germ cells, secrete androgen-binding protein (ABP) and inhibin, form the blood-testis barrier, and hold most of the testis's aromatase." + (failTub ? " Damaged in this case: less inhibin." : ""),
     '<circle class="hg-hit" cx="274" cy="412" r="12"/>');
   o += L(172, 368, "Sertoli cells", 212, 400, "start", "hg-xs b");
-  o += HOT("Leydig cells, the LH target, in the connective tissue between the tubules: they make testosterone from cholesterol (and, in adults, aromatase here turns some into estradiol)." + (failT ? " Failing in this case: little testosterone." : ""),
+  o += HOT("Leydig cells, the LH target, in the connective tissue between the tubules: they make testosterone from cholesterol. They have some aromatase, but most is in the Sertoli cells." + (failT ? " Failing in this case: little testosterone." : ""),
     '<g class="' + (failT ? "hg-fail" : "") + '">' + D.LEY + "</g>");
   o += T(112, 406, "Leydig cells", "hg-xs b", "middle");
   if (failT) o += '<rect class="hg-stamp" x="194" y="306" width="74" height="16" rx="4"/>' + T(231, 318, "failing", "hg-xs hg-stampt", "middle");
@@ -174,8 +174,8 @@ function hgRender(st, D) {
   o += T(151, 440, "ABP", "hg-xs hg-abpt", "middle");
   o += HOT("Testosterone leaves the Leydig cells for the blood.", '<path class="hg-fl hg-tl" d="' + hgPath(D.P_TOUT) + '"/>');
   o += HOT("Inhibin leaves the Sertoli cells for the blood.", '<path class="hg-fl hg-inhl' + (fl.inh === "ng" ? " is-q" : "") + '" d="' + hgPath(D.P_INHOUT) + '"/>');
-  o += HOT("Aromatase (estrogen synthase) turns testosterone into estradiol. From puberty on it is in the Leydig cells, driven by LH; in the fetus and newborn it is in the Sertoli cells, driven by FSH.",
-    '<path class="hg-e2l" d="M96 466L84 486"/><circle class="hg-e2" cx="88" cy="479" r="2"/>' + T(70, 500, "estradiol", "hg-xs hg-e2t", "start") + T(70, 513, "(aromatase)", "hg-xs mut", "start"));
+  o += HOT("Aromatase (estrogen synthase) turns testosterone into estradiol. Dr. Madison corrected his slide in class: the Sertoli cells, driven by FSH, do most of it from fetal development on; the Leydig cells have some.",
+    '<path class="hg-e2l" d="M270 507L282 525"/><circle class="hg-e2" cx="278" cy="519" r="2"/>' + T(288, 540, "estradiol", "hg-xs hg-e2t", "middle") + T(288, 553, "aromatase", "hg-xs mut", "middle"));
   if (lv.itt) o += hgChip(154, 528, "T in testis", lv.itt, D.INFO.itt, ring("itt"), "hg-tt", false);
   o += hgChip(312, 325, "sperm", lv.sp, D.INFO.sp, ring("sp"), "", true);
   o += "</g>";
@@ -329,7 +329,7 @@ export default function hpg() {
     D, render: hgRender, say: hgSay, helpers: [hgPath, hgDots, hgWord, hgCW, hgChip, hgTrace, hgMark, hgBrake],
     controls: `<div class="am-controls" role="group" aria-label="Case">` + Object.keys(SC).map((k) => `<button type="button" class="am-btn" data-amk="sc" data-amv="${k}">${{ normal: "Normal", cont: "Continuous GnRH", inj: "Testosterone injections", testes: "Failing testes", pit: "Failing pituitary", tub: "Damaged tubules", ard: "5-alpha-reductase deficiency", ais: "Androgen insensitivity" }[k]}</button>`).join("") + `</div>`,
     sources: [
-      "From the L15 notes (Dr. Madison): GnRH from the hypothalamus releases LH and FSH; LH acts on the Leydig cells (testosterone), FSH on the Sertoli cells (spermatogenesis, ABP, inhibin); testosterone inhibits GnRH and LH and inhibin inhibits FSH; GnRH (and so LH) must be pulsatile, and continuous GnRH decreases LH and testosterone; ABP keeps testosterone higher in the testis than in the blood; 5-alpha-reductase makes DHT in peripheral tissues (penis, scrotum, prostate); aromatase in the Sertoli cells (FSH) in the fetus and newborn and in the Leydig cells (LH) from puberty on; the hormone-pattern table (failing testes, failing pituitary, testosterone injections, damaged tubules with low inhibin, continuous GnRH with FSH not on the slides); androgen insensitivity and 5-alpha-reductase deficiency.",
+      "From the L15 notes (Dr. Madison): GnRH from the hypothalamus releases LH and FSH; LH acts on the Leydig cells (testosterone), FSH on the Sertoli cells (spermatogenesis, ABP, inhibin); testosterone inhibits GnRH and LH and inhibin inhibits FSH; GnRH (and so LH) must be pulsatile, and continuous GnRH decreases LH and testosterone; ABP keeps testosterone higher in the testis than in the blood; 5-alpha-reductase makes DHT in peripheral tissues (penis, scrotum, prostate); aromatase mostly in the Sertoli cells (FSH) from fetal development on, with some in the Leydig cells (his correction in the 11/6 recording, which overrides the slide's \"Leydig cells from puberty on\"); the hormone-pattern table (failing testes, failing pituitary, testosterone injections, damaged tubules with low inhibin, continuous GnRH with FSH not on the slides); androgen insensitivity and 5-alpha-reductase deficiency.",
       "From the hub's case questions on this lecture: GnRH rises with failing testes (the brake is off GnRH, LH and FSH) and falls with injected testosterone; the injection case's very low sperm count and lost intratesticular testosterone; the damaged-tubule case's very low sperm count; testosterone in the male range in both development cases, and DHT low in 5-alpha-reductase deficiency. Anything a case or the notes don't give is tagged \"not given\" rather than worked out.",
       "Schematic and not to scale: the brain is a simple sagittal outline and the testis is a magnified tubule with Leydig cells beside it. The GnRH monitor is qualitative (its pulse spacing and heights aren't data), and the flows' speeds only say higher or lower. The axis is drawn for an adult; the development cases dim it and look at the targets.",
     ],

@@ -64,6 +64,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/question-ids-are-permanent.md
 
+@vault/rules/dont-ask-what-professors-skip.md
+
 @vault/rules/question-health-flags-are-leads.md
 
 @vault/rules/high-likelihood-topics.md

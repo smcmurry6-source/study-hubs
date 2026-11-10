@@ -5,7 +5,7 @@ hub: heme-endo-exam2
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
-waiting-on: L17 and L18 slides; the recordings of Lecture A and L13-L16; the Exam 2 review (Wed 11/11)
+waiting-on: L17 and L18 slides; the L16 recording (Tue 11/10); the Exam 2 review (Wed 11/11)
 agent: 
 pr: 
 ---
@@ -35,13 +35,15 @@ re-rank High Likelihood from the review on Wed 11/11.
 - Quiz 3 is open until Thu 11/12, 11:59 pm and the take-home until 11/15: never use either
   ([graded-coursework](../rules/graded-coursework.md)).
 - `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: update them if the course announces a count per lecture.
+- **The bank is kept high yield** (Sam, 2026-11-08: "803 is way too many questions"; it was cut to 339): L17 and L18 get
+  about 30-35 questions each, and L16 going taught swaps questions instead of adding; see the hub note.
 
 ## Done when
 
 - [ ] L17 and L18 are lectures with notes at both levels, narration, questions in every required format and their
       `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions
 - [ ] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
-      and Exam Hints quoted from what was said
+      and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 waits for its 11/10 recording)
 - [ ] High Likelihood re-ranked from the 11/11 review
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [ ] Vault written back (hub note, decisions, this note's Outcome)
@@ -53,5 +55,18 @@ re-rank High Likelihood from the review on Wed 11/11.
 - 2026-11-05: the hub merged with smcmurry6-source/study-hubs#246: every question vetted, nine figures, both narration
   levels. The places where a lecture contradicts a textbook or itself (kept as taught) are in the hub note: check each
   against the recording when A and L13-L16 go to taught, and the figures against the slide images.
+- 2026-11-08: Sam added the 11/6 recordings' transcripts to Drive ("update the heme and endo exam 2 hub with the
+  transcripts i just added to the drive folder"; then "merge when ready"). A, L13, L14 and L15 are taught: notes at both
+  levels checked against what was said, 57 new questions (sources relabeled `rec` where the point was said aloud), Exam
+  Hints quoted from each recording, High Likelihood re-ranked from what each professor flagged, both mp3s regenerated,
+  and the `hpg` figure moved to Dr. Madison's in-class aromatase correction. The contradictions found are in the hub
+  note's content flags. Still to do here: L16 (recording Tue 11/10), L17 and L18, the 11/11 review, and the `cycle`
+  figure's FSH at midcycle (L14 and L16 disagree).
+- 2026-11-08: Sam: "2 should come out along with any questions that professors say we dont need to know". `mh-2s-6`
+  retired; every recording and Exam 1's de-emphasis hints checked, nothing else tested a skipped point. Do the same
+  check for L16-L18 and the review. Then "That should be a standing rule" (now
+  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)) and "803 is way too many questions. They need
+  to be higher yield": the bank was cut to 339 high-yield questions (464 ids retired), High Likelihood made selective
+  (about half of each lecture), the Refresher to one question per Exam 1 topic. New lectures stay at that size.
 
 ## Outcome
