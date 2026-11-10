@@ -59,6 +59,9 @@ it, already taught and vetted, instead of writing it again.
   ("the numbers may not be accurate" is not "you don't need it", Sam 2026-11-10).
 - A leans on Exam 2's lectures (L11's diabetes drugs and cutoffs, L12's thyroid, parathyroid and adrenal pathology): its
   notes and whys mention them. If Exam 3 doesn't cover those, keep the wording that explains them on its own.
+- **L17 and L18 too:** L16 is the last lecture on Exam 2 (Sam, 2026-11-10, from Dr. Herr), so L17 Pregnancy and lactation
+  (Dr. Madison, Tue 11/10) and L18 Estrogens and androgens (Dr. Fasinu, Wed 11/11) were never built; the Exam 3 hub builds
+  them from their slides and recordings, with every per-lecture rule.
 - Sources: Drive, "Hematology and Endocrinology" → "Exam 2" (A's slides and the `GMT20261106` 8 am transcript). Never
   commit them; the [graded-coursework](../rules/graded-coursework.md) rules apply as in Exam 2.
 

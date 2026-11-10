@@ -7,8 +7,9 @@ status: live
 
 # Heme & Endo Exam 2
 
-DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, 45 on L11-L18, 5 on Exam 1 material. **Dr. Taylor's Lecture A
-is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
+DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 material, 8 on L11, 9 on L12 (both hours), 7 each on
+L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
+(they go to Exam 3 with A). **Dr. Taylor's Lecture A is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
 that for exam 3"): the hub's A came out whole that day, and everything it had (notes, narration, 58 questions, hints,
 tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its `HUBS` entry in `index.html`.
 
@@ -48,7 +49,8 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
   Every Zoom caption is labeled "Michael Herr" because the room's account is his: A is Dr. Taylor and L15 Dr. Madison.
   Their questions' `src` is `rec` where the point was said aloud. L16 is still slides-only (taught Tue 11/10). L17 and L18
-  had no slides on 2026-11-05: [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
+  aren't on Exam 2 (Sam, 2026-11-10: "L16 is the last lecture on the test"), so this hub doesn't get them:
+  [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
 - **Sources:** Drive, "Hematology and Endocrinology" → "Exam 2" (slides, schedule, syllabus, the recordings'
   transcripts). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule: everything in "Resources
   from D3s" (last year's Exam 2 study guide, Anki deck of practice questions, a female repro study doc), Quiz 3 (open
@@ -87,10 +89,17 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   identification, near-duplicates and slide trivia stay out). On the Exam 2 lectures, 133 cut questions came back as they were (ids
   un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
   `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures hold 393
-  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43; 258 are High Likelihood. The mock's 45 are L11 8, L12a 7,
-  L12b 7, L13-L15 6 each, L16 5 (A's 5 went one each to L12a and L13-L16). **The mock stays 50 questions** (Sam,
-  2026-11-10); when Dr. Herr gives the exam's breakdown per lecture, Sam will pass it on: put it in `EXAM_COUNTS` and
-  `MOCK_BLUEPRINT` (and give each lecture that many High Likelihood topics, [high-likelihood-topics](../rules/high-likelihood-topics.md)). **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
+  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43.
+- **The exam's count per lecture** (Sam, 2026-11-10, from Dr. Herr: "5 review, 8 for l11, 9 for l12, and 7 for the rest"):
+  `EXAM_COUNTS = { dmpharm 8, L12 9, mhisto 7, fhisto 7, mphys 7, fphys 7, refresh 5 }`, and `MOCK_BLUEPRINT` is the same
+  object, so the mock is the exam's 50. L12's two hours share their 9 (`EXAM_GROUPS`): the mock draws the 9 from L12a and
+  L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
+  **High Likelihood follows the counts** ([high-likelihood-topics](../rules/high-likelihood-topics.md), as Exam 1 did): each
+  lecture keeps its first n topics in rank order (L11 8, L13-L16 7 each) and L12 keeps 9, 4 from L12a and 5 from L12b
+  (L12b's recording flagged more: 17 `emphasize` hints to 12). 29 lower-ranked topics came off; 163 Exam 2 questions
+  are High Likelihood (258 before). The Refresher keeps all 55 of Exam 1's topics (Sam's "do not cut them"). When the
+  11/11 review or L16's recording ranks a topic higher, swap it in for the lowest one, keeping each lecture at its count.
+  **Adding to it:** a lecture going taught (L16) gets the same audit: its hints and
   topics covered, its notes' key terms covered once, nothing on skipped points.
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
   histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
