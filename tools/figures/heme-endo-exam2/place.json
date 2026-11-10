@@ -13,6 +13,7 @@
    {"full": "The pattern to carry into the exam", "plain": "The one idea", "figs": ["axislab"]}
   ],
   "mhisto": [
+   {"full": "Sertoli cells", "plain": "Sertoli cells", "figs": ["sertoli"]},
    {"full": "Spermatogenesis: the terms", "plain": "From stem cell to sperm", "figs": ["tubule"]},
    {"full": "The duct system, in order", "plain": "The ducts", "figs": ["ducts"]}
   ],
@@ -31,7 +32,7 @@
   "dmpharm": ["insulins", "drugsites"],
   "path1": ["axislab"],
   "path2": ["cah", "axislab"],
-  "mhisto": ["tubule", "ducts"],
+  "mhisto": ["sertoli", "tubule", "ducts"],
   "fhisto": ["follicle", "cycle"],
   "mphys": ["hpg"],
   "fphys": ["cycle"]
