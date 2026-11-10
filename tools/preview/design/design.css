@@ -653,6 +653,61 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-framefig .tp-rcard { width: 100%; max-width: 180px; }
 .tp-framefig p { font-size: var(--fs-meta); color: var(--muted); text-align: center; }
 .tp-framefig p b { color: var(--text); }
+/* a card that's only shown (a shelf, a set), the folded groups of set pieces in the customizer */
+.tp-static { cursor: default; }
+.tp-static:hover, .tp-static:active { transform: none; }
+.tp-more { border-top: 1px solid var(--rule); padding-top: 10px; }
+.tp-more summary { cursor: pointer; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); margin-bottom: 10px; }
+.tp-more summary .num { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: var(--r-pill); background: var(--track); color: var(--text); font-size: var(--fs-meta); text-align: center; }
+/* hub mastery: the two options side by side at each size, then each on a whole place */
+#tpMastery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#tpMastery .tp-wide { grid-column: span 2; }
+/* the sets: a season is its picture and its eight cards; a rank is its two */
+#tpSets { grid-template-columns: 1fr; gap: 26px; }
+.tp-set { display: grid; gap: 10px; }
+.tp-sethead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.tp-sethead b { font-size: var(--fs-card); font-weight: var(--w-head); }
+.tp-sethead span { font-size: var(--fs-meta); color: var(--muted); }
+.tp-setbody { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }
+.tp-setbody .tp-rcards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#tpRankSets { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 22px; }
+.tp-rankset { display: grid; gap: 8px; align-content: start; }
+.tp-rankset .tp-rcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* the shop's shelves */
+#tpShop { display: grid; gap: 14px; }
+.tp-shelf { display: grid; gap: 10px; background: var(--row); border-radius: var(--r-row); padding: 16px; }
+.tp-shelf header { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 12px; }
+.tp-shelf h4 { font-size: var(--fs-card); font-weight: var(--w-head); }
+.tp-shelf .tp-note { grid-column: 1 / -1; }
+.tp-when { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tp-shelf .tp-rcards { grid-template-columns: repeat(auto-fill, minmax(128px, 148px)); }
+.tp-shelf-season { box-shadow: 0 0 0 2px var(--gold) inset; }
+.tp-shelf-back { box-shadow: 0 0 0 2px var(--text) inset; }
+.tp-ribbon { position: absolute; left: -3%; right: -3%; top: 44%; padding: 3px 0; background: #3B2E3A; color: #fff; font-size: clamp(10px, 8.4cqw, 12px); font-weight: 800; letter-spacing: .02em; transform: rotate(-6deg); }
+/* visiting: the board with its Visit buttons and the switch, and the place you're looking at */
+.tp-visiting { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 18px; align-items: start; }
+.tp-vboard { display: grid; gap: 12px; }
+.tp-vboard h4, .tp-vhead b { font-size: var(--fs-card); font-weight: var(--w-head); }
+.tp-vboard ol { display: grid; gap: 6px; }
+.tp-vrow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto 92px; align-items: center; gap: 10px; min-height: 52px; padding: 6px 12px; border-radius: var(--r-row); background: var(--row); font-size: var(--fs-label); }
+.tp-vrow.me { box-shadow: 0 0 0 2px var(--gold) inset; }
+.tp-vrow > .num:first-child { color: var(--muted); font-weight: var(--w-strong); }
+.tp-vname { font-weight: var(--w-strong); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tp-vname small { display: block; font-size: var(--fs-meta); font-weight: 400; color: var(--muted); }
+.tp-vbtn { height: 36px; padding: 0 14px; }
+.tp-vbtn[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.tp-vnote { font-size: var(--fs-meta); color: var(--muted); text-align: center; }
+.tp-vswitch { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-row); border: 1px solid var(--rule); cursor: pointer; font-size: var(--fs-label); }
+.tp-vswitch small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.tp-vswitch input { appearance: none; -webkit-appearance: none; width: 46px; height: 28px; border-radius: 999px; background: var(--track); position: relative; cursor: pointer; transition: background var(--t-press) var(--ease-out); }
+.tp-vswitch input::after { content: ""; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); transition: transform var(--t-press) var(--ease-out); }
+.tp-vswitch input:checked { background: var(--primary); }
+.tp-vswitch input:checked::after { transform: translateX(18px); }
+.tp-vswitch input:focus-visible { outline: 3px solid var(--focus, var(--primary)); outline-offset: 2px; }
+.tp-vplace { display: grid; gap: 10px; }
+.tp-vhead { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 12px; }
+.tp-vhead span { grid-column: 1; font-size: var(--fs-meta); color: var(--muted); }
+.tp-vhead .btn { grid-column: 2; grid-row: 1 / span 2; height: 36px; }
 .tp-cardburst { position: absolute; left: 50%; top: 40%; width: 110%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; }
 #tpOutfits { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
 .tp-outpic { background: var(--row); box-shadow: none; padding: 8px 10% 0; }
@@ -669,11 +724,22 @@ img.emb-disc, .big, .small img { display: block; }
   #tpThemes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #tpRanks, #tpOutfits { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #tpSets { grid-template-columns: 1fr; }
+  #tpRankSets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tp-setbody, .tp-visiting { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .tp-gal, #tpYard, #tpFrames { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   #tpHomes, #tpNights, #tpScenes, #tpThemes { grid-template-columns: 1fr; }
   #tpRanks, #tpOutfits, #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #tpMastery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #tpSets, #tpRankSets { grid-template-columns: 1fr; }
+  .tp-setbody .tp-rcards, .tp-shelf .tp-rcards { grid-template-columns: none; }
+  .tp-rankset .tp-rcards { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; margin: 0; padding: 0; }
+  .tp-shelf { padding: 12px; }
+  .tp-vrow { grid-template-columns: 20px minmax(0, 1fr) 84px; }
+  .tp-vrow .xp-gold { grid-column: 2; grid-row: 2; font-size: var(--fs-meta); }
+  .tp-vrow > :last-child { grid-column: 3; grid-row: 1 / span 2; }
   /* on a phone the cards are a row you swipe, each big enough to read */
   .tp-rcards { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 40%; gap: 10px; overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory; scroll-padding: 0 6px; padding: 6px 6px 10px; margin: 0 -6px; scrollbar-width: thin; }
@@ -681,4 +747,4 @@ img.emb-disc, .big, .small img { display: block; }
   .tp-pick { padding: 12px; }
   .tp-card { max-width: none; }
 }
-@media (prefers-reduced-motion: reduce) { .tp-rcard { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tp-rcard, .tp-vswitch input, .tp-vswitch input::after { transition: none; } }

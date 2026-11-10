@@ -617,17 +617,21 @@
   var HOLS = [["", "No holiday"], ["halloween", "Halloween"], ["thanksgiving", "Thanksgiving"], ["winter", "Christmas"], ["newyear", "New Year's"], ["valentine", "Valentine's Day"], ["dentist", "Dentist's Day"], ["stpatrick", "St. Patrick's Day"], ["easter", "Easter"]];
   var SEASONS = [["", "Summer"], ["spring", "Spring"], ["fall", "Fall"]];
   var FLAIR_HUBS = ["occlusion", "perio", "heme-endo-exam2", "pcd-implants-exam1", "special-patient-care", "generic"];
-  function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i], t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : "" }; }); }
-  var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1])];
-  var FLAIR_NAMES = ["No pennants yet", "One hub mastered (Silver)", "Three hubs", "Four, one crowned", "Six hubs"];
+  /* a made-up student's hub medals: the live hubs' tints first, then more hues for the hubs still to come */
+  var MORE_TINTS = ["#C2417A", "#2E9E6B", "#8A4FD0", "#E08A1E", "#1FA3A8", "#D9483B", "#5B6FD6", "#7A8F2E", "#B5651D", "#3F8FBF", "#A04FA8", "#4F9A52", "#D46A6A", "#6B7A8F"];
+  function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i] || "hub-" + (i + 1), t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : MORE_TINTS[(i - FLAIR_HUBS.length + MORE_TINTS.length * 2) % MORE_TINTS.length] }; }); }
+  var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1]), flairOf([4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1]), flairOf([4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1])];
+  var FLAIR_NAMES = ["No hubs mastered yet", "One hub (Silver)", "Three hubs", "Six hubs, two crowned", "Twelve hubs", "Twenty hubs"];
+  var MASTERY = [["case", "Trophy case"], ["plaque", "Gem plaque"]];
+  var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank"; }, byRank = function(x){ return x.set === "rank"; };
   var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
-    tier: 3, level: 2, flair: 2, holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
+    tier: 3, level: 2, flair: 3, mastery: "case", holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
   function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
   function isStill(){ return PS.still || reduced; }
   function tpOpts(o){
     return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
-      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
+      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], mastery: PS.mastery, holiday: PS.holiday, season: PS.season }, o || {});
   }
   function timmyArt(k){
     var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
@@ -643,7 +647,9 @@
   function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Default</span>'; }
   function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Default") + "</i>"; }
   /* a piece's rarity and price for a caption: free things just say so */
-  function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + price(x.price || 0) : rarTag(""); }
+  function isGift(x){ var se = x.set && TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0]; return !!(se && se.gift); }
+  function priceOf(x){ return x.rank ? '<span class="tp-price free">' + esc(x.rankName) + " rank</span>" : isGift(x) ? '<span class="tp-price free">Yours</span>' : price(x.price || 0); }
+  function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + priceOf(x) : rarTag(""); }
   function sentence(t){ t = String(t || "").replace(/^(Free|Default|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
   function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
   /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
@@ -695,10 +701,13 @@
   function rcard(x, thumb, on, data){
     var r = x.rarity || "";
     return '<button type="button" class="tp-rcard r-' + (r || "free") + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + frameImg(r || "Common") +
-      (r ? '<span class="tp-rprice">' + price(x.price || 0) + "</span>" : "") +
+      (r ? '<span class="tp-rprice">' + priceOf(x) + "</span>" : "") +
       '<span class="tp-rthumb">' + thumb + '</span><span class="tp-rtext"><span class="tp-rname">' + esc(cardName(x.n)) + '</span><span class="tp-rmeta">' + rarTag(r) + "</span></span></button>";
   }
 
+  /* the same card where it's only shown, not picked (a shelf, a set) */
+  function scard(x, thumb, extra){ return rcard(x, thumb, false, "").replace('<button type="button" class="', '<span class="tp-static ').replace(/ aria-pressed="false"\s*>/, ">").replace(/<\/button>$/, (extra || "") + "</span>"); }
+  function kindOf(x){ return TP.HOMES.indexOf(x) >= 0 ? "home" : TP.SCENES.indexOf(x) >= 0 ? "scene" : TP.YARD.indexOf(x) >= 0 ? "yard" : "outfit"; }
   function place(){
     if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
     if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
@@ -712,7 +721,7 @@
         "<li><b>No plot square:</b> each scene’s ground fills the picture, and the yard is its flat middle.</li>" +
         "<li><b>Homes sit in their scene:</b> a soft shadow, the scene’s own ground round the walls, its path, tree and lamp.</li>" +
         "<li><b>Five yard spots</b> along the front; the bowling lane takes two.</li>" +
-        "<li><b>What you’ve earned is part of it:</b> your rank is the statue by the door, each hub you master a pennant in the bunting.</li>" +
+        "<li><b>What you’ve earned is part of it:</b> your rank is the statue by the door, and every hub you master goes in the display beside the house.</li>" +
         "<li><b>Timmy hops on the ground</b> round the house and the yard things, never over them.</li>" +
         "<li><b>Day and night</b> follow your clock (7 pm to 7 am).</li>" +
         "<li><b>Light to load:</b> one kit draws every combination (about " + Math.round(TP.CSS.length / 1024 + 180) + " KB before compression), loaded only when his place is on screen.</li>" +
@@ -724,7 +733,12 @@
       galleryPanel("tpYard", "The yard", "Twelve things for the yard spots, each drawn to fit one. Tap one in the builder for its egg.") +
       galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
       galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
-      galleryPanel("tpRanks", "Your rank and your mastery", "The handpiece statue in each rank’s material, its steps for the level, and the bunting: one pennant per hub, Bronze, Silver or Gold, a Crown in gold with a crown on it.") +
+      galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material, and its steps for the level.") +
+      galleryPanel("tpMastery", "Hub mastery: two options to pick from", "The pennants are gone. Every hub you master shows beside the house, in a trophy case (a cup per hub) or on a plaque (a gem per hub). The metal is the medal (Bronze, Silver, Gold; a Crown sparkles), the color is the hub’s own, and both grow as you master more, up to twenty. Tap it in the builder and Timmy counts them. Try either one under “Preview only”.") +
+      galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
+      galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
+      '<div class="panel s12"><h3>The shop’s shelves</h3><p>Daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price. A design of the shelves: the shop itself is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
+      '<div class="panel s12"><h3>Visiting</h3><p>On by default: anyone on the boards can be visited from their name there, and one switch turns it off. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
       galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
       galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
       galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.") +
@@ -732,6 +746,7 @@
         Object.keys(TP.EGGS).map(function(k){ var e = TP.EGGS[k]; return "<li><b>" + esc(e.n) + "</b> " + esc(e.does) + (e.say ? ": <q>" + esc(e.say) + "</q>" : "") + "</li>"; }).join("") + "</ul></details></div></div>";
     $$(".tp-modebar [data-mode]").forEach(function(b){ b.addEventListener("click", function(){ PS.mode = b.dataset.mode; buildPlace(); }); });
     buildPlace();
+    shopMock(); visitMock();
     lazyGalleries();
   }
   function galleryPanel(id, h, p){ return '<div class="panel s12"><h3>' + h + "</h3><p>" + p + '</p><div class="panel-body tp-gal" id="' + id + '" data-lazy="1"></div></div>'; }
@@ -752,22 +767,52 @@
         return placeFig(o, t.n, esc(t.note) + list + '<button type="button" class="btn tp-try" data-theme-try="' + t.k + '">Try it in the builder</button>', "lawn", "tp-theme", out);
       }).join("");
     },
-    tpHomes: function(){ return TP.HOMES.map(function(h){ var t = byK(TP.THEMES, h.theme) || {}; return placeFig({ home: h.k, scene: (t.scene) || "hill", tier: 1, yard: {} }, h.n, tagLine(h) + " " + esc(sentence(h.note)), "door"); }).join(""); },
-    tpNights: function(){ return TP.HOMES.map(function(h){ var up = {}; h.ups.forEach(function(k){ up[k] = true; }); return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: up, yard: { front: "campfire" } }, h.n + " at night", "", "door"); }).join(""); },
-    tpScenes: function(){ return TP.SCENES.map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: {} }, s.n, tagLine(s) + " " + esc(sentence(s.note)), "door"); }).join(""); },
+    tpHomes: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var t = byK(TP.THEMES, h.theme) || {}; return placeFig({ home: h.k, scene: (t.scene) || "hill", tier: 1, yard: {} }, h.n, tagLine(h) + " " + esc(sentence(h.note)), "door"); }).join(""); },
+    tpNights: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ up[k] = true; }); return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: up, yard: { front: "campfire" } }, h.n + " at night", "", "door"); }).join(""); },
+    tpScenes: function(){ return TP.SCENES.filter(builtIn).map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: {} }, s.n, tagLine(s) + " " + esc(sentence(s.note)), "door"); }).join(""); },
     tpYard: function(){
-      return TP.YARD.map(function(y){ var t = byK(TP.THEMES, y.theme), sc = t && t.scene || "hill", k = y.wide ? "side" : "front", yd = {}; yd[k] = y.k;
+      return TP.YARD.filter(builtIn).map(function(y){ var t = byK(TP.THEMES, y.theme), sc = t && t.scene || "hill", k = y.wide ? "side" : "front", yd = {}; yd[k] = y.k;
         return placeFig({ home: "cottage", scene: sc, tier: 0, bare: true, yard: yd, viewBox: slotCrop(k, y.wide) }, y.n, tagLine(y) + " " + esc(y.note), "", "tp-yardfig"); }).join("");
     },
-    tpUps: function(){ return TP.HOMES.map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
+    tpUps: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
       return placeFig({ home: h.k, scene: "hill", tier: 0, up: up, yard: {}, viewBox: HOME_CROP() }, h.n, esc(h.ups.filter(function(k){ return k !== "paint"; }).map(function(k, i){ return i ? lowerFirst(h.upn[k]) : h.upn[k]; }).join(", "))); }).join("") +
       '<div class="tp-upcards">' + TP.UPGRADES.map(function(u){ return '<span class="tp-piece">' + esc(cardName(u.n)) + " " + tagLine(u) + "</span>"; }).join("") + "</div>"; },
     tpPaint: function(){ return TP.PAINTS.map(function(p){ return placeFig({ home: "cottage", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.n, tagLine(p), "", "tp-small"); }).join("") +
       TP.PAINTS.map(function(p){ return placeFig({ home: "lighthouse", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.boldName + " stripes", "", "", "tp-small"); }).join(""); },
     tpRanks: function(){
       return TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", tier: i, level: 3, yard: {}, viewBox: statueCrop(), night: i === 6 }, n, i === 6 ? "It glows, and its stars come out" : "", "", "tp-small"); }).join("") +
-        LEVELS.map(function(l, i){ return placeFig({ home: "cottage", scene: "hill", tier: 4, level: i + 1, yard: {}, viewBox: statueCrop() }, "Gold " + l, (i + 1) + (i ? " steps" : " step"), "", "tp-small"); }).join("") +
-        FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: ["cottage", "mushroom", "castle", "lighthouse"][i], scene: "hill", tier: 2, flair: fl, yard: {}, viewBox: HOME_CROP() }, FLAIR_NAMES[i + 1], "", "", "tp-small"); }).join("");
+        LEVELS.map(function(l, i){ return placeFig({ home: "cottage", scene: "hill", tier: 4, level: i + 1, yard: {}, viewBox: statueCrop() }, "Gold " + l, (i + 1) + (i ? " steps" : " step"), "", "tp-small"); }).join("");
+    },
+    /* the two mastery displays, side by side at each size, then each on a whole place */
+    tpMastery: function(){
+      var vb = [185, 116, 70, 78], out = "";
+      MASTERY.forEach(function(m, i){ out += placeFig({ home: i ? "castle" : "cottage", scene: i ? "clouds" : "hill", tier: 4, level: 2, flair: FLAIRS[4], mastery: m[0], yard: { left: "garden", right: "hammock" } }, m[1] + ", on a whole place", "Twelve hubs", "door", "tp-wide"); });
+      FLAIRS.slice(1).forEach(function(fl, i){ MASTERY.forEach(function(m){
+        out += placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, mastery: m[0], yard: {}, viewBox: vb }, m[1] + ": " + FLAIR_NAMES[i + 1].toLowerCase(), "", "", "tp-small"); }); });
+      return out;
+    },
+    tpRankSets: function(){
+      if (!TP.SETS) return "";
+      return TP.SETS.ranks.map(function(r){
+        var o = byK(TP.OUTFITS, r.outfit[0]), y = byK(TP.YARD, r.yard[0]);
+        if (!o || !y) return '<figure class="tp-fig"><figcaption><b>' + esc(r.rank) + "</b><span>Not drawn yet</span></figcaption></figure>";
+        return '<div class="tp-rankset"><div class="tp-sethead"><b>' + esc(r.rank) + '</b><span>Reach ' + esc(r.rank) + " I</span></div>" + '<div class="tp-rcards">' +
+          scard(o, thumbImg("outfit", o.k)) + scard(y, thumbImg("yard", y.k, {})) + "</div></div>"; }).join("");
+    },
+    tpSets: function(){
+      if (!TP.SETS) return "";
+      return TP.SETS.seasons.map(function(se){
+        var of = function(list){ return list.filter(function(x){ return x.set === se.k; }); }, homes = of(TP.HOMES), scenes = of(TP.SCENES), yard = of(TP.YARD), outfits = of(TP.OUTFITS);
+        var head = '<div class="tp-sethead"><b>' + esc(se.n) + "</b><span>" + esc(se.when) + (se.gift ? " · everyone’s from the start" : "") + "</span></div>";
+        if (!homes.length || !scenes.length) return '<div class="tp-set">' + head + '<p class="tp-note">Not drawn yet.</p></div>';
+        var yd = {}; yard.forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+        var pic = placeFig({ home: homes[0].k, scene: scenes[0].k, tier: 3, level: 2, yard: yd, up: { flag: true } }, "", "", "door", "tp-setpic", outfits.length ? outfits[outfits.length - 1].k : "");
+        var cards = homes.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); })
+          .concat(scenes.map(function(x){ return rcard(x, thumbImg("scene", x.k), false, 'data-set-try="' + se.k + '"'); }),
+            outfits.map(function(x){ return rcard(x, thumbImg("outfit", x.k), false, 'data-set-try="' + se.k + '" data-set-outfit="' + x.k + '"'); }),
+            yard.map(function(x){ return rcard(x, thumbImg("yard", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); }));
+        return '<div class="tp-set">' + head + '<div class="tp-setbody">' + pic + '<div class="tp-rcards">' + cards.join("") + "</div></div></div>";
+      }).join("");
     },
     tpFrames: function(){
       var sample = { Common: ["yard", "mailbox"], Uncommon: ["yard", "campfire"], Rare: ["yard", "telescope"], Epic: ["home", "igloo"], Legendary: ["home", "lighthouse"] };
@@ -775,12 +820,13 @@
         return '<div class="tp-framefig">' + rcard(x, thumbImg(s[0], s[1], {}), false, 'data-burst="' + r.k + '"') + "<p><b>" + esc(r.k) + "</b> " + fmtPrice(r.band[0]) + " to " + fmtPrice(r.band[1]) + "</p></div>"; }).join("");
     },
     tpOutfits: function(){
-      return TP.OUTFITS.map(function(o){ var t = byK(TP.THEMES, o.theme);
+      return TP.OUTFITS.filter(builtIn).map(function(o){ var t = byK(TP.THEMES, o.theme);
         return '<figure class="tp-fig tp-outfig"><div class="tp-pic tp-outpic">' + thumbImg("outfit", o.k) + "</div><figcaption><b>" + esc(o.n) + "</b><span>" + tagLine(o) + " " + esc(t ? t.n : "") + "</span><span><q>" + esc(o.say[0]) + "</q></span></figcaption></figure>"; }).join("");
     },
     tpSeasons: function(){
       var list = [["", "fall", "Fall"], ["", "spring", "Spring"], ["winter", "", "Christmas"], ["halloween", "fall", "Halloween"], ["thanksgiving", "fall", "Thanksgiving"], ["newyear", "", "New Year's"], ["valentine", "", "Valentine's Day"], ["stpatrick", "spring", "St. Patrick's Day"], ["easter", "spring", "Easter"], ["dentist", "", "Dentist's Day"]];
-      return list.map(function(x, i){ return placeFig({ home: TP.HOMES[i % TP.HOMES.length].k, scene: i === 2 ? "forest" : "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
+      var homes = TP.HOMES.filter(builtIn);
+      return list.map(function(x, i){ return placeFig({ home: homes[i % homes.length].k, scene: i === 2 ? "forest" : "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
     }
   };
   function lazyGalleries(){
@@ -795,6 +841,11 @@
     $$("[data-theme-try]", el).forEach(function(b){ b.addEventListener("click", function(){
       var t = byK(TP.THEMES, b.dataset.themeTry);
       PS.scene = t.scene || PS.scene; PS.home = THEME_HOME[t.k] || PS.home; PS.yard = themeFill(t); PS.outfit = t.outfits[0] || ""; PS.paint = "cream";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-set-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.dataset.setTry, of = function(list){ return list.filter(function(x){ return x.set === k; }); }, yd = {};
+      of(TP.YARD).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      PS.home = of(TP.HOMES)[0].k; PS.scene = of(TP.SCENES)[0].k; PS.yard = yd; PS.paint = "cream"; PS.outfit = b.dataset.setOutfit || (of(TP.OUTFITS)[2] || {}).k || "";
       buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
     $$("[data-burst]", el).forEach(function(b){ b.addEventListener("click", function(){
       if (isStill()) return;
@@ -882,12 +933,17 @@
     u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
   }
   function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
+  function masteryLine(){
+    var fl = FLAIRS[PS.flair], n = [0, 0, 0, 0, 0]; fl.forEach(function(x){ n[x.lvl]++; });
+    var parts = [[4, "Crown"], [3, "Gold"], [2, "Silver"], [1, "Bronze"]].filter(function(q){ return n[q[0]]; }).map(function(q){ return n[q[0]] + " " + q[1]; });
+    return fl.length + (fl.length === 1 ? " hub" : " hubs") + " mastered: " + listN(parts) + ".";
+  }
   function playEgg(g){
     var k = g.dataset.egg, e = TP.EGGS[k] || {};
     g.classList.remove("tp-on"); void g.getBoundingClientRect(); g.classList.add("tp-on");
     clearTimeout(g._t); g._t = setTimeout(function(){ g.classList.remove("tp-on"); }, 2600);
     PS.found[k] = 1; found();
-    say(k === "statue" ? rankLine() : e.say);
+    say(k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say);
     ST.lastTap = Date.now();
     if (isStill()) return;
     var target = spotFor(g);
@@ -898,7 +954,7 @@
   function spotFor(g){
     var it = g.closest(".tp-item"), k = g.dataset.egg, sp = ST.layout.spots;
     if (it && sp[it.dataset.slot]) return it.dataset.slot;
-    if (k === "home" || k === "statue" || k === "brush" || k === "bunting") return sp.deck && Math.random() < .4 ? "deck" : "door";
+    if (k === "home" || k === "statue" || k === "brush" || k === "mastery") return sp.deck && Math.random() < .4 ? "deck" : "door";
     var b; try { b = g.getBBox(); } catch (x) { return null; }
     var q = TP.unproject(b.x + b.width / 2, b.y + b.height);
     if (!(q[0] > -2 && q[1] > -2 && q[0] < 16.5 && q[1] < 16.5)) return null;
@@ -1004,21 +1060,26 @@
     var head = '<div class="tp-tabs" role="group" aria-label="What to change">' + tabs.map(function(t){ return chip(t[1], pick === t[0], 'data-pick="' + t[0] + '"'); }).join("") + "</div>";
     var cards = function(list){ return '<div class="tp-rcards">' + list.join("") + "</div>"; };
     if (pick === "home") {
-      body = "<h4>Home</h4>" + cards(TP.HOMES.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: PS.scene }), x.k === PS.home, 'data-home="' + x.k + '"'); })) +
+      var homeCard = function(x){ return rcard(x, thumbImg("home", x.k, { scene: PS.scene }), x.k === PS.home, 'data-home="' + x.k + '"'); };
+      body = "<h4>Home</h4>" + cards(TP.HOMES.filter(builtIn).map(homeCard)) + more("From the seasonal sets", TP.HOMES.filter(inSets).map(homeCard), inSets(h)) +
         "<h4>Upgrades for " + esc(h.n.replace(/^The /, "the ")) + "</h4>" + '<div class="tp-opts">' + TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0; }).map(function(u){
           var on = !!PS.up[u.k], own = h.upn[u.k], same = cardName(own).toLowerCase() === cardName(u.n).toLowerCase();
           return '<button type="button" class="tp-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-up="' + u.k + '">' + rarTag(u.rarity) +
             '<span class="tp-upn"><b>' + esc(cardName(u.n)) + "</b><small>" + esc(same ? "" : own) + "</small></span>" + price(u.price) + "</button>"; }).join("") + "</div>" +
-        "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home), c = bold ? p.bold : p.c;
-          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>";
+        (h.ups.indexOf("paint") < 0 ? "" : "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home) || !!h.set, c = bold ? p.bold : p.c;
+          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>");
     } else if (pick === "scene") {
-      body = "<h4>The scene</h4>" + cards(TP.SCENES.map(function(s){ return rcard(s, thumbImg("scene", s.k), s.k === PS.scene, 'data-scene="' + s.k + '"'); }));
+      var sceneCard = function(x){ return rcard(x, thumbImg("scene", x.k), x.k === PS.scene, 'data-scene="' + x.k + '"'); };
+      body = "<h4>The scene</h4>" + cards(TP.SCENES.filter(builtIn).map(sceneCard)) + more("From the seasonal sets", TP.SCENES.filter(inSets).map(sceneCard), inSets(byK(TP.SCENES, PS.scene)));
     } else if (pick === "timmy") {
-      body = "<h4>What Timmy wears</h4>" + cards([rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""')].concat(TP.OUTFITS.map(function(o){ return rcard(o, thumbImg("outfit", o.k), PS.outfit === o.k, 'data-outfit="' + o.k + '"'); })));
+      var outCard = function(o){ return rcard(o, thumbImg("outfit", o.k), PS.outfit === o.k, 'data-outfit="' + o.k + '"'); }, cur0 = byK(TP.OUTFITS, PS.outfit) || {};
+      body = "<h4>What Timmy wears</h4>" + cards([rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""')].concat(TP.OUTFITS.filter(builtIn).map(outCard))) +
+        more("Earned by rank", TP.OUTFITS.filter(byRank).map(outCard), byRank(cur0)) + more("From the seasonal sets", TP.OUTFITS.filter(inSets).map(outCard), inSets(cur0));
     } else {
       var sl = byK(TP.SLOTS, pick), cur = PS.yard[pick];
-      body = "<h4>" + esc(sl.n) + "</h4>" + cards([rcard({ n: "Nothing here", rarity: "", price: 0 }, "", !cur, 'data-item=""')].concat(TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; })
-        .map(function(y){ return rcard(y, thumbImg("yard", y.k, { scene: PS.scene }), cur === y.k, 'data-item="' + y.k + '"'); }))) +
+      var yardCard = function(y){ return rcard(y, thumbImg("yard", y.k, { scene: PS.scene }), cur === y.k, 'data-item="' + y.k + '"'); }, curY = byK(TP.YARD, cur) || {};
+      body = "<h4>" + esc(sl.n) + "</h4>" + cards([rcard({ n: "Nothing here", rarity: "", price: 0 }, "", !cur, 'data-item=""')].concat(TP.YARD.filter(builtIn).filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; }).map(yardCard))) +
+        more("Earned by rank", TP.YARD.filter(byRank).map(yardCard), byRank(curY)) + more("From the seasonal sets", TP.YARD.filter(inSets).map(yardCard), inSets(curY)) +
         (pick === "side" || pick === "corner" ? '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>' : "");
     }
     body += '<div class="tp-shop"><button type="button" class="btn" disabled>Get more in the shop</button><span class="tp-note">The shop is part B: here everything is yours to try. Prices are in Shiny Gold Crowns.</span></div>';
@@ -1026,12 +1087,13 @@
       '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
       selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
       selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
-      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
+      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) + selRow("Mastery display", "mastery", MASTERY, PS.mastery) +
       selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
       selRow("Timmy", "timmy", [["happy", "Happy"], ["ok", "Okay"], ["sad", "Sad"], ["sick", "Sick"], ["sleep", "Asleep"], ["scared", "Startled"]].concat((A.timmy.hp || []).map(function(x){ return ["hp" + x.hp, x.hp + " HP"]; })), PS.timmy) +
       '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
     el.innerHTML = head + '<div class="tp-pick">' + body + "</div>" + prev;
-    $("details", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $(".tp-prev", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $$(".tp-more", el).forEach(function(d){ d.addEventListener("toggle", function(){ side.more[d.dataset.more] = d.open; }); });
     $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.pick = b.dataset.pick; if (PS.mode === "play" && PS.pick !== "timmy" && PS.pick !== "scene") PS.mode = "customize"; buildPlace(); }); });
     $$("[data-home]", el).forEach(function(b){ b.addEventListener("click", function(){ if (PS.home === b.dataset.home) return; PS.home = b.dataset.home; buildPlace({ burst: "home", say: byK(TP.HOMES, PS.home).n + ". Home sweet home." }); }); });
     $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.up[b.dataset.up] = !PS.up[b.dataset.up]; buildPlace(PS.up[b.dataset.up] ? { burst: "home" } : {}); }); });
@@ -1048,6 +1110,12 @@
     $$("select[data-k]", el).forEach(function(s){ s.addEventListener("change", function(){ var k = s.dataset.k; PS[k] = k === "tier" || k === "flair" || k === "level" ? +s.value : s.value; buildPlace(); }); });
     $("[data-still]", el).addEventListener("change", function(e){ PS.still = e.target.checked; buildPlace(); });
   }
+  /* a folded group of cards in the customizer (the sets are many): open when the piece in use is in it, or once opened */
+  side.more = {};
+  function more(title, cards, has){
+    if (!cards.length) return "";
+    return '<details class="tp-more" data-more="' + esc(title) + '"' + (has || side.more[title] ? " open" : "") + "><summary>" + esc(title) + ' <span class="num">' + cards.length + '</span></summary><div class="tp-rcards">' + cards.join("") + "</div></details>";
+  }
   function selRow(label, k, opts, cur){
     return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
   }
@@ -1055,6 +1123,49 @@
     var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(PS.timmy, PS.outfit)), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
     $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), isStill()) + "</div>" +
       '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
+  }
+
+  /* ---------- the shop's shelves (a design of what get_my_shop returns: today, this week, the season, a throwback) ---------- */
+  function anyCard(x, extra){ var kind = kindOf(x); return scard(x, thumbImg(kind, x.k, kind === "scene" || kind === "outfit" ? undefined : {}), extra); }
+  function shopMock(){
+    var el = $("#tpShop"); if (!el) return;
+    var pick = function(list, ks){ return ks.map(function(k){ return byK(list, k); }).filter(Boolean); };
+    var shelf = function(title, when, note, cards, cls){ return '<section class="tp-shelf ' + (cls || "") + '"><header><h4>' + esc(title) + '</h4><span class="tp-when">' + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") + '</header><div class="tp-rcards">' + cards.join("") + "</div></section>"; };
+    var season = TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === "thanksgiving"; })[0], of = function(list, k){ return list.filter(function(x){ return x.set === k; }); };
+    var seasonal = season ? of(TP.HOMES, season.k).concat(of(TP.SCENES, season.k), of(TP.OUTFITS, season.k), of(TP.YARD, season.k)) : [];
+    var back = [].concat(of(TP.YARD, "spring").slice(1, 2), of(TP.OUTFITS, "valentine").slice(0, 1), of(TP.HOMES, "summer").slice(0, 1));
+    var ribbon = '<span class="tp-ribbon">Back for today</span>';
+    el.innerHTML =
+      shelf("Today’s picks", "New picks in 6 h 12 min", "Four pieces, the same for everyone, new every day.", pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"])).map(function(x){ return anyCard(x); })) +
+      shelf("This week", "5 days left", "Three bigger pieces that stay all week.", pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"])).map(function(x){ return anyCard(x); })) +
+      (seasonal.length ? shelf(season.n, "On sale until November 27", "The season’s set, only while the season lasts. Two seasons at once (fall is on too) get a shelf each.", seasonal.map(function(x){ return anyCard(x); }), "tp-shelf-season") : "") +
+      (back.length ? shelf("Back for today", "A throwback day: two a month", "Three pieces from seasons that have passed, at their usual price, today only.", back.map(function(x){ return anyCard(x, ribbon); }), "tp-shelf-back") : "") +
+      '<p class="tp-note">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them.</p>';
+  }
+
+  /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
+  var VISIT = [
+    { name: "Molar Maverick", xp: "48,210", tier: 5, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4, mastery: "plaque" }, outfit: "aviator" },
+    { name: "Floss Boss", xp: "41,775", tier: 4, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3, mastery: "case" }, outfit: "parade-marshal" },
+    { name: "Captain Cuspid", xp: "39,020", tier: 4, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 3, mastery: "case" }, outfit: "captain" },
+    { name: "Enamel Ninja", xp: "33,480", tier: 3, off: true },
+    { name: "You", xp: "29,150", tier: 3, me: true }
+  ];
+  var VS = { at: 0, on: true };
+  function visitMock(){
+    var el = $("#tpVisit"); if (!el) return;
+    var v = VISIT[VS.at], rows = VISIT.map(function(r, i){
+      var act = r.me ? '<span class="tp-vnote">Your place</span>' : r.off ? '<span class="tp-vnote">Visits off</span>' : '<button type="button" class="btn tp-vbtn" data-visit="' + i + '" aria-pressed="' + (i === VS.at) + '">' + (i === VS.at ? "Visiting" : "Visit") + "</button>";
+      return '<li class="tp-vrow' + (r.me ? " me" : "") + '"><span class="num">' + (i + 1) + '</span><span class="tp-vname">' + esc(r.name) + "<small>" + esc(TIER_NAMES[r.tier]) + '</small></span><span class="num xp-gold">' + r.xp + " XP</span>" + act + "</li>"; }).join("");
+    var o = Object.assign({ tier: v.tier, level: 2, timmy: { g: timmyG(timmySvg("happy", v.outfit)), at: "door" } }, v.o, { flair: FLAIRS[v.o.flair] });
+    ["home", "scene"].forEach(function(k){ if (!byK(k === "home" ? TP.HOMES : TP.SCENES, o[k])) o[k] = k === "home" ? "cottage" : "hill"; });
+    Object.keys(o.yard).forEach(function(k){ if (!byK(TP.YARD, o.yard[k])) delete o.yard[k]; });
+    el.innerHTML = '<div class="tp-vboard"><h4>The rank board</h4><ol>' + rows + "</ol>" +
+        '<label class="tp-vswitch"><input type="checkbox" role="switch" id="tpVisitOn"' + (VS.on ? " checked" : "") + '><span><b>Let classmates visit my place</b><small>' + (VS.on ? "On. They see your place under your board name, nothing else." : "Off. Your name on the boards has no Visit button.") + "</small></span></label></div>" +
+      '<div class="tp-vplace"><div class="tp-vhead"><b>' + esc(v.name) + "’s place</b><span>Visiting · look, don’t touch</span>" + '<button type="button" class="btn" disabled>Back to mine</button></div>' +
+        '<div class="tp-pic">' + sceneImg(TP.render(o).svg, v.name + "'s place", isStill()) + "</div></div>";
+    $$("[data-visit]", el).forEach(function(b){ b.addEventListener("click", function(){ VS.at = +b.dataset.visit; visitMock(); }); });
+    $("#tpVisitOn", el).addEventListener("change", function(e){ VS.on = e.target.checked; visitMock(); });
   }
 
   /* ---------- controls ---------- */
