@@ -96,6 +96,8 @@ window.SH_PLACE = (function placeKit(INK, C){
   function archUV(u0, u1, v0, v1, n){ var r = (u1 - u0) / 2, c = u0 + r, out = [[u0, v0], [u1, v0], [u1, v1 - r]]; for (var i = 1; i < (n || 8); i++){ var a = Math.PI * i / (n || 8); out.push([c + Math.cos(a) * r, v1 - r + Math.sin(a) * r * 1.0]); } out.push([u0, v1 - r]); return out; }
   /* points round a circle on the ground, from angle a0 to a1 (degrees; 0 = +x, 90 = +y, the front is -45 to 135) */
   function arcPts(cx, cy, r, a0, a1, n){ var out = []; for (var i = 0; i <= n; i++){ var a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; out.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } return out; }
+  /* the far slope of a gable roof whose ridge runs along x: it shows past the ridge when the roof is flatter than 45 degrees */
+  function backSlope(e0, e1, ym, yb, ze, zr, col){ return FO(D([[e0, ym, zr], [e1, ym, zr], [e1, yb, ze], [e0, yb, ze]]), col, 1.6); }
   /* snow on a gable's front slope, on a cone and on a dome */
   function snowSlope(e0, e1, ye, ym, ze, zr, t){
     t = t || .58;
@@ -184,7 +186,8 @@ window.SH_PLACE = (function placeKit(INK, C){
   function bands(cols, y0, y1){
     var s = "", h = (y1 - y0) / cols.length;
     /* the first band reaches well above the picture, so a tall crop never runs out of sky */
-    cols.forEach(function(c, i){ s += '<rect x="0" y="' + f(y0 + i * h - (i ? 0 : 80)) + '" width="400" height="' + f(h + .6 + (i ? 0 : 80)) + '" fill="' + c + '"/>'; });
+    var up = y0 <= 0 ? 80 : 0;                   // only the sky: a band that starts lower (the sea) must not paint over it
+    cols.forEach(function(c, i){ s += '<rect x="0" y="' + f(y0 + i * h - (i ? 0 : up)) + '" width="400" height="' + f(h + .6 + (i ? 0 : up)) + '" fill="' + c + '"/>'; });
     return s;
   }
   function sun(x, y){
@@ -255,8 +258,12 @@ window.SH_PLACE = (function placeKit(INK, C){
   /* ------------------------------------------------------------------ the ground ----------------------------------- */
   /* Each scene's land fills the picture below its top edge, a function of x (a hill's crest, the dunes, a planet's
      rim), and above its bottom edge where it has one (a cliff, a cloud bank). */
+  /* a gradual hill (Sam, 2026-11-10: not a semicircle poking up from the ground): a bell, rounded on top and easing out
+     at its foot, wider than the picture so the land runs off both edges. top at cx; rx is where the old dome ended:
+     the bell is as high there as the yard needs, and reaches its foot (base) at 1.5 rx. */
   function arcTop(cx, top, rx, base){
-    return function(x){ var d = (x - cx) / rx, a = Math.abs(d); return a >= 1 ? base + (Math.abs(x - cx) - rx) * .8 : base - (base - top) * Math.sqrt(1 - d * d); };
+    var w = rx * 1.52;
+    return function(x){ var d = Math.min(1, Math.abs(x - cx) / w); return top + (base - top) * (1 - Math.cos(Math.PI * d)) / 2; };
   }
   function trace(fn, x0, x1, step){ var pts = []; for (var x = x0; x < x1; x += step || 6) pts.push([x, fn(x)]); pts.push([x1, fn(x1)]); return pts; }
   function landD(top, bot){ var a = trace(top, 30, 370), b = bot ? trace(bot, 30, 370).reverse() : [[370, 300], [30, 300]]; return D2(a.concat(b)); }
@@ -274,13 +281,16 @@ window.SH_PLACE = (function placeKit(INK, C){
 
   var HILL_TOP = arcTop(200, 74, 142, 172);
   var BEACH_TOP = arcTop(198, 80, 150, 170);
-  function shoreX(y){ return 384 - (y - 140) * .95 + 7 * Math.sin(y / 13); }
+  /* the beach is an island (Sam, 2026-11-10): the sea behind the dune, round both ends and across the front. shoreB(x)
+     is the front shoreline; the dune's crest (BEACH_TOP) is its back. */
+  function shoreB(x){ var d = (x - 176) / 190; return d * d >= 1 ? 0 : 170 + 96 * Math.sqrt(1 - d * d) + 3 * Math.sin(x / 13) + 1.6 * Math.sin(x / 5.3 + 1); }
+  function onIsland(sx, sy, m){ return sy < shoreB(sx) - (m || 0); }
   var FOREST_TOP = arcTop(200, 72, 168, 156);
   var MTN_TOP = arcTop(200, 70, 172, 150);
   function cliffY(x){ var d = (x - 200) / 160; return 256 - 24 * d * d + 3.5 * Math.sin(x / 7); }
-  function planetTop(x){ var d = x - 200; return 400 - Math.sqrt(Math.max(0, 326 * 326 - d * d)); }
+  var MOON_TOP = arcTop(200, 72, 176, 146);
   var CLOUD_ARC = arcTop(200, 78, 166, 160);
-  function cloudTop(x){ return CLOUD_ARC(x) - 5 * Math.abs(Math.sin(x / 9)); }
+  function cloudTop(x){ return CLOUD_ARC(x); }
   function cloudBot(x){ var d = (x - 200) / 160; return 262 - 26 * d * d + 6 * Math.abs(Math.sin(x / 11)); }
 
   /* the bits a scene tucks round a home's walls, so the walls meet the ground instead of standing on it */
@@ -289,7 +299,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     if (kind === "snow") return ell(x, y + .6, 6 * k, 3 * k, "#DCEAF6", 0) + ell(x - .6, y - .4, 5.2 * k, 2.8 * k, "#FFFFFF", 0) + (i % 3 ? "" : L("M" + f(x - 5 * k) + " " + f(y + 1) + " q5 2.4 10 0", 1, "#B9CCDD"));
     if (kind === "sand") return ell(x, y + .4, 6.4 * k, 2.8 * k, o.night ? "#A08F66" : "#EBD39A", 0) + ell(x - .8, y - .2, 5 * k, 2.2 * k, o.night ? "#B9A67C" : "#F7E4B2", 0) + (i % 4 === 1 ? tuft(x + 2, y, o.night ? "#6E7A4E" : "#A8B868", .9) : "") + (i % 5 === 3 ? ell(x - 2, y, 1.6, 1.1, "#FFD9C2", .7) : "");
     if (kind === "moss") return F(lumps(x, y - .6, 4.6 * k, i + 3, 6, .55), o.night ? "#3F7550" : "#5DA45A") + (i % 3 === 0 ? fern(x, y + .4, o.night).replace(/stroke-width="3"/g, 'stroke-width="2"') : "") + (i % 4 === 2 ? L("M" + f(x + 2) + " " + f(y) + " v-3", 1.2, "#FFF7EC") + ell(x + 2, y - 3.4, 2.4, 1.4, K.red, .8) : "");
-    if (kind === "space") return tuft(x, y + .4, o.night ? "#3E9A80" : "#4FB394", k) + (i % 3 === 1 ? crystal(x + 2, y + 1, .7) : "");
+    if (kind === "space") return ell(x, y + .5, 6 * k, 2.6 * k, "#BDB9D6", 0) + ell(x - .8, y - .1, 4.4 * k, 1.9 * k, "#DCD9EA", 0) + (i % 3 === 1 ? crystal(x + 2, y + 1, .7) : i % 3 === 2 ? ell(x + 3, y + .6, 1.8, 1.1, "#8F8AB2", .7) : "");
     if (kind === "cloud") return circ(x, y - 1, 4.6 * k, "#FFFFFF", 0) + circ(x + 4 * k, y + .2, 3.6 * k, "#F1EEFA", 0) + L("M" + f(x - 4.4 * k) + " " + f(y + .6) + " q4.4 2.6 9 0", 1, "#C9C1E6");
     /* grass, with a flower now and then */
     return tuft(x, y + .6, o.night ? "#3D7449" : "#5DA45A", k) + tuft(x + 2.6, y + 1, o.night ? "#4A8457" : "#6CB060", k * .8) + (i % 4 === 2 ? flower(x + 1, y + .8, ["#FF8FB1", "#FFE27A", "#B08CFF"][i % 3], .8) : "");
@@ -356,7 +366,8 @@ window.SH_PLACE = (function placeKit(INK, C){
         : bands(["#BDE6FA", "#CDEDFB", "#DDF3FC", "#ECF8FD"], 0, 300) + sun(318, 38) + cloud(118, 30) + G("tp-gull", L("M240 52 q4 -4 8 0 q4 -4 8 0 M268 70 q3 -3 6 0 q3 -3 6 0", 1.4)); },
       far: function(o){
         var w = o.night ? ["#28507A", "#22466C", "#1D3D5F"] : ["#8FD3F2", "#7FCDEB", "#6FC3EA"];
-        var s = bands(w, 116, 300) + L("M0 116 H400", 1.6);
+        var s = bands(w, 116, 300) + F("M0 116 H400 V121 H0 Z", o.night ? "#3C6690" : "#C9ECFA", .8) + L("M0 116 H400", 1.4, INK, .7);
+        if (!o.night) s += G("tp-wave", L("M306 124 h24 M312 130 h14 M300 137 h30 M310 144 h12", 1.6, "#FFFFFF", .7));
         s += G("tp-wave", L("M20 132 q8 -4 16 0 M340 128 q8 -4 16 0 M362 150 q8 -4 16 0", 1.4, "#fff", .8));
         /* a far island with a palm, on the left */
         s += FO("M28 117 Q46 104 64 117 Z", o.night ? "#7C6A48" : "#F3DDA8", 1.4) + L("M48 108 q1 -10 -2 -16", 1.6) +
@@ -365,37 +376,36 @@ window.SH_PLACE = (function placeKit(INK, C){
       },
       land: function(o){
         var sand = o.night ? ["#B9A67C", "#A08F66", "#86774F"] : ["#F7E4B2", "#ECD49C", "#D6B676"];
-        var s = F(landD(BEACH_TOP), sand[0]);
-        s += F("M30 " + f(BEACH_TOP(30)) + " L30 300 L170 300 C130 272 82 244 52 210 Z", sand[1], .8);
+        var s = F(landD(BEACH_TOP, shoreB), sand[0]);
+        s += F("M30 " + f(BEACH_TOP(30)) + " L30 " + f(shoreB(30)) + " C60 " + f(shoreB(60) - 6) + " 110 " + f(shoreB(110) - 10) + " 150 " + f(shoreB(150) - 12) + " C120 246 82 232 52 204 Z", sand[1], .8);
         s += L(D2(trace(BEACH_TOP, 30, 370), true), SW);
         /* beach grass along the dune tops */
         trace(BEACH_TOP, 54, 346, 15).forEach(function(q, i){ if (q[0] > 120 && q[0] < 300) return; s += tuft(q[0], q[1] + 5, o.night ? "#6E7A4E" : "#A8B868", 1.2 + (i % 3) * .2); });
-        /* the sea comes in at the front: wet sand, then foam, then the water */
-        var sh = []; for (var y = 128; y <= 300; y += 5) sh.push([shoreX(y), y]);
-        s += F(D2(sh.map(function(q){ return [q[0] - 10, q[1]]; }).concat([[400, 300], [400, 128]])), sand[2], .6);
+        /* the sea all round: the shallows, the foam where it meets the sand, then wet sand */
         var w = o.night ? ["#2C5A86", "#22466C", "#4A7BA8"] : ["#8FD3F2", "#6FC3EA", "#BDE6F7"];
-        s += F(D2(sh.concat([[400, 300], [400, 128]])), w[0]);
-        s += F(D2(sh.map(function(q){ return [q[0] + 18, q[1]]; }).concat([[400, 300], [400, 128]])), w[1]);
+        var sh = trace(shoreB, 30, 366, 5).filter(function(q){ return q[1] > 0; });
+        s += F(D2(sh.concat(sh.slice().reverse().map(function(q){ return [q[0], q[1] + 13]; }))), w[2], .75);
+        s += F(D2(sh.map(function(q){ return [q[0], q[1] - 9]; }).concat(sh.slice().reverse())), sand[2], .55);
         s += G("tp-foam", L(D2(sh, true), 3.2, "#FFFFFF", .95));
-        s += L(D2(sh.map(function(q){ return [q[0] + 1.6, q[1]]; }), true), 1.2, INK, .6);
-        s += G("tp-wave", L("M304 214 q6 -3 12 0 M334 238 q6 -3 12 0 M318 266 q6 -3 12 0 M352 196 q6 -3 12 0", 1.4, "#FFFFFF", .85));
+        s += L(D2(sh.map(function(q){ return [q[0], q[1] + 1.8]; }), true), 1.2, INK, .55);
+        s += G("tp-wave", L("M304 250 q6 -3 12 0 M70 258 q6 -3 12 0 M150 270 q6 -3 12 0 M352 226 q6 -3 12 0", 1.4, "#FFFFFF", .85));
         /* a whale out there (tap: it spouts) */
-        var wh = FO("M322 252 q12 -10 26 -2 q-6 6 -14 6 q-8 0 -12 -4 z", o.night ? "#2C3E66" : "#3C5A8A", 1.4) + L("M318 252 q-3 -4 -6 -2 M318 252 q-2 4 -5 4", 1.6) +
-          L("M336 240 q-2 -8 -6 -12 M336 240 q0 -9 0 -14 M336 240 q2 -8 6 -12", 1.8, "#FFFFFF");
-        s += egg("whale", '<rect x="300" y="230" width="56" height="32" fill="#000" opacity="0"/>' + G("tp-wave", L("M314 256 q6 -3 12 0 M332 258 q6 -3 12 0", 1.4, "#FFFFFF", .8)), wh);
+        var wh = FO("M322 256 q12 -10 26 -2 q-6 6 -14 6 q-8 0 -12 -4 z", o.night ? "#2C3E66" : "#3C5A8A", 1.4) + L("M318 256 q-3 -4 -6 -2 M318 256 q-2 4 -5 4", 1.6) +
+          L("M336 244 q-2 -8 -6 -12 M336 244 q0 -9 0 -14 M336 244 q2 -8 6 -12", 1.8, "#FFFFFF");
+        s += egg("whale", '<rect x="300" y="234" width="56" height="32" fill="#000" opacity="0"/>' + G("tp-wave", L("M314 260 q6 -3 12 0 M332 262 q6 -3 12 0", 1.4, "#FFFFFF", .8)), wh);
         return s;
       },
       flat: function(o){
-        var on = function(sx, sy, x, y){ return sy > BEACH_TOP(sx) + 6 && sx < shoreX(sy) - 14 && !busy(x, y); };
+        var on = function(sx, sy, x, y){ return sy > BEACH_TOP(sx) + 6 && onIsland(sx, sy, 14) && !busy(x, y); };
         var s = scatter(93, 22, on, function(sx, sy){ return L("M" + f(sx - 4) + " " + f(sy) + " q2 -1.4 4 0 q2 1.4 4 0", 1.1, o.night ? "#86774F" : "#D6B676"); }).join("");
         s += scatter(94, 7, on, function(sx, sy, i){ return i % 3 === 2 ? F("M" + f(sx) + " " + f(sy - 4) + " l1.2 2.8 3 .2 -2.3 1.9 .8 2.9 -2.7 -1.6 -2.7 1.6 .8 -2.9 -2.3 -1.9 3 -.2 z", "#F59A6E") : ell(sx, sy, 2, 1.4, ["#FFD9C2", "#FFFFFF"][i % 2], .7); }).join("");
         /* a crab on the sand (tap: off it scuttles) */
         var cb = G("tp-eo", ell(0, 0, 4.6, 3, K.red, 1.2) + L("M-4 1 l-3 2 M-4 -1 l-3 -1 M4 1 l3 2 M4 -1 l3 -1", 1.1) + FO("M-5 -3 q-3 -4 0 -5 q1 2 1 3 z M5 -3 q3 -4 0 -5 q-1 2 -1 3 z", K.red, .9) + circ(-1.4, -3, .8, INK) + circ(1.4, -3, .8, INK));
-        s += egg("crab", T(258, 248, cb + circ(0, 0, 10, "#000", 0).replace("/>", ' opacity="0"/>')));
+        s += egg("crab", T(236, 244, cb + circ(0, 0, 10, "#000", 0).replace("/>", ' opacity="0"/>')));
         return s;
       },
       props: function(o){
-        return scatter(95, 4, function(sx, sy, x, y){ return sy > BEACH_TOP(sx) + 10 && sx < shoreX(sy) - 22 && !inYard(x, y) && !busy(x, y); }, function(sx, sy, i, R, x, y){
+        return scatter(95, 4, function(sx, sy, x, y){ return sy > BEACH_TOP(sx) + 10 && onIsland(sx, sy, 20) && !inYard(x, y) && !busy(x, y); }, function(sx, sy, i, R, x, y){
           var s = i === 1 ? circ(sx, sy - 5, 5, "#FFFFFF", 1.3) + F("M" + f(sx - 5) + " " + f(sy - 5) + " a5 5 0 0 1 5 -5 v5 z", K.red) + F("M" + f(sx) + " " + f(sy - 10) + " a5 5 0 0 1 5 5 h-5 z", K.blue) + O("M" + f(sx - 5) + " " + f(sy - 5) + " a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0", 1.3)
             : tuft(sx, sy, o.night ? "#6E7A4E" : "#A8B868", 1.4) + tuft(sx + 4, sy + 1, o.night ? "#5C6840" : "#8EA050", 1.1);
           return { x: x, y: y, s: s };
@@ -496,62 +506,81 @@ window.SH_PLACE = (function placeKit(INK, C){
       fg: function(){ return G("tp-snowfall", flakes(rng(31), 16)); }
     },
     space: {
-      n: "The night sky", note: "A little planet under the Dark Matter stars", rarity: "Epic", theme: "starlight", price: 2500, id: "night-sky", alwaysNight: true,
-      top: planetTop, skirt: "space", path: "crystal", treeKind: "crystal", lamp: "crystal", grade: ["#5B2BC0", .08],
-      chip: function(){ return ["#7CCBA4", "#4A9A74"]; },
+      /* redrawn 2026-11-10 (Sam: "the planet doesn't make sense"): Timmy's place is on the moon. Pale regolith and
+         craters under a black sky, the Earth overhead, the Dark Matter stars round it. No grass, no air, no second moon. */
+      n: "The night sky", note: "On the moon, with the Earth and the Dark Matter stars overhead", rarity: "Epic", theme: "starlight", price: 2500, id: "night-sky", alwaysNight: true,
+      top: MOON_TOP, skirt: "space", path: "crystal", treeKind: "crystal", lamp: "crystal", grade: ["#5B2BC0", .07],
+      chip: function(){ return ["#D2CFE4", "#9D98BC"]; },
       sky: function(o){
-        var s = bands(["#0E0726", "#140B33", "#1D0F45", "#2A1458", "#341B66"], 0, 300);
+        var s = bands(["#0B0620", "#110A2E", "#190E3E", "#22124E", "#2B185C"], 0, 300);
         s += F("M-10 120 Q80 70 170 104 Q260 136 410 70 V120 Q300 168 190 140 Q90 116 -10 160 Z", "#5B2BC0", .22) + F("M-10 136 Q100 96 200 124 Q300 150 410 104 V118 Q300 160 200 140 Q100 116 -10 150 Z", K.dmTeal, .12);
         s += starField(41, 46, 120);
-        [[40, 40, 6], [120, 22, 4], [250, 34, 5], [352, 60, 7], [300, 100, 4], [70, 110, 5], [160, 66, 3.6]].forEach(function(p, i){ s += dmStar(p[0], p[1], p[2], i % 3 ? K.dmLight : K.dmTeal, "tp-twinkle", i * .4); });
-        s += G("tp-planet", ell(330, 30, 26, 6, "none", 0) + FO("M308 30 A22 22 0 0 1 352 30", "#E07090", 1.6) + circ(330, 30, 15, "#F7A3BA", 1.6) + F("M336 18 a15 15 0 0 1 0 25 a12 15 0 0 0 0 -25 z", "#E07090") +
-          L("M304 32 Q330 44 356 32", 2.2, "#FFE9A8") + L("M304 32 Q330 44 356 32", 1, INK));
-        s += moon(90, 80);
+        [[40, 40, 6], [120, 22, 4], [250, 34, 5], [352, 96, 5], [286, 104, 4], [70, 110, 5], [160, 66, 3.6]].forEach(function(p, i){ s += dmStar(p[0], p[1], p[2], i % 3 ? K.dmLight : K.dmTeal, "tp-twinkle", i * .4); });
+        /* the Earth, three-quarters lit from the left: seas, two continents, a swirl of cloud, its night side. Tap: a
+           rocket goes round it */
+        var ex = 318, ey = 46, er = 21;
+        var earth = circ(ex, ey, er, "#4FA8E8", 0) +
+          F("M" + (ex - 15) + " " + (ey - 13) + " q7 -6 15 -4 q3 4 -2 8 q-1 6 -7 7 q-6 -2 -6 -11 z M" + (ex - 4) + " " + (ey + 6) + " q6 -3 10 1 q2 6 -3 11 q-5 1 -7 -4 z M" + (ex + 9) + " " + (ey - 10) + " q5 0 7 4 q-3 3 -7 1 z", "#5CC98A") +
+          L("M" + (ex - 19) + " " + (ey + 2) + " q8 -4 15 0 q6 3 12 -1 M" + (ex - 8) + " " + (ey - 17) + " q7 3 14 0", 2.4, "#FFFFFF", .85) +
+          F("M" + (ex + 8) + " " + (ey - 19.4) + " a" + er + " " + er + " 0 0 1 0 38.8 a15 " + er + " 0 0 0 0 -38.8 z", "#1B2A5C", .55) +
+          '<circle cx="' + ex + '" cy="' + ey + '" r="' + er + '" fill="none" stroke="' + INK + '" stroke-width="1.8"/>' + HI("M" + (ex - 15) + " " + (ey - 9) + " a17 17 0 0 1 9 -8", 1.6);
+        var rocket = T(ex - er - 9, ey - 12, '<g transform="rotate(-30)">' + FO("M0 -7 q4 3 4 9 v3 h-8 v-3 q0 -6 4 -9 z", "#FFFFFF", 1.2) + F("M-4 3 l-3 4 h3 z M4 3 l3 4 h-3 z", K.red) + circ(0, -1, 1.5, "#8FD3F2", .8) + F("M-2 5 q2 6 4 0 z", "#FFC24A") + "</g>");
+        s += egg("earth", G("tp-planet", earth) + circ(ex, ey, er + 4, "#000", 0).replace("/>", ' opacity="0"/>'), rocket);
+        /* a small ringed planet, far off on the other side */
+        s += G("tp-float", FO("M68 62 a11 11 0 0 1 22 0", "#E07090", 1.4) + circ(79, 62, 8, "#F7A3BA", 1.4) + F("M82 55 a8 8 0 0 1 0 14 a6 8 0 0 0 0 -14 z", "#E07090") + L("M65 63 Q79 70 93 63", 2, "#FFE9A8") + L("M65 63 Q79 70 93 63", .9, INK));
         return s;
       },
-      far: function(){ return G("tp-float", rock(64, 132, 12, 5) + rock(338, 120, 10, 4.4)); },
+      /* the far ridges of the moon: low, rounded crater walls, darker with distance */
+      far: function(){
+        return FO("M30 150 Q60 126 96 138 Q124 118 160 134 Q196 120 236 134 Q276 116 312 134 Q344 122 372 144 V190 H30 Z", "#8E88B0", 1.4) +
+          F("M96 138 Q110 132 124 138 Q112 142 96 138 Z M236 134 Q252 128 268 134 Q252 140 236 134 Z", "#A7A1C6");
+      },
       land: function(o){
-        var g = ["#86D4AC", "#72C29A", "#5EAE88", "#4A9A74"];
-        var s = F(landD(planetTop), g[0]);
-        /* the planet curves away: a darker band along its rim, its thin air glowing */
-        var rim = trace(planetTop, 30, 370), inner = trace(function(x){ var d = x - 200; return 400 - Math.sqrt(Math.max(0, 312 * 312 - d * d)) + 6; }, 30, 370).reverse();
-        s += F(D2(rim.concat(inner)), g[2], .7);
-        s += F("M30 " + f(planetTop(30)) + " L30 300 L170 300 C120 270 70 236 40 190 Z", g[1], .7) + F("M370 " + f(planetTop(370)) + " L370 300 L230 300 C280 270 330 236 360 190 Z", g[2], .8);
-        s += L(D2(rim, true), 9, K.dmTeal, .22) + L(D2(rim, true), SW);
+        var g = ["#CFCCE2", "#BDB9D6", "#A8A3C6", "#8F8AB2", "#E6E4F2"];
+        var s = F(landD(MOON_TOP), g[0]);
+        s += F("M30 " + f(MOON_TOP(30)) + " L30 300 L170 300 C120 270 70 236 40 196 Z", g[1], .8) + F("M370 " + f(MOON_TOP(370)) + " L370 300 L230 300 C280 270 330 236 360 196 Z", g[2], .85);
+        /* the lit lip of the horizon, then its line */
+        s += L(D2(trace(function(x){ return MOON_TOP(x) + 3; }, 30, 370), true), 3, g[4], .8) + L(D2(trace(MOON_TOP, 30, 370), true), SW);
+        s += L("M60 236 Q92 226 122 232 M262 256 Q292 246 326 250", 1.3, g[3], .6);
         /* a crater with a friend in it (tap: it pops up and waves) */
         var alien = FO("M300 238 q0 -12 8 -12 q8 0 8 12 z", "#9BE36A", 1.3) + circ(304.6, 231, 1.6, "#FFFFFF", .8) + circ(311.4, 231, 1.6, "#FFFFFF", .8) + circ(304.8, 231.3, .7, INK) + circ(311.6, 231.3, .7, INK) +
           L("M304 226 l-3 -6 M312 226 l3 -6", 1.2) + circ(301, 219.6, 1.4, "#FFE27A", .8) + circ(315, 219.6, 1.4, "#FFE27A", .8) + FO("M316 232 q6 -4 7 -9 q2 2 -1 7 z", "#9BE36A", 1);
-        s += egg("alien", ell(308, 240, 16, 5.4, g[3], 1.4) + ell(308, 241, 12, 3.6, "#3B7A5E", 0), alien);
+        s += egg("alien", ell(308, 240, 17, 5.8, g[4], 1.4) + ell(308, 241, 13.4, 4, g[3], 1.1) + ell(309, 242, 10, 2.6, "#6F6A92", 0), alien);
         return s;
       },
       flat: function(o){
-        var on = function(sx, sy, x, y){ return sy > planetTop(sx) + 8 && !busy(x, y); };
-        var s = scatter(101, 7, on, function(sx, sy, i){ var r = 5 + (i % 3) * 2; return ell(sx, sy, r, r * .42, "#5EAE88", 1.1) + ell(sx + .6, sy + .4, r * .7, r * .26, "#4A9A74", 0); }).join("");
-        s += scatter(102, 16, on, function(sx, sy, i){ return circ(sx, sy, 1.2, i % 2 ? K.dmTeal : "#FFE9A8").replace("/>", ' class="tp-twinkle" style="animation-delay:' + f(i * .3 % 2.6) + 's"/>'); }).join("");
+        var on = function(sx, sy, x, y){ return sy > MOON_TOP(sx) + 8 && !busy(x, y) && !(sx > 284 && sx < 332 && sy > 226 && sy < 252); };
+        /* craters: a lit far rim, a shaded bowl; and loose stones */
+        var s = scatter(101, 9, on, function(sx, sy, i){ var r = 5 + (i % 3) * 2.4; return ell(sx, sy, r, r * .42, "#E6E4F2", 1.1) + ell(sx + .4, sy + .5, r * .78, r * .3, "#8F8AB2", 0) + ell(sx + .9, sy + .9, r * .5, r * .17, "#77729C", 0); }).join("");
+        s += scatter(102, 14, on, function(sx, sy, i){ return i % 3 ? ell(sx, sy, 1.8, 1.1, "#A8A3C6", .7) : circ(sx, sy, 1.2, i % 2 ? K.dmTeal : "#FFE9A8").replace("/>", ' class="tp-twinkle" style="animation-delay:' + f(i * .3 % 2.6) + 's"/>'); }).join("");
         return s;
       },
       props: function(o){
-        return scatter(103, 6, function(sx, sy, x, y){ return sy > planetTop(sx) + 12 && !inYard(x, y) && !busy(x, y) && !(sx > 288 && sx < 330 && sy > 214 && sy < 250); }, function(sx, sy, i, R, x, y){
-          return { x: x, y: y, s: crystal(sx, sy, 1.3 + R() * .5, i % 2 ? [K.dmLight, "#8F5BE8"] : [K.dmTeal, "#43C8A8"]) + crystal(sx + 5, sy + 1, .8) };
+        return scatter(103, 6, function(sx, sy, x, y){ return sy > MOON_TOP(sx) + 12 && !inYard(x, y) && !busy(x, y) && !(sx > 284 && sx < 334 && sy > 212 && sy < 254); }, function(sx, sy, i, R, x, y){
+          return { x: x, y: y, s: i % 3 === 2 ? FO("M" + f(sx - 8) + " " + f(sy) + " L" + f(sx - 5) + " " + f(sy - 6) + " L" + f(sx + 3) + " " + f(sy - 8) + " L" + f(sx + 8) + " " + f(sy) + " Z", "#A8A3C6", 1.4) + F("M" + f(sx - 5) + " " + f(sy - 6) + " L" + f(sx + 3) + " " + f(sy - 8) + " L" + f(sx + 5) + " " + f(sy - 4) + " L" + f(sx - 1) + " " + f(sy - 5) + " Z", "#E6E4F2")
+            : crystal(sx, sy, 1.3 + R() * .5, i % 2 ? [K.dmLight, "#8F5BE8"] : [K.dmTeal, "#43C8A8"]) + crystal(sx + 5, sy + 1, .8) };
         });
       },
       fg: function(){ return ""; }
     },
     clouds: {
+      /* redrawn 2026-11-10 (Sam: "looks more like snow than a cloud"): big round billows along the top, puffs drawn
+         across the surface, warm light and pink shade instead of snow's blue white, and two gaps the sky shows through */
       n: "Above the clouds", note: "A cloud bank in the sky, a rainbow behind", rarity: "Epic", theme: "clouds", price: 2800, id: "clouds",
-      top: cloudTop, bot: cloudBot, skirt: "cloud", path: "gold", treeKind: "cloud", lamp: "gold", grade: ["#FFC9D9", .06],
-      chip: function(o){ return o.night ? ["#D9D4EF", "#A99FD0"] : ["#FFFFFF", "#D9D4EF"]; },
+      top: cloudTop, bot: cloudBot, skirt: "cloud", path: "gold", treeKind: "cloud", lamp: "gold", grade: ["#FFC9D9", .05],
+      chip: function(o){ return o.night ? ["#D9D4EF", "#A99FD0"] : ["#FFFDF8", "#E3D6EE"]; },
       sky: function(o){
         if (o.night) return bands(["#1A2558", "#22306A", "#2C3C7A", "#3A4888", "#4A5496"], 0, 300) + moon(320, 44) + starField(61, 34, 150);
-        var s = bands(["#A9CFF7", "#BCD9F8", "#CFE3FA", "#E2EBFB", "#F4E9F6", "#FCE4EC"], 0, 300);
+        var s = bands(["#8FC2F5", "#A6CFF7", "#BDDCF9", "#D4E6FA", "#EEE4F4", "#FBDDE6"], 0, 300);
         ["#E5484D", "#F59A1E", "#F5D21E", "#3ECF7E", "#3FA7E0", "#9B7BE0"].forEach(function(c, i){ s += L("M" + (226 + i * 5) + " 150 A" + (78 - i * 5) + " " + (78 - i * 5) + " 0 0 1 " + (382 - i * 5) + " 150", 4.4, c, .6); });
         return s + sun(80, 40) + cloud(150, 30, .8);
       },
       far: function(o){
-        var c = o.night ? ["#6C74A8", "#5A6296"] : ["#FFFFFF", "#EEE9F8"], s = "", R = rng(63);
-        /* the tops of the clouds far off, and a few below */
-        for (var x = -10; x < 410; x += 26){ var y = 150 + R() * 10; s += circ(x, y, 16 + R() * 8, c[1], 0); }
-        for (x = 0; x < 410; x += 34){ s += circ(x, 296 + R() * 6, 18 + R() * 8, c[0], 1.2); }
+        var c = o.night ? ["#6C74A8", "#5A6296"] : ["#FFFFFF", "#F3E9F5"], s = "", R = rng(63);
+        /* other cloud banks far off, flat-bottomed, and a few below */
+        [[60, 132, 1], [150, 118, .7], [330, 138, .9], [258, 112, .55]].forEach(function(q){
+          var k = q[2]; s += F("M" + f(q[0] - 30 * k) + " " + f(q[1]) + " q-2 -12 12 -12 q4 -12 18 -9 q10 -6 18 5 q12 0 12 10 q0 6 -6 6 z", c[1], .9); });
+        for (var x = 0; x < 410; x += 34){ s += circ(x, 296 + R() * 6, 18 + R() * 8, c[0], 1.2); }
         /* a hot-air balloon drifting by (tap: up it goes) */
         var b = G("tp-eo", FO("M318 62 q-14 0 -14 -15 q0 -15 14 -15 q14 0 14 15 q0 15 -14 15 z", "#F7A3BA", 1.6) + F("M318 32 q6 1 8 15 q-1 14 -8 15 z", "#E07090") + L("M318 32 V62", 1, INK, .6) +
           L("M312 62 l2 8 M324 62 l-2 8", 1) + FO("M313 70 h10 v6 h-10 z", K.wood, 1.2) + G("tp-float", ""));
@@ -559,28 +588,43 @@ window.SH_PLACE = (function placeKit(INK, C){
         return s;
       },
       land: function(o){
-        var g = o.night ? ["#D9D4EF", "#C3BBE3", "#A99FD0"] : ["#FFFFFF", "#F1EEFA", "#DCD6F0"];
-        var s = "";
-        /* puffs along the bottom first, then the cloud's top over them, so only their round bellies show */
-        trace(cloudBot, 30, 370, 13).forEach(function(q, i){ s += circ(q[0], q[1] - 4, 10 + (i % 3) * 2.4, g[2], 1.4); });
-        s += F(landD(cloudTop, function(x){ return cloudBot(x) - 4; }), g[0]);
-        s += F("M370 " + f(cloudTop(370)) + " L370 " + f(cloudBot(370) - 4) + " L240 " + f(cloudBot(240) - 4) + " C282 236 330 206 352 180 Z", g[1]);
-        s += L(D2(trace(cloudTop, 30, 370), true), SW);
+        var g = o.night ? ["#D9D4EF", "#C3BBE3", "#A99FD0", "#8E84BD", "#B9B0DC"] : ["#FFFDF8", "#FBEEF3", "#E9DDF1", "#C7B9E2", "#FFE6DA"];
+        var s = "", R = rng(71);
+        /* the bellies along the bottom first, warm underneath, so only their round undersides show */
+        trace(cloudBot, 30, 370, 15).forEach(function(q, i){ var r = 12 + (i % 3) * 3; s += circ(q[0], q[1] - 5, r, g[2], 1.4) + F("M" + f(q[0] - r * .7) + " " + f(q[1] - 5 + r * .5) + " q" + f(r * .7) + " " + f(r * .5) + " " + f(r * 1.4) + " 0 q-" + f(r * .7) + " " + f(r * .9) + " -" + f(r * 1.4) + " 0 z", g[4], .8); });
+        /* the billows along the top: big round heads standing over the crest */
+        var heads = trace(CLOUD_ARC, 38, 362, 18).map(function(q, i){ return [q[0], q[1], 12 + ((i * 7) % 5) * 2.2 + R() * 2]; });
+        heads.forEach(function(q){ s += circ(q[0], q[1] + q[2] * .3, q[2], g[0], SW); });
+        s += F(landD(function(x){ return CLOUD_ARC(x) + 7; }, function(x){ return cloudBot(x) - 4; }), g[0]);
+        heads.forEach(function(q, i){ s += L("M" + f(q[0] + q[2] * .15) + " " + f(q[1] + q[2] * 1.1) + " q" + f(q[2] * .7) + " -" + f(q[2] * .15) + " " + f(q[2] * .8) + " -" + f(q[2] * .9), 1.3, g[3], .7) + (i % 2 ? "" : HI("M" + f(q[0] - q[2] * .6) + " " + f(q[1] - q[2] * .1) + " q" + f(q[2] * .1) + " -" + f(q[2] * .5) + " " + f(q[2] * .55) + " -" + f(q[2] * .55), 1.6)); });
+        /* its shaded side, in pink, never blue */
+        s += F("M370 " + f(CLOUD_ARC(370) + 7) + " L370 " + f(cloudBot(370) - 4) + " L240 " + f(cloudBot(240) - 4) + " C282 236 330 206 352 180 Z", g[1]);
+        /* two gaps the sky shows through, puffs round their rims */
+        [[118, 242, 13, 5], [306, 236, 11, 4.4]].forEach(function(q){
+          s += ell(q[0], q[1], q[2] + 2.4, q[3] + 1.6, g[2], 0) + ell(q[0], q[1] + .6, q[2], q[3], o.night ? "#2C3C7A" : "#A6CFF7", 1.2) +
+            circ(q[0] - q[2] * .7, q[1] + q[3] * .7, q[3] * .9, g[0], 0) + circ(q[0] + q[2] * .5, q[1] + q[3], q[3] * .8, g[0], 0) + circ(q[0] - q[2] * .1, q[1] + q[3] * 1.2, q[3] * .7, g[0], 0);
+        });
         return s;
       },
       flat: function(o){
-        var on = function(sx, sy, x, y){ return sy > cloudTop(sx) + 6 && sy < cloudBot(sx) - 12 && !busy(x, y); };
-        return scatter(104, 14, on, function(sx, sy, i){ return i % 2 ? L("M" + f(sx - 5) + " " + f(sy) + " q5 2.6 10 0", 1.1, o.night ? "#A99FD0" : "#DCD6F0") : dmStar(sx, sy - 2, 2.2, o.night ? "#FFF3C4" : "#FFE27A", "tp-twinkle", i * .3); }).join("");
+        var c = o.night ? ["#C3BBE3", "#8E84BD"] : ["#F7E9F0", "#C7B9E2"];
+        var on = function(sx, sy, x, y){ return sy > cloudTop(sx) + 12 && sy < cloudBot(sx) - 14 && !busy(x, y) && !(sy > 228 && ((sx > 98 && sx < 138) || (sx > 290 && sx < 322))); };
+        /* puffs drawn across the top: a soft shade under three round bumps */
+        return scatter(104, 26, on, function(sx, sy, i, R){
+          var k = .8 + R() * .7;
+          if (i % 5 === 4) return dmStar(sx, sy - 2, 2.2, o.night ? "#FFF3C4" : "#FFE27A", "tp-twinkle", i * .3);
+          return ell(sx + 1, sy + 1.4, 9.5 * k, 2.8 * k, c[0], 0) + L("M" + f(sx - 8 * k) + " " + f(sy) + " q" + f(1.6 * k) + " -" + f(4.6 * k) + " " + f(5.4 * k) + " -" + f(2 * k) + " q" + f(2.2 * k) + " -" + f(4.2 * k) + " " + f(5.6 * k) + " -" + f(.8 * k) + " q" + f(3.4 * k) + " -" + f(2 * k) + " " + f(4.6 * k) + " " + f(2.4 * k), 1.2, c[1], .9);
+        }).join("");
       },
       props: function(o){
-        return scatter(105, 5, function(sx, sy, x, y){ return sy > cloudTop(sx) + 10 && sy < cloudBot(sx) - 16 && !inYard(x, y) && !busy(x, y); }, function(sx, sy, i, R, x, y){
-          return { x: x, y: y, s: circ(sx, sy - 5, 7, "#FFFFFF", 1.3) + circ(sx + 6, sy - 3, 5, "#FFFFFF", 1.3) + circ(sx - 5, sy - 2, 4.4, "#FFFFFF", 1.2) + F("M" + f(sx - 9) + " " + f(sy) + " h20 v-3 h-20 z", "#FFFFFF") };
+        return scatter(105, 5, function(sx, sy, x, y){ return sy > cloudTop(sx) + 14 && sy < cloudBot(sx) - 18 && !inYard(x, y) && !busy(x, y) && !(sy > 224 && ((sx > 94 && sx < 142) || (sx > 286 && sx < 326))); }, function(sx, sy, i, R, x, y){
+          return { x: x, y: y, s: circ(sx, sy - 6, 8, "#FFFDF8", 1.3) + circ(sx + 7, sy - 3.4, 5.6, "#FFFDF8", 1.3) + circ(sx - 6, sy - 2.6, 5, "#FFFDF8", 1.2) + F("M" + f(sx - 10) + " " + f(sy + .6) + " h22 v-4 h-22 z", "#FFFDF8") + L("M" + f(sx - 10) + " " + f(sy + .6) + " h22", 1.2, o.night ? "#8E84BD" : "#C7B9E2") };
         });
       },
       fg: function(){ return ""; }
     }
   };
-  function sceneOn(sc, sx, sy){ return sy > sc.top(sx) + 2 && (!sc.bot || sy < sc.bot(sx) - 2) && (!sc.wet || sx < shoreX(sy) - 10); }
+  function sceneOn(sc, sx, sy){ return sy > sc.top(sx) + 2 && (!sc.bot || sy < sc.bot(sx) - 2) && (!sc.wet || onIsland(sx, sy, 8)); }
 
   /* ------------------------------------------------------------------ the scene's own pieces ------------------------ */
   function roundTree(b, o){
@@ -769,8 +813,8 @@ window.SH_PLACE = (function placeKit(INK, C){
       n: "The cottage", note: "Default: the cottage on the hill, every Timmy's first home", rarity: "", theme: "hilltop", price: 0, id: "",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Shutters and window boxes", porch: "A porch with a lamp", chimney: "A stone chimney", flag: "A Timmy flag on the gable", paint: "Wall paint" },
-      door: [5.5, 8.4], brush: [7.5, 9.0], statue: [3.0, 9.3], spots: { door: [5.5, 10.6] }, h: 7.4,
-      eaves: [[2.1, 8.9, 3.55], [8.9, 8.9, 3.55]], foot: [2.4, 3.0, 8.6, 8.6], base: [[2.4, 8.6], [8.6, 8.6], [8.6, 3.0]], block: [2.2, 2.6, 9.0, 9.0], porchBlock: [3.6, 8.4, 7.5, 10.2],
+      door: [5.5, 8.4], brush: [7.25, 9.05], statue: [3.0, 9.3], porchZ: { brush: .38 }, spots: { door: [5.5, 10.9] }, h: 7.4,
+      eaves: [[2.1, 8.9, 3.55], [8.9, 8.9, 3.55]], foot: [2.4, 3.0, 8.6, 8.6], base: [[2.4, 8.6], [8.6, 8.6], [8.6, 3.0]], block: [2.2, 2.6, 9.0, 9.0], porchBlock: [3.6, 8.4, 8.2, 10.6],
       draw: function(o){
         var p = PAINTS[o.paint] || PAINTS.cream, u = o.up, s = "", lights = "";
         s += box(2.4, 3.0, 0, 6.2, 5.6, .4, { top: K.stone, left: K.stoneShade, right: K.stoneDark });
@@ -812,62 +856,86 @@ window.SH_PLACE = (function placeKit(INK, C){
         s += FO(D(barge), K.roofShade) + O(D(slope));
         if (o.snow) s += snowSlope(e0, e1, ye, ym, ze, zr);
         if (u.porch){
-          s += box(3.7, 8.4, 0, 3.6, 1.6, .38, { top: K.woodLight, left: K.wood, right: K.woodShade });
-          for (var b = 1; b < 4; b++) s += L(D([[3.7 + b * .9, 8.4, .38], [3.7 + b * .9, 10.0, .38]], true), .9, K.woodShade);
-          s += box(3.9, 9.7, .38, .22, .22, 2.6, { top: "#FFFFFF", left: "#FFFFFF", right: "#E9DACB" }, { sw: 1.4, si: .9 });
-          s += box(6.9, 9.7, .38, .22, .22, 2.6, { top: "#FFFFFF", left: "#FFFFFF", right: "#E9DACB" }, { sw: 1.4, si: .9 });
-          s += FO(D([[3.6, 8.4, 3.35], [7.4, 8.4, 3.35], [7.4, 10.1, 2.95], [3.6, 10.1, 2.95]]), K.roof, 1.8) + FO(D([[7.4, 8.4, 3.35], [7.4, 10.1, 2.95], [7.4, 10.1, 2.7], [7.4, 8.4, 3.1]]), K.roofShade, 1.4);
-          if (o.snow) s += FO(D([[3.6, 8.4, 3.4], [7.4, 8.4, 3.4], [7.4, 9.5, 3.18], [3.6, 9.5, 3.18]]), "#FFFFFF", 1.1);
-          if (o.night){ var lp = P(5.5, 10.0, 2.7); lights += glowAt(lp[0], lp[1] + 3, 12) + FO("M" + f(lp[0] - 2) + " " + f(lp[1]) + " h4 l-.6 5 h-2.8 z", K.lit, 1); }
+          /* a deck across the front and a little roof over the door only, so the rank statue (left) and the toothbrush
+             (right, standing on the deck) stay in the open: an upgrade never covers what's already there */
+          s += box(3.7, 8.4, 0, 4.4, 1.6, .38, { top: K.woodLight, left: K.wood, right: K.woodShade });
+          for (var b = 1; b < 5; b++) s += L(D([[3.7 + b * .88, 8.4, .38], [3.7 + b * .88, 10.0, .38]], true), .9, K.woodShade);
+          s += box(4.9, 10.0, 0, 1.2, .45, .19, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.4, si: .9 });
+          s += box(4.62, 9.62, .38, .2, .2, 2.5, { top: "#FFFFFF", left: "#FFFFFF", right: "#E9DACB" }, { sw: 1.4, si: .9 });
+          s += box(6.18, 9.62, .38, .2, .2, 2.5, { top: "#FFFFFF", left: "#FFFFFF", right: "#E9DACB" }, { sw: 1.4, si: .9 });
+          s += FO(D([[4.45, 8.4, 3.4], [6.55, 8.4, 3.4], [6.55, 10.0, 2.95], [4.45, 10.0, 2.95]]), K.roof, 1.8) + FO(D([[6.55, 8.4, 3.4], [6.55, 10.0, 2.95], [6.55, 10.0, 2.72], [6.55, 8.4, 3.16]]), K.roofShade, 1.4);
+          s += L(D([[4.45, 9.2, 3.18], [6.55, 9.2, 3.18]], true), 1, K.roofDark, .6);
+          if (o.snow) s += FO(D([[4.45, 8.4, 3.45], [6.55, 8.4, 3.45], [6.55, 9.4, 3.18], [4.45, 9.4, 3.18]]), "#FFFFFF", 1.1);
+          var lp = P(5.5, 9.9, 2.72); s += L("M" + f(lp[0]) + " " + f(lp[1]) + " v3", 1.2) + FO("M" + f(lp[0] - 2) + " " + f(lp[1] + 3) + " h4 l-.6 4.6 h-2.8 z", o.night ? K.lit : "#FFF3C4", 1);
+          if (o.night) lights += glowAt(lp[0], lp[1] + 5, 12);
         }
         if (u.flag) s += flagOn(8.9, 5.8, 6.4, 2.6);
         return { body: s, lights: lights };
       }
     },
     castle: {
-      n: "The castle", note: "Legendary: towers, a gate and banners", rarity: "Legendary", theme: "clouds", price: 8000, id: "castle",
+      /* rebuilt 2026-11-10 (Sam: "looks off and could be better"): a real castle's plan. Three round towers on the
+         corners you can see (left, front and right), crenellated curtain walls between them, the gate in the wall that
+         faces left with its banners and torches, and a square keep with a pointed roof rising behind. */
+      n: "The castle", note: "Legendary: three towers, a gate with banners and a keep", rarity: "Legendary", theme: "clouds", price: 8000, id: "castle",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Stained glass", porch: "A stone landing", flag: "A Timmy flag on the keep", paint: "Roofs and banners" },
-      door: [5.5, 7.6], brush: [8.6, 8.4], statue: [7.4, 9.0], spots: { door: [5.5, 9.6], tower: [2.4, 9.8] }, h: 10.4,
-      eaves: [[3.0, 7.6, 4.7], [8.0, 7.6, 4.7]], foot: [1.6, 1.9, 9.4, 9.2],
-      base: arcPts(2.7, 8.0, 1.25, -10, 150, 6).concat([[4.0, 7.6], [8.0, 7.6], [8.0, 4.3]]).concat(arcPts(8.3, 3.1, 1.25, 60, -20, 4)), block: [1.3, 1.6, 9.8, 9.4],
+      door: [5.5, 8.15], brush: [8.95, 6.75], statue: [3.75, 9.4], spots: { door: [5.5, 10.4], tower: [1.9, 10.0] }, h: 10.8,
+      eaves: [[3.6, 8.15, 3.5], [7.5, 8.15, 3.5]], foot: [1.5, 2.0, 9.5, 9.1],
+      base: arcPts(2.45, 8.15, .95, 175, 25, 5).concat(arcPts(8.55, 8.15, .95, 155, -65, 7)).concat(arcPts(8.55, 2.95, .95, 65, -30, 4)), block: [1.4, 1.8, 9.7, 9.3], porchBlock: [4.5, 8.15, 6.5, 9.9],
       draw: function(o){
-        var u = o.up, bp = BOLD[o.paint] || BOLD.cream, roof = o.paint && o.paint !== "cream" ? bp : { c: K.roof, s: K.roofShade }, s = "", lights = "";
-        var st = { top: K.stone, left: K.stone, right: K.stoneShade };
-        s += cyl(5.0, 4.6, 0, 1.1, 7.4, 1.1, K.stone, K.stoneShade, K.stone, { open: true });
-        s += cone(5.0, 4.6, 7.4, 1.35, 9.9, roof.c, roof.s, { hi: true });
-        if (o.snow) s += snowCone(5.0, 4.6, 7.4, 1.35, 9.9);
-        s += box(3.0, 3.4, 0, 5.0, 4.2, 4.8, st);
-        if (o.snow) s += F(D([[3.0, 3.4, 4.8], [8.0, 3.4, 4.8], [8.0, 7.6, 4.8], [3.0, 7.6, 4.8]]), "#FFFFFF", .95);
-        for (var i = 0; i < 5; i++){ s += box(3.0 + i * 1.05, 7.15, 4.8, .5, .45, .55, st, { sw: 1.4, si: .9 }); }
-        for (i = 0; i < 4; i++){ s += box(7.55, 3.4 + i * 1.05, 4.8, .45, .5, .55, st, { sw: 1.4, si: .9 }); }
-        var R = rng(7);
-        for (var z = 1; z < 4.8; z += .8){ for (var x = 3.3 + R() * .6; x < 7.8; x += 1.4 + R() * .6) s += L(D([[x, 7.6, z], [x + .6, 7.6, z]], true), .9, K.stoneDark, .7); for (var y = 3.7 + R() * .6; y < 7.4; y += 1.4 + R() * .6) s += L(D([[8, y, z], [8, y + .6, z]], true), .9, K.stoneDark, .6); }
-        var ban = o.paint && o.paint !== "cream" ? bp.c : K.blue;
-        [[3.95, 4.55], [6.45, 7.05]].forEach(function(xx){
-          s += FO(D(onY(7.6, [[xx[0], 4.4], [xx[1], 4.4], [xx[1], 2.5], [(xx[0] + xx[1]) / 2, 2.1], [xx[0], 2.5]])), ban, 1.4);
-          s += tinyTooth.apply(null, P((xx[0] + xx[1]) / 2, 7.6, 3.4).concat([.42, "#FFFFFF"]));
+        var u = o.up, bp = BOLD[o.paint] || BOLD.cream, roof = o.paint && o.paint !== "cream" ? bp : { c: K.roof, s: K.roofShade }, s = "", lights = "", i;
+        var st = { top: K.stone, left: K.stone, right: K.stoneShade }, ban = o.paint && o.paint !== "cream" ? bp.c : K.blue;
+        var WH = 3.4, R = rng(7), TR = .9;
+        function courses(face, plane, u0, u1, z0, z1){ var out = ""; for (var z = z0; z < z1; z += .8) for (var t = u0 + .2 + R() * .5; t < u1 - .6; t += 1.3 + R() * .6) out += L(D((face === "y" ? onY : onX)(plane, [[t, z], [t + .6, z]]), true), .9, K.stoneDark, face === "y" ? .7 : .6); return out; }
+        /* a round tower: its drum, an arrow slit, the walk and its teeth, the pointed roof */
+        function tower(cx, cy, h, top){
+          var t = cyl(cx, cy, 0, TR, h, TR, K.stone, K.stoneShade, K.stone, { open: true });
+          for (var zz = 1.1; zz < h - .4; zz += 1.1){ var a = P(cx, cy, zz); t += L("M" + f(a[0] - RX(TR) * .72) + " " + f(a[1] + RY(TR) * .66) + " q" + f(RX(TR) * .34) + " 2.2 " + f(RX(TR) * .5) + " 2.6", .9, K.stoneDark, .7); }
+          var w = P(cx + .42, cy + .76, h * .62), slit = "M" + f(w[0] - 1.9) + " " + f(w[1] + 4.2) + " v-6.4 a1.9 1.9 0 0 1 3.8 0 v6.4 z";
+          t += FO(slit, o.night ? K.lit : K.glass, 1.3);
+          if (o.night) lights += glowAt(w[0], w[1], 9) + FO(slit, K.lit, 1.3);
+          t += cyl(cx, cy, h, TR + .25, h + .5, TR + .25, K.stone, K.stoneShade, o.snow ? "#FFFFFF" : K.stoneShade);
+          var c = P(cx, cy, h + .5);
+          [-.78, -.3, .22, .7].forEach(function(k){ var x0 = c[0] + RX(TR + .25) * k, y0 = c[1] + RY(TR + .25) * Math.sqrt(1 - k * k); t += FO("M" + f(x0 - 2) + " " + f(y0 + .6) + " v-4.2 h4.2 v4.2 z", k > .1 ? K.stoneShade : K.stone, 1.3); });
+          t += cone(cx, cy, h + .5, TR + .12, top, roof.c, roof.s, { hi: true });
+          if (o.snow) t += snowCone(cx, cy, h + .5, TR + .12, top);
+          return t;
+        }
+        /* the keep, behind the walls: a square tower with teeth and a pointed roof */
+        var kx = 3.9, ky = 3.5, kw = 3.3, kd = 3.3, kh = 7.0;
+        s += box(kx, ky, 0, kw, kd, kh, st) + courses("y", ky + kd, kx, kx + kw, 4.6, kh) + courses("x", kx + kw, ky, ky + kd, 4.6, kh);
+        var kwn = win("y", ky + kd, kx + 1.2, kx + 2.1, 4.9, 6.3, { night: o.night, arch: true, stained: !!u.windows }); s += kwn.s; lights += kwn.lights;
+        for (i = 0; i < 3; i++) s += box(kx + .15 + i * 1.22, ky + kd - .45, kh, .58, .45, .5, st, { sw: 1.4, si: .9 });
+        for (i = 0; i < 3; i++) s += box(kx + kw - .45, ky + .15 + i * 1.22, kh, .45, .58, .5, st, { sw: 1.4, si: .9 });
+        var ap = [kx + kw / 2, ky + kd / 2, 10.6], rz = kh + .15, e = .25;
+        s += FO(D([[kx - e, ky + kd + e, rz], [kx + kw + e, ky + kd + e, rz], ap]), roof.c) + FO(D([[kx + kw + e, ky + kd + e, rz], [kx + kw + e, ky - e, rz], ap]), roof.s);
+        s += HI(D([[kx + .2, ky + kd, rz + .5], [kx + kw / 2 - .25, ky + kd / 2 + .5, 9.7]], true), 2);
+        if (o.snow) s += F(D([[kx + .6, ky + kd - .4, rz + 1.5], [kx + kw - .2, ky + kd - .2, rz + 1.4], ap]), "#FFFFFF");
+        /* the curtain walls and their walk */
+        s += box(2.45, 7.55, 0, 6.1, .6, WH, st) + box(7.95, 2.95, 0, .6, 5.2, WH, st);
+        if (o.snow) s += F(D([[2.45, 7.55, WH], [8.55, 7.55, WH], [8.55, 8.15, WH], [2.45, 8.15, WH]]), "#FFFFFF", .95) + F(D([[7.95, 2.95, WH], [8.55, 2.95, WH], [8.55, 8.15, WH], [7.95, 8.15, WH]]), "#FFFFFF", .95);
+        s += courses("y", 8.15, 3.4, 7.6, .9, WH) + courses("x", 8.55, 3.9, 7.2, .9, WH);
+        for (i = 0; i < 4; i++) s += box(3.55 + i * 1.05, 7.7, WH, .55, .45, .5, st, { sw: 1.4, si: .9 });
+        for (i = 0; i < 3; i++) s += box(8.1, 4.15 + i * 1.05, WH, .45, .55, .5, st, { sw: 1.4, si: .9 });
+        /* the banners, the gate and its bands */
+        [[3.75, 4.35], [6.65, 7.25]].forEach(function(xx){
+          s += FO(D(onY(8.15, [[xx[0], 3.15], [xx[1], 3.15], [xx[1], 1.5], [(xx[0] + xx[1]) / 2, 1.1], [xx[0], 1.5]])), ban, 1.4);
+          s += tinyTooth.apply(null, P((xx[0] + xx[1]) / 2, 8.15, 2.4).concat([.4, "#FFFFFF"]));
         });
-        s += doorArch("y", 7.6, 4.7, 6.3, 2.9, { color: K.wood });
-        s += L(D(onY(7.6, [[4.95, .1], [4.95, 2.4]]), true) + D(onY(7.6, [[5.25, .1], [5.25, 2.6]]), true) + D(onY(7.6, [[5.75, .1], [5.75, 2.6]]), true) + D(onY(7.6, [[6.05, .1], [6.05, 2.4]]), true), .9, K.woodShade);
-        [[4.2, 5.0], [6.0, 6.8]].forEach(function(yy){ var w = win("x", 8.0, yy[0], yy[1], 2.6, 3.9, { night: o.night, arch: true, stained: !!u.windows }); s += w.s; lights += w.lights; });
-        [[2.7, 8.0], [8.3, 3.1]].forEach(function(c){
-          s += cyl(c[0], c[1], 0, 1.2, 6.0, 1.2, K.stone, K.stoneShade, K.stone, { open: true });
-          for (var zz = 1.2; zz < 6; zz += 1.2){ var a = P(c[0], c[1], zz); s += L("M" + f(a[0] - RX(1.2) * .7) + " " + f(a[1] + RY(1.2) * .7) + " q" + f(RX(1.2) * .35) + " 2 " + f(RX(1.2) * .5) + " 2.5", .9, K.stoneDark, .7); }
-          var w = P(c[0] + .6, c[1] + .9, 3.6);
-          s += FO("M" + f(w[0] - 2) + " " + f(w[1] + 4) + " v-6 a2 2 0 0 1 4 0 v6 z", o.night ? K.lit : K.glass, 1.3);
-          if (o.night) lights += glowAt(w[0], w[1], 9) + FO("M" + f(w[0] - 2) + " " + f(w[1] + 4) + " v-6 a2 2 0 0 1 4 0 v6 z", K.lit, 1.3);
-          s += cyl(c[0], c[1], 6.0, 1.45, 6.5, 1.45, K.stone, K.stoneShade, o.snow ? "#FFFFFF" : K.stoneShade);
-          s += cone(c[0], c[1], 6.5, 1.55, 9.2, roof.c, roof.s, { hi: true });
-          if (o.snow) s += snowCone(c[0], c[1], 6.5, 1.55, 9.2);
-        });
-        if (u.porch) s += box(4.3, 7.6, 0, 2.4, 1.0, .3, st, { sw: 1.6, si: 1 }) + box(4.1, 8.6, 0, 2.8, .7, .15, st, { sw: 1.4, si: .9 });
-        [[4.2, 7.7], [6.8, 7.7]].forEach(function(t){
-          var a = P(t[0], t[1], 2.4);
+        s += FO(D(onY(8.15, archUV(4.72, 6.28, 0, 2.95, 10))), K.stoneShade, 1.6);
+        s += doorArch("y", 8.15, 4.86, 6.14, 2.75, { color: K.wood });
+        s += L(D(onY(8.15, [[5.2, .1], [5.2, 2.45]]), true) + D(onY(8.15, [[5.8, .1], [5.8, 2.45]]), true), .9, K.woodShade) + L(D(onY(8.15, [[4.88, .9], [6.12, .9]]), true) + D(onY(8.15, [[4.88, 1.9], [6.12, 1.9]]), true), 1.6, K.stoneDark);
+        [[4.0, 4.8], [5.3, 6.1], [6.6, 7.4]].forEach(function(yy, n){ if (n === 1) return; var w = win("x", 8.55, yy[0], yy[1], 1.3, 2.6, { night: o.night, arch: true, stained: !!u.windows }); s += w.s; lights += w.lights; });
+        /* the towers: the left and right ones, then the one on the corner nearest you */
+        s += tower(2.45, 8.15, 4.7, 7.5) + tower(8.55, 2.95, 4.7, 7.5) + tower(8.55, 8.15, 4.7, 7.5);
+        if (u.porch) s += box(4.7, 8.15, 0, 1.6, .9, .34, st, { sw: 1.6, si: 1 }) + box(4.55, 9.05, 0, 1.9, .7, .17, st, { sw: 1.4, si: .9 });
+        [[4.55, 8.2], [6.45, 8.2]].forEach(function(t){
+          var a = P(t[0], t[1], 2.2);
           s += L("M" + f(a[0]) + " " + f(a[1]) + " v6", 2.6) + L("M" + f(a[0]) + " " + f(a[1]) + " v6", 1.2, K.woodShade) + G("tp-flame", FO("M" + f(a[0]) + " " + f(a[1] - 6) + " q3 3 0 6 q-3 -3 0 -6 z", K.orange, 1));
           if (o.night) lights += glowAt(a[0], a[1] - 3, 11) + G("tp-flame", F("M" + f(a[0]) + " " + f(a[1] - 6) + " q3 3 0 6 q-3 -3 0 -6 z", K.yellow));
         });
-        if (u.flag) s += flagOn(5.0, 4.6, 9.9, 1.6);
+        if (u.flag) s += flagOn(ap[0], ap[1], ap[2] - .1, 1.7);
         return { body: s, lights: lights };
       }
     },
@@ -931,6 +999,7 @@ window.SH_PLACE = (function placeKit(INK, C){
         s += FO(D(onY(7.1, dd)), K.door, 1.6) + circ(P(5.75, 7.1, dz + .85)[0], P(5.75, 7.1, dz + .85)[1], 1.2, INK);
         var e0 = 3.0, e1 = 7.8, ye = 7.6, ze = 7.2, zr = 8.7, ym = 5.25, yb = 2.9;
         var slope = [[e0, ye, ze], [e1, ye, ze], [e1, ym, zr], [e0, ym, zr]];
+        s += backSlope(e0, e1, ym, yb, ze, zr, "#B8553D");
         s += F(D(slope), "#E8866A") + F(D([[e0 + 3, ye, ze], [e1, ye, ze], [e1, ym, zr], [e0 + 3.8, ym, zr]]), "#B8553D", .3) + O(D(slope));
         s += FO(D([[e1, ye, ze], [e1, ym, zr], [e1, yb, ze], [e1, yb, ze - .3], [e1, ym, zr - .35], [e1, ye, ze - .3]]), "#B8553D");
         s += FO(D([[7.4, 3.4, 7.25], [7.4, 7.1, 7.25], [7.4, 5.25, 8.4]]), p.s, 1.4);
@@ -959,7 +1028,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       n: "The beach hut", note: "Epic: up on stilts, with steps down to the sand", rarity: "Epic", theme: "seaside", price: 2600, id: "beach-hut",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Porthole windows", porch: "A railing and a life ring", flag: "A pennant on the roof", paint: "Plank paint" },
-      door: [5.5, 7.6], brush: [8.0, 10.0], statue: [3.5, 8.6, 1.2], spots: { door: [5.5, 11.2], deck: [7.4, 8.7, 1.2] }, h: 6.4,
+      door: [5.5, 7.6], brush: [8.35, 9.85], statue: [3.5, 8.6, 1.2], spots: { door: [5.5, 11.2], deck: [7.4, 8.7, 1.2] }, h: 6.4,
       climbs: { deck: [[5.5, 11.0, 0], [5.5, 9.4, 1.2], [7.4, 8.7, 1.2]] },
       eaves: [[2.9, 7.95, 3.6], [8.1, 7.95, 3.6]], foot: [2.8, 3.0, 8.4, 9.2], base: [[2.8, 9.2], [4.6, 9.2], [6.4, 9.2], [8.4, 9.2], [8.4, 3.0]], block: [2.6, 2.8, 8.7, 10.8],
       draw: function(o){
@@ -983,6 +1052,7 @@ window.SH_PLACE = (function placeKit(INK, C){
         var e0 = 3.0, e1 = 8.2, ye = 7.95, ze = DZ + 2.45, zr = DZ + 3.9, ym = 5.5, yb = 3.05;
         s += FO(D([[7.9, 3.4, DZ + 2.5], [7.9, 7.6, DZ + 2.5], [7.9, 5.5, zr - .25]]), p.s);
         var slope = [[e0, ye, ze], [e1, ye, ze], [e1, ym, zr], [e0, ym, zr]];
+        s += backSlope(e0, e1, ym, yb, ze, zr, "#3E95AE");
         s += F(D(slope), "#5FB6CC") + F(D([[e0 + 3.4, ye, ze], [e1, ye, ze], [e1, ym, zr], [e0 + 4.4, ym, zr]]), "#3E95AE", .35);
         for (var r = 1; r < 9; r++){ var xx = e0 + (e1 - e0) * r / 9; s += L(D([[xx, ye, ze], [xx, ym, zr]], true), .9, "#3E95AE", .8); }
         s += FO(D([[e1, ye, ze], [e1, ym, zr], [e1, yb, ze], [e1, yb, ze - .3], [e1, ym, zr - .32], [e1, ye, ze - .3]]), "#3E95AE") + O(D(slope));
@@ -990,13 +1060,13 @@ window.SH_PLACE = (function placeKit(INK, C){
         /* the steps down to the sand */
         for (var k = 0; k < 3; k++) s += box(4.85, 9.2 + k * .5, 0, 1.3, .5, DZ * (1 - k / 3) - .02, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.3, si: .8 });
         /* a surfboard leaning on the deck */
-        var sb = seg(P(8.75, 6.9, 0), P(8.1, 6.5, 2.9));
+        var sb = seg(P(8.8, 5.75, 0), P(8.12, 5.55, 2.9));
         s += L(sb, 9.4) + L(sb, 6.6, K.yellow) + L(sb, 1.4, K.red);
         if (u.porch){
           var rail = function(a, c){ return L(D([a, c], true), 2.6) + L(D([a, c], true), 1.2, "#FFFFFF"); };
           s += rail([2.8, 9.2, DZ + .75], [4.75, 9.2, DZ + .75]) + rail([6.25, 9.2, DZ + .75], [8.4, 9.2, DZ + .75]) + rail([8.4, 9.2, DZ + .75], [8.4, 3.0, DZ + .75]);
           [[2.8, 9.2], [3.8, 9.2], [4.75, 9.2], [6.25, 9.2], [7.3, 9.2], [8.4, 9.2], [8.4, 7.6], [8.4, 6.0], [8.4, 4.5], [8.4, 3.0]].forEach(function(q){ s += L(D([[q[0], q[1], DZ], [q[0], q[1], DZ + .75]], true), 2.2) + L(D([[q[0], q[1], DZ], [q[0], q[1], DZ + .75]], true), 1, "#FFFFFF"); });
-          var lr = P(3.95, 7.6, DZ + 1.35);
+          var lr = P(3.8, 9.2, DZ + .36);
           s += ell(lr[0], lr[1], 6, 6.4, "#FFFFFF", 1.6) + ell(lr[0], lr[1], 2.6, 2.8, p.c, 1.2) + L("M" + f(lr[0] - 6) + " " + f(lr[1]) + " h3.4 M" + f(lr[0] + 2.6) + " " + f(lr[1]) + " h3.4 M" + f(lr[0]) + " " + f(lr[1] - 6.4) + " v3.6 M" + f(lr[0]) + " " + f(lr[1] + 2.8) + " v3.6", 2.6, K.red);
           if (o.night){ var lp = P(8.4, 9.2, DZ + 1.0); lights += glowAt(lp[0], lp[1], 10) + circ(lp[0], lp[1], 2, K.litHot, .9); }
         }
@@ -1008,8 +1078,8 @@ window.SH_PLACE = (function placeKit(INK, C){
       n: "The lighthouse", note: "Legendary: red and white, its lamp sweeps the night", rarity: "Legendary", theme: "seaside", price: 7000, id: "lighthouse",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Round windows", porch: "The keeper's cottage", flag: "A flag on the lantern", paint: "Stripe color" },
-      door: [5.5, 7.0], brush: [7.5, 8.4], statue: [3.6, 9.2], spots: { door: [5.5, 9.0] }, h: 12,
-      eaves: [[3.8, 6.4, 8.35], [6.6, 3.6, 8.35], 5], round: [5.5, 5.0, 2.3], base: arcPts(5.5, 5.0, 2.35, -40, 135, 14), block: [3.0, 2.6, 8.0, 7.6], porchBlock: [1.0, 5.0, 3.9, 8.8],
+      door: [5.5, 7.0], brush: [8.35, 6.7], statue: [4.45, 9.95], spots: { door: [5.5, 9.0] }, h: 12,
+      eaves: [[3.8, 6.4, 8.35], [6.6, 3.6, 8.35], 5], round: [5.5, 5.0, 2.3], base: arcPts(5.5, 5.0, 2.35, -40, 135, 14), block: [3.0, 2.6, 8.6, 7.6], porchBlock: [1.0, 5.0, 3.9, 8.8],
       draw: function(o){
         var u = o.up, bp = BOLD[o.paint] || BOLD.cream, s = "", lights = "", cx = 5.5, cy = 5.0;
         if (u.porch){
@@ -1054,7 +1124,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       n: "The igloo", note: "Epic: snow blocks, a tunnel door and a warm glow", rarity: "Epic", theme: "snowy", price: 2200, id: "igloo",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Ice windows", porch: "Snow lanterns", chimney: "A stovepipe", flag: "A flag on top", paint: "Ice tint" },
-      door: [5.5, 9.55], brush: [7.6, 9.8], statue: [3.1, 9.0], spots: { door: [5.5, 10.9] }, h: 5.2,
+      door: [5.5, 9.55], brush: [8.55, 8.7], statue: [3.1, 9.0], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow",
       eaves: [[2.7, 7.4, 1.7], [7.8, 2.4, 1.7], 8], round: [5.5, 5.3, 3.0],
       base: arcPts(5.5, 5.3, 3.05, -40, 62, 8).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
       draw: function(o){
@@ -1107,10 +1177,18 @@ window.SH_PLACE = (function placeKit(INK, C){
         if (o.snow) s += snowDome(cx, cy, 3.75, 2.55, 2.5, .45);
         /* the slit, open, the telescope out of it */
         var a = 32 * Math.PI / 180, rim = P(cx + Math.cos(a) * 2.5, cy + Math.sin(a) * 2.5, 3.8), top = P(cx + .15, cy + .05, 6.2), mid = [(top[0] + rim[0]) / 2, (top[1] + rim[1]) / 2];
-        var slit = "M" + f(top[0] - 3) + " " + f(top[1] + 1) + " Q" + f(mid[0] - 6) + " " + f(mid[1] - 2) + " " + f(rim[0] - 4.6) + " " + f(rim[1] - .6) + " L" + f(rim[0] + 4.6) + " " + f(rim[1] + .6) + " Q" + f(mid[0] + 4) + " " + f(mid[1] + 1) + " " + f(top[0] + 3) + " " + f(top[1] - 1) + " Z";
-        var inner = "M" + f(top[0] - 1.4) + " " + f(top[1] + 2) + " Q" + f(mid[0] - 3.6) + " " + f(mid[1]) + " " + f(rim[0] - 2.4) + " " + f(rim[1]) + " L" + f(rim[0] + 2.4) + " " + f(rim[1] + .6) + " Q" + f(mid[0] + 2) + " " + f(mid[1] + 1.4) + " " + f(top[0] + 1.4) + " " + f(top[1]) + " Z";
-        var tele = function(){ var t0 = [mid[0] + 1, mid[1] + 3], te = [mid[0] + 13, mid[1] - 9];
-          return L(seg(t0, te), 6.4) + L(seg(t0, te), 3.8, "#E8BE45") + L(seg([t0[0] + 4, t0[1] - 4], [t0[0] + 5.4, t0[1] - 5.4]), 6.4) + L(seg([t0[0] + 4, t0[1] - 4], [t0[0] + 5.4, t0[1] - 5.4]), 3.8, "#C9971C") + ell(te[0] + 1, te[1] - 1, 2, 2.4, "#7FCDEB", 1.2); };
+        var slit = "M" + f(top[0] - 4.6) + " " + f(top[1] + 1.4) + " Q" + f(mid[0] - 8.5) + " " + f(mid[1] - 2.6) + " " + f(rim[0] - 7) + " " + f(rim[1] - 1.2) + " L" + f(rim[0] + 6.4) + " " + f(rim[1] + 1) + " Q" + f(mid[0] + 6.4) + " " + f(mid[1] + 1.6) + " " + f(top[0] + 4.4) + " " + f(top[1] - 1.2) + " Z";
+        var inner = "M" + f(top[0] - 2.6) + " " + f(top[1] + 2.6) + " Q" + f(mid[0] - 5.6) + " " + f(mid[1]) + " " + f(rim[0] - 4.4) + " " + f(rim[1] - .4) + " L" + f(rim[0] + 4) + " " + f(rim[1] + .8) + " Q" + f(mid[0] + 3.6) + " " + f(mid[1] + 1.8) + " " + f(top[0] + 2.4) + " " + f(top[1] + .4) + " Z";
+        /* a refractor on its mount: a white tube, a brass band, a dark dew shield round the lens and a little finder scope */
+        var tele = function(){
+          var t0 = [mid[0] - 2.5, mid[1] + 6.5], te = [mid[0] + 12.5, mid[1] - 11.5], dx = te[0] - t0[0], dy = te[1] - t0[1], n = Math.sqrt(dx * dx + dy * dy), ux = dx / n, uy = dy / n;
+          var at2 = function(t, w){ return [t0[0] + ux * t - uy * w, t0[1] + uy * t + ux * w]; };
+          var out = L(seg(t0, te), 8.6) + L(seg(t0, te), 6, "#F4F6FA") + L(seg(at2(1, -1.6), at2(n - 6, -1.6)), 1.4, "#FFFFFF", .9) + L(seg(at2(1, 2), at2(n - 6, 2)), 1.6, "#C9D1DE", .9);
+          out += L(seg(at2(n * .42, 0), at2(n * .42 + 2, 0)), 8.6) + L(seg(at2(n * .42, 0), at2(n * .42 + 2, 0)), 6, "#E8BE45");
+          out += L(seg(at2(n - 5.5, 0), at2(n + .5, 0)), 10.6) + L(seg(at2(n - 5.5, 0), at2(n + .5, 0)), 8, "#3C4A63");
+          var e = at2(n + 1.2, 0); out += G("", ell(0, 0, 2.3, 4.6, "#9BD8F0", 1.3) + L("M-.6 -2.4 q1.2 1.4 .8 3.6", 1, "#FFFFFF", .9)).replace("<g", '<g transform="translate(' + f(e[0]) + " " + f(e[1]) + ") rotate(" + f(Math.atan2(uy, ux) * 180 / Math.PI) + ')"');
+          out += L(seg(at2(n * .2, -5.6), at2(n * .62, -5.6)), 3.8) + L(seg(at2(n * .2, -5.6), at2(n * .62, -5.6)), 1.8, "#E8BE45") + L(seg(at2(n * .3, -4.6), at2(n * .3, -3.2)), 1.2) + L(seg(at2(n * .52, -4.6), at2(n * .52, -3.2)), 1.2);
+          return out; };
         s += FO(slit, "#2B2550", 1.5) + tele();
         if (o.night) lights += glowAt(mid[0], mid[1], 12) + FO(slit, "#2B2550", 1.5) + F(inner, "#FFD86B", .55) + tele();
         if (u.porch){
@@ -1131,7 +1209,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     return sh(.35) + sh(0);
   }
   function skirt(sc, h, o){
-    var pts = baseOf(h), s = "", R = rng(31 + h.k.length), d = h.door, kind = o.snow ? "snow" : sc.skirt, n = 0;
+    var pts = baseOf(h), s = "", R = rng(31 + h.k.length), d = h.door, kind = o.snow ? "snow" : h.skirt || sc.skirt, n = 0;
     for (var i = 0; i < pts.length - 1; i++){
       var a = pts[i], b = pts[i + 1], len = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])), m = Math.max(1, Math.round(len / .62));
       for (var j = i ? 1 : 0; j <= m; j++){
@@ -1392,23 +1470,36 @@ window.SH_PLACE = (function placeKit(INK, C){
     { k: "diamond", n: "Diamond",     c: "#CFF1FF", s: "#7FCDEB", h: "#FFFFFF" },
     { k: "dark",    n: "Dark Matter", c: "#4A2A8C", s: "#2A0F5C", h: "#B57BFF" }
   ];
-  /* a high-speed handpiece standing on its end: the handle, the neck bent forward, the head with its bur (24 px tall) */
+  /* a high-speed handpiece, held up like a trophy (redrawn 2026-11-10: Sam, "doesn't look like a handpiece"): the long
+     handle with its coupling at the foot and the knurled grip, the contra-angle bend, the small head set across the end
+     and the bur coming out of it. It leans away from the door (head up and to the left), about 34 px tall. */
   function handpiece(m, o){
-    var s = "", body = "M-3.4 0 L-2.8 -14 Q-2.6 -18 -1.8 -20 L1.9 -20 Q2.7 -18 2.8 -14 L3.4 0 Z";
-    if (m.k === "dark") s += circ(0, -12, 15, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
-    s += F(body, m.c) + F("M.8 0 L1 -14 Q1.1 -18 1 -20 L1.9 -20 Q2.7 -18 2.8 -14 L3.4 0 Z", m.s) + O(body, 1.4);
-    s += L("M-3 -5.4 h6.2 M-2.9 -7.6 h5.9", .9, INK, .55);
-    var neck = "M-1.6 -20 L1.8 -20 L5.6 -25.6 L2.6 -27.4 Z";
-    s += FO(neck, m.c, 1.3) + F("M1.8 -20 L5.6 -25.6 L4.2 -26.5 L.8 -20.6 Z", m.s);
-    /* the head: a short drum across the neck's end, its bur pointing down and forward */
-    var head = "M2.6 -27.4 L5.6 -25.6 L7.2 -28.2 L4.2 -30 Z";
-    s += FO("M1.6 -27 Q1.4 -30.8 4.6 -31.6 Q8.4 -31.8 8.4 -28.2 L7.2 -26 Q4 -24.6 1.6 -27 Z", m.c, 1.4) + F("M5.6 -25.8 L8 -28.4 Q8.4 -30.6 6.6 -31.4 Q8.6 -29 7.2 -26 Z", m.s) + head.replace(/.*/, "");
-    s += L("M7 -26.4 L10.4 -22.4", 1.6) + circ(10.6, -22.2, .9, m.k === "dark" ? m.h : "#E8BE45");
-    s += L("M-1.6 -3 L-1.2 -16", 1, m.h, .9);
-    if (m.k === "antique") s += circ(-1.4, -9, .9, m.pat) + circ(1.6, -4, .7, m.pat);
-    if (m.k === "diamond") s += L("M-2.4 -2 L2 -12 M-1 -15 L2.4 -6", .7, "#FFFFFF");
-    if (m.k === "dark") s += circ(-1, -6, .5, "#FFFFFF") + circ(1.4, -12, .6, K.dmTeal) + circ(-.6, -16, .4, "#FFFFFF");
-    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(-6, -22, 2.6, "#FFFFFF", "tp-twinkle", .6);
+    var s = "", A = [4.8, -2.2], B = [-3, -21.4], C = [-6.9, -25.4], Hd = [-8.9, -27.2];
+    function unit(a, b){ var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.sqrt(dx * dx + dy * dy); return [dx / l, dy / l]; }
+    function quad(a, b, wa, wb){ var d = unit(a, b), n = [-d[1], d[0]]; return [[a[0] + n[0] * wa, a[1] + n[1] * wa], [b[0] + n[0] * wb, b[1] + n[1] * wb], [b[0] - n[0] * wb, b[1] - n[1] * wb], [a[0] - n[0] * wa, a[1] - n[1] * wa]]; }
+    function along(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
+    var d = unit(A, B), n = [-d[1], d[0]];                      // n points down and to the left: the lit side is -n
+    if (m.k === "dark") s += circ(-1, -16, 17, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
+    /* the neck first (behind the grip), then the handle, lit along its upper edge and shaded along its lower */
+    var nk = quad(B, C, 1.9, 1.7); s += FO(D2(nk), m.c, 1.4);
+    var hq = quad(A, B, 2.6, 2.1); s += F(D2(hq), m.c) + F(D2([hq[0], hq[1], along(hq[1], hq[2], .42), along(hq[0], hq[3], .42)]), m.s) + O(D2(hq), 1.5);
+    /* the coupling at the foot: a wider collar and its end cap */
+    var c0 = along(A, B, .13), cq = quad(A, c0, 3.3, 3.2); s += FO(D2(cq), m.s, 1.4) + L(seg(along(cq[0], cq[3], .5), along(cq[1], cq[2], .5)), .9, INK, .5);
+    /* the knurled grip: four bands across the handle near the neck */
+    [.58, .66, .74, .82].forEach(function(t){ var q = along(A, B, t), w = 2.6 - .5 * t; s += L(seg([q[0] + n[0] * w, q[1] + n[1] * w], [q[0] - n[0] * w, q[1] - n[1] * w]), .9, INK, .6); });
+    s += L(seg(along(hq[3], hq[2], .08), along(hq[3], hq[2], .5)).replace(/M([-\d.]+) ([-\d.]+)/, function(_, x, y){ return "M" + f(+x + n[0] * 1.1) + " " + f(+y + n[1] * 1.1); }), 1.1, m.h, .95);
+    /* the head: a short drum set across the end of the neck, its cap at the back, the bur out of its face */
+    var u = unit(C, Hd), v = [u[1], -u[0]];                    // v: the bur's way, down and to the left
+    var hp = [[Hd[0] - v[0] * 3.2 - u[0] * 2.9, Hd[1] - v[1] * 3.2 - u[1] * 2.9], [Hd[0] - v[0] * 3.2 + u[0] * 2.9, Hd[1] - v[1] * 3.2 + u[1] * 2.9], [Hd[0] + v[0] * 3.6 + u[0] * 2.9, Hd[1] + v[1] * 3.6 + u[1] * 2.9], [Hd[0] + v[0] * 3.6 - u[0] * 2.9, Hd[1] + v[1] * 3.6 - u[1] * 2.9]];
+    var bur0 = [Hd[0] + v[0] * 3.6, Hd[1] + v[1] * 3.6], bur1 = [Hd[0] + v[0] * 8.4, Hd[1] + v[1] * 8.4];
+    s += L(seg(bur0, bur1), 2.6) + L(seg(bur0, bur1), 1.1, "#E9EEF2") + circ(bur1[0], bur1[1], 1.2, m.k === "dark" ? m.h : "#E8BE45", .8);
+    s += '<path d="' + D2(hp) + '" fill="' + m.c + '" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round"/>' + F(D2([hp[1], hp[2], along(hp[2], hp[3], .45), along(hp[1], hp[0], .45)]), m.s) +
+      '<path d="' + D2(hp) + '" fill="none" stroke="' + INK + '" stroke-width="1.5" stroke-linejoin="round"/>';
+    s += L(seg([Hd[0] - v[0] * 2 + u[0] * 1.5, Hd[1] - v[1] * 2 + u[1] * 1.5], [Hd[0] + v[0] * 2 + u[0] * 1.5, Hd[1] + v[1] * 2 + u[1] * 1.5]), 1, m.h, .95);
+    if (m.k === "antique") s += circ(1.6, -9.6, .9, m.pat) + circ(-.4, -15.6, .7, m.pat);
+    if (m.k === "diamond") s += L("M3.4 -5.4 L-.6 -13.6 M1.4 -8.2 L-2.4 -19", .7, "#FFFFFF");
+    if (m.k === "dark") s += circ(2.2, -8, .5, "#FFFFFF") + circ(-.6, -15, .6, K.dmTeal) + circ(-2.4, -20, .4, "#FFFFFF");
+    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(6, -27, 2.6, "#FFFFFF", "tp-twinkle", .6);
     return s;
   }
   function statue(x, y, z, tier, level, o){
@@ -1419,7 +1510,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     if (o.snow) s += F(D([[x - .3, y - .3, zt], [x + .3, y - .3, zt], [x + .3, y + .3, zt], [x - .3, y + .3, zt]]), "#FFFFFF");
     var t = P(x, y, zt);
     s += T(t[0], t[1] - 1, handpiece(m, o));
-    var glint = L("M" + f(t[0] - 4) + " " + f(t[1] - 6) + " l6 -14", 2.2, "#FFFFFF") + dmStar(t[0] + 6, t[1] - 30, 4, "#FFFFFF", "");
+    var glint = L("M" + f(t[0] + 3) + " " + f(t[1] - 7) + " l-5 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
     return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
   /* mastery: one pennant per hub medal in the bunting along the home's eaves (Bronze, Silver, Gold; a Crown is gold with
@@ -1442,8 +1533,8 @@ window.SH_PLACE = (function placeKit(INK, C){
   }
 
   /* ------------------------------------------------------------------ the fixed pieces ----------------------------- */
-  function toothbrush(x, y){
-    var b = P(x, y, 0);
+  function toothbrush(x, y, z){
+    var b = P(x, y, z || 0);
     var s = T(b[0], b[1], '<g transform="rotate(-6) scale(.62)">' +
       FO("M-4.4 0 C-4.8 -16 -4.2 -30 -2.4 -42 L-1.6 -54 L1.6 -54 L2.4 -42 C4.2 -30 4.8 -16 4.4 0 Z", "#8FD3F5", 2.4) + F("M-2.8 -12 C-3 -20 -2.6 -26 -1.8 -32 L1.8 -32 C2.6 -26 3 -20 2.8 -12 Z", K.blue) +
       FO("M-3 -54 L-3 -73 Q-3 -76.6 0 -76.6 Q3 -76.6 3 -73 L3 -54 Z", "#8FD3F5", 2.4) +
@@ -1586,7 +1677,7 @@ window.SH_PLACE = (function placeKit(INK, C){
       lights += drawn.lights;
       items.push({ z: FIX.tree[0] + FIX.tree[1], s: sceneTree(sc, so) });
       var st = home.statue || FIX.statue, stt = statue(st[0], st[1], st[2] || 0, tier, o.level || 1, so); items.push({ z: st[0] + st[1] + (st[2] ? 1.2 : .3), s: stt.s }); lights += stt.lights;
-      var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1]) });
+      var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
       var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
       if (H === "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
@@ -1803,6 +1894,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     owl: { n: "An owl", does: "looks round and blinks", say: "Who studies at night? We do." },
     yeti: { n: "A rock", does: "a yeti peeks out and waves", say: "Was that a yeti? Very white teeth." },
     alien: { n: "A crater", does: "a friend pops up and waves", say: "A friend from the next planet over." },
+    earth: { n: "The Earth", does: "a rocket goes round it", say: "That's home. The other home. Everyone I floss for lives there." },
     balloon: { n: "A hot-air balloon", does: "rises and dips", say: "Up, up and away." },
     home: { n: "Home", does: "a happy wobble", say: "Home sweet home. No sweets, though." },
     brush: { n: "The toothbrush", does: "wiggles", say: "My toothbrush says hi. It talks now, apparently." },
@@ -1823,7 +1915,7 @@ window.SH_PLACE = (function placeKit(INK, C){
     telescope: { n: "The telescope", does: "finds a star", say: "Found one! Calling it Molar Major." },
     timmy: { n: "Timmy", does: "a flip", say: "Wheee!" }
   };
-  var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s",
+  var EGG_ANIM = { sun: "tp-pop 2.6s", moon: "tp-cow 2.4s ease-in-out", cloud: "tp-pop 2.2s", stars: "tp-shoot 1.4s ease-out", neighbor: "tp-pop 2.6s", whale: "tp-peek 2.6s", yeti: "tp-peek 2.6s", alien: "tp-peek 2.6s", earth: "tp-pop 2.6s",
     home: "tp-pop 1.8s", statue: "tp-pop 2s", tree: "tp-drop 2s ease-in", brush: "tp-pop 1.8s", garden: "tp-jump 1.8s", pool: "tp-splash 1.2s ease-out", fountain: "tp-geyser 2s", doghouse: "tp-peek 2.4s",
     mailbox: "tp-jump 2.2s", sandcastle: "tp-peek 2.4s", campfire: "tp-sparks 1.6s ease-out", hotspring: "tp-sparks 2s ease-out", telescope: "tp-pop 2.4s" };
   var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "sun"];
