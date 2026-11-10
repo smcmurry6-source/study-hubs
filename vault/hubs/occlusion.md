@@ -94,6 +94,9 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   `node tools/figures/site/build.mjs` from `tools/figures/site/`.
 - The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
 - Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
+- The "which statement" formats (2026-11-10) reach `next/content/` through the build, and their choices shuffle
+  there too, but the new engine's type filter (`FMTS` in `widget/hub.js`) doesn't list `which` / `whichf` yet: add
+  `["which", "Which statement is true"], ["whichf", "Which statement is false"]` before the release.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
   the page sends you to the live hub, and a plain static server would reach the class's data.
 
