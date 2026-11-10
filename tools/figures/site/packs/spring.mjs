@@ -1,0 +1,334 @@
+/* The Spring set of Timmy's place (tools/figures/site/sets.mjs lists its eight pieces; the shop's catalog has the same
+   rows). One self-contained function: the build hands it the kit's tools (place.mjs, TOOLS) and pastes its source into
+   tools/preview/design/place.js, so it uses nothing from outside itself but T. Structure: packs/thanksgiving.mjs.
+
+   - home:    flowerpot-house, a giant terracotta flowerpot on its saucer, flowers and leaves growing out of it for a roof;
+   - scene:   cherry-blossoms, pink trees behind the hill and on its slopes, a bough across the corner, petals everywhere
+              (the scene's own tree is dressed in blossom by a prop drawn right over it);
+   - yard:    birdbath (a robin on the rim), beehives (stacked boxes, bees), greenhouse (plants inside, lit at night);
+   - outfits: rain-slicker (hat, collar, a pair of boots in hand), beekeeper (veiled hat, bees), butterfly-wings.
+   Never sugar (no honey as a treat). No ids, gradients, filters, text, images or emoji: flat fills and ink outlines. */
+export function pack(T){
+  var K = T.K, P = T.P, D = T.D, f = T.f, F = T.F, O = T.O, L = T.L, FO = T.FO, G = T.G, circ = T.circ, ell = T.ell, box = T.box, cyl = T.cyl, INK = T.INK;
+  var p = T.p, O2 = T.O2, O3 = T.O3, O4 = T.O4;
+  var PINK = ["#FFD9E5", "#F9B4CB", "#EE8FB0"], TERRA = { c: "#DB7B52", s: "#B95C3A" }, DARK = "#3B2E3A";
+
+  /* a five-petal blossom, a loose petal, a leaf (pointing up, turned a degrees), a bee, a small butterfly: all in screen space */
+  function blossom(x, y, r, c, mid, sw){
+    var s = ""; sw = sw == null ? .7 : sw;
+    for (var i = 0; i < 5; i++){ var a = i * Math.PI * 2 / 5 - Math.PI / 2; s += circ(x + Math.cos(a) * r * .6, y + Math.sin(a) * r * .6, r * .5, c, sw); }
+    return s + circ(x, y, r * .34, mid || "#FFE27A", sw * .8);
+  }
+  function petalD(x, y, k){ return "M" + f(x - 2.4 * k) + " " + f(y) + " q" + f(2.4 * k) + " " + f(-2.3 * k) + " " + f(4.8 * k) + " 0 q" + f(-2.4 * k) + " " + f(2.3 * k) + " " + f(-4.8 * k) + " 0z"; }
+  function petal(x, y, a, c, k){ return '<path transform="rotate(' + f(a) + " " + f(x) + " " + f(y) + ')" d="' + petalD(x, y, k || 1) + '" fill="' + c + '"/>'; }
+  function falling(x, y, c, delay){ return '<path class="tp-leaf" style="animation-delay:' + f(delay) + 's" d="' + petalD(x, y, 1.1) + '" fill="' + c + '" stroke="' + INK + '" stroke-width=".5"/>'; }
+  function leaf(x, y, len, w, a, c, vein){
+    return '<g transform="translate(' + f(x) + " " + f(y) + ") rotate(" + f(a) + ')">' + FO("M0 0 Q" + f(w) + " " + f(-len * .45) + " 0 " + f(-len) + " Q" + f(-w) + " " + f(-len * .45) + " 0 0 Z", c, 1.1) + L("M0 -1.4 V" + f(-len + 2.4), .8, vein || "#3F8A4A", .8) + "</g>";
+  }
+  function bee(x, y, k, d){
+    k = k || 1; d = d || 1;
+    return ell(x - 1.4 * k * d, y - 3 * k, 2.7 * k, 1.9 * k, "#FFFFFF", .6 * k, .92) + ell(x + 1.3 * k * d, y - 3.5 * k, 2.5 * k, 1.8 * k, "#EAF6FF", .6 * k, .92) +
+      ell(x, y, 3.9 * k, 2.8 * k, "#FFD23F", .9 * k) +
+      L("M" + f(x - 1.6 * k * d) + " " + f(y - 2.5 * k) + " q" + f(.9 * k * d) + " " + f(2.5 * k) + " 0 " + f(5 * k) + " M" + f(x + .6 * k * d) + " " + f(y - 2.7 * k) + " q" + f(.9 * k * d) + " " + f(2.7 * k) + " 0 " + f(5.4 * k), 1.3 * k, DARK) +
+      circ(x + 3.6 * k * d, y - .2 * k, 1.9 * k, DARK) + L("M" + f(x - 3.9 * k * d) + " " + f(y) + " h" + f(-1.7 * k * d), .9 * k);
+  }
+  function flutter(x, y, k, c, c2){
+    return ell(x - 3.1 * k, y - 1.6 * k, 3.3 * k, 2.6 * k, c, .8) + ell(x + 3.1 * k, y - 1.6 * k, 3.3 * k, 2.6 * k, c, .8) + ell(x - 2.3 * k, y + 2 * k, 2.2 * k, 1.8 * k, c2, .7) + ell(x + 2.3 * k, y + 2 * k, 2.2 * k, 1.8 * k, c2, .7) +
+      L("M" + f(x) + " " + f(y - 3.4 * k) + " V" + f(y + 3.4 * k), 1.4 * k) + L("M" + f(x) + " " + f(y - 3.4 * k) + " l" + f(-1.6 * k) + " " + f(-2.4 * k) + " M" + f(x) + " " + f(y - 3.4 * k) + " l" + f(1.6 * k) + " " + f(-2.4 * k), .7);
+  }
+  /* a cherry tree in bloom, its foot at (x, y) */
+  function cherry(x, y, k, o, seed, far){
+    var c = o.snow ? ["#FBF3F6", "#E6D5DD"] : o.night ? ["#C890AE", "#A5708F"] : far ? ["#FBC9DA", "#F3A8C3"] : [PINK[1], PINK[2]];
+    var c2 = o.snow ? ["#FFFFFF", "#EADCE3"] : o.night ? ["#D8A5BF", "#B17E9B"] : far ? ["#FFE0EA", "#F9BFD3"] : [PINK[0], PINK[1]];
+    var wood = o.night ? "#5A3F38" : "#7A4E3C", s = far ? "" : ell(x + 1, y + 1, 11 * k, 3.6 * k, "#000", 0, .1);
+    var br = "M" + f(x) + " " + f(y - 13 * k) + " l" + f(-7 * k) + " " + f(-7 * k) + " M" + f(x + .6 * k) + " " + f(y - 14 * k) + " l" + f(7 * k) + " " + f(-8 * k);
+    s += FO("M" + f(x - 2 * k) + " " + f(y) + " q" + f(.8 * k) + " " + f(-9 * k) + " " + f(-.6 * k) + " " + f(-17 * k) + " h" + f(4.4 * k) + " q" + f(-1.4 * k) + " " + f(8 * k) + " " + f(.4 * k) + " " + f(17 * k) + " z", wood, 1.3);
+    s += L(br, 2.6 * k) + L(br, 1.3 * k, wood);
+    s += T.canopy(x - 7.5 * k, y - 22 * k, 9.5 * k, c, seed) + T.canopy(x + 8 * k, y - 23 * k, 9 * k, c, seed + 1) + T.canopy(x, y - 31 * k, 10.5 * k, c2, seed + 2);
+    if (!far) [[-9, -20], [7, -26], [1, -34], [-3, -25], [11, -19]].forEach(function(q, i){ s += circ(x + q[0] * k, y + q[1] * k, 1.5 * k, i % 2 ? "#FFFFFF" : "#E0708F"); });
+    return s;
+  }
+
+  /* ------------------------------------------------------------------ the home: a flowerpot house ------------------- */
+  var homes = {
+    "flowerpot-house": {
+      note: "A giant terracotta flowerpot on its saucer, a sunflower, a tulip and a heap of leaves for a roof",
+      ups: ["flag", "paint"], upn: { flag: "A Timmy flag among the flowers", paint: "Pot glaze" },
+      door: [5.5, 7.82], brush: [8.9, 6.9], statue: [2.7, 9.4], spots: { door: [5.5, 9.6] }, h: 10.2,
+      eaves: [[3.3, 7.7, 4.6], [7.7, 3.3, 4.6], 22], round: [5.5, 5.5, 2.8], base: T.arcPts(5.5, 5.5, 2.9, -40, 135, 14), block: [2.4, 2.5, 8.7, 8.7],
+      draw: function(o){
+        var u = o.up, glazed = o.paint && o.paint !== "cream", pc = glazed ? T.BOLD[o.paint] : TERRA, rc = glazed ? pc : { c: "#E88F66", s: "#C4683F" };
+        var s = "", lights = "", cx = 5.5, cy = 5.5, zb = .28, z1 = 4.5, z2 = 5.4;
+        var rAt = function(z){ return 2.3 + .55 * (z - zb) / (z1 - zb); };
+        var arc = function(z, r){ var c = P(cx, cy, z); return "M" + f(c[0] - T.RX(r)) + " " + f(c[1]) + " A" + f(T.RX(r)) + " " + f(T.RY(r)) + " 0 0 0 " + f(c[0] + T.RX(r)) + " " + f(c[1]); };
+        /* the saucer, the pot and its rim */
+        s += cyl(cx, cy, 0, 2.7, zb, 2.85, "#C96A44", "#A8502F", "#B95C3A", { sw: 1.6, si: 1 });
+        s += cyl(cx, cy, zb, 2.3, z1, 2.85, pc.c, pc.s, pc.s, { open: true });
+        s += L(arc(z1 - .16, 2.84), 3, pc.s, .85) + L(arc(3.55, rAt(3.55)), 1, INK, .28) + L(arc(3.3, rAt(3.3)), 1, INK, .2);
+        var hl = P(cx - 1.55, cy + 1.3, 4.0), hb = P(cx - 1.35, cy + 1.1, 1.2); s += T.HI("M" + f(hl[0]) + " " + f(hl[1]) + " L" + f(hb[0]) + " " + f(hb[1]), 2.2);
+        /* a big round window with a flower box, a little one over the door */
+        var wn = function(a, z, rx, ry, boxed){
+          var r = rAt(z), c = P(cx + Math.cos(a * Math.PI / 180) * r, cy + Math.sin(a * Math.PI / 180) * r, z);
+          var pane = function(col){ return ell(c[0], c[1], rx, ry, col, 1.2) + L("M" + f(c[0] - rx) + " " + f(c[1]) + " h" + f(rx * 2) + " M" + f(c[0]) + " " + f(c[1] - ry) + " v" + f(ry * 2), 1); };
+          s += ell(c[0], c[1], rx + 1.6, ry + 1.6, "#FFFDF6", 1.4) + pane(o.night ? K.lit : K.glass);
+          if (!o.night) s += L("M" + f(c[0] - rx * .6) + " " + f(c[1] - ry * .3) + " l" + f(rx * .34) + " " + f(-ry * .34), 1.2, "#FFFFFF");
+          if (boxed) s += FO("M" + f(c[0] - rx - 2) + " " + f(c[1] + ry + 1.2) + " h" + f(rx * 2 + 4) + " l-.8 3 h" + f(-rx * 2 - 2.4) + " z", K.wood, 1.1) + circ(c[0] - 4, c[1] + ry + .4, 1.8, "#FF8FB1", .8) + circ(c[0], c[1] + ry, 1.8, "#FFE27A", .8) + circ(c[0] + 4, c[1] + ry + .4, 1.8, "#B08CFF", .8);
+          if (o.night) lights += T.glowAt(c[0], c[1], rx + 5) + pane(K.lit);
+        };
+        wn(40, 2.55, 5.6, 6, true); wn(91, 3.52, 3.3, 3.6, false);
+        var dp = P(5.5, cy + 2.32, zb);
+        s += T.roundDoor(dp[0], dp[1], 13, 18.4, o.paint === "mint" ? "#FFF7EC" : "#7CC46A", o.paint === "mint" ? "#D8CCB4" : "#4F9A52");
+        s += cyl(cx, cy, z1, 3.05, z2, 3.15, rc.c, rc.s, rc.c);
+        var tc = P(cx, cy, z2), x = tc[0], y = tc[1];
+        s += ell(x, y, T.RX(2.8), T.RY(2.8), "#6E4A36", 1.3);
+        /* what grows out of it: tall leaves at the back, a heap of green, three big flowers, leaves and a vine over the rim */
+        var g1 = o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#4F8E58", "#3A6E46"] : ["#7CC46A", "#4F9A52"], g2 = o.snow ? ["#FFFFFF", "#E3EDF6"] : o.night ? ["#5C9C62", "#44794E"] : ["#93D37E", "#5DA45A"], lf = o.night ? "#44794E" : "#5DA45A";
+        s += leaf(x - 12, y - 14, 30, 6.5, -22, lf) + leaf(x + 13, y - 14, 28, 6.5, 24, lf) + leaf(x - 27, y - 2, 22, 5.5, -52, lf) + leaf(x + 28, y - 1, 21, 5.5, 54, lf);
+        var stem = function(d){ return L(d, 3.4) + L(d, 1.7, "#4F9A52"); };
+        s += stem("M" + f(x - 18) + " " + f(y - 8) + " Q" + f(x - 20) + " " + f(y - 22) + " " + f(x - 25) + " " + f(y - 30)) + stem("M" + f(x + 20) + " " + f(y - 6) + " Q" + f(x + 23) + " " + f(y - 16) + " " + f(x + 28) + " " + f(y - 22)) + stem("M" + f(x) + " " + f(y - 20) + " Q" + f(x + 1) + " " + f(y - 30) + " " + f(x - 1) + " " + f(y - 40));
+        s += T.canopy(x - 17, y + 1, 16, g1, 41) + T.canopy(x + 18, y + 2, 15, g1, 42) + T.canopy(x, y - 8, 18, g2, 43);
+        [[-22, 2, "#FFFFFF"], [-9, -14, "#FFC0CD"], [9, -3, "#FFFFFF"], [22, 6, "#FFC0CD"], [-4, 6, "#FFE27A"], [14, -15, "#FFFFFF"]].forEach(function(q){ s += blossom(x + q[0], y + q[1], 3.3, o.snow ? "#FFFFFF" : q[2], "#F2A93B"); });
+        /* the tulip, the bellflower and the sunflower */
+        var tx = x - 25, ty = y - 31;
+        s += FO("M" + f(tx - 6.4) + " " + f(ty - 7.4) + " l3.4 4 3 -6.2 3 6.2 3.4 -4 q2 13.6 -6.4 14.4 q-8.4 -.8 -6.4 -14.4 z", "#FF8FB1", 1.3) + L("M" + f(tx) + " " + f(ty - 4) + " v8", .9, "#E0708F");
+        s += blossom(x + 28, y - 24, 8, "#B08CFF", "#FFE27A", 1.1);
+        var sx = x - 1, sy = y - 42;
+        for (var i = 0; i < 11; i++){ var a = i * Math.PI * 2 / 11; s += circ(sx + Math.cos(a) * 7.4, sy + Math.sin(a) * 7.4, 3.5, "#FFD23F", .9); }
+        s += circ(sx, sy, 5.6, "#8A5A3A", 1.2) + circ(sx - 1.4, sy - 1.4, 1.2, "#B98559") + circ(sx + 1.8, sy + 1, .9, "#B98559");
+        s += leaf(x - 24, y + 13, 13, 4.4, 196, g1[0]) + leaf(x - 5, y + 18, 12, 4.2, 172, g2[0]) + leaf(x + 11, y + 17, 13, 4.4, 160, g1[0]);
+        var vine = "M" + f(x + 31) + " " + f(y + 10) + " q5 8 2 16 q-3 8 1 16";
+        s += L(vine, 2.6) + L(vine, 1.3, "#4F9A52") + leaf(x + 34, y + 21, 7, 2.8, 70, g2[0]) + leaf(x + 31, y + 31, 7, 2.8, -80, g1[0]) + leaf(x + 34, y + 41, 7, 2.8, 110, g2[0]);
+        if (o.snow) s += ell(x, y - 21, 12, 3.6, "#FFFFFF", 0) + ell(x - 19, y - 10, 8, 2.8, "#FFFFFF", 0) + ell(x + 20, y - 8, 8, 2.8, "#FFFFFF", 0);
+        if (u.flag) s += T.flagOn(6.42, 4.5, 7.3, 2.6);
+        if (o.night) lights += T.firefly(152, 112, .4) + T.firefly(246, 96, 1.5) + T.firefly(228, 60, 2.3);
+        return { body: s, lights: lights };
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the scene: a cherry blossom grove ------------- */
+  var scenes = {
+    "cherry-blossoms": T.hillScene({ farLift: 8,
+      note: "Pink trees in bloom all round the hill, petals drifting down and lying on the grass",
+      path: "stones", treeKind: "round", lamp: "lantern", grade: ["#FFC4D8", .07],
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5E9372", "#528566", "#467658", "#355E45"] : ["#BDE5A6", "#AEDB97", "#9BCE86", "#6FB068"]; },
+      sky: function(o){
+        var s = "";
+        if (o.night) s = T.bands(["#1D1B4A", "#2A2560", "#3B3075", "#523E86"], 0, 300) + T.moon(92, 42) + T.starField(13, 26, 130);
+        else s = T.bands(["#BDE4F8", "#CFEBF9", "#E6F2FA", "#FCEAF1"], 0, 300) + T.sun(84, 40) + T.cloud(150, 24, .7) + T.cloud(250, 34, .5);
+        var pc = o.night ? ["#B88AA4", "#C9A0B6"] : [PINK[1], PINK[0]];
+        [[122, 62, 20], [136, 84, 80], [262, 66, 140], [282, 96, 50], [64, 96, 110], [318, 122, 30], [104, 110, 160], [240, 52, 100]].forEach(function(q, i){ s += petal(q[0], q[1], q[2], pc[i % 2], 1.1); });
+        return s;
+      },
+      far: function(o){
+        var c = o.snow ? ["#EEF5FB", "#DCEAF6"] : o.night ? ["#4B7A66", "#3F6C5A"] : ["#D2EDC2", "#BCE2AB"], s = "", top = "M0 150 Q56 118 126 134 Q200 104 284 130 Q338 110 400 132";
+        s += F(top + " V300 H0 Z", c[0]) + L(top, 1.4, INK, .5);
+        /* a far row of small trees on the next ridge, a nearer ridge, then the grove itself, standing just behind the crest */
+        [[40, 136], [58, 131], [76, 130], [94, 131], [112, 133], [296, 126], [314, 122], [332, 119], [350, 120], [368, 124]].forEach(function(q, i){ s += cherry(q[0], q[1], .52, o, 70 + i * 3, true); });
+        s += F("M0 186 Q70 160 140 174 Q230 160 300 178 Q360 164 400 176 V300 H0 Z", c[1]);
+        [[52, 1.0, 10], [76, 1.25, 4], [102, 1.05, 12], [126, 1.3, 5], [146, 1.0, 12], [254, 1.0, 12], [274, 1.3, 5], [298, 1.05, 12], [322, 1.25, 4], [346, 1.0, 10]].forEach(function(q, i){ s += cherry(q[0], T.HILL_TOP(q[0]) + q[2], q[1], o, 110 + i * 3); });
+        return s;
+      },
+      flat: function(o, on){
+        if (o.snow) return "";
+        var cols = o.night ? ["#B88AA4", "#A77892", "#C9A0B6"] : [PINK[0], PINK[1], "#FFFFFF"];
+        return T.scatter(212, 9, on, function(sx, sy){ return ell(sx, sy, 9, 3.2, o.night ? "#8FA58E" : "#D9EBC0", 0, .8) + petal(sx - 4, sy - .6, 20, cols[0], 1.1) + petal(sx + 2, sy + .8, 150, cols[1], 1) + petal(sx + 5, sy - 1, 80, cols[0], .9) + petal(sx - 1, sy - 1.6, 110, cols[2], .9); }).join("") +
+          T.scatter(211, 80, on, function(sx, sy, i, R){ return petal(sx, sy, R() * 180, cols[i % 3], .75 + R() * .5); }).join("") +
+          T.scatter(213, 12, on, function(sx, sy){ return T.tuft(sx, sy, o.night ? "#3D7449" : "#6CB060", .9); }).join("");
+      },
+      props: function(o, on){
+        /* trees on the slopes, each over its own fallen petals; and the scene's tree by the house, dressed in blossom */
+        var out = T.scatter(214, 5, on, function(sx, sy, i, R, x, y){
+          var under = o.snow ? "" : ell(sx, sy + 1, 15, 5, o.night ? "#A77892" : "#F9C6D6", 0, .6) + petal(sx - 9, sy + 2, 30, o.night ? "#C9A0B6" : PINK[0], 1) + petal(sx + 8, sy + 3, 140, o.night ? "#C9A0B6" : "#FFFFFF", 1) + petal(sx + 2, sy + 4.4, 80, o.night ? "#B88AA4" : PINK[1], 1);
+          return { x: x, y: y, s: under + cherry(sx, sy, .95 + R() * .25, o, 150 + i * 3) };
+        });
+        var b = P(T.FIX.tree[0], T.FIX.tree[1], 0), cy = b[1] - 40;
+        var c = o.snow ? ["#FBF3F6", "#E6D5DD"] : o.night ? ["#C890AE", "#A5708F"] : [PINK[1], PINK[2]], c2 = o.snow ? ["#FFFFFF", "#EADCE3"] : o.night ? ["#D8A5BF", "#B17E9B"] : [PINK[0], PINK[1]];
+        var dress = T.canopy(b[0] - 8, cy + 8, 17.6, c, 21) + T.canopy(b[0] + 9, cy + 6, 16.6, c, 22) + T.canopy(b[0], cy - 6, 18.6, c2, 23);
+        [[-13, 6], [7, -9], [13, 9], [-3, 14], [-12, -8], [3, 2], [-4, -14]].forEach(function(q, i){ dress += blossom(b[0] + q[0], cy + q[1], 2.8, i % 2 ? "#FFFFFF" : PINK[0], "#E0708F", .6); });
+        if (!o.snow) dress += falling(b[0] + 18, cy + 26, PINK[1], 0) + falling(b[0] - 22, cy + 30, PINK[0], 1.6) + falling(b[0] + 4, cy + 36, "#FFFFFF", 3.1);
+        out.push({ x: T.FIX.tree[0], y: T.FIX.tree[1] + .02, s: dress });
+        return out;
+      },
+      fg: function(o){
+        /* a bough in bloom across the top corner, and petals coming down */
+        var wood = o.night ? "#5A3F38" : "#7A4E3C", s = "", bough = "M364 2 C340 8 318 16 300 30 C288 40 280 50 268 54 M318 18 C312 30 314 44 306 58 M342 8 C332 0 318 -3 304 0 M286 42 C280 36 272 34 264 36";
+        s += L(bough, 5.8) + L(bough, 3.2, wood);
+        var bl = o.snow ? ["#FFFFFF", "#FBF3F6"] : o.night ? ["#D8A5BF", "#C890AE"] : [PINK[0], PINK[1]];
+        [[300, 30, 5.4], [286, 42, 4.6], [268, 55, 5.2], [306, 59, 4.8], [314, 36, 4.2], [304, 1, 4.6], [324, 13, 4.8], [342, 9, 4.2], [322, 0, 3.6], [291, 31, 3.6], [277, 48, 3.6], [311, 47, 3.8], [334, 20, 4], [350, 4, 4.4], [264, 36, 4.2], [274, 35, 3.2]].forEach(function(q, i){ s += blossom(q[0], q[1], q[2], bl[i % 2], "#E0708F", .7); });
+        [[296, 20], [330, 4], [282, 54], [316, 28]].forEach(function(q){ s += circ(q[0], q[1], 1.7, o.night ? "#A5708F" : PINK[2], .6); });
+        if (!o.snow) [[262, 76, 0], [292, 92, 1.3], [132, 66, 2.2], [108, 92, .7], [330, 116, 3], [70, 116, 3.8], [236, 44, 1.9]].forEach(function(q, i){ s += falling(q[0], q[1], i % 2 ? bl[0] : bl[1], q[2]); });
+        return s;
+      }
+    })
+  };
+
+  /* ------------------------------------------------------------------ the yard -------------------------------------- */
+  function robin(x, y, k, d){
+    var q = function(a, b){ return f(x + a * k * d) + " " + f(y + b * k); };
+    return L("M" + q(-1, 0) + " L" + q(-1, -2.6) + " M" + q(1.6, 0) + " L" + q(1.6, -2.6), 1.1, "#8A5A3A") +
+      FO("M" + q(-5, -5.6) + " L" + q(-11, -3.4) + " L" + q(-5.6, -8) + " Z", "#6E625C", .9) +
+      FO("M" + q(-6, -6) + " C" + q(-6.4, -12) + " " + q(-1, -13.4) + " " + q(2.4, -13) + " C" + q(6.6, -12.6) + " " + q(7.4, -8) + " " + q(5.4, -4.8) + " C" + q(3.4, -1.6) + " " + q(-4.8, -1.4) + " " + q(-6, -6) + " Z", "#8C7F78", 1.1) +
+      F("M" + q(6, -7.4) + " C" + q(6.2, -3.8) + " " + q(2, -2) + " " + q(-2.6, -2.4) + " C" + q(-1.2, -6) + " " + q(2.4, -8.6) + " " + q(6, -7.4) + " Z", "#F28C4E") +
+      FO("M" + q(6.7, -10.6) + " L" + q(10.4, -9.4) + " L" + q(6.9, -8.4) + " Z", "#F2C230", .7) + circ(x + 4.1 * k * d, y - 10.6 * k, .95 * k, INK) +
+      L("M" + q(-3.8, -7.6) + " Q" + q(-1, -4.8) + " " + q(1.8, -6.8), 1, "#5E534E");
+  }
+  function hive(x, y, w, layers, snow){
+    var s = box(x + .1, y + .1, 0, w - .2, w - .2, .22, { top: K.wood, left: K.wood, right: K.woodShade }, { sw: 1.3, si: .9 }), z = .22;
+    layers.forEach(function(q, i){
+      s += box(x, y, z, w, w, q[2], { top: q[0], left: q[0], right: q[1] }, { sw: 1.5, si: 1 });
+      s += L(D([[x + w * .36, y + w, z + q[2] * .62], [x + w * .64, y + w, z + q[2] * .62]], true), 1.7, INK, .5) + L(D([[x + w, y + w * .36, z + q[2] * .62], [x + w, y + w * .64, z + q[2] * .62]], true), 1.7, INK, .4);
+      if (!i) s += FO(D(T.onY(y + w, T.rectUV(x + w * .22, x + w * .78, z + .05, z + .2))), DARK, .8) + box(x + w * .16, y + w, z - .05, w * .68, .24, .06, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.1, si: .7 });
+      z += q[2];
+    });
+    s += box(x - .1, y - .1, z, w + .2, w + .2, .17, { top: snow ? "#FFFFFF" : "#E6EBEF", left: "#CDD5DC", right: "#A9B3BE" }, { sw: 1.5, si: 1 });
+    return s;
+  }
+  /* the greenhouse's panes, for the drawing and for its light at night */
+  var GH = (function(){
+    var x0 = .35, x1 = 3.15, y0 = .55, y1 = 2.85, zk = .38, zw = 2.15, ym = 1.7, zr = 3.3;
+    return { x0: x0, x1: x1, y0: y0, y1: y1, zk: zk, zw: zw, ym: ym, zr: zr,
+      front: T.onY(y1, T.rectUV(x0, x1, zk, zw)), gable: T.onX(x1, [[y0, zk], [y1, zk], [y1, zw], [ym, zr], [y0, zw]]),
+      roof: [[x0 - .1, y1 + .12, zw - .1], [x1 + .1, y1 + .12, zw - .1], [x1 + .1, ym, zr], [x0 - .1, ym, zr]] };
+  })();
+  var yard = {
+    "birdbath": {
+      note: "A stone birdbath with a robin on its rim", spot: [3.3, 3.4],
+      egg: { n: "The birdbath", does: "the robin splashes", say: "Splash! Birds have no teeth at all. You do, so brush them." }, anim: "tp-jump 1.8s",
+      draw: function(o){
+        var s = ell.apply(null, P(1.9, 2.0, 0).concat([26, 10, "#1B2A3A", 0, .1])), st = { sw: 1.5, si: 1 };
+        s += cyl(1.8, 1.8, 0, 1.0, .24, .88, K.stone, K.stoneShade, "#E6EBF0", st) + cyl(1.8, 1.8, .24, .46, 2.3, .3, K.stone, K.stoneShade, K.stone, { sw: 1.5, si: 1, open: true });
+        s += cyl(1.8, 1.8, 1.1, .4, 1.3, .4, "#E6EBF0", K.stoneShade, "#E6EBF0", { sw: 1.2, si: .8 }) + cyl(1.8, 1.8, 2.3, .5, 2.5, .56, "#E6EBF0", K.stoneShade, "#E6EBF0", { sw: 1.3, si: .9 });
+        s += cyl(1.8, 1.8, 2.5, .62, 3.2, 1.6, "#E6EBF0", K.stoneShade, K.stone, st);
+        var w = P(1.8, 1.8, 3.2);
+        s += ell(w[0], w[1] + .8, T.RX(1.33), T.RY(1.33), o.night ? "#4A93C4" : K.water, 1.1) + G("tp-water", L("M" + f(w[0] - 8) + " " + f(w[1] - 1) + " q3 -1.6 6 0 M" + f(w[0] + 2) + " " + f(w[1] + 3.4) + " q3 -1.6 6 0", 1.2, "#FFFFFF", .85));
+        if (o.snow) s += ell(w[0] + 11, w[1] + 5, 6, 2, "#FFFFFF", 0);
+        var r = P(1.8 + 1.56 * Math.cos(2.0), 1.8 + 1.56 * Math.sin(2.0), 3.2);
+        s += robin(r[0], r[1] + .6, 1.15, 1);
+        /* spring round its foot */
+        s += T.tuft.apply(null, P(.8, 2.5, 0).concat([o.night ? "#3D7449" : "#5DA45A", 1.1])) + T.tulip(P(.75, 2.75, 0), 8, "#FF8FB1") + T.tulip(P(1.25, 3.05, 0), 6.4, "#FFD23F") + T.daisyOn(P(3.0, 1.5, 0), 7, "#FFFFFF") + T.tuft.apply(null, P(2.9, 1.9, 0).concat([o.night ? "#3D7449" : "#5DA45A", 1]));
+        return s;
+      },
+      bits: function(){
+        var w = P(1.8, 1.8, 3.2), s = "";
+        [[-12, -6], [-5, -11], [3, -8], [10, -12], [15, -4], [-17, -1]].forEach(function(q){ s += FO("M" + f(w[0] + q[0]) + " " + f(w[1] + q[1] - 2.6) + " q-2.2 3.2 0 4.6 q2.2 -1.4 0 -4.6 z", "#A9E1F7", .7); });
+        return s + L("M" + f(w[0] - 16) + " " + f(w[1] + 4) + " q-4 -3 -3 -8 M" + f(w[0] + 14) + " " + f(w[1] + 5) + " q5 -3 4 -8", 1.2, "#FFFFFF", .9);
+      }
+    },
+    "beehives": {
+      note: "Two painted hives, boxes stacked on their stands, the bees coming and going", spot: [3.35, 3.4],
+      egg: { n: "The beehives", does: "the bees come out for a look", say: "Bees shape wax with their mandibles. Your lower jaw is a mandible too." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var s = ell.apply(null, P(1.9, 2.0, 0).concat([31, 11, "#1B2A3A", 0, .1]));
+        s += hive(.3, 1.0, 1.5, [["#FFFDF6", "#E6DCC6", .8], ["#FFE08A", "#E0B94E", .8], ["#BFE3F5", "#8FC1DC", .56]], o.snow);
+        s += hive(2.05, .5, 1.35, [["#C9F0DD", "#93D3B4", .78], ["#FFD0DC", "#E9A3B7", .6]], o.snow);
+        s += T.daisyOn(P(.45, 3.1, 0), 6.4, "#FFFFFF") + T.flower.apply(null, P(1.0, 3.35, 0).concat(["#B08CFF", 1.2])) + T.daisyOn(P(2.2, 2.55, 0), 6, "#FFE27A") + T.flower.apply(null, P(2.75, 2.5, 0).concat(["#FF8FB1", 1.2])) + T.tuft.apply(null, P(1.6, 3.2, 0).concat([o.night ? "#3D7449" : "#5DA45A", 1]));
+        if (o.night) return s;
+        var a = P(1.2, 2.75, .7), b = P(2.4, 2.1, 2.3), c = P(.2, 2.6, 2.7), d = P(3.2, 1.5, 1.2);
+        var trail = L("M" + f(b[0] - 4) + " " + f(b[1] + 1) + " q-8 6 -14 0 q-5 -6 2 -10", .9, INK, .5).replace("/>", ' stroke-dasharray="1.6 2.6"/>');
+        return s + G("tp-float", trail + bee(a[0], a[1], 1.25, 1) + bee(b[0], b[1], 1.25, 1) + bee(c[0], c[1], 1.15, -1)) + G("tp-bob", bee(d[0], d[1], 1.1, -1));
+      },
+      bits: function(){ var e = P(1.05, 2.7, .4), s = ""; [[-10, -6, 1], [-2, -15, -1], [9, -8, 1], [2, -27, 1], [-13, -22, -1]].forEach(function(q){ s += bee(e[0] + q[0], e[1] + q[1], 1.1, q[2]); }); return s; }
+    },
+    "greenhouse": {
+      note: "A glass house full of seedlings, tomatoes and ferns; it glows at night", spot: [3.35, 3.45],
+      egg: { n: "The greenhouse", does: "a butterfly comes out of the roof vent", say: "Warm in here! Leafy greens have calcium, and teeth love calcium." }, anim: "tp-sparks 2.4s ease-out",
+      draw: function(o){
+        var g = GH, x0 = g.x0, x1 = g.x1, y0 = g.y0, y1 = g.y1, zk = g.zk, zw = g.zw, ym = g.ym, zr = g.zr, lit = o.night, i;
+        var gl = lit ? K.lit : "#CFEFFC", gr = lit ? "#F2CC6A" : "#A9D9EE", gt = lit ? K.litHot : "#E6F7FD", W = "#FFFDF6";
+        var fr = function(d, w){ return L(d, (w || 1.3) + 1.7) + L(d, w || 1.3, W); };
+        var pot = function(x, y, z, r){ return cyl(x, y, z, r * .72, z + .3, r, TERRA.c, TERRA.s, "#6E4A36", { sw: 1.1, si: .7 }); };
+        var s = ell.apply(null, P(1.95, 2.0, 0).concat([33, 12, "#1B2A3A", 0, .1]));
+        /* the floor and the far walls, seen through the glass */
+        s += FO(D([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0]]), "#CDAE86", 1.2);
+        var bg = T.onX(x0, [[y0, 0], [y1, 0], [y1, zw], [ym, zr], [y0, zw]]), bw = T.onY(y0, T.rectUV(x0, x1, 0, zw));
+        s += F(D(bg), gl, .6) + F(D(bw), gl, .6) + L(D(bg), 1.1, INK, .45) + L(D(bw), 1.1, INK, .45);
+        for (i = 1; i < 4; i++) s += L(D([[x0 + i * .7, y0, 0], [x0 + i * .7, y0, zw]], true) + D([[x0, y0 + i * .575, 0], [x0, y0 + i * .575, zw]], true), 1, "#FFFFFF", .85);
+        /* inside: a bench of seedlings along the back, a tomato vine, a hanging basket, a big fern by the door */
+        s += box(x0 + .2, y0 + .2, 0, 2.1, .55, .6, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.2, si: .8 });
+        [[.3, "#FF8FB1", 0], [.8, "#FFD23F", 1], [1.3, "#B08CFF", 0], [1.8, "#FFFFFF", 1]].forEach(function(q){
+          var px = x0 + .2 + q[0], py = y0 + .48; s += pot(px, py, .6, .2) + (q[2] ? T.daisyOn(P(px, py, .9), 6, q[1]) : T.tulip(P(px, py, .9), 6.4, q[1]));
+        });
+        var tv = P(x0 + .5, y1 - .7, .3), tt = P(x0 + .5, y1 - .7, 1.95);
+        s += pot(x0 + .5, y1 - .7, 0, .3) + L(T.seg(tv, tt), 2.6) + L(T.seg(tv, tt), 1.3, K.wood) + leaf(tv[0], tv[1] - 5, 7, 3, -62, "#6CB060") + leaf(tv[0], tv[1] - 9, 7, 3, 64, "#6CB060") + leaf(tv[0], tv[1] - 13, 6.4, 2.8, -58, "#7CC46A") + leaf(tv[0], tv[1] - 16, 6, 2.6, 60, "#7CC46A") +
+          circ(tv[0] - 3.4, tv[1] - 3.4, 2.1, K.red, .8) + circ(tv[0] + 3.6, tv[1] - 7.4, 2.1, K.red, .8) + circ(tv[0] - 3, tv[1] - 11.6, 1.8, "#F59A6E", .8);
+        var hb = P(2.3, ym, zr - .1), hy = hb[1] + 9;
+        s += L("M" + f(hb[0]) + " " + f(hb[1]) + " V" + f(hy), .9) + leaf(hb[0] - 2, hy + 2, 7, 2.6, 215, "#6CB060") + leaf(hb[0] + 2, hy + 2, 7, 2.6, 145, "#6CB060") + leaf(hb[0], hy + 2, 8, 2.6, 180, "#7CC46A") + FO("M" + f(hb[0] - 4.4) + " " + f(hy) + " h8.8 q-.6 4.6 -4.4 4.6 q-3.8 0 -4.4 -4.6 z", K.wood, 1) + circ(hb[0] - 2, hy - 1.4, 1.6, "#FF8FB1", .7) + circ(hb[0] + 2, hy - 1.4, 1.6, "#FFFFFF", .7);
+        var fp = P(x1 - .65, y1 - .6, .3);
+        s += pot(x1 - .65, y1 - .6, 0, .32) + leaf(fp[0], fp[1] - 1, 13, 3.6, -40, "#5DA45A") + leaf(fp[0], fp[1] - 1, 13, 3.6, 38, "#5DA45A") + leaf(fp[0], fp[1] - 1, 15, 3.8, -8, "#6CB060") + leaf(fp[0], fp[1] - 1, 10, 3.2, 70, "#7CC46A") + leaf(fp[0], fp[1] - 1, 10, 3.2, -72, "#7CC46A");
+        /* the near walls: a white kick board, then glass in a white frame; the door is in the gable end */
+        s += FO(D(T.onY(y1, T.rectUV(x0, x1, 0, zk))), W, 1.5) + FO(D(T.onX(x1, T.rectUV(y0, y1, 0, zk))), "#E3DCCB", 1.5);
+        s += F(D(g.front), gl, lit ? .55 : .42) + F(D(g.gable), gr, lit ? .55 : .5);
+        if (!lit) s += T.HI(D([[x0 + .2, y1, zw - .25], [x0 + .55, y1, zk + .5]], true), 1.6) + T.HI(D([[x0 + 1.6, y1, zw - .25], [x0 + 1.95, y1, zk + .5]], true), 1.6);
+        s += fr(D(g.front)) + fr(D(g.gable));
+        for (i = 1; i < 4; i++) s += fr(D([[x0 + i * .7, y1, zk], [x0 + i * .7, y1, zw]], true), 1);
+        s += fr(D([[x1, y0, zw], [x1, y1, zw]], true), 1);
+        s += FO(D(T.onX(x1, T.rectUV(ym - .46, ym + .46, 0, 1.78))), W, 1.4) + F(D(T.onX(x1, T.rectUV(ym - .3, ym + .3, .5, 1.62))), gr, .9) + L(D(T.onX(x1, T.rectUV(ym - .3, ym + .3, .5, 1.62))), 1) + circ.apply(null, P(x1, ym + .36, .9).concat([1, INK]));
+        /* the roof: glass on rafters, a white ridge, a vent propped open */
+        s += F(D(g.roof), gt, lit ? .5 : .55) + fr(D(g.roof));
+        for (i = 1; i < 4; i++) s += fr(D([[x0 + i * .7, y1 + .12, zw - .1], [x0 + i * .7, ym, zr]], true), 1);
+        s += L(D([[x0 - .1, ym, zr], [x1 + .1, ym, zr]], true), 4) + L(D([[x0 - .1, ym, zr], [x1 + .1, ym, zr]], true), 2.2, W);
+        var vent = [[1.4, ym + .06, zr - .04], [2.1, ym + .06, zr - .04], [2.1, ym + .72, zr - .32], [1.4, ym + .72, zr - .32]];
+        s += L(D([[1.75, ym + .72, zr - .66], [1.75, ym + .72, zr - .32]], true), 1.2) + F(D(vent), gt, .85) + fr(D(vent), 1);
+        if (o.snow) s += FO(D([[x0 - .1, ym + .5, zr - .44], [x1 + .1, ym + .5, zr - .44], [x1 + .1, ym, zr + .04], [x0 - .1, ym, zr + .04]]), "#FFFFFF", 1.1);
+        /* outside: a watering can and a row of tulips along the front */
+        var wc = P(x0 + .25, y1 + .45, 0);
+        s += FO("M" + f(wc[0] - 3.6) + " " + f(wc[1]) + " v-6.4 h7.2 v6.4 q-3.6 1.4 -7.2 0 z", "#8FB5D9", 1.1) + L("M" + f(wc[0] + 3.6) + " " + f(wc[1] - 3) + " l5 -4.4 M" + f(wc[0] - 3.6) + " " + f(wc[1] - 5.4) + " q-3.4 .6 -3 3.2 q.6 1.6 3 1.4", 1.4) + circ(wc[0] + 9.2, wc[1] - 8, 1.4, "#8FB5D9", .8);
+        [[1.3, "#FF8FB1"], [1.75, "#FFD23F"], [2.2, "#FF8FB1"]].forEach(function(q){ s += T.tulip(P(q[0], y1 + .35, 0), 5.6, q[1]); });
+        return s;
+      },
+      lights: function(){ var c = P(1.75, 1.7, 1.5); return T.glowAt(c[0], c[1], 34) + F(D(GH.front), K.litHot, .4) + F(D(GH.roof), K.litHot, .34) + F(D(GH.gable), K.lit, .34); },
+      bits: function(){ var v = P(1.75, GH.ym + .5, GH.zr + .7); return flutter(v[0], v[1], 1.5, "#6FC3F0", "#B79BF0") + flutter(v[0] + 13, v[1] + 9, 1, "#FFD23F", "#F59A6E"); }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the outfits ----------------------------------- */
+  var Y1 = "#FFD23F", Y2 = "#E5AE1C";
+  var drop = function(x, y, k){ return '<path d="M' + f(x) + " " + f(y - 7 * k) + " q" + f(-5 * k) + " " + f(7 * k) + " 0 " + f(10 * k) + " q" + f(5 * k) + " " + f(-3 * k) + " 0 " + f(-10 * k) + ' z" fill="#8FD3F5" ' + O2 + "/>"; };
+  var boot = function(x, y, r){
+    return '<g transform="translate(' + x + " " + y + ") rotate(" + r + ')">' + p("M-6 -13 h10 v12 h8 q6 0 6 7 v3 h-24 z", "#3ECF7E", O3) + '<path d="M-6 8.4 h24" stroke="#FFFDF6" stroke-width="2.6"/><path d="M-6 -8.6 h10" stroke="#239A72" stroke-width="2.4"/></g>';
+  };
+  var wing = p("M150 98 C146 56 162 6 188 2 C208 0 212 40 202 66 C194 86 174 98 150 104 Z", "#3F4FA8") +
+    '<path d="M155 91 C154 58 168 18 186 13 C199 11 202 40 194 62 C188 78 172 90 155 96 Z" fill="#6FC3F0"/><path d="M157 86 C158 64 166 42 177 31 C182 50 176 72 157 86 Z" fill="#BFE7FA"/>' +
+    '<path d="M153 97 L185 14 M153 97 L198 54 M153 97 L182 86" fill="none" stroke="' + INK + '" stroke-width="1.6" opacity=".45"/>' +
+    '<circle cx="186" cy="42" r="8" fill="#FF8FB1" ' + O2 + '/><circle cx="186" cy="42" r="3.4" fill="#FFE27A"/>' +
+    '<circle cx="205.6" cy="30" r="2" fill="#FFFFFF"/><circle cx="206" cy="44" r="2" fill="#FFFFFF"/><circle cx="202.4" cy="59" r="2" fill="#FFFFFF"/><circle cx="194.6" cy="74" r="2" fill="#FFFFFF"/><circle cx="198" cy="10" r="2" fill="#FFFFFF"/>' +
+    p("M150 102 C176 95 206 100 208 120 C208 138 190 147 174 139 C162 132 152 119 150 109 Z", "#6E50B8") +
+    '<path d="M157 105 C177 100 199 105 201 120 C200 132 187 139 176 133 C167 128 159 118 157 108 Z" fill="#B79BF0"/>' +
+    '<circle cx="184" cy="118" r="6.4" fill="#FFE27A" ' + O2 + '/><circle cx="184" cy="118" r="2.6" fill="#F59A6E"/><circle cx="198" cy="110" r="1.8" fill="#FFFFFF"/><circle cx="200" cy="124" r="1.8" fill="#FFFFFF"/><circle cx="192" cy="134" r="1.8" fill="#FFFFFF"/>';
+  var antenna = function(d, x, y){ return '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="7" stroke-linecap="round"/><path d="' + d + '" fill="none" stroke="#6E50B8" stroke-width="3.2" stroke-linecap="round"/><circle cx="' + x + '" cy="' + y + '" r="6" fill="#FF8FB1" ' + O3 + "/>"; };
+  var mesh = (function(){ var d = "", y; [33, 40, 160, 167].forEach(function(x){ d += "M" + x + " 47 V122 "; }); for (y = 56; y < 122; y += 8) d += "M28 " + y + " H46 M154 " + y + " H172 "; return '<path d="' + d + '" fill="none" stroke="#B5AD92" stroke-width="1.3"/>'; })();
+  var outfits = {
+    "rain-slicker": {
+      note: "A yellow rain hat, the collar of his slicker and a pair of green boots",
+      face: p("M49 116 Q100 137 151 116 L154 129 Q100 172 46 129 Z", Y1, O3) + '<path d="M76 125 L100 143 L124 125" fill="none" stroke="' + Y2 + '" stroke-width="2.8" stroke-linejoin="round"/>' + p("M95 140 h10 v9 h-10 z", "#D9DFE5", O2) +
+        boot(160, 111, 10) + boot(171, 116, -8),
+      top: p("M38 44 Q22 57 26 74 Q40 63 56 61 L144 61 Q160 63 174 74 Q178 57 162 44 Z", Y2) + p("M58 48 C54 16 76 -6 100 -6 C124 -6 146 16 142 48 Q100 58 58 48 Z", Y1) +
+        '<path d="M100 -4 V44 M79 2 Q70 22 72 46 M121 2 Q130 22 128 46" fill="none" stroke="' + Y2 + '" stroke-width="2.4"/>' + p("M38 48 Q100 27 162 48 Q100 67 38 48 Z", Y1) +
+        '<path d="M54 49 Q100 36 146 49" fill="none" stroke="#FFF0A8" stroke-width="2.6" stroke-linecap="round"/><circle cx="100" cy="-6" r="4.6" fill="' + Y2 + '" ' + O2 + "/>" + drop(24, 22, 1) + drop(170, 8, .8) + drop(184, 40, .7),
+      say: ["April showers? Bring them on. Water is my favorite drink.", "Enamel is the hardest thing in your body. Still, I like a hat.", "Splash in every puddle, then brush before bed."]
+    },
+    "beekeeper": {
+      note: "A veiled straw hat, a white bee suit's collar and a few friendly bees",
+      back: p("M30 42 L26 118 Q28 127 40 127 L160 127 Q172 127 174 118 L170 42 Z", "#F6F2E2", O3) + mesh,
+      face: p("M51 125 Q100 145 149 125 L153 130 Q100 172 47 130 Z", "#FFF7E0", O3) + '<path d="M100 137 V151" fill="none" stroke="' + INK + '" stroke-width="2.4" stroke-linecap="round"/>' + p("M97 148 h6 v7 h-6 z", "#D9DFE5", O2) +
+        '<path d="M57 121 Q100 139 143 121" fill="none" stroke="' + INK + '" stroke-width="7.4" stroke-linecap="round"/><path d="M57 121 Q100 139 143 121" fill="none" stroke="#F2C230" stroke-width="3.6" stroke-linecap="round"/>' +
+        '<path d="M30 92 q-12 -4 -10 -16 q3 -9 12 -6" fill="none" stroke="' + INK + '" stroke-width="1.6" stroke-dasharray="3 4" opacity=".6"/>' + bee(34, 68, 2.5, 1) + bee(170, 96, 2.4, -1),
+      top: '<ellipse cx="100" cy="44" rx="76" ry="14.5" fill="#EBD9A4" ' + O4 + "/>" + p("M65 44 C62 20 74 3 100 3 C126 3 138 20 135 44 Q100 54 65 44 Z", "#FFF4D0") + p("M65 35 Q100 27 135 35 L135 44 Q100 54 65 44 Z", Y1, O2) +
+        '<path d="M80 33 v14 M94 31 v17 M108 31 v17 M122 33 v14" fill="none" stroke="' + DARK + '" stroke-width="4"/><path d="M30 49 Q100 68 170 49" fill="none" stroke="#C9B26E" stroke-width="2.4"/>' + bee(146, 36, 2.3, 1),
+      say: ["The bees and I get along. We both love flowers.", "Be a busy bee: one more practice set before the break.", "Bees have mandibles. So do you. Name its parts, go!"]
+    },
+    "butterfly-wings": {
+      note: "Big blue and violet wings, curly antennae, a harness with a blossom on it and a daisy to carry",
+      back: wing + '<g transform="translate(200 0) scale(-1 1)">' + wing + "</g>",
+      face: '<path d="M58 111 L100 139 L142 111" fill="none" stroke="' + INK + '" stroke-width="8.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M58 111 L100 139 L142 111" fill="none" stroke="#6E50B8" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>' + blossom(100, 138, 10, "#FF8FB1", "#FFE27A", 2.2) +
+        '<path d="M38 124 Q30 104 32 86" fill="none" stroke="' + INK + '" stroke-width="6" stroke-linecap="round"/><path d="M38 124 Q30 104 32 86" fill="none" stroke="#4F9A52" stroke-width="2.6" stroke-linecap="round"/>' + p("M33 106 q-12 -2 -14 -12 q11 0 14 12 z", "#7CC46A", O2) +
+        (function(){ var s = ""; for (var i = 0; i < 8; i++){ var a = i * Math.PI / 4; s += '<circle cx="' + f(32 + Math.cos(a) * 9) + '" cy="' + f(80 + Math.sin(a) * 9) + '" r="5" fill="#FFFFFF" ' + O2 + "/>"; } return s + '<circle cx="32" cy="80" r="6" fill="#FFD23F" ' + O2 + "/>"; })(),
+      top: '<path d="M59 53 Q64 36 80 35 Q92 35 100 46 Q108 35 120 35 Q136 36 141 53" fill="none" stroke="' + INK + '" stroke-width="9" stroke-linecap="round"/><path d="M59 53 Q64 36 80 35 Q92 35 100 46 Q108 35 120 35 Q136 36 141 53" fill="none" stroke="#B79BF0" stroke-width="4.8" stroke-linecap="round"/>' +
+        antenna("M84 36 C82 16 74 0 60 -6 C51 -9 45 -2 51 4", 51, 4) + antenna("M116 36 C118 16 126 0 140 -6 C149 -9 155 -2 149 4", 149, 4),
+      say: ["Caterpillar to butterfly. That's you, by graduation.", "Butterflies taste with their feet. I'm glad you have a tongue.", "Spread your wings. Then spread some toothpaste."]
+    }
+  };
+
+  return { k: "spring", homes: homes, scenes: scenes, yard: yard, outfits: outfits };
+}

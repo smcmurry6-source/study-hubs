@@ -122,6 +122,17 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
   (`record_costume_sighting`; a spotted costume joins that visitor's shop), Link my devices merging all of it. The 48-item
   catalog is a draft for phase 4's art and Sam's look. The gold crowns' one-time grants (trophies, medals, rank-ups) count
   from the release on; the XP from before counts (the note's "median about 120").
+- 2026-11-06 (Claude Code): the catalog follows Timmy's place's art (Sam: "upgrade the names"): 68 rows, the homes,
+  scenes, yard things, paints, upgrades and the six theme outfits with the kit's ids, rarities and prices; five yard spots
+  and `wide` for the bowling lane ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289). The outfits not drawn
+  yet, the snacks, boosts and seasonal items are still drafts.
+- 2026-11-10: Sam's new calls for the shop (daily and weekly items plus a seasonal section; a full seasonal set per season
+  with a Legendary house and scene; past seasons unlocked for everyone; rank-up unlocks) are in [round 3](done/2026-11-10-redesign-timmys-place-round-3.md).
+- 2026-11-10 (Claude Code): round 3 ([its note](done/2026-11-10-redesign-timmys-place-round-3.md)): the catalog is 180 rows
+  (181 later that day, with Timmy's podcast studio, `podcast-studio`)
+  (56 everyday, 112 seasonal in 14 sets, 12 rank pieces); `get_my_shop` returns the daily and weekly picks, the seasons
+  on sale and a "Back for today" shelf on two throwback days a month; rank sets are earned, Halloween's set is a gift;
+  visiting is `get_place` from a board's visit key. `tools/release/xp.js`: 344 checks. The design page shows the shelves.
 
 ## Outcome
 

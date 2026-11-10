@@ -51,5 +51,6 @@ Put the ranks, trophies and celebrations on the design system without changing t
 
 - 2026-11-05: written from the agreed plan.
 - 2026-11-06: parts A-D added (Sam's calls on the journeys, the shop, Timmy's place and the bowling egg).
+- 2026-11-06: part C's art drawn on the design page for Sam's look ([Timmy's place](2026-11-06-redesign-timmys-place.md), its log).
 
 ## Outcome

@@ -34,8 +34,17 @@ union all
 -- 5. helpers the schema revokes that anon can run anyway
 select 'internal helper open to anon', p.proname
 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-where n.nspname = 'public' and p.proname in ('sh_admin_ok', 'sh_visitor_xp', 'sh_xp_rebuild', 'sh_insights', 'sh_insight_retries', 'sh_data_quality', 'sh_archive_version', 'sh_retention_run', 'sh_retention_status')
+where n.nspname = 'public' and p.proname in ('sh_admin_ok', 'sh_visitor_xp', 'sh_xp_rebuild', 'sh_insights', 'sh_insight_retries', 'sh_data_quality', 'sh_archive_version', 'sh_retention_run', 'sh_retention_status',
+    'sh_visit_key', 'sh_visit_link')        -- the last two: the visit keys of migration_v54 (rls-expectations.json's anonNoRun), once it is applied
   and has_function_privilege('anon', p.oid, 'execute')
+union all
+-- 5b. tables that must be closed to anon altogether (rls-expectations.json's anonNone: what's behind the visit keys)
+select 'private table open to anon', c.relname
+from pg_class c join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public' and c.relkind = 'r' and c.relname in ('visit_secret', 'pet_visit_off')
+  and (has_table_privilege('anon', c.oid, 'select') or has_table_privilege('anon', c.oid, 'insert')
+       or has_table_privilege('anon', c.oid, 'update') or has_table_privilege('anon', c.oid, 'delete')
+       or exists (select 1 from pg_policies pol where pol.schemaname = 'public' and pol.tablename = c.relname))
 order by 1, 2;
 
 -- 6. what anon may do to tables directly (compare with tools/release/rls-expectations.json)

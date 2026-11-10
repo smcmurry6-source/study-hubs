@@ -38,7 +38,9 @@
     var t = A.tints[hub] || A.tints.generic, e = A.emblems[hub] || A.emblems.generic;
     return img('<circle cx="32" cy="32" r="31" fill="' + t.light + '"/>' + '<g transform="translate(6.4 6.4) scale(.8)">' + e.body + "</g>", e.label, cls, "0 0 64 64");
   }
-  function flame(level, cls){ return art(A.flame[level], "0 0 40 48", "flame " + (cls || ""), level === 3 ? "A blazing streak" : level === 2 ? "A streak" : "A new streak"); }
+  function flame(level, cls){ return art(A.flame[level], "0 0 40 48", "flame " + (cls || ""), ["", "A new streak", "A streak", "A blazing streak", "A blue-hot streak", "A Dark Matter streak"][level]); }
+  /* the flame for a streak: it grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30 (Sam, 2026-11-10) */
+  function flameLevel(days){ return days >= 30 ? 5 : days >= 10 ? 4 : days >= 7 ? 3 : days >= 3 ? 2 : 1; }
   function xpSpark(){ return art(A.xp, "0 0 24 24", ""); }
   function ring(done, of, cls){
     var r = 15, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, done / of));
@@ -47,6 +49,22 @@
   }
   function timmy(k){ return uniq(A.timmy.bar[k] || A.timmy.bar.happy); }
 
+  /* Today's goal as a ring of 20 teeth, the way the hub engine draws it (widget/hub.js teethRing; Sam, 2026-11-06: "a more
+     visually interesting progress circle"): each tooth is a twentieth of the goal and fills in the hub's color, a thin
+     arc shows the exact share, the tooth that just filled pops in */
+  var TOOTH = "M-5 -3C-5.5 -7-3.5-7.8-1.8-7C-.8-6.6.8-6.6 1.8-7C3.5-7.8 5.5-7 5-3C4.7-.5 4 1.5 3.2 5C2.8 7 1.4 7.4 1 5.4L.4 2.6C.2 2-.2 2-.4 2.6L-1 5.4C-1.4 7.4-2.8 7-3.2 5C-4 1.5-4.7-.5-5-3Z";
+  var teethShown = -1;
+  function teethRing(done, of){
+    var N = 20, f = of ? Math.min(1, done / of) * N : 0, on = Math.floor(f), r = 33, c = 2 * Math.PI * r, out = "";
+    for (var k = 0; k < N; k++){
+      var st = k < on ? "is-on" : k < f ? "is-part" : "";
+      if (k < on && teethShown >= 0 && k >= teethShown) st += " is-new";
+      out += '<g transform="rotate(' + (k * 360 / N) + ' 60 60) translate(60 13)"><g class="tooth' + (st ? " " + st : "") + '"><path d="' + TOOTH + '"/>' + (k < on ? '<path class="shine" d="M-3.1-4.4C-2.7-5.6-1.7-5.9-.9-5.6"/>' : "") + "</g></g>";
+    }
+    teethShown = on;
+    return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0 0 120 120" role="img" aria-label="' + done + " of " + of + ' questions today">' +
+      '<circle class="t-track" cx="60" cy="60" r="' + r + '"/><circle class="t-arc" cx="60" cy="60" r="' + r + '" stroke-dasharray="' + c.toFixed(2) + '" stroke-dashoffset="' + (c * (1 - (of ? Math.min(1, done / of) : 0))).toFixed(2) + '"/>' + out + "</svg>";
+  }
   /* the drawn answer marks: a hand-drawn ring or box that fills when picked, and a blob with a tick or a cross once
      answered (marks like articulating paper leaves on a cusp) */
   var RING = "M14 4.2C19.6 4 24 8.4 23.9 14c-.1 5.7-4.4 10-9.9 9.9C8.4 23.8 4.1 19.6 4.2 14 4.3 8.5 8.5 4.4 14 4.2Z";
@@ -252,17 +270,27 @@
       var open = {};
       $$(".ch", el).forEach(function(b){ if (b.classList.contains("is-wrong") || b.classList.contains("is-missed")) open[b.dataset.i] = 1; });
       if (!Object.keys(open).length) open[picked[0]] = 1;
-      var whys = '<div class="why"><h4>Why each choice</h4>' + q.choices.map(function(c, i){
+      /* folded until the student taps it, as widget/hub.js draws it (Sam, 2026-11-06 and 2026-11-10) */
+      var whys = '<details class="why"><summary class="why-bar"><span>Why each choice</span><span class="chev">' + icon("chevron", 16) + "</span></summary>" + q.choices.map(function(c, i){
         var b = $('.ch[data-i="' + i + '"]', el), tag = b.classList.contains("is-wrong") ? "Your pick" : b.classList.contains("is-right") && picked.indexOf(i) > -1 ? "Your pick" : b.classList.contains("is-missed") ? "You missed this one" : "";
         var st = b.classList.contains("is-right") ? "right" : b.classList.contains("is-wrong") ? "wrong" : b.classList.contains("is-missed") ? "missed" : "";
         return "<details" + (open[i] ? " open" : "") + '><summary><span class="tick" style="color:' + (st === "wrong" ? "var(--wrong)" : st ? "var(--right)" : "var(--muted)") + '">' + (st ? mark(multi ? "box" : "ring", st) : mark(multi ? "box" : "ring")) + "</span><span>" + esc(c) +
           (tag ? ' <span class="tag">· ' + tag + "</span>" : "") + '</span><span class="chev">' + icon("chevron", 16) + "</span></summary><p>" + esc(q.why[i]) + "</p></details>";
-      }).join("") + "</div>";
+      }).join("") + "</details>";
       var res = $(".qc-result", el);
       res.innerHTML = verdict + '<p class="qc-ex">' + esc(q.ex) + ' <a href="#formats">Find this in the notes</a></p>' + whys +
         '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + 'Try it again</button><span class="grow"></span>' +
-        '<span class="thumbs">Good question?<button class="btn btn-icon" type="button" aria-label="Good question">' + icon("thumbup", 18) + '</button><button class="btn btn-icon" type="button" aria-label="Not a good question">' + icon("thumbdown", 18) + "</button></span></div>";
+        '<span class="thumbs"><span class="thumbs-q" aria-live="polite">Good question?</span><button class="btn btn-icon" type="button" data-thumb="up" aria-pressed="false" aria-label="Good question">' + icon("thumbup", 18) + '</button><button class="btn btn-icon" type="button" data-thumb="down" aria-pressed="false" aria-label="Not a good question">' + icon("thumbdown", 18) + "</button></span></div>";
       res.hidden = false;
+      /* the thumbs: the one you tap pops and fills (up: with a few sparks; down: a small dip), and the line thanks you */
+      $$("[data-thumb]", res).forEach(function(b){ b.addEventListener("click", function(){
+        var on = b.getAttribute("aria-pressed") !== "true", up = b.dataset.thumb === "up";
+        $$("[data-thumb]", res).forEach(function(o){ o.setAttribute("aria-pressed", "false"); o.classList.remove("pop"); $$(".thumb-spark", o).forEach(function(x){ o.removeChild(x); }); });
+        $(".thumbs-q", res).textContent = !on ? "Good question?" : up ? "Thanks! Glad it helped." : "Thanks. We'll take a look.";
+        if (!on) return;
+        b.setAttribute("aria-pressed", "true"); void b.offsetWidth; b.classList.add("pop");
+        if (up && !reduced) for (var i = 0; i < 5; i++) { var sp = document.createElement("i"); sp.className = "thumb-spark"; sp.style.setProperty("--a", (-150 + i * 30) + "deg"); sp.style.animationDelay = (i * 18) + "ms"; b.appendChild(sp); }
+      }); });
       $("[data-again]", res).addEventListener("click", function(){ var n = card(q, opt); el.replaceWith(n); if (opt.live) n.querySelector(".ch").focus(); });
       if (opt.live && !opt.silent) reward(from, right, xp);
     }
@@ -290,12 +318,14 @@
       if (state.goal < state.of) {
         state.goal++;
         $$("[data-ring]").forEach(function(r){ r.outerHTML = ring(state.goal, state.of, r.getAttribute("class").replace("ring", "").trim()).replace("<svg ", '<svg data-ring="1" '); });
+        $$("[data-teeth]").forEach(function(w){ w.innerHTML = teethRing(state.goal, state.of); });
+        $$("[data-goalnum]").forEach(function(n){ n.textContent = state.goal; });
         $$("[data-goaltext]").forEach(function(n){ n.textContent = state.goal + " of " + state.of; });
         if (state.goal === state.of) {
           state.streak++;
           setTimeout(function(){
             $$("[data-streak]").forEach(function(n){ n.textContent = state.streak + " days"; });
-            $$("[data-flame]").forEach(function(f){ var lvl = state.streak >= 7 ? 3 : state.streak >= 3 ? 2 : 1; var n = h(flame(lvl, "grow-in")); n.setAttribute("data-flame", "1"); f.replaceWith(n); });
+            $$("[data-flame]").forEach(function(f){ var lvl = flameLevel(state.streak); var n = h(flame(lvl, "grow-in")); n.setAttribute("data-flame", "1"); f.replaceWith(n); });
             $$("[data-goalcap]").forEach(function(n){ n.textContent = "Goal met. Your streak grows to " + state.streak + " days."; });
             react(true, "Goal met! " + state.streak + " days in a row.");
           }, 900);
@@ -357,7 +387,7 @@
   function buildHub(){
     var hub = root.dataset.hub, H = HUBS[hub] || HUBS.generic, d = daysTo(H.date), M = A.mastheads[hub] || A.mastheads.generic;
     var hp = A.handpieces[3];
-    var lvl = state.streak >= 7 ? 3 : state.streak >= 3 ? 2 : 1;
+    var lvl = flameLevel(state.streak);
     var count = d == null ? '<b>Soon</b><span>a countdown once the date is set</span>' : d > 1 ? '<b class="num">' + d + '</b><span>days to go</span>' : d === 1 ? '<b>Tomorrow</b><span>one more evening</span>' : d === 0 ? '<b>Today</b><span>good luck</span>' : '<b>Done</b><span>this exam has passed</span>';
     var frame = '<div class="hubframe">' +
       '<nav class="hubbar" aria-label="' + esc(H.name) + ' hub">' +
@@ -388,8 +418,8 @@
             return '<button class="chip" type="button" aria-pressed="' + (c[2] ? "true" : "false") + '">' + c[0] + ' <span class="n num">' + c[1] + "</span></button>"; }).join("") + "</div>" +
         '<div class="livecard" id="liveCard"></div>' +
         '<aside class="today" aria-label="Today">' +
-          '<div class="panel"><h3>Today</h3><div class="panel-body big-ring">' + ring(state.goal, state.of, "").replace("<svg ", '<svg data-ring="1" ') +
-            '<div><p class="ring-num num" data-goaltext>' + state.goal + " of " + state.of + '</p><p class="ring-cap" data-goalcap>One more right or wrong answer meets today’s goal.</p></div></div>' +
+          '<div class="panel"><h3>Today</h3><div class="panel-body big-ring teeth-ring"><div class="teeth-wrap"><span data-teeth>' + teethRing(state.goal, state.of) + '</span><p class="teeth-num"><b class="num" data-goalnum>' + state.goal + '</b><span>of ' + state.of + '</span></p></div>' +
+            '<div><p class="ring-cap" data-goalcap>One more right or wrong answer meets today’s goal.</p></div></div>' +
             '<dl class="kv"><div><dt>' + icon("flame", 18) + 'Streak</dt><dd class="num" data-streak>' + state.streak + " days</dd></div>" +
             "<div><dt>" + icon("xp", 18) + 'XP today</dt><dd class="num" data-xptoday>+' + state.xpToday + " XP</dd></div>" +
             "<div><dt>" + icon("questions", 18) + 'This session</dt><dd class="num" data-session>' + state.session + " answered · " + state.right + " right</dd></div>" +
@@ -473,8 +503,8 @@
         '<figure><span class="tim" id="flinchTim">' + timmy("scared") + '</span><figcaption><span class="say">So close. Read why.</span></figcaption></figure></div>' +
         '<div class="qc-go"><button class="btn" type="button" id="playTim">' + icon("play", 18) + "Play it</button></div></div>" +
       '<div class="s6 stack">' +
-        '<div class="panel"><h3>The streak flame</h3><p>A day counts when you meet your goal. The flame grows at 3 days and blazes at 7.</p><div class="panel-body flames">' +
-          [[1, "1 day"], [2, "4 days"], [3, "7 days and up"]].map(function(f){ return "<figure>" + flame(f[0]) + "<figcaption>" + f[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
+        '<div class="panel"><h3>The streak flame</h3><p>A day counts when you meet your goal. The flame grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30.</p><div class="panel-body flames">' +
+          [[1, "1 day"], [2, "3 days"], [3, "7 days"], [4, "10 days: blue"], [5, "30 days: Dark Matter"]].map(function(f){ return "<figure>" + flame(f[0]) + "<figcaption>" + f[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
         '<div class="panel"><h3>The daily goal</h3><p>20 questions a day unless you change it; Timmy cheers when the ring closes.</p><div class="panel-body rings">' +
           [[0, "Not started"], [12, "12 of 20"], [20, "Done"]].map(function(r){ return "<figure>" + ring(r[0], 20) + "<figcaption>" + r[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
       "</div>" +
@@ -595,6 +625,936 @@
       '<div class="panel s12"><h3>His house</h3><p>It grows with your rank: a fence, a mailbox, gold trim, a night sky, and a pennant for every hub you master.</p><div class="panel-body houses">' + houses + "</div></div>";
   }
 
+  /* ---------- Timmy's place (redesign phase 4, part C): place.js, built from tools/figures/site/place.mjs ----------
+     The stage draws the live kit (SH_PLACE.render) inline, in a shadow root so its CSS stays with it: Timmy hops between
+     spots on the ground (SH_PLACE.route), drawn in the scene's depth order, and tapping things plays their easter eggs.
+     The pickers are rarity cards; the galleries are still pictures, drawn as they scroll near. */
+  var TP = window.SH_PLACE;
+  var TIER_NAMES = ["Stone", "Antique", "Bronze", "Silver", "Gold", "Diamond", "Dark Matter"];
+  var LEVELS = ["I", "II", "III"];
+  var HOLS = [["", "No holiday"], ["halloween", "Halloween"], ["thanksgiving", "Thanksgiving"], ["winter", "Christmas"], ["newyear", "New Year's"], ["valentine", "Valentine's Day"], ["dentist", "Dentist's Day"], ["stpatrick", "St. Patrick's Day"], ["easter", "Easter"]];
+  var SEASONS = [["", "Summer"], ["spring", "Spring"], ["fall", "Fall"]];
+  var FLAIR_HUBS = ["occlusion", "perio", "heme-endo-exam2", "pcd-implants-exam1", "special-patient-care", "generic"];
+  /* a made-up student's hub medals: the live hubs' tints first, then more hues for the hubs still to come */
+  var MORE_TINTS = ["#C2417A", "#2E9E6B", "#8A4FD0", "#E08A1E", "#1FA3A8", "#D9483B", "#5B6FD6", "#7A8F2E", "#B5651D", "#3F8FBF", "#A04FA8", "#4F9A52", "#D46A6A", "#6B7A8F"];
+  function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i] || "hub-" + (i + 1), t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : MORE_TINTS[(i - FLAIR_HUBS.length + MORE_TINTS.length * 2) % MORE_TINTS.length] }; }); }
+  var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1]), flairOf([4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1]), flairOf([4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1])];
+  var FLAIR_NAMES = ["No hubs mastered yet", "One hub (Silver)", "Three hubs", "Six hubs, two crowned", "Twelve hubs", "Twenty hubs"];
+  /* names for the big view: the live hubs' own, then made-up ones for the hubs still to come */
+  var MORE_HUBS = ["Oral Pathology", "Endodontics", "Pharmacology", "Oral Surgery", "Pediatric Dentistry", "Orthodontics", "Dental Materials", "Radiology", "Head and Neck Anatomy", "Operative Dentistry", "Prosthodontics", "Cariology", "Local Anesthesia", "Oral Medicine", "Ethics", "Biochemistry"];
+  function hubLabel(h){ var t = A.tints && A.tints[h], m = /^hub-(\d+)$/.exec(h); return h === "generic" ? MORE_HUBS[15] : t && t.name ? t.name : m ? MORE_HUBS[(+m[1] - 7 + MORE_HUBS.length) % MORE_HUBS.length] : h; }
+  var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank"; }, byRank = function(x){ return x.set === "rank"; };
+  var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
+    tier: 3, level: 2, flair: 3, holiday: "", season: "", hp: 82, outfit: "", mode: "play", pick: "home", still: false, found: {} };
+  function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
+  function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
+  function isStill(){ return PS.still || reduced; }
+  function tpOpts(o){
+    return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
+      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
+  }
+  function timmyArt(k){
+    var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
+    if (m) return m.svg;
+    var hp = (t.hp || []).filter(function(x){ return "hp" + x.hp === k; })[0];
+    return (hp || t.moods[0]).svg;
+  }
+  function timmySvg(mood, outfit){ var s = timmyArt(mood || "happy"); return outfit ? TP.dress(s, outfit) : s; }
+  /* Timmy inside a scene: his drawing at 36 wide, its feet (pet.js's shadow, y 226) on the spot */
+  function timmyG(svg, hl){
+    var star = function(x, y, k, d){ return '<path class="tp-twinkle" style="animation-delay:' + d + 's" transform="translate(' + x + " " + y + ") scale(" + k + ')" d="M0 -3 L.8 -.8 L3 0 L.8 .8 L0 3 L-.8 .8 L-3 0 L-.8 -.8 Z" fill="#FFE27A" stroke="#3B2E3A" stroke-width=".35"/>'; };
+    return '<g class="tp-tface"><g class="tp-tmood">' + '<svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>" +
+      (hl && hl.k === "sparkling" ? star(-17, -38, 1, 0) + star(17, -28, .8, .7) + star(-19, -14, .7, 1.3) + star(15, -44, .6, 1.9) : "") + "</g>";
+  }
+  /* Timmy's health at his place: the kit's table (TP.HEALTH) says how he looks, moves and behaves at each level */
+  function HL(){ return TP.healthFor(PS.hp); }
+  function hpLine(t){ return String(t || "").replace("{hp}", PS.hp); }
+  function hpRange(h){ var i = TP.HEALTH.indexOf(h), top = i ? TP.HEALTH[i - 1].min - 1 : 100; return h.min === top ? h.min + " HP" : h.min + " to " + top + " HP"; }
+  function fmtPrice(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  var COIN = null;
+  function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Default</span>'; }
+  function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Default") + "</i>"; }
+  /* a piece's rarity and price for a caption: free things just say so */
+  function isGift(x){ var se = x.set && TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0]; return !!(se && se.gift); }
+  function priceOf(x){ return x.rank ? '<span class="tp-price free">' + esc(x.rankName) + " rank</span>" : isGift(x) ? '<span class="tp-price free">Yours</span>' : price(x.price || 0); }
+  function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + priceOf(x) : rarTag(""); }
+  function sentence(t){ t = String(t || "").replace(/^(Free|Default|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
+  function placeFig(o, cap, sub, timmySpot, cls, outfit, art){
+    if (timmySpot) o = Object.assign({}, o, { timmy: { g: timmyG(timmySvg(art && art.art || "happy", outfit), art), at: timmySpot } });
+    var vb = o.viewBox || TP.VIEWBOX, r = TP.render(o);
+    var pic = img(r.svg, cap).replace("<img ", '<img width="' + vb[2] + '" height="' + vb[3] + '" ');
+    return '<figure class="tp-fig ' + (cls || "") + '"><div class="tp-pic' + (o.night ? " is-night" : "") + '">' + pic + "</div>" + (cap ? "<figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption>" : "") + "</figure>";
+  }
+  /* the card's scene goes on the page as a picture, with the kit's motion inside unless it's still */
+  function sceneImg(svgStr, alt, still){
+    if (!still) svgStr = svgStr.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
+    return img(svgStr, alt, "tp-sceneimg");
+  }
+  function sceneAlt(){
+    var h = byK(TP.HOMES, PS.home), sc = byK(TP.SCENES, PS.scene), items = TP.SLOTS.map(function(s){ return PS.yard[s.k]; }).filter(Boolean).map(function(k){ return byK(TP.YARD, k).n.replace(/^A /, "a "); });
+    return "Timmy's place: " + h.n.replace(/^The /, "the ") + " on " + sc.n.replace(/^The /, "the ") + (items.length ? ", with " + (items.length > 1 ? items.slice(0, -1).join(", ") + " and " + items[items.length - 1] : items[0]) : "");
+  }
+  function crop(pts, pad){
+    var xs = [], ys = [];
+    pts.forEach(function(p){ var q = TP.project(p[0], p[1], p[2]); xs.push(q[0]); ys.push(q[1]); });
+    var x0 = Math.min.apply(null, xs) - pad, y0 = Math.min.apply(null, ys) - pad, x1 = Math.max.apply(null, xs) + pad, y1 = Math.max.apply(null, ys) + pad;
+    return [Math.round(x0), Math.round(y0), Math.round(x1 - x0), Math.round(y1 - y0)];
+  }
+  function cube(x0, y0, x1, y1, z){ return [[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0], [x0, y0, z], [x1, y0, z], [x1, y1, z], [x0, y1, z]]; }
+  var HOME_CROP = function(){ return crop(cube(1.2, 1.6, 10, 10.6, 11.6), 6); };
+  function slotCrop(k, wide){ var s = TP.SLOT_AT[k]; return crop(cube(s.x - .6, s.y - .6, s.x + TP.S + .6, s.y + (wide ? 7.5 : TP.S) + .6, 3.4), 8); }
+  function statueCrop(){ return crop(cube(1.9, 8.1, 4.2, 10.5, 3.6), 10); }
+
+  /* each rarity's card art, from the kit (frame()), as a picture with its own motion inside */
+  var FRAME_IMG = {};
+  function frameImg(r){
+    var k = r || "Common", key = k + (isStill() ? "-still" : "");
+    if (!FRAME_IMG[key]) {
+      var css = TP.CSS.split("\n").filter(function(l){ return /tp-r-|@keyframes tp-spin|prefers-reduced/.test(l); }).join("\n");
+      var s = TP.frame(k); if (!isStill()) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + css + "</style>");
+      FRAME_IMG[key] = img(s, "", "tp-rframe");
+    }
+    return FRAME_IMG[key];
+  }
+  var THUMBS = {};
+  function thumbImg(kind, k, o){
+    var key = kind + ":" + k + ":" + JSON.stringify(o || {});
+    if (!THUMBS[key]) THUMBS[key] = kind === "outfit" ? img(timmySvg("happy", k), "") : img(TP.thumb(kind, k, o), "");
+    return THUMBS[key];
+  }
+  function cardName(n){ n = n.replace(/^(The|A|An) /, ""); return n.charAt(0).toUpperCase() + n.slice(1); }
+  /* a shop card: the rarity's art behind the thing itself, its name, rarity and price */
+  function rcard(x, thumb, on, data){
+    var r = x.rarity || "";
+    return '<button type="button" class="tp-rcard r-' + (r || "free") + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + frameImg(r || "Common") +
+      (r ? '<span class="tp-rprice">' + priceOf(x) + "</span>" : "") +
+      '<span class="tp-rthumb">' + thumb + '</span><span class="tp-rtext"><span class="tp-rname">' + esc(cardName(x.n)) + '</span><span class="tp-rmeta">' + rarTag(r) + "</span></span></button>";
+  }
+
+  /* the same card where it's only shown, not picked (a shelf, a set) */
+  function scard(x, thumb, extra){ return rcard(x, thumb, false, "").replace('<button type="button" class="', '<span class="tp-static ').replace(/ aria-pressed="false"\s*>/, ">").replace(/<\/button>$/, (extra || "") + "</span>"); }
+  function kindOf(x){ return TP.HOMES.indexOf(x) >= 0 ? "home" : TP.SCENES.indexOf(x) >= 0 ? "scene" : TP.YARD.indexOf(x) >= 0 ? "yard" : "outfit"; }
+  function place(){
+    if (!TP) { $("#placeGrid").innerHTML = '<p class="note">place.js is missing: run node tools/figures/site/build.mjs</p>'; return; }
+    if (!$("#tpCss")) document.head.insertAdjacentHTML("beforeend", '<style id="tpCss">' + TP.CSS + "</style>");
+    $("#placeGrid").innerHTML =
+      '<div class="panel s12"><h3>Build it</h3><p>Play: tap things in the picture (the sun, the house, whatever’s in the yard) and Timmy hops over to see. Customize: the dock shows what’s in every spot now; tap one (or the spot in the picture) and the view moves in close on it while its drawer opens: homes and yard things on shelves, Timmy’s outfits on a wardrobe rail, each with Classics, Seasonal and Rank tabs. <b>Surprise me</b> redoes the whole place. <b>Timmy’s health</b> (under the picture) changes how he looks, moves and behaves: try the levels. Reduced motion: all still.</p>' +
+        '<div class="panel-body tp-build"><div class="tp-stage-wrap"><div class="tp-modebar"><div class="seg" role="group" aria-label="What tapping does">' +
+          '<button type="button" data-mode="play">Play</button><button type="button" data-mode="customize">Customize</button></div>' +
+          '<button type="button" class="tp-vrand tp-shuffle" id="tpShuffle">' + VIC.dice + '<span>Surprise me</span></button><button type="button" class="tp-zoom" id="tpZoom" aria-pressed="true">Close-up</button>' +
+          '<span class="tp-found" id="tpFound" aria-live="polite"></span></div>' +
+          '<div class="tp-stage" id="tpStage"></div><div class="tp-hp" id="tpHp"></div></div><div class="tp-side" id="tpSide"></div></div></div>' +
+      '<div class="panel s6"><h3>On the “you” card</h3><p>The small size, on the dashboard and in a hub’s More: what the builder shows, cropped close.</p><div class="panel-body"><div class="tp-card" id="tpCard"></div></div></div>' +
+      '<div class="panel s6 tp-short"><h3>How it’s built</h3><p>Slots, not free placement, so every combination looks right and nothing overlaps.</p><div class="panel-body tp-how"><ul>' +
+        "<li><b>No plot square:</b> each scene’s ground fills the picture, and the yard is its flat middle.</li>" +
+        "<li><b>Homes sit in their scene:</b> a soft shadow, the scene’s own ground round the walls, its path, tree and lamp.</li>" +
+        "<li><b>Five yard spots</b> along the front; the bowling lane takes two.</li>" +
+        "<li><b>What you’ve earned is part of it:</b> your rank is the statue by the door, and every hub you master goes in the display beside the house.</li>" +
+        "<li><b>Timmy hops on the ground</b> round the house and the yard things, never over them.</li>" +
+        "<li><b>Day and night</b> follow your clock (7 pm to 7 am).</li>" +
+        "<li><b>Light to load:</b> one kit draws every combination (about " + Math.round(TP.CSS.length / 1024 + 180) + " KB before compression), loaded only when his place is on screen.</li>" +
+        "</ul></div></div>" +
+      galleryPanel("tpThemes", "Themes", "Six sets of things that belong together, a scene, its homes, yard things and an outfit for Timmy, and the classics, which go anywhere. Every piece is sold on its own; a theme is just what matches.") +
+      galleryPanel("tpHomes", "The homes", "The cottage is free and stays every Timmy’s first home. Seven more from the shop, each shown in its own theme’s scene.") +
+      galleryPanel("tpNights", "At night", "Each home’s own lights: windows, a porch lamp, torches at the castle gate, fireflies round the mushroom, the lighthouse’s turning beam, the igloo’s glow, the observatory’s open slit.") +
+      galleryPanel("tpScenes", "The scenes", "Each with its own ground, path, tree and lamp, and something to find: number thirty-one’s house on the next hill and the rabbit down it, a whale and a crab, an owl in the pines, a yeti behind a rock, a friend in a crater, a hot-air balloon.") +
+      galleryPanel("tpYard", "The yard", "Twelve things for the yard spots, each drawn to fit one. Tap one in the builder for its egg.") +
+      galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
+      galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
+      galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material. Every rank has three levels, I, II and III, and the statue stands on one step for each: one at I, two at II, three at III. Dark Matter glows, and its stars come out.") +
+      galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
+      galleryPanel("tpHealth", "Timmy’s health at home", "His HP shows at his place the way it does in the pet: the drawing (sparkles, then plaque, stains, a cavity, receding gums, a cracked cusp), how he moves (how high and fast he hops, how far he goes) and what he does (how much he wanders, how big his wave is, whether he’ll flip, what he says). At 0 HP he stays on the doorstep. Try it live in Build it, above. A visitor never sees it: a visited Timmy always looks well.") +
+      galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
+      galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
+      '<div class="panel s12"><h3>The shop</h3><p>A wooden shop: plank walls, a hanging sign, Timmy behind the counter and the pieces in wooden cabinets. Its shelves: daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price, each marked with a small “Today only” stamp. <b>Tap any piece</b> and its window opens: the piece in its rarity’s display case, your place with it in, its set, the price against your crowns, Buy and Try. <b>Buying</b> plays out by rarity, with sound: coins fly in, the piece pops, and the party grows from a Common’s little pop to a Legendary’s charge-up, gold flash, confetti and fanfare (the speaker button turns sound off; reduced motion skips the animation). A design: the crowns here are made up, so buy away, and the real shop is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
+      '<div class="panel s12"><h3>The rank board and visiting</h3><p>Every name has its rank’s handpiece beside it, and your own row carries your board name (never “You”) on a gold nameplate with your Timmy peeking over it. Visiting is on by default: tap <b>Visit</b> on a row, or <b>Visit someone random</b>, and clouds drift in from every side, cover the screen and scatter again over that person’s place. While you’re there, the arrows take you to the next or the last place, and <b>Back to mine</b> brings you home. One switch turns visits to your place off. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
+      galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
+      galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
+      galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.") +
+      '<div class="panel s12"><h3>Every easter egg</h3><p>What tapping each thing does, and what Timmy says. Spoilers, so it’s folded.</p><div class="panel-body"><details class="tp-eggs"><summary>Show all ' + Object.keys(TP.EGGS).length + "</summary><ul>" +
+        Object.keys(TP.EGGS).map(function(k){ var e = TP.EGGS[k]; return "<li><b>" + esc(e.n) + "</b> " + esc(e.does) + (e.say ? ": <q>" + esc(e.say) + "</q>" : "") + "</li>"; }).join("") + "</ul></details></div></div>";
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.addEventListener("click", function(){ PS.mode = b.dataset.mode; buildPlace(); }); });
+    $("#tpShuffle").addEventListener("click", shuffle);
+    $("#tpZoom").addEventListener("click", function(){ PS.wide = !PS.wide; buildPlace(); });
+    buildPlace();
+    shopMock(); visitMock();
+    lazyGalleries();
+  }
+  function galleryPanel(id, h, p){ return '<div class="panel s12"><h3>' + h + "</h3><p>" + p + '</p><div class="panel-body tp-gal" id="' + id + '" data-lazy="1"></div></div>'; }
+  function listN(names){ return names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names[0] || ""; }
+  function themeFill(t){
+    var y = {}, order = ["left", "front", "right", "corner", "side"];
+    t.yard.forEach(function(k, i){ var it = byK(TP.YARD, k); if (it.wide) y.side = k; else y[order[i]] = k; });
+    return y;
+  }
+  var THEME_HOME = { hilltop: "cottage", seaside: "lighthouse", woodland: "treehouse", snowy: "igloo", starlight: "observatory", clouds: "castle" };
+  var GALLERIES = {
+    tpThemes: function(){
+      return TP.THEMES.map(function(t){
+        var home = THEME_HOME[t.k] || "cottage", scene = t.scene || "hill", out = t.outfits[0] || "";
+        var pieces = [].concat(t.scene ? [byK(TP.SCENES, t.scene)] : [], t.homes.map(function(k){ return byK(TP.HOMES, k); }), t.yard.map(function(k){ return byK(TP.YARD, k); }), t.outfits.map(function(k){ return byK(TP.OUTFITS, k); }));
+        var list = '<span class="tp-pieces">' + pieces.map(function(x){ return '<span class="tp-piece">' + esc(cardName(x.n)) + " " + tagLine(x) + "</span>"; }).join("") + "</span>";
+        var o = { home: home, scene: scene, tier: 3, level: 2, yard: themeFill(t), up: { chimney: true, flag: true }, flair: FLAIRS[2] };
+        return placeFig(o, t.n, esc(t.note) + list + '<button type="button" class="btn tp-try" data-theme-try="' + t.k + '">Try it in the builder</button>', "lawn", "tp-theme", out);
+      }).join("");
+    },
+    tpHomes: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var t = byK(TP.THEMES, h.theme) || {}; return placeFig({ home: h.k, scene: (t.scene) || "hill", tier: 1, yard: {} }, h.n, tagLine(h) + " " + esc(sentence(h.note)), "door"); }).join(""); },
+    tpNights: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ up[k] = true; }); return placeFig({ home: h.k, scene: "hill", tier: 3, night: true, up: up, yard: { front: "campfire" } }, h.n + " at night", "", "door"); }).join(""); },
+    tpScenes: function(){ return TP.SCENES.filter(builtIn).map(function(s){ return placeFig({ home: "cottage", scene: s.k, tier: 1, yard: {} }, s.n, tagLine(s) + " " + esc(sentence(s.note)), "door"); }).join(""); },
+    tpYard: function(){
+      return TP.YARD.filter(builtIn).map(function(y){ var t = byK(TP.THEMES, y.theme), sc = t && t.scene || "hill", k = y.wide ? "side" : "front", yd = {}; yd[k] = y.k;
+        return placeFig({ home: "cottage", scene: sc, tier: 0, bare: true, yard: yd, viewBox: slotCrop(k, y.wide) }, y.n, tagLine(y) + " " + esc(y.note), "", "tp-yardfig"); }).join("");
+    },
+    tpUps: function(){ return TP.HOMES.filter(builtIn).map(function(h){ var up = {}; h.ups.forEach(function(k){ if (k !== "paint") up[k] = true; });
+      return placeFig({ home: h.k, scene: "hill", tier: 0, up: up, yard: {}, viewBox: HOME_CROP() }, h.n, esc(h.ups.filter(function(k){ return k !== "paint"; }).map(function(k, i){ return i ? lowerFirst(h.upn[k]) : h.upn[k]; }).join(", "))); }).join("") +
+      '<div class="tp-upcards">' + TP.UPGRADES.map(function(u){ return '<span class="tp-piece">' + esc(cardName(u.n)) + " " + tagLine(u) + "</span>"; }).join("") + "</div>"; },
+    tpPaint: function(){ return TP.PAINTS.map(function(p){ return placeFig({ home: "cottage", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.n, tagLine(p), "", "tp-small"); }).join("") +
+      TP.PAINTS.map(function(p){ return placeFig({ home: "lighthouse", scene: "hill", tier: 0, paint: p.k, yard: {}, viewBox: HOME_CROP() }, p.boldName + " stripes", "", "", "tp-small"); }).join(""); },
+    /* every rank has three levels and its statue stands on a step for each (Sam, 2026-11-10: the gallery showed the steps
+       for Gold only, which read as if only Gold had them) */
+    tpRanks: function(){
+      return TIER_NAMES.map(function(n, i){
+        return '<div class="tp-rankrow"><h5>' + hpImg(i, "tp-rankhp") + esc(n) + "</h5>" + LEVELS.map(function(l, k){
+          return placeFig({ home: "cottage", scene: "hill", tier: i, level: k + 1, yard: {}, viewBox: statueCrop(), night: i === 6 }, n + " " + l, (k + 1) + (k ? " steps" : " step"), "", "tp-small");
+        }).join("") + "</div>";
+      }).join("");
+    },
+    /* the medal board on a whole place (tap it for the big view), then close up at each size */
+    tpMastery: function(){
+      var vb = [185, 116, 70, 78];
+      var open = function(n, label){ return '<button type="button" class="btn tp-try" data-mastery-open="' + n + '">' + label + "</button>"; };
+      return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
+        placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the medals glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
+        FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
+    },
+    tpHealth: function(){
+      var o = { home: "cottage", scene: "hill", yard: { corner: "mailbox" } }, d = TP.layout(o).spots.corner, q = TP.project(d[0], d[1], d[2] || 0);
+      return TP.HEALTH.map(function(h){ return placeFig(Object.assign({ viewBox: [q[0] - 36, q[1] - 60, 62, 74] }, o), h.n, hpRange(h) + ". " + h.does + ".", "corner", "tp-small", "", h); }).join("");
+    },
+    tpRankSets: function(){
+      if (!TP.SETS) return "";
+      return TP.SETS.ranks.map(function(r){
+        var o = byK(TP.OUTFITS, r.outfit[0]), y = byK(TP.YARD, r.yard[0]);
+        if (!o || !y) return '<figure class="tp-fig"><figcaption><b>' + esc(r.rank) + "</b><span>Not drawn yet</span></figcaption></figure>";
+        return '<div class="tp-rankset"><div class="tp-sethead"><b>' + esc(r.rank) + '</b><span>Reach ' + esc(r.rank) + " I</span></div>" + '<div class="tp-rcards">' +
+          scard(o, thumbImg("outfit", o.k)) + scard(y, thumbImg("yard", y.k, {})) + "</div></div>"; }).join("");
+    },
+    tpSets: function(){
+      if (!TP.SETS) return "";
+      return TP.SETS.seasons.map(function(se){
+        var of = function(list){ return list.filter(function(x){ return x.set === se.k; }); }, homes = of(TP.HOMES), scenes = of(TP.SCENES), yard = of(TP.YARD), outfits = of(TP.OUTFITS);
+        var head = '<div class="tp-sethead"><b>' + esc(se.n) + "</b><span>" + esc(se.when) + (se.gift ? " · everyone’s from the start" : "") + "</span></div>";
+        if (!homes.length || !scenes.length) return '<div class="tp-set">' + head + '<p class="tp-note">Not drawn yet.</p></div>';
+        var yd = {}; yard.forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+        var pic = placeFig({ home: homes[0].k, scene: scenes[0].k, tier: 3, level: 2, yard: yd, up: { flag: true } }, "", "", "door", "tp-setpic", outfits.length ? outfits[outfits.length - 1].k : "");
+        var cards = homes.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); })
+          .concat(scenes.map(function(x){ return rcard(x, thumbImg("scene", x.k), false, 'data-set-try="' + se.k + '"'); }),
+            outfits.map(function(x){ return rcard(x, thumbImg("outfit", x.k), false, 'data-set-try="' + se.k + '" data-set-outfit="' + x.k + '"'); }),
+            yard.map(function(x){ return rcard(x, thumbImg("yard", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); }));
+        return '<div class="tp-set">' + head + '<div class="tp-setbody">' + pic + '<div class="tp-rcards">' + cards.join("") + "</div></div></div>";
+      }).join("");
+    },
+    tpFrames: function(){
+      var sample = { Common: ["yard", "mailbox"], Uncommon: ["yard", "campfire"], Rare: ["yard", "telescope"], Epic: ["home", "igloo"], Legendary: ["home", "lighthouse"] };
+      return TP.RARITIES.map(function(r){ var s = sample[r.k], x = s[0] === "home" ? byK(TP.HOMES, s[1]) : byK(TP.YARD, s[1]);
+        return '<div class="tp-framefig">' + rcard(x, thumbImg(s[0], s[1], {}), false, 'data-burst="' + r.k + '"') + "<p><b>" + esc(r.k) + "</b> " + fmtPrice(r.band[0]) + " to " + fmtPrice(r.band[1]) + "</p></div>"; }).join("");
+    },
+    tpOutfits: function(){
+      return TP.OUTFITS.filter(builtIn).map(function(o){ var t = byK(TP.THEMES, o.theme);
+        return '<figure class="tp-fig tp-outfig"><div class="tp-pic tp-outpic">' + thumbImg("outfit", o.k) + "</div><figcaption><b>" + esc(o.n) + "</b><span>" + tagLine(o) + " " + esc(t ? t.n : "") + "</span><span><q>" + esc(o.say[0]) + "</q></span></figcaption></figure>"; }).join("");
+    },
+    tpSeasons: function(){
+      var list = [["", "fall", "Fall"], ["", "spring", "Spring"], ["winter", "", "Christmas"], ["halloween", "fall", "Halloween"], ["thanksgiving", "fall", "Thanksgiving"], ["newyear", "", "New Year's"], ["valentine", "", "Valentine's Day"], ["stpatrick", "spring", "St. Patrick's Day"], ["easter", "spring", "Easter"], ["dentist", "", "Dentist's Day"]];
+      var homes = TP.HOMES.filter(builtIn);
+      return list.map(function(x, i){ return placeFig({ home: homes[i % homes.length].k, scene: i === 2 ? "forest" : "hill", tier: 2, holiday: x[0], season: x[1], yard: { front: "garden" } }, x[2], "", "", "tp-small"); }).join("");
+    }
+  };
+  function lazyGalleries(){
+    var draw = function(el){ if (!el.dataset.lazy) return; delete el.dataset.lazy; el.innerHTML = GALLERIES[el.id]().replace(/<img /g, '<img loading="lazy" '); wireGallery(el); };
+    var els = $$(".tp-gal[data-lazy]");
+    if (!("IntersectionObserver" in window)) { els.forEach(draw); return; }
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { io.unobserve(e.target); draw(e.target); } }); }, { rootMargin: "900px 0px" });
+    els.forEach(function(el){ io.observe(el); });
+    lazyGalleries.all = function(){ els.forEach(function(el){ io.unobserve(el); draw(el); }); };
+  }
+  function wireGallery(el){
+    $$("[data-theme-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var t = byK(TP.THEMES, b.dataset.themeTry);
+      PS.scene = t.scene || PS.scene; PS.home = THEME_HOME[t.k] || PS.home; PS.yard = themeFill(t); PS.outfit = t.outfits[0] || ""; PS.paint = "cream";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-mastery-open]", el).forEach(function(b){ b.addEventListener("click", function(){ openMastery(FLAIRS[+b.dataset.masteryOpen]); }); });
+    $$("[data-set-try]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.dataset.setTry, of = function(list){ return list.filter(function(x){ return x.set === k; }); }, yd = {};
+      of(TP.YARD).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      PS.home = of(TP.HOMES)[0].k; PS.scene = of(TP.SCENES)[0].k; PS.yard = yd; PS.paint = "cream"; PS.outfit = b.dataset.setOutfit || (of(TP.OUTFITS)[2] || {}).k || "";
+      buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-burst]", el).forEach(function(b){ b.addEventListener("click", function(){
+      if (isStill()) return;
+      var old = $(".tp-cardburst", b); if (old) old.remove();
+      b.insertAdjacentHTML("beforeend", '<span class="tp-cardburst">' + TP.burst(b.dataset.burst) + "</span>");
+      setTimeout(function(){ var n = $(".tp-cardburst", b); if (n) n.remove(); }, 1600); }); });
+  }
+
+  /* ---------- the stage: the scene inline (a shadow root), Timmy hopping, eggs, the customize targets ---------- */
+  var STAGE_CSS = [
+    ":host{display:block}.tp-box{position:relative;line-height:0}.tp-box>svg.tp-scene{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}",
+    ".tp-egg{outline:none}.tp-egg:focus-visible{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)}.tp-timmy{cursor:pointer}",
+    ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
+    ".tp-hitarea:hover,.tp-hitarea:focus-visible{fill:rgba(255,255,255,.2);stroke:#fff;stroke-dasharray:4 4}.tp-hitarea.on{stroke:#fff;stroke-width:2.6;stroke-dasharray:5 4;fill:rgba(255,255,255,.16)}",
+    ".tp-hithome.on,.tp-hithome:hover,.tp-hithome:focus-visible{fill:rgba(255,255,255,.08)}",
+    /* the speech bubble comes from Timmy: it sits over his head, its tail points at him, and it follows him as he hops */
+    ".tp-bubble{position:absolute;left:0;top:0;width:max-content;max-width:min(72%,300px);transform:translateY(5px) scale(.96);transform-origin:var(--tail,50%) 100%;background:#fff;color:#3B2E3A;border:2px solid #3B2E3A;border-radius:14px;",
+    "padding:6px 11px;font:inherit;font-size:13.5px;font-weight:650;line-height:1.35;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;text-align:center;z-index:2}",
+    ".tp-bubble.on{opacity:1;transform:none}",
+    ".tp-bubble::before,.tp-bubble::after{content:'';position:absolute;left:var(--tail,50%);top:100%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #3B2E3A}",
+    ".tp-bubble::after{border-left-width:5px;border-right-width:5px;border-top:7px solid #fff;margin-top:-.5px}",
+    ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}",
+    ".tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
+    /* Timmy waves with his right arm (the same move as the pet's do-wave) */
+    ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out var(--wn,6) alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(var(--wa,-58deg))}}",
+    /* how he stands follows his health: a bounce at his best, a droop and sway when he hurts, a shiver at his worst */
+    ".tp-tmood{transform-box:fill-box;transform-origin:50% 100%}",
+    ".tp-timmy.hl-bounce .tp-tmood{animation:tp-hl-bounce 1.1s ease-in-out infinite}@keyframes tp-hl-bounce{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-1.7px) scale(.985,1.025)}}",
+    ".tp-timmy.hl-droop .tp-tmood{animation:tp-hl-droop 3.6s ease-in-out infinite}@keyframes tp-hl-droop{0%,100%{transform:rotate(-2.4deg) scale(1,.962)}50%{transform:rotate(2.4deg) scale(1.012,.948)}}",
+    ".tp-timmy.hl-shiver .tp-tmood{animation:tp-hl-shiver 2.2s linear infinite}@keyframes tp-hl-shiver{0%,56%,100%{transform:translateX(0) scale(1.01,.935)}60%,68%,76%,84%,92%{transform:translateX(-.55px) scale(1.01,.935)}64%,72%,80%,88%,96%{transform:translateX(.55px) scale(1.01,.935)}}",
+    ".tp-still .tp-tmood{animation:none!important}.tp-still .tp-timmy.hl-droop .tp-tmood{transform:scale(1,.96)}.tp-still .tp-timmy.hl-shiver .tp-tmood{transform:scale(1.01,.935)}",
+    "@media (prefers-reduced-motion: reduce){.tp-bubble{transition:none}.tp-timmy.do-wave .shpet-arm-r,.tp-tmood{animation:none!important}}"
+  ].join("\n");
+  var ST = { at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, tg: null, tw: null, face: null, depth: null, sr: null, wander: 0, lastTap: 0, layout: null, visible: true };
+  function buildPlace(opt){
+    opt = opt || {};
+    var host = $("#tpStage"); if (!host.shadowRoot) host.attachShadow({ mode: "open" });
+    var sr = host.shadowRoot, still = isStill(), o = tpOpts({ marks: PS.mode === "customize" && PS.pick !== "timmy" }), L = TP.layout(o), vb = TP.VIEWBOX;
+    cancelAnimationFrame(ST.raf); ST.busy = false; ST.next = null; ST.bub = null;
+    if (!L.spots[ST.at]) ST.at = "door";
+    var H = HL(); if (H.stay) ST.at = "door";
+    o.timmy = { g: timmyG(timmySvg(H.art, PS.outfit), H), at: ST.at };
+    var r = TP.render(o);
+    var hits = PS.mode !== "customize" ? "" : '<svg class="tp-hit" viewBox="' + vb.join(" ") + '" aria-label="Spots you can change">' +
+      Object.keys(r.slots).map(function(k){ var it = PS.yard[k], name = byK(TP.SLOTS, k).n;
+        return '<path class="tp-hitarea' + (PS.pick === k ? " on" : "") + '" data-pick="' + k + '" d="' + r.slots[k] + '" tabindex="0" role="button" aria-label="' + esc(name + ": " + (it ? byK(TP.YARD, it).n : "empty") + ". Change it") + '"/>'; }).join("") +
+      '<path class="tp-hitarea tp-hithome' + (PS.pick === "home" ? " on" : "") + '" data-pick="home" d="' + r.homeHit + '" tabindex="0" role="button" aria-label="' + esc(byK(TP.HOMES, PS.home).n + ". Change it") + '"/></svg>';
+    host.classList.toggle("is-night", !!(o.night || byK(TP.SCENES, PS.scene).alwaysNight));
+    sr.innerHTML = "<style>" + TP.CSS + "\n" + STAGE_CSS + "</style>" + '<div class="tp-box' + (still ? " tp-still" : "") + '">' +
+      r.svg.replace(' aria-hidden="true" focusable="false"', ' role="group" aria-label="' + esc(sceneAlt()) + '"') + hits + '<div class="tp-bubble" role="status" aria-live="polite"></div></div>';
+    ST.sr = sr; ST.layout = L; ST.depth = $(".tp-depth", sr); ST.tg = $(".tp-timmy", sr); ST.tw = ST.tg && ST.tg.parentNode; ST.face = ST.tg && $(".tp-tface", ST.tg);
+    ST.pos = L.spots[ST.at].slice(); setTimmy(ST.pos, 0, 1, 1);
+    camTo($$("svg.tp-scene, svg.tp-hit", sr), camFor(), still);
+    var zb = $("#tpZoom"); zb.hidden = PS.mode !== "customize"; zb.setAttribute("aria-pressed", PS.wide ? "false" : "true");
+    if (ST.tg) { ST.tg.setAttribute("role", "button"); ST.tg.setAttribute("tabindex", "0"); ST.tg.setAttribute("aria-label", "Timmy, " + H.n.toLowerCase() + ", " + PS.hp + " HP");
+      if (H.idle) ST.tg.classList.add("hl-" + H.idle);
+      ST.tg.addEventListener("click", function(e){ e.stopPropagation(); tapTimmy(); }); keyed(ST.tg, tapTimmy); }
+    $$(".tp-egg", sr).forEach(function(g){
+      var k = g.dataset.egg, e = TP.EGGS[k] || TP.EGGS.home;
+      g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-label", e.n + ": " + e.does);
+      g.addEventListener("click", function(ev){ ev.stopPropagation(); playEgg(g); });
+      keyed(g, function(){ playEgg(g); });
+    });
+    $$(".tp-hitarea", sr).forEach(function(p){
+      var go = function(){ PS.pick = p.dataset.pick; buildPlace(); var n = ST.sr && $('.tp-hitarea[data-pick="' + PS.pick + '"]', ST.sr); if (n) n.focus(); };
+      p.addEventListener("click", function(e){ e.stopPropagation(); go(); }); keyed(p, go);
+    });
+    $$(".tp-modebar [data-mode]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.mode === PS.mode ? "true" : "false"); });
+    found();
+    if (opt.burst) sfx("pop");
+    if (opt.burst && !still) burstAt(opt.burst);
+    if (opt.burst && opt.burst !== "home" && L.spots[opt.burst]) setTimeout(function(){ goTo(opt.burst); }, still ? 0 : 450);
+    if (opt.say) say(opt.say);
+    wanderOn();
+    side();
+    placeCard();
+    hpUI();
+  }
+  /* the health control under the picture: a preview of what the hubs will feed in (his HP follows your studying) */
+  var HP_PRESET = { sparkling: 100, healthy: 82, plaque: 62, stains: 48, cavity: 32, perio: 18, fracture: 6, zero: 0 };
+  function hpUI(){
+    var el = $("#tpHp"); if (!el) return;
+    var H = HL();
+    if (!el.firstChild) {
+      el.innerHTML = '<div class="tp-hphead"><b>Timmy’s health</b><output id="tpHpOut" for="tpHpRange"></output></div>' +
+        '<input type="range" id="tpHpRange" min="0" max="100" step="1" aria-label="Timmy’s HP">' +
+        '<div class="tp-hpsteps" role="group" aria-label="Health levels">' + TP.HEALTH.map(function(h){ return '<button type="button" data-hp="' + h.k + '" title="' + esc(hpRange(h)) + '">' + esc(h.n) + "</button>"; }).join("") + "</div>" +
+        '<p class="tp-note" id="tpHpDoes"></p><p class="tp-note tp-hpnote">A preview: in the hubs his HP follows your studying. Visitors never see it.</p>';
+      var set = function(v, speak){ PS.hp = Math.max(0, Math.min(100, Math.round(v))); var h = HL(); buildPlace(speak ? { say: hpLine(h.hello[0]) } : {}); };
+      $("#tpHpRange", el).addEventListener("input", function(e){ PS.hp = +e.target.value; hpUI(); });
+      $("#tpHpRange", el).addEventListener("change", function(e){ set(+e.target.value, true); });
+      $$("[data-hp]", el).forEach(function(b){ b.addEventListener("click", function(){ set(HP_PRESET[b.dataset.hp], true); }); });
+    }
+    $("#tpHpRange", el).value = PS.hp; el.dataset.level = H.k;
+    $("#tpHpRange", el).style.setProperty("--fill", PS.hp + "%");
+    $("#tpHpOut", el).textContent = PS.hp + " HP · " + H.n;
+    $("#tpHpDoes", el).textContent = H.does + ".";
+    $$("[data-hp]", el).forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.hp === H.k ? "true" : "false"); });
+  }
+  /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
+     the scene, for Play and when Close-up is off. One viewBox, eased, shared by the picture and its tap areas */
+  function camFor(){
+    var V = TP.VIEWBOX, c, frac;
+    if (PS.mode !== "customize" || PS.wide || PS.pick === "scene" || !ST.layout) return V.slice();
+    if (PS.pick === "home") { c = HOME_CROP(); frac = .74; }
+    else if (PS.pick === "timmy") { var sp = ST.layout.spots[ST.at] || ST.layout.spots.door, q = TP.project(sp[0], sp[1], sp[2] || 0); c = [q[0] - 22, q[1] - 62, 44, 70]; frac = .46; }
+    else { var it = byK(TP.YARD, PS.yard[PS.pick] || ""); c = slotCrop(PS.pick, it && it.wide); frac = .58; }
+    var w = Math.min(V[2], Math.max(c[2] * 1.2, c[3] * 1.2 * V[2] / V[3], V[2] * frac)), h = w * V[3] / V[2];
+    return [Math.max(V[0], Math.min(V[0] + V[2] - w, c[0] + c[2] / 2 - w / 2)), Math.max(V[1], Math.min(V[1] + V[3] - h, c[1] + c[3] / 2 - h / 2)), w, h];
+  }
+  function camTo(svgs, to, now){
+    cancelAnimationFrame(ST.camRaf); ST.camGoal = to;
+    var from = ST.cam || TP.VIEWBOX.slice(), set = function(v){ ST.cam = v; svgs.forEach(function(n){ n.setAttribute("viewBox", v.map(function(x){ return x.toFixed(2); }).join(" ")); }); bubbleAt(); };
+    if (now || from.join() === to.join()) { set(to.slice()); return; }
+    set(from); var t0 = performance.now();
+    var step = function(t){ var u = Math.min(1, (t - t0) / 560), e = 1 - Math.pow(1 - u, 3); set(from.map(function(a, i){ return a + (to[i] - a) * e; })); if (u < 1) ST.camRaf = requestAnimationFrame(step); };
+    ST.camRaf = requestAnimationFrame(step);
+  }
+  /* Surprise me: a whole new place, from everything there is */
+  function shuffle(){
+    var any = function(l){ return l[Math.floor(Math.random() * l.length)]; }, yard = {}, small = TP.YARD.filter(function(y){ return !y.wide; });
+    ["left", "front", "right", "corner", "side"].forEach(function(k){ if (Math.random() < .72) { var y = any(small), used = Object.keys(yard).some(function(q){ return yard[q] === y.k; }); if (!used) yard[k] = y.k; } });
+    PS.home = any(TP.HOMES).k; PS.scene = any(TP.SCENES).k; PS.yard = yard; PS.outfit = Math.random() < .8 ? any(TP.OUTFITS).k : ""; PS.paint = any(TP.PAINTS).k;
+    PS.up = {}; (byK(TP.HOMES, PS.home).ups || []).forEach(function(u){ if (u !== "paint" && Math.random() < .5) PS.up[u] = true; });
+    var was = PS.wide; PS.wide = true; buildPlace({ burst: "home", say: "A whole new look! What do you think?" }); PS.wide = was;
+    if (!isStill()) setTimeout(function(){ flip(true); }, 500);
+  }
+  function keyed(el, fn){ el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); fn(); } }); }
+  function found(){
+    var eggs = ST.sr ? $$(".tp-egg", ST.sr).map(function(g){ return g.dataset.egg; }) : [], seen = {};
+    eggs.forEach(function(k){ seen[k] = 1; });
+    var n = Object.keys(seen).length, got = Object.keys(seen).filter(function(k){ return PS.found[k]; }).length;
+    $("#tpFound").textContent = PS.mode === "play" ? (got ? got + " of " + n + " surprises found here" : n + " things here do something when tapped") : "Tap a dashed spot or the house";
+  }
+  function say(text){
+    var b = ST.sr && $(".tp-bubble", ST.sr); if (!b || !text) return;
+    b.textContent = text; b.classList.toggle("small", b.parentNode.clientWidth < 440); ST.bub = { el: b, w: b.offsetWidth, h: b.offsetHeight }; bubbleAt();
+    b.classList.add("on"); clearTimeout(say.t); say.t = setTimeout(function(){ b.classList.remove("on"); ST.bub = null; }, 3200);
+  }
+  /* put the bubble over Timmy's head (under him when there's no room above), kept inside the picture, its tail on him */
+  function bubbleAt(){
+    var u = ST.bub; if (!u || !ST.pos) return;
+    var box = u.el.parentNode, W = box.clientWidth, H = box.clientHeight, vb = ST.cam || TP.VIEWBOX, q = TP.project(ST.pos[0], ST.pos[1], ST.pos[2] || 0), k = TP.VIEWBOX[2] / vb[2];
+    var x = (q[0] - vb[0]) / vb[2] * W, head = (q[1] - (PS.outfit ? 60 : 50) - vb[1]) / vb[3] * H, feet = (q[1] + 4 - vb[1]) / vb[3] * H; void k;
+    var left = Math.max(6, Math.min(W - u.w - 6, x - u.w / 2)), below = head - u.h - 11 < 4, top = below ? feet + 11 : head - u.h - 11;
+    u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
+  }
+  function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
+  /* one shared window for the big views (mastery, a shop item): a dialog that closes on its X, Escape or a tap outside */
+  function openDlg(html, cls){
+    var d = $("#tpDlg");
+    if (!d) { d = document.createElement("dialog"); d.id = "tpDlg"; document.body.appendChild(d);
+      d.addEventListener("click", function(e){ if (e.target === d || e.target.closest("[data-dlg-close]")) d.close(); }); }
+    d.className = "tp-dlg " + (cls || ""); d.innerHTML = html;
+    if (d.open) d.close();
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+    return d;
+  }
+  var DLG_X = '<button type="button" class="tp-dlgx" data-dlg-close aria-label="Close"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>';
+  /* hub mastery, large: the board opened up. Every hub's own medal (the same art the hub shows when you earn it), with its
+     name and level, best first, then the hubs with no medal yet. The made-up hubs still to come wear the placeholder
+     medal with their own ribbon colors, since a real hub always has its own set */
+  function mixHex(a, b, t){
+    var h = function(c){ c = c.replace("#", ""); return [0, 2, 4].map(function(i){ return parseInt(c.slice(i, i + 2), 16); }); }, x = h(a), y = h(b);
+    return "#" + x.map(function(v, i){ return ("0" + Math.round(v + (y[i] - v) * t).toString(16)).slice(-2); }).join("");
+  }
+  function medalImg(x, cls){
+    var lvl = Math.max(1, x.lvl), own = A.medals[x.hub], art = (own || A.medals.generic)[lvl - 1], g = A.tints.generic;
+    if (!own && x.tint && /^#[0-9a-f]{6}$/i.test(x.tint)) art = art.split(g.ink).join(x.tint).split(mixHex(g.ink, "#000000", .28)).join(mixHex(x.tint, "#000000", .28))
+      .split(g.mid).join(mixHex(x.tint, "#FFFFFF", .42)).split(mixHex(g.mid, "#000000", .2)).join(mixHex(x.tint, "#FFFFFF", .2));
+    return img(art, "", "tp-medal " + (cls || ""), "0 0 64 64");
+  }
+  function openMastery(flair){
+    var list = (flair || []).slice().sort(function(a, b){ return b.lvl - a.lvl; }), n = [0, 0, 0, 0, 0]; list.forEach(function(x){ n[x.lvl]++; });
+    var todo = [0, 1].map(function(i){ return { hub: "hub-" + (list.length + 7 + i), lvl: 0, tint: "" }; });
+    var chips = [4, 3, 2, 1].filter(function(l){ return n[l]; }).map(function(l){ return '<span class="tp-mchip">' + medalImg({ hub: "generic", lvl: l }) + "<b class=\"num\">" + n[l] + "</b> " + TP.MEDALS[l] + "</span>"; }).join("");
+    var card = function(x, i){ return '<li class="tp-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + medalImg(x) + "<b>" + esc(hubLabel(x.hub)) + '</b><span class="tp-mlvl">' + (x.lvl ? TP.MEDALS[x.lvl] : "No medal yet") + "</span></li>"; };
+    openDlg('<div class="tp-mboard">' + DLG_X +
+      '<div class="tp-mhead"><span class="tp-mcrest" aria-hidden="true">' + (list.length ? medalImg(list[0]) : medalImg({ hub: "generic", lvl: 1 }, "is-none")) + '</span><div><h3 id="tpDlgT">Your hub mastery</h3>' +
+        "<p>" + (list.length ? list.length + (list.length === 1 ? " hub" : " hubs") + " mastered" : "No hubs mastered yet: your first medal hangs here") + "</p></div></div>" +
+      (chips ? '<p class="tp-mchips">' + chips + "</p>" : "") +
+      '<ul class="tp-mgrid">' + list.concat(todo).map(card).join("") + "</ul>" +
+      '<p class="tp-mfoot">These are the medals each hub gives you, the same ones that pop up when you earn them. The board by the house hangs your best twenty.</p></div>', "tp-mdlg").setAttribute("aria-labelledby", "tpDlgT");
+  }
+  function masteryLine(){
+    var fl = FLAIRS[PS.flair], n = [0, 0, 0, 0, 0]; fl.forEach(function(x){ n[x.lvl]++; });
+    var parts = [[4, "Crown"], [3, "Gold"], [2, "Silver"], [1, "Bronze"]].filter(function(q){ return n[q[0]]; }).map(function(q){ return n[q[0]] + " " + q[1]; });
+    return fl.length + (fl.length === 1 ? " hub" : " hubs") + " mastered: " + listN(parts) + ".";
+  }
+  function playEgg(g){
+    var k = g.dataset.egg, e = TP.EGGS[k] || {};
+    g.classList.remove("tp-on"); void g.getBoundingClientRect(); g.classList.add("tp-on");
+    clearTimeout(g._t); g._t = setTimeout(function(){ g.classList.remove("tp-on"); }, 2600);
+    PS.found[k] = 1; found();
+    var H = HL(), line = k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say;
+    if (H.stay && k !== "mastery" && k !== "statue") { ST.rested = !ST.rested; line = ST.rested ? H.rest : line; }
+    say(line);
+    ST.lastTap = Date.now();
+    if (k === "mastery") { clearTimeout(ST.mt); ST.mt = setTimeout(function(){ openMastery(FLAIRS[PS.flair]); }, isStill() ? 0 : 650); }
+    if (isStill()) return;
+    var target = spotFor(g);
+    if (H.stay) { lookAt(target); return; }
+    if (target) goTo(target); else hopInPlace();
+  }
+  /* he turns to face a spot without leaving his own */
+  function lookAt(spot){
+    var sp = ST.layout && ST.layout.spots[spot]; if (!sp || !ST.pos || ST.busy) return;
+    var a = TP.project(ST.pos[0], ST.pos[1], 0), b = TP.project(sp[0], sp[1], 0);
+    if (Math.abs(b[0] - a[0]) > .5) { ST.dir = b[0] < a[0] ? -1 : 1; setTimmy(ST.pos, 0, 1, 1); }
+  }
+  /* where Timmy goes to see a thing: its yard spot, the door for the home and what's by it, else the nearest spot when
+     it stands on the ground in the yard; things in the sky or far off, he hops where he is */
+  function spotFor(g){
+    var it = g.closest(".tp-item"), k = g.dataset.egg, sp = ST.layout.spots;
+    if (it && sp[it.dataset.slot]) return it.dataset.slot;
+    if (k === "home" || k === "statue" || k === "brush" || k === "mastery") return sp.deck && Math.random() < .4 ? "deck" : "door";
+    var b; try { b = g.getBBox(); } catch (x) { return null; }
+    var q = TP.unproject(b.x + b.width / 2, b.y + b.height);
+    if (!(q[0] > -2 && q[1] > -2 && q[0] < 16.5 && q[1] < 16.5)) return null;
+    var best = null, bd = 1e9; Object.keys(sp).forEach(function(s){ var p = sp[s], d = (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); if (d < bd) { bd = d; best = s; } });
+    return best;
+  }
+  function setTimmy(p, arc, kx, ky){
+    if (!ST.tg) return;
+    var q = TP.project(p[0], p[1], p[2] || 0);
+    ST.tg.setAttribute("transform", "translate(" + q[0].toFixed(1) + " " + (q[1] - arc).toFixed(1) + ")");
+    ST.face.setAttribute("transform", "scale(" + (ST.dir * kx).toFixed(3) + " " + ky.toFixed(3) + ")");
+    /* drawn in the scene's depth order: in front of what's behind him, behind what's in front */
+    var z = p[0] + p[1] + .3, c = ST.depth.firstChild;
+    while (c && (c === ST.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
+    if (c !== ST.tw.nextSibling) ST.depth.insertBefore(ST.tw, c);
+    if (ST.bub) { var keep = ST.pos; ST.pos = p; bubbleAt(); ST.pos = keep; }
+  }
+  function lerp(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t]; }
+  function goTo(spot){
+    if (!ST.layout || !ST.layout.spots[spot]) return;
+    if (HL().stay && spot !== "door") { lookAt(spot); return; }
+    if (isStill()) { ST.at = spot; ST.pos = ST.layout.spots[spot].slice(); setTimmy(ST.pos, 0, 1, 1); return; }
+    if (ST.busy) { ST.next = spot; return; }
+    if (spot === ST.at) { hopInPlace(); return; }
+    var path = TP.route(tpOpts(), ST.at, spot); ST.at = spot;
+    hops(path);
+  }
+  function hops(path, plain){
+    var list = [], H = HL(), stride = 1.15 * H.stride, soft = Math.min(1, H.hop + .25);
+    for (var i = 1; i < path.length; i++){
+      var a = path[i - 1], b = path[i], dz = (b[2] || 0) - (a[2] || 0), d = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + dz * dz * 1.4);
+      var n = Math.max(1, Math.ceil(d / stride));
+      for (var j = 0; j < n; j++) list.push([lerp(a, b, j / n), lerp(a, b, (j + 1) / n), Math.abs(dz) > .3]);
+    }
+    if (!list.length) return;
+    ST.busy = true;
+    var hi = 0, t0 = performance.now(), AIR = 260 * H.pace, LAND = 90 * Math.max(1, H.pace * .8) + (H.hop < .5 ? 40 : 0), cheer = H.cheer && !plain;
+    var start = function(h){ var p = TP.project(h[0][0], h[0][1], h[0][2]), q = TP.project(h[1][0], h[1][1], h[1][2]); if (Math.abs(q[0] - p[0]) > .5) ST.dir = q[0] < p[0] ? -1 : 1; };
+    start(list[0]);
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var h = list[hi], t = now - t0;
+      /* a hop; with no hop left in him (hop 0) it's a limp: he dips and leans into each short step */
+      if (t < AIR) { var u = t / AIR, e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, w = Math.sin(Math.PI * u);
+        if (H.hop > 0) setTimmy(lerp(h[0], h[1], e), w * (h[2] ? 3 : 6) * H.hop, 1 - .04 * w * soft, 1 + .07 * w * soft);
+        else setTimmy(lerp(h[0], h[1], e), 0, 1 + .05 * w, 1 - .07 * w); }
+      else if (t < AIR + LAND) { var v = Math.sin(Math.PI * (t - AIR) / LAND); setTimmy(h[1], 0, 1 + .1 * v * soft, 1 - .13 * v * soft); }
+      else {
+        hi++; t0 = now;
+        if (hi >= list.length) { ST.busy = false; ST.pos = h[1]; setTimmy(h[1], 0, 1, 1); if (ST.next) { var n = ST.next; ST.next = null; goTo(n); } else if (cheer) hopInPlace(); return; }
+        start(list[hi]);
+      }
+      ST.raf = requestAnimationFrame(frame);
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  function hopInPlace(){ if (isStill() || ST.busy || !ST.pos || HL().hop <= 0) return; hops([ST.pos, ST.pos.slice(0, 2).concat([(ST.pos[2] || 0) + .01]), ST.pos], true); }
+  /* Timmy waves hello when he's tapped (and now and then by himself); tap him again while he's waving and he flips */
+  function wave(quiet){
+    if (!ST.tg) return;
+    var H = HL();
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(hpLine(H.hello[(wave.n = (wave.n || 0) + 1) % H.hello.length])); }
+    if (isStill()) return;
+    ST.tg.style.setProperty("--wn", H.wave[0]); ST.tg.style.setProperty("--wa", -H.wave[1] + "deg");
+    ST.tg.classList.remove("do-wave"); void ST.tg.getBoundingClientRect(); ST.tg.classList.add("do-wave"); ST.waveAt = Date.now(); ST.waveFor = H.wave[0] * 380 + 120;
+    clearTimeout(wave.t); wave.t = setTimeout(function(){ if (ST.tg) ST.tg.classList.remove("do-wave"); }, ST.waveFor);
+  }
+  /* a second tap while he waves: a flip when he's well; when he isn't, he says why not (and manages a small hop if he can) */
+  function tapTimmy(){
+    ST.lastTap = Date.now();
+    var H = HL(), again = Date.now() - (ST.waveAt || 0) < Math.max(1400, ST.waveFor || 2400) && !isStill();
+    if (!again) { wave(); return; }
+    ST.waveAt = 0; if (ST.tg) ST.tg.classList.remove("do-wave");
+    if (H.flip) flip(); else { PS.found.timmy = 1; found(); say(hpLine(H.tired)); hopInPlace(); }
+  }
+  function flip(quiet){
+    if (quiet !== true) { PS.found.timmy = 1; found(); say(TP.EGGS.timmy.say); }
+    if (isStill() || ST.busy || !ST.pos) return;
+    var twice = HL().k === "sparkling";
+    ST.busy = true; var t0 = performance.now(), D = twice ? 860 : 620, p = ST.pos;
+    var frame = function(now){
+      if (!ST.tg) { ST.busy = false; return; }
+      var u = Math.min(1, (now - t0) / D);
+      setTimmy(p, Math.sin(Math.PI * u) * (twice ? 22 : 16), Math.cos(u * Math.PI * (twice ? 4 : 2)), 1);
+      if (u < 1) ST.raf = requestAnimationFrame(frame); else { setTimmy(p, 0, 1, 1); ST.busy = false; }
+    };
+    ST.raf = requestAnimationFrame(frame);
+  }
+  /* while it's on screen and nobody's tapping, he does something now and then: how often he wanders off, how far, and
+     what he does instead all follow his health */
+  function wanderOn(){
+    if (ST.wander) return;
+    var host = $("#tpStage");
+    if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ ST.visible = es[0].isIntersecting; }).observe(host);
+    ST.wander = setInterval(function(){
+      if (isStill() || PS.mode !== "play" || ST.busy || !ST.visible || document.hidden || Date.now() - ST.lastTap < 6000 || !ST.layout) return;
+      var H = HL(), sp = ST.layout.spots;
+      if (H.stay) return;
+      if (Math.random() > H.roam) {
+        if (H.idle === "bounce") { if (Math.random() < .4) flip(true); else if (Math.random() < .5) hopInPlace(); else wave(true); }
+        else if (H.wave[0] >= 4 && Math.random() < .55) wave(true);
+        return;
+      }
+      var keys = Object.keys(sp).filter(function(k){ return k !== ST.at; });
+      if (H.near) { var d = sp.door; keys = keys.filter(function(k){ var q = sp[k]; return k === "door" || k === "deck" || Math.sqrt((q[0] - d[0]) * (q[0] - d[0]) + (q[1] - d[1]) * (q[1] - d[1])) < 4.2; }); }
+      if (keys.length) goTo(keys[Math.floor(Math.random() * keys.length)]);
+    }, 5200);
+  }
+  function burstAt(where){
+    var it = where === "home" ? null : PS.yard[where], x = it ? byK(TP.YARD, it) : byK(TP.HOMES, PS.home), r = x && x.rarity || "Common", vb = ST.camGoal || TP.VIEWBOX, q;
+    if (where === "home") q = TP.project(5.5, 5.5, 4);
+    else { var s = TP.SLOT_AT[where]; q = TP.project(s.x + TP.S / 2, s.y + (x && x.wide ? 3.75 : TP.S / 2), 1); }
+    var box = ST.sr && $(".tp-box", ST.sr); if (!box) return;
+    box.insertAdjacentHTML("beforeend", '<div class="tp-burstpos" style="width:' + (26 * TP.VIEWBOX[2] / vb[2]).toFixed(1) + "%;left:" + ((q[0] - vb[0]) / vb[2] * 100).toFixed(2) + "%;top:" + ((q[1] - vb[1]) / vb[3] * 100).toFixed(2) + '%">' + TP.burst(r) + "</div>");
+    setTimeout(function(){ var b = ST.sr && $(".tp-burstpos", ST.sr); if (b) b.remove(); }, 1700);
+  }
+
+  /* ---------- the side panel: what to change, as rarity cards ---------- */
+  function chip(label, on, data, extra){ return '<button type="button" class="tp-chip' + (on ? " on" : "") + '" aria-pressed="' + (on ? "true" : "false") + '" ' + data + ">" + (extra || "") + esc(label) + "</button>"; }
+  var DOCK_N = { right: "Back", side: "Side", left: "Path, left", front: "Path, right", corner: "Front" };
+  var DRAWER = { home: ["Homes", "The cottage is free. Everything else is on its shelf."], scene: ["Scenes", "Where the whole place stands."], timmy: ["Timmy’s wardrobe", "Pick an outfit off the rail."] };
+  function side(){
+    var el = $("#tpSide"), pick = PS.pick, h = byK(TP.HOMES, PS.home), lane = PS.yard.side === "lane";
+    if (pick === "corner" && lane) pick = PS.pick = "side";
+    /* the dock: what's in every spot right now, as pictures */
+    var tile = function(k, label, pic, full, small){ return '<button type="button" class="tp-dtile' + (small ? " is-slot" : "") + (pick === k ? " on" : "") + (pic ? "" : " is-empty") + '" data-pick="' + k + '" aria-pressed="' + (pick === k) + '" aria-label="' + esc(full) + '"><span class="tp-dpic">' + (pic || '<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 4.500v11M4.500 10h11" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round"/></svg>') + "</span><b>" + esc(label) + "</b></button>"; };
+    var cur0 = byK(TP.OUTFITS, PS.outfit), sc = byK(TP.SCENES, PS.scene);
+    var dock = '<div class="tp-dock" role="group" aria-label="What to change"><div class="tp-dmain">' +
+      tile("home", "Home", thumbImg("home", PS.home, { scene: PS.scene }), "Home: " + h.n) + tile("scene", "Scene", thumbImg("scene", PS.scene), "Scene: " + sc.n) + tile("timmy", "Timmy", thumbImg("outfit", PS.outfit), "Timmy: " + (cur0 ? cur0.n : "no outfit")) + "</div>" +
+      '<div class="tp-dyard"><span class="tp-dlab">The yard</span>' + TP.SLOTS.filter(function(q){ return !(q.k === "corner" && lane); }).map(function(q){ var it = byK(TP.YARD, PS.yard[q.k] || "");
+        return tile(q.k, DOCK_N[q.k] || q.n, it ? thumbImg("yard", it.k, { scene: PS.scene }) : "", q.n + ": " + (it ? it.n : "empty"), true); }).join("") + "</div></div>";
+    /* the drawer: one kind of thing, in three tabs (the classics, the seasonal sets by set, the rank rewards) */
+    var kind = pick === "home" || pick === "scene" || pick === "timmy" ? pick : "yard", sl = kind === "yard" ? byK(TP.SLOTS, pick) : null, curK = kind === "home" ? PS.home : kind === "scene" ? PS.scene : kind === "timmy" ? PS.outfit : PS.yard[pick];
+    var list = kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "timmy" ? TP.OUTFITS : TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; });
+    var data = kind === "home" ? "data-home" : kind === "scene" ? "data-scene" : kind === "timmy" ? "data-outfit" : "data-item";
+    var card = function(x){ return rcard(x, kind === "timmy" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: PS.scene }), x.k === curK, data + '="' + x.k + '"'); };
+    var cur = byK(list, curK || ""), groups = [["classic", "Classics", list.filter(builtIn)], ["sets", "Seasonal", list.filter(inSets)], ["rank", "Rank", list.filter(byRank)]].filter(function(g){ return g[2].length; });
+    var src = side.src[kind]; if (!src || side.last !== pick + ":" + (curK || "")) src = cur && inSets(cur) ? "sets" : cur && byRank(cur) ? "rank" : src || "classic";
+    if (!groups.some(function(g){ return g[0] === src; })) src = groups[0][0];
+    side.src[kind] = src; side.last = pick + ":" + (curK || "");
+    var tabs = groups.length < 2 ? "" : '<div class="seg tp-dsrc" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + g[2].length + "</span></button>"; }).join("") + "</div>";
+    var shown = groups.filter(function(g){ return g[0] === src; })[0][2], rack = kind === "timmy" ? "tp-rail" : "tp-plank", cards;
+    if (src === "sets") cards = TP.SETS.seasons.map(function(se){ var mine = shown.filter(function(x){ return x.set === se.k; }); return mine.length ? '<h5 class="tp-seth">' + esc(se.n) + (se.gift ? " <small>yours already</small>" : "") + '</h5><div class="tp-rcards ' + rack + '">' + mine.map(card).join("") + "</div>" : ""; }).join("");
+    else cards = '<div class="tp-rcards ' + rack + '">' + (kind === "timmy" && src === "classic" ? rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""') : "") + shown.map(card).join("") + "</div>" +
+      (src === "rank" ? '<p class="tp-note">Rank pieces are earned, never sold: one outfit and one yard piece at every full rank-up.</p>' : "");
+    var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."] : [DRAWER[kind][0], kind === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[kind][1]];
+    var body = '<div class="tp-dhead"><div><h4>' + esc(head[0]) + "</h4><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="btn tp-dclear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tp-dcards">' + cards + "</div>";
+    if (kind === "home") body += '<div class="tp-dextra"><h4>Upgrades for ' + esc(h.n.replace(/^The /, "the ")) + '</h4><div class="tp-opts">' + TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0; }).map(function(u){
+          var on = !!PS.up[u.k], own = h.upn[u.k], same = cardName(own).toLowerCase() === cardName(u.n).toLowerCase();
+          return '<button type="button" class="tp-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-up="' + u.k + '">' + rarTag(u.rarity) +
+            '<span class="tp-upn"><b>' + esc(cardName(u.n)) + "</b><small>" + esc(same ? "" : own) + "</small></span>" + price(u.price) + "</button>"; }).join("") + "</div>" +
+        (h.ups.indexOf("paint") < 0 ? "" : "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home) || !!h.set, c = h.set && p.k === "cream" ? "#F4EFE6" : bold ? p.bold : p.c;
+          return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>") + "</div>";
+    if (kind === "yard" && (pick === "side" || pick === "corner")) body += '<p class="tp-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
+    body += '<div class="tp-shop"><a class="btn" href="#tpShop">Get more in the shop</a><span class="tp-note">Here everything is yours to try. Prices are in Shiny Gold Crowns.</span></div>';
+    var prev = '<details class="tp-prev"' + (side.open ? " open" : "") + "><summary>Preview only: time, rank, season</summary>" +
+      '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
+      selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
+      selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
+      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
+      selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
+      '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
+    var keep = $(".tp-dcards", el), top = keep && side.kept === kind + src ? keep.scrollTop : 0; side.kept = kind + src;
+    el.innerHTML = dock + '<div class="tp-drawer d-' + kind + '">' + body + "</div>" + prev;
+    if (top) $(".tp-dcards", el).scrollTop = top;
+    $(".tp-prev", el).addEventListener("toggle", function(e){ side.open = e.target.open; });
+    $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ side.src[kind] = b.dataset.src; side(); var n = $('[data-src="' + b.dataset.src + '"]', el); if (n) n.focus(); }); });
+    $$("[data-pick]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.pick = b.dataset.pick; PS.mode = "customize"; buildPlace(); var n = $('.tp-dtile[data-pick="' + PS.pick + '"]', el); if (n) n.focus({ preventScroll: true }); }); });
+    $$("[data-home]", el).forEach(function(b){ b.addEventListener("click", function(){ if (PS.home === b.dataset.home) return; PS.home = b.dataset.home; buildPlace({ burst: "home", say: byK(TP.HOMES, PS.home).n + ". Home sweet home." }); }); });
+    $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.up[b.dataset.up] = !PS.up[b.dataset.up]; buildPlace(PS.up[b.dataset.up] ? { burst: "home" } : {}); }); });
+    $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.paint = b.dataset.paint; buildPlace(); }); });
+    $$("[data-scene]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.scene = b.dataset.scene; buildPlace({ say: byK(TP.SCENES, PS.scene).n + ". Let's look around." }); }); });
+    $$("[data-outfit]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.outfit = b.dataset.outfit; var o = byK(TP.OUTFITS, PS.outfit); buildPlace({ say: o ? o.say[0] : "Back to just me." }); if (!isStill()) setTimeout(function(){ flip(true); }, 120); }); });
+    $$("[data-item]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = PS.pick, it = b.dataset.item;
+      if (it === "lane") { delete PS.yard.corner; PS.yard.side = "lane"; k = PS.pick = "side"; }
+      else if (it) { if (k === "side" && PS.yard.side === "lane" && it !== "lane") delete PS.yard.side; PS.yard[k] = it; }
+      else delete PS.yard[k];
+      buildPlace(it ? { burst: k, say: "New: " + byK(TP.YARD, it).n.replace(/^A /, "a ") + "." } : {}); }); });
+    $$("[data-time]", el).forEach(function(b){ b.addEventListener("click", function(){ PS.time = b.dataset.time; buildPlace(); }); });
+    $$("select[data-k]", el).forEach(function(s){ s.addEventListener("change", function(){ var k = s.dataset.k; PS[k] = k === "tier" || k === "flair" || k === "level" ? +s.value : s.value; buildPlace(); }); });
+    $("[data-still]", el).addEventListener("change", function(e){ PS.still = e.target.checked; buildPlace(); });
+  }
+  side.src = {};
+  function selRow(label, k, opts, cur){
+    return '<label class="tp-ctl"><span>' + label + '</span><span class="select-wrap"><select class="select" data-k="' + k + '">' + opts.map(function(o){ return '<option value="' + o[0] + '"' + (String(o[0]) === String(cur) ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18) + "</span></label>";
+  }
+  function placeCard(){
+    var o = tpOpts({ viewBox: TP.CARD, timmy: { g: timmyG(timmySvg(HL().art, PS.outfit), HL()), at: "door" } }), rr = TP.render(o), h = byK(TP.HOMES, PS.home), s = byK(TP.SCENES, PS.scene);
+    $("#tpCard").innerHTML = '<div class="tp-pic tp-cardpic' + (o.night ? " is-night" : "") + '">' + sceneImg(rr.svg, sceneAlt(), isStill()) + "</div>" +
+      '<div class="tp-cardfoot"><div><b>Timmy’s place</b><span>' + esc(h.n) + " · " + esc(s.n.replace(/^The /, "the ")) + '</span></div><a class="btn" href="#place">Change it</a></div>';
+  }
+
+  /* ---------- the shop: a storefront of shelves (what get_my_shop returns: today, this week, the season, a throwback),
+     and a window that opens on any piece. A mock: the wallet and what's owned live on this page only ---------- */
+  var SHOP = { wallet: 3450, owned: {} };
+  var KIND_N = { home: "Home", scene: "Scene", yard: "Yard piece", outfit: "Outfit for Timmy" };
+  var SIC = {
+    clock: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5.800V10l2.800 1.900" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    glass: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M5 2.500h10M5 17.500h10M6.200 2.500c0 4 3.800 5 3.800 7.500s-3.800 3.500-3.800 7.500M13.800 2.500c0 4-3.800 5-3.800 7.500s3.800 3.500 3.800 7.500" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.600 16.500c.6-1.900 4.200-1.900 4.800 0Z" fill="currentColor"/></svg>',
+    check: '<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M4.500 10.500l3.700 3.700L15.500 6.500" fill="none" stroke="currentColor" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  /* sound cues, synthesized (no files): a tick when a window opens, coins when you pay, a fanfare that grows with the
+     rarity, a thud when you can't afford it, a whoosh for the clouds. One switch turns them off; the real thing follows
+     the site's own sound setting */
+  var SND = { on: true, ctx: null };
+  try { SND.on = localStorage.getItem("sh_design_sound") !== "off"; } catch (e) {}
+  function audio(){
+    if (!SND.on) return null;
+    try { if (!SND.ctx) SND.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (SND.ctx.state === "suspended") SND.ctx.resume(); return SND.ctx; } catch (e) { return null; }
+  }
+  function tone(f, at, dur, type, vol, to){
+    var c = audio(); if (!c) return;
+    var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + .02 + at;
+    o.type = type || "triangle"; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol || .08, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .03);
+  }
+  function hiss(at, dur, vol, f0, f1){
+    var c = audio(); if (!c) return;
+    var n = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0); for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    var src = c.createBufferSource(), flt = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + .02 + at; src.buffer = buf; flt.type = "bandpass"; flt.Q.value = .8;
+    flt.frequency.setValueAtTime(f0, t); flt.frequency.exponentialRampToValueAtTime(f1, t + dur * .5); flt.frequency.exponentialRampToValueAtTime(f0, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * .45); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(flt); flt.connect(g); g.connect(c.destination); src.start(t); src.stop(t + dur + .05);
+  }
+  var NOTE = { G4: 392, C5: 523.25, D5: 587.33, E5: 659.25, Fs5: 739.99, G5: 783.99, A5: 880, C6: 1046.5, D6: 1174.66, E6: 1318.51, Fs6: 1479.98, G6: 1567.98, C7: 2093 };
+  function sfx(k, at){
+    at = at || 0;
+    if (k === "open") { tone(660, at, .07, "triangle", .06); tone(990, at + .05, .1, "triangle", .05); }
+    else if (k === "pop") tone(320, at, .12, "sine", .1, 640);
+    else if (k === "deny") { tone(196, at, .16, "triangle", .1, 130); tone(147, at + .12, .2, "triangle", .08, 98); }
+    else if (k === "coins") for (var i = 0; i < 5; i++) { tone(i % 2 ? 1976 : 1568, at + i * .075, .09, "triangle", .06); tone(i % 2 ? 3136 : 2637, at + i * .075 + .015, .06, "sine", .03); }
+    else if (k === "whoosh") hiss(at, 1.5, .09, 280, 1900);
+    else if (k === "rise") { tone(196, at, .72, "triangle", .07, 784); tone(98, at, .72, "sine", .08, 196); hiss(at, .72, .04, 500, 3200); }
+    else if (k === "Common") { tone(NOTE.C5, at, .12, "triangle", .09); tone(NOTE.E5, at + .09, .2, "triangle", .09); }
+    else if (k === "Uncommon") { [NOTE.C5, NOTE.E5, NOTE.G5].forEach(function(f, i){ tone(f, at + i * .09, i === 2 ? .3 : .12, "triangle", .09); }); }
+    else if (k === "Rare") { [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6].forEach(function(f, i){ tone(f, at + i * .085, i === 3 ? .45 : .12, "triangle", .09); }); tone(NOTE.C7, at + .36, .3, "sine", .03); tone(NOTE.G6, at + .44, .3, "sine", .03); }
+    else if (k === "Epic") { [NOTE.D5, NOTE.Fs5, NOTE.A5, NOTE.D6, NOTE.Fs6].forEach(function(f, i){ tone(f, at + i * .08, i === 4 ? .6 : .12, "triangle", .09); });
+      [293.66, 440, NOTE.Fs5].forEach(function(f){ tone(f, at + .32, .75, "sine", .05); }); [NOTE.D6, NOTE.Fs6, 1760].forEach(function(f, i){ tone(f * 2, at + .5 + i * .07, .22, "sine", .02); }); tone(110, at, .3, "sine", .12, 55); }
+    else if (k === "Legendary") { [NOTE.G4, NOTE.C5, NOTE.E5, NOTE.G5].forEach(function(f, i){ tone(f, at + i * .07, .11, "triangle", .1); }); tone(NOTE.C6, at + .3, 1.1, "triangle", .1);
+      [261.63, 329.63, 392, NOTE.C5].forEach(function(f){ tone(f, at + .3, 1.2, "sine", .05); }); [NOTE.E6, NOTE.G6, NOTE.C7, NOTE.G6, NOTE.C7].forEach(function(f, i){ tone(f, at + .5 + i * .09, .2, "sine", .03); });
+      tone(90, at, .4, "sine", .16, 40); tone(90, at + .3, .5, "sine", .14, 40); hiss(at + .28, .8, .04, 2500, 6000); }
+  }
+  function allPieces(){ return TP.HOMES.concat(TP.SCENES, TP.OUTFITS, TP.YARD); }
+  function seasonOf(x){ return x.set && x.set !== "rank" && TP.SETS ? TP.SETS.seasons.filter(function(q){ return q.k === x.set; })[0] : null; }
+  function pieceId(x){ return kindOf(x) + ":" + x.k; }
+  function pieceBy(id){ var q = id.split(":"), list = q[0] === "home" ? TP.HOMES : q[0] === "scene" ? TP.SCENES : q[0] === "yard" ? TP.YARD : TP.OUTFITS; return byK(list, q[1]); }
+  /* a set piece is shown in its own set's scene, anything else in yours */
+  function sceneFor(x){ var sc = x.set ? TP.SCENES.filter(function(q){ return q.set === x.set; })[0] : null; return sc ? sc.k : PS.scene; }
+  function pieceThumb(x){ var kind = kindOf(x); return kind === "outfit" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: sceneFor(x) }); }
+  function slotFor(x){ if (x.wide) return "side"; var free = ["left", "front", "right", "corner"].filter(function(k){ return !PS.yard[k] && !(k === "corner" && PS.yard.side === "lane"); }); return free[0] || "left"; }
+  /* your place with the piece in it (the window's "At my place" view, and what "Try it" does to the builder) */
+  function withPiece(x, apply){
+    var kind = kindOf(x), t = apply ? PS : { home: PS.home, scene: PS.scene, outfit: PS.outfit, yard: Object.assign({}, PS.yard) };
+    if (kind === "home") t.home = x.k; else if (kind === "scene") t.scene = x.k; else if (kind === "outfit") t.outfit = x.k;
+    else { var sl = slotFor(x); if (x.wide) delete t.yard.corner; else if (sl === "side" && t.yard.side === "lane") delete t.yard.side; t.yard[sl] = x.k; if (apply) PS.pick = sl; }
+    if (apply) { if (kind !== "yard") PS.pick = kind === "outfit" ? "timmy" : kind; return null; }
+    return tpOpts({ home: t.home, scene: t.scene, yard: t.yard, timmy: { g: timmyG(timmySvg("happy", t.outfit)), at: "door" } });
+  }
+  function shopCard(x, shelf){
+    var own = SHOP.owned[pieceId(x)], extra = (shelf === "back" ? '<span class="tp-stamp">' + SIC.glass + "<b>Today only</b></span>" : "") + (own ? '<span class="tp-owned">' + SIC.check + "Yours</span>" : "");
+    return rcard(x, pieceThumb(x), false, 'data-shop="' + pieceId(x) + '" data-shelf="' + shelf + '" aria-label="' + esc(cardName(x.n) + ", " + (x.rarity || "") + ", " + (own ? "yours" : fmtPrice(x.price || 0) + " crowns") + (shelf === "back" ? ", back for today only" : "") + ". Open") + '"')
+      .replace(' aria-pressed="false"', "").replace(/<\/button>$/, extra + "</button>");
+  }
+  function shopMock(){
+    var el = $("#tpShop"); if (!el) return;
+    var pick = function(list, ks){ return ks.map(function(k){ return byK(list, k); }).filter(Boolean); };
+    var shelf = function(k, title, when, ic, note, items){ return '<section class="tp-shelf tp-shelf-' + k + '"><header><h4 class="tp-tagsign">' + esc(title) + '</h4><span class="tp-when">' + ic + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") +
+      '</header><div class="tp-rcards tp-plank">' + items.map(function(x){ return shopCard(x, k); }).join("") + "</div></section>"; };
+    var season = TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === "thanksgiving"; })[0], of = function(list, k){ return list.filter(function(x){ return x.set === k; }); };
+    var seasonal = season ? of(TP.HOMES, season.k).concat(of(TP.SCENES, season.k), of(TP.OUTFITS, season.k), of(TP.YARD, season.k)) : [];
+    var back = [].concat(of(TP.YARD, "spring").slice(1, 2), of(TP.OUTFITS, "valentine").slice(0, 1), of(TP.HOMES, "summer").slice(0, 1));
+    var stripes = ""; for (var n = 0; n < 40; n++) stripes += "<i></i>";
+    el.innerHTML = '<div class="tp-store"><div class="tp-awning" aria-hidden="true">' + stripes + "</div>" +
+      '<div class="tp-storehead"><span class="tp-keeper" aria-hidden="true">' + img(timmySvg("happy", "sunhat"), "") + '</span><div class="tp-sign"><i class="tp-nail a"></i><i class="tp-nail b"></i><b>Timmy’s Shop</b><span>Tap anything for a closer look.</span></div>' +
+        '<div class="tp-storeend"><button type="button" class="tp-snd" id="tpSnd" aria-pressed="' + SND.on + '" aria-label="Sound"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.500h3l4-3.500v12l-4-3.500H3Z" fill="currentColor"/>' + (SND.on ? '<path d="M13 7a4.200 4.200 0 0 1 0 6M15.200 4.800a7.300 7.300 0 0 1 0 10.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>' : '<path d="M13.200 7.800l4 4.400M17.200 7.800l-4 4.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>') + "</svg><span>" + (SND.on ? "Sound on" : "Sound off") + '</span></button>' +
+        '<span class="tp-wallet" title="Shiny Gold Crowns">' + img(TP.coin(), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(SHOP.wallet) + "</b><small>crowns</small></span></div></div>" +
+      shelf("today", "Today’s picks", "New picks in 6 h 12 min", SIC.clock, "Four pieces, the same for everyone, new every day.", pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"]))) +
+      shelf("week", "This week", "5 days left", SIC.clock, "Three bigger pieces that stay all week.", pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"]))) +
+      (seasonal.length ? shelf("season", season.n, "Until November 27", SIC.clock, "The season’s set, only while the season lasts. Nothing from a season or a holiday is ever sold before its dates. Two seasons at once (fall is on too) get a shelf each.", seasonal) : "") +
+      (back.length ? shelf("back", "Back for today", "Gone at midnight", SIC.glass, "A throwback day, two a month: three pieces from seasons that have passed, at their usual price. On other days this shelf isn’t here.", back) : "") +
+      '<p class="tp-note tp-storefoot">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them. The crowns and what you buy here are made up for this page.</p></div>';
+    $$("[data-shop]", el).forEach(function(b){ b.addEventListener("click", function(){ sfx("open"); openItem(pieceBy(b.dataset.shop), b.dataset.shelf); }); });
+    $("#tpSnd", el).addEventListener("click", function(){ SND.on = !SND.on; try { localStorage.setItem("sh_design_sound", SND.on ? "on" : "off"); } catch (e) {} shopMock(); if (SND.on) sfx("open"); var n = $("#tpSnd"); if (n) n.focus(); });
+  }
+  /* the window on one piece: a display case in the rarity's color with turning rays, the piece itself or your place with
+     it in, what it is, its set, the price against your crowns, Buy and Try */
+  function rays(){ var s = ""; for (var a = 0; a < 12; a++) s += '<path d="M0 0L-13 -120L13 -120Z" transform="rotate(' + a * 30 + ')"/>'; return '<svg class="tp-irays" viewBox="-100 -100 200 200" aria-hidden="true"><g fill="#fff">' + s + "</g></svg>"; }
+  /* buying: the coins fly into the piece, it pops, and the rarity decides how big the party is. Common: a pop and a few
+     dots. Uncommon: a ring too. Rare: a flash, two rings, the word. Epic: the piece spins, three rings, a star shower.
+     Legendary: it charges up first (the case shakes, the rays race, a rising note), then a gold flash over the whole
+     window, the kit's Legendary burst, confetti everywhere and a fanfare */
+  var FX = { Common: { n: 10, rings: 0, t: 900, pal: ["#8A847E", "#C9C2BA", "#FFD23F"] }, Uncommon: { n: 16, rings: 1, t: 1050, pal: ["#1C6E52", "#7FD6AE", "#FFD23F", "#FFFFFF"] },
+    Rare: { n: 24, rings: 2, t: 1250, word: "Rare!", flash: 1, pal: ["#1C5C88", "#7CC4F2", "#FFD23F", "#FFFFFF"] }, Epic: { n: 38, rings: 3, t: 1550, word: "Epic!", flash: 1, spin: 1, pal: ["#4E3492", "#B79BFF", "#FF8BD0", "#FFD23F", "#FFFFFF"] },
+    Legendary: { n: 70, rings: 3, t: 2300, word: "Legendary!", flash: 2, spin: 1, charge: 750, pal: ["#F2C230", "#FFE27A", "#FF8B7B", "#7CC4F2", "#B79BFF", "#FFFFFF"] } };
+  function purchaseFx(d, r, done){
+    var fx = FX[r] || FX.Common, box = $(".tp-item", d), cs = $(".tp-icase", d), wait = fx.charge || 0, html = "", i;
+    for (i = 0; i < 5; i++) html += '<span class="tp-fxcoin" style="--i:' + i + ";--sx:" + (60 + i * 26) + "px;--sy:" + (150 - (i % 2) * 30) + 'px">' + img(TP.coin(), "", "", "0 0 24 24") + "</span>";
+    cs.insertAdjacentHTML("beforeend", '<div class="tp-fx" aria-hidden="true">' + html + "</div>");
+    sfx("coins"); if (wait) { box.classList.add("is-charging"); sfx("rise", .25); }
+    setTimeout(function(){
+      if (!d.open) { done(); return; }
+      var layer = $(".tp-fx", cs), W = cs.clientWidth, far = Math.max(W, cs.clientHeight) * (r === "Legendary" ? .95 : r === "Epic" ? .8 : .6), out = "";
+      for (i = 0; i < fx.rings; i++) out += '<i class="tp-fxring" style="--t:' + i * 130 + 'ms"></i>';
+      for (i = 0; i < fx.n; i++) { var a = (i / fx.n) * Math.PI * 2 + (i % 3) * .21, dist = far * (.45 + ((i * 37) % 11) / 20), star = i % 4 === 0 && fx.rings > 1;
+        out += '<i class="tp-fxbit' + (star ? " is-star" : i % 3 === 1 ? " is-bar" : "") + '" style="--x:' + Math.round(Math.cos(a) * dist) + "px;--y:" + Math.round(Math.sin(a) * dist * .8) + "px;--r:" + ((i * 71) % 360 - 180) + "deg;--c:" + fx.pal[i % fx.pal.length] + ";--t:" + (i % 5) * 28 + "ms;--s:" + (7 + (i * 13) % 8) + 'px"></i>'; }
+      layer.innerHTML = (fx.flash ? '<i class="tp-fxflash"></i>' : "") + out + '<div class="tp-iburst">' + TP.burst(r) + "</div>" + (fx.word ? '<b class="tp-fxword">' + fx.word + "</b>" : "");
+      box.classList.remove("is-charging"); box.classList.add("is-bought"); if (fx.spin) box.classList.add("is-spin"); if (fx.flash > 1) box.classList.add("is-gold");
+      sfx("pop"); sfx(r, .05);
+      setTimeout(done, fx.t);
+    }, 430 + wait);
+  }
+  function openItem(x, shelf, view, bought){
+    if (!x) return;
+    var kind = kindOf(x), id = pieceId(x), r = x.rarity || "Common", se = seasonOf(x), own = !!SHOP.owned[id], cost = x.price || 0, short = cost - SHOP.wallet; view = view || "piece";
+    var pic = view === "place" ? '<div class="tp-iplace">' + sceneImg(TP.render(withPiece(x)).svg, "Your place with " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); }), isStill()) + "</div>"
+      : '<div class="tp-ipiece k-' + kind + '">' + (kind === "outfit" ? '<span class="tp-ipod" aria-hidden="true"></span>' + img(timmySvg("happy", x.k), "Timmy in " + x.n.replace(/^(The|A|An) /, function(m){ return m.toLowerCase(); })) : pieceThumb(x).replace('alt=""', 'alt="' + esc(cardName(x.n)) + '"')) + "</div>";
+    var others = se ? allPieces().filter(function(q){ return q.set === x.set && q !== x; }) : [];
+    var fits = kind === "yard" ? (x.wide ? "It’s long: it takes the side yard and the front corner together." : "Fits any spot in the yard.") : kind === "home" ? "Your yard, upgrades and paint move in with you." : kind === "scene" ? "Your home and yard move over as they are." : "Timmy wears it at his place, and on your card.";
+    var buy = own ? '<p class="tp-iown">' + SIC.check + (bought ? "It’s yours! " : "Yours. ") + "It’s in your inventory for good.</p>" + '<button type="button" class="tp-buy" data-item-try="1">Put it out at my place</button>'
+      : '<div class="tp-iprice"><span class="tp-ibig">' + img(TP.coin(), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(cost) + "</b></span><span class=\"tp-ihave\">" + (short > 0 ? "You have " + fmtPrice(SHOP.wallet) + ": " + fmtPrice(short) + " more to go" : "You have " + fmtPrice(SHOP.wallet) + ", so " + fmtPrice(-short) + " left after") + "</span>" +
+          (short > 0 ? '<span class="tp-ibar" aria-hidden="true"><i style="width:' + Math.round(SHOP.wallet / cost * 100) + '%"></i></span>' : "") + "</div>" +
+        '<div class="tp-iacts"><span class="tp-buywrap"><button type="button" class="tp-buy" data-item-buy="1"' + (short > 0 ? " disabled" : "") + ">" + (short > 0 ? "Not enough yet" : "Buy for " + fmtPrice(cost)) + '</button></span><button type="button" class="btn tp-itry" data-item-try="1">Try it at my place</button></div>';
+    var d = openDlg('<div class="tp-item r-' + r + (bought ? " is-new" : "") + '">' + DLG_X +
+      '<div class="tp-icase">' + rays() + '<span class="tp-icorner a" aria-hidden="true"></span><span class="tp-icorner b" aria-hidden="true"></span>' + pic + 
+        '<div class="seg tp-iview" role="group" aria-label="What the picture shows"><button type="button" data-iview="piece" aria-pressed="' + (view === "piece") + '">The piece</button><button type="button" data-iview="place" aria-pressed="' + (view === "place") + '">At my place</button></div></div>' +
+      '<div class="tp-iinfo"><p class="tp-ikind">' + esc(KIND_N[kind]) + (se ? " · " + esc(se.n) + " set" : "") + '</p><h3 id="tpDlgT">' + esc(cardName(x.n)) + "</h3>" +
+        '<p class="tp-itags">' + rarTag(r) + (shelf === "back" ? '<span class="tp-stamp is-inline">' + SIC.glass + "<b>Back for today only</b></span>" : "") + "</p>" +
+        '<p class="tp-idesc">' + esc(sentence(x.note)) + ". " + fits + "</p>" +
+        (kind === "outfit" && x.say ? '<p class="tp-isay"><span aria-hidden="true">' + img(timmySvg("happy", ""), "") + "</span><q>" + esc(x.say[(x.say.length > 1 ? 1 : 0)]) + "</q></p>" : "") +
+        (se ? '<div class="tp-iset"><b>' + esc(se.n) + " set</b><span>" + esc(shelf === "back" ? "Its season has passed: this piece is back today only, gone at midnight. The rest of the set comes back with its season." : "On sale: " + se.when + ".") + '</span><div class="tp-isetrow">' +
+          others.map(function(q){ return shelf === "back" ? '<span class="tp-imini is-off" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</span>" : '<button type="button" class="tp-imini" data-item-go="' + pieceId(q) + '" aria-label="' + esc(cardName(q.n)) + '" title="' + esc(cardName(q.n)) + '">' + pieceThumb(q) + "</button>"; }).join("") + "</div></div>" : "") +
+        '<div class="tp-ibuy">' + buy + "</div></div></div>", "tp-idlg");
+    d.setAttribute("aria-labelledby", "tpDlgT");
+    $$("[data-iview]", d).forEach(function(b){ b.addEventListener("click", function(){ openItem(x, shelf, b.dataset.iview); var n = $('[data-iview="' + b.dataset.iview + '"]', $("#tpDlg")); if (n) n.focus(); }); });
+    $$("[data-item-go]", d).forEach(function(b){ b.addEventListener("click", function(){ sfx("open"); openItem(pieceBy(b.dataset.itemGo), shelf); }); });
+    var wrap = $(".tp-iacts", d); if (wrap && short > 0) wrap.addEventListener("click", function(e){ if (e.target.closest(".tp-buywrap")) { sfx("deny"); var bar = $(".tp-iprice", d); bar.classList.remove("is-no"); void bar.offsetWidth; bar.classList.add("is-no"); } });
+    $$("[data-item-buy]", d).forEach(function(b){ b.addEventListener("click", function(){
+      if (SHOP.wallet < cost || d.dataset.busy) return;
+      SHOP.wallet -= cost; SHOP.owned[id] = 1; shopMock();
+      var done = function(){ delete d.dataset.busy; if (!d.open) return; openItem(x, shelf, view, true); var n = $(".tp-buy", $("#tpDlg")); if (n) n.focus(); };
+      if (isStill()) { sfx("coins"); sfx(r, .3); done(); return; }
+      d.dataset.busy = "1"; b.disabled = true; purchaseFx(d, r, done); }); });
+    $$("[data-item-try]", d).forEach(function(b){ b.addEventListener("click", function(){
+      withPiece(x, true); PS.mode = "customize"; d.close(); buildPlace(kind === "yard" ? { burst: PS.pick } : kind === "home" ? { burst: "home" } : kind === "outfit" && x.say ? { say: x.say[0] } : {});
+      $("#tpStage").scrollIntoView({ block: "center", behavior: isStill() ? "auto" : "smooth" }); }); });
+  }
+
+  /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
+  var VISIT = [
+    { name: "Molar Maverick", xp: "48,210", tier: 5, level: 3, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4 }, outfit: "aviator" },
+    { name: "Floss Boss", xp: "41,775", tier: 4, level: 2, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3 }, outfit: "parade-marshal" },
+    { name: "Captain Cuspid", xp: "39,020", tier: 4, level: 1, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 2 }, outfit: "captain" },
+    { name: "Enamel Ninja", xp: "33,480", tier: 3, level: 3, off: true },
+    { name: "Bicuspid Bandit", xp: "29,150", tier: 3, level: 2, me: true },
+    { name: "Plaque Attack", xp: "27,900", tier: 3, level: 1, o: { home: "mushroom", scene: "forest", yard: { left: "campfire", front: "mailbox", right: "hammock" }, up: { chimney: true }, flair: 2 }, outfit: "ranger" },
+    { name: "Wisdom Whiz", xp: "22,340", tier: 2, level: 3, o: { home: "igloo", scene: "mountain", night: true, yard: { left: "hotspring", right: "telescope" }, up: {}, flair: 1 }, outfit: "beanie" },
+    { name: "Sir Flossalot", xp: "18,060", tier: 2, level: 1, o: { home: "observatory", scene: "space", yard: { left: "telescope", front: "doghouse" }, up: { flag: true }, flair: 1 }, outfit: "nightcap" }
+  ];
+  var ME = 4, VS = { at: 0, on: true };
+  var VIC = {
+    dice: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg>',
+    go: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    back: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pin: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 18s5.5-5.4 5.5-9.6A5.5 5.5 0 0 0 4.500 8.400C4.500 12.600 10 18 10 18Z" fill="currentColor"/><circle cx="10" cy="8.300" r="2" fill="#fff"/></svg>',
+    lock: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="4" y="9" width="12" height="8.500" rx="2.500" fill="currentColor"/><path d="M6.800 9V6.800a3.200 3.200 0 0 1 6.400 0V9" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    home: '<svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="M3 9.500L10 3.500l7 6M5 8.500V16.500h10V8.500" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  function hpImg(tier, cls){ var h = A.handpieces[tier] || A.handpieces[0]; return img(h.svg, h.name + " handpiece", cls || "tp-vhp"); }
+  /* what a visitor sees: the person's place under their board name. Your own row shows the place from the builder */
+  function visitOpts(v){
+    if (v.me) return tpOpts({ timmy: { g: timmyG(timmySvg("happy", PS.outfit)), at: "door" } });
+    var o = Object.assign({ tier: v.tier, level: v.level, timmy: { g: timmyG(timmySvg("happy", v.outfit)), at: "door" } }, v.o, { flair: FLAIRS[v.o.flair] });
+    ["home", "scene"].forEach(function(k){ if (!byK(k === "home" ? TP.HOMES : TP.SCENES, o[k])) o[k] = k === "home" ? "cottage" : "hill"; });
+    o.yard = Object.assign({}, o.yard); Object.keys(o.yard).forEach(function(k){ if (!byK(TP.YARD, o.yard[k])) delete o.yard[k]; });
+    return o;
+  }
+  function visitThumb(v){ var o = v.me ? { home: PS.home, scene: PS.scene } : v.o; return thumbImg("home", byK(TP.HOMES, o.home) ? o.home : "cottage", { scene: byK(TP.SCENES, o.scene) ? o.scene : "hill" }); }
+  function visitable(){ return VISIT.map(function(r, i){ return i; }).filter(function(i){ return !VISIT[i].off && !VISIT[i].me; }); }
+  function visitStep(d){ var l = visitable(), at = l.indexOf(VS.at); return l[at < 0 ? (d > 0 ? 0 : l.length - 1) : (at + d + l.length) % l.length]; }
+  function visitMock(){
+    var el = $("#tpVisit"); if (!el) return;
+    var v = VISIT[VS.at], list = visitable(), nth = list.indexOf(VS.at), prev = VISIT[visitStep(-1)], next = VISIT[visitStep(1)];
+    var rows = VISIT.map(function(r, i){
+      var here = i === VS.at, act;
+      if (r.me) act = '<button type="button" class="tp-vgo is-mine" data-visit="' + i + '" aria-pressed="' + here + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Home" : "My place") + "</span></button>";
+      else if (r.off) act = '<span class="tp-vnote">' + VIC.lock + " Visits off</span>";
+      else act = '<button type="button" class="tp-vgo" data-visit="' + i + '" aria-pressed="' + here + '" aria-label="' + esc((here ? "You are visiting " : "Visit ") + r.name) + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Here" : "Visit") + "</span>" + (here ? VIC.pin : VIC.go) + "</button>";
+      return '<li class="tp-vrow' + (r.me ? " me" : "") + (here ? " here" : "") + '">' +
+        (r.me ? '<span class="tp-vsheen" aria-hidden="true"></span><span class="tp-vpeek" aria-hidden="true">' + img(timmySvg("happy", PS.outfit), "") + '</span><span class="tp-vflag">That’s you</span>' : "") +
+        '<span class="num tp-vpos">' + (i + 1) + "</span>" + hpImg(r.tier) + '<span class="tp-vname">' + esc(r.name) + "<small>" + esc(TIER_NAMES[r.tier] + " " + LEVELS[r.level - 1]) + '</small></span><span class="num xp-gold">' + r.xp + " XP</span>" + act + "</li>"; }).join("");
+    var o = visitOpts(v);
+    el.innerHTML = '<div class="tp-vboard"><div class="tp-vtop"><h4>The rank board</h4><button type="button" class="tp-vrand" data-visit-random="1">' + VIC.dice + "<span>Visit someone random</span></button></div><ol>" + rows + "</ol>" +
+        '<label class="tp-vswitch"><input type="checkbox" role="switch" id="tpVisitOn"' + (VS.on ? " checked" : "") + '><span><b>Let classmates visit my place</b><small>' + (VS.on ? "On. They see your place under your board name, nothing else." : "Off. Your name on the boards has no Visit button.") + "</small></span></label></div>" +
+      '<div class="tp-vplace" id="tpVisitPlace"><div class="tp-vhead" role="status">' + hpImg(v.tier, "tp-vhp big") + "<div><b>" + esc(v.me ? "Your place" : v.name + "’s place") + "</b><span>" + esc(TIER_NAMES[v.tier] + " " + LEVELS[v.level - 1]) + (v.me ? " · home again" : " · visiting: look, don’t touch") + "</span></div>" +
+          (v.me ? "" : '<button type="button" class="btn tp-vhome" data-visit="' + ME + '">' + VIC.home + "Back to mine</button>") + "</div>" +
+        '<div class="tp-pic tp-vpic' + (o.night || (byK(TP.SCENES, o.scene) || {}).alwaysNight ? " is-night" : "") + '">' + sceneImg(TP.render(o).svg, v.me ? "Your place" : v.name + "'s place", isStill()) +
+          '<button type="button" class="tp-vnav prev" data-visit="' + visitStep(-1) + '" aria-label="' + esc("Previous place: " + prev.name) + '">' + VIC.back + '</button><button type="button" class="tp-vnav next" data-visit="' + visitStep(1) + '" aria-label="' + esc("Next place: " + next.name) + '">' + VIC.next + "</button></div>" +
+        '<div class="tp-vfoot"><span>' + (nth < 0 ? list.length + " places open to visit" : "Place " + (nth + 1) + " of " + list.length + " open to visit") + '</span><span class="tp-vnext">Next: ' + esc(next.name) + "</span></div></div>";
+    $$("[data-visit]", el).forEach(function(b){ b.addEventListener("click", function(){ visitGo(+b.dataset.visit, b.classList.contains("tp-vnav")); }); });
+    $("[data-visit-random]", el).addEventListener("click", function(){ var l = visitable().filter(function(i){ return i !== VS.at; }); visitGo(l[Math.floor(Math.random() * l.length)]); });
+    $("#tpVisitOn", el).addEventListener("change", function(e){ VS.on = e.target.checked; visitMock(); });
+  }
+  /* going to a place: clouds roll in over the whole screen, the place changes behind them, and they part */
+  function visitGo(i, nav){
+    if (i === VS.at || !VISIT[i]) return;
+    var v = VISIT[i];
+    clouds(v.me ? "Heading home" : "Off to " + v.name + "’s place", hpImg(v.tier, "tp-vhp"), function(){
+      VS.at = i; visitMock();
+      var pl = $("#tpVisitPlace"), r = pl.getBoundingClientRect();
+      if (r.top < 60 || r.bottom > innerHeight) pl.scrollIntoView({ block: r.height > innerHeight - 80 ? "start" : "center" });
+      var f = nav ? $(".tp-vnav." + (nav && visitStep(1) !== i ? "next" : "next"), pl) : $(".tp-vhead", pl); if (nav && f) f.focus({ preventScroll: true });
+    });
+  }
+  /* the trip: a sky of separate clouds drifts in from every side and piles up over the whole screen, the place changes
+     behind them, and they scatter outward again (Sam, 2026-11-10: "it shouldn't look like two curtains coming together") */
+  var CLOUD_SHAPES = [
+    [[30, 62, 22], [58, 44, 30], [92, 50, 26], [118, 66, 18], [74, 70, 26], [48, 74, 18], [100, 76, 16]],
+    [[26, 60, 18], [50, 48, 26], [82, 40, 28], [112, 54, 24], [92, 72, 22], [60, 74, 22], [34, 74, 14]],
+    [[34, 56, 24], [66, 42, 26], [98, 46, 30], [122, 68, 16], [84, 72, 24], [52, 72, 20]]
+  ];
+  /* soft clouds: no ink outline, a pale underside and a faint halo, so a pile of them melts into one sky
+     (Sam: "the individual clouds should be less harsh so it comes together more seamlessly") */
+  function cloudSvg(k){
+    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = function(grow, dy){ return c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + (q[1] + dy) + '" r="' + (q[2] + grow) + '"/>'; }).join(""); };
+    return '<svg viewBox="-12 -8 168 128" aria-hidden="true"><g fill="#B9AEDA" opacity=".16">' + ring(9, 8) + '</g><g fill="#FFFFFF" opacity=".55">' + ring(6, 0) + '</g><g fill="#E0D8EF">' + ring(0, 5) + '</g><g fill="#FFFFFF">' + ring(0, 0) + "</g>" +
+      '<g fill="none" stroke="#E4DDF1" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
+  }
+  function clouds(label, emblem, swap){
+    if (isStill()) { swap(); return; }
+    var c = $("#tpClouds");
+    if (!c) { c = document.createElement("div"); c.id = "tpClouds"; c.setAttribute("aria-hidden", "true"); document.body.appendChild(c); }
+    var W = innerWidth, H = innerHeight, cols = W > H ? 4 : 3, rows = W > H ? 3 : 4, size = Math.max(W / cols, H / rows) * 2.05, far = Math.max(W, H) * .9, html = "", n = 0;
+    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, n++) {
+      var jx = ((n * 37) % 11 - 5) / 60, jy = ((n * 53) % 9 - 4) / 60, x = (q + .5) / cols + jx, y = (r + .5) / rows + jy;
+      var vx = x - .5, vy = (y - .5) * .8, len = Math.sqrt(vx * vx + vy * vy);
+      if (len < .12) { var a = n * 2.4; vx = Math.cos(a); vy = Math.sin(a) + .4; len = Math.sqrt(vx * vx + vy * vy); }
+      html += '<span class="tp-cloud" style="--x:' + (x * 100).toFixed(1) + "%;--y:" + (y * 100).toFixed(1) + "%;--s:" + Math.round(size * (.86 + ((n * 29) % 7) / 22)) + "px;--dx:" + Math.round(vx / len * far) + "px;--dy:" + Math.round(vy / len * far) +
+        "px;--r:" + (((n * 17) % 9) - 4) * 3 + "deg;--d:" + ((n * 7) % cols * 45 + (n % 3) * 35) + "ms;--d2:" + ((n * 5) % 4) * 45 + 'ms">' + cloudSvg(n) + "</span>";
+    }
+    c.innerHTML = '<i class="tp-clfill"></i>' + html + '<div class="tp-clmsg">' + emblem + "<b>" + esc(label) + "</b></div>";
+    c.className = "tp-clouds"; void c.offsetWidth; c.className = "tp-clouds in"; sfx("whoosh");
+    [clouds.a, clouds.b, clouds.c].forEach(clearTimeout);
+    clouds.a = setTimeout(function(){ swap(); }, 800);
+    clouds.b = setTimeout(function(){ c.className = "tp-clouds out"; }, 1400);
+    clouds.c = setTimeout(function(){ c.className = "tp-clouds"; c.innerHTML = ""; }, 2350);
+  }
+
   /* ---------- controls ---------- */
   function setFace(f){ root.dataset.face = f; $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === f ? "true" : "false"); }); save(); tokens(); }
   function setTheme(t){ root.dataset.theme = t; $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === t ? "true" : "false"); }); save(); tokens(); }
@@ -610,8 +1570,8 @@
     $$(".seg [data-face]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.face === root.dataset.face ? "true" : "false"); b.addEventListener("click", function(){ setFace(b.dataset.face); }); });
     $$(".seg [data-theme]").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.theme === root.dataset.theme ? "true" : "false"); b.addEventListener("click", function(){ setTheme(b.dataset.theme); }); });
     pick.addEventListener("change", function(){ setHub(pick.value); });
-    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys();
+    tiles(); buildHub(); pairs(); rewards(); faces(); tokens(); icons(); hubart(); medals(); timmys(); place();
   }
-  window.SH_DESIGN = { LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub };
+  window.SH_DESIGN = { shop: SHOP, sfx: sfx, LIVE_BY_HUB: LIVE_BY_HUB, rebuild: buildHub, place: PS, rebuildPlace: function(o){ buildPlace(o); }, drawGalleries: function(){ if (lazyGalleries.all) lazyGalleries.all(); }, placeStage: ST };
   init();
 })();

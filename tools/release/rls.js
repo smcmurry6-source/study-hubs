@@ -9,7 +9,9 @@
 //   - every function that takes p_secret refuses a missing and a wrong secret (and writes nothing), and accepts
 //     the right one (so the test means something);
 //   - per-visitor reads (get_my_answers, get_personal_stats, the bootstrap, the shop, the rank) return only that
-//     visitor's rows, and no function a visitor can run hands back another visitor's id.
+//     visitor's rows, and no function a visitor can run hands back another visitor's id;
+//   - visiting (migration_v54): the tables and helpers behind the visit keys are closed to anon (rls-expectations.json's
+//     anonNone and anonNoRun), and a place opened with someone's key, like the boards, carries no visitor id.
 // The migrations waiting for their release (supabase/pending-migrations.txt) are applied on top of the schema first, so
 // they're checked with everything else. Nothing here touches the live database. Run it whenever a migration or supabase/schema.sql changes:
 //   node tools/release/rls.js            (needs PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
@@ -106,6 +108,7 @@ try {
          insert into idea_reports (idea_id, visitor_id) select id, 'rls-C' from ideas where visitor_id = 'rls-B';
          insert into idea_notes (visitor_id, idea_id, status, note) select 'rls-B', id, 'planned', 'made-up note' from ideas where visitor_id = 'rls-B';
          insert into xp_sessions (visitor_id, hub, kind, started_at) values ('rls-B','rls-hub','mock',now());`);
+    if (has('pet_visit_off')) sql(`insert into pet_visit_off (visitor_id) values ('rls-C')`);   /* C turned visiting off */
   }
 
   /* 1. row-level security on, and anon's direct access is exactly the expected list */
@@ -201,19 +204,61 @@ try {
   if (game) {
     const asAnon = t => JSON.parse(sql(`begin; set local role anon; select (${t})::text; rollback;`)[0][0]);
     const shopA = asAnon(`public.get_my_shop('rls-A')`), shopN = asAnon(`public.get_my_shop(null)`);
-    if (shopA.inventory.length || Object.keys(shopA.equipped).length || shopA.costumes.length || shopA.boost || !shopA.wallet || shopA.wallet.spent !== 0)
+    /* gifts (Halloween's set) are everyone's and rank items come with the rank: neither is anyone else's thing */
+    const bought = inv => (inv || []).filter(i => i.how !== 'gift' && i.how !== 'rank');
+    if (bought(shopA.inventory).length || Object.keys(shopA.equipped).length || shopA.costumes.length || shopA.boost || !shopA.wallet || shopA.wallet.spent !== 0)
       fail(`get_my_shop for visitor A shows someone else's things: ${JSON.stringify({ inv: shopA.inventory, eq: shopA.equipped, boost: shopA.boost, wallet: shopA.wallet })}`);
     if (shopN.wallet || shopN.inventory.length || shopN.boost) fail('get_my_shop with no visitor returned visitor data');
     const rankA = asAnon(`public.get_rank_profile_v2('rls-A')`);
     if (!rankA || Number(rankA.xp) !== 41 || rankA.boost) fail(`get_rank_profile_v2 for visitor A is ${JSON.stringify(rankA)}, expected A's 41 XP and no boost`);
     const b2 = asAnon(`public.get_widget_bootstrap_v2('rls-A', 'rls-hub', null, 'ep')`), b2n = asAnon(`public.get_widget_bootstrap_v2(null, 'rls-hub', null, null)`);
-    if ((b2.answers || []).length !== 3 || !b2.rank || Number(b2.rank.xp) !== 41 || (b2.shop.inventory || []).length) fail(`get_widget_bootstrap_v2 for visitor A doesn't match A's rows (${(b2.answers || []).length} answers, rank ${JSON.stringify(b2.rank && b2.rank.xp)})`);
+    if ((b2.answers || []).length !== 3 || !b2.rank || Number(b2.rank.xp) !== 41 || bought(b2.shop.inventory).length) fail(`get_widget_bootstrap_v2 for visitor A doesn't match A's rows (${(b2.answers || []).length} answers, rank ${JSON.stringify(b2.rank && b2.rank.xp)})`);
     if ((b2n.answers || []).length || b2n.rank || (b2n.inbox || []).length || (b2n.shop && b2n.shop.wallet)) fail('get_widget_bootstrap_v2 with no visitor returned visitor data');
     const inboxA = asAnon(`(select coalesce(json_agg(x), '[]') from public.get_my_inbox_v2('rls-A') x)`);
     if (inboxA.some(r => r.kind === 'idea')) fail('get_my_inbox_v2 for visitor A shows B\'s idea notes');
     const board = asAnon(`public.get_ideas('rls-A')`);
     if (!board.ideas.length || board.ideas.some(i => i.own) || board.ideas[0].mine !== 1) fail(`get_ideas for visitor A: ${JSON.stringify(board.ideas)} (expected B's idea, not A's own, with A's up vote)`);
     notes.push('get_my_shop, get_rank_profile_v2, get_widget_bootstrap_v2, get_my_inbox_v2 and get_ideas return only the asking visitor\'s rows');
+
+    /* 6b. visiting (migration_v54): what's behind the visit keys is closed to anon, and a place gives no id away */
+    for (const t of EXPECT.anonNone || []) {
+      if (!has(t)) { fail(`rls-expectations.json's anonNone lists ${t}, which isn't a table`); continue; }
+      for (const p of ['select', 'insert', 'update', 'delete']) if (sql(`select has_table_privilege('anon', ${q('public.' + t)}, ${q(p)})`)[0][0] === 't') fail(`anon has ${p} on ${t}, which must be closed to anon altogether`);
+      if (Number(sql(`select count(*) from pg_policies where schemaname = 'public' and tablename = ${q(t)}`)[0][0])) fail(`${t} has a row-level security policy; it must have none`);
+      for (const [what, stmt] of [['read', `select count(*) from public.${t}`], ['insert into', `insert into public.${t} default values`], ['update', `update public.${t} set ${t === 'visit_secret' ? "secret = 'x'" : "visitor_id = 'x'"}`], ['delete from', `delete from public.${t}`]]) {
+        let done = false; try { sql(`begin; set local role anon; ${stmt}; rollback;`); done = true; } catch (e) { if (!/permission denied/i.test(e.message)) done = true; }
+        if (done) fail(`anon could ${what} ${t} directly (or it failed for another reason than permission)`);
+      }
+    }
+    for (const sig of EXPECT.anonNoRun || []) {
+      let can; try { can = sql(`select has_function_privilege('anon', ${q('public.' + sig)}, 'execute')`)[0][0]; } catch (e) { fail(`rls-expectations.json's anonNoRun lists ${sig}, which isn't a function`); continue; }
+      if (can === 't') fail(`anon can run ${sig}, which must be closed to anon`);
+    }
+    let ran = false; try { sql(`begin; set local role anon; select public.sh_visit_key('rls-B'); rollback;`); ran = true; } catch (e) {}
+    if (ran) fail('anon worked out a visit key from a visitor id (sh_visit_key)');
+    const keyB = sql(`select public.sh_visit_key('rls-B')`)[0][0], keyC = sql(`select public.sh_visit_key('rls-C')`)[0][0];
+    const anonText = t => sql(`begin; set local role anon; select coalesce((${t})::text, 'null'); rollback;`).map(r => r.join(' ')).join(' ');
+    const placeB = anonText(`public.get_place(${q(keyB)})`);
+    let pB = null; try { pB = JSON.parse(placeB); } catch (e) {}
+    if (!pB || pB.name !== 'Made Up Incisor' || !pB.equipped || pB.equipped.outfit !== 'bow-tie') fail(`get_place with B's key doesn't show B's place: ${placeB.slice(0, 120)}`);
+    else if (Object.keys(pB).sort().join(',') !== 'equipped,flair,name,rank') fail(`get_place returns more than a place shows: ${Object.keys(pB).sort().join(',')}`);
+    if (/rls-[ABC]/.test(placeB) || placeB.includes(keyB)) fail(`get_place hands back a visitor id or the key: ${placeB.slice(0, 120)}`);
+    if (anonText(`public.get_place(${q(keyC)})`) !== 'null') fail('get_place opened the place of someone who turned visiting off');
+    for (const bad of [`'rls-B'`, `'rls-A'`, `repeat('0', 24)`, `null::text`]) if (anonText(`public.get_place(${bad})`) !== 'null') fail(`get_place(${bad}) answered; only a visit key opens a place`);
+    const boards = { get_rank_board_v2: `'rls-A', 50`, get_leaderboard_v2: '50', get_correct_streak_stats_v2: '', get_arcade_leaderboard_v2: `'rls-hub', 'board', 'rls-A', 50` };
+    sql(`insert into arcade_scores (hub, game, visitor_id, score) values ('rls-hub','board','rls-B',10), ('rls-hub','board','rls-C',20);
+         insert into correct_streaks (visitor_id, current_streak, best_streak) values ('rls-B', 7, 7) on conflict (visitor_id) do update set current_streak = 7, best_streak = 7;`);
+    let withKey = 0;
+    for (const [f, args] of Object.entries(boards)) {
+      const text = anonText(`select coalesce(json_agg(x), '[]') from public.${f}(${args}) x`);
+      if (/rls-[ABC]/.test(text)) fail(`${f} hands back a visitor id: ${text.slice(0, 120)}`);
+      if (text.includes(keyC)) fail(`${f} carries the visit key of someone who turned visiting off`);
+      let r = []; try { r = JSON.parse(text); } catch (e) {}
+      if (r.length && !r.every(x => 'visit' in x && (x.visit === null || /^[0-9a-f]{24}$/.test(x.visit)))) fail(`${f}: a row without a visit key column, or one that isn't a key or null`);
+      if (text.includes(keyB)) withKey++;
+    }
+    if (withKey < 3) fail(`B's visit key should be on the rank board, the arcade board and the answer-streak stats; found on ${withKey} board(s)`);
+    notes.push(`visiting: ${(EXPECT.anonNone || []).length} tables and ${(EXPECT.anonNoRun || []).length} helpers closed to anon; get_place and the four boards give a key, never an id`);
   }
 
   /* 7. no function a visitor can run hands back another visitor's id: every one (but triggers) is called as anon with A's

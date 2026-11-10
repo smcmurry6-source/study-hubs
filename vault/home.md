@@ -67,6 +67,8 @@ Hub building
 - [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
 - [Draw a Patient Box case from its numbers](how-to/draw-a-patient-box-case.md): the shared case kit (chart, radiograph,
   drawn view and the diagnosis from one set of numbers) every hub's Patient Box questions use.
+- [Draw a seasonal set or a rank set for Timmy's place](how-to/draw-a-seasonal-set.md): one list (`sets.mjs`), a pack per
+  set, the catalog and the build that checks them.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
 - [Read usage data and run surveys](how-to/read-usage-data.md)
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)

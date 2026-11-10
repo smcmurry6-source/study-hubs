@@ -32,6 +32,38 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Timmy's place, round 3: on the design page and in the pending migration only, Claude Code)** — Sam's
+  third round of feedback ([task](vault/tasks/done/2026-11-10-redesign-timmys-place-round-3.md), PR #299, stacked on #289).
+  **Students see nothing yet**: nothing is wired into `widget/pet.js`, `widget/eggs.js`, `widget/hub.js` or
+  `widget/ranks.js`, and `migration_v54.sql` is still unapplied. (1) Art fixes: "Why each choice" folded, a pop on the
+  "Good question?" thumbs, shiny gold XP text, a five-level streak flame (blue at 10 days, Dark Matter at 30), the coin
+  as a dental crown, Perio's emblem tooth, "Default" on the cottage; the hill and island rise gradually; the seaside,
+  cloud and starlight scenes, the castle, treehouse, beach hut, observatory and igloo, and most of the yard redrawn (a
+  **mouthwash fountain**, id `mouthwash-fountain`, a dog with the doghouse, a mint for the lane's ball). Timmy waves and
+  his speech bubble follows him. (2) Hub mastery: the pennants are gone; a **medal board** beside the house hangs each
+  hub's own mastery medal in miniature (up to 20), and tapping it opens a big view of every medal (Sam picked the plaque,
+  then asked for the same medals on the board and in the pop-up; no trophy case, no gems, no `mastery` option).
+  (3) **Sets**: `tools/figures/site/sets.mjs`
+  lists 14 seasonal sets of 8 pieces (new: Spring, Summer, Tooth Fairy week, Mardi Gras, the Fourth of July) and the
+  Handpiece's six rank sets (an outfit and a yard piece per full rank-up, earned, never sold); each is one file in
+  `tools/figures/site/packs/` ([how-to](vault/how-to/draw-a-seasonal-set.md)); the build checks 1,436 drawings and 3,384
+  walks and `--strict` fails on a set with no pack. (4) Server, still pending: the catalog is 181 rows; seasonal windows
+  (`sh_shop_seasons`), two throwback days a month, rank sets by rank, Halloween's set as a gift, the shop's shelves in
+  `get_my_shop`, and visiting (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js`
+  348 checks; nothing seasonal is sold before its season's first run (`added_on`, `sh_season_was_on`); the Fourth of
+  July's set is June 28 to July 4 (Sam confirmed). (5) The design page shows all of it as mock-ups on made-up names: a
+  **wooden shop** (plank walls, cabinets, a counter; any piece opens in its own window; "Back for today" is a corner stamp; buying plays out by rarity
+  with synthesized sound cues), a **customizer** (a picture dock, shelves, a wardrobe rail, a camera that moves in), the
+  **rank board** with each rank's handpiece emblem and your own name on a gold nameplate, and **visiting** (Visit, a
+  random visit, next and back, a trip through soft clouds). (6) Polish: the statue's handpiece stands upright; the
+  igloo's doorway is clear; the emerald hills have one gated wall. (7) **Timmy's podcast studio** is a yard piece (kit
+  key `studio`, shop id `podcast-studio`, Epic, 2,400): a sound booth with an on-air lamp, an antenna, the show's poster
+  and his mic; tapped, it goes on air. (8) **Timmy's health at his place**: the kit's `HEALTH` table (eight levels, the
+  cut-offs of `conditions()` in `widget/pet.js`) sets his drawing, how he hops, how much he wanders, his wave, whether he
+  flips and what he says; at 0 HP he stays on the doorstep. A visitor never sees it. (9) **Gentler ground**: every
+  scene's contour is a wider, flatter bell (`arcTop(cx, top, edge)`; Sam: "too extreme and pointy"), and each scene
+  raises its backdrop to match (`farLift`). Sam: "Looks good", "its good to merge when youre ready" (#299, with #289's
+  commits). Next: the wiring into the live widgets.
 - **2026-11-10 (Heme & Endo Exam 2: the exam's own count per lecture, Claude Code)** — Sam, from Dr. Herr: 5 on Exam 1, 8
   on L11, 9 on L12, 7 each on L13-L16, and L16 is the last lecture on the exam. `EXAM_COUNTS` (= `MOCK_BLUEPRINT`, with
   `EXAM_GROUPS` letting L12's two hours share their 9, drawn at random) drives the mock, the "Most likely questions" box,
@@ -158,6 +190,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   estradiol mark moved to the tubule). The pronunciation lexicon reads "Class II/III" as two and three. Open: the `cycle`
   figure's FSH at midcycle (L14 says it peaks with LH; L16's slide says inhibin holds it down), L16 on 11/10, L17, L18.
 
+- **2026-11-06 (redesign phase 4 part C: Timmy's place, the art, Claude Code)** — Nothing students see changes. Timmy's
+  house card redrawn as a little isometric world you build, on the design page only (`tools/preview/design/`, "Timmy's
+  place"), then redrawn again from Sam's feedback: no plot square (each scene's ground fills the picture and the homes sit
+  in it), eight homes (new: a beach hut, a lighthouse, an igloo, an observatory), six scenes (new: above the clouds),
+  twelve yard things in five spots, seven theme outfits in six themes, the rank as a handpiece statue by the door and
+  mastery as pennants in the bunting, animated art per rarity (card frames, a placing burst), Timmy hopping on the ground
+  round things instead of floating, and small eggs on what you tap. Play and Customize on the design page. One kit,
+  `tools/figures/site/place.mjs`, built into `tools/preview/design/place.js` by `build.mjs` (`--check` covers it; 648
+  drawings and 1872 walks checked). `migration_v54.sql` (still unapplied) follows Sam's calls: five yard spots, the
+  bowling lane `wide`, the art's names and ids in the catalog (68 rows); `tools/release/xp.js` 247 checks.
+  `widget/pet.js` is unchanged until Sam approves the art
+  ([task](vault/tasks/2026-11-06-redesign-timmys-place.md)).
 - **2026-11-06 (redesign phase 5, part 3: the game layer's server, written and tested, not applied, Claude Code)** — Nothing
   changes for students and nothing reaches the live database: `migration_v54.sql` waits in `supabase/pending-migrations.txt`
   for the redesign's release ([vault/reference/game-server.md](vault/reference/game-server.md)). It adds, beside today's

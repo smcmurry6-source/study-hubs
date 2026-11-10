@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/289
 ---
 
 # Timmy's place: the house card, redrawn as a scene you build
@@ -58,7 +58,8 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - [ ] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
       preview with reduced motion too
 - [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
-      every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4)
+      every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4); its five yard spots and
+      names follow the art (Sam, 2026-11-06)
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -70,8 +71,53 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
   (windows, porch, chimney, flag, paint) on the server; a yard item moves between spots; on Link my devices the newer
   choice per slot wins (`migration_v54.sql`, [game-server](../reference/game-server.md)). The slot names are a draft for
   phase 4's renderer.
+- 2026-11-06 (Claude Code): the art, drawn first on the design page, for Sam's look before anything goes into
+  `widget/pet.js`. One kit, `tools/figures/site/place.mjs`, built by `build.mjs` into `tools/preview/design/place.js`
+  (`window.SH_PLACE`): an isometric 14 x 14 plot with five yard slots (a wide one for the lane), drawn back to front.
+  Four homes (the cottage redrawn, the castle, the giant mushroom, the treehouse), each with its own Timmy spots, door,
+  toothbrush and night lights, and four to five upgrades (windows, a porch or landing, a chimney, a flag, a paint color);
+  five scenes (the hill, with thirty-one's house on the next hill and the rabbit by its burrow; a beach, a forest, a snowy
+  mountain, the night sky with the Dark Matter stars); six yard items (a garden, a pool, a hammock, a mint fountain, a
+  doghouse, a bowling lane). The rank layers, the pennants, the Crown, the seasons and the holiday props draw on every
+  home and scene. The design page's "Timmy's place" section has the full view (tap a spot, Timmy walks there, drag or
+  tilt) and the card, light and dark, at 390 px, reduced motion still. The build checks 188 combinations. Waiting for
+  Sam's look; then the renderer goes into `widget/pet.js`, and `LORE.md` and the About page get their lines when a
+  student's Timmy can really move.
+- 2026-11-06 (Claude Code): the art against the server draft above: its rarity tags now follow `shop_items` in
+  `migration_v54.sql`. Two differences are Sam's call (PR #289): the server keeps six yard spots, the art draws five
+  (the lane takes two); the server sells a mailbox, the art keeps the mailbox as the Bronze rank's and has a mint fountain
+  instead. The upgrades' names differ too (round windows and a brick chimney there; shutters, window boxes and a stone
+  chimney here): whichever Sam picks, the other side follows.
+- 2026-11-06 (Claude Code): redrawn from Sam's feedback, with free rein. **No plot square**: each scene's ground fills the
+  picture (a hilltop, dunes into the sea, a pine clearing, a snowy ledge over the clouds, a little planet, a cloud bank),
+  and the homes sit in it with a soft shadow and the scene's own ground, path, tree and lamp. **Eight homes** (the cottage,
+  the castle, the giant mushroom, the treehouse, and new: a beach hut, a lighthouse, an igloo, an observatory), **six
+  scenes** (new: above the clouds), **twelve yard things** (new: a sandcastle, a beach umbrella, a campfire, a hot spring,
+  a telescope, the mailbox back in the shop) and **seven theme outfits** for Timmy, in six themes (hilltop, seaside,
+  woodland, snowy, starlight, clouds) plus the classics. **Earned things are part of the place**: the rank is a statue of
+  the handpiece by the door (the rank's material, one to three steps for the level), each mastered hub a pennant in the
+  bunting (gold with a crown mark for a Crown). **Rarity art**: each rarity has its own animated card frame, placing burst
+  and coin. **Timmy hops** on the ground between spots, round the house and the yard things (a route over a visibility
+  graph; he climbs the treehouse ladder and the beach hut's steps), never floats. **Eggs**: tapping the sun or moon, the
+  house, the yard things and each scene's critter plays a small animation with a line from Timmy. The design page has Play
+  and Customize, rarity cards with prices, and the galleries; the build checks 648 drawings and 1872 walks.
+- 2026-11-06 (Claude Code): Sam's calls on the redraw: five yard spots, the mint fountain stays, the server's names follow
+  the art. `migration_v54.sql` now has the five spots (`yard-left`, `yard-front`, `yard-corner`, `yard-side`,
+  `yard-right`), `wide` for the bowling lane (`equip_item` keeps it in the side yard and clears the front corner), the
+  upgrades renamed (`fancy-windows`, `chimney`, Timmy flag) and every new piece with the kit's id, rarity and price (68
+  rows); `tools/release/xp.js` tests the spots and the lane (247 checks pass). Still waiting for Sam's look at the art;
+  then the renderer goes into `widget/pet.js`, and `LORE.md` (the new critters: the rabbit, a crab, an owl, a yeti, a
+  friend in a crater, a whale, the dog) and the About page get their lines.
+- 2026-11-10: Sam's third round of feedback (the art, the scenes, the yard, mastery, rank-up unlocks, seasonal sets, the
+  shop's shelves, visiting someone's Timmy) is its own task: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md). PR #289 stays open for it.
+- 2026-11-10 (Claude Code): round 3 is built on the design page ([its note](done/2026-11-10-redesign-timmys-place-round-3.md)):
+  the scenes, homes and yard redrawn, Timmy's wave and his bubble, two mastery displays for Sam to pick from, and the
+  seasonal and rank sets as packs (`tools/figures/site/packs/`). Still nothing in `widget/pet.js`.
+- 2026-11-10 (Claude Code): Sam's second look: hub mastery is one **medal board** (each hub's own medal, a big view on
+  tap), the statue stands upright, and the design page has the shop's window, the customizer, the rank board and
+  visiting ([round 3's note](done/2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
 
 ## Outcome
 
-Related: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+Related: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
 [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../rules/diagrams-anima.md)

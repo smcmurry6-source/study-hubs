@@ -15,10 +15,16 @@
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
 //     extend), equip_item, snack HP in Timmy's days, rare-costume sightings;
 //   - the idea board: names, limits, votes, reports, statuses with Inbox notes, starter ideas, no visitor ids;
-//   - the bootstrap with all of it, the Dark Matter unlock once per journey, and anon can't reach the private parts.
+//   - the bootstrap with all of it, the Dark Matter unlock once per journey;
+//   - the seasonal sets and the rank sets: the catalog is exactly tools/figures/site/sets.mjs; when each season's set is
+//     on sale (sh_shop_seasons, 2026-2028); Halloween's set is everyone's; a rank set is owned at its rank and never
+//     sold; two throwback days a month; the daily and weekly picks never hold a seasonal, gift or rank item;
+//   - visiting: a board row's key opens that person's place and nothing else of theirs; turning it off takes the key off
+//     every board; Link my devices keeps it off;
+//   - anon can't reach the private parts.
 //   node tools/release/xp.js     (PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 'use strict';
-const fs = require('fs'), path = require('path');
+const fs = require('fs'), path = require('path'), { execFileSync } = require('child_process');
 const { throwaway } = require('./pg');
 const KEYS = require('../xp/keys');
 const ROOT = path.resolve(__dirname, '../..');
@@ -363,7 +369,7 @@ try {
   ok(fr.common > fr.uncommon && fr.uncommon > fr.rare && fr.rare > fr.epic && fr.epic > (fr.legendary || 0), `rarer items come up less often (days a year per item: ${JSON.stringify(fr)})`);
   ok(rows(`select item_id from sh_shop_day('2026-10-15') where shelf = 'season'`).map(r => r.item_id).includes('pumpkin-lantern')
     && rows(`select item_id from sh_shop_day('2026-10-15') where shelf = 'season'`).map(r => r.item_id).includes('leaf-pile'), 'Halloween and fall items are on sale in October');
-  eq(rows(`select item_id from sh_shop_day('${D0}') where shelf = 'season'`).length, 0, 'no seasonal items on a day without a season');
+  eq(rows(`select item_id from sh_shop_day('2030-01-15') where shelf = 'season'`).length, 0, 'no seasonal items on a day without a season');
   ok(['apple', 'cheese-cube', 'floss', 'fluoride-rinse', 'boost-1h', 'boost-3h'].every(x => sh('always').includes(x)), 'snacks, floss and boosts are always on the shelf');
   // buying (as a visitor, today)
   const today = rows(`select * from sh_shop_day((now() at time zone 'America/Chicago')::date)`);
@@ -398,13 +404,20 @@ try {
   sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-B', 'mb:xh:1', 'medal', 2, now() - interval '1 minute', now() + interval '1 day')`);
   eq([num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and starts_at < now() and ends_at > now()`), num(`select sh_xp_mult('xp-B', now())`)], [2, 2], 'a shop boost and a medal boost together: still 2x');
   // equip
-  sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch') on conflict do nothing`);
+  sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch'), ('xp-B', 'bowling-lane'), ('xp-B', 'mailbox') on conflict do nothing`);
   eq(anonJson(`equip_item('xp-B', 'outfit', 'white-coat')`).error, 'not-owned', 'equipping something not owned');
   eq(anonJson(`equip_item('xp-B', 'home', 'garden')`).error, 'slot', 'a yard item can\'t be the home');
   ok(anonJson(`equip_item('xp-B', 'home', 'castle')`).equipped.home === 'castle', 'move into the castle');
-  anon(`select equip_item('xp-B', 'yard-1', 'garden')`);
-  const ey = anonJson(`equip_item('xp-B', 'yard-3', 'garden')`).equipped;
-  ok(ey['yard-3'] === 'garden' && !ey['yard-1'], 'a yard item moves from one spot to another');
+  anon(`select equip_item('xp-B', 'yard-left', 'garden')`);
+  const ey = anonJson(`equip_item('xp-B', 'yard-front', 'garden')`).equipped;
+  ok(ey['yard-front'] === 'garden' && !ey['yard-left'], 'a yard item moves from one spot to another');
+  eq(anonJson(`equip_item('xp-B', 'yard-6', 'mailbox')`).error, 'bad', 'only the five yard spots the art draws');
+  anon(`select equip_item('xp-B', 'yard-corner', 'mailbox')`);
+  eq(anonJson(`equip_item('xp-B', 'yard-left', 'bowling-lane')`).error, 'slot', 'the bowling lane only in the side yard');
+  const lane = anonJson(`equip_item('xp-B', 'yard-corner', 'bowling-lane')`).equipped;
+  ok(lane['yard-side'] === 'bowling-lane' && !lane['yard-corner'], `the bowling lane takes the side yard and the front corner (${JSON.stringify(lane)})`);
+  const unlane = anonJson(`equip_item('xp-B', 'yard-corner', 'mailbox')`).equipped;
+  ok(unlane['yard-corner'] === 'mailbox' && !unlane['yard-side'], 'something in the front corner takes the lane away');
   ok(anonJson(`equip_item('xp-B', 'porch', 'porch')`).equipped.porch === 'porch' && anonJson(`equip_item('xp-B', 'chimney', 'porch')`).error === 'slot', 'an upgrade only in its own slot');
   ok(!('home' in anonJson(`equip_item('xp-B', 'home', null)`).equipped), 'back to the cottage');
   // rare costumes
@@ -416,7 +429,7 @@ try {
   ok(buy('xp-B', 'pirate', 'buy-b-0000011').ok && !json(`get_my_shop('xp-B')`).items.some(i => i.shelf === 'spotted'), 'bought, it leaves the Spotted shelf');
   ok(buy('xp-B3', 'pirate', 'buy-b3-000001').error !== undefined && buy('xp-B3', 'pirate', 'buy-b3-000001').error === 'not-today', 'someone who hasn\'t spotted it can\'t buy it');
   const gs = json(`get_my_shop('xp-B')`), g0 = json(`get_my_shop(null)`);
-  ok(gs.wallet && gs.inventory.length >= 4 && gs.equipped['yard-3'] === 'garden' && gs.costumes.length === 1 && gs.snacks_today.length === 2 && gs.boost, 'get_my_shop has the wallet, things, what\'s equipped, costumes, today\'s snacks and the boost');
+  ok(gs.wallet && gs.inventory.length >= 4 && gs.equipped['yard-front'] === 'garden' && gs.costumes.length === 1 && gs.snacks_today.length === 2 && gs.boost, 'get_my_shop has the wallet, things, what\'s equipped, costumes, today\'s snacks and the boost');
   ok(g0.wallet === null && g0.items.length >= 13 && g0.inventory.length === 0, 'without a visitor, just today\'s shop');
   raises(() => anon(`select admin_upsert_shop_item('wrong', '{"id":"x"}'::jsonb)`), '28000', 'editing the catalog with a wrong secret');
   raises(() => anon(`select admin_upsert_shop_item(${S}, '{"id":"too-cheap","name":"X","kind":"outfit","rarity":"legendary","price":100}'::jsonb)`), '23514', 'a price outside its rarity\'s band');
@@ -520,13 +533,260 @@ try {
   }
   notes.push('bootstrap v2, the Dark Matter unlock once per journey, journey trophies, the boards with journeys');
 
-  /* ---------- 13. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items'])
+  /* ---------- 13. the seasonal sets, Halloween's gift set, the rank sets and throwback days (Sam, 2026-11-10) ---------- */
+  // the catalog is exactly tools/figures/site/sets.mjs (an ES module, and this file is CommonJS: read it in a child process)
+  const setsUrl = require('url').pathToFileURL(path.join(ROOT, 'tools/figures/site/sets.mjs')).href;
+  const SETS = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
+    `import { SEASONS, RANKS, allSetItems } from ${JSON.stringify(setsUrl)}; process.stdout.write(JSON.stringify({ seasons: SEASONS.map(s => s.k), gifts: SEASONS.filter(s => s.gift).map(s => s.k), ranks: RANKS.map(r => r.gtier), items: allSetItems() }));`], { encoding: 'utf8' }));
+  const byId = a => Object.fromEntries(a.map(r => [r.id, JSON.stringify(r)]));
+  const wantSets = byId(SETS.items.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: i.season || null, gift: !!i.gift, rank_tier: i.rank == null ? null : i.rank })));
+  const gotSets = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier from shop_items where season is not null or gift or rank_tier is not null`));
+  const setDiff = [...new Set([...Object.keys(wantSets), ...Object.keys(gotSets)])].filter(id => wantSets[id] !== gotSets[id]).sort();
+  ok(setDiff.length === 0 && SETS.items.length === 124, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
+  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 57 + SETS.items.length, 'the catalog has 181 rows: 57 everyday ones (the rotation, the always-shelf, the rare costumes), 112 seasonal and 12 rank');
+  const perSeason = rows(`select season, count(*)::int as n, count(*) filter (where kind = 'home' and rarity = 'legendary')::int as h, count(*) filter (where kind = 'scene' and rarity = 'legendary')::int as s,
+      string_agg(rarity, ',' order by price) filter (where kind = 'outfit') as o, string_agg(rarity, ',' order by price) filter (where kind = 'yard') as y, bool_or(rotates or shelf) as r, bool_and(gift) as g
+    from shop_items where season is not null group by 1 order by 1`);
+  eq(perSeason.map(r => r.season), SETS.seasons.slice().sort(), 'a set for each of the fourteen seasons in sets.mjs');
+  ok(perSeason.every(r => r.n === 8 && r.h === 1 && r.s === 1 && r.o === 'rare,epic,legendary' && r.y === 'rare,epic,legendary' && !r.r),
+    `every season's set: a Legendary home and scene, a Rare, Epic and Legendary outfit and yard thing, none in the rotation (${JSON.stringify(perSeason.find(r => r.n !== 8 || r.h !== 1 || r.s !== 1 || r.r) || '')})`);
+  eq(perSeason.filter(r => r.g).map(r => r.season), SETS.gifts, 'only Halloween\'s set is a gift');
+  eq(num(`select count(*) from shop_items where id in ('vampire-cape', 'pilgrim-hat', 'party-hat', 'clover-hat', 'bunny-ears', 'scarf', 'mint-fountain')`), 0, 'the old draft seasonal rows and the mint fountain are gone');
+  eq(rows(`select name, kind, rarity, price, season from shop_items where id = 'mouthwash-fountain'`), [{ name: 'Mouthwash fountain', kind: 'yard', rarity: 'rare', price: 900, season: null }], 'the mouthwash fountain, under its new id');
+  const rankRows = rows(`select id, kind, price, rank_tier, rotates, shelf from shop_items where rank_tier is not null order by rank_tier, kind`);
+  ok(rankRows.length === 12 && rankRows.every(r => r.price === 0 && !r.rotates && !r.shelf && ['outfit', 'yard'].includes(r.kind)) && JSON.stringify([...new Set(rankRows.map(r => r.rank_tier))]) === JSON.stringify(SETS.ranks),
+    'twelve rank items: an outfit and a yard thing for each of the Handpiece\'s six full rank-ups, price 0, on no shelf');
+  raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, rank_tier, rotates) values ('t-rank-priced', 'X', 'outfit', 'rare', 700, 3, false)`), '23514', 'a rank item with a price');
+  raises(() => sql(`insert into shop_items (id, name, kind, rarity, price) values ('t-free', 'X', 'outfit', 'rare', 0)`), '23514', 'a price of 0 without a rank');
+  raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, rank_tier, rotates) values ('t-rank-home', 'X', 'home', 'rare', 0, 3, false)`), '23514', 'a rank item that isn\'t an outfit or a yard thing');
+  raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, rank_tier) values ('t-rank-rot', 'X', 'outfit', 'rare', 0, 3)`), '23514', 'a rank item in the rotation');
+  raises(() => sql(`insert into shop_items (id, name, kind, rarity, price, season) values ('t-season', 'X', 'outfit', 'rare', 700, 'midwinter')`), '23514', 'a season the catalog doesn\'t know');
+
+  // when each season's set is on sale. Easter: 2026-04-05, 2027-03-28, 2028-04-16; Fat Tuesday: 2026-02-17, 2027-02-09,
+  // 2028-02-29; the fourth Thursday of November: 2026-11-26, 2027-11-25, 2028-11-23
+  eq(rows(`select to_char(sh_easter(y), 'YYYY-MM-DD') as e from generate_series(2026, 2028) y`).map(r => r.e), ['2026-04-05', '2027-03-28', '2028-04-16'], 'Easter Sunday of 2026, 2027 and 2028');
+  const SALE = [
+    ['2026-01-01', 'newyear'], ['2026-01-02', 'newyear'], ['2026-01-03', ''], ['2026-02-07', ''], ['2026-02-08', 'valentine'], ['2026-02-10', 'valentine'],
+    ['2026-02-11', 'mardigras,valentine'], ['2026-02-14', 'mardigras,valentine'], ['2026-02-15', 'mardigras'], ['2026-02-17', 'mardigras'], ['2026-02-18', ''],
+    ['2026-03-29', 'spring'], ['2026-03-30', 'easter,spring'], ['2026-04-06', 'easter,spring'], ['2026-04-07', 'spring'],
+    ['2026-05-31', 'spring'], ['2026-06-01', 'summer'], ['2026-06-27', 'summer'], ['2026-06-28', 'july4,summer'], ['2026-07-04', 'july4,summer'], ['2026-07-05', 'summer'],
+    ['2026-09-21', 'summer'], ['2026-09-22', 'fall'], ['2026-09-30', 'fall'], ['2026-10-01', 'halloween,fall'], ['2026-10-31', 'halloween,fall'], ['2026-11-01', 'thanksgiving,fall'],
+    ['2026-11-27', 'thanksgiving,fall'], ['2026-11-28', 'winter,fall'], ['2026-11-30', 'winter,fall'], ['2026-12-01', 'winter'], ['2026-12-26', 'winter'], ['2026-12-27', 'newyear'], ['2026-12-31', 'newyear'],
+    ['2027-01-02', 'newyear'], ['2027-01-03', ''], ['2027-02-02', ''], ['2027-02-03', 'mardigras'], ['2027-02-07', 'mardigras'], ['2027-02-08', 'mardigras,valentine'],
+    ['2027-02-09', 'mardigras,valentine'], ['2027-02-10', 'valentine'], ['2027-02-14', 'valentine'], ['2027-02-15', ''],
+    ['2027-02-21', ''], ['2027-02-22', 'toothfairy'], ['2027-02-27', 'toothfairy'], ['2027-02-28', 'toothfairy,dentist'], ['2027-03-01', 'dentist'], ['2027-03-06', 'dentist'], ['2027-03-07', ''],
+    ['2027-03-10', ''], ['2027-03-11', 'stpatrick'], ['2027-03-17', 'stpatrick'], ['2027-03-18', ''], ['2027-03-19', ''], ['2027-03-20', 'spring'], ['2027-03-21', 'spring'],
+    ['2027-03-22', 'easter,spring'], ['2027-03-28', 'easter,spring'], ['2027-03-29', 'easter,spring'], ['2027-03-30', 'spring'],
+    ['2027-11-26', 'thanksgiving,fall'], ['2027-11-27', 'winter,fall'],
+    ['2028-02-22', 'toothfairy'], ['2028-02-23', 'mardigras,toothfairy'], ['2028-02-28', 'mardigras,toothfairy'], ['2028-02-29', 'mardigras,dentist'], ['2028-03-01', 'dentist'], ['2028-03-06', 'dentist'], ['2028-03-07', ''],
+    ['2028-04-09', 'spring'], ['2028-04-10', 'easter,spring'], ['2028-04-17', 'easter,spring'], ['2028-04-18', 'spring'],
+    ['2028-11-24', 'thanksgiving,fall'], ['2028-11-25', 'winter,fall'], ['2028-12-26', 'winter'], ['2028-12-27', 'newyear']
+  ];
+  const saleGot = Object.fromEntries(rows(`select d, array_to_string(sh_shop_seasons(d::date), ',') as s from unnest(array[${SALE.map(r => q(r[0])).join(',')}]) d`).map(r => [r.d, r.s]));
+  const saleOff = SALE.filter(([d, s]) => saleGot[d] !== s);
+  ok(saleOff.length === 0, `sh_shop_seasons on ${SALE.length} sample days of 2026-2028: each window's first and last day and the days outside it (${saleOff.length} differ${saleOff.length ? ': ' + saleOff.slice(0, 4).map(([d, s]) => `${d} got "${saleGot[d]}", expected "${s}"`).join('; ') : ''})`);
+  const perYear = rows(`select s, array_agg(n order by y) as n from (select extract(year from d)::int as y, s, count(*)::int as n from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d
+      cross join lateral unnest(sh_shop_seasons(d::date)) s group by 1, 2) z group by 1 order by 1`);
+  eq(Object.fromEntries(perYear.map(r => [r.s, r.n.join(',')])), { dentist: '7,7,7', easter: '8,8,8', fall: '70,70,70', halloween: '31,31,31', july4: '7,7,7', mardigras: '7,7,7', newyear: '7,7,7', spring: '73,73,73',
+    stpatrick: '7,7,7', summer: '113,113,113', thanksgiving: '27,26,24', toothfairy: '7,7,7', valentine: '7,7,7', winter: '29,30,32' }, 'the days each set is on sale in 2026, 2027 and 2028 (a short holiday: 7)');
+  eq(num(`select count(*) from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d
+          where (sh_season(d::date) is not null and not (sh_season(d::date) = any(sh_shop_seasons(d::date)))) or (sh_is_fall(d::date) <> ('fall' = any(sh_shop_seasons(d::date))))`), 0,
+    'a holiday\'s set is on sale on every day Timmy dresses up for it, and the fall set exactly in the fall weeks (sh_season and sh_is_fall unchanged, as checked against widget/pet.js above)');
+  eq(json(`to_jsonb(sh_shop_seasons(null))`), [], 'no day, no season');
+
+  // three years of the shared shop, day by day, for the checks below. The catalog's rows joined it "today" (added_on's
+  // default), so date them before the three years: a throwback only brings back a season that has run since then.
+  sql(`update shop_items set added_on = '2025-01-01'`);
+  sql(`create table xp_test_shop as select d::date as d, s.item_id, s.shelf, s.pos
+       from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d cross join lateral sh_shop_day(d::date) s`);
+  eq(num(`select count(*) from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') g where
+          (select coalesce(array_agg(s.item_id order by s.item_id), '{}') from xp_test_shop s where s.d = g::date and s.shelf = 'season')
+          is distinct from (select coalesce(array_agg(i.id order by i.id), '{}') from shop_items i where i.active and i.season = any(sh_shop_seasons(g::date)))`), 0,
+    'on every day of 2026-2028 the season shelf is exactly the rows of the seasons on sale');
+  eq(num(`select count(*) from (select d from xp_test_shop where shelf = 'season' group by d having count(*) <> 8 * cardinality(sh_shop_seasons(d))) z`), 0, 'eight items for each season on sale');
+  eq(rows(`select i.season, s.pos from xp_test_shop s join shop_items i on i.id = s.item_id where s.d = '2027-02-28' and s.shelf = 'season' order by s.pos`).map(r => r.season).join(','),
+    Array(8).fill('toothfairy').concat(Array(8).fill('dentist')).join(','), 'two sets at once (February 28): Tooth Fairy week\'s eight, then Dentist\'s Day\'s');
+  eq(rows(`select shelf, count(*)::int as n from xp_test_shop where shelf in ('daily', 'weekly', 'always') group by 1 order by 1`).map(r => [r.shelf, r.n]), [['always', 6 * 1096], ['daily', 4 * 1096], ['weekly', 3 * 1096]],
+    'every day of the three years has 4 daily items, 3 weekly ones and the always-shelf');
+  eq(num(`select count(*) from xp_test_shop s join shop_items i on i.id = s.item_id where s.shelf in ('daily', 'weekly') and (i.season is not null or i.gift or i.rank_tier is not null)`), 0,
+    'the daily and weekly picks never hold a seasonal, gift or rank item (three years)');
+  eq(num(`select count(*) from xp_test_shop s join shop_items i on i.id = s.item_id where i.rank_tier is not null`), 0, 'a rank item is never on any shelf');
+  eq(rows(`select s.shelf, count(distinct s.d)::int as days, count(distinct s.item_id)::int as items from xp_test_shop s join shop_items i on i.id = s.item_id where i.gift group by 1`), [{ shelf: 'season', days: 93, items: 8 }],
+    'the gift set is listed only on the season shelf, in October');
+
+  // throwback days
+  const tbDays = rows(`select to_char(m, 'YYYY-MM') as m, sh_throwback_days(m::date) as days, (select count(*)::int from generate_series(m::date, (m + interval '1 month' - interval '1 day')::date, interval '1 day') g where sh_is_throwback(g::date)) as n
+                       from generate_series('2026-01-01'::date, '2028-12-01'::date, interval '1 month') m`);
+  ok(tbDays.length === 36 && tbDays.every(r => r.days.length === 2 && r.days[0] >= 1 && r.days[0] <= 14 && r.days[1] >= 15 && r.days[1] <= 28 && r.n === 2),
+    `every month of 2026-2028 has exactly two throwback days, one in each half (${JSON.stringify(tbDays.find(r => r.n !== 2 || r.days.length !== 2) || tbDays[0])})`);
+  ok(new Set(tbDays.map(r => r.days.join('-'))).size >= 20, 'the throwback days change from month to month');
+  eq(rows(`select sh_throwback_days('2027-05-01') as a, sh_throwback_days('2027-05-31') as b`).map(r => JSON.stringify(r.a) === JSON.stringify(r.b)), [true], 'the same two days whichever day of the month asks');
+  const tbShelf = rows(`select to_char(s.d, 'YYYY-MM') as m, count(distinct s.d)::int as days, count(*)::int as n, count(distinct (s.d, s.item_id))::int as items, bool_and(sh_is_throwback(s.d)) as on_day,
+      count(*) filter (where i.season is null or i.gift or i.rank_tier is not null or i.season = any(sh_shop_seasons(s.d)))::int as bad
+    from xp_test_shop s join shop_items i on i.id = s.item_id where s.shelf = 'throwback' group by 1 order by 1`);
+  ok(tbShelf.length === 36 && tbShelf.every(r => r.days === 2 && r.n === 6 && r.items === 6 && r.on_day && r.bad === 0),
+    `each throwback day's shelf: 3 seasonal items, none in season, none a gift, none a rank item (${JSON.stringify(tbShelf.find(r => r.days !== 2 || r.n !== 6 || r.bad) || tbShelf[0])})`);
+  const tbMix = Object.fromEntries(rows(`select case when i.kind in ('home', 'scene') then 'place' else i.rarity end as c, count(*)::int as n
+    from generate_series('2026-01-01'::date, '2045-12-31'::date, interval '1 day') d cross join lateral sh_throwback_items(d::date) t join shop_items i on i.id = t.item_id
+    where sh_is_throwback(d::date) group by 1`).map(r => [r.c, r.n]));
+  ok(tbMix.rare > tbMix.epic && tbMix.epic > tbMix.legendary && tbMix.legendary > tbMix.place && tbMix.place > 0,
+    `on throwback days rarer items come back less often, and homes and scenes least (twenty years, 26 items of each: ${JSON.stringify(tbMix)})`);
+  eq(rows(`select * from sh_throwback_items((select min(g)::date from generate_series('2027-06-01'::date, '2027-06-30'::date, interval '1 day') g where not sh_is_throwback(g::date)))`), [], 'no throwback shelf on any other day');
+  // nothing is sold before its season's first run (Sam, 2026-11-10): with a catalog that opened on 2026-11-15, a
+  // throwback can only bring back a season that has already been on sale since that day
+  sql(`update shop_items set added_on = '2026-11-15'`);
+  const early = rows(`select to_char(d, 'YYYY-MM-DD') as d, i.season from generate_series('2026-11-15'::date, '2027-11-14'::date, interval '1 day') d
+      cross join lateral sh_throwback_items(d::date) t join shop_items i on i.id = t.item_id order by 1`);
+  const firstRun = { thanksgiving: '2026-11-15', fall: '2026-11-15', winter: '2026-11-28', newyear: '2026-12-27', valentine: '2027-02-08', mardigras: '2027-02-03',
+    toothfairy: '2027-02-22', dentist: '2027-02-28', stpatrick: '2027-03-11', spring: '2027-03-20', easter: '2027-03-22', summer: '2027-06-01', july4: '2027-06-28' };
+  const tooSoon = early.filter(r => !firstRun[r.season] || r.d <= firstRun[r.season]);
+  ok(early.length > 30 && tooSoon.length === 0, `in the catalog's first year no throwback item comes before its season's first run (${early.length} items; ${tooSoon.length} too soon${tooSoon.length ? ': ' + JSON.stringify(tooSoon[0]) : ''})`);
+  const dec = [...new Set(early.filter(r => r.d >= '2026-12-01' && r.d <= '2026-12-14').map(r => r.season))].sort();
+  ok(dec.length > 0 && dec.every(s => s === 'thanksgiving' || s === 'fall'), `December's first throwback day brings back only Thanksgiving and fall pieces (${dec.join(', ')})`);
+  eq(num(`select count(*) from generate_series('2026-11-15'::date, '2027-03-21'::date, interval '1 day') d cross join lateral sh_shop_day(d::date) s
+          join shop_items i on i.id = s.item_id where i.season = 'easter'`), 0, 'no Easter piece is on any shelf before Easter week first comes');
+  ok(rows(`select sh_season_was_on('easter', '2026-11-15', '2028-04-01') as a, sh_season_was_on('easter', '2026-11-15', '2027-03-22') as b, sh_season_was_on('easter', '2027-03-30', '2028-04-09') as c`)
+    .every(r => r.a === true && r.b === false && r.c === false), 'a season counts as run from the day after its first day on sale, across a long gap between Easters, and not before the catalog had it');
+  sql(`update shop_items set added_on = '2025-01-01'`);
+
+  // buying a seasonal item: in season, or on a throwback day when it's on that shelf
+  const buyAt = (day, v, item, req) => json(`sh_buy(${q(day)}::date, ${q(v)}, ${q(item)}, ${q(req)})`);
+  const offDay = (item, from) => one(`select to_char(g, 'YYYY-MM-DD') from generate_series(${q(from)}::date, ${q(from)}::date + 40, interval '1 day') g
+    where not exists (select 1 from xp_test_shop s where s.d = g::date and s.item_id = ${q(item)}) order by 1 limit 1`);
+  award('xp-T', 'rep:flag:9010', 120000);
+  eq(buyAt(offDay('clover-patch', '2027-07-01'), 'xp-T', 'clover-patch', 'buy-t-0000001').error, 'not-today', 'a St. Patrick\'s item in July: not on sale');
+  const inSeason = buyAt('2027-03-12', 'xp-T', 'clover-patch', 'buy-t-0000002');
+  ok(inSeason.ok && inSeason.price === 700, `the same item in its week: bought at its price (${JSON.stringify(inSeason)})`);
+  eq(buyAt(offDay('pot-of-gold', '2027-03-18'), 'xp-T', 'pot-of-gold', 'buy-t-0000003').error, 'not-today', 'the day its week ends, the rest of the set is off sale');
+  const tb1 = rows(`select to_char(d, 'YYYY-MM-DD') as d, item_id, (select price from shop_items where id = item_id) as price from xp_test_shop where shelf = 'throwback' and d >= '2027-06-01' order by d, pos limit 1`)[0];
+  eq(buyAt(offDay(tb1.item_id, tb1.d), 'xp-T', tb1.item_id, 'buy-t-0000004').error, 'not-today', `an out-of-season item (${tb1.item_id}) on a day that isn't a throwback day`);
+  const tbBuy = buyAt(tb1.d, 'xp-T', tb1.item_id, 'buy-t-0000005');
+  ok(tbBuy.ok && tbBuy.price === tb1.price && num(`select count(*) from pet_inventory where visitor_id = 'xp-T' and item_id = ${q(tb1.item_id)}`) === 1, `on a throwback day (${tb1.d}) it's on the Back for today shelf and sells at its usual price (${JSON.stringify(tbBuy)})`);
+  const tbShop = json(`sh_my_shop(${q(tb1.d)}::date, 'xp-T')`);
+  ok(tbShop.throwback === true && tbShop.items.filter(i => i.shelf === 'throwback').length === 3 && tbShop.items.find(i => i.id === tb1.item_id).owned === true, 'the shop that day says it\'s a throwback day and lists the three, the bought one as owned');
+  eq(json(`sh_my_shop('2027-02-28'::date, null)`).seasons, ['toothfairy', 'dentist'], 'the shop names the seasons on sale');
+
+  // Halloween's set is everyone's
+  const giftIds = SETS.items.filter(i => i.gift).map(i => i.id).sort();
+  eq(giftIds.length, 8, 'eight gift items in sets.mjs');
+  eq(one(`select sh_owns('xp-N', 'haunted-manor')`), 't', 'someone brand new owns a Halloween item');
+  const nShop = json(`sh_my_shop('2026-10-15'::date, 'xp-N')`);
+  eq(nShop.inventory.map(i => i.id + ':' + i.how).sort(), giftIds.map(id => id + ':gift'), 'their things are the eight gifts, marked as gifts');
+  ok(giftIds.every(id => nShop.items.some(i => i.id === id && i.shelf === 'season' && i.owned && i.gift)) && nShop.items.some(i => i.id === 'leaf-pile' && i.shelf === 'season' && !i.owned && !i.gift),
+    'in October the season shelf lists the gift set as owned, beside fall\'s set, which is for sale');
+  ok(anonJson(`equip_item('xp-N', 'home', 'haunted-manor')`).equipped.home === 'haunted-manor' && anonJson(`equip_item('xp-N', 'outfit', 'skeleton-suit')`).equipped.outfit === 'skeleton-suit', 'a gift can be put on by anyone');
+  eq([buyAt('2026-10-15', 'xp-T', 'haunted-manor', 'buy-t-0000006').error, buyAt('2027-07-10', 'xp-T', 'haunted-manor', 'buy-t-0000007').error], ['owned', 'owned'], 'a gift can never be bought: it\'s already owned, in October or not');
+  eq(num(`select count(*) from pet_inventory where item_id = any(${q('{' + giftIds.join(',') + '}')}::text[])`) + num(`select count(*) from pet_purchases where item_id = any(${q('{' + giftIds.join(',') + '}')}::text[])`), 0, 'no rows are written for a gift');
+
+  // rank sets: earned by rank, never sold
+  const shopOf = v => anonJson(`get_my_shop(${q(v)})`);
+  const rk0 = shopOf('xp-RK');
+  ok(rk0.locked.length === 12 && rk0.locked[0].rank_tier === 1 && rk0.locked[0].name && !rk0.inventory.some(i => i.how === 'rank'), 'before any rank-up: the twelve rank items are listed as locked, each with its tier');
+  eq(anonJson(`equip_item('xp-RK', 'outfit', 'rank-antique-outfit')`).error, 'not-owned', 'a rank item can\'t be put on below its rank');
+  const rkBuy = anonJson(`buy_item('xp-RK', 'rank-antique-outfit', 'buy-rk-000001')`);
+  ok(rkBuy.error === 'rank' && rkBuy.rank_tier === 1, `a rank item can't be bought (${JSON.stringify(rkBuy)})`);
+  award('xp-RK', 'rep:flag:9011', 300);
+  eq(num(`select gtier from sh_rank(${xpOf('xp-RK')})`), 1, '300 XP is the first full rank-up (Antique)');
+  ok(anonJson(`equip_item('xp-RK', 'outfit', 'rank-antique-outfit')`).equipped.outfit === 'rank-antique-outfit' && anonJson(`equip_item('xp-RK', 'yard-left', 'rank-antique-yard')`).equipped['yard-left'] === 'rank-antique-yard',
+    'at the rank, its outfit and its yard thing can be put on');
+  eq(anonJson(`equip_item('xp-RK', 'outfit', 'rank-bronze-outfit')`).error, 'not-owned', 'the next rank\'s outfit is still locked');
+  const rk1 = shopOf('xp-RK');
+  eq(rk1.inventory.filter(i => i.how === 'rank').map(i => i.id).sort(), ['rank-antique-outfit', 'rank-antique-yard'], 'get_my_shop lists them as owned by rank');
+  ok(rk1.locked.length === 10 && rk1.locked.every(i => i.rank_tier >= 2) && rk1.inventory.filter(i => i.how === 'gift').length === 8, 'and the ten still locked');
+  eq([anonJson(`buy_item('xp-RK', 'rank-antique-outfit', 'buy-rk-000002')`).error, anonJson(`buy_item('xp-RK', 'rank-bronze-outfit', 'buy-rk-000003')`).error], ['owned', 'rank'], 'owned once reached; the next one still can\'t be bought');
+  award('xp-RK', 'rep:flag:9012', 4700);
+  eq(shopOf('xp-RK').inventory.filter(i => i.how === 'rank').length, 6, 'at Silver (5,000 XP): the sets of every rank passed, three in all');
+  eq(num(`select count(*) from pet_inventory where visitor_id = 'xp-RK'`), 0, 'with no rows written');
+  anon(`select equip_item('xp-RK', 'outfit', 'rank-silver-outfit')`);
+  sql(`delete from xp_awards where visitor_id = 'xp-RK'; select sh_xp_rebuild(array['xp-RK'])`);
+  ok(xpOf('xp-RK') === 0 && one(`select item_id from pet_equipped where visitor_id = 'xp-RK' and slot = 'outfit'`) === 'rank-silver-outfit' && anonJson(`equip_item('xp-RK', 'outfit', 'rank-silver-outfit')`).error === 'not-owned',
+    'if XP ever drops below the rank, what is on stays on; it can\'t be put on again');
+  ok(shopOf('xp-T').locked.length === 0 && shopOf('xp-T').inventory.filter(i => i.how === 'rank').length === 12 && shopOf('xp-T').inventory.some(i => i.how === 'bought' && i.id === 'clover-patch' && i.at), 'past Dark Matter: all twelve, beside what was bought');
+  notes.push(`seasonal sets: the catalog matches sets.mjs (${SETS.items.length} rows), ${SALE.length} sample days of sh_shop_seasons, three years of shelves, throwback days, the gift set, the rank sets`);
+
+  /* ---------- 14. visiting someone's place from the boards ---------- */
+  sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values
+         ('xp-VS', 'xh', 'old1', true, ((date_trunc('day', now() at time zone 'America/Chicago') - interval '1 day' + interval '12 hours') at time zone 'America/Chicago')),
+         ('xp-VS', 'xh', 'old2', true, now());
+       insert into visitor_names (visitor_id, display_name) values ('xp-VS', 'Visit Subject');
+       insert into correct_streaks (visitor_id, current_streak, best_streak) values ('xp-VS', 99999, 99999)
+         on conflict (visitor_id) do update set current_streak = excluded.current_streak, best_streak = excluded.best_streak;
+       insert into arcade_scores (hub, game, visitor_id, score) values ('xh', 'board', 'xp-VS', 999999), ('xh', 'board', 'xp-VA', 5);
+       insert into achievements (visitor_id, kind, hub) values ('xp-VS', 'mastery-gold', 'xh');
+       insert into pet_inventory (visitor_id, item_id) values ('xp-VS', 'castle'), ('xp-VS', 'night-sky'), ('xp-VS', 'garden'), ('xp-VS', 'porch'), ('xp-VS', 'paint-mint'), ('xp-VS', 'bow-tie');`);
+  const vsPlace = { home: 'castle', scene: 'night-sky', 'yard-left': 'garden', 'yard-right': 'haunted-tree', porch: 'porch', paint: 'paint-mint', outfit: 'bow-tie' };
+  for (const [slot, item] of Object.entries(vsPlace)) anon(`select equip_item('xp-VS', ${q(slot)}, ${q(item)})`);
+  const boardRows = () => ({
+    rank: anonJson(`(select coalesce(json_agg(x), '[]') from get_rank_board_v2('xp-VS', 50) x)`),
+    streak: anonJson(`(select coalesce(json_agg(x), '[]') from get_leaderboard_v2(50) x)`),
+    correct: anonJson(`(select coalesce(json_agg(x), '[]') from get_correct_streak_stats_v2() x)`),
+    arcade: anonJson(`(select coalesce(json_agg(x), '[]') from get_arcade_leaderboard_v2('xh', 'board', 'xp-VS', 50) x)`)
+  });
+  const place = k => anonJson(`coalesce(get_place(${k == null ? 'null' : q(k)}), 'null'::jsonb)`);
+  const sorted = o => JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]));
+  const HEX = /^[0-9a-f]{24}$/;
+  const b1v = boardRows(), vsRows = b => Object.entries(b).map(([n, r]) => [n, r.filter(x => x.display_name === 'Visit Subject')]);
+  ok(vsRows(b1v).every(([, r]) => r.length >= 1), `the made-up visitor is on all four boards (${vsRows(b1v).map(([n, r]) => n + ' ' + r.length).join(', ')})`);
+  const K = b1v.rank.find(x => x.is_me).visit;
+  ok(HEX.test(K) && vsRows(b1v).every(([, r]) => r.every(x => x.visit === K)), `visiting is on by default: the same 24-character key on that person's row of every board (the caller's own row too)`);
+  ok(Object.values(b1v).every(r => r.every(x => HEX.test(x.visit || ''))) && new Set(b1v.rank.map(x => x.visit)).size === b1v.rank.length, 'every row of every board has a key, a different one for each person');
+  eq(shopOf('xp-VS').visiting, true, 'get_my_shop says visiting is on');
+  const pl = place(K), meRow = b1v.rank.find(x => x.is_me);
+  eq(Object.keys(pl).sort(), ['equipped', 'flair', 'name', 'rank'], 'a place is a name, what stands in each slot, the rank and the mastery flair, and nothing else');
+  eq(pl.name, 'Visit Subject', 'under the leaderboard name, as the boards show it');
+  eq(sorted(pl.equipped), sorted(vsPlace), 'the home, scene, yard spots, upgrade, paint and outfit that person chose (a gift among them)');
+  eq([sorted(pl.rank), pl.flair], [sorted({ journey: meRow.journey, tier: meRow.tier, level: meRow.level }), meRow.flair], 'the rank and the flair the board shows');
+  ok(pl.flair === 'xh:3', `the flair is the hub medals (${pl.flair})`);
+  const allIds = new Set(rows(`select visitor_id from xp_visitors union select visitor_id from visitor_names union select visitor_id from pet_equipped union select visitor_id from arcade_scores
+                               union select visitor_id from correct_streaks union select visitor_id from personal_answers`).map(r => r.visitor_id));
+  const NEVER = ['visitor_id', 'visitor', 'id', 'key', 'visit', 'xp', 'hp', 'snacks', 'snacks_today', 'streak', 'answers', 'correct', 'wallet', 'balance', 'inventory', 'costumes', 'boost', 'at', 'set_at',
+    'bought_at', 'updated_at', 'day', 'days', 'last_seen', 'step', 'step_at', 'next_at', 'tier_at'];
+  const leaks = o => { const bad = []; (function walk(x, k){
+    if (k != null && (allIds.has(k) || NEVER.includes(k))) bad.push('key ' + k);
+    if (typeof x === 'string' && (allIds.has(x) || /xp-|idea-vis-/.test(x) || /\d{4}-\d\d-\d\d|\d\d:\d\d/.test(x))) bad.push('value ' + x);
+    if (typeof x === 'number' && !(Number.isInteger(x) && x >= 0 && x <= 6)) bad.push('number ' + x);
+    if (x && typeof x === 'object') for (const [kk, vv] of Object.entries(x)) walk(vv, Array.isArray(x) ? null : kk);
+  })(o, null); return bad; };
+  ok(allIds.has('xp-VS') && allIds.size > 30 && leaks(pl).length === 0, `a place holds no visitor id, no XP, HP, streak, answers, wallet or inventory, and no date or time (${leaks(pl).join(', ')})`);
+  ok(!/xp-|idea-vis-/.test(JSON.stringify(b1v)), 'the boards with their keys still carry no visitor id');
+  const nameVA = one(`select anon_name('xp-VA')`), rowVA = b1v.arcade.find(x => x.display_name === nameVA), plVA = rowVA && place(rowVA.visit);
+  ok(plVA && plVA.name === nameVA && sorted(plVA.equipped) === '[]' && plVA.rank.journey === 0 && plVA.rank.tier === 0 && plVA.rank.level === 1 && leaks(plVA).length === 0,
+    'someone with only an arcade score and no chosen name: their generated name, an empty place, the first rank');
+  // off
+  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'turning visiting off');
+  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'off twice is still off');
+  const b2off = boardRows();
+  ok(vsRows(b2off).every(([, r]) => r.length >= 1 && r.every(x => x.visit === null)) && !JSON.stringify(b2off).includes(K), 'off: that person\'s row has no key on any of the four boards, and the old key is nowhere');
+  ok(b2off.rank.filter(x => x.display_name !== 'Visit Subject').every(x => HEX.test(x.visit || '')), 'everyone else keeps theirs');
+  eq(place(K), null, 'the old key opens nothing');
+  eq(shopOf('xp-VS').visiting, false, 'get_my_shop says visiting is off');
+  // on again
+  eq(anonJson(`set_visiting('xp-VS', true)`), { ok: true, visiting: true }, 'turning it back on');
+  ok(vsRows(boardRows()).every(([, r]) => r.every(x => x.visit === K)) && place(K).name === 'Visit Subject' && shopOf('xp-VS').visiting === true, 'on again: the same key is back on every board and opens the place');
+  eq([place('0'.repeat(24)), place('xp-VS'), place('nope'), place(null), place(K.toUpperCase())], [null, null, null, null, null], 'an unknown key, a visitor id, a malformed key and no key all give nothing');
+  eq([anonJson(`set_visiting('', false)`).ok, anonJson(`set_visiting(null, false)`).ok, anonJson(`set_visiting('xp-VS', null)`).ok, anonJson(`set_visiting(repeat('x', 81), false)`).ok], [false, false, false, false], 'set_visiting refuses a bad id or no choice');
+  eq(num(`select count(*) from pet_visit_off`), 0, 'and writes nothing for them');
+  // Link my devices keeps an opt-out, whichever device made it
+  anon(`select set_visiting('xp-VL2', false); select set_visiting('xp-VM', false)`);
+  const vc1 = anon(`select create_link_code('xp-VL')`)[0][0], vc2 = anon(`select create_link_code('xp-VM')`)[0][0];
+  eq([anon(`select redeem_link_code(${q(vc1)}, 'xp-VL2')`)[0][0], anon(`select redeem_link_code(${q(vc2)}, 'xp-VM2')`)[0][0]], ['xp-VL', 'xp-VM'], 'two pairs of devices link');
+  eq(rows(`select visitor_id from pet_visit_off order by 1`).map(r => r.visitor_id), ['xp-VL', 'xp-VM'], 'linked: off on either device stays off, on the id that remains');
+  ok(shopOf('xp-VL').visiting === false && shopOf('xp-VM').visiting === false, 'and the shop says so');
+  ok(num(`select length(secret) from visit_secret`) >= 32 && num(`select count(*) from visit_secret`) === 1, 'one server-side secret behind the keys');
+  notes.push('visiting: on by default, a key per board row, a place with only what it shows, off and on again, unknown keys, Link my devices');
+
+  /* ---------- 15. the private parts stay private ---------- */
+  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'pet_visit_off'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
+  raises(() => anon(`insert into public.pet_visit_off (visitor_id) values ('x')`), '42501', 'anon writes pet_visit_off directly');
+  raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,
     `sh_xp_replay(array['x'])`, `sh_wallet('xp-B')`, `sh_session_start(null, 'x', 'xh', 'mock', null)`, `sh_pod_minute(null, 'x', 'xh', 'ep1', 0)`,
-    `sh_medal_check('x', 'xh', now())`, `sh_xp_mult('x', now())`, `sh_key('xh', 'x1', null)`])
+    `sh_medal_check('x', 'xh', now())`, `sh_xp_mult('x', now())`, `sh_key('xh', 'x1', null)`,
+    `sh_visit_key('xp-VS')`, `sh_visit_link('xp-VS')`, `sh_owns('xp-B', 'castle')`, `sh_owned('xp-B')`, `sh_buy(null, 'xp-B', 'apple', 'buy-anon-0001')`, `sh_my_shop(null, 'xp-B')`, `sh_throwback_items(current_date)`])
     raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+  eq([anon(`select sh_shop_seasons('2026-10-15')`)[0][0], anon(`select sh_is_throwback('2026-10-15') is not null`)[0][0], anon(`select cardinality(sh_throwback_days('2026-10-15'))`)[0][0]], ['{halloween,fall}', 't', '2'],
+    'anon can ask which seasons are on sale and which days are throwback days (pure arithmetic on the calendar)');
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n').slice(0, 3).join(' | ')} (${(e.stack || '').split('\n').filter(l => /xp\.js:\d+/.test(l)).map(l => l.replace(/.*xp\.js:(\d+).*/, 'line $1')).join(' < ')})`.replace(/\s+\)$/, ')'));
 }

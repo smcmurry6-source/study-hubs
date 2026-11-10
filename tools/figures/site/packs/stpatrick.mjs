@@ -1,0 +1,339 @@
+/* The St. Patrick's Day set of Timmy's place (tools/figures/site/sets.mjs lists its eight pieces; the shop's catalog has
+   the same rows). One self-contained function: the build hands it the kit's tools (place.mjs, TOOLS) and pastes its
+   source into tools/preview/design/place.js, so it uses nothing from outside itself but T. Structure: packs/thanksgiving.mjs.
+
+   - home:    thatched-cottage: whitewashed walls, a thick rounded thatch roof (hipped, a bulging profile), a green half-door.
+   - scene:   emerald-hills: three ranks of green hills fenced with dry-stone walls, sheep, mossy boulders, a gated wall along the yard, and a rainbow over it all.
+   - yard:    clover-patch (one four-leaf clover), wishing-well, pot-of-gold (at the foot of a little rainbow).
+   - outfits: flat-cap (tweed), bagpiper (a feathered cap, bagpipes under his arm), gold-buckle-suit (tall green hat, coat, bow tie).
+   Never sugar, no alcohol, nothing religious. No ids, gradients, filters, text, images or emoji: flat fills and ink outlines. */
+export function pack(T){
+  var K = T.K, P = T.P, D = T.D, f = T.f, F = T.F, O = T.O, L = T.L, FO = T.FO, G = T.G, circ = T.circ, ell = T.ell, box = T.box, cyl = T.cyl, INK = T.INK;
+  var p = T.p, O2 = T.O2, O3 = T.O3, O4 = T.O4;
+  var RB = ["#E5484D", "#F28C28", "#F2C230", "#3FB56B", "#3FA7E0", "#8E6BD8"];
+  var GR = ["#5FCB6E", "#4DB868", "#3FA85C", "#2B7A45"];
+  /* a clover in screen space: n heart-shaped leaflets round a middle; sq squashes it to lie on the ground */
+  function clover(x, y, r, n, fill, rot, sq, sw){
+    var s = '<g transform="translate(' + f(x) + " " + f(y) + ") scale(1 " + (sq || 1) + ") rotate(" + (rot || 0) + ')">';
+    for (var i = 0; i < n; i++) s += '<g transform="rotate(' + f(i * 360 / n) + ')">' + FO("M0 0 C" + f(-r * .95) + " " + f(-r * .2) + " " + f(-r * .95) + " " + f(-r * 1.3) + " 0 " + f(-r * .84) + " C" + f(r * .95) + " " + f(-r * 1.3) + " " + f(r * .95) + " " + f(-r * .2) + " 0 0 Z", fill, sw || .9) + L("M0 " + f(-r * .18) + " V" + f(-r * .66), .6, "#FFFFFF", .5) + "</g>";
+    return s + "</g>";
+  }
+  /* a rainbow arc in screen space (a half circle on the line y = cy), outer radius r, each band w wide */
+  function bow(cx, cy, r, w, op, legL, legR){
+    var s = "";
+    RB.forEach(function(c, i){ var q = r - w / 2 - i * w; s += L("M" + f(cx - q) + " " + f(cy + (legL || 0)) + " V" + f(cy) + " A" + f(q) + " " + f(q) + " 0 0 1 " + f(cx + q) + " " + f(cy) + " V" + f(cy + (legR || 0)), w + .3, c, op); });
+    return s;
+  }
+  function coin(x, y, k){ k = k || 1; return ell(x, y + 1 * k, 3.4 * k, 1.7 * k, "#C9971C", .8) + ell(x, y, 3.4 * k, 1.7 * k, "#FFD95A", .8) + L("M" + f(x - 1.6 * k) + " " + f(y - .3 * k) + " q1.6 -.9 3.2 0", .6, "#FFF6C8"); }
+  function sheep(x, y, k, night){
+    var wool = night ? "#C9D3DD" : "#FFFDF6";
+    return L("M" + f(x - 2 * k) + " " + f(y - 2 * k) + " v" + f(2.4 * k) + " M" + f(x + 2 * k) + " " + f(y - 2 * k) + " v" + f(2.4 * k), 1.2) + FO(T.lumps(x, y - 4 * k, 4.6 * k, 7, 7, .76), wool, 1) + ell(x - 4.6 * k, y - 4.8 * k, 1.9 * k, 2.3 * k, "#3B2E3A", 0) + L("M" + f(x - 3.4 * k) + " " + f(y - 6.4 * k) + " l" + f(1.4 * k) + " " + f(-.8 * k), 1.2);
+  }
+  /* a dry-stone wall far off: a pale line with an ink edge and the joints dotted along it */
+  function farWall(d, k, col, op){ return L(d, 3 * k, INK, .5 * op) + L(d, 1.8 * k, col, op) + L(d, 1.8 * k, "#7C8792", .55 * op).replace("/>", ' stroke-dasharray="1 3"/>'); }
+
+  /* ------------------------------------------------------------------ the home: a thatched cottage ------------------ */
+  var homes = {
+    "thatched-cottage": {
+      note: "Whitewashed walls under a thick, rounded thatch roof, with a green half-door and a turf fire going",
+      ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the ridge", paint: "Wall paint" },
+      door: [5.5, 8.4], brush: [7.3, 9.05], statue: [3.0, 9.3], spots: { door: [5.5, 10.6] }, h: 8.2,
+      eaves: [[2.15, 8.85, 2.95], [8.85, 8.85, 2.95]], foot: [2.6, 3.2, 8.4, 8.4], base: [[2.6, 8.4], [8.4, 8.4], [8.4, 3.2]], block: [2.4, 2.8, 9.3, 8.9],
+      draw: function(o){
+        var u = o.up, wall = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#FFFDF6", s: "#E4DDCF" }, s = "", lights = "";
+        var x0 = 2.6, x1 = 8.4, y0 = 3.2, y1 = 8.4, zw = 3.4, e0 = 2.15, e1 = 8.85, ye = 8.85, yb = 2.75, ym = 5.8, ze = 3.45, zr = 6.3, hip = 1.7, th = .5;
+        var TH = o.snow ? ["#F7FBFF", "#E6EEF6", "#D3E0EC", "#B9CCDD", "#E6EEF6"] : ["#EDCF7A", "#DDB85A", "#C9A247", "#A27A2A", "#D4AB4A"];
+        /* the walls, a gray wash along their foot */
+        s += box(x0, y0, 0, x1 - x0, y1 - y0, zw, { top: wall.c, left: wall.c, right: wall.s });
+        s += FO(D(T.onY(y1, T.rectUV(x0, x1, 0, .34))), "#C3CAD1", 1) + FO(D(T.onX(x1, T.rectUV(y0, y1, 0, .34))), "#A3ACB5", 1);
+        s += L(D(T.onY(y1, [[3.0, 2.3], [3.5, 2.3]]), true) + D(T.onY(y1, [[7.2, .9], [7.9, .9]]), true) + D(T.onX(x1, [[3.7, 2.4], [4.2, 2.4]]), true) + D(T.onX(x1, [[7.5, 1.0], [8.0, 1.0]]), true), .8, INK, .22);
+        /* windows: small and deep-set */
+        [[3.25, 4.25], [6.75, 7.75]].forEach(function(q){ var w = T.win("y", y1, q[0], q[1], 1.15, 2.2, { night: o.night }); s += FO(D(T.onY(y1, T.rectUV(q[0] - .12, q[1] + .12, 1.0, 1.15))), "#3DAA5C", 1) + w.s; lights += w.lights; });
+        [[4.0, 5.1, true], [6.3, 7.4, false]].forEach(function(q){ var w = T.win("x", x1, q[0], q[1], 1.15, 2.2, { night: o.night, box: q[2] }); s += w.s; lights += w.lights; });
+        /* the half-door: the top leaf swung in, the bottom one shut, a gold shamrock on it */
+        s += FO(D(T.onY(y1, T.rectUV(4.78, 6.22, 0, 2.38))), "#2B7A45", 1.6);
+        var inside = FO(D(T.onY(y1, T.rectUV(4.92, 6.08, 1.2, 2.25))), o.night ? K.lit : "#4A3550", 1.2);
+        s += inside + FO(D(T.onY(y1, [[4.92, 1.2], [5.28, 1.26], [5.28, 2.19], [4.92, 2.25]])), "#2F8F4E", 1.1);
+        s += FO(D(T.onY(y1, T.rectUV(4.92, 6.08, 0, 1.2))), "#3DAA5C", 1.5) + L(D(T.onY(y1, [[5.22, .06], [5.22, 1.1]]), true) + D(T.onY(y1, [[5.78, .06], [5.78, 1.1]]), true), .9, "#2B7A45");
+        s += FO(D(T.onY(y1, T.rectUV(4.86, 6.14, 1.12, 1.26))), "#63CC7E", 1.1);
+        var sh = P(5.5, y1, .62); s += clover(sh[0], sh[1], 2.5, 3, "#F2C94C", 0, 1, .7);
+        var kn = P(5.95, y1, .72); s += circ(kn[0], kn[1], 1.1, INK);
+        if (o.night){ var dg = P(5.5, y1, 1.72); lights += T.glowAt(dg[0], dg[1], 11) + inside; }
+        /* a stack of turf against the side wall */
+        s += box(x1 + .04, 6.7, 0, .62, 1.4, .8, { top: "#7A5540", left: "#8A624A", right: "#5E4030" }, { sw: 1.4, si: .9 });
+        s += L(D([[x1 + .66, 6.7, .27], [x1 + .66, 8.1, .27]], true) + D([[x1 + .66, 6.7, .54], [x1 + .66, 8.1, .54]], true) + D([[x1 + .66, 7.15, 0], [x1 + .66, 7.15, .27]], true) + D([[x1 + .66, 7.65, .27], [x1 + .66, 7.65, .54]], true) + D([[x1 + .66, 7.3, .54], [x1 + .66, 7.3, .8]], true), .8, INK, .5);
+        /* the thatch: its cut edge along the eaves, then the four bulging faces, back to front */
+        s += FO(D([[e0, ye, ze], [e1, ye, ze], [e1, ye, ze - th], [e0, ye, ze - th]]), TH[2], 1.6) + FO(D([[e1, ye, ze], [e1, yb, ze], [e1, yb, ze - th], [e1, ye, ze - th]]), o.snow ? "#C9A247" : TH[3], 1.6);
+        if (o.snow) s = s.replace(/fill="#D3E0EC"(?=[^>]*stroke-width="1.6"\/>$)/, 'fill="#DDB85A"');
+        for (var i = 0; i < 16; i++) s += L(D([[e0 + .25 + i * .42, ye, ze - .08], [e0 + .25 + i * .42, ye, ze - th + .08]], true), .8, "#8A6420", .55);
+        for (i = 0; i < 14; i++) s += L(D([[e1, yb + .3 + i * .43, ze - .08], [e1, yb + .3 + i * .43, ze - th + .08]], true), .8, "#6E4E16", .5);
+        var hf = function(t){ return 1 - (1 - t) * (1 - t); };
+        var pt = function(face, t, q){
+          var z = ze + (zr - ze) * hf(t), xa = e0 + hip * t, xb = e1 - hip * t, ya = yb + (ym - yb) * t, yc = ye - (ye - ym) * t;
+          return face === "front" ? [xa + (xb - xa) * q, yc, z] : face === "back" ? [xa + (xb - xa) * q, ya, z] : face === "right" ? [xb, ya + (yc - ya) * q, z] : [xa, ya + (yc - ya) * q, z];
+        };
+        var faceD = function(face, t0, t1){ var a = [], b = [], n = 10; for (var j = 0; j <= n; j++){ var t = t0 + (t1 - t0) * j / n; a.push(pt(face, t, 0)); b.unshift(pt(face, t, 1)); } return D(a.concat(b)); };
+        var line = function(face, t, q0, q1){ return D([pt(face, t, q0), pt(face, t, q1)], true); };
+        s += FO(faceD("back", 0, 1), TH[1], 1.6) + FO(faceD("left", 0, 1), TH[1], 1.6) + FO(faceD("right", 0, 1), TH[2], 1.8) + FO(faceD("front", 0, 1), TH[0], 1.8);
+        s += L(line("front", .27, .02, .98) + line("front", .52, .02, .98), 1, TH[3], .45) + L(line("right", .27, .03, .97) + line("right", .52, .03, .97), 1, TH[3], .5);
+        var R = T.rng(17);
+        for (i = 0; i < 30; i++){ var tt = .04 + R() * .58, qq = .03 + R() * .94; s += L(D([pt("front", tt, qq), pt("front", tt + .09, qq)], true), 1, TH[3], .5); }
+        for (i = 0; i < 12; i++){ tt = .04 + R() * .58; qq = .05 + R() * .9; s += L(D([pt("right", tt, qq), pt("right", tt + .09, qq)], true), 1, "#7C5A1C", .45); }
+        s += T.HI(D([pt("front", .1, .04), pt("front", .3, .05), pt("front", .5, .06)], true), 2);
+        /* the ridge: a darker cap with a scalloped edge, stitched down with crossed rods */
+        var cap = [], n = 14; for (i = 0; i <= n; i++) cap.push(pt("front", i % 2 ? .66 : .74, i / n)); for (i = 6; i >= 0; i--) cap.push(pt("front", .74 + .26 * (1 - i / 6) , 1)); for (i = 0; i <= 6; i++) cap.push(pt("front", 1 - .26 * i / 6, 0));
+        s += FO(faceD("right", .72, 1), o.snow ? TH[3] : "#B88F38", 1.2) + FO(D(cap), TH[4], 1.2);
+        for (i = 0; i < 9; i++){ var q0 = .05 + i * .1; s += L(D([pt("front", .8, q0), pt("front", .95, q0 + .08)], true) + D([pt("front", .95, q0), pt("front", .8, q0 + .08)], true), .9, TH[3], .85); }
+        /* the chimney, whitewashed, with a pot and smoke */
+        var cx = 6.25, cy = ym - .42;
+        s += box(cx, cy, zr - .1, .9, .84, 1.2, { top: "#C9C1B4", left: wall.c, right: wall.s }) + box(cx - .1, cy - .1, zr + 1.1, 1.1, 1.04, .2, { top: o.snow ? "#FFFFFF" : "#B9C0C6", left: "#D5DBE1", right: "#A9B3BE" }, { sw: 1.4, si: .9 });
+        s += cyl(cx + .45, cy + .42, zr + 1.3, .2, zr + 1.62, .17, "#D9825A", "#B5623E", "#5A3D2C", { sw: 1.3 });
+        var top = P(cx + .45, cy + .42, zr + 1.62); s += T.smoke(top[0], top[1] - 6);
+        if (u.flag) s += T.flagOn(e0 + hip + .45, ym, zr - .02, 1.9);
+        if (o.night) lights += T.firefly(120, 152, .4) + T.firefly(292, 128, 1.5);
+        return { body: s, lights: lights };
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the scene: emerald hills ---------------------- */
+  var stoneWall = function(x, y, len, o, along){
+    var c = o.night ? ["#A9B3BE", "#98A2AD", "#7F8994"] : ["#E3E7EB", "#CBD1D7", "#A9B3BE"], s, i;
+    if (o.snow) c = ["#FFFFFF", "#CBD1D7", "#A9B3BE"];
+    if (along === "y"){
+      s = box(x, y, 0, .46, len, .62, { top: c[0], left: c[1], right: c[2] }, { sw: 1.5, si: .9 });
+      s += L(D([[x + .46, y, .32], [x + .46, y + len, .32]], true), .8, INK, .4);
+      for (i = 0; i < len / .5 - 1; i++) s += L(D([[x + .46, y + .3 + i * .5, i % 2 ? 0 : .32], [x + .46, y + .3 + i * .5, i % 2 ? .32 : .62]], true), .8, INK, .4);
+    } else {
+      s = box(x, y, 0, len, .46, .62, { top: c[0], left: c[1], right: c[2] }, { sw: 1.5, si: .9 });
+      s += L(D([[x, y + .46, .32], [x + len, y + .46, .32]], true), .8, INK, .4);
+      for (i = 0; i < len / .5 - 1; i++) s += L(D([[x + .3 + i * .5, y + .46, i % 2 ? 0 : .32], [x + .3 + i * .5, y + .46, i % 2 ? .32 : .62]], true), .8, INK, .4);
+    }
+    return s;
+  };
+  /* a field boulder with a cap of moss, a smaller stone tucked against it */
+  var boulder = function(x, y, k, o){
+    var st = o.night ? ["#98A2AD", "#7F8994"] : ["#D5DBE1", "#A9B3BE"], moss = o.snow ? "#FFFFFF" : o.night ? "#2F7A50" : "#4FB565";
+    var d = "M" + f(x - 6.4 * k) + " " + f(y) + " q" + f(-1.2 * k) + " " + f(-5.4 * k) + " " + f(2.6 * k) + " " + f(-7.6 * k) + " q" + f(3.6 * k) + " " + f(-2.4 * k) + " " + f(7.2 * k) + " " + f(-.4 * k) + " q" + f(3.4 * k) + " " + f(2.4 * k) + " " + f(2.8 * k) + " " + f(8 * k) + " Z";
+    return ell(x, y + .4 * k, 7.6 * k, 2.2 * k, "#000", 0, .1) + FO(d, st[0], 1.5) +
+      F("M" + f(x + 1.2 * k) + " " + f(y - .6 * k) + " q" + f(3.2 * k) + " " + f(-3 * k) + " " + f(2 * k) + " " + f(-7 * k) + " q" + f(2.6 * k) + " " + f(2.6 * k) + " " + f(2.2 * k) + " " + f(7 * k) + " Z", st[1], .8) +
+      FO("M" + f(x - 4.6 * k) + " " + f(y - 6.6 * k) + " q" + f(3 * k) + " " + f(-3.4 * k) + " " + f(7.4 * k) + " " + f(-1.6 * k) + " q" + f(1.6 * k) + " " + f(.8 * k) + " " + f(2 * k) + " " + f(2.2 * k) + " q" + f(-1.6 * k) + " " + f(1.2 * k) + " " + f(-3 * k) + " " + f(.4 * k) + " q" + f(-1.4 * k) + " " + f(1.6 * k) + " " + f(-3.2 * k) + " " + f(.4 * k) + " q" + f(-1.8 * k) + " " + f(1 * k) + " " + f(-3.2 * k) + " " + f(-1.4 * k) + " Z", moss, 1.1) +
+      FO("M" + f(x - 9.4 * k) + " " + f(y + 1 * k) + " q" + f(-.4 * k) + " " + f(-3 * k) + " " + f(2.2 * k) + " " + f(-3.4 * k) + " q" + f(2.6 * k) + " " + f(.2 * k) + " " + f(2.6 * k) + " " + f(3.4 * k) + " Z", st[0], 1.2) +
+      L("M" + f(x - 3.4 * k) + " " + f(y - 3.4 * k) + " l" + f(1.8 * k) + " " + f(1.4 * k) + " M" + f(x - .6 * k) + " " + f(y - 1.6 * k) + " l" + f(1.2 * k) + " " + f(-1.2 * k), .9, INK, .35);
+  };
+  var scenes = {
+    "emerald-hills": T.hillScene({
+      note: "Rolling green hills stitched with dry-stone walls, sheep on them, and a rainbow after the rain",
+      path: "stones", treeKind: "round", lamp: "lantern", grade: ["#C8FFD0", .05],
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#4FA06C", "#459160", "#3A8054", "#2E6C46"] : ["#7AD67F", "#69C972", "#55B764", "#3A9650"]; },
+      sky: function(o){
+        if (o.night) return T.bands(["#10283C", "#153449", "#1B4157", "#234E64"], 0, 300) + T.starField(7, 28, 130) + bow(200, 196, 172, 5.2, .16) + T.moon(318, 40);
+        return T.bands(["#A6DCF7", "#BBE6F9", "#D0EFFB", "#E4F7FD"], 0, 300) + T.sun(70, 30) + bow(200, 196, 172, 5.2, .82) + T.cloud(312, 26, .9) + T.cloud(150, 20, .6);
+      },
+      far: function(o){
+        var c = o.snow ? ["#F1F6FB", "#E3EDF6", "#D3E1EF", "#FFFFFF", "#DCEAF6"] : o.night ? ["#3F7F68", "#377561", "#2F6A57", "#47897A", "#346E5C"] : ["#BDEBB2", "#9CDD95", "#7FCF82", "#D6F2B6", "#A2DE9A"];
+        var st = o.night ? "#9AA6B2" : "#E6EAEE", wo = o.night ? .8 : 1, s = "";
+        /* the far rank: two tall round hills, parted into fields by walls that run over them */
+        var d0 = "M0 98 Q30 62 64 66 Q104 72 140 112 L260 112 Q300 68 340 58 Q376 56 400 82";
+        s += F(d0 + " V300 H0 Z", c[0]);
+        s += F("M40 70 Q58 63 76 67 Q82 80 80 92 Q62 89 45 94 Q47 82 40 70 Z", c[3]) + F("M80 92 Q95 95 107 101 Q106 110 100 120 L78 118 Q82 104 80 92 Z", c[4]) + F("M0 100 Q24 96 45 94 Q46 106 42 120 L0 124 Z", c[4]);
+        s += F("M300 80 Q322 64 340 58 Q337 74 338 88 Q318 90 299 97 Q298 88 300 80 Z", c[3]) + F("M338 88 Q372 86 400 100 L400 116 L342 112 Q338 100 338 88 Z", c[4]) + F("M268 108 Q282 100 299 97 Q300 108 306 120 L262 122 Z", c[4]);
+        s += L(d0, 1.4, INK, .5);
+        ["M40 70 Q48 92 42 122", "M76 67 Q84 92 78 122", "M108 84 Q108 102 100 122", "M0 100 Q60 84 128 106", "M300 80 Q296 100 306 122", "M340 58 Q336 86 344 116", "M374 62 Q372 80 378 96", "M262 110 Q330 84 400 100"].forEach(function(w){ s += farWall(w, .75, st, wo); });
+        s += sheep(60, 82, .55, o.night) + sheep(322, 80, .55, o.night) + sheep(360, 78, .5, o.night);
+        /* the middle rank, with a little white cottage of its own */
+        var d1 = "M0 134 Q36 106 76 114 Q110 122 140 142 L260 142 Q292 114 332 108 Q370 104 400 126";
+        s += F(d1 + " V300 H0 Z", c[1]) + F("M52 113 Q74 111 96 121 Q99 134 94 146 Q72 138 54 142 Q57 126 52 113 Z", c[4]) + F("M306 115 Q332 106 356 107 Q360 122 354 138 Q330 132 306 142 Q310 128 306 115 Z", c[4]) + L(d1, 1.4, INK, .5);
+        ["M52 113 Q58 128 52 150", "M96 121 Q100 136 92 152", "M0 152 Q40 132 78 140 Q112 146 140 158", "M306 115 Q312 130 304 150", "M356 107 Q360 124 352 146", "M262 152 Q296 136 334 132 Q368 130 400 144"].forEach(function(w){ s += farWall(w, 1, st, wo); });
+        s += '<g opacity="' + (o.night ? ".85" : ".95") + '">' + FO("M324 124 v-8 h13 v8 z", o.night ? "#C9C1B4" : "#FFFDF6", 1.1) + FO("M321.6 116.6 q2 -6.4 8.9 -6.6 q6.9 .2 8.9 6.6 z", o.snow ? "#FFFFFF" : o.night ? "#A8904E" : "#DDB85A", 1.1) + F("M329 124 v-4.6 h3 v4.6 z", o.night ? K.lit : "#3DAA5C") + "</g>";
+        s += sheep(72, 130, .7, o.night) + sheep(30, 136, .62, o.night) + sheep(374, 124, .7, o.night) + sheep(286, 136, .62, o.night);
+        /* the near rank: hedgerow trees along its crest */
+        var d2 = "M0 168 Q40 144 84 152 Q120 160 150 174 L250 174 Q290 152 330 148 Q368 146 400 160";
+        s += F(d2 + " V300 H0 Z", c[2]);
+        [[18, 152, 7], [56, 144, 6], [112, 156, 6], [296, 148, 6], [346, 144, 7], [388, 152, 6]].forEach(function(q, k){ s += T.canopy(q[0], q[1], q[2], o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#2F6A50", "#255840"] : ["#4FB565", "#3A9650"], 30 + k); });
+        s += farWall("M0 176 Q40 154 84 162 Q120 168 150 182", 1.2, st, wo) + farWall("M250 182 Q290 162 330 158 Q368 156 400 170", 1.2, st, wo);
+        return s;
+      },
+      landExtra: function(o){
+        /* the boundary wall along the yard's right edge, stacked dry */
+        /* one unbroken run on each side of a gateway: two capped pillars and a wooden field gate left ajar */
+        var c = o.night ? ["#A9B3BE", "#98A2AD", "#7F8994"] : o.snow ? ["#FFFFFF", "#CBD1D7", "#A9B3BE"] : ["#E3E7EB", "#CBD1D7", "#A9B3BE"];
+        var pillar = function(y){ return box(16.27, y, 0, .62, .5, 1.02, { top: c[0], left: c[1], right: c[2] }, { sw: 1.5, si: .9 }) + box(16.2, y - .07, 1.02, .76, .64, .16, { top: c[0], left: c[1], right: c[2] }, { sw: 1.3, si: .8 }); };
+        var wood = o.night ? "#6E5340" : "#9A6B45", gx = function(y){ return 16.58 + (y - 6.05) * .42; }, g = function(y, z){ return [gx(y), y, z]; };
+        var s = stoneWall(16.35, .4, 5.15, o, "y") + pillar(5.55);
+        s += L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 2.6) + L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 1.3, wood);
+        [.26, .52, .78].forEach(function(z){ s += L(D([g(6.05, z), g(7.0, z)], true), 2.4) + L(D([g(6.05, z), g(7.0, z)], true), 1.2, wood); });
+        s += L(D([g(6.05, .26), g(7.0, .78)], true), 2.2) + L(D([g(6.05, .26), g(7.0, .78)], true), 1, wood);
+        return s + pillar(7.25) + stoneWall(16.35, 7.75, 4.85, o, "y") + pillar(12.6);
+      },
+      flat: function(o, on){
+        if (o.snow) return "";
+        var tc = o.night ? "#2E7048" : "#3A9650", cl = o.night ? "#2A7A4A" : "#2F9E57";
+        return T.scatter(151, 44, on, function(sx, sy){ return T.tuft(sx, sy, tc, .8); }).join("") +
+          T.scatter(152, 18, on, function(sx, sy){ return circ(sx - 1.4, sy, 1.5, cl) + circ(sx + 1.4, sy, 1.5, cl) + circ(sx, sy - 1.9, 1.5, cl); }).join("") +
+          T.scatter(153, 12, on, function(sx, sy, i){ return circ(sx, sy, 1.9, o.night ? "#B9C3B0" : i % 3 ? "#FFFFFF" : "#FFE27A", .7) + (i % 3 ? circ(sx, sy, .7, "#F2C230") : ""); }).join("");
+      },
+      props: function(o, on){
+        var ok = function(sx, sy, x, y){ return on(sx, sy, x, y) && !(x > 14.3 && x < 18.7 && y > -.8 && y < 14.2); };
+        return T.scatter(154, 9, ok, function(sx, sy, i, R, x, y){
+          var s = i % 3 === 0 ? boulder(sx, sy, i % 2 ? 1.15 : .9, o)
+            : i % 3 === 1 ? sheep(sx, sy, 1.15, o.night) + (i % 2 ? sheep(sx + 12, sy + 3, .9, o.night) : "")
+            : T.canopy(sx, sy - 6, 7.4, o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#2F7A50", "#256341"] : ["#4FB565", "#3A9650"], 50 + i) + (o.snow ? "" : [[-3, -8], [2, -10], [4, -5], [-1, -4], [-5, -4]].map(function(q){ return circ(sx + q[0], sy + q[1], 1.3, o.night ? "#C9B85A" : "#FFD23F", .5); }).join(""));
+          return { x: x, y: y, s: s };
+        });
+      }
+    })
+  };
+
+  /* ------------------------------------------------------------------ the yard -------------------------------------- */
+  var potAt = function(){ var g = P(1.8, 1.9, 0); return { g: g, c: g[0] - 3, base: g[1] - 8, px: g[0] + 18.6, py: g[1] + 6 }; };
+  var yard = {
+    "clover-patch": {
+      note: "A thick patch of clover, white blossoms in it, and one four-leaf clover standing tall", spot: [3.3, 3.4],
+      egg: { n: "The clover patch", does: "the four-leaf clover sparkles", say: "Found the four-leaf one! Lucky. Luckier still if you floss." }, anim: "tp-sparks 2s ease-out",
+      draw: function(o){
+        var c = P(1.75, 1.75, 0), x = c[0], y = c[1], s = ell(x, y + 2, 31, 11.5, "#1B2A3A", 0, .1);
+        var d = T.lumps(x, y - .5, 27, 5, 12, .5); s += F(d, o.night ? "#2C7A48" : "#3A9650") + O(d, 1.5);
+        [[-17, -3, 5.2, 0, 10], [-6, -8, 5, 1, 50], [6, -8.4, 5.2, 2, 20], [17, -4, 5, 0, 70], [-19, 4, 4.8, 1, 30], [-9, 1, 5.4, 2, 80], [12, 2.6, 5.2, 1, 0], [21, 3, 4.4, 2, 40], [-10, 9, 5, 0, 60], [15, 9.4, 4.8, 0, 25]].forEach(function(q){ s += clover(x + q[0], y + q[1], q[2], 3, GR[q[3]], q[4], .7, 1); });
+        [[-13, -6], [10, -5], [-2, 10.5]].forEach(function(q){ s += L("M" + f(x + q[0]) + " " + f(y + q[1]) + " v-5", 1.3, "#2B7A45") + circ(x + q[0], y + q[1] - 6.4, 2.6, o.night ? "#DDE6EC" : "#FFFFFF", .9) + circ(x + q[0] - .8, y + q[1] - 7, .5, "#F7C6D4"); });
+        /* the lucky one */
+        s += L("M" + f(x + 1) + " " + f(y + 5) + " Q" + f(x + 3) + " " + f(y - 6) + " " + f(x + 1.5) + " " + f(y - 15), 3.6) + L("M" + f(x + 1) + " " + f(y + 5) + " Q" + f(x + 3) + " " + f(y - 6) + " " + f(x + 1.5) + " " + f(y - 15), 1.7, "#4DB868");
+        s += clover(x + 1.5, y - 17, 8.6, 4, "#73E07F", 45, 1, 1.3);
+        s += circ(x + 20, y - 1.4, 2.1, K.red, .8) + circ(x + 18.6, y - 2.4, 1, INK) + L("M" + f(x + 20.6) + " " + f(y - 3.4) + " v4", .6);
+        s += T.dmStar(x + 12.5, y - 25, 2.6, "#FFE27A", "tp-twinkle", 0);
+        if (o.snow) s += ell(x - 12, y - 5, 6, 2, "#FFFFFF", 0) + ell(x + 14, y + 6, 5, 1.8, "#FFFFFF", 0);
+        return s;
+      },
+      bits: function(){ var c = P(1.75, 1.75, 0), x = c[0] + 1.5, y = c[1] - 17; return T.dmStar(x - 14, y - 6, 3.4, "#FFE27A", "", 0) + T.dmStar(x + 13, y + 3, 3, "#FFFFFF", "", 0) + T.dmStar(x + 2, y - 15, 4, "#FFE27A", "", 0) + T.dmStar(x - 10, y + 8, 2.4, "#FFFFFF", "", 0); }
+    },
+    "wishing-well": {
+      note: "A round stone well under a little green roof, a bucket on its rope", spot: [3.35, 3.45],
+      egg: { n: "The wishing well", does: "a coin drops in with a splash", say: "Make a wish! Mine: everybody flosses tonight." }, anim: "tp-splash 1.2s ease-out",
+      draw: function(o){
+        var wood = { top: K.woodLight, left: K.wood, right: K.woodShade }, cx = 1.8, cy = 1.8, r = 1.05, hw = 1.05, s = ell.apply(null, P(1.95, 2.05, 0).concat([27, 10.5, "#1B2A3A", 0, .1]));
+        var st = o.night ? ["#C3CAD1", "#98A2AD", "#B1B9C1"] : ["#DCE1E6", "#A9B3BE", "#C7CED5"];
+        s += box(.42, 1.68, 0, .24, .24, 3.35, wood, { sw: 1.4, si: .9 });
+        s += cyl(cx, cy, 0, r, hw, r, st[0], st[1], st[2]);
+        /* the courses of stone */
+        var b = P(cx, cy, 0), ax = T.RX(r), ay = T.RY(r), U = 10.5, i, j;
+        for (j = 1; j < 3; j++) s += L("M" + f(b[0] - ax) + " " + f(b[1] - j * .35 * U) + " A" + f(ax) + " " + f(ay) + " 0 0 0 " + f(b[0] + ax) + " " + f(b[1] - j * .35 * U), .9, INK, .4);
+        for (j = 0; j < 3; j++) for (i = 0; i < 6; i++){ var a = (18 + i * 29 + (j % 2) * 14) * Math.PI / 180, xx = b[0] + Math.cos(a) * ax, yy = b[1] + Math.sin(a) * ay; s += L("M" + f(xx) + " " + f(yy - j * .35 * U) + " v" + f(-.35 * U), .9, INK, .4); }
+        /* the mouth: the far wall inside, then the water */
+        var m = P(cx, cy, hw), ix = T.RX(.74), iy = T.RY(.74);
+        s += ell(m[0], m[1], ix, iy, o.night ? "#2F8FC0" : K.water, 1.3) + F("M" + f(m[0] - ix) + " " + f(m[1]) + " A" + f(ix) + " " + f(iy) + " 0 0 1 " + f(m[0] + ix) + " " + f(m[1]) + " A" + f(ix) + " " + f(iy * .5) + " 0 0 0 " + f(m[0] - ix) + " " + f(m[1]) + " Z", "#5E6A78");
+        s += G("tp-water", L("M" + f(m[0] - 4) + " " + f(m[1] + 3) + " h5 M" + f(m[0] + 1) + " " + f(m[1] + 1) + " h4", 1, "#FFFFFF", .8)) + ell(m[0], m[1], ix, iy, "none", 1.3);
+        /* the bucket on its rope, the roller, the near post and the crank */
+        var r0 = P(cx, cy, 2.5), bt = P(cx, cy, 1.86);
+        s += L(T.seg(r0, bt), 2.2) + L(T.seg(r0, bt), 1, "#E9D9A8");
+        s += L("M" + f(bt[0] - 3.6) + " " + f(bt[1] + 1.6) + " Q" + f(bt[0]) + " " + f(bt[1] - 4) + " " + f(bt[0] + 3.6) + " " + f(bt[1] + 1.6), 1.2);
+        s += cyl(cx, cy, 1.34, .25, 1.74, .31, K.woodLight, K.wood, "#8FD3F5", { sw: 1.4, si: 1 });
+        var ba = P(cx, cy, 1.52); s += L("M" + f(ba[0] - 3.4) + " " + f(ba[1]) + " q3.4 2.6 6.8 0", 1, "#8E98A3");
+        var a0 = P(.54, 1.8, 2.5), a1 = P(3.06, 1.8, 2.5);
+        s += L(T.seg(a0, a1), 5) + L(T.seg(a0, a1), 2.8, K.wood) + L("M" + f(r0[0] - 3) + " " + f(r0[1] - 3.2) + " l1.4 3.6 M" + f(r0[0] - .6) + " " + f(r0[1] - 2) + " l1.4 3.6 M" + f(r0[0] + 1.8) + " " + f(r0[1] - .8) + " l1.4 3.6", 1.1, "#E9D9A8");
+        s += box(2.94, 1.68, 0, .24, .24, 3.35, wood, { sw: 1.4, si: .9 });
+        var k0 = P(3.2, 1.8, 2.5), k1 = P(3.62, 1.8, 2.5), k2 = P(3.62, 1.8, 2.05);
+        s += L(T.seg(k0, k1) + " L" + f(k2[0]) + " " + f(k2[1]), 2) + circ(k2[0], k2[1], 1.5, K.red, .8);
+        /* the roof: a green slope and its gable, a gold tooth on it */
+        var e = [.1, 3.5], ze = 3.2, zr = 4.2, rf = o.snow ? ["#F7FBFF", "#DCEAF6"] : ["#46B56A", "#2B7A45"];
+        s += FO(D([[e[1], .8, ze], [e[1], 2.8, ze], [e[1], 1.8, zr]]), o.snow ? "#3FA85C" : rf[1], 1.6);
+        s += FO(D([[e[0], 2.8, ze], [e[1], 2.8, ze], [e[1], 1.8, zr], [e[0], 1.8, zr]]), rf[0], 1.6);
+        for (j = 1; j < 3; j++){ var yy2 = 2.8 - j / 3, zz = ze + j / 3; s += L(D([[e[0], yy2, zz], [e[1], yy2, zz]], true), .9, INK, .35); }
+        for (j = 0; j < 3; j++) for (i = 0; i < 5; i++) s += L(D([[e[0] + .4 + i * .68 + (j % 2) * .34, 2.8 - j / 3, ze + j / 3], [e[0] + .4 + i * .68 + (j % 2) * .34, 2.8 - (j + 1) / 3, ze + (j + 1) / 3]], true), .8, INK, .3);
+        s += FO(D([[e[0], 2.8, ze], [e[1], 2.8, ze], [e[1], 2.8, ze - .14], [e[0], 2.8, ze - .14]]), rf[1], 1.1);
+        var gt = P(e[1], 1.8, 3.52); s += T.tinyTooth(gt[0], gt[1], .5, K.gold);
+        var t0 = P(.5, 2.95, 0), t1 = P(3.0, 2.3, 0); s += T.tuft(t0[0], t0[1], "#3A9650", .9) + T.tuft(t1[0], t1[1] + 2, "#3A9650", .8) + clover(t0[0] + 6, t0[1] + 1, 2.6, 3, GR[1], 20, .75, .7);
+        return s;
+      },
+      lights: function(){ var m = P(1.8, 1.8, 1.05); return T.glowAt(m[0], m[1], 10); },
+      bits: function(){ var m = P(1.8, 1.8, 1.05), x = m[0], y = m[1]; return coin(x - 4, y - 9, 1.1) + L("M" + f(x - 5) + " " + f(y) + " q-4 -5 -7 -3 M" + f(x + 4) + " " + f(y) + " q4 -6 7 -3 M" + f(x) + " " + f(y - 1) + " q1 -5 3 -6", 1.5, "#8FD3F5") + circ(x - 13, y - 4, 1.3, "#8FD3F5", .6) + circ(x + 12, y - 5, 1.3, "#8FD3F5", .6); }
+    },
+    "pot-of-gold": {
+      note: "A black pot heaped with gleaming coins, right where a little rainbow comes down", spot: [3.4, 3.45],
+      egg: { n: "The pot of gold", does: "coins jump out and gleam", say: "Gold! Dentists make crowns out of it, you know." }, anim: "tp-jump 1.8s",
+      draw: function(o){
+        var q = potAt(), g = q.g, c = q.c, base = q.base, px = q.px, py = q.py, R0 = 30, w = 2.8, s = "";
+        s += ell(g[0], g[1] + 3, 31, 11, "#1B2A3A", 0, .1);
+        /* the rainbow: out of a little cloud, over, and down into the pot */
+        s += L("M" + f(c - R0) + " " + f(base + 12) + " V" + f(base) + " A" + R0 + " " + R0 + " 0 0 1 " + f(c + R0) + " " + f(base) + " V" + f(base + 4), 1.6) + bow(c, base, R0, w, o.night ? .9 : 1, 12, 4);
+        var ri = R0 - 6 * w; s += L("M" + f(c - R0) + " " + f(base + 12) + " V" + f(base) + " A" + R0 + " " + R0 + " 0 0 1 " + f(c + R0) + " " + f(base) + " V" + f(base + 4) + " M" + f(c - ri) + " " + f(base + 12) + " V" + f(base) + " A" + f(ri) + " " + f(ri) + " 0 0 1 " + f(c + ri) + " " + f(base) + " V" + f(base + 4), 1.3);
+        var cl = T.lumps(c - R0 + 8.4, base + 13, 11.5, 3, 8, .6); s += G("tp-float", F(cl, "#FFFFFF") + O(cl, 1.3) + L("M" + f(c - R0 + 2) + " " + f(base + 15) + " q5 2.6 11 0", 1, "#B9CCDD"));
+        /* the pot: three feet, a round belly, a rim, and the heap */
+        s += FO("M" + f(px - 9) + " " + f(py - 3) + " l-1.6 3.4 h3.6 z M" + f(px + 9) + " " + f(py - 3) + " l1.6 3.4 h-3.6 z M" + f(px - 1.6) + " " + f(py - 1) + " l-.4 3.6 h4 l-.4 -3.6 z", "#2B2530", 1.1);
+        s += ell(px, py - 9, 12, 9.2, "#453D4C", 1.7) + F("M" + f(px + 3) + " " + f(py - 17.6) + " q9 2.4 9 8.8 q0 6 -7.4 8.6 q3.4 -4 3.4 -8.6 q0 -4.8 -5 -8.8 z", "#2B2530", .9) + L("M" + f(px - 8.6) + " " + f(py - 12) + " q-1.6 4 .4 8", 1.6, "#8A8294", .9);
+        s += L("M" + f(px - 11.4) + " " + f(py - 13) + " q-4 .6 -3 4 M" + f(px + 11.4) + " " + f(py - 13) + " q4 .6 3 4", 1.5);
+        s += clover(px - 1, py - 7.4, 3, 3, GR[0], 0, 1, .7);
+        s += FO("M" + f(px - 10) + " " + f(py - 16.4) + " Q" + f(px - 9.4) + " " + f(py - 26.5) + " " + f(px) + " " + f(py - 27.5) + " Q" + f(px + 9.4) + " " + f(py - 26.5) + " " + f(px + 10) + " " + f(py - 16.4) + " Z", "#F2C94C", 1.4);
+        s += ell(px, py - 16.4, 11, 3.6, "#5A5263", 1.5) + F("M" + f(px - 8.6) + " " + f(py - 16.8) + " q8.6 4 17.2 0 q-2 -4.4 -8.6 -4.4 q-6.6 0 -8.6 4.4 z", "#F2C94C");
+        [[-5.4, -18.6, 1], [5, -18.2, 1], [0, -16.6, 1.05], [-3, -22.6, .95], [3.6, -22.4, .95], [.4, -26, .9]].forEach(function(k){ s += coin(px + k[0], py + k[1], k[2]); });
+        s += coin(px - 17, py + 2, 1) + coin(px - 10.6, py + 5.4, 1) + coin(px - 17.6, py - .4, 1) + '<g transform="rotate(-24 ' + f(px - 24.6) + " " + f(py + 4) + ')">' + ell(px - 24.6, py + 4, 2.3, 3.3, "#FFD95A", .8) + "</g>";
+        s += T.dmStar(px - 4.4, py - 27.4, 3, "#FFFFFF", "tp-twinkle", 0) + T.dmStar(px + 8, py - 21.6, 2.3, "#FFFFFF", "tp-twinkle", .9) + T.dmStar(px - 14, py + .6, 2, "#FFFFFF", "tp-twinkle", 1.7);
+        if (o.snow) s += ell(c - R0 + 8.4, base + 7.6, 6, 1.6, "#FFFFFF", 0);
+        return s;
+      },
+      lights: function(){ var q = potAt(); return T.glowAt(q.px, q.py - 21, 12); },
+      bits: function(){ var q = potAt(), x = q.px, y = q.py - 30; return coin(x - 8, y - 4, 1.1) + coin(x + 6, y - 9, 1.1) + coin(x - 1, y - 15, 1.1) + T.dmStar(x - 13, y - 13, 3, "#FFE27A", "", 0) + T.dmStar(x + 13, y - 2, 2.6, "#FFFFFF", "", 0); }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the outfits ----------------------------------- */
+  var tweed = (function(){
+    var s = "", n = 0;
+    for (var j = 0; j < 5; j++) for (var x = 50; x <= 150; x += 8.4){
+      var y = 14 + j * 8.2 + Math.abs(x - 100) * .05, dx = (x - 100) / 55, dy = (y - 31) / 24;
+      if (dx * dx + dy * dy > .78) continue;
+      s += "M" + f(x - 2.4) + " " + f(y + (n % 2 ? -2.6 : 2.6)) + " l4.8 " + (n % 2 ? 5.2 : -5.2) + " "; n++;
+    }
+    return '<path d="' + s + '" fill="none" stroke="#56764E" stroke-width="1.7" stroke-linecap="round" opacity=".75"/>';
+  })();
+  var pipe = function(x0, y0, x1, y1, w){
+    var d = "M" + x0 + " " + y0 + " L" + x1 + " " + y1, at = function(t){ return [x0 + (x1 - x0) * t, y0 + (y1 - y0) * t]; }, a = at(.45), b = at(.8), l = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)), ux = (x1 - x0) / l, uy = (y1 - y0) / l;
+    var ring = function(q){ return '<path d="M' + f(q[0] - ux * 2.4) + " " + f(q[1] - uy * 2.4) + " l" + f(ux * 4.8) + " " + f(uy * 4.8) + '" stroke="#FFFDF6" stroke-width="' + (w + .6) + '" stroke-linecap="butt"/>'; };
+    return '<path d="' + d + '" stroke="' + INK + '" stroke-width="' + (w + 4.4) + '" stroke-linecap="round"/><path d="' + d + '" stroke="#5E4030" stroke-width="' + w + '" stroke-linecap="round"/>' + ring(a) + ring(b) +
+      '<path d="M' + f(x1 - ux * 5) + " " + f(y1 - uy * 5) + " L" + x1 + " " + y1 + '" stroke="#FFFDF6" stroke-width="' + (w + 2.4) + '" stroke-linecap="round"/>';
+  };
+  var outfits = {
+    "flat-cap": {
+      note: "A tweed flat cap, herringbone, pulled down over the brim",
+      top: p("M54 50 Q100 62 146 50 Q149 60 133 66 Q100 74 67 66 Q51 60 54 50 Z", "#5F7A54", O3) +
+        p("M42 47 C35 25 58 5 98 3 C140 1 165 24 158 47 C150 55 126 58 100 58 C74 58 50 55 42 47 Z", "#86A474") + tweed +
+        '<path d="M50 46 Q100 37 150 46" fill="none" stroke="#B9D0A6" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>' +
+        '<path d="M58 22 Q72 10 90 7" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".45"/>' +
+        '<circle cx="64" cy="34" r="1.3" fill="#D9A45A"/><circle cx="118" cy="14" r="1.3" fill="#D9A45A"/><circle cx="140" cy="38" r="1.3" fill="#C4553A"/><circle cx="88" cy="46" r="1.3" fill="#C4553A"/>' +
+        '<ellipse cx="100" cy="6.4" rx="6" ry="3" fill="#5F7A54" ' + O2 + "/>",
+      say: ["Cap on, sleeves up. Let's herd some flashcards.", "Tweed keeps my crown warm. Enamel keeps it strong.", "A good cap and a good brush: all a tooth needs."]
+    },
+    "bagpiper": {
+      note: "A green piper's cap with a tall feather, and bagpipes tucked under his arm",
+      back: pipe(167, 104, 165, 6, 5) + pipe(177, 102, 181, 16, 5) + pipe(187, 104, 197, 28, 5) +
+        '<path d="M164 46 Q172 54 180 50 Q188 56 194 54" fill="none" stroke="' + INK + '" stroke-width="4.4" stroke-linecap="round"/><path d="M164 46 Q172 54 180 50 Q188 56 194 54" fill="none" stroke="#F2C94C" stroke-width="2" stroke-linecap="round"/>' +
+        p("M192 54 l5 10 l-7 1 z", "#F2C94C", O2) +
+        '<g transform="rotate(-16 172 116)"><ellipse cx="172" cy="116" rx="28" ry="20" fill="#2F9E57" ' + O4 + '/><path d="M148 108 H196 M147 122 H197" stroke="#F2C94C" stroke-width="2.2"/><path d="M160 99 V133 M183 99 V133" stroke="#1F6E3C" stroke-width="3.4" opacity=".85"/><path d="M152 102 Q160 96 170 96" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".5"/></g>',
+      face: pipe(160, 121, 120, 137, 4.4) + '<circle cx="150" cy="125" r="1.3" fill="' + INK + '"/><circle cx="142" cy="128.2" r="1.3" fill="' + INK + '"/><circle cx="134" cy="131.4" r="1.3" fill="' + INK + '"/>',
+      top: p("M46 46 C38 20 62 -1 100 -1 C142 -1 174 12 172 38 C170 52 152 57 132 53 L60 53 C52 53 48 51 46 46 Z", "#2F9E57") +
+        '<path d="M62 20 Q78 6 100 5" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".45"/><path d="M150 16 Q164 26 162 42" fill="none" stroke="#1F6E3C" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>' +
+        p("M48 44 Q98 34 146 45 L146 56 Q98 46 52 54 Z", "#1F6E3C", O3) +
+        p("M68 34 C50 16 44 -10 54 -30 C70 -14 76 12 74 34 Z", "#FFFDF6", O3) + '<path d="M70 30 Q60 6 56 -22 M62 12 l-7 -5 M66 20 l-9 -3 M60 0 l-5 -6 M64 6 l7 -6 M67 18 l6 -5 M60 -10 l5 -6" fill="none" stroke="#B9C7D3" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<circle cx="70" cy="40" r="9" fill="#F2C94C" ' + O3 + "/>" + T.tinyTooth(70, 40.4, 1.05, "#FFFDF6"),
+      say: ["Piper Timmy! Earplugs are optional.", "I know one tune. It's called Brush Twice a Day.", "Pipes up, plaque down!"]
+    },
+    "gold-buckle-suit": {
+      note: "A tall green hat with a gold buckle, a green coat with gold buttons and an orange bow tie",
+      face: p("M36 100 Q46 90 60 98 L58 111 Q46 105 38 113 Z", "#2F9E57", O3) + p("M164 100 Q154 90 140 98 L142 111 Q154 105 162 113 Z", "#2F9E57", O3) +
+        '<path d="M39 108.6 Q47 101.6 57 106.4 M161 108.6 Q153 101.6 143 106.4" fill="none" stroke="#F2C94C" stroke-width="2.6"/>' +
+        p("M47 112 L72 113 L97 131 L92 152 Q72 148 58 136 Q48 128 47 112 Z", "#2F9E57", O3) + p("M153 112 L128 113 L103 131 L108 152 Q128 148 142 136 Q152 128 153 112 Z", "#2F9E57", O3) +
+        p("M60 113 L72 113 L97 131 L84 135 Z", "#1F6E3C", O2) + p("M140 113 L128 113 L103 131 L116 135 Z", "#1F6E3C", O2) +
+        '<circle cx="100" cy="139" r="2.8" fill="#F2C94C" ' + O2.replace("2.2", "1.4") + '/><circle cx="100" cy="148" r="2.8" fill="#F2C94C" ' + O2.replace("2.2", "1.4") + "/>" +
+        p("M100 123 L83 115 Q80 123 83 131 Z", "#F28C28", O3) + p("M100 123 L117 115 Q120 123 117 131 Z", "#F28C28", O3) + '<rect x="95.4" y="118.4" width="9.2" height="9.2" rx="2.4" fill="#D46A12" ' + O2 + "/>" +
+        clover(68, 126, 4, 3, "#73E07F", 0, 1, 1),
+      top: '<ellipse cx="100" cy="43" rx="64" ry="11.5" fill="#1F7A43" ' + O4 + "/>" +
+        p("M68 42 L63 -17 Q100 -27 137 -17 L132 42 Q100 50 68 42 Z", "#2F9E57") + '<ellipse cx="100" cy="-18" rx="37" ry="7.4" fill="#46B56A" ' + O3 + "/>" +
+        p("M66.6 24 Q100 32 133.4 24 L132 42 Q100 50 68 42 Z", "#2B2230", O3) +
+        p("M86 23 h28 v25 h-28 z", "#F2C94C", O3) + p("M93 29.6 h14 v12 h-14 z", "#2B2230", O2) + '<path d="M89 26 h8" stroke="#FFF6C8" stroke-width="2" stroke-linecap="round"/>' +
+        '<path d="M72 -8 L75 18" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" opacity=".4"/><path d="M40 45 Q100 62 160 45" fill="none" stroke="#14592F" stroke-width="2.2" opacity=".7"/>' +
+        clover(124, 20, 5, 3, "#73E07F", 20, 1, 1.1),
+      say: ["Fresh off the rainbow! My gold is all in crowns.", "Green suit, gold buckle, pearly whites.", "No pinching! I'm in green from root to crown."]
+    }
+  };
+
+  return { k: "stpatrick", homes: homes, scenes: scenes, yard: yard, outfits: outfits };
+}
