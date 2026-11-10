@@ -61,8 +61,8 @@ const HUB = `
 .anima .hot.is-hot{filter:drop-shadow(0 0 3px var(--anatomy-lit))}
 .anima .hot:focus-visible{outline:2px solid var(--anatomy-lit);outline-offset:3px}
 .anima .am-controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:12px 0 6px;font:13px var(--font-body);color:var(--ink)}
-.anima .am-slider{display:flex;align-items:center;gap:10px;flex:1 1 300px;font:.78rem var(--font-mono);color:var(--ink-soft)}
-.anima .am-slider input{flex:1;accent-color:var(--accent);min-width:120px}
+.anima .am-slider{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;flex:1 1 300px;min-width:0;font:.78rem var(--font-mono);color:var(--ink-soft)}
+.anima .am-slider input{flex:1 1 120px;accent-color:var(--accent);min-width:0}
 .anima .am-btn{border:1px solid var(--line-strong);border-radius:8px;background:transparent;color:var(--ink-soft);font:500 .8rem var(--font-body);padding:5px 10px;cursor:pointer}
 .anima .am-btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
 .anima .am-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
