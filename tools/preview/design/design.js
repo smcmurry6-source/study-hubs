@@ -758,7 +758,7 @@
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
       '<div class="panel s12"><h3>The shop’s shelves</h3><p>Daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price. A design of the shelves: the shop itself is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
-      '<div class="panel s12"><h3>Visiting</h3><p>On by default: anyone on the boards can be visited from their name there, and one switch turns it off. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
+      '<div class="panel s12"><h3>The rank board and visiting</h3><p>Every name has its rank’s handpiece beside it, and your own row carries your board name (never “You”) on a gold nameplate with your Timmy peeking over it. Visiting is on by default: tap <b>Visit</b> on a row, or <b>Visit someone random</b>, and clouds drift in from every side, cover the screen and scatter again over that person’s place. While you’re there, the arrows take you to the next or the last place, and <b>Back to mine</b> brings you home. One switch turns visits to your place off. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
       galleryPanel("tpFrames", "Rarity card art", "Every rarity has its own card in the shop and the customizer, and its own burst when you place something. Tap a card to see its burst.") +
       galleryPanel("tpOutfits", "Outfits for Timmy", "One for each theme, drawn on the live Timmy the way his holiday outfits are.") +
       galleryPanel("tpSeasons", "The seasons and holidays", "The yard follows the seasons and the holidays on any home and scene: the tree turns in the fall and blossoms in spring, snow and a snowman at Christmas, a prop by the door for each holiday.") +
@@ -1192,27 +1192,101 @@
 
   /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
   var VISIT = [
-    { name: "Molar Maverick", xp: "48,210", tier: 5, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4 }, outfit: "aviator" },
-    { name: "Floss Boss", xp: "41,775", tier: 4, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3 }, outfit: "parade-marshal" },
-    { name: "Captain Cuspid", xp: "39,020", tier: 4, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 2 }, outfit: "captain" },
-    { name: "Enamel Ninja", xp: "33,480", tier: 3, off: true },
-    { name: "You", xp: "29,150", tier: 3, me: true }
+    { name: "Molar Maverick", xp: "48,210", tier: 5, level: 3, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4 }, outfit: "aviator" },
+    { name: "Floss Boss", xp: "41,775", tier: 4, level: 2, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3 }, outfit: "parade-marshal" },
+    { name: "Captain Cuspid", xp: "39,020", tier: 4, level: 1, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 2 }, outfit: "captain" },
+    { name: "Enamel Ninja", xp: "33,480", tier: 3, level: 3, off: true },
+    { name: "Bicuspid Bandit", xp: "29,150", tier: 3, level: 2, me: true },
+    { name: "Plaque Attack", xp: "27,900", tier: 3, level: 1, o: { home: "mushroom", scene: "forest", yard: { left: "campfire", front: "mailbox", right: "hammock" }, up: { chimney: true }, flair: 2 }, outfit: "ranger" },
+    { name: "Wisdom Whiz", xp: "22,340", tier: 2, level: 3, o: { home: "igloo", scene: "mountain", night: true, yard: { left: "hotspring", right: "telescope" }, up: {}, flair: 1 }, outfit: "beanie" },
+    { name: "Sir Flossalot", xp: "18,060", tier: 2, level: 1, o: { home: "observatory", scene: "space", yard: { left: "telescope", front: "doghouse" }, up: { flag: true }, flair: 1 }, outfit: "nightcap" }
   ];
-  var VS = { at: 0, on: true };
+  var ME = 4, VS = { at: 0, on: true };
+  var VIC = {
+    dice: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg>',
+    go: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    back: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pin: '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 18s5.5-5.4 5.5-9.6A5.5 5.5 0 0 0 4.500 8.400C4.500 12.600 10 18 10 18Z" fill="currentColor"/><circle cx="10" cy="8.300" r="2" fill="#fff"/></svg>',
+    lock: '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="4" y="9" width="12" height="8.500" rx="2.500" fill="currentColor"/><path d="M6.800 9V6.800a3.200 3.200 0 0 1 6.400 0V9" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    home: '<svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="M3 9.500L10 3.500l7 6M5 8.500V16.500h10V8.500" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  function hpImg(tier, cls){ var h = A.handpieces[tier] || A.handpieces[0]; return img(h.svg, h.name + " handpiece", cls || "tp-vhp"); }
+  /* what a visitor sees: the person's place under their board name. Your own row shows the place from the builder */
+  function visitOpts(v){
+    if (v.me) return tpOpts({ timmy: { g: timmyG(timmySvg("happy", PS.outfit)), at: "door" } });
+    var o = Object.assign({ tier: v.tier, level: v.level, timmy: { g: timmyG(timmySvg("happy", v.outfit)), at: "door" } }, v.o, { flair: FLAIRS[v.o.flair] });
+    ["home", "scene"].forEach(function(k){ if (!byK(k === "home" ? TP.HOMES : TP.SCENES, o[k])) o[k] = k === "home" ? "cottage" : "hill"; });
+    o.yard = Object.assign({}, o.yard); Object.keys(o.yard).forEach(function(k){ if (!byK(TP.YARD, o.yard[k])) delete o.yard[k]; });
+    return o;
+  }
+  function visitThumb(v){ var o = v.me ? { home: PS.home, scene: PS.scene } : v.o; return thumbImg("home", byK(TP.HOMES, o.home) ? o.home : "cottage", { scene: byK(TP.SCENES, o.scene) ? o.scene : "hill" }); }
+  function visitable(){ return VISIT.map(function(r, i){ return i; }).filter(function(i){ return !VISIT[i].off && !VISIT[i].me; }); }
+  function visitStep(d){ var l = visitable(), at = l.indexOf(VS.at); return l[at < 0 ? (d > 0 ? 0 : l.length - 1) : (at + d + l.length) % l.length]; }
   function visitMock(){
     var el = $("#tpVisit"); if (!el) return;
-    var v = VISIT[VS.at], rows = VISIT.map(function(r, i){
-      var act = r.me ? '<span class="tp-vnote">Your place</span>' : r.off ? '<span class="tp-vnote">Visits off</span>' : '<button type="button" class="btn tp-vbtn" data-visit="' + i + '" aria-pressed="' + (i === VS.at) + '">' + (i === VS.at ? "Visiting" : "Visit") + "</button>";
-      return '<li class="tp-vrow' + (r.me ? " me" : "") + '"><span class="num">' + (i + 1) + '</span><span class="tp-vname">' + esc(r.name) + "<small>" + esc(TIER_NAMES[r.tier]) + '</small></span><span class="num xp-gold">' + r.xp + " XP</span>" + act + "</li>"; }).join("");
-    var o = Object.assign({ tier: v.tier, level: 2, timmy: { g: timmyG(timmySvg("happy", v.outfit)), at: "door" } }, v.o, { flair: FLAIRS[v.o.flair] });
-    ["home", "scene"].forEach(function(k){ if (!byK(k === "home" ? TP.HOMES : TP.SCENES, o[k])) o[k] = k === "home" ? "cottage" : "hill"; });
-    Object.keys(o.yard).forEach(function(k){ if (!byK(TP.YARD, o.yard[k])) delete o.yard[k]; });
-    el.innerHTML = '<div class="tp-vboard"><h4>The rank board</h4><ol>' + rows + "</ol>" +
+    var v = VISIT[VS.at], list = visitable(), nth = list.indexOf(VS.at), prev = VISIT[visitStep(-1)], next = VISIT[visitStep(1)];
+    var rows = VISIT.map(function(r, i){
+      var here = i === VS.at, act;
+      if (r.me) act = '<button type="button" class="tp-vgo is-mine" data-visit="' + i + '" aria-pressed="' + here + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Home" : "My place") + "</span></button>";
+      else if (r.off) act = '<span class="tp-vnote">' + VIC.lock + " Visits off</span>";
+      else act = '<button type="button" class="tp-vgo" data-visit="' + i + '" aria-pressed="' + here + '" aria-label="' + esc((here ? "You are visiting " : "Visit ") + r.name) + '"><span class="tp-vthumb">' + visitThumb(r) + "</span><span>" + (here ? "Here" : "Visit") + "</span>" + (here ? VIC.pin : VIC.go) + "</button>";
+      return '<li class="tp-vrow' + (r.me ? " me" : "") + (here ? " here" : "") + '">' +
+        (r.me ? '<span class="tp-vsheen" aria-hidden="true"></span><span class="tp-vpeek" aria-hidden="true">' + img(timmySvg("happy", PS.outfit), "") + '</span><span class="tp-vflag">That’s you</span>' : "") +
+        '<span class="num tp-vpos">' + (i + 1) + "</span>" + hpImg(r.tier) + '<span class="tp-vname">' + esc(r.name) + "<small>" + esc(TIER_NAMES[r.tier] + " " + LEVELS[r.level - 1]) + '</small></span><span class="num xp-gold">' + r.xp + " XP</span>" + act + "</li>"; }).join("");
+    var o = visitOpts(v);
+    el.innerHTML = '<div class="tp-vboard"><div class="tp-vtop"><h4>The rank board</h4><button type="button" class="tp-vrand" data-visit-random="1">' + VIC.dice + "<span>Visit someone random</span></button></div><ol>" + rows + "</ol>" +
         '<label class="tp-vswitch"><input type="checkbox" role="switch" id="tpVisitOn"' + (VS.on ? " checked" : "") + '><span><b>Let classmates visit my place</b><small>' + (VS.on ? "On. They see your place under your board name, nothing else." : "Off. Your name on the boards has no Visit button.") + "</small></span></label></div>" +
-      '<div class="tp-vplace"><div class="tp-vhead"><b>' + esc(v.name) + "’s place</b><span>Visiting · look, don’t touch</span>" + '<button type="button" class="btn" disabled>Back to mine</button></div>' +
-        '<div class="tp-pic">' + sceneImg(TP.render(o).svg, v.name + "'s place", isStill()) + "</div></div>";
-    $$("[data-visit]", el).forEach(function(b){ b.addEventListener("click", function(){ VS.at = +b.dataset.visit; visitMock(); }); });
+      '<div class="tp-vplace" id="tpVisitPlace"><div class="tp-vhead" role="status">' + hpImg(v.tier, "tp-vhp big") + "<div><b>" + esc(v.me ? "Your place" : v.name + "’s place") + "</b><span>" + esc(TIER_NAMES[v.tier] + " " + LEVELS[v.level - 1]) + (v.me ? " · home again" : " · visiting: look, don’t touch") + "</span></div>" +
+          (v.me ? "" : '<button type="button" class="btn tp-vhome" data-visit="' + ME + '">' + VIC.home + "Back to mine</button>") + "</div>" +
+        '<div class="tp-pic tp-vpic' + (o.night || (byK(TP.SCENES, o.scene) || {}).alwaysNight ? " is-night" : "") + '">' + sceneImg(TP.render(o).svg, v.me ? "Your place" : v.name + "'s place", isStill()) +
+          '<button type="button" class="tp-vnav prev" data-visit="' + visitStep(-1) + '" aria-label="' + esc("Previous place: " + prev.name) + '">' + VIC.back + '</button><button type="button" class="tp-vnav next" data-visit="' + visitStep(1) + '" aria-label="' + esc("Next place: " + next.name) + '">' + VIC.next + "</button></div>" +
+        '<div class="tp-vfoot"><span>' + (nth < 0 ? list.length + " places open to visit" : "Place " + (nth + 1) + " of " + list.length + " open to visit") + '</span><span class="tp-vnext">Next: ' + esc(next.name) + "</span></div></div>";
+    $$("[data-visit]", el).forEach(function(b){ b.addEventListener("click", function(){ visitGo(+b.dataset.visit, b.classList.contains("tp-vnav")); }); });
+    $("[data-visit-random]", el).addEventListener("click", function(){ var l = visitable().filter(function(i){ return i !== VS.at; }); visitGo(l[Math.floor(Math.random() * l.length)]); });
     $("#tpVisitOn", el).addEventListener("change", function(e){ VS.on = e.target.checked; visitMock(); });
+  }
+  /* going to a place: clouds roll in over the whole screen, the place changes behind them, and they part */
+  function visitGo(i, nav){
+    if (i === VS.at || !VISIT[i]) return;
+    var v = VISIT[i];
+    clouds(v.me ? "Heading home" : "Off to " + v.name + "’s place", hpImg(v.tier, "tp-vhp"), function(){
+      VS.at = i; visitMock();
+      var pl = $("#tpVisitPlace"), r = pl.getBoundingClientRect();
+      if (r.top < 60 || r.bottom > innerHeight) pl.scrollIntoView({ block: r.height > innerHeight - 80 ? "start" : "center" });
+      var f = nav ? $(".tp-vnav." + (nav && visitStep(1) !== i ? "next" : "next"), pl) : $(".tp-vhead", pl); if (nav && f) f.focus({ preventScroll: true });
+    });
+  }
+  /* the trip: a sky of separate clouds drifts in from every side and piles up over the whole screen, the place changes
+     behind them, and they scatter outward again (Sam, 2026-11-10: "it shouldn't look like two curtains coming together") */
+  var CLOUD_SHAPES = [
+    [[30, 62, 22], [58, 44, 30], [92, 50, 26], [118, 66, 18], [74, 70, 26], [48, 74, 18], [100, 76, 16]],
+    [[26, 60, 18], [50, 48, 26], [82, 40, 28], [112, 54, 24], [92, 72, 22], [60, 74, 22], [34, 74, 14]],
+    [[34, 56, 24], [66, 42, 26], [98, 46, 30], [122, 68, 16], [84, 72, 24], [52, 72, 20]]
+  ];
+  function cloudSvg(k){
+    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + q[2] + '"/>'; }).join("");
+    return '<svg viewBox="0 0 144 104" aria-hidden="true"><g fill="#fff" stroke="#3B2E3A" stroke-width="5">' + ring + '</g><g fill="#fff">' + ring + "</g>" +
+      '<g fill="none" stroke="#DDD5EA" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
+  }
+  function clouds(label, emblem, swap){
+    if (isStill()) { swap(); return; }
+    var c = $("#tpClouds");
+    if (!c) { c = document.createElement("div"); c.id = "tpClouds"; c.setAttribute("aria-hidden", "true"); document.body.appendChild(c); }
+    var W = innerWidth, H = innerHeight, cols = W > H ? 4 : 3, rows = W > H ? 3 : 4, size = Math.max(W / cols, H / rows) * 2.05, far = Math.max(W, H) * .9, html = "", n = 0;
+    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, n++) {
+      var jx = ((n * 37) % 11 - 5) / 60, jy = ((n * 53) % 9 - 4) / 60, x = (q + .5) / cols + jx, y = (r + .5) / rows + jy;
+      var vx = x - .5, vy = (y - .5) * .8, len = Math.sqrt(vx * vx + vy * vy);
+      if (len < .12) { var a = n * 2.4; vx = Math.cos(a); vy = Math.sin(a) + .4; len = Math.sqrt(vx * vx + vy * vy); }
+      html += '<span class="tp-cloud" style="--x:' + (x * 100).toFixed(1) + "%;--y:" + (y * 100).toFixed(1) + "%;--s:" + Math.round(size * (.86 + ((n * 29) % 7) / 22)) + "px;--dx:" + Math.round(vx / len * far) + "px;--dy:" + Math.round(vy / len * far) +
+        "px;--r:" + (((n * 17) % 9) - 4) * 3 + "deg;--d:" + ((n * 7) % cols * 45 + (n % 3) * 35) + "ms;--d2:" + ((n * 5) % 4) * 45 + 'ms">' + cloudSvg(n) + "</span>";
+    }
+    c.innerHTML = '<i class="tp-clfill"></i>' + html + '<div class="tp-clmsg">' + emblem + "<b>" + esc(label) + "</b></div>";
+    c.className = "tp-clouds"; void c.offsetWidth; c.className = "tp-clouds in";
+    [clouds.a, clouds.b, clouds.c].forEach(clearTimeout);
+    clouds.a = setTimeout(function(){ swap(); }, 800);
+    clouds.b = setTimeout(function(){ c.className = "tp-clouds out"; }, 1400);
+    clouds.c = setTimeout(function(){ c.className = "tp-clouds"; c.innerHTML = ""; }, 2350);
   }
 
   /* ---------- controls ---------- */
