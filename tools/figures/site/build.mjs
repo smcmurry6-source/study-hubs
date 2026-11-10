@@ -149,7 +149,7 @@ if (placeKit) {
   pairs.forEach(([h, sc, hi, si]) => [false, true].forEach((night) => {
     combos.push({ home: h.k, scene: sc.k, night, tier: 0 });
     combos.push({ home: h.k, scene: sc.k, night, tier: 6, level: 3, up: ups(h), paint: K.PAINTS[(hi + si) % K.PAINTS.length].k, yard: fill(hi + si), flair, marks: true });
-    combos.push({ home: h.k, scene: sc.k, night, tier: (hi + si) % 6, level: 1 + (hi % 3), yard: Object.assign(fill(hi), { side: "lane" }), flair: flair.slice(0, 2), mastery: "plaque" });
+    combos.push({ home: h.k, scene: sc.k, night, tier: (hi + si) % 6, level: 1 + (hi % 3), yard: Object.assign(fill(hi), { side: "lane" }), flair: flair.slice(0, 2) });
   }));
   /* a set's yard pieces, in the yard of their own scene (or the hill), day and night */
   K.YARD.filter((y) => y.set).forEach((y, i) => { const sc = K.SCENES.find((x) => x.set === y.set) || { k: "hill" }, hm = K.HOMES.find((x) => x.set === y.set) || { k: "cottage" };
@@ -167,6 +167,7 @@ if (placeKit) {
   pairs.forEach(([h, sc]) => art.push(["thumb " + h.k + " " + sc.k, K.thumb("home", h.k, { scene: sc.k, up: ups(h) })]));
   K.SCENES.forEach((sc) => art.push(["thumb " + sc.k, K.thumb("scene", sc.k)]));
   K.RARITIES.forEach((r) => { art.push(["frame " + r.k, K.frame(r.k)]); art.push(["burst " + r.k, K.burst(r.k)]); });
+  [0, 1, 2, 3, 4].forEach((l) => art.push(["gem " + l, K.gem(l, "#2E9E6B")]));
   art.push(["coin", K.coin()]);
   K.OUTFITS.forEach((o) => { const p = K.outfitParts(o.k); art.push(["outfit " + o.k, p.back + p.face + p.top]); });
   for (const [w, svg] of art) {

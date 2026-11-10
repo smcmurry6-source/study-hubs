@@ -640,16 +640,18 @@
   function flairOf(lvls){ return lvls.map(function(l, i){ var h = FLAIR_HUBS[i] || "hub-" + (i + 1), t = A.tints && A.tints[h]; return { hub: h, lvl: l, tint: t ? t.ink || t.light : MORE_TINTS[(i - FLAIR_HUBS.length + MORE_TINTS.length * 2) % MORE_TINTS.length] }; }); }
   var FLAIRS = [[], flairOf([2]), flairOf([3, 2, 1]), flairOf([4, 4, 3, 3, 2, 1]), flairOf([4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 1, 1]), flairOf([4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1])];
   var FLAIR_NAMES = ["No hubs mastered yet", "One hub (Silver)", "Three hubs", "Six hubs, two crowned", "Twelve hubs", "Twenty hubs"];
-  var MASTERY = [["case", "Trophy case"], ["plaque", "Gem plaque"]];
+  /* names for the big view: the live hubs' own, then made-up ones for the hubs still to come */
+  var MORE_HUBS = ["Oral Pathology", "Endodontics", "Pharmacology", "Oral Surgery", "Pediatric Dentistry", "Orthodontics", "Dental Materials", "Radiology", "Head and Neck Anatomy", "Operative Dentistry", "Prosthodontics", "Cariology", "Local Anesthesia", "Oral Medicine", "Ethics", "Biochemistry"];
+  function hubLabel(h){ var t = A.tints && A.tints[h], m = /^hub-(\d+)$/.exec(h); return h === "generic" ? MORE_HUBS[15] : t && t.name ? t.name : m ? MORE_HUBS[(+m[1] - 7 + MORE_HUBS.length) % MORE_HUBS.length] : h; }
   var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank"; }, byRank = function(x){ return x.set === "rank"; };
   var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
-    tier: 3, level: 2, flair: 3, mastery: "case", holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
+    tier: 3, level: 2, flair: 3, holiday: "", season: "", timmy: "happy", outfit: "", mode: "play", pick: "home", still: false, found: {} };
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
   function clockNight(){ var hr = new Date().getHours(); return hr < 7 || hr >= 19; }
   function isStill(){ return PS.still || reduced; }
   function tpOpts(o){
     return Object.assign({ home: PS.home, scene: PS.scene, night: PS.time === "night" || (PS.time === "clock" && clockNight()), yard: PS.yard, up: PS.up, paint: PS.paint,
-      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], mastery: PS.mastery, holiday: PS.holiday, season: PS.season }, o || {});
+      tier: PS.tier, level: PS.level, flair: FLAIRS[PS.flair], holiday: PS.holiday, season: PS.season }, o || {});
   }
   function timmyArt(k){
     var t = A.timmy, m = (t.moods || []).filter(function(x){ return x.k === k; })[0];
@@ -752,7 +754,7 @@
       galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
       galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
       galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material, and its steps for the level.") +
-      galleryPanel("tpMastery", "Hub mastery: two options to pick from", "The pennants are gone. Every hub you master shows beside the house, in a trophy case (a cup per hub) or on a plaque (a gem per hub). The metal is the medal (Bronze, Silver, Gold; a Crown sparkles), the color is the hub’s own, and both grow as you master more, up to twenty. Tap it in the builder and Timmy counts them. Try either one under “Preview only”.") +
+      galleryPanel("tpMastery", "Hub mastery: the gem plaque", "Every hub you master sets a gem in the plaque beside the house: the gem is the hub’s own color, its setting is the medal (Bronze, Silver, Gold; a Crown sparkles). It grows as you master more, and shows your best twenty. <b>Tap the plaque</b>, here or in the builder, and the big view opens with every hub’s gem, its name and its medal.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
       '<div class="panel s12"><h3>The shop’s shelves</h3><p>Daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price. A design of the shelves: the shop itself is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
@@ -801,13 +803,13 @@
       return TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", tier: i, level: 3, yard: {}, viewBox: statueCrop(), night: i === 6 }, n, i === 6 ? "It glows, and its stars come out" : "", "", "tp-small"); }).join("") +
         LEVELS.map(function(l, i){ return placeFig({ home: "cottage", scene: "hill", tier: 4, level: i + 1, yard: {}, viewBox: statueCrop() }, "Gold " + l, (i + 1) + (i ? " steps" : " step"), "", "tp-small"); }).join("");
     },
-    /* the two mastery displays, side by side at each size, then each on a whole place */
+    /* the plaque on a whole place (tap it for the big view), then close up at each size */
     tpMastery: function(){
-      var vb = [185, 116, 70, 78], out = "";
-      MASTERY.forEach(function(m, i){ out += placeFig({ home: i ? "castle" : "cottage", scene: i ? "clouds" : "hill", tier: 4, level: 2, flair: FLAIRS[4], mastery: m[0], yard: { left: "garden", right: "hammock" } }, m[1] + ", on a whole place", "Twelve hubs", "door", "tp-wide"); });
-      FLAIRS.slice(1).forEach(function(fl, i){ MASTERY.forEach(function(m){
-        out += placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, mastery: m[0], yard: {}, viewBox: vb }, m[1] + ": " + FLAIR_NAMES[i + 1].toLowerCase(), "", "", "tp-small"); }); });
-      return out;
+      var vb = [185, 116, 70, 78];
+      var open = function(n, label){ return '<button type="button" class="btn tp-try" data-mastery-open="' + n + '">' + label + "</button>"; };
+      return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
+        placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the gems glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
+        FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
     },
     tpRankSets: function(){
       if (!TP.SETS) return "";
@@ -860,6 +862,7 @@
       var t = byK(TP.THEMES, b.dataset.themeTry);
       PS.scene = t.scene || PS.scene; PS.home = THEME_HOME[t.k] || PS.home; PS.yard = themeFill(t); PS.outfit = t.outfits[0] || ""; PS.paint = "cream";
       buildPlace({ burst: "home" }); $("#place").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); }); });
+    $$("[data-mastery-open]", el).forEach(function(b){ b.addEventListener("click", function(){ openMastery(FLAIRS[+b.dataset.masteryOpen]); }); });
     $$("[data-set-try]", el).forEach(function(b){ b.addEventListener("click", function(){
       var k = b.dataset.setTry, of = function(list){ return list.filter(function(x){ return x.set === k; }); }, yd = {};
       of(TP.YARD).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
@@ -951,6 +954,31 @@
     u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
   }
   function rankLine(){ return "Your rank, " + TIER_NAMES[PS.tier] + " " + LEVELS[PS.level - 1] + (PS.level < 3 ? ". One more step at the next level." : PS.tier < 6 ? ". The next rank changes what it's made of." : ". Made of Dark Matter, and it glows."); }
+  /* one shared window for the big views (mastery, a shop item): a dialog that closes on its X, Escape or a tap outside */
+  function openDlg(html, cls){
+    var d = $("#tpDlg");
+    if (!d) { d = document.createElement("dialog"); d.id = "tpDlg"; document.body.appendChild(d);
+      d.addEventListener("click", function(e){ if (e.target === d || e.target.closest("[data-dlg-close]")) d.close(); }); }
+    d.className = "tp-dlg " + (cls || ""); d.innerHTML = html;
+    if (d.open) d.close();
+    if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+    return d;
+  }
+  var DLG_X = '<button type="button" class="tp-dlgx" data-dlg-close aria-label="Close"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>';
+  /* hub mastery, large: the plaque opened up. Every hub's gem with its name and medal, best first, then the hubs with no
+     medal yet as empty settings */
+  function openMastery(flair){
+    var list = (flair || []).slice().sort(function(a, b){ return b.lvl - a.lvl; }), n = [0, 0, 0, 0, 0]; list.forEach(function(x){ n[x.lvl]++; });
+    var todo = [0, 1].map(function(i){ return { hub: "hub-" + (list.length + 7 + i), lvl: 0, tint: "" }; });
+    var chips = [4, 3, 2, 1].filter(function(l){ return n[l]; }).map(function(l){ return '<span class="tp-mchip">' + TP.gem(l, "") + "<b class=\"num\">" + n[l] + "</b> " + TP.MEDALS[l] + "</span>"; }).join("");
+    var card = function(x, i){ return '<li class="tp-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + TP.gem(x.lvl, x.tint) + "<b>" + esc(hubLabel(x.hub)) + '</b><span class="tp-mlvl">' + (x.lvl ? TP.MEDALS[x.lvl] : "No medal yet") + "</span></li>"; };
+    openDlg('<div class="tp-mboard">' + DLG_X +
+      '<div class="tp-mhead"><span class="tp-mcrest" aria-hidden="true">' + TP.gem(list.length ? list[0].lvl : 0, list.length ? list[0].tint : "") + '</span><div><h3 id="tpDlgT">Your hub mastery</h3>' +
+        "<p>" + (list.length ? list.length + (list.length === 1 ? " hub" : " hubs") + " mastered" : "No hubs mastered yet: your first medal sets the first gem") + "</p></div></div>" +
+      (chips ? '<p class="tp-mchips">' + chips + "</p>" : "") +
+      '<ul class="tp-mgrid">' + list.concat(todo).map(card).join("") + "</ul>" +
+      '<p class="tp-mfoot">The gem is the hub’s color and its setting is the medal. The plaque by the house shows your best twenty.</p></div>', "tp-mdlg").setAttribute("aria-labelledby", "tpDlgT");
+  }
   function masteryLine(){
     var fl = FLAIRS[PS.flair], n = [0, 0, 0, 0, 0]; fl.forEach(function(x){ n[x.lvl]++; });
     var parts = [[4, "Crown"], [3, "Gold"], [2, "Silver"], [1, "Bronze"]].filter(function(q){ return n[q[0]]; }).map(function(q){ return n[q[0]] + " " + q[1]; });
@@ -963,6 +991,7 @@
     PS.found[k] = 1; found();
     say(k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say);
     ST.lastTap = Date.now();
+    if (k === "mastery") { clearTimeout(ST.mt); ST.mt = setTimeout(function(){ openMastery(FLAIRS[PS.flair]); }, isStill() ? 0 : 650); }
     if (isStill()) return;
     var target = spotFor(g);
     if (target) goTo(target); else hopInPlace();
@@ -1105,7 +1134,7 @@
       '<div class="tp-ctl"><span>Time</span><div class="seg" role="group" aria-label="Time of day">' + [["clock", "Your clock"], ["day", "Day"], ["night", "Night"]].map(function(t){ return '<button type="button" data-time="' + t[0] + '" aria-pressed="' + (PS.time === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</div></div>" +
       selRow("Rank", "tier", TIER_NAMES.map(function(n, i){ return [i, n]; }), PS.tier) +
       selRow("Level", "level", LEVELS.map(function(n, i){ return [i + 1, n]; }), PS.level) +
-      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) + selRow("Mastery display", "mastery", MASTERY, PS.mastery) +
+      selRow("Mastery", "flair", FLAIR_NAMES.map(function(n, i){ return [i, n]; }), PS.flair) +
       selRow("Season", "season", SEASONS, PS.season) + selRow("Holiday", "holiday", HOLS, PS.holiday) +
       selRow("Timmy", "timmy", [["happy", "Happy"], ["ok", "Okay"], ["sad", "Sad"], ["sick", "Sick"], ["sleep", "Asleep"], ["scared", "Startled"]].concat((A.timmy.hp || []).map(function(x){ return ["hp" + x.hp, x.hp + " HP"]; })), PS.timmy) +
       '<label class="tp-ctl tp-check"><input type="checkbox" data-still="1"' + (PS.still ? " checked" : "") + "> Show it as reduced motion does (still)</label></div></details>";
@@ -1163,9 +1192,9 @@
 
   /* ---------- visiting: from a name on the boards to that person's place (made-up names and places) ---------- */
   var VISIT = [
-    { name: "Molar Maverick", xp: "48,210", tier: 5, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4, mastery: "plaque" }, outfit: "aviator" },
-    { name: "Floss Boss", xp: "41,775", tier: 4, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3, mastery: "case" }, outfit: "parade-marshal" },
-    { name: "Captain Cuspid", xp: "39,020", tier: 4, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 3, mastery: "case" }, outfit: "captain" },
+    { name: "Molar Maverick", xp: "48,210", tier: 5, o: { home: "castle", scene: "clouds", yard: { left: "fountain", front: "garden", side: "lane" }, up: { flag: true }, flair: 4 }, outfit: "aviator" },
+    { name: "Floss Boss", xp: "41,775", tier: 4, o: { home: "harvest-barn", scene: "harvest-fields", yard: { left: "hay-bales", front: "harvest-table", right: "turkey-balloon" }, up: { flag: true }, flair: 3 }, outfit: "parade-marshal" },
+    { name: "Captain Cuspid", xp: "39,020", tier: 4, o: { home: "lighthouse", scene: "beach", yard: { left: "umbrella", front: "sandcastle", right: "pool" }, up: { porch: true }, flair: 2 }, outfit: "captain" },
     { name: "Enamel Ninja", xp: "33,480", tier: 3, off: true },
     { name: "You", xp: "29,150", tier: 3, me: true }
   ];

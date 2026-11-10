@@ -1647,42 +1647,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     var glint = L("M" + f(t[0] + 3) + " " + f(t[1] - 7) + " l-5 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
     return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
-  /* mastery: every hub medal shows by the house, in one of two displays (Sam picks; o.mastery "case" or "plaque"). Both grow
-     with the number of hubs, up to 20, best medals first; the metal says the level (Bronze, Silver, Gold; a Crown is gold
-     with a sparkle) and the color is the hub's own tint. */
+  /* mastery: every hub medal shows by the house on a gem plaque (Sam, 2026-11-10: "I like the gem plaque"; the trophy case
+     drawn beside it is gone). It grows with the number of hubs, up to 20, best medals first; the metal says the level
+     (Bronze, Silver, Gold; a Crown is gold with a sparkle) and the color is the hub's own tint. Tapping it opens the big
+     view of every hub's gem (gemArt below draws one gem large). */
   var MEDAL = ["", ["#C47A3E", "#8F5220", "#E9B07C"], ["#C9D1D9", "#8E98A3", "#F4F7FA"], ["#E8BE45", "#B98A16", "#FFE9A3"], ["#F2C230", "#B98A16", "#FFF3C4"]];
   function masteryList(flair){ return flair.slice().sort(function(p, q){ return q.lvl - p.lvl; }).slice(0, 20); }
   function masteryGrid(n){ var cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : n <= 12 ? 4 : 5; return [cols, Math.ceil(n / cols)]; }
-  /* A: a trophy case, one cup per hub on its shelves (it faces you, like the plaque, so the cups show) */
-  function trophyCase(x, y, flair, o){
-    var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
-    var g = masteryGrid(n), cols = g[0], rows = g[1], cw = n <= 1 ? 10 : n <= 4 ? 8.4 : n <= 9 ? 7.2 : n <= 12 ? 6.4 : 5.8, rh = cw + 2.4, k = cw / 7.2;
-    var W = cols * cw + 6, H = rows * rh + 5.4, t = P(x, y, 0), bx = t[0], by = t[1] - 2.6, top = by - H, s = "", lights = "";
-    s += ell(bx + 2, t[1] + .6, W * .52, 3, "#1B2A3A", 0, .14);
-    s += FO("M" + f(bx - W / 2 + 1) + " " + f(t[1]) + " v-3 h2.4 v3 z M" + f(bx + W / 2 - 3.4) + " " + f(t[1]) + " v-3 h2.4 v3 z", K.woodShade, 1.1);
-    s += FO("M" + f(bx + W / 2) + " " + f(by) + " l2.6 -1.8 V" + f(top - 1.8) + " l-2.6 1.8 z", K.woodShade, 1.3);
-    s += FO("M" + f(bx - W / 2) + " " + f(by) + " V" + f(top) + " H" + f(bx + W / 2) + " V" + f(by) + " Z", K.wood, 1.5);
-    s += FO("M" + f(bx - W / 2 - 1.2) + " " + f(top) + " l2.6 -1.8 H" + f(bx + W / 2 + 3.8) + " l-2.6 1.8 z", K.woodLight, 1.3);
-    s += FO("M" + f(bx - 5.4) + " " + f(top - 1.8) + " q5.4 -6.4 10.8 0 z", K.woodLight, 1.3) + tinyTooth(bx, top - 3.4, .3, "#FFFFFF");
-    var gx0 = bx - W / 2 + 2.2, gw = W - 4.4, gy0 = top + 2.2, gh = H - 4.4;
-    s += FO("M" + f(gx0) + " " + f(gy0) + " h" + f(gw) + " v" + f(gh) + " h" + f(-gw) + " z", o.night ? "#FFE9A8" : "#E3F4FB", 1);
-    if (o.night) lights += glowAt(bx, top + H / 2, Math.max(10, W * .45));
-    for (var r = 0; r < rows; r++){
-      var sy = gy0 + gh - (rows - 1 - r) * rh - .2, inRow = Math.min(cols, n - r * cols);
-      if (r < rows - 1) s += L("M" + f(gx0) + " " + f(sy) + " h" + f(gw), 1.3, K.woodShade);
-      for (var c = 0; c < inRow; c++){
-        var fl = list[r * cols + c], lvl = Math.max(1, Math.min(4, fl.lvl | 0)), m = MEDAL[lvl], kk = k * [.8, .8, .9, 1, 1.04][lvl];
-        var cup = FO("M-2.5 0 h5 v-1.6 h-5 z", fl.tint || m[1], .7) + FO("M-.7 -1.6 v-1.2 h1.4 v1.2 z", m[1], .5) +
-          (lvl >= 3 ? L("M-2.5 -6 q-1.9 .2 -1.3 1.9 q.5 .9 1.6 .7 M2.5 -6 q1.9 .2 1.3 1.9 q-.5 .9 -1.6 .7", .8) : "") +
-          FO("M-2.7 -6.9 h5.4 q.1 4.2 -2.7 4.2 q-2.8 0 -2.7 -4.2 z", m[0], .8) + L("M-1.5 -6.1 q-.2 1.6 .5 2.4", .8, m[2], .95);
-        if (lvl >= 4) cup += dmStar(1.8, -8, 2.2, "#FFFFFF", "tp-twinkle", c * .3);
-        s += '<g transform="translate(' + f(bx + (c - (inRow - 1) / 2) * cw) + " " + f(sy - .5) + ") scale(" + f(kk) + ')">' + cup + "</g>";
-      }
-    }
-    s += L("M" + f(gx0 + 1.6) + " " + f(gy0 + 4.6) + " l2.6 -3", 1, "#FFFFFF", .85);
-    return { s: s, lights: lights };
-  }
-  /* B: a plaque on a post, one gem per hub set in its board */
+  /* a plaque on a post, one gem per hub set in its board */
   function gemPlaque(x, y, flair, o){
     var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
     var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10 : n <= 4 ? 8.2 : n <= 9 ? 7 : n <= 12 ? 6.2 : 5.6;
@@ -1704,9 +1676,25 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     });
     return { s: s, lights: lights };
   }
-  function mastery(h, flair, o, kind){
+  /* one gem, large, in its metal setting: lvl 1-4 (0: an empty setting, for a hub with no medal yet), in the hub's tint */
+  function gemArt(lvl, tint){
+    lvl = Math.max(0, Math.min(4, lvl | 0));
+    var m = lvl ? MEDAL[lvl] : ["#E4DEE6", "#C9C1CC", "#F6F2F7"], col = tint || m[0], s = "";
+    s += circ(32, 33, 28, m[0], 2) + circ(32, 33, 22.5, m[1], 0) + L("M10.5 24 A23.5 23.5 0 0 1 27 7.4", 2.6, m[2], .95) + L("M52 45 A23.5 23.5 0 0 1 41 56", 2, m[2], .6);
+    if (!lvl) return wrapGem(s + '<circle cx="32" cy="33" r="15" fill="none" stroke="' + INK + '" stroke-width="1.6" stroke-dasharray="3 4.5" opacity=".45"/>');
+    var gem = "M13.5 29.5 L21.5 17.5 H42.5 L50.5 29.5 L32 52 Z";
+    s += FO(gem, col, 2) +
+      F("M13.5 29.5 L21.5 17.5 H42.5 L50.5 29.5 Z", "#FFFFFF", .34) + F("M21.5 17.5 L26 29.5 H13.5 Z", "#FFFFFF", .3) + F("M38 29.5 H50.5 L32 52 Z", INK, .16) + F("M26 29.5 H38 L32 52 Z", "#FFFFFF", .16) +
+      L("M13.5 29.5 H50.5 M21.5 17.5 L26 29.5 L32 52 L38 29.5 L42.5 17.5 M26 29.5 L32 17.5 L38 29.5", 1.1, INK, .5) + O(gem, 2) +
+      L("M24.6 20.4 L22.4 24", 1.8, "#FFFFFF", .95);
+    [[12.4, 28.6], [51.6, 28.6], [32, 54.2]].forEach(function(q){ s += circ(q[0], q[1], 2.6, m[0], 1.2); });
+    if (lvl >= 4) s += dmStar(50, 13, 6.4, "#FFFFFF", "tp-twinkle", 0) + dmStar(13, 50, 4.2, "#FFF3C4", "tp-twinkle", .6) + dmStar(55, 40, 3.2, "#FFFFFF", "tp-twinkle", 1.1);
+    return wrapGem(s);
+  }
+  function wrapGem(s){ return '<svg class="tp-gem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + s + "</svg>"; }
+  function mastery(h, flair, o){
     if (!flair || !flair.length) return { s: "", lights: "", z: 0 };
-    var at = h.mast || FIX.mast, m = kind === "plaque" ? gemPlaque(at[0], at[1], flair, o) : trophyCase(at[0], at[1], flair, o), t = P(at[0], at[1], 0);
+    var at = h.mast || FIX.mast, m = gemPlaque(at[0], at[1], flair, o), t = P(at[0], at[1], 0);
     var spark = dmStar(t[0] - 9, t[1] - 30, 3.4, "#FFFFFF", "") + dmStar(t[0] + 10, t[1] - 22, 2.8, "#FFE27A", "") + dmStar(t[0] + 2, t[1] - 42, 3, "#FFFFFF", "");
     return { s: egg("mastery", m.s, spark), lights: m.lights, z: at[0] + at[1] + .2 };
   }
@@ -1824,7 +1812,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
 
   /* ------------------------------------------------------------------ the render ----------------------------------- */
   /* o = { home, scene, night, yard: { left: "garden", ... }, up: { windows, porch, chimney, flag: true }, paint,
-           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] and mastery "case" | "plaque" (the mastery display),
+           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] (the gem plaque),
            season "", "fall", "winter", "spring", holiday (holidayId()), marks (dash the empty spots: the full view),
            timmy: { g: markup, at: spot } (a still picture with Timmy in it), viewBox, bare (a yard item on its own) }
      returns { svg, spots (screen [x, y]), plot (yard [x, y, z]), slots { name: path d }, homeHit, eggs [keys] }        */
@@ -1856,7 +1844,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       lights += drawn.lights;
       items.push({ z: FIX.tree[0] + FIX.tree[1], s: sceneTree(sc, so) });
       var st = home.statue || FIX.statue, stt = statue(st[0], st[1], st[2] || 0, tier, o.level || 1, so); items.push({ z: st[0] + st[1] + (st[2] ? 1.2 : .3), s: stt.s }); lights += stt.lights;
-      var ma = mastery(home, flair, so, o.mastery); if (ma.s) { items.push({ z: ma.z, s: ma.s }); lights += ma.lights; }
+      var ma = mastery(home, flair, so); if (ma.s) { items.push({ z: ma.z, s: ma.s }); lights += ma.lights; }
       var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
       var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
@@ -2080,7 +2068,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     brush: { n: "The toothbrush", does: "wiggles", say: "My toothbrush says hi. It talks now, apparently." },
     statue: { n: "Your rank", does: "it gleams", say: "" },
     tree: { n: "The tree", does: "shakes", say: "Whoa, the tree is ticklish." },
-    mastery: { n: "Your hub mastery", does: "it sparkles", say: "One for every hub you've mastered. The metal is the medal." },
+    mastery: { n: "Your hub mastery", does: "it sparkles, and opens the big view of every gem", say: "One gem for every hub you've mastered. The metal is the medal." },
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },
@@ -2197,7 +2185,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
 
   function meta(list, keys){ return Object.keys(list).map(function(k){ var x = list[k], o = { k: k }; keys.forEach(function(q){ if (x[q] !== undefined) o[q] = x[q]; }); return o; }); }
   return {
-    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, route: route, project: P, layout: layout,
+    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, gem: gemArt, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
     HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),
     SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]),
