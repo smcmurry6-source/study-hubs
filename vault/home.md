@@ -39,6 +39,7 @@ Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md)
 - [Two-statement and true/false questions](rules/two-statement-and-true-false.md) (CI minimums per taught lecture)
 - [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture)
+- ["Which statement is true / false?" questions](rules/which-statement-questions.md) (CI minimum per taught lecture)
 - [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture.
 - [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins.
 - [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).
@@ -103,12 +104,12 @@ Hub building
 Live
 - [Occlusion](hubs/occlusion.md)
 - [Periodontology](hubs/perio.md)
-- [PCD Implants Exam 1](hubs/pcd-implants-exam1.md)
 - [Heme & Endo Exam 2](hubs/heme-endo-exam2.md)
-- [Special Patient Care](hubs/special-patient-care.md)
 
 Archived (page still up)
-- [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
+- [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) · [Special Patient Care](hubs/special-patient-care.md) (retrospective after its
+  window closes, 11-14) ·
+  [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
   [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) · [MSK Exam 3](hubs/msk-exam3.md)
 - Removed earlier (no folder, labels only): GI Exam 1 (`gi-exam1`), GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 

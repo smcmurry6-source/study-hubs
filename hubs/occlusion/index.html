@@ -6253,6 +6253,98 @@ function nums(id, lec, src, lead, stmts, truth, wrong, ex, reasons, extra){
   mcq(id, lec, src, lead + '\n' + stmts.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n'), sets.map(numLabel), ex, extra);
   var q = QUESTIONS[QUESTIONS.length - 1]; q.fmt = 'numbered'; q.answer = sets.indexOf(right); q.why = why;
 }
+/* "Which statement" items: which() (fmt 'which': one true statement, three false) and whichf() (fmt 'whichf': one false,
+   three true). Four statements that each stand alone, key first, [statement, why] pairs; the choices shuffle.
+   Sam, 2026-11-10: vault/rules/which-statement-questions.md. */
+function which(id, lec, src, stem, pairs, ex, extra){ mcq(id, lec, src, stem, pairs.map(function(p){ return p[0]; }), ex, extra); var q = QUESTIONS[QUESTIONS.length - 1]; q.why = pairs.map(function(p){ return p[1]; }); q.fmt = 'which'; }
+function whichf(id, lec, src, stem, pairs, ex, extra){ which(id, lec, src, stem, pairs, ex, extra); QUESTIONS[QUESTIONS.length - 1].fmt = 'whichf'; }
+/* ---------- Which statement items (final lectures) ----------
+   "Which statement is true?" (which) and "Which statement is false?" (whichf) items, two of each per lecture
+   (Sam, 2026-11-10). Written from this hub's notes and cram sheet; each choice carries its why. */
+which('in-ws-records','instruments','handout',
+  'Which statement about eccentric records is true?',
+  [['One protrusive record taken 3-5 mm forward sets the SCI on both sides','A protrusive record moves both condyles forward, so it sets the SCI on both sides.'],
+   ['One lateral record sets the SCI on the same side as the movement','A lateral record sets the contralateral (nonworking) side, the condyle that moves forward.'],
+   ['Lateral records are preferred for the SCI because their SCI is shallower','Protrusive records are preferred; the SCI from a lateral record is steeper.'],
+   ['Protrusive and lateral records are taken about 7-10 mm from CR','They are taken about 3-5 mm from CR.']],
+  'A protrusive record at 3-5 mm sets both SCIs. Two lateral records each set the contralateral side (and the Bennett angle). Protrusive is preferred for the SCI because a lateral record gives a steeper SCI.');
+which('in-ws-facebow','instruments','handout',
+  'Which statement about the facebow is true?',
+  [['An arbitrary facebow puts the hinge axis within about 2-5 mm of the patient\'s','An arbitrary facebow uses average points and lands within about 2-5 mm of the true hinge axis.'],
+   ['A facebow transfer mounts the mandibular cast to the hinge axis','The facebow mounts the maxillary cast; the mandibular cast is mounted to it with a CR record.'],
+   ['A kinematic facebow relies on average ear-canal points rather than locating the exact hinge axis','A kinematic facebow locates the exact hinge axis; the ear-canal version is the arbitrary one.'],
+   ['The Slidematic\'s anterior point is marked 43 mm above tooth #24','The Slidematic\'s anterior point is 43 mm above #7, a maxillary tooth.']],
+  'The facebow mounts the maxillary cast only, using the ear canals and one anterior point (the Slidematic: 43 mm above #7). An arbitrary facebow is within about 2-5 mm of the hinge axis; a kinematic facebow finds the exact axis.');
+whichf('in-wf-artic','instruments','handout',
+  'Which statement about articulators is false?',
+  [['In an arcon articulator, the condylar element is on the upper member','This is the false one: in an arcon articulator the condyle is on the lower member and the fossa on the upper, as in the skull.'],
+   ['A non-adjustable articulator is accurate only in MICP','This is true: any other position, or a record that separates the teeth, adds error.'],
+   ['The Bennett angle setting is the one least needed on a semi-adjustable articulator','This is true: Dr. Givan would leave it off first, because the average values are close.'],
+   ['An articulator is most useful when it is about the size of the patient','This is true: about 110 mm (4 inches) between the condyles.']],
+  'Arcon: condyle on the lower member, fossa on the upper. Non-adjustable: accurate in MICP only. Semi-adjustable: SCI and Bennett angle, the Bennett angle least needed. Best value: an articulator about the patient\'s size, about 110 mm between condyles.');
+whichf('in-wf-cr','instruments','handout',
+  'Which statement about CR records is false?',
+  [['A CR record should be made with the teeth lightly touching','This is the false one: a CR record is made with no tooth contact, so the teeth can\'t deflect the mandible.'],
+   ['Wax is often preferred for a CR record','This is true: wax is the usual material for a CR record.'],
+   ['MIP differs from CO in about 90 percent of people','This is true: in about 90 percent, the teeth close from CO into a different MIP.'],
+   ['On a fully adjustable articulator, the CR record\'s thickness doesn\'t affect accuracy','This is true: with the exact hinge axis, opening and closing on the articulator follows the patient\'s arc.']],
+  'A CR record: no tooth contact, minimal opening (or at the treatment VDO), usually wax. MIP and CO differ in about 90 percent of people. On a fully adjustable articulator, mounted on the exact axis, record thickness doesn\'t matter.');
+which('mo-ws-wear','malocclusion','handout',
+  'Which statement about tooth wear is true?',
+  [['Erosion leaves dull, cupped surfaces and restorations that stand proud','Acid dissolves the tooth around a restoration, leaving it proud, and cups the facets: dull, not shiny.'],
+   ['Erosion leaves shiny facets with sharp edges that match the opposing tooth','Shiny, sharp-edged facets that match the opposing tooth are attrition.'],
+   ['Bulimia erodes the mandibular molars\' occlusal surfaces first','Bulimia erodes the maxillary anteriors; mandibular molar occlusals are part of the GERD pattern.'],
+   ['Abfraction is a proven clinical cause of noncarious cervical lesions','Abfraction is still unproven clinically.']],
+  'Attrition: shiny, sharp, matching facets at contacts. Erosion: dull, cupped surfaces, proud restorations (GERD: maxillary linguals back to the second molar and mandibular molar occlusals; bulimia: maxillary anteriors). Abrasion: third-body, usually the toothbrush. Abfraction remains unproven.');
+which('mo-ws-splint','malocclusion','handout',
+  'Which statement about occlusal splints is true?',
+  [['A mandibular splint interferes less with speech, so it suits daytime wear','Less speech interference is why the mandibular splint is the daytime choice.'],
+   ['A repositioning splint is a reversible treatment, like a stabilization splint','The slides class a repositioning splint as irreversible; the flat plane stabilization splint is the reversible one.'],
+   ['A maxillary splint is ideally suited to a Class III relationship','The maxillary splint is ideally suited to Class II division 1.'],
+   ['A maxillary stabilization splint has deep cusp indentations instead of a flat plane','A stabilization splint has a flat plane with an anterior ramp, so the teeth aren\'t locked into one position.']],
+  'Maxillary stabilization splint: flat plane plus an anterior ramp, sturdy, worn at night, ideal for Class II division 1. Mandibular splint: less speech interference, for daytime. A repositioning splint is irreversible.');
+whichf('mo-wf-mobility','malocclusion','handout',
+  'Which statement about tooth mobility is false?',
+  [['Tooth mobility is greatest late in the day, after a day of function','This is the false one: mobility is greatest on waking, after a night of parafunction.'],
+   ['A healthy tooth moves about 28 µm vertically under load and needs about 4 hours to recover','This is true: about 28 µm, with full recovery taking about 4 hours.'],
+   ['An implant moves only about 2-3 µm vertically','This is true: with no PDL, an implant moves only about 2-3 µm.'],
+   ['About 150 µm is the limit of physiologic horizontal mobility','This is true: normal horizontal movement is 56-108 µm, with 150 µm the limit.']],
+  'Vertical: about 28 µm, about 4 hours to recover; an implant 2-3 µm. Horizontal: 56-108 µm, limit 150 µm. Mobility is worst on waking. Adapted mobility is stable (monitor); traumatic mobility is increasing (splint).');
+whichf('mo-wf-tmd','malocclusion','handout',
+  'Which statement about occlusion and TMD is false?',
+  [['Existing posterior interferences are much more common in symptomatic patients','This is the false one: existing interferences are found about equally in symptomatic and asymptomatic people.'],
+   ['Muscle problems make up about 50 percent of TMDs and joint problems about 35 percent','This is true: about half are muscle problems and about a third are joint problems.'],
+   ['Reversible and irreversible treatments report similar success, so conservative care comes first','This is true: both report 50-90 percent success, so start conservative.'],
+   ['Bruxism is centrally driven and is not started by occlusal contacts','This is true: bruxism is a CNS event tied to arousal, not to the occlusion.']],
+  'TMD: muscles about 50 percent, joints about 35 percent. Existing interferences are equal in symptomatic and asymptomatic people, so don\'t equilibrate to prevent TMD, but don\'t add new ones. Reversible and irreversible care both report 50-90 percent success. Bruxism is CNS-driven.');
+which('dn-ws-ssr','dentures','hub',
+  'Which statement about support, retention and stability is true?',
+  [['Stability, resistance to horizontal forces, is the most important property','When stability fails, biting hurts; it is also what implants improve most.'],
+   ['Support is the resistance to forces that pull the denture away from the tissue','Resistance to dislodgement is retention; support resists vertical force toward the tissue.'],
+   ['Retention is the resistance to horizontal forces that slide the denture','Resistance to horizontal force is stability; retention resists dislodgement.'],
+   ['The ridge crests are the best areas to take a denture\'s support','Support is taken on the buccal shelf, the retromolar pad and the palate, not the ridges.']],
+  'Support: resistance to vertical force toward the tissue (buccal shelf, retromolar pad, palate). Retention: resistance to dislodgement. Stability: resistance to horizontal force, the most important, and what implants help most.');
+which('dn-ws-nonbal','dentures','hub',
+  'Which statement about non-balanced (neutrocentric) denture occlusion is true?',
+  [['A non-balanced setup uses flat 0° teeth with the condylar guidance set at 0°','Flat teeth and a 0° condylar guidance on the articulator let the teeth separate in eccentric movements.'],
+   ['A non-balanced setup keeps the anterior teeth in contact in protrusion','A non-balanced setup has no anterior contact.'],
+   ['A non-balanced setup uses posterior teeth about 40 percent wider than natural teeth','The posterior teeth are set lingually and about 40 percent narrower.'],
+   ['A non-balanced setup sets the posterior teeth on a steep compensating curve','The teeth are set parallel to the ridges, with no curve.']],
+  'Non-balanced (neutrocentric): flat 0° teeth parallel to the ridges, no curve, no anterior contact, condylar guidance 0° on the articulator, set lingually and 40 percent narrower, maybe no lower second molar.');
+whichf('dn-wf-ling','dentures','hub',
+  'Which statement about lingualized denture occlusion is false?',
+  [['Lingualized occlusion puts a long mandibular buccal cusp into a flat maxillary fossa','This is the false one: it is the long maxillary lingual cusp that sits on a flat or wide mandibular fossa.'],
+   ['Lingualized occlusion can be set either balanced or non-balanced, depending on the patient','This is true: lingualized can be set either way.'],
+   ['Lingualized occlusion directs the force over the ridge crest','This is true: force over the crest is among its advantages.'],
+   ['Wear and loss of VDO are drawbacks of lingualized occlusion','This is true: the slides list wear and VDO loss as its disadvantages.']],
+  'Lingualized: a long maxillary lingual cusp on a flat or wide mandibular fossa, like a mortar and pestle. It can be balanced or not, has no anterior contact, directs force over the crest, and can wear and lose VDO.');
+whichf('dn-wf-co','dentures','hub',
+  'Which statement about how complete dentures contact is false?',
+  [['Dentures are built in MIP, with the joints free to find their own position','This is the false one: dentures are built in centric occlusion, with the joints seated; MIP isn\'t used.'],
+   ['Anterior denture teeth are kept out of contact in centric occlusion','This is true: the contacts are posterior, because the premaxilla is weak.'],
+   ['Each denture moves as one piece, so it acts like one upper and one lower tooth','This is true: a force anywhere on it moves the whole denture.'],
+   ['Setting the posterior teeth in crossbite is acceptable after resorption','This is true: the mandible resorbs down and out and the maxilla up and in, so a crossbite is fine.']],
+  'Denture occlusion is built in centric occlusion with the joints seated (no MIP), with posterior contacts and the anteriors out of contact. Each denture is one piece. After resorption, a crossbite setup is acceptable.');
 /* Patient cases: one Patient Box (and its drawn findings) shared by every question on that patient. pc(key) gives
    a question the box and its pcase, so the box says "Same patient · 2 of 3" and Shuffle keeps the set together. */
 var CASES = {
@@ -6354,7 +6446,7 @@ mcq('rv-mip-def','review','handout','Maximum intercuspation (MIP, MICP, ICP) is 
 mcq('rv-mip-dynamic','review','hub','Which statement about MIP matches Dr. Givan\'s lecture?',
   ['It is neuromuscularly determined and changes whenever the teeth or restorations change','It is fixed once growth is complete, so it is always a safe and stable place to restore teeth','It is the same as centric occlusion in about 90% of people','It is set by the seated condyle, so it never shifts'],
   '"MIP is a constantly updated position... not going to be the same this year as it was last year." Every restoration, tooth movement or loss changes it. That is why "I\'ll just keep restoring to MIP" can get you into trouble. CO is the structurally determined one; MIP and CO DIFFER in about 90% of people.',
-  { cue:'MIP Moves; CO (condyle) stays.' });
+  { cue:'MIP Moves; CO (condyle) stays.', fmt:'which' });
 mcq('rv-co-def','review','handout','Centric occlusion (CO), as Dr. Givan uses it on exams, means:',
   ['The tooth contact when the mandible is in centric relation','The complete intercuspation of the teeth regardless of jaw position','The most stable tooth contact the patient can find','The denture tooth contact at the patient\'s vertical dimension of rest'],
   '"If I use the term centric occlusion, this is what I mean": the contact of the teeth with the joints seated (CR). It is NOT a synonym for MIP, even though many people misuse it that way. "Centric" means the joint is centered; it has nothing to do with the teeth.',
@@ -6412,7 +6504,7 @@ mcq('rv-cmr','review','handout','In the cusp-marginal ridge arrangement, the man
   'Cusp-marginal ridge: these cusps land in the opposing embrasures in MIP: a one-to-two tooth relationship. Most adults have it, and it was waxed with Payne\'s technique. Dr. Givan often chooses it on purpose because multiple contacts help prevent supereruption.');
 mcq('rv-cf','review','handout','Which is true of the cusp-fossa arrangement?',
   ['It is a tooth-to-tooth relationship considered ideal but rarely found in natural teeth','Most adults have it, and it is the scheme Payne waxed','It requires the curve of Spee to be flat','It is a one-to-two tooth relationship with the centric cusps contacting marginal ridges'],
-  'Cusp-fossa: centric cusps sit in opposing fossae, tooth to tooth. Considered "ideal" but rarely found naturally; follows ideal Spee and Wilson curves; tripodized contacts; waxed with P.K. Thomas\'s technique. The majority of adults have cusp-marginal ridge instead.');
+  'Cusp-fossa: centric cusps sit in opposing fossae, tooth to tooth. Considered "ideal" but rarely found naturally; follows ideal Spee and Wilson curves; tripodized contacts; waxed with P.K. Thomas\'s technique. The majority of adults have cusp-marginal ridge instead.', {fmt:'which'});
 mcq('rv-vo','review','handout','What vertical overlap (overbite) does Dr. Givan describe as the most accepted ideal, and why do orthodontists accept less?',
   ['About 3 mm (3-5 mm normal); orthodontists accept about 1 mm for brackets','About 1 mm; orthodontists accept 3-5 mm because it is more stable after treatment','About 6 mm; orthodontics accepts 3 mm to reduce wear','About 2-6 mm, the same range as freeway space'],
   'Vertical overlap 3-5 mm is normal, 3 mm the most accepted. Orthodontics often accepts 1 mm to make room for the lower anterior brackets. The proper terms are vertical overlap (lay: overbite) and horizontal overlap (lay: overjet).');
@@ -7602,7 +7694,7 @@ mcq('ap-copy','applying','handout','A patient needing a crown on #6 has group fu
   '"In the absence of signs or symptoms, it is best to copy the existing guidance when restorations are required." That is good conformative dentistry; canine guidance is not automatically "better."');
 mcq('ap-mip','applying','handout','Which statement about MIP comes from Lec3-2?',
   ['The end of the chewing cycle, where force peaks and swallowing is stabilized; not stable long term','It is the most stable long-term reference position, so every restoration should be built to it without question','It is the same as centric relation','It is used only for dentures'],
-  'MIP: the end of the chewing cycle, where teeth apply maximum force and the mandible is stabilized to swallow; "not stable over the long term" because it changes with every change in the occlusion.');
+  'MIP: the end of the chewing cycle, where teeth apply maximum force and the mandible is stabilized to swallow; "not stable over the long term" because it changes with every change in the occlusion.', {fmt:'which'});
 mcq('ap-contacts-day','applying','handout','In a day, the teeth contact in MIP for about 17.5 minutes. That comprises roughly:',
   ['1,800 chewing strokes and 500 swallowing contacts','500 chewing strokes and 1,800 swallowing contacts','590 chewing strokes and 146 swallowing contacts','18,000 chewing strokes and 5,000 swallowing contacts'],
   '17.5 minutes = about 1,800 chewing strokes + 500 swallowing contacts (1,800 × 365 = 657,000 chewing strokes a year). The 590 swallows a day in Lec2-2 counts all swallows, not tooth contacts.');
@@ -11925,7 +12017,7 @@ function bankNormShow(){
   if(isLk(STATE.ui.qstatus)){ STATE.ui.qlikely = STATE.ui.qstatus; STATE.ui.qstatus = 'all'; }
   if(STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = '';
 }
-var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
+var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['which','Which statement is true'],['whichf','Which statement is false'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
 function bankIsFmt(q, fm){ return fm === 'pbox' ? !!q.pbox : fm === 'img' ? !!q.img : (fm === 'multi' || fm === 'match' || fm === 'sequence') ? q.type === fm : q.fmt === fm; }
 function bankLabelOf(list, k){ for(var i = 0; i < list.length; i++) if(list[i][0] === k) return list[i][1]; return k; }
 function lecPickSummary(ids){
