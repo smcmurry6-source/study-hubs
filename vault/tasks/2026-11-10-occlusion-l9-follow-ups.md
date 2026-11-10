@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-16
 waiting-on: Sam's answers on the four L9 diagram candidates; Dr. Lawson's slides; the other 11/12 lecture
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/305
 ---
 
 # Occlusion L9 (Noncarious Cervical Lesions): diagrams, the slides check and the other 11/12 lecture
@@ -75,6 +75,6 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
 
 ## Log
 
-- 2026-11-10: written when L9 shipped from the transcript; the four candidates went to Sam in chat.
+- 2026-11-10: written when L9 shipped from the transcript ([PR #305](https://github.com/smcmurry6-source/study-hubs/pull/305)); the four candidates went to Sam in chat.
 
 ## Outcome

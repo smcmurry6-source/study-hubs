@@ -1,6 +1,6 @@
 {
  "about": "Per-page budgets for tools/release/perf.js, measured as a mid-range phone on slow 4G (see the script). kb = bytes over the wire without narration or video; fcp, lcp, tbt in ms. Raise one only with a reason in the PR that Sam approves; lower them when a page gets lighter.",
- "updated": "2026-11-06",
+ "updated": "2026-11-10",
  "profile": "slow 4G, CPU 4x, 412x823 phone",
  "pages": {
   "index.html": {
@@ -39,7 +39,7 @@
    "tbt": 500
   },
   "hubs/occlusion/": {
-   "kb": 1350,
+   "kb": 1370,
    "requests": 33,
    "fcp": 2000,
    "lcp": 2500,

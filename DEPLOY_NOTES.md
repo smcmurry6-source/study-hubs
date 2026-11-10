@@ -46,7 +46,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   subgingivally, CEJ. The notes give both views where L9 meets L7 (Lawson: abfraction is a cause, treat it with a night
   guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/2026-11-10-occlusion-l9-follow-ups.md):
   Sam's answers on four diagram candidates, the check against Dr. Lawson's slides (names spelled by ear) and the other
-  11/12 lecture as L10. No schema change.
+  11/12 lecture as L10. Occlusion's performance budget 1350 -> 1370 KB (L9 adds about 25 KB over the wire; BUG-053),
+  for Sam to approve with the PR. No schema change.
 - **2026-11-10 (Heme & Endo Exam 2: Dr. Taylor's Lecture A out, saved for Exam 3, Claude Code)** — Sam asked Dr. Herr:
   he forgot Lecture A when he wrote Exam 2, so it will likely be on the next exam ("i guess save all that for exam 3").
   A came out of the hub whole: its notes at both levels and both mp3s, 58 questions (`dc-*`, retired in the hub's
