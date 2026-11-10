@@ -94,6 +94,9 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   `node tools/figures/site/build.mjs` from `tools/figures/site/`.
 - The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
 - Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
+- The "which statement" formats (2026-11-10) reach `next/content/` through the build, and their choices shuffle
+  there too, but the new engine's type filter (`FMTS` in `widget/hub.js`) doesn't list `which` / `whichf` yet: add
+  `["which", "Which statement is true"], ["whichf", "Which statement is false"]` before the release.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
   the page sends you to the live hub, and a plain static server would reach the class's data.
 
@@ -114,6 +117,10 @@ The hub loads the shared case kit (`widget/cases.js`, 2026-11-05) and has an emp
 markers, so a Patient Box question can name a case (`pcase`) and get a chart, film and drawn view from its numbers
 ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)). Its own case pictures (`CASE_IMG`, `pimg`: casts,
 marks, the TMJ view) stay as they are; use the kit for any new perio chart or radiograph.
+
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `nums()`, followed by two of each for L6-L8 (`in-`, `mo-`, `dn-` + `ws-`/`wf-`). Each new final lecture needs at
+  least one of each (CI); the midterm lectures are grandfathered. `rv-mip-dynamic`, `rv-cf` and `ap-mip` are tagged `which`.
 
 ## Pending
 

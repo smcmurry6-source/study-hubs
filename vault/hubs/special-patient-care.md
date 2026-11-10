@@ -1,8 +1,8 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived]
 hub: special-patient-care
-status: live
+status: archived
 ---
 
 # Special Patient Care
@@ -30,7 +30,8 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
   its `HUBS` entry; `SH_EXPORT.exams` / `SH_EXPORT.archiveOn` in the hub use `EXAM_DATE`, hour 0, so the hub's own
   "archived" notice agrees). The page and its direct link stay up. Its exam has `checkinClosed:true`: no check-in button
   or pop-up, ever; Home's done message only asks students not to discuss the exam until after Nov 18 (`TALK_FROM`).
-  The retrospective has no check-ins to read.
+  The retrospective has no check-ins to read. **It archived on schedule (11-06)**; write the retrospective in the first lessons
+  audit after the window closes (Sat 11-14), while the page is still up. By 11-10 it had 16 people, 6.5 h and 69 answers in all.
 - **Question formats:** multiple choice (with two-statement, numbered-statement and EXCEPT items), true/false, matching
   and, since 2026-11-04, multiple answer (24, three per unit, `mm()` with an inline why per choice). Sam chose no ordering,
   fill-in-the-blank or Hot Spot practice. **Mock:** 45 questions in 135 minutes (`MOCK_BLUEPRINT`, `MOCK_LIMIT`), one

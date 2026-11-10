@@ -70,13 +70,22 @@ const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
 const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
+/* "Which statement is true?" (fmt 'which': one true, three false) and "Which statement is false?" (fmt 'whichf': one false,
+   three true): Sam's standing rule, 2026-11-10 (vault/rules/which-statement-questions.md). Every lecture taught after it
+   needs at least one of each. Hubs archived before the rule are exempt, and so are the lectures already taught then
+   (Occlusion's midterm lectures, Heme & Endo Exam 2's Exam 1 Refresher, Perio's sessions through Session 9). */
+const WHICH_MIN = { which: 1, whichf: 1 };
+const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1', 'special-patient-care']);
+const WHICH_GRANDFATHERED = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying',
+  'heme-endo-exam2:refresh', 'perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy',
+  'perio:resective-furcation', 'perio:implants-perio', 'perio:antibiotics-host-mod', 'perio:perio-plastic-esthetics']);
 /* High Likelihood Exam Questions (Sam's standing rule, 2026-10-30; vault/rules/high-likelihood-topics.md):
    every lecture with questions has at least one LIKELY_TOPICS entry, so a lecture added to a hub is ranked too, and every
    topic's ids exist in that lecture. Archived hubs from before the rule are exempt, and so are lectures whose exam is over
    while the hub stays up for a later one (Occlusion's midterm lectures; the final isn't cumulative). */
 const LIKELY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
 const LIKELY_SKIP = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying']);
-const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement' };
+const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement', which: '"which statement is true"', whichf: '"which statement is false"' };
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 /* Question ids are permanent (vault/rules/question-ids-are-permanent.md): class data, reports, pins and question health
    are keyed on them. tools/question-ids/<hub>.txt lists every id the hub has ever shipped, "<id> retired" for one deleted
@@ -142,6 +151,14 @@ function lint(hub, A){
       if (sets.some(st => st.some(k => k < 1 || k > n))) problems.push(`${hub}: ${q.id} a numbered-statement choice names a statement the stem doesn't have`);
       if (sets.some((st, i) => i && cmp(sets[i - 1], st) >= 0)) problems.push(`${hub}: ${q.id} numbered-statement choices must be in canonical order (sorted by their numbers)`);
     }
+    if (q.fmt === 'which' || q.fmt === 'whichf') {
+      /* four (or more) statements that each stand alone; one true (which) or one false (whichf); the choices shuffle */
+      const st = q.stem || '', neg = /\b(false|incorrect|not true|not correct|EXCEPT)\b/i.test(st);
+      if (q.type !== 'mcq' || (q.choices || []).length < 4) problems.push(`${hub}: ${q.id} a "which statement" item needs 4 or more statements as its choices`);
+      if (!/\bwhich\b/i.test(st)) problems.push(`${hub}: ${q.id} a "which statement" stem asks "Which statement ... ?"`);
+      if (q.fmt === 'which' && neg) problems.push(`${hub}: ${q.id} asks for the false statement: make it fmt 'whichf' (whichf())`);
+      if (q.fmt === 'whichf' && !neg) problems.push(`${hub}: ${q.id} is fmt 'whichf' but its stem doesn't ask which statement is false`);
+    }
     if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
     if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
@@ -164,6 +181,9 @@ function lint(hub, A){
       if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
         if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; see vault/rules/${f === 'numbered' ? 'numbered-statements' : 'two-statement-and-true-false'}.md)`); });
+      if (WHICH_EXEMPT.has(hub) || WHICH_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
+      Object.keys(WHICH_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
+        if (n < WHICH_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${WHICH_MIN[f]}; see vault/rules/which-statement-questions.md)`); });
     });
     const tfq = Q.filter(q => q.fmt === 'tf');
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);

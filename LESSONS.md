@@ -4,9 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-05** (the full audit on the evening of 11-04, PR #245, and the pre-build refresh for Heme & Endo Exam 2,
-steps 1-3, data read 10 pm Central on 11-04, PR #246; PCD Implants' exam is Friday). Sam runs
-the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
+**Last refreshed: 2026-11-10** (the full audit, data read 5:50 am Central, with PCD Implants Exam 1's retrospective and recap;
+Heme & Endo Exam 2's exam is Friday). Sam runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
 
@@ -91,88 +90,55 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-04 evening: the full audit (9:45 pm Central, PR #245) and the pre-build refresh for Heme & Endo Exam 2 (steps 1-3, data
-read at 10 pm, PR #246).** "Since" = the 11-04 morning audit, whose fixes went live at 9 am Central. Live hubs: **PCD Implants Exam 1**
-(Fri 11-6 on Canvas, 7 am-8 pm), Special Patient Care (Canvas window 11-6 to 11-13), Occlusion and perio (finals 11-19). Heme & Endo
-Exam 1 is archived; its card and check-in stay until 11-06 10 pm. Nothing newly archived. Data quality (`sh_data_quality()`): no test
-rows, no stats drift, 34 overcounted minutes; two new event families, `notes-jump` ("Find this in the notes", from 11-04) and `qrate`
-(the "Good question?" thumbs). **The widget's search panel is barely used**: 8 searches from 10-01 to 11-04, none since 10-21.
-Tracking works (`record_search` is granted and called); people just don't open it, so zero-result searches are no longer a signal
-worth waiting for.
+**2026-11-10 morning (data read 5:50 am Central).** "Since" = the 11-04 evening audit (data read 10 pm Central). Live hubs: **Heme &
+Endo Exam 2** (Fri 11-13, 10:00 am, four days out), **Occlusion** (final Mon 11-16) and **perio** (final Thu 11-19). **PCD Implants
+Exam 1 is newly archived** (exam 11-06): its retrospective is below and its recap went on the dashboard this morning. Special Patient
+Care archived itself when its Canvas window opened (11-06, Sam's call); its window closes 11-13 (Canvas keeps it to 11-14), so its
+retrospective goes in the next audit. Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes; PCD Implants' class
+counters run 480 answers behind its personal rows, all on the statement items rewritten 11-04 and `tm-mm-2`, whose counters were
+cleared at those changes with Sam's OK (expected, not a tracking fault). Searches: none since 10-21.
 
-**Student voice since 11-04 morning:** no question reports. Suggestion #14 (PCD Implants, 8:40 pm), "a lot of the statement questions
-seem to all have the same answer... the select all being options 1,2,4 a lot." **Right**: 36 of 46 two-statement keys were "Statement
-1 is true; statement 2 is false" (always the third choice), statement 1 was true in all 30 numbered items (statement 2 in 28; every
-key a three-statement combination, 17 of them "1, 2 and 4"), and the second choice was the key in 23 of 30. True/false was balanced
-(38 True, 39 False). Special Patient Care, on the same engine, had statement 1 true in all 24 of its numbered items. Accuracy didn't
-show anyone using the pattern yet (items keyed "1 true, 2 false" 81-82%, the others 86-92%), but the practice was teaching a habit the
-exam won't reward. **Fixed in both hubs in PR #245** (below), and CI now fails a hub whose statement keys form a pattern. Check-ins:
-one more for the Occlusion midterm (n = 17: About right 8, Exam asked different things 7, Hub was easier 2; diagrams 4.6/5, Patient
-Box pictures 3.9/5, readiness 3.8/5). Heme & Endo: none since 11-03 evening. The live survey ("help shape the hubs 2"): more "No
-thanks", no answers (14 answers and 90 skips since it went live).
+**Student voice since 11-04 evening:** one report, #38 (Heme & Endo Exam 2, 11-09: put the Sertoli cell drawing itself, unlabeled, in
+`mh-fig-seq`; open, for Sam). Check-ins: PCD Implants 5 (below), one more for Heme & Endo Exam 1 (final n = 14 people: About right
+11, Hub was harder a couple, none "Exam asked different things"; its check-in closed 11-06), and one Occlusion midterm person checked in a second time (n stays 17
+people). The live survey ("help shape the hubs 2"): one answer since, asking for a first pass that teaches only what the exam will ask,
+and Anki-style flashcards (14 answers and 94 skips in all).
 
-**Did the last refresh work?** ("since" = answers after 9 am)
-- `bm-goodacre` (#37, the percentages taken out of its choices): 9 of 9 right before, 9 of 14 since. The giveaway was real.
-- Explanations that now name the favorite wrong answer: `ev-misch` 12 of 24 then 12-13 of 19-20 since, `bm-moment` 10 of 18 then 10
-  of 16, `ev-blade` flat (14 of 23, then 11 of 18). Flat to slightly up, on small numbers.
-- **Select-all ticks arrive now** (11 PCD Implants items, 109 tries since): misses split evenly between a right option left out (9% of
-  right-option slots) and a wrong one ticked (8%). `tm-mm-2` (platform switching, 4 of 5 options right, the hardest first try in the
-  hub: 7% of 15 people) is missed by leaving out the definition itself ("Abutment narrower than the implant", the least-ticked right
-  option); `tm-mm-1` (screw-retained advantages, 2 of 5) by adding a cement-retained advantage. Since 9 am: `tm-mm-1` 8 of 12, `tm-mm-2`
-  and `tm-mm-3` 6 of 12 each.
-- **"Practiced least" on Home** (10:15 am): the last four lectures caught up (Imaging, CBCT, Surgery, Guided: 7-9 answerers each
-  before, 12-16 since; 18% of all answers before, 35% by 10 pm), **but not through the new row: nobody tapped it.** "Where to next"
-  got 2 taps in two days. People got there through the bank in order, the lecture picker and "Not answered yet". On Home, the
-  quick-start row is what gets tapped ("Practice questions" 7 people, the notes button 8).
+**Did the last refresh work?** (PCD Implants; "before" = answers to 10 pm on 11-04, "since" = the eve and exam day)
+- **Statement keys rebalanced** (#245): two-statement 83% of 703 before, 82% of 1,141 since; numbered 87% of 497, then 85% of 952. No
+  dip worth the name, so the class wasn't leaning on the old pattern, and the balanced keys cost nothing.
+- **Explanations that now name the favorite wrong answer**: `im-template-vdo` 10 of 17 before, **44 of 53 since (83%)**; `ev-misch` 24
+  of 43, then 17 of 25; `tm-mm-1` 15 of 30, then 28 of 46; `bm-moment` 20 of 34, then 27 of 43. `ev-blade` stayed flat (61%, then 64%)
+  and so did `tm-mm-3` (56%, then 54%; reworded on exam day).
+- `bm-goodacre` (#37, percentages out of its choices): 57% since (17 of 30), a real question now. `tm-mm-2` (3 right of 5): 13 of 27
+  before, 16 of 26 since.
+- **Quick-start "Practice questions" to the least-practiced lectures** (11-05): 7 people tapped it (either version), all on the
+  eve; Home's "Practiced least" row got no taps, ever. The lag closed anyway: the last four lectures had 12-17 answerers each
+  before the eve and **43-47 on the eve and exam day, like every other lecture**, and took the most answers (Surgery 2,476, Imaging
+  1,950, CBCT 1,883, against 1,199-1,525 on the first two lectures).
 
 **Per hub:**
-- **PCD Implants** (the eve is 11-05): 66 people, 137 h all time (59 people and 77 h on 11-04), 44 on 2+ days, median 79 min, 6 under 5
-  min. 9,591 answers from 46 people (median 112), 88%. Since 11-04 morning: notes 2,268 min (43 people), bank 1,815 (39), Home 67 (27),
-  mock 50 (5 people, 86% on average), Daily Drill 22 (5), Timmy Time 57 (a couple of people). By lecture 84-92% (Evolution lowest at 84%
-  with 28 tries per question; Guided 92% at 7). By format: select-all 70%, two-statement 83%, matching 85%, numbered 86%, MCQ 89%,
-  true/false 91%. Hardest (12+ tries): `tm-mm-2` 48%, `tm-mm-1` 50%, `su-match` 54%, `tm-mm-3` 56%, `ev-misch` 57% ("Ford Turner" x14
-  of 44), `bm-moment` 59% ("Force / area" x12 of 34), `im-template-vdo` 59% ("to make room for the drill and the guide sleeves" x7 of
-  17: **fixed in #245**, the explanation says the template is worn for the scan and sleeves belong to the surgical guide). Question
-  health: five "stronger students miss it more" leads (`in-num-3`, `bm-order`, `bm-occ-goals`, `ev-frialit`, `tm-depth`), each resting
-  on a few misses; every key agrees with the notes, so they're for Sam's list, not a change (`in-num-3`: see "To fix"). "Find this in
-  the notes" (new 11-04): its button appeared after a miss for 33 people and a few opened it; 21 people met a miss it found no paragraph
-  for. Bank filters since 11-04: High likelihood 14 people, Not answered yet 13, Random 9.
-  **Statement keys, fixed in #245:** two-statement keys are now 12 / 11 / 11 / 12 over the four choices (7 items swapped their two
-  statements; 8 had the false statement made true and 10 the true one made false by one taught detail, every fact from the item's
-  own explanation and the notes). Numbered keys are 7 / 8 / 8 / 7 by position, the false statement sits at every number (statement 1
-  true in 22 of 30), three are keyed "1, 2, 3 and 4" and two have two true. The class picks of the changed items were moved with their
-  choices, or cleared where a statement was rewritten (`tools/data-fixes/2026-11-04-statement-keys.sql`, run at merge with Sam's OK).
-  Next: two-statement accuracy should dip on the eve now that the pattern is gone; that is the point, not a regression.
-- **Special Patient Care** (window opens Fri): 12 people, 6 h all time, a few since 11-03 midday (68 tries in all). Numbered statements
-  reordered in #245 (the false one at every number), four two-statement items swapped and two made "both false" (keys 12 / 6 / 10 / 12).
-- **Occlusion**: a few people since (16 min). Lows unchanged: `an-compound` (25% right first try; 54% of 103 tries pick the
-  hinge-and-glide choice), `cc-parfitt` 31%, `cs-pro-incline` 37%, `fp-post` 38% (40% pick the second-molar cusp), and
-  `rv-ch-spee` (42% of 78 pick "Taller"; its explanation already names the condylar-guidance trap).
-- **Perio**: 11 people on 11-04, 5.5 h since (bank 255 min from 8 people), its most since the midterm (final 11-19). `q3-M01` 28% of
-  72 (21% first try; few of the 14 who missed it got it next time), `q4-M05` 33% first try, `q3-04` 25%: leads for the final.
-
-**Heme & Endo Exam 1 (archived), for Exam 2.** Nothing new since its retrospective below: no reports after 10-30, no check-ins after
-11-03 evening (final n = 13 people: About right 10, Hub was harder a couple, none "Exam asked different things"). Its bank spread both
-statement formats well (two-statement keys 11-18 per choice; statement 1 true in 22 of 25 numbered items, which is the most to allow).
-False-keyed true/false items scored 80% against 87% for true-keyed (1,476 and 1,814 tries), and "Both statements are false" was the
-lowest two-statement key (68%): the class leans "True". Building Exam 2 (diabetes drugs, endocrine pathology, dental endocrinology,
-reproductive histology and physiology): use Exam 1's recipe (recordings, the professors' focus lists and in-class review, the official
-count per lecture as the mock blueprint and `LIKELY_TOPICS`); carry Exam 1's weakest lecture into the diabetes drugs (Endocrine
-Pancreas, 79%: the misses were hormone-sensitive vs lipoprotein lipase, 26 picks, and which way islet blood flows, 27 "True"); count
-the statement keys before shipping (below); and expect the lectures finished last to get the fewest tries.
-
-**To fix** (listed by the pre-build refresh; the first three are done in PR #245):
-- ~~PCD Implants: rebalance the two-statement and numbered keys before Friday, then answer suggestion #14.~~ Done (#245; the class
-  picks are moved or cleared at merge, and #14 is answered after it).
-- ~~Special Patient Care: make statement 1 false in some numbered items before its window opens.~~ Done (#245).
-- ~~CI: fail a hub whose statement keys form a pattern.~~ Done (#245), at 10-40% per two-statement choice, 45% per numbered key
-  position and 90% for one statement number.
-- PCD Implants `in-num-3` (for Sam): the 5 misses all call statement 1 ("junctional epithelium attached to titanium") false; the
-  notes call that tissue "junctional epithelium" in the comparison table and "barrier epithelium" in the figure. Make one name win.
-- ~~PCD Implants `tm-mm-2` (for Sam): 4 of 5 options right, 7% on a first try; consider 3 right of 5 under the same id.~~ Done
-  2026-11-05: 3 right of 5 ("Decreases soft tissue volume" is the new wrong option). Its numbers start over.
-- ~~PCD Implants: point the quick-start "Practice questions" button at the least-practiced lectures.~~ Done 2026-11-05
-  (`qs=practice-least`); next refresh, compare its taps with the row's.
+- **Heme & Endo Exam 2** (Fri): 26 people and 36 h since it opened (11-05), nearly all on 11-09 (24 people, 1,786 min); all 26 had
+  used Exam 1's hub. 1,931 answers from 21 people, 80%. Bank 1,179 min, notes 751. **Practice is piling up in bank order** (L11 15
+  tries per question, L12a 9, L12b 7, A 4, L13 2, L15 1, L14 and L16 about 0); with four days left, PCD Implants says it closes by
+  itself, and the quick-start "Practice questions" opens unanswered questions in bank order. By format: numbered 76%, two-statement
+  78%, MCQ 79%, true/false 86%. Hardest (12-27 tries, small numbers): `p1-corticotroph` 43% ("ACTH low and cortisol high" x5) and
+  `p2-cah-17` 46% (21-hydroxylase x5), whose explanations now name those choices; `p1-num-ptc` 50%; `dm-glucose-dep` 59%
+  (repaglinide x7; its why line and the summary slide's secretagogue split cover it). Question health: `p1-fc-mets` and
+  `p2-shpt-dialysis` are "possible miskey" on 8 first tries each; both keys agree with the notes (follicular carcinoma spreads by
+  blood to bone and lung; renal failure drives secondary hyperparathyroidism) and the picked choices (papillary's lymphatic route,
+  primary disease) are named in the explanations: leads for Sam's list, no change. The bank was reworked on 11-08 and 11-10
+  (339, then 431), so most of these numbers are a day old.
+- **Occlusion** (final 11-16: L6-L8): 23 people since, 14 on 11-09; notes 823 min, bank 299 (663 answers from 6 people, 83%). The
+  final's lectures have few tries yet (L6 7 per question, L7 1, L8 none). Nothing flagged. The midterm lows are unchanged and not on
+  the final (`an-compound` 45% of 103, `fp-post` 45%, `cs-pro-incline` 41%).
+- **Perio** (final 11-19): quiet: 11 people on 11-05 (312 min), 267 answers from a few people since. `q4-M02` (SRP goals, select-all) is
+  flagged very hard (38% first try, 34 people): its explanation named only the two wrong options, and now lists the three goals;
+  `q4-44`'s explanation never gave its number (4 µm; "0.4 mm" is the favorite wrong answer), and now does. Unchanged leads for the
+  final: `q3-M01` 28% of 72 (UniFe; "Plaque index" is the favorite wrong tick), `q4-06` 33% of 18, `q4-02` 36% of 28, `q4-M05` 40%.
+  Expect the final's eve (11-18) to carry most of its use.
+- **Special Patient Care** (archived 11-06): 16 people, 6.5 h and 69 answers from a few people, all before the window opened. Little to
+  learn from yet beyond that; the retrospective comes after the window closes.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -194,13 +160,14 @@ the statement keys before shipping (below); and expect the lectures finished las
 
 - **Almost all studying happens in the last 3-4 days.** GI Exam 2: 35% of all time was the day before the exam
   (53 of 78 people); days 5+ out were small. Perio midterm: 42% of all perio time was the day before (57 people, 91 h). MSK Exam 3: 44% (61 of 87 people, 89 h),
-  and 26 of those 61 opened the hub for the first time that evening; over half of all MSK answers came on the eve and
+  and 26 of those 61 opened the hub for the first time that evening; PCD Implants: 40% (73 of 88 people, 20 of them new that evening); over half of all MSK answers came on the eve and
   exam morning. Have every lecture's questions in the hub by ~4 days before the exam,
   and put the quickest high-yield review (Daily Drill, cram sheet, exam hints) where the night-before crowd lands.
 - **Lecture notes and the question bank are the hub.** In perio and MSK (per-section data, 2026-09-23 on) notes +
   bank are ~80% of time; the first survey's "most helpful" answers were Question bank 4, Lecture notes 1. Arcade,
   review tables, mock exams and Atlas-style extras each get a few people. Build and polish notes + bank first. Final numbers: MSK bank 99 h + notes 62 h of
-  204 h; perio bank 98 h + notes 51 h of 217 h; PCD 3 bank 106 h + notes 77 h of 212 h; MSK 4 bank 60 h + notes 45 h of 131 h.
+  204 h; perio bank 98 h + notes 51 h of 217 h; PCD 3 bank 106 h + notes 77 h of 212 h; MSK 4 bank 60 h + notes 45 h of 131 h; PCD Implants bank 159 h + notes 136 h of 339 h, the notes
+  leading the first two of its three days (when a hub opens days ahead, people read first and drill on the eve).
   **The extras each reach a minority**: across all hubs to 10-19, Listen 23 people ever, mind maps 36, the highlighter 12,
   MSK 4's interactive diagrams 18 of 71, the Timmy Time podcast 20 (a third of the MSK 4 eve crowd; a few heard it all). The widget's
   search panel is used least of all (8 searches from 10-01 to 11-04, across every hub), so don't wait on zero-result searches to find
@@ -232,7 +199,9 @@ the statement keys before shipping (below); and expect the lectures finished las
   Point Home's "Where to next", the drill and the mock at the lectures with the fewest answers, whenever they were added.
   **The lag closes by itself when there are days to spare**: PCD Implants' last four lectures went from 7-9 answerers each to 12-16 on
   day two (18% -> 35% of answers), while Home's new "Practiced least" row got no taps ("Where to next" got 2 in two days). Have every
-  lecture in the bank from the start; the pointers matter most for a hub that opens 1-3 days out, or a lecture added last. **Steer
+  lecture in the bank from the start; the pointers matter most for a hub that opens 1-3 days out, or a lecture added last.
+  **Final reading, PCD Implants:** on the eve and exam day every lecture had 43-47 answerers (the last four 12-17 before) and the last
+  four took the most answers; the quick start's least-practiced button reached 7 people, the row none. The class fixes the lag itself. **Steer
   through what people already tap**: the quick-start row and the bank's own filters (bank order, the lecture picker, "Not answered
   yet") are where a nudge lands, not a row lower on Home.
 - **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
@@ -266,7 +235,8 @@ the statement keys before shipping (below); and expect the lectures finished las
   midterm check-ins (n = 14, 7 "worse than expected"): the exam had two-statement true/false, "pick the numbers" items (four to
   seven numbered statements, choices are combinations) and "tricky wording". Every hub from Heme/Endo Exam 1 on gets a few
   numbered-statement items per lecture besides the two-statement and true/false rule, and stems phrased the way that
-  professor asks (NOT/EXCEPT, "most likely", "best explains"), drawn from how they word their own slide questions. **A standing
+  professor asks (NOT/EXCEPT, "most likely", "best explains"), drawn from how they word their own slide questions. A PCD Implants check-in
+  (2026-11-07) asked for one more: "which statement is correct" items whose four choices are four different statements; add a few beside the other formats. **A standing
   rule since 2026-10-28** (`vault/rules/numbered-statements.md`: at least 2 per taught lecture, CI-checked); Occlusion got
   16 (`nums()`), and the final will show whether they close the "Exam asked different things" gap. **First read, Heme & Endo Exam 1**
   (the first hub built with numbered items, the professors' focus lists and an in-class review set from the start): of 10 people who
@@ -301,7 +271,8 @@ the statement keys before shipping (below); and expect the lectures finished las
   `ca-2s-4` stayed at 41% and `pa-tf-3` at 53-55%. When a statement item stays low, make the false detail plainer (one taught number or
   name) or add a plain MCQ on the same fact; don't expect the explanation to fix it. Again on PCD Implants (11-04): two of three MCQs
   rose 7-15 points after their explanations named the favorite wrong answer (`ev-misch` 50% -> 13 of 20), and of three select-alls whose
-  explanations now name every option, one rose (`tm-mm-1` 39% -> 8 of 12) and two stayed flat.
+  explanations now name every option, one rose (`tm-mm-1` 39% -> 8 of 12) and two stayed flat. Over the eve and exam day:
+  `im-template-vdo` 59% -> 83% (44 of 53), `ev-misch` 56% -> 68%, `tm-mm-1` 50% -> 61%, while `ev-blade` and `tm-mm-3` stayed flat.
 
 - **A report that says the key contradicts the case moves accuracy more than an added sentence.** 10-13 evening: the two
   keys rewritten from reports went 47% -> 14/14 (`ce-isolation`) and 48% -> 70% (`ve-pbox-3`); of five explanations that
@@ -330,7 +301,7 @@ the statement keys before shipping (below); and expect the lectures finished las
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
 - **Check-ins and surveys speak for the heavy users.** Every check-in group so far studied several times its hub's median
-  (GI 2: respondents' median 177 minutes against 29 for everyone), and 169 of 190 people shown a survey said "No thanks"
+  (GI 2: respondents' median 177 minutes against 29 for everyone; PCD Implants: 361 against 199, n = 5), and 169 of 190 people shown a survey said "No thanks"
   (to 11-04). Read "About right" next to the use data, never as the class's verdict; the people who bounced aren't in it.
 - **People decline a tour offered on arrival, but finish one they choose.** Dashboard tour: 12 of 97 shown the prompt
   started it, 8 finished; hub tours 11 of 118, 9 finished (10-21 to 11-04). Teach a feature where it's used (a one-line
@@ -384,7 +355,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   number true in over 90%). Give the key a size another choice shares ("1, 3 and 4" next to "2, 3 and 4", not next to two pairs and
   "1, 2, 3 and 4"), and key some items "all four" or "two". Also expect the "True" lean: false-keyed true/false items score lower
   (Heme & Endo 80% vs 87%, PCD Implants 88% vs 93%), and so does "Both statements are false" (Heme & Endo 68%, the lowest key). The
-  false half is where the practice is; keep it honest (one taught detail changed).
+  false half is where the practice is; keep it honest (one taught detail changed). **Balancing costs nothing:** after PCD Implants'
+  keys were spread on its eve, two-statement accuracy went 83% -> 82% and numbered 87% -> 85% (1,141 and 952 answers), so nobody had
+  been leaning on the pattern; balance from the start rather than wait for a student to notice.
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
@@ -442,6 +415,82 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 
 ## Hub retrospectives
 
+### PCD Implants Exam 1 (`pcd-implants-exam1`), exam 2026-11-06 (Canvas, 7 am-8 pm), archived 2026-11-06 (written 2026-11-10)
+
+Data: 88 people, 339 h, level with Heme & Endo Exam 1 for the most of any hub; 25 came on one day only, **54 on 3+ days** and the
+median was **199 min** each (both the most yet), 13 under 5 min. **25,392 answers from 66 people** (median 334, most 1,225; 45 answered
+on 2+ days), 87%. The hub went up 11-03, three days out, with all nine lectures: 11-03 3,625 min (50 people), 11-04 4,946 (59), **night
+before 8,183 min from 73 (40% of all time)**, 20 of them first-time visitors; exam day 3,315 (52; the Canvas window ran all day); 8
+studied after midnight. 29 mocks from 15 people: 75% as stored, but four exam-day mocks were ended after a few questions (1-5 of 40)
+and count as full ones; without them about 86%. Daily Drill 12 people on 18 person-days. Arcade about 33 runs (Sort 14 from 5
+people). Timmy Time 11 people pressed play, 258 min heard. Recap on the dashboard since 11-10.
+
+| Section | Minutes | People |
+|---|---|---|
+| Question bank | 9,539 | 65 |
+| Lecture notes | 8,172 | 64 |
+| Cram sheet | 588 | 23 |
+| Home | 488 | 87 |
+| Mock exam | 452 | 17 |
+| Review (all) | ~440 | 17 (Evolution; the others 4-8) |
+| Exam hints | 205 | 27 |
+| Daily Drill | 135 | 12 |
+| Timmy Time | 125 | 9 |
+| Weak Spots | 122 | 10 |
+| Arcade (all) | ~75 | 9 |
+
+**The notes did more of the work than in any hub so far** (40% of all time; PCD 3 36%, MSK 4 34%, Heme & Endo 1 32%), and led the bank
+three and two days out (1,881 vs 1,421 min, then 2,561 vs 2,086) before the bank took over on the eve (4,513 vs 2,511). Plain English
+12 people, As taught 8; Listen 6; mind map a few. 62 people saw an interactive figure and 26 moved one.
+
+| By lecture | Accuracy | Tries per question |
+|---|---|---|
+| CBCT 101: Basic Science | 84% | 42.4 |
+| Introduction to Implant Surgery | 85% | 42.4 |
+| Evolution of Dental Implants | 85% | 48.5 |
+| Implant Terminology and Basics | 86% | 50.5 |
+| Imaging for Implant Diagnosis | 87% | 47.7 |
+| Introduction to Implants and the Implant-Tissue Interface | 89% | 51.8 |
+| Biomechanics in Implant Dentistry | 89% | 45.0 |
+| Prefabricated Abutments | 91% | 41.7 |
+| Guided Surgery vs Freehand | 93% | 37.2 |
+
+By format: select-all 72% (11), two-statement 82% (46), matching 83% (11), numbered 85% (30), plain MCQ 88% (370), true/false 91% (77).
+By source: slides 87%, recordings 88%. Hardest (12+ tries): `ev-2s-4` 47% (who designed the TMI and the blade; "Both statements are
+true" x5; the recap's featured question), `su-match` 51% (vertical space per prosthesis), `tm-mm-3` 55% (the 7 mm; "4 mm for the
+screw head" ticked 17 times), `tm-2s-6` 56%, `tm-mm-1` 57% ("More passive fit for an FPD" ticked 14), `su-mm-1` 59% ("Implant
+malpositioning", a surgical factor, ticked 14), `su-def-bran` 60% (Albrektsson's wording x30), `su-bar` 60%, `ev-misch` 60% (Ford
+Turner x21), `bm-moment` 61% (force / area x25), `im-process` 61% ("Plan in the software" x19), `im-motion` 62% (beam hardening x18).
+**The lecture lag closed by itself**: before the eve the last four lectures had 12-17 answerers each (27-38 on the first three); on
+the eve and exam day every lecture had 43-47, and the last four took the most answers. Tries per question ended at 37-52 for every
+lecture. The four drawn Patient Box cases (`su-pb-1` to `su-pb-4`, from 11-05): 40 people answered at least one, 84-100% right.
+
+Used: "Try it again" shown to 63 people (2,965 retries, 78% right); the High likelihood chip 39 people, "Not answered yet" 37, Random
+27, "Missed last time" 17, a lecture's "Only" button 16; "Why each choice" opened by 18 (401 taps); pins 12 people (142); the
+highlighter 13 (1,590 marks). "Find this in the notes" appeared after a miss for 58 people and was opened by 17; 48 met a miss it
+couldn't place. Little used: the quick start's least-practiced "Practice questions" (7 people, the eve only), Home's "Practiced least"
+row (none), the hub tour (all 12 shown it on arrival declined; a few started it from the menu), the search panel (none). Plaque bosses: 71 met one, 16 hid it.
+
+Check-ins, **n = 5 people** (later ones go into the next audit), all heavy users: their median was 361 min and 737 answers (the hub's
+199 and 334), 77-95% right. Hub vs exam: most said About right, none "Exam asked different things"; most went better than expected,
+none worse; readiness 3.6 of 5. The new questions: the drawn Patient Box cases rated 4 of 5 against the old text boxes by everyone who
+rated them (one hadn't reached them); the diagrams and implant-type drawings 4.5 of 5 (the Occlusion midterm's diagrams: 4.6, n = 17);
+**all five ticked High likelihood questions** as a help, most "Why each choice", a few each the class's picks per choice, pins, the
+least-practiced button and Timmy Time; all but one said "keep improving it right up to the exam". Written: more "which statement is
+correct" items where each choice is a different statement (a format, not a topic). Reports: four and suggestion #14, all fixed and
+answered within a day (brand detail #35/#36, a choice set #34, the percentages in `bm-goodacre` #37, the statement-key pattern #14).
+
+What changes because of it: (1) **the recipe held**: three days of hub with every lecture in from the first day, the recordings, the
+course's hint list and a bank checked against every hint gave the deepest use per person yet; (2) **when a hub opens days ahead, the
+notes come first**: polish them before the bank's extras, since they carried the first two days; (3) the lag behind bank order closed
+on its own on the eve, so the Home pointers aren't worth more work (keep the quick-start one, it costs nothing); (4) High Likelihood is
+what the check-ins name first again: keep it in every hub; (5) explanation fixes that name the favorite wrong answer kept working for
+MCQs (`im-template-vdo` 59% to 83%) and stayed weaker for select-alls; (6) rebalancing the statement keys cost nothing (two-statement 83%
+to 82%), so balance them from the start; (7) add a few "which of these statements is true" MCQs (four full statements as the choices)
+beside the two-statement and numbered formats; (8) read mock averages without the mocks ended after a few questions (the data-quality
+note). Cleanup still to do by hand: remove `hubs/pcd-implants-exam1/` (its card leaves the dashboard 11-16) and optionally move its
+entry into `ARCHIVED_HUBS`.
+
 ### Heme & Endo Exam 1 (`heme-endo-exam1`), exam 2026-10-30, reopened for a late exam, archives 2026-11-03 (written 2026-11-03)
 
 Data: 92 people, 341 h, the most of any hub so far; 22 came on one day only, **50 on 3+ days**, median **183 min** each (also the most),
@@ -486,7 +535,8 @@ Hardest: `ca-2s-4` 41% (calcitonin; "1 true, 2 false" x13), `cs-2s-3` 44%, `gr-r
 54% (islet blood flow; "True" x27). Late lectures were not the weakest this time: the pancreas lecture was (79%), the calcium and drug
 lectures got the fewest tries (31-33 per question vs 43-64).
 
-Check-ins, **n = 13 people** (14 rows by 11-04; later ones go into the next audit): **About right 10**, Hub was harder 2 (93-94% accurate,
+Check-ins, **n = 13 people** (14 rows by 11-04; the final count, after the check-in closed 11-06, is 14 people, the one more About
+right): **About right 10**, Hub was harder 2 (93-94% accurate,
 83-295 min), one left it blank, none "Exam asked different things"; went better than expected 8, as expected 4, worse 1; readiness 3-5 (median
 4). The three after the late exam (11-03): About right twice (520-783 min, 75-79%), Hub was harder once. Against use: the one
 "worse than expected" answered the most of anyone (1,541 at 84%, 732 min) and still called the hub about right; the two lowest-accuracy

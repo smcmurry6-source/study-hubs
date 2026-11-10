@@ -154,6 +154,12 @@ material. Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-i
   14-28, L14 uterine 1-5 / 5-14 / 15-28) differ; each lecture's questions use its own. L16 (slides only): rising GnRH
   causes hot flashes (fp-meno-2 says "according to the lecture").
 
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `mq()`, followed by one block of two of each per lecture (ids `<prefix>-ws-*` and `<prefix>-wf-*`). L16 (`fphys`)
+  has its four from the slides; when its recording lands, check them against what Dr. Madison said. Six older items are
+  tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
+  `r-ca-calcitonin`).
+
 ## Pending
 
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam2`.
