@@ -45,7 +45,10 @@ tags: [widget, supabase]
   holds for "Deployment failed, try again later" after a few minutes of `deployment_queued` (2026-11-06: #285's and
   #281's publishes both ended that way, GitHub's status page said Pages was fine, and re-running #281's failed again
   in a minute): the live site stays on the last good publish until the next merge. `node tools/release/postcheck.js`
-  catches it ("the live copy differs from main").
+  catches it ("the live copy differs from main"). It happened again on 2026-11-10: #301's publish sat in
+  `syncing_files` for 10 minutes and the deploy step canceled it ("Timeout reached"), so the Perio S9 diagrams waited
+  for the next merge. When a release can't wait for someone else's PR, a small vault-only PR (one that records what
+  happened) publishes it.
 - **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.

@@ -64,6 +64,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
   Drive. S9 taken straight to taught; see Outcome.
 - 2026-11-10: Sam: "Yes to all diagrams. Merge when ready". All five built (`tools/figures/perio/`), placed under
   the notes and in their Review sections, and merged by the agent once green; see Outcome.
+- 2026-11-10: #301's Pages publish timed out; a vault-only PR records it and republishes the site when merged.
 
 ## Outcome
 
@@ -98,4 +99,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - **Where:** under the S9 notes (`FIG_BY_LEC`, outside the narrated text) and in Review: `cairo` in `s9-recession`,
   `palate` and `grafts` in `grafts`, `ape` in `ape`, `egd` in `esthetics`. The About page's Perio diagrams sentence
   lists them. No notes, questions or audio changed.
+- **Publishing:** GitHub Pages' first publish of #301 (b115ec3) timed out ("syncing_files" for 10 minutes, then
+  canceled), so the live site stayed on #297 until the next merge to `main`. The post-release check and the site
+  changelog line wait for that publish.
 
