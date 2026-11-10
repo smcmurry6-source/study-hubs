@@ -297,7 +297,7 @@ window.SH_PLACE = (function placeKit(INK, C){
 
   var SCENES = {
     hill: {
-      n: "The hill", note: "Free: the hilltop where every Timmy starts", rarity: "", theme: "hilltop", price: 0, id: "",
+      n: "The hill", note: "Default: the hilltop where every Timmy starts", rarity: "", theme: "hilltop", price: 0, id: "",
       top: HILL_TOP, skirt: "grass", path: "stones", treeKind: "round", lamp: "post", grade: ["#FFE7B0", .05],
       chip: function(o){ return o.night ? ["#5E9E6A", "#3F7550"] : [K.grass, K.grassShade]; },
       sky: function(o){ return o.night ? bands(["#141E46", "#1B2858", "#24346A", "#2E4178"], 0, 300) + moon(330, 44) + starField(5, 30, 150)
@@ -766,7 +766,7 @@ window.SH_PLACE = (function placeKit(INK, C){
 
   var HOMES = {
     cottage: {
-      n: "The cottage", note: "Free: the cottage on the hill, every Timmy's first home", rarity: "", theme: "hilltop", price: 0, id: "",
+      n: "The cottage", note: "Default: the cottage on the hill, every Timmy's first home", rarity: "", theme: "hilltop", price: 0, id: "",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Shutters and window boxes", porch: "A porch with a lamp", chimney: "A stone chimney", flag: "A Timmy flag on the gable", paint: "Wall paint" },
       door: [5.5, 8.4], brush: [7.5, 9.0], statue: [3.0, 9.3], spots: { door: [5.5, 10.6] }, h: 7.4,
@@ -1709,11 +1709,15 @@ window.SH_PLACE = (function placeKit(INK, C){
     }
     return '<svg class="tp-burst" viewBox="-40 -40 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' + s + "</svg>";
   }
-  /* a Shiny Gold Crown: a gold dental crown (the restoration, never a king's crown), its cusps and a glint. 24 box. */
+  /* a Shiny Gold Crown: a full gold crown, the restoration (never a king's crown, and not a chef's hat: Sam, 2026-11-10).
+     A molar's crown seen a little from below, so it reads as a cap: two cusps and the groove between them, the bulge of
+     the contact, the taper to the margin, and the hollow it seats on. 24 box. */
   function coin(){
-    return FO("M5 10.5 C4.6 6.4 7 4.4 9.2 5.4 C10.4 3.6 13.6 3.6 14.8 5.4 C17 4.4 19.4 6.4 19 10.5 C18.7 14 17.6 17.4 16.8 19.6 Q12 21 7.2 19.6 C6.4 17.4 5.3 14 5 10.5 Z", "#F2C94C", 1.6) +
-      F("M14.6 6 C16.6 5.4 18.8 7 18.6 10.5 C18.3 14 17.3 17.2 16.6 19.4 Q14.8 20 13.4 20.2 C14.8 16 15.6 11 14.6 6 Z", "#C9971C") + L("M8.4 8.6 Q12 10.6 15.6 8.6 M12 9.8 V12.6", 1.1, "#9C7414") + L("M7.2 19.6 Q12 21 16.8 19.6", 1.2, "#9C7414") +
-      dmStar(8.4, 7.6, 2.2, "#FFFFFF", "");
+    return FO("M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z", "#F2C94C", 1.6) +
+      F("M15.7 5.3 C17.4 5.5 18.6 6.7 19 8.4 C19.6 11 18.8 14.2 17.4 16.8 L14.9 16.4 C16.6 12.6 17.1 8.8 15.7 5.3 Z", "#C9971C") +
+      L("M12 6.4 V9.6 M9.4 9 Q12 10.5 14.6 9", 1.1, "#9C7414") +
+      ell(12, 17.5, 5.75, 2.3, "#8A6410", 1.6) + F("M7.4 18.3 Q12 20.3 16.6 18.3 Q12 21 7.4 18.3 Z", "#C9971C") +
+      HI("M6.3 9.4 C6.5 7.8 7.2 6.8 8.1 6.3", 1.3) + dmStar(8.6, 11.6, 2, "#FFFFFF", "");
   }
 
   /* ------------------------------------------------------------------ Timmy's theme outfits ------------------------ */

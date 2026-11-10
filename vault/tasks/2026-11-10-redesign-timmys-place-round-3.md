@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-10
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -114,6 +114,25 @@ fall in the school year (with their dates), and ask Sam which to add before draw
   banner that lists them on tap) and what a Crown adds.
 - **Past seasons unlocked**: whether that means every past season since the game layer's release, or only Halloween
   2026, as Sam said.
+
+## Sam's answers (2026-11-10, AskUserQuestion)
+
+- **New seasons**: Spring (Mar 20 - May 31, when no holiday is on) and Summer (Jun 1 - Sep 21), each with a full set, the
+  way fall has one. No deep-winter season.
+- **New holidays**: Tooth Fairy week (Feb 22-28), Mardi Gras (the week through Fat Tuesday) and the Fourth of July
+  (Jul 1-4), each with a full set.
+- **A full set** is 1 house and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and yard thing:
+  8 pieces a season (the agent's reading of "everything else"; Sam didn't change it).
+- **Short holidays** (Dentist's Day, New Year, St. Patrick's, Valentine's): the set is on sale for the 7 days ending on
+  the holiday's last day. Timmy's own outfit days stay as they are.
+- **Past seasons**: only Halloween 2026's set is free for everyone, whenever the release is.
+- **Visiting**: "Its on by default and you visit from the boards". Anyone on the boards can be visited from their name
+  there, with a switch to turn it off. A visitor sees only the place under the leaderboard name.
+- **Rank-up unlocks**: "I want it to be timmy outfit and a decoration only. Do rank only": each full rank-up gives an
+  outfit and a decoration (no house), earned by rank and never sold.
+- **Seasonal returns**: two throwback days a month, the same for everyone: a "Back for today" shelf of 3 random
+  out-of-season items at their usual price.
+- **Mastery**: draw two (a trophy case by the door and a wall plaque with gems) and Sam picks from screenshots.
 
 ## Done when
 

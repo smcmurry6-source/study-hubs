@@ -64,10 +64,14 @@ function occlusion(){
 /* ---------------- Perio: a probe in the sulcus at the gumline of a molar ---------------- */
 function perio(){
   const t = T["perio"];
-  const tooth = "M12.5 38 C10 28 11.5 15 18 12.5 C21 11.4 22.5 14 24.2 14 C26 14 27.6 11.4 30.6 12.5 C37.5 15 38.6 28 36 38 L35 56 L14 56 Z";
+  /* a molar's crown (redrawn 2026-11-10: Sam, "the tooth looks odd"): two cusps and the groove between them, the bulge of
+     the contact in its upper third, then the taper to the neck, which the gum covers */
+  const tooth = "M10.4 25.6 C8.6 18.2 11.6 11 17.8 10.4 C21 10.1 22.4 13 24.4 13 C26.4 13 27.8 10.1 31 10.4 C37.2 11 40.2 18.2 38.4 25.6 " +
+    "C37.4 29.8 35.9 33 35.6 37.4 L35 56 L14 56 L13.2 37.4 C12.9 33 11.4 29.8 10.4 25.6 Z";
   return [
-    S(tooth, C.enamel, "M30.6 13.6 C36 16 37.6 27 35.2 37 L34.2 54 L31 54 C33 42 34 26 30.6 13.6 Z", C.enamelShade),
-    H("M15.5 26 C15.6 20 17 16.5 19.5 15.4"),
+    S(tooth, C.enamel, "M31.4 11.4 C36.6 12.6 39 18.8 37.4 25.4 C36.4 29.6 34.9 33 34.6 37.4 L34.2 54 L30.6 54 C32.4 41 35.4 24 31.4 11.4 Z", C.enamelShade),
+    L("M24.4 13.4 V17.4", 1.5),
+    H("M13.2 22.6 C12.9 18.4 14.6 14.9 17.4 13.6"),
     /* the probe: handle, angled shank, and the banded tip down in the pocket on the distal side */
     ROD("M60 4.5 L48.5 16", 5.2, t.ink),
     H("M57.2 5.9 L50.6 12.4", 1.4),

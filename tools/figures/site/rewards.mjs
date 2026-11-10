@@ -12,8 +12,27 @@ const SMALL_IN = "M20.2 30 C22 32.6 24.4 34.4 24.2 37.6 C24 40.4 22.4 42 20.2 42
 
 const stroke = `stroke="${INK}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
 
-/* level 1: an ember (a 1-2 day streak), 2: a flame (3-6), 3: a blaze with sparks (7+) */
+/* the blaze (level 3's shape) in other fires: o = outer, m = middle, c = core, spark = the sparks' two fills */
+const BLAZE_IN = "M20.2 13.6 C24 20 30.4 23.4 30.2 31.8 C30 39.2 25.6 43.4 20 43.4 C14.4 43.4 10 39.6 10.2 33.2 C10.4 28.6 13 25.8 15.2 22.6 C15.6 26 17 27.8 18.8 28.4 C17.8 23.2 18.2 18 20.2 13.6 Z";
+const TONGUE = "M28.6 13.2 C31.2 16.6 34.6 18 35.6 22.6 C34.2 21.4 32.6 20.8 31 20.8";
+const STAR4 = (x, y, r) => `M${x} ${y - r} l${r * .3} ${r * .7} ${r * .7} ${r * .3} -${r * .7} ${r * .3} -${r * .3} ${r * .7} -${r * .3} -${r * .7} -${r * .7} -${r * .3} ${r * .7} -${r * .3} Z`;
+function blaze(o, m, c, spark, extra = ""){
+  return `<g class="fl-spark"><path d="${STAR4(5, 16, 4)}" fill="${spark[0]}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>` +
+    `<circle cx="35" cy="9" r="1.8" fill="${spark[1]}" stroke="${INK}" stroke-width="1.1"/></g>` +
+    `<g class="fl-out"><path d="${TONGUE}" fill="${o}" ${stroke}/><path d="${OUTER}" fill="${o}" ${stroke}/></g>` +
+    `<g class="fl-in"><path d="${BLAZE_IN}" fill="${m}"/><path d="${INNER}" fill="${c}"/>${extra}</g>` +
+    `<path d="M10.4 30.6 C10.6 26.8 12.2 23.6 14 21.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".7"/>`;
+}
+/* Dark Matter's colors, as the rank's (widget/ranks.js) */
+const DM = { deep: "#2A0F5C", mid: "#7A3CFF", light: "#B57BFF", teal: "#7FF0D2" };
+
+/* level 1: an ember (a 1-2 day streak), 2: a flame (3-6), 3: a blaze with sparks (7-9), 4: a blue blaze, the hottest
+   fire (10-29), 5: a Dark Matter blaze, deep violet with a teal core and its own stars (30 days and up; Sam, 2026-11-10) */
 export const FLAME = {
+  4: blaze("#2D7FE0", "#57C2F2", "#E4F8FF", ["#BFEAFF", "#57C2F2"]),
+  5: blaze(DM.deep, DM.mid, DM.teal, [DM.teal, DM.light],
+       `<path d="${STAR4(15.6, 36.4, 2.2)}" fill="#fff"/><path d="${STAR4(24.4, 30.6, 1.6)}" fill="#fff"/><circle cx="21.4" cy="38.8" r=".9" fill="#fff"/>`) +
+     `<g class="fl-spark"><path d="${STAR4(33.4, 34, 2.6)}" fill="${DM.light}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/></g>`,
   1: `<g class="fl-out"><path d="${SMALL}" fill="${C.orange}" ${stroke}/></g><g class="fl-in"><path d="${SMALL_IN}" fill="${C.yellow}"/></g>` +
      `<path d="M15.4 33.6 C15.6 31.4 16.6 29.8 17.6 28.6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".7"/>`,
   2: `<g class="fl-out"><path d="${OUTER}" fill="${C.orange}" ${stroke}/></g><g class="fl-in"><path d="${INNER}" fill="${C.yellow}"/></g>` +

@@ -38,7 +38,9 @@
     var t = A.tints[hub] || A.tints.generic, e = A.emblems[hub] || A.emblems.generic;
     return img('<circle cx="32" cy="32" r="31" fill="' + t.light + '"/>' + '<g transform="translate(6.4 6.4) scale(.8)">' + e.body + "</g>", e.label, cls, "0 0 64 64");
   }
-  function flame(level, cls){ return art(A.flame[level], "0 0 40 48", "flame " + (cls || ""), level === 3 ? "A blazing streak" : level === 2 ? "A streak" : "A new streak"); }
+  function flame(level, cls){ return art(A.flame[level], "0 0 40 48", "flame " + (cls || ""), ["", "A new streak", "A streak", "A blazing streak", "A blue-hot streak", "A Dark Matter streak"][level]); }
+  /* the flame for a streak: it grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30 (Sam, 2026-11-10) */
+  function flameLevel(days){ return days >= 30 ? 5 : days >= 10 ? 4 : days >= 7 ? 3 : days >= 3 ? 2 : 1; }
   function xpSpark(){ return art(A.xp, "0 0 24 24", ""); }
   function ring(done, of, cls){
     var r = 15, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, done / of));
@@ -252,17 +254,27 @@
       var open = {};
       $$(".ch", el).forEach(function(b){ if (b.classList.contains("is-wrong") || b.classList.contains("is-missed")) open[b.dataset.i] = 1; });
       if (!Object.keys(open).length) open[picked[0]] = 1;
-      var whys = '<div class="why"><h4>Why each choice</h4>' + q.choices.map(function(c, i){
+      /* folded until the student taps it, as widget/hub.js draws it (Sam, 2026-11-06 and 2026-11-10) */
+      var whys = '<details class="why"><summary class="why-bar"><span>Why each choice</span><span class="chev">' + icon("chevron", 16) + "</span></summary>" + q.choices.map(function(c, i){
         var b = $('.ch[data-i="' + i + '"]', el), tag = b.classList.contains("is-wrong") ? "Your pick" : b.classList.contains("is-right") && picked.indexOf(i) > -1 ? "Your pick" : b.classList.contains("is-missed") ? "You missed this one" : "";
         var st = b.classList.contains("is-right") ? "right" : b.classList.contains("is-wrong") ? "wrong" : b.classList.contains("is-missed") ? "missed" : "";
         return "<details" + (open[i] ? " open" : "") + '><summary><span class="tick" style="color:' + (st === "wrong" ? "var(--wrong)" : st ? "var(--right)" : "var(--muted)") + '">' + (st ? mark(multi ? "box" : "ring", st) : mark(multi ? "box" : "ring")) + "</span><span>" + esc(c) +
           (tag ? ' <span class="tag">· ' + tag + "</span>" : "") + '</span><span class="chev">' + icon("chevron", 16) + "</span></summary><p>" + esc(q.why[i]) + "</p></details>";
-      }).join("") + "</div>";
+      }).join("") + "</details>";
       var res = $(".qc-result", el);
       res.innerHTML = verdict + '<p class="qc-ex">' + esc(q.ex) + ' <a href="#formats">Find this in the notes</a></p>' + whys +
         '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + 'Try it again</button><span class="grow"></span>' +
-        '<span class="thumbs">Good question?<button class="btn btn-icon" type="button" aria-label="Good question">' + icon("thumbup", 18) + '</button><button class="btn btn-icon" type="button" aria-label="Not a good question">' + icon("thumbdown", 18) + "</button></span></div>";
+        '<span class="thumbs"><span class="thumbs-q" aria-live="polite">Good question?</span><button class="btn btn-icon" type="button" data-thumb="up" aria-pressed="false" aria-label="Good question">' + icon("thumbup", 18) + '</button><button class="btn btn-icon" type="button" data-thumb="down" aria-pressed="false" aria-label="Not a good question">' + icon("thumbdown", 18) + "</button></span></div>";
       res.hidden = false;
+      /* the thumbs: the one you tap pops and fills (up: with a few sparks; down: a small dip), and the line thanks you */
+      $$("[data-thumb]", res).forEach(function(b){ b.addEventListener("click", function(){
+        var on = b.getAttribute("aria-pressed") !== "true", up = b.dataset.thumb === "up";
+        $$("[data-thumb]", res).forEach(function(o){ o.setAttribute("aria-pressed", "false"); o.classList.remove("pop"); $$(".thumb-spark", o).forEach(function(x){ o.removeChild(x); }); });
+        $(".thumbs-q", res).textContent = !on ? "Good question?" : up ? "Thanks! Glad it helped." : "Thanks. We'll take a look.";
+        if (!on) return;
+        b.setAttribute("aria-pressed", "true"); void b.offsetWidth; b.classList.add("pop");
+        if (up && !reduced) for (var i = 0; i < 5; i++) { var sp = document.createElement("i"); sp.className = "thumb-spark"; sp.style.setProperty("--a", (-150 + i * 30) + "deg"); sp.style.animationDelay = (i * 18) + "ms"; b.appendChild(sp); }
+      }); });
       $("[data-again]", res).addEventListener("click", function(){ var n = card(q, opt); el.replaceWith(n); if (opt.live) n.querySelector(".ch").focus(); });
       if (opt.live && !opt.silent) reward(from, right, xp);
     }
@@ -295,7 +307,7 @@
           state.streak++;
           setTimeout(function(){
             $$("[data-streak]").forEach(function(n){ n.textContent = state.streak + " days"; });
-            $$("[data-flame]").forEach(function(f){ var lvl = state.streak >= 7 ? 3 : state.streak >= 3 ? 2 : 1; var n = h(flame(lvl, "grow-in")); n.setAttribute("data-flame", "1"); f.replaceWith(n); });
+            $$("[data-flame]").forEach(function(f){ var lvl = flameLevel(state.streak); var n = h(flame(lvl, "grow-in")); n.setAttribute("data-flame", "1"); f.replaceWith(n); });
             $$("[data-goalcap]").forEach(function(n){ n.textContent = "Goal met. Your streak grows to " + state.streak + " days."; });
             react(true, "Goal met! " + state.streak + " days in a row.");
           }, 900);
@@ -357,7 +369,7 @@
   function buildHub(){
     var hub = root.dataset.hub, H = HUBS[hub] || HUBS.generic, d = daysTo(H.date), M = A.mastheads[hub] || A.mastheads.generic;
     var hp = A.handpieces[3];
-    var lvl = state.streak >= 7 ? 3 : state.streak >= 3 ? 2 : 1;
+    var lvl = flameLevel(state.streak);
     var count = d == null ? '<b>Soon</b><span>a countdown once the date is set</span>' : d > 1 ? '<b class="num">' + d + '</b><span>days to go</span>' : d === 1 ? '<b>Tomorrow</b><span>one more evening</span>' : d === 0 ? '<b>Today</b><span>good luck</span>' : '<b>Done</b><span>this exam has passed</span>';
     var frame = '<div class="hubframe">' +
       '<nav class="hubbar" aria-label="' + esc(H.name) + ' hub">' +
@@ -473,8 +485,8 @@
         '<figure><span class="tim" id="flinchTim">' + timmy("scared") + '</span><figcaption><span class="say">So close. Read why.</span></figcaption></figure></div>' +
         '<div class="qc-go"><button class="btn" type="button" id="playTim">' + icon("play", 18) + "Play it</button></div></div>" +
       '<div class="s6 stack">' +
-        '<div class="panel"><h3>The streak flame</h3><p>A day counts when you meet your goal. The flame grows at 3 days and blazes at 7.</p><div class="panel-body flames">' +
-          [[1, "1 day"], [2, "4 days"], [3, "7 days and up"]].map(function(f){ return "<figure>" + flame(f[0]) + "<figcaption>" + f[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
+        '<div class="panel"><h3>The streak flame</h3><p>A day counts when you meet your goal. The flame grows at 3 days, blazes at 7, burns blue at 10 and turns Dark Matter at 30.</p><div class="panel-body flames">' +
+          [[1, "1 day"], [2, "3 days"], [3, "7 days"], [4, "10 days: blue"], [5, "30 days: Dark Matter"]].map(function(f){ return "<figure>" + flame(f[0]) + "<figcaption>" + f[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
         '<div class="panel"><h3>The daily goal</h3><p>20 questions a day unless you change it; Timmy cheers when the ring closes.</p><div class="panel-body rings">' +
           [[0, "Not started"], [12, "12 of 20"], [20, "Done"]].map(function(r){ return "<figure>" + ring(r[0], 20) + "<figcaption>" + r[1] + "</figcaption></figure>"; }).join("") + "</div></div>" +
       "</div>" +
@@ -628,11 +640,11 @@
   function timmyG(svg){ return '<g class="tp-tface"><svg x="-18" y="-46.1" width="36" height="47.2" viewBox="0 -30 200 262" overflow="visible">' + svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "") + "</svg></g>"; }
   function fmtPrice(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
   var COIN = null;
-  function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Free</span>'; }
-  function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Free") + "</i>"; }
+  function price(n){ if (!COIN) COIN = img(TP.coin(), "Shiny Gold Crowns", "tp-coin", "0 0 24 24"); return n ? '<span class="tp-price">' + COIN + fmtPrice(n) + "</span>" : '<span class="tp-price free">Default</span>'; }
+  function rarTag(r){ return '<i class="tp-rar r-' + (r || "free") + '">' + esc(r || "Default") + "</i>"; }
   /* a piece's rarity and price for a caption: free things just say so */
   function tagLine(x){ return x.rarity ? rarTag(x.rarity) + " " + price(x.price || 0) : rarTag(""); }
-  function sentence(t){ t = String(t || "").replace(/^(Free|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function sentence(t){ t = String(t || "").replace(/^(Free|Default|Uncommon|Rare|Epic|Legendary): /, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
   function lowerFirst(t){ return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
   /* a still picture of a place, Timmy at a spot when asked (vb: the crop, from the kit's own viewBox) */
   function placeFig(o, cap, sub, timmySpot, cls, outfit){

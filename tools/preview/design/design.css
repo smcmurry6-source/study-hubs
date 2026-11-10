@@ -23,6 +23,7 @@
   --on-primary: #ffffff;
   --gold: #e2a72e;           /* the accent: rewards (XP, the goal ring, the rank) */
   --gold-ink: #8a5d00;       /* gold as text: 5.6:1 */
+  --xp-lo: #805400; --xp-mid: #a97600; --xp-hi: #d09a12; --xp-shine: #ffe9a3; --xp-edge: rgba(90, 52, 0, .25);   /* shiny gold XP text */
   --flame: #f59a1e;
   --right: #247b50; --right-bg: #dcf5e5; --right-ink: #0f4a2c;
   --wrong: #c4242a; --wrong-bg: #ffe9e6; --wrong-ink: #831c1e;
@@ -54,6 +55,7 @@
   --text: #f5f2f4; --muted: #b8b0b6;
   --primary: #f5f2f4; --on-primary: #2b2230;
   --gold: #f2c14e; --gold-ink: #f2c14e; --flame: #f7a83c;
+  --xp-lo: #c98a1a; --xp-mid: #f2c14e; --xp-hi: #ffe9a3; --xp-shine: #ffffff; --xp-edge: rgba(0, 0, 0, .55);
   --right: #4cc38a; --right-bg: #173022; --right-ink: #8fe0b6;
   --wrong: #f0727a; --wrong-bg: #3a1b1f; --wrong-ink: #f7a9ae;
   --track: #353135;
@@ -256,15 +258,27 @@ img.emb-disc, .big, .small img { display: block; }
 .verdict .ic { width: 26px; height: 26px; }
 .verdict.ok { color: var(--right); } .verdict.no { color: var(--wrong); } .verdict.part { color: var(--gold-ink); }
 .verdict .xp { margin-left: auto; color: var(--gold-ink); font-size: var(--fs-label); }
+/* XP text is a shiny gold (Sam, 2026-11-10): gold leaf with a sheen that sweeps across now and then. The fallback color
+   is the plain gold ink; reduced motion keeps the sheen still. */
+.verdict .xp, .rankpill .xpn, #phoneXp .num, dd[data-xptoday], .xp-gold { font-weight: var(--w-head);
+  background: linear-gradient(100deg, transparent 42%, var(--xp-shine) 50%, transparent 58%) 130% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, var(--xp-hi) 8%, var(--xp-mid) 46%, var(--xp-lo) 58%, var(--xp-mid) 96%);
+  -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 .5px 0 var(--xp-edge)); animation: xp-sheen 3.6s ease-in-out infinite; }
+@keyframes xp-sheen { 0%, 55% { background-position: 130% 0, 0 0; } 100% { background-position: -30% 0, 0 0; } }
 .qc-ex { margin-top: 8px; font-size: var(--fs-body); line-height: 1.55; }
 .qc-ex a { color: var(--hub-text); font-weight: var(--w-strong); text-decoration-thickness: 1.5px; text-underline-offset: 3px; white-space: nowrap; }
-.why { margin-top: 14px; }
-.why h4 { font-size: var(--fs-label); font-weight: var(--w-head); }
-.why details { margin-top: 6px; border-radius: var(--r-row); background: var(--row); }
-.why summary { display: grid; grid-template-columns: 22px 1fr 18px; gap: 10px; align-items: center; padding: 10px 14px; font-size: var(--fs-label); cursor: pointer; list-style: none; }
+/* "Why each choice": one folded bar, as widget/hub.css has it; the choices open inside it */
+.why { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--r-row); }
+.why > .why-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 8px 14px;
+  font-size: var(--fs-label); font-weight: var(--w-head); cursor: pointer; list-style: none; border-radius: var(--r-row); }
+.why > .why-bar:hover { background: var(--row); }
+.why[open] { padding-bottom: 8px; }
+.why details { margin: 6px 8px 0; border-radius: var(--r-row); background: var(--row); }
+.why details summary { display: grid; grid-template-columns: 22px 1fr 18px; gap: 10px; align-items: center; padding: 10px 14px; font-size: var(--fs-label); cursor: pointer; list-style: none; }
 .why summary::-webkit-details-marker { display: none; }
-.why summary .chev { transition: transform var(--t-ui) var(--ease-out); color: var(--muted); }
-.why details[open] summary .chev { transform: rotate(90deg); }
+.why summary .chev { display: flex; transition: transform var(--t-ui) var(--ease-out); color: var(--muted); }
+.why[open] > .why-bar .chev, .why details[open] summary .chev { transform: rotate(90deg); }
 .why details p { padding: 0 14px 12px 46px; font-size: var(--fs-label); line-height: 1.5; color: var(--text); }
 .why .tag { font-size: var(--fs-meta); color: var(--muted); }
 .why .tick { width: 22px; height: 22px; }
@@ -272,6 +286,20 @@ img.emb-disc, .big, .small img { display: block; }
 .qc-after { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .qc-after .grow { flex: 1; }
 .thumbs { display: flex; align-items: center; gap: 2px; font-size: var(--fs-meta); color: var(--muted); }
+.thumbs-q { margin-right: 4px; }
+/* the thumbs: the one you tap fills, pops and tilts (up: sparks fly; down: it dips) */
+.thumbs .btn-icon { position: relative; transition: color var(--t-ui) var(--ease-out), background var(--t-ui) var(--ease-out); }
+.thumbs .btn-icon[aria-pressed="true"] { color: var(--right); background: color-mix(in srgb, var(--right) 14%, transparent); }
+.thumbs .btn-icon[data-thumb="down"][aria-pressed="true"] { color: var(--wrong); background: color-mix(in srgb, var(--wrong) 12%, transparent); }
+.thumbs .btn-icon[aria-pressed="true"] .ic path:first-child { fill: currentColor; fill-opacity: .22; }
+.thumbs .btn-icon.pop .ic { animation: thumb-up 520ms var(--ease-out); transform-origin: 30% 80%; }
+.thumbs .btn-icon[data-thumb="down"].pop .ic { animation-name: thumb-down; transform-origin: 30% 20%; }
+@keyframes thumb-up { 0% { transform: scale(.7) rotate(18deg); } 45% { transform: scale(1.32) rotate(-16deg); } 70% { transform: scale(.96) rotate(4deg); } 100% { transform: none; } }
+@keyframes thumb-down { 0% { transform: scale(.8) rotate(-12deg); } 40% { transform: translateY(5px) scale(1.2) rotate(12deg); } 70% { transform: translateY(-1px) rotate(-3deg); } 100% { transform: none; } }
+.thumb-spark { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: var(--gold); pointer-events: none;
+  opacity: 0; animation: thumb-spark 560ms var(--ease-out) forwards; }
+.thumb-spark:nth-child(odd) { background: var(--right); }
+@keyframes thumb-spark { 0% { opacity: 1; transform: rotate(var(--a)) translateX(6px) scale(.6); } 70% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(24px) scale(1); } }
 
 .recall-face { margin-top: 14px; padding: 20px; background: var(--row); border-radius: var(--r-row); border: 1px solid var(--border); min-height: 120px; }
 .recall-face p { font-size: var(--fs-body); line-height: 1.55; }
