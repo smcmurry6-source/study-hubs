@@ -115,6 +115,10 @@ markers, so a Patient Box question can name a case (`pcase`) and get a chart, fi
 ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)). Its own case pictures (`CASE_IMG`, `pimg`: casts,
 marks, the TMJ view) stay as they are; use the kit for any new perio chart or radiograph.
 
+- **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
+  after `nums()`, followed by two of each for L6-L8 (`in-`, `mo-`, `dn-` + `ws-`/`wf-`). Each new final lecture needs at
+  least one of each (CI); the midterm lectures are grandfathered. `rv-mip-dynamic`, `rv-cf` and `ap-mip` are tagged `which`.
+
 ## Pending
 
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)

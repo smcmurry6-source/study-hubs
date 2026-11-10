@@ -39,6 +39,7 @@ Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md)
 - [Two-statement and true/false questions](rules/two-statement-and-true-false.md) (CI minimums per taught lecture)
 - [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture)
+- ["Which statement is true / false?" questions](rules/which-statement-questions.md) (CI minimum per taught lecture)
 - [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture.
 - [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins.
 - [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).

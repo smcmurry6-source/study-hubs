@@ -3533,6 +3533,224 @@ function nums(id, lec, src, lead, stmts, truth, wrong, ex, reasons, extra){
 /* Patient cases: one Patient Box (and its drawn findings) shared by every question on that patient. pc(key) gives
 /* mq(): a multiple-choice question whose choices carry their own "why" line: [[choice, why], ...], key first */
 function mq(id, lec, src, stem, pairs, ex, extra){ mcq(id, lec, src, stem, pairs.map(function(p){ return p[0]; }), ex, extra); QUESTIONS[QUESTIONS.length - 1].why = pairs.map(function(p){ return p[1]; }); }
+/* "Which statement" items: which() (fmt 'which': one true statement, three false) and whichf() (fmt 'whichf': one false,
+   three true). Four statements that each stand alone, key first, [statement, why] pairs as in mq(); the choices shuffle.
+   Sam, 2026-11-10: vault/rules/which-statement-questions.md. */
+function which(id, lec, src, stem, pairs, ex, extra){ mq(id, lec, src, stem, pairs, ex, extra); QUESTIONS[QUESTIONS.length - 1].fmt = 'which'; }
+function whichf(id, lec, src, stem, pairs, ex, extra){ mq(id, lec, src, stem, pairs, ex, extra); QUESTIONS[QUESTIONS.length - 1].fmt = 'whichf'; }
+/* ---------- Which statement items ----------
+   "Which statement is true?" (which) and "Which statement is false?" (whichf) items, two of each per lecture
+   (Sam, 2026-11-10). Written from this hub's notes and cram sheet; each choice carries its why. */
+which("dm-ws-insulin", "dmpharm", "slides",
+  "Which statement about how long the insulins act is true?",
+  [["Regular insulin peaks at about 3 hours and is gone by about 8 hours", "Regular (short-acting) insulin peaks around 3 hours and wears off by about 8."],
+   ["Lispro, aspart and glulisine start in 5 to 15 minutes and last about 12 hours", "The rapid insulins do start in 5 to 15 minutes, but they last about 4 hours, not 12."],
+   ["Glargine lasts more than 24 hours, with a sharp peak at about 6 hours", "Glargine is the peakless basal insulin: more than 24 hours with no peak."],
+   ["Inhaled Afrezza starts acting in about 2 to 4 hours, like NPH", "The 2 to 4 hour onset is NPH's; Afrezza starts in 1 to 2 minutes."]],
+  "Rapid (lispro, aspart, glulisine): onset 5 to 15 minutes, about 4 hours. Regular: peak about 3 hours, gone by 8. NPH: onset 2 to 4 hours. Glargine: more than 24 hours, no peak; degludec more than 42 hours. Afrezza (inhaled): 1 to 2 minutes.");
+which("dm-ws-alpha", "dmpharm", "slides",
+  "Which statement about acarbose and miglitol is true?",
+  [["They block brush-border alpha-glucosidase, so flatulence and bloating are common", "Undigested carbohydrate reaches the colon and ferments: flatulence, bloating and diarrhea."],
+   ["They block brush-border alpha-glucosidase, and hypoglycemia is their main adverse effect", "On their own they cause no hypoglycemia; their adverse effects are in the gut."],
+   ["They block the SGLT2 transporter in the kidney, so flatulence and bloating are common", "Blocking SGLT2 is what the gliflozins do; acarbose and miglitol act in the gut."],
+   ["They close the beta cell K-ATP channel, so flatulence and bloating are common", "Closing the K-ATP channel is how sulfonylureas release insulin."]],
+  "Acarbose and miglitol block alpha-glucosidase at the intestinal brush border, so carbohydrate is absorbed more slowly. The undigested sugar ferments in the colon (flatulence, bloating, diarrhea), and they cause no hypoglycemia on their own.");
+whichf("dm-wf-tzd", "dmpharm", "slides",
+  "Which statement about the thiazolidinediones (pioglitazone, rosiglitazone) is false?",
+  [["They are safe to start in NYHA class III or IV heart failure", "This is the false one: they cause fluid retention and are avoided in NYHA class III and IV heart failure."],
+   ["They act on PPAR-gamma, a nuclear receptor", "This is true: TZDs are PPAR-gamma agonists, and PPAR-gamma is a nuclear receptor."],
+   ["They can cause edema, weight gain and macular edema", "This is true: fluid retention drives the edema, weight gain, heart failure and macular edema."],
+   ["They are avoided when ALT is over 2.5 times the upper limit of normal", "This is true: the lecture gives ALT over 2.5 times normal as a reason not to use them."]],
+  "TZDs act on PPAR-gamma, a nuclear receptor. Their problems come from fluid retention: edema, weight gain, heart failure and macular edema. Avoid them in NYHA class III and IV heart failure and when ALT is over 2.5 times normal.");
+whichf("dm-wf-su", "dmpharm", "slides",
+  "Which statement about the sulfonylureas is false?",
+  [["They lower glucose even in a patient with no working beta cells", "This is the false one: they work by making beta cells release insulin, so they need working beta cells."],
+   ["They close the beta cell K-ATP channel, so calcium enters and insulin is released", "This is true: closing the channel depolarizes the cell, calcium enters and insulin is released."],
+   ["Patients with G6PD deficiency need caution with them", "This is true: G6PD deficiency is one of the lecture's sulfonylurea warnings."],
+   ["Taken with alcohol, they can cause a disulfiram-like reaction", "This is true: flushing, nausea and headache with alcohol, a disulfiram-like reaction."]],
+  "Sulfonylureas close the beta cell K-ATP channel: depolarization, calcium in, insulin out. They need working beta cells, and as those fail the dose climbs until the drug stops working. Warnings: G6PD deficiency, liver and kidney disease, and a disulfiram-like reaction with alcohol.");
+which("p1-ws-adenoma", "path1", "slides",
+  "Which statement about pituitary adenomas is true?",
+  [["Gonadotroph adenomas cause no hormone syndrome and are found by their mass effect", "Gonadotroph adenomas make FSH and LH but have no clinical syndrome, so they surface as macroadenomas through mass effect."],
+   ["Prolactinomas are the least common hyperfunctioning pituitary tumor", "Prolactinomas are the most common hyperfunctioning pituitary tumor."],
+   ["Somatotroph adenomas are usually the smallest pituitary adenomas, most under 10 mm across", "Somatotroph adenomas are the largest, and mass effects are frequent."],
+   ["A microadenoma is over 10 mm across and a macroadenoma is under 10 mm", "That swaps them: a microadenoma is under 10 mm, a macroadenoma over 10 mm."]],
+  "Prolactinoma: the most common hyperfunctioning type, usually a microadenoma. Somatotroph: the largest. Gonadotroph: no syndrome, found by mass effect. Micro means under 10 mm, macro over 10 mm.");
+which("p1-ws-spread", "path1", "slides",
+  "Which statement about how thyroid carcinomas spread is true?",
+  [["Papillary carcinoma spreads by lymphatics; follicular carcinoma spreads by blood", "Papillary goes to the lymph nodes; follicular invades vessels and spreads by blood."],
+   ["Papillary carcinoma spreads by blood; follicular carcinoma spreads by lymphatics", "That swaps them: papillary is the lymphatic one, follicular the one that travels by blood."],
+   ["Follicular carcinoma spreads by blood, and its usual targets are the liver and spleen", "Follicular carcinoma does spread by blood, but to the lung and bone."],
+   ["Papillary carcinoma spreads by lymphatics and is usually a single focus in one lobe", "Papillary carcinoma is often multifocal, which is why the whole thyroid comes out."]],
+  "Papillary: lymphatics to the lymph nodes, often multifocal (total thyroidectomy). Follicular: capsular or vascular invasion and spread by blood to the lung and bone.");
+whichf("p1-wf-graves", "path1", "slides",
+  "Which statement about Graves disease is false?",
+  [["It is more common in men than in women", "This is the false one: Graves disease affects women about 5 times as often as men."],
+   ["IgG antibodies stimulate the TSH receptor", "This is true: an IgG autoantibody stimulates the TSH receptor, so the gland overproduces."],
+   ["It is the most common cause of endogenous hyperthyroidism", "This is true: Graves disease is the most common cause of endogenous hyperthyroidism."],
+   ["Diffuse hyperplasia, goiter and ophthalmopathy are typical", "This is true: the whole gland is hyperplastic and enlarged, and Graves ophthalmopathy is part of it."]],
+  "Graves disease: an IgG autoantibody stimulates the TSH receptor, causing diffuse hyperplasia, goiter and ophthalmopathy. It is the most common cause of endogenous hyperthyroidism, women 5 to 1.");
+whichf("p1-wf-hypopit", "path1", "slides",
+  "Which statement about hypopituitarism is false?",
+  [["Sheehan syndrome is ischemic necrosis of the posterior pituitary around delivery", "This is the false one: Sheehan syndrome is ischemic necrosis of the anterior pituitary, which is why she can't breastfeed."],
+   ["Symptoms appear only after about 75 percent of the anterior pituitary is lost", "This is true: the gland has a large reserve, so about 75 percent must be lost."],
+   ["A null cell adenoma makes no hormone but can shut down the normal gland as a mass", "This is true: a nonsecretory adenoma causes hypopituitarism by pressing on the normal gland."],
+   ["A hypothalamic tumor can cause it by stopping the releasing factors", "This is true: a hypothalamic disorder can stop the releasing factors, a less common cause."]],
+  "Hypopituitarism appears once about 75 percent of the anterior pituitary is lost. Causes include null cell adenomas, Sheehan syndrome (postpartum ischemic necrosis of the anterior pituitary) and, less often, a hypothalamic tumor.");
+which("p2-ws-pheo", "path2", "slides",
+  "Which statement about pheochromocytoma is true?",
+  [["Its tumor cells form nests called zellballen", "Pheochromocytoma's chromaffin cells grow in nests, the zellballen."],
+   ["It is a tumor of the adrenal cortex's zona fasciculata", "It is a tumor of the chromaffin cells of the adrenal medulla, not the cortex."],
+   ["It secretes cortisol, causing attacks of sweating and palpitations", "It secretes catecholamines; cortisol comes from the zona fasciculata."],
+   ["Its attacks bring sweating, palpitations and low blood pressure", "The catecholamine surges raise blood pressure: the attacks are hypertensive."]],
+  "Pheochromocytoma: a tumor of the medulla's chromaffin cells that secretes catecholamines, with attacks of sweating, palpitations and hypertension. Rule of 10s; its cells form zellballen.");
+whichf("p2-wf-nb", "path2", "slides",
+  "Which statement about neuroblastoma is false?",
+  [["It is a slow-growing tumor found mostly in adults over 50", "This is the false one: neuroblastoma is very aggressive, and about 80 percent of cases are in children under 5."],
+   ["About 80 percent of cases are in children under 5", "This is true: neuroblastoma is a tumor of young children."],
+   ["It spreads to bone, liver, lung and lymph nodes", "This is true: those are its sites of spread."],
+   ["In adults, olfactory neuroblastoma arises in the roof of the nose", "This is true: the adult form, olfactory neuroblastoma, sits in the roof of the nasal cavity."]],
+  "Neuroblastoma: very aggressive, 80 percent under age 5, arising along the sympathetic chain (the abdomen most often) and spreading to bone, liver, lung and lymph nodes. Adults get olfactory neuroblastoma in the roof of the nose.");
+whichf("p2-wf-aldo", "path2", "slides",
+  "Which statement about aldosterone and hyperaldosteronism is false?",
+  [["In Conn syndrome, aldosterone and renin are both high", "This is the false one: in Conn syndrome (primary) the high aldosterone suppresses renin, so renin is low."],
+   ["Renal artery stenosis raises both aldosterone and renin", "This is true: in secondary hyperaldosteronism, renin drives the aldosterone, so both are high."],
+   ["Aldosterone makes the kidney take back sodium and dump potassium", "This is true: aldosterone retains sodium and excretes potassium."],
+   ["Heart failure can cause secondary hyperaldosteronism", "This is true: CHF and renal artery stenosis are the lecture's causes of the secondary form."]],
+  "Aldosterone takes back sodium and dumps potassium. Primary (Conn): aldosterone high, renin low. Secondary (heart failure, renal artery stenosis): aldosterone high and renin high.");
+which("dc-ws-calcium", "dental", "slides",
+  "Which statement about how the body regulates calcium is true?",
+  [["Calcitonin comes from the thyroid when calcium rises and reverses PTH's effects on bone", "Calcitonin is the thyroid's answer to high calcium: it reverses PTH's effects on bone cells."],
+   ["Calcitonin comes from the parathyroids when calcium rises and reverses PTH's effects on bone", "Calcitonin is made in the thyroid (its C cells); the parathyroids make PTH."],
+   ["PTH raises blood calcium by making the kidney excrete more calcium", "PTH makes the kidney reabsorb calcium, not excrete it."],
+   ["Vitamin D, the long-term regulator of calcium, is activated in the liver", "Dr. Taylor's slide has vitamin D activated in the kidney."]],
+  "PTH is the fast-acting regulator: osteoclast resorption, calcium reabsorption in the kidney and calcitriol so the gut absorbs calcium. Vitamin D, activated in the kidney, is the long-term one. Calcitonin, from the thyroid when calcium rises, reverses PTH's effects on bone cells.");
+which("dc-ws-thyroid", "dental", "slides",
+  "Which statement about thyroid disease and dental care is true?",
+  [["Hypothyroidism in children delays eruption; hyperthyroidism accelerates it", "Too little thyroid hormone slows eruption; too much speeds it up."],
+   ["Hyperthyroidism in children delays eruption; hypothyroidism accelerates it", "That swaps them: hyperthyroidism accelerates eruption and hypothyroidism delays it."],
+   ["Hypothyroidism brings tachycardia and heat intolerance, so limit vasoconstrictor", "Tachycardia, heat intolerance and epinephrine sensitivity belong to uncontrolled hyperthyroidism."],
+   ["Hyperthyroidism brings macroglossia and delayed wound healing", "Macroglossia and delayed wound healing are findings of hypothyroidism."]],
+  "Hyperthyroid: weight loss, tachycardia, heat intolerance, more sensitivity to epinephrine (avoid excessive vasoconstrictor when uncontrolled), accelerated eruption. Hypothyroid, seen far more often: fatigue, weight gain, bradycardia, delayed eruption, macroglossia, delayed wound healing.");
+whichf("dc-wf-addison", "dental", "slides",
+  "Which statement about a patient with Addison disease in the dental chair is false?",
+  [["The oral pigmentation comes from low ACTH stimulating melanocytes", "This is the false one: ACTH is high in Addison disease, and the high ACTH stimulates the melanocytes."],
+   ["Hypotension, fatigue and hyperpigmentation are typical", "This is true: those are the findings on Dr. Taylor's slide."],
+   ["A long or stressful surgery can trigger an adrenal crisis, so the steroid dose may be raised", "This is true: after a big procedure the patient may need extra corticosteroid, the dose set with the physician."],
+   ["Severe hypotension and confusion are signs of an adrenal crisis", "This is true: severe hypotension, weakness, confusion, loss of consciousness and shock."]],
+  "Addison disease: hypotension, fatigue and hyperpigmentation, with diffuse oral melanosis because high ACTH stimulates melanocytes. Long or stressful surgery, infection, trauma or a missed steroid dose can trigger an adrenal crisis.");
+whichf("dc-wf-dmmouth", "dental", "slides",
+  "Which statement about diabetes and the mouth is false?",
+  [["Periodontal disease affects glycemic control, but not the other way around", "This is the false one: the link is bidirectional; diabetes worsens periodontal disease, and periodontal inflammation worsens glycemic control."],
+   ["Xerostomia, candidiasis and burning mouth syndrome are oral findings", "This is true: all three are on Dr. Taylor's list of oral manifestations."],
+   ["Decreased neutrophil function and a poor blood supply are reasons diabetic wounds heal poorly", "This is true: with impaired collagen synthesis, they explain poor diabetic healing."],
+   ["An HbA1c above 7 percent raises the risk of implant failure", "This is true: above 7 is poorly controlled, with more implant failure and periodontal disease."]],
+  "Diabetes in the mouth: xerostomia, candidiasis, burning mouth syndrome, delayed healing, more periodontal disease and caries. The periodontal link runs both ways. Poor healing comes from decreased neutrophil function, poor blood supply and impaired collagen synthesis.");
+which("mh-ws-spg", "mhisto", "rec",
+  "Which statement about the spermatogonia is true?",
+  [["Pale type A spermatogonia are the progenitors, with a central nucleolus and no vacuole", "Pale type A cells are the progenitors: no nuclear vacuole and a central nucleolus."],
+   ["Dark type A spermatogonia are the progenitors, with a central nucleolus and no nuclear vacuole", "Dark type A cells are the reserve stem cells, with a nuclear vacuole and a peripheral nucleolus."],
+   ["Type B spermatogonia are the reserve stem cells, with a nuclear vacuole", "The reserve stem cells are the dark type A spermatogonia; type B cells go on to become primary spermatocytes."],
+   ["Type B spermatogonia sit in the adluminal compartment, above the tight junctions", "Spermatogonia, type B included, sit in the basal compartment; primary spermatocytes are the ones that move past the junctions."]],
+  "Dark type A: the reserve stem cell, with a nuclear vacuole and a peripheral nucleolus. Pale type A: the progenitor, no vacuole and a central nucleolus. Type B spermatogonia become primary spermatocytes, which move into the adluminal compartment.");
+whichf("mh-wf-testis", "mhisto", "slides",
+  "Which statement about the testis and its seminiferous tubules is false?",
+  [["The tubule's epithelium contains Sertoli cells, spermatogenic cells and Leydig cells", "This is the false one: the epithelium has only Sertoli cells and spermatogenic cells; Leydig cells sit in the connective tissue between the tubules."],
+   ["Septa running in from the thick tunica albuginea divide the testis into about 250 lobules", "This is true: the septa make about 250 lobules."],
+   ["Each lobule holds several blind-ended, coiled seminiferous tubules", "This is true: each lobule has several coiled tubules."],
+   ["Peritubular myoid cells lie in the tubule's outer wall", "This is true: the wall is connective tissue with peritubular myoid cells."]],
+  "The thick tunica albuginea sends septa in, making about 250 lobules, each with several blind-ended, coiled seminiferous tubules. The wall: connective tissue and peritubular myoid cells. The epithelium: only Sertoli cells and spermatogenic cells. Leydig cells lie between the tubules.");
+whichf("mh-wf-vas", "mhisto", "rec",
+  "Which statement about the vas deferens and the ducts beyond it is false?",
+  [["The vas deferens joins the prostate's duct to form the ejaculatory duct", "This is the false one: the vas joins the duct of the seminal vesicle to form the ejaculatory duct."],
+   ["The vas deferens has a thick muscular wall and stereocilia", "This is true: a straight duct with a thick muscular wall, lined with stereocilia."],
+   ["The testicular artery and pampiniform plexus run in the spermatic cord with the vas", "This is true: Dr. Herr said those are the only two other parts of the cord to know."],
+   ["The ejaculatory duct passes through the prostate to the urethra", "This is true: the ejaculatory duct runs through the prostate and opens into the urethra."]],
+  "Vas deferens: straight, a thick muscular wall, stereocilia; it runs in the spermatic cord with the testicular artery and the pampiniform plexus. The vas and the seminal vesicle's duct form the ejaculatory duct, which passes through the prostate into the urethra.");
+which("fh-ws-stages", "fhisto", "slides",
+  "Which statement about the stages of the ovarian follicle is true?",
+  [["An early primary follicle has one layer of cuboidal granulosa cells", "The early primary follicle's single layer has turned cuboidal: these are now granulosa cells."],
+   ["A primordial follicle has one layer of cuboidal granulosa cells", "A primordial follicle's single layer is squamous; cuboidal cells mark the early primary follicle."],
+   ["A late primary follicle already has an antrum filled with liquor folliculi", "Liquor folliculi and an antrum are what make a follicle secondary; the late primary has several layers but no antrum."],
+   ["A Graafian follicle is about 2 mm across and lies deep in the ovary", "A Graafian follicle is about 20 mm and bulges from the surface of the ovary."]],
+  "Primordial: one layer of squamous cells. Early primary: one layer of cuboidal granulosa cells. Late primary: several layers, theca forming. Secondary: liquor folliculi and an antrum. Graafian: about 20 mm, bulging on the ovary.");
+which("fh-ws-vagina", "fhisto", "slides",
+  "Which statement about the vagina and cervix is true?",
+  [["The vagina's lining is stratified squamous epithelium with no glands", "Stratified squamous epithelium, and no glands."],
+   ["The vagina's lining is simple columnar epithelium with many mucous glands", "Simple columnar mucus-secreting epithelium lines the cervical canal, not the vagina, and the vagina has no glands."],
+   ["Lactobacillus turns the vagina's glycogen into acetic acid, which keeps pathogens down", "Lactobacillus makes lactic acid from the glycogen."],
+   ["Cervical mucus is thick and viscous at ovulation and watery in pregnancy", "That swaps them: watery at ovulation, a viscous plug in pregnancy."]],
+  "Vagina: stratified squamous, no glands; Lactobacillus turns glycogen into lactic acid, which keeps pathogens down. Cervix: mucus-secreting columnar crypts; watery mucus at ovulation, a viscous plug in pregnancy; the transformation zone meets stratified squamous epithelium.");
+whichf("fh-wf-oocyte", "fhisto", "slides",
+  "Which statement about the oocyte's meiosis is false?",
+  [["The ovulated cell is a secondary oocyte arrested in prophase I", "This is the false one: the ovulated secondary oocyte is arrested at metaphase II; prophase I is where the primary oocyte waits."],
+   ["Every follicle in a resting ovary holds a primary oocyte arrested in prophase I", "This is true: the primary oocyte waits in prophase I until the LH surge."],
+   ["Only fertilization finishes meiosis II, giving an ovum and a second polar body", "This is true: without fertilization, meiosis II is never completed."],
+   ["Unequal cytokinesis gives one large oocyte and one tiny polar body", "This is true: nearly all the cytoplasm stays with the oocyte."]],
+  "Primary oocyte: arrested in prophase I in every follicle; the LH surge finishes meiosis I just before ovulation. The ovulated secondary oocyte is arrested at metaphase II, and only fertilization finishes meiosis II. Each division is unequal: one big oocyte, one tiny polar body.");
+whichf("fh-wf-lh", "fhisto", "rec",
+  "Which statement about the hormones around ovulation is false?",
+  [["Progesterone from the Graafian follicle triggers the LH surge", "This is the false one: estrogen from the Graafian follicle triggers the LH surge."],
+   ["FSH grows a group of 10 to 12 antral follicles", "This is true: the FSH surge grows 10 to 12 antral follicles, and one becomes dominant."],
+   ["The LH surge finishes meiosis I just before ovulation", "This is true: the LH surge restarts the primary oocyte's arrested meiosis."],
+   ["Theca interna cells carry LH receptors and make androgens that become estrogen", "This is true: the theca interna's androgens are the precursors of estrogen."]],
+  "FSH grows 10 to 12 antral follicles; LH matures and ovulates the dominant one. Estrogen from the Graafian follicle triggers the LH surge, which finishes meiosis I and leads to rupture. The theca interna has LH receptors and makes androgens, the estrogen precursors.");
+which("mp-ws-labs", "mphys", "rec",
+  "Which statement about male reproductive lab patterns is true?",
+  [["Failing testes give low testosterone with high LH and FSH", "With no testosterone or inhibin to feed back, the pituitary turns LH and FSH up."],
+   ["A failing pituitary gives low testosterone with high LH and FSH", "A failing pituitary makes everything low: LH, FSH and testosterone."],
+   ["Injected testosterone gives high testosterone with high LH and FSH", "Injected testosterone suppresses LH and FSH, so the sperm count falls too."],
+   ["Continuous GnRH raises LH and testosterone more than pulses do", "GnRH must pulse; given continuously, it lowers LH and testosterone."]],
+  "Failing testes: low testosterone, high LH and FSH. Failing pituitary: all low. Injected testosterone: high testosterone, low LH and FSH, low sperm count. GnRH works only in pulses.");
+which("mp-ws-5ard", "mphys", "rec",
+  "Which statement about 5-alpha-reductase deficiency is true?",
+  [["The person is XY with testes and Wolffian ducts but has female genitalia", "Testosterone still builds the Wolffian structures, but without DHT the external genitalia stay female."],
+   ["The person is XY with testes, but the Müllerian ducts persist as a uterus", "Sertoli AMH still works, so there are no Müllerian ducts and no uterus."],
+   ["The person is XX with ovaries, and virilizes at puberty", "The person is XY with testes; the virilization at puberty is right."],
+   ["The androgen receptor is mutated, so testosterone has no effect anywhere", "A mutated or absent androgen receptor is androgen insensitivity syndrome, a different condition."]],
+  "5-alpha-reductase deficiency: XY, testes, Wolffian ducts present, no Müllerian ducts, but female external genitalia because DHT builds the penis, scrotum and prostate. Raised as girls, they virilize at puberty, often how it's found.");
+whichf("mp-wf-semen", "mphys", "rec",
+  "Which statement about the fluids that make up semen is false?",
+  [["The prostate's PSA forms the clot, and fibrinogen from the seminal vesicles breaks it", "This is the false one: that swaps them; seminal vesicle fibrinogen forms the clot and the prostate's PSA breaks it down."],
+   ["The seminal vesicles supply most of the fluid, with fructose for energy", "This is true: 60 to 70 percent of the fluid, with fructose."],
+   ["Prostaglandins in the seminal vesicles' fluid cause contractions in the female reproductive tract", "This is true: Dr. Madison taught that the prostaglandins make the female tract contract."],
+   ["Cowper's glands' mucus comes before ejaculation and neutralizes the urethra", "This is true: the bulbourethral (Cowper's) glands' clear, alkaline mucus lubricates and neutralizes the urethra first."]],
+  "Seminal vesicles: 60 to 70 percent of the fluid, fructose, prostaglandins (female tract contractions) and fibrinogen (the clot). Prostate: 20 to 30 percent, thin milky fluid with citrate, calcium and PSA, which breaks the clot. Cowper's glands: clear, alkaline mucus before ejaculation.");
+whichf("mp-wf-feedback", "mphys", "rec",
+  "Which statement about the hormones of the male reproductive axis is false?",
+  [["Inhibin from Sertoli cells inhibits FSH at both the hypothalamus and the pituitary", "This is the false one: inhibin acts at the pituitary only."],
+   ["Testosterone feeds back to inhibit GnRH at the hypothalamus and LH at the pituitary", "This is true: testosterone inhibits both GnRH and LH."],
+   ["GnRH must pulse; given continuously, it lowers LH and testosterone", "This is true: continuous GnRH shuts the axis down."],
+   ["LH turns up cholesterol desmolase in Leydig cells, as ACTH does in the adrenal", "This is true: LH controls the rate-limiting step, side-chain cleavage, just as ACTH does in the adrenal."]],
+  "Testosterone inhibits GnRH (hypothalamus) and LH (pituitary); inhibin from Sertoli cells inhibits FSH at the pituitary only. GnRH must pulse. LH turns up cholesterol desmolase, the rate-limiting step, as ACTH does in the adrenal.");
+which("fp-ws-estrogens", "fphys", "slides",
+  "Which statement about the three estrogens is true?",
+  [["Estriol is the estrogen of pregnancy, made by the placenta from fetal precursors", "Estriol comes from the placenta, built from the fetus's 16-OH-DHEA-S."],
+   ["Estrone is the main estrogen the ovary makes during a woman's reproductive years", "The main ovarian estrogen is 17-beta-estradiol; estrone dominates after menopause."],
+   ["17-beta-estradiol is the estrogen of menopause, made from adrenal DHEA", "The estrogen of menopause is estrone; 17-beta-estradiol is the main ovarian estrogen."],
+   ["Estrone in menopause comes from DHEA made by the adrenal zona glomerulosa", "The DHEA comes from the zona reticularis; the zona glomerulosa makes aldosterone."]],
+  "17-beta-estradiol: the main ovarian estrogen. Estrone: the estrogen of menopause, from adrenal DHEA (zona reticularis). Estriol: the estrogen of pregnancy, from fetal 16-OH-DHEA-S in the placenta.");
+which("fp-ws-ovulation", "fphys", "slides",
+  "Which statement about ovulation is true?",
+  [["Ovulation comes about 14 days before menses, whatever the cycle's length", "The luteal phase is the fixed part: ovulation falls about 14 days before the next menses."],
+   ["The egg is released about 2 to 4 hours after the LH surge", "The egg comes out about 24 to 36 hours after the LH surge."],
+   ["Collagenases strengthen the follicle wall so it can hold the egg until it is released", "Collagenases weaken the follicle wall so it can rupture."],
+   ["Prostaglandins lower blood flow to the follicle just before ovulation", "Prostaglandins raise blood flow to the follicle."]],
+  "Ovulation falls about 14 days before menses. The egg leaves 24 to 36 hours after the LH surge, as collagenases weaken the follicle wall and prostaglandins raise its blood flow.");
+whichf("fp-wf-feedback", "fphys", "slides",
+  "Which statement about feedback in the female reproductive axis is false?",
+  [["Progesterone switches to positive feedback once it rises above about 200 pg/mL", "This is the false one: estrogen is the hormone that switches to positive feedback above about 200 pg/mL; progesterone gives negative feedback only."],
+   ["Inhibin from the ovary suppresses FSH", "This is true: the ovary makes inhibin, which holds FSH down."],
+   ["Positive feedback is what makes the female axis cyclical", "This is true: the male axis has no positive feedback and is acyclical."],
+   ["KNDy neurons relay stress, nutrition and inflammation signals to the GnRH neurons", "This is true: the GnRH neurons don't sense these directly; the kisspeptin (KNDy) neurons pass them on."]],
+  "Progesterone gives negative feedback only. Estrogen gives negative feedback, or positive above about 200 pg/mL, and that positive feedback makes the female axis cyclical. Inhibin suppresses FSH. KNDy neurons relay stress, nutrition, metabolism and inflammation to the GnRH neurons.");
+whichf("fp-wf-effects", "fphys", "slides",
+  "Which statement about the effects of estrogen and progesterone is false?",
+  [["Progesterone makes the myometrium contract, and estrogen relaxes it", "This is the false one: that swaps them; estrogen makes the myometrium contract and progesterone relaxes it."],
+   ["Estrogen makes the cervical mucus watery", "This is true: estrogen produces the watery mucus of the follicular phase."],
+   ["Progesterone increases the endometrium's secretions and blood vessels and thickens the mucus", "This is true: those are progesterone's luteal-phase effects."],
+   ["Estrogen drives endometrial growth and lengthens its arteries", "This is true: estrogen rebuilds the endometrium in the proliferative phase."]],
+  "Estrogen: endometrial growth, longer arteries, watery mucus, a contracting myometrium. Progesterone: more secretions and vessels, thick mucus, a relaxed myometrium.");
 
 /* mm(): a select-all question whose options carry their own flag and "why": [[choice, isCorrect, why], ...] */
 function mm(id, lec, src, stem, rows, ex, extra){ var c = []; rows.forEach(function(r, i){ if(r[1]) c.push(i); }); multi(id, lec, src, stem, rows.map(function(r){ return r[0]; }), c, ex, extra); QUESTIONS[QUESTIONS.length - 1].why = rows.map(function(r){ return r[2]; }); }
@@ -4194,7 +4412,7 @@ mq("p1-graves-1", "path1", "hub",
           ["TSH", "Under 0.01 mIU/L (normal 0.4-4.0)"],
           ["Free T4", "3.8 ng/dL (normal 0.8-1.8)"]], pcase: "path1-case4"});
 
-mq("p1-graves-2", "path1", "hub",
+which("p1-graves-2", "path1", "hub",
   "Which statement about her lab pattern is correct?",
   [["It is primary: her thyroid makes the excess T4, and feedback has shut off TSH", "A gland making hormone on its own suppresses TSH by negative feedback: high T4, low TSH, primary."],
    ["It is secondary: her pituitary is making excess TSH, which then drives the thyroid", "Secondary hyperthyroidism shows TSH high along with T4; hers is suppressed."],
@@ -4446,7 +4664,7 @@ mq("p2-pth-kidney", "path2", "slides",
    ["Less calcium reabsorbed, less phosphate reabsorbed, more 1,25-dihydroxy vitamin D made", "Losing calcium in the urine would lower serum calcium, the opposite of what PTH is released to do."],
    ["More sodium reabsorbed, more potassium excreted, more 1,25-dihydroxy vitamin D made", "Keeping sodium and dumping potassium is aldosterone's action on the kidney, not PTH's."]],
   "PTH raises serum calcium through the kidney (keep calcium, dump phosphate, make 1,25-dihydroxy vitamin D) and the bone (more turnover). The rising calcium then switches PTH off: negative feedback.");
-mq("p2-pth-fragments", "path2", "rec",
+which("p2-pth-fragments", "path2", "rec",
   "Which statement about the fragments of PTH in the blood is accurate?",
   [["N-terminal fragments are biologically active, last minutes and are broken down by the liver and kidney", "The active end of PTH is short-lived and is metabolized by the liver and kidney."],
    ["C-terminal fragments are biologically active, last minutes and are broken down by the liver and kidney", "The C-terminal fragments are the inactive ones; the N-terminal end is the part that acts."],
@@ -4883,7 +5101,7 @@ tf("p2-tf-8", "path2", "rec", "In secondary hypoadrenalism, ACTH is high while c
   "In secondary disease the pituitary fails, so ACTH is low along with cortisol.");
 
 // ---------- Adrenal cortical tumors ----------
-mq("p2-cortex-adenoma", "path2", "slides",
+which("p2-cortex-adenoma", "path2", "slides",
   "Which statement about adrenal cortical adenomas is accurate?",
   [["Most secrete nothing; of those that do, most secrete aldosterone", "The slide: most adenomas are nonsecreting, and the most common functional ones make aldosterone."],
    ["Most secrete cortisol, which makes them the main cause of Cushing syndrome", "Most adenomas are nonsecreting, and the functional ones mostly make aldosterone."],
@@ -5481,7 +5699,7 @@ mq("mh-x-pseudo", "mhisto", "slides",
 
 // ---------- Epididymis ----------
 
-mq("mh-cilia-stereo", "mhisto", "rec",
+which("mh-cilia-stereo", "mhisto", "rec",
   "Which statement correctly contrasts the apical surfaces of the efferent ductules and the epididymis?",
   [["Efferent ductules: motile cilia that sweep sperm. Epididymis: stereocilia, nonmotile microvilli", "True cilia move sperm in the efferent ductules; the epididymis's stereocilia are really long microvilli that do not move."],
    ["Efferent ductules: stereocilia that absorb fluid. Epididymis: motile cilia that sweep sperm along", "That swaps them: the efferent ductules are the ciliated ones, and the stereocilia belong to the epididymis (and vas deferens)."],
@@ -6791,7 +7009,7 @@ QUESTIONS.push({"id": "r-h1-tf-8", "lec": "refresh", "type": "mcq", "stem": "Tru
 QUESTIONS.push({"id": "r-h1-chief", "lec": "refresh", "type": "mcq", "stem": "In the parathyroid gland, chief cells differ from oxyphils in that chief cells:", "choices": ["Are the major functional cells and secrete PTH", "Are larger, paler and do not secrete any hormone", "Are filled with lipid", "Secrete calcitonin"], "answer": 0, "ex": "Chief cells are the major functional cells, with dense granules of PTH released by exocytosis. Oxyphils are larger, non-secretory, and occur singly or in clumps. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "why": ["Chief cells make PTH.", "That describes oxyphils.", "Fat cells are in the stroma, not the chief cells.", "Calcitonin comes from thyroid C cells."]});
 QUESTIONS.push({"id": "r-h1-casr", "lec": "refresh", "type": "mcq", "stem": "What triggers chief cells to release PTH?", "choices": ["Calcium-sensing receptors detecting low serum calcium", "Calcium-sensing receptors detecting high serum calcium", "TSH from the pituitary", "Low serum glucose"], "answer": 0, "ex": "Calcium-sensing receptors on chief cells detect low serum calcium and stimulate PTH production and secretion; high serum calcium inhibits it. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "why": ["Low calcium → PTH.", "High calcium inhibits PTH secretion.", "PTH is not under pituitary control.", "Glucose controls insulin and glucagon, not PTH."]});
 QUESTIONS.push({"id": "r-h1-2s-5", "lec": "refresh", "type": "mcq", "stem": "Read the two statements.\n1. Oxyphils are the major hormone-secreting cells of the parathyroid.\n2. Parathyroid glands sit on the anterior surface of the thyroid lobes.", "choices": ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], "answer": 1, "ex": "Chief cells secrete PTH; oxyphils are non-secretory. The parathyroids are embedded in the posterior surface of the thyroid lobes. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "fmt": "2stmt", "why": ["Statement 1 is false, not true: oxyphils are non-secretory; chief cells make PTH. Statement 2 is false, not true: the parathyroids are on the posterior surface of the thyroid.", "Statement 1 is false: oxyphils are non-secretory; chief cells make PTH. Statement 2 is false: the parathyroids are on the posterior surface of the thyroid.", "Statement 1 is false, not true: oxyphils are non-secretory; chief cells make PTH.", "Statement 2 is false, not true: the parathyroids are on the posterior surface of the thyroid."]});
-QUESTIONS.push({"id": "r-h1-ccell", "lec": "refresh", "type": "mcq", "stem": "Which statement about thyroid C cells is correct?", "choices": ["They don't touch the colloid, and they secrete calcitonin", "They line the follicle lumen, touch the colloid and secrete T4", "They are the functional cells of the parathyroid", "They are supporting glial cells"], "answer": 0, "ex": "C cells (parafollicular cells) sit at the periphery of follicles, inside the basal lamina but not in contact with colloid, and secrete calcitonin. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "why": ["Peripheral, no colloid contact, calcitonin.", "Follicular cells line the lumen and make thyroid hormone.", "Chief cells are the parathyroid's functional cells.", "Pituicytes are the glial cells of the posterior pituitary."]});
+QUESTIONS.push({"id": "r-h1-ccell", "lec": "refresh", "type": "mcq", "fmt": "which", "stem": "Which statement about thyroid C cells is correct?", "choices": ["They don't touch the colloid, and they secrete calcitonin", "They line the follicle lumen, touch the colloid and secrete T4", "They are the functional cells of the parathyroid", "They are supporting glial cells"], "answer": 0, "ex": "C cells (parafollicular cells) sit at the periphery of follicles, inside the basal lamina but not in contact with colloid, and secrete calcitonin. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "why": ["Peripheral, no colloid contact, calcitonin.", "Follicular cells line the lumen and make thyroid hormone.", "Chief cells are the parathyroid's functional cells.", "Pituicytes are the glial cells of the posterior pituitary."]});
 QUESTIONS.push({"id": "r-h1-2s-3", "lec": "refresh", "type": "mcq", "stem": "Read the two statements.\n1. C cells of the thyroid are in direct contact with the colloid.\n2. Thyroid follicular cells have their basal surface on a basal lamina.", "choices": ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], "answer": 3, "ex": "C cells sit inside the basal lamina at the edge of the follicle but do not touch the colloid. Follicular cells face the colloid apically and rest on a basal lamina. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "fmt": "2stmt", "why": ["Statement 1 is false, not true: C cells lie within the basal lamina but not in contact with colloid.", "Statement 2 is true, not false: the basal surface of follicular cells sits on a typical basal lamina.", "Statement 1 is false, not true: C cells lie within the basal lamina but not in contact with colloid. Statement 2 is true, not false: the basal surface of follicular cells sits on a typical basal lamina.", "Statement 1 is false: C cells lie within the basal lamina but not in contact with colloid. Statement 2 is true: the basal surface of follicular cells sits on a typical basal lamina."]});
 QUESTIONS.push({"id": "r-h1-num-2", "lec": "refresh", "type": "mcq", "stem": "Which statements about the thyroid and parathyroid are true?\n1. Oxyphils secrete most of the PTH.\n2. Colloid is stored thyroglobulin.\n3. C cells secrete calcitonin.\n4. A person cannot survive without parathyroid glands.", "choices": ["1, 2 and 3", "1, 2, 3 and 4", "2 and 3 only", "2, 3 and 4"], "answer": 3, "ex": "Oxyphils are non-secretory; chief cells make PTH. The other three are true. (Exam 1 · L1 Endocrine Histology 1)", "src": "slides", "fmt": "numbered", "why": ["Includes 1 and leaves out 4.", "Includes 1, which is false.", "Leaves out 4, which is true (absence is incompatible with life).", "Only statement 1 is false: chief cells make PTH."]});
 QUESTIONS.push({"id": "r-rv-paracrine", "lec": "refresh", "type": "mcq", "stem": "Which of the following pairs is an example of paracrine regulation?", "choices": ["Somatostatin - insulin secretion", "Somatostatin - GH secretion", "Norepinephrine - CRH secretion", "CRH - ACTH secretion", "Dopamine - prolactin secretion"], "answer": 0, "ex": "At the review: paracrine means signaling to neighboring cells. Delta cells and beta cells sit side by side in the islet, so somatostatin reaches the beta cells locally; the other pairs travel too far (portal blood or nerves) to count. (Exam 1 · L2 Hypothalamus and Pituitary)", "src": "review", "why": ["Delta-cell somatostatin acts on neighboring beta cells in the islet.", "Hypothalamic somatostatin reaches the pituitary through the portal blood: too far for paracrine.", "Norepinephrine on CRH neurons is neural signaling.", "CRH reaches the corticotrophs through the portal blood.", "Hypothalamic dopamine reaches the lactotrophs through the portal blood."]});
@@ -6978,7 +7196,7 @@ QUESTIONS.push({"id": "r-ca-ob-rec", "lec": "refresh", "type": "mcq", "stem": "O
 QUESTIONS.push({"id": "r-ca-2s-2", "lec": "refresh", "type": "mcq", "stem": "Read the two statements.\n1. Osteoclasts carry the PTH receptor.\n2. Osteoblasts carry the estrogen receptor.", "choices": ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], "answer": 3, "ex": "Osteoblasts carry PTH, vitamin D and estrogen receptors; osteoclasts carry the calcitonin receptor. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "fmt": "2stmt", "why": ["Statement 1 is false, not true: the PTH receptor is on osteoblasts.", "Statement 2 is true, not false: osteoblasts carry estrogen receptors.", "Statement 1 is false, not true: the PTH receptor is on osteoblasts. Statement 2 is true, not false: osteoblasts carry estrogen receptors.", "Statement 1 is false: the PTH receptor is on osteoblasts. Statement 2 is true: osteoblasts carry estrogen receptors."]});
 QUESTIONS.push({"id": "r-ca-num-2", "lec": "refresh", "type": "mcq", "stem": "Which statements about bone cells, PTH and vitamin D are true?\n1. Osteoblasts carry the receptors for PTH, vitamin D3 and estrogen.\n2. Osteoclasts carry the receptor for calcitonin.\n3. In chief cells, a rise in intracellular calcium triggers PTH secretion.\n4. The liver adds the hydroxyl at carbon 1 that activates vitamin D.", "choices": ["1 and 2 only", "1, 2 and 3", "1, 2 and 4", "2 and 3 only"], "answer": 0, "ex": "Osteoblasts carry the PTH, vitamin D3 and estrogen receptors, and osteoclasts the calcitonin receptor (Dr. Galin: put a star by it). The chief cell is the exception in endocrinology: a rise in intracellular calcium blocks PTH secretion. The liver hydroxylates carbon 25; the kidney's 1α-hydroxylase adds carbon 1 to make the active hormone. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "fmt": "numbered", "why": ["Osteoblasts hold the PTH, D3 and estrogen receptors; osteoclasts the calcitonin receptor.", "Includes 3: in chief cells, rising intracellular calcium blocks PTH secretion.", "Includes 4: the liver works at carbon 25; the kidney adds carbon 1.", "Includes 3 and leaves out 1: PTH's receptor is on the osteoblast."]});
 QUESTIONS.push({"id": "r-ca-oc-rec", "lec": "refresh", "type": "mcq", "stem": "Which bone cell carries the calcitonin receptor?", "choices": ["Osteoclast", "Osteoblast", "Osteocyte", "Chondrocyte"], "answer": 0, "ex": "Calcitonin acts directly on osteoclasts to inhibit resorption. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "why": ["Osteoclast.", "Osteoblasts carry PTH, vitamin D and estrogen receptors.", "Not the calcitonin target taught.", "Cartilage cell."]});
-QUESTIONS.push({"id": "r-ca-calcitonin", "lec": "refresh", "type": "mcq", "stem": "Which statement about calcitonin is correct?", "choices": ["It inhibits osteoclasts, and its secretion rises with plasma calcium", "It is essential for life", "It raises plasma calcium", "It stimulates osteoblasts through their calcitonin receptor"], "answer": 0, "ex": "Calcitonin opposes PTH: inhibits osteoclastic resorption and lowers calcium. Not essential; gastrin also stimulates it; used for osteoporosis. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "why": ["Inhibits osteoclasts; rises with calcium.", "It is not essential.", "It lowers calcium.", "Its receptor is on osteoclasts."]});
+QUESTIONS.push({"id": "r-ca-calcitonin", "lec": "refresh", "type": "mcq", "fmt": "which", "stem": "Which statement about calcitonin is correct?", "choices": ["It inhibits osteoclasts, and its secretion rises with plasma calcium", "It is essential for life", "It raises plasma calcium", "It stimulates osteoblasts through their calcitonin receptor"], "answer": 0, "ex": "Calcitonin opposes PTH: inhibits osteoclastic resorption and lowers calcium. Not essential; gastrin also stimulates it; used for osteoporosis. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "why": ["Inhibits osteoclasts; rises with calcium.", "It is not essential.", "It lowers calcium.", "Its receptor is on osteoclasts."]});
 QUESTIONS.push({"id": "r-ca-hpt", "lec": "refresh", "type": "mcq", "stem": "Primary hyperparathyroidism shows:", "choices": ["High PTH despite high calcium, with low phosphate", "Low PTH with low calcium", "High PTH with low calcium and high phosphate", "Normal PTH with high calcitonin"], "answer": 0, "ex": "One or more glands (hyperplasia or a benign tumor) make too much PTH regardless of calcium. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "slides", "why": ["Inappropriately high PTH, high Ca, low P.", "That is hypoparathyroidism.", "High PTH with low calcium is the normal response to low calcium.", "Not this disease."]});
 QUESTIONS.push({"id": "r-ca-r-stones", "lec": "refresh", "type": "mcq", "stem": "Why do people with primary hyperparathyroidism keep getting kidney stones?", "choices": ["So much calcium is filtered that it spills over and meets phosphate", "PTH blocks calcium reabsorption, so all of it ends up in the urine", "High calcitonin precipitates calcium and phosphate in the collecting duct", "Low PTH lets phosphate pile up in the blood"], "answer": 0, "ex": "Excess PTH raises blood calcium, and all of it must be filtered. The excess exceeds what the tubule can handle, spills over and meets phosphate: stones, again and again, which should prompt a PTH check. (Exam 1 · L10 Calcium and Phosphate Regulation)", "src": "rec", "why": ["The filtered calcium overwhelms the kidney and meets phosphate: stones.", "PTH increases calcium reabsorption; the problem is the sheer amount filtered.", "Calcitonin isn't high here; it is a treatment.", "PTH is high in this disease, and phosphate is low."]});
 QUESTIONS.push({"id": "r-pa-2s-2", "lec": "refresh", "type": "mcq", "stem": "Read the two statements.\n1. Insulin inhibits hormone-sensitive lipase in fat.\n2. Insulin activates glucose-6-phosphatase in the liver.", "choices": ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], "answer": 2, "ex": "Insulin keeps fat stored by inhibiting HSL. Glucose-6-phosphatase releases glucose from the liver; insulin inactivates it and glucagon activates it. (Exam 1 · L5 Endocrine Pancreas)", "src": "rec", "fmt": "2stmt", "why": ["Statement 2 is false, not true: insulin inactivates glucose-6-phosphatase; glucagon activates it.", "Statement 1 is true, not false: insulin blocks lipolysis by inhibiting HSL.", "Statement 1 is true: insulin blocks lipolysis by inhibiting HSL. Statement 2 is false: insulin inactivates glucose-6-phosphatase; glucagon activates it.", "Statement 1 is true, not false: insulin blocks lipolysis by inhibiting HSL. Statement 2 is false, not true: insulin inactivates glucose-6-phosphatase; glucagon activates it."]});
@@ -7855,7 +8073,7 @@ function bankNormShow(){
   if(isLk(STATE.ui.qstatus)){ STATE.ui.qlikely = STATE.ui.qstatus; STATE.ui.qstatus = 'all'; }
   if(STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = '';
 }
-var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
+var BANK_FMTS = [['2stmt','Two statements'],['tf','True or false'],['numbered','Numbered statements'],['which','Which statement is true'],['whichf','Which statement is false'],['except','EXCEPT / NOT'],['pbox','Patient Box cases'],['img','Diagram questions'],['multi','Select all that apply'],['match','Matching'],['sequence','Put in order']];
 function bankIsFmt(q, fm){ return fm === 'pbox' ? !!q.pbox : fm === 'img' ? !!q.img : (fm === 'multi' || fm === 'match' || fm === 'sequence') ? q.type === fm : q.fmt === fm; }
 function bankLabelOf(list, k){ for(var i = 0; i < list.length; i++) if(list[i][0] === k) return list[i][1]; return k; }
 function lecPickSummary(ids){

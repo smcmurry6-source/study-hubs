@@ -780,3 +780,15 @@ dn-2s-10
 dn-tf-12
 dn-tf-13
 dn-tf-14
+in-ws-records
+in-ws-facebow
+in-wf-artic
+in-wf-cr
+mo-ws-wear
+mo-ws-splint
+mo-wf-mobility
+mo-wf-tmd
+dn-ws-ssr
+dn-ws-nonbal
+dn-wf-ling
+dn-wf-co
