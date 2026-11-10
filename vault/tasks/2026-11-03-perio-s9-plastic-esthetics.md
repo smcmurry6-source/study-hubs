@@ -5,7 +5,7 @@ hub: perio
 created: 2026-11-03
 requested-by: Sam
 due: 2026-11-19
-waiting-on: the live class's capture (gingival excess and abnormal color, the week of Nov 9), and Sam's answers on the diagram candidates
+waiting-on: the live class's capture (gingival excess and abnormal color, the week of Nov 9)
 agent: Claude Code (claude/bold-thompson-v88wcy)
 pr: https://github.com/smcmurry6-source/study-hubs/pull/298
 ---
@@ -36,9 +36,10 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - [ ] The live class's capture (gingival excess, altered passive eruption, esthetics, abnormal color): check those
   sections, their questions and hints against it, take the "(slides; the live session)" labels and the lecture `note`
   off, regenerate both mp3s
-- [ ] Diagram candidates put to Sam (below); build what's approved, note the skipped ones in the hub note
+- [x] Diagram candidates put to Sam (below); build what's approved, note the skipped ones in the hub note (all five
+  approved, none skipped)
 
-## Diagram candidates (2026-11-10, waiting on Sam, one by one)
+## Diagram candidates (2026-11-10; Sam approved all five the same day)
 
 1. **Cairo RT1 / RT2 / RT3 side by side**: a facial view and probe readings for each type, with a toggle that draws the
    line a graft can cover to. Supports `q9-L10`-`L12`, `q9-S02`, `q9-P02`, `q9-P04`. Under the notes' recession
@@ -61,6 +62,8 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - 2026-11-03: written; waiting on the lecture.
 - 2026-11-10: Dr. Abou-Arraj's recording (posted Nov 9, the first part of the session) and his 2026 slides were in
   Drive. S9 taken straight to taught; see Outcome.
+- 2026-11-10: Sam: "Yes to all diagrams. Merge when ready". All five built (`tools/figures/perio/`), placed under
+  the notes and in their Review sections, and merged by the agent once green; see Outcome.
 
 ## Outcome
 
@@ -82,5 +85,17 @@ slides (then the recording) are in the Drive folder, build it out before the fin
   words added.
 - **Where the sources differ** (the notes give both; no question turns on them): recession prevalence (the recording
   vs the slide's 88% / 50%), and ADM ("comparable or superior" on a slide vs "doesn't work as well" in the guide).
-- **Left:** the live class's capture, and the diagram candidates (see the checklist above).
+- **Left:** the live class's capture (see the checklist above). When it comes, check Figs 4 and 5 against it too.
+
+2026-11-10, the diagrams PR (Sam: "Yes to all diagrams. Merge when ready"):
+- **Five figures**, built with the anima kit in `tools/figures/perio/` and pasted in by `build.mjs`: S9 · Fig 1 `cairo`
+  (the Cairo types on one canine, with what a graft can cover), Fig 2 `palate` (the palate's layers and the greater
+  palatine bundle at 7, 12 or 17 mm for a shallow, average or high vault, with FGG and CTG outlines), Fig 3 `grafts`
+  (a CTG under a coronally advanced flap and an FGG left exposed above an apically positioned flap, four steps each),
+  Fig 4 `ape` (Types 1 and 2, subcategories A and B, before and after their crown lengthening) and Fig 5 `egd` (the
+  gummy smile: lip length and mobility sliders, the lower facial third and short crowns, each pointing to its cause and
+  treatment).
+- **Where:** under the S9 notes (`FIG_BY_LEC`, outside the narrated text) and in Review: `cairo` in `s9-recession`,
+  `palate` and `grafts` in `grafts`, `ape` in `ape`, `egd` in `esthetics`. The About page's Perio diagrams sentence
+  lists them. No notes, questions or audio changed.
 
