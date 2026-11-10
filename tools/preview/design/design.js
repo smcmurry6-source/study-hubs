@@ -1066,7 +1066,7 @@
           var on = !!PS.up[u.k], own = h.upn[u.k], same = cardName(own).toLowerCase() === cardName(u.n).toLowerCase();
           return '<button type="button" class="tp-upg' + (on ? " on" : "") + '" aria-pressed="' + on + '" data-up="' + u.k + '">' + rarTag(u.rarity) +
             '<span class="tp-upn"><b>' + esc(cardName(u.n)) + "</b><small>" + esc(same ? "" : own) + "</small></span>" + price(u.price) + "</button>"; }).join("") + "</div>" +
-        (h.ups.indexOf("paint") < 0 ? "" : "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home) || !!h.set, c = bold ? p.bold : p.c;
+        (h.ups.indexOf("paint") < 0 ? "" : "<h4>" + esc(h.upn.paint) + '</h4><div class="tp-opts tp-paints">' + TP.PAINTS.map(function(p){ var bold = /mushroom|castle|lighthouse/.test(PS.home) || !!h.set, c = h.set && p.k === "cream" ? "#F4EFE6" : bold ? p.bold : p.c;
           return '<button type="button" class="tp-swatch' + (PS.paint === p.k ? " on" : "") + '" data-paint="' + p.k + '" aria-pressed="' + (PS.paint === p.k) + '" aria-label="' + esc(bold ? p.boldName : p.n) + '" title="' + esc((bold ? p.boldName : p.n) + (p.price ? ", " + p.price + " gold crowns" : ", free")) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div>");
     } else if (pick === "scene") {
       var sceneCard = function(x){ return rcard(x, thumbImg("scene", x.k), x.k === PS.scene, 'data-scene="' + x.k + '"'); };

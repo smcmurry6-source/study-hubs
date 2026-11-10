@@ -16,6 +16,9 @@ tags: [map]
   `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
   `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
   a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
+- `tools/figures/site/` — the site's drawn art, built by `build.mjs`: emblems, mastheads, medals, the rewards art, and
+  Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal and rank sets; `packs/<set>.mjs`, one file per
+  set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)).
 - `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
   hub or feature; don't read it whole.
 - `index.html` — dashboard. Hub cards come from the `HUBS` / `CLASSES`
