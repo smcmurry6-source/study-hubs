@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Perio: Session 9 taught, from Dr. Abou-Arraj's recording, Claude Code)** — Sam: "Update perio hub".
+  Dr. Abou-Arraj's recorded first part of S9 (posted Nov 9) and his 2026 slides were in Drive, so S9 (Periodontal
+  Plastic Therapy & Esthetics) went from `upcoming` straight to `taught`. Notes rewritten at both levels (40 aligned
+  paragraphs; the gingival excess, altered passive eruption, esthetics and tattoo sections are labeled "(slides; the
+  live session)" until the live class is posted) and both mp3s regenerated; 59 new questions (`q9-L01`-`L36`, `E`, `M`,
+  five two-statement, ten true/false, four numbered) plus four drawn Patient Box items on two new cases (`no-kg-24`,
+  `recession-11`); 12 Exam Hints and 12 ranked `LIKELY_TOPICS`; Review, cram, mind map and arcade words redone; ten
+  names in `tools/podcast/lexicon.json`. The teal and amber session chips are a shade darker in light mode, for AA
+  contrast (BUG-050, caught by `a11y.js`). Still to come: the live class's part, and the diagram candidates for Sam
+  ([task](vault/tasks/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
 - **2026-11-10 (Heme & Endo Exam 2: coverage over count, Dr. Herr's FSH and his focus slides, Claude Code)** — Sam: "be
   sure the emphasized points are covered, deemphasized points are left out ... be sure that the high likelihood questions
   are sufficient. I dont know what you took out from them. Go with dr herrs version", then Dr. Herr's in-class focus
