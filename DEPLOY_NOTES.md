@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Occlusion L9: Noncarious Cervical Lesions, Dr. Lawson's prerecorded lecture, Claude Code)** — Sam added
+  the transcript of Dr. Lawson's prerecorded lecture for the 11/12 session ("i dont have his slides yet or the other
+  lecture from thursday"), so L9 `nccl` went live from the recording alone, the way L8 did. It has its own notes at both
+  levels with both mp3s (`audio/nccl-full.mp3`, `-plain.mp3`), 57 questions (`nc-*`, `cs-nc-*`: 22 multiple-choice, 10
+  Patient Box case items on three pbox-only cases, 5 two-statement, 9 true/false, 4 numbered, 2 which-true, 2
+  which-false, 2 select-all, 1 match, every choice with its why), 16 emphasize and 2 de-emphasize Exam Hints, 10 High
+  Likelihood topics, a Review group and two side-by-side rows, cram lines and two sort sets. The bank grows from 785 to
+  842. The mock stays 45 questions in an hour, now 12 each from L6-L8 and 9 from L9. A ninth tag color, slate, was
+  added to the tag CSS (light and both dark blocks). The exam card, hints banner, mock intro, Home notice, page
+  description, footer and dashboard card list L9 and no longer say the final is only Dr. Givan's lectures; the
+  redesign (`next/`) copy matches and its content was rebuilt. Lexicon: NCCLs, Dzakovich, chelator, exostoses, tori,
+  subgingivally, CEJ. The notes give both views where L9 meets L7 (Lawson: abfraction is a cause, treat it with a night
+  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/2026-11-10-occlusion-l9-follow-ups.md):
+  Sam's answers on four diagram candidates, the check against Dr. Lawson's slides (names spelled by ear) and the other
+  11/12 lecture as L10. Occlusion's performance budget 1350 -> 1370 KB (L9 adds about 25 KB over the wire; BUG-053),
+  for Sam to approve with the PR. No schema change.
 - **2026-11-10 (Heme & Endo Exam 2: Dr. Taylor's Lecture A out, saved for Exam 3, Claude Code)** — Sam asked Dr. Herr:
   he forgot Lecture A when he wrote Exam 2, so it will likely be on the next exam ("i guess save all that for exam 3").
   A came out of the hub whole: its notes at both levels and both mp3s, 58 questions (`dc-*`, retired in the hub's
