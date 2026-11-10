@@ -211,9 +211,15 @@ fall in the school year (with their dates), and ask Sam which to add before draw
     are mossy boulders).
   - **Timmy's podcast studio** is a yard decoration (Sam: "i also want timmys podcast studio to be a decoration"): a
     sound booth on a deck with a studio window, an on-air lamp, the show's poster, an antenna, his mic and a stool. Kit
-    key `studio`, shop id `podcast-studio`, one of the classics (goes in any scene), Epic, 2,400 crowns (the agent's
-    pick of rarity and price). Tapped, it goes on air (the lamp lights, the antenna sends rings) and Timmy says the
+    key `studio`, shop id `podcast-studio`, one of the classics (goes in any scene), Epic, 2,400 crowns (Sam: "podcast
+    studio price is good"). Tapped, it goes on air (the lamp lights, the antenna sends rings) and Timmy says the
     show's opening line. The catalog is 181 rows now (57 everyday).
+  - **Sam's third look** ("why does only gold get the three tiers of steps? also, i want there to be a wooden theme to
+    timmys shop. the medal switch is good. podcast studio price is good"): every rank has three levels and its statue a
+    step for each; the "Your rank" gallery showed the steps for Gold only, so it now shows I, II and III for every
+    rank. The shop is wooden: plank walls in a timber frame, each shelf a cabinet with thick boards, Timmy behind a
+    counter, the sign carved and hung on chains, the crowns and the sound switch on wooden plaques, and a timber frame
+    round a piece's window. The same wood in light and dark (deeper in dark).
   - The vendored `taste-skill` was not run in full: its house rules are for work screens and marketing pages (no
     decorative shapes), which fights a decorative game screen in Timmy's ink style. Its look-and-fix loop on
     screenshots is what the polish pass did.
@@ -234,7 +240,6 @@ Waiting for Sam's look at the second set of screenshots (PR above). Left for aft
 - Only the Handpiece's six rank sets exist; the ModuPro's and the Loupes' are drawn before anyone reaches them.
 - A tall yard piece in the front spot (the wishing well, the swing) stands in front of the door, and one in the side
   yard or the front corner can cover part of the medal board: that is the player's choice of spot, not a drawing fault.
-- If Sam only meant "the board and its pop-up match" and wants the gems back, the gem version is commit `5fc40aa`.
 
 Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
 [the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·

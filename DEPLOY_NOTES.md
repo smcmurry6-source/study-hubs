@@ -52,7 +52,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `get_my_shop`, and visiting (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js`
   348 checks; nothing seasonal is sold before its season's first run (`added_on`, `sh_season_was_on`); the Fourth of
   July's set is June 28 to July 4 (Sam confirmed). (5) The design page shows all of it as mock-ups on made-up names: a
-  **storefront shop** (any piece opens in its own window; "Back for today" is a corner stamp; buying plays out by rarity
+  **wooden shop** (plank walls, cabinets, a counter; any piece opens in its own window; "Back for today" is a corner stamp; buying plays out by rarity
   with synthesized sound cues), a **customizer** (a picture dock, shelves, a wardrobe rail, a camera that moves in), the
   **rank board** with each rank's handpiece emblem and your own name on a gold nameplate, and **visiting** (Visit, a
   random visit, next and back, a trip through soft clouds). (6) Polish: the statue's handpiece stands upright; the
