@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Lessons refresh, Claude Code)** — `/lessons-audit`, data read 5:50 am Central. PCD Implants Exam 1 is archived: its
+  retrospective is in `LESSONS.md` (88 people, 339 h, median 199 min each; the notes carried the first two days; the lecture lag closed
+  by itself on the eve; 5 check-ins) and its recap was published to the dashboard. Four explanations fixed in live hubs: Heme & Endo
+  Exam 2 `p2-cah-17` and `p1-corticotroph` now name the class's favorite wrong answer (21-hydroxylase; ACTH low with cortisol high);
+  perio `q4-44` gives its number (4 µm, not 0.4 mm) and `q4-M02` lists the three goals of SRP. Same ids and choice order, so the
+  class picks stay put. `LESSONS.md` Live signals rewritten and the standing lessons updated; the data-quality note adds
+  early-ended mocks and cleared class counters; PCD Implants and Special Patient Care move to Archived in `vault/home.md`.
 - **2026-11-10 (Heme & Endo Exam 2: every Exam 1 High Likelihood question, fuller gaps, focus slides from the decks,
   Claude Code)** — Sam: "include all of the exam 1 high likelihood questions. do not cut them. pull randomly from them for
   the mock. do not include them in the default question bank filter unless you click to include them"; "fill in the gaps

@@ -103,12 +103,12 @@ Hub building
 Live
 - [Occlusion](hubs/occlusion.md)
 - [Periodontology](hubs/perio.md)
-- [PCD Implants Exam 1](hubs/pcd-implants-exam1.md)
 - [Heme & Endo Exam 2](hubs/heme-endo-exam2.md)
-- [Special Patient Care](hubs/special-patient-care.md)
 
 Archived (page still up)
-- [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
+- [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) · [Special Patient Care](hubs/special-patient-care.md) (retrospective after its
+  window closes, 11-14) ·
+  [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
   [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) · [MSK Exam 3](hubs/msk-exam3.md)
 - Removed earlier (no folder, labels only): GI Exam 1 (`gi-exam1`), GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 
