@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Heme & Endo Exam 2: coverage over count, Dr. Herr's FSH and his focus slides, Claude Code)** — Sam: "be
+  sure the emphasized points are covered, deemphasized points are left out ... be sure that the high likelihood questions
+  are sufficient. I dont know what you took out from them. Go with dr herrs version", then Dr. Herr's in-class focus
+  slides for L13 and L14. (1) Midcycle FSH peaks with LH just before ovulation, as on Dr. Herr's L14 graph, everywhere:
+  L14 and L16 notes (both levels), cram, note tables, the ovulation sequence, the `cycle` figure (`cycle.mjs`) and
+  `fh-tf-fshpeak`; L16's slide is noted as differing; `fhisto-full`, `fphys-full` and `fphys-plain` regenerated.
+  (2) A `focus` Exam Hint kind ("focus list", no quotation marks) at the top of L13 and L14, and the topics on those
+  slides rank first ("focus list + recording"). (3) Every lecture audited for coverage: 90 cut questions back (ids
+  un-retired), 2 new (`dm-met-lactic`, `mh-spermio-phases`), five topic lines reworded; 339 → 431 (L11 53, L12a 44, L12b
+  45, A 43, L13 44, L14 45, L15 42, L16 35, R 80), 369 High Likelihood. Hub note: "Coverage, not a count".
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't

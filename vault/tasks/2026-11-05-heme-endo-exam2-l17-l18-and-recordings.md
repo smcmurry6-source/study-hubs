@@ -67,6 +67,13 @@ re-rank High Likelihood from the review on Wed 11/11.
   check for L16-L18 and the review. Then "That should be a standing rule" (now
   [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)) and "803 is way too many questions. They need
   to be higher yield": the bank was cut to 339 high-yield questions (464 ids retired), High Likelihood made selective
-  (about half of each lecture), the Refresher to one question per Exam 1 topic. New lectures stay at that size.
+  (about half of each lecture), the Refresher to one question per Exam 1 topic. (Superseded by the next entry.)
+- 2026-11-08 to 11-10: Sam: "be sure the emphasized points are covered, deemphasized points are left out ... be sure
+  that the high likelihood questions are sufficient. I dont know what you took out from them. Go with dr herrs version",
+  then Dr. Herr's in-class focus slides for L13 and L14 (11-09). Midcycle FSH now follows Dr. Herr hub-wide (notes,
+  cram, `cycle`, the L14 and L16 mp3s regenerated); the focus list is an Exam Hint and ranks those topics first; every
+  lecture was audited for coverage (emphasized points, topic facets, gaps): 90 cut questions back, 2 new, 339 → 431,
+  369 High Likelihood. Still to do: L16's recording (Tue 11/10), L17 and L18, the 11/11 review, each with the same
+  coverage audit.
 
 ## Outcome
