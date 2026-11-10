@@ -419,9 +419,15 @@ var FIG_PLACE = {
     { full:'Support, stability and retention', plain:'Support, stability and retention', figs:['ssr'] },
     { full:'Both balanced and non-balanced work well', plain:'The three setups', figs:['schemes'] },
     { full:'Tooth forms compared', plain:'Tooth shapes.', figs:['toothforms'] }
+  ],
+  nccl: [
+    { full:'His analogy: push on a stop sign.', plain:'A push on the slope of a cusp', figs:['abfract'] },
+    { full:'Cupped-out cusp tips.', plain:'Cavities are acid too', figs:['cupping'] },
+    { full:'Vomiting (bulimia', plain:'Cavities are acid too', figs:['erosion9'] },
+    { full:'pH and buffering capacity sound', plain:'Buffering capacity is how much saliva', figs:['buffer'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'], nccl:['abfract','cupping','erosion9','buffer'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

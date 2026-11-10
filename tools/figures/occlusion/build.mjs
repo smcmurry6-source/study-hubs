@@ -22,6 +22,12 @@ const ACB = "/* anima:css begin */\n", ACE = "/* anima:css end */\n";
    the live code and the build share one model */
 function animaJs(){
   const figs = FIGURES.map((f) => {
+    /* an alias: another lecture's copy of a figure, its own title, caption and lecture, the same drawing and live code,
+       with data overrides (where it opens); its markup names the alias so mount() finds this entry */
+    if (f.alias) return `  FIGS[${JSON.stringify(f.id)}] = { title: ${JSON.stringify(f.title)}, caption: ${JSON.stringify(f.caption)}, lec: ${JSON.stringify(f.lec)},
+    html: FIGS[${JSON.stringify(f.alias)}].html.split(${JSON.stringify(`data-anima="${f.alias}"`)}).join(${JSON.stringify(`data-anima="${f.id}"`)}),
+    data: Object.assign({}, FIGS[${JSON.stringify(f.alias)}].data, ${JSON.stringify(f.data || {})}),
+    live: FIGS[${JSON.stringify(f.alias)}].live };`;
     const helpers = (f.helpers || []).map((fn) => fn.toString()).join("\n    ");
     const names = (f.helpers || []).map((fn) => `d.${fn.name} = ${fn.name};`).join(" ");
     return `  FIGS[${JSON.stringify(f.id)}] = { title: ${JSON.stringify(f.title)}, caption: ${JSON.stringify(f.caption)}, lec: ${JSON.stringify(f.lec)},
@@ -43,7 +49,7 @@ ${figs}
 })();
 `;
 }
-const animaCss = () => baseCss() + FIGURES.map((f) => f.css).join("") + "\n";
+const animaCss = () => baseCss() + FIGURES.map((f) => f.css || "").join("") + "\n";
 
 function between(src, b, e, body){
   const i = src.indexOf(b), j = src.indexOf(e);

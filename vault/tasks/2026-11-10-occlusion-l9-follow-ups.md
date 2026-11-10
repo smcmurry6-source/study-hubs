@@ -5,7 +5,7 @@ hub: occlusion
 created: 2026-11-10
 requested-by: Sam
 due: 2026-11-16
-waiting-on: Sam's answers on the four L9 diagram candidates; Dr. Lawson's slides; the other 11/12 lecture
+waiting-on: Dr. Lawson's slides; the other 11/12 lecture
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/305
 ---
@@ -42,7 +42,7 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
   each), `EXAM_INFO`, `COURSE_DATES`, the hints banner, the mock intro, the Home notice, the dashboard card, and the same
   words in `hubs/occlusion/next/index.html`.
 
-**Diagram candidates** (proposed 2026-11-10, waiting on Sam):
+**Diagram candidates** (proposed 2026-11-10; Sam approved all four the same day, and they are built: see the Log):
 
 1. **Abfraction: the tooth flexes like a stop sign.** A premolar in buccolingual section, in its bone, with a load you can
    move from straight down the long axis to an inclined plane: under the inclined load the crown tips, the tooth flexes
@@ -66,8 +66,8 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
 
 ## Done when
 
-- [ ] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
-- [ ] The approved figures are built and checked at 390 px in both themes, with screenshots for Sam
+- [x] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
+- [x] The approved figures are built and checked at 390 px in both themes, with screenshots for Sam
 - [ ] Dr. Lawson's slides are checked against L9's notes, questions, hints and likely topics (the names above), with
       both mp3s rebuilt if the notes change
 - [ ] The other 11/12 lecture is added as L10 (or Sam says there's nothing to add)
@@ -76,5 +76,13 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
 ## Log
 
 - 2026-11-10: written when L9 shipped from the transcript ([PR #305](https://github.com/smcmurry6-source/study-hubs/pull/305)); the four candidates went to Sam in chat.
+- 2026-11-10: Sam: "Approve the budget, make all diagrams, merge when ready". All four built in the diagrams PR: Fig 24
+  `abfract` (after "His analogy: push on a stop sign"), Fig 26 `cupping` (after "Cupped-out cusp tips."), `erosion9` (Fig 19
+  again, after "Vomiting (bulimia"), Fig 25 `buffer` (after "pH and buffering capacity sound"); in plain English after the
+  matching paragraphs; in Review as three `figs` sections. The About page's Diagrams entry has an L9 sentence. The page went
+  to 1379 KB, so the budget is 1395 KB now (BUG-055).
 
 ## Outcome
+
+The diagrams are done (2026-11-10, all four approved and built; see the Log). Still open: Dr. Lawson's slides check and
+the other 11/12 lecture (L10), so this note stays `blocked` until those arrive.

@@ -182,12 +182,14 @@ const SOURCES = `<details class="am-sources"><summary>What this shows, and what'
 
 function erLive(root, D) {
   var box = root.querySelector(".er-box"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), sleepRow = root.querySelector(".er-sleep");
-  var st = { k: "gerd", side: "R" };
+  /* a copy placed under another lecture can open on another cause (D.start) and add that lecture's point (D.extra) */
+  var st = { k: D.start || "gerd", side: "R" };
+  root.querySelectorAll("[data-erk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-erk") === st.k)); });
   function key() { return st.k === "gerd" ? "gerd" + st.side : st.k; }
   function apply() {
     D.erApply(box, key(), D);
     sleepRow.hidden = st.k !== "gerd";
-    sum.textContent = D.TEXT[st.k] + (st.k === "nccl" ? "" : D.TEXT.more);
+    sum.textContent = D.TEXT[st.k] + ((D.extra && D.extra[st.k]) || "") + (st.k === "nccl" ? "" : D.TEXT.more);
     if (readout) readout.textContent = { gerd: "lingual maxillary, mandibular molars", bulimia: "maxillary anteriors", soda1: "all teeth", soda2: "back and front, severe", citrus1: "front teeth", citrus2: "back teeth", nccl: "facial, maxillary premolars" }[st.k];
   }
   root.querySelectorAll("[data-erk]").forEach(function (b) { b.addEventListener("click", function () { st.k = b.getAttribute("data-erk"); root.querySelectorAll("[data-erk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); apply(); }); });
