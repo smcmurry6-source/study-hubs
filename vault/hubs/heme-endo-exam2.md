@@ -88,7 +88,9 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
   `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures hold 393
   (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43; 258 are High Likelihood. The mock's 45 are L11 8, L12a 7,
-  L12b 7, L13-L15 6 each, L16 5 (A's 5 went one each to L12a and L13-L16). **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
+  L12b 7, L13-L15 6 each, L16 5 (A's 5 went one each to L12a and L13-L16). **The mock stays 50 questions** (Sam,
+  2026-11-10); when Dr. Herr gives the exam's breakdown per lecture, Sam will pass it on: put it in `EXAM_COUNTS` and
+  `MOCK_BLUEPRINT` (and give each lecture that many High Likelihood topics, [high-likelihood-topics](../rules/high-likelihood-topics.md)). **Adding to it:** a new lecture (L17, L18) or one going taught gets the same audit: its hints and
   topics covered, its notes' key terms covered once, nothing on skipped points.
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
   histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
