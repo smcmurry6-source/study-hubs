@@ -64,6 +64,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   scene's contour is a wider, flatter bell (`arcTop(cx, top, edge)`; Sam: "too extreme and pointy"), and each scene
   raises its backdrop to match (`farLift`). Sam: "Looks good", "its good to merge when youre ready" (#299, with #289's
   commits). Next: the wiring into the live widgets.
+- **2026-11-10 (Heme & Endo Exam 2: the exam's own count per lecture, Claude Code)** — Sam, from Dr. Herr: 5 on Exam 1, 8
+  on L11, 9 on L12, 7 each on L13-L16, and L16 is the last lecture on the exam. `EXAM_COUNTS` (= `MOCK_BLUEPRINT`, with
+  `EXAM_GROUPS` letting L12's two hours share their 9, drawn at random) drives the mock, the "Most likely questions" box,
+  Home's exam facts and the Exam Hints banner. High Likelihood keeps every topic (Sam: "Dont remove any high likelihood
+  questions"; the High Likelihood rule now says counts never trim topics, for every hub). L17 and
+  L18 aren't added to this hub (they go to Exam 3 with Lecture A). Also fixes two places #304 missed that still said
+  Lecture A was on the exam (BUG-054).
 - **2026-11-10 (Occlusion L9: Noncarious Cervical Lesions, Dr. Lawson's prerecorded lecture, Claude Code)** — Sam added
   the transcript of Dr. Lawson's prerecorded lecture for the 11/12 session ("i dont have his slides yet or the other
   lecture from thursday"), so L9 `nccl` went live from the recording alone, the way L8 did. It has its own notes at both

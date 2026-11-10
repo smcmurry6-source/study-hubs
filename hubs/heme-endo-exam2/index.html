@@ -1684,11 +1684,11 @@ function pixelHeart(){
 var EXAM_DATE = '2026-11-13', EXAM_END = '2026-11-13';
 var EXAM_TIME = '10:00', EXAM_CLOSES = '11:30';
 var EXAM_INFO = [
-  ['What', 'Exam 2: 50 multiple-choice questions. 45 are on the new material (lectures 11-18) and 5 are on Exam 1 material.'],
-  ['Not on it', 'Dr. Taylor\'s Lecture A (Dental endocrinology). Dr. Herr says he left it off Exam 2, so it will likely be on Exam 3; this hub leaves it out.'],
+  ['What', 'Exam 2: 50 multiple-choice questions. 45 are on the new material, lectures 11-16 (8 on L11, 9 on L12, 7 each on L13, L14, L15 and L16), and 5 are on Exam 1 material.'],
+  ['Not on it', 'L16 is the last lecture on Exam 2, so L17 Pregnancy and lactation and L18 Estrogens and androgens aren\'t on it. Neither is Dr. Taylor\'s Lecture A (Dental endocrinology): Dr. Herr says he left it off, so it will likely be on Exam 3. This hub leaves all three out.'],
   ['When', 'Friday, November 13, 10:00-11:30 am (the dental students\' sitting; optometry sits at 8:00).'],
   ['Where', 'In person, Volker Hall Lecture Room B, on Canvas with LockDown Browser, as for Exam 1.'],
-  ['Lectures', 'L11 Diabetes pharmacology, L12 Endocrine pathology (both hours), L13-L14 Male and female reproductive histology, L15-L16 Male and female reproductive physiology, L17 Pregnancy and lactation, L18 Estrogens and androgens. L17 and L18 join this hub when their slides are posted.'],
+  ['Lectures', 'L11 Diabetes pharmacology, L12 Endocrine pathology (both hours), L13-L14 Male and female reproductive histology, L15-L16 Male and female reproductive physiology.'],
   ['Review', 'Wednesday, November 11, 2:00-2:50 pm, with Dr. Madison.'],
   ['Exam 1 material', 'Five questions come from Exam 1. The Exam 1 Refresher (R) holds every one of the Exam 1 hub\'s High Likelihood questions (all 55 of its predicted topics), and the mock\'s five Exam 1 questions are drawn at random from them. The Question Bank leaves R out until you tick it under Lectures, or tap "Exam 1 High likelihood" under Only.'],
   ['Before', 'Quiz 3 is due Thursday, November 12, at 11:59 pm. This hub uses nothing from the quizzes or the take-home.']
@@ -1698,12 +1698,12 @@ var COURSE_DATES = [
   { date:'2026-11-03', label:'L11 Pharmacology of diabetes (Dr. Fasinu, two hours)', kind:'lecture' },
   { date:'2026-11-04', label:'L12 Endocrine pathology (Dr. Dababneh, two hours)', kind:'lecture' },
   { date:'2026-11-06', label:'A Dental endocrinology (Dr. Taylor; not on Exam 2, likely on Exam 3); L13 and L14 Male and female reproductive histology (Dr. Herr); L15 Male reproductive physiology (Dr. Madison)', kind:'lecture' },
-  { date:'2026-11-10', label:'L16 Female reproductive physiology and L17 Pregnancy and lactation (Dr. Madison)', kind:'lecture' },
-  { date:'2026-11-11', label:'L18 Estrogens and androgens (Dr. Fasinu); Exam 2 review with Dr. Madison, 2:00 pm', kind:'lecture' },
+  { date:'2026-11-10', label:'L16 Female reproductive physiology, the last lecture on Exam 2, and L17 Pregnancy and lactation, not on Exam 2 (Dr. Madison)', kind:'lecture' },
+  { date:'2026-11-11', label:'L18 Estrogens and androgens (Dr. Fasinu; not on Exam 2); Exam 2 review with Dr. Madison, 2:00 pm', kind:'lecture' },
   { date:'2026-11-12', label:'Quiz 3 due, 11:59 pm', kind:'due' },
   { date:'2026-11-13', label:'Exam 2, 10:00-11:30 am (dental)', kind:'exam' },
   { date:'2026-11-15', label:'Take-home assignment due', kind:'due' },
-  { date:'2026-11-20', label:'Exam 3 (likely includes Dr. Taylor\'s Lecture A)', kind:'later' }
+  { date:'2026-11-20', label:'Exam 3 (likely includes Dr. Taylor\'s Lecture A, L17 and L18)', kind:'later' }
 ];
 var LECTURES = [
   { id:"dmpharm", num:11, title:"Pharmacology of Diabetes Mellitus", who:"Dr. Fasinu", tag:"teal", source:"Recorded lecture (11/3, two hours) + slides", status:"taught" },
@@ -6889,10 +6889,13 @@ var SORT_SETS = [{"id": "dmpharm-dmhypo", "lec": "dmpharm", "title": "Can it cau
 var SRC_LABEL = { 'rec':'From the recording', 'slides':'From the slides', 'hub':'Hub case', 'focus':'Exam 1 focus list', 'class':'Exam 1 class case', 'review':'Exam 1 in-class review' };
 var DRILL_HY = {};
 
-/* ---------- MOCK: the exam's format, 50 questions in 90 minutes: 45 new, weighted by lecture time (no official counts per
-   lecture yet; L17 and L18 have no slides yet, so their share is spread over the rest; Dr. Taylor's Lecture A is not on Exam 2,
-   Sam, 2026-11-10, from Dr. Herr, so its 5 went one each to L12a and L13-L16), and 5 from Exam 1: the Refresher's High Likelihood questions (MOCK_LIKELY_ONLY). */
-var MOCK_BLUEPRINT = {"dmpharm": 8, "path1": 7, "path2": 7, "mhisto": 6, "fhisto": 6, "mphys": 6, "fphys": 5, "refresh": 5};
+/* ---------- MOCK and EXAM_COUNTS: the exam's own count per lecture (Sam, 2026-11-10, from Dr. Herr): 50 questions in 90
+   minutes, 5 from Exam 1, 8 from L11, 9 from L12 (both hours together: EXAM_GROUPS, so the mock draws them from L12a and
+   L12b at random) and 7 each from L13-L16. L16 is the last lecture on the exam; Lecture A, L17 and L18 are not on it.
+   The Exam 1 five come from the Refresher's High Likelihood questions (MOCK_LIKELY_ONLY). */
+var EXAM_COUNTS = { dmpharm: 8, L12: 9, mhisto: 7, fhisto: 7, mphys: 7, fphys: 7, refresh: 5 };
+var EXAM_GROUPS = { L12: ['path1', 'path2'] };
+var MOCK_BLUEPRINT = EXAM_COUNTS;
 var MOCK_LIMIT = 90 * 60;
 /* Sam, 2026-11-06: the mock's five Exam 1 questions come from the High Likelihood questions (the Refresher's copies of
    Exam 1's High Likelihood questions); since 2026-11-10, drawn at random from all of them (mockLikelyPick) */
@@ -7027,7 +7030,9 @@ var RENDER_SEQ = 0;
    sufficient"; the rest of the bank fills the gaps) each topic lists one question for each point it names, no two on the same
    fact, so most of each lecture's bank is High Likelihood and the untagged questions cover the notes' other sections. L13
    and L14 rank the topics on Dr. Herr's in-class focus slides first (basis "focus list + recording").
-   Edit the topics here, not on the questions; when an exam's count per lecture is announced, add EXAM_COUNTS. ---------- */
+   Edit the topics here, not on the questions. The exam's count per lecture (EXAM_COUNTS) is shown beside each lecture but
+   never trims its topics: every topic a professor hinted at stays High Likelihood (Sam, 2026-11-10: "Dont remove any high
+   likelihood questions"). ---------- */
 var LIKELY_TOPICS = [{"lec": "dmpharm", "t": "Choosing an insulin: rapid or regular for a meal, long-acting as basal, and the onset, peak and duration of each preparation", "basis": "recording", "ids": ["dm-ins-meal", "dm-ins-basal", "dm-2s-6", "dm-ins-shortest"]},
   {"lec": "dmpharm", "t": "Which drugs cause hypoglycemia (insulin and the secretagogues) and which rarely do", "basis": "recording", "ids": ["dm-hypo-class", "dm-met-hypo", "dm-glucose-dep"]},
   {"lec": "dmpharm", "t": "Weight effects: gain with insulin, sulfonylureas, meglitinides and TZDs; loss with GLP-1 agonists; a GLP-1 agonist first for a patient with a weight problem", "basis": "recording", "ids": ["dm-mm-weight", "dm-pb-wt-1"]},
@@ -7157,7 +7162,6 @@ var LIKELY_TOPICS = [{"lec": "dmpharm", "t": "Choosing an insulin: rapid or regu
   {"lec": "refresh", "t": "L10 Calcium and Phosphate Regulation: PTH acts on osteoblasts, which signal osteoclasts", "basis": "Exam 1 hint", "ids": ["r-ca-ob-rec", "r-ca-2s-2", "r-ca-num-2"]},
   {"lec": "refresh", "t": "L10 Calcium and Phosphate Regulation: Calcitonin on the osteoclast", "basis": "Exam 1 hint", "ids": ["r-ca-oc-rec", "r-ca-calcitonin"]},
   {"lec": "refresh", "t": "L10 Calcium and Phosphate Regulation: Primary hyperparathyroidism: high PTH and calcium, low phosphate, stones", "basis": "Exam 1 hint", "ids": ["r-ca-hpt", "r-ca-r-stones"]}];
-var EXAM_COUNTS = {};
 (function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
 /* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
 function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
@@ -7165,11 +7169,12 @@ function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Pred
 /* how many questions a lecture's Practice button opens: a question listed under two topics counts once */
 function likelyCount(ts){ var seen = {}; ts.forEach(function(t){ t.ids.forEach(function(id){ seen[id] = 1; }); }); return Object.keys(seen).length; }
 function likelyHTML(){
-  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The exam\'s count per lecture hasn\'t been announced, so each lecture lists what the professor flagged in the recording or an in-class focus list first (<i>focus list + recording</i>, <i>recording</i>), then the lecture\'s objectives (<i>objectives</i>) and the core of the slides (<i>slides</i>). The Refresher keeps Exam 1\'s predicted topics and all of their questions.</span></summary>' +
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> Each lecture shows how many questions the exam has on it (8 for L11, 9 for L12\'s two hours together, 7 each for L13-L16) and lists its predicted topics, ranked by what the professor flagged in the recording or an in-class focus list first (<i>focus list + recording</i>, <i>recording</i>), then the lecture\'s objectives (<i>objectives</i>) and the core of the slides (<i>slides</i>). The Refresher keeps Exam 1\'s predicted topics and all of their questions.</span></summary>' +
     '<div class="likely-grid">' + LECTURES.map(function(l){
       var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }); if(!ts.length) return '';
-      var n = EXAM_COUNTS[l.id];
-      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+(n ? n+' on the exam' : ts.length+' predicted topic'+(ts.length===1?'':'s'))+'</small></h4><ol>' +
+      var g = Object.keys(EXAM_GROUPS).filter(function(k){ return EXAM_GROUPS[k].indexOf(l.id) !== -1; })[0], n = EXAM_COUNTS[g || l.id];
+      var cnt = !n ? ts.length+' predicted topic'+(ts.length===1?'':'s') : g ? n+' on the exam for L12a and L12b together' : n+' on the exam';
+      return '<div class="likely-lec tag-'+l.tag+'"><h4><span class="lec-num">'+lecLabel(l)+'</span>'+escHtml(l.title.split(':')[0])+' <small>'+cnt+'</small></h4><ol>' +
         ts.map(function(t){ return '<li>'+escHtml(t.t)+' <span class="likely-basis">'+escHtml(t.basis)+'</span></li>'; }).join('') +
         '</ol><button type="button" class="btn" data-likely="'+l.id+'">Practice these ('+likelyCount(ts)+')</button></div>';
     }).join('') + '</div></details>';
@@ -7444,12 +7449,12 @@ function renderHome(){
     '<div class="hh-main"><p class="hh-kicker">Hematology &amp; Endocrinology · Exam 2</p><h2>The exam</h2>' +
       '<p class="hh-when">' + icon('calendar') + 'Fri, Nov 13 · 10:00-11:30 am · in person, LockDown Browser</p>' +
       '<div id="homeCount">' + countdownHTML() + '</div>' +
-      '<div class="hh-chips"><span>50 questions</span><span>45 new</span><span>5 from Exam 1</span><span>L11-L18 and A</span></div></div>' +
+      '<div class="hh-chips"><span>50 questions</span><span>45 new</span><span>5 from Exam 1</span><span>L11-L16</span></div></div>' +
     '<div class="hh-ready">' + ringSVG(Math.round(right / total * 100)) + '<div class="hh-ready-txt"><b>' + right + ' of ' + total + '</b><span>questions right on your latest try</span>' +
       (acc !== null ? '<span>' + acc + '% of all your answers right</span>' : '<span>Answer a few to see your accuracy</span>') + '</div></div>' +
   '</section>';
   var pending = LECTURES.filter(function(l){ return l.status !== 'taught'; });
-  if(pending.length) h += '<div class="home-alert">' + icon('notes') + '<span><b>From the slides so far:</b> ' + pending.map(function(l){ return lecLabel(l) + ' ' + escHtml(l.title.split(':')[0]); }).join(', ') + '. These notes are from the slides and speaker notes; they get the professors\' words and exam hints once the recordings are posted. L17 Pregnancy and lactation and L18 Estrogens and androgens join when their slides are posted.</span></div>';
+  if(pending.length) h += '<div class="home-alert">' + icon('notes') + '<span><b>From the slides so far:</b> ' + pending.map(function(l){ return lecLabel(l) + ' ' + escHtml(l.title.split(':')[0]); }).join(', ') + '. These notes are from the slides and speaker notes; they get the professors\' words and exam hints once the recordings are posted. L16 is the last lecture on the exam.</span></div>';
   h += '<div class="quick-start home-qs" aria-label="Start studying">' +
     '<button type="button" class="qs-btn primary" data-home="new"><span class="qs-ic">' + icon('bank') + '</span><span><b>Practice questions</b><small>' + left + ' you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
@@ -7912,7 +7917,7 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>The exam: Friday, November 13, 10:00-11:30 am; 50 questions, 45 on L11-L18 and A, 5 on Exam 1.</b> Below: the most likely questions for each lecture, then what the professors said in the recordings, in their words. Lectures given after this hub was built get their hints when their recordings are posted.</span></div>' +
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>The exam: Friday, November 13, 10:00-11:30 am; 50 questions: 8 on L11, 9 on L12, 7 each on L13-L16, 5 on Exam 1.</b> Below: the most likely questions for each lecture, then what the professors said in the recordings, in their words. Lectures given after this hub was built get their hints when their recordings are posted.</span></div>' +
     likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">These are direct quotes from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>, plus the slides a professor told the class to focus on (<span class="kind focus">focus list</span>).</p>';
   LECTURES.forEach(function(l){
@@ -8046,12 +8051,15 @@ function mockLikelyPick(lec, n){
   var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq' && q.likely; });
   return shuffled(pool).slice(0, n);
 }
+/* a blueprint key is a lecture id or a group of lectures the exam counts together (EXAM_GROUPS: L12's two hours) */
+function mockLecs(k){ return EXAM_GROUPS[k] || [k]; }
+function mockLecIds(){ return Object.keys(MOCK_BLUEPRINT).reduce(function(a, k){ return a.concat(mockLecs(k)); }, []); }
 function buildMock(){
   var ids = [];
   Object.keys(MOCK_BLUEPRINT).forEach(function(lec){
     var likely = MOCK_LIKELY_ONLY[lec] ? mockLikelyPick(lec, MOCK_BLUEPRINT[lec]) : [];
     if(likely.length){ likely.forEach(function(q){ ids.push(q.id); }); return; }
-    var pool = (QUESTIONS_BY_LECTURE[lec]||[]).filter(function(q){ return q.type === 'mcq'; });
+    var pool = mockLecs(lec).reduce(function(a, l){ return a.concat(QUESTIONS_BY_LECTURE[l]||[]); }, []).filter(function(q){ return q.type === 'mcq'; });
     var fresh = shuffled(pool.filter(mockFresh));
     var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
     fresh.concat(rest).slice(0, MOCK_BLUEPRINT[lec]).forEach(function(q){ ids.push(q.id); });
@@ -8079,7 +8087,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, like the real exam: 45 spread over the new lectures by their share of lecture time (the exam\'s count per lecture hasn\'t been announced) and 5 on Exam 1, drawn from the Exam 1 Refresher\'s High Likelihood questions (Exam 1\'s predicted topics), each from a different Exam 1 lecture. The mock uses single-answer questions, including two-statement, true/false and numbered-statement items; practice the select-all, matching and ordering items in the bank (More filters, question type). Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real exam: choose an answer for each question with no feedback, then submit. The clock counts against 90:00, the exam\'s hour and a half (about 108 seconds a question), and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' questions, with the real exam\'s own count per lecture: 8 from L11, 9 from L12 (both hours together), 7 each from L13, L14, L15 and L16, and 5 on Exam 1, drawn at random from the Exam 1 Refresher\'s High Likelihood questions (Exam 1\'s predicted topics). The mock uses single-answer questions, including two-statement, true/false and numbered-statement items; practice the select-all, matching and ordering items in the bank (More filters, question type). Questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real exam: choose an answer for each question with no feedback, then submit. The clock counts against 90:00, the exam\'s hour and a half (about 108 seconds a question), and turns red past it. Then review every card with its explanation.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start the '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
@@ -8092,7 +8100,7 @@ function renderMock(body){
     '<button type="button" class="btn" id="mockNew">New mock</button></div>';
   if(m.submitted){
     h += '<div class="rv-table-wrap" style="margin-bottom:24px"><table class="rv-table"><thead><tr><th>Lecture</th><th>Correct</th><th>Score</th></tr></thead><tbody>' +
-      Object.keys(MOCK_BLUEPRINT).map(function(lec){
+      mockLecIds().map(function(lec){
         var qs = m.ids.filter(function(id){ return QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].lec === lec; });
         var c = qs.filter(function(id){ return m.res[id]; }).length;
         return '<tr><td>'+lecChip(lec)+'</td><td>'+c+' / '+qs.length+'</td><td>'+(qs.length?Math.round(c/qs.length*100):0)+'%</td></tr>';
@@ -8143,7 +8151,7 @@ function renderMock(body){
       });
       /* for the shared widget's trophies (a 90%+ mock on 20 or more questions) and its results card (widget/fx.js) */
       var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
-      var byLec = Object.keys(MOCK_BLUEPRINT).map(function(lec){
+      var byLec = mockLecIds().map(function(lec){
         var l = LECTURE_BY_ID[lec], qs = m.ids.filter(function(id){ return QUESTIONS_BY_ID[id] && QUESTIONS_BY_ID[id].lec === lec; });
         return { label: l ? lecLabel(l) + ' · ' + l.title.split(':')[0].split(',')[0] : lec, correct: qs.filter(function(id){ return m.res[id]; }).length, total: qs.length };
       });
