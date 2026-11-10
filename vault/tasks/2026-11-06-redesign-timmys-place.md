@@ -110,6 +110,9 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
   friend in a crater, a whale, the dog) and the About page get their lines.
 - 2026-11-10: Sam's third round of feedback (the art, the scenes, the yard, mastery, rank-up unlocks, seasonal sets, the
   shop's shelves, visiting someone's Timmy) is its own task: [round 3](2026-11-10-redesign-timmys-place-round-3.md). PR #289 stays open for it.
+- 2026-11-10 (Claude Code): round 3 is built on the design page ([its note](2026-11-10-redesign-timmys-place-round-3.md)):
+  the scenes, homes and yard redrawn, Timmy's wave and his bubble, two mastery displays for Sam to pick from, and the
+  seasonal and rank sets as packs (`tools/figures/site/packs/`). Still nothing in `widget/pet.js`.
 
 ## Outcome
 

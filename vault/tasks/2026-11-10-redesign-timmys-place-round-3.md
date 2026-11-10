@@ -1,11 +1,11 @@
 ---
 type: task
-status: in-progress
+status: review
 hub: widget
 created: 2026-11-10
 requested-by: Sam
 due: 
-waiting-on: 
+waiting-on: Sam
 agent: Claude Code
 pr: 
 ---
@@ -40,59 +40,60 @@ and change how unlocks, seasons and the shop work, on the design page first, the
 ## Sam's list (2026-11-10, in Sam's words where they're short)
 
 **Questions and rewards (the design page's question card and rewards art):**
-- [ ] Make "Why each choice" collapsed by default. (`widget/hub.js` already folds it; the design page's own card,
+- [x] Make "Why each choice" collapsed by default. (`widget/hub.js` already folds it; the design page's own card,
       `design.js` around `var whys`, draws it open.)
-- [ ] An animation when you tap the thumbs up or down on "Good question?".
-- [ ] The XP text color a shiny gold.
-- [ ] The streak flame turns blue at 10 days and Dark Matter at 30 days.
-- [ ] The tooth in the Perio hub emblem looks odd: redraw it (an exception to the live hubs' art approved on 2026-11-06).
-- [ ] The gold crown currency logo looks closer to a chef's hat: redraw it as a dental crown.
+- [x] An animation when you tap the thumbs up or down on "Good question?".
+- [x] The XP text color a shiny gold.
+- [x] The streak flame turns blue at 10 days and Dark Matter at 30 days.
+- [x] The tooth in the Perio hub emblem looks odd: redraw it (an exception to the live hubs' art approved on 2026-11-06).
+- [x] The gold crown currency logo looks closer to a chef's hat: redraw it as a dental crown.
 
 **Timmy himself:**
-- [ ] Timmy waves now and then, and when you tap him.
-- [ ] His speech bubbles come from Timmy, not the top middle of the picture.
+- [x] Timmy waves now and then, and when you tap him.
+- [x] His speech bubbles come from Timmy, not the top middle of the picture.
 
 **The scenes:**
-- [ ] The land around the house rises in a gradual hill, not a semicircle poking up from the ground; the seaside scene
+- [x] The land around the house rises in a gradual hill, not a semicircle poking up from the ground; the seaside scene
       the same, more like an island.
-- [ ] Seaside: the sun sits in the middle of the sky, and the water-to-sky transition looks wrong.
-- [ ] Above the clouds: the cloud looks more like snow than a cloud.
-- [ ] Starlight: the planet doesn't make sense.
+- [x] Seaside: the sun sits in the middle of the sky, and the water-to-sky transition looks wrong.
+- [x] Above the clouds: the cloud looks more like snow than a cloud.
+- [x] Starlight: the planet doesn't make sense.
 
 **The homes:**
-- [ ] The cottage is labeled "Default", not "Free".
-- [ ] The castle looks off and could be better; the treehouse roof doesn't line up; the beach hut's roof the same; the
+- [x] The cottage is labeled "Default", not "Free".
+- [x] The castle looks off and could be better; the treehouse roof doesn't line up; the beach hut's roof the same; the
       observatory's telescope looks odd.
-- [ ] The igloo has grass on top of it.
-- [ ] The house upgrades must not break what's already there: they mess up the handpiece and the toothbrush. And the
+- [x] The igloo has grass on top of it.
+- [x] The house upgrades must not break what's already there: they mess up the handpiece and the toothbrush. And the
       handpiece doesn't look like a handpiece.
 
 **The yard:**
-- [ ] The garden more detailed.
-- [ ] The swimming pool's water overlaps the side of the pool.
-- [ ] The hammock's pillow doesn't mesh.
-- [ ] The mint fountain becomes a **mouthwash fountain**, and its water stops abruptly at the top.
-- [ ] A dog when you have the doghouse; the chew toy more detailed.
-- [ ] The tooth used on the bowling lane, the mailbox and the pennant has a chunk taken out and looks squished.
-- [ ] The mailbox's flowers better.
-- [ ] The sandcastle's towers don't look right.
-- [ ] The beach chair doesn't look like a beach chair.
-- [ ] The bowling lane decoration uses the sugar-free mint as its ball (as the bowling egg does).
+- [x] The garden more detailed.
+- [x] The swimming pool's water overlaps the side of the pool.
+- [x] The hammock's pillow doesn't mesh.
+- [x] The mint fountain becomes a **mouthwash fountain**, and its water stops abruptly at the top.
+- [x] A dog when you have the doghouse; the chew toy more detailed.
+- [x] The tooth used on the bowling lane, the mailbox and the pennant has a chunk taken out and looks squished.
+- [x] The mailbox's flowers better.
+- [x] The sandcastle's towers don't look right.
+- [x] The beach chair doesn't look like a beach chair.
+- [x] The bowling lane decoration uses the sugar-free mint as its ball (as the bowling egg does).
 
 **Hub mastery:**
-- [ ] A better way to show hub mastery that scales to many more hubs; the pennants don't show up well.
+- [x] A better way to show hub mastery that scales to many more hubs; the pennants don't show up well.
 
 **Unlocks, seasons and the shop:**
-- [ ] Every **full rank-up** (not the I, II, III tiers) unlocks a decoration, an outfit and a house.
-- [ ] Every season gets a full set of cosmetics in the shop: **1 house and 1 scene per season (both Legendary)**, and a
+- [x] Every **full rank-up** (not the I, II, III tiers) unlocks a decoration, an outfit and a house. (Sam's answer
+      below: an outfit and a decoration only.)
+- [x] Every season gets a full set of cosmetics in the shop: **1 house and 1 scene per season (both Legendary)**, and a
       Rare, Epic and Legendary of everything else. They're limited time; at rare intervals a random selection of
       seasonal items comes back to the shop. **Seasons that have already passed are unlocked for everyone by default**
       (Sam: "i think this only includes halloween").
-- [ ] The shop has **daily and weekly items**, and a **seasonal section** while a season is on.
-- [ ] Overall: more outfits, scenes, houses and everything.
+- [x] The shop has **daily and weekly items**, and a **seasonal section** while a season is on.
+- [x] Overall: more outfits, scenes, houses and everything.
 
 **Visiting:**
-- [ ] Users can visit someone else's Timmy.
+- [x] Users can visit someone else's Timmy.
 
 **A question for the agent to answer Sam:** "Are there any more seasons or holidays we need to incorporate?" Today's
 are in `holidayId()` and `isFall()` in `widget/pet.js` (Halloween, Thanksgiving, winter, New Year, Valentine's, Dentist's
@@ -136,14 +137,14 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 
 ## Done when
 
-- [ ] Every item in Sam's list done on the design page (or answered, where it's a question), with screenshots to Sam in
+- [x] Every item in Sam's list done on the design page (or answered, where it's a question), with screenshots to Sam in
       light and dark, laptop and phone, and the hosted preview if Sam asks for one
-- [ ] The server follows: `migration_v54.sql` (still unapplied; check `supabase/pending-migrations.txt`) gets the rank
+- [x] The server follows: `migration_v54.sql` (still unapplied; check `supabase/pending-migrations.txt`) gets the rank
       unlocks, the seasonal sets and their rotation, the shop's daily, weekly and seasonal shelves, the mouthwash
       fountain's id, the visiting function, and their tests in `tools/release/xp.js` (and `rls.js` for visiting)
-- [ ] `node tools/figures/site/build.mjs --check`, `node tools/ci/syntax.js`, `node tools/ci/vault.js`, the database
+- [x] `node tools/figures/site/build.mjs --check`, `node tools/ci/syntax.js`, `node tools/ci/vault.js`, the database
       suites, and the smoke test pass
-- [ ] Vault written back: this note's Log and Outcome, [decisions](../decisions.md),
+- [x] Vault written back: this note's Log and Outcome, [decisions](../decisions.md),
       [Timmy's place](2026-11-06-redesign-timmys-place.md), [the shop](2026-11-06-redesign-timmy-shop.md),
       [game-server](../reference/game-server.md), `DEPLOY_NOTES.md`
 
@@ -152,7 +153,43 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 - 2026-11-10: written from Sam's list in chat (Claude Code, the session that made PRs #289 and #291), so the next chat
   can start from it.
 
+- 2026-11-10 (Claude Code, a second session): asked Sam the five calls and the seasons question (answers above), then
+  worked the list on the design page, from PR #289's branch. Nothing is wired into `widget/pet.js`, `widget/eggs.js`,
+  `widget/hub.js` or `widget/ranks.js`.
+  - **Quick fixes**: "Why each choice" folded; a pop and sparks on the "Good question?" thumbs; XP text in a shiny
+    gold; the streak flame has five levels (blue at 10 days, Dark Matter at 30); the coin redrawn as a gold dental crown;
+    Perio's emblem tooth redrawn; the cottage reads "Default".
+  - **Timmy**: he waves now and then and when tapped (tap again and he flips); the speech bubble sits over his head, with
+    a tail, and follows him.
+  - **Scenes and homes**: the hill and the island rise gradually; the seaside's sun and horizon, the cloud scene's cloud
+    and starlight's planet redrawn; the castle, the treehouse and beach hut roofs and the observatory's telescope
+    redrawn; the igloo sits on snow; upgrades no longer cover the statue or the toothbrush; the statue is a handpiece.
+  - **Yard**: the garden, pool, hammock, **mouthwash fountain** (id `mouthwash-fountain`), doghouse with its dog,
+    mailbox, sandcastle, sun loungers and the lane (a mint for a ball) redrawn; the little tooth mark redrawn.
+  - **Mastery**: the pennants are gone. Two displays beside the house for Sam to pick from, each good for 20 hubs: a
+    **trophy case** (a cup per hub) and a **gem plaque** (a gem per hub in the hub's color); the metal is the medal.
+  - **Sets**: `tools/figures/site/sets.mjs` lists 14 seasonal sets of 8 pieces (Spring, Summer, Tooth Fairy week, Mardi
+    Gras and the Fourth of July are new) and the Handpiece's six rank sets; each is drawn in its own pack
+    (`tools/figures/site/packs/`, [how-to](../how-to/draw-a-seasonal-set.md)).
+  - **Server** (`migration_v54.sql`, still pending): the catalog (180 rows), seasonal windows, two throwback days a
+    month, rank sets earned by rank, Halloween's set as a gift, the shop's shelves in `get_my_shop`, and visiting
+    (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js` has 344 checks.
+  - **The design page**: galleries for the mastery options, the rank sets and the seasonal sets, and designs of the
+    shop's shelves and of visiting from the boards.
+
 ## Outcome
+
+Waiting for Sam's look at the screenshots (PR below). Left for after it:
+
+- **Sam picks** the trophy case or the gem plaque.
+- **The Fourth of July window**: Sam said July 1-4; the server and `sets.mjs` use June 28 to July 4, by the rule "a short
+  holiday's set is on sale for the seven days ending on its last day". Say which.
+- **Wiring** (not done, by instruction): the place, the sets, the wave and the bubble into `widget/pet.js`; the new
+  seasons and holidays into `holidayId()` / `isFall()` (the server's `sh_shop_seasons` already has them); flame levels
+  4 and 5 into `widget/hub.js` (it picks levels 1-3 today); the shop and visiting clients; then the About page (visiting,
+  the sets, the mastery display) and `tools/podcast/LORE.md`.
+- Only the Handpiece's six rank sets exist; the ModuPro's and the Loupes' are drawn before anyone reaches them.
+- A tall piece in the side yard or the front corner can cover part of the mastery display.
 
 Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
 [the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
