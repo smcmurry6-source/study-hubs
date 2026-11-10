@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Perio S9: five drawn diagrams, Claude Code, #301)** — Sam: "Yes to all diagrams. Merge when ready". The five
+  S9 candidates, built with the anima kit in `tools/figures/perio/` (`cairo.mjs`, `palate.mjs`, `grafts.mjs`, `ape.mjs`,
+  `egd.mjs`; `build.mjs` pastes them into the hub): **Fig 1 The Cairo recession types** (one canine with 4 mm of
+  recession as RT1, RT2 and RT3, the buccal and interproximal CAL, and a toggle for what a graft can cover), **Fig 2 The
+  palate as a donor site** (a section through a premolar and the palate: epithelium, lamina propria, submucosa, and the
+  greater palatine bundle at about 7, 12 or 17 mm for a shallow, average or high vault, with FGG and CTG outlines),
+  **Fig 3 Covered or exposed: which graft** (a CTG under a coronally advanced flap and an FGG left exposed above an
+  apically positioned flap, four steps each, from his two recorded cases), **Fig 4 Altered passive eruption** (Coslet's
+  Types 1/2 and A/B, before and after their crown lengthening) and **Fig 5 A gummy smile: find the cause** (lip length
+  and mobility sliders, the lower facial third and short crowns, each pointing to its cause and treatment). Under the S9
+  notes and in the Review section each illustrates; Figs 4 and 5 follow the slides until the live class is posted. Each
+  cites its outside sources. About page: the Perio diagrams sentence. No notes, questions or audio changed.
 - **2026-11-10 ("Which statement" questions, Claude Code)** — Sam: "add which statement questions" and "also do the inverse".
   Two new formats with their own Question Bank filter entries: **Which statement is true** (`which`, one true of four) and
   **Which statement is false** (`whichf`, one false of four), built by `which()` / `whichf()` in Heme & Endo Exam 2 and Occlusion.
