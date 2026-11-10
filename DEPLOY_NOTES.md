@@ -32,6 +32,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Timmy's place, round 3: on the design page and in the pending migration only, Claude Code)** — Sam's
+  third round of feedback ([task](vault/tasks/2026-11-10-redesign-timmys-place-round-3.md), PR #299, stacked on #289).
+  **Students see nothing yet**: nothing is wired into `widget/pet.js`, `widget/eggs.js`, `widget/hub.js` or
+  `widget/ranks.js`, and `migration_v54.sql` is still unapplied. (1) Art fixes: "Why each choice" folded, a pop on the
+  "Good question?" thumbs, shiny gold XP text, a five-level streak flame (blue at 10 days, Dark Matter at 30), the coin
+  as a dental crown, Perio's emblem tooth, "Default" on the cottage; the hill and island rise gradually; the seaside,
+  cloud and starlight scenes, the castle, treehouse, beach hut, observatory and igloo, and most of the yard redrawn (a
+  **mouthwash fountain**, id `mouthwash-fountain`, a dog with the doghouse, a mint for the lane's ball). Timmy waves and
+  his speech bubble follows him. (2) Hub mastery: the pennants are gone; a **trophy case** and a **gem plaque**, each good
+  for 20 hubs, for Sam to pick from (`mastery: "case" | "plaque"` in the kit). (3) **Sets**: `tools/figures/site/sets.mjs`
+  lists 14 seasonal sets of 8 pieces (new: Spring, Summer, Tooth Fairy week, Mardi Gras, the Fourth of July) and the
+  Handpiece's six rank sets (an outfit and a yard piece per full rank-up, earned, never sold); each is one file in
+  `tools/figures/site/packs/` ([how-to](vault/how-to/draw-a-seasonal-set.md)); the build checks 1,430 drawings and 3,384
+  walks and `--strict` fails on a set with no pack. (4) Server, still pending: the catalog is 180 rows; seasonal windows
+  (`sh_shop_seasons`), two throwback days a month, rank sets by rank, Halloween's set as a gift, the shop's shelves in
+  `get_my_shop`, and visiting (`get_place` by a board's visit key, on by default, `set_visiting`); `tools/release/xp.js`
+  344 checks. (5) The design page shows all of it, with designs of the shop's shelves and of visiting. Open: Sam's pick
+  of the mastery display; the Fourth of July window (Sam said July 1-4, the server has June 28 to July 4).
 - **2026-11-08 (Heme & Endo Exam 2: a high-yield bank, and a standing rule on what professors skip, Claude Code)** — Sam:
   "That should be a standing rule. Also 803 is way too many questions. They need to be higher yield". (1) New standing
   rule for every hub, `vault/rules/dont-ask-what-professors-skip.md`: no question tests what a professor said you don't
