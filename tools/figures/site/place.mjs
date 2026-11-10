@@ -191,7 +191,7 @@ export function placeKit(INK, C, PACKS, SETS){
     right:  { n: "The back corner",    x: 10.2, y: .8 }
   };
   var SLOT_ORDER = ["right", "side", "left", "front", "corner"];
-  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [9.95, 7.9] };
+  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [10.05, 8.3] };
   /* where nothing else grows: the home, the path, the slots and the fixed pieces */
   function busy(x, y){
     if (x > 1.2 && x < 9.8 && y > 1.2 && y < 10.4) return true;
@@ -1176,9 +1176,9 @@ export function placeKit(INK, C, PACKS, SETS){
       n: "The igloo", note: "Epic: snow blocks, a tunnel door and a warm glow", rarity: "Epic", theme: "snowy", price: 2200, id: "igloo",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Ice windows", porch: "Snow lanterns", chimney: "A stovepipe", flag: "A flag on top", paint: "Ice tint" },
-      door: [5.5, 9.55], brush: [8.55, 8.7], statue: [3.1, 9.0], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow",
+      door: [5.5, 9.55], brush: [9.0, 8.25], statue: [1.9, 8.6], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow", gap: [[3.1, 7.2, 6.3, 10.4], [3.1, 8.75, 7.0, 10.4]],
       eaves: [[2.7, 7.4, 1.7], [7.8, 2.4, 1.7], 8], round: [5.5, 5.3, 3.0],
-      base: arcPts(5.5, 5.3, 3.05, -40, 62, 8).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
+      base: arcPts(5.5, 5.3, 3.05, -24, 62, 7).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
       draw: function(o){
         var u = o.up, p = PAINTS[o.paint] || PAINTS.cream, ice = o.paint && o.paint !== "cream" ? p : { c: "#FBFDFF", s: "#D6E6F4" }, s = "", lights = "", cx = 5.5, cy = 5.3;
         /* its own patch of snow, whatever the scene */
@@ -1203,7 +1203,7 @@ export function placeKit(INK, C, PACKS, SETS){
         var dw = onY(tY1 + .01, archUV(4.85, 6.15, 0, 1.25, 10));
         s += FO(D(dw), o.night ? K.lit : "#3D5A80", 1.4);
         if (o.night){ var dc = P(5.5, tY1, .6); lights += glowAt(dc[0], dc[1], 14) + FO(D(dw), K.lit, 1.4); }
-        if (u.porch) [[4.0, 9.8], [7.0, 9.8]].forEach(function(q){ s += box(q[0] - .3, q[1] - .3, 0, .6, .6, .7, { top: "#FFFFFF", left: "#F4F8FC", right: "#D6E6F4" }, { sw: 1.3, si: .8 }); var c = P(q[0], q[1] + .3, .35); s += circ(c[0], c[1], 1.4, o.night ? K.litHot : "#FFE9A8", .8); if (o.night) lights += glowAt(c[0], c[1], 8); });
+        if (u.porch) [[4.3, 9.95], [7.25, 9.95]].forEach(function(q){ s += box(q[0] - .3, q[1] - .3, 0, .6, .6, .7, { top: "#FFFFFF", left: "#F4F8FC", right: "#D6E6F4" }, { sw: 1.3, si: .8 }); var c = P(q[0], q[1] + .3, .35); s += circ(c[0], c[1], 1.4, o.night ? K.litHot : "#FFE9A8", .8); if (o.night) lights += glowAt(c[0], c[1], 8); });
         if (u.flag) s += flagOn(cx, cy, 2.95, 2.0);
         return { body: s, lights: lights };
       }
@@ -1266,7 +1266,8 @@ export function placeKit(INK, C, PACKS, SETS){
       var a = pts[i], b = pts[i + 1], len = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])), m = Math.max(1, Math.round(len / .62));
       for (var j = i ? 1 : 0; j <= m; j++){
         var t = j / m, x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
-        if (Math.abs(x - d[0]) < 1.0 && Math.abs(y - d[1]) < 1.3) continue;
+        /* nothing piles up in the doorway; a home whose doorway is more than a door (the igloo's tunnel) lists the patches to keep clear (gap) */
+        if (h.gap ? h.gap.some(function(g){ return x > g[0] && x < g[2] && y > g[1] && y < g[3]; }) : Math.abs(x - d[0]) < 1.0 && Math.abs(y - d[1]) < 1.3) continue;
         var q = P(x + .1, y + .1, 0); s += skirtBit(kind, q[0], q[1], n++, R, o);
       }
     }
@@ -1698,12 +1699,14 @@ export function placeKit(INK, C, PACKS, SETS){
       dmStar(x + r * 1.02, y - r * 1.1, Math.max(1.6, r * .62), "#FFFFFF", "tp-twinkle", i * .3);
     return s;
   }
-  /* a board on a post, one medal per hub hung on it */
+  /* a board on a short post, one medal per hub hung on it. Kept small and low (Sam, 2026-11-10: "be sure it isn't covering
+     too much of the house"): at twenty medals it is about 31 wide and 35 tall, post and all, and stands at the foot of the
+     right wall's front end, where the wall is lowest on the picture */
   function medalBoard(x, y, flair, o){
     var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
-    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10.4 : n <= 4 ? 8.6 : n <= 9 ? 7.4 : n <= 12 ? 6.6 : 6, r = cell * .36, ch = r * 2.75 + .5;
+    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 9.4 : n <= 4 ? 7.8 : n <= 9 ? 6.6 : n <= 12 ? 5.8 : 5.2, r = cell * .36, ch = r * 2.75 + .5;
     var crown = list.some(function(q){ return q.lvl >= 4; }), padT = crown ? r * .85 : 0;
-    var W = cols * cell + 6, H = rows * ch + padT + 5.4, t = P(x, y, 0), bx = t[0], by = t[1] - 9, top = by - H, s = "", lights = "";
+    var W = cols * cell + 5.4, H = rows * ch + padT + 5, t = P(x, y, 0), bx = t[0], by = t[1] - 6, top = by - H, s = "", lights = "";
     s += ell(bx + 2, t[1] + 1, 7, 2.6, "#1B2A3A", 0, .14) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 5) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 2.8, K.wood);
     var board = "M" + f(bx - W / 2) + " " + f(by) + " V" + f(top + 3) + " q0 -3 3 -3 H" + f(bx - 5) + " q5 -5.4 10 0 H" + f(bx + W / 2 - 3) + " q3 0 3 3 V" + f(by) + " q0 2.4 -2.4 2.4 H" + f(bx - W / 2 + 2.4) + " q-2.4 0 -2.4 -2.4 Z";
     s += FO(board, K.woodLight, 1.5) + F("M" + f(bx + W / 2 - 3.2) + " " + f(top + .8) + " q2.6 .2 2.6 2.4 V" + f(by) + " q0 1.8 -1.8 1.8 h-.8 z", K.wood, .8);

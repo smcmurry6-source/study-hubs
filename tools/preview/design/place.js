@@ -167,7 +167,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     right:  { n: "The back corner",    x: 10.2, y: .8 }
   };
   var SLOT_ORDER = ["right", "side", "left", "front", "corner"];
-  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [9.95, 7.9] };
+  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [10.05, 8.3] };
   /* where nothing else grows: the home, the path, the slots and the fixed pieces */
   function busy(x, y){
     if (x > 1.2 && x < 9.8 && y > 1.2 && y < 10.4) return true;
@@ -1152,9 +1152,9 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The igloo", note: "Epic: snow blocks, a tunnel door and a warm glow", rarity: "Epic", theme: "snowy", price: 2200, id: "igloo",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Ice windows", porch: "Snow lanterns", chimney: "A stovepipe", flag: "A flag on top", paint: "Ice tint" },
-      door: [5.5, 9.55], brush: [8.55, 8.7], statue: [3.1, 9.0], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow",
+      door: [5.5, 9.55], brush: [9.0, 8.25], statue: [1.9, 8.6], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow", gap: [[3.1, 7.2, 6.3, 10.4], [3.1, 8.75, 7.0, 10.4]],
       eaves: [[2.7, 7.4, 1.7], [7.8, 2.4, 1.7], 8], round: [5.5, 5.3, 3.0],
-      base: arcPts(5.5, 5.3, 3.05, -40, 62, 8).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
+      base: arcPts(5.5, 5.3, 3.05, -24, 62, 7).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
       draw: function(o){
         var u = o.up, p = PAINTS[o.paint] || PAINTS.cream, ice = o.paint && o.paint !== "cream" ? p : { c: "#FBFDFF", s: "#D6E6F4" }, s = "", lights = "", cx = 5.5, cy = 5.3;
         /* its own patch of snow, whatever the scene */
@@ -1179,7 +1179,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
         var dw = onY(tY1 + .01, archUV(4.85, 6.15, 0, 1.25, 10));
         s += FO(D(dw), o.night ? K.lit : "#3D5A80", 1.4);
         if (o.night){ var dc = P(5.5, tY1, .6); lights += glowAt(dc[0], dc[1], 14) + FO(D(dw), K.lit, 1.4); }
-        if (u.porch) [[4.0, 9.8], [7.0, 9.8]].forEach(function(q){ s += box(q[0] - .3, q[1] - .3, 0, .6, .6, .7, { top: "#FFFFFF", left: "#F4F8FC", right: "#D6E6F4" }, { sw: 1.3, si: .8 }); var c = P(q[0], q[1] + .3, .35); s += circ(c[0], c[1], 1.4, o.night ? K.litHot : "#FFE9A8", .8); if (o.night) lights += glowAt(c[0], c[1], 8); });
+        if (u.porch) [[4.3, 9.95], [7.25, 9.95]].forEach(function(q){ s += box(q[0] - .3, q[1] - .3, 0, .6, .6, .7, { top: "#FFFFFF", left: "#F4F8FC", right: "#D6E6F4" }, { sw: 1.3, si: .8 }); var c = P(q[0], q[1] + .3, .35); s += circ(c[0], c[1], 1.4, o.night ? K.litHot : "#FFE9A8", .8); if (o.night) lights += glowAt(c[0], c[1], 8); });
         if (u.flag) s += flagOn(cx, cy, 2.95, 2.0);
         return { body: s, lights: lights };
       }
@@ -1242,7 +1242,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       var a = pts[i], b = pts[i + 1], len = Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])), m = Math.max(1, Math.round(len / .62));
       for (var j = i ? 1 : 0; j <= m; j++){
         var t = j / m, x = a[0] + (b[0] - a[0]) * t, y = a[1] + (b[1] - a[1]) * t;
-        if (Math.abs(x - d[0]) < 1.0 && Math.abs(y - d[1]) < 1.3) continue;
+        /* nothing piles up in the doorway; a home whose doorway is more than a door (the igloo's tunnel) lists the patches to keep clear (gap) */
+        if (h.gap ? h.gap.some(function(g){ return x > g[0] && x < g[2] && y > g[1] && y < g[3]; }) : Math.abs(x - d[0]) < 1.0 && Math.abs(y - d[1]) < 1.3) continue;
         var q = P(x + .1, y + .1, 0); s += skirtBit(kind, q[0], q[1], n++, R, o);
       }
     }
@@ -1674,12 +1675,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       dmStar(x + r * 1.02, y - r * 1.1, Math.max(1.6, r * .62), "#FFFFFF", "tp-twinkle", i * .3);
     return s;
   }
-  /* a board on a post, one medal per hub hung on it */
+  /* a board on a short post, one medal per hub hung on it. Kept small and low (Sam, 2026-11-10: "be sure it isn't covering
+     too much of the house"): at twenty medals it is about 31 wide and 35 tall, post and all, and stands at the foot of the
+     right wall's front end, where the wall is lowest on the picture */
   function medalBoard(x, y, flair, o){
     var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
-    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10.4 : n <= 4 ? 8.6 : n <= 9 ? 7.4 : n <= 12 ? 6.6 : 6, r = cell * .36, ch = r * 2.75 + .5;
+    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 9.4 : n <= 4 ? 7.8 : n <= 9 ? 6.6 : n <= 12 ? 5.8 : 5.2, r = cell * .36, ch = r * 2.75 + .5;
     var crown = list.some(function(q){ return q.lvl >= 4; }), padT = crown ? r * .85 : 0;
-    var W = cols * cell + 6, H = rows * ch + padT + 5.4, t = P(x, y, 0), bx = t[0], by = t[1] - 9, top = by - H, s = "", lights = "";
+    var W = cols * cell + 5.4, H = rows * ch + padT + 5, t = P(x, y, 0), bx = t[0], by = t[1] - 6, top = by - H, s = "", lights = "";
     s += ell(bx + 2, t[1] + 1, 7, 2.6, "#1B2A3A", 0, .14) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 5) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 2.8, K.wood);
     var board = "M" + f(bx - W / 2) + " " + f(by) + " V" + f(top + 3) + " q0 -3 3 -3 H" + f(bx - 5) + " q5 -5.4 10 0 H" + f(bx + W / 2 - 3) + " q3 0 3 3 V" + f(by) + " q0 2.4 -2.4 2.4 H" + f(bx - W / 2 + 2.4) + " q-2.4 0 -2.4 -2.4 Z";
     s += FO(board, K.woodLight, 1.5) + F("M" + f(bx + W / 2 - 3.2) + " " + f(top + .8) + " q2.6 .2 2.6 2.4 V" + f(by) + " q0 1.8 -1.8 1.8 h-.8 z", K.wood, .8);
@@ -4721,6 +4724,16 @@ function pack(T){
     }
     return s;
   };
+  /* a field boulder with a cap of moss, a smaller stone tucked against it */
+  var boulder = function(x, y, k, o){
+    var st = o.night ? ["#98A2AD", "#7F8994"] : ["#D5DBE1", "#A9B3BE"], moss = o.snow ? "#FFFFFF" : o.night ? "#2F7A50" : "#4FB565";
+    var d = "M" + f(x - 6.4 * k) + " " + f(y) + " q" + f(-1.2 * k) + " " + f(-5.4 * k) + " " + f(2.6 * k) + " " + f(-7.6 * k) + " q" + f(3.6 * k) + " " + f(-2.4 * k) + " " + f(7.2 * k) + " " + f(-.4 * k) + " q" + f(3.4 * k) + " " + f(2.4 * k) + " " + f(2.8 * k) + " " + f(8 * k) + " Z";
+    return ell(x, y + .4 * k, 7.6 * k, 2.2 * k, "#000", 0, .1) + FO(d, st[0], 1.5) +
+      F("M" + f(x + 1.2 * k) + " " + f(y - .6 * k) + " q" + f(3.2 * k) + " " + f(-3 * k) + " " + f(2 * k) + " " + f(-7 * k) + " q" + f(2.6 * k) + " " + f(2.6 * k) + " " + f(2.2 * k) + " " + f(7 * k) + " Z", st[1], .8) +
+      FO("M" + f(x - 4.6 * k) + " " + f(y - 6.6 * k) + " q" + f(3 * k) + " " + f(-3.4 * k) + " " + f(7.4 * k) + " " + f(-1.6 * k) + " q" + f(1.6 * k) + " " + f(.8 * k) + " " + f(2 * k) + " " + f(2.2 * k) + " q" + f(-1.6 * k) + " " + f(1.2 * k) + " " + f(-3 * k) + " " + f(.4 * k) + " q" + f(-1.4 * k) + " " + f(1.6 * k) + " " + f(-3.2 * k) + " " + f(.4 * k) + " q" + f(-1.8 * k) + " " + f(1 * k) + " " + f(-3.2 * k) + " " + f(-1.4 * k) + " Z", moss, 1.1) +
+      FO("M" + f(x - 9.4 * k) + " " + f(y + 1 * k) + " q" + f(-.4 * k) + " " + f(-3 * k) + " " + f(2.2 * k) + " " + f(-3.4 * k) + " q" + f(2.6 * k) + " " + f(.2 * k) + " " + f(2.6 * k) + " " + f(3.4 * k) + " Z", st[0], 1.2) +
+      L("M" + f(x - 3.4 * k) + " " + f(y - 3.4 * k) + " l" + f(1.8 * k) + " " + f(1.4 * k) + " M" + f(x - .6 * k) + " " + f(y - 1.6 * k) + " l" + f(1.2 * k) + " " + f(-1.2 * k), .9, INK, .35);
+  };
   var scenes = {
     "emerald-hills": T.hillScene({
       note: "Rolling green hills stitched with dry-stone walls, sheep on them, and a rainbow after the rain",
@@ -4756,8 +4769,15 @@ function pack(T){
       },
       landExtra: function(o){
         /* the boundary wall along the yard's right edge, stacked dry */
-        var s = ""; [[.4, 3.1], [3.7, 2.9], [6.8, 3.2], [10.2, 2.6]].forEach(function(q){ s += stoneWall(16.35, q[0], q[1], o, "y"); });
-        return s;
+        /* one unbroken run on each side of a gateway: two capped pillars and a wooden field gate left ajar */
+        var c = o.night ? ["#A9B3BE", "#98A2AD", "#7F8994"] : o.snow ? ["#FFFFFF", "#CBD1D7", "#A9B3BE"] : ["#E3E7EB", "#CBD1D7", "#A9B3BE"];
+        var pillar = function(y){ return box(16.27, y, 0, .62, .5, 1.02, { top: c[0], left: c[1], right: c[2] }, { sw: 1.5, si: .9 }) + box(16.2, y - .07, 1.02, .76, .64, .16, { top: c[0], left: c[1], right: c[2] }, { sw: 1.3, si: .8 }); };
+        var wood = o.night ? "#6E5340" : "#9A6B45", gx = function(y){ return 16.58 + (y - 6.05) * .42; }, g = function(y, z){ return [gx(y), y, z]; };
+        var s = stoneWall(16.35, .4, 5.15, o, "y") + pillar(5.55);
+        s += L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 2.6) + L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 1.3, wood);
+        [.26, .52, .78].forEach(function(z){ s += L(D([g(6.05, z), g(7.0, z)], true), 2.4) + L(D([g(6.05, z), g(7.0, z)], true), 1.2, wood); });
+        s += L(D([g(6.05, .26), g(7.0, .78)], true), 2.2) + L(D([g(6.05, .26), g(7.0, .78)], true), 1, wood);
+        return s + pillar(7.25) + stoneWall(16.35, 7.75, 4.85, o, "y") + pillar(12.6);
       },
       flat: function(o, on){
         if (o.snow) return "";
@@ -4767,9 +4787,9 @@ function pack(T){
           T.scatter(153, 12, on, function(sx, sy, i){ return circ(sx, sy, 1.9, o.night ? "#B9C3B0" : i % 3 ? "#FFFFFF" : "#FFE27A", .7) + (i % 3 ? circ(sx, sy, .7, "#F2C230") : ""); }).join("");
       },
       props: function(o, on){
-        var ok = function(sx, sy, x, y){ return on(sx, sy, x, y) && !(x > 15.2 && x < 17.9 && y > -.6 && y < 13.8); };
+        var ok = function(sx, sy, x, y){ return on(sx, sy, x, y) && !(x > 14.3 && x < 18.7 && y > -.8 && y < 14.2); };
         return T.scatter(154, 9, ok, function(sx, sy, i, R, x, y){
-          var s = i % 3 === 0 ? stoneWall(x - 1.2, y - .23, 2.4, o, "x")
+          var s = i % 3 === 0 ? boulder(sx, sy, i % 2 ? 1.15 : .9, o)
             : i % 3 === 1 ? sheep(sx, sy, 1.15, o.night) + (i % 2 ? sheep(sx + 12, sy + 3, .9, o.night) : "")
             : T.canopy(sx, sy - 6, 7.4, o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#2F7A50", "#256341"] : ["#4FB565", "#3A9650"], 50 + i) + (o.snow ? "" : [[-3, -8], [2, -10], [4, -5], [-1, -4], [-5, -4]].map(function(q){ return circ(sx + q[0], sy + q[1], 1.3, o.night ? "#C9B85A" : "#FFD23F", .5); }).join(""));
           return { x: x, y: y, s: s };

@@ -3,7 +3,7 @@
    source into tools/preview/design/place.js, so it uses nothing from outside itself but T. Structure: packs/thanksgiving.mjs.
 
    - home:    thatched-cottage: whitewashed walls, a thick rounded thatch roof (hipped, a bulging profile), a green half-door.
-   - scene:   emerald-hills: three ranks of green hills fenced with dry-stone walls, sheep, and a rainbow over it all.
+   - scene:   emerald-hills: three ranks of green hills fenced with dry-stone walls, sheep, mossy boulders, a gated wall along the yard, and a rainbow over it all.
    - yard:    clover-patch (one four-leaf clover), wishing-well, pot-of-gold (at the foot of a little rainbow).
    - outfits: flat-cap (tweed), bagpiper (a feathered cap, bagpipes under his arm), gold-buckle-suit (tall green hat, coat, bow tie).
    Never sugar, no alcohol, nothing religious. No ids, gradients, filters, text, images or emoji: flat fills and ink outlines. */
@@ -111,6 +111,16 @@ export function pack(T){
     }
     return s;
   };
+  /* a field boulder with a cap of moss, a smaller stone tucked against it */
+  var boulder = function(x, y, k, o){
+    var st = o.night ? ["#98A2AD", "#7F8994"] : ["#D5DBE1", "#A9B3BE"], moss = o.snow ? "#FFFFFF" : o.night ? "#2F7A50" : "#4FB565";
+    var d = "M" + f(x - 6.4 * k) + " " + f(y) + " q" + f(-1.2 * k) + " " + f(-5.4 * k) + " " + f(2.6 * k) + " " + f(-7.6 * k) + " q" + f(3.6 * k) + " " + f(-2.4 * k) + " " + f(7.2 * k) + " " + f(-.4 * k) + " q" + f(3.4 * k) + " " + f(2.4 * k) + " " + f(2.8 * k) + " " + f(8 * k) + " Z";
+    return ell(x, y + .4 * k, 7.6 * k, 2.2 * k, "#000", 0, .1) + FO(d, st[0], 1.5) +
+      F("M" + f(x + 1.2 * k) + " " + f(y - .6 * k) + " q" + f(3.2 * k) + " " + f(-3 * k) + " " + f(2 * k) + " " + f(-7 * k) + " q" + f(2.6 * k) + " " + f(2.6 * k) + " " + f(2.2 * k) + " " + f(7 * k) + " Z", st[1], .8) +
+      FO("M" + f(x - 4.6 * k) + " " + f(y - 6.6 * k) + " q" + f(3 * k) + " " + f(-3.4 * k) + " " + f(7.4 * k) + " " + f(-1.6 * k) + " q" + f(1.6 * k) + " " + f(.8 * k) + " " + f(2 * k) + " " + f(2.2 * k) + " q" + f(-1.6 * k) + " " + f(1.2 * k) + " " + f(-3 * k) + " " + f(.4 * k) + " q" + f(-1.4 * k) + " " + f(1.6 * k) + " " + f(-3.2 * k) + " " + f(.4 * k) + " q" + f(-1.8 * k) + " " + f(1 * k) + " " + f(-3.2 * k) + " " + f(-1.4 * k) + " Z", moss, 1.1) +
+      FO("M" + f(x - 9.4 * k) + " " + f(y + 1 * k) + " q" + f(-.4 * k) + " " + f(-3 * k) + " " + f(2.2 * k) + " " + f(-3.4 * k) + " q" + f(2.6 * k) + " " + f(.2 * k) + " " + f(2.6 * k) + " " + f(3.4 * k) + " Z", st[0], 1.2) +
+      L("M" + f(x - 3.4 * k) + " " + f(y - 3.4 * k) + " l" + f(1.8 * k) + " " + f(1.4 * k) + " M" + f(x - .6 * k) + " " + f(y - 1.6 * k) + " l" + f(1.2 * k) + " " + f(-1.2 * k), .9, INK, .35);
+  };
   var scenes = {
     "emerald-hills": T.hillScene({
       note: "Rolling green hills stitched with dry-stone walls, sheep on them, and a rainbow after the rain",
@@ -146,8 +156,15 @@ export function pack(T){
       },
       landExtra: function(o){
         /* the boundary wall along the yard's right edge, stacked dry */
-        var s = ""; [[.4, 3.1], [3.7, 2.9], [6.8, 3.2], [10.2, 2.6]].forEach(function(q){ s += stoneWall(16.35, q[0], q[1], o, "y"); });
-        return s;
+        /* one unbroken run on each side of a gateway: two capped pillars and a wooden field gate left ajar */
+        var c = o.night ? ["#A9B3BE", "#98A2AD", "#7F8994"] : o.snow ? ["#FFFFFF", "#CBD1D7", "#A9B3BE"] : ["#E3E7EB", "#CBD1D7", "#A9B3BE"];
+        var pillar = function(y){ return box(16.27, y, 0, .62, .5, 1.02, { top: c[0], left: c[1], right: c[2] }, { sw: 1.5, si: .9 }) + box(16.2, y - .07, 1.02, .76, .64, .16, { top: c[0], left: c[1], right: c[2] }, { sw: 1.3, si: .8 }); };
+        var wood = o.night ? "#6E5340" : "#9A6B45", gx = function(y){ return 16.58 + (y - 6.05) * .42; }, g = function(y, z){ return [gx(y), y, z]; };
+        var s = stoneWall(16.35, .4, 5.15, o, "y") + pillar(5.55);
+        s += L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 2.6) + L(D([g(6.05, .08), g(6.05, .86)], true) + D([g(7.0, .08), g(7.0, .86)], true), 1.3, wood);
+        [.26, .52, .78].forEach(function(z){ s += L(D([g(6.05, z), g(7.0, z)], true), 2.4) + L(D([g(6.05, z), g(7.0, z)], true), 1.2, wood); });
+        s += L(D([g(6.05, .26), g(7.0, .78)], true), 2.2) + L(D([g(6.05, .26), g(7.0, .78)], true), 1, wood);
+        return s + pillar(7.25) + stoneWall(16.35, 7.75, 4.85, o, "y") + pillar(12.6);
       },
       flat: function(o, on){
         if (o.snow) return "";
@@ -157,9 +174,9 @@ export function pack(T){
           T.scatter(153, 12, on, function(sx, sy, i){ return circ(sx, sy, 1.9, o.night ? "#B9C3B0" : i % 3 ? "#FFFFFF" : "#FFE27A", .7) + (i % 3 ? circ(sx, sy, .7, "#F2C230") : ""); }).join("");
       },
       props: function(o, on){
-        var ok = function(sx, sy, x, y){ return on(sx, sy, x, y) && !(x > 15.2 && x < 17.9 && y > -.6 && y < 13.8); };
+        var ok = function(sx, sy, x, y){ return on(sx, sy, x, y) && !(x > 14.3 && x < 18.7 && y > -.8 && y < 14.2); };
         return T.scatter(154, 9, ok, function(sx, sy, i, R, x, y){
-          var s = i % 3 === 0 ? stoneWall(x - 1.2, y - .23, 2.4, o, "x")
+          var s = i % 3 === 0 ? boulder(sx, sy, i % 2 ? 1.15 : .9, o)
             : i % 3 === 1 ? sheep(sx, sy, 1.15, o.night) + (i % 2 ? sheep(sx + 12, sy + 3, .9, o.night) : "")
             : T.canopy(sx, sy - 6, 7.4, o.snow ? ["#F7FBFF", "#DCEAF6"] : o.night ? ["#2F7A50", "#256341"] : ["#4FB565", "#3A9650"], 50 + i) + (o.snow ? "" : [[-3, -8], [2, -10], [4, -5], [-1, -4], [-5, -4]].map(function(q){ return circ(sx + q[0], sy + q[1], 1.3, o.night ? "#C9B85A" : "#FFD23F", .5); }).join(""));
           return { x: x, y: y, s: s };
