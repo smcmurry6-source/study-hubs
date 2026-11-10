@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Heme & Endo Exam 2: the two-Sertoli-cell figure, Claude Code)** — Report #38 and Sam's "Draw the figure":
+  the hub's own unlabeled version of Dr. Herr's L13 drawing he said is on the exam (`tools/figures/heme-endo-exam2/sertoli.mjs`),
+  laid out like his slide (Sam's screenshot, matched and not committed): his ten labels numbered in scrambled order and the
+  two compartments lettered, with the key after answering. It sits above
+  `mh-fig-seq` and `mh-fig-label` and under the notes' "Sertoli cells" heading; `build.mjs` now writes the hub's `FIGS` line.
 - **2026-11-10 (Perio S9: five drawn diagrams, Claude Code, #301)** — Sam: "Yes to all diagrams. Merge when ready". The five
   S9 candidates, built with the anima kit in `tools/figures/perio/` (`cairo.mjs`, `palate.mjs`, `grafts.mjs`, `ape.mjs`,
   `egd.mjs`; `build.mjs` pastes them into the hub): **Fig 1 The Cairo recession types** (one canine with 4 mm of

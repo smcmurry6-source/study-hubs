@@ -1,4 +1,5 @@
-// Pastes the Heme & Endo Exam 2 hub's anima figures into hubs/heme-endo-exam2/index.html between its markers.
+// Pastes the Heme & Endo Exam 2 hub's anima figures into hubs/heme-endo-exam2/index.html between its markers, and its
+// static drawn figures (sertoli.mjs) into its `var FIGS = {...};` line.
 //   node tools/figures/heme-endo-exam2/build.mjs            rebuild the hub's anima blocks from the files here
 //   node tools/figures/heme-endo-exam2/build.mjs --check    exit 1 if the hub's blocks are out of date
 //   node tools/figures/heme-endo-exam2/build.mjs --preview  also write standalone pages to dist/ for anima's checks
@@ -7,6 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { baseCss } from "./shared.mjs";
 import { FIGURES } from "./index.mjs";
+import { SERTOLI } from "./sertoli.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,12 +53,19 @@ function between(src, b, e, body){
 const hub = readFileSync(HUB, "utf8");
 let out = between(hub, AJB, AJE, animaJs());
 out = between(out, ACB, ACE, animaCss());
+/* the static drawn figures (FIGS: figHTML above a stem, figAfterHTML after answering, figCardHTML in the notes and
+   Review), written as the hub's one `var FIGS = {...};` line */
+const STATIC = [SERTOLI];
+const FL = out.match(/^var FIGS = \{.*\};$/m);
+if (!FL) throw new Error("the hub's `var FIGS = {...};` line was not found");
+out = out.replace(FL[0], () => "var FIGS = " + JSON.stringify(Object.fromEntries(STATIC.map((f) =>
+  [f.id, { title: f.title, caption: f.caption, lec: f.lec, key: f.key, svg: f.svg }]))) + ";");
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/heme-endo-exam2/index.html: the anima blocks are stale; run node tools/figures/heme-endo-exam2/build.mjs"); process.exit(1); }
+  if (out !== hub) { console.error("hubs/heme-endo-exam2/index.html: the anima blocks or the FIGS line are stale; run node tools/figures/heme-endo-exam2/build.mjs"); process.exit(1); }
   console.log("heme-endo-exam2 anima blocks are up to date");
 } else {
   writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + "; FIGS: " + STATIC.map((f) => f.id).join(", ") + ")");
 }
 if (process.argv.includes("--preview")) {
   // standalone pages with the hub's tokens, for anima's capture and line checks
