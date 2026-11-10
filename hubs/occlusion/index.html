@@ -1805,6 +1805,95 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima .tf-svg{--dn-base:#8c4d55;--dn-base-edge:#d48b90} }
 :root[data-theme="dark"] .anima .tf-svg{--dn-base:#8c4d55;--dn-base-edge:#d48b90}
 
+.anima .ab-box{max-width:600px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:4px 14px}
+.anima .am-svg.ab-box svg.ab-tooth{flex:340 1 300px;width:auto;max-width:420px}
+.anima .am-svg.ab-box svg.ab-signbox{flex:200 1 170px;width:auto;max-width:240px}
+.anima .ab-svg .ab-t{fill:var(--anatomy-text);font:12px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
+.anima .ab-svg .ab-strong{fill:var(--anatomy-strong);font-weight:700}
+.anima .ab-svg .ab-cap{fill:var(--anatomy-muted);font-size:11px}
+.anima .ab-svg .ab-on{stroke:var(--anatomy-shade-1)}
+.anima .ab-svg .ab-tlab{fill:var(--tm-vessel);font-weight:700}
+.anima .ab-svg .ab-clab{fill:#2f6fb4;font-weight:700}
+.anima .ab-svg .ab-bone{fill:var(--tm-bone);stroke:var(--anatomy-lo);stroke-width:1}
+.anima .ab-svg .ab-pdl{fill:var(--anatomy-faint);stroke:var(--anatomy-lo);stroke-width:.6}
+.anima .ab-svg .ab-gum{fill:var(--tm-retro);stroke:var(--anatomy-lo);stroke-width:.8;stroke-linejoin:round}
+.anima .ab-svg .ab-axis{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:5 4;pointer-events:none}
+.anima .ab-svg .ab-enamel{fill:var(--tm-disc-mid)}
+.anima .ab-svg .ab-dentin{fill:#e3c98a;stroke:var(--anatomy-lo);stroke-width:.8;stroke-linejoin:round}
+.anima .ab-svg .ab-pulp{fill:var(--tm-muscle);stroke:var(--anatomy-lo);stroke-width:.7}
+.anima .ab-svg .ab-out{fill:none;stroke:var(--anatomy-hi);stroke-width:1.3;stroke-linejoin:round;pointer-events:none}
+.anima .ab-svg .ab-cej{fill:none;stroke:none}
+.anima .ab-svg .ab-band{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.anima .ab-svg .ab-tens{stroke:var(--tm-vessel)}
+.anima .ab-svg .ab-comp{stroke:#3b7fd0}
+.anima .ab-svg .ab-air{fill:var(--surface);stroke:none;pointer-events:none}
+.anima .ab-svg .ab-notch{fill:none;stroke:var(--anatomy-hi);stroke-width:1.3;stroke-linejoin:miter;pointer-events:stroke}
+.anima .ab-svg .ab-force{fill:none;stroke:var(--anatomy-strong);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.anima .ab-svg .ab-ground{fill:var(--anatomy-shade-1);stroke:none}
+.anima .ab-svg .ab-post{fill:none;stroke:var(--anatomy-mid);stroke-width:7;stroke-linecap:butt;stroke-linejoin:round}
+.anima .ab-svg .ab-sign{fill:#c8323a;stroke:var(--anatomy-hi);stroke-width:1}
+.anima .ab-svg .ab-sign-rim{fill:none;stroke:#fff;stroke-width:2}
+.anima .ab-svg .ab-stop{fill:#fff;font:700 15px var(--font-body);letter-spacing:.5px}
+.anima .ab-svg .ab-crack{fill:var(--anatomy-hi)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima .ab-svg .ab-clab{fill:#7fb2ec} :root:not([data-theme="light"]) .anima .ab-svg .ab-comp{stroke:#6ea8ea} }
+:root[data-theme="dark"] .anima .ab-svg .ab-clab{fill:#7fb2ec}
+:root[data-theme="dark"] .anima .ab-svg .ab-comp{stroke:#6ea8ea}
+
+.anima .bf-box{max-width:700px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:6px 18px}
+.anima .am-svg.bf-box svg{flex:1 1 280px;width:auto;max-width:380px}
+.anima .bf-svg .bf-t{fill:var(--anatomy-text);font:12px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round}
+.anima .bf-svg .bf-strong{fill:var(--anatomy-strong);font-weight:700}
+.anima .bf-svg .bf-cap{fill:var(--anatomy-muted);font-size:11px}
+.anima .bf-svg .bf-ok{fill:#2f8a5b;font-weight:700;font-size:11.5px}
+.anima .bf-svg .bf-ph{fill:var(--anatomy-strong);font:700 16px var(--anatomy-mono);stroke:none}
+.anima .bf-svg .bf-meter{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:1.2}
+.anima .bf-svg .bf-glass{fill:none;stroke:var(--anatomy-hi);stroke-width:2;stroke-linejoin:round}
+.anima .bf-svg .bf-liq{fill-opacity:.8;stroke:none;transition:fill .35s ease}
+.anima .bf-svg .bf-probe{fill:none;stroke:var(--anatomy-mid);stroke-width:4;stroke-linecap:round}
+.anima .bf-svg .bf-bulb2{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:1.2}
+.anima .bf-svg .bf-cable{fill:none;stroke:var(--anatomy-hi);stroke-width:1.4}
+.anima .bf-svg .bf-dropper{fill:var(--anatomy-face);stroke:var(--anatomy-hi);stroke-width:1.2;stroke-linejoin:round}
+.anima .bf-svg .bf-bulb{fill:var(--anatomy-mid);stroke:var(--anatomy-hi);stroke-width:1}
+.anima .bf-svg .bf-drop{fill:#7fb6e6;stroke:var(--anatomy-hi);stroke-width:.8}
+.anima .bf-svg .bf-grid{fill:none;stroke:var(--anatomy-faint);stroke-width:1}
+.anima .bf-svg .bf-neutral{fill:none;stroke:#2f8a5b;stroke-width:1.4;stroke-dasharray:5 4}
+.anima .bf-svg .bf-axis{fill:none;stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .bf-svg .bf-line{fill:none;stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.anima .bf-svg .bf-line.bf-a,.anima .bf-svg .bf-dot.bf-a{stroke:var(--accent)}.anima .bf-svg .bf-dot.bf-a{fill:var(--accent)}
+.anima .bf-svg .bf-line.bf-b,.anima .bf-svg .bf-dot.bf-b{stroke:var(--tag-rose)}.anima .bf-svg .bf-dot.bf-b{fill:var(--tag-rose)}
+.anima .bf-svg .bf-at{fill:var(--accent)}.anima .bf-svg .bf-bt{fill:var(--tag-rose)}
+.anima .am-btn:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima .bf-svg .bf-ok{fill:#6fcf97} :root:not([data-theme="light"]) .anima .bf-svg .bf-neutral{stroke:#6fcf97} }
+:root[data-theme="dark"] .anima .bf-svg .bf-ok{fill:#6fcf97}
+:root[data-theme="dark"] .anima .bf-svg .bf-neutral{stroke:#6fcf97}
+@media (prefers-reduced-motion: reduce){.anima .bf-svg .bf-liq{transition:none}}
+
+.anima .cp-box{max-width:600px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:4px 14px}
+.anima .am-svg.cp-box svg.cp-tooth{flex:340 1 300px;width:auto;max-width:420px;overflow:hidden}
+.anima .am-svg.cp-box svg.cp-scale{flex:200 1 170px;width:auto;max-width:240px}
+.anima .cp-svg .cp-t{fill:var(--anatomy-text);font:12px var(--anatomy-mono);paint-order:stroke;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
+.anima .cp-svg .cp-strong{fill:var(--anatomy-strong);font-weight:700}
+.anima .cp-svg .cp-cap{fill:var(--anatomy-muted);font-size:11px}
+.anima .cp-svg .cp-call{fill:var(--anatomy-strong);font-weight:700}
+.anima .cp-svg .cp-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:1;pointer-events:none}
+.anima .cp-svg .cp-dot{fill:var(--anatomy-strong);pointer-events:none}
+.anima .cp-svg .cp-bone{fill:var(--tm-bone);stroke:var(--anatomy-lo);stroke-width:1}
+.anima .cp-svg .cp-pdl{fill:var(--anatomy-faint);stroke:none}
+.anima .cp-svg .cp-gum{fill:var(--tm-retro);stroke:var(--anatomy-lo);stroke-width:.8;stroke-linejoin:round}
+.anima .cp-svg .cp-enamel{fill:var(--tm-disc-mid)}
+.anima .cp-svg .cp-dentin{fill:#e3c98a;stroke:var(--anatomy-lo);stroke-width:.8;stroke-linejoin:round}
+.anima .cp-svg .cp-pulp{fill:var(--tm-muscle);stroke:var(--anatomy-lo);stroke-width:.7;pointer-events:none}
+.anima .cp-svg .cp-out{fill:none;stroke:var(--anatomy-hi);stroke-width:1.3;stroke-linejoin:round;pointer-events:none}
+.anima .cp-svg .cp-hit{fill:transparent;stroke:none}
+.anima .cp-svg .cp-bar{stroke:none}
+.anima .cp-svg .cp-barline{fill:none;stroke:var(--anatomy-hi);stroke-width:1}
+.anima .cp-svg .cp-tick{fill:none;stroke:var(--anatomy-strong);stroke-width:1.6}
+.anima .cp-svg .cp-band{fill:var(--tag-rose);fill-opacity:.12;stroke:var(--tag-rose);stroke-width:1.4;stroke-dasharray:4 3;transition:fill-opacity .3s ease}
+.anima .cp-svg .cp-band.on{fill-opacity:.3}
+.anima .cp-svg .cp-band-t{fill:var(--tag-rose);font-weight:700;font-size:11.5px}
+.anima .cp-svg .cp-arrow{fill:none;stroke:var(--anatomy-mid);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+@media (prefers-reduced-motion: reduce){.anima .cp-svg .cp-band{transition:none}}
+
 /* anima:css end */
 </style>
 </head>
@@ -2374,9 +2463,15 @@ var FIG_PLACE = {
     { full:'Support, stability and retention', plain:'Support, stability and retention', figs:['ssr'] },
     { full:'Both balanced and non-balanced work well', plain:'The three setups', figs:['schemes'] },
     { full:'Tooth forms compared', plain:'Tooth shapes.', figs:['toothforms'] }
+  ],
+  nccl: [
+    { full:'His analogy: push on a stop sign.', plain:'A push on the slope of a cusp', figs:['abfract'] },
+    { full:'Cupped-out cusp tips.', plain:'Cavities are acid too', figs:['cupping'] },
+    { full:'Vomiting (bulimia', plain:'Cavities are acid too', figs:['erosion9'] },
+    { full:'pH and buffering capacity sound', plain:'Buffering capacity is how much saliva', figs:['buffer'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'], nccl:['abfract','cupping','erosion9','buffer'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;
@@ -5753,12 +5848,14 @@ var ANIMA = (function(){
     d.erApply = erApply; return d; })(),
     live: function erLive(root, D) {
   var box = root.querySelector(".er-box"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), sleepRow = root.querySelector(".er-sleep");
-  var st = { k: "gerd", side: "R" };
+  /* a copy placed under another lecture can open on another cause (D.start) and add that lecture's point (D.extra) */
+  var st = { k: D.start || "gerd", side: "R" };
+  root.querySelectorAll("[data-erk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-erk") === st.k)); });
   function key() { return st.k === "gerd" ? "gerd" + st.side : st.k; }
   function apply() {
     D.erApply(box, key(), D);
     sleepRow.hidden = st.k !== "gerd";
-    sum.textContent = D.TEXT[st.k] + (st.k === "nccl" ? "" : D.TEXT.more);
+    sum.textContent = D.TEXT[st.k] + ((D.extra && D.extra[st.k]) || "") + (st.k === "nccl" ? "" : D.TEXT.more);
     if (readout) readout.textContent = { gerd: "lingual maxillary, mandibular molars", bulimia: "maxillary anteriors", soda1: "all teeth", soda2: "back and front, severe", citrus1: "front teeth", citrus2: "back teeth", nccl: "facial, maxillary premolars" }[st.k];
   }
   root.querySelectorAll("[data-erk]").forEach(function (b) { b.addEventListener("click", function () { st.k = b.getAttribute("data-erk"); root.querySelectorAll("[data-erk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); apply(); }); });
@@ -6188,6 +6285,380 @@ var ANIMA = (function(){
   root.querySelector(".tf-box").addEventListener("pointerover", hot); root.querySelector(".tf-box").addEventListener("click", hot);
   text(); draw();
 } };
+  FIGS["abfract"] = { title: "Abfraction: why the notch forms at the neck of the tooth", caption: "Move the load from the long axis onto an inclined plane and watch the tooth bend about the bone: one side compressed, the other stretched. Then load it again and again to see where the lesion forms, beside his stop sign.", lec: "nccl",
+    html: "<div class=\"anima\" data-anima=\"abfract\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 24</span><span class=\"iso-plate-corner\" data-corner=\"title\">Abfraction: the tooth bends</span><span class=\"iso-plate-corner\" data-corner=\"hint\">move the load</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>tension buccal · compression lingual</span></div><div class=\"am-svg ab-box\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg ab-svg ab-tooth\" viewBox=\"0 0 340 356\" role=\"img\" aria-label=\"A mandibular premolar in buccolingual section, in its bone, with a load on the buccal cusp: the crown bends about the bone, the lingual cervical side is compressed and the buccal cervical side is under tension.\"><path class=\"ab-bone hot\" data-info=\"The alveolar bone holds the root. Where the tooth is anchored in the bone is the fulcrum it bends about.\" d=\"M87.1 360C88.3 353.9 91.6 336.4 94.4 323.3C97.2 310.1 100.9 295.3 103.9 281.3C106.8 267.3 110 252 112.3 239.3C114.5 226.5 115.8 214.2 117.5 204.6C119.2 195 120.1 187.5 122.2 181.5C124.4 175.6 115.7 171 130.3 168.9C144.9 166.8 194.8 166.8 209.7 168.9C224.6 171 217.1 175.6 219.9 181.5C222.6 187.5 224 195 226.2 204.6C228.4 214.2 230.5 226.5 233 239.3C235.5 252 238.6 267.3 241.4 281.3C244.2 295.3 247.4 310.1 249.8 323.3C252.3 336.4 255.1 353.9 256.1 360Z\"/><path class=\"ab-pdl\" d=\"M130.3 168.9C130.4 171.9 130 178.5 130.6 186.8C131.2 195 132.3 207.8 133.8 218.3C135.3 228.8 137.3 240 139.6 249.8C141.8 259.6 144.3 268.8 147.4 277.1C150.6 285.3 154.7 294.3 158.5 299.1C162.2 303.9 166.2 305.9 170 305.9C173.9 305.9 177.8 303.9 181.6 299.1C185.3 294.3 189.4 285.3 192.6 277.1C195.7 268.8 198.2 259.6 200.5 249.8C202.7 240 204.7 228.8 206.2 218.3C207.7 207.8 208.8 195 209.4 186.8C210 178.5 209.6 171.9 209.7 168.9Z\"/><path class=\"ab-gum hot\" data-info=\"The gingiva.\" d=\"M133.5 153.7C132.6 154.1 130.1 154.3 128.1 156.3C126.2 158.3 123.6 161.6 121.7 165.8C119.8 170 118.1 175.2 116.7 181.5C115.2 187.8 114 196.7 113.1 203.6C112.1 210.4 110.5 219.8 111 222.5C111.5 225.1 115.1 222.3 116.2 219.3C117.4 216.3 116.7 210.9 117.7 204.6C118.7 198.3 120.1 187.5 122.2 181.5C124.3 175.6 128.4 172.4 130.3 168.9C132.2 165.4 133.1 161.9 133.6 160.5Z\"/><path class=\"ab-gum hot\" data-info=\"The gingiva.\" d=\"M206.8 153.7C207.8 154.1 210.6 154.3 212.7 156.3C214.7 158.3 217.2 161.6 219.4 165.8C221.5 170 223.5 175.2 225.4 181.5C227.4 187.8 229.6 196.7 230.9 203.6C232.2 210.4 234.1 219.8 233.5 222.5C233 225.1 229 222.3 227.8 219.3C226.5 216.3 227.3 210.9 226 204.6C224.7 198.3 222.6 187.5 219.9 181.5C217.2 175.6 211.9 172.4 209.7 168.9C207.5 165.4 207 161.9 206.5 160.5Z\"/><path class=\"ab-axis\" d=\"M170 313.8L170 40.8\"/><path class=\"ab-enamel hot\" data-info=\"Enamel, the crown's cap. Tooth structure, like most materials, is much stronger in compression than in tension (being pulled apart).\" d=\"M133.5 150C133 147.9 131.2 144.6 130.5 140.6C129.8 136.5 129.3 130.6 129.4 125.9C129.5 121.1 130.1 116.6 131.1 112.2C132.1 107.8 133.3 104.2 135.4 99.6C137.6 95.1 140.4 89.4 144 84.9C147.5 80.4 152.1 75.6 156.6 72.3C161.1 69 167.2 65.3 170.9 65C174.7 64.6 176.6 67.3 178.9 70.2C181.2 73.1 182.6 80.5 184.6 82.3C186.7 84 188.6 81.8 191.1 80.7C193.5 79.6 196.7 75.5 199.4 75.5C202.1 75.5 205.3 77.9 207.3 80.7C209.4 83.5 210.6 87.7 211.6 92.3C212.6 96.8 213.5 102.6 213.5 108C213.6 113.4 212.6 119.6 211.9 124.8C211.1 130.1 209.8 135.3 209 139.5C208.2 143.7 207.4 147.7 207 150C206.7 152.3 207 150.5 206.8 153.2C206.7 155.8 206.6 160.2 206.2 165.8C205.9 171.4 205.4 178 204.7 186.8C203.9 195.5 202.9 207.8 201.5 218.3C200.1 228.8 198.4 240.1 196.3 249.8C194.2 259.4 191.7 268.3 188.9 276C186.1 283.7 182.6 291.6 179.5 296C176.3 300.3 173.2 302.3 170 302.3C166.9 302.3 163.7 300.3 160.6 296C157.4 291.6 153.9 283.7 151.1 276C148.3 268.3 145.9 259.4 143.8 249.8C141.7 240.1 139.9 228.8 138.5 218.3C137.1 207.8 136.1 195.5 135.4 186.8C134.6 178 134.1 171.4 133.8 165.8C133.5 160.2 133.6 155.8 133.6 153.2C133.5 150.5 134 152.1 133.5 150Z\"/><path class=\"ab-dentin hot\" data-info=\"Dentin, under the enamel and making up the root.\" d=\"M133.5 150C133.9 147.7 135.2 143.5 136 139.5C136.9 135.5 137.6 130.4 138.6 125.9C139.6 121.3 140.5 116.5 142 112.2C143.5 107.9 145.3 103.6 147.8 100.1C150.2 96.6 153.5 93.9 156.9 91.2C160.3 88.5 164.5 83.9 168 83.9C171.5 83.8 175.2 89.1 177.9 91C180.6 92.9 181.8 95.2 184.1 95.4C186.3 95.6 189.2 93.5 191.4 92.5C193.6 91.4 195.3 88.3 197.2 89.1C199.1 89.9 201.6 93.7 202.8 97.5C203.9 101.4 203.6 107 204 112.2C204.3 117.5 204.4 124.3 204.8 129C205.2 133.7 206 137.1 206.3 140.6C206.7 144.1 207 147.9 207 150C207.1 152.1 207 150.5 206.8 153.2C206.7 155.8 206.6 160.2 206.2 165.8C205.9 171.4 205.4 178 204.7 186.8C203.9 195.5 202.9 207.8 201.5 218.3C200.1 228.8 198.4 240.1 196.3 249.8C194.2 259.4 191.7 268.3 188.9 276C186.1 283.7 182.6 291.6 179.5 296C176.3 300.3 173.2 302.3 170 302.3C166.9 302.3 163.7 300.3 160.6 296C157.4 291.6 153.9 283.7 151.1 276C148.3 268.3 145.9 259.4 143.8 249.8C141.7 240.1 139.9 228.8 138.5 218.3C137.1 207.8 136.1 195.5 135.4 186.8C134.6 178 134.1 171.4 133.8 165.8C133.5 160.2 133.6 155.8 133.6 153.2C133.5 150.5 133.1 152.3 133.5 150Z\"/><path class=\"ab-pulp hot\" data-info=\"The pulp.\" d=\"M166.9 97.5C168.7 96.8 169.2 104.2 171.1 105.9C173.1 107.7 176.1 108.1 178.3 108C180.6 107.9 183.3 104.7 184.8 105.4C186.4 106.1 187.5 108.6 187.5 112.2C187.5 115.8 186.1 121.5 185 126.9C183.8 132.3 181.8 138.3 180.4 144.8C179 151.2 177.5 154.4 176.5 165.8C175.6 177.1 175.3 197.3 174.7 213C174.2 228.8 173.7 247.1 173.2 260.3C172.6 273.4 172.2 286.5 171.5 291.8C170.7 297 169.3 297 168.5 291.8C167.8 286.5 167.4 273.4 166.9 260.3C166.3 247.1 165.8 228.8 165.3 213C164.7 197.3 164.3 177.1 163.5 165.8C162.7 154.4 161.3 151.2 160.5 144.8C159.7 138.3 158.7 132.7 158.7 126.9C158.7 121.1 159 115 160.3 110.1C161.7 105.2 165.1 98.2 166.9 97.5Z\"/><path class=\"ab-out\" d=\"M133.5 150C133 147.9 131.2 144.6 130.5 140.6C129.8 136.5 129.3 130.6 129.4 125.9C129.5 121.1 130.1 116.6 131.1 112.2C132.1 107.8 133.3 104.2 135.4 99.6C137.6 95.1 140.4 89.4 144 84.9C147.5 80.4 152.1 75.6 156.6 72.3C161.1 69 167.2 65.3 170.9 65C174.7 64.6 176.6 67.3 178.9 70.2C181.2 73.1 182.6 80.5 184.6 82.3C186.7 84 188.6 81.8 191.1 80.7C193.5 79.6 196.7 75.5 199.4 75.5C202.1 75.5 205.3 77.9 207.3 80.7C209.4 83.5 210.6 87.7 211.6 92.3C212.6 96.8 213.5 102.6 213.5 108C213.6 113.4 212.6 119.6 211.9 124.8C211.1 130.1 209.8 135.3 209 139.5C208.2 143.7 207.4 147.7 207 150C206.7 152.3 207 150.5 206.8 153.2C206.7 155.8 206.6 160.2 206.2 165.8C205.9 171.4 205.4 178 204.7 186.8C203.9 195.5 202.9 207.8 201.5 218.3C200.1 228.8 198.4 240.1 196.3 249.8C194.2 259.4 191.7 268.3 188.9 276C186.1 283.7 182.6 291.6 179.5 296C176.3 300.3 173.2 302.3 170 302.3C166.9 302.3 163.7 300.3 160.6 296C157.4 291.6 153.9 283.7 151.1 276C148.3 268.3 145.9 259.4 143.8 249.8C141.7 240.1 139.9 228.8 138.5 218.3C137.1 207.8 136.1 195.5 135.4 186.8C134.6 178 134.1 171.4 133.8 165.8C133.5 160.2 133.6 155.8 133.6 153.2C133.5 150.5 134 152.1 133.5 150Z\"/><path class=\"ab-cej\" d=\"M133.5 150C134 148.3 135.2 143.5 136 139.5C136.9 135.5 137.6 130.4 138.6 125.9C139.6 121.3 140.5 116.5 142 112.2C143.5 107.9 145.3 103.6 147.8 100.1C150.2 96.6 153.5 93.9 156.9 91.2C160.3 88.5 166.2 85.1 168 83.9\"/><path class=\"ab-cej\" d=\"M191.4 92.5C192.4 91.9 195.3 88.3 197.2 89.1C199.1 89.9 201.6 93.7 202.8 97.5C203.9 101.4 203.6 107 204 112.2C204.3 117.5 204.4 124.3 204.8 129C205.2 133.7 206 137.1 206.3 140.6C206.7 144.1 206.9 148.4 207 150\"/><path class=\"ab-band ab-comp hot\" data-info=\"Compression: the squeezed side. Tooth structure handles compression well.\" style=\"stroke-opacity:0.705\" d=\"M201.3 167.9C201.4 166.3 201.6 161.4 201.8 158.4C202 155.4 201.9 153.2 202.3 150C202.7 146.9 203.5 143.7 204.3 139.5C205.1 135.3 206.5 128.5 207.1 124.8C207.8 121.1 208 118.7 208.1 117.5\"/><path class=\"ab-band ab-comp\" style=\"stroke-opacity:0.121\" d=\"M138.7 167.9C138.7 166.3 138.5 161.4 138.4 158.4C138.3 155.4 138.8 153 138.3 150C137.7 147 135.9 144.6 135.2 140.6C134.5 136.5 134.1 129.7 134.1 125.9C134.1 122 135 118.9 135.2 117.5\"/><path class=\"ab-band ab-tens hot\" data-info=\"Tension: the stretched side. The tensile forces pull apart the bonds within the tooth structure here, at the cervical area just above the fulcrum.\" style=\"stroke-opacity:0.9009999999999999\" d=\"M138.7 167.9C138.7 166.3 138.5 161.4 138.4 158.4C138.3 155.4 138.8 153 138.3 150C137.7 147 135.9 144.6 135.2 140.6C134.5 136.5 134.1 129.7 134.1 125.9C134.1 122 135 118.9 135.2 117.5\"/><path class=\"ab-force\" style=\"stroke-opacity:1\" d=\"M128.1 36.3L155.4 70.7M147.1 68.4L155.7 71.1L155 62.1\"/><text class=\"ab-t ab-strong\" x=\"10\" y=\"22\" text-anchor=\"start\">load</text><text class=\"ab-t ab-cap\" x=\"10\" y=\"36\" text-anchor=\"start\">on an inclined plane</text><g class=\"ab-call\"><path class=\"am-leader\" d=\"M135.4 181.7L130.3 168.9\"/><circle class=\"am-dot\" cx=\"130.3\" cy=\"168.9\" r=\"1.8\"/><text class=\"ab-t\" x=\"10\" y=\"185.7\" text-anchor=\"start\">fulcrum:</text><text class=\"ab-t\" x=\"10\" y=\"198.7\" text-anchor=\"start\">the bone holds it</text></g><g class=\"ab-call\"><path class=\"am-leader\" d=\"M63.4 108.2L134.3 122.7\"/><circle class=\"am-dot\" cx=\"134.3\" cy=\"122.7\" r=\"1.8\"/><text class=\"ab-t ab-tlab\" x=\"10\" y=\"112.2\" text-anchor=\"start\">tension</text></g><g class=\"ab-call\"><path class=\"am-leader\" d=\"M249.8 108.2L207.5 122.7\"/><circle class=\"am-dot\" cx=\"207.5\" cy=\"122.7\" r=\"1.8\"/><text class=\"ab-t ab-clab\" x=\"332\" y=\"112.2\" text-anchor=\"end\">compression</text></g><text class=\"ab-t ab-cap\" x=\"12\" y=\"348\" text-anchor=\"start\">buccal</text><text class=\"ab-t ab-cap\" x=\"328\" y=\"348\" text-anchor=\"end\">lingual</text></svg><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg ab-svg ab-signbox\" viewBox=\"0 0 200 300\" role=\"img\" aria-label=\"A stop sign on a post anchored in the ground, pushed the same way: it bends at the ground, the stretched side under tension.\"><text class=\"ab-t ab-strong\" x=\"100\" y=\"16\" text-anchor=\"middle\">his analogy: a stop sign</text><rect class=\"ab-ground hot\" data-info=\"The stop sign: push on it and it bends at the ground, where it's anchored (the fulcrum). The side being stretched is under tension, and that's where it gets damaged.\" x=\"0\" y=\"262\" width=\"200\" height=\"38\"/><path class=\"ab-post hot\" data-info=\"The stop sign: push on it and it bends at the ground, where it's anchored (the fulcrum). The side being stretched is under tension, and that's where it gets damaged.\" d=\"M100 262L100.2 251.3L100.6 240.7L101.4 230L102.4 219.3L103.6 208.7L105 198L106.6 187.3L108.4 176.7L110.2 166L112.1 155.3L114.1 144.7L116.1 134\"/><path class=\"ab-band ab-comp\" style=\"stroke-opacity:0.705\" d=\"M106.5 260L107 228\"/><path class=\"ab-band ab-comp\" style=\"stroke-opacity:0.121\" d=\"M93.5 260L94 228\"/><path class=\"ab-band ab-tens\" style=\"stroke-opacity:0.9009999999999999\" d=\"M93.5 260L94 228\"/><g class=\"hot\" data-info=\"The stop sign: push on it and it bends at the ground, where it's anchored (the fulcrum). The side being stretched is under tension, and that's where it gets damaged.\" transform=\"translate(121.8 104) rotate(10.7)\"><path class=\"ab-sign\" d=\"M21.1 14.5L8.7 35.1L-8.7 35.1L-21.1 14.5L-21.1 -14.5L-8.7 -35.1L8.7 -35.1L21.1 -14.5Z\"/><path class=\"ab-sign-rim\" d=\"M18.8 13L7.8 31.4L-7.8 31.4L-18.8 13L-18.8 -13L-7.8 -31.4L7.8 -31.4L18.8 -13Z\"/><text class=\"ab-stop\" transform=\"scale(0.6 1)\" x=\"0\" y=\"6\" text-anchor=\"middle\">STOP</text></g><path class=\"ab-force\" style=\"stroke-opacity:1\" d=\"M66.7 63.2L97.8 102.4M89.5 100.1L98.1 102.8L97.4 93.8\"/><text class=\"ab-t ab-strong\" x=\"62.7\" y=\"58.2\" text-anchor=\"start\">push</text><text class=\"ab-t ab-tlab\" x=\"89\" y=\"222\" text-anchor=\"end\">tension</text><text class=\"ab-t ab-clab\" x=\"111\" y=\"222\" text-anchor=\"start\">compression</text><text class=\"ab-t ab-cap ab-on\" x=\"100\" y=\"282\" text-anchor=\"middle\">the ground holds it:</text><text class=\"ab-t ab-cap ab-on\" x=\"100\" y=\"295\" text-anchor=\"middle\">the fulcrum</text></svg></div></div></figure><div class=\"am-controls\"><label class=\"am-slider\">long axis<input type=\"range\" min=\"0\" max=\"100\" value=\"100\" data-abt aria-label=\"Where the load lands: from straight down the long axis to an inclined plane\">inclined plane</label></div>\n<div class=\"am-controls\"><button type=\"button\" class=\"am-btn\" data-abplay>Load it again and again</button><button type=\"button\" class=\"am-btn\" data-abreset>Start over</button></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Hover or tap the tooth, the bone or the stop sign.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>From the L9 notes (Dr. Lawson's prerecorded lecture): loads on the inclined planes of the occlusal surface cause stress at the cervical part of the tooth; things are stronger in compression than in tension; the fulcrum is where the tooth is anchored in the bone; one side is compressed, the other is under tension, and abfraction lesions form where the tensile stress is, just above the fulcrum; the stop sign analogy; the clues (exostoses and tori, opposing wear facets) and the night guard. Dr. Givan's L7 adds that abfraction is supported by lab studies but neither validated nor rejected clinically.</li>\n<li>Outside sources: Lee and Eakle (J Prosthet Dent 1984;52:374-380) proposed that lateral forces flex the tooth about a fulcrum at the cervical area and that the tensile stress there breaks the bonds between the enamel crystals; Grippo (J Esthet Dent 1991;3:14-19) named these lesions abfractions and described them as wedge-shaped. The tooth is drawn to typical mandibular second premolar dimensions (Wheeler's Dental Anatomy: crown 8 mm, root 14.5 mm, 8 mm buccolingually), with the bone crest about 1.8 mm below the CEJ.</li>\n<li>Schematic: the load here pushes the crown to the lingual, so the buccal side is the tensile one, where these notches are most often seen; a load from the other side would reverse it. The bend is drawn about a hundred times larger than a real tooth flexes, the stress is shown as colored bands rather than computed, and the notch grows over a few loads where in a mouth it takes years. Educational, not clinical guidance.</li></ul></details></div>",
+    data: (function(){ var d = {"TW":340,"TH":356,"SW":200,"SH":300,"HOT":{"enamel":"Enamel, the crown's cap. Tooth structure, like most materials, is much stronger in compression than in tension (being pulled apart).","dentin":"Dentin, under the enamel and making up the root.","pulp":"The pulp.","bone":"The alveolar bone holds the root. Where the tooth is anchored in the bone is the fulcrum it bends about.","gum":"The gingiva.","tens":"Tension: the stretched side. The tensile forces pull apart the bonds within the tooth structure here, at the cervical area just above the fulcrum.","comp":"Compression: the squeezed side. Tooth structure handles compression well.","notch":"The abfraction lesion: on the tensile side, at the cervical area, just above the fulcrum. Clues that a patient loads their teeth this hard: tori and exostoses, opposing wear facets or other generalized wear. Treatment: a night guard; restore it too if needed for esthetics.","sign":"The stop sign: push on it and it bends at the ground, where it's anchored (the fulcrum). The side being stretched is under tension, and that's where it gets damaged."},"V":{"OX":170,"OY":150,"S":10.5},"YC":-1.8,"YTOP":8.1,"ANG":38.4,"BEND":0.95,"DMAX":1.7,"CROWN":[[-3.5,0],[-3.82,0.9],[-4,2.3],[-3.92,3.6],[-3.6,4.8],[-2.9,6.2],[-1.8,7.4],[-0.5,8.1],[0.3,7.6],[0.95,6.45],[1.55,6.6],[2.3,7.1],[3.1,6.6],[3.6,5.5],[3.9,4],[3.85,2.4],[3.65,1],[3.5,0]],"DEJ":[[-3.5,0],[-3.3,1],[-3.12,2.3],[-2.88,3.6],[-2.42,4.75],[-1.62,5.6],[-0.62,6.3],[0.38,5.62],[1,5.2],[1.68,5.48],[2.2,5.8],[2.8,5],[3.02,3.6],[3.2,2],[3.4,0.9],[3.5,0]],"ROOT":[[3.5,0],[3.49,-0.3],[3.45,-1.5],[3.3,-3.5],[3,-6.5],[2.5,-9.5],[1.8,-12],[0.9,-13.9],[0,-14.5],[-0.9,-13.9],[-1.8,-12],[-2.5,-9.5],[-3,-6.5],[-3.3,-3.5],[-3.45,-1.5],[-3.49,-0.3],[-3.5,0]],"PULP":[[-0.62,5],[-0.15,4.2],[0.55,4],[1.15,4.25],[1.45,3.6],[1.3,2.2],[0.95,0.5],[0.62,-1.5],[0.45,-6],[0.3,-10.5],[0.14,-13.5],[-0.14,-13.5],[-0.3,-10.5],[-0.45,-6],[-0.62,-1.5],[-0.95,0.5],[-1.2,2.2],[-1.15,3.8]],"BONE":[[-7.9,-20],[-7.2,-16.5],[-6.3,-12.5],[-5.5,-8.5],[-5,-5.2],[-4.55,-3],[-3.78,-1.8],[3.78,-1.8],[4.75,-3],[5.35,-5.2],[6,-8.5],[6.8,-12.5],[7.6,-16.5],[8.2,-20]],"SOCKET":[[-3.78,-1.8],[-3.75,-3.5],[-3.45,-6.5],[-2.9,-9.5],[-2.15,-12.1],[-1.1,-14.2],[0,-14.85],[1.1,-14.2],[2.15,-12.1],[2.9,-9.5],[3.45,-6.5],[3.75,-3.5],[3.78,-1.8]],"GUM":[[[-3.49,-0.35],[-4,-0.6],[-4.6,-1.5],[-5.08,-3],[-5.42,-5.1],[-5.62,-6.9],[-5.12,-6.6],[-4.98,-5.2],[-4.55,-3],[-3.78,-1.8],[-3.47,-1]],[[3.49,-0.35],[4.05,-0.6],[4.7,-1.5],[5.28,-3],[5.8,-5.1],[6.05,-6.9],[5.5,-6.6],[5.33,-5.2],[4.75,-3],[3.78,-1.8],[3.47,-1]]],"BAND":{"b":[[-2.98,-1.7],[-3.02,-0.8],[-3.05,0],[-3.37,0.9],[-3.55,2.3],[-3.5,3.1]],"l":[[2.98,-1.7],[3.02,-0.8],[3.05,0],[3.2,1],[3.4,2.4],[3.45,3.1]]},"TIP":[-0.5,8.1],"INC":[-1.8,7.4]};
+    function abLat(st, D) { return Math.sin(st.t * D.ANG * Math.PI / 180); }
+    function abSmooth(pts, closed) {
+  var f = function (n) { return Math.round(n * 10) / 10; }, n = pts.length, last = closed ? n : n - 1, d = "M" + f(pts[0][0]) + " " + f(pts[0][1]);
+  for (var i = 0; i < last; i++) { var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    if (!closed) { if (i === 0) p0 = p1; if (i + 2 >= n) p3 = p2; }
+    d += "C" + f(p1[0] + (p2[0] - p0[0]) / 6) + " " + f(p1[1] + (p2[1] - p0[1]) / 6) + " " + f(p2[0] - (p3[0] - p1[0]) / 6) + " " + f(p2[1] - (p3[1] - p1[1]) / 6) + " " + f(p2[0]) + " " + f(p2[1]); }
+  return d + (closed ? "Z" : "");
+}
+    function abTooth(st, D) {
+  var f = function (n) { return Math.round(n * 10) / 10; }, V = D.V, lat = D.abLat(st, D), dm = D.BEND * lat * st.u, o = "";
+  /* the crown bends to the lingual above the crest, most at the top (a cantilever held in the bone) */
+  function bx(y) { if (y <= D.YC) return 0; var s = (y - D.YC) / (D.YTOP - D.YC); return dm * (3 * s * s - s * s * s) / 2; }
+  function P(p) { return [V.OX + (p[0] + bx(p[1])) * V.S, V.OY - p[1] * V.S]; }
+  function S(pts, closed) { return D.abSmooth(pts.map(P), closed); }
+  function L(pts) { return "M" + pts.map(function (p) { var q = P(p); return f(q[0]) + " " + f(q[1]); }).join("L"); }
+  function tx(x, y, t, cls, a) { return '<text class="ab-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  /* a label (one or more lines) with a leader from the end of its first line to the point p (mm) */
+  function lab(lines, x, y, p, a, cls) { var q = P(p), w = Math.max.apply(null, lines.map(function (s) { return s.length; })) * 7.2, sx = a === "end" ? x - w - 3 : x + w + 3;
+    return '<g class="ab-call"><path class="am-leader" d="M' + f(sx) + " " + f(y - 4) + "L" + f(q[0]) + " " + f(q[1]) + '"/><circle class="am-dot" cx="' + f(q[0]) + '" cy="' + f(q[1]) + '" r="1.8"/>' +
+      lines.map(function (s, i) { return tx(x, y + i * 13, s, cls, a); }).join("") + "</g>"; }
+  var tooth = D.CROWN.slice(0, -1).concat(D.ROOT.slice(0, -1)), dent = D.DEJ.slice(0, -1).concat(D.ROOT.slice(0, -1));
+  /* bone, socket, gingiva (the root sits in the socket; the bone doesn't bend) */
+  o += '<path class="ab-bone hot" data-info="' + D.HOT.bone + '" d="' + S(D.BONE, false) + 'Z"/>';
+  o += '<path class="ab-pdl" d="' + S(D.SOCKET, false) + 'Z"/>';
+  D.GUM.forEach(function (g) { o += '<path class="ab-gum hot" data-info="' + D.HOT.gum + '" d="' + S(g, false) + 'Z"/>'; });
+  /* the long axis */
+  o += '<path class="ab-axis" d="M' + V.OX + " " + f(V.OY + 15.6 * V.S) + "L" + V.OX + " " + f(V.OY - 10.4 * V.S) + '"/>';
+  /* the tooth */
+  o += '<path class="ab-enamel hot" data-info="' + D.HOT.enamel + '" d="' + S(tooth, true) + '"/>';
+  o += '<path class="ab-dentin hot" data-info="' + D.HOT.dentin + '" d="' + S(dent, true) + '"/>';
+  o += '<path class="ab-pulp hot" data-info="' + D.HOT.pulp + '" d="' + S(D.PULP, true) + '"/>';
+  o += '<path class="ab-out" d="' + S(tooth, true) + '"/>';
+  o += '<path class="ab-cej" d="' + S(D.DEJ.slice(0, 7), false) + '"/><path class="ab-cej" d="' + S(D.DEJ.slice(9), false) + '"/>';
+  /* the stress bands: compression where it's squeezed, tension where it's stretched */
+  var tn = lat * st.u, cb = 0.32 * st.u * (1 - lat), cl = Math.min(1, 0.32 * st.u + 0.62 * tn);
+  o += '<path class="ab-band ab-comp hot" data-info="' + D.HOT.comp + '" style="stroke-opacity:' + f(cl * 100) / 100 + '" d="' + S(D.BAND.l, false) + '"/>';
+  if (cb > 0.01) o += '<path class="ab-band ab-comp" style="stroke-opacity:' + f(cb * 100) / 100 + '" d="' + S(D.BAND.b, false) + '"/>';
+  if (tn > 0.01) o += '<path class="ab-band ab-tens hot" data-info="' + D.HOT.tens + '" style="stroke-opacity:' + f(Math.min(1, tn * 1.45) * 100) / 100 + '" d="' + S(D.BAND.b, false) + '"/>';
+  /* the lesion: a notch on the buccal (tensile) side, CEJ area, just above the bone */
+  if (st.d > 0.02) {
+    var ap = [-3.83 + st.d, 0.95];
+    o += '<path class="ab-air" d="' + L([[-4.9, 2.3], [-4.0, 2.3], ap, [-3.49, -0.3], [-4.9, -0.3]]) + 'Z"/>';
+    o += '<path class="ab-notch hot" data-info="' + D.HOT.notch + '" d="' + L([[-4.0, 2.3], ap, [-3.49, -0.3]]) + '"/>';
+  }
+  /* the load: square to the surface it lands on */
+  var a = st.t * D.ANG * Math.PI / 180, dir = [Math.sin(a), -Math.cos(a)], c = [D.TIP[0] + (D.INC[0] - D.TIP[0]) * st.t, D.TIP[1] + (D.INC[1] - D.TIP[1]) * st.t];
+  var p1 = P(c), p0 = [p1[0] - dir[0] * 46, p1[1] + dir[1] * 46], ux = (p1[0] - p0[0]) / 46, uy = (p1[1] - p0[1]) / 46;
+  o += '<path class="ab-force" style="stroke-opacity:' + f((0.35 + 0.65 * st.u) * 100) / 100 + '" d="M' + f(p0[0]) + " " + f(p0[1]) + "L" + f(p1[0] - ux * 2) + " " + f(p1[1] - uy * 2) +
+    "M" + f(p1[0] - ux * 9 - uy * 5) + " " + f(p1[1] - uy * 9 + ux * 5) + "L" + f(p1[0] - ux * 1.5) + " " + f(p1[1] - uy * 1.5) + "L" + f(p1[0] - ux * 9 + uy * 5) + " " + f(p1[1] - uy * 9 - ux * 5) + '"/>';
+  o += tx(10, 22, "load", "ab-strong", "start") + tx(10, 36, st.t < 0.12 ? "down the long axis" : "on an inclined plane", "ab-cap", "start");
+  /* labels */
+  o += lab(["fulcrum:", "the bone holds it"], 10, V.OY + 3.4 * V.S, [-3.78, -1.8], "start");
+  if (tn > 0.08) o += lab(["tension"], 10, V.OY - 3.6 * V.S, [-3.55, 2.6], "start", "ab-tlab");
+  else o += lab(["compression"], 10, V.OY - 3.6 * V.S, [-3.55, 2.6], "start", "ab-clab");
+  o += lab(["compression"], D.TW - 8, V.OY - 3.6 * V.S, [3.42, 2.6], "end", "ab-clab");
+  if (st.d > 0.3) o += lab(["NCCL: just", "above the fulcrum"], 10, V.OY + 0.2 * V.S, [-3.83 + st.d, 0.95], "start", "ab-strong");
+  o += tx(12, D.TH - 8, "buccal", "ab-cap", "start") + tx(D.TW - 12, D.TH - 8, "lingual", "ab-cap", "end");
+  return o;
+}
+    function abSign(st, D) {
+  var f = function (n) { return Math.round(n * 10) / 10; }, lat = D.abLat(st, D), o = "", G = 262, X0 = 100, HP = 128;
+  function tx(x, y, t, cls, a) { return '<text class="ab-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  var ds = 26 * lat * st.u, pts = [], i;
+  for (i = 0; i <= 12; i++) { var h = HP * i / 12, q = h / HP; pts.push([X0 + ds * (3 * q * q - q * q * q) / 2, G - h]); }
+  var top = pts[12], s = 1.5 * ds / HP, th = Math.atan(s) * 180 / Math.PI, cx = top[0] + s * 30, cy = top[1] - 30;
+  o += tx(X0, 16, "his analogy: a stop sign", "ab-strong", "middle");
+  /* the ground: it holds the post, as the bone holds the root */
+  o += '<rect class="ab-ground hot" data-info="' + D.HOT.sign + '" x="0" y="' + G + '" width="' + D.SW + '" height="' + (D.SH - G) + '"/>';
+  o += '<path class="ab-post hot" data-info="' + D.HOT.sign + '" d="M' + pts.map(function (p) { return f(p[0]) + " " + f(p[1]); }).join("L") + '"/>';
+  /* stress at the base */
+  var tn = lat * st.u, cb = 0.32 * st.u * (1 - lat), cl = Math.min(1, 0.32 * st.u + 0.62 * tn);
+  o += '<path class="ab-band ab-comp" style="stroke-opacity:' + f(cl * 100) / 100 + '" d="M' + f(X0 + 6.5) + " " + (G - 2) + "L" + f(X0 + 6.5 + ds * 0.03) + " " + (G - 34) + '"/>';
+  if (cb > 0.01) o += '<path class="ab-band ab-comp" style="stroke-opacity:' + f(cb * 100) / 100 + '" d="M' + f(X0 - 6.5) + " " + (G - 2) + "L" + f(X0 - 6.5 + ds * 0.03) + " " + (G - 34) + '"/>';
+  if (tn > 0.01) o += '<path class="ab-band ab-tens" style="stroke-opacity:' + f(Math.min(1, tn * 1.45) * 100) / 100 + '" d="M' + f(X0 - 6.5) + " " + (G - 2) + "L" + f(X0 - 6.5 + ds * 0.03) + " " + (G - 34) + '"/>';
+  if (st.k > 0.02) o += '<path class="ab-crack" d="M' + f(X0 - 4) + " " + f(G - 12 - 6 * st.k) + "L" + f(X0 - 4 + 4.5 * st.k) + " " + f(G - 9) + "L" + f(X0 - 4) + " " + f(G - 6 + 2 * st.k) + 'Z"/>';
+  /* the sign, seen at an angle so its face is toward the push, leaning with the top of the post */
+  var oct = [], k;
+  for (k = 0; k < 8; k++) { var a = (22.5 + 45 * k) * Math.PI / 180; oct.push(f(0.6 * 38 * Math.cos(a)) + " " + f(38 * Math.sin(a))); }
+  var oin = []; for (k = 0; k < 8; k++) { var b = (22.5 + 45 * k) * Math.PI / 180; oin.push(f(0.6 * 34 * Math.cos(b)) + " " + f(34 * Math.sin(b))); }
+  o += '<g class="hot" data-info="' + D.HOT.sign + '" transform="translate(' + f(cx) + " " + f(cy) + ") rotate(" + f(th) + ')"><path class="ab-sign" d="M' + oct.join("L") + 'Z"/><path class="ab-sign-rim" d="M' + oin.join("L") + 'Z"/>' +
+    '<text class="ab-stop" transform="scale(0.6 1)" x="0" y="6" text-anchor="middle">STOP</text></g>';
+  /* the push, the same way the load meets the tooth */
+  var an = st.t * D.ANG * Math.PI / 180, dir = [Math.sin(an), Math.cos(an)];
+  var tgt = [cx - 22.8 * st.t + 0 * (1 - st.t), cy - 38 * (1 - st.t)], p0 = [tgt[0] - dir[0] * 52, tgt[1] - dir[1] * 52];
+  o += '<path class="ab-force" style="stroke-opacity:' + f((0.35 + 0.65 * st.u) * 100) / 100 + '" d="M' + f(p0[0]) + " " + f(p0[1]) + "L" + f(tgt[0] - dir[0] * 2) + " " + f(tgt[1] - dir[1] * 2) +
+    "M" + f(tgt[0] - dir[0] * 9 - dir[1] * 5) + " " + f(tgt[1] - dir[1] * 9 + dir[0] * 5) + "L" + f(tgt[0] - dir[0] * 1.5) + " " + f(tgt[1] - dir[1] * 1.5) + "L" + f(tgt[0] - dir[0] * 9 + dir[1] * 5) + " " + f(tgt[1] - dir[1] * 9 - dir[0] * 5) + '"/>';
+  o += tx(p0[0] - 4, p0[1] - 5, "push", "ab-strong", st.t > 0.5 ? "start" : "middle");
+  o += tx(X0 - 11, G - 40, tn > 0.08 ? "tension" : "compression", tn > 0.08 ? "ab-tlab" : "ab-clab", "end") + tx(X0 + 11, G - 40, "compression", "ab-clab", "start");
+  o += tx(X0, G + 20, "the ground holds it:", "ab-cap ab-on", "middle") + tx(X0, G + 33, "the fulcrum", "ab-cap ab-on", "middle");
+  return o;
+}
+    d.abLat = abLat; d.abSmooth = abSmooth; d.abTooth = abTooth; d.abSign = abSign; return d; })(),
+    live: function abLive(root, D) {
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var tooth = root.querySelector(".ab-tooth"), sign = root.querySelector(".ab-signbox"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
+  var slider = root.querySelector("[data-abt]"), play = root.querySelector("[data-abplay]"), reset = root.querySelector("[data-abreset]");
+  var st = { t: 1, u: 1, d: 0, k: 0 }, raf = 0, playing = false;
+  function draw() { tooth.innerHTML = D.abTooth(st, D); sign.innerHTML = D.abSign(st, D); }
+  function text() {
+    var lat = D.abLat(st, D), s;
+    if (lat < 0.08) s = "A load straight down the long axis presses the whole tooth evenly: it's all compression, which tooth structure handles well. Nothing bends, so no lesion forms" + (st.d > 0.02 ? " (the notch you see was made by the earlier loads)." : ".");
+    else s = "A load the tooth isn't supposed to have, on an inclined plane, pushes the crown to the lingual. The bone holds the root, so the tooth bends about the fulcrum where it's anchored: the lingual side is compressed and the buccal side is stretched, under tension. Tooth structure is weaker in tension, so the bonds pull apart there, at the cervical area just above the fulcrum.";
+    if (st.d > 0.3) s += " Load after load, an abfraction lesion has formed on the tensile side. It's hard to be sure it isn't abrasion: look for tori, exostoses and wear facets, and treat it with a night guard, a sacrificial piece of plastic to grind on.";
+    sum.textContent = s;
+    if (readout) readout.textContent = lat < 0.08 ? "all compression" : "tension buccal · compression lingual";
+  }
+  function stop() { cancelAnimationFrame(raf); playing = false; play.setAttribute("aria-pressed", "false"); st.u = 1; draw(); text(); }
+  /* repeat the load: each one bends the tooth and lets it go; where there's tension, the notch deepens */
+  function run() {
+    if (playing) { stop(); return; }
+    var lat = D.abLat(st, D), per = 0.24 * lat / Math.sin(D.ANG * Math.PI / 180);
+    if (reduce.matches) { st.d = Math.min(D.DMAX, st.d + per * 8); st.k = Math.min(1, st.k + lat * 1.1); st.u = 1; draw(); text(); return; }
+    playing = true; play.setAttribute("aria-pressed", "true");
+    var t0 = performance.now(), n = 8, last = 0;
+    function step(now) {
+      var ph = (now - t0) / 620, c = Math.floor(ph);
+      if (c > last) { st.d = Math.min(D.DMAX, st.d + per); st.k = Math.min(1, st.k + lat * 0.14); last = c; text(); }
+      if (c >= n) { stop(); return; }
+      st.u = Math.sin(Math.PI * (ph - c)); draw();
+      raf = requestAnimationFrame(step);
+    }
+    raf = requestAnimationFrame(step);
+  }
+  slider.addEventListener("input", function () { st.t = +slider.value / 100; if (!playing) st.u = 1; draw(); text(); });
+  play.addEventListener("click", run);
+  reset.addEventListener("click", function () { if (playing) stop(); st.d = 0; st.k = 0; draw(); text(); });
+  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && root.contains(el) && el.getAttribute("data-info")) info.textContent = el.getAttribute("data-info"); }
+  [tooth, sign].forEach(function (s) { s.addEventListener("pointerover", hot); s.addEventListener("click", hot); });
+  draw(); text();
+} };
+  FIGS["buffer"] = { title: "pH vs buffering capacity", caption: "Two drinks at the same pH, 4. Add bicarbonate a drop at a time and count how much each takes to reach neutral; then try diluting one with water.", lec: "nccl",
+    html: "<div class=\"anima\" data-anima=\"buffer\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 25</span><span class=\"iso-plate-corner\" data-corner=\"title\">pH vs buffering capacity</span><span class=\"iso-plate-corner\" data-corner=\"hint\">add bicarbonate</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>both pH 4.0</span></div><div class=\"am-svg bf-box\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg bf-svg bf-glasses\" viewBox=\"0 0 340 256\" role=\"img\" aria-label=\"Two drinks, both at pH 4, each with a pH probe in it and a dropper of bicarbonate above it.\"><g class=\"hot\" data-info=\"Bicarbonate, a base: added a little at a time, the way buffering capacity is measured. It's also what saliva uses to neutralize what you drink.\"><path class=\"bf-dropper\" d=\"M48 22h14v32l-5 14h-4l-5-14Z\"/><rect class=\"bf-bulb\" x=\"46\" y=\"10\" width=\"18\" height=\"14\" rx=\"6\"/></g><path class=\"bf-liq hot\" data-info=\"Drink A starts at pH 4. Very little bicarbonate brings it to neutral: a low buffering capacity, and that's good.\" style=\"fill:rgb(216,87,74)\" d=\"M41.9 156.8L134.1 156.8L129 212L47 212Z\"/><g class=\"hot\" data-info=\"A pH probe: how you measure pH. It reads how acidic the drink is right now, not how much acid it holds.\"><path class=\"bf-cable\" d=\"M112 66C112 60 120 58 124 56\"/><path class=\"bf-probe\" d=\"M112 64L112 196\"/><circle class=\"bf-bulb2\" cx=\"112\" cy=\"199\" r=\"5\"/><rect class=\"bf-meter\" x=\"96\" y=\"18\" width=\"66\" height=\"38\" rx=\"6\"/><text class=\"bf-t bf-cap\" x=\"129\" y=\"32\" text-anchor=\"middle\">pH</text><text class=\"bf-t bf-ph\" x=\"129\" y=\"50\" text-anchor=\"middle\">4.0</text></g><path class=\"bf-glass\" d=\"M35.5 86L47 212L129 212L140.6 86\"/><text class=\"bf-t bf-cap\" x=\"55\" y=\"81\" text-anchor=\"middle\">bicarbonate</text><text class=\"bf-t bf-strong\" x=\"88\" y=\"232\" text-anchor=\"middle\">Drink A</text><text class=\"bf-t bf-cap\" x=\"88\" y=\"247\" text-anchor=\"middle\">no bicarbonate yet</text><g class=\"hot\" data-info=\"Bicarbonate, a base: added a little at a time, the way buffering capacity is measured. It's also what saliva uses to neutralize what you drink.\"><path class=\"bf-dropper\" d=\"M212 22h14v32l-5 14h-4l-5-14Z\"/><rect class=\"bf-bulb\" x=\"210\" y=\"10\" width=\"18\" height=\"14\" rx=\"6\"/></g><path class=\"bf-liq hot\" data-info=\"Drink B starts at the same pH 4 but takes much more bicarbonate: a high buffering capacity, and that's bad, like orange juice and wine. Citric acid also grabs calcium (a chelator).\" style=\"fill:rgb(216,87,74)\" d=\"M205.9 156.8L298.1 156.8L293 212L211 212Z\"/><g class=\"hot\" data-info=\"A pH probe: how you measure pH. It reads how acidic the drink is right now, not how much acid it holds.\"><path class=\"bf-cable\" d=\"M276 66C276 60 284 58 288 56\"/><path class=\"bf-probe\" d=\"M276 64L276 196\"/><circle class=\"bf-bulb2\" cx=\"276\" cy=\"199\" r=\"5\"/><rect class=\"bf-meter\" x=\"260\" y=\"18\" width=\"66\" height=\"38\" rx=\"6\"/><text class=\"bf-t bf-cap\" x=\"293\" y=\"32\" text-anchor=\"middle\">pH</text><text class=\"bf-t bf-ph\" x=\"293\" y=\"50\" text-anchor=\"middle\">4.0</text></g><path class=\"bf-glass\" d=\"M199.5 86L211 212L293 212L304.6 86\"/><text class=\"bf-t bf-cap\" x=\"219\" y=\"81\" text-anchor=\"middle\">bicarbonate</text><text class=\"bf-t bf-strong\" x=\"252\" y=\"232\" text-anchor=\"middle\">Drink B</text><text class=\"bf-t bf-cap\" x=\"252\" y=\"247\" text-anchor=\"middle\">no bicarbonate yet</text></svg><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg bf-svg bf-chart\" viewBox=\"0 0 340 214\" role=\"img\" aria-label=\"A chart of each drink's pH against the drops of bicarbonate added, with neutral (pH 7) marked.\"><path class=\"bf-grid\" d=\"M44 156H326\"/><text class=\"bf-t bf-cap\" x=\"38\" y=\"160\" text-anchor=\"end\">4</text><path class=\"bf-grid\" d=\"M44 116H326\"/><text class=\"bf-t bf-cap\" x=\"38\" y=\"120\" text-anchor=\"end\">5</text><path class=\"bf-grid\" d=\"M44 76H326\"/><text class=\"bf-t bf-cap\" x=\"38\" y=\"80\" text-anchor=\"end\">6</text><path class=\"bf-neutral\" d=\"M44 36H326\"/><text class=\"bf-t bf-cap\" x=\"38\" y=\"40\" text-anchor=\"end\">7</text><text class=\"bf-t bf-ok\" x=\"326\" y=\"30\" text-anchor=\"end\">neutral</text><path class=\"bf-grid\" d=\"M44 176v4\"/><text class=\"bf-t bf-cap\" x=\"44\" y=\"192\" text-anchor=\"middle\">0</text><path class=\"bf-grid\" d=\"M106.7 176v4\"/><text class=\"bf-t bf-cap\" x=\"106.7\" y=\"192\" text-anchor=\"middle\">10</text><path class=\"bf-grid\" d=\"M169.3 176v4\"/><text class=\"bf-t bf-cap\" x=\"169.3\" y=\"192\" text-anchor=\"middle\">20</text><path class=\"bf-grid\" d=\"M232 176v4\"/><text class=\"bf-t bf-cap\" x=\"232\" y=\"192\" text-anchor=\"middle\">30</text><path class=\"bf-grid\" d=\"M294.7 176v4\"/><text class=\"bf-t bf-cap\" x=\"294.7\" y=\"192\" text-anchor=\"middle\">40</text><path class=\"bf-axis\" d=\"M44 16V176H326\"/><text class=\"bf-t bf-cap\" x=\"38\" y=\"12\" text-anchor=\"end\">pH</text><text class=\"bf-t bf-cap\" x=\"185\" y=\"208\" text-anchor=\"middle\">bicarbonate added (drops)</text><path class=\"bf-line bf-a\" d=\"M44 156\"/><circle class=\"bf-dot bf-a\" cx=\"44\" cy=\"156\" r=\"3.2\"/><text class=\"bf-t bf-strong bf-at\" x=\"51\" y=\"150\" text-anchor=\"start\">A</text><path class=\"bf-line bf-b\" d=\"M44 156\"/><circle class=\"bf-dot bf-b\" cx=\"44\" cy=\"156\" r=\"3.2\"/><text class=\"bf-t bf-strong bf-bt\" x=\"51\" y=\"170\" text-anchor=\"start\">B</text></svg></div></div></figure><div class=\"am-controls\"><button type=\"button\" class=\"am-btn\" data-bfadd=\"1\">Add a drop of bicarbonate</button><button type=\"button\" class=\"am-btn\" data-bfadd=\"5\">Add 5 drops</button><button type=\"button\" class=\"am-btn\" data-bfwater>Add water (double it)</button><button type=\"button\" class=\"am-btn\" data-bfreset>Start over</button></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Hover or tap a drink, a probe or the bicarbonate.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>From the L9 notes (Dr. Lawson's prerecorded lecture): buffering capacity is how much bicarbonate, and so how much saliva, it takes to neutralize a drink; a drink at pH 4 that takes a lot has a high buffering capacity (bad), one that takes a little a low one (good); pH is measured with a probe, buffering capacity by adding bicarbonate a little at a time until the pH is back to neutral; measured this way, orange juice and wine are \"way, way bad\"; citric acid is a chelator; pH is a log scale, so doubling an acid with water doesn't meaningfully change its pH (\"a swimming pool of water\"), and a base such as bicarbonate is what neutralizes it.</li>\n<li>Outside sources: the dental erosion literature measures a drink's buffering capacity as its titratable acidity, the base needed to bring it to a set pH, and finds it predicts erosion better than pH alone (Lussi, Jaeggi and Zero, Caries Res 2004;38 Suppl 1:34-44). Drink B is a citric acid buffer computed from citric acid's three pKa values (3.13, 4.76, 6.40, CRC Handbook of Chemistry and Physics); drink A is an unbuffered strong acid. Diluting an unbuffered acid twofold raises its pH by about 0.3 (log 2), so getting from 4 to 7 would take about a thousandfold dilution.</li>\n<li>Schematic: the two drinks are made up (both at pH 4, his example), not measured beverages, and a \"drop\" is an arbitrary unit sized so A needs 5 and B 40. Bicarbonate is modeled as a plain base: the carbon dioxide it releases is ignored. The liquid's color follows its pH like an indicator, as a cue; real drinks don't change color. Educational, not clinical guidance.</li></ul></details></div>",
+    data: (function(){ var d = {"GW":340,"GH":256,"CW":340,"CH":214,"HOT":{"drop":"Bicarbonate, a base: added a little at a time, the way buffering capacity is measured. It's also what saliva uses to neutralize what you drink.","probe":"A pH probe: how you measure pH. It reads how acidic the drink is right now, not how much acid it holds.","liqa":"Drink A starts at pH 4. Very little bicarbonate brings it to neutral: a low buffering capacity, and that's good.","liqb":"Drink B starts at the same pH 4 but takes much more bicarbonate: a high buffering capacity, and that's bad, like orange juice and wine. Citric acid also grabs calcium (a chelator)."},"KW":1e-14,"KA":[0.0007413102413009177,0.000017378008287493764,3.981071705534969e-7],"DROP":0.00002,"AA":0.0001,"CT":0.0003962840387878352,"NA0":0.0003084711999144987,"NA_DROPS":5,"NB_DROPS":40};
+    function bfN(h, D) { var k = D.KA, a = h * h * k[0], b = h * k[0] * k[1], c = k[0] * k[1] * k[2]; return (a + 2 * b + 3 * c) / (h * h * h + a + b + c); }
+    function bfPH(dr, n, V, D) {
+  var b = n * D.DROP;
+  if (dr === "a") { var c = (D.AA - b) / V, h = (c + Math.sqrt(c * c + 4 * D.KW)) / 2; return -Math.log(h) / Math.LN10; }
+  var lo = 1, hi = 13;
+  for (var i = 0; i < 60; i++) { var m = (lo + hi) / 2, x = Math.pow(10, -m), g = x + (D.NA0 + b) / V - D.CT / V * D.bfN(x, D) - D.KW / x; if (g > 0) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+    function bfColor(p) {
+  var S = [[4, [216, 87, 74]], [5, [232, 145, 58]], [6, [222, 190, 64]], [7, [90, 169, 95]]], i;
+  if (p <= S[0][0]) return "rgb(" + S[0][1].join(",") + ")";
+  for (i = 1; i < S.length; i++) if (p <= S[i][0]) { var u = (p - S[i - 1][0]) / (S[i][0] - S[i - 1][0]), a = S[i - 1][1], b = S[i][1]; return "rgb(" + [0, 1, 2].map(function (k) { return Math.round(a[k] + (b[k] - a[k]) * u); }).join(",") + ")"; }
+  return "rgb(" + S[S.length - 1][1].join(",") + ")";
+}
+    function bfGlasses(st, D) {
+  var f = function (n) { return Math.round(n * 10) / 10; }, o = "";
+  function tx(x, y, t, cls, a) { return '<text class="bf-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  [["a", 88], ["b", 252]].forEach(function (g) {
+    var dr = g[0], x = g[1], s = st[dr], p = D.bfPH(dr, s.n, st.V, D), done = p >= 6.995;
+    var top = 92, bot = 212, wt = 52, wb = 41, lv = { 1: 0.46, 2: 0.66, 4: 0.82, 8: 0.92 }[st.V] || 0.95, ly = bot - (bot - top) * lv;
+    var xl = function (y) { return x - (wb + (wt - wb) * (bot - y) / (bot - top)); }, xr = function (y) { return 2 * x - xl(y); };
+    /* the dropper, then the drop on its way */
+    o += '<g class="hot" data-info="' + D.HOT.drop + '"><path class="bf-dropper" d="M' + f(x - 40) + " 22h14v32l-5 14h-4l-5-14Z" + '"/><rect class="bf-bulb" x="' + f(x - 42) + '" y="10" width="18" height="14" rx="6"/></g>';
+    if (st.fall && st.fall[dr] != null && !done) { var fy = 72 + (ly - 72) * st.fall[dr]; o += '<circle class="bf-drop" cx="' + f(x - 33) + '" cy="' + f(fy) + '" r="3.4"/>'; }
+    /* the liquid, its color by pH (red at 4, green at 7, like an indicator) */
+    o += '<path class="bf-liq hot" data-info="' + D.HOT["liq" + dr] + '" style="fill:' + D.bfColor(p) + '" d="M' + f(xl(ly)) + " " + f(ly) + "L" + f(xr(ly)) + " " + f(ly) + "L" + f(xr(bot)) + " " + bot + "L" + f(xl(bot)) + " " + bot + 'Z"/>';
+    /* the pH probe, its cable up to the meter */
+    o += '<g class="hot" data-info="' + D.HOT.probe + '"><path class="bf-cable" d="M' + f(x + 24) + " 66C" + f(x + 24) + " 60 " + f(x + 32) + " 58 " + f(x + 36) + ' 56"/><path class="bf-probe" d="M' + f(x + 24) + " 64L" + f(x + 24) + " " + f(bot - 16) + '"/><circle class="bf-bulb2" cx="' + f(x + 24) + '" cy="' + f(bot - 13) + '" r="5"/>';
+    o += '<rect class="bf-meter" x="' + f(x + 8) + '" y="18" width="66" height="38" rx="6"/>' + tx(x + 41, 32, "pH", "bf-cap", "middle") + tx(x + 41, 50, (Math.round(p * 10) / 10).toFixed(1), "bf-ph", "middle") + "</g>";
+    o += '<path class="bf-glass" d="M' + f(xl(top - 6)) + " " + f(top - 6) + "L" + f(xl(bot)) + " " + bot + "L" + f(xr(bot)) + " " + bot + "L" + f(xr(top - 6)) + " " + f(top - 6) + '"/>';
+    o += tx(x - 33, 81, "bicarbonate", "bf-cap", "middle");
+    /* the name and how it's going */
+    o += tx(x, 232, "Drink " + dr.toUpperCase() + (st.V > 1 ? ", volume ×" + st.V : ""), "bf-strong", "middle");
+    var line = done ? "neutral after " + s.n + " drops" : s.n ? s.n + (s.n === 1 ? " drop" : " drops") + " so far" : "no bicarbonate yet";
+    o += tx(x, 247, line, done ? "bf-ok" : "bf-cap", "middle");
+  });
+  return o;
+}
+    function bfChart(st, D) {
+  var f = function (n) { return Math.round(n * 10) / 10; }, o = "", x0 = 44, x1 = 326, y0 = 176, y1 = 16, xm = 45, p0 = 3.5, p1 = 7.5;
+  function X(n) { return x0 + (x1 - x0) * n / xm; } function Y(p) { return y0 - (y0 - y1) * (Math.min(p1, Math.max(p0, p)) - p0) / (p1 - p0); }
+  function tx(x, y, t, cls, a) { return '<text class="bf-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  [4, 5, 6, 7].forEach(function (p) { o += '<path class="' + (p === 7 ? "bf-neutral" : "bf-grid") + '" d="M' + x0 + " " + f(Y(p)) + "H" + x1 + '"/>' + tx(x0 - 6, Y(p) + 4, String(p), "bf-cap", "end"); });
+  o += tx(x1, Y(7) - 6, "neutral", "bf-ok", "end");
+  [0, 10, 20, 30, 40].forEach(function (n) { o += '<path class="bf-grid" d="M' + f(X(n)) + " " + y0 + "v4" + '"/>' + tx(X(n), y0 + 16, String(n), "bf-cap", "middle"); });
+  o += '<path class="bf-axis" d="M' + x0 + " " + y1 + "V" + y0 + "H" + x1 + '"/>';
+  o += tx(x0 - 6, y1 - 4, "pH", "bf-cap", "end") + tx((x0 + x1) / 2, y0 + 32, "bicarbonate added (drops)", "bf-cap", "middle");
+  ["a", "b"].forEach(function (dr) {
+    var h = st[dr].hist; if (!h.length) return;
+    o += '<path class="bf-line bf-' + dr + '" d="M' + h.map(function (q) { return f(X(q[0])) + " " + f(Y(q[1])); }).join("L") + '"/>';
+    var e = h[h.length - 1]; o += '<circle class="bf-dot bf-' + dr + '" cx="' + f(X(e[0])) + '" cy="' + f(Y(e[1])) + '" r="3.2"/>' + tx(X(e[0]) + 7, Y(e[1]) + (dr === "a" ? -6 : 14), dr.toUpperCase(), "bf-strong bf-" + dr + "t", "start");
+  });
+  return o;
+}
+    function bfState(D) { return { V: 1, a: { n: 0, hist: [[0, D.bfPH("a", 0, 1, D)]] }, b: { n: 0, hist: [[0, D.bfPH("b", 0, 1, D)]] }, fall: null, water: 0 }; }
+    d.bfN = bfN; d.bfPH = bfPH; d.bfColor = bfColor; d.bfGlasses = bfGlasses; d.bfChart = bfChart; d.bfState = bfState; return d; })(),
+    live: function bfLive(root, D) {
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var gl = root.querySelector(".bf-glasses"), ch = root.querySelector(".bf-chart"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
+  var st = D.bfState(D), raf = 0, busy = false;
+  var adds = root.querySelectorAll("[data-bfadd]"), water = root.querySelector("[data-bfwater]"), reset = root.querySelector("[data-bfreset]");
+  function ph(dr) { return D.bfPH(dr, st[dr].n, st.V, D); }
+  function one(v) { return (Math.round(v * 10) / 10).toFixed(1); }
+  function draw() { gl.innerHTML = D.bfGlasses(st, D); ch.innerHTML = D.bfChart(st, D); }
+  function text() {
+    var pa = ph("a"), pb = ph("b"), da = pa >= 6.995, db = pb >= 6.995, s;
+    if (st.water && !st.a.n && !st.b.n) s = "Water alone: the volume is ×" + st.V + " and A has only moved to pH " + one(pa) + ", B to " + one(pb) + ". pH is a log scale, so each doubling moves an acid at most about 0.3; to get from 4 to 7 you'd need about a thousand times the water (a swimming pool). Now add bicarbonate: it still takes the same amount, because the water took no acid away. A base works.";
+    else if (!st.a.n && !st.b.n) s = "Both drinks start at pH 4, measured with a pH probe. Add bicarbonate a little at a time, the way buffering capacity is measured, and count how much each takes to get back to neutral (pH 7).";
+    else if (!da) s = "Drink A is at pH " + one(pa) + " and drink B at " + one(pb) + " after the same bicarbonate. Keep going: which one reaches neutral first?";
+    else if (!db) s = "Drink A reached neutral after " + st.a.n + " drops: a low buffering capacity, and that's good, because your saliva can neutralize it quickly. Drink B started at the same pH 4 and is only at " + one(pb) + ". Keep adding.";
+    else s = "Drink B took " + st.b.n + " drops, " + Math.round(st.b.n / st.a.n) + " times as many as A, though both started at pH 4: a high buffering capacity, and that's bad. pH and buffering capacity sound alike but aren't the same thing. Measured this way, orange juice and wine are much worse than their pH alone suggests, and citric acid also grabs calcium.";
+    sum.textContent = s;
+    if (readout) readout.textContent = (da ? "A " + st.a.n + " drops" : "A pH " + one(pa)) + " · " + (db ? "B " + st.b.n + " drops" : "B pH " + one(pb));
+    adds.forEach(function (b) { b.disabled = da && db; });
+  }
+  /* add k drops to each drink that isn't neutral yet, one at a time */
+  function add(k) {
+    if (busy) return;
+    var left = k;
+    function drop() {
+      ["a", "b"].forEach(function (dr) { if (ph(dr) < 6.995) { st[dr].n++; st[dr].hist.push([st[dr].n, ph(dr)]); } });
+      left--; draw(); text();
+      if (left > 0 && (ph("a") < 6.995 || ph("b") < 6.995)) next(); else busy = false;
+    }
+    function next() {
+      if (reduce.matches) { drop(); return; }
+      busy = true; var t0 = performance.now();
+      function step(now) { var u = Math.min(1, (now - t0) / (k > 1 ? 160 : 360)); st.fall = { a: u, b: u }; gl.innerHTML = D.bfGlasses(st, D); if (u < 1) raf = requestAnimationFrame(step); else { st.fall = null; drop(); } }
+      raf = requestAnimationFrame(step);
+    }
+    next();
+  }
+  adds.forEach(function (b) { b.addEventListener("click", function () { add(+b.getAttribute("data-bfadd")); }); });
+  water.addEventListener("click", function () {
+    if (busy || st.V >= 8) return;
+    st.V *= 2; st.water++; ["a", "b"].forEach(function (dr) { st[dr].hist.push([st[dr].n, ph(dr)]); });
+    water.disabled = st.V >= 8; draw(); text();
+  });
+  reset.addEventListener("click", function () { cancelAnimationFrame(raf); busy = false; st = D.bfState(D); water.disabled = false; draw(); text(); });
+  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && root.contains(el)) info.textContent = el.getAttribute("data-info"); }
+  [gl, ch].forEach(function (s) { s.addEventListener("pointerover", hot); s.addEventListener("click", hot); });
+  draw(); text();
+} };
+  FIGS["cupping"] = { title: "Cupped-out cusp tips", caption: "Wear the cusp tips down until a pinpoint of dentin shows, then compare wear alone with wear plus acid: the exposed dentin dissolves first and cups out.", lec: "nccl",
+    html: "<div class=\"anima\" data-anima=\"cupping\"><figure class=\"iso-figure\"><div class=\"iso-plate\"><div class=\"iso-plate-corners\" aria-hidden=\"true\"><span class=\"iso-plate-corner\" data-corner=\"fig\">Fig 26</span><span class=\"iso-plate-corner\" data-corner=\"title\">Cupped-out cusp tips</span><span class=\"iso-plate-corner\" data-corner=\"hint\">wear it down</span><span class=\"iso-plate-corner\" data-corner=\"readout\" data-readout>wear plus acid · unworn</span></div><div class=\"am-svg cp-box\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg cp-svg cp-tooth\" viewBox=\"0 0 340 300\" role=\"img\" aria-label=\"A mandibular first molar cut buccolingually, close up on the crown: enamel over dentin, a dentin horn under each cusp. Wear flattens the cusp tips; with acid the exposed dentin dissolves into a cup.\"><path class=\"cp-pdl\" d=\"M70.8 267.2L72.1 287L74.3 331L263.5 331L265.7 287L267.9 267.2Z\"/><path class=\"cp-bone\" d=\"M70.8 267.2L72.1 287L74.3 331L24.8 331L31.4 302.4L44.6 282.6L60 270.5Z\"/><path class=\"cp-bone\" d=\"M267.9 267.2L265.7 287L263.5 331L313 331L306.4 302.4L293.2 282.6L277.8 270.5Z\"/><path class=\"cp-gum\" d=\"M73.9 238.6L72.7 238.2L71.2 238.3L69.5 238.9L67.5 239.9L65.4 241.3L63.3 243L61.1 245.1L58.8 247.7L56.4 250.7L53.9 253.9L51.4 257.3L49 260.6L46.6 264L44.2 267.6L41.7 271.3L39.3 275.1L37 278.9L34.7 282.6L32.5 286.2L30.4 289.8L28.3 293.3L26.3 296.9L24.4 300.7L22.6 304.6L20.7 309.1L18.7 314.1L16.8 319.2L15.1 324L14.1 328.1L13.8 331L14.5 332.9L16.2 334L18.3 334.4L20.7 334.1L23 333L24.8 331L26.1 327.8L27.1 323.3L28 317.9L28.9 312.3L30 307L31.4 302.4L33.2 298.5L35.2 294.9L37.4 291.5L39.8 288.3L42.2 285.4L44.6 282.6L47.1 280L49.7 277.7L52.5 275.5L55.1 273.6L57.7 271.9L60 270.5L62.2 269.6L64.2 269.2L66.1 269.1L67.9 268.9L69.5 268.3L70.8 267.2L71.8 265.3L72.6 262.9L73.1 260.1L73.5 257.2L73.8 254.4L74.1 251.8L74.4 249.3L74.7 246.6L74.8 244L74.8 241.6L74.5 239.8Z\"/><path class=\"cp-gum\" d=\"M263.7 238.6L264.9 238.2L266.4 238.3L268.2 238.9L270.3 239.9L272.4 241.3L274.5 243L276.7 245.1L279 247.7L281.4 250.7L283.9 253.9L286.4 257.3L288.8 260.6L291.2 264L293.6 267.6L296.1 271.3L298.5 275.1L300.8 278.9L303.1 282.6L305.3 286.2L307.4 289.8L309.5 293.3L311.5 296.9L313.4 300.7L315.2 304.6L317.1 309.1L319.1 314.1L321 319.2L322.7 324L323.7 328.1L324 331L323.3 332.9L321.6 334L319.5 334.4L317.1 334.1L314.8 333L313 331L311.7 327.8L310.7 323.3L309.8 317.9L308.9 312.3L307.8 307L306.4 302.4L304.6 298.5L302.6 294.9L300.4 291.5L298 288.3L295.6 285.4L293.2 282.6L290.7 280L288 277.7L285.3 275.5L282.6 273.6L280.1 271.9L277.8 270.5L275.8 269.6L273.9 269.2L272.2 269.1L270.6 268.9L269.2 268.3L267.9 267.2L266.8 265.3L265.9 262.9L265.1 260.1L264.4 257.2L263.9 254.4L263.5 251.8L263.1 249.3L262.8 246.6L262.7 244L262.7 241.6L263 239.8Z\"/><path class=\"cp-enamel hot\" data-info=\"Enamel: thickest over the cusps. Wear flattens the cusp tips first, and it has to wear through before any dentin shows.\" d=\"M73.2 232L72.7 231.1L71.9 229.9L71.1 228.5L70.1 227L69.1 225.4L68 223.6L67 221.8L65.9 219.9L64.8 217.9L63.8 216L63 214.1L62.2 212.2L61.5 210.4L60.9 208.5L60.3 206.6L59.7 204.6L59.1 202.7L58.6 200.7L58.2 198.6L57.8 196.6L57.4 194.5L57.1 192.3L56.9 190.2L56.7 188L56.6 185.8L56.5 183.5L56.5 181.2L56.6 178.8L56.7 176.4L56.8 174L57 171.5L57.3 169.1L57.6 166.7L58 164.2L58.4 161.8L58.9 159.4L59.4 157L60 154.6L60.7 152.3L61.4 149.9L62.2 147.5L63 145.1L63.9 142.7L64.8 140.3L65.8 138L66.7 135.6L67.8 133.2L68.8 130.8L69.9 128.4L71 126L72.2 123.5L73.4 121L74.7 118.5L76 116.1L77.3 113.6L78.7 111.2L80.1 108.9L81.4 106.6L82.8 104.4L84.2 102.2L85.6 100.1L87 98L88.5 96L90 94L91.5 92L93 90.1L94.5 88.3L96 86.5L97.5 84.8L99 83.2L100.4 81.6L101.8 80.2L103.2 78.8L104.5 77.5L105.8 76.2L107.1 75L108.4 73.8L109.6 72.8L110.9 71.8L112.1 71L113.4 70.3L114.7 69.8L115.9 69.4L117.2 69.2L118.5 69.2L119.7 69.3L121 69.6L122.3 70.1L123.5 70.7L124.8 71.4L126 72.2L127.3 73.2L128.6 74.3L129.9 75.4L131.2 76.7L132.6 78L134 79.5L135.4 81.2L136.9 83L138.4 85L139.9 87.1L141.4 89.3L142.9 91.5L144.4 93.7L145.9 95.9L147.4 98.1L148.8 100.2L150.2 102.2L151.6 104.2L152.9 106.2L154.3 108.2L155.7 110.3L157 112.3L158.3 114.3L159.6 116.2L160.9 118.1L162.1 119.8L163.3 121.4L164.5 122.9L165.6 124.2L166.7 125.3L167.7 126.3L168.6 127.2L169.5 128L170.4 128.7L171.2 129.3L172.1 129.8L172.9 130.1L173.8 130.4L174.7 130.6L175.6 130.8L176.6 130.8L177.6 130.8L178.6 130.7L179.7 130.5L180.8 130.3L181.8 130L182.9 129.6L184 129L185.2 128.4L186.3 127.6L187.4 126.6L188.6 125.5L189.8 124.2L191 122.7L192.2 120.9L193.5 119L194.8 116.9L196.1 114.6L197.4 112.2L198.7 109.8L200 107.3L201.3 104.9L202.6 102.4L203.9 100.1L205.2 97.8L206.5 95.6L207.8 93.2L209.2 90.8L210.5 88.4L211.8 86L213.2 83.6L214.5 81.3L215.8 79.1L217.1 76.9L218.3 74.9L219.5 73.1L220.6 71.4L221.7 69.9L222.6 68.4L223.6 67.1L224.4 65.9L225.3 64.7L226.1 63.7L226.9 62.8L227.8 62L228.6 61.4L229.6 60.9L230.5 60.6L231.6 60.4L232.7 60.4L233.9 60.5L235.1 60.8L236.4 61.3L237.7 61.9L239 62.6L240.4 63.4L241.7 64.4L243 65.5L244.4 66.6L245.7 67.9L247 69.2L248.3 70.6L249.6 72.2L250.9 74L252.3 75.8L253.6 77.7L254.9 79.8L256.2 81.9L257.5 84.1L258.8 86.4L260 88.7L261.2 91L262.4 93.4L263.5 95.8L264.7 98.4L265.8 101L267 103.7L268.1 106.5L269.1 109.4L270.2 112.2L271.2 115.1L272.1 117.9L273 120.8L273.8 123.6L274.5 126.4L275.2 129.2L275.8 131.9L276.3 134.7L276.8 137.5L277.2 140.3L277.6 143L277.9 145.8L278.2 148.6L278.4 151.3L278.6 154L278.8 156.7L278.9 159.4L279 162.1L279 164.7L278.9 167.4L278.8 170.1L278.6 172.7L278.4 175.4L278.2 177.9L277.9 180.5L277.6 183L277.3 185.5L277 187.9L276.7 190.2L276.4 192.5L276 194.7L275.6 196.9L275.2 199L274.7 201.1L274.2 203.1L273.7 205.1L273.2 207.1L272.7 209L272.2 210.8L271.7 212.6L271.2 214.4L270.7 216.2L270.1 217.9L269.5 219.7L268.8 221.4L268.2 223.1L267.6 224.7L266.9 226.2L266.4 227.7L265.8 229L265.3 230.2L264.9 231.2L264.6 232L263.5 254L261.3 287L259.1 331L78.7 331L76.5 287L74.3 254L73.2 232Z\"/><path class=\"cp-dentin hot\" data-info=\"Dentin: under the enamel. It has a higher critical pH than enamel, so once it's exposed, acid dissolves it first and faster.\" d=\"M73.2 232L73.1 231.1L73 229.9L72.9 228.5L72.7 227L72.5 225.4L72.4 223.6L72.2 221.8L72.1 219.9L72 217.9L72 216L72 214.1L72.1 212.2L72.3 210.3L72.5 208.4L72.8 206.5L73.2 204.5L73.5 202.5L74 200.5L74.4 198.5L74.8 196.4L75.3 194.3L75.7 192.2L76.1 190.1L76.5 188L76.9 185.9L77.2 183.7L77.5 181.5L77.8 179.2L78.2 176.9L78.5 174.7L78.8 172.4L79.2 170.2L79.6 167.9L80 165.8L80.4 163.7L80.9 161.6L81.4 159.6L81.9 157.6L82.5 155.7L83.1 153.8L83.7 151.9L84.3 150.1L84.9 148.2L85.6 146.4L86.3 144.7L87 143L87.8 141.3L88.6 139.6L89.4 138L90.3 136.3L91.2 134.7L92.1 133.1L93.1 131.5L94.1 130L95.1 128.5L96.2 127.1L97.3 125.7L98.4 124.4L99.5 123.1L100.7 122L101.9 120.9L103.2 119.8L104.6 118.8L106 117.8L107.4 116.9L108.8 116L110.3 115.3L111.7 114.6L113.1 114L114.5 113.6L115.9 113.3L117.2 113.2L118.5 113.2L119.7 113.5L121 113.8L122.2 114.3L123.4 114.9L124.6 115.6L125.7 116.4L126.9 117.2L128.1 118.1L129.2 119L130.4 120L131.5 120.9L132.6 121.9L133.8 122.9L134.9 124L136 125.2L137.1 126.4L138.2 127.6L139.3 128.9L140.3 130.2L141.4 131.5L142.5 132.7L143.6 134L144.7 135.2L145.8 136.4L146.8 137.6L147.9 138.9L148.9 140.2L150 141.4L151 142.7L152.1 143.9L153.2 145.1L154.3 146.3L155.4 147.4L156.6 148.5L157.9 149.5L159.2 150.5L160.6 151.5L162 152.5L163.5 153.5L165 154.4L166.5 155.3L168 156.2L169.6 156.9L171.1 157.5L172.6 157.9L174.1 158.2L175.5 158.3L176.9 158.2L178.4 157.9L179.8 157.5L181.2 157L182.6 156.3L184 155.5L185.4 154.6L186.8 153.7L188.1 152.7L189.5 151.6L190.7 150.6L192 149.5L193.2 148.4L194.4 147.2L195.5 145.9L196.6 144.6L197.7 143.2L198.8 141.8L199.9 140.3L200.9 138.9L202 137.4L203 135.9L204.1 134.4L205.2 133L206.3 131.5L207.4 130L208.5 128.5L209.6 126.9L210.8 125.3L211.9 123.7L213 122.2L214.1 120.7L215.2 119.2L216.3 117.8L217.3 116.6L218.4 115.4L219.4 114.3L220.5 113.2L221.5 112.2L222.5 111.2L223.5 110.3L224.5 109.4L225.4 108.7L226.4 108L227.4 107.4L228.4 107L229.5 106.7L230.5 106.6L231.6 106.6L232.7 106.8L233.8 107.2L234.9 107.6L236.1 108.2L237.2 108.9L238.4 109.6L239.5 110.5L240.6 111.4L241.7 112.3L242.7 113.3L243.7 114.3L244.7 115.3L245.6 116.4L246.5 117.6L247.4 118.8L248.3 120L249.1 121.4L250 122.8L250.7 124.2L251.5 125.8L252.2 127.4L252.9 129.1L253.6 130.8L254.2 132.6L254.8 134.6L255.4 136.6L255.9 138.7L256.4 140.9L256.9 143.1L257.3 145.4L257.8 147.7L258.1 150.1L258.5 152.4L258.8 154.8L259.1 157.2L259.3 159.6L259.5 162.2L259.7 164.7L259.8 167.4L259.9 170.1L259.9 172.7L260 175.4L260 178.1L260 180.7L260.1 183.2L260.1 185.7L260.2 188L260.3 190.3L260.4 192.5L260.4 194.6L260.5 196.7L260.5 198.8L260.6 200.8L260.7 202.8L260.8 204.7L260.9 206.6L261 208.5L261.1 210.4L261.3 212.2L261.5 214.1L261.8 216L262 217.9L262.4 219.9L262.7 221.8L263 223.6L263.3 225.4L263.7 227L264 228.5L264.2 229.9L264.4 231.1L264.6 232L263.5 254L261.3 287L259.1 331L78.7 331L76.5 287L74.3 254L73.2 232Z\"/><path class=\"cp-pulp\" d=\"M132.6 174.8L131.7 174.9L130.9 175.3L130.1 176.1L129.4 177.1L128.7 178.5L128.1 180L127.6 181.7L127.1 183.6L126.7 185.7L126.5 188.1L126.3 190.7L126.1 193.5L126.1 196.4L126 199.5L126 202.5L126 205.6L126 208.7L126.1 211.8L126.3 215.1L126.5 218.4L126.7 221.7L126.9 225.1L127 228.6L127.1 232L127.2 235.2L127.2 238L127.3 240.6L127.3 243.4L127.3 246.6L127.3 250.3L127.2 254.9L127.1 260.6L126.9 268.1L126.5 277.4L126 287.8L125.5 298.7L125.1 309.4L124.8 319.1L124.7 327.3L124.9 333.2L125.4 337.1L126.3 339.9L127.4 341.4L128.5 341.9L129.8 341.2L130.9 339.5L131.9 336.9L132.6 333.2L133 327.7L133.1 320.1L133.1 310.9L133 301L132.9 290.9L133 281.5L133.2 273.3L133.7 267.2L134.4 263L135.2 260.2L136 258.3L137.1 257.2L138.3 256.6L139.8 256.2L141.5 255.8L143.6 255.1L146.1 254.2L149 253.5L152.3 252.9L155.8 252.5L159.4 252.2L163 252L166.6 251.8L170 251.8L173.4 251.8L177 252L180.6 252.2L184.2 252.5L187.7 252.9L191 253.5L193.9 254.2L196.4 255.1L198.5 255.8L200.2 256.2L201.7 256.6L202.9 257.2L204 258.3L204.8 260.2L205.6 263L206.3 267.2L206.8 273.3L207 281.5L207.1 290.9L207 301L206.9 310.9L206.9 320.1L207 327.7L207.4 333.2L208.1 336.9L209.1 339.5L210.2 341.2L211.5 341.9L212.6 341.4L213.7 339.9L214.6 337.1L215.1 333.2L215.3 327.3L215.2 319.1L214.9 309.4L214.4 298.7L213.9 287.8L213.5 277.4L213.1 268.1L212.9 260.6L212.9 254.9L212.9 250.3L213 246.6L213.2 243.4L213.4 240.6L213.6 238L213.8 235.2L214 232L214.2 228.6L214.5 225.2L214.8 221.8L215.2 218.5L215.5 215.2L215.8 212L216 208.8L216.2 205.6L216.3 202.4L216.5 199.1L216.6 195.8L216.6 192.6L216.6 189.5L216.6 186.5L216.4 183.8L216.2 181.4L215.9 179.1L215.5 176.9L215 174.9L214.5 173L213.9 171.5L213.2 170.3L212.5 169.5L211.8 169.3L211 169.8L210.3 170.9L209.4 172.6L208.6 174.6L207.6 176.8L206.6 178.9L205.4 180.9L204.1 182.5L202.6 183.9L201 185.2L199.3 186.4L197.4 187.6L195.5 188.7L193.6 189.7L191.7 190.5L189.8 191.3L187.9 191.9L186.1 192.4L184.2 192.8L182.3 193L180.4 193.2L178.4 193.3L176.4 193.4L174.4 193.5L172.3 193.6L170.1 193.6L167.9 193.6L165.6 193.5L163.3 193.4L161.1 193.1L158.9 192.8L156.8 192.4L154.7 191.9L152.6 191.2L150.6 190.5L148.6 189.7L146.6 188.8L144.7 187.9L143 186.9L141.4 185.8L140 184.5L138.7 182.9L137.5 181.1L136.4 179.3L135.4 177.7L134.4 176.3L133.5 175.3Z\"/><path class=\"cp-out\" d=\"M73.2 232L72.7 231.1L71.9 229.9L71.1 228.5L70.1 227L69.1 225.4L68 223.6L67 221.8L65.9 219.9L64.8 217.9L63.8 216L63 214.1L62.2 212.2L61.5 210.4L60.9 208.5L60.3 206.6L59.7 204.6L59.1 202.7L58.6 200.7L58.2 198.6L57.8 196.6L57.4 194.5L57.1 192.3L56.9 190.2L56.7 188L56.6 185.8L56.5 183.5L56.5 181.2L56.6 178.8L56.7 176.4L56.8 174L57 171.5L57.3 169.1L57.6 166.7L58 164.2L58.4 161.8L58.9 159.4L59.4 157L60 154.6L60.7 152.3L61.4 149.9L62.2 147.5L63 145.1L63.9 142.7L64.8 140.3L65.8 138L66.7 135.6L67.8 133.2L68.8 130.8L69.9 128.4L71 126L72.2 123.5L73.4 121L74.7 118.5L76 116.1L77.3 113.6L78.7 111.2L80.1 108.9L81.4 106.6L82.8 104.4L84.2 102.2L85.6 100.1L87 98L88.5 96L90 94L91.5 92L93 90.1L94.5 88.3L96 86.5L97.5 84.8L99 83.2L100.4 81.6L101.8 80.2L103.2 78.8L104.5 77.5L105.8 76.2L107.1 75L108.4 73.8L109.6 72.8L110.9 71.8L112.1 71L113.4 70.3L114.7 69.8L115.9 69.4L117.2 69.2L118.5 69.2L119.7 69.3L121 69.6L122.3 70.1L123.5 70.7L124.8 71.4L126 72.2L127.3 73.2L128.6 74.3L129.9 75.4L131.2 76.7L132.6 78L134 79.5L135.4 81.2L136.9 83L138.4 85L139.9 87.1L141.4 89.3L142.9 91.5L144.4 93.7L145.9 95.9L147.4 98.1L148.8 100.2L150.2 102.2L151.6 104.2L152.9 106.2L154.3 108.2L155.7 110.3L157 112.3L158.3 114.3L159.6 116.2L160.9 118.1L162.1 119.8L163.3 121.4L164.5 122.9L165.6 124.2L166.7 125.3L167.7 126.3L168.6 127.2L169.5 128L170.4 128.7L171.2 129.3L172.1 129.8L172.9 130.1L173.8 130.4L174.7 130.6L175.6 130.8L176.6 130.8L177.6 130.8L178.6 130.7L179.7 130.5L180.8 130.3L181.8 130L182.9 129.6L184 129L185.2 128.4L186.3 127.6L187.4 126.6L188.6 125.5L189.8 124.2L191 122.7L192.2 120.9L193.5 119L194.8 116.9L196.1 114.6L197.4 112.2L198.7 109.8L200 107.3L201.3 104.9L202.6 102.4L203.9 100.1L205.2 97.8L206.5 95.6L207.8 93.2L209.2 90.8L210.5 88.4L211.8 86L213.2 83.6L214.5 81.3L215.8 79.1L217.1 76.9L218.3 74.9L219.5 73.1L220.6 71.4L221.7 69.9L222.6 68.4L223.6 67.1L224.4 65.9L225.3 64.7L226.1 63.7L226.9 62.8L227.8 62L228.6 61.4L229.6 60.9L230.5 60.6L231.6 60.4L232.7 60.4L233.9 60.5L235.1 60.8L236.4 61.3L237.7 61.9L239 62.6L240.4 63.4L241.7 64.4L243 65.5L244.4 66.6L245.7 67.9L247 69.2L248.3 70.6L249.6 72.2L250.9 74L252.3 75.8L253.6 77.7L254.9 79.8L256.2 81.9L257.5 84.1L258.8 86.4L260 88.7L261.2 91L262.4 93.4L263.5 95.8L264.7 98.4L265.8 101L267 103.7L268.1 106.5L269.1 109.4L270.2 112.2L271.2 115.1L272.1 117.9L273 120.8L273.8 123.6L274.5 126.4L275.2 129.2L275.8 131.9L276.3 134.7L276.8 137.5L277.2 140.3L277.6 143L277.9 145.8L278.2 148.6L278.4 151.3L278.6 154L278.8 156.7L278.9 159.4L279 162.1L279 164.7L278.9 167.4L278.8 170.1L278.6 172.7L278.4 175.4L278.2 177.9L277.9 180.5L277.6 183L277.3 185.5L277 187.9L276.7 190.2L276.4 192.5L276 194.7L275.6 196.9L275.2 199L274.7 201.1L274.2 203.1L273.7 205.1L273.2 207.1L272.7 209L272.2 210.8L271.7 212.6L271.2 214.4L270.7 216.2L270.1 217.9L269.5 219.7L268.8 221.4L268.2 223.1L267.6 224.7L266.9 226.2L266.4 227.7L265.8 229L265.3 230.2L264.9 231.2L264.6 232L263.5 254L261.3 287L259.1 331L78.7 331L76.5 287L74.3 254L73.2 232Z\"/><text class=\"cp-t cp-strong\" x=\"6\" y=\"163.4\">enamel</text><path class=\"cp-lead\" d=\"M50 159.4L69.9 159.4\"/><circle class=\"cp-dot\" cx=\"69.9\" cy=\"159.4\" r=\"2\"/><text class=\"cp-t cp-strong\" x=\"334\" y=\"200.8\" text-anchor=\"end\">dentin</text><path class=\"cp-lead\" d=\"M292 196.8L245.9 196.8\"/><circle class=\"cp-dot\" cx=\"245.9\" cy=\"196.8\" r=\"2\"/><g class=\"hot\" data-info=\"The dentin horn: the dentin under each cusp reaches up toward its tip, so when the enamel wears through, a pinpoint of dentin shows there first.\"><circle class=\"cp-hit\" cx=\"117.2\" cy=\"113.2\" r=\"12\"/><text class=\"cp-t cp-strong\" x=\"6\" y=\"108.8\">dentin horn</text><path class=\"cp-lead\" d=\"M82 104.8L115.2 114.2\"/><circle class=\"cp-dot\" cx=\"115.2\" cy=\"114.2\" r=\"2\"/></g><text class=\"cp-t cp-cap\" x=\"6\" y=\"292\">buccal</text><text class=\"cp-t cp-cap\" x=\"334\" y=\"292\" text-anchor=\"end\">lingual</text></svg><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"iso-svg cp-svg cp-scale\" viewBox=\"0 0 200 300\" role=\"img\" aria-label=\"A pH scale from neutral down to more acidic: dentin starts to dissolve at a higher pH than enamel, and between the two an acid dissolves dentin but not enamel.\"><text class=\"cp-t cp-strong\" x=\"8\" y=\"18\">Why dentin first?</text><rect class=\"cp-bar\" x=\"30\" y=\"50\" width=\"12\" height=\"7.8\" style=\"fill:rgb(97,170,93)\"/><rect class=\"cp-bar\" x=\"30\" y=\"57.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(110,172,90)\"/><rect class=\"cp-bar\" x=\"30\" y=\"64.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(123,174,87)\"/><rect class=\"cp-bar\" x=\"30\" y=\"72\" width=\"12\" height=\"7.8\" style=\"fill:rgb(136,176,84)\"/><rect class=\"cp-bar\" x=\"30\" y=\"79.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(149,178,81)\"/><rect class=\"cp-bar\" x=\"30\" y=\"86.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(163,181,78)\"/><rect class=\"cp-bar\" x=\"30\" y=\"94\" width=\"12\" height=\"7.8\" style=\"fill:rgb(176,183,75)\"/><rect class=\"cp-bar\" x=\"30\" y=\"101.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(189,185,72)\"/><rect class=\"cp-bar\" x=\"30\" y=\"108.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(202,187,69)\"/><rect class=\"cp-bar\" x=\"30\" y=\"116\" width=\"12\" height=\"7.8\" style=\"fill:rgb(215,189,66)\"/><rect class=\"cp-bar\" x=\"30\" y=\"123.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(223,188,64)\"/><rect class=\"cp-bar\" x=\"30\" y=\"130.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(224,183,63)\"/><rect class=\"cp-bar\" x=\"30\" y=\"138\" width=\"12\" height=\"7.8\" style=\"fill:rgb(225,179,63)\"/><rect class=\"cp-bar\" x=\"30\" y=\"145.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(226,174,62)\"/><rect class=\"cp-bar\" x=\"30\" y=\"152.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(227,170,61)\"/><rect class=\"cp-bar\" x=\"30\" y=\"160\" width=\"12\" height=\"7.8\" style=\"fill:rgb(228,165,61)\"/><rect class=\"cp-bar\" x=\"30\" y=\"167.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(229,161,60)\"/><rect class=\"cp-bar\" x=\"30\" y=\"174.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(230,156,60)\"/><rect class=\"cp-bar\" x=\"30\" y=\"182\" width=\"12\" height=\"7.8\" style=\"fill:rgb(231,152,59)\"/><rect class=\"cp-bar\" x=\"30\" y=\"189.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(232,147,58)\"/><rect class=\"cp-bar\" x=\"30\" y=\"196.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(231,142,59)\"/><rect class=\"cp-bar\" x=\"30\" y=\"204\" width=\"12\" height=\"7.8\" style=\"fill:rgb(230,136,60)\"/><rect class=\"cp-bar\" x=\"30\" y=\"211.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(228,131,62)\"/><rect class=\"cp-bar\" x=\"30\" y=\"218.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(226,125,64)\"/><rect class=\"cp-bar\" x=\"30\" y=\"226\" width=\"12\" height=\"7.8\" style=\"fill:rgb(225,119,65)\"/><rect class=\"cp-bar\" x=\"30\" y=\"233.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(223,113,67)\"/><rect class=\"cp-bar\" x=\"30\" y=\"240.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(222,107,68)\"/><rect class=\"cp-bar\" x=\"30\" y=\"248\" width=\"12\" height=\"7.8\" style=\"fill:rgb(220,102,70)\"/><rect class=\"cp-bar\" x=\"30\" y=\"255.3\" width=\"12\" height=\"7.8\" style=\"fill:rgb(218,96,72)\"/><rect class=\"cp-bar\" x=\"30\" y=\"262.7\" width=\"12\" height=\"7.8\" style=\"fill:rgb(217,90,73)\"/><rect class=\"cp-barline\" x=\"30\" y=\"50\" width=\"12\" height=\"220\"/><text class=\"cp-t cp-cap\" x=\"24\" y=\"54\" text-anchor=\"end\">7</text><text class=\"cp-t cp-cap\" x=\"48\" y=\"54\">neutral</text><g class=\"hot\" data-info=\"Between the two critical pHs an acid dissolves dentin but not enamel: that's why the exposed dentin cups out while the enamel rim stands.\"><rect class=\"cp-band on\" x=\"26\" y=\"101.3\" width=\"20\" height=\"58.7\" rx=\"3\"/><text class=\"cp-t cp-band-t\" x=\"56\" y=\"127.7\">dentin dissolves,</text><text class=\"cp-t cp-band-t\" x=\"56\" y=\"141.7\">enamel doesn't</text></g><g class=\"hot\" data-info=\"Dentin's critical pH, where it starts to dissolve, is higher: a milder acid already dissolves it.\"><path class=\"cp-tick\" d=\"M26 101.3H52\"/><text class=\"cp-t cp-strong\" x=\"56\" y=\"83.3\">dentin starts</text><text class=\"cp-t cp-cap\" x=\"56\" y=\"97.3\">to dissolve</text></g><g class=\"hot\" data-info=\"Enamel's critical pH is lower: it takes a stronger acid to dissolve enamel.\"><path class=\"cp-tick\" d=\"M26 160H52\"/><text class=\"cp-t cp-strong\" x=\"56\" y=\"174\">enamel starts</text><text class=\"cp-t cp-cap\" x=\"56\" y=\"188\">to dissolve</text></g><path class=\"cp-arrow\" d=\"M36 278v14m-4 -5l4 5 4-5\"/><text class=\"cp-t cp-cap\" x=\"48\" y=\"290\">more acidic</text></svg></div></div></figure><div class=\"am-controls\"><label class=\"am-slider\">new<input type=\"range\" min=\"0\" max=\"100\" value=\"0\" data-cpt aria-label=\"Years of wear, from a new tooth to heavily worn\">years of wear</label></div>\n<div class=\"am-controls\" role=\"group\" aria-label=\"What wears the tooth\"><button type=\"button\" class=\"am-btn\" data-cpacid=\"0\" aria-pressed=\"false\">Wear alone</button><button type=\"button\" class=\"am-btn\" data-cpacid=\"1\" aria-pressed=\"true\">Wear plus acid</button><button type=\"button\" class=\"am-btn\" data-cpplay>Watch it happen</button></div>\n<p class=\"am-summary\" aria-live=\"polite\"></p>\n<p class=\"am-info\">Hover or tap the enamel, the dentin or the pH scale.</p><details class=\"am-sources\"><summary>What this shows, and what's simplified</summary><ul>\n<li>From the L9 notes (Dr. Lawson's prerecorded lecture, a side point he \"always thought was cool\"): cupped-out cusp tips on eroded molars are a combination of wear and erosion. The patient wears through the enamel of a cusp tip until a pinpoint of dentin shows, the dentin horn under each cusp; as soon as that dentin is exposed, acid selectively dissolves it, because dentin has a higher critical pH than enamel. From L7 (Dr. Givan): attrition alone leaves facets with enamel and dentin at the same height; erosion leaves dull, cupped facets, as the dentin goes faster than the enamel.</li>\n<li>Outside sources: cupping of the occlusal surfaces, the dentin hollowed below a rim of enamel, is a recognized sign of erosive tooth wear (Ganss and Lussi, Diagnosis of erosive tooth wear, Monogr Oral Sci 2014;25:22-31). The tooth's size and shape are a mandibular first molar's (Wheeler's Dental Anatomy: crown 7.5 mm high, 10.5 mm buccolingually, the crown tilted lingually over the root), with enamel about 2 mm thick over the cusps (Ten Cate's Oral Histology: up to about 2.5 mm). The scale places dentin's critical pH at about 6.3 and enamel's at about 5.5, typical textbook values; dentin's mineral is more soluble than enamel's (Hoppenbrouwers, Driessens and Borggreven, Arch Oral Biol 1987;32:319-322). The lecture gave no numbers, so the scale shows only their order.</li>\n<li>Schematic: the years are not to scale, the buccal (supporting) cusp is drawn wearing first, and each facet is drawn flat. A real critical pH isn't fixed: it depends on the calcium and phosphate in the fluid on the tooth. Acid also softens enamel, and a cup's rim can chip; neither is drawn. Educational, not clinical guidance.</li></ul></details></div>",
+    data: (function(){ var d = {"HOT":{"enamel":"Enamel: thickest over the cusps. Wear flattens the cusp tips first, and it has to wear through before any dentin shows.","dentin":"Dentin: under the enamel. It has a higher critical pH than enamel, so once it's exposed, acid dissolves it first and faster.","horn":"The dentin horn: the dentin under each cusp reaches up toward its tip, so when the enamel wears through, a pinpoint of dentin shows there first.","cup":"The cup: the exposed dentin has dissolved below the enamel around it, which stands as a rim. Wear plus erosion; L7 adds that eroded facets are dull, not shiny.","band":"Between the two critical pHs an acid dissolves dentin but not enamel: that's why the exposed dentin cups out while the enamel rim stands.","den":"Dentin's critical pH, where it starts to dissolve, is higher: a milder acid already dissolves it.","ena":"Enamel's critical pH is lower: it takes a stronger acid to dissolve enamel."},"TH":300,"V":{"OX":170,"OY":232,"S":22},"XS":0.3,"OUT":[[-4.4,0],[-4.9,0.9],[-5.15,2],[-5.05,3.3],[-4.6,4.6],[-3.9,5.9],[-3.1,6.9],[-2.4,7.4],[-1.7,7],[-0.9,5.9],[-0.2,4.9],[0.3,4.6],[0.9,4.9],[1.6,6.1],[2.3,7.3],[2.8,7.8],[3.5,7.4],[4.2,6.3],[4.75,4.8],[4.95,3.3],[4.85,1.9],[4.6,0.8],[4.3,0]],"DEJ":[[-4.4,0],[-4.45,0.9],[-4.25,2],[-4.05,3.2],[-3.7,4.2],[-3.15,5],[-2.4,5.4],[-1.75,5.05],[-1.15,4.4],[-0.55,3.75],[0.25,3.35],[1,3.75],[1.6,4.5],[2.2,5.3],[2.75,5.7],[3.35,5.35],[3.8,4.6],[4.05,3.4],[4.1,2],[4.15,0.9],[4.3,0]],"ROOT":[[4.3,0],[4.25,-1],[4.15,-2.5],[4.05,-4.5],[-4.15,-4.5],[-4.25,-2.5],[-4.35,-1],[-4.4,0]],"PULP":[[-1.7,2.6],[-1.95,2.2],[-2,1.2],[-1.95,0],[-1.95,-1.3],[-2.05,-4.6],[-1.7,-4.6],[-1.65,-1.6],[-1.2,-1.05],[0,-0.9],[1.2,-1.05],[1.65,-1.6],[1.7,-4.6],[2.05,-4.6],[1.95,-1.3],[2,0],[2.1,1.2],[2.1,2.3],[1.9,2.85],[1.55,2.25],[0.9,1.85],[0.2,1.75],[-0.6,1.8],[-1.3,2.1]],"SOCKET":[[-4.51,-1.6],[-4.45,-2.5],[-4.35,-4.5],[4.25,-4.5],[4.35,-2.5],[4.45,-1.6]],"BONE":[[[-4.51,-1.6],[-4.45,-2.5],[-4.35,-4.5],[-6.6,-4.5],[-6.3,-3.2],[-5.7,-2.3],[-5,-1.75]],[[4.45,-1.6],[4.35,-2.5],[4.25,-4.5],[6.5,-4.5],[6.2,-3.2],[5.6,-2.3],[4.9,-1.75]]],"GUM":[[[-4.37,-0.3],[-4.85,-0.5],[-5.5,-1.3],[-6.15,-2.3],[-6.7,-3.3],[-7.1,-4.5],[-6.6,-4.5],[-6.3,-3.2],[-5.7,-2.3],[-5,-1.75],[-4.51,-1.6],[-4.36,-0.9]],[[4.26,-0.3],[4.75,-0.5],[5.4,-1.3],[6.05,-2.3],[6.6,-3.3],[7,-4.5],[6.5,-4.5],[6.2,-3.2],[5.6,-2.3],[4.9,-1.75],[4.45,-1.6],[4.25,-0.9]]],"B":{"tip":7.4,"horn":5.4,"end":4.75,"ue":0.45,"dmax":1.1},"L":{"tip":7.8,"horn":5.7,"end":5.15,"ue":0.7,"dmax":0.7},"HORN":[-2.4,5.4],"PH":{"top":7,"bot":4,"y0":50,"y1":270,"den":6.3,"ena":5.5}};
+    function cpCurve(pts, closed, n) {
+  var o = [], N = pts.length, m = closed ? N : N - 1;
+  function P(i) { if (closed) return pts[(i + N) % N]; return pts[Math.max(0, Math.min(N - 1, i))]; }
+  for (var i = 0; i < m; i++) {
+    var p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    for (var k = 0; k < n; k++) {
+      var t = k / n, t2 = t * t, t3 = t2 * t;
+      o.push([0, 1].map(function (j) { return 0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3); }));
+    }
+  }
+  if (!closed) o.push(pts[N - 1].slice());
+  return o;
+}
+    function cpWear(u, a, D) {
+  function one(c) {
+    var p = u < c.ue ? c.tip - (c.tip - c.horn) * u / c.ue : c.horn - (c.horn - c.end) * (u - c.ue) / (1 - c.ue);
+    var s = u <= c.ue ? 0 : Math.min(1, 1.4 * (u - c.ue) / (1 - c.ue));
+    return { p: p, d: a * c.dmax * s, open: u >= c.ue - 0.004 };
+  }
+  return { b: one(D.B), l: one(D.L) };
+}
+    function cpSurf(w, D) {
+  var dej = D.cpCurve(D.DEJ, false, 12), cups = [];
+  [["b", function (x) { return x < D.XS; }], ["l", function (x) { return x >= D.XS; }]].forEach(function (c) {
+    var f = w[c[0]], lo = 1e9, hi = -1e9;
+    dej.forEach(function (q) { if (c[1](q[0]) && q[1] >= f.p) { lo = Math.min(lo, q[0]); hi = Math.max(hi, q[0]); } });
+    if (hi > lo) { var hw = (hi - lo) / 2; cups.push({ side: c[0], xm: (lo + hi) / 2, hw: hw, d: Math.min(f.d, 1.1 * hw), p: f.p }); }
+  });
+  function S(x) {
+    var y = x < D.XS ? w.b.p : w.l.p;
+    cups.forEach(function (c) { var t = (x - c.xm) / (c.hw * 1.06); if (Math.abs(t) < 1) y = Math.min(y, c.p - c.d * Math.sqrt(1 - t * t)); });
+    return y;
+  }
+  return { S: S, cups: cups };
+}
+    function cpTooth(st, D) {
+  var V = D.V, f = function (n) { return Math.round(n * 10) / 10; };
+  function X(x) { return V.OX + x * V.S; } function Y(y) { return V.OY - y * V.S; }
+  function pts(a) { return a.map(function (q) { return f(X(q[0])) + " " + f(Y(q[1])); }).join("L"); }
+  function poly(a, cls, info) { return '<path class="' + cls + (info ? ' hot" data-info="' + info : "") + '" d="M' + pts(a) + 'Z"/>'; }
+  function tx(x, y, t, cls, a) { return '<text class="cp-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  function lead(x1, y1, x2, y2) { return '<path class="cp-lead" d="M' + f(x1) + " " + f(y1) + "L" + f(x2) + " " + f(y2) + '"/><circle class="cp-dot" cx="' + f(x2) + '" cy="' + f(y2) + '" r="2"/>'; }
+  var w = D.cpWear(st.u, st.a, D), sf = D.cpSurf(w, D), clamp = function (a) { return a.map(function (q) { return [q[0], Math.min(q[1], sf.S(q[0]))]; }); };
+  var out = clamp(D.cpCurve(D.OUT, false, 12)), dej = clamp(D.cpCurve(D.DEJ, false, 12)), root = D.ROOT.slice(1), o = "";
+  o += poly(D.SOCKET, "cp-pdl");
+  D.BONE.forEach(function (b) { o += poly(b, "cp-bone"); });
+  D.GUM.forEach(function (g) { o += poly(D.cpCurve(g, true, 6), "cp-gum"); });
+  o += poly(out.concat(root), "cp-enamel", D.HOT.enamel);
+  o += poly(dej.concat(root), "cp-dentin", D.HOT.dentin);
+  o += poly(D.cpCurve(D.PULP, true, 8), "cp-pulp");
+  o += '<path class="cp-out" d="M' + pts(out.concat(root)) + 'Z"/>';
+  /* the cups, for hover */
+  sf.cups.forEach(function (c) { if (c.d > 0.08) o += '<ellipse class="hot cp-hit" data-info="' + D.HOT.cup + '" cx="' + f(X(c.xm)) + '" cy="' + f(Y(c.p - c.d / 2)) + '" rx="' + f(c.hw * V.S + 4) + '" ry="' + f(c.d * V.S / 2 + 6) + '"/>'; });
+  /* labels */
+  o += tx(6, Y(3.3) + 4, "enamel", "cp-strong") + lead(50, Y(3.3), X(-4.55), Y(3.3));
+  o += tx(334, Y(1.6) + 4, "dentin", "cp-strong", "end") + lead(292, Y(1.6), X(3.45), Y(1.6));
+  if (!w.b.open) o += '<g class="hot" data-info="' + D.HOT.horn + '"><circle class="cp-hit" cx="' + f(X(D.HORN[0])) + '" cy="' + f(Y(D.HORN[1])) + '" r="12"/>' + tx(6, Y(5.6), "dentin horn", "cp-strong") + lead(82, Y(5.6) - 4, X(D.HORN[0]) - 2, Y(D.HORN[1]) + 1) + "</g>";
+  var cb = sf.cups.filter(function (c) { return c.side === "b"; })[0], lines = null, tgt = null;
+  if (st.u >= 0.02 && !w.b.open) { lines = ["wear facet: the enamel of", "the cusp tip worn flat"]; tgt = [-2.4, w.b.p]; }
+  else if (w.b.open && st.u < D.B.ue + 0.06) { lines = ["a pinpoint of dentin shows:", "the dentin horn"]; tgt = [cb ? cb.xm : D.HORN[0], w.b.p]; }
+  else if (w.b.open && cb && cb.d > 0.08) { lines = ["cupped out: acid dissolves", "the exposed dentin first"]; tgt = [cb.xm, cb.p - cb.d]; }
+  else if (w.b.open) { lines = ["wear alone: a flat facet, enamel", "and dentin at the same height"]; tgt = [cb ? cb.xm : D.HORN[0], w.b.p]; }
+  if (lines) o += tx(6, 16, lines[0], "cp-call") + tx(6, 30, lines[1], "cp-call") + lead(44, 35, X(tgt[0]), Y(tgt[1]) - 1);
+  o += tx(6, D.TH - 8, "buccal", "cp-cap") + tx(334, D.TH - 8, "lingual", "cp-cap", "end");
+  return o;
+}
+    function cpScale(st, D) {
+  var P = D.PH, f = function (n) { return Math.round(n * 10) / 10; }, o = "";
+  function Y(p) { return P.y0 + (P.top - p) / (P.top - P.bot) * (P.y1 - P.y0); }
+  function tx(x, y, t, cls, a) { return '<text class="cp-t' + (cls ? " " + cls : "") + '" x="' + f(x) + '" y="' + f(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + t + "</text>"; }
+  o += tx(8, 18, "Why dentin first?", "cp-strong");
+  for (var i = 0; i < 30; i++) { var p = P.top - (P.top - P.bot) * i / 30; o += '<rect class="cp-bar" x="30" y="' + f(Y(p)) + '" width="12" height="' + f((P.y1 - P.y0) / 30 + 0.5) + '" style="fill:' + D.cpColor(p - (P.top - P.bot) / 60) + '"/>'; }
+  o += '<rect class="cp-barline" x="30" y="' + P.y0 + '" width="12" height="' + (P.y1 - P.y0) + '"/>';
+  o += tx(24, Y(7) + 4, "7", "cp-cap", "end") + tx(48, Y(7) + 4, "neutral", "cp-cap");
+  o += '<g class="hot" data-info="' + D.HOT.band + '"><rect class="cp-band' + (st.a > 0.5 ? " on" : "") + '" x="26" y="' + f(Y(P.den)) + '" width="20" height="' + f(Y(P.ena) - Y(P.den)) + '" rx="3"/>';
+  o += tx(56, Y((P.den + P.ena) / 2) - 3, "dentin dissolves,", "cp-band-t") + tx(56, Y((P.den + P.ena) / 2) + 11, "enamel doesn't", "cp-band-t") + "</g>";
+  [["den", "dentin starts", D.HOT.den], ["ena", "enamel starts", D.HOT.ena]].forEach(function (k) {
+    var y = Y(P[k[0]]);
+    o += '<g class="hot" data-info="' + k[2] + '"><path class="cp-tick" d="M26 ' + f(y) + 'H52"/>' + tx(56, y - (k[0] === "den" ? 18 : -14), k[1], "cp-strong") + tx(56, y - (k[0] === "den" ? 4 : -28), "to dissolve", "cp-cap") + "</g>";
+  });
+  o += '<path class="cp-arrow" d="M36 ' + (P.y1 + 8) + "v14m-4 -5l4 5 4-5" + '"/>' + tx(48, P.y1 + 20, "more acidic", "cp-cap");
+  return o;
+}
+    function cpColor(p) {
+  var S = [[4, [216, 87, 74]], [5, [232, 145, 58]], [6, [222, 190, 64]], [7, [90, 169, 95]]], i;
+  if (p <= S[0][0]) return "rgb(" + S[0][1].join(",") + ")";
+  for (i = 1; i < S.length; i++) if (p <= S[i][0]) { var u = (p - S[i - 1][0]) / (S[i][0] - S[i - 1][0]), a = S[i - 1][1], b = S[i][1]; return "rgb(" + [0, 1, 2].map(function (k) { return Math.round(a[k] + (b[k] - a[k]) * u); }).join(",") + ")"; }
+  return "rgb(" + S[S.length - 1][1].join(",") + ")";
+}
+    d.cpCurve = cpCurve; d.cpWear = cpWear; d.cpSurf = cpSurf; d.cpTooth = cpTooth; d.cpScale = cpScale; d.cpColor = cpColor; return d; })(),
+    live: function cpLive(root, D) {
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
+  var tooth = root.querySelector(".cp-tooth"), scale = root.querySelector(".cp-scale"), sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
+  var slider = root.querySelector("[data-cpt]"), play = root.querySelector("[data-cpplay]"), segs = root.querySelectorAll("[data-cpacid]");
+  var st = { u: 0, a: 1 }, acid = 1, raf = 0, araf = 0;
+  function draw() { tooth.innerHTML = D.cpTooth(st, D); scale.innerHTML = D.cpScale(st, D); }
+  function text() {
+    var w = D.cpWear(st.u, st.a, D), s, r;
+    if (st.u < 0.02) { s = "A mandibular first molar, cut buccolingually: enamel over dentin, thickest over the cusps, with a dentin horn reaching up under each cusp. Move the slider to wear it down over the years."; r = "unworn"; }
+    else if (!w.b.open) { s = "Wear flattens the cusp tips first. Only enamel is worn so far: the dentin horn under the cusp is still covered."; r = "enamel worn"; }
+    else if (st.u < D.B.ue + 0.06) { s = "The enamel of the buccal cusp tip has worn through: a pinpoint of dentin shows, the dentin horn. What happens next depends on acid."; r = "dentin shows"; }
+    else if (acid) { s = "As soon as the dentin is exposed, acid selectively dissolves it, because dentin has a higher critical pH than enamel. It sinks below the enamel around it: a cupped-out cusp tip, from wear plus erosion" + (w.l.open ? ", now on the lingual cusp too." : ". Keep going and the lingual cusp cups too."); r = "cupped"; }
+    else { s = "Wear alone wears the enamel and the dentin together: a flat facet with both at the same height (L7: attrition). No cup forms until acid is added."; r = "flat facet"; }
+    sum.textContent = s;
+    if (readout) readout.textContent = (acid ? "wear plus acid" : "wear alone") + " · " + r;
+  }
+  function setAcid(v) {
+    acid = v; segs.forEach(function (b) { b.setAttribute("aria-pressed", String(+b.getAttribute("data-cpacid") === v)); });
+    cancelAnimationFrame(araf);
+    if (reduce.matches) { st.a = v; draw(); text(); return; }
+    var a0 = st.a, t0 = performance.now();
+    function step(now) { var k = Math.min(1, (now - t0) / 600); st.a = a0 + (v - a0) * (1 - Math.pow(1 - k, 3)); draw(); if (k < 1) araf = requestAnimationFrame(step); else text(); }
+    text(); araf = requestAnimationFrame(step);
+  }
+  function run() {
+    cancelAnimationFrame(raf);
+    if (reduce.matches) { st.u = 1; slider.value = 100; draw(); text(); return; }
+    var t0 = performance.now(), u0 = st.u >= 0.99 ? 0 : st.u, dur = 5200 * (1 - u0);
+    function step(now) { var k = Math.min(1, (now - t0) / dur); st.u = u0 + (1 - u0) * k; slider.value = Math.round(st.u * 100); draw(); text(); if (k < 1) raf = requestAnimationFrame(step); }
+    raf = requestAnimationFrame(step);
+  }
+  slider.addEventListener("input", function () { cancelAnimationFrame(raf); st.u = +slider.value / 100; draw(); text(); });
+  segs.forEach(function (b) { b.addEventListener("click", function () { setAcid(+b.getAttribute("data-cpacid")); }); });
+  play.addEventListener("click", run);
+  function hot(e) { var el = e.target.closest && e.target.closest(".hot"); if (el && root.contains(el) && el.getAttribute("data-info")) info.textContent = el.getAttribute("data-info"); }
+  [tooth, scale].forEach(function (s) { s.addEventListener("pointerover", hot); s.addEventListener("click", hot); });
+  draw(); text();
+} };
+  FIGS["erosion9"] = { title: "Where acid erodes: vomiting and NCCLs", caption: "L7's erosion map, opened on vomiting: the lingual of the maxillary teeth, mostly the anteriors. Tap NCCLs for the cervical notches, or any other cause to compare.", lec: "nccl",
+    html: FIGS["erosion"].html.split("data-anima=\"erosion\"").join("data-anima=\"erosion9\""),
+    data: Object.assign({}, FIGS["erosion"].data, {"start":"bulimia","extra":{"bulimia":" Dr. Lawson (L9) gives the reason: the lip protects the facial surfaces, and the tongue the lingual of the mandibular teeth.","nccl":" L9: when acidic fluids sit at the cervical area, they make NCCLs; erosion is one of the three causes, with abrasion and abfraction, alone or together."}}),
+    live: FIGS["erosion"].live };
   function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   /* noTitle: the caller heads it (Review sections use their own h3). The figures use no SVG ids, so copies can repeat. */
   function html(key, noTitle){ var f = FIGS[key]; if(!f) return ""; return '<figure class="lec-fig">' + (noTitle ? '' : '<h4>' + esc(f.title) + '</h4>') + '<p class="lec-fig-cap">' + esc(f.caption) + '</p>' + f.html + '</figure>'; }
@@ -10834,12 +11305,15 @@ var REVIEW = [
     "Like pushing on a stop sign anchored in the ground",
     "Dr. Givan (L7): supported in vitro, neither validated nor rejected clinically"
   ] },
+  { title:'Abfraction, drawn', type:'figs', figs:['abfract'] },
+  { title:'Erosion, drawn: cupped cusp tips and where vomiting erodes', type:'figs', figs:['cupping','erosion9'] },
   { title:'pH vs buffering capacity', type:'table', head:['','pH','Buffering capacity'], rows:[
     ["What it tells you", "How acidic the drink is (water is 7; lower is more acidic)", "How much bicarbonate (saliva) it takes to neutralize the drink"],
     ["How it's measured", "A pH probe in the solution", "Add bicarbonate a little at a time until the pH is back to neutral"],
     ["Which way is bad", "Lower", "Higher"],
     ["What it changes", "The order of the drinks on his chart", "About the same order, but orange juice and wine get much worse"]
   ]},
+  { title:'pH vs buffering capacity, drawn', type:'figs', figs:['buffer'] },
   { title:'Drinks and the mouth\'s pH', type:'list', items:[
     "Coffee: milk makes it less acidic; tea is better than coffee",
     "Sparkling water: the carbonic acid sets the acidity, not the flavor, so bubblier is more acidic",

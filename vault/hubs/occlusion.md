@@ -72,7 +72,17 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
     change re-poses it: look at every scheme and move again after one. Reuse it for any new denture section.
     Fig 20's proportions come from outside sources (2026-11-06, [outside-sources-for-figures](../rules/outside-sources-for-figures.md)):
     the mandible loses about twice the maxilla's ridge height (Tallgren), and the basal bone stays put (Cawood & Howell).
-  - The anima figures are numbered Fig 1-23 (plus Fig 2b) in lecture order; a new one takes the next free number.
+  - The anima figures are numbered Fig 1-26 (plus Fig 2b) in lecture order; a new one takes the next free number.
+  - **An alias shows a figure under a second lecture** without a second copy of its drawing: an entry
+    `{ id, alias, lec, title, caption, data }` in `anima/index.mjs` (after the figure it copies); `build.mjs` gives it the
+    original's markup and live code, and `data` overrides the original's. `erosion9` is Fig 19 under L9: `start` opens it
+    on bulimia and `extra` adds L9's reasons to the bulimia and NCCL summaries (`erLive` reads both).
+  - L9's figures draw what the L9 notes teach, with sources cited in each one's "What this shows" block. `abfract`
+    (Fig 24) bends a mandibular premolar as a cantilever about the bone crest (exaggerated about 100x), the load on the
+    buccal cusp's outer incline pushing the crown lingually, so the buccal side is tensile. `cupping` (Fig 26) is a
+    mandibular first molar's mesial cusps in section; its pH scale places the critical pHs at about 6.3 (dentin) and 5.5
+    (enamel) but labels only their order, since the lecture gave no numbers. `buffer` (Fig 25) computes both drinks'
+    pH: A an unbuffered strong acid, B citric acid from its three pKa values, sized so A takes 5 drops and B 40.
   - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
     the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
     **mesial** fossa of #30, as the sheet draws it, though real crown widths would put it nearer the central fossa) and
@@ -126,8 +136,9 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   support/stability/retention, posterior tooth forms); built the same day as Figs 20-23 (`resorb`, `ssr`, `schemes`,
   `toothforms`; [PR #260](https://github.com/smcmurry6-source/study-hubs/pull/260)). L8's diagram review is done; don't
   propose these again.
-- 2026-11-10: four L9 candidates went to Sam (abfraction's flex, the buffering-capacity titration, the cupped cusp tip,
-  and reusing Fig 19 under L9's erosion section), waiting on the answers ([task](../tasks/2026-11-10-occlusion-l9-follow-ups.md)).
+- 2026-11-10: Sam approved all four L9 candidates ("make all diagrams"); built the same day as Figs 24-26 (`abfract`,
+  `cupping`, `buffer`) plus `erosion9`, Fig 19 again under L9 opened on bulimia
+  ([task](../tasks/2026-11-10-occlusion-l9-follow-ups.md)). L9's diagram review is done; don't propose these again.
 
 ## Drawn Patient Box cases
 

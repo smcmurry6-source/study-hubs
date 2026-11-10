@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (Occlusion L9 diagrams: abfraction, cupped cusp tips, pH vs buffering capacity, Fig 19 again, Claude Code)**
+  — Sam: "Approve the budget, make all diagrams, merge when ready". All four L9 candidates are built in
+  `tools/figures/occlusion/anima/`, in the L9 notes at both levels next to the paragraph each explains (`FIG_PLACE.nccl`
+  in `od.js`) and in L9's Review (three `figs` sections). **Fig 24 `abfract`**: a mandibular premolar in its bone; move the
+  load from the long axis onto the buccal cusp's incline and the tooth bends about the crest like the pushed stop sign
+  beside it (compression lingual, tension buccal); "Load it again and again" grows the notch on the tensile side just
+  above the bone. **Fig 26 `cupping`**: a mandibular first molar's crown in section; wear the cusp tips down until a
+  pinpoint of dentin shows, then wear alone (a flat facet, L7) or wear plus acid (the dentin cups out below an enamel rim),
+  beside a pH scale with dentin's critical pH above enamel's. **Fig 25 `buffer`**: two drinks at pH 4 with pH probes; add
+  bicarbonate a drop at a time (A neutral after 5, B, a citric acid buffer, after 40) or water (the pH barely moves), with
+  a pH vs drops chart. **`erosion9`**: L7's Fig 19 again under L9, opened on bulimia with L9's reasons (the lip, the
+  tongue) and the NCCL view one tap away, as an **alias**, a new `build.mjs` entry type that reuses a figure's drawing and
+  live code under another lecture with data overrides (`erLive` reads `D.start` and `D.extra`). About page: an L9 sentence
+  in Diagrams. Occlusion's page is 1379 KB over the wire, so its budget went from 1370 to 1395 KB (BUG-055; BUG-053's raise
+  approved).
 - **2026-11-10 (Timmy's place, round 3: on the design page and in the pending migration only, Claude Code)** — Sam's
   third round of feedback ([task](vault/tasks/done/2026-11-10-redesign-timmys-place-round-3.md), PR #299, stacked on #289).
   **Students see nothing yet**: nothing is wired into `widget/pet.js`, `widget/eggs.js`, `widget/hub.js` or
