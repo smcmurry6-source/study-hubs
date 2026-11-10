@@ -167,7 +167,6 @@ if (placeKit) {
   pairs.forEach(([h, sc]) => art.push(["thumb " + h.k + " " + sc.k, K.thumb("home", h.k, { scene: sc.k, up: ups(h) })]));
   K.SCENES.forEach((sc) => art.push(["thumb " + sc.k, K.thumb("scene", sc.k)]));
   K.RARITIES.forEach((r) => { art.push(["frame " + r.k, K.frame(r.k)]); art.push(["burst " + r.k, K.burst(r.k)]); });
-  [0, 1, 2, 3, 4].forEach((l) => art.push(["gem " + l, K.gem(l, "#2E9E6B")]));
   art.push(["coin", K.coin()]);
   K.OUTFITS.forEach((o) => { const p = K.outfitParts(o.k); art.push(["outfit " + o.k, p.back + p.face + p.top]); });
   for (const [w, svg] of art) {

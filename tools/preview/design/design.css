@@ -678,12 +678,12 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-more { border-top: 1px solid var(--rule); padding-top: 10px; }
 .tp-more summary { cursor: pointer; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); margin-bottom: 10px; }
 .tp-more summary .num { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: var(--r-pill); background: var(--track); color: var(--text); font-size: var(--fs-meta); text-align: center; }
-/* hub mastery: the plaque on a whole place, then close up at each size */
+/* hub mastery: the medal board on a whole place, then close up at each size */
 #tpMastery { grid-template-columns: repeat(10, minmax(0, 1fr)); }
 #tpMastery .tp-wide { grid-column: span 5; }
 #tpMastery .tp-small { grid-column: span 2; }
 .tp-fig figcaption .tp-try { margin-top: 8px; }
-/* the big views: one dialog. The mastery view is the plaque opened up: a wooden frame round dark felt, a gem per hub */
+/* the big views: one dialog. The mastery view is the board opened up: a wooden frame round dark felt, a medal per hub */
 .tp-dlg { padding: 0; border: 0; background: none; color: inherit; max-width: min(960px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: visible; }
 .tp-dlg::backdrop { background: rgba(27, 20, 30, .62); }
 .tp-dlg[open] { animation: tp-dlg-in 220ms var(--ease-out) both; }
@@ -700,12 +700,14 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-mhead p { color: #E9DCEF; font-size: var(--fs-label); }
 .tp-mchips { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px 0; }
 .tp-mchip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px 3px 4px; border-radius: 999px; background: rgba(255, 255, 255, .12); font-size: var(--fs-label); }
-.tp-mchip .tp-gem { width: 26px; height: 26px; }
+.tp-mchip .tp-medal { width: 28px; height: 28px; }
 .tp-mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; padding: 16px 12px 6px; }
 .tp-mcard { display: grid; grid-template-rows: auto 1fr auto; justify-items: center; align-items: center; gap: 4px; padding: 12px 8px 12px; border-radius: 16px; background: rgba(255, 255, 255, .08); text-align: center;
-  animation: tp-gem-in 420ms var(--ease-out) both; animation-delay: calc(var(--i) * 35ms + 120ms); }
-@keyframes tp-gem-in { from { opacity: 0; transform: translateY(8px) scale(.9); } }
-.tp-mcard .tp-gem { width: 76px; height: 76px; }
+  animation: tp-medal-in 420ms var(--ease-out) both; animation-delay: calc(var(--i) * 35ms + 120ms); }
+@keyframes tp-medal-in { from { opacity: 0; transform: translateY(8px) scale(.9); } }
+.tp-mcard .tp-medal { width: 84px; height: 84px; }
+.tp-mcrest .tp-medal { width: 100%; height: 100%; }
+.lvl-0 .tp-medal, .tp-medal.is-none { filter: grayscale(1) brightness(1.5); opacity: .32; }
 .tp-mcard b { font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.2; color: #fff; }
 .tp-mlvl { font-size: var(--fs-meta); font-weight: var(--w-strong); padding: 1px 10px; border-radius: 999px; color: #3B2E3A; }
 .lvl-4 .tp-mlvl { background: #F2C230; box-shadow: 0 0 0 2px #FFF3C4; } .lvl-3 .tp-mlvl { background: #E8BE45; } .lvl-2 .tp-mlvl { background: #C9D1D9; } .lvl-1 .tp-mlvl { background: #D08A52; }
@@ -715,7 +717,7 @@ img.emb-disc, .big, .small img { display: block; }
 @media (max-width: 640px) {
   .tp-mboard { padding: 16px 10px 12px; border-radius: 22px; }
   .tp-mgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px 8px 4px; }
-  .tp-mcard .tp-gem { width: 60px; height: 60px; }
+  .tp-mcard .tp-medal { width: 68px; height: 68px; }
   .tp-mcard b { font-size: var(--fs-meta); overflow-wrap: anywhere; }
   .tp-mhead h3 { font-size: 20px; }
 }
@@ -809,8 +811,8 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-clouds { position: fixed; inset: 0; z-index: 2000; pointer-events: none; overflow: hidden; display: none; }
 .tp-clouds.in, .tp-clouds.out { display: block; pointer-events: auto; }
 .tp-clfill { position: absolute; inset: 0; background: #fff; opacity: 0; }
-.tp-clouds.in .tp-clfill { animation: tp-clfill 260ms linear 520ms forwards; }
-.tp-clouds.out .tp-clfill { animation: tp-clfill 200ms linear reverse forwards; }
+.tp-clouds.in .tp-clfill { animation: tp-clfill 420ms ease-in 300ms forwards; }
+.tp-clouds.out .tp-clfill { animation: tp-clfill 420ms ease-in reverse forwards; }
 @keyframes tp-clfill { from { opacity: 0; } to { opacity: 1; } }
 .tp-cloud { position: absolute; left: var(--x); top: var(--y); width: var(--s); margin: calc(var(--s) * -.36) 0 0 calc(var(--s) * -.5); opacity: 0; will-change: transform; }
 .tp-cloud svg { display: block; width: 100%; height: auto; }
@@ -818,7 +820,7 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-clouds.out .tp-cloud { animation: tp-cloud-out 780ms cubic-bezier(.5, 0, .85, .55) var(--d2) both; }
 @keyframes tp-cloud-in { from { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(.62) rotate(var(--r)); } to { opacity: 1; transform: none; } }
 @keyframes tp-cloud-out { from { opacity: 1; transform: none; } to { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(calc(var(--r) * -1)); } }
-.tp-clmsg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 8px; max-width: 80vw; padding: 16px 26px 18px; border-radius: 26px; background: #fff; border: 3px solid #3B2E3A; box-shadow: 0 5px 0 #3B2E3A; text-align: center; color: #3B2E3A; opacity: 0; }
+.tp-clmsg { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 8px; max-width: 80vw; text-align: center; color: #3B2E3A; opacity: 0; }
 .tp-clmsg .tp-vhp { width: 72px; height: 72px; }
 .tp-clmsg b { font-size: 22px; font-weight: var(--w-head); line-height: 1.2; }
 .tp-clmsg { z-index: 2; }

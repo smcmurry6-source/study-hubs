@@ -11,7 +11,7 @@
        grade over the whole picture;
      - six themes (a scene, its homes, yard things and outfits for Timmy that belong together) and the classics;
      - what students earn meshes with the place: the rank is a statue of the journey's object by the door, in the tier's
-       material, on one to three steps for the level; each hub's mastery medal shows in the display by the house (a trophy case or a gem plaque);
+       material, on one to three steps for the level; each hub's mastery medal hangs on the board by the house;
        Dark Matter brings its stars;
      - Timmy hops on the ground between spots (route()), drawn in the scene's depth order, never floating over things;
      - tapping things plays small easter eggs (EGGS), and each rarity has its own card art (frame()) and placing burst.
@@ -1671,54 +1671,52 @@ export function placeKit(INK, C, PACKS, SETS){
     var glint = L("M" + f(t[0] + 3) + " " + f(t[1] - 7) + " l-5 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
     return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
-  /* mastery: every hub medal shows by the house on a gem plaque (Sam, 2026-11-10: "I like the gem plaque"; the trophy case
-     drawn beside it is gone). It grows with the number of hubs, up to 20, best medals first; the metal says the level
-     (Bronze, Silver, Gold; a Crown is gold with a sparkle) and the color is the hub's own tint. Tapping it opens the big
-     view of every hub's gem (gemArt below draws one gem large). */
-  var MEDAL = ["", ["#C47A3E", "#8F5220", "#E9B07C"], ["#C9D1D9", "#8E98A3", "#F4F7FA"], ["#E8BE45", "#B98A16", "#FFE9A3"], ["#F2C230", "#B98A16", "#FFF3C4"]];
+  /* mastery: every hub medal shows by the house on a board (Sam, 2026-11-10: picked the plaque over the trophy case, then
+     "the mastery medals that pop up on the screen and the ones that are visible in Timmy's board need to be the same"). So
+     the board holds the hubs' own medals in miniature, as medals.mjs draws them: the metal disc says the level (Bronze,
+     Silver, Gold; a Crown is gold with a crown on top), the two ribbon tails are the hub's tint. It grows with the number
+     of hubs, up to 20, best medals first. Tapping it opens the big view, which shows the same medals at full size. */
+  var MEDAL = ["", ["#C47A3E", "#8F5220", "#E9B07C"], ["#C9D1D9", "#8E98A3", "#F4F7FA"], ["#F2C94C", "#C9971C", "#FFE9A3"], ["#F2C94C", "#C9971C", "#FFF3C4"]];
+  function mixHex(a, b, t){
+    var h = function(c){ c = c.replace("#", ""); if (c.length === 3) c = c.replace(/./g, "$&$&"); return [0, 2, 4].map(function(i){ return parseInt(c.slice(i, i + 2), 16); }); }, x = h(a), y = h(b);
+    return "#" + x.map(function(v, i){ return ("0" + Math.round(v + (y[i] - v) * t).toString(16)).slice(-2); }).join("");
+  }
   function masteryList(flair){ return flair.slice().sort(function(p, q){ return q.lvl - p.lvl; }).slice(0, 20); }
   function masteryGrid(n){ var cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : n <= 12 ? 4 : 5; return [cols, Math.ceil(n / cols)]; }
-  /* a plaque on a post, one gem per hub set in its board */
-  function gemPlaque(x, y, flair, o){
+  /* one medal, small: the disc at (x, y), r its radius; the tails hang .9r below it and a crown stands .8r above */
+  function miniMedal(x, y, r, lvl, tint, i){
+    var m = MEDAL[lvl], col = tint || m[1], q = function(a, b){ return f(x + a * r) + " " + f(y + b * r); }, sw = Math.max(.55, Math.min(.9, r * .3)), s = "";
+    s += FO("M" + q(-.8, .3) + " L" + q(-.05, .62) + " L" + q(-.36, 1.9) + " L" + q(-.6, 1.6) + " L" + q(-.9, 1.76) + " Z", col, sw) +
+      FO("M" + q(.8, .3) + " L" + q(.05, .62) + " L" + q(.36, 1.9) + " L" + q(.6, 1.6) + " L" + q(.9, 1.76) + " Z", mixHex(col, "#FFFFFF", .42), sw);
+    s += circ(x, y, r, m[0], sw + .1) + '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(r * .66) + '" fill="none" stroke="' + m[1] + '" stroke-width="' + f(Math.max(.4, r * .14)) + '"/>' +
+      L("M" + q(-.78, -.2) + " A" + f(r * .8) + " " + f(r * .8) + " 0 0 1 " + q(-.2, -.78), Math.max(.5, r * .2), "#FFFFFF", .85);
+    s += r >= 2.6 ? tinyTooth(x, y + r * .05, r * .075, INK) : circ(x, y, r * .26, INK, 0);
+    if (lvl >= 4) s += FO("M" + q(-.62, -.86) + " L" + q(-.8, -1.6) + " L" + q(-.34, -1.24) + " L" + q(0, -1.84) + " L" + q(.34, -1.24) + " L" + q(.8, -1.6) + " L" + q(.62, -.86) + " Z", "#F2C94C", sw) +
+      dmStar(x + r * 1.02, y - r * 1.1, Math.max(1.6, r * .62), "#FFFFFF", "tp-twinkle", i * .3);
+    return s;
+  }
+  /* a board on a post, one medal per hub hung on it */
+  function medalBoard(x, y, flair, o){
     var list = masteryList(flair), n = list.length; if (!n) return { s: "", lights: "" };
-    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10 : n <= 4 ? 8.2 : n <= 9 ? 7 : n <= 12 ? 6.2 : 5.6;
-    var W = cols * cell + 7, H = rows * cell + 7, t = P(x, y, 0), bx = t[0], by = t[1] - 9, top = by - H, s = "", lights = "";
+    var g = masteryGrid(n), cols = g[0], rows = g[1], cell = n <= 1 ? 10.4 : n <= 4 ? 8.6 : n <= 9 ? 7.4 : n <= 12 ? 6.6 : 6, r = cell * .36, ch = r * 2.75 + .5;
+    var crown = list.some(function(q){ return q.lvl >= 4; }), padT = crown ? r * .85 : 0;
+    var W = cols * cell + 6, H = rows * ch + padT + 5.4, t = P(x, y, 0), bx = t[0], by = t[1] - 9, top = by - H, s = "", lights = "";
     s += ell(bx + 2, t[1] + 1, 7, 2.6, "#1B2A3A", 0, .14) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 5) + L("M" + f(bx) + " " + f(t[1]) + " V" + f(by - 2), 2.8, K.wood);
     var board = "M" + f(bx - W / 2) + " " + f(by) + " V" + f(top + 3) + " q0 -3 3 -3 H" + f(bx - 5) + " q5 -5.4 10 0 H" + f(bx + W / 2 - 3) + " q3 0 3 3 V" + f(by) + " q0 2.4 -2.4 2.4 H" + f(bx - W / 2 + 2.4) + " q-2.4 0 -2.4 -2.4 Z";
     s += FO(board, K.woodLight, 1.5) + F("M" + f(bx + W / 2 - 3.2) + " " + f(top + .8) + " q2.6 .2 2.6 2.4 V" + f(by) + " q0 1.8 -1.8 1.8 h-.8 z", K.wood, .8);
     s += FO("M" + f(bx - W / 2 + 2.4) + " " + f(top + 2.6) + " h" + f(W - 4.8) + " v" + f(H - 3.2) + " h" + f(-(W - 4.8)) + " z", o.night ? "#3A2F52" : "#4A3550", .9);
     s += tinyTooth(bx, top - .6, .34, "#FFFFFF");
     list.forEach(function(fl, i){
-      var lvl = Math.max(1, Math.min(4, fl.lvl | 0)), m = MEDAL[lvl], c = i % cols, r = Math.floor(i / cols), inRow = Math.min(cols, n - r * cols);
-      var gx = bx + (c - (inRow - 1) / 2) * cell, gy = top + 2.6 + (H - 3.2) / 2 + (r - (rows - 1) / 2) * cell, R = cell * .34, col = fl.tint || m[0];
-      var gem = "M" + f(gx - R) + " " + f(gy - R * .25) + " L" + f(gx - R * .5) + " " + f(gy - R * .95) + " H" + f(gx + R * .5) + " L" + f(gx + R) + " " + f(gy - R * .25) + " L" + f(gx) + " " + f(gy + R) + " Z";
-      s += circ(gx, gy, R + 1.7, m[0], .8) + circ(gx, gy, R + .5, m[1], 0) + FO(gem, col, .7) +
-        F("M" + f(gx - R) + " " + f(gy - R * .25) + " L" + f(gx - R * .5) + " " + f(gy - R * .95) + " H" + f(gx + R * .5) + " L" + f(gx + R) + " " + f(gy - R * .25) + " Z", "#FFFFFF", .38) +
-        L("M" + f(gx - R * .5) + " " + f(gy - R * .25) + " L" + f(gx) + " " + f(gy + R) + " L" + f(gx + R * .5) + " " + f(gy - R * .25), .5, "#FFFFFF", .55);
-      if (lvl >= 4) s += dmStar(gx + R * .9, gy - R * .9, Math.max(1.8, R * .8), "#FFFFFF", "tp-twinkle", i * .3);
-      if (o.night) lights += circ(gx, gy, R + 3, col, 0).replace("/>", ' opacity=".28"/>');
+      var lvl = Math.max(1, Math.min(4, fl.lvl | 0)), c = i % cols, row = Math.floor(i / cols), inRow = Math.min(cols, n - row * cols);
+      var gx = bx + (c - (inRow - 1) / 2) * cell, gy = top + 2.6 + .9 + padT + r + row * ch;
+      s += miniMedal(gx, gy, r, lvl, fl.tint, i);
+      if (o.night) lights += circ(gx, gy + r * .3, r + 2.6, fl.tint || MEDAL[lvl][0], 0).replace("/>", ' opacity=".28"/>');
     });
     return { s: s, lights: lights };
   }
-  /* one gem, large, in its metal setting: lvl 1-4 (0: an empty setting, for a hub with no medal yet), in the hub's tint */
-  function gemArt(lvl, tint){
-    lvl = Math.max(0, Math.min(4, lvl | 0));
-    var m = lvl ? MEDAL[lvl] : ["#E4DEE6", "#C9C1CC", "#F6F2F7"], col = tint || m[0], s = "";
-    s += circ(32, 33, 28, m[0], 2) + circ(32, 33, 22.5, m[1], 0) + L("M10.5 24 A23.5 23.5 0 0 1 27 7.4", 2.6, m[2], .95) + L("M52 45 A23.5 23.5 0 0 1 41 56", 2, m[2], .6);
-    if (!lvl) return wrapGem(s + '<circle cx="32" cy="33" r="15" fill="none" stroke="' + INK + '" stroke-width="1.6" stroke-dasharray="3 4.5" opacity=".45"/>');
-    var gem = "M13.5 29.5 L21.5 17.5 H42.5 L50.5 29.5 L32 52 Z";
-    s += FO(gem, col, 2) +
-      F("M13.5 29.5 L21.5 17.5 H42.5 L50.5 29.5 Z", "#FFFFFF", .34) + F("M21.5 17.5 L26 29.5 H13.5 Z", "#FFFFFF", .3) + F("M38 29.5 H50.5 L32 52 Z", INK, .16) + F("M26 29.5 H38 L32 52 Z", "#FFFFFF", .16) +
-      L("M13.5 29.5 H50.5 M21.5 17.5 L26 29.5 L32 52 L38 29.5 L42.5 17.5 M26 29.5 L32 17.5 L38 29.5", 1.1, INK, .5) + O(gem, 2) +
-      L("M24.6 20.4 L22.4 24", 1.8, "#FFFFFF", .95);
-    [[12.4, 28.6], [51.6, 28.6], [32, 54.2]].forEach(function(q){ s += circ(q[0], q[1], 2.6, m[0], 1.2); });
-    if (lvl >= 4) s += dmStar(50, 13, 6.4, "#FFFFFF", "tp-twinkle", 0) + dmStar(13, 50, 4.2, "#FFF3C4", "tp-twinkle", .6) + dmStar(55, 40, 3.2, "#FFFFFF", "tp-twinkle", 1.1);
-    return wrapGem(s);
-  }
-  function wrapGem(s){ return '<svg class="tp-gem" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + s + "</svg>"; }
   function mastery(h, flair, o){
     if (!flair || !flair.length) return { s: "", lights: "", z: 0 };
-    var at = h.mast || FIX.mast, m = gemPlaque(at[0], at[1], flair, o), t = P(at[0], at[1], 0);
+    var at = h.mast || FIX.mast, m = medalBoard(at[0], at[1], flair, o), t = P(at[0], at[1], 0);
     var spark = dmStar(t[0] - 9, t[1] - 30, 3.4, "#FFFFFF", "") + dmStar(t[0] + 10, t[1] - 22, 2.8, "#FFE27A", "") + dmStar(t[0] + 2, t[1] - 42, 3, "#FFFFFF", "");
     return { s: egg("mastery", m.s, spark), lights: m.lights, z: at[0] + at[1] + .2 };
   }
@@ -1836,7 +1834,7 @@ export function placeKit(INK, C, PACKS, SETS){
 
   /* ------------------------------------------------------------------ the render ----------------------------------- */
   /* o = { home, scene, night, yard: { left: "garden", ... }, up: { windows, porch, chimney, flag: true }, paint,
-           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] (the gem plaque),
+           tier 0-6 and level 1-3 (the rank: the statue's material and steps), flair [{ hub, lvl 1-4, tint }] (the medal board),
            season "", "fall", "winter", "spring", holiday (holidayId()), marks (dash the empty spots: the full view),
            timmy: { g: markup, at: spot } (a still picture with Timmy in it), viewBox, bare (a yard item on its own) }
      returns { svg, spots (screen [x, y]), plot (yard [x, y, z]), slots { name: path d }, homeHit, eggs [keys] }        */
@@ -2092,7 +2090,7 @@ export function placeKit(INK, C, PACKS, SETS){
     brush: { n: "The toothbrush", does: "wiggles", say: "My toothbrush says hi. It talks now, apparently." },
     statue: { n: "Your rank", does: "it gleams", say: "" },
     tree: { n: "The tree", does: "shakes", say: "Whoa, the tree is ticklish." },
-    mastery: { n: "Your hub mastery", does: "it sparkles, and opens the big view of every gem", say: "One gem for every hub you've mastered. The metal is the medal." },
+    mastery: { n: "Your hub mastery", does: "it sparkles, and opens the big view of every medal", say: "One medal for every hub you've mastered. The ribbons are the hub's colors." },
     garden: { n: "The garden", does: "a carrot pops up", say: "Carrots: crunchy, and they scrub your teeth." },
     pool: { n: "The pool", does: "a splash", say: "Cannonball!" },
     hammock: { n: "The hammock", does: "swings", say: "Five minutes. Then back to studying." },
@@ -2209,7 +2207,7 @@ export function placeKit(INK, C, PACKS, SETS){
 
   function meta(list, keys){ return Object.keys(list).map(function(k){ var x = list[k], o = { k: k }; keys.forEach(function(q){ if (x[q] !== undefined) o[q] = x[q]; }); return o; }); }
   return {
-    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, gem: gemArt, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
+    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
     HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),
     SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]),

@@ -754,7 +754,7 @@
       galleryPanel("tpUps", "Upgrades of the home itself", "Fancy windows, a porch, a chimney and a Timmy flag: four shop items that every home draws its own way.") +
       galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
       galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material, and its steps for the level.") +
-      galleryPanel("tpMastery", "Hub mastery: the gem plaque", "Every hub you master sets a gem in the plaque beside the house: the gem is the hub’s own color, its setting is the medal (Bronze, Silver, Gold; a Crown sparkles). It grows as you master more, and shows your best twenty. <b>Tap the plaque</b>, here or in the builder, and the big view opens with every hub’s gem, its name and its medal.") +
+      galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
       '<div class="panel s12"><h3>The shop’s shelves</h3><p>Daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price. A design of the shelves: the shop itself is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
@@ -803,12 +803,12 @@
       return TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", tier: i, level: 3, yard: {}, viewBox: statueCrop(), night: i === 6 }, n, i === 6 ? "It glows, and its stars come out" : "", "", "tp-small"); }).join("") +
         LEVELS.map(function(l, i){ return placeFig({ home: "cottage", scene: "hill", tier: 4, level: i + 1, yard: {}, viewBox: statueCrop() }, "Gold " + l, (i + 1) + (i ? " steps" : " step"), "", "tp-small"); }).join("");
     },
-    /* the plaque on a whole place (tap it for the big view), then close up at each size */
+    /* the medal board on a whole place (tap it for the big view), then close up at each size */
     tpMastery: function(){
       var vb = [185, 116, 70, 78];
       var open = function(n, label){ return '<button type="button" class="btn tp-try" data-mastery-open="' + n + '">' + label + "</button>"; };
       return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
-        placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the gems glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
+        placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the medals glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
         FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
     },
     tpRankSets: function(){
@@ -965,19 +965,30 @@
     return d;
   }
   var DLG_X = '<button type="button" class="tp-dlgx" data-dlg-close aria-label="Close"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>';
-  /* hub mastery, large: the plaque opened up. Every hub's gem with its name and medal, best first, then the hubs with no
-     medal yet as empty settings */
+  /* hub mastery, large: the board opened up. Every hub's own medal (the same art the hub shows when you earn it), with its
+     name and level, best first, then the hubs with no medal yet. The made-up hubs still to come wear the placeholder
+     medal with their own ribbon colors, since a real hub always has its own set */
+  function mixHex(a, b, t){
+    var h = function(c){ c = c.replace("#", ""); return [0, 2, 4].map(function(i){ return parseInt(c.slice(i, i + 2), 16); }); }, x = h(a), y = h(b);
+    return "#" + x.map(function(v, i){ return ("0" + Math.round(v + (y[i] - v) * t).toString(16)).slice(-2); }).join("");
+  }
+  function medalImg(x, cls){
+    var lvl = Math.max(1, x.lvl), own = A.medals[x.hub], art = (own || A.medals.generic)[lvl - 1], g = A.tints.generic;
+    if (!own && x.tint && /^#[0-9a-f]{6}$/i.test(x.tint)) art = art.split(g.ink).join(x.tint).split(mixHex(g.ink, "#000000", .28)).join(mixHex(x.tint, "#000000", .28))
+      .split(g.mid).join(mixHex(x.tint, "#FFFFFF", .42)).split(mixHex(g.mid, "#000000", .2)).join(mixHex(x.tint, "#FFFFFF", .2));
+    return img(art, "", "tp-medal " + (cls || ""), "0 0 64 64");
+  }
   function openMastery(flair){
     var list = (flair || []).slice().sort(function(a, b){ return b.lvl - a.lvl; }), n = [0, 0, 0, 0, 0]; list.forEach(function(x){ n[x.lvl]++; });
     var todo = [0, 1].map(function(i){ return { hub: "hub-" + (list.length + 7 + i), lvl: 0, tint: "" }; });
-    var chips = [4, 3, 2, 1].filter(function(l){ return n[l]; }).map(function(l){ return '<span class="tp-mchip">' + TP.gem(l, "") + "<b class=\"num\">" + n[l] + "</b> " + TP.MEDALS[l] + "</span>"; }).join("");
-    var card = function(x, i){ return '<li class="tp-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + TP.gem(x.lvl, x.tint) + "<b>" + esc(hubLabel(x.hub)) + '</b><span class="tp-mlvl">' + (x.lvl ? TP.MEDALS[x.lvl] : "No medal yet") + "</span></li>"; };
+    var chips = [4, 3, 2, 1].filter(function(l){ return n[l]; }).map(function(l){ return '<span class="tp-mchip">' + medalImg({ hub: "generic", lvl: l }) + "<b class=\"num\">" + n[l] + "</b> " + TP.MEDALS[l] + "</span>"; }).join("");
+    var card = function(x, i){ return '<li class="tp-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + medalImg(x) + "<b>" + esc(hubLabel(x.hub)) + '</b><span class="tp-mlvl">' + (x.lvl ? TP.MEDALS[x.lvl] : "No medal yet") + "</span></li>"; };
     openDlg('<div class="tp-mboard">' + DLG_X +
-      '<div class="tp-mhead"><span class="tp-mcrest" aria-hidden="true">' + TP.gem(list.length ? list[0].lvl : 0, list.length ? list[0].tint : "") + '</span><div><h3 id="tpDlgT">Your hub mastery</h3>' +
-        "<p>" + (list.length ? list.length + (list.length === 1 ? " hub" : " hubs") + " mastered" : "No hubs mastered yet: your first medal sets the first gem") + "</p></div></div>" +
+      '<div class="tp-mhead"><span class="tp-mcrest" aria-hidden="true">' + (list.length ? medalImg(list[0]) : medalImg({ hub: "generic", lvl: 1 }, "is-none")) + '</span><div><h3 id="tpDlgT">Your hub mastery</h3>' +
+        "<p>" + (list.length ? list.length + (list.length === 1 ? " hub" : " hubs") + " mastered" : "No hubs mastered yet: your first medal hangs here") + "</p></div></div>" +
       (chips ? '<p class="tp-mchips">' + chips + "</p>" : "") +
       '<ul class="tp-mgrid">' + list.concat(todo).map(card).join("") + "</ul>" +
-      '<p class="tp-mfoot">The gem is the hub’s color and its setting is the medal. The plaque by the house shows your best twenty.</p></div>', "tp-mdlg").setAttribute("aria-labelledby", "tpDlgT");
+      '<p class="tp-mfoot">These are the medals each hub gives you, the same ones that pop up when you earn them. The board by the house hangs your best twenty.</p></div>', "tp-mdlg").setAttribute("aria-labelledby", "tpDlgT");
   }
   function masteryLine(){
     var fl = FLAIRS[PS.flair], n = [0, 0, 0, 0, 0]; fl.forEach(function(x){ n[x.lvl]++; });
@@ -1264,10 +1275,12 @@
     [[26, 60, 18], [50, 48, 26], [82, 40, 28], [112, 54, 24], [92, 72, 22], [60, 74, 22], [34, 74, 14]],
     [[34, 56, 24], [66, 42, 26], [98, 46, 30], [122, 68, 16], [84, 72, 24], [52, 72, 20]]
   ];
+  /* soft clouds: no ink outline, a pale underside and a faint halo, so a pile of them melts into one sky
+     (Sam: "the individual clouds should be less harsh so it comes together more seamlessly") */
   function cloudSvg(k){
-    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + q[2] + '"/>'; }).join("");
-    return '<svg viewBox="0 0 144 104" aria-hidden="true"><g fill="#fff" stroke="#3B2E3A" stroke-width="5">' + ring + '</g><g fill="#fff">' + ring + "</g>" +
-      '<g fill="none" stroke="#DDD5EA" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
+    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = function(grow, dy){ return c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + (q[1] + dy) + '" r="' + (q[2] + grow) + '"/>'; }).join(""); };
+    return '<svg viewBox="-12 -8 168 128" aria-hidden="true"><g fill="#B9AEDA" opacity=".16">' + ring(9, 8) + '</g><g fill="#FFFFFF" opacity=".55">' + ring(6, 0) + '</g><g fill="#E0D8EF">' + ring(0, 5) + '</g><g fill="#FFFFFF">' + ring(0, 0) + "</g>" +
+      '<g fill="none" stroke="#E4DDF1" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
   }
   function clouds(label, emblem, swap){
     if (isStill()) { swap(); return; }
