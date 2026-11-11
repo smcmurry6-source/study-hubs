@@ -282,14 +282,20 @@ is in [its own note](2026-11-06-idea-board.md).
 3. The new hubs' `back:` already points at `../../../next/`; at the switch it goes back to `../../`.
 4. `hubHref()` in `widget/dash.js` sends a hub with a `next/` folder to it, and to the old page otherwise. Once every live
    hub has switched, drop `next` from the data and the two link shapes (`#drill` and `#timmy` are the old hubs').
-5. `sw.js`: add `hubs.js`, `widget/dash.js`, `widget/dash.css`, `widget/hub.css`, `widget/hub-art.js` and
-   `widget/hub-art/dash.js` to `PRECACHE`, drop what only the old dashboard used, and bump the version.
+5. `sw.js`: add `hubs.js`, `widget/dash.js`, `widget/dash.css`, `widget/hub.css`, `widget/hub-art.js`,
+   `widget/hub-art/dash.js` and `widget/hub-art/class.js` (the classroom and the stage) to `PRECACHE` (not
+   `widget/hub-art/outfits.js`, 168 KB, which loads only when someone on the page wears a shop outfit), drop what only the old dashboard used, and bump the version.
 6. `tools/release/a11y.js`, `perf.js`, `matrix.js` and `tools/ci/smoke.js` test `next/` beside the old dashboard today:
    fold the two into one, rename the baseline and budget keys (`dashboard/next` to `dashboard`, `next/` to `index.html`).
 7. The old dashboard's keys still read: `sh_dash_last` (the hub you opened last) and `sh_dash_flap` (the countdown's
    last value). `sh_dash_arcade_hub` and `sh_dash_arcade_game` are no longer used; nothing needs migrating.
 8. `get_widget_bootstrap_v2` and the `_v2` boards are called first and fall back to today's functions when the database
    doesn't have them (`rpc2` in `widget/dash.js`); once migration_v54 is applied the fallback can come out.
+9. **What a Timmy wears, after the shop** (phase 4): `shPet.fit()` in `widget/pet.js` sends the holiday outfit today
+   (`<holiday>:<outfit>`). Once the shop is live it should send the equipped shop outfit's id when there is one (the
+   classroom's `cleanFit()` and `timmyArt()` in `widget/dash.js` already take an id and draw it with
+   `widget/hub-art/outfits.js`; the preview's made-up class wears some). The leaderboard's top three get theirs from
+   `get_place` through the visit key on their row, so they are plain Timmys until migration_v54 is applied.
 
 **About page: Part 1, the dashboard** (rewrite these entries; nothing here is a secret except the last one)
 
@@ -307,11 +313,21 @@ is in [its own note](2026-11-06-idea-board.md).
   see with "Pick your name" / "Change name", Timmy's house (or Timmy waiting to meet you), your handpiece medallion, rank,
   XP, place in the class and the bar to the next level, your mastery medals, your day streak with **the last seven days
   as dots** and this week's answers. The top bar shows the streak and rank too. The two-weeks strip is gone.
-- **The class**: **Studying right now** is a tile at the top: the live count with a pulsing dot and a chip for each hub
-  someone is in (the count is in the top bar too). Under it the leaderboard, one list at a time: **Ranks** (top 10, with
-  every rank from Stone to Dark Matter folded under it) or **Study streaks**, **the top three on a podium**.
+- **The class**: **Studying right now** is **a drawn classroom** (Sam, 2026-11-11): the count on the chalkboard with
+  how many are in each hub, and a Timmy at a desk for everyone who has a hub open, wearing what their own Timmy has on
+  (a plain tooth if they haven't adopted him, or have him or the extras off). When someone opens a hub their Timmy hops
+  in through the door and jumps into a desk; when they close it he gets up and leaves. The desk's front is the hub's
+  color, the windows show day or night, rows are added as the room fills, and past a full room a sign by the door says
+  how many are in the hall. No names: nobody can tell which Timmy is whose. Reduce motion (or answer animations off)
+  seats them without the walk; Focus mode shows the plain count. The count is in the top bar too. Under it the
+  leaderboard, one list at a time: **Ranks** (top 10, with every rank from Stone to Dark Matter folded under it) or
+  **Study streaks**, with **the top three on a stage**: curtains, spotlights, torches, confetti, gold, silver and
+  bronze blocks, a crown for first, and each winner's own Timmy on top in their outfit (with the shop; a plain Timmy if
+  they turned visiting off). The rest of the board is on the dark stage floor with a bar for how close each is to first.
   **Gone from the dashboard** (Sam, 2026-11-11): correct-in-a-row, the arcade high scores (each hub's Arcade keeps its
   own boards) and the "When people study" chart. The Golden Probe line is under the board when someone has won today.
+- **What the hubs record** (already on the live About page since the PR that added it): the outfit goes with the
+  studying-now count, with no name or id, and isn't saved.
 - **Past hubs** (replaces "Hub recaps" and the greyed-out cards): each finished exam's recap is **a live infographic**
   in that hub's color, one exam at a time (chips switch between them): hours studied together, classmates, questions
   answered and how many right, counting up as you reach them; hours per day as bars that grow, the exam day marked; the

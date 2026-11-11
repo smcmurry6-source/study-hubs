@@ -257,8 +257,12 @@
           /* who has a hub open this minute */
           '<div class="dx-now" id="now" role="group" aria-labelledby="nowH">' +
             '<h3 class="sr" id="nowH">Studying right now</h3>' +
-            '<p class="dx-now-num"><i class="dx-pulse" aria-hidden="true"></i><b class="num" id="nowCount">–</b><span>studying right now</span></p>' +
-            '<ul class="dx-now-hubs" id="nowHubs"></ul>' +
+            /* the drawn classroom goes in here once its art and Timmy have loaded (syncRoom); the count and the hubs then sit on its board */
+            '<div class="dx-room" id="room" aria-hidden="true"></div><p class="dx-hall" id="nowHall" hidden></p>' +
+            '<div class="dx-now-board" id="nowBoard">' +
+              '<p class="dx-now-num"><i class="dx-pulse" aria-hidden="true"></i><b class="num" id="nowCount">–</b><span>studying right now</span></p>' +
+              '<ul class="dx-now-hubs" id="nowHubs"></ul>' +
+            "</div>" +
           "</div>" +
           '<div class="dx-classhead"><h3 id="boardH">Leaderboard</h3>' +
             '<span class="seg" role="group" aria-label="Leaderboard" id="boardSeg">' +
@@ -404,16 +408,169 @@
     })();
   }
 
-  var liveBy = {};
+  var liveBy = {}, people = [];
+  /* One entry for each hub tab open in the class: { key, hub, fit }. fit is what that person's Timmy wears ("" for none):
+     "<holiday>:<outfit>" (widget/pet.js fit()) or a shop outfit's id. It comes from another browser, so it is only ever
+     matched against the outfits this page has, never written into the page. No name and no id comes with it. */
+  function cleanFit(f){ f = String(f == null ? "" : f); return /^[a-z0-9]{1,20}:[a-z0-9-]{1,30}$/.test(f) || /^[a-z0-9-]{1,40}$/.test(f) ? f : ""; }
+  function setPeople(hub, list){
+    var keep = {}, out = [];
+    list.forEach(function(p){ keep[p.key] = p; });
+    people.forEach(function(p){ if (p.hub !== hub) out.push(p); else if (keep[p.key]) { out.push(keep[p.key]); delete keep[p.key]; } });
+    list.forEach(function(p){ if (keep[p.key]) out.push(p); });
+    people = out; liveBy[hub] = list.length;
+  }
   /* the count in the bar and the tile in the class panel: the total, and a chip for each hub someone is in */
   function paintNow(){
     var t = 0; Object.keys(liveBy).forEach(function(k){ t += liveBy[k] || 0; });
     $("liveCount").textContent = t; $("nowCount").textContent = t;
-    var live = HUBS.filter(function(h){ return liveBy[h.id]; });
+    /* busiest first: the room's board has space for three */
+    var live = HUBS.filter(function(h){ return liveBy[h.id]; }).sort(function(x, y){ return liveBy[y.id] - liveBy[x.id]; });
     $("nowHubs").innerHTML = live.length ? live.map(function(h){
-      return "<li>" + emblem(h.id, "dx-emb") + '<span><b class="num">' + liveBy[h.id] + "</b> in " + esc(hubName(h)) + "</span></li>";
+      return "<li>" + emblem(h.id, "dx-emb") + '<span><b class="num">' + liveBy[h.id] + '</b><span class="dx-in"> in ' + esc(hubName(h)) + "</span></span></li>";
     }).join("") : '<li class="is-none">Nobody has a hub open this minute. Be the first.</li>';
     $("now").classList.toggle("is-live", t > 0);
+    syncRoom();
+  }
+
+  /* ---------- the class's room (Sam, 2026-11-11): the studying-now tile as a drawn classroom. A Timmy for each person
+     studying, in what theirs is wearing, at a desk whose front is their hub's color; they hop in from the door and jump
+     into a desk, and get up and leave. The room, desks and door are widget/hub-art/class.js (tools/figures/site/
+     classroom.mjs); Timmy is widget/pet.js art(). Without either, or in Focus mode, the tile stays the plain count. ---------- */
+  var CA = null;            /* window.SH_CLASS_ART, once widget/hub-art/class.js has loaded */
+  var rm = null;            /* the room as drawn: { w, h, night, rows, seats, order, at: { key: seat }, fits: { key: fit }, geo, door } */
+  function still(){ return reduced() || ls("sh_pref_fx") === "off"; }
+  function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
+  function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
+  var outfitsAsked = false;
+  /* the shop's outfits (widget/hub-art/outfits.js, 55 of them) load only when someone is wearing one */
+  function wantOutfits(){
+    if (outfitsAsked) return; outfitsAsked = true;
+    var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+    el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
+    document.head.appendChild(el);
+  }
+  /* the inside of a Timmy drawing in someone's outfit. Always healthy: nobody sees someone else's Timmy's health. */
+  function timmyArt(fit, mood){
+    var P = window.shPet, O = window.SH_OUTFITS, svg;
+    fit = cleanFit(fit);
+    if (fit.indexOf(":") > 0) svg = P.art({ hp: 100, mood: mood || "happy", hat: "", fit: fit }, 200);
+    else {
+      svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
+      if (fit && O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
+      else if (fit && !O) wantOutfits();
+    }
+    return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+  }
+  function timmyBox(box, fit, mood){
+    return '<svg x="' + box.x + '" y="' + box.y + '" width="' + box.w + '" height="' + box.h + '" viewBox="0 -30 200 262" overflow="visible">' + timmyArt(fit, mood) + "</svg>";
+  }
+  function tintKey(hub){ return DA.tints[hub] ? hub : "generic"; }
+  /* most are happy at their desks; now and then one has nodded off */
+  function seated(p){
+    var h = hashOf(p.key), mood = h % 12 === 7 ? "sleep" : h % 5 === 3 ? "ok" : "happy";
+    return '<g class="rm-bob" style="animation-delay:-' + (h % 32) / 10 + 's">' + timmyBox(CA.room.SEAT, p.fit, mood) + "</g>";
+  }
+  function seatEl(i){ return q('.rm-seat[data-seat="' + i + '"]', $("room")); }
+  /* the count and the hubs sit on the room's board (b: its place in the drawing), or back in the plain tile (null) */
+  function placeBoard(b){
+    var el = $("nowBoard"); if (!el) return;
+    ["left", "top", "width", "height"].forEach(function(k, i){ el.style[k] = b ? [b.x, b.y, b.w, b.h][i] + "px" : ""; });
+    $("now").classList.toggle("is-tight", !!b && b.w < 190);   /* a narrow board: the hubs get a line of their own */
+  }
+  /* when every desk is taken, a sign by the door says how many more there are */
+  function paintHall(){
+    var el = $("nowHall"); if (!el) return;
+    var more = rm ? people.length - rm.seats.length : 0;
+    el.hidden = more <= 0; el.textContent = more > 0 ? "+" + more + " in the hall" : "";
+    if (rm && rm.geo) el.style.top = Math.round(rm.geo.door.y + rm.geo.door.h * .42) + "px";
+  }
+  function buildRoom(o, seats, rows){
+    var R = CA.room, g = R.geo(o);
+    /* desks fill from the front row's middle outward */
+    var order = seats.map(function(st, i){ return i; }).sort(function(x, y){ return (seats[y].row - seats[x].row) || (Math.abs(seats[x].x - o.w * .45) - Math.abs(seats[y].x - o.w * .45)); });
+    var at = {}, fits = {}, bySeat = {}, s;
+    people.slice(0, seats.length).forEach(function(p, i){ at[p.key] = order[i]; fits[p.key] = p.fit; bySeat[order[i]] = p; });
+    s = '<g class="rm-bg">' + R.room(o) + '</g><g class="rm-dooropen">' + R.door({ w: o.w, h: o.h, night: o.night, open: true }) + R.plant(o) + "</g>";
+    for (var r = 0; r < rows; r++) {
+      s += '<g class="rm-row">';
+      for (var i = 0; i < seats.length; i++) {
+        var st = seats[i], p = bySeat[i]; if (st.row !== r) continue;
+        s += '<g class="rm-seat" data-seat="' + i + '" data-fit="' + (p ? p.fit : "") + '" transform="translate(' + st.x + " " + st.y + ") scale(" + st.s + ')">' + R.chair() +
+          '<g class="rm-tim">' + (p ? seated(p) : "") + '</g><g class="rm-desk">' + R.desk(p ? tintKey(p.hub) : null, p ? hashOf(p.key) % 4 : null) + "</g></g>";
+      }
+      s += "</g>";
+    }
+    s += '<g class="rm-walk"></g>';
+    $("room").innerHTML = '<svg viewBox="0 0 ' + o.w + " " + o.h + '" width="' + o.w + '" height="' + o.h + '" focusable="false">' + s + "</svg>";
+    rm = { w: o.w, h: o.h, night: o.night, rows: rows, seats: seats, order: order, at: at, fits: fits, geo: g, door: 0 };
+    $("now").classList.add("has-room"); $("now").classList.toggle("is-still", still());
+    placeBoard(g.board); paintHall();
+  }
+  /* the door stands open while anyone is in the doorway */
+  function doorOpen(d){ if (!rm) return; rm.door = Math.max(0, rm.door + d); var el = q(".rm-dooropen", $("room")); if (el) el.style.opacity = rm.door ? "1" : "0"; }
+  /* a Timmy on his way: in from the door, down the aisle in hops to his row, then one jump into the desk (leaving runs
+     the same way backwards). n staggers a few at once; done runs when he gets there. */
+  function walk(fit, i, leaving, n, done){
+    var R = CA.room, my = rm, st = rm.seats[i], g = rm.geo, layer = q(".rm-walk", $("room")); if (!layer) { if (done) done(); return; }
+    var d0 = { x: g.door.x + g.door.w / 2, y: g.wall + 3, k: st.s * .86 }, ai = { x: g.door.x + g.door.w / 2 - 4, y: Math.min(rm.h - 3, st.y + 2), k: st.s }, se = { x: st.x, y: st.y - 7.1 * st.s, k: st.s };
+    var pts = [], j, t;
+    for (j = 0; j <= 12; j++) { t = j / 12; pts.push([d0.x + (ai.x - d0.x) * t, d0.y + (ai.y - d0.y) * t - Math.abs(Math.sin(t * Math.PI * 3)) * 6, d0.k + (ai.k - d0.k) * t]); }
+    for (j = 1; j <= 12; j++) { t = j / 12; pts.push([ai.x + (se.x - ai.x) * t, ai.y + (se.y - ai.y) * t - Math.sin(t * Math.PI) * 30, st.s]); }
+    if (leaving) pts.reverse();
+    var frames = pts.map(function(c){ return { transform: "translate(" + c[0].toFixed(1) + "px," + c[1].toFixed(1) + "px) scale(" + c[2].toFixed(3) + ")" }; });
+    var el = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    el.setAttribute("class", "rm-walker"); el.innerHTML = timmyBox(R.STAND, fit, "happy");
+    el.style.transform = frames[0].transform; el.style.opacity = "0"; layer.appendChild(el);
+    setTimeout(function(){
+      if (rm !== my || !el.isConnected || !el.animate) { el.remove(); if (done) done(); return; }
+      var hop = 1100, jump = 800, total = hop + jump;
+      el.style.opacity = "1";
+      /* coming in, the door is open for the first steps; going out, for the last */
+      setTimeout(function(){ if (rm === my) doorOpen(1); }, leaving ? jump : 0);
+      setTimeout(function(){ if (rm === my) doorOpen(-1); }, leaving ? total + 200 : 700);
+      el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
+    }, (n || 0) * 450);
+  }
+  function arrive(p, i, quiet, n){
+    function sit(){
+      var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
+      el.setAttribute("data-fit", p.fit);
+      q(".rm-tim", el).innerHTML = seated(p); q(".rm-desk", el).innerHTML = CA.room.desk(tintKey(p.hub), hashOf(p.key) % 4);
+      if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
+    }
+    if (quiet) sit(); else walk(p.fit, i, false, n, sit);
+  }
+  function depart(i, quiet, n){
+    var el = seatEl(i); if (!el) return;
+    var tim = q(".rm-tim", el), was = !!tim.firstChild, fit = cleanFit(el.getAttribute("data-fit"));
+    tim.innerHTML = ""; el.setAttribute("data-fit", ""); q(".rm-desk", el).innerHTML = CA.room.desk(null, null);
+    if (!quiet && was) walk(fit, i, true, n, null);
+  }
+  /* bring the room in line with who is studying: draw it, redraw it for a new size, time of day or number of rows, or
+     walk the comings and goings in and out */
+  function syncRoom(){
+    var now = $("now"), host = $("room"); if (!now || !host) return;
+    if (!roomReady()) { if (rm) { rm = null; host.innerHTML = ""; now.classList.remove("has-room"); placeBoard(null); paintHall(); } return; }
+    var w = Math.round(now.clientWidth), hr = new Date().getHours(); if (w < 220) return;
+    var o = { w: w, h: w < 480 ? 170 : 150, n: people.length, night: hr >= 19 || hr < 6 }, R = CA.room, seats = R.seats(o), rows = seats[seats.length - 1].row + 1;
+    /* rows are added as soon as they're needed, and taken away only once there are two desks to spare without them */
+    if (rm && rm.w === o.w && rows < rm.rows && seats.length < people.length + 2) { o.rows = rm.rows; seats = R.seats(o); rows = rm.rows; }
+    if (!rm || rm.w !== o.w || rm.night !== o.night || rm.rows !== rows || rm.seats.length !== seats.length) { buildRoom(o, seats, rows); return; }
+    var here = {}, taken = {}, n = 0;
+    people.forEach(function(p){ here[p.key] = p; });
+    var gone = Object.keys(rm.at).filter(function(k){ return !here[k]; }), came = people.filter(function(p){ return rm.at[p.key] == null; });
+    var quiet = still() || document.hidden || gone.length + came.length > 6;
+    now.classList.toggle("is-still", still());
+    gone.forEach(function(k){ var i = rm.at[k]; delete rm.at[k]; delete rm.fits[k]; depart(i, quiet, n++); });
+    Object.keys(rm.at).forEach(function(k){ taken[rm.at[k]] = 1; });
+    came.forEach(function(p){
+      var i = rm.order.filter(function(x){ return !taken[x]; })[0]; if (i == null) return;      /* no desk left: in the hall */
+      taken[i] = 1; rm.at[p.key] = i; rm.fits[p.key] = p.fit; arrive(p, i, quiet, n++);
+    });
+    /* someone changed what their Timmy wears */
+    people.forEach(function(p){ var i = rm.at[p.key]; if (i != null && rm.fits[p.key] !== p.fit) { rm.fits[p.key] = p.fit; arrive(p, i, true, 0); } });
+    paintHall();
   }
   function liveLine(hub){
     var n = liveBy[hub.id];
@@ -1007,34 +1164,75 @@
     var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair, { who: r.display_name }) : "";
     return '<span class="nm-t">' + esc(r.display_name) + (extra || "") + "</span>" + f;
   }
-  /* a row carries its visit key (the _v2 boards, migration_v54) as data-visit: Timmy's place (phase 4) opens from it */
-  function rowHTML(r, place, mid, val, unit){
+  /* a row carries its visit key (the _v2 boards, migration_v54) as data-visit: Timmy's place (phase 4) opens from it.
+     pct: its bar against first place (0 to 1) */
+  function rowHTML(r, place, mid, val, unit, pct){
     return "<li" + (r.is_me ? ' class="me"' : "") + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r.tier, r.level) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
-      (mid ? '<span class="lvl">' + esc(mid) + "</span>" : "") + '<span class="val num">' + val + "<small>" + unit + "</small></span></li>";
+      '<span class="lvl">' + esc(mid || "") + '</span><span class="dx-vs" aria-hidden="true"><i style="width:' + Math.max(2, Math.min(100, Math.round((pct || 0) * 100))) + '%"></i></span>' +
+      '<span class="val num">' + val + "<small>" + unit + "</small></span></li>";
   }
-  /* the top three stand on a podium (first in the middle, by CSS order), everyone after them in the list */
-  function podiumHTML(rows, art, val){
+  /* the top three: their names and numbers under the stage (first in the middle, by CSS order), everyone after them in the list */
+  function podiumHTML(rows, art, val, mid){
     return '<ol class="dx-podium">' + rows.slice(0, 3).map(function(r, i){
-      return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="dx-pod-who">' + art(r) + "</span>" +
-        '<span class="nm">' + nameFlair(r, r.is_me ? " (you)" : "") + '</span><span class="val num">' + val(r) + '</span><span class="dx-step"><span class="sr">Place </span><b class="num">' + (i + 1) + "</b></span></li>";
+      return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="dx-step"><span class="sr">Place </span><b class="num">' + (i + 1) + '</b></span><span class="dx-win-who">' + art(r) + "</span>" +
+        '<span class="dx-win-txt"><span class="nm">' + nameFlair(r, r.is_me ? " (you)" : "") + '</span><span class="dx-win-sub">' + (mid ? '<span class="mid">' + esc(mid(r)) + "</span>" : "") + '<span class="val num">' + val(r) + "</span></span></span></li>";
     }).join("") + "</ol>";
   }
-  function boardMsg(msg){ $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
+  /* the stage (widget/hub-art/class.js, tools/figures/site/stage.mjs): curtains, lights, the three blocks, and each
+     winner's Timmy on top in what theirs is wearing (fits: the top three's outfits, "" for a plain Timmy) */
+  function stageSvg(w, rows, fits){
+    var S = CA.stage, h = w < 480 ? 262 : 300, fl = h - 44, cx = w / 2, k = w < 480 ? .74 : 1, pw = Math.min(150, w * .3), gap = Math.min(170, w * .31);
+    var s = S.stage({ w: w, h: h }), fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
+    if (w > 560) [-1, 1].forEach(function(d){ s += S.G(cx + d * (gap + pw / 2 + 44), fl + 8, 1, S.torch(74) + '<svg x="-20" y="-108" width="40" height="48" viewBox="0 0 40 48" overflow="visible">' + fla + "</svg>"); });
+    [{ p: 2, x: cx - gap, h: 74 * k, tw: 68 * k }, { p: 1, x: cx, h: 108 * k, tw: 82 * k }, { p: 3, x: cx + gap, h: 54 * k, tw: 64 * k }].forEach(function(b){
+      var th = b.tw * 1.31, top = fl + 10 - b.h;
+      s += S.G(b.x, fl + 10, 1, S.pedestal(b.p, pw, b.h));
+      if (window.shPet && window.shPet.art && rows[b.p - 1]) s += '<g class="st-win st-win' + b.p + '"><svg x="' + (b.x - b.tw / 2).toFixed(1) + '" y="' + (top - th * (256 / 262) + 2).toFixed(1) + '" width="' + b.tw.toFixed(1) + '" height="' + th.toFixed(1) +
+        '" viewBox="0 -30 200 262" overflow="visible">' + timmyArt(fits[b.p - 1] || "", "happy") + "</svg></g>";
+      if (b.p === 1) s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>" + S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
+    });
+    s += '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>";
+    return '<svg class="dx-set" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + s + "</svg>";
+  }
+  function boardMsg(msg){ boardData = null; $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
+  var boardData = null;      /* the board as last loaded: { which, rows, fits } (painted again when the page's width changes) */
+  function paintBoard(){
+    var d = boardData, R = window.shRanks; if (!d || d.which !== boardNow) return;
+    var rows = d.rows, ranks = d.which === "ranks", pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows, w = Math.round($("board").clientWidth);
+    var first = Math.max(1, ranks ? +rows[0].xp || 0 : +rows[0].streak || 0);
+    var set = pod && CA && CA.stage && w >= 240 ? stageSvg(w, rows, d.fits || []) : "";
+    $("board").innerHTML = '<div class="dx-arena' + (set ? " has-set" : "") + (still() ? " is-still" : "") + '" data-w="' + w + '">' + set +
+      (pod ? (ranks ? podiumHTML(rows, function(r){ return R.art(r.tier, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); }, function(r){ return num(r.xp) + "<small>XP</small>"; }, function(r){ return R.rankName(r.tier, r.level || R.levelFor(r.xp)); })
+        : podiumHTML(rows, function(r){ return flame(r.streak); }, function(r){ return r.streak + "<small>" + (r.streak === 1 ? "day" : "days") + "</small>"; })) : "") +
+      (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r, i){
+        return ranks ? rowHTML(r, r.rnk, R.rankName(r.tier, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
+          : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
+      }).join("") + "</ol>" : "") + "</div>";
+  }
+  /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
+     row. Someone who turned visiting off, or a database without the game layer yet, gives a plain Timmy. */
+  function loadFits(sb, d){
+    if (V2 !== true || !sb) return;
+    d.rows.slice(0, 3).forEach(function(r, i){
+      if (!r.visit) return;
+      sb.rpc("get_place", { p_key: r.visit }).then(function(res){
+        var f = cleanFit(res && res.data && res.data.equipped && res.data.equipped.outfit);
+        if (f && boardData === d) { d.fits[i] = f; paintBoard(); }
+      }, function(){});
+    });
+  }
   function drawBoard(){
     var sb = boardSb, which = boardNow;
     $("boardNote").textContent = BOARD_NOTE[which]; $("boardNote").hidden = !BOARD_NOTE[which];
     $("ladderFold").hidden = which !== "ranks" || !window.shRanks;
     if (!sb) { boardMsg(); return; }
-    $("board").innerHTML = '<p class="note">Loading…</p>';
+    if (!boardData || boardData.which !== which) $("board").innerHTML = '<p class="note">Loading…</p>';
     if (which === "ranks") {
       rpc2(sb, "get_rank_board", { p_visitor: VISITOR || null, p_limit: 10 }).then(function(res){
         if (boardNow !== which) return;
         var rows = (res && res.data) || [], R = window.shRanks;
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
-        var pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows;
-        $("board").innerHTML = (pod ? podiumHTML(rows, function(r){ return R.art(r.tier, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); },
-            function(r){ return num(r.xp) + "<small>XP</small>"; }) : "") +
-          (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r){ return rowHTML(r, r.rnk, R.rankName(r.tier, r.level || R.levelFor(r.xp)), num(r.xp), "XP"); }).join("") + "</ol>" : "");
+        boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
         var me = rows.filter(function(r){ return r.is_me; })[0];
         $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
           var mine = me && me.tier === i;
@@ -1046,9 +1244,7 @@
         if (boardNow !== which) return;
         var rows = (res && res.data) || [];
         if (!rows.length){ boardMsg("No streaks yet. Answer questions two days in a row to start one."); return; }
-        var pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows;
-        $("board").innerHTML = (pod ? podiumHTML(rows, function(r){ return flame(r.streak); }, function(r){ return r.streak + "<small>" + (r.streak === 1 ? "day" : "days") + "</small>"; }) : "") +
-          (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r, i){ return rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days"); }).join("") + "</ol>" : "");
+        boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
       }, function(){ if (boardNow === which) boardMsg(); });
     }
   }
@@ -1308,7 +1504,10 @@
       try{
         var ch = sb.channel("presence:" + hub, { config: { presence: { key: "dash-" + watcher + "-" + hub } } });
         ch.on("presence", { event: "sync" }, function(){
-          try{ liveBy[hub] = Object.keys(ch.presenceState()).length || 0; }catch(e){ liveBy[hub] = 0; }
+          try{
+            var ps = ch.presenceState();
+            setPeople(hub, Object.keys(ps).map(function(k){ var m = ps[k] && ps[k][0]; return { key: hub + "/" + k, hub: hub, fit: cleanFit(m && m.fit) }; }));
+          }catch(e){ setPeople(hub, []); }
           paintNow();
           var line = $("hubLive"); if (line && selected === hub) line.innerHTML = liveLine(h);
         });
@@ -1352,7 +1551,7 @@
   /* The page is drawn from this device's own data first. The class's data and the shared widgets (ranks, Timmy, the
      Inbox, click counts) come after, in this order, so the first screen doesn't wait for them on a slow phone. A page
      that lists one of them itself is left alone. */
-  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "pet.js", "timmy.js"];
+  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "pet.js", "timmy.js", "hub-art/class.js"];
   function loadLate(done){
     var need = LATE.filter(function(f){ return !q('script[src$="' + f + '"]'); }), left = need.length;
     if (!left) { done(); return; }
@@ -1362,7 +1561,21 @@
       document.head.appendChild(s);
     });
   }
-  function afterDraw(){ loadLate(startClassData); }
+  function afterDraw(){
+    loadLate(function(){
+      CA = window.SH_CLASS_ART || null;
+      startClassData(); syncRoom();
+      /* the room and the stage are drawn to the pixel, so they are drawn again when their width changes */
+      if (window.ResizeObserver) {
+        var rt = 0;
+        new ResizeObserver(function(){
+          clearTimeout(rt);
+          rt = setTimeout(function(){ syncRoom(); var ar = q(".dx-arena", $("board")); if (ar && Math.abs(+ar.getAttribute("data-w") - $("board").clientWidth) > 4) paintBoard(); }, 120);
+        }).observe($("class"));
+      }
+      document.addEventListener("sh:pref", function(){ syncRoom(); paintBoard(); });
+    });
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", afterDraw); else afterDraw();
 
   /* offline copy of the dashboard and hubs (sw.js); best-effort */
@@ -1374,11 +1587,20 @@
   setInterval(function(){
     if (ymd(new Date()) !== dayKey){ dayKey = ymd(new Date()); hubSig = partitionHubs(); redraw(); }
     else applyHubStates();
+    syncRoom();      /* the room's windows go dark at 7 pm and light at 6 am */
   }, 60 * 1000);
 
-  /* setLive({ hubId: n }) paints the live counts from outside: the preview uses it, since realtime has no fixture there */
-  function setLive(by){
-    liveBy = by && typeof by === "object" ? by : {}; paintNow();
+  /* setLive({ hubId: n }, [{ key, hub, fit }]) paints who is studying from outside: the preview uses it, since realtime
+     has no fixture there. Without the list, each hub gets n plain Timmys. */
+  function setLive(by, list){
+    by = by && typeof by === "object" ? by : {};
+    liveBy = {};
+    HUBS.forEach(function(h){
+      var mine = Array.isArray(list) ? list.filter(function(p){ return p && p.hub === h.id; }).map(function(p){ return { key: h.id + "/" + String(p.key), hub: h.id, fit: cleanFit(p.fit) }; }) : null;
+      if (!mine) { mine = []; for (var i = 0; i < (+by[h.id] || 0); i++) mine.push({ key: h.id + "/#" + i, hub: h.id, fit: "" }); }
+      setPeople(h.id, mine);
+    });
+    paintNow();
     var hub = HUBS.filter(function(h){ return h.id === selected; })[0], line = $("hubLive"); if (hub && line) line.innerHTML = liveLine(hub);
   }
   window.shDash = { redraw: redraw, hubs: function(){ return HUBS.slice(); }, tint: tintVars, icon: icon, setLive: setLive };

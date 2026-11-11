@@ -44,6 +44,7 @@ does exactly the deletes marked "the weekly job" below and nothing else. A new k
 | `question_events` | the school year | collapse to hub × qid × version totals (tries, right, choices, medians), no ids | **proposed, not approved**: added by the question-health work after Sam's call; ask Sam | Question health reads 120 days per person (tries and retries need the person) |
 | `question_feedback` | until the hub's page comes down | delete with the hub, or keep counts per question with no ids | **proposed, not approved**: ask Sam | One thumb per person per question, read only while the hub is live |
 | `link_attempts` | 7 days | delete | the weekly job | Only the last hour is read (rate limit) |
+| Who has a hub open, and what their Timmy is wearing (Realtime presence, [event-taxonomy](event-taxonomy.md)) | not stored | gone when the tab closes | nothing to run | No visitor id or name; never written to a table |
 | `zz-test` and blank-hub rows | none | delete (pings, click reach, feature events, hourly rows, click counts) | the weekly job | Test data |
 | `question_stats`, `question_choices`, `question_versions`, `question_reviews`, `ui_clicks`, `search_terms`, `mode_stats`, `presence_hourly`, `hub_recaps`, `changelog`, `feature_daily`, `retention_runs`, `hub_archive_log` | keep | | | No visitor ids; small |
 | Trophies and games: `achievements`, `arcade_scores`, `egg_events`, `nuke_*`, `exam_luck`, `correct_streaks`, `visitor_names`, `visitor_links`, `question_pins` | keep | | | They are the students' own records and settings |
