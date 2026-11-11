@@ -783,7 +783,14 @@
      sends) gets a made-up number that drifts a little, as a real class would; nothing on the live hubs listens for it */
   function fakeOnline(){
     var n = 9;
-    function send(){ try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {} }
+    function send(){
+      try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {}
+      /* the redesigned dashboard (widget/dash.js) shows the count hub by hub: split the made-up number over its live hubs, most in the first */
+      try {
+        var D = window.shDash;
+        if (D && D.setLive && D.hubs) { var hubs = D.hubs(), by = {}, left = n; hubs.forEach(function(h, i){ var k = i === hubs.length - 1 ? left : Math.ceil(left * .55); by[h.id] = k; left -= k; }); D.setLive(by); }
+      } catch (e) {}
+    }
     setTimeout(send, 1200);
     setInterval(function(){ n = Math.max(3, Math.min(16, n + [-1, 0, 1][Math.floor(Math.random() * 3)])); send(); }, 20000);
   }
