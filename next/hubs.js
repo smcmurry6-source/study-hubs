@@ -174,9 +174,14 @@ window.SH_DASH_DATA = {
     "Review tables",
     "Mock exam",
     "Arcade",
-    "Listen"
+    "Listen",
+    "Timmy Time"
    ],
-   "stateKey": "hee2-state-v1"
+   "stateKey": "hee2-state-v1",
+   "podcast": {
+    "name": "Timmy Time",
+    "sub": "The last-minute review, 52 min"
+   }
   },
   {
    "id": "heme-endo-exam1",
