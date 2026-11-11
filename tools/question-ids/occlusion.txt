@@ -429,12 +429,12 @@ ap-tf-implat
 ap-tf-shim
 ap-num-1
 ap-num-2
-in-cr-mount
+in-cr-mount retired
 in-mip-limit
 in-pathologic
 in-most-use
 in-waxing
-in-arcon
+in-arcon retired
 in-uab-class
 in-nonadj-acc
 in-nonadj-record
@@ -451,31 +451,31 @@ in-neutro
 in-bennett
 in-bennett-off
 in-iss
-in-fb-cast
+in-fb-cast retired
 in-fb-points
 in-frankfort
 in-indirect
-in-arb-mm
+in-arb-mm retired
 in-kinematic
 in-slidematic
 in-level
 in-nofb
 in-mt-post
 in-cr-wax
-in-cr-contact
+in-cr-contact retired
 in-cr-open
-in-90
+in-90 retired
 in-co-mip
 in-mip-misused
 in-lab-errors
 in-hand-artic
 in-vps-time
-in-vps-where
+in-vps-where retired
 in-vps-fit
 in-wax-dis
 in-five-req
 in-rec-base
-in-prot-rec
+in-prot-rec retired
 in-lat-sets
 in-why-prot
 in-30deg
@@ -495,7 +495,7 @@ in-job
 in-virtual
 in-semi-records
 in-panto-tables
-cs-in-crown-art
+cs-in-crown-art retired
 cs-in-crown-lab
 cs-in-rehab-rec
 cs-in-rehab-sci
@@ -503,27 +503,27 @@ cs-in-rehab-fb
 cs-in-high
 cs-in-high-fix
 in-2s-1
-in-2s-2
+in-2s-2 retired
 in-2s-3
 in-2s-4
-in-2s-5
+in-2s-5 retired
 in-2s-6
 in-2s-7
-in-2s-8
+in-2s-8 retired
 in-tf-1
 in-tf-2
-in-tf-3
+in-tf-3 retired
 in-tf-4
 in-tf-5
 in-tf-6
 in-tf-7
 in-tf-8
 in-tf-9
-in-tf-10
+in-tf-10 retired
 in-seq-prog
 in-num-1
-in-num-2
-in-num-3
+in-num-2 retired
+in-num-3 retired
 in-num-4
 in-num-5
 mo-dysfunction
@@ -533,9 +533,9 @@ mo-acute-malocc
 mo-tmd-def
 mo-tmd-split
 mo-bell
-mo-ofp
+mo-ofp retired
 mo-healing
-mo-model
+mo-model retired
 mo-regulated
 mo-event-sys
 mo-tol-sys
@@ -569,15 +569,15 @@ mo-prophy
 mo-new-medio
 mo-better-q
 mo-muscle-joint
-mo-straw
+mo-straw retired
 mo-therapy-def
 mo-rev-occ
-mo-repos-irrev
+mo-repos-irrev retired
 mo-splint-uses
 mo-stab-vs-repos
 mo-max-splint
 mo-div1
-mo-mand-splint
+mo-mand-splint retired
 mo-partial
 mo-irrev-when
 mo-least
@@ -597,21 +597,21 @@ mo-rebound
 mo-implant-mob
 mo-horiz
 mo-roots
-mo-morning
-mo-adapt
+mo-morning retired
+mo-adapt retired
 mo-splinting
 mo-miller2
 mo-wear-pain
 mo-wear-first
 mo-3mm
-mo-attrition
-mo-abrasion
+mo-attrition retired
+mo-abrasion retired
 mo-proud
 mo-cupping
 mo-acid
 mo-gerd
 mo-gerd-side
-mo-bulimia
+mo-bulimia retired
 mo-screwdriver
 mo-soda
 mo-swim
@@ -625,7 +625,7 @@ mo-clench
 mo-occupational
 mo-scallop
 mo-sleep
-mo-brux-cause
+mo-brux-cause retired
 mo-brux-o2
 mo-brux-forces
 mo-brux-tx
@@ -648,18 +648,18 @@ mo-2s-4
 mo-2s-5
 mo-2s-6
 mo-2s-7
-mo-2s-8
+mo-2s-8 retired
 mo-tf-1
 mo-tf-2
 mo-tf-3
 mo-tf-4
-mo-tf-5
+mo-tf-5 retired
 mo-tf-6
 mo-tf-7
 mo-tf-8
 mo-tf-9
 mo-tf-10
-mo-tf-11
+mo-tf-11 retired
 mo-tf-12
 mo-num-1
 mo-num-2
@@ -680,31 +680,31 @@ dn-temperament retired
 dn-implant-why
 dn-one-tooth
 dn-proprio
-dn-hold
+dn-hold retired
 dn-fit
 dn-border
 dn-pps
 dn-articulator
 dn-resorb-maxpost
 dn-resorb-mand
-dn-crossbite
+dn-crossbite retired
 dn-tongue
 dn-recent
 dn-support
-dn-stability
+dn-stability retired
 dn-ssr-most
 dn-support-areas
 dn-premax
-dn-co
+dn-co retired
 dn-cr
 dn-bal-def
 dn-nonbal-def
 dn-cg0
-dn-nonbal-except
+dn-nonbal-except retired
 dn-m2
 dn-bolus
 dn-chew
-dn-ling-def
+dn-ling-def retired
 dn-ling-pop
 dn-ling-ant
 dn-ling-con
@@ -721,7 +721,7 @@ dn-berry
 dn-waxrim
 dn-post-except
 dn-quint
-dn-fixed
+dn-fixed retired
 dn-reverse
 dn-partial
 cs-dn-flat-prop
@@ -739,8 +739,8 @@ dn-2s-1
 dn-2s-2
 dn-2s-3
 dn-2s-4
-dn-2s-5
-dn-2s-6
+dn-2s-5 retired
+dn-2s-6 retired
 dn-2s-7 retired
 dn-2s-8
 dn-tf-1
@@ -759,10 +759,10 @@ dn-num-2
 dn-num-3
 dn-num-4
 dn-num-5
-dn-num-6
-dn-sel-nonbal
+dn-num-6 retired
+dn-sel-nonbal retired
 dn-sel-ling
-dn-match-resorb
+dn-match-resorb retired
 dn-ret-fluid
 dn-support-occl
 dn-tip-except
@@ -780,38 +780,38 @@ dn-2s-10
 dn-tf-12
 dn-tf-13
 dn-tf-14
-in-ws-records
+in-ws-records retired
 in-ws-facebow
 in-wf-artic
 in-wf-cr
-mo-ws-wear
+mo-ws-wear retired
 mo-ws-splint
 mo-wf-mobility
 mo-wf-tmd
 dn-ws-ssr
-dn-ws-nonbal
+dn-ws-nonbal retired
 dn-wf-ling
 dn-wf-co
 nc-def
 nc-rmgi
 nc-three
-nc-paste
+nc-paste retired
 nc-rda
 nc-sensor
 nc-hand
-nc-evidence
+nc-evidence retired
 nc-tension
-nc-fulcrum
-nc-clues
-nc-splint
+nc-fulcrum retired
+nc-clues retired
+nc-splint retired
 nc-caries-sites
 nc-cupping
-nc-vomit
+nc-vomit retired
 nc-buffer-def
-nc-buffer-high
-nc-oj
+nc-buffer-high retired
+nc-oj retired
 nc-citric
-nc-water
+nc-water retired
 nc-why-etio
 nc-restore
 cs-nc-br-cause
@@ -826,7 +826,7 @@ cs-nc-ac-help
 cs-nc-ac-6
 nc-2s-1
 nc-2s-2
-nc-2s-3
+nc-2s-3 retired
 nc-2s-4
 nc-2s-5
 nc-tf-1
@@ -841,11 +841,11 @@ nc-tf-9
 nc-num-1
 nc-num-2
 nc-num-3
-nc-num-4
-nc-ws-1
+nc-num-4 retired
+nc-ws-1 retired
 nc-ws-2
 nc-wf-1
-nc-wf-2
+nc-wf-2 retired
 nc-sel-evid
 nc-sel-acid
 nc-match-fix
