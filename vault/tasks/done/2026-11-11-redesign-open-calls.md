@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/308
+pr: https://github.com/smcmurry6-source/study-hubs/pull/315
 ---
 
 # The redesign's open calls, answered in one pass
@@ -69,7 +69,8 @@ agent records each answer in [decisions](../../decisions.md) and changes the cod
   `xp.js`, `rls.js` and `rls-expectations.json` updated and passing, and [game-server](../../reference/game-server.md)'s Visiting
   section; and make an author's idea delete remove the row and its votes (and update `xp.js`'s idea-board checks). It can ride with any later phase 5 or phase 4 session.
 - 2026-11-11 (Claude Code): written from the game-server note, the shop, idea board and release notes.
-- 2026-11-11 (Claude Code, its own short session): both `migration_v54.sql` changes made, not applied (see the Outcome).
+- 2026-11-11 (Claude Code, its own short session): both `migration_v54.sql` changes made, not applied (see the Outcome);
+  [PR 315](https://github.com/smcmurry6-source/study-hubs/pull/315) (the answers were recorded in PR 308).
 
 ## Outcome
 
