@@ -71,13 +71,16 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   picture question"; the picture is the follicle stages): a `focus` hint first in L13 (the Sertoli cell) and L14 (the
   follicle stages), the first topic of each (basis "image on the exam + focus list + recording") and an `EXAM_INFO`
   "Pictures" row. The Sertoli cell already has its drawing (`FIGS.sertoli`, `mh-fig-label`, `mh-fig-seq`). The follicle stages
-  got theirs the same day (Sam: "Yes, draw it"): `FIGS.follicles`, built by `tools/figures/heme-endo-exam2/follicles.mjs`
-  with follicle.mjs's own drawing helpers (exported for it), one piece of ovarian cortex with the five follicles numbered out
-  of order (4 primordial, 2 early primary, 5 late primary, 1 secondary, 3 Graafian) and the Graafian follicle's parts
-  lettered (A antrum, B corona radiata, C cumulus oophorus, D granulosa cells, E theca interna, F theca externa); its key gives
-  L16's other names. It sits under L14's "Telling the stages apart" (`FIG_PLACE`) above the stepped anima figure, and four
-  picture questions use it (`fh-fig-graafian`, `fh-fig-multi`, `fh-fig-order`, `fh-fig-theca`), first in L14's picture topic.
-  Changing the drawing's numbers or letters means changing those four questions' keys.
+  got theirs the same day (Sam: "Yes, draw it"; then, with a screenshot of the slide: "This is actually the female question he
+  was talking about"): `FIGS.follicles`, built by `tools/figures/heme-endo-exam2/follicles.mjs` with follicle.mjs's own
+  drawing helpers (exported for it), **laid out like Dr. Herr's slide** (the screenshot isn't in the repo): the five stages in
+  a column, numbered 1-5 as he numbers them (primordial, unilaminar primary, multilaminar primary, antral, mature graafian),
+  and each of his 18 labels a letter, the same letter wherever he repeats one, out of order (A zona pellucida, B antrum,
+  C follicular cell, D corona radiata, E granulosa cells, F theca externa, G oocyte, H basal lamina, I cumulus oophorus,
+  J theca interna, K stromal cells). It sits under L14's "Telling the stages apart" (`FIG_PLACE`) above the stepped anima
+  figure, and six picture questions use it (`fh-fig-graafian`, `fh-fig-multi`, `fh-fig-order`, `fh-fig-theca`,
+  `fh-fig-cumulus`, `fh-fig-zona`), first in L14's picture topic. Changing the drawing's numbers or letters means changing
+  those questions' keys.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A (since removed), L13,
   L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).

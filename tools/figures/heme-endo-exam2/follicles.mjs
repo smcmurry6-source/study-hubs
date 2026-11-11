@@ -1,150 +1,171 @@
 // L14 (Dr. Herr): the follicle stages, one of Exam 2's two picture questions (Sam, 2026-11-11: "The two images on the exam
-// are sertoli and female reproductive stages picture question"; the picture is the follicle stages, and Sam: "Yes, draw
-// it"). A static figure (FIGS, not anima), unlabeled like the Sertoli cell drawing: the five follicles are numbered and
-// the Graafian follicle's parts lettered, and the key names them, so a student can test themselves first. build.mjs
-// writes it into the hub's `var FIGS = {...};` line.
+// are sertoli and female reproductive stages picture question", "Yes, draw it", then, with a screenshot of the slide:
+// "This is actually the female question he was talking about"). A static figure (FIGS, not anima), unlabeled like the
+// Sertoli cell drawing: the stages keep his numbers 1-5 and every one of his labels is a letter, and the key gives his
+// words, so a student can test themselves first. build.mjs writes it into the hub's `var FIGS = {...};` line.
 //
-// One piece of ovarian cortex, the way a section shows it: the surface epithelium and tunica albuginea on top, spindle-
-// shaped stromal cells, primordial follicles just under the tunica albuginea, growing follicles deeper, and the mature
-// Graafian follicle bulging on the surface. Each follicle is drawn with the same helpers as the stepped anima figure
-// (follicle.mjs), so the two agree. The names and parts are Dr. Herr's (figures-teach-the-lecture): his five stages, and
-// the Graafian follicle's antrum, cumulus oophorus, corona radiata, granulosa cells and the two thecae. L16 (Dr.
-// Madison) names two stages differently, and the key says so. The numbers are deliberately out of order, so the picture
-// never gives away the sequence (fh-fig-order).
+// Laid out like his slide (the screenshot is not kept in the repo): the five follicles in a column, smallest on top,
+// numbered 1 to 5 down the left, his labels down the right with leaders: 1 primordial follicle (oocyte, stromal cells,
+// follicular cell), 2 unilaminar primary (basal lamina, zona pellucida forming), 3 multilaminar primary (zona pellucida,
+// granulosa cells, theca interna), 4 antral (antrum, theca interna, theca externa, granulosa cells: the fluid still in
+// several spaces, the oocyte off to one side) and 5 mature (graafian) (theca externa, theca interna, antrum, granulosa
+// cells, corona radiata, cumulus oophorus: one big antrum, the oocyte on its mound low in the follicle). The same structure
+// keeps one letter wherever he labels it, and the letters are deliberately out of order. Drawn anew in the hub's colors
+// with the stepped follicle figure's own helpers (follicle.mjs), not traced. Names and labels are his
+// (figures-teach-the-lecture); the key adds the hub notes' other names for 2-4 and L16's.
 //
 // Sources (for the drawing's accuracy; nothing copied):
-//   - Ross MH, Pawlina W. Histology: A Text and Atlas, 8th ed. (2020), ch. 23: primordial follicles lie in the
-//     superficial cortex just under the tunica albuginea, a primary oocyte in one layer of squamous follicular cells; in
-//     the primary follicle the cells turn cuboidal, then stratify (unilaminar to multilaminar) as the zona pellucida forms
-//     and the stroma organizes into the theca; fluid-filled spaces join into one antrum in the secondary follicle, the
-//     oocyte sits eccentric on the cumulus oophorus with the corona radiata around it; the mature follicle spans the
-//     cortex and bulges from the surface.
+//   - Ross MH, Pawlina W. Histology: A Text and Atlas, 8th ed. (2020), ch. 23: the primordial follicle's one layer of
+//     squamous follicular cells among the stromal cells; the cuboidal granulosa cells, the forming zona pellucida and the
+//     basal lamina of the unilaminar primary follicle; stratified granulosa cells and the theca of the multilaminar one;
+//     fluid-filled spaces that join into one antrum; the oocyte eccentric on the cumulus oophorus, the corona radiata
+//     around it.
 //   - Mescher AL. Junqueira's Basic Histology, 16th ed. (2021), ch. 22: the theca interna's plump, vascular cells inside
-//     the fibrous theca externa; the granulosa layer (membrana granulosa) lining the antrum.
-// Schematic: not to scale. A real Graafian follicle (about 20 mm) is far larger than its neighbors and the primordial
-// follicles far smaller (oocyte about 25 µm); the sizes here only rank them.
-import follicle, { foR, foPt, foCirc, foRing, foStroma, foOocyte, foTheca, foGran, foSurface } from "./follicle.mjs";
+//     the fibrous theca externa.
+// Schematic: sizes only rank the stages (the oocyte grows from about 25 to 100-150 µm, the mature follicle to about 20 mm).
+import follicle, { foPt, foCirc, foRing, foOocyte, foTheca, foGran, foPolar } from "./follicle.mjs";
 import { f1, LIGHT, DARK } from "./shared.mjs";
 
-const W = 540, H = 368;
-const FX0 = 8, FX1 = 532, FY0 = 10, FY1 = 360;
-const BASE = 60, BUMP = 30, BX = 394, BW = 104;            // the ovary's surface, bulging over the Graafian follicle
-const sT = (x) => BASE - BUMP * Math.exp(-Math.pow((x - BX) / BW, 2));
-
-// the five follicles: [stage, center x, center y]
-const GF = { x: 394, y: 161 };   // Graafian
-const SF = { x: 158, y: 262 };   // secondary (antral)
-const LP = { x: 72, y: 150 };    // late primary (multilaminar)
-const EP = { x: 192, y: 126 };   // early primary (unilaminar)
-const PF = { x: 262, y: 96 };    // primordial
-const OTHER_PRIM = [[30, 98], [248, 342], [258, 214], [494, 332]];
+const W = 440, H = 766;
+const CX = 180, LX = 418;                                   // the follicles' column; the letters' column
+const Y = [40, 112, 230, 410, 636];                         // the five follicles' centers
 
 /* the follicle helpers' classes, restyled for a static figure outside .anima: the stepped figure's own CSS, rescoped */
 const FO_CSS = follicle().css.split("\n").filter((l) => /^\.anima \.follicle-svg \.fo-[a-z-]+(\.fo-swell)?\{[^}]*\}$/.test(l))
   .map((l) => l.replace(".anima .follicle-svg ", ".ffs ")).join("");
 const CSS = `.ffs{${LIGHT}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ffs{${DARK}}}:root[data-theme="dark"] .ffs{${DARK}}` +
   FO_CSS +
+  ".ffs .halo{fill:var(--bx-matrix)}" +
+  ".ffs .sd{fill:var(--bx-nuc-line);opacity:.8}" +
   ".ffs .lead{stroke:var(--ink-faint);stroke-width:1.1}" +
-  ".ffs .num circle{fill:var(--bg);stroke:var(--accent);stroke-width:1.6}" +
-  ".ffs .num text{fill:var(--ink);font:700 13px var(--font-body);text-anchor:middle}" +
+  ".ffs .lead-dot{fill:var(--ink-soft)}" +
+  ".ffs .num circle{fill:var(--accent)}" +
+  ".ffs .num text{fill:var(--bg);font:700 14px var(--font-body);text-anchor:middle}" +
   ".ffs .let rect{fill:var(--bg);stroke:var(--ink-soft);stroke-width:1.3}" +
-  ".ffs .let text{fill:var(--ink);font:700 12.5px var(--font-body);text-anchor:middle}" +
-  ".ffs .side{fill:var(--ink-soft);font:italic 12.5px var(--font-body)}";
+  ".ffs .let text{fill:var(--ink);font:700 12.5px var(--font-body);text-anchor:middle}";
 
-/* ---------- the follicles (each as in follicle.mjs's matching stage, smaller) ---------- */
-function primordial(x, y, r, sd){
-  return foRing(x, y, r, r + 4.5, Math.max(6, Math.round(r / 2.2)), sd, "fo-fc", "fo-gn", "flat") + foOocyte(x, y, r, { nr: r * 0.36, nx: r * 0.22, ny: -r * 0.12 });
-}
-function earlyPrimary(x, y){
-  const r = 18;
-  let o = foOocyte(x, y, r, { nr: 6.5, nx: 2, ny: -1 });
-  let zf = ""; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283, p = foPt(x, y, r + 1.5, a), q = foPt(x, y, r + 1.5, a + 0.45);
-    zf += `<path class="fo-zp" stroke-width="2" d="M${f1(p[0])} ${f1(p[1])}A${r + 1.5} ${r + 1.5} 0 0 1 ${f1(q[0])} ${f1(q[1])}"/>`; }
-  o += zf + foRing(x, y, r + 3, r + 11, 15, 0.1, "fo-gc", "fo-gn", "round") + foCirc(x, y, r + 11.5, "fo-bl");
+/* deterministic jitter */
+let seed = 20261111;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+/* stromal (or theca) cells as short dark dashes in a ring, lying along it */
+function dashes(cx, cy, r1, r2, n, rot, cls = "sd", len = 4.6){
+  let o = "";
+  for (let i = 0; i < n; i++) {
+    const a = rot + (i + rnd() * 0.5) / n * 2 * Math.PI, r = r1 + rnd() * (r2 - r1), p = foPt(cx, cy, r, a);
+    o += `<ellipse class="${cls}" cx="${f1(p[0])}" cy="${f1(p[1])}" rx="${f1(len * (0.8 + rnd() * 0.4))}" ry="1.3" transform="rotate(${f1(a * 57.2958 + 90 + (rnd() - 0.5) * 30)} ${f1(p[0])} ${f1(p[1])})"/>`;
+  }
   return o;
 }
-function latePrimary(x, y){
-  const r = 18, zo = r + 4.5, gR = zo + 24, ti = gR + 7, te = ti + 7;
-  let o = foTheca(x, y, gR + 1, ti, te, 11, false) + foCirc(x, y, gR + 1, "fo-bl");
-  for (let i = 0; i < 3; i++) { const ra = zo + i * 8, rb = ra + 8; o += foRing(x, y, ra, rb, Math.round(2 * Math.PI * (ra + 4) / 7.5), i * 0.11, "fo-gc", "fo-gn", "round"); }
-  o += `<circle class="fo-zp" cx="${x}" cy="${y}" r="${f1(r + 2.2)}" stroke-width="4"/>` + foOocyte(x, y, r, { nr: 6.5, nx: 2, ny: -1 });
+const halo = (cx, cy, r) => `<circle class="halo" cx="${cx}" cy="${cy}" r="${r}"/>`;
+
+/* ---------- the five stages ---------- */
+function primordial(cy){        // a small oocyte in one layer of flat follicular cells, stromal cells around
+  return halo(CX, cy, 28) + foRing(CX, cy, 13, 17.5, 8, 0.4, "fo-fc", "fo-gn", "flat") + foOocyte(CX, cy, 13, { nr: 4.8, nx: 1.5, ny: -1 }) +
+    dashes(CX, cy, 21.5, 26, 11, 0.1);
+}
+function unilaminar(cy){        // one layer of cube-shaped granulosa cells on a basal lamina; the zona pellucida forming
+  let zf = "";
+  for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283 + 0.3, p = foPt(CX, cy, 15.4, a), q = foPt(CX, cy, 15.4, a + 0.5);
+    zf += `<path class="fo-zp" stroke-width="2.2" d="M${f1(p[0])} ${f1(p[1])}A15.4 15.4 0 0 1 ${f1(q[0])} ${f1(q[1])}"/>`; }
+  return halo(CX, cy, 34) + foRing(CX, cy, 17, 26, 14, 0.15, "fo-gc", "fo-gn", "round") + foCirc(CX, cy, 26.6, "fo-bl") +
+    foOocyte(CX, cy, 14, { nr: 5, nx: 1.5, ny: -1 }) + zf + dashes(CX, cy, 29.5, 33, 13, 0.4);
+}
+function multilaminar(cy){      // many layers of granulosa cells around a complete zona; a theca interna forming outside
+  let o = halo(CX, cy, 72) + dashes(CX, cy, 63.5, 70, 34, 0.2) + foCirc(CX, cy, 60.6, "fo-bl");
+  for (let i = 0; i < 5; i++) { const ra = 25 + i * 7.1, rb = ra + 7.1; o += foRing(CX, cy, ra, rb, Math.round(2 * Math.PI * (ra + 3.5) / 7), i * 0.13, "fo-gc", "fo-gn", "round"); }
+  return o + `<circle class="fo-zp" cx="${CX}" cy="${cy}" r="22.6" stroke-width="4.6"/>` + foOocyte(CX, cy, 20, { nr: 7, nx: 2, ny: -1.5 });
+}
+/* granulosa nuclei packed in a disk, skipping wherever skip(x, y) says */
+function granDisk(cx, cy, R, skip){
+  let o = foCirc(cx, cy, R, "fo-gbg");
+  for (let rr = 4; rr < R - 2; rr += 6.4) {
+    const n = Math.max(1, Math.floor(2 * Math.PI * rr / 6.6));
+    for (let j = 0; j < n; j++) {
+      const a = (j + rnd() * 0.5) / n * 2 * Math.PI, r2 = rr + (rnd() - 0.5) * 2, p = foPt(cx, cy, r2, a);
+      if (!skip(p[0], p[1])) o += foCirc(p[0], p[1], 2.2, "fo-gn");
+    }
+  }
   return o;
 }
-/* secondary (G false) or Graafian (G true): an antrum, the oocyte on the cumulus oophorus with its corona radiata */
-function antral(cx, cy, G){
-  const gR = G ? 92 : 64, ti = gR + (G ? 13 : 9), te = ti + (G ? 11 : 9), tc = G ? 2.35 : 2.25, wall = G ? 11 : 24;
-  const rc = G ? 60 : 38;
-  const ra = (a) => { const d = Math.atan2(Math.sin(a - tc), Math.cos(a - tc));
-    return G ? (gR - wall) - 30 * Math.exp(-d * d / 0.2) : (gR - wall) - 17 * Math.exp(-d * d / 0.4) - 7 * (1 + Math.cos(d)); };
-  const oR = G ? 15 : 15, oc = foPt(cx, cy, rc, tc), zr = oR + 3.5, cr = zr + 7;
-  let o = foTheca(cx, cy, gR + 1, ti, te, G ? 21 : 17, false) + foCirc(cx, cy, gR + 1, "fo-bl");
-  o += foGran(cx, cy, gR, ra, [oc[0], oc[1], cr], G ? 5 : 9);
-  const pts = []; for (let i = 0; i < 120; i++) { const a = i / 120 * 2 * Math.PI; pts.push(foPt(cx, cy, ra(a) - 0.5, a)); }
-  // the antrum, its fluid pale; the corona radiata and zona around the oocyte
-  o += `<path class="fo-liq" d="${smoothPath(pts)}"/>`;
+const ANTRAL_POOLS = [[-26, -24, 21, 0.4], [10, -46, 11, 1.7], [-48, 8, 9, 2.9], [-14, 10, 8, 0.9], [24, -18, 6, 2.2], [-34, 34, 6, 1.1]];
+const ANTRAL_OO = [26, 24, 17];
+function antral(cy){            // fluid in several spaces joining into one antrum; the oocyte off to one side
+  const R = 78;
+  const pool = ([, , r, ph]) => (a) => r * (1 + 0.16 * Math.sin(3 * a + ph) + 0.09 * Math.sin(5 * a + ph * 2));
+  const inPool = (x, y) => ANTRAL_POOLS.some((p) => { const dx = x - (CX + p[0]), dy = y - (cy + p[1]); return Math.hypot(dx, dy) < pool(p)(Math.atan2(dy, dx)) + 3; });
+  const [ox, oy, orr] = ANTRAL_OO, oc = [CX + ox, cy + oy];
+  let o = halo(CX, cy, 100) + foTheca(CX, cy, R + 1, R + 9, R + 18, 13, false) + foCirc(CX, cy, R + 1, "fo-bl");
+  o += granDisk(CX, cy, R, (x, y) => inPool(x, y) || Math.hypot(x - oc[0], y - oc[1]) < orr + 5.5);
+  for (const p of ANTRAL_POOLS) o += `<path class="fo-liq" d="${foPolar(CX + p[0], cy + p[1], pool(p), 48)}"/>`;
+  o += `<circle class="fo-zp" cx="${f1(oc[0])}" cy="${f1(oc[1])}" r="${orr + 2.3}" stroke-width="4"/>` + foOocyte(oc[0], oc[1], orr, { nr: 6, nx: 2, ny: -1.5 });
+  return o;
+}
+const MAT = { gR: 94, wall: 10, tc: 1.95, rc: 62, oR: 15 };
+function mature(cy){            // one big antrum; the oocyte, in its corona radiata, on the cumulus oophorus
+  const { gR, wall, tc, rc, oR } = MAT, ti = gR + 12, te = ti + 10;
+  const ra = (a) => { const d = Math.atan2(Math.sin(a - tc), Math.cos(a - tc)); return (gR - wall) - 32 * Math.exp(-d * d / 0.2); };
+  const oc = foPt(CX, cy, rc, tc), zr = oR + 3.6, cr = zr + 7.2;
+  let o = halo(CX, cy, 126) + foTheca(CX, cy, gR + 1, ti, te, 21, false) + foCirc(CX, cy, gR + 1, "fo-bl");
+  o += foGran(CX, cy, gR, ra, [oc[0], oc[1], cr], 5);
+  o += `<path class="fo-liq" d="${foPolar(CX, cy, (a) => ra(a) - 0.5, 120)}"/>`;
   o += foRing(oc[0], oc[1], zr, cr, 15, 0.2, "fo-gc", "fo-gn", "radial");
   o += `<circle class="fo-zp" cx="${f1(oc[0])}" cy="${f1(oc[1])}" r="${f1(oR + 2)}" stroke-width="3.5"/>` + foOocyte(oc[0], oc[1], oR, { nr: 6, nx: 2, ny: -1.5, cg: true });
-  return { svg: o, gR, ti, te, tc, rc, oc, cr, ra };
-}
-function smoothPath(p){
-  const n = p.length; let d = `M${f1(p[0][0])} ${f1(p[0][1])}`;
-  for (let i = 0; i < n; i++) { const a = p[(i - 1 + n) % n], b = p[i], c = p[(i + 1) % n], e = p[(i + 2) % n];
-    d += `C${f1(b[0] + (c[0] - a[0]) / 6)} ${f1(b[1] + (c[1] - a[1]) / 6)} ${f1(c[0] - (e[0] - b[0]) / 6)} ${f1(c[1] - (e[1] - b[1]) / 6)} ${f1(c[0])} ${f1(c[1])}`; }
-  return d + "Z";
+  return { svg: o, oc, cr };
 }
 
-/* ---------- the key ---------- */
+/* ---------- the key: his numbers and labels ---------- */
 export const KEY = [
-  ["1", "Secondary (antral) follicle: fluid pooled into one antrum, the oocyte on the cumulus oophorus (L16 calls any follicle with an antrum Graafian)"],
-  ["2", "Early primary (unilaminar) follicle: one layer of cube-shaped granulosa cells"],
-  ["3", "Mature Graafian follicle: huge, bulging from the ovary's surface; the one that ovulates"],
-  ["4", "Primordial follicle: one layer of flat (squamous) follicular cells"],
-  ["5", "Late primary (multilaminar) follicle: many layers of granulosa cells, the theca forming, no fluid yet (L16 calls it secondary)"],
-  ["A", "Antrum (liquor folliculi)"],
-  ["B", "Corona radiata"],
-  ["C", "Cumulus oophorus"],
-  ["D", "Granulosa cells"],
-  ["E", "Theca interna"],
+  ["1", "Primordial follicle"],
+  ["2", "Unilaminar primary follicle (early primary)"],
+  ["3", "Multilaminar primary follicle (late primary; L16 calls it secondary)"],
+  ["4", "Antral follicle (the notes' secondary follicle: fluid spaces joining into one antrum)"],
+  ["5", "Mature (graafian) follicle"],
+  ["A", "Zona pellucida (forming, in 2)"],
+  ["B", "Antrum"],
+  ["C", "Follicular cell"],
+  ["D", "Corona radiata"],
+  ["E", "Granulosa cells"],
   ["F", "Theca externa"],
+  ["G", "Oocyte"],
+  ["H", "Basal lamina"],
+  ["I", "Cumulus oophorus"],
+  ["J", "Theca interna"],
+  ["K", "Stromal cells"],
 ];
 
-const num = (n, px, py, x, y) => `<line class="lead" x1="${f1(px)}" y1="${f1(py)}" x2="${f1(x)}" y2="${f1(y)}"/><g class="num"><circle cx="${f1(x)}" cy="${f1(y)}" r="11"/><text x="${f1(x)}" y="${f1(y + 4.5)}">${n}</text></g>`;
-const let_ = (n, px, py, x, y) => (px == null ? "" : `<line class="lead" x1="${f1(px)}" y1="${f1(py)}" x2="${f1(x)}" y2="${f1(y)}"/>`) +
-  `<g class="let"><rect x="${f1(x - 9.5)}" y="${f1(y - 9.5)}" width="19" height="19" rx="4"/><text x="${f1(x)}" y="${f1(y + 4.4)}">${n}</text></g>`;
+const lead = (px, py, y) => `<line class="lead" x1="${f1(px)}" y1="${f1(py)}" x2="${LX - 10}" y2="${f1(y)}"/><circle class="lead-dot" cx="${f1(px)}" cy="${f1(py)}" r="1.6"/>`;
+const letter = (L, px, py, y) => lead(px, py, y) + `<g class="let"><rect x="${LX - 9.5}" y="${f1(y - 9.5)}" width="19" height="19" rx="4"/><text x="${LX}" y="${f1(y + 4.4)}">${L}</text></g>`;
+const number = (n, y) => `<g class="num"><circle cx="26" cy="${y}" r="14"/><text x="26" y="${y + 5}">${n}</text></g>`;
 
 function svg(){
-  const g = antral(GF.x, GF.y, true), s = antral(SF.x, SF.y, false);
-  const holes = [[GF.x, GF.y, g.te + 2], [SF.x, SF.y, s.te + 2], [LP.x, LP.y, 62], [EP.x, EP.y, 31], [PF.x, PF.y, 14]]
-    .concat(OTHER_PRIM.map(([x, y]) => [x, y, 13]));
-  const parts = [];
-  parts.push(`<rect class="fo-field" x="${FX0}" y="${FY0}" width="${FX1 - FX0}" height="${FY1 - FY0}" rx="10"/>`);
-  parts.push(foStroma(FX0, FY0, FX1, FY1, holes, sT, 7, 900));
-  parts.push(foSurface(FX0, FX1, BASE, BUMP, BX, BW, null, FY0));
-  parts.push(primordial(PF.x, PF.y, 9, 0.3));
-  OTHER_PRIM.forEach(([x, y], i) => parts.push(primordial(x, y, 8 + (i % 2), 0.7 * i)));
-  parts.push(earlyPrimary(EP.x, EP.y), latePrimary(LP.x, LP.y), s.svg, g.svg);
-  // the five follicles, numbered out of order
-  const edge = (c, r, toward) => { const dx = toward[0] - c.x, dy = toward[1] - c.y, d = Math.hypot(dx, dy); return [c.x + dx / d * r, c.y + dy / d * r]; };
-  const N = [[1, SF, s.te, [42, 248]], [2, EP, 30, [236, 156]], [3, GF, g.te, [300, 318]], [4, PF, 13, [226, 82]], [5, LP, 46, [128, 86]]];
-  for (const [n, c, r, at] of N) { const p = edge(c, r - 4, at); parts.push(num(n, p[0], p[1], at[0], at[1])); }
-  // the Graafian follicle's parts, lettered
-  const at = (r, a) => foPt(GF.x, GF.y, r, a);
-  parts.push(let_("A", null, null, GF.x + 22, GF.y - 34));
-  const cor = foPt(g.oc[0], g.oc[1], g.cr - 3, -0.5); parts.push(let_("B", cor[0], cor[1], GF.x + 2, GF.y + 18));
-  const cum = foPt(GF.x, GF.y, g.ra(g.tc + 0.45) + 4, g.tc + 0.45); parts.push(let_("C", cum[0], cum[1], GF.x - 30, GF.y + 6));
-  const gr = at(g.gR - 6, 0.1); parts.push(let_("D", gr[0], gr[1], GF.x + 44, GF.y + 18));
-  const tin = at((g.gR + g.ti) / 2 + 1, 0.72); parts.push(let_("E", tin[0], tin[1], 506, 300));
-  const tex = at((g.ti + g.te) / 2 + 1, 0.98); parts.push(let_("F", tex[0], tex[1], 470, 336));
-  parts.push(`<text class="side" x="${FX0 + 10}" y="${FY0 + 22}">Ovary, cortex</text>`);
-  return `<svg class="ffs" viewBox="0 0 ${W} ${H}" role="img" aria-label="A piece of ovarian cortex with five follicles at different stages, numbered 1 to 5 out of order, and six parts of the largest one lettered A to F">` +
+  const p = (r, a, cy) => foPt(CX, cy, r, a);
+  const m = mature(Y[4]);
+  const parts = [primordial(Y[0]), unilaminar(Y[1]), multilaminar(Y[2]), antral(Y[3]), m.svg];
+  Y.forEach((y, i) => parts.push(number(i + 1, y)));
+  // 1 primordial: oocyte, stromal cells, follicular cell
+  parts.push(letter("G", ...p(6, -0.7, Y[0]), 16), letter("K", ...p(24, 0.0, Y[0]), 40), letter("C", ...p(15.2, 0.95, Y[0]), 66));
+  // 2 unilaminar primary: basal lamina, zona pellucida forming
+  parts.push(letter("H", ...p(26.6, -0.55, Y[1]), 96), letter("A", ...p(15.4, 0.75, Y[1]), 122));
+  // 3 multilaminar primary: zona pellucida, granulosa cells, theca interna
+  parts.push(letter("A", ...p(22.6, -0.75, Y[2]), 190), letter("E", ...p(46, -0.2, Y[2]), 218), letter("J", ...p(66, 0.25, Y[2]), 248));
+  // 4 antral: antrum, theca interna, theca externa, granulosa cells
+  const pool = ANTRAL_POOLS[1];
+  parts.push(letter("B", CX + pool[0] + 4, Y[3] + pool[1], 350), letter("J", ...p(84, -0.42, Y[3]), 378),
+    letter("F", ...p(93.5, 0.02, Y[3]), 408), letter("E", CX - 6, Y[3] + 54, 444));
+  // 5 mature (graafian): theca externa, theca interna, antrum, granulosa cells, corona radiata, cumulus oophorus
+  const cor = foPt(m.oc[0], m.oc[1], m.cr - 3, -0.2), cum = p(81, 1.55, Y[4]);
+  parts.push(letter("F", ...p(111, -0.98, Y[4]), 528), letter("J", ...p(100.5, -0.72, Y[4]), 554), letter("B", CX + 30, Y[4] - 34, 580),
+    letter("E", ...p(89, 0.12, Y[4]), 612), letter("D", ...cor, 676), letter("I", ...cum, 708));
+  return `<svg class="ffs" viewBox="0 0 ${W} ${H}" role="img" aria-label="Five ovarian follicles in a column, numbered 1 to 5 from the smallest to the largest, with their parts lettered A to K">` +
     `<style>${CSS}</style>${parts.join("")}</svg>`;
 }
 
 export const FOLLICLES = {
   id: "follicles",
   lec: "fhisto",
-  title: "The follicle stages in the ovarian cortex",
-  caption: "One of Exam 2's two picture questions shows the follicle stages (L14). Name each numbered follicle and each lettered part of the largest one, then open the key. Schematic, not to scale.",
+  title: "The five follicle stages",
+  caption: "Dr. Herr's follicle-stages picture (L14) is on the exam. This is the hub's own unlabeled version, laid out like his: name each number and letter, then open the key. Schematic.",
   key: KEY,
   svg: svg(),
 };

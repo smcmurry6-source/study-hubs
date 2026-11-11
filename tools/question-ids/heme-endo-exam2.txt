@@ -897,3 +897,5 @@ fh-fig-graafian
 fh-fig-multi
 fh-fig-order
 fh-fig-theca
+fh-fig-cumulus
+fh-fig-zona

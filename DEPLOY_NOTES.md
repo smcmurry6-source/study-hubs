@@ -41,9 +41,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   maintenance": three new R topics (PTH and calcitriol synergize; how PTH maintains blood calcium; T3 synergizes with GH on bone)
   with three new questions and three Exam 1 copies, R's notes (both levels, narration regenerated), cram and a focus hint, and the
   mock's five now follow the split (`MOCK_PLAN`: 2 from L2, 1 synergy, 1 PTH, 1 any). "The two images on the exam are sertoli and
-  female reproductive stages": focus hints and an `EXAM_INFO` "Pictures" row, and (Sam: "Yes, draw it") a numbered follicle-stages
-  drawing (`FIGS.follicles`, `tools/figures/heme-endo-exam2/follicles.mjs`) under L14's notes with four picture questions.
-  545 questions (50 new ids in the registry); `next/` rebuilt. About page's High Likelihood and Diagrams entries updated.
+  female reproductive stages": focus hints and an `EXAM_INFO` "Pictures" row, and (Sam: "Yes, draw it", then a screenshot of the slide: "This is
+  actually the female question he was talking about") an unlabeled drawing laid out like Dr. Herr's five-stage slide
+  (`FIGS.follicles`, `tools/figures/heme-endo-exam2/follicles.mjs`: his numbers 1-5, his labels as letters A-K) under L14's
+  notes with six picture questions. 547 questions (52 new ids in the registry); `next/` rebuilt. About page's High Likelihood and Diagrams entries updated.
 
 - **2026-11-11 (Heme & Endo Exam 2: the five Exam 1 questions come from L2, L3, L6 and L10, Claude Code)** — Sam: "the exam 1
   questions for heme and endo exam 2 will come from l2,6,3, and 10". The Exam 1 Refresher's `LIKELY_TOPICS` keep only those four
