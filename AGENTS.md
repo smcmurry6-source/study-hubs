@@ -14,7 +14,7 @@ Why and how: [vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md
 1. This file.
 2. [vault/home.md](vault/home.md): the map of everything.
 3. **The notes in `vault/rules/`**: Sam's standing rules. They apply to every change you make. Read every one,
-   except those marked `load: on-demand` (arcade, podcast, figures, a new hub's art): read those when your task
+   except those marked `load: on-demand` (writing questions, arcade, podcast, figures, a new hub's art): read those when your task
    touches that feature (`CLAUDE.md`'s "Feature rules" says when). (Claude Code loads the rest through `CLAUDE.md`.)
 4. Your task note, if you were given one (`vault/tasks/...`), and every note it links.
 5. The note for each hub you'll touch: `vault/hubs/<hub-id>.md`.

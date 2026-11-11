@@ -39,6 +39,9 @@ Put the ranks, trophies and celebrations on the design system without changing t
 
 ## Done when
 
+- [ ] First, before parts A-D grow it: `widget/hub.js` split into its core and the parts each session changes (the
+  bank and study toggle, rewards and cards, Timmy and his place), loaded as now, with no behavior change and the
+  smoke, a11y and perf suites passing ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4)
 - [ ] Every card and the cutscene reviewed in a recording on the preview, reduced motion too
 - [ ] Part A, B, C and D done as their notes say (each note's "Done when")
 - [ ] The arcade lobby of each live hub redrawn; game mechanics unchanged

@@ -54,23 +54,7 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/about-page.md
 
-@vault/rules/every-choice-gets-a-why.md
-
-@vault/rules/two-statement-and-true-false.md
-
-@vault/rules/numbered-statements.md
-
-@vault/rules/which-statement-questions.md
-
-@vault/rules/question-bank-filter-panel.md
-
 @vault/rules/question-ids-are-permanent.md
-
-@vault/rules/dont-ask-what-professors-skip.md
-
-@vault/rules/question-health-flags-are-leads.md
-
-@vault/rules/high-likelihood-topics.md
 
 @vault/rules/hub-home-page.md
 
@@ -90,9 +74,16 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 These standing rules apply to one feature each, so they aren't loaded into every session (Sam, 2026-11-06: tasks were
 slow to start). They bind just as much: **read the ones for a feature before you change it.** Claude Code also loads
-them by itself when it opens a file in `tools/figures/` or `tools/podcast/` (each has a `CLAUDE.md` that imports them),
+them by itself when it opens a file in `hubs/`, `tools/figures/` or `tools/podcast/` (each has a `CLAUDE.md` that imports them),
 and the `/podcast` and `anima` skills point at them.
 
+- **Writing or editing questions** (any hub's bank, a lecture added or taught, `QUESTION_WHY`, `LIKELY_TOPICS`, Exam Hints,
+  the Question Bank's panel, a question-health flag, the lessons refresh's fixes): [every-choice-gets-a-why](vault/rules/every-choice-gets-a-why.md),
+  [two-statement-and-true-false](vault/rules/two-statement-and-true-false.md), [numbered-statements](vault/rules/numbered-statements.md),
+  [which-statement-questions](vault/rules/which-statement-questions.md), [high-likelihood-topics](vault/rules/high-likelihood-topics.md),
+  [dont-ask-what-professors-skip](vault/rules/dont-ask-what-professors-skip.md), [question-bank-filter-panel](vault/rules/question-bank-filter-panel.md),
+  [question-health-flags-are-leads](vault/rules/question-health-flags-are-leads.md). Claude Code loads them by itself when it opens a file in `hubs/`
+  (`hubs/CLAUDE.md`); `/lessons-audit` and [build-a-hub](vault/how-to/build-a-hub.md) point at them.
 - **An arcade game or a hub's arcade skin** (`widget/games.js`, a hub's `GAMES` list or skin, lobby thumbnails):
   [arcade-skins](vault/rules/arcade-skins.md).
 - **A Timmy Time episode** (`tools/podcast/`, a hub's `SH_PODCAST`, `widget/podcast.js`):
@@ -106,10 +97,8 @@ and the `/podcast` and `anima` skills point at them.
 
 ## How-tos and reference
 
-@vault/how-to/narrate-with-kokoro.md
-
-@vault/how-to/read-usage-data.md
-
-@vault/how-to/reply-to-reports.md
+Read when the task calls for it (not loaded, to keep every session's start small; Sam, 2026-11-11):
+[narrate-with-kokoro](vault/how-to/narrate-with-kokoro.md) (narration), [read-usage-data](vault/how-to/read-usage-data.md)
+(the analytics, surveys), [reply-to-reports](vault/how-to/reply-to-reports.md) (student reports, notices).
 
 @vault/reference/shared-infrastructure.md

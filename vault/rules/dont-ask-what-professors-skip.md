@@ -1,5 +1,6 @@
 ---
 type: rule
+load: on-demand
 tags: [questions, content]
 since: 2026-11-08
 ---

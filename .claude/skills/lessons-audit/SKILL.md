@@ -6,7 +6,8 @@ description: Run the study-hubs lessons audit (a.k.a. lessons refresh) on demand
 # Lessons audit
 
 The procedure is `tools/lessons-refresh.md`; this skill is the fast, repeatable way to run it end to end. The rules
-come in with `CLAUDE.md`; read `LESSONS.md` (all of it: the standing lessons are the yardstick), `tools/lessons-refresh.md`
+come in with `CLAUDE.md`, and the question-writing rules with `hubs/CLAUDE.md` once you open a hub file (read them
+first if you fix a question before that: the "Writing or editing questions" line under "Feature rules" in `CLAUDE.md`); read `LESSONS.md` (all of it: the standing lessons are the yardstick), `tools/lessons-refresh.md`
 and the note of each live hub (`vault/hubs/`) first.
 
 Needs the **Supabase connector** (`execute_sql`, project `thytmzsgymydbzcqdnix`, read-only). If it isn't available,

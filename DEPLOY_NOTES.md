@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
+  question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
+  professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
+  a session opens a hub file, and `CLAUDE.md` lists them under "Feature rules". The narration, usage-data and reports how-tos
+  are links. Every session now starts with about 58 KB of notes instead of 81 KB (about 5.6k tokens less on every turn). New:
+  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/2026-11-11-redesign-open-calls.md)
+  for Sam in one list; phase 4 starts by splitting `widget/hub.js`.
+
 - **2026-11-10 (migration_v54 applied by mistake, then undone, Claude Code)** — After Sam's "also apply the sql", a
   session applied `migration_v54.sql` (the game layer's server) to the live project, though it was meant to wait for the
   redesign's release. No page called it and no student data reached its tables. Sam: "dont run the migration if it wasnt
