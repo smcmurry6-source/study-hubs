@@ -3904,7 +3904,7 @@ mq("dm-meg", "dmpharm", "slides", "Which feature belongs to repaglinide and nate
    ["They close the beta cell's ATP-sensitive potassium channel to release insulin", "Both classes do this; the meglitinides share two binding sites with the sulfonylureas and have one of their own."],
    ["They cause no hypoglycemia, because they act only when glucose is high", "They do cause hypoglycemia, just less than sulfonylureas; glucose-dependent insulin release belongs to the incretin drugs."],
    ["They are the long-acting first generation, now rarely used for that reason", "That describes chlorpropamide, the first-generation sulfonylurea: long-acting, with a high risk of hypoglycemia."]],
-  "Meglitinides are the quick squeeze: same mechanism and side effects as sulfonylureas (hypoglycemia, though less, weight gain, low durability), with flexible dosing at meals but frequent doses. Don't use them if a sulfonylurea has failed.");
+  "Meglitinides are the quick squeeze: same mechanism and side effects as sulfonylureas (hypoglycemia, though less, weight gain, low durability), with flexible dosing at meals but frequent doses. Don't use them if a sulfonylurea has failed. They don't spare you hypoglycemia: insulin release that depends on the glucose level belongs to the GLP-1 agonists and DPP-4 inhibitors.");
 
 tf("dm-tf-4", "dmpharm", "slides", "A patient whose sulfonylurea has stopped working is a good candidate for repaglinide.", false,
   "Repaglinide and nateglinide work the same way as sulfonylureas, through the beta cell's ATP-sensitive potassium channel, so the slide says not to use a meglitinide once a sulfonylurea has failed.",
@@ -3946,7 +3946,7 @@ mq("dm-met-lactic", "dmpharm", "slides", "A patient starting metformin asks abou
    ["Genital yeast infections", "Genital yeast infections come with the SGLT2 inhibitors, which leave glucose in the urine."],
    ["Fluid retention and edema", "Fluid retention and edema belong to the thiazolidinediones, which is why they are avoided in heart failure."],
    ["A disulfiram-like reaction with alcohol", "The disulfiram-like reaction with alcohol is a sulfonylurea warning, the same one metronidazole carries."]],
-  "Metformin's adverse effects: GI upset (nausea, cramps, bloating, diarrhea), which usually fades in one or two weeks; decreased vitamin B12 absorption; and lactic acidosis. Its contraindications are an eGFR below 30 (absolute) and acute or chronic metabolic acidosis.");
+  "Metformin's adverse effects: GI upset (nausea, cramps, bloating, diarrhea), which usually fades in one or two weeks; decreased vitamin B12 absorption; and lactic acidosis. Its contraindications are an eGFR below 30 (absolute) and acute or chronic metabolic acidosis. The disulfiram-like reaction with alcohol is a sulfonylurea warning, not metformin's.");
 
 two("dm-2s-2", "dmpharm", "rec", "Metformin delays the absorption of food from the gut, which flattens the glucose spike after a meal.", "Metformin's GI side effects usually fade within one or two weeks.", true, true,
   "Besides cutting the liver's glucose output, metformin slows absorption from the gut, so a big post-meal spike becomes a slow plateau. The same slowing explains its common GI effects (bloating, indigestion, cramps, diarrhea), which usually settle after a week or two.",
@@ -4500,7 +4500,7 @@ mq("p1-fc-mets", "path1", "slides",
    ["The cervical lymph nodes, carried there through the lymphatics", "Lymphatic spread to the neck nodes is papillary carcinoma's route."],
    ["The lung, after spreading there through the lymphatic vessels", "The lung is a target, but follicular carcinoma reaches it through blood vessels, not lymphatics."],
    ["The cervical lymph nodes, carried there through the blood", "Follicular carcinoma's blood-borne spread goes to distant organs rather than the neck nodes."]],
-  "Follicular carcinoma invades capsule and vessels, so its metastases are blood-borne: lung and bones (shoulder girdle, sternum, skull, iliac bones), most often from widely invasive tumors. Papillary carcinoma is the one that goes to lymph nodes.");
+  "Follicular carcinoma invades capsule and vessels, so its metastases are blood-borne: lung and bones (shoulder girdle, sternum, skull, iliac bones), most often from widely invasive tumors. Papillary carcinoma is the one that goes to lymph nodes. The lung is one of its sites, but it gets there through the blood, not the lymphatics.");
 
 // ---------- Papillary carcinoma ----------
 two("p1-2s-ptc", "path1", "rec",
@@ -4776,7 +4776,7 @@ mq("p2-shpt-dialysis", "path2", "hub",
    ["Primary hyperparathyroidism from chief cell hyperplasia, which enlarges all four glands without a stimulus", "Primary disease raises calcium; his is low, and his renal failure is a known stimulus."],
    ["Pseudohypoparathyroidism: his kidneys resist PTH, so the glands make more and more of it", "Pseudohypoparathyroidism is diagnosed only after renal failure is ruled out, and he has renal failure."],
    ["Parathyroid carcinoma, since PTH is more than six times the upper limit", "Carcinoma brings very high calcium, over 13, not low calcium."]],
-  "Renal failure is the most common cause of secondary hyperparathyroidism: chronic hypocalcemia keeps the glands stimulated until they are all hyperplastic. Its features resemble primary disease but are less severe; surgery, when needed, is a three-and-a-half gland parathyroidectomy.");
+  "Renal failure is the most common cause of secondary hyperparathyroidism: chronic hypocalcemia keeps the glands stimulated until they are all hyperplastic. Its features resemble primary disease but are less severe; surgery, when needed, is a three-and-a-half gland parathyroidectomy. Primary chief cell hyperplasia also enlarges all four glands, but it raises calcium; his is low, so something is driving the glands, and here it is his renal failure.");
 
 mq("p2-shpt-fix", "path2", "rec",
   "A patient's secondary hyperparathyroidism is traced to vitamin D deficiency. According to Dr. Dababneh, what matters most?",
@@ -4901,7 +4901,7 @@ mq("p2-case4-a", "path2", "hub",
    ["An ACTH-secreting pituitary tumor", "A pituitary source raises ACTH as well as cortisol; hers is suppressed."],
    ["An ACTH-secreting lung tumor", "Ectopic ACTH also raises ACTH; hers is under 5."],
    ["Long-term oral steroid pills", "Steroid pills can cause Cushing syndrome, but she takes none."]],
-  "Adrenal Cushing: cortisol high, ACTH low, because cortisol feeds back on the pituitary. Pituitary and ectopic tumors: both high. Same logic as primary hyperthyroidism, with T4 high and TSH low.",
+  "Adrenal Cushing: cortisol high, ACTH low, because cortisol feeds back on the pituitary. Pituitary and ectopic tumors: both high. So a pituitary tumor (Cushing disease) is ruled out here: her ACTH is under 5, switched off by her own cortisol. Same logic as primary hyperthyroidism, with T4 high and TSH low.",
   {pbox: [["Patient", "41-year-old woman at a dental recall visit"],
           ["History", "A year of weight gain around the middle; rounder face; fat pad at the back of the neck; new acne"],
           ["Medications", "None; no steroid use"],
@@ -5029,7 +5029,7 @@ mq("p2-case6-a", "path2", "hub",
    ["Secondary hypoadrenalism: the pituitary has stopped making ACTH", "Secondary disease has low ACTH along with low cortisol; his ACTH is very high."],
    ["Conn syndrome: an adrenal adenoma making excess aldosterone", "Aldosterone excess would raise sodium, lower potassium and raise blood pressure: the opposite of his labs."],
    ["An ACTH-secreting pituitary tumor overdriving the adrenals", "A pituitary ACTH tumor would push cortisol up, not down."]],
-  "Addison disease is chronic primary hypoadrenalism: weakness, fatigue, weight loss, nausea and vomiting, hyperpigmentation, hypotension, low glucose, low sodium, high potassium and high ACTH, with an inability to withstand stress.",
+  "Addison disease is chronic primary hypoadrenalism: weakness, fatigue, weight loss, nausea and vomiting, hyperpigmentation, hypotension, low glucose, low sodium, high potassium and high ACTH, with an inability to withstand stress. His ACTH is high because the failing cortex no longer feeds back on the pituitary, not because a tumor is driving it: an ACTH-secreting pituitary tumor would push cortisol up, and his is 2.",
   {pbox: [["Patient", "44-year-old man at a dental visit"],
           ["Complaint", "Months of fatigue, weakness, nausea and a 6 kg weight loss"],
           ["Oral exam", "Brown patches on the gingiva and buccal mucosa; skin darker than usual"],
