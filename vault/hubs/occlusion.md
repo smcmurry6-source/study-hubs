@@ -25,7 +25,7 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 - **No fact more than twice** (Sam, 2026-11-10, [decisions](../decisions.md)): a concept may be asked two ways, not for every
   concept. `mo-10` was retired for it, and on 2026-11-11 the rest of the final's questions were checked the same way
   ("check the rest of the final questions"): 58 facts in L6-L9 were asked three to five times, and 58 questions came out,
-  so every fact is now asked at most twice (the list is in the PR, [#318](https://github.com/smcmurry6-source/study-hubs/pull/318)).
+  so every fact is now asked at most twice (the list is in the PR, [#319](https://github.com/smcmurry6-source/study-hubs/pull/319)).
   **How it was counted:** every statement of a two-statement or numbered item counts as asking its fact, a which/whichf
   item counts for its key, a case question for what it applies, and a fact asked in two lectures counts across both. The
   two kept are in different formats where possible, a Patient Box question is kept over a plain one, and nothing was
