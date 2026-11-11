@@ -6,8 +6,8 @@ created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
 waiting-on: the Exam 2 review (Wed 11/11)
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/310
 ---
 
 # Heme & Endo Exam 2: make the slides-only lectures taught (L17 and L18 left the exam)
