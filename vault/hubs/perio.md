@@ -105,13 +105,13 @@ live hub. Until then **edit content in the live file only**:
   (the mock), the suture pictures (`SUTURE_DIAGRAMS`, `SUTURE_DEFS` → figures), and each session's `REF_SECTIONS` into the
   Review tables under that session's notes (the live hub's own HTML; More's Side by side has nothing left, so it's hidden,
   `core.noSide`). The sandbox runs `widget/cases.js` first, so the Patient Box rows (`foldBox`) come out as the live hub draws them.
-- **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, all 749
-  question ids (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
+- **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
+  question id (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
   `answered`, `totalSeen`, `activeDates`, `achievements` as `true`), which the dashboard reads as it is. The engine reads and
   writes it only through `ansOf()`, `putAnswer()`, `studyDayList()` and `achMap()`, so the live page reads a save the new
   one wrote (checked: a rollback keeps every answer). It adds `nx` (the daily goal) and `read` (Notes done), which the live
   page ignores. The bank's saved filters (`ui.qbank`) move into the engine's once (`ui.qbankIn`).
-- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for all 749 (the
+- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for every question (the
   Patient Box rows before the stem, a multi's keys: `core.exportCase`).
 - The engine learned, gated to the hubs that have them: **recall cards** (reveal, then "I got it" / "I missed it"),
   **case links** ("In the notes", `shCases.refHTML`), a lecture's **note** under its title, **HTML review sections**, and the
