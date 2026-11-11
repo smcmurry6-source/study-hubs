@@ -160,6 +160,13 @@ list, Home's progress by lecture, the bank's lecture picker, Exam Hints and the 
 **Notes done**: the button at the end of a lecture's notes, or reading to the end after a minute, fills its badge with its
 color and a check, in the notes' list and on Home; tap it again to take it back; kept on this device, like highlights.
 
+**Timmy Time's page** (Sam, 2026-11-11: "Redesign the timmy time ui/card"): built in the engine (`podDress`), so every hub on
+it with an episode has it from the release. Home's animated card stays among the quick starts, as now. For the About page
+(the Timmy Time entry, rewritten): the episode has its own page under More, on the hub's color with Timmy in headphones
+(he bobs while it plays): a big Play button, back 15 s, forward 30 s, the speed, and a bar to drag; the chapters are listed
+under it, always open (tap one to jump there, the one playing is marked); then what the class thinks, as now. The small
+player pinned to the bottom while you're elsewhere is in the hub's color too.
+
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add, with phase 1's draft):
 - A hub's **review-only lectures** (`core.json`'s `reviewOnly`, Heme & Endo Exam 2's Exam 1 Refresher) are out of the bank
   until ticked: "All lectures" means the others, the picker's words are the hub's own (`SH_HUB.review`), the tag says when

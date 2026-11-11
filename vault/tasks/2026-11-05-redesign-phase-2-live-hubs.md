@@ -68,7 +68,13 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   default color with dark labels on every new hub), fixed. Sam's answers: switch it in only if the release beats 11/13; the
   About page now says the mock's five Exam 1 questions are drawn at random; a preview (the `preview` label on #312). Learn
   and Flashcards wasn't lost: it's [its own task](2026-11-06-redesign-learn-and-flashcards.md), not started. **Left for
-  Heme & Endo:** Sam's look at the colors in the preview. **Next step for this task:**
+  Heme & Endo:** Sam's look at the colors in the preview.
+- 2026-11-11 (Claude Code, same session): Sam: "Looks much better. Redesign the timmy time ui/card", and asked whether the
+  animated card still shows on Home (yes, among the quick starts, unchanged). Built in the engine for every hub on it:
+  More > Timmy Time as one page (the episode on the hub's color with Timmy in headphones, the chapters always open, then
+  what the class thinks; the pinned player in the hub's color), checked on Occlusion's new version (the only one with an
+  episode). axe on it found BUG-057 in the shared player (the speed and vote buttons' spoken names), fixed live with no
+  look change. **Left for Heme & Endo:** Sam's look at the colors and the player in the preview. **Next step for this task:**
   Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
   `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
 

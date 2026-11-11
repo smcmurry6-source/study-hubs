@@ -76,12 +76,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".status-badge"
-    },
-    "label-content-name-mismatch": {
-     "n": 3,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": ".sh-pod-rate"
     }
    },
    "focus": null,

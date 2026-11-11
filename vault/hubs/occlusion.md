@@ -129,6 +129,11 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   from the engine, by its place in `LECTURES` (L1 blue, L2 orange, L3 teal, L4 magenta, L5 olive, L6 violet, L7 mustard, L8
   sky, L9 brown), and the notes have **Notes done**. A lecture added at the end takes the next color; one inserted earlier
   shifts the rest.
+- Since 2026-11-11 (Sam: "Redesign the timmy time ui/card"), **More > Timmy Time** is the engine's own page: the shared
+  player (`widget/podcast.js`) fills the slot and `podDress` in `widget/hub.js` lays it out (the episode on the hub's color
+  with Timmy in headphones, the chapters always open, then what the class thinks; `.pod-x` in `widget/hub.css`). This is
+  the only hub on the engine with an episode so far, so check it here after any change to the player. Home's animated card
+  is unchanged.
 
 ## Diagram decisions
 

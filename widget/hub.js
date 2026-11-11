@@ -1357,9 +1357,52 @@
     var t = $("[data-tour]", el); t.addEventListener("click", function(){ track("more:tour"); startTour(); });
   }
   function moreTimmy(body){
-    var pod = CORE.podcast;
-    body.innerHTML = pod ? '<div class="pod-slot" data-sh-podcast></div><p class="note">' + esc(pod.blurb || "") + "</p>" : "<p>No episode for this hub yet.</p>";
+    if (!CORE.podcast) { body.innerHTML = "<p>No episode for this hub yet.</p>"; return; }
+    body.innerHTML = '<div class="pod-slot" data-sh-podcast></div>';
+    var slot = $(".pod-slot", body);
+    if (slot.hasAttribute("data-sh-podcast-ready")) { podDress(slot); return; }
+    var mo = new MutationObserver(function(){ if (slot.hasAttribute("data-sh-podcast-ready")) { mo.disconnect(); podDress(slot); } });
+    mo.observe(slot, { attributes: true, attributeFilter: ["data-sh-podcast-ready"] });
   }
+  /* Timmy Time's player, redesigned (Sam, 2026-11-11): the shared player (widget/podcast.js, the same on every hub) fills
+     the slot; the engine then lays it out as one page: the episode on a field of the hub's color with Timmy in headphones
+     (he bobs while it plays), the play controls and a progress bar on it; then the chapters as a track list (always open,
+     two columns on a wide screen, the one playing marked), then what the class thinks. Only the layout and the drawing change: every control, vote
+     and comment is the shared player's own, so it works and counts the same as on the live hubs. */
+  function podDress(slot){
+    var card = $(".sh-pod-card", slot); if (!card || card.classList.contains("pod-x")) return;
+    var main = $(".sh-pod-main", card), art = $(".sh-pod-art", card), social = $(".sh-pod-social", card), chs = $(".sh-pod-chapters", card);
+    if (!main || !art) return;
+    card.classList.add("pod-x");
+    art.innerHTML = spot("notes", POD_COL, "pa-notes") + spot("timmyTime", POD_COL, "pa-timmy");
+    art.setAttribute("aria-hidden", "true");
+    var title = $(".sh-pod-title", main); if (title) { title.setAttribute("role", "heading"); title.setAttribute("aria-level", "2"); }
+    var seek = $(".sh-pod-progress .sh-pod-seek", main);
+    if (seek) { var bar = document.createElement("span"); bar.className = "pod-bar"; bar.innerHTML = '<i class="pod-fill" aria-hidden="true"></i>'; seek.parentNode.insertBefore(bar, seek); bar.appendChild(seek); }
+    var hero = document.createElement("div"); hero.className = "pod-hero";
+    card.insertBefore(hero, card.firstChild); hero.appendChild(main); hero.appendChild(art);
+    var cols = document.createElement("div"); cols.className = "pod-cols";
+    if (chs) {
+      chs.hidden = false; chs.style.setProperty("--rows", Math.ceil($$(".sh-pod-ch", chs).length / 2));
+      $$(".sh-pod-ch", chs).forEach(function(b){ b.insertAdjacentHTML("beforeend", '<span class="pod-eq" aria-hidden="true"><i></i><i></i><i></i></span>'); });
+      var sec = document.createElement("section"); sec.className = "panel pod-chs"; sec.setAttribute("aria-labelledby", "podChH");
+      sec.innerHTML = '<h2 id="podChH">Chapters</h2><p class="note">Tap one to jump there.</p>'; sec.appendChild(chs); cols.appendChild(sec);
+    }
+    if (social) {
+      social.classList.add("panel"); social.setAttribute("aria-labelledby", "podSoH"); social.setAttribute("role", "region");
+      social.insertAdjacentHTML("afterbegin", '<h2 id="podSoH">What the class thinks</h2>'); cols.appendChild(social);
+    }
+    card.appendChild(cols);
+    podSync();
+  }
+  /* the progress bar's filled part follows the player's own slider (the shared player moves the slider; the media events
+     don't bubble, so they're caught on the way down) */
+  function podSync(){
+    requestAnimationFrame(function(){ $$(".pod-bar").forEach(function(b){ var s = b.querySelector(".sh-pod-seek"); if (s) b.style.setProperty("--p", String(+s.value / 1000)); }); });
+  }
+  ["timeupdate", "seeked", "loadedmetadata", "ended", "input", "change"].forEach(function(t){
+    document.addEventListener(t, function(e){ var x = e.target; if (x && x.classList && (x.classList.contains("sh-pod-seek") || x.tagName === "AUDIO")) podSync(); }, true);
+  });
   function moreHints(body){
     needStudy().then(function(){ needQuestions().then(function(){
       var X = C.hints || {}, hints = STUDY.hints || [];

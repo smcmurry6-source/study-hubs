@@ -215,7 +215,8 @@ until then: outside a preview the page sends the visitor to the live hub. Until 
   `widget/hub.css`, by the lecture's place in `LECTURES`): L11 blue, L12a orange, L12b teal, L13 magenta, L14 olive, L15
   violet, L16 mustard, and the Refresher grey (review only). Adding a lecture at the end keeps the others' colors; one
   inserted earlier shifts the rest. **Notes done** (`STATE.read`, this device only) fills a lecture's badge.
-- No Timmy Time yet, so the new Home and More have no episode card. When one is made, `/podcast` wires the live hub and
+- No Timmy Time yet, so the new Home and More have no episode card (the engine's redesigned player page, 2026-11-11, shows
+  up by itself once `SH_PODCAST` exists; see Occlusion's note). When one is made, `/podcast` wires the live hub and
   then runs `node tools/hub-next/build.mjs --hub heme-endo-exam2`, so `SH_PODCAST` (its lore comments included) reaches
   `core.json`; the engine draws the Home card, the More tile and the player with likes, dislikes and comments.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/heme-endo-exam2/next/`).

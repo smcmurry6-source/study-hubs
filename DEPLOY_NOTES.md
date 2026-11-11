@@ -48,8 +48,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   end after a minute; `STATE.read`, this device) fills a lecture's badge. **BUG-056**, fixed: on the new hubs the Timmy Time
   player's Play and Post buttons were in the default color with dark labels (each hub's tint now on the page root too,
   `data-hx-hub`). `/podcast` now rebuilds a hub's new version. **Live:** the About page's High Likelihood entry now says the
-  mock's five Exam 1 questions are drawn at random (Sam: "draw at random"). Notes:
-  [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
+  mock's five Exam 1 questions are drawn at random (Sam: "draw at random"). Round 3 (Sam: "Redesign the timmy time
+  ui/card"): on every hub on the engine, More > Timmy Time is one page: the episode on a field of the hub's color with Timmy
+  in headphones (he bobs while it plays), a big Play, round skip and speed buttons and a progress bar on it, the chapters as
+  a track list (always open, two columns on a laptop, the one playing marked with a small equalizer), then "What the class
+  thinks"; the pinned player is in the hub's color too. The engine only lays out and restyles the shared player
+  (`podDress` in `widget/hub.js`, `.pod-x` in `widget/hub.css`), so the live hubs' player looks the same. Home's animated
+  Timmy Time card stays where it was. **Live, no look change: BUG-057**, fixed in `widget/podcast.js`: the speed and
+  like/dislike buttons' spoken names now include what they show ("Playback speed 1×", "Like this episode, 7 likes").
+  Notes: [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
 - **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
   question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
   professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
