@@ -60,7 +60,15 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   account, phone and laptop: the four views, every More page, the six games, the drill, the mock (50: L12a + L12b = 9, R's 5
   High Likelihood), Exam 1 High likelihood ticking and unticking R; the release drafts are in [the release note](2026-11-06-redesign-release.md).
   **Left for Heme & Endo:** Sam's look on [PR #312](https://github.com/smcmurry6-source/study-hubs/pull/312) (one round, screenshots shown in the session) and anything it asks for; the timing question (its
-  exam is 11/13, so by the release's rule it is switched in only if the release comes first). **Next step for this task:**
+  exam is 11/13, so by the release's rule it is switched in only if the release comes first).
+- 2026-11-11 (Claude Code, same session): Sam's look: "it needs a little bit more color ... to distinguish each lecture", and
+  "everything else looks good". Built in the engine for every hub on it: each lecture's own color (question cards, the
+  notes' list, Home, the picker, hints, cram, mock, stats; review-only grey) and **Notes done** (a button at the end of the
+  notes, or reading to the end after a minute). Checking Timmy Time on the engine found BUG-056 (the player's buttons in the
+  default color with dark labels on every new hub), fixed. Sam's answers: switch it in only if the release beats 11/13; the
+  About page now says the mock's five Exam 1 questions are drawn at random; a preview (the `preview` label on #312). Learn
+  and Flashcards wasn't lost: it's [its own task](2026-11-06-redesign-learn-and-flashcards.md), not started. **Left for
+  Heme & Endo:** Sam's look at the colors in the preview. **Next step for this task:**
   Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
   `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
 

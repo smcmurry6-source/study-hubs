@@ -41,7 +41,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   ticked, `SH_EXPORT.uncounted` for the medal), **a toggle tied to a lecture** (Exam 1 High likelihood ticks R and unticks it
   again), **the mock's grouped L12 and the Refresher's five High Likelihood picks**, "which statement" type filters, focus-list
   hints and a plural "In the professors' words". The build handles a hub without the Occlusion drawing kit (its `FIGS` and
-  `FIG_PLACE` as data). Its six arcade lobby drawings are new (`tools/figures/site/arcade.mjs`, from `HEE2_SKIN`). Notes:
+  `FIG_PLACE` as data). Its six arcade lobby drawings are new (`tools/figures/site/arcade.mjs`, from `HEE2_SKIN`). After Sam's
+  look ("more color ... to distinguish each lecture"): **each lecture has its own color** on every hub on the engine (question
+  cards' lecture chip and top edge, the notes' list, Home's rows, the picker, hints, cram, mock and stats; a review-only
+  lecture grey; `LCOL`/`lc()`, `.lc-0` to `.lc-9`), and **Notes done** (a button at the end of the notes, or reading to the
+  end after a minute; `STATE.read`, this device) fills a lecture's badge. **BUG-056**, fixed: on the new hubs the Timmy Time
+  player's Play and Post buttons were in the default color with dark labels (each hub's tint now on the page root too,
+  `data-hx-hub`). `/podcast` now rebuilds a hub's new version. **Live:** the About page's High Likelihood entry now says the
+  mock's five Exam 1 questions are drawn at random (Sam: "draw at random"). Notes:
   [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
 - **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
   question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what

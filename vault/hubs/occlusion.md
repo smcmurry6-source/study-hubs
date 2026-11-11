@@ -125,6 +125,10 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
   and "In Dr. Givan's words" though L9's hints are Dr. Lawson's. `widget/hub.js` builds "In " + prof + "'s words", so
   "the professors" would read wrong: word it per lecture (or plural) before the release. Since phase 2 the engine takes
   `SH_HUB.hints.words` for that heading (Heme & Endo Exam 2: "In the professors' words").
+- Since 2026-11-11 (Sam's look at Heme & Endo Exam 2's new version: "more color"), **each lecture has its own color** here too,
+  from the engine, by its place in `LECTURES` (L1 blue, L2 orange, L3 teal, L4 magenta, L5 olive, L6 violet, L7 mustard, L8
+  sky, L9 brown), and the notes have **Notes done**. A lecture added at the end takes the next color; one inserted earlier
+  shifts the rest.
 
 ## Diagram decisions
 

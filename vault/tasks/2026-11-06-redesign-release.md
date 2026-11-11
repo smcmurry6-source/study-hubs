@@ -150,7 +150,15 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 
 Built in `hubs/heme-endo-exam2/next/` (2026-11-11). Its exam is Friday, November 13, 10:00 am: by the rule above ("a hub
 whose exam passed before the release keeps its old page"), **this new version is switched in only if the release comes
-before then**; after that, the live page stays like an archived hub's unless Sam says otherwise.
+before then** (Sam, 2026-11-11: "Switch it in only if the release beats 11/13"); after that, the live page stays like an
+archived hub's.
+
+**Lecture colors and Notes done** (Sam's look at it, 2026-11-11: "more color ... to distinguish each lecture"): built in the
+engine, so every hub on it has them from the release (Occlusion and Heme & Endo now, Perio once it's ported). For the About
+page (Notes, Question Bank): every lecture has its own color, on each question's lecture tag and the card's top edge, the notes'
+list, Home's progress by lecture, the bank's lecture picker, Exam Hints and the cram sheet (a review-only lecture is grey);
+**Notes done**: the button at the end of a lecture's notes, or reading to the end after a minute, fills its badge with its
+color and a check, in the notes' list and on Home; tap it again to take it back; kept on this device, like highlights.
 
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add, with phase 1's draft):
 - A hub's **review-only lectures** (`core.json`'s `reviewOnly`, Heme & Endo Exam 2's Exam 1 Refresher) are out of the bank
@@ -171,9 +179,9 @@ its `FIGS` and `FIG_PLACE` go into `figures.js` as data. The mock's blueprint ma
 lecture's questions from its High Likelihood ones only (`MOCK_LIKELY_ONLY`).
 
 **About page**: nothing new for Heme & Endo beyond phase 1's drafts (its Refresher, Exam 1 High likelihood and the Cycle
-Arcade work as now). Its arcade row: every game in the lobby with its own drawing, Lab Sort first. Already wrong today:
-High Likelihood says the mock's five Exam 1 questions come "each from a different Exam 1 lecture"; since 2026-11-10 they are
-drawn at random from the Refresher's High Likelihood questions (the [hub note](../hubs/heme-endo-exam2.md)).
+Arcade work as now). Its arcade row: every game in the lobby with its own drawing, Lab Sort first. (High Likelihood's line on
+the mock's five Exam 1 questions said "each from a different Exam 1 lecture"; Sam, 2026-11-11: "draw at random", so it now
+says they're drawn at random, fixed on the live page in [#312](https://github.com/smcmurry6-source/study-hubs/pull/312).)
 
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
 

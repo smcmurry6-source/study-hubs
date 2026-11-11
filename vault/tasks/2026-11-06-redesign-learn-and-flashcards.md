@@ -14,6 +14,10 @@ pr:
 
 ## Goal
 
+Still wanted (Sam, 2026-11-11, on the new Heme & Endo Exam 2: "i had previously asked for a quizlet learn mode and an anki
+flashcard mode ... did that get lost"). It wasn't built in phase 1 or 2; it's this task, in a session of its own
+([run-a-redesign-session](../how-to/run-a-redesign-session.md)).
+
 Sam's idea (2026-11-06): "a toggle in the question bank to switch the format to Quizlet Learn or Anki flashcards." The
 Questions view gets a three-way toggle, **Study as: Questions · Learn · Flashcards**. It changes how the questions the
 filter panel picked are studied: as the cards they are now, in rounds that end when every question is mastered (like

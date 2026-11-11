@@ -209,7 +209,15 @@ until then: outside a preview the page sends the visitor to the live hub. Until 
   four professors teach the lectures.
 - Its art: tint `#a83232`, emblem and masthead (phase 0) and the six arcade lobby drawings (phase 2: `tools/figures/site/arcade.mjs`,
   `heSort()` to `heCross()`, from `HEE2_SKIN`), built into `widget/hub-art/heme-endo-exam2.js` by `node tools/figures/site/build.mjs`.
-- No Timmy Time yet, so the new Home and More have no episode card; when one is made, `SH_PODCAST` reaches `core.json` by itself.
+- **Switched in only if the release beats 11/13** (Sam, 2026-11-11): its exam is Friday, November 13, 10 am; if the release
+  comes later, the live page stays to the end.
+- **Each lecture has its own color** (Sam, 2026-11-11: "more color"), from the engine (`LCOL`, `lc()`, `.lc-0` to `.lc-9` in
+  `widget/hub.css`, by the lecture's place in `LECTURES`): L11 blue, L12a orange, L12b teal, L13 magenta, L14 olive, L15
+  violet, L16 mustard, and the Refresher grey (review only). Adding a lecture at the end keeps the others' colors; one
+  inserted earlier shifts the rest. **Notes done** (`STATE.read`, this device only) fills a lecture's badge.
+- No Timmy Time yet, so the new Home and More have no episode card. When one is made, `/podcast` wires the live hub and
+  then runs `node tools/hub-next/build.mjs --hub heme-endo-exam2`, so `SH_PODCAST` (its lore comments included) reaches
+  `core.json`; the engine draws the Home card, the More tile and the player with likes, dislikes and comments.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/heme-endo-exam2/next/`).
 
 ## Pending
